@@ -26,24 +26,4 @@
 	&:active {
 		color: $black;
 	}
-
-	// This variant is used in inline situations, like Buttons, Social Links, Navigation Menu.
-	&.block-list-appender__toggle {
-		display: flex;
-		flex-direction: row;
-		box-shadow: none;
-		height: $button-size-xs;
-		width: $button-size-xs;
-		// Important to override styles form Button component.
-		padding: 0 !important;
-
-		& > svg {
-			width: $button-size-xs;
-			height: $button-size-xs;
-			background-color: var(--wp-admin-theme-color);
-			color: $white;
-			border-radius: $radius-block-ui;
-			flex: 1 0 auto;
-		}
-	}
 }

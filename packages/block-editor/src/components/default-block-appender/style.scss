@@ -1,3 +1,12 @@
+/**
+ * Default block appender.
+ *
+ * This component shows up in 3 places:
+ * - the black plus that sits at the end of the canvas, if the last block isn't a paragraph
+ * - on the right, inside empty paragraphs
+ * - absolute positioned and blue inside nesting containers
+ */
+
 .block-editor-default-block-appender {
 	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
 
@@ -23,32 +32,104 @@
 	}
 }
 
-// Empty / default block side inserter.
-.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter, // Empty paragraph, needs specificity to override inherited popover styles.
-.block-editor-default-block-appender .block-editor-inserter { // Empty appender.
+// The black plus that shows up on the right side of an empty paragraph block, or the initial appender
+// that exists only on empty documents.
+.block-editor-default-block-appender .block-editor-inserter,
+.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter { // This needs specificity to override inherited popover styles.
 	position: absolute;
 	top: 0;
-	height: $button-size-small + $grid-unit-10;
-
-	.block-editor-inserter__toggle {
-		margin-right: 0;
-	}
-}
-
-// Left side.
-.block-editor-block-list__empty-block-inserter,
-.block-editor-default-block-appender .block-editor-inserter {
-	@include break-small {
-		display: flex;
-		height: 100%;
-	}
+	right: 0;
+	line-height: 0;
 
 	&:disabled {
 		display: none;
 	}
 }
 
-.block-editor-default-block-appender.has-visible-prompt .block-editor-inserter,
-.block-editor-block-list__empty-block-inserter {
+
+/**
+ * Fixed position appender.
+ * These styles apply to all in-canvas inserters that exist inside nesting containers.
+ */
+
+.block-editor-block-list__block .block-list-appender {
+	position: absolute;
+	list-style: none;
+	padding: 0;
+	z-index: z-index(".block-editor-block-list__block .block-list-appender");
+	top: 0;
+	transform: translateY(-0.5px);
 	right: 0;
+	@include break-small() {
+		right: -($button-size-xs - $border-width);
+	}
+
+	// These rules needs extra specificity as it's affected by DOM rules.
+	&.block-list-appender {
+		margin: 0;
+		line-height: 0;
+	}
+
+	// Make it smaller and blue to match focus styles.
+	// @todo: these are currently two separate components. Since we're now
+	// treating them the same, one or both can be retired.
+	.block-editor-inserter__toggle.components-button.has-icon,
+	.block-list-appender__toggle {
+		display: flex;
+		flex-direction: row;
+		box-shadow: none;
+		height: $button-size-xs;
+		width: $button-size-xs;
+
+		// Important to override styles form Button component.
+		padding: 0 !important;
+
+		// Unset from .block-editor-inserter__toggle.
+		background: none;
+		min-width: $button-size-xs;
+
+		& > svg {
+			width: $button-size-xs;
+			height: $button-size-xs;
+			background-color: var(--wp-admin-theme-color);
+			color: $white;
+			border-radius: $radius-block-ui;
+			flex: 1 0 auto;
+		}
+	}
+
+	// This content only shows up inside the empty appender.
+	.block-editor-default-block-appender__content {
+		display: none;
+	}
+
+	// These could be avoided by employing a :not(:only-child) on the parent,
+	// but this should be more performant.
+	// @todo: These styles can almost certainly be refactored away we refactor
+	// the markup and classes of the component itself. The rules provide some
+	// baseline styles for when the block is the only one inside.
+	&:only-child {
+		position: relative;
+		right: auto;
+		align-self: center;
+		list-style: none;
+		line-height: inherit;
+
+		.block-editor-default-block-appender__content {
+			display: block;
+		}
+
+		// These styles effectively unset the blue styles again.
+		.block-editor-inserter__toggle.components-button.has-icon {
+			height: $button-size-small;
+			width: $button-size-small;
+
+			& > svg {
+				width: $button-size-small;
+				height: $button-size-small;
+				background-color: $gray-900;
+			}
+		}
+	}
 }
+
