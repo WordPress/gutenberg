@@ -1,18 +1,43 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
-	Button,
 	FlexItem,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+import isTemplateRemovable from '../../utils/is-template-removable';
+
+function Actions( { template, onClose } ) {
+	const { removeTemplate } = useDispatch( editSiteStore );
+
+	return (
+		<MenuGroup>
+			<MenuItem
+				onClick={ () => {
+					removeTemplate( template );
+					onClose();
+				} }
+			>
+				{ __( 'Remove template' ) }
+			</MenuItem>
+		</MenuGroup>
+	);
+}
 
 export default function Table( { templateType } ) {
 	const { templates, isLoading, postType } = useSelect(
@@ -85,11 +110,20 @@ export default function Table( { templateType } ) {
 							{ template.theme }
 						</FlexItem>
 						<FlexItem className="edit-site-list-table-column">
-							<Button
-								icon={ moreVertical }
-								label={ __( 'Actions' ) }
-								iconSize={ 24 }
-							/>
+							{ isTemplateRemovable( template ) && (
+								<DropdownMenu
+									icon={ moreVertical }
+									label={ __( 'Actions' ) }
+									className="edit-site-list-table__actions"
+								>
+									{ ( { onClose } ) => (
+										<Actions
+											template={ template }
+											onClose={ onClose }
+										/>
+									) }
+								</DropdownMenu>
+							) }
 						</FlexItem>
 					</HStack>
 				</li>
