@@ -190,7 +190,11 @@ function ListView(
 	// for example, in the Block Editor,
 	// try to expand the block list tree.
 	useEffect( () => {
-		if ( ! hasFocus ) {
+		if (
+			! hasFocus &&
+			Array.isArray( selectedBlockParentClientIds ) &&
+			selectedBlockParentClientIds.length
+		) {
 			setExpandedState( {
 				type: 'expand',
 				clientIds: selectedBlockParentClientIds,

@@ -16,7 +16,6 @@ export default function useListViewClientIds( blocks ) {
 				getDraggedBlockClientIds,
 				getSelectedBlockClientIds,
 				__unstableGetClientIdsTree,
-				getSelectedBlockClientIds,
 				getBlockParents,
 			} = select( blockEditorStore );
 			const selectedBlockClientIds = getSelectedBlockClientIds();
