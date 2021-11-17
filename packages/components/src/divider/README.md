@@ -9,15 +9,19 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import { Divider, FormGroup, ListGroup } from '@wordpress/components/ui';
+import {
+	__experimentalDivider as Divider,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
+} from `@wordpress/components`;
 
 function Example() {
 	return (
-		<ListGroup>
-			<FormGroup>...</FormGroup>
+		<VStack spacing={4}>
+			<Text>Some text here</Text>
 			<Divider />
-			<FormGroup>...</FormGroup>
-		</ListGroup>
+			<Text>Some more text here</Text>
+		</VStack>
 	);
 }
 ```
