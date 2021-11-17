@@ -129,7 +129,7 @@ const DimensionControls = ( {
 					resetAllFilter={ () => ( {
 						scale: 'cover',
 					} ) }
-					isShownByDefault={ !! height }
+					isShownByDefault={ true }
 					panelId={ clientId }
 				>
 					<ToggleGroupControl
