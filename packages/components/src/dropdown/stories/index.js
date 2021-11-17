@@ -14,7 +14,7 @@ import {
  */
 import Dropdown from '../';
 import Button from '../../button';
-import MenuGroup from '../../menu-group';
+import { MenuGroup } from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
 
