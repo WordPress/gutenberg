@@ -31,6 +31,8 @@ const SCALE_OPTIONS = (
 	</>
 );
 
+const DEFAULT_SCALE = 'cover';
+
 const scaleHelp = {
 	cover: __(
 		'Image is scaled and cropped to fill the entire space without being distorted.'
@@ -74,12 +76,12 @@ const DimensionControls = ( {
 				onDeselect={ () =>
 					setAttributes( {
 						height: undefined,
-						scale: 'cover',
+						scale: DEFAULT_SCALE,
 					} )
 				}
 				resetAllFilter={ () => ( {
 					height: undefined,
-					scale: 'cover',
+					scale: DEFAULT_SCALE,
 				} ) }
 				isShownByDefault={ true }
 				panelId={ clientId }
@@ -119,15 +121,15 @@ const DimensionControls = ( {
 			</ToolsPanelItem>
 			{ !! height && (
 				<ToolsPanelItem
-					hasValue={ () => !! scale }
+					hasValue={ () => !! scale && scale !== DEFAULT_SCALE }
 					label={ scaleLabel }
 					onDeselect={ () =>
 						setAttributes( {
-							scale: 'cover',
+							scale: DEFAULT_SCALE,
 						} )
 					}
 					resetAllFilter={ () => ( {
-						scale: 'cover',
+						scale: DEFAULT_SCALE,
 					} ) }
 					isShownByDefault={ true }
 					panelId={ clientId }
