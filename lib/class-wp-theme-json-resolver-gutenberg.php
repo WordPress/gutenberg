@@ -226,7 +226,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		);
 
 		$cache_key = sprintf( 'wp_global_styles_post_type_%s', md5( serialize( $args ) ) );
-		$post_id = wp_cache_get( $cache_key );
+		$post_id   = wp_cache_get( $cache_key );
 		if ( false !== $post_id ) {
 			if ( (int) $post_id > 0 ) {
 				return get_post( $post_id, ARRAY_A );
