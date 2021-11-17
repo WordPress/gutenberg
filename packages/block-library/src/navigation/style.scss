@@ -325,12 +325,10 @@
 	}
 }
 
-// Allow the container to grow when space-between is applied.
-.items-justified-space-between {
-	.wp-block-navigation__container,
-	.wp-block-page-list {
-		flex-grow: 1;
-	}
+// Allow menu items to be spaced out by space-between when only navigation links are present.
+.wp-block-navigation__container:only-child,
+.wp-block-page-list:only-child {
+	flex-grow: 1;
 }
 
 
