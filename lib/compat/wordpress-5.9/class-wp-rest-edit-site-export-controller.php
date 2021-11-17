@@ -80,6 +80,7 @@ class WP_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 		header( 'Content-Length: ' . filesize( $filename ) );
 		flush();
 		readfile( $filename );
+		unlink( $filename );
 		exit;
 	}
 }
