@@ -45,6 +45,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		if ( preg_match( '#post_type = \'wp_global_styles\'#', $query ) ) {
 			$this->queries[] = $query;
 		}
+		return $query;
 	}
 
 	function test_translations_are_applied() {
@@ -268,7 +269,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_user_data_from_custom_post_type_does_not_use_uncached_queries() {
-		add_filter( 'template_root', array( $this, 'filter_db_query' ) );
+		add_filter( 'query', array( $this, 'filter_db_query' ) );
 		$query_count = count( $this->queries );
 		for ( $i = 0; $i < 3; $i++ ) {
 			WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_custom_post_type( wp_get_theme() );
