@@ -1,5 +1,24 @@
 == Changelog ==
 
+= 11.9.1 =
+
+### Bug Fixes
+
+#### Block Library
+- Gallery: Fix issue with columns and link destination not copying across when gallery updated to v2 format. ([36388](https://github.com/WordPress/gutenberg/pull/36388))
+
+#### Full Site Editing
+- Site editor: Add feature flag to toggle the new site editor sidebar. ([36516](https://github.com/WordPress/gutenberg/pull/36516))
+- Site editor: Prevent loading state from showing the admin menu. ([36455](https://github.com/WordPress/gutenberg/pull/36455))
+
+#### Testing
+- Cover Block: Fix regressions in opacity. ([36406](https://github.com/WordPress/gutenberg/pull/36406))
+- E2E: Add more Cover block tests ([36321](https://github.com/WordPress/gutenberg/pull/36321))
+
+
+
+
+
 = 11.9.0 =
 
 ### Features
