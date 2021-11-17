@@ -26,21 +26,21 @@ const MARGIN_DIRECTIONS: Record<
 };
 
 // Renders the correct margins given the Divider's `orientation` and the writing direction.
-// When both the generic `marign` and the specific `marginTop|marginBottom` props are defined,
+// When both the generic `margin` and the specific `marginStart|marginEnd` props are defined,
 // the more specific prop will take priority.
 const renderMargin = ( {
 	'aria-orientation': orientation = 'horizontal',
 	margin,
-	marginTop,
-	marginBottom,
+	marginStart,
+	marginEnd,
 }: Props ) =>
 	css(
 		rtl( {
 			[ MARGIN_DIRECTIONS[ orientation ].start ]: space(
-				marginTop ?? margin
+				marginStart ?? margin
 			),
 			[ MARGIN_DIRECTIONS[ orientation ].end ]: space(
-				marginBottom ?? margin
+				marginEnd ?? margin
 			),
 		} )()
 	);

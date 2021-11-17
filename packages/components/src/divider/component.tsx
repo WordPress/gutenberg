@@ -17,11 +17,46 @@ import {
 import { DividerView } from './styles';
 import type { Props } from './types';
 
+function useDeprecatedProps( {
+	marginBottom,
+	marginTop,
+	marginStart,
+	marginEnd,
+	...otherProps
+}: WordPressComponentProps< Props, 'hr', false > ) {
+	const propsToReturn: WordPressComponentProps< Props, 'hr', false > = {
+		...otherProps,
+	};
+
+	// Transform deprecated `marginTop` prop into `marginStart`.
+	let computedMarginStart = marginStart;
+	if ( marginTop ) {
+		computedMarginStart ??= marginTop;
+	}
+	if ( typeof computedMarginStart !== 'undefined' ) {
+		propsToReturn.marginStart = computedMarginStart;
+	}
+
+	// Transform deprecated `marginTop` prop into `marginStart`.
+	let computedMarginEnd = marginEnd;
+	if ( marginBottom ) {
+		computedMarginEnd ??= marginBottom;
+	}
+	if ( typeof computedMarginEnd !== 'undefined' ) {
+		propsToReturn.marginEnd = computedMarginEnd;
+	}
+
+	return propsToReturn;
+}
+
 function Divider(
 	props: WordPressComponentProps< Props, 'hr', false >,
 	forwardedRef: Ref< any >
 ) {
-	const contextProps = useContextSystem( props, 'Divider' );
+	const contextProps = useContextSystem(
+		useDeprecatedProps( props ),
+		'Divider'
+	);
 
 	return (
 		<Separator

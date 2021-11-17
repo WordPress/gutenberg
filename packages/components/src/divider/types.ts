@@ -11,15 +11,28 @@ import type { SpaceInput } from '../ui/utils/space';
 
 export interface OwnProps {
 	/**
-	 * Adjusts all margins.
+	 * Adjusts all margins on the inline dimension.
 	 */
 	margin?: SpaceInput;
 	/**
+	 * Adjusts the inline-start margin.
+	 */
+	marginStart?: SpaceInput;
+	/**
+	 * Adjusts the inline-end margin.
+	 */
+	marginEnd?: SpaceInput;
+
+	/**
 	 * Adjusts top margins.
+	 *
+	 * @deprecated
 	 */
 	marginTop?: SpaceInput;
 	/**
 	 * Adjusts bottom margins.
+	 *
+	 * @deprecated
 	 */
 	marginBottom?: SpaceInput;
 }
