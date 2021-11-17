@@ -22,12 +22,21 @@ const DEFAULT_COLUMNS = 2;
 const generateMenuItems = ( {
 	panelItems,
 	shouldReset,
+	currentMenuItems,
 }: ToolsPanelMenuItemsConfig ) => {
 	const menuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
 
 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
 		const group = isShownByDefault ? 'default' : 'optional';
-		menuItems[ group ][ label ] = shouldReset ? false : hasValue();
+
+		// If a menu item for this label already exists, do not overwrite its value.
+		// This can cause default controls that have been flagged as customized to
+		// lose their value.
+		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
+		const value =
+			existingItemValue !== undefined ? existingItemValue : hasValue();
+
+		menuItems[ group ][ label ] = shouldReset ? false : value;
 	} );
 
 	return menuItems;
@@ -62,7 +71,18 @@ export function useToolsPanel(
 	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
 
 	const registerPanelItem = ( item: ToolsPanelItem ) => {
-		setPanelItems( ( items ) => [ ...items, item ] );
+		setPanelItems( ( items ) => {
+			// If an item with this label is already registered, remove it first.
+			// This can happen when an item is moved between the default and optional
+			// groups.
+			const existingIndex = items.findIndex(
+				( oldItem ) => oldItem.label === item.label
+			);
+			if ( existingIndex !== -1 ) {
+				items.splice( existingIndex, 1 );
+			}
+			return [ ...items, item ];
+		} );
 	};
 
 	// Panels need to deregister on unmount to avoid orphans in menu state.
@@ -72,11 +92,16 @@ export function useToolsPanel(
 		// controls, e.g. both panels have a "padding" control, the
 		// deregistration of the first panel doesn't occur until after the
 		// registration of the next.
-		const index = panelItems.findIndex( ( item ) => item.label === label );
-
-		if ( index !== -1 ) {
-			setPanelItems( ( items ) => items.splice( index, 1 ) );
-		}
+		setPanelItems( ( items ) => {
+			const newItems = [ ...items ];
+			const index = newItems.findIndex(
+				( item ) => item.label === label
+			);
+			if ( index !== -1 ) {
+				newItems.splice( index, 1 );
+			}
+			return newItems;
+		} );
 	};
 
 	// Manage and share display state of menu items representing child controls.
@@ -87,11 +112,14 @@ export function useToolsPanel(
 
 	// Setup menuItems state as panel items register themselves.
 	useEffect( () => {
-		const items = generateMenuItems( {
-			panelItems,
-			shouldReset: false,
+		setMenuItems( ( prevState ) => {
+			const items = generateMenuItems( {
+				panelItems,
+				shouldReset: false,
+				currentMenuItems: prevState,
+			} );
+			return items;
 		} );
-		setMenuItems( items );
 	}, [ panelItems ] );
 
 	// Force a menu item to be checked.
@@ -100,14 +128,18 @@ export function useToolsPanel(
 	//.we need to update that when their value is customized.
 	const flagItemCustomization = (
 		label: string,
-		group: ToolsPanelMenuItemKey = 'default'
+		group: ToolsPanelMenuItemKey = 'default',
+		value: boolean = true
 	) => {
-		setMenuItems( {
-			...menuItems,
-			[ group ]: {
-				...menuItems[ group ],
-				[ label ]: true,
-			},
+		setMenuItems( ( items ) => {
+			const newState = {
+				...items,
+				[ group ]: {
+					...items[ group ],
+					[ label ]: value,
+				},
+			};
+			return newState;
 		} );
 	};
 

@@ -70,8 +70,8 @@ export function useToolsPanelItem(
 	// If this item represents a default control it will need to notify the
 	// panel when a custom value has been set.
 	useEffect( () => {
-		if ( isShownByDefault && isValueSet && ! wasValueSet ) {
-			flagItemCustomization( label );
+		if ( isShownByDefault && isValueSet !== wasValueSet ) {
+			flagItemCustomization( label, 'default', isValueSet );
 		}
 	}, [ isValueSet, wasValueSet, isShownByDefault, label ] );
 

@@ -124,7 +124,11 @@ export type ToolsPanelContext = {
 	hasMenuItems: boolean;
 	registerPanelItem: ( item: ToolsPanelItem ) => void;
 	deregisterPanelItem: ( label: string ) => void;
-	flagItemCustomization: ( label: string ) => void;
+	flagItemCustomization: (
+		label: string,
+		group: ToolsPanelMenuItemKey,
+		value: boolean
+	) => void;
 	isResetting: boolean;
 	shouldRenderPlaceholderItems: boolean;
 	areAllOptionalControlsHidden: boolean;
@@ -139,4 +143,5 @@ export type ToolsPanelControlsGroupProps = {
 export type ToolsPanelMenuItemsConfig = {
 	panelItems: ToolsPanelItem[];
 	shouldReset: boolean;
+	currentMenuItems?: ToolsPanelMenuItems;
 };
