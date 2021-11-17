@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Icon,
 	ToggleControl,
@@ -21,6 +21,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage, upload } from '@wordpress/icons';
 import { SVG, Path } from '@wordpress/primitives';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -40,7 +41,6 @@ function PostFeaturedImageDisplay( {
 	setAttributes,
 	context: { postId, postType, queryId },
 	noticeUI,
-	noticeOperations,
 } ) {
 	const isDescendentOfQueryLoop = !! queryId;
 	const { isLink, height, width, scale } = attributes;
@@ -90,10 +90,10 @@ function PostFeaturedImageDisplay( {
 		}
 	};
 
-	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
-	}
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const onUploadError = ( message ) => {
+		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
+	};
 
 	let image;
 	if ( ! featuredImage && isDescendentOfQueryLoop ) {
