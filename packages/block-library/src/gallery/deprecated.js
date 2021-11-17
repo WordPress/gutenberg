@@ -743,6 +743,7 @@ const v3 = {
 		if ( isGalleryV2Enabled() ) {
 			return runV2Migration( attributes );
 		}
+		return attributes;
 	},
 };
 const v2 = {
