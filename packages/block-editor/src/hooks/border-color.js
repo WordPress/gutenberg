@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ColorGradientControl from '../components/colors-gradients/control';
+import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import {
 	getColorClassName,
 	getColorObjectByColorValue,
@@ -46,13 +47,15 @@ export function BorderColorEdit( props ) {
 		attributes: { borderColor, style },
 		setAttributes,
 	} = props;
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const disableCustomColors = ! useSetting( 'color.custom' );
-	const disableCustomGradients = ! useSetting( 'color.customGradient' );
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const availableColors = colorGradientSettings.colors.reduce(
+		( colors, origin ) => colors.concat( origin.colors ),
+		[]
+	);
 	const [ colorValue, setColorValue ] = useState(
 		() =>
 			getColorObjectByAttributeValues(
-				colors,
+				availableColors,
 				borderColor,
 				style?.border?.color
 			)?.color
@@ -61,7 +64,10 @@ export function BorderColorEdit( props ) {
 	const onChangeColor = ( value ) => {
 		setColorValue( value );
 
-		const colorObject = getColorObjectByColorValue( colors, value );
+		const colorObject = getColorObjectByColorValue(
+			availableColors,
+			value
+		);
 		const newStyle = {
 			...style,
 			border: {
@@ -83,11 +89,10 @@ export function BorderColorEdit( props ) {
 		<ColorGradientControl
 			label={ __( 'Color' ) }
 			colorValue={ colorValue }
-			colors={ colors }
-			gradients={ undefined }
-			disableCustomColors={ disableCustomColors }
-			disableCustomGradients={ disableCustomGradients }
 			onColorChange={ onChangeColor }
+			clearable={ false }
+			__experimentalHasMultipleOrigins
+			{ ...colorGradientSettings }
 		/>
 	);
 }
