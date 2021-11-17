@@ -176,6 +176,7 @@ export default function BorderPanel( { name } ) {
 						disableCustomColors={ disableCustomColors }
 						disableCustomGradients={ disableCustomGradients }
 						onColorChange={ handleOnChange( setBorderColor ) }
+						clearable={ false }
 					/>
 				</ToolsPanelItem>
 			) }
