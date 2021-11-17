@@ -34,7 +34,7 @@ const DEPRECATED_LINK_DESTINATION_ATTACHMENT = 'post';
  * @return {number}           Default number of columns for the gallery.
  */
 export function defaultColumnsNumberV1( attributes ) {
-	return Math.min( 3, attributes.images.length );
+	return Math.min( 3, attributes?.images?.length );
 }
 
 /**
