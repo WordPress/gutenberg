@@ -25,3 +25,27 @@ function Example() {
 	);
 }
 ```
+
+## Props
+
+### `margin`: `number`
+
+Adjusts all margins on the inline dimension.
+
+- Required: No
+
+### `marginStart`: `number`
+
+Adjusts the inline-start margin.
+
+- Required: No
+
+### `marginEnd`: `number`
+
+Adjusts the inline-end margin.
+
+- Required: No
+
+### Inherited props
+
+`Divider` also inherits all of the [`Separator` props](https://reakit.io/docs/separator/).
