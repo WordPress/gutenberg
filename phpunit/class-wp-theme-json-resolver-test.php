@@ -291,5 +291,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		}
 		$query_count = count( $this->queries ) - $query_count;
 		$this->assertEquals( 0, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type' );
+		remove_filter( 'query', array( $this, 'filter_db_query' ) );
 	}
 }
