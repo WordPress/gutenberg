@@ -27,6 +27,11 @@
 	}
 }
 
+.edit-site-list-header__right {
+	// Creating a stacking context so that it won't be covered by title.
+	position: relative;
+}
+
 .edit-site {
 	.edit-site-list {
 		.interface-interface-skeleton__editor {

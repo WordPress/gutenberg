@@ -12,6 +12,7 @@ import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -73,9 +74,15 @@ export function initializeEditor( id, settings ) {
  *
  * @param {string} id           ID of the root element to render the screen in.
  * @param {string} templateType The type of the list. "wp_template" or "wp_template_part".
+ * @param {Object} settings     Editor settings.
  */
-export function initializeList( id, templateType ) {
+export function initializeList( id, templateType, settings ) {
 	const target = document.getElementById( id );
+
+	dispatch( editorStore ).updateEditorSettings( {
+		defaultTemplateTypes: settings.defaultTemplateTypes,
+		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
+	} );
 
 	render( <List templateType={ templateType } />, target );
 }
