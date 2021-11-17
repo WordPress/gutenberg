@@ -33,6 +33,22 @@ function gutenberg_wordpress_version_notice() {
 }
 
 /**
+ * Display a version notice and deactivate the Gutenberg plugin if use_balanceTags
+ * is actvated and WP < 5.9 as the new Gallery block is not compatible with this 
+ * combination
+ * 
+ * @since 12.0
+ */
+function gutenberg_wordpress_gallery_block_version_notice() {
+	echo '<div class="error"><p>';
+	/* translators: %s: Minimum required version */
+	printf( __( 'If you have the "correct invalidly nested XHTML automatically" Writing setting activated Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress, or turn off this setting before activating Gutenberg.', 'gutenberg' ), '5.9' );
+	echo '</p></div>';
+
+	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
+}
+
+/**
  * Display a build notice.
  *
  * @since 0.1.0
@@ -66,6 +82,13 @@ function gutenberg_pre_init() {
 	// X.Y for its major releases.
 	if ( version_compare( $version, '5.7', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
+		return;
+	}
+
+	// The Gallery block refactor in 12.0+ is not compatible with the use_balanceTags option
+	// in versions of WordPress < 5.9.
+	if ( version_compare( $version, '5.9', '<' ) && (int) get_option( 'use_balanceTags' ) === 1 ) {
+		add_action( 'admin_notices', 'gutenberg_wordpress_gallery_block_version_notice' );
 		return;
 	}
 
