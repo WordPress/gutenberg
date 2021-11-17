@@ -65,41 +65,15 @@ class WP_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 	 * @return WP_Error|void
 	 */
 	public function export() {
-		if ( ! class_exists( 'ZipArchive' ) ) {
-			return new WP_Error( __( 'Zip Export not supported.', 'gutenberg' ) );
-		}
-
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), 'edit-site-export' );
 
-		$zip = new ZipArchive();
-		$zip->open( $filename, ZipArchive::OVERWRITE );
-		$zip->addEmptyDir( 'theme' );
-		$zip->addEmptyDir( 'theme/block-templates' );
-		$zip->addEmptyDir( 'theme/block-template-parts' );
+		// Generate the export file.
+		$success = gutenberg_generate_edit_site_export_file( $filename );
 
-		// Load templates into the zip file.
-		$templates = gutenberg_get_block_templates();
-		foreach ( $templates as $template ) {
-			$template->content = _remove_theme_attribute_from_content( $template->content );
-
-			$zip->addFromString(
-				'theme/block-templates/' . $template->slug . '.html',
-				$template->content
-			);
+		if ( is_wp_error( $success ) ) {
+			return $success;
 		}
-
-		// Load template parts into the zip file.
-		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
-		foreach ( $template_parts as $template_part ) {
-			$zip->addFromString(
-				'theme/block-template-parts/' . $template_part->slug . '.html',
-				$template_part->content
-			);
-		}
-
-		// Save changes to the zip file.
-		$zip->close();
 
 		header( 'Content-Type: application/zip' );
 		header( 'Content-Disposition: attachment; filename=edit-site-export.zip' );
