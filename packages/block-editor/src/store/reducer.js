@@ -182,6 +182,19 @@ function getMutateSafeObject( original, working ) {
 }
 
 /**
+ * Returns true if the two object arguments have the same keys, or false
+ * otherwise.
+ *
+ * @param {Object} a First object.
+ * @param {Object} b Second object.
+ *
+ * @return {boolean} Whether the two objects have the same keys.
+ */
+export function hasSameKeys( a, b ) {
+	return isEqual( keys( a ), keys( b ) );
+}
+
+/**
  * Returns true if, given the currently dispatching action and the previously
  * dispatched action, the two actions are updating the same block attribute, or
  * false otherwise.
@@ -197,7 +210,7 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 		lastAction !== undefined &&
 		lastAction.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
 		isEqual( action.clientIds, lastAction.clientIds ) &&
-		isEqual( action.attributes, lastAction.attributes )
+		hasSameKeys( action.attributes, lastAction.attributes )
 	);
 }
 
