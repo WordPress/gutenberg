@@ -3,6 +3,9 @@
 /docs/designers-developers/developers           @mkaz @ajitbohra
 /docs/designers-developers/designers            @mkaz @ajitbohra
 
+# Schemas
+/schemas/json                                   @ajlende
+
 # Data
 /packages/api-fetch                             @nerrad @mmtr
 /packages/core-data                             @nerrad
