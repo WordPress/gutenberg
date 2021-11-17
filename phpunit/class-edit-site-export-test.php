@@ -1,13 +1,13 @@
 <?php
 /**
- * Test `gutenberg_edit_site_export` and its helper functions.
+ * Test `wp_generate_edit_site_export_file` and its helper functions.
  *
  * @package    Gutenberg
  */
 
 class Edit_Site_Export_Test extends WP_UnitTestCase {
-	function test_gutenberg_edit_site_export() {
-		$filename = gutenberg_generate_edit_site_export_file();
+	function test_wp_generate_edit_site_export_file() {
+		$filename = wp_generate_edit_site_export_file();
 		$this->assertTrue( file_exists( $filename ), 'zip file is created at the specified path' );
 		$this->assertTrue( filesize( $filename ) > 0, 'zip file is larger than 0 bytes' );
 
