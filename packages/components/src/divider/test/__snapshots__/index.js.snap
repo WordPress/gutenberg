@@ -3,9 +3,9 @@
 exports[`props should render correctly 1`] = `
 .emotion-0 {
   border-color: rgba(0, 0, 0, 0.1);
+  margin: 0;
   border-width: 0 0 1px 0;
   height: 0;
-  margin: 0;
   width: auto;
 }
 
