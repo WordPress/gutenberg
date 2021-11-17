@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -31,15 +26,15 @@ export function useMenuGroup(
 		...otherProps
 	} = useContextSystem( props, 'MenuGroup' );
 
-	const classNames = classnames( className, 'components-menu-group' );
 	const cx = useCx();
 	const menuGroupClassName = useMemo( () => {
 		return cx(
 			styles.MenuGroup,
 			hideSeparator && styles.MenuGroupWithHiddenSeparator,
-			classNames
+			className
 		);
 	}, [ className, hideSeparator ] );
+
 	const menuGroupLabelClassName = useMemo( () => {
 		return cx( styles.MenuGroupLabel, 'components-menu-group__label' );
 	}, [] );

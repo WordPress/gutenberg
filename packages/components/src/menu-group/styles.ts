@@ -10,15 +10,19 @@ import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
 export const MenuGroup = css`
-	margin-top: ${ space( 2 ) };
-	padding-top: ${ space( 2 ) };
-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 900 ] };
+	& + .components-menu-group {
+		margin-top: ${ space( 2 ) };
+		padding-top: ${ space( 2 ) };
+		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 900 ] };
+	}
 `;
 
 export const MenuGroupWithHiddenSeparator = css`
-	border-top: none;
-	margin-top: 0;
-	padding-top: 0;
+	& + .components-menu-group {
+		border-top: none;
+		margin-top: 0;
+		padding-top: 0;
+	}
 `;
 
 export const MenuGroupLabel = css`

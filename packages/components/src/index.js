@@ -86,7 +86,7 @@ export {
 } from './item-group';
 export { default as __experimentalInputControl } from './input-control';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
-export { default as MenuGroup } from './menu-group';
+export { MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
 export { default as MenuItemsChoice } from './menu-items-choice';
 export { default as Modal } from './modal';
