@@ -255,7 +255,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$user_cpt    = get_post( $cpt_post_id, ARRAY_A );
 		}
 		$cache_expiration = $user_cpt ? DAY_IN_SECONDS : HOUR_IN_SECONDS;
-		wp_cache_add( $cache_key, $user_cpt ? $user_cpt['ID'] : -1, '', $cache_expiration );
+		wp_cache_set( $cache_key, $user_cpt ? $user_cpt['ID'] : -1, '', $cache_expiration );
 
 		return $user_cpt;
 	}
