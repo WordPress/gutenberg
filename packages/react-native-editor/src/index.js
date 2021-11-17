@@ -21,7 +21,10 @@ import {
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 
 const reactNativeSetup = () => {
-	LogBox.ignoreLogs( [ /Require\scycle:|lineHeight/ ] );
+	LogBox.ignoreLogs( [
+		'Require cycle:', // TODO: Refactor to remove require cycles
+		'lineHeight', // TODO: Remove lineHeight warning from Aztec
+	] );
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 };
