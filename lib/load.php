@@ -71,6 +71,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-url-details-controller.php';
 	}
 
+	if ( ! class_exists( 'WP_REST_Edit_Site_Export_Controller' ) ) {
+		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-edit-site-export-controller.php';
+	}
+
 	require __DIR__ . '/rest-api.php';
 }
 
