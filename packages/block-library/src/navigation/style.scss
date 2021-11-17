@@ -345,6 +345,13 @@
 		align-items: var(--layout-align, initial);
 	}
 
+	// If the responsive wrapper is present but overlay is not open,
+	// overlay styles shouldn't apply.
+	&:not(.is-menu-open.is-menu-open) {
+		color: inherit !important;
+		background-color: inherit !important;
+	}
+
 	// Overlay menu.
 	// Provide an opinionated default style for menu items inside.
 	// Inherit as much as we can regarding colors, fonts, sizes,
@@ -432,9 +439,9 @@
 
 		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
-		// @todo: We should revisit this so that the overlay colors can be applied, instead of the background.
 		.wp-block-navigation-item .wp-block-navigation__submenu-container,
-		.wp-block-navigation-item {
+		.wp-block-navigation-item,
+		.wp-block-page-list {
 			color: inherit !important;
 			background: transparent !important;
 		}
