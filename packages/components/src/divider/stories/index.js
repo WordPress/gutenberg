@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { number } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
  */
+import { Text } from '../../text';
 import { Divider } from '..';
 
 export default {
@@ -16,23 +18,43 @@ export default {
 	},
 };
 
-const BlackDivider = ( props ) => (
-	<Divider { ...props } style={ { borderColor: 'black' } } />
-);
+// make the border color black to give higher contrast and help it appear in storybook better
+const BlackDivider = styled( Divider )`
+	border-color: #000;
+`;
 
-export const _default = () => {
+const VerticalWrapper = styled.div`
+	display: flex;
+	align-items: stretch;
+	justify-content: start;
+`;
+
+export const Horizontal = () => {
 	const props = {
-		margin: number( 'margin', 0 ),
+		margin: number( 'margin', 2 ),
+		marginStart: number( 'marginStart', undefined ),
+		marginEnd: number( 'marginEnd', undefined ),
 	};
-	// make the border color black to give higher contrast and help it appear in storybook better
-	return <BlackDivider { ...props } />;
+	return (
+		<div>
+			<Text>Some text before the divider</Text>
+			<BlackDivider { ...props } />
+			<Text>Some text after the divider</Text>
+		</div>
+	);
 };
 
-export const splitMargins = () => {
+export const Vertical = () => {
 	const props = {
-		marginTop: number( 'marginTop', 0 ),
-		marginBottom: number( 'marginBottom', 0 ),
+		margin: number( 'margin', 2 ),
+		marginStart: number( 'marginStart', undefined ),
+		marginEnd: number( 'marginEnd', undefined ),
 	};
-
-	return <BlackDivider { ...props } />;
+	return (
+		<VerticalWrapper>
+			<Text>Some text before the divider</Text>
+			<BlackDivider orientation="vertical" { ...props } />
+			<Text>Some text after the divider</Text>
+		</VerticalWrapper>
+	);
 };
