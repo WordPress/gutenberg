@@ -214,6 +214,19 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 	);
 }
 
+/**
+ * Returns true if the currently dispatched action is modifying the
+ * content block attribute
+ *
+ * @param {Object} action Currently dispatching action.
+ *
+ * @return {boolean} Whether or not actions are updating block content
+ */
+export function isUpdatingContent( action ) {
+	const { attributes } = action;
+	return Boolean( attributes.content );
+}
+
 function buildBlockTree( state, blocks ) {
 	const result = {};
 	const stack = [ ...blocks ];
@@ -526,11 +539,15 @@ function withPersistentBlockChange( reducer ) {
 			};
 		}
 
+		const shouldPersistBlockAttributeUpdates =
+			! isUpdatingSameBlockAttribute( action, lastAction ) ||
+			! isUpdatingContent( action );
+
 		nextState = {
 			...nextState,
 			isPersistentChange: isExplicitPersistentChange
 				? ! markNextChangeAsNotPersistent
-				: ! isUpdatingSameBlockAttribute( action, lastAction ),
+				: shouldPersistBlockAttributeUpdates,
 		};
 
 		// In comparing against the previous action, consider only those which
