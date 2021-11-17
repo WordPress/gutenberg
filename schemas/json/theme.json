@@ -312,269 +312,263 @@
 		},
 		"settingsBlocksPropertiesComplete": {
 			"type": "object",
-			"allOf": [
-				{
-					"properties": {
-						"core/archives": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/audio": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/block": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/button": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/buttons": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/calendar": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/categories": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/code": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/column": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/columns": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/comment-author-name": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/comment-author-avatar": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/comment-content": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/comment-date": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/comment-edit-link": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/comment-reply-link": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/comment-template": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/comments-query-loop": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/cover": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/embed": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/file": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/freeform": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/gallery": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/group": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/heading": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/home-link": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/html": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/image": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/latest-comments": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/latest-posts": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/list": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/loginout": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/media-text": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/missing": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/more": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/navigation": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/navigation-link": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/nextpage": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/page-list": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/paragraph": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-author": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-comments": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-comments-count": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-comments-form": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-comments-link": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-content": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-date": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-excerpt": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-featured-image": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-navigation-link": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-template": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-terms": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/post-title": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/preformatted": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/pullquote": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/query": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/query-pagination": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/query-pagination-next": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/query-pagination-numbers": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/query-pagination-previous": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/query-title": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/quote": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/rss": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/search": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/separator": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/shortcode": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/site-logo": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/site-tagline": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/site-title": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/social-link": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/social-links": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/spacer": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/table": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/table-of-contents": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/tag-cloud": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/template-part": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/term-description": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/text-columns": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/verse": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/video": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/widget-area": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/legacy-widget": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						},
-						"core/widget-group": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						}
-					}
+			"properties": {
+				"core/archives": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				{
-					"patternProperties": {
-						"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
-							"$ref": "#/definitions/settingsPropertiesComplete"
-						}
-					},
-					"additionalProperties": false
+				"core/audio": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/block": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/button": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/buttons": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/calendar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/categories": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/code": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/column": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/columns": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-author-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-content": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-date": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-edit-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-reply-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-query-loop": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/cover": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/embed": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/file": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/freeform": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/gallery": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/group": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/heading": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/home-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/html": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/image": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/latest-comments": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/latest-posts": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/list": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/loginout": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/media-text": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/missing": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/more": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/navigation": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/navigation-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/nextpage": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/page-list": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/paragraph": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-author": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comments": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comments-count": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comments-form": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comments-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-content": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-date": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-excerpt": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-featured-image": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-navigation-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-terms": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/preformatted": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/pullquote": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-pagination": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-pagination-next": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-pagination-numbers": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-pagination-previous": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/quote": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/rss": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/search": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/separator": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/shortcode": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/site-logo": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/site-tagline": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/site-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/social-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/social-links": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/spacer": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/table": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/table-of-contents": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/tag-cloud": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/template-part": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/term-description": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/text-columns": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/verse": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/video": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/widget-area": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/legacy-widget": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/widget-group": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				}
-			]
+			},
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				}
+			},
+			"additionalProperties": false
 		},
 		"settingsCustomAdditionalProperties": {
 			"type": "object",
@@ -780,269 +774,263 @@
 		},
 		"stylesBlocksPropertiesComplete": {
 			"type": "object",
-			"allOf": [
-				{
-					"properties": {
-						"core/archives": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/audio": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/block": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/button": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/buttons": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/calendar": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/categories": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/code": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/column": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/columns": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/comment-author-name": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/comment-author-avatar": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/comment-content": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/comment-date": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/comment-edit-link": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/comment-reply-link": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/comment-template": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/comments-query-loop": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/cover": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/embed": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/file": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/freeform": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/gallery": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/group": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/heading": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/home-link": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/html": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/image": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/latest-comments": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/latest-posts": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/list": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/loginout": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/media-text": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/missing": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/more": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/navigation": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/navigation-link": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/nextpage": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/page-list": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/paragraph": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-author": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-comments": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-comments-count": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-comments-form": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-comments-link": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-content": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-date": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-excerpt": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-featured-image": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-navigation-link": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-template": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-terms": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/post-title": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/preformatted": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/pullquote": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/query": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/query-pagination": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/query-pagination-next": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/query-pagination-numbers": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/query-pagination-previous": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/query-title": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/quote": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/rss": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/search": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/separator": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/shortcode": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/site-logo": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/site-tagline": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/site-title": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/social-link": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/social-links": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/spacer": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/table": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/table-of-contents": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/tag-cloud": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/template-part": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/term-description": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/text-columns": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/verse": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/video": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/widget-area": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/legacy-widget": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						},
-						"core/widget-group": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						}
-					}
+			"properties": {
+				"core/archives": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				{
-					"patternProperties": {
-						"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-						}
-					},
-					"additionalProperties": false
+				"core/audio": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/block": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/button": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/buttons": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/calendar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/categories": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/code": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/column": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/columns": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-author-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-content": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-date": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-edit-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-reply-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-query-loop": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/cover": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/embed": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/file": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/freeform": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/gallery": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/group": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/heading": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/home-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/html": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/image": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/latest-comments": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/latest-posts": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/loginout": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/media-text": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/missing": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/more": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/navigation": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/navigation-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/nextpage": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/page-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/paragraph": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-author": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comments": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comments-count": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comments-form": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comments-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-content": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-date": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-excerpt": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-featured-image": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-navigation-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-terms": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/preformatted": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/pullquote": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-pagination": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-pagination-next": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-pagination-numbers": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-pagination-previous": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/quote": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/rss": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/search": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/separator": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/shortcode": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/site-logo": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/site-tagline": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/site-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/social-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/social-links": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/spacer": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/table": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/table-of-contents": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tag-cloud": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/template-part": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/term-description": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/text-columns": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/verse": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/video": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/widget-area": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/legacy-widget": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/widget-group": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				}
-			]
+			},
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				}
+			},
+			"additionalProperties": false
 		},
 		"stylesPropertiesAndElementsComplete": {
 			"type": "object",
