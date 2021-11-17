@@ -136,6 +136,14 @@ export const ToolsPanelItem = css`
 		}
 	}
 
+	/**
+	 * The targeting of .components-custom-select-control__label here is a
+	 * temporary measure only.
+	 *
+	 * It should be replaced once CustomSelectControl component has been
+	 * refactored and can be targeted via component interpolation.
+	 */
+	.components-custom-select-control__label,
 	${ BaseControlLabel } {
 		line-height: 1.4em;
 	}
