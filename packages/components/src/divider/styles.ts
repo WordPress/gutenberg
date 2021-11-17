@@ -8,29 +8,64 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { space } from '../ui/utils/space';
-import CONFIG from '../utils/config-values';
-import type { OwnProps } from './types';
+import { CONFIG, rtl } from '../utils';
+import type { Props } from './types';
 
-const renderMargin = ( { margin, marginTop, marginBottom }: OwnProps ) => {
-	if ( typeof margin !== 'undefined' ) {
-		return css( {
-			marginBottom: space( margin ),
-			marginTop: space( margin ),
-		} );
-	}
+const MARGIN_DIRECTIONS: Record<
+	NonNullable< Props[ 'orientation' ] >,
+	Record< 'start' | 'end', string >
+> = {
+	vertical: {
+		start: 'marginLeft',
+		end: 'marginRight',
+	},
+	horizontal: {
+		start: 'marginTop',
+		end: 'marginBottom',
+	},
+};
 
+// Renders the correct margins given the Divider's `orientation` and the writing direction.
+// When both the generic `marign` and the specific `marginTop|marginBottom` props are defined,
+// the more specific prop will take priority.
+const renderMargin = ( {
+	'aria-orientation': orientation = 'horizontal',
+	margin,
+	marginTop,
+	marginBottom,
+}: Props ) =>
+	css(
+		rtl( {
+			[ MARGIN_DIRECTIONS[ orientation ].start ]: space(
+				marginTop ?? margin
+			),
+			[ MARGIN_DIRECTIONS[ orientation ].end ]: space(
+				marginBottom ?? margin
+			),
+		} )()
+	);
+
+const renderBorderWidth = ( {
+	'aria-orientation': orientation = 'horizontal',
+}: Props ) => {
 	return css( {
-		marginTop: space( marginTop ),
-		marginBottom: space( marginBottom ),
+		borderWidth: orientation === 'vertical' ? '0 1px 0 0' : '0 0 1px 0',
 	} );
 };
 
-export const DividerView = styled.hr< OwnProps >`
-	border-color: ${ CONFIG.colorDivider };
-	border-width: 0 0 1px 0;
-	height: 0;
-	margin: 0;
-	width: auto;
+const renderSize = ( {
+	'aria-orientation': orientation = 'horizontal',
+}: Props ) =>
+	css( {
+		height: orientation === 'vertical' ? 'auto' : 0,
+		width: orientation === 'vertical' ? 0 : 'auto',
+	} );
 
+export const DividerView = styled.hr< Props >`
+	border-color: ${ CONFIG.colorDivider };
+	margin: 0;
+
+	${ renderBorderWidth }
+	${ renderSize }
 	${ renderMargin }
 `;
