@@ -65,14 +65,11 @@ class WP_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 	 * @return WP_Error|void
 	 */
 	public function export() {
-		// Create ZIP file in the temporary directory.
-		$filename = tempnam( get_temp_dir(), 'edit-site-export' );
-
 		// Generate the export file.
-		$success = gutenberg_generate_edit_site_export_file( $filename );
+		$filename = gutenberg_generate_edit_site_export_file();
 
-		if ( is_wp_error( $success ) ) {
-			return $success;
+		if ( is_wp_error( $filename ) ) {
+			return $filename;
 		}
 
 		header( 'Content-Type: application/zip' );

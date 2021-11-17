@@ -10,17 +10,21 @@
  * template parts from the site editor at the
  * specified path in a ZIP file.
  *
- * @param string $filename path of the ZIP file.
- *
- * @return WP_Error|bool
+ * @return WP_Error|string Path of the ZIP file or error on failure.
  */
-function gutenberg_generate_edit_site_export_file( $filename ) {
+function gutenberg_generate_edit_site_export_file() {
 	if ( ! class_exists( 'ZipArchive' ) ) {
-		return new WP_Error( 'Zip Export not supported.' );
+		return new WP_Error( __( 'Zip Export not supported.', 'gutenberg' ) );
 	}
 
+	$obscura  = wp_generate_password( 12, false, false );
+	$filename = get_temp_dir() . 'edit-site-export-' . $obscura . '.zip';
+
 	$zip = new ZipArchive();
-	$zip->open( $filename, ZipArchive::OVERWRITE );
+	if ( true !== $zip->open( $filename, ZipArchive::CREATE ) ) {
+		return new WP_Error( __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
+	}
+
 	$zip->addEmptyDir( 'theme' );
 	$zip->addEmptyDir( 'theme/block-templates' );
 	$zip->addEmptyDir( 'theme/block-template-parts' );
@@ -48,5 +52,5 @@ function gutenberg_generate_edit_site_export_file( $filename ) {
 	// Save changes to the zip file.
 	$zip->close();
 
-	return true;
+	return $filename;
 }
