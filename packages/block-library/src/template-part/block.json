@@ -22,15 +22,7 @@
 	},
 	"supports": {
 		"align": true,
-		"html": false,
-		"color": {
-			"gradients": true,
-			"link": true
-		},
-		"spacing": {
-			"padding": true
-		},
-		"__experimentalLayout": true
+		"html": false
 	},
 	"editorStyle": "wp-block-template-part-editor"
 }
