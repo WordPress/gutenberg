@@ -48,7 +48,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 			'status'  => 'approve',
 		);
 
-		// We are not taking into account nested comments yet
+		// We don't count nested comments yet.
 		$comment_count = get_comments( $top_level_args );
 
 		$comment_args['offset'] = ( ceil( $comment_count / $per_page ) - 1 ) * $per_page;
@@ -78,7 +78,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 }
 
 /**
- * Registers the `core/comment-template` block on the server.
+ * Registers the `core/comment-teOrmplate` block on the server.
  */
 function register_block_core_comment_template() {
 	register_block_type_from_metadata(
