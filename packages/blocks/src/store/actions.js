@@ -46,7 +46,8 @@ function processBlockType( blockType ) {
 	const settings = applyFilters(
 		'blocks.registerBlockType',
 		{ ...blockType },
-		name
+		name,
+		null
 	);
 
 	if ( settings.deprecated ) {
@@ -64,7 +65,8 @@ function processBlockType( blockType ) {
 						...omit( blockType, DEPRECATED_ENTRY_KEYS ),
 						...deprecation,
 					},
-					name
+					name,
+					deprecation
 				),
 				DEPRECATED_ENTRY_KEYS
 			)
