@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	store as coreDataStore,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -43,6 +40,7 @@ export default function useNavigationMenu( slug ) {
 
 			let navigationMenu = null;
 
+			console.log( 'TEST' );
 			if ( slug ) {
 				navigationMenu = getEditedEntityRecord(
 					...navigationMenuSingleArgs
@@ -51,18 +49,30 @@ export default function useNavigationMenu( slug ) {
 					! navigationMenu?.id &&
 					! created /* && hasResolvedNavigationMenu */
 				) {
+					console.log( 'WELL IM CREATING A NEW ENTITY! WHY?!' );
 					setCreated( true );
 					const record = {
-						slug: slug,
+						slug,
 						name: slug,
 						post_name: slug,
+						status: 'publish',
 					};
+					dispatch( coreStore ).receiveEntityRecords(
+						'postType',
+						'wp_navigation',
+						[ { ...record, id: slug } ]
+					);
 					dispatch( coreStore )
 						.saveEntityRecord( 'postType', 'wp_navigation', record )
-					dispatch( coreStore )
-						.receiveEntityRecords( 'postType', 'wp_navigation', [
-							{ ...record, id: slug },
-						] )
+						.then( ( createdRecord ) => {
+							dispatch(
+								coreStore
+							).receiveEntityRecords(
+								'postType',
+								'wp_navigation',
+								[ createdRecord ]
+							);
+						} );
 					navigationMenu = getEditedEntityRecord(
 						...navigationMenuSingleArgs
 					);

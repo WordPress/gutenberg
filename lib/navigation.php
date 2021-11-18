@@ -321,5 +321,5 @@ function gutenberg_set_unique_slug_on_create_navigation_post( $post_id ) {
 	}
 }
 
-add_action( 'save_post_wp_navigation', 'gutenberg_set_unique_slug_on_create_navigation_post' );
+//add_action( 'save_post_wp_navigation', 'gutenberg_set_unique_slug_on_create_navigation_post' );
 

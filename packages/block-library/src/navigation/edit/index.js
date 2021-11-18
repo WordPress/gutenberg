@@ -265,6 +265,7 @@ function Navigation( {
 	const area = useTemplatePartArea( isDisabled ? undefined : clientId );
 	const oldSlug = attributes.slug;
 	useEffect( () => {
+		console.log( { oldSlug, areaSlug: area?.area } );
 		if ( ! oldSlug ) {
 			const newSlug = area?.area
 				? `wp-${ area.area }-menu`
