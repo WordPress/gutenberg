@@ -7,7 +7,6 @@ import {
 	ToggleControl,
 	PanelBody,
 	Placeholder,
-	withNotices,
 	Button,
 } from '@wordpress/components';
 import {
@@ -53,7 +52,6 @@ function PostFeaturedImageDisplay( {
 	attributes,
 	setAttributes,
 	context: { postId, postType, queryId },
-	noticeUI,
 } ) {
 	const isDescendentOfQueryLoop = !! queryId;
 	const { isLink, height, width, scale } = attributes;
@@ -110,7 +108,6 @@ function PostFeaturedImageDisplay( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onError={ onUploadError }
 				placeholder={ placeholder }
-				notices={ noticeUI }
 				mediaLibraryButton={ ( { open } ) => {
 					return (
 						<Button
@@ -176,12 +173,10 @@ function PostFeaturedImageDisplay( {
 	);
 }
 
-const PostFeaturedImageWithNotices = withNotices( PostFeaturedImageDisplay );
-
 export default function PostFeaturedImageEdit( props ) {
 	const blockProps = useBlockProps();
 	if ( ! props.context?.postId ) {
 		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
-	return <PostFeaturedImageWithNotices { ...props } />;
+	return <PostFeaturedImageDisplay { ...props } />;
 }
