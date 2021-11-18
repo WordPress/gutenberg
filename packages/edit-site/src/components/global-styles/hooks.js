@@ -6,7 +6,7 @@ import { get, cloneDeep, set, isEqual, has } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { useContext, useCallback, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
@@ -225,19 +225,28 @@ export function useColorsPerOrigin( name ) {
 		const result = [];
 		if ( themeColors && themeColors.length ) {
 			result.push( {
-				name: __( 'Theme' ),
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
 				colors: themeColors,
 			} );
 		}
 		if ( defaultColors && defaultColors.length ) {
 			result.push( {
-				name: __( 'Default' ),
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
 				colors: defaultColors,
 			} );
 		}
 		if ( customColors && customColors.length ) {
 			result.push( {
-				name: __( 'Custom' ),
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
 				colors: customColors,
 			} );
 		}
@@ -253,19 +262,28 @@ export function useGradientsPerOrigin( name ) {
 		const result = [];
 		if ( themeGradients && themeGradients.length ) {
 			result.push( {
-				name: __( 'Theme' ),
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
 				gradients: themeGradients,
 			} );
 		}
 		if ( defaultGradients && defaultGradients.length ) {
 			result.push( {
-				name: __( 'Default' ),
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
 				gradients: defaultGradients,
 			} );
 		}
 		if ( customGradients && customGradients.length ) {
 			result.push( {
-				name: __( 'Custom' ),
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
 				gradients: customGradients,
 			} );
 		}

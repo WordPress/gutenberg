@@ -8,7 +8,7 @@ import { every, isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { PanelBody, ColorIndicator } from '@wordpress/components';
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, _x } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -181,7 +181,10 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 		const result = [];
 		if ( themeColors && themeColors.length ) {
 			result.push( {
-				name: __( 'Theme' ),
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
 				colors: themeColors,
 			} );
 		}
@@ -191,13 +194,19 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 			defaultColors.length
 		) {
 			result.push( {
-				name: __( 'Default' ),
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
 				colors: defaultColors,
 			} );
 		}
 		if ( customColors && customColors.length ) {
 			result.push( {
-				name: __( 'Custom' ),
+				name: _x(
+					'Custom',
+					'Indicates this palette comes from the theme.'
+				),
 				colors: customColors,
 			} );
 		}
@@ -214,7 +223,10 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 		const result = [];
 		if ( themeGradients && themeGradients.length ) {
 			result.push( {
-				name: __( 'Theme' ),
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
 				gradients: themeGradients,
 			} );
 		}
@@ -224,13 +236,19 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 			defaultGradients.length
 		) {
 			result.push( {
-				name: __( 'Default' ),
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
 				gradients: defaultGradients,
 			} );
 		}
 		if ( customGradients && customGradients.length ) {
 			result.push( {
-				name: __( 'Custom' ),
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
 				gradients: customGradients,
 			} );
 		}
