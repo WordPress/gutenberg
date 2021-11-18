@@ -126,8 +126,7 @@ export type ToolsPanelContext = {
 	deregisterPanelItem: ( label: string ) => void;
 	flagItemCustomization: (
 		label: string,
-		group: ToolsPanelMenuItemKey,
-		value: boolean
+		group?: ToolsPanelMenuItemKey
 	) => void;
 	isResetting: boolean;
 	shouldRenderPlaceholderItems: boolean;

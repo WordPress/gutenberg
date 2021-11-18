@@ -126,18 +126,17 @@ export function useToolsPanel(
 	// Force a menu item to be checked.
 	// This is intended for use with default panel items. They are displayed
 	// separately to optional items and have different display states,
-	//.we need to update that when their value is customized.
+	// we need to update that when their value is customized.
 	const flagItemCustomization = (
 		label: string,
-		group: ToolsPanelMenuItemKey = 'default',
-		value: boolean = true
+		group: ToolsPanelMenuItemKey = 'default'
 	) => {
 		setMenuItems( ( items ) => {
 			const newState = {
 				...items,
 				[ group ]: {
 					...items[ group ],
-					[ label ]: value,
+					[ label ]: true,
 				},
 			};
 			return newState;
