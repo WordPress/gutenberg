@@ -22,7 +22,7 @@
  *
  * @return array The settings to retrieve.
  */
-function gutenberg_get_global_settings( $path = array(), $context ) {
+function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 	if ( ! empty( $context['block_name'] ) ) {
 		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 	}
@@ -54,7 +54,7 @@ function gutenberg_get_global_settings( $path = array(), $context ) {
  *
  * @return array The styles to retrieve.
  */
-function gutenberg_get_global_styles( $path = array(), $context ) {
+function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 	if ( ! empty( $context['block_name'] ) ) {
 		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 	}
