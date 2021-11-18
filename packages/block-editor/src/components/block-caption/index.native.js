@@ -57,7 +57,7 @@ export default compose( [
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlockName = getBlockName( parentId );
 
-		hasBlockSupport(
+		const hideCaption = hasBlockSupport(
 			parentBlockName,
 			'__experimentalHideChildBlockControls',
 			false
@@ -66,7 +66,8 @@ export default compose( [
 		// We'll render the caption so that the soft keyboard is not forced to close on Android
 		// but still hide it by setting its display style to none. See wordpress-mobile/gutenberg-mobile#1221
 		const shouldDisplay =
-			! RichText.isEmpty( caption ) > 0 || isBlockSelected;
+			! hideCaption &&
+			( ! RichText.isEmpty( caption ) > 0 || isBlockSelected );
 
 		return {
 			shouldDisplay,
