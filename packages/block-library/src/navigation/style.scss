@@ -325,6 +325,13 @@
 	}
 }
 
+// Allow menu items to be spaced out by space-between when only navigation links are present.
+.wp-block-navigation__container:only-child,
+.wp-block-page-list:only-child {
+	flex-grow: 1;
+}
+
+
 /**
  * Mobile menu.
  */
