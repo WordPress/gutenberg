@@ -40,7 +40,7 @@ function gutenberg_get_global_settings( $path = array(), $context ) {
 /**
  * Function to get the styles resulting of merging core, theme, and user data.
  *
- * @param array  $path   Path to the specific style to retrieve. Optional.
+ * @param array $path    Path to the specific style to retrieve. Optional.
  *                       If empty, will return all styles.
  * @param array $context {
  *     Metadata to know where to retrieve the $path from. Optional.
@@ -56,7 +56,7 @@ function gutenberg_get_global_settings( $path = array(), $context ) {
  */
 function gutenberg_get_global_styles( $path = array(), $context ) {
 	if ( ! empty( $context['block_name'] ) ) {
-		$path = array_merge( array( 'blocks', $block_name ), $path );
+		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 	}
 
 	$origin = 'user';
