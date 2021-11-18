@@ -5,9 +5,6 @@
 }
 
 // Hide inserter from previews.
-// This selector could be cleaner if we had a CSS class to target inside the preview iframe.
-html[style] body > .is-root-container .wp-block-columns {
-	.block-list-appender {
-		display: none;
-	}
+.block-editor-block-preview__content-iframe .wp-block-columns .block-list-appender {
+	display: none;
 }
