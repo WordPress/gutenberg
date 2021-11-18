@@ -218,7 +218,7 @@ export function getSupportedGlobalStylesPanels( name ) {
 }
 
 export function useColorsPerOrigin( name ) {
-	const [ userColors ] = useSetting( 'color.palette.user', name );
+	const [ customColors ] = useSetting( 'color.palette.user', name );
 	const [ themeColors ] = useSetting( 'color.palette.theme', name );
 	const [ defaultColors ] = useSetting( 'color.palette.core', name );
 	return useMemo( () => {
@@ -235,18 +235,18 @@ export function useColorsPerOrigin( name ) {
 				colors: themeColors,
 			} );
 		}
-		if ( userColors && userColors.length ) {
+		if ( customColors && customColors.length ) {
 			result.push( {
-				name: __( 'User' ),
-				colors: userColors,
+				name: __( 'Custom' ),
+				colors: customColors,
 			} );
 		}
 		return result;
-	}, [ userColors, themeColors, defaultColors ] );
+	}, [ customColors, themeColors, defaultColors ] );
 }
 
 export function useGradientsPerOrigin( name ) {
-	const [ userGradients ] = useSetting( 'color.gradients.user', name );
+	const [ customGradients ] = useSetting( 'color.gradients.user', name );
 	const [ themeGradients ] = useSetting( 'color.gradients.theme', name );
 	const [ defaultGradients ] = useSetting( 'color.gradients.core', name );
 	return useMemo( () => {
@@ -263,12 +263,12 @@ export function useGradientsPerOrigin( name ) {
 				gradients: themeGradients,
 			} );
 		}
-		if ( userGradients && userGradients.length ) {
+		if ( customGradients && customGradients.length ) {
 			result.push( {
-				name: __( 'User' ),
-				gradients: userGradients,
+				name: __( 'Custom' ),
+				gradients: customGradients,
 			} );
 		}
 		return result;
-	}, [ userGradients, themeGradients, defaultGradients ] );
+	}, [ customGradients, themeGradients, defaultGradients ] );
 }
