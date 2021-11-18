@@ -357,7 +357,7 @@ export default function LogoEdit( {
 	setAttributes,
 	isSelected,
 } ) {
-	const { width, shouldSyncIcon } = attributes;
+	const { className: styleClass, width, shouldSyncIcon } = attributes;
 	const [ logoUrl, setLogoUrl ] = useState();
 	const ref = useRef();
 
@@ -368,10 +368,12 @@ export default function LogoEdit( {
 		siteIconId,
 		mediaItemData,
 		isRequestingMediaItem,
+		logoBlockCount,
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } = select(
 			coreStore
 		);
+		const { getGlobalBlockCount } = select( blockEditorStore );
 		const siteSettings = getEditedEntityRecord( 'root', 'site' );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		const _siteLogo = siteSettings?.site_logo;
@@ -402,10 +404,39 @@ export default function LogoEdit( {
 			},
 			isRequestingMediaItem: _isRequestingMediaItem,
 			siteIconId: _siteIconId,
+			logoBlockCount: getGlobalBlockCount( 'core/site-logo' ),
 		};
 	}, [] );
 
 	const { editEntityRecord } = useDispatch( coreStore );
+
+	useEffect( () => {
+		// Cleanup function to discard unsaved changes to the icon and logo when
+		// the block is removed.
+		return () => {
+			// Do nothing if the block is being rendered in the styles preview or the
+			// block inserter.
+			if (
+				styleClass?.includes(
+					'block-editor-block-types-list__site-logo-example'
+				) ||
+				styleClass?.includes(
+					'block-editor-block-styles__block-preview-container'
+				)
+			) {
+				return;
+			}
+
+			// Only discard unsaved changes if we are removing the last Site Logo block
+			// on the page.
+			if ( logoBlockCount === 1 ) {
+				editEntityRecord( 'root', 'site', undefined, {
+					site_logo: undefined,
+					site_icon: undefined,
+				} );
+			}
+		};
+	}, [] );
 
 	const setLogo = ( newValue ) => {
 		if ( shouldSyncIcon ) {
