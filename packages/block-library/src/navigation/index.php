@@ -526,9 +526,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		'wp-block-navigation__responsive-container-open',
 		$is_hidden_by_default ? 'always-shown' : '',
 	);
+	$plain_menu_classes 					= array(
+		'wp-block-navigation__plain-menu',
+		$is_hidden_by_default ? 'always-shown' : ''
+	);
 
 	$responsive_container_markup = sprintf(
 		'<button aria-expanded="false" aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
+			<div class="%8$s">%2$s</div>
 			<div class="%5$s" style="%7$s" id="modal-%1$s">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-%1$s-title" >
@@ -545,7 +550,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		__( 'Close menu' ), // Close button label.
 		implode( ' ', $responsive_container_classes ),
 		implode( ' ', $open_button_classes ),
-		$colors['overlay_inline_styles']
+		$colors['overlay_inline_styles'],
+		implode(' ', $plain_menu_classes)
 	);
 
 	return sprintf(

@@ -36,8 +36,17 @@ export default function ResponsiveWrapper( {
 		'wp-block-navigation__responsive-container-open',
 		{ 'always-shown': isHiddenByDefault }
 	);
+	const plainMenuClasses = classnames( 'wp-block-navigation__plain-menu', {
+		'always-shown': isHiddenByDefault,
+	} );
 
 	const modalId = `${ id }-modal`;
+
+	const dialogProps = {
+		className: 'wp-block-navigation__responsive-dialog',
+		'aria-labelledby': `${ modalId }-title`,
+		...( isOpen && { role: 'dialog', 'aria-modal': true } ),
+	};
 
 	return (
 		<>
@@ -64,6 +73,8 @@ export default function ResponsiveWrapper( {
 				</Button>
 			) }
 
+			<div className={ plainMenuClasses }>{ children }</div>
+
 			<div
 				className={ responsiveContainerClasses }
 				style={ styles }
@@ -73,12 +84,7 @@ export default function ResponsiveWrapper( {
 					className="wp-block-navigation__responsive-close"
 					tabIndex="-1"
 				>
-					<div
-						className="wp-block-navigation__responsive-dialog"
-						role="dialog"
-						aria-modal="true"
-						aria-labelledby={ `${ modalId }-title` }
-					>
+					<div { ...dialogProps }>
 						<Button
 							className="wp-block-navigation__responsive-container-close"
 							aria-label={ __( 'Close menu' ) }
