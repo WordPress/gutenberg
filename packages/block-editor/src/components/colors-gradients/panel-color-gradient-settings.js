@@ -174,15 +174,19 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 	const colorGradientSettings = useCommonSingleMultipleSelects();
 	const userColors = useSetting( 'color.palette.user' );
 	const themeColors = useSetting( 'color.palette.theme' );
-	const coreColors = useSetting( 'color.palette.core' );
+	const defaultColors = useSetting( 'color.palette.core' );
 	const shouldDisplayDefaultColors = useSetting( 'color.defaultPalette' );
 
 	colorGradientSettings.colors = useMemo( () => {
 		const result = [];
-		if ( shouldDisplayDefaultColors && coreColors && coreColors.length ) {
+		if (
+			shouldDisplayDefaultColors &&
+			defaultColors &&
+			defaultColors.length
+		) {
 			result.push( {
-				name: __( 'Core' ),
-				colors: coreColors,
+				name: __( 'Default' ),
+				colors: defaultColors,
 			} );
 		}
 		if ( themeColors && themeColors.length ) {
@@ -198,11 +202,11 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 			} );
 		}
 		return result;
-	}, [ coreColors, themeColors, userColors ] );
+	}, [ defaultColors, themeColors, userColors ] );
 
 	const userGradients = useSetting( 'color.gradients.user' );
 	const themeGradients = useSetting( 'color.gradients.theme' );
-	const coreGradients = useSetting( 'color.gradients.core' );
+	const defaultGradients = useSetting( 'color.gradients.core' );
 	const shouldDisplayDefaultGradients = useSetting(
 		'color.defaultGradients'
 	);
@@ -210,12 +214,12 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 		const result = [];
 		if (
 			shouldDisplayDefaultGradients &&
-			coreGradients &&
-			coreGradients.length
+			defaultGradients &&
+			defaultGradients.length
 		) {
 			result.push( {
-				name: __( 'Core' ),
-				gradients: coreGradients,
+				name: __( 'Default' ),
+				gradients: defaultGradients,
 			} );
 		}
 		if ( themeGradients && themeGradients.length ) {
@@ -231,7 +235,7 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 			} );
 		}
 		return result;
-	}, [ userGradients, themeGradients, coreGradients ] );
+	}, [ userGradients, themeGradients, defaultGradients ] );
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }
