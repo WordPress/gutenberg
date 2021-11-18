@@ -361,7 +361,7 @@ describe( 'ToolsPanel', () => {
 				onSelect: jest.fn(),
 			};
 
-			const testPanel = () => (
+			const TestPanel = () => (
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem
 						{ ...altControlProps }
@@ -378,7 +378,7 @@ describe( 'ToolsPanel', () => {
 				</ToolsPanel>
 			);
 
-			const { rerender } = render( testPanel() );
+			const { rerender } = render( <TestPanel /> );
 
 			// The linked control should start out as an optional control and is
 			// not rendered because it does not have a value.
@@ -402,7 +402,7 @@ describe( 'ToolsPanel', () => {
 			// conditional `isShownByDefault` prop.
 			altControlProps.attributes.value = true;
 
-			rerender( testPanel() );
+			rerender( <TestPanel /> );
 
 			// The linked control should now be a default control and rendered
 			// despite not having a value.
@@ -442,7 +442,7 @@ describe( 'ToolsPanel', () => {
 				onSelect: jest.fn(),
 			};
 
-			const testPanel = () => (
+			const TestPanel = () => (
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem
 						{ ...altControlProps }
@@ -461,7 +461,7 @@ describe( 'ToolsPanel', () => {
 				</ToolsPanel>
 			);
 
-			const { rerender } = render( testPanel() );
+			const { rerender } = render( <TestPanel /> );
 
 			// The conditional control should not yet be rendered.
 			let conditionalItem = screen.queryByText( 'Conditional control' );
@@ -480,7 +480,7 @@ describe( 'ToolsPanel', () => {
 			// render the new default control into the ToolsPanel.
 			altControlProps.attributes.value = true;
 
-			rerender( testPanel() );
+			rerender( <TestPanel /> );
 
 			// The conditional control should now be rendered and included in
 			// the panel's menu.
@@ -525,7 +525,7 @@ describe( 'ToolsPanel', () => {
 				areAllOptionalControlsHidden: true,
 			};
 
-			const testPanel = () => (
+			const TestPanel = () => (
 				<ToolsPanelContext.Provider value={ context }>
 					<ToolsPanelItem { ...altControlProps } panelId="1234">
 						<div>Item</div>
@@ -535,7 +535,7 @@ describe( 'ToolsPanel', () => {
 
 			// On the initial render of the panel, the ToolsPanelItem should
 			// be registered.
-			const { rerender } = render( testPanel() );
+			const { rerender } = render( <TestPanel /> );
 
 			expect( context.registerPanelItem ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -552,7 +552,7 @@ describe( 'ToolsPanel', () => {
 			// Rerender the panel item. Because we are switching away from this
 			// panel, its panelItem should NOT be registered, but it SHOULD be
 			// deregistered.
-			rerender( testPanel() );
+			rerender( <TestPanel /> );
 
 			// registerPanelItem has still only been called once.
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
@@ -568,7 +568,7 @@ describe( 'ToolsPanel', () => {
 
 			// Rerender the panel and ensure that the panelItem is registered
 			// again, and it is not de-registered.
-			rerender( testPanel() );
+			rerender( <TestPanel /> );
 
 			expect( context.registerPanelItem ).toHaveBeenCalledWith(
 				expect.objectContaining( {
