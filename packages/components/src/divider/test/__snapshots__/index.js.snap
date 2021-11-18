@@ -2,9 +2,8 @@
 
 exports[`props should render correctly 1`] = `
 .emotion-0 {
-  border-color: rgba(0, 0, 0, 0.1);
   margin: 0;
-  border-width: 0 0 1px 0;
+  border-bottom: 1px solid currentColor;
   height: 0;
   width: auto;
 }
@@ -23,10 +22,9 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -2,10 +2,8 @@
+  Array [
     Object {
-      "border-color": "rgba(0, 0, 0, 0.1)",
-      "border-width": "0 0 1px 0",
+      "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
 -     "margin-bottom": "calc(4px * 7)",
@@ -41,10 +39,9 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -2,9 +2,8 @@
+  Array [
     Object {
-      "border-color": "rgba(0, 0, 0, 0.1)",
-      "border-width": "0 0 1px 0",
+      "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
 -     "margin-bottom": "calc(4px * 5)",
@@ -58,10 +55,9 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -2,9 +2,8 @@
+  Array [
     Object {
-      "border-color": "rgba(0, 0, 0, 0.1)",
-      "border-width": "0 0 1px 0",
+      "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
 -     "margin-top": "calc(4px * 5)",

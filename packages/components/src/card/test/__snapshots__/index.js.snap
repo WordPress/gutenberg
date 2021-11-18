@@ -269,9 +269,8 @@ Object {
 }
 
 .emotion-10 {
-  border-color: rgba(0, 0, 0, 0.1);
   margin: 0;
-  border-width: 0 0 1px 0;
+  border-bottom: 1px solid currentColor;
   height: 0;
   width: auto;
   box-sizing: border-box;
@@ -525,9 +524,8 @@ Object {
 }
 
 .emotion-10 {
-  border-color: rgba(0, 0, 0, 0.1);
   margin: 0;
-  border-width: 0 0 1px 0;
+  border-bottom: 1px solid currentColor;
   height: 0;
   width: auto;
   box-sizing: border-box;
