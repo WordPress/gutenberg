@@ -54,7 +54,11 @@ export function useToolsPanelItem(
 			} );
 		}
 
-		return () => deregisterPanelItem( label );
+		return () => {
+			if ( currentPanelId === panelId ) {
+				deregisterPanelItem( label );
+			}
+		}
 	}, [
 		currentPanelId,
 		panelId,
