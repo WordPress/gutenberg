@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { space } from '../ui/utils/space';
-import { CONFIG, rtl } from '../utils';
+import { rtl } from '../utils';
 import type { Props } from './types';
 
 const MARGIN_DIRECTIONS: Record<
@@ -45,11 +45,13 @@ const renderMargin = ( {
 		} )()
 	);
 
-const renderBorderWidth = ( {
+const renderBorder = ( {
 	'aria-orientation': orientation = 'horizontal',
 }: Props ) => {
 	return css( {
-		borderWidth: orientation === 'vertical' ? '0 1px 0 0' : '0 0 1px 0',
+		[ orientation === 'vertical'
+			? 'borderRight'
+			: 'borderBottom' ]: '1px solid currentColor',
 	} );
 };
 
@@ -62,10 +64,9 @@ const renderSize = ( {
 	} );
 
 export const DividerView = styled.hr< Props >`
-	border-color: ${ CONFIG.colorDivider };
 	margin: 0;
 
-	${ renderBorderWidth }
+	${ renderBorder }
 	${ renderSize }
 	${ renderMargin }
 `;
