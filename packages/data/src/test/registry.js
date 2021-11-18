@@ -72,6 +72,7 @@ describe( 'createRegistry', () => {
 					subscribe,
 				} )
 			).toThrow();
+			expect( console ).toHaveWarned();
 		} );
 
 		describe( 'getSelectors', () => {

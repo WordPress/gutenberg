@@ -4,6 +4,11 @@
 import { mapValues, isObject, forEach } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import createReduxStore from './redux-store';
@@ -158,12 +163,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
-	 * Registers a generic store.
+	 * Registers a store instance.
 	 *
 	 * @param {string} name Store registry name.
 	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
 	 */
-	function registerGenericStore( name, store ) {
+	function registerStoreInstance( name, store ) {
 		if ( typeof store.getSelectors !== 'function' ) {
 			throw new TypeError( 'store.getSelectors must be a function' );
 		}
@@ -203,7 +208,35 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {WPDataStore} store Store definition.
 	 */
 	function register( store ) {
-		registerGenericStore( store.name, store.instantiate( registry ) );
+		registerStoreInstance( store.name, store.instantiate( registry ) );
+	}
+
+	function registerGenericStore( name, store ) {
+		deprecated( 'wp.data.registerGenericStore', {
+			since: '5.9',
+			alternative: 'wp.data.register( storeDescriptor )',
+		} );
+		registerStoreInstance( name, store );
+	}
+
+	/**
+	 * Registers a standard `@wordpress/data` store.
+	 *
+	 * @param {string} storeName Unique namespace identifier.
+	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
+	 *
+	 * @return {Object} Registered store object.
+	 */
+	function registerStore( storeName, options ) {
+		if ( ! options.reducer ) {
+			throw new TypeError( 'Must specify store reducer' );
+		}
+
+		const store = createReduxStore( storeName, options ).instantiate(
+			registry
+		);
+		registerStoreInstance( storeName, store );
+		return store.store;
 	}
 
 	/**
@@ -239,7 +272,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 	let registry = {
 		batch,
-		registerGenericStore,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
@@ -248,28 +280,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
+		registerGenericStore,
+		registerStore,
 		__experimentalMarkListeningStores,
 		__experimentalSubscribeStore,
-	};
-
-	/**
-	 * Registers a standard `@wordpress/data` store.
-	 *
-	 * @param {string} storeName Unique namespace identifier.
-	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
-	 *
-	 * @return {Object} Registered store object.
-	 */
-	registry.registerStore = ( storeName, options ) => {
-		if ( ! options.reducer ) {
-			throw new TypeError( 'Must specify store reducer' );
-		}
-
-		const store = createReduxStore( storeName, options ).instantiate(
-			registry
-		);
-		registerGenericStore( storeName, store );
-		return store.store;
 	};
 
 	//
