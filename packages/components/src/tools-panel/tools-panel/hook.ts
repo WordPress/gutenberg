@@ -72,16 +72,17 @@ export function useToolsPanel(
 
 	const registerPanelItem = ( item: ToolsPanelItem ) => {
 		setPanelItems( ( items ) => {
+			const newItems = [ ...items ];
 			// If an item with this label is already registered, remove it first.
 			// This can happen when an item is moved between the default and optional
 			// groups.
-			const existingIndex = items.findIndex(
+			const existingIndex = newItems.findIndex(
 				( oldItem ) => oldItem.label === item.label
 			);
 			if ( existingIndex !== -1 ) {
-				items.splice( existingIndex, 1 );
+				newItems.splice( existingIndex, 1 );
 			}
-			return [ ...items, item ];
+			return [ ...newItems, item ];
 		} );
 	};
 
