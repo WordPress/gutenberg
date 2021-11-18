@@ -40,33 +40,20 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		'offset'                    => 0,
 	);
 
-	if ( get_option( 'thread_comments' ) ) {
-		$comment_args['hierarchical'] = 'threaded';
-	} else {
-		$comment_args['hierarchical'] = false;
-	}
-
 	if ( $page ) {
 		$comment_args['offset'] = ( $page - 1 ) * $per_page;
 	} else {
-		$top_level_query = new WP_Comment_Query();
-		$top_level_args  = array(
+		$top_level_args = array(
 			'count'   => true,
 			'orderby' => false,
 			'post_id' => $post_id,
 			'status'  => 'approve',
 		);
 
-		if ( $comment_args['hierarchical'] ) {
-			$top_level_args['parent'] = 0;
-		}
+		// We are not taking into account nested comments yet
+		$comment_count = get_comments( $top_level_args );
 
-		if ( isset( $comment_args['include_unapproved'] ) ) {
-			$top_level_args['include_unapproved'] = $comment_args['include_unapproved'];
-		}
-		$top_level_args         = apply_filters( 'comments_template_top_level_query_args', $top_level_args );
-		$top_level_count        = $top_level_query->query( $top_level_args );
-		$comment_args['offset'] = ( ceil( $top_level_count / $per_page ) - 1 ) * $per_page;
+		$comment_args['offset'] = ( ceil( $comment_count / $per_page ) - 1 ) * $per_page;
 	}
 
 	$comments = get_comments( $comment_args );
