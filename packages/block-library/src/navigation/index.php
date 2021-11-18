@@ -546,8 +546,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			</div>',
 		$modal_unique_id,
 		$inner_blocks_html,
-		__( 'Open menu' ), // Open button label.
-		__( 'Close menu' ), // Close button label.
+		__( 'Open' ), // Open button label.
+		__( 'Close' ), // Close button label.
 		implode( ' ', $responsive_container_classes ),
 		implode( ' ', $open_button_classes ),
 		$colors['overlay_inline_styles'],
