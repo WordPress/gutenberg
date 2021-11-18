@@ -13,7 +13,7 @@ const ios = {
 
 exports.iosLocal = {
 	...ios,
-	deviceName: 'iPhone 12',
+	deviceName: 'iPhone 13',
 	wdaLaunchTimeout: 240000,
 	usePrebuiltWDA: false,
 };
