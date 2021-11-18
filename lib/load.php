@@ -71,6 +71,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-url-details-controller.php';
 	}
 
+	if ( ! class_exists( 'WP_REST_Edit_Site_Export_Controller' ) ) {
+		require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-edit-site-export-controller.php';
+	}
+
 	require __DIR__ . '/rest-api.php';
 }
 
@@ -91,6 +95,7 @@ require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
+require __DIR__ . '/compat/wordpress-5.9/edit-site-export.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
@@ -113,7 +118,6 @@ require __DIR__ . '/full-site-editing/templates.php';
 require __DIR__ . '/full-site-editing/template-parts.php';
 require __DIR__ . '/full-site-editing/template-loader.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
-require __DIR__ . '/full-site-editing/edit-site-export.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
 require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
