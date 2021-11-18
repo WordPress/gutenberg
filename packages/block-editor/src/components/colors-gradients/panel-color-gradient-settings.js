@@ -172,7 +172,7 @@ const PanelColorGradientSettingsSingleSelect = ( props ) => {
 
 const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 	const colorGradientSettings = useCommonSingleMultipleSelects();
-	const userColors = useSetting( 'color.palette.user' );
+	const customColors = useSetting( 'color.palette.user' );
 	const themeColors = useSetting( 'color.palette.theme' );
 	const defaultColors = useSetting( 'color.palette.core' );
 	const shouldDisplayDefaultColors = useSetting( 'color.defaultPalette' );
@@ -195,16 +195,16 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 				colors: themeColors,
 			} );
 		}
-		if ( userColors && userColors.length ) {
+		if ( customColors && customColors.length ) {
 			result.push( {
-				name: __( 'User' ),
-				colors: userColors,
+				name: __( 'Custom' ),
+				colors: customColors,
 			} );
 		}
 		return result;
-	}, [ defaultColors, themeColors, userColors ] );
+	}, [ defaultColors, themeColors, customColors ] );
 
-	const userGradients = useSetting( 'color.gradients.user' );
+	const customGradients = useSetting( 'color.gradients.user' );
 	const themeGradients = useSetting( 'color.gradients.theme' );
 	const defaultGradients = useSetting( 'color.gradients.core' );
 	const shouldDisplayDefaultGradients = useSetting(
@@ -228,14 +228,14 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 				gradients: themeGradients,
 			} );
 		}
-		if ( userGradients && userGradients.length ) {
+		if ( customGradients && customGradients.length ) {
 			result.push( {
-				name: __( 'User' ),
-				gradients: userGradients,
+				name: __( 'Custom' ),
+				gradients: customGradients,
 			} );
 		}
 		return result;
-	}, [ userGradients, themeGradients, defaultGradients ] );
+	}, [ customGradients, themeGradients, defaultGradients ] );
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }
