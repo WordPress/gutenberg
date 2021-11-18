@@ -3,3 +3,11 @@
 		outline: $border-width solid $gray-300;
 	}
 }
+
+// Hide inserter from previews.
+// This selector could be cleaner if we had a CSS class to target inside the preview iframe.
+html[style] body > .is-root-container .wp-block-columns {
+	.block-list-appender {
+		display: none;
+	}
+}
