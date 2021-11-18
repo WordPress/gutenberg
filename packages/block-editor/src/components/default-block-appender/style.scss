@@ -74,11 +74,13 @@
 	// treating them the same, one or both can be retired.
 	.block-editor-inserter__toggle.components-button.has-icon,
 	.block-list-appender__toggle {
-		display: flex;
 		flex-direction: row;
 		box-shadow: none;
 		height: $button-size-small;
 		width: $button-size-small;
+
+		// Hide by default, then we unhide it when the selected block is a direct ancestor.
+		display: none;
 
 		// Important to override styles form Button component.
 		padding: 0 !important;
@@ -116,3 +118,10 @@
 	}
 }
 
+// Unhide the inserter when you're in the exact container.
+.block-editor-block-list__block.is-selected > .block-list-appender {
+	.block-editor-inserter__toggle.components-button.has-icon,
+	.block-list-appender__toggle {
+		display: flex;
+	}
+}
