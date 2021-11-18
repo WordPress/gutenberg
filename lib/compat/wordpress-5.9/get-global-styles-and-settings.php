@@ -40,25 +40,28 @@ function gutenberg_get_global_settings( $path = array(), $context ) {
 /**
  * Function to get the styles resulting of merging core, theme, and user data.
  *
- * @param array  $path              Path to the specific style to retrieve. Optional.
- *                                  If empty, will return all styles.
- * @param string $block_name        Which block to retrieve the styles from. Optional.
- *                                  If empty, it'll return the styles for the global context.
- * @param string $origin            Which origin to take data from. Optional.
- *                                  It can be 'all' (core, theme, and user) or 'base' (core and theme).
- *                                  If empty or unknown, 'all' is used.
+ * @param array  $path   Path to the specific style to retrieve. Optional.
+ *                       If empty, will return all styles.
+ * @param array $context {
+ *     Metadata to know where to retrieve the $path from. Optional.
+ *
+ *     @type string $block_name Which block to retrieve the styles from.
+ *                              If empty, it'll return the styles for the global context.
+ *     @type string $origin     Which origin to take data from.
+ *                              Valid values are 'all' (core, theme, and user) or 'base' (core and theme).
+ *                              If empty or unknown, 'all' is used.
+ * }
  *
  * @return array The styles to retrieve.
  */
-function gutenberg_get_global_styles( $path = array(), $block_name = '', $origin = 'all' ) {
-	if ( '' !== $block_name ) {
+function gutenberg_get_global_styles( $path = array(), $context ) {
+	if ( ! empty( $context['block_name'] ) ) {
 		$path = array_merge( array( 'blocks', $block_name ), $path );
 	}
 
-	if ( 'base' === $origin ) {
+	$origin = 'user';
+	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
 		$origin = 'theme';
-	} else {
-		$origin = 'user';
 	}
 
 	$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_raw_data()['styles'];
