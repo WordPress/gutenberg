@@ -498,6 +498,90 @@ describe( 'ToolsPanel', () => {
 		} );
 	} );
 
+	describe( 'registration of panel items', () => {
+		it( 'should register and deregister items when switching between panels', () => {
+			// This test adds a `panelId` prop to two panels, to simulate
+			// the registration and de-registration of panelItems when
+			// switching between panels and test for any issues.
+			//
+			// When you switch from panel A to panel B, only panel A items
+			// should be deregistered, and only panel B items should be registered.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/36588
+
+			const noop = () => undefined;
+			const context = {
+				panelId: '1234',
+				menuItems: {
+					default: {},
+					optional: { [ altControlProps.label ]: true },
+				},
+				hasMenuItems: false,
+				isResetting: false,
+				shouldRenderPlaceholderItems: false,
+				registerPanelItem: jest.fn(),
+				deregisterPanelItem: jest.fn(),
+				flagItemCustomization: noop,
+				areAllOptionalControlsHidden: true,
+			};
+
+			const testPanel = () => (
+				<ToolsPanelContext.Provider value={ context }>
+					<ToolsPanelItem { ...altControlProps } panelId="1234">
+						<div>Item</div>
+					</ToolsPanelItem>
+				</ToolsPanelContext.Provider>
+			);
+
+			// On the initial render of the panel, the ToolsPanelItem should
+			// be registered.
+			const { rerender } = render( testPanel() );
+
+			expect( context.registerPanelItem ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					label: altControlProps.label,
+					panelId: '1234',
+				} )
+			);
+			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 0 );
+
+			// Simulate a change in panel, e.g. a switch of block selection.
+			context.panelId = '4321';
+			context.menuItems.optional[ altControlProps.label ] = false;
+
+			// Rerender the panel item. Because we are switching away from this
+			// panel, its panelItem should NOT be registered, but it SHOULD be
+			// deregistered.
+			rerender( testPanel() );
+
+			// registerPanelItem has still only been called once.
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
+			// deregisterPanelItem is called, given that we have switched panels.
+			expect( context.deregisterPanelItem ).toBeCalledWith(
+				altControlProps.label
+			);
+
+			// Simulate switching back to the original panel, e.g. by selecting
+			// the original block again.
+			context.panelId = '1234';
+			context.menuItems.optional[ altControlProps.label ] = true;
+
+			// Rerender the panel and ensure that the panelItem is registered
+			// again, and it is not de-registered.
+			rerender( testPanel() );
+
+			expect( context.registerPanelItem ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					label: altControlProps.label,
+					panelId: '1234',
+				} )
+			);
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
+			// deregisterPanelItem has still only been called once.
+			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
 	describe( 'callbacks on menu item selection', () => {
 		beforeEach( () => {
 			jest.clearAllMocks();
