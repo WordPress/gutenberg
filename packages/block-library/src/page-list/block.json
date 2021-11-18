@@ -25,7 +25,12 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"color": {
+			"background": true,
+			"link": true,
+			"text": true
+		}
 	},
 	"editorStyle": "wp-block-page-list-editor",
 	"style": "wp-block-page-list"
