@@ -330,7 +330,7 @@ const SiteLogo = ( {
 									setAttributes( { shouldSyncIcon: value } );
 									setIcon( value ? logoId : undefined );
 								} }
-								checked={ shouldSyncIcon }
+								checked={ !! shouldSyncIcon }
 								help={ syncSiteIconHelpText }
 							/>
 						</>
