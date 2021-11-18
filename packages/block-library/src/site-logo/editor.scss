@@ -1,4 +1,5 @@
-.wp-block[data-align="center"] > .wp-block-site-logo > div {
+.wp-block[data-align="center"] > .wp-block-site-logo {
+	display: table;
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
