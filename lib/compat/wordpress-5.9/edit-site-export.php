@@ -30,6 +30,19 @@ if ( ! function_exists( 'wp_generate_edit_site_export_file' ) ) {
 		$zip->addEmptyDir( 'theme/block-templates' );
 		$zip->addEmptyDir( 'theme/block-template-parts' );
 
+		// Load theme and user styles.
+		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+		$user_data  = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
+
+		// Merge the user config into the theme data.
+		// The user config takes precedence over the theme.
+		$theme_data->merge( $user_data );
+
+		$zip->addFromString(
+			'theme/theme.json',
+			wp_json_encode( $theme_data->get_raw_data(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
+		);
+
 		// Load templates into the zip file.
 		$templates = gutenberg_get_block_templates();
 		foreach ( $templates as $template ) {
