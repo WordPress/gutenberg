@@ -73,15 +73,9 @@ const DimensionControls = ( {
 				className="single-column"
 				hasValue={ () => !! height }
 				label={ __( 'Height' ) }
-				onDeselect={ () =>
-					setAttributes( {
-						height: undefined,
-						scale: DEFAULT_SCALE,
-					} )
-				}
+				onDeselect={ () => setAttributes( { height: undefined } ) }
 				resetAllFilter={ () => ( {
 					height: undefined,
-					scale: DEFAULT_SCALE,
 				} ) }
 				isShownByDefault={ true }
 				panelId={ clientId }
