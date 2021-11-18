@@ -206,6 +206,10 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		return $post;
 	}
 
+	public function create_item( $request ) {
+		return $this->update_item( $request );
+	}
+
 	public function update_item( $request ) {
 		$navigation = $this->get_post( $request['id'] );
 		if ( ! $navigation ) {
@@ -224,10 +228,10 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		}
 
 		$navigation    = $this->get_post( $request['id'] );
-		$fields_update = $this->update_additional_fields_for_object( $navigation, $request );
-		if ( is_wp_error( $fields_update ) ) {
-			return $fields_update;
-		}
+//		$fields_update = $this->update_additional_fields_for_object( $navigation, $request );
+//		if ( is_wp_error( $fields_update ) ) {
+//			return $fields_update;
+//		}
 
 		return $this->prepare_item_for_response(
 			$navigation,
@@ -243,13 +247,9 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 			$changes->post_name   = $request['id'];
-		} elseif ( 'custom' !== $navigation->source ) {
-			$changes->post_name   = $navigation->slug;
-			$changes->post_type   = $this->post_type;
-			$changes->post_status = 'publish';
 		} else {
-			$changes->post_name   = $navigation->slug;
-			$changes->ID          = $navigation->wp_id;
+			$changes->post_name   = $navigation->post_name;
+			$changes->ID          = $navigation->ID;
 			$changes->post_status = 'publish';
 		}
 		if ( isset( $request['content'] ) ) {
