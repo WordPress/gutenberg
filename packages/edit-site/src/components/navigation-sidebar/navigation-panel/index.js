@@ -90,7 +90,7 @@ const NavigationPanel = ( { isOpen, setIsOpen, activeTemplateType } ) => {
 									title={ __( 'Styles' ) }
 									href={ addQueryArgs( '', {
 										page: 'gutenberg-edit-site',
-										style: 'open',
+										styles: 'open',
 									} ) }
 								/>
 								<NavigationItem
