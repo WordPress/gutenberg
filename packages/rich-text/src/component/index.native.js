@@ -122,7 +122,7 @@ export class RichText extends Component {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
-			dimensions: Dimensions.get( 'window' ),
+			currentFontSize: this.getFontSize( arguments[ 0 ] ),
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -799,6 +799,9 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		const { style } = this.props;
+		const { currentFontSize } = this.state;
+
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
 		}
@@ -816,6 +819,16 @@ export class RichText extends Component {
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
+		}
+
+		if (
+			currentFontSize &&
+			( style?.fontSize || prevProps?.style?.fontSize ) &&
+			style?.fontSize !== currentFontSize
+		) {
+			this.setState( {
+				currentFontSize: this.getFontSize( this.props ),
+			} );
 		}
 	}
 
@@ -859,35 +872,35 @@ export class RichText extends Component {
 		};
 	}
 
-	getFontSize() {
-		const { baseGlobalStyles, tagName } = this.props;
+	getFontSize( props ) {
+		const { baseGlobalStyles, tagName, fontSize, style } = props;
 		const tagNameFontSize =
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.fontSize;
 
-		let fontSize = DEFAULT_FONT_SIZE;
+		let newFontSize = DEFAULT_FONT_SIZE;
 
 		if ( baseGlobalStyles?.typography?.fontSize ) {
-			fontSize = baseGlobalStyles?.typography?.fontSize;
+			newFontSize = baseGlobalStyles?.typography?.fontSize;
 		}
 
 		if ( tagNameFontSize ) {
-			fontSize = tagNameFontSize;
+			newFontSize = tagNameFontSize;
 		}
 
-		if ( this.props.style?.fontSize ) {
-			fontSize = this.props.style.fontSize;
+		if ( style?.fontSize ) {
+			newFontSize = style.fontSize;
 		}
 
-		if ( this.props.fontSize && ! tagNameFontSize ) {
-			fontSize = this.props.fontSize;
+		if ( fontSize && ! tagNameFontSize ) {
+			newFontSize = fontSize;
 		}
-		const { height, width } = this.state.dimensions;
+		const { height, width } = Dimensions.get( 'window' );
 		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
 		// We need to always convert to px units because the selected value
 		// could be coming from the web where it could be stored as a different unit.
-		const selectedPxValue = getPxFromCssUnit( fontSize, cssUnitOptions );
+		const selectedPxValue = getPxFromCssUnit( newFontSize, cssUnitOptions );
 
-		return parseFloat( selectedPxValue );
+		return selectedPxValue;
 	}
 
 	getLineHeight() {
@@ -931,6 +944,7 @@ export class RichText extends Component {
 			disableEditingMenu = false,
 			baseGlobalStyles,
 		} = this.props;
+		const { currentFontSize } = this.state;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
@@ -942,7 +956,7 @@ export class RichText extends Component {
 		);
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
-		const fontSize = this.getFontSize();
+		const fontSize = parseFloat( currentFontSize );
 		const lineHeight = this.getLineHeight();
 
 		const {
