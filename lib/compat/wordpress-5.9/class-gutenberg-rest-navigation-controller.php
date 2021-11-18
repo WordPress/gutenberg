@@ -206,5 +206,69 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		return $post;
 	}
 
+	public function update_item( $request ) {
+		$navigation = $this->get_post( $request['id'] );
+		if ( ! $navigation ) {
+			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.' ), array( 'status' => 404 ) );
+		}
+
+		$changes = $this->prepare_item_for_database( $request );
+
+		if ( ! is_wp_error( $navigation ) ) {
+			$result = wp_update_post( wp_slash( (array) $changes ), true );
+		} else {
+			$result = wp_insert_post( wp_slash( (array) $changes ), true );
+		}
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$navigation    = $this->get_post( $request['id'] );
+		$fields_update = $this->update_additional_fields_for_object( $navigation, $request );
+		if ( is_wp_error( $fields_update ) ) {
+			return $fields_update;
+		}
+
+		return $this->prepare_item_for_response(
+			$navigation,
+			$request
+		);
+	}
+
+	protected function prepare_item_for_database( $request ) {
+		$navigation = $this->get_post( $request['id'] );
+		$navigation = is_wp_error( $navigation ) ? null : $navigation;
+		$changes  = new stdClass();
+		if ( null === $navigation ) {
+			$changes->post_type   = $this->post_type;
+			$changes->post_status = 'publish';
+			$changes->post_name   = $request['id'];
+		} elseif ( 'custom' !== $navigation->source ) {
+			$changes->post_name   = $navigation->slug;
+			$changes->post_type   = $this->post_type;
+			$changes->post_status = 'publish';
+		} else {
+			$changes->post_name   = $navigation->slug;
+			$changes->ID          = $navigation->wp_id;
+			$changes->post_status = 'publish';
+		}
+		if ( isset( $request['content'] ) ) {
+			$changes->post_content = $request['content'];
+		} elseif ( null !== $navigation && 'custom' !== $navigation->source ) {
+			$changes->post_content = $navigation->content;
+		}
+		if ( isset( $request['title'] ) ) {
+			$changes->post_title = $request['title'];
+		} elseif ( null !== $navigation && 'custom' !== $navigation->source ) {
+			$changes->post_title = $navigation->title;
+		}
+		if ( isset( $request['description'] ) ) {
+			$changes->post_excerpt = $request['description'];
+		} elseif ( null !== $navigation && 'custom' !== $navigation->source ) {
+			$changes->post_excerpt = $navigation->description;
+		}
+
+		return $changes;
+	}
 
 }
