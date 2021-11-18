@@ -18,11 +18,6 @@ export default {
 	},
 };
 
-// make the border color black to give higher contrast and help it appear in storybook better
-const BlackDivider = styled( Divider )`
-	border-color: #000;
-`;
-
 const VerticalWrapper = styled.div`
 	display: flex;
 	align-items: stretch;
@@ -38,7 +33,7 @@ export const Horizontal = () => {
 	return (
 		<div>
 			<Text>Some text before the divider</Text>
-			<BlackDivider { ...props } />
+			<Divider { ...props } />
 			<Text>Some text after the divider</Text>
 		</div>
 	);
@@ -53,7 +48,7 @@ export const Vertical = () => {
 	return (
 		<VerticalWrapper>
 			<Text>Some text before the divider</Text>
-			<BlackDivider orientation="vertical" { ...props } />
+			<Divider orientation="vertical" { ...props } />
 			<Text>Some text after the divider</Text>
 		</VerticalWrapper>
 	);
