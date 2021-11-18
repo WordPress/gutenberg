@@ -28,7 +28,7 @@ registerPlugin( 'edit-site', {
 						icon={ download }
 						onClick={ () =>
 							apiFetch( {
-								path: '/__experimental/edit-site/v1/export',
+								path: '/wp-block-editor/v1/export',
 								parse: false,
 							} )
 								.then( ( res ) => res.blob() )
