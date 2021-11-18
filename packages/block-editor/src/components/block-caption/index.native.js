@@ -9,6 +9,7 @@ import { View } from 'react-native';
 import { Caption, RichText } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -44,11 +45,23 @@ const BlockCaption = ( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } = select(
-			blockEditorStore
-		);
+		const {
+			getBlockAttributes,
+			getSelectedBlockClientId,
+			getBlockName,
+			getBlockRootClientId,
+		} = select( blockEditorStore );
 		const { caption } = getBlockAttributes( clientId ) || {};
 		const isBlockSelected = getSelectedBlockClientId() === clientId;
+
+		const parentId = getBlockRootClientId( clientId );
+		const parentBlockName = getBlockName( parentId );
+
+		hasBlockSupport(
+			parentBlockName,
+			'__experimentalHideChildBlockControls',
+			false
+		);
 
 		// We'll render the caption so that the soft keyboard is not forced to close on Android
 		// but still hide it by setting its display style to none. See wordpress-mobile/gutenberg-mobile#1221
