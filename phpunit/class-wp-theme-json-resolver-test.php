@@ -118,8 +118,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_switching_themes_recalculates_data() {
-		// By default, the theme for unit tests is "default",
-		// which doesn't have theme.json support.
+		// The "default" theme doesn't have theme.json support.
+		switch_theme( 'default' );
 		$default = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
 		// Switch to a theme that does have support.
