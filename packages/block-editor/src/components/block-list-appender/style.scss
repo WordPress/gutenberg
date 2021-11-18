@@ -60,3 +60,13 @@
 		transform: scale(0);
 	}
 }
+
+// Hide entirely in the site editor.
+// This appender, being part of the DOM, appears to the CSS as if it is another block.
+// In doing so, it causes big layout shifts when selecting nesting containers, which is
+// problematic in both post and site editors, though by nature, most so in the site editor.
+// @todo: this is meant to be a temporary measure, letting us find a better solution for
+// both editors in the process.
+.edit-site-block-editor__block-list .block-editor-block-list__block .block-list-appender {
+	display: none;
+}
