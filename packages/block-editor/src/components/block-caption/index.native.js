@@ -54,6 +54,10 @@ export default compose( [
 		const { caption } = getBlockAttributes( clientId ) || {};
 		const isBlockSelected = getSelectedBlockClientId() === clientId;
 
+		// Detect whether the block is an inner block by checking if it has a parent block.
+		// getBlockRootClientId() will return an empty string for all top-level blocks.
+		// If the block is an inner block, its parent may explicitly hide child block controls.
+		// See: https://github.com/wordpress-mobile/gutenberg-mobile/pull/4256
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlockName = getBlockName( parentId );
 
