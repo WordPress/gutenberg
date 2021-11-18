@@ -93,7 +93,6 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
-	context: { navigationArea },
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -109,28 +108,10 @@ function Navigation( {
 		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
 
-	const [ areaMenu, setAreaMenu ] = useEntityProp(
-		'root',
-		'navigationArea',
-		'navigation',
-		navigationArea
-	);
-
-	const navigationAreaMenu = areaMenu === 0 ? undefined : areaMenu;
-
-	const navigationMenuId = navigationArea
-		? navigationAreaMenu
-		: attributes.navigationMenuId;
-
-	const setNavigationMenuId = useCallback(
-		( postId ) => {
-			setAttributes( { navigationMenuId: postId } );
-			if ( navigationArea ) {
-				setAreaMenu( postId );
-			}
-		},
-		[ navigationArea ]
-	);
+	const navigationMenuId = attributes.navigationMenuId;
+	const setNavigationMenuId = useCallback( ( postId ) => {
+		setAttributes( { navigationMenuId: postId } );
+	}, [] );
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ navigationMenuId }`
@@ -160,7 +141,7 @@ function Navigation( {
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
-	const isWithinUnassignedArea = navigationArea && ! navigationMenuId;
+	const isWithinUnassignedArea = ! navigationMenuId;
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems || isWithinUnassignedArea
@@ -356,9 +337,6 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ () => {
-											if ( navigationArea ) {
-												setAreaMenu( 0 );
-											}
 											setAttributes( {
 												navigationMenuId: undefined,
 											} );
@@ -482,9 +460,6 @@ function Navigation( {
 						<NavigationMenuDeleteControl
 							onDelete={ () => {
 								replaceInnerBlocks( clientId, [] );
-								if ( navigationArea ) {
-									setAreaMenu( 0 );
-								}
 								setAttributes( {
 									navigationMenuId: undefined,
 								} );

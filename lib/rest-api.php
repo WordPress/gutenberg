@@ -41,15 +41,6 @@ function gutenberg_register_rest_menu_location() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_menu_location' );
 
 /**
- * Registers the navigation areas REST API routes.
- */
-function gutenberg_register_rest_navigation_areas() {
-	$navigation_areas = new WP_REST_Block_Navigation_Areas_Controller();
-	$navigation_areas->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_navigation_areas' );
-
-/**
  * Registers the customizer nonces REST API routes.
  */
 function gutenberg_register_rest_customizer_nonces() {
