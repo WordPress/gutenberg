@@ -53,9 +53,9 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	};
 
 	return (
-		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<>
+		<>
+			<BlockSettingsMenuControls>
+				{ ( { onClose } ) => (
 					<MenuItem
 						onClick={ () => {
 							setIsModalOpen( true );
@@ -64,16 +64,16 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 					>
 						{ __( 'Make template part' ) }
 					</MenuItem>
-					{ isModalOpen && (
-						<CreateTemplatePartModal
-							closeModal={ () => {
-								setIsModalOpen( false );
-							} }
-							onCreate={ onConvert }
-						/>
-					) }
-				</>
+				) }
+			</BlockSettingsMenuControls>
+			{ isModalOpen && (
+				<CreateTemplatePartModal
+					closeModal={ () => {
+						setIsModalOpen( false );
+					} }
+					onCreate={ onConvert }
+				/>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }
