@@ -68,7 +68,8 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"micromodal": "^0.4.6",
-		"moment": "^2.22.1"
+		"moment": "^2.22.1",
+		"uuid": "^8.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

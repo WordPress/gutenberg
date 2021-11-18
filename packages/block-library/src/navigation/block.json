@@ -11,7 +11,7 @@
 		"navigationMenuId": {
 		  "type": "number"
 		},
-		"menuSlug": {
+		"slug": {
 		  "type": "string"
 		},
 		"textColor": {

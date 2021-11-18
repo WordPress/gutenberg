@@ -10,12 +10,10 @@ import {
 	useState,
 	useEffect,
 	useRef,
-	useCallback,
 	Platform,
 	useContext,
 } from '@wordpress/element';
 import { v4 as uuid } from 'uuid';
-import { Disabled } from '@wordpress/components';
 import {
 	InspectorControls,
 	BlockControls,
@@ -31,6 +29,7 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
+	Disabled,
 	PanelBody,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -113,7 +112,7 @@ function Navigation( {
 	} = attributes;
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		`navigationMenu/${ attributes.menuSlug }`
+		`navigationMenu/${ attributes.slug }`
 	);
 
 	const { innerBlocks, isInnerBlockSelected } = useSelect(
@@ -155,7 +154,7 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
-	} = useNavigationMenu( attributes.menuSlug );
+	} = useNavigationMenu( attributes.slug );
 
 	const navRef = useRef();
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
@@ -264,18 +263,18 @@ function Navigation( {
 	// early.
 	const isDisabled = useContext( Disabled.Context );
 	const area = useTemplatePartArea( isDisabled ? undefined : clientId );
-	const oldSlug = attributes.menuSlug;
+	const oldSlug = attributes.slug;
 	useEffect( () => {
 		if ( ! oldSlug ) {
 			const newSlug = area?.area
 				? `wp-${ area.area }-menu`
 				: `wp-${ uuid() }-menu`;
-			setAttributes( { menuSlug: newSlug } );
+			setAttributes( { slug: newSlug } );
 		}
 	}, [ oldSlug, area?.area ] );
 	useEffect( () => {
 		if ( navigationMenu?.slug ) {
-			setAttributes( { menuSlug: navigationMenu.slug } );
+			setAttributes( { slug: navigationMenu.slug } );
 		}
 	}, [ navigationMenu?.slug ] );
 
@@ -297,7 +296,7 @@ function Navigation( {
 				onSave={ ( post ) => {
 					setHasSavedUnsavedInnerBlocks( true );
 					// Switch to using the wp_navigation entity.
-					setAttributes( { menuSlug: post.slug } );
+					setAttributes( { slug: post.slug } );
 				} }
 			/>
 		);
@@ -305,7 +304,7 @@ function Navigation( {
 
 	// Show a warning if the selected menu is no longer available.
 	// TODO - the user should be able to select a new one?
-	if ( attributes.menuSlug && isNavigationMenuMissing ) {
+	if ( attributes.slug && isNavigationMenuMissing ) {
 		return (
 			<div { ...blockProps }>
 				<Warning>
@@ -335,7 +334,7 @@ function Navigation( {
 		<EntityProvider
 			kind="postType"
 			type="wp_navigation"
-			id={ attributes.menuSlug }
+			id={ attributes.slug }
 		>
 			<RecursionProvider>
 				<BlockControls>
@@ -348,13 +347,13 @@ function Navigation( {
 							>
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
-										onSelect={ ( { id, slug } ) => {
-											setAttributes( { menuSlug: slug } );
+										onSelect={ ( { slug } ) => {
+											setAttributes( { slug } );
 											onClose();
 										} }
 										onCreateNew={ () => {
 											setAttributes( {
-												menuSlug: undefined,
+												slug: undefined,
 											} );
 											setIsPlaceholderShown( true );
 										} }
@@ -477,7 +476,7 @@ function Navigation( {
 							onDelete={ () => {
 								replaceInnerBlocks( clientId, [] );
 								setAttributes( {
-									menuSlug: undefined,
+									slug: undefined,
 								} );
 								setIsPlaceholderShown( true );
 							} }
@@ -489,7 +488,7 @@ function Navigation( {
 						<PlaceholderComponent
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
-								setAttributes( { menuSlug: post.slug } );
+								setAttributes( { slug: post.slug } );
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }
