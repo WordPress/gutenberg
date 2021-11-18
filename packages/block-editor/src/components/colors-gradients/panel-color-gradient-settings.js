@@ -179,6 +179,12 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 
 	colorGradientSettings.colors = useMemo( () => {
 		const result = [];
+		if ( themeColors && themeColors.length ) {
+			result.push( {
+				name: __( 'Theme' ),
+				colors: themeColors,
+			} );
+		}
 		if (
 			shouldDisplayDefaultColors &&
 			defaultColors &&
@@ -187,12 +193,6 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 			result.push( {
 				name: __( 'Default' ),
 				colors: defaultColors,
-			} );
-		}
-		if ( themeColors && themeColors.length ) {
-			result.push( {
-				name: __( 'Theme' ),
-				colors: themeColors,
 			} );
 		}
 		if ( customColors && customColors.length ) {
@@ -212,6 +212,12 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 	);
 	colorGradientSettings.gradients = useMemo( () => {
 		const result = [];
+		if ( themeGradients && themeGradients.length ) {
+			result.push( {
+				name: __( 'Theme' ),
+				gradients: themeGradients,
+			} );
+		}
 		if (
 			shouldDisplayDefaultGradients &&
 			defaultGradients &&
@@ -220,12 +226,6 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 			result.push( {
 				name: __( 'Default' ),
 				gradients: defaultGradients,
-			} );
-		}
-		if ( themeGradients && themeGradients.length ) {
-			result.push( {
-				name: __( 'Theme' ),
-				gradients: themeGradients,
 			} );
 		}
 		if ( customGradients && customGradients.length ) {

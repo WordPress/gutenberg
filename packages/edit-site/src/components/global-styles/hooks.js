@@ -223,16 +223,16 @@ export function useColorsPerOrigin( name ) {
 	const [ defaultColors ] = useSetting( 'color.palette.core', name );
 	return useMemo( () => {
 		const result = [];
-		if ( defaultColors && defaultColors.length ) {
-			result.push( {
-				name: __( 'Default' ),
-				colors: defaultColors,
-			} );
-		}
 		if ( themeColors && themeColors.length ) {
 			result.push( {
 				name: __( 'Theme' ),
 				colors: themeColors,
+			} );
+		}
+		if ( defaultColors && defaultColors.length ) {
+			result.push( {
+				name: __( 'Default' ),
+				colors: defaultColors,
 			} );
 		}
 		if ( customColors && customColors.length ) {
@@ -251,16 +251,16 @@ export function useGradientsPerOrigin( name ) {
 	const [ defaultGradients ] = useSetting( 'color.gradients.core', name );
 	return useMemo( () => {
 		const result = [];
-		if ( defaultGradients && defaultGradients.length ) {
-			result.push( {
-				name: __( 'Default' ),
-				gradients: defaultGradients,
-			} );
-		}
 		if ( themeGradients && themeGradients.length ) {
 			result.push( {
 				name: __( 'Theme' ),
 				gradients: themeGradients,
+			} );
+		}
+		if ( defaultGradients && defaultGradients.length ) {
+			result.push( {
+				name: __( 'Default' ),
+				gradients: defaultGradients,
 			} );
 		}
 		if ( customGradients && customGradients.length ) {
