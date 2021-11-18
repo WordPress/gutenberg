@@ -24,10 +24,52 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$number = $block->context['queryPerPage'];
-
+	$per_page = $block->context['queryPerPage'];
 	// Get an array of comments for the current post.
-	$comments = get_approved_comments( $post_id, array( 'number' => $number ) );
+
+	$page = (int) get_query_var( 'cpage' );
+
+	$comment_args = array(
+		'number'                    => $per_page,
+		'orderby'                   => 'comment_date_gmt',
+		'order'                     => 'ASC',
+		'status'                    => 'approve',
+		'post_id'                   => $post_id,
+		'no_found_rows'             => false,
+		'update_comment_meta_cache' => false,
+		'offset'                    => 0,
+	);
+
+	if ( get_option( 'thread_comments' ) ) {
+		$comment_args['hierarchical'] = 'threaded';
+	} else {
+		$comment_args['hierarchical'] = false;
+	}
+
+	if ( $page ) {
+		$comment_args['offset'] = ( $page - 1 ) * $per_page;
+	} else {
+		$top_level_query = new WP_Comment_Query();
+		$top_level_args  = array(
+			'count'   => true,
+			'orderby' => false,
+			'post_id' => $post_id,
+			'status'  => 'approve',
+		);
+
+		if ( $comment_args['hierarchical'] ) {
+			$top_level_args['parent'] = 0;
+		}
+
+		if ( isset( $comment_args['include_unapproved'] ) ) {
+			$top_level_args['include_unapproved'] = $comment_args['include_unapproved'];
+		}
+		$top_level_args         = apply_filters( 'comments_template_top_level_query_args', $top_level_args );
+		$top_level_count        = $top_level_query->query( $top_level_args );
+		$comment_args['offset'] = ( ceil( $top_level_count / $per_page ) - 1 ) * $per_page;
+	}
+
+	$comments = get_comments( $comment_args );
 
 	if ( count( $comments ) === 0 ) {
 		return '';
