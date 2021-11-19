@@ -17,6 +17,8 @@
 function render_block_core_query_pagination_previous( $attributes, $content, $block ) {
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$paged    = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( 'Previous Page' );
@@ -25,33 +27,39 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	if ( $pagination_arrow ) {
 		$label = $pagination_arrow . $label;
 	}
-	$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
-	if( 1 === $paged ){
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'first-page' ) );
-	}
-	$content = sprintf(
-		'<span %1$s>%2$s</span>',
-		$wrapper_attributes,
-		$label
-	);
 	// Check if the pagination is for Query that inherits the global context
 	// and handle appropriately.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
+		global $wp_query;
+		$max_page               = ! $max_page || $max_page > $wp_query->max_num_pages ? $wp_query->max_num_pages : $max_page;
 		$filter_link_attributes = function() use ( $wrapper_attributes ) {
 			return $wrapper_attributes;
 		};
+
 		add_filter( 'previous_posts_link_attributes', $filter_link_attributes );
-		if( 1 !== $paged ){
+		if ( 1 !== $paged ) {
 			$content = get_previous_posts_link( $label );
+		} else {
+			// Prints the link only if there are pages to paginate
+			$content = $max_page > 1 ? sprintf(
+				'<span %1$s>%2$s</span>',
+				$wrapper_attributes,
+				$label
+			) : '';
 		}
 		remove_filter( 'previous_posts_link_attributes', $filter_link_attributes );
-	} elseif ( 1 !== $page ) {
-		$content = sprintf(
+	} else {
+		$content = 1 !== $page ? sprintf(
 			'<a href="%1$s" %2$s>%3$s</a>',
 			esc_url( add_query_arg( $page_key, $page - 1 ) ),
 			$wrapper_attributes,
 			$label
+		) : sprintf(
+			'<span %1$s>%2$s</span>',
+			$wrapper_attributes,
+			$label
 		);
+
 	}
 	return $content;
 }
