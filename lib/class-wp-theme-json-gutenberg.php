@@ -281,7 +281,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Constructor.
 	 *
 	 * @param array  $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin What source of data this object represents. One of core, theme, or user. Default: theme.
+	 * @param string $origin What source of data this object represents. One of default, theme, or user. Default: theme.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
 		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
