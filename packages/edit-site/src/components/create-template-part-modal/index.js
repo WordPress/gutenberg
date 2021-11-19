@@ -28,6 +28,7 @@ import { TEMPLATE_PART_AREA_GENERAL } from '../../store/constants';
 export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 	const [ title, setTitle ] = useState( '' );
 	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_GENERAL );
+	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const instanceId = useInstanceId( CreateTemplatePartModal );
 
 	const templatePartAreas = useSelect(
@@ -46,10 +47,12 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 			<form
 				onSubmit={ async ( event ) => {
 					event.preventDefault();
-					if ( ! title || ! area ) {
+					if ( ! title ) {
 						return;
 					}
+					setIsSubmitting( true );
 					await onCreate( { title, area } );
+					setIsSubmitting( false );
 					closeModal();
 				} }
 			>
@@ -70,7 +73,6 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 						id={ `edit-site-create-template-part-modal__area-selection-${ instanceId }` }
 						onChange={ setArea }
 						checked={ area }
-						required
 					>
 						{ templatePartAreas.map(
 							( { icon, label, area: value, description } ) => (
@@ -117,7 +119,8 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ ! title || ! area }
+							disabled={ ! title }
+							isBusy={ isSubmitting }
 						>
 							{ __( 'Create' ) }
 						</Button>

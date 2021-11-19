@@ -116,7 +116,8 @@ export function* removeTemplate( template ) {
 		'deleteEntityRecord',
 		'postType',
 		template.type,
-		template.id
+		template.id,
+		{ force: true }
 	);
 }
 

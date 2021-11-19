@@ -8,9 +8,8 @@ import { kebabCase } from 'lodash';
  */
 import { useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { addQueryArgs } from '@wordpress/url';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -19,23 +18,22 @@ import CreateTemplatePartModal from '../create-template-part-modal';
 
 export default function NewTemplatePart( { postType } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const { saveEntityRecord } = useDispatch( coreStore );
 
 	async function createTemplatePart( { title, area } ) {
-		if ( ! title || ! area ) {
+		if ( ! title ) {
 			return;
 		}
 
-		const templatePart = await saveEntityRecord(
-			'postType',
-			'wp_template_part',
-			{
+		const templatePart = await apiFetch( {
+			path: '/wp/v2/template-parts',
+			method: 'POST',
+			data: {
 				slug: kebabCase( title ),
 				title,
 				content: '',
 				area,
-			}
-		);
+			},
+		} );
 
 		// Navigate to the created template part editor.
 		window.location.search = addQueryArgs( '', {
@@ -43,6 +41,9 @@ export default function NewTemplatePart( { postType } ) {
 			postId: templatePart.id,
 			postType: 'wp_template_part',
 		} );
+
+		// Wait for async navigation to happen before closing the modal.
+		await new Promise( () => {} );
 	}
 
 	return (

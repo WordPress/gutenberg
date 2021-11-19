@@ -12,15 +12,11 @@ import {
 	MenuItem,
 	NavigableMenu,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
+import apiFetch from '@wordpress/api-fetch';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
@@ -45,23 +41,26 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
-	const { addTemplate } = useDispatch( editSiteStore );
 
-	async function createTemplate( slug ) {
+	async function createTemplate( { slug } ) {
 		const { title, description } = find( defaultTemplateTypes, { slug } );
 
-		const { templateId } = await addTemplate( {
-			excerpt: description,
-			// Slugs need to be strings, so this is for template `404`
-			slug: slug.toString(),
-			status: 'publish',
-			title,
+		const template = await apiFetch( {
+			path: '/wp/v2/templates',
+			method: 'POST',
+			data: {
+				excerpt: description,
+				// Slugs need to be strings, so this is for template `404`
+				slug: slug.toString(),
+				status: 'publish',
+				title,
+			},
 		} );
 
 		// Navigate to the created template editor.
 		window.location.search = addQueryArgs( '', {
 			page: 'gutenberg-edit-site',
-			postId: templateId,
+			postId: template.id,
 			postType: 'wp_template',
 		} );
 	}
@@ -92,7 +91,7 @@ export default function NewTemplate( { postType } ) {
 				variant: 'primary',
 			} }
 		>
-			{ ( { onClose } ) => (
+			{ () => (
 				<NavigableMenu className="edit-site-new-template-dropdown__popover">
 					<MenuGroup label={ postType.labels.add_new_item }>
 						{ map(
@@ -102,8 +101,8 @@ export default function NewTemplate( { postType } ) {
 									info={ description }
 									key={ slug }
 									onClick={ () => {
-										createTemplate( slug );
-										onClose();
+										createTemplate( { slug } );
+										// We will be navigated way so no need to close the dropdown.
 									} }
 								>
 									{ title }
