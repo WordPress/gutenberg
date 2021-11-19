@@ -34,7 +34,7 @@ The [WordPress.org Roadmap](https://wordpress.org/about/roadmap/) with Four Phas
 
 **Biweekly:**
 
-[“What’s New In Gutenberg?” posts](https://make.wordpress.org/core/tag/gutenberg-new/). These updates are wrangled by the Core Editor team and focus on what’s been released in each biweekly Gutenberg release. Currently, they tend to mimic a changelog.
+[“What’s New In Gutenberg?” release posts](https://make.wordpress.org/core/tag/gutenberg-new/). These updates are wrangled by the Core Editor team and focus on what’s been released in each biweekly Gutenberg release. They include the most relevant features released and a full changelog.
 
 **Weekly:**
 
