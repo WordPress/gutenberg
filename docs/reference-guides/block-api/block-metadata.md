@@ -6,7 +6,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 
 ```json
 {
-	"$schema": "https://json.schemastore.org/block.json",
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "my-plugin/notice",
 	"title": "Notice",
@@ -61,7 +61,7 @@ The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `bl
 Development is improved by using a defined schema definition file. Supported editors can provide help like tooltips, autocomplete, and schema validation. To use the schema, add the following to the top of the `block.json`.
 
 ```json
-"$schema": "https://json.schemastore.org/block.json"
+"$schema": "https://schemas.wp.org/trunk/block.json"
 ```
 
 ## Block registration

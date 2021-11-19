@@ -15,18 +15,20 @@ const migrateWithLayout = ( attributes ) => {
 		return attributes;
 	}
 
-	const { contentJustification, orientation } = attributes;
-
-	const updatedAttributes = {
-		...attributes,
-	};
+	const {
+		contentJustification,
+		orientation,
+		...updatedAttributes
+	} = attributes;
 
 	if ( contentJustification || orientation ) {
 		Object.assign( updatedAttributes, {
 			layout: {
 				type: 'flex',
-				justifyContent: contentJustification || 'left',
-				orientation: orientation || 'horizontal',
+				...( contentJustification && {
+					justifyContent: contentJustification,
+				} ),
+				...( orientation && { orientation } ),
 			},
 		} );
 	}
@@ -57,7 +59,8 @@ const deprecated = [
 				},
 			},
 		},
-		isEligible: ( { layout } ) => ! layout,
+		isEligible: ( { contentJustification, orientation } ) =>
+			!! contentJustification || !! orientation,
 		migrate: migrateWithLayout,
 		save( { attributes: { contentJustification, orientation } } ) {
 			return (

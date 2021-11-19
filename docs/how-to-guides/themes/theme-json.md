@@ -226,9 +226,13 @@ The settings section has the following structure:
 		},
 		"color": {
 			"background": true,
+			"corePalette": true,
+			"coreGradients": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
+			"corePalette": true,
+			"coreGradients": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
@@ -981,11 +985,11 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ## Developing with theme.json
 
-It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at [SchemaStore.org](https://schemastore.org/)
+It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
 
-Editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://json.schemastore.org/theme-v1.json"` to the beginning of your theme.json file.
+Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
 
-![Example using validation with schema](https://developer.wordpress.org/files/2021/10/schema-validation.gif)
+![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
 
 
 ## Frequently Asked Questions

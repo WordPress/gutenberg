@@ -1,7 +1,9 @@
 # Documentation
-/docs                                           @ajitbohra
-/docs/designers-developers/developers           @mkaz @ajitbohra
-/docs/designers-developers/designers            @mkaz @ajitbohra
+/docs                                           @ajitbohra @mkaz
+
+# Schemas
+/schemas                                        @mkaz
+/schemas/json                                   @ajlende
 
 # Data
 /packages/api-fetch                             @nerrad @mmtr

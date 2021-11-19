@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/page-list",
 	"title": "Page List",
@@ -6,8 +7,7 @@
 	"description": "Display a list of all pages.",
 	"keywords": [ "menu", "navigation" ],
 	"textdomain": "default",
-	"attributes": {
-	},
+	"attributes": {},
 	"usesContext": [
 		"textColor",
 		"customTextColor",

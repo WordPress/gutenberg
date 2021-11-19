@@ -97,7 +97,7 @@ function GalleryEdit( props ) {
 		shortCodeTransforms,
 		sizeSlug,
 	} = attributes;
-	useMobileWarning();
+
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
@@ -138,6 +138,8 @@ function GalleryEdit( props ) {
 	const imageData = useGetMedia( innerBlockImages );
 
 	const newImages = useGetNewImages( images, imageData );
+
+	useMobileWarning( newImages );
 
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {

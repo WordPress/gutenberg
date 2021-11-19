@@ -532,6 +532,10 @@ _Returns_
 
 Opens the publish panel.
 
+### openTypographyToolsPanelMenu
+
+Opens the Typography tools panel menu provided via block supports.
+
 ### pressKeyTimes
 
 Presses the given keyboard key a number of times in sequence.

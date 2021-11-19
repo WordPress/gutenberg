@@ -158,12 +158,12 @@ export const dispatch = defaultRegistry.dispatch;
 export const subscribe = defaultRegistry.subscribe;
 
 /**
- * Registers a generic store.
+ * Registers a generic store instance.
  *
- * @deprecated Use `register` instead.
+ * @deprecated Use `register( storeDescriptor )` instead.
  *
- * @param {string} key    Store registry key.
- * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+ * @param {string} name Store registry name.
+ * @param {Object} store Store instance (`{ getSelectors, getActions, subscribe }`).
  */
 export const registerGenericStore = defaultRegistry.registerGenericStore;
 

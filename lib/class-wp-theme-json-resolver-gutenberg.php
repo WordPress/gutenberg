@@ -157,7 +157,32 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		* So we take theme supports, transform it to theme.json shape
 		* and merge the self::$theme upon that.
 		*/
-		$theme_support_data  = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		if ( ! self::theme_has_support() ) {
+			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
+				$theme_support_data['settings']['color'] = array();
+			}
+
+			$default_palette = false;
+			if ( current_theme_supports( 'default-color-palette' ) ) {
+				$default_palette = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['color']['palette'] ) ) {
+				// If the theme does not have any palette, we still want to show the core one.
+				$default_palette = true;
+			}
+			$theme_support_data['settings']['color']['corePalette'] = $default_palette;
+
+			$default_gradients = false;
+			if ( current_theme_supports( 'default-gradient-presets' ) ) {
+				$default_gradients = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['color']['gradients'] ) ) {
+				// If the theme does not have any gradients, we still want to show the core ones.
+				$default_gradients = true;
+			}
+			$theme_support_data['settings']['color']['coreGradients'] = $default_gradients;
+		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( self::$theme );
 
@@ -346,7 +371,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = is_readable( get_theme_file_path( 'theme.json' ) );
+			self::$theme_has_support = (
+				is_readable( self::get_file_path_from_theme( 'theme.json' ) ) ||
+				is_readable( self::get_file_path_from_theme( 'theme.json', true ) )
+			);
 		}
 
 		return self::$theme_has_support;

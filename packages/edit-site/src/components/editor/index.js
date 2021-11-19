@@ -33,18 +33,21 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
  */
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import ErrorBoundary from '../error-boundary';
+import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from './global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
+	drawer: __( 'Navigation Sidebar' ),
 };
 
 function Editor( { initialSettings, onError } ) {
@@ -218,6 +221,11 @@ function Editor( { initialSettings, onError } ) {
 														<ComplementaryArea.Slot scope="core/edit-site" />
 													)
 												}
+												drawer={
+													<NavigationSidebar
+														defaultIsOpen={ false }
+													/>
+												}
 												header={
 													<Header
 														openEntitiesSavedStates={
@@ -288,6 +296,7 @@ function Editor( { initialSettings, onError } ) {
 												}
 												footer={ <BlockBreadcrumb /> }
 											/>
+											<WelcomeGuide />
 											<Popover.Slot />
 											<PluginArea />
 										</ErrorBoundary>

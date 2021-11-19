@@ -19,7 +19,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import NavigationLink from './navigation-link';
 import MoreMenu from './more-menu';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
@@ -106,8 +105,6 @@ export default function Header( {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				<NavigationLink />
-
 				<div className="edit-site-header__toolbar">
 					<Button
 						ref={ inserterButton }
