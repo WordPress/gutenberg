@@ -268,7 +268,7 @@ describe( 'global styles renderer', () => {
 				settings: {
 					color: {
 						palette: {
-							core: [
+							default: [
 								{
 									name: 'White',
 									slug: 'white',
@@ -286,7 +286,7 @@ describe( 'global styles renderer', () => {
 						'core/heading': {
 							color: {
 								palette: {
-									core: [
+									default: [
 										{
 											name: 'Blue',
 											slug: 'blue',

@@ -119,7 +119,7 @@ export default function useSetting( path ) {
 					return (
 						experimentalFeaturesResult.user ??
 						experimentalFeaturesResult.theme ??
-						experimentalFeaturesResult.core
+						experimentalFeaturesResult.default
 					);
 				}
 				return experimentalFeaturesResult;

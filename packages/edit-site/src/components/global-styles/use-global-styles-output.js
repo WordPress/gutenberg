@@ -60,7 +60,7 @@ function getPresetsDeclarations( blockPresets = {} ) {
 		PRESET_METADATA,
 		( declarations, { path, valueKey, cssVarInfix } ) => {
 			const presetByOrigin = get( blockPresets, path, [] );
-			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
+			[ 'default', 'theme', 'user' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
 						declarations.push(
@@ -94,7 +94,7 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 			}
 
 			const presetByOrigin = get( blockPresets, path, [] );
-			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
+			[ 'default', 'theme', 'user' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( { slug } ) => {
 						classes.forEach( ( { classSuffix, propertyName } ) => {
