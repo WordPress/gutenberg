@@ -89,7 +89,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style  = "$selector {";
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
-			$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
+			$style .= 'gap: var(--wp--style--block-gap--self, var(--wp--style--block-gap, 0.5em));';
 		} else {
 			$style .= 'gap: 0.5em;';
 		}

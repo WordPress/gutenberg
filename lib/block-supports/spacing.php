@@ -116,7 +116,7 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 	}
 
 	$style = sprintf(
-		'--wp--style--block-gap: %s',
+		'--wp--style--block-gap--self: %s',
 		esc_attr( $gap_value )
 	);
 
