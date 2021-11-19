@@ -16,7 +16,7 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 
 ## Ways to Stay Informed
 
-New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale so what follows is more of a catalogue of ways to keep up rather than a recommendation for how to do so. 
+New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale. What follows is more of a catalogue of ways to keep up rather than a recommendation for how to do so. 
 
 **Yearly:**
 
