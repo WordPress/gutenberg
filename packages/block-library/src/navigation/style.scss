@@ -258,7 +258,7 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container,
 .wp-block-navigation__responsive-container-content {
-	gap: var(--wp--style--block-gap, 2em);
+	gap: var(--wp--style--block-gap--self, var(--wp--style--block-gap, 2em));
 }
 
 // Menu items with background.
@@ -269,7 +269,7 @@ button.wp-block-navigation-item__content {
 	&,
 	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
-		gap: var(--wp--style--block-gap, 0.5em);
+		gap: var(--wp--style--block-gap--self, var(--wp--style--block-gap, 0.5em));
 	}
 }
 
