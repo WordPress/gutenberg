@@ -27,6 +27,14 @@ function Palette( { name } ) {
 	const screenPath = ! name
 		? '/colors/palette'
 		: '/blocks/' + name + '/colors/palette';
+	const palleteButtonText =
+		colors.length > 0
+			? sprintf(
+					// Translators: %d: Number of palette colors.
+					_n( '%d color', '%d colors', colors.length ),
+					colors.length
+			  )
+			: __( 'Add custom colors' );
 
 	return (
 		<VStack spacing={ 3 }>
@@ -44,13 +52,7 @@ function Palette( { name } ) {
 								) ) }
 							</ZStack>
 						</FlexBlock>
-						<FlexItem>
-							{ sprintf(
-								// Translators: %d: Number of palette colors.
-								_n( '%d color', '%d colors', colors.length ),
-								colors.length
-							) }
-						</FlexItem>
+						<FlexItem>{ palleteButtonText }</FlexItem>
 					</HStack>
 				</NavigationButton>
 			</ItemGroup>
