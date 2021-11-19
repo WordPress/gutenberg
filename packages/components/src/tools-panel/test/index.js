@@ -499,13 +499,14 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'registration of panel items', () => {
-		it( 'should register and deregister items when switching between panels', () => {
-			// This test adds a `panelId` prop to two panels, to simulate
-			// the registration and de-registration of panelItems when
-			// switching between panels and test for any issues.
+		it( 'should register and deregister items when panelId changes', () => {
+			// This test simulates switching block selection, which causes the
+			// `ToolsPanel` to rerender with a new panelId, necessitating the
+			// registration and deregistration of appropriate `ToolsPanelItem`
+			// children.
 			//
-			// When you switch from panel A to panel B, only panel A items
-			// should be deregistered, and only panel B items should be registered.
+			// When the `panelId` changes, only items matching the new ID register
+			// themselves, while those for the old panelId deregister.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/36588
 
@@ -543,14 +544,14 @@ describe( 'ToolsPanel', () => {
 					panelId: '1234',
 				} )
 			);
-			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 0 );
+			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
 			// Simulate a change in panel, e.g. a switch of block selection.
 			context.panelId = '4321';
 			context.menuItems.optional[ altControlProps.label ] = false;
 
-			// Rerender the panel item. Because we are switching away from this
-			// panel, its panelItem should NOT be registered, but it SHOULD be
+			// Rerender the panel item. Because we have a new panelId, this
+			// panelItem should NOT be registered, but it SHOULD be
 			// deregistered.
 			rerender( <TestPanel /> );
 
@@ -561,7 +562,7 @@ describe( 'ToolsPanel', () => {
 				altControlProps.label
 			);
 
-			// Simulate switching back to the original panel, e.g. by selecting
+			// Simulate switching back to the original panelId, e.g. by selecting
 			// the original block again.
 			context.panelId = '1234';
 			context.menuItems.optional[ altControlProps.label ] = true;
