@@ -8,7 +8,7 @@ import { every, isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { PanelBody, ColorIndicator } from '@wordpress/components';
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, _x } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -172,64 +172,88 @@ const PanelColorGradientSettingsSingleSelect = ( props ) => {
 
 const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 	const colorGradientSettings = useCommonSingleMultipleSelects();
-	const userColors = useSetting( 'color.palette.user' );
+	const customColors = useSetting( 'color.palette.user' );
 	const themeColors = useSetting( 'color.palette.theme' );
-	const coreColors = useSetting( 'color.palette.core' );
-	const shouldDisplayCoreColors = useSetting( 'color.corePalette' );
+	const defaultColors = useSetting( 'color.palette.core' );
+	const shouldDisplayDefaultColors = useSetting( 'color.defaultPalette' );
 
 	colorGradientSettings.colors = useMemo( () => {
 		const result = [];
-		if ( shouldDisplayCoreColors && coreColors && coreColors.length ) {
-			result.push( {
-				name: __( 'Core' ),
-				colors: coreColors,
-			} );
-		}
 		if ( themeColors && themeColors.length ) {
 			result.push( {
-				name: __( 'Theme' ),
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
 				colors: themeColors,
 			} );
 		}
-		if ( userColors && userColors.length ) {
+		if (
+			shouldDisplayDefaultColors &&
+			defaultColors &&
+			defaultColors.length
+		) {
 			result.push( {
-				name: __( 'User' ),
-				colors: userColors,
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				colors: defaultColors,
+			} );
+		}
+		if ( customColors && customColors.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette comes from the theme.'
+				),
+				colors: customColors,
 			} );
 		}
 		return result;
-	}, [ coreColors, themeColors, userColors ] );
+	}, [ defaultColors, themeColors, customColors ] );
 
-	const userGradients = useSetting( 'color.gradients.user' );
+	const customGradients = useSetting( 'color.gradients.user' );
 	const themeGradients = useSetting( 'color.gradients.theme' );
-	const coreGradients = useSetting( 'color.gradients.core' );
-	const shouldDisplayCoreGradients = useSetting( 'color.coreGradients' );
+	const defaultGradients = useSetting( 'color.gradients.core' );
+	const shouldDisplayDefaultGradients = useSetting(
+		'color.defaultGradients'
+	);
 	colorGradientSettings.gradients = useMemo( () => {
 		const result = [];
-		if (
-			shouldDisplayCoreGradients &&
-			coreGradients &&
-			coreGradients.length
-		) {
-			result.push( {
-				name: __( 'Core' ),
-				gradients: coreGradients,
-			} );
-		}
 		if ( themeGradients && themeGradients.length ) {
 			result.push( {
-				name: __( 'Theme' ),
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
 				gradients: themeGradients,
 			} );
 		}
-		if ( userGradients && userGradients.length ) {
+		if (
+			shouldDisplayDefaultGradients &&
+			defaultGradients &&
+			defaultGradients.length
+		) {
 			result.push( {
-				name: __( 'User' ),
-				gradients: userGradients,
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				gradients: defaultGradients,
+			} );
+		}
+		if ( customGradients && customGradients.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				gradients: customGradients,
 			} );
 		}
 		return result;
-	}, [ userGradients, themeGradients, coreGradients ] );
+	}, [ customGradients, themeGradients, defaultGradients ] );
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }

@@ -170,10 +170,10 @@
 				}
 			],
 			"custom": true,
-			"corePalette": true,
-			"coreGradients": true,
 			"customDuotone": true,
 			"customGradient": true,
+			"defaultGradients": true,
+			"defaultPalette": true,
 			"link": false,
 			"text": true
 		},
