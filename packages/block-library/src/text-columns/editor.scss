@@ -3,8 +3,3 @@
 		outline: $border-width solid $gray-300;
 	}
 }
-
-// Hide inserter from previews.
-.block-editor-block-preview__content-iframe .wp-block-columns .block-list-appender {
-	display: none;
-}
