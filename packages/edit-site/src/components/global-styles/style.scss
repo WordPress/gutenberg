@@ -12,6 +12,10 @@
 		width: 36px;
 		margin-left: 0;
 		padding: 0;
+
+		&::after {
+			display: none;
+		}
 	}
 }
 
