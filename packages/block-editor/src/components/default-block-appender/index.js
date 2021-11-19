@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -26,13 +25,12 @@ export const ZWNBSP = '\ufeff';
 
 export function DefaultBlockAppender( {
 	isLocked,
-	isVisible,
 	onAppend,
 	showPrompt,
 	placeholder,
 	rootClientId,
 } ) {
-	if ( isLocked || ! isVisible ) {
+	if ( isLocked ) {
 		return null;
 	}
 
@@ -77,23 +75,14 @@ export function DefaultBlockAppender( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const {
-			getBlockCount,
-			getBlockName,
-			isBlockValid,
-			getSettings,
-			getTemplateLock,
-		} = select( blockEditorStore );
+		const { getBlockCount, getSettings, getTemplateLock } = select(
+			blockEditorStore
+		);
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const isLastBlockDefault =
-			getBlockName( ownProps.lastBlockClientId ) ===
-			getDefaultBlockName();
-		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 		const { bodyPlaceholder } = getSettings();
 
 		return {
-			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
 			showPrompt: isEmpty,
 			isLocked: !! getTemplateLock( ownProps.rootClientId ),
 			placeholder: bodyPlaceholder,
