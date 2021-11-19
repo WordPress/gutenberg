@@ -33,9 +33,9 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
  */
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
@@ -113,11 +113,7 @@ function Editor( { initialSettings, onError } ) {
 	// so that they can be selected with core/editor selectors in any editor.
 	// This is needed because edit-site doesn't initialize with EditorProvider,
 	// which internally uses updateEditorSettings as well.
-	const {
-		defaultTemplateTypes,
-		defaultTemplatePartAreas,
-		__experimentalNewMenuSidebar: newMenuSidebar,
-	} = settings;
+	const { defaultTemplateTypes, defaultTemplatePartAreas } = settings;
 	useEffect( () => {
 		updateEditorSettings( {
 			defaultTemplateTypes,
@@ -219,16 +215,16 @@ function Editor( { initialSettings, onError } ) {
 											<SidebarComplementaryAreaFills />
 											<InterfaceSkeleton
 												labels={ interfaceLabels }
-												drawer={
-													newMenuSidebar ? undefined : (
-														<NavigationSidebar />
-													)
-												}
 												secondarySidebar={ secondarySidebar() }
 												sidebar={
 													sidebarIsOpened && (
 														<ComplementaryArea.Slot scope="core/edit-site" />
 													)
+												}
+												drawer={
+													<NavigationSidebar
+														defaultIsOpen={ false }
+													/>
 												}
 												header={
 													<Header

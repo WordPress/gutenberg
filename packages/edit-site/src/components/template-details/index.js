@@ -31,13 +31,7 @@ export default function TemplateDetails( { template, onClose } ) {
 			select( editorStore ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
-	const newMenuSidebar = useSelect(
-		( select ) =>
-			select( editSiteStore ).getSettings().__experimentalNewMenuSidebar
-	);
-	const { openNavigationPanelToMenu, revertTemplate } = useDispatch(
-		editSiteStore
-	);
+	const { revertTemplate } = useDispatch( editSiteStore );
 
 	const templateSubMenu = useMemo( () => {
 		if ( template?.type === 'wp_template' ) {
@@ -52,11 +46,6 @@ export default function TemplateDetails( { template, onClose } ) {
 	if ( ! template ) {
 		return null;
 	}
-
-	const showTemplateInSidebar = () => {
-		onClose();
-		openNavigationPanelToMenu( templateSubMenu.menu );
-	};
 
 	const revert = () => {
 		revertTemplate( template );
@@ -101,23 +90,11 @@ export default function TemplateDetails( { template, onClose } ) {
 
 			<Button
 				className="edit-site-template-details__show-all-button"
-				{ ...( newMenuSidebar
-					? {
-							href: addQueryArgs( 'edit.php', {
-								// TODO: We should update this to filter by template part's areas as well.
-								post_type: template.type,
-							} ),
-					  }
-					: {
-							onClick: showTemplateInSidebar,
-							'aria-label': sprintf(
-								/* translators: %1$s: the template part's area name ("Headers", "Sidebars") or "templates". */
-								__(
-									'Browse all %1$s. This will open the %1$s menu in the navigation side panel.'
-								),
-								templateSubMenu.title
-							),
-					  } ) }
+				href={ addQueryArgs( '', {
+					page: 'gutenberg-edit-site',
+					// TODO: We should update this to filter by template part's areas as well.
+					postType: template.type,
+				} ) }
 			>
 				{ sprintf(
 					/* translators: the template part's area name ("Headers", "Sidebars") or "templates". */

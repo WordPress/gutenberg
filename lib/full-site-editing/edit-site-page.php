@@ -32,6 +32,15 @@ function gutenberg_is_edit_site_page( $page ) {
 }
 
 /**
+ * Checks whether the provided page is the templates list page.
+ *
+ * @return bool True for Site Editor pages, false otherwise.
+ */
+function gutenberg_is_edit_site_list_page() {
+	return isset( $_GET['postType'] ) && ! isset( $_GET['postId'] );
+}
+
+/**
  * Load editor styles (this is copied from edit-form-blocks.php).
  * Ideally the code is extracted into a reusable function.
  *
@@ -68,7 +77,50 @@ function gutenberg_get_editor_styles() {
 }
 
 /**
- * Initialize the Gutenberg Edit Site Page.
+ * Initialize the Gutenberg Templates List Page.
+ */
+function gutenberg_edit_site_list_init() {
+	wp_enqueue_script( 'wp-edit-site' );
+	wp_enqueue_style( 'wp-edit-site' );
+	wp_enqueue_media();
+
+	$template_type = $_GET['postType'];
+	$post_type     = get_post_type_object( $template_type );
+
+	$preload_data = array_reduce(
+		array(
+			'/',
+			"/wp/v2/types/$template_type?context=edit",
+			'/wp/v2/types?context=edit',
+			"/wp/v2/$post_type->rest_base?context=edit",
+		),
+		'rest_preload_api_request',
+		array()
+	);
+
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
+
+	wp_add_inline_script(
+		'wp-edit-site',
+		sprintf(
+			'wp.domReady( function() {
+				wp.editSite.initializeList( "%s", "%s" );
+			} );',
+			'edit-site-editor',
+			$template_type
+		)
+	);
+}
+
+/**
+ * Initialize the Gutenberg Site Editor.
  *
  * @since 7.2.0
  *
@@ -89,6 +141,10 @@ function gutenberg_edit_site_init( $hook ) {
 			return "$classes is-fullscreen-mode";
 		}
 	);
+
+	if ( gutenberg_is_edit_site_list_page() ) {
+		return gutenberg_edit_site_list_init();
+	}
 
 	/**
 	 * Make the WP Screen object aware that this is a block editor page.
@@ -135,7 +191,7 @@ function gutenberg_edit_site_init( $hook ) {
 					'/wp/v2/themes/' . $active_theme . '/global-styles',
 				)
 			),
-			'initializer_name' => 'initialize',
+			'initializer_name' => 'initializeEditor',
 			'editor_settings'  => $settings,
 		)
 	);
