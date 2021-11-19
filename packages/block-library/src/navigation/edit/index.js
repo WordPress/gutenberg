@@ -6,10 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+	Platform,
+} from '@wordpress/element';
 import {
 	InspectorControls,
-	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
@@ -20,7 +25,7 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, useEntityProp } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -38,10 +43,12 @@ import { __ } from '@wordpress/i18n';
 import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
+import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
+import NavigationMenuPublishButton from './navigation-menu-publish-button';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 
@@ -75,8 +82,8 @@ function detectColors( colorsDetectionElement, setColor, setBackground ) {
 function Navigation( {
 	attributes,
 	setAttributes,
-	isSelected,
 	clientId,
+	isSelected,
 	className,
 	backgroundColor,
 	setBackgroundColor,
@@ -86,37 +93,77 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+	context: { navigationArea },
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
 	const {
-		navigationMenuId,
-		itemsJustification,
 		openSubmenusOnClick,
-		orientation,
 		overlayMenu,
 		showSubmenuIcon,
+		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
+
+	const [ areaMenu, setAreaMenu ] = useEntityProp(
+		'root',
+		'navigationArea',
+		'navigation',
+		navigationArea
+	);
+
+	const navigationAreaMenu = areaMenu === 0 ? undefined : areaMenu;
+
+	const navigationMenuId = navigationArea
+		? navigationAreaMenu
+		: attributes.navigationMenuId;
+
+	const setNavigationMenuId = useCallback(
+		( postId ) => {
+			setAttributes( { navigationMenuId: postId } );
+			if ( navigationArea ) {
+				setAreaMenu( postId );
+			}
+		},
+		[ navigationArea ]
+	);
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ navigationMenuId }`
 	);
 
-	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( clientId ),
+	const { innerBlocks, isInnerBlockSelected } = useSelect(
+		( select ) => {
+			const { getBlocks, hasSelectedInnerBlock } = select(
+				blockEditorStore
+			);
+			return {
+				innerBlocks: getBlocks( clientId ),
+				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
+			};
+		},
 		[ clientId ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
-	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		replaceInnerBlocks,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+
+	const [
+		hasSavedUnsavedInnerBlocks,
+		setHasSavedUnsavedInnerBlocks,
+	] = useState( false );
+
+	const isWithinUnassignedArea = navigationArea && ! navigationMenuId;
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems
+		! hasExistingNavItems || isWithinUnassignedArea
 	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
@@ -127,10 +174,13 @@ function Navigation( {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		canSwitchNavigationMenu,
-		hasResolvedNavigationMenu,
+		hasResolvedNavigationMenus,
+		navigationMenus,
+		navigationMenu,
 	} = useNavigationMenu( navigationMenuId );
 
 	const navRef = useRef();
+	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const { listViewToolbarButton, listViewModal } = useListViewModal(
 		clientId
@@ -142,8 +192,8 @@ function Navigation( {
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames( className, {
-			[ `items-justified-${ attributes.itemsJustification }` ]: itemsJustification,
-			'is-vertical': orientation === 'vertical',
+			'items-justified-right': justifyContent === 'right',
+			'items-justified-space-between': justifyContent === 'space-between',
 			'is-responsive': 'never' !== overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
@@ -162,6 +212,29 @@ function Navigation( {
 		},
 	} );
 
+	const overlayClassnames = classnames( {
+		'has-text-color':
+			!! overlayTextColor.color || !! overlayTextColor?.class,
+		[ getColorClassName(
+			'color',
+			overlayTextColor?.slug
+		) ]: !! overlayTextColor?.slug,
+		'has-background':
+			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
+		[ getColorClassName(
+			'background-color',
+			overlayBackgroundColor?.slug
+		) ]: !! overlayBackgroundColor?.slug,
+	} );
+
+	const overlayStyles = {
+		color: ! overlayTextColor?.slug && overlayTextColor?.color,
+		backgroundColor:
+			! overlayBackgroundColor?.slug &&
+			overlayBackgroundColor?.color &&
+			overlayBackgroundColor.color,
+	};
+
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
@@ -172,6 +245,15 @@ function Navigation( {
 		setDetectedOverlayBackgroundColor,
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	// Spacer block needs orientation from context. This is a patch until
+	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
+	useEffect( () => {
+		if ( orientation ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { orientation } );
+		}
+	}, [ orientation ] );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
@@ -196,26 +278,30 @@ function Navigation( {
 
 	// Hide the placeholder if an navigation menu entity has loaded.
 	useEffect( () => {
-		if ( isEntityAvailable ) {
-			setIsPlaceholderShown( false );
-		}
+		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
+	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
-	// with a prompt to 'save'.
+	// that automatically saves the menu.
 	const hasUnsavedBlocks =
-		hasExistingNavItems && navigationMenuId === undefined;
+		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks
 				blockProps={ blockProps }
 				blocks={ innerBlocks }
-				isSelected={ isSelected }
-				onSave={ ( post ) =>
-					setAttributes( { navigationMenuId: post.id } )
-				}
+				clientId={ clientId }
+				navigationMenus={ navigationMenus }
+				hasSelection={ isSelected || isInnerBlockSelected }
+				hasSavedUnsavedInnerBlocks={ hasSavedUnsavedInnerBlocks }
+				onSave={ ( post ) => {
+					setHasSavedUnsavedInnerBlocks( true );
+					// Switch to using the wp_navigation entity.
+					setNavigationMenuId( post.id );
+				} }
 			/>
 		);
 	}
@@ -248,11 +334,6 @@ function Navigation( {
 		? CustomPlaceholder
 		: Placeholder;
 
-	const justifyAllowedControls =
-		orientation === 'vertical'
-			? [ 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right', 'space-between' ];
-
 	return (
 		<EntityProvider
 			kind="postType"
@@ -261,8 +342,8 @@ function Navigation( {
 		>
 			<RecursionProvider>
 				<BlockControls>
-					<ToolbarGroup>
-						{ isEntityAvailable && (
+					{ ! isDraftNavigationMenu && isEntityAvailable && (
+						<ToolbarGroup>
 							<ToolbarDropdownMenu
 								label={ __( 'Select Menu' ) }
 								text={ __( 'Select Menu' ) }
@@ -271,47 +352,32 @@ function Navigation( {
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
 										onSelect={ ( { id } ) => {
-											setAttributes( {
-												navigationMenuId: id,
-											} );
+											setNavigationMenuId( id );
 											onClose();
+										} }
+										onCreateNew={ () => {
+											if ( navigationArea ) {
+												setAreaMenu( 0 );
+											}
+											setAttributes( {
+												navigationMenuId: undefined,
+											} );
+											setIsPlaceholderShown( true );
 										} }
 									/>
 								) }
 							</ToolbarDropdownMenu>
-						) }
-					</ToolbarGroup>
-					{ hasItemJustificationControls && (
-						<JustifyToolbar
-							value={ itemsJustification }
-							allowedControls={ justifyAllowedControls }
-							onChange={ ( value ) =>
-								setAttributes( { itemsJustification: value } )
-							}
-							popoverProps={ {
-								position: 'bottom right',
-								isAlternate: true,
-							} }
-						/>
+						</ToolbarGroup>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
+					{ isDraftNavigationMenu && (
+						<ToolbarGroup>
+							<NavigationMenuPublishButton />
+						</ToolbarGroup>
+					) }
 				</BlockControls>
 				{ listViewModal }
 				<InspectorControls>
-					{ isEntityAvailable && (
-						<PanelBody title={ __( 'Navigation menu' ) }>
-							<NavigationMenuNameControl />
-							<NavigationMenuDeleteControl
-								onDelete={ () => {
-									replaceInnerBlocks( clientId, [] );
-									setAttributes( {
-										navigationMenuId: undefined,
-									} );
-									setIsPlaceholderShown( true );
-								} }
-							/>
-						</PanelBody>
-					) }
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
 							<h3>{ __( 'Overlay Menu' ) }</h3>
@@ -365,6 +431,7 @@ function Navigation( {
 					) }
 					{ hasColorSettings && (
 						<PanelColorSettings
+							__experimentalHasMultipleOrigins
 							title={ __( 'Color' ) }
 							initialOpen={ false }
 							colorSettings={ [
@@ -409,21 +476,39 @@ function Navigation( {
 						</PanelColorSettings>
 					) }
 				</InspectorControls>
+				{ isEntityAvailable && (
+					<InspectorControls __experimentalGroup="advanced">
+						<NavigationMenuNameControl />
+						<NavigationMenuDeleteControl
+							onDelete={ () => {
+								replaceInnerBlocks( clientId, [] );
+								if ( navigationArea ) {
+									setAreaMenu( 0 );
+								}
+								setAttributes( {
+									navigationMenuId: undefined,
+								} );
+								setIsPlaceholderShown( true );
+							} }
+						/>
+					</InspectorControls>
+				) }
 				<nav { ...blockProps }>
 					{ ! isEntityAvailable && isPlaceholderShown && (
 						<PlaceholderComponent
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
-								setAttributes( {
-									navigationMenuId: post.id,
-								} );
+								setNavigationMenuId( post.id );
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }
-							hasResolvedNavigationMenu={
-								hasResolvedNavigationMenu
+							hasResolvedNavigationMenus={
+								hasResolvedNavigationMenus
 							}
 						/>
+					) }
+					{ ! isEntityAvailable && ! isPlaceholderShown && (
+						<PlaceholderPreview isLoading />
 					) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper
@@ -432,6 +517,8 @@ function Navigation( {
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ 'never' !== overlayMenu }
 							isHiddenByDefault={ 'always' === overlayMenu }
+							classNames={ overlayClassnames }
+							styles={ overlayStyles }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks

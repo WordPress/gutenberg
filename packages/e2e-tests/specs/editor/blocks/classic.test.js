@@ -51,8 +51,9 @@ describe( 'Classic', () => {
 		await page.click( '.media-menu-item#menu-item-gallery' );
 
 		// Wait for media modal to appear and upload image.
-		await page.waitForSelector( '.media-modal input[type=file]' );
-		const inputElement = await page.$( '.media-modal input[type=file]' );
+		const inputElement = await page.waitForSelector(
+			'.media-modal .moxie-shim input[type=file]'
+		);
 		const testImagePath = path.join(
 			__dirname,
 			'..',

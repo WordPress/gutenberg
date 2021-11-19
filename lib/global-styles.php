@@ -6,33 +6,6 @@
  */
 
 /**
- * Takes a tree adhering to the theme.json schema and generates
- * the corresponding stylesheet.
- *
- * @param WP_Theme_JSON_Gutenberg $tree  Input tree.
- * @param array                   $types Which styles to load. It accepts 'variables', 'styles', 'presets'. By default, it'll load all.
- *
- * @return string Stylesheet.
- */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $types = array( 'variables', 'styles', 'presets' ) ) {
-	$origins             = array( 'core', 'theme', 'user' );
-	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-	$supports_link_color = get_theme_support( 'experimental-link-color' );
-	if ( ! $supports_theme_json && ! $supports_link_color ) {
-		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
-		$origins = array( 'core' );
-	} elseif ( ! $supports_theme_json && $supports_link_color ) {
-		// For the legacy link color feature to work, the CSS Custom Properties
-		// should be in scope (either the core or the theme ones).
-		$origins = array( 'core', 'theme' );
-	}
-
-	$stylesheet = $tree->get_stylesheet( $types, $origins );
-
-	return $stylesheet;
-}
-
-/**
  * Fetches the preferences for each origin (core, theme, user)
  * and enqueues the resulting stylesheet.
  */
@@ -78,17 +51,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$context = 'mobile';
 	}
 
-	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-
 	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
-	}
-
-	if ( 'site-editor' === $context && gutenberg_experimental_is_site_editor_available() ) {
-		$theme = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
-
-		$settings['__experimentalGlobalStylesBaseConfig']['styles']   = $theme->get_raw_data()['styles'];
-		$settings['__experimentalGlobalStylesBaseConfig']['settings'] = $theme->get_settings();
+		$settings['__experimentalStyles'] = gutenberg_get_global_styles();
 	}
 
 	if ( 'other' === $context ) {
@@ -119,7 +83,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			),
 		);
 		foreach ( $new_presets as $new_style ) {
-			$style_css = gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( $new_style['css'] ) );
+			$style_css = gutenberg_get_global_stylesheet( array( $new_style['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_style['css']    = $style_css;
 				$new_global_styles[] = $new_style;
@@ -131,7 +95,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'__unstableType' => 'theme',
 		);
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$style_css = gutenberg_experimental_global_styles_get_stylesheet( $consolidated, array( $new_block_classes['css'] ) );
+			$style_css = gutenberg_get_global_stylesheet( array( $new_block_classes['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_block_classes['css'] = $style_css;
 				$new_global_styles[]      = $new_block_classes;
@@ -142,7 +106,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
-	$settings['__experimentalFeatures'] = $consolidated->get_settings();
+	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
 
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
@@ -150,7 +114,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			$colors_by_origin['user'] : (
 				isset( $colors_by_origin['theme'] ) ?
 					$colors_by_origin['theme'] :
-					$colors_by_origin['core']
+					$colors_by_origin['default']
 			);
 	}
 
@@ -160,7 +124,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			$gradients_by_origin['user'] : (
 				isset( $gradients_by_origin['theme'] ) ?
 					$gradients_by_origin['theme'] :
-					$gradients_by_origin['core']
+					$gradients_by_origin['default']
 			);
 	}
 
@@ -170,7 +134,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			$font_sizes_by_origin['user'] : (
 				isset( $font_sizes_by_origin['theme'] ) ?
 					$font_sizes_by_origin['theme'] :
-					$font_sizes_by_origin['core']
+					$font_sizes_by_origin['default']
 			);
 	}
 
@@ -186,16 +150,16 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
 		unset( $settings['__experimentalFeatures']['typography']['customFontSize'] );
 	}
-	if ( isset( $settings['__experimentalFeatures']['typography']['customLineHeight'] ) ) {
-		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['customLineHeight'];
-		unset( $settings['__experimentalFeatures']['typography']['customLineHeight'] );
+	if ( isset( $settings['__experimentalFeatures']['typography']['lineHeight'] ) ) {
+		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['lineHeight'];
+		unset( $settings['__experimentalFeatures']['typography']['lineHeight'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
 		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
 	}
-	if ( isset( $settings['__experimentalFeatures']['spacing']['customPadding'] ) ) {
-		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['customPadding'];
-		unset( $settings['__experimentalFeatures']['spacing']['customPadding'] );
+	if ( isset( $settings['__experimentalFeatures']['spacing']['padding'] ) ) {
+		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['padding'];
+		unset( $settings['__experimentalFeatures']['spacing']['padding'] );
 	}
 
 	return $settings;
@@ -251,7 +215,6 @@ function gutenberg_global_styles_filter_post( $content ) {
  */
 function gutenberg_global_styles_kses_init_filters() {
 	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
-	add_filter( 'safe_style_css', 'gutenberg_global_styles_include_support_for_duotone', 10, 2 );
 }
 
 /**
@@ -291,6 +254,8 @@ function gutenberg_global_styles_force_filtered_html_on_import_filter( $arg ) {
 	return $arg;
 }
 
+// TODO: Remove this filter when minimum supported version is WP 5.8
+// As all this code is not needed anymore now core supports all variables.
 /**
  * This filter is the last being executed on force_filtered_html_on_import.
  * If the input of the filter is true it means we are in an import situation and should
@@ -321,18 +286,6 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 		return $allow_css;
 	}
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
-}
-
-/**
- * This is for using kses to test user data.
- *
- * @param array $atts Allowed CSS property names, according to kses.
- *
- * @return array The new allowed CSS property names.
- */
-function gutenberg_global_styles_include_support_for_duotone( $atts ) {
-	$atts[] = 'filter';
-	return $atts;
 }
 
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.5 (2021-11-07)
+
 ### Internal
 
 -   Removed `getStablePath` function. Please use `normalizePath` from `@wordpress/url` package instead ([#35992](https://github.com/WordPress/gutenberg/pull/35992)).``

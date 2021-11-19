@@ -106,17 +106,19 @@ export function* addTemplate( template ) {
 }
 
 /**
- * Removes a template, and updates the current page and template.
+ * Removes a template.
  *
- * @param {number} templateId The template ID.
+ * @param {Object} template The template object.
  */
-export function* removeTemplate( templateId ) {
-	yield apiFetch( {
-		path: `/wp/v2/templates/${ templateId }`,
-		method: 'DELETE',
-	} );
-	const page = yield controls.select( editSiteStoreName, 'getPage' );
-	yield controls.dispatch( editSiteStoreName, 'setPage', page );
+export function* removeTemplate( template ) {
+	yield controls.dispatch(
+		coreStore,
+		'deleteEntityRecord',
+		'postType',
+		template.type,
+		template.id,
+		{ force: true }
+	);
 }
 
 /**

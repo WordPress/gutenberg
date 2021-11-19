@@ -25,6 +25,7 @@ import { closeSmall } from '@wordpress/icons';
  */
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
+import StyleProvider from '../style-provider';
 
 // Used to count the number of open modals.
 let openModalCount = 0;
@@ -52,6 +53,7 @@ export default function Modal( {
 	className,
 	contentLabel,
 	onKeyDown,
+	isFullScreen = false,
 } ) {
 	const ref = useRef();
 	const instanceId = useInstanceId( Modal );
@@ -111,55 +113,68 @@ export default function Modal( {
 			) }
 			onKeyDown={ handleEscapeKeyDown }
 		>
-			<div
-				className={ classnames( 'components-modal__frame', className ) }
-				style={ style }
-				ref={ useMergeRefs( [
-					constrainedTabbingRef,
-					focusReturnRef,
-					focusOnMountRef,
-				] ) }
-				role={ role }
-				aria-label={ contentLabel }
-				aria-labelledby={ contentLabel ? null : headingId }
-				aria-describedby={ aria.describedby }
-				tabIndex="-1"
-				{ ...( shouldCloseOnClickOutside ? focusOutsideProps : {} ) }
-				onKeyDown={ onKeyDown }
-			>
-				<div className={ 'components-modal__content' } role="document">
-					<div className="components-modal__header">
-						<div className="components-modal__header-heading-container">
-							{ icon && (
-								<span
-									className="components-modal__icon-container"
-									aria-hidden
-								>
-									{ icon }
-								</span>
-							) }
-							{ title && (
-								<h1
-									id={ headingId }
-									className="components-modal__header-heading"
-								>
-									{ title }
-								</h1>
+			<StyleProvider document={ document }>
+				<div
+					className={ classnames(
+						'components-modal__frame',
+						className,
+						{
+							'is-full-screen': isFullScreen,
+						}
+					) }
+					style={ style }
+					ref={ useMergeRefs( [
+						constrainedTabbingRef,
+						focusReturnRef,
+						focusOnMountRef,
+					] ) }
+					role={ role }
+					aria-label={ contentLabel }
+					aria-labelledby={ contentLabel ? null : headingId }
+					aria-describedby={ aria.describedby }
+					tabIndex="-1"
+					{ ...( shouldCloseOnClickOutside
+						? focusOutsideProps
+						: {} ) }
+					onKeyDown={ onKeyDown }
+				>
+					<div
+						className={ 'components-modal__content' }
+						role="document"
+					>
+						<div className="components-modal__header">
+							<div className="components-modal__header-heading-container">
+								{ icon && (
+									<span
+										className="components-modal__icon-container"
+										aria-hidden
+									>
+										{ icon }
+									</span>
+								) }
+								{ title && (
+									<h1
+										id={ headingId }
+										className="components-modal__header-heading"
+									>
+										{ title }
+									</h1>
+								) }
+							</div>
+							{ isDismissible && (
+								<Button
+									onClick={ onRequestClose }
+									icon={ closeSmall }
+									label={
+										closeButtonLabel || __( 'Close dialog' )
+									}
+								/>
 							) }
 						</div>
-						{ isDismissible && (
-							<Button
-								onClick={ onRequestClose }
-								icon={ closeSmall }
-								label={
-									closeButtonLabel || __( 'Close dialog' )
-								}
-							/>
-						) }
+						{ children }
 					</div>
-					{ children }
 				</div>
-			</div>
+			</StyleProvider>
 		</div>,
 		document.body
 	);

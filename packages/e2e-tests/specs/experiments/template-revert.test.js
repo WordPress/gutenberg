@@ -16,7 +16,11 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { siteEditor } from '../../experimental-features';
 
-const { visit: visitSiteEditor, getEditedPostContent } = siteEditor;
+const {
+	visit: visitSiteEditor,
+	getEditedPostContent,
+	disableWelcomeGuide,
+} = siteEditor;
 
 const assertSaveButtonIsDisabled = () =>
 	page.waitForSelector(
@@ -97,6 +101,7 @@ describe( 'Template Revert', () => {
 	beforeEach( async () => {
 		await trashAllPosts( 'wp_template' );
 		await visitSiteEditor();
+		await disableWelcomeGuide();
 	} );
 
 	it( 'should delete the template after saving the reverted template', async () => {

@@ -17,6 +17,7 @@ import { Text } from '../../text';
 import { Heading } from '../../heading';
 import { reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
+import SearchControl from '../../search-control';
 
 export const NavigationUI = styled.div`
 	width: 100%;
@@ -68,20 +69,6 @@ export const MenuTitleUI = styled.div`
 	width: 100%;
 `;
 
-export const MenuTitleHeadingUI = styled( Heading )`
-	align-items: center;
-	color: inherit;
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: ${ space( 2 ) };
-	padding: ${ () =>
-		isRTL()
-			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } ${ space( 3 ) }`
-			: `${ space( 1 ) } ${ space( 3 ) } ${ space( 1 ) } ${ space(
-					4
-			  ) }` };
-`;
-
 export const MenuTitleActionsUI = styled.span`
 	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
 
@@ -104,55 +91,45 @@ export const MenuTitleActionsUI = styled.span`
 	}
 `;
 
-export const MenuTitleSearchUI = styled.div`
-	padding: 0;
-	position: relative;
+export const MenuTitleSearchUI = styled( SearchControl )`
+	input[type='search'].components-search-control__input {
+		margin: 0;
+		background: #303030;
+		color: #fff;
 
-	input {
-		height: ${ space( 9 ) }; // 36px, same height as MenuTitle
-		margin-bottom: ${ space( 2 ) };
-		padding-left: ${ space( 8 ) }; // Leave room for the search icon
-		padding-right: ${ space(
-			8
-		) }; // Leave room for the close search button
+		&:focus {
+			background: #434343;
+			color: #fff;
+		}
 
-		&::-webkit-search-decoration,
-		&::-webkit-search-cancel-button,
-		&::-webkit-search-results-button,
-		&::-webkit-search-results-decoration {
-			-webkit-appearance: none;
+		&::placeholder {
+			color: rgba( 255, 255, 255, 0.6 );
 		}
 	}
 
-	> svg {
-		left: ${ space( 1 ) };
-		position: absolute;
-		top: 6px;
+	svg {
+		fill: white;
 	}
 
-	.components-button.is-small {
-		height: 30px;
+	.components-button.has-icon {
 		padding: 0;
-		position: absolute;
-		right: ${ space( 2 ) };
-		top: 3px;
-
-		&:active:not( :disabled ) {
-			background: none;
-		}
-		&:hover:not( :disabled ) {
-			box-shadow: none;
-		}
+		min-width: auto;
 	}
 `;
 
 export const GroupTitleUI = styled( Heading )`
+	min-height: ${ space( 12 ) };
+	align-items: center;
 	color: inherit;
-	margin-top: ${ space( 2 ) };
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: ${ space( 2 ) };
 	padding: ${ () =>
 		isRTL()
-			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } 0`
-			: `${ space( 1 ) } 0 ${ space( 1 ) } ${ space( 4 ) }` };
+			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } ${ space( 2 ) }`
+			: `${ space( 1 ) } ${ space( 2 ) } ${ space( 1 ) } ${ space(
+					4
+			  ) }` };
 `;
 
 export const ItemBaseUI = styled.li`

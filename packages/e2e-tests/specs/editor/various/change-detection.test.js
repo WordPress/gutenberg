@@ -10,6 +10,7 @@ import {
 	saveDraft,
 	openDocumentSettingsSidebar,
 	isCurrentURL,
+	openTypographyToolsPanelMenu,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -381,6 +382,10 @@ describe( 'Change detection', () => {
 
 		// Change the paragraph's `drop cap`.
 		await page.click( '[data-type="core/paragraph"]' );
+
+		await openTypographyToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Drop cap"]' );
+
 		const [ dropCapToggle ] = await page.$x(
 			"//label[contains(text(), 'Drop cap')]"
 		);

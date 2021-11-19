@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { normalizePath } from '@wordpress/url';
+import { getQueryArg, normalizePath } from '@wordpress/url';
 
 /**
  * @param {Record<string, any>} preloadedData
@@ -15,9 +15,17 @@ function createPreloadingMiddleware( preloadedData ) {
 
 	return ( options, next ) => {
 		const { parse = true } = options;
-		if ( typeof options.path === 'string' ) {
+		/** @type {string | void} */
+		let rawPath = options.path;
+		if ( ! rawPath && options.url ) {
+			const pathFromQuery = getQueryArg( options.url, 'rest_route' );
+			if ( typeof pathFromQuery === 'string' ) {
+				rawPath = pathFromQuery;
+			}
+		}
+		if ( typeof rawPath === 'string' ) {
 			const method = options.method || 'GET';
-			const path = normalizePath( options.path );
+			const path = normalizePath( rawPath );
 
 			if ( 'GET' === method && cache[ path ] ) {
 				const cacheData = cache[ path ];
