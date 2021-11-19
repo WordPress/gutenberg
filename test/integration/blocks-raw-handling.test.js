@@ -178,7 +178,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<ul><li>one</li><li>two</li><li>three</li></ul>'
+			'<ul class="wp-block-list"><li>one</li><li>two</li><li>three</li></ul>'
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -277,7 +277,7 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should treat multiple list items as a block', () => {
 		const filtered = pasteHandler( {
-			HTML: '<ul><li>One</li><li>Two</li><li>Three</li></ul>',
+			HTML: '<ul class="wp-block-list"><li>One</li><li>Two</li><li>Three</li></ul>',
 			plainText: 'One\nTwo\nThree\n',
 			mode: 'AUTO',
 		} )
@@ -285,7 +285,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<ul><li>One</li><li>Two</li><li>Three</li></ul>'
+			'<ul class="wp-block-list"><li>One</li><li>Two</li><li>Three</li></ul>'
 		);
 		expect( console ).toHaveLogged();
 	} );

@@ -8,7 +8,7 @@ export default function save( { attributes } ) {
 	const TagName = ordered ? 'ol' : 'ul';
 
 	return (
-		<TagName { ...useBlockProps.save( { type, reversed, start, className: `wp-block-list` } ) }>
+		<TagName { ...useBlockProps.save( { type, reversed, start } ) }>
 			<RichText.Content value={ values } multiline="li" />
 		</TagName>
 	);

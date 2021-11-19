@@ -37,7 +37,6 @@
 	},
 	"supports": {
 		"anchor": true,
-		"className": false,
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true,
