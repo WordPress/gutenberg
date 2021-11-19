@@ -345,9 +345,9 @@ class WP_Theme_JSON_Gutenberg {
 			array( 'border', 'style' ),
 			array( 'border', 'width' ),
 			array( 'color', 'link' ),
+			array( 'spacing', 'blockGap' ),
 			array( 'spacing', 'margin' ),
 			array( 'spacing', 'padding' ),
-			array( 'spacing', 'units' ),
 			array( 'typography', 'lineHeight' ),
 		);
 
