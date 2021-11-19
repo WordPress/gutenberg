@@ -41,7 +41,7 @@ function Palette( { name } ) {
 			<Subtitle>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButton path={ screenPath }>
-					<HStack>
+					<HStack isReversed={ colors.length === 0 }>
 						<FlexBlock>
 							<ZStack isLayered={ false } offset={ -8 }>
 								{ colors.slice( 0, 5 ).map( ( { color } ) => (
