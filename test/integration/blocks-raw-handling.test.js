@@ -266,7 +266,7 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should treat single list item as inline text', () => {
 		const filtered = pasteHandler( {
-			HTML: '<ul><li>Some <strong>bold</strong> text.</li></ul>',
+			HTML: '<ul class="wp-block-list"><li>Some <strong>bold</strong> text.</li></ul>',
 			plainText: 'Some <strong>bold</strong> text.\n',
 			mode: 'AUTO',
 		} );
