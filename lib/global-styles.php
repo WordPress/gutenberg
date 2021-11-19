@@ -359,6 +359,75 @@ function gutenberg_register_webfonts_from_theme_json() {
 	wp_register_webfonts( gutenberg_get_webfonts_from_theme_json() );
 }
 
+
+/**
+ * Add missing fonts data to the global styles.
+ *
+ * @param array $data The global styles.
+ *
+ * @return array The global styles with missing fonts data.
+ */
+function gutenberg_add_registered_webfonts_to_global_styles( $data ) {
+	$font_families_from_theme = gutenberg_get_webfonts_from_theme_json();
+	$font_families_registered = wp_webfonts()->webfonts()->get_all_registered();
+
+	/**
+	 * Helper to get an array of the font-families.
+	 *
+	 * @param array $families_data The font-families data.
+	 *
+	 * @return array The font-families array.
+	 */
+	$get_families = function( $families_data ) {
+		$families = array();
+		foreach ( $families_data as $family ) {
+			$families[] = $family['font-family'];
+		}
+
+		// Micro-optimization: Use array_flip( array_flip( $array ) )
+		// instead of array_unique( $array ) because it's faster.
+		// The result is the same.
+		return array_flip( array_flip( $families ) );
+	};
+
+	// Diff the arrays to find the missing fonts.
+	$to_add = array_diff(
+		$get_families( $font_families_registered ),
+		$get_families( $font_families_from_theme )
+	);
+
+	// Bail out early if there are no missing fonts.
+	if ( empty( $to_add ) ) {
+		return $data;
+	}
+
+	// Make sure the path to settings.typography.fontFamilies.theme exists
+	// before adding missing fonts.
+	if ( ! isset( $data['settings'] ) ) {
+		$data['settings'] = array();
+	}
+	if ( ! isset( $data['settings']['typography'] ) ) {
+		$data['settings']['typography'] = array();
+	}
+	if ( ! isset( $data['settings']['typography']['fontFamilies'] ) ) {
+		$data['settings']['typography']['fontFamilies'] = array();
+	}
+	if ( ! isset( $data['settings']['typography']['fontFamilies']['theme'] ) ) {
+		$data['settings']['typography']['fontFamilies']['theme'] = array();
+	}
+
+	// Add missing fonts.
+	foreach ( $to_add as $family ) {
+		$data['settings']['typography']['fontFamilies']['theme'][] = array(
+			'fontFamily' => false !== strpos( $family, ' ' ) ? "'{$family}'" : $family,
+			'name'       => $family,
+			'slug'       => sanitize_title( $family ),
+		);
+	}
+
+	return $data;
+}
+
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.
 if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
