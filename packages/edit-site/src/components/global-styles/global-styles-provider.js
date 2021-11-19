@@ -135,7 +135,7 @@ function useGlobalStylesBaseConfig() {
 		).__experimentalGetCurrentThemeBaseGlobalStyles();
 	}, [] );
 
-	return baseConfig;
+	return [ !! baseConfig, baseConfig ];
 }
 
 function useGlobalStylesContext() {
@@ -144,7 +144,7 @@ function useGlobalStylesContext() {
 		userConfig,
 		setUserConfig,
 	] = useGlobalStylesUserConfig();
-	const baseConfig = useGlobalStylesBaseConfig();
+	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
 			return {};
@@ -153,7 +153,7 @@ function useGlobalStylesContext() {
 	}, [ userConfig, baseConfig ] );
 	const context = useMemo( () => {
 		return {
-			isReady: isUserConfigReady,
+			isReady: isUserConfigReady && isBaseConfigReady,
 			user: userConfig,
 			base: baseConfig,
 			merged: mergedConfig,
@@ -165,6 +165,7 @@ function useGlobalStylesContext() {
 		baseConfig,
 		setUserConfig,
 		isUserConfigReady,
+		isBaseConfigReady,
 	] );
 
 	return context;
