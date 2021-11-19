@@ -28,7 +28,7 @@ The [WordPress.org Roadmap](https://wordpress.org/about/roadmap/) with Four Phas
 
 **Monthly:**
 
-[“What’s Next In Gutenberg?” posts](https://make.wordpress.org/core/tag/gutenberg-next/). These updates are wrangled by the Core Editor team and highlight what’s planned for the coming month of work on Gutenberg, how to get involved, and more. 
+[“What’s Next In Gutenberg?” posts](https://make.wordpress.org/core/tag/gutenberg-next/). These updates are wrangled by the Core Editor team and highlight areas of work aligned with the Gutenberg roadmap for contributors to help, how to get involved, and more. 
 
 [Block Based Themes Meeting](https://make.wordpress.org/themes/tags/block-based-meeting/). These meetings are currently wrangled in the #themereview Slack channel and are dedicated to sharing FSE changes that will specifically impact themes. Agendas and summaries are shared on the [Make Themes blog](https://make.wordpress.org/themes/). 
 
