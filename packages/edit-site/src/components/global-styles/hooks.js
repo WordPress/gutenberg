@@ -221,6 +221,8 @@ export function useColorsPerOrigin( name ) {
 	const [ customColors ] = useSetting( 'color.palette.user', name );
 	const [ themeColors ] = useSetting( 'color.palette.theme', name );
 	const [ defaultColors ] = useSetting( 'color.palette.core', name );
+	const [ shouldDisplayDefaultColors ] = useSetting( 'color.defaultPalette' );
+
 	return useMemo( () => {
 		const result = [];
 		if ( themeColors && themeColors.length ) {
@@ -232,7 +234,11 @@ export function useColorsPerOrigin( name ) {
 				colors: themeColors,
 			} );
 		}
-		if ( defaultColors && defaultColors.length ) {
+		if (
+			shouldDisplayDefaultColors &&
+			defaultColors &&
+			defaultColors.length
+		) {
 			result.push( {
 				name: _x(
 					'Default',
@@ -258,6 +264,10 @@ export function useGradientsPerOrigin( name ) {
 	const [ customGradients ] = useSetting( 'color.gradients.user', name );
 	const [ themeGradients ] = useSetting( 'color.gradients.theme', name );
 	const [ defaultGradients ] = useSetting( 'color.gradients.core', name );
+	const [ shouldDisplayDefaultGradients ] = useSetting(
+		'color.defaultGradients'
+	);
+
 	return useMemo( () => {
 		const result = [];
 		if ( themeGradients && themeGradients.length ) {
@@ -269,7 +279,11 @@ export function useGradientsPerOrigin( name ) {
 				gradients: themeGradients,
 			} );
 		}
-		if ( defaultGradients && defaultGradients.length ) {
+		if (
+			shouldDisplayDefaultGradients &&
+			defaultGradients &&
+			defaultGradients.length
+		) {
 			result.push( {
 				name: _x(
 					'Default',
