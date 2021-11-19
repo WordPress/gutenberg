@@ -216,7 +216,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Formatting Toolbar",
+		"title": "Formatting Toolbar API",
 		"slug": "format-api",
 		"markdown_source": "../docs/how-to-guides/format-api/README.md",
 		"parent": "how-to-guides"
