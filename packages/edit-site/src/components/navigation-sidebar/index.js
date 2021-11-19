@@ -1,30 +1,37 @@
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import NavigationPanel from './navigation-panel';
 import NavigationToggle from './navigation-toggle';
-import { store as editSiteStore } from '../../store';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
 	Slot: NavigationPanelPreviewSlot,
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
-export default function NavigationSidebar() {
-	const isNavigationOpen = useSelect( ( select ) => {
-		return select( editSiteStore ).isNavigationOpened();
-	}, [] );
+export default function NavigationSidebar( {
+	defaultIsOpen = false,
+	activeTemplateType,
+} ) {
+	const [ isNavigationOpen, setIsNavigationOpen ] = useState( defaultIsOpen );
 
 	return (
 		<>
-			<NavigationToggle isOpen={ isNavigationOpen } />
-			<NavigationPanel isOpen={ isNavigationOpen } />
+			<NavigationToggle
+				isOpen={ isNavigationOpen }
+				setIsOpen={ setIsNavigationOpen }
+			/>
+			<NavigationPanel
+				isOpen={ isNavigationOpen }
+				setIsOpen={ setIsNavigationOpen }
+				activeTemplateType={ activeTemplateType }
+			/>
 			<NavigationPanelPreviewSlot />
 		</>
 	);
