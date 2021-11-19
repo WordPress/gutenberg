@@ -53,8 +53,7 @@ export default function ResponsiveWrapper( {
 			{ ! isOpen && (
 				<Button
 					aria-haspopup="true"
-					aria-expanded={ isOpen }
-					aria-label={ __( 'Open menu' ) }
+					aria-label={ __( 'Open navigation menu' ) }
 					className={ openButtonClasses }
 					onClick={ () => onToggle( true ) }
 				>
