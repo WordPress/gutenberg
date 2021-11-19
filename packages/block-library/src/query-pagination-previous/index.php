@@ -40,7 +40,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 		if ( 1 !== $paged ) {
 			$content = get_previous_posts_link( $label );
 		} else {
-			// Prints the link only if there are pages to paginate
+			// Prints the link only if there are pages to paginate.
 			$content = $max_page > 1 ? sprintf(
 				'<span %1$s>%2$s</span>',
 				$wrapper_attributes,
