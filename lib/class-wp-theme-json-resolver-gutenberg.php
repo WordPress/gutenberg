@@ -117,7 +117,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$config     = self::read_json_file( __DIR__ . '/theme.json' );
 		$config     = self::translate( $config );
-		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'core' );
+		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
 		return self::$core;
 	}
@@ -283,8 +283,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 	/**
 	 * There are three sources of data (origins) for a site:
-	 * core, theme, and user. The user's has higher priority
-	 * than the theme's, and the theme's higher than core's.
+	 * default, theme, and user. The user's has higher priority
+	 * than the theme's, and the theme's higher than defaults's.
 	 *
 	 * Unlike the getters {@link get_core_data},
 	 * {@link get_theme_data}, and {@link get_user_data},

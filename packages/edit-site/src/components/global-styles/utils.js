@@ -90,7 +90,7 @@ function findInPresetsBy(
 	for ( const presetByOrigin of orderedPresetsByOrigin ) {
 		if ( presetByOrigin ) {
 			// Preset origins ordered by priority.
-			const origins = [ 'user', 'theme', 'core' ];
+			const origins = [ 'user', 'theme', 'default' ];
 			for ( const origin of origins ) {
 				const presets = presetByOrigin[ origin ];
 				if ( presets ) {

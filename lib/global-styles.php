@@ -114,7 +114,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			$colors_by_origin['user'] : (
 				isset( $colors_by_origin['theme'] ) ?
 					$colors_by_origin['theme'] :
-					$colors_by_origin['core']
+					$colors_by_origin['default']
 			);
 	}
 
@@ -124,7 +124,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			$gradients_by_origin['user'] : (
 				isset( $gradients_by_origin['theme'] ) ?
 					$gradients_by_origin['theme'] :
-					$gradients_by_origin['core']
+					$gradients_by_origin['default']
 			);
 	}
 
@@ -134,7 +134,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			$font_sizes_by_origin['user'] : (
 				isset( $font_sizes_by_origin['theme'] ) ?
 					$font_sizes_by_origin['theme'] :
-					$font_sizes_by_origin['core']
+					$font_sizes_by_origin['default']
 			);
 	}
 
