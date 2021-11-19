@@ -339,18 +339,24 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $context The context to which the settings belong.
 	 */
 	private static function do_opt_in_into_settings( &$context ) {
-		// todo: take into account existing settings, if they exists
-		if ( ! isset( _wp_array_get( $context, array( 'border', 'color' ) ) ) {
-			gutenberg_experimental_set( $context, array( 'border', 'color' ), true );
+		$to_opt_in = array(
+			array( 'border', 'color' ),
+			array( 'border', 'radius' ),
+			array( 'border', 'style' ),
+			array( 'border', 'width' ),
+			array( 'spacing', 'margin' ),
+			array( 'spacing', 'padding' ),
+			array( 'spacing', 'units' ),
+			array( 'typography', 'customFontSize' ),
+			array( 'typography', 'lineHeight' ),
+		);
+
+		foreach ( $to_opt_in as $path ) {
+			if ( null === _wp_array_get( $context, $path, null ) ) {
+				_wp_array_set( $context, $path, true );
+			}
 		}
-		gutenberg_experimental_set( $context, array( 'border', 'radius' ), true );
-		gutenberg_experimental_set( $context, array( 'border', 'style' ), true );
-		gutenberg_experimental_set( $context, array( 'border', 'width' ), true );
-		gutenberg_experimental_set( $context, array( 'spacing', 'margin' ), true );
-		gutenberg_experimental_set( $context, array( 'spacing', 'padding' ), true );
-		gutenberg_experimental_set( $context, array( 'spacing', 'units' ), true );
-		gutenberg_experimental_set( $context, array( 'typography', 'customFontSize' ), true );
-		gutenberg_experimental_set( $context, array( 'typography', 'lineHeight' ), true );
+
 		unset( $context['appearanceTools'] );
 	}
 
