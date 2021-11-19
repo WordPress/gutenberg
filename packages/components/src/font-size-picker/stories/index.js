@@ -156,3 +156,41 @@ export const differentControlBySize = () => {
 		<FontSizePickerWithState fontSizes={ fontSizes } initialValue={ 8 } />
 	);
 };
+
+export const withComplexCSSValues = () => {
+	const fontSizes = object( 'Font Sizes', [
+		{
+			name: 'Small',
+			slug: 'small',
+			size: '0.75rem',
+		},
+		{
+			name: 'Normal',
+			slug: 'normal',
+			size: '1rem',
+		},
+		{
+			name: 'Large',
+			slug: 'large',
+			size: '2.5rem',
+		},
+		{
+			name: 'Extra Large',
+			slug: 'extra-large',
+			size: '3.5rem',
+		},
+		{
+			name: 'Huge',
+			slug: 'huge',
+			size: 'clamp(2.5rem, 4vw, 3rem)',
+		},
+	] );
+	return (
+		<div style={ { maxWidth: '248px' } }>
+			<FontSizePickerWithState
+				fontSizes={ fontSizes }
+				initialValue={ '1rem' }
+			/>
+		</div>
+	);
+};
