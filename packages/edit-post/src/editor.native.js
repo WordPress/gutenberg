@@ -30,6 +30,9 @@ class Editor extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
+		// need to set this globally to avoid race with deprecations
+		window.wp.galleryBlockV2Enabled = props.galleryWithImageBlocks;
+
 		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
 			this.props.switchEditorMode( 'text' );

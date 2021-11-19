@@ -64,7 +64,7 @@ import { EditorHelpTopics } from '@wordpress/editor';
 import EditorProvider from './index.js';
 
 class NativeEditorProvider extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
 		// Keep a local reference to `post` to detect changes
@@ -75,9 +75,6 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
-
-		// need to set this globally to avoid race with deprecations
-		window.wp.galleryBlockV2Enabled = props.galleryWithImageBlocks;
 
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
@@ -100,9 +97,6 @@ class NativeEditorProvider extends Component {
 			updateSettings,
 			galleryWithImageBlocks,
 		} = this.props;
-
-		// TODO: remove this as unnecessary since we are setting in constructor?
-		window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
 
 		updateSettings( {
 			...capabilities,
