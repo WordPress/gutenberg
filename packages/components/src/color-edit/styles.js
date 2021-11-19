@@ -48,7 +48,7 @@ export const ColorNameInputControl = styled( InputControl )`
 `;
 
 export const ColorItem = styled( Item )`
-	padding: 3px 0 3px ${ space( 3 ) };
+	padding: 3px ${ space( 3 ) };
 	height: calc( 40px - ${ CONFIG.borderWidth } );
 `;
 
