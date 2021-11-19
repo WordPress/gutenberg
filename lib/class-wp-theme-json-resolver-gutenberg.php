@@ -225,14 +225,16 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			),
 		);
 
-		$cache_key = sprintf( 'wp_global_styles_post_type_%s', md5( serialize( $args ) ) );
+		$cache_key = sprintf( 'wp_global_styles_%s', md5( serialize( $args ) ) );
 		$post_id   = wp_cache_get( $cache_key );
-		if ( false !== $post_id ) {
-			if ( (int) $post_id > 0 ) {
-				return get_post( $post_id, ARRAY_A );
-			} elseif ( -1 === $post_id && ! $should_create_cpt ) {
-				return $user_cpt;
-			}
+
+		if ( (int) $post_id > 0 ) {
+			return get_post( $post_id, ARRAY_A );
+		}
+
+		// Special case: '-1' is a results not found.
+		if ( -1 === $post_id && ! $should_create_cpt ) {
+			return $user_cpt;
 		}
 
 		$recent_posts = wp_get_recent_posts( $args );
