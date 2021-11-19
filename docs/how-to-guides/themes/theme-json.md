@@ -218,7 +218,7 @@ The settings section has the following structure:
 {
 	"version": 1,
 	"settings": {
-		"appearanceTools": true,
+		"appearanceTools": false,
 		"border": {
 			"color": false,
 			"radius": false,
