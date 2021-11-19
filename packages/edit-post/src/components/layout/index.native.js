@@ -60,7 +60,7 @@ class Layout extends Component {
 	}
 
 	componentWillUnmount() {
-		this.safeAreaSubscription.remove();
+		this.safeAreaSubscription?.remove();
 		this._isMounted = false;
 	}
 
