@@ -220,7 +220,7 @@ export function getSupportedGlobalStylesPanels( name ) {
 export function useColorsPerOrigin( name ) {
 	const [ customColors ] = useSetting( 'color.palette.user', name );
 	const [ themeColors ] = useSetting( 'color.palette.theme', name );
-	const [ defaultColors ] = useSetting( 'color.palette.core', name );
+	const [ defaultColors ] = useSetting( 'color.palette.default', name );
 	const [ shouldDisplayDefaultColors ] = useSetting( 'color.defaultPalette' );
 
 	return useMemo( () => {
@@ -263,7 +263,7 @@ export function useColorsPerOrigin( name ) {
 export function useGradientsPerOrigin( name ) {
 	const [ customGradients ] = useSetting( 'color.gradients.user', name );
 	const [ themeGradients ] = useSetting( 'color.gradients.theme', name );
-	const [ defaultGradients ] = useSetting( 'color.gradients.core', name );
+	const [ defaultGradients ] = useSetting( 'color.gradients.default', name );
 	const [ shouldDisplayDefaultGradients ] = useSetting(
 		'color.defaultGradients'
 	);

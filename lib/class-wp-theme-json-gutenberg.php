@@ -35,7 +35,7 @@ class WP_Theme_JSON_Gutenberg {
 	const ROOT_BLOCK_SELECTOR = 'body';
 
 	const VALID_ORIGINS = array(
-		'core',
+		'default',
 		'theme',
 		'user',
 	);
@@ -1263,7 +1263,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
-	 * @param array $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
+	 * @param array $origins A list of origins to include. By default it includes 'default', 'theme', and 'user'.
 	 *
 	 * @return string Stylesheet.
 	 */
