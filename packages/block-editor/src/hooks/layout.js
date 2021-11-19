@@ -79,7 +79,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 				<PanelBody title={ __( 'Layout' ) }>
 					{ allowInheriting && !! defaultThemeLayout && (
 						<ToggleControl
-							label={ __( 'Inherit default layout' ) }
+							label={ __( 'Use inner block alignment' ) }
 							checked={ !! inherit }
 							onChange={ () =>
 								setAttributes( {
