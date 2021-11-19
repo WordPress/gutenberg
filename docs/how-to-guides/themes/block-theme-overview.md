@@ -158,7 +158,7 @@ Load the pattern in a template or template part:
 ```html
 <!-- wp:group -->
 <div class="wp-block-group">
-<!-- wp:pattern {"slug":"wordpress-credit"} /-->
+<!-- wp:pattern {"slug":"myblocktheme/wordpress-credit"} /-->
 </div>
 <!-- /wp:group -->
 ```
