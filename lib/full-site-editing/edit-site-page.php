@@ -192,7 +192,7 @@ function gutenberg_edit_site_init( $hook ) {
 					'/wp/v2/themes?context=edit&status=active',
 					'/wp/v2/global-styles/' . $active_global_styles_id . '?context=edit',
 					'/wp/v2/global-styles/' . $active_global_styles_id,
-					'/wp/v2/themes/' . $active_theme . '/global-styles',
+					'/wp/v2/global-styles/themes/' . $active_theme,
 				)
 			),
 			'initializer_name' => 'initializeEditor',
