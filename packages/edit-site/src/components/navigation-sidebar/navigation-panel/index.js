@@ -87,13 +87,6 @@ const NavigationPanel = ( { isOpen, setIsOpen, activeTemplateType } ) => {
 									} ) }
 								/>
 								<NavigationItem
-									title={ __( 'Styles' ) }
-									href={ addQueryArgs( '', {
-										page: 'gutenberg-edit-site',
-										styles: 'open',
-									} ) }
-								/>
-								<NavigationItem
 									title={ __( 'Templates' ) }
 									item="wp_template"
 									href={ addQueryArgs( '', {
