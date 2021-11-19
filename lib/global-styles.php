@@ -338,7 +338,7 @@ function gutenberg_get_webfonts_from_theme_json() {
 
 				// Convert keys to kebab-case.
 				foreach ( $font_face as $property => $value ) {
-					$kebab_case               = gutenberg_experimental_to_kebab_case( $property );
+					$kebab_case               = _wp_to_kebab_case( $property );
 					$font_face[ $kebab_case ] = $value;
 					if ( $kebab_case !== $property ) {
 						unset( $font_face[ $property ] );
