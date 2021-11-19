@@ -136,7 +136,7 @@ Register a pattern:
 ```php
 <?php
 register_block_pattern( 
-	'wordpress-credit',
+	'myblocktheme/wordpress-credit',
 	array(
 		'title'      => __( 'Wordpress credit', 'myblocktheme' ),
 		'content'    => '
