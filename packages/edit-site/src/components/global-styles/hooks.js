@@ -65,7 +65,7 @@ export function useSetting( path, blockName, source = 'all' ) {
 		const getSettingValue = ( configToUse ) => {
 			const result = get( configToUse, currentPath );
 			if ( PATHS_WITH_MERGE[ path ] ) {
-				return result?.user ?? result?.theme ?? result?.core;
+				return result?.user ?? result?.theme ?? result?.default;
 			}
 			return result;
 		};
