@@ -285,11 +285,12 @@ Note, however, that not all settings are relevant for all blocks. The settings s
 
 ### Opt-in into UI controls
 
-There's one special setting property, `appearanceTools`, which is a boolean and its default value is true. When this is enabled, the following setting properties will be on by default:
+There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
 
 - border: color, radius, style, width
-- spacing: margin, padding, units
-- typography: customFontSize, lineHeight
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
 
 #### Backward compatibility with add_theme_support
 
