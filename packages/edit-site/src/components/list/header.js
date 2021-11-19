@@ -3,10 +3,12 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalHeading as Heading,
-	Button,
-} from '@wordpress/components';
+import { __experimentalHeading as Heading } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import AddNewTemplate from '../add-new-template';
 
 export default function Header( { templateType } ) {
 	const postType = useSelect(
@@ -24,8 +26,8 @@ export default function Header( { templateType } ) {
 				{ postType.labels?.name }
 			</Heading>
 
-			<div>
-				<Button variant="primary">{ postType.labels?.add_new }</Button>
+			<div className="edit-site-list-header__right">
+				<AddNewTemplate templateType={ templateType } />
 			</div>
 		</header>
 	);

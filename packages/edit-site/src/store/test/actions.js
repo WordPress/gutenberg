@@ -86,7 +86,12 @@ describe( 'actions', () => {
 			const it = removeTemplate( template );
 			expect( it.next().value ).toEqual( {
 				actionName: 'deleteEntityRecord',
-				args: [ 'postType', 'wp_template_part', 'tt1-blocks//general' ],
+				args: [
+					'postType',
+					'wp_template_part',
+					'tt1-blocks//general',
+					{ force: true },
+				],
 				storeKey: 'core',
 				type: '@@data/DISPATCH',
 			} );

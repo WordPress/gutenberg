@@ -78,8 +78,10 @@ function gutenberg_get_editor_styles() {
 
 /**
  * Initialize the Gutenberg Templates List Page.
+ *
+ * @param array $settings The editor settings.
  */
-function gutenberg_edit_site_list_init() {
+function gutenberg_edit_site_list_init( $settings ) {
 	wp_enqueue_script( 'wp-edit-site' );
 	wp_enqueue_style( 'wp-edit-site' );
 	wp_enqueue_media();
@@ -111,10 +113,11 @@ function gutenberg_edit_site_list_init() {
 		'wp-edit-site',
 		sprintf(
 			'wp.domReady( function() {
-				wp.editSite.initializeList( "%s", "%s" );
+				wp.editSite.initializeList( "%s", "%s", %s );
 			} );',
 			'edit-site-editor',
-			$template_type
+			$template_type,
+			wp_json_encode( $settings )
 		)
 	);
 }
@@ -142,8 +145,18 @@ function gutenberg_edit_site_init( $hook ) {
 		}
 	);
 
+	$custom_settings = array(
+		'siteUrl'                              => site_url(),
+		'postsPerPage'                         => get_option( 'posts_per_page' ),
+		'styles'                               => gutenberg_get_editor_styles(),
+		'defaultTemplateTypes'                 => gutenberg_get_indexed_default_template_types(),
+		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
+		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
+		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
+	);
+
 	if ( gutenberg_is_edit_site_list_page() ) {
-		return gutenberg_edit_site_list_init();
+		return gutenberg_edit_site_list_init( $custom_settings );
 	}
 
 	/**
@@ -154,15 +167,6 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 	$current_screen->is_block_editor( true );
 
-	$custom_settings         = array(
-		'siteUrl'                              => site_url(),
-		'postsPerPage'                         => get_option( 'posts_per_page' ),
-		'styles'                               => gutenberg_get_editor_styles(),
-		'defaultTemplateTypes'                 => gutenberg_get_indexed_default_template_types(),
-		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
-		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
-		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
-	);
 	$site_editor_context     = new WP_Block_Editor_Context();
 	$settings                = gutenberg_get_block_editor_settings( $custom_settings, $site_editor_context );
 	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();

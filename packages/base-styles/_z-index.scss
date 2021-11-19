@@ -139,7 +139,7 @@ $z-layers: (
 
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
-	".edit-site-template-part-converter__modal": 1000001,
+	".edit-site-create-template-part-modal": 1000001,
 
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,
