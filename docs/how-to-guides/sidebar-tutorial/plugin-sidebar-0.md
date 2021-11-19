@@ -1,6 +1,10 @@
-# Creating a Sidebar for Your Plugin
+# Plugin Sidebar
 
-This tutorial starts with you having an existing plugin setup and ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](/docs/how-to-guides/javascript/) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
+How to add a sidebar to your plugin. A sidebar is the region to the far right of the editor. Your plugin can add an additional icon next to the InspectorControls (gear icon) that can be expanded.
+
+![Example sidebar](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/sidebar-up-and-running.png)
+
+**Prerequisite:**: The tutorial assumes you have an existing plugin setup and ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](/docs/how-to-guides/javascript/) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
 
 In the next sections, you're going to create a custom sidebar for a plugin that contains a text control so the user can update a value that is stored in the `post_meta` table.
 
