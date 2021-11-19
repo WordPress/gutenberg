@@ -219,6 +219,36 @@
 	}
 }
 
+// General submenu colors.
+// These styles are stored here as opposed to in the separate submenu block,
+// so that they can affect both submenus and page lists with submenu items both.
+.wp-block-navigation-submenu {
+	position: relative;
+	display: flex;
+
+	.wp-block-navigation__submenu-icon svg {
+		stroke: currentColor;
+	}
+}
+
+button.wp-block-navigation-item__content {
+	background-color: transparent;
+	border: none;
+	color: currentColor;
+	font-size: inherit;
+	font-family: inherit;
+	line-height: inherit;
+
+	// Buttons default to center alignment. This becomes visible
+	// when a menu item label is long enough to wrap.
+	text-align: left;
+}
+
+.wp-block-navigation-submenu__toggle {
+	cursor: pointer;
+}
+
+
 /**
  * Margins
  */
