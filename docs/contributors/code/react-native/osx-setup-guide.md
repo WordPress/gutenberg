@@ -1,6 +1,6 @@
-# A first-time setup guide to native mobile development (OSX)
+# Setup guide for React Native development (OSX)
 
-Are you interested in contributing to native mobile development? This
+Are you interested in contributing to the native mobile editor? This
 guide is a detailed walk through designed to get you up and running!
 
 Note that the following instructions here are primarily focused on the
@@ -15,8 +15,9 @@ the XCode to both compile the iOS app and use the phone simulator app.
 Once it has been installed from the App Store, open it by visiting `Applications > Xcode`
 
 After opening the application:
-* Accept the license agreement.
-* Verify that `Xcode > Preferences > Locations > Command Line Tools` points at the current Xcode version.
+
+-   Accept the license agreement.
+-   Verify that `Xcode > Preferences > Locations > Command Line Tools` points at the current Xcode version.
 
 <img src="https://developer.wordpress.org/files/2021/10/xcode-command-line-tools.png" width="500" alt="Screenshot of XCode command line tools settings.">
 
@@ -41,17 +42,21 @@ Some good options are [nvm](https://github.com/nvm-sh/nvm) or [volta](https://vo
 Pick one and follow the install instructions noted on their website.
 
 Then run:
+
 ```sh
 nvm install lts/*
 nvm alias default lts/* #sets this as the default when opening a new terminal
 nvm use #switches to the project settings
 ```
+
 Or
+
 ```sh
 volta install node #defaults to installing lts
 ```
 
 Then install dependencies from your Gutenberg checkout folder:
+
 ```
 npm ci
 ```
@@ -95,6 +100,7 @@ npm run native start:reset #starts metro
 ```
 
 In another terminal type:
+
 ```
 npm run native ios
 ```
@@ -145,13 +151,16 @@ export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/tools
 export PATH=$PATH:$ANDROID_HOME/tools/bin
 export PATH=$PATH:$ANDROID_HOME/platform-tools
-````
+```
 
 Save then source, or open a new terminal to pick up changes.
+
 ```sh
 source ~/.zshrc
 ```
+
 or
+
 ```sh
 source ~/.bash_profile
 ```
@@ -230,7 +239,7 @@ If all things go well, it should look like:
 
 ### Android Integration Tests
 
-**Create a new virtual device()** that matches the device specified in [packages/react-native-editor/__device-tests__/helpers/caps.js](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/__device-tests__/helpers/caps.js#L30) At the time of this writing, this would be a Pixel 3 XL image, using Android 9 (API 28).
+**Create a new virtual device()** that matches the device specified in [packages/react-native-editor/**device-tests**/helpers/caps.js](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/__device-tests__/helpers/caps.js#L30) At the time of this writing, this would be a Pixel 3 XL image, using Android 9 (API 28).
 
 Start the virtual device first. Go back to the AVD by clicking on the phone icon, then click the green play button.
 
