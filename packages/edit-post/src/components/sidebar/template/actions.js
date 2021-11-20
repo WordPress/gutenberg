@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	Modal,
@@ -129,7 +129,10 @@ function PostTemplateActions() {
 					</Button>
 				) }
 				<Button variant="link" onClick={ () => setIsModalOpen( true ) }>
-					{ __( 'New' ) }
+					{
+						/* translators: button to create a new template */
+						_x( 'New', 'action' )
+					}
 				</Button>
 			</div>
 			{ isModalOpen && (
