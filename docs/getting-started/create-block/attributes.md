@@ -41,7 +41,7 @@ The component is added similar to an HTML tag, setting a label, the `value` is s
 
 The save function will simply write the `attributes.message` as a div tag since that is how we defined it to be parsed.
 
-Install the components module in order to be able to use the TextControl component:
+OPTIONAL: For IDE support (code completion and hints), you can install the `@wordpress/components` module which is where the TextControl component is imported from. This install command is optional since the build process automatically detects `@wordpress/*` imports and specifies as dependencies in the assets file.
 
 ```shell
 npm install @wordpress/components --save
