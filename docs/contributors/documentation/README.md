@@ -131,6 +131,7 @@ This is an **alert** callout.
 This is a **warning** callout.
 </div>
 
+
 ### Editor config
 
 You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.
