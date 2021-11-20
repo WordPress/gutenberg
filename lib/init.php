@@ -95,17 +95,16 @@ add_action( 'admin_menu', 'gutenberg_menu', 9 );
  */
 function gutenberg_site_editor_menu() {
 	if ( gutenberg_experimental_is_site_editor_available() ) {
-		add_menu_page(
-			__( 'Site Editor (beta)', 'gutenberg' ),
+		add_theme_page(
+			__( 'Editor (beta)', 'gutenberg' ),
 			sprintf(
 			/* translators: %s: "beta" label. */
-				__( 'Site Editor %s', 'gutenberg' ),
+				__( 'Editor %s', 'gutenberg' ),
 				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
 			),
 			'edit_theme_options',
 			'gutenberg-edit-site',
-			'gutenberg_edit_site_page',
-			'dashicons-layout'
+			'gutenberg_edit_site_page'
 		);
 	}
 }

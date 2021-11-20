@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/navigation` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -14,8 +14,10 @@
  */
 function block_core_navigation_build_css_colors( $attributes ) {
 	$colors = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
+		'css_classes'           => array(),
+		'inline_styles'         => '',
+		'overlay_css_classes'   => array(),
+		'overlay_inline_styles' => '',
 	);
 
 	// Text color.
@@ -54,6 +56,42 @@ function block_core_navigation_build_css_colors( $attributes ) {
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
 	}
 
+	// Overlay text color.
+	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $attributes );
+	$has_custom_overlay_text_color = array_key_exists( 'customOverlayTextColor', $attributes );
+
+	// If has overlay text color.
+	if ( $has_custom_overlay_text_color || $has_named_overlay_text_color ) {
+		// Add has-text-color class.
+		$colors['overlay_css_classes'][] = 'has-text-color';
+	}
+
+	if ( $has_named_overlay_text_color ) {
+		// Add the overlay color class.
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $attributes['overlayTextColor'] );
+	} elseif ( $has_custom_overlay_text_color ) {
+		// Add the custom overlay color inline style.
+		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
+	}
+
+	// Overlay background color.
+	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
+	$has_custom_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $attributes );
+
+	// If has overlay background color.
+	if ( $has_custom_overlay_background_color || $has_named_overlay_background_color ) {
+		// Add has-background class.
+		$colors['overlay_css_classes'][] = 'has-background';
+	}
+
+	if ( $has_named_overlay_background_color ) {
+		// Add the overlay background-color class.
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', $attributes['overlayBackgroundColor'] );
+	} elseif ( $has_custom_overlay_background_color ) {
+		// Add the custom overlay background-color inline style.
+		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
+	}
+
 	return $colors;
 }
 
@@ -83,103 +121,6 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 	}
 
 	return $font_sizes;
-}
-
-/**
- * Returns the menu items for a WordPress menu location.
- *
- * @param string $location The menu location.
- * @return array Menu items for the location.
- */
-function gutenberg_get_menu_items_at_location( $location ) {
-	if ( empty( $location ) ) {
-		return;
-	}
-
-	// Build menu data. The following approximates the code in
-	// `wp_nav_menu()` and `gutenberg_output_block_nav_menu`.
-
-	// Find the location in the list of locations, returning early if the
-	// location can't be found.
-	$locations = get_nav_menu_locations();
-	if ( ! isset( $locations[ $location ] ) ) {
-		return;
-	}
-
-	// Get the menu from the location, returning early if there is no
-	// menu or there was an error.
-	$menu = wp_get_nav_menu_object( $locations[ $location ] );
-	if ( ! $menu || is_wp_error( $menu ) ) {
-		return;
-	}
-
-	$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
-	_wp_menu_item_classes_by_context( $menu_items );
-
-	return $menu_items;
-}
-
-/**
- * Sorts a standard array of menu items into a nested structure keyed by the
- * id of the parent menu.
- *
- * @param array $menu_items Menu items to sort.
- * @return array An array keyed by the id of the parent menu where each element
- *               is an array of menu items that belong to that parent.
- */
-function gutenberg_sort_menu_items_by_parent_id( $menu_items ) {
-	$sorted_menu_items = array();
-	foreach ( (array) $menu_items as $menu_item ) {
-		$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
-	}
-	unset( $menu_items, $menu_item );
-
-	$menu_items_by_parent_id = array();
-	foreach ( $sorted_menu_items as $menu_item ) {
-		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
-	}
-
-	return $menu_items_by_parent_id;
-}
-
-/**
- * Turns menu item data into a nested array of parsed blocks
- *
- * @param array $menu_items               An array of menu items that represent
- *                                        an individual level of a menu.
- * @param array $menu_items_by_parent_id  An array keyed by the id of the
- *                                        parent menu where each element is an
- *                                        array of menu items that belong to
- *                                        that parent.
- * @return array An array of parsed block data.
- */
-function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
-	if ( empty( $menu_items ) ) {
-		return array();
-	}
-
-	$blocks = array();
-
-	foreach ( $menu_items as $menu_item ) {
-		$block = array(
-			'blockName' => 'core/navigation-link',
-			'attrs'     => array(
-				'label' => $menu_item->title,
-				'url'   => $menu_item->url,
-			),
-		);
-
-		$block['innerBlocks'] = gutenberg_parse_blocks_from_menu_items(
-			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-					? $menu_items_by_parent_id[ $menu_item->ID ]
-					: array(),
-			$menu_items_by_parent_id
-		);
-
-		$blocks[] = $block;
-	}
-
-	return $blocks;
 }
 
 /**
@@ -230,6 +171,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks = $block->inner_blocks;
 
+	// If `__unstableLocation` is defined, create inner blocks from the classic menu assigned to that location.
 	if ( empty( $inner_blocks ) && array_key_exists( '__unstableLocation', $attributes ) ) {
 		$menu_items = gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] );
 		if ( empty( $menu_items ) ) {
@@ -238,14 +180,52 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
 		$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
+	}
+
+	if ( ! empty( $block->context['navigationArea'] ) ) {
+		$area    = $block->context['navigationArea'];
+		$mapping = get_option( 'wp_navigation_areas', array() );
+		if ( ! empty( $mapping[ $area ] ) ) {
+			$attributes['navigationMenuId'] = $mapping[ $area ];
+		}
+	}
+
+	// Load inner blocks from the navigation post.
+	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+		$navigation_post = get_post( $attributes['navigationMenuId'] );
+		if ( ! isset( $navigation_post ) ) {
+			return '';
+		}
+
+		$parsed_blocks = parse_blocks( $navigation_post->post_content );
+
+		// 'parse_blocks' includes a null block with '\n\n' as the content when
+		// it encounters whitespace. This code strips it.
+		$compacted_blocks = array_filter(
+			$parsed_blocks,
+			function( $block ) {
+				return isset( $block['blockName'] );
+			}
+		);
 
 		// TODO - this uses the full navigation block attributes for the
 		// context which could be refined.
-		$inner_blocks = new WP_Block_List( $parsed_blocks, $attributes );
+		$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 	}
 
 	if ( empty( $inner_blocks ) ) {
 		return '';
+	}
+
+	// Restore legacy classnames for submenu positioning.
+	$layout_class = '';
+	if ( isset( $attributes['layout']['justifyContent'] ) ) {
+		if ( 'right' === $attributes['layout']['justifyContent'] ) {
+			$layout_class .= 'items-justified-right';
+		} elseif ( 'space-between' === $attributes['layout']['justifyContent'] ) {
+			$layout_class .= 'items-justified-space-between';
+		}
 	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
@@ -253,9 +233,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$classes    = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
-		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
-		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		$is_responsive_menu ? array( 'is-responsive' ) : array()
+		$is_responsive_menu ? array( 'is-responsive' ) : array(),
+		$layout_class ? array( $layout_class ) : array()
 	);
 
 	$inner_blocks_html = '';
@@ -306,6 +285,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$responsive_container_classes = array(
 		'wp-block-navigation__responsive-container',
 		$is_hidden_by_default ? 'hidden-by-default' : '',
+		implode( ' ', $colors['overlay_css_classes'] ),
 	);
 	$open_button_classes          = array(
 		'wp-block-navigation__responsive-container-open',
@@ -314,7 +294,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$responsive_container_markup = sprintf(
 		'<button aria-expanded="false" aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
-			<div class="%5$s" id="modal-%1$s" aria-hidden="true">
+			<div class="%5$s" style="%7$s" id="modal-%1$s">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-%1$s-title" >
 							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
@@ -329,7 +309,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		__( 'Open menu' ), // Open button label.
 		__( 'Close menu' ), // Close button label.
 		implode( ' ', $responsive_container_classes ),
-		implode( ' ', $open_button_classes )
+		implode( ' ', $open_button_classes ),
+		$colors['overlay_inline_styles']
 	);
 
 	return sprintf(

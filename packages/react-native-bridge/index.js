@@ -422,4 +422,18 @@ export function requestGotoCustomerSupportOptions() {
 	RNReactNativeGutenbergBridge.requestGotoCustomerSupportOptions();
 }
 
+/**
+ * Request the host app receive an event with properties.
+ *
+ * @param {string} eventName  Name representing to the event.
+ * @param {Object} properties Key-value pairs of event properties.
+ * @return {void}
+ */
+export function sendEventToHost( eventName, properties ) {
+	return RNReactNativeGutenbergBridge.sendEventToHost(
+		eventName,
+		properties
+	);
+}
+
 export default RNReactNativeGutenbergBridge;

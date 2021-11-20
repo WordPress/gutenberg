@@ -19,7 +19,11 @@
 	align-items: center;
 
 	&.is-focus-mode {
-		padding: 48px 48px 0;
+		padding: 48px;
+
+		.edit-site-visual-editor__editor-canvas {
+			border-radius: 2px;
+		}
 	}
 }
 
@@ -38,6 +42,10 @@
 	&:hover {
 		color: $gray-100;
 	}
+}
+
+.components-resizable-box__container {
+	margin: 0 auto;
 }
 
 .resizable-editor__drag-handle {

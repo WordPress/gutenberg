@@ -1,21 +1,15 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
 import {
-	BlockList,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -23,14 +17,6 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { store as editSiteStore } from '../../store';
 import ResizeHandle from './resize-handle';
-
-const LAYOUT = {
-	type: 'default',
-	// At the root level of the site editor, no alignments should be allowed.
-	alignments: [],
-};
-
-const RESPONSIVE_DEVICE = 'responsive';
 
 const DEFAULT_STYLES = {
 	width: '100%',
@@ -56,34 +42,45 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			select( editSiteStore ).__experimentalGetPreviewDeviceType(),
 		[]
 	);
-	const resizedCanvasStyles = useResizeCanvas( deviceType ) ?? DEFAULT_STYLES;
-	const previousResizedCanvasStylesRef = useRef( resizedCanvasStyles );
-	// Keep the height of the canvas when resizing on each device type.
-	const styles =
-		deviceType === RESPONSIVE_DEVICE
-			? previousResizedCanvasStylesRef.current
-			: resizedCanvasStyles;
-	const [ width, setWidth ] = useState( styles.width );
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = useDispatch( editSiteStore );
+	const deviceStyles = useResizeCanvas( deviceType );
+	const [ width, setWidth ] = useState( DEFAULT_STYLES.width );
+	const [ height, setHeight ] = useState( DEFAULT_STYLES.height );
 	const iframeRef = useRef();
 	const mouseMoveTypingResetRef = useMouseMoveTypingReset();
 	const ref = useMergeRefs( [ iframeRef, mouseMoveTypingResetRef ] );
 
 	useEffect(
-		function setWidthWhenDeviceTypeChanged() {
-			if ( deviceType !== RESPONSIVE_DEVICE ) {
-				setWidth( resizedCanvasStyles.width );
-				previousResizedCanvasStylesRef.current = resizedCanvasStyles;
+		function autoResizeIframeHeight() {
+			const iframe = iframeRef.current;
+
+			if ( ! iframe || ! enableResizing ) {
+				return;
 			}
+
+			const resizeObserver = new iframe.contentWindow.ResizeObserver(
+				() => {
+					setHeight(
+						iframe.contentDocument.querySelector(
+							`.edit-site-block-editor__block-list`
+						).offsetHeight
+					);
+				}
+			);
+
+			// Observing the <html> rather than the <body> because the latter
+			// gets destroyed and remounted after initialization in <Iframe>.
+			resizeObserver.observe( iframe.contentDocument.documentElement );
+
+			return () => {
+				resizeObserver.disconnect();
+			};
 		},
-		[ deviceType, resizedCanvasStyles.width ]
+		[ enableResizing ]
 	);
 
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
 		if ( iframeRef.current ) {
-			setWidth( `${ iframeRef.current.offsetWidth + deltaPixels }px` );
+			setWidth( iframeRef.current.offsetWidth + deltaPixels );
 		}
 	}, [] );
 
@@ -91,14 +88,14 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 		<ResizableBox
 			size={ {
 				width,
-				height: styles.height,
+				height,
 			} }
 			onResizeStop={ ( event, direction, element ) => {
 				setWidth( element.style.width );
-				setPreviewDeviceType( RESPONSIVE_DEVICE );
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"
+			maxHeight="100%"
 			enable={ {
 				right: enableResizing,
 				left: enableResizing,
@@ -129,21 +126,22 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 			} }
 		>
 			<Iframe
-				style={
-					// We'll be using the size controlled by ResizableBox so resetting them here.
-					omit( styles, [ 'width', 'height', 'margin' ] )
+				style={ enableResizing ? undefined : deviceStyles }
+				head={
+					<>
+						<EditorStyles styles={ settings.styles } />
+						<style>{
+							// Forming a "block formatting context" to prevent margin collapsing.
+							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+							`.edit-site-block-editor__block-list { display: flow-root; }`
+						}</style>
+					</>
 				}
-				head={ <EditorStyles styles={ settings.styles } /> }
 				ref={ ref }
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"
 				{ ...props }
-			>
-				<BlockList
-					className="edit-site-block-editor__block-list wp-site-blocks"
-					__experimentalLayout={ LAYOUT }
-				/>
-			</Iframe>
+			/>
 		</ResizableBox>
 	);
 }

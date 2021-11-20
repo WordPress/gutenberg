@@ -2,34 +2,50 @@
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	Icon,
+	MenuItem,
 	ToggleControl,
 	PanelBody,
-	withNotices,
+	Placeholder,
+	Button,
 } from '@wordpress/components';
 import {
 	InspectorControls,
 	BlockControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	BlockIcon,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { postFeaturedImage } from '@wordpress/icons';
+import { upload } from '@wordpress/icons';
+import { SVG, Path } from '@wordpress/primitives';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import DimensionControls from './dimension-controls';
 
+const placeholderIllustration = (
+	<SVG
+		className="components-placeholder__illustration"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 60 60"
+		preserveAspectRatio="xMidYMid slice" // @todo: "slice" matches the "cover" behavior, "meet" could be used for "container" and "fill" values.
+	>
+		<Path
+			vectorEffect="non-scaling-stroke"
+			d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
+		/>
+	</SVG>
+);
+
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
-	<div className="post-featured-image_placeholder">
-		<Icon icon={ postFeaturedImage } />
-		<p> { __( 'Featured Image' ) }</p>
+	<div className="wp-block-post-featured-image__placeholder">
+		{ placeholderIllustration }
 	</div>
 );
 
@@ -37,8 +53,6 @@ function PostFeaturedImageDisplay( {
 	attributes,
 	setAttributes,
 	context: { postId, postType, queryId },
-	noticeUI,
-	noticeOperations,
 } ) {
 	const isDescendentOfQueryLoop = !! queryId;
 	const { isLink, height, width, scale } = attributes;
@@ -48,42 +62,66 @@ function PostFeaturedImageDisplay( {
 		'featured_media',
 		postId
 	);
+
 	const media = useSelect(
 		( select ) =>
 			featuredImage &&
 			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
 		[ featuredImage ]
 	);
+
 	const blockProps = useBlockProps( {
-		style: { width },
+		style: { width, height },
 	} );
+
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder className="block-editor-media-placeholder">
+				{ placeholderIllustration }
+				{ content }
+			</Placeholder>
+		);
+	};
+
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
 			setFeaturedImage( value.id );
 		}
 	};
-	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
-	}
+
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const onUploadError = ( message ) => {
+		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
+	};
+
 	let image;
 	if ( ! featuredImage && isDescendentOfQueryLoop ) {
 		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
+
+	const label = __( 'Add a featured image' );
+
 	if ( ! featuredImage ) {
 		image = (
 			<MediaPlaceholder
-				icon={ <BlockIcon icon={ postFeaturedImage } /> }
 				onSelect={ onSelectImage }
-				notices={ noticeUI }
-				onError={ onUploadError }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				labels={ {
-					title: __( 'Featured image' ),
-					instructions: __(
-						'Upload a media file or pick one from your media library.'
-					),
+				onError={ onUploadError }
+				placeholder={ placeholder }
+				mediaLibraryButton={ ( { open } ) => {
+					return (
+						<Button
+							icon={ upload }
+							variant="primary"
+							label={ label }
+							showTooltip
+							tooltipPosition="top center"
+							onClick={ () => {
+								open();
+							} }
+						/>
+					);
 				} }
 			/>
 		);
@@ -128,7 +166,11 @@ function PostFeaturedImageDisplay( {
 						accept="image/*"
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
-					/>
+					>
+						<MenuItem onClick={ () => setFeaturedImage( 0 ) }>
+							{ __( 'Reset' ) }
+						</MenuItem>
+					</MediaReplaceFlow>
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>{ image }</figure>
@@ -136,12 +178,10 @@ function PostFeaturedImageDisplay( {
 	);
 }
 
-const PostFeaturedImageWithNotices = withNotices( PostFeaturedImageDisplay );
-
 export default function PostFeaturedImageEdit( props ) {
 	const blockProps = useBlockProps();
 	if ( ! props.context?.postId ) {
 		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
-	return <PostFeaturedImageWithNotices { ...props } />;
+	return <PostFeaturedImageDisplay { ...props } />;
 }

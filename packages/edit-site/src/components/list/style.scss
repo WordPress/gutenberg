@@ -1,0 +1,113 @@
+.edit-site-list-header {
+	position: relative;
+	align-items: center;
+	background-color: $white;
+	display: flex;
+	height: $header-height;
+	box-sizing: border-box;
+	width: 100%;
+	justify-content: flex-end;
+	padding-right: $grid-unit-20;
+
+	body.is-fullscreen-mode & {
+		padding-left: 60px;
+		transition: padding-left 20ms linear;
+		transition-delay: 80ms;
+		@include reduce-motion("transition");
+	}
+
+	.edit-site-list-header__title {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		text-align: center;
+		font-size: 20px;
+		padding: 0;
+		margin: 0;
+	}
+}
+
+.edit-site-list-header__right {
+	// Creating a stacking context so that it won't be covered by title.
+	position: relative;
+}
+
+.edit-site {
+	.edit-site-list {
+		.interface-interface-skeleton__editor {
+			min-width: 100%;
+
+			@include break-medium() {
+				min-width: 0;
+			}
+		}
+
+		.interface-interface-skeleton__content {
+			background: $white;
+		}
+	}
+}
+
+.edit-site-list-main {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: $grid-unit-20;
+
+	@include break-medium() {
+		padding: $grid-unit * 9;
+	}
+}
+
+.edit-site-list-table {
+	width: 100%;
+	border: $border-width solid $gray-200;
+	border-radius: 2px;
+	margin: 0;
+	overflow: hidden;
+
+	li {
+		display: flex;
+		align-items: center;
+		padding: $grid-unit-20;
+		box-sizing: border-box;
+		border-top: $border-width solid $gray-100;
+		margin: 0;
+
+		@include break-medium() {
+			padding: $grid-unit-30 $grid-unit-40;
+		}
+
+		.edit-site-list-table-column:nth-child(1) {
+			width: calc(60% - 36px);
+
+			a {
+				display: block;
+				text-decoration: none;
+				font-weight: 500;
+				margin-bottom: $grid-unit-05;
+			}
+		}
+
+		.edit-site-list-table-column:nth-child(2) {
+			width: calc(40% - 36px);
+		}
+
+		.edit-site-list-table-column:nth-child(3) {
+			min-width: $button-size;
+		}
+	}
+
+	li.edit-site-list-table-head {
+		border-bottom: $border-width solid $gray-200;
+		font-size: 16px;
+		font-weight: 500;
+		text-align: left;
+		color: $black;
+		border-top: none;
+
+		& + li {
+			border-top: 0;
+		}
+	}
+}

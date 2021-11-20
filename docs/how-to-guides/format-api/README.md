@@ -1,4 +1,4 @@
-# Introduction to the Format API
+# Formatting Toolbar API
 
 The purpose of this tutorial is to introduce you to the Format API. The Format API makes it possible for developers to add custom buttons to the formatting toolbar and have them apply a _format_ to a text selection. Bold is an example of a standard button in the formatting toolbar.
 

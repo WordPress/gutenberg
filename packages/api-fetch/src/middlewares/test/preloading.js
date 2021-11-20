@@ -1,32 +1,9 @@
 /**
  * Internal dependencies
  */
-import createPreloadingMiddleware, { getStablePath } from '../preloading';
+import createPreloadingMiddleware from '../preloading';
 
 describe( 'Preloading Middleware', () => {
-	describe( 'getStablePath', () => {
-		it( 'returns same value if no query parameters', () => {
-			const path = '/foo/bar';
-
-			expect( getStablePath( path ) ).toBe( path );
-		} );
-
-		it( 'returns a stable path', () => {
-			const abc = getStablePath( '/foo/bar?a=5&b=1&c=2' );
-			const bca = getStablePath( '/foo/bar?b=1&c=2&a=5' );
-			const bac = getStablePath( '/foo/bar?b=1&a=5&c=2' );
-			const acb = getStablePath( '/foo/bar?a=5&c=2&b=1' );
-			const cba = getStablePath( '/foo/bar?c=2&b=1&a=5' );
-			const cab = getStablePath( '/foo/bar?c=2&a=5&b=1' );
-
-			expect( abc ).toBe( bca );
-			expect( bca ).toBe( bac );
-			expect( bac ).toBe( acb );
-			expect( acb ).toBe( cba );
-			expect( cba ).toBe( cab );
-		} );
-	} );
-
 	describe( 'given preloaded data', () => {
 		describe( 'when data is requested from a preloaded endpoint', () => {
 			describe( 'and it is requested for the first time', () => {

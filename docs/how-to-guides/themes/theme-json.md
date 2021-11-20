@@ -169,6 +169,9 @@ The settings section has the following structure:
 {
 	"version": 1,
 	"settings": {
+		"border": {
+			"customRadius": false
+		},
 		"color": {
 			"custom": true,
 			"customDuotone": true,
@@ -216,16 +219,18 @@ The settings section has the following structure:
 	"version": 1,
 	"settings": {
 		"border": {
-			"customColor": false,
-			"customRadius": false,
-			"customStyle": false,
-			"customWidth": false
+			"color": false,
+			"radius": false,
+			"style": false,
+			"width": false
 		},
 		"color": {
 			"background": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
+			"defaultGradients": true,
+			"defaultPalette": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
@@ -238,20 +243,22 @@ The settings section has the following structure:
 			"wideSize": "1000px"
 		},
 		"spacing": {
-			"customMargin": false,
-			"customPadding": false,
+			"blockGap": null,
+			"margin": false,
+			"padding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
 			"customFontSize": true,
-			"customFontStyle": true,
-			"customFontWeight": true,
-			"customLineHeight": false,
-			"customTextDecorations": true,
-			"customTextTransforms": true,
 			"dropCap": true,
 			"fontFamilies": [],
-			"fontSizes": []
+			"fontSizes": [],
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"lineHeight": false,
+			"textDecoration": true,
+			"textTransform": true
 		},
 		"blocks": {
 			"core/paragraph": {
@@ -281,8 +288,8 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 
 | add_theme_support           | theme.json setting                                        |
 | --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.customLineHeight` to `true`.              |
-| `custom-spacing`            | Set `spacing.customPadding` to `true`.                    |
+| `custom-line-height`        | Set `typography.lineHeight` to `true`.              |
+| `custom-spacing`            | Set `spacing.padding` to `true`.                    |
 | `custom-units`              | Provide the list of units via `spacing.units`.            |
 | `disable-custom-colors`     | Set `color.custom` to `false`.                            |
 | `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |
@@ -611,6 +618,9 @@ Each block declares which style properties it exposes via the [block supports me
 {
 	"version": 1,
 	"styles": {
+		"border": {
+			"radius": "value"
+		},
 		"color": {
 			"background": "value",
 			"gradient": "value",
@@ -636,6 +646,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"elements": {
 			"link": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {}
@@ -649,6 +660,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"blocks": {
 			"core/group": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {},
@@ -685,6 +697,9 @@ Each block declares which style properties it exposes via the [block supports me
 			"gradient": "value",
 			"text": "value"
 		},
+		"filter": {
+			"duotone": "value"
+		},
 		"spacing": {
 			"blockGap": "value",
 			"margin": {
@@ -705,6 +720,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontSize": "value",
 			"fontStyle": "value",
 			"fontWeight": "value",
+			"letterSpacing": "value",
 			"lineHeight": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
@@ -779,7 +795,7 @@ body {
 
 Styles found within a block will be enqueued using the block selector.
 
-By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitely telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
+By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
 
 {% codetabs %}
 {% Input %}
@@ -967,11 +983,11 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ## Developing with theme.json
 
-It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at [SchemaStore.org](https://schemastore.org/)
+It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
 
-To use the schema, add `"$schema": "https://json.schemastore.org/theme-v1.json"` to the beginning of your theme.json file. Visual Studio Code and other editors will pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor.
+Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
 
-![Example using validation with schema](https://developer.wordpress.org/files/2021/10/schema-validation.gif)
+![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
 
 
 ## Frequently Asked Questions
@@ -995,8 +1011,8 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 
 The `--` as a separator has two functions:
 
-- Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
-- Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
+- Readability, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
+- Parsability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
 
 ### Why using `--` as a separator?
 

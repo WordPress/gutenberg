@@ -32,11 +32,12 @@ import { closeSmall } from '@wordpress/icons';
  */
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
+import StyleProvider from '../style-provider';
 
 // Used to count the number of open modals.
 let openModalCount = 0;
 
-const Modal = ( props, forwardedRef ) => {
+function Modal( props, forwardedRef ) {
 	const {
 		bodyOpenClassName = 'modal-open',
 		role = 'dialog',
@@ -60,6 +61,7 @@ const Modal = ( props, forwardedRef ) => {
 		className = '',
 		contentLabel = null,
 		onKeyDown,
+		isFullScreen = false,
 	} = props;
 
 	const ref = useRef();
@@ -121,63 +123,76 @@ const Modal = ( props, forwardedRef ) => {
 			) }
 			onKeyDown={ handleEscapeKeyDown }
 		>
-			<div
-				className={ classnames( 'components-modal__frame', className ) }
-				style={ style }
-				ref={ useMergeRefs( [
-					constrainedTabbingRef,
-					focusReturnRef,
-					focusOnMountRef,
-				] ) }
-				role={ role }
-				aria-label={ contentLabel }
-				aria-labelledby={ contentLabel ? null : headingId }
-				aria-describedby={ aria.describedby }
-				tabIndex="-1"
-				{ ...( shouldCloseOnClickOutside ? focusOutsideProps : {} ) }
-				onKeyDown={ onKeyDown }
-			>
+			<StyleProvider document={ document }>
 				<div
-					className={ `components-modal__content ${
-						! showTitle ? 'no-title' : ''
-					}` }
-					role="document"
-				>
-					{ showTitle && (
-						<div className="components-modal__header">
-							<div className="components-modal__header-heading-container">
-								{ icon && (
-									<span
-										className="components-modal__icon-container"
-										aria-hidden
-									>
-										{ icon }
-									</span>
-								) }
-								<h1
-									id={ headingId }
-									className="components-modal__header-heading"
-								>
-									{ title }
-								</h1>
-							</div>
-							{ isDismissible && (
-								<Button
-									onClick={ onRequestClose }
-									icon={ closeSmall }
-									label={
-										closeButtonLabel || __( 'Close dialog' )
-									}
-								/>
-							) }
-						</div>
+					className={ classnames(
+						'components-modal__frame',
+						className,
+						{
+							'is-full-screen': isFullScreen,
+						}
 					) }
-					{ children }
+					style={ style }
+					ref={ useMergeRefs( [
+						constrainedTabbingRef,
+						focusReturnRef,
+						focusOnMountRef,
+					] ) }
+					role={ role }
+					aria-label={ contentLabel }
+					aria-labelledby={ contentLabel ? null : headingId }
+					aria-describedby={ aria.describedby }
+					tabIndex="-1"
+					{ ...( shouldCloseOnClickOutside
+						? focusOutsideProps
+						: {} ) }
+					onKeyDown={ onKeyDown }
+				>
+					<div
+						className={ `components-modal__content ${
+							! showTitle ? 'no-title' : ''
+						}` }
+						role="document"
+					>
+						{ showTitle && (
+							<div className="components-modal__header">
+								<div className="components-modal__header-heading-container">
+									{ icon && (
+										<span
+											className="components-modal__icon-container"
+											aria-hidden
+										>
+											{ icon }
+										</span>
+									) }
+									{ title && (
+										<h1
+											id={ headingId }
+											className="components-modal__header-heading"
+										>
+											{ title }
+										</h1>
+									) }
+								</div>
+								{ isDismissible && (
+									<Button
+										onClick={ onRequestClose }
+										icon={ closeSmall }
+										label={
+											closeButtonLabel ||
+											__( 'Close dialog' )
+										}
+									/>
+								) }
+							</div>
+						) }
+						{ children }
+					</div>
 				</div>
-			</div>
+			</StyleProvider>
 		</div>,
 		document.body
 	);
-};
+}
 
 export default forwardRef( Modal );

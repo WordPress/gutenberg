@@ -60,6 +60,7 @@
 		"src/select-control/**/*",
 		"src/shortcut/**/*",
 		"src/slot-fill/**/*",
+		"src/style-provider/**/*",
 		"src/spacer/**/*",
 		"src/spinner/**/*",
 		"src/surface/**/*",

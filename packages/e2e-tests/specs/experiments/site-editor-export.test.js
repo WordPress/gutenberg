@@ -41,6 +41,7 @@ describe( 'Site Editor Templates Export', () => {
 
 	beforeEach( async () => {
 		await siteEditor.visit();
+		await siteEditor.disableWelcomeGuide();
 	} );
 
 	it( 'clicking export should download edit-site-export.zip file', async () => {

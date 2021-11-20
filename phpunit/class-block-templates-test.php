@@ -79,8 +79,8 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		wp_delete_post( self::$post->ID );
 	}
 
-	function test_gutenberg_build_template_result_from_file() {
-		$template = _gutenberg_build_template_result_from_file(
+	function test_build_block_template_result_from_file() {
+		$template = _build_block_template_result_from_file(
 			array(
 				'slug' => 'single',
 				'path' => __DIR__ . '/fixtures/template.html',
@@ -98,7 +98,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'wp_template', $template->type );
 
 		// Test template parts.
-		$template_part = _gutenberg_build_template_result_from_file(
+		$template_part = _build_block_template_result_from_file(
 			array(
 				'slug' => 'header',
 				'path' => __DIR__ . '/fixtures/template.html',
@@ -117,8 +117,8 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template_part->area );
 	}
 
-	function test_gutenberg_build_template_result_from_post() {
-		$template = _gutenberg_build_template_result_from_post(
+	function test_build_block_template_result_from_post() {
+		$template = _build_block_template_result_from_post(
 			self::$post,
 			'wp_template'
 		);
@@ -134,7 +134,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'wp_template', $template->type );
 
 		// Test template parts.
-		$template_part = _gutenberg_build_template_result_from_post(
+		$template_part = _build_block_template_result_from_post(
 			self::$template_part_post,
 			'wp_template_part'
 		);
@@ -150,10 +150,10 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template_part->area );
 	}
 
-	function test_gutenberg_inject_theme_attribute_in_content() {
+	function test_inject_theme_attribute_in_block_template_content() {
 		$theme                           = get_stylesheet();
 		$content_without_theme_attribute = '<!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /-->';
-		$template_content                = _gutenberg_inject_theme_attribute_in_content(
+		$template_content                = _inject_theme_attribute_in_block_template_content(
 			$content_without_theme_attribute,
 			$theme
 		);
@@ -164,7 +164,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $template_content );
 
 		$content_without_theme_attribute_nested = '<!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /--><!-- /wp:group -->';
-		$template_content                       = _gutenberg_inject_theme_attribute_in_content(
+		$template_content                       = _inject_theme_attribute_in_block_template_content(
 			$content_without_theme_attribute_nested,
 			$theme
 		);
@@ -176,7 +176,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 
 		// Does not inject theme when there is an existing theme attribute.
 		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"fake-theme","align":"full", "tagName":"header","className":"site-header"} /-->';
-		$template_content                      = _gutenberg_inject_theme_attribute_in_content(
+		$template_content                      = _inject_theme_attribute_in_block_template_content(
 			$content_with_existing_theme_attribute,
 			$theme
 		);
@@ -184,17 +184,39 @@ class Block_Templates_Test extends WP_UnitTestCase {
 
 		// Does not inject theme when there is no template part.
 		$content_with_no_template_part = '<!-- wp:post-content /-->';
-		$template_content              = _gutenberg_inject_theme_attribute_in_content(
+		$template_content              = _inject_theme_attribute_in_block_template_content(
 			$content_with_no_template_part,
 			$theme
 		);
 		$this->assertEquals( $content_with_no_template_part, $template_content );
 	}
 
+	function test_remove_theme_attribute_in_block_template_content() {
+		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"tt1-blocks","align":"full","tagName":"header","className":"site-header"} /-->';
+		$template_content                      = _remove_theme_attribute_in_block_template_content( $content_with_existing_theme_attribute );
+		$expected                              = '<!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header"} /-->';
+		$this->assertEquals( $expected, $template_content );
+
+		$content_with_existing_theme_attribute_nested = '<!-- wp:group --><!-- wp:template-part {"slug":"header","theme":"tt1-blocks","align":"full","tagName":"header","className":"site-header"} /--><!-- /wp:group -->';
+		$template_content                             = _remove_theme_attribute_in_block_template_content( $content_with_existing_theme_attribute_nested );
+		$expected                                     = '<!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header"} /--><!-- /wp:group -->';
+		$this->assertEquals( $expected, $template_content );
+
+		// Does not modify content when there is no existing theme attribute.
+		$content_without_theme_attribute = '<!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header"} /-->';
+		$template_content                = _remove_theme_attribute_in_block_template_content( $content_without_theme_attribute );
+		$this->assertEquals( $content_without_theme_attribute, $template_content );
+
+		// Does not remove theme when there is no template part.
+		$content_with_no_template_part = '<!-- wp:post-content /-->';
+		$template_content              = _remove_theme_attribute_in_block_template_content( $content_with_no_template_part );
+		$this->assertEquals( $content_with_no_template_part, $template_content );
+	}
+
 	/**
 	 * Should retrieve the template from the theme files.
 	 */
-	function test_gutenberg_get_block_template_from_file() {
+	function test_get_block_template_from_file() {
 		$id       = get_stylesheet() . '//' . 'index';
 		$template = gutenberg_get_block_template( $id, 'wp_template' );
 		$this->assertEquals( $id, $template->id );
@@ -219,7 +241,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	/**
 	 * Should retrieve the template from the CPT.
 	 */
-	function test_gutenberg_get_block_template_from_post() {
+	function test_get_block_template_from_post() {
 		$id       = get_stylesheet() . '//' . 'my_template';
 		$template = gutenberg_get_block_template( $id, 'wp_template' );
 		$this->assertEquals( $id, $template->id );
@@ -287,22 +309,22 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	/**
 	 * Should flatten nested blocks
 	 */
-	function test_gutenberg_flatten_blocks() {
+	function test_flatten_blocks() {
 		$content_template_part_inside_group = '<!-- wp:group --><!-- wp:template-part {"slug":"header"} /--><!-- /wp:group -->';
 		$blocks                             = parse_blocks( $content_template_part_inside_group );
-		$actual                             = _gutenberg_flatten_blocks( $blocks );
+		$actual                             = _flatten_blocks( $blocks );
 		$expected                           = array( $blocks[0], $blocks[0]['innerBlocks'][0] );
 		$this->assertEquals( $expected, $actual );
 
 		$content_template_part_inside_group_inside_group = '<!-- wp:group --><!-- wp:group --><!-- wp:template-part {"slug":"header"} /--><!-- /wp:group --><!-- /wp:group -->';
 		$blocks   = parse_blocks( $content_template_part_inside_group_inside_group );
-		$actual   = _gutenberg_flatten_blocks( $blocks );
+		$actual   = _flatten_blocks( $blocks );
 		$expected = array( $blocks[0], $blocks[0]['innerBlocks'][0], $blocks[0]['innerBlocks'][0]['innerBlocks'][0] );
 		$this->assertEquals( $expected, $actual );
 
 		$content_without_inner_blocks = '<!-- wp:group /-->';
 		$blocks                       = parse_blocks( $content_without_inner_blocks );
-		$actual                       = _gutenberg_flatten_blocks( $blocks );
+		$actual                       = _flatten_blocks( $blocks );
 		$expected                     = array( $blocks[0] );
 		$this->assertEquals( $expected, $actual );
 	}

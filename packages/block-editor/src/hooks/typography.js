@@ -216,8 +216,9 @@ export function TypographyPanel( props ) {
 			) }
 			{ ! isLetterSpacingDisabled && (
 				<ToolsPanelItem
+					className="single-column"
 					hasValue={ () => hasLetterSpacingValue( props ) }
-					label={ __( 'Letter-spacing' ) }
+					label={ __( 'Letter spacing' ) }
 					onDeselect={ () => resetLetterSpacing( props ) }
 					isShownByDefault={ defaultControls?.letterSpacing }
 					resetAllFilter={ createResetAllFilter( 'letterSpacing' ) }

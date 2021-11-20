@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/gallery",
 	"title": "Gallery",
@@ -79,6 +80,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"fixedHeight": {
+			"type": "boolean",
+			"default": true
+		},
 		"linkTarget": {
 			"type": "string"
 		},
@@ -96,7 +101,8 @@
 	},
 	"providesContext": {
 		"allowResize": "allowResize",
-		"imageCrop": "imageCrop"
+		"imageCrop": "imageCrop",
+		"fixedHeight": "fixedHeight"
 	},
 	"supports": {
 		"anchor": true,

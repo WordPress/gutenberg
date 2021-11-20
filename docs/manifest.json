@@ -90,6 +90,156 @@
 		"parent": null
 	},
 	{
+		"title": "Accessibility",
+		"slug": "accessibility",
+		"markdown_source": "../docs/how-to-guides/accessibility.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Backward Compatibility",
+		"slug": "backward-compatibility",
+		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Deprecations",
+		"slug": "deprecations",
+		"markdown_source": "../docs/how-to-guides/backward-compatibility/deprecations.md",
+		"parent": "backward-compatibility"
+	},
+	{
+		"title": "Meta Boxes",
+		"slug": "meta-box",
+		"markdown_source": "../docs/how-to-guides/backward-compatibility/meta-box.md",
+		"parent": "backward-compatibility"
+	},
+	{
+		"title": "Blocks",
+		"slug": "block-tutorial",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Writing Your First Block Type",
+		"slug": "writing-your-first-block-type",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Applying Styles From a Stylesheet",
+		"slug": "applying-styles-with-stylesheets",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Introducing Attributes and Editable Fields",
+		"slug": "introducing-attributes-and-editable-fields",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Block Controls: Block Toolbar and Settings Sidebar",
+		"slug": "block-controls-toolbar-and-sidebar",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Creating dynamic blocks",
+		"slug": "creating-dynamic-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Generate Blocks with WP-CLI",
+		"slug": "generate-blocks-with-wp-cli",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Nested Blocks: Using InnerBlocks",
+		"slug": "nested-blocks-inner-blocks",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Designer Documentation",
+		"slug": "designers",
+		"markdown_source": "../docs/how-to-guides/designers/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Block Design",
+		"slug": "block-design",
+		"markdown_source": "../docs/how-to-guides/designers/block-design.md",
+		"parent": "designers"
+	},
+	{
+		"title": "User Interface",
+		"slug": "user-interface",
+		"markdown_source": "../docs/how-to-guides/designers/user-interface.md",
+		"parent": "designers"
+	},
+	{
+		"title": "Resources",
+		"slug": "design-resources",
+		"markdown_source": "../docs/how-to-guides/designers/design-resources.md",
+		"parent": "designers"
+	},
+	{
+		"title": "Animation",
+		"slug": "animation",
+		"markdown_source": "../docs/how-to-guides/designers/animation.md",
+		"parent": "designers"
+	},
+	{
+		"title": "Development Platform",
+		"slug": "platform",
+		"markdown_source": "../docs/how-to-guides/platform/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Building a custom block editor",
+		"slug": "custom-block-editor",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
+		"parent": "platform"
+	},
+	{
+		"title": "Tutorial: building a custom block editor",
+		"slug": "tutorial",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
+		"parent": "custom-block-editor"
+	},
+	{
+		"title": "Feature Flags",
+		"slug": "feature-flags",
+		"markdown_source": "../docs/how-to-guides/feature-flags.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Formatting Toolbar API",
+		"slug": "format-api",
+		"markdown_source": "../docs/how-to-guides/format-api/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Register a New Format",
+		"slug": "1-register-format",
+		"markdown_source": "../docs/how-to-guides/format-api/1-register-format.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Add a Button to the Toolbar",
+		"slug": "2-toolbar-button",
+		"markdown_source": "../docs/how-to-guides/format-api/2-toolbar-button.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Apply the Format When the Button Is Clicked",
+		"slug": "3-apply-format",
+		"markdown_source": "../docs/how-to-guides/format-api/3-apply-format.md",
+		"parent": "format-api"
+	},
+	{
 		"title": "Getting Started with JavaScript",
 		"slug": "javascript",
 		"markdown_source": "../docs/how-to-guides/javascript/README.md",
@@ -144,6 +294,12 @@
 		"parent": "javascript"
 	},
 	{
+		"title": "Internationalization",
+		"slug": "internationalization",
+		"markdown_source": "../docs/how-to-guides/internationalization.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Meta Boxes",
 		"slug": "metabox",
 		"markdown_source": "../docs/how-to-guides/metabox/README.md",
@@ -180,13 +336,19 @@
 		"parent": "metabox"
 	},
 	{
-		"title": "Displaying Notices from Your Plugin or Theme",
+		"title": "A first-time setup guide to native mobile development (OSX)",
+		"slug": "osx-setup-guide",
+		"markdown_source": "../docs/how-to-guides/native-mobile/osx-setup-guide.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Notices",
 		"slug": "notices",
 		"markdown_source": "../docs/how-to-guides/notices/README.md",
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Creating a Sidebar for Your Plugin",
+		"title": "Plugin Sidebar",
 		"slug": "plugin-sidebar-0",
 		"markdown_source": "../docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md",
 		"parent": "how-to-guides"
@@ -222,54 +384,6 @@
 		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Blocks",
-		"slug": "block-tutorial",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Writing Your First Block Type",
-		"slug": "writing-your-first-block-type",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Applying Styles From a Stylesheet",
-		"slug": "applying-styles-with-stylesheets",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Introducing Attributes and Editable Fields",
-		"slug": "introducing-attributes-and-editable-fields",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Block Controls: Block Toolbar and Settings Sidebar",
-		"slug": "block-controls-toolbar-and-sidebar",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Creating dynamic blocks",
-		"slug": "creating-dynamic-blocks",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Generate Blocks with WP-CLI",
-		"slug": "generate-blocks-with-wp-cli",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Nested Blocks: Using InnerBlocks",
-		"slug": "nested-blocks-inner-blocks",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
 		"title": "Themes",
 		"slug": "themes",
 		"markdown_source": "../docs/how-to-guides/themes/README.md",
@@ -300,111 +414,9 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Feature Flags",
-		"slug": "feature-flags",
-		"markdown_source": "../docs/how-to-guides/feature-flags.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Backward Compatibility",
-		"slug": "backward-compatibility",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Deprecations",
-		"slug": "deprecations",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/deprecations.md",
-		"parent": "backward-compatibility"
-	},
-	{
-		"title": "Meta Boxes",
-		"slug": "meta-box",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/meta-box.md",
-		"parent": "backward-compatibility"
-	},
-	{
-		"title": "Introduction to the Format API",
-		"slug": "format-api",
-		"markdown_source": "../docs/how-to-guides/format-api/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Register a New Format",
-		"slug": "1-register-format",
-		"markdown_source": "../docs/how-to-guides/format-api/1-register-format.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Add a Button to the Toolbar",
-		"slug": "2-toolbar-button",
-		"markdown_source": "../docs/how-to-guides/format-api/2-toolbar-button.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Apply the Format When the Button Is Clicked",
-		"slug": "3-apply-format",
-		"markdown_source": "../docs/how-to-guides/format-api/3-apply-format.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Gutenberg as a Development Platform",
-		"slug": "platform",
-		"markdown_source": "../docs/how-to-guides/platform/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Building a custom block editor",
-		"slug": "custom-block-editor",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
-		"parent": "platform"
-	},
-	{
-		"title": "Tutorial: building a custom block editor",
-		"slug": "tutorial",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
-		"parent": "custom-block-editor"
-	},
-	{
-		"title": "Designer Documentation",
-		"slug": "designers",
-		"markdown_source": "../docs/how-to-guides/designers/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Block Design",
-		"slug": "block-design",
-		"markdown_source": "../docs/how-to-guides/designers/block-design.md",
-		"parent": "designers"
-	},
-	{
-		"title": "User Interface",
-		"slug": "user-interface",
-		"markdown_source": "../docs/how-to-guides/designers/user-interface.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Resources",
-		"slug": "design-resources",
-		"markdown_source": "../docs/how-to-guides/designers/design-resources.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Animation",
-		"slug": "animation",
-		"markdown_source": "../docs/how-to-guides/designers/animation.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Accessibility",
-		"slug": "accessibility",
-		"markdown_source": "../docs/how-to-guides/accessibility.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Internationalization",
-		"slug": "internationalization",
-		"markdown_source": "../docs/how-to-guides/internationalization.md",
+		"title": "Thunks in Core-Data",
+		"slug": "thunks",
+		"markdown_source": "../docs/how-to-guides/thunks.md",
 		"parent": "how-to-guides"
 	},
 	{

@@ -17,5 +17,6 @@
 		"src/redux-store/metadata/**/*",
 		"src/promise-middleware.js",
 		"src/utils",
+	  	"src/*.ts"
 	]
 }

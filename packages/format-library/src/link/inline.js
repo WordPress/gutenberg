@@ -12,6 +12,8 @@ import {
 	applyFormat,
 	useAnchorRef,
 	removeFormat,
+	slice,
+	replace,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
@@ -22,8 +24,9 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { createLinkFormat, isValidHref } from './utils';
+import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
+import useLinkInstanceKey from './use-link-instance-key';
 
 function InlineLinkUI( {
 	isActive,
@@ -35,6 +38,11 @@ function InlineLinkUI( {
 	stopAddingLink,
 	contentRef,
 } ) {
+	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
+
+	// Get the text content minus any HTML tags.
+	const richTextText = richLinkTextValue.text;
+
 	/**
 	 * Pending settings to be applied to the next link. When inserting a new
 	 * link, toggle values cannot be applied immediately, because there is not
@@ -60,6 +68,7 @@ function InlineLinkUI( {
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
+		title: richTextText,
 		...nextLinkValue,
 	};
 
@@ -99,7 +108,7 @@ function InlineLinkUI( {
 		}
 
 		const newUrl = prependHTTP( nextValue.url );
-		const format = createLinkFormat( {
+		const linkFormat = createLinkFormat( {
 			url: newUrl,
 			type: nextValue.type,
 			id:
@@ -109,17 +118,46 @@ function InlineLinkUI( {
 			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 
+		const newText = nextValue.title || newUrl;
 		if ( isCollapsed( value ) && ! isActive ) {
-			const newText = nextValue.title || newUrl;
+			// Scenario: we don't have any actively selected text or formats.
 			const toInsert = applyFormat(
 				create( { text: newText } ),
-				format,
+				linkFormat,
 				0,
 				newText.length
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			const newValue = applyFormat( value, format );
+			// Scenario: we have any active text selection or an active format
+			let newValue;
+
+			if ( newText === richTextText ) {
+				// If we're not updating the text then ignore
+				newValue = applyFormat( value, linkFormat );
+			} else {
+				// Create new RichText value for the new text in order that we
+				// can apply formats to it.
+				newValue = create( { text: newText } );
+
+				// Apply the new Link format to this new text value.
+				newValue = applyFormat(
+					newValue,
+					linkFormat,
+					0,
+					newText.length
+				);
+
+				// Update the original (full) RichTextValue replacing the
+				// target text with the *new* RichTextValue containing:
+				// 1. The new text content.
+				// 2. The new link format.
+				// Note original formats will be lost when applying this change.
+				// That is expected behaviour.
+				// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
+				newValue = replace( value, richTextText, newValue );
+			}
+
 			newValue.start = newValue.end;
 			newValue.activeFormats = [];
 			onChange( newValue );
@@ -146,6 +184,12 @@ function InlineLinkUI( {
 	}
 
 	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
+
+	// Generate a string based key that is unique to this anchor reference.
+	// This is used to force re-mount the LinkControl component to avoid
+	// potential stale state bugs caused by the component not being remounted
+	// See https://github.com/WordPress/gutenberg/pull/34742.
+	const forceRemountKey = useLinkInstanceKey( anchorRef );
 
 	// The focusOnMount prop shouldn't evolve during render of a Popover
 	// otherwise it causes a render of the content.
@@ -185,6 +229,7 @@ function InlineLinkUI( {
 			position="bottom center"
 		>
 			<LinkControl
+				key={ forceRemountKey }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
@@ -193,9 +238,34 @@ function InlineLinkUI( {
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
+				hasTextControl
 			/>
 		</Popover>
 	);
+}
+
+function getRichTextValueFromSelection( value, isActive ) {
+	// Default to the selection ranges on the RichTextValue object.
+	let textStart = value.start;
+	let textEnd = value.end;
+
+	// If the format is currently active then the rich text value
+	// should always be taken from the bounds of the active format
+	// and not the selected text.
+	if ( isActive ) {
+		const boundary = getFormatBoundary( value, {
+			type: 'core/link',
+		} );
+
+		textStart = boundary.start;
+
+		// Text *selection* always extends +1 beyond the edge of the format.
+		// We account for that here.
+		textEnd = boundary.end + 1;
+	}
+
+	// Get a RichTextValue containing the selected text content.
+	return slice( value, textStart, textEnd );
 }
 
 export default withSpokenMessages( InlineLinkUI );

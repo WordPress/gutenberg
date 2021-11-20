@@ -152,9 +152,9 @@ The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wor
 
 Release types and their schedule:
 
--   [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) (`latest` dist tag) – when there is no "feature-freeze" mode in WordPress Core, publishing happens every two weeks based on the new stable version of the Gutenberg plugin. Otherwise, only bug fixes get manually included and published to npm before every next beta and RC version of the following WordPress release.
+-   [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) (`latest` dist tag) – when there is no "feature-freeze" mode in WordPress Core, publishing happens every two weeks based on the newly created RC1 version of the Gutenberg plugin. Otherwise, only bug fixes get manually included and published to npm before every next beta and RC version of the following WordPress release.
 -   [Minor WordPress Releases](#minor-wordpress-releases) (`patch` dist tag) – only when bug fixes or security releases need to be backported into WordPress Core.
--   [Development Releases](#development-releases) (`next` dist tag) – at least every two weeks when the RC version for the Gutenberg plugin is released.
+-   [Development Releases](#development-releases) (`next` dist tag) – when there is a "feature-freeze" mode in WordPress Core, publishing can still happen every two weeks based on the new RC1 version of the Gutenberg plugin. It is also possible to perform development releases at any time when there is a need to test the upcoming changes.
 
 There is also an option to perform [Standalone Bugfix Package Releases](#standalone-bugfix-package-releases) at will. It should be reserved only for critical bug fixes or security releases that must be published to _npm_ outside of a regular WordPress release cycle.
 

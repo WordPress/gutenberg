@@ -162,7 +162,7 @@ export function getBlockTypography(
 		}
 	}
 
-	if ( blockStyleAttributes?.fontSize ) {
+	if ( blockStyleAttributes?.fontSize && baseGlobalStyles ) {
 		const mappedFontSize = find( fontSizes, {
 			slug: blockStyleAttributes?.fontSize,
 		} );
@@ -265,7 +265,7 @@ function normalizeFontSizes( fontSizes ) {
 	const normalizedFontSizes = {};
 	const dimensions = Dimensions.get( 'window' );
 
-	[ 'core', 'theme', 'user' ].forEach( ( key ) => {
+	[ 'default', 'theme', 'user' ].forEach( ( key ) => {
 		if ( fontSizes[ key ] ) {
 			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
 				( fontSizeObject ) => {

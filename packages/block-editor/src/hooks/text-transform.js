@@ -62,7 +62,7 @@ export function useIsTextTransformDisabled( { name: blockName } = {} ) {
 		blockName,
 		TEXT_TRANSFORM_SUPPORT_KEY
 	);
-	const hasTextTransforms = useSetting( 'typography.customTextTransforms' );
+	const hasTextTransforms = useSetting( 'typography.textTransform' );
 	return notSupported || ! hasTextTransforms;
 }
 

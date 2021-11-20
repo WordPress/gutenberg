@@ -96,7 +96,8 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 	add_action( 'wp_head', 'gutenberg_viewport_meta_tag', 0 );
 
 	// Render title tag with content, regardless of whether theme has title-tag support.
-	remove_action( 'wp_head', '_wp_render_title_tag', 1 );    // Remove conditional title tag rendering...
+	remove_action( 'wp_head', '_wp_render_title_tag', 1 ); // Remove conditional title tag rendering...
+	remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
 	add_action( 'wp_head', 'gutenberg_render_title_tag', 1 ); // ...and make it unconditional.
 
 	// This file will be included instead of the theme's template file.
@@ -265,3 +266,28 @@ function gutenberg_resolve_template_for_new_post( $wp_query ) {
 		$wp_query->set( 'post_status', 'auto-draft' );
 	}
 }
+
+/**
+ * Redirect the edit links for templates to the site editor.
+ *
+ * @param string $link    The original link.
+ * @param int    $post_id The custom post id.
+ */
+function gutenberg_get_edit_template_link( $link, $post_id ) {
+	$post = get_post( $post_id );
+
+	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
+		return $link;
+	}
+
+	$template = _build_block_template_result_from_post( $post );
+
+	if ( is_wp_error( $template ) ) {
+		return $link;
+	}
+
+	$edit_link = 'themes.php?page=gutenberg-edit-site&postId=%1$s&postType=%2$s';
+
+	return admin_url( sprintf( $edit_link, urlencode( $template->id ), $template->type ) );
+}
+add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );

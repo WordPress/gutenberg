@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
 import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -40,6 +41,8 @@ export default function LinkPreview( {
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
+
+	const displayTitle = richData?.title || value?.title || displayURL;
 
 	const isEmptyURL = ! value.url.length;
 
@@ -84,9 +87,7 @@ export default function LinkPreview( {
 									className="block-editor-link-control__search-item-title"
 									href={ value.url }
 								>
-									{ richData?.title ||
-										value?.title ||
-										displayURL }
+									{ stripHTML( displayTitle ) }
 								</ExternalLink>
 
 								{ value?.url && (

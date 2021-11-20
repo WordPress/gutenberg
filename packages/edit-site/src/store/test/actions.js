@@ -77,29 +77,23 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'removeTemplate', () => {
-		it( 'should issue a REST request to delete the template, then read the current page and then set the page with an updated template list', () => {
-			const templateId = 1;
-			const page = { path: '/' };
+		it( 'should issue a deleteEntityRecord request', () => {
+			const template = {
+				id: 'tt1-blocks//general',
+				type: 'wp_template_part',
+			};
 
-			const it = removeTemplate( templateId );
+			const it = removeTemplate( template );
 			expect( it.next().value ).toEqual( {
-				type: 'API_FETCH',
-				request: {
-					path: `/wp/v2/templates/${ templateId }`,
-					method: 'DELETE',
-				},
-			} );
-			expect( it.next().value ).toEqual( {
-				type: '@@data/SELECT',
-				storeKey: 'core/edit-site',
-				selectorName: 'getPage',
-				args: [],
-			} );
-			expect( it.next( page ).value ).toEqual( {
+				actionName: 'deleteEntityRecord',
+				args: [
+					'postType',
+					'wp_template_part',
+					'tt1-blocks//general',
+					{ force: true },
+				],
+				storeKey: 'core',
 				type: '@@data/DISPATCH',
-				storeKey: 'core/edit-site',
-				actionName: 'setPage',
-				args: [ page ],
 			} );
 			expect( it.next().done ).toBe( true );
 		} );

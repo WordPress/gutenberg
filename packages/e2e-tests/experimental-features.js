@@ -108,7 +108,7 @@ export const siteEditor = {
 			page: 'gutenberg-edit-site',
 			...query,
 		} ).slice( 1 );
-		await visitAdminPage( 'admin.php', query );
+		await visitAdminPage( 'themes.php', query );
 		await page.waitForSelector( '.edit-site-visual-editor iframe' );
 	},
 
@@ -156,5 +156,32 @@ export const siteEditor = {
 			}
 			return '';
 		} );
+	},
+
+	async disableWelcomeGuide() {
+		const isWelcomeGuideActive = await page.evaluate( () =>
+			wp.data.select( 'core/edit-site' ).isFeatureActive( 'welcomeGuide' )
+		);
+		const isWelcomeGuideStyesActive = await page.evaluate( () =>
+			wp.data
+				.select( 'core/edit-site' )
+				.isFeatureActive( 'welcomeGuideStyles' )
+		);
+
+		if ( isWelcomeGuideActive ) {
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/edit-site' )
+					.toggleFeature( 'welcomeGuide' )
+			);
+		}
+
+		if ( isWelcomeGuideStyesActive ) {
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/edit-site' )
+					.toggleFeature( 'welcomeGuideStyles' )
+			);
+		}
 	},
 };

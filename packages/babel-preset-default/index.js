@@ -22,7 +22,10 @@ module.exports = ( api ) => {
 
 	const getPresetEnv = () => {
 		const opts = {
-			include: [ 'proposal-nullish-coalescing-operator' ],
+			include: [
+				'proposal-nullish-coalescing-operator',
+				'proposal-logical-assignment-operators',
+			],
 		};
 
 		if ( isTestEnv ) {
