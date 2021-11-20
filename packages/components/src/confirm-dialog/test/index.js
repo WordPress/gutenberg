@@ -120,29 +120,6 @@ describe( 'Confirm', () => {
 				expect( onCancel ).toHaveBeenCalled();
 			} );
 
-			it( 'should not render if dialog is closed by clicking the `x` button, and the `onCancel` callback should be called', async () => {
-				const onCancel = jest.fn().mockName( 'onCancel()' );
-
-				const wrapper = render(
-					<ConfirmDialog
-						title="Hi there!"
-						onConfirm={ noop }
-						onCancel={ onCancel }
-					>
-						Are you sure?
-					</ConfirmDialog>
-				);
-
-				const confirmDialog = wrapper.getByRole( 'dialog' );
-				const button = wrapper.getByLabelText( 'Cancel' );
-
-				fireEvent.click( button );
-
-				expect( button ).toBeVisible();
-				expect( confirmDialog ).not.toBeInTheDocument();
-				expect( onCancel ).toHaveBeenCalled();
-			} );
-
 			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 

@@ -41,11 +41,12 @@ function Modal( props, forwardedRef ) {
 	const {
 		bodyOpenClassName = 'modal-open',
 		role = 'dialog',
-		title = '',
+		title = null,
+		showTitle = true,
 		focusOnMount = true,
 		shouldCloseOnEsc = true,
 		shouldCloseOnClickOutside = true,
-		isDismissable = false, // Deprecated
+		isDismissable, // Deprecated
 		isDismissible = isDismissable || true,
 		/* accessibility */
 		aria = {
@@ -53,13 +54,13 @@ function Modal( props, forwardedRef ) {
 			describedby: null,
 		},
 		onRequestClose,
-		icon = '',
+		icon,
 		closeButtonLabel,
 		children,
-		style = null,
-		overlayClassName = '',
-		className = '',
-		contentLabel = null,
+		style,
+		overlayClassName,
+		className,
+		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
 	} = props;
@@ -73,7 +74,6 @@ function Modal( props, forwardedRef ) {
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
-	const showTitle = !! title;
 
 	useEffect( () => {
 		openModalCount++;

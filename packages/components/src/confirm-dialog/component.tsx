@@ -76,6 +76,7 @@ function ConfirmDialog(
 					closeButtonLabel={ __( 'Cancel' ) }
 					isDismissible={ true }
 					ref={ forwardedRef }
+					showTitle={ false }
 					{ ...otherProps }
 				>
 					<VStack spacing={ 8 }>
