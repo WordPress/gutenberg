@@ -93,7 +93,7 @@ const PostStatus = ( { isOpened, onTogglePanel } ) => (
 
 ## Currently available SlotFills and examples
 
-The following SlotFills are available in the `edit-post` package. Please refer to the individual items below for usage and example details:
+The following SlotFills are available. Please refer to the individual items below for usage and example details:
 
 -   [MainDashboardButton](/docs/reference-guides/slotfills/main-dashboard-button.md)
 -   [PluginBlockSettingsMenuItem](/docs/reference-guides/slotfills/plugin-block-settings-menu-item.md)

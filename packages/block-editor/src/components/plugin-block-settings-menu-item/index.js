@@ -6,9 +6,13 @@ import { difference } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import BlockSettingsMenuControls from '../block-settings-menu-controls';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
 	difference( selected, allowed ).length === 0;
@@ -43,7 +47,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
- * var PluginBlockSettingsMenuItem = wp.editPost.PluginBlockSettingsMenuItem;
+ * var PluginBlockSettingsMenuItem = wp.blockEditor.PluginBlockSettingsMenuItem;
  *
  * function doOnClick(){
  * 	// To be called when the user clicks the menu item.
@@ -66,7 +70,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
- * import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
+ * import { PluginBlockSettingsMenuItem } from '@wordpress/block-editor';
  *
  * const doOnClick = ( ) => {
  *     // To be called when the user clicks the menu item.
