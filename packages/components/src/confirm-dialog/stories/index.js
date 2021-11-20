@@ -99,7 +99,7 @@ export const Controlled = () => {
 				onConfirm={ handleConfirm }
 				onCancel={ handleCancel }
 			>
-				message={ daText() }
+				{ daText() }
 			</ConfirmDialog>
 			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
 				Open ConfirmDialog
