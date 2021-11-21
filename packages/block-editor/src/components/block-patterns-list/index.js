@@ -37,9 +37,6 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 					aria-describedby={
 						pattern.description ? descriptionId : undefined
 					}
-					draggable={ draggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
 				>
 					<CompositeItem
 						role="option"
@@ -48,10 +45,18 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 						className="block-editor-block-patterns-list__item"
 						onClick={ () => onClick( pattern, blocks ) }
 					>
-						<BlockPreview
-							blocks={ blocks }
-							viewportWidth={ viewportWidth }
-						/>
+						<div
+							className="block-editor-block-patterns-preview__overlay"
+							draggable={ draggable }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
+						></div>
+						<div className="block-editor-block-patterns-pattern__preview">
+							<BlockPreview
+								blocks={ blocks }
+								viewportWidth={ viewportWidth }
+							/>
+						</div>
 						<div className="block-editor-block-patterns-list__item-title">
 							{ pattern.title }
 						</div>
