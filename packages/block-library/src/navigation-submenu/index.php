@@ -188,7 +188,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		);
 	}
 
-	$html               = '<li ' . $wrapper_attributes . '>';
+	$html = '<li ' . $wrapper_attributes . '>';
 
 	// If Submenus open on hover, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
