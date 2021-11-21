@@ -74,3 +74,17 @@
 	padding: 4px 2px 8px;
 	font-size: 12px;
 }
+
+.block-editor-block-patterns-preview__overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
+.block-editor-block-patterns-pattern__preview {
+	width: 100%;
+	height: 100%;
+}
