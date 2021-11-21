@@ -23,5 +23,5 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 };
 
 export function isGalleryV2Enabled() {
-	return window.wp.galleryBlockV2Enabled;
+	return window.wp?.galleryBlockV2Enabled === false ? false : true;
 }
