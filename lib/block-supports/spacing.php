@@ -119,7 +119,8 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 		$gap_column_value_is_valid = isset( $gap_value['column'] ) && ! preg_match( $regex_pattern, $gap_value['column'] );
 
 		if ( $gap_row_value_is_valid && $gap_column_value_is_valid ) {
-			$styles[] = sprintf( '--wp--style--block-gap: %s %s;', esc_attr( $gap_value['row'] ), esc_attr( $gap_value['column'] ) );
+			$gap_shorthand_value = $gap_value['row'] === $gap_value['column'] ? esc_attr( $gap_value['row'] ) : esc_attr( $gap_value['row'] ) . ' ' . esc_attr( $gap_value['column'] );
+			$styles[]            = sprintf( '--wp--style--block-gap: %s;', $gap_shorthand_value );
 		}
 
 		if ( $gap_row_value_is_valid ) {
@@ -134,7 +135,7 @@ function gutenberg_render_spacing_gap_support( $block_content, $block ) {
 			return $block_content;
 		}
 
-		$styles[] = sprintf( '--wp--style--block-gap: %s %s;', esc_attr( $gap_value ), esc_attr( $gap_value ) );
+		$styles[] = sprintf( '--wp--style--block-gap: %s;', esc_attr( $gap_value ) );
 		$styles[] = sprintf( '--wp--style--block-row-gap: %s;', esc_attr( $gap_value ) );
 		$styles[] = sprintf( '--wp--style--block-column-gap: %s;', esc_attr( $gap_value ) );
 	}
