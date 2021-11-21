@@ -29,12 +29,12 @@ See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation fo
 
 ### Handbook structure
 
-The handbook is organized into four sections based on the functional types of documents.  [The Documentation System](https://documentation.divio.com/) does a great job explaining the needs and functions of each type, but in short they are:
+The handbook is organized into four sections based on the functional types of documents. [The Documentation System](https://documentation.divio.com/) does a great job explaining the needs and functions of each type, but in short they are:
 
-- **Getting started tutorials** - full lessons that take learners step by step to complete an objective, for example the [create a block tutorial](/docs/getting-started/create-block/README.md).
-- **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docshow-to-guides/format-api/README.md).
-- **Reference guides** - API documentation, purely functional descriptions, 
-- **Explanations** - longer documentation focused on learning, not a specific task.
+-   **Getting started tutorials** - full lessons that take learners step by step to complete an objective, for example the [create a block tutorial](/docs/getting-started/create-block/README.md).
+-   **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docshow-to-guides/format-api/README.md).
+-   **Reference guides** - API documentation, purely functional descriptions,
+-   **Explanations** - longer documentation focused on learning, not a specific task.
 
 ### Update a document
 
@@ -110,9 +110,7 @@ The Block Editor handbook supports the same [notice styles as other WordPress ha
 The recommended way to implement in markdown is to use the raw HTML and `callout callout-LEVEL` classes. For example:
 
 ```html
-    <div class="callout callout-info">
-        This is an **info** callout.
-    </div>
+<div class="callout callout-info">This is an **info** callout.</div>
 ```
 
 The following classes are available: `info`, `tip`, `alert`, `warning`
@@ -132,7 +130,6 @@ This is an **alert** callout.
 <div class="callout callout-warning">
 This is a **warning** callout.
 </div>
-
 
 ### Editor config
 
