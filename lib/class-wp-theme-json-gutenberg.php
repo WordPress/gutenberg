@@ -1335,11 +1335,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array
 	 */
 	private static function remove_insecure_settings( $input ) {
-		$origins = array( 'default', 'theme', 'user' );
-
 		$output = array();
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-			foreach ( $origins as $origin ) {
+			foreach( self::VALID_ORIGINS as $origin ) {
 				$path_with_origin = array_merge( $preset_metadata['path'], array( $origin ) );
 				$presets          = _wp_array_get( $input, $path_with_origin, null );
 				if ( null === $presets ) {

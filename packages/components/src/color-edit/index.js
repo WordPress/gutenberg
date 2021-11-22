@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import kebabCase from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -232,7 +232,7 @@ export default function ColorEdit( {
 							isSmall
 							isPressed={ isAdding }
 							icon={ plus }
-							label={ __( 'Add custom color' ) }
+							label={ __( 'Add color' ) }
 							onClick={ () => {
 								onChange( [
 									...colors,

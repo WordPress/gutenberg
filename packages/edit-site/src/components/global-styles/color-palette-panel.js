@@ -35,6 +35,11 @@ export default function ColorPalettePanel( { name } ) {
 		'color.palette.user',
 		name
 	);
+
+	const [ defaultPaletteEnabled ] = useSetting(
+		'color.defaultPalette',
+		name
+	);
 	return (
 		<VStack
 			className="edit-site-global-styles-color-palette-panel"
@@ -49,15 +54,17 @@ export default function ColorPalettePanel( { name } ) {
 					paletteLabel={ __( 'Theme' ) }
 				/>
 			) }
-			{ !! defaultColors && !! defaultColors.length && (
-				<ColorEdit
-					canReset={ defaultColors !== baseDefaultColors }
-					canOnlyChangeValues
-					colors={ defaultColors }
-					onChange={ setDefaultColors }
-					paletteLabel={ __( 'Default' ) }
-				/>
-			) }
+			{ !! defaultColors &&
+				!! defaultColors.length &&
+				!! defaultPaletteEnabled && (
+					<ColorEdit
+						canReset={ defaultColors !== baseDefaultColors }
+						canOnlyChangeValues
+						colors={ defaultColors }
+						onChange={ setDefaultColors }
+						paletteLabel={ __( 'Default' ) }
+					/>
+				) }
 			<ColorEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
