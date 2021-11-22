@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import kebabCase from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -49,12 +49,14 @@ function ColorNameInput( { value, onChange } ) {
 }
 
 function ColorOption( {
+	canOnlyChangeValues,
 	color,
 	onChange,
 	isEditing,
 	onStartEditing,
 	onRemove,
 	onStopEditing,
+	slugPrefix,
 } ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
 	return (
@@ -68,14 +70,14 @@ function ColorOption( {
 					<ColorIndicatorStyled colorValue={ color.color } />
 				</FlexItem>
 				<FlexItem>
-					{ isEditing ? (
+					{ isEditing && ! canOnlyChangeValues ? (
 						<ColorNameInput
 							value={ color.name }
 							onChange={ ( nextName ) =>
 								onChange( {
 									...color,
 									name: nextName,
-									slug: kebabCase( nextName ),
+									slug: slugPrefix + kebabCase( nextName ),
 								} )
 							}
 						/>
@@ -83,7 +85,7 @@ function ColorOption( {
 						<ColorNameContainer>{ color.name }</ColorNameContainer>
 					) }
 				</FlexItem>
-				{ isEditing && (
+				{ isEditing && ! canOnlyChangeValues && (
 					<FlexItem>
 						<RemoveButton
 							isSmall
@@ -119,6 +121,8 @@ function ColorPaletteEditListView( {
 	onChange,
 	editingColor,
 	setEditingColor,
+	canOnlyChangeValues,
+	slugPrefix,
 } ) {
 	// When unmounting the component if there are empty colors (the user did not complete the insertion) clean them.
 	const colorReference = useRef();
@@ -140,6 +144,7 @@ function ColorPaletteEditListView( {
 			<ItemGroup isBordered isSeparated>
 				{ colors.map( ( color, index ) => (
 					<ColorOption
+						canOnlyChangeValues={ canOnlyChangeValues }
 						key={ index }
 						color={ color }
 						onStartEditing={ () => {
@@ -177,6 +182,7 @@ function ColorPaletteEditListView( {
 								setEditingColor( null );
 							}
 						} }
+						slugPrefix={ slugPrefix }
 					/>
 				) ) }
 			</ItemGroup>
@@ -186,7 +192,15 @@ function ColorPaletteEditListView( {
 
 const EMPTY_ARRAY = [];
 
-export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
+export default function ColorEdit( {
+	colors = EMPTY_ARRAY,
+	onChange,
+	paletteLabel,
+	emptyMessage,
+	canOnlyChangeValues,
+	canReset,
+	slugPrefix = '',
+} ) {
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingColor, setEditingColor ] = useState( null );
 	const isAdding =
@@ -200,7 +214,7 @@ export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
 	return (
 		<ColorEditStyles>
 			<ColorHStackHeader>
-				<ColorHeading>{ __( 'Custom' ) }</ColorHeading>
+				<ColorHeading>{ paletteLabel }</ColorHeading>
 				<ColorActionsContainer>
 					{ isEditing && (
 						<DoneButton
@@ -213,24 +227,26 @@ export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
 							{ __( 'Done' ) }
 						</DoneButton>
 					) }
-					<Button
-						isSmall
-						isPressed={ isAdding }
-						icon={ plus }
-						label={ __( 'Add custom color' ) }
-						onClick={ () => {
-							onChange( [
-								...colors,
-								{
-									color: '#000',
-									name: '',
-									slug: '',
-								},
-							] );
-							setIsEditing( true );
-							setEditingColor( colors.length );
-						} }
-					/>
+					{ ! canOnlyChangeValues && (
+						<Button
+							isSmall
+							isPressed={ isAdding }
+							icon={ plus }
+							label={ __( 'Add color' ) }
+							onClick={ () => {
+								onChange( [
+									...colors,
+									{
+										color: '#000',
+										name: '',
+										slug: '',
+									},
+								] );
+								setIsEditing( true );
+								setEditingColor( colors.length );
+							} }
+						/>
+					) }
 					{ ! isEditing && (
 						<Button
 							disabled={ ! hasColors }
@@ -242,10 +258,10 @@ export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
 							} }
 						/>
 					) }
-					{ isEditing && (
+					{ isEditing && ( canReset || ! canOnlyChangeValues ) && (
 						<DropdownMenu
 							icon={ moreVertical }
-							label={ __( 'Custom color options' ) }
+							label={ __( 'Color options' ) }
 							toggleProps={ {
 								isSmall: true,
 							} }
@@ -253,17 +269,31 @@ export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
 							{ ( { onClose } ) => (
 								<>
 									<NavigableMenu role="menu">
-										<Button
-											variant="tertiary"
-											onClick={ () => {
-												setEditingColor( null );
-												setIsEditing( false );
-												onChange();
-												onClose();
-											} }
-										>
-											{ __( 'Remove all custom colors' ) }
-										</Button>
+										{ ! canOnlyChangeValues && (
+											<Button
+												variant="tertiary"
+												onClick={ () => {
+													setEditingColor( null );
+													setIsEditing( false );
+													onChange();
+													onClose();
+												} }
+											>
+												{ __( 'Remove all colors' ) }
+											</Button>
+										) }
+										{ canReset && (
+											<Button
+												variant="tertiary"
+												onClick={ () => {
+													setEditingColor( null );
+													onChange();
+													onClose();
+												} }
+											>
+												{ __( 'Reset colors' ) }
+											</Button>
+										) }
 									</NavigableMenu>
 								</>
 							) }
@@ -275,10 +305,12 @@ export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
 				<>
 					{ isEditing && (
 						<ColorPaletteEditListView
+							canOnlyChangeValues={ canOnlyChangeValues }
 							colors={ colors }
 							onChange={ onChange }
 							editingColor={ editingColor }
 							setEditingColor={ setEditingColor }
+							slugPrefix={ slugPrefix }
 						/>
 					) }
 					{ ! isEditing && (
@@ -291,10 +323,7 @@ export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
 					) }
 				</>
 			) }
-			{ ! hasColors &&
-				__(
-					'Custom colors are empty! Add some colors to create your own color palette.'
-				) }
+			{ ! hasColors && emptyMessage }
 		</ColorEditStyles>
 	);
 }
