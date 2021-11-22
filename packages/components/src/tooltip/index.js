@@ -96,7 +96,7 @@ function Tooltip( {
 	children,
 	position,
 	text,
-	shortcut,
+	shortcut = null,
 	delay = TOOLTIP_DELAY,
 } ) {
 	/**

@@ -24,6 +24,7 @@ import type { ToggleGroupControlOptionProps } from '../types';
 import { useToggleGroupControlContext } from '../context';
 import * as styles from './styles';
 import { useCx } from '../../utils/hooks';
+import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
 
@@ -57,20 +58,25 @@ function ToggleGroupControlOption(
 
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
-			<Radio
-				{ ...radioProps }
-				as="button"
-				aria-label={ radioProps[ 'aria-label' ] ?? label }
-				className={ classes }
-				data-value={ value }
-				ref={ forwardedRef }
-				value={ value }
+			<Tooltip
+				text={ radioProps[ 'aria-label' ] ?? label }
+				position="top center"
 			>
-				<ButtonContentView>{ label }</ButtonContentView>
-				<LabelPlaceholderView aria-hidden>
-					{ label }
-				</LabelPlaceholderView>
-			</Radio>
+				<Radio
+					{ ...radioProps }
+					as="button"
+					aria-label={ radioProps[ 'aria-label' ] ?? label }
+					className={ classes }
+					data-value={ value }
+					ref={ forwardedRef }
+					value={ value }
+				>
+					<ButtonContentView>{ label }</ButtonContentView>
+					<LabelPlaceholderView aria-hidden>
+						{ label }
+					</LabelPlaceholderView>
+				</Radio>
+			</Tooltip>
 		</LabelView>
 	);
 }
