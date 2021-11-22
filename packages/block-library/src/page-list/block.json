@@ -21,7 +21,8 @@
 		"customFontSize",
 		"showSubmenuIcon",
 		"style",
-		"openSubmenusOnClick"
+		"openSubmenusOnClick",
+		"__unstableMaxPages"
 	],
 	"supports": {
 		"reusable": false,

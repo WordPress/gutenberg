@@ -293,6 +293,10 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
+	if ( array_key_exists( '__unstableMaxPages', $block->context ) ) {
+		$nested_pages = array_slice( $nested_pages, 0, $block->context['__unstableMaxPages'] );
+	}
+
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 
 	$open_submenus_on_click = array_key_exists( 'openSubmenusOnClick', $block->context ) ? $block->context['openSubmenusOnClick'] : false;
