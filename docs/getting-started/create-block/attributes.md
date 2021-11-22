@@ -81,7 +81,7 @@ export default function save( { attributes } ) {
 }
 ```
 
-If you have run the start script before `npm start` and the script is still running, you can reload the editor now and add the block to test.
+If you have previously run `npm start`, and the script is still running, you can reload the editor now and add the block to test.
 Otherwise rebuild the block using `npm run build`, reload the editor and add the block. Type a message in the editor, save, and view it in the post.
 
 Next Section: [Code Implementation](/docs/getting-started/create-block/block-code.md)
