@@ -110,7 +110,7 @@
 			bottom: 0;
 			left: 0;
 			border: $border-width dashed currentColor;
-			opacity: 0.3;
+			opacity: 0.4;
 			pointer-events: none;
 
 			// Inherit border radius from style variations.
@@ -155,7 +155,7 @@
 			height: 100%;
 			stroke: currentColor;
 			stroke-dasharray: 3;
-			opacity: 0.3;
+			opacity: 0.4;
 		}
 	}
 
