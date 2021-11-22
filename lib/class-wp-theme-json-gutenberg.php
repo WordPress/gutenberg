@@ -301,7 +301,9 @@ class WP_Theme_JSON_Gutenberg {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
-					_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
+					if ( 'user' !== $origin || isset( $preset[0] ) ) {
+						_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
+					}
 				}
 			}
 		}
@@ -1335,46 +1337,48 @@ class WP_Theme_JSON_Gutenberg {
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-			$presets = _wp_array_get( $input, $preset_metadata['path'], null );
-			if ( null === $presets ) {
-				continue;
-			}
+			foreach ( self::VALID_ORIGINS as $origin ) {
+				$path_with_origin = array_merge( $preset_metadata['path'], array( $origin ) );
+				$presets          = _wp_array_get( $input, $path_with_origin, null );
+				if ( null === $presets ) {
+					continue;
+				}
 
-			$escaped_preset = array();
-			foreach ( $presets as $preset ) {
-				if (
-					esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
-					sanitize_html_class( $preset['slug'] ) === $preset['slug']
-				) {
-					$value = null;
-					if ( isset( $preset_metadata['value_key'] ) ) {
-						$value = $preset[ $preset_metadata['value_key'] ];
-					} elseif (
-						isset( $preset_metadata['value_func'] ) &&
-						is_callable( $preset_metadata['value_func'] )
+				$escaped_preset = array();
+				foreach ( $presets as $preset ) {
+					if (
+						esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
+						sanitize_html_class( $preset['slug'] ) === $preset['slug']
 					) {
-						$value = call_user_func( $preset_metadata['value_func'], $preset );
-					}
+						$value = null;
+						if ( isset( $preset_metadata['value_key'] ) ) {
+							$value = $preset[ $preset_metadata['value_key'] ];
+						} elseif (
+							isset( $preset_metadata['value_func'] ) &&
+							is_callable( $preset_metadata['value_func'] )
+						) {
+							$value = call_user_func( $preset_metadata['value_func'], $preset );
+						}
 
-					$preset_is_valid = true;
-					foreach ( $preset_metadata['properties'] as $property ) {
-						if ( ! self::is_safe_css_declaration( $property, $value ) ) {
-							$preset_is_valid = false;
-							break;
+						$preset_is_valid = true;
+						foreach ( $preset_metadata['properties'] as $property ) {
+							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+								$preset_is_valid = false;
+								break;
+							}
+						}
+
+						if ( $preset_is_valid ) {
+							$escaped_preset[] = $preset;
 						}
 					}
+				}
 
-					if ( $preset_is_valid ) {
-						$escaped_preset[] = $preset;
-					}
+				if ( ! empty( $escaped_preset ) ) {
+					_wp_array_set( $output, $path_with_origin, $escaped_preset );
 				}
 			}
-
-			if ( ! empty( $escaped_preset ) ) {
-				_wp_array_set( $output, $preset_metadata['path'], $escaped_preset );
-			}
 		}
-
 		return $output;
 	}
 
