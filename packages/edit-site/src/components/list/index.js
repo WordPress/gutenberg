@@ -36,23 +36,30 @@ export default function List( { templateType } ) {
 		[ templateType ]
 	);
 
+	// `postType` could load in asynchronously. Only provide the detailed region labels if
+	// the postType has loaded, otherwise `InterfaceSkeleton` will fallback to the defaults.
 	const itemsListLabel = postType?.labels?.items_list;
-
-	return (
-		<InterfaceSkeleton
-			className="edit-site-list"
-			labels={ {
+	const detailedRegionLabels = postType
+		? {
 				header: sprintf(
 					// translators: %s - the name of the page, 'Header' as in the header area of that page.
 					__( '%s - Header' ),
 					itemsListLabel
 				),
-				drawer: __( 'Navigation Sidebar' ),
 				body: sprintf(
 					// translators: %s - the name of the page, 'Content' as in the content area of that page.
 					__( '%s - Content' ),
 					itemsListLabel
 				),
+		  }
+		: undefined;
+
+	return (
+		<InterfaceSkeleton
+			className="edit-site-list"
+			labels={ {
+				drawer: __( 'Navigation Sidebar' ),
+				...detailedRegionLabels,
 			} }
 			header={ <Header templateType={ templateType } /> }
 			drawer={
