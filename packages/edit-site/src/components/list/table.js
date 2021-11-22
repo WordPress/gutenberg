@@ -6,9 +6,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
-	FlexItem,
-	__experimentalHStack as HStack,
-	__experimentalHeading as Heading,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -77,23 +74,28 @@ export default function Table( { templateType } ) {
 	}
 
 	return (
-		<ul className="edit-site-list-table">
-			<HStack className="edit-site-list-table-head" as="li">
-				<FlexItem className="edit-site-list-table-column">
-					<Heading level={ 4 }>{ __( 'Template' ) }</Heading>
-				</FlexItem>
-				<FlexItem className="edit-site-list-table-column">
-					<Heading level={ 4 }>{ __( 'Added by' ) }</Heading>
-				</FlexItem>
-				<FlexItem className="edit-site-list-table-column">
-					<VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>
-				</FlexItem>
-			</HStack>
+		<table className="edit-site-list-table">
+			<thead>
+				<tr className="edit-site-list-table-head">
+					<th className="edit-site-list-table-column">
+						{ __( 'Template' ) }
+					</th>
+					<th className="edit-site-list-table-column">
+						{ __( 'Added by' ) }
+					</th>
+					<th className="edit-site-list-table-column">
+						<VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>
+					</th>
+				</tr>
+			</thead>
 
-			{ templates.map( ( template ) => (
-				<li key={ template.id }>
-					<HStack className="edit-site-list-table-row">
-						<FlexItem className="edit-site-list-table-column">
+			<tbody>
+				{ templates.map( ( template ) => (
+					<tr
+						key={ template.id }
+						className="edit-site-list-table-row"
+					>
+						<td className="edit-site-list-table-column">
 							<a
 								href={ addQueryArgs( '', {
 									page: 'gutenberg-edit-site',
@@ -104,12 +106,12 @@ export default function Table( { templateType } ) {
 								{ template.title.rendered }
 							</a>
 							{ template.description }
-						</FlexItem>
+						</td>
 
-						<FlexItem className="edit-site-list-table-column">
+						<td className="edit-site-list-table-column">
 							{ template.theme }
-						</FlexItem>
-						<FlexItem className="edit-site-list-table-column">
+						</td>
+						<td className="edit-site-list-table-column">
 							{ isTemplateRemovable( template ) && (
 								<DropdownMenu
 									icon={ moreVertical }
@@ -124,10 +126,10 @@ export default function Table( { templateType } ) {
 									) }
 								</DropdownMenu>
 							) }
-						</FlexItem>
-					</HStack>
-				</li>
-			) ) }
-		</ul>
+						</td>
+					</tr>
+				) ) }
+			</tbody>
+		</table>
 	);
 }
