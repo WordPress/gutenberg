@@ -699,6 +699,11 @@ function CoverEdit( {
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
+				<BoxControlVisualizer
+					values={ styleAttribute?.spacing?.padding }
+					showValues={ styleAttribute?.visualizers?.padding }
+					className="block-library-cover__padding-visualizer"
+				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
 					onResizeStart={ () => {
@@ -729,10 +734,7 @@ function CoverEdit( {
 					) }
 					style={ { backgroundImage: gradientValue, ...bgStyle } }
 				/>
-				<BoxControlVisualizer
-					values={ styleAttribute?.spacing?.padding }
-					showValues={ styleAttribute?.visualizers?.padding }
-				/>
+
 				{ url && isImageBackground && isImgElement && (
 					<img
 						ref={ isDarkElement }
