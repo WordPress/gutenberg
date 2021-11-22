@@ -15,6 +15,31 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
+	// Get all registered webfonts.
+	$font_families_registered = wp_webfonts()->webfonts()->get_all_registered();
+
+	if ( ! empty( $font_families_registered ) ) {
+		$classes_styles = '';
+		$body_vars      = '';
+		$added          = array();
+
+		// Loop registered webfonts and generate styles.
+		foreach ( $font_families_registered as $font_family ) {
+			$family = $font_family['font-family'];
+			$family = false !== strpos( $family, ' ' ) ? "'{$family}'" : $family;
+			$slug   = sanitize_title( $family );
+			if ( in_array( $slug, $added, true ) ) {
+				continue;
+			}
+
+			$body_vars      .= "--wp--preset--font-family--$slug:$family;";
+			$classes_styles .= ".has-$slug-font-family{font-family:var(--wp--preset--font-family--$slug) !important;}";
+			$added[]         = $slug;
+		}
+
+		$stylesheet .= 'body{' . $body_vars . '}' . $classes_styles;
+	}
+
 	if ( isset( wp_styles()->registered['global-styles'] ) ) {
 		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
 	} else {
