@@ -5,6 +5,11 @@ import momentLib from 'moment';
 import 'moment-timezone/moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
+/**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
 /** @typedef {import('moment').Moment} Moment */
 /** @typedef {import('moment').LocaleSpecification} MomentLocaleSpecification */
 
@@ -409,7 +414,17 @@ export function format( dateFormat, dateValue = new Date() ) {
 	}
 	// Join with [] between to separate characters, and replace
 	// unneeded separators with static text.
-	return momentDate.format( newFormat.join( '[]' ) );
+	const dateString = momentDate.format( newFormat.join( '[]' ) );
+	/**
+	 * Filters the formatted date like 'wp_date()'
+	 *
+	 * @param {string} dateString Formatted result.
+	 * @param {string} dateFormat Format string.
+	 * @param {Moment} momentDate Parsed date by moment.js.
+	 */
+	return String(
+		applyFilters( 'date.format', dateString, dateFormat, momentDate )
+	);
 }
 
 /**
