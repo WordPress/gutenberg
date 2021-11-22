@@ -437,7 +437,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-add_action( 'after_setup_theme', 'gutenberg_register_webfonts_from_theme_json' );
+add_action( 'wp_loaded', 'gutenberg_register_webfonts_from_theme_json' );
 add_filter( 'wp_rest_prepare_theme_item', 'gutenberg_add_registered_webfonts_to_global_styles' );
 
 // kses actions&filters.
