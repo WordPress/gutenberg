@@ -409,13 +409,13 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 
 	// Make sure the path to settings.typography.fontFamilies.theme exists
 	// before adding missing fonts.
-	if ( ! isset( $data['settings'] ) ) {
+	if ( empty( $data['settings'] ) ) {
 		$data['settings'] = array();
 	}
-	if ( ! isset( $data['settings']['typography'] ) ) {
+	if ( empty( $data['settings']['typography'] ) ) {
 		$data['settings']['typography'] = array();
 	}
-	if ( ! isset( $data['settings']['typography']['fontFamilies'] ) ) {
+	if ( empty( $data['settings']['typography']['fontFamilies'] ) ) {
 		$data['settings']['typography']['fontFamilies'] = array();
 	}
 
