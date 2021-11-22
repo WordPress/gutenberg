@@ -2,6 +2,7 @@
 /**
  * Server-side rendering of the `core/navigation-area` block.
  *
+ * @deprecated 5.9.0
  * @package WordPress
  */
 
