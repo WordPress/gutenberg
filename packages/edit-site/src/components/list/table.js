@@ -74,6 +74,8 @@ export default function Table( { templateType } ) {
 	}
 
 	return (
+		// These explicit aria roles are needed for Safari.
+		// See https://developer.mozilla.org/en-US/docs/Web/CSS/display#tables
 		<table className="edit-site-list-table" role="table">
 			<thead>
 				<tr className="edit-site-list-table-head" role="row">
