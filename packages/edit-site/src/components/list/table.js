@@ -74,16 +74,25 @@ export default function Table( { templateType } ) {
 	}
 
 	return (
-		<table className="edit-site-list-table">
+		<table className="edit-site-list-table" role="table">
 			<thead>
-				<tr className="edit-site-list-table-head">
-					<th className="edit-site-list-table-column">
+				<tr className="edit-site-list-table-head" role="row">
+					<th
+						className="edit-site-list-table-column"
+						role="columnheader"
+					>
 						{ __( 'Template' ) }
 					</th>
-					<th className="edit-site-list-table-column">
+					<th
+						className="edit-site-list-table-column"
+						role="columnheader"
+					>
 						{ __( 'Added by' ) }
 					</th>
-					<th className="edit-site-list-table-column">
+					<th
+						className="edit-site-list-table-column"
+						role="columnheader"
+					>
 						<VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>
 					</th>
 				</tr>
@@ -94,8 +103,9 @@ export default function Table( { templateType } ) {
 					<tr
 						key={ template.id }
 						className="edit-site-list-table-row"
+						role="row"
 					>
-						<td className="edit-site-list-table-column">
+						<td className="edit-site-list-table-column" role="cell">
 							<a
 								href={ addQueryArgs( '', {
 									page: 'gutenberg-edit-site',
@@ -108,10 +118,10 @@ export default function Table( { templateType } ) {
 							{ template.description }
 						</td>
 
-						<td className="edit-site-list-table-column">
+						<td className="edit-site-list-table-column" role="cell">
 							{ template.theme }
 						</td>
-						<td className="edit-site-list-table-column">
+						<td className="edit-site-list-table-column" role="cell">
 							{ isTemplateRemovable( template ) && (
 								<DropdownMenu
 									icon={ moreVertical }
