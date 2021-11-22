@@ -218,8 +218,13 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// If there are no inner blocks then fallback to rendering the Page List block.
 	if ( empty( $inner_blocks ) ) {
 		$is_fallback     = true; // indicate we are rendering the fallback.
-		$page_list_block = parse_blocks( '<!-- wp:page-list /-->' );
-		$inner_blocks    = new WP_Block_List( $page_list_block, $attributes );
+
+		$page_list_block = array(
+			'blockName' => 'core/page-list',
+			'attrs'     => array(),
+		);
+
+		$inner_blocks = new WP_Block_List( array( $page_list_block ), $attributes );
 	}
 
 	// Restore legacy classnames for submenu positioning.
