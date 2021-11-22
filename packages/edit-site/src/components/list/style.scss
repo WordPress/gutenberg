@@ -66,7 +66,7 @@
 	margin: 0;
 	overflow: hidden;
 
-	li {
+	tr {
 		display: flex;
 		align-items: center;
 		padding: $grid-unit-20;
@@ -78,36 +78,39 @@
 			padding: $grid-unit-30 $grid-unit-40;
 		}
 
+		// Template.
 		.edit-site-list-table-column:nth-child(1) {
 			width: calc(60% - 36px);
+			flex-grow: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
 
 			a {
-				display: block;
+				display: inline-block;
 				text-decoration: none;
 				font-weight: 500;
 				margin-bottom: $grid-unit-05;
 			}
 		}
 
+		// Added by.
 		.edit-site-list-table-column:nth-child(2) {
 			width: calc(40% - 36px);
 		}
 
+		// Actions.
 		.edit-site-list-table-column:nth-child(3) {
 			min-width: $button-size;
+			flex-shrink: 0;
 		}
 	}
 
-	li.edit-site-list-table-head {
-		border-bottom: $border-width solid $gray-200;
+	tr.edit-site-list-table-head {
 		font-size: 16px;
-		font-weight: 500;
+		font-weight: 600;
 		text-align: left;
-		color: $black;
+		color: #050505;
 		border-top: none;
-
-		& + li {
-			border-top: 0;
-		}
 	}
 }
