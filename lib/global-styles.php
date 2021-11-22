@@ -289,24 +289,15 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 }
 
 /**
- * Get webfonts defined in theme.json.
- *
- * @return array Returns an array of webfonts defined in theme.json.
+ * Register webfonts defined in theme.json.
  */
-function gutenberg_get_webfonts_from_theme_json() {
-	static $webfonts = null;
-
+function gutenberg_register_webfonts_from_theme_json() {
 	// Get settings from theme.json.
 	$theme_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
 
 	// Bail out early if there are no settings for webfonts.
 	if ( empty( $theme_settings['typography'] ) || empty( $theme_settings['typography']['fontFamilies'] ) ) {
-		return array();
-	}
-
-	// Return cached webfonts if available.
-	if ( null !== $webfonts ) {
-		return $webfonts;
+		return;
 	}
 
 	$webfonts = array();
@@ -349,14 +340,7 @@ function gutenberg_get_webfonts_from_theme_json() {
 			}
 		}
 	}
-	return $webfonts;
-}
-
-/**
- * Register webfonts defined in theme.json.
- */
-function gutenberg_register_webfonts_from_theme_json() {
-	wp_register_webfonts( gutenberg_get_webfonts_from_theme_json() );
+	wp_register_webfonts( $webfonts );
 }
 
 /**
