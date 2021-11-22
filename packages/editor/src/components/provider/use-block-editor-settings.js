@@ -8,6 +8,7 @@ import { pick, defaultTo } from 'lodash';
  */
 import { Platform, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
@@ -87,47 +88,54 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		return saveEntityRecord( 'postType', 'page', options );
 	};
 
+	let supportedEditorSettings = [
+		'__experimentalBlockDirectory',
+		'__experimentalBlockPatternCategories',
+		'__experimentalBlockPatterns',
+		'__experimentalFeatures',
+		'__experimentalPreferredStyleVariations',
+		'__experimentalSetIsInserterOpened',
+		'__unstableGalleryWithImageBlocks',
+		'alignWide',
+		'allowedBlockTypes',
+		'bodyPlaceholder',
+		'codeEditingEnabled',
+		'colors',
+		'disableCustomColors',
+		'disableCustomFontSizes',
+		'disableCustomGradients',
+		'enableCustomLineHeight',
+		'enableCustomSpacing',
+		'enableCustomUnits',
+		'focusMode',
+		'fontSizes',
+		'gradients',
+		'hasFixedToolbar',
+		'hasReducedUI',
+		'imageDefaultSize',
+		'imageDimensions',
+		'imageEditing',
+		'imageSizes',
+		'isRTL',
+		'keepCaretInsideBlock',
+		'maxWidth',
+		'onUpdateDefaultBlockStyles',
+		'styles',
+		'template',
+		'templateLock',
+		'titlePlaceholder',
+		'supportsLayout',
+		'widgetTypesToHideFromLegacyWidgetBlock',
+	];
+
+	supportedEditorSettings = applyFilters(
+		'editor.SupportedEditorSettings',
+		supportedEditorSettings
+	);
+
 	return useMemo(
 		() => ( {
-			...pick( settings, [
-				'__experimentalBlockDirectory',
-				'__experimentalBlockPatternCategories',
-				'__experimentalBlockPatterns',
-				'__experimentalFeatures',
-				'__experimentalPreferredStyleVariations',
-				'__experimentalSetIsInserterOpened',
-				'__unstableGalleryWithImageBlocks',
-				'alignWide',
-				'allowedBlockTypes',
-				'bodyPlaceholder',
-				'codeEditingEnabled',
-				'colors',
-				'disableCustomColors',
-				'disableCustomFontSizes',
-				'disableCustomGradients',
-				'enableCustomLineHeight',
-				'enableCustomSpacing',
-				'enableCustomUnits',
-				'focusMode',
-				'fontSizes',
-				'gradients',
-				'hasFixedToolbar',
-				'hasReducedUI',
-				'imageDefaultSize',
-				'imageDimensions',
-				'imageEditing',
-				'imageSizes',
-				'isRTL',
-				'keepCaretInsideBlock',
-				'maxWidth',
-				'onUpdateDefaultBlockStyles',
-				'styles',
-				'template',
-				'templateLock',
-				'titlePlaceholder',
-				'supportsLayout',
-				'widgetTypesToHideFromLegacyWidgetBlock',
-			] ),
+			...pick( settings, supportedEditorSettings ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
