@@ -185,7 +185,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
 	}
 
-	if ( false && ! empty( $block->context['navigationArea'] ) ) {
+	if ( ! empty( $block->context['navigationArea'] ) ) {
 		$area    = $block->context['navigationArea'];
 		$mapping = get_option( 'wp_navigation_areas', array() );
 		if ( ! empty( $mapping[ $area ] ) ) {
