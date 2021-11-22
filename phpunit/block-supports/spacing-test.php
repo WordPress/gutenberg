@@ -78,7 +78,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'<div style="--wp--style--block-gap: 3em 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;" class="wp-block-test-block">Test</div>',
+			'<div style="--wp--style--block-gap: 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;" class="wp-block-test-block">Test</div>',
 			$render_output
 		);
 	}
@@ -117,7 +117,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'<div style="--wp--style--block-gap: 3em 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;" class="wp-test-block"><p style="color: red;">Test</p></div>',
+			'<div style="--wp--style--block-gap: 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;" class="wp-test-block"><p style="color: red;">Test</p></div>',
 			$render_output
 		);
 	}
@@ -130,7 +130,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'<div style="--wp--style--block-gap: 3em 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;"><p>Test</p></div>',
+			'<div style="--wp--style--block-gap: 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em;"><p>Test</p></div>',
 			$render_output
 		);
 	}
@@ -143,7 +143,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'<div class="wp-test-block" style="--wp--style--block-gap: 3em 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em; background: green;"><p style="color: red;">Test</p></div>',
+			'<div class="wp-test-block" style="--wp--style--block-gap: 3em; --wp--style--block-row-gap: 3em; --wp--style--block-column-gap: 3em; background: green;"><p style="color: red;">Test</p></div>',
 			$render_output
 		);
 	}
