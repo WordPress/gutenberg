@@ -78,10 +78,10 @@
 
 	// Submenu indicator.
 	.wp-block-navigation__submenu-icon {
-		align-self: center;
-		height: inherit;
+		align-self: center; // This one affects nested submenu indicators.
 		line-height: 0;
-		margin-left: 6px;
+		display: inline-block;
+		vertical-align: middle;
 
 		// Affect the button as well.
 		padding: 0;
@@ -89,9 +89,16 @@
 		color: currentColor;
 		border: none;
 
+		// Scale to font size.
+		margin-left: 0.25em;
+		width: 0.6em;
+		height: 0.6em;
+
 		svg {
 			display: inline-block;
 			stroke: currentColor;
+			width: inherit;
+			height: inherit;
 		}
 	}
 }
