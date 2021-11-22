@@ -54,8 +54,10 @@ function useHasLetterSpacingControl( name ) {
 	);
 }
 
-export default function TypographyPanel( { name } ) {
+export default function TypographyPanel( { name, element } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
+	const prefix =
+		element === 'text' || ! element ? '' : `elements.${ element }.`;
 	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
@@ -73,25 +75,28 @@ export default function TypographyPanel( { name } ) {
 	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
 
 	const [ fontFamily, setFontFamily ] = useStyle(
-		'typography.fontFamily',
+		prefix + 'typography.fontFamily',
 		name
 	);
-	const [ fontSize, setFontSize ] = useStyle( 'typography.fontSize', name );
+	const [ fontSize, setFontSize ] = useStyle(
+		prefix + 'typography.fontSize',
+		name
+	);
 
 	const [ fontStyle, setFontStyle ] = useStyle(
-		'typography.fontStyle',
+		prefix + 'typography.fontStyle',
 		name
 	);
 	const [ fontWeight, setFontWeight ] = useStyle(
-		'typography.fontWeight',
+		prefix + 'typography.fontWeight',
 		name
 	);
 	const [ lineHeight, setLineHeight ] = useStyle(
-		'typography.lineHeight',
+		prefix + 'typography.lineHeight',
 		name
 	);
 	const [ letterSpacing, setLetterSpacing ] = useStyle(
-		'typography.letterSpacing',
+		prefix + 'typography.letterSpacing',
 		name
 	);
 
