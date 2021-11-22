@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import deprecated from "@wordpress/deprecated";
+import deprecated from '@wordpress/deprecated';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	MenuGroup,
