@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
 
@@ -15,6 +16,7 @@ import ScreenHeader from './header';
 import NavigationButton from './navigation-button';
 import { useStyle } from './hooks';
 import Subtitle from './subtitle';
+import TypographyPanel from './typography-panel';
 
 function TextItem( { name, parentMenu } ) {
 	const [ fontFamily ] = useStyle( 'typography.fontFamily', name );
@@ -25,17 +27,21 @@ function TextItem( { name, parentMenu } ) {
 
 	return (
 		<NavigationButton path={ parentMenu + '/typography/text' }>
-			<FlexItem
-				style={ {
-					fontFamily,
-					fontSize,
-					fontStyle,
-					fontWeight,
-					letterSpacing,
-				} }
-			>
-				{ __( 'Text' ) }
-			</FlexItem>
+			<HStack justify="flex-start">
+				<FlexItem
+					className="edit-site-global-styles-screen-typography__indicator"
+					style={ {
+						fontFamily,
+						fontSize,
+						fontStyle,
+						fontWeight,
+						letterSpacing,
+					} }
+				>
+					{ __( 'Aa' ) }
+				</FlexItem>
+				<FlexItem>{ __( 'Text' ) }</FlexItem>
+			</HStack>
 		</NavigationButton>
 	);
 }
@@ -66,17 +72,21 @@ function LinkItem( { name, parentMenu } ) {
 
 	return (
 		<NavigationButton path={ parentMenu + '/typography/link' }>
-			<FlexItem
-				style={ {
-					fontFamily,
-					fontSize,
-					fontStyle,
-					fontWeight,
-					letterSpacing,
-				} }
-			>
-				{ __( 'Link' ) }
-			</FlexItem>
+			<HStack justify="flex-start">
+				<FlexItem
+					className="edit-site-global-styles-screen-typography__indicator"
+					style={ {
+						fontFamily,
+						fontSize,
+						fontStyle,
+						fontWeight,
+						letterSpacing,
+					} }
+				>
+					{ __( 'Aa' ) }
+				</FlexItem>
+				<FlexItem>{ __( 'Link' ) }</FlexItem>
+			</HStack>
 		</NavigationButton>
 	);
 }
@@ -94,15 +104,20 @@ function ScreenTypography( { name } ) {
 				) }
 			/>
 
-			<div className="edit-site-global-styles-screen-typography">
-				<VStack spacing={ 3 }>
-					<Subtitle>{ __( 'Elements' ) }</Subtitle>
-					<ItemGroup isBordered isSeparated>
-						<TextItem name={ name } parentMenu={ parentMenu } />
-						<LinkItem name={ name } parentMenu={ parentMenu } />
-					</ItemGroup>
-				</VStack>
-			</div>
+			{ ! name && (
+				<div className="edit-site-global-styles-screen-typography">
+					<VStack spacing={ 3 }>
+						<Subtitle>{ __( 'Elements' ) }</Subtitle>
+						<ItemGroup isBordered isSeparated>
+							<TextItem name={ name } parentMenu={ parentMenu } />
+							<LinkItem name={ name } parentMenu={ parentMenu } />
+						</ItemGroup>
+					</VStack>
+				</div>
+			) }
+
+			{ /* no typogrpahy elements support yet for blocks */ }
+			{ !! name && <TypographyPanel name={ name } element="text" /> }
 		</>
 	);
 }
