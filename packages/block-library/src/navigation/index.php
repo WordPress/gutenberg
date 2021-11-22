@@ -183,7 +183,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
 	}
 
-	if ( ! empty( $block->context['navigationArea'] ) ) {
+	if ( false && ! empty( $block->context['navigationArea'] ) ) {
 		$area    = $block->context['navigationArea'];
 		$mapping = get_option( 'wp_navigation_areas', array() );
 		if ( ! empty( $mapping[ $area ] ) ) {
@@ -215,7 +215,34 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	if ( empty( $inner_blocks ) ) {
-		return '';
+		$all_pages = get_pages(
+			array(
+				'sort_column' => 'menu_order,post_title',
+				'order'       => 'asc',
+				'number'      => 4,
+			)
+		);
+
+		// If thare are no pages, there is nothing to show.
+		if ( empty( $all_pages ) ) {
+			return;
+		}
+
+		$wrapper_markup = '<ul class="wp-block-navigation__container">%s</ul>';
+
+		$items_markup = array_reduce(
+			$all_pages,
+			function( $acc, $page ) {
+				$acc .= '<li class="wp-block-navigation-item"><a href="' . esc_url( get_permalink( $page->ID ) ) . '">' . esc_attr( $page->post_title ) . '</a></li>';
+				return $acc;
+			},
+			''
+		);
+
+		return sprintf(
+			$wrapper_markup,
+			$items_markup
+		);
 	}
 
 	// Restore legacy classnames for submenu positioning.
