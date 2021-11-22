@@ -27,15 +27,15 @@ export default function NavigationSidebar( {
 
 	useEffect( () => {
 		// When transitioning to desktop open the navigation if `isDefaultOpen` is true.
-		if ( isDefaultOpen && isDesktopViewport && ! isNavigationOpen ) {
+		if ( isDefaultOpen && isDesktopViewport ) {
 			setIsNavigationOpen( true );
 		}
 
 		// When transitioning to mobile/tablet, close the navigation.
-		if ( ! isDesktopViewport && isNavigationOpen ) {
+		if ( ! isDesktopViewport ) {
 			setIsNavigationOpen( false );
 		}
-	}, [ isDefaultOpen, isDesktopViewport, isNavigationOpen ] );
+	}, [ isDefaultOpen, isDesktopViewport ] );
 
 	return (
 		<>
