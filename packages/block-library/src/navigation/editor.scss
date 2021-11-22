@@ -96,6 +96,19 @@
 	}
 }
 
+// Show even when a child is selected. This is an edgecase just for navigation submenus.
+.is-editing > .wp-block-navigation__submenu-container {
+	.block-list-appender {
+		position: static;
+		margin-left: auto;
+
+		> .block-list-appender__toggle {
+			display: block;
+		}
+	}
+}
+
+
 /**
  * Colors Selector component
  */
