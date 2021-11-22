@@ -27,11 +27,6 @@ const LinkEditSlot = ( props ) => (
 beforeAll( () => {
 	jest.useFakeTimers();
 	jest.spyOn( Keyboard, 'dismiss' );
-	Keyboard.dismiss.mockImplementation();
-} );
-
-afterAll( () => {
-	Keyboard.dismiss.mockRestore();
 } );
 
 describe( 'Android', () => {

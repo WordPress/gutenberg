@@ -12,13 +12,6 @@ import LinkSettingsNavigation from '../link-settings-navigation';
 beforeAll( () => {
 	jest.useFakeTimers();
 	jest.spyOn( Keyboard, 'dismiss' );
-	Keyboard.dismiss.mockImplementation( () => {
-		'>>> WHY';
-	} );
-} );
-
-afterAll( () => {
-	Keyboard.dismiss.mockRestore();
 } );
 
 const subject = (
