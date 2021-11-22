@@ -217,7 +217,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// If there are no inner blocks then fallback to rendering the Page List block.
 	if ( empty( $inner_blocks ) ) {
-		$is_fallback     = true; // indicate we are rendering the fallback.
+		$is_fallback = true; // indicate we are rendering the fallback.
 
 		$page_list_block = array(
 			'blockName' => 'core/page-list',
