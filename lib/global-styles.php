@@ -20,7 +20,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 
 	if ( ! empty( $font_families_registered ) ) {
 		$classes_styles = '';
-		$body_vars      = '';
 		$added          = array();
 
 		// Loop registered webfonts and generate styles.
@@ -32,12 +31,11 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 				continue;
 			}
 
-			$body_vars      .= "--wp--preset--font-family--$slug:$family;";
 			$classes_styles .= ".has-$slug-font-family{font-family:var(--wp--preset--font-family--$slug) !important;}";
 			$added[]         = $slug;
 		}
 
-		$stylesheet .= 'body{' . $body_vars . '}' . $classes_styles;
+		$stylesheet .= $classes_styles;
 	}
 
 	if ( isset( wp_styles()->registered['global-styles'] ) ) {
@@ -47,6 +45,41 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		wp_add_inline_style( 'global-styles', $stylesheet );
 		wp_enqueue_style( 'global-styles' );
 	}
+}
+
+/**
+ * Adds the custom webfonts CSS properties to global-styles.
+ *
+ * @param array $declarations The CSS Custom Properties.
+ *
+ * @return array
+ */
+function gutenberg_add_registered_webfonts_global_styles_vars( $declarations ) {
+	// Get all registered webfonts.
+	$font_families_registered = wp_webfonts()->webfonts()->get_all_registered();
+	$added                    = array();
+
+	// Loop registered webfonts and add declarations styles.
+	foreach ( $font_families_registered as $font_family ) {
+		$family = $font_family['font-family'];
+		$slug   = sanitize_title( $font_family['font-family'] );
+
+		if ( in_array( $slug, $added, true ) ) {
+			continue;
+		}
+
+		$family = false !== strpos( $font_family['font-family'], ' ' )
+			? "'{$font_family['font-family']}'"
+			: $font_family['font-family'];
+
+		$declarations[] = array(
+			'name'  => "--wp--preset--font-family--{$slug}",
+			'value' => $family,
+		);
+		$added[]        = $slug;
+	}
+
+	return $declarations;
 }
 
 /**
@@ -464,6 +497,7 @@ add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 add_action( 'wp_loaded', 'gutenberg_register_webfonts_from_theme_json' );
 add_filter( 'wp_rest_prepare_theme_item', 'gutenberg_add_registered_webfonts_to_global_styles' );
+add_filter( 'wp_block_styles_preset_vars', 'gutenberg_add_registered_webfonts_global_styles_vars' );
 
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );
