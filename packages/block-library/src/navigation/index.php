@@ -214,35 +214,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 	}
 
+	// If there are no inner blocks then fallback to rendering the Page List block.
 	if ( empty( $inner_blocks ) ) {
-		$all_pages = get_pages(
-			array(
-				'sort_column' => 'menu_order,post_title',
-				'order'       => 'asc',
-				'number'      => 4,
-			)
-		);
-
-		// If thare are no pages, there is nothing to show.
-		if ( empty( $all_pages ) ) {
-			return;
-		}
-
-		$wrapper_markup = '<ul class="wp-block-navigation__container">%s</ul>';
-
-		$items_markup = array_reduce(
-			$all_pages,
-			function( $acc, $page ) {
-				$acc .= '<li class="wp-block-navigation-item"><a href="' . esc_url( get_permalink( $page->ID ) ) . '">' . esc_attr( $page->post_title ) . '</a></li>';
-				return $acc;
-			},
-			''
-		);
-
-		return sprintf(
-			$wrapper_markup,
-			$items_markup
-		);
+		$page_list_block = parse_blocks( '<!-- wp:page-list /-->' );
+		$inner_blocks = new WP_Block_List( $page_list_block, $attributes );
 	}
 
 	// Restore legacy classnames for submenu positioning.
