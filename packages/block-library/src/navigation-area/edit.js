@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	MenuGroup,
@@ -50,6 +51,10 @@ function NavigationAreaBlock( { attributes, setAttributes } ) {
 			} ) ),
 		[ navigationAreas ]
 	);
+
+	deprecated( 'wp.blockLibrary.NavigationArea', {
+		since: '5.9',
+	} );
 
 	return (
 		<>
