@@ -20,13 +20,27 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
-import type { ToggleGroupControlOptionProps } from '../types';
+import type { ToggleGroupControlOptionProps, WithToolTipProps } from '../types';
 import { useToggleGroupControlContext } from '../context';
 import * as styles from './styles';
 import { useCx } from '../../utils/hooks';
 import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
+
+const WithToolTip = ( {
+	text,
+	children,
+}: WordPressComponentProps< WithToolTipProps, 'div' > ) => {
+	if ( !! text ) {
+		return (
+			<Tooltip text={ text } position="top center">
+				{ children }
+			</Tooltip>
+		);
+	}
+	return <>{ children }</>;
+};
 
 function ToggleGroupControlOption(
 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
@@ -42,7 +56,14 @@ function ToggleGroupControlOption(
 		'ToggleGroupControlOption'
 	);
 
-	const { className, isBlock = false, label, value, ...radioProps } = {
+	const {
+		className,
+		isBlock = false,
+		label,
+		value,
+		tooltipText,
+		...radioProps
+	} = {
 		...toggleGroupControlContext,
 		...buttonProps,
 	};
@@ -58,10 +79,7 @@ function ToggleGroupControlOption(
 
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
-			<Tooltip
-				text={ radioProps[ 'aria-label' ] ?? label }
-				position="top center"
-			>
+			<WithToolTip text={ tooltipText }>
 				<Radio
 					{ ...radioProps }
 					as="button"
@@ -76,7 +94,7 @@ function ToggleGroupControlOption(
 						{ label }
 					</LabelPlaceholderView>
 				</Radio>
-			</Tooltip>
+			</WithToolTip>
 		</LabelView>
 	);
 }

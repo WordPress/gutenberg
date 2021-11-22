@@ -71,6 +71,11 @@ const _default = ( { options } ) => {
 				opt[ 'aria-label' ],
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
+			tooltipText={ text(
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }: tooltipText`,
+				opt.tooltipText,
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+			) }
 		/>
 	) );
 
@@ -98,6 +103,16 @@ Default.args = {
 		{ value: 'center', label: 'Center' },
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
+	],
+};
+
+export const WithTooltipText = _default.bind( {} );
+WithTooltipText.args = {
+	...Default.args,
+	options: [
+		{ value: 1, label: '1', tooltipText: 'One' },
+		{ value: 2, label: '2', tooltipText: 'Two' },
+		{ value: 3, label: '3', tooltipText: 'Three' },
 	],
 };
 

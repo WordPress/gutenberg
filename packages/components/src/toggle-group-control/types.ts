@@ -18,6 +18,21 @@ export type ToggleGroupControlOptionProps = {
 	 * to specify a different label for assistive technologies.
 	 */
 	label: string;
+	/**
+	 * Label for the Tooltip component. If set, determines whether the tooltip is displayed.
+	 */
+	tooltipText?: string;
+};
+
+export type WithToolTipProps = {
+	/**
+	 * React children
+	 */
+	children: ReactNode;
+	/**
+	 * Label for the Tooltip component. If set, determines whether the tooltip is displayed.
+	 */
+	text?: string;
 };
 
 export type ToggleGroupControlProps = Omit<
