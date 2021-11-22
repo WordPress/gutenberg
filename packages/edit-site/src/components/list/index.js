@@ -48,7 +48,7 @@ export default function List( { templateType } ) {
 					itemsListLabel
 				),
 				drawer: __( 'Navigation Sidebar' ),
-				content: sprintf(
+				body: sprintf(
 					// translators: %s - the name of the page, 'Content' as in the content area of that page.
 					__( '%s - Content' ),
 					itemsListLabel
