@@ -37,7 +37,7 @@ function useDeprecatedProps( {
 		propsToReturn.marginStart = computedMarginStart;
 	}
 
-	// Transform deprecated `marginTop` prop into `marginStart`.
+	// Transform deprecated `marginBottom` prop into `marginEnd`.
 	let computedMarginEnd = marginEnd;
 	if ( marginBottom ) {
 		computedMarginEnd ??= marginBottom;
