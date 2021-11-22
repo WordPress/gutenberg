@@ -15,29 +15,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	// Get all registered webfonts.
-	$font_families_registered = wp_webfonts()->webfonts()->get_all_registered();
-
-	if ( ! empty( $font_families_registered ) ) {
-		$classes_styles = '';
-		$added          = array();
-
-		// Loop registered webfonts and generate styles.
-		foreach ( $font_families_registered as $font_family ) {
-			$family = $font_family['font-family'];
-			$family = false !== strpos( $family, ' ' ) ? "'{$family}'" : $family;
-			$slug   = sanitize_title( $family );
-			if ( in_array( $slug, $added, true ) ) {
-				continue;
-			}
-
-			$classes_styles .= ".has-$slug-font-family{font-family:var(--wp--preset--font-family--$slug) !important;}";
-			$added[]         = $slug;
-		}
-
-		$stylesheet .= $classes_styles;
-	}
-
 	if ( isset( wp_styles()->registered['global-styles'] ) ) {
 		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
 	} else {
@@ -45,41 +22,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		wp_add_inline_style( 'global-styles', $stylesheet );
 		wp_enqueue_style( 'global-styles' );
 	}
-}
-
-/**
- * Adds the custom webfonts CSS properties to global-styles.
- *
- * @param array $declarations The CSS Custom Properties.
- *
- * @return array
- */
-function gutenberg_add_registered_webfonts_global_styles_vars( $declarations ) {
-	// Get all registered webfonts.
-	$font_families_registered = wp_webfonts()->webfonts()->get_all_registered();
-	$added                    = array();
-
-	// Loop registered webfonts and add declarations styles.
-	foreach ( $font_families_registered as $font_family ) {
-		$family = $font_family['font-family'];
-		$slug   = sanitize_title( $font_family['font-family'] );
-
-		if ( in_array( $slug, $added, true ) ) {
-			continue;
-		}
-
-		$family = false !== strpos( $font_family['font-family'], ' ' )
-			? "'{$font_family['font-family']}'"
-			: $font_family['font-family'];
-
-		$declarations[] = array(
-			'name'  => "--wp--preset--font-family--{$slug}",
-			'value' => $family,
-		);
-		$added[]        = $slug;
-	}
-
-	return $declarations;
 }
 
 /**
@@ -417,7 +359,6 @@ function gutenberg_register_webfonts_from_theme_json() {
 	wp_register_webfonts( gutenberg_get_webfonts_from_theme_json() );
 }
 
-
 /**
  * Add missing fonts data to the global styles.
  *
@@ -425,9 +366,12 @@ function gutenberg_register_webfonts_from_theme_json() {
  *
  * @return array The global styles with missing fonts data.
  */
-function gutenberg_add_registered_webfonts_to_global_styles( $data ) {
-	$font_families_from_theme = gutenberg_get_webfonts_from_theme_json();
+function gutenberg_add_webfonts_to_theme_json( $data ) {
 	$font_families_registered = wp_webfonts()->webfonts()->get_all_registered();
+	$font_families_from_theme = array();
+	if ( ! empty( $data['settings'] ) && ! empty( $data['settings']['typography'] ) && ! empty( $data['settings']['typography']['fontFamilies'] ) ) {
+		$font_families_from_theme = $data['settings']['typography']['fontFamilies'];
+	}
 
 	/**
 	 * Helper to get an array of the font-families.
@@ -439,7 +383,11 @@ function gutenberg_add_registered_webfonts_to_global_styles( $data ) {
 	$get_families = function( $families_data ) {
 		$families = array();
 		foreach ( $families_data as $family ) {
-			$families[] = $family['font-family'];
+			if ( isset( $family['font-family'] ) ) {
+				$families[] = $family['font-family'];
+			} elseif ( isset( $family['fontFamily'] ) ) {
+				$families[] = $family['fontFamily'];
+			}
 		}
 
 		// Micro-optimization: Use array_flip( array_flip( $array ) )
@@ -470,13 +418,10 @@ function gutenberg_add_registered_webfonts_to_global_styles( $data ) {
 	if ( ! isset( $data['settings']['typography']['fontFamilies'] ) ) {
 		$data['settings']['typography']['fontFamilies'] = array();
 	}
-	if ( ! isset( $data['settings']['typography']['fontFamilies']['theme'] ) ) {
-		$data['settings']['typography']['fontFamilies']['theme'] = array();
-	}
 
 	// Add missing fonts.
 	foreach ( $to_add as $family ) {
-		$data['settings']['typography']['fontFamilies']['theme'][] = array(
+		$data['settings']['typography']['fontFamilies'][] = array(
 			'fontFamily' => false !== strpos( $family, ' ' ) ? "'{$family}'" : $family,
 			'name'       => $family,
 			'slug'       => sanitize_title( $family ),
@@ -496,8 +441,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 add_action( 'wp_loaded', 'gutenberg_register_webfonts_from_theme_json' );
-add_filter( 'wp_rest_prepare_theme_item', 'gutenberg_add_registered_webfonts_to_global_styles' );
-add_filter( 'wp_block_styles_preset_vars', 'gutenberg_add_registered_webfonts_global_styles_vars' );
+add_filter( 'theme_json_data', 'gutenberg_add_webfonts_to_theme_json' );
 
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );

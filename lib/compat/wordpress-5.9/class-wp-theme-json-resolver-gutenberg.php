@@ -144,6 +144,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			/**
+			 * Filters the theme.json data.
+			 *
+			 * @param array $theme_json_data The theme.json data.
+			 *
+			 * @return array The theme.json data.
+			 */
+			$theme_json_data = apply_filters( 'theme_json_data', $theme_json_data );
 			self::$theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {

@@ -426,16 +426,6 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 			'settings' => $settings,
 			'styles'   => $styles,
 		);
-
-		/**
-		 * Filters the response for a single theme global styles config.
-		 *
-		 * @param array           $result  The response data.
-		 * @param WP_REST_Request $request The request instance.
-		 *
-		 * @return array
-		 */
-		$result   = apply_filters( 'wp_rest_prepare_theme_item', $result, $request );
 		$response = rest_ensure_response( $result );
 
 		return $response;
