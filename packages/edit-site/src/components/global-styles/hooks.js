@@ -45,12 +45,14 @@ export function useSetting( path, blockName, source = 'all' ) {
 		? `settings.${ path }`
 		: `settings.blocks.${ blockName }.${ path }`;
 
+		console.log( {mergedConfig, userConfig });
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
 			const newUserConfig = cloneDeep( currentConfig );
 			const pathToSet = PATHS_WITH_MERGE[ path ]
-				? fullPath + '.user'
+				? fullPath + '.custom'
 				: fullPath;
+			console.log('setSetting', { pathToSet, newValue });
 			set( newUserConfig, pathToSet, newValue );
 
 			return newUserConfig;
@@ -65,7 +67,7 @@ export function useSetting( path, blockName, source = 'all' ) {
 		const getSettingValue = ( configToUse ) => {
 			const result = get( configToUse, currentPath );
 			if ( PATHS_WITH_MERGE[ path ] ) {
-				return result?.user ?? result?.theme ?? result?.default;
+				return result?.custom ?? result?.theme ?? result?.default;
 			}
 			return result;
 		};
@@ -218,7 +220,7 @@ export function getSupportedGlobalStylesPanels( name ) {
 }
 
 export function useColorsPerOrigin( name ) {
-	const [ customColors ] = useSetting( 'color.palette.user', name );
+	const [ customColors ] = useSetting( 'color.palette.custom', name );
 	const [ themeColors ] = useSetting( 'color.palette.theme', name );
 	const [ defaultColors ] = useSetting( 'color.palette.default', name );
 	const [ shouldDisplayDefaultColors ] = useSetting( 'color.defaultPalette' );
@@ -261,7 +263,7 @@ export function useColorsPerOrigin( name ) {
 }
 
 export function useGradientsPerOrigin( name ) {
-	const [ customGradients ] = useSetting( 'color.gradients.user', name );
+	const [ customGradients ] = useSetting( 'color.gradients.custom', name );
 	const [ themeGradients ] = useSetting( 'color.gradients.theme', name );
 	const [ defaultGradients ] = useSetting( 'color.gradients.default', name );
 	const [ shouldDisplayDefaultGradients ] = useSetting(

@@ -22,7 +22,7 @@ import { useSetting } from './hooks';
 const EMPTY_COLORS = [];
 
 function Palette( { name } ) {
-	const [ colorsSetting ] = useSetting( 'color.palette.user', name );
+	const [ colorsSetting ] = useSetting( 'color.palette.custom', name );
 	const colors = colorsSetting || EMPTY_COLORS;
 	const screenPath = ! name
 		? '/colors/palette'

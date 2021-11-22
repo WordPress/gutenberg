@@ -117,7 +117,7 @@ export default function useSetting( path ) {
 			if ( experimentalFeaturesResult !== undefined ) {
 				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
 					return (
-						experimentalFeaturesResult.user ??
+						experimentalFeaturesResult.custom ??
 						experimentalFeaturesResult.theme ??
 						experimentalFeaturesResult.default
 					);
