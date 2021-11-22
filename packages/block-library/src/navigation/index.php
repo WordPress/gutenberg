@@ -221,12 +221,38 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$is_fallback                      = true; // indicate we are rendering the fallback.
 		$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
 
-		$page_list_block = array(
-			'blockName' => 'core/page-list',
-			'attrs'     => array(),
+		$navigation_posts = get_posts(
+			array(
+				'post_type' => 'wp_navigation',
+			)
 		);
 
-		$inner_blocks = new WP_Block_List( array( $page_list_block ), $attributes );
+		$navigation_post = null;
+
+		// Pick first non-empty Navigation.
+		foreach ( $navigation_posts as $navigation_maybe ) {
+			if ( ! empty( $navigation_maybe->post_content ) ) {
+				$navigation_post = $navigation_maybe;
+				break;
+			}
+		}
+
+		// Use non-empty Navigation if available.
+		if ( $navigation_post ) {
+			$fallback_blocks = parse_blocks( $navigation_post->post_content );
+		} else {
+			$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
+
+			// Requires wrapping array.
+			$fallback_blocks = array(
+				array(
+					'blockName' => 'core/page-list',
+					'attrs'     => array(),
+				),
+			);
+		}
+
+		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
 	}
 
 	// Restore legacy classnames for submenu positioning.
