@@ -30,6 +30,17 @@ const MAX_SUGGESTED_ITEMS = 6;
  */
 const EMPTY_ARRAY = [];
 
+// Blocks that should be prioritized in the Inserter tab.
+const PRIORITIZED_BLOCKS = {
+	theme: [
+		'core/navigation',
+		'core/template-part/header',
+		'core/template-part/footer',
+		'core/query/posts-list',
+	],
+	// design: [],
+};
+
 export function BlockTypesTab( {
 	rootClientId,
 	onInsert,
@@ -61,6 +72,47 @@ export function BlockTypesTab( {
 			( itemList ) => groupBy( itemList, 'category' )
 		)( items );
 	}, [ items ] );
+
+	const sortPrioritizedBlocks = ( _category ) => {
+		const categoryPrioritizedBlocks = PRIORITIZED_BLOCKS[ _category ];
+		/**
+		 * We always add one(1) to the returned index to simplify our checks for no
+		 * matches and zero index handling.
+		 *
+		 * For example when `findIndex` doesn't find a match will return `-1`,
+		 * so by adding `1` will become zero that will help us use `boolean` checks.
+		 *
+		 * @param {string} blockId The block id is the block name. In block variations the variation name is appended.
+		 */
+		const getBlockIndex = ( blockId ) =>
+			categoryPrioritizedBlocks.findIndex(
+				( _blockId ) => _blockId === blockId
+			) + 1;
+		return ( a, b ) => {
+			const firstBlockIndex = getBlockIndex( a.id );
+			const secondBlockIndex = getBlockIndex( b.id );
+			if ( !! firstBlockIndex && !! secondBlockIndex ) {
+				/**
+				 * We also need to check our prefered order, because items order
+				 * depends on block declaration order as well.
+				 */
+				return firstBlockIndex > secondBlockIndex ? 1 : -1;
+			}
+			return !! firstBlockIndex && ! secondBlockIndex ? -1 : 1;
+		};
+	};
+	// Prioritize blocks's display order in Inserter per block category.
+	const prioritizedItemsPerCategory = useMemo( () => {
+		return Object.entries( itemsPerCategory ).reduce(
+			( accumulator, [ category, _items ] ) => {
+				accumulator[ category ] = ! PRIORITIZED_BLOCKS[ category ]
+					? _items
+					: [ ..._items ].sort( sortPrioritizedBlocks( category ) );
+				return accumulator;
+			},
+			{}
+		);
+	}, [ itemsPerCategory ] );
 
 	const itemsPerCollection = useMemo( () => {
 		// Create a new Object to avoid mutating collection.
@@ -113,7 +165,8 @@ export function BlockTypesTab( {
 				) }
 
 				{ map( currentlyRenderedCategories, ( category ) => {
-					const categoryItems = itemsPerCategory[ category.slug ];
+					const categoryItems =
+						prioritizedItemsPerCategory[ category.slug ];
 					if ( ! categoryItems || ! categoryItems.length ) {
 						return null;
 					}
