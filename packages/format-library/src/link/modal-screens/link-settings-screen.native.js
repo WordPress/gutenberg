@@ -70,7 +70,10 @@ const LinkSettingsScreen = ( {
 		const { isActiveLink, isRemovingLink } = linkValues;
 		if ( !! inputValue && ! isActiveLink && isVisible ) {
 			submitLink( { shouldCloseBottomSheet: false } );
-		} else if ( ( inputValue === '' && isActiveLink ) || isRemovingLink ) {
+		} else if (
+			( ( inputValue === '' && isActiveLink ) || isRemovingLink ) &&
+			isVisible
+		) {
 			removeLink( { shouldCloseBottomSheet: false } );
 		}
 	}, [
