@@ -4,7 +4,7 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-export default function useNavigationMenu( navigationMenuId ) {
+export default function useNavigationMenu( ref ) {
 	return useSelect(
 		( select ) => {
 			const {
@@ -17,12 +17,12 @@ export default function useNavigationMenu( navigationMenuId ) {
 			const navigationMenuSingleArgs = [
 				'postType',
 				'wp_navigation',
-				navigationMenuId,
+				ref,
 			];
-			const rawNavigationMenu = navigationMenuId
+			const rawNavigationMenu = ref
 				? getEntityRecord( ...navigationMenuSingleArgs )
 				: null;
-			let navigationMenu = navigationMenuId
+			let navigationMenu = ref
 				? getEditedEntityRecord( ...navigationMenuSingleArgs )
 				: null;
 
@@ -32,7 +32,7 @@ export default function useNavigationMenu( navigationMenuId ) {
 				navigationMenu = null;
 			}
 
-			const hasResolvedNavigationMenu = navigationMenuId
+			const hasResolvedNavigationMenu = ref
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
 						navigationMenuSingleArgs
@@ -48,14 +48,14 @@ export default function useNavigationMenu( navigationMenuId ) {
 				...navigationMenuMultipleArgs
 			);
 
-			const canSwitchNavigationMenu = navigationMenuId
+			const canSwitchNavigationMenu = ref
 				? navigationMenus?.length > 1
 				: navigationMenus?.length > 0;
 
 			return {
 				isNavigationMenuResolved: hasResolvedNavigationMenu,
 				isNavigationMenuMissing:
-					! navigationMenuId ||
+					! ref ||
 					( hasResolvedNavigationMenu && ! rawNavigationMenu ),
 				canSwitchNavigationMenu,
 				hasResolvedNavigationMenus: hasFinishedResolution(
@@ -66,6 +66,6 @@ export default function useNavigationMenu( navigationMenuId ) {
 				navigationMenus,
 			};
 		},
-		[ navigationMenuId ]
+		[ ref ]
 	);
 }
