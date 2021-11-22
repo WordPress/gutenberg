@@ -30,12 +30,13 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	$page = (int) get_query_var( 'cpage' );
 
 	$comment_args = array(
-		'number'  => $per_page,
-		'orderby' => 'comment_date_gmt',
-		'order'   => 'ASC',
-		'status'  => 'approve',
-		'post_id' => $post_id,
-		'offset'  => 0,
+		'number'    => $per_page,
+		'orderby'   => 'comment_date_gmt',
+		'order'     => 'ASC',
+		'status'    => 'approve',
+		'post_id'   => $post_id,
+		'offset'    => 0,
+		'parent_id' => 0,
 	);
 
 	if ( $page ) {
