@@ -219,7 +219,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// If there are no inner blocks then fallback to rendering the Page List block.
 	if ( empty( $inner_blocks ) ) {
 		$is_fallback            = true; // indicate we are rendering the fallback.
-		$attributes['maxPages'] = 4; // set value to be passed as context to Page List block.
+		$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
 
 		$page_list_block = array(
 			'blockName' => 'core/page-list',

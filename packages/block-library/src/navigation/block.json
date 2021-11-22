@@ -56,7 +56,7 @@
 		"customOverlayTextColor": {
 			"type": "string"
 		},
-		"maxPages": {
+		"__unstableMaxPages": {
 			"type": "number"
 		}
 	},
@@ -76,7 +76,7 @@
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
 		"orientation": "orientation",
-		"maxPages": "maxPages"
+		"__unstableMaxPages": "__unstableMaxPages"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

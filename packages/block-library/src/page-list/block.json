@@ -22,7 +22,7 @@
 		"showSubmenuIcon",
 		"style",
 		"openSubmenusOnClick",
-		"maxPages"
+		"__unstableMaxPages"
 	],
 	"supports": {
 		"reusable": false,
