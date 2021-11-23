@@ -3,5 +3,6 @@
 <resources>
 
     <bool name="history_enable">false</bool>
+    <bool name="use_aztec_style_html">false</bool>
 
 </resources>
