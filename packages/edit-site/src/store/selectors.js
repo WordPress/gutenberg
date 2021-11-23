@@ -119,6 +119,7 @@ export const getSettings = createSelector(
 		state.settings,
 		isFeatureActive( state, 'focusMode' ),
 		isFeatureActive( state, 'fixedToolbar' ),
+		getReusableBlocks( state ),
 	]
 );
 
