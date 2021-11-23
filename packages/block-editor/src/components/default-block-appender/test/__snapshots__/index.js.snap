@@ -8,7 +8,6 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   <p
     aria-label="Add block"
     className="block-editor-default-block-appender__content"
-    contentEditable={true}
     onFocus={
       [MockFunction] {
         "calls": Array [
@@ -23,7 +22,6 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
       }
     }
     role="button"
-    suppressContentEditableWarning={true}
     tabIndex="0"
   >
     Type / to choose a block
@@ -44,10 +42,8 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   <p
     aria-label="Add block"
     className="block-editor-default-block-appender__content"
-    contentEditable={true}
     onFocus={[MockFunction]}
     role="button"
-    suppressContentEditableWarning={true}
     tabIndex="0"
   >
     Type / to choose a block
@@ -68,10 +64,8 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   <p
     aria-label="Add block"
     className="block-editor-default-block-appender__content"
-    contentEditable={true}
     onFocus={[MockFunction]}
     role="button"
-    suppressContentEditableWarning={true}
     tabIndex="0"
   >
     ﻿
