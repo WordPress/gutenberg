@@ -53,7 +53,6 @@ export default function useDefaultNavigationTitle( clientId ) {
 	// early.
 	const area = useTemplatePartAreaLabel( isDisabled ? undefined : clientId );
 
-	// Automatically save the uncontrolled blocks.
 	return useMemo( () => {
 		// Ensure other navigation menus have loaded so an
 		// accurate name can be created.
