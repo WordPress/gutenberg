@@ -154,6 +154,13 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		key: 'stylesheet',
 	},
+	{
+		label: __( 'Plugins' ),
+		name: 'plugin',
+		kind: 'root',
+		baseURL: '/wp/v2/plugins',
+		baseURLParams: { context: 'edit' },
+	},
 ];
 
 export const kinds = [
