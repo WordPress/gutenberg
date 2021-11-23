@@ -52,10 +52,8 @@ class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 	 */
 	public function test_is_valid_schema_with_invalid( array $webfont, $expected_message ) { // phpcs:ignore VariableAnalysis
 
-		/*
-		$this->expectNotice();
-		$this->expectNoticeMessage( $expected_message );
-		*/
+		$this->expectException( Notice::class );
+		$this->expectException( $expected_message );
 
 		$this->assertFalse( self::$validator->is_valid_schema( $webfont ) );
 	}
