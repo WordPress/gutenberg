@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { serialize, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	Placeholder,
 	Button,
@@ -9,8 +9,6 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
 import { useCallback, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
@@ -24,6 +22,7 @@ import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import menuItemsToBlocks from '../../menu-items-to-blocks';
 import useNavigationMenu from '../../use-navigation-menu';
+import useCreateNavigationMenu from '../use-create-navigation-menu';
 
 const ExistingMenusDropdown = ( {
 	canSwitchNavigationMenu,
@@ -89,41 +88,15 @@ const ExistingMenusDropdown = ( {
 };
 
 export default function NavigationPlaceholder( {
+	clientId,
 	onFinish,
 	canSwitchNavigationMenu,
 	hasResolvedNavigationMenus,
 } ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
-
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
-
 	const [ menuName, setMenuName ] = useState( '' );
-
-	const { saveEntityRecord } = useDispatch( coreStore );
-
-	// This callback uses data from the two placeholder steps and only creates
-	// a new navigation menu when the user completes the final step.
-	const createNavigationMenu = useCallback(
-		async ( title, blocks = [] ) => {
-			if ( ! title ) {
-				return;
-			}
-			const record = {
-				title,
-				content: serialize( blocks ),
-				status: 'publish',
-			};
-
-			const navigationMenu = await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				record
-			);
-
-			return navigationMenu;
-		},
-		[ serialize, saveEntityRecord ]
-	);
+	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
 	const onFinishMenuCreation = async (
 		blocks,
