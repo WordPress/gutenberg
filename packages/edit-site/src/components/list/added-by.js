@@ -40,7 +40,7 @@ function AddedByPlugin( { slug } ) {
 			<div className="edit-site-list-added-by__icon">
 				<Icon icon={ pluginIcon } />
 			</div>
-			<span>{ plugin?.name?.rendered }</span>
+			<span>{ plugin?.name }</span>
 		</HStack>
 	);
 }

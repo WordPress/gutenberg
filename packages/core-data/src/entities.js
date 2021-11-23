@@ -160,6 +160,7 @@ export const defaultEntities = [
 		kind: 'root',
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
+		key: 'plugin',
 	},
 ];
 
