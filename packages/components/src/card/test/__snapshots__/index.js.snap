@@ -269,6 +269,7 @@ Object {
 }
 
 .emotion-10 {
+  border: 0;
   margin: 0;
   border-bottom: 1px solid currentColor;
   height: 0;
@@ -524,6 +525,7 @@ Object {
 }
 
 .emotion-10 {
+  border: 0;
   margin: 0;
   border-bottom: 1px solid currentColor;
   height: 0;

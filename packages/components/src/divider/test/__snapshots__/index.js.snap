@@ -2,6 +2,7 @@
 
 exports[`props should render correctly 1`] = `
 .emotion-0 {
+  border: 0;
   margin: 0;
   border-bottom: 1px solid currentColor;
   height: 0;
@@ -22,8 +23,9 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-  Array [
+@@ -2,10 +2,8 @@
     Object {
+      "border": "0",
       "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
@@ -34,13 +36,14 @@ Snapshot Diff:
   ]
 `;
 
-exports[`props should render marginBottom 1`] = `
+exports[`props should render marginEnd 1`] = `
 Snapshot Diff:
 - Received styles
 + Base styles
 
-  Array [
+@@ -2,9 +2,8 @@
     Object {
+      "border": "0",
       "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
@@ -50,13 +53,14 @@ Snapshot Diff:
   ]
 `;
 
-exports[`props should render marginTop 1`] = `
+exports[`props should render marginStart 1`] = `
 Snapshot Diff:
 - Received styles
 + Base styles
 
-  Array [
+@@ -2,9 +2,8 @@
     Object {
+      "border": "0",
       "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
