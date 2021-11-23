@@ -1237,7 +1237,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'color'   => array(
 						'custom'  => true,
 						'palette' => array(
-							'user' => array(
+							'custom' => array(
 								array(
 									'name'  => 'Red',
 									'slug'  => 'red',
@@ -1264,7 +1264,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'color'   => array(
 								'custom'  => true,
 								'palette' => array(
-									'user' => array(
+									'custom' => array(
 										array(
 											'name'  => 'Yellow',
 											'slug'  => 'yellow',
@@ -1297,7 +1297,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'settings' => array(
 				'color'  => array(
 					'palette' => array(
-						'user' => array(
+						'custom' => array(
 							array(
 								'name'  => 'Red',
 								'slug'  => 'red',
@@ -1320,7 +1320,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'core/group' => array(
 						'color' => array(
 							'palette' => array(
-								'user' => array(
+								'custom' => array(
 									array(
 										'name'  => 'Yellow',
 										'slug'  => 'yellow',
@@ -1353,7 +1353,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'color'      => array(
 						'palette' => array(
-							'user' => array(
+							'custom' => array(
 								array(
 									'name'  => 'Red/><b>ok</ok>',
 									'slug'  => 'red',
@@ -1379,7 +1379,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'typography' => array(
 						'fontFamilies' => array(
-							'user' => array(
+							'custom' => array(
 								array(
 									'name'       => 'Helvetica Arial/><b>test</b>',
 									'slug'       => 'helvetica-arial',
@@ -1407,7 +1407,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'core/group' => array(
 							'color' => array(
 								'palette' => array(
-									'user' => array(
+									'custom' => array(
 										array(
 											'name'  => 'Red/><b>ok</ok>',
 											'slug'  => 'red',
@@ -1442,7 +1442,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'settings' => array(
 				'color'      => array(
 					'palette' => array(
-						'user' => array(
+						'custom' => array(
 							array(
 								'name'  => 'Pink',
 								'slug'  => 'pink',
@@ -1453,7 +1453,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'typography' => array(
 					'fontFamilies' => array(
-						'user' => array(
+						'custom' => array(
 							array(
 								'name'       => 'Cambria',
 								'slug'       => 'cambria',
@@ -1466,7 +1466,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'core/group' => array(
 						'color' => array(
 							'palette' => array(
-								'user' => array(
+								'custom' => array(
 									array(
 										'name'  => 'Pink',
 										'slug'  => 'pink',
