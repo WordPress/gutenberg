@@ -1,7 +1,5 @@
 <?php
 
-use PHPUnit\Framework\Error\Notice as Notice;
-
 /**
  * @group  webfonts
  * @covers WP_Webfonts_Schema_Validator
@@ -49,13 +47,9 @@ class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_is_valid_schema_with_invalid
 	 *
-	 * @param array  $webfont          Webfont input.
-	 * @param string $expected_message Expected notice message.
+	 * @param array $webfont Webfont input.
 	 */
-	public function test_is_valid_schema_with_invalid( array $webfont, $expected_message ) {
-		$this->expectException( Notice::class );
-		$this->expectException( $expected_message );
-
+	public function test_is_valid_schema_with_invalid( array $webfont ) {
 		$this->assertFalse( self::$validator->is_valid_schema( $webfont ) );
 	}
 
@@ -389,14 +383,10 @@ class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_set_valid_properties_with_invalid_and_error
 	 *
-	 * @param array  $webfont          Webfont input.
-	 * @param array  $expected         Expected updated webfont.
-	 * @param string $expected_message Expected notice message.
+	 * @param array $webfont  Webfont input.
+	 * @param array $expected Expected updated webfont.
 	 */
-	public function test_set_valid_properties_with_invalid_and_error( array $webfont, array $expected, $expected_message ) {
-		$this->expectException( Notice::class );
-		$this->expectException( $expected_message );
-
+	public function test_set_valid_properties_with_invalid_and_error( array $webfont, array $expected ) {
 		$this->assertSame( $expected, self::$validator->set_valid_properties( $webfont ) );
 	}
 
