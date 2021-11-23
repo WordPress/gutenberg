@@ -1,55 +1,64 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
-import { number } from '@storybook/addon-knobs';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
  */
+import { useCx } from '../../utils';
 import { Text } from '../../text';
 import { Divider } from '..';
 
 export default {
 	component: Divider,
 	title: 'Components (Experimental)/Divider',
-	parameters: {
-		knobs: { disabled: false },
+	argTypes: {
+		margin: {
+			control: { type: 'number' },
+		},
+		marginStart: {
+			control: { type: 'number' },
+		},
+		marginEnd: {
+			control: { type: 'number' },
+		},
 	},
 };
 
-const VerticalWrapper = styled.div`
-	display: flex;
-	align-items: stretch;
-	justify-content: start;
-`;
+const HorizontalTemplate = ( args ) => (
+	<div>
+		<Text>Some text before the divider</Text>
+		<Divider { ...args } />
+		<Text>Some text after the divider</Text>
+	</div>
+);
 
-export const Horizontal = () => {
-	const props = {
-		margin: number( 'margin', 2 ),
-		marginStart: number( 'marginStart', undefined ),
-		marginEnd: number( 'marginEnd', undefined ),
-	};
+const VerticalTemplate = ( args ) => {
+	const cx = useCx();
+	const wrapperClassName = cx( css`
+		display: flex;
+		align-items: stretch;
+		justify-content: start;
+	` );
+
 	return (
-		<div>
+		<div className={ wrapperClassName }>
 			<Text>Some text before the divider</Text>
-			<Divider { ...props } />
+			<Divider orientation="vertical" { ...args } />
 			<Text>Some text after the divider</Text>
 		</div>
 	);
 };
 
-export const Vertical = () => {
-	const props = {
-		margin: number( 'margin', 2 ),
-		marginStart: number( 'marginStart', undefined ),
-		marginEnd: number( 'marginEnd', undefined ),
-	};
-	return (
-		<VerticalWrapper>
-			<Text>Some text before the divider</Text>
-			<Divider orientation="vertical" { ...props } />
-			<Text>Some text after the divider</Text>
-		</VerticalWrapper>
-	);
+export const Horizontal = HorizontalTemplate.bind( {} );
+Horizontal.args = {
+	margin: 2,
+	marginStart: undefined,
+	marginEnd: undefined,
+};
+
+export const Vertical = VerticalTemplate.bind( {} );
+Vertical.args = {
+	...Horizontal.args,
 };
