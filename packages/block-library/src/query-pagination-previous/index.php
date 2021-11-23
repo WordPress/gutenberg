@@ -49,7 +49,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 		}
 		remove_filter( 'previous_posts_link_attributes', $filter_link_attributes );
 	} else {
-		$content = 1 !== $page ? sprintf(
+		$content = ( 1 !== $page ) ? sprintf(
 			'<a href="%1$s" %2$s>%3$s</a>',
 			esc_url( add_query_arg( $page_key, $page - 1 ) ),
 			$wrapper_attributes,
