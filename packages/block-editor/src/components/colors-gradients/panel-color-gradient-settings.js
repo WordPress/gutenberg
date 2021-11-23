@@ -17,6 +17,7 @@ import ColorGradientControl from './control';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
+import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
 import useMultipleOriginColorsAndGradients from './use-multiple-origin-colors-and-gradients';
 
 // translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
@@ -151,13 +152,6 @@ export const PanelColorGradientSettingsInner = ( {
 		</PanelBody>
 	);
 };
-
-function useCommonSingleMultipleSelects() {
-	return {
-		disableCustomColors: ! useSetting( 'color.custom' ),
-		disableCustomGradients: ! useSetting( 'color.customGradient' ),
-	};
-}
 
 const PanelColorGradientSettingsSingleSelect = ( props ) => {
 	const colorGradientSettings = useCommonSingleMultipleSelects();

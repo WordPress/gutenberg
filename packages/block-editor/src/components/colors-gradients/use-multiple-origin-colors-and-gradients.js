@@ -2,12 +2,13 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useSetting from '../use-setting';
+import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
 
 /**
  * Retrieves color and gradient related settings.
@@ -18,62 +19,89 @@ import useSetting from '../use-setting';
  * @return {Object} Color and gradient related settings.
  */
 export default function useMultipleOriginColorsAndGradients() {
-	const colorGradientSettings = {
-		disableCustomColors: ! useSetting( 'color.custom' ),
-		disableCustomGradients: ! useSetting( 'color.customGradient' ),
-	};
-
-	const userColors = useSetting( 'color.palette.user' );
+	const colorGradientSettings = useCommonSingleMultipleSelects();
+	const customColors = useSetting( 'color.palette.custom' );
 	const themeColors = useSetting( 'color.palette.theme' );
-	const coreColors = useSetting( 'color.palette.core' );
+	const defaultColors = useSetting( 'color.palette.default' );
+	const shouldDisplayDefaultColors = useSetting( 'color.defaultPalette' );
+
 	colorGradientSettings.colors = useMemo( () => {
 		const result = [];
-		if ( coreColors && coreColors.length ) {
-			result.push( {
-				name: __( 'Core' ),
-				colors: coreColors,
-			} );
-		}
 		if ( themeColors && themeColors.length ) {
 			result.push( {
-				name: __( 'Theme' ),
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
 				colors: themeColors,
 			} );
 		}
-		if ( userColors && userColors.length ) {
+		if (
+			shouldDisplayDefaultColors &&
+			defaultColors &&
+			defaultColors.length
+		) {
 			result.push( {
-				name: __( 'User' ),
-				colors: userColors,
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				colors: defaultColors,
+			} );
+		}
+		if ( customColors && customColors.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette comes from the theme.'
+				),
+				colors: customColors,
 			} );
 		}
 		return result;
-	}, [ coreColors, themeColors, userColors ] );
+	}, [ defaultColors, themeColors, customColors ] );
 
-	const userGradients = useSetting( 'color.gradients.user' );
+	const customGradients = useSetting( 'color.gradients.custom' );
 	const themeGradients = useSetting( 'color.gradients.theme' );
-	const coreGradients = useSetting( 'color.gradients.core' );
+	const defaultGradients = useSetting( 'color.gradients.default' );
+	const shouldDisplayDefaultGradients = useSetting(
+		'color.defaultGradients'
+	);
 	colorGradientSettings.gradients = useMemo( () => {
 		const result = [];
-		if ( coreGradients && coreGradients.length ) {
-			result.push( {
-				name: __( 'Core' ),
-				gradients: coreGradients,
-			} );
-		}
 		if ( themeGradients && themeGradients.length ) {
 			result.push( {
-				name: __( 'Theme' ),
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
 				gradients: themeGradients,
 			} );
 		}
-		if ( userGradients && userGradients.length ) {
+		if (
+			shouldDisplayDefaultGradients &&
+			defaultGradients &&
+			defaultGradients.length
+		) {
 			result.push( {
-				name: __( 'User' ),
-				gradients: userGradients,
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				gradients: defaultGradients,
+			} );
+		}
+		if ( customGradients && customGradients.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				gradients: customGradients,
 			} );
 		}
 		return result;
-	}, [ userGradients, themeGradients, coreGradients ] );
+	}, [ customGradients, themeGradients, defaultGradients ] );
 
 	return colorGradientSettings;
 }
