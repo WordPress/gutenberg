@@ -64,6 +64,7 @@ const renderSize = ( {
 	} );
 
 export const DividerView = styled.hr< Props >`
+	border: 0;
 	margin: 0;
 
 	${ renderBorder }
