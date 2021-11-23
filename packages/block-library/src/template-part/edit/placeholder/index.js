@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -65,7 +65,7 @@ export default function TemplatePartPlaceholder( {
 			// block attributes.
 			const record = {
 				title,
-				slug: 'template-part',
+				slug: kebabCase( title ),
 				content: serialize( startingBlocks ),
 				// `area` is filterable on the server and defaults to `UNCATEGORIZED`
 				// if provided value is not allowed.
