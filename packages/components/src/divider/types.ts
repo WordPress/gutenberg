@@ -22,19 +22,6 @@ export interface OwnProps {
 	 * Adjusts the inline-end margin.
 	 */
 	marginEnd?: SpaceInput;
-
-	/**
-	 * Adjusts top margins.
-	 *
-	 * @deprecated
-	 */
-	marginTop?: SpaceInput;
-	/**
-	 * Adjusts bottom margins.
-	 *
-	 * @deprecated
-	 */
-	marginBottom?: SpaceInput;
 }
 
 export interface Props extends Omit< SeparatorProps, 'children' >, OwnProps {}
