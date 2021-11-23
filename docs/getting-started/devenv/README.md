@@ -21,7 +21,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ```
 
 Quit and restart terminal
-Install node version (14x).
+Install Node.js v14.
 
 ```
 nvm install 14
@@ -57,7 +57,7 @@ The tools are used to convert the JavaScript we are going to write into a format
 
 For Mac and Linux, it is recommended to use the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Using `nvm` to install node allows installing specific versions, plus installs locally in your home directory and avoids any global permission issues.
 
-For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the version (14x) is recommended. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
+For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, v14 is recommended. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
 
 Here are the quick instructions to install using nvm, see the [full installation instructions](https://github.com/nvm-sh/nvm#installing-and-updating) for additional details.
 
@@ -71,7 +71,7 @@ Note: On macOS, the required developer tools are not installed by default, if no
 
 <img src="https://developer.wordpress.org/files/2020/07/git-install-prompt.png" alt="Mac git command requies command line developer tools" width="400" height="195"/>
 
-After installing nvm, you need to use it to install node, to install the version (14x) of node, run:
+After installing nvm, you need to use it to install Node.js, to install v14, run:
 
 ```sh
 nvm install 14
@@ -100,13 +100,13 @@ The important part after installing is being able to use them in your terminal. 
 
 ```sh
 > node -v
-v14.x.x
+v14.18.1
 
 > npm -v
-6.x.x
+6.14.15
 ```
 
-Your versions may not match exactly, that is fine. The minimum version for node is >= 10.x and for npm >= 6.9x, using the current version (14x) will be supported until upgrade is required.
+Your versions may not match exactly, that is fine. The minimum version for Node.js is >= 12 and for npm >= 6.9, using v14 will be supported until upgrade is required.
 
 ## WordPress Development Site
 
