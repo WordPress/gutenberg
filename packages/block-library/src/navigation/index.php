@@ -200,7 +200,11 @@ function block_core_navigation_get_fallback() {
 
 	// Prefer using the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-		$fallback_blocks = block_core_navigation_normalize_parsed_blocks( parse_blocks( $navigation_post->post_content ) );
+		$maybe_fallback = block_core_navigation_normalize_parsed_blocks( parse_blocks( $navigation_post->post_content ) );
+
+		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
+		// In this case default to the (Page List) fallback.
+		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 	}
 
 	return $fallback_blocks;
