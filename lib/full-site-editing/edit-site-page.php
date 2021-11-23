@@ -97,7 +97,7 @@ function gutenberg_edit_site_list_init( $settings ) {
 			'/',
 			"/wp/v2/types/$post_type->name?context=edit",
 			'/wp/v2/types?context=edit',
-			"/wp/v2/$post_type->rest_base?context=edit",
+			"/wp/v2/$post_type->rest_base?context=edit&per_page=-1",
 		),
 		'rest_preload_api_request',
 		array()

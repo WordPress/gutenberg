@@ -33,7 +33,8 @@ export default function NewTemplate( { postType } ) {
 		( select ) => ( {
 			templates: select( coreStore ).getEntityRecords(
 				'postType',
-				'wp_template'
+				'wp_template',
+				{ per_page: -1 }
 			),
 			defaultTemplateTypes: select(
 				editorStore

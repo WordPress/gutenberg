@@ -46,10 +46,13 @@ export default function Table( { templateType } ) {
 			} = select( coreStore );
 
 			return {
-				templates: getEntityRecords( 'postType', templateType ),
+				templates: getEntityRecords( 'postType', templateType, {
+					per_page: -1,
+				} ),
 				isLoading: ! hasFinishedResolution( 'getEntityRecords', [
 					'postType',
 					templateType,
+					{ per_page: -1 },
 				] ),
 				postType: getPostType( templateType ),
 			};
