@@ -188,6 +188,79 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected_no_origin, $actual_no_origin );
 	}
 
+	function test_get_settings_using_opt_in_key() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'appearanceTools' => true,
+					'blocks'          => array(
+						'core/paragraph' => array(
+							'typography' => array(
+								'lineHeight' => false,
+							),
+						),
+						'core/group'     => array(
+							'appearanceTools' => true,
+							'typography'      => array(
+								'lineHeight' => false, // This should override appearanceTools.
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual   = $theme_json->get_settings();
+		$expected = array(
+			'border'     => array(
+				'width'  => true,
+				'style'  => true,
+				'radius' => true,
+				'color'  => true,
+			),
+			'color'      => array(
+				'link' => true,
+			),
+			'spacing'    => array(
+				'blockGap' => true,
+				'margin'   => true,
+				'padding'  => true,
+			),
+			'typography' => array(
+				'lineHeight' => true,
+			),
+			'blocks'     => array(
+				'core/paragraph' => array(
+					'typography' => array(
+						'lineHeight' => false,
+					),
+				),
+				'core/group'     => array(
+					'border'     => array(
+						'width'  => true,
+						'style'  => true,
+						'radius' => true,
+						'color'  => true,
+					),
+					'color'      => array(
+						'link' => true,
+					),
+					'spacing'    => array(
+						'blockGap' => true,
+						'margin'   => true,
+						'padding'  => true,
+					),
+					'typography' => array(
+						'lineHeight' => false,
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	function test_get_stylesheet_support_for_shorthand_and_longhand_values() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

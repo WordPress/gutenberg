@@ -81,13 +81,14 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	const VALID_SETTINGS = array(
-		'border'     => array(
+		'appearanceTools' => null,
+		'border'          => array(
 			'color'  => null,
 			'radius' => null,
 			'style'  => null,
 			'width'  => null,
 		),
-		'color'      => array(
+		'color'           => array(
 			'background'       => null,
 			'custom'           => null,
 			'customDuotone'    => null,
@@ -100,18 +101,18 @@ class WP_Theme_JSON_Gutenberg {
 			'palette'          => null,
 			'text'             => null,
 		),
-		'custom'     => null,
-		'layout'     => array(
+		'custom'          => null,
+		'layout'          => array(
 			'contentSize' => null,
 			'wideSize'    => null,
 		),
-		'spacing'    => array(
+		'spacing'         => array(
 			'blockGap' => null,
 			'margin'   => null,
 			'padding'  => null,
 			'units'    => null,
 		),
-		'typography' => array(
+		'typography'      => array(
 			'customFontSize' => null,
 			'dropCap'        => null,
 			'fontFamilies'   => null,
@@ -292,7 +293,8 @@ class WP_Theme_JSON_Gutenberg {
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
-		$this->theme_json    = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$this->theme_json    = self::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = self::get_setting_nodes( $this->theme_json );
@@ -307,6 +309,57 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Enables some opt-in settings if theme declared support.
+	 *
+	 * @param array $theme_json A theme.json structure to modify.
+	 * @return array The modified theme.json structure.
+	 */
+	private static function maybe_opt_in_into_settings( $theme_json ) {
+		$new_theme_json = $theme_json;
+
+		if ( isset( $new_theme_json['settings']['appearanceTools'] ) ) {
+			self::do_opt_in_into_settings( $new_theme_json['settings'] );
+		}
+
+		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
+			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
+				if ( isset( $block['appearanceTools'] ) ) {
+					self::do_opt_in_into_settings( $block );
+				}
+			}
+		}
+
+		return $new_theme_json;
+	}
+
+	/**
+	 * Enables some settings.
+	 *
+	 * @param array $context The context to which the settings belong.
+	 */
+	private static function do_opt_in_into_settings( &$context ) {
+		$to_opt_in = array(
+			array( 'border', 'color' ),
+			array( 'border', 'radius' ),
+			array( 'border', 'style' ),
+			array( 'border', 'width' ),
+			array( 'color', 'link' ),
+			array( 'spacing', 'blockGap' ),
+			array( 'spacing', 'margin' ),
+			array( 'spacing', 'padding' ),
+			array( 'typography', 'lineHeight' ),
+		);
+
+		foreach ( $to_opt_in as $path ) {
+			if ( null === _wp_array_get( $context, $path, null ) ) {
+				_wp_array_set( $context, $path, true );
+			}
+		}
+
+		unset( $context['appearanceTools'] );
 	}
 
 	/**
