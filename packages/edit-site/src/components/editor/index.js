@@ -219,11 +219,7 @@ function Editor( { initialSettings, onError } ) {
 														<ComplementaryArea.Slot scope="core/edit-site" />
 													)
 												}
-												drawer={
-													<NavigationSidebar
-														defaultIsOpen={ false }
-													/>
-												}
+												drawer={ <NavigationSidebar /> }
 												header={
 													<Header
 														openEntitiesSavedStates={
