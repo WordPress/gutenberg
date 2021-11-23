@@ -15,7 +15,7 @@ const WIDE_CONTROLS = [ 'wide', 'full' ];
 
 export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	// Always add the `none` option if not exists.
-	if ( ! controls.includes( 'none' ) ) {
+	if ( controls.length > 0 && ! controls.includes( 'none' ) ) {
 		controls = [ 'none', ...controls ];
 	}
 	const { wideControlsEnabled = false, themeSupportsLayout } = useSelect(
