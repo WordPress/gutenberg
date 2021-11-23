@@ -43,6 +43,7 @@ import { __ } from '@wordpress/i18n';
 import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
+import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
@@ -276,7 +277,7 @@ function Navigation( {
 
 	// Hide the placeholder if an navigation menu entity has loaded.
 	useEffect( () => {
-		setIsPlaceholderShown( ! isEntityAvailable );
+		setIsPlaceholderShown( ! isEntityAvailable || ! hasExistingNavItems );
 	}, [ isEntityAvailable ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
@@ -472,7 +473,7 @@ function Navigation( {
 					</InspectorControls>
 				) }
 				<nav { ...blockProps }>
-					{ ! isEntityAvailable && isPlaceholderShown && (
+					{ isPlaceholderShown && (
 						<PlaceholderComponent
 							onFinish={ ( post, blocks ) => {
 								setIsPlaceholderShown( false );
@@ -488,6 +489,9 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 						/>
+					) }
+					{ ! isEntityAvailable && ! isPlaceholderShown && (
+						<PlaceholderPreview isLoading />
 					) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper
