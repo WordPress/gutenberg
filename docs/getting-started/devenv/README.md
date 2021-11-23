@@ -21,10 +21,10 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ```
 
 Quit and restart terminal
-Install the long-term support (lts) version of node.
+Install Node.js v14.
 
 ```
-nvm install --lts
+nvm install 14
 ```
 
 **2. WordPress Development Site**
@@ -57,7 +57,7 @@ The tools are used to convert the JavaScript we are going to write into a format
 
 For Mac and Linux, it is recommended to use the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Using `nvm` to install node allows installing specific versions, plus installs locally in your home directory and avoids any global permission issues.
 
-For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, the long term support (LTS) version is recommended. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
+For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, v14 is recommended. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
 
 Here are the quick instructions to install using nvm, see the [full installation instructions](https://github.com/nvm-sh/nvm#installing-and-updating) for additional details.
 
@@ -71,16 +71,16 @@ Note: On macOS, the required developer tools are not installed by default, if no
 
 <img src="https://developer.wordpress.org/files/2020/07/git-install-prompt.png" alt="Mac git command requies command line developer tools" width="400" height="195"/>
 
-After installing nvm, you need to use it to install node, to install the LTS version of node, run:
+After installing nvm, you need to use it to install Node.js, to install v14, run:
 
 ```sh
-nvm install --lts
+nvm install 14
 ```
 
 If there is an error running the above command, for example a common error that occurs is:
 
 ```sh
-$ nvm install --lts
+$ nvm install 14
 zsh: command not found: nvm
 ```
 
@@ -93,20 +93,20 @@ On macOS Catalina, the default shell is zsh, to create the profile file type `to
 After creating the profile file, re-run the install command:
 
 ```sh
-nvm install --lts
+nvm install 14
 ```
 
 The important part after installing is being able to use them in your terminal. Open a terminal command-line and type `node -v` and `npm -v` to confirm they are installed.
 
 ```sh
 > node -v
-v12.18.0
+v14.18.1
 
 > npm -v
-6.14.4
+6.14.15
 ```
 
-Your versions may not match exactly, that is fine. The minimum version for node is >= 10.x and for npm >= 6.9x, using the current LTS version will always be supported.
+Your versions may not match exactly, that is fine. The minimum version for Node.js is >= 12 and for npm >= 6.9, using v14 will be supported until upgrade is required.
 
 ## WordPress Development Site
 
@@ -159,6 +159,7 @@ A common issue when running `wp-env` is `Error while running docker-compose comm
 If you see the error: `Host is already in use by another container`
 
 -   The container is already running, or another one is. You can stop an existing container running use `wp-env stop` from the directory you started it.
+- If you do not remember the directory you started wp-env in, you can stop all containers with `docker stop $(docker ps -q)`. Please note, this will stop all containers, use caution with this command.
 
 ### Alternative to Docker
 
@@ -178,7 +179,7 @@ The important part is having a WordPress site installed, and know where and how 
 
 Alternative editors include [Sublime Text](https://www.sublimetext.com/) that is also available across platforms, though is a commercial product; or other free alternatives include [Vim](https://www.vim.org/), [Atom](https://atom.io/), and [Notepad++](https://notepad-plus-plus.org/) all support standard JavaScript style development.
 
-You can use any editor you're comfortable with, it is more a personal preference. The development setup for WordPress block editor is a common JavaScript environment and most editors have plugins and suppport. The key is having a way to open, edit, and save text files.
+You can use any editor you're comfortable with, it is more a personal preference. The development setup for WordPress block editor is a common JavaScript environment and most editors have plugins and support. The key is having a way to open, edit, and save text files.
 
 ## Uninstall - Start Over
 
