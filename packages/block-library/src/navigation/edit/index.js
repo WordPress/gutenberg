@@ -43,12 +43,10 @@ import { __ } from '@wordpress/i18n';
 import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
-import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
-import NavigationMenuPublishButton from './navigation-menu-publish-button';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 
@@ -286,8 +284,7 @@ function Navigation( {
 	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
-	const hasUnsavedBlocks =
-		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
+	const hasUnsavedBlocks = ! isEntityAvailable && ! isWithinUnassignedArea;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks
@@ -356,11 +353,6 @@ function Navigation( {
 						</ToolbarGroup>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
-					{ isDraftNavigationMenu && (
-						<ToolbarGroup>
-							<NavigationMenuPublishButton />
-						</ToolbarGroup>
-					) }
 				</BlockControls>
 				{ listViewModal }
 				<InspectorControls>
@@ -482,9 +474,13 @@ function Navigation( {
 				<nav { ...blockProps }>
 					{ ! isEntityAvailable && isPlaceholderShown && (
 						<PlaceholderComponent
-							onFinish={ ( post ) => {
+							onFinish={ ( post, blocks ) => {
 								setIsPlaceholderShown( false );
-								setNavigationMenuId( post.id );
+								if ( post ) {
+									setNavigationMenuId( post.id );
+								} else {
+									replaceInnerBlocks( clientId, blocks );
+								}
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }
@@ -492,9 +488,6 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 						/>
-					) }
-					{ ! isEntityAvailable && ! isPlaceholderShown && (
-						<PlaceholderPreview isLoading />
 					) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper

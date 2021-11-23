@@ -23,7 +23,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import menuItemsToBlocks from '../../menu-items-to-blocks';
-import NavigationMenuNameModal from '../navigation-menu-name-modal';
 import useNavigationMenu from '../../use-navigation-menu';
 
 const ExistingMenusDropdown = ( {
@@ -100,18 +99,15 @@ export default function NavigationPlaceholder( {
 
 	const [ menuName, setMenuName ] = useState( '' );
 
-	const [ isNewMenuModalVisible, setIsNewMenuModalVisible ] = useState(
-		false
-	);
-
-	const [ createEmpty, setCreateEmpty ] = useState( false );
-
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	// This callback uses data from the two placeholder steps and only creates
 	// a new navigation menu when the user completes the final step.
 	const createNavigationMenu = useCallback(
-		async ( title = __( 'Untitled Navigation Menu' ), blocks = [] ) => {
+		async ( title, blocks = [] ) => {
+			if ( ! title ) {
+				return;
+			}
 			const record = {
 				title,
 				content: serialize( blocks ),
@@ -129,12 +125,15 @@ export default function NavigationPlaceholder( {
 		[ serialize, saveEntityRecord ]
 	);
 
-	const onFinishMenuCreation = async ( navigationMenuTitle, blocks ) => {
+	const onFinishMenuCreation = async (
+		blocks,
+		navigationMenuTitle = null
+	) => {
 		const navigationMenu = await createNavigationMenu(
 			navigationMenuTitle,
 			blocks
 		);
-		onFinish( navigationMenu );
+		onFinish( navigationMenu, blocks );
 	};
 
 	const {
@@ -152,7 +151,7 @@ export default function NavigationPlaceholder( {
 	const createFromMenu = useCallback(
 		( name ) => {
 			const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
-			onFinishMenuCreation( name, blocks );
+			onFinishMenuCreation( blocks, name );
 		},
 		[ menuItems, menuItemsToBlocks, onFinish ]
 	);
@@ -170,14 +169,13 @@ export default function NavigationPlaceholder( {
 		setMenuName( name );
 	};
 
-	const onCreateEmptyMenu = ( name ) => {
-		onFinishMenuCreation( name, [] );
+	const onCreateEmptyMenu = () => {
+		onFinishMenuCreation( [] );
 	};
 
-	const onCreateAllPages = ( name ) => {
+	const onCreateAllPages = () => {
 		const block = [ createBlock( 'core/page-list' ) ];
-		onFinishMenuCreation( name, block );
-		setIsNewMenuModalVisible( true );
+		onFinishMenuCreation( block );
 	};
 
 	useEffect( () => {
@@ -225,10 +223,7 @@ export default function NavigationPlaceholder( {
 								<>
 									<Button
 										variant="tertiary"
-										onClick={ () => {
-											setIsNewMenuModalVisible( true );
-											setCreateEmpty( false );
-										} }
+										onClick={ onCreateAllPages }
 									>
 										{ __( 'Add all pages' ) }
 									</Button>
@@ -237,27 +232,13 @@ export default function NavigationPlaceholder( {
 							) : undefined }
 							<Button
 								variant="tertiary"
-								onClick={ () => {
-									setIsNewMenuModalVisible( true );
-									setCreateEmpty( true );
-								} }
+								onClick={ onCreateEmptyMenu }
 							>
 								{ __( 'Start empty' ) }
 							</Button>
 						</div>
 					</div>
 				</Placeholder>
-			) }
-			{ isNewMenuModalVisible && (
-				<NavigationMenuNameModal
-					title={ __( 'Create your new navigation menu' ) }
-					onRequestClose={ () => {
-						setIsNewMenuModalVisible( false );
-					} }
-					onFinish={
-						createEmpty ? onCreateEmptyMenu : onCreateAllPages
-					}
-				/>
 			) }
 		</>
 	);
