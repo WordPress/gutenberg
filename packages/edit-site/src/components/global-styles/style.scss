@@ -15,6 +15,16 @@
 	}
 }
 
+.edit-site-typography-panel__preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100px;
+	margin-bottom: $grid-unit-20;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+}
+
 .edit-site-global-styles-screen-typography {
 	margin: $grid-unit-20;
 }

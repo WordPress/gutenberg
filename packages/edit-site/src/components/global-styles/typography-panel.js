@@ -99,9 +99,29 @@ export default function TypographyPanel( { name, element } ) {
 		prefix + 'typography.letterSpacing',
 		name
 	);
+	const extraStyles =
+		element === 'link'
+			? {
+					textDecoration: 'underline',
+			  }
+			: {};
 
 	return (
 		<PanelBody className="edit-site-typography-panel" initialOpen={ true }>
+			<div
+				className="edit-site-typography-panel__preview"
+				style={ {
+					fontFamily: fontFamily ?? 'serif',
+					fontSize,
+					fontStyle,
+					fontWeight,
+					letterSpacing,
+					...extraStyles,
+				} }
+			>
+				Aa
+			</div>
+
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }

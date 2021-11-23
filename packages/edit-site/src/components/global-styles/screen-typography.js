@@ -31,7 +31,7 @@ function TextItem( { name, parentMenu } ) {
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
 					style={ {
-						fontFamily,
+						fontFamily: fontFamily ?? 'serif',
 						fontSize,
 						fontStyle,
 						fontWeight,
@@ -81,6 +81,7 @@ function LinkItem( { name, parentMenu } ) {
 						fontStyle,
 						fontWeight,
 						letterSpacing,
+						textDecoration: 'underline',
 					} }
 				>
 					{ __( 'Aa' ) }
