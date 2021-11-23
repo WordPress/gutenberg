@@ -31,7 +31,7 @@ export interface ZStackProps {
 	 */
 	isReversed?: boolean;
 	/**
-	 * The amount of offset between each child element.
+	 * The amount of offset between each child element. The amount of space between each child element. Defaults to `0`. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
 	 *
 	 * @default 0
 	 */
