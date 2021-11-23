@@ -132,6 +132,32 @@ function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
+
+/**
+ * Finds the first non-empty `wp_navigation` Post.
+ *
+ * @return WP_Post|null the first non-empty Navigation or null.
+ */
+function get_non_empty_navigation_post() {
+	$navigation_posts = get_posts(
+		array(
+			'post_type' => 'wp_navigation',
+		)
+	);
+
+	$navigation_post = null;
+
+	// Pick first non-empty Navigation.
+	foreach ( $navigation_posts as $navigation_maybe ) {
+		if ( ! empty( $navigation_maybe->post_content ) ) {
+			$navigation_post = $navigation_maybe;
+			break;
+		}
+	}
+
+	return $navigation_post;
+}
+
 /**
  * Renders the `core/navigation` block on server.
  *
@@ -220,21 +246,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( empty( $inner_blocks ) ) {
 		$is_fallback = true; // indicate we are rendering the fallback.
 
-		$navigation_posts = get_posts(
-			array(
-				'post_type' => 'wp_navigation',
-			)
-		);
-
-		$navigation_post = null;
-
-		// Pick first non-empty Navigation.
-		foreach ( $navigation_posts as $navigation_maybe ) {
-			if ( ! empty( $navigation_maybe->post_content ) ) {
-				$navigation_post = $navigation_maybe;
-				break;
-			}
-		}
+		$navigation_post = get_non_empty_navigation_post();
 
 		// Use non-empty Navigation if available.
 		if ( $navigation_post ) {
