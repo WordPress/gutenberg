@@ -19,7 +19,7 @@ jobs:
         strategy:
             matrix:
                 xcode: ['13.0']
-                device: ['iPhone 12']
+                device: ['iPhone 11']
                 native-test-name: [gutenberg-editor-initial-html]
                 node: ['14']
 
