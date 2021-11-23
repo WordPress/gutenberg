@@ -139,10 +139,15 @@ function block_core_navigation_render_submenu_icon() {
  * @return WP_Post|null the first non-empty Navigation or null.
  */
 function block_core_navigation_get_non_empty_navigation() {
+	// Order and orderby args set to mirror those in `wp_get_nav_menus`
+	// see:
+	// - https://github.com/WordPress/wordpress-develop/blob/ba943e113d3b31b121f77a2d30aebe14b047c69d/src/wp-includes/nav-menu.php#L613-L619.
+	// - https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters.
 	$navigation_posts = get_posts(
 		array(
 			'post_type' => 'wp_navigation',
-			'order'     => 'DESC',
+			'order'     => 'ASC',
+			'orderby'   => 'name',
 		)
 	);
 
