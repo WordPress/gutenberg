@@ -159,6 +159,25 @@ function block_core_navigation_get_non_empty_navigation() {
 }
 
 /**
+ * 'parse_blocks' includes a null block with '\n\n' as the content when
+ * it encounters whitespace. This code strips it.
+ *
+ * @param array $parsed_blocks the parsed blocks to be normalized.
+ * @return array the normalized parsed blocks.
+ */
+function block_core_navigation_normalize_parsed_blocks( $parsed_blocks ) {
+	$filtered = array_filter(
+		$parsed_blocks,
+		function( $block ) {
+			return isset( $block['blockName'] );
+		}
+	);
+
+	// Reset keys.
+	return array_values( $filtered );
+}
+
+/**
  * Retrieves the appropriate fallback to be used on the front of the
  * site when there is no menu assigned to the Nav block.
  *
@@ -181,12 +200,7 @@ function block_core_navigation_get_fallback() {
 
 	// Prefer using the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-		$maybe_fallback = parse_blocks( $navigation_post->post_content );
-
-		// If block is unable to be parsed the parser fallsback to a null blockname. This can happen if the block
-		// in the content is not registered or is invalid.
-		// Add additional safety check to avoid invalid block being treated as valid fallback.
-		$fallback_blocks = ! empty( $maybe_fallback[0] ) && null !== $maybe_fallback[0]['blockName'] ? $maybe_fallback : $fallback_blocks;
+		$fallback_blocks = block_core_navigation_normalize_parsed_blocks( parse_blocks( $navigation_post->post_content ) );
 	}
 
 	return $fallback_blocks;
@@ -264,12 +278,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		// 'parse_blocks' includes a null block with '\n\n' as the content when
 		// it encounters whitespace. This code strips it.
-		$compacted_blocks = array_filter(
-			$parsed_blocks,
-			function( $block ) {
-				return isset( $block['blockName'] );
-			}
-		);
+		$compacted_blocks = block_core_navigation_normalize_parsed_blocks( $parsed_blocks );
 
 		// TODO - this uses the full navigation block attributes for the
 		// context which could be refined.
