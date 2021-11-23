@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -49,10 +50,15 @@ export function DefaultBlockAppender( {
 				// We want this element to be styled as a paragraph by themes.
 				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 				role="button"
-				aria-label={ __( 'Add block' ) }
+				aria-label={ __( 'Add default block' ) }
 				// A wrapping container for this one already has the wp-block className.
 				className="block-editor-default-block-appender__content"
-				onFocus={ onAppend }
+				onKeyDown={ ( event ) => {
+					if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+						onAppend();
+					}
+				} }
+				onClick={ () => onAppend() }
 			>
 				{ showPrompt ? value : ZWNBSP }
 			</p>
