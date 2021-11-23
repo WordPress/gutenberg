@@ -14,7 +14,7 @@ const DEFAULT_CONTROLS = [ 'none', 'left', 'center', 'right', 'wide', 'full' ];
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
 export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
-	// Always add the `none` option if not exists.
+	// If the options list is not empty but is missing the 'none' option add it to the list.
 	if ( controls.length > 0 && ! controls.includes( 'none' ) ) {
 		controls = [ 'none', ...controls ];
 	}
