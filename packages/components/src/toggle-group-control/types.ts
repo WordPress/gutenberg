@@ -19,9 +19,12 @@ export type ToggleGroupControlOptionProps = {
 	 */
 	label: string;
 	/**
-	 * Label for the Tooltip component. If set, determines whether the tooltip is displayed.
+	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
+	 * show the aria-label or the label prop text.
+	 *
+	 * @default false
 	 */
-	tooltipText?: string;
+	showTooltip?: boolean;
 };
 
 export type WithToolTipProps = {
@@ -30,9 +33,15 @@ export type WithToolTipProps = {
 	 */
 	children: ReactNode;
 	/**
-	 * Label for the Tooltip component. If set, determines whether the tooltip is displayed.
+	 * Label for the Tooltip component.
 	 */
-	text?: string;
+	text: string;
+	/**
+	 * Whether to wrap the control option in a Tooltip component.
+	 *
+	 * @default false
+	 */
+	showTooltip?: boolean;
 };
 
 export type ToggleGroupControlProps = Omit<

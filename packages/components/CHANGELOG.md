@@ -6,6 +6,9 @@
 
 -   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
 
+### Enhancements
+-   Added a `showTooltip` prop to `ToggleGroupControlOption` in order to display tooltip text (using `<Tooltip />`). ([36726](https://github.com/WordPress/gutenberg/pull/36726)).
+
 ### Experimental
 
 -   Reinstated the ability to pass additional props to the `ToolsPanel` ([36428](https://github.com/WordPress/gutenberg/pull/36428)).

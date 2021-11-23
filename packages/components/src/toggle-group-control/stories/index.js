@@ -71,9 +71,9 @@ const _default = ( { options } ) => {
 				opt[ 'aria-label' ],
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
-			tooltipText={ text(
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: tooltipText`,
-				opt.tooltipText,
+			showTooltip={ boolean(
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }: showTooltip`,
+				opt.showTooltip,
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
 		/>
@@ -106,13 +106,13 @@ Default.args = {
 	],
 };
 
-export const WithTooltipText = _default.bind( {} );
-WithTooltipText.args = {
+export const WithTooltip = _default.bind( {} );
+WithTooltip.args = {
 	...Default.args,
 	options: [
-		{ value: 1, label: '1', tooltipText: 'One' },
-		{ value: 2, label: '2', tooltipText: 'Two' },
-		{ value: 3, label: '3', tooltipText: 'Three' },
+		{ value: 1, label: '1', showTooltip: true, 'aria-label': 'One' },
+		{ value: 2, label: '2', showTooltip: true, 'aria-label': 'Two' },
+		{ value: 3, label: '3', showTooltip: true, 'aria-label': 'Three' },
 	],
 };
 

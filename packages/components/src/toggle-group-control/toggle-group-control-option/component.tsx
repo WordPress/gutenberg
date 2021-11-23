@@ -9,7 +9,6 @@ import { Radio } from 'reakit';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -28,11 +27,8 @@ import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
 
-const WithToolTip = ( {
-	text,
-	children,
-}: WordPressComponentProps< WithToolTipProps, 'div' > ) => {
-	if ( !! text ) {
+const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
+	if ( showTooltip && text ) {
 		return (
 			<Tooltip text={ text } position="top center">
 				{ children }
@@ -61,7 +57,7 @@ function ToggleGroupControlOption(
 		isBlock = false,
 		label,
 		value,
-		tooltipText,
+		showTooltip = false,
 		...radioProps
 	} = {
 		...toggleGroupControlContext,
@@ -76,14 +72,17 @@ function ToggleGroupControlOption(
 		className,
 		isActive && styles.buttonActive
 	);
+	const optionLabel = !! radioProps[ 'aria-label' ]
+		? radioProps[ 'aria-label' ]
+		: label;
 
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
-			<WithToolTip text={ tooltipText }>
+			<WithToolTip showTooltip={ showTooltip } text={ optionLabel }>
 				<Radio
 					{ ...radioProps }
 					as="button"
-					aria-label={ radioProps[ 'aria-label' ] ?? label }
+					aria-label={ optionLabel }
 					className={ classes }
 					data-value={ value }
 					ref={ forwardedRef }
