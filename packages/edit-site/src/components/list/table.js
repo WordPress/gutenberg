@@ -109,8 +109,7 @@ export default function Table( { templateType } ) {
 					>
 						<td className="edit-site-list-table-column" role="cell">
 							<a
-								href={ addQueryArgs( '', {
-									page: 'gutenberg-edit-site',
+								href={ addQueryArgs( window.location.href, {
 									postId: template.id,
 									postType: template.type,
 								} ) }
