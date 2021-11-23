@@ -12,6 +12,7 @@ import styled from '@emotion/styled';
  */
 import { typography, chevronRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -133,6 +134,7 @@ const ItemWithChevron = ( {
 	alwaysVisible,
 	...otherProps
 } ) => {
+	const isRtlLayout = isRTL();
 	const cx = useCx();
 
 	const appearingChevron = css`
@@ -151,8 +153,9 @@ const ItemWithChevron = ( {
 			cx( css`
 				display: block;
 				fill: currentColor;
+				transform: ${ isRtlLayout ? 'scaleX( -100% )' : 'none' };
 			` ),
-		[]
+		[ isRtlLayout ]
 	);
 
 	return (
