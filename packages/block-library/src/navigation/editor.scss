@@ -216,6 +216,15 @@ $color-control-label-height: 20px;
 	background: none;
 	min-height: 0;
 
+	// Inherit orientation.
+	&,
+	.components-placeholder__fieldset,
+	.wp-block-navigation-placeholder__controls,
+	.wp-block-navigation-placeholder__preview,
+	.wp-block-navigation-placeholder__actions {
+		flex-direction: inherit;
+	}
+
 	// Needed for the preview menu items to match actual menu items.
 	.components-placeholder__fieldset {
 		font-size: inherit;
@@ -284,6 +293,8 @@ $color-control-label-height: 20px;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
+	flex-direction: row;
+	align-items: flex-start;
 	display: none;
 	position: relative;
 	z-index: 1;
