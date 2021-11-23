@@ -310,10 +310,14 @@ add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );
  * @return string The HTML.
  */
 function _gutenberg_maybe_remove_emoji_detection_script( $html ) {
-	// Detect all 4-byte characters.
-	// Not all 4-byte characters are emojis, but this casts a wide net
+	$multi3  = '(?:[\xE0-\xEF]..)';
+	$multi4  = '(?:[\xF0-\xF4]...)';
+	$anychar = "(?:$multi4|$multi3)";
+
+	// Detect all 3-byte and 4-byte characters.
+	// Not all 3/4-byte characters are emojis, but this casts a wide net
 	// to check if it's safe to remove the emojis script.
-	preg_match( '/[\x{10000}-\x{1FFFF}]/u', $html, $matches );
+	preg_match( "/$anychar/", $html, $match );
 
 	// If there are no 4-byte characters, it's safe to remove the emoji script.
 	if ( empty( $matches ) ) {
