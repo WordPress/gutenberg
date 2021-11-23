@@ -9,6 +9,11 @@
 		},
 		"settingsProperties": {
 			"properties": {
+				"appearanceTools": {
+					"description": "Setting that enables ui tools. \nGutenberg plugin required.",
+					"type": "boolean",
+					"default": false
+				},
 				"border": {
 					"description": "Settings related to borders.\nGutenberg plugin required.",
 					"type": "object",
