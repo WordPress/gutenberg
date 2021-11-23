@@ -5,7 +5,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { InterfaceSkeleton } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
-import { useViewportMatch } from '@wordpress/compose';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
@@ -18,7 +17,6 @@ import Table from './table';
 
 export default function List( { templateType } ) {
 	useRegisterShortcuts();
-	const isDesktopViewport = useViewportMatch( 'medium' );
 
 	const { previousShortcut, nextShortcut } = useSelect( ( select ) => {
 		return {
@@ -64,8 +62,8 @@ export default function List( { templateType } ) {
 			header={ <Header templateType={ templateType } /> }
 			drawer={
 				<NavigationSidebar
-					defaultIsOpen={ isDesktopViewport }
 					activeTemplateType={ templateType }
+					isDefaultOpen
 				/>
 			}
 			content={

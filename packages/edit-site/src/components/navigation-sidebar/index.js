@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,10 +17,25 @@ export const {
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
 export default function NavigationSidebar( {
-	defaultIsOpen = false,
+	isDefaultOpen = false,
 	activeTemplateType,
 } ) {
-	const [ isNavigationOpen, setIsNavigationOpen ] = useState( defaultIsOpen );
+	const isDesktopViewport = useViewportMatch( 'medium' );
+	const [ isNavigationOpen, setIsNavigationOpen ] = useState(
+		isDefaultOpen && isDesktopViewport
+	);
+
+	useEffect( () => {
+		// When transitioning to desktop open the navigation if `isDefaultOpen` is true.
+		if ( isDefaultOpen && isDesktopViewport ) {
+			setIsNavigationOpen( true );
+		}
+
+		// When transitioning to mobile/tablet, close the navigation.
+		if ( ! isDesktopViewport ) {
+			setIsNavigationOpen( false );
+		}
+	}, [ isDefaultOpen, isDesktopViewport ] );
 
 	return (
 		<>
