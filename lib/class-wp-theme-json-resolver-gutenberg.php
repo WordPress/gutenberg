@@ -394,8 +394,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	private static function get_file_path_from_theme( $file_name, $template = false ) {
 		$path      = $template ? get_template_directory() : get_stylesheet_directory();
 		$candidate = $path . '/' . $file_name;
-
-		return is_readable( $candidate ) ? $candidate : '';
+		/**
+		 * Filters whether the current theme has theme.json file or not.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param string Whether the current theme has an theme.json or not.
+		 */
+		return apply_filters( 'get_file_path_from_theme', is_readable( $candidate ) ? $candidate : '' );
 	}
 
 	/**

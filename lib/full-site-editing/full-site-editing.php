@@ -11,7 +11,14 @@
  * @return boolean Whether the current theme is an FSE theme or not.
  */
 function gutenberg_is_fse_theme() {
-	return is_readable( get_theme_file_path( '/block-templates/index.html' ) );
+	/**
+	 * Filters whether the current theme has enabled FSE support or not.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param boolean Whether the current theme is an FSE theme or not.
+	 */
+	return apply_filters( 'gutenberg_is_fse_theme', is_readable( get_theme_file_path( '/block-templates/index.html' ) ) );
 }
 
 /**
