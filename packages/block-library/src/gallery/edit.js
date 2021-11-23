@@ -125,7 +125,10 @@ function GalleryEdit( props ) {
 
 	const wasBlockJustInserted = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).wasBlockJustInserted( clientId, 'inserter_menu' );
+			return select( blockEditorStore ).wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			);
 		},
 		[ clientId ]
 	);
