@@ -45,14 +45,12 @@ export function useSetting( path, blockName, source = 'all' ) {
 		? `settings.${ path }`
 		: `settings.blocks.${ blockName }.${ path }`;
 
-		console.log( {mergedConfig, userConfig });
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
 			const newUserConfig = cloneDeep( currentConfig );
 			const pathToSet = PATHS_WITH_MERGE[ path ]
 				? fullPath + '.custom'
 				: fullPath;
-			console.log('setSetting', { pathToSet, newValue });
 			set( newUserConfig, pathToSet, newValue );
 
 			return newUserConfig;
