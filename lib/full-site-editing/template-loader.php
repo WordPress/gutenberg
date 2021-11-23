@@ -180,7 +180,16 @@ function gutenberg_get_the_template_html() {
 
 	// Wrap block template in .wp-site-blocks to allow for specific descendant styles
 	// (e.g. `.wp-site-blocks > *`).
-	return '<div class="wp-site-blocks">' . $content . '</div>';
+	$content = '<div class="wp-site-blocks">' . $content . '</div>';
+
+	/**
+	 * Filters the markup for the current template.
+	 *
+	 * @param string $result The markup for the current template.
+	 *
+	 * @return string The markup for the current template.
+	 */
+	return apply_filters( 'template_html', $content );
 }
 
 /**
@@ -291,3 +300,27 @@ function gutenberg_get_edit_template_link( $link, $post_id ) {
 	return admin_url( sprintf( $edit_link, urlencode( $template->id ), $template->type ) );
 }
 add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );
+
+/**
+ * Checks the HTML to be rendered for any emojis.
+ * If there are none, then the emoji script is removed from the `<head>`.
+ *
+ * @param string $html The HTML to be rendered.
+ *
+ * @return string The HTML.
+ */
+function _gutenberg_maybe_remove_emoji_detection_script( $html ) {
+	// Detect all 4-byte characters.
+	// Not all 4-byte characters are emojis, but this casts a wide net
+	// to check if it's safe to remove the emojis script.
+	preg_match( '/[\x{10000}-\x{1FFFF}]/u', $html, $matches );
+
+	// If there are no 4-byte characters, it's safe to remove the emoji script.
+	if ( empty( $matches ) ) {
+		remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	}
+
+	return $html;
+}
+add_filter( 'template_html', '_gutenberg_maybe_remove_emoji_detection_script', 20 );
+
