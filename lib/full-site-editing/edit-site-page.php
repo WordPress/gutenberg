@@ -86,13 +86,16 @@ function gutenberg_edit_site_list_init( $settings ) {
 	wp_enqueue_style( 'wp-edit-site' );
 	wp_enqueue_media();
 
-	$template_type = $_GET['postType'];
-	$post_type     = get_post_type_object( $template_type );
+	$post_type = get_post_type_object( $_GET['postType'] );
+
+	if ( ! $post_type ) {
+		wp_die( __( 'Invalid post type.', 'gutenberg' ) );
+	}
 
 	$preload_data = array_reduce(
 		array(
 			'/',
-			"/wp/v2/types/$template_type?context=edit",
+			"/wp/v2/types/$post_type->name?context=edit",
 			'/wp/v2/types?context=edit',
 			"/wp/v2/$post_type->rest_base?context=edit",
 		),
@@ -116,7 +119,7 @@ function gutenberg_edit_site_list_init( $settings ) {
 				wp.editSite.initializeList( "%s", "%s", %s );
 			} );',
 			'edit-site-editor',
-			$template_type,
+			$post_type->name,
 			wp_json_encode( $settings )
 		)
 	);
