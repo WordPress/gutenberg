@@ -1373,12 +1373,10 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		$to_replace   = array();
 		$to_replace[] = array( 'spacing', 'units' );
-		foreach ( self::VALID_ORIGINS as $origin ) {
-			$to_replace[] = array( 'color', 'duotone', $origin );
-			$to_replace[] = array( 'color', 'palette', $origin );
-			$to_replace[] = array( 'color', 'gradients', $origin );
-			$to_replace[] = array( 'typography', 'fontSizes', $origin );
-			$to_replace[] = array( 'typography', 'fontFamilies', $origin );
+		foreach ( self::PRESETS_METADATA as $metadata ) {
+			foreach ( self::VALID_ORIGINS as $origin ) {
+				$to_replace[] = array_merge( $metadata['path'], array( $origin ) );
+			}
 		}
 
 		$nodes = self::get_setting_nodes( $this->theme_json );
