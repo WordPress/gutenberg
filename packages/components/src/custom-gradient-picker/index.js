@@ -98,6 +98,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 			labelPosition="top"
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
+			size="__unstable-large"
 			value={ hasGradient && type }
 		/>
 	);

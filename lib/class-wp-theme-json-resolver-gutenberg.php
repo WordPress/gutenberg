@@ -117,7 +117,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$config     = self::read_json_file( __DIR__ . '/theme.json' );
 		$config     = self::translate( $config );
-		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'core' );
+		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
 		return self::$core;
 	}
@@ -157,7 +157,32 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		* So we take theme supports, transform it to theme.json shape
 		* and merge the self::$theme upon that.
 		*/
-		$theme_support_data  = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
+		if ( ! self::theme_has_support() ) {
+			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
+				$theme_support_data['settings']['color'] = array();
+			}
+
+			$default_palette = false;
+			if ( current_theme_supports( 'default-color-palette' ) ) {
+				$default_palette = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['color']['palette'] ) ) {
+				// If the theme does not have any palette, we still want to show the core one.
+				$default_palette = true;
+			}
+			$theme_support_data['settings']['color']['defaultPalette'] = $default_palette;
+
+			$default_gradients = false;
+			if ( current_theme_supports( 'default-gradient-presets' ) ) {
+				$default_gradients = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['color']['gradients'] ) ) {
+				// If the theme does not have any gradients, we still want to show the core ones.
+				$default_gradients = true;
+			}
+			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
+		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( self::$theme );
 
@@ -237,7 +262,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
 				trigger_error( 'Error when decoding a theme.json schema for user data. ' . json_last_error_msg() );
-				return new WP_Theme_JSON_Gutenberg( $config, 'user' );
+				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 			}
 
 			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
@@ -251,15 +276,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'user' );
+		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 
 		return self::$user;
 	}
 
 	/**
 	 * There are three sources of data (origins) for a site:
-	 * core, theme, and user. The user's has higher priority
-	 * than the theme's, and the theme's higher than core's.
+	 * default, theme, and custom. The custom's has higher priority
+	 * than the theme's, and the theme's higher than defaults's.
 	 *
 	 * Unlike the getters {@link get_core_data},
 	 * {@link get_theme_data}, and {@link get_user_data},
@@ -273,17 +298,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * the user preference wins.
 	 *
 	 * @param string $origin To what level should we merge data.
-	 *                       Valid values are 'theme' or 'user'.
-	 *                       Default is 'user'.
+	 *                       Valid values are 'theme' or 'custom'.
+	 *                       Default is 'custom'.
 	 *
 	 * @return WP_Theme_JSON_Gutenberg
 	 */
-	public static function get_merged_data( $origin = 'user' ) {
+	public static function get_merged_data( $origin = 'custom' ) {
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( self::get_core_data() );
 		$result->merge( self::get_theme_data() );
 
-		if ( 'user' === $origin ) {
+		if ( 'custom' === $origin ) {
 			$result->merge( self::get_user_data() );
 		}
 

@@ -42,12 +42,14 @@ export default function AnglePickerControl( {
 					max={ 360 }
 					min={ 0 }
 					onChange={ handleOnNumberChange }
+					size="__unstable-large"
 					step="1"
 					value={ value }
 					hideHTMLArrows
 					suffix={
 						<Spacer
 							as={ Text }
+							marginBottom={ 0 }
 							marginRight={ space( 3 ) }
 							style={ {
 								color: 'var( --wp-admin-theme-color )',

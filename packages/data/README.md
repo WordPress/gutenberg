@@ -164,43 +164,33 @@ Integrating an existing redux store with its own reducers, store enhancers and m
 _Example:_
 
 ```js
+import { mapValues } from 'lodash';
+import { register } from '@wordpress/data';
 import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
-import { registerGenericStore } from 'wordpress/data';
-
 const reduxStore = createStore();
 
-const mappedSelectors = Object.keys( existingSelectors ).reduce(
-	( acc, selectorKey ) => {
-		acc[ selectorKey ] = ( ...args ) =>
-			existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
-		return acc;
-	},
-	{}
+const boundSelectors = mapValues(
+	existingSelectors,
+	( selector ) => ( ...args ) => selector( reduxStore.getState(), ...args )
 );
 
-const mappedActions = Object.keys( existingActions ).reduce(
-	( acc, actionKey ) => {
-		acc[ actionKey ] = ( ...args ) =>
-			reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
-		return acc;
-	},
-	{}
+const boundActions = mapValues( existingActions, ( action ) => ( ...args ) =>
+	reduxStore.dispatch( action( ...args ) )
 );
 
 const genericStore = {
-	getSelectors() {
-		return mappedSelectors;
-	},
-	getActions() {
-		return mappedActions;
-	},
-	subscribe: reduxStore.subscribe,
+	name: 'existing-app',
+	instantiate: () => ( {
+		getSelectors: () => boundSelectors,
+		getActions: () => boundActions,
+		subscribe: reduxStore.subscribe,
+	} ),
 };
 
-registerGenericStore( 'existing-app', genericStore );
+register( genericStore );
 ```
 
 It is also possible to implement a completely custom store from scratch:
@@ -208,39 +198,49 @@ It is also possible to implement a completely custom store from scratch:
 _Example:_
 
 ```js
-import { registerGenericStore } from '@wordpress/data';
+import { register } from '@wordpress/data';
 
-function createCustomStore() {
-	let storeChanged = () => {};
-	const prices = { hammer: 7.5 };
-
-	const selectors = {
-		getPrice( itemName ) {
-			return prices[ itemName ];
-		},
-	};
-
-	const actions = {
-		setPrice( itemName, price ) {
-			prices[ itemName ] = price;
-			storeChanged();
-		},
-	};
-
+function customStore() {
 	return {
-		getSelectors() {
-			return selectors;
-		},
-		getActions() {
-			return actions;
-		},
-		subscribe( listener ) {
-			storeChanged = listener;
+		name: 'custom-data',
+		instantiate: () => {
+			const listeners = new Set();
+			const prices = { hammer: 7.5 };
+
+			function storeChanged() {
+				for ( const listener of listeners ) {
+					listener();
+				}
+			}
+
+			function subscribe( listener ) {
+				listeners.add( listener );
+				return () => listeners.delete( listener );
+			}
+
+			const selectors = {
+				getPrice( itemName ) {
+					return prices[ itemName ];
+				},
+			};
+
+			const actions = {
+				setPrice( itemName, price ) {
+					prices[ itemName ] = price;
+					storeChanged();
+				},
+			};
+
+			return {
+				getSelectors: () => selectors,
+				getActions: () => actions,
+				subscribe,
+			};
 		},
 	};
 }
 
-registerGenericStore( 'custom-data', createCustomStore() );
+register( customStore );
 ```
 
 ## Comparison with Redux

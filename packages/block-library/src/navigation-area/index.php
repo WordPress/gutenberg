@@ -2,6 +2,7 @@
 /**
  * Server-side rendering of the `core/navigation-area` block.
  *
+ * @deprecated 5.9.0 See https://github.com/WordPress/gutenberg/issues/36524
  * @package WordPress
  */
 

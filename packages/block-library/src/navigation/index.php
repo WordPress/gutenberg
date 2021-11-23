@@ -142,6 +142,8 @@ function block_core_navigation_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
+
+	$is_fallback = false;
 	/**
 	 * Deprecated:
 	 * The rgbTextColor and rgbBackgroundColor attributes
@@ -214,8 +216,17 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 	}
 
+	// If there are no inner blocks then fallback to rendering the Page List block.
 	if ( empty( $inner_blocks ) ) {
-		return '';
+		$is_fallback                      = true; // indicate we are rendering the fallback.
+		$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
+
+		$page_list_block = array(
+			'blockName' => 'core/page-list',
+			'attrs'     => array(),
+		);
+
+		$inner_blocks = new WP_Block_List( array( $page_list_block ), $attributes );
 	}
 
 	// Restore legacy classnames for submenu positioning.
@@ -234,7 +245,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
 		$is_responsive_menu ? array( 'is-responsive' ) : array(),
-		$layout_class ? array( $layout_class ) : array()
+		$layout_class ? array( $layout_class ) : array(),
+		$is_fallback ? array( 'is-fallback' ) : array()
 	);
 
 	$inner_blocks_html = '';

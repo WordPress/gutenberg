@@ -50,6 +50,9 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						const {
 							ownerDocument: { documentElement },
 						} = bodyElement;
+						documentElement.classList.add(
+							'block-editor-block-preview__content-iframe'
+						);
 						documentElement.style.position = 'absolute';
 						documentElement.style.width = '100%';
 						bodyElement.style.padding =
