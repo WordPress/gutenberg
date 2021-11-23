@@ -82,23 +82,24 @@ const NavigationPanel = ( { isOpen, setIsOpen, activeTemplateType } ) => {
 							<NavigationGroup title={ __( 'Editor' ) }>
 								<NavigationItem
 									title={ __( 'Site' ) }
-									href={ addQueryArgs( '', {
-										page: 'gutenberg-edit-site',
+									href={ addQueryArgs( window.location.href, {
+										postId: undefined,
+										postType: undefined,
 									} ) }
 								/>
 								<NavigationItem
 									title={ __( 'Templates' ) }
 									item="wp_template"
-									href={ addQueryArgs( '', {
-										page: 'gutenberg-edit-site',
+									href={ addQueryArgs( window.location.href, {
+										postId: undefined,
 										postType: 'wp_template',
 									} ) }
 								/>
 								<NavigationItem
 									title={ __( 'Template Parts' ) }
 									item="wp_template_part"
-									href={ addQueryArgs( '', {
-										page: 'gutenberg-edit-site',
+									href={ addQueryArgs( window.location.href, {
+										postId: undefined,
 										postType: 'wp_template_part',
 									} ) }
 								/>

@@ -95,8 +95,7 @@ export default function Table( { templateType } ) {
 					<HStack className="edit-site-list-table-row">
 						<FlexItem className="edit-site-list-table-column">
 							<a
-								href={ addQueryArgs( '', {
-									page: 'gutenberg-edit-site',
+								href={ addQueryArgs( window.location.href, {
 									postId: template.id,
 									postType: template.type,
 								} ) }
