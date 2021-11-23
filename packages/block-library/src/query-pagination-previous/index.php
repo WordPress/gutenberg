@@ -20,10 +20,12 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	$paged    = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
-	$wrapper_attributes = get_block_wrapper_attributes();
-	$default_label      = __( 'Previous Page' );
-	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-	$pagination_arrow   = get_query_pagination_arrow( $block, false );
+	$wrapper_attributes        = get_block_wrapper_attributes();
+	$hidden_wrapper_attributes = get_block_wrapper_attributes( array( 'aria-hidden' => 'true' ) );
+	$default_label             = __( 'Previous Page' );
+	$label                     = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
+	$pagination_arrow          = get_query_pagination_arrow( $block, false );
+	
 	if ( $pagination_arrow ) {
 		$label = $pagination_arrow . $label;
 	}
@@ -43,7 +45,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 			// Prints the link only if there are pages to paginate.
 			$content = $max_page > 1 ? sprintf(
 				'<span %1$s>%2$s</span>',
-				$wrapper_attributes,
+				$hidden_wrapper_attributes,
 				$label
 			) : '';
 		}
@@ -56,7 +58,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 			$label
 		) : sprintf(
 			'<span %1$s>%2$s</span>',
-			$wrapper_attributes,
+			$hidden_wrapper_attributes,
 			$label
 		);
 
