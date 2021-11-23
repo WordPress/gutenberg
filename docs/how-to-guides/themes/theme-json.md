@@ -1086,3 +1086,27 @@ A few notes about this process:
 	}
 }
 ```
+
+### What is blockGap and how can I use it?
+
+blockGap adjusts the vertical margin, or gap, between blocks.
+It is also used for margins between inner blocks in columns, buttons, and social icons.
+In the editor, the control for the blockGap is called Block spacing, located in the Dimensions panel.
+
+The value you define for the blockGap style uses a CSS property, a preset, named `--wp--style--block-gap`.
+The default value is 2em.
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"spacing": {
+			"blockGap": true,
+		}
+	},
+	"styles": {
+		"spacing": {
+			"blockGap": "1.5rem"
+		}
+	}
+}
