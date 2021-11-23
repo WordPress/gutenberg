@@ -168,19 +168,25 @@ function block_core_navigation_get_non_empty_navigation() {
  * @return array the array of blocks to be used as a fallback.
  */
 function block_core_navigation_get_fallback() {
+
+	// Default to a list of Pages.
+	$fallback_blocks = array(
+		array(
+			'blockName' => 'core/page-list',
+			'attrs'     => array(),
+		),
+	);
+
 	$navigation_post = block_core_navigation_get_non_empty_navigation();
 
-	// Use non-empty Navigation if available.
+	// Prefer using the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-		$fallback_blocks = parse_blocks( $navigation_post->post_content );
-	} else {
-		// Requires wrapping array.
-		$fallback_blocks = array(
-			array(
-				'blockName' => 'core/page-list',
-				'attrs'     => array(),
-			),
-		);
+		$maybe_fallback = parse_blocks( $navigation_post->post_content );
+
+		// If block is unable to be parsed the parser fallsback to a null blockname. This can happen if the block
+		// in the content is not registered or is invalid.
+		// Add additional safety check to avoid invalid block being treated as valid fallback.
+		$fallback_blocks = ! empty( $maybe_fallback[0] ) && null !== $maybe_fallback[0]['blockName'] ? $maybe_fallback : $fallback_blocks;
 	}
 
 	return $fallback_blocks;
