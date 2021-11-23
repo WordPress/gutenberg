@@ -275,6 +275,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 	}
 
+	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to work.
+	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+		$attributes['ref'] = $attributes['navigationMenuId'];
+	}
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
 		$navigation_post = get_post( $attributes['ref'] );
