@@ -54,6 +54,7 @@ function NavigationAreaBlock( { attributes, setAttributes } ) {
 
 	deprecated( 'wp.blockLibrary.NavigationArea', {
 		since: '5.9',
+		plugin: 'gutenberg',
 	} );
 
 	return (
