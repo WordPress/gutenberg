@@ -317,6 +317,9 @@ function _gutenberg_maybe_remove_emoji_detection_script( $html ) {
 	// Detect all 3-byte and 4-byte characters.
 	// Not all 3/4-byte characters are emojis, but this casts a wide net
 	// to check if it's safe to remove the emojis script.
+	// This regex should be improved in the future to be more precice,
+	// but even this wide net should be enough to remove the script
+	// in a lot of sites that don't need it.
 	preg_match( "/$anychar/", $html, $match );
 
 	// If there are no 4-byte characters, it's safe to remove the emoji script.
