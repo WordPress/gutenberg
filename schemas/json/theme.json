@@ -578,6 +578,11 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				}
 			},
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				}
+			},
 			"additionalProperties": false
 		},
 		"settingsCustomAdditionalProperties": {
@@ -1032,6 +1037,11 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/widget-group": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				}
+			},
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				}
 			},
