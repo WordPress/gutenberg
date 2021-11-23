@@ -6,21 +6,10 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   data-root-client-id=""
 >
   <p
-    aria-label="Add block"
+    aria-label="Add default block"
     className="block-editor-default-block-appender__content"
-    onFocus={
-      [MockFunction] {
-        "calls": Array [
-          Array [],
-        ],
-        "results": Array [
-          Object {
-            "type": "return",
-            "value": undefined,
-          },
-        ],
-      }
-    }
+    onClick={[Function]}
+    onKeyDown={[Function]}
     role="button"
     tabIndex="0"
   >
@@ -40,9 +29,10 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   data-root-client-id=""
 >
   <p
-    aria-label="Add block"
+    aria-label="Add default block"
     className="block-editor-default-block-appender__content"
-    onFocus={[MockFunction]}
+    onClick={[Function]}
+    onKeyDown={[Function]}
     role="button"
     tabIndex="0"
   >
@@ -62,9 +52,10 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   data-root-client-id=""
 >
   <p
-    aria-label="Add block"
+    aria-label="Add default block"
     className="block-editor-default-block-appender__content"
-    onFocus={[MockFunction]}
+    onClick={[Function]}
+    onKeyDown={[Function]}
     role="button"
     tabIndex="0"
   >

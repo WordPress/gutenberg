@@ -29,7 +29,7 @@ describe( 'DefaultBlockAppender', () => {
 			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
 		);
 
-		wrapper.find( 'p' ).simulate( 'focus' );
+		wrapper.find( 'p' ).simulate( 'click' );
 
 		expect( wrapper ).toMatchSnapshot();
 
