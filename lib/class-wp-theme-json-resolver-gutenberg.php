@@ -262,7 +262,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
 				trigger_error( 'Error when decoding a theme.json schema for user data. ' . json_last_error_msg() );
-				return new WP_Theme_JSON_Gutenberg( $config, 'user' );
+				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 			}
 
 			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
@@ -276,14 +276,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'user' );
+		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 
 		return self::$user;
 	}
 
 	/**
 	 * There are three sources of data (origins) for a site:
-	 * default, theme, and user. The user's has higher priority
+	 * default, theme, and custom. The custom's has higher priority
 	 * than the theme's, and the theme's higher than defaults's.
 	 *
 	 * Unlike the getters {@link get_core_data},
@@ -298,17 +298,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * the user preference wins.
 	 *
 	 * @param string $origin To what level should we merge data.
-	 *                       Valid values are 'theme' or 'user'.
-	 *                       Default is 'user'.
+	 *                       Valid values are 'theme' or 'custom'.
+	 *                       Default is 'custom'.
 	 *
 	 * @return WP_Theme_JSON_Gutenberg
 	 */
-	public static function get_merged_data( $origin = 'user' ) {
+	public static function get_merged_data( $origin = 'custom' ) {
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( self::get_core_data() );
 		$result->merge( self::get_theme_data() );
 
-		if ( 'user' === $origin ) {
+		if ( 'custom' === $origin ) {
 			$result->merge( self::get_user_data() );
 		}
 

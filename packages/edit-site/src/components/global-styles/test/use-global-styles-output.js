@@ -206,7 +206,7 @@ describe( 'global styles renderer', () => {
 				settings: {
 					color: {
 						palette: {
-							user: [
+							custom: [
 								{
 									name: 'White',
 									slug: 'white',

@@ -37,7 +37,7 @@ class WP_Theme_JSON_Gutenberg {
 	const VALID_ORIGINS = array(
 		'default',
 		'theme',
-		'user',
+		'custom',
 	);
 
 	const VALID_TOP_LEVEL_KEYS = array(
@@ -281,7 +281,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Constructor.
 	 *
 	 * @param array  $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin What source of data this object represents. One of default, theme, or user. Default: theme.
+	 * @param string $origin What source of data this object represents. One of default, theme, or custom. Default: theme.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
 		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
@@ -1265,7 +1265,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
-	 * @param array $origins A list of origins to include. By default it includes 'default', 'theme', and 'user'.
+	 * @param array $origins A list of origins to include. By default it includes 'default', 'theme', and 'custom'.
 	 *
 	 * @return string Stylesheet.
 	 */

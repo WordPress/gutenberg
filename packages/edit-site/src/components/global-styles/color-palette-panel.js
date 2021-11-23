@@ -32,7 +32,7 @@ export default function ColorPalettePanel( { name } ) {
 		'base'
 	);
 	const [ customColors, setCustomColors ] = useSetting(
-		'color.palette.user',
+		'color.palette.custom',
 		name
 	);
 
