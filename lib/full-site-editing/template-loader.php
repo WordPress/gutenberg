@@ -320,7 +320,7 @@ function _gutenberg_maybe_remove_emoji_detection_script( $html ) {
 	// This regex should be improved in the future to be more precice,
 	// but even this wide net should be enough to remove the script
 	// in a lot of sites that don't need it.
-	preg_match( "/$anychar/", $html, $match );
+	preg_match( "/$anychar/", $html, $matches );
 
 	// If there are no 4-byte characters, it's safe to remove the emoji script.
 	if ( empty( $matches ) ) {
