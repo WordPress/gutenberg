@@ -138,7 +138,7 @@ function block_core_navigation_render_submenu_icon() {
  *
  * @return WP_Post|null the first non-empty Navigation or null.
  */
-function get_non_empty_navigation_post() {
+function block_core_navigation_get_non_empty_navigation() {
 	$navigation_posts = get_posts(
 		array(
 			'post_type' => 'wp_navigation',
@@ -167,8 +167,8 @@ function get_non_empty_navigation_post() {
  *
  * @return array the array of blocks to be used as a fallback.
  */
-function get_fallback() {
-	$navigation_post = get_non_empty_navigation_post();
+function block_core_navigation_get_fallback() {
+	$navigation_post = block_core_navigation_get_non_empty_navigation();
 
 	// Use non-empty Navigation if available.
 	if ( $navigation_post ) {
@@ -275,7 +275,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$is_fallback                      = true; // indicate we are rendering the fallback.
 		$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
 
-		$fallback_blocks = get_fallback();
+		$fallback_blocks = block_core_navigation_get_fallback();
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
 	}
