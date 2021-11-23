@@ -218,8 +218,8 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$raw_config                       = json_decode( $post->post_content, true );
 		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
-		$config;
-		if( $is_global_styles_user_theme_json ) {
+		$config                           = array();
+		if ( $is_global_styles_user_theme_json ) {
 			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, 'user' ) )->get_raw_data();
 		}
 
