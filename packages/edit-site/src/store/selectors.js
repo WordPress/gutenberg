@@ -309,10 +309,9 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			templateId
 		);
 
-		const templateParts = select( coreDataStore ).getEntityRecords(
-			'postType',
-			'wp_template_part'
-		);
+		const templateParts = select(
+			coreDataStore
+		).getEntityRecords( 'postType', 'wp_template_part', { per_page: -1 } );
 		const templatePartsById = keyBy(
 			templateParts,
 			( templatePart ) => templatePart.id
