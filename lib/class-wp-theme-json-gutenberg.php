@@ -1379,17 +1379,98 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
+		/**
+		 * We need to remove the incoming presets that have the same slug
+		 * than an existing default preset. This is the list of slugs present
+		 * in the global config we'll use to filter the incoming slugs.
+		 */
+		$slugs_global = self::get_slugs_from_path( $this->theme_json );
+
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
 			foreach ( $to_replace as $property_path ) {
 				$path = array_merge( $metadata['path'], $property_path );
 				$node = _wp_array_get( $incoming_data, $path, null );
 				if ( isset( $node ) ) {
+					if ( 'theme' === $path[ count( $path ) - 1 ] ) {
+						$slugs_for_context = self::get_slugs_from_path( $this->theme_json, $metadata['path'] );
+						$slugs_to_filter   = array_merge_recursive( $slugs_global, $slugs_for_context );
+						$node              = self::filter_slugs( $node, $property_path, $slugs_to_filter );
+					}
 					_wp_array_set( $this->theme_json, $path, $node );
 				}
 			}
 		}
 
+	}
+
+	/**
+	 * Returns the slugs for all the presets in the given path
+	 * as an associative array whose keys are the preset paths.
+	 *
+	 * For example:
+	 *
+	 * array(
+	 *   'color' => array(
+	 *     'palette'   => array( 'slug-1', 'slug-2' ),
+	 *     'gradients' => array( 'slug-3', 'slug-4' ),
+	 *   ),
+	 *   'typography' => array(
+	 *     'fontSizes' => array( 'slug-5', 'slug-6'),
+	 *   )
+	 * )
+	 *
+	 * @param array $data A theme.json like structure to inspect.
+	 * @param array $node_path The path to inspect. It's 'settings' by default.
+	 *
+	 * @return array An associative array containing the slugs for the given path.
+	 */
+	private static function get_slugs_from_path( $data, $node_path = array( 'settings' ) ) {
+		$slugs = array();
+		foreach ( self::PRESETS_METADATA as $metadata ) {
+			$slugs_for_preset = array();
+			$path             = array_merge( $node_path, $metadata['path'], array( 'default' ) );
+			$preset           = _wp_array_get( $data, $path, null );
+			if ( isset( $preset ) ) {
+				$slugs_for_preset = array_map(
+					function( $value ) {
+						return isset( $value['slug'] ) ? $value['slug'] : null;
+					},
+					$preset
+				);
+			}
+			_wp_array_set( $slugs, $metadata['path'], $slugs_for_preset );
+		}
+
+		return $slugs;
+	}
+
+	/**
+	 * Removes the preset values whose slug is equal to any of default presets.
+	 *
+	 * @param array $node The node with the presets to validate.
+	 * @param array $path The path to the preset to inspect.
+	 * @param array $slugs The slugs to remove.
+	 *
+	 * @return array The new node
+	 */
+	private static function filter_slugs( $node, $path, $slugs ) {
+		// The path comes with the origin as the last key (default, theme, custom),
+		// so we remove it first.
+		array_pop( $path );
+		$slugs_for_preset = _wp_array_get( $slugs, $path, array() );
+		if ( empty( $slugs_for_preset ) ) {
+			return $node;
+		}
+
+		$new_node = array();
+		foreach ( $node as $value ) {
+			if ( isset( $value['slug'] ) && ! in_array( $value['slug'], $slugs_for_preset, true ) ) {
+				$new_node[] = $value;
+			}
+		}
+
+		return $new_node;
 	}
 
 	/**
