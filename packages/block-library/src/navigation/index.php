@@ -142,6 +142,7 @@ function block_core_navigation_get_non_empty_navigation() {
 	$navigation_posts = get_posts(
 		array(
 			'post_type' => 'wp_navigation',
+			'order'     => 'DESC',
 		)
 	);
 
@@ -159,8 +160,10 @@ function block_core_navigation_get_non_empty_navigation() {
 }
 
 /**
+ * Filter out empty "null" blocks from the block list.
  * 'parse_blocks' includes a null block with '\n\n' as the content when
- * it encounters whitespace. This code strips it.
+ * it encounters whitespace. This is not a bug but rather how the parser
+ * is designed.
  *
  * @param array $parsed_blocks the parsed blocks to be normalized.
  * @return array the normalized parsed blocks.
