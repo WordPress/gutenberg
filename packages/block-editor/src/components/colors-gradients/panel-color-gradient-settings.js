@@ -172,7 +172,7 @@ const PanelColorGradientSettingsSingleSelect = ( props ) => {
 
 const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 	const colorGradientSettings = useCommonSingleMultipleSelects();
-	const customColors = useSetting( 'color.palette.user' );
+	const customColors = useSetting( 'color.palette.custom' );
 	const themeColors = useSetting( 'color.palette.theme' );
 	const defaultColors = useSetting( 'color.palette.default' );
 	const shouldDisplayDefaultColors = useSetting( 'color.defaultPalette' );
@@ -213,7 +213,7 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 		return result;
 	}, [ defaultColors, themeColors, customColors ] );
 
-	const customGradients = useSetting( 'color.gradients.user' );
+	const customGradients = useSetting( 'color.gradients.custom' );
 	const themeGradients = useSetting( 'color.gradients.theme' );
 	const defaultGradients = useSetting( 'color.gradients.default' );
 	const shouldDisplayDefaultGradients = useSetting(

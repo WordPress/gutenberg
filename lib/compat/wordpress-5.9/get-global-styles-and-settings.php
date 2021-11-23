@@ -27,7 +27,7 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 	}
 
-	$origin = 'user';
+	$origin = 'custom';
 	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
 		$origin = 'theme';
 	}
@@ -59,7 +59,7 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 	}
 
-	$origin = 'user';
+	$origin = 'custom';
 	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
 		$origin = 'theme';
 	}
@@ -105,7 +105,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		$types = array( 'variables', 'styles', 'presets' );
 	}
 
-	$origins = array( 'default', 'theme', 'user' );
+	$origins = array( 'default', 'theme', 'custom' );
 	if ( ! $supports_theme_json && ! $supports_link_color ) {
 		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
 		$origins = array( 'default' );
