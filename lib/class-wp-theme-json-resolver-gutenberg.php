@@ -13,49 +13,6 @@
 class WP_Theme_JSON_Resolver_Gutenberg {
 
 	/**
-	 * Container for data coming from core.
-	 *
-	 * @var WP_Theme_JSON_Gutenberg
-	 */
-	private static $core = null;
-
-	/**
-	 * Container for data coming from the theme.
-	 *
-	 * @var WP_Theme_JSON_Gutenberg
-	 */
-	private static $theme = null;
-
-	/**
-	 * Whether or not the theme supports theme.json.
-	 *
-	 * @var boolean
-	 */
-	private static $theme_has_support = null;
-
-	/**
-	 * Container for data coming from the user.
-	 *
-	 * @var WP_Theme_JSON_Gutenberg
-	 */
-	private static $user = null;
-
-	/**
-	 * Stores the ID of the custom post type
-	 * that holds the user data.
-	 *
-	 * @var integer
-	 */
-	private static $user_custom_post_type_id = null;
-
-	/**
-	 * Container to keep loaded i18n schema for `theme.json`.
-	 *
-	 * @var Array
-	 */
-	private static $i18n_schema = null;
-
-	/**
 	 * Processes a file that adheres to the theme.json
 	 * schema and returns an array with its contents,
 	 * or a void array if none found.
@@ -97,12 +54,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array Returns the modified $theme_json_structure.
 	 */
 	private static function translate( $theme_json, $domain = 'default' ) {
-		if ( null === self::$i18n_schema ) {
-			$i18n_schema       = gutenberg_json_file_decode( __DIR__ . '/theme-i18n.json' );
-			self::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
+		$i18n_schema = wp_cache_get( 'theme_json_i18n_schema' );
+		if ( false === $i18n_schema ) {
+			$i18n_schema = gutenberg_json_file_decode( __DIR__ . '/theme-i18n.json' );
+			$i18n_schema = ( null === $i18n_schema ) ? array() : $i18n_schema;
+			wp_cache_set( 'theme_json_i18n_schema', $i18n_schema );
 		}
 
-		return gutenberg_translate_settings_using_i18n_schema( self::$i18n_schema, $theme_json, $domain );
+		return gutenberg_translate_settings_using_i18n_schema( $i18n_schema, $theme_json, $domain );
 	}
 
 	/**
@@ -111,15 +70,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds core data.
 	 */
 	public static function get_core_data() {
-		if ( null !== self::$core ) {
-			return self::$core;
+		$cached = wp_cache_get( 'theme_json_core' );
+		if ( $cached ) {
+			return $cached;
 		}
 
-		$config     = self::read_json_file( __DIR__ . '/theme.json' );
-		$config     = self::translate( $config );
-		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
+		$config = self::read_json_file( __DIR__ . '/theme.json' );
+		$config = self::translate( $config );
+		$config = new WP_Theme_JSON_Gutenberg( $config, 'default' );
+		wp_cache_set( 'theme_json_core', $config );
 
-		return self::$core;
+		return $config;
 	}
 
 	/**
@@ -133,10 +94,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
 	public static function get_theme_data() {
-		if ( null === self::$theme ) {
+		$theme_json_data = wp_cache_get( 'theme_json_theme' );
+		if ( ! $theme_json_data ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			self::$theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			$theme_json_data = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
 				// Get parent theme.json.
@@ -146,16 +108,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 				// Merge the child theme.json into the parent theme.json.
 				// The child theme takes precedence over the parent.
-				$parent_theme->merge( self::$theme );
-				self::$theme = $parent_theme;
+				$parent_theme->merge( $theme_json_data );
+				$theme_json_data = $parent_theme;
 			}
+			wp_cache_set( 'theme_json_theme', $theme_json_data );
 		}
 
 		/*
 		* We want the presets and settings declared in theme.json
 		* to override the ones declared via theme supports.
 		* So we take theme supports, transform it to theme.json shape
-		* and merge the self::$theme upon that.
+		* and merge the theme's theme.json into that.
 		*/
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_default_block_editor_settings() );
 		if ( ! self::theme_has_support() ) {
@@ -184,7 +147,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
-		$with_theme_supports->merge( self::$theme );
+		$with_theme_supports->merge( $theme_json_data );
 
 		return $with_theme_supports;
 	}
@@ -250,8 +213,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds user data.
 	 */
 	public static function get_user_data() {
-		if ( null !== self::$user ) {
-			return self::$user;
+		$config = wp_cache_get( 'theme_json_user' );
+		if ( false !== $config ) {
+			return $config;
 		}
 
 		$config   = array();
@@ -276,9 +240,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
-
-		return self::$user;
+		$config = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+		wp_cache_set( 'theme_json_user', $config );
+		return $config;
 	}
 
 	/**
@@ -349,19 +313,22 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Returns the ID of the custom post type
 	 * that stores user data.
 	 *
-	 * @return integer
+	 * @return integer|null;
 	 */
 	public static function get_user_custom_post_type_id() {
-		if ( null !== self::$user_custom_post_type_id ) {
-			return self::$user_custom_post_type_id;
+		$cached_id = wp_cache_get( 'theme_json_user_cpt_id' );
+		if ( false !== $cached_id ) {
+			return $cached_id;
 		}
 
-		$user_cpt = self::get_user_data_from_custom_post_type( true );
+		$user_cpt_id = null;
+		$user_cpt    = self::get_user_data_from_custom_post_type( true );
 		if ( array_key_exists( 'ID', $user_cpt ) ) {
-			self::$user_custom_post_type_id = $user_cpt['ID'];
+			$user_cpt_id = $user_cpt['ID'];
+			wp_cache_set( 'theme_json_user_cpt_id', $user_cpt_id );
 		}
 
-		return self::$user_custom_post_type_id;
+		return $user_cpt_id;
 	}
 
 	/**
@@ -370,14 +337,20 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return boolean
 	 */
 	public static function theme_has_support() {
-		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = (
-				is_readable( self::get_file_path_from_theme( 'theme.json' ) ) ||
-				is_readable( self::get_file_path_from_theme( 'theme.json', true ) )
-			);
+		$found       = null;
+		$has_support = wp_cache_get( 'theme_json_has_support', '', false, $found );
+		if ( null !== $found ) {
+			return $has_support;
 		}
 
-		return self::$theme_has_support;
+		$has_support = (
+			is_readable( self::get_file_path_from_theme( 'theme.json' ) ) ||
+			is_readable( self::get_file_path_from_theme( 'theme.json', true ) )
+		);
+
+		wp_cache_set( 'theme_json_has_support', $has_support );
+
+		return $has_support;
 	}
 
 	/**
@@ -402,12 +375,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Cleans the cached data so it can be recalculated.
 	 */
 	public static function clean_cached_data() {
-		self::$core                     = null;
-		self::$theme                    = null;
-		self::$user                     = null;
-		self::$user_custom_post_type_id = null;
-		self::$theme_has_support        = null;
-		self::$i18n_schema              = null;
+		wp_cache_delete( 'theme_json_core' );
+		wp_cache_delete( 'theme_json_theme' );
+		wp_cache_delete( 'theme_json_user' );
+		wp_cache_delete( 'theme_json_user_cpt_id' );
+		wp_cache_delete( 'theme_json_has_support' );
+		wp_cache_delete( 'theme_json_i18n_schema' );
 	}
 
 }
