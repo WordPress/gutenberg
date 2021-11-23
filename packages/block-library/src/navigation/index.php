@@ -275,7 +275,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 	}
 
-	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to work.
+	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
 	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
 		$attributes['ref'] = $attributes['navigationMenuId'];
 	}
