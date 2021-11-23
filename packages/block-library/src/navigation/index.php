@@ -159,6 +159,34 @@ function get_non_empty_navigation_post() {
 }
 
 /**
+ * Retrieves the appropriate fallback to be used on the front of the
+ * site when there is no menu assigned to the Nav block.
+ *
+ * This aims to mirror how the fallback mechanic for wp_nav_menu works.
+ * See https://developer.wordpress.org/reference/functions/wp_nav_menu/#more-information.
+ *
+ * @return array the array of blocks to be used as a fallback.
+ */
+function get_fallback() {
+	$navigation_post = get_non_empty_navigation_post();
+
+	// Use non-empty Navigation if available.
+	if ( $navigation_post ) {
+		$fallback_blocks = parse_blocks( $navigation_post->post_content );
+	} else {
+		// Requires wrapping array.
+		$fallback_blocks = array(
+			array(
+				'blockName' => 'core/page-list',
+				'attrs'     => array(),
+			),
+		);
+	}
+
+	return $fallback_blocks;
+}
+
+/**
  * Renders the `core/navigation` block on server.
  *
  * @param array $attributes The block attributes.
@@ -242,26 +270,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 	}
 
-	// If there are no inner blocks then fallback to rendering the Page List block.
+	// If there are no inner blocks then fallback to rendering an appropriate fallback.
 	if ( empty( $inner_blocks ) ) {
-		$is_fallback = true; // indicate we are rendering the fallback.
+		$is_fallback                      = true; // indicate we are rendering the fallback.
+		$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
 
-		$navigation_post = get_non_empty_navigation_post();
-
-		// Use non-empty Navigation if available.
-		if ( $navigation_post ) {
-			$fallback_blocks = parse_blocks( $navigation_post->post_content );
-		} else {
-			$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
-
-			// Requires wrapping array.
-			$fallback_blocks = array(
-				array(
-					'blockName' => 'core/page-list',
-					'attrs'     => array(),
-				),
-			);
-		}
+		$fallback_blocks = get_fallback();
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
 	}
