@@ -115,6 +115,7 @@ describe( 'selectors', () => {
 				focusMode: false,
 				hasFixedToolbar: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
+				__experimentalReusableBlocks: [],
 			} );
 		} );
 
@@ -129,12 +130,14 @@ describe( 'selectors', () => {
 				},
 			};
 			const setInserterOpened = () => {};
+
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				outlineMode: true,
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
 				__experimentalSetIsInserterOpened: setInserterOpened,
+				__experimentalReusableBlocks: [],
 				mediaUpload: expect.any( Function ),
 			} );
 		} );
