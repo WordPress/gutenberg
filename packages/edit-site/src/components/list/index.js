@@ -67,7 +67,9 @@ export default function List( { templateType } ) {
 
 	return (
 		<InterfaceSkeleton
-			className="edit-site-list"
+			className={ classnames( 'edit-site-list', {
+				'is-navigation-open': isNavigationOpen,
+			} ) }
 			labels={ {
 				drawer: __( 'Navigation Sidebar' ),
 				...detailedRegionLabels,
@@ -79,15 +81,7 @@ export default function List( { templateType } ) {
 					isDefaultOpen
 				/>
 			}
-			notices={
-				<div
-					className={ classnames( 'edit-site-list-snackbars', {
-						'is-navigation-open': isNavigationOpen,
-					} ) }
-				>
-					<EditorSnackbars />
-				</div>
-			}
+			notices={ <EditorSnackbars /> }
 			content={
 				<main className="edit-site-list-main">
 					<Table templateType={ templateType } />
