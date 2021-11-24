@@ -96,6 +96,7 @@
 	}
 }
 
+
 /**
  * Colors Selector component
  */
@@ -179,9 +180,28 @@ $color-control-label-height: 20px;
 	justify-content: flex-start;
 }
 
+
 /**
  * Setup state
  */
+
+// Loading state.
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.wp-block-navigation-placeholder__actions.is-loading {
+	animation: loadingpulse 1s linear infinite;
+	animation-delay: 0.5s; // avoid animating for fast network responses
+}
 
 // Unstyle some inherited placeholder component styles.
 .components-placeholder.wp-block-navigation-placeholder {
@@ -206,87 +226,19 @@ $color-control-label-height: 20px;
 	.is-selected & {
 		color: $gray-900;
 	}
-}
 
-// Spinner.
-.wp-block-navigation-placeholder .components-spinner {
-	margin-top: -4px;
-	margin-left: 4px;
-	vertical-align: middle;
-	margin-right: 7px;
-}
+	// Hide most placeholder content until selected.
+	.wp-block-navigation-placeholder__actions > * {
+		display: none;
 
-@keyframes loadingpulse {
-	0% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.5;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-// Unselected state.
-.wp-block-navigation-placeholder__preview {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	flex-wrap: nowrap;
-	width: 100%;
-	overflow: hidden;
-
-	&.is-loading {
-		animation: loadingpulse 1s linear infinite;
-		animation-delay: 0.5s; // avoid animating for fast network responses
-	}
-
-	// Style skeleton elements to mostly match the metrics of actual menu items.
-	// Needs specificity.
-	.wp-block-navigation-item.wp-block-navigation-item {
-		position: relative;
-		min-width: 72px;
-
-		&::before {
-			display: block;
-			content: "";
-			border-radius: $radius-block-ui;
-			background: currentColor;
-			height: $grid-unit-20;
-			width: 100%;
-		}
-	}
-
-	.wp-block-navigation-placeholder__preview-search-icon {
-		height: $icon-size;
-		svg {
-			fill: currentColor;
-		}
-	}
-
-	.wp-block-navigation-item.wp-block-navigation-item,
-	.wp-block-navigation-placeholder__preview-search-icon {
-		opacity: 0.3;
-	}
-
-	&:not(.is-loading) {
-		// Don't show the preview boxes for an empty nav block,
-		// but be technically present to help size the empty state.
-		.wp-block-navigation.is-selected & {
+		.is-selected & {
 			display: flex;
-			opacity: 0;
-			width: 0;
-			overflow: hidden;
-			flex-wrap: nowrap;
-			flex: 0;
 		}
+	}
 
-		// Hide entirely when vertical.
-		.wp-block-navigation.is-selected .is-small &,
-		.wp-block-navigation.is-selected .is-medium & {
-			display: none;
-		}
+	// Always show the block logo.
+	.wp-block-navigation-placeholder__actions__indicator {
+		display: flex;
 	}
 }
 
@@ -298,9 +250,13 @@ $color-control-label-height: 20px;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	flex-direction: row;
 	align-items: center;
-	display: none;
 	position: relative;
 	z-index: 1;
+
+	// Unhide actions when selected.
+	.wp-block-navigation-placeholder__actions > * {
+		display: flex;
+	}
 
 	// Adjust padding for when shown horizontally.
 	.is-large & {
