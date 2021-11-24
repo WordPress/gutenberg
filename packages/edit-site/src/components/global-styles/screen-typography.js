@@ -20,7 +20,6 @@ import TypographyPanel from './typography-panel';
 
 function TextItem( { name, parentMenu } ) {
 	const [ fontFamily ] = useStyle( 'typography.fontFamily', name );
-	const [ fontSize ] = useStyle( 'typography.fontSize', name );
 	const [ fontStyle ] = useStyle( 'typography.fontStyle', name );
 	const [ fontWeight ] = useStyle( 'typography.fontWeight', name );
 	const [ letterSpacing ] = useStyle( 'typography.letterSpacing', name );
@@ -32,7 +31,6 @@ function TextItem( { name, parentMenu } ) {
 					className="edit-site-global-styles-screen-typography__indicator"
 					style={ {
 						fontFamily: fontFamily ?? 'serif',
-						fontSize,
 						fontStyle,
 						fontWeight,
 						letterSpacing,
@@ -52,7 +50,6 @@ function LinkItem( { name, parentMenu } ) {
 		'elements.link.typography.fontFamily',
 		name
 	);
-	const [ fontSize ] = useStyle( 'elements.link.typography.fontSize', name );
 	const [ fontStyle ] = useStyle(
 		'elements.link.typography.fontStyle',
 		name
@@ -77,7 +74,6 @@ function LinkItem( { name, parentMenu } ) {
 					className="edit-site-global-styles-screen-typography__indicator"
 					style={ {
 						fontFamily,
-						fontSize,
 						fontStyle,
 						fontWeight,
 						letterSpacing,
