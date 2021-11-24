@@ -567,6 +567,7 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
 		$template->status         = $post->post_status;
 		$template->has_theme_file = $has_theme_file;
 		$template->is_custom      = true;
+		$template->post_author    = $post->post_author;
 
 		if ( 'wp_template' === $post->post_type && isset( $default_template_types[ $template->slug ] ) ) {
 			$template->is_custom = false;

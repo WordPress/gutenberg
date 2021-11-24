@@ -94,4 +94,11 @@ class WP_Block_Template {
 	 * @var bool
 	 */
 	public $is_custom = true;
+
+	/**
+	 * Author.
+	 *
+	 * @var int
+	 */
+	public $post_author = 0;
 }
