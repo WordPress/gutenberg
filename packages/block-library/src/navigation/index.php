@@ -187,7 +187,6 @@ function block_core_navigation_normalize_parsed_blocks( $parsed_blocks ) {
  * @return array the array of blocks to be used as a fallback.
  */
 function block_core_navigation_get_fallback() {
-
 	// Default to a list of Pages.
 	$fallback_blocks = array(
 		array(
