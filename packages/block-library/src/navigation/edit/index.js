@@ -277,7 +277,7 @@ function Navigation( {
 
 	// Hide the placeholder if an navigation menu entity has loaded.
 	useEffect( () => {
-		setIsPlaceholderShown( ! isEntityAvailable || ! hasExistingNavItems );
+		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
@@ -476,12 +476,10 @@ function Navigation( {
 				<nav { ...blockProps }>
 					{ isPlaceholderShown && (
 						<PlaceholderComponent
-							onFinish={ ( post, blocks ) => {
+							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
 								if ( post ) {
 									setNavigationMenuId( post.id );
-								} else {
-									replaceInnerBlocks( clientId, blocks );
 								}
 								selectBlock( clientId );
 							} }
