@@ -11,6 +11,8 @@
 -   Reinstated the ability to pass additional props to the `ToolsPanel` ([36428](https://github.com/WordPress/gutenberg/pull/36428)).
 -   Added an `__unstable-large` size variant to `InputControl`, `SelectControl`, and `UnitControl` for selective migration to the larger 40px heights. ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
 -   Fixed inconsistent padding in `UnitControl` ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+-   Added support for RTL behavior for the `ZStack`'s `offset` prop ([#36769](https://github.com/WordPress/gutenberg/pull/36769))
+-   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([36588](https://github.com/WordPress/gutenberg/pull/36588)).
 
 ### Bug Fix
 
