@@ -269,7 +269,6 @@ describe( 'Preview with Custom Fields enabled', () => {
 		// Add an initial title and content.
 		await editorPage.type( '.editor-post-title__input', 'title 1' );
 		await editorPage.keyboard.press( 'Tab' );
-		await editorPage.keyboard.press( 'Enter' );
 		await editorPage.keyboard.type( 'content 1' );
 
 		// Publish the post and then close the publish panel.
