@@ -303,7 +303,8 @@ class WP_Theme_JSON_Gutenberg {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
-					if ( 'user' !== $origin || isset( $preset[0] ) ) {
+					// If the preset is not already keyed by origin.
+					if ( isset( $preset[0] ) || empty( $preset ) ) {
 						_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
 					}
 				}
