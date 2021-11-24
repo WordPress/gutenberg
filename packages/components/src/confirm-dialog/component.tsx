@@ -39,16 +39,16 @@ function ConfirmDialog(
 	} = useContextSystem( props, 'ConfirmDialog' );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
-	const [ selfClose, setSelfClose ] = useState< boolean >();
+	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
 
 	useEffect( () => {
 		// We only allow the dialog to close itself if `isOpenProp` is *not* set.
 		// If `isOpenProp` is set, then it (probably) means it's controlled by a
-		// parent component. In that case, `selfClose` might do more harm than
+		// parent component. In that case, `shouldSelfClose` might do more harm than
 		// good, so we disable it.
 		const isIsOpenSet = typeof isOpenProp !== 'undefined';
 		setIsOpen( isIsOpenSet ? isOpenProp : true );
-		setSelfClose( ! isIsOpenSet );
+		setShouldSelfClose( ! isIsOpenSet );
 	}, [ isOpenProp ] );
 
 	const handleEvent = ( callback?: ( event: DialogInputEvent ) => void ) => (
@@ -56,7 +56,7 @@ function ConfirmDialog(
 	) => {
 		// `onCancel` is optional
 		callback?.( event );
-		if ( selfClose ) {
+		if ( shouldSelfClose ) {
 			setIsOpen( false );
 		}
 	};
