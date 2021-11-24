@@ -1419,7 +1419,6 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 			}
-
 		}
 
 	}
