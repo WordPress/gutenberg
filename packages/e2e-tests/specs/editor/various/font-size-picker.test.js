@@ -8,6 +8,7 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	activateTheme,
+	openTypographyToolsPanelMenu,
 } from '@wordpress/e2e-test-utils';
 
 const openFontSizeSelectControl = async () => {
@@ -15,13 +16,6 @@ const openFontSizeSelectControl = async () => {
 		"//div[contains(@class, 'components-font-size-picker__controls')]//button[contains(@class, 'components-custom-select-control__button')]";
 	const selectControl = await page.waitForXPath( selectControlSelector );
 	return selectControl.click();
-};
-
-const openTypographyToolsPanelMenu = async () => {
-	const toggleSelector =
-		"//div[contains(@class, 'typography-block-support-panel')]//button[contains(@class, 'components-dropdown-menu__toggle')]";
-	const toggle = await page.waitForXPath( toggleSelector );
-	return toggle.click();
 };
 
 const FONT_SIZE_TOGGLE_GROUP_SELECTOR =

@@ -84,6 +84,7 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		await siteEditor.visit( { postId: id, postType: 'page' } );
+		await siteEditor.disableWelcomeGuide();
 
 		let i = 3;
 

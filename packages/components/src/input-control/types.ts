@@ -23,12 +23,14 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
 
 export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 
+export type Size = 'default' | 'small' | '__unstable-large';
+
 interface BaseProps {
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	hideLabelFromVision?: boolean;
 	isFocused: boolean;
 	labelPosition?: LabelPosition;
-	size?: 'default' | 'small';
+	size?: Size;
 }
 
 export type InputChangeCallback<

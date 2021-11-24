@@ -293,7 +293,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$locations = $this->get_menu_locations( $term->term_id );
 		$rest_base = 'menu-locations';
 		foreach ( $locations as $location ) {
-			$url                                        = rest_url( sprintf( '__experimental/%s/%s', $rest_base, $location ) );
+			$url                                        = rest_url( sprintf( 'wp/v2/%s/%s', $rest_base, $location ) );
 			$links['https://api.w.org/menu-location'][] = array(
 				'href'       => $url,
 				'embeddable' => true,

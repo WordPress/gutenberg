@@ -182,7 +182,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 			) . '<span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>' .
 			'</button>';
 		} else {
-			$markup .= '<a class="wp-block-pages-list__item__link' . $navigation_child_content_class . ' "href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . wp_kses(
+			$markup .= '<a class="wp-block-pages-list__item__link' . $navigation_child_content_class . '" href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . wp_kses(
 				$page['title'],
 				wp_kses_allowed_html( 'post' )
 			) . '</a>';
@@ -292,6 +292,10 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$css_classes     = trim( implode( ' ', $classes ) );
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
+
+	if ( array_key_exists( '__unstableMaxPages', $block->context ) ) {
+		$nested_pages = array_slice( $nested_pages, 0, $block->context['__unstableMaxPages'] );
+	}
 
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 

@@ -90,9 +90,10 @@ export default function TemplateDetails( { template, onClose } ) {
 
 			<Button
 				className="edit-site-template-details__show-all-button"
-				href={ addQueryArgs( 'edit.php', {
+				href={ addQueryArgs( window.location.href, {
 					// TODO: We should update this to filter by template part's areas as well.
-					post_type: template.type,
+					postId: undefined,
+					postType: template.type,
 				} ) }
 			>
 				{ sprintf(

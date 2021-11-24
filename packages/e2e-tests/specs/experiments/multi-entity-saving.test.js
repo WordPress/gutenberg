@@ -244,6 +244,7 @@ describe( 'Multi-entity save flow', () => {
 				postId: 'tt1-blocks//index',
 				postType: 'wp_template',
 			} );
+			await siteEditor.disableWelcomeGuide();
 
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
