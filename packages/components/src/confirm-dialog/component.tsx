@@ -73,13 +73,16 @@ function ConfirmDialog(
 		[ handleEvent, onConfirm ]
 	);
 
+	const cancelLabel = __( 'Cancel' );
+	const confirmLabel = __( 'OK' );
+
 	return (
 		<>
 			{ isOpen && (
 				<Modal
 					onRequestClose={ handleEvent( onCancel ) }
 					onKeyDown={ handleEnter }
-					closeButtonLabel={ __( 'Cancel' ) }
+					closeButtonLabel={ cancelLabel }
 					isDismissible={ true }
 					ref={ forwardedRef }
 					showTitle={ false }
@@ -92,13 +95,13 @@ function ConfirmDialog(
 								variant="tertiary"
 								onClick={ handleEvent( onCancel ) }
 							>
-								{ __( 'Cancel' ) }
+								{ cancelLabel }
 							</Button>
 							<Button
 								variant="primary"
 								onClick={ handleEvent( onConfirm ) }
 							>
-								{ __( 'OK' ) }
+								{ confirmLabel }
 							</Button>
 						</Flex>
 					</VStack>
