@@ -1394,7 +1394,7 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		$slugs_global = self::get_slugs_not_to_override( $this->theme_json );
 
-		$nodes = self::get_setting_nodes( $this->theme_json );
+		$nodes = self::get_setting_nodes( $incoming_data );
 		foreach ( $nodes as $metadata ) {
 			foreach ( $to_replace as $property_path ) {
 				$path = array_merge( $metadata['path'], $property_path );
