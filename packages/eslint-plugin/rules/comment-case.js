@@ -55,7 +55,8 @@ module.exports = {
 						nextComment &&
 						nextComment.type === 'Line' &&
 						nextComment.loc.start.line ===
-							comment.loc.start.line + 1;
+							comment.loc.start.line + 1 &&
+						! codeBeforeComment( sourceCode, nextComment );
 					const isPrecededDirectlyByLineComment =
 						previousComment &&
 						! codeBeforeComment( sourceCode, comment ) &&
