@@ -138,7 +138,7 @@ function block_core_navigation_render_submenu_icon() {
  *
  * @return WP_Post|null the first non-empty Navigation or null.
  */
-function block_core_navigation_get_non_empty_navigation() {
+function block_core_navigation_get_first_non_empty_navigation() {
 	// Order and orderby args set to mirror those in `wp_get_nav_menus`
 	// see:
 	// - https://github.com/WordPress/wordpress-develop/blob/ba943e113d3b31b121f77a2d30aebe14b047c69d/src/wp-includes/nav-menu.php#L613-L619.
@@ -165,7 +165,7 @@ function block_core_navigation_get_non_empty_navigation() {
  * @param array $parsed_blocks the parsed blocks to be normalized.
  * @return array the normalized parsed blocks.
  */
-function block_core_navigation_normalize_parsed_blocks( $parsed_blocks ) {
+function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 	$filtered = array_filter(
 		$parsed_blocks,
 		function( $block ) {
@@ -186,7 +186,7 @@ function block_core_navigation_normalize_parsed_blocks( $parsed_blocks ) {
  *
  * @return array the array of blocks to be used as a fallback.
  */
-function block_core_navigation_get_fallback() {
+function block_core_navigation_get_fallback_blocks() {
 	// Default to a list of Pages.
 	$fallback_blocks = array(
 		array(
@@ -195,11 +195,11 @@ function block_core_navigation_get_fallback() {
 		),
 	);
 
-	$navigation_post = block_core_navigation_get_non_empty_navigation();
+	$navigation_post = block_core_navigation_get_first_non_empty_navigation();
 
 	// Prefer using the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-		$maybe_fallback = block_core_navigation_normalize_parsed_blocks( parse_blocks( $navigation_post->post_content ) );
+		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
 
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 		// In this case default to the (Page List) fallback.
@@ -284,7 +284,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		// 'parse_blocks' includes a null block with '\n\n' as the content when
 		// it encounters whitespace. This code strips it.
-		$compacted_blocks = block_core_navigation_normalize_parsed_blocks( $parsed_blocks );
+		$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
 		// TODO - this uses the full navigation block attributes for the
 		// context which could be refined.
@@ -296,7 +296,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$is_fallback                      = true; // indicate we are rendering the fallback.
 		$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
 
-		$fallback_blocks = block_core_navigation_get_fallback();
+		$fallback_blocks = block_core_navigation_get_fallback_blocks();
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
 	}
