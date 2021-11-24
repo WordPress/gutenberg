@@ -25,12 +25,13 @@ function Actions( { template, onClose } ) {
 	return (
 		<MenuGroup>
 			<MenuItem
+				isDestructive
 				onClick={ () => {
 					removeTemplate( template );
 					onClose();
 				} }
 			>
-				{ __( 'Remove template' ) }
+				{ __( 'Delete template' ) }
 			</MenuItem>
 		</MenuGroup>
 	);
