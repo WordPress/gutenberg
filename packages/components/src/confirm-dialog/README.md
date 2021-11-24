@@ -126,5 +126,3 @@ The callback that's called when the user cancels. A cancellation can happen when
 It's not required if `isOpen` is not set (uncontrolled mode), as the component will take care of closing itself, but you can still pass a callback if something must be done upon cancelling (the component will still close itself in this case).
 
 If `isOpen` is set (controlled mode), then it's required, and you need to set the state that defines `isOpen` to `false` as part of this callback if you want the dialog to close when the user cancels.
-
-`isOpen` is set when its value is `boolean` (`true` or `false`) and not set if it's `undefined`.
