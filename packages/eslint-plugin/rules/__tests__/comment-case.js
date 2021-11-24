@@ -41,11 +41,25 @@ ruleTester.run( 'comment-case', rule, {
 			code: `// translators: some translation hint`,
 		},
 		{
+			code: `// Ends with URL https://github.com/WordPress/gutenberg`,
+		},
+		{
+			code: `// https://github.com/WordPress/gutenberg`,
+		},
+		{
+			code: `// https://github.com/WordPress/gutenberg starts with URL.`,
+		},
+		{
 			code: `const someVar = 1; // Describe the var.`,
 		},
 		{
 			code: `// My period ending comment
 			// that runs on to the next line.`,
+		},
+		{
+			code: `const codeOnLine = true; // Disable reason: valid-sprintf applies to \`@wordpress/i18n\` where
+// strings are expected to need to be extracted, and thus variables are
+// not allowed. This string will not need to be extracted.`,
 		},
 		{
 			code: `// A few.
