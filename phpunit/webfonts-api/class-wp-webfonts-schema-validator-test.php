@@ -33,10 +33,11 @@ class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 		return array(
 			'basic schema' => array(
 				array(
-					'provider'    => 'google',
+					'provider'    => 'local',
 					'font-family' => 'Open Sans',
 					'font-style'  => 'normal',
 					'font-weight' => '400',
+					'src'         => 'https://example.com/open-sans-400.woff2',
 				),
 			),
 		);
@@ -189,13 +190,13 @@ class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 		return array(
 			'basic schema'                   => array(
 				'webfont'  => array(
-					'provider'    => 'google',
+					'provider'    => 'local',
 					'font-family' => 'Open Sans',
 					'font-style'  => 'normal',
 					'font-weight' => '400',
 				),
 				'expected' => array(
-					'provider'     => 'google',
+					'provider'     => 'local',
 					'font-family'  => 'Open Sans',
 					'font-style'   => 'normal',
 					'font-weight'  => '400',
@@ -207,10 +208,10 @@ class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 					'font-weight' => '400',
 					'font-style'  => 'normal',
 					'font-family' => 'Open Sans',
-					'provider'    => 'google',
+					'provider'    => 'local',
 				),
 				'expected' => array(
-					'provider'     => 'google',
+					'provider'     => 'local',
 					'font-family'  => 'Open Sans',
 					'font-style'   => 'normal',
 					'font-weight'  => '400',
@@ -312,7 +313,7 @@ class WP_Webfonts_Schema_Validator_Test extends WP_UnitTestCase {
 			'empty array - no schema'          => array(
 				'webfont'  => array(),
 				'expected' => array(
-					'provider'     => '',
+					'provider'     => 'local',
 					'font-family'  => '',
 					'font-style'   => 'normal',
 					'font-weight'  => '400',

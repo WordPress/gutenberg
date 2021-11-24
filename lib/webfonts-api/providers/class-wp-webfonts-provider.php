@@ -118,66 +118,6 @@ abstract class WP_Webfonts_Provider {
 	abstract public function get_css();
 
 	/**
-	 * Gets cached styles from a remote URL.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @param string $id   An ID used to cache the styles.
-	 * @param string $url  The URL to fetch.
-	 * @param array  $args Optional. The arguments to pass to `wp_remote_get()`.
-	 *                     Default empty array.
-	 * @return string The styles.
-	 */
-	protected function get_cached_remote_styles( $id, $url, array $args = array() ) {
-		$css = get_site_transient( $id );
-
-		// Get remote response and cache the CSS if it hasn't been cached already.
-		if ( false === $css ) {
-			$css = $this->get_remote_styles( $url, $args );
-
-			/*
-			 * Early return if the request failed.
-			 * Cache an empty string for 60 seconds to avoid bottlenecks.
-			 */
-			if ( empty( $css ) ) {
-				set_site_transient( $id, '', MINUTE_IN_SECONDS );
-				return '';
-			}
-
-			// Cache the CSS for a month.
-			set_site_transient( $id, $css, MONTH_IN_SECONDS );
-		}
-
-		return $css;
-	}
-
-	/**
-	 * Gets styles from the remote font service via the given URL.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @param string $url  The URL to fetch.
-	 * @param array  $args Optional. The arguments to pass to `wp_remote_get()`.
-	 *                     Default empty array.
-	 * @return string The styles on success. Empty string on failure.
-	 */
-	protected function get_remote_styles( $url, array $args = array() ) {
-		// Use a modern user-agent, to get woff2 files.
-		$args['user-agent'] = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0';
-
-		// Get the remote URL contents.
-		$response = wp_remote_get( $url, $args );
-
-		// Early return if the request failed.
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			return '';
-		}
-
-		// Get the response body.
-		return wp_remote_retrieve_body( $response );
-	}
-
-	/**
 	 * Gets the provider's resource hints.
 	 *
 	 * The Controller calls this method {@see WP_Webfonts_Controller::get_resource_hints()}

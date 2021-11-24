@@ -82,7 +82,7 @@ class WP_Webfonts_Schema_Validator {
 	 * @var array
 	 */
 	protected $basic_schema = array(
-		'provider'     => '',
+		'provider'     => 'local',
 		'font-family'  => '',
 		'font-style'   => 'normal',
 		'font-weight'  => '400',

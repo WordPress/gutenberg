@@ -120,7 +120,7 @@ class WP_Webfonts_Registry {
 	 * @param array $webfont {
 	 *     Webfont definition.
 	 *
-	 *    @type string       $provider                The provider ID (e.g. 'local', 'google').
+	 *    @type string       $provider                The provider ID (e.g. 'local').
 	 *    @type string       $font_family             The @font-face font-family property.
 	 *    @type string       $font_weight             The @font-face font-weight property.
 	 *                                                The font-weight can be a single value, or a range.

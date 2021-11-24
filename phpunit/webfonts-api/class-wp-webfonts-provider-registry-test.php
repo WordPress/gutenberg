@@ -58,9 +58,8 @@ class WP_Webfonts_Provider_Registry_Test extends WP_UnitTestCase {
 
 		$providers = $registry->get_all_registered();
 
-		$expected = array( 'google', 'local' );
+		$expected = array( 'local' );
 		$this->assertSame( $expected, array_keys( $providers ) );
-		$this->assertInstanceOf( 'WP_Webfonts_Google_Provider', $providers['google'] );
 		$this->assertInstanceOf( 'WP_Webfonts_Local_Provider', $providers['local'] );
 	}
 
@@ -77,7 +76,7 @@ class WP_Webfonts_Provider_Registry_Test extends WP_UnitTestCase {
 
 		$providers = $registry->get_all_registered();
 
-		$expected = array( 'google', 'local', 'my-custom-provider' );
+		$expected = array( 'local', 'my-custom-provider' );
 		$this->assertSame( $expected, array_keys( $providers ) );
 	}
 }

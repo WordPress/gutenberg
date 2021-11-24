@@ -78,10 +78,6 @@ class WP_Webfonts_Provider_Registry {
 		// Load the abstract class into memory.
 		require_once __DIR__ . '/providers/class-wp-webfonts-provider.php';
 
-		// Register the Google Provider.
-		require_once __DIR__ . '/providers/class-wp-webfonts-google-provider.php';
-		$this->register( WP_Webfonts_Google_Provider::class );
-
 		// Register the Local Provider.
 		require_once __DIR__ . '/providers/class-wp-webfonts-local-provider.php';
 		$this->register( WP_Webfonts_Local_Provider::class );

@@ -18,7 +18,7 @@
  *         ⤢                    ⤡
  *  Webfonts Registry     Providers Registry
  *       ↕                ⤢           ⤡         .. [custom providers]
- *  Validator         Local        Google Fonts
+ *  Validator         Local        Other Fonts
  *                    Provider     Provider
  *                      ↕             ↕
  *                    Filesystem   Remote Font API Service
@@ -213,7 +213,7 @@ class WP_Webfonts_Controller {
 				 *
 				 * @param bool  $has_permission Permission to do the remote request.
 				 *                              Default false.
-				 * @param string $provider_id   Provider's ID, e.g. 'google', to identify
+				 * @param string $provider_id   Provider's ID, e.g. 'local', to identify
 				 *                              the remote webfonts service provider.
 				 */
 				true !== apply_filters( 'has_remote_webfonts_request_permission', false, $provider_id )

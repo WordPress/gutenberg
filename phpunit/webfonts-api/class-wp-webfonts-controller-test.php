@@ -14,7 +14,6 @@ class WP_Webfonts_Controller_Test extends WP_UnitTestCase {
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-provider-registry.php';
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/class-wp-webfonts-controller.php';
 		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-provider.php';
-		require_once dirname( dirname( __DIR__ ) ) . '/lib/webfonts-api/providers/class-wp-webfonts-google-provider.php';
 		require_once __DIR__ . '/mocks/class-my-custom-webfonts-provider-mock.php';
 	}
 
@@ -100,15 +99,15 @@ class WP_Webfonts_Controller_Test extends WP_UnitTestCase {
 		$property->setValue( $this->controller, $stylesheet_handle );
 
 		// Set up the provider mock.
-		$provider  = $this->getMockBuilder( 'WP_Webfonts_Google_Provider' )->getMock();
+		$provider  = $this->getMockBuilder( 'WP_Webfonts_Local_Provider' )->getMock();
 		$providers = array(
-			'google' => $provider,
+			'local' => $provider,
 		);
 		$this->provider_registry_mock
 			->expects( $this->once() )
 			->method( 'get_all_registered' )
 			->willReturn( $providers );
-		// The Google Fonts provider should never be called.
+		// The Local Fonts provider should never be called.
 		$provider
 			->expects( $this->never() )
 			->method( 'set_webfonts' );

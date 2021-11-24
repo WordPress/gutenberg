@@ -27,14 +27,14 @@ class WP_Webfonts_Registry_Test extends WP_UnitTestCase {
 	public function test_get_all_registered() {
 		$expected = array(
 			'open-sans.normal.400' => array(
-				'provider'     => 'google',
+				'provider'     => 'local',
 				'font-family'  => 'Open Sans',
 				'font-style'   => 'normal',
 				'font-weight'  => '400',
 				'font-display' => 'fallback',
 			),
 			'roboto.normal.900'    => array(
-				'provider'     => 'google',
+				'provider'     => 'local',
 				'font-family'  => 'Robot',
 				'font-style'   => 'normal',
 				'font-weight'  => '900',
@@ -169,13 +169,13 @@ class WP_Webfonts_Registry_Test extends WP_UnitTestCase {
 		return array(
 			'valid schema without font-display' => array(
 				'webfont'           => array(
-					'provider'    => 'google',
+					'provider'    => 'local',
 					'font_family' => 'Roboto',
 					'font_style'  => 'normal',
 					'font_weight' => 'normal',
 				),
 				'validated_webfont' => array(
-					'provider'     => 'google',
+					'provider'     => 'local',
 					'font-family'  => 'Roboto',
 					'font-style'   => 'normal',
 					'font-weight'  => 'normal',
@@ -216,7 +216,7 @@ class WP_Webfonts_Registry_Test extends WP_UnitTestCase {
 		 */
 		$property = new ReflectionProperty( $this->registry, 'registry_by_provider' );
 		$property->setAccessible( true );
-		$property->setValue( $this->registry, array( 'google', 'local' ) );
+		$property->setValue( $this->registry, array( 'local' ) );
 
 		$this->assertSame( array(), $this->registry->get_by_provider( 'my-custom-provider' ) );
 	}
@@ -254,7 +254,7 @@ class WP_Webfonts_Registry_Test extends WP_UnitTestCase {
 			'no webfonts for requested provider' => array(
 				'webfonts'    => array(
 					array(
-						'provider'    => 'google',
+						'provider'    => 'local',
 						'font_family' => 'Lato',
 						'font_style'  => 'italic',
 						'font_weight' => '400',
@@ -266,40 +266,44 @@ class WP_Webfonts_Registry_Test extends WP_UnitTestCase {
 			'with one provider'                  => array(
 				'webfonts'    => array(
 					array(
-						'provider'    => 'google',
+						'provider'    => 'local',
 						'font_family' => 'Lato',
 						'font_style'  => 'italic',
 						'font_weight' => '400',
+						'src'         => 'https://example.com/lato-400i.woff2',
 					),
 					array(
-						'provider'    => 'google',
+						'provider'    => 'local',
 						'font_family' => 'Roboto',
 						'font_style'  => 'normal',
 						'font_weight' => '900',
+						'src'         => 'https://example.com/lato-900.woff2',
 					),
 				),
-				'provider_id' => 'google',
+				'provider_id' => 'local',
 				'expected'    => array(
 					'lato.italic.400'   => array(
-						'provider'     => 'google',
+						'provider'     => 'local',
 						'font-family'  => 'Lato',
 						'font-style'   => 'italic',
 						'font-weight'  => '400',
 						'font-display' => 'fallback',
+						'src'          => 'https://example.com/lato-400i.woff2',
 					),
 					'roboto.normal.900' => array(
-						'provider'     => 'google',
+						'provider'     => 'local',
 						'font-family'  => 'Roboto',
 						'font-style'   => 'normal',
 						'font-weight'  => '900',
 						'font-display' => 'fallback',
+						'src'          => 'https://example.com/lato-900.woff2',
 					),
 				),
 			),
 			'with multiple providers'            => array(
 				'webfonts'    => array(
 					array(
-						'provider'    => 'google',
+						'provider'    => 'example',
 						'font_family' => 'Open Sans',
 						'font_style'  => 'normal',
 						'font_weight' => '400',
@@ -313,7 +317,7 @@ class WP_Webfonts_Registry_Test extends WP_UnitTestCase {
 						'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
 					),
 					array(
-						'provider'    => 'google',
+						'provider'    => 'example',
 						'font_family' => 'Roboto',
 						'font_style'  => 'normal',
 						'font_weight' => '900',
