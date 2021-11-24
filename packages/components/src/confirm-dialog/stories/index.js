@@ -64,7 +64,9 @@ export const VeeeryLongMessage = () => {
 };
 
 export const UncontrolledAndWithExplicitOnCancel = () => {
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
+	const [ confirmVal, setConfirmVal ] = useState(
+		"Hasn't confirmed or cancelled yet"
+	);
 
 	return (
 		<>
@@ -84,7 +86,9 @@ export const UncontrolledAndWithExplicitOnCancel = () => {
 // `setIsOpen` calls below).
 export const Controlled = () => {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
+	const [ confirmVal, setConfirmVal ] = useState(
+		"Hasn't confirmed or cancelled yet"
+	);
 
 	const handleConfirm = () => {
 		setConfirmVal( 'Confirmed!' );
