@@ -59,6 +59,11 @@ export function DefaultBlockAppender( {
 					}
 				} }
 				onClick={ () => onAppend() }
+				onFocus={ () => {
+					if ( showPrompt ) {
+						onAppend();
+					}
+				} }
 			>
 				{ showPrompt ? value : ZWNBSP }
 			</p>
