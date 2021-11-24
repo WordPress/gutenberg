@@ -195,33 +195,49 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * It can also create and return a new draft CPT.
 	 *
-	 * @param bool  $should_create_cpt Whether a new CPT should be created if no one was found.
-	 *                                 False by default.
-	 * @param array $post_status_filter Filter CPT by post status.
-	 *                                  ['publish'] by default, so it only fetches published posts.
+	 * @param WP_Theme $theme             The theme object.
+	 *                                    If empty, it defaults to the current theme.
+	 * @param bool     $should_create_cpt Whether a new CPT should be created if no one was found.
+	 *                                    False by default.
+	 * @param array    $post_status_filter Filter CPT by post status.
+	 *                                    ['publish'] by default, so it only fetches published posts.
 	 *
 	 * @return array Custom Post Type for the user's origin config.
 	 */
-	private static function get_user_data_from_custom_post_type( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
+	public static function get_user_data_from_custom_post_type( $theme, $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
+		if ( ! $theme instanceof WP_Theme ) {
+			$theme = wp_get_theme();
+		}
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
-		$recent_posts     = wp_get_recent_posts(
-			array(
-				'numberposts' => 1,
-				'orderby'     => 'date',
-				'order'       => 'desc',
-				'post_type'   => $post_type_filter,
-				'post_status' => $post_status_filter,
-				'tax_query'   => array(
-					array(
-						'taxonomy' => 'wp_theme',
-						'field'    => 'name',
-						'terms'    => wp_get_theme()->get_stylesheet(),
-					),
+		$args             = array(
+			'numberposts' => 1,
+			'orderby'     => 'date',
+			'order'       => 'desc',
+			'post_type'   => $post_type_filter,
+			'post_status' => $post_status_filter,
+			'tax_query'   => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'name',
+					'terms'    => $theme->get_stylesheet(),
 				),
-			)
+			),
 		);
 
+		$cache_key = sprintf( 'wp_global_styles_%s', md5( serialize( $args ) ) );
+		$post_id   = wp_cache_get( $cache_key );
+
+		if ( (int) $post_id > 0 ) {
+			return get_post( $post_id, ARRAY_A );
+		}
+
+		// Special case: '-1' is a results not found.
+		if ( -1 === $post_id && ! $should_create_cpt ) {
+			return $user_cpt;
+		}
+
+		$recent_posts = wp_get_recent_posts( $args );
 		if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
 			$user_cpt = $recent_posts[0];
 		} elseif ( $should_create_cpt ) {
@@ -240,6 +256,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			);
 			$user_cpt    = get_post( $cpt_post_id, ARRAY_A );
 		}
+		$cache_expiration = $user_cpt ? DAY_IN_SECONDS : HOUR_IN_SECONDS;
+		wp_cache_set( $cache_key, $user_cpt ? $user_cpt['ID'] : -1, '', $cache_expiration );
 
 		return $user_cpt;
 	}
@@ -255,7 +273,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 
 		$config   = array();
-		$user_cpt = self::get_user_data_from_custom_post_type();
+		$user_cpt = self::get_user_data_from_custom_post_type( wp_get_theme() );
 		if ( array_key_exists( 'post_content', $user_cpt ) ) {
 			$decoded_data = json_decode( $user_cpt['post_content'], true );
 
@@ -356,7 +374,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return self::$user_custom_post_type_id;
 		}
 
-		$user_cpt = self::get_user_data_from_custom_post_type( true );
+		$user_cpt = self::get_user_data_from_custom_post_type( wp_get_theme(), true );
 		if ( array_key_exists( 'ID', $user_cpt ) ) {
 			self::$user_custom_post_type_id = $user_cpt['ID'];
 		}
