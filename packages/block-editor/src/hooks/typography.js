@@ -231,7 +231,7 @@ export function TypographyPanel( props ) {
 	);
 }
 
-const hasTypographySupport = ( blockName ) => {
+export const hasTypographySupport = ( blockName ) => {
 	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
 		hasBlockSupport( blockName, key )
 	);
