@@ -146,6 +146,9 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * - path       => where to find the preset within the settings section
 	 *
+	 * - override   => whether a theme preset with the same slug as a default preset
+	 *                 can override it
+	 *
 	 * - value_key  => the key that represents the value
 	 *
 	 * - value_func => optionally, instead of value_key, a function to generate
@@ -174,6 +177,7 @@ class WP_Theme_JSON_Gutenberg {
 	const PRESETS_METADATA = array(
 		array(
 			'path'       => array( 'color', 'palette' ),
+			'override'   => false,
 			'value_key'  => 'color',
 			'css_vars'   => '--wp--preset--color--$slug',
 			'classes'    => array(
@@ -185,6 +189,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'color', 'gradients' ),
+			'override'   => false,
 			'value_key'  => 'gradient',
 			'css_vars'   => '--wp--preset--gradient--$slug',
 			'classes'    => array( '.has-$slug-gradient-background' => 'background' ),
@@ -192,6 +197,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'color', 'duotone' ),
+			'override'   => true,
 			'value_func' => 'gutenberg_render_duotone_filter_preset',
 			'css_vars'   => '--wp--preset--duotone--$slug',
 			'classes'    => array(),
@@ -199,6 +205,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'typography', 'fontSizes' ),
+			'override'   => true,
 			'value_key'  => 'size',
 			'css_vars'   => '--wp--preset--font-size--$slug',
 			'classes'    => array( '.has-$slug-font-size' => 'font-size' ),
@@ -206,6 +213,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'typography', 'fontFamilies' ),
+			'override'   => true,
 			'value_key'  => 'fontFamily',
 			'css_vars'   => '--wp--preset--font-family--$slug',
 			'classes'    => array( '.has-$slug-font-family' => 'font-family' ),
@@ -1428,6 +1436,10 @@ class WP_Theme_JSON_Gutenberg {
 	private static function get_slugs_from_default_origin( $data, $node_path = array( 'settings' ) ) {
 		$slugs = array();
 		foreach ( self::PRESETS_METADATA as $metadata ) {
+			if ( $metadata['override'] ) {
+				continue;
+			}
+
 			$slugs_for_preset = array();
 			$path             = array_merge( $node_path, $metadata['path'], array( 'default' ) );
 			$preset           = _wp_array_get( $data, $path, null );
