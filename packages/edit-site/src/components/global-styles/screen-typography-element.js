@@ -16,7 +16,7 @@ const elements = {
 	},
 	link: {
 		description: __( 'Manage the fonts and typography used on the links.' ),
-		title: __( 'Link' ),
+		title: __( 'Links' ),
 	},
 };
 
