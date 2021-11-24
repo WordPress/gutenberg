@@ -15,6 +15,9 @@ import { ConfirmDialog } from '..';
 export default {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const daText = () =>
