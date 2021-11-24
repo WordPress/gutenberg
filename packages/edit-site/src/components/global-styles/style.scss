@@ -30,8 +30,13 @@
 }
 
 .edit-site-global-styles-screen-typography__indicator {
-	width: $grid-unit-30;
+	height: 24px;
+	width: 24px;
 	font-size: 14px;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	border-radius: $radius-block-ui;
 }
 
 .edit-site-global-styles-screen-colors {

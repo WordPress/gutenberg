@@ -18,71 +18,49 @@ import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 
-function TextItem( { name, parentMenu } ) {
-	const [ fontFamily ] = useStyle( 'typography.fontFamily', name );
-	const [ fontStyle ] = useStyle( 'typography.fontStyle', name );
-	const [ fontWeight ] = useStyle( 'typography.fontWeight', name );
-	const [ letterSpacing ] = useStyle( 'typography.letterSpacing', name );
-
-	return (
-		<NavigationButton path={ parentMenu + '/typography/text' }>
-			<HStack justify="flex-start">
-				<FlexItem
-					className="edit-site-global-styles-screen-typography__indicator"
-					style={ {
-						fontFamily: fontFamily ?? 'serif',
-						fontStyle,
-						fontWeight,
-						letterSpacing,
-					} }
-				>
-					{ __( 'Aa' ) }
-				</FlexItem>
-				<FlexItem>{ __( 'Text' ) }</FlexItem>
-			</HStack>
-		</NavigationButton>
-	);
-}
-
-function LinkItem( { name, parentMenu } ) {
+function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
-	const [ fontFamily ] = useStyle(
-		'elements.link.typography.fontFamily',
-		name
-	);
-	const [ fontStyle ] = useStyle(
-		'elements.link.typography.fontStyle',
-		name
-	);
-	const [ fontWeight ] = useStyle(
-		'elements.link.typography.fontWeight',
-		name
-	);
+	const prefix =
+		element === 'text' || ! element ? '' : `elements.${ element }.`;
+	const extraStyles =
+		element === 'link'
+			? {
+					textDecoration: 'underline',
+			  }
+			: {};
+	const [ fontFamily ] = useStyle( prefix + 'typography.fontFamily', name );
+	const [ fontStyle ] = useStyle( prefix + 'typography.fontStyle', name );
+	const [ fontWeight ] = useStyle( prefix + 'typography.fontWeight', name );
 	const [ letterSpacing ] = useStyle(
-		'elements.link.typography.letterSpacing',
+		prefix + 'typography.letterSpacing',
 		name
 	);
+	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
+	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
+	const [ color ] = useStyle( prefix + 'color.text', name );
 
 	if ( ! hasSupport ) {
 		return null;
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/typography/link' }>
+		<NavigationButton path={ parentMenu + '/typography/' + element }>
 			<HStack justify="flex-start">
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
 					style={ {
-						fontFamily,
+						fontFamily: fontFamily ?? 'serif',
+						background: gradientValue ?? backgroundColor,
+						color,
 						fontStyle,
 						fontWeight,
 						letterSpacing,
-						textDecoration: 'underline',
+						...extraStyles,
 					} }
 				>
 					{ __( 'Aa' ) }
 				</FlexItem>
-				<FlexItem>{ __( 'Link' ) }</FlexItem>
+				<FlexItem>{ label }</FlexItem>
 			</HStack>
 		</NavigationButton>
 	);
@@ -106,8 +84,18 @@ function ScreenTypography( { name } ) {
 					<VStack spacing={ 3 }>
 						<Subtitle>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
-							<TextItem name={ name } parentMenu={ parentMenu } />
-							<LinkItem name={ name } parentMenu={ parentMenu } />
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="text"
+								label={ __( 'Text' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="link"
+								label={ __( 'Link' ) }
+							/>
 						</ItemGroup>
 					</VStack>
 				</div>

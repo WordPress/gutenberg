@@ -99,6 +99,9 @@ export default function TypographyPanel( { name, element } ) {
 		prefix + 'typography.letterSpacing',
 		name
 	);
+	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
+	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
+	const [ color ] = useStyle( prefix + 'color.text', name );
 	const extraStyles =
 		element === 'link'
 			? {
@@ -112,6 +115,8 @@ export default function TypographyPanel( { name, element } ) {
 				className="edit-site-typography-panel__preview"
 				style={ {
 					fontFamily: fontFamily ?? 'serif',
+					background: gradientValue ?? backgroundColor,
+					color,
 					fontSize,
 					fontStyle,
 					fontWeight,
