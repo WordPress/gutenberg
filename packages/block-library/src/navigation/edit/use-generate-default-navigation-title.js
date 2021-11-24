@@ -3,66 +3,50 @@
  */
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
+import { useContext, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import useNavigationMenu from '../use-navigation-menu';
 import useTemplatePartAreaLabel from '../use-template-part-area-label';
 
-const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
 	'postType',
 	'wp_navigation',
 	{ status: 'draft', per_page: -1 },
 ];
 
-export default function useDefaultNavigationTitle( clientId ) {
+const PUBLISHED_MENU_PARAMS = [
+	'postType',
+	'wp_navigation',
+	{ per_page: -1, status: 'publish' },
+];
+
+export default function useGenerateDefaultNavigationTitle( clientId ) {
 	// The block will be disabled in a block preview, use this as a way of
 	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
-
-	const { draftNavigationMenus, hasResolvedDraftNavigationMenus } = useSelect(
-		( select ) => {
-			if ( isDisabled ) {
-				return EMPTY_OBJECT;
-			}
-
-			const { getEntityRecords, hasFinishedResolution } = select(
-				coreStore
-			);
-
-			return {
-				draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
-				hasResolvedDraftNavigationMenus: hasFinishedResolution(
-					'getEntityRecords',
-					DRAFT_MENU_PARAMS
-				),
-			};
-		},
-		[ isDisabled ]
-	);
-
-	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
 	// Because we can't conditionally call hooks, pass an undefined client id
 	// arg to bypass the expensive `useTemplateArea` code. The hook will return
 	// early.
 	const area = useTemplatePartAreaLabel( isDisabled ? undefined : clientId );
 
-	return useMemo( () => {
+	const registry = useRegistry();
+	return useCallback( async () => {
 		// Ensure other navigation menus have loaded so an
 		// accurate name can be created.
-		if (
-			isDisabled ||
-			! hasResolvedDraftNavigationMenus ||
-			! hasResolvedNavigationMenus
-		) {
+		if ( isDisabled ) {
 			return '';
 		}
+		const { getEntityRecords } = registry.resolveSelect( coreStore );
+
+		const [ draftNavigationMenus, navigationMenus ] = await Promise.all( [
+			getEntityRecords( ...DRAFT_MENU_PARAMS ),
+			getEntityRecords( ...PUBLISHED_MENU_PARAMS ),
+		] );
 
 		const title = area
 			? sprintf(
@@ -91,12 +75,5 @@ export default function useDefaultNavigationTitle( clientId ) {
 				: title;
 
 		return titleWithCount || '';
-	}, [
-		isDisabled,
-		hasResolvedDraftNavigationMenus,
-		hasResolvedNavigationMenus,
-		draftNavigationMenus,
-		navigationMenus,
-		area,
-	] );
+	}, [ isDisabled, area ] );
 }
