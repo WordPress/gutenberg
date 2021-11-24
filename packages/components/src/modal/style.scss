@@ -126,13 +126,4 @@
 		display: block;
 		margin-bottom: $grid-unit-30;
 	}
-
-	&.no-title {
-		margin-top: 0;
-		padding-top: $grid-unit-30;
-
-		&::before {
-			content: none;
-		}
-	}
 }
