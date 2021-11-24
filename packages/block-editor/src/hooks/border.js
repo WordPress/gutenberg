@@ -19,7 +19,6 @@ import { BorderWidthEdit } from './border-width';
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 
 export function BorderPanel( props ) {
-	const isSupported = hasBorderSupport( props.name );
 
 	const isColorSupported =
 		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
@@ -41,7 +40,7 @@ export function BorderPanel( props ) {
 		! isWidthSupported,
 	].every( Boolean );
 
-	if ( isDisabled || ! isSupported ) {
+	if ( isDisabled ) {
 		return null;
 	}
 
