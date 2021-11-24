@@ -9,6 +9,7 @@ import { text } from '@storybook/addon-knobs';
  * Internal dependencies
  */
 import Button from '../../button';
+import { Heading } from '../../heading';
 import { ConfirmDialog } from '..';
 
 export default {
@@ -21,46 +22,46 @@ const daText = () =>
 
 // Simplest usage: just declare the component with the required `onConfirm` prop.
 export const _default = () => {
-	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
 
 	return (
 		<>
 			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
 				{ daText() }
 			</ConfirmDialog>
-			<h1>{ confirmVal }</h1>
+			<Heading level={ 1 }>{ confirmVal }</Heading>
 		</>
 	);
 };
 
 export const WithJSXMessage = () => {
-	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
 
 	return (
 		<>
 			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
-				{ <h1>{ daText() }</h1> }
+				<Heading level={ 2 }>{ daText() }</Heading>
 			</ConfirmDialog>
-			<h1>{ confirmVal }</h1>
+			<Heading level={ 1 }>{ confirmVal }</Heading>
 		</>
 	);
 };
 
 export const VeeeryLongMessage = () => {
-	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
 
 	return (
 		<>
 			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
 				{ daText().repeat( 20 ) }
 			</ConfirmDialog>
-			<h1>{ confirmVal }</h1>
+			<Heading level={ 1 }>{ confirmVal }</Heading>
 		</>
 	);
 };
 
 export const UncontrolledAndWithExplicitOnCancel = () => {
-	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
 
 	return (
 		<>
@@ -70,7 +71,7 @@ export const UncontrolledAndWithExplicitOnCancel = () => {
 			>
 				{ daText() }
 			</ConfirmDialog>
-			<h1>{ confirmVal }</h1>
+			<Heading level={ 1 }>{ confirmVal }</Heading>
 		</>
 	);
 };
@@ -80,7 +81,7 @@ export const UncontrolledAndWithExplicitOnCancel = () => {
 // `setIsOpen` calls below).
 export const Controlled = () => {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const [ confirmVal, setConfirmVal ] = useState( 'Not confirmed' );
+	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
 
 	const handleConfirm = () => {
 		setConfirmVal( 'Confirmed!' );
@@ -101,10 +102,12 @@ export const Controlled = () => {
 			>
 				{ daText() }
 			</ConfirmDialog>
+
+			<Heading level={ 1 }>{ confirmVal }</Heading>
+
 			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
 				Open ConfirmDialog
 			</Button>
-			<h1>{ confirmVal }</h1>
 		</>
 	);
 };
