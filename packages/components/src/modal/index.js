@@ -8,7 +8,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createPortal, useEffect, useRef } from '@wordpress/element';
+import {
+	createPortal,
+	useEffect,
+	useRef,
+	forwardRef,
+} from '@wordpress/element';
 import {
 	useInstanceId,
 	useFocusReturn,
@@ -32,7 +37,7 @@ import StyleProvider from '../style-provider';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
-export default function Modal( props ) {
+function Modal( props, forwardedRef ) {
 	const {
 		bodyOpenClassName = 'modal-open',
 		role = 'dialog',
@@ -110,7 +115,7 @@ export default function Modal( props ) {
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			ref={ ref }
+			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ classnames(
 				'components-modal__screen-overlay',
 				overlayClassName
@@ -183,3 +188,5 @@ export default function Modal( props ) {
 		document.body
 	);
 }
+
+export default forwardRef( Modal );
