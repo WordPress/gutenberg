@@ -17,12 +17,15 @@ const {
 	defaultRequestToHandle,
 } = require( './util' );
 
+const defaultExternalizedReportFileName = 'externalized-dependencies.json';
+
 class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
 		this.options = Object.assign(
 			{
 				combineAssets: false,
 				combinedOutputFile: null,
+				externalizedReport: false,
 				injectPolyfill: false,
 				outputFormat: 'php',
 				useDefaults: true,
@@ -137,9 +140,24 @@ class DependencyExtractionWebpackPlugin {
 		const {
 			combineAssets,
 			combinedOutputFile,
+			externalizedReport,
 			injectPolyfill,
 			outputFormat,
 		} = this.options;
+
+		// Dump actually externalized dependencies to a report file.
+		if ( externalizedReport ) {
+			const externalizedReportFile =
+				typeof externalizedReport === 'string'
+					? externalizedReport
+					: defaultExternalizedReportFileName;
+			compilation.emitAsset(
+				externalizedReportFile,
+				new RawSource(
+					JSON.stringify( Array.from( this.externalizedDeps ) )
+				)
+			);
+		}
 
 		const combinedAssetsData = {};
 

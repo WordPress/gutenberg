@@ -103,11 +103,10 @@ function Navigation( {
 	customAppender: CustomAppender = null,
 } ) {
 	const {
-		itemsJustification,
 		openSubmenusOnClick,
-		orientation,
 		overlayMenu,
 		showSubmenuIcon,
+		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
 
 	const [ areaMenu, setAreaMenu ] = useEntityProp(
@@ -150,7 +149,11 @@ function Navigation( {
 		[ clientId ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
-	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		replaceInnerBlocks,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	const [
 		hasSavedUnsavedInnerBlocks,
@@ -189,8 +192,8 @@ function Navigation( {
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames( className, {
-			[ `items-justified-${ attributes.itemsJustification }` ]: itemsJustification,
-			'is-vertical': orientation === 'vertical',
+			'items-justified-right': justifyContent === 'right',
+			'items-justified-space-between': justifyContent === 'space-between',
 			'is-responsive': 'never' !== overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
@@ -209,6 +212,29 @@ function Navigation( {
 		},
 	} );
 
+	const overlayClassnames = classnames( {
+		'has-text-color':
+			!! overlayTextColor.color || !! overlayTextColor?.class,
+		[ getColorClassName(
+			'color',
+			overlayTextColor?.slug
+		) ]: !! overlayTextColor?.slug,
+		'has-background':
+			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
+		[ getColorClassName(
+			'background-color',
+			overlayBackgroundColor?.slug
+		) ]: !! overlayBackgroundColor?.slug,
+	} );
+
+	const overlayStyles = {
+		color: ! overlayTextColor?.slug && overlayTextColor?.color,
+		backgroundColor:
+			! overlayBackgroundColor?.slug &&
+			overlayBackgroundColor?.color &&
+			overlayBackgroundColor.color,
+	};
+
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
@@ -219,6 +245,15 @@ function Navigation( {
 		setDetectedOverlayBackgroundColor,
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	// Spacer block needs orientation from context. This is a patch until
+	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
+	useEffect( () => {
+		if ( orientation ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { orientation } );
+		}
+	}, [ orientation ] );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
@@ -268,20 +303,6 @@ function Navigation( {
 					setNavigationMenuId( post.id );
 				} }
 			/>
-		);
-	}
-
-	// Show a warning if the selected menu is no longer available.
-	// TODO - the user should be able to select a new one?
-	if ( navigationMenuId && isNavigationMenuMissing ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __(
-						'Navigation menu has been deleted or is unavailable'
-					) }
-				</Warning>
-			</div>
 		);
 	}
 
@@ -482,6 +503,8 @@ function Navigation( {
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ 'never' !== overlayMenu }
 							isHiddenByDefault={ 'always' === overlayMenu }
+							classNames={ overlayClassnames }
+							styles={ overlayStyles }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks

@@ -8,6 +8,7 @@ export default function useNavigationMenu( navigationMenuId ) {
 	return useSelect(
 		( select ) => {
 			const {
+				getEntityRecord,
 				getEditedEntityRecord,
 				getEntityRecords,
 				hasFinishedResolution,
@@ -18,6 +19,9 @@ export default function useNavigationMenu( navigationMenuId ) {
 				'wp_navigation',
 				navigationMenuId,
 			];
+			const rawNavigationMenu = navigationMenuId
+				? getEntityRecord( ...navigationMenuSingleArgs )
+				: null;
 			const navigationMenu = navigationMenuId
 				? getEditedEntityRecord( ...navigationMenuSingleArgs )
 				: null;
@@ -45,7 +49,7 @@ export default function useNavigationMenu( navigationMenuId ) {
 				isNavigationMenuResolved: hasResolvedNavigationMenu,
 				isNavigationMenuMissing:
 					! navigationMenuId ||
-					( hasResolvedNavigationMenu && ! navigationMenu ),
+					( hasResolvedNavigationMenu && ! rawNavigationMenu ),
 				canSwitchNavigationMenu,
 				hasResolvedNavigationMenus: hasFinishedResolution(
 					'getEntityRecords',

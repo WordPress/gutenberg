@@ -103,14 +103,26 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
-				// --justification-setting allows children to inherit the value regardless or row or column direction.
-				$style .= "--justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
+				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
+					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
+					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
+					$style .= '--layout-direction: row;';
+					$style .= "--layout-wrap: $flex_wrap;";
+					$style .= "--layout-justify: {$justify_content_options[ $layout['justifyContent'] ]};";
+					$style .= '--layout-align: center;';
+				}
 			}
 		} else {
 			$style .= 'flex-direction: column;';
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
-				$style .= "--justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
+				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
+					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
+					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
+					$style .= '--layout-direction: column;';
+					$style .= '--layout-justify: initial;';
+					$style .= "--layout-align: {$justify_content_options[ $layout['justifyContent'] ]};";
+				}
 			}
 		}
 		$style .= '}';
@@ -194,7 +206,11 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  * @return string                Filtered block content.
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
-	$group_with_inner_container_regex = '/(^\s*<div\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/';
+	$tag_name                         = isset( $block['attrs']['tagName'] ) ? $block['attrs']['tagName'] : 'div';
+	$group_with_inner_container_regex = sprintf(
+		'/(^\s*<%1$s\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/U',
+		preg_quote( $tag_name, '/' )
+	);
 	if (
 		'core/group' !== $block['blockName'] ||
 		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
@@ -204,7 +220,10 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$replace_regex   = '/(^\s*<div\b[^>]*wp-block-group[^>]*>)(.*)(<\/div>\s*$)/ms';
+	$replace_regex   = sprintf(
+		'/(^\s*<%1$s\b[^>]*wp-block-group[^>]*>)(.*)(<\/%1$s>\s*$)/ms',
+		preg_quote( $tag_name, '/' )
+	);
 	$updated_content = preg_replace_callback(
 		$replace_regex,
 		function( $matches ) {

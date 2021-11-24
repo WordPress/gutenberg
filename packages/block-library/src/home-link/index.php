@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/home-link` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**

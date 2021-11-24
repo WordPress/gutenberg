@@ -19,7 +19,7 @@ import {
 import { siteEditor } from '../../experimental-features';
 
 const templatePartNameInput =
-	'.edit-site-template-part-converter__modal .components-text-control__input';
+	'.edit-site-create-template-part-modal .components-text-control__input';
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
@@ -36,6 +36,7 @@ describe( 'Template Part', () => {
 	describe( 'Template part block', () => {
 		beforeEach( async () => {
 			await siteEditor.visit();
+			await siteEditor.disableWelcomeGuide();
 		} );
 
 		async function navigateToHeader() {

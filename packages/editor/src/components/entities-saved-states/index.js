@@ -151,7 +151,14 @@ export default function EntitiesSavedStates( { close } ) {
 				saveEditedEntityRecord( kind, name, key );
 			}
 		} );
-		saveSpecifiedEntityEdits( 'root', 'site', undefined, siteItemsToSave );
+		if ( siteItemsToSave.length ) {
+			saveSpecifiedEntityEdits(
+				'root',
+				'site',
+				undefined,
+				siteItemsToSave
+			);
+		}
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on

@@ -9,7 +9,7 @@ import { castArray, mapValues } from 'lodash';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
-import { STORE_NAME } from '../store/name';
+import coreDataStore from '../store';
 
 jest.useFakeTimers();
 
@@ -72,6 +72,7 @@ describe( 'createRegistry', () => {
 					subscribe,
 				} )
 			).toThrow();
+			expect( console ).toHaveWarned();
 		} );
 
 		describe( 'getSelectors', () => {
@@ -377,7 +378,7 @@ describe( 'createRegistry', () => {
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
 					registry
-						.select( STORE_NAME )
+						.select( coreDataStore )
 						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
@@ -404,7 +405,7 @@ describe( 'createRegistry', () => {
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
 					registry
-						.select( STORE_NAME )
+						.select( coreDataStore )
 						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
@@ -412,31 +413,6 @@ describe( 'createRegistry', () => {
 			jest.runAllTimers();
 
 			return promise;
-		} );
-
-		it( 'should resolve promise non-action to dispatch', () => {
-			let shouldThrow = false;
-			registry.registerStore( 'demo', {
-				reducer: ( state = 'OK' ) => {
-					if ( shouldThrow ) {
-						throw 'Should not have dispatched';
-					}
-
-					return state;
-				},
-				selectors: {
-					getValue: ( state ) => state,
-				},
-				resolvers: {
-					getValue: () => Promise.resolve(),
-				},
-			} );
-			shouldThrow = true;
-
-			registry.select( 'demo' ).getValue();
-			jest.runAllTimers();
-
-			return new Promise( ( resolve ) => process.nextTick( resolve ) );
 		} );
 
 		it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
@@ -807,15 +783,19 @@ describe( 'createRegistry', () => {
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
 			const subscribe = () => {};
-			registry.registerGenericStore( 'store', {
-				getSelectors,
-				getActions,
-				subscribe,
-			} );
+			const myStore = {
+				name: 'store',
+				instantiate: () => ( {
+					getSelectors,
+					getActions,
+					subscribe,
+				} ),
+			};
+			registry.register( myStore );
 			const subRegistry = createRegistry( {}, registry );
 
-			subRegistry.select( 'store' ).mySelector();
-			subRegistry.dispatch( 'store' ).myAction();
+			subRegistry.select( myStore ).mySelector();
+			subRegistry.dispatch( myStore ).myAction();
 
 			expect( mySelector ).toHaveBeenCalled();
 			expect( myAction ).toHaveBeenCalled();
@@ -827,10 +807,13 @@ describe( 'createRegistry', () => {
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
 			const subscribe = () => {};
-			registry.registerGenericStore( 'store', {
-				getSelectors,
-				getActions,
-				subscribe,
+			registry.register( {
+				name: 'store',
+				instantiate: () => ( {
+					getSelectors,
+					getActions,
+					subscribe,
+				} ),
 			} );
 
 			const subRegistry = createRegistry( {}, registry );
@@ -839,10 +822,13 @@ describe( 'createRegistry', () => {
 			const getSelectors2 = () => ( { mySelector: mySelector2 } );
 			const getActions2 = () => ( { myAction: myAction2 } );
 			const subscribe2 = () => {};
-			subRegistry.registerGenericStore( 'store', {
-				getSelectors: getSelectors2,
-				getActions: getActions2,
-				subscribe: subscribe2,
+			subRegistry.register( {
+				name: 'store',
+				instantiate: () => ( {
+					getSelectors: getSelectors2,
+					getActions: getActions2,
+					subscribe: subscribe2,
+				} ),
 			} );
 
 			subRegistry.select( 'store' ).mySelector();

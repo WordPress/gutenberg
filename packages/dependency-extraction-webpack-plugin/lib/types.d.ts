@@ -15,4 +15,5 @@ declare interface DependencyExtractionWebpackPluginOptions {
 	requestToHandle?: ( request: string ) => string | undefined;
 	combinedOutputFile?: string | null;
 	combineAssets?: boolean;
+	externalizedReportFile?: string | undefined;
 }

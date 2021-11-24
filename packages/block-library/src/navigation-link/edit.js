@@ -722,6 +722,7 @@ export default function NavigationLinkEdit( {
 						>
 							<LinkControl
 								hasTextControl
+								hasRichPreviews
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }

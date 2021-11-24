@@ -97,7 +97,7 @@ function GalleryEdit( props ) {
 		shortCodeTransforms,
 		sizeSlug,
 	} = attributes;
-	useMobileWarning();
+
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
@@ -123,6 +123,16 @@ function GalleryEdit( props ) {
 		[ clientId ]
 	);
 
+	const wasBlockJustInserted = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			);
+		},
+		[ clientId ]
+	);
+
 	const images = useMemo(
 		() =>
 			innerBlockImages?.map( ( block ) => ( {
@@ -138,6 +148,8 @@ function GalleryEdit( props ) {
 	const imageData = useGetMedia( innerBlockImages );
 
 	const newImages = useGetNewImages( images, imageData );
+
+	useMobileWarning( newImages );
 
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
@@ -435,6 +447,9 @@ function GalleryEdit( props ) {
 			value={ hasImageIds ? images : {} }
 			onError={ onUploadError }
 			notices={ hasImages ? undefined : noticeUI }
+			autoOpenMediaUpload={
+				! hasImages && isSelected && wasBlockJustInserted
+			}
 		/>
 	);
 

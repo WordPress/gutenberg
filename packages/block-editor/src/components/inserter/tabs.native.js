@@ -63,7 +63,7 @@ function InserterTabs( {
 	}, [ tabIndex ] );
 
 	const { tabs, tabKeys } = useMemo( () => {
-		const filteredTabs = InserterTabs.TABS.filter(
+		const filteredTabs = InserterTabs.getTabs().filter(
 			( { name } ) => showReusableBlocks || name !== 'reusable'
 		);
 		return {
@@ -114,8 +114,9 @@ function InserterTabs( {
 }
 
 function TabsControl( { onChangeTab, showReusableBlocks } ) {
+	const tabs = InserterTabs.getTabs();
 	const segments = useMemo( () => {
-		const filteredTabs = InserterTabs.TABS.filter(
+		const filteredTabs = tabs.filter(
 			( { name } ) => showReusableBlocks || name !== 'reusable'
 		);
 		return filteredTabs.map( ( { title } ) => title );
@@ -123,7 +124,7 @@ function TabsControl( { onChangeTab, showReusableBlocks } ) {
 
 	const segmentHandler = useCallback(
 		( selectedTab ) => {
-			const tabTitles = InserterTabs.TABS.map( ( { title } ) => title );
+			const tabTitles = tabs.map( ( { title } ) => title );
 			onChangeTab( tabTitles.indexOf( selectedTab ) );
 		},
 		[ onChangeTab ]
@@ -139,7 +140,7 @@ function TabsControl( { onChangeTab, showReusableBlocks } ) {
 
 InserterTabs.Control = TabsControl;
 
-InserterTabs.TABS = [
+InserterTabs.getTabs = () => [
 	{ name: 'blocks', title: __( 'Blocks' ), component: BlockTypesTab },
 	{ name: 'reusable', title: __( 'Reusable' ), component: ReusableBlocksTab },
 ];

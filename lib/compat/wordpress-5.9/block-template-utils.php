@@ -218,6 +218,10 @@ if ( ! function_exists( '_get_block_template_file' ) ) {
 	 * @return array|null Template.
 	 */
 	function _get_block_template_file( $template_type, $slug ) {
+		if ( 'wp_template' !== $template_type && 'wp_template_part' !== $template_type ) {
+			return null;
+		}
+
 		$template_base_paths = array(
 			'wp_template'      => 'block-templates',
 			'wp_template_part' => 'block-template-parts',
@@ -264,6 +268,10 @@ if ( ! function_exists( '_get_block_templates_files' ) ) {
 	 * @return array Template.
 	 */
 	function _get_block_templates_files( $template_type ) {
+		if ( 'wp_template' !== $template_type && 'wp_template_part' !== $template_type ) {
+			return null;
+		}
+
 		$template_base_paths = array(
 			'wp_template'      => 'block-templates',
 			'wp_template_part' => 'block-template-parts',
@@ -411,6 +419,40 @@ if ( ! function_exists( '_inject_theme_attribute_in_block_template_content' ) ) 
 
 		if ( $has_updated_content ) {
 			foreach ( $template_blocks as &$block ) {
+				$new_content .= serialize_block( $block );
+			}
+
+			return $new_content;
+		}
+
+		return $template_content;
+	}
+}
+
+if ( ! function_exists( '_remove_theme_attribute_in_block_template_content' ) ) {
+	/**
+	 * Parses wp_template content and removes the theme attribute from
+	 * each wp_template_part
+	 *
+	 * @param string $template_content serialized wp_template content.
+	 *
+	 * @return string Updated wp_template content.
+	 */
+	function _remove_theme_attribute_in_block_template_content( $template_content ) {
+		$has_updated_content = false;
+		$new_content         = '';
+		$template_blocks     = parse_blocks( $template_content );
+
+		$blocks = _flatten_blocks( $template_blocks );
+		foreach ( $blocks as $key => $block ) {
+			if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
+				unset( $blocks[ $key ]['attrs']['theme'] );
+				$has_updated_content = true;
+			}
+		}
+
+		if ( $has_updated_content ) {
+			foreach ( $template_blocks as $block ) {
 				$new_content .= serialize_block( $block );
 			}
 
@@ -667,7 +709,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
  */
 function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	/**
-	 * Filters the block templates array before the query takes place.
+	 * Filters the block template object before the query takes place.
 	 *
 	 * Return a non-null value to bypass the WordPress queries.
 	 *
@@ -716,11 +758,11 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$block_template = get_block_file_template( $id, $template_type );
 
 	/**
-	 * Filters the array of queried block templates array after they've been fetched.
+	 * Filters the queried block template object after it's been fetched.
 	 *
 	 * @since 10.8
 	 *
-	 * @param WP_Block_Template $block_template The found block template.
+	 * @param WP_Block_Template|null $block_template The found block template, or null if there isn't one.
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 	 * @param array  $template_type wp_template or wp_template_part.
 	 */

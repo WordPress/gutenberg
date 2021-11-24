@@ -118,8 +118,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_switching_themes_recalculates_data() {
-		// By default, the theme for unit tests is "default",
-		// which doesn't have theme.json support.
+		// The "default" theme doesn't have theme.json support.
+		switch_theme( 'default' );
 		$default = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
 		// Switch to a theme that does have support.
@@ -177,7 +177,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	function test_merges_child_theme_json_into_parent_theme_json() {
 		switch_theme( 'block-theme-child' );
 
-		$actual_settings   = WP_Theme_JSON_Resolver::get_theme_data()->get_settings();
+		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
 		$expected_settings = array(
 			'color'      => array(
 				'custom'         => false,
@@ -250,7 +250,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			WP_Theme_JSON_Resolver::get_theme_data()->get_custom_templates(),
+			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_custom_templates(),
 			array(
 				'page-home' => array(
 					'title'     => 'Homepage',

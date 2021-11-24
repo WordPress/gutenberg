@@ -104,7 +104,7 @@ export const defaultEntities = [
 	{
 		name: 'menu',
 		kind: 'root',
-		baseURL: '/__experimental/menus',
+		baseURL: '/wp/v2/menus',
 		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
@@ -112,7 +112,7 @@ export const defaultEntities = [
 	{
 		name: 'menuItem',
 		kind: 'root',
-		baseURL: '/__experimental/menu-items',
+		baseURL: '/wp/v2/menu-items',
 		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
@@ -121,7 +121,7 @@ export const defaultEntities = [
 	{
 		name: 'menuLocation',
 		kind: 'root',
-		baseURL: '/__experimental/menu-locations',
+		baseURL: '/wp/v2/menu-locations',
 		baseURLParams: { context: 'edit' },
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
@@ -130,7 +130,7 @@ export const defaultEntities = [
 	{
 		name: 'navigationArea',
 		kind: 'root',
-		baseURL: '/__experimental/block-navigation-areas',
+		baseURL: '/wp/v2/block-navigation-areas',
 		baseURLParams: { context: 'edit' },
 		plural: 'navigationAreas',
 		label: __( 'Navigation Area' ),
