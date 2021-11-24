@@ -26,7 +26,13 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import MainDashboardButton from '../../main-dashboard-button';
 
-const NavigationPanel = ( { isOpen, setIsOpen, activeTemplateType } ) => {
+const SITE_EDITOR_KEY = 'site-editor';
+
+const NavigationPanel = ( {
+	isOpen,
+	setIsOpen,
+	activeItem = SITE_EDITOR_KEY,
+} ) => {
 	const siteTitle = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreDataStore );
 
@@ -43,7 +49,7 @@ const NavigationPanel = ( { isOpen, setIsOpen, activeTemplateType } ) => {
 		if ( isOpen ) {
 			panelRef.current.focus();
 		}
-	}, [ activeTemplateType, isOpen ] );
+	}, [ activeItem, isOpen ] );
 
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
@@ -69,7 +75,7 @@ const NavigationPanel = ( { isOpen, setIsOpen, activeTemplateType } ) => {
 					</div>
 				</div>
 				<div className="edit-site-navigation-panel__scroll-container">
-					<Navigation activeItem={ activeTemplateType }>
+					<Navigation activeItem={ activeItem }>
 						<MainDashboardButton.Slot>
 							<NavigationBackButton
 								backButtonLabel={ __( 'Dashboard' ) }
@@ -82,6 +88,7 @@ const NavigationPanel = ( { isOpen, setIsOpen, activeTemplateType } ) => {
 							<NavigationGroup title={ __( 'Editor' ) }>
 								<NavigationItem
 									title={ __( 'Site' ) }
+									item={ SITE_EDITOR_KEY }
 									href={ addQueryArgs( window.location.href, {
 										postId: undefined,
 										postType: undefined,
