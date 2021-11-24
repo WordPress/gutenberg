@@ -1384,7 +1384,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * than an existing default preset. This is the list of slugs present
 		 * in the global config we'll use to filter the incoming slugs.
 		 */
-		$slugs_global = self::get_slugs_from_path( $this->theme_json );
+		$slugs_global = self::get_slugs_from_default_origin( $this->theme_json );
 
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
@@ -1393,7 +1393,7 @@ class WP_Theme_JSON_Gutenberg {
 				$node = _wp_array_get( $incoming_data, $path, null );
 				if ( isset( $node ) ) {
 					if ( 'theme' === $path[ count( $path ) - 1 ] ) {
-						$slugs_for_context = self::get_slugs_from_path( $this->theme_json, $metadata['path'] );
+						$slugs_for_context = self::get_slugs_from_default_origin( $this->theme_json, $metadata['path'] );
 						$slugs_to_filter   = array_merge_recursive( $slugs_global, $slugs_for_context );
 						$node              = self::filter_slugs( $node, $property_path, $slugs_to_filter );
 					}
@@ -1425,7 +1425,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @return array An associative array containing the slugs for the given path.
 	 */
-	private static function get_slugs_from_path( $data, $node_path = array( 'settings' ) ) {
+	private static function get_slugs_from_default_origin( $data, $node_path = array( 'settings' ) ) {
 		$slugs = array();
 		foreach ( self::PRESETS_METADATA as $metadata ) {
 			$slugs_for_preset = array();
