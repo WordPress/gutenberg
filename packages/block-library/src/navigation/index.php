@@ -145,23 +145,15 @@ function block_core_navigation_get_non_empty_navigation() {
 	// - https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters.
 	$navigation_posts = get_posts(
 		array(
-			'post_type' => 'wp_navigation',
-			'order'     => 'ASC',
-			'orderby'   => 'name',
+			'post_type'      => 'wp_navigation',
+			'order'          => 'ASC',
+			'orderby'        => 'name',
+			'posts_per_page' => -1, // include all posts.
+			's'              => '<!--', // look for block indicators to ensure we only include non-empty Navigations.
 		)
 	);
+	return count( $navigation_posts ) ? $navigation_posts[0] : null;
 
-	$navigation_post = null;
-
-	// Pick first non-empty Navigation.
-	foreach ( $navigation_posts as $navigation_maybe ) {
-		if ( ! empty( $navigation_maybe->post_content ) ) {
-			$navigation_post = $navigation_maybe;
-			break;
-		}
-	}
-
-	return $navigation_post;
 }
 
 /**
