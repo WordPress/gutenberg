@@ -10,6 +10,7 @@ import type { Ref, KeyboardEvent } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -51,21 +52,26 @@ function ConfirmDialog(
 		setShouldSelfClose( ! isIsOpenSet );
 	}, [ isOpenProp ] );
 
-	const handleEvent = ( callback?: ( event: DialogInputEvent ) => void ) => (
-		event: DialogInputEvent
-	) => {
-		// `onCancel` is optional
-		callback?.( event );
-		if ( shouldSelfClose ) {
-			setIsOpen( false );
-		}
-	};
+	const handleEvent = useCallback(
+		( callback?: ( event: DialogInputEvent ) => void ) => (
+			event: DialogInputEvent
+		) => {
+			callback?.( event );
+			if ( shouldSelfClose ) {
+				setIsOpen( false );
+			}
+		},
+		[ shouldSelfClose, setIsOpen ]
+	);
 
-	const handleEnter = ( event: KeyboardEvent< HTMLDivElement > ) => {
-		if ( event.key === 'Enter' ) {
-			handleEvent( onConfirm )( event );
-		}
-	};
+	const handleEnter = useCallback(
+		( event: KeyboardEvent< HTMLDivElement > ) => {
+			if ( event.key === 'Enter' ) {
+				handleEvent( onConfirm )( event );
+			}
+		},
+		[ handleEvent, onConfirm ]
+	);
 
 	return (
 		<>
