@@ -45,7 +45,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	} elseif ( ! $max_page || $max_page > $page ) {
 		$custom_query = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		$max_num_pages = (int) $custom_query->max_num_pages;
-		if ( !$max_num_pages ) {
+		if ( ! $max_num_pages ) {
 			return '';
 		}
 		if ( $max_num_pages !== $page ) {
