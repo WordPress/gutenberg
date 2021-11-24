@@ -1,12 +1,13 @@
 .titleStyle {
 	text-align: left;
 	font-weight: bold;
+	flex-grow: 0;
 }
 
 .summaryStyle {
 	text-align: left;
 	font-size: 14px;
-	line-height: 20px;
+	flex-grow: 0;
 }
 
 .itemContainerStyle {
