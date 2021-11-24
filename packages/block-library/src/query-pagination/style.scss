@@ -38,6 +38,13 @@ $pagination-margin: 0.5em;
 		visibility: hidden;
 	}
 
+	&.wp-justify-left,
+	&.wp-justify-right {
+		> [aria-hidden="true"] {
+			display: none;
+		}
+	}
+
 	&.aligncenter {
 		justify-content: center;
 	}
