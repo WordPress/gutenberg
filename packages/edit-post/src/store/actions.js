@@ -424,7 +424,9 @@ export function setIsListViewOpened( isOpen ) {
  * @param {boolean} value Is editing template.
  * @return {Object} Action object.
  */
-export function setIsEditingTemplate( value ) {
+export function* setIsEditingTemplate( value ) {
+	const showOrHideBlocks = !! value ? showBlockTypes : hideBlockTypes;
+	yield showOrHideBlocks( 'core/template-part' );
 	return {
 		type: 'SET_IS_EDITING_TEMPLATE',
 		value,

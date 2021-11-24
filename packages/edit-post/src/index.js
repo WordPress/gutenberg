@@ -16,6 +16,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import './hooks';
 import './plugins';
 import Editor from './editor';
+import { store as editPostStore } from './store';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -101,6 +102,7 @@ export function initializeEditor(
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
+	dispatch( editPostStore ).hideBlockTypes( 'core/template-part' );
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
