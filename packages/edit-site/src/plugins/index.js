@@ -16,6 +16,7 @@ import { download } from '@wordpress/icons';
  * Internal dependencies
  */
 import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
+import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 
 registerPlugin( 'edit-site', {
 	render() {
@@ -27,7 +28,7 @@ registerPlugin( 'edit-site', {
 						icon={ download }
 						onClick={ () =>
 							apiFetch( {
-								path: '/__experimental/edit-site/v1/export',
+								path: '/wp-block-editor/v1/export',
 								parse: false,
 							} )
 								.then( ( res ) => res.blob() )
@@ -45,6 +46,7 @@ registerPlugin( 'edit-site', {
 					>
 						{ __( 'Export' ) }
 					</MenuItem>
+					<WelcomeGuideMenuItem />
 				</ToolsMoreMenuGroup>
 			</>
 		);

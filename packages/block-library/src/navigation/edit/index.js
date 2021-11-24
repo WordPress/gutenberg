@@ -6,10 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+	Platform,
+} from '@wordpress/element';
 import {
 	InspectorControls,
-	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
@@ -20,7 +25,7 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, useEntityProp } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -88,23 +93,44 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+	context: { navigationArea },
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
 	const {
-		navigationMenuId,
-		itemsJustification,
 		openSubmenusOnClick,
-		orientation,
 		overlayMenu,
 		showSubmenuIcon,
+		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
+
+	const [ areaMenu, setAreaMenu ] = useEntityProp(
+		'root',
+		'navigationArea',
+		'navigation',
+		navigationArea
+	);
+
+	const navigationAreaMenu = areaMenu === 0 ? undefined : areaMenu;
+
+	const navigationMenuId = navigationArea
+		? navigationAreaMenu
+		: attributes.navigationMenuId;
+
+	const setNavigationMenuId = useCallback(
+		( postId ) => {
+			setAttributes( { navigationMenuId: postId } );
+			if ( navigationArea ) {
+				setAreaMenu( postId );
+			}
+		},
+		[ navigationArea ]
+	);
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ navigationMenuId }`
@@ -123,15 +149,21 @@ function Navigation( {
 		[ clientId ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
-	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		replaceInnerBlocks,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	const [
 		hasSavedUnsavedInnerBlocks,
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
+	const isWithinUnassignedArea = navigationArea && ! navigationMenuId;
+
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems
+		! hasExistingNavItems || isWithinUnassignedArea
 	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
@@ -160,8 +192,8 @@ function Navigation( {
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames( className, {
-			[ `items-justified-${ attributes.itemsJustification }` ]: itemsJustification,
-			'is-vertical': orientation === 'vertical',
+			'items-justified-right': justifyContent === 'right',
+			'items-justified-space-between': justifyContent === 'space-between',
 			'is-responsive': 'never' !== overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
@@ -180,6 +212,29 @@ function Navigation( {
 		},
 	} );
 
+	const overlayClassnames = classnames( {
+		'has-text-color':
+			!! overlayTextColor.color || !! overlayTextColor?.class,
+		[ getColorClassName(
+			'color',
+			overlayTextColor?.slug
+		) ]: !! overlayTextColor?.slug,
+		'has-background':
+			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
+		[ getColorClassName(
+			'background-color',
+			overlayBackgroundColor?.slug
+		) ]: !! overlayBackgroundColor?.slug,
+	} );
+
+	const overlayStyles = {
+		color: ! overlayTextColor?.slug && overlayTextColor?.color,
+		backgroundColor:
+			! overlayBackgroundColor?.slug &&
+			overlayBackgroundColor?.color &&
+			overlayBackgroundColor.color,
+	};
+
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
@@ -190,6 +245,15 @@ function Navigation( {
 		setDetectedOverlayBackgroundColor,
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	// Spacer block needs orientation from context. This is a patch until
+	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
+	useEffect( () => {
+		if ( orientation ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { orientation } );
+		}
+	}, [ orientation ] );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
@@ -222,35 +286,23 @@ function Navigation( {
 	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
-	const hasUnsavedBlocks = hasExistingNavItems && ! isEntityAvailable;
+	const hasUnsavedBlocks =
+		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<UnsavedInnerBlocks
 				blockProps={ blockProps }
 				blocks={ innerBlocks }
+				clientId={ clientId }
 				navigationMenus={ navigationMenus }
 				hasSelection={ isSelected || isInnerBlockSelected }
 				hasSavedUnsavedInnerBlocks={ hasSavedUnsavedInnerBlocks }
 				onSave={ ( post ) => {
 					setHasSavedUnsavedInnerBlocks( true );
 					// Switch to using the wp_navigation entity.
-					setAttributes( { navigationMenuId: post.id } );
+					setNavigationMenuId( post.id );
 				} }
 			/>
-		);
-	}
-
-	// Show a warning if the selected menu is no longer available.
-	// TODO - the user should be able to select a new one?
-	if ( navigationMenuId && isNavigationMenuMissing ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __(
-						'Navigation menu has been deleted or is unavailable'
-					) }
-				</Warning>
-			</div>
 		);
 	}
 
@@ -267,11 +319,6 @@ function Navigation( {
 	const PlaceholderComponent = CustomPlaceholder
 		? CustomPlaceholder
 		: Placeholder;
-
-	const justifyAllowedControls =
-		orientation === 'vertical'
-			? [ 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right', 'space-between' ];
 
 	return (
 		<EntityProvider
@@ -291,52 +338,32 @@ function Navigation( {
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
 										onSelect={ ( { id } ) => {
-											setAttributes( {
-												navigationMenuId: id,
-											} );
+											setNavigationMenuId( id );
 											onClose();
+										} }
+										onCreateNew={ () => {
+											if ( navigationArea ) {
+												setAreaMenu( 0 );
+											}
+											setAttributes( {
+												navigationMenuId: undefined,
+											} );
+											setIsPlaceholderShown( true );
 										} }
 									/>
 								) }
 							</ToolbarDropdownMenu>
 						</ToolbarGroup>
 					) }
-					{ hasItemJustificationControls && (
-						<JustifyToolbar
-							value={ itemsJustification }
-							allowedControls={ justifyAllowedControls }
-							onChange={ ( value ) =>
-								setAttributes( { itemsJustification: value } )
-							}
-							popoverProps={ {
-								position: 'bottom right',
-								isAlternate: true,
-							} }
-						/>
-					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
-					<ToolbarGroup>
-						{ isDraftNavigationMenu && (
+					{ isDraftNavigationMenu && (
+						<ToolbarGroup>
 							<NavigationMenuPublishButton />
-						) }
-					</ToolbarGroup>
+						</ToolbarGroup>
+					) }
 				</BlockControls>
 				{ listViewModal }
 				<InspectorControls>
-					{ isEntityAvailable && (
-						<PanelBody title={ __( 'Navigation menu' ) }>
-							<NavigationMenuNameControl />
-							<NavigationMenuDeleteControl
-								onDelete={ () => {
-									replaceInnerBlocks( clientId, [] );
-									setAttributes( {
-										navigationMenuId: undefined,
-									} );
-									setIsPlaceholderShown( true );
-								} }
-							/>
-						</PanelBody>
-					) }
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
 							<h3>{ __( 'Overlay Menu' ) }</h3>
@@ -435,14 +462,29 @@ function Navigation( {
 						</PanelColorSettings>
 					) }
 				</InspectorControls>
+				{ isEntityAvailable && (
+					<InspectorControls __experimentalGroup="advanced">
+						<NavigationMenuNameControl />
+						<NavigationMenuDeleteControl
+							onDelete={ () => {
+								replaceInnerBlocks( clientId, [] );
+								if ( navigationArea ) {
+									setAreaMenu( 0 );
+								}
+								setAttributes( {
+									navigationMenuId: undefined,
+								} );
+								setIsPlaceholderShown( true );
+							} }
+						/>
+					</InspectorControls>
+				) }
 				<nav { ...blockProps }>
 					{ ! isEntityAvailable && isPlaceholderShown && (
 						<PlaceholderComponent
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
-								setAttributes( {
-									navigationMenuId: post.id,
-								} );
+								setNavigationMenuId( post.id );
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }
@@ -461,6 +503,8 @@ function Navigation( {
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ 'never' !== overlayMenu }
 							isHiddenByDefault={ 'always' === overlayMenu }
+							classNames={ overlayClassnames }
+							styles={ overlayStyles }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks

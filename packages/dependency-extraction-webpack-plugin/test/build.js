@@ -61,9 +61,13 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 
 				// Asset files should match.
 				assetFiles.forEach( ( assetFile ) => {
+					const assetBasename = path.basename( assetFile );
+
 					expect(
 						fs.readFileSync( assetFile, 'utf-8' )
-					).toMatchSnapshot( 'Asset file should match snapshot' );
+					).toMatchSnapshot(
+						`Asset file '${ assetBasename }' should match snapshot`
+					);
 				} );
 
 				const compareByModuleIdentifier = ( m1, m2 ) => {
@@ -75,7 +79,7 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 				};
 
 				// Webpack stats external modules should match.
-				const externalModules = stats.compilation.modules
+				const externalModules = Array.from( stats.compilation.modules )
 					.filter( ( { externalType } ) => externalType )
 					.sort( compareByModuleIdentifier )
 					.map( ( module ) => ( {

@@ -36,3 +36,8 @@
 		}
 	}
 }
+
+// Hide inserter from previews.
+.block-editor-block-preview__content-iframe .block-list-appender {
+	display: none;
+}

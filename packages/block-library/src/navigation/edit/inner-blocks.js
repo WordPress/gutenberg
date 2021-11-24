@@ -81,7 +81,8 @@ export default function NavigationInnerBlocks( {
 			blocks.every(
 				( { name } ) =>
 					name === 'core/navigation-link' ||
-					name === 'core/navigation-submenu'
+					name === 'core/navigation-submenu' ||
+					name === 'core/page-list'
 			),
 		[ blocks ]
 	);

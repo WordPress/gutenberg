@@ -106,17 +106,19 @@ export function* addTemplate( template ) {
 }
 
 /**
- * Removes a template, and updates the current page and template.
+ * Removes a template.
  *
- * @param {number} templateId The template ID.
+ * @param {Object} template The template object.
  */
-export function* removeTemplate( templateId ) {
-	yield apiFetch( {
-		path: `/wp/v2/templates/${ templateId }`,
-		method: 'DELETE',
-	} );
-	const page = yield controls.select( editSiteStoreName, 'getPage' );
-	yield controls.dispatch( editSiteStoreName, 'setPage', page );
+export function* removeTemplate( template ) {
+	yield controls.dispatch(
+		coreStore,
+		'deleteEntityRecord',
+		'postType',
+		template.type,
+		template.id,
+		{ force: true }
+	);
 }
 
 /**
@@ -336,9 +338,12 @@ export function setIsListViewOpened( isOpen ) {
 /**
  * Reverts a template to its original theme-provided file.
  *
- * @param {Object} template The template to revert.
+ * @param {Object}  template            The template to revert.
+ * @param {Object}  [options]
+ * @param {boolean} [options.allowUndo] Whether to allow the user to undo
+ *                                      reverting the template. Default true.
  */
-export function* revertTemplate( template ) {
+export function* revertTemplate( template, { allowUndo = true } = {} ) {
 	if ( ! isTemplateRevertable( template ) ) {
 		yield controls.dispatch(
 			noticesStore,
@@ -426,32 +431,40 @@ export function* revertTemplate( template ) {
 			}
 		);
 
-		const undoRevert = async () => {
-			await dispatch( coreStore ).editEntityRecord(
-				'postType',
-				template.type,
-				edited.id,
+		if ( allowUndo ) {
+			const undoRevert = async () => {
+				await dispatch( coreStore ).editEntityRecord(
+					'postType',
+					template.type,
+					edited.id,
+					{
+						content: serializeBlocks,
+						blocks: edited.blocks,
+						source: 'custom',
+					}
+				);
+			};
+			yield controls.dispatch(
+				noticesStore,
+				'createSuccessNotice',
+				__( 'Template reverted.' ),
 				{
-					content: serializeBlocks,
-					blocks: edited.blocks,
-					source: 'custom',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: undoRevert,
+						},
+					],
 				}
 			);
-		};
-		yield controls.dispatch(
-			noticesStore,
-			'createSuccessNotice',
-			__( 'Template reverted.' ),
-			{
-				type: 'snackbar',
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick: undoRevert,
-					},
-				],
-			}
-		);
+		} else {
+			yield controls.dispatch(
+				noticesStore,
+				'createSuccessNotice',
+				__( 'Template reverted.' )
+			);
+		}
 	} catch ( error ) {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'

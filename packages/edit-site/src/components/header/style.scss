@@ -25,6 +25,8 @@ $header-toolbar-min-width: 335px;
 		display: flex;
 		align-items: center;
 		height: 100%;
+		flex-grow: 1;
+		justify-content: center;
 		// Flex items will, by default, refuse to shrink below a minimum
 		// intrinsic width. In order to shrink this flexbox item, and
 		// subsequently truncate child text, we set an explicit min-width.
@@ -109,7 +111,6 @@ body.is-navigation-sidebar-open {
 .edit-site-header__actions {
 	display: inline-flex;
 	align-items: center;
-	flex-wrap: wrap;
 	padding-right: $grid-unit-05;
 
 	.interface-pinned-items {

@@ -47,6 +47,7 @@ import * as mediaText from './media-text';
 import * as missing from './missing';
 import * as more from './more';
 import * as navigation from './navigation';
+import * as navigationArea from './navigation-area';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
@@ -251,6 +252,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								commentReplyLink,
 								commentTemplate,
 								commentsQueryLoop,
+								navigationArea,
 								postComment,
 								postCommentsCount,
 								postCommentsForm,

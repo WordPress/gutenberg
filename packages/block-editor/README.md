@@ -209,6 +209,10 @@ _Returns_
 
 -   `WPElement`: Element.
 
+### BlockStyles
+
+Undocumented declaration.
+
 ### BlockTitle
 
 Renders the block's configured title as a string, or empty if the title
@@ -679,6 +683,18 @@ _Parameters_
 _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
+
+### useCachedTruthy
+
+Keeps an up-to-date copy of the passed value and returns it. If value becomes falsy, it will return the last truthy copy.
+
+_Parameters_
+
+-   _value_ `any`:
+
+_Returns_
+
+-   `any`: value
 
 ### useInnerBlocksProps
 

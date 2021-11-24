@@ -18,12 +18,15 @@ export default function ResponsiveWrapper( {
 	isResponsive,
 	onToggle,
 	isHiddenByDefault,
+	classNames,
+	styles,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
 	}
 	const responsiveContainerClasses = classnames(
 		'wp-block-navigation__responsive-container',
+		classNames,
 		{
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
@@ -63,8 +66,8 @@ export default function ResponsiveWrapper( {
 
 			<div
 				className={ responsiveContainerClasses }
+				style={ styles }
 				id={ modalId }
-				aria-hidden={ ! isOpen }
 			>
 				<div
 					className="wp-block-navigation__responsive-close"

@@ -1,6 +1,25 @@
-// Styles copied from button block styles.
 .wp-block-post-comments-form {
+	&[style*="font-weight"] :where(.comment-reply-title) {
+		font-weight: inherit;
+	}
+	&[style*="font-family"] :where(.comment-reply-title) {
+		font-family: inherit;
+	}
+	&[class*="-font-size"] :where(.comment-reply-title),
+	&[style*="font-size"] :where(.comment-reply-title) {
+		font-size: inherit;
+	}
+	&[style*="line-height"] :where(.comment-reply-title) {
+		line-height: inherit;
+	}
+	&[style*="font-style"] :where(.comment-reply-title) {
+		font-style: inherit;
+	}
+	&[style*="letter-spacing"] :where(.comment-reply-title) {
+		letter-spacing: inherit;
+	}
 
+	// Styles copied from button block styles.
 	input[type="submit"] {
 		border: none;
 		box-shadow: none;

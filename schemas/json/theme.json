@@ -9,6 +9,11 @@
 		},
 		"settingsProperties": {
 			"properties": {
+				"appearanceTools": {
+					"description": "Setting that enables ui tools. \nGutenberg plugin required.",
+					"type": "boolean",
+					"default": false
+				},
 				"border": {
 					"description": "Settings related to borders.\nGutenberg plugin required.",
 					"type": "object",
@@ -57,6 +62,16 @@
 						},
 						"customGradient": {
 							"description": "Allow users to create custom gradients.\nSince 5.8.",
+							"type": "boolean",
+							"default": true
+						},
+						"defaultGradients": {
+							"description": "Allow users to choose colors from the default gradients. \nGutenberg plugin required.",
+							"type": "boolean",
+							"default": true
+						},
+						"defaultPalette": {
+							"description": "Allow users to choose colors from the default palette. \nGutenberg plugin required.",
 							"type": "boolean",
 							"default": true
 						},
@@ -563,6 +578,11 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				}
 			},
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				}
+			},
 			"additionalProperties": false
 		},
 		"settingsCustomAdditionalProperties": {
@@ -1017,6 +1037,11 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/widget-group": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				}
+			},
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				}
 			},

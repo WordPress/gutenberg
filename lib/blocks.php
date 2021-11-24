@@ -33,6 +33,7 @@ function gutenberg_reregister_core_block_types() {
 				'media-text',
 				'missing',
 				'more',
+				'navigation-area',
 				'navigation-link',
 				'navigation-submenu',
 				'nextpage',
@@ -65,10 +66,13 @@ function gutenberg_reregister_core_block_types() {
 				'comment-template.php'          => 'core/comment-template',
 				'file.php'                      => 'core/file',
 				'home-link.php'                 => 'core/home-link',
+				'image.php'                     => 'core/image',
+				'gallery.php'                   => 'core/gallery',
 				'latest-comments.php'           => 'core/latest-comments',
 				'latest-posts.php'              => 'core/latest-posts',
 				'loginout.php'                  => 'core/loginout',
 				'navigation.php'                => 'core/navigation',
+				'navigation-area.php'           => 'core/navigation-area',
 				'navigation-link.php'           => 'core/navigation-link',
 				'navigation-submenu.php'        => 'core/navigation-submenu',
 				'page-list.php'                 => 'core/page-list',
@@ -553,7 +557,7 @@ function gutenberg_migrate_old_typography_shape( $metadata ) {
 					sprintf( __( 'Block %1$s is declaring %2$s support on block.json under supports.%2$s. %2$s support is now declared under supports.typography.%2$s.', 'gutenberg' ), $metadata['name'], $typography_key ),
 					headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
 				);
-				gutenberg_experimental_set( $metadata['supports'], array( 'typography', $typography_key ), $support_for_key );
+				_wp_array_set( $metadata['supports'], array( 'typography', $typography_key ), $support_for_key );
 				unset( $metadata['supports'][ $typography_key ] );
 			}
 		}

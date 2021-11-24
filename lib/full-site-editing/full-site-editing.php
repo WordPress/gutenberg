@@ -39,6 +39,10 @@ function gutenberg_remove_legacy_pages() {
 				$indexes_to_remove[] = $index;
 			}
 
+			if ( false !== strpos( $menu_item[2], 'site-editor.php' ) ) {
+				$indexes_to_remove[] = $index;
+			}
+
 			if ( false !== strpos( $menu_item[2], 'gutenberg-widgets' ) ) {
 				$indexes_to_remove[] = $index;
 			}
