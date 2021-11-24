@@ -341,6 +341,7 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ () => {
+											replaceInnerBlocks( clientId, [] );
 											if ( navigationArea ) {
 												setAreaMenu( 0 );
 											}
