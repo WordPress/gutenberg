@@ -17,42 +17,30 @@ describe( 'Convert to tree', () => {
 			{ commentId: 6, parent: 1 },
 		] );
 
-		expect( comments ).toMatchInlineSnapshot( `
-		Array [
-		  Object {
-		    "children": Array [
-		      Object {
-		        "children": Array [],
-		        "commentId": 6,
-		        "parent": 1,
-		      },
-		    ],
-		    "commentId": 1,
-		    "parent": 0,
-		  },
-		  Object {
-		    "children": Array [
-		      Object {
-		        "children": Array [],
-		        "commentId": 3,
-		        "parent": 2,
-		      },
-		      Object {
-		        "children": Array [
-		          Object {
-		            "children": Array [],
-		            "commentId": 5,
-		            "parent": 4,
-		          },
-		        ],
-		        "commentId": 4,
-		        "parent": 2,
-		      },
-		    ],
-		    "commentId": 2,
-		    "parent": 0,
-		  },
-		]
-	` );
+		expect( comments ).toEqual( [
+			{
+				commentId: 1,
+				parent: 0,
+				children: [
+					{
+						children: [],
+						commentId: 6,
+						parent: 1,
+					},
+				],
+			},
+			{
+				commentId: 2,
+				parent: 0,
+				children: [
+					{ children: [], commentId: 3, parent: 2 },
+					{
+						children: [ { children: [], commentId: 5, parent: 4 } ],
+						commentId: 4,
+						parent: 2,
+					},
+				],
+			},
+		] );
 	} );
 } );
