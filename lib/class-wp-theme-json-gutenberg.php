@@ -1470,11 +1470,11 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Removes the preset values whose slug is equal to any of default presets.
+	 * Removes the preset values whose slug is equal to any of given slugs.
 	 *
 	 * @param array $node The node with the presets to validate.
-	 * @param array $path The path to the preset to inspect.
-	 * @param array $slugs The slugs to remove.
+	 * @param array $path The path to the preset type to inspect.
+	 * @param array $slugs The slugs that should not be overriden.
 	 *
 	 * @return array The new node
 	 */
