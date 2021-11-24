@@ -142,12 +142,12 @@ function Navigation( {
 				blockEditorStore
 			);
 			const blocks = getBlocks( clientId );
-			const firstSubmenu = blocks.find(
+			const didFindSubmenu = !! blocks.find(
 				( block ) => block.name === 'core/navigation-submenu'
 			);
 
 			return {
-				hasSubmenus: !! firstSubmenu,
+				hasSubmenus: didFindSubmenu,
 				innerBlocks: blocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
@@ -420,21 +420,26 @@ function Navigation( {
 										onChange={ ( value ) => {
 											setAttributes( {
 												openSubmenusOnClick: value,
+												...( value && {
+													showSubmenuIcon: true,
+												} ), // make sure arrows are shown when we toggle this on.
 											} );
 										} }
 										label={ __( 'Open on click' ) }
 									/>
-									{ ! attributes.openSubmenusOnClick && (
-										<ToggleControl
-											checked={ showSubmenuIcon }
-											onChange={ ( value ) => {
-												setAttributes( {
-													showSubmenuIcon: value,
-												} );
-											} }
-											label={ __( 'Show icons' ) }
-										/>
-									) }
+
+									<ToggleControl
+										checked={ showSubmenuIcon }
+										onChange={ ( value ) => {
+											setAttributes( {
+												showSubmenuIcon: value,
+											} );
+										} }
+										disabled={
+											attributes.openSubmenusOnClick
+										}
+										label={ __( 'Show arrow' ) }
+									/>
 								</>
 							) }
 						</PanelBody>
