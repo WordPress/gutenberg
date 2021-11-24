@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { convertToTree } from '../util';
 
 describe( 'Convert to tree', () => {
