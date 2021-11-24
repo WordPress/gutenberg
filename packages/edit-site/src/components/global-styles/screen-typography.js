@@ -94,7 +94,7 @@ function ScreenTypography( { name } ) {
 								name={ name }
 								parentMenu={ parentMenu }
 								element="link"
-								label={ __( 'Link' ) }
+								label={ __( 'Links' ) }
 							/>
 						</ItemGroup>
 					</VStack>
