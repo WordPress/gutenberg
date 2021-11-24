@@ -12,7 +12,8 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] [Embed block] Included Link in Block Settings [#36099]
 -   [**] Fix tab titles translation of inserter menu [#36534]
--   [*] [Media&Text block] Fix an issue where the text font size would be bigger than expected in some cases  [#36570]
+-   [*] [Media&Text block] Fix an issue where the text font size would be bigger than expected in some cases [#36570]
+-   [**] [Gallery block] When a gallery block is added, the media options are auto opened for v2 of the Gallery block. [#36757]
 
 ## 1.66.0
 -   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
