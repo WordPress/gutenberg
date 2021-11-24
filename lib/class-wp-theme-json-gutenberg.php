@@ -1378,36 +1378,48 @@ class WP_Theme_JSON_Gutenberg {
 		 * This is the case of color.palette, color.gradients, color.duotone,
 		 * typography.fontSizes, or typography.fontFamilies.
 		 *
+		 * Additionally, for some preset types, we also want to make sure the
+		 * values they introduce don't conflict with default values. We do so
+		 * by checking the incoming slugs for theme presets and compare them
+		 * with the equivalent dfefault presets: if a slug is present as a default
+		 * we remove it from the theme presets.
 		 */
-		$to_replace   = array();
-		$to_replace[] = array( 'spacing', 'units' );
-		foreach ( self::PRESETS_METADATA as $metadata ) {
-			foreach ( self::VALID_ORIGINS as $origin ) {
-				$to_replace[] = array_merge( $metadata['path'], array( $origin ) );
-			}
-		}
-
-		/**
-		 * We need to remove the incoming presets that have the same slug
-		 * than an existing default preset. This is the list of slugs present
-		 * in the global config we'll use to filter the incoming slugs.
-		 */
+		$nodes        = self::get_setting_nodes( $incoming_data );
 		$slugs_global = self::get_slugs_not_to_override( $this->theme_json );
+		foreach ( $nodes as $node ) {
+			$slugs_for_context = self::get_slugs_not_to_override( $this->theme_json, $node['path'] );
+			$slugs             = array_merge_recursive( $slugs_global, $slugs_for_context );
 
-		$nodes = self::get_setting_nodes( $incoming_data );
-		foreach ( $nodes as $metadata ) {
-			foreach ( $to_replace as $property_path ) {
-				$path = array_merge( $metadata['path'], $property_path );
-				$node = _wp_array_get( $incoming_data, $path, null );
-				if ( isset( $node ) ) {
-					if ( 'theme' === $path[ count( $path ) - 1 ] ) {
-						$slugs_for_context = self::get_slugs_not_to_override( $this->theme_json, $metadata['path'] );
-						$slugs_to_filter   = array_merge_recursive( $slugs_global, $slugs_for_context );
-						$node              = self::filter_slugs( $node, $property_path, $slugs_to_filter );
+			// Replace the spacing.units.
+			$path    = array_merge( $node['path'], array( 'spacing', 'units' ) );
+			$content = _wp_array_get( $incoming_data, $path, null );
+			if ( isset( $content ) ) {
+				_wp_array_set( $this->theme_json, $path, $content );
+			}
+
+			// Replace the presets.
+			foreach ( self::PRESETS_METADATA as $preset ) {
+				foreach ( self::VALID_ORIGINS as $origin ) {
+					$path    = array_merge( $node['path'], $preset['path'], array( $origin ) );
+					$content = _wp_array_get( $incoming_data, $path, null );
+					if ( ! isset( $content ) ) {
+						continue;
 					}
-					_wp_array_set( $this->theme_json, $path, $node );
+
+					if (
+						( 'theme' !== $origin ) ||
+						( 'theme' === $origin && $preset['override'] )
+					) {
+						_wp_array_set( $this->theme_json, $path, $content );
+					}
+
+					if ( 'theme' === $origin && ! $preset['override'] ) {
+						$content = self::filter_slugs( $content, $preset['path'], $slugs );
+						_wp_array_set( $this->theme_json, $path, $content );
+					}
 				}
 			}
+
 		}
 
 	}
@@ -1441,14 +1453,16 @@ class WP_Theme_JSON_Gutenberg {
 			$slugs_for_preset = array();
 			$path             = array_merge( $node_path, $metadata['path'], array( 'default' ) );
 			$preset           = _wp_array_get( $data, $path, null );
-			if ( isset( $preset ) ) {
-				$slugs_for_preset = array_map(
-					function( $value ) {
-						return isset( $value['slug'] ) ? $value['slug'] : null;
-					},
-					$preset
-				);
+			if ( ! isset( $preset ) ) {
+				continue;
 			}
+
+			$slugs_for_preset = array_map(
+				function( $value ) {
+					return isset( $value['slug'] ) ? $value['slug'] : null;
+				},
+				$preset
+			);
 			_wp_array_set( $slugs, $metadata['path'], $slugs_for_preset );
 		}
 
@@ -1465,9 +1479,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The new node
 	 */
 	private static function filter_slugs( $node, $path, $slugs ) {
-		// The path comes with the origin as the last key (default, theme, custom),
-		// so we remove it first.
-		array_pop( $path );
 		$slugs_for_preset = _wp_array_get( $slugs, $path, array() );
 		if ( empty( $slugs_for_preset ) ) {
 			return $node;
