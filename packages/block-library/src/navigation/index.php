@@ -148,7 +148,7 @@ function block_core_navigation_get_non_empty_navigation() {
 			'post_type'      => 'wp_navigation',
 			'order'          => 'ASC',
 			'orderby'        => 'name',
-			'posts_per_page' => -1, // include all posts.
+			'posts_per_page' => 1, // only the first post
 			's'              => '<!--', // look for block indicators to ensure we only include non-empty Navigations.
 		)
 	);
