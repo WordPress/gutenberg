@@ -68,12 +68,13 @@ function Actions( { template } ) {
 				<MenuGroup>
 					{ isRemovable && (
 						<MenuItem
+							isDestructive
 							onClick={ () => {
 								removeTemplate( template );
 								onClose();
 							} }
 						>
-							{ __( 'Remove template' ) }
+							{ __( 'Delete template' ) }
 						</MenuItem>
 					) }
 					{ isRevertable && (
