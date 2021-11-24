@@ -1,3 +1,5 @@
+let identifiers = [];
+
 const codeBeforeComment = ( sourceCode, node ) => {
 	const prevToken = sourceCode.getTokenBefore( node );
 	if ( prevToken && prevToken.loc.end.line === node.loc.start.line ) {
@@ -22,9 +24,16 @@ module.exports = {
 		return {
 			Program( node ) {
 				const { comments } = node;
+				identifiers = node.tokens.filter(
+					( x ) => x.type === 'Identifier'
+				);
 				comments.forEach( ( comment, index ) => {
-					// Regex to check if the comment contains an \@see or @todo type directive - any @ sign followed by a word.
-					const translatorOrTodoTypeCommentRegex = /translators:|@\w*\s/;
+					// Return early if this comment is a shebang at the start of a bash script.
+					const isShebang =
+						sourceCode.lines[ 0 ].indexOf( '#!' ) === 0;
+					if ( isShebang ) {
+						return;
+					}
 
 					// Skip block comments that cross multiple lines.
 					if (
@@ -35,16 +44,6 @@ module.exports = {
 					}
 					const { value } = comment;
 
-					// Skip translator or @see/@todo etc. comments
-					if ( value.match( translatorOrTodoTypeCommentRegex ) ) {
-						return;
-					}
-
-					const trimmedValue = value.trim();
-					const lastChar = trimmedValue.charAt(
-						trimmedValue.length - 1
-					);
-
 					const previousComment =
 						index !== 0 ? comments[ index - 1 ] : null;
 					const nextComment =
@@ -54,7 +53,6 @@ module.exports = {
 
 					const isFollowedDirectlyByLineComment =
 						nextComment &&
-						! codeBeforeComment( sourceCode, comment ) &&
 						nextComment.type === 'Line' &&
 						nextComment.loc.start.line ===
 							comment.loc.start.line + 1;
@@ -65,8 +63,13 @@ module.exports = {
 						previousComment.loc.end.line ===
 							comment.loc.start.line - 1;
 
-					// Check to see if the comment starts with a space.
-					if ( value.charAt( 0 ) !== ' ' ) {
+					// Check to see if the comment starts with a space, or a *.
+					if (
+						value.length > 0 &&
+						value.charAt( 0 ) !== ' ' &&
+						value.charAt( 0 ) !== '' &&
+						value.charAt( 0 ) !== '*'
+					) {
 						context.report( {
 							node,
 							loc: comment.loc,
@@ -74,31 +77,85 @@ module.exports = {
 						} );
 					}
 
+					// Regex to check if the comment contains an \@see or @todo type directive - any @ sign followed by a word.
+					const translatorOrTodoTypeCommentRegex = /translators:|@\w*\s/;
+
+					// Ignore pragmas/compiler hints/shebangs.
+					const pragmaRegex = /__mocks__\/.*\.js|@ts-(ignore|(no)?check)|eslint-(disable|enable)(-next-line)?|global\s\S/;
+
+					// Ignore known common words that don't need to be capitalized.
+					const commonWordRegex = /iOS|npm-?\w*|lint-?\w*|id/;
+
+					// Ignore if comment contains a URL.
+					const regexTests = [
+						translatorOrTodoTypeCommentRegex,
+						pragmaRegex,
+						commonWordRegex,
+					];
+					const commentMatchesExcludedTypes = regexTests.some(
+						( regex ) => {
+							return value.match( regex );
+						}
+					);
+
+					// Skip translator or @see/@todo etc. comments
+					if ( commentMatchesExcludedTypes ) {
+						return;
+					}
+
+					const trimmedValue = value.trim();
+					const startsWithURL = trimmedValue.match(
+						/^((https?)|(www))\S*/
+					);
+
 					// Check to see if first word starts with a capital letter.
 					if (
+						! startsWithURL &&
 						! isPrecededDirectlyByLineComment &&
 						trimmedValue.charAt( 0 ) !==
 							trimmedValue.charAt( 0 ).toUpperCase()
 					) {
-						context.report( {
-							node,
-							loc: comment.loc,
-							messageId: 'capitalLetter',
-						} );
-					}
+						// Check that the comment doesn't start with an identifier used on the line above or below.
+						// If it does then allow it to be lower case.
+						// This caters for comments describing the code, referring to variables/tokens as they are written.
+						const identifiersOnNextOrPreviousLines = identifiers
+							.filter(
+								( identifier ) =>
+									identifier.loc.start.line ===
+										comment.loc.start.line + 1 ||
+									identifier.loc.start.line ===
+										comment.loc.start.line - 1 ||
+									identifier.loc.start.line ===
+										comment.loc.start.line
+							)
+							.map( ( identifier ) => identifier.value );
 
-					// Check for correct punctuation.
-					if (
-						lastChar !== '.' &&
-						lastChar !== '!' &&
-						lastChar !== '?'
-					) {
-						// Check if next comment is on the following line, if it is then this rule doesn't count
-						// because comments could be formatted over multiple lines like this one is.
-						if ( isFollowedDirectlyByLineComment ) {
-							return;
+						const trimmedComment = comment.value.trim();
+						if (
+							! identifiersOnNextOrPreviousLines.some(
+								( identifier ) =>
+									trimmedComment.indexOf( identifier ) === 0
+							)
+						) {
+							context.report( {
+								node,
+								loc: comment.loc,
+								messageId: 'capitalLetter',
+							} );
 						}
-
+					}
+					const endsWithURL = trimmedValue.match(
+						/((https?)|(www))\S*\s?$/
+					);
+					// Check for correct punctuation. Check that last character is a word character (should guard
+					// against code comments being flagged). Check if next comment is on the following line, if it is,
+					// then this rule doesn't count because comments could be formatted over multiple lines like this
+					// one is.
+					if (
+						! endsWithURL &&
+						! value.match( /\W$/ ) &&
+						! isFollowedDirectlyByLineComment
+					) {
 						context.report( {
 							node,
 							loc: comment.loc,
