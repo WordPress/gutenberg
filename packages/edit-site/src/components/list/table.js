@@ -22,12 +22,18 @@ import isTemplateRevertable from '../../utils/is-template-revertable';
 
 function Actions( { template } ) {
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
+	const { saveEditedEntityRecord } = useDispatch( coreStore );
 
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
 
 	if ( ! isRemovable && ! isRevertable ) {
 		return null;
+	}
+
+	async function revertAndSaveTemplate() {
+		await revertTemplate( template, { allowUndo: false } );
+		await saveEditedEntityRecord( 'postType', template.type, template.id );
 	}
 
 	return (
@@ -52,7 +58,7 @@ function Actions( { template } ) {
 						<MenuItem
 							info={ __( 'Restore template to theme default' ) }
 							onClick={ () => {
-								revertTemplate( template );
+								revertAndSaveTemplate();
 								onClose();
 							} }
 						>
