@@ -487,6 +487,7 @@ function Navigation( {
 							hasResolvedNavigationMenus={
 								hasResolvedNavigationMenus
 							}
+							clientId={ clientId }
 						/>
 					) }
 					{ ! isEntityAvailable && ! isPlaceholderShown && (
