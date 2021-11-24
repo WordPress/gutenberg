@@ -281,7 +281,7 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
-	const createNewMenu = useCallback( () => {
+	const startWithEmptyMenu = useCallback( () => {
 		replaceInnerBlocks( clientId, [] );
 		if ( navigationArea ) {
 			setAreaMenu( 0 );
@@ -326,7 +326,7 @@ function Navigation( {
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
 					) }
-					<Button onClick={ createNewMenu } variant="link">
+					<Button onClick={ startWithEmptyMenu } variant="link">
 						{ __( 'Create a new menu?' ) }
 					</Button>
 				</Warning>
@@ -369,7 +369,7 @@ function Navigation( {
 											setNavigationMenuId( id );
 											onClose();
 										} }
-										onCreateNew={ createNewMenu }
+										onCreateNew={ startWithEmptyMenu }
 									/>
 								) }
 							</ToolbarDropdownMenu>
