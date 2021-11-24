@@ -128,6 +128,16 @@ export default function BorderPanel( { name } ) {
 		setBorderWidth( undefined );
 	};
 
+	// When we set a border color or width ensure we have a style so the user
+	// can see a visible border.
+	const handleOnChangeWithStyle = ( setStyle ) => ( value ) => {
+		if ( !! value && ! borderStyle ) {
+			setBorderStyle( 'solid' );
+		}
+
+		setStyle( value || undefined );
+	};
+
 	return (
 		<ToolsPanel label={ __( 'Border' ) } resetAll={ resetAll }>
 			{ showBorderWidth && (
@@ -142,7 +152,7 @@ export default function BorderPanel( { name } ) {
 						value={ borderWidthValue }
 						label={ __( 'Width' ) }
 						min={ MIN_BORDER_WIDTH }
-						onChange={ handleOnChange( setBorderWidth ) }
+						onChange={ handleOnChangeWithStyle( setBorderWidth ) }
 						units={ units }
 					/>
 				</ToolsPanelItem>
@@ -175,7 +185,9 @@ export default function BorderPanel( { name } ) {
 						gradients={ undefined }
 						disableCustomColors={ disableCustomColors }
 						disableCustomGradients={ disableCustomGradients }
-						onColorChange={ handleOnChange( setBorderColor ) }
+						onColorChange={ handleOnChangeWithStyle(
+							setBorderColor
+						) }
 						clearable={ false }
 					/>
 				</ToolsPanelItem>
