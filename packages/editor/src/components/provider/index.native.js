@@ -91,12 +91,7 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			capabilities,
-			locale,
-			updateSettings,
-			galleryWithImageBlocks,
-		} = this.props;
+		const { capabilities, locale, updateSettings } = this.props;
 
 		updateSettings( {
 			...capabilities,
@@ -149,8 +144,10 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
-			( editorSettings ) => {
-				window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+			( { galleryWithImageBlocks, ...editorSettings } ) => {
+				if ( typeof galleryWithImageBlocks === 'boolean' ) {
+					window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+				}
 				updateSettings( this.getThemeColors( editorSettings ) );
 			}
 		);
