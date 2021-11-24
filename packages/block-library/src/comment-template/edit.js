@@ -13,6 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { convertToTree } from './util';
 
 const TEMPLATE = [
 	[ 'core/comment-author-avatar' ],
@@ -25,8 +26,71 @@ const TEMPLATE = [
 
 function CommentTemplateInnerBlocks() {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
-	return <li { ...innerBlocksProps } />;
+	return <li { ...innerBlocksProps }></li>;
 }
+
+const RenderComments = ( {
+	blockContexts,
+	blockProps,
+	blocks,
+	setActiveBlockContext,
+	activeBlockContext,
+} ) => {
+	return (
+		<ol { ...blockProps }>
+			{ blockContexts &&
+				blockContexts.map( ( blockContext ) => (
+					<BlockContextProvider
+						key={ blockContext.commentId }
+						value={ blockContext }
+					>
+						{ blockContext ===
+						( activeBlockContext || blockContexts[ 0 ] ) ? (
+							<>
+								<CommentTemplateInnerBlocks />
+								{ blockContext.children.length > 0 ? (
+									<RenderComments
+										blockContexts={ blockContext.children }
+										blockProps={ blockProps }
+										blocks={ blocks }
+										activeBlockContext={
+											activeBlockContext
+										}
+										setActiveBlockContext={
+											setActiveBlockContext
+										}
+									/>
+								) : null }
+							</>
+						) : (
+							<li>
+								<BlockPreview
+									blocks={ blocks }
+									__experimentalLive
+									__experimentalOnClick={ () =>
+										setActiveBlockContext( blockContext )
+									}
+								/>
+								{ blockContext.children.length > 0 ? (
+									<RenderComments
+										blockContexts={ blockContext.children }
+										blockProps={ blockProps }
+										blocks={ blocks }
+										activeBlockContext={
+											activeBlockContext
+										}
+										setActiveBlockContext={
+											setActiveBlockContext
+										}
+									/>
+								) : null }
+							</li>
+						) }
+					</BlockContextProvider>
+				) ) }
+		</ol>
+	);
+};
 
 export default function CommentTemplateEdit( {
 	clientId,
@@ -45,12 +109,7 @@ export default function CommentTemplateEdit( {
 				comments: getEntityRecords( 'root', 'comment', {
 					post: postId,
 					status: 'approve',
-					per_page:
-						// `commentsPerPage` are added to the REST API.
-						//
-						// If the `queryPerPage` is set, use that. Otherwise, just use `50`
-						// (it's the default value of comments_per_page)
-						queryPerPage || 50,
+					per_page: queryPerPage,
 					order: 'asc',
 				} ),
 				blocks: getBlocks( clientId ),
@@ -60,7 +119,13 @@ export default function CommentTemplateEdit( {
 	);
 
 	const blockContexts = useMemo(
-		() => comments?.map( ( comment ) => ( { commentId: comment.id } ) ),
+		() =>
+			convertToTree(
+				comments?.map( ( { id, parent } ) => ( {
+					commentId: id,
+					parent,
+				} ) )
+			),
 		[ comments ]
 	);
 
@@ -77,29 +142,12 @@ export default function CommentTemplateEdit( {
 	}
 
 	return (
-		<ol { ...blockProps }>
-			{ blockContexts &&
-				blockContexts.map( ( blockContext ) => (
-					<BlockContextProvider
-						key={ blockContext.commentId }
-						value={ blockContext }
-					>
-						{ blockContext ===
-						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<CommentTemplateInnerBlocks />
-						) : (
-							<li>
-								<BlockPreview
-									blocks={ blocks }
-									__experimentalLive
-									__experimentalOnClick={ () =>
-										setActiveBlockContext( blockContext )
-									}
-								/>
-							</li>
-						) }
-					</BlockContextProvider>
-				) ) }
-		</ol>
+		<RenderComments
+			blockContexts={ blockContexts }
+			blockProps={ blockProps }
+			blocks={ blocks }
+			activeBlockContext={ activeBlockContext }
+			setActiveBlockContext={ setActiveBlockContext }
+		/>
 	);
 }
