@@ -67,7 +67,7 @@ describe( 'Confirm', () => {
 				expect( onConfirm ).toHaveBeenCalled();
 			} );
 
-			it( 'should not render if closed by clicking `Cancel`, and the `onConfirm` callback should be called', async () => {
+			it( 'should not render if closed by clicking `Cancel`, and the `onCancel` callback should be called', async () => {
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				const wrapper = render(
