@@ -43,3 +43,9 @@ Autocompleters within blocks may be extended and overridden. Learn more about th
 Posts in the editor move through a couple of different stages between being stored in `post_content` and appearing in the editor. Since the blocks themselves are data structures that live in memory it takes a parsing and serialization step to transform out from and into the stored format in the database.
 
 Customizing the parser is an advanced topic that you can learn more about in the [Extending the Parser](/docs/reference-guides/filters/parser-filters.md) section.
+
+## Block Patterns
+
+Patterns are collections of pre-arranged blocks that can be combined and arranged in many ways making it easier to create beautiful content. They act as a head-start, leaving you to plug and play with your content as you see fit and be as simple as single blocks or as complex as a full-page layout.
+
+Learn [How to Create a Block Pattern](/docs/how-to-guides/block-tutorial/create-block-pattern.md)
