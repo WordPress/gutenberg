@@ -3,6 +3,7 @@
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { EditorSnackbars } from '@wordpress/editor';
 import { InterfaceSkeleton } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -66,6 +67,7 @@ export default function List( { templateType } ) {
 					isDefaultOpen
 				/>
 			}
+			notices={ <EditorSnackbars /> }
 			content={
 				<main className="edit-site-list-main">
 					<Table templateType={ templateType } />
