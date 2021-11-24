@@ -1387,8 +1387,8 @@ class WP_Theme_JSON_Gutenberg {
 		$nodes        = self::get_setting_nodes( $incoming_data );
 		$slugs_global = self::get_slugs_not_to_override( $this->theme_json );
 		foreach ( $nodes as $node ) {
-			$slugs_for_context = self::get_slugs_not_to_override( $this->theme_json, $node['path'] );
-			$slugs             = array_merge_recursive( $slugs_global, $slugs_for_context );
+			$slugs_node = self::get_slugs_not_to_override( $this->theme_json, $node['path'] );
+			$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
 
 			// Replace the spacing.units.
 			$path    = array_merge( $node['path'], array( 'spacing', 'units' ) );
