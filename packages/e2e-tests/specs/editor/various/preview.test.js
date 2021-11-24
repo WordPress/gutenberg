@@ -14,7 +14,7 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-/** @typedef {import('puppeteer').Page} Page */
+/** @typedef {import('puppeteer-core').Page} Page */
 
 /**
  * Given the Page instance for the editor, opens preview drodpdown, and

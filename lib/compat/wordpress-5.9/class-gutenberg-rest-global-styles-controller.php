@@ -220,7 +220,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
 		$config                           = array();
 		if ( $is_global_styles_user_theme_json ) {
-			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, 'user' ) )->get_raw_data();
+			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' ) )->get_raw_data();
 		}
 
 		$fields = $this->get_fields_for_response( $request );
