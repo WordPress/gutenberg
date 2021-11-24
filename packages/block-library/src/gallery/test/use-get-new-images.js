@@ -23,7 +23,7 @@ describe( 'gallery block useGetNewImages hook', () => {
 		expect( hook.result.current ).toEqual( null );
 	} );
 
-	it( 'returns an empty array if the only images are those those loaded from post content', () => {
+	it( 'returns an empty array if the only images are those loaded from post content', () => {
 		hook.rerender( {
 			images: [ { clientId: 'abc123', id: 1, fromSavedContent: true } ],
 			imageData: [ { id: 1 } ],
