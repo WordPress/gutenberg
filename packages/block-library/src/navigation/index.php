@@ -221,7 +221,10 @@ function block_core_navigation_get_fallback() {
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
 
+	// Flag used to indicate whether the rendered output is considered to be
+	// a fallback (i.e. the block has no menu associated with it).
 	$is_fallback = false;
+
 	/**
 	 * Deprecated:
 	 * The rgbTextColor and rgbBackgroundColor attributes
