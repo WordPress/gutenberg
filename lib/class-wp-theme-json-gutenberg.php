@@ -1392,7 +1392,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * than an existing default preset. This is the list of slugs present
 		 * in the global config we'll use to filter the incoming slugs.
 		 */
-		$slugs_global = self::get_slugs_from_default_origin( $this->theme_json );
+		$slugs_global = self::get_slugs_not_to_override( $this->theme_json );
 
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
@@ -1401,7 +1401,7 @@ class WP_Theme_JSON_Gutenberg {
 				$node = _wp_array_get( $incoming_data, $path, null );
 				if ( isset( $node ) ) {
 					if ( 'theme' === $path[ count( $path ) - 1 ] ) {
-						$slugs_for_context = self::get_slugs_from_default_origin( $this->theme_json, $metadata['path'] );
+						$slugs_for_context = self::get_slugs_not_to_override( $this->theme_json, $metadata['path'] );
 						$slugs_to_filter   = array_merge_recursive( $slugs_global, $slugs_for_context );
 						$node              = self::filter_slugs( $node, $property_path, $slugs_to_filter );
 					}
@@ -1413,8 +1413,9 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Returns the slugs for all the presets in the given path
-	 * as an associative array whose keys are the preset paths.
+	 * Returns the slugs for all the presets that cannot be overriden
+	 * in the given path. It returns an associative array
+	 * whose keys are the preset paths and the leafs is the list of slugs.
 	 *
 	 * For example:
 	 *
@@ -1433,7 +1434,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @return array An associative array containing the slugs for the given path.
 	 */
-	private static function get_slugs_from_default_origin( $data, $node_path = array( 'settings' ) ) {
+	private static function get_slugs_not_to_override( $data, $node_path = array( 'settings' ) ) {
 		$slugs = array();
 		foreach ( self::PRESETS_METADATA as $metadata ) {
 			if ( $metadata['override'] ) {
