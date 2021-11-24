@@ -22,9 +22,16 @@ export default function useNavigationMenu( navigationMenuId ) {
 			const rawNavigationMenu = navigationMenuId
 				? getEntityRecord( ...navigationMenuSingleArgs )
 				: null;
-			const navigationMenu = navigationMenuId
+			let navigationMenu = navigationMenuId
 				? getEditedEntityRecord( ...navigationMenuSingleArgs )
 				: null;
+
+			// getEditedEntityRecord will return the post regardless of status.
+			// Therefore if the found post is not published then we should ignore it.
+			if ( navigationMenu?.status !== 'publish' ) {
+				navigationMenu = null;
+			}
+
 			const hasResolvedNavigationMenu = navigationMenuId
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
@@ -35,7 +42,7 @@ export default function useNavigationMenu( navigationMenuId ) {
 			const navigationMenuMultipleArgs = [
 				'postType',
 				'wp_navigation',
-				{ per_page: -1 },
+				{ per_page: -1, status: 'publish' },
 			];
 			const navigationMenus = getEntityRecords(
 				...navigationMenuMultipleArgs
