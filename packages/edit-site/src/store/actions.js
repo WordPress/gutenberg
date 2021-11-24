@@ -343,7 +343,7 @@ export function setIsListViewOpened( isOpen ) {
  * @param {boolean} [options.allowUndo] Whether to allow the user to undo
  *                                      reverting the template. Default true.
  */
-export function* revertTemplate( template, { allowUndo = false } = {} ) {
+export function* revertTemplate( template, { allowUndo = true } = {} ) {
 	if ( ! isTemplateRevertable( template ) ) {
 		yield controls.dispatch(
 			noticesStore,
