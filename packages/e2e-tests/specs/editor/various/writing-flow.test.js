@@ -45,9 +45,11 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
 	await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 
-	// Arrow down from last of layouts exits nested context to default
-	// appender of root level.
-	await page.keyboard.press( 'ArrowDown' );
+	await page.keyboard.press( 'Escape' ); // Enter navigation mode
+	await page.keyboard.press( 'ArrowLeft' ); // move to the column block
+	await page.keyboard.press( 'ArrowLeft' ); // move to the columns block
+	await page.keyboard.press( 'Enter' ); // Enter edit mode with the columns block selected
+	await page.keyboard.press( 'Enter' ); // Creates a paragraph after the columns block.
 	await page.keyboard.type( 'Second paragraph' );
 };
 
@@ -289,6 +291,8 @@ describe( 'Writing Flow', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/9626
 
 		await insertBlock( 'Shortcode' );
+		await insertBlock( 'Paragraph' );
+		await await page.click( '.wp-block-shortcode' );
 
 		// Should remain in title upon ArrowRight:
 		await page.keyboard.press( 'ArrowRight' );
@@ -304,7 +308,7 @@ describe( 'Writing Flow', () => {
 		);
 		expect( isInShortcodeBlock ).toBe( true );
 
-		// Should navigate into blocks list upon ArrowDown:
+		// Should navigate to the next block.
 		await page.keyboard.press( 'ArrowDown' );
 		const isInParagraphBlock = await page.evaluate(
 			() => !! document.activeElement.closest( '.wp-block-paragraph' )

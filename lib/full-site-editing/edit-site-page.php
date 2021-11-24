@@ -32,6 +32,15 @@ function gutenberg_is_edit_site_page( $page ) {
 }
 
 /**
+ * Checks whether the provided page is the templates list page.
+ *
+ * @return bool True for Site Editor pages, false otherwise.
+ */
+function gutenberg_is_edit_site_list_page() {
+	return isset( $_GET['postType'] ) && ! isset( $_GET['postId'] );
+}
+
+/**
  * Load editor styles (this is copied from edit-form-blocks.php).
  * Ideally the code is extracted into a reusable function.
  *
@@ -68,7 +77,56 @@ function gutenberg_get_editor_styles() {
 }
 
 /**
- * Initialize the Gutenberg Edit Site Page.
+ * Initialize the Gutenberg Templates List Page.
+ *
+ * @param array $settings The editor settings.
+ */
+function gutenberg_edit_site_list_init( $settings ) {
+	wp_enqueue_script( 'wp-edit-site' );
+	wp_enqueue_style( 'wp-edit-site' );
+	wp_enqueue_media();
+
+	$post_type = get_post_type_object( $_GET['postType'] );
+
+	if ( ! $post_type ) {
+		wp_die( __( 'Invalid post type.', 'gutenberg' ) );
+	}
+
+	$preload_data = array_reduce(
+		array(
+			'/',
+			"/wp/v2/types/$post_type->name?context=edit",
+			'/wp/v2/types?context=edit',
+			"/wp/v2/$post_type->rest_base?context=edit&per_page=-1",
+		),
+		'rest_preload_api_request',
+		array()
+	);
+
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
+
+	wp_add_inline_script(
+		'wp-edit-site',
+		sprintf(
+			'wp.domReady( function() {
+				wp.editSite.initializeList( "%s", "%s", %s );
+			} );',
+			'edit-site-editor',
+			$post_type->name,
+			wp_json_encode( $settings )
+		)
+	);
+}
+
+/**
+ * Initialize the Gutenberg Site Editor.
  *
  * @since 7.2.0
  *
@@ -90,15 +148,7 @@ function gutenberg_edit_site_init( $hook ) {
 		}
 	);
 
-	/**
-	 * Make the WP Screen object aware that this is a block editor page.
-	 * Since custom blocks check whether the screen is_block_editor,
-	 * this is required for custom blocks to be loaded.
-	 * See wp_enqueue_registered_block_scripts_and_styles in wp-includes/script-loader.php
-	 */
-	$current_screen->is_block_editor( true );
-
-	$custom_settings         = array(
+	$custom_settings = array(
 		'siteUrl'                              => site_url(),
 		'postsPerPage'                         => get_option( 'posts_per_page' ),
 		'styles'                               => gutenberg_get_editor_styles(),
@@ -107,6 +157,19 @@ function gutenberg_edit_site_init( $hook ) {
 		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 	);
+
+	if ( gutenberg_is_edit_site_list_page() ) {
+		return gutenberg_edit_site_list_init( $custom_settings );
+	}
+
+	/**
+	 * Make the WP Screen object aware that this is a block editor page.
+	 * Since custom blocks check whether the screen is_block_editor,
+	 * this is required for custom blocks to be loaded.
+	 * See wp_enqueue_registered_block_scripts_and_styles in wp-includes/script-loader.php
+	 */
+	$current_screen->is_block_editor( true );
+
 	$site_editor_context     = new WP_Block_Editor_Context();
 	$settings                = gutenberg_get_block_editor_settings( $custom_settings, $site_editor_context );
 	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
@@ -132,10 +195,10 @@ function gutenberg_edit_site_init( $hook ) {
 					'/wp/v2/themes?context=edit&status=active',
 					'/wp/v2/global-styles/' . $active_global_styles_id . '?context=edit',
 					'/wp/v2/global-styles/' . $active_global_styles_id,
-					'/wp/v2/themes/' . $active_theme . '/global-styles',
+					'/wp/v2/global-styles/themes/' . $active_theme,
 				)
 			),
-			'initializer_name' => 'initialize',
+			'initializer_name' => 'initializeEditor',
 			'editor_settings'  => $settings,
 		)
 	);
@@ -200,3 +263,18 @@ function register_site_editor_homepage_settings() {
 	);
 }
 add_action( 'init', 'register_site_editor_homepage_settings', 10 );
+
+/**
+ * Sets the HTML <title> in the Site Editor list page to be the title of the CPT
+ * being edited, e.g. 'Templates'.
+ */
+function gutenberg_set_site_editor_list_page_title() {
+	global $title;
+	if ( gutenberg_is_edit_site_list_page() ) {
+		$post_type = get_post_type_object( $_GET['postType'] );
+		if ( $post_type ) {
+			$title = $post_type->labels->name;
+		}
+	}
+}
+add_action( 'load-appearance_page_gutenberg-edit-site', 'gutenberg_set_site_editor_list_page_title' );

@@ -17,6 +17,7 @@ import {
 	getPreviousEditedPostId,
 	getPage,
 	getNavigationPanelActiveMenu,
+	getReusableBlocks,
 	isNavigationOpened,
 	isInserterOpened,
 	isListViewOpened,
@@ -24,8 +25,12 @@ import {
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
+	const getEntityRecords = jest.fn( () => [] );
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
+	};
+	getReusableBlocks.registry = {
+		select: jest.fn( () => ( { getEntityRecords } ) ),
 	};
 
 	describe( 'isFeatureActive', () => {
@@ -83,6 +88,22 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getReusableBlocks', () => {
+		it( "selects `getEntityRecords( 'postType', 'wp_block' )` from the core store", () => {
+			expect( getReusableBlocks() ).toEqual( [] );
+			expect( getReusableBlocks.registry.select ).toHaveBeenCalledWith(
+				coreDataStore
+			);
+			expect( getEntityRecords ).toHaveBeenCalledWith(
+				'postType',
+				'wp_block',
+				{
+					per_page: -1,
+				}
+			);
+		} );
+	} );
+
 	describe( 'getSettings', () => {
 		it( "returns the settings when the user can't create media", () => {
 			canUser.mockReturnValueOnce( false );
@@ -94,6 +115,7 @@ describe( 'selectors', () => {
 				focusMode: false,
 				hasFixedToolbar: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
+				__experimentalReusableBlocks: [],
 			} );
 		} );
 
@@ -108,12 +130,14 @@ describe( 'selectors', () => {
 				},
 			};
 			const setInserterOpened = () => {};
+
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				outlineMode: true,
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
 				__experimentalSetIsInserterOpened: setInserterOpened,
+				__experimentalReusableBlocks: [],
 				mediaUpload: expect.any( Function ),
 			} );
 		} );

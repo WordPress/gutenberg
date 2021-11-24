@@ -35,9 +35,9 @@ class WP_Theme_JSON_Gutenberg {
 	const ROOT_BLOCK_SELECTOR = 'body';
 
 	const VALID_ORIGINS = array(
-		'core',
+		'default',
 		'theme',
-		'user',
+		'custom',
 	);
 
 	const VALID_TOP_LEVEL_KEYS = array(
@@ -81,37 +81,38 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	const VALID_SETTINGS = array(
-		'border'     => array(
+		'appearanceTools' => null,
+		'border'          => array(
 			'color'  => null,
 			'radius' => null,
 			'style'  => null,
 			'width'  => null,
 		),
-		'color'      => array(
-			'background'     => null,
-			'corePalette'    => null,
-			'coreGradients'  => null,
-			'custom'         => null,
-			'customDuotone'  => null,
-			'customGradient' => null,
-			'duotone'        => null,
-			'gradients'      => null,
-			'link'           => null,
-			'palette'        => null,
-			'text'           => null,
+		'color'           => array(
+			'background'       => null,
+			'custom'           => null,
+			'customDuotone'    => null,
+			'customGradient'   => null,
+			'defaultGradients' => null,
+			'defaultPalette'   => null,
+			'duotone'          => null,
+			'gradients'        => null,
+			'link'             => null,
+			'palette'          => null,
+			'text'             => null,
 		),
-		'custom'     => null,
-		'layout'     => array(
+		'custom'          => null,
+		'layout'          => array(
 			'contentSize' => null,
 			'wideSize'    => null,
 		),
-		'spacing'    => array(
+		'spacing'         => array(
 			'blockGap' => null,
 			'margin'   => null,
 			'padding'  => null,
 			'units'    => null,
 		),
-		'typography' => array(
+		'typography'      => array(
 			'customFontSize' => null,
 			'dropCap'        => null,
 			'fontFamilies'   => null,
@@ -281,7 +282,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Constructor.
 	 *
 	 * @param array  $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin What source of data this object represents. One of core, theme, or user. Default: theme.
+	 * @param string $origin What source of data this object represents. One of default, theme, or custom. Default: theme.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
 		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
@@ -292,7 +293,8 @@ class WP_Theme_JSON_Gutenberg {
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
-		$this->theme_json    = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$this->theme_json    = self::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = self::get_setting_nodes( $this->theme_json );
@@ -301,10 +303,64 @@ class WP_Theme_JSON_Gutenberg {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
-					_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
+					// If the preset is not already keyed by origin.
+					if ( isset( $preset[0] ) || empty( $preset ) ) {
+						_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
+					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Enables some opt-in settings if theme declared support.
+	 *
+	 * @param array $theme_json A theme.json structure to modify.
+	 * @return array The modified theme.json structure.
+	 */
+	private static function maybe_opt_in_into_settings( $theme_json ) {
+		$new_theme_json = $theme_json;
+
+		if ( isset( $new_theme_json['settings']['appearanceTools'] ) ) {
+			self::do_opt_in_into_settings( $new_theme_json['settings'] );
+		}
+
+		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
+			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
+				if ( isset( $block['appearanceTools'] ) ) {
+					self::do_opt_in_into_settings( $block );
+				}
+			}
+		}
+
+		return $new_theme_json;
+	}
+
+	/**
+	 * Enables some settings.
+	 *
+	 * @param array $context The context to which the settings belong.
+	 */
+	private static function do_opt_in_into_settings( &$context ) {
+		$to_opt_in = array(
+			array( 'border', 'color' ),
+			array( 'border', 'radius' ),
+			array( 'border', 'style' ),
+			array( 'border', 'width' ),
+			array( 'color', 'link' ),
+			array( 'spacing', 'blockGap' ),
+			array( 'spacing', 'margin' ),
+			array( 'spacing', 'padding' ),
+			array( 'typography', 'lineHeight' ),
+		);
+
+		foreach ( $to_opt_in as $path ) {
+			if ( null === _wp_array_get( $context, $path, null ) ) {
+				_wp_array_set( $context, $path, true );
+			}
+		}
+
+		unset( $context['appearanceTools'] );
 	}
 
 	/**
@@ -1263,7 +1319,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
-	 * @param array $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
+	 * @param array $origins A list of origins to include. By default it includes 'default', 'theme', and 'custom'.
 	 *
 	 * @return string Stylesheet.
 	 */
@@ -1335,46 +1391,48 @@ class WP_Theme_JSON_Gutenberg {
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-			$presets = _wp_array_get( $input, $preset_metadata['path'], null );
-			if ( null === $presets ) {
-				continue;
-			}
+			foreach ( self::VALID_ORIGINS as $origin ) {
+				$path_with_origin = array_merge( $preset_metadata['path'], array( $origin ) );
+				$presets          = _wp_array_get( $input, $path_with_origin, null );
+				if ( null === $presets ) {
+					continue;
+				}
 
-			$escaped_preset = array();
-			foreach ( $presets as $preset ) {
-				if (
-					esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
-					sanitize_html_class( $preset['slug'] ) === $preset['slug']
-				) {
-					$value = null;
-					if ( isset( $preset_metadata['value_key'] ) ) {
-						$value = $preset[ $preset_metadata['value_key'] ];
-					} elseif (
-						isset( $preset_metadata['value_func'] ) &&
-						is_callable( $preset_metadata['value_func'] )
+				$escaped_preset = array();
+				foreach ( $presets as $preset ) {
+					if (
+						esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
+						sanitize_html_class( $preset['slug'] ) === $preset['slug']
 					) {
-						$value = call_user_func( $preset_metadata['value_func'], $preset );
-					}
+						$value = null;
+						if ( isset( $preset_metadata['value_key'] ) ) {
+							$value = $preset[ $preset_metadata['value_key'] ];
+						} elseif (
+							isset( $preset_metadata['value_func'] ) &&
+							is_callable( $preset_metadata['value_func'] )
+						) {
+							$value = call_user_func( $preset_metadata['value_func'], $preset );
+						}
 
-					$preset_is_valid = true;
-					foreach ( $preset_metadata['properties'] as $property ) {
-						if ( ! self::is_safe_css_declaration( $property, $value ) ) {
-							$preset_is_valid = false;
-							break;
+						$preset_is_valid = true;
+						foreach ( $preset_metadata['properties'] as $property ) {
+							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+								$preset_is_valid = false;
+								break;
+							}
+						}
+
+						if ( $preset_is_valid ) {
+							$escaped_preset[] = $preset;
 						}
 					}
+				}
 
-					if ( $preset_is_valid ) {
-						$escaped_preset[] = $preset;
-					}
+				if ( ! empty( $escaped_preset ) ) {
+					_wp_array_set( $output, $path_with_origin, $escaped_preset );
 				}
 			}
-
-			if ( ! empty( $escaped_preset ) ) {
-				_wp_array_set( $output, $preset_metadata['path'], $escaped_preset );
-			}
 		}
-
 		return $output;
 	}
 

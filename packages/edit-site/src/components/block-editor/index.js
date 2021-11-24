@@ -20,6 +20,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -132,6 +133,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
 			</BlockTools>
+			<ReusableBlocksMenuItems />
 		</BlockEditorProvider>
 	);
 }

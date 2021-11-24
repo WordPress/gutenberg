@@ -306,20 +306,6 @@ function Navigation( {
 		);
 	}
 
-	// Show a warning if the selected menu is no longer available.
-	// TODO - the user should be able to select a new one?
-	if ( navigationMenuId && isNavigationMenuMissing ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __(
-						'Navigation menu has been deleted or is unavailable'
-					) }
-				</Warning>
-			</div>
-		);
-	}
-
 	if ( isEntityAvailable && hasAlreadyRendered ) {
 		return (
 			<div { ...blockProps }>
