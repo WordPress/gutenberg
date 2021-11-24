@@ -107,6 +107,13 @@ module.exports = {
 
 The output format for the generated asset file. There are two options available: 'php' or 'json'.
 
+##### `outputFilename`
+
+- Type: string | function
+- Default: null
+
+The filename for the generated asset file. Accepts the same values as the Webpack `output.filename` option.
+
 ##### `combineAssets`
 
 -   Type: boolean
