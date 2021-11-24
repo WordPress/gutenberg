@@ -62,6 +62,7 @@ function Modal( props, forwardedRef ) {
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		__experimentalHideHeader = false,
 	} = props;
 
 	const ref = useRef();
@@ -148,38 +149,43 @@ function Modal( props, forwardedRef ) {
 					onKeyDown={ onKeyDown }
 				>
 					<div
-						className={ 'components-modal__content' }
+						className={ classnames( 'components-modal__content', {
+							'hide-header': __experimentalHideHeader,
+						} ) }
 						role="document"
 					>
-						<div className="components-modal__header">
-							<div className="components-modal__header-heading-container">
-								{ icon && (
-									<span
-										className="components-modal__icon-container"
-										aria-hidden
-									>
-										{ icon }
-									</span>
-								) }
-								{ title && (
-									<h1
-										id={ headingId }
-										className="components-modal__header-heading"
-									>
-										{ title }
-									</h1>
+						{ ! __experimentalHideHeader && (
+							<div className="components-modal__header">
+								<div className="components-modal__header-heading-container">
+									{ icon && (
+										<span
+											className="components-modal__icon-container"
+											aria-hidden
+										>
+											{ icon }
+										</span>
+									) }
+									{ title && (
+										<h1
+											id={ headingId }
+											className="components-modal__header-heading"
+										>
+											{ title }
+										</h1>
+									) }
+								</div>
+								{ isDismissible && (
+									<Button
+										onClick={ onRequestClose }
+										icon={ closeSmall }
+										label={
+											closeButtonLabel ||
+											__( 'Close dialog' )
+										}
+									/>
 								) }
 							</div>
-							{ isDismissible && (
-								<Button
-									onClick={ onRequestClose }
-									icon={ closeSmall }
-									label={
-										closeButtonLabel || __( 'Close dialog' )
-									}
-								/>
-							) }
-						</div>
+						) }
 						{ children }
 					</div>
 				</div>
