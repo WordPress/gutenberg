@@ -34,6 +34,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarGroup,
 	ToolbarDropdownMenu,
+	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -280,6 +281,17 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
+	function createNewMenu() {
+		replaceInnerBlocks( clientId, [] );
+		if ( navigationArea ) {
+			setAreaMenu( 0 );
+		}
+		setAttributes( {
+			navigationMenuId: undefined,
+		} );
+		setIsPlaceholderShown( true );
+	}
+
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
 	// Either this block was saved in the content or inserted by a pattern.
@@ -302,6 +314,23 @@ function Navigation( {
 					setNavigationMenuId( post.id );
 				} }
 			/>
+		);
+	}
+
+	// Show a warning if the selected menu is no longer available.
+	// TODO - the user should be able to select a new one?
+	if ( navigationMenuId && isNavigationMenuMissing ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __(
+						'Navigation menu has been deleted or is unavailable. '
+					) }
+					<Button onClick={ createNewMenu } variant="link">
+						{ __( 'Create a new menu?' ) }
+					</Button>
+				</Warning>
+			</div>
 		);
 	}
 
@@ -340,16 +369,7 @@ function Navigation( {
 											setNavigationMenuId( id );
 											onClose();
 										} }
-										onCreateNew={ () => {
-											replaceInnerBlocks( clientId, [] );
-											if ( navigationArea ) {
-												setAreaMenu( 0 );
-											}
-											setAttributes( {
-												navigationMenuId: undefined,
-											} );
-											setIsPlaceholderShown( true );
-										} }
+										onCreateNew={ createNewMenu }
 									/>
 								) }
 							</ToolbarDropdownMenu>
