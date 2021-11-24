@@ -263,3 +263,18 @@ function register_site_editor_homepage_settings() {
 	);
 }
 add_action( 'init', 'register_site_editor_homepage_settings', 10 );
+
+/**
+ * Sets the HTML <title> in the Site Editor list page to be the title of the CPT
+ * being edited, e.g. 'Templates'.
+ */
+function gutenberg_set_site_editor_list_page_title() {
+	global $title;
+	if ( gutenberg_is_edit_site_list_page() ) {
+		$post_type = get_post_type_object( $_GET['postType'] );
+		if ( $post_type ) {
+			$title = $post_type->labels->name;
+		}
+	}
+}
+add_action( 'load-appearance_page_gutenberg-edit-site', 'gutenberg_set_site_editor_list_page_title' );
