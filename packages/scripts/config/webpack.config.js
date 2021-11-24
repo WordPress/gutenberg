@@ -230,6 +230,9 @@ const config = {
 		// https://github.com/johnagan/clean-webpack-plugin/issues/159
 		new CleanWebpackPlugin( {
 			cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
+			// Prevent it from deleting webpack assets during builds that have
+			// multiple configurations returned in the webpack config.
+			cleanStaleWebpackAssets: false,
 		} ),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.

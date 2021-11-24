@@ -26,16 +26,19 @@ import {
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import {
+	ShortcutProvider,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
@@ -62,6 +65,8 @@ function Editor( { initialSettings, onError } ) {
 		template,
 		templateResolved,
 		isNavigationOpen,
+		previousShortcut,
+		nextShortcut,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -98,13 +103,19 @@ function Editor( { initialSettings, onError } ) {
 				: false,
 			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/previous-region' ),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
 		};
 	}, [] );
 	const { updateEditorSettings } = useDispatch( editorStore );
 	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
 		editSiteStore
 	);
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
 	useEffect( () => {
 		updateSettings( initialSettings );
 	}, [] );
@@ -113,11 +124,7 @@ function Editor( { initialSettings, onError } ) {
 	// so that they can be selected with core/editor selectors in any editor.
 	// This is needed because edit-site doesn't initialize with EditorProvider,
 	// which internally uses updateEditorSettings as well.
-	const {
-		defaultTemplateTypes,
-		defaultTemplatePartAreas,
-		__experimentalNewMenuSidebar: newMenuSidebar,
-	} = settings;
+	const { defaultTemplateTypes, defaultTemplatePartAreas } = settings;
 	useEffect( () => {
 		updateEditorSettings( {
 			defaultTemplateTypes,
@@ -166,19 +173,6 @@ function Editor( { initialSettings, onError } ) {
 		}
 	}, [ isNavigationOpen ] );
 
-	useEffect(
-		function openGlobalStylesOnLoad() {
-			const searchParams = new URLSearchParams( window.location.search );
-			if ( searchParams.get( 'styles' ) === 'open' ) {
-				enableComplementaryArea(
-					'core/edit-site',
-					'edit-site/global-styles'
-				);
-			}
-		},
-		[ enableComplementaryArea ]
-	);
-
 	// Don't render the Editor until the settings are set and loaded
 	const isReady =
 		settings?.siteUrl &&
@@ -219,17 +213,13 @@ function Editor( { initialSettings, onError } ) {
 											<SidebarComplementaryAreaFills />
 											<InterfaceSkeleton
 												labels={ interfaceLabels }
-												drawer={
-													newMenuSidebar ? undefined : (
-														<NavigationSidebar />
-													)
-												}
 												secondarySidebar={ secondarySidebar() }
 												sidebar={
 													sidebarIsOpened && (
 														<ComplementaryArea.Slot scope="core/edit-site" />
 													)
 												}
+												drawer={ <NavigationSidebar /> }
 												header={
 													<Header
 														openEntitiesSavedStates={
@@ -299,6 +289,10 @@ function Editor( { initialSettings, onError } ) {
 													</>
 												}
 												footer={ <BlockBreadcrumb /> }
+												shortcuts={ {
+													previous: previousShortcut,
+													next: nextShortcut,
+												} }
 											/>
 											<WelcomeGuide />
 											<Popover.Slot />
