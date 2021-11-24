@@ -1424,9 +1424,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *     'palette'   => array( 'slug-1', 'slug-2' ),
 	 *     'gradients' => array( 'slug-3', 'slug-4' ),
 	 *   ),
-	 *   'typography' => array(
-	 *     'fontSizes' => array( 'slug-5', 'slug-6'),
-	 *   )
 	 * )
 	 *
 	 * @param array $data A theme.json like structure to inspect.
