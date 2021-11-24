@@ -30,31 +30,33 @@ import StyleProvider from '../style-provider';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
-export default function Modal( {
-	bodyOpenClassName = 'modal-open',
-	role = 'dialog',
-	title = null,
-	focusOnMount = true,
-	shouldCloseOnEsc = true,
-	shouldCloseOnClickOutside = true,
-	isDismissable, // Deprecated
-	isDismissible = isDismissable || true,
-	/* accessibility */
-	aria = {
-		labelledby: null,
-		describedby: null,
-	},
-	onRequestClose,
-	icon,
-	closeButtonLabel,
-	children,
-	style,
-	overlayClassName,
-	className,
-	contentLabel,
-	onKeyDown,
-	isFullScreen = false,
-} ) {
+export default function Modal( props ) {
+	const {
+		bodyOpenClassName = 'modal-open',
+		role = 'dialog',
+		title = null,
+		focusOnMount = true,
+		shouldCloseOnEsc = true,
+		shouldCloseOnClickOutside = true,
+		isDismissable, // Deprecated
+		isDismissible = isDismissable || true,
+		/* accessibility */
+		aria = {
+			labelledby: null,
+			describedby: null,
+		},
+		onRequestClose,
+		icon,
+		closeButtonLabel,
+		children,
+		style,
+		overlayClassName,
+		className,
+		contentLabel,
+		onKeyDown,
+		isFullScreen = false,
+	} = props;
+
 	const ref = useRef();
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
