@@ -449,3 +449,29 @@ CSS;
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_hide_visibility_and_status_for_navigation_posts' );
+
+/**
+ * Sets a custom slug when creating auto-draft wp_navigatino posts.
+ * This is only needed for auto-drafts created by the regular WP editor.
+ * If this page is to be removed, this won't be necessary.
+ *
+ * @param int $post_id Post ID.
+ */
+function gutenberg_set_unique_slug_on_create_wp_navigation( $post_id ) {
+	// This is the core function with the same functionality.
+	if ( function_exists( 'gutenberg_set_unique_slug_on_create_wp_navigation' ) ) {
+		return;
+	}
+
+	$post = get_post( $post_id );
+	if ( ! $post->post_name ) {
+		wp_update_post(
+			array(
+				'ID'        => $post_id,
+				'post_name' => $post_id . '',
+			)
+		);
+	}
+}
+
+add_action( 'save_post_wp_navigation', 'gutenberg_set_unique_slug_on_create_wp_navigation' );
