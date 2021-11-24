@@ -44,7 +44,11 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
 	} elseif ( ! $max_page || $max_page > $page ) {
 		$custom_query = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
-		if ( (int) $custom_query->max_num_pages !== $page ) {
+		$max_num_pages = (int) $custom_query->max_num_pages;
+		if ( !$max_num_pages ) {
+			return '';
+		}
+		if ( $max_num_pages !== $page ) {
 			$content = sprintf(
 				'<a href="%1$s" %2$s>%3$s</a>',
 				esc_url( add_query_arg( $page_key, $page + 1 ) ),
