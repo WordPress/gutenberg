@@ -821,10 +821,12 @@ export class RichText extends Component {
 			this._editor.blur();
 		}
 
+		const currentFontSizeStyle = parseFloat( style?.fontSize );
+		const prevFontSizeStyle = parseFloat( prevProps?.style?.fontSize );
 		if (
 			currentFontSize &&
-			( style?.fontSize || prevProps?.style?.fontSize ) &&
-			style?.fontSize !== currentFontSize
+			( currentFontSizeStyle || prevFontSizeStyle ) &&
+			currentFontSizeStyle !== currentFontSize
 		) {
 			this.setState( {
 				currentFontSize: this.getFontSize( this.props ),
@@ -900,7 +902,7 @@ export class RichText extends Component {
 		// could be coming from the web where it could be stored as a different unit.
 		const selectedPxValue = getPxFromCssUnit( newFontSize, cssUnitOptions );
 
-		return selectedPxValue;
+		return parseFloat( selectedPxValue );
 	}
 
 	getLineHeight() {
@@ -956,7 +958,7 @@ export class RichText extends Component {
 		);
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
-		const fontSize = parseFloat( currentFontSize );
+		const fontSize = currentFontSize;
 		const lineHeight = this.getLineHeight();
 
 		const {
