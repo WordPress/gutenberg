@@ -31,8 +31,8 @@ describe.each( [
 
 	it( 'navigates in and out of toolbar by keyboard (Alt+F10, Escape)', async () => {
 		// Assumes new post focus starts in title. Create first new
-		// block by ArrowDown.
-		await page.keyboard.press( 'ArrowDown' );
+		// block by Enter.
+		await page.keyboard.press( 'Enter' );
 
 		// [TEMPORARY]: A new paragraph is not technically a block yet
 		// until starting to type within it.

@@ -156,6 +156,12 @@ describe( 'Order of block keyboard navigation', () => {
 		} );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Add block' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Add default block' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveLabel() ).toBe(
 			'Paragraph Block. Row 2. 1'
 		);
