@@ -46,7 +46,7 @@ export default function NavigationSidebar( {
 			<NavigationPanel
 				isOpen={ isNavigationOpen }
 				setIsOpen={ setIsNavigationOpen }
-				activeTemplateType={ activeTemplateType }
+				activeItem={ activeTemplateType }
 			/>
 			<NavigationPanelPreviewSlot />
 		</>
