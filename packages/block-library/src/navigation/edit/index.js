@@ -281,7 +281,7 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
-	function createNewMenu() {
+	const createNewMenu = useCallback( () => {
 		replaceInnerBlocks( clientId, [] );
 		if ( navigationArea ) {
 			setAreaMenu( 0 );
@@ -290,7 +290,7 @@ function Navigation( {
 			navigationMenuId: undefined,
 		} );
 		setIsPlaceholderShown( true );
-	}
+	}, [ clientId ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
