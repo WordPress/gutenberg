@@ -28,14 +28,16 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string  $selector CSS selector.
- * @param array   $layout   Layout object. The one that is passed has already checked the existance of default block layout.
+ * @param string  $class_prefix          Prefix for the CSS selector class name.
+ * @param array   $layout                Layout object. The one that is passed has already checked the existance of default block layout.
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
  *
- * @return string CSS style.
+ * @return array The CSS styles, keyed by classname.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false ) {
-	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
+function gutenberg_get_layout_style( $class_prefix = 'wp-container-layout', $layout, $has_block_gap_support = false ) {
+	$styles       = array();
+	$class_prefix = 'wp-container-layout';
+	$layout_type  = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
 	if ( 'default' === $layout_type ) {
@@ -52,21 +54,42 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > * {";
-			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
-			$style .= 'margin-left: auto !important;';
-			$style .= 'margin-right: auto !important;';
-			$style .= '}';
+			// Add `allMaxWidth` class and styles.
+			$selector = "{$class_prefix}__allMaxWidth--" . esc_attr( $all_max_width_value );
+			$style    = '';
+			$style    = ".$selector > * {";
+			$style   .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
+			$style   .= 'margin-left: auto !important;';
+			$style   .= 'margin-right: auto !important;';
+			$style   .= '}';
 
-			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+			$styles[ $selector ] = $style;
+
+			// Add `wideMaxWidth` class and styles.
+			$selector = "{$class_prefix}__wideMaxWidth--" . esc_attr( $wide_max_width_value );
+			$style    = '';
+			$style   .= ".$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
+			$style   .= ".$selector .alignfull { max-width: none; }";
+
+			$styles[ $selector ] = $style;
 		}
 
-		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
-		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
+		// Add `type--default` class and styles.
+		$selector = "{$class_prefix}__type--default";
+		$style    = '';
+		$style   .= ".$selector .alignleft { float: left; margin-right: 2em; }";
+		$style   .= ".$selector .alignright { float: right; margin-left: 2em; }";
+
+		$styles[ $selector ] = $style;
+
 		if ( $has_block_gap_support ) {
-			$style .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
-			$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
+			// Add `type--default--blockGap` class and styles.
+			$selector = "{$class_prefix}__type--default--block-gap";
+			$style    = '';
+			$style   .= ".$selector > * { margin-top: 0; margin-bottom: 0; }";
+			$style   .= ".$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
+
+			$styles[ $selector ] = $style;
 		}
 	} elseif ( 'flex' === $layout_type ) {
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
@@ -86,51 +109,105 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$layout['flexWrap'] :
 			'wrap';
 
-		$style  = "$selector {";
-		$style .= 'display: flex;';
+		// Add `type--flex` class and styles.
+		$selector = "{$class_prefix}__type--flex";
+		$style    = '';
+		$style   .= ".$selector { display: flex; }";
+		$style   .= ".$selector > * { margin: 0; }";
+
+		$styles[ $selector ] = $style;
+
 		if ( $has_block_gap_support ) {
-			$style .= 'gap: var( --wp--style--block-gap, 0.5em );';
+			// Add `type--flex--block-gap` class and styles.
+			$selector = "{$class_prefix}__type--flex--block-gap";
+			$style    = '';
+			$style   .= ".$selector { gap: var( --wp--style--block-gap, 0.5em ); }";
+
+			$styles[ $selector ] = $style;
 		} else {
-			$style .= 'gap: 0.5em;';
+			// Add `type--flex--gap` class and styles.
+			$selector = "{$class_prefix}__type--flex--gap";
+			$style    = '';
+			$style   .= '.$selector { gap: 0.5em; }';
+
+			$styles[ $selector ] = $style;
 		}
-		$style .= "flex-wrap: $flex_wrap;";
+
+		// Add `flex-wrap` class and styles.
+		$selector = "{$class_prefix}__flexWrap--" . esc_attr( $flex_wrap );
+		$style    = '';
+		$style   .= ".$selector { flex-wrap: $flex_wrap; }";
+
+		$styles[ $selector ] = $style;
+
 		if ( 'horizontal' === $layout_orientation ) {
-			$style .= 'align-items: center;';
+			// Add `orientation--horizontal` class and styles.
+			$selector = "{$class_prefix}__orientation--horizontal";
+			$style    = '';
+			$style   .= ".$selector { align-items: center; }";
+
+			$styles[ $selector ] = $style;
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented
 			 * by custom css.
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+				// Add `orientation--horizontal--justify-content` class and styles.
+				$selector = "{$class_prefix}__orientation--horizontal--justify-content--" . esc_attr( $justify_content_options[ $layout['justifyContent'] ] );
+				$style  = '';
+				$style .= ".$selector { justify-content: {$justify_content_options[ $layout['justifyContent'] ]}; }";
+
+				$styles[ $selector ] = $style;
+
 				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
+					// Add `set-cascading-properties` class and styles.
+					$selector = "{$class_prefix}__set-cascading-properties";
+					$style  = '';
+					$style .= ".$selector {";
 					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
 					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
 					$style .= '--layout-direction: row;';
 					$style .= "--layout-wrap: $flex_wrap;";
 					$style .= "--layout-justify: {$justify_content_options[ $layout['justifyContent'] ]};";
 					$style .= '--layout-align: center;';
+					$style .= '}';
+
+					$styles[ $selector ] = $style;
 				}
 			}
 		} else {
-			$style .= 'flex-direction: column;';
+			// Add `orientation--vertical` class and styles.
+			$selector = "{$class_prefix}__orientation--horizontal";
+			$style    = '';
+			$style   .= ".$selector { flex-direction: column; }";
+
+			$styles[ $selector ] = $style;
+
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
+				// Add `orientation--vertical--justify-content` class and styles.
+				$selector = "{$class_prefix}__orientation--vertical--justify-content--" . esc_attr( $justify_content_options[ $layout['justifyContent'] ] );
+				$style    = '';
+				$style   .= ".$selector { align-items: {$justify_content_options[ $layout['justifyContent'] ]}; }";
 				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
+					// Add `set-cascading-properties` class and styles.
+					$selector = "{$class_prefix}__set-cascading-properties";
+					$style  = '';
+					$style .= ".$selector {";
 					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
 					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
 					$style .= '--layout-direction: column;';
 					$style .= '--layout-justify: initial;';
 					$style .= "--layout-align: {$justify_content_options[ $layout['justifyContent'] ]};";
+					$style .= '}';
+
+					$styles[ $selector ] = $style;
 				}
 			}
 		}
-		$style .= '}';
-
-		$style .= "$selector > * { margin: 0; }";
 	}
 
-	return $style;
+	return $styles;
 }
 
 /**
@@ -160,16 +237,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	$id    = uniqid();
-	$style = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support );
+	$styles = gutenberg_get_layout_style( 'wp-layout-container', $used_layout, $has_block_gap_support );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="wp-container-' . $id . ' ',
+		'class="' . implode( ' ', array_keys( $styles ) ) . ' ',
 		$block_content,
 		1
 	);
+
+	$style = implode( ' ', array_values( $styles ) );
 
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
