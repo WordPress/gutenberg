@@ -131,7 +131,11 @@ function computeAnchorRect(
 	}
 
 	const { parentNode } = anchorRefFallback.current;
-	const rect = parentNode.getBoundingClientRect();
+	const rect = offsetIframe(
+		parentNode.getBoundingClientRect(),
+		parentNode.ownerDocument,
+		container
+	);
 
 	if ( shouldAnchorIncludePadding ) {
 		return rect;
