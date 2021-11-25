@@ -37,8 +37,13 @@ function CommentTemplateInnerBlocks() {
  * Component that renders a list of (nested) comments. It is called recursively
  * in its own body.
  *
- * @param {Object} props                 Component props.
- * @param {Array}  [props.blockContexts] - Array of comment objects.
+ * @param {Object} props                         Component props.
+ * @param {Array}  [props.blockProps]            - Props from parent's `useBlockProps()`.
+ * @param {Array}  [props.blockContexts]         - Array of comment objects.
+ * @param {Array}  [props.activeBlockContext]    - The block that is currently active.
+ * @param {Array}  [props.setActiveBlockContext] - The setter for activeBlockContext.
+ * @param {Array}  [props.blocks]                - Array of blocks returned from
+ *                                               getBlocks() in parent .
  * @return {WPElement}                 		List of comments.
  */
 const RenderComments = ( { blockContexts, ...props } ) => (
@@ -66,9 +71,7 @@ const RenderComments = ( { blockContexts, ...props } ) => (
 								blocks={ props.blocks }
 								__experimentalLive
 								__experimentalOnClick={ () =>
-									props.setActiveBlockContext(
-										props.blockContext
-									)
+									props.setActiveBlockContext( blockContext )
 								}
 							/>
 							{ blockContext.children.length > 0 ? (
