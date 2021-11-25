@@ -41,6 +41,7 @@ export default function WelcomeGuideEditor() {
 							</p>
 							<p className="edit-site-welcome-guide__text">
 								{ createInterpolateElement(
+								 	// translators: <StylesIconImage /> is the icon for Styles. Do not translate.
 									__(
 										'Click <StylesIconImage /> to start designing your blocks, and choose your typography, layout, and colors.'
 									),
