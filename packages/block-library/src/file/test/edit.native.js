@@ -13,7 +13,8 @@ import { MediaUploadProgress } from '@wordpress/block-editor';
  */
 import { FileEdit } from '../edit.native.js';
 
-// React-native-aztec shouldn't be mocked because these tests are based on
+// eslint-disable-next-line @wordpress/comment-case
+// react-native-aztec shouldn't be mocked because these tests are based on
 // snapshot testing where we want to keep the original component.
 jest.unmock( '@wordpress/react-native-aztec' );
 
