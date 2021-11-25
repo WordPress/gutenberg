@@ -136,8 +136,8 @@ function Editor( {
 			true === settings.allowedBlockTypes
 				? map( blockTypes, 'name' )
 				: settings.allowedBlockTypes || [];
+		// Omit hidden block types if exists and non-empty.
 		if ( size( hiddenBlockTypes ) > 0 ) {
-			// Omit hidden block types if exists and non-empty.
 			result.allowedBlockTypes = without(
 				defaultAllowedBlockTypes,
 				...hiddenBlockTypes
