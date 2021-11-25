@@ -133,7 +133,7 @@ function computeAnchorRect(
 	const { parentNode } = anchorRefFallback.current;
 	const rect = offsetIframe(
 		parentNode.getBoundingClientRect(),
-		parentNode.ownerDocument || anchorRefFallback.current.ownerDocument,
+		parentNode.ownerDocument,
 		container
 	);
 
