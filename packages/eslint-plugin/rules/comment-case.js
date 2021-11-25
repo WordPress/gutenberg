@@ -85,7 +85,7 @@ module.exports = {
 					const pragmaRegex = /prettier-?\w*|__mocks__\/.*\.js|@ts-(ignore|(no)?check)|eslint-(disable|enable)(-next-line)?|global\s\S/;
 
 					// Ignore known common words that don't need to be capitalized.
-					const commonWordRegex = /iOS|npm-?\w*|lint-?\w*|id/;
+					const commonWordRegex = /i(Pad|Phone|Mac|OS)|npm-?\w*|lint-?\w*|id/;
 
 					// Ignore if comment contains a URL.
 					const regexTests = [
