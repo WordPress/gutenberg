@@ -51,7 +51,7 @@ function AddedByTheme( { slug, isCustomized } ) {
 					<Icon icon={ themeIcon } />
 				</div>
 			</CustomizedTooltip>
-			<span>{ theme?.name?.rendered }</span>
+			<span>{ theme?.name?.rendered || slug }</span>
 		</HStack>
 	);
 }
@@ -69,7 +69,7 @@ function AddedByPlugin( { slug, isCustomized } ) {
 					<Icon icon={ pluginIcon } />
 				</div>
 			</CustomizedTooltip>
-			<span>{ plugin?.name }</span>
+			<span>{ plugin?.name || slug }</span>
 		</HStack>
 	);
 }
