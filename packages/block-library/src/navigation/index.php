@@ -189,13 +189,19 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
  * @return array the array of blocks to be used as a fallback.
  */
 function block_core_navigation_get_fallback_blocks() {
-	// Default to a list of Pages.
-	$fallback_blocks = array(
+	$page_list_fallback = array(
 		array(
 			'blockName' => 'core/page-list',
 			'attrs'     => array(),
 		),
 	);
+
+	$registry = WP_Block_Type_Registry::get_instance();
+
+	// If `core/page-list` is not registered then return empty blocks.
+	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
+
+	// Default to a list of Pages.
 
 	$navigation_post = block_core_navigation_get_first_non_empty_navigation();
 
@@ -303,6 +309,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
 
 		$fallback_blocks = block_core_navigation_get_fallback_blocks();
+
+		// May be empty if core/navigation or core/page list are not registered.
+		if ( empty( $fallback_blocks ) ) {
+			return '';
+		}
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
 	}
