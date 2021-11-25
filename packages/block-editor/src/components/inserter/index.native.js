@@ -45,7 +45,8 @@ const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 		onClick={ onToggle }
 		extraProps={ {
 			hint: __( 'Double tap to add a block' ),
-			// TestID is present to disambiguate this element for native UI tests. It's not
+			// eslint-disable-next-line @wordpress/comment-case
+			// testID is present to disambiguate this element for native UI tests. It's not
 			// usually required for components. See: https://git.io/JeQ7G.
 			testID: 'add-block-button',
 			onLongPress,
