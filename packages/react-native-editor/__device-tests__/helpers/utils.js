@@ -205,6 +205,7 @@ const typeString = async ( driver, element, str, clear ) => {
 
 const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
+		// eslint-disable-next-line @wordpress/comment-case
 		// await element.clear(); This was not working correctly on iOS so need a custom implementation
 		await clearTextBox( driver, element );
 	}

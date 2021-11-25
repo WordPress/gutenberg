@@ -509,9 +509,8 @@ export function renderComponent(
 	if (
 		typeof (
 			// Ignore reason: Current prettier reformats parens and mangles type assertion
-			// prettier-ignore.
-			/** @type {{getChildContext?: () => unknown}} */ ( instance )
-				.getChildContext
+			// prettier-ignore
+			/** @type {{getChildContext?: () => unknown}} */ ( instance ).getChildContext
 		) === 'function'
 	) {
 		Object.assign(
