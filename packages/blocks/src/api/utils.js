@@ -181,7 +181,8 @@ export function getAccessibleBlockLabel(
 		: '';
 	const hasPosition = position !== undefined;
 
-	// GetBlockLabel returns the block title as a fallback when there's no label,
+	// eslint-disable-next-line @wordpress/comment-case
+	// getBlockLabel returns the block title as a fallback when there's no label,
 	// if it did return the title, this function needs to avoid adding the
 	// title twice within the accessible label. Use this `hasLabel` boolean to
 	// handle that.
