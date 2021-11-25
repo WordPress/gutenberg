@@ -25,42 +25,65 @@ import { getActiveStyle, replaceActiveStyle } from '../block-styles/utils';
 import { store as blockEditorStore } from '../../store';
 
 /**
- * @typedef  {Object}   CustomClassNameMenuItemProps
- * @property {boolean}  isSelected Whether the item is selected.
- * @property {Function} onClick    An onClick handler.
- * @property {Object}   style      A block style object.
+ * @typedef  {Object}   CustomClassNameMenuDropDownMenuProps
+ * @property {string}   activeStyle            The currently active style.
+ * @property {Object}   blockStyles            A collection of Block Styles.
+ * @property {Function} onSelectStyleClassName An onClick handler.
  */
 
 /**
- * Returns a menu item component.
+ * Returns a DropDownMenu component.
  *
- * @param {CustomClassNameMenuItemProps} props The component.
+ * @param {CustomClassNameMenuDropDownMenuProps} props The component.
  * @return {WPComponent}                        The menu item component.
  */
-function CustomClassNameMenuItem( { isSelected, onClick, style } ) {
+function CustomClassNameMenuDropDownMenu( {
+	activeStyle,
+	blockStyles,
+	onSelectStyleClassName,
+} ) {
 	return (
-		<MenuItem
-			key={ style?.label }
-			icon={ isSelected && check }
-			isSelected={ isSelected }
-			onClick={ onClick }
-			role="menuitemcheckbox"
+		<DropdownMenu
+			className="additional-class-name-control__block-style-dropdown"
+			icon={ moreVertical }
+			label={ __( 'Existing Styles' ) }
 		>
-			{ style?.label }
-		</MenuItem>
+			{ ( { onClose } ) => (
+				<MenuGroup label={ __( 'Block style classes' ) }>
+					{ blockStyles.map( ( style ) => {
+						const isSelected = activeStyle?.name === style.name;
+						const icon = isSelected ? check : null;
+						return (
+							<MenuItem
+								key={ style?.label }
+								icon={ icon }
+								isSelected={ isSelected }
+								onClick={ () => {
+									onSelectStyleClassName( style );
+									onClose();
+								} }
+								role="menuitemcheckbox"
+							>
+								{ style?.label }
+							</MenuItem>
+						);
+					} ) }
+				</MenuGroup>
+			) }
+		</DropdownMenu>
 	);
 }
 
 /**
  * @typedef  {Object}   CustomClassNameControlProps
- * @property {string}   clientId                    Selected Block clientId.
- * @property {string}   name                        Selected Block name.
- * @property {Object}   attributes                  Selected Block's attributes.
- * @property {Function} setAttributes               Set attributes callback.
+ * @property {string}   clientId      Selected Block clientId.
+ * @property {string}   name          Selected Block name.
+ * @property {Object}   attributes    Selected Block's attributes.
+ * @property {Function} setAttributes Set attributes callback.
  */
 
 /**
- * Control to display unified font style and weight options.
+ * Control to display custom class name control dropdown and text input.
  *
  * @param {CustomClassNameControlProps} props Component props.
  *
@@ -119,36 +142,11 @@ export default function CustomClassNameControl( {
 					help={ __( 'Separate multiple classes with spaces.' ) }
 				>
 					{ hasBlockStyles && (
-						<DropdownMenu
-							className="additional-class-name-control__block-style-dropdown"
-							icon={ moreVertical }
-							label={ __( 'Existing Styles' ) }
-						>
-							{ ( { onClose } ) => (
-								<MenuGroup
-									label={ __( 'Block style classes' ) }
-								>
-									{ blockStyles.map( ( style ) => {
-										return (
-											<CustomClassNameMenuItem
-												style={ style }
-												key={ style.label }
-												isSelected={
-													activeStyle?.name ===
-													style.name
-												}
-												onClick={ () => {
-													onSelectStyleClassName(
-														style
-													);
-													onClose();
-												} }
-											/>
-										);
-									} ) }
-								</MenuGroup>
-							) }
-						</DropdownMenu>
+						<CustomClassNameMenuDropDownMenu
+							activeStyle={ activeStyle }
+							blockStyles={ blockStyles }
+							onSelectStyleClassName={ onSelectStyleClassName }
+						/>
 					) }
 				</TextControl>
 			</div>
