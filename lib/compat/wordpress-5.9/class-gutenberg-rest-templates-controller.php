@@ -426,7 +426,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 				if ( ! $user_obj ) {
 					return new WP_Error(
 						'rest_invalid_author',
-						__( 'Invalid author ID.' ),
+						__( 'Invalid author ID.', 'gutenberg' ),
 						array( 'status' => 400 )
 					);
 				}
@@ -642,7 +642,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'author'         => array(
-					'description' => __( 'The ID for the author of the template.' ),
+					'description' => __( 'The ID for the author of the template.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
