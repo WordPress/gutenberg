@@ -1,4 +1,4 @@
-// Noinspection DuplicatedCode.
+// noinspection DuplicatedCode
 
 /**
  * External dependencies
