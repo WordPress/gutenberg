@@ -298,7 +298,7 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  * @return {*} A value whose reference will change only when an edit occurs.
  */
 export const getReferenceByDistinctEdits = createRegistrySelector(
-	( select ) => (/* State. */) => {
+	( select ) => () => {
 		deprecated(
 			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
 			{

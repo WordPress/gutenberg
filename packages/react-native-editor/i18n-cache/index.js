@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console @wordpress/comment-case */
 
 /**
  * External dependencies
@@ -8,53 +8,53 @@ const path = require( 'path' );
 const fetch = require( 'node-fetch' );
 
 const supportedLocales = [
-	'ar', // Arabic.
-	'bg', // Bulgarian.
-	'bo', // Tibetan.
-	'ca', // Catalan.
-	'cs', // Czech.
-	'cy', // Welsh.
-	'da', // Danish.
-	'de', // German.
+	'ar', // Arabic
+	'bg', // Bulgarian
+	'bo', // Tibetan
+	'ca', // Catalan
+	'cs', // Czech
+	'cy', // Welsh
+	'da', // Danish
+	'de', // German
 	'en-au', // English (Australia)
 	'en-ca', // English (Canada)
 	'en-gb', // English (UK)
 	'en-nz', // English (New Zealand)
 	'en-za', // English (South Africa)
-	'el', // Greek.
-	'es', // Spanish.
+	'el', // Greek
+	'es', // Spanish
 	'es-ar', // Spanish (Argentina)
 	'es-cl', // Spanish (Chile)
 	'es-cr', // Spanish (Costa Rica)
-	'fa', // Persian.
-	'fr', // French.
-	'gl', // Galician.
-	'he', // Hebrew.
-	'hr', // Croatian.
-	'hu', // Hungarian.
-	'id', // Indonesian.
-	'is', // Icelandic.
-	'it', // Italian.
-	'ja', // Japanese.
-	'ka', // Georgian.
-	'ko', // Korean.
+	'fa', // Persian
+	'fr', // French
+	'gl', // Galician
+	'he', // Hebrew
+	'hr', // Croatian
+	'hu', // Hungarian
+	'id', // Indonesian
+	'is', // Icelandic
+	'it', // Italian
+	'ja', // Japanese
+	'ka', // Georgian
+	'ko', // Korean
 	'nb', // Norwegian (Bokmål)
-	'nl', // Dutch.
+	'nl', // Dutch
 	'nl-be', // Dutch (Belgium)
-	'pl', // Polish.
-	'pt', // Portuguese.
+	'pl', // Polish
+	'pt', // Portuguese
 	'pt-br', // Portuguese (Brazil)
-	'ro', // Romainian.
-	'ru', // Russian.
-	'sk', // Slovak.
-	'sq', // Albanian.
-	'sr', // Serbian.
-	'sv', // Swedish.
-	'th', // Thai.
-	'tr', // Turkish.
-	'uk', // Ukrainian.
-	'ur', // Urdu.
-	'vi', // Vietnamese.
+	'ro', // Romainian
+	'ru', // Russian
+	'sk', // Slovak
+	'sq', // Albanian
+	'sr', // Serbian
+	'sv', // Swedish
+	'th', // Thai
+	'tr', // Turkish
+	'uk', // Ukrainian
+	'ur', // Urdu
+	'vi', // Vietnamese
 	'zh-cn', // Chinese (China)
 	'zh-tw', // Chinese (Taiwan)
 ];
@@ -77,7 +77,7 @@ const fetchTranslation = ( locale ) => {
 				inCache: true,
 			} );
 		} catch ( error ) {
-			// Translation not found, let's fetch it.
+			// translation not found, let's fetch it
 		}
 	}
 
@@ -144,7 +144,7 @@ module.exports = {
 	getTranslation,
 };
 
-// If run as a script.
+// if run as a script
 if ( require.main === module ) {
 	fetchTranslations().then( ( translations ) => {
 		const indexNative = `/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */
@@ -180,4 +180,4 @@ export const getTranslation = ( locale ) => translations[ locale ];
 	} );
 }
 
-/* eslint-enable no-console */
+/* eslint-enable no-console @wordpress/comment-case */

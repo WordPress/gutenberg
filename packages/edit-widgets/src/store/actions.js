@@ -95,7 +95,8 @@ export const saveWidgetAreas = ( widgetAreas ) => async ( {
 			await dispatch.saveWidgetArea( widgetArea.id );
 		}
 	} finally {
-		// SaveEditedEntityRecord resets the resolution status, let's fix it manually.
+		// eslint-disable-next-line @wordpress/comment-case
+		// saveEditedEntityRecord resets the resolution status, let's fix it manually.
 		await registry
 			.dispatch( coreStore )
 			.finishResolution(

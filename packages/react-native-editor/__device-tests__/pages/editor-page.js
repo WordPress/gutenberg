@@ -212,7 +212,7 @@ class EditorPage {
 	}
 
 	async dismissKeyboard() {
-		await this.driver.sleep( 1000 ); // / wait for any keyboard animations.
+		await this.driver.sleep( 1000 ); // Wait for any keyboard animations.
 		const keyboardShown = await this.driver.isKeyboardShown();
 		if ( ! keyboardShown ) {
 			return;
