@@ -93,7 +93,8 @@ class NavigableContainer extends Component {
 
 		const offset = eventToOffset( event );
 
-		// EventToOffset returns undefined if the event is not handled by the component.
+		// eslint-disable-next-line @wordpress/comment-case
+		// eventToOffset returns undefined if the event is not handled by the component.
 		if ( offset !== undefined && stopNavigationEvents ) {
 			// Prevents arrow key handlers bound to the document directly interfering.
 			event.stopImmediatePropagation();
