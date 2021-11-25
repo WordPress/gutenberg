@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Icon,
+	Tooltip,
+} from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import {
@@ -14,9 +18,21 @@ import {
 	plugins as pluginIcon,
 	commentAuthorAvatar as customizedByUserIcon,
 } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
-const NON_PLUGIN_SOURCES = [ 'theme', 'custom' ];
+
+function CustomizedTooltip( { isCustomized, children } ) {
+	if ( ! isCustomized ) {
+		return children;
+	}
+
+	return (
+		<Tooltip text={ __( 'This template has been customized' ) }>
+			{ children }
+		</Tooltip>
+	);
+}
 
 function AddedByTheme( { slug, isCustomized } ) {
 	const theme = useSelect(
@@ -26,19 +42,21 @@ function AddedByTheme( { slug, isCustomized } ) {
 
 	return (
 		<HStack alignment="left">
-			<div
-				className={ classnames( 'edit-site-list-added-by__icon', {
-					'is-customized': isCustomized,
-				} ) }
-			>
-				<Icon icon={ themeIcon } />
-			</div>
+			<CustomizedTooltip isCustomized={ isCustomized }>
+				<div
+					className={ classnames( 'edit-site-list-added-by__icon', {
+						'is-customized': isCustomized,
+					} ) }
+				>
+					<Icon icon={ themeIcon } />
+				</div>
+			</CustomizedTooltip>
 			<span>{ theme?.name?.rendered }</span>
 		</HStack>
 	);
 }
 
-function AddedByPlugin( { slug } ) {
+function AddedByPlugin( { slug, isCustomized } ) {
 	const plugin = useSelect(
 		( select ) => select( coreStore ).getPlugin( slug ),
 		[ slug ]
@@ -46,9 +64,11 @@ function AddedByPlugin( { slug } ) {
 
 	return (
 		<HStack alignment="left">
-			<div className="edit-site-list-added-by__icon">
-				<Icon icon={ pluginIcon } />
-			</div>
+			<CustomizedTooltip isCustomized={ isCustomized }>
+				<div className="edit-site-list-added-by__icon">
+					<Icon icon={ pluginIcon } />
+				</div>
+			</CustomizedTooltip>
 			<span>{ plugin?.name }</span>
 		</HStack>
 	);
@@ -77,7 +97,16 @@ export default function AddedBy( { templateType, template } ) {
 	}
 
 	if ( TEMPLATE_POST_TYPE_NAMES.includes( templateType ) ) {
-		if ( template.has_theme_file ) {
+		// Template originally provided by a theme, but customized by a user.
+		// Templates originally didn't have the 'origin' field so identify
+		// older customized templates by checking for no origin and a 'theme'
+		// or 'custom' source.
+		if (
+			template.has_theme_file &&
+			( template.origin === 'theme' ||
+				( ! template.origin &&
+					[ 'theme', 'custom' ].includes( template.source ) ) )
+		) {
 			return (
 				<AddedByTheme
 					slug={ template.theme }
@@ -86,12 +115,18 @@ export default function AddedBy( { templateType, template } ) {
 			);
 		}
 
-		if ( ! NON_PLUGIN_SOURCES.includes( template.source ) ) {
-			return <AddedByPlugin slug={ template.source } />;
+		// Template originally provided by a plugin, but customized by a user.
+		if ( template.has_theme_file && template.origin === 'plugin' ) {
+			return (
+				<AddedByPlugin
+					slug={ template.theme }
+					isCustomized={ template.source === 'custom' }
+				/>
+			);
 		}
 
-		// Fallback for any custom template already created without an assigned
-		// author.
+		// Template was created from scratch, but has no author. Author support
+		// was only added to templates in WordPress 5.9.
 		if (
 			! template.has_theme_file &&
 			template.source === 'custom' &&
@@ -108,5 +143,7 @@ export default function AddedBy( { templateType, template } ) {
 		}
 	}
 
+	// Simply show the author for templates created from scratch that have an
+	// author or for any other post type.
 	return <AddedByAuthor id={ template.author } />;
 }
