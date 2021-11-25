@@ -257,7 +257,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// - we don't have a relationship to a `wp_navigation` Post (via `navigationMenuId`).
 	// - we don't have any inner blocks (e.g. a block pattern).
 	// ...then create inner blocks from the classic menu assigned to that location.
-	if (  array_key_exists( '__unstableLocation', $attributes ) && ! array_key_exists( 'navigationMenuId', $attributes ) && empty($inner_blocks) ) {
+	if (
+		array_key_exists( '__unstableLocation', $attributes ) &&
+		! array_key_exists( 'navigationMenuId', $attributes ) &&
+		empty( $inner_blocks )
+	) {
 		$menu_items = gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] );
 		if ( empty( $menu_items ) ) {
 			return '';
