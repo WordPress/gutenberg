@@ -154,7 +154,7 @@ module.exports = {
 					// one is.
 					if (
 						! endsWithURL &&
-						! value.match( /\W$/ ) &&
+						! trimmedValue.match( /\W$/ ) &&
 						! isFollowedDirectlyByLineComment
 					) {
 						context.report( {
