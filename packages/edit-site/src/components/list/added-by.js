@@ -87,6 +87,31 @@ function AddedByAuthor( { id } ) {
 	);
 }
 
+function AddedBySite() {
+	const { name, logoURL } = useSelect( ( select ) => {
+		const { getEntityRecord, getMedia } = select( coreStore );
+		const siteData = getEntityRecord( 'root', '__unstableBase' );
+
+		return {
+			name: siteData.name,
+			logoURL: siteData?.site_logo
+				? getMedia( siteData.site_logo )?.source_url
+				: undefined,
+		};
+	}, [] );
+
+	return (
+		<HStack alignment="left">
+			<img
+				className="edit-site-list-added-by__avatar"
+				alt=""
+				src={ logoURL }
+			/>
+			<span>{ name }</span>
+		</HStack>
+	);
+}
+
 export default function AddedBy( { templateType, template } ) {
 	if ( ! template ) {
 		return;
@@ -122,20 +147,14 @@ export default function AddedBy( { templateType, template } ) {
 		}
 
 		// Template was created from scratch, but has no author. Author support
-		// was only added to templates in WordPress 5.9. Fallback to showing this
-		// as a customized theme template.
+		// was only added to templates in WordPress 5.9. Fallback to showing the
+		// site logo and title.
 		if (
 			! template.has_theme_file &&
 			template.source === 'custom' &&
-			! template.author &&
-			template.theme
+			! template.author
 		) {
-			return (
-				<AddedByTheme
-					slug={ template.theme }
-					isCustomized={ template.source === 'custom' }
-				/>
-			);
+			return <AddedBySite />;
 		}
 	}
 
