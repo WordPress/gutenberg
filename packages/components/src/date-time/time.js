@@ -28,6 +28,10 @@ import TimeZone from './timezone';
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
+function from12hTo24h( hours, isPm ) {
+	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
+}
+
 /**
  * <UpdateOnBlurAsIntegerField>
  * A shared component to parse, validate, and handle remounting of the underlying form field element like <input> and <select>.
@@ -132,11 +136,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 
 			const newDate = date
 				.clone()
-				.hours(
-					value === 'PM'
-						? ( ( parsedHours % 12 ) + 12 ) % 24
-						: parsedHours % 12
-				);
+				.hours( from12hTo24h( parsedHours, value === 'PM' ) );
 
 			changeDate( newDate );
 		};
