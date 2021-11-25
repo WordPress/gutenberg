@@ -15,7 +15,7 @@ import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+/** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
@@ -78,15 +78,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                   or the store definition.
+	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+	 *                                                       or the store descriptor.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
-	function select( storeNameOrDefinition ) {
-		const storeName = isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition;
+	function select( storeNameOrDescriptor ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
 		__experimentalListeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
@@ -109,15 +109,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * and modified so that they return promises that resolve to their eventual values,
 	 * after any resolvers have ran.
 	 *
-	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                   or the store definition.
+	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+	 *                                                       or the store descriptor.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function resolveSelect( storeNameOrDefinition ) {
-		const storeName = isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition;
+	function resolveSelect( storeNameOrDescriptor ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
 		__experimentalListeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
@@ -130,15 +130,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Returns the available actions for a part of the state.
 	 *
-	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                   or the store definition.
+	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+	 *                                                       or the store descriptor.
 	 *
 	 * @return {*} The action's returned value.
 	 */
-	function dispatch( storeNameOrDefinition ) {
-		const storeName = isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition;
+	function dispatch( storeNameOrDescriptor ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getActions();
@@ -203,9 +203,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
-	 * Registers a new store definition.
+	 * Registers a new store given a store descriptor.
 	 *
-	 * @param {WPDataStore} store Store definition.
+	 * @param {StoreDescriptor} store Store descriptor.
 	 */
 	function register( store ) {
 		registerStoreInstance( store.name, store.instantiate( registry ) );
