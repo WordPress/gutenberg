@@ -214,6 +214,15 @@ function block_core_navigation_get_fallback_blocks() {
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 	}
 
+	/**
+	 * Filters the fallback experience for the Navigation block.
+	 *
+	 * Returning a falsey value will opt out of the fallback and cause the block not to render.
+	 * To customise the blocks provided return an array of blocks - these should be valid
+	 * children of the `core/navigation` block.
+	 *
+	 * @param array[] default fallback blocks provided by the default block mechanic.
+	 */
 	return apply_filters( 'block_core_navigation_render_fallback', $fallback_blocks );
 }
 
