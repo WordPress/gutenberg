@@ -25,34 +25,29 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	}
 
 	$per_page = $block->context['queryPerPage'];
-	// Get an array of comments for the current post.
 
 	$page = (int) get_query_var( 'cpage' );
 
 	$comment_args = array(
-		'number'    => $per_page,
-		'orderby'   => 'comment_date_gmt',
-		'order'     => 'ASC',
-		'status'    => 'approve',
-		'post_id'   => $post_id,
-		'offset'    => 0,
-		'parent_id' => 0,
+		'number'  => $per_page,
+		'orderby' => 'comment_date_gmt',
+		'order'   => 'ASC',
+		'status'  => 'approve',
+		'post_id' => $post_id,
+		'offset'  => 0,
+		'parent'  => 0, // Only show top-level comments. Needs to be updated with responses.
 	);
 
 	if ( $page ) {
 		$comment_args['offset'] = ( $page - 1 ) * $per_page;
 	} else {
-		$top_level_args = array(
-			'count'   => true,
-			'orderby' => false,
+		$top_level_args         = array(
 			'post_id' => $post_id,
-			'status'  => 'approve',
+			'count'   => true,
+			'parent'  => 0,
 		);
-
-		// We don't count nested comments yet.
-		$comment_count = get_comments( $top_level_args );
-
-		$comment_args['offset'] = ( ceil( $comment_count / $per_page ) - 1 ) * $per_page;
+		$top_level_count        = get_comments( $top_level_args );
+		$comment_args['offset'] = ( ceil( $top_level_count / $per_page ) - 1 ) * $per_page;
 	}
 
 	$comments = get_comments( $comment_args );
