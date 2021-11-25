@@ -21,6 +21,13 @@ const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	textTransform: 'var:preset|text-transform|',
 };
 
+const migrateIdToRef = ( { navigationMenuId, ...attributes } ) => {
+	return {
+		...attributes,
+		ref: navigationMenuId,
+	};
+};
+
 const migrateWithLayout = ( attributes ) => {
 	if ( !! attributes.layout ) {
 		return attributes;
@@ -45,6 +52,97 @@ const migrateWithLayout = ( attributes ) => {
 	}
 
 	return updatedAttributes;
+};
+
+const v6 = {
+	attributes: {
+		navigationMenuId: {
+			type: 'number',
+		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
+		rgbTextColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		rgbBackgroundColor: {
+			type: 'string',
+		},
+		showSubmenuIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		openSubmenusOnClick: {
+			type: 'boolean',
+			default: false,
+		},
+		overlayMenu: {
+			type: 'string',
+			default: 'mobile',
+		},
+		__unstableLocation: {
+			type: 'string',
+		},
+		overlayBackgroundColor: {
+			type: 'string',
+		},
+		customOverlayBackgroundColor: {
+			type: 'string',
+		},
+		overlayTextColor: {
+			type: 'string',
+		},
+		customOverlayTextColor: {
+			type: 'string',
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		inserter: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalTextTransform: true,
+			__experimentalFontFamily: true,
+			__experimentalTextDecoration: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		spacing: {
+			blockGap: true,
+			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+		__experimentalLayout: {
+			allowSwitching: false,
+			allowInheriting: false,
+			default: {
+				type: 'flex',
+				setCascadingProperties: true,
+			},
+		},
+	},
+	save() {
+		return <InnerBlocks.Content />;
+	},
+	isEligible: ( { navigationMenuId } ) => !! navigationMenuId,
+	migrate: migrateIdToRef,
 };
 
 const v5 = {
@@ -135,7 +233,7 @@ const v5 = {
 	},
 	isEligible: ( { itemsJustification, orientation } ) =>
 		!! itemsJustification || !! orientation,
-	migrate: migrateWithLayout,
+	migrate: compose( migrateIdToRef, migrateWithLayout ),
 };
 
 const v4 = {
@@ -218,7 +316,7 @@ const v4 = {
 	save() {
 		return <InnerBlocks.Content />;
 	},
-	migrate: compose( migrateWithLayout, migrateFontFamily ),
+	migrate: compose( migrateIdToRef, migrateWithLayout, migrateFontFamily ),
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
 	},
@@ -259,6 +357,7 @@ const migrateTypographyPresets = function ( attributes ) {
 };
 
 const deprecated = [
+	v6,
 	v5,
 	v4,
 	// Remove `isResponsive` attribute.
@@ -336,6 +435,7 @@ const deprecated = [
 			return attributes.isResponsive;
 		},
 		migrate: compose(
+			migrateIdToRef,
 			migrateWithLayout,
 			migrateFontFamily,
 			migrateIsResponsive
@@ -410,6 +510,7 @@ const deprecated = [
 			return false;
 		},
 		migrate: compose(
+			migrateIdToRef,
 			migrateWithLayout,
 			migrateFontFamily,
 			migrateTypographyPresets
@@ -454,7 +555,7 @@ const deprecated = [
 			html: false,
 			inserter: true,
 		},
-		migrate( attributes ) {
+		migrate: compose( migrateIdToRef, ( attributes ) => {
 			return {
 				...omit( attributes, [ 'rgbTextColor', 'rgbBackgroundColor' ] ),
 				customTextColor: attributes.textColor
@@ -464,7 +565,7 @@ const deprecated = [
 					? undefined
 					: attributes.rgbBackgroundColor,
 			};
-		},
+		} ),
 		save() {
 			return <InnerBlocks.Content />;
 		},

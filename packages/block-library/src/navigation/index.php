@@ -9,7 +9,8 @@
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
  *
- * @param  array $attributes Navigation block attributes.
+ * @param array $attributes Navigation block attributes.
+ *
  * @return array Colors CSS classes and inline styles.
  */
 function block_core_navigation_build_css_colors( $attributes ) {
@@ -99,7 +100,8 @@ function block_core_navigation_build_css_colors( $attributes ) {
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the navigation markup in the front-end.
  *
- * @param  array $attributes Navigation block attributes.
+ * @param array $attributes Navigation block attributes.
+ *
  * @return array Font size CSS classes and inline styles.
  */
 function block_core_navigation_build_css_font_sizes( $attributes ) {
@@ -269,13 +271,17 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$area    = $block->context['navigationArea'];
 		$mapping = get_option( 'wp_navigation_areas', array() );
 		if ( ! empty( $mapping[ $area ] ) ) {
-			$attributes['navigationMenuId'] = $mapping[ $area ];
+			$attributes['ref'] = $mapping[ $area ];
 		}
 	}
 
-	// Load inner blocks from the navigation post.
+	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
 	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
-		$navigation_post = get_post( $attributes['navigationMenuId'] );
+		$attributes['ref'] = $attributes['navigationMenuId'];
+	}
+	// Load inner blocks from the navigation post.
+	if ( array_key_exists( 'ref', $attributes ) ) {
+		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
 			return '';
 		}
@@ -407,8 +413,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 /**
  * Register the navigation block.
  *
- * @uses render_block_core_navigation()
  * @throws WP_Error An WP_Error exception parsing the block definition.
+ * @uses render_block_core_navigation()
  */
 function register_block_core_navigation() {
 	register_block_type_from_metadata(
@@ -425,6 +431,7 @@ add_action( 'init', 'register_block_core_navigation' );
  * Filter that changes the parsed attribute values of navigation blocks contain typographic presets to contain the values directly.
  *
  * @param array $parsed_block The block being rendered.
+ *
  * @return array The block being rendered without typographic presets.
  */
 function block_core_navigation_typographic_presets_backcompatibility( $parsed_block ) {
@@ -448,6 +455,7 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 			}
 		}
 	}
+
 	return $parsed_block;
 }
 

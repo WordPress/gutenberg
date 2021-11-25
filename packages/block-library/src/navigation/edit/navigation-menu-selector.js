@@ -13,13 +13,13 @@ import useNavigationMenu from '../use-navigation-menu';
 
 export default function NavigationMenuSelector( { onSelect, onCreateNew } ) {
 	const { navigationMenus } = useNavigationMenu();
-	const navigationMenuId = useEntityId( 'postType', 'wp_navigation' );
+	const ref = useEntityId( 'postType', 'wp_navigation' );
 
 	return (
 		<>
 			<MenuGroup>
 				<MenuItemsChoice
-					value={ navigationMenuId }
+					value={ ref }
 					onSelect={ ( selectedId ) =>
 						onSelect(
 							navigationMenus.find(
