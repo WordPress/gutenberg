@@ -369,7 +369,8 @@ function GalleryEdit( props ) {
 	}, [ isSelected ] );
 
 	useEffect( () => {
-		// LinkTo attribute must be saved so blocks don't break when changing
+		// eslint-disable-next-line @wordpress/comment-case
+		// linkTo attribute must be saved so blocks don't break when changing
 		// image_default_link_type in options.php.
 		if ( ! linkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
