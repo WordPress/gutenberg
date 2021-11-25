@@ -41,12 +41,12 @@ function ScreenColorPalette( { name } ) {
 					label={ __( 'Solid' ) }
 				/>
 				<ToggleGroupControlOption
-					value="gradients"
-					label={ __( 'Gradients' ) }
+					value="gradient"
+					label={ __( 'Gradient' ) }
 				/>
 			</ToggleGroupControl>
 			{ currentTab === 'solid' && <ColorPalettePanel name={ name } /> }
-			{ currentTab === 'gradients' && (
+			{ currentTab === 'gradient' && (
 				<GradientPalettePanel name={ name } />
 			) }
 		</>
