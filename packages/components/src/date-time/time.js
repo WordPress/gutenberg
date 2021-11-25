@@ -121,8 +121,16 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 	}
 
 	function update( name, value ) {
+		// If the 12-hour format is being used and the 'PM' period is selected, then
+		// the incoming value (which ranges 1-12) should be increased by 12 to match
+		// the expected 24-hour format.
+		let adjustedValue = value;
+		if ( is12Hour ) {
+			adjustedValue = from12hTo24h( value, am === 'PM' );
+		}
+
 		// Clone the date and call the specific setter function according to `name`.
-		const newDate = date.clone()[ name ]( value );
+		const newDate = date.clone()[ name ]( adjustedValue );
 		changeDate( newDate );
 	}
 
