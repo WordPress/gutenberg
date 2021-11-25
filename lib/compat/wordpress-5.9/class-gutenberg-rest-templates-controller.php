@@ -173,10 +173,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
-			$template = get_block_file_template( $request['id'], $this->post_type );
-			if ( ! $template ) {
-				$template = get_block_file_template( str_replace( '/', '//', $request['id'] ), $this->post_type );
-			}
+			$template = $this->get_template_by_id( $request['id'], true );
 		} else {
 			$template = $this->get_template_by_id( $request['id'] );
 		}
@@ -345,13 +342,26 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 *
 	 * See https://core.trac.wordpress.org/ticket/54507 for more context
 	 *
-	 * @param string $id ID of the template.
+	 * @param string  $id        ID of the template.
+	 * @param boolean $from_file Optional Whether to use gutenberg_get_block_template instead of get_block_file_template.
 	 * @return WP_Block_Template|null Template.
 	 */
-	private function get_template_by_id( $id ) {
-		$template = gutenberg_get_block_template( $id, $this->post_type );
+	private function get_template_by_id( $id, $from_file = false ) {
+		$getter   = $from_file ? 'get_block_file_template' : 'gutenberg_get_block_template';
+		$template = $getter( $id, $this->post_type );
 		if ( ! $template ) {
-			$template = gutenberg_get_block_template( str_replace( '/', '//', $id ), $this->post_type );
+			$uri       = $_SERVER['REQUEST_URI'];
+			$delimiter = '/wp/v2/templates/';
+
+			// Extract part of the path that comes after /wp/v2/templates/.
+			$literal_id = substr( $uri, strpos( $uri, $delimiter ) + strlen( $delimiter ) );
+
+			// Extract part of the path before the query string (if any).
+			$literal_id = explode( '?', $literal_id )[0];
+
+			// Remove any trailing slashes.
+			$literal_id = rtrim( $literal_id, '/' );
+			$template   = $getter( $literal_id, $this->post_type );
 		}
 		return $template;
 	}
