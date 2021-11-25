@@ -45,7 +45,7 @@ export function useDragCursor(
 		if ( isDragging ) {
 			document.documentElement.style.cursor = dragCursor;
 		} else {
-			// @ts-expect-error.
+			// @ts-expect-error
 			document.documentElement.style.cursor = null;
 		}
 	}, [ isDragging ] );
