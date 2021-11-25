@@ -15,7 +15,7 @@ export const browserSupportsPdfs = () => {
 		return false;
 	}
 
-	// IPad pretends to be a Mac.
+	// iPad pretends to be a Mac.
 	if (
 		window.navigator.userAgent.indexOf( 'Macintosh' ) > -1 &&
 		window.navigator.maxTouchPoints &&

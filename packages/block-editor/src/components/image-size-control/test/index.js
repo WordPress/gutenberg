@@ -142,7 +142,8 @@ describe( 'ImageSizeControl', () => {
 			fireEvent.change( heightInput, { target: { value: '' } } );
 
 			await waitFor( () => {
-				// OnChange is called and sets the dimension to undefined rather than
+				// eslint-disable-next-line @wordpress/comment-case
+				// onChange is called and sets the dimension to undefined rather than
 				// the empty string.
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnChange ).toHaveBeenCalledWith( {
@@ -172,7 +173,8 @@ describe( 'ImageSizeControl', () => {
 			fireEvent.change( widthInput, { target: { value: '' } } );
 
 			await waitFor( () => {
-				// OnChange is called and sets the dimension to undefined rather than
+				// eslint-disable-next-line @wordpress/comment-case
+				// onChange is called and sets the dimension to undefined rather than
 				// the empty string.
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnChange ).toHaveBeenCalledWith( {
@@ -299,7 +301,8 @@ describe( 'ImageSizeControl', () => {
 			} );
 
 			await waitFor( () => {
-				// OnChangeImage is called with the slug and the event.
+				// eslint-disable-next-line @wordpress/comment-case
+				// onChangeImage is called with the slug and the event.
 				expect( mockOnChangeImage ).toHaveBeenCalledWith(
 					'thumbnail',
 					expect.any( Object )
