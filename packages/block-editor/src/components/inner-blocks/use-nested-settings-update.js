@@ -18,26 +18,26 @@ import { getLayoutType } from '../../layouts';
  * the block-editor store, then the store is updated with the new settings which
  * came from props.
  *
- * @param {string}            clientId                       The client ID of the block to update.
- * @param {string[]}          allowedBlocks                  An array of block names which are permitted
- *                                                           in inner blocks.
- * @param {string[]}          __experimentalDisallowedBlocks An array of block names which are not permitted in inner blocks.
- * @param {?Array}            __experimentalDefaultBlock     The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean} __experimentalDirectInsert     If a default block should be inserted directly by the
- *                                                           appender.
- * @param {string}            [templateLock]                 The template lock specified for the inner
- *                                                           blocks component. (e.g. "all")
- * @param {boolean}           captureToolbars                Whether or children toolbars should be shown
- *                                                           in the inner blocks component rather than on
- *                                                           the child block.
- * @param {string}            orientation                    The direction in which the block
- *                                                           should face.
- * @param {Object}            layout                         The layout object for the block container.
+ * @param {string}            clientId                   The client ID of the block to update.
+ * @param {string[]}          allowedBlocks              An array of block names which are permitted
+ *                                                       in inner blocks.
+ * @param {string[]}          __unstableDisallowedBlocks An array of block names which are not permitted in inner blocks.
+ * @param {?Array}            __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
+ * @param {?Function|boolean} __experimentalDirectInsert If a default block should be inserted directly by the
+ *                                                       appender.
+ * @param {string}            [templateLock]             The template lock specified for the inner
+ *                                                       blocks component. (e.g. "all")
+ * @param {boolean}           captureToolbars            Whether or children toolbars should be shown
+ *                                                       in the inner blocks component rather than on
+ *                                                       the child block.
+ * @param {string}            orientation                The direction in which the block
+ *                                                       should face.
+ * @param {Object}            layout                     The layout object for the block container.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
 	allowedBlocks,
-	__experimentalDisallowedBlocks,
+	__unstableDisallowedBlocks,
 	__experimentalDefaultBlock,
 	__experimentalDirectInsert,
 	templateLock,
@@ -68,14 +68,14 @@ export default function useNestedSettingsUpdate(
 	// render.
 	const _allowedBlocks = useMemo( () => allowedBlocks, allowedBlocks );
 	const _disallowedBlocks = useMemo(
-		() => __experimentalDisallowedBlocks,
-		__experimentalDisallowedBlocks
+		() => __unstableDisallowedBlocks,
+		__unstableDisallowedBlocks
 	);
 
 	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
-			__experimentalDisallowedBlocks: _disallowedBlocks,
+			__unstableDisallowedBlocks: _disallowedBlocks,
 			templateLock:
 				templateLock === undefined ? parentLock : templateLock,
 		};
@@ -110,7 +110,7 @@ export default function useNestedSettingsUpdate(
 		clientId,
 		blockListSettings,
 		_allowedBlocks,
-		__experimentalDisallowedBlocks,
+		__unstableDisallowedBlocks,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		templateLock,

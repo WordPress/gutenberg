@@ -1249,7 +1249,7 @@ const canInsertBlockTypeUnmemoized = (
 
 	let parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
 	const parentDisallowedBlocks =
-		parentBlockListSettings?.__experimentalDisallowedBlocks;
+		parentBlockListSettings?.__unstableDisallowedBlocks;
 
 	// These two settings are conflicting one of them should be used at a time.
 	if ( parentAllowedBlocks && parentDisallowedBlocks ) {

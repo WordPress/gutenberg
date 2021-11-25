@@ -59,7 +59,7 @@ function EditableContent( { layout, context = {} } ) {
 			onInput,
 			onChange,
 			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
-			__experimentalDisallowedBlocks: [ 'core/template-part' ],
+			__unstableDisallowedBlocks: [ 'core/template-part' ],
 		}
 	);
 	return <div { ...props } />;
