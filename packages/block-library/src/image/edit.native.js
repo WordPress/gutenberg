@@ -134,7 +134,7 @@ function LinkSettings( {
 		url: {
 			valueMask,
 			autoFocus: false,
-			autoFill: true,
+			autoFill: false,
 		},
 		openInNewTab: {
 			label: __( 'Open in new tab' ),

@@ -1,6 +1,7 @@
 {
 	"version": 2,
 	"settings": {
+		"appearanceTools": false,
 		"color": {
 			"background": true,
 			"palette": [

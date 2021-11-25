@@ -55,6 +55,9 @@
 		},
 		"customOverlayTextColor": {
 			"type": "string"
+		},
+		"__unstableMaxPages": {
+			"type": "number"
 		}
 	},
 	"usesContext": [ "navigationArea" ],
@@ -72,7 +75,8 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation"
+		"orientation": "orientation",
+		"__unstableMaxPages": "__unstableMaxPages"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

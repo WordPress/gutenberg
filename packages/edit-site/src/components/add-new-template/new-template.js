@@ -33,7 +33,8 @@ export default function NewTemplate( { postType } ) {
 		( select ) => ( {
 			templates: select( coreStore ).getEntityRecords(
 				'postType',
-				'wp_template'
+				'wp_template',
+				{ per_page: -1 }
 			),
 			defaultTemplateTypes: select(
 				editorStore
@@ -58,8 +59,7 @@ export default function NewTemplate( { postType } ) {
 		} );
 
 		// Navigate to the created template editor.
-		window.location.search = addQueryArgs( '', {
-			page: 'gutenberg-edit-site',
+		window.location.href = addQueryArgs( window.location.href, {
 			postId: template.id,
 			postType: 'wp_template',
 		} );

@@ -3,7 +3,7 @@
 
 # Schemas
 /schemas                                        @mkaz
-/schemas/json                                   @ajlende
+/schemas/json                                   @ajlende @mkaz
 
 # Data
 /packages/api-fetch                             @nerrad @mmtr
@@ -65,7 +65,7 @@
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
 /packages/create-block                          @gziolo @mkaz
-/packages/create-block-tutorial-template        @gziolo
+/packages/create-block-tutorial-template        @gziolo @mkaz
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/docgen                                @oandregal

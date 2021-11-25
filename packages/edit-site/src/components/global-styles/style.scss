@@ -15,6 +15,30 @@
 	}
 }
 
+.edit-site-typography-panel__preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100px;
+	margin-bottom: $grid-unit-20;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles-screen-typography {
+	margin: $grid-unit-20;
+}
+
+.edit-site-global-styles-screen-typography__indicator {
+	height: 24px;
+	width: 24px;
+	font-size: 14px;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	border-radius: $radius-block-ui;
+}
+
 .edit-site-global-styles-screen-colors {
 	margin: $grid-unit-20;
 

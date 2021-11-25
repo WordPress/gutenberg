@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 /**
  * External dependencies
  */
@@ -6,7 +8,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createPortal, useEffect, useRef } from '@wordpress/element';
+import {
+	createPortal,
+	useEffect,
+	useRef,
+	forwardRef,
+} from '@wordpress/element';
 import {
 	useInstanceId,
 	useFocusReturn,
@@ -30,31 +37,34 @@ import StyleProvider from '../style-provider';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
-export default function Modal( {
-	bodyOpenClassName = 'modal-open',
-	role = 'dialog',
-	title = null,
-	focusOnMount = true,
-	shouldCloseOnEsc = true,
-	shouldCloseOnClickOutside = true,
-	isDismissable, // Deprecated
-	isDismissible = isDismissable || true,
-	/* accessibility */
-	aria = {
-		labelledby: null,
-		describedby: null,
-	},
-	onRequestClose,
-	icon,
-	closeButtonLabel,
-	children,
-	style,
-	overlayClassName,
-	className,
-	contentLabel,
-	onKeyDown,
-	isFullScreen = false,
-} ) {
+function Modal( props, forwardedRef ) {
+	const {
+		bodyOpenClassName = 'modal-open',
+		role = 'dialog',
+		title = null,
+		focusOnMount = true,
+		shouldCloseOnEsc = true,
+		shouldCloseOnClickOutside = true,
+		isDismissable, // Deprecated
+		isDismissible = isDismissable || true,
+		/* accessibility */
+		aria = {
+			labelledby: null,
+			describedby: null,
+		},
+		onRequestClose,
+		icon,
+		closeButtonLabel,
+		children,
+		style,
+		overlayClassName,
+		className,
+		contentLabel,
+		onKeyDown,
+		isFullScreen = false,
+		__experimentalHideHeader = false,
+	} = props;
+
 	const ref = useRef();
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
@@ -106,7 +116,7 @@ export default function Modal( {
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			ref={ ref }
+			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ classnames(
 				'components-modal__screen-overlay',
 				overlayClassName
@@ -139,38 +149,43 @@ export default function Modal( {
 					onKeyDown={ onKeyDown }
 				>
 					<div
-						className={ 'components-modal__content' }
+						className={ classnames( 'components-modal__content', {
+							'hide-header': __experimentalHideHeader,
+						} ) }
 						role="document"
 					>
-						<div className="components-modal__header">
-							<div className="components-modal__header-heading-container">
-								{ icon && (
-									<span
-										className="components-modal__icon-container"
-										aria-hidden
-									>
-										{ icon }
-									</span>
-								) }
-								{ title && (
-									<h1
-										id={ headingId }
-										className="components-modal__header-heading"
-									>
-										{ title }
-									</h1>
+						{ ! __experimentalHideHeader && (
+							<div className="components-modal__header">
+								<div className="components-modal__header-heading-container">
+									{ icon && (
+										<span
+											className="components-modal__icon-container"
+											aria-hidden
+										>
+											{ icon }
+										</span>
+									) }
+									{ title && (
+										<h1
+											id={ headingId }
+											className="components-modal__header-heading"
+										>
+											{ title }
+										</h1>
+									) }
+								</div>
+								{ isDismissible && (
+									<Button
+										onClick={ onRequestClose }
+										icon={ closeSmall }
+										label={
+											closeButtonLabel ||
+											__( 'Close dialog' )
+										}
+									/>
 								) }
 							</div>
-							{ isDismissible && (
-								<Button
-									onClick={ onRequestClose }
-									icon={ closeSmall }
-									label={
-										closeButtonLabel || __( 'Close dialog' )
-									}
-								/>
-							) }
-						</div>
+						) }
 						{ children }
 					</div>
 				</div>
@@ -179,3 +194,5 @@ export default function Modal( {
 		document.body
 	);
 }
+
+export default forwardRef( Modal );

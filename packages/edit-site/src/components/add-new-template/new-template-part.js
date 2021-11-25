@@ -36,8 +36,7 @@ export default function NewTemplatePart( { postType } ) {
 		} );
 
 		// Navigate to the created template part editor.
-		window.location.search = addQueryArgs( '', {
-			page: 'gutenberg-edit-site',
+		window.location.href = addQueryArgs( window.location.href, {
 			postId: templatePart.id,
 			postType: 'wp_template_part',
 		} );

@@ -218,6 +218,7 @@ The settings section has the following structure:
 {
 	"version": 1,
 	"settings": {
+		"appearanceTools": false,
 		"border": {
 			"color": false,
 			"radius": false,
@@ -281,6 +282,15 @@ The settings section has the following structure:
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
 
 Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
+
+### Opt-in into UI controls
+
+There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
+
+- border: color, radius, style, width
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
 
 #### Backward compatibility with add_theme_support
 
@@ -1076,3 +1086,27 @@ A few notes about this process:
 	}
 }
 ```
+
+### What is blockGap and how can I use it?
+
+blockGap adjusts the vertical margin, or gap, between blocks.
+It is also used for margins between inner blocks in columns, buttons, and social icons.
+In the editor, the control for the blockGap is called Block spacing, located in the Dimensions panel.
+
+The value you define for the blockGap style uses a CSS property, a preset, named `--wp--style--block-gap`.
+The default value is 2em.
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"spacing": {
+			"blockGap": true,
+		}
+	},
+	"styles": {
+		"spacing": {
+			"blockGap": "1.5rem"
+		}
+	}
+}

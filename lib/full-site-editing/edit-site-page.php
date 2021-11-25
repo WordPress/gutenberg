@@ -86,15 +86,18 @@ function gutenberg_edit_site_list_init( $settings ) {
 	wp_enqueue_style( 'wp-edit-site' );
 	wp_enqueue_media();
 
-	$template_type = $_GET['postType'];
-	$post_type     = get_post_type_object( $template_type );
+	$post_type = get_post_type_object( $_GET['postType'] );
+
+	if ( ! $post_type ) {
+		wp_die( __( 'Invalid post type.', 'gutenberg' ) );
+	}
 
 	$preload_data = array_reduce(
 		array(
 			'/',
-			"/wp/v2/types/$template_type?context=edit",
+			"/wp/v2/types/$post_type->name?context=edit",
 			'/wp/v2/types?context=edit',
-			"/wp/v2/$post_type->rest_base?context=edit",
+			"/wp/v2/$post_type->rest_base?context=edit&per_page=-1",
 		),
 		'rest_preload_api_request',
 		array()
@@ -116,7 +119,7 @@ function gutenberg_edit_site_list_init( $settings ) {
 				wp.editSite.initializeList( "%s", "%s", %s );
 			} );',
 			'edit-site-editor',
-			$template_type,
+			$post_type->name,
 			wp_json_encode( $settings )
 		)
 	);
@@ -260,3 +263,18 @@ function register_site_editor_homepage_settings() {
 	);
 }
 add_action( 'init', 'register_site_editor_homepage_settings', 10 );
+
+/**
+ * Sets the HTML <title> in the Site Editor list page to be the title of the CPT
+ * being edited, e.g. 'Templates'.
+ */
+function gutenberg_set_site_editor_list_page_title() {
+	global $title;
+	if ( gutenberg_is_edit_site_list_page() ) {
+		$post_type = get_post_type_object( $_GET['postType'] );
+		if ( $post_type ) {
+			$title = $post_type->labels->name;
+		}
+	}
+}
+add_action( 'load-appearance_page_gutenberg-edit-site', 'gutenberg_set_site_editor_list_page_title' );

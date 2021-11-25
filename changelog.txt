@@ -1,8 +1,14 @@
 == Changelog ==
 
-= 12.0.0-rc.1 =
+= 12.0.1 =
+
+### Enhancements
+
+#### Global Styles
+- Add caching to `WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_custom_post_type()`. ([36584](https://github.com/WordPress/gutenberg/pull/36584))
 
 
+= 12.0.0 =
 
 ### Features
 
@@ -13,35 +19,34 @@
 
 #### Block Library
 - Move WP_REST_Block_Navigation_Areas_Controller from Gutenberg to Core. ([36374](https://github.com/WordPress/gutenberg/pull/36374))
-- Try: Let Featured Image block inherit dimensions, look like a placeholder. ([36517](https://github.com/WordPress/gutenberg/pull/36517))
+- Let Featured Image block inherit dimensions, look like a placeholder. ([36517](https://github.com/WordPress/gutenberg/pull/36517))
 - Change all the uses of "website" to "site". ([36220](https://github.com/WordPress/gutenberg/pull/36220))
 - Enable Previews for Navigation Link Blocks. ([36412](https://github.com/WordPress/gutenberg/pull/36412))
 
 #### Site Editor
-- FSE: Add welcome guide. ([36172](https://github.com/WordPress/gutenberg/pull/36172))
+- Add  welcome guide. ([36172](https://github.com/WordPress/gutenberg/pull/36172))
 - Update back button URL. ([36313](https://github.com/WordPress/gutenberg/pull/36313))
 - Improve compatiblity with menu endpoints WordPress 5.9. ([36372](https://github.com/WordPress/gutenberg/pull/36372))
 - React to any errors coming up in gutenberg_migrate_menu_to_navigation_post. ([36461](https://github.com/WordPress/gutenberg/pull/36461))
 
 #### Block API
-- Blocks: Update schema to require either a type or an enum. ([36267](https://github.com/WordPress/gutenberg/pull/36267))
-- Schema: Allow block.json attribute type to be an array. ([36295](https://github.com/WordPress/gutenberg/pull/36295))
+- Update schema to require either a type or an enum. ([36267](https://github.com/WordPress/gutenberg/pull/36267))
 - Add `_wp_array_set` and `_wp_to_kebab_case` to 5.8 compat. ([36399](https://github.com/WordPress/gutenberg/pull/36399))
 
 #### Design Tools
 - Paragraph: Merge text settings into typography panel. ([36334](https://github.com/WordPress/gutenberg/pull/36334))
 
 #### Build Tooling
-- Scripts: Add TypeScript for builds and tests. ([36260](https://github.com/WordPress/gutenberg/pull/36260))
+- Add TypeScript for builds and tests. ([36260](https://github.com/WordPress/gutenberg/pull/36260))
 - stylelint-config: Widen the acceptable version range for the 'stylelint' peerDependency. ([36518](https://github.com/WordPress/gutenberg/pull/36518))
-- Babel Preset: Update Babel packages to 7.16 version. ([36244](https://github.com/WordPress/gutenberg/pull/36244))
+- Update Babel packages to 7.16 version. ([36244](https://github.com/WordPress/gutenberg/pull/36244))
 
 #### Style Variations
 - Block Styles: Show style preview when hovered or focused. ([34522](https://github.com/WordPress/gutenberg/pull/34522))
 
 #### Schema
-- Schemas: Update schema URL to wp.org domain. ([36316](https://github.com/WordPress/gutenberg/pull/36316))
-
+- Update schema URL to wp.org domain. ([36316](https://github.com/WordPress/gutenberg/pull/36316))
+- Allow block.json attribute type to be an array. ([36295](https://github.com/WordPress/gutenberg/pull/36295))
 
 ### Bug Fixes
 
@@ -49,7 +54,7 @@
 - DEWP: Fix deprecation warning. ([36285](https://github.com/WordPress/gutenberg/pull/36285))
 - Fix mobile horizontal scrollbar. ([36567](https://github.com/WordPress/gutenberg/pull/36567))
 - Fix schema to allow for custom blocks in theme.json. ([36341](https://github.com/WordPress/gutenberg/pull/36341))
-- Fix: Theme switch on the global styles rest api unit test. ([36277](https://github.com/WordPress/gutenberg/pull/36277))
+- Theme switch on the global styles rest api unit test. ([36277](https://github.com/WordPress/gutenberg/pull/36277))
 - Polish metabox container. ([36297](https://github.com/WordPress/gutenberg/pull/36297))
 
 #### Block Library
@@ -84,7 +89,7 @@
 - Site Editor - prevent loading state from showing the admin menu. ([36455](https://github.com/WordPress/gutenberg/pull/36455))
 
 #### Themes
-- Fix: Add ability to opt out of Core color palette V2. ([36492](https://github.com/WordPress/gutenberg/pull/36492))
+- Add the ability to opt-out of Core color palette V2. ([36492](https://github.com/WordPress/gutenberg/pull/36492))
 
 #### Build Tooling
 - Fix not transforming logical assignments for packages. ([36484](https://github.com/WordPress/gutenberg/pull/36484))
@@ -105,7 +110,7 @@
 #### Global Styles
 - Chore: Add comment to Remove filter to allow WP variables after min version is 5.8. ([36281](https://github.com/WordPress/gutenberg/pull/36281))
 - Chore: Update: Centralize safe_style_css usages. ([36280](https://github.com/WordPress/gutenberg/pull/36280))
-- [Global Styles]: Add block icon next to blocks list. ([36520](https://github.com/WordPress/gutenberg/pull/36520))
+- Add block icon next to blocks list. ([36520](https://github.com/WordPress/gutenberg/pull/36520))
 - theme.json: Adds a setting property that enables some other ones. ([36246](https://github.com/WordPress/gutenberg/pull/36246))
 
 #### Block Library
@@ -115,15 +120,15 @@
 - Return wp error from wp_insert_post. ([36483](https://github.com/WordPress/gutenberg/pull/36483))
 
 #### Full Site Editing
-- FSE: Add template_type guards. ([36318](https://github.com/WordPress/gutenberg/pull/36318))
+- Add template_type guards. ([36318](https://github.com/WordPress/gutenberg/pull/36318))
 
 
 ### Documentation
 
 - "npm install" suggestion provides a better learning experience. ([36217](https://github.com/WordPress/gutenberg/pull/36217))
 - Added specific links to agenda and notes posts related to core editor meetings. ([36199](https://github.com/WordPress/gutenberg/pull/36199))
-- Docs: Schemastore - $schema is VS Code-specific. ([36179](https://github.com/WordPress/gutenberg/pull/36179))
-- Docs: Update GIF image in documentation with wp.org schema URL. ([36456](https://github.com/WordPress/gutenberg/pull/36456))
+- Schemastore - $schema is VS Code-specific. ([36179](https://github.com/WordPress/gutenberg/pull/36179))
+- Update GIF image in documentation with wp.org schema URL. ([36456](https://github.com/WordPress/gutenberg/pull/36456))
 - Update Versions in WordPress to include 5.9. ([36156](https://github.com/WordPress/gutenberg/pull/36156))
 - Update combobox-control component readme. ([36413](https://github.com/WordPress/gutenberg/pull/36413))
 - Update theme.json schema to refer to wp.org URL. ([36332](https://github.com/WordPress/gutenberg/pull/36332))
@@ -150,7 +155,7 @@
 - E2E: Add more Cover block tests. ([36321](https://github.com/WordPress/gutenberg/pull/36321))
 - Fix Performance CI tests and make them always use the latest major as base branch. ([36463](https://github.com/WordPress/gutenberg/pull/36463))
 - Fix failing tests and compatibility with 5.9. ([36368](https://github.com/WordPress/gutenberg/pull/36368))
-- Tests: Add integration tests with core blocks schema validation. ([36351](https://github.com/WordPress/gutenberg/pull/36351))
+- Add integration tests with core blocks schema validation. ([36351](https://github.com/WordPress/gutenberg/pull/36351))
 - Skip flaky image block test. ([36446](https://github.com/WordPress/gutenberg/pull/36446))
 
 #### Icons
@@ -179,9 +184,6 @@
 
 #### Template Editor
 - Change edit links for templates and template parts. ([36294](https://github.com/WordPress/gutenberg/pull/36294))
-
-
-
 
 
 = 11.9.1 =
