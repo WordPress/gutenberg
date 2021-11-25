@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-// Import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	AlignmentControl,
 	BlockControls,
