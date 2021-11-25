@@ -15,7 +15,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
-function toggleRichText( container, toggle ) {
+export function toggleRichText( container, toggle ) {
 	Array.from(
 		container.querySelectorAll(
 			// Exclude the Post Editor from multi-select disable.
