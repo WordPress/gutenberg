@@ -49,7 +49,8 @@ function Snackbar(
 		onRemove = noop,
 		icon = null,
 		explicitDismiss = false,
-		// OnDismiss is a callback executed when the snackbar is dismissed.
+		// eslint-disable-next-line @wordpress/comment-case
+		// onDismiss is a callback executed when the snackbar is dismissed.
 		// It is distinct from onRemove, which _looks_ like a callback but is
 		// actually the function to call to remove the snackbar from the UI.
 		onDismiss = noop,
