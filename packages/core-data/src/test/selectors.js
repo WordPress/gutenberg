@@ -24,8 +24,8 @@ import {
 	getCurrentUser,
 	getReferenceByDistinctEdits,
 } from '../selectors';
-
-// GetEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
+// eslint-disable-next-line @wordpress/comment-case
+// getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
 describe.each( [
 	[ getEntityRecord ],
 	[ __experimentalGetEntityRecordNoResolver ],

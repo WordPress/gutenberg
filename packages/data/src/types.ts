@@ -49,9 +49,7 @@ export interface DataEmitter {
 	isPaused: boolean;
 }
 
-//
-// Type Helpers
-// .
+// Type Helpers.
 
 type ActionCreatorsOf<
 	Config extends AnyConfig
