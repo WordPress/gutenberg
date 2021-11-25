@@ -17,6 +17,23 @@
 	}
 }
 
+.edit-site-global-styles-sidebar {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+
+	.components-panel,
+	.components-navigator-provider {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+
+	.components-navigator-screen {
+		flex: 1;
+	}
+}
+
 .edit-site-global-styles-sidebar .interface-complementary-area-header .components-button.has-icon {
 	margin-left: 0;
 }
