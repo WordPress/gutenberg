@@ -174,8 +174,11 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	public function get_item( $request ) {
 		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
 			$template = get_block_file_template( $request['id'], $this->post_type );
+			if ( ! $template ) {
+				$template = get_block_file_template( str_replace( '/', '//', $request['id'] ), $this->post_type );
+			}
 		} else {
-			$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+			$template = $this->get_template_by_id( $request['id'] );
 		}
 
 		if ( ! $template ) {
@@ -202,7 +205,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+		$template = $this->get_template_by_id( $request['id'] );
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -223,7 +226,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			return $result;
 		}
 
-		$template      = gutenberg_get_block_template( $request['id'], $this->post_type );
+		$template      = $this->get_template_by_id( $request['id'] );
 		$fields_update = $this->update_additional_fields_for_object( $template, $request );
 		if ( is_wp_error( $fields_update ) ) {
 			return $fields_update;
@@ -292,7 +295,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
-		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+		$template = $this->get_template_by_id( $request['id'] );
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -330,6 +333,27 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		wp_trash_post( $id );
 		$template->status = 'trash';
 		return $this->prepare_item_for_response( $template, $request );
+	}
+
+	/**
+	 * Requesting this endpoint for a template like "twentytwentytwo//home" requires using
+	 * a path like /wp/v2/templates/twentytwentytwo//home. There are special cases when
+	 * WordPress routing corrects the name to contain only a single slash like "twentytwentytwo/home".
+	 *
+	 * This method attempts to find a template with a specific ID, and if it's missing then it
+	 * falls back to a double-slashed version of the ID.
+	 *
+	 * See https://core.trac.wordpress.org/ticket/54507 for more context
+	 *
+	 * @param string $id ID of the template.
+	 * @return WP_Block_Template|null Template.
+	 */
+	private function get_template_by_id( $id ) {
+		$template = gutenberg_get_block_template( $id, $this->post_type );
+		if ( ! $template ) {
+			$template = gutenberg_get_block_template( str_replace( '/', '//', $id ), $this->post_type );
+		}
+		return $template;
 	}
 
 	/**
