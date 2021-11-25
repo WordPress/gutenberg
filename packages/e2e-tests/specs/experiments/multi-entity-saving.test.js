@@ -9,6 +9,7 @@ import {
 	trashAllPosts,
 	activateTheme,
 	clickButton,
+	createReusableBlock,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -21,13 +22,9 @@ describe( 'Multi-entity save flow', () => {
 	const checkedBoxSelector = '.components-checkbox-control__checked';
 	const checkboxInputSelector = '.components-checkbox-control__input';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
-	const templatePartSelector = '*[data-type="core/template-part"]';
-	const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
-	const createNewButtonSelector =
-		'//button[contains(text(), "New template part")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -66,8 +63,6 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector =
 			'.edit-post-layout__toggle-entities-saved-states-panel-button';
 		const publishPanelSelector = '.editor-post-publish-panel';
-		const confirmTitleButtonSelector =
-			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		// Reusable assertions inside Post editor.
 		const assertMultiSaveEnabled = async () => {
@@ -101,20 +96,10 @@ describe( 'Multi-entity save flow', () => {
 			await assertExistance( savePanelSelector, false );
 
 			// Add a template part and edit it.
-			await insertBlock( 'Template Part' );
-			const createNewButton = await page.waitForXPath(
-				createNewButtonSelector
-			);
-			await createNewButton.click();
-			const confirmTitleButton = await page.waitForSelector(
-				confirmTitleButtonSelector
-			);
-			await confirmTitleButton.click();
-
-			await page.waitForSelector( activatedTemplatePartSelector );
-			await page.click( '.block-editor-button-block-appender' );
-			await page.click( '.editor-block-list-item-paragraph' );
-			await page.keyboard.type( 'some words...' );
+			await createReusableBlock( 'Hi!', 'Test' );
+			await page.waitForSelector( 'p[data-type="core/paragraph"]' );
+			await page.click( 'p[data-type="core/paragraph"]' );
+			await page.keyboard.type( 'Oh!' );
 
 			// Should trigger multi-entity save button once template part edited.
 			await assertMultiSaveEnabled();
@@ -166,13 +151,11 @@ describe( 'Multi-entity save flow', () => {
 			await assertMultiSaveDisabled();
 			await assertExistance( saveA11ySelector, false );
 
-			// Update template part.
-			await page.click( templatePartSelector );
-			await page.click(
-				`${ templatePartSelector } .wp-block[data-type="core/paragraph"]`
-			);
-			await page.keyboard.type( '...some more words...' );
-			await page.keyboard.press( 'Enter' );
+			// Update reusable block again.
+			await page.click( 'p[data-type="core/paragraph"]' );
+			// We need to click again due to the clickthrough overlays in reusable blocks.
+			await page.click( 'p[data-type="core/paragraph"]' );
+			await page.keyboard.type( 'R!' );
 
 			// Multi-entity saving should be enabled.
 			await assertMultiSaveEnabled();

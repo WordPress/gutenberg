@@ -161,6 +161,10 @@ _Parameters_
 -   _object.excerpt_ `[string]`: Excerpt of the new post.
 -   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
+### createReusableBlock
+
+Undocumented declaration.
+
 ### createURL
 
 Creates new URL by parsing base URL, WPPath and query string.
