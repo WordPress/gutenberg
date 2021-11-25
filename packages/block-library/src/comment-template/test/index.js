@@ -7,7 +7,7 @@ describe( 'Convert to tree', () => {
 	it( 'Empty comments', () => {
 		const comments = convertToTree( [] );
 
-		expect( comments ).toMatchInlineSnapshot( `Array []` );
+		expect( comments ).toEqual( [] );
 	} );
 
 	it( 'Handle comments', () => {

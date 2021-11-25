@@ -33,68 +33,56 @@ function CommentTemplateInnerBlocks() {
 	return <li { ...innerBlocksProps }></li>;
 }
 
-const RenderComments = ( {
-	blockContexts,
-	blockProps,
-	blocks,
-	setActiveBlockContext,
-	activeBlockContext,
-} ) => {
-	return (
-		<ol { ...blockProps }>
-			{ blockContexts &&
-				blockContexts.map( ( blockContext ) => (
-					<BlockContextProvider
-						key={ blockContext.commentId }
-						value={ blockContext }
-					>
-						{ blockContext ===
-						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<>
-								<CommentTemplateInnerBlocks />
-								{ blockContext.children.length > 0 ? (
-									<RenderComments
-										blockContexts={ blockContext.children }
-										blockProps={ blockProps }
-										blocks={ blocks }
-										activeBlockContext={
-											activeBlockContext
-										}
-										setActiveBlockContext={
-											setActiveBlockContext
-										}
-									/>
-								) : null }
-							</>
-						) : (
-							<li>
-								<BlockPreview
-									blocks={ blocks }
-									__experimentalLive
-									__experimentalOnClick={ () =>
-										setActiveBlockContext( blockContext )
-									}
+/**
+ * Component that renders a list of (nested) comments. It is called recursively
+ * in its own body.
+ *
+ * @param {Object} props                 Component props.
+ * @param {Array}  [props.blockContexts] - Array of comment objects.
+ * @return {WPElement}                 		List of comments.
+ */
+const RenderComments = ( { blockContexts, ...props } ) => (
+	<ol { ...props.blockProps }>
+		{ blockContexts &&
+			blockContexts.map( ( blockContext ) => (
+				<BlockContextProvider
+					key={ blockContext.commentId }
+					value={ blockContext }
+				>
+					{ blockContext ===
+					( props.activeBlockContext || blockContexts[ 0 ] ) ? (
+						<>
+							<CommentTemplateInnerBlocks />
+							{ blockContext.children.length > 0 ? (
+								<RenderComments
+									blockContexts={ blockContext.children }
+									{ ...props }
 								/>
-								{ blockContext.children.length > 0 ? (
-									<RenderComments
-										blockContexts={ blockContext.children }
-										blockProps={ blockProps }
-										blocks={ blocks }
-										activeBlockContext={
-											activeBlockContext
-										}
-										setActiveBlockContext={
-											setActiveBlockContext
-										}
-									/>
-								) : null }
-							</li>
-						) }
-					</BlockContextProvider>
-				) ) }
-		</ol>
-	);
-};
+							) : null }
+						</>
+					) : (
+						<li>
+							<BlockPreview
+								blocks={ props.blocks }
+								__experimentalLive
+								__experimentalOnClick={ () =>
+									props.setActiveBlockContext(
+										props.blockContext
+									)
+								}
+							/>
+							{ blockContext.children.length > 0 ? (
+								<RenderComments
+									blockContexts={ blockContext.children }
+									{ ...props }
+								/>
+							) : null }
+						</li>
+					) }
+				</BlockContextProvider>
+			) ) }
+	</ol>
+);
 
 export default function CommentTemplateEdit( {
 	clientId,
