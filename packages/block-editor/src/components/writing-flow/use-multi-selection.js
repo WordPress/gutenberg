@@ -18,7 +18,7 @@ import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-pr
 export function toggleRichText( container, toggle ) {
 	Array.from(
 		container.querySelectorAll(
-			// Exclude the Post Editor from multi-select disable.
+			// Exclude the Post Title from multi-select disable.
 			'.rich-text:not( .editor-post-title__input )'
 		)
 	).forEach( ( node ) => {
