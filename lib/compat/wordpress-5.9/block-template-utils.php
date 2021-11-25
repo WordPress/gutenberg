@@ -299,7 +299,7 @@ if ( ! function_exists( '_get_block_templates_files' ) ) {
 			return null;
 		}
 
-		$themes = array(
+		$themes         = array(
 			get_stylesheet() => get_stylesheet_directory(),
 			get_template()   => get_template_directory(),
 		);
