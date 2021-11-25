@@ -85,7 +85,7 @@ function ConfirmDialog(
 					closeButtonLabel={ cancelLabel }
 					isDismissible={ true }
 					ref={ forwardedRef }
-					showTitle={ false }
+					__experimentalHideHeader
 					{ ...otherProps }
 				>
 					<VStack spacing={ 8 }>
