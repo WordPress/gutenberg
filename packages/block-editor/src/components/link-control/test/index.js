@@ -1795,7 +1795,8 @@ describe( 'Addition Settings UI', () => {
 				label.innerHTML &&
 				label.innerHTML.includes( expectedSettingText )
 		);
-		expect( newTabSettingLabel ).not.toBeUndefined(); // Find() returns "undefined" if not found.
+		// eslint-disable-next-line @wordpress/comment-case
+		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found.
 
 		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute(
 			'for'
@@ -1980,7 +1981,7 @@ describe( 'Rich link previews', () => {
 		} );
 
 		// eslint-disable-next-line @wordpress/comment-case
-		// MockFetchRichUrlData resolves on next "tick" of event loop.
+		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2015,7 +2016,7 @@ describe( 'Rich link previews', () => {
 		} );
 
 		// eslint-disable-next-line @wordpress/comment-case
-		// MockFetchRichUrlData resolves on next "tick" of event loop.
+		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2047,7 +2048,7 @@ describe( 'Rich link previews', () => {
 		} );
 
 		// eslint-disable-next-line @wordpress/comment-case
-		// MockFetchRichUrlData resolves on next "tick" of event loop.
+		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2088,7 +2089,7 @@ describe( 'Rich link previews', () => {
 		} );
 
 		// eslint-disable-next-line @wordpress/comment-case
-		// MockFetchRichUrlData resolves on next "tick" of event loop.
+		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2128,7 +2129,7 @@ describe( 'Rich link previews', () => {
 		} );
 
 		// eslint-disable-next-line @wordpress/comment-case
-		// MockFetchRichUrlData resolves on next "tick" of event loop.
+		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2175,7 +2176,7 @@ describe( 'Rich link previews', () => {
 			} );
 
 			// eslint-disable-next-line @wordpress/comment-case
-			// MockFetchRichUrlData resolves on next "tick" of event loop.
+			// mockFetchRichUrlData resolves on next "tick" of event loop.
 			await act( async () => {
 				await eventLoopTick();
 			} );
@@ -2215,7 +2216,7 @@ describe( 'Rich link previews', () => {
 			} );
 
 			// eslint-disable-next-line @wordpress/comment-case
-			// MockFetchRichUrlData resolves on next "tick" of event loop.
+			// mockFetchRichUrlData resolves on next "tick" of event loop.
 			await act( async () => {
 				await eventLoopTick();
 			} );
@@ -2245,7 +2246,7 @@ describe( 'Rich link previews', () => {
 		} );
 
 		// eslint-disable-next-line @wordpress/comment-case
-		// MockFetchRichUrlData resolves on next "tick" of event loop.
+		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2276,7 +2277,7 @@ describe( 'Rich link previews', () => {
 		} );
 
 		// eslint-disable-next-line @wordpress/comment-case
-		// MockFetchRichUrlData resolves on next "tick" of event loop.
+		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
