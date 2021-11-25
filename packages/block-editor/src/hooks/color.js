@@ -31,7 +31,6 @@ import ColorPanel from './color-panel';
 import useSetting from '../components/use-setting';
 
 export const COLOR_SUPPORT_KEY = 'color';
-const EMPTY_ARRAY = [];
 
 const hasColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
@@ -442,7 +441,15 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+		const { palette: solidsPerOrigin } = useSetting( 'color' );
+		const colors = useMemo(
+			() => [
+				...( solidsPerOrigin.custom || [] ),
+				...( solidsPerOrigin.theme || [] ),
+				...solidsPerOrigin.default,
+			],
+			[ solidsPerOrigin ]
+		);
 		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
