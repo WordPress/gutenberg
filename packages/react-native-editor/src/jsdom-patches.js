@@ -65,8 +65,10 @@ Node.prototype.contains = function ( otherNode ) {
  * https://dom.spec.whatwg.org/#dom-node-insertbefore for the latest spec.
  */
 Node.prototype.insertBefore = function (
-	/* Node. */ newChild,
-	/* Node. */ refChild
+	/* eslint-disable @wordpress/comment-case */
+	/* Node */ newChild,
+	/* Node */ refChild
+	/* eslint-enable @wordpress/comment-case */
 ) {
 	if ( this._readonly === true ) {
 		throw new core.DOMException(
@@ -187,7 +189,7 @@ function isNonDocumentTypeChildNode( node ) {
 	return node instanceof Element || node instanceof CharacterData;
 }
 
-// $FlowFixMe.
+// $FlowFixMe
 Object.defineProperties( Node.prototype, {
 	/*
 	 * This defines parentElement property on the Node prototype using a getter.
