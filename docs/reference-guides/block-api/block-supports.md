@@ -424,31 +424,40 @@ supports: {
 }
 ```
 
-## fontSize
+## typography
 
 -   Type: `boolean`
 -   Default value: `false`
 
-This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.
+This value signals that a block supports the typography properties. When it does, the block editor will show an UI control for the user to set its values.
 
 The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or the default ones if none is provided.
 
 ```js
 supports: {
-    // Enable UI control for font-size.
-    fontSize: true,
+    // Enable UI control for typography.
+    typography: true,
 }
 ```
 
-When the block declares support for `fontSize`, the attributes definition is extended to include two new attributes: `fontSize` and `style`:
+When the block declares support for `typography`, the attributes definition is extended to include two new attributes: `fontSize` and `style`:
 
 -   `fontSize`: attribute of `string` type with no default assigned. It stores the preset values set by the user. The block can apply a default fontSize by specifying its own `fontSize` attribute with a default e.g.:
 
 ```js
 attributes: {
-    fontSize: {
-        type: 'string',
-        default: 'some-value',
+    typograhy: {
+    	fontSize: true
+    }
+}
+```
+```
+attributes: {
+    typography: {
+    	fontSize: {
+        	type: 'string',
+        	default: 'some-value'
+	}
     }
 }
 ```
