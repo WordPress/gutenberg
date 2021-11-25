@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
@@ -13,7 +18,7 @@ import {
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
 const NON_PLUGIN_SOURCES = [ 'theme', 'custom' ];
 
-function AddedByTheme( { slug } ) {
+function AddedByTheme( { slug, isCustomized } ) {
 	const theme = useSelect(
 		( select ) => select( coreStore ).getTheme( slug ),
 		[ slug ]
@@ -21,7 +26,11 @@ function AddedByTheme( { slug } ) {
 
 	return (
 		<HStack alignment="left">
-			<div className="edit-site-list-added-by__icon">
+			<div
+				className={ classnames( 'edit-site-list-added-by__icon', {
+					'is-customized': isCustomized,
+				} ) }
+			>
 				<Icon icon={ themeIcon } />
 			</div>
 			<span>{ theme?.name?.rendered }</span>
@@ -68,8 +77,13 @@ export default function AddedBy( { templateType, template } ) {
 	}
 
 	if ( TEMPLATE_POST_TYPE_NAMES.includes( templateType ) ) {
-		if ( template.has_theme_file && template.source === 'theme' ) {
-			return <AddedByTheme slug={ template.theme } />;
+		if ( template.has_theme_file ) {
+			return (
+				<AddedByTheme
+					slug={ template.theme }
+					isCustomized={ template.source === 'custom' }
+				/>
+			);
 		}
 
 		if ( ! NON_PLUGIN_SOURCES.includes( template.source ) ) {
