@@ -23,7 +23,8 @@ export function isLockAvailable( state, store, path, { exclusive } ) {
 		}
 	}
 
-	// IteratePath terminates early if path is unreachable, let's
+	// eslint-disable-next-line @wordpress/comment-case
+	// iteratePath terminates early if path is unreachable, let's
 	// re-fetch the node and check it exists in the tree.
 	const node = getNode( locks, storePath );
 	if ( ! node ) {
