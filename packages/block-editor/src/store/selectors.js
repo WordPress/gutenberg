@@ -1260,8 +1260,7 @@ const canInsertBlockTypeUnmemoized = (
 	}
 	if (
 		! parentAllowedBlocks &&
-		parentDisallowedBlocks &&
-		parentDisallowedBlocks.includes( blockName )
+		parentDisallowedBlocks?.includes( blockName )
 	) {
 		return false;
 	}
