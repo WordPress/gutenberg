@@ -811,7 +811,7 @@ describe.skip( 'Navigation', () => {
 			newMenuButton[ 0 ].click();
 		}
 
-		it.only( 'only update the current entity linked with the block', async () => {
+		it.only( 'only update a single entity currently linked with the block', async () => {
 			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
 			// consistent and to test the feature more rigorously than the single default sample page.
 			await mockPagesResponse( [
@@ -831,6 +831,7 @@ describe.skip( 'Navigation', () => {
 
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
+
 			// Create an empty nav block.
 			await createEmptyNavBlock();
 			await populateNavWithOneItem();
@@ -869,12 +870,6 @@ describe.skip( 'Navigation', () => {
 
 			await page.waitForXPath( NAV_ENTITY_SELECTOR );
 			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
-
-			// Now reset to an empty menu.
-			//
-			// // Confirm there is only one updated Navigation Menu entity.
-			// // Snapshot should contain the mocked pages.
-			// expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 	} );
 } );
