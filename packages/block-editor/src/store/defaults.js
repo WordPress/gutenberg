@@ -34,7 +34,8 @@ export const SETTINGS_DEFAULTS = {
 	alignWide: false,
 	supportsLayout: true,
 
-	// Colors setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// eslint-disable-next-line @wordpress/comment-case
+	// colors setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	colors: [
 		{
@@ -94,7 +95,8 @@ export const SETTINGS_DEFAULTS = {
 			color: '#9b51e0',
 		},
 	],
-	// FontSizes setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// eslint-disable-next-line @wordpress/comment-case
+	// fontSizes setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	fontSizes: [
 		{
@@ -158,8 +160,8 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalSpotlightEntityBlocks: [],
 	__experimentalGenerateAnchors: false,
 	__unstableGalleryWithImageBlocks: false,
-
-	// Gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// eslint-disable-next-line @wordpress/comment-case
+	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	gradients: [
 		{

@@ -199,7 +199,8 @@ describe( 'useBlockSync hook', () => {
 			);
 		} );
 
-		// ReplaceInnerBlocks should not be called when the controlling
+		// eslint-disable-next-line @wordpress/comment-case
+		// replaceInnerBlocks should not be called when the controlling
 		// block value is the same as what already exists in the store.
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 	} );
