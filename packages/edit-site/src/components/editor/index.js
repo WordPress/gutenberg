@@ -26,13 +26,17 @@ import {
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import {
+	ShortcutProvider,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import URLQueryController from '../url-query-controller';
@@ -46,6 +50,7 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
+	drawer: __( 'Navigation Sidebar' ),
 };
 
 function Editor( { initialSettings, onError } ) {
@@ -60,6 +65,8 @@ function Editor( { initialSettings, onError } ) {
 		template,
 		templateResolved,
 		isNavigationOpen,
+		previousShortcut,
+		nextShortcut,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -96,13 +103,19 @@ function Editor( { initialSettings, onError } ) {
 				: false,
 			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/previous-region' ),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
 		};
 	}, [] );
 	const { updateEditorSettings } = useDispatch( editorStore );
 	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
 		editSiteStore
 	);
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
 	useEffect( () => {
 		updateSettings( initialSettings );
 	}, [] );
@@ -160,19 +173,6 @@ function Editor( { initialSettings, onError } ) {
 		}
 	}, [ isNavigationOpen ] );
 
-	useEffect(
-		function openGlobalStylesOnLoad() {
-			const searchParams = new URLSearchParams( window.location.search );
-			if ( searchParams.get( 'styles' ) === 'open' ) {
-				enableComplementaryArea(
-					'core/edit-site',
-					'edit-site/global-styles'
-				);
-			}
-		},
-		[ enableComplementaryArea ]
-	);
-
 	// Don't render the Editor until the settings are set and loaded
 	const isReady =
 		settings?.siteUrl &&
@@ -219,6 +219,7 @@ function Editor( { initialSettings, onError } ) {
 														<ComplementaryArea.Slot scope="core/edit-site" />
 													)
 												}
+												drawer={ <NavigationSidebar /> }
 												header={
 													<Header
 														openEntitiesSavedStates={
@@ -288,6 +289,10 @@ function Editor( { initialSettings, onError } ) {
 													</>
 												}
 												footer={ <BlockBreadcrumb /> }
+												shortcuts={ {
+													previous: previousShortcut,
+													next: nextShortcut,
+												} }
 											/>
 											<WelcomeGuide />
 											<Popover.Slot />

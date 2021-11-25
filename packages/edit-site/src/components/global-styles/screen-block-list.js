@@ -3,6 +3,11 @@
  */
 import { getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import {
+	FlexItem,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -29,7 +34,12 @@ function BlockMenuItem( { block } ) {
 
 	return (
 		<NavigationButton path={ '/blocks/' + block.name }>
-			{ block.title }
+			<HStack justify="flex-start">
+				<FlexItem>
+					<BlockIcon icon={ block.icon } />
+				</FlexItem>
+				<FlexItem>{ block.title }</FlexItem>
+			</HStack>
 		</NavigationButton>
 	);
 }

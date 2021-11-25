@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	Button,
 	Icon,
@@ -12,20 +12,8 @@ import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useReducedMotion } from '@wordpress/compose';
 
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../../store';
-
-function NavigationToggle( { icon, isOpen } ) {
-	const {
-		isRequestingSiteIcon,
-		navigationPanelMenu,
-		siteIconUrl,
-	} = useSelect( ( select ) => {
-		const { getCurrentTemplateNavigationPanelSubMenu } = select(
-			editSiteStore
-		);
+function NavigationToggle( { icon, isOpen, setIsOpen } ) {
+	const { isRequestingSiteIcon, siteIconUrl } = useSelect( ( select ) => {
 		const { getEntityRecord, isResolving } = select( coreDataStore );
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
@@ -36,25 +24,13 @@ function NavigationToggle( { icon, isOpen } ) {
 				'__unstableBase',
 				undefined,
 			] ),
-			navigationPanelMenu: getCurrentTemplateNavigationPanelSubMenu(),
 			siteIconUrl: siteData.site_icon_url,
 		};
 	}, [] );
 
-	const {
-		openNavigationPanelToMenu,
-		setIsNavigationPanelOpened,
-	} = useDispatch( editSiteStore );
-
 	const disableMotion = useReducedMotion();
 
-	const toggleNavigationPanel = () => {
-		if ( isOpen ) {
-			setIsNavigationPanelOpened( false );
-			return;
-		}
-		openNavigationPanelToMenu( navigationPanelMenu );
-	};
+	const toggleNavigationPanel = () => setIsOpen( ( open ) => ! open );
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 

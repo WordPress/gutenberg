@@ -14,6 +14,7 @@ import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
+import ScreenTypographyElement from './screen-typography-element';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
@@ -28,6 +29,14 @@ function ContextScreens( { name } ) {
 		<>
 			<NavigatorScreen path={ parentMenu + '/typography' }>
 				<ScreenTypography name={ name } />
+			</NavigatorScreen>
+
+			<NavigatorScreen path={ parentMenu + '/typography/text' }>
+				<ScreenTypographyElement name={ name } element="text" />
+			</NavigatorScreen>
+
+			<NavigatorScreen path={ parentMenu + '/typography/link' }>
+				<ScreenTypographyElement name={ name } element="link" />
 			</NavigatorScreen>
 
 			<NavigatorScreen path={ parentMenu + '/colors' }>

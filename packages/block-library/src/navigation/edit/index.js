@@ -34,6 +34,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarGroup,
 	ToolbarDropdownMenu,
+	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -48,7 +49,6 @@ import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
-import NavigationMenuPublishButton from './navigation-menu-publish-button';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 
@@ -212,6 +212,29 @@ function Navigation( {
 		},
 	} );
 
+	const overlayClassnames = classnames( {
+		'has-text-color':
+			!! overlayTextColor.color || !! overlayTextColor?.class,
+		[ getColorClassName(
+			'color',
+			overlayTextColor?.slug
+		) ]: !! overlayTextColor?.slug,
+		'has-background':
+			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
+		[ getColorClassName(
+			'background-color',
+			overlayBackgroundColor?.slug
+		) ]: !! overlayBackgroundColor?.slug,
+	} );
+
+	const overlayStyles = {
+		color: ! overlayTextColor?.slug && overlayTextColor?.color,
+		backgroundColor:
+			! overlayBackgroundColor?.slug &&
+			overlayBackgroundColor?.color &&
+			overlayBackgroundColor.color,
+	};
+
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
@@ -258,6 +281,17 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
+	const startWithEmptyMenu = useCallback( () => {
+		replaceInnerBlocks( clientId, [] );
+		if ( navigationArea ) {
+			setAreaMenu( 0 );
+		}
+		setAttributes( {
+			navigationMenuId: undefined,
+		} );
+		setIsPlaceholderShown( true );
+	}, [ clientId ] );
+
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
 	// Either this block was saved in the content or inserted by a pattern.
@@ -290,8 +324,11 @@ function Navigation( {
 			<div { ...blockProps }>
 				<Warning>
 					{ __(
-						'Navigation menu has been deleted or is unavailable'
+						'Navigation menu has been deleted or is unavailable. '
 					) }
+					<Button onClick={ startWithEmptyMenu } variant="link">
+						{ __( 'Create a new menu?' ) }
+					</Button>
 				</Warning>
 			</div>
 		);
@@ -332,26 +369,13 @@ function Navigation( {
 											setNavigationMenuId( id );
 											onClose();
 										} }
-										onCreateNew={ () => {
-											if ( navigationArea ) {
-												setAreaMenu( 0 );
-											}
-											setAttributes( {
-												navigationMenuId: undefined,
-											} );
-											setIsPlaceholderShown( true );
-										} }
+										onCreateNew={ startWithEmptyMenu }
 									/>
 								) }
 							</ToolbarDropdownMenu>
 						</ToolbarGroup>
 					) }
 					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
-					{ isDraftNavigationMenu && (
-						<ToolbarGroup>
-							<NavigationMenuPublishButton />
-						</ToolbarGroup>
-					) }
 				</BlockControls>
 				{ listViewModal }
 				<InspectorControls>
@@ -471,17 +495,20 @@ function Navigation( {
 					</InspectorControls>
 				) }
 				<nav { ...blockProps }>
-					{ ! isEntityAvailable && isPlaceholderShown && (
+					{ isPlaceholderShown && (
 						<PlaceholderComponent
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
-								setNavigationMenuId( post.id );
+								if ( post ) {
+									setNavigationMenuId( post.id );
+								}
 								selectBlock( clientId );
 							} }
 							canSwitchNavigationMenu={ canSwitchNavigationMenu }
 							hasResolvedNavigationMenus={
 								hasResolvedNavigationMenus
 							}
+							clientId={ clientId }
 						/>
 					) }
 					{ ! isEntityAvailable && ! isPlaceholderShown && (
@@ -494,6 +521,8 @@ function Navigation( {
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ 'never' !== overlayMenu }
 							isHiddenByDefault={ 'always' === overlayMenu }
+							classNames={ overlayClassnames }
+							styles={ overlayStyles }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks

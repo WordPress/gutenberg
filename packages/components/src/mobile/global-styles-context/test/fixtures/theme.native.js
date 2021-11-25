@@ -23,7 +23,7 @@ export const GLOBAL_STYLES_PALETTE = [
 ];
 
 export const GLOBAL_STYLES_GRADIENTS = {
-	core: [
+	default: [
 		{
 			name: 'Vivid cyan blue to vivid purple',
 			gradient:
@@ -138,7 +138,7 @@ export const PARSED_GLOBAL_STYLES = {
 export const RAW_FEATURES = {
 	color: {
 		palette: {
-			core: [
+			default: [
 				{
 					name: 'Black',
 					slug: 'black',
@@ -174,7 +174,7 @@ export const RAW_FEATURES = {
 			],
 		},
 		gradients: {
-			core: [
+			default: [
 				{
 					name: 'Vivid cyan blue to vivid purple',
 					gradient:
@@ -204,7 +204,7 @@ export const RAW_FEATURES = {
 	},
 	typography: {
 		fontSizes: {
-			core: [
+			default: [
 				{
 					name: 'Small',
 					slug: 'small',

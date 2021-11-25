@@ -8,6 +8,7 @@ export default function useNavigationMenu( navigationMenuId ) {
 	return useSelect(
 		( select ) => {
 			const {
+				getEntityRecord,
 				getEditedEntityRecord,
 				getEntityRecords,
 				hasFinishedResolution,
@@ -18,9 +19,19 @@ export default function useNavigationMenu( navigationMenuId ) {
 				'wp_navigation',
 				navigationMenuId,
 			];
-			const navigationMenu = navigationMenuId
+			const rawNavigationMenu = navigationMenuId
+				? getEntityRecord( ...navigationMenuSingleArgs )
+				: null;
+			let navigationMenu = navigationMenuId
 				? getEditedEntityRecord( ...navigationMenuSingleArgs )
 				: null;
+
+			// getEditedEntityRecord will return the post regardless of status.
+			// Therefore if the found post is not published then we should ignore it.
+			if ( navigationMenu?.status !== 'publish' ) {
+				navigationMenu = null;
+			}
+
 			const hasResolvedNavigationMenu = navigationMenuId
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
@@ -31,7 +42,7 @@ export default function useNavigationMenu( navigationMenuId ) {
 			const navigationMenuMultipleArgs = [
 				'postType',
 				'wp_navigation',
-				{ per_page: -1 },
+				{ per_page: -1, status: 'publish' },
 			];
 			const navigationMenus = getEntityRecords(
 				...navigationMenuMultipleArgs
@@ -45,7 +56,7 @@ export default function useNavigationMenu( navigationMenuId ) {
 				isNavigationMenuResolved: hasResolvedNavigationMenu,
 				isNavigationMenuMissing:
 					! navigationMenuId ||
-					( hasResolvedNavigationMenu && ! navigationMenu ),
+					( hasResolvedNavigationMenu && ! rawNavigationMenu ),
 				canSwitchNavigationMenu,
 				hasResolvedNavigationMenus: hasFinishedResolution(
 					'getEntityRecords',

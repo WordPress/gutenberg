@@ -5,13 +5,16 @@
 @import "./components/header/style.scss";
 @import "./components/header/document-actions/style.scss";
 @import "./components/header/more-menu/style.scss";
-@import "./components/header/navigation-link/style.scss";
+@import "./components/navigation-sidebar/navigation-toggle/style.scss";
+@import "./components/navigation-sidebar/navigation-panel/style.scss";
+@import "./components/list/style.scss";
+@import "./components/add-new-template/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/settings-header/style.scss";
 @import "./components/sidebar/template-card/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/template-details/style.scss";
-@import "./components/template-part-converter/style.scss";
+@import "./components/create-template-part-modal/style.scss";
 @import "./components/secondary-sidebar/style.scss";
 @import "./components/welcome-guide/style.scss";
 
@@ -38,15 +41,14 @@ body.site-editor-php {
 	@include break-small {
 		bottom: 0;
 		left: 0;
-		min-height: calc(100vh - #{$admin-bar-height-big});
+		min-height: 100vh;
 		position: absolute;
 		right: 0;
 		top: 0;
 	}
 
-	// The WP header height changes at this breakpoint.
-	@include break-medium {
-		min-height: calc(100vh - #{$admin-bar-height});
+	.interface-interface-skeleton {
+		top: 0;
 	}
 
 	// Todo: Remove this rule when edit site gets support

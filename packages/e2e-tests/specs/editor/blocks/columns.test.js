@@ -21,7 +21,7 @@ describe( 'Columns', () => {
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		const columnBlockMenuItem = (
 			await page.$x(
-				'//button[contains(concat(" ", @class, " "), " block-editor-list-view-block-select-button ")][text()="Column"]'
+				'//a[contains(concat(" ", @class, " "), " block-editor-list-view-block-select-button ")][text()="Column"]'
 			)
 		 )[ 0 ];
 		await columnBlockMenuItem.click();

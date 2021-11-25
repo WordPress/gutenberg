@@ -39,7 +39,7 @@ export const updateGallery = ( {
 	}
 	const innerBlocks = images.map( ( image ) =>
 		createBlock( 'core/image', {
-			id: parseInt( image.id, 10 ),
+			id: image.id ? parseInt( image.id, 10 ) : null,
 			url: image.url,
 			alt: image.alt,
 			caption: image.caption,

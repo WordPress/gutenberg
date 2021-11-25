@@ -78,10 +78,10 @@
 
 	// Submenu indicator.
 	.wp-block-navigation__submenu-icon {
-		align-self: center;
-		height: inherit;
+		align-self: center; // This one affects nested submenu indicators.
 		line-height: 0;
-		margin-left: 6px;
+		display: inline-block;
+		vertical-align: middle;
 
 		// Affect the button as well.
 		padding: 0;
@@ -89,9 +89,16 @@
 		color: currentColor;
 		border: none;
 
+		// Scale to font size.
+		margin-left: 0.25em;
+		width: 0.6em;
+		height: 0.6em;
+
 		svg {
 			display: inline-block;
 			stroke: currentColor;
+			width: inherit;
+			height: inherit;
 		}
 	}
 }
@@ -219,6 +226,36 @@
 	}
 }
 
+// General submenu colors.
+// These styles are stored here as opposed to in the separate submenu block,
+// so that they can affect both submenus and page lists with submenu items both.
+.wp-block-navigation-submenu {
+	position: relative;
+	display: flex;
+
+	.wp-block-navigation__submenu-icon svg {
+		stroke: currentColor;
+	}
+}
+
+button.wp-block-navigation-item__content {
+	background-color: transparent;
+	border: none;
+	color: currentColor;
+	font-size: inherit;
+	font-family: inherit;
+	line-height: inherit;
+
+	// Buttons default to center alignment. This becomes visible
+	// when a menu item label is long enough to wrap.
+	text-align: left;
+}
+
+.wp-block-navigation-submenu__toggle {
+	cursor: pointer;
+}
+
+
 /**
  * Margins
  */
@@ -325,6 +362,13 @@
 	}
 }
 
+// Allow menu items to be spaced out by space-between when only navigation links are present.
+.wp-block-navigation__container:only-child,
+.wp-block-page-list:only-child {
+	flex-grow: 1;
+}
+
+
 /**
  * Mobile menu.
  */
@@ -343,6 +387,13 @@
 		flex-direction: var(--layout-direction, initial);
 		justify-content: var(--layout-justify, initial);
 		align-items: var(--layout-align, initial);
+	}
+
+	// If the responsive wrapper is present but overlay is not open,
+	// overlay styles shouldn't apply.
+	&:not(.is-menu-open.is-menu-open) {
+		color: inherit !important;
+		background-color: inherit !important;
 	}
 
 	// Overlay menu.
@@ -432,9 +483,9 @@
 
 		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
-		// @todo: We should revisit this so that the overlay colors can be applied, instead of the background.
 		.wp-block-navigation-item .wp-block-navigation__submenu-container,
-		.wp-block-navigation-item {
+		.wp-block-navigation-item,
+		.wp-block-page-list {
 			color: inherit !important;
 			background: transparent !important;
 		}
