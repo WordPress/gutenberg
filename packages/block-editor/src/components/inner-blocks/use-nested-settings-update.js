@@ -66,11 +66,10 @@ export default function useNestedSettingsUpdate(
 
 	// Memoize as inner blocks implementors often pass a new array on every
 	// render.
-	const _allowedBlocks = useMemo( () => allowedBlocks, allowedBlocks );
-	const _disallowedBlocks = useMemo(
-		() => __unstableDisallowedBlocks,
-		__unstableDisallowedBlocks
-	);
+	const _allowedBlocks = useMemo( () => allowedBlocks, [ allowedBlocks ] );
+	const _disallowedBlocks = useMemo( () => __unstableDisallowedBlocks, [
+		__unstableDisallowedBlocks,
+	] );
 
 	useLayoutEffect( () => {
 		const newSettings = {
