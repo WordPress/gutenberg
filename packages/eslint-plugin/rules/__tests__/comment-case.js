@@ -50,6 +50,9 @@ ruleTester.run( 'comment-case', rule, {
 			code: `// prettier-ignore some rule`,
 		},
 		{
+			code: `// @ts-expect-error The \`direction\` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes \`direction\` (string) that come from React intrinsic prop definitions`,
+		},
+		{
 			code: `// https://github.com/WordPress/gutenberg starts with URL.`,
 		},
 		{
