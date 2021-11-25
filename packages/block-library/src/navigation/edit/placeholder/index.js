@@ -169,7 +169,6 @@ export default function NavigationPlaceholder( {
 			) }
 			{ hasResolvedNavigationMenus && ! isStillLoading && (
 				<Placeholder className="wp-block-navigation-placeholder">
-					<PlaceholderPreview />
 					<div className="wp-block-navigation-placeholder__controls">
 						<div className="wp-block-navigation-placeholder__actions">
 							<div className="wp-block-navigation-placeholder__actions__indicator">
