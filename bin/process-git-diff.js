@@ -8,7 +8,7 @@
 
 // Example usage:
 //
-// git diff -U0 | xargs -0 node bin/process-git-diff.
+// git diff -U0 | xargs -0 node bin/process-git-diff
 
 // Example input:
 //
