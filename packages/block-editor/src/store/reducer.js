@@ -648,7 +648,8 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			state?.controlledInnerBlocks ?? {}
 		);
 
-		// PickBy returns only the truthy values from controlledInnerBlocks.
+		// eslint-disable-next-line @wordpress/comment-case
+		// pickBy returns only the truthy values from controlledInnerBlocks.
 		const controlledInnerBlocks = Object.keys(
 			pickBy( state?.controlledInnerBlocks ?? {} )
 		);
