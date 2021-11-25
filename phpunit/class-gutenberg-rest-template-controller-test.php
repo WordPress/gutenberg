@@ -160,6 +160,37 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		);
 	}
 
+	/**
+	 * Ticket 54507
+	 */
+	public function test_get_item_works_with_a_single_slash() {
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/tt1-blocks/index' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		unset( $data['content'] );
+		unset( $data['_links'] );
+
+		$this->assertEquals(
+			array(
+				'id'             => 'tt1-blocks//index',
+				'theme'          => 'tt1-blocks',
+				'slug'           => 'index',
+				'title'          => array(
+					'raw'      => 'Index',
+					'rendered' => 'Index',
+				),
+				'description'    => 'The default template used when no other template is available. This is a required template in WordPress.',
+				'status'         => 'publish',
+				'source'         => 'theme',
+				'type'           => 'wp_template',
+				'wp_id'          => null,
+				'has_theme_file' => true,
+			),
+			$data
+		);
+	}
+
 	public function test_create_item() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/templates' );
