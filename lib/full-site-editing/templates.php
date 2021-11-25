@@ -13,6 +13,12 @@ function gutenberg_register_template_post_type() {
 		return;
 	}
 
+	// If the post type has already been registered (by WordPress core), skip
+	// registration.
+	if ( post_type_exists( 'wp_template' ) ) {
+		return;
+	}
+
 	$labels = array(
 		'name'                  => __( 'Templates', 'gutenberg' ),
 		'singular_name'         => __( 'Template', 'gutenberg' ),
