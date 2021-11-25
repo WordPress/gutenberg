@@ -53,6 +53,12 @@ ruleTester.run( 'comment-case', rule, {
 			code: `/* istanbul ignore next */`,
 		},
 		{
+			code: `/* $FlowFixMe some other text */`,
+		},
+		{
+			code: `/* $FlowIssue some other text */`,
+		},
+		{
 			code: `// noinspection DuplicatedCode`,
 		},
 		{
