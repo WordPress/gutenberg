@@ -60,7 +60,7 @@ describe( 'Document Settings', () => {
 					'.edit-post-header-toolbar__list-view-toggle'
 				);
 				const headerTemplatePartListViewButton = await page.waitForXPath(
-					'//button[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
+					'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
 				);
 				headerTemplatePartListViewButton.click();
 				await page.click(
