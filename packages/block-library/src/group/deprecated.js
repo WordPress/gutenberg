@@ -187,7 +187,7 @@ const deprecated = [
 			);
 		},
 	},
-	// V1 of group block. Deprecated to add an inner-container div around `InnerBlocks.Content`.
+	// v1 of group block. Deprecated to add an inner-container div around `InnerBlocks.Content`.
 	{
 		attributes: {
 			backgroundColor: {

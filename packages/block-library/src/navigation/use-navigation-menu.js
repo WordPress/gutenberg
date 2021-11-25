@@ -26,7 +26,8 @@ export default function useNavigationMenu( navigationMenuId ) {
 				? getEditedEntityRecord( ...navigationMenuSingleArgs )
 				: null;
 
-			// GetEditedEntityRecord will return the post regardless of status.
+			// eslint-disable-next-line @wordpress/comment-case
+			// getEditedEntityRecord will return the post regardless of status.
 			// Therefore if the found post is not published then we should ignore it.
 			if ( navigationMenu?.status !== 'publish' ) {
 				navigationMenu = null;

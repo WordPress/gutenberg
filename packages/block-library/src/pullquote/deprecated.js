@@ -187,7 +187,8 @@ const deprecated = [
 	{
 		attributes: {
 			...blockAttributes,
-			// FigureStyle is an attribute that never existed.
+			// eslint-disable-next-line @wordpress/comment-case
+			// figureStyle is an attribute that never existed.
 			// We are using it as a way to access the styles previously applied to the figure.
 			figureStyle: {
 				source: 'attribute',
