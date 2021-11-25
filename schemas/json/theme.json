@@ -1130,13 +1130,13 @@
 			]
 		},
 		"customTemplates": {
-			"description": "Additional metadata for custom templates defined in the block-templates folder.\nGutenberg plugin required.",
+			"description": "Additional metadata for custom templates defined in the templates folder.\nGutenberg plugin required.",
 			"type": "array",
 			"items": {
 				"type": "object",
 				"properties": {
 					"name": {
-						"description": "Filename, without extension, of the template in the block-templates folder.\nGutenberg plugin required.",
+						"description": "Filename, without extension, of the template in the templates folder.\nGutenberg plugin required.",
 						"type": "string"
 					},
 					"title": {
@@ -1157,13 +1157,13 @@
 			}
 		},
 		"templateParts": {
-			"description": "Additional metadata for template parts defined in the block-template-parts folder.\nGutenberg plugin required.",
+			"description": "Additional metadata for template parts defined in the parts folder.\nGutenberg plugin required.",
 			"type": "array",
 			"items": {
 				"type": "object",
 				"properties": {
 					"name": {
-						"description": "Filename, without extension, of the template in the block-template-parts folder.\nGutenberg plugin required.",
+						"description": "Filename, without extension, of the template in the parts folder.\nGutenberg plugin required.",
 						"type": "string"
 					},
 					"title": {

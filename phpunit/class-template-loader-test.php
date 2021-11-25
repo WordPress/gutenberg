@@ -64,7 +64,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/page-home.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
-		$this->assertStringEqualsFile( get_stylesheet_directory() . '/block-templates/page-home.html', $_wp_current_template_content );
+		$this->assertStringEqualsFile( get_stylesheet_directory() . '/templates/page-home.html', $_wp_current_template_content );
 	}
 
 	function test_gutenberg_page_block_template_takes_precedence() {
@@ -77,7 +77,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/page.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
-		$this->assertStringEqualsFile( get_stylesheet_directory() . '/block-templates/page.html', $_wp_current_template_content );
+		$this->assertStringEqualsFile( get_stylesheet_directory() . '/templates/page.html', $_wp_current_template_content );
 	}
 
 	function test_gutenberg_block_template_takes_precedence_over_equally_specific_php_template() {
@@ -88,7 +88,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/index.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
-		$this->assertStringEqualsFile( get_stylesheet_directory() . '/block-templates/index.html', $_wp_current_template_content );
+		$this->assertStringEqualsFile( get_stylesheet_directory() . '/templates/index.html', $_wp_current_template_content );
 	}
 
 	/**
@@ -149,7 +149,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path          = gutenberg_override_query_template( $parent_theme_page_template_path, $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
-		$this->assertStringEqualsFile( get_stylesheet_directory() . '/block-templates/page-1.html', $_wp_current_template_content );
+		$this->assertStringEqualsFile( get_stylesheet_directory() . '/templates/page-1.html', $_wp_current_template_content );
 
 		switch_theme( 'test-theme' );
 	}
