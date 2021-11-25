@@ -294,7 +294,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
 	// Limit the number of items to be visually displayed.
-	if ( array_key_exists( '__unstableMaxPages', $attributes ) ) {
+	if ( ! empty( $attributes['__unstableMaxPages'] ) ) {
 		$nested_pages = array_slice( $nested_pages, 0, $attributes['__unstableMaxPages'] );
 	}
 
