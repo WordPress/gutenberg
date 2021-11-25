@@ -7,7 +7,6 @@ import { fireEvent, render, screen } from '@testing-library/react';
  * Internal dependencies
  */
 import { Item, ItemGroup } from '..';
-// Import { CONFIG } from '../../utils';
 
 describe( 'ItemGroup', () => {
 	describe( 'ItemGroup component', () => {
