@@ -108,7 +108,9 @@ class WP_Block_Template {
 	/**
 	 * Author.
 	 *
+	 * A value of 0 means no author.
+	 *
 	 * @var int
 	 */
-	public $post_author = 0;
+	public $author = 0;
 }
