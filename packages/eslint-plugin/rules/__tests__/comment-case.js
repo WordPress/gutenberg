@@ -47,6 +47,9 @@ ruleTester.run( 'comment-case', rule, {
 			code: `// https://github.com/WordPress/gutenberg`,
 		},
 		{
+			code: `// prettier-ignore some rule`,
+		},
+		{
 			code: `// https://github.com/WordPress/gutenberg starts with URL.`,
 		},
 		{
