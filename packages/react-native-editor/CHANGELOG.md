@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.67.0
 -   [*] [Embed block] Included Link in Block Settings [#36099]
 -   [**] Fix tab titles translation of inserter menu [#36534]
 -   [*] [Media&Text block] Fix an issue where the text font size would be bigger than expected in some cases [#36570]
