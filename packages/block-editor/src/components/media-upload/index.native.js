@@ -205,8 +205,9 @@ export class MediaUpload extends Component {
 
 		if ( value === URL_MEDIA_SOURCE ) {
 			prompt(
-				__( 'Type a URL' ), // Title.
-				undefined, // Message.
+				/* eslint-disable @wordpress/comment-case */
+				__( 'Type a URL' ), // title
+				undefined, // message
 				[
 					{
 						text: __( 'Cancel' ),
@@ -217,11 +218,12 @@ export class MediaUpload extends Component {
 						onPress: onSelectURL,
 					},
 				], // Buttons.
-				'plain-text', // Type.
-				undefined, // DefaultValue.
-				'url' // KeyboardType.
+				'plain-text', // type
+				undefined, // defaultValue
+				'url' // keyboardType
 			);
 			return;
+			/* eslint-enable @wordpress/comment-case */
 		}
 
 		const mediaSource = this.getAllSources()
