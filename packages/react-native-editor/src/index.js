@@ -31,7 +31,8 @@ const reactNativeSetup = () => {
 const gutenbergSetup = () => {
 	const wpData = require( '@wordpress/data' );
 
-	// Wp-data.
+	// eslint-disable-next-line @wordpress/comment-case
+	// wp-data
 	const userId = 1;
 	const storageKey = 'WP_DATA_USER_' + userId;
 	wpData.use( wpData.plugins.persistence, { storageKey } );
