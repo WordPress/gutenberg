@@ -129,22 +129,27 @@ function Editor( {
 			keepCaretInsideBlock,
 		};
 
-		// Omit hidden block types if exists and non-empty.
+		// Defer to passed setting for `allowedBlockTypes` if provided as
+		// anything other than `true` (where `true` is equivalent to allow
+		// all block types).
+		const defaultAllowedBlockTypes =
+			true === settings.allowedBlockTypes
+				? map( blockTypes, 'name' )
+				: settings.allowedBlockTypes || [];
 		if ( size( hiddenBlockTypes ) > 0 ) {
-			// Defer to passed setting for `allowedBlockTypes` if provided as
-			// anything other than `true` (where `true` is equivalent to allow
-			// all block types).
-			const defaultAllowedBlockTypes =
-				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
-					: settings.allowedBlockTypes || [];
-
+			// Omit hidden block types if exists and non-empty.
 			result.allowedBlockTypes = without(
 				defaultAllowedBlockTypes,
 				...hiddenBlockTypes
 			);
 		}
-
+		// Hide `Template Part` when we are not in template mode.
+		if ( ! isTemplateMode ) {
+			result.allowedBlockTypes = without(
+				defaultAllowedBlockTypes,
+				'core/template-part'
+			);
+		}
 		return result;
 	}, [
 		settings,
@@ -158,6 +163,7 @@ function Editor( {
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
+		isTemplateMode,
 	] );
 
 	const styles = useMemo( () => {

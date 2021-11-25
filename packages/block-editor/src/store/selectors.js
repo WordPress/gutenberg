@@ -15,6 +15,7 @@ import {
 	filter,
 	mapKeys,
 	orderBy,
+	without,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1246,7 +1247,24 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
+	let parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
+	const parentDisallowedBlocks =
+		parentBlockListSettings?.__experimentalDisallowedBlocks;
+
+	// These two settings are conflicting one of them should be used at a time.
+	if ( parentAllowedBlocks && parentDisallowedBlocks ) {
+		parentAllowedBlocks = without(
+			parentAllowedBlocks,
+			...parentDisallowedBlocks
+		);
+	}
+	if (
+		! parentAllowedBlocks &&
+		parentDisallowedBlocks &&
+		parentDisallowedBlocks.includes( blockName )
+	) {
+		return false;
+	}
 	const hasParentAllowedBlock = checkAllowList(
 		parentAllowedBlocks,
 		blockName
