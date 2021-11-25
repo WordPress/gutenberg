@@ -16,15 +16,18 @@ import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 function toggleRichText( container, toggle ) {
-	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach(
-		( node ) => {
-			if ( toggle ) {
-				node.setAttribute( 'contenteditable', true );
-			} else {
-				node.removeAttribute( 'contenteditable' );
-			}
+	Array.from(
+		container.querySelectorAll(
+			// Exclude the Post Editor from multi-select disable.
+			'.rich-text:not( .editor-post-title__input )'
+		)
+	).forEach( ( node ) => {
+		if ( toggle ) {
+			node.setAttribute( 'contenteditable', true );
+		} else {
+			node.removeAttribute( 'contenteditable' );
 		}
-	);
+	} );
 }
 
 /**
