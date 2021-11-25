@@ -68,9 +68,9 @@ export function __experimentalUseGradient( {
 	const { gradients: gradientsPerOrigin } = useSetting( 'color' );
 	const allGradients = useMemo(
 		() => [
-			...( gradientsPerOrigin.custom || [] ),
-			...( gradientsPerOrigin.theme || [] ),
-			...gradientsPerOrigin.default,
+			...( gradientsPerOrigin?.custom || [] ),
+			...( gradientsPerOrigin?.theme || [] ),
+			...( gradientsPerOrigin?.default || [] ),
 		],
 		[ gradientsPerOrigin ]
 	);

@@ -228,28 +228,28 @@ export function ColorEdit( props ) {
 
 	const solidsEnabled =
 		areCustomSolidsEnabled ||
-		! solidsPerOrigin.theme ||
-		solidsPerOrigin.theme.length > 0;
+		! solidsPerOrigin?.theme ||
+		solidsPerOrigin?.theme?.length > 0;
 
 	const gradientsEnabled =
 		areCustomGradientsEnabled ||
-		! gradientsPerOrigin.theme ||
-		gradientsPerOrigin.theme.length > 0;
+		! gradientsPerOrigin?.theme ||
+		gradientsPerOrigin?.theme?.length > 0;
 
 	const allSolids = useMemo(
 		() => [
-			...( solidsPerOrigin.custom || [] ),
-			...( solidsPerOrigin.theme || [] ),
-			...solidsPerOrigin.default,
+			...( solidsPerOrigin?.custom || [] ),
+			...( solidsPerOrigin?.theme || [] ),
+			...( solidsPerOrigin?.default || [] ),
 		],
 		[ solidsPerOrigin ]
 	);
 
 	const allGradients = useMemo(
 		() => [
-			...( gradientsPerOrigin.custom || [] ),
-			...( gradientsPerOrigin.theme || [] ),
-			...gradientsPerOrigin.default,
+			...( gradientsPerOrigin?.custom || [] ),
+			...( gradientsPerOrigin?.theme || [] ),
+			...( gradientsPerOrigin?.default || [] ),
 		],
 		[ gradientsPerOrigin ]
 	);
@@ -444,9 +444,9 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 		const { palette: solidsPerOrigin } = useSetting( 'color' );
 		const colors = useMemo(
 			() => [
-				...( solidsPerOrigin.custom || [] ),
-				...( solidsPerOrigin.theme || [] ),
-				...solidsPerOrigin.default,
+				...( solidsPerOrigin?.custom || [] ),
+				...( solidsPerOrigin?.theme || [] ),
+				...( solidsPerOrigin?.default || [] ),
 			],
 			[ solidsPerOrigin ]
 		);

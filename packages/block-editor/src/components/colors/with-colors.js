@@ -48,9 +48,9 @@ const withEditorColorPalette = () =>
 			const { palette: colorPerOrigin } = useSetting( 'color' );
 			const allColors = useMemo(
 				() => [
-					...( colorPerOrigin.custom || [] ),
-					...( colorPerOrigin.theme || [] ),
-					...colorPerOrigin.default,
+					...( colorPerOrigin?.custom || [] ),
+					...( colorPerOrigin?.theme || [] ),
+					...( colorPerOrigin?.default || [] ),
 				],
 				[ colorPerOrigin ]
 			);

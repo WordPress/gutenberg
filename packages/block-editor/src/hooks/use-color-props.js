@@ -93,17 +93,17 @@ export function useColorProps( attributes ) {
 	} = useSetting( 'color' );
 	const colors = useMemo(
 		() => [
-			...( solidsPerOrigin.custom || [] ),
-			...( solidsPerOrigin.theme || [] ),
-			...solidsPerOrigin.default,
+			...( solidsPerOrigin?.custom || [] ),
+			...( solidsPerOrigin?.theme || [] ),
+			...( solidsPerOrigin?.default || [] ),
 		],
 		[ solidsPerOrigin ]
 	);
 	const gradients = useMemo(
 		() => [
-			...( gradientsPerOrigin.custom || [] ),
-			...( gradientsPerOrigin.theme || [] ),
-			...gradientsPerOrigin.default,
+			...( gradientsPerOrigin?.custom || [] ),
+			...( gradientsPerOrigin?.theme || [] ),
+			...( gradientsPerOrigin?.default || [] ),
 		],
 		[ gradientsPerOrigin ]
 	);
