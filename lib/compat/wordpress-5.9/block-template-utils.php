@@ -550,6 +550,8 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
 			return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
 		}
 
+		$origin = get_post_meta( $post->ID, 'origin', true );
+
 		$theme          = $terms[0]->name;
 		$has_theme_file = wp_get_theme()->get_stylesheet() === $theme &&
 			null !== _get_block_template_file( $post->post_type, $post->post_name );
@@ -561,6 +563,7 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
 		$template->content        = $post->post_content;
 		$template->slug           = $post->post_name;
 		$template->source         = 'custom';
+		$template->origin         = ! empty( $origin ) ? $origin : null;
 		$template->type           = $post->post_type;
 		$template->description    = $post->post_excerpt;
 		$template->title          = $post->post_title;

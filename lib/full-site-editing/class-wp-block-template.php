@@ -68,6 +68,16 @@ class WP_Block_Template {
 	public $source = 'theme';
 
 	/**
+	 * Origin of the content when the content has been customized.
+	 * When customized, origin takes on the value of source and source becomes
+	 * 'custom'.
+	 *
+	 * @since 5.9.0
+	 * @var string
+	 */
+	public $origin;
+
+	/**
 	 * Post Id.
 	 *
 	 * @var integer|null
