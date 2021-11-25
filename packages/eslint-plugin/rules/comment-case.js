@@ -82,7 +82,7 @@ module.exports = {
 					const translatorOrTodoTypeCommentRegex = /translators:|@\w*\s/;
 
 					// Ignore pragmas/compiler hints/shebangs.
-					const pragmaRegex = /noinspection\s\S+|istanbul|browserslist|prettier-?\w*|__mocks__\/.*\.js|@ts-(ignore|(no)?check|expect-error)|eslint-(disable|enable)(-next-line)?|globals?\s\S+/;
+					const pragmaRegex = /\$Flow|noinspection\s\S+|istanbul|browserslist|prettier-?\w*|__mocks__\/.*\.js|@ts-(ignore|(no)?check|expect-error)|eslint-(disable|enable)(-next-line)?|globals?\s\S+/;
 
 					// Ignore known common words that don't need to be capitalized.
 					// Includes npm, lint, id, v1, v2 etc. (when referring to versions), and the Apple products.
