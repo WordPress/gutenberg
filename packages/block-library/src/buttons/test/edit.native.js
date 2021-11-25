@@ -43,7 +43,8 @@ describe( 'when a button is shown', () => {
 		);
 		fireEvent.press( buttonsBlock );
 
-		// OnLayout event has to be explicitly dispatched in BlockList component,
+		// eslint-disable-next-line @wordpress/comment-case
+		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
 		const innerBlockListWrapper = await waitFor( () =>
 			within( buttonsBlock ).getByTestId( 'block-list-wrapper' )
