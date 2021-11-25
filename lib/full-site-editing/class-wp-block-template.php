@@ -72,7 +72,6 @@ class WP_Block_Template {
 	 * When customized, origin takes on the value of source and source becomes
 	 * 'custom'.
 	 *
-	 * @since 5.9.0
 	 * @var string
 	 */
 	public $origin;
