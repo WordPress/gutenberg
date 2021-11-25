@@ -36,7 +36,7 @@ export {
 } from './card';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
-export { default as __experimentalColorEdit } from './color-edit';
+export { default as __experimentalPaletteEdit } from './palette-edit';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { ColorPicker } from './color-picker';
