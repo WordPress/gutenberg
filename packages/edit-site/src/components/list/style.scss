@@ -183,6 +183,7 @@
 
 .edit-site-list-added-by__icon {
 	display: flex;
+	flex-shrink: 0;
 	position: relative;
 	align-items: center;
 	justify-content: center;
@@ -209,6 +210,7 @@
 }
 
 .edit-site-list-added-by__avatar {
+	flex-shrink: 0;
 	overflow: hidden;
 	border-radius: 100%;
 	background: $gray-800;
