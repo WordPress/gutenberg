@@ -11,12 +11,24 @@ import {
 	Icon,
 	Tooltip,
 } from '@wordpress/components';
+import { useRefEffect } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { layout as themeIcon, plugins as pluginIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
+
+function useOnImageLoads( onLoad ) {
+	return useRefEffect( ( node ) => {
+		node.addEventListener( 'load', onLoad );
+
+		return () => {
+			node.removeEventListener( 'load', onLoad );
+		};
+	}, [] );
+}
 
 function CustomizedTooltip( { isCustomized, children } ) {
 	if ( ! isCustomized ) {
@@ -74,14 +86,18 @@ function AddedByAuthor( { id } ) {
 	const user = useSelect( ( select ) => select( coreStore ).getUser( id ), [
 		id,
 	] );
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	const ref = useOnImageLoads( () => setIsImageLoaded( true ) );
 
 	return (
 		<HStack alignment="left">
-			<img
-				className="edit-site-list-added-by__avatar"
-				alt=""
-				src={ user?.avatar_urls[ 48 ] }
-			/>
+			<div
+				className={ classnames( 'edit-site-list-added-by__avatar', {
+					'is-loaded': isImageLoaded,
+				} ) }
+			>
+				<img ref={ ref } alt="" src={ user?.avatar_urls[ 48 ] } />
+			</div>
 			<span>{ user?.nickname }</span>
 		</HStack>
 	);
@@ -99,14 +115,18 @@ function AddedBySite() {
 				: undefined,
 		};
 	}, [] );
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	const ref = useOnImageLoads( () => setIsImageLoaded( true ) );
 
 	return (
 		<HStack alignment="left">
-			<img
-				className="edit-site-list-added-by__avatar"
-				alt=""
-				src={ logoURL }
-			/>
+			<div
+				className={ classnames( 'edit-site-list-added-by__avatar', {
+					'is-loaded': isImageLoaded,
+				} ) }
+			>
+				<img ref={ ref } alt="" src={ logoURL } />
+			</div>
 			<span>{ name }</span>
 		</HStack>
 	);

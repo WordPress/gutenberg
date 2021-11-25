@@ -209,8 +209,24 @@
 }
 
 .edit-site-list-added-by__avatar {
+	overflow: hidden;
+	border-radius: 100%;
+	background: $gray-800;
 	width: $grid-unit-40;
 	height: $grid-unit-40;
-	border-radius: 100%;
-	object-fit: cover;
+
+	img {
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		object-fit: cover;
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+	}
+
+	&.is-loaded {
+		img {
+			opacity: 1;
+		}
+	}
 }
