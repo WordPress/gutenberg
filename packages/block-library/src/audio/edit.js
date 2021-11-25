@@ -101,16 +101,16 @@ function AudioEdit( {
 			: null;
 	}
 
-	// const { setAttributes, isSelected, noticeUI } = this.props;
+	// Const { setAttributes, isSelected, noticeUI } = this.props;
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls
+			// In this case there was an error and we should continue in the editing state
+			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( { src: undefined, id: undefined } );
 			return;
 		}
-		// sets the block's attribute and updates the edit component from the
-		// selected media, then switches off the editing UI
+		// Sets the block's attribute and updates the edit component from the
+		// selected media, then switches off the editing UI.
 		setAttributes( { src: media.url, id: media.id } );
 	}
 	if ( ! src ) {

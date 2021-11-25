@@ -193,7 +193,7 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 
 		// Wait for the autocomplete suggestion item to appear.
 		await page.waitForXPath( suggestionPath );
-		// Set the suggestion
+		// Set the suggestion.
 		const suggestion = await page.waitForXPath( suggestionPath );
 
 		// Select it (so we're clicking the right one, even if it's further down the list)
@@ -201,7 +201,7 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 	}
 
 	if ( label ) {
-		// Wait for rich text editor input to be focused before we start typing the label
+		// Wait for rich text editor input to be focused before we start typing the label.
 		await page.waitForSelector( ':focus.rich-text' );
 
 		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
@@ -421,7 +421,7 @@ describe.skip( 'Navigation', () => {
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
-		// Wait for URL input to be focused
+		// Wait for URL input to be focused.
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
@@ -436,7 +436,7 @@ describe.skip( 'Navigation', () => {
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
 
-		//click the link placeholder
+		// Click the link placeholder.
 		const placeholder = await page.waitForSelector(
 			'.wp-block-navigation-link__placeholder'
 		);
@@ -480,7 +480,7 @@ describe.skip( 'Navigation', () => {
 
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
-		// Wait for URL input to be focused
+		// Wait for URL input to be focused.
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
@@ -495,7 +495,7 @@ describe.skip( 'Navigation', () => {
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
 
-		// Click the link placeholder
+		// Click the link placeholder.
 		const placeholder = await page.waitForSelector(
 			'.wp-block-navigation-link__placeholder'
 		);
@@ -541,7 +541,7 @@ describe.skip( 'Navigation', () => {
 
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
-		// Wait for URL input to be focused
+		// Wait for URL input to be focused.
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
@@ -561,7 +561,7 @@ describe.skip( 'Navigation', () => {
 			'A really long page name that will not exist'
 		);
 
-		// Wait for URL input to be focused
+		// Wait for URL input to be focused.
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
@@ -594,7 +594,7 @@ describe.skip( 'Navigation', () => {
 
 		await selectDropDownOption( 'Test Menu 2' );
 
-		// 	const blocks = await getAllBlocks();
+		// Const blocks = await getAllBlocks();
 		// await selectBlockByClientId( blocks[ 0 ].clientId );
 
 		await toggleSidebar();
@@ -676,7 +676,7 @@ describe.skip( 'Navigation', () => {
 	} );
 
 	// The following tests are unstable, roughly around when https://github.com/WordPress/wordpress-develop/pull/1412
-	// landed. The block manually tests well, so let's skip to unblock other PRs and immediately follow up. cc @vcanales
+	// landed. The block manually tests well, so let's skip to unblock other PRs and immediately follow up. cc @vcanales.
 	it.skip( 'loads frontend code only if the block is present', async () => {
 		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
 		// consistent and to test the feature more rigorously than the single default sample page.

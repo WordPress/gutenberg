@@ -142,7 +142,7 @@ const EmbedEdit = ( props ) => {
 		setAttributes( { url: newURL } );
 	}, [ preview?.html, attributesUrl ] );
 
-	// Handle incoming preview
+	// Handle incoming preview.
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
 			// Even though we set attributes that get derived from the preview,

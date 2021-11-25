@@ -20,7 +20,7 @@ import {
 } from '../../toggle-group-control';
 import { ToolsPanel, ToolsPanelItem } from '..';
 
-// These options match the theme.json typography schema
+// These options match the theme.json typography schema.
 const fontFamilies = [
 	{
 		fontFamily:

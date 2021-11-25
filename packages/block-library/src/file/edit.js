@@ -93,7 +93,7 @@ function FileEdit( {
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
-		// Upload a file drag-and-dropped into the editor
+		// Upload a file drag-and-dropped into the editor.
 		if ( isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
@@ -115,7 +115,7 @@ function FileEdit( {
 	}, [] );
 
 	useEffect( () => {
-		// Add a unique fileId to each file block
+		// Add a unique fileId to each file block.
 		setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
 	}, [ clientId ] );
 
@@ -295,9 +295,9 @@ function FileEdit( {
 								'wp-block-file__button-richtext-wrapper'
 							}
 						>
-							{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
+							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
-								tagName="div" // must be block-level or else cursor disappears
+								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
 								className={ 'wp-block-file__button' }
 								value={ downloadButtonText }

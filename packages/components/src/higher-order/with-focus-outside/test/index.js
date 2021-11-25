@@ -36,7 +36,7 @@ describe( 'withFocusOutside', () => {
 		}
 	);
 
-	// this is needed because TestUtils does not accept a stateless component.
+	// This is needed because TestUtils does not accept a stateless component.
 	// anything run through a HOC ends up as a stateless component.
 	const getTestComponent = ( WrappedComponent, props ) => {
 		class TestComponent extends Component {

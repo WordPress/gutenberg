@@ -17,7 +17,7 @@ export type NavigatorContext = [
 	( path: NavigatorPath ) => void
 ];
 
-// Returned by the `useNavigator` hook
+// Returned by the `useNavigator` hook.
 export type Navigator = {
 	push: ( path: string, options: NavigatorPathOptions ) => void;
 };

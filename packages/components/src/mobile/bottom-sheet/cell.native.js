@@ -193,7 +193,7 @@ class BottomSheetCell extends Component {
 		};
 
 		const separatorStyle = () => {
-			//eslint-disable-next-line @wordpress/no-unused-vars-before-return
+			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 			const defaultSeparatorStyle = this.props.getStylesFromColorScheme(
 				styles.separator,
 				styles.separatorDark

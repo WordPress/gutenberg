@@ -118,7 +118,7 @@ describe( 'List', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
 
-		// Expect list to be deleted
+		// Expect list to be deleted.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

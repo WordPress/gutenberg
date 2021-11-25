@@ -17,7 +17,7 @@ import {
 // eslint-disable-next-line no-restricted-syntax
 import Editor from '@wordpress/edit-post/src/editor';
 
-// Set up the mocks for getting the HTML output of the editor
+// Set up the mocks for getting the HTML output of the editor.
 let triggerHtmlSerialization;
 let serializedHtml;
 subscribeParentGetHtml.mockImplementation( ( callback ) => {
@@ -52,7 +52,7 @@ export function initializeEditor( props ) {
 	return new Promise( ( resolve ) => {
 		waitFor( () => getByTestId( 'block-list-wrapper' ) ).then(
 			( blockListWrapper ) => {
-				// onLayout event has to be explicitly dispatched in BlockList component,
+				// OnLayout event has to be explicitly dispatched in BlockList component,
 				// otherwise the inner blocks are not rendered.
 				fireEvent( blockListWrapper, 'layout', {
 					nativeEvent: {
@@ -79,7 +79,7 @@ export function waitFor(
 		try {
 			result = cb();
 		} catch ( e ) {
-			//NOOP
+			// NOOP.
 		}
 		if ( ! result && time < timeout ) {
 			setTimeout(
@@ -105,7 +105,7 @@ export function waitFor(
 	);
 }
 
-// Helper for getting the current HTML output of the editor
+// Helper for getting the current HTML output of the editor.
 export function getEditorHtml() {
 	if ( ! triggerHtmlSerialization ) {
 		throw new Error( 'HTML serialization trigger is not defined.' );

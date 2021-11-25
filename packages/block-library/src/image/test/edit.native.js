@@ -39,7 +39,7 @@ afterAll( () => {
 		unregisterBlockType( name );
 	} );
 
-	// Restore mocks
+	// Restore mocks.
 	Image.getSize.mockRestore();
 } );
 

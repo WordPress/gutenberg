@@ -72,7 +72,7 @@ function useKeyboardShortcut(
 				? target.current
 				: // We were passing `document` here previously, so to successfully cast it to Element we must cast it first to `unknown`.
 				  // Not sure if this is a mistake but it was the behavior previous to the addition of types so we're just doing what's
-				  // necessary to maintain the existing behavior
+				  // necessary to maintain the existing behavior.
 				  /** @type {Element} */ (/** @type {unknown} */ ( document ))
 		);
 		castArray( shortcuts ).forEach( ( shortcut ) => {

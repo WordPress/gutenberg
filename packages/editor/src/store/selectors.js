@@ -298,7 +298,7 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  * @return {*} A value whose reference will change only when an edit occurs.
  */
 export const getReferenceByDistinctEdits = createRegistrySelector(
-	( select ) => (/* state */) => {
+	( select ) => (/* State. */) => {
 		deprecated(
 			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
 			{
@@ -371,7 +371,7 @@ const getNestedEditedPostProperty = ( state, attributeName ) => {
  * @return {*} Post attribute value.
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	// Special cases
+	// Special cases.
 	switch ( attributeName ) {
 		case 'content':
 			return getEditedPostContent( state );

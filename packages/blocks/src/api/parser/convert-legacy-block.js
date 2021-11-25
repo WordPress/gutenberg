@@ -41,8 +41,8 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 			providerSlug in deprecated
 				? deprecated[ providerSlug ]
 				: providerSlug;
-		// this is needed as the `responsive` attribute was passed
-		// in a different way before the refactoring to block variations
+		// This is needed as the `responsive` attribute was passed
+		// in a different way before the refactoring to block variations.
 		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
 			newAttributes.responsive = true;
 		}

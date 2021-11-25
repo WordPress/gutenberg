@@ -53,7 +53,7 @@ export const saveNavigationPost = ( post ) => async ( {
 	try {
 		const menuId = post.meta.menuId;
 
-		// Save menu
+		// Save menu.
 		await registry
 			.dispatch( coreDataStore )
 			.saveEditedEntityRecord( 'root', 'menu', menuId );
@@ -66,7 +66,7 @@ export const saveNavigationPost = ( post ) => async ( {
 			throw new Error( error.message );
 		}
 
-		// Save menu items
+		// Save menu items.
 		const updatedBlocks = await dispatch(
 			batchSaveMenuItems( post.blocks[ 0 ], menuId )
 		);
@@ -127,7 +127,7 @@ const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
 	dispatch,
 	registry,
 } ) => {
-	// Make sure all the existing menu items are available before proceeding
+	// Make sure all the existing menu items are available before proceeding.
 	const oldMenuItems = await registry
 		.resolveSelect( coreDataStore )
 		.getMenuItems( { menus: menuId, per_page: -1 } );
@@ -146,7 +146,7 @@ const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
 		batchUpdateMenuItems( navBlockWithRecordIds, menuId )
 	);
 
-	// Delete menu items
+	// Delete menu items.
 	const deletedIds = difference(
 		oldMenuItems.map( ( { id } ) => id ),
 		blocksTreeToList( navBlockAfterUpdates ).map( getRecordIdFromBlock )
@@ -183,7 +183,7 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
 		.dispatch( coreDataStore )
 		.__experimentalBatch( tasks );
 
-	// Return an updated navigation block with all the IDs in
+	// Return an updated navigation block with all the IDs in.
 	const blockToResult = new Map( zip( blocksWithoutRecordId, results ) );
 	return mapBlocksTree( navigationBlock, ( block ) => {
 		if ( ! blockToResult.has( block ) ) {
@@ -220,9 +220,9 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 		);
 	}
 	const updatedMenuItems = allMenuItems
-		// Filter out unsupported blocks
+		// Filter out unsupported blocks.
 		.filter( ( { block } ) => isBlockSupportedInNav( block ) )
-		// Transform the blocks into menu items
+		// Transform the blocks into menu items.
 		.map( ( { block, parentBlock, childIndex } ) =>
 			blockToMenuItem(
 				block,
@@ -234,7 +234,7 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 				menuId
 			)
 		)
-		// Filter out menu items without any edits
+		// Filter out menu items without any edits.
 		.filter( ( menuItem ) => {
 			// Update an existing entity record.
 			registry
@@ -248,7 +248,7 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 				.hasEditsForEntityRecord( 'root', 'menuItem', menuItem.id );
 		} );
 
-	// Map the edited menu items to batch tasks
+	// Map the edited menu items to batch tasks.
 	const tasks = updatedMenuItems.map(
 		( menuItem ) => ( { saveEditedEntityRecord } ) =>
 			saveEditedEntityRecord( 'root', 'menuItem', menuItem.id )

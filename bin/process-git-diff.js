@@ -7,7 +7,7 @@
 
 // Example usage:
 //
-// git diff -U0 | xargs -0 node bin/process-git-diff
+// git diff -U0 | xargs -0 node bin/process-git-diff.
 
 // Example input:
 //
@@ -22,7 +22,7 @@
 // @@ -14648 +14649,2 @@
 // -                       "dev": true
 // +                       "dev": true,
-// +                       "optional": true
+// +                       "optional": true.
 
 const hasNonOptionalDiff = !! ( process.argv[ 2 ] || '' )
 	// Strip individual diffs of optional-only.

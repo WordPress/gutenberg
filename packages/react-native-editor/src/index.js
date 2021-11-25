@@ -31,7 +31,7 @@ const reactNativeSetup = () => {
 const gutenbergSetup = () => {
 	const wpData = require( '@wordpress/data' );
 
-	// wp-data
+	// Wp-data.
 	const userId = 1;
 	const storageKey = 'WP_DATA_USER_' + userId;
 	wpData.use( wpData.plugins.persistence, { storageKey } );
@@ -128,7 +128,7 @@ const setupLocale = ( locale, extraTranslations ) => {
 
 	let gutenbergTranslations = getTranslation( locale );
 	if ( locale && ! gutenbergTranslations ) {
-		// Try stripping out the regional
+		// Try stripping out the regional.
 		locale = locale.replace( /[-_][A-Za-z]+$/, '' );
 		gutenbergTranslations = getTranslation( locale );
 	}
@@ -139,7 +139,7 @@ const setupLocale = ( locale, extraTranslations ) => {
 	);
 	// eslint-disable-next-line no-console
 	console.log( 'locale', locale, translations );
-	// Only change the locale if it's supported by gutenberg
+	// Only change the locale if it's supported by gutenberg.
 	if ( gutenbergTranslations || extraTranslations ) {
 		setLocaleData( translations );
 	}

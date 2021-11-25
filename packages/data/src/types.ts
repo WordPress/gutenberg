@@ -51,7 +51,7 @@ export interface DataEmitter {
 
 //
 // Type Helpers
-//
+// .
 
 type ActionCreatorsOf<
 	Config extends AnyConfig

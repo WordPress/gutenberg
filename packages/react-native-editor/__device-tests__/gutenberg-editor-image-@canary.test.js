@@ -20,11 +20,11 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.selectEmptyImageBlock( imageBlock );
 			await editorPage.chooseMediaLibrary();
 
-			// Workaround because of #952
+			// Workaround because of #952.
 			const titleElement = await editorPage.getTitleElement();
 			await clickMiddleOfElement( editorPage.driver, titleElement );
 			await editorPage.dismissKeyboard();
-			// end workaround
+			// End workaround.
 
 			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
 			await swipeUp( editorPage.driver, imageBlock );

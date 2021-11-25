@@ -331,7 +331,7 @@ const hasPHP =
 		  } )()
 		: false;
 
-// skipping if `php` isn't available to us, such as in local dev without it
+// Skipping if `php` isn't available to us, such as in local dev without it
 // skipping preserves snapshots while commenting out or simply
 // not injecting the tests prompts `jest` to remove "obsolete snapshots"
 const makeTest = hasPHP
@@ -351,7 +351,7 @@ export const phpTester = ( name, filename ) =>
 						{
 							input: doc,
 							encoding: 'utf8',
-							timeout: 30 * 1000, // abort after 30 seconds, that's too long anyway
+							timeout: 30 * 1000, // Abort after 30 seconds, that's too long anyway.
 						}
 					);
 

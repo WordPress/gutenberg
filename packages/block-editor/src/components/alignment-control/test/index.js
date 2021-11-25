@@ -75,7 +75,7 @@ describe( 'AlignmentUI', () => {
 		const customControls = wrapperCustomControls.props().controls;
 		expect( customControls ).toHaveLength( 2 );
 
-		// should correctly call on change when right alignment is pressed (active alignment)
+		// Should correctly call on change when right alignment is pressed (active alignment)
 		const rightControl = customControls.find(
 			( { align } ) => align === 'custom-right'
 		);
@@ -85,7 +85,7 @@ describe( 'AlignmentUI', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( undefined );
 		onChangeSpy.mockClear();
 
-		// should correctly call on change when right alignment is pressed (inactive alignment)
+		// Should correctly call on change when right alignment is pressed (inactive alignment)
 		const leftControl = customControls.find(
 			( { align } ) => align === 'custom-left'
 		);

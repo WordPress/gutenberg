@@ -75,7 +75,7 @@ const MyNavigation = ( {
 			</NavigatorButton>
 		</NavigatorScreen>
 
-		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included */ }
+		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
 	</NavigatorProvider>
 );
 
@@ -162,7 +162,7 @@ describe( 'Navigator', () => {
 
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
-		// Navigate to child screen
+		// Navigate to child screen.
 		fireEvent.click( getToChildScreenButton() );
 
 		expect(
@@ -171,7 +171,7 @@ describe( 'Navigator', () => {
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getToHomeScreenButton() ).toBeInTheDocument();
 
-		// Navigate back to home screen
+		// Navigate back to home screen.
 		fireEvent.click( getToHomeScreenButton() );
 
 		expect(

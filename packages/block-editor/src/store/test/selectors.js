@@ -3074,7 +3074,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return empty object if settings for the blocks don’t exist', () => {
-			// Does not include target Block clientIds
+			// Does not include target Block clientIds.
 			const state = {
 				blockListSettings: {
 					'test-2-dummy-clientId': {

@@ -132,7 +132,7 @@ export function useClipboardHandler() {
 				removeBlocks( selectedBlockClientIds );
 			} else if ( event.type === 'paste' ) {
 				if ( eventDefaultPrevented ) {
-					// This was likely already handled in rich-text/use-paste-handler.js
+					// This was likely already handled in rich-text/use-paste-handler.js.
 					return;
 				}
 				const {

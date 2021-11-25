@@ -16,22 +16,22 @@ describe( 'Gutenberg Editor tests for List block', () => {
 			await listBlockElement.click();
 		}
 
-		// Send the first list item text
+		// Send the first list item text.
 		await editorPage.sendTextToListBlock(
 			listBlockElement,
 			testData.listItem1
 		);
 
-		// send an Enter
+		// Send an Enter.
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
-		// Send the second list item text
+		// Send the second list item text.
 		await editorPage.sendTextToListBlock(
 			listBlockElement,
 			testData.listItem2
 		);
 
-		// switch to html and verify html
+		// Switch to html and verify html.
 		const html = await editorPage.getHtmlContent();
 		expect( html.toLowerCase() ).toBe( testData.listHtml.toLowerCase() );
 	} );
@@ -42,18 +42,18 @@ describe( 'Gutenberg Editor tests for List block', () => {
 			blockNames.list
 		);
 
-		// Click List block to force EditText focus
+		// Click List block to force EditText focus.
 		await listBlockElement.click();
 
-		// Send a click on the order list format button
+		// Send a click on the order list format button.
 		await editorPage.clickOrderedListToolBarButton();
 
-		// switch to html and verify html
+		// Switch to html and verify html.
 		const html = await editorPage.getHtmlContent();
 		expect( html.toLowerCase() ).toBe(
 			testData.listHtmlOrdered.toLowerCase()
 		);
-		// Remove list block to return editor to empty state
+		// Remove list block to return editor to empty state.
 		listBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.list
 		);

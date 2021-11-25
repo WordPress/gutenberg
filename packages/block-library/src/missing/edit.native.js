@@ -173,7 +173,7 @@ export class UnsupportedBlockEdit extends Component {
 						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
 						// A small delay will ensure that the controller has already been removed.
 						this.timeout = setTimeout( () => {
-							// for the Classic block, the content is kept in the `content` attribute
+							// For the Classic block, the content is kept in the `content` attribute.
 							const content =
 								blockName === 'core/freeform'
 									? attributes.content

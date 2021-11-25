@@ -122,7 +122,7 @@ function ListViewBlock( {
 
 	const showBlockActions =
 		withExperimentalFeatures &&
-		//hide actions for blocks like core/widget-areas
+		// hide actions for blocks like core/widget-areas
 		( ! hideContainerBlockActions ||
 			( hideContainerBlockActions && level > 1 ) );
 

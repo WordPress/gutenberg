@@ -1,2 +1,2 @@
-// This comment should be ignored
+// This comment should be ignored.
 export default function () {}

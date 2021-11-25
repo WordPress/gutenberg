@@ -48,10 +48,10 @@ export function PanelBody(
 		onToggle( next );
 	};
 
-	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value
+	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
 	const scrollAfterOpenRef = useRef();
 	scrollAfterOpenRef.current = scrollAfterOpen;
-	// Runs after initial render
+	// Runs after initial render.
 	useUpdateEffect( () => {
 		if (
 			isOpened &&

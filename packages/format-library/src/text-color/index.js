@@ -95,7 +95,7 @@ function TextColorEdit( {
 					/>
 				}
 				title={ title }
-				// If has no colors to choose but a color is active remove the color onClick
+				// If has no colors to choose but a color is active remove the color onClick.
 				onClick={
 					hasColorsToChoose
 						? enableIsAddingColor
@@ -137,7 +137,7 @@ export const textColor = {
 	 */
 	__unstableFilterAttributeValue( key, value ) {
 		if ( key !== 'style' ) return value;
-		// We should not add a background-color if it's already set
+		// We should not add a background-color if it's already set.
 		if ( value && value.includes( 'background-color' ) ) return value;
 		const addedCSS = [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' );
 		// Prepend `addedCSS` to avoid a double `;;` as any the existing CSS

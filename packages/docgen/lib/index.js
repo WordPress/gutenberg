@@ -93,7 +93,7 @@ const runCustomFormatter = (
 const currentFileStack = [];
 
 module.exports = ( sourceFile, options ) => {
-	// Input: process CLI args, prepare files, etc
+	// Input: process CLI args, prepare files, etc.
 	const processDir = process.cwd();
 	if ( sourceFile === undefined ) {
 		process.stderr.write( '\n' );
@@ -116,7 +116,7 @@ module.exports = ( sourceFile, options ) => {
 		? path.join( processDir, options.output )
 		: inputBase + '-api.md';
 
-	// Process
+	// Process.
 	const result = processFile( processDir, sourceFile );
 	const filteredIR = result.ir.filter( ( symbol ) => {
 		if ( isSymbolPrivate( symbol ) ) {
@@ -130,7 +130,7 @@ module.exports = ( sourceFile, options ) => {
 		return true;
 	} );
 
-	// Ouput
+	// Ouput.
 	if ( result === undefined ) {
 		process.stdout.write(
 			'\nFile was processed, but contained no ES6 module exports:'

@@ -44,7 +44,7 @@ const defaultRenderToggle = ( {
 
 	const { onClick, ...rest } = toggleProps;
 
-	// Handle both onClick functions from the toggle and the parent component
+	// Handle both onClick functions from the toggle and the parent component.
 	function handleClick( event ) {
 		if ( onToggle ) {
 			onToggle( event );
@@ -81,7 +81,7 @@ class Inserter extends Component {
 	onToggle( isOpen ) {
 		const { onToggle } = this.props;
 
-		// Surface toggle callback to parent component
+		// Surface toggle callback to parent component.
 		if ( onToggle ) {
 			onToggle( isOpen );
 		}
@@ -278,7 +278,7 @@ export default compose( [
 						return getBlockIndex( end, rootClientId ) + 1;
 					}
 
-					// Otherwise, we insert at the end of the current rootClientId
+					// Otherwise, we insert at the end of the current rootClientId.
 					return getBlockOrder( rootClientId ).length;
 				}
 

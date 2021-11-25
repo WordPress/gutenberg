@@ -147,7 +147,7 @@ describe( 'DocumentOutline', () => {
 			const blocks = [ headingH2, nestedHeading ];
 			const wrapper = mount( <DocumentOutline blocks={ blocks } /> );
 
-			// Unnested heading and nested heading should appear as items
+			// Unnested heading and nested heading should appear as items.
 			const tableOfContentItems = wrapper.find(
 				tableOfContentItemsSelector
 			);

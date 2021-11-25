@@ -21,7 +21,7 @@ describe( 'Duplicating blocks', () => {
 
 		// Select the test we just typed
 		// This doesn't do anything but we previously had a duplicationi bug
-		// When the selection was not collapsed
+		// When the selection was not collapsed.
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		await clickBlockToolbarButton( 'Options' );
@@ -36,10 +36,10 @@ describe( 'Duplicating blocks', () => {
 
 		// Select the test we just typed
 		// This doesn't do anything but we previously had a duplicationi bug
-		// When the selection was not collapsed
+		// When the selection was not collapsed.
 		await pressKeyWithModifier( 'primary', 'a' );
 
-		// Duplicate using the keyboard shortccut
+		// Duplicate using the keyboard shortccut.
 		await pressKeyWithModifier( 'primaryShift', 'd' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

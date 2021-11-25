@@ -13,7 +13,7 @@ import {
 const openPageAttributesPanel = async () => {
 	const openButton = await findSidebarPanelWithTitle( 'Page Attributes' );
 
-	// Get the classes from the panel
+	// Get the classes from the panel.
 	const buttonClassName = await (
 		await openButton.getProperty( 'className' )
 	 ).jsonValue();

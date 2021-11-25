@@ -53,7 +53,7 @@ function BlockHTML( { clientId } ) {
 			isValid,
 		} );
 
-		// Ensure the state is updated if we reset so it displays the default content
+		// Ensure the state is updated if we reset so it displays the default content.
 		if ( ! html ) {
 			setHtml( { content } );
 		}

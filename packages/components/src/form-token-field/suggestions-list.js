@@ -19,8 +19,8 @@ class SuggestionsList extends Component {
 	}
 
 	componentDidUpdate() {
-		// only have to worry about scrolling selected suggestion into view
-		// when already expanded
+		// Only have to worry about scrolling selected suggestion into view
+		// when already expanded.
 		if (
 			this.props.selectedIndex > -1 &&
 			this.props.scrollIntoView &&
@@ -60,7 +60,7 @@ class SuggestionsList extends Component {
 	}
 
 	handleMouseDown( e ) {
-		// By preventing default here, we will not lose focus of <input> when clicking a suggestion
+		// By preventing default here, we will not lose focus of <input> when clicking a suggestion.
 		e.preventDefault();
 	}
 

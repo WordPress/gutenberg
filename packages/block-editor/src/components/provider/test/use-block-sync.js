@@ -199,7 +199,7 @@ describe( 'useBlockSync hook', () => {
 			);
 		} );
 
-		// replaceInnerBlocks should not be called when the controlling
+		// ReplaceInnerBlocks should not be called when the controlling
 		// block value is the same as what already exists in the store.
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 	} );

@@ -96,7 +96,7 @@ function InserterSearchResults( {
 			: results;
 	}, [ filterValue, patterns, maxBlockPatterns ] );
 
-	// Announce search results on change
+	// Announce search results on change.
 	useEffect( () => {
 		if ( ! filterValue ) {
 			return;

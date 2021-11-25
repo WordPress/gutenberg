@@ -33,8 +33,8 @@ function Slot(
 		// of fillProps.
 	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
 
-	// fillProps may be an update that interacts with the layout, so we
-	// useLayoutEffect
+	// FillProps may be an update that interacts with the layout, so we
+	// useLayoutEffect.
 	useLayoutEffect( () => {
 		registry.updateSlot( name, fillProps );
 	} );

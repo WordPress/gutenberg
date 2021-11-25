@@ -13,7 +13,7 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	for ( let i = 0; i < options.length; i++ ) {
 		const option = options[ i ];
 
-		// Merge label into keywords
+		// Merge label into keywords.
 		let { keywords = [] } = option;
 		if ( 'string' === typeof option.label ) {
 			keywords = [ ...keywords, option.label ];
@@ -28,7 +28,7 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 
 		filtered.push( option );
 
-		// Abort early if max reached
+		// Abort early if max reached.
 		if ( filtered.length === maxResults ) {
 			break;
 		}
@@ -83,7 +83,7 @@ export default function getDefaultUseItems( autocompleter ) {
 							} )
 						);
 
-						// create a regular expression to filter the options
+						// Create a regular expression to filter the options.
 						const search = new RegExp(
 							'(?:\\b|\\s|^)' + escapeRegExp( filterValue ),
 							'i'

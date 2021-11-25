@@ -43,7 +43,7 @@ import { symbol } from '@wordpress/icons';
  *                                 text value. See `wp.richText.create`.
  */
 
-// Module constants
+// Module constants.
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
@@ -1329,7 +1329,7 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 		return ! parentIsLocked;
 	}
 
-	// when remove is true, it means we cannot remove it.
+	// When remove is true, it means we cannot remove it.
 	return ! lock?.remove;
 }
 
@@ -1370,7 +1370,7 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 		return ! parentIsLocked;
 	}
 
-	// when move is true, it means we cannot move it.
+	// When move is true, it means we cannot move it.
 	return ! lock?.move;
 }
 
@@ -1524,7 +1524,7 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 		keywords: blockType.keywords,
 		variations: inserterVariations,
 		example: blockType.example,
-		utility: 1, // deprecated
+		utility: 1, // Deprecated.
 	};
 };
 
@@ -1624,7 +1624,7 @@ export const getInserterItems = createSelector(
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
-				utility: 1, // deprecated
+				utility: 1, // Deprecated.
 				frecency,
 			};
 		};
@@ -1651,7 +1651,7 @@ export const getInserterItems = createSelector(
 		);
 
 		const blockVariations = [];
-		// Show all available blocks with variations
+		// Show all available blocks with variations.
 		for ( const item of blockTypeInserterItems ) {
 			const { variations = [] } = item;
 			if ( variations.length ) {

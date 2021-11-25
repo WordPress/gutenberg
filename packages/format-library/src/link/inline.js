@@ -129,11 +129,11 @@ function InlineLinkUI( {
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			// Scenario: we have any active text selection or an active format
+			// Scenario: we have any active text selection or an active format.
 			let newValue;
 
 			if ( newText === richTextText ) {
-				// If we're not updating the text then ignore
+				// If we're not updating the text then ignore.
 				newValue = applyFormat( value, linkFormat );
 			} else {
 				// Create new RichText value for the new text in order that we

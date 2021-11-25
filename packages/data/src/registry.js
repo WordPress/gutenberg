@@ -150,7 +150,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	//
 	// Deprecated
 	// TODO: Remove this after `use()` is removed.
-	//
+	// .
 	function withPlugins( attributes ) {
 		return mapValues( attributes, ( attribute, key ) => {
 			if ( typeof attribute !== 'function' ) {
@@ -165,7 +165,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a store instance.
 	 *
-	 * @param {string} name Store registry name.
+	 * @param {string} name  Store registry name.
 	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
 	 */
 	function registerStoreInstance( name, store ) {
@@ -289,7 +289,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	//
 	// TODO:
 	// This function will be deprecated as soon as it is no longer internally referenced.
-	//
+	// .
 	function use( plugin, options ) {
 		registry = {
 			...registry,

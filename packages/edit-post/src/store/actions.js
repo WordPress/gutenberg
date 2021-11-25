@@ -290,7 +290,7 @@ export function* requestMetaBoxUpdates() {
 		type: 'REQUEST_META_BOX_UPDATES',
 	};
 
-	// Saves the wp_editor fields
+	// Saves the wp_editor fields.
 	if ( window.tinyMCE ) {
 		window.tinyMCE.triggerSave();
 	}
@@ -305,7 +305,7 @@ export function* requestMetaBoxUpdates() {
 		post.author ? [ 'post_author', post.author ] : false,
 	].filter( Boolean );
 
-	// We gather all the metaboxes locations data and the base form data
+	// We gather all the metaboxes locations data and the base form data.
 	const baseFormData = new window.FormData(
 		document.querySelector( '.metabox-base-form' )
 	);
@@ -337,7 +337,7 @@ export function* requestMetaBoxUpdates() {
 	);
 
 	try {
-		// Save the metaboxes
+		// Save the metaboxes.
 		yield apiFetch( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',

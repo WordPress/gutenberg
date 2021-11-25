@@ -34,7 +34,7 @@ describe( 'validation', () => {
 		title: 'block title',
 	};
 	beforeAll( () => {
-		// Initialize the block store
+		// Initialize the block store.
 		require( '../../store' );
 	} );
 

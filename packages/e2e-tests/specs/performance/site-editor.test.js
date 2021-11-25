@@ -88,7 +88,7 @@ describe( 'Site Editor Performance', () => {
 
 		let i = 3;
 
-		// Measuring loading time
+		// Measuring loading time.
 		while ( i-- ) {
 			await page.reload();
 			await page.waitForSelector( '.edit-site-visual-editor', {

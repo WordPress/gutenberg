@@ -11,7 +11,7 @@ import FormatToolbar from './format-toolbar';
 
 const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 	if ( inline ) {
-		// Render in popover
+		// Render in popover.
 		return (
 			<Popover
 				noArrow
@@ -29,7 +29,7 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 			</Popover>
 		);
 	}
-	// Render regular toolbar
+	// Render regular toolbar.
 	return (
 		<BlockControls group="inline">
 			<FormatToolbar />

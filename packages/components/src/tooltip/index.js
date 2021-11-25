@@ -110,7 +110,7 @@ function Tooltip( {
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
 
 	const createMouseDown = ( event ) => {
-		// Preserve original child callback behavior
+		// Preserve original child callback behavior.
 		emitToChild( children, 'onMouseDown', event );
 
 		// On mouse down, the next `mouseup` should revert the value of the
@@ -142,7 +142,7 @@ function Tooltip( {
 
 	const createToggleIsOver = ( eventName, isDelayed ) => {
 		return ( event ) => {
-			// Preserve original child callback behavior
+			// Preserve original child callback behavior.
 			emitToChild( children, eventName, event );
 
 			// Mouse events behave unreliably in React for disabled elements,
@@ -163,7 +163,7 @@ function Tooltip( {
 			}
 
 			// Needed in case unsetting is over while delayed set pending, i.e.
-			// quickly blur/mouseleave before delayedSetIsOver is called
+			// quickly blur/mouseleave before delayedSetIsOver is called.
 			delayedSetIsOver.cancel();
 
 			const _isOver = includes( [ 'focus', 'mouseenter' ], event.type );

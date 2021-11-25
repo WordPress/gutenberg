@@ -15,7 +15,7 @@ describe( 'ImageSizeControl', () => {
 	const getWidthInput = () => screen.getByLabelText( 'Width' );
 
 	afterEach( () => {
-		// cleanup on exiting
+		// Cleanup on exiting.
 		jest.clearAllMocks();
 	} );
 
@@ -142,7 +142,7 @@ describe( 'ImageSizeControl', () => {
 			fireEvent.change( heightInput, { target: { value: '' } } );
 
 			await waitFor( () => {
-				// onChange is called and sets the dimension to undefined rather than
+				// OnChange is called and sets the dimension to undefined rather than
 				// the empty string.
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnChange ).toHaveBeenCalledWith( {
@@ -172,7 +172,7 @@ describe( 'ImageSizeControl', () => {
 			fireEvent.change( widthInput, { target: { value: '' } } );
 
 			await waitFor( () => {
-				// onChange is called and sets the dimension to undefined rather than
+				// OnChange is called and sets the dimension to undefined rather than
 				// the empty string.
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnChange ).toHaveBeenCalledWith( {
@@ -299,7 +299,7 @@ describe( 'ImageSizeControl', () => {
 			} );
 
 			await waitFor( () => {
-				// onChangeImage is called with the slug and the event.
+				// OnChangeImage is called with the slug and the event.
 				expect( mockOnChangeImage ).toHaveBeenCalledWith(
 					'thumbnail',
 					expect.any( Object )

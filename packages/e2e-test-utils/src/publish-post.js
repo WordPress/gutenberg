@@ -12,9 +12,9 @@ import { openPublishPanel } from './open-publish-panel';
 export async function publishPost() {
 	await openPublishPanel();
 
-	// Publish the post
+	// Publish the post.
 	await page.click( '.editor-post-publish-button' );
 
-	// A success notice should show up
+	// A success notice should show up.
 	return page.waitForSelector( '.components-snackbar' );
 }

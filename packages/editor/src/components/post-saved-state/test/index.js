@@ -23,13 +23,13 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 } );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
 
 jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );

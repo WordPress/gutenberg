@@ -111,7 +111,7 @@ function checkXdebugPhpCompatibility( config ) {
 	const phpCompatibility = true;
 
 	// If PHP version is defined
-	// ensure it meets the Xdebug minimum compatibility requirment
+	// ensure it meets the Xdebug minimum compatibility requirment.
 	if ( config.env.development.phpVersion ) {
 		const versionTokens = config.env.development.phpVersion.split( '.' );
 		const majorVer = parseInt( versionTokens[ 0 ] );
@@ -124,7 +124,7 @@ function checkXdebugPhpCompatibility( config ) {
 		}
 
 		// Xdebug 3 supports 7.2 and higher
-		// Ensure user has specified a compatible PHP version
+		// Ensure user has specified a compatible PHP version.
 		if ( majorVer < 7 || ( majorVer === 7 && minorVer < 2 ) ) {
 			throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
 		}
@@ -142,7 +142,7 @@ function checkXdebugPhpCompatibility( config ) {
  * @return {string} The dockerfile contents.
  */
 function dockerFileContents( image, config ) {
-	// Don't install XDebug unless it is explicitly required
+	// Don't install XDebug unless it is explicitly required.
 	let shouldInstallXdebug = false;
 
 	if ( config.xdebug !== 'off' ) {

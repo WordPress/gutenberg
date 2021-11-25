@@ -21,7 +21,7 @@ const config = require( '../config' );
  * @return {Promise<string>} Repository local path.
  */
 async function runGitRepositoryCloneStep( abortMessage ) {
-	// Cloning the repository
+	// Cloning the repository.
 	let gitWorkingDirectoryPath;
 	await runStep( 'Cloning the Git repository', abortMessage, async () => {
 		log( '>> Cloning the Git repository' );

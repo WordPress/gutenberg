@@ -24,7 +24,7 @@ import {
  */
 import withNotices from '..';
 
-// Implementation detail of Notice component used to query the dismissal button
+// Implementation detail of Notice component used to query the dismissal button.
 const stockDismissText = 'Dismiss this notice';
 
 function noticesFrom( list ) {
@@ -151,13 +151,13 @@ describe( 'withNotices rendering', () => {
 		const [ buttonRemoveFirst ] = getAllByLabelText( stockDismissText );
 		const getRemovalTarget = () =>
 			within( container ).getByText(
-				// the last item corresponds to the first notice in the DOM
+				// The last item corresponds to the first notice in the DOM.
 				messages[ messages.length - 1 ]
 			);
 		expect(
 			await waitForElementToBeRemoved( () => {
 				const target = getRemovalTarget();
-				// Removes the first notice in the DOM
+				// Removes the first notice in the DOM.
 				fireEvent.click( buttonRemoveFirst );
 				return target;
 			} ).then( () => true )

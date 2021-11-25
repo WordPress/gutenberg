@@ -62,7 +62,7 @@ function createMore( customText, noTeaser, doc ) {
 		node.dataset.customText = customText;
 	}
 	if ( noTeaser ) {
-		// "Boolean" data attribute
+		// "Boolean" data attribute.
 		node.dataset.noTeaser = '';
 	}
 	return node;

@@ -106,7 +106,7 @@ function BlockPatternsTabs( {
 		[ allCategories ]
 	);
 
-	// Remove any empty categories
+	// Remove any empty categories.
 	const populatedCategories = useMemo( () => {
 		const categories = allCategories
 			.filter( ( category ) =>
