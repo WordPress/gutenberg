@@ -82,7 +82,7 @@ module.exports = {
 					const translatorOrTodoTypeCommentRegex = /translators:|@\w*\s/;
 
 					// Ignore pragmas/compiler hints/shebangs.
-					const pragmaRegex = /__mocks__\/.*\.js|@ts-(ignore|(no)?check)|eslint-(disable|enable)(-next-line)?|global\s\S/;
+					const pragmaRegex = /prettier-?\w*|__mocks__\/.*\.js|@ts-(ignore|(no)?check)|eslint-(disable|enable)(-next-line)?|global\s\S/;
 
 					// Ignore known common words that don't need to be capitalized.
 					const commonWordRegex = /iOS|npm-?\w*|lint-?\w*|id/;
