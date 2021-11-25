@@ -594,9 +594,6 @@ describe.skip( 'Navigation', () => {
 
 		await selectDropDownOption( 'Test Menu 2' );
 
-		// Const blocks = await getAllBlocks();
-		// await selectBlockByClientId( blocks[ 0 ].clientId );
-
 		await toggleSidebar();
 
 		const [ openOnClickButton ] = await page.$x(
