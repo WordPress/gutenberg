@@ -13,11 +13,7 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import {
-	layout as themeIcon,
-	plugins as pluginIcon,
-	commentAuthorAvatar as customizedByUserIcon,
-} from '@wordpress/icons';
+import { layout as themeIcon, plugins as pluginIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
@@ -126,19 +122,19 @@ export default function AddedBy( { templateType, template } ) {
 		}
 
 		// Template was created from scratch, but has no author. Author support
-		// was only added to templates in WordPress 5.9.
+		// was only added to templates in WordPress 5.9. Fallback to showing this
+		// as a customized theme template.
 		if (
 			! template.has_theme_file &&
 			template.source === 'custom' &&
-			! template.author
+			! template.author &&
+			template.theme
 		) {
 			return (
-				<HStack alignment="left">
-					<div className="edit-site-list-added-by__icon">
-						<Icon icon={ customizedByUserIcon } />
-					</div>
-					<span>Customized by user</span>
-				</HStack>
+				<AddedByTheme
+					slug={ template.theme }
+					isCustomized={ template.source === 'custom' }
+				/>
 			);
 		}
 	}
