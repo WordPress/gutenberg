@@ -312,6 +312,7 @@ function Navigation( {
 					setHasSavedUnsavedInnerBlocks( true );
 					// Switch to using the wp_navigation entity.
 					setNavigationMenuId( post.id );
+					setAttributes( { slug: post.slug } );
 				} }
 			/>
 		);
@@ -365,8 +366,9 @@ function Navigation( {
 							>
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
-										onSelect={ ( { id } ) => {
+										onSelect={ ( { id, slug } ) => {
 											setNavigationMenuId( id );
+											setAttributes( { slug } );
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
@@ -501,6 +503,7 @@ function Navigation( {
 								setIsPlaceholderShown( false );
 								if ( post ) {
 									setNavigationMenuId( post.id );
+									setAttributes( { slug: post.slug } );
 								}
 								selectBlock( clientId );
 							} }
