@@ -19,12 +19,12 @@ theme
 |__ style.css
 |__ theme.json
 |__ functions.php
-|__ block-templates
+|__ templates
     |__ index.html
     |__ single.html
     |__ archive.html
     |__ ...
-|__ block-template-parts
+|__ parts
     |__ header.html
     |__ footer.html
     |__ sidebar.html
@@ -78,7 +78,7 @@ Please note that the "Templates" admin menu under "Appearance" will _not_ list t
 
 ### Edit Templates within the Full-site Editor
 
-To begin, create a blank template file within your theme. For example: `mytheme/block-templates/index.html`. Afterwards, open the Full-site editor. Your new template should appear as the active template, and should be blank. Add blocks as you normally would using Gutenberg. You can add and create template parts directly using the "Template Parts" block.
+To begin, create a blank template file within your theme. For example: `mytheme/templates/index.html`. Afterwards, open the Full-site editor. Your new template should appear as the active template, and should be blank. Add blocks as you normally would using Gutenberg. You can add and create template parts directly using the "Template Parts" block.
 
 Repeat for any additional templates you'd like to bundle with your theme.
 

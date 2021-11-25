@@ -26,10 +26,10 @@ To use a block theme, you first need to activate the Gutenberg plugin.
 
 There are two files that are required to activate any theme: `index.php` and `style.css`.
 For the plugin to recognize that a block theme is active, the theme must also include an `index.html` template
-inside a folder called `block-templates`.
+inside a folder called `templates`.
 
 The theme may optionally include a `functions.php` file and a [theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles.
-Template parts are optional. If they are included they must be placed inside a `block-template-parts` folder.
+Template parts are optional. If they are included they must be placed inside a `parts` folder.
 
 File structure:
 ```
@@ -38,10 +38,10 @@ theme
 |__ functions.php
 |__ index.php
 |__ theme.json
-|__ block-templates
+|__ templates
 	|__ index.html
 	|__ ...
-|__ block-template-parts
+|__ parts
 	|__ header.html
 	|__ footer.html
 	|__ ...
@@ -52,7 +52,7 @@ theme
 Create a new folder for your theme in `/wp-content/themes/`.
 In this example, the folder name is `fse-tutorial`.
 
-Inside the theme folder, create the `block-templates` and `block-template-parts` folders.
+Inside the theme folder, create the `templates` and `parts` folders.
 
 Create a `style.css` file. The file header in the `style.css` file has [the same items you would use in a classic theme](https://developer.wordpress.org/themes/basics/main-stylesheet-style-css/#explanations).
 
@@ -79,7 +79,7 @@ Use it to make something cool, have fun, and share what you've learned with othe
 
 Create a blank `index.php` file. This file is used as a fallback if the theme is activated without Gutenberg.
 
-Inside the `block-templates` folder, create a blank `index.html` file.
+Inside the `templates` folder, create a blank `index.html` file.
 
 Optionally, create a `functions.php` file.
 In this file, you can enqueue `style.css`, include additional files, enable an editor stylesheet and add theme support.
@@ -132,9 +132,9 @@ theme
  |__ style.css
  |__ functions.php (optional)
  |__ index.php
- |__ block-templates
+ |__ templates
  	|__ index.html
- |__ block-template-parts
+ |__ parts
  	|__ (empty folder)
 ```
 
@@ -151,7 +151,7 @@ The fourth way is temporary and involves going to the Appearance menu > Template
 
 ### Manual template creation
 
-Create two template part files called `header.html` and `footer.html` and place them inside the `block-template-parts` folder.
+Create two template part files called `header.html` and `footer.html` and place them inside the `parts` folder.
 
 When you add blocks manually to your HTML files, start with an HTML comment that includes the block name prefixed with `wp:`.
 There are both self-closing and multi-line blocks as shown in the example below.
@@ -240,8 +240,8 @@ are saved to the database as custom post types. To export them as theme files, f
 
 - In the site editor, open the **More tools and options** menu.
 - Select the **Export** option to download a zip file containing the files. Unpack the files.
-- Copy the updated `index.html` file from `theme/block-templates/` to your theme's `block-templates` folder.
-- Copy template part one and two from `theme/block-template-parts/` to your theme's `block-template-parts` folder.
+- Copy the updated `index.html` file from `theme/templates/` to your theme's `templates` folder.
+- Copy template part one and two from `theme/parts/` to your theme's `parts` folder.
 - Rename the template parts to `header.html` and `footer.html`, respectively.
 - Open `index.html` and update the template part slugs in the block markup.
 
@@ -319,7 +319,7 @@ The query pagination block can only be used inside the query loop. Place it insi
 #### Posts and pages
 
 Next, create a new template for displaying single posts.
-If you are editing theme files directly, create a file called `single.html` inside the block-templates folder.
+If you are editing theme files directly, create a file called `single.html` inside the templates folder.
 
 Add the site header and site footer template parts:
 
@@ -353,7 +353,7 @@ Add your preferred blocks inside the group block. Some new blocks that are avail
 Save the HTML file, or save and export the post template if you are working in the site editor.
 
 Copy all the blocks and create a template for displaying pages.
-Optionally, save a copy of `single.html` as `page.html` inside the block-templates folder.
+Optionally, save a copy of `single.html` as `page.html` inside the templates folder.
 Adjust the blocks for the page template, and save.
 
 #### Archives
@@ -805,7 +805,7 @@ There are three template areas to choose from: Header, footer, and general.
 ## Custom templates
 
 Custom templates for posts, pages, and custom post types are created by adding additional HTML files inside the
-`block-templates` folder.
+`templates` folder.
 In a classic theme, templates are identified with a file header. In a block theme, you list templates in the `theme.json` file.
 
 All templates that are listed in the `customTemplates` section of `theme.json` are selectable in the site editor.
