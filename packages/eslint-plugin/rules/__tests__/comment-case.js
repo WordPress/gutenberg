@@ -50,6 +50,9 @@ ruleTester.run( 'comment-case', rule, {
 			code: `// prettier-ignore some rule`,
 		},
 		{
+			code: `/* istanbul ignore next */`,
+		},
+		{
 			code: `// noinspection DuplicatedCode`,
 		},
 		{
