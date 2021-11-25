@@ -52,7 +52,8 @@ export function initializeEditor( props ) {
 	return new Promise( ( resolve ) => {
 		waitFor( () => getByTestId( 'block-list-wrapper' ) ).then(
 			( blockListWrapper ) => {
-				// OnLayout event has to be explicitly dispatched in BlockList component,
+				// eslint-disable-next-line @wordpress/comment-case
+				// onLayout event has to be explicitly dispatched in BlockList component,
 				// otherwise the inner blocks are not rendered.
 				fireEvent( blockListWrapper, 'layout', {
 					nativeEvent: {
