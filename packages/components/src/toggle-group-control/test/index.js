@@ -7,17 +7,8 @@ import { render, fireEvent, screen } from '@testing-library/react';
  * Internal dependencies
  */
 import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
-import { TOOLTIP_DELAY } from '../../tooltip';
 
 describe( 'ToggleGroupControl', () => {
-	beforeEach( () => {
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.useRealTimers();
-	} );
-
 	const options = (
 		<>
 			<ToggleGroupControlOption value="rigas" label="R" />
@@ -80,13 +71,11 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Delicious Gnocchi'
 		);
 
-		fireEvent.mouseEnter( firstRadio );
+		fireEvent.focus( firstRadio );
 
-		setTimeout( () => {
-			expect(
-				screen.getByText( 'Click for Delicious Gnocchi' )
-			).toBeInTheDocument();
-		}, TOOLTIP_DELAY );
+		expect(
+			screen.getByText( 'Click for Delicious Gnocchi' )
+		).toBeInTheDocument();
 	} );
 
 	it( 'should not render tooltip', () => {
@@ -100,12 +89,10 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Sumptuous Caponata'
 		);
 
-		fireEvent.mouseEnter( secondRadio );
+		fireEvent.focus( secondRadio );
 
-		setTimeout( () => {
-			expect(
-				screen.queryByText( 'Click for Sumptuous Caponata' )
-			).not.toBeInTheDocument();
-		}, TOOLTIP_DELAY );
+		expect(
+			screen.queryByText( 'Click for Sumptuous Caponata' )
+		).not.toBeInTheDocument();
 	} );
 } );
