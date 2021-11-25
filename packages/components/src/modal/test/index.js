@@ -49,7 +49,7 @@ describe( 'Modal', () => {
 
 	it( 'hides the header when the `__experimentalHideHeader` prop is used', () => {
 		render(
-			<Modal title="Test Title" __experimentalHideHeader={ true }>
+			<Modal title="Test Title" __experimentalHideHeader>
 				<p>Modal content</p>
 			</Modal>
 		);
