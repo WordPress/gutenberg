@@ -118,7 +118,7 @@ describe( 'Publishing', () => {
 			it( `should publish the ${ postType } without opening the post-publish sidebar.`, async () => {
 				await page.type( '.editor-post-title__input', 'E2E Test Post' );
 
-				// The "Publish" button should be shown instead of the "Publish..." toggle
+				// The "Publish" button should be shown instead of the "Publish..." toggle.
 				expect(
 					await page.$( '.editor-post-publish-panel__toggle' )
 				).toBeNull();

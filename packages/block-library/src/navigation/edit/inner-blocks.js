@@ -66,7 +66,7 @@ export default function NavigationInnerBlocks( {
 				] )?.length,
 
 				// This prop is already available but computing it here ensures it's
-				// fresh compared to isImmediateParentOfSelectedBlock
+				// fresh compared to isImmediateParentOfSelectedBlock.
 				isSelected: selectedBlockId === clientId,
 			};
 		},

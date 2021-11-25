@@ -71,10 +71,12 @@ export default function save( { attributes } ) {
 	};
 
 	const objectPosition =
-		// prettier-ignore
+		// Prettier-ignore.
 		focalPoint && isImgElement
-			 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-			 : undefined;
+			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
+					focalPoint.y * 100
+			  ) }%`
+			: undefined;
 
 	const classes = classnames(
 		{

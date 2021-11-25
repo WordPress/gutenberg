@@ -37,7 +37,7 @@ export default function getOffsetParent( node ) {
 		return closestElement;
 	}
 
-	// offsetParent is undocumented/draft
+	// OffsetParent is undocumented/draft.
 	return /** @type {Node & { offsetParent: Node }} */ ( closestElement )
 		.offsetParent;
 }

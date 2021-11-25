@@ -1,5 +1,5 @@
 /* eslint-disable no-alert */
-/* globals alert */
+/* Globals alert. */
 /**
  * External dependencies
  */

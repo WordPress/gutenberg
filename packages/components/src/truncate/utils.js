@@ -34,10 +34,10 @@ export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
 	const wordLength = word.length;
 	// Setting default values
 	// eslint-disable-next-line no-bitwise
-	const frontLength = ~~headLength; // will cast to integer
+	const frontLength = ~~headLength; // Will cast to integer
 	// eslint-disable-next-line no-bitwise
 	const backLength = ~~tailLength;
-	/* istanbul ignore next */
+	/* Istanbul ignore next. */
 	const truncateStr = ! isNil( ellipsis ) ? ellipsis : TRUNCATE_ELLIPSIS;
 
 	if (

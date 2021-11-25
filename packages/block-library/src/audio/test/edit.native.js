@@ -18,7 +18,7 @@ import {
  */
 import { metadata, settings, name } from '../index';
 
-// react-native-aztec shouldn't be mocked because these tests are based on
+// React-native-aztec shouldn't be mocked because these tests are based on
 // snapshot testing where we want to keep the original component.
 jest.unmock( '@wordpress/react-native-aztec' );
 

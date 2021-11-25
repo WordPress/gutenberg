@@ -148,7 +148,7 @@ function addAttribute( settings ) {
 		return settings;
 	}
 
-	// allow blocks to specify their own attribute definition with default values if needed.
+	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( ! settings.attributes.style ) {
 		Object.assign( settings.attributes, {
 			style: {

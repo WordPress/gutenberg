@@ -167,7 +167,7 @@ function Editor( { onError } ) {
 		[ enableComplementaryArea ]
 	);
 
-	// Don't render the Editor until the settings are set and loaded
+	// Don't render the Editor until the settings are set and loaded.
 	const isReady =
 		settings?.siteUrl &&
 		templateType !== undefined &&

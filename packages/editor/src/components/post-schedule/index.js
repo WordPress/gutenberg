@@ -68,11 +68,11 @@ export default function PostSchedule() {
 	// We also make sure this a is not escaped by a "/"
 	const is12HourTime = /a(?!\\)/i.test(
 		settings.formats.time
-			.toLowerCase() // Test only the lower case a
-			.replace( /\\\\/g, '' ) // Replace "//" with empty strings
+			.toLowerCase() // Test only the lower case a.
+			.replace( /\\\\/g, '' ) // Replace "//" with empty strings.
 			.split( '' )
 			.reverse()
-			.join( '' ) // Reverse the string and test for "a" not followed by a slash
+			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
 	);
 
 	function onChange( newDate ) {

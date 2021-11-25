@@ -37,7 +37,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 		// Check if we are toggling the width off
 		const width = selectedWidth === newWidth ? undefined : newWidth;
 
-		// Update attributes
+		// Update attributes.
 		setAttributes( { width } );
 	}
 

@@ -30,8 +30,8 @@ module.exports = ( token ) => {
 				case 'AssignmentExpression':
 					name = t.declaration.left.name;
 					break;
-				//case 'FunctionDeclaration'
-				//case 'ClassDeclaration'
+				// Case 'FunctionDeclaration'
+				// case 'ClassDeclaration'
 				default:
 					name = get( t.declaration, [ 'id', 'name' ], '*default*' );
 			}

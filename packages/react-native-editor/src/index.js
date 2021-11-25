@@ -39,7 +39,7 @@ const registerGutenberg = ( {
 			// eslint-disable-next-line no-unused-vars
 			const { rootTag, ...parentProps } = this.props;
 
-			// Setup locale
+			// Setup locale.
 			setupLocale(
 				parentProps.locale,
 				parentProps.translations,
@@ -57,7 +57,7 @@ const registerGutenberg = ( {
 			// Initialize editor
 			this.editorComponent = setup();
 
-			// Dispatch pre-render hooks
+			// Dispatch pre-render hooks.
 			doAction( 'native.pre-render', parentProps );
 
 			this.filteredProps = applyFilters(
@@ -67,7 +67,7 @@ const registerGutenberg = ( {
 		}
 
 		componentDidMount() {
-			// Dispatch post-render hooks
+			// Dispatch post-render hooks.
 			doAction( 'native.render', this.filteredProps );
 		}
 

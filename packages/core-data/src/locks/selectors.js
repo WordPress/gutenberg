@@ -23,7 +23,7 @@ export function isLockAvailable( state, store, path, { exclusive } ) {
 		}
 	}
 
-	// iteratePath terminates early if path is unreachable, let's
+	// IteratePath terminates early if path is unreachable, let's
 	// re-fetch the node and check it exists in the tree.
 	const node = getNode( locks, storePath );
 	if ( ! node ) {

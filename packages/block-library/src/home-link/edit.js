@@ -23,7 +23,7 @@ export default function HomeEdit( {
 	const { homeUrl } = useSelect(
 		( select ) => {
 			const {
-				getUnstableBase, //site index
+				getUnstableBase, // Site index.
 			} = select( coreStore );
 			return {
 				homeUrl: getUnstableBase()?.home,

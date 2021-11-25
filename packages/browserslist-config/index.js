@@ -1,4 +1,4 @@
-// browserslist-config/index.js
+// Browserslist-config/index.js.
 module.exports = [
 	'> 1%',
 	'last 1 Android versions',

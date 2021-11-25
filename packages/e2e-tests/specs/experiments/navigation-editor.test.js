@@ -345,7 +345,7 @@ describe.skip( 'Navigation editor', () => {
 		} );
 		expect( submenuLinkVisible ).toBeDefined();
 
-		// click in the top left corner of the canvas.
+		// Click in the top left corner of the canvas.
 		const canvas = await page.$( '.edit-navigation-layout__content-area' );
 		const boundingBox = await canvas.boundingBox();
 		await page.mouse.click( boundingBox.x + 5, boundingBox.y + 5 );
@@ -523,7 +523,7 @@ describe.skip( 'Navigation editor', () => {
 				name: 'Block: Navigation',
 			} ).toBeFound();
 
-			// Check for the placeholder state
+			// Check for the placeholder state.
 			await expect( {
 				role: 'button',
 				name: 'Start blank',
@@ -674,7 +674,7 @@ describe.skip( 'Navigation editor', () => {
 				return attributes;
 			} );
 
-			// Check the last item is the one we just inserted
+			// Check the last item is the one we just inserted.
 			expect( lastItemAttributes.label ).toEqual( itemToSelect.title );
 			expect( lastItemAttributes.isTopLevelLink ).toBeTruthy();
 		} );

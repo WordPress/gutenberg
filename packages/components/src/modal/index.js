@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck.
 
 /**
  * External dependencies
@@ -45,7 +45,7 @@ function Modal( props, forwardedRef ) {
 		shouldCloseOnEsc = true,
 		shouldCloseOnClickOutside = true,
 		isDismissible = true,
-		/* accessibility */
+		/* Accessibility. */
 		aria = {
 			labelledby: null,
 			describedby: null,
@@ -105,7 +105,7 @@ function Modal( props, forwardedRef ) {
 	}
 
 	return createPortal(
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions.
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ classnames(

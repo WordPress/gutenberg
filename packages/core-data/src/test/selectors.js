@@ -25,7 +25,7 @@ import {
 	getReferenceByDistinctEdits,
 } from '../selectors';
 
-// getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests
+// GetEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
 describe.each( [
 	[ getEntityRecord ],
 	[ __experimentalGetEntityRecordNoResolver ],
@@ -398,7 +398,7 @@ describe( 'getEntityRecords', () => {
 			'wp_block'
 		);
 
-		// Simulate update states
+		// Simulate update states.
 		state = { ...state };
 
 		const postTypeSecondRecords = getEntityRecords(

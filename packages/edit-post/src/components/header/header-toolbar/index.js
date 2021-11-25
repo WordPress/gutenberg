@@ -105,7 +105,7 @@ function HeaderToolbar() {
 	);
 	const openInserter = useCallback( () => {
 		if ( isInserterOpened ) {
-			// Focusing the inserter button closes the inserter popover
+			// Focusing the inserter button closes the inserter popover.
 			inserterButton.current.focus();
 		} else {
 			setIsInserterOpened( true );

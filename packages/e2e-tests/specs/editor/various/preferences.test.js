@@ -21,7 +21,7 @@ describe( 'preferences', () => {
 				( node ) => node.textContent
 			);
 		} catch ( error ) {
-			// page.$eval throws when it does not find the selector, which we
+			// Page.$eval throws when it does not find the selector, which we
 			// can intentionally intercept and consider as there being no
 			// active sidebar tab (no sidebar).
 			return null;
@@ -44,7 +44,7 @@ describe( 'preferences', () => {
 		await page.waitForSelector( '.edit-post-layout' );
 		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
 
-		// Dismiss
+		// Dismiss.
 		await page.click(
 			'.edit-post-sidebar__panel-tabs [aria-label="Close settings"]'
 		);

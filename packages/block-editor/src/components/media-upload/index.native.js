@@ -79,7 +79,7 @@ export class MediaUpload extends Component {
 
 	getAllSources() {
 		const cameraImageSource = {
-			id: mediaSources.deviceCamera, // ID is the value sent to native
+			id: mediaSources.deviceCamera, // ID is the value sent to native.
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 			label: __( 'Take a Photo' ),
 			requiresModal: true,
@@ -205,8 +205,8 @@ export class MediaUpload extends Component {
 
 		if ( value === URL_MEDIA_SOURCE ) {
 			prompt(
-				__( 'Type a URL' ), // title
-				undefined, // message
+				__( 'Type a URL' ), // Title.
+				undefined, // Message.
 				[
 					{
 						text: __( 'Cancel' ),
@@ -216,10 +216,10 @@ export class MediaUpload extends Component {
 						text: __( 'Apply' ),
 						onPress: onSelectURL,
 					},
-				], // buttons
-				'plain-text', // type
-				undefined, // defaultValue
-				'url' // keyboardType
+				], // Buttons.
+				'plain-text', // Type.
+				undefined, // DefaultValue.
+				'url' // KeyboardType.
 			);
 			return;
 		}

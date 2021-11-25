@@ -244,7 +244,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
 		if ( ! url && ! overlayColor ) {
-			// Reset isDark
+			// Reset isDark.
 			setIsDark( false );
 		}
 	}, [ ! url && ! overlayColor, setIsDark ] );

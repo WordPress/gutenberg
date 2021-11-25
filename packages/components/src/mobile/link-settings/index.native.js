@@ -35,57 +35,57 @@ import styles from './style.scss';
 const NEW_TAB_REL = 'noreferrer noopener';
 
 function LinkSettings( {
-	// Control link settings `BottomSheet` visibility
+	// Control link settings `BottomSheet` visibility.
 	isVisible,
-	// Callback that is called on closing bottom sheet
+	// Callback that is called on closing bottom sheet.
 	onClose,
-	// Function called to set attributes
+	// Function called to set attributes.
 	setAttributes,
-	// Callback that is called when url input field is empty
+	// Callback that is called when url input field is empty.
 	onEmptyURL,
 	// Object of available options along with specific, customizable properties.
 	// Available options keys:
-	//	* url - uses `TextControl` component to set `attributes.url`
-	//	* linkLabel - uses `TextControl` component to set `attributes.label`
-	//	* openInNewTab - uses `ToggleControl` component to set `attributes.linkTarget` and `attributes.rel`
-	//	* linkRel - uses `TextControl` component to set `attributes.rel`
-	//	* footer - uses `FooterMessageControl` component to display message, e.g. about missing functionality
+	// * url - uses `TextControl` component to set `attributes.url`
+	// * linkLabel - uses `TextControl` component to set `attributes.label`
+	// * openInNewTab - uses `ToggleControl` component to set `attributes.linkTarget` and `attributes.rel`
+	// * linkRel - uses `TextControl` component to set `attributes.rel`
+	// * footer - uses `FooterMessageControl` component to display message, e.g. about missing functionality
 	// Available properties:
-	//	* label - control component label, e.g. `Button Link URL`
-	//	* placeholder - control component placeholder, e.g. `Add URL`
-	//	* autoFocus (url only) - whether url input should be focused on sheet opening
-	//	* autoFill (url only) - whether url input should be filled with url from clipboard
+	// * label - control component label, e.g. `Button Link URL`
+	// * placeholder - control component placeholder, e.g. `Add URL`
+	// * autoFocus (url only) - whether url input should be focused on sheet opening
+	// * autoFill (url only) - whether url input should be filled with url from clipboard
 	// Example:
-	//	const options = {
-	//		url: {
-	//			label: __( 'Button Link URL' ),
-	//			placeholder: __( 'Add URL' ),
-	//			autoFocus: true,
-	//			autoFill: true,
-	//		}
-	//	}
+	// const options = {
+	// url: {
+	// label: __( 'Button Link URL' ),
+	// placeholder: __( 'Add URL' ),
+	// autoFocus: true,
+	// autoFill: true,
+	// }
+	// }
 	options,
 	// Specifies whether settings should be wrapped into `BottomSheet`
 	withBottomSheet,
 	// Defines buttons which will be displayed below the all options.
 	// It's an array of objects with following properties:
-	//	* label - button title
-	//	* onPress - callback that is called on pressing button
+	// * label - button title
+	// * onPress - callback that is called on pressing button
 	// Example:
 	// 	const actions = [
-	//		{
-	//			label: __( 'Remove link' ),
-	//			onPress: () => setAttributes({ url: '' }),
-	//		},
-	//	];
+	// {
+	// label: __( 'Remove link' ),
+	// onPress: () => setAttributes({ url: '' }),
+	// },
+	// ];
 	actions,
-	// Specifies whether general `BottomSheet` is opened
+	// Specifies whether general `BottomSheet` is opened.
 	editorSidebarOpened,
-	// Specifies whether icon should be displayed next to the label
+	// Specifies whether icon should be displayed next to the label.
 	showIcon,
 	onLinkCellPressed,
 	urlValue,
-	// Attributes properties
+	// Attributes properties.
 	url,
 	label = '',
 	linkTarget,
@@ -222,7 +222,7 @@ function LinkSettings( {
 		if ( ! clipboardText ) {
 			return;
 		}
-		// Check if pasted text is URL
+		// Check if pasted text is URL.
 		if ( ! isURL( clipboardText ) ) {
 			return;
 		}

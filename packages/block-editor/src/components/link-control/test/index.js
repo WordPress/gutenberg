@@ -38,7 +38,7 @@ const mockFetchSearchSuggestions = jest.fn();
 let mockFetchRichUrlData;
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
@@ -68,19 +68,19 @@ function eventLoopTick() {
 let container = null;
 
 beforeEach( () => {
-	// setup a DOM element as a render target
+	// Setup a DOM element as a render target.
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
 } );
 
 afterEach( () => {
-	// cleanup on exiting
+	// Cleanup on exiting.
 	unmountComponentAtNode( container );
 	container.remove();
 	container = null;
 	mockFetchSearchSuggestions.mockReset();
-	mockFetchRichUrlData?.mockReset(); // conditionally reset as it may NOT be a mock
+	mockFetchRichUrlData?.mockReset(); // Conditionally reset as it may NOT be a mock.
 } );
 
 function getURLInput() {
@@ -93,7 +93,7 @@ function getSearchResults() {
 	// the search results with `role="listbox"`.
 	const relatedSelector = input.getAttribute( 'aria-owns' );
 
-	// Select by relationship as well as role
+	// Select by relationship as well as role.
 	return container.querySelectorAll(
 		`#${ relatedSelector }[role="listbox"] [role="option"]`
 	);
@@ -111,7 +111,7 @@ describe( 'Basic rendering', () => {
 			render( <LinkControl />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = getURLInput();
 
 		expect( searchInput ).not.toBeNull();
@@ -143,19 +143,19 @@ describe( 'Basic rendering', () => {
 			render( <LinkControl />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = getURLInput();
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
 		// Find all elements with link
-		// Filter out the element with the text 'ENTER' because it doesn't contain link
+		// Filter out the element with the text 'ENTER' because it doesn't contain link.
 		const linkElements = Array.from(
 			container.querySelectorAll(
 				'.block-editor-link-control__search-item-info'
@@ -325,15 +325,15 @@ describe( 'Searching for a link', () => {
 			render( <LinkControl />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = getURLInput();
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
 		const searchResultElements = getSearchResults();
@@ -363,15 +363,15 @@ describe( 'Searching for a link', () => {
 			render( <LinkControl />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = getURLInput();
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 
@@ -387,7 +387,7 @@ describe( 'Searching for a link', () => {
 
 		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
 
-		// Sanity check that a search suggestion shows up corresponding to the data
+		// Sanity check that a search suggestion shows up corresponding to the data.
 		expect( firstSearchResultItemHTML ).toEqual(
 			expect.stringContaining( firstFauxSuggestion.title )
 		);
@@ -395,7 +395,7 @@ describe( 'Searching for a link', () => {
 			expect.stringContaining( firstFauxSuggestion.type )
 		);
 
-		// The fallback URL suggestion should not be shown when input is not URL-like
+		// The fallback URL suggestion should not be shown when input is not URL-like.
 		expect( lastSearchResultItemHTML ).not.toEqual(
 			expect.stringContaining( 'URL' )
 		);
@@ -408,17 +408,17 @@ describe( 'Searching for a link', () => {
 			render( <LinkControl />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = container.querySelector(
 			'input[aria-label="URL"]'
 		);
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
 		const searchResultTextHighlightElements = Array.from(
@@ -455,10 +455,10 @@ describe( 'Searching for a link', () => {
 			render( <LinkControl showSuggestions={ false } />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = getURLInput();
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, {
 				target: { value: 'anything' },
@@ -467,7 +467,7 @@ describe( 'Searching for a link', () => {
 
 		const searchResultElements = getSearchResults();
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
@@ -485,17 +485,17 @@ describe( 'Searching for a link', () => {
 				render( <LinkControl />, container );
 			} );
 
-			// Search Input UI
+			// Search Input UI.
 			const searchInput = getURLInput();
 
-			// Simulate searching for a term
+			// Simulate searching for a term.
 			act( () => {
 				Simulate.change( searchInput, {
 					target: { value: searchTerm },
 				} );
 			} );
 
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 
@@ -506,13 +506,13 @@ describe( 'Searching for a link', () => {
 			const additionalDefaultFallbackURLSuggestionLength = 1;
 
 			// We should see a search result for each of the expect search suggestions
-			// plus 1 additional one for the fallback URL suggestion
+			// plus 1 additional one for the fallback URL suggestion.
 			expect( searchResultElements ).toHaveLength(
 				fauxEntitySuggestions.length +
 					additionalDefaultFallbackURLSuggestionLength
 			);
 
-			// The last item should be a URL search suggestion
+			// The last item should be a URL search suggestion.
 			expect( lastSearchResultItemHTML ).toEqual(
 				expect.stringContaining( searchTerm )
 			);
@@ -530,23 +530,23 @@ describe( 'Searching for a link', () => {
 			render( <LinkControl noURLSuggestion />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = getURLInput();
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, {
 				target: { value: 'couldbeurlorentitysearchterm' },
 			} );
 		} );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
 
 		const searchResultElements = getSearchResults();
 
-		// We should see a search result for each of the expect search suggestions and nothing else
+		// We should see a search result for each of the expect search suggestions and nothing else.
 		expect( searchResultElements ).toHaveLength(
 			fauxEntitySuggestions.length
 		);
@@ -555,9 +555,9 @@ describe( 'Searching for a link', () => {
 
 describe( 'Manual link entry', () => {
 	it.each( [
-		[ 'https://make.wordpress.org' ], // explicit https
-		[ 'http://make.wordpress.org' ], // explicit http
-		[ 'www.wordpress.org' ], // usage of "www"
+		[ 'https://make.wordpress.org' ], // Explicit https.
+		[ 'http://make.wordpress.org' ], // Explicit http.
+		[ 'www.wordpress.org' ], // Usage of "www".
 	] )(
 		'should display a single suggestion result when the current input value is URL-like (eg: %s)',
 		async ( searchTerm ) => {
@@ -565,17 +565,17 @@ describe( 'Manual link entry', () => {
 				render( <LinkControl />, container );
 			} );
 
-			// Search Input UI
+			// Search Input UI.
 			const searchInput = getURLInput();
 
-			// Simulate searching for a term
+			// Simulate searching for a term.
 			act( () => {
 				Simulate.change( searchInput, {
 					target: { value: searchTerm },
 				} );
 			} );
 
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 
 			const searchResultElements = getSearchResults();
@@ -613,7 +613,7 @@ describe( 'Manual link entry', () => {
 					render( <LinkControl />, container );
 				} );
 
-				// Search Input UI
+				// Search Input UI.
 				const searchInput = getURLInput();
 
 				let submitButton = queryByRole( container, 'button', {
@@ -624,14 +624,14 @@ describe( 'Manual link entry', () => {
 				expect( submitButton ).not.toBeNull();
 				expect( submitButton ).toBeInTheDocument();
 
-				// Simulate searching for a term
+				// Simulate searching for a term.
 				act( () => {
 					Simulate.change( searchInput, {
 						target: { value: searchString },
 					} );
 				} );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
 				// Attempt to submit the empty search value in the input.
@@ -658,7 +658,7 @@ describe( 'Manual link entry', () => {
 					render( <LinkControl />, container );
 				} );
 
-				// Search Input UI
+				// Search Input UI.
 				const searchInput = getURLInput();
 
 				let submitButton = queryByRole( container, 'button', {
@@ -669,14 +669,14 @@ describe( 'Manual link entry', () => {
 				expect( submitButton ).not.toBeNull();
 				expect( submitButton ).toBeInTheDocument();
 
-				// Simulate searching for a term
+				// Simulate searching for a term.
 				act( () => {
 					Simulate.change( searchInput, {
 						target: { value: searchString },
 					} );
 				} );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
 				// Attempt to submit the empty search value in the input.
@@ -709,17 +709,17 @@ describe( 'Manual link entry', () => {
 					render( <LinkControl />, container );
 				} );
 
-				// Search Input UI
+				// Search Input UI.
 				const searchInput = getURLInput();
 
-				// Simulate searching for a term
+				// Simulate searching for a term.
 				act( () => {
 					Simulate.change( searchInput, {
 						target: { value: searchTerm },
 					} );
 				} );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
 				const searchResultElements = getSearchResults();
@@ -747,7 +747,7 @@ describe( 'Manual link entry', () => {
 
 describe( 'Default search suggestions', () => {
 	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
-		const expectedResultsLength = 3; // set within `LinkControl`
+		const expectedResultsLength = 3; // Set within `LinkControl`.
 
 		act( () => {
 			render( <LinkControl showInitialSuggestions />, container );
@@ -755,7 +755,7 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = getURLInput();
 
 		const searchResultsWrapper = container.querySelector(
@@ -770,7 +770,7 @@ describe( 'Default search suggestions', () => {
 		);
 
 		// Verify input has no value has default suggestions should only show
-		// when this does not have a value
+		// when this does not have a value.
 		expect( searchInput.value ).toBe( '' );
 
 		// Ensure only called once as a guard against potential infinite
@@ -778,7 +778,7 @@ describe( 'Default search suggestions', () => {
 		// which has calls to `setState` within it.
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 
-		// Verify the search results already display the initial suggestions
+		// Verify the search results already display the initial suggestions.
 		expect( initialSearchResultElements ).toHaveLength(
 			expectedResultsLength
 		);
@@ -789,7 +789,6 @@ describe( 'Default search suggestions', () => {
 	it( 'should not display initial suggestions when input value is present', async () => {
 		// Render with an initial value an ensure that no initial suggestions
 		// are shown.
-		//
 		act( () => {
 			render(
 				<LinkControl
@@ -807,7 +806,7 @@ describe( 'Default search suggestions', () => {
 		//
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
-		//
+		// .
 		const currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
@@ -822,10 +821,10 @@ describe( 'Default search suggestions', () => {
 
 		const searchResultElements = getSearchResults();
 
-		// search input is set to the URL value
+		// Search input is set to the URL value.
 		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
 
-		// it should match any url that's like ?p= and also include a URL option
+		// It should match any url that's like ?p= and also include a URL option.
 		expect( searchResultElements ).toHaveLength( 5 );
 
 		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
@@ -843,22 +842,22 @@ describe( 'Default search suggestions', () => {
 		let searchResultElements;
 		let searchInput;
 
-		// Search Input UI
+		// Search Input UI.
 		searchInput = getURLInput();
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
 		expect( searchInput.value ).toBe( searchTerm );
 
 		searchResultElements = getSearchResults();
 
-		// delete the text
+		// Delete the text.
 		act( () => {
 			Simulate.change( searchInput, { target: { value: '' } } );
 		} );
@@ -869,7 +868,7 @@ describe( 'Default search suggestions', () => {
 
 		searchInput = getURLInput();
 
-		// check the input is empty now
+		// Check the input is empty now.
 		expect( searchInput.value ).toBe( '' );
 
 		const searchResultLabel = container.querySelector(
@@ -960,12 +959,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				render( <LinkControlConsumer />, container );
 			} );
 
-			// Search Input UI
+			// Search Input UI.
 			const searchInput = container.querySelector(
 				'input[aria-label="URL"]'
 			);
 
-			// Simulate searching for a term
+			// Simulate searching for a term.
 			act( () => {
 				Simulate.change( searchInput, {
 					target: { value: entityNameText },
@@ -991,14 +990,14 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 
 			// No need to wait in this test because we control the Promise
-			// resolution manually via the `resolver` reference
+			// resolution manually via the `resolver` reference.
 			act( () => {
 				Simulate.click( createButton );
 			} );
 
 			await eventLoopTick();
 
-			// Check for loading indicator
+			// Check for loading indicator.
 			const loadingIndicator = container.querySelector(
 				'.block-editor-link-control__loading'
 			);
@@ -1011,7 +1010,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				expect.stringContaining( 'Creating' )
 			);
 
-			// Resolve the `createSuggestion` promise
+			// Resolve the `createSuggestion` promise.
 			await act( async () => {
 				resolver( resolvedEntity );
 			} );
@@ -1057,12 +1056,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			render( <LinkControlConsumer />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = container.querySelector(
 			'input[aria-label="URL"]'
 		);
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, {
 				target: { value: 'Some new page to create' },
@@ -1130,12 +1129,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			render( <LinkControlConsumer />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = container.querySelector(
 			'input[aria-label="URL"]'
 		);
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, {
 				target: { value: entityNameText },
@@ -1154,7 +1153,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			)
 		);
 
-		// Step down into the search results, highlighting the first result item
+		// Step down into the search results, highlighting the first result item.
 		act( () => {
 			Simulate.keyDown( searchInput, { keyCode: DOWN } );
 		} );
@@ -1196,12 +1195,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			render( <LinkControlConsumer />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = container.querySelector(
 			'input[aria-label="URL"]'
 		);
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, {
 				target: { value: entityNameText },
@@ -1234,10 +1233,10 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 						container
 					);
 				} );
-				// Await the initial suggestions to be fetched
+				// Await the initial suggestions to be fetched.
 				await eventLoopTick();
 
-				// Search Input UI
+				// Search Input UI.
 				const searchInput = container.querySelector(
 					'input[aria-label="URL"]'
 				);
@@ -1252,9 +1251,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					)
 				);
 
-				// Verify input has no value
+				// Verify input has no value.
 				expect( searchInput.value ).toBe( '' );
-				expect( createButton ).toBeFalsy(); // shouldn't exist!
+				expect( createButton ).toBeFalsy(); // Shouldn't exist!
 			}
 		);
 
@@ -1262,16 +1261,16 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			act( () => {
 				render(
 					<LinkControl
-						showInitialSuggestions={ true } // should show even if we're not showing initial suggestions
+						showInitialSuggestions={ true } // Should show even if we're not showing initial suggestions.
 						createSuggestion={ jest.fn() }
 					/>,
 					container
 				);
 			} );
-			// Await the initial suggestions to be fetched
+			// Await the initial suggestions to be fetched.
 			await eventLoopTick();
 
-			// Search Input UI
+			// Search Input UI.
 			const searchInput = container.querySelector(
 				'input[aria-label="URL"]'
 			);
@@ -1286,9 +1285,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				)
 			);
 
-			// Verify input has no value
+			// Verify input has no value.
 			expect( searchInput.value ).toBe( '' );
-			expect( createButton ).toBeFalsy(); // shouldn't exist!
+			expect( createButton ).toBeFalsy(); // Shouldn't exist!
 		} );
 
 		it.each( [
@@ -1307,12 +1306,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					);
 				} );
 
-				// Search Input UI
+				// Search Input UI.
 				const searchInput = container.querySelector(
 					'input[aria-label="URL"]'
 				);
 
-				// Simulate searching for a term
+				// Simulate searching for a term.
 				act( () => {
 					Simulate.change( searchInput, {
 						target: { value: inputText },
@@ -1332,7 +1331,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					)
 				);
 
-				expect( createButton ).toBeFalsy(); // shouldn't exist!
+				expect( createButton ).toBeFalsy(); // Shouldn't exist!
 			}
 		);
 	} );
@@ -1343,7 +1342,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			let searchInput;
 
 			const throwsError = () => {
-				throw new Error( 'API response returned invalid entity.' ); // this can be any error and msg
+				throw new Error( 'API response returned invalid entity.' ); // This can be any error and msg.
 			};
 
 			const createSuggestion = () => Promise.reject( throwsError() );
@@ -1355,10 +1354,10 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 			} );
 
-			// Search Input UI
+			// Search Input UI.
 			searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
-			// Simulate searching for a term
+			// Simulate searching for a term.
 			act( () => {
 				Simulate.change( searchInput, {
 					target: { value: searchText },
@@ -1393,10 +1392,10 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				'.block-editor-link-control__search-error'
 			);
 
-			// Catch the error in the test to avoid test failures
+			// Catch the error in the test to avoid test failures.
 			expect( throwsError ).toThrow( Error );
 
-			// Check human readable error notice is perceivable
+			// Check human readable error notice is perceivable.
 			expect( errorNotice ).not.toBeFalsy();
 			expect( errorNotice.innerHTML ).toEqual(
 				expect.stringContaining(
@@ -1404,7 +1403,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				)
 			);
 
-			// Verify input is repopulated with original search text
+			// Verify input is repopulated with original search text.
 			expect( searchInput ).not.toBeFalsy();
 			expect( searchInput.value ).toBe( searchText );
 
@@ -1435,7 +1434,7 @@ describe( 'Selecting links', () => {
 			render( <LinkControlConsumer />, container );
 		} );
 
-		// TODO: select by aria role or visible text
+		// TODO: select by aria role or visible text.
 		const currentLink = getCurrentLink();
 		const currentLinkHTML = currentLink.innerHTML;
 		const currentLinkAnchor = currentLink.querySelector(
@@ -1469,11 +1468,11 @@ describe( 'Selecting links', () => {
 			render( <LinkControlConsumer />, container );
 		} );
 
-		// Required in order to select the button below
+		// Required in order to select the button below.
 		let currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.click( currentLinkBtn );
 		} );
@@ -1481,15 +1480,15 @@ describe( 'Selecting links', () => {
 		const searchInput = getURLInput();
 		currentLinkUI = getCurrentLink();
 
-		// We should be back to showing the search input
+		// We should be back to showing the search input.
 		expect( searchInput ).not.toBeNull();
-		expect( searchInput.value ).toBe( selectedLink.url ); // prepopulated with previous link's URL
+		expect( searchInput.value ).toBe( selectedLink.url ); // Prepopulated with previous link's URL.
 		expect( currentLinkUI ).toBeNull();
 	} );
 
 	describe( 'Selection using mouse click', () => {
 		it.each( [
-			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
+			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // Entity search.
 			[
 				'url',
 				'https://www.wordpress.org',
@@ -1499,7 +1498,7 @@ describe( 'Selecting links', () => {
 					url: 'https://www.wordpress.org',
 					type: 'URL',
 				},
-			], // url
+			], // Url.
 		] )(
 			'should display a current selected link UI when a %s suggestion for the search "%s" is clicked',
 			async ( type, searchTerm, selectedLink ) => {
@@ -1518,24 +1517,24 @@ describe( 'Selecting links', () => {
 					render( <LinkControlConsumer />, container );
 				} );
 
-				// Search Input UI
+				// Search Input UI.
 				const searchInput = getURLInput();
 
-				// Simulate searching for a term
+				// Simulate searching for a term.
 				act( () => {
 					Simulate.change( searchInput, {
 						target: { value: searchTerm },
 					} );
 				} );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
 				const searchResultElements = getSearchResults();
 
 				const firstSearchSuggestion = first( searchResultElements );
 
-				// Simulate selecting the first of the search suggestions
+				// Simulate selecting the first of the search suggestions.
 				act( () => {
 					Simulate.click( firstSearchSuggestion );
 				} );
@@ -1548,7 +1547,7 @@ describe( 'Selecting links', () => {
 					`[href="${ selectedLink.url }"]`
 				);
 
-				// Check that this suggestion is now shown as selected
+				// Check that this suggestion is now shown as selected.
 				expect( currentLinkHTML ).toEqual(
 					expect.stringContaining( selectedLink.title )
 				);
@@ -1562,7 +1561,7 @@ describe( 'Selecting links', () => {
 
 	describe( 'Selection using keyboard', () => {
 		it.each( [
-			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
+			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // Entity search.
 			[
 				'url',
 				'https://www.wordpress.org',
@@ -1572,7 +1571,7 @@ describe( 'Selecting links', () => {
 					url: 'https://www.wordpress.org',
 					type: 'URL',
 				},
-			], // url
+			], // Url.
 		] )(
 			'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard',
 			async ( type, searchTerm, selectedLink ) => {
@@ -1591,21 +1590,21 @@ describe( 'Selecting links', () => {
 					render( <LinkControlConsumer />, container );
 				} );
 
-				// Search Input UI
+				// Search Input UI.
 				const searchInput = getURLInput();
 				searchInput.focus();
 
-				// Simulate searching for a term
+				// Simulate searching for a term.
 				act( () => {
 					Simulate.change( searchInput, {
 						target: { value: searchTerm },
 					} );
 				} );
 
-				//fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
-				// Step down into the search results, highlighting the first result item
+				// Step down into the search results, highlighting the first result item.
 				act( () => {
 					Simulate.keyDown( searchInput, { keyCode: DOWN } );
 				} );
@@ -1619,14 +1618,14 @@ describe( 'Selecting links', () => {
 					'[role="option"][aria-selected="true"]'
 				);
 
-				// We should have highlighted the first item using the keyboard
+				// We should have highlighted the first item using the keyboard.
 				expect( selectedSearchResultElement ).toEqual(
 					firstSearchSuggestion
 				);
 
-				// Only entity searches contain more than 1 suggestion
+				// Only entity searches contain more than 1 suggestion.
 				if ( type === 'entity' ) {
-					// Check we can go down again using the down arrow
+					// Check we can go down again using the down arrow.
 					act( () => {
 						Simulate.keyDown( searchInput, { keyCode: DOWN } );
 					} );
@@ -1636,12 +1635,12 @@ describe( 'Selecting links', () => {
 					);
 
 					// We should have highlighted the first item using the keyboard
-					// eslint-disable-next-line jest/no-conditional-expect
+					// eslint-disable-next-line jest/no-conditional-expect.
 					expect( selectedSearchResultElement ).toEqual(
 						secondSearchSuggestion
 					);
 
-					// Check we can go back up via up arrow
+					// Check we can go back up via up arrow.
 					act( () => {
 						Simulate.keyDown( searchInput, { keyCode: UP } );
 					} );
@@ -1651,18 +1650,18 @@ describe( 'Selecting links', () => {
 					);
 
 					// We should be back to highlighting the first search result again
-					// eslint-disable-next-line jest/no-conditional-expect
+					// eslint-disable-next-line jest/no-conditional-expect.
 					expect( selectedSearchResultElement ).toEqual(
 						firstSearchSuggestion
 					);
 				}
 
-				// Submit the selected item as the current link
+				// Submit the selected item as the current link.
 				act( () => {
 					Simulate.keyDown( searchInput, { keyCode: ENTER } );
 				} );
 
-				// Check that the suggestion selected via is now shown as selected
+				// Check that the suggestion selected via is now shown as selected.
 				const currentLink = container.querySelector(
 					'.block-editor-link-control__search-item.is-current'
 				);
@@ -1705,10 +1704,10 @@ describe( 'Selecting links', () => {
 				'Recently updated'
 			);
 
-			// Search Input UI
+			// Search Input UI.
 			const searchInput = getURLInput();
 
-			// Step down into the search results, highlighting the first result item
+			// Step down into the search results, highlighting the first result item.
 			act( () => {
 				Simulate.keyDown( searchInput, { keyCode: DOWN } );
 			} );
@@ -1724,12 +1723,12 @@ describe( 'Selecting links', () => {
 				'[role="option"][aria-selected="true"]'
 			);
 
-			// We should have highlighted the first item using the keyboard
+			// We should have highlighted the first item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
 				firstSearchSuggestion
 			);
 
-			// Check we can go down again using the down arrow
+			// Check we can go down again using the down arrow.
 			act( () => {
 				Simulate.keyDown( searchInput, { keyCode: DOWN } );
 			} );
@@ -1738,12 +1737,12 @@ describe( 'Selecting links', () => {
 				'[role="option"][aria-selected="true"]'
 			);
 
-			// We should have highlighted the first item using the keyboard
+			// We should have highlighted the first item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
 				secondSearchSuggestion
 			);
 
-			// Check we can go back up via up arrow
+			// Check we can go back up via up arrow.
 			act( () => {
 				Simulate.keyDown( searchInput, { keyCode: UP } );
 			} );
@@ -1752,7 +1751,7 @@ describe( 'Selecting links', () => {
 				'[role="option"][aria-selected="true"]'
 			);
 
-			// We should be back to highlighting the first search result again
+			// We should be back to highlighting the first search result again.
 			expect( selectedSearchResultElement ).toEqual(
 				firstSearchSuggestion
 			);
@@ -1784,7 +1783,7 @@ describe( 'Addition Settings UI', () => {
 				label.innerHTML &&
 				label.innerHTML.includes( expectedSettingText )
 		);
-		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found
+		expect( newTabSettingLabel ).not.toBeUndefined(); // Find() returns "undefined" if not found.
 
 		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute(
 			'for'
@@ -1829,7 +1828,7 @@ describe( 'Addition Settings UI', () => {
 			render( <LinkControlConsumer />, container );
 		} );
 
-		// Grab the elements using user perceivable DOM queries
+		// Grab the elements using user perceivable DOM queries.
 		const settingsLegend = Array.from(
 			container.querySelectorAll( 'legend' )
 		).find(
@@ -1851,15 +1850,15 @@ describe( 'Addition Settings UI', () => {
 			settingControlsLabels
 		).map( ( label ) => label.innerHTML );
 
-		// Check we have the correct number of controls
+		// Check we have the correct number of controls.
 		expect( settingControlsLabels ).toHaveLength( 2 );
 
-		// Check the labels match
+		// Check the labels match.
 		expect( settingControlLabelsText ).toEqual(
 			expect.arrayContaining( customSettingsLabelsText )
 		);
 
-		// Assert the default "checked" states match the expected
+		// Assert the default "checked" states match the expected.
 		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
 		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
 	} );
@@ -1873,15 +1872,15 @@ describe( 'Post types', () => {
 			render( <LinkControl />, container );
 		} );
 
-		// Search Input UI
+		// Search Input UI.
 		const searchInput = getURLInput();
 
-		// Simulate searching for a term
+		// Simulate searching for a term.
 		act( () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
 		const searchResultElements = getSearchResults();
@@ -1905,17 +1904,17 @@ describe( 'Post types', () => {
 				);
 			} );
 
-			// Search Input UI
+			// Search Input UI.
 			const searchInput = getURLInput();
 
-			// Simulate searching for a term
+			// Simulate searching for a term.
 			act( () => {
 				Simulate.change( searchInput, {
 					target: { value: searchTerm },
 				} );
 			} );
 
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			// FetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 
 			const searchResultElements = getSearchResults();
@@ -1935,7 +1934,7 @@ describe( 'Post types', () => {
 describe( 'Rich link previews', () => {
 	const selectedLink = {
 		id: '1',
-		title: 'Wordpress.org', // customize this for differentiation in assertions
+		title: 'Wordpress.org', // Customize this for differentiation in assertions.
 		url: 'https://www.wordpress.org',
 		type: 'URL',
 	};
@@ -1966,7 +1965,7 @@ describe( 'Rich link previews', () => {
 			render( <LinkControl value={ selectedLink } />, container );
 		} );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop
+		// MockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2000,7 +1999,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop
+		// MockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2031,7 +2030,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop
+		// MockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2071,7 +2070,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop
+		// MockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2110,7 +2109,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop
+		// MockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2156,7 +2155,7 @@ describe( 'Rich link previews', () => {
 				);
 			} );
 
-			// mockFetchRichUrlData resolves on next "tick" of event loop
+			// MockFetchRichUrlData resolves on next "tick" of event loop.
 			await act( async () => {
 				await eventLoopTick();
 			} );
@@ -2195,7 +2194,7 @@ describe( 'Rich link previews', () => {
 				);
 			} );
 
-			// mockFetchRichUrlData resolves on next "tick" of event loop
+			// MockFetchRichUrlData resolves on next "tick" of event loop.
 			await act( async () => {
 				await eventLoopTick();
 			} );
@@ -2224,7 +2223,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop
+		// MockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2254,7 +2253,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop
+		// MockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
 		} );

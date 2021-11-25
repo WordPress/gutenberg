@@ -68,7 +68,7 @@ function Notice( {
 	actions = [],
 	politeness = getDefaultPoliteness( status ),
 	__unstableHTML,
-	// onDismiss is a callback executed when the notice is dismissed.
+	// OnDismiss is a callback executed when the notice is dismissed.
 	// It is distinct from onRemove, which _looks_ like a callback but is
 	// actually the function to call to remove the notice from the UI.
 	onDismiss = noop,

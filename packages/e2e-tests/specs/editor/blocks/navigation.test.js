@@ -84,15 +84,15 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 
 		// Wait for the autocomplete suggestion item to appear.
 		await page.waitForXPath( suggestionPath );
-		// Set the suggestion
+		// Set the suggestion.
 		const suggestion = await page.waitForXPath( suggestionPath );
 
-		// Select it (so we're clicking the right one, even if it's further down the list)
+		// Select it (so we're clicking the right one, even if it's further down the list).
 		await suggestion.click();
 	}
 
 	if ( label ) {
-		// Wait for rich text editor input to be focused before we start typing the label
+		// Wait for rich text editor input to be focused before we start typing the label.
 		await page.waitForSelector( ':focus.rich-text' );
 
 		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
@@ -222,7 +222,7 @@ async function waitForBlock( blockName ) {
 }
 
 // Disable reason - these tests are to be re-written.
-// eslint-disable-next-line jest/no-disabled-tests
+// eslint-disable-next-line jest/no-disabled-tests.
 describe( 'Navigation', () => {
 	const contributorUsername = uniqueId( 'contributoruser_' );
 	let contributorPassword;
@@ -340,7 +340,7 @@ describe( 'Navigation', () => {
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
-		// Wait for URL input to be focused
+		// Wait for URL input to be focused.
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
@@ -405,7 +405,7 @@ describe( 'Navigation', () => {
 		);
 		await appenderAgain.click();
 
-		// Wait for URL input to be focused
+		// Wait for URL input to be focused.
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
@@ -420,7 +420,7 @@ describe( 'Navigation', () => {
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
 
-		// Click the link placeholder
+		// Click the link placeholder.
 		const placeholder = await page.waitForSelector(
 			'.wp-block-navigation-link__placeholder'
 		);
@@ -589,7 +589,7 @@ describe( 'Navigation', () => {
 
 		const navBlock = await waitForBlock( 'Navigation' );
 
-		// Select the block to convert to a wp_navigation
+		// Select the block to convert to a wp_navigation.
 		await navBlock.click();
 
 		// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
@@ -630,7 +630,7 @@ describe( 'Navigation', () => {
 
 			const navBlock = await waitForBlock( 'Navigation' );
 
-			// Select the block to convert to a wp_navigation
+			// Select the block to convert to a wp_navigation.
 			await navBlock.click();
 
 			// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
@@ -674,7 +674,7 @@ describe( 'Navigation', () => {
 			await page.waitForXPath( NAV_ENTITY_SELECTOR );
 			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
 
-			// Publish the post
+			// Publish the post.
 			const entitySaveButton = await page.waitForSelector(
 				'.editor-entities-saved-states__save-button'
 			);
@@ -846,7 +846,7 @@ describe( 'Navigation', () => {
 			// no URL of label and can be considered unpopulated.
 			await clickBlockToolbarButton( 'Select Submenu' );
 
-			// Check for non-disabled Convert to Link button
+			// Check for non-disabled Convert to Link button.
 			const convertToLinkButton = await page.$(
 				'[aria-label="Block tools"] [aria-label="Convert to Link"]:not([disabled])'
 			);
@@ -894,7 +894,7 @@ describe( 'Navigation', () => {
 			);
 			await theOption.click();
 
-			// Make sure the snackbar error shows up
+			// Make sure the snackbar error shows up.
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
@@ -917,7 +917,7 @@ describe( 'Navigation', () => {
 			await createNewPost();
 			await insertBlock( 'Navigation' );
 
-			// Make sure the snackbar error shows up
+			// Make sure the snackbar error shows up.
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="${ noticeText }" ]`
 			);

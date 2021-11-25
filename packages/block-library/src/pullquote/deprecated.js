@@ -187,7 +187,7 @@ const deprecated = [
 	{
 		attributes: {
 			...blockAttributes,
-			// figureStyle is an attribute that never existed.
+			// FigureStyle is an attribute that never existed.
 			// We are using it as a way to access the styles previously applied to the figure.
 			figureStyle: {
 				source: 'attribute',

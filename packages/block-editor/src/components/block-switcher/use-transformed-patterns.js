@@ -92,7 +92,7 @@ export const getPatternTransformedBlocks = (
  * @param {WPBlock[]}        selectedBlocks The currently selected blocks.
  * @return {TransformedBlockPattern[]} Returns the eligible matched patterns with all the selected blocks.
  */
-// TODO tests
+// TODO tests.
 const useTransformedPatterns = ( patterns, selectedBlocks ) => {
 	return useMemo(
 		() =>

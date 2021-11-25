@@ -15,11 +15,11 @@ export function ControlledStateStory() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
-	// Mock navigation link
+	// Mock navigation link.
 	const MockLink = ( { href, children } ) => (
 		<Button
 			href={ href }
-			// Since we're not actually navigating pages, simulate it with on onClick
+			// Since we're not actually navigating pages, simulate it with on onClick.
 			onClick={ ( event ) => {
 				event.preventDefault();
 				const item = href.replace( 'https://example.com/', '' );

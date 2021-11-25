@@ -115,7 +115,7 @@ async function buildCSS( file ) {
 	const builtSass = await renderSass( {
 		file,
 		includePaths: [ path.join( PACKAGES_DIR, 'base-styles' ) ],
-		//
+		// .
 		data: ''.concat( '@use "sass:math";', importLists, contents ),
 	} );
 
