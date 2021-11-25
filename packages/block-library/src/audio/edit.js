@@ -101,7 +101,6 @@ function AudioEdit( {
 			: null;
 	}
 
-	// Const { setAttributes, isSelected, noticeUI } = this.props;
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
 			// In this case there was an error and we should continue in the editing state
