@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Added a `showTooltip` prop to `ToggleGroupControlOption` in order to display tooltip text (using `<Tooltip />`). ([#36726](https://github.com/WordPress/gutenberg/pull/36726)).
+
 ## 19.0.2 (2021-11-15)
 
 -   Remove erroneous use of `??=` syntax from `build-module`.

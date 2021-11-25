@@ -92,13 +92,8 @@ const emitToChild = ( children, eventName, event ) => {
 	}
 };
 
-function Tooltip( {
-	children,
-	position,
-	text,
-	shortcut,
-	delay = TOOLTIP_DELAY,
-} ) {
+function Tooltip( props ) {
+	const { children, position, text, shortcut, delay = TOOLTIP_DELAY } = props;
 	/**
 	 * Whether a mouse is currently pressed, used in determining whether
 	 * to handle a focus event as displaying the tooltip immediately.
