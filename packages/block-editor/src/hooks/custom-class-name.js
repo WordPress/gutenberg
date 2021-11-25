@@ -7,27 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	TextControl,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { check, moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
-import {
-	getActiveStyle,
-	replaceActiveStyle,
-} from '../components/block-styles/utils';
-import { store as blockEditorStore } from '../store';
+import CustomClassNameControl from '../components/custom-class-name-control';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -52,33 +38,6 @@ export function addAttribute( settings ) {
 }
 
 /**
- * @typedef  {Object}   CustomClassNameMenuItemProps
- * @property {boolean}  isSelected                   Whether the item is selected.
- * @property {Function} onClick                      An onClick handler.
- * @property {Object}   style                        A block style object.
- */
-
-/**
- * Returns a menu item component.
- *
- * @param {CustomClassNameMenuItemProps} props  The component props.
- * @return {WPComponent}                        The menu item component.
- */
-function CustomClassNameMenuItem( { isSelected, onClick, style } ) {
-	return (
-		<MenuItem
-			key={ style?.label }
-			icon={ isSelected && check }
-			isSelected={ isSelected }
-			onClick={ onClick }
-			role="menuitemcheckbox"
-		>
-			{ style?.label }
-		</MenuItem>
-	);
-}
-
-/**
  * Override the default edit UI to include a new block inspector control for
  * assigning the custom class name, if block supports custom class name.
  *
@@ -95,111 +54,11 @@ export const withInspectorControl = createHigherOrderComponent(
 				true
 			);
 
-			const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-			const blockStyles = useSelect(
-				( select ) =>
-					select( blocksStore ).getBlockStyles( props.name ),
-				[ props.name, props.attributes.className ]
-			);
-
-			const hasBlockStyles = blockStyles && !! blockStyles.length;
-
-			const activeStyle = hasBlockStyles
-				? getActiveStyle(
-						blockStyles,
-						props.attributes.className || ''
-				  )
-				: null;
-
-			const onSelectStyleClassName = ( style ) => {
-				const styleClassName = replaceActiveStyle(
-					props.attributes.className,
-					activeStyle,
-					style
-				);
-				updateBlockAttributes( props.clientId, {
-					className: styleClassName,
-				} );
-			};
-
-			const additionalClassNameContainerClasses = classnames(
-				'additional-class-name-control__container',
-				{
-					'has-block-styles': hasBlockStyles,
-				}
-			);
-
 			if ( hasCustomClassName && props.isSelected ) {
 				return (
 					<>
 						<BlockEdit { ...props } />
-						<InspectorControls __experimentalGroup="advanced">
-							<div
-								className={
-									additionalClassNameContainerClasses
-								}
-							>
-								<TextControl
-									className="additional-class-name-control__text-control"
-									autoComplete="off"
-									label={ __( 'Additional CSS class(es)' ) }
-									value={ props.attributes.className || '' }
-									onChange={ ( nextValue ) => {
-										props.setAttributes( {
-											className:
-												nextValue !== ''
-													? nextValue
-													: undefined,
-										} );
-									} }
-									help={ __(
-										'Separate multiple classes with spaces.'
-									) }
-								>
-									{ hasBlockStyles && (
-										<DropdownMenu
-											className="additional-class-name-control__block-style-dropdown"
-											icon={ moreVertical }
-											label={ __( 'Existing Styles' ) }
-										>
-											{ ( { onClose } ) => (
-												<MenuGroup
-													label={ __(
-														'Block style classes'
-													) }
-												>
-													{ blockStyles.map(
-														( style ) => {
-															return (
-																<CustomClassNameMenuItem
-																	style={
-																		style
-																	}
-																	key={
-																		style.label
-																	}
-																	isSelected={
-																		activeStyle?.name ===
-																		style.name
-																	}
-																	onClick={ () => {
-																		onSelectStyleClassName(
-																			style
-																		);
-																		onClose();
-																	} }
-																/>
-															);
-														}
-													) }
-												</MenuGroup>
-											) }
-										</DropdownMenu>
-									) }
-								</TextControl>
-							</div>
-						</InspectorControls>
+						<CustomClassNameControl { ...props } />
 					</>
 				);
 			}
