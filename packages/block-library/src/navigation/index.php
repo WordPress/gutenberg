@@ -151,7 +151,7 @@ function block_core_navigation_get_first_non_empty_navigation() {
 			'order'          => 'ASC',
 			'orderby'        => 'name',
 			'posts_per_page' => 1, // only the first post.
-			's'              => '<!--', // look for block indicators to ensure we only include non-empty Navigations.
+			's'              => '<!-- wp:', // look for block indicators to ensure we only include non-empty Navigations.
 		)
 	);
 	return count( $navigation_posts ) ? $navigation_posts[0] : null;
