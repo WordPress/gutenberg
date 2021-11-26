@@ -23,7 +23,7 @@ import { addQueryArgs } from '@wordpress/url';
 import {
 	home as siteIcon,
 	layout as templateIcon,
-	header as templatePartIcon,
+	symbolFilled as templatePartIcon,
 } from '@wordpress/icons';
 
 /**
