@@ -5,7 +5,6 @@ import {
 	toggleFeature,
 	setTemplate,
 	addTemplate,
-	removeTemplate,
 	setTemplatePart,
 	setPage,
 	showHomepage,
@@ -73,39 +72,6 @@ describe( 'actions', () => {
 				},
 				done: true,
 			} );
-		} );
-	} );
-
-	describe( 'removeTemplate', () => {
-		it( 'should issue a deleteEntityRecord request', () => {
-			const template = {
-				id: 'tt1-blocks//general',
-				type: 'wp_template_part',
-				title: {
-					raw: 'General Template',
-					rendered: 'General Template',
-				},
-			};
-
-			const it = removeTemplate( template );
-			expect( it.next().value ).toEqual( {
-				actionName: 'deleteEntityRecord',
-				args: [
-					'postType',
-					'wp_template_part',
-					'tt1-blocks//general',
-					{ force: true },
-				],
-				storeKey: 'core',
-				type: '@@data/DISPATCH',
-			} );
-			expect( it.next().value ).toEqual( {
-				actionName: 'createSuccessNotice',
-				args: [ '"General Template" removed.', { type: 'snackbar' } ],
-				storeKey: 'core/notices',
-				type: '@@data/DISPATCH',
-			} );
-			expect( it.next().done ).toBe( true );
 		} );
 	} );
 

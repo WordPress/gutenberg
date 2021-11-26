@@ -121,6 +121,18 @@ export function* removeTemplate( template ) {
 			{ force: true }
 		);
 
+		const lastError = yield controls.select(
+			coreStore,
+			'getLastEntityDeleteError',
+			'postType',
+			template.type,
+			template.id
+		);
+
+		if ( lastError ) {
+			throw lastError;
+		}
+
 		yield controls.dispatch(
 			noticesStore,
 			'createSuccessNotice',
