@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] [iOS] Fix scroll update when typing in RichText component [#36914]
 
 ## 1.67.0
 -   [**] Adds Clipboard Link Suggestion to Image block and Button block [#35972]
