@@ -105,6 +105,7 @@ As we're still early in the process, the number of blocks specifically dedicated
 -   Query
 -   Query Loop
 -   Query Pagination
+-   Pattern
 -   Post Title
 -   Post Content
 -   Post Author
@@ -123,6 +124,46 @@ As we're still early in the process, the number of blocks specifically dedicated
 ## Styling
 
 One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, the [Global Styles](/docs/how-to-guides/themes/theme-json.md) effort will provide a scaffolding for adding many theme styles in the future.
+
+## Internationalization (i18n)
+
+A pattern block can be used to insert translatable content inside a block template. Since those files are php-based, there is a mechanism to mark strings for translation or supply dynamic URLs.
+
+#### Example
+
+Register a pattern: 
+
+```php
+<?php
+register_block_pattern( 
+	'myblocktheme/wordpress-credit',
+	array(
+		'title'      => __( 'Wordpress credit', 'myblocktheme' ),
+		'content'    => '
+						<!-- wp:paragraph -->
+						<p>' .
+						sprintf(
+							/* Translators: WordPress link. */
+							esc_html__( 'Proudly Powered by %s', 'myblocktheme' ),
+							'<a href="' . esc_url( __( 'https://wordpress.org', 'myblocktheme' ) ) . '" rel="nofollow">WordPress</a>'
+						) . '</p>
+						<!-- /wp:paragraph -->',
+		'inserter'   => false
+	)
+);
+```
+
+Load the pattern in a template or template part:
+
+```html
+<!-- wp:group -->
+<div class="wp-block-group">
+<!-- wp:pattern {"slug":"myblocktheme/wordpress-credit"} /-->
+</div>
+<!-- /wp:group -->
+```
+
+You can read more about [internationalization in WordPress here](https://developer.wordpress.org/apis/handbook/internationalization/).
 
 ## Classic Themes
 
