@@ -65,7 +65,7 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const { gradients: gradientsPerOrigin } = useSetting( 'color' );
+	const { gradients: gradientsPerOrigin } = useSetting( 'color' ) || {};
 	const allGradients = useMemo(
 		() => [
 			...( gradientsPerOrigin?.custom || [] ),

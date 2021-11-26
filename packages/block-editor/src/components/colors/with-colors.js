@@ -45,7 +45,7 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			const { palette: colorPerOrigin } = useSetting( 'color' );
+			const { palette: colorPerOrigin } = useSetting( 'color' ) || {};
 			const allColors = useMemo(
 				() => [
 					...( colorPerOrigin?.custom || [] ),

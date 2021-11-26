@@ -87,10 +87,8 @@ export function getColorClassesAndStyles( attributes ) {
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
-	const {
-		palette: solidsPerOrigin,
-		gradients: gradientsPerOrigin,
-	} = useSetting( 'color' );
+	const { palette: solidsPerOrigin, gradients: gradientsPerOrigin } =
+		useSetting( 'color' ) || {};
 	const colors = useMemo(
 		() => [
 			...( solidsPerOrigin?.custom || [] ),

@@ -224,7 +224,7 @@ export function ColorEdit( props ) {
 		text: isTextEnabled,
 		background: isBackgroundEnabled,
 		link: isLinkEnabled,
-	} = useSetting( 'color' );
+	} = useSetting( 'color' ) || {};
 
 	const solidsEnabled =
 		areCustomSolidsEnabled ||
@@ -441,7 +441,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const { palette: solidsPerOrigin } = useSetting( 'color' );
+		const { palette: solidsPerOrigin } = useSetting( 'color' ) || {};
 		const colors = useMemo(
 			() => [
 				...( solidsPerOrigin?.custom || [] ),
