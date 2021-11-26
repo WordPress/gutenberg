@@ -27,6 +27,10 @@ export default function RenameMenuItem( { template, onClose } ) {
 		noticesStore
 	);
 
+	if ( template.is_custom ) {
+		return null;
+	}
+
 	async function onTemplateRename( event ) {
 		event.preventDefault();
 
