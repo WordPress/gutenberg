@@ -142,12 +142,12 @@ function Navigation( {
 				blockEditorStore
 			);
 			const blocks = getBlocks( clientId );
-			const didFindSubmenu = !! blocks.find(
+			const firstSubmenu = !! blocks.find(
 				( block ) => block.name === 'core/navigation-submenu'
 			);
 
 			return {
-				hasSubmenus: didFindSubmenu,
+				hasSubmenus: firstSubmenu,
 				innerBlocks: blocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
@@ -422,7 +422,7 @@ function Navigation( {
 												openSubmenusOnClick: value,
 												...( value && {
 													showSubmenuIcon: true,
-												} ), // make sure arrows are shown when we toggle this on.
+												} ), // Make sure arrows are shown when we toggle this on.
 											} );
 										} }
 										label={ __( 'Open on click' ) }
