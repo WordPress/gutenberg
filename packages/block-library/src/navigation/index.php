@@ -192,7 +192,9 @@ function block_core_navigation_get_fallback_blocks() {
 	$page_list_fallback = array(
 		array(
 			'blockName' => 'core/page-list',
-			'attrs'     => array(),
+			'attrs'     => array(
+				'__unstableMaxPages' => 4,
+			),
 		),
 	);
 
@@ -314,8 +316,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// If there are no inner blocks then fallback to rendering an appropriate fallback.
 	if ( empty( $inner_blocks ) ) {
-		$is_fallback                      = true; // indicate we are rendering the fallback.
-		$attributes['__unstableMaxPages'] = 4; // set value to be passed as context to Page List block.
+		$is_fallback = true; // indicate we are rendering the fallback.
 
 		$fallback_blocks = block_core_navigation_get_fallback_blocks();
 
