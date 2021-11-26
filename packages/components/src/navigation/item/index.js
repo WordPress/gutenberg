@@ -29,6 +29,7 @@ export default function NavigationItem( props ) {
 		navigateToMenu,
 		onClick = noop,
 		title,
+		icon,
 		hideIfTargetMenuEmpty,
 		isText,
 		...restProps
@@ -62,7 +63,7 @@ export default function NavigationItem( props ) {
 
 		onClick( event );
 	};
-	const icon = isRTL() ? chevronLeft : chevronRight;
+	const navigationIcon = isRTL() ? chevronLeft : chevronRight;
 	const baseProps = children ? props : { ...props, onClick: undefined };
 	const itemProps = isText
 		? restProps
@@ -75,9 +76,10 @@ export default function NavigationItem( props ) {
 					<NavigationItemBaseContent
 						title={ title }
 						badge={ badge }
+						icon={ icon }
 					/>
 
-					{ navigateToMenu && <Icon icon={ icon } /> }
+					{ navigateToMenu && <Icon icon={ navigationIcon } /> }
 				</ItemUI>
 			) }
 		</NavigationItemBase>
