@@ -68,6 +68,7 @@ function Actions( { template } ) {
 					{ isRemovable && (
 						<MenuItem
 							isDestructive
+							isTertiary
 							onClick={ () => {
 								removeTemplate( template );
 								onClose();
