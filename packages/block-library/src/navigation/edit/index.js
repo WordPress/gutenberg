@@ -134,13 +134,19 @@ function Navigation( {
 		`navigationMenu/${ ref }`
 	);
 
-	const { innerBlocks, isInnerBlockSelected } = useSelect(
+	const { innerBlocks, isInnerBlockSelected, hasSubmenus } = useSelect(
 		( select ) => {
 			const { getBlocks, hasSelectedInnerBlock } = select(
 				blockEditorStore
 			);
+			const blocks = getBlocks( clientId );
+			const firstSubmenu = !! blocks.find(
+				( block ) => block.name === 'core/navigation-submenu'
+			);
+
 			return {
-				innerBlocks: getBlocks( clientId ),
+				hasSubmenus: firstSubmenu,
+				innerBlocks: blocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
 		},
@@ -411,26 +417,35 @@ function Navigation( {
 									label={ __( 'Always' ) }
 								/>
 							</ToggleGroupControl>
-							<h3>{ __( 'Submenus' ) }</h3>
-							<ToggleControl
-								checked={ openSubmenusOnClick }
-								onChange={ ( value ) => {
-									setAttributes( {
-										openSubmenusOnClick: value,
-									} );
-								} }
-								label={ __( 'Open on click' ) }
-							/>
-							{ ! attributes.openSubmenusOnClick && (
-								<ToggleControl
-									checked={ showSubmenuIcon }
-									onChange={ ( value ) => {
-										setAttributes( {
-											showSubmenuIcon: value,
-										} );
-									} }
-									label={ __( 'Show icons' ) }
-								/>
+							{ hasSubmenus && (
+								<>
+									<h3>{ __( 'Submenus' ) }</h3>
+									<ToggleControl
+										checked={ openSubmenusOnClick }
+										onChange={ ( value ) => {
+											setAttributes( {
+												openSubmenusOnClick: value,
+												...( value && {
+													showSubmenuIcon: true,
+												} ), // Make sure arrows are shown when we toggle this on.
+											} );
+										} }
+										label={ __( 'Open on click' ) }
+									/>
+
+									<ToggleControl
+										checked={ showSubmenuIcon }
+										onChange={ ( value ) => {
+											setAttributes( {
+												showSubmenuIcon: value,
+											} );
+										} }
+										disabled={
+											attributes.openSubmenusOnClick
+										}
+										label={ __( 'Show arrow' ) }
+									/>
+								</>
 							) }
 						</PanelBody>
 					) }
