@@ -174,3 +174,9 @@
 	height: $grid-unit-40;
 	border-radius: 100%;
 }
+
+.edit-site-list.is-navigation-open .components-snackbar-list {
+	@include break-medium() {
+		margin-left: $nav-sidebar-width;
+	}
+}
