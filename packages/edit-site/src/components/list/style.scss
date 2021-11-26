@@ -114,3 +114,9 @@
 		border-top: none;
 	}
 }
+
+.edit-site-list.is-navigation-open .components-snackbar-list {
+	@include break-medium() {
+		margin-left: $nav-sidebar-width;
+	}
+}

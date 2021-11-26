@@ -14,7 +14,7 @@ import {
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -25,36 +25,37 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import MainDashboardButton from '../../main-dashboard-button';
+import { store as editSiteStore } from '../../../store';
 
 const SITE_EDITOR_KEY = 'site-editor';
 
-const NavigationPanel = ( {
-	isOpen,
-	setIsOpen,
-	activeItem = SITE_EDITOR_KEY,
-} ) => {
-	const siteTitle = useSelect( ( select ) => {
+const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
+	const { isNavigationOpen, siteTitle } = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreDataStore );
 
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-		return siteData.name;
+		return {
+			siteTitle: siteData.name,
+			isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
+		};
 	}, [] );
+	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
 	// Ensures focus is moved to the panel area when it is activated
 	// from a separate component (such as document actions in the header).
 	const panelRef = useRef();
 	useEffect( () => {
-		if ( isOpen ) {
+		if ( isNavigationOpen ) {
 			panelRef.current.focus();
 		}
-	}, [ activeItem, isOpen ] );
+	}, [ activeItem, isNavigationOpen ] );
 
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
-			setIsOpen( false );
+			setIsNavigationPanelOpened( false );
 		}
 	};
 
@@ -62,7 +63,7 @@ const NavigationPanel = ( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			className={ classnames( `edit-site-navigation-panel`, {
-				'is-open': isOpen,
+				'is-open': isNavigationOpen,
 			} ) }
 			ref={ panelRef }
 			tabIndex="-1"
