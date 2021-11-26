@@ -135,7 +135,7 @@ export function* removeTemplate( template ) {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'
 				? error.message
-				: __( 'An error occurred while removing the template.' );
+				: __( 'An error occurred while deleting the template.' );
 
 		yield controls.dispatch(
 			noticesStore,
