@@ -125,7 +125,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 		// the incoming value (which ranges 1-12) should be increased by 12 to match
 		// the expected 24-hour format.
 		let adjustedValue = value;
-		if ( is12Hour ) {
+		if ( name === 'hours' && is12Hour ) {
 			adjustedValue = from12hTo24h( value, am === 'PM' );
 		}
 
