@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -23,6 +24,9 @@ import isTemplateRevertable from '../../utils/is-template-revertable';
 function Actions( { template } ) {
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		noticesStore
+	);
 
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
@@ -32,8 +36,25 @@ function Actions( { template } ) {
 	}
 
 	async function revertAndSaveTemplate() {
-		await revertTemplate( template, { allowUndo: false } );
-		await saveEditedEntityRecord( 'postType', template.type, template.id );
+		try {
+			await revertTemplate( template, { allowUndo: false } );
+			await saveEditedEntityRecord(
+				'postType',
+				template.type,
+				template.id
+			);
+
+			createSuccessNotice( __( 'Template reverted.' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while reverting the template.' );
+
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		}
 	}
 
 	return (
