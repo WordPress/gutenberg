@@ -24,6 +24,11 @@ if ( ! function_exists( 'wp_get_global_settings' ) ) {
 	 * @return array The settings to retrieve.
 	 */
 	function wp_get_global_settings( $path = array(), $context = array() ) {
+		$pre_global_settings = apply_filters( 'pre_wp_get_global_settings', null, $path, $context );
+		if ( null !== $pre_global_settings ) {
+			return $pre_global_settings;
+		}
+
 		if ( ! empty( $context['block_name'] ) ) {
 			$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 		}
@@ -58,6 +63,11 @@ if ( ! function_exists( 'wp_get_global_styles' ) ) {
 	 * @return array The styles to retrieve.
 	 */
 	function wp_get_global_styles( $path = array(), $context = array() ) {
+		$pre_global_styles = apply_filters( 'pre_wp_get_global_styles', null, $path, $context );
+		if ( null !== $pre_global_styles ) {
+			return $pre_global_styles;
+		}
+
 		if ( ! empty( $context['block_name'] ) ) {
 			$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 		}
@@ -85,6 +95,11 @@ if ( ! function_exists( 'wp_get_global_stylesheet' ) ) {
 	 * @return string Stylesheet.
 	 */
 	function wp_get_global_stylesheet( $types = array() ) {
+		$pre_global_stylesheet = apply_filters( 'pre_wp_get_global_stylesheet', null, $types );
+		if ( null !== $pre_global_stylesheet ) {
+			return $pre_global_stylesheet;
+		}
+
 		// Return cached value if it can be used and exists.
 		// It's cached by theme to make sure that theme switching clears the cache.
 		$can_use_cached = (
