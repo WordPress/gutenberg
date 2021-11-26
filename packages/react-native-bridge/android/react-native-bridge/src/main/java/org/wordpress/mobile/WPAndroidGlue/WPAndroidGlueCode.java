@@ -39,6 +39,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.horcrux.svg.SvgPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
@@ -572,6 +573,7 @@ public class WPAndroidGlueCode {
                 new ReanimatedPackage(),
                 new RNPromptPackage(),
                 new RNCWebViewPackage(),
+                new ClipboardPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 

@@ -112,6 +112,7 @@ dependencies {
         api project(':react-native-reanimated')
         api project(':react-native-prompt-android')
         api project(':react-native-webview')
+        api project(':@react-native-clipboard_clipboard')
         debugRuntimeOnly "org.wordpress-mobile:hermes-debug-mirror:0.66.1"
         releaseRuntimeOnly "org.wordpress-mobile:hermes-release-mirror:0.66.1"
    }
