@@ -129,7 +129,7 @@
 	}
 }
 
-.edit-site-template__modal {
+.edit-site-list__rename-modal {
 	.components-base-control {
 		@include break-medium() {
 			width: $grid-unit * 40;
@@ -145,7 +145,7 @@
 	}
 }
 
-.edit-site-template__modal-actions {
+.edit-site-list__rename-modal-actions {
 	margin-top: $grid-unit-15;
 }
 

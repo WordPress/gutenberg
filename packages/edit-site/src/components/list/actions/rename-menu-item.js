@@ -50,7 +50,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }
-					overlayClassName="edit-site-template__modal"
+					overlayClassName="edit-site-list__rename-modal"
 				>
 					<form onSubmit={ onTemplateRename }>
 						<Flex align="flex-start" gap={ 8 }>
@@ -64,7 +64,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 						</Flex>
 
 						<Flex
-							className="edit-site-template__modal-actions"
+							className="edit-site-list__rename-modal-actions"
 							justify="flex-end"
 							expanded={ false }
 						>
