@@ -102,7 +102,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			self::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
 		}
 
-		return gutenberg_translate_settings_using_i18n_schema( self::$i18n_schema, $theme_json, $domain );
+		return wp_translate_settings_using_i18n_schema( self::$i18n_schema, $theme_json, $domain );
 	}
 
 	/**

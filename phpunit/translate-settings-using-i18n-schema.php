@@ -61,7 +61,7 @@ class Tests_L10n_TranslateSettingsUsingI18nSchema extends WP_UnitTestCase {
 				),
 			),
 		);
-		$result      = gutenberg_translate_settings_using_i18n_schema(
+		$result      = wp_translate_settings_using_i18n_schema(
 			$i18n_schema,
 			$settings,
 			$textdomain
