@@ -412,8 +412,11 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			'status'         => $template->status,
 			'wp_id'          => $template->wp_id,
 			'has_theme_file' => $template->has_theme_file,
-			'is_custom'      => $template->is_custom,
 		);
+
+		if ( 'wp_template' === $template->type ) {
+			$result['is_custom'] = $template->is_custom;
+		}
 
 		if ( 'wp_template_part' === $template->type ) {
 			$result['area'] = $template->area;
@@ -580,14 +583,17 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'is_custom'      => array(
-					'description' => __( 'Whether a template is a custom template.', 'gutenberg' ),
-					'type'        => 'bool',
-					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
-				),
 			),
 		);
+
+		if ( 'wp_template' === $this->post_type ) {
+			$schema['properties']['is_custom'] = array(
+				'description' => __( 'Whether a template is a custom template.', 'gutenberg' ),
+				'type'        => 'bool',
+				'context'     => array( 'embed', 'view', 'edit' ),
+				'readonly'    => true,
+			);
+		}
 
 		if ( 'wp_template_part' === $this->post_type ) {
 			$schema['properties']['area'] = array(

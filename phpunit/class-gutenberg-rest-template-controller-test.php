@@ -102,7 +102,6 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'wp_id'          => null,
 				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
 				'has_theme_file' => true,
-				'is_custom'      => true,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
 		);
@@ -158,7 +157,6 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'wp_id'          => null,
 				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
 				'has_theme_file' => true,
-				'is_custom'      => true,
 			),
 			$data
 		);
@@ -236,7 +234,6 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				),
 				'area'           => 'header',
 				'has_theme_file' => false,
-				'is_custom'      => true,
 			),
 			$data
 		);
