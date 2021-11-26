@@ -76,14 +76,66 @@ function gutenberg_get_editor_styles() {
 	return $styles;
 }
 
+/**
+ * Preloads data for the templates list page.
+ *
+ * @param WP_Post_Type $post_type The post type that the list page will show.
+ */
 function gutenberg_edit_site_list_preload_data( $post_type ) {
+	$posts_path = "/wp/v2/$post_type->rest_base?context=edit&per_page=-1";
+	$path       = untrailingslashit( $posts_path );
+	$path_parts = parse_url( $path );
+	$request    = new WP_REST_Request( 'GET', $path_parts['path'] );
+
+	if ( ! empty( $path_parts['query'] ) ) {
+		parse_str( $path_parts['query'], $query_params );
+		$request->set_query_params( $query_params );
+	}
+
+	$dynamic_preload_requests = array();
+	$response                 = rest_do_request( $request );
+
+	if ( 200 === $response->status ) {
+		$server = rest_get_server();
+		$posts  = (array) $server->response_to_data( $response, false );
+
+		foreach ( $posts as $post_data ) {
+			if ( ! empty( $post_data['author'] ) ) {
+				$author_id                  = $post_data['author'];
+				$dynamic_preload_requests[] = "/wp/v2/users/$author_id?context=edit";
+			}
+
+			if ( 'wp_template' === $post_data['type'] || 'wp_template_part' === $post_data['type'] ) {
+				$has_theme_origin_or_source =
+					( ! empty( $post_data['source'] ) && 'theme' === $post_data['source'] ) ||
+					( ! empty( $post_data['origin'] ) && 'theme' === $post_data['origin'] );
+
+				if ( $has_theme_origin_or_source ) {
+					$theme_id                   = $post_data['theme'];
+					$dynamic_preload_requests[] = "/wp/v2/themes/$theme_id?context=edit";
+				}
+
+				$has_plugin_origin_or_source =
+					( ! empty( $post_data['source'] ) && 'plugin' === $post_data['source'] ) ||
+					( ! empty( $post_data['origin'] ) && 'plugin' === $post_data['origin'] );
+
+				if ( $has_plugin_origin_or_source ) {
+					$plugin_id                  = $post_data['theme'];
+					$dynamic_preload_requests[] = "/wp/v2/plugins/$plugin_id?context=edit";
+				}
+			}
+		}
+	}
 
 	$preload_data = array_reduce(
-		array(
-			'/',
-			"/wp/v2/types/$post_type->name?context=edit",
-			'/wp/v2/types?context=edit',
-			"/wp/v2/$post_type->rest_base?context=edit&per_page=-1",
+		array_merge(
+			array(
+				'/',
+				"/wp/v2/types/$post_type->name?context=edit",
+				'/wp/v2/types?context=edit',
+				$posts_path,
+			),
+			array_unique( $dynamic_preload_requests )
 		),
 		'rest_preload_api_request',
 		array()
