@@ -72,13 +72,14 @@ function render_comments( $comments, $block ) {
 
 		// If the comment has children, recurse to create the HTML for the nested comments.
 		if ( ! empty( $comment['comment_children'] ) ) {
-			$block_content .= render_comments( $comment['comment_children'], $block );
+			$inner_content  = render_comments( $comment['comment_children'], $block );
+			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
 		}
 
 		$content .= '<li>' . $block_content . '</li>';
 	}
 
-	return sprintf( '<ol>%1$s</ol>', $content );
+	return $content;
 
 }
 
@@ -112,7 +113,9 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	// `comment_children` property.
 	$comment_tree = convert_to_tree( $comments );
 
-	return render_comments( $comment_tree, $block );
+	$wrapper_attributes = get_block_wrapper_attributes();
+
+	return sprintf( '<ol %1$s>%2$s</ol>', $wrapper_attributes, render_comments( $comment_tree, $block ) );
 }
 
 /**

@@ -1,5 +1,4 @@
 .wp-block-comment-template {
-	margin-top: 0;
 	margin-bottom: 0;
 	max-width: 100%;
 	list-style: none;
@@ -7,5 +6,12 @@
 
 	li {
 		clear: both;
+	}
+
+	ol {
+		margin-bottom: 0;
+		max-width: 100%;
+		list-style: none;
+		padding-left: 2rem;
 	}
 }
