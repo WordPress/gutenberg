@@ -1,20 +1,13 @@
 /**
- * WordPress dependencies
- */
-import { Icon } from '@wordpress/icons';
-
-/**
  * Internal dependencies
  */
 import { ItemBadgeUI, ItemTitleUI } from '../styles/navigation-styles';
 
 export default function NavigationItemBaseContent( props ) {
-	const { badge, title, icon } = props;
+	const { badge, title } = props;
 
 	return (
 		<>
-			{ icon && <Icon icon={ icon } /> }
-
 			{ title && (
 				<ItemTitleUI
 					className="components-navigation__item-title"

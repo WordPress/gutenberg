@@ -182,6 +182,10 @@ export const ItemUI = styled.div`
 	width: 100%;
 	color: inherit;
 	opacity: 0.7;
+
+	> svg {
+		margin-right: ${ space( 2 ) };
+	}
 `;
 
 export const ItemBadgeUI = styled.span`

@@ -73,10 +73,11 @@ export default function NavigationItem( props ) {
 		<NavigationItemBase { ...baseProps } className={ classes }>
 			{ children || (
 				<ItemUI { ...itemProps }>
+					{ icon && <Icon icon={ icon } /> }
+
 					<NavigationItemBaseContent
 						title={ title }
 						badge={ badge }
-						icon={ icon }
 					/>
 
 					{ navigateToMenu && <Icon icon={ navigationIcon } /> }
