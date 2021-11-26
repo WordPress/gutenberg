@@ -145,7 +145,7 @@ export default function CustomSelectControl( {
 			<ul
 				{ ...menuProps }
 				onKeyDown={ ( e ) => {
-					e.nativeEvent.stopImmediatePropagation();
+					e.stopPropagation();
 					menuProps.onKeyDown( e );
 				} }
 			>
