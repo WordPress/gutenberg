@@ -349,7 +349,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 
 		// ZIP file contains at least one HTML file.
 		$has_html_files = false;
-		$num_files      = $zip->numFiles;
+		$num_files      = $zip->numFiles; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		for ( $i = 0; $i < $num_files; $i++ ) {
 			$filename = $zip->getNameIndex( $i );
 			if ( '.html' === substr( $filename, -5 ) ) {
