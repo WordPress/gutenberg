@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] [iOS] Fix scroll update when typing in RichText component [#36914]
 
 ## 1.67.0
 -   [**] Adds Clipboard Link Suggestion to Image block and Button block [#35972]
@@ -23,14 +24,14 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fixed a race condition when autosaving content (Android) [#36072]
 
 ## 1.65.1
-- [**] Fixed a crash that could occur when copying lists from Microsoft Word. [https://github.com/WordPress/gutenberg/pull/36019]
+-   [**] Fixed a crash that could occur when copying lists from Microsoft Word. [https://github.com/WordPress/gutenberg/pull/36019]
 
 ## 1.65.0
-- [**] Search block - Text and background color support [#35511]
-- [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]
-* [*] Fixed an issue where the Help screens may not respect an iOS device's notch. [#35570]
-- [**] Block inserter indicates newly available block types [#35201]
-- [*] Add support for the Mark HTML tag [#35956]
+-   [**] Search block - Text and background color support [#35511]
+-   [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]
+-   [*] Fixed an issue where the Help screens may not respect an iOS device's notch. [#35570]
+-   [**] Block inserter indicates newly available block types [#35201]
+-   [*] Add support for the Mark HTML tag [#35956]
 
 ## 1.64.1
 -   [**] Fix updating the block list after block removal [#35721]
