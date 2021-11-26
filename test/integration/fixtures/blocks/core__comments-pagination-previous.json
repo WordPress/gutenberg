@@ -1,0 +1,25 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/comments-pagination-previous",
+		"isValid": true,
+		"attributes": {
+			"fontSize": "extra-large",
+			"style": {
+				"elements": {
+					"link": {
+						"color": {
+							"text": "#2405ff"
+						}
+					}
+				},
+				"typography": {
+					"fontStyle": "normal",
+					"fontWeight": "600"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

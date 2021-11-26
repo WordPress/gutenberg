@@ -1,0 +1,24 @@
+[
+	{
+		"blockName": "core/comments-pagination-previous",
+		"attrs": {
+			"fontSize": "extra-large",
+			"style": {
+				"elements": {
+					"link": {
+						"color": {
+							"text": "#2405ff"
+						}
+					}
+				},
+				"typography": {
+					"fontStyle": "normal",
+					"fontWeight": "600"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]
