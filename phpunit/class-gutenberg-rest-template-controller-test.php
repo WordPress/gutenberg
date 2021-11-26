@@ -163,7 +163,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	/**
 	 * Ticket 54507
 	 *
-	 * @dataProvider template_endpoint_urls
+	 * @dataProvider get_template_endpoint_urls
 	 */
 	public function test_get_item_works_with_a_single_slash( $endpoint_url ) {
 		wp_set_current_user( self::$admin_id );
