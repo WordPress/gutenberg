@@ -44,9 +44,7 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	async function createTemplate( { slug } ) {
 		try {
@@ -66,16 +64,14 @@ export default function NewTemplate( { postType } ) {
 				},
 			} );
 
-			createSuccessNotice(
-				__( 'Template created! Navigating to the editor…' ),
-				{ type: 'snackbar' }
-			);
-
 			// Navigate to the created template editor.
 			window.location.href = addQueryArgs( window.location.href, {
 				postId: template.id,
 				postType: 'wp_template',
 			} );
+
+			// Wait for async navigation to happen before closing the modal.
+			await new Promise( () => {} );
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'

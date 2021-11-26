@@ -11,7 +11,7 @@ import { useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -21,9 +21,7 @@ import CreateTemplatePartModal from '../create-template-part-modal';
 
 export default function NewTemplatePart( { postType } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -45,17 +43,6 @@ export default function NewTemplatePart( { postType } ) {
 				},
 			} );
 
-			createSuccessNotice(
-				sprintf(
-					/* translators: The template part title. */
-					__( '"%s" created! Navigating to the editor…' ),
-					title
-				),
-				{
-					type: 'snackbar',
-				}
-			);
-
 			// Navigate to the created template part editor.
 			window.location.href = addQueryArgs( window.location.href, {
 				postId: templatePart.id,
@@ -65,7 +52,9 @@ export default function NewTemplatePart( { postType } ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while creating the template part.' );
+					: __(
+							'An error occurred while creating the template part.'
+					  );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
