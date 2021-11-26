@@ -169,6 +169,36 @@ describe( 'TimePicker', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:00:00' );
 	} );
 
+	it( 'should allow to set the time correctly when the PM period is selected', () => {
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime="1986-10-18T11:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const pmButton = screen.getByText( 'PM' );
+		fireEvent.click( pmButton );
+
+		const hoursInput = screen.getByLabelText( 'Hours' );
+		fireEvent.change( hoursInput, { target: { value: '6' } } );
+		fireEvent.blur( hoursInput );
+
+		// When clicking on 'PM', we expect the time to be 11pm
+		expect( onChangeSpy ).toHaveBeenNthCalledWith(
+			1,
+			'1986-10-18T23:00:00'
+		);
+		// When changing the hours to '6', we expect the time to be 6pm
+		expect( onChangeSpy ).toHaveBeenNthCalledWith(
+			2,
+			'1986-10-18T18:00:00'
+		);
+	} );
+
 	it( 'should truncate at the minutes on change', () => {
 		const onChangeSpy = jest.fn();
 
