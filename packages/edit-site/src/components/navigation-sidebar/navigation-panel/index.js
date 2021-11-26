@@ -20,6 +20,11 @@ import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
+import {
+	home as siteIcon,
+	layout as templateIcon,
+	symbolFilled as templatePartIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -88,6 +93,7 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 						<NavigationMenu>
 							<NavigationGroup title={ __( 'Editor' ) }>
 								<NavigationItem
+									icon={ siteIcon }
 									title={ __( 'Site' ) }
 									item={ SITE_EDITOR_KEY }
 									href={ addQueryArgs( window.location.href, {
@@ -96,6 +102,7 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 									} ) }
 								/>
 								<NavigationItem
+									icon={ templateIcon }
 									title={ __( 'Templates' ) }
 									item="wp_template"
 									href={ addQueryArgs( window.location.href, {
@@ -104,6 +111,7 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 									} ) }
 								/>
 								<NavigationItem
+									icon={ templatePartIcon }
 									title={ __( 'Template Parts' ) }
 									item="wp_template_part"
 									href={ addQueryArgs( window.location.href, {
