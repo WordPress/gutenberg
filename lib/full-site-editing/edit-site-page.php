@@ -76,21 +76,7 @@ function gutenberg_get_editor_styles() {
 	return $styles;
 }
 
-/**
- * Initialize the Gutenberg Templates List Page.
- *
- * @param array $settings The editor settings.
- */
-function gutenberg_edit_site_list_init( $settings ) {
-	wp_enqueue_script( 'wp-edit-site' );
-	wp_enqueue_style( 'wp-edit-site' );
-	wp_enqueue_media();
-
-	$post_type = get_post_type_object( $_GET['postType'] );
-
-	if ( ! $post_type ) {
-		wp_die( __( 'Invalid post type.', 'gutenberg' ) );
-	}
+function gutenberg_edit_site_list_preload_data( $post_type ) {
 
 	$preload_data = array_reduce(
 		array(
@@ -111,6 +97,25 @@ function gutenberg_edit_site_list_init( $settings ) {
 		),
 		'after'
 	);
+}
+
+/**
+ * Initialize the Gutenberg Templates List Page.
+ *
+ * @param array $settings The editor settings.
+ */
+function gutenberg_edit_site_list_init( $settings ) {
+	wp_enqueue_script( 'wp-edit-site' );
+	wp_enqueue_style( 'wp-edit-site' );
+	wp_enqueue_media();
+
+	$post_type = get_post_type_object( $_GET['postType'] );
+
+	if ( ! $post_type ) {
+		wp_die( __( 'Invalid post type.', 'gutenberg' ) );
+	}
+
+	gutenberg_edit_site_list_preload_data( $post_type );
 
 	wp_add_inline_script(
 		'wp-edit-site',
