@@ -113,31 +113,42 @@ export default function GradientPicker( {
 	const Component = __experimentalHasMultipleOrigins
 		? MultipleOrigin
 		: SingleOrigin;
+
+	const actions = clearable && (
+		<CircularOptionPicker.ButtonAction onClick={ clearGradient }>
+			{ __( 'Clear' ) }
+		</CircularOptionPicker.ButtonAction>
+	);
+
+	if ( gradients?.length ) {
+		return (
+			<Component
+				className={ className }
+				clearable={ clearable }
+				clearGradient={ clearGradient }
+				gradients={ gradients }
+				onChange={ onChange }
+				value={ value }
+				actions={ actions }
+				content={
+					! disableCustomGradients && (
+						<CustomGradientPicker
+							value={ value }
+							onChange={ onChange }
+						/>
+					)
+				}
+			/>
+		);
+	}
+
 	return (
-		<Component
+		<CircularOptionPicker
 			className={ className }
-			clearable={ clearable }
-			clearGradient={ clearGradient }
-			gradients={ gradients }
-			onChange={ onChange }
-			value={ value }
-			actions={
-				clearable && (
-					<CircularOptionPicker.ButtonAction
-						onClick={ clearGradient }
-					>
-						{ __( 'Clear' ) }
-					</CircularOptionPicker.ButtonAction>
-				)
-			}
-			content={
-				! disableCustomGradients && (
-					<CustomGradientPicker
-						value={ value }
-						onChange={ onChange }
-					/>
-				)
-			}
-		/>
+			options={ [] }
+			actions={ actions }
+		>
+			<CustomGradientPicker value={ value } onChange={ onChange } />
+		</CircularOptionPicker>
 	);
 }
