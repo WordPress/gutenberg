@@ -102,8 +102,10 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$number = $block->context['queryPerPage'];
+
 	// Get an array of comments for the current post.
-	$comments = get_approved_comments( $post_id, array( 'number' => $block->context['queryPerPage'] ) );
+	$comments = get_approved_comments( $post_id, array( 'number' => $number ) );
 
 	if ( count( $comments ) === 0 ) {
 		return '';
