@@ -204,6 +204,32 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		);
 	}
 
+	/**
+	 * Ticket 54507
+	 *
+	 * @dataProvider get_template_ids_to_sanitize
+	 */
+	public function test_sanitize_template_id( $input_id, $sanitized_id ) {
+		$endpoint = new Gutenberg_REST_Templates_Controller( 'wp_template' );
+		$this->assertEquals(
+			$sanitized_id,
+			$endpoint->_sanitize_template_id( $input_id )
+		);
+	}
+
+	/**
+	 *
+	 */
+	public function get_template_ids_to_sanitize() {
+		return array(
+			array( 'tt1-blocks/index', 'tt1-blocks//index' ),
+			array( 'tt1-blocks//index', 'tt1-blocks//index' ),
+
+			array( 'theme-experiments/tt1-blocks/index', 'theme-experiments/tt1-blocks//index' ),
+			array( 'theme-experiments/tt1-blocks//index', 'theme-experiments/tt1-blocks//index' ),
+		);
+	}
+
 	public function test_create_item() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/templates' );
