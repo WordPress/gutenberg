@@ -92,6 +92,7 @@ export const PanelColorGradientSettingsInner = ( {
 	title,
 	showTitle = true,
 	__experimentalHasMultipleOrigins,
+	enableAlpha,
 	...props
 } ) => {
 	if (
@@ -143,6 +144,7 @@ export const PanelColorGradientSettingsInner = ( {
 						disableCustomColors,
 						disableCustomGradients,
 						__experimentalHasMultipleOrigins,
+						enableAlpha,
 						...setting,
 					} }
 				/>
