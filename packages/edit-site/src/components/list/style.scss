@@ -157,32 +157,6 @@
 
 .edit-site-list-added-by__icon {
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: $grid-unit-40;
-	height: $grid-unit-40;
-	background: $gray-800;
-	border-radius: 100%;
-
-	svg {
-		fill: $white;
-	}
-}
-
-.edit-site-list-added-by__avatar {
-	width: $grid-unit-40;
-	height: $grid-unit-40;
-	border-radius: 100%;
-}
-
-.edit-site-list.is-navigation-open .components-snackbar-list {
-	@include break-medium() {
-		margin-left: $nav-sidebar-width;
-	}
-}
-
-.edit-site-list-added-by__icon {
-	display: flex;
 	flex-shrink: 0;
 	position: relative;
 	align-items: center;
