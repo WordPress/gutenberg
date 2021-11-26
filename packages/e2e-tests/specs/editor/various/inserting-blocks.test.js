@@ -77,7 +77,7 @@ describe( 'Inserting blocks', () => {
 		).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
 
-		// Using the slash command
+		// Using the slash command.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/quote' );
 		await page.waitForXPath(
@@ -105,7 +105,7 @@ describe( 'Inserting blocks', () => {
 		await page.keyboard.press( 'Backspace' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Using the regular inserter
+		// Using the regular inserter.
 		await insertBlock( 'Preformatted' );
 		await page.keyboard.type( 'Pre block' );
 		await page.keyboard.press( 'Enter' );
@@ -130,7 +130,7 @@ describe( 'Inserting blocks', () => {
 		await page.click( '.editor-post-title__input' );
 		await closeGlobalBlockInserter();
 
-		// Using the between inserter
+		// Using the between inserter.
 		const insertionPoint = await page.$( '[data-type="core/quote"]' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
@@ -198,7 +198,7 @@ describe( 'Inserting blocks', () => {
 			'components-search-control__input'
 		);
 
-		// Tab to the block list
+		// Tab to the block list.
 		await page.keyboard.press( 'Tab' );
 
 		// Expect the block list to be the active element.
@@ -209,7 +209,7 @@ describe( 'Inserting blocks', () => {
 			'block-editor-block-types-list__item'
 		);
 
-		// Try using the up arrow key
+		// Try using the up arrow key.
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Expect the block list to still be the active element.
@@ -284,7 +284,7 @@ describe( 'Inserting blocks', () => {
 		await page.keyboard.type( 'Third paragraph' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Using the between inserter
+		// Using the between inserter.
 		const insertionPoint = await page.$( '[data-type="core/heading"]' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {

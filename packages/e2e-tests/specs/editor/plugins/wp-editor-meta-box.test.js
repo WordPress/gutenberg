@@ -22,7 +22,7 @@ describe( 'WP Editor Meta Boxes', () => {
 		// Add title to enable valid non-empty post save.
 		await page.type( '.editor-post-title__input', 'Hello Meta' );
 
-		// Type something
+		// Type something.
 		await expect( page ).toClick( '#test_tinymce_id-html' );
 		await page.type( '#test_tinymce_id', 'Typing in a metabox' );
 		await page.click( '#test_tinymce_id-tmce' );

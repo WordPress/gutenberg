@@ -102,7 +102,7 @@ function useMovingAnimation( {
 		}
 
 		if ( prefersReducedMotion ) {
-			// if the animation is disabled and the scroll needs to be adjusted,
+			// If the animation is disabled and the scroll needs to be adjusted,
 			// just move directly to the final scroll position.
 			preserveScrollPosition();
 

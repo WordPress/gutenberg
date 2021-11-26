@@ -13,7 +13,7 @@ import withState from '../';
  */
 import { Component } from '@wordpress/element';
 
-// this is needed because TestUtils does not accept a stateless component.
+// This is needed because TestUtils does not accept a stateless component.
 // anything run through a HOC ends up as a stateless component.
 const getTestComponent = ( WrappedComponent ) => {
 	class TestComponent extends Component {

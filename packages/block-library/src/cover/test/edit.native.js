@@ -33,7 +33,7 @@ jest.mock( '@wordpress/compose', () => ( {
 	) ),
 } ) );
 
-// Simplified tree to render Cover edit within slot
+// Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
 	<SlotFillProvider>
 		<BlockEdit isSelected name={ name } clientId={ 0 } { ...props } />
@@ -55,7 +55,7 @@ beforeAll( () => {
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
 
-	// Register required blocks
+	// Register required blocks.
 	registerBlockType( name, {
 		...metadata,
 		...settings,
@@ -69,10 +69,10 @@ beforeAll( () => {
 } );
 
 afterAll( () => {
-	// Restore mocks
+	// Restore mocks.
 	Image.getSize.mockRestore();
 
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	unregisterBlockType( name );
 	unregisterBlockType( 'core/paragraph' );
 } );

@@ -57,9 +57,9 @@ function InputField(
 	ref: Ref< HTMLInputElement >
 ) {
 	const {
-		// State
+		// State.
 		state,
-		// Actions
+		// Actions.
 		change,
 		commit,
 		drag,

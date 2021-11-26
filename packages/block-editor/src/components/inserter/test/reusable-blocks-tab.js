@@ -17,13 +17,13 @@ import items, { categories, collections } from './fixtures';
 import useBlockTypesState from '../hooks/use-block-types-state';
 
 jest.mock( '../hooks/use-block-types-state', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );

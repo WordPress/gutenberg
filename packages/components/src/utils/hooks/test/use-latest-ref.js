@@ -71,7 +71,7 @@ function incrementCountDebouncedRef() {
 
 describe( 'useLatestRef', () => {
 	describe( 'Example', () => {
-		// prove the example works as expected
+		// Prove the example works as expected.
 		it( 'should start at 0', () => {
 			render( <Example /> );
 			expect( getCount() ).toEqual( 'Count: 0' );

@@ -55,7 +55,7 @@ function ContrastChecker( {
 	backgroundColor,
 	fallbackBackgroundColor,
 	fallbackTextColor,
-	fontSize, // font size value in pixels
+	fontSize, // Font size value in pixels.
 	isLargeText,
 	textColor,
 } ) {

@@ -39,7 +39,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockTransformationsMenu from '../block-switcher/block-transformations-menu';
 
 const BlockActionsMenu = ( {
-	// Select
+	// Select.
 	blockTitle,
 	canInsertBlockType,
 	getBlocksByClientId,
@@ -53,7 +53,7 @@ const BlockActionsMenu = ( {
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
-	// Dispatch
+	// Dispatch.
 	createSuccessNotice,
 	convertToRegularBlocks,
 	duplicateBlock,
@@ -62,7 +62,7 @@ const BlockActionsMenu = ( {
 	openGeneralSidebar,
 	pasteBlock,
 	removeBlocks,
-	// Passed in
+	// Passed in.
 	anchorNodeRef,
 	isStackedHorizontally,
 	onDelete,

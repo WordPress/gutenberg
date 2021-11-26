@@ -15,21 +15,21 @@ import { setLocaleData } from '@wordpress/i18n';
 import { registerCoreBlocks } from '../..';
 
 beforeAll( () => {
-	// Mock translations
+	// Mock translations.
 	setLocaleData( {
 		'block title\u0004Table': [ 'Tabla' ],
 		"'%s' is not fully-supported": [ '«%s» no es totalmente compatible' ],
 	} );
 
-	// Register all core blocks
+	// Register all core blocks.
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
-	// Clean up translations
+	// Clean up translations.
 	setLocaleData( {} );
 
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
 	} );

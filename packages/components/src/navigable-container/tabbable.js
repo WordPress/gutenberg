@@ -27,7 +27,7 @@ export function TabbableContainer( { eventToOffset, ...props }, ref ) {
 		// - +1: move focus forward
 		// - -1: move focus backward
 		// -  0: don't move focus, but acknowledge event and thus stop it
-		// - undefined: do nothing, let the event propagate
+		// - undefined: do nothing, let the event propagate.
 		if ( eventToOffset ) {
 			return eventToOffset( evt );
 		}

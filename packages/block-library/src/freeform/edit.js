@@ -132,7 +132,7 @@ export default function ClassicEdit( {
 
 			editor.on( 'keydown', ( event ) => {
 				if ( isKeyboardEvent.primary( event, 'z' ) ) {
-					// Prevent the gutenberg undo kicking in so TinyMCE undo stack works as expected
+					// Prevent the gutenberg undo kicking in so TinyMCE undo stack works as expected.
 					event.stopPropagation();
 				}
 
@@ -141,7 +141,7 @@ export default function ClassicEdit( {
 						event.keyCode === DELETE ) &&
 					isTmceEmpty( editor )
 				) {
-					// delete the block
+					// Delete the block.
 					onReplace( [] );
 					event.preventDefault();
 					event.stopImmediatePropagation();

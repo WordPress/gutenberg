@@ -8,7 +8,7 @@ import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 function EditorKeyboardShortcutsRegister() {
-	// Registering the shortcuts
+	// Registering the shortcuts.
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {

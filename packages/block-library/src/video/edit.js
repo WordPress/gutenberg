@@ -91,9 +91,9 @@ function VideoEdit( {
 
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error
+			// In this case there was an error
 			// previous attributes should be removed
-			// because they may be temporary blob urls
+			// because they may be temporary blob urls.
 			setAttributes( {
 				src: undefined,
 				id: undefined,
@@ -102,8 +102,8 @@ function VideoEdit( {
 			return;
 		}
 
-		// sets the block's attribute and updates the edit component from the
-		// selected media
+		// Sets the block's attribute and updates the edit component from the
+		// selected media.
 		setAttributes( {
 			src: media.url,
 			id: media.id,

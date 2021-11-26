@@ -630,7 +630,7 @@ describe( 'state', () => {
 					controlledInnerBlocks: {},
 				} );
 
-				// the block object of the parent should be updated
+				// The block object of the parent should be updated.
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
 				);

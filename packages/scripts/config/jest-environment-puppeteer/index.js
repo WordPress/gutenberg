@@ -71,7 +71,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 
 		this.global.jestPuppeteer = {
 			debug: async () => {
-				// Set timeout to 4 days
+				// Set timeout to 4 days.
 				this.setTimeout( 345600000 );
 				// Run a debugger (in case Puppeteer has been launched with `{ devtools: true }`)
 				await this.global.page.evaluate( () => {
@@ -84,7 +84,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 						'\n\n🕵️‍  Code is paused, press enter to resume'
 					)
 				);
-				// Run an infinite promise
+				// Run an infinite promise.
 				return new Promise( ( resolve ) => {
 					const { stdin } = process;
 					const onKeyPress = ( key ) => {

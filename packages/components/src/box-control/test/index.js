@@ -99,7 +99,7 @@ describe( 'BoxControl', () => {
 							if ( next.top ) {
 								setState( next );
 							} else {
-								// This reverts it to being uncontrolled
+								// This reverts it to being uncontrolled.
 								setState( undefined );
 							}
 						} }
@@ -195,15 +195,15 @@ describe( 'BoxControl', () => {
 
 	describe( 'Unit selections', () => {
 		it( 'should update unlinked controls unit selection based on all input control', () => {
-			// Render control
+			// Render control.
 			render( <BoxControl /> );
 
-			// Make unit selection on all input control
+			// Make unit selection on all input control.
 			const allUnitSelect = screen.getByLabelText( 'Select unit' );
 			allUnitSelect.focus();
 			fireEvent.change( allUnitSelect, { target: { value: 'em' } } );
 
-			// Unlink the controls
+			// Unlink the controls.
 			const unlink = screen.getByLabelText( /Unlink Sides/ );
 			fireEvent.click( unlink );
 
@@ -213,15 +213,15 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should use individual side attribute unit when available', () => {
-			// Render control
+			// Render control.
 			const { rerender } = render( <BoxControl /> );
 
-			// Make unit selection on all input control
+			// Make unit selection on all input control.
 			const allUnitSelect = screen.getByLabelText( 'Select unit' );
 			allUnitSelect.focus();
 			fireEvent.change( allUnitSelect, { target: { value: 'vw' } } );
 
-			// Unlink the controls
+			// Unlink the controls.
 			const unlink = screen.getByLabelText( /Unlink Sides/ );
 			fireEvent.click( unlink );
 

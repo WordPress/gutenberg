@@ -241,7 +241,7 @@ function Sandbox( {
 	}
 
 	function checkMessageForResize( event ) {
-		// Attempt to parse the message data as JSON if passed as string
+		// Attempt to parse the message data as JSON if passed as string.
 		let data = event.nativeEvent.data || {};
 
 		if ( 'string' === typeof data ) {

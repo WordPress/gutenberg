@@ -10,7 +10,7 @@ describe( 'add', () => {
 		expect( add( '105', 30 ) ).toBe( 135 );
 		expect( add( 105, '30' ) ).toBe( 135 );
 
-		// Negative values
+		// Negative values.
 		expect( add( 100, '-30' ) ).toBe( 70 );
 		expect( add( -100, '-30' ) ).toBe( -130 );
 	} );
@@ -27,7 +27,7 @@ describe( 'subtract', () => {
 		expect( subtract( '105', 30 ) ).toBe( 75 );
 		expect( subtract( 105, '30' ) ).toBe( 75 );
 
-		// Negative values
+		// Negative values.
 		expect( subtract( 100, '-30' ) ).toBe( 130 );
 		expect( subtract( -100, '-30' ) ).toBe( -70 );
 	} );

@@ -164,7 +164,7 @@ export const marks = () => {
 	const minNegative = { min: -10, max: 10, step: 1 };
 	const rangeNegative = { min: -10, max: -1, step: 1 };
 
-	// use a short alias to keep formatting to fewer lines
+	// Use a short alias to keep formatting to fewer lines.
 	const Range = RangeControlLabeledByMarksType;
 
 	return (

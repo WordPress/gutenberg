@@ -33,7 +33,7 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 	};
 
 	const handleOnChange = ( nextValue ) => {
-		// Set the next value without modification if lineHeight has been defined
+		// Set the next value without modification if lineHeight has been defined.
 		if ( isDefined ) {
 			onChange( nextValue );
 			return;
@@ -49,11 +49,11 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 
 		switch ( nextValue ) {
 			case `${ STEP }`:
-				// Increment by step value
+				// Increment by step value.
 				adjustedNextValue = BASE_DEFAULT_VALUE + STEP;
 				break;
 			case '0':
-				// Decrement by step value
+				// Decrement by step value.
 				adjustedNextValue = BASE_DEFAULT_VALUE - STEP;
 				break;
 		}

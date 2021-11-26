@@ -24,7 +24,7 @@ export const _default = () => {
 	const props = {
 		margin: number( 'margin', 0 ),
 	};
-	// make the border color black to give higher contrast and help it appear in storybook better
+	// Make the border color black to give higher contrast and help it appear in storybook better.
 	return <BlackDivider { ...props } />;
 };
 

@@ -77,10 +77,10 @@ describe( 'InputControl', () => {
 			input.focus();
 			fireEvent.change( input, { target: { value: 'two' } } );
 
-			// Ensuring <InputControl /> is controlled
+			// Ensuring <InputControl /> is controlled.
 			fireEvent.blur( input );
 
-			// Updating the value
+			// Updating the value.
 			rerender( <InputControl value="three" onChange={ spy } /> );
 
 			expect( input.value ).toBe( 'three' );
@@ -103,12 +103,12 @@ describe( 'InputControl', () => {
 
 			// Assuming <InputControl /> is controlled (not focused)
 
-			// Updating the value
+			// Updating the value.
 			rerender( <InputControl value="New" onChange={ spy } /> );
 
 			expect( input.value ).toBe( 'New' );
 
-			// Change it back to the original value
+			// Change it back to the original value.
 			rerender( <InputControl value="Original" onChange={ spy } /> );
 
 			expect( input.value ).toBe( 'Original' );

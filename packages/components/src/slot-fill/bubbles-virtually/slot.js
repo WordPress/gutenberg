@@ -33,8 +33,9 @@ function Slot(
 		// of fillProps.
 	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
 
+	// eslint-disable-next-line @wordpress/comment-case
 	// fillProps may be an update that interacts with the layout, so we
-	// useLayoutEffect
+	// useLayoutEffect.
 	useLayoutEffect( () => {
 		registry.updateSlot( name, fillProps );
 	} );

@@ -131,7 +131,7 @@ describe( 'Table', () => {
 		// Expect the table to have a header, body and footer with written content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Toggle off the switches
+		// Toggle off the switches.
 		await headerSwitch[ 0 ].click();
 		await footerSwitch[ 0 ].click();
 

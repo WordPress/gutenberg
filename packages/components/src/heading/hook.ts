@@ -63,7 +63,7 @@ export function useHeading(
 		'aria-level'?: number;
 	} = {};
 	if ( typeof as === 'string' && as[ 0 ] !== 'h' ) {
-		// if not a semantic `h` element, add a11y props:
+		// If not a semantic `h` element, add a11y props:
 		a11yProps.role = 'heading';
 		a11yProps[ 'aria-level' ] =
 			typeof level === 'string' ? parseInt( level ) : level;

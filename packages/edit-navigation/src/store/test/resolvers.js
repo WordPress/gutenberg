@@ -38,7 +38,7 @@ jest.mock( '@wordpress/blocks', () => {
 } );
 
 function createRegistryWithStores() {
-	// create a registry and register stores
+	// Create a registry and register stores.
 	const registry = createRegistry();
 
 	registry.register( editNavigationStore );

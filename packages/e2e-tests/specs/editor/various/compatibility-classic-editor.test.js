@@ -28,7 +28,7 @@ describe( 'Compatibility with classic editor', () => {
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
-		// Check the the content doesn't contain <p> tags
+		// Check the the content doesn't contain <p> tags.
 		await page.waitForSelector( '.entry-content' );
 		const content = await page.$eval( '.entry-content', ( element ) =>
 			element.innerHTML.trim()

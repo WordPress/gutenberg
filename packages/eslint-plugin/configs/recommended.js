@@ -50,7 +50,7 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				// Don't require redundant JSDoc types in TypeScript files.
 				'jsdoc/require-param-type': 'off',
 				'jsdoc/require-returns-type': 'off',
-				// handled by TS itself
+				// Handled by TS itself.
 				'no-unused-vars': 'off',
 			},
 		},

@@ -79,7 +79,7 @@ function computeAnchorRect(
 
 		// Duck-type to check if `anchorRef` is an instance of Range
 		// `anchorRef instanceof window.Range` checks will break across document boundaries
-		// such as in an iframe
+		// such as in an iframe.
 		if ( typeof anchorRef?.cloneRange === 'function' ) {
 			return offsetIframe(
 				getRectangleFromRange( anchorRef ),
@@ -90,7 +90,7 @@ function computeAnchorRect(
 
 		// Duck-type to check if `anchorRef` is an instance of Element
 		// `anchorRef instanceof window.Element` checks will break across document boundaries
-		// such as in an iframe
+		// such as in an iframe.
 		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
 			const rect = offsetIframe(
 				anchorRef.getBoundingClientRect(),
@@ -389,7 +389,7 @@ const Popover = (
 				typeof contentWidth === 'number' ? contentWidth + 'px' : ''
 			);
 
-			// Compute the animation position
+			// Compute the animation position.
 			const yAxisMapping = {
 				top: 'bottom',
 				bottom: 'top',

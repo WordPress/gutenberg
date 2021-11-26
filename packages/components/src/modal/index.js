@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 
 /**
  * External dependencies
@@ -45,9 +45,9 @@ function Modal( props, forwardedRef ) {
 		focusOnMount = true,
 		shouldCloseOnEsc = true,
 		shouldCloseOnClickOutside = true,
-		isDismissable, // Deprecated
+		isDismissable, // Deprecated.
 		isDismissible = isDismissable || true,
-		/* accessibility */
+		/* Accessibility. */
 		aria = {
 			labelledby: null,
 			describedby: null,

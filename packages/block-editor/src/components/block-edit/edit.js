@@ -55,7 +55,7 @@ export const Edit = ( props ) => {
 		return <Component { ...props } context={ context } />;
 	}
 
-	// Generate a class name for the block's editable form
+	// Generate a class name for the block's editable form.
 	const generatedClassName = hasBlockSupport( blockType, 'className', true )
 		? getBlockDefaultClassName( name )
 		: null;

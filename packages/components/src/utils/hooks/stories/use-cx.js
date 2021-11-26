@@ -41,7 +41,7 @@ const IFrame = ( { children } ) => {
 		}
 
 		node.addEventListener( 'load', () => {
-			// iframe isn't immediately ready in Firefox
+			// Iframe isn't immediately ready in Firefox.
 			setIfReady();
 		} );
 	};

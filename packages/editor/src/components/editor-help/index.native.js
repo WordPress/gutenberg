@@ -133,7 +133,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 												<Text style={ sectionTitle }>
 													{ __( 'The basics' ) }
 												</Text>
-												{ /* Print out help topics */ }
+												{ /* Print out help topics. */ }
 												{ HELP_TOPICS.map(
 													( { label, icon } ) => {
 														const labelSlug = kebabCase(
@@ -187,7 +187,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 							</BottomSheetConsumer>
 						</View>
 					</BottomSheet.NavigationScreen>
-					{ /* Print out help detail screens */ }
+					{ /* Print out help detail screens. */ }
 					{ HELP_TOPICS.map( ( { view, label } ) => {
 						const labelSlug = kebabCase( label );
 						return (

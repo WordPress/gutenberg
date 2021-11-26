@@ -14,7 +14,7 @@ describe( 'adding blocks', () => {
 	} );
 
 	it( 'Should switch to the large style of the quote block', async () => {
-		// Inserting a quote block
+		// Inserting a quote block.
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'Quote content' );
 
@@ -25,7 +25,7 @@ describe( 'adding blocks', () => {
 		);
 		await largeStyleButton.click();
 
-		// Check the content
+		// Check the content.
 		const content = await getEditedPostContent();
 		expect( content ).toMatchSnapshot();
 	} );

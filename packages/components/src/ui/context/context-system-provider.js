@@ -54,9 +54,9 @@ function useContextSystemBridge( { value } ) {
 
 	useUpdateEffect( () => {
 		if (
-			// objects are equivalent
+			// Objects are equivalent.
 			isEqual( valueRef.current, value ) &&
-			// but not the same reference
+			// But not the same reference.
 			valueRef.current !== value
 		) {
 			warn( `Please memoize your context: ${ JSON.stringify( value ) }` );

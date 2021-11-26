@@ -183,7 +183,7 @@ export default function useTabNav() {
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
 			const target = focus.tabbable[ direction ]( event.target );
-			// only do something when the next tabbable is a focus capture div (before/after)
+			// Only do something when the next tabbable is a focus capture div (before/after)
 			if (
 				target === focusCaptureBeforeRef.current ||
 				target === focusCaptureAfterRef.current

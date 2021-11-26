@@ -297,7 +297,7 @@ function wrapperSelector( select ) {
 	const { name, attributes = {}, isValid } = getBlock( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
 
-	// Get Block List Settings for all ancestors of the current Block clientId
+	// Get Block List Settings for all ancestors of the current Block clientId.
 	const parentBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
 		blockParentsClientIds
 	);

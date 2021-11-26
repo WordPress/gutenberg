@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 import BlockAlignmentUI from '../ui';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );

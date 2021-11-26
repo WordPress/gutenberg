@@ -251,7 +251,7 @@ function GalleryEdit( props ) {
 			id: newImageId,
 		} );
 
-		// if the attachment caption is updated
+		// If the attachment caption is updated.
 		if ( attachment && attachment.caption !== newImage.caption ) {
 			return newImage.caption;
 		}
@@ -368,15 +368,16 @@ function GalleryEdit( props ) {
 	}, [] );
 
 	useEffect( () => {
-		// Deselect images when deselecting the block
+		// Deselect images when deselecting the block.
 		if ( ! isSelected ) {
 			setSelectedImage();
 		}
 	}, [ isSelected ] );
 
 	useEffect( () => {
+		// eslint-disable-next-line @wordpress/comment-case
 		// linkTo attribute must be saved so blocks don't break when changing
-		// image_default_link_type in options.php
+		// image_default_link_type in options.php.
 		if ( ! linkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
@@ -466,7 +467,7 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ /* TODO: Remove platform condition when native conversion is ready */ }
+			{ /* TODO: Remove platform condition when native conversion is ready. */ }
 			{ Platform.isWeb && __unstableGalleryWithImageBlocks && (
 				<BlockControls group="other">
 					<ToolbarButton

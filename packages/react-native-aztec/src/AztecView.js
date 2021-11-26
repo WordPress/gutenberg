@@ -194,7 +194,7 @@ class AztecView extends Component {
 	_onPress( event ) {
 		if ( ! this.isFocused() ) {
 			this.focus(); // Call to move the focus in RN way (TextInputState)
-			this._onFocus( event ); // Check if there are listeners set on the focus event
+			this._onFocus( event ); // Check if there are listeners set on the focus event.
 		}
 	}
 
@@ -221,7 +221,7 @@ class AztecView extends Component {
 				"Removing lineHeight style as it's not supported by native AztecView"
 			);
 			// Prevents passing line-heigth within styles to avoid a crash due to values without units
-			// We now support this but passing line-height as a prop instead
+			// We now support this but passing line-height as a prop instead.
 		}
 
 		return (

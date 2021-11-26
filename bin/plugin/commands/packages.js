@@ -60,7 +60,7 @@ async function runWordPressReleaseBranchSyncStep(
 				packageJsonPath
 			);
 
-			// Creating the release branch
+			// Creating the release branch.
 			await git.checkoutRemoteBranch(
 				gitWorkingDirectoryPath,
 				wordpressReleaseBranch
@@ -207,7 +207,7 @@ async function updatePackages(
 				nextVersion,
 				version,
 			} ) => {
-				// Update changelog
+				// Update changelog.
 				const content = await fs.promises.readFile(
 					changelogPath,
 					'utf8'
@@ -224,7 +224,7 @@ async function updatePackages(
 					)
 				);
 
-				// Update package.json
+				// Update package.json.
 				const packageJson = readJSONFile( packageJSONPath );
 				const newPackageJson = {
 					...packageJson,

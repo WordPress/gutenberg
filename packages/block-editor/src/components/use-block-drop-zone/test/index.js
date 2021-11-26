@@ -22,7 +22,7 @@ const elementData = [
 		bottom: 900,
 		right: 400,
 	},
-	// Fourth block wraps to the next row/column
+	// Fourth block wraps to the next row/column.
 	{
 		top: 0,
 		left: 400,

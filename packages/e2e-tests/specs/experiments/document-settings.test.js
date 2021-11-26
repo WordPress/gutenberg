@@ -41,13 +41,13 @@ describe( 'Document Settings', () => {
 
 	describe( 'when a template is selected from the navigation sidebar', () => {
 		it( 'should display the selected templates name in the document header', async () => {
-			// Navigate to a template
+			// Navigate to a template.
 			await siteEditor.visit( {
 				postId: 'tt1-blocks//index',
 				postType: 'wp_template',
 			} );
 
-			// Evaluate the document settings title
+			// Evaluate the document settings title.
 			const actual = await getDocumentSettingsTitle();
 
 			expect( actual ).toEqual( 'Index' );
@@ -67,7 +67,7 @@ describe( 'Document Settings', () => {
 					'button[aria-label="Close list view sidebar"]'
 				);
 
-				// Evaluate the document settings secondary title
+				// Evaluate the document settings secondary title.
 				const actual = await getDocumentSettingsSecondaryTitle();
 
 				expect( actual ).toEqual( 'Header' );
@@ -77,13 +77,13 @@ describe( 'Document Settings', () => {
 
 	describe( 'when a template part is selected from the navigation sidebar', () => {
 		it( "should display the selected template part's name in the document header", async () => {
-			// Navigate to a template part
+			// Navigate to a template part.
 			await siteEditor.visit( {
 				postId: 'tt1-blocks//header',
 				postType: 'wp_template_part',
 			} );
 
-			// Evaluate the document settings title
+			// Evaluate the document settings title.
 			const actual = await getDocumentSettingsTitle();
 
 			expect( actual ).toEqual( 'header' );

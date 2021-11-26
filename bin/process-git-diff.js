@@ -1,3 +1,4 @@
+/* eslint-disable @wordpress/comment-case */
 // npm will introduce changes to a `package-lock.json` file for optional
 // dependencies varying on environment. If the only changes are the
 // addition of an "optional" flag in `package-lock.json` file from
@@ -23,7 +24,7 @@
 // -                       "dev": true
 // +                       "dev": true,
 // +                       "optional": true
-
+/* eslint-enable @wordpress/comment-case */
 const hasNonOptionalDiff = !! ( process.argv[ 2 ] || '' )
 	// Strip individual diffs of optional-only.
 	.replace( /@@ .+ @@\n(-.+\n\+.+,\n)?\+.+\"optional\": true,?\n/gm, '' )

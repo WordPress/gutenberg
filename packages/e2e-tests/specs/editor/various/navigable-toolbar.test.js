@@ -38,7 +38,7 @@ describe.each( [
 		// until starting to type within it.
 		await page.keyboard.type( 'Example' );
 
-		// Upward
+		// Upward.
 		await pressKeyWithModifier( 'alt', 'F10' );
 		expect( await isInBlockToolbar() ).toBe( true );
 	} );

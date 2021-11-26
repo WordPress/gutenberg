@@ -71,14 +71,14 @@ describe.each( [
 	 */
 	// eslint-disable-next-line jest/no-done-callback
 	it( 'should display the LINK SETTINGS with an EMPTY LINK TO field.', async ( done ) => {
-		// Arrange
+		// Arrange.
 		const expectation =
 			'The LINK SETTINGS > LINK TO field SHOULD be displayed WITHOUT a URL from the CLIPBOARD.';
 		const url = 'https://tonytahmouchtest.files.wordpress.com';
 		const subject = await initializeEditor( { initialHtml } );
 		Clipboard.getString.mockReturnValue( url );
 
-		// Act
+		// Act.
 		try {
 			const block = await waitFor( () =>
 				subject.getByA11yLabel(
@@ -94,7 +94,7 @@ describe.each( [
 			done.fail( error );
 		}
 
-		// Assert
+		// Assert.
 		try {
 			await waitFor( () =>
 				subject.getByA11yLabel(
@@ -119,14 +119,14 @@ describe.each( [
 			 */
 			// eslint-disable-next-line jest/no-done-callback
 			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async ( done ) => {
-				// Arrange
+				// Arrange.
 				const expectation =
 					'The LINK PICKER > LINK SUGGESTION SHOULD NOT suggest the URL from the CLIPBOARD.';
 				const url = 'tonytahmouchtest.files.wordpress.com';
 				const subject = await initializeEditor( { initialHtml } );
 				Clipboard.getString.mockReturnValue( url );
 
-				// Act
+				// Act.
 				try {
 					const block = await waitFor( () =>
 						subject.getByA11yLabel(
@@ -165,7 +165,7 @@ describe.each( [
 					done.fail( error );
 				}
 
-				// Assert
+				// Assert.
 				waitFor(
 					() =>
 						subject.getByA11yLabel(
@@ -187,14 +187,14 @@ describe.each( [
 			 */
 			// eslint-disable-next-line jest/no-done-callback
 			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async ( done ) => {
-				// Arrange
+				// Arrange.
 				const expectation =
 					'The LINK PICKER > LINK SUGGESTION SHOULD NOT suggest the URL from the CLIPBOARD.';
 				const url = 'https://tonytahmouchtest.files.wordpress.com';
 				const subject = await initializeEditor( { initialHtml } );
 				Clipboard.getString.mockReturnValue( url );
 
-				// Act
+				// Act.
 				try {
 					const block = await waitFor( () =>
 						subject.getByA11yLabel(
@@ -256,7 +256,7 @@ describe.each( [
 					done.fail( error );
 				}
 
-				// Assert
+				// Assert.
 				waitFor(
 					() =>
 						subject.getByA11yLabel(
@@ -281,7 +281,7 @@ describe.each( [
 					' with the URL from the CLIPBOARD.',
 				// eslint-disable-next-line jest/no-done-callback
 				async ( done ) => {
-					// Arrange
+					// Arrange.
 					const url = 'https://tonytahmouchtest.files.wordpress.com';
 					const expectation =
 						'The LINK PICKER > LINK SUGGESTION SHOULD suggest the URL from the CLIPBOARD, e.g.,' +
@@ -292,7 +292,7 @@ describe.each( [
 					const subject = await initializeEditor( { initialHtml } );
 					Clipboard.getString.mockReturnValue( url );
 
-					// Act
+					// Act.
 					try {
 						const block = await waitFor( () =>
 							subject.getByA11yLabel(
@@ -335,7 +335,7 @@ describe.each( [
 						done.fail( error );
 					}
 
-					// Assert
+					// Assert.
 					try {
 						await waitFor( () => subject.getByText( url ) );
 						await waitFor( () =>
@@ -360,14 +360,14 @@ describe.each( [
 					' populated in the LINK TO field.',
 				// eslint-disable-next-line jest/no-done-callback
 				async ( done ) => {
-					// Arrange
+					// Arrange.
 					const expectation =
 						'The LINK SETTINGS > LINK TO field SHOULD be displayed WITH a URL from the CLIPBOARD.';
 					const url = 'https://tonytahmouchtest.files.wordpress.com';
 					const subject = await initializeEditor( { initialHtml } );
 					Clipboard.getString.mockReturnValue( url );
 
-					// Act
+					// Act.
 					try {
 						const block = await waitFor( () =>
 							subject.getByA11yLabel(
@@ -412,7 +412,7 @@ describe.each( [
 						done.fail( error );
 					}
 
-					// Assert
+					// Assert.
 					try {
 						await waitFor( () =>
 							subject.getByA11yLabel(

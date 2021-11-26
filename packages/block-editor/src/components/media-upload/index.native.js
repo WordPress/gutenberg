@@ -79,7 +79,7 @@ export class MediaUpload extends Component {
 
 	getAllSources() {
 		const cameraImageSource = {
-			id: mediaSources.deviceCamera, // ID is the value sent to native
+			id: mediaSources.deviceCamera, // ID is the value sent to native.
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 			label: __( 'Take a Photo' ),
 			requiresModal: true,
@@ -205,6 +205,7 @@ export class MediaUpload extends Component {
 
 		if ( value === URL_MEDIA_SOURCE ) {
 			prompt(
+				/* eslint-disable @wordpress/comment-case */
 				__( 'Type a URL' ), // title
 				undefined, // message
 				[
@@ -216,12 +217,13 @@ export class MediaUpload extends Component {
 						text: __( 'Apply' ),
 						onPress: onSelectURL,
 					},
-				], // buttons
+				], // Buttons.
 				'plain-text', // type
 				undefined, // defaultValue
 				'url' // keyboardType
 			);
 			return;
+			/* eslint-enable @wordpress/comment-case */
 		}
 
 		const mediaSource = this.getAllSources()

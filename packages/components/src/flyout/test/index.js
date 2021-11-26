@@ -44,7 +44,7 @@ describe( 'props', () => {
 
 		const flyouts = screen.getAllByRole( 'dialog' );
 		const trigger = screen.getByText( invisibleFlyoutTriggerContent );
-		// assert only the base flyout rendered
+		// Assert only the base flyout rendered.
 		expect( flyouts ).toHaveLength( 1 );
 		expect( flyouts[ 0 ].id ).toBe( baseFlyoutId );
 		expect( trigger ).not.toBeUndefined();

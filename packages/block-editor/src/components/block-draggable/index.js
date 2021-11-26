@@ -52,7 +52,7 @@ const BlockDraggable = ( {
 		blockEditorStore
 	);
 
-	// Stop dragging blocks if the block draggable is unmounted
+	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
 		return () => {
 			if ( isDragging.current ) {

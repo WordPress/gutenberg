@@ -60,12 +60,12 @@ function ToggleGroupControl(
 		state: value,
 	} );
 
-	// Propagate radio.state change
+	// Propagate radio.state change.
 	useUpdateEffect( () => {
 		onChange( radio.state );
 	}, [ radio.state ] );
 
-	// Sync incoming value with radio.state
+	// Sync incoming value with radio.state.
 	useUpdateEffect( () => {
 		if ( value !== radio.state ) {
 			radio.setState( value );

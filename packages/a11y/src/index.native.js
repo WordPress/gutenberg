@@ -11,7 +11,7 @@ import filterMessage from './filter-message';
  */
 export function speak( message, ariaLive ) {
 	message = filterMessage( message );
-	//TODO: Use native module to speak message
+	// TODO: Use native module to speak message.
 	if ( ariaLive === 'assertive' ) {
 	} else {
 	}

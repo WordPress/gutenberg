@@ -260,8 +260,8 @@ describe( 'FormTokenField', () => {
 				'th',
 			] );
 
-			// before sending a hover event, we need to wait for
-			// SuggestionList#_scrollingIntoView to become false
+			// Before sending a hover event, we need to wait for
+			// SuggestionList#_scrollingIntoView to become false.
 			jest.advanceTimersByTime( 100 );
 
 			TestUtils.Simulate.mouseEnter( hoverSuggestion );

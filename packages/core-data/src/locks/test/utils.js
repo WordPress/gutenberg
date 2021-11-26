@@ -193,13 +193,13 @@ describe( 'deepCopyLocksTreePath', () => {
 		expect( deepCopy.children ).not.toBe( tree.children );
 		expect( deepCopy.children.target ).not.toBe( tree.children.target );
 
-		// Locks lists should be preserved
+		// Locks lists should be preserved.
 		expect( deepCopy.locks ).toBe( tree.locks );
 		expect( deepCopy.children.target.locks ).toBe(
 			tree.children.target.locks
 		);
 
-		// Specific locks should be preserved
+		// Specific locks should be preserved.
 		expect( deepCopy.locks[ 0 ] ).toBe( tree.locks[ 0 ] );
 
 		// No need to clone lower levels of the tree, let's check if they're still the same:

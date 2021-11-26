@@ -16,7 +16,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		}
 
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
-		// Should have 3 paragraph blocks at this point
+		// Should have 3 paragraph blocks at this point.
 
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
@@ -96,7 +96,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		}
 
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
-		// Should have 3 paragraph blocks at this point
+		// Should have 3 paragraph blocks at this point.
 
 		if ( isAndroid() ) {
 			await editorPage.dismissKeyboard();

@@ -383,7 +383,7 @@ describe( 'Post generator actions', () => {
 		} );
 		it( 'yields expected action for the api fetch call', () => {
 			const { value } = fulfillment.next( postType );
-			// since the timestamp is a computed value we can't do a direct comparison.
+			// Since the timestamp is a computed value we can't do a direct comparison.
 			// so we'll just see if the path has most of the value.
 			expect( value.request.path ).toEqual(
 				expect.stringContaining(

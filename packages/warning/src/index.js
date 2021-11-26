@@ -47,7 +47,7 @@ export default function warning( message ) {
 	try {
 		throw Error( message );
 	} catch ( x ) {
-		// do nothing
+		// Do nothing.
 	}
 
 	logged.add( message );

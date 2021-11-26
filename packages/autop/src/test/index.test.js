@@ -66,18 +66,18 @@ test( 'skip pre elements', () => {
 done = 0;
 });`;
 
-	// Not wrapped in <p> tags
+	// Not wrapped in <p> tags.
 	let str = `<pre>${ code }</pre>`;
 	expect( autop( str ).trim() ).toBe( str );
 
-	// Text before/after is wrapped in <p> tags
+	// Text before/after is wrapped in <p> tags.
 	str = `Look at this code\n\n<pre>${ code }</pre>\n\nIsn't that cool?`;
 
-	// Expected text after autop
+	// Expected text after autop.
 	let expected = `<p>Look at this code</p>\n<pre>${ code }</pre>\n<p>Isn't that cool?</p>`;
 	expect( autop( str ).trim() ).toBe( expected );
 
-	// Make sure HTML breaks are maintained if manually inserted
+	// Make sure HTML breaks are maintained if manually inserted.
 	str =
 		'Look at this code\n\n<pre>Line1<br />Line2<br>Line3<br/>Line4\nActual Line 2\nActual Line 3</pre>\n\nCool, huh?';
 	expected =
@@ -134,7 +134,7 @@ Paragraph two.`;
 Paragraph two.`;
 
 	const expected =
-		'<p>Paragraph one.</p>\n' + // line breaks only after <p>
+		'<p>Paragraph one.</p>\n' + // Line breaks only after <p>
 		'<p><video class="wp-video-shortcode" id="video-0-1" width="640" height="360" preload="metadata" controls="controls">' +
 		'<source type="video/mp4" src="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4" />' +
 		'<!-- WebM/VP8 for Firefox4, Opera, and Chrome -->' +
@@ -166,7 +166,7 @@ Paragraph two.`;
 Paragraph two.`;
 
 	const shortcodeExpected =
-		'<p>Paragraph one.</p>\n' + // line breaks only after <p>
+		'<p>Paragraph one.</p>\n' + // Line breaks only after <p>
 		'<p>[video width="720" height="480" mp4="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4"]' +
 		'<!-- WebM/VP8 for Firefox4, Opera, and Chrome --><source type="video/webm" src="myvideo.webm" />' +
 		'<!-- Ogg/Vorbis for older Firefox and Opera versions --><source type="video/ogg" src="myvideo.ogv" />' +
@@ -196,7 +196,7 @@ test( 'param embed elements', () => {
 Paragraph two.`;
 
 	const expected1 =
-		'<p>Paragraph one.</p>\n' + // line breaks only after <p>
+		'<p>Paragraph one.</p>\n' + // Line breaks only after <p>
 		'<p><object width="400" height="224" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0">' +
 		'<param name="src" value="http://domain.tld/wp-content/uploads/2013/12/xyz.swf" />' +
 		'<param name="allowfullscreen" value="true" />' +
@@ -232,7 +232,7 @@ Paragraph two.`;
 Paragraph two.`;
 
 	const expected2 =
-		'<p>Paragraph one.</p>\n' + // line breaks only after block tags
+		'<p>Paragraph one.</p>\n' + // Line breaks only after block tags.
 		'<div class="video-player" id="x-video-0">\n' +
 		'<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="640" height="360" id="video-0" standby="Standby text">' +
 		'<param name="movie" value="http://domain.tld/wp-content/uploads/2013/12/xyz.swf" />' +
@@ -318,11 +318,11 @@ test( 'that_autop_treats_block_level_elements_as_blocks', () => {
 	} );
 
 	let expected = content.join( '\n' );
-	let input = content.join( '\n\n' ); // WS difference
+	let input = content.join( '\n\n' ); // WS difference.
 
 	expect( autop( input ).trim() ).toBe( expected );
 
-	input = content.join( '' ); // WS difference
+	input = content.join( '' ); // WS difference.
 
 	expect( autop( input ).trim() ).toBe( expected );
 

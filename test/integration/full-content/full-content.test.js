@@ -47,10 +47,10 @@ function normalizeParsedBlocks( blocks ) {
 			JSON.stringify( omit( block, 'validationIssues' ) )
 		);
 
-		// Change client IDs to a predictable value
+		// Change client IDs to a predictable value.
 		block.clientId = '_clientId_' + index;
 
-		// Recurse to normalize inner blocks
+		// Recurse to normalize inner blocks.
 		block.innerBlocks = normalizeParsedBlocks( block.innerBlocks );
 
 		return block;
@@ -69,7 +69,7 @@ describe( 'full post content fixture', () => {
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		// Load all hooks that modify blocks
+		// Load all hooks that modify blocks.
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.GUTENBERG_PHASE === 2 ) {

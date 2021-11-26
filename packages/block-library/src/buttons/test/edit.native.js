@@ -16,12 +16,12 @@ import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 beforeAll( () => {
-	// Register all core blocks
+	// Register all core blocks.
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
 	} );
@@ -43,6 +43,7 @@ describe( 'when a button is shown', () => {
 		);
 		fireEvent.press( buttonsBlock );
 
+		// eslint-disable-next-line @wordpress/comment-case
 		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
 		const innerBlockListWrapper = await waitFor( () =>

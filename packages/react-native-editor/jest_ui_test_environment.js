@@ -19,7 +19,7 @@ class CustomEnvironment extends JSDOMEnvironment {
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'E2E setup exception:', error );
-			throw error; // re-throw to fail the test
+			throw error; // Re-throw to fail the test.
 		}
 	}
 

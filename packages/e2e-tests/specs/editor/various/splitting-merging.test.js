@@ -16,19 +16,19 @@ describe( 'splitting and merging blocks', () => {
 	} );
 
 	it( 'should split and merge paragraph blocks using Enter and Backspace', async () => {
-		// Use regular inserter to add paragraph block and text
+		// Use regular inserter to add paragraph block and text.
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'FirstSecond' );
 
 		// Move caret between 'First' and 'Second' and press Enter to split
-		// paragraph blocks
+		// paragraph blocks.
 		await pressKeyTimes( 'ArrowLeft', 6 );
 		await page.keyboard.press( 'Enter' );
 
-		// Assert that there are now two paragraph blocks with correct content
+		// Assert that there are now two paragraph blocks with correct content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Press Backspace to merge paragraph blocks
+		// Press Backspace to merge paragraph blocks.
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure that caret position is correctly placed at the between point.
@@ -76,12 +76,12 @@ describe( 'splitting and merging blocks', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/8388
 
-		// First paragraph
+		// First paragraph.
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
 
-		// Second paragraph
+		// Second paragraph.
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.up( 'Shift' );

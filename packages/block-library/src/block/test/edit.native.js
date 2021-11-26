@@ -26,15 +26,15 @@ const getMockedReusableBlock = ( id ) => ( {
     <!-- wp:heading -->
     <h2>First Reusable block</h2>
     <!-- /wp:heading -->
-    
+
     <!-- wp:paragraph -->
     <p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
     <!-- /wp:paragraph -->
-    
+
     !-- wp:heading {"level":4} -->
     <h4>List</h4>
     <!-- /wp:heading -->
-    
+
     <!-- wp:list -->
     <ul><li>First Item</li><li>Second Item</li><li>Third Item</li></ul>
     <!-- /wp:list -->
@@ -46,12 +46,12 @@ const getMockedReusableBlock = ( id ) => ( {
 } );
 
 beforeAll( () => {
-	// Register all core blocks
+	// Register all core blocks.
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
 	} );
@@ -83,12 +83,13 @@ describe( 'Reusable block', () => {
 			capabilities: { reusableBlock: true },
 		} );
 
-		// Open the inserter menu
+		// Open the inserter menu.
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
 
-		// Navigate to reusable tab
+		// Navigate to reusable tab.
 		const reusableSegment = getByText( 'Reusable' );
-		// onLayout event is required by Segment component
+		// eslint-disable-next-line @wordpress/comment-case
+		// onLayout event is required by Segment component.
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
 				layout: {
@@ -99,7 +100,8 @@ describe( 'Reusable block', () => {
 		fireEvent.press( reusableSegment );
 
 		const reusableBlockList = getByTestId( 'InserterUI-ReusableBlocks' );
-		// onScroll event used to force the FlatList to render all items
+		// eslint-disable-next-line @wordpress/comment-case
+		// onScroll event used to force the FlatList to render all items.
 		fireEvent.scroll( reusableBlockList, {
 			nativeEvent: {
 				contentOffset: { y: 0, x: 0 },
@@ -108,12 +110,12 @@ describe( 'Reusable block', () => {
 			},
 		} );
 
-		// Insert a reusable block
+		// Insert a reusable block.
 		fireEvent.press(
 			await waitFor( () => getByText( `Reusable block - 1` ) )
 		);
 
-		// Get the reusable block
+		// Get the reusable block.
 		const reusableBlock = await waitFor( () =>
 			getByA11yLabel( /Reusable block Block\. Row 1/ )
 		);
@@ -172,6 +174,7 @@ describe( 'Reusable block', () => {
 			within( reusableBlock ).getByTestId( 'block-list-wrapper' )
 		);
 
+		// eslint-disable-next-line @wordpress/comment-case
 		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
 		fireEvent( innerBlockListWrapper, 'layout', {
