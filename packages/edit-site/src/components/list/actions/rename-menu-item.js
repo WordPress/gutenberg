@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Button,
 	Flex,
@@ -13,25 +12,62 @@ import {
 	Modal,
 	TextControl,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 export default function RenameMenuItem( { template, onClose } ) {
+	const [ title, setTitle ] = useState( () => template.title.rendered );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const [ title, setTitle ] = useEntityProp(
-		'postType',
-		template.type,
-		'title',
-		template.id
+	const { getLastEntitySaveError } = useSelect( coreStore );
+	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
+		coreStore
+	);
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		noticesStore
 	);
 
 	async function onTemplateRename( event ) {
 		event.preventDefault();
-		setIsModalOpen( false );
-		onClose();
 
-		// Presist edited entity.
-		await saveEditedEntityRecord( 'postType', template.type, template.id );
+		try {
+			await editEntityRecord( 'postType', template.type, template.id, {
+				title,
+			} );
+
+			// Update state before saving rerenders the list.
+			setTitle( '' );
+			setIsModalOpen( false );
+			onClose();
+
+			// Persist edited entity.
+			await saveEditedEntityRecord(
+				'postType',
+				template.type,
+				template.id
+			);
+
+			const lastError = getLastEntitySaveError(
+				'postType',
+				template.type,
+				template.id
+			);
+
+			if ( lastError ) {
+				throw lastError;
+			}
+
+			createSuccessNotice( __( 'Template has been renamed.' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while renaming the template.' );
+
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		}
 	}
 
 	return (
@@ -49,6 +85,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
+						setTitle( '' );
 					} }
 					overlayClassName="edit-site-list__rename-modal"
 				>
@@ -59,6 +96,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 									label={ __( 'Name' ) }
 									value={ title }
 									onChange={ setTitle }
+									required
 								/>
 							</FlexItem>
 						</Flex>
@@ -73,6 +111,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
+										setTitle( '' );
 									} }
 								>
 									{ __( 'Cancel' ) }
