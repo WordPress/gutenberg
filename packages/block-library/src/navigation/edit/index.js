@@ -287,7 +287,7 @@ function Navigation( {
 		}
 		// innerBlocks are intentionally not listed as deps. This function is only concerned
 		// with the snapshot from the time when ref became undefined.
-	}, [ clientId, ref ] );
+	}, [ clientId, ref, innerBlocks ] );
 
 	const startWithEmptyMenu = useCallback( () => {
 		if ( navigationArea ) {
