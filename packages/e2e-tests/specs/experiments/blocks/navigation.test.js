@@ -811,7 +811,7 @@ describe.skip( 'Navigation', () => {
 			newMenuButton[ 0 ].click();
 		}
 
-		it.only( 'only update a single entity currently linked with the block', async () => {
+		it( 'only update a single entity currently linked with the block', async () => {
 			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
 			// consistent and to test the feature more rigorously than the single default sample page.
 			await mockPagesResponse( [
