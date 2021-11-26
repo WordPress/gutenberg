@@ -2,7 +2,6 @@ module.exports = {
 	plugins: [ '@wordpress' ],
 	rules: {
 		'@wordpress/no-unused-vars-before-return': 'error',
-		'@wordpress/comment-case': 'warn',
 		'@wordpress/no-base-control-with-label-without-id': 'error',
 		'@wordpress/no-unguarded-get-range-at': 'error',
 		'@wordpress/no-global-active-element': 'error',
