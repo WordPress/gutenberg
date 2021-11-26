@@ -920,7 +920,7 @@ if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
 		$zip->addEmptyDir( 'theme/parts' );
 
 		// Load templates into the zip file.
-		$templates = get_block_templates();
+		$templates = gutenberg_get_block_templates();
 		foreach ( $templates as $template ) {
 			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
 
@@ -931,7 +931,7 @@ if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
 		}
 
 		// Load template parts into the zip file.
-		$template_parts = get_block_templates( array(), 'wp_template_part' );
+		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
 		foreach ( $template_parts as $template_part ) {
 			$zip->addFromString(
 				'theme/parts/' . $template_part->slug . '.html',
