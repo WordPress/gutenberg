@@ -350,18 +350,38 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		$getter   = $from_file ? 'get_block_file_template' : 'gutenberg_get_block_template';
 		$template = $getter( $id, $this->post_type );
 		if ( ! $template ) {
-			$uri       = $_SERVER['REQUEST_URI'];
-			$delimiter = '/wp/v2/templates/';
+			$uri = $_SERVER['REQUEST_URI'];
+			// Make sure REQUEST_URI is set.
+			if ( ! $uri ) {
+				return;
+			}
+			$delimiter = $this->namespace . '/' . $this->rest_base . '/';
 
 			// Extract part of the path that comes after /wp/v2/templates/.
-			$literal_id = substr( $uri, strpos( $uri, $delimiter ) + strlen( $delimiter ) );
+			$start = strpos( $uri, $delimiter );
+			if ( false === $start ) {
+				return;
+			}
+			$inferred_id = substr( $uri, $start + strlen( $delimiter ) );
 
-			// Extract part of the path before the query string (if any).
-			$literal_id = explode( '?', $literal_id )[0];
+			// Only use part of the path until the first querystring-like symbol (either ? or &).
+			$parts = preg_split( '|[?&]|', $inferred_id );
+			if ( ! $parts ) {
+				return;
+			}
+			$inferred_id = $parts[0];
 
 			// Remove any trailing slashes.
-			$literal_id = rtrim( $literal_id, '/' );
-			$template   = $getter( $literal_id, $this->post_type );
+			$inferred_id = rtrim( $inferred_id, '/' );
+
+			// Halt if the parsed string differs from original one in more than just the number of slashes.
+			// This prevents any creative inputs that wouldn't otherwise be used.
+			if ( str_replace( '/', '', $id ) === str_replace( '/', '', $inferred_id ) ) {
+				return;
+			}
+
+			// Get the template.
+			$template = $getter( $inferred_id, $this->post_type );
 		}
 		return $template;
 	}
