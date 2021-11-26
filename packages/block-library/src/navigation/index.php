@@ -214,7 +214,16 @@ function block_core_navigation_get_fallback_blocks() {
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 	}
 
-	return $fallback_blocks;
+	/**
+	 * Filters the fallback experience for the Navigation block.
+	 *
+	 * Returning a falsey value will opt out of the fallback and cause the block not to render.
+	 * To customise the blocks provided return an array of blocks - these should be valid
+	 * children of the `core/navigation` block.
+	 *
+	 * @param array[] default fallback blocks provided by the default block mechanic.
+	 */
+	return apply_filters( 'block_core_navigation_render_fallback', $fallback_blocks );
 }
 
 /**
@@ -310,12 +319,13 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 		$fallback_blocks = block_core_navigation_get_fallback_blocks();
 
-		// May be empty if core/navigation or core/page list are not registered.
-		if ( empty( $fallback_blocks ) ) {
+		// Fallback my have been filtered so do basic test for validity.
+		if ( empty( $fallback_blocks ) || ! is_array( $fallback_blocks ) ) {
 			return '';
 		}
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
+
 	}
 
 	// Restore legacy classnames for submenu positioning.
@@ -424,8 +434,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 /**
  * Register the navigation block.
  *
- * @throws WP_Error An WP_Error exception parsing the block definition.
  * @uses render_block_core_navigation()
+ * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
 	register_block_type_from_metadata(
