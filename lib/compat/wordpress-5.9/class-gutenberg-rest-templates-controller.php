@@ -69,6 +69,33 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 						'id' => array(
 							'description' => __( 'The id of a template', 'gutenberg' ),
 							'type'        => 'string',
+
+							/**
+							 * Requesting this endpoint for a template like "twentytwentytwo//home" requires using
+							 * a path like /wp/v2/templates/twentytwentytwo//home. There are special cases when
+							 * WordPress routing corrects the name to contain only a single slash like "twentytwentytwo/home".
+							 *
+							 * This method doubles the last slash if it's not already doubled. It relies on the template
+							 * ID format {theme_name}//{template_slug} and the fact that slugs cannot contain slashes.
+							 *
+							 * See https://core.trac.wordpress.org/ticket/54507 for more context
+							 */
+							'sanitize_callback' => function( $id ) {
+								$last_slash_pos = strrpos( $id, '/' );
+								if ( $last_slash_pos === false ) {
+									return $id;
+								}
+
+								$is_double_slashed = substr($id, $last_slash_pos - 1, 1 ) === '/';
+								if ( ! $is_double_slashed ) {
+									$id =
+										substr( $id, 0, $last_slash_pos )
+										. '/'
+										. substr( $id, $last_slash_pos );
+								}
+
+								return $id;
+							}
 						),
 					),
 				),
@@ -173,9 +200,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
-			$template = $this->get_template_by_id( $request['id'], true );
+			$template = get_block_file_template( $request['id'], $this->post_type );
 		} else {
-			$template = $this->get_template_by_id( $request['id'] );
+			$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		}
 
 		if ( ! $template ) {
@@ -202,7 +229,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$template = $this->get_template_by_id( $request['id'] );
+		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -223,7 +250,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			return $result;
 		}
 
-		$template      = $this->get_template_by_id( $request['id'] );
+		$template      = gutenberg_get_block_template( $request['id'], $this->post_type );
 		$fields_update = $this->update_additional_fields_for_object( $template, $request );
 		if ( is_wp_error( $fields_update ) ) {
 			return $fields_update;
@@ -292,7 +319,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
-		$template = $this->get_template_by_id( $request['id'] );
+		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -330,37 +357,6 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		wp_trash_post( $id );
 		$template->status = 'trash';
 		return $this->prepare_item_for_response( $template, $request );
-	}
-
-	/**
-	 * Requesting this endpoint for a template like "twentytwentytwo//home" requires using
-	 * a path like /wp/v2/templates/twentytwentytwo//home. There are special cases when
-	 * WordPress routing corrects the name to contain only a single slash like "twentytwentytwo/home".
-	 *
-	 * This method attempts to find a template with a specific ID, and if it's missing then it
-	 * falls back to doubling the last slash in the identifier. This exploits the fact that template
-	 * ID format is {theme_name}//{template_slug} and that slugs cannot contain slashes.
-	 *
-	 * See https://core.trac.wordpress.org/ticket/54507 for more context
-	 *
-	 * @param string  $id        ID of the template.
-	 * @param boolean $from_file Optional Whether to use gutenberg_get_block_template instead of get_block_file_template.
-	 * @return WP_Block_Template|null Template.
-	 */
-	private function get_template_by_id( $id, $from_file = false ) {
-		$getter   = $from_file ? 'get_block_file_template' : 'gutenberg_get_block_template';
-		$template = $getter( $id, $this->post_type );
-		if ( ! $template ) {
-			$last_slash_pos = strrpos( $id, '/' );
-			$fallback_id    =
-				substr( $id, 0, $last_slash_pos )
-				. '/'
-				. substr( $id, $last_slash_pos );
-
-			// Get the template.
-			$template = $getter( $fallback_id, $this->post_type );
-		}
-		return $template;
 	}
 
 	/**
