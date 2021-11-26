@@ -30,7 +30,7 @@ const TEMPLATE = [
 
 function CommentTemplateInnerBlocks() {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
-	return <li { ...innerBlocksProps }></li>;
+	return <li { ...innerBlocksProps } />;
 }
 
 /**
