@@ -162,10 +162,12 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 	/**
 	 * Ticket 54507
+	 *
+	 * @dataProvider template_endpoint_urls
 	 */
-	public function test_get_item_works_with_a_single_slash() {
+	public function test_get_item_works_with_a_single_slash( $endpoint_url ) {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/tt1-blocks/index' );
+		$request  = new WP_REST_Request( 'GET', $endpoint_url );
 		$response = rest_get_server()->dispatch( $request );
 
 		$data = $response->get_data();
@@ -189,6 +191,16 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'has_theme_file' => true,
 			),
 			$data
+		);
+	}
+
+	/**
+	 *
+	 */
+	public function template_endpoint_urls() {
+		return array(
+			array( '/wp/v2/templates/tt1-blocks/index' ),
+			array( '/wp/v2/templates/tt1-blocks//index' ),
 		);
 	}
 
