@@ -4,10 +4,10 @@
 	"name": "core/comments-pagination-numbers",
 	"title": "Comments Pagination Numbers",
 	"category": "design",
-	"parent": [ "core/comments-pagination" ],
+	"parent": [ "core/comments-query-loop" ],
 	"description": "Displays a list of page numbers for comment pagination",
 	"textdomain": "default",
-	"usesContext": [ "queryId", "query" ],
+	"usesContext": [ "queryId", "queryPerPage", "postId" ],
 	"supports": {
 		"reusable": false,
 		"html": false

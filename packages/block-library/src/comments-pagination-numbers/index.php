@@ -12,74 +12,49 @@
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
  *
- * @return string Returns the pagination numbers for the Query.
+ * @return string Returns the pagination numbers for the comments.
  */
-function render_block_core_query_pagination_numbers( $attributes, $content, $block ) {
-	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
-	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
+function render_block_core_comments_pagination_numbers( $attributes, $content, $block ) {
+	// Get the post ID from which comments should be retrieved.
+	$post_id = isset( $block->context['postId'] )
+		? $block->context['postId']
+		: get_the_id();
 
-	$wrapper_attributes = get_block_wrapper_attributes();
-	$content            = '';
-	global $wp_query;
-	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
-		// Take into account if we have set a bigger `max page`
-		// than what the query has.
-		$total         = ! $max_page || $max_page > $wp_query->max_num_pages ? $wp_query->max_num_pages : $max_page;
-		$paginate_args = array(
-			'prev_next' => false,
-			'total'     => $total,
-		);
-		$content       = paginate_links( $paginate_args );
-	} else {
-		$block_query = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
-		// `paginate_links` works with the global $wp_query, so we have to
-		// temporarily switch it with our custom query.
-		$prev_wp_query = $wp_query;
-		$wp_query      = $block_query;
-		$total         = ! $max_page || $max_page > $wp_query->max_num_pages ? $wp_query->max_num_pages : $max_page;
-		$paginate_args = array(
-			'base'      => '%_%',
-			'format'    => "?$page_key=%#%",
-			'current'   => max( 1, $page ),
-			'total'     => $total,
-			'prev_next' => false,
-		);
-		if ( 1 !== $page ) {
-			/**
-			 * `paginate_links` doesn't use the provided `format` when the page is `1`.
-			 * This is great for the main query as it removes the extra query params
-			 * making the URL shorter, but in the case of multiple custom queries is
-			 * problematic. It results in returning an empty link which ends up with
-			 * a link to the current page.
-			 *
-			 * A way to address this is to add a `fake` query arg with no value that
-			 * is the same for all custom queries. This way the link is not empty and
-			 * preserves all the other existent query args.
-			 *
-			 * @see https://developer.wordpress.org/reference/functions/paginate_links/
-			 *
-			 * The proper fix of this should be in core. Track Ticket:
-			 * @see https://core.trac.wordpress.org/ticket/53868
-			 *
-			 * TODO: After two WP versions (starting from the WP version the core patch landed),
-			 * we should remove this and call `paginate_links` with the proper new arg.
-			 */
-			$paginate_args['add_args'] = array( 'cst' => '' );
-		}
-		// We still need to preserve `paged` query param if exists, as is used
-		// for Queries that inherit from global context.
-		$paged = empty( $_GET['paged'] ) ? null : (int) $_GET['paged'];
-		if ( $paged ) {
-			$paginate_args['add_args'] = array( 'paged' => $paged );
-		}
-		$content = paginate_links( $paginate_args );
-		wp_reset_postdata(); // Restore original Post Data.
-		$wp_query = $prev_wp_query;
+	if ( ! $post_id ) {
+		return '';
 	}
+
+	// Get the 'comments per page' setting.
+	$per_page = isset( $block->context['queryPerPage'] )
+		? $block->context['queryPerPage']
+		: get_option( 'comments_per_page' );
+
+	// Get the total number of pages.
+	$comments = get_approved_comments( $post_id );
+	$total    = get_comment_pages_count( $comments, $per_page );
+
+	// Get the number of the default page.
+	$default_page = 'newest' === get_option( 'default_comments_page' ) ? 1 : $total;
+
+	// Get the current comment page from the URL.
+	$current = empty( $_GET['cpage'] ) ? $default_page : (int) $_GET['cpage'];
+
+	// Render links.
+	$content = paginate_comments_links(
+		array(
+			'total'     => $total,
+			'current'   => $current,
+			'prev_next' => false,
+			'echo'      => false,
+		)
+	);
+
 	if ( empty( $content ) ) {
 		return '';
 	}
+
+	$wrapper_attributes = get_block_wrapper_attributes();
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
@@ -90,12 +65,12 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 /**
  * Registers the `core/comments-pagination-numbers` block on the server.
  */
-function register_block_core_query_pagination_numbers() {
+function register_block_core_comments_pagination_numbers() {
 	register_block_type_from_metadata(
 		__DIR__ . '/comments-pagination-numbers',
 		array(
-			'render_callback' => 'render_block_core_query_pagination_numbers',
+			'render_callback' => 'render_block_core_comments_pagination_numbers',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_query_pagination_numbers' );
+add_action( 'init', 'register_block_core_comments_pagination_numbers' );
