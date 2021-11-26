@@ -338,7 +338,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * WordPress routing corrects the name to contain only a single slash like "twentytwentytwo/home".
 	 *
 	 * This method attempts to find a template with a specific ID, and if it's missing then it
-	 * falls back to a double-slashed version of the ID.
+	 * falls back to parsing REQUEST_URI in an attempt to grab the verbatim ID passed by the user.
 	 *
 	 * See https://core.trac.wordpress.org/ticket/54507 for more context
 	 *
