@@ -79,6 +79,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			<MenuItem
 				onClick={ () => {
 					setIsModalOpen( true );
+					setTitle( template.title.rendered );
 				} }
 			>
 				{ __( 'Rename' ) }
@@ -89,7 +90,6 @@ export default function RenameMenuItem( { template, onClose } ) {
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
-						setTitle( '' );
 					} }
 					overlayClassName="edit-site-list__rename-modal"
 				>
@@ -115,7 +115,6 @@ export default function RenameMenuItem( { template, onClose } ) {
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
-										setTitle( '' );
 									} }
 								>
 									{ __( 'Cancel' ) }
