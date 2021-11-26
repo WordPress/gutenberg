@@ -9,6 +9,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
@@ -168,14 +169,16 @@ export default function Table( { templateType } ) {
 						role="row"
 					>
 						<td className="edit-site-list-table-column" role="cell">
-							<a
-								href={ addQueryArgs( window.location.href, {
-									postId: template.id,
-									postType: template.type,
-								} ) }
-							>
-								{ template.title.rendered }
-							</a>
+							<Heading level={ 4 }>
+								<a
+									href={ addQueryArgs( window.location.href, {
+										postId: template.id,
+										postType: template.type,
+									} ) }
+								>
+									{ template.title.rendered }
+								</a>
+							</Heading>
 							{ template.description }
 						</td>
 
