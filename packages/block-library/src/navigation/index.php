@@ -150,6 +150,7 @@ function block_core_navigation_get_first_non_empty_navigation() {
 		'no_found_rows'  => true,
 		'order'          => 'ASC',
 		'orderby'        => 'name',
+		'post_status'    => 'publish',
 		'posts_per_page' => 20, // Try the first 20 posts
 	);
 
