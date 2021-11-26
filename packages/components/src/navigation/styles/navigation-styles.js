@@ -184,6 +184,11 @@ export const ItemUI = styled.div`
 	opacity: 0.7;
 `;
 
+export const ItemIconUI = styled.span`
+	display: flex;
+	margin-right: ${ space( 2 ) };
+`;
+
 export const ItemBadgeUI = styled.span`
 	margin-left: ${ () => ( isRTL() ? '0' : space( 2 ) ) };
 	margin-right: ${ () => ( isRTL() ? space( 2 ) : '0' ) };
