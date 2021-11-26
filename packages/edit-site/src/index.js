@@ -86,6 +86,8 @@ export function initializeList( id, templateType, settings ) {
 	} );
 
 	// Default the navigation panel to be opened when we're in a bigger screen.
+	// We update the store synchronously before rendering so that we won't
+	// trigger an unnecessary re-render with useEffect.
 	dispatch( editSiteStore ).setIsNavigationPanelOpened(
 		select( viewportStore ).isViewportMatch( 'medium' )
 	);
