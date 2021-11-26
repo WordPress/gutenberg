@@ -23,9 +23,9 @@ function ScreenColorPalette( { name } ) {
 		<>
 			<ScreenHeader
 				back={ parentMenu + '/colors' }
-				title={ __( 'Color Palette' ) }
+				title={ __( 'Palette' ) }
 				description={ __(
-					'Color palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
+					'Palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
 				) }
 			/>
 			<ToggleGroupControl
