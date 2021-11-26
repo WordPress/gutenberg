@@ -27,7 +27,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 		noticesStore
 	);
 
-	if ( template.is_custom ) {
+	if ( template.has_theme_file ) {
 		return null;
 	}
 
