@@ -282,9 +282,11 @@ function Navigation( {
 	// If the ref no longer exists the reset the inner blocks
 	// to provide a clean slate.
 	useEffect( () => {
-		if ( ref === undefined ) {
+		if ( ref === undefined && innerBlocks.length > 0 ) {
 			replaceInnerBlocks( clientId, [] );
 		}
+		// innerBlocks are intentionally not listed as deps. This function is only concerned
+		// with the snapshot from the time when ref became undefined.
 	}, [ clientId, ref ] );
 
 	const startWithEmptyMenu = useCallback( () => {
