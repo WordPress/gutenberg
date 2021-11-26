@@ -183,7 +183,7 @@ export const ItemUI = styled.div`
 	color: inherit;
 	opacity: 0.7;
 
-	> svg {
+	> svg:first-child {
 		margin-right: ${ space( 2 ) };
 	}
 `;
