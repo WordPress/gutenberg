@@ -15,7 +15,7 @@ import { isRTL } from '@wordpress/i18n';
  */
 import Button from '../../button';
 import { useNavigationContext } from '../context';
-import { ItemUI } from '../styles/navigation-styles';
+import { ItemUI, ItemIconUI } from '../styles/navigation-styles';
 import NavigationItemBaseContent from './base-content';
 import NavigationItemBase from './base';
 
@@ -73,7 +73,11 @@ export default function NavigationItem( props ) {
 		<NavigationItemBase { ...baseProps } className={ classes }>
 			{ children || (
 				<ItemUI { ...itemProps }>
-					{ icon && <Icon icon={ icon } /> }
+					{ icon && (
+						<ItemIconUI>
+							<Icon icon={ icon } />
+						</ItemIconUI>
+					) }
 
 					<NavigationItemBaseContent
 						title={ title }
