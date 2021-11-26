@@ -350,14 +350,15 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		$getter   = $from_file ? 'get_block_file_template' : 'gutenberg_get_block_template';
 		$template = $getter( $id, $this->post_type );
 		if ( ! $template ) {
-			$uri = $_SERVER['REQUEST_URI'];
 			// Make sure REQUEST_URI is set.
-			if ( ! $uri ) {
+			if ( empty( $_SERVER['REQUEST_URI'] ) ) {
 				return;
 			}
+
+			$uri       = $_SERVER['REQUEST_URI'];
 			$delimiter = $this->namespace . '/' . $this->rest_base . '/';
 
-			// Extract part of the path that comes after /wp/v2/templates/.
+			// Extract the part of the path that comes after /wp/v2/templates/.
 			$start = strpos( $uri, $delimiter );
 			if ( false === $start ) {
 				return;
