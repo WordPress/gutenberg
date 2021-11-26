@@ -197,7 +197,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	/**
 	 *
 	 */
-	public function template_endpoint_urls() {
+	public function get_template_endpoint_urls() {
 		return array(
 			array( '/wp/v2/templates/tt1-blocks/index' ),
 			array( '/wp/v2/templates/tt1-blocks//index' ),
