@@ -67,8 +67,8 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
-							'description' => __( 'The id of a template', 'gutenberg' ),
-							'type'        => 'string',
+							'description'       => __( 'The id of a template', 'gutenberg' ),
+							'type'              => 'string',
 
 							/**
 							 * Requesting this endpoint for a template like "twentytwentytwo//home" requires using
@@ -82,20 +82,20 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 							 */
 							'sanitize_callback' => function( $id ) {
 								$last_slash_pos = strrpos( $id, '/' );
-								if ( $last_slash_pos === false ) {
+								if ( false === $last_slash_pos ) {
 									return $id;
 								}
 
-								$is_double_slashed = substr($id, $last_slash_pos - 1, 1 ) === '/';
-								if ( ! $is_double_slashed ) {
-									$id =
-										substr( $id, 0, $last_slash_pos )
-										. '/'
-										. substr( $id, $last_slash_pos );
+								$is_double_slashed = substr( $id, $last_slash_pos - 1, 1 ) === '/';
+								if ( $is_double_slashed ) {
+									return $id;
 								}
-
-								return $id;
-							}
+								return (
+									substr( $id, 0, $last_slash_pos )
+									. '/'
+									. substr( $id, $last_slash_pos )
+								);
+							},
 						),
 					),
 				),
