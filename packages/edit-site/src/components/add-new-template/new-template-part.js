@@ -65,7 +65,7 @@ export default function NewTemplatePart( { postType } ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'Creating failed.' );
+					: __( 'An error occurred while creating the template part.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
