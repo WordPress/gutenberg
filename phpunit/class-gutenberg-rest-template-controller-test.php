@@ -76,6 +76,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'type'           => 'wp_template',
 				'wp_id'          => null,
 				'has_theme_file' => true,
+				'is_custom'      => false,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//index' )
 		);
@@ -129,6 +130,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'type'           => 'wp_template',
 				'wp_id'          => null,
 				'has_theme_file' => true,
+				'is_custom'      => false,
 			),
 			$data
 		);
@@ -263,6 +265,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 					'raw' => 'Content',
 				),
 				'has_theme_file' => false,
+				'is_custom'      => true,
 			),
 			$data
 		);
