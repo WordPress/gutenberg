@@ -47,13 +47,13 @@ describe( 'TimePicker', () => {
 		fireEvent.change( hoursInput, { target: { value: '12' } } );
 		fireEvent.blur( hoursInput );
 
-		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T12:00:00' );
+		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T00:00:00' );
 		onChangeSpy.mockClear();
 
 		fireEvent.change( minutesInput, { target: { value: '35' } } );
 		fireEvent.blur( minutesInput );
 
-		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T12:35:00' );
+		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T00:35:00' );
 		onChangeSpy.mockClear();
 	} );
 
