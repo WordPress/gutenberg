@@ -67,8 +67,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
-							'description' => __( 'The id of a template', 'gutenberg' ),
-							'type'        => 'string',
+							'description'       => __( 'The id of a template', 'gutenberg' ),
+							'type'              => 'string',
+							'sanitize_callback' => array( $this, '_sanitize_template_id' ),
 						),
 					),
 				),
@@ -114,6 +115,36 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Requesting this endpoint for a template like "twentytwentytwo//home" requires using
+	 * a path like /wp/v2/templates/twentytwentytwo//home. There are special cases when
+	 * WordPress routing corrects the name to contain only a single slash like "twentytwentytwo/home".
+	 *
+	 * This method doubles the last slash if it's not already doubled. It relies on the template
+	 * ID format {theme_name}//{template_slug} and the fact that slugs cannot contain slashes.
+	 *
+	 * See https://core.trac.wordpress.org/ticket/54507 for more context
+	 *
+	 * @param string $id Template ID.
+	 * @return string Sanitized template ID.
+	 */
+	public function _sanitize_template_id( $id ) {
+		$last_slash_pos = strrpos( $id, '/' );
+		if ( false === $last_slash_pos ) {
+			return $id;
+		}
+
+		$is_double_slashed = substr( $id, $last_slash_pos - 1, 1 ) === '/';
+		if ( $is_double_slashed ) {
+			return $id;
+		}
+		return (
+			substr( $id, 0, $last_slash_pos )
+			. '/'
+			. substr( $id, $last_slash_pos )
+		);
 	}
 
 	/**
