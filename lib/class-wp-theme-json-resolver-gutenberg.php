@@ -67,7 +67,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	private static function read_json_file( $file_path ) {
 		$config = array();
 		if ( $file_path ) {
-			$decoded_file = gutenberg_json_file_decode( $file_path, array( 'associative' => true ) );
+			$decoded_file = wp_json_file_decode( $file_path, array( 'associative' => true ) );
 			if ( is_array( $decoded_file ) ) {
 				$config = $decoded_file;
 			}
@@ -98,11 +98,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	private static function translate( $theme_json, $domain = 'default' ) {
 		if ( null === self::$i18n_schema ) {
-			$i18n_schema       = gutenberg_json_file_decode( __DIR__ . '/theme-i18n.json' );
+			$i18n_schema       = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
 			self::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
 		}
 
-		return gutenberg_translate_settings_using_i18n_schema( self::$i18n_schema, $theme_json, $domain );
+		return wp_translate_settings_using_i18n_schema( self::$i18n_schema, $theme_json, $domain );
 	}
 
 	/**
