@@ -338,7 +338,8 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * WordPress routing corrects the name to contain only a single slash like "twentytwentytwo/home".
 	 *
 	 * This method attempts to find a template with a specific ID, and if it's missing then it
-	 * falls back to parsing REQUEST_URI in an attempt to grab the verbatim ID passed by the user.
+	 * falls back to doubling the last slash in the identifier. This exploits the fact that template
+	 * ID format is {theme_name}//{template_slug} and that slugs cannot contain slashes.
 	 *
 	 * See https://core.trac.wordpress.org/ticket/54507 for more context
 	 *
@@ -350,39 +351,14 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		$getter   = $from_file ? 'get_block_file_template' : 'gutenberg_get_block_template';
 		$template = $getter( $id, $this->post_type );
 		if ( ! $template ) {
-			// Make sure REQUEST_URI is set.
-			if ( empty( $_SERVER['REQUEST_URI'] ) ) {
-				return;
-			}
-
-			$uri       = $_SERVER['REQUEST_URI'];
-			$delimiter = $this->namespace . '/' . $this->rest_base . '/';
-
-			// Extract the part of the path that comes after /wp/v2/templates/.
-			$start = strpos( $uri, $delimiter );
-			if ( false === $start ) {
-				return;
-			}
-			$inferred_id = substr( $uri, $start + strlen( $delimiter ) );
-
-			// Only use part of the path until the first querystring-like symbol (either ? or &).
-			$parts = preg_split( '|[?&]|', $inferred_id );
-			if ( ! $parts ) {
-				return;
-			}
-			$inferred_id = $parts[0];
-
-			// Remove any trailing slashes.
-			$inferred_id = rtrim( $inferred_id, '/' );
-
-			// Halt if the parsed string differs from original one in more than just the number of slashes.
-			// This prevents any creative inputs that wouldn't otherwise be used.
-			if ( str_replace( '/', '', $id ) === str_replace( '/', '', $inferred_id ) ) {
-				return;
-			}
+			$last_slash_pos = strrpos( $id, '/' );
+			$fallback_id    =
+				substr( $id, 0, $last_slash_pos )
+				. '/'
+				. substr( $id, $last_slash_pos );
 
 			// Get the template.
-			$template = $getter( $inferred_id, $this->post_type );
+			$template = $getter( $fallback_id, $this->post_type );
 		}
 		return $template;
 	}

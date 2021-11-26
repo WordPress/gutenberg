@@ -165,14 +165,8 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	 */
 	public function test_get_item_works_with_a_single_slash() {
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/templates/tt1-blocks/index' );
-		$old_uri = $_SERVER['REQUEST_URI'];
-
-		$_SERVER['REQUEST_URI'] = '/index.php/wp-json/wp/v2/templates/tt1-blocks//index/?context=edit&_locale=user';
-
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/tt1-blocks/index' );
 		$response = rest_get_server()->dispatch( $request );
-
-		$_SERVER['REQUEST_URI'] = $old_uri;
 
 		$data = $response->get_data();
 		unset( $data['content'] );
