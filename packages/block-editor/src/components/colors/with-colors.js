@@ -6,7 +6,7 @@ import { isString, kebabCase, reduce, upperFirst } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -19,8 +19,6 @@ import {
 	getMostReadableColor,
 } from './utils';
 import useSetting from '../use-setting';
-
-const DEFAULT_COLORS = [];
 
 /**
  * Higher order component factory for injecting the `colorsArray` argument as
@@ -47,8 +45,16 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			const colors = useSetting( 'color.palette' ) || DEFAULT_COLORS;
-			return <WrappedComponent { ...props } colors={ colors } />;
+			const { palette: colorPerOrigin } = useSetting( 'color' ) || {};
+			const allColors = useMemo(
+				() => [
+					...( colorPerOrigin?.custom || [] ),
+					...( colorPerOrigin?.theme || [] ),
+					...( colorPerOrigin?.default || [] ),
+				],
+				[ colorPerOrigin ]
+			);
+			return <WrappedComponent { ...props } colors={ allColors } />;
 		},
 		'withEditorColorPalette'
 	);
