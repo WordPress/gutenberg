@@ -128,3 +128,29 @@
 		margin-left: $nav-sidebar-width;
 	}
 }
+
+.edit-site-list__rename-modal {
+	.components-base-control {
+		@include break-medium() {
+			width: $grid-unit * 40;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content::before {
+		margin-bottom: $grid-unit-05;
+	}
+}
+
+.edit-site-list__rename-modal-actions {
+	margin-top: $grid-unit-15;
+}
+
+.edit-site-template__actions {
+	button:not(:last-child) {
+		margin-right: $grid-unit-10;
+	}
+}
