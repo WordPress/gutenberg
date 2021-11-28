@@ -1,98 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import isTemplateRemovable from '../../utils/is-template-removable';
-import isTemplateRevertable from '../../utils/is-template-revertable';
-
-function Actions( { template } ) {
-	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
-
-	const isRemovable = isTemplateRemovable( template );
-	const isRevertable = isTemplateRevertable( template );
-
-	if ( ! isRemovable && ! isRevertable ) {
-		return null;
-	}
-
-	async function revertAndSaveTemplate() {
-		try {
-			await revertTemplate( template, { allowUndo: false } );
-			await saveEditedEntityRecord(
-				'postType',
-				template.type,
-				template.id
-			);
-
-			createSuccessNotice( __( 'Template reverted.' ), {
-				type: 'snackbar',
-			} );
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while reverting the template.' );
-
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
-		}
-	}
-
-	return (
-		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Actions' ) }
-			className="edit-site-list-table__actions"
-		>
-			{ ( { onClose } ) => (
-				<MenuGroup>
-					{ isRemovable && (
-						<MenuItem
-							isDestructive
-							onClick={ () => {
-								removeTemplate( template );
-								onClose();
-							} }
-						>
-							{ __( 'Delete template' ) }
-						</MenuItem>
-					) }
-					{ isRevertable && (
-						<MenuItem
-							info={ __( 'Restore template to theme default' ) }
-							onClick={ () => {
-								revertAndSaveTemplate();
-								onClose();
-							} }
-						>
-							{ __( 'Clear customizations' ) }
-						</MenuItem>
-					) }
-				</MenuGroup>
-			) }
-		</DropdownMenu>
-	);
-}
+import Actions from './actions';
 
 export default function Table( { templateType } ) {
 	const { templates, isLoading, postType } = useSelect(
