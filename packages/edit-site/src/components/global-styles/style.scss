@@ -68,3 +68,12 @@
 	text-transform: uppercase;
 	font-weight: 500;
 }
+
+.edit-site-screen-color-palette-toggle.edit-site-screen-color-palette-toggle {
+	margin-right: $grid-unit-20;
+	margin-left: $grid-unit-20;
+	width: unset;
+	.components-toggle-group-control {
+		min-height: $grid-unit-40;
+	}
+}

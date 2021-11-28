@@ -52,6 +52,7 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/url": "file:../url",
+		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.3.1",
 		"downloadjs": "^1.4.7",
 		"file-saver": "^2.0.2",

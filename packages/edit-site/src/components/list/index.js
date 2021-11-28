@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
@@ -6,6 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { InterfaceSkeleton } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { EditorSnackbars } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -14,20 +20,27 @@ import useRegisterShortcuts from './use-register-shortcuts';
 import Header from './header';
 import NavigationSidebar from '../navigation-sidebar';
 import Table from './table';
+import { store as editSiteStore } from '../../store';
 
 export default function List( { templateType } ) {
 	useRegisterShortcuts();
 
-	const { previousShortcut, nextShortcut } = useSelect( ( select ) => {
-		return {
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-site/previous-region' ),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
-		};
-	}, [] );
+	const { previousShortcut, nextShortcut, isNavigationOpen } = useSelect(
+		( select ) => {
+			return {
+				previousShortcut: select(
+					keyboardShortcutsStore
+				).getAllShortcutKeyCombinations(
+					'core/edit-site/previous-region'
+				),
+				nextShortcut: select(
+					keyboardShortcutsStore
+				).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
+				isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
+			};
+		},
+		[]
+	);
 
 	const postType = useSelect(
 		( select ) => select( coreStore ).getPostType( templateType ),
@@ -54,7 +67,9 @@ export default function List( { templateType } ) {
 
 	return (
 		<InterfaceSkeleton
-			className="edit-site-list"
+			className={ classnames( 'edit-site-list', {
+				'is-navigation-open': isNavigationOpen,
+			} ) }
 			labels={ {
 				drawer: __( 'Navigation Sidebar' ),
 				...detailedRegionLabels,
@@ -66,6 +81,7 @@ export default function List( { templateType } ) {
 					isDefaultOpen
 				/>
 			}
+			notices={ <EditorSnackbars /> }
 			content={
 				<main className="edit-site-list-main">
 					<Table templateType={ templateType } />
