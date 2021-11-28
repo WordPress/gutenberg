@@ -191,6 +191,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'type'           => 'wp_template',
 				'wp_id'          => null,
 				'has_theme_file' => true,
+				'is_custom'      => false,
 			),
 			$data
 		);
