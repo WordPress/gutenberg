@@ -414,7 +414,7 @@ function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_par
 		$blocks[] = $block;
 	}
 
-	return $blocks;
+	return apply_filters( 'navigation_after_parse_blocks_from_menu_items', $blocks, $menu_items );
 }
 
 /**
