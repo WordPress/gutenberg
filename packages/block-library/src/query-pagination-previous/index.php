@@ -25,6 +25,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	$default_label             = __( 'Previous Page' );
 	$label                     = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow          = get_query_pagination_arrow( $block, false );
+	$content                   = '';
 
 	if ( $pagination_arrow ) {
 		$label = $pagination_arrow . $label;
@@ -39,29 +40,40 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 		};
 
 		add_filter( 'previous_posts_link_attributes', $filter_link_attributes );
-		if ( 1 !== $paged ) {
-			$content = get_previous_posts_link( $label );
-		} else {
-			// Prints the link only if there are pages to paginate.
-			$content = $max_page > 1 ? sprintf(
-				'<span %1$s>%2$s</span>',
-				$hidden_wrapper_attributes,
-				$label
-			) : '';
+
+		// If there are pages to paginate...
+		if ( 1 < $max_page ) {
+			if ( 1 !== $paged ) { // ... and we are NOT in the first one.
+				$content = get_previous_posts_link( $label );
+			} else { // ... and we are in the first one.
+				$content = sprintf(
+					'<span %1$s>%2$s</span>',
+					$hidden_wrapper_attributes,
+					$label
+				);
+			}
 		}
 		remove_filter( 'previous_posts_link_attributes', $filter_link_attributes );
-	} else {
-		$content = ( 1 !== $page ) ? sprintf(
-			'<a href="%1$s" %2$s>%3$s</a>',
-			esc_url( add_query_arg( $page_key, $page - 1 ) ),
-			$wrapper_attributes,
-			$label
-		) : sprintf(
-			'<span %1$s>%2$s</span>',
-			$hidden_wrapper_attributes,
-			$label
-		);
-
+	} elseif ( ! $max_page || $max_page > $page ) {
+		$custom_query  = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
+		$max_num_pages = $custom_query->max_num_pages ? $custom_query->max_num_pages : 1;
+		// If there are pages to paginate...
+		if ( 1 < $max_num_pages ) {
+			if ( 1 !== $page ) { // ... and we are NOT in the first one.
+				$content = sprintf(
+					'<a href="%1$s" %2$s>%3$s</a>',
+					esc_url( add_query_arg( $page_key, $page - 1 ) ),
+					$wrapper_attributes,
+					$label
+				);
+			} else {  // ... and we are in the first one.
+				$content = sprintf(
+					'<span %1$s>%2$s</span>',
+					$hidden_wrapper_attributes,
+					$label
+				);
+			}
+		}
 	}
 	return $content;
 }
