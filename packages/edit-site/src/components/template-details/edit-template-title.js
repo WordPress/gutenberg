@@ -21,7 +21,7 @@ export default function EditTemplateTitle( { template } ) {
 				'Give the template a title that indicates its purpose, e.g. "Full Width".'
 			) }
 			onChange={ ( newTitle ) => {
-				setTitle( newTitle );
+				setTitle( newTitle || template.slug );
 			} }
 		/>
 	);
