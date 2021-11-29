@@ -173,7 +173,9 @@ describe( 'Multi-entity save flow', () => {
 			await page.keyboard.type( '...more title!' );
 
 			// Verify update button is enabled.
-			const enabledSaveButton = await page.$( enabledSavePostSelector );
+			const enabledSaveButton = await page.waitForSelector(
+				enabledSavePostSelector
+			);
 			expect( enabledSaveButton ).not.toBeNull();
 			// Verify multi-entity saving not enabled.
 			await assertMultiSaveDisabled();
