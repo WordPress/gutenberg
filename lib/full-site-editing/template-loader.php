@@ -302,5 +302,5 @@ function _gutenberg_maybe_remove_emoji_detection_script() {
 		remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 	}
 }
-add_filter( 'wp_loaded', '_gutenberg_maybe_remove_emoji_detection_script', 20 );
+add_filter( 'wp_loaded', '_gutenberg_maybe_remove_emoji_detection_script' );
 
