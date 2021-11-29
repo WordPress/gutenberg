@@ -192,6 +192,7 @@ $preview-image-height: 140px;
 		flex-direction: row;
 		align-items: flex-start;
 		margin-right: $grid-unit-10;
+		min-width: 0;
 
 		// Force text to wrap to improve UX when encountering long lines
 		// of text, particular those with no spaces.
@@ -222,6 +223,10 @@ $preview-image-height: 140px;
 		img {
 			width: 16px; // favicons often have a source of 32px
 		}
+	}
+
+	.block-editor-link-control__search-item-details {
+		min-width: 0;
 	}
 
 	&.is-error .block-editor-link-control__search-item-icon {
@@ -269,6 +274,7 @@ $preview-image-height: 140px;
 		color: $gray-700;
 		font-size: 0.9em;
 		line-height: 1.3;
+		white-space: nowrap;
 	}
 
 	.block-editor-link-control__search-item-error-notice {
