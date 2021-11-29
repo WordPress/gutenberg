@@ -7,6 +7,7 @@ import { sortBy } from 'lodash';
  * WordPress dependencies
  */
 import { createBlock, parse } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -21,7 +22,8 @@ export default function menuItemsToBlocks( menuItems ) {
 	}
 
 	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
+	const blocks = mapMenuItemsToBlocks( menuTree );
+	return applyFilters( 'navigation.menuItemsToBlocks', blocks, menuItems );
 }
 
 /**
