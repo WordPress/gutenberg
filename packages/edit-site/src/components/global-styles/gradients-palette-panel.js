@@ -1,9 +1,16 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
 	__experimentalVStack as VStack,
 	__experimentalPaletteEdit as PaletteEdit,
+	DuotonePicker,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -40,11 +47,24 @@ export default function GradientPalettePanel( { name } ) {
 		'color.defaultGradients',
 		name
 	);
+	const [ duotonePalette ] = useSetting( 'color.duotone' ) || [];
 	return (
 		<VStack
 			className="edit-site-global-styles-gradient-palette-panel"
 			spacing={ 10 }
 		>
+			<div>
+				<Heading className="edit-site-global-styles-gradient-palette-panel__duotone-heading">
+					{ __( 'Duotone' ) }
+				</Heading>
+				<DuotonePicker
+					duotonePalette={ duotonePalette }
+					disableCustomDuotone={ true }
+					disableCustomColors={ true }
+					clearable={ false }
+					onChange={ noop }
+				/>
+			</div>
 			{ !! themeGradients && !! themeGradients.length && (
 				<PaletteEdit
 					canReset={ themeGradients !== baseThemeGradients }
