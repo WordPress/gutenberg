@@ -12,7 +12,7 @@
  * @param WP_Comment[] $comments  - Array of comments.
  * @return array
  */
-function convert_to_tree( $comments ) {
+function block_core_comment_template_convert_to_tree( $comments ) {
 	$table = array();
 
 	// If there are no comments, we can return early an empty array.
@@ -59,7 +59,7 @@ function convert_to_tree( $comments ) {
  * @param WP_Block     $block           Block instance.
  * @return string
  */
-function render_comments( $comments, $block ) {
+function block_core_comment_template_render_comments( $comments, $block ) {
 	$content = '';
 	foreach ( $comments as $comment ) {
 
@@ -72,7 +72,10 @@ function render_comments( $comments, $block ) {
 
 		// If the comment has children, recurse to create the HTML for the nested comments.
 		if ( ! empty( $comment['comment_children'] ) ) {
-			$inner_content  = render_comments( $comment['comment_children'], $block );
+			$inner_content  = block_core_comment_template_render_comments(
+				$comment['comment_children'],
+				$block
+			);
 			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
 		}
 
@@ -113,11 +116,15 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 
 	// Convert the flat array of comments to a nested array of arrays with a
 	// `comment_children` property.
-	$comment_tree = convert_to_tree( $comments );
+	$comment_tree = block_core_comment_template_convert_to_tree( $comments );
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 
-	return sprintf( '<ol %1$s>%2$s</ol>', $wrapper_attributes, render_comments( $comment_tree, $block ) );
+	return sprintf(
+		'<ol %1$s>%2$s</ol>',
+		$wrapper_attributes,
+		block_core_comment_template_render_comments( $comment_tree, $block )
+	);
 }
 
 /**
