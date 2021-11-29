@@ -328,4 +328,35 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$expected                     = array( $blocks[0] );
 		$this->assertEquals( $expected, $actual );
 	}
+
+	/**
+	 * Should generate block templates export file.
+	 */
+	function test_wp_generate_block_templates_export_file() {
+		$filename = wp_generate_block_templates_export_file();
+		$this->assertFileExists( $filename, 'zip file is created at the specified path' );
+		$this->assertTrue( filesize( $filename ) > 0, 'zip file is larger than 0 bytes' );
+
+		// Open ZIP file and make sure the directories exist.
+		$zip = new ZipArchive();
+		$zip->open( $filename );
+		$has_theme_dir                = $zip->locateName( 'theme/' ) !== false;
+		$has_block_templates_dir      = $zip->locateName( 'theme/templates/' ) !== false;
+		$has_block_template_parts_dir = $zip->locateName( 'theme/parts/' ) !== false;
+		$this->assertTrue( $has_theme_dir, 'theme directory exists' );
+		$this->assertTrue( $has_block_templates_dir, 'theme/templates directory exists' );
+		$this->assertTrue( $has_block_template_parts_dir, 'theme/parts directory exists' );
+
+		// ZIP file contains at least one HTML file.
+		$has_html_files = false;
+		$num_files      = $zip->numFiles; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		for ( $i = 0; $i < $num_files; $i++ ) {
+			$filename = $zip->getNameIndex( $i );
+			if ( '.html' === substr( $filename, -5 ) ) {
+				$has_html_files = true;
+				break;
+			}
+		}
+		$this->assertTrue( $has_html_files, 'contains at least one html file' );
+	}
 }
