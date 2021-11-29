@@ -230,11 +230,9 @@ function gutenberg_use_balancetags_check( $new_value ) {
 	global $wp_version;
 
 	if ( 1 === (int) $new_value && version_compare( $wp_version, '5.9', '<' ) ) {
-		echo '<div class="error"><p>';
 		/* translators: %s: Minimum required version */
-		echo esc_html( printf( __( 'Gutenberg requires WordPress %s or later to function properly with <code>use_balanceTags</code> enabled. Please upgrade WordPress before enabling <code>use_balanceTags</code>.', 'gutenberg' ), '5.9' ) );
-		echo '</p></div>';
-
+		$message = sprintf( __( 'Gutenberg requires WordPress %s or later in order to enable the correct invalidly nested XHTML automatically option. Please upgrade WordPress before enabling.', 'gutenberg' ), '5.9' );
+		add_settings_error('gutenberg_use_balancetags_check', 'gutenberg_use_balancetags_check', $message, 'error' );
 		return 0;
 	}
 
