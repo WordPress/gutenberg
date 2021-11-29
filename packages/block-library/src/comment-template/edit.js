@@ -28,9 +28,26 @@ const TEMPLATE = [
 	[ 'core/comment-edit-link' ],
 ];
 
-function CommentTemplateInnerBlocks() {
+function CommentTemplateInnerBlocks( {
+	comments,
+	activeBlockContext,
+	setActiveBlockContext,
+	blocks,
+} ) {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
-	return <li { ...innerBlocksProps } />;
+	return (
+		<li { ...innerBlocksProps }>
+			{ innerBlocksProps.children }
+			{ comments.length > 0 ? (
+				<RenderComments
+					blockContexts={ comments }
+					activeBlockContext={ activeBlockContext }
+					setActiveBlockContext={ setActiveBlockContext }
+					blocks={ blocks }
+				/>
+			) : null }
+		</li>
+	);
 }
 
 /**
@@ -46,8 +63,14 @@ function CommentTemplateInnerBlocks() {
  *                                               getBlocks() in parent .
  * @return {WPElement}                 		List of comments.
  */
-const RenderComments = ( { blockContexts, ...props } ) => (
-	<ol { ...props.blockProps }>
+const RenderComments = ( {
+	blockProps,
+	blockContexts,
+	activeBlockContext,
+	setActiveBlockContext,
+	blocks,
+} ) => (
+	<ol { ...blockProps }>
 		{ blockContexts &&
 			blockContexts.map( ( blockContext ) => (
 				<BlockContextProvider
@@ -55,29 +78,30 @@ const RenderComments = ( { blockContexts, ...props } ) => (
 					value={ blockContext }
 				>
 					{ blockContext ===
-					( props.activeBlockContext || blockContexts[ 0 ] ) ? (
-						<>
-							<CommentTemplateInnerBlocks />
-							{ blockContext.children.length > 0 ? (
-								<RenderComments
-									blockContexts={ blockContext.children }
-									{ ...props }
-								/>
-							) : null }
-						</>
+					( activeBlockContext || blockContexts[ 0 ] ) ? (
+						<CommentTemplateInnerBlocks
+							comments={ blockContext.children }
+							activeBlockContext={ activeBlockContext }
+							setActiveBlockContext={ setActiveBlockContext }
+							blocks={ blocks }
+						/>
 					) : (
 						<li>
 							<BlockPreview
-								blocks={ props.blocks }
+								blocks={ blocks }
 								__experimentalLive
 								__experimentalOnClick={ () =>
-									props.setActiveBlockContext( blockContext )
+									setActiveBlockContext( blockContext )
 								}
 							/>
 							{ blockContext.children.length > 0 ? (
 								<RenderComments
 									blockContexts={ blockContext.children }
-									{ ...props }
+									activeBlockContext={ activeBlockContext }
+									setActiveBlockContext={
+										setActiveBlockContext
+									}
+									blocks={ blocks }
 								/>
 							) : null }
 						</li>
