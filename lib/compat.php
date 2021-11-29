@@ -200,7 +200,8 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs' );
  * as it needs to be available when the intial block parsing runs on editor load, and most of
  * the editor store and standard flags are not loaded yet at that point
  *
- * Note: This should be removed when the minimum required WP version is >= 5.9.
+ * @since 12.1.0
+ * @todo This should be removed when the minimum required WP version is >= 5.9.
  *
  * @return void.
  */
@@ -215,3 +216,28 @@ function gutenberg_check_gallery_block_v2_compatibility() {
 	);
 }
 add_action( 'init', 'gutenberg_check_gallery_block_v2_compatibility' );
+
+/**
+ * Prevent use_balanceTags being enabled on WordPress 5.8 or earlier as it breaks
+ * the layout of the new Gallery block.
+ *
+ * @since 12.1.0
+ * @todo This should be removed when the minimum required WP version is >= 5.9.
+ *
+ * @param int $new_value The new value for use_balanceTags.
+ */
+function gutenberg_use_balancetags_check( $new_value ) {
+	global $wp_version;
+
+	if ( 1 === (int) $new_value && version_compare( $wp_version, '5.9', '<' ) ) {
+		echo '<div class="error"><p>';
+		/* translators: %s: Minimum required version */
+		echo esc_html( printf( __( 'Gutenberg requires WordPress %s or later to function properly with <code>use_balanceTags</code> enabled. Please upgrade WordPress before enabling <code>use_balanceTags</code>.', 'gutenberg' ), '5.9' ) );
+		echo '</p></div>';
+
+		return 0;
+	}
+
+	return $new_value;
+}
+add_filter( 'pre_update_option_use_balanceTags', 'gutenberg_use_balancetags_check' );
