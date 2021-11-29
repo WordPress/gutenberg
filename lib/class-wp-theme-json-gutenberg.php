@@ -14,7 +14,6 @@
  *
  * @access private
  */
-
 class WP_Theme_JSON_Gutenberg {
 
 	/**
@@ -320,9 +319,9 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin    Optional. What source of data this object represents.
-	 *                          One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 * @param array  $theme_json A structure that follows the theme.json schema.
+	 * @param string $origin     Optional. What source of data this object represents.
+	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
 		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
@@ -330,7 +329,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
-
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
 		$theme_json          = self::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
@@ -485,7 +483,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *         'elements': {}
 	 *       }
 	 *     }
-	 *
 	 *
 	 * @return array Block metadata.
 	 */
@@ -1059,11 +1056,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * for the presets and adds them to the $declarations array
 	 * following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
-	 *
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @param array $settings Settings to process.
 	 * @param array $origins  List of origins to process.
@@ -1089,10 +1087,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * for the custom values and adds them to the $declarations
 	 * array following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @param array $settings Settings to process.
 	 * @return array Returns the modified $declarations.
@@ -1172,10 +1172,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @param array $styles Styles to process.
 	 * @param array $settings Theme settings.
