@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+} from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __, _x, isRTL } from '@wordpress/i18n';
@@ -31,6 +35,7 @@ export default function Edit( {
 	const minSize = sizes ? sizes[ 0 ] : 24;
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const blockProps = useBlockProps();
+	const spacingProps = useSpacingProps( attributes );
 	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
 
 	const inspectorControls = (
@@ -90,7 +95,7 @@ export default function Edit( {
 	return (
 		<>
 			{ inspectorControls }
-			<div>{ displayAvatar }</div>
+			<div { ...spacingProps }>{ displayAvatar }</div>
 		</>
 	);
 }

@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import { navigationPanel, siteEditor } from '../../experimental-features';
+import { navigationPanel, siteEditor } from './utils';
 
 const clickTemplateItem = async ( menus, itemName ) => {
 	await navigationPanel.open();

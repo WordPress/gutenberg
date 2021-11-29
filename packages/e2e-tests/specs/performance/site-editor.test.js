@@ -19,7 +19,7 @@ import {
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../../experimental-features';
+import { siteEditor } from '../site-editor/utils';
 import {
 	readFile,
 	deleteFile,

@@ -6,7 +6,7 @@ import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../../experimental-features';
+import { siteEditor } from './utils';
 
 async function getDocumentSettingsTitle() {
 	const titleElement = await page.waitForSelector(
