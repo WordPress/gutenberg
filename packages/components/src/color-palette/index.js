@@ -135,6 +135,7 @@ export default function ColorPalette( {
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
 				<Dropdown
+					contentClassName="components-color-palette__custom-color-dropdown-content"
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<button
