@@ -96,6 +96,7 @@ dependencies {
         implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-reanimated', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-prompt-android', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-webview:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-webview', 'dependencies')}"
+        implementation "com.github.wordpress-mobile:react-native-clipboard:${extractPackageVersion('../../../react-native-editor/package.json', 'react-native-clipboard', 'dependencies')}"
         runtimeOnly "org.wordpress-mobile:hermes-release-mirror:0.66.1"
    } else {
         api 'com.facebook.react:react-native:+'
