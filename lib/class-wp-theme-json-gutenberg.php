@@ -642,7 +642,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_custom_templates() {
 		$custom_templates = array();
-		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
+		if ( ! isset( $this->theme_json['customTemplates'] ) || ! is_array( $this->theme_json['customTemplates'] ) ) {
 			return $custom_templates;
 		}
 
@@ -664,7 +664,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_template_parts() {
 		$template_parts = array();
-		if ( ! isset( $this->theme_json['templateParts'] ) ) {
+		if ( ! isset( $this->theme_json['templateParts'] ) || ! is_array( $this->theme_json['templateParts'] ) ) {
 			return $template_parts;
 		}
 
