@@ -317,6 +317,10 @@ describe( 'Image', () => {
 
 		// Resize the Uploaded Image.
 		await openDocumentSettingsSidebar();
+		await page.waitForSelector(
+			'[aria-label="Image size presets"] button:first-child',
+			{ visible: true }
+		);
 		await page.click(
 			'[aria-label="Image size presets"] button:first-child'
 		);
