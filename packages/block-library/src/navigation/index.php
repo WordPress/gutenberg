@@ -151,7 +151,7 @@ function block_core_navigation_get_first_non_empty_navigation() {
 		'order'          => 'ASC',
 		'orderby'        => 'name',
 		'post_status'    => 'publish',
-		'posts_per_page' => 20, // Try the first 20 posts
+		'posts_per_page' => 20, // Try the first 20 posts.
 	);
 
 	$navigation_posts = new WP_Query( $parsed_args );
