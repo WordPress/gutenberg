@@ -315,7 +315,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @var int
 	 */
-
 	const LATEST_SCHEMA = 2;
 
 	/**
@@ -568,18 +567,18 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * Example:
 	 *
-	 * {
-	 *   'root': {
-	 *     'color': {
-	 *       'custom': true
+	 *     {
+	 *       'root': {
+	 *         'color': {
+	 *           'custom': true
+	 *         }
+	 *       },
+	 *       'core/paragraph': {
+	 *         'spacing': {
+	 *           'customPadding': true
+	 *         }
+	 *       }
 	 *     }
-	 *   },
-	 *   'core/paragraph': {
-	 *     'typography': {
-	 *       'customFontSize': true
-	 *     }
-	 *   }
-	 * }
 	 *
 	 * @return array Settings per block.
 	 */
@@ -599,11 +598,22 @@ class WP_Theme_JSON_Gutenberg {
 	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
-	 * @param array $origins A list of origins to include. By default it includes 'default', 'theme', and 'custom'.
-	 *
+	 * @param array $origins A list of origins to include. By default it includes self::VALID_ORIGINS.
 	 * @return string Stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = self::VALID_ORIGINS ) {
+		if ( is_string( $types ) ) {
+			// Dispatch error and map old arguments to new ones.
+			_deprecated_argument( __FUNCTION__, '5.9' );
+			if ( 'block_styles' === $types ) {
+				$types = array( 'styles', 'presets' );
+			} elseif ( 'css_variables' === $types ) {
+				$types = array( 'variables' );
+			} else {
+				$types = array( 'variables', 'styles', 'presets' );
+			}
+		}
+
 		$blocks_metadata = self::get_blocks_metadata();
 		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
 		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
@@ -682,7 +692,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *   }
 	 *
 	 * @param array $style_nodes Nodes with styles.
-	 *
 	 * @return string The new stylesheet.
 	 */
 	private function get_block_classes( $style_nodes ) {
@@ -756,10 +765,9 @@ class WP_Theme_JSON_Gutenberg {
 	 *   p.has-value-gradient-background {
 	 *     background: value;
 	 *   }
-
+	 *
 	 * @param array $setting_nodes Nodes with settings.
 	 * @param array $origins       List of origins to process presets from.
-	 *
 	 * @return string The new stylesheet.
 	 */
 	private function get_preset_classes( $setting_nodes, $origins ) {
@@ -787,14 +795,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * For each section this creates a new ruleset such as:
 	 *
-	 *   block-selector {
-	 *     --wp--preset--category--slug: value;
-	 *     --wp--custom--variable: value;
-	 *   }
+	 *     block-selector {
+	 *       --wp--preset--category--slug: value;
+	 *       --wp--custom--variable: value;
+	 *     }
 	 *
 	 * @param array $nodes Nodes with settings.
 	 * @param array $origins List of origins to process.
-	 *
 	 * @return string The new stylesheet.
 	 */
 	private function get_css_variables( $nodes, $origins ) {
@@ -863,7 +870,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param string $selector Original selector.
 	 * @param string $to_append Selector to append.
-	 *
 	 * @return string
 	 */
 	private static function append_to_selector( $selector, $to_append ) {
@@ -883,7 +889,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array  $settings Settings to process.
 	 * @param string $selector Selector wrapping the classes.
 	 * @param array  $origins  List of origins to process.
-	 *
 	 * @return string The result of processing the presets.
 	 */
 	private static function compute_preset_classes( $settings, $selector, $origins ) {
@@ -978,7 +983,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $settings Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
 	 * @param array $origins List of origins to process.
-	 *
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
 	private static function get_settings_values_by_slug( $settings, $preset_metadata, $origins ) {
@@ -1019,7 +1023,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $settings Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
 	 * @param array $origins List of origins to process.
-	 *
 	 * @return array Array of presets where the key and value are both the slug.
 	 */
 	private static function get_settings_slugs( $settings, $preset_metadata, $origins = self::VALID_ORIGINS ) {
@@ -1045,7 +1048,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param string $input String to replace.
 	 * @param string $slug The slug value to use to generate the custom property.
-	 *
 	 * @return string The CSS Custom Property. Something along the lines of --wp--preset--color--black.
 	 */
 	private static function replace_slug_in_string( $input, $slug ) {
@@ -1057,16 +1059,14 @@ class WP_Theme_JSON_Gutenberg {
 	 * for the presets and adds them to the $declarations array
 	 * following the format:
 	 *
-	 * ```php
-	 * array(
-	 *   'name'  => 'property_name',
-	 *   'value' => 'property_value,
-	 * )
-	 * ```
+	 *     array(
+	 *       'name'  => 'property_name',
+	 *       'value' => 'property_value,
+	 *     )
+	 *
 	 *
 	 * @param array $settings Settings to process.
 	 * @param array $origins  List of origins to process.
-	 *
 	 * @return array Returns the modified $declarations.
 	 */
 	private static function compute_preset_vars( $settings, $origins ) {
@@ -1089,15 +1089,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * for the custom values and adds them to the $declarations
 	 * array following the format:
 	 *
-	 * ```php
-	 * array(
-	 *   'name'  => 'property_name',
-	 *   'value' => 'property_value,
-	 * )
-	 * ```
+	 *     array(
+	 *       'name'  => 'property_name',
+	 *       'value' => 'property_value,
+	 *     )
 	 *
 	 * @param array $settings Settings to process.
-	 *
 	 * @return array Returns the modified $declarations.
 	 */
 	private static function compute_theme_vars( $settings ) {
@@ -1130,24 +1127,23 @@ class WP_Theme_JSON_Gutenberg {
 	 * For example, assuming the given prefix is '--wp'
 	 * and the token is '--', for this input tree:
 	 *
-	 * {
-	 *   'some/property': 'value',
-	 *   'nestedProperty': {
-	 *     'sub-property': 'value'
-	 *   }
-	 * }
+	 *     {
+	 *       'some/property': 'value',
+	 *       'nestedProperty': {
+	 *         'sub-property': 'value'
+	 *       }
+	 *     }
 	 *
 	 * it'll return this output:
 	 *
-	 * {
-	 *   '--wp--some-property': 'value',
-	 *   '--wp--nested-property--sub-property': 'value'
-	 * }
+	 *     {
+	 *       '--wp--some-property': 'value',
+	 *       '--wp--nested-property--sub-property': 'value'
+	 *     }
 	 *
 	 * @param array  $tree Input tree to process.
 	 * @param string $prefix Prefix to prepend to each variable. '' by default.
 	 * @param string $token Token to use between levels. '--' by default.
-	 *
 	 * @return array The flattened tree.
 	 */
 	private static function flatten_tree( $tree, $prefix = '', $token = '--' ) {
@@ -1176,17 +1172,14 @@ class WP_Theme_JSON_Gutenberg {
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
-	 * ```php
-	 * array(
-	 *   'name'  => 'property_name',
-	 *   'value' => 'property_value,
-	 * )
-	 * ```
+	 *     array(
+	 *       'name'  => 'property_name',
+	 *       'value' => 'property_value,
+	 *     )
 	 *
 	 * @param array $styles Styles to process.
 	 * @param array $settings Theme settings.
 	 * @param array $properties Properties metadata.
-	 *
 	 * @return array Returns the modified $declarations.
 	 */
 	private static function compute_style_properties( $styles, $settings = array(), $properties = self::PROPERTIES_METADATA ) {
@@ -1233,8 +1226,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * "--wp--preset--color--secondary".
 	 *
 	 * @param array $styles Styles subtree.
-	 * @param array $path Which property to process.
-	 *
+	 * @param array $path   Which property to process.
 	 * @return string Style property value.
 	 */
 	private static function get_property_value( $styles, $path ) {
@@ -1263,20 +1255,19 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Builds metadata for the setting nodes, which returns in the form of:
 	 *
-	 * [
-	 *   [
-	 *     'path'     => ['path', 'to', 'some', 'node' ],
-	 *     'selector' => 'CSS selector for some node'
-	 *   ],
-	 *   [
-	 *     'path'     => [ 'path', 'to', 'other', 'node' ],
-	 *     'selector' => 'CSS selector for other node'
-	 *   ],
-	 * ]
+	 *     [
+	 *       [
+	 *         'path'     => ['path', 'to', 'some', 'node' ],
+	 *         'selector' => 'CSS selector for some node'
+	 *       ],
+	 *       [
+	 *         'path'     => [ 'path', 'to', 'other', 'node' ],
+	 *         'selector' => 'CSS selector for other node'
+	 *       ],
+	 *     ]
 	 *
 	 * @param array $theme_json The tree to extract setting nodes from.
-	 * @param array $selectors List of selectors per block.
-	 *
+	 * @param array $selectors  List of selectors per block.
 	 * @return array
 	 */
 	private static function get_setting_nodes( $theme_json, $selectors = array() ) {
@@ -1314,22 +1305,21 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Builds metadata for the style nodes, which returns in the form of:
 	 *
-	 * [
-	 *   [
-	 *     'path'     => [ 'path', 'to', 'some', 'node' ],
-	 *     'selector' => 'CSS selector for some node',
-	 *     'duotone'  => 'CSS selector for duotone for some node'
-	 *   ],
-	 *   [
-	 *     'path'     => ['path', 'to', 'other', 'node' ],
-	 *     'selector' => 'CSS selector for other node',
-	 *     'duotone'  => null
-	 *   ],
-	 * ]
+	 *     [
+	 *       [
+	 *         'path'     => [ 'path', 'to', 'some', 'node' ],
+	 *         'selector' => 'CSS selector for some node',
+	 *         'duotone'  => 'CSS selector for duotone for some node'
+	 *       ],
+	 *       [
+	 *         'path'     => ['path', 'to', 'other', 'node' ],
+	 *         'selector' => 'CSS selector for other node',
+	 *         'duotone'  => null
+	 *       ],
+	 *     ]
 	 *
 	 * @param array $theme_json The tree to extract style nodes from.
-	 * @param array $selectors List of selectors per block.
-	 *
+	 * @param array $selectors  List of selectors per block.
 	 * @return array
 	 */
 	private static function get_style_nodes( $theme_json, $selectors = array() ) {
@@ -1455,7 +1445,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -1532,7 +1521,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * Removes insecure data from theme.json.
 	 *
 	 * @param array $theme_json Structure to sanitize.
-	 *
 	 * @return array Sanitized structure.
 	 */
 	public static function remove_insecure_properties( $theme_json ) {
@@ -1591,7 +1579,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * without the insecure settings.
 	 *
 	 * @param array $input Node to process.
-	 *
 	 * @return array
 	 */
 	private static function remove_insecure_settings( $input ) {
@@ -1647,7 +1634,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * without the insecure styles.
 	 *
 	 * @param array $input Node to process.
-	 *
 	 * @return array
 	 */
 	private static function remove_insecure_styles( $input ) {
@@ -1691,13 +1677,11 @@ class WP_Theme_JSON_Gutenberg {
 		return $this->theme_json;
 	}
 
-		/**
-	 *
+	/**
 	 * Transforms the given editor settings according the
 	 * add_theme_support format to the theme.json format.
 	 *
 	 * @param array $settings Existing editor settings.
-	 *
 	 * @return array Config that adheres to the theme.json schema.
 	 */
 	public static function get_from_editor_settings( $settings ) {
