@@ -75,9 +75,14 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		}
 	}
 
+	// Border width support is enforced if border style support is opted into.
+	$has_border_style_support = gutenberg_has_border_feature_support( $block_type, 'style' );
+	$has_border_width_support = $has_border_style_support ||
+		gutenberg_has_border_feature_support( $block_type, 'width' );
+
 	// Border style.
 	if (
-		gutenberg_has_border_feature_support( $block_type, 'style' ) &&
+		$has_border_style_support &&
 		isset( $block_attributes['style']['border']['style'] )
 	) {
 		$border_style = $block_attributes['style']['border']['style'];
@@ -86,7 +91,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Border width.
 	if (
-		gutenberg_has_border_feature_support( $block_type, 'width' ) &&
+		$has_border_width_support &&
 		isset( $block_attributes['style']['border']['width'] )
 	) {
 		$border_width = $block_attributes['style']['border']['width'];

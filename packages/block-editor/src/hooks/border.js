@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import {
+	__experimentalGrid as Grid,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -35,23 +38,23 @@ import { cleanEmptyObject } from './utils';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 
+const useHasBorderFeatureSupport = ( blockName, feature ) => {
+	return (
+		useSetting( `border.${ feature }` ) &&
+		hasBorderSupport( blockName, feature )
+	);
+};
+
 export function BorderPanel( props ) {
-	const { clientId } = props;
+	const { clientId, name: blockName } = props;
 	const isDisabled = useIsBorderDisabled( props );
-	const isSupported = hasBorderSupport( props.name );
+	const isSupported = hasBorderSupport( blockName );
 
-	const isColorSupported =
-		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
-
-	const isRadiusSupported =
-		useSetting( 'border.radius' ) &&
-		hasBorderSupport( props.name, 'radius' );
-
-	const isStyleSupported =
-		useSetting( 'border.style' ) && hasBorderSupport( props.name, 'style' );
-
+	const isColorSupported = useHasBorderFeatureSupport( blockName, 'color' );
+	const isRadiusSupported = useHasBorderFeatureSupport( blockName, 'radius' );
+	const isStyleSupported = useHasBorderFeatureSupport( blockName, 'style' );
 	const isWidthSupported =
-		useSetting( 'border.width' ) && hasBorderSupport( props.name, 'width' );
+		useHasBorderFeatureSupport( blockName, 'width' ) || isStyleSupported;
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -77,32 +80,68 @@ export function BorderPanel( props ) {
 		},
 	} );
 
+	const getWidthAndStyleFilter = () => {
+		if ( isWidthSupported && isStyleSupported ) {
+			return ( newAttributes ) => ( {
+				...newAttributes,
+				style: {
+					...newAttributes.style,
+					border: {
+						...newAttributes.style?.border,
+						width: undefined,
+						style: undefined,
+					},
+				},
+			} );
+		}
+
+		return isWidthSupported
+			? createResetAllFilter( 'width' )
+			: createResetAllFilter( 'style' );
+	};
+
+	const hasWidthAndStyleValue = () => {
+		if ( isStyleSupported ) {
+			return hasBorderWidthValue( props ) || hasBorderStyleValue( props );
+		}
+
+		return hasBorderWidthValue( props );
+	};
+
+	const isWidthAndStyleDefault =
+		defaultBorderControls?.widthAndStyle ||
+		( isWidthSupported && defaultBorderControls?.width ) ||
+		( isStyleSupported && defaultBorderControls?.style );
+
+	const widthAndStyleLabel = ! isStyleSupported
+		? __( 'Width' )
+		: __( 'Width & Style' );
+
+	const createResetWidthAndStyle = () => () => {
+		if ( isWidthSupported && isStyleSupported ) {
+			return resetBorderWidthAndStyle( props );
+		}
+
+		return isWidthSupported
+			? resetBorderWidth( props )
+			: resetBorderStyle( props );
+	};
+
 	return (
 		<InspectorControls __experimentalGroup="border">
-			{ isWidthSupported && (
+			{ isWidthSupported && ( // Style cannot be supported without width.
 				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => hasBorderWidthValue( props ) }
-					label={ __( 'Width' ) }
-					onDeselect={ () => resetBorderWidth( props ) }
-					isShownByDefault={ defaultBorderControls?.width }
-					resetAllFilter={ createResetAllFilter( 'width' ) }
+					hasValue={ () => hasWidthAndStyleValue() }
+					label={ widthAndStyleLabel }
+					onDeselect={ createResetWidthAndStyle() }
+					isShownByDefault={ isWidthAndStyleDefault }
+					resetAllFilter={ getWidthAndStyleFilter() }
 					panelId={ clientId }
 				>
-					<BorderWidthEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ isStyleSupported && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => hasBorderStyleValue( props ) }
-					label={ __( 'Style' ) }
-					onDeselect={ () => resetBorderStyle( props ) }
-					isShownByDefault={ defaultBorderControls?.style }
-					resetAllFilter={ createResetAllFilter( 'style' ) }
-					panelId={ clientId }
-				>
-					<BorderStyleEdit { ...props } />
+					<Grid gap="4">
+						<BorderWidthEdit { ...props } />
+						{ isStyleSupported && <BorderStyleEdit { ...props } /> }
+					</Grid>
 				</ToolsPanelItem>
 			) }
 			{ isColorSupported && (
@@ -211,5 +250,26 @@ export function removeBorderAttribute( style, attribute ) {
 			...style?.border,
 			[ attribute ]: undefined,
 		},
+	} );
+}
+
+/**
+ * Resets both the border width and style block support attributes
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetBorderWidthAndStyle( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			border: {
+				...style?.border,
+				width: undefined,
+				style: undefined,
+			},
+		} ),
 	} );
 }
