@@ -6,20 +6,21 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
  */
 import './plugins';
 import './hooks';
-import './store';
+import { store as editSiteStore } from './store';
 import Editor from './components/editor';
 import List from './components/list';
 
@@ -83,6 +84,13 @@ export function initializeList( id, templateType, settings ) {
 		defaultTemplateTypes: settings.defaultTemplateTypes,
 		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
 	} );
+
+	// Default the navigation panel to be opened when we're in a bigger screen.
+	// We update the store synchronously before rendering so that we won't
+	// trigger an unnecessary re-render with useEffect.
+	dispatch( editSiteStore ).setIsNavigationPanelOpened(
+		select( viewportStore ).isViewportMatch( 'medium' )
+	);
 
 	render( <List templateType={ templateType } />, target );
 }

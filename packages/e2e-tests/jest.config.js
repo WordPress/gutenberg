@@ -5,6 +5,7 @@ const baseConfig = require( '@wordpress/scripts/config/jest-e2e.config' );
 
 module.exports = {
 	...baseConfig,
+	testMatch: [ '<rootDir>/specs/**/*.test.js' ],
 	setupFiles: [ '<rootDir>/config/gutenberg-phase.js' ],
 	setupFilesAfterEnv: [
 		'<rootDir>/config/setup-test-framework.js',

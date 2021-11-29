@@ -28,6 +28,7 @@ class DependencyExtractionWebpackPlugin {
 				externalizedReport: false,
 				injectPolyfill: false,
 				outputFormat: 'php',
+				outputFilename: null,
 				useDefaults: true,
 			},
 			options
@@ -143,6 +144,7 @@ class DependencyExtractionWebpackPlugin {
 			externalizedReport,
 			injectPolyfill,
 			outputFormat,
+			outputFilename,
 		} = this.options;
 
 		// Dump actually externalized dependencies to a report file.
@@ -196,12 +198,14 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
-			const runtimeChunk = entrypoint.getRuntimeChunk();
+			const entrypointChunk = isWebpack4
+				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
+				: entrypoint.getEntrypointChunk();
 
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
 				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
-				version: runtimeChunk.hash,
+				version: entrypointChunk.hash,
 			};
 
 			const assetString = this.stringify( assetData );
@@ -211,7 +215,7 @@ class DependencyExtractionWebpackPlugin {
 			const buildFilename = compilation.getPath(
 				compiler.options.output.filename,
 				{
-					chunk: runtimeChunk,
+					chunk: entrypointChunk,
 					filename,
 					query,
 					basename: basename( filename ),
@@ -226,14 +230,30 @@ class DependencyExtractionWebpackPlugin {
 				continue;
 			}
 
-			const assetFilename = buildFilename.replace(
-				/\.js$/i,
-				'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
-			);
+			let assetFilename;
+
+			if ( outputFilename ) {
+				assetFilename = compilation.getPath( outputFilename, {
+					chunk: entrypointChunk,
+					filename,
+					query,
+					basename: basename( filename ),
+					contentHash: createHash( 'md4' )
+						.update( assetString )
+						.digest( 'hex' ),
+				} );
+			} else {
+				assetFilename = buildFilename.replace(
+					/\.js$/i,
+					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
+				);
+			}
 
 			// Add source and file into compilation for webpack to output.
 			compilation.assets[ assetFilename ] = new RawSource( assetString );
-			runtimeChunk.files[ isWebpack4 ? 'push' : 'add' ]( assetFilename );
+			entrypointChunk.files[ isWebpack4 ? 'push' : 'add' ](
+				assetFilename
+			);
 		}
 
 		if ( combineAssets ) {

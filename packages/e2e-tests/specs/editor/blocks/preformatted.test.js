@@ -7,6 +7,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	insertBlock,
+	clickBlockAppender,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Preformatted', () => {
@@ -39,7 +40,7 @@ describe( 'Preformatted', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'ArrowDown' );
+		await clickBlockAppender();
 		await page.keyboard.type( '3' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );

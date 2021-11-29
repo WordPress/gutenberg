@@ -44,6 +44,7 @@ function ColorGradientControlInner( {
 	gradientValue,
 	clearable,
 	showTitle = true,
+	enableAlpha,
 } ) {
 	const canChooseAColor =
 		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
@@ -109,6 +110,7 @@ function ColorGradientControlInner( {
 								__experimentalHasMultipleOrigins
 							}
 							clearable={ clearable }
+							enableAlpha={ enableAlpha }
 						/>
 					) }
 					{ ( currentTab === 'gradient' || ! canChooseAColor ) && (

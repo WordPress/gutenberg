@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalColorEdit as ColorEdit,
+	__experimentalPaletteEdit as PaletteEdit,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -46,7 +46,7 @@ export default function ColorPalettePanel( { name } ) {
 			spacing={ 10 }
 		>
 			{ !! themeColors && !! themeColors.length && (
-				<ColorEdit
+				<PaletteEdit
 					canReset={ themeColors !== baseThemeColors }
 					canOnlyChangeValues
 					colors={ themeColors }
@@ -57,7 +57,7 @@ export default function ColorPalettePanel( { name } ) {
 			{ !! defaultColors &&
 				!! defaultColors.length &&
 				!! defaultPaletteEnabled && (
-					<ColorEdit
+					<PaletteEdit
 						canReset={ defaultColors !== baseDefaultColors }
 						canOnlyChangeValues
 						colors={ defaultColors }
@@ -65,7 +65,7 @@ export default function ColorPalettePanel( { name } ) {
 						paletteLabel={ __( 'Default' ) }
 					/>
 				) }
-			<ColorEdit
+			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
 				paletteLabel={ __( 'Custom' ) }
