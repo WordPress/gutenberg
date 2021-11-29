@@ -53,7 +53,7 @@ function gutenberg_get_layout_style( $selector, $layout, $padding, $has_block_ga
 
 		$style = '';
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector {";
+			$style = "$selector {";
 			// Using important here to override the inline padding that could be potentially
 			// applied using the custom padding control before the layout inheritance is applied.
 			$style .= sprintf(
