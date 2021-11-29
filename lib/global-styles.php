@@ -181,7 +181,7 @@ function gutenberg_experimental_is_site_editor_available() {
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
 	if ( gutenberg_experimental_is_site_editor_available() ) {
-		WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
+		register_global_styles_custom_post_type();
 	}
 }
 
