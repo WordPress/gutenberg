@@ -76,11 +76,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * - value_key  => the key that represents the value
 	 * - value_func => optionally, instead of value_key, a function to generate
 	 *                 the value that takes a preset as an argument
-	 * - css_vars   => name of the var to generate. The "$slug" substring will be
-	 *                 replaced by the slug of each preset. For example,
-	 *                 given a preset for color with two values whose slugs are "black" and "white",
-	 *                 the string "--wp--preset--color--$slug" will generate two variables:
-	 *                 "--wp--preset--color--black" and "--wp--preset--color--white".
+	 *                 (either value_key or value_func should be present)
+	 * - css_vars   => template string to use in generating the CSS Custom Property.
+	 *                 Example output: "--wp--preset--duotone--blue: <value>" will generate as many CSS Custom Properties as presets defined
+	 *                 substituting the $slug for the slug's value for each preset value.
 	 * - classes    => array containing a structure with the classes to
 	 *                 generate for the presets, where for each array item
 	 *                 the key is the class name and the value the property name.
