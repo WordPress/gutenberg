@@ -6,7 +6,7 @@ import { boolean, text } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import { MenuGroup } from '../';
+import MenuGroup from '../';
 
 export default {
 	title: 'Components/MenuGroup',

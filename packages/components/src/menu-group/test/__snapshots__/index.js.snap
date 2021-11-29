@@ -1,18 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MenuGroup should match snapshot 1`] = `
+exports[`MenuGroup should render correctly 1`] = `
+.emotion-0+.components-menu-group {
+  margin-top: calc(4px * 2);
+  padding-top: calc(4px * 2);
+  border-top: 1px solid #1e1e1e;
+}
+
+.emotion-2 {
+  padding: 0 calc(4px * 2);
+  margin-top: calc(4px * 1);
+  margin-bottom: calc(4px * 3);
+  color: #757575;
+  text-transform: uppercase;
+  font-size: calc(0.92 * 13px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 <div
-  className="components-menu-group"
+  class="components-menu-group emotion-0 emotion-1"
 >
   <div
     aria-hidden="true"
-    className="components-menu-group__label"
+    class="components-menu-group__label emotion-2 emotion-1"
     id="components-menu-group-label-1"
   >
     My group
   </div>
   <div
     aria-labelledby="components-menu-group-label-1"
+    class="emotion-4 emotion-1"
     role="group"
   >
     <p>

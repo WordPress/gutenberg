@@ -1,27 +1,26 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import { MenuGroup } from '../';
+import MenuGroup from '../';
 
 describe( 'MenuGroup', () => {
 	test( 'should render null when no children provided', () => {
-		const wrapper = shallow( <MenuGroup /> );
+		const wrapper = render( <MenuGroup /> );
 
-		expect( wrapper.html() ).toBe( null );
+		expect( wrapper.container.firstChild ).toBe( null );
 	} );
 
-	test( 'should match snapshot', () => {
-		const wrapper = shallow(
+	test( 'should render correctly', () => {
+		const wrapper = render(
 			<MenuGroup label="My group" instanceId="1">
 				<p>My item</p>
 			</MenuGroup>
 		);
-
-		expect( wrapper ).toMatchSnapshot();
+		expect( wrapper.container.firstChild ).toMatchSnapshot();
 	} );
 } );
