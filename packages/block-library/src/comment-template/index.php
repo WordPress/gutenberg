@@ -16,7 +16,7 @@ function convert_to_tree( $comments ) {
 	$table = array();
 
 	// If there are no comments, we can return early an empty array.
-	if ( ! isset( $comments ) || empty( $comments ) ) {
+	if ( empty( $comments ) ) {
 		return array();
 	}
 
