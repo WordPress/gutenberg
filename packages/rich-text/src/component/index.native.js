@@ -54,6 +54,7 @@ const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
+	'core/text-color': 'mark',
 };
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
