@@ -506,11 +506,13 @@ if ( ! function_exists( '_build_block_template_result_from_file' ) ) {
 		$template->content        = _inject_theme_attribute_in_block_template_content( $template_content );
 		$template->slug           = $template_file['slug'];
 		$template->source         = 'theme';
+		$template->origin         = null;
 		$template->type           = $template_type;
 		$template->title          = ! empty( $template_file['title'] ) ? $template_file['title'] : $template_file['slug'];
 		$template->status         = 'publish';
 		$template->has_theme_file = true;
 		$template->is_custom      = true;
+		$template->author         = 0;
 
 		if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
 			$template->description = $default_template_types[ $template_file['slug'] ]['description'];
