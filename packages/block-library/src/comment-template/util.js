@@ -36,7 +36,7 @@ export const convertToTree = ( data ) => {
 
 	const tree = [];
 
-	// Iterate over the original commenta again
+	// Iterate over the original comments again
 	data.forEach( ( item ) => {
 		if ( item.parent ) {
 			// If the comment has a "parent", then find that parent in the table that
