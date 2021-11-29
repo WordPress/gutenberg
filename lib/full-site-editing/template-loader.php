@@ -293,12 +293,9 @@ function gutenberg_get_edit_template_link( $link, $post_id ) {
 add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );
 
 /**
- * Checks the HTML to be rendered for any emojis.
- * If there are none, then the emoji script is removed from the `<head>`.
+ * Remove the emoji script for themes that support block templates.
  *
- * @param string $html The HTML to be rendered.
- *
- * @return string The HTML.
+ * @return void
  */
 function _gutenberg_maybe_remove_emoji_detection_script() {
 	if ( gutenberg_supports_block_templates() ) {
