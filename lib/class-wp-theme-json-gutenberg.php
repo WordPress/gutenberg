@@ -1,14 +1,20 @@
 <?php
 /**
- * Process of structures that adhere to the theme.json schema.
+ * WP_Theme_JSON_Gutenberg class
  *
  * @package gutenberg
  */
 
 /**
- * Class that encapsulates the processing of
- * structures that adhere to the theme.json spec.
+ * Class that encapsulates the processing of structures that adhere to the theme.json spec.
+ *
+ * This class is for internal core usage and is not supposed to be used by extenders (plugins and/or themes).
+ * This is a low-level API that may need to do breaking changes. Please,
+ * use get_global_settings, get_global_styles, and get_global_stylesheet instead.
+ *
+ * @access private
  */
+
 class WP_Theme_JSON_Gutenberg {
 
 	/**
@@ -28,102 +34,22 @@ class WP_Theme_JSON_Gutenberg {
 	private static $blocks_metadata = null;
 
 	/**
-	 * The CSS selector for the root block.
+	 * The CSS selector for the top-level styles.
 	 *
 	 * @var string
 	 */
 	const ROOT_BLOCK_SELECTOR = 'body';
 
+	/**
+	 * The sources of data this object can represent.
+	 *
+	 * @since 5.8.0
+	 * @var string[]
+	 */
 	const VALID_ORIGINS = array(
 		'default',
 		'theme',
 		'custom',
-	);
-
-	const VALID_TOP_LEVEL_KEYS = array(
-		'customTemplates',
-		'templateParts',
-		'styles',
-		'settings',
-		'version',
-	);
-
-	const VALID_STYLES = array(
-		'border'     => array(
-			'color'  => null,
-			'radius' => null,
-			'style'  => null,
-			'width'  => null,
-		),
-		'color'      => array(
-			'background' => null,
-			'gradient'   => null,
-			'text'       => null,
-		),
-		'filter'     => array(
-			'duotone' => null,
-		),
-		'spacing'    => array(
-			'margin'   => null,
-			'padding'  => null,
-			'blockGap' => null,
-		),
-		'typography' => array(
-			'fontFamily'     => null,
-			'fontSize'       => null,
-			'fontStyle'      => null,
-			'fontWeight'     => null,
-			'letterSpacing'  => null,
-			'lineHeight'     => null,
-			'textDecoration' => null,
-			'textTransform'  => null,
-		),
-	);
-
-	const VALID_SETTINGS = array(
-		'appearanceTools' => null,
-		'border'          => array(
-			'color'  => null,
-			'radius' => null,
-			'style'  => null,
-			'width'  => null,
-		),
-		'color'           => array(
-			'background'       => null,
-			'custom'           => null,
-			'customDuotone'    => null,
-			'customGradient'   => null,
-			'defaultGradients' => null,
-			'defaultPalette'   => null,
-			'duotone'          => null,
-			'gradients'        => null,
-			'link'             => null,
-			'palette'          => null,
-			'text'             => null,
-		),
-		'custom'          => null,
-		'layout'          => array(
-			'contentSize' => null,
-			'wideSize'    => null,
-		),
-		'spacing'         => array(
-			'blockGap' => null,
-			'margin'   => null,
-			'padding'  => null,
-			'units'    => null,
-		),
-		'typography'      => array(
-			'customFontSize' => null,
-			'dropCap'        => null,
-			'fontFamilies'   => null,
-			'fontSizes'      => null,
-			'fontStyle'      => null,
-			'fontWeight'     => null,
-			'letterSpacing'  => null,
-			'lineHeight'     => null,
-			'textDecoration' => null,
-			'textTransform'  => null,
-		),
 	);
 
 	/**
@@ -154,7 +80,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * - value_func => optionally, instead of value_key, a function to generate
 	 *                 the value that takes a preset as an argument
 	 *
-	 * - css_var    => name of the var to generate. The "$slug" substring will be
+	 * - css_vars   => name of the var to generate. The "$slug" substring will be
 	 *                 replaced by the slug of each preset. For example,
 	 *                 given a preset for color with two values whose slugs are "black" and "white",
 	 *                 the string "--wp--preset--color--$slug" will generate two variables:
@@ -170,6 +96,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                   '.has-$slug-background-color' => 'background-color',
 	 *                   '.has-$slug-border-color'     => 'border-color',
 	 *                 )
+	 *
 	 * - properties => array of CSS properties to be used by kses to
 	 *                 validate the content of each preset
 	 *                 by means of the remove_insecure_properties method.
@@ -274,6 +201,112 @@ class WP_Theme_JSON_Gutenberg {
 		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
 	);
 
+	/**
+	 * The top-level keys a theme.json can have.
+	 *
+	 * @var string[]
+	 */
+	const VALID_TOP_LEVEL_KEYS = array(
+		'customTemplates',
+		'settings',
+		'styles',
+		'templateParts',
+		'version',
+	);
+
+	/**
+	 * The valid properties under the settings key.
+	 *
+	 * @var array
+	 */
+	const VALID_SETTINGS = array(
+		'appearanceTools' => null,
+		'border'          => array(
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
+		),
+		'color'           => array(
+			'background'       => null,
+			'custom'           => null,
+			'customDuotone'    => null,
+			'customGradient'   => null,
+			'defaultGradients' => null,
+			'defaultPalette'   => null,
+			'duotone'          => null,
+			'gradients'        => null,
+			'link'             => null,
+			'palette'          => null,
+			'text'             => null,
+		),
+		'custom'          => null,
+		'layout'          => array(
+			'contentSize' => null,
+			'wideSize'    => null,
+		),
+		'spacing'         => array(
+			'blockGap' => null,
+			'margin'   => null,
+			'padding'  => null,
+			'units'    => null,
+		),
+		'typography'      => array(
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+		),
+	);
+
+	/**
+	 * The valid properties under the styles key.
+	 *
+	 * @var array
+	 */
+	const VALID_STYLES = array(
+		'border'     => array(
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
+		),
+		'color'      => array(
+			'background' => null,
+			'gradient'   => null,
+			'text'       => null,
+		),
+		'filter'     => array(
+			'duotone' => null,
+		),
+		'spacing'    => array(
+			'margin'   => null,
+			'padding'  => null,
+			'blockGap' => null,
+		),
+		'typography' => array(
+			'fontFamily'     => null,
+			'fontSize'       => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+		),
+	);
+
+	/**
+	 * The valid elements that can be found under styles.
+	 *
+	 * @var string[]
+	 */
 	const ELEMENTS = array(
 		'link' => 'a',
 		'h1'   => 'h1',
@@ -284,24 +317,31 @@ class WP_Theme_JSON_Gutenberg {
 		'h6'   => 'h6',
 	);
 
+	/**
+	 * The latest version of the schema in use.
+	 *
+	 * @var int
+	 */
+
 	const LATEST_SCHEMA = 2;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param array  $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin What source of data this object represents. One of default, theme, or custom. Default: theme.
+	 * @param array $theme_json A structure that follows the theme.json schema.
+	 * @param string $origin    Optional. What source of data this object represents.
+	 *                          One of 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
 		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
 
-		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
-		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$theme_json          = self::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
 		$this->theme_json    = self::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
