@@ -77,7 +77,6 @@ figure.wp-block-gallery {
 	}
 }
 
-
 /**
  * Gallery inspector controls settings.
  */
@@ -129,6 +128,7 @@ figure.wp-block-gallery {
 			bottom: 0;
 			left: 0;
 			z-index: 1;
+			pointer-events: none;
 		}
 	}
 

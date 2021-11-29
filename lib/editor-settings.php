@@ -25,7 +25,7 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_supports_block_templates();
 
 	if ( gutenberg_is_fse_theme() ) {
-		$settings['defaultTemplatePartAreas'] = gutenberg_get_allowed_template_part_areas();
+		$settings['defaultTemplatePartAreas'] = get_allowed_block_template_part_areas();
 	}
 
 	return $settings;

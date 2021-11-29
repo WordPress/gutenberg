@@ -22,7 +22,6 @@ import {
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 	__unstableEditorStyles as EditorStyles,
 	useSetting,
 	__experimentalLayoutStyle as LayoutStyle,
@@ -153,7 +152,6 @@ export default function VisualEditor( { styles } ) {
 	const contentRef = useMergeRefs( [
 		ref,
 		useClipboardHandler(),
-		useCanvasClickRedirect(),
 		useTypewriter(),
 		useTypingObserver(),
 		useBlockSelectionClearer(),

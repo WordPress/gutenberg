@@ -10,7 +10,7 @@ For example, in your `block.json` file you would add:
 
 ```json
 {
-	"$schema": "https://raw.githubusercontent.com/WordPress/gutenberg/trunk/packages/schemas/json/block.json"
+	"$schema": "https://raw.githubusercontent.com/WordPress/gutenberg/trunk/schemas/json/block.json"
 }
 ```
 

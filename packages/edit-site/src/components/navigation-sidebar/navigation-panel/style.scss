@@ -9,8 +9,10 @@
 	@include reduce-motion("transition");
 
 	// Footer is visible from medium so we subtract footer's height
-	@include break-medium() {
-		height: calc(100% - #{$button-size-small + $border-width});
+	.interface-interface-skeleton.has-footer & {
+		@include break-medium() {
+			height: calc(100% - #{$button-size-small + $border-width});
+		}
 	}
 }
 

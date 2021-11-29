@@ -9,6 +9,9 @@ import classnames from 'classnames';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationBackButton as NavigationBackButton,
+	__experimentalNavigationGroup as NavigationGroup,
+	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -16,65 +19,43 @@ import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 import { decodeEntities } from '@wordpress/html-entities';
+import { addQueryArgs } from '@wordpress/url';
+import {
+	home as siteIcon,
+	layout as templateIcon,
+	symbolFilled as templatePartIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import SiteMenu from './menus';
 import MainDashboardButton from '../../main-dashboard-button';
 import { store as editSiteStore } from '../../../store';
-import { MENU_ROOT } from './constants';
 
-const NavigationPanel = ( { isOpen } ) => {
-	const {
-		page: { context: { postType, postId } = {} } = {},
-		editedPostId,
-		editedPostType,
-		activeMenu,
-		siteTitle,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostType,
-			getEditedPostId,
-			getNavigationPanelActiveMenu,
-			getPage,
-		} = select( editSiteStore );
+const SITE_EDITOR_KEY = 'site-editor';
+
+const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
+	const { isNavigationOpen, siteTitle } = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreDataStore );
 
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 		return {
-			page: getPage(),
-			editedPostId: getEditedPostId(),
-			editedPostType: getEditedPostType(),
-			activeMenu: getNavigationPanelActiveMenu(),
 			siteTitle: siteData.name,
+			isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
 		};
 	}, [] );
-
-	const {
-		setNavigationPanelActiveMenu: setActive,
-		setIsNavigationPanelOpened,
-	} = useDispatch( editSiteStore );
-
-	let activeItem;
-	if ( activeMenu !== MENU_ROOT ) {
-		if ( activeMenu.startsWith( 'content' ) ) {
-			activeItem = `${ postType }-${ postId }`;
-		} else {
-			activeItem = `${ editedPostType }-${ editedPostId }`;
-		}
-	}
+	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
 	// Ensures focus is moved to the panel area when it is activated
 	// from a separate component (such as document actions in the header).
 	const panelRef = useRef();
 	useEffect( () => {
-		if ( isOpen ) {
+		if ( isNavigationOpen ) {
 			panelRef.current.focus();
 		}
-	}, [ activeMenu, isOpen ] );
+	}, [ activeItem, isNavigationOpen ] );
 
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
@@ -87,7 +68,7 @@ const NavigationPanel = ( { isOpen } ) => {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			className={ classnames( `edit-site-navigation-panel`, {
-				'is-open': isOpen,
+				'is-open': isNavigationOpen,
 			} ) }
 			ref={ panelRef }
 			tabIndex="-1"
@@ -100,21 +81,46 @@ const NavigationPanel = ( { isOpen } ) => {
 					</div>
 				</div>
 				<div className="edit-site-navigation-panel__scroll-container">
-					<Navigation
-						activeItem={ activeItem }
-						activeMenu={ activeMenu }
-						onActivateMenu={ setActive }
-					>
-						{ activeMenu === MENU_ROOT && (
-							<MainDashboardButton.Slot>
-								<NavigationBackButton
-									backButtonLabel={ __( 'Dashboard' ) }
-									className="edit-site-navigation-panel__back-to-dashboard"
-									href="index.php"
+					<Navigation activeItem={ activeItem }>
+						<MainDashboardButton.Slot>
+							<NavigationBackButton
+								backButtonLabel={ __( 'Dashboard' ) }
+								className="edit-site-navigation-panel__back-to-dashboard"
+								href="index.php"
+							/>
+						</MainDashboardButton.Slot>
+
+						<NavigationMenu>
+							<NavigationGroup title={ __( 'Editor' ) }>
+								<NavigationItem
+									icon={ siteIcon }
+									title={ __( 'Site' ) }
+									item={ SITE_EDITOR_KEY }
+									href={ addQueryArgs( window.location.href, {
+										postId: undefined,
+										postType: undefined,
+									} ) }
 								/>
-							</MainDashboardButton.Slot>
-						) }
-						<SiteMenu />
+								<NavigationItem
+									icon={ templateIcon }
+									title={ __( 'Templates' ) }
+									item="wp_template"
+									href={ addQueryArgs( window.location.href, {
+										postId: undefined,
+										postType: 'wp_template',
+									} ) }
+								/>
+								<NavigationItem
+									icon={ templatePartIcon }
+									title={ __( 'Template Parts' ) }
+									item="wp_template_part"
+									href={ addQueryArgs( window.location.href, {
+										postId: undefined,
+										postType: 'wp_template_part',
+									} ) }
+								/>
+							</NavigationGroup>
+						</NavigationMenu>
 					</Navigation>
 				</div>
 			</div>

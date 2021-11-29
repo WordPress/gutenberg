@@ -138,4 +138,19 @@ module.exports = {
 	isSelected: {
 		color: 'blue',
 	},
+	'embed-no-preview__help-icon': {
+		fill: 'gray',
+	},
+	'embed-no-preview__sheet-icon': {
+		fill: 'gray',
+	},
+	fullAlignment: {
+		width: '100%',
+	},
+	'embed__icon--error': {
+		fill: 'red',
+	},
+	'components-autocomplete': {
+		height: 100,
+	},
 };

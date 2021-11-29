@@ -26,21 +26,4 @@
 	&:active {
 		color: $black;
 	}
-
-	// This variant is used in inline situations, like Buttons, Social Links, Navigation Menu.
-	&.block-list-appender__toggle {
-		display: flex;
-		flex-direction: row;
-		box-shadow: none;
-		height: $icon-size;
-		width: $icon-size;
-
-		& > svg {
-			width: $icon-size;
-			background-color: $gray-900;
-			color: $white;
-			border-radius: $radius-block-ui;
-			flex: 1 0 auto;
-		}
-	}
 }

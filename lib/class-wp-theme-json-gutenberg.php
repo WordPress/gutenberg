@@ -35,9 +35,9 @@ class WP_Theme_JSON_Gutenberg {
 	const ROOT_BLOCK_SELECTOR = 'body';
 
 	const VALID_ORIGINS = array(
-		'core',
+		'default',
 		'theme',
-		'user',
+		'custom',
 	);
 
 	const VALID_TOP_LEVEL_KEYS = array(
@@ -81,45 +81,48 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	const VALID_SETTINGS = array(
-		'border'     => array(
-			'color'        => null,
-			'customRadius' => null,
-			'style'        => null,
-			'width'        => null,
+		'appearanceTools' => null,
+		'border'          => array(
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
 		),
-		'color'      => array(
-			'background'     => null,
-			'custom'         => null,
-			'customDuotone'  => null,
-			'customGradient' => null,
-			'duotone'        => null,
-			'gradients'      => null,
-			'link'           => null,
-			'palette'        => null,
-			'text'           => null,
+		'color'           => array(
+			'background'       => null,
+			'custom'           => null,
+			'customDuotone'    => null,
+			'customGradient'   => null,
+			'defaultGradients' => null,
+			'defaultPalette'   => null,
+			'duotone'          => null,
+			'gradients'        => null,
+			'link'             => null,
+			'palette'          => null,
+			'text'             => null,
 		),
-		'custom'     => null,
-		'layout'     => array(
+		'custom'          => null,
+		'layout'          => array(
 			'contentSize' => null,
 			'wideSize'    => null,
 		),
-		'spacing'    => array(
-			'blockGap'      => null,
-			'customMargin'  => null,
-			'customPadding' => null,
-			'units'         => null,
+		'spacing'         => array(
+			'blockGap' => null,
+			'margin'   => null,
+			'padding'  => null,
+			'units'    => null,
 		),
-		'typography' => array(
-			'customFontSize'   => null,
-			'customLineHeight' => null,
-			'dropCap'          => null,
-			'fontFamilies'     => null,
-			'fontSizes'        => null,
-			'fontStyle'        => null,
-			'fontWeight'       => null,
-			'letterSpacing'    => null,
-			'textDecoration'   => null,
-			'textTransform'    => null,
+		'typography'      => array(
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
 		),
 	);
 
@@ -142,6 +145,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * This contains the necessary metadata to process them:
 	 *
 	 * - path       => where to find the preset within the settings section
+	 *
+	 * - override   => whether a theme preset with the same slug as a default preset
+	 *                 can override it
 	 *
 	 * - value_key  => the key that represents the value
 	 *
@@ -171,6 +177,7 @@ class WP_Theme_JSON_Gutenberg {
 	const PRESETS_METADATA = array(
 		array(
 			'path'       => array( 'color', 'palette' ),
+			'override'   => false,
 			'value_key'  => 'color',
 			'css_vars'   => '--wp--preset--color--$slug',
 			'classes'    => array(
@@ -182,6 +189,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'color', 'gradients' ),
+			'override'   => false,
 			'value_key'  => 'gradient',
 			'css_vars'   => '--wp--preset--gradient--$slug',
 			'classes'    => array( '.has-$slug-gradient-background' => 'background' ),
@@ -189,6 +197,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'color', 'duotone' ),
+			'override'   => true,
 			'value_func' => 'gutenberg_render_duotone_filter_preset',
 			'css_vars'   => '--wp--preset--duotone--$slug',
 			'classes'    => array(),
@@ -196,6 +205,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'typography', 'fontSizes' ),
+			'override'   => true,
 			'value_key'  => 'size',
 			'css_vars'   => '--wp--preset--font-size--$slug',
 			'classes'    => array( '.has-$slug-font-size' => 'font-size' ),
@@ -203,6 +213,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'typography', 'fontFamilies' ),
+			'override'   => true,
 			'value_key'  => 'fontFamily',
 			'css_vars'   => '--wp--preset--font-family--$slug',
 			'classes'    => array( '.has-$slug-font-family' => 'font-family' ),
@@ -273,34 +284,25 @@ class WP_Theme_JSON_Gutenberg {
 		'h6'   => 'h6',
 	);
 
-	const LATEST_SCHEMA = 1;
+	const LATEST_SCHEMA = 2;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param array  $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin What source of data this object represents. One of core, theme, or user. Default: theme.
+	 * @param string $origin What source of data this object represents. One of default, theme, or custom. Default: theme.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
 		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
 
-		// The old format is not meant to be ported to core.
-		// We can remove it at that point.
-		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
-		}
-
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
-		}
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
-		$this->theme_json    = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$this->theme_json    = self::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = self::get_setting_nodes( $this->theme_json );
@@ -309,10 +311,64 @@ class WP_Theme_JSON_Gutenberg {
 				$path   = array_merge( $node['path'], $preset_metadata['path'] );
 				$preset = _wp_array_get( $this->theme_json, $path, null );
 				if ( null !== $preset ) {
-					gutenberg_experimental_set( $this->theme_json, $path, array( $origin => $preset ) );
+					// If the preset is not already keyed by origin.
+					if ( isset( $preset[0] ) || empty( $preset ) ) {
+						_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
+					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Enables some opt-in settings if theme declared support.
+	 *
+	 * @param array $theme_json A theme.json structure to modify.
+	 * @return array The modified theme.json structure.
+	 */
+	private static function maybe_opt_in_into_settings( $theme_json ) {
+		$new_theme_json = $theme_json;
+
+		if ( isset( $new_theme_json['settings']['appearanceTools'] ) ) {
+			self::do_opt_in_into_settings( $new_theme_json['settings'] );
+		}
+
+		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
+			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
+				if ( isset( $block['appearanceTools'] ) ) {
+					self::do_opt_in_into_settings( $block );
+				}
+			}
+		}
+
+		return $new_theme_json;
+	}
+
+	/**
+	 * Enables some settings.
+	 *
+	 * @param array $context The context to which the settings belong.
+	 */
+	private static function do_opt_in_into_settings( &$context ) {
+		$to_opt_in = array(
+			array( 'border', 'color' ),
+			array( 'border', 'radius' ),
+			array( 'border', 'style' ),
+			array( 'border', 'width' ),
+			array( 'color', 'link' ),
+			array( 'spacing', 'blockGap' ),
+			array( 'spacing', 'margin' ),
+			array( 'spacing', 'padding' ),
+			array( 'typography', 'lineHeight' ),
+		);
+
+		foreach ( $to_opt_in as $path ) {
+			if ( null === _wp_array_get( $context, $path, null ) ) {
+				_wp_array_set( $context, $path, true );
+			}
+		}
+
+		unset( $context['appearanceTools'] );
 	}
 
 	/**
@@ -596,7 +652,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( is_array( $value_path ) ) {
 				$path_string = implode( '.', $value_path );
 				if (
-					isset( self::PROTECTED_PROPERTIES[ $path_string ] ) &&
+					array_key_exists( $path_string, self::PROTECTED_PROPERTIES ) &&
 					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
 				) {
 					continue;
@@ -714,7 +770,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
-				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				$value = '';
 				if ( isset( $preset_metadata['value_key'] ) ) {
@@ -755,7 +811,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 			foreach ( $preset_per_origin[ $origin ] as $preset ) {
-				$slug = gutenberg_experimental_to_kebab_case( $preset['slug'] );
+				$slug = _wp_to_kebab_case( $preset['slug'] );
 
 				// Use the array as a set so we don't get duplicates.
 				$result[ $slug ] = $slug;
@@ -1075,8 +1131,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *     }
 	 *   },
 	 *   'core/paragraph': {
-	 *     'spacing': {
-	 *       'customPadding': true
+	 *     'typography': {
+	 *       'customFontSize': true
 	 *     }
 	 *   }
 	 * }
@@ -1271,7 +1327,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
-	 * @param array $origins A list of origins to include. By default it includes 'core', 'theme', and 'user'.
+	 * @param array $origins A list of origins to include. By default it includes 'default', 'theme', and 'custom'.
 	 *
 	 * @return string Stylesheet.
 	 */
@@ -1306,30 +1362,135 @@ class WP_Theme_JSON_Gutenberg {
 		$incoming_data    = $incoming->get_raw_data();
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
-		// The array_replace_recursive algorithm merges at the leaf level.
-		// For leaf values that are arrays it will use the numeric indexes for replacement.
-		// In those cases, we want to replace the existing with the incoming value, if it exists.
-		$to_replace   = array();
-		$to_replace[] = array( 'spacing', 'units' );
-		foreach ( self::VALID_ORIGINS as $origin ) {
-			$to_replace[] = array( 'color', 'duotone', $origin );
-			$to_replace[] = array( 'color', 'palette', $origin );
-			$to_replace[] = array( 'color', 'gradients', $origin );
-			$to_replace[] = array( 'typography', 'fontSizes', $origin );
-			$to_replace[] = array( 'typography', 'fontFamilies', $origin );
-		}
+		/*
+		 * The array_replace_recursive algorithm merges at the leaf level,
+		 * but we don't want leaf arrays to be merged, so we overwrite it.
+		 *
+		 * For leaf values that are sequential arrays it will use the numeric indexes for replacement.
+		 * We rather replace the existing with the incoming value, if it exists.
+		 * This is the case of spacing.units.
+		 *
+		 * For leaf values that are associative arrays it will merge them as expected.
+		 * This is also not the behavior we want for the current associative arrays (presets).
+		 * We rather replace the existing with the incoming value, if it exists.
+		 * This happens, for example, when we merge data from theme.json upon existing
+		 * theme supports or when we merge anything coming from the same source twice.
+		 * This is the case of color.palette, color.gradients, color.duotone,
+		 * typography.fontSizes, or typography.fontFamilies.
+		 *
+		 * Additionally, for some preset types, we also want to make sure the
+		 * values they introduce don't conflict with default values. We do so
+		 * by checking the incoming slugs for theme presets and compare them
+		 * with the equivalent dfefault presets: if a slug is present as a default
+		 * we remove it from the theme presets.
+		 */
+		$nodes        = self::get_setting_nodes( $incoming_data );
+		$slugs_global = self::get_slugs_not_to_override( $this->theme_json );
+		foreach ( $nodes as $node ) {
+			$slugs_node = self::get_slugs_not_to_override( $this->theme_json, $node['path'] );
+			$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
 
-		$nodes = self::get_setting_nodes( $this->theme_json );
-		foreach ( $nodes as $metadata ) {
-			foreach ( $to_replace as $property_path ) {
-				$path = array_merge( $metadata['path'], $property_path );
-				$node = _wp_array_get( $incoming_data, $path, null );
-				if ( isset( $node ) ) {
-					gutenberg_experimental_set( $this->theme_json, $path, $node );
+			// Replace the spacing.units.
+			$path    = array_merge( $node['path'], array( 'spacing', 'units' ) );
+			$content = _wp_array_get( $incoming_data, $path, null );
+			if ( isset( $content ) ) {
+				_wp_array_set( $this->theme_json, $path, $content );
+			}
+
+			// Replace the presets.
+			foreach ( self::PRESETS_METADATA as $preset ) {
+				foreach ( self::VALID_ORIGINS as $origin ) {
+					$path    = array_merge( $node['path'], $preset['path'], array( $origin ) );
+					$content = _wp_array_get( $incoming_data, $path, null );
+					if ( ! isset( $content ) ) {
+						continue;
+					}
+
+					if (
+						( 'theme' !== $origin ) ||
+						( 'theme' === $origin && $preset['override'] )
+					) {
+						_wp_array_set( $this->theme_json, $path, $content );
+					}
+
+					if ( 'theme' === $origin && ! $preset['override'] ) {
+						$content = self::filter_slugs( $content, $preset['path'], $slugs );
+						_wp_array_set( $this->theme_json, $path, $content );
+					}
 				}
 			}
 		}
 
+	}
+
+	/**
+	 * Returns the slugs for all the presets that cannot be overriden
+	 * in the given path. It returns an associative array
+	 * whose keys are the preset paths and the leafs is the list of slugs.
+	 *
+	 * For example:
+	 *
+	 * array(
+	 *   'color' => array(
+	 *     'palette'   => array( 'slug-1', 'slug-2' ),
+	 *     'gradients' => array( 'slug-3', 'slug-4' ),
+	 *   ),
+	 * )
+	 *
+	 * @param array $data A theme.json like structure to inspect.
+	 * @param array $node_path The path to inspect. It's 'settings' by default.
+	 *
+	 * @return array An associative array containing the slugs for the given path.
+	 */
+	private static function get_slugs_not_to_override( $data, $node_path = array( 'settings' ) ) {
+		$slugs = array();
+		foreach ( self::PRESETS_METADATA as $metadata ) {
+			if ( $metadata['override'] ) {
+				continue;
+			}
+
+			$slugs_for_preset = array();
+			$path             = array_merge( $node_path, $metadata['path'], array( 'default' ) );
+			$preset           = _wp_array_get( $data, $path, null );
+			if ( ! isset( $preset ) ) {
+				continue;
+			}
+
+			$slugs_for_preset = array_map(
+				function( $value ) {
+					return isset( $value['slug'] ) ? $value['slug'] : null;
+				},
+				$preset
+			);
+			_wp_array_set( $slugs, $metadata['path'], $slugs_for_preset );
+		}
+
+		return $slugs;
+	}
+
+	/**
+	 * Removes the preset values whose slug is equal to any of given slugs.
+	 *
+	 * @param array $node The node with the presets to validate.
+	 * @param array $path The path to the preset type to inspect.
+	 * @param array $slugs The slugs that should not be overriden.
+	 *
+	 * @return array The new node
+	 */
+	private static function filter_slugs( $node, $path, $slugs ) {
+		$slugs_for_preset = _wp_array_get( $slugs, $path, array() );
+		if ( empty( $slugs_for_preset ) ) {
+			return $node;
+		}
+
+		$new_node = array();
+		foreach ( $node as $value ) {
+			if ( isset( $value['slug'] ) && ! in_array( $value['slug'], $slugs_for_preset, true ) ) {
+				$new_node[] = $value;
+			}
+		}
+
+		return $new_node;
 	}
 
 	/**
@@ -1343,46 +1504,48 @@ class WP_Theme_JSON_Gutenberg {
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-			$presets = _wp_array_get( $input, $preset_metadata['path'], null );
-			if ( null === $presets ) {
-				continue;
-			}
+			foreach ( self::VALID_ORIGINS as $origin ) {
+				$path_with_origin = array_merge( $preset_metadata['path'], array( $origin ) );
+				$presets          = _wp_array_get( $input, $path_with_origin, null );
+				if ( null === $presets ) {
+					continue;
+				}
 
-			$escaped_preset = array();
-			foreach ( $presets as $preset ) {
-				if (
-					esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
-					sanitize_html_class( $preset['slug'] ) === $preset['slug']
-				) {
-					$value = null;
-					if ( isset( $preset_metadata['value_key'] ) ) {
-						$value = $preset[ $preset_metadata['value_key'] ];
-					} elseif (
-						isset( $preset_metadata['value_func'] ) &&
-						is_callable( $preset_metadata['value_func'] )
+				$escaped_preset = array();
+				foreach ( $presets as $preset ) {
+					if (
+						esc_attr( esc_html( $preset['name'] ) ) === $preset['name'] &&
+						sanitize_html_class( $preset['slug'] ) === $preset['slug']
 					) {
-						$value = call_user_func( $preset_metadata['value_func'], $preset );
-					}
+						$value = null;
+						if ( isset( $preset_metadata['value_key'] ) ) {
+							$value = $preset[ $preset_metadata['value_key'] ];
+						} elseif (
+							isset( $preset_metadata['value_func'] ) &&
+							is_callable( $preset_metadata['value_func'] )
+						) {
+							$value = call_user_func( $preset_metadata['value_func'], $preset );
+						}
 
-					$preset_is_valid = true;
-					foreach ( $preset_metadata['properties'] as $property ) {
-						if ( ! self::is_safe_css_declaration( $property, $value ) ) {
-							$preset_is_valid = false;
-							break;
+						$preset_is_valid = true;
+						foreach ( $preset_metadata['properties'] as $property ) {
+							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+								$preset_is_valid = false;
+								break;
+							}
+						}
+
+						if ( $preset_is_valid ) {
+							$escaped_preset[] = $preset;
 						}
 					}
+				}
 
-					if ( $preset_is_valid ) {
-						$escaped_preset[] = $preset;
-					}
+				if ( ! empty( $escaped_preset ) ) {
+					_wp_array_set( $output, $path_with_origin, $escaped_preset );
 				}
 			}
-
-			if ( ! empty( $escaped_preset ) ) {
-				gutenberg_experimental_set( $output, $preset_metadata['path'], $escaped_preset );
-			}
 		}
-
 		return $output;
 	}
 
@@ -1406,7 +1569,7 @@ class WP_Theme_JSON_Gutenberg {
 				// double up shorthand and longhand styles.
 				$value = _wp_array_get( $input, $path, array() );
 				if ( ! is_array( $value ) ) {
-					gutenberg_experimental_set( $output, $path, $value );
+					_wp_array_set( $output, $path, $value );
 				}
 			}
 		}
@@ -1436,15 +1599,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
-		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
-		}
-
-		// Provide backwards compatibility for settings that did not land in 5.8
-		// and have had their `custom` prefixed removed since.
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = WP_Theme_JSON_Schema_V1::parse( $theme_json );
-		}
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
@@ -1460,7 +1615,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$output = self::remove_insecure_styles( $input );
 			if ( ! empty( $output ) ) {
-				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
+				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
 		}
 
@@ -1473,7 +1628,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$output = self::remove_insecure_settings( $input );
 			if ( ! empty( $output ) ) {
-				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
+				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
 		}
 
@@ -1542,7 +1697,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
 				$theme_settings['settings']['typography'] = array();
 			}
-			$theme_settings['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+			$theme_settings['settings']['typography']['lineHeight'] = $settings['enableCustomLineHeight'];
 		}
 
 		if ( isset( $settings['enableCustomUnits'] ) ) {
@@ -1590,7 +1745,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
 				$theme_settings['settings']['spacing'] = array();
 			}
-			$theme_settings['settings']['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+			$theme_settings['settings']['spacing']['padding'] = $settings['enableCustomSpacing'];
 		}
 
 		// Things that didn't land in core yet, so didn't have a setting assigned.

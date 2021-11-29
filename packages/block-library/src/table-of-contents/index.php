@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/table-of-contents` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**

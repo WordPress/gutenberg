@@ -177,7 +177,7 @@ module.exports = {
 
 The following configurable variables are used with the template files. Template authors can change default values to use when users don't provide their data:
 
--   `$schema` (default: `https://json.schemastore.org/block.json`)
+-   `$schema` (default: `https://schemas.wp.org/trunk/block.json`)
 -   `apiVersion` (default: `2`) - see https://make.wordpress.org/core/2020/11/18/block-api-version-2/.
 -   `slug` (no default)
 -   `namespace` (default: `'create-block'`)

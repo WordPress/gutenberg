@@ -91,6 +91,7 @@ export function initializeEditor(
 	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
 		fixedToolbar: false,
 		welcomeGuide: true,
+		mobileGalleryWarning: true,
 		fullscreenMode: true,
 		showIconLabels: false,
 		themeStyles: true,

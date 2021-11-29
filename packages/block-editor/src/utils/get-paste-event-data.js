@@ -27,7 +27,7 @@ export function getPasteEventData( { clipboardData } ) {
 
 	const files = getFilesFromDataTransfer(
 		clipboardData
-	).filter( ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+	).filter( ( { type } ) => /^image\/(?:jpe?g|png|gif|webp)$/.test( type ) );
 
 	// Only process files if no HTML is present.
 	// A pasted file may have the URL as plain text.

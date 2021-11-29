@@ -10,7 +10,7 @@
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$stylesheet = gutenberg_get_global_stylesheet();
+	$stylesheet = wp_get_global_stylesheet();
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -52,7 +52,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$settings['__experimentalStyles'] = gutenberg_get_global_styles();
+		$settings['__experimentalStyles'] = wp_get_global_styles();
 	}
 
 	if ( 'other' === $context ) {
@@ -83,7 +83,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			),
 		);
 		foreach ( $new_presets as $new_style ) {
-			$style_css = gutenberg_get_global_stylesheet( array( $new_style['css'] ) );
+			$style_css = wp_get_global_stylesheet( array( $new_style['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_style['css']    = $style_css;
 				$new_global_styles[] = $new_style;
@@ -95,7 +95,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'__unstableType' => 'theme',
 		);
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$style_css = gutenberg_get_global_stylesheet( array( $new_block_classes['css'] ) );
+			$style_css = wp_get_global_stylesheet( array( $new_block_classes['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_block_classes['css'] = $style_css;
 				$new_global_styles[]      = $new_block_classes;
@@ -106,35 +106,35 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
-	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
+	$settings['__experimentalFeatures'] = wp_get_global_settings();
 
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
-		$settings['colors'] = isset( $colors_by_origin['user'] ) ?
-			$colors_by_origin['user'] : (
+		$settings['colors'] = isset( $colors_by_origin['custom'] ) ?
+			$colors_by_origin['custom'] : (
 				isset( $colors_by_origin['theme'] ) ?
 					$colors_by_origin['theme'] :
-					$colors_by_origin['core']
+					$colors_by_origin['default']
 			);
 	}
 
 	if ( isset( $settings['__experimentalFeatures']['color']['gradients'] ) ) {
 		$gradients_by_origin   = $settings['__experimentalFeatures']['color']['gradients'];
-		$settings['gradients'] = isset( $gradients_by_origin['user'] ) ?
-			$gradients_by_origin['user'] : (
+		$settings['gradients'] = isset( $gradients_by_origin['custom'] ) ?
+			$gradients_by_origin['custom'] : (
 				isset( $gradients_by_origin['theme'] ) ?
 					$gradients_by_origin['theme'] :
-					$gradients_by_origin['core']
+					$gradients_by_origin['default']
 			);
 	}
 
 	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
 		$font_sizes_by_origin  = $settings['__experimentalFeatures']['typography']['fontSizes'];
-		$settings['fontSizes'] = isset( $font_sizes_by_origin['user'] ) ?
+		$settings['fontSizes'] = isset( $font_sizes_by_origin['custom'] ) ?
 			$font_sizes_by_origin['user'] : (
 				isset( $font_sizes_by_origin['theme'] ) ?
 					$font_sizes_by_origin['theme'] :
-					$font_sizes_by_origin['core']
+					$font_sizes_by_origin['default']
 			);
 	}
 
@@ -150,16 +150,16 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
 		unset( $settings['__experimentalFeatures']['typography']['customFontSize'] );
 	}
-	if ( isset( $settings['__experimentalFeatures']['typography']['customLineHeight'] ) ) {
-		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['customLineHeight'];
-		unset( $settings['__experimentalFeatures']['typography']['customLineHeight'] );
+	if ( isset( $settings['__experimentalFeatures']['typography']['lineHeight'] ) ) {
+		$settings['enableCustomLineHeight'] = $settings['__experimentalFeatures']['typography']['lineHeight'];
+		unset( $settings['__experimentalFeatures']['typography']['lineHeight'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
 		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
 	}
-	if ( isset( $settings['__experimentalFeatures']['spacing']['customPadding'] ) ) {
-		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['customPadding'];
-		unset( $settings['__experimentalFeatures']['spacing']['customPadding'] );
+	if ( isset( $settings['__experimentalFeatures']['spacing']['padding'] ) ) {
+		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['padding'];
+		unset( $settings['__experimentalFeatures']['spacing']['padding'] );
 	}
 
 	return $settings;
@@ -215,7 +215,6 @@ function gutenberg_global_styles_filter_post( $content ) {
  */
 function gutenberg_global_styles_kses_init_filters() {
 	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
-	add_filter( 'safe_style_css', 'gutenberg_global_styles_include_support_for_duotone', 10, 2 );
 }
 
 /**
@@ -255,6 +254,8 @@ function gutenberg_global_styles_force_filtered_html_on_import_filter( $arg ) {
 	return $arg;
 }
 
+// TODO: Remove this filter when minimum supported version is WP 5.8
+// As all this code is not needed anymore now core supports all variables.
 /**
  * This filter is the last being executed on force_filtered_html_on_import.
  * If the input of the filter is true it means we are in an import situation and should
@@ -285,18 +286,6 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 		return $allow_css;
 	}
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
-}
-
-/**
- * This is for using kses to test user data.
- *
- * @param array $atts Allowed CSS property names, according to kses.
- *
- * @return array The new allowed CSS property names.
- */
-function gutenberg_global_styles_include_support_for_duotone( $atts ) {
-	$atts[] = 'filter';
-	return $atts;
 }
 
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.

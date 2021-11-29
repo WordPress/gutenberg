@@ -11,7 +11,8 @@
  * @return boolean Whether the current theme is an FSE theme or not.
  */
 function gutenberg_is_fse_theme() {
-	return is_readable( get_theme_file_path( '/block-templates/index.html' ) );
+	return is_readable( get_theme_file_path( '/block-templates/index.html' ) ) ||
+		is_readable( get_theme_file_path( '/templates/index.html' ) );
 }
 
 /**
@@ -36,6 +37,10 @@ function gutenberg_remove_legacy_pages() {
 		$indexes_to_remove = array();
 		foreach ( $submenu['themes.php'] as $index => $menu_item ) {
 			if ( false !== strpos( $menu_item[2], 'customize.php' ) && ! gutenberg_site_requires_customizer() ) {
+				$indexes_to_remove[] = $index;
+			}
+
+			if ( false !== strpos( $menu_item[2], 'site-editor.php' ) ) {
 				$indexes_to_remove[] = $index;
 			}
 

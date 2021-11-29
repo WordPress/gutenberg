@@ -119,7 +119,11 @@ const BlockInspectorSingleBlock = ( {
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ clientId } />
+						<BlockStyles
+							scope="core/edit-post"
+							clientId={ clientId }
+							className="block-inspector__block-styles"
+						/>
 						{ hasBlockSupport(
 							blockName,
 							'defaultStylePicker',
@@ -133,6 +137,11 @@ const BlockInspectorSingleBlock = ( {
 				__experimentalGroup="typography"
 				bubblesVirtually={ bubblesVirtually }
 				label={ __( 'Typography' ) }
+			/>
+			<InspectorControls.Slot
+				__experimentalGroup="border"
+				bubblesVirtually={ bubblesVirtually }
+				label={ __( 'Border' ) }
 			/>
 			<InspectorControls.Slot
 				__experimentalGroup="dimensions"

@@ -96,13 +96,13 @@ function ScreenColors( { name } ) {
 				back={ parentMenu ? parentMenu : '/' }
 				title={ __( 'Colors' ) }
 				description={ __(
-					'Manage palettes and the default color of different global elements on the website.'
+					'Manage palettes and the default color of different global elements on the site.'
 				) }
 			/>
 
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
-					<Palette contextName={ name } />
+					<Palette name={ name } />
 
 					<VStack spacing={ 3 }>
 						<Subtitle>{ __( 'Elements' ) }</Subtitle>

@@ -8,15 +8,20 @@ import { blockDefault } from '@wordpress/icons';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 const ALLOWED_BLOCKS = [
-	'core/post-comment-content',
-	'core/post-comment-author',
-	'core/post-comment-date',
-	'core/post-comment-reply-link',
+	'core/comment-author-avatar',
+	'core/comment-author-name',
+	'core/comment-content',
+	'core/comment-date',
+	'core/comment-edit-link',
+	'core/comment-reply-link',
 ];
 const TEMPLATE = [
-	[ 'core/post-comment-content' ],
-	[ 'core/post-comment-author' ],
-	[ 'core/post-comment-reply-link' ],
+	[ 'core/comment-author-avatar' ],
+	[ 'core/comment-author-name' ],
+	[ 'core/comment-date' ],
+	[ 'core/comment-content' ],
+	[ 'core/comment-reply-link' ],
+	[ 'core/comment-edit-link' ],
 ];
 
 export default function Edit( { attributes: { commentId }, setAttributes } ) {

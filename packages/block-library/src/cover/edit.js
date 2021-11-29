@@ -310,6 +310,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
+	markNextChangeAsNotPersistent,
 } ) {
 	const {
 		contentPosition,
@@ -391,6 +392,8 @@ function CoverEdit( {
 	);
 
 	useEffect( () => {
+		// This side-effect should not create an undo level.
+		markNextChangeAsNotPersistent();
 		setAttributes( { isDark: isCoverDark } );
 	}, [ isCoverDark ] );
 
@@ -543,6 +546,7 @@ function CoverEdit( {
 					</PanelBody>
 				) }
 				<PanelColorGradientSettings
+					__experimentalHasMultipleOrigins
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
 					settings={ [
@@ -701,6 +705,7 @@ function CoverEdit( {
 				<BoxControlVisualizer
 					values={ styleAttribute?.spacing?.padding }
 					showValues={ styleAttribute?.visualizers?.padding }
+					className="block-library-cover__padding-visualizer"
 				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
@@ -768,10 +773,14 @@ function CoverEdit( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( blockEditorStore );
+		const {
+			toggleSelection,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = dispatch( blockEditorStore );
 
 		return {
 			toggleSelection,
+			markNextChangeAsNotPersistent: __unstableMarkNextChangeAsNotPersistent,
 		};
 	} ),
 	withColors( { overlayColor: 'background-color' } ),

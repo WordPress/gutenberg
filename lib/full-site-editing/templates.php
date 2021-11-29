@@ -22,6 +22,7 @@ function gutenberg_register_template_post_type() {
 		'new_item'              => __( 'New Template', 'gutenberg' ),
 		'edit_item'             => __( 'Edit Template', 'gutenberg' ),
 		'view_item'             => __( 'View Template', 'gutenberg' ),
+		'view_items'            => __( 'View Templates', 'gutenberg' ),
 		'all_items'             => __( 'All Templates', 'gutenberg' ),
 		'search_items'          => __( 'Search Templates', 'gutenberg' ),
 		'parent_item_colon'     => __( 'Parent Template:', 'gutenberg' ),
@@ -41,7 +42,7 @@ function gutenberg_register_template_post_type() {
 		'public'                => false,
 		'has_archive'           => false,
 		'show_ui'               => true,
-		'show_in_menu'          => 'themes.php',
+		'show_in_menu'          => false,
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'templates',
@@ -54,6 +55,7 @@ function gutenberg_register_template_post_type() {
 			'excerpt',
 			'editor',
 			'revisions',
+			'author',
 		),
 	);
 

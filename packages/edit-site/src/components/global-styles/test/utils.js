@@ -21,7 +21,7 @@ describe( 'editor utils', () => {
 							name: 'Secondary',
 						},
 					],
-					user: [
+					custom: [
 						{
 							slug: 'primary',
 							color: '#007cba',

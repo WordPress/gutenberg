@@ -1,19 +1,5 @@
-.block-editor-hooks__border-controls {
-	.block-editor-hooks__border-controls-row {
-		display: flex;
-		justify-content: space-between;
-
-		> * {
-			width: calc(50% - #{ $grid-unit-10 });
-		}
-	}
-
-	.components-unit-control-wrapper {
-		margin-bottom: $grid-unit-30;
-
-		&:last-child {
-			margin-bottom: $grid-unit-10;
-		}
+.border-block-support-panel {
+	.single-column {
+		grid-column: span 1;
 	}
 }
-
