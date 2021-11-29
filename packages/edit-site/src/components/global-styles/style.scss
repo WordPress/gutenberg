@@ -15,6 +15,30 @@
 	}
 }
 
+.edit-site-typography-panel__preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100px;
+	margin-bottom: $grid-unit-20;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles-screen-typography {
+	margin: $grid-unit-20;
+}
+
+.edit-site-global-styles-screen-typography__indicator {
+	height: 24px;
+	width: 24px;
+	font-size: 14px;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	border-radius: $radius-block-ui;
+}
+
 .edit-site-global-styles-screen-colors {
 	margin: $grid-unit-20;
 
@@ -22,7 +46,6 @@
 		margin-left: 0;
 		display: block;
 		border-radius: 50%;
-		border: 0;
 		height: 24px;
 		width: 24px;
 		padding: 0;
@@ -31,6 +54,7 @@
 			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
 		background-position: 0 0, 25px 25px;
 		background-size: calc(2 * 5px) calc(2 * 5px);
+		border: $border-width solid $gray-300;
 	}
 }
 
@@ -43,4 +67,21 @@
 	margin-bottom: 0 !important;
 	text-transform: uppercase;
 	font-weight: 500;
+}
+
+.edit-site-screen-color-palette-toggle.edit-site-screen-color-palette-toggle {
+	margin-right: $grid-unit-20;
+	margin-left: $grid-unit-20;
+	width: unset;
+	.components-toggle-group-control {
+		min-height: $grid-unit-40;
+	}
+}
+
+h2.edit-site-global-styles-gradient-palette-panel__duotone-heading.components-heading {
+	text-transform: uppercase;
+	line-height: $grid-unit-30;
+	font-weight: 500;
+	font-size: 11px;
+	margin-bottom: $grid-unit-10;
 }

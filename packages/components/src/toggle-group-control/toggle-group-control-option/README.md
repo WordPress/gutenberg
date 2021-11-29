@@ -18,7 +18,7 @@ import {
 function Example() {
 	return (
 		<ToggleGroupControl label="my label" value="vertical" isBlock>
-			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
+			<ToggleGroupControlOption value="horizontal" label="Horizontal" showTooltip={ true } />
 			<ToggleGroupControlOption value="vertical" label="Vertical" />
 		</ToggleGroupControl>
 	);
@@ -38,3 +38,10 @@ Label for the option. If needed, the `aria-label` prop can be used in addition t
 The value of the `ToggleGroupControlOption`.
 
 - Required: Yes
+
+### `showTooltip`: `boolean`
+
+Whether to show a tooltip when hovering over the option. The tooltip will attempt to use the `aria-label` prop text first, then the `label` prop text if no `aria-label` prop is found.
+
+- Required: No
+

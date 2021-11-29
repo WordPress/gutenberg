@@ -55,6 +55,7 @@ function gutenberg_register_template_post_type() {
 			'excerpt',
 			'editor',
 			'revisions',
+			'author',
 		),
 	);
 

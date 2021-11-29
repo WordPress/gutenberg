@@ -22,7 +22,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 		<Button
 			className="editor-post-trash"
 			isDestructive
-			variant="tertiary"
+			variant="secondary"
 			onClick={ onClick }
 		>
 			{ __( 'Move to trash' ) }

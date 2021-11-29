@@ -277,7 +277,7 @@ describe( 'createRegistry', () => {
 			expect( resolver ).toHaveBeenCalledTimes( 2 );
 		} );
 
-		it( 'should support the object resolver definition', () => {
+		it( 'should support the object resolver descriptor', () => {
 			const resolver = jest.fn();
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
@@ -484,7 +484,7 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'register', () => {
-		it( 'should work with the store definition as param for select', () => {
+		it( 'should work with the store descriptor as param for select', () => {
 			const store = createReduxStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
@@ -496,7 +496,7 @@ describe( 'createRegistry', () => {
 			expect( registry.select( store ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should work with the store definition as param for dispatch', async () => {
+		it( 'should work with the store descriptor as param for dispatch', async () => {
 			const store = createReduxStore( 'demo', {
 				reducer( state = 'OK', action ) {
 					if ( action.type === 'UPDATE' ) {

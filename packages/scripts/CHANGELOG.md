@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `puppeteer-core` dependency has been updated from requiring `^10.1.0` to requiring `^11.0.0` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
+
 ### Bug Fixes
 
-- Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
+-   Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
 
 ## 19.2.0 (2021-11-15)
 
