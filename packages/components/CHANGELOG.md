@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.1.0
+
 ### Enhancements
 
 -   Added a `showTooltip` prop to `ToggleGroupControlOption` in order to display tooltip text (using `<Tooltip />`). ([#36726](https://github.com/WordPress/gutenberg/pull/36726)).
