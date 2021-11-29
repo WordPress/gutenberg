@@ -81,13 +81,10 @@ function FontSizePicker(
 			return isSimpleCssValue( value ) && `(${ value })`;
 		}
 		if ( shouldUseSelectControl ) {
-			if ( selectedOption?.slug === 'default' ) {
-				return false;
-			}
-
-			return isSimpleCssValue( selectedOption?.size )
-				? `(${ selectedOption?.size })`
-				: `(${ __( 'Dynamic' ) })`;
+			return (
+				isSimpleCssValue( selectedOption?.size ) &&
+				`(${ selectedOption?.size })`
+			);
 		}
 		// Calculate the `hint` for toggle group control.
 		let hint = selectedOption.name;
