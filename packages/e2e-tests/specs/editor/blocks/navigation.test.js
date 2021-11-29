@@ -784,4 +784,92 @@ describe.skip( 'Navigation', () => {
 
 		expect( isScriptLoaded ).toBe( true );
 	} );
+
+	describe( 'Creating and restarting', () => {
+		async function populateNavWithOneItem() {
+			// Add a Link block first.
+			await page.waitForSelector(
+				'.wp-block-navigation .block-list-appender'
+			);
+			await page.click( '.wp-block-navigation .block-list-appender' );
+			// Add a link to the Link block.
+			await updateActiveNavigationLink( {
+				url: 'https://wordpress.org',
+				label: 'WP',
+				type: 'url',
+			} );
+		}
+
+		async function resetNavBlockToInitialState() {
+			await page.waitForSelector( '[aria-label="Select Menu"]' );
+			await page.click( '[aria-label="Select Menu"]' );
+
+			await page.waitForXPath( '//span[text()="Create new menu"]' );
+			const newMenuButton = await page.$x(
+				'//span[text()="Create new menu"]'
+			);
+			newMenuButton[ 0 ].click();
+		}
+
+		it( 'only update a single entity currently linked with the block', async () => {
+			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
+			// consistent and to test the feature more rigorously than the single default sample page.
+			await mockPagesResponse( [
+				{
+					title: 'Home',
+					slug: 'home',
+				},
+				{
+					title: 'About',
+					slug: 'about',
+				},
+				{
+					title: 'Contact Us',
+					slug: 'contact',
+				},
+			] );
+
+			// Add the navigation block.
+			await insertBlock( 'Navigation' );
+
+			// Create an empty nav block.
+			await createEmptyNavBlock();
+			await populateNavWithOneItem();
+
+			// Let's confirm that the menu entity was updated.
+			await page.waitForSelector(
+				'.editor-post-publish-panel__toggle:not([aria-disabled="true"])'
+			);
+			await page.click( '.editor-post-publish-panel__toggle' );
+
+			const NAV_ENTITY_SELECTOR =
+				'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
+			await page.waitForXPath( NAV_ENTITY_SELECTOR );
+			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
+
+			// Publish the post
+			await page.click( '.editor-entities-saved-states__save-button' );
+			await page.waitForSelector( '.editor-post-publish-button' );
+			await page.click( '.editor-post-publish-button' );
+
+			// A success notice should show up
+			await page.waitForSelector( '.components-snackbar' );
+
+			// Now try inserting another Link block via the quick inserter.
+			await page.focus( '.wp-block-navigation' );
+
+			await resetNavBlockToInitialState();
+			await createEmptyNavBlock();
+			await populateNavWithOneItem();
+
+			// Let's confirm that only the last menu entity was updated.
+			await page.waitForSelector(
+				'.editor-post-publish-button__button:not([aria-disabled="true"])'
+			);
+			await page.click( '.editor-post-publish-button__button' );
+
+			await page.waitForXPath( NAV_ENTITY_SELECTOR );
+			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
+		} );
+	} );
 } );

@@ -30,6 +30,11 @@
 			"background": true,
 			"text": false,
 			"links": false
+		},
+		"spacing": {
+			"__experimentalSkipSerialization": true,
+			"margin": true,
+			"padding": true
 		}
 	}
 }

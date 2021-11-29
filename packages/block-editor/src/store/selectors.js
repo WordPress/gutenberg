@@ -1643,22 +1643,19 @@ export const getInserterItems = createSelector(
 			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
 
-		// Exclude any block type item that is to be replaced by a default
-		// variation.
-		const visibleBlockTypeInserterItems = blockTypeInserterItems.filter(
-			( { variations = [] } ) =>
-				! variations.some( ( { isDefault } ) => isDefault )
-		);
-
-		const blockVariations = [];
-		// Show all available blocks with variations
-		for ( const item of blockTypeInserterItems ) {
+		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
 			const { variations = [] } = item;
+			// Exclude any block type item that is to be replaced by a default variation
+			if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
+				accumulator.push( item );
+			}
 			if ( variations.length ) {
 				const variationMapper = getItemFromVariation( state, item );
-				blockVariations.push( ...variations.map( variationMapper ) );
+				accumulator.push( ...variations.map( variationMapper ) );
 			}
-		}
+			return accumulator;
+		}, [] );
+
 		// Ensure core blocks are prioritized in the returned results,
 		// because third party blocks can be registered earlier than
 		// the core blocks (usually by using the `init` action),
@@ -1671,20 +1668,11 @@ export const getInserterItems = createSelector(
 			type.push( block );
 			return blocks;
 		};
-		const items = visibleBlockTypeInserterItems.reduce( groupByType, {
-			core: [],
-			noncore: [],
-		} );
-		const variations = blockVariations.reduce( groupByType, {
-			core: [],
-			noncore: [],
-		} );
-		const sortedBlockTypes = [
-			...items.core,
-			...variations.core,
-			...items.noncore,
-			...variations.noncore,
-		];
+		const {
+			core: coreItems,
+			noncore: nonCoreItems,
+		} = items.reduce( groupByType, { core: [], noncore: [] } );
+		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
 		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [

@@ -10,7 +10,7 @@ import { isObject, setWith, clone } from 'lodash';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect, Platform } from '@wordpress/element';
+import { useRef, useEffect, useMemo, Platform } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -31,7 +31,6 @@ import ColorPanel from './color-panel';
 import useSetting from '../components/use-setting';
 
 export const COLOR_SUPPORT_KEY = 'color';
-const EMPTY_ARRAY = [];
 
 const hasColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
@@ -217,13 +216,43 @@ function immutableSet( object, path, value ) {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const solids = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
-	const areCustomSolidsEnabled = useSetting( 'color.custom' );
-	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
-	const isLinkEnabled = useSetting( 'color.link' );
-	const isTextEnabled = useSetting( 'color.text' );
-	const isBackgroundEnabled = useSetting( 'color.background' );
+	const {
+		palette: solidsPerOrigin,
+		gradients: gradientsPerOrigin,
+		customGradient: areCustomGradientsEnabled,
+		custom: areCustomSolidsEnabled,
+		text: isTextEnabled,
+		background: isBackgroundEnabled,
+		link: isLinkEnabled,
+	} = useSetting( 'color' ) || {};
+
+	const solidsEnabled =
+		areCustomSolidsEnabled ||
+		! solidsPerOrigin?.theme ||
+		solidsPerOrigin?.theme?.length > 0;
+
+	const gradientsEnabled =
+		areCustomGradientsEnabled ||
+		! gradientsPerOrigin?.theme ||
+		gradientsPerOrigin?.theme?.length > 0;
+
+	const allSolids = useMemo(
+		() => [
+			...( solidsPerOrigin?.custom || [] ),
+			...( solidsPerOrigin?.theme || [] ),
+			...( solidsPerOrigin?.default || [] ),
+		],
+		[ solidsPerOrigin ]
+	);
+
+	const allGradients = useMemo(
+		() => [
+			...( gradientsPerOrigin?.custom || [] ),
+			...( gradientsPerOrigin?.theme || [] ),
+			...( gradientsPerOrigin?.default || [] ),
+		],
+		[ gradientsPerOrigin ]
+	);
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -239,20 +268,15 @@ export function ColorEdit( props ) {
 	}
 
 	const hasLinkColor =
-		hasLinkColorSupport( blockName ) &&
-		isLinkEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		hasLinkColorSupport( blockName ) && isLinkEnabled && solidsEnabled;
 	const hasTextColor =
-		hasTextColorSupport( blockName ) &&
-		isTextEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		hasTextColorSupport( blockName ) && isTextEnabled && solidsEnabled;
 	const hasBackgroundColor =
 		hasBackgroundColorSupport( blockName ) &&
 		isBackgroundEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		solidsEnabled;
 	const hasGradientColor =
-		hasGradientSupport( blockName ) &&
-		( gradients.length > 0 || areCustomGradientsEnabled );
+		hasGradientSupport( blockName ) && gradientsEnabled;
 
 	if (
 		! hasLinkColor &&
@@ -266,13 +290,13 @@ export function ColorEdit( props ) {
 	const { style, textColor, backgroundColor, gradient } = attributes;
 	let gradientValue;
 	if ( hasGradientColor && gradient ) {
-		gradientValue = getGradientValueBySlug( gradients, gradient );
+		gradientValue = getGradientValueBySlug( allGradients, gradient );
 	} else if ( hasGradientColor ) {
 		gradientValue = style?.color?.gradient;
 	}
 
 	const onChangeColor = ( name ) => ( value ) => {
-		const colorObject = getColorObjectByColorValue( solids, value );
+		const colorObject = getColorObjectByColorValue( allSolids, value );
 		const attributeName = name + 'Color';
 		const newStyle = {
 			...localAttributes.current.style,
@@ -296,7 +320,7 @@ export function ColorEdit( props ) {
 	};
 
 	const onChangeGradient = ( value ) => {
-		const slug = getGradientSlugByValue( gradients, value );
+		const slug = getGradientSlugByValue( allGradients, value );
 		let newAttributes;
 		if ( slug ) {
 			const newStyle = {
@@ -331,7 +355,7 @@ export function ColorEdit( props ) {
 	};
 
 	const onChangeLinkColor = ( value ) => {
-		const colorObject = getColorObjectByColorValue( solids, value );
+		const colorObject = getColorObjectByColorValue( allSolids, value );
 		const newLinkColorValue = colorObject?.slug
 			? `var:preset|color|${ colorObject.slug }`
 			: value;
@@ -360,7 +384,7 @@ export function ColorEdit( props ) {
 								label: __( 'Text color' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
-									solids,
+									allSolids,
 									textColor,
 									style?.color?.text
 								).color,
@@ -375,7 +399,7 @@ export function ColorEdit( props ) {
 									? onChangeColor( 'background' )
 									: undefined,
 								colorValue: getColorObjectByAttributeValues(
-									solids,
+									allSolids,
 									backgroundColor,
 									style?.color?.background
 								).color,
@@ -392,7 +416,7 @@ export function ColorEdit( props ) {
 								label: __( 'Link Color' ),
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
-									solids,
+									allSolids,
 									style?.elements?.link?.color?.text
 								),
 								clearable: !! style?.elements?.link?.color
@@ -417,7 +441,15 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+		const { palette: solidsPerOrigin } = useSetting( 'color' ) || {};
+		const colors = useMemo(
+			() => [
+				...( solidsPerOrigin?.custom || [] ),
+				...( solidsPerOrigin?.theme || [] ),
+				...( solidsPerOrigin?.default || [] ),
+			],
+			[ solidsPerOrigin ]
+		);
 		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
