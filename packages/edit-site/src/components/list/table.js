@@ -14,7 +14,7 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import Actions from './actions';
-import TemplateAddedBy from './added-by';
+import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
 	const { templates, isLoading, postType } = useSelect(
@@ -105,7 +105,7 @@ export default function Table( { templateType } ) {
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
-							<TemplateAddedBy
+							<AddedBy
 								templateType={ templateType }
 								template={ template }
 							/>
