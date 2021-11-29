@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../../experimental-features';
+import { siteEditor } from './utils';
 
 async function toggleSidebar() {
 	await page.click(

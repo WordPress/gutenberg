@@ -14,7 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../../experimental-features';
+import { siteEditor } from './utils';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
