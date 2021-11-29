@@ -410,7 +410,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $input Structure to sanitize.
 	 * @param array $valid_block_names List of valid block names.
 	 * @param array $valid_element_names List of valid element names.
-	 *
 	 * @return array The sanitized output.
 	 */
 	private static function sanitize( $input, $valid_block_names, $valid_element_names ) {
@@ -469,21 +468,25 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * Example:
 	 *
-	 * {
-	 *   'core/paragraph': {
-	 *     'selector': 'p'
-	 *   },
-	 *   'core/heading': {
-	 *     'selector': 'h1'
-	 *   },
-	 *   'core/group': {
-	 *     'selector': '.wp-block-group'
-	 *   },
-	 *   'core/cover': {
-	 *     'selector': '.wp-block-cover',
-	 *     'duotone': '> .wp-block-cover__image-background, > .wp-block-cover__video-background'
-	 *   }
-	 * }
+	 *     {
+	 *       'core/paragraph': {
+	 *         'selector': 'p',
+	 *         'elements': {
+	 *           'link' => 'link selector',
+	 *           'etc'  => 'element selector'
+	 *         }
+	 *       },
+	 *       'core/heading': {
+	 *         'selector': 'h1',
+	 *         'elements': {}
+	 *       },
+	 *       'core/image': {
+	 *         'selector': '.wp-block-image',
+	 *         'duotone': 'img',
+	 *         'elements': {}
+	 *       }
+	 *     }
+	 *
 	 *
 	 * @return array Block metadata.
 	 */
@@ -536,7 +539,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $tree Input to process.
 	 * @param array $schema Schema to adhere to.
-	 *
 	 * @return array Returns the modified $tree.
 	 */
 	private static function remove_keys_not_in_schema( $tree, $schema ) {
