@@ -29,7 +29,7 @@ export function PreformattedEdit( props ) {
 		...( style?.color && { color: style.color } ),
 	};
 	const hasBaseColors =
-		style?.baseColors && Object.entries( style?.baseColors ).length !== 0;
+		style?.baseColors && Object.entries( style.baseColors ).length !== 0;
 	const containerStyles = [
 		wpBlockPreformatted,
 		style?.backgroundColor && { backgroundColor: style.backgroundColor },
