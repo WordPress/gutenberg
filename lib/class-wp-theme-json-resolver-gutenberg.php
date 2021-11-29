@@ -134,6 +134,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * is present in theme.json and in theme supports,
 	 * the theme.json takes precendence.
 	 *
+	 * @param array $deprecated Deprecated argument.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
 	public static function get_theme_data( $deprecated = array() ) {

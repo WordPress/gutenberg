@@ -1,4 +1,10 @@
 <?php
+/**
+ * Function to register the Custom Post Type
+ * to be used to store user's config.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Registers a Custom Post Type to store the user's origin config.
