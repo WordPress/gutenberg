@@ -137,16 +137,9 @@ export default function CommentTemplateEdit( {
 		[ queryPerPage, postId, clientId ]
 	);
 
-	const blockContexts = useMemo(
-		() =>
-			convertToTree(
-				comments?.map( ( { id, parent } ) => ( {
-					commentId: id,
-					parent,
-				} ) )
-			),
-		[ comments ]
-	);
+	const blockContexts = useMemo( () => convertToTree( comments ), [
+		comments,
+	] );
 
 	if ( ! comments ) {
 		return (

@@ -7,31 +7,32 @@
  * @example
  * ```
  * const comments = [
- *		{ commentId: 1, parent: 0 },
- *		{ commentId: 2, parent: 1 },
- *		{ commentId: 3, parent: 2 },
- *		{ commentId: 4, parent: 1 },
+ *		{ id: 1, parent: 0 },
+ *		{ id: 2, parent: 1 },
+ *		{ id: 3, parent: 2 },
+ *		{ id: 4, parent: 1 },
  *	]
  * expect( convertToTree( comments ) ).toEqual( [
  *	{
- *		commentId: 1,
+ *		id: 1,
+ *    commentId: 1,
  *		children: [
- *			{ commentId: 2, children: [ { commentId: 3, children: [] } ] },
- *			{ commentId: 4, children: [] },
+ *			{ id: 2, commentId: 2, children: [ { id: 3, commentId: 3, children: [] } ] },
+ *			{ id: 4, commentId: 4, children: [] },
  *			],
  *		},
  *	] );
  * ```
- * @typedef {{commentId: number, parent: number}} Comment
+ * @typedef {{id: number, parent: number}} Comment
  * @param {Comment[]} data - List of comment objects.
  */
 export const convertToTree = ( data ) => {
 	const table = {};
 	if ( ! data ) return [];
 
-	// First create a hash table of { [commentId]: comment, children: [] }
+	// First create a hash table of { [id]: { ...comment, children: [] }}
 	data.forEach( ( item ) => {
-		table[ item.commentId ] = { ...item, children: [] };
+		table[ item.id ] = { ...item, commentId: item.id, children: [] };
 	} );
 
 	const tree = [];
@@ -42,12 +43,12 @@ export const convertToTree = ( data ) => {
 			// If the comment has a "parent", then find that parent in the table that
 			// we have created above and push the current comment to the array of its
 			// children.
-			table[ item.parent ].children.push( table[ item.commentId ] );
+			table[ item.parent ].children.push( table[ item.id ] );
 		} else {
 			// Otherwise, if the comment has no parent (also works if parent is 0)
 			// that means that it's a top-level comment so we can find it in the table
 			// and push it to the final tree.
-			tree.push( table[ item.commentId ] );
+			tree.push( table[ item.id ] );
 		}
 	} );
 	return tree;
