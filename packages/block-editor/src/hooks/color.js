@@ -9,9 +9,25 @@ import { isObject, setWith, clone } from 'lodash';
  */
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useRef, useEffect, useMemo, Platform } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import {
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalUseNavigator as useNavigator,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalView as View,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalSpacer as Spacer,
+	__experimentalHeading as Heading,
+	FlexItem,
+	ColorIndicator,
+	PanelBody,
+} from '@wordpress/components';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -28,6 +44,7 @@ import {
 } from '../components/gradients';
 import { cleanEmptyObject } from './utils';
 import ColorPanel from './color-panel';
+import InspectorControls from '../components/inspector-controls';
 import useSetting from '../components/use-setting';
 
 export const COLOR_SUPPORT_KEY = 'color';
@@ -207,6 +224,55 @@ function immutableSet( object, path, value ) {
 	return setWith( object ? clone( object ) : {}, path, value, clone );
 }
 
+function NavigationButton( {
+	path,
+	icon,
+	children,
+	isBack = false,
+	...props
+} ) {
+	const navigator = useNavigator();
+	return (
+		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
+			{ icon && (
+				<HStack justify="flex-start">
+					<FlexItem>
+						<Icon icon={ icon } size={ 24 } />
+					</FlexItem>
+					<FlexItem>{ children }</FlexItem>
+				</HStack>
+			) }
+			{ ! icon && children }
+		</Item>
+	);
+}
+
+function ScreenHeader( { back, title } ) {
+	return (
+		<VStack spacing={ 2 }>
+			<HStack spacing={ 2 }>
+				<View>
+					<NavigationButton
+						path={ back }
+						icon={
+							<Icon
+								icon={ isRTL() ? chevronRight : chevronLeft }
+								variant="muted"
+							/>
+						}
+						size="small"
+						isBack
+						aria-label={ __( 'Navigate to the previous view' ) }
+					/>
+				</View>
+				<Spacer>
+					<Heading level={ 5 }>{ title }</Heading>
+				</Spacer>
+			</HStack>
+		</VStack>
+	);
+}
+
 /**
  * Inspector control panel containing the color related configuration
  *
@@ -294,6 +360,24 @@ export function ColorEdit( props ) {
 	} else if ( hasGradientColor ) {
 		gradientValue = style?.color?.gradient;
 	}
+	const backgroundValue = hasBackgroundColor
+		? getColorObjectByAttributeValues(
+				allSolids,
+				backgroundColor,
+				style?.color?.background
+		  ).color
+		: undefined;
+	const textColorValue = getColorObjectByAttributeValues(
+		allSolids,
+		textColor,
+		style?.color?.text
+	).color;
+	const linkColorValue = hasLinkColor
+		? getLinkColorFromAttributeValue(
+				allSolids,
+				style?.elements?.link?.color?.text
+		  )
+		: undefined;
 
 	const onChangeColor = ( name ) => ( value ) => {
 		const colorObject = getColorObjectByColorValue( allSolids, value );
@@ -371,61 +455,140 @@ export function ColorEdit( props ) {
 	};
 
 	return (
-		<ColorPanel
-			enableContrastChecking={
-				// Turn on contrast checker for web only since it's not supported on mobile yet.
-				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
-			}
-			clientId={ props.clientId }
-			settings={ [
-				...( hasTextColor
-					? [
-							{
-								label: __( 'Text color' ),
-								onColorChange: onChangeColor( 'text' ),
-								colorValue: getColorObjectByAttributeValues(
-									allSolids,
-									textColor,
-									style?.color?.text
-								).color,
-							},
-					  ]
-					: [] ),
-				...( hasBackgroundColor || hasGradientColor
-					? [
-							{
-								label: __( 'Background color' ),
-								onColorChange: hasBackgroundColor
-									? onChangeColor( 'background' )
-									: undefined,
-								colorValue: getColorObjectByAttributeValues(
-									allSolids,
-									backgroundColor,
-									style?.color?.background
-								).color,
-								gradientValue,
-								onGradientChange: hasGradientColor
-									? onChangeGradient
-									: undefined,
-							},
-					  ]
-					: [] ),
-				...( hasLinkColor
-					? [
-							{
-								label: __( 'Link Color' ),
-								onColorChange: onChangeLinkColor,
-								colorValue: getLinkColorFromAttributeValue(
-									allSolids,
-									style?.elements?.link?.color?.text
-								),
-								clearable: !! style?.elements?.link?.color
-									?.text,
-							},
-					  ]
-					: [] ),
-			] }
-		/>
+		<InspectorControls>
+			<PanelBody
+				title={ __( 'Colors' ) }
+				className="block-editor__hooks-colors-panel"
+			>
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen path="/">
+						<ItemGroup isBordered isSeparated>
+							{ ( hasBackgroundColor || hasGradientColor ) && (
+								<NavigationButton path="/background">
+									<HStack justify="flex-start">
+										<FlexItem>
+											<ColorIndicator
+												colorValue={
+													gradientValue ??
+													backgroundValue
+												}
+											/>
+										</FlexItem>
+										<FlexItem>
+											{ __( 'Background' ) }
+										</FlexItem>
+									</HStack>
+								</NavigationButton>
+							) }
+							{ hasTextColor && (
+								<NavigationButton path="/text">
+									<HStack justify="flex-start">
+										<FlexItem>
+											<ColorIndicator
+												colorValue={ textColorValue }
+											/>
+										</FlexItem>
+										<FlexItem>{ __( 'Text' ) }</FlexItem>
+									</HStack>
+								</NavigationButton>
+							) }
+							{ hasLinkColor && (
+								<NavigationButton path="/link">
+									<HStack justify="flex-start">
+										<FlexItem>
+											<ColorIndicator
+												colorValue={ linkColorValue }
+											/>
+										</FlexItem>
+										<FlexItem>{ __( 'Links' ) }</FlexItem>
+									</HStack>
+								</NavigationButton>
+							) }
+						</ItemGroup>
+					</NavigatorScreen>
+
+					{ ( hasBackgroundColor || hasGradientColor ) && (
+						<NavigatorScreen path="/background">
+							<ScreenHeader
+								back="/"
+								title={ __( 'Background' ) }
+							/>
+							<ColorPanel
+								enableContrastChecking={
+									// Turn on contrast checker for web only since it's not supported on mobile yet.
+									Platform.OS === 'web' &&
+									! gradient &&
+									! style?.color?.gradient
+								}
+								clientId={ props.clientId }
+								settings={ [
+									{
+										label: __( 'Background color' ),
+										onColorChange: hasBackgroundColor
+											? onChangeColor( 'background' )
+											: undefined,
+										colorValue: backgroundValue,
+										gradientValue,
+										onGradientChange: hasGradientColor
+											? onChangeGradient
+											: undefined,
+									},
+								] }
+							/>
+						</NavigatorScreen>
+					) }
+
+					{ hasTextColor && (
+						<NavigatorScreen path="/text">
+							<ScreenHeader back="/" title={ __( 'Text' ) } />
+							<ColorPanel
+								enableContrastChecking={
+									// Turn on contrast checker for web only since it's not supported on mobile yet.
+									Platform.OS === 'web' &&
+									! gradient &&
+									! style?.color?.gradient
+								}
+								clientId={ props.clientId }
+								settings={ [
+									{
+										label: __( 'Text color' ),
+										onColorChange: onChangeColor( 'text' ),
+										colorValue: textColorValue,
+									},
+								] }
+							/>
+						</NavigatorScreen>
+					) }
+
+					{ hasLinkColor && (
+						<NavigatorScreen path="/link">
+							<ScreenHeader back="/" title={ __( 'Link' ) } />
+							<ColorPanel
+								enableContrastChecking={
+									// Turn on contrast checker for web only since it's not supported on mobile yet.
+									Platform.OS === 'web' &&
+									! gradient &&
+									! style?.color?.gradient
+								}
+								clientId={ props.clientId }
+								settings={ [
+									{
+										label: __( 'Link Color' ),
+										onColorChange: onChangeLinkColor,
+										colorValue: getLinkColorFromAttributeValue(
+											allSolids,
+											style?.elements?.link?.color?.text
+										),
+										clearable: !! style?.elements?.link
+											?.color?.text,
+									},
+								] }
+							/>
+						</NavigatorScreen>
+					) }
+				</NavigatorProvider>
+			</PanelBody>
+		</InspectorControls>
 	);
 }
 

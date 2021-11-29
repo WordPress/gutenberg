@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
  */
 import PanelColorGradientSettings from '../components/colors-gradients/panel-color-gradient-settings';
 import ContrastChecker from '../components/contrast-checker';
-import InspectorControls from '../components/inspector-controls';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedStyle( node ) {
@@ -20,7 +19,6 @@ export default function ColorPanel( {
 	settings,
 	clientId,
 	enableContrastChecking = true,
-	showTitle = true,
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
@@ -54,22 +52,19 @@ export default function ColorPanel( {
 	} );
 
 	return (
-		<InspectorControls>
-			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
-				initialOpen={ false }
-				settings={ settings }
-				showTitle={ showTitle }
-				__experimentalHasMultipleOrigins
-				__experimentalIsRenderedInSidebar
-			>
-				{ enableContrastChecking && (
-					<ContrastChecker
-						backgroundColor={ detectedBackgroundColor }
-						textColor={ detectedColor }
-					/>
-				) }
-			</PanelColorGradientSettings>
-		</InspectorControls>
+		<PanelColorGradientSettings
+			title={ __( 'Color' ) }
+			settings={ settings }
+			showTitle={ false }
+			__experimentalHasMultipleOrigins
+			__experimentalIsRenderedInSidebar
+		>
+			{ enableContrastChecking && (
+				<ContrastChecker
+					backgroundColor={ detectedBackgroundColor }
+					textColor={ detectedColor }
+				/>
+			) }
+		</PanelColorGradientSettings>
 	);
 }
