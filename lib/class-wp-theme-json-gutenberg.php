@@ -1141,9 +1141,9 @@ class WP_Theme_JSON_Gutenberg {
 	 *       '--wp--nested-property--sub-property': 'value'
 	 *     }
 	 *
-	 * @param array  $tree Input tree to process.
-	 * @param string $prefix Prefix to prepend to each variable. '' by default.
-	 * @param string $token Token to use between levels. '--' by default.
+	 * @param array  $tree   Input tree to process.
+	 * @param string $prefix Optional. Prefix to prepend to each variable. Default empty string.
+	 * @param string $token  Optional. Token to use between levels. Default '--'.
 	 * @return array The flattened tree.
 	 */
 	private static function flatten_tree( $tree, $prefix = '', $token = '--' ) {
