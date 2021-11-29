@@ -564,149 +564,294 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Given a tree, it creates a flattened one
-	 * by merging the keys and binding the leaf values
-	 * to the new keys.
+	 * Returns the existing settings for each block.
 	 *
-	 * It also transforms camelCase names into kebab-case
-	 * and substitutes '/' by '-'.
-	 *
-	 * This is thought to be useful to generate
-	 * CSS Custom Properties from a tree,
-	 * although there's nothing in the implementation
-	 * of this function that requires that format.
-	 *
-	 * For example, assuming the given prefix is '--wp'
-	 * and the token is '--', for this input tree:
+	 * Example:
 	 *
 	 * {
-	 *   'some/property': 'value',
-	 *   'nestedProperty': {
-	 *     'sub-property': 'value'
+	 *   'root': {
+	 *     'color': {
+	 *       'custom': true
+	 *     }
+	 *   },
+	 *   'core/paragraph': {
+	 *     'typography': {
+	 *       'customFontSize': true
+	 *     }
 	 *   }
 	 * }
 	 *
-	 * it'll return this output:
-	 *
-	 * {
-	 *   '--wp--some-property': 'value',
-	 *   '--wp--nested-property--sub-property': 'value'
-	 * }
-	 *
-	 * @param array  $tree Input tree to process.
-	 * @param string $prefix Prefix to prepend to each variable. '' by default.
-	 * @param string $token Token to use between levels. '--' by default.
-	 *
-	 * @return array The flattened tree.
+	 * @return array Settings per block.
 	 */
-	private static function flatten_tree( $tree, $prefix = '', $token = '--' ) {
-		$result = array();
-		foreach ( $tree as $property => $value ) {
-			$new_key = $prefix . str_replace(
-				'/',
-				'-',
-				strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case.
-			);
+	public function get_settings() {
+		if ( ! isset( $this->theme_json['settings'] ) ) {
+			return array();
+		} else {
+			return $this->theme_json['settings'];
+		}
+	}
 
-			if ( is_array( $value ) ) {
-				$new_prefix = $new_key . $token;
-				$result     = array_merge(
-					$result,
-					self::flatten_tree( $value, $new_prefix, $token )
+	/**
+	 * Returns the stylesheet that results of processing
+	 * the theme.json structure this object represents.
+	 *
+	 * @param array $types    Types of styles to load. Will load all by default. It accepts:
+	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
+	 *                         'styles': only the styles section in theme.json.
+	 *                         'presets': only the classes for the presets.
+	 * @param array $origins A list of origins to include. By default it includes 'default', 'theme', and 'custom'.
+	 *
+	 * @return string Stylesheet.
+	 */
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = self::VALID_ORIGINS ) {
+		$blocks_metadata = self::get_blocks_metadata();
+		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		$stylesheet = '';
+
+		if ( in_array( 'variables', $types, true ) ) {
+			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
+		}
+
+		if ( in_array( 'styles', $types, true ) ) {
+			$stylesheet .= $this->get_block_classes( $style_nodes );
+		}
+
+		if ( in_array( 'presets', $types, true ) ) {
+			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+		}
+
+		return $stylesheet;
+	}
+
+	/**
+	 * Returns the page templates of the current theme.
+	 *
+	 * @return array
+	 */
+	public function get_custom_templates() {
+		$custom_templates = array();
+		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
+			return $custom_templates;
+		}
+
+		foreach ( $this->theme_json['customTemplates'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$custom_templates[ $item['name'] ] = array(
+					'title'     => isset( $item['title'] ) ? $item['title'] : '',
+					'postTypes' => isset( $item['postTypes'] ) ? $item['postTypes'] : array( 'page' ),
 				);
-			} else {
-				$result[ $new_key ] = $value;
 			}
 		}
-		return $result;
+		return $custom_templates;
 	}
 
 	/**
-	 * Returns the style property for the given path.
+	 * Returns the template part data of current theme.
 	 *
-	 * It also converts CSS Custom Property stored as
-	 * "var:preset|color|secondary" to the form
-	 * "--wp--preset--color--secondary".
-	 *
-	 * @param array $styles Styles subtree.
-	 * @param array $path Which property to process.
-	 *
-	 * @return string Style property value.
+	 * @return array
 	 */
-	private static function get_property_value( $styles, $path ) {
-		$value = _wp_array_get( $styles, $path, '' );
-
-		if ( '' === $value || is_array( $value ) ) {
-			return $value;
+	public function get_template_parts() {
+		$template_parts = array();
+		if ( ! isset( $this->theme_json['templateParts'] ) ) {
+			return $template_parts;
 		}
 
-		$prefix     = 'var:';
-		$prefix_len = strlen( $prefix );
-		$token_in   = '|';
-		$token_out  = '--';
-		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
-			$unwrapped_name = str_replace(
-				$token_in,
-				$token_out,
-				substr( $value, $prefix_len )
-			);
-			$value          = "var(--wp--$unwrapped_name)";
+		foreach ( $this->theme_json['templateParts'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$template_parts[ $item['name'] ] = array(
+					'title' => isset( $item['title'] ) ? $item['title'] : '',
+					'area'  => isset( $item['area'] ) ? $item['area'] : '',
+				);
+			}
 		}
-
-		return $value;
+		return $template_parts;
 	}
 
 	/**
-	 * Given a styles array, it extracts the style properties
-	 * and adds them to the $declarations array following the format:
+	 * Converts each style section into a list of rulesets
+	 * containing the block styles to be appended to the stylesheet.
 	 *
-	 * ```php
-	 * array(
-	 *   'name'  => 'property_name',
-	 *   'value' => 'property_value,
-	 * )
-	 * ```
+	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
 	 *
-	 * @param array $styles Styles to process.
-	 * @param array $settings Theme settings.
-	 * @param array $properties Properties metadata.
+	 * For each section this creates a new ruleset such as:
 	 *
-	 * @return array Returns the modified $declarations.
+	 *   block-selector {
+	 *     style-property-one: value;
+	 *   }
+	 *
+	 * @param array $style_nodes Nodes with styles.
+	 *
+	 * @return string The new stylesheet.
 	 */
-	private static function compute_style_properties( $styles, $settings = array(), $properties = self::PROPERTIES_METADATA ) {
-		$declarations = array();
-		if ( empty( $styles ) ) {
-			return $declarations;
-		}
+	private function get_block_classes( $style_nodes ) {
+		$block_rules = '';
 
-		foreach ( $properties as $css_property => $value_path ) {
-			$value = self::get_property_value( $styles, $value_path );
-
-			// Look up protected properties, keyed by value path.
-			// Skip protected properties that are explicitly set to `null`.
-			if ( is_array( $value_path ) ) {
-				$path_string = implode( '.', $value_path );
-				if (
-					array_key_exists( $path_string, self::PROTECTED_PROPERTIES ) &&
-					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
-				) {
-					continue;
-				}
-			}
-
-			// Skip if empty and not "0" or value represents array of longhand values.
-			$has_missing_value = empty( $value ) && ! is_numeric( $value );
-			if ( $has_missing_value || is_array( $value ) ) {
+		foreach ( $style_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
 				continue;
 			}
 
-			$declarations[] = array(
-				'name'  => $css_property,
-				'value' => $value,
-			);
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$selector     = $metadata['selector'];
+			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
+			$declarations = self::compute_style_properties( $node, $settings );
+
+			// 1. Separate the ones who use the general selector
+			// and the ones who use the duotone selector.
+			$declarations_duotone = array();
+			foreach ( $declarations as $index => $declaration ) {
+				if ( 'filter' === $declaration['name'] ) {
+					unset( $declarations[ $index ] );
+					$declarations_duotone[] = $declaration;
+				}
+			}
+
+			// 2. Generate the rules that use the general selector.
+			$block_rules .= self::to_ruleset( $selector, $declarations );
+
+			// 3. Generate the rules that use the duotone selector.
+			if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+				$selector_duotone = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
+				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
+			}
+
+			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$block_rules .= 'body { margin: 0; }';
+				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
+				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
+				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+				if ( $has_block_gap_support ) {
+					$block_rules .= '.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }';
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+				}
+			}
 		}
 
-		return $declarations;
+		return $block_rules;
+	}
+
+	/**
+	 * Creates new rulesets as classes for each preset value such as:
+	 *
+	 *   .has-value-color {
+	 *     color: value;
+	 *   }
+	 *
+	 *   .has-value-background-color {
+	 *     background-color: value;
+	 *   }
+	 *
+	 *   .has-value-font-size {
+	 *     font-size: value;
+	 *   }
+	 *
+	 *   .has-value-gradient-background {
+	 *     background: value;
+	 *   }
+	 *
+	 *   p.has-value-gradient-background {
+	 *     background: value;
+	 *   }
+
+	 * @param array $setting_nodes Nodes with settings.
+	 * @param array $origins       List of origins to process presets from.
+	 *
+	 * @return string The new stylesheet.
+	 */
+	private function get_preset_classes( $setting_nodes, $origins ) {
+		$preset_rules = '';
+
+		foreach ( $setting_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
+				continue;
+			}
+
+			$selector      = $metadata['selector'];
+			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$preset_rules .= self::compute_preset_classes( $node, $selector, $origins );
+		}
+
+		return $preset_rules;
+	}
+
+	/**
+	 * Converts each styles section into a list of rulesets
+	 * to be appended to the stylesheet.
+	 * These rulesets contain all the css variables (custom variables and preset variables).
+	 *
+	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
+	 *
+	 * For each section this creates a new ruleset such as:
+	 *
+	 *   block-selector {
+	 *     --wp--preset--category--slug: value;
+	 *     --wp--custom--variable: value;
+	 *   }
+	 *
+	 * @param array $nodes Nodes with settings.
+	 * @param array $origins List of origins to process.
+	 *
+	 * @return string The new stylesheet.
+	 */
+	private function get_css_variables( $nodes, $origins ) {
+		$stylesheet = '';
+		foreach ( $nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
+				continue;
+			}
+
+			$selector = $metadata['selector'];
+
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$declarations = array_merge( self::compute_preset_vars( $node, $origins ), self::compute_theme_vars( $node ) );
+
+			$stylesheet .= self::to_ruleset( $selector, $declarations );
+		}
+
+		return $stylesheet;
+	}
+
+	/**
+	 * Given a selector and a declaration list,
+	 * creates the corresponding ruleset.
+	 *
+	 * To help debugging, will add some space
+	 * if SCRIPT_DEBUG is defined and true.
+	 *
+	 * @param string $selector CSS selector.
+	 * @param array  $declarations List of declarations.
+	 *
+	 * @return string CSS ruleset.
+	 */
+	private static function to_ruleset( $selector, $declarations ) {
+		if ( empty( $declarations ) ) {
+			return '';
+		}
+		$ruleset = '';
+
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$declaration_block = array_reduce(
+				$declarations,
+				function ( $carry, $element ) {
+					return $carry .= "\t" . $element['name'] . ': ' . $element['value'] . ";\n"; },
+				''
+			);
+			$ruleset          .= $selector . " {\n" . $declaration_block . "}\n";
+		} else {
+			$declaration_block = array_reduce(
+				$declarations,
+				function ( $carry, $element ) {
+					return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
+				''
+			);
+			$ruleset          .= $selector . '{' . $declaration_block . '}';
+		}
+
+		return $ruleset;
 	}
 
 	/**
@@ -729,6 +874,46 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return implode( ',', $new_selectors );
+	}
+
+	/**
+	 * Given a settings array, it returns the generated rulesets
+	 * for the preset classes.
+	 *
+	 * @param array  $settings Settings to process.
+	 * @param string $selector Selector wrapping the classes.
+	 * @param array  $origins  List of origins to process.
+	 *
+	 * @return string The result of processing the presets.
+	 */
+	private static function compute_preset_classes( $settings, $selector, $origins ) {
+		if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+			// Classes at the global level do not need any CSS prefixed,
+			// and we don't want to increase its specificity.
+			$selector = '';
+		}
+
+		$stylesheet = '';
+		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+			$slugs = self::get_settings_slugs( $settings, $preset_metadata, $origins );
+			foreach ( $preset_metadata['classes'] as $class => $property ) {
+				foreach ( $slugs as $slug ) {
+					$css_var     = self::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name  = self::replace_slug_in_string( $class, $slug );
+					$stylesheet .= self::to_ruleset(
+						self::append_to_selector( $selector, $class_name ),
+						array(
+							array(
+								'name'  => $property,
+								'value' => 'var(' . $css_var . ') !important',
+							),
+						)
+					);
+				}
+			}
+		}
+
+		return $stylesheet;
 	}
 
 	/**
@@ -856,46 +1041,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Given a settings array, it returns the generated rulesets
-	 * for the preset classes.
-	 *
-	 * @param array  $settings Settings to process.
-	 * @param string $selector Selector wrapping the classes.
-	 * @param array  $origins  List of origins to process.
-	 *
-	 * @return string The result of processing the presets.
-	 */
-	private static function compute_preset_classes( $settings, $selector, $origins ) {
-		if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-			// Classes at the global level do not need any CSS prefixed,
-			// and we don't want to increase its specificity.
-			$selector = '';
-		}
-
-		$stylesheet = '';
-		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-			$slugs = self::get_settings_slugs( $settings, $preset_metadata, $origins );
-			foreach ( $preset_metadata['classes'] as $class => $property ) {
-				foreach ( $slugs as $slug ) {
-					$css_var     = self::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
-					$class_name  = self::replace_slug_in_string( $class, $slug );
-					$stylesheet .= self::to_ruleset(
-						self::append_to_selector( $selector, $class_name ),
-						array(
-							array(
-								'name'  => $property,
-								'value' => 'var(' . $css_var . ') !important',
-							),
-						)
-					);
-				}
-			}
-		}
-
-		return $stylesheet;
-	}
-
-	/**
 	 * Transform a slug into a CSS Custom Property.
 	 *
 	 * @param string $input String to replace.
@@ -970,260 +1115,200 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Given a selector and a declaration list,
-	 * creates the corresponding ruleset.
+	 * Given a tree, it creates a flattened one
+	 * by merging the keys and binding the leaf values
+	 * to the new keys.
 	 *
-	 * To help debugging, will add some space
-	 * if SCRIPT_DEBUG is defined and true.
+	 * It also transforms camelCase names into kebab-case
+	 * and substitutes '/' by '-'.
 	 *
-	 * @param string $selector CSS selector.
-	 * @param array  $declarations List of declarations.
+	 * This is thought to be useful to generate
+	 * CSS Custom Properties from a tree,
+	 * although there's nothing in the implementation
+	 * of this function that requires that format.
 	 *
-	 * @return string CSS ruleset.
-	 */
-	private static function to_ruleset( $selector, $declarations ) {
-		if ( empty( $declarations ) ) {
-			return '';
-		}
-		$ruleset = '';
-
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$declaration_block = array_reduce(
-				$declarations,
-				function ( $carry, $element ) {
-					return $carry .= "\t" . $element['name'] . ': ' . $element['value'] . ";\n"; },
-				''
-			);
-			$ruleset          .= $selector . " {\n" . $declaration_block . "}\n";
-		} else {
-			$declaration_block = array_reduce(
-				$declarations,
-				function ( $carry, $element ) {
-					return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
-				''
-			);
-			$ruleset          .= $selector . '{' . $declaration_block . '}';
-		}
-
-		return $ruleset;
-	}
-
-	/**
-	 * Converts each styles section into a list of rulesets
-	 * to be appended to the stylesheet.
-	 * These rulesets contain all the css variables (custom variables and preset variables).
-	 *
-	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
-	 *
-	 * For each section this creates a new ruleset such as:
-	 *
-	 *   block-selector {
-	 *     --wp--preset--category--slug: value;
-	 *     --wp--custom--variable: value;
-	 *   }
-	 *
-	 * @param array $nodes Nodes with settings.
-	 * @param array $origins List of origins to process.
-	 *
-	 * @return string The new stylesheet.
-	 */
-	private function get_css_variables( $nodes, $origins ) {
-		$stylesheet = '';
-		foreach ( $nodes as $metadata ) {
-			if ( null === $metadata['selector'] ) {
-				continue;
-			}
-
-			$selector = $metadata['selector'];
-
-			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$declarations = array_merge( self::compute_preset_vars( $node, $origins ), self::compute_theme_vars( $node ) );
-
-			$stylesheet .= self::to_ruleset( $selector, $declarations );
-		}
-
-		return $stylesheet;
-	}
-
-	/**
-	 * Converts each style section into a list of rulesets
-	 * containing the block styles to be appended to the stylesheet.
-	 *
-	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
-	 *
-	 * For each section this creates a new ruleset such as:
-	 *
-	 *   block-selector {
-	 *     style-property-one: value;
-	 *   }
-	 *
-	 * @param array $style_nodes Nodes with styles.
-	 *
-	 * @return string The new stylesheet.
-	 */
-	private function get_block_classes( $style_nodes ) {
-		$block_rules = '';
-
-		foreach ( $style_nodes as $metadata ) {
-			if ( null === $metadata['selector'] ) {
-				continue;
-			}
-
-			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$selector     = $metadata['selector'];
-			$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
-			$declarations = self::compute_style_properties( $node, $settings );
-
-			// 1. Separate the ones who use the general selector
-			// and the ones who use the duotone selector.
-			$declarations_duotone = array();
-			foreach ( $declarations as $index => $declaration ) {
-				if ( 'filter' === $declaration['name'] ) {
-					unset( $declarations[ $index ] );
-					$declarations_duotone[] = $declaration;
-				}
-			}
-
-			// 2. Generate the rules that use the general selector.
-			$block_rules .= self::to_ruleset( $selector, $declarations );
-
-			// 3. Generate the rules that use the duotone selector.
-			if ( isset( $metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
-				$selector_duotone = self::scope_selector( $metadata['selector'], $metadata['duotone'] );
-				$block_rules     .= self::to_ruleset( $selector_duotone, $declarations_duotone );
-			}
-
-			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= 'body { margin: 0; }';
-				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
-				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
-				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-
-				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
-				if ( $has_block_gap_support ) {
-					$block_rules .= '.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }';
-					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
-				}
-			}
-		}
-
-		return $block_rules;
-	}
-
-	/**
-	 * Creates new rulesets as classes for each preset value such as:
-	 *
-	 *   .has-value-color {
-	 *     color: value;
-	 *   }
-	 *
-	 *   .has-value-background-color {
-	 *     background-color: value;
-	 *   }
-	 *
-	 *   .has-value-font-size {
-	 *     font-size: value;
-	 *   }
-	 *
-	 *   .has-value-gradient-background {
-	 *     background: value;
-	 *   }
-	 *
-	 *   p.has-value-gradient-background {
-	 *     background: value;
-	 *   }
-
-	 * @param array $setting_nodes Nodes with settings.
-	 * @param array $origins       List of origins to process presets from.
-	 *
-	 * @return string The new stylesheet.
-	 */
-	private function get_preset_classes( $setting_nodes, $origins ) {
-		$preset_rules = '';
-
-		foreach ( $setting_nodes as $metadata ) {
-			if ( null === $metadata['selector'] ) {
-				continue;
-			}
-
-			$selector      = $metadata['selector'];
-			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$preset_rules .= self::compute_preset_classes( $node, $selector, $origins );
-		}
-
-		return $preset_rules;
-	}
-
-	/**
-	 * Returns the existing settings for each block.
-	 *
-	 * Example:
+	 * For example, assuming the given prefix is '--wp'
+	 * and the token is '--', for this input tree:
 	 *
 	 * {
-	 *   'root': {
-	 *     'color': {
-	 *       'custom': true
-	 *     }
-	 *   },
-	 *   'core/paragraph': {
-	 *     'typography': {
-	 *       'customFontSize': true
-	 *     }
+	 *   'some/property': 'value',
+	 *   'nestedProperty': {
+	 *     'sub-property': 'value'
 	 *   }
 	 * }
 	 *
-	 * @return array Settings per block.
+	 * it'll return this output:
+	 *
+	 * {
+	 *   '--wp--some-property': 'value',
+	 *   '--wp--nested-property--sub-property': 'value'
+	 * }
+	 *
+	 * @param array  $tree Input tree to process.
+	 * @param string $prefix Prefix to prepend to each variable. '' by default.
+	 * @param string $token Token to use between levels. '--' by default.
+	 *
+	 * @return array The flattened tree.
 	 */
-	public function get_settings() {
-		if ( ! isset( $this->theme_json['settings'] ) ) {
-			return array();
-		} else {
-			return $this->theme_json['settings'];
+	private static function flatten_tree( $tree, $prefix = '', $token = '--' ) {
+		$result = array();
+		foreach ( $tree as $property => $value ) {
+			$new_key = $prefix . str_replace(
+				'/',
+				'-',
+				strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case.
+			);
+
+			if ( is_array( $value ) ) {
+				$new_prefix = $new_key . $token;
+				$result     = array_merge(
+					$result,
+					self::flatten_tree( $value, $new_prefix, $token )
+				);
+			} else {
+				$result[ $new_key ] = $value;
+			}
 		}
+		return $result;
 	}
 
 	/**
-	 * Returns the page templates of the current theme.
+	 * Given a styles array, it extracts the style properties
+	 * and adds them to the $declarations array following the format:
 	 *
-	 * @return array
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
+	 *
+	 * @param array $styles Styles to process.
+	 * @param array $settings Theme settings.
+	 * @param array $properties Properties metadata.
+	 *
+	 * @return array Returns the modified $declarations.
 	 */
-	public function get_custom_templates() {
-		$custom_templates = array();
-		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
-			return $custom_templates;
+	private static function compute_style_properties( $styles, $settings = array(), $properties = self::PROPERTIES_METADATA ) {
+		$declarations = array();
+		if ( empty( $styles ) ) {
+			return $declarations;
 		}
 
-		foreach ( $this->theme_json['customTemplates'] as $item ) {
-			if ( isset( $item['name'] ) ) {
-				$custom_templates[ $item['name'] ] = array(
-					'title'     => isset( $item['title'] ) ? $item['title'] : '',
-					'postTypes' => isset( $item['postTypes'] ) ? $item['postTypes'] : array( 'page' ),
-				);
+		foreach ( $properties as $css_property => $value_path ) {
+			$value = self::get_property_value( $styles, $value_path );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					array_key_exists( $path_string, self::PROTECTED_PROPERTIES ) &&
+					_wp_array_get( $settings, self::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
 			}
+
+			// Skip if empty and not "0" or value represents array of longhand values.
+			$has_missing_value = empty( $value ) && ! is_numeric( $value );
+			if ( $has_missing_value || is_array( $value ) ) {
+				continue;
+			}
+
+			$declarations[] = array(
+				'name'  => $css_property,
+				'value' => $value,
+			);
 		}
-		return $custom_templates;
+
+		return $declarations;
 	}
 
 	/**
-	 * Returns the template part data of current theme.
+	 * Returns the style property for the given path.
+	 *
+	 * It also converts CSS Custom Property stored as
+	 * "var:preset|color|secondary" to the form
+	 * "--wp--preset--color--secondary".
+	 *
+	 * @param array $styles Styles subtree.
+	 * @param array $path Which property to process.
+	 *
+	 * @return string Style property value.
+	 */
+	private static function get_property_value( $styles, $path ) {
+		$value = _wp_array_get( $styles, $path, '' );
+
+		if ( '' === $value || is_array( $value ) ) {
+			return $value;
+		}
+
+		$prefix     = 'var:';
+		$prefix_len = strlen( $prefix );
+		$token_in   = '|';
+		$token_out  = '--';
+		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
+			$unwrapped_name = str_replace(
+				$token_in,
+				$token_out,
+				substr( $value, $prefix_len )
+			);
+			$value          = "var(--wp--$unwrapped_name)";
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Builds metadata for the setting nodes, which returns in the form of:
+	 *
+	 * [
+	 *   [
+	 *     'path'     => ['path', 'to', 'some', 'node' ],
+	 *     'selector' => 'CSS selector for some node'
+	 *   ],
+	 *   [
+	 *     'path'     => [ 'path', 'to', 'other', 'node' ],
+	 *     'selector' => 'CSS selector for other node'
+	 *   ],
+	 * ]
+	 *
+	 * @param array $theme_json The tree to extract setting nodes from.
+	 * @param array $selectors List of selectors per block.
 	 *
 	 * @return array
 	 */
-	public function get_template_parts() {
-		$template_parts = array();
-		if ( ! isset( $this->theme_json['templateParts'] ) ) {
-			return $template_parts;
+	private static function get_setting_nodes( $theme_json, $selectors = array() ) {
+		$nodes = array();
+		if ( ! isset( $theme_json['settings'] ) ) {
+			return $nodes;
 		}
 
-		foreach ( $this->theme_json['templateParts'] as $item ) {
-			if ( isset( $item['name'] ) ) {
-				$template_parts[ $item['name'] ] = array(
-					'title' => isset( $item['title'] ) ? $item['title'] : '',
-					'area'  => isset( $item['area'] ) ? $item['area'] : '',
-				);
-			}
+		// Top-level.
+		$nodes[] = array(
+			'path'     => array( 'settings' ),
+			'selector' => self::ROOT_BLOCK_SELECTOR,
+		);
+
+		// Calculate paths for blocks.
+		if ( ! isset( $theme_json['settings']['blocks'] ) ) {
+			return $nodes;
 		}
-		return $template_parts;
+
+		foreach ( $theme_json['settings']['blocks'] as $name => $node ) {
+			$selector = null;
+			if ( isset( $selectors[ $name ]['selector'] ) ) {
+				$selector = $selectors[ $name ]['selector'];
+			}
+
+			$nodes[] = array(
+				'path'     => array( 'settings', 'blocks', $name ),
+				'selector' => $selector,
+			);
+		}
+
+		return $nodes;
 	}
 
 	/**
@@ -1301,91 +1386,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $nodes;
-	}
-
-	/**
-	 * Builds metadata for the setting nodes, which returns in the form of:
-	 *
-	 * [
-	 *   [
-	 *     'path'     => ['path', 'to', 'some', 'node' ],
-	 *     'selector' => 'CSS selector for some node'
-	 *   ],
-	 *   [
-	 *     'path'     => [ 'path', 'to', 'other', 'node' ],
-	 *     'selector' => 'CSS selector for other node'
-	 *   ],
-	 * ]
-	 *
-	 * @param array $theme_json The tree to extract setting nodes from.
-	 * @param array $selectors List of selectors per block.
-	 *
-	 * @return array
-	 */
-	private static function get_setting_nodes( $theme_json, $selectors = array() ) {
-		$nodes = array();
-		if ( ! isset( $theme_json['settings'] ) ) {
-			return $nodes;
-		}
-
-		// Top-level.
-		$nodes[] = array(
-			'path'     => array( 'settings' ),
-			'selector' => self::ROOT_BLOCK_SELECTOR,
-		);
-
-		// Calculate paths for blocks.
-		if ( ! isset( $theme_json['settings']['blocks'] ) ) {
-			return $nodes;
-		}
-
-		foreach ( $theme_json['settings']['blocks'] as $name => $node ) {
-			$selector = null;
-			if ( isset( $selectors[ $name ]['selector'] ) ) {
-				$selector = $selectors[ $name ]['selector'];
-			}
-
-			$nodes[] = array(
-				'path'     => array( 'settings', 'blocks', $name ),
-				'selector' => $selector,
-			);
-		}
-
-		return $nodes;
-	}
-
-	/**
-	 * Returns the stylesheet that results of processing
-	 * the theme.json structure this object represents.
-	 *
-	 * @param array $types    Types of styles to load. Will load all by default. It accepts:
-	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
-	 *                         'styles': only the styles section in theme.json.
-	 *                         'presets': only the classes for the presets.
-	 * @param array $origins A list of origins to include. By default it includes 'default', 'theme', and 'custom'.
-	 *
-	 * @return string Stylesheet.
-	 */
-	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = self::VALID_ORIGINS ) {
-		$blocks_metadata = self::get_blocks_metadata();
-		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
-		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
-
-		$stylesheet = '';
-
-		if ( in_array( 'variables', $types, true ) ) {
-			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
-		}
-
-		if ( in_array( 'styles', $types, true ) ) {
-			$stylesheet .= $this->get_block_classes( $style_nodes );
-		}
-
-		if ( in_array( 'presets', $types, true ) ) {
-			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
-		}
-
-		return $stylesheet;
 	}
 
 	/**
@@ -1529,6 +1529,64 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Removes insecure data from theme.json.
+	 *
+	 * @param array $theme_json Structure to sanitize.
+	 *
+	 * @return array Sanitized structure.
+	 */
+	public static function remove_insecure_properties( $theme_json ) {
+		$sanitized = array();
+
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+
+		$valid_block_names   = array_keys( self::get_blocks_metadata() );
+		$valid_element_names = array_keys( self::ELEMENTS );
+		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+
+		$blocks_metadata = self::get_blocks_metadata();
+		$style_nodes     = self::get_style_nodes( $theme_json, $blocks_metadata );
+		foreach ( $style_nodes as $metadata ) {
+			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
+			if ( empty( $input ) ) {
+				continue;
+			}
+
+			$output = self::remove_insecure_styles( $input );
+			if ( ! empty( $output ) ) {
+				_wp_array_set( $sanitized, $metadata['path'], $output );
+			}
+		}
+
+		$setting_nodes = self::get_setting_nodes( $theme_json );
+		foreach ( $setting_nodes as $metadata ) {
+			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
+			if ( empty( $input ) ) {
+				continue;
+			}
+
+			$output = self::remove_insecure_settings( $input );
+			if ( ! empty( $output ) ) {
+				_wp_array_set( $sanitized, $metadata['path'], $output );
+			}
+		}
+
+		if ( empty( $sanitized['styles'] ) ) {
+			unset( $theme_json['styles'] );
+		} else {
+			$theme_json['styles'] = $sanitized['styles'];
+		}
+
+		if ( empty( $sanitized['settings'] ) ) {
+			unset( $theme_json['settings'] );
+		} else {
+			$theme_json['settings'] = $sanitized['settings'];
+		}
+
+		return $theme_json;
+	}
+
+	/**
 	 * Processes a setting node and returns the same node
 	 * without the insecure settings.
 	 *
@@ -1625,64 +1683,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Removes insecure data from theme.json.
-	 *
-	 * @param array $theme_json Structure to sanitize.
-	 *
-	 * @return array Sanitized structure.
-	 */
-	public static function remove_insecure_properties( $theme_json ) {
-		$sanitized = array();
-
-		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
-
-		$valid_block_names   = array_keys( self::get_blocks_metadata() );
-		$valid_element_names = array_keys( self::ELEMENTS );
-		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
-
-		$blocks_metadata = self::get_blocks_metadata();
-		$style_nodes     = self::get_style_nodes( $theme_json, $blocks_metadata );
-		foreach ( $style_nodes as $metadata ) {
-			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
-			if ( empty( $input ) ) {
-				continue;
-			}
-
-			$output = self::remove_insecure_styles( $input );
-			if ( ! empty( $output ) ) {
-				_wp_array_set( $sanitized, $metadata['path'], $output );
-			}
-		}
-
-		$setting_nodes = self::get_setting_nodes( $theme_json );
-		foreach ( $setting_nodes as $metadata ) {
-			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
-			if ( empty( $input ) ) {
-				continue;
-			}
-
-			$output = self::remove_insecure_settings( $input );
-			if ( ! empty( $output ) ) {
-				_wp_array_set( $sanitized, $metadata['path'], $output );
-			}
-		}
-
-		if ( empty( $sanitized['styles'] ) ) {
-			unset( $theme_json['styles'] );
-		} else {
-			$theme_json['styles'] = $sanitized['styles'];
-		}
-
-		if ( empty( $sanitized['settings'] ) ) {
-			unset( $theme_json['settings'] );
-		} else {
-			$theme_json['settings'] = $sanitized['settings'];
-		}
-
-		return $theme_json;
-	}
-
-	/**
 	 * Returns the raw data.
 	 *
 	 * @return array Raw data.
@@ -1691,7 +1691,7 @@ class WP_Theme_JSON_Gutenberg {
 		return $this->theme_json;
 	}
 
-	/**
+		/**
 	 *
 	 * Transforms the given editor settings according the
 	 * add_theme_support format to the theme.json format.
