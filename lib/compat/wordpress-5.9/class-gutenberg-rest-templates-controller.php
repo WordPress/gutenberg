@@ -67,8 +67,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
-							'description' => __( 'The id of a template', 'gutenberg' ),
-							'type'        => 'string',
+							'description'       => __( 'The id of a template', 'gutenberg' ),
+							'type'              => 'string',
+							'sanitize_callback' => array( $this, '_sanitize_template_id' ),
 						),
 					),
 				),
@@ -114,6 +115,36 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Requesting this endpoint for a template like "twentytwentytwo//home" requires using
+	 * a path like /wp/v2/templates/twentytwentytwo//home. There are special cases when
+	 * WordPress routing corrects the name to contain only a single slash like "twentytwentytwo/home".
+	 *
+	 * This method doubles the last slash if it's not already doubled. It relies on the template
+	 * ID format {theme_name}//{template_slug} and the fact that slugs cannot contain slashes.
+	 *
+	 * See https://core.trac.wordpress.org/ticket/54507 for more context
+	 *
+	 * @param string $id Template ID.
+	 * @return string Sanitized template ID.
+	 */
+	public function _sanitize_template_id( $id ) {
+		$last_slash_pos = strrpos( $id, '/' );
+		if ( false === $last_slash_pos ) {
+			return $id;
+		}
+
+		$is_double_slashed = substr( $id, $last_slash_pos - 1, 1 ) === '/';
+		if ( $is_double_slashed ) {
+			return $id;
+		}
+		return (
+			substr( $id, 0, $last_slash_pos )
+			. '/'
+			. substr( $id, $last_slash_pos )
+		);
 	}
 
 	/**
@@ -214,6 +245,10 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 
 		$changes = $this->prepare_item_for_database( $request );
 
+		if ( is_wp_error( $changes ) ) {
+			return $changes;
+		}
+
 		if ( 'custom' === $template->source ) {
 			$result = wp_update_post( wp_slash( (array) $changes ), true );
 		} else {
@@ -252,7 +287,12 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$changes            = $this->prepare_item_for_database( $request );
+		$changes = $this->prepare_item_for_database( $request );
+
+		if ( is_wp_error( $changes ) ) {
+			return $changes;
+		}
+
 		$changes->post_name = $request['slug'];
 		$result             = wp_insert_post( wp_slash( (array) $changes ), true );
 		if ( is_wp_error( $result ) ) {
@@ -354,6 +394,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->tax_input   = array(
 				'wp_theme' => $template->theme,
 			);
+			$changes->meta_input  = array(
+				'origin' => $template->source,
+			);
 		} else {
 			$changes->post_name   = $template->slug;
 			$changes->ID          = $template->wp_id;
@@ -385,6 +428,24 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			}
 		}
 
+		if ( ! empty( $request['author'] ) ) {
+			$post_author = (int) $request['author'];
+
+			if ( get_current_user_id() !== $post_author ) {
+				$user_obj = get_userdata( $post_author );
+
+				if ( ! $user_obj ) {
+					return new WP_Error(
+						'rest_invalid_author',
+						__( 'Invalid author ID.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+			}
+
+			$changes->post_author = $post_author;
+		}
+
 		return $changes;
 	}
 
@@ -403,6 +464,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			'content'        => array( 'raw' => $template->content ),
 			'slug'           => $template->slug,
 			'source'         => $template->source,
+			'origin'         => $template->origin,
 			'type'           => $template->type,
 			'description'    => $template->description,
 			'title'          => array(
@@ -412,7 +474,12 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			'status'         => $template->status,
 			'wp_id'          => $template->wp_id,
 			'has_theme_file' => $template->has_theme_file,
+			'author'         => (int) $template->author,
 		);
+
+		if ( 'wp_template' === $template->type ) {
+			$result['is_custom'] = $template->is_custom;
+		}
 
 		if ( 'wp_template_part' === $template->type ) {
 			$result['area'] = $template->area;
@@ -543,6 +610,12 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
+				'origin'         => array(
+					'description' => __( 'Source of customized template', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
 				'content'        => array(
 					'description' => __( 'Content of template.', 'gutenberg' ),
 					'type'        => array( 'object', 'string' ),
@@ -579,8 +652,22 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
+				'author'         => array(
+					'description' => __( 'The ID for the author of the template.', 'gutenberg' ),
+					'type'        => 'integer',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
 			),
 		);
+
+		if ( 'wp_template' === $this->post_type ) {
+			$schema['properties']['is_custom'] = array(
+				'description' => __( 'Whether a template is a custom template.', 'gutenberg' ),
+				'type'        => 'bool',
+				'context'     => array( 'embed', 'view', 'edit' ),
+				'readonly'    => true,
+			);
+		}
 
 		if ( 'wp_template_part' === $this->post_type ) {
 			$schema['properties']['area'] = array(

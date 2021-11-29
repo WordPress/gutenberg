@@ -7,18 +7,16 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
-import { serialize } from '@wordpress/blocks';
 import { Disabled, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import useTemplatePartAreaLabel from '../use-template-part-area-label';
+import useCreateNavigationMenu from './use-create-navigation-menu';
 
 const NOOP = () => {};
 const EMPTY_OBJECT = {};
@@ -51,7 +49,6 @@ export default function UnsavedInnerBlocks( {
 		onChange: NOOP,
 		onInput: NOOP,
 	} );
-	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const {
 		isSaving,
@@ -83,29 +80,7 @@ export default function UnsavedInnerBlocks( {
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
-	const createNavigationMenu = useCallback(
-		async ( title ) => {
-			const record = {
-				title,
-				content: serialize( blocks ),
-				status: 'draft',
-			};
-
-			const navigationMenu = await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				record
-			);
-
-			return navigationMenu;
-		},
-		[ blocks, serialize, saveEntityRecord ]
-	);
-
-	// Because we can't conditionally call hooks, pass an undefined client id
-	// arg to bypass the expensive `useTemplateArea` code. The hook will return
-	// early.
-	const area = useTemplatePartAreaLabel( isDisabled ? undefined : clientId );
+	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( async () => {
@@ -134,33 +109,7 @@ export default function UnsavedInnerBlocks( {
 		}
 
 		savingLock.current = true;
-		const title = area
-			? sprintf(
-					// translators: %s: the name of a menu (e.g. Header navigation).
-					__( '%s navigation' ),
-					area
-			  )
-			: // translators: 'navigation' as in website navigation.
-			  __( 'Navigation' );
-
-		// Determine how many menus start with the automatic title.
-		const matchingMenuTitleCount = [
-			...draftNavigationMenus,
-			...navigationMenus,
-		].reduce(
-			( count, menu ) =>
-				menu?.title?.raw?.startsWith( title ) ? count + 1 : count,
-			0
-		);
-
-		// Append a number to the end of the title if a menu with
-		// the same name exists.
-		const titleWithCount =
-			matchingMenuTitleCount > 0
-				? `${ title } ${ matchingMenuTitleCount + 1 }`
-				: title;
-
-		const menu = await createNavigationMenu( titleWithCount );
+		const menu = await createNavigationMenu( null, blocks );
 		onSave( menu );
 		savingLock.current = false;
 	}, [
@@ -172,7 +121,7 @@ export default function UnsavedInnerBlocks( {
 		navigationMenus,
 		hasSelection,
 		createNavigationMenu,
-		area,
+		blocks,
 	] );
 
 	return (

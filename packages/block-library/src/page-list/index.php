@@ -293,8 +293,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
-	if ( array_key_exists( '__unstableMaxPages', $block->context ) ) {
-		$nested_pages = array_slice( $nested_pages, 0, $block->context['__unstableMaxPages'] );
+	// Limit the number of items to be visually displayed.
+	if ( ! empty( $attributes['__unstableMaxPages'] ) ) {
+		$nested_pages = array_slice( $nested_pages, 0, $attributes['__unstableMaxPages'] );
 	}
 
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );

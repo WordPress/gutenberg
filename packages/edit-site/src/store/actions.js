@@ -5,7 +5,7 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { controls, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -111,14 +111,51 @@ export function* addTemplate( template ) {
  * @param {Object} template The template object.
  */
 export function* removeTemplate( template ) {
-	yield controls.dispatch(
-		coreStore,
-		'deleteEntityRecord',
-		'postType',
-		template.type,
-		template.id,
-		{ force: true }
-	);
+	try {
+		yield controls.dispatch(
+			coreStore,
+			'deleteEntityRecord',
+			'postType',
+			template.type,
+			template.id,
+			{ force: true }
+		);
+
+		const lastError = yield controls.select(
+			coreStore,
+			'getLastEntityDeleteError',
+			'postType',
+			template.type,
+			template.id
+		);
+
+		if ( lastError ) {
+			throw lastError;
+		}
+
+		yield controls.dispatch(
+			noticesStore,
+			'createSuccessNotice',
+			sprintf(
+				/* translators: The template/part's name. */
+				__( '"%s" removed.' ),
+				template.title.rendered
+			),
+			{ type: 'snackbar' }
+		);
+	} catch ( error ) {
+		const errorMessage =
+			error.message && error.code !== 'unknown_error'
+				? error.message
+				: __( 'An error occurred while deleting the template.' );
+
+		yield controls.dispatch(
+			noticesStore,
+			'createErrorNotice',
+			errorMessage,
+			{ type: 'snackbar' }
+		);
+	}
 }
 
 /**

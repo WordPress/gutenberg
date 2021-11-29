@@ -97,7 +97,6 @@ require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
-require __DIR__ . '/compat/wordpress-5.9/edit-site-export.php';
 require __DIR__ . '/editor-settings.php';
 
 if ( ! class_exists( 'WP_Block_Template' ) ) {

@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { getInlineStyles } from './style';
@@ -23,8 +28,6 @@ import useSetting from '../components/use-setting';
 // This utility is intended to assist where the serialization of the colors
 // block support is being skipped for a block but the color related CSS classes
 // & styles still need to be generated so they can be applied to inner elements.
-
-const EMPTY_ARRAY = [];
 
 /**
  * Provides the CSS class names and inline styles for a block's color support
@@ -84,8 +87,24 @@ export function getColorClassesAndStyles( attributes ) {
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const { palette: solidsPerOrigin, gradients: gradientsPerOrigin } =
+		useSetting( 'color' ) || {};
+	const colors = useMemo(
+		() => [
+			...( solidsPerOrigin?.custom || [] ),
+			...( solidsPerOrigin?.theme || [] ),
+			...( solidsPerOrigin?.default || [] ),
+		],
+		[ solidsPerOrigin ]
+	);
+	const gradients = useMemo(
+		() => [
+			...( gradientsPerOrigin?.custom || [] ),
+			...( gradientsPerOrigin?.theme || [] ),
+			...( gradientsPerOrigin?.default || [] ),
+		],
+		[ gradientsPerOrigin ]
+	);
 
 	const colorProps = getColorClassesAndStyles( attributes );
 

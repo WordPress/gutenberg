@@ -424,50 +424,6 @@ supports: {
 }
 ```
 
-## fontSize
-
--   Type: `boolean`
--   Default value: `false`
-
-This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.
-
-The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or the default ones if none is provided.
-
-```js
-supports: {
-    // Enable UI control for font-size.
-    fontSize: true,
-}
-```
-
-When the block declares support for `fontSize`, the attributes definition is extended to include two new attributes: `fontSize` and `style`:
-
--   `fontSize`: attribute of `string` type with no default assigned. It stores the preset values set by the user. The block can apply a default fontSize by specifying its own `fontSize` attribute with a default e.g.:
-
-```js
-attributes: {
-    fontSize: {
-        type: 'string',
-        default: 'some-value',
-    }
-}
-```
-
--   `style`: attribute of `object` type with no default assigned. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
-
-```js
-attributes: {
-    style: {
-        type: 'object',
-        default: {
-            typography: {
-                fontSize: 'value'
-            }
-        }
-    }
-}
-```
-
 ## html
 
 -   Type: `boolean`
@@ -493,35 +449,6 @@ By default, all blocks will appear in the inserter. To hide a block so that it c
 supports: {
 	// Hide this block from the inserter.
 	inserter: false;
-}
-```
-
-## lineHeight
-
--   Type: `boolean`
--   Default value: `false`
-
-This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#supporting-custom-line-heights).
-
-```js
-supports: {
-    // Enable UI control for line-height.
-    lineHeight: true,
-}
-```
-
-When the block declares support for `lineHeight`, the attributes definition is extended to include a new attribute `style` of `object` type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
-
-```js
-attributes: {
-    style: {
-        type: 'object',
-        default: {
-            typography: {
-                lineHeight: 'value'
-            }
-        }
-    }
 }
 ```
 
@@ -586,3 +513,101 @@ supports: {
 ```
 
 A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed. Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
+
+
+## typography
+
+-   Type: `Object`
+-   Default value: `null`
+-   Subproperties:
+    - `fontSize`: type `boolean`, default value `false`
+    - `lineHeight`: type `boolean`, default value `false`
+
+The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for font-size.
+        fontSize: true,
+        // Enable support and UI control for line-height.
+        lineHeight: true,
+    },
+}
+```
+
+### typography.fontSize
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.
+
+The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or the default ones if none are provided.
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for font-size.
+        fontSize: true,
+    },
+}
+```
+
+When the block declares support for `fontSize`, the attributes definition is extended to include two new attributes: `fontSize` and `style`:
+
+-   `fontSize`: attribute of `string` type with no default assigned. It stores any preset value selected by the user. The block can apply a default fontSize by specifying its own `fontSize` attribute with a default e.g.:
+
+```js
+attributes: {
+    fontSize: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+-   `style`: attribute of `object` type with no default assigned. It stores the custom values set by the user and is shared with other block supports such as color. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                fontSize: 'value'
+            }
+        }
+    }
+}
+```
+
+### typography.lineHeight
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#supporting-custom-line-heights).
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for line-height.
+        lineHeight: true,
+    },
+}
+```
+
+When the block declares support for `lineHeight`, the attributes definition is extended to include a new attribute `style` of `object` type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                lineHeight: 'value'
+            }
+        }
+    }
+}
+```
