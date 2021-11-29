@@ -68,6 +68,7 @@ export default function Actions( { template } ) {
 							/>
 							<MenuItem
 								isDestructive
+								isTertiary
 								onClick={ () => {
 									removeTemplate( template );
 									onClose();
