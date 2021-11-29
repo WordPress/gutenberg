@@ -30,7 +30,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@react-native-clipboard/clipboard": "1.9.0",
+		"@react-native-clipboard/clipboard": "https://raw.githubusercontent.com/wordpress-mobile/react-native-clipboard/9a0f0de383d21455f627bf0393d4a3037c02dbcb/react-native-clipboard-clipboard-1.9.0-wp-1.tgz",
 		"@react-native-community/blur": "3.6.0",
 		"@react-native-community/masked-view": "https://raw.githubusercontent.com/wordpress-mobile/react-native-masked-view/f204c270ecd7c63ddea3449ba829d2415076faa2/react-native-community-masked-view-0.1.11-wp-1.tgz",
 		"@react-native-community/slider": "https://raw.githubusercontent.com/wordpress-mobile/react-native-slider/851dbc78d015afa55ad1e526c6d14bb86399722b/react-native-community-slider-3.0.2-wp-1.tgz",
