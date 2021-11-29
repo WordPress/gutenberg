@@ -18,7 +18,8 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"text": false,
+			"link": false
 		},
 		"typography": {
 			"fontSize": true,
