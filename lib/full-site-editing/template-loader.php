@@ -180,16 +180,7 @@ function gutenberg_get_the_template_html() {
 
 	// Wrap block template in .wp-site-blocks to allow for specific descendant styles
 	// (e.g. `.wp-site-blocks > *`).
-	$content = '<div class="wp-site-blocks">' . $content . '</div>';
-
-	/**
-	 * Filters the markup for the current template.
-	 *
-	 * @param string $result The markup for the current template.
-	 *
-	 * @return string The markup for the current template.
-	 */
-	return apply_filters( 'template_html', $content );
+	return '<div class="wp-site-blocks">' . $content . '</div>';
 }
 
 /**
@@ -309,25 +300,10 @@ add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );
  *
  * @return string The HTML.
  */
-function _gutenberg_maybe_remove_emoji_detection_script( $html ) {
-	$multi3  = '(?:[\xE0-\xEF]..)';
-	$multi4  = '(?:[\xF0-\xF4]...)';
-	$anychar = "(?:$multi4|$multi3)";
-
-	// Detect all 3-byte and 4-byte characters.
-	// Not all 3/4-byte characters are emojis, but this casts a wide net
-	// to check if it's safe to remove the emojis script.
-	// This regex should be improved in the future to be more precice,
-	// but even this wide net should be enough to remove the script
-	// in a lot of sites that don't need it.
-	preg_match( "/$anychar/", $html, $matches );
-
-	// If there are no 4-byte characters, it's safe to remove the emoji script.
-	if ( empty( $matches ) ) {
+function _gutenberg_maybe_remove_emoji_detection_script() {
+	if ( gutenberg_supports_block_templates() ) {
 		remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 	}
-
-	return $html;
 }
-add_filter( 'template_html', '_gutenberg_maybe_remove_emoji_detection_script', 20 );
+add_filter( 'wp_loaded', '_gutenberg_maybe_remove_emoji_detection_script', 20 );
 
