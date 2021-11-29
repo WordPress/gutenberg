@@ -74,7 +74,7 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 
-	it.skip( 'should replace, reset size, and keep selection', async () => {
+	it( 'should replace, reset size, and keep selection', async () => {
 		await insertBlock( 'Image' );
 		const filename1 = await upload( '.wp-block-image input[type="file"]' );
 		await waitForImage( filename1 );
@@ -85,6 +85,10 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
 		await openDocumentSettingsSidebar();
+		await page.waitForSelector(
+			'[aria-label="Image size presets"] button:first-child',
+			{ visible: true }
+		);
 		await page.click( '[aria-label="Image size presets"] button' );
 
 		const regex2 = new RegExp(
@@ -104,7 +108,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
-		await page.click( '.wp-block-image img' );
+		await page.click( '.wp-block-image' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
