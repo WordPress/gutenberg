@@ -71,21 +71,16 @@ class WP_Theme_JSON_Gutenberg {
 	 * This contains the necessary metadata to process them:
 	 *
 	 * - path       => where to find the preset within the settings section
-	 *
 	 * - override   => whether a theme preset with the same slug as a default preset
 	 *                 can override it
-	 *
 	 * - value_key  => the key that represents the value
-	 *
 	 * - value_func => optionally, instead of value_key, a function to generate
 	 *                 the value that takes a preset as an argument
-	 *
 	 * - css_vars   => name of the var to generate. The "$slug" substring will be
 	 *                 replaced by the slug of each preset. For example,
 	 *                 given a preset for color with two values whose slugs are "black" and "white",
 	 *                 the string "--wp--preset--color--$slug" will generate two variables:
 	 *                 "--wp--preset--color--black" and "--wp--preset--color--white".
-	 *
 	 * - classes    => array containing a structure with the classes to
 	 *                 generate for the presets, where for each array item
 	 *                 the key is the class name and the value the property name.
@@ -96,7 +91,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *                   '.has-$slug-background-color' => 'background-color',
 	 *                   '.has-$slug-border-color'     => 'border-color',
 	 *                 )
-	 *
 	 * - properties => array of CSS properties to be used by kses to
 	 *                 validate the content of each preset
 	 *                 by means of the remove_insecure_properties method.
