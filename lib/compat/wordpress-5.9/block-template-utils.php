@@ -111,55 +111,55 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 		$default_template_types = array(
 			'index'          => array(
 				'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
-				'description' => __( 'The default template used when no other template is available. This is a required template in WordPress.', 'gutenberg' ),
+				'description' => __( 'Displays posts.', 'gutenberg' ),
 			),
 			'home'           => array(
 				'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used for the main page that displays blog posts. This is the front page by default in WordPress. If a static front page is set, this is the template used for the page that contains the latest blog posts.', 'gutenberg' ),
+				'description' => __( 'Displays as the site\'s home page, or as the Posts page when a static home page it set.', 'gutenberg' ),
 			),
 			'front-page'     => array(
 				'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to render the front page of the site, whether it displays blog posts or a static page. The front page template takes precedence over the "Home" template.', 'gutenberg' ),
+				'description' => __( 'Displays as the site\'s home page.', 'gutenberg' ),
 			),
 			'singular'       => array(
 				'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used for displaying single views of the content. This template is a fallback for the Single, Post, and Page templates, which take precedence when they exist.', 'gutenberg' ),
+				'description' => __( 'Displays a single post or page.', 'gutenberg' ),
 			),
 			'single'         => array(
 				'title'       => _x( 'Single Post', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to display a single blog post.', 'gutenberg' ),
+				'description' => __( 'Displays a single post.', 'gutenberg' ),
 			),
 			'page'           => array(
 				'title'       => _x( 'Page', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to display individual pages.', 'gutenberg' ),
+				'description' => __( 'Displays a single page.', 'gutenberg' ),
 			),
 			'archive'        => array(
 				'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
-				'description' => __( 'The archive template displays multiple entries at once. It is used as a fallback for the Category, Author, and Date templates, which take precedence when they are available.', 'gutenberg' ),
+				'description' => __( 'Displays post categories, tags, and other archives.', 'gutenberg' ),
 			),
 			'author'         => array(
 				'title'       => _x( 'Author', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts from a single author.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts written by a single author.', 'gutenberg' ),
 			),
 			'category'       => array(
 				'title'       => _x( 'Category', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts from the same category.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts in single post category.', 'gutenberg' ),
 			),
 			'taxonomy'       => array(
 				'title'       => _x( 'Taxonomy', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts from the same taxonomy.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts from a single post taxonomy.', 'gutenberg' ),
 			),
 			'date'           => array(
 				'title'       => _x( 'Date', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts from a specific date.', 'gutenberg' ),
+				'description' => __( 'Displays posts from a specific date.', 'gutenberg' ),
 			),
 			'tag'            => array(
 				'title'       => _x( 'Tag', 'Template name', 'gutenberg' ),
-				'description' => __( 'Archive template used to display a list of posts with a given tag.', 'gutenberg' ),
+				'description' => __( 'Displays latest posts with single post tag.', 'gutenberg' ),
 			),
 			'attachment'     => array(
 				'title'       => __( 'Media', 'gutenberg' ),
-				'description' => __( 'Template used to display individual media items or attachments.', 'gutenberg' ),
+				'description' => __( 'Displays individual media items or attachments.', 'gutenberg' ),
 			),
 			'search'         => array(
 				'title'       => _x( 'Search', 'Template name', 'gutenberg' ),
@@ -167,11 +167,11 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'privacy-policy' => array(
 				'title'       => __( 'Privacy Policy', 'gutenberg' ),
-				'description' => '',
+				'description' => __( 'Displays the privacy policy page.', 'gutenberg' ),
 			),
 			'404'            => array(
 				'title'       => _x( '404', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template shown when no content is found.', 'gutenberg' ),
+				'description' => __( 'Displays when no content is found.', 'gutenberg' ),
 			),
 		);
 
