@@ -18,7 +18,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useContext, createPortal } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -31,6 +31,7 @@ import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import BlockList from '../components/block-list';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -271,9 +272,9 @@ export const withBlockControls = createHigherOrderComponent(
 			<>
 				{ shouldDisplayControls && (
 					<>
+						<ColorEdit { ...props } />
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />
-						<ColorEdit { ...props } />
 						<DimensionsPanel
 							{ ...props }
 							__experimentalSetVisualizers={ createSetVisualizers(
@@ -309,16 +310,20 @@ const withElementsStyles = createHigherOrderComponent(
 			blockElementsContainerIdentifier,
 			props.attributes.style?.elements
 		);
+		const element = useContext( BlockList.__unstableElementContext );
 
 		return (
 			<>
-				{ elements && (
-					<style
-						dangerouslySetInnerHTML={ {
-							__html: styles,
-						} }
-					/>
-				) }
+				{ elements &&
+					element &&
+					createPortal(
+						<style
+							dangerouslySetInnerHTML={ {
+								__html: styles,
+							} }
+						/>,
+						element
+					) }
 
 				<BlockListBlock
 					{ ...props }

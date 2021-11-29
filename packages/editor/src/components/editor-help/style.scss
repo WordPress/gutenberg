@@ -1,3 +1,28 @@
+.button {
+	margin: $grid-unit-10 $grid-unit-05;
+	align-items: center;
+	justify-content: center;
+	border: $border-width solid $gray-300;
+}
+
+.buttonDark {
+	border-color: $gray-700;
+}
+
+.buttonText {
+	font-weight: 600;
+	font-size: 16px;
+	color: $light-primary;
+}
+
+.buttonTextDark {
+	color: $dark-primary;
+}
+
+.navigationContainer {
+	overflow: hidden;
+}
+
 .container {
 	height: 100%;
 }

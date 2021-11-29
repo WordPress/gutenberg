@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `puppeteer-core` dependency has been updated from requiring `^10.1.0` to requiring `^11.0.0` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
+
+### Bug Fixes
+
+-   Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
+
+## 19.2.0 (2021-11-15)
+
+### New Features
+
+-   Add basic support for TypeScript in `build`, `start`, `test-e2e` and `test-unit-js` commands ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
+
+### Enhancements
+
+-   The bundled `browserslist` dependency has been updated from requiring `^4.16.6` to requiring `^4.17.6` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   Updated the default ESLint config to work correctly with the latest version of `@wordpress/eslint-plugin` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
+## 19.1.0 (2021-11-07)
+
+### Enhancements
+
+-   Increase the timeout for e2e tests to 30 seconds ([#35983](https://github.com/WordPress/gutenberg/pull/35983)).
+
+## 19.0.0 (2021-10-22)
+
+### Breaking Changes
+
+-   The webpack config was updated to no longer include the polyfill by default when creating the `assets.php` file. If your usage requires the `wp-polyfill`, you must explicitly set it as a dependency ([#34536](https://github.com/WordPress/gutenberg/pull/35436)].
+
+### Enhancements
+
+-   Allow customization of the `ARTIFACTS_PATH` in the `jest-environment-puppeteer` failed test reporter via the `WP_ARTIFACTS_PATH` environment variable ([#35371](https://github.com/WordPress/gutenberg/pull/35371)).
+
+## 18.1.0 (2021-10-12)
+
 ### Enhancements
 
 -   The bundled `jest-dev-server` dependency has been updated to the next major version `^5.0.3` ([#34560](https://github.com/WordPress/gutenberg/pull/34560)).

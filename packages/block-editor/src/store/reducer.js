@@ -240,36 +240,45 @@ function buildBlockTree( state, blocks ) {
 	return result;
 }
 
-function updateParentInnerBlocksInTree( state, tree, updatedClientIds ) {
-	const clientIds = new Set( [] );
+function updateParentInnerBlocksInTree(
+	state,
+	tree,
+	updatedClientIds,
+	updateChildrenOfUpdatedClientIds = false
+) {
+	const uncontrolledParents = new Set( [] );
 	const controlledParents = new Set();
 	for ( const clientId of updatedClientIds ) {
-		let current = clientId;
+		let current = updateChildrenOfUpdatedClientIds
+			? clientId
+			: state.parents[ clientId ];
 		do {
 			if ( state.controlledInnerBlocks[ current ] ) {
-				controlledParents.add( current );
+				// Should stop on controlled blocks.
 				// If we reach a controlled parent, break out of the loop.
+				controlledParents.add( current );
 				break;
 			} else {
-				clientIds.add( current );
+				// else continue traversing up through parents.
+				uncontrolledParents.add( current );
+				current = state.parents[ current ];
 			}
-			// Should stop on controlled blocks.
-			current = state.parents[ current ];
 		} while ( current !== undefined );
 	}
 
 	// To make sure the order of assignments doesn't matter,
 	// we first create empty objects and mutates the inner blocks later.
-	for ( const clientId of clientIds ) {
+	for ( const clientId of uncontrolledParents ) {
 		tree[ clientId ] = {
 			...tree[ clientId ],
 		};
 	}
-	for ( const clientId of clientIds ) {
+	for ( const clientId of uncontrolledParents ) {
 		tree[ clientId ].innerBlocks = ( state.order[ clientId ] || [] ).map(
 			( subClientId ) => tree[ subClientId ]
 		);
 	}
+
 	// Controlled parent blocks, need a dedicated key for their inner blocks
 	// to be used when doing getBlocks( controlledBlockClientId ).
 	for ( const clientId of controlledParents ) {
@@ -310,7 +319,8 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 					...newState.tree,
 					...subTree,
 				},
-				action.rootClientId ? [ action.rootClientId ] : [ '' ]
+				action.rootClientId ? [ action.rootClientId ] : [ '' ],
+				true
 			);
 			break;
 		}
@@ -320,11 +330,13 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 				{
 					...newState.tree,
 					[ action.clientId ]: {
+						...newState.tree[ action.clientId ],
 						...newState.byClientId[ action.clientId ],
 						attributes: newState.attributes[ action.clientId ],
 					},
 				},
-				[ action.clientId ]
+				[ action.clientId ],
+				false
 			);
 			break;
 		case 'UPDATE_BLOCK_ATTRIBUTES': {
@@ -344,7 +356,8 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 					...newState.tree,
 					...newSubTree,
 				},
-				action.clientIds
+				action.clientIds,
+				false
 			);
 			break;
 		}
@@ -363,7 +376,26 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 					),
 					...subTree,
 				},
-				action.blocks.map( ( b ) => b.clientId )
+				action.blocks.map( ( b ) => b.clientId ),
+				false
+			);
+
+			// If there are no replaced blocks, it means we're removing blocks so we need to update their parent.
+			const parentsOfRemovedBlocks = [];
+			for ( const clientId of action.clientIds ) {
+				if (
+					state.parents[ clientId ] !== undefined &&
+					( state.parents[ clientId ] === '' ||
+						newState.byClientId[ state.parents[ clientId ] ] )
+				) {
+					parentsOfRemovedBlocks.push( state.parents[ clientId ] );
+				}
+			}
+			newState.tree = updateParentInnerBlocksInTree(
+				newState,
+				newState.tree,
+				parentsOfRemovedBlocks,
+				true
 			);
 			break;
 		}
@@ -388,7 +420,8 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 						)
 					)
 				),
-				parentsOfRemovedBlocks
+				parentsOfRemovedBlocks,
+				true
 			);
 			break;
 		case 'MOVE_BLOCKS_TO_POSITION': {
@@ -405,7 +438,8 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 			newState.tree = updateParentInnerBlocksInTree(
 				newState,
 				newState.tree,
-				updatedBlockUids
+				updatedBlockUids,
+				true
 			);
 			break;
 		}
@@ -417,7 +451,8 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 			newState.tree = updateParentInnerBlocksInTree(
 				newState,
 				newState.tree,
-				updatedBlockUids
+				updatedBlockUids,
+				true
 			);
 			break;
 		}
@@ -444,7 +479,8 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 						return result;
 					}, {} ),
 				},
-				updatedBlockUids
+				updatedBlockUids,
+				false
 			);
 		}
 	}
@@ -949,7 +985,7 @@ export const blocks = flow(
 				return {
 					...state,
 					...omit( blockOrder, '' ),
-					'': ( state?.[ '' ] || [] ).concat( blockOrder ),
+					'': ( state?.[ '' ] || [] ).concat( blockOrder[ '' ] ),
 				};
 			}
 			case 'INSERT_BLOCKS': {

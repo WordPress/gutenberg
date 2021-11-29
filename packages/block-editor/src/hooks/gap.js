@@ -132,7 +132,8 @@ export function GapEdit( props ) {
 		web: (
 			<>
 				<UnitControl
-					label={ __( 'Block gap' ) }
+					label={ __( 'Block spacing' ) }
+					__unstableInputWidth="80px"
 					min={ 0 }
 					onChange={ onChange }
 					units={ units }

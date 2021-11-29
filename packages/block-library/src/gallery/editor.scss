@@ -16,7 +16,7 @@ figure.wp-block-gallery {
 		flex: 0 0 100%;
 	}
 
-	> .components-form-file-upload {
+	> .blocks-gallery-media-placeholder-wrapper {
 		flex-basis: 100%;
 	}
 
@@ -77,7 +77,6 @@ figure.wp-block-gallery {
 	}
 }
 
-
 /**
  * Gallery inspector controls settings.
  */
@@ -129,6 +128,7 @@ figure.wp-block-gallery {
 			bottom: 0;
 			left: 0;
 			z-index: 1;
+			pointer-events: none;
 		}
 	}
 

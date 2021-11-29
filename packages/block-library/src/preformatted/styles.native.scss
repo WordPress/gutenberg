@@ -23,3 +23,8 @@
 .wpRichTextDark {
 	@extend %wpBlockPreformattedDarkColor;
 }
+
+.wp-block-preformatted__no-background {
+	background: transparent;
+	padding: 0;
+}

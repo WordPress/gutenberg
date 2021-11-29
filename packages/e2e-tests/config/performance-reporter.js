@@ -29,19 +29,40 @@ class PerformanceReporter {
 
 		const results = readFileSync( filepath, 'utf8' );
 		const {
-			load,
+			serverResponse,
+			firstPaint,
+			domContentLoaded,
+			loaded,
+			firstContentfulPaint,
+			firstBlock,
 			type,
 			focus,
+			listViewOpen,
 			inserterOpen,
 			inserterHover,
 			inserterSearch,
 		} = JSON.parse( results );
 
-		if ( load && load.length ) {
+		if ( serverResponse && serverResponse.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Loading Time:' ) }
-Average time to load: ${ success( round( average( load ) ) + 'ms' ) }` );
+Average time to server response (subtracted from client side metrics): ${ success(
+				round( average( serverResponse ) ) + 'ms'
+			) }
+Average time to first paint: ${ success(
+				round( average( firstPaint ) ) + 'ms'
+			) }
+Average time to DOM content load: ${ success(
+				round( average( domContentLoaded ) ) + 'ms'
+			) }
+Average time to load: ${ success( round( average( loaded ) ) + 'ms' ) }
+Average time to first contentful paint: ${ success(
+				round( average( firstContentfulPaint ) ) + 'ms'
+			) }
+Average time to first block: ${ success(
+				round( average( firstBlock ) ) + 'ms'
+			) }` );
 		}
 
 		if ( type && type.length ) {
@@ -67,6 +88,21 @@ Slowest time to select a block: ${ success(
 			) }
 Fastest time to select a block: ${ success(
 				round( Math.min( ...focus ) ) + 'ms'
+			) }` );
+		}
+
+		if ( listViewOpen && listViewOpen.length ) {
+			// eslint-disable-next-line no-console
+			console.log( `
+${ title( 'Opening List View Performance:' ) }
+Average time to open list view: ${ success(
+				round( average( listViewOpen ) ) + 'ms'
+			) }
+Slowest time to open list view: ${ success(
+				round( Math.max( ...listViewOpen ) ) + 'ms'
+			) }
+Fastest time to open list view: ${ success(
+				round( Math.min( ...listViewOpen ) ) + 'ms'
 			) }` );
 		}
 

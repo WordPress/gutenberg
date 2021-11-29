@@ -21,7 +21,7 @@ Install the module
 npm install @wordpress/element --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -294,7 +294,7 @@ aside from `children` are passed.
 
 _Parameters_
 
--   _props_ `RawHTMLProps`: Children should be a string of HTML. Other props will be passed through to div wrapper.
+-   _props_ `RawHTMLProps`: Children should be a string of HTML or an array of strings. Other props will be passed through to the div wrapper.
 
 _Returns_
 

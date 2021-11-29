@@ -73,15 +73,22 @@ export class HTMLTextInput extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme } = this.props;
-		const htmlStyle = getStylesFromColorScheme(
-			styles.htmlView,
-			styles.htmlViewDark
-		);
-		const placeholderStyle = getStylesFromColorScheme(
-			styles.placeholder,
-			styles.placeholderDark
-		);
+		const { getStylesFromColorScheme, style } = this.props;
+		const titleStyle = [
+			styles.htmlViewTitle,
+			style?.text && { color: style.text },
+		];
+		const htmlStyle = [
+			getStylesFromColorScheme( styles.htmlView, styles.htmlViewDark ),
+			style?.text && { color: style.text },
+		];
+		const placeholderStyle = {
+			...getStylesFromColorScheme(
+				styles.placeholder,
+				styles.placeholderDark
+			),
+			...( style?.text && { color: style.text } ),
+		};
 		return (
 			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
 				<TextInput
@@ -89,7 +96,7 @@ export class HTMLTextInput extends Component {
 					accessibilityLabel="html-view-title"
 					textAlignVertical="center"
 					numberOfLines={ 1 }
-					style={ styles.htmlViewTitle }
+					style={ titleStyle }
 					value={ this.props.title }
 					placeholder={ __( 'Add title' ) }
 					placeholderTextColor={ placeholderStyle.color }

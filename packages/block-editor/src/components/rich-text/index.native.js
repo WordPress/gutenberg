@@ -55,7 +55,9 @@ import {
 	getMultilineTag,
 	getAllowedFormats,
 	isShortcode,
+	createLinkInParagraph,
 } from './utils';
+import EmbedHandlerPicker from './embed-handler-picker';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
@@ -118,6 +120,7 @@ function RichTextWrapper(
 	const fallbackRef = useRef();
 	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
 	const nativeProps = useNativeProps();
+	const embedHandlerPickerRef = useRef();
 	const selector = ( select ) => {
 		const {
 			isCaretWithinFormattedText,
@@ -439,10 +442,19 @@ function RichTextWrapper(
 				mode = 'BLOCKS';
 			}
 
+			const isPastedURL = isURL( plainText.trim() );
+			const presentEmbedHandlerPicker = () =>
+				embedHandlerPickerRef.current?.presentPicker( {
+					createEmbed: () =>
+						onReplace( content, content.length - 1, -1 ),
+					createLink: () =>
+						createLinkInParagraph( plainText.trim(), onReplace ),
+				} );
+
 			if (
 				__unstableEmbedURLOnPaste &&
 				isEmpty( value ) &&
-				isURL( plainText.trim() )
+				isPastedURL
 			) {
 				mode = 'BLOCKS';
 			}
@@ -472,9 +484,30 @@ function RichTextWrapper(
 
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
+				// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
+				// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
+				const canPasteEmbed =
+					isPastedURL &&
+					content.length === 1 &&
+					content[ 0 ].name === 'core/embed';
 				if ( onReplace && isEmpty( value ) ) {
+					if ( canPasteEmbed ) {
+						onChange(
+							insert( value, create( { text: plainText } ) )
+						);
+						if ( __unstableEmbedURLOnPaste ) {
+							presentEmbedHandlerPicker();
+						}
+						return;
+					}
 					onReplace( content, content.length - 1, -1 );
 				} else {
+					if ( canPasteEmbed ) {
+						onChange(
+							insert( value, create( { text: plainText } ) )
+						);
+						return;
+					}
 					splitValue( value, content );
 				}
 			}
@@ -650,6 +683,7 @@ function RichTextWrapper(
 							/>
 						) }
 					</Autocomplete>
+					<EmbedHandlerPicker ref={ embedHandlerPickerRef } />
 				</>
 			) }
 		</RichText>

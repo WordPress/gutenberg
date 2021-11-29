@@ -24,7 +24,7 @@ import { chevronDown } from '@wordpress/icons';
  */
 import { useMenuEntityProp, useSelectedMenuId } from '../../hooks';
 import useNavigationEntities from './use-navigation-entities';
-import menuItemsToBlocks from './menu-items-to-blocks';
+import { menuItemsToBlocks } from '../../store/transform';
 
 /**
  * Convert pages to blocks.

@@ -33,6 +33,17 @@ const getNormalizedBlockType = ( state, nameOrType ) =>
 		: nameOrType;
 
 /**
+ * Returns all the unprocessed block types as passed during the registration.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Unprocessed block types.
+ */
+export function __experimentalGetUnprocessedBlockTypes( state ) {
+	return state.unprocessedBlockTypes;
+}
+
+/**
  * Returns all the available block types.
  *
  * @param {Object} state Data state.
@@ -40,15 +51,8 @@ const getNormalizedBlockType = ( state, nameOrType ) =>
  * @return {Array} Block Types.
  */
 export const getBlockTypes = createSelector(
-	( state ) => {
-		return Object.values( state.blockTypes ).map( ( blockType ) => {
-			return {
-				...blockType,
-				variations: getBlockVariations( state, blockType.name ),
-			};
-		} );
-	},
-	( state ) => [ state.blockTypes, state.blockVariations ]
+	( state ) => Object.values( state.blockTypes ),
+	( state ) => [ state.blockTypes ]
 );
 
 /**
@@ -126,7 +130,7 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const match = variations?.find( ( variation ) => {
 		if ( Array.isArray( variation.isActive ) ) {
 			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType.attributes || {} );
+			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
 				( attribute ) => attributeKeys.includes( attribute )
 			);

@@ -53,6 +53,11 @@ import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
 
+/**
+ * Internal dependencies
+ */
+import useMobileWarning from './use-mobile-warning';
+
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
@@ -118,6 +123,16 @@ function GalleryEdit( props ) {
 		[ clientId ]
 	);
 
+	const wasBlockJustInserted = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			);
+		},
+		[ clientId ]
+	);
+
 	const images = useMemo(
 		() =>
 			innerBlockImages?.map( ( block ) => ( {
@@ -134,11 +149,14 @@ function GalleryEdit( props ) {
 
 	const newImages = useGetNewImages( images, imageData );
 
+	useMobileWarning( newImages );
+
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			updateBlockAttributes( newImage.clientId, {
 				...buildImageAttributes( false, newImage.attributes ),
 				id: newImage.id,
+				align: undefined,
 			} );
 		} );
 	}, [ newImages ] );
@@ -429,6 +447,9 @@ function GalleryEdit( props ) {
 			value={ hasImageIds ? images : {} }
 			onError={ onUploadError }
 			notices={ hasImages ? undefined : noticeUI }
+			autoOpenMediaUpload={
+				! hasImages && isSelected && wasBlockJustInserted
+			}
 		/>
 	);
 
@@ -490,7 +511,7 @@ function GalleryEdit( props ) {
 							hideCancelButton={ true }
 						/>
 					) }
-					{ Platform.isWeb && ! imageSizeOptions && (
+					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
 								{ __( 'Image size' ) }

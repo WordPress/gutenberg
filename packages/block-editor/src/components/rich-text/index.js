@@ -26,6 +26,7 @@ import {
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -307,14 +308,17 @@ function RichTextWrapper(
 			{ isSelected && (
 				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<inputEventContext.Provider value={ inputEvents }>
-						{ children && children( { value, onChange, onFocus } ) }
-						<FormatEdit
-							value={ value }
-							onChange={ onChange }
-							onFocus={ onFocus }
-							formatTypes={ formatTypes }
-							forwardedRef={ anchorRef }
-						/>
+						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+							{ children &&
+								children( { value, onChange, onFocus } ) }
+							<FormatEdit
+								value={ value }
+								onChange={ onChange }
+								onFocus={ onFocus }
+								formatTypes={ formatTypes }
+								forwardedRef={ anchorRef }
+							/>
+						</Popover.__unstableSlotNameProvider>
 					</inputEventContext.Provider>
 				</keyboardShortcutContext.Provider>
 			) }

@@ -10,7 +10,7 @@ export {
 } from '@wordpress/primitives';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
-export { default as ColorPicker } from './color-picker';
+export { ColorPicker } from './color-picker';
 export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
@@ -30,7 +30,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 } from './slot-fill';
-export { default as FontSizePicker } from './font-size-picker'; // Intentionally called after slot-fill.
+
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
@@ -66,6 +66,7 @@ export { default as Disabled } from './disabled';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
+export { default as FontSizePicker } from './font-size-picker'; // Intentionally called after slot-fill and withFilters.
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
@@ -102,6 +103,7 @@ export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-sc
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as LinkSettingsScreen } from './mobile/link-settings/link-settings-screen';
 export { default as LinkSettingsNavigation } from './mobile/link-settings/link-settings-navigation';
+export { default as ImageLinkDestinationsScreen } from './mobile/link-settings/image-link-destinations-screen';
 export { default as SegmentedControl } from './mobile/segmented-control';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';

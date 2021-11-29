@@ -115,9 +115,8 @@ export function DimensionsPanel( props ) {
 			) }
 			{ ! isGapDisabled && (
 				<ToolsPanelItem
-					className="single-column"
 					hasValue={ () => hasGapValue( props ) }
-					label={ __( 'Block gap' ) }
+					label={ __( 'Block spacing' ) }
 					onDeselect={ () => resetGap( props ) }
 					resetAllFilter={ createResetAllFilter( 'blockGap' ) }
 					isShownByDefault={ defaultSpacingControls?.blockGap }

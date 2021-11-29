@@ -42,7 +42,7 @@ _Returns_
 ### documentHasTextSelection
 
 Check whether the current document has selected text. This applies to ranges
-of text in the document, and not selection inside <input> and <textarea>
+of text in the document, and not selection inside `<input>` and `<textarea>`
 elements.
 
 See: <https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects>.
@@ -58,8 +58,8 @@ _Returns_
 ### documentHasUncollapsedSelection
 
 Check whether the current document has any sort of selection. This includes
-ranges of text across elements and any selection inside <input> and
-<textarea> elements.
+ranges of text across elements and any selection inside `<input>` and
+`<textarea>` elements.
 
 _Parameters_
 

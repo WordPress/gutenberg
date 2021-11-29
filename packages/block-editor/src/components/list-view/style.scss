@@ -15,10 +15,14 @@
 	// Use position relative for row animation.
 	position: relative;
 
-	&.is-selected .block-editor-list-view-block-contents {
+	&.is-selected {
 		background: var(--wp-admin-theme-color);
+	}
+	&.is-selected .block-editor-list-view-block-contents,
+	&.is-selected .components-button.has-icon {
 		color: $white;
-
+	}
+	&.is-selected .block-editor-list-view-block-contents {
 		// Hide selection styles while a user is dragging blocks/files etc.
 		.is-dragging-components-draggable & {
 			background: none;
@@ -26,40 +30,41 @@
 		}
 	}
 	&.is-selected .block-editor-list-view-block-contents:focus {
-		box-shadow:
-			inset 0 0 0 1px $white,
-			0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-		// Hide focus styles while a user is dragging blocks/files etc.
-		.is-dragging-components-draggable & {
-			box-shadow: none;
+		&::after {
+			box-shadow:
+				inset 0 0 0 1px $white,
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
+	&.is-selected .block-editor-list-view-block__menu:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+	}
 
+	&.is-branch-selected:not(.is-selected) {
+		// Lighten a CSS variable without introducing a new SASS variable
+		background:
+			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
+			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
+	}
 	&.is-branch-selected.is-selected .block-editor-list-view-block-contents {
 		border-radius: 2px 2px 0 0;
 	}
-
 	&[aria-expanded="false"] {
 		&.is-branch-selected.is-selected .block-editor-list-view-block-contents {
 			border-radius: 2px;
 		}
 	}
 	&.is-branch-selected:not(.is-selected) .block-editor-list-view-block-contents {
-		// Lighten a CSS variable without introducing a new SASS variable
-		background:
-			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
-			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
 		border-radius: 0;
-	}
-	&.is-branch-selected.is-last-of-selected-branch .block-editor-list-view-block-contents {
-		border-radius: 0 0 2px 2px;
 	}
 
 	&.is-dragging {
 		display: none;
 	}
 
+	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	.block-editor-list-view-block-contents {
 		display: flex;
 		align-items: center;
@@ -71,19 +76,6 @@
 		border-radius: 2px;
 		position: relative;
 		white-space: nowrap;
-
-		&:hover,
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-			// Hide hover styles while a user is dragging blocks/files etc.
-			.is-dragging-components-draggable & {
-				box-shadow: none;
-			}
-		}
-		&:focus {
-			z-index: 1;
-		}
 
 		&.is-dropping-before::before {
 			content: "";
@@ -99,6 +91,42 @@
 		.components-modal__content & {
 			padding-left: 0;
 			padding-right: 0;
+		}
+	}
+
+	.block-editor-list-view-block-contents:focus {
+		box-shadow: none;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: -(24px + 5px); // Icon size + padding.
+			bottom: 0;
+			left: 0;
+			border-radius: inherit;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			z-index: 1;
+			pointer-events: none;
+
+			// Hide focus styles while a user is dragging blocks/files etc.
+			.is-dragging-components-draggable & {
+				box-shadow: none;
+			}
+		}
+	}
+	// Fix focus styling width when one row has fewer cells.
+	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
+		right: 0;
+	}
+
+	.block-editor-list-view-block__menu:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		z-index: 1;
+
+		// Hide focus styles while a user is dragging blocks/files etc.
+		.is-dragging-components-draggable & {
+			box-shadow: none;
 		}
 	}
 
@@ -125,7 +153,7 @@
 		line-height: 0;
 		width: $button-size;
 		opacity: 0;
-		vertical-align: top;
+		vertical-align: middle;
 		@include reduce-motion("transition");
 
 		// Show on hover, visible, and show above to keep the hit area size.
@@ -146,7 +174,11 @@
 	}
 
 	.block-editor-list-view-block__menu-cell {
-		padding-top: $grid-unit-10;
+		padding-right: 5px;
+
+		.components-button.has-icon {
+			height: 24px;
+		}
 	}
 
 	.block-editor-list-view-block__mover-cell-alignment-wrapper {
@@ -248,7 +280,6 @@
 	}
 }
 
-.block-editor-list-view-block-slot__description,
 .block-editor-list-view-block-select-button__description,
 .block-editor-list-view-appender__description {
 	display: none;
@@ -327,5 +358,11 @@ $block-navigation-max-indent: 8;
 	margin-left: 0;
 	border: none;
 	box-shadow: none;
+}
+
+.block-editor-list-view-placeholder {
+	padding: 0;
+	margin: 0;
+	height: 36px;
 }
 

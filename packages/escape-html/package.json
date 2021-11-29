@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/escape-html",
-	"version": "2.2.1",
+	"version": "2.2.3",
 	"description": "Escape HTML utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.13.10"
+		"@babel/runtime": "^7.16.0"
 	},
 	"publishConfig": {
 		"access": "public"

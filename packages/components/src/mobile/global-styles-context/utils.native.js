@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { find, startsWith, get, camelCase, has } from 'lodash';
+import { Dimensions } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -156,7 +162,7 @@ export function getBlockTypography(
 		}
 	}
 
-	if ( blockStyleAttributes?.fontSize ) {
+	if ( blockStyleAttributes?.fontSize && baseGlobalStyles ) {
 		const mappedFontSize = find( fontSizes, {
 			slug: blockStyleAttributes?.fontSize,
 		} );
@@ -227,10 +233,10 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 
 export function getMappedValues( features, palette ) {
 	const typography = features?.typography;
-	const colors = { ...palette?.theme, ...palette?.user };
+	const colors = { ...palette?.theme, ...palette?.custom };
 	const fontSizes = {
 		...typography?.fontSizes?.theme,
-		...typography?.fontSizes?.user,
+		...typography?.fontSizes?.custom,
 	};
 	const mappedValues = {
 		color: {
@@ -243,6 +249,41 @@ export function getMappedValues( features, palette ) {
 		},
 	};
 	return mappedValues;
+}
+
+/**
+ * Returns the normalized fontSizes to include the sizePx value for each of the different sizes.
+ *
+ * @param {Object} fontSizes found in global styles.
+ * @return {Object} normalized sizes.
+ */
+function normalizeFontSizes( fontSizes ) {
+	// Adds normalized PX values for each of the different keys
+	if ( ! fontSizes ) {
+		return fontSizes;
+	}
+	const normalizedFontSizes = {};
+	const dimensions = Dimensions.get( 'window' );
+
+	[ 'default', 'theme', 'user' ].forEach( ( key ) => {
+		if ( fontSizes[ key ] ) {
+			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
+				( fontSizeObject ) => {
+					fontSizeObject.sizePx = getPxFromCssUnit(
+						fontSizeObject.size,
+						{
+							width: dimensions.width,
+							height: dimensions.height,
+							fontSize: 16,
+						}
+					);
+					return fontSizeObject;
+				}
+			);
+		}
+	} );
+
+	return normalizedFontSizes;
 }
 
 export function getGlobalStyles( rawStyles, rawFeatures ) {
@@ -266,6 +307,8 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		customValues
 	);
 
+	const fontSizes = normalizeFontSizes( features?.typography?.fontSizes );
+
 	return {
 		colors,
 		gradients,
@@ -277,7 +320,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 				background: features?.color?.background ?? true,
 			},
 			typography: {
-				fontSizes: features?.typography?.fontSizes,
+				fontSizes,
 				customLineHeight: features?.custom?.[ 'line-height' ],
 			},
 		},

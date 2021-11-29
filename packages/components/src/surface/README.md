@@ -14,7 +14,7 @@ In the example below, notice how the `Surface` renders in white (or dark gray if
 import {
 	__experimentalSurface as Surface,
 	__experimentalText as Text
-} from '@wordpress/components/ui';
+} from '@wordpress/components';
 
 function Example() {
 	return (

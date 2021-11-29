@@ -6,13 +6,6 @@
 @import "~@wordpress/base-styles/breakpoints";
 @import "~@wordpress/base-styles/colors";
 @import "~@wordpress/base-styles/mixins";
+@import "~@wordpress/base-styles/default-custom-properties";
 @import "~@wordpress/base-styles/variables";
 @import "~@wordpress/base-styles/z-index";
-
-// @wordpress package styles
-@import "../packages/components/src/style.scss";
-@import "../packages/block-editor/src/style.scss";
-@import "../packages/block-library/src/style.scss";
-@import "../packages/block-library/src/theme.scss";
-@import "../packages/block-library/src/editor.scss";
-@import "../packages/format-library/src/style.scss";

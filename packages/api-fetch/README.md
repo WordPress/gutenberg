@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/api-fetch --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -56,28 +56,28 @@ Shorthand to be used in place of `body`, accepts an object value to be stringifi
 
 ### Aborting a request
 
-Aborting a request can be achieved through the use of [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) in the same way as you would when using the native `fetch` API. 
+Aborting a request can be achieved through the use of [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) in the same way as you would when using the native `fetch` API.
 
 For legacy browsers that don't support `AbortController`, you can either:
 
-* Provide your own polyfill of `AbortController` if you still want it to be abortable. 
-* Ignore it as shown in the example below.
+-   Provide your own polyfill of `AbortController` if you still want it to be abortable.
+-   Ignore it as shown in the example below.
 
 **Example**
 
 ```js
-const controller = typeof AbortController === 'undefined'
-	? undefined
-	: new AbortController();
+const controller =
+	typeof AbortController === 'undefined' ? undefined : new AbortController();
 
-apiFetch( { path: '/wp/v2/posts', signal: controller?.signal } )
-	.catch( ( error ) => {
+apiFetch( { path: '/wp/v2/posts', signal: controller?.signal } ).catch(
+	( error ) => {
 		// If the browser doesn't support AbortController then the code below will never log.
 		// However, in most cases this should be fine as it can be considered to be a progressive enhancement.
 		if ( error.name === 'AbortError' ) {
 			console.log( 'Request has been aborted' );
 		}
-	} );
+	}
+);
 
 controller?.abort();
 ```

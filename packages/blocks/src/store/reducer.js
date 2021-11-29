@@ -42,7 +42,32 @@ export const DEFAULT_CATEGORIES = [
 ];
 
 /**
- * Reducer managing the block types
+ * Reducer managing the unprocessed block types in a form passed when registering the by block.
+ * It's for internal use only. It allows recomputing the processed block types on-demand after block type filters
+ * get added or removed.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function unprocessedBlockTypes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_UNPROCESSED_BLOCK_TYPE':
+			return {
+				...state,
+				[ action.blockType.name ]: action.blockType,
+			};
+		case 'REMOVE_BLOCK_TYPES':
+			return omit( state, action.names );
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the processed block types with all filters applied.
+ * The state is derived from the `unprocessedBlockTypes` reducer.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -54,12 +79,7 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBy(
-					map( action.blockTypes, ( blockType ) =>
-						omit( blockType, 'styles ' )
-					),
-					'name'
-				),
+				...keyBy( action.blockTypes, 'name' ),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
@@ -86,8 +106,15 @@ export function blockStyles( state = {}, action ) {
 					( blockType ) => {
 						return uniqBy(
 							[
-								...get( blockType, [ 'styles' ], [] ),
-								...get( state, [ blockType.name ], [] ),
+								...get( blockType, [ 'styles' ], [] ).map(
+									( style ) => ( {
+										...style,
+										source: 'block',
+									} )
+								),
+								...get( state, [ blockType.name ], [] ).filter(
+									( { source } ) => 'block' !== source
+								),
 							],
 							( style ) => style.name
 						);
@@ -136,8 +163,15 @@ export function blockVariations( state = {}, action ) {
 					( blockType ) => {
 						return uniqBy(
 							[
-								...get( blockType, [ 'variations' ], [] ),
-								...get( state, [ blockType.name ], [] ),
+								...get( blockType, [ 'variations' ], [] ).map(
+									( variation ) => ( {
+										...variation,
+										source: 'block',
+									} )
+								),
+								...get( state, [ blockType.name ], [] ).filter(
+									( { source } ) => 'block' !== source
+								),
 							],
 							( variation ) => variation.name
 						);
@@ -256,6 +290,7 @@ export function collections( state = {}, action ) {
 }
 
 export default combineReducers( {
+	unprocessedBlockTypes,
 	blockTypes,
 	blockStyles,
 	blockVariations,

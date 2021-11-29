@@ -40,6 +40,7 @@ const EmbedPreview = ( {
 	isProviderPreviewable,
 	type,
 	url,
+	isDefaultEmbedInfo,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 	const { locale } = useSelect( blockEditorStore ).getSettings();
@@ -137,6 +138,7 @@ const EmbedPreview = ( {
 						isSelected={ isSelected }
 						onPress={ () => setIsCaptionSelected( false ) }
 						previewable={ previewable }
+						isDefaultEmbedInfo={ isDefaultEmbedInfo }
 					/>
 				) }
 				<BlockCaption

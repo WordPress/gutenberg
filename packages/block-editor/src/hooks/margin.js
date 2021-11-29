@@ -73,7 +73,7 @@ export function resetMargin( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether margin setting is disabled.
  */
 export function useIsMarginDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'spacing.customMargin' );
+	const isDisabled = ! useSetting( 'spacing.margin' );
 	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'margin' );
 
 	return ! hasMarginSupport( blockName ) || isDisabled || isInvalid;

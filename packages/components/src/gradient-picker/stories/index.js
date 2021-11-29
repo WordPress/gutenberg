@@ -16,6 +16,9 @@ import GradientPicker from '../';
 export default {
 	title: 'Components/GradientPicker',
 	component: GradientPicker,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const GradientPickerWithState = ( props ) => {

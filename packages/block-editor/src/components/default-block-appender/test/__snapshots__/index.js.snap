@@ -6,24 +6,12 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   data-root-client-id=""
 >
   <p
-    aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
-    contentEditable={true}
-    onFocus={
-      [MockFunction] {
-        "calls": Array [
-          Array [],
-        ],
-        "results": Array [
-          Object {
-            "type": "return",
-            "value": undefined,
-          },
-        ],
-      }
-    }
+    aria-label="Add default block"
+    className="block-editor-default-block-appender__content"
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
     role="button"
-    suppressContentEditableWarning={true}
     tabIndex="0"
   >
     Type / to choose a block
@@ -42,12 +30,12 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   data-root-client-id=""
 >
   <p
-    aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
-    contentEditable={true}
-    onFocus={[MockFunction]}
+    aria-label="Add default block"
+    className="block-editor-default-block-appender__content"
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
     role="button"
-    suppressContentEditableWarning={true}
     tabIndex="0"
   >
     Type / to choose a block
@@ -66,12 +54,12 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   data-root-client-id=""
 >
   <p
-    aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
-    contentEditable={true}
-    onFocus={[MockFunction]}
+    aria-label="Add default block"
+    className="block-editor-default-block-appender__content"
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
     role="button"
-    suppressContentEditableWarning={true}
     tabIndex="0"
   >
     ﻿

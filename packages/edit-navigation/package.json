@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.9.18",
+	"version": "1.9.22",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
@@ -27,7 +27,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
@@ -36,7 +36,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/data-controls": "file:../data-controls",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/dom-ready": "file:../dom-ready",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",

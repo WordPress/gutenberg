@@ -22,10 +22,9 @@ import InserterSearchResults from './search-results';
 import { store as blockEditorStore } from '../../store';
 import InserterTabs from './tabs';
 import styles from './style.scss';
+import { filterInserterItems } from './utils';
 
 const MIN_ITEMS_FOR_SEARCH = 2;
-const REUSABLE_BLOCKS_CATEGORY = 'reusable';
-
 function InserterMenu( {
 	onSelect,
 	onDismiss,
@@ -69,9 +68,9 @@ function InserterMenu( {
 			}
 
 			const allItems = getInserterItems( targetRootClientId );
-			const reusableBlockItems = allItems.filter(
-				( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
-			);
+			const reusableBlockItems = filterInserterItems( allItems, {
+				onlyReusable: true,
+			} );
 
 			return {
 				items: allItems,

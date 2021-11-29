@@ -27,9 +27,12 @@ function InserterMenu( {
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
+	__experimentalFilterValue = '',
 	shouldFocusBlock = true,
 } ) {
-	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ filterValue, setFilterValue ] = useState(
+		__experimentalFilterValue
+	);
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
 		null

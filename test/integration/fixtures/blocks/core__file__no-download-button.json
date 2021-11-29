@@ -5,6 +5,7 @@
 		"isValid": true,
 		"attributes": {
 			"href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+			"fileId": "wp-block-file--media-_clientId_0",
 			"fileName": "lkjfijwef",
 			"textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
 			"showDownloadButton": false,
@@ -12,6 +13,6 @@
 			"previewHeight": 600
 		},
 		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\">lkjfijwef</a></div>"
+		"originalContent": "<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_0\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\">lkjfijwef</a></div>"
 	}
 ]

@@ -56,6 +56,26 @@ const FONT_WEIGHTS = [
 ];
 
 /**
+ * Adjusts font appearance field label in case either font styles or weights
+ * are disabled.
+ *
+ * @param {boolean} hasFontStyles  Whether font styles are enabled and present.
+ * @param {boolean} hasFontWeights Whether font weights are enabled and present.
+ * @return {string} A label representing what font appearance is being edited.
+ */
+export const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
+	if ( ! hasFontStyles ) {
+		return __( 'Font weight' );
+	}
+
+	if ( ! hasFontWeights ) {
+		return __( 'Font style' );
+	}
+
+	return __( 'Appearance' );
+};
+
+/**
  * Control to display unified font style and weight options.
  *
  * @param {Object} props Component props.
@@ -70,6 +90,7 @@ export default function FontAppearanceControl( props ) {
 		value: { fontStyle, fontWeight },
 	} = props;
 	const hasStylesOrWeights = hasFontStyles || hasFontWeights;
+	const label = getFontAppearanceLabel( hasFontStyles, hasFontWeights );
 	const defaultOption = {
 		key: 'default',
 		name: __( 'Default' ),
@@ -143,25 +164,14 @@ export default function FontAppearanceControl( props ) {
 		return hasFontStyles ? styleOptions() : weightOptions();
 	}, [ props.options ] );
 
-	// Find current selection by comparing font style & weight against options.
-	const currentSelection = selectOptions.find(
-		( option ) =>
-			option.style.fontStyle === fontStyle &&
-			option.style.fontWeight === fontWeight
-	);
-
-	// Adjusts field label in case either styles or weights are disabled.
-	const getLabel = () => {
-		if ( ! hasFontStyles ) {
-			return __( 'Font weight' );
-		}
-
-		if ( ! hasFontWeights ) {
-			return __( 'Font style' );
-		}
-
-		return __( 'Appearance' );
-	};
+	// Find current selection by comparing font style & weight against options,
+	// and fall back to the Default option if there is no matching option.
+	const currentSelection =
+		selectOptions.find(
+			( option ) =>
+				option.style.fontStyle === fontStyle &&
+				option.style.fontWeight === fontWeight
+		) || selectOptions[ 0 ];
 
 	// Adjusts screen reader description based on styles or weights.
 	const getDescribedBy = () => {
@@ -193,19 +203,17 @@ export default function FontAppearanceControl( props ) {
 	};
 
 	return (
-		<fieldset className="components-font-appearance-control">
-			{ hasStylesOrWeights && (
-				<CustomSelectControl
-					className="components-font-appearance-control__select"
-					label={ getLabel() }
-					describedBy={ getDescribedBy() }
-					options={ selectOptions }
-					value={ currentSelection }
-					onChange={ ( { selectedItem } ) =>
-						onChange( selectedItem.style )
-					}
-				/>
-			) }
-		</fieldset>
+		hasStylesOrWeights && (
+			<CustomSelectControl
+				className="components-font-appearance-control"
+				label={ label }
+				describedBy={ getDescribedBy() }
+				options={ selectOptions }
+				value={ currentSelection }
+				onChange={ ( { selectedItem } ) =>
+					onChange( selectedItem.style )
+				}
+			/>
+		)
 	);
 }

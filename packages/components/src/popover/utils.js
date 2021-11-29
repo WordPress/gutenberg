@@ -139,8 +139,10 @@ export function computePopoverXAxisPosition(
 	}
 
 	if ( boundaryElement ) {
-		const boundaryRect = boundaryElement.getBoundingClientRect();
-		popoverLeft = Math.min( popoverLeft, boundaryRect.right - width );
+		popoverLeft = Math.min(
+			popoverLeft,
+			boundaryElement.offsetLeft + boundaryElement.offsetWidth - width
+		);
 
 		// Avoid the popover being position beyond the left boundary if the
 		// direction is left to right.

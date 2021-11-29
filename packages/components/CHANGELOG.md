@@ -2,6 +2,98 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
+
+### Experimental
+
+-   Reinstated the ability to pass additional props to the `ToolsPanel` ([#36428](https://github.com/WordPress/gutenberg/pull/36428)).
+-   Added an `__unstable-large` size variant to `InputControl`, `SelectControl`, and `UnitControl` for selective migration to the larger 40px heights. ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+-   Fixed inconsistent padding in `UnitControl` ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+-   Added support for RTL behavior for the `ZStack`'s `offset` prop ([#36769](https://github.com/WordPress/gutenberg/pull/36769))
+-   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([#36588](https://github.com/WordPress/gutenberg/pull/36588)).
+-   Added `__experimentalHideHeader` prop to `Modal` component ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+-   Added experimental `ConfirmDialog` component ([#34153](https://github.com/WordPress/gutenberg/pull/34153)).
+
+### Bug Fix
+
+-   Fixed spacing between `BaseControl` fields and help text within the `ToolsPanel` ([#36334](https://github.com/WordPress/gutenberg/pull/36334))
+
+### Enhancements
+
+-   Wrapped `Modal` in a `forwardRef` call ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+
+## 19.1.0
+
+### Enhancements
+
+-   Added a `showTooltip` prop to `ToggleGroupControlOption` in order to display tooltip text (using `<Tooltip />`). ([#36726](https://github.com/WordPress/gutenberg/pull/36726)).
+
+### Bug Fix
+
+-   Fixed a bug which prevented setting `PM` hours correctly in the `DateTimePicker` ([#36878](https://github.com/WordPress/gutenberg/pull/36878)).
+
+## 19.0.2 (2021-11-15)
+
+-   Remove erroneous use of `??=` syntax from `build-module`.
+
+## 19.0.1 (2021-11-07)
+
+### Enhancements
+
+-   Updated the `ColorPalette` and `GradientPicker` components to the latest designs ([#35970](https://github.com/WordPress/gutenberg/pull/35970)).
+
+### Experimental
+
+-   Updated the `ToolsPanel` to use `Grid` internally to manage panel layout ([#35621](https://github.com/WordPress/gutenberg/pull/35621)).
+-   Added experimental `__experimentalHasMultipleOrigins` prop to the `ColorPalette` and `GradientPicker` components ([#35970](https://github.com/WordPress/gutenberg/pull/35970)).
+
+## 19.0.0 (2021-10-22)
+
+### New Features
+
+-   Added support for `step="any"` in `NumberControl` and `RangeControl` ([#34542](https://github.com/WordPress/gutenberg/pull/34542)).
+
+### Enhancements
+
+-   Removed the separator shown between `ToggleGroupControl` items ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
+-   The `ColorPicker` component property `onChangeComplete`, a function accepting a color object, was replaced with the property `onChange`, a function accepting a  string on  ([#35220](https://github.com/WordPress/gutenberg/pull/35220)).
+-   The property `disableAlpha`, was removed from the `ColorPicker` component. Use the new opposite property `enableAlpha` instead ([#35220](https://github.com/WordPress/gutenberg/pull/35220)).
+
+### Experimental
+
+-   Removed the `fieldset` wrapper from the `FontAppearanceControl` component ([35461](https://github.com/WordPress/gutenberg/pull/35461)).
+-   Refactored the `ToggleGroupControl` component's structure and embedded `ToggleGroupControlButton` directly into `ToggleGroupControlOption` ([#35600](https://github.com/WordPress/gutenberg/pull/35600)).
+-   Added support for showing an experimental hint in `CustomSelectControl`  ([#35673](https://github.com/WordPress/gutenberg/pull/35673)).
+
+### Breaking Changes
+
+-   The `color` property a `tinycolor2` color object passed on `onChangeComplete` property of the `ColorPicker` component was removed. Please use the new `onChange` property that accepts a string color representation ([#35562](https://github.com/WordPress/gutenberg/pull/35562)).
+
+## 18.0.0 (2021-10-12)
+
+### Breaking Changes
+
+-   Removed the deprecated `position` and `menuLabel` from the `DropdownMenu` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+-   Removed the deprecated `onClickOutside` prop from the `Popover` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+-   Changed `RangeControl` component to not apply `shiftStep` to inputs from its `<input type="range"/>` ([35020](https://github.com/WordPress/gutenberg/pull/35020)).
+-   Removed `isAction` prop from `Item`. The component will now rely on `onClick` to render as a `button` ([35152](https://github.com/WordPress/gutenberg/pull/35152)).
+
+### New Features
+
+-   Add an experimental `Navigator` components ([#34904](https://github.com/WordPress/gutenberg/pull/34904)) as a replacement for the previous `Navigation` related components.
+-   Update the `ColorPicker` component to the latest design ([#35220](https://github.com/WordPress/gutenberg/pull/35220))
+
+### Bug Fix
+
+-   Fixed rounding of value in `RangeControl` component when it loses focus while the `SHIFT` key is held. ([#35020](https://github.com/WordPress/gutenberg/pull/35020)).
+
+### Internal
+
+-   Deleted the `createComponent` utility function ([#34929](https://github.com/WordPress/gutenberg/pull/34929)).
+-   Deleted the `useJumpStep` utility function ([#35561](https://github.com/WordPress/gutenberg/pull/35561)).
+
 ## 17.0.0 (2021-09-09)
 
 ### Breaking Change
@@ -16,7 +108,7 @@
 
 ### Internal
 
--   Renamed `PolymorphicComponent*` types to `WordPressComponent*` ([#34330](https://github.com/WordPress/gutenberg/pull/34330))
+-   Renamed `PolymorphicComponent*` types to `WordPressComponent*` ([#34330](https://github.com/WordPress/gutenberg/pull/34330)).
 
 ## 16.0.0 (2021-08-23)
 

@@ -29,18 +29,3 @@
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	color: $gray-900;
 }
-
-.wp-block-widget-group__edit-form {
-	background: $white;
-	border-radius: $radius-block-ui;
-	border: 1px solid $gray-900;
-	padding: $grid-unit-15 - 1px; // Subtract the border width.
-
-	.wp-block-widget-group__edit-form-title {
-		color: $black;
-		font-family: $default-font;
-		font-size: 14px;
-		font-weight: 600;
-		margin: 0 0 $grid-unit-15 0;
-	}
-}

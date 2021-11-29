@@ -129,6 +129,7 @@ export const __EXPERIMENTAL_ELEMENTS = {
 };
 
 export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
+	'color.duotone': true,
 	'color.gradients': true,
 	'color.palette': true,
 	'typography.fontFamilies': true,

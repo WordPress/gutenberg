@@ -24,7 +24,9 @@ import RovingTabIndexContainer from './roving-tab-index';
  * @return {?Array} The array of focusables in the row.
  */
 function getRowFocusables( rowElement ) {
-	const focusablesInRow = focus.focusable.find( rowElement );
+	const focusablesInRow = focus.focusable.find( rowElement, {
+		sequential: true,
+	} );
 
 	if ( ! focusablesInRow || ! focusablesInRow.length ) {
 		return;

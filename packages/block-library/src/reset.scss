@@ -8,8 +8,6 @@
 // We use :where to keep specificity minimal.
 // https://css-tricks.com/almanac/selectors/w/where/
 html :where(.editor-styles-wrapper) {
-	padding: 8px;
-
 	/**
 	* The following styles revert to the browser defaults overriding the WPAdmin styles.
 	* This is only needed while the block editor is not being loaded in an iframe.
@@ -23,13 +21,6 @@ html :where(.editor-styles-wrapper) {
 	// an explicit white background color, assuming a white editing canvas.
 	// So to match browser defaults, we provide a white default here as well.
 	background: #fff;
-
-	// For full-wide blocks, we compensate for the base padding.
-	// These margins should match the padding value above.
-	.block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {
-		margin-left: -8px;
-		margin-right: -8px;
-	}
 
 	.wp-align-wrapper {
 		max-width: $content-width;
@@ -127,7 +118,8 @@ html :where(.editor-styles-wrapper) {
 	select:focus {
 		color: revert;
 		border-color: revert;
-		background: revert;
+		background-color: revert;
+		background-image: revert;
 		box-shadow: revert;
 		text-shadow: revert;
 		cursor: revert;

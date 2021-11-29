@@ -1,37 +1,7 @@
 /**
- * Given a path, returns a normalized path where equal query parameter values
- * will be treated as identical, regardless of order they appear in the original
- * text.
- *
- * @param {string} path Original path.
- *
- * @return {string} Normalized path.
+ * WordPress dependencies
  */
-export function getStablePath( path ) {
-	const splitted = path.split( '?' );
-	const query = splitted[ 1 ];
-	const base = splitted[ 0 ];
-	if ( ! query ) {
-		return base;
-	}
-
-	// 'b=1&c=2&a=5'
-	return (
-		base +
-		'?' +
-		query
-			// [ 'b=1', 'c=2', 'a=5' ]
-			.split( '&' )
-			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-			.map( ( entry ) => entry.split( '=' ) )
-			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-			.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
-			// [ 'a=5', 'b=1', 'c=2' ]
-			.map( ( pair ) => pair.join( '=' ) )
-			// 'a=5&b=1&c=2'
-			.join( '&' )
-	);
-}
+import { getQueryArg, normalizePath } from '@wordpress/url';
 
 /**
  * @param {Record<string, any>} preloadedData
@@ -39,20 +9,28 @@ export function getStablePath( path ) {
  */
 function createPreloadingMiddleware( preloadedData ) {
 	const cache = Object.keys( preloadedData ).reduce( ( result, path ) => {
-		result[ getStablePath( path ) ] = preloadedData[ path ];
+		result[ normalizePath( path ) ] = preloadedData[ path ];
 		return result;
 	}, /** @type {Record<string, any>} */ ( {} ) );
 
 	return ( options, next ) => {
 		const { parse = true } = options;
-		if ( typeof options.path === 'string' ) {
+		/** @type {string | void} */
+		let rawPath = options.path;
+		if ( ! rawPath && options.url ) {
+			const pathFromQuery = getQueryArg( options.url, 'rest_route' );
+			if ( typeof pathFromQuery === 'string' ) {
+				rawPath = pathFromQuery;
+			}
+		}
+		if ( typeof rawPath === 'string' ) {
 			const method = options.method || 'GET';
-			const path = getStablePath( options.path );
+			const path = normalizePath( rawPath );
 
 			if ( 'GET' === method && cache[ path ] ) {
 				const cacheData = cache[ path ];
 
-				// Unsetting the cache key ensures that the data is only preloaded a single time
+				// Unsetting the cache key ensures that the data is only used a single time
 				delete cache[ path ];
 
 				return Promise.resolve(
@@ -72,11 +50,12 @@ function createPreloadingMiddleware( preloadedData ) {
 				cache[ method ] &&
 				cache[ method ][ path ]
 			) {
-				return Promise.resolve(
-					parse
-						? cache[ method ][ path ].body
-						: cache[ method ][ path ]
-				);
+				const cacheData = cache[ method ][ path ];
+
+				// Unsetting the cache key ensures that the data is only used a single time
+				delete cache[ method ][ path ];
+
+				return Promise.resolve( parse ? cacheData.body : cacheData );
 			}
 		}
 

@@ -157,8 +157,8 @@ Snapshot Diff:
 @@ -1,30 +1,30 @@
   <div>
     <div
--     class="components-surface components-card components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
-+     class="components-surface components-card components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
+-     class="components-surface components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
++     class="components-surface components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Card"
     >
@@ -375,7 +375,7 @@ Object {
 <body>
     <div>
       <div
-        class="components-surface components-card components-card emotion-0 emotion-1"
+        class="components-surface components-card emotion-0 emotion-1"
         data-wp-c16t="true"
         data-wp-component="Card"
       >
@@ -630,7 +630,7 @@ Object {
 
 <div>
     <div
-      class="components-surface components-card components-card emotion-0 emotion-1"
+      class="components-surface components-card emotion-0 emotion-1"
       data-wp-c16t="true"
       data-wp-component="Card"
     >
@@ -850,7 +850,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
 
 <div>
   <div
-    class="components-surface components-card components-card emotion-0 emotion-1"
+    class="components-surface components-card emotion-0 emotion-1"
     data-wp-c16t="true"
     data-wp-component="Card"
   >

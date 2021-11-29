@@ -92,4 +92,96 @@ describe( 'Copy/cut/paste of whole blocks', () => {
 		await pressKeyWithModifier( 'primary', 'v' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should handle paste events once', async () => {
+		// Add group block with paragraph
+		await insertBlock( 'Group' );
+		await page.click( '.block-editor-button-block-appender' );
+		await page.click( '.editor-block-list-item-paragraph' );
+		await page.keyboard.type( 'P' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// Cut group
+		await pressKeyWithModifier( 'primary', 'x' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Enter' );
+
+		await page.evaluate( () => {
+			window.e2eTestPasteOnce = [];
+			let oldBlocks = wp.data.select( 'core/block-editor' ).getBlocks();
+			wp.data.subscribe( () => {
+				const blocks = wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				if ( blocks !== oldBlocks ) {
+					window.e2eTestPasteOnce.push(
+						blocks.map( ( { clientId, name } ) => ( {
+							clientId,
+							name,
+						} ) )
+					);
+				}
+				oldBlocks = blocks;
+			} );
+		} );
+
+		// Paste
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		// Blocks should only be modified once, not twice with new clientIds on a single paste action
+		const blocksUpdated = await page.evaluate(
+			() => window.e2eTestPasteOnce
+		);
+
+		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'can copy group onto non textual element (image, spacer)', async () => {
+		// Add group block with paragraph
+		await insertBlock( 'Group' );
+		await page.click( '.block-editor-button-block-appender' );
+		await page.click( '.editor-block-list-item-paragraph' );
+		await page.keyboard.type( 'P' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// Cut group
+		await pressKeyWithModifier( 'primary', 'x' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Enter' );
+
+		// Insert a non textual element (a spacer)
+		await insertBlock( 'Spacer' );
+		// Spacer is focused
+		await page.evaluate( () => {
+			window.e2eTestPasteOnce = [];
+			let oldBlocks = wp.data.select( 'core/block-editor' ).getBlocks();
+			wp.data.subscribe( () => {
+				const blocks = wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				if ( blocks !== oldBlocks ) {
+					window.e2eTestPasteOnce.push(
+						blocks.map( ( { clientId, name } ) => ( {
+							clientId,
+							name,
+						} ) )
+					);
+				}
+				oldBlocks = blocks;
+			} );
+		} );
+
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		// Paste should be handled on non-textual elements and only handled once.
+		const blocksUpdated = await page.evaluate(
+			() => window.e2eTestPasteOnce
+		);
+
+		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

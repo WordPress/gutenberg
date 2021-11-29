@@ -76,3 +76,10 @@ Removes a media replace notice.
 
 -   Type: `func`
 -   Required: No
+
+### children
+
+-   Type: `Element`
+-   Required: No
+
+If passed, children are rendered inside the dropdown.

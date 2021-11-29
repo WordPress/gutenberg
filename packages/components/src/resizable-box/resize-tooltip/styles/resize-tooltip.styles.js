@@ -44,7 +44,7 @@ export const Tooltip = styled.div`
 
 export const LabelText = styled( Text )`
 	&&& {
-		color: white;
+		color: ${ COLORS.ui.textDark };
 		display: block;
 		font-size: 13px;
 		line-height: 1.4;

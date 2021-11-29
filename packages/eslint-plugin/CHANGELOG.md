@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 9.3.0 (2021-11-15)
+
+### Enhancements
+
+-   Replaced deprecated `babel-eslint` dependency with `@babel/eslint-parser` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `eslint-plugin-import` dependency has been updated from requiring `^2.23.4` to requiring `^2.25.2` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
+## 9.2.0 (2021-10-12)
+
 ### Enhancement
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^34.1.0` to requiring `^36.0.8` ([#34338](https://github.com/WordPress/gutenberg/pull/34338)).
