@@ -43,7 +43,6 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		add_filter( 'next_posts_link_attributes', $filter_link_attributes );
 
 		// If there are pages to paginate.
-		var_dump( $wp_query->max_num_pages );
 		if ( 1 < $max_page ) {
 			if ( (int) $max_page !== $paged ) { // If we are NOT in the last one.
 				$content = get_next_posts_link( $label, $max_page );
