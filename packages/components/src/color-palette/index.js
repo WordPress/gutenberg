@@ -146,7 +146,13 @@ export default function ColorPalette( {
 							aria-label={ __( 'Custom color picker' ) }
 							style={ { background: value } }
 						>
-							{ value }
+							{ value ? (
+								value
+							) : (
+								<span className="components-color-palette__custom-color__unset">
+									{ __( 'Unset' ) }
+								</span>
+							) }
 						</button>
 					) }
 				/>
