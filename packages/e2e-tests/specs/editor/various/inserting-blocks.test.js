@@ -14,7 +14,7 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
+/** @typedef {import('puppeteer-core').ElementHandle} ElementHandle */
 
 /**
  * Waits for all patterns in the inserter to have a height, which should
@@ -173,7 +173,7 @@ describe( 'Inserting blocks', () => {
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/9583
 	it( 'should not allow transfer of focus outside of the block-insertion menu once open', async () => {
 		// Enter the default block and click the inserter toggle button to the left of it.
-		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Enter' );
 		await showBlockToolbar();
 		await page.click(
 			'.block-editor-block-list__empty-block-inserter .block-editor-inserter__toggle'
@@ -243,6 +243,10 @@ describe( 'Inserting blocks', () => {
 		);
 		expect( selectedButtonBlocks.length ).toBe( 1 );
 
+		// The block appender is only visible when there's no selection.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
 		// Specifically click the root container appender.
 		await page.click(
 			'.block-editor-block-list__layout.is-root-container > .block-list-appender .block-editor-inserter__toggle'

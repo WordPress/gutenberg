@@ -7,7 +7,11 @@
 	"description": "Display a list of all pages.",
 	"keywords": [ "menu", "navigation" ],
 	"textdomain": "default",
-	"attributes": {},
+	"attributes": {
+		"__unstableMaxPages": {
+			"type": "number"
+		}
+	},
 	"usesContext": [
 		"textColor",
 		"customTextColor",

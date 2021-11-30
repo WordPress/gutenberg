@@ -10,7 +10,7 @@
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$stylesheet = gutenberg_get_global_stylesheet();
+	$stylesheet = wp_get_global_stylesheet();
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -52,7 +52,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	if ( 'mobile' === $context && WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		$settings['__experimentalStyles'] = gutenberg_get_global_styles();
+		$settings['__experimentalStyles'] = wp_get_global_styles();
 	}
 
 	if ( 'other' === $context ) {
@@ -83,7 +83,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			),
 		);
 		foreach ( $new_presets as $new_style ) {
-			$style_css = gutenberg_get_global_stylesheet( array( $new_style['css'] ) );
+			$style_css = wp_get_global_stylesheet( array( $new_style['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_style['css']    = $style_css;
 				$new_global_styles[] = $new_style;
@@ -95,7 +95,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'__unstableType' => 'theme',
 		);
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$style_css = gutenberg_get_global_stylesheet( array( $new_block_classes['css'] ) );
+			$style_css = wp_get_global_stylesheet( array( $new_block_classes['css'] ) );
 			if ( '' !== $style_css ) {
 				$new_block_classes['css'] = $style_css;
 				$new_global_styles[]      = $new_block_classes;
@@ -106,35 +106,35 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
-	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
+	$settings['__experimentalFeatures'] = wp_get_global_settings();
 
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
-		$settings['colors'] = isset( $colors_by_origin['user'] ) ?
-			$colors_by_origin['user'] : (
+		$settings['colors'] = isset( $colors_by_origin['custom'] ) ?
+			$colors_by_origin['custom'] : (
 				isset( $colors_by_origin['theme'] ) ?
 					$colors_by_origin['theme'] :
-					$colors_by_origin['core']
+					$colors_by_origin['default']
 			);
 	}
 
 	if ( isset( $settings['__experimentalFeatures']['color']['gradients'] ) ) {
 		$gradients_by_origin   = $settings['__experimentalFeatures']['color']['gradients'];
-		$settings['gradients'] = isset( $gradients_by_origin['user'] ) ?
-			$gradients_by_origin['user'] : (
+		$settings['gradients'] = isset( $gradients_by_origin['custom'] ) ?
+			$gradients_by_origin['custom'] : (
 				isset( $gradients_by_origin['theme'] ) ?
 					$gradients_by_origin['theme'] :
-					$gradients_by_origin['core']
+					$gradients_by_origin['default']
 			);
 	}
 
 	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
 		$font_sizes_by_origin  = $settings['__experimentalFeatures']['typography']['fontSizes'];
-		$settings['fontSizes'] = isset( $font_sizes_by_origin['user'] ) ?
+		$settings['fontSizes'] = isset( $font_sizes_by_origin['custom'] ) ?
 			$font_sizes_by_origin['user'] : (
 				isset( $font_sizes_by_origin['theme'] ) ?
 					$font_sizes_by_origin['theme'] :
-					$font_sizes_by_origin['core']
+					$font_sizes_by_origin['default']
 			);
 	}
 
@@ -181,7 +181,7 @@ function gutenberg_experimental_is_site_editor_available() {
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
 	if ( gutenberg_experimental_is_site_editor_available() ) {
-		WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
+		register_global_styles_custom_post_type();
 	}
 }
 

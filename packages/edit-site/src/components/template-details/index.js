@@ -24,6 +24,7 @@ import {
 } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
+import EditTemplateTitle from './edit-template-title';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -55,13 +56,17 @@ export default function TemplateDetails( { template, onClose } ) {
 	return (
 		<div className="edit-site-template-details">
 			<div className="edit-site-template-details__group">
-				<Heading
-					level={ 4 }
-					weight={ 600 }
-					className="edit-site-template-details__title"
-				>
-					{ title }
-				</Heading>
+				{ template.is_custom ? (
+					<EditTemplateTitle template={ template } />
+				) : (
+					<Heading
+						level={ 4 }
+						weight={ 600 }
+						className="edit-site-template-details__title"
+					>
+						{ title }
+					</Heading>
+				) }
 
 				{ description && (
 					<Text
@@ -90,9 +95,9 @@ export default function TemplateDetails( { template, onClose } ) {
 
 			<Button
 				className="edit-site-template-details__show-all-button"
-				href={ addQueryArgs( '', {
-					page: 'gutenberg-edit-site',
+				href={ addQueryArgs( window.location.href, {
 					// TODO: We should update this to filter by template part's areas as well.
+					postId: undefined,
 					postType: template.type,
 				} ) }
 			>

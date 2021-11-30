@@ -1,14 +1,19 @@
 <?php
 /**
- * Process the different data sources for site-level
- * config and offers and API to work with them.
+ * WP_Theme_JSON_Resolver_Gutenberg class
  *
  * @package gutenberg
  */
 
 /**
- * Class that abstracts the processing
- * of the different data sources.
+ * Class that abstracts the processing of the different data sources
+ * for site-level config and offers an API to work with them.
+ *
+ * This class is for internal core usage and is not supposed to be used by extenders (plugins and/or themes).
+ * This is a low-level API that may need to do breaking changes. Please,
+ * use get_global_settings, get_global_styles, and get_global_stylesheet instead.
+ *
+ * @access private
  */
 class WP_Theme_JSON_Resolver_Gutenberg {
 
@@ -29,7 +34,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Whether or not the theme supports theme.json.
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private static $theme_has_support = null;
 
@@ -51,7 +56,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Container to keep loaded i18n schema for `theme.json`.
 	 *
-	 * @var Array
+	 * @var array
 	 */
 	private static $i18n_schema = null;
 
@@ -61,13 +66,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * or a void array if none found.
 	 *
 	 * @param string $file_path Path to file. Empty if no file.
-	 *
 	 * @return array Contents that adhere to the theme.json schema.
 	 */
 	private static function read_json_file( $file_path ) {
 		$config = array();
 		if ( $file_path ) {
-			$decoded_file = gutenberg_json_file_decode( $file_path, array( 'associative' => true ) );
+			$decoded_file = wp_json_file_decode( $file_path, array( 'associative' => true ) );
 			if ( is_array( $decoded_file ) ) {
 				$config = $decoded_file;
 			}
@@ -78,6 +82,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Returns a data structure used in theme.json translation.
 	 *
+	 * @deprecated
 	 * @return array An array of theme.json fields that are translatable and the keys that are translatable
 	 */
 	public static function get_fields_to_translate() {
@@ -91,18 +96,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * according to the language set by the user.
 	 *
 	 * @param array  $theme_json The theme.json to translate.
-	 * @param string $domain    Optional. Text domain. Unique identifier for retrieving translated strings.
-	 *                          Default 'default'.
-	 *
+	 * @param string $domain     Optional. Text domain. Unique identifier for retrieving translated strings.
+	 *                           Default 'default'.
 	 * @return array Returns the modified $theme_json_structure.
 	 */
 	private static function translate( $theme_json, $domain = 'default' ) {
 		if ( null === self::$i18n_schema ) {
-			$i18n_schema       = gutenberg_json_file_decode( __DIR__ . '/theme-i18n.json' );
+			$i18n_schema       = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
 			self::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
 		}
 
-		return gutenberg_translate_settings_using_i18n_schema( self::$i18n_schema, $theme_json, $domain );
+		return wp_translate_settings_using_i18n_schema( self::$i18n_schema, $theme_json, $domain );
 	}
 
 	/**
@@ -117,7 +121,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$config     = self::read_json_file( __DIR__ . '/theme.json' );
 		$config     = self::translate( $config );
-		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'core' );
+		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
 		return self::$core;
 	}
@@ -130,9 +134,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * is present in theme.json and in theme supports,
 	 * the theme.json takes precendence.
 	 *
+	 * @param array $deprecated Deprecated argument.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
-	public static function get_theme_data() {
+	public static function get_theme_data( $deprecated = array() ) {
+		if ( ! empty( $deprecated ) ) {
+			_deprecated_argument( __METHOD__, '5.9' );
+		}
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
@@ -171,7 +179,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				// If the theme does not have any palette, we still want to show the core one.
 				$default_palette = true;
 			}
-			$theme_support_data['settings']['color']['corePalette'] = $default_palette;
+			$theme_support_data['settings']['color']['defaultPalette'] = $default_palette;
 
 			$default_gradients = false;
 			if ( current_theme_supports( 'default-gradient-presets' ) ) {
@@ -181,7 +189,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				// If the theme does not have any gradients, we still want to show the core ones.
 				$default_gradients = true;
 			}
-			$theme_support_data['settings']['color']['coreGradients'] = $default_gradients;
+			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( self::$theme );
@@ -190,38 +198,55 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Returns the CPT that contains the user's origin config
-	 * for the current theme or a void array if none found.
+	 * Returns the custom post type that contains the user's origin config
+	 * for the current theme or a void array if none are found.
 	 *
-	 * It can also create and return a new draft CPT.
+	 * This can also create and return a new draft custom post type.
 	 *
-	 * @param bool  $should_create_cpt Whether a new CPT should be created if no one was found.
-	 *                                 False by default.
-	 * @param array $post_status_filter Filter CPT by post status.
-	 *                                  ['publish'] by default, so it only fetches published posts.
-	 *
+	 * @param WP_Theme $theme              The theme object.  If empty, it
+	 *                                     defaults to the current theme.
+	 * @param bool     $should_create_cpt  Optional. Whether a new custom post
+	 *                                     type should be created if none are
+	 *                                     found.  False by default.
+	 * @param array    $post_status_filter Filter Optional. custom post type by
+	 *                                     post status.  ['publish'] by default,
+	 *                                     so it only fetches published posts.
 	 * @return array Custom Post Type for the user's origin config.
 	 */
-	private static function get_user_data_from_custom_post_type( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
+	public static function get_user_data_from_custom_post_type( $theme, $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
+		if ( ! $theme instanceof WP_Theme ) {
+			$theme = wp_get_theme();
+		}
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
-		$recent_posts     = wp_get_recent_posts(
-			array(
-				'numberposts' => 1,
-				'orderby'     => 'date',
-				'order'       => 'desc',
-				'post_type'   => $post_type_filter,
-				'post_status' => $post_status_filter,
-				'tax_query'   => array(
-					array(
-						'taxonomy' => 'wp_theme',
-						'field'    => 'name',
-						'terms'    => wp_get_theme()->get_stylesheet(),
-					),
+		$args             = array(
+			'numberposts' => 1,
+			'orderby'     => 'date',
+			'order'       => 'desc',
+			'post_type'   => $post_type_filter,
+			'post_status' => $post_status_filter,
+			'tax_query'   => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'name',
+					'terms'    => $theme->get_stylesheet(),
 				),
-			)
+			),
 		);
 
+		$cache_key = sprintf( 'wp_global_styles_%s', md5( serialize( $args ) ) );
+		$post_id   = wp_cache_get( $cache_key );
+
+		if ( (int) $post_id > 0 ) {
+			return get_post( $post_id, ARRAY_A );
+		}
+
+		// Special case: '-1' is a results not found.
+		if ( -1 === $post_id && ! $should_create_cpt ) {
+			return $user_cpt;
+		}
+
+		$recent_posts = wp_get_recent_posts( $args );
 		if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
 			$user_cpt = $recent_posts[0];
 		} elseif ( $should_create_cpt ) {
@@ -240,6 +265,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			);
 			$user_cpt    = get_post( $cpt_post_id, ARRAY_A );
 		}
+		$cache_expiration = $user_cpt ? DAY_IN_SECONDS : HOUR_IN_SECONDS;
+		wp_cache_set( $cache_key, $user_cpt ? $user_cpt['ID'] : -1, '', $cache_expiration );
 
 		return $user_cpt;
 	}
@@ -255,14 +282,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 
 		$config   = array();
-		$user_cpt = self::get_user_data_from_custom_post_type();
+		$user_cpt = self::get_user_data_from_custom_post_type( wp_get_theme() );
+
 		if ( array_key_exists( 'post_content', $user_cpt ) ) {
 			$decoded_data = json_decode( $user_cpt['post_content'], true );
 
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
 				trigger_error( 'Error when decoding a theme.json schema for user data. ' . json_last_error_msg() );
-				return new WP_Theme_JSON_Gutenberg( $config, 'user' );
+				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 			}
 
 			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
@@ -276,15 +304,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'user' );
+		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 
 		return self::$user;
 	}
 
 	/**
 	 * There are three sources of data (origins) for a site:
-	 * core, theme, and user. The user's has higher priority
-	 * than the theme's, and the theme's higher than core's.
+	 * default, theme, and custom. The custom's has higher priority
+	 * than the theme's, and the theme's higher than defaults's.
 	 *
 	 * Unlike the getters {@link get_core_data},
 	 * {@link get_theme_data}, and {@link get_user_data},
@@ -297,18 +325,21 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * for the paragraph block, and the theme has done it as well,
 	 * the user preference wins.
 	 *
-	 * @param string $origin To what level should we merge data.
-	 *                       Valid values are 'theme' or 'user'.
-	 *                       Default is 'user'.
-	 *
+	 * @param string $origin Optional. To what level should we merge data.
+	 *                       Valid values are 'theme' or 'custom'.
+	 *                       Default is 'custom'.
 	 * @return WP_Theme_JSON_Gutenberg
 	 */
-	public static function get_merged_data( $origin = 'user' ) {
+	public static function get_merged_data( $origin = 'custom' ) {
+		if ( is_array( $origin ) ) {
+			_deprecated_argument( __FUNCTION__, '5.9' );
+		}
+
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( self::get_core_data() );
 		$result->merge( self::get_theme_data() );
 
-		if ( 'user' === $origin ) {
+		if ( 'custom' === $origin ) {
 			$result->merge( self::get_user_data() );
 		}
 
@@ -316,47 +347,18 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Registers a Custom Post Type to store the user's origin config.
-	 */
-	public static function register_user_custom_post_type() {
-		$args = array(
-			'label'        => __( 'Global Styles', 'gutenberg' ),
-			'description'  => 'CPT to store user design tokens',
-			'public'       => false,
-			'show_ui'      => false,
-			'show_in_rest' => false,
-			'rewrite'      => false,
-			'capabilities' => array(
-				'read'                   => 'edit_theme_options',
-				'create_posts'           => 'edit_theme_options',
-				'edit_posts'             => 'edit_theme_options',
-				'edit_published_posts'   => 'edit_theme_options',
-				'delete_published_posts' => 'edit_theme_options',
-				'edit_others_posts'      => 'edit_theme_options',
-				'delete_others_posts'    => 'edit_theme_options',
-			),
-			'map_meta_cap' => true,
-			'supports'     => array(
-				'title',
-				'editor',
-				'revisions',
-			),
-		);
-		register_post_type( 'wp_global_styles', $args );
-	}
-
-	/**
 	 * Returns the ID of the custom post type
 	 * that stores user data.
 	 *
-	 * @return integer
+	 * @return integer|null
 	 */
 	public static function get_user_custom_post_type_id() {
 		if ( null !== self::$user_custom_post_type_id ) {
 			return self::$user_custom_post_type_id;
 		}
 
-		$user_cpt = self::get_user_data_from_custom_post_type( true );
+		$user_cpt = self::get_user_data_from_custom_post_type( wp_get_theme(), true );
+
 		if ( array_key_exists( 'ID', $user_cpt ) ) {
 			self::$user_custom_post_type_id = $user_cpt['ID'];
 		}
@@ -367,7 +369,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Whether the current theme has a theme.json file.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
@@ -381,14 +383,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Builds the path to the given file
-	 * and checks that it is readable.
+	 * Builds the path to the given file and checks that it is readable.
 	 *
-	 * If it isn't, returns an empty string,
-	 * otherwise returns the whole file path.
+	 * If it isn't, returns an empty string, otherwise returns the whole file path.
 	 *
 	 * @param string $file_name Name of the file.
-	 * @param bool   $template  Use template theme directroy. Default: false.
+	 * @param bool   $template  Optional. Use template theme directory. Default false.
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
 	private static function get_file_path_from_theme( $file_name, $template = false ) {

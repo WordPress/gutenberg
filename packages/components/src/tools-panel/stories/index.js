@@ -7,6 +7,10 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -254,6 +258,185 @@ export const WithSlotFillItems = () => {
 				<Panel>
 					<ToolsPanel
 						label="Tools Panel With SlotFill Items"
+						resetAll={ resetAll }
+						panelId={ panelId }
+					>
+						<Slot />
+					</ToolsPanel>
+				</Panel>
+			</PanelWrapperView>
+		</SlotFillProvider>
+	);
+};
+
+export const WithConditionalDefaultControl = () => {
+	const [ attributes, setAttributes ] = useState( {} );
+	const { height, scale } = attributes;
+
+	const resetAll = ( resetFilters = [] ) => {
+		let newAttributes = {};
+
+		resetFilters.forEach( ( resetFilter ) => {
+			newAttributes = {
+				...newAttributes,
+				...resetFilter( newAttributes ),
+			};
+		} );
+
+		setAttributes( newAttributes );
+	};
+
+	const updateAttribute = ( name, value ) => {
+		setAttributes( {
+			...attributes,
+			[ name ]: value,
+		} );
+	};
+
+	return (
+		<SlotFillProvider>
+			<ToolsPanelItems>
+				<SingleColumnItem
+					hasValue={ () => !! height }
+					label="Injected Height"
+					onDeselect={ () => updateAttribute( 'height', undefined ) }
+					resetAllFilter={ () => ( { height: undefined } ) }
+					panelId={ panelId }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label="Injected Height"
+						value={ height }
+						onChange={ ( next ) =>
+							updateAttribute( 'height', next )
+						}
+					/>
+				</SingleColumnItem>
+				<ToolsPanelItem
+					hasValue={ () => !! scale }
+					label="Scale"
+					onDeselect={ () => updateAttribute( 'scale', undefined ) }
+					resetAllFilter={ () => ( { scale: undefined } ) }
+					panelId={ panelId }
+					isShownByDefault={ !! height }
+				>
+					<ToggleGroupControl
+						label="Scale"
+						value={ scale }
+						onChange={ ( next ) =>
+							updateAttribute( 'scale', next )
+						}
+						isBlock
+					>
+						<ToggleGroupControlOption value="cover" label="Cover" />
+						<ToggleGroupControlOption
+							value="contain"
+							label="Contain"
+						/>
+						<ToggleGroupControlOption value="fill" label="Fill" />
+					</ToggleGroupControl>
+				</ToolsPanelItem>
+			</ToolsPanelItems>
+			<PanelWrapperView>
+				<Panel>
+					<ToolsPanel
+						label="Tools Panel With Conditional Default via SlotFill"
+						resetAll={ resetAll }
+						panelId={ panelId }
+					>
+						<Slot />
+					</ToolsPanel>
+				</Panel>
+			</PanelWrapperView>
+		</SlotFillProvider>
+	);
+};
+
+export const WithConditionallyRenderedControl = () => {
+	const [ attributes, setAttributes ] = useState( {} );
+	const { height, scale } = attributes;
+
+	const resetAll = ( resetFilters = [] ) => {
+		let newAttributes = {};
+
+		resetFilters.forEach( ( resetFilter ) => {
+			newAttributes = {
+				...newAttributes,
+				...resetFilter( newAttributes ),
+			};
+		} );
+
+		setAttributes( newAttributes );
+	};
+
+	const updateAttribute = ( name, value ) => {
+		setAttributes( {
+			...attributes,
+			[ name ]: value,
+		} );
+	};
+
+	return (
+		<SlotFillProvider>
+			<ToolsPanelItems>
+				<SingleColumnItem
+					hasValue={ () => !! height }
+					label="Injected Height"
+					onDeselect={ () => {
+						updateAttribute( 'scale', undefined );
+						updateAttribute( 'height', undefined );
+					} }
+					resetAllFilter={ () => ( { height: undefined } ) }
+					panelId={ panelId }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label="Injected Height"
+						value={ height }
+						onChange={ ( next ) =>
+							updateAttribute( 'height', next )
+						}
+					/>
+				</SingleColumnItem>
+				{ !! height && (
+					<ToolsPanelItem
+						hasValue={ () => !! scale }
+						label="Scale"
+						onDeselect={ () =>
+							updateAttribute( 'scale', undefined )
+						}
+						resetAllFilter={ () => ( { scale: undefined } ) }
+						panelId={ panelId }
+						isShownByDefault={ true }
+					>
+						<ToggleGroupControl
+							label="Scale"
+							value={ scale }
+							onChange={ ( next ) =>
+								updateAttribute( 'scale', next )
+							}
+							isBlock
+						>
+							<ToggleGroupControlOption
+								value="cover"
+								label="Cover"
+							/>
+							<ToggleGroupControlOption
+								value="contain"
+								label="Contain"
+							/>
+							<ToggleGroupControlOption
+								value="fill"
+								label="Fill"
+							/>
+						</ToggleGroupControl>
+					</ToolsPanelItem>
+				) }
+			</ToolsPanelItems>
+			<PanelWrapperView>
+				<Panel>
+					<ToolsPanel
+						label="Tools Panel With Conditionally Rendered Item via SlotFill"
 						resetAll={ resetAll }
 						panelId={ panelId }
 					>

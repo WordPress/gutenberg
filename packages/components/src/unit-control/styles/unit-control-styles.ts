@@ -18,6 +18,7 @@ type SelectProps = {
 
 type InputProps = {
 	disableUnits?: boolean;
+	size: SelectSize;
 };
 
 export const Root = styled.div`
@@ -25,11 +26,21 @@ export const Root = styled.div`
 	position: relative;
 `;
 
-const paddingStyles = ( { disableUnits }: InputProps ) => {
-	const value = disableUnits ? 3 : 24;
+const paddingStyles = ( { disableUnits, size }: InputProps ) => {
+	const paddings = {
+		default: {
+			paddingRight: 8,
+		},
+		small: {
+			paddingRight: 8,
+		},
+		'__unstable-large': {
+			paddingRight: disableUnits ? 16 : 8,
+		},
+	};
 
 	return css`
-		${ rtl( { paddingRight: value } )() };
+		${ rtl( paddings[ size ] )() };
 	`;
 };
 
@@ -62,49 +73,24 @@ export const ValueInput = styled( NumberControl )`
 	}
 `;
 
-const unitSizeStyles = ( { selectSize }: SelectProps ) => {
-	const sizes = {
-		default: {
-			height: 28,
-			lineHeight: '24px',
-			minHeight: 28,
-			top: 1,
-		},
-		small: {
-			height: 22,
-			lineHeight: '18px',
-			minHeight: 22,
-			top: 1,
-		},
-	};
+const baseUnitLabelStyles = css`
+	appearance: none;
+	background: transparent;
+	border-radius: 2px;
+	border: none;
+	box-sizing: border-box;
+	color: ${ COLORS.darkGray[ 500 ] };
+	display: block;
+	font-size: 8px;
+	letter-spacing: -0.5px;
+	outline: none;
+	padding: 2px 1px;
+	text-align-last: center;
+	text-transform: uppercase;
+	width: 20px;
 
-	return css( sizes[ selectSize ] );
-};
-
-const baseUnitLabelStyles = ( props: SelectProps ) => {
-	return css`
-		appearance: none;
-		background: transparent;
-		border-radius: 2px;
-		border: none;
-		box-sizing: border-box;
-		color: ${ COLORS.darkGray[ 500 ] };
-		display: block;
-		font-size: 8px;
-		line-height: 1;
-		letter-spacing: -0.5px;
-		outline: none;
-		padding: 2px 1px;
-		position: absolute;
-		text-align-last: center;
-		text-transform: uppercase;
-		width: 20px;
-
-		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
-		${ rtl( { right: 0 } )() }
-		${ unitSizeStyles( props ) }
-	`;
-};
+	${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+`;
 
 export const UnitLabel = styled.div< SelectProps >`
 	&&& {
@@ -119,6 +105,7 @@ export const UnitSelect = styled.select< SelectProps >`
 		${ baseUnitLabelStyles };
 		cursor: pointer;
 		border: 1px solid transparent;
+		height: 100%;
 
 		&:hover {
 			background-color: ${ COLORS.lightGray[ 300 ] };
