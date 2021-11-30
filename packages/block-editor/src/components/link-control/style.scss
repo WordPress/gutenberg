@@ -199,7 +199,7 @@ $preview-image-height: 140px;
 		white-space: pre-wrap;
 		overflow-wrap: break-word;
 		word-wrap: break-word;
-		word-break: break-word;
+		word-break: break-all;
 	}
 
 	&.is-preview .block-editor-link-control__search-item-header {
