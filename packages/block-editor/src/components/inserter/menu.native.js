@@ -106,7 +106,7 @@ function InserterMenu( {
 	}, [] );
 
 	const onClose = useCallback( () => {
-		// if should replace but didn't insert any block
+		// If should replace but didn't insert any block
 		// re-insert default block.
 		if ( shouldReplaceBlock ) {
 			insertDefaultBlock( {}, destinationRootClientId, insertionIndex );

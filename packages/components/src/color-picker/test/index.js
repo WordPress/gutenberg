@@ -131,7 +131,7 @@ describe( 'ColorPicker', () => {
 			h: 125,
 			s: 0.2,
 			l: 0.5,
-			// add alpha to prove it's ignored.
+			// Add alpha to prove it's ignored.
 			a: 0.5,
 		};
 
