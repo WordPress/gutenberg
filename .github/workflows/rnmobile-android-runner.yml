@@ -18,6 +18,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
+                api-level: ['29']
                 native-test-name: [gutenberg-editor-initial-html]
                 node: ['14']
 
@@ -37,11 +38,12 @@ jobs:
               uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
               with:
                   path: ~/.gradle/caches
-                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+                  key: ${{ runner.os }}-${{ runner.api-level }}-gradle-${{ hashFiles('**/*.gradle') }}
 
-            - uses: reactivecircus/android-emulator-runner@2b2ebf2e518e38a17180117fc2b677006db27330 # v2.21.0
+            - name: Run Android Device Tests
+              uses: reactivecircus/android-emulator-runner@2b2ebf2e518e38a17180117fc2b677006db27330 # v2.21.0
               with:
-                  api-level: 29
+                  api-level: ${{ runner.api-level }}
                   profile: pixel_xl
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
