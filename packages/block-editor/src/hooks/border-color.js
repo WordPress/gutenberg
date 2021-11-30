@@ -92,6 +92,7 @@ export function BorderColorEdit( props ) {
 			onColorChange={ onChangeColor }
 			clearable={ false }
 			__experimentalHasMultipleOrigins
+			__experimentalIsRenderedInSidebar
 			{ ...colorGradientSettings }
 		/>
 	);
