@@ -80,6 +80,10 @@ ruleTester.run( 'comment-case', rule, {
 // not allowed. This string will not need to be extracted.`,
 		},
 		{
+			code: `// codeOnLine small c.
+			const codeOnLine = true;`,
+		},
+		{
 			code: `// A few.
 			// comments that all end.
 			// with periods.`,
@@ -93,6 +97,11 @@ ruleTester.run( 'comment-case', rule, {
 		{
 			code: `const someVar = 1; // Describe the var`,
 			errors: [ { messageId: 'missingPunctuation' } ],
+		},
+		{
+			code: `// comment small c.
+			const c = true;`,
+			errors: [ { messageId: 'capitalLetter' } ],
 		},
 		{
 			code: `const someVar = 1; // no capital letter.`,

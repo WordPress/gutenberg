@@ -136,7 +136,9 @@ module.exports = {
 						if (
 							! identifiersOnNextOrPreviousLines.some(
 								( identifier ) =>
-									trimmedComment.indexOf( identifier ) === 0
+									trimmedComment.indexOf(
+										`${ identifier } `
+									) === 0
 							)
 						) {
 							context.report( {
