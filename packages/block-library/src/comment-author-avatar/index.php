@@ -62,7 +62,7 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 		)
 	);
 	if ( isset( $spacing_attributes ) ) {
-		return sprintf( '<div style="%1s">%2s</div>', $spacing_string, $avatar_block );
+		return sprintf( '<div style="%1s">%2s</div>', esc_attr( $spacing_string ), $avatar_block );
 	}
 	return sprintf( '<div>%1s</div>', $avatar_block );
 }
