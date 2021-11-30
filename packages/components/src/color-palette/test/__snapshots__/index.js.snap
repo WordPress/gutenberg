@@ -26,6 +26,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
 <Dropdown
+  contentClassName="components-color-palette__custom-color-dropdown-content"
   key=".0"
   renderContent={[Function]}
   renderToggle={[Function]}
@@ -177,6 +178,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         data-wp-component="VStack"
       >
         <Dropdown
+          contentClassName="components-color-palette__custom-color-dropdown-content"
           key=".0"
           renderContent={[Function]}
           renderToggle={[Function]}

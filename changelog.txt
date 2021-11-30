@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 12.0.1 =
+
+### Enhancements
+
+#### Global Styles
+- Add caching to `WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_custom_post_type()`. ([36584](https://github.com/WordPress/gutenberg/pull/36584))
+
+
 = 12.0.0 =
 
 ### Features

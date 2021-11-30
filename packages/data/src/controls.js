@@ -8,7 +8,7 @@ import { isObject } from 'lodash';
  */
 import { createRegistryControl } from './factory';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+/** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
 const SELECT = '@@data/SELECT';
 const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';
@@ -20,9 +20,9 @@ const DISPATCH = '@@data/DISPATCH';
  * Note: This control synchronously returns the current selector value, triggering the
  * resolution, but not waiting for it.
  *
- * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
- * @param {string}             selectorName          The name of the selector.
- * @param {Array}              args                  Arguments for the selector.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ * @param {string}                 selectorName          The name of the selector.
+ * @param {Array}                  args                  Arguments for the selector.
  *
  * @example
  * ```js
@@ -37,12 +37,12 @@ const DISPATCH = '@@data/DISPATCH';
  *
  * @return {Object} The control descriptor.
  */
-function select( storeNameOrDefinition, selectorName, ...args ) {
+function select( storeNameOrDescriptor, selectorName, ...args ) {
 	return {
 		type: SELECT,
-		storeKey: isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition,
+		storeKey: isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor,
 		selectorName,
 		args,
 	};
@@ -55,9 +55,9 @@ function select( storeNameOrDefinition, selectorName, ...args ) {
  * selectors that may have a resolver. In such case, it will return a `Promise` that resolves
  * after the selector finishes resolving, with the final result value.
  *
- * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
- * @param {string}             selectorName          The name of the selector
- * @param {Array}              args                  Arguments for the selector.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ * @param {string}                 selectorName          The name of the selector
+ * @param {Array}                  args                  Arguments for the selector.
  *
  * @example
  * ```js
@@ -72,12 +72,12 @@ function select( storeNameOrDefinition, selectorName, ...args ) {
  *
  * @return {Object} The control descriptor.
  */
-function resolveSelect( storeNameOrDefinition, selectorName, ...args ) {
+function resolveSelect( storeNameOrDescriptor, selectorName, ...args ) {
 	return {
 		type: RESOLVE_SELECT,
-		storeKey: isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition,
+		storeKey: isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor,
 		selectorName,
 		args,
 	};
@@ -86,9 +86,9 @@ function resolveSelect( storeNameOrDefinition, selectorName, ...args ) {
 /**
  * Dispatches a control action for triggering a registry dispatch.
  *
- * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
- * @param {string}             actionName            The name of the action to dispatch
- * @param {Array}              args                  Arguments for the dispatch action.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ * @param {string}                 actionName            The name of the action to dispatch
+ * @param {Array}                  args                  Arguments for the dispatch action.
  *
  * @example
  * ```js
@@ -103,12 +103,12 @@ function resolveSelect( storeNameOrDefinition, selectorName, ...args ) {
  *
  * @return {Object}  The control descriptor.
  */
-function dispatch( storeNameOrDefinition, actionName, ...args ) {
+function dispatch( storeNameOrDescriptor, actionName, ...args ) {
 	return {
 		type: DISPATCH,
-		storeKey: isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition,
+		storeKey: isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor,
 		actionName,
 		args,
 	};

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`KeyboardShortcutHelpModal should match snapshot when the modal is active 1`] = `
-<Modal
+<ForwardRef(Modal)
   className="edit-post-keyboard-shortcut-help-modal"
   closeLabel="Close"
   onRequestClose={[Function]}
@@ -80,7 +80,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
     }
     title="Text formatting"
   />
-</Modal>
+</ForwardRef(Modal)>
 `;
 
 exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not active 1`] = `""`;

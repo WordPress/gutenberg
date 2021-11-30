@@ -1,6 +1,0 @@
-@include break-medium() {
-	.components-color-edit__color-popover.components-popover .components-popover__content.components-popover__content.components-popover__content {
-		margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 };
-		margin-top: #{ -($grid-unit-60 + $border-width) };
-	}
-}
