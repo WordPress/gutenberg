@@ -87,7 +87,7 @@ function Interface( { blockEditorSettings } ) {
 		<InterfaceSkeleton
 			labels={ interfaceLabels }
 			header={ <Header /> }
-			secondarySidebar={ <SecondarySidebar /> }
+			secondarySidebar={ ! isMobileViewport && <SecondarySidebar /> }
 			sidebar={
 				hasSidebarEnabled && (
 					<ComplementaryArea.Slot scope="core/edit-widgets" />
