@@ -93,6 +93,7 @@ export const PanelColorGradientSettingsInner = ( {
 	title,
 	showTitle = true,
 	__experimentalHasMultipleOrigins,
+	__experimentalIsRenderedInSidebar,
 	enableAlpha,
 	...props
 } ) => {
@@ -145,6 +146,7 @@ export const PanelColorGradientSettingsInner = ( {
 						disableCustomColors,
 						disableCustomGradients,
 						__experimentalHasMultipleOrigins,
+						__experimentalIsRenderedInSidebar,
 						enableAlpha,
 						...setting,
 					} }

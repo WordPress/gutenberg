@@ -8,6 +8,7 @@ const SeparatorSettings = ( { color, setColor } ) => (
 	<InspectorControls>
 		<PanelColorSettings
 			__experimentalHasMultipleOrigins
+			__experimentalIsRenderedInSidebar
 			title={ __( 'Color' ) }
 			colorSettings={ [
 				{

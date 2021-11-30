@@ -63,6 +63,7 @@ function ScreenTextColor( { name } ) {
 				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
+				__experimentalIsRenderedInSidebar
 			/>
 		</>
 	);
