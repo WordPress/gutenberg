@@ -594,7 +594,6 @@ export class RichText extends Component {
 	}
 
 	onSelectionChange( start, end ) {
-		const { activeFormats: currentActiveFormats } = this.state;
 		const hasChanged =
 			this.selectionStart !== start || this.selectionEnd !== end;
 
@@ -612,20 +611,6 @@ export class RichText extends Component {
 			const value = this.createRecord();
 			const activeFormats = getActiveFormats( value );
 			this.setState( { activeFormats } );
-		}
-
-		// This resets the current active format after the selection changes
-		const textColorFormat = 'core/text-color';
-		const isColorFormatChange =
-			this.lastAztecEventType === 'format change' &&
-			currentActiveFormats?.[ 0 ]?.type === textColorFormat;
-		if ( this.isIOS && hasChanged && isColorFormatChange ) {
-			const value = this.createRecord();
-
-			if ( ! value?.formats?.[ value?.end - 1 ] ) {
-				const activeFormats = getActiveFormats( value );
-				this.setState( { activeFormats } );
-			}
 		}
 
 		this.props.onSelectionChange( start, end );
