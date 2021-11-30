@@ -355,12 +355,12 @@ DEPENDENCIES:
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec`)
+  - WordPress-Aztec-iOS (from `https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git`, commit `60cbbd879bd3572c1ad008c366dd2590a9444f58`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - boost-for-react-native
-    - WordPress-Aztec-iOS
 
 EXTERNAL SOURCES:
   BVLinearGradient:
@@ -449,15 +449,23 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
     :path: "../../react-native-aztec"
+  WordPress-Aztec-iOS:
+    :commit: 60cbbd879bd3572c1ad008c366dd2590a9444f58
+    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
+
+CHECKOUT OPTIONS:
+  WordPress-Aztec-iOS:
+    :commit: 60cbbd879bd3572c1ad008c366dd2590a9444f58
+    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   BVLinearGradient: 1e5474c982efcfcaed47f368a61431bb38a4faf8
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
-  FBReactNativeSpec: ee3fc80110975e231c8537d2e434a8afabe66fdc
+  FBReactNativeSpec: 80e9cf1155002ee4720084d8813326d913815e2f
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   Gutenberg: cb22fce31133194d87ce74b3f3d45ebf91b585cf
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
@@ -500,6 +508,6 @@ SPEC CHECKSUMS:
   WordPress-Aztec-iOS: af36d9cb86a0109b568f516874870e2801ba1bd9
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
 
-PODFILE CHECKSUM: db5f67a29ecba75541dad181ff59246b6da2fb09
+PODFILE CHECKSUM: 881a1826345fd9dbdf7302c452bccd010d6c35b0
 
 COCOAPODS: 1.10.1
