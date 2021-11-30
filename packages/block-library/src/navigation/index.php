@@ -145,17 +145,23 @@ function block_core_navigation_get_first_non_empty_navigation() {
 	// see:
 	// - https://github.com/WordPress/wordpress-develop/blob/ba943e113d3b31b121f77a2d30aebe14b047c69d/src/wp-includes/nav-menu.php#L613-L619.
 	// - https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters.
-	$navigation_posts = get_posts(
-		array(
-			'post_type'      => 'wp_navigation',
-			'order'          => 'ASC',
-			'orderby'        => 'name',
-			'posts_per_page' => 1, // only the first post.
-			's'              => '<!-- wp:', // look for block indicators to ensure we only include non-empty Navigations.
-		)
+	$parsed_args = array(
+		'post_type'      => 'wp_navigation',
+		'no_found_rows'  => true,
+		'order'          => 'ASC',
+		'orderby'        => 'name',
+		'post_status'    => 'publish',
+		'posts_per_page' => 20, // Try the first 20 posts.
 	);
-	return count( $navigation_posts ) ? $navigation_posts[0] : null;
 
+	$navigation_posts = new WP_Query( $parsed_args );
+	foreach ( $navigation_posts->posts as $navigation_post ) {
+		if ( has_blocks( $navigation_post ) ) {
+			return $navigation_post;
+		}
+	}
+
+	return null;
 }
 
 /**
