@@ -657,12 +657,12 @@ export default function NavigationSubmenuEdit( {
 							/>
 						</Popover>
 					) }
-					{ ( showSubmenuIcon || openSubmenusOnClick ) && (
-						<span className="wp-block-navigation__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					) }
 				</ParentElement>
+				{ ( showSubmenuIcon || openSubmenusOnClick ) && (
+					<span className="wp-block-navigation__submenu-icon">
+						<ItemSubmenuIcon />
+					</span>
+				) }
 				<div { ...innerBlocksProps } />
 			</div>
 		</Fragment>

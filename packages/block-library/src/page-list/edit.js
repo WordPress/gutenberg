@@ -235,14 +235,16 @@ const PageItems = memo( function PageItems( {
 
 function ItemSubmenuToggle( { title } ) {
 	return (
-		<button
-			className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
-			aria-expanded="false"
-		>
-			{ title }
+		<>
+			<button
+				className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
+				aria-expanded="false"
+			>
+				{ title }
+			</button>
 			<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
 				<ItemSubmenuIcon />
 			</span>
-		</button>
+		</>
 	);
 }
