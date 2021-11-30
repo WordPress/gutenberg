@@ -70,6 +70,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const isTemplatePart = templateType === 'wp_template_part';
+	const isTemplate = templateType === 'wp_template';
 
 	return (
 		<BlockEditorProvider
@@ -98,7 +99,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			</SidebarInspectorFill>
 			<BlockTools
 				className={ classnames( 'edit-site-visual-editor', {
-					'is-focus-mode': isTemplatePart,
+					'is-focus-mode': isTemplatePart || isTemplate,
 				} ) }
 				__unstableContentRef={ contentRef }
 				onClick={ ( event ) => {
