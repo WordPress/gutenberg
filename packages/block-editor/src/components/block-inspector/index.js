@@ -115,7 +115,7 @@ const BlockInspectorSingleBlock = ( {
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
 						<BlockStyles
-							scope="core/edit-post"
+							scope="core/block-inspector"
 							clientId={ clientId }
 						/>
 						{ hasBlockSupport(
