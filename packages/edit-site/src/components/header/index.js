@@ -100,7 +100,7 @@ export default function Header( {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const isFocusMode = templateType === 'wp_template_part';
+	const isFocusMode = templateType === 'wp_template_part' || 'wp_template';
 
 	return (
 		<div className="edit-site-header">

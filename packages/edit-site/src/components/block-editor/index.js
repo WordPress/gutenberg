@@ -115,7 +115,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					// Reinitialize the editor and reset the states when the template changes.
 					key={ templateId }
 					enableResizing={
-						isTemplatePart &&
+						isTemplatePart || isTemplate &&
 						// Disable resizing in mobile viewport.
 						! isMobileViewport
 					}
