@@ -85,10 +85,6 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
 		await openDocumentSettingsSidebar();
-		await page.waitForSelector(
-			'[aria-label="Image size presets"] button:first-child',
-			{ visible: true }
-		);
 		await page.click( '[aria-label="Image size presets"] button' );
 
 		const regex2 = new RegExp(
@@ -318,13 +314,9 @@ describe( 'Image', () => {
 
 		// Upload an initial image.
 		const filename = await upload( '.wp-block-image input[type="file"]' );
-
+		await waitForImage( filename );
 		// Resize the Uploaded Image.
 		await openDocumentSettingsSidebar();
-		await page.waitForSelector(
-			'[aria-label="Image size presets"] button:first-child',
-			{ visible: true }
-		);
 		await page.click(
 			'[aria-label="Image size presets"] button:first-child'
 		);
