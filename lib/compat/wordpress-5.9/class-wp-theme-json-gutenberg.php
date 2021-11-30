@@ -721,15 +721,7 @@ class WP_Theme_JSON_Gutenberg {
 			// user-generated values take precedence in the CSS cascade.
 			// See: https://github.com/WordPress/gutenberg/issues/36147.
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= self::to_ruleset(
-					self::ROOT_BLOCK_SELECTOR,
-					array(
-						array(
-							'name'  => 'margin',
-							'value' => '0',
-						),
-					)
-				);
+				$block_rules .= "body { margin: 0; }\n";
 			}
 
 			// 2. Generate the rules that use the general selector.
