@@ -5,7 +5,7 @@
 	"title": "Comments Pagination Numbers",
 	"category": "design",
 	"parent": [ "core/comments-query-loop" ],
-	"description": "Displays a list of page numbers for comment pagination",
+	"description": "Displays a list of page numbers for comments pagination.",
 	"textdomain": "default",
 	"usesContext": [ "queryId", "queryPerPage", "postId" ],
 	"supports": {
