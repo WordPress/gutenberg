@@ -4,6 +4,8 @@
 
 ### Bug Fix
 
+-   Fixed error thrown in `ColorPicker` when used in controlled state in color gradients ([#36941](https://github.com/WordPress/gutenberg/pull/36941)).
+-   Updated readme to include default value introduced in fix for unexpected movements in the `ColorPicker` ([#35670](https://github.com/WordPress/gutenberg/pull/35670)).
 -   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
 
 ### Experimental

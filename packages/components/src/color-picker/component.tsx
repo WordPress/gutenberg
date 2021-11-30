@@ -66,15 +66,15 @@ const ColorPicker = (
 		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
+	// Use a safe default value for the color and remove the possibility of `undefined`.
 	const [ color, setColor ] = useControlledValue( {
 		onChange,
 		value: colorProp,
 		defaultValue,
 	} );
 
-	// Use a safe default value for the color and remove the possibility of `undefined`.
 	const safeColordColor = useMemo( () => {
-		return color ? colord( color ) : colord( defaultValue );
+		return colord( color );
 	}, [ color, defaultValue ] );
 
 	const debouncedSetColor = useDebounce( setColor );
