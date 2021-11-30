@@ -197,7 +197,7 @@ $preview-image-height: 140px;
 		// of text, particular those with no spaces.
 		// See: https://github.com/WordPress/gutenberg/issues/33586#issuecomment-888921188
 		white-space: pre-wrap;
-		word-wrap: break-word;
+		overflow-wrap: break-word;
 		word-break: break-all;
 	}
 
