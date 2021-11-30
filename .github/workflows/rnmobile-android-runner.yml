@@ -38,12 +38,12 @@ jobs:
               uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
               with:
                   path: ~/.gradle/caches
-                  key: ${{ runner.os }}-${{ runner.api-level }}-gradle-${{ hashFiles('**/*.gradle') }}
+                  key: ${{ runner.os }}-${{ matrix.api-level }}-gradle-${{ hashFiles('**/*.gradle') }}
 
             - name: Run Android Device Tests
               uses: reactivecircus/android-emulator-runner@2b2ebf2e518e38a17180117fc2b677006db27330 # v2.21.0
               with:
-                  api-level: ${{ runner.api-level }}
+                  api-level: ${{ matrix.api-level }}
                   profile: pixel_xl
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
