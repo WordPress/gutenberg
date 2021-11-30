@@ -39,10 +39,9 @@ jobs:
                   path: ~/.gradle/caches
                   key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 
-            - uses: reactivecircus/android-emulator-runner@5de26e4bd23bf523e8a4b7f077df8bfb8e52b50e # v2.19.1
+            - uses: reactivecircus/android-emulator-runner@2b2ebf2e518e38a17180117fc2b677006db27330 # v2.21.0
               with:
-                  api-level: 28
-                  emulator-build: 7425822 # https://git.io/JE3jX
+                  api-level: 29
                   profile: pixel_xl
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
