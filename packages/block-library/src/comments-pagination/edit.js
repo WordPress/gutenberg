@@ -17,6 +17,9 @@ import { PanelBody } from '@wordpress/components';
  */
 import { CommentsPaginationArrowControls } from './comments-pagination-arrow-controls';
 
+// TODO: add pagination-previous/next blocks once they are implemented.
+const TEMPLATE = [ [ 'core/comments-pagination-numbers' ] ];
+
 const getDefaultBlockLayout = ( blockTypeOrName ) => {
 	const layoutBlockSupportConfig = getBlockSupport(
 		blockTypeOrName,
@@ -48,6 +51,11 @@ export default function QueryPaginationEdit( {
 	}, [] );
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+		allowedBlocks: [
+			// TODO: add pagination-previous/next blocks once they are implemented.
+			'core/comments-pagination-numbers',
+		],
 		__experimentalLayout: usedLayout,
 	} );
 	return (
