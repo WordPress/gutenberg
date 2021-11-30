@@ -27,7 +27,7 @@ export async function createUser(
 ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'user-new.php' );
-
+	await page.waitForSelector( '#user_login', { visible: true } );
 	await page.type( '#user_login', username );
 	await page.type( '#email', snakeCase( username ) + '@example.com' );
 	if ( firstName ) {
