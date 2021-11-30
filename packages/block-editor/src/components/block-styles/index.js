@@ -35,6 +35,11 @@ function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
 	);
 }
 
+// Top position (in px) of the Block Styles container
+// relative to the editor pane.
+// The value is the equivalent of the container's right position.
+const DEFAULT_POSITION_TOP = 16;
+
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( {
 	clientId,
@@ -60,7 +65,8 @@ function BlockStyles( {
 		const scrollContainer = document.querySelector(
 			'.interface-interface-skeleton__content'
 		);
-		setContainerScrollTop( scrollContainer.scrollTop + 16 );
+		const scrollTop = scrollContainer?.scrollTop || 0;
+		setContainerScrollTop( scrollTop + DEFAULT_POSITION_TOP );
 	}, [ hoveredStyle ] );
 
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
