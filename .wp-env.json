@@ -1,5 +1,6 @@
 {
 	"core": "WordPress/WordPress",
+	"phpVersion": "7.4",
 	"plugins": [ "." ],
 	"themes": [ "WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.7" ],
 	"env": {
