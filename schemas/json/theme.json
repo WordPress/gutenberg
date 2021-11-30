@@ -1067,7 +1067,7 @@
 		"version": {
 			"description": "Version of theme.json to use.\nSince 5.8.",
 			"type": "integer",
-			"enum": [ 1 ]
+			"enum": [ 2 ]
 		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).\nSince 5.8.",
