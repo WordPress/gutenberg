@@ -170,6 +170,13 @@ describe( 'Multi-entity save flow', () => {
 			await assertExistance( saveA11ySelector, false );
 
 			await publishPost();
+			// Wait for the success notice specifically for the published post.
+			// `publishPost()` has a similar check but it only checks for the
+			// existence of any snackbars. In this case, there's another "Site updated"
+			// notice which will be sufficient for that and thus creating a false-positive.
+			await page.waitForXPath(
+				'//*[@id="a11y-speak-polite"][contains(text(), "Post published")]'
+			);
 
 			// Update the post.
 			await page.click( '.editor-post-title' );
