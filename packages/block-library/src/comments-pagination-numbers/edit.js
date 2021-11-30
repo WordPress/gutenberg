@@ -7,7 +7,7 @@ const PaginationItem = ( { content, tag: Tag = 'a', extraClass = '' } ) => (
 	<Tag className={ `page-numbers ${ extraClass }` }>{ content }</Tag>
 );
 
-export default function QueryPaginationNumbersEdit() {
+export default function CommentsPaginationNumbersEdit() {
 	return (
 		<div { ...useBlockProps() }>
 			<PaginationItem content="1" />
