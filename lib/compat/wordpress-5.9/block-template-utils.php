@@ -506,11 +506,13 @@ if ( ! function_exists( '_build_block_template_result_from_file' ) ) {
 		$template->content        = _inject_theme_attribute_in_block_template_content( $template_content );
 		$template->slug           = $template_file['slug'];
 		$template->source         = 'theme';
+		$template->origin         = null;
 		$template->type           = $template_type;
 		$template->title          = ! empty( $template_file['title'] ) ? $template_file['title'] : $template_file['slug'];
 		$template->status         = 'publish';
 		$template->has_theme_file = true;
 		$template->is_custom      = true;
+		$template->author         = 0;
 
 		if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
 			$template->description = $default_template_types[ $template_file['slug'] ]['description'];
@@ -550,6 +552,8 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
 			return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
 		}
 
+		$origin = get_post_meta( $post->ID, 'origin', true );
+
 		$theme          = $terms[0]->name;
 		$has_theme_file = wp_get_theme()->get_stylesheet() === $theme &&
 			null !== _get_block_template_file( $post->post_type, $post->post_name );
@@ -561,12 +565,14 @@ if ( ! function_exists( '_build_block_template_result_from_post' ) ) {
 		$template->content        = $post->post_content;
 		$template->slug           = $post->post_name;
 		$template->source         = 'custom';
+		$template->origin         = ! empty( $origin ) ? $origin : null;
 		$template->type           = $post->post_type;
 		$template->description    = $post->post_excerpt;
 		$template->title          = $post->post_title;
 		$template->status         = $post->post_status;
 		$template->has_theme_file = $has_theme_file;
 		$template->is_custom      = true;
+		$template->author         = $post->post_author;
 
 		if ( 'wp_template' === $post->post_type && isset( $default_template_types[ $template->slug ] ) ) {
 			$template->is_custom = false;
@@ -889,5 +895,59 @@ if ( ! function_exists( 'block_footer_area' ) ) {
 	 */
 	function block_footer_area() {
 		block_template_part( 'footer' );
+	}
+}
+
+if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
+	/**
+	 * Creates an export of the current templates and
+	 * template parts from the site editor at the
+	 * specified path in a ZIP file.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @return WP_Error|string Path of the ZIP file or error on failure.
+	 */
+	function wp_generate_block_templates_export_file() {
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			return new WP_Error( __( 'Zip Export not supported.', 'gutenberg' ) );
+		}
+
+		$obscura  = wp_generate_password( 12, false, false );
+		$filename = get_temp_dir() . 'edit-site-export-' . $obscura . '.zip';
+
+		$zip = new ZipArchive();
+		if ( true !== $zip->open( $filename, ZipArchive::CREATE ) ) {
+			return new WP_Error( __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
+		}
+
+		$zip->addEmptyDir( 'theme' );
+		$zip->addEmptyDir( 'theme/templates' );
+		$zip->addEmptyDir( 'theme/parts' );
+
+		// Load templates into the zip file.
+		$templates = gutenberg_get_block_templates();
+		foreach ( $templates as $template ) {
+			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
+
+			$zip->addFromString(
+				'theme/templates/' . $template->slug . '.html',
+				$template->content
+			);
+		}
+
+		// Load template parts into the zip file.
+		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
+		foreach ( $template_parts as $template_part ) {
+			$zip->addFromString(
+				'theme/parts/' . $template_part->slug . '.html',
+				$template_part->content
+			);
+		}
+
+		// Save changes to the zip file.
+		$zip->close();
+
+		return $filename;
 	}
 }

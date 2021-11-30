@@ -24,6 +24,7 @@ import {
 } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
+import EditTemplateTitle from './edit-template-title';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -55,13 +56,17 @@ export default function TemplateDetails( { template, onClose } ) {
 	return (
 		<div className="edit-site-template-details">
 			<div className="edit-site-template-details__group">
-				<Heading
-					level={ 4 }
-					weight={ 600 }
-					className="edit-site-template-details__title"
-				>
-					{ title }
-				</Heading>
+				{ template.is_custom ? (
+					<EditTemplateTitle template={ template } />
+				) : (
+					<Heading
+						level={ 4 }
+						weight={ 600 }
+						className="edit-site-template-details__title"
+					>
+						{ title }
+					</Heading>
+				) }
 
 				{ description && (
 					<Text
