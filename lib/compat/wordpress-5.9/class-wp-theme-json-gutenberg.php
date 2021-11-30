@@ -96,7 +96,7 @@ class WP_Theme_JSON_Gutenberg {
 	const PRESETS_METADATA = array(
 		array(
 			'path'       => array( 'color', 'palette' ),
-			'override'   => false,
+			'override'   => array( 'color', 'defaultPalette' ),
 			'value_key'  => 'color',
 			'css_vars'   => '--wp--preset--color--$slug',
 			'classes'    => array(
@@ -108,7 +108,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'       => array( 'color', 'gradients' ),
-			'override'   => false,
+			'override'   => array( 'color', 'defaultGradients' ),
 			'value_key'  => 'gradient',
 			'css_vars'   => '--wp--preset--gradient--$slug',
 			'classes'    => array( '.has-$slug-gradient-background' => 'background' ),
@@ -1433,19 +1433,49 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
+					$should_override = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
+
 					if (
 						( 'theme' !== $origin ) ||
-						( 'theme' === $origin && $preset['override'] )
+						( 'theme' === $origin && $should_override )
 					) {
 						_wp_array_set( $this->theme_json, $path, $content );
 					}
 
-					if ( 'theme' === $origin && ! $preset['override'] ) {
+					if ( 'theme' === $origin && ! $should_override ) {
 						$content = self::filter_slugs( $content, $preset['path'], $slugs );
 						_wp_array_set( $this->theme_json, $path, $content );
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Returns whether a presets should be overriden or not.
+	 *
+	 * @param array      $theme_json The theme.json like structure to inspect.
+	 * @param array      $path Path to inspect.
+	 * @param bool|array $override Data to compute whether to override the preset.
+	 * @return boolean
+	 */
+	private static function should_override_preset( $theme_json, $path, $override ) {
+		if ( is_bool( $override ) ) {
+			return $override;
+		}
+
+		if ( is_array( $override ) ) {
+			// The relationship between whether to override the defaults
+			// and whether the defaults are enabled is inverse:
+			//
+			// - If defaults are enabled  => theme presets should not be overriden
+			// - If defaults are disabled => theme presets should be overriden
+			//
+			// For example, a theme sets defaultPalette to false,
+			// making the default palette hidden from the user.
+			// In that case, we want all the theme presets to be present,
+			// so they should override the defaults.
+			return ! _wp_array_get( $theme_json, array_merge( $path, $override ), true );
 		}
 	}
 
@@ -1471,7 +1501,8 @@ class WP_Theme_JSON_Gutenberg {
 	private static function get_slugs_not_to_override( $data, $node_path = array( 'settings' ) ) {
 		$slugs = array();
 		foreach ( self::PRESETS_METADATA as $metadata ) {
-			if ( $metadata['override'] ) {
+			$override = self::should_override_preset( $data, $node_path, $metadata['override'] );
+			if ( $override ) {
 				continue;
 			}
 
