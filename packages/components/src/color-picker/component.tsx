@@ -75,7 +75,7 @@ const ColorPicker = (
 
 	const safeColordColor = useMemo( () => {
 		return colord( color );
-	}, [ color, defaultValue ] );
+	}, [ color ] );
 
 	const debouncedSetColor = useDebounce( setColor );
 
