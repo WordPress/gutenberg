@@ -205,7 +205,6 @@ const Tooltip = ( {
 	];
 
 	const getReferenceElementPosition = () => {
-		// eslint-disable-next-line @wordpress/comment-case
 		// rAF allows render to complete before calculating layout
 		// eslint-disable-next-line no-undef
 		requestAnimationFrame( () => {

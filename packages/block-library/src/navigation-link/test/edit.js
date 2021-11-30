@@ -192,7 +192,6 @@ describe( 'edit', () => {
 				linkSuggestion,
 				setAttributes
 			);
-			// eslint-disable-next-line @wordpress/comment-case
 			// post_format returns a slug ID value from the Search API
 			// we do not persist this ID since we expect this value to be a post or term ID.
 			expect( setAttributes ).toHaveBeenCalledWith( {

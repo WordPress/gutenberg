@@ -151,7 +151,6 @@ describe( 'Basic rendering', () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
@@ -334,7 +333,6 @@ describe( 'Searching for a link', () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
@@ -373,7 +371,6 @@ describe( 'Searching for a link', () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
@@ -421,7 +418,6 @@ describe( 'Searching for a link', () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
@@ -471,7 +467,6 @@ describe( 'Searching for a link', () => {
 
 		const searchResultElements = getSearchResults();
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
@@ -500,7 +495,6 @@ describe( 'Searching for a link', () => {
 				} );
 			} );
 
-			// eslint-disable-next-line @wordpress/comment-case
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
@@ -546,7 +540,6 @@ describe( 'Searching for a link', () => {
 			} );
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
@@ -582,7 +575,6 @@ describe( 'Manual link entry', () => {
 				} );
 			} );
 
-			// eslint-disable-next-line @wordpress/comment-case
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 
@@ -639,7 +631,6 @@ describe( 'Manual link entry', () => {
 					} );
 				} );
 
-				// eslint-disable-next-line @wordpress/comment-case
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
@@ -685,7 +676,6 @@ describe( 'Manual link entry', () => {
 					} );
 				} );
 
-				// eslint-disable-next-line @wordpress/comment-case
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
@@ -729,7 +719,6 @@ describe( 'Manual link entry', () => {
 					} );
 				} );
 
-				// eslint-disable-next-line @wordpress/comment-case
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
@@ -859,7 +848,6 @@ describe( 'Default search suggestions', () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
@@ -1537,7 +1525,6 @@ describe( 'Selecting links', () => {
 					} );
 				} );
 
-				// eslint-disable-next-line @wordpress/comment-case
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
@@ -1612,7 +1599,6 @@ describe( 'Selecting links', () => {
 					} );
 				} );
 
-				// eslint-disable-next-line @wordpress/comment-case
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
@@ -1795,7 +1781,7 @@ describe( 'Addition Settings UI', () => {
 				label.innerHTML &&
 				label.innerHTML.includes( expectedSettingText )
 		);
-		// eslint-disable-next-line @wordpress/comment-case
+
 		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found.
 
 		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute(
@@ -1893,7 +1879,6 @@ describe( 'Post types', () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
@@ -1928,7 +1913,6 @@ describe( 'Post types', () => {
 				} );
 			} );
 
-			// eslint-disable-next-line @wordpress/comment-case
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 
@@ -1980,7 +1964,6 @@ describe( 'Rich link previews', () => {
 			render( <LinkControl value={ selectedLink } />, container );
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
@@ -2015,7 +1998,6 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
@@ -2047,7 +2029,6 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
@@ -2088,7 +2069,6 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
@@ -2128,7 +2108,6 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
@@ -2175,7 +2154,6 @@ describe( 'Rich link previews', () => {
 				);
 			} );
 
-			// eslint-disable-next-line @wordpress/comment-case
 			// mockFetchRichUrlData resolves on next "tick" of event loop.
 			await act( async () => {
 				await eventLoopTick();
@@ -2215,7 +2193,6 @@ describe( 'Rich link previews', () => {
 				);
 			} );
 
-			// eslint-disable-next-line @wordpress/comment-case
 			// mockFetchRichUrlData resolves on next "tick" of event loop.
 			await act( async () => {
 				await eventLoopTick();
@@ -2245,7 +2222,6 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();
@@ -2276,7 +2252,6 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// mockFetchRichUrlData resolves on next "tick" of event loop.
 		await act( async () => {
 			await eventLoopTick();

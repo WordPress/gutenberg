@@ -99,7 +99,6 @@ describe( 'Reusable block', () => {
 		fireEvent.press( reusableSegment );
 
 		const reusableBlockList = getByTestId( 'InserterUI-ReusableBlocks' );
-		// eslint-disable-next-line @wordpress/comment-case
 		// onScroll event used to force the FlatList to render all items.
 		fireEvent.scroll( reusableBlockList, {
 			nativeEvent: {
@@ -175,7 +174,6 @@ describe( 'Reusable block', () => {
 			within( reusableBlock ).getByTestId( 'block-list-wrapper' )
 		);
 
-		// eslint-disable-next-line @wordpress/comment-case
 		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
 		fireEvent( innerBlockListWrapper, 'layout', {

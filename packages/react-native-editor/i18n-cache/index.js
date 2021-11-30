@@ -1,4 +1,4 @@
-/* eslint-disable no-console @wordpress/comment-case */
+/* eslint-disable no-console */
 
 /**
  * External dependencies
@@ -180,4 +180,4 @@ export const getTranslation = ( locale ) => translations[ locale ];
 	} );
 }
 
-/* eslint-enable no-console @wordpress/comment-case */
+/* eslint-enable no-console */

@@ -716,7 +716,6 @@ describe( 'createRegistry', () => {
 			expect( listener ).toHaveBeenCalledTimes( 1 );
 
 			const listener2 = jest.fn();
-			// eslint-disable-next-line @wordpress/comment-case
 			// useSelect subscribes to the stores differently,
 			// This test ensures batching works in this case as well.
 			const unsubscribe = registry.__experimentalSubscribeStore(

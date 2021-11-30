@@ -37,7 +37,6 @@ export default function getOffsetParent( node ) {
 		return closestElement;
 	}
 
-	// eslint-disable-next-line @wordpress/comment-case
 	// offsetParent is undocumented/draft.
 	return /** @type {Node & { offsetParent: Node }} */ ( closestElement )
 		.offsetParent;

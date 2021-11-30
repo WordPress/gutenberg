@@ -205,7 +205,6 @@ export class MediaUpload extends Component {
 
 		if ( value === URL_MEDIA_SOURCE ) {
 			prompt(
-				/* eslint-disable @wordpress/comment-case */
 				__( 'Type a URL' ), // title
 				undefined, // message
 				[
@@ -223,7 +222,6 @@ export class MediaUpload extends Component {
 				'url' // keyboardType
 			);
 			return;
-			/* eslint-enable @wordpress/comment-case */
 		}
 
 		const mediaSource = this.getAllSources()

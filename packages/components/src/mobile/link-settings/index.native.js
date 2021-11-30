@@ -33,7 +33,6 @@ import LinkRelIcon from './link-rel';
 import styles from './style.scss';
 
 const NEW_TAB_REL = 'noreferrer noopener';
-/* eslint-disable @wordpress/comment-case */
 function LinkSettings( {
 	// Control link settings `BottomSheet` visibility
 	isVisible,
@@ -91,7 +90,6 @@ function LinkSettings( {
 	linkTarget,
 	rel = '',
 } ) {
-	/* eslint-enable @wordpress/comment-case */
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );

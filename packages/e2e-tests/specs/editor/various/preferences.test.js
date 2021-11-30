@@ -21,7 +21,6 @@ describe( 'preferences', () => {
 				( node ) => node.textContent
 			);
 		} catch ( error ) {
-			// eslint-disable-next-line @wordpress/comment-case
 			// page.$eval throws when it does not find the selector, which we
 			// can intentionally intercept and consider as there being no
 			// active sidebar tab (no sidebar).

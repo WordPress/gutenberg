@@ -65,10 +65,8 @@ Node.prototype.contains = function ( otherNode ) {
  * https://dom.spec.whatwg.org/#dom-node-insertbefore for the latest spec.
  */
 Node.prototype.insertBefore = function (
-	/* eslint-disable @wordpress/comment-case */
 	/* Node */ newChild,
 	/* Node */ refChild
-	/* eslint-enable @wordpress/comment-case */
 ) {
 	if ( this._readonly === true ) {
 		throw new core.DOMException(
