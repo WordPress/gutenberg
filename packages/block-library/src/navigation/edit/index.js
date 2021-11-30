@@ -452,6 +452,7 @@ function Navigation( {
 					{ hasColorSettings && (
 						<PanelColorSettings
 							__experimentalHasMultipleOrigins
+							__experimentalIsRenderedInSidebar
 							title={ __( 'Color' ) }
 							initialOpen={ false }
 							colorSettings={ [

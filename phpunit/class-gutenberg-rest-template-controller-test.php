@@ -278,7 +278,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'has_theme_file' => false,
 				'is_custom'      => true,
 				'origin'         => null,
-				'author'         => 0,
+				'author'         => self::$admin_id,
 			),
 			$data
 		);
@@ -318,7 +318,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'area'           => 'header',
 				'has_theme_file' => false,
 				'origin'         => null,
-				'author'         => 0,
+				'author'         => self::$admin_id,
 			),
 			$data
 		);

@@ -547,6 +547,7 @@ function CoverEdit( {
 				) }
 				<PanelColorGradientSettings
 					__experimentalHasMultipleOrigins
+					__experimentalIsRenderedInSidebar
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
 					settings={ [

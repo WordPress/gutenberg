@@ -98,7 +98,8 @@ export default function Table( { templateType } ) {
 										postType: template.type,
 									} ) }
 								>
-									{ template.title.rendered }
+									{ template.title?.rendered ||
+										template.slug }
 								</a>
 							</Heading>
 							{ template.description }
