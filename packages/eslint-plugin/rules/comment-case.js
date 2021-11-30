@@ -86,7 +86,7 @@ module.exports = {
 
 					// Ignore known common words that don't need to be capitalized.
 					// Includes npm, lint, id, v1, v2 etc. (when referring to versions), and the Apple products.
-					const commonWordRegex = /i(Pad|Phone|Mac|OS)|npm-?\w*|lint-?\w*|id|v\d+/;
+					const commonWordRegex = /^i(Pad|Phone|Mac|OS)|^npm-?\w*|^lint-?\w*|^id|^v\d+/;
 
 					// Ignore if comment contains a URL.
 					const regexTests = [
