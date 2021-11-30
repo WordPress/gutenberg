@@ -74,7 +74,7 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 
-	it.skip( 'should replace, reset size, and keep selection', async () => {
+	it( 'should replace, reset size, and keep selection', async () => {
 		await insertBlock( 'Image' );
 		const filename1 = await upload( '.wp-block-image input[type="file"]' );
 		await waitForImage( filename1 );
@@ -104,7 +104,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
-		await page.click( '.wp-block-image img' );
+		await page.click( '.wp-block-image' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
@@ -314,9 +314,13 @@ describe( 'Image', () => {
 
 		// Upload an initial image.
 		const filename = await upload( '.wp-block-image input[type="file"]' );
-
+		await waitForImage( filename );
 		// Resize the Uploaded Image.
 		await openDocumentSettingsSidebar();
+		await page.waitForSelector(
+			'[aria-label="Image size presets"] button:first-child',
+			{ visible: true }
+		);
 		await page.click(
 			'[aria-label="Image size presets"] button:first-child'
 		);
@@ -337,15 +341,15 @@ describe( 'Image', () => {
 		await editButton.click();
 
 		await page.waitForSelector( '.block-editor-url-input__input' );
-		await page.evaluate(
-			() =>
-				( document.querySelector(
-					'.block-editor-url-input__input'
-				).value = '' )
-		);
 
+		// Clear the input field. Delay added to account for typing delays.
+		const inputField = await page.$( '.block-editor-url-input__input' );
+		await inputField.click( { clickCount: 3, delay: 100 } );
+		await page.keyboard.press( 'Backspace', { delay: 100 } );
+
+		// Replace the url. Delay added to account for typing delays.
 		await page.focus( '.block-editor-url-input__input' );
-		await page.keyboard.type( imageUrl );
+		await page.keyboard.type( imageUrl, { delay: 100 } );
 		await page.click( '.block-editor-link-control__search-submit' );
 
 		const regexAfter = new RegExp(
