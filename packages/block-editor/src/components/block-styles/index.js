@@ -60,7 +60,9 @@ function BlockStyles( {
 		const scrollContainer = document.querySelector(
 			'.interface-interface-skeleton__content'
 		);
-		setContainerScrollTop( scrollContainer.scrollTop + 16 );
+		const scrollTop = scrollContainer?.scrollTop || 0;
+		// Add the hardcoded equivalent of the container's right position.
+		setContainerScrollTop( scrollTop + 16 );
 	}, [ hoveredStyle ] );
 
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
