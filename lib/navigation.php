@@ -182,25 +182,6 @@ function gutenberg_get_navigation_areas() {
 }
 
 /**
- * Returns the API paths to preload to make the navigation area block load fast.
- *
- * @return array A list of paths.
- */
-function gutenberg_get_navigation_areas_paths_to_preload() {
-	$areas        = gutenberg_get_navigation_areas_menus();
-	$active_areas = array_intersect_key( $areas, gutenberg_get_navigation_areas() );
-	$paths        = array(
-		'/wp/v2/block-navigation-areas?context=edit',
-	);
-	foreach ( $active_areas as $post_id ) {
-		if ( 0 !== $post_id ) {
-			$paths[] = "/wp/v2/navigation/$post_id?context=edit";
-		}
-	}
-	return $paths;
-}
-
-/**
  * Migrates classic menus to a block-based navigation post on theme switch.
  * Assigns the created navigation post to the corresponding navigation area.
  *

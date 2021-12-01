@@ -179,7 +179,6 @@ function gutenberg_edit_site_init( $hook ) {
 		'edit-site',
 		array(
 			'preload_paths'    => array_merge(
-				gutenberg_get_navigation_areas_paths_to_preload(),
 				array(
 					array( '/wp/v2/media', 'OPTIONS' ),
 					'/',
