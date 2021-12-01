@@ -21,8 +21,13 @@
 	overflow: visible;
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
 	border: none;
+	border-radius: $radius-block-ui;
 	& > div {
 		padding: 0;
+	}
+	.react-colorful__saturation {
+		border-top-right-radius: $radius-block-ui;
+		border-top-left-radius: $radius-block-ui;
 	}
 }
 
