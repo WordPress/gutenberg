@@ -134,12 +134,18 @@ function getEntries() {
 	return entry;
 }
 
-threadLoader.warmup(
-	{
-		poolTimeout: Infinity,
-	},
-	[ require.resolve( 'babel-loader' ), '@wordpress/babel-preset-default' ]
-);
+const workerOptions = {
+	poolTimeout: Infinity,
+};
+
+// Only warm up the loader when in development mode to prevent it from hanging.
+// @see https://github.com/webpack-contrib/thread-loader/issues/122
+if ( mode !== 'production' ) {
+	threadLoader.warmup( workerOptions, [
+		require.resolve( 'babel-loader' ),
+		'@wordpress/babel-preset-default',
+	] );
+}
 
 module.exports = {
 	mode,
@@ -183,12 +189,10 @@ module.exports = {
 				test: /\.[tj]sx?$/,
 				exclude: /node_modules/,
 				use: [
-					{
-						loader: require.resolve( 'thread-loader' ),
-						options: {
-							poolTimeout: Infinity,
-						},
-					},
+					// {
+					// 	loader: require.resolve( 'thread-loader' ),
+					// 	options: workerOptions,
+					// },
 					{
 						loader: require.resolve( 'babel-loader' ),
 						options: {
