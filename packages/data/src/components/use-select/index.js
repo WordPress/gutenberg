@@ -88,7 +88,7 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( mapSelect, deps = [] ) {
+export default function useSelect( mapSelect, deps ) {
 	const hasMappingFunction = 'function' === typeof mapSelect;
 
 	// If we're recalling a store by its name or by
@@ -230,7 +230,7 @@ export default function useSelect( mapSelect, deps = [] ) {
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry, trapSelect, ...deps, hasMappingFunction ] );
+	}, [ registry, trapSelect, hasMappingFunction, ...( deps || [] ) ] );
 
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
