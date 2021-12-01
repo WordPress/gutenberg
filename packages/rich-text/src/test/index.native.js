@@ -109,6 +109,20 @@ describe( '<RichText/>', () => {
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
+		it( `should display rich text at the PROVIDED font size computed from the selected GLOBAL
+		\`__experimentalGlobalStylesBaseStyles.typography.fontSize\` CSS with decimal values.`, () => {
+			// Arrange
+			const expectedFontSize = 18;
+			mockGlobalSettings( { fontSize: '1.125rem' } );
+			// Act
+			const { getByA11yLabel } = render(
+				<RichText accessibilityLabel={ 'editor' } />
+			);
+			// Assert
+			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			expect( actualFontSize ).toBe( expectedFontSize );
+		} );
+
 		it( `should display rich text at the font size computed from the LOCAL \`fontSize\` CSS with HIGHEST PRIORITY
 		when CSS is provided ambiguously from ALL possible sources.`, () => {
 			// Arrange
