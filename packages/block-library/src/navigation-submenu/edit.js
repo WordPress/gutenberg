@@ -510,7 +510,7 @@ export default function NavigationSubmenuEdit( {
 			__experimentalDirectInsert: true,
 
 			// Ensure block toolbar is not too far removed from item
-			// being edited when in vertical mode.
+			// being edited.
 			// see: https://github.com/WordPress/gutenberg/pull/34615.
 			__experimentalCaptureToolbars: true,
 
