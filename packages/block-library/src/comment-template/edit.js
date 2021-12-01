@@ -42,7 +42,7 @@ function CommentTemplateInnerBlocks( {
 		<li { ...innerBlocksProps }>
 			{ children }
 			{ comments.length > 0 ? (
-				<RenderComments
+				<CommentsList
 					blockContexts={ comments }
 					activeBlockContext={ activeBlockContext }
 					setActiveBlockContext={ setActiveBlockContext }
@@ -66,7 +66,7 @@ function CommentTemplateInnerBlocks( {
  *                                               getBlocks() in parent .
  * @return {WPElement}                 		List of comments.
  */
-const RenderComments = ( {
+const CommentsList = ( {
 	blockProps,
 	blockContexts,
 	activeBlockContext,
@@ -98,7 +98,7 @@ const RenderComments = ( {
 								}
 							/>
 							{ blockContext.children.length > 0 ? (
-								<RenderComments
+								<CommentsList
 									blockContexts={ blockContext.children }
 									activeBlockContext={ activeBlockContext }
 									setActiveBlockContext={
@@ -157,7 +157,7 @@ export default function CommentTemplateEdit( {
 	}
 
 	return (
-		<RenderComments
+		<CommentsList
 			blockContexts={ blockContexts }
 			blockProps={ blockProps }
 			blocks={ blocks }
