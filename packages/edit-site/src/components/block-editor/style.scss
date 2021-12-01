@@ -19,16 +19,12 @@
 	align-items: center;
 
 	&.is-focus-mode {
-		padding: 48px;
+		padding: $grid-unit-60;
 
 		.edit-site-visual-editor__editor-canvas {
-			border-radius: 2px;
+			border-radius: $radius-block-ui;
 		}
 	}
-}
-
-.edit-site-visual-editor__editor-canvas {
-	border-radius: 2px 2px 0 0;
 }
 
 .edit-site-visual-editor__back-button {
