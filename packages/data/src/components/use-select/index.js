@@ -230,7 +230,7 @@ export default function useSelect( mapSelect, deps = [] ) {
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry, trapSelect, deps, hasMappingFunction ] );
+	}, [ registry, trapSelect, ...deps, hasMappingFunction ] );
 
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
