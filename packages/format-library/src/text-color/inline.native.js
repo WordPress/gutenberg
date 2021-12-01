@@ -53,11 +53,17 @@ function setColors( value, name, colorSettings, colors ) {
 
 	const format = { type: name, attributes };
 
-	return value?.start !== value?.end
-		? applyFormat( value, format )
-		: // For cases when there is no text selected, formatting is forced
-		  // for the first empty character
-		  applyFormat( value, format, value?.start - 1, value?.end + 1 );
+	// For cases when there is no text selected, formatting is forced
+	// for the first empty character
+	if (
+		value?.start === value?.end &&
+		( value?.text.length === 0 ||
+			value.text?.charAt( value.end - 1 ) === ' ' )
+	) {
+		return applyFormat( value, format, value?.start - 1, value?.end + 1 );
+	}
+
+	return applyFormat( value, format );
 }
 
 function ColorPicker( { name, value, onChange } ) {
