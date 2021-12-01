@@ -1,27 +1,7 @@
 [
 	{
 		"blockName": "core/comments-pagination-next",
-		"attrs": {
-			"style": {
-				"color": {
-					"text": "#cf2e2e"
-				},
-				"elements": {
-					"link": {
-						"color": {
-							"text": "#00ff51"
-						}
-					}
-				},
-				"typography": {
-					"textTransform": "uppercase",
-					"fontStyle": "normal",
-					"fontWeight": "700"
-				}
-			},
-			"backgroundColor": "black",
-			"fontSize": "large"
-		},
+		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "",
 		"innerContent": []

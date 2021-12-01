@@ -18,10 +18,9 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 	$comments_per_page = isset( $block->context['queryPerPage'] ) ? $block->context['queryPerPage'] : 4;
 	$comments_number   = (int) get_comments_number();
 	$max_page          = (int) floor( $comments_number / $comments_per_page );
-
-	$default_label    = __( 'Next Comments' );
-	$label            = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-	$pagination_arrow = get_query_pagination_arrow( $block, true );
+	$default_label     = __( 'Next Comments' );
+	$label             = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
+	$pagination_arrow  = get_query_pagination_arrow( $block, true );
 	if ( $pagination_arrow ) {
 		$label .= $pagination_arrow;
 	}

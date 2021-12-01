@@ -15,7 +15,7 @@ export default function CommentsPaginationNextEdit( {
 	setAttributes,
 	context: { paginationArrow },
 } ) {
-	const displayArrow = arrowMap[ paginationArrow ] || arrowMap.none;
+	const displayArrow = arrowMap[ paginationArrow ];
 	return (
 		<div { ...useBlockProps() }>
 			<a
