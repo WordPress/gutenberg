@@ -106,9 +106,9 @@ if ( ! class_exists( 'WP_Block_Template' ) ) {
 
 // These are used by some FSE features
 // as well as global styles.
-require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php';
 
 require __DIR__ . '/full-site-editing/full-site-editing.php';
 require __DIR__ . '/full-site-editing/block-templates.php';

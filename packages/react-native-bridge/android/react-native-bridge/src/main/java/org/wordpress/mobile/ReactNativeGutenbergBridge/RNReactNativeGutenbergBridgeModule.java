@@ -60,6 +60,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
     private static final String MAP_KEY_THEME_UPDATE_RAW_STYLES = "rawStyles";
+    private static final String MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks";
     public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE = "success";
 
     private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
@@ -149,6 +150,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         Serializable gradients = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_GRADIENTS);
         Serializable rawStyles = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_RAW_STYLES);
 
+        // We must assign null here to distinguish between a missing value and false
+        Boolean galleryWithImageBlocks = null;
+        if (editorTheme.containsKey(MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS)) {
+            galleryWithImageBlocks = editorTheme.getBoolean(MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS);
+        }
+
+
         if (colors != null) {
             writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.fromList((ArrayList)colors));
         }
@@ -159,6 +167,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
         if (rawStyles != null) {
             writableMap.putString(MAP_KEY_THEME_UPDATE_RAW_STYLES, rawStyles.toString());
+        }
+
+        if (galleryWithImageBlocks != null) {
+            writableMap.putBoolean(MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS, galleryWithImageBlocks);
         }
 
         emitToJS(EVENT_NAME_UPDATE_EDITOR_SETTINGS, writableMap);
