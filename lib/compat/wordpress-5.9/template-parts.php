@@ -2,6 +2,12 @@
 /**
  * Block template part functions.
  *
+ * This is a temporary compatibility fix for WordPress 5.8.x, which is missing
+ * some features for template parts that are present in 5.9.
+ *
+ * Once 5.9 is the minimum supported WordPress version for the Gutenberg
+ * plugin, this shim can be removed.
+ *
  * @package gutenberg
  */
 
@@ -9,13 +15,11 @@
  * Registers block editor 'wp_template_part' post type.
  */
 function gutenberg_register_template_part_post_type() {
-	if ( ! gutenberg_supports_block_templates() ) {
+	if ( post_type_exists( 'wp_template_part' ) ) {
 		return;
 	}
 
-	// If the post type has already been registered (by WordPress core), skip
-	// registration.
-	if ( post_type_exists( 'wp_template_part' ) ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
