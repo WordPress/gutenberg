@@ -50,6 +50,10 @@ export function subscribeParentToggleHTMLMode( callback ) {
 	return gutenbergBridgeEvents.addListener( 'toggleHTMLMode', callback );
 }
 
+export function subscribeParentRemoveAllBlocks( callback ) {
+	return gutenbergBridgeEvents.addListener( 'removeAllBlocks', callback );
+}
+
 export function subscribeSetFocusOnTitle( callback ) {
 	return gutenbergBridgeEvents.addListener( 'setFocusOnTitle', callback );
 }

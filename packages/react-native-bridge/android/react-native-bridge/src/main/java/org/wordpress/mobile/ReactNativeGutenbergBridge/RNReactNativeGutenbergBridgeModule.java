@@ -42,6 +42,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
     private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
     private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
+    private static final String EVENT_NAME_REMOVE_ALL_BLOCKS = "removeAllBlocks";
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
@@ -399,6 +400,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     public void toggleEditorMode() {
         emitToJS(EVENT_NAME_TOGGLE_HTML_MODE, null);
+    }
+
+    public void removeAllBlocks() {
+        emitToJS(EVENT_NAME_REMOVE_ALL_BLOCKS, null);
     }
 
     public void notifyModalClosed() {

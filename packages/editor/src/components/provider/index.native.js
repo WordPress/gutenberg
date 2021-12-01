@@ -11,6 +11,7 @@ import RNReactNativeGutenbergBridge, {
 	setBlockTypeImpressions,
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
+	subscribeParentRemoveAllBlocks,
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
@@ -111,6 +112,12 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode(
 			() => {
 				this.toggleMode();
+			}
+		);
+
+		this.subscriptionRemoveAllBlocks = subscribeParentRemoveAllBlocks(
+			() => {
+				this.removeAllBlocks();
 			}
 		);
 
@@ -318,6 +325,13 @@ class NativeEditorProvider extends Component {
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
+	removeAllBlocks() {
+		console.log('***** REMOVE ALL BLOCKS');
+		console.log(this.props)
+		const test = this.props.getAllBlocksWithoutInnerBlocks();
+		console.log(test)
+	}
+
 	updateCapabilitiesAction( capabilities ) {
 		this.props.updateSettings( capabilities );
 	}
@@ -366,6 +380,7 @@ export default compose( [
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
 			getSettings: getBlockEditorSettings,
+			__unstableGetBlockWithoutInnerBlocks: getAllBlocksWithoutInnerBlocks,
 		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -376,6 +391,7 @@ export default compose( [
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
 			getBlockEditorSettings,
+			getAllBlocksWithoutInnerBlocks,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
