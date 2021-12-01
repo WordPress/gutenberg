@@ -3,7 +3,8 @@
 		"typography": {
 				"fontSizes": [
 					{
-						"name": "Font size name"
+						"name": "Font size name",
+						"alias": "Short font size name"
 					}
 				],
 				"fontFamilies": [

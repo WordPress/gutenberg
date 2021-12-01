@@ -47,23 +47,41 @@ function FontSizePicker(
 		availableUnits: [ 'px', 'em', 'rem' ],
 	} );
 
-	// The main font size UI displays a toggle group when the presets are less
-	// than six and a select control when they are more.
-	//
-	// A select control is also used when the value of a preset cannot be
-	// immediately computed (eg. 'calc', 'var').
+	/**
+	 * The main font size UI displays a toggle group when the presets are less
+	 * than six and a select control when they are more.
+	 *
+	 * A select control is also used when the value of a preset cannot be
+	 * immediately computed (eg. 'calc', 'var') and there is no `alias` provided
+	 * for every font size.
+	 */
+	const fontSizesContainComplexValues = fontSizes.some(
+		( { size } ) => ! isSimpleCssValue( size )
+	);
+	const allFontSizesHaveAliases = fontSizes.every(
+		( { alias } ) => !! alias
+	);
 	const shouldUseSelectControl =
 		fontSizes.length > 5 ||
-		fontSizes.some( ( { size } ) => ! isSimpleCssValue( size ) );
+		( fontSizesContainComplexValues && ! allFontSizesHaveAliases );
+	const shouldUseAliases =
+		fontSizesContainComplexValues && allFontSizesHaveAliases;
 
 	const options = useMemo(
 		() =>
 			getFontSizeOptions(
 				shouldUseSelectControl,
 				fontSizes,
-				disableCustomFontSizes
+				disableCustomFontSizes,
+				shouldUseAliases
 			),
-		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
+		[
+			shouldUseSelectControl,
+			fontSizes,
+			disableCustomFontSizes,
+			allFontSizesHaveAliases,
+			shouldUseAliases,
+		]
 	);
 	const selectedOption = getSelectedOption( fontSizes, value );
 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
@@ -88,12 +106,18 @@ function FontSizePicker(
 		}
 		// Calculate the `hint` for toggle group control.
 		let hint = selectedOption.name;
-		if ( typeof selectedOption.size === 'string' ) {
+		if ( ! shouldUseAliases && typeof selectedOption.size === 'string' ) {
 			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
 			hint += `(${ unit })`;
 		}
 		return hint;
-	}, [ showCustomValueControl, selectedOption?.slug, value, isCustomValue ] );
+	}, [
+		showCustomValueControl,
+		selectedOption?.slug,
+		value,
+		isCustomValue,
+		shouldUseAliases,
+	] );
 
 	if ( ! options ) {
 		return null;

@@ -65,10 +65,11 @@ If no value exists, this prop defines the starting position for the font size pi
 
 ### fontSizes
 
-An array of font size objects. The object should contain properties size, name, and slug.
+An array of font size objects. The object should contain properties `size`, `name`, `slug` and can contain `alias` on special use cases described right below.
 The property `size` contains a number with the font size value, in `px` or a string specifying the font size CSS property that should be used eg: "13px", "1em", or "clamp(12px, 5vw, 100px)".
 The `name` property includes a label for that font size e.g.: `Small`.
 The `slug` property is a string with a unique identifier for the font size. Used for the class generation process.
+The `alias` property will only be used if available font sizes are eligible for showing the segmented control, contain some complex css value(`clamp, var, etc..`) and is present in every font size.
 
 **Note:** The slugs `default` and `custom` are reserved and cannot be used.
 

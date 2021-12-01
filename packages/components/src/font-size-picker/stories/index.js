@@ -194,3 +194,73 @@ export const withComplexCSSValues = () => {
 		</div>
 	);
 };
+
+export const withAliasesAndComplexCssValues = () => {
+	const aliases = [ 'XS', 'S', 'N', 'L', 'XL', 'XXL' ];
+	const options = [
+		{
+			name: 'Extra Small',
+			slug: 'extra-small',
+			size: '0.65rem',
+		},
+		{
+			name: 'Small',
+			slug: 'small',
+			size: '0.75rem',
+		},
+		{
+			name: 'Normal',
+			slug: 'normal',
+			size: '1rem',
+		},
+		{
+			name: 'Large',
+			slug: 'large',
+			size: '2.5rem',
+		},
+		{
+			name: 'Extra Large',
+			slug: 'extra-large',
+			size: '3.5rem',
+		},
+		{
+			name: 'Huge',
+			slug: 'huge',
+			size: '3.8rem',
+		},
+	];
+	const showMoreFontSizes = boolean( 'Add more font sizes', false );
+	const addComplexCssValues = boolean(
+		'Add some complex css values(calc, var, etc..)',
+		true
+	);
+	const addAliases = boolean(
+		'Add aliases to font sizes - used depending the number of available options and whether they contain complex css values',
+		true
+	);
+
+	const _options = options.map( ( option, index ) => {
+		const _option = { ...option };
+		if ( addAliases ) {
+			_option.alias = aliases[ index ];
+		}
+		// Adding just one complex css value is enough (first element);
+		if ( addComplexCssValues && ! index ) {
+			_option.size = 'clamp(1.75rem, 3vw, 2.25rem)';
+		}
+		return _option;
+	} );
+
+	const fontSizes = _options.slice(
+		0,
+		showMoreFontSizes ? _options.length : 5
+	);
+	return (
+		<div style={ { maxWidth: '248px' } }>
+			<FontSizePickerWithState
+				fontSizes={ fontSizes }
+				initialValue={ '1rem' }
+			/>
+		</div>
+	);
+};

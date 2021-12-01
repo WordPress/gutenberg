@@ -50,19 +50,21 @@ export function isSimpleCssValue( value ) {
  * @param {boolean}  useSelectControl       Whether to use a select control.
  * @param {Object[]} optionsArray           Array of available font sizes objects.
  * @param {*}        disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
+ * @param {boolean}  shouldUseAliases       Flag for using `alias` in ToggleGroupControl - if applicable.
  * @return {Object[]|null} Array of font sizes in proper format for the used control.
  */
 export function getFontSizeOptions(
 	useSelectControl,
 	optionsArray,
-	disableCustomFontSizes
+	disableCustomFontSizes,
+	shouldUseAliases
 ) {
 	if ( disableCustomFontSizes && ! optionsArray.length ) {
 		return null;
 	}
 	return useSelectControl
 		? getSelectOptions( optionsArray, disableCustomFontSizes )
-		: getToggleGroupOptions( optionsArray );
+		: getToggleGroupOptions( optionsArray, shouldUseAliases );
 }
 
 function getSelectOptions( optionsArray, disableCustomFontSizes ) {
@@ -80,10 +82,10 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	} ) );
 }
 
-function getToggleGroupOptions( optionsArray ) {
-	return optionsArray.map( ( { slug, size, name } ) => {
-		let label = size;
-		if ( typeof size === 'string' ) {
+function getToggleGroupOptions( optionsArray, shouldUseAliases ) {
+	return optionsArray.map( ( { slug, size, name, alias } ) => {
+		let label = shouldUseAliases ? alias : size;
+		if ( ! shouldUseAliases && typeof size === 'string' ) {
 			const [ numericValue ] = splitValueAndUnitFromSize( size );
 			label = numericValue;
 		}
