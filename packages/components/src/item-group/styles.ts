@@ -10,7 +10,7 @@ import { CONFIG, COLORS } from '../utils';
 
 export const unstyledButton = css`
 	appearance: none;
-	border: 1px solid transparent;
+	border: 0;
 	cursor: pointer;
 	background: none;
 	text-align: left;
