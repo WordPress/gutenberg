@@ -123,6 +123,8 @@ function gutenberg_edit_site_list_init( $settings ) {
 			wp_json_encode( $settings )
 		)
 	);
+
+	do_action( 'enqueue_block_editor_assets' );
 }
 
 /**
