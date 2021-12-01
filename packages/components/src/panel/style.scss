@@ -28,6 +28,11 @@
 	&.is-opened {
 		padding: $grid-unit-20;
 	}
+
+	// Don't cascade the padding into nested panels.
+	.components-panel__body {
+		padding: 0;
+	}
 }
 
 .components-panel__header {
