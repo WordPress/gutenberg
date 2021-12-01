@@ -7,10 +7,6 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { useCx } from '../utils/hooks/use-cx';
-
-/**
- * Internal dependencies
- */
 import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import * as styles from './styles';
 import type { MenuGroupProps } from './types';
