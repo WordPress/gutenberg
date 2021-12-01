@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
@@ -14,16 +14,10 @@ import importReusableBlock from '../../utils/import';
 function ImportForm( { instanceId, onUpload } ) {
 	const inputId = 'list-reusable-blocks-import-form-' + instanceId;
 
-	let isStillMounted = true;
+	const formRef = useRef();
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ error, setError ] = useState( null );
 	const [ file, setFile ] = useState( null );
-
-	useEffect( () => {
-		return function () {
-			isStillMounted = false;
-		};
-	}, [] );
 
 	const onChangeFile = ( event ) => {
 		setFile( event.target.files[ 0 ] );
@@ -38,7 +32,7 @@ function ImportForm( { instanceId, onUpload } ) {
 		setIsLoading( { isLoading: true } );
 		importReusableBlock( file )
 			.then( ( reusableBlock ) => {
-				if ( ! isStillMounted ) {
+				if ( ! formRef ) {
 					return;
 				}
 
@@ -46,7 +40,7 @@ function ImportForm( { instanceId, onUpload } ) {
 				onUpload( reusableBlock );
 			} )
 			.catch( ( errors ) => {
-				if ( ! isStillMounted ) {
+				if ( ! formRef ) {
 					return;
 				}
 
@@ -75,6 +69,7 @@ function ImportForm( { instanceId, onUpload } ) {
 		<form
 			className="list-reusable-blocks-import-form"
 			onSubmit={ onSubmit }
+			ref={ formRef }
 		>
 			{ error && (
 				<Notice status="error" onRemove={ () => onDismissError() }>
