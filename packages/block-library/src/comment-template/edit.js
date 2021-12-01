@@ -34,10 +34,13 @@ function CommentTemplateInnerBlocks( {
 	setActiveBlockContext,
 	blocks,
 } ) {
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	const { children, ...innerBlocksProps } = useInnerBlocksProps(
+		{},
+		{ template: TEMPLATE }
+	);
 	return (
 		<li { ...innerBlocksProps }>
-			{ innerBlocksProps.children }
+			{ children }
 			{ comments.length > 0 ? (
 				<RenderComments
 					blockContexts={ comments }
