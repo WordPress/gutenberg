@@ -3,7 +3,7 @@
  */
 import { isString, isObject } from 'lodash';
 
-/** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
+/** @typedef {string | { display: string, ariaLabel: string } | undefined } Shortcut */
 /**
  * @typedef Props
  * @property {Shortcut} shortcut    Shortcut configuration
