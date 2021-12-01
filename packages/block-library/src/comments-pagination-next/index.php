@@ -12,7 +12,7 @@
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
  *
- * @return string Returns the next posts link for the query pagination.
+ * @return string Returns the next comments link for the query pagination.
  */
 function render_block_core_comments_pagination_next( $attributes, $content, $block ) {
 	$comments_per_page = isset( $block->context['queryPerPage'] ) ? $block->context['queryPerPage'] : 4;

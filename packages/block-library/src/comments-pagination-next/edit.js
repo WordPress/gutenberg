@@ -17,27 +17,28 @@ export default function CommentsPaginationNextEdit( {
 } ) {
 	const displayArrow = arrowMap[ paginationArrow ];
 	return (
-		<div { ...useBlockProps() }>
-			<a
-				href="#comments-pagination-next-pseudo-link"
-				onClick={ ( event ) => event.preventDefault() }
-			>
-				<PlainText
-					__experimentalVersion={ 2 }
-					tagName="span"
-					aria-label={ __( 'Next comments page link' ) }
-					placeholder={ __( 'Next Comments' ) }
-					value={ label }
-					onChange={ ( newLabel ) =>
-						setAttributes( { label: newLabel } )
-					}
-				/>
-				{ displayArrow && (
-					<span className={ `wp-block-query-pagination-next-arrow` }>
-						{ displayArrow }
-					</span>
-				) }
-			</a>
-		</div>
+		<a
+			href="#comments-pagination-next-pseudo-link"
+			onClick={ ( event ) => event.preventDefault() }
+			{ ...useBlockProps() }
+		>
+			<PlainText
+				__experimentalVersion={ 2 }
+				tagName="span"
+				aria-label={ __( 'Next comments page link' ) }
+				placeholder={ __( 'Next Comments' ) }
+				value={ label }
+				onChange={ ( newLabel ) =>
+					setAttributes( { label: newLabel } )
+				}
+			/>
+			{ displayArrow && (
+				<span
+					className={ `wp-block-query-pagination-next-arrow is-arrow-${ paginationArrow }` }
+				>
+					{ displayArrow }
+				</span>
+			) }
+		</a>
 	);
 }
