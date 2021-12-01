@@ -28,10 +28,23 @@ const TEMPLATE = [
 	[ 'core/comment-edit-link' ],
 ];
 
+/**
+ * Component which renders the inner blocks of the Comment Template.
+ *
+ * @param {Object} props                         Component props.
+ * @param {Array}  [props.blockContext]          - A comment object.
+ * @param {Array}  [props.activeBlockContext]    - The block that is currently active.
+ * @param {Array}  [props.setActiveBlockContext] - The setter for activeBlockContext.
+ * @param {Array}  [props.firstBlock]            - First comment in the array.
+ * @param {Array}  [props.blocks]                - Array of blocks returned from
+ *                                               getBlocks() in parent .
+ * @return {WPElement}                 		Inner blocks of the Comment Template
+ */
 function CommentTemplateInnerBlocks( {
-	comments,
+	blockContext,
 	activeBlockContext,
 	setActiveBlockContext,
+	firstBlock,
 	blocks,
 } ) {
 	const { children, ...innerBlocksProps } = useInnerBlocksProps(
@@ -40,10 +53,20 @@ function CommentTemplateInnerBlocks( {
 	);
 	return (
 		<li { ...innerBlocksProps }>
-			{ children }
-			{ comments.length > 0 ? (
+			{ blockContext === ( activeBlockContext || firstBlock ) ? (
+				children
+			) : (
+				<BlockPreview
+					blocks={ blocks }
+					__experimentalLive
+					__experimentalOnClick={ () =>
+						setActiveBlockContext( blockContext )
+					}
+				/>
+			) }
+			{ blockContext?.children?.length > 0 ? (
 				<CommentsList
-					blockContexts={ comments }
+					blockContexts={ blockContext.children }
 					activeBlockContext={ activeBlockContext }
 					setActiveBlockContext={ setActiveBlockContext }
 					blocks={ blocks }
@@ -54,8 +77,7 @@ function CommentTemplateInnerBlocks( {
 }
 
 /**
- * Component that renders a list of (nested) comments. It is called recursively
- * in its own body.
+ * Component that renders a list of (nested) comments. It is called recursively.
  *
  * @param {Object} props                         Component props.
  * @param {Array}  [props.blockProps]            - Props from parent's `useBlockProps()`.
@@ -80,35 +102,13 @@ const CommentsList = ( {
 					key={ blockContext.commentId }
 					value={ blockContext }
 				>
-					{ blockContext ===
-					( activeBlockContext || blockContexts[ 0 ] ) ? (
-						<CommentTemplateInnerBlocks
-							comments={ blockContext.children }
-							activeBlockContext={ activeBlockContext }
-							setActiveBlockContext={ setActiveBlockContext }
-							blocks={ blocks }
-						/>
-					) : (
-						<li>
-							<BlockPreview
-								blocks={ blocks }
-								__experimentalLive
-								__experimentalOnClick={ () =>
-									setActiveBlockContext( blockContext )
-								}
-							/>
-							{ blockContext.children.length > 0 ? (
-								<CommentsList
-									blockContexts={ blockContext.children }
-									activeBlockContext={ activeBlockContext }
-									setActiveBlockContext={
-										setActiveBlockContext
-									}
-									blocks={ blocks }
-								/>
-							) : null }
-						</li>
-					) }
+					<CommentTemplateInnerBlocks
+						blockContext={ blockContext }
+						activeBlockContext={ activeBlockContext }
+						setActiveBlockContext={ setActiveBlockContext }
+						blocks={ blocks }
+						firstBlock={ blockContexts[ 0 ] }
+					/>
 				</BlockContextProvider>
 			) ) }
 	</ol>
