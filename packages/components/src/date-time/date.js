@@ -12,13 +12,40 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
  * WordPress dependencies
  */
 import { Component, createRef, useEffect, useRef } from '@wordpress/element';
-import { isRTL, _n, sprintf } from '@wordpress/i18n';
+import { isRTL, _n, __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { Tooltip } from '../';
 
 /**
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
+
+function renderTooltipContent( events ) {
+	const needToPrune = events.length > 4;
+	const eventsToRender = needToPrune ? events.slice( 0, 3 ) : events;
+	if ( needToPrune ) {
+		eventsToRender.push( {
+			title: __( '…and more' ),
+		} );
+	}
+
+	return (
+		<div className="components-datetime__date-day-events">
+			<ul>
+				{ eventsToRender.map( ( event, ind ) => (
+					<li key={ `event-${ ind }` }>
+						{ event.title || __( 'No title' ) }
+					</li>
+				) ) }
+			</ul>
+		</div>
+	);
+}
 
 function DatePickerDay( { day, events = [] } ) {
 	const ref = useRef();
@@ -65,7 +92,15 @@ function DatePickerDay( { day, events = [] } ) {
 				'has-events': events?.length,
 			} ) }
 		>
-			{ day.format( 'D' ) }
+			{ events?.length ? (
+				<Tooltip text={ renderTooltipContent( events ) }>
+					<div className="components-datetime__date__day">
+						{ day.format( 'D' ) }
+					</div>
+				</Tooltip>
+			) : (
+				day.format( 'D' )
+			) }
 		</div>
 	);
 }
