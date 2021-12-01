@@ -189,10 +189,10 @@ module.exports = {
 				test: /\.[tj]sx?$/,
 				exclude: /node_modules/,
 				use: [
-					// {
-					// 	loader: require.resolve( 'thread-loader' ),
-					// 	options: workerOptions,
-					// },
+					{
+						loader: require.resolve( 'thread-loader' ),
+						options: workerOptions,
+					},
 					{
 						loader: require.resolve( 'babel-loader' ),
 						options: {
@@ -279,7 +279,10 @@ module.exports = {
 			),
 		} ),
 		mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
-		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
+		new DependencyExtractionWebpackPlugin( {
+			injectPolyfill: ( entrypointName ) =>
+				entrypointName.endsWith( '/index' ),
+		} ),
 		new MiniCSSExtractPlugin( {
 			filename: ( pathData ) => {
 				if (

@@ -170,7 +170,12 @@ class DependencyExtractionWebpackPlugin {
 		] of compilation.entrypoints.entries() ) {
 			const entrypointExternalizedWpDeps = new Set();
 			if ( injectPolyfill ) {
-				entrypointExternalizedWpDeps.add( 'wp-polyfill' );
+				if (
+					typeof injectPolyfill !== 'function' ||
+					injectPolyfill( entrypointName, entrypoint )
+				) {
+					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
+				}
 			}
 
 			const processModule = ( { userRequest } ) => {
