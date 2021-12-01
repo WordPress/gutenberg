@@ -462,7 +462,6 @@ if ( ! function_exists( '_remove_theme_attribute_in_block_template_content' ) ) 
 	 */
 	function _remove_theme_attribute_in_block_template_content( $template_content ) {
 		$has_updated_content = false;
-		$new_content         = '';
 		$template_blocks     = parse_blocks( $template_content );
 
 		$blocks = _flatten_blocks( $template_blocks );

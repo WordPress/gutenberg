@@ -453,7 +453,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * Prepare a single template output for response
 	 *
 	 * @param Gutenberg_Block_Template $template Template instance.
-	 * @param WP_REST_Request   $request Request object.
+	 * @param WP_REST_Request          $request Request object.
 	 *
 	 * @return WP_REST_Response $data
 	 */

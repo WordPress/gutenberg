@@ -11,9 +11,8 @@
  * @package gutenberg
  */
 
-
 // Only run any of the code in this file if the version is less than 5.9.
-// wp_is_block_template_theme was introduced in 5.9
+// wp_is_block_template_theme was introduced in 5.9.
 if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
 	/**
 	 * Registers block editor 'wp_template_part' post type.
