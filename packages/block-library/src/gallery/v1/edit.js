@@ -24,10 +24,8 @@ import {
 	ToggleControl,
 	withNotices,
 	RangeControl,
-	ToolbarButton,
 } from '@wordpress/components';
 import {
-	BlockControls,
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
@@ -53,7 +51,6 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
-import UpdateGalleryModal from './update-gallery-modal';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -102,13 +99,10 @@ function GalleryEdit( props ) {
 		mediaUpload,
 		getMedia,
 		wasBlockJustInserted,
-		__unstableGalleryWithImageBlocks,
 	} = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 
 		return {
-			__unstableGalleryWithImageBlocks:
-				settings.__unstableGalleryWithImageBlocks,
 			imageSizes: settings.imageSizes,
 			mediaUpload: settings.mediaUpload,
 			getMedia: select( coreStore ).getMedia,
@@ -414,10 +408,6 @@ function GalleryEdit( props ) {
 		/>
 	);
 
-	const [ isUpdateOpen, setUpdateOpen ] = useState( false );
-	const openUpdateModal = () => setUpdateOpen( true );
-	const closeUpdateModal = () => setUpdateOpen( false );
-
 	const blockProps = useBlockProps();
 
 	if ( ! hasImages ) {
@@ -466,24 +456,7 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ /* TODO: Remove platform condition when native conversion is ready */ }
-			{ Platform.isWeb && __unstableGalleryWithImageBlocks && (
-				<BlockControls group="other">
-					<ToolbarButton
-						onClick={ openUpdateModal }
-						title={ __( 'Update' ) }
-						label={ __( 'Update to the new gallery format' ) }
-					>
-						{ __( 'Update' ) }
-					</ToolbarButton>
-				</BlockControls>
-			) }
-			{ Platform.isWeb && isUpdateOpen && (
-				<UpdateGalleryModal
-					onClose={ closeUpdateModal }
-					clientId={ clientId }
-				/>
-			) }
+
 			{ noticeUI }
 			<Gallery
 				{ ...props }

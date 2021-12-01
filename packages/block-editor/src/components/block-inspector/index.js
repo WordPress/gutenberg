@@ -122,7 +122,6 @@ const BlockInspectorSingleBlock = ( {
 						<BlockStyles
 							scope="core/edit-post"
 							clientId={ clientId }
-							className="block-inspector__block-styles"
 						/>
 						{ hasBlockSupport(
 							blockName,
