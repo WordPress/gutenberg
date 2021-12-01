@@ -259,10 +259,10 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		const files = getFilesFromDataTransfer( event.dataTransfer );
 		const html = event.dataTransfer.getData( 'text/html' );
 
-		if ( files.length ) {
-			_onFilesDrop( files );
-		} else if ( html ) {
+		if ( html ) {
 			_onHTMLDrop( html );
+		} else if ( files.length ) {
+			_onFilesDrop( files );
 		} else {
 			_onDrop( event );
 		}
