@@ -7,7 +7,7 @@ import { useMemoOne } from 'use-memo-one';
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
-import { useRef, useCallback, useReducer, useMemo } from '@wordpress/element';
+import { useRef, useCallback, useReducer } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
@@ -27,20 +27,20 @@ const renderQueue = createQueue();
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @param {Function|StoreDescriptor|string} _mapSelect Function called on every state change. The
- *                                                     returned value is exposed to the component
- *                                                     implementing this hook. The function receives
- *                                                     the `registry.select` method on the first
- *                                                     argument and the `registry` on the second
- *                                                     argument.
- *                                                     When a store key is passed, all selectors for
- *                                                     the store will be returned. This is only meant
- *                                                     for usage of these selectors in event
- *                                                     callbacks, not for data needed to create the
- *                                                     element tree.
- * @param {Array}                           deps       If provided, this memoizes the mapSelect so the
- *                                                     same `mapSelect` is invoked on every state
- *                                                     change unless the dependencies change.
+ * @param {Function|StoreDescriptor|string} mapSelect Function called on every state change. The
+ *                                                    returned value is exposed to the component
+ *                                                    implementing this hook. The function receives
+ *                                                    the `registry.select` method on the first
+ *                                                    argument and the `registry` on the second
+ *                                                    argument.
+ *                                                    When a store key is passed, all selectors for
+ *                                                    the store will be returned. This is only meant
+ *                                                    for usage of these selectors in event
+ *                                                    callbacks, not for data needed to create the
+ *                                                    element tree.
+ * @param {Array}                           deps      If provided, this memoizes the mapSelect so the
+ *                                                    same `mapSelect` is invoked on every state
+ *                                                    change unless the dependencies change.
  *
  * @example
  * ```js
@@ -88,14 +88,24 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( _mapSelect, deps ) {
-	const isWithoutMapping = typeof _mapSelect !== 'function';
+export default function useSelect( mapSelect, deps = [] ) {
+	const hasMappingFunction = 'function' === typeof mapSelect;
 
-	if ( isWithoutMapping ) {
+	// If we're recalling a store by its name or by
+	// its descriptor then we won't be caching the
+	// calls to `mapSelect` because we won't be calling it.
+	if ( ! hasMappingFunction ) {
 		deps = [];
 	}
 
-	const mapSelect = useCallback( _mapSelect, deps );
+	// Because of the "rule of hooks" we have to call `useCallback`
+	// on every invocation whether or not we have a real function
+	// for `mapSelect`. we'll create this intermediate variable to
+	// fulfill that need and then reference it with our "real"
+	// `_mapSelect` if we can.
+	const callbackMapper = useCallback( mapSelect, deps );
+	const _mapSelect = hasMappingFunction ? callbackMapper : null;
+
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 	// React can sometimes clear the `useMemo` cache.
@@ -110,7 +120,7 @@ export default function useSelect( _mapSelect, deps ) {
 	const latestMapOutputError = useRef();
 	const isMountedAndNotUnsubscribing = useRef();
 
-	// Keep track of the stores being selected in the mapSelect function,
+	// Keep track of the stores being selected in the _mapSelect function,
 	// and only subscribe to those stores later.
 	const listeningStores = useRef( [] );
 	const trapSelect = useCallback(
@@ -122,46 +132,39 @@ export default function useSelect( _mapSelect, deps ) {
 		[ registry ]
 	);
 
-	// Generate a "flag" for used in the effect dependency array.
-	// It's different than just using `mapSelect` since deps could be undefined,
-	// in that case, we would still want to memoize it.
-	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
-
 	let mapOutput;
 
-	if ( ! isWithoutMapping ) {
-		try {
-			if (
-				latestMapSelect.current !== mapSelect ||
-				latestMapOutputError.current
-			) {
+	if ( _mapSelect ) {
+		mapOutput = latestMapOutput.current;
+		const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
+		const lastMapSelectFailed = !! latestMapOutputError.current;
+
+		if ( hasReplacedMapSelect || lastMapSelectFailed ) {
+			try {
 				mapOutput = trapSelect( () =>
-					mapSelect( registry.select, registry )
+					_mapSelect( registry.select, registry )
 				);
-			} else {
-				mapOutput = latestMapOutput.current;
-			}
-		} catch ( error ) {
-			let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+			} catch ( error ) {
+				let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
-			if ( latestMapOutputError.current ) {
-				errorMessage += `\nThe error may be correlated with this previous error:\n`;
-				errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
-				errorMessage += 'Original stack trace:';
-			}
+				if ( latestMapOutputError.current ) {
+					errorMessage += `\nThe error may be correlated with this previous error:\n`;
+					errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
+					errorMessage += 'Original stack trace:';
+				}
 
-			// eslint-disable-next-line no-console
-			console.error( errorMessage );
-			mapOutput = latestMapOutput.current;
+				// eslint-disable-next-line no-console
+				console.error( errorMessage );
+			}
 		}
 	}
 
 	useIsomorphicLayoutEffect( () => {
-		if ( isWithoutMapping ) {
+		if ( ! hasMappingFunction ) {
 			return;
 		}
 
-		latestMapSelect.current = mapSelect;
+		latestMapSelect.current = _mapSelect;
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
 		isMountedAndNotUnsubscribing.current = true;
@@ -177,7 +180,7 @@ export default function useSelect( _mapSelect, deps ) {
 	} );
 
 	useIsomorphicLayoutEffect( () => {
-		if ( isWithoutMapping ) {
+		if ( ! hasMappingFunction ) {
 			return;
 		}
 
@@ -227,7 +230,7 @@ export default function useSelect( _mapSelect, deps ) {
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry, trapSelect, depsChangedFlag, isWithoutMapping ] );
+	}, [ registry, trapSelect, deps, hasMappingFunction ] );
 
-	return isWithoutMapping ? registry.select( _mapSelect ) : mapOutput;
+	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
