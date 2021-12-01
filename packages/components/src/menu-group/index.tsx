@@ -62,7 +62,7 @@ function MenuGroup(
  *
  * @example
  * ```jsx
- * import { MenuGroup } from `@wordpress/components`
+ * import { MenuGroup, MenuItem } from `@wordpress/components`
  *
  * function Example() {
  *   return (
