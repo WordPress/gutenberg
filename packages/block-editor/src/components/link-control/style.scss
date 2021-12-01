@@ -198,7 +198,10 @@ $preview-image-height: 140px;
 		// See: https://github.com/WordPress/gutenberg/issues/33586#issuecomment-888921188
 		white-space: pre-wrap;
 		overflow-wrap: break-word;
-		word-break: break-all;
+
+		.block-editor-link-control__search-item-info {
+			word-break: break-all;
+		}
 	}
 
 	&.is-preview .block-editor-link-control__search-item-header {
