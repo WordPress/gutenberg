@@ -101,7 +101,7 @@ function gutenberg_experiments_editor_settings( $settings ) {
 	// This bypass needs to remain in place until this is resolved and a patch released.
 	// https://core.trac.wordpress.org/ticket/54130.
 	$experiments_settings = array(
-		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1,
+		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1 || is_wp_version_compatible( '5.9' ),
 	);
 	return array_merge( $settings, $experiments_settings );
 }
