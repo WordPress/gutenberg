@@ -7,7 +7,7 @@ import { kebabCase } from 'lodash';
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 
@@ -64,6 +64,7 @@ function Option( {
 } ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = isGradient ? element.gradient : element.color;
+
 	return (
 		<PaletteItem
 			as="div"
@@ -240,8 +241,8 @@ export default function PaletteEdit( {
 		editingElement &&
 		elements[ editingElement ] &&
 		! elements[ editingElement ].slug;
-
-	const hasElements = elements.length > 0;
+	const elementsLength = elements.length;
+	const hasElements = elementsLength > 0;
 
 	return (
 		<PaletteEditStyles>
@@ -270,13 +271,18 @@ export default function PaletteEdit( {
 									: __( 'Add color' )
 							}
 							onClick={ () => {
+								const tempOptionName = sprintf(
+									/* translators: %s: is a temporary id for a custom color */
+									__( 'Color %s ' ),
+									elementsLength + 1
+								);
 								onChange( [
 									...elements,
 									{
 										...( isGradient
 											? { gradient: DEFAULT_GRADIENT }
 											: { color: '#000' } ),
-										name: '',
+										name: tempOptionName,
 										slug: '',
 									},
 								] );

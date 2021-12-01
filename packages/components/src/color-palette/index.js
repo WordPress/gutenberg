@@ -5,6 +5,7 @@ import { map } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -117,6 +118,7 @@ export default function ColorPalette( {
 	onChange,
 	value,
 	__experimentalHasMultipleOrigins = false,
+	__experimentalIsRenderedInSidebar = false,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 	const Component = __experimentalHasMultipleOrigins
@@ -135,7 +137,12 @@ export default function ColorPalette( {
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
 				<Dropdown
-					contentClassName="components-color-palette__custom-color-dropdown-content"
+					contentClassName={ classnames(
+						'components-color-palette__custom-color-dropdown-content',
+						{
+							'is-rendered-in-sidebar': __experimentalIsRenderedInSidebar,
+						}
+					) }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<button

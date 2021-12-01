@@ -30,10 +30,7 @@ import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
-const BlockInspector = ( {
-	showNoBlockSelectedMessage = true,
-	bubblesVirtually = true,
-} ) => {
+const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const {
 		count,
 		hasBlockStyles,
@@ -69,7 +66,7 @@ const BlockInspector = ( {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+				<InspectorControls.Slot />
 			</div>
 		);
 	}
@@ -100,7 +97,6 @@ const BlockInspector = ( {
 			clientId={ selectedBlockClientId }
 			blockName={ blockType.name }
 			hasBlockStyles={ hasBlockStyles }
-			bubblesVirtually={ bubblesVirtually }
 		/>
 	);
 };
@@ -109,7 +105,6 @@ const BlockInspectorSingleBlock = ( {
 	clientId,
 	blockName,
 	hasBlockStyles,
-	bubblesVirtually,
 } ) => {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
@@ -122,7 +117,6 @@ const BlockInspectorSingleBlock = ( {
 						<BlockStyles
 							scope="core/edit-post"
 							clientId={ clientId }
-							className="block-inspector__block-styles"
 						/>
 						{ hasBlockSupport(
 							blockName,
@@ -132,31 +126,28 @@ const BlockInspectorSingleBlock = ( {
 					</PanelBody>
 				</div>
 			) }
-			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+			<InspectorControls.Slot />
 			<InspectorControls.Slot
 				__experimentalGroup="typography"
-				bubblesVirtually={ bubblesVirtually }
 				label={ __( 'Typography' ) }
 			/>
 			<InspectorControls.Slot
 				__experimentalGroup="border"
-				bubblesVirtually={ bubblesVirtually }
 				label={ __( 'Border' ) }
 			/>
 			<InspectorControls.Slot
 				__experimentalGroup="dimensions"
-				bubblesVirtually={ bubblesVirtually }
 				label={ __( 'Dimensions' ) }
 			/>
 			<div>
-				<AdvancedControls bubblesVirtually={ bubblesVirtually } />
+				<AdvancedControls />
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);
 };
 
-const AdvancedControls = ( { bubblesVirtually } ) => {
+const AdvancedControls = () => {
 	const slot = useSlot( InspectorAdvancedControls.slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
@@ -170,10 +161,7 @@ const AdvancedControls = ( { bubblesVirtually } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorControls.Slot
-				__experimentalGroup="advanced"
-				bubblesVirtually={ bubblesVirtually }
-			/>
+			<InspectorControls.Slot __experimentalGroup="advanced" />
 		</PanelBody>
 	);
 };

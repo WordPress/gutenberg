@@ -105,6 +105,7 @@ function ScreenBackgroundColor( { name } ) {
 				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
+				__experimentalIsRenderedInSidebar
 			/>
 		</>
 	);
