@@ -278,11 +278,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks = $block->inner_blocks;
 
-	// If `__unstableLocation` is defined and:
+	// If:
+	// - the gutenberg plugin is active
+	// - `__unstableLocation` is defined
 	// - we have menu items at the defined location
 	// - we don't have a relationship to a `wp_navigation` Post (via `navigationMenuId`).
 	// ...then create inner blocks from the classic menu assigned to that location.
 	if (
+		defined( 'IS_GUTENBERG_PLUGIN' ) &&
 		array_key_exists( '__unstableLocation', $attributes ) &&
 		! array_key_exists( 'navigationMenuId', $attributes ) &&
 		! empty( gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
