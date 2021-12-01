@@ -131,18 +131,22 @@ export default function CommentTemplateEdit( {
 				comments: getEntityRecords( 'root', 'comment', {
 					post: postId,
 					status: 'approve',
-					per_page: queryPerPage,
 					order: 'asc',
 				} ),
 				blocks: getBlocks( clientId ),
 			};
 		},
-		[ queryPerPage, postId, clientId ]
+		[ postId, clientId ]
 	);
 
-	const blockContexts = useMemo( () => convertToTree( comments ), [
-		comments,
-	] );
+	// We convert the flat list of comments to tree.
+	// Then, we show only a maximum of `queryPerPage` number of comments.
+	// This is because passing `per_page` to `getEntityRecords()` does not
+	// take into account nested comments.
+	const blockContexts = useMemo(
+		() => convertToTree( comments ).slice( 0, queryPerPage ),
+		[ comments, queryPerPage ]
+	);
 
 	if ( ! comments ) {
 		return (

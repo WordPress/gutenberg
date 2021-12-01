@@ -1,8 +1,8 @@
 /**
  *
- * This function converts a list of comment objects with a `parent` property to
- * a list of comment objects with a `children` property. The `children` property
- * is itself a list of comment objects.
+ * This function converts a flat list of comment objects with a `parent` property
+ * to a nested list of comment objects with a `children` property. The `children`
+ * property is itself a list of comment objects.
  *
  * @example
  * ```
