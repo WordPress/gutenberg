@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   The peer dependency constraint for ESLint has been updated from `^6 || ^7` to `^8`.
 -   The bundled `@typescript-eslint/eslint-plugin` dependency has been updated from requiring `^4.31.0` to requiring `^5.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
 -   The bundled `@typescript-eslint/parser` dependency has been updated from requiring `^4.31.0` to requiring `^5.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
 -   The bundled `eslint-config-prettier` dependency has been updated from requiring `^7.1.0` to requiring `^8.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
