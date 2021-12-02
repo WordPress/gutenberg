@@ -392,16 +392,21 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks = $block->inner_blocks;
 
+	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
+	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+		$attributes['ref'] = $attributes['navigationMenuId'];
+	}
+
 	// If:
 	// - the gutenberg plugin is active
 	// - `__unstableLocation` is defined
 	// - we have menu items at the defined location
-	// - we don't have a relationship to a `wp_navigation` Post (via `navigationMenuId`).
+	// - we don't have a relationship to a `wp_navigation` Post (via `ref`).
 	// ...then create inner blocks from the classic menu assigned to that location.
 	if (
 		defined( 'IS_GUTENBERG_PLUGIN' ) &&
 		array_key_exists( '__unstableLocation', $attributes ) &&
-		! array_key_exists( 'navigationMenuId', $attributes ) &&
+		! array_key_exists( 'ref', $attributes ) &&
 		! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
 	) {
 		$menu_items = block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] );
@@ -414,10 +419,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
 	}
 
-	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
-	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
-		$attributes['ref'] = $attributes['navigationMenuId'];
-	}
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
 		$navigation_post = get_post( $attributes['ref'] );
