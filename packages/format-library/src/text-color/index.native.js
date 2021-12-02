@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -12,12 +13,14 @@ import { BlockControls, useSetting } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { getActiveColors } from './inline.js';
 import { default as InlineColorUI } from './inline';
+import styles from './style.scss';
 
 const name = 'core/text-color';
 const title = __( 'Text color' );
@@ -89,30 +92,52 @@ function TextColorEdit( {
 		}
 	}, [ hasColorsToChoose, value ] );
 
+	const outlineStyle = usePreferredColorSchemeStyle(
+		styles[ 'components-inline-color__outline' ],
+		styles[ 'components-inline-color__outline--dark' ]
+	);
+
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
 	}
+
+	const isActiveStyle = {
+		...colorIndicatorStyle,
+		...( ! colorIndicatorStyle?.backgroundColor
+			? { backgroundColor: 'transparent' }
+			: {} ),
+		...styles[ 'components-inline-color--is-active' ],
+	};
+
+	const customContainerStyles =
+		styles[ 'components-inline-color__button-container' ];
 
 	return (
 		<>
 			<BlockControls>
 				<ToolbarGroup>
+					{ isActive && (
+						<View style={ outlineStyle } pointerEvents="none" />
+					) }
+
 					<ToolbarButton
 						name="text-color"
-						className="format-library-text-color-button"
 						isActive={ isActive }
 						icon={
 							<Icon
 								icon={ textColorIcon }
 								style={
 									colorIndicatorStyle?.color && {
-										color: colorIndicatorStyle?.color,
+										color: colorIndicatorStyle.color,
 									}
 								}
 							/>
 						}
 						title={ title }
-						extraProps={ { isActiveStyle: colorIndicatorStyle } }
+						extraProps={ {
+							isActiveStyle,
+							customContainerStyles,
+						} }
 						// If has no colors to choose but a color is active remove the color onClick
 						onClick={ onPressButton }
 					/>
