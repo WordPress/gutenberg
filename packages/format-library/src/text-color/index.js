@@ -17,6 +17,8 @@ import { removeFormat } from '@wordpress/rich-text';
  */
 import { default as InlineColorUI, getActiveColors } from './inline';
 
+export const transparentValue = 'rgba(0, 0, 0, 0)';
+
 const name = 'core/text-color';
 const title = __( 'Highlight' );
 
@@ -30,7 +32,7 @@ function getComputedStyleProperty( element, property ) {
 
 	if (
 		property === 'background-color' &&
-		value === 'rgba(0, 0, 0, 0)' &&
+		value === transparentValue &&
 		element.parentElement
 	) {
 		return getComputedStyleProperty( element.parentElement, property );
@@ -47,7 +49,7 @@ function fillComputedColors( element, { color, backgroundColor } ) {
 	return {
 		color: color || getComputedStyleProperty( element, 'color' ),
 		backgroundColor:
-			backgroundColor === 'rgba(0, 0, 0, 0)'
+			backgroundColor === transparentValue
 				? getComputedStyleProperty( element, 'background-color' )
 				: backgroundColor,
 	};

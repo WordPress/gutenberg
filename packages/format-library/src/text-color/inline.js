@@ -28,14 +28,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { textColor as settings } from './index';
+import { textColor as settings, transparentValue } from './index';
 
 function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
 			const [ property, value ] = rule.split( ':' );
 			if ( property === 'color' ) accumulator.color = value;
-			if ( property === 'background-color' )
+			if ( property === 'background-color' && value !== transparentValue )
 				accumulator.backgroundColor = value;
 		}
 		return accumulator;
