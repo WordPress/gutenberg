@@ -23,6 +23,7 @@ import './hooks';
 import { store as editSiteStore } from './store';
 import Editor from './components/editor';
 import List from './components/list';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -57,7 +58,15 @@ export function initializeEditor( id, settings ) {
 	const reboot = reinitializeEditor.bind( null, target, settings );
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+
+	addFilter(
+		'blocks.registerBlockType',
+		'core/edit-site/block-register',
+		addInsertersupportForTemplatePartBlock
+	);
 	registerCoreBlocks();
+	removeFilter( 'blocks.registerBlockType', 'core/edit-site/block-register' );
+
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: true,
@@ -68,6 +77,19 @@ export function initializeEditor( id, settings ) {
 		<Editor initialSettings={ settings } onError={ reboot } />,
 		target
 	);
+}
+
+function addInsertersupportForTemplatePartBlock( definition ) {
+	if ( definition.name === 'core/template-part' ) {
+		return {
+			...definition,
+			supports: {
+				...definition.supports,
+				inserter: true,
+			},
+		};
+	}
+	return definition;
 }
 
 /**
