@@ -462,7 +462,6 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 				textColor
 			)?.color;
 		}
-
 		if ( backgroundColor ) {
 			extraStyles.backgroundColor = getColorObjectByAttributeValues(
 				colors,
