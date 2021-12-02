@@ -1,5 +1,9 @@
 .block-editor__hooks-colors-panel {
 
+	.components-dropdown {
+		display: block;
+	}
+
 	// Allow horizontal overflow so the size-increasing color indicators don't cause a scrollbar.
 	.components-navigator-screen {
 		overflow-x: visible;
