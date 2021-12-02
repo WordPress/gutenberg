@@ -124,7 +124,8 @@ export default function GradientPicker( {
 			onChange={ onChange }
 			value={ value }
 			actions={
-				clearable && (
+				clearable &&
+				( gradients?.length || ! disableCustomGradients ) && (
 					<CircularOptionPicker.ButtonAction
 						onClick={ clearGradient }
 					>
