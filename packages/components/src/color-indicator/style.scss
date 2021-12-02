@@ -1,11 +1,8 @@
 .component-color-indicator {
-	width: 25px;
-	height: 16px;
-	margin-left: 0.8rem;
-	border: 1px solid #dadada;
+	width: $grid-unit-50 * 0.5;
+	height: $grid-unit-50 * 0.5;
+	border-radius: 50%;
+	border: $border-width solid $gray-300;
 	display: inline-block;
-
-	& + & {
-		margin-left: 0.5rem;
-	}
+	padding: 0;
 }
