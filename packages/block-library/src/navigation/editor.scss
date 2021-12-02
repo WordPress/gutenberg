@@ -20,6 +20,11 @@
 	}
 }
 
+.editor-styles-wrapper .wp-block-navigation.is-disabled,
+.editor-styles-wrapper .wp-block-navigation.is-disabled * {
+	cursor: not-allowed;
+}
+
 // The following rule affects the positioning of the dropdown arrow indicator.
 // On the frontend, this element is inline, which makes it look correct. In the editor,
 // the label is block, which causes the dropdown indicator to wrap onto a new line.
