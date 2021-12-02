@@ -37,7 +37,8 @@ function render_block_core_comments_pagination_numbers( $attributes, $content, $
 	$default_page = 'newest' === get_option( 'default_comments_page' ) ? 1 : $total;
 
 	// Get the current comment page from the URL.
-	$current = empty( $_GET['cpage'] ) ? $default_page : (int) $_GET['cpage'];
+	$cpage   = get_query_var( 'cpage' );
+	$current = ! $cpage ? $default_page : $cpage;
 
 	// Render links.
 	$content = paginate_comments_links(
