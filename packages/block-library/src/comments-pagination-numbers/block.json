@@ -3,7 +3,7 @@
 	"apiVersion": 2,
 	"name": "core/comments-pagination-numbers",
 	"title": "Comments Pagination Numbers",
-	"category": "design",
+  "category": "theme",
 	"parent": [ "core/comments-pagination" ],
 	"description": "Displays a list of page numbers for comments pagination.",
 	"textdomain": "default",
