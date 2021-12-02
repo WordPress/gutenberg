@@ -78,7 +78,7 @@ export function BorderColorEdit( props ) {
 				customBorderColor
 			)?.color
 		);
-	}, [ borderColor, customBorderColor ] );
+	}, [ borderColor, customBorderColor, availableColors ] );
 
 	const onChangeColor = ( value ) => {
 		setColorValue( value );
