@@ -14,8 +14,6 @@ module.exports = {
 		[ `@wordpress\\/(${ transpiledPackageNames.join(
 			'|'
 		) })$` ]: 'packages/$1/src',
-		// See https://github.com/facebook/jest/issues/11100#issuecomment-967161978
-		'@eslint/eslintrc': '@eslint/eslintrc/dist/eslintrc-universal.cjs',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
