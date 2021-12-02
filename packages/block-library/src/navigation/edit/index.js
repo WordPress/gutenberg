@@ -27,7 +27,11 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { EntityProvider, useEntityProp } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	useEntityProp,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -146,7 +150,13 @@ function Navigation( {
 		`navigationMenu/${ ref }`
 	);
 
-	const { innerBlocks, isInnerBlockSelected, hasSubmenus } = useSelect(
+	const {
+		canUserCreateNavigation,
+		canUserEditNavigationEntity,
+		innerBlocks,
+		isInnerBlockSelected,
+		hasSubmenus,
+	} = useSelect(
 		( select ) => {
 			const { getBlocks, hasSelectedInnerBlock } = select(
 				blockEditorStore
@@ -160,10 +170,20 @@ function Navigation( {
 				hasSubmenus: firstSubmenu,
 				innerBlocks: blocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
+				canUserCreateNavigation: select( coreStore ).canUser(
+					'create',
+					'navigation'
+				),
+				canUserEditNavigationEntity: ref
+					? select( coreStore ).canUser( 'edit', 'navigation', ref )
+					: false,
 			};
 		},
 		[ clientId ]
 	);
+
+	const userCanCreateNewNavigationBlock = ! ref && canUserCreateNavigation;
+
 	const hasExistingNavItems = !! innerBlocks.length;
 	const {
 		replaceInnerBlocks,
@@ -221,7 +241,7 @@ function Navigation( {
 				'background-color',
 				backgroundColor?.slug
 			) ]: !! backgroundColor?.slug,
-			'is-disabled': ! canUserEdit,
+			'is-disabled': ! canUserEditNavigationEntity,
 		} ),
 		style: {
 			color: ! textColor?.slug && textColor?.color,
@@ -353,7 +373,7 @@ function Navigation( {
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
 					) }
-					{ canUserEdit && (
+					{ canUserEditNavigationEntity && (
 						<Button onClick={ startWithEmptyMenu } variant="link">
 							{ __( 'Create a new menu?' ) }
 						</Button>
@@ -377,12 +397,15 @@ function Navigation( {
 		? CustomPlaceholder
 		: Placeholder;
 
-	const MaybeDisabledComponent = canUserEdit ? Fragment : Disabled;
+	const canUserUseBlock =
+		canUserEditNavigationEntity || userCanCreateNewNavigationBlock;
+
+	const MaybeDisabledComponent = canUserUseBlock ? Fragment : Disabled;
 
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider>
-				{ canUserEdit && (
+				{ canUserUseBlock && (
 					<BlockControls>
 						{ ! isDraftNavigationMenu && isEntityAvailable && (
 							<ToolbarGroup>
@@ -407,9 +430,9 @@ function Navigation( {
 					</BlockControls>
 				) }
 				{ listViewModal }
-				{ canUserEdit && (
+				{ canUserUseBlock && (
 					<InspectorControls>
-						{ hasSubmenuIndicatorSetting && canUserEdit && (
+						{ hasSubmenuIndicatorSetting && canUserUseBlock && (
 							<PanelBody title={ __( 'Display' ) }>
 								<h3>{ __( 'Overlay Menu' ) }</h3>
 								<ToggleGroupControl
@@ -419,7 +442,9 @@ function Navigation( {
 										'Collapses the navigation options in a menu icon opening an overlay.'
 									) }
 									onChange={ ( value ) =>
-										setAttributes( { overlayMenu: value } )
+										setAttributes( {
+											overlayMenu: value,
+										} )
 									}
 									isBlock
 									hideLabelFromVision
@@ -469,7 +494,7 @@ function Navigation( {
 								) }
 							</PanelBody>
 						) }
-						{ hasColorSettings && canUserEdit && (
+						{ hasColorSettings && canUserUseBlock && (
 							<PanelColorSettings
 								__experimentalHasMultipleOrigins
 								__experimentalIsRenderedInSidebar
@@ -520,7 +545,7 @@ function Navigation( {
 						) }
 					</InspectorControls>
 				) }
-				{ isEntityAvailable && canUserEdit && (
+				{ isEntityAvailable && canUserUseBlock && (
 					<InspectorControls __experimentalGroup="advanced">
 						<NavigationMenuNameControl />
 						<NavigationMenuDeleteControl
@@ -537,7 +562,7 @@ function Navigation( {
 					</InspectorControls>
 				) }
 				<nav { ...blockProps }>
-					{ isPlaceholderShown && canUserEdit && (
+					{ isPlaceholderShown && canUserUseBlock && (
 						<PlaceholderComponent
 							onFinish={ ( post ) => {
 								setIsPlaceholderShown( false );
@@ -583,7 +608,7 @@ function Navigation( {
 					) }
 				</nav>
 			</RecursionProvider>
-			{ ! canUserEdit && isSelected && (
+			{ ! canUserUseBlock && isSelected && (
 				<Warning>
 					{ __( 'You do not have permission to edit Navigation.' ) }
 				</Warning>
