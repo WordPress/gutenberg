@@ -219,12 +219,15 @@ export function ColorEdit( props ) {
 	const {
 		palette: solidsPerOrigin,
 		gradients: gradientsPerOrigin,
-		customGradient: areCustomGradientsEnabled,
-		custom: areCustomSolidsEnabled,
 		text: isTextEnabled,
 		background: isBackgroundEnabled,
 		link: isLinkEnabled,
 	} = useSetting( 'color' ) || {};
+
+	// The following color settings need to be accessed explicitly due to
+	// special handling for deprecated flags for these paths in `useSetting`.
+	const areCustomSolidsEnabled = useSetting( 'color.custom' );
+	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
 
 	const solidsEnabled =
 		areCustomSolidsEnabled ||
