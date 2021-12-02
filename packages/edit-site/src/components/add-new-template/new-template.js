@@ -30,8 +30,40 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'index',
 ];
 
+// The "Template Hierarchy" mapping from registered templates.
+// @see https://developer.wordpress.org/themes/basics/template-hierarchy/
+const TEMPLATE_HIERARCHY = {
+	'font-page': 'home',
+	home: 'index',
+	'single-post': 'single',
+	single: 'singular',
+	singular: 'index',
+	page: 'singular',
+	archive: 'category',
+	category: 'index',
+	search: 'index',
+	404: 'index',
+};
+
+function getFallbackTemplateContentFromHierarchy( templateSlug, templates ) {
+	const fallbackTemplateSlug = TEMPLATE_HIERARCHY[ templateSlug ] || 'index';
+
+	const fallbackTemplate = templates.find(
+		( template ) => template.slug === fallbackTemplateSlug
+	);
+
+	if ( ! fallbackTemplate ) {
+		return getFallbackTemplateContentFromHierarchy(
+			fallbackTemplateSlug,
+			templates
+		);
+	}
+
+	return fallbackTemplate.content.raw;
+}
+
 export default function NewTemplate( { postType } ) {
-	const { templates, defaultTemplateTypes } = useSelect(
+	const { templates, defaultTemplateTypes, defaultBlockTemplate } = useSelect(
 		( select ) => ( {
 			templates: select( coreStore ).getEntityRecords(
 				'postType',
@@ -41,6 +73,8 @@ export default function NewTemplate( { postType } ) {
 			defaultTemplateTypes: select(
 				editorStore
 			).__experimentalGetDefaultTemplateTypes(),
+			defaultBlockTemplate: select( editorStore ).getEditorSettings()
+				.defaultBlockTemplate,
 		} ),
 		[]
 	);
@@ -52,6 +86,10 @@ export default function NewTemplate( { postType } ) {
 				slug,
 			} );
 
+			const newTemplateContent =
+				defaultBlockTemplate ??
+				getFallbackTemplateContentFromHierarchy( slug, templates );
+
 			const template = await apiFetch( {
 				path: '/wp/v2/templates',
 				method: 'POST',
@@ -59,6 +97,7 @@ export default function NewTemplate( { postType } ) {
 					excerpt: description,
 					// Slugs need to be strings, so this is for template `404`
 					slug: slug.toString(),
+					content: newTemplateContent,
 					status: 'publish',
 					title,
 				},
