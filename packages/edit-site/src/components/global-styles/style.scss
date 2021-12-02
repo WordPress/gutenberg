@@ -34,6 +34,8 @@
 	margin: $grid-unit-20;
 
 	.component-color-indicator {
+		margin-left: 0;
+
 		// Show a diagonal line (crossed out) for empty swatches.
 		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 	}
