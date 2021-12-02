@@ -108,7 +108,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
 			);
 
 			$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-				? gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+				? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
 				: array();
 			$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
 
