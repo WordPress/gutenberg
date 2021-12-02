@@ -230,7 +230,10 @@ export default function useSelect( mapSelect, deps ) {
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry, trapSelect, hasMappingFunction, ...( deps || [] ) ] );
+		// If you're tempted to eliminate the spread dependencies below don't do it!
+		// We're passing these in from the calling function and want to make sure we're
+		// examining every individual value inside the `deps` array.
+	}, [ registry, trapSelect, hasMappingFunction, ...( deps ?? [] ) ] );
 
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
