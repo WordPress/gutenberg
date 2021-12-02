@@ -21,7 +21,6 @@ import {
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
 
 /* global wp */
 
@@ -102,6 +101,25 @@ function isMediaDestroyed( id ) {
 	return attachment.destroyed;
 }
 
+/**
+ * Runs an error callback if the image does not load.
+ * If the error callback is triggered, we infer that that image
+ * has been deleted.
+ *
+ * @param {string}   imageURL An image url for Image.src.
+ * @param {Function} onError  A callback function if image load errors.
+ */
+function checkImageStatus( imageURL, onError = () => {} ) {
+	if ( ! imageURL ) {
+		return;
+	}
+	const newImage = new window.Image();
+	newImage.src = imageURL;
+	newImage.addEventListener( 'error', function () {
+		onError();
+	} );
+}
+
 export function ImageEdit( {
 	attributes,
 	setAttributes,
@@ -124,8 +142,8 @@ export function ImageEdit( {
 		height,
 		sizeSlug,
 	} = attributes;
+
 	const [ temporaryURL, setTemporaryURL ] = useState();
-	const [ temporaryMediaId, setTemporaryMediaId ] = useState();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -143,31 +161,12 @@ export function ImageEdit( {
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
 
-	const mediaObject = useSelect(
-		( select ) => {
-			return select( coreStore ).getMedia( id );
-		},
-		[ id ]
-	);
-
-	// Also check for destroyed media when the image is selected,
-	// If the image is used elsewhere in a post,
-	// the onCloseModal callback won't fire.
-	// Also check on media object itself in case
-	// the page had reloaded and the media attachment collection state no longer exists.
+	// Check onload if the image exists.
 	useEffect( () => {
-		// If we can find the media in the store,
-		// remove the temporary one in state.
-		if ( temporaryMediaId && temporaryMediaId === mediaObject?.id ) {
-			setTemporaryMediaId( undefined );
-			return;
+		if ( url ) {
+			checkImageStatus( url, clearImageAttributes );
 		}
-		if ( isSelected && !! id && ! temporaryMediaId ) {
-			if ( isMediaDestroyed( id ) || ! mediaObject?.id ) {
-				clearImageAttributes();
-			}
-		}
-	}, [ isSelected, id, mediaObject?.id, temporaryMediaId ] );
+	}, [] );
 
 	function clearImageAttributes() {
 		setAttributes( {
@@ -204,10 +203,6 @@ export function ImageEdit( {
 		}
 
 		setTemporaryURL();
-
-		// Keep a record of the media object id in state
-		// until we can grab one from the store.
-		setTemporaryMediaId( media.id );
 
 		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
 
