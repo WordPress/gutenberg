@@ -407,7 +407,7 @@ export function ColorEdit( props ) {
 				<ItemGroup isBordered isSeparated>
 					{ ( hasBackgroundColor || hasGradientColor ) && (
 						<Dropdown
-							position="middle left"
+							contentClassName="block-editor__hooks-colors-panel__dropdown"
 							renderToggle={ ( { onToggle } ) => {
 								return (
 									<Item onClick={ onToggle }>
@@ -453,7 +453,7 @@ export function ColorEdit( props ) {
 					) }
 					{ hasTextColor && (
 						<Dropdown
-							position="middle left"
+							contentClassName="block-editor__hooks-colors-panel__dropdown"
 							renderToggle={ ( { onToggle } ) => (
 								<Item onClick={ onToggle }>
 									<HStack justify="flex-start">
@@ -486,7 +486,7 @@ export function ColorEdit( props ) {
 					) }
 					{ hasLinkColor && (
 						<Dropdown
-							position="middle left"
+							contentClassName="block-editor__hooks-colors-panel__dropdown"
 							renderToggle={ ( { onToggle } ) => (
 								<Item onClick={ onToggle }>
 									<HStack justify="flex-start">
