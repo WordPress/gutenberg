@@ -38,4 +38,40 @@
 	.block-editor-block-inspector & .components-base-control {
 		margin-bottom: inherit;
 	}
+
+	.components-dropdown {
+		display: block;
+	}
+
+	// Allow horizontal overflow so the size-increasing color indicators don't cause a scrollbar.
+	.components-navigator-screen {
+		overflow-x: visible;
+	}
+
 }
+
+@include break-medium() {
+	.block-editor-panel-color-gradient-settings__dropdown .components-popover__content {
+		margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 } !important;
+		margin-top: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+	}
+}
+
+.block-editor-panel-color-gradient-settings__item {
+	// @todo: this can be removed when https://github.com/WordPress/gutenberg/pull/37028 lands.
+	.component-color-indicator {
+		margin-left: 0;
+		display: block;
+		border-radius: 50%;
+		border: 0;
+		height: 24px;
+		width: 24px;
+		padding: 0;
+		background-image:
+			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
+			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
+		background-position: 0 0, 25px 25px;
+		background-size: calc(2 * 5px) calc(2 * 5px);
+	}
+}
+

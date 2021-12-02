@@ -7,7 +7,16 @@ import { every, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PanelBody, ColorIndicator } from '@wordpress/components';
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+	FlexItem,
+	ColorIndicator,
+	PanelBody,
+	Dropdown,
+} from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 
 /**
@@ -136,23 +145,54 @@ export const PanelColorGradientSettingsInner = ( {
 			title={ showTitle ? titleElement : undefined }
 			{ ...props }
 		>
-			{ settings.map( ( setting, index ) => (
-				<ColorGradientControl
-					showTitle={ showTitle }
-					key={ index }
-					{ ...{
-						colors,
-						gradients,
-						disableCustomColors,
-						disableCustomGradients,
-						__experimentalHasMultipleOrigins,
-						__experimentalIsRenderedInSidebar,
-						enableAlpha,
-						...setting,
-					} }
-				/>
-			) ) }
-			{ children }
+			<ItemGroup isBordered isSeparated>
+				{ settings.map( ( setting, index ) => (
+					<Dropdown
+						key={ index }
+						contentClassName="block-editor-panel-color-gradient-settings__dropdown"
+						renderToggle={ ( { onToggle } ) => {
+							return (
+								<Item
+									onClick={ onToggle }
+									className="block-editor-panel-color-gradient-settings__item"
+								>
+									<HStack justify="flex-start">
+										<FlexItem>
+											<ColorIndicator
+												colorValue={
+													setting.gradientValue ??
+													setting.colorValue
+												}
+											/>
+										</FlexItem>
+										<FlexItem>{ setting.label }</FlexItem>
+									</HStack>
+								</Item>
+							);
+						} }
+						renderContent={ () => (
+							<ColorGradientControl
+								showTitle={ false }
+								{ ...{
+									colors,
+									gradients,
+									disableCustomColors,
+									disableCustomGradients,
+									__experimentalHasMultipleOrigins,
+									__experimentalIsRenderedInSidebar,
+									enableAlpha,
+									...setting,
+								} }
+							/>
+						) }
+					/>
+				) ) }
+			</ItemGroup>
+			{ !! children && (
+				<>
+					<Spacer marginY={ 4 } /> { children }
+				</>
+			) }
 		</PanelBody>
 	);
 };
