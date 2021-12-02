@@ -25,7 +25,14 @@ import styles from './style.scss';
 const MAX_ITEM_WIDTH = 120;
 const HALF_COLUMN = 0.5;
 
-function StylePreview( { onPress, isActive, style, url } ) {
+function StylePreview( {
+	onPress,
+	isActive,
+	style,
+	url,
+	imageSource,
+	imageStyles,
+} ) {
 	const [ itemWidth, setItemWidth ] = useState( MAX_ITEM_WIDTH );
 	const { label, name } = style;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
@@ -88,8 +95,8 @@ function StylePreview( { onPress, isActive, style, url } ) {
 					{ isActive &&
 						getOutline( [ styles.outline, innerOutlineStyle ] ) }
 					<Image
-						style={ [ styles.image, styles[ name ] ] }
-						source={ { uri: url } }
+						style={ [ styles.image, styles[ name ], imageStyles ] }
+						source={ url ? { uri: url } : imageSource }
 					/>
 				</View>
 				<Text

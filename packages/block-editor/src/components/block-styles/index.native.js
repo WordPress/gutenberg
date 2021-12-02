@@ -20,7 +20,7 @@ import StylePreview from './preview';
 import containerStyles from './style.scss';
 import { store as blockEditorStore } from '../../store';
 
-function BlockStyles( { clientId, url } ) {
+function BlockStyles( { clientId, url, imageSources, imageStyles } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( blockEditorStore );
 		const { getBlockStyles } = select( blocksStore );
@@ -49,7 +49,7 @@ function BlockStyles( { clientId, url } ) {
 	const mappedRenderedStyles = useMemo( () => {
 		const activeStyle = getActiveStyle( renderedStyles, className );
 
-		return renderedStyles.map( ( style ) => {
+		return renderedStyles.map( ( style, idx ) => {
 			const styleClassName = replaceActiveStyle(
 				className,
 				activeStyle,
@@ -63,6 +63,8 @@ function BlockStyles( { clientId, url } ) {
 				} );
 			};
 
+			const imageSource = imageSources ? imageSources[ idx ] : null;
+
 			return (
 				<StylePreview
 					onPress={ onStylePress }
@@ -70,6 +72,8 @@ function BlockStyles( { clientId, url } ) {
 					key={ style.name }
 					style={ style }
 					url={ url }
+					imageSource={ imageSource }
+					imageStyles={ imageStyles }
 				/>
 			);
 		} );
