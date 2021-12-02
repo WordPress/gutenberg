@@ -21,6 +21,7 @@ import { CommentsPaginationArrowControls } from './comments-pagination-arrow-con
 const TEMPLATE = [
 	[ 'core/comments-pagination-numbers' ],
 	[ 'core/comments-pagination-next' ],
+	[ 'core/comments-pagination-previous' ],
 ];
 
 const getDefaultBlockLayout = ( blockTypeOrName ) => {
@@ -46,16 +47,17 @@ export default function QueryPaginationEdit( {
 		 * Comments Pagination Next block exists.
 		 */
 		return innerBlocks?.find( ( innerBlock ) => {
-			return [ 'core/comments-pagination-next' ].includes(
-				innerBlock.name
-			);
+			return [
+				'core/comments-pagination-next',
+				'core/comments-pagination-previous',
+			].includes( innerBlock.name );
 		} );
 	}, [] );
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		allowedBlocks: [
-			// TODO: add pagination-previous blocks once they are implemented.
+			'core/comments-pagination-previous',
 			'core/comments-pagination-numbers',
 			'core/comments-pagination-next',
 		],

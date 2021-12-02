@@ -4,7 +4,7 @@
 	"name": "core/comments-pagination-previous",
 	"title": "Comments Pagination Previous",
 	"category": "design",
-	"parent": [ "core/comments-query-loop" ],
+	"parent": [ "core/comments-pagination" ],
 	"description": "Displays the previous comments page link.",
 	"textdomain": "default",
 	"attributes": {
@@ -18,7 +18,6 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true,
 			"text": false
 		},
 		"typography": {

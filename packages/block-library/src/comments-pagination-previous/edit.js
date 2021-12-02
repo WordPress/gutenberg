@@ -15,13 +15,20 @@ export default function CommentsPaginationPreviousEdit( {
 	setAttributes,
 	context: { paginationArrow },
 } ) {
-	const displayArrow = arrowMap[ paginationArrow ] || arrowMap.none;
+	const displayArrow = arrowMap[ paginationArrow ];
 	return (
 		<div { ...useBlockProps() }>
 			<a
 				href="#comments-pagination-previous-pseudo-link"
 				onClick={ ( event ) => event.preventDefault() }
 			>
+				{ displayArrow && (
+					<span
+						className={ `wp-block-comments-pagination-previous-arrow is-arrow-${ paginationArrow }` }
+					>
+						{ displayArrow }
+					</span>
+				) }
 				<PlainText
 					__experimentalVersion={ 2 }
 					tagName="span"
@@ -32,13 +39,6 @@ export default function CommentsPaginationPreviousEdit( {
 						setAttributes( { label: newLabel } )
 					}
 				/>
-				{ displayArrow && (
-					<span
-						className={ `wp-block-query-pagination-previous-arrow` }
-					>
-						{ displayArrow }
-					</span>
-				) }
 			</a>
 		</div>
 	);
