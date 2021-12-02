@@ -135,11 +135,10 @@ function getEntries() {
 }
 
 const workerOptions = {
-	poolTimeout: Infinity,
+	// Only set the timeout to infinity in development mode to prevent it from hanging.
+	poolTimeout: mode !== 'production' ? Infinity : undefined,
 };
 
-// Only warm up the loader when in development mode to prevent it from hanging.
-// @see https://github.com/webpack-contrib/thread-loader/issues/122
 if ( mode !== 'production' ) {
 	threadLoader.warmup( workerOptions, [
 		require.resolve( 'babel-loader' ),
