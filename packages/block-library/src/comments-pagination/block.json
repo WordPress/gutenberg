@@ -20,7 +20,6 @@
 		"align": true,
 		"reusable": false,
 		"html": false,
-		"inserter": false,
 		"color": {
 			"gradients": true,
 			"link": true
