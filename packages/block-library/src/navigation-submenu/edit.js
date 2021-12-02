@@ -520,7 +520,7 @@ export default function NavigationSubmenuEdit( {
 					! selectedBlockHasDescendants ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				hasDescendants
-					? InnerBlocks.DefaultAppender
+					? InnerBlocks.ButtonBlockAppender
 					: false,
 		}
 	);
