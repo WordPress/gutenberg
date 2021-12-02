@@ -713,12 +713,17 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 function gutenberg_extend_block_editor_styles_html() {
 	global $pagenow;
 
+	$gs_css_vars = 'global-styles-css-custom-properties';
+	wp_register_style( $gs_css_vars, false, array(), true, true );
+	wp_add_inline_style( $gs_css_vars, wp_get_global_stylesheet( array( 'variables' ) ) );
+
 	$script_handles = array();
 	$style_handles  = array(
 		'wp-block-editor',
 		'wp-block-library',
 		'wp-block-library-theme',
 		'wp-edit-blocks',
+		$gs_css_vars,
 	);
 
 	if ( 'widgets.php' === $pagenow || 'customize.php' === $pagenow ) {
