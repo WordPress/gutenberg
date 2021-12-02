@@ -34,11 +34,13 @@ function render_block_core_comments_pagination_numbers( $attributes, $content, $
 	$total    = get_comment_pages_count( $comments, $per_page );
 
 	// Get the number of the default page.
-	$default_page = 'newest' === get_option( 'default_comments_page' ) ? 1 : $total;
+	$default_page = 'newest' === get_option( 'default_comments_page' ) ? $total : 1;
 
 	// Get the current comment page from the URL.
-	$cpage   = get_query_var( 'cpage' );
-	$current = ! $cpage ? $default_page : $cpage;
+	$current = get_query_var( 'cpage' );
+	if ( ! $current ) {
+		$current = $default_page;
+	}
 
 	// Render links.
 	$content = paginate_comments_links(
