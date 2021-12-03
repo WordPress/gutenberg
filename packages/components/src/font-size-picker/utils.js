@@ -18,8 +18,8 @@ const CUSTOM_FONT_SIZE_OPTION = {
  * In case we have at most five font sizes, where at least one the them
  * contain a complex css value(clamp, var, etc..) show a `T-shirt size`
  * alias as a label of the font size. We do this because complex css values
- * cannot be caluclated properly and the `T-shirt size` can help the user
- * better mentally map the different available font sizes.
+ * cannot be caluclated properly and the `T-shirt size` alias can help the
+ * user better mentally map the different available font sizes.
  */
 const FONT_SIZES_ALIASES = [ 'S', 'M', 'L', 'XL', 'XXL' ];
 
