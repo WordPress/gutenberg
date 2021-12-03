@@ -152,7 +152,7 @@ describe( 'Card', () => {
 				</Card>
 			);
 			const { container: containerExtraSmall } = render(
-				<Card isBorderless={ false } size="extraSmall">
+				<Card size="extraSmall">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Body</CardBody>
 					<CardFooter>Footer</CardFooter>
