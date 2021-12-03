@@ -12,7 +12,6 @@ import {
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
-	FullscreenMode,
 	InterfaceSkeleton,
 	ComplementaryArea,
 	store as interfaceStore,
@@ -207,7 +206,6 @@ function Editor( { initialSettings, onError } ) {
 									>
 										<GlobalStylesRenderer />
 										<ErrorBoundary onError={ onError }>
-											<FullscreenMode isActive />
 											<UnsavedChangesWarning />
 											<KeyboardShortcuts.Register />
 											<SidebarComplementaryAreaFills />

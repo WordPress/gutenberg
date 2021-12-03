@@ -19,7 +19,6 @@ import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 import { decodeEntities } from '@wordpress/html-entities';
-import { addQueryArgs } from '@wordpress/url';
 import {
 	home as siteIcon,
 	layout as templateIcon,
@@ -29,10 +28,17 @@ import {
 /**
  * Internal dependencies
  */
+import { useLink } from '../../routes/link';
 import MainDashboardButton from '../../main-dashboard-button';
 import { store as editSiteStore } from '../../../store';
 
 const SITE_EDITOR_KEY = 'site-editor';
+
+function NavLink( { params, replace, ...props } ) {
+	const linkProps = useLink( params, replace );
+
+	return <NavigationItem { ...linkProps } { ...props } />;
+}
 
 const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 	const { isNavigationOpen, siteTitle } = useSelect( ( select ) => {
@@ -92,32 +98,32 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 
 						<NavigationMenu>
 							<NavigationGroup title={ __( 'Editor' ) }>
-								<NavigationItem
+								<NavLink
 									icon={ siteIcon }
 									title={ __( 'Site' ) }
 									item={ SITE_EDITOR_KEY }
-									href={ addQueryArgs( window.location.href, {
+									params={ {
 										postId: undefined,
 										postType: undefined,
-									} ) }
+									} }
 								/>
-								<NavigationItem
+								<NavLink
 									icon={ templateIcon }
 									title={ __( 'Templates' ) }
 									item="wp_template"
-									href={ addQueryArgs( window.location.href, {
+									params={ {
 										postId: undefined,
 										postType: 'wp_template',
-									} ) }
+									} }
 								/>
-								<NavigationItem
+								<NavLink
 									icon={ templatePartIcon }
 									title={ __( 'Template Parts' ) }
 									item="wp_template_part"
-									href={ addQueryArgs( window.location.href, {
+									params={ {
 										postId: undefined,
 										postType: 'wp_template_part',
-									} ) }
+									} }
 								/>
 							</NavigationGroup>
 						</NavigationMenu>

@@ -3,29 +3,29 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { getQueryArg, addQueryArgs, removeQueryArgs } from '@wordpress/url';
+import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
 
 export default function URLQueryController() {
 	const { setTemplate, setTemplatePart, showHomepage, setPage } = useDispatch(
 		editSiteStore
 	);
+	const {
+		params: { postId, postType },
+	} = useLocation();
 
-	// Set correct entity on load.
+	// Set correct entity on page navigation.
 	useEffect( () => {
-		const url = window.location.href;
-		const postId = getQueryArg( url, 'postId' );
-
 		if ( ! postId ) {
 			showHomepage();
 			return;
 		}
 
-		const postType = getQueryArg( url, 'postType' );
 		if ( 'page' === postType || 'post' === postType ) {
 			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
 		} else if ( 'wp_template' === postType ) {
@@ -35,7 +35,7 @@ export default function URLQueryController() {
 		} else {
 			showHomepage();
 		}
-	}, [] );
+	}, [ postId, postType ] );
 
 	// Update page URL when context changes.
 	const pageContext = useCurrentPageContext();

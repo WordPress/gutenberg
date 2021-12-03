@@ -9,7 +9,6 @@ import { kebabCase } from 'lodash';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -17,9 +16,11 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+import { useHistory } from '../routes';
 import CreateTemplatePartModal from '../create-template-part-modal';
 
 export default function NewTemplatePart( { postType } ) {
+	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -44,10 +45,12 @@ export default function NewTemplatePart( { postType } ) {
 			} );
 
 			// Navigate to the created template part editor.
-			window.location.href = addQueryArgs( window.location.href, {
+			history.push( {
 				postId: templatePart.id,
-				postType: 'wp_template_part',
+				postType: templatePart.type,
 			} );
+
+			// TODO: Add a success notice?
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'

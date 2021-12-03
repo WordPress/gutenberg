@@ -14,6 +14,7 @@ import {
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as viewportStore } from '@wordpress/viewport';
+import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ import { store as viewportStore } from '@wordpress/viewport';
 import './plugins';
 import './hooks';
 import { store as editSiteStore } from './store';
+import { Routes } from './components/routes';
 import Editor from './components/editor';
 import List from './components/list';
 
@@ -35,8 +37,31 @@ import List from './components/list';
 export function reinitializeEditor( target, settings ) {
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind( null, target, settings );
+
+	dispatch( editorStore ).updateEditorSettings( settings );
+
+	if ( ! getQueryArg( window.location.href, 'postId' ) ) {
+		// Default the navigation panel to be opened when we're in a bigger
+		// screen and land in the list screen.
+		// We update the store synchronously before rendering so that we won't
+		// trigger an unnecessary re-render with useEffect.
+		dispatch( editSiteStore ).setIsNavigationPanelOpened(
+			select( viewportStore ).isViewportMatch( 'medium' )
+		);
+	}
+
 	render(
-		<Editor initialSettings={ settings } onError={ reboot } />,
+		<Routes>
+			{ ( { params: { postType, postId } } ) => {
+				if ( ! postId && postType ) {
+					return <List templateType={ postType } />;
+				}
+
+				return (
+					<Editor initialSettings={ settings } onError={ reboot } />
+				);
+			} }
+		</Routes>,
 		target
 	);
 }
@@ -54,7 +79,6 @@ export function initializeEditor( id, settings ) {
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, target, settings );
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
@@ -64,35 +88,7 @@ export function initializeEditor( id, settings ) {
 		} );
 	}
 
-	render(
-		<Editor initialSettings={ settings } onError={ reboot } />,
-		target
-	);
-}
-
-/**
- * Initializes the site editor templates list screen.
- *
- * @param {string} id           ID of the root element to render the screen in.
- * @param {string} templateType The type of the list. "wp_template" or "wp_template_part".
- * @param {Object} settings     Editor settings.
- */
-export function initializeList( id, templateType, settings ) {
-	const target = document.getElementById( id );
-
-	dispatch( editorStore ).updateEditorSettings( {
-		defaultTemplateTypes: settings.defaultTemplateTypes,
-		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
-	} );
-
-	// Default the navigation panel to be opened when we're in a bigger screen.
-	// We update the store synchronously before rendering so that we won't
-	// trigger an unnecessary re-render with useEffect.
-	dispatch( editSiteStore ).setIsNavigationPanelOpened(
-		select( viewportStore ).isViewportMatch( 'medium' )
-	);
-
-	render( <List templateType={ templateType } />, target );
+	reinitializeEditor( target, settings );
 }
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
