@@ -1,40 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import isTemplateRemovable from '../../utils/is-template-removable';
-
-function Actions( { template, onClose } ) {
-	const { removeTemplate } = useDispatch( editSiteStore );
-
-	return (
-		<MenuGroup>
-			<MenuItem
-				onClick={ () => {
-					removeTemplate( template );
-					onClose();
-				} }
-			>
-				{ __( 'Remove template' ) }
-			</MenuItem>
-		</MenuGroup>
-	);
-}
+import Actions from './actions';
+import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
 	const { templates, isLoading, postType } = useSelect(
@@ -111,35 +91,28 @@ export default function Table( { templateType } ) {
 						role="row"
 					>
 						<td className="edit-site-list-table-column" role="cell">
-							<a
-								href={ addQueryArgs( window.location.href, {
-									postId: template.id,
-									postType: template.type,
-								} ) }
-							>
-								{ template.title.rendered }
-							</a>
+							<Heading level={ 4 }>
+								<a
+									href={ addQueryArgs( window.location.href, {
+										postId: template.id,
+										postType: template.type,
+									} ) }
+								>
+									{ template.title?.rendered ||
+										template.slug }
+								</a>
+							</Heading>
 							{ template.description }
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
-							{ template.theme }
+							<AddedBy
+								templateType={ templateType }
+								template={ template }
+							/>
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
-							{ isTemplateRemovable( template ) && (
-								<DropdownMenu
-									icon={ moreVertical }
-									label={ __( 'Actions' ) }
-									className="edit-site-list-table__actions"
-								>
-									{ ( { onClose } ) => (
-										<Actions
-											template={ template }
-											onClose={ onClose }
-										/>
-									) }
-								</DropdownMenu>
-							) }
+							<Actions template={ template } />
 						</td>
 					</tr>
 				) ) }

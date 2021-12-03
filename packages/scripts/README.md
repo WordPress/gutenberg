@@ -282,7 +282,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](<(https://www.npmjs.com/package/@wordpress/stylelint-config)>) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](https://www.npmjs.com/package/@wordpress/stylelint-config) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `packages-update`
 

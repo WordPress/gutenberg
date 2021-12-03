@@ -13,7 +13,6 @@ import groups from './groups';
 
 export default function InspectorControlsSlot( {
 	__experimentalGroup: group = 'default',
-	bubblesVirtually = true,
 	label,
 	...props
 } ) {
@@ -32,14 +31,10 @@ export default function InspectorControlsSlot( {
 	if ( label ) {
 		return (
 			<BlockSupportToolsPanel group={ group } label={ label }>
-				<BlockSupportSlotContainer
-					{ ...props }
-					bubblesVirtually={ bubblesVirtually }
-					Slot={ Slot }
-				/>
+				<BlockSupportSlotContainer { ...props } Slot={ Slot } />
 			</BlockSupportToolsPanel>
 		);
 	}
 
-	return <Slot { ...props } bubblesVirtually={ bubblesVirtually } />;
+	return <Slot { ...props } bubblesVirtually />;
 }

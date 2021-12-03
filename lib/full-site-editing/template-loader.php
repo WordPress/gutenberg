@@ -111,7 +111,7 @@ function gutenberg_override_query_template( $template, $type, array $templates )
  *
  * @param string   $template_type      The current template type.
  * @param string[] $template_hierarchy (optional) The current template hierarchy, ordered by priority.
- * @return null|WP_Block_Template A block template if found. Null if not.
+ * @return null|Gutenberg_Block_Template A block template if found. Null if not.
  */
 function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 	if ( ! $template_type ) {

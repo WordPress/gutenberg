@@ -26,7 +26,8 @@
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"wp-phpunit/wp-phpunit": "^5.4",
 		"phpunit/phpunit": "^8.5",
-		"spatie/phpunit-watcher": "^1.23"
+		"spatie/phpunit-watcher": "^1.23",
+		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"require": {
 		"composer/installers": "~1.0"

@@ -508,6 +508,12 @@ export default function NavigationSubmenuEdit( {
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: true,
+
+			// Ensure block toolbar is not too far removed from item
+			// being edited.
+			// see: https://github.com/WordPress/gutenberg/pull/34615.
+			__experimentalCaptureToolbars: true,
+
 			renderAppender:
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&

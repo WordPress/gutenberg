@@ -8,7 +8,7 @@
 	"keywords": [ "menu", "navigation", "links" ],
 	"textdomain": "default",
 	"attributes": {
-		"navigationMenuId": {
+		"ref": {
 			"type": "number"
 		},
 		"textColor": {
@@ -55,9 +55,6 @@
 		},
 		"customOverlayTextColor": {
 			"type": "string"
-		},
-		"__unstableMaxPages": {
-			"type": "number"
 		}
 	},
 	"usesContext": [ "navigationArea" ],
@@ -75,8 +72,7 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation",
-		"__unstableMaxPages": "__unstableMaxPages"
+		"orientation": "orientation"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

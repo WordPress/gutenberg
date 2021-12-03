@@ -61,6 +61,7 @@ export default function ColorPanel( {
 				settings={ settings }
 				showTitle={ showTitle }
 				__experimentalHasMultipleOrigins
+				__experimentalIsRenderedInSidebar
 			>
 				{ enableContrastChecking && (
 					<ContrastChecker

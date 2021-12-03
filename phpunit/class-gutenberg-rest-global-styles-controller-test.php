@@ -33,7 +33,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		gutenberg_register_wp_theme_taxonomy();
 		self::$admin_id = $factory->user->create(
 			array(
 				'role' => 'administrator',

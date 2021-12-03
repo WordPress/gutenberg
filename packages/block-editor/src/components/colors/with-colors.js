@@ -6,7 +6,7 @@ import { isString, kebabCase, reduce, upperFirst } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -19,8 +19,6 @@ import {
 	getMostReadableColor,
 } from './utils';
 import useSetting from '../use-setting';
-
-const DEFAULT_COLORS = [];
 
 /**
  * Higher order component factory for injecting the `colorsArray` argument as
@@ -38,6 +36,8 @@ const withCustomColorPalette = ( colorsArray ) =>
 		'withCustomColorPalette'
 	);
 
+const EMPTY_OBJECT = {};
+
 /**
  * Higher order component factory for injecting the editor colors as the
  * `colors` prop in the `withColors` HOC.
@@ -47,8 +47,20 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			const colors = useSetting( 'color.palette' ) || DEFAULT_COLORS;
-			return <WrappedComponent { ...props } colors={ colors } />;
+			// Some color settings have a special handling for deprecated flags in `useSetting`,
+			// so we can't unwrap them by doing const { ... } = useSetting('color')
+			// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
+			const colorPerOrigin =
+				useSetting( 'color.palette' ) || EMPTY_OBJECT;
+			const allColors = useMemo(
+				() => [
+					...( colorPerOrigin?.custom || [] ),
+					...( colorPerOrigin?.theme || [] ),
+					...( colorPerOrigin?.default || [] ),
+				],
+				[ colorPerOrigin ]
+			);
+			return <WrappedComponent { ...props } colors={ allColors } />;
 		},
 		'withEditorColorPalette'
 	);

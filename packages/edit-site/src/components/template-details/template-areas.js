@@ -48,7 +48,7 @@ function TemplatePartItemMore( {
 			{ isTemplateRevertable( templatePart ) && (
 				<MenuGroup>
 					<MenuItem
-						info={ __( 'Restore template to theme default' ) }
+						info={ __( 'Restore template to default state' ) }
 						onClick={ clearCustomizations }
 					>
 						{ __( 'Clear customizations' ) }

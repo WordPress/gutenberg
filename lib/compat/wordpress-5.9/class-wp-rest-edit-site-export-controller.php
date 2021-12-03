@@ -66,7 +66,7 @@ class WP_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 	 */
 	public function export() {
 		// Generate the export file.
-		$filename = wp_generate_edit_site_export_file();
+		$filename = wp_generate_block_templates_export_file();
 
 		if ( is_wp_error( $filename ) ) {
 			return $filename;

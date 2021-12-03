@@ -104,6 +104,8 @@ function ScreenBackgroundColor( { name } ) {
 				disableCustomGradients={ ! areCustomGradientsEnabled }
 				__experimentalHasMultipleOrigins
 				showTitle={ false }
+				enableAlpha
+				__experimentalIsRenderedInSidebar
 			/>
 		</>
 	);
