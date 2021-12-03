@@ -125,11 +125,7 @@ require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
 require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
-<<<<<<< HEAD
 require __DIR__ . '/compat/experimental/blocks.php';
-=======
-require __DIR__ . '/compat/wordpress-5.9.1/blocks.php';
->>>>>>> b3355e146d (Add function to style arrows on comment pagination in php)
 
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-patterns.php';

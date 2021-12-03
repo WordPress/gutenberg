@@ -19,8 +19,8 @@ import { CommentsPaginationArrowControls } from './comments-pagination-arrow-con
 
 // TODO: add pagination-previous blocks once they are implemented.
 const TEMPLATE = [
-	[ 'core/comments-pagination-next' ],
 	[ 'core/comments-pagination-numbers' ],
+	[ 'core/comments-pagination-next' ],
 ];
 
 const getDefaultBlockLayout = ( blockTypeOrName ) => {

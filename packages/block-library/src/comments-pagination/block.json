@@ -32,6 +32,6 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-comments-pagination-editor",
-	"style": "wp-block-comments-pagination"
+	"editorStyle": "wp-block-query-pagination-editor",
+	"style": "wp-block-query-pagination"
 }
