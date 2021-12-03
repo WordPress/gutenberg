@@ -44,6 +44,13 @@ describe( '<RichText/>', () => {
 	 */
 	const window = Dimensions.get( 'window' );
 
+	const decimalUnitsData = [
+		[ '1.125rem', 18 ],
+		[ '10.52px', 11 ],
+		[ '2.3136em', 37 ],
+		[ '1.42vh', 19 ],
+	];
+
 	beforeEach( () => {
 		mockGlobalSettings( {} );
 	} );
@@ -109,19 +116,22 @@ describe( '<RichText/>', () => {
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
-		it( `should display rich text at the PROVIDED font size computed from the selected GLOBAL
-		\`__experimentalGlobalStylesBaseStyles.typography.fontSize\` CSS with decimal values.`, () => {
-			// Arrange
-			const expectedFontSize = 18;
-			mockGlobalSettings( { fontSize: '1.125rem' } );
-			// Act
-			const { getByA11yLabel } = render(
-				<RichText accessibilityLabel={ 'editor' } />
-			);
-			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
+		test.each( decimalUnitsData )(
+			`should display rich text at the PROVIDED font size computed from the selected GLOBAL
+		\`__experimentalGlobalStylesBaseStyles.typography.fontSize\` CSS with decimal value: %s`,
+			( unit, expected ) => {
+				// Arrange
+				mockGlobalSettings( { fontSize: unit } );
+				// Act
+				const { getByA11yLabel } = render(
+					<RichText accessibilityLabel={ 'editor' } />
+				);
+				// Assert
+				const actualFontSize = getByA11yLabel( 'editor' ).props
+					.fontSize;
+				expect( actualFontSize ).toBe( expected );
+			}
+		);
 
 		it( `should display rich text at the font size computed from the LOCAL \`fontSize\` CSS with HIGHEST PRIORITY
 		when CSS is provided ambiguously from ALL possible sources.`, () => {
