@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Fixed `GradientPicker` not displaying `CustomGradientPicker` when no gradients are provided ([#36900](https://github.com/WordPress/gutenberg/pull/36900)).
+
 ## 19.1.0
 
 ### Enhancements
