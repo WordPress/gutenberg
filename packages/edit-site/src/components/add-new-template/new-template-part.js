@@ -7,11 +7,11 @@ import { kebabCase } from 'lodash';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,6 +23,8 @@ export default function NewTemplatePart( { postType } ) {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { getLastEntitySaveError } = useSelect( coreStore );
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -33,16 +35,25 @@ export default function NewTemplatePart( { postType } ) {
 		}
 
 		try {
-			const templatePart = await apiFetch( {
-				path: '/wp/v2/template-parts',
-				method: 'POST',
-				data: {
+			const templatePart = await saveEntityRecord(
+				'postType',
+				'wp_template_part',
+				{
 					slug: kebabCase( title ),
 					title,
 					content: '',
 					area,
-				},
-			} );
+				}
+			);
+
+			const lastEntitySaveError = getLastEntitySaveError(
+				'postType',
+				'wp_template_part',
+				templatePart.id
+			);
+			if ( lastEntitySaveError ) {
+				throw lastEntitySaveError;
+			}
 
 			// Navigate to the created template part editor.
 			history.push( {

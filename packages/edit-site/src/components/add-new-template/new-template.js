@@ -15,7 +15,6 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -49,7 +48,9 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { getLastEntitySaveError } = useSelect( coreStore );
 
 	async function createTemplate( { slug } ) {
 		try {
@@ -57,17 +58,26 @@ export default function NewTemplate( { postType } ) {
 				slug,
 			} );
 
-			const template = await apiFetch( {
-				path: '/wp/v2/templates',
-				method: 'POST',
-				data: {
+			const template = await saveEntityRecord(
+				'postType',
+				'wp_template',
+				{
 					excerpt: description,
 					// Slugs need to be strings, so this is for template `404`
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-				},
-			} );
+				}
+			);
+
+			const lastEntitySaveError = getLastEntitySaveError(
+				'postType',
+				'wp_template',
+				template.id
+			);
+			if ( lastEntitySaveError ) {
+				throw lastEntitySaveError;
+			}
 
 			// Navigate to the created template editor.
 			history.push( {
