@@ -8,13 +8,14 @@ import {
 } from '@wordpress/block-library';
 import { dispatch, select } from '@wordpress/data';
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { SlotFillProvider } from '@wordpress/components';
 import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as viewportStore } from '@wordpress/viewport';
-import { getQueryArg } from '@wordpress/url';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -25,6 +26,11 @@ import { store as editSiteStore } from './store';
 import { Routes } from './components/routes';
 import Editor from './components/editor';
 import List from './components/list';
+import NavigationSidebar from './components/navigation-sidebar';
+
+function getIsListPage( { postId, postType } ) {
+	return !! ( ! postId && postType );
+}
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -52,7 +58,11 @@ export function reinitializeEditor( target, settings ) {
 			defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
 		} );
 
-		if ( ! getQueryArg( window.location.href, 'postId' ) ) {
+		const isLandingOnListPage = getIsListPage(
+			getQueryArgs( window.location.href )
+		);
+
+		if ( isLandingOnListPage ) {
 			// Default the navigation panel to be opened when we're in a bigger
 			// screen and land in the list screen.
 			dispatch( editSiteStore ).setIsNavigationPanelOpened(
@@ -62,15 +72,32 @@ export function reinitializeEditor( target, settings ) {
 	}
 
 	render(
-		<Routes>
-			{ ( { params: { postType, postId } } ) => {
-				if ( ! postId && postType ) {
-					return <List templateType={ postType } />;
-				}
+		<SlotFillProvider>
+			<Routes>
+				{ ( { params } ) => {
+					const isListPage = getIsListPage( params );
 
-				return <Editor onError={ reboot } />;
-			} }
-		</Routes>,
+					return (
+						<>
+							{ isListPage ? (
+								<List />
+							) : (
+								<Editor onError={ reboot } />
+							) }
+							{ /* Keep the instance of the sidebar to ensure focus will not be lost
+							 * when navigating to other pages. */ }
+							<NavigationSidebar
+								// Open the navigation sidebar by default when in the list page.
+								isDefaultOpen={ !! isListPage }
+								activeTemplateType={
+									isListPage ? params.postType : undefined
+								}
+							/>
+						</>
+					);
+				} }
+			</Routes>
+		</SlotFillProvider>,
 		target
 	);
 }

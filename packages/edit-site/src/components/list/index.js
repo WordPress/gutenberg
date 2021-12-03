@@ -21,9 +21,14 @@ import Header from './header';
 import NavigationSidebar from '../navigation-sidebar';
 import Table from './table';
 import { store as editSiteStore } from '../../store';
+import { useLocation } from '../routes';
 import useTitle from '../routes/use-title';
 
-export default function List( { templateType } ) {
+export default function List() {
+	const {
+		params: { postType: templateType },
+	} = useLocation();
+
 	useRegisterShortcuts();
 
 	const { previousShortcut, nextShortcut, isNavigationOpen } = useSelect(
@@ -78,12 +83,7 @@ export default function List( { templateType } ) {
 				...detailedRegionLabels,
 			} }
 			header={ <Header templateType={ templateType } /> }
-			drawer={
-				<NavigationSidebar
-					activeTemplateType={ templateType }
-					isDefaultOpen
-				/>
-			}
+			drawer={ <NavigationSidebar.Slot /> }
 			notices={ <EditorSnackbars /> }
 			content={
 				<main className="edit-site-list-main">

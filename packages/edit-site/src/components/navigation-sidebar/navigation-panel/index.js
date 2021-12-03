@@ -15,7 +15,6 @@ import {
 } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -54,15 +53,6 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 	}, [] );
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
-	// Ensures focus is moved to the panel area when it is activated
-	// from a separate component (such as document actions in the header).
-	const panelRef = useRef();
-	useEffect( () => {
-		if ( isNavigationOpen ) {
-			panelRef.current.focus();
-		}
-	}, [ activeItem, isNavigationOpen ] );
-
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -76,8 +66,6 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 			className={ classnames( `edit-site-navigation-panel`, {
 				'is-open': isNavigationOpen,
 			} ) }
-			ref={ panelRef }
-			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
 		>
 			<div className="edit-site-navigation-panel__inner">
