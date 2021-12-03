@@ -5,6 +5,7 @@ import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 
 export default function useTitle( title ) {
 	const siteTitle = useSelect(
@@ -26,7 +27,8 @@ export default function useTitle( title ) {
 			if ( document.title !== formattedTitle ) {
 				document.title = formattedTitle;
 
-				// TODO: We might want to also add accessibility-related announcements here.
+				// Announce title on route change for screen readers.
+				speak( document.title );
 			}
 		}
 	}, [ title, siteTitle ] );
