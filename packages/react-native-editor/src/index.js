@@ -19,7 +19,7 @@ import initialHtml from './initial-html';
 import setupLocale from './setup-locale';
 import { getTranslation } from '../i18n-cache';
 
-const registerGutenberg = ( initCallback ) => {
+const registerGutenberg = ( beforeInitCallback ) => {
 	class Gutenberg extends Component {
 		constructor() {
 			super( ...arguments );
@@ -33,13 +33,13 @@ const registerGutenberg = ( initCallback ) => {
 				getTranslation,
 			} );
 
+			if ( beforeInitCallback ) {
+				beforeInitCallback( parentProps );
+			}
+
 			// Initialize editor
 			const setup = require( './setup' ).default;
 			this.editorComponent = setup();
-
-			if ( initCallback ) {
-				initCallback( parentProps );
-			}
 
 			// Dispatch pre-render hooks
 			doAction( 'native.pre-render', parentProps );
