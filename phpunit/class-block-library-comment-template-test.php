@@ -39,10 +39,6 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 
 	}
 
-	public function tearDown() {
-		wp_delete_post( self::$custom_post );
-	}
-
 	/**
 	 * Test rendering a single comment
 	 */
