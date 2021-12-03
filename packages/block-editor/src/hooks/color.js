@@ -457,15 +457,20 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 			return <BlockListBlock { ...props } />;
 		}
 
-		const extraStyles = {
-			color: textColor
-				? getColorObjectByAttributeValues( colors, textColor )?.color
-				: undefined,
-			backgroundColor: backgroundColor
-				? getColorObjectByAttributeValues( colors, backgroundColor )
-						?.color
-				: undefined,
-		};
+		const extraStyles = {};
+
+		if ( textColor ) {
+			extraStyles.color = getColorObjectByAttributeValues(
+				colors,
+				textColor
+			)?.color;
+		}
+		if ( backgroundColor ) {
+			extraStyles.backgroundColor = getColorObjectByAttributeValues(
+				colors,
+				backgroundColor
+			)?.color;
+		}
 
 		let wrapperProps = props.wrapperProps;
 		wrapperProps = {
