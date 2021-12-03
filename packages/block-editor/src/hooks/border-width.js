@@ -62,9 +62,7 @@ export const BorderWidthEdit = ( props ) => {
 			// changes to a non-zero value.
 			setColorSelection( borderColor );
 			setCustomColorSelection( customBorderColor );
-			if ( borderStyle !== 'none' ) {
-				setStyleSelection( borderStyle );
-			}
+			setStyleSelection( borderStyle );
 
 			// Clear style and color attributes.
 			borderPaletteColor = undefined;
