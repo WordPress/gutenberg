@@ -239,8 +239,9 @@ $color-control-label-height: 20px;
 	align-items: center;
 	min-height: $button-size + $grid-unit-05 + $grid-unit-05;
 	padding: $grid-unit-05 $grid-unit-10 $grid-unit-05 $grid-unit-15;
+	min-width: $grid-unit-10 * 12;
 
-	.is-selected & {
+	.wp-block-navigation.is-selected & {
 		display: none;
 	}
 
