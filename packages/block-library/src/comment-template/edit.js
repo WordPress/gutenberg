@@ -31,19 +31,19 @@ const TEMPLATE = [
 /**
  * Component which renders the inner blocks of the Comment Template.
  *
- * @param {Object} props                         Component props.
- * @param {Array}  [props.blockContext]          - A comment object.
- * @param {Array}  [props.activeBlockContext]    - The block that is currently active.
- * @param {Array}  [props.setActiveBlockContext] - The setter for activeBlockContext.
- * @param {Array}  [props.firstBlock]            - First comment in the array.
- * @param {Array}  [props.blocks]                - Array of blocks returned from
- *                                               getBlocks() in parent .
+ * @param {Object} props                    Component props.
+ * @param {Array}  [props.comment]          - A comment object.
+ * @param {Array}  [props.activeComment]    - The block that is currently active.
+ * @param {Array}  [props.setActiveComment] - The setter for activeComment.
+ * @param {Array}  [props.firstBlock]       - First comment in the array.
+ * @param {Array}  [props.blocks]           - Array of blocks returned from
+ *                                          getBlocks() in parent .
  * @return {WPElement}                 		Inner blocks of the Comment Template
  */
 function CommentTemplateInnerBlocks( {
-	blockContext,
-	activeBlockContext,
-	setActiveBlockContext,
+	comment,
+	activeComment,
+	setActiveComment,
 	firstBlock,
 	blocks,
 } ) {
@@ -53,22 +53,20 @@ function CommentTemplateInnerBlocks( {
 	);
 	return (
 		<li { ...innerBlocksProps }>
-			{ blockContext === ( activeBlockContext || firstBlock ) ? (
+			{ comment === ( activeComment || firstBlock ) ? (
 				children
 			) : (
 				<BlockPreview
 					blocks={ blocks }
 					__experimentalLive
-					__experimentalOnClick={ () =>
-						setActiveBlockContext( blockContext )
-					}
+					__experimentalOnClick={ () => setActiveComment( comment ) }
 				/>
 			) }
-			{ blockContext?.children?.length > 0 ? (
+			{ comment?.children?.length > 0 ? (
 				<CommentsList
-					blockContexts={ blockContext.children }
-					activeBlockContext={ activeBlockContext }
-					setActiveBlockContext={ setActiveBlockContext }
+					comments={ comment.children }
+					activeComment={ activeComment }
+					setActiveComment={ setActiveComment }
 					blocks={ blocks }
 				/>
 			) : null }
@@ -79,35 +77,35 @@ function CommentTemplateInnerBlocks( {
 /**
  * Component that renders a list of (nested) comments. It is called recursively.
  *
- * @param {Object} props                         Component props.
- * @param {Array}  [props.blockProps]            - Props from parent's `useBlockProps()`.
- * @param {Array}  [props.blockContexts]         - Array of comment objects.
- * @param {Array}  [props.activeBlockContext]    - The block that is currently active.
- * @param {Array}  [props.setActiveBlockContext] - The setter for activeBlockContext.
- * @param {Array}  [props.blocks]                - Array of blocks returned from
- *                                               getBlocks() in parent .
+ * @param {Object} props                    Component props.
+ * @param {Array}  [props.comments]         - Array of comment objects.
+ * @param {Array}  [props.blockProps]       - Props from parent's `useBlockProps()`.
+ * @param {Array}  [props.activeComment]    - The block that is currently active.
+ * @param {Array}  [props.setActiveComment] - The setter for activeComment.
+ * @param {Array}  [props.blocks]           - Array of blocks returned from
+ *                                          getBlocks() in parent .
  * @return {WPElement}                 		List of comments.
  */
 const CommentsList = ( {
+	comments,
 	blockProps,
-	blockContexts,
-	activeBlockContext,
-	setActiveBlockContext,
+	activeComment,
+	setActiveComment,
 	blocks,
 } ) => (
 	<ol { ...blockProps }>
-		{ blockContexts &&
-			blockContexts.map( ( blockContext ) => (
+		{ comments &&
+			comments.map( ( comment ) => (
 				<BlockContextProvider
-					key={ blockContext.commentId }
-					value={ blockContext }
+					key={ comment.commentId }
+					value={ comment }
 				>
 					<CommentTemplateInnerBlocks
-						blockContext={ blockContext }
-						activeBlockContext={ activeBlockContext }
-						setActiveBlockContext={ setActiveBlockContext }
+						comment={ comment }
+						activeComment={ activeComment }
+						setActiveComment={ setActiveComment }
 						blocks={ blocks }
-						firstBlock={ blockContexts[ 0 ] }
+						firstBlock={ comments[ 0 ] }
 					/>
 				</BlockContextProvider>
 			) ) }
@@ -120,15 +118,15 @@ export default function CommentTemplateEdit( {
 } ) {
 	const blockProps = useBlockProps();
 
-	const [ activeBlockContext, setActiveBlockContext ] = useState();
+	const [ activeComment, setActiveComment ] = useState();
 
-	const { comments, blocks } = useSelect(
+	const { rawComments, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
 			return {
-				comments: getEntityRecords( 'root', 'comment', {
+				rawComments: getEntityRecords( 'root', 'comment', {
 					post: postId,
 					status: 'approve',
 					order: 'asc',
@@ -143,12 +141,12 @@ export default function CommentTemplateEdit( {
 	// Then, we show only a maximum of `queryPerPage` number of comments.
 	// This is because passing `per_page` to `getEntityRecords()` does not
 	// take into account nested comments.
-	const blockContexts = useMemo(
-		() => convertToTree( comments ).slice( 0, queryPerPage ),
-		[ comments, queryPerPage ]
+	const comments = useMemo(
+		() => convertToTree( rawComments ).slice( 0, queryPerPage ),
+		[ rawComments, queryPerPage ]
 	);
 
-	if ( ! comments ) {
+	if ( ! rawComments ) {
 		return (
 			<p { ...blockProps }>
 				<Spinner />
@@ -162,11 +160,11 @@ export default function CommentTemplateEdit( {
 
 	return (
 		<CommentsList
-			blockContexts={ blockContexts }
+			comments={ comments }
 			blockProps={ blockProps }
 			blocks={ blocks }
-			activeBlockContext={ activeBlockContext }
-			setActiveBlockContext={ setActiveBlockContext }
+			activeComment={ activeComment }
+			setActiveComment={ setActiveComment }
 		/>
 	);
 }
