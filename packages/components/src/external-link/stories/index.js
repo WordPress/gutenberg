@@ -11,7 +11,7 @@ export default {
 	title: 'Components/ExternalLink',
 	component: ExternalLink,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

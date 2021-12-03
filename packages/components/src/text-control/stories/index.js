@@ -17,7 +17,7 @@ export default {
 	title: 'Components/TextControl',
 	component: TextControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
