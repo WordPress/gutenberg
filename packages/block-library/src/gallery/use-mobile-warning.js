@@ -20,7 +20,7 @@ export default function useMobileWarning( newImages ) {
 
 	createWarningNotice(
 		__(
-			'Editing this Gallery in the WordPress mobile app requires version 18.2 or higher.'
+			'If you want to edit the gallery you just added in the mobile app, to avoid losing any data please make sure you use version 18.2 of the app or above.'
 		),
 		{ type: 'snackbar', explicitDismiss: true }
 	);

@@ -73,6 +73,8 @@ export function getColorClassesAndStyles( attributes ) {
 	};
 }
 
+const EMPTY_OBJECT = {};
+
 /**
  * Determines the color related props for a block derived from its color block
  * support attributes.
@@ -87,8 +89,12 @@ export function getColorClassesAndStyles( attributes ) {
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
-	const { palette: solidsPerOrigin, gradients: gradientsPerOrigin } =
-		useSetting( 'color' ) || {};
+	// Some color settings have a special handling for deprecated flags in `useSetting`,
+	// so we can't unwrap them by doing const { ... } = useSetting('color')
+	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
+	const solidsPerOrigin = useSetting( 'color.palette' ) || EMPTY_OBJECT;
+	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
+
 	const colors = useMemo(
 		() => [
 			...( solidsPerOrigin?.custom || [] ),

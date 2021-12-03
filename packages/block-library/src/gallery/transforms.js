@@ -8,8 +8,6 @@ import { filter, every, toString } from 'lodash';
  */
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
-import { select } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -24,7 +22,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT as DEPRECATED_LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA as DEPRECATED_LINK_DESTINATION_MEDIA,
 } from './v1/constants';
-import { pickRelevantMediaFiles } from './shared';
+import { pickRelevantMediaFiles, isGalleryV2Enabled } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -49,9 +47,8 @@ const parseShortcodeIds = ( ids ) => {
  * @return   {Block}                 The transformed block.
  */
 function updateThirdPartyTransformToGallery( block ) {
-	const settings = select( blockEditorStore ).getSettings();
 	if (
-		settings.__unstableGalleryWithImageBlocks &&
+		isGalleryV2Enabled() &&
 		block.name === 'core/gallery' &&
 		block.attributes?.images.length > 0
 	) {
@@ -145,8 +142,7 @@ const transforms = {
 
 				const validImages = filter( attributes, ( { url } ) => url );
 
-				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__unstableGalleryWithImageBlocks ) {
+				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = validImages.map( ( image ) => {
 						return createBlock( 'core/image', image );
 					} );
@@ -184,10 +180,7 @@ const transforms = {
 				images: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						const settings = select(
-							blockEditorStore
-						).getSettings();
-						if ( ! settings.__unstableGalleryWithImageBlocks ) {
+						if ( ! isGalleryV2Enabled() ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
 								id: toString( id ),
 							} ) );
@@ -197,10 +190,7 @@ const transforms = {
 				ids: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						const settings = select(
-							blockEditorStore
-						).getSettings();
-						if ( ! settings.__unstableGalleryWithImageBlocks ) {
+						if ( ! isGalleryV2Enabled() ) {
 							return parseShortcodeIds( ids );
 						}
 					},
@@ -208,10 +198,7 @@ const transforms = {
 				shortCodeTransforms: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						const settings = select(
-							blockEditorStore
-						).getSettings();
-						if ( settings.__unstableGalleryWithImageBlocks ) {
+						if ( isGalleryV2Enabled() ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
 								id: parseInt( id ),
 							} ) );
@@ -227,10 +214,7 @@ const transforms = {
 				linkTo: {
 					type: 'string',
 					shortcode: ( { named: { link } } ) => {
-						const settings = select(
-							blockEditorStore
-						).getSettings();
-						if ( ! settings.__unstableGalleryWithImageBlocks ) {
+						if ( ! isGalleryV2Enabled() ) {
 							switch ( link ) {
 								case 'post':
 									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
@@ -273,8 +257,7 @@ const transforms = {
 				);
 			},
 			transform( files ) {
-				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__unstableGalleryWithImageBlocks ) {
+				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = files.map( ( file ) =>
 						createBlock( 'core/image', {
 							url: createBlobURL( file ),
@@ -299,8 +282,7 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/image' ],
 			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
-				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__unstableGalleryWithImageBlocks ) {
+				if ( isGalleryV2Enabled() ) {
 					if ( innerBlocks.length > 0 ) {
 						return innerBlocks.map(
 							( {

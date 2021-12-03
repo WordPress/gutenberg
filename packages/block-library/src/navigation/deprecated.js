@@ -33,22 +33,23 @@ const migrateWithLayout = ( attributes ) => {
 		return attributes;
 	}
 
-	const { itemsJustification, orientation } = attributes;
-
-	const updatedAttributes = {
-		...attributes,
-	};
+	const {
+		itemsJustification,
+		orientation,
+		...updatedAttributes
+	} = attributes;
 
 	if ( itemsJustification || orientation ) {
 		Object.assign( updatedAttributes, {
 			layout: {
 				type: 'flex',
-				justifyContent: itemsJustification || 'left',
-				orientation: orientation || 'horizontal',
+				setCascadingProperties: 'true',
+				...( itemsJustification && {
+					justifyContent: itemsJustification,
+				} ),
+				...( orientation && { orientation } ),
 			},
 		} );
-		delete updatedAttributes.itemsJustification;
-		delete updatedAttributes.orientation;
 	}
 
 	return updatedAttributes;

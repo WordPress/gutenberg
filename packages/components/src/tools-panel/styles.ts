@@ -70,6 +70,7 @@ export const ToolsPanelHeader = css`
 	 */
 	.components-dropdown-menu {
 		margin: ${ space( -1 ) } 0;
+		line-height: 0;
 	}
 	&&&& .components-dropdown-menu__toggle {
 		padding: 0;

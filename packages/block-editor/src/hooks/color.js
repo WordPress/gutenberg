@@ -32,6 +32,8 @@ import useSetting from '../components/use-setting';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
+const EMPTY_OBJECT = {};
+
 const hasColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 	return (
@@ -216,15 +218,16 @@ function immutableSet( object, path, value ) {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const {
-		palette: solidsPerOrigin,
-		gradients: gradientsPerOrigin,
-		customGradient: areCustomGradientsEnabled,
-		custom: areCustomSolidsEnabled,
-		text: isTextEnabled,
-		background: isBackgroundEnabled,
-		link: isLinkEnabled,
-	} = useSetting( 'color' ) || {};
+	// Some color settings have a special handling for deprecated flags in `useSetting`,
+	// so we can't unwrap them by doing const { ... } = useSetting('color')
+	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
+	const solidsPerOrigin = useSetting( 'color.palette' ) || EMPTY_OBJECT;
+	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
+	const areCustomSolidsEnabled = useSetting( 'color.custom' );
+	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
+	const isBackgroundEnabled = useSetting( 'color.background' );
+	const isLinkEnabled = useSetting( 'color.link' );
+	const isTextEnabled = useSetting( 'color.text' );
 
 	const solidsEnabled =
 		areCustomSolidsEnabled ||
@@ -441,7 +444,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const { palette: solidsPerOrigin } = useSetting( 'color' ) || {};
+		const solidsPerOrigin = useSetting( 'color.palette' ) || EMPTY_OBJECT;
 		const colors = useMemo(
 			() => [
 				...( solidsPerOrigin?.custom || [] ),
