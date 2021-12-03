@@ -130,6 +130,7 @@ export default function CommentTemplateEdit( {
 					post: postId,
 					status: 'approve',
 					order: 'asc',
+					context: 'embed',
 				} ),
 				blocks: getBlocks( clientId ),
 			};
