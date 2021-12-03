@@ -13,6 +13,7 @@ import { Component, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import './globals';
 import { omit } from 'lodash';
 import initialHtml from './initial-html';
 import setupLocale from './setup-locale';

@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import './globals';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
 
