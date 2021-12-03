@@ -13,6 +13,8 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { useContext } from '@wordpress/element';
+import { EnvContext } from '../../block-env';
 
 /**
  * Retrieves the block types inserter state.
@@ -22,6 +24,7 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert ) => {
+	const env = useContext( EnvContext );
 	const { categories, collections, items } = useSelect(
 		( select ) => {
 			const { getInserterItems } = select( blockEditorStore );
@@ -30,7 +33,7 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 			return {
 				categories: getCategories(),
 				collections: getCollections(),
-				items: getInserterItems( rootClientId ),
+				items: getInserterItems( rootClientId, env ),
 			};
 		},
 		[ rootClientId ]

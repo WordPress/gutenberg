@@ -1410,10 +1410,24 @@ function getInsertUsage( state, id ) {
  * @param {Object}  blockType    BlockType
  * @param {?string} rootClientId Optional root client ID of block list.
  *
+ * @param           envs
+ * @param           env
  * @return {boolean} Whether the given block type is allowed to be shown in the inserter.
  */
-const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
+const canIncludeBlockTypeInInserter = (
+	state,
+	blockType,
+	rootClientId,
+	env
+) => {
 	if ( ! hasBlockSupport( blockType, 'inserter', true ) ) {
+		return false;
+	}
+
+	if (
+		blockType.supports?.inserterEnv &&
+		env !== blockType.supports.inserterEnv
+	) {
 		return false;
 	}
 
@@ -1558,7 +1572,7 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
  * @property {number}   frecency          Heuristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
-	( state, rootClientId = null ) => {
+	( state, rootClientId = null, envs = [] ) => {
 		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
 			buildScope: 'inserter',
 		} );
@@ -1631,7 +1645,12 @@ export const getInserterItems = createSelector(
 
 		const blockTypeInserterItems = getBlockTypes()
 			.filter( ( blockType ) =>
-				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+				canIncludeBlockTypeInInserter(
+					state,
+					blockType,
+					rootClientId,
+					envs
+				)
 			)
 			.map( buildBlockTypeInserterItem );
 

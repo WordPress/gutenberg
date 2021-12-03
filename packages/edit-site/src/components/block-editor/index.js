@@ -15,6 +15,7 @@ import {
 	__experimentalLinkControl,
 	BlockInspector,
 	BlockTools,
+	BlockEnvProvider,
 	__unstableBlockSettingsMenuFirstItem,
 	__unstableUseTypingObserver as useTypingObserver,
 	store as blockEditorStore,
@@ -121,10 +122,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					settings={ settings }
 					contentRef={ mergedRefs }
 				>
-					<BlockList
-						className="edit-site-block-editor__block-list wp-site-blocks"
-						__experimentalLayout={ LAYOUT }
-					/>
+					<BlockEnvProvider name="site">
+						<BlockList
+							className="edit-site-block-editor__block-list wp-site-blocks"
+							__experimentalLayout={ LAYOUT }
+						/>
+					</BlockEnvProvider>
 				</ResizableEditor>
 
 				<__unstableBlockSettingsMenuFirstItem>

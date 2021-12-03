@@ -8,6 +8,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	useSetting,
+	BlockEnvProvider,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	store as blockEditorStore,
 	Warning,
@@ -113,12 +114,14 @@ export default function PostContentEdit( { context, attributes } ) {
 	}
 
 	return (
-		<RecursionProvider>
-			{ contextPostId && contextPostType ? (
-				<Content context={ context } layout={ layout } />
-			) : (
-				<Placeholder />
-			) }
-		</RecursionProvider>
+		<BlockEnvProvider name="post">
+			<RecursionProvider>
+				{ contextPostId && contextPostType ? (
+					<Content context={ context } layout={ layout } />
+				) : (
+					<Placeholder />
+				) }
+			</RecursionProvider>
+		</BlockEnvProvider>
 	);
 }
