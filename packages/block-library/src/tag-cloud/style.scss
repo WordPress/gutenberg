@@ -26,6 +26,7 @@
 		margin-bottom: 10px;
 		padding: 5px 10px;
 
+		&:active,
 		&:hover {
 			background-color: var(--wp--preset--color--foreground);
 			color: var(--wp--preset--color--background);
