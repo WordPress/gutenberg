@@ -110,6 +110,72 @@ describe.each( [
 	} );
 
 	describe( '<LinkPicker/>', () => {
+		// TODO: Add tests for when the app comes to foreground with Valid and Invalid URLs in Clipboard.
+		describe( 'Show Suggestions - No Results', () => {
+			/**
+			 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
+			 * GIVEN the CLIPBOARD has NO URL;
+			 * GIVEN the STATE has NO URL;
+			 * WHEN the USER selects the LINK TO cell;
+			 */
+			// eslint-disable-next-line jest/no-done-callback
+			it( 'should display the LINK PICKER with NO LINK SUGGESTION RESULT CELLS.', async ( done ) => {
+				// Arrange
+				const expectation =
+					'The LINK PICKER > LINK SUGGESTION SHOULD NOT suggest ANYTHING.';
+				const subject = await initializeEditor( { initialHtml } );
+				Clipboard.getString.mockReturnValue( '' );
+
+				// Act
+				try {
+					const block = await waitFor( () =>
+						subject.getByA11yLabel(
+							type === 'core/image'
+								? /Image Block/
+								: /Button Block/
+						)
+					);
+					fireEvent.press( block );
+					fireEvent.press( block );
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel( 'Open Settings' )
+						)
+					);
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel(
+								`Link to, ${
+									type === 'core/image'
+										? 'None'
+										: 'Search or type URL'
+								}`
+							)
+						)
+					);
+					if ( type === 'core/image' ) {
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel( /Custom URL/ )
+							)
+						);
+					}
+					await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
+				} catch ( error ) {
+					done.fail( error );
+				}
+
+				// Assert
+				try {
+					// TODO: Consider using this new approach for detecting nonexistence of the Clipboard Suggestion.
+					await waitFor( () => subject.getByA11yLabel( /No items/ ) );
+					done();
+				} catch ( error ) {
+					done.fail( expectation );
+				}
+			} );
+		} );
+
 		describe( 'Hide Clipboard Link Suggestion - Invalid URL in Clipboard', () => {
 			/**
 			 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
