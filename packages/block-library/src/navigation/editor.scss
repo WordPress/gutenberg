@@ -266,6 +266,7 @@ $color-control-label-height: 20px;
 	}
 
 	> svg {
+		fill: currentColor;
 		opacity: 0.4;
 	}
 }
