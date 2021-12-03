@@ -28,6 +28,8 @@ const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
 	// eslint-disable-next-line no-console
 	console.disableYellowBox = true;
+
+	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 };
 
 const gutenbergSetup = () => {
@@ -37,8 +39,6 @@ const gutenbergSetup = () => {
 	wpData.use( wpData.plugins.persistence, { storageKey } );
 
 	setupApiFetch();
-
-	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 
 	const isHermes = () => global.HermesInternal !== null;
 	// eslint-disable-next-line no-console
