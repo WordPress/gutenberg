@@ -54,8 +54,8 @@ function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
 
 	const linkProps = useLink(
 		{
-			postId: selectedTemplatePart.id,
-			postType: selectedTemplatePart.type,
+			postId: selectedTemplatePart?.id,
+			postType: selectedTemplatePart?.type,
 		},
 		{
 			fromTemplateId: params.postId,
