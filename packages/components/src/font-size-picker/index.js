@@ -50,37 +50,24 @@ function FontSizePicker(
 	/**
 	 * The main font size UI displays a toggle group when the presets are less
 	 * than six and a select control when they are more.
-	 *
-	 * A select control is also used when the value of a preset cannot be
-	 * immediately computed (eg. 'calc', 'var') and there is no `alias` provided
-	 * for every font size.
 	 */
 	const fontSizesContainComplexValues = fontSizes.some(
 		( { size } ) => ! isSimpleCssValue( size )
 	);
-	const allFontSizesHaveAliases = fontSizes.every(
-		( { alias } ) => !! alias
-	);
-	const shouldUseSelectControl =
-		fontSizes.length > 5 ||
-		( fontSizesContainComplexValues && ! allFontSizesHaveAliases );
-	const shouldUseAliases =
-		fontSizesContainComplexValues && allFontSizesHaveAliases;
-
+	const shouldUseSelectControl = fontSizes.length > 5;
 	const options = useMemo(
 		() =>
 			getFontSizeOptions(
 				shouldUseSelectControl,
 				fontSizes,
 				disableCustomFontSizes,
-				shouldUseAliases
+				fontSizesContainComplexValues
 			),
 		[
 			shouldUseSelectControl,
 			fontSizes,
 			disableCustomFontSizes,
-			allFontSizesHaveAliases,
-			shouldUseAliases,
+			fontSizesContainComplexValues,
 		]
 	);
 	const selectedOption = getSelectedOption( fontSizes, value );
@@ -106,7 +93,10 @@ function FontSizePicker(
 		}
 		// Calculate the `hint` for toggle group control.
 		let hint = selectedOption.name;
-		if ( ! shouldUseAliases && typeof selectedOption.size === 'string' ) {
+		if (
+			! fontSizesContainComplexValues &&
+			typeof selectedOption.size === 'string'
+		) {
 			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
 			hint += `(${ unit })`;
 		}
@@ -116,7 +106,7 @@ function FontSizePicker(
 		selectedOption?.slug,
 		value,
 		isCustomValue,
-		shouldUseAliases,
+		fontSizesContainComplexValues,
 	] );
 
 	if ( ! options ) {

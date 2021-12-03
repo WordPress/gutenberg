@@ -15,6 +15,15 @@ const CUSTOM_FONT_SIZE_OPTION = {
 };
 
 /**
+ * In case we have at most five font sizes, where at least one the them
+ * contain a complex css value(clamp, var, etc..) show a `T-shirt size`
+ * alias as a label of the font size. We do this because complex css values
+ * cannot be caluclated properly and the `T-shirt size` can help the user
+ * better mentally map the different available font sizes.
+ */
+const FONT_SIZES_ALIASES = [ 'S', 'M', 'L', 'XL', 'XXL' ];
+
+/**
  * Helper util to split a font size to its numeric value
  * and its `unit`, if exists.
  *
@@ -47,24 +56,24 @@ export function isSimpleCssValue( value ) {
  * Return font size options in the proper format depending
  * on the currently used control (select, toggle group).
  *
- * @param {boolean}  useSelectControl       Whether to use a select control.
- * @param {Object[]} optionsArray           Array of available font sizes objects.
- * @param {*}        disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
- * @param {boolean}  shouldUseAliases       Flag for using `alias` in ToggleGroupControl - if applicable.
+ * @param {boolean}  useSelectControl               Whether to use a select control.
+ * @param {Object[]} optionsArray                   Array of available font sizes objects.
+ * @param {*}        disableCustomFontSizes         Flag that indicates if custom font sizes are disabled.
+ * @param {boolean}  optionsContainComplexCssValues Whether font sizes contain at least one complex css value(clamp, var, etc..).
  * @return {Object[]|null} Array of font sizes in proper format for the used control.
  */
 export function getFontSizeOptions(
 	useSelectControl,
 	optionsArray,
 	disableCustomFontSizes,
-	shouldUseAliases
+	optionsContainComplexCssValues
 ) {
 	if ( disableCustomFontSizes && ! optionsArray.length ) {
 		return null;
 	}
 	return useSelectControl
 		? getSelectOptions( optionsArray, disableCustomFontSizes )
-		: getToggleGroupOptions( optionsArray, shouldUseAliases );
+		: getToggleGroupOptions( optionsArray, optionsContainComplexCssValues );
 }
 
 function getSelectOptions( optionsArray, disableCustomFontSizes ) {
@@ -82,10 +91,12 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	} ) );
 }
 
-function getToggleGroupOptions( optionsArray, shouldUseAliases ) {
-	return optionsArray.map( ( { slug, size, name, alias } ) => {
-		let label = shouldUseAliases ? alias : size;
-		if ( ! shouldUseAliases && typeof size === 'string' ) {
+function getToggleGroupOptions( optionsArray, optionsContainComplexCssValues ) {
+	return optionsArray.map( ( { slug, size, name }, index ) => {
+		let label = optionsContainComplexCssValues
+			? FONT_SIZES_ALIASES[ index ]
+			: size;
+		if ( ! optionsContainComplexCssValues && typeof size === 'string' ) {
 			const [ numericValue ] = splitValueAndUnitFromSize( size );
 			label = numericValue;
 		}
