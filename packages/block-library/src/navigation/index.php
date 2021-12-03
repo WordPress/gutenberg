@@ -7,7 +7,7 @@
 
 // These functions are used for the __unstableLocation feature and only active
 // when the gutenberg plugin is active.
-if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	/**
 	 * Returns the menu items for a WordPress menu location.
 	 *
@@ -404,7 +404,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// - we don't have a relationship to a `wp_navigation` Post (via `ref`).
 	// ...then create inner blocks from the classic menu assigned to that location.
 	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) &&
+		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
 		array_key_exists( '__unstableLocation', $attributes ) &&
 		! array_key_exists( 'ref', $attributes ) &&
 		! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
