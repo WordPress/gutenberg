@@ -128,35 +128,6 @@ if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
 	add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
 
 	/**
-	 * Fixes the label of the 'wp_template' admin menu entry.
-	 */
-	function gutenberg_fix_template_admin_menu_entry() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-		global $submenu;
-		if ( ! isset( $submenu['themes.php'] ) ) {
-			return;
-		}
-		$post_type = get_post_type_object( 'wp_template' );
-		if ( ! $post_type ) {
-			return;
-		}
-		foreach ( $submenu['themes.php'] as $key => $submenu_entry ) {
-			if ( $post_type->labels->all_items === $submenu['themes.php'][ $key ][0] ) {
-				$submenu['themes.php'][ $key ][0] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
-				break;
-			}
-		}
-	}
-	add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
-
-	// Customize the `wp_template` admin list.
-	add_filter( 'manage_wp_template_posts_columns', 'gutenberg_templates_lists_custom_columns' );
-	add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
-	add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
-
-	/**
 	 * Sets a custom slug when creating auto-draft templates.
 	 * This is only needed for auto-drafts created by the regular WP editor.
 	 * If this page is to be removed, this won't be necessary.
