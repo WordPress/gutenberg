@@ -3,7 +3,15 @@
 		"clientId": "_clientId_0",
 		"name": "core/comments-pagination-next",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"label": "Next Comments",
+			"fontSize": "medium",
+			"style": {
+				"typography": {
+					"textTransform": "lowercase"
+				}
+			}
+		},
 		"innerBlocks": [],
 		"originalContent": ""
 	}

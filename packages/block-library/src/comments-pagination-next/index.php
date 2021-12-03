@@ -15,9 +15,9 @@
  * @return string Returns the next comments link for the query pagination.
  */
 function render_block_core_comments_pagination_next( $attributes, $content, $block ) {
-	$comments_per_page = isset( $block->context['queryPerPage'] ) ? $block->context['queryPerPage'] : 4;
+	$comments_per_page = $block->context['queryPerPage'];
 	$comments_number   = (int) get_comments_number();
-	$max_page          = (int) floor( $comments_number / $comments_per_page );
+	$max_page          = isset( $comments_per_page ) ? (int) floor( $comments_number / $comments_per_page ) : 0;
 	$default_label     = __( 'Next Comments' );
 	$label             = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow  = get_query_pagination_arrow( $block, true );
@@ -32,6 +32,7 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 		return '';
 	}
 
+	// TODO - Apply block wrapper attributes to the link instead of on the wrapper.
 	return sprintf(
 		'<div %1s>%2s</div>',
 		$wrapper_attributes,

@@ -43,7 +43,7 @@ export default function QueryPaginationEdit( {
 		const innerBlocks = getBlocks( clientId );
 		/**
 		 * Show the `paginationArrow` control only if a
-		 * `CommentsPaginationNext/Previous` block exists.
+		 * Comments Pagination Next block exists.
 		 */
 		return innerBlocks?.find( ( innerBlock ) => {
 			return [ 'core/comments-pagination-next' ].includes(

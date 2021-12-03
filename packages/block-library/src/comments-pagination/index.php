@@ -20,7 +20,7 @@ function render_block_core_comments_pagination( $attributes, $content ) {
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
-		get_block_wrapper_attributes(array('class' => 'wp-block-query-pagination')),
+		get_block_wrapper_attributes( array( 'class' => 'wp-block-query-pagination' ) ),
 		$content
 	);
 }
