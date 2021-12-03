@@ -22,31 +22,21 @@ describe( 'Convert to tree', () => {
 
 		expect( comments ).toEqual( [
 			{
-				id: 1,
 				commentId: 1,
-				parent: 0,
 				children: [
 					{
-						children: [],
-						id: 6,
 						commentId: 6,
-						parent: 1,
+						children: [],
 					},
 				],
 			},
 			{
-				id: 2,
 				commentId: 2,
-				parent: 0,
 				children: [
-					{ children: [], commentId: 3, id: 3, parent: 2 },
+					{ commentId: 3, children: [] },
 					{
-						children: [
-							{ children: [], commentId: 5, id: 5, parent: 4 },
-						],
-						id: 4,
 						commentId: 4,
-						parent: 2,
+						children: [ { commentId: 5, children: [] } ],
 					},
 				],
 			},

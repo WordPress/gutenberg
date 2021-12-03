@@ -32,7 +32,7 @@ export const convertToTree = ( data ) => {
 
 	// First create a hash table of { [id]: { ...comment, children: [] }}
 	data.forEach( ( item ) => {
-		table[ item.id ] = { ...item, commentId: item.id, children: [] };
+		table[ item.id ] = { commentId: item.id, children: [] };
 	} );
 
 	const tree = [];
