@@ -6,6 +6,11 @@ import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
 
 /**
+ * External dependencies
+ */
+import { I18nManager } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -33,6 +38,8 @@ const gutenbergSetup = () => {
 	wpData.use( wpData.plugins.persistence, { storageKey } );
 
 	setupApiFetch();
+
+	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 
 	const isHermes = () => global.HermesInternal !== null;
 	// eslint-disable-next-line no-console

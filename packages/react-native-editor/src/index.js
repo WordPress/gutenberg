@@ -15,6 +15,8 @@ import { Component, cloneElement } from '@wordpress/element';
  */
 import { omit } from 'lodash';
 import initialHtml from './initial-html';
+import setupLocale from './setup-locale';
+import { getTranslation } from '../i18n-cache';
 
 const registerGutenberg = ( initCallback ) => {
 	class Gutenberg extends Component {
@@ -24,8 +26,11 @@ const registerGutenberg = ( initCallback ) => {
 			const parentProps = omit( this.props || {}, [ 'rootTag' ] );
 
 			// Setup locale
-			const setupLocale = require( './setup-locale' ).default;
-			setupLocale( parentProps.locale, parentProps.translations );
+			setupLocale( {
+				locale: parentProps.locale,
+				extraTranslations: parentProps.translations,
+				getTranslation,
+			} );
 
 			// Initialize editor
 			const setup = require( './setup' ).default;
@@ -57,4 +62,4 @@ const registerGutenberg = ( initCallback ) => {
 	AppRegistry.registerComponent( 'gutenberg', () => Gutenberg );
 };
 
-export { initialHtml as initialHtmlGutenberg, registerGutenberg };
+export { initialHtml as initialHtmlGutenberg, registerGutenberg, setupLocale };
