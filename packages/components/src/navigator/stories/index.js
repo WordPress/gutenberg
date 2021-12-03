@@ -20,12 +20,12 @@ export default {
 
 function NavigatorButton( { path, isBack = false, ...props } ) {
 	const navigator = useNavigator();
+
+	const handleOnClick = () =>
+		isBack ? navigator.pop() : navigator.push( path );
+
 	return (
-		<Button
-			variant="secondary"
-			onClick={ () => navigator.push( path, { isBack } ) }
-			{ ...props }
-		/>
+		<Button variant="secondary" onClick={ handleOnClick } { ...props } />
 	);
 }
 

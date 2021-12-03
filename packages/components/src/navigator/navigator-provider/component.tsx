@@ -21,7 +21,11 @@ import {
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
-import type { NavigatorProviderProps, NavigatorPath } from '../types';
+import type {
+	NavigatorProviderProps,
+	NavigatorLocation,
+	NavigatorContext as NavigatorContextType,
+} from '../types';
 
 function NavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
@@ -34,9 +38,39 @@ function NavigatorProvider(
 		...otherProps
 	} = useContextSystem( props, 'NavigatorProvider' );
 
-	const [ path, setPath ] = useState< NavigatorPath >( {
-		path: initialPath,
-	} );
+	const [ locationHistory, setLocationHistory ] = useState<
+		NavigatorLocation[]
+	>( [
+		{
+			path: initialPath,
+		},
+	] );
+
+	const navigatorContextValue: NavigatorContextType = {
+		location: locationHistory[ locationHistory.length - 1 ],
+		push: ( path, options ) => {
+			setLocationHistory( [
+				...locationHistory,
+				{
+					path,
+					isBack: false,
+					navigationTriggerElement: options?.navigationTriggerElement,
+				},
+			] );
+		},
+		pop: () => {
+			if ( locationHistory.length > 1 ) {
+				setLocationHistory( [
+					...locationHistory.slice( 0, -2 ),
+					// Force the `isBack` flag to `true` when navigating back.
+					{
+						...locationHistory[ locationHistory.length - 2 ],
+						isBack: true,
+					},
+				] );
+			}
+		},
+	};
 
 	const cx = useCx();
 	const classes = useMemo(
@@ -47,7 +81,7 @@ function NavigatorProvider(
 
 	return (
 		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
-			<NavigatorContext.Provider value={ [ path, setPath ] }>
+			<NavigatorContext.Provider value={ navigatorContextValue }>
 				{ children }
 			</NavigatorContext.Provider>
 		</View>
