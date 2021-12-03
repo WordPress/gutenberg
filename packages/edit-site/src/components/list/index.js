@@ -21,6 +21,7 @@ import Header from './header';
 import NavigationSidebar from '../navigation-sidebar';
 import Table from './table';
 import { store as editSiteStore } from '../../store';
+import useTitle from '../routes/use-title';
 
 export default function List( { templateType } ) {
 	useRegisterShortcuts();
@@ -46,6 +47,8 @@ export default function List( { templateType } ) {
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
 	);
+
+	useTitle( postType?.labels?.name );
 
 	// `postType` could load in asynchronously. Only provide the detailed region labels if
 	// the postType has loaded, otherwise `InterfaceSkeleton` will fallback to the defaults.

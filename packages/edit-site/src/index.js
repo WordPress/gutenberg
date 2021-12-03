@@ -35,19 +35,30 @@ import List from './components/list';
  * @param {?Object} settings Editor settings object.
  */
 export function reinitializeEditor( target, settings ) {
+	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind( null, target, settings );
 
-	dispatch( editorStore ).updateEditorSettings( settings );
+	// We dispatch actions and update the store synchronously before rendering
+	// so that we won't trigger unnecessary re-renders with useEffect.
+	{
+		dispatch( editSiteStore ).updateSettings( settings );
+		// Keep the defaultTemplateTypes in the core/editor settings too,
+		// so that they can be selected with core/editor selectors in any editor.
+		// This is needed because edit-site doesn't initialize with EditorProvider,
+		// which internally uses updateEditorSettings as well.
+		dispatch( editorStore ).updateEditorSettings( {
+			defaultTemplateTypes: settings.defaultTemplateTypes,
+			defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
+		} );
 
-	if ( ! getQueryArg( window.location.href, 'postId' ) ) {
-		// Default the navigation panel to be opened when we're in a bigger
-		// screen and land in the list screen.
-		// We update the store synchronously before rendering so that we won't
-		// trigger an unnecessary re-render with useEffect.
-		dispatch( editSiteStore ).setIsNavigationPanelOpened(
-			select( viewportStore ).isViewportMatch( 'medium' )
-		);
+		if ( ! getQueryArg( window.location.href, 'postId' ) ) {
+			// Default the navigation panel to be opened when we're in a bigger
+			// screen and land in the list screen.
+			dispatch( editSiteStore ).setIsNavigationPanelOpened(
+				select( viewportStore ).isViewportMatch( 'medium' )
+			);
+		}
 	}
 
 	render(
@@ -57,9 +68,7 @@ export function reinitializeEditor( target, settings ) {
 					return <List templateType={ postType } />;
 				}
 
-				return (
-					<Editor initialSettings={ settings } onError={ reboot } />
-				);
+				return <Editor onError={ reboot } />;
 			} }
 		</Routes>,
 		target
