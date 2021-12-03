@@ -282,7 +282,7 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
  */
 function gutenberg_load_css_custom_properties() {
 	wp_register_style( 'global-styles-css-custom-properties', false, array(), true, true );
-	wp_add_inline_style( 'global-styles-css-custom-properties', gutenberg_get_global_stylesheet( array( 'variables' ) ) );
+	wp_add_inline_style( 'global-styles-css-custom-properties', wp_get_global_stylesheet( array( 'variables' ) ) );
 	wp_enqueue_style( 'global-styles-css-custom-properties' );
 }
 
