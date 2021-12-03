@@ -167,12 +167,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$id              = uniqid();
 	$style           = gutenberg_get_layout_style( ".wp-container-$id", $used_layout, $has_block_gap_support );
 	$container_class = 'wp-container-' . $id . ' ';
-	$justify_class   = $used_layout['justifyContent'] ? 'wp-justify-' . $used_layout['justifyContent'] . ' ' : '';
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . $container_class . $justify_class,
+		'class="' . $container_class,
 		$block_content,
 		1
 	);

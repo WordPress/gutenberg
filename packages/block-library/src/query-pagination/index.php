@@ -18,9 +18,12 @@ function render_block_core_query_pagination( $attributes, $content ) {
 		return '';
 	}
 
+	$justifyContent = $attributes['layout']['justifyContent'];
+	$justify_class  = $justifyContent ? 'wp-justify-' . $justifyContent : '';
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
-		get_block_wrapper_attributes(),
+		get_block_wrapper_attributes( array( 'class' => $justify_class ) ),
 		$content
 	);
 }
