@@ -97,15 +97,14 @@
 }
 
 // Show even when a child is selected. This is an edgecase just for navigation submenus.
-.is-editing > .wp-block-navigation__submenu-container {
-	.block-list-appender {
-		position: static;
-		margin-left: auto;
+.is-editing > .wp-block-navigation__submenu-container > .block-list-appender {
+	display: block;
+	position: static;
+}
 
-		> .block-list-appender__toggle {
-			display: block;
-		}
-	}
+// Hide when hovering.
+.wp-block-navigation__submenu-container .block-list-appender {
+	display: none;
 }
 
 
