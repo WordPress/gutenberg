@@ -31,11 +31,8 @@ $pagination-margin: 0.5em;
 			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
 		}
 	}
-
-	// Non-clickeable previous and next elements are not visible
-	>span.wp-block-query-pagination-next,
-	>span.wp-block-query-pagination-previous {
-		visibility: hidden;
+	&.aligncenter {
+		justify-content: center;
 	}
 
 	&.wp-justify-left,
