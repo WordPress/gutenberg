@@ -250,6 +250,19 @@ describe( 'Multi-entity save flow', () => {
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
+		const saveAllChanges = async () => {
+			// Clicking button should open panel with boxes checked.
+			await page.click( activeSaveSiteSelector );
+			await page.waitForSelector( savePanelSelector );
+			await assertAllBoxesChecked();
+
+			// Save a11y button should not be present with save panel open.
+			await assertExistance( saveA11ySelector, false );
+
+			// Saving should result in items being saved.
+			await page.click( entitiesSaveSelector );
+		};
+
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
 			await siteEditor.visit( {
@@ -279,20 +292,55 @@ describe( 'Multi-entity save flow', () => {
 			// Save a11y button should be present.
 			await assertExistance( saveA11ySelector, true );
 
-			// Clicking button should open panel with boxes checked.
-			await page.click( activeSaveSiteSelector );
-			await page.waitForSelector( savePanelSelector );
-			await assertAllBoxesChecked();
+			// Save all changes.
+			await saveAllChanges();
 
-			// Save a11y button should not be present with save panel open.
-			await assertExistance( saveA11ySelector, false );
-
-			// Saving should result in items being saved.
-			await page.click( entitiesSaveSelector );
 			const disabledButton = await page.waitForSelector(
 				disabledSaveSiteSelector
 			);
 			expect( disabledButton ).not.toBeNull();
+		} );
+
+		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
+			// Navigate to site editor.
+			await siteEditor.visit( {
+				postId: 'tt1-blocks//index',
+				postType: 'wp_template',
+			} );
+			await siteEditor.disableWelcomeGuide();
+
+			// Insert a paragraph at the bottom.
+			await insertBlock( 'Paragraph' );
+
+			// Open the block settings.
+			await page.click( 'button[aria-label="Settings"]' );
+
+			// Click on font size selector.
+			await page.click( 'button[aria-label="Font size"]' );
+
+			// Click on a different font size.
+			const extraSmallFontSize = await page.waitForXPath(
+				'//li[contains(text(), "Extra small")]'
+			);
+			await extraSmallFontSize.click();
+
+			// Save all changes.
+			await saveAllChanges();
+
+			// Click on font size selector again.
+			await page.click( 'button[aria-label="Font size"]' );
+
+			// Select another font size.
+			const normalFontSize = await page.waitForXPath(
+				'//li[contains(text(), "Normal")]'
+			);
+			await normalFontSize.click();
+
+			// Assert that the save button has been re-enabled.
+			const saveButton = await page.waitForSelector(
+				activeSaveSiteSelector
+			);
+			expect( saveButton ).not.toBeNull();
 		} );
 	} );
 } );
