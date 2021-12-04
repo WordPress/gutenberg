@@ -1,8 +1,21 @@
-.block-editor-line-height-control {
+// TODO: Remove this class before merging
+.block-editor-line-height-control-legacy {
 	margin-bottom: 24px;
 
 	input {
 		display: block;
 		max-width: 60px;
+	}
+}
+// end TODO
+
+.block-editor-line-height-control {
+	&.has-legacy-styles {
+		margin-bottom: 24px;
+		line-height: 1.4;
+
+		.components-input-control__container {
+			margin-top: 4px;
+		}
 	}
 }

@@ -1,8 +1,16 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TextControl } from '@wordpress/components';
+import {
+	__experimentalNumberControl as NumberControl,
+	TextControl,
+} from '@wordpress/components';
 import { ZERO } from '@wordpress/keycodes';
 
 /**
@@ -15,7 +23,8 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
-export default function LineHeightControl( { value: lineHeight, onChange } ) {
+// TODO: Remove before merging
+export function LegacyLineHeightControl( { value: lineHeight, onChange } ) {
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const handleOnKeyDown = ( event ) => {
@@ -64,7 +73,7 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 	const value = isDefined ? lineHeight : RESET_VALUE;
 
 	return (
-		<div className="block-editor-line-height-control">
+		<div className="block-editor-line-height-control-legacy">
 			<TextControl
 				autoComplete="off"
 				onKeyDown={ handleOnKeyDown }
@@ -73,6 +82,35 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
 				type="number"
+				value={ value }
+				min={ 0 }
+			/>
+		</div>
+	);
+}
+
+export default function LineHeightControl( {
+	value: lineHeight,
+	onChange,
+	__unstableHasLegacyStyles = true,
+} ) {
+	const isDefined = isLineHeightDefined( lineHeight );
+	const value = isDefined ? lineHeight : RESET_VALUE;
+
+	return (
+		<div
+			className={ classNames( 'block-editor-line-height-control', {
+				'has-legacy-styles': __unstableHasLegacyStyles,
+			} ) }
+		>
+			<NumberControl
+				__unstableInputWidth={
+					__unstableHasLegacyStyles ? '60px' : undefined
+				}
+				onChange={ onChange }
+				label={ __( 'Line height' ) }
+				placeholder={ BASE_DEFAULT_VALUE }
+				step={ STEP }
 				value={ value }
 				min={ 0 }
 			/>
