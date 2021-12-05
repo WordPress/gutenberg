@@ -38,7 +38,7 @@ add_filter( 'render_block_data', 'render_block_core_gallery_data' );
  * This render callback needs to be here
  * so that the gallery styles are loaded in block-based themes.
  */
-function gutenberg_register_block_core_gallery() {
+function register_block_core_gallery() {
 	register_block_type_from_metadata(
 		__DIR__ . '/gallery',
 		array(
@@ -49,4 +49,4 @@ function gutenberg_register_block_core_gallery() {
 	);
 }
 
-add_action( 'init', 'gutenberg_register_block_core_gallery', 20 );
+add_action( 'init', 'register_block_core_gallery', 20 );
