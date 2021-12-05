@@ -16,7 +16,7 @@
  * @param array $parsed_block The block being rendered.
  * @return array The migrated block object.
  */
-function render_block_core_gallery_data( $parsed_block ) {
+function block_core_gallery_data_id_backcompatibility( $parsed_block ) {
 	if ( 'core/gallery' === $parsed_block['blockName'] ) {
 		foreach ( $parsed_block['innerBlocks'] as $key => $inner_block ) {
 			if ( 'core/image' === $inner_block['blockName'] ) {
@@ -30,7 +30,7 @@ function render_block_core_gallery_data( $parsed_block ) {
 	return $parsed_block;
 }
 
-add_filter( 'render_block_data', 'render_block_core_gallery_data' );
+add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' );
 
 /**
  * Registers the `core/gallery` block on server.
