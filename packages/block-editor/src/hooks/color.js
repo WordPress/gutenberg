@@ -221,7 +221,17 @@ export function ColorEdit( props ) {
 	// Some color settings have a special handling for deprecated flags in `useSetting`,
 	// so we can't unwrap them by doing const { ... } = useSetting('color')
 	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
-	const solidsPerOrigin = useSetting( 'color.palette' ) || EMPTY_OBJECT;
+	const userPalette = useSetting( 'color.palette.custom' );
+	const themePalette = useSetting( 'color.palette.theme' );
+	const defaultPalette = useSetting( 'color.palette.default' );
+	const allSolids = useMemo(
+		() => [
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
+		],
+		[ userPalette, themePalette, defaultPalette ]
+	);
 	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
 	const areCustomSolidsEnabled = useSetting( 'color.custom' );
 	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
@@ -230,23 +240,12 @@ export function ColorEdit( props ) {
 	const isTextEnabled = useSetting( 'color.text' );
 
 	const solidsEnabled =
-		areCustomSolidsEnabled ||
-		! solidsPerOrigin?.theme ||
-		solidsPerOrigin?.theme?.length > 0;
+		areCustomSolidsEnabled || ! themePalette || themePalette?.length > 0;
 
 	const gradientsEnabled =
 		areCustomGradientsEnabled ||
 		! gradientsPerOrigin?.theme ||
 		gradientsPerOrigin?.theme?.length > 0;
-
-	const allSolids = useMemo(
-		() => [
-			...( solidsPerOrigin?.custom || [] ),
-			...( solidsPerOrigin?.theme || [] ),
-			...( solidsPerOrigin?.default || [] ),
-		],
-		[ solidsPerOrigin ]
-	);
 
 	const allGradients = useMemo(
 		() => [
@@ -444,19 +443,20 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const solidsPerOrigin = useSetting( 'color.palette' ) || EMPTY_OBJECT;
+		const userPalette = useSetting( 'color.palette.custom' ) || [];
+		const themePalette = useSetting( 'color.palette.theme' ) || [];
+		const defaultPalette = useSetting( 'color.palette.default' ) || [];
 		const colors = useMemo(
 			() => [
-				...( solidsPerOrigin?.custom || [] ),
-				...( solidsPerOrigin?.theme || [] ),
-				...( solidsPerOrigin?.default || [] ),
+				...( userPalette || [] ),
+				...( themePalette || [] ),
+				...( defaultPalette || [] ),
 			],
-			[ solidsPerOrigin ]
+			[ userPalette, themePalette, defaultPalette ]
 		);
 		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
-
 		const extraStyles = {};
 
 		if ( textColor ) {

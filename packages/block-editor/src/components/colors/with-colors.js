@@ -36,8 +36,6 @@ const withCustomColorPalette = ( colorsArray ) =>
 		'withCustomColorPalette'
 	);
 
-const EMPTY_OBJECT = {};
-
 /**
  * Higher order component factory for injecting the editor colors as the
  * `colors` prop in the `withColors` HOC.
@@ -50,15 +48,16 @@ const withEditorColorPalette = () =>
 			// Some color settings have a special handling for deprecated flags in `useSetting`,
 			// so we can't unwrap them by doing const { ... } = useSetting('color')
 			// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
-			const colorPerOrigin =
-				useSetting( 'color.palette' ) || EMPTY_OBJECT;
+			const userPalette = useSetting( 'color.palette.custom' );
+			const themePalette = useSetting( 'color.palette.theme' );
+			const defaultPalette = useSetting( 'color.palette.default' );
 			const allColors = useMemo(
 				() => [
-					...( colorPerOrigin?.custom || [] ),
-					...( colorPerOrigin?.theme || [] ),
-					...( colorPerOrigin?.default || [] ),
+					...( userPalette || [] ),
+					...( themePalette || [] ),
+					...( defaultPalette || [] ),
 				],
-				[ colorPerOrigin ]
+				[ userPalette, themePalette, defaultPalette ]
 			);
 			return <WrappedComponent { ...props } colors={ allColors } />;
 		},
