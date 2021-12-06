@@ -1,10 +1,10 @@
-# Setup guide for React Native development (OSX)
+# Setup guide for React Native development (macOS)
 
 Are you interested in contributing to the native mobile editor? This
 guide is a detailed walk through designed to get you up and running!
 
 Note that the following instructions here are primarily focused on the
-OSX environment. For other environments, [the React Native quickstart documentation](https://reactnative.dev/docs/environment-setup)
+macOS environment. For other environments, [the React Native quickstart documentation](https://reactnative.dev/docs/environment-setup)
 has helpful pointers and steps for getting set up.
 
 ## Install Xcode
