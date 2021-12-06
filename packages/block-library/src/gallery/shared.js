@@ -29,11 +29,19 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
  * can be removed when minimum supported WP version >=5.9.
  */
 export function isGalleryV2Enabled() {
-	// We want to fail early here, at least during beta testing phase, to ensure
-	// there aren't instances where undefined values cause false negatives.
-	if ( ! window.wp || typeof window.wp.galleryBlockV2Enabled !== 'boolean' ) {
-		throw 'window.wp.galleryBlockV2Enabled is not defined';
+	// Only run the Gallery version compat check if the plugin is running, otherwise
+	// assume we are in 5.9 core and enable by default.
+	if ( process.env.GUTENBERG_PHASE === 2 ) {
+		// We want to fail early here, at least during beta testing phase, to ensure
+		// there aren't instances where undefined values cause false negatives.
+		if (
+			! window.wp ||
+			typeof window.wp.galleryBlockV2Enabled !== 'boolean'
+		) {
+			throw 'window.wp.galleryBlockV2Enabled is not defined';
+		}
+		return window.wp.galleryBlockV2Enabled;
 	}
 
-	return window.wp.galleryBlockV2Enabled;
+	return true;
 }
