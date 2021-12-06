@@ -50,3 +50,28 @@ addFilter(
 	'core/template-part',
 	enhanceTemplatePartVariations
 );
+
+addFilter(
+	'blockEditor.getInserterItems',
+	'test',
+	( types, rootClientId, { getBlock, getBlockParentsByBlockName } ) => {
+		const templateParts = types.filter( ( { id } ) =>
+			id.startsWith( 'core/template-part' )
+		);
+		if ( ! templateParts.length ) {
+			return types;
+		}
+
+		const hasParent =
+			getBlock( rootClientId )?.name === 'core/post-template' ||
+			getBlockParentsByBlockName( rootClientId, 'core/post-template' )
+				.length;
+		if ( hasParent ) {
+			for ( let i = templateParts.length - 1; i >= 0; i-- ) {
+				types.splice( types.indexOf( templateParts[ i ] ), 1 );
+			}
+		}
+
+		return types;
+	}
+);

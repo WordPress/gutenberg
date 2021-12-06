@@ -30,6 +30,7 @@ import {
 	parse,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 
 /**
@@ -826,6 +827,7 @@ export const isAncestorMultiSelected = createSelector(
 		state.selection.selectionEnd.clientId,
 	]
 );
+
 /**
  * Returns the client ID of the block which begins the multi-selection set, or
  * null if there is no multi-selection.
@@ -1513,7 +1515,9 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 		isDisabled,
 		frecency: calculateFrecency( time, count ),
 	};
-	if ( buildScope === 'transform' ) return blockItemBase;
+	if ( buildScope === 'transform' ) {
+		return blockItemBase;
+	}
 
 	const inserterVariations = getBlockVariations( blockType.name, 'inserter' );
 	return {
@@ -1673,7 +1677,18 @@ export const getInserterItems = createSelector(
 			noncore: nonCoreItems,
 		} = items.reduce( groupByType, { core: [], noncore: [] } );
 		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
-		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
+		const computedBlockTypes = [
+			...sortedBlockTypes,
+			...reusableBlockInserterItems,
+		];
+		const hookName = 'blockEditor.getInserterItems';
+		return applyFilters( hookName, computedBlockTypes, rootClientId, {
+			getBlock: getBlock.bind( null, state ),
+			getBlockParentsByBlockName: getBlockParentsByBlockName.bind(
+				null,
+				state
+			),
+		} );
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -1950,7 +1965,9 @@ export const __experimentalGetAllowedPatterns = createSelector(
  */
 export const __experimentalGetPatternsByBlockTypes = createSelector(
 	( state, blockNames, rootClientId = null ) => {
-		if ( ! blockNames ) return EMPTY_ARRAY;
+		if ( ! blockNames ) {
+			return EMPTY_ARRAY;
+		}
 		const patterns = __experimentalGetAllowedPatterns(
 			state,
 			rootClientId
@@ -1991,7 +2008,9 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
  */
 export const __experimentalGetPatternTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
-		if ( ! blocks ) return EMPTY_ARRAY;
+		if ( ! blocks ) {
+			return EMPTY_ARRAY;
+		}
 		/**
 		 * For now we only handle blocks without InnerBlocks and take into account
 		 * the `__experimentalRole` property of blocks' attributes for the transformation.
