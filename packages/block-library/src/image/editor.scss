@@ -74,11 +74,23 @@ figure.wp-block-image:not(.wp-block) {
 	> .wp-block-image {
 		display: grid;
 		grid-template-rows: auto auto;
-		grid-template-columns: min-content;
-
+		grid-template-columns: [resized] min-content [no-resize] auto;
+		.components-placeholder {
+			grid-column: no-resize;
+		}
+		.components-resizable-box__container {
+			grid-column: resized;
+		}
 		> figcaption {
+			grid-column: resized;
 			display: table-caption;
 			caption-side: bottom;
+		}
+	}
+	> .wp-block-image:not(.is-resized) {
+		> .components-resizable-box__container,
+		> figcaption {
+			grid-column: no-resize;
 		}
 	}
 }
