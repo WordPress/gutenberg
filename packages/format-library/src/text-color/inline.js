@@ -89,7 +89,7 @@ function setColors( value, name, colorSettings, colors ) {
 		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
 	} else {
 		// Override default browser color for mark element.
-		styles.push( [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' ) );
+		styles.push( [ 'background-color', transparentValue ].join( ':' ) );
 	}
 
 	if ( color ) {
