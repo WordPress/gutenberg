@@ -11,7 +11,7 @@
  *
  * @param  array $attributes The block attributes.
  * @param  array $content    The block content.
- * @return string            Returns the block content with the data-id attribute added.
+ * @return string Returns the block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content ) {
 	if ( isset( $attributes['data-id'] ) ) {
