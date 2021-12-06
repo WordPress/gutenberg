@@ -15,12 +15,10 @@
 			"type": "number"
 		},
 		"heightUnit": {
-			"type": "string",
-			"default": "px"
+			"type": "string"
 		},
 		"widthUnit": {
-			"type": "string",
-			"default": "px"
+			"type": "string"
 		}
 	},
 	"usesContext": [ "orientation" ],
