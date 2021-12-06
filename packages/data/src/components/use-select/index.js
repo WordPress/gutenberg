@@ -17,6 +17,7 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 
+const noop = () => {};
 const renderQueue = createQueue();
 
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
@@ -103,7 +104,7 @@ export default function useSelect( mapSelect, deps ) {
 	// for `mapSelect`. we'll create this intermediate variable to
 	// fulfill that need and then reference it with our "real"
 	// `_mapSelect` if we can.
-	const callbackMapper = useCallback( mapSelect, deps );
+	const callbackMapper = useCallback( hasMappingFunction ? mapSelect : noop, deps );
 	const _mapSelect = hasMappingFunction ? callbackMapper : null;
 
 	const registry = useRegistry();
