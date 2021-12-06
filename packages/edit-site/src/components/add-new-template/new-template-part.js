@@ -26,7 +26,7 @@ export default function NewTemplatePart( { postType } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { getLastEntitySaveError } = useSelect( coreStore );
 
-	async function createTemplatePart( { title, area }, { closeModal } ) {
+	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
 			createErrorNotice( __( 'Title is not defined.' ), {
 				type: 'snackbar',
@@ -55,7 +55,7 @@ export default function NewTemplatePart( { postType } ) {
 				throw lastEntitySaveError;
 			}
 
-			closeModal();
+			setIsModalOpen( false );
 
 			// Navigate to the created template part editor.
 			history.push( {
@@ -74,7 +74,7 @@ export default function NewTemplatePart( { postType } ) {
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 
-			closeModal();
+			setIsModalOpen( false );
 		}
 	}
 

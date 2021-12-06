@@ -18,55 +18,28 @@ export default function URLQueryController() {
 	const {
 		params: { postId, postType },
 	} = useLocation();
+	const homeTemplateId = useSelect(
+		( select ) => select( editSiteStore ).getHomeTemplateId(),
+		[]
+	);
 
 	// Set correct entity on page navigation.
 	useEffect( () => {
-		if ( ! postId ) {
-			showHomepage();
-			return;
-		}
-
 		if ( 'page' === postType || 'post' === postType ) {
 			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
 		} else if ( 'wp_template' === postType ) {
 			setTemplate( postId );
 		} else if ( 'wp_template_part' === postType ) {
 			setTemplatePart( postId );
+		} else if ( homeTemplateId ) {
+			history.replace( {
+				postType: 'wp_template',
+				postId: homeTemplateId,
+			} );
 		} else {
 			showHomepage();
 		}
-	}, [ postId, postType ] );
-
-	// Update page URL when context changes.
-	const pageContext = useCurrentPageContext();
-	useEffect( () => {
-		history.replace( pageContext );
-	}, [ pageContext ] );
+	}, [ postId, postType, homeTemplateId, history ] );
 
 	return null;
-}
-
-function useCurrentPageContext() {
-	return useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId, getPage } = select(
-			editSiteStore
-		);
-
-		const page = getPage();
-		let _postId = getEditedPostId(),
-			_postType = getEditedPostType();
-		// This doesn't seem right to me,
-		// we shouldn't be using the "page" and the "template" in the same way.
-		// This need to be investigated.
-		if ( page?.context?.postId && page?.context?.postType ) {
-			_postId = page.context.postId;
-			_postType = page.context.postType;
-		}
-
-		if ( _postId && _postType ) {
-			return { postId: _postId, postType: _postType };
-		}
-
-		return null;
-	}, [] );
 }
