@@ -2046,7 +2046,7 @@
 		"parent": "react-native"
 	},
 	{
-		"title": "Setup guide for React Native development (OSX)",
+		"title": "Setup guide for React Native development (macOS)",
 		"slug": "osx-setup-guide",
 		"markdown_source": "../docs/contributors/code/react-native/osx-setup-guide.md",
 		"parent": "react-native"
