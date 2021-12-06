@@ -23,19 +23,23 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow   = get_query_pagination_arrow( $block, false );
 
+	if ( $pagination_arrow ) {
+		$label = $pagination_arrow . $label;
+	}
 	// TODO: udpate below comment..
-	// Also we don't probably care about the arrow addition in $label below, do we?
-	// If we are in query's first page, render a hidden placeholder for...(design, accessibility) purposes??
-	$placholder_attributes = get_block_wrapper_attributes( array( 'style' => 'visibility:hidden;' ) );
+	// If we are in query's first page, render a hidden placeholder for...(design) purposes??
+	$placholder_attributes = get_block_wrapper_attributes(
+		array(
+			'aria-hidden' => 'true',
+			'style'       => 'visibility:hidden;',
+		)
+	);
 	$placeholder           = sprintf(
 		'<span %1$s>%2$s</span>',
 		$placholder_attributes,
 		$label
 	);
 
-	if ( $pagination_arrow ) {
-		$label = $pagination_arrow . $label;
-	}
 	// Check if the pagination is for Query that inherits the global context
 	// and handle appropriately.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
