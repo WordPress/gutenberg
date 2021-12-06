@@ -44,9 +44,10 @@ function parseCSS( css = '' ) {
 
 function parseClassName( className = '', colorSettings ) {
 	return className.split( ' ' ).reduce( ( accumulator, name ) => {
-		const match = name.match( /^has-([^-]+)-color$/ );
-		if ( match ) {
-			const [ , colorSlug ] = name.match( /^has-([^-]+)-color$/ );
+		if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
+			const colorSlug = name
+				.replace( /^has-/, '' )
+				.replace( /-color$/, '' );
 			const colorObject = getColorObjectByAttributeValues(
 				colorSettings,
 				colorSlug
