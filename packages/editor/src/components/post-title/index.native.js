@@ -8,11 +8,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	__experimentalRichText as RichText,
-	create,
-	insert,
-} from '@wordpress/rich-text';
+import { __experimentalRichText as RichText } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -32,6 +28,7 @@ class PostTitle extends Component {
 		super( props );
 
 		this.setRef = this.setRef.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 	}
 	componentDidUpdate( prevProps ) {
 		// Unselect if any other block is selected and blur the RichText
@@ -61,16 +58,26 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
-	onPaste( { value, onChange, plainText } ) {
+	onPaste( { html, plainText } ) {
+		const { title, onInsertBlockAfter, onUpdate } = this.props;
+
 		const content = pasteHandler( {
+			HTML: html,
 			plainText,
-			mode: 'INLINE',
-			tagName: 'p',
 		} );
 
-		if ( typeof content === 'string' ) {
-			const valueToInsert = create( { html: content } );
-			onChange( insert( value, valueToInsert ) );
+		if ( typeof content !== 'string' && content.length ) {
+			const [ firstBlock ] = content;
+			if (
+				! title &&
+				( firstBlock.name === 'core/heading' ||
+					firstBlock.name === 'core/paragraph' )
+			) {
+				onUpdate( firstBlock.attributes.content );
+				onInsertBlockAfter( content.slice( 1 ) );
+			} else {
+				onInsertBlockAfter( content );
+			}
 		}
 	}
 
@@ -184,6 +191,7 @@ export default compose(
 
 		return {
 			postType: getEditedPostAttribute( 'type' ),
+			title: getEditedPostAttribute( 'title' ),
 			isAnyBlockSelected: !! selectedId,
 			isSelected: isPostTitleSelected(),
 			isDimmed: selectionIsNested,
@@ -191,13 +199,15 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { undo, redo, togglePostTitleSelection } = dispatch(
+		const { undo, redo, togglePostTitleSelection, editPost } = dispatch(
 			editorStore
 		);
 
-		const { clearSelectedBlock, insertDefaultBlock } = dispatch(
-			blockEditorStore
-		);
+		const {
+			clearSelectedBlock,
+			insertDefaultBlock,
+			insertBlocks,
+		} = dispatch( blockEditorStore );
 
 		return {
 			onEnterPress() {
@@ -211,6 +221,12 @@ export default compose(
 			},
 			onUnselect() {
 				togglePostTitleSelection( false );
+			},
+			onUpdate( title ) {
+				editPost( { title } );
+			},
+			onInsertBlockAfter( blocks ) {
+				insertBlocks( blocks, 0 );
 			},
 		};
 	} ),
