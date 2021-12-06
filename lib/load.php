@@ -103,18 +103,12 @@ require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.ph
 require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/templates.php';
 require __DIR__ . '/compat/wordpress-5.9/template-parts.php';
+require __DIR__ . '/compat/wordpress-5.9/theme-templates.php';
 require __DIR__ . '/editor-settings.php';
-
-
-// These are used by some FSE features
-// as well as global styles.
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php';
-
 require __DIR__ . '/full-site-editing/full-site-editing.php';
-require __DIR__ . '/full-site-editing/block-templates.php';
-require __DIR__ . '/full-site-editing/default-template-types.php';
 require __DIR__ . '/full-site-editing/template-loader.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
