@@ -52,27 +52,22 @@ addFilter(
 );
 
 addFilter(
-	'blockEditor.__unstableGetInserterItems',
+	'blockEditor.__unstableCanInsertBlockType',
 	'removeTemplatePartsFromPostTemplates',
-	( types, rootClientId, { getBlock, getBlockParentsByBlockName } ) => {
-		const templateParts = types.filter(
-			( type ) => type.name === 'core/template-part'
-		);
-		if ( ! templateParts.length ) {
-			return types;
+	(
+		can,
+		blockType,
+		rootClientId,
+		{ getBlock, getBlockParentsByBlockName }
+	) => {
+		if ( blockType.name !== 'core/template-part' ) {
+			return can;
 		}
 
 		const hasDisallowedParent =
 			getBlock( rootClientId )?.name === 'core/post-template' ||
 			getBlockParentsByBlockName( rootClientId, 'core/post-template' )
 				.length;
-		if ( hasDisallowedParent ) {
-			// Remove all template part-like blocks
-			for ( let i = templateParts.length - 1; i >= 0; i-- ) {
-				types.splice( types.indexOf( templateParts[ i ] ), 1 );
-			}
-		}
-
-		return types;
+		return ! hasDisallowedParent;
 	}
 );

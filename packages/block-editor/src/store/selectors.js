@@ -1261,15 +1261,30 @@ const canInsertBlockTypeUnmemoized = (
 		parentName
 	);
 
-	if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
-		return hasParentAllowedBlock || hasBlockAllowedParent;
-	} else if ( hasParentAllowedBlock !== null ) {
-		return hasParentAllowedBlock;
-	} else if ( hasBlockAllowedParent !== null ) {
-		return hasBlockAllowedParent;
+	if (
+		hasParentAllowedBlock !== null &&
+		hasBlockAllowedParent !== null &&
+		! hasParentAllowedBlock &&
+		! hasBlockAllowedParent
+	) {
+		return false;
+	} else if ( hasParentAllowedBlock !== null && ! hasParentAllowedBlock ) {
+		return false;
+	} else if ( hasBlockAllowedParent !== null && ! hasBlockAllowedParent ) {
+		return false;
 	}
 
-	return true;
+	const hookName = 'blockEditor.__unstableCanInsertBlockType';
+	return applyFilters( hookName, true, blockType, rootClientId, {
+		// Pass bound selectors of the current registry. If we're in a nested
+		// context, the data will differ from the one selected from the root
+		// registry.
+		getBlock: getBlock.bind( null, state ),
+		getBlockParentsByBlockName: getBlockParentsByBlockName.bind(
+			null,
+			state
+		),
+	} );
 };
 
 /**
@@ -1675,21 +1690,7 @@ export const getInserterItems = createSelector(
 			noncore: nonCoreItems,
 		} = items.reduce( groupByType, { core: [], noncore: [] } );
 		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
-		const computedBlockTypes = [
-			...sortedBlockTypes,
-			...reusableBlockInserterItems,
-		];
-		const hookName = 'blockEditor.__unstableGetInserterItems';
-		return applyFilters( hookName, computedBlockTypes, rootClientId, {
-			// Pass bound selectors of the current registry. If we're in a nested
-			// context, the data will differ from the one selected from the root
-			// registry.
-			getBlock: getBlock.bind( null, state ),
-			getBlockParentsByBlockName: getBlockParentsByBlockName.bind(
-				null,
-				state
-			),
-		} );
+		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],

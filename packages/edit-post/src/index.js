@@ -81,10 +81,14 @@ export function initializeEditor(
 ) {
 	// Only add the filter when the post editor is initialized, not imported.
 	addFilter(
-		'blockEditor.__unstableGetInserterItems',
+		'blockEditor.__unstableCanInsertBlockType',
 		'removeTemplatePartsFromInserter',
-		( types ) =>
-			types.filter( ( type ) => type.name !== 'core/template-part' )
+		( can, blockType ) => {
+			if ( blockType.name === 'core/template-part' ) {
+				return false;
+			}
+			return can;
+		}
 	);
 
 	const target = document.getElementById( id );
