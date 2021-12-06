@@ -36,12 +36,12 @@ $pagination-margin: 0.5em;
 	>span.wp-block-query-pagination-next,
 	>span.wp-block-query-pagination-previous {
 		visibility: hidden;
+		display: none;
 	}
 
-	&.wp-justify-left,
-	&.wp-justify-right {
-		> [aria-hidden="true"] {
-			display: none;
+	&.wp-justify-space-between {
+		> span[aria-hidden="true"] {
+			display: block;
 		}
 	}
 
