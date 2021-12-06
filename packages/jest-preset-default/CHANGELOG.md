@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-### Bug Fix
+### Bug Fixes
 
+-   Allow ESLint to be imported from within Jest (e.g. when using `ruleTester`) ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
 -   Improve support for test files with `.jsx` and `.tsx` extensions ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
 
 ## 7.1.2 (2021-10-22)

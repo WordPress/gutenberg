@@ -12,5 +12,6 @@
 		"reusable": false,
 		"html": false,
 		"align": true
-	}
+	},
+	"style": "wp-block-comment-template"
 }

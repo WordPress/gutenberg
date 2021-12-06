@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 12.0.2 =
+
+### Bug Fixes
+
+#### Block Variations
+- Block Styles: Check for existence of scroll container. ([37010](https://github.com/WordPress/gutenberg/pull/37010))
+
+
+
+
+
 = 12.1.0-rc.1 =
 
 

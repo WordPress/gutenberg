@@ -277,11 +277,11 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function test_will_return_from_cache_if_populated() {
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
 
-		remove_filter( "pre_transient_{$transient_name}", '__return_null' );
+		remove_filter( "pre_site_transient_{$transient_name}", '__return_null' );
 
 		// Force cache to return a known value as the remote URL http response body.
 		add_filter(
-			"pre_transient_{$transient_name}",
+			"pre_site_transient_{$transient_name}",
 			function() {
 				return '<html><head><title>This value from cache.</title></head><body></body></html>';
 			}
@@ -301,7 +301,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		// Data should be that from cache not from mocked network response.
 		$this->assertContains( 'This value from cache', $data['title'] );
 
-		remove_all_filters( "pre_transient_{$transient_name}" );
+		remove_all_filters( "pre_site_transient_{$transient_name}" );
 	}
 
 	public function test_allows_filtering_data_retrieved_for_a_given_url() {

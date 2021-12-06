@@ -61,7 +61,7 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 		$templates = array_slice( $templates, 0, $index + 1 );
 	}
 
-	$block_template = gutenberg_resolve_template( $type, $templates );
+	$block_template = gutenberg_resolve_template( $type, $templates, $template );
 
 	if ( $block_template ) {
 		if ( empty( $block_template->content ) && is_user_logged_in() ) {
@@ -109,11 +109,14 @@ function gutenberg_override_query_template( $template, $type, array $templates )
  *
  * Accepts an optional $template_hierarchy argument as a hint.
  *
+ * @since 5.9.0 Added the `$fallback_template` parameter.
+ *
  * @param string   $template_type      The current template type.
  * @param string[] $template_hierarchy (optional) The current template hierarchy, ordered by priority.
- * @return null|WP_Block_Template A block template if found. Null if not.
+ * @param string   $fallback_template  A PHP fallback template to use if no matching block template is found.
+ * @return null|Gutenberg_Block_Template A block template if found. Null if not.
  */
-function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
+function gutenberg_resolve_template( $template_type, $template_hierarchy, $fallback_template ) {
 	if ( ! $template_type ) {
 		return null;
 	}
@@ -144,6 +147,43 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 			return $slug_priorities[ $template_a->slug ] - $slug_priorities[ $template_b->slug ];
 		}
 	);
+
+	$theme_base_path        = get_stylesheet_directory() . DIRECTORY_SEPARATOR;
+	$parent_theme_base_path = get_template_directory() . DIRECTORY_SEPARATOR;
+
+	// Is the current theme a child theme, and is the PHP fallback template part of it?
+	if (
+		strpos( $fallback_template, $theme_base_path ) === 0 &&
+		strpos( $fallback_template, $parent_theme_base_path ) === false
+	) {
+		$fallback_template_slug = substr(
+			$fallback_template,
+			// Starting position of slug.
+			strpos( $fallback_template, $theme_base_path ) + strlen( $theme_base_path ),
+			// Remove '.php' suffix.
+			-4
+		);
+
+		// Is our candidate block template's slug identical to our PHP fallback template's?
+		if (
+			count( $templates ) &&
+			$fallback_template_slug === $templates[0]->slug &&
+			'theme' === $templates[0]->source
+		) {
+			// Unfortunately, we cannot trust $templates[0]->theme, since it will always
+			// be set to the current theme's slug by _build_block_template_result_from_file(),
+			// even if the block template is really coming from the current theme's parent.
+			// (The reason for this is that we want it to be associated with the current theme
+			// -- not its parent -- once we edit it and store it to the DB as a wp_template CPT.)
+			// Instead, we use _get_block_template_file() to locate the block template file.
+			$template_file = _get_block_template_file( 'wp_template', $fallback_template_slug );
+			if ( $template_file && get_template() === $template_file['theme'] ) {
+				// The block template is part of the parent theme, so we
+				// have to give precedence to the child theme's PHP template.
+				array_shift( $templates );
+			}
+		}
+	}
 
 	return count( $templates ) ? $templates[0] : null;
 }
@@ -266,28 +306,3 @@ function gutenberg_resolve_template_for_new_post( $wp_query ) {
 		$wp_query->set( 'post_status', 'auto-draft' );
 	}
 }
-
-/**
- * Redirect the edit links for templates to the site editor.
- *
- * @param string $link    The original link.
- * @param int    $post_id The custom post id.
- */
-function gutenberg_get_edit_template_link( $link, $post_id ) {
-	$post = get_post( $post_id );
-
-	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
-		return $link;
-	}
-
-	$template = _build_block_template_result_from_post( $post );
-
-	if ( is_wp_error( $template ) ) {
-		return $link;
-	}
-
-	$edit_link = 'themes.php?page=gutenberg-edit-site&postId=%1$s&postType=%2$s';
-
-	return admin_url( sprintf( $edit_link, urlencode( $template->id ), $template->type ) );
-}
-add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );
