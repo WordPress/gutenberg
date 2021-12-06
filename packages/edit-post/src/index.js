@@ -8,6 +8,7 @@ import {
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -78,6 +79,14 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	// Only add the filter when the post editor is initialized, not imported.
+	addFilter(
+		'blockEditor.__unstableGetInserterItems',
+		'removeTemplatePartsFromInserter',
+		( types ) =>
+			types.filter( ( type ) => type.name !== 'core/template-part' )
+	);
+
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind(
 		null,
