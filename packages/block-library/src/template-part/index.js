@@ -52,8 +52,8 @@ addFilter(
 );
 
 addFilter(
-	'blockEditor.getInserterItems',
-	'test',
+	'blockEditor.__unstableGetInserterItems',
+	'removeTemplatePartsFromPostTemplates',
 	( types, rootClientId, { getBlock, getBlockParentsByBlockName } ) => {
 		const templateParts = types.filter(
 			( type ) => type.name === 'core/template-part'

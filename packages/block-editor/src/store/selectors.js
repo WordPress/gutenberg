@@ -1679,7 +1679,7 @@ export const getInserterItems = createSelector(
 			...sortedBlockTypes,
 			...reusableBlockInserterItems,
 		];
-		const hookName = 'blockEditor.getInserterItems';
+		const hookName = 'blockEditor.__unstableGetInserterItems';
 		return applyFilters( hookName, computedBlockTypes, rootClientId, {
 			// Pass bound selectors of the current registry. If we're in a nested
 			// context, the data will differ from the one selected from the root
