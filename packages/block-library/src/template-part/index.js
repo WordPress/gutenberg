@@ -55,18 +55,19 @@ addFilter(
 	'blockEditor.getInserterItems',
 	'test',
 	( types, rootClientId, { getBlock, getBlockParentsByBlockName } ) => {
-		const templateParts = types.filter( ( { id } ) =>
-			id.startsWith( 'core/template-part' )
+		const templateParts = types.filter(
+			( type ) => type.name === 'core/template-part'
 		);
 		if ( ! templateParts.length ) {
 			return types;
 		}
 
-		const hasParent =
+		const hasDisallowedParent =
 			getBlock( rootClientId )?.name === 'core/post-template' ||
 			getBlockParentsByBlockName( rootClientId, 'core/post-template' )
 				.length;
-		if ( hasParent ) {
+		if ( hasDisallowedParent ) {
+			// Remove all template part-like blocks
 			for ( let i = templateParts.length - 1; i >= 0; i-- ) {
 				types.splice( types.indexOf( templateParts[ i ] ), 1 );
 			}
