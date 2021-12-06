@@ -190,7 +190,7 @@ const SpacerEdit = ( {
 
 	return (
 		<>
-			<View { ...useBlockProps() } style={ style }>
+			<View { ...useBlockProps( { style } ) }>
 				{ resizableBoxWithOrientation( orientation ) }
 			</View>
 			<SpacerControls
