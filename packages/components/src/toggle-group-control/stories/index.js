@@ -19,7 +19,7 @@ export default {
 	component: ToggleGroupControl,
 	title: 'Components/ToggleGroupControl',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

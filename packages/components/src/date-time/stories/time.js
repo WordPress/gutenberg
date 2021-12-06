@@ -13,7 +13,7 @@ export default {
 	title: 'Components/TimePicker',
 	component: TimePicker,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
