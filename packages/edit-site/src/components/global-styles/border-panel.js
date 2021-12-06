@@ -7,6 +7,7 @@ import {
 	__experimentalColorGradientControl as ColorGradientControl,
 } from '@wordpress/block-editor';
 import {
+	__experimentalGrid as Grid,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
@@ -62,10 +63,15 @@ function useHasBorderStyleControl( name ) {
 
 function useHasBorderWidthControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	return (
+	const hasStyleControl =
+		useSetting( 'border.style', name )[ 0 ] &&
+		supports.includes( 'borderStyle' );
+	const hasWidthControl =
 		useSetting( 'border.width', name )[ 0 ] &&
-		supports.includes( 'borderWidth' )
-	);
+		supports.includes( 'borderWidth' );
+
+	// Width control/support is enforced if border style supported.
+	return hasWidthControl || hasStyleControl;
 }
 
 export default function BorderPanel( { name } ) {
@@ -138,37 +144,48 @@ export default function BorderPanel( { name } ) {
 		setStyle( value || undefined );
 	};
 
+	const widthAndStyleLabel = ! showBorderStyle
+		? __( 'Width' )
+		: __( 'Width & Style' );
+
 	return (
 		<ToolsPanel label={ __( 'Border' ) } resetAll={ resetAll }>
-			{ showBorderWidth && (
+			{ showBorderWidth && ( // Style cannot be supported without width.
 				<ToolsPanelItem
-					className="single-column"
-					hasValue={ createHasValueCallback( 'width' ) }
-					label={ __( 'Width' ) }
-					onDeselect={ createResetCallback( setBorderWidth ) }
+					hasValue={ () => {
+						if ( showBorderStyle ) {
+							return (
+								!! userBorderStyles?.width ||
+								!! userBorderStyles?.style
+							);
+						}
+
+						return !! userBorderStyles?.width;
+					} }
+					label={ widthAndStyleLabel }
+					onDeselect={ () => {
+						setBorderWidth( undefined );
+						setBorderStyle( undefined );
+					} }
 					isShownByDefault={ true }
 				>
-					<UnitControl
-						value={ borderWidthValue }
-						label={ __( 'Width' ) }
-						min={ MIN_BORDER_WIDTH }
-						onChange={ handleOnChangeWithStyle( setBorderWidth ) }
-						units={ units }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showBorderStyle && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ createHasValueCallback( 'style' ) }
-					label={ __( 'Style' ) }
-					onDeselect={ createResetCallback( setBorderStyle ) }
-					isShownByDefault={ true }
-				>
-					<BorderStyleControl
-						value={ borderStyle }
-						onChange={ handleOnChange( setBorderStyle ) }
-					/>
+					<Grid gap="4">
+						<UnitControl
+							value={ borderWidthValue }
+							label={ __( 'Width' ) }
+							min={ MIN_BORDER_WIDTH }
+							onChange={ handleOnChangeWithStyle(
+								setBorderWidth
+							) }
+							units={ units }
+						/>
+						{ showBorderStyle && (
+							<BorderStyleControl
+								value={ borderStyle }
+								onChange={ handleOnChange( setBorderStyle ) }
+							/>
+						) }
+					</Grid>
 				</ToolsPanelItem>
 			) }
 			{ showBorderColor && (
