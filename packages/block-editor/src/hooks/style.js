@@ -333,14 +333,23 @@ export const withBlockControls = createHigherOrderComponent(
  */
 const withElementsStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const elements = props.attributes.style?.elements;
-
 		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 			BlockListBlock
 		) }`;
+
+		const skipSerialization = shouldSkipSerialization(
+			props.name,
+			COLOR_SUPPORT_KEY,
+			'link'
+		);
+
+		const elements = skipSerialization
+			? omit( props.attributes.style?.elements, [ 'link' ] )
+			: props.attributes.style?.elements;
+
 		const styles = compileElementsStyles(
 			blockElementsContainerIdentifier,
-			props.attributes.style?.elements
+			elements
 		);
 		const element = useContext( BlockList.__unstableElementContext );
 
