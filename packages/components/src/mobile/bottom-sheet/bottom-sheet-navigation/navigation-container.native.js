@@ -98,7 +98,10 @@ function BottomSheetNavigationContainer( {
 				return;
 			}
 
-			if ( height > 1 && height !== currentHeight ) {
+			if (
+				height > 1 &&
+				Math.round( height ) !== Math.round( currentHeight )
+			) {
 				if ( currentHeight === 1 ) {
 					setCurrentHeight( height );
 				} else if ( animate ) {
