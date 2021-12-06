@@ -1515,9 +1515,7 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 		isDisabled,
 		frecency: calculateFrecency( time, count ),
 	};
-	if ( buildScope === 'transform' ) {
-		return blockItemBase;
-	}
+	if ( buildScope === 'transform' ) return blockItemBase;
 
 	const inserterVariations = getBlockVariations( blockType.name, 'inserter' );
 	return {
@@ -1965,9 +1963,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
  */
 export const __experimentalGetPatternsByBlockTypes = createSelector(
 	( state, blockNames, rootClientId = null ) => {
-		if ( ! blockNames ) {
-			return EMPTY_ARRAY;
-		}
+		if ( ! blockNames ) return EMPTY_ARRAY;
 		const patterns = __experimentalGetAllowedPatterns(
 			state,
 			rootClientId
@@ -2008,9 +2004,7 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
  */
 export const __experimentalGetPatternTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
-		if ( ! blocks ) {
-			return EMPTY_ARRAY;
-		}
+		if ( ! blocks ) return EMPTY_ARRAY;
 		/**
 		 * For now we only handle blocks without InnerBlocks and take into account
 		 * the `__experimentalRole` property of blocks' attributes for the transformation.
