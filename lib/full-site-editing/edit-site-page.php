@@ -77,28 +77,6 @@ function gutenberg_get_editor_styles() {
 }
 
 /**
- * Get the Gutenberg Templates List Page preload paths.
- */
-function gutenberg_edit_site_list_preload_paths() {
-	if ( ! gutenberg_is_edit_site_list_page() ) {
-		return array();
-	}
-
-	$post_type = get_post_type_object( $_GET['postType'] );
-
-	if ( ! $post_type ) {
-		wp_die( __( 'Invalid post type.', 'gutenberg' ) );
-	}
-
-	return array(
-		'/',
-		"/wp/v2/types/$post_type->name?context=edit",
-		'/wp/v2/types?context=edit',
-		"/wp/v2/$post_type->rest_base?context=edit&per_page=-1",
-	);
-}
-
-/**
  * Initialize the Gutenberg Site Editor.
  *
  * @since 7.2.0
@@ -110,6 +88,14 @@ function gutenberg_edit_site_init( $hook ) {
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
+	}
+
+	if ( gutenberg_is_edit_site_list_page() ) {
+		$post_type = get_post_type_object( $_GET['postType'] );
+
+		if ( ! $post_type ) {
+			wp_die( __( 'Invalid post type.', 'gutenberg' ) );
+		}
 	}
 
 	// Default to is-fullscreen-mode to avoid rendering wp-admin navigation menu while loading and
@@ -130,8 +116,6 @@ function gutenberg_edit_site_init( $hook ) {
 		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 	);
-
-	$list_page_preload_paths = gutenberg_edit_site_list_preload_paths();
 
 	/**
 	 * Make the WP Screen object aware that this is a block editor page.
@@ -154,20 +138,21 @@ function gutenberg_edit_site_init( $hook ) {
 					array( '/wp/v2/media', 'OPTIONS' ),
 					'/',
 					'/wp/v2/types?context=edit',
+					'/wp/v2/types/wp_template?context=edit',
+					'/wp/v2/types/wp_template-part?context=edit',
 					'/wp/v2/taxonomies?context=edit',
 					'/wp/v2/pages?context=edit',
 					'/wp/v2/categories?context=edit',
 					'/wp/v2/posts?context=edit',
 					'/wp/v2/tags?context=edit',
-					'/wp/v2/templates?context=edit',
-					'/wp/v2/template-parts?context=edit',
+					'/wp/v2/templates?context=edit&per_page=-1',
+					'/wp/v2/template-parts?context=edit&per_page=-1',
 					'/wp/v2/settings',
 					'/wp/v2/themes?context=edit&status=active',
 					'/wp/v2/global-styles/' . $active_global_styles_id . '?context=edit',
 					'/wp/v2/global-styles/' . $active_global_styles_id,
 					'/wp/v2/global-styles/themes/' . $active_theme,
 				),
-				$list_page_preload_paths
 			),
 			'initializer_name' => 'initializeEditor',
 			'editor_settings'  => $settings,

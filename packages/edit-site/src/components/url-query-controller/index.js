@@ -3,18 +3,18 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { useLocation } from '../routes';
+import { useLocation, useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
 export default function URLQueryController() {
 	const { setTemplate, setTemplatePart, showHomepage, setPage } = useDispatch(
 		editSiteStore
 	);
+	const history = useHistory();
 	const {
 		params: { postId, postType },
 	} = useLocation();
@@ -40,11 +40,7 @@ export default function URLQueryController() {
 	// Update page URL when context changes.
 	const pageContext = useCurrentPageContext();
 	useEffect( () => {
-		const newUrl = pageContext
-			? addQueryArgs( window.location.href, pageContext )
-			: removeQueryArgs( window.location.href, 'postType', 'postId' );
-
-		window.history.replaceState( {}, '', newUrl );
+		history.replace( pageContext );
 	}, [ pageContext ] );
 
 	return null;
