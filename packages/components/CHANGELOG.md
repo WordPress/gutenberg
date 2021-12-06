@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 19.1.3 (2021-12-06)
+
+-   Fix missing version information in `CHANGELOG.md`.
+
+## 19.1.2 (2021-12-06)
+
 ### Bug Fix
 
 -   Fixed `GradientPicker` not displaying `CustomGradientPicker` when no gradients are provided ([#36900](https://github.com/WordPress/gutenberg/pull/36900)).
@@ -9,7 +15,7 @@
 -   Updated readme to include default value introduced in fix for unexpected movements in the `ColorPicker` ([#35670](https://github.com/WordPress/gutenberg/pull/35670)).
 -   Added support for the legacy `extraSmall` value for the `size` prop in the `Card` component ([#37097](https://github.com/WordPress/gutenberg/pull/37097)).
 
-## 19.1.0
+## 19.1.0 (2021-11-29)
 
 ### Enhancements
 
