@@ -29,18 +29,17 @@ describe( 'RichText', () => {
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
 
-		// Tab to the "Text" tab.
-		await page.keyboard.press( 'Tab' );
-		// Tab to black.
-		await page.keyboard.press( 'Tab' );
-		// Select color other than black.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		// Use a color name with multiple words to ensure that it becomes
+		// active. Previously we had a broken regular expression.
+		const option = await page.waitForSelector(
+			'[aria-label="Color: Cyan bluish gray"]'
+		);
+
+		await option.click();
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await page.keyboard.press( 'Space' );
+		await option.click();
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

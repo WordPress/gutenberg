@@ -44,6 +44,7 @@ function parseCSS( css = '' ) {
 
 function parseClassName( className = '', colorSettings ) {
 	return className.split( ' ' ).reduce( ( accumulator, name ) => {
+		// `colorSlug` could contain dashes, so simply match the start and end.
 		if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
 			const colorSlug = name
 				.replace( /^has-/, '' )
