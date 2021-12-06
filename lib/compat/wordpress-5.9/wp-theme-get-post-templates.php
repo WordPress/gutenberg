@@ -1,6 +1,6 @@
 <?php
 /**
- * Support for page templates.
+ * Support for custom block-based page templates.
  *
  * @package gutenberg
  */
