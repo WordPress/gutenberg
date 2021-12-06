@@ -96,7 +96,14 @@ export function useColorProps( attributes ) {
 	const themePalette = useSetting( 'color.palette.theme' ) || [];
 	const defaultPalette = useSetting( 'color.palette.default' ) || [];
 	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
-	const colors = [ ...userPalette, ...themePalette, ...defaultPalette ];
+	const colors = useMemo(
+		() => [
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
+		],
+		[ userPalette, themePalette, defaultPalette ]
+	);
 	const gradients = useMemo(
 		() => [
 			...( gradientsPerOrigin?.custom || [] ),

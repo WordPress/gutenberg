@@ -52,7 +52,11 @@ const withEditorColorPalette = () =>
 			const themePalette = useSetting( 'color.palette.theme' );
 			const defaultPalette = useSetting( 'color.palette.default' );
 			const allColors = useMemo(
-				() => [ ...userPalette, ...themePalette, ...defaultPalette ],
+				() => [
+					...( userPalette || [] ),
+					...( themePalette || [] ),
+					...( defaultPalette || [] ),
+				],
 				[ userPalette, themePalette, defaultPalette ]
 			);
 			return <WrappedComponent { ...props } colors={ allColors } />;

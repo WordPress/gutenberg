@@ -225,7 +225,11 @@ export function ColorEdit( props ) {
 	const themePalette = useSetting( 'color.palette.theme' );
 	const defaultPalette = useSetting( 'color.palette.default' );
 	const allSolids = useMemo(
-		() => [ ...userPalette, ...themePalette, ...defaultPalette ],
+		() => [
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
+		],
 		[ userPalette, themePalette, defaultPalette ]
 	);
 	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
@@ -442,7 +446,14 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 		const userPalette = useSetting( 'color.palette.custom' ) || [];
 		const themePalette = useSetting( 'color.palette.theme' ) || [];
 		const defaultPalette = useSetting( 'color.palette.default' ) || [];
-		const colors = [ ...userPalette, ...themePalette, ...defaultPalette ];
+		const colors = useMemo(
+			() => [
+				...( userPalette || [] ),
+				...( themePalette || [] ),
+				...( defaultPalette || [] ),
+			],
+			[ userPalette, themePalette, defaultPalette ]
+		);
 		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
