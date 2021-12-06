@@ -3,21 +3,20 @@
  */
 import classnames from 'classnames';
 
-/**
- * WordPress dependencies
- */
-import { Icon, navigation } from '@wordpress/icons';
-
 const PlaceholderPreview = ( { isLoading } ) => {
 	return (
-		<div
+		<ul
 			className={ classnames(
 				'wp-block-navigation-placeholder__preview',
 				{ 'is-loading': isLoading }
 			) }
 		>
-			<Icon icon={ navigation } />
-		</div>
+			<li>&#8203;</li>
+			<li>&#8203;</li>
+			<li>&#8203;</li>
+			<li>&#8203;</li>
+			<li>&#8203;</li>
+		</ul>
 	);
 };
 

@@ -217,8 +217,10 @@ $color-control-label-height: 20px;
 	min-height: 0;
 
 	// Needed for the preview menu items to match actual menu items.
+	gap: inherit;
 	.components-placeholder__fieldset {
 		font-size: inherit;
+		gap: inherit;
 	}
 
 	.components-placeholder__fieldset .components-button {
@@ -237,15 +239,18 @@ $color-control-label-height: 20px;
 .wp-block-navigation-placeholder__preview {
 	display: flex;
 	align-items: center;
-	min-height: $button-size + $grid-unit-05 + $grid-unit-05;
 	padding: $grid-unit-05 $grid-unit-10 $grid-unit-05 $grid-unit-15;
 	min-width: $grid-unit-10 * 12;
 
+	// Make it at least as high as the smallest placeholder.
+	min-height: $button-size + $grid-unit-05 + $grid-unit-05;
+
+	// Hide when selected.
 	.wp-block-navigation.is-selected & {
 		display: none;
 	}
 
-	// Draw the dashed outline.
+	/*// Draw the dashed outline.
 	// By setting the dashed border to currentColor, we ensure it's visible
 	// against any background color.
 	color: currentColor;
@@ -264,11 +269,17 @@ $color-control-label-height: 20px;
 
 		// Inherit border radius from style variations.
 		border-radius: inherit;
-	}
+	}*/
 
-	> svg {
-		fill: currentColor;
-		opacity: 0.4;
+	// Draw navigation placeholder indicators.
+	gap: inherit;
+
+	li {
+		border: $border-width dashed currentColor;
+		opacity: 0.45;
+		height: 1em;
+		width: 4em;
+		border-radius: $radius-block-ui;
 	}
 }
 
