@@ -27,7 +27,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		// List themes global styles.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/themes/(?P<stylesheet>[^.\/]+(?:\/[^.\/]+)?)',
+			'/' . $this->rest_base . '/themes/(?P<stylesheet>[\w\.-]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -46,7 +46,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		// Lists/updates a single global style variation based on the given id.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\/\w\.-]+)',
+			'/' . $this->rest_base . '/(?P<id>[\/\d]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -109,11 +109,6 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_item( $request ) {
-		// Request ID is theme name for some instances, causing it to fail.
-		// Should this look up based on theme name if not numeric?
-		if ( ! is_numeric( $request['id'] ) ) {
-			return [];
-		};
 		$post = get_post( $request['id'] );
 		if ( ! $post || 'wp_global_styles' !== $post->post_type ) {
 			return new WP_Error( 'rest_global_styles_not_found', __( 'No global styles config exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
