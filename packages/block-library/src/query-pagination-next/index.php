@@ -20,13 +20,13 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$paged    = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
-	$wrapper_attributes        = get_block_wrapper_attributes();
-	$placeholder_attributes    = get_block_wrapper_attributes( array( 'aria-hidden' => 'true' ) );
-	$default_label             = __( 'Next Page' );
-	$label                     = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-	$pagination_arrow          = get_query_pagination_arrow( $block, true );
-	$content                   = '';
-	$placeholder               = sprintf(
+	$wrapper_attributes     = get_block_wrapper_attributes();
+	$placeholder_attributes = get_block_wrapper_attributes( array( 'aria-hidden' => 'true' ) );
+	$default_label          = __( 'Next Page' );
+	$label                  = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
+	$pagination_arrow       = get_query_pagination_arrow( $block, true );
+	$content                = '';
+	$placeholder            = sprintf(
 		'<span %1$s>%2$s</span>',
 		$placeholder_attributes,
 		$label
