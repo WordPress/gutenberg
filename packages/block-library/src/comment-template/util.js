@@ -7,24 +7,25 @@
  * @example
  * ```
  * const comments = [
- *		{ id: 1, parent: 0 },
- *		{ id: 2, parent: 1 },
- *		{ id: 3, parent: 2 },
- *		{ id: 4, parent: 1 },
- *	]
+ * 	{ id: 1, parent: 0 },
+ * 	{ id: 2, parent: 1 },
+ * 	{ id: 3, parent: 2 },
+ * 	{ id: 4, parent: 1 },
+ * ];
  * expect( convertToTree( comments ) ).toEqual( [
- *	{
- *		id: 1,
- *    commentId: 1,
- *		children: [
- *			{ id: 2, commentId: 2, children: [ { id: 3, commentId: 3, children: [] } ] },
- *			{ id: 4, commentId: 4, children: [] },
- *			],
- *		},
- *	] );
+ * 	{
+ * 		commentId: 1,
+ * 		children: [
+ * 			{ commentId: 2, children: [ { commentId: 3, children: [] } ] },
+ * 			{ commentId: 4, children: [] },
+ * 		],
+ * 	},
+ * ] );
  * ```
  * @typedef {{id: number, parent: number}} Comment
  * @param {Comment[]} data - List of comment objects.
+ *
+ * @return {Object[]} Nested list of comment objects with a `children` property.
  */
 export const convertToTree = ( data ) => {
 	const table = {};
