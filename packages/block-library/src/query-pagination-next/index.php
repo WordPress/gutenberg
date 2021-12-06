@@ -21,11 +21,16 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes        = get_block_wrapper_attributes();
-	$hidden_wrapper_attributes = get_block_wrapper_attributes( array( 'aria-hidden' => 'true' ) );
+	$placeholder_attributes    = get_block_wrapper_attributes( array( 'aria-hidden' => 'true' ) );
 	$default_label             = __( 'Next Page' );
 	$label                     = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow          = get_query_pagination_arrow( $block, true );
 	$content                   = '';
+	$placeholder               = sprintf(
+		'<span %1$s>%2$s</span>',
+		$placeholder_attributes,
+		$label
+	);
 
 	if ( $pagination_arrow ) {
 		$label .= $pagination_arrow;
@@ -47,11 +52,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 			if ( (int) $max_page !== $paged ) { // If we are NOT in the last one.
 				$content = get_next_posts_link( $label, $max_page );
 			} else { // If we are in the last one.
-				$content = sprintf(
-					'<span %1$s>%2$s</span>',
-					$hidden_wrapper_attributes,
-					$label
-				);
+				$content = $placeholder;
 			}
 		}
 		remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
@@ -68,11 +69,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 					$label
 				);
 			} else { // If we are in the last one.
-				$content = sprintf(
-					'<span %1$s>%2$s</span>',
-					$hidden_wrapper_attributes,
-					$label
-				);
+				$content = $placeholder;
 			}
 		}
 		wp_reset_postdata(); // Restore original Post Data.

@@ -21,11 +21,16 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes        = get_block_wrapper_attributes();
-	$hidden_wrapper_attributes = get_block_wrapper_attributes( array( 'aria-hidden' => 'true' ) );
+	$placeholder_attributes    = get_block_wrapper_attributes( array( 'aria-hidden' => 'true' ) );
 	$default_label             = __( 'Previous Page' );
 	$label                     = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow          = get_query_pagination_arrow( $block, false );
 	$content                   = '';
+	$placeholder = sprintf(
+		'<span %1$s>%2$s</span>',
+		$hidden_wrapper_attributes,
+		$label
+	);
 
 	if ( $pagination_arrow ) {
 		$label = $pagination_arrow . $label;
@@ -46,11 +51,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 			if ( 1 !== $paged ) { // ... and we are NOT in the first one.
 				$content = get_previous_posts_link( $label );
 			} else { // ... and we are in the first one.
-				$content = sprintf(
-					'<span %1$s>%2$s</span>',
-					$hidden_wrapper_attributes,
-					$label
-				);
+				$content = $placeholder;
 			}
 		}
 		remove_filter( 'previous_posts_link_attributes', $filter_link_attributes );
@@ -67,11 +68,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 					$label
 				);
 			} else {  // ... and we are in the first one.
-				$content = sprintf(
-					'<span %1$s>%2$s</span>',
-					$hidden_wrapper_attributes,
-					$label
-				);
+				$content = $content = $placeholder;
 			}
 		}
 	}
