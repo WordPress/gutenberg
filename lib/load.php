@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+define( 'IS_GUTENBERG_PLUGIN', true );
+
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
