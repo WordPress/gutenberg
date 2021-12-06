@@ -115,7 +115,6 @@ require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.
 require __DIR__ . '/full-site-editing/full-site-editing.php';
 require __DIR__ . '/full-site-editing/block-templates.php';
 require __DIR__ . '/full-site-editing/default-template-types.php';
-require __DIR__ . '/full-site-editing/templates-utils.php';
 require __DIR__ . '/full-site-editing/page-templates.php';
 require __DIR__ . '/full-site-editing/template-loader.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
