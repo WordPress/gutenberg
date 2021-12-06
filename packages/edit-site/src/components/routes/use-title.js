@@ -28,7 +28,7 @@ export default function useTitle( title ) {
 				document.title = formattedTitle;
 
 				// Announce title on route change for screen readers.
-				speak( document.title );
+				speak( document.title, 'assertive' );
 			}
 		}
 	}, [ title, siteTitle ] );
