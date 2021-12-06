@@ -53,6 +53,8 @@ describe( 'Multi-entity save flow', () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 
+		// Get the current Site Title and Site Tagline, so that we can reset
+		// them back to the original values once the test suite has finished.
 		originalSiteTitle = await getOption( 'blogname' );
 		originalBlogDescription = await getOption( 'blogdescription' );
 	} );
@@ -60,6 +62,7 @@ describe( 'Multi-entity save flow', () => {
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
 
+		// Reset the Site Title and Site Tagline back to their original values.
 		await setOption( 'blogname', originalSiteTitle );
 		await setOption( 'blogdescription', originalBlogDescription );
 	} );
