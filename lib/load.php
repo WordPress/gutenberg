@@ -115,9 +115,9 @@ require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.
 require __DIR__ . '/full-site-editing/full-site-editing.php';
 require __DIR__ . '/full-site-editing/block-templates.php';
 require __DIR__ . '/full-site-editing/default-template-types.php';
-require __DIR__ . '/full-site-editing/page-templates.php';
 require __DIR__ . '/full-site-editing/template-loader.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
+require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
 require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
