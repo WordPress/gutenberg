@@ -51,6 +51,7 @@ addFilter(
 	enhanceTemplatePartVariations
 );
 
+// Prevent adding template parts inside post templates.
 addFilter(
 	'blockEditor.__unstableCanInsertBlockType',
 	'removeTemplatePartsFromPostTemplates',

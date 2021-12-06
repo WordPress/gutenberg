@@ -79,6 +79,7 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	// Prevent adding template part in the post editor.
 	// Only add the filter when the post editor is initialized, not imported.
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
