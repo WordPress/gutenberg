@@ -22,11 +22,13 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
-	const hasThemeStyles = useSelect( ( select ) =>
-		select( interfaceStore ).isFeatureActive(
-			'core/edit-widgets',
-			'themeStyles'
-		)
+	const hasThemeStyles = useSelect(
+		( select ) =>
+			select( interfaceStore ).isFeatureActive(
+				'core/edit-widgets',
+				'themeStyles'
+			),
+		[]
 	);
 
 	const styles = useMemo( () => {

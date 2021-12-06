@@ -74,13 +74,15 @@ export default function NavigationMenu( props ) {
 					/>
 				) }
 
-				<NavigationMenuTitle
-					hasSearch={ hasSearch }
-					onSearch={ onSearch }
-					search={ search }
-					title={ title }
-					titleAction={ titleAction }
-				/>
+				{ title && (
+					<NavigationMenuTitle
+						hasSearch={ hasSearch }
+						onSearch={ onSearch }
+						search={ search }
+						title={ title }
+						titleAction={ titleAction }
+					/>
+				) }
 
 				<NavigableMenu>
 					<ul aria-labelledby={ menuTitleId }>

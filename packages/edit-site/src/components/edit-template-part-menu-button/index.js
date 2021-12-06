@@ -17,41 +17,56 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as editSiteStore } from '../../store';
 
 export default function EditTemplatePartMenuButton() {
-	const selectedTemplatePart = useSelect( ( select ) => {
-		const block = select( blockEditorStore ).getSelectedBlock();
+	return (
+		<BlockSettingsMenuControls>
+			{ ( { selectedClientIds, onClose } ) => (
+				<EditTemplatePartMenuItem
+					selectedClientId={ selectedClientIds[ 0 ] }
+					onClose={ onClose }
+				/>
+			) }
+		</BlockSettingsMenuControls>
+	);
+}
 
-		if ( block && isTemplatePart( block ) ) {
-			const { theme, slug } = block.attributes;
-
-			return select( coreStore ).getEntityRecord(
-				'postType',
-				'wp_template_part',
-				// Ideally this should be an official public API.
-				`${ theme }//${ slug }`
+function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
+	const selectedTemplatePart = useSelect(
+		( select ) => {
+			const block = select( blockEditorStore ).getBlock(
+				selectedClientId
 			);
-		}
-	}, [] );
-	const { setTemplatePart } = useDispatch( editSiteStore );
+
+			if ( block && isTemplatePart( block ) ) {
+				const { theme, slug } = block.attributes;
+
+				return select( coreStore ).getEntityRecord(
+					'postType',
+					'wp_template_part',
+					// Ideally this should be an official public API.
+					`${ theme }//${ slug }`
+				);
+			}
+		},
+		[ selectedClientId ]
+	);
+
+	const { pushTemplatePart } = useDispatch( editSiteStore );
 
 	if ( ! selectedTemplatePart ) {
 		return null;
 	}
 
 	return (
-		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<MenuItem
-					onClick={ () => {
-						setTemplatePart( selectedTemplatePart.id );
-						onClose();
-					} }
-				>
-					{
-						/* translators: %s: template part title */
-						sprintf( __( 'Edit %s' ), selectedTemplatePart.slug )
-					}
-				</MenuItem>
-			) }
-		</BlockSettingsMenuControls>
+		<MenuItem
+			onClick={ () => {
+				pushTemplatePart( selectedTemplatePart.id );
+				onClose();
+			} }
+		>
+			{
+				/* translators: %s: template part title */
+				sprintf( __( 'Edit %s' ), selectedTemplatePart.slug )
+			}
+		</MenuItem>
 	);
 }

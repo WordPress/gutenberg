@@ -16,6 +16,7 @@ import {
 	Children,
 	useRef,
 	cloneElement,
+	Platform,
 } from '@wordpress/element';
 
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -59,7 +60,13 @@ const options = {
 
 const ANIMATION_DURATION = 190;
 
-function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
+function BottomSheetNavigationContainer( {
+	children,
+	animate,
+	main,
+	theme,
+	style,
+} ) {
 	const Stack = useRef( createStackNavigator() ).current;
 	const context = useContext( BottomSheetNavigationContext );
 	const [ currentHeight, setCurrentHeight ] = useState(
@@ -87,7 +94,14 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 					typeof height !== 'string' ) ||
 				typeof height === 'string'
 			) {
-				performLayoutAnimation( ANIMATION_DURATION );
+				// Animating the opacity for the initial modal results in the backdrop
+				// provided by react-native-modal to never transition from transparent
+				// to partially opaque black. The core issue was not idenfited, but it
+				// may relate to the experimental state of LayoutAnimation for Android.
+				// https://reactnative.dev/docs/layoutanimation
+				if ( ! Platform.isAndroid || currentHeight !== 1 ) {
+					performLayoutAnimation( ANIMATION_DURATION );
+				}
 				setCurrentHeight( height );
 
 				return;
@@ -129,11 +143,7 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 
 	return useMemo( () => {
 		return (
-			<View
-				style={ {
-					height: currentHeight,
-				} }
-			>
+			<View style={ [ style, { height: currentHeight } ] }>
 				<BottomSheetNavigationProvider
 					value={ {
 						setHeight,

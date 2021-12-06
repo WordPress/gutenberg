@@ -3,6 +3,8 @@
  */
 const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
+const { resolve } = require( 'path' );
+const { existsSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { fromPairs, isObject } = require( 'lodash' );
 const npmPackageArg = require( 'npm-package-arg' );
@@ -124,6 +126,9 @@ const getBlockTemplate = async ( templateName ) => {
 	}
 
 	try {
+		if ( existsSync( resolve( templateName ) ) ) {
+			return await configToTemplate( require( resolve( templateName ) ) );
+		}
 		return await configToTemplate( require( templateName ) );
 	} catch ( error ) {
 		if ( error instanceof CLIError ) {
@@ -180,6 +185,7 @@ const getBlockTemplate = async ( templateName ) => {
 
 const getDefaultValues = ( blockTemplate ) => {
 	return {
+		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 2,
 		namespace: 'create-block',
 		category: 'widgets',

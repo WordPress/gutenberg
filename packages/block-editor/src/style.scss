@@ -1,4 +1,5 @@
 @import "./autocompleters/style.scss";
+@import "./components/block-alignment-control/style.scss";
 @import "./components/block-alignment-matrix-control/style.scss";
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
@@ -31,12 +32,12 @@
 @import "./components/default-block-appender/style.scss";
 @import "./components/duotone-control/style.scss";
 @import "./components/font-appearance-control/style.scss";
-@import "./components/justify-content-control/style.scss";
-@import "./components/link-control/style.scss";
-@import "./components/line-height-control/style.scss";
 @import "./components/image-size-control/style.scss";
 @import "./components/inner-blocks/style.scss";
 @import "./components/inserter-list-item/style.scss";
+@import "./components/justify-content-control/style.scss";
+@import "./components/line-height-control/style.scss";
+@import "./components/link-control/style.scss";
 @import "./components/list-view/style.scss";
 @import "./components/media-replace-flow/style.scss";
 @import "./components/media-placeholder/style.scss";
@@ -45,7 +46,6 @@
 @import "./components/responsive-block-control/style.scss";
 @import "./components/rich-text/style.scss";
 @import "./components/skip-to-selected-block/style.scss";
-@import "./components/text-decoration-and-transform/style.scss";
 @import "./components/text-transform-control/style.scss";
 @import "./components/text-decoration-control/style.scss";
 @import "./components/tool-selector/style.scss";
@@ -55,6 +55,8 @@
 @import "./hooks/anchor.scss";
 @import "./hooks/layout.scss";
 @import "./hooks/border.scss";
+@import "./hooks/dimensions.scss";
+@import "./hooks/typography.scss";
 
 @import "./components/block-toolbar/style.scss";
 @import "./components/inserter/style.scss";

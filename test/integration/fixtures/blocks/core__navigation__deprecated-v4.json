@@ -1,0 +1,20 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/navigation",
+		"isValid": true,
+		"attributes": {
+			"showSubmenuIcon": true,
+			"openSubmenusOnClick": false,
+			"overlayMenu": "never",
+			"fontFamily": "cambria-georgia",
+			"layout": {
+				"type": "flex",
+				"setCascadingProperties": "true",
+				"orientation": "horizontal"
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

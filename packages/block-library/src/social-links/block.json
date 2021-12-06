@@ -1,9 +1,10 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/social-links",
 	"title": "Social Icons",
 	"category": "widgets",
-	"description": "Display icons linking to your social media profiles or websites.",
+	"description": "Display icons linking to your social media profiles or sites.",
 	"keywords": [ "links" ],
 	"textdomain": "default",
 	"attributes": {
@@ -47,6 +48,14 @@
 			"allowInheriting": false,
 			"default": {
 				"type": "flex"
+			}
+		},
+		"spacing": {
+			"blockGap": true,
+			"margin": [ "top", "bottom" ],
+			"units": [ "px", "em", "rem", "vh", "vw" ],
+			"__experimentalDefaultControls": {
+				"blockGap": true
 			}
 		}
 	},

@@ -17,19 +17,27 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	}
 }
 
+// Make the image inside the resize to get the full width
+.components-resizable-box__container > img {
+	width: inherit;
+}
+
 // This is the "visible" resize handle - the circle part
 .components-resizable-box__handle::after {
 	display: block;
 	content: "";
 	width: $resize-handler-size;
 	height: $resize-handler-size;
-	border: 2px solid var(--wp-admin-theme-color);
 	border-radius: 50%;
 	background: $white;
 	cursor: inherit;
 	position: absolute;
 	top: calc(50% - #{ceil($resize-handler-size * 0.5)});
 	right: calc(50% - #{ceil($resize-handler-size * 0.5)});
+
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	// Only visible in Windows High Contrast mode.
+	outline: 2px solid transparent;
 }
 
 // This is the "visible" resize handle for side handles - the line

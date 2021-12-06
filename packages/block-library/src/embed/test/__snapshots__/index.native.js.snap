@@ -1,0 +1,191 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Embed block alignment options sets Align center option 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true,\\"align\\":\\"center\\"} -->
+<figure class=\\"wp-block-embed aligncenter is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block alignment options sets Align left option 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true,\\"align\\":\\"left\\"} -->
+<figure class=\\"wp-block-embed alignleft is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block alignment options sets Align right option 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true,\\"align\\":\\"right\\"} -->
+<figure class=\\"wp-block-embed alignright is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block alignment options sets Full width option 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true,\\"align\\":\\"full\\"} -->
+<figure class=\\"wp-block-embed alignfull is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block alignment options sets Wide width option 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true,\\"align\\":\\"wide\\"} -->
+<figure class=\\"wp-block-embed alignwide is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block block settings toggles resize for smaller devices media settings 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"allowResponsive\\":false,\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block create by pasting URL creates embed block when pasting URL in paragraph block 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://www.youtube.com/watch?v=lXMskKTw3Bc\\",\\"type\\":\\"video\\",\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true,\\"className\\":\\"wp-embed-aspect-16-9 wp-has-aspect-ratio\\"} -->
+<figure class=\\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio\\"><div class=\\"wp-block-embed__wrapper\\">
+https://www.youtube.com/watch?v=lXMskKTw3Bc
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block create by pasting URL creates link when pasting URL in paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p><a href=\\"https://www.youtube.com/watch?v=lXMskKTw3Bc\\">https://www.youtube.com/watch?v=lXMskKTw3Bc</a></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Embed block displays cannot embed on the placeholder if preview data is null 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/testing\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/testing
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block edit URL edits URL when edited after setting a bad URL of a provider 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block edit URL keeps the previous URL if an invalid URL is set 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block edit URL keeps the previous URL if no URL is set 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block edit URL replaces URL 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://www.youtube.com/watch?v=lXMskKTw3Bc\\",\\"type\\":\\"video\\",\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true,\\"className\\":\\"wp-embed-aspect-16-9 wp-has-aspect-ratio\\"} -->
+<figure class=\\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio\\"><div class=\\"wp-block-embed__wrapper\\">
+https://www.youtube.com/watch?v=lXMskKTw3Bc
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block edit URL sets empty state when setting an empty URL 1`] = `"<!-- wp:embed {\\"url\\":\\"\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} /-->"`;
+
+exports[`Embed block insert via slash inserter insert generic embed block 1`] = `"<!-- wp:embed /-->"`;
+
+exports[`Embed block insert via slash inserter inserts Twitter embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} /-->"`;
+
+exports[`Embed block insert via slash inserter inserts Vimeo embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"vimeo\\",\\"responsive\\":true} /-->"`;
+
+exports[`Embed block insert via slash inserter inserts WordPress embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"wordpress\\"} /-->"`;
+
+exports[`Embed block insert via slash inserter inserts YouTube embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true} /-->"`;
+
+exports[`Embed block insertion inserts Twitter embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} /-->"`;
+
+exports[`Embed block insertion inserts Vimeo embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"vimeo\\",\\"responsive\\":true} /-->"`;
+
+exports[`Embed block insertion inserts WordPress embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"wordpress\\"} /-->"`;
+
+exports[`Embed block insertion inserts YouTube embed block 1`] = `"<!-- wp:embed {\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true} /-->"`;
+
+exports[`Embed block insertion inserts generic embed block 1`] = `"<!-- wp:embed /-->"`;
+
+exports[`Embed block retry allows editing link if request failed 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\"} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block retry converts to link if preview request failed 1`] = `
+"<!-- wp:paragraph -->
+<p><a href=\\"https://twitter.com/notnownikki\\">https://twitter.com/notnownikki</a></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Embed block retry retries loading the preview if initial request failed 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block set URL upon block insertion auto-pastes the URL from clipboard 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block set URL upon block insertion sets a valid URL when dismissing edit URL modal 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block set URL upon block insertion sets empty URL when dismissing edit URL modal 1`] = `"<!-- wp:embed {\\"url\\":\\"\\"} /-->"`;
+
+exports[`Embed block set URL when empty block auto-pastes the URL from clipboard 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block set URL when empty block sets a valid URL when dismissing edit URL modal 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embed block set URL when empty block sets empty URL when dismissing edit URL modal 1`] = `"<!-- wp:embed {\\"url\\":\\"\\"} /-->"`;
+
+exports[`Embed block sets block caption 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div><figcaption>Caption</figcaption></figure>
+<!-- /wp:embed -->"
+`;

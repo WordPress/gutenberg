@@ -8,11 +8,11 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import BlockSupportToolsPanel from './block-support-tools-panel';
+import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
 export default function InspectorControlsSlot( {
 	__experimentalGroup: group = 'default',
-	bubblesVirtually = true,
 	label,
 	...props
 } ) {
@@ -31,10 +31,10 @@ export default function InspectorControlsSlot( {
 	if ( label ) {
 		return (
 			<BlockSupportToolsPanel group={ group } label={ label }>
-				<Slot { ...props } bubblesVirtually={ bubblesVirtually } />
+				<BlockSupportSlotContainer { ...props } Slot={ Slot } />
 			</BlockSupportToolsPanel>
 		);
 	}
 
-	return <Slot { ...props } bubblesVirtually={ bubblesVirtually } />;
+	return <Slot { ...props } bubblesVirtually />;
 }

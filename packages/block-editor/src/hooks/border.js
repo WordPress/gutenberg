@@ -2,62 +2,135 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { PanelBody } from '@wordpress/components';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import {
+	BorderColorEdit,
+	hasBorderColorValue,
+	resetBorderColor,
+} from './border-color';
+import {
+	BorderRadiusEdit,
+	hasBorderRadiusValue,
+	resetBorderRadius,
+} from './border-radius';
+import {
+	BorderStyleEdit,
+	hasBorderStyleValue,
+	resetBorderStyle,
+} from './border-style';
+import {
+	BorderWidthEdit,
+	hasBorderWidthValue,
+	resetBorderWidth,
+} from './border-width';
 import InspectorControls from '../components/inspector-controls';
 import useSetting from '../components/use-setting';
-import { BorderColorEdit } from './border-color';
-import { BorderRadiusEdit } from './border-radius';
-import { BorderStyleEdit } from './border-style';
-import { BorderWidthEdit } from './border-width';
+import { cleanEmptyObject } from './utils';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 
 export function BorderPanel( props ) {
+	const { clientId } = props;
 	const isDisabled = useIsBorderDisabled( props );
 	const isSupported = hasBorderSupport( props.name );
 
 	const isColorSupported =
-		useSetting( 'border.customColor' ) &&
-		hasBorderSupport( props.name, 'color' );
+		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
 
 	const isRadiusSupported =
-		useSetting( 'border.customRadius' ) &&
+		useSetting( 'border.radius' ) &&
 		hasBorderSupport( props.name, 'radius' );
 
 	const isStyleSupported =
-		useSetting( 'border.customStyle' ) &&
-		hasBorderSupport( props.name, 'style' );
+		useSetting( 'border.style' ) && hasBorderSupport( props.name, 'style' );
 
 	const isWidthSupported =
-		useSetting( 'border.customWidth' ) &&
-		hasBorderSupport( props.name, 'width' );
+		useSetting( 'border.width' ) && hasBorderSupport( props.name, 'width' );
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
 	}
 
+	const defaultBorderControls = getBlockSupport( props.name, [
+		BORDER_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
+	const createResetAllFilter = (
+		borderAttribute,
+		topLevelAttributes = {}
+	) => ( newAttributes ) => ( {
+		...newAttributes,
+		...topLevelAttributes,
+		style: {
+			...newAttributes.style,
+			border: {
+				...newAttributes.style?.border,
+				[ borderAttribute ]: undefined,
+			},
+		},
+	} );
+
 	return (
-		<InspectorControls>
-			<PanelBody
-				className="block-editor-hooks__border-controls"
-				title={ __( 'Border' ) }
-				initialOpen={ false }
-			>
-				{ ( isWidthSupported || isStyleSupported ) && (
-					<div className="block-editor-hooks__border-controls-row">
-						{ isWidthSupported && <BorderWidthEdit { ...props } /> }
-						{ isStyleSupported && <BorderStyleEdit { ...props } /> }
-					</div>
-				) }
-				{ isColorSupported && <BorderColorEdit { ...props } /> }
-				{ isRadiusSupported && <BorderRadiusEdit { ...props } /> }
-			</PanelBody>
+		<InspectorControls __experimentalGroup="border">
+			{ isWidthSupported && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasBorderWidthValue( props ) }
+					label={ __( 'Width' ) }
+					onDeselect={ () => resetBorderWidth( props ) }
+					isShownByDefault={ defaultBorderControls?.width }
+					resetAllFilter={ createResetAllFilter( 'width' ) }
+					panelId={ clientId }
+				>
+					<BorderWidthEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ isStyleSupported && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasBorderStyleValue( props ) }
+					label={ __( 'Style' ) }
+					onDeselect={ () => resetBorderStyle( props ) }
+					isShownByDefault={ defaultBorderControls?.style }
+					resetAllFilter={ createResetAllFilter( 'style' ) }
+					panelId={ clientId }
+				>
+					<BorderStyleEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ isColorSupported && (
+				<ToolsPanelItem
+					hasValue={ () => hasBorderColorValue( props ) }
+					label={ __( 'Color' ) }
+					onDeselect={ () => resetBorderColor( props ) }
+					isShownByDefault={ defaultBorderControls?.color }
+					resetAllFilter={ createResetAllFilter( 'color', {
+						borderColor: undefined,
+					} ) }
+					panelId={ clientId }
+				>
+					<BorderColorEdit { ...props } />
+				</ToolsPanelItem>
+			) }
+			{ isRadiusSupported && (
+				<ToolsPanelItem
+					hasValue={ () => hasBorderRadiusValue( props ) }
+					label={ __( 'Radius' ) }
+					onDeselect={ () => resetBorderRadius( props ) }
+					isShownByDefault={ defaultBorderControls?.radius }
+					resetAllFilter={ createResetAllFilter( 'radius' ) }
+					panelId={ clientId }
+				>
+					<BorderRadiusEdit { ...props } />
+				</ToolsPanelItem>
+			) }
 		</InspectorControls>
 	);
 }
@@ -113,11 +186,30 @@ export function shouldSkipSerialization( blockType ) {
  */
 const useIsBorderDisabled = () => {
 	const configs = [
-		! useSetting( 'border.customColor' ),
-		! useSetting( 'border.customRadius' ),
-		! useSetting( 'border.customStyle' ),
-		! useSetting( 'border.customWidth' ),
+		! useSetting( 'border.color' ),
+		! useSetting( 'border.radius' ),
+		! useSetting( 'border.style' ),
+		! useSetting( 'border.width' ),
 	];
 
 	return configs.every( Boolean );
 };
+
+/**
+ * Returns a new style object where the specified border attribute has been
+ * removed.
+ *
+ * @param {Object} style     Styles from block attributes.
+ * @param {string} attribute The border style attribute to clear.
+ *
+ * @return {Object} Style object with the specified attribute removed.
+ */
+export function removeBorderAttribute( style, attribute ) {
+	return cleanEmptyObject( {
+		...style,
+		border: {
+			...style?.border,
+			[ attribute ]: undefined,
+		},
+	} );
+}

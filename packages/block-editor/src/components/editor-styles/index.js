@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -14,6 +16,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import transformStyles from '../../utils/transform-styles';
 
 const EDITOR_STYLES_SELECTOR = '.editor-styles-wrapper';
+extend( [ namesPlugin, a11yPlugin ] );
 
 function useDarkThemeBodyClassName( styles ) {
 	return useCallback(
@@ -48,11 +51,11 @@ function useDarkThemeBodyClassName( styles ) {
 					.getComputedStyle( canvas, null )
 					.getPropertyValue( 'background-color' );
 			}
-
+			const colordBackgroundColor = colord( backgroundColor );
 			// If background is transparent, it should be treated as light color.
 			if (
-				tinycolor( backgroundColor ).getLuminance() > 0.5 ||
-				tinycolor( backgroundColor ).getAlpha() === 0
+				colordBackgroundColor.luminance() > 0.5 ||
+				colordBackgroundColor.alpha() === 0
 			) {
 				body.classList.remove( 'is-dark-theme' );
 			} else {

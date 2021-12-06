@@ -148,14 +148,15 @@ function menuItemToBlockAttributes( {
 			classes.join( ' ' ).trim() && {
 				className: classes.join( ' ' ).trim(),
 			} ),
+		/* eslint-disable camelcase */
 		...( attr_title?.length && {
 			title: attr_title,
 		} ),
-		// eslint-disable-next-line camelcase
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
 			} ),
+		/* eslint-enable camelcase */
 		...( description?.length && {
 			description,
 		} ),
@@ -189,9 +190,10 @@ function createDataTree( dataset, id = 'id', relation = 'parent' ) {
 			...data,
 			children: [],
 		};
-	}
-	for ( const data of dataset ) {
 		if ( data[ relation ] ) {
+			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
+			hashTable[ data[ relation ] ].children =
+				hashTable[ data[ relation ] ].children || [];
 			hashTable[ data[ relation ] ].children.push(
 				hashTable[ data[ id ] ]
 			);

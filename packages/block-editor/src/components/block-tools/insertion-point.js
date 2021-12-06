@@ -14,7 +14,8 @@ import {
 	createContext,
 	useContext,
 } from '@wordpress/element';
-import { Popover } from '@wordpress/components';
+import { Popover, __unstableMotion as motion } from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -31,7 +32,7 @@ function InsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
@@ -79,7 +80,7 @@ function InsertionPointPopover( {
 	}, [] );
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );
-
+	const isVertical = orientation === 'vertical';
 	const style = useMemo( () => {
 		if ( ! previousElement && ! nextElement ) {
 			return {};
@@ -92,7 +93,7 @@ function InsertionPointPopover( {
 			? nextElement.getBoundingClientRect()
 			: null;
 
-		if ( orientation === 'vertical' ) {
+		if ( isVertical ) {
 			return {
 				width: previousElement
 					? previousElement.offsetWidth
@@ -133,7 +134,7 @@ function InsertionPointPopover( {
 			? nextElement.getBoundingClientRect()
 			: null;
 
-		if ( orientation === 'vertical' ) {
+		if ( isVertical ) {
 			if ( isRTL() ) {
 				return {
 					top: previousRect ? previousRect.bottom : nextRect.top,
@@ -173,6 +174,7 @@ function InsertionPointPopover( {
 	}, [ previousElement, nextElement ] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+	const disableMotion = useReducedMotion();
 
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
@@ -193,10 +195,91 @@ function InsertionPointPopover( {
 		}
 	}
 
+	function maybeHideInserterPoint( event ) {
+		// Only hide the inserter if it's triggered on the wrapper,
+		// and the inserter is not open.
+		if ( event.target === ref.current && ! openRef.current ) {
+			hideInsertionPoint();
+		}
+	}
+
 	// Only show the in-between inserter between blocks, so when there's a
 	// previous and a next element.
 	const showInsertionPointInserter =
 		previousElement && nextElement && isInserterShown;
+
+	// Define animation variants for the line element.
+	const horizontalLine = {
+		start: {
+			width: 0,
+			top: '50%',
+			bottom: '50%',
+			x: 0,
+		},
+		rest: {
+			width: 4,
+			top: 0,
+			bottom: 0,
+			x: -2,
+		},
+		hover: {
+			width: 4,
+			top: 0,
+			bottom: 0,
+			x: -2,
+		},
+	};
+	const verticalLine = {
+		start: {
+			height: 0,
+			left: '50%',
+			right: '50%',
+			y: 0,
+		},
+		rest: {
+			height: 4,
+			left: 0,
+			right: 0,
+			y: -2,
+		},
+		hover: {
+			height: 4,
+			left: 0,
+			right: 0,
+			y: -2,
+		},
+	};
+	const lineVariants = {
+		// Initial position starts from the center and invisible.
+		start: {
+			...( ! isVertical ? horizontalLine.start : verticalLine.start ),
+			opacity: 0,
+		},
+		// The line expands to fill the container. If the inserter is visible it
+		// is delayed so it appears orchestrated.
+		rest: {
+			...( ! isVertical ? horizontalLine.rest : verticalLine.rest ),
+			opacity: 1,
+			borderRadius: '2px',
+			transition: { delay: showInsertionPointInserter ? 0.4 : 0 },
+		},
+		hover: {
+			...( ! isVertical ? horizontalLine.hover : verticalLine.hover ),
+			opacity: 1,
+			borderRadius: '2px',
+			transition: { delay: 0.4 },
+		},
+	};
+
+	const inserterVariants = {
+		start: {
+			scale: disableMotion ? 1 : 0,
+		},
+		rest: {
+			scale: 1,
+			transition: { delay: 0.2 },
+		},
+	};
 
 	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
@@ -216,8 +299,17 @@ function InsertionPointPopover( {
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
+			// Forces a remount of the popover when its position changes
+			// This makes sure the popover doesn't animate from its previous position.
+			key={ nextClientId + '--' + rootClientId }
 		>
-			<div
+			<motion.div
+				layout={ ! disableMotion }
+				initial={ disableMotion ? 'rest' : 'start' }
+				animate="rest"
+				whileHover="hover"
+				whileTap="pressed"
+				exit="start"
 				ref={ ref }
 				tabIndex={ -1 }
 				onClick={ onClick }
@@ -225,11 +317,16 @@ function InsertionPointPopover( {
 				className={ classnames( className, {
 					'is-with-inserter': showInsertionPointInserter,
 				} ) }
+				onHoverEnd={ maybeHideInserterPoint }
 				style={ style }
 			>
-				<div className="block-editor-block-list__insertion-point-indicator" />
+				<motion.div
+					variants={ lineVariants }
+					className="block-editor-block-list__insertion-point-indicator"
+				/>
 				{ showInsertionPointInserter && (
-					<div
+					<motion.div
+						variants={ inserterVariants }
 						className={ classnames(
 							'block-editor-block-list__insertion-point-inserter'
 						) }
@@ -246,9 +343,9 @@ function InsertionPointPopover( {
 								openRef.current = false;
 							} }
 						/>
-					</div>
+					</motion.div>
 				) }
-			</div>
+			</motion.div>
 		</Popover>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */

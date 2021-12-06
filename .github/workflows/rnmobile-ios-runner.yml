@@ -14,11 +14,12 @@ concurrency:
 
 jobs:
     test:
-        runs-on: macos-latest
+        runs-on: macos-11
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                xcode: [12.2]
+                xcode: ['13.0']
+                device: ['iPhone 11']
                 native-test-name: [gutenberg-editor-initial-html]
                 node: ['14']
 
@@ -42,7 +43,7 @@ jobs:
                   path: |
                       packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
                       packages/react-native-editor/ios/build/WDA
-                  key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ hashFiles('ios-checksums.txt') }}
+                  key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ matrix.device }}-${{ hashFiles('ios-checksums.txt') }}
 
             - name: Restore pods cache
               uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
@@ -65,6 +66,9 @@ jobs:
 
             - name: Build Web Driver Agent (if needed)
               run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
+
+            - name: Force update Launch Database to prevent issues when opening the Simulator app
+              run: /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer/Applications/Simulator.app
 
             - name: Run iOS Device Tests
               run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}

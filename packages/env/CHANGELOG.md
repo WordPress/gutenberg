@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.1.3 (2021-11-07)
+
+### Bug Fix
+
+- Fix Xdebug installation code to ensure it would fail gracefully
+
 ## 4.0.3 (2021-04-29)
 
 ### Bug Fix

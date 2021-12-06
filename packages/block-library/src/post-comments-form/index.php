@@ -61,17 +61,3 @@ function gutenberg_comment_form_block_form_defaults( $fields ) {
 	return $fields;
 }
 add_filter( 'comment_form_defaults', 'gutenberg_comment_form_block_form_defaults' );
-
-add_action(
-	'wp_enqueue_scripts',
-	/**
-	 * Add the button stylesheet as a dependency for the post-comment form stylesheet.
-	 */
-	function() {
-		global $wp_styles;
-		if ( ! empty( $wp_styles->registered ) && ! empty( $wp_styles->registered['wp-block-post-comments-form'] ) ) {
-			$wp_styles->registered['wp-block-post-comments-form']->deps[] = 'wp-block-button';
-		}
-	},
-	1
-);

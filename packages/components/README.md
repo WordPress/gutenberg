@@ -33,6 +33,10 @@ In non-WordPress projects, link to the `build-style/style.css` file directly, it
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
 
+## Docs & examples
+
+You can browse the components docs and examples at https://wordpress.github.io/gutenberg/
+
 ## Contributing
 
 See [CONTRIBUTING.md](/packages/components/CONTRIBUTING.md) for the contributing guidelines for the `@wordpress/components` package.

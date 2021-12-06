@@ -12,7 +12,7 @@ import FormGroupHelp from './form-group-help';
 import FormGroupLabel from './form-group-label';
 
 /**
- * @param {import('../context').WordPressComponentProps<import('./types').FormGroupContentProps, 'label'>} props
+ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupContentProps, 'label', false>} props
  */
 function FormGroupContent( {
 	alignLabel,

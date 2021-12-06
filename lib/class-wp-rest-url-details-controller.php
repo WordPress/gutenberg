@@ -19,7 +19,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp-block-editor/v1';
 		$this->rest_base = 'url-details';
 	}
 
@@ -310,7 +310,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
-		$description = $this->get_metadata_from_meta_element( $meta_elements, 'name', '\bdescription\b' );
+		$description = $this->get_metadata_from_meta_element( $meta_elements, 'name', '(?:description|og:description)' );
 
 		// Bail out if description not found.
 		if ( '' === $description ) {
@@ -383,7 +383,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return mixed The value from the cache.
 	 */
 	private function get_cache( $key ) {
-		return get_transient( $key );
+		return get_site_transient( $key );
 	}
 
 	/**
@@ -406,7 +406,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		 */
 		$cache_expiration = apply_filters( 'rest_url_details_cache_expiration', $ttl );
 
-		return set_transient( $key, $data, $cache_expiration );
+		return set_site_transient( $key, $data, $cache_expiration );
 	}
 
 	/**

@@ -10,7 +10,6 @@ const postcss = require( 'postcss' );
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 
 const {
@@ -72,7 +71,6 @@ const plugins = [
 			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
 		),
 	} ),
-	new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
 

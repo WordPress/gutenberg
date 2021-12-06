@@ -1,16 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`core/more/edit/native should match snapshot when content is empty 1`] = `
-<View>
+<View
+  style={
+    Array [
+      undefined,
+      undefined,
+      undefined,
+    ]
+  }
+>
   <PreformattedEdit
     getStylesFromColorScheme={[Function]}
     setAttributes={[MockFunction]}
+    style={Object {}}
   />
 </View>
 `;
 
 exports[`core/more/edit/native should match snapshot when content is not empty 1`] = `
-<View>
+<View
+  style={
+    Array [
+      undefined,
+      undefined,
+      undefined,
+    ]
+  }
+>
   <PreformattedEdit
     attributes={
       Object {
@@ -19,6 +36,7 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
     }
     getStylesFromColorScheme={[Function]}
     setAttributes={[MockFunction]}
+    style={Object {}}
   />
 </View>
 `;

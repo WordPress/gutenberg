@@ -25,7 +25,7 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
 	/**
 	 * `Heading` will typically render the sizes `1`, `2`, `3`, `4`, `5`, or `6`, which map to `h1`-`h6`.
 	 *
-	 * @default 3
+	 * @default 2
 	 *
 	 * @example
 	 * ```jsx
@@ -56,16 +56,17 @@ export function useHeading(
 		'Heading'
 	);
 
-	const as = asProp || `h${ level }`;
+	const as = ( asProp || `h${ level }` ) as keyof JSX.IntrinsicElements;
 
 	const a11yProps: {
 		role?: string;
-		'aria-level'?: string | number;
+		'aria-level'?: number;
 	} = {};
 	if ( typeof as === 'string' && as[ 0 ] !== 'h' ) {
 		// if not a semantic `h` element, add a11y props:
 		a11yProps.role = 'heading';
-		a11yProps[ 'aria-level' ] = level;
+		a11yProps[ 'aria-level' ] =
+			typeof level === 'string' ? parseInt( level ) : level;
 	}
 
 	const textProps = useText( {

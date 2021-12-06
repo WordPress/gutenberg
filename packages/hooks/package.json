@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/hooks",
-	"version": "3.2.0",
+	"version": "3.2.2",
 	"description": "WordPress hooks library.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,7 +26,7 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.13.10"
+		"@babel/runtime": "^7.16.0"
 	},
 	"publishConfig": {
 		"access": "public"

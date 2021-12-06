@@ -13,7 +13,7 @@ import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentControl,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
@@ -199,7 +199,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const imageSizes = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return settings?.imageSizes;
-	} );
+	}, [] );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			getImageSourceUrlBySizeSlug( image, slug )

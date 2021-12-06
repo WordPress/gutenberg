@@ -27,7 +27,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	] = useResizeObserver();
 	const styles = useSelect( ( select ) => {
 		return select( store ).getSettings().styles;
-	} );
+	}, [] );
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
@@ -50,6 +50,9 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						const {
 							ownerDocument: { documentElement },
 						} = bodyElement;
+						documentElement.classList.add(
+							'block-editor-block-preview__content-iframe'
+						);
 						documentElement.style.position = 'absolute';
 						documentElement.style.width = '100%';
 						bodyElement.style.padding =

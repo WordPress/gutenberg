@@ -61,7 +61,7 @@ export default function PostTitle() {
 			isFocusMode: focusMode,
 			hasFixedToolbar: _hasFixedToolbar,
 		};
-	} );
+	}, [] );
 
 	useEffect( () => {
 		if ( ! ref.current ) {
@@ -199,7 +199,7 @@ export default function PostTitle() {
 		preserveWhiteSpace: true,
 	} );
 
-	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-interactions */
+	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 	return (
 		<PostTypeSupportCheck supportKeys="title">
 			<h1
@@ -207,6 +207,8 @@ export default function PostTitle() {
 				contentEditable
 				className={ className }
 				aria-label={ decodedPlaceholder }
+				role="textbox"
+				aria-multiline="true"
 				onFocus={ onSelect }
 				onBlur={ onUnselect }
 				onKeyDown={ onKeyDown }
@@ -215,5 +217,5 @@ export default function PostTitle() {
 			/>
 		</PostTypeSupportCheck>
 	);
-	/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-interactions */
+	/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 }

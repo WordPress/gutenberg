@@ -7,22 +7,17 @@ import {
 	camelCase,
 	isArray,
 	isEmpty,
-	isFunction,
 	isNil,
 	isObject,
-	isPlainObject,
 	isString,
 	mapKeys,
-	omit,
 	pick,
 	pickBy,
-	some,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 
@@ -30,8 +25,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import i18nBlockSchema from './i18n-block.json';
-import { isValidIcon, normalizeIconObject } from './utils';
-import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from './constants';
+import { BLOCK_ICON_DEFAULT } from './constants';
 import { store as blocksStore } from '../store';
 
 /**
@@ -145,18 +139,6 @@ import { store as blocksStore } from '../store';
  *                                              then no preview is shown.
  */
 
-/**
- * Mapping of legacy category slugs to their latest normal values, used to
- * accommodate updates of the default set of block categories.
- *
- * @type {Record<string,string>}
- */
-const LEGACY_CATEGORY_MAPPING = {
-	common: 'text',
-	formatting: 'text',
-	layout: 'design',
-};
-
 export const serverSideBlockDefinitions = {};
 
 /**
@@ -256,26 +238,6 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
-	if ( isObject( blockNameOrMetadata ) ) {
-		unstable__bootstrapServerSideBlockDefinitions( {
-			[ name ]: getBlockSettingsFromMetadata( blockNameOrMetadata ),
-		} );
-	}
-
-	settings = {
-		name,
-		icon: BLOCK_ICON_DEFAULT,
-		keywords: [],
-		attributes: {},
-		providesContext: {},
-		usesContext: [],
-		supports: {},
-		styles: [],
-		save: () => null,
-		...serverSideBlockDefinitions?.[ name ],
-		...settings,
-	};
-
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
 			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
@@ -287,87 +249,30 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
-	const preFilterSettings = { ...settings };
-	settings = applyFilters( 'blocks.registerBlockType', settings, name );
-
-	if ( settings.deprecated ) {
-		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
-			pick(
-				// Only keep valid deprecation keys.
-				applyFilters(
-					'blocks.registerBlockType',
-					// Merge deprecation keys with pre-filter settings
-					// so that filters that depend on specific keys being
-					// present don't fail.
-					{
-						// Omit deprecation keys here so that deprecations
-						// can opt out of specific keys like "supports".
-						...omit( preFilterSettings, DEPRECATED_ENTRY_KEYS ),
-						...deprecation,
-					},
-					name
-				),
-				DEPRECATED_ENTRY_KEYS
-			)
-		);
+	if ( isObject( blockNameOrMetadata ) ) {
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: getBlockSettingsFromMetadata( blockNameOrMetadata ),
+		} );
 	}
 
-	if ( ! isPlainObject( settings ) ) {
-		console.error( 'Block settings must be a valid object.' );
-		return;
-	}
+	const blockType = {
+		name,
+		icon: BLOCK_ICON_DEFAULT,
+		keywords: [],
+		attributes: {},
+		providesContext: {},
+		usesContext: [],
+		supports: {},
+		styles: [],
+		variations: [],
+		save: () => null,
+		...serverSideBlockDefinitions?.[ name ],
+		...settings,
+	};
 
-	if ( ! isFunction( settings.save ) ) {
-		console.error( 'The "save" property must be a valid function.' );
-		return;
-	}
-	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
-		console.error( 'The "edit" property must be a valid function.' );
-		return;
-	}
+	dispatch( blocksStore ).__experimentalRegisterBlockType( blockType );
 
-	// Canonicalize legacy categories to equivalent fallback.
-	if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
-		settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
-	}
-
-	if (
-		'category' in settings &&
-		! some( select( blocksStore ).getCategories(), {
-			slug: settings.category,
-		} )
-	) {
-		console.warn(
-			'The block "' +
-				name +
-				'" is registered with an invalid category "' +
-				settings.category +
-				'".'
-		);
-		delete settings.category;
-	}
-
-	if ( ! ( 'title' in settings ) || settings.title === '' ) {
-		console.error( 'The block "' + name + '" must have a title.' );
-		return;
-	}
-	if ( typeof settings.title !== 'string' ) {
-		console.error( 'Block titles must be strings.' );
-		return;
-	}
-
-	settings.icon = normalizeIconObject( settings.icon );
-	if ( ! isValidIcon( settings.icon.src ) ) {
-		console.error(
-			'The icon passed is invalid. ' +
-				'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
-		);
-		return;
-	}
-
-	dispatch( blocksStore ).addBlockTypes( settings );
-
-	return settings;
+	return select( blocksStore ).getBlockType( name );
 }
 
 /**
@@ -544,7 +449,7 @@ export function getDefaultBlockName() {
  * @return {?Object} Block type.
  */
 export function getBlockType( name ) {
-	return select( blocksStore ).getBlockType( name );
+	return select( blocksStore )?.getBlockType( name );
 }
 
 /**

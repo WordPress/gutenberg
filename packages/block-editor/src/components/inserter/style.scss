@@ -25,19 +25,19 @@ $block-inserter-tabs-height: 44px;
 		border: none;
 
 		.block-editor-inserter__quick-inserter > * {
-			border-left: 1px solid $gray-400;
-			border-right: 1px solid $gray-400;
+			border-left: $border-width solid $gray-400;
+			border-right: $border-width solid $gray-400;
 
 			&:first-child {
-				border-top: 1px solid $gray-400;
+				border-top: $border-width solid $gray-400;
 			}
 
 			&:last-child {
-				border-bottom: 1px solid $gray-400;
+				border-bottom: $border-width solid $gray-400;
 			}
 
 			&.components-button {
-				border: 1px solid $gray-900;
+				border: $border-width solid $gray-900;
 			}
 		}
 	}
@@ -100,7 +100,7 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	background: $white;
-	padding: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
 	position: sticky;
 	top: 0;
 	z-index: z-index(".block-editor-inserter__search");
@@ -108,17 +108,20 @@ $block-inserter-tabs-height: 44px;
 	.components-search-control__icon {
 		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
 	}
+
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
 }
 
 .block-editor-inserter__tabs {
 	display: flex;
 	flex-direction: column;
-	margin-top: -$grid-unit-10;
 
 	.components-tab-panel__tabs {
 		position: sticky;
 		// Computed based off the search input height and paddings
-		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
+		top: $grid-unit-20 + $grid-unit-60;
 		background: $white;
 		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tabs");
 		border-bottom: $border-width solid $gray-300;
@@ -163,7 +166,8 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
-	line-height: 1.2;
+	height: 36px;
+	line-height: 36px;
 }
 
 .block-editor-inserter__panel-dropdown select {
@@ -173,10 +177,6 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__block-list {
 	flex-grow: 1;
 	position: relative;
-}
-
-.block-editor-inserter__popover .block-editor-block-types-list {
-	margin: -8px;
 }
 
 .block-editor-inserter__reusable-blocks-panel {
@@ -191,7 +191,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__no-results {
 	padding: $grid-unit-40;
-	margin-top: $grid-unit-40 * 2;
 	text-align: center;
 }
 
@@ -298,6 +297,12 @@ $block-inserter-tabs-height: 44px;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		grid-gap: $grid-unit-10;
+		.block-editor-block-patterns-list__list-item {
+			margin-bottom: 0;
+		}
+		.block-editor-block-preview__container {
+			min-height: 100px;
+		}
 	}
 }
 
@@ -325,7 +330,66 @@ $block-inserter-tabs-height: 44px;
 		color: $gray-400;
 	}
 
-	&:focus:not(:disabled) {
-		box-shadow: inset 0 0 0 1.5px var(--wp-admin-theme-color), inset 0 0 0 3px #fff;
+	// Specificity is needed for the border color.
+	&.components-button:focus:not(:disabled) {
+		box-shadow: none;
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-block-patterns-explorer {
+	&__sidebar {
+		position: absolute;
+		top: $header-height;
+		left: 0;
+		bottom: 0;
+		width: $sidebar-width;
+		padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
+		overflow-x: visible;
+		overflow-y: scroll;
+
+		&__categories-list__item {
+			display: block;
+			width: 100%;
+			height: 48px;
+			text-align: left;
+		}
+	}
+
+	&__search {
+		margin-bottom: $grid-unit-40;
+	}
+
+	&__search-results-count {
+		padding-bottom: $grid-unit-40;
+	}
+
+	&__list {
+		margin-left: $sidebar-width - $grid-unit-40;
+	}
+
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-gap: $grid-unit-40;
+		grid-template-columns: repeat(1, 1fr);
+
+		@include break-xlarge() {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include break-huge() {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		.block-editor-block-patterns-list__list-item {
+			min-height: 240px;
+		}
+
+		.block-editor-block-preview__container {
+			height: inherit;
+			min-height: 100px;
+			max-height: 800px;
+		}
 	}
 }

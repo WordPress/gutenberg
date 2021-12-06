@@ -1,35 +1,64 @@
 /**
  * External dependencies
  */
-import { number } from '@storybook/addon-knobs';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
  */
+import { useCx } from '../../utils';
+import { Text } from '../../text';
 import { Divider } from '..';
 
 export default {
 	component: Divider,
 	title: 'Components (Experimental)/Divider',
+	argTypes: {
+		margin: {
+			control: { type: 'number' },
+		},
+		marginStart: {
+			control: { type: 'number' },
+		},
+		marginEnd: {
+			control: { type: 'number' },
+		},
+	},
 };
 
-const BlackDivider = ( props ) => (
-	<Divider { ...props } style={ { borderColor: 'black' } } />
+const HorizontalTemplate = ( args ) => (
+	<div>
+		<Text>Some text before the divider</Text>
+		<Divider { ...args } />
+		<Text>Some text after the divider</Text>
+	</div>
 );
 
-export const _default = () => {
-	const props = {
-		margin: number( 'margin', 0 ),
-	};
-	// make the border color black to give higher contrast and help it appear in storybook better
-	return <BlackDivider { ...props } />;
+const VerticalTemplate = ( args ) => {
+	const cx = useCx();
+	const wrapperClassName = cx( css`
+		display: flex;
+		align-items: stretch;
+		justify-content: start;
+	` );
+
+	return (
+		<div className={ wrapperClassName }>
+			<Text>Some text before the divider</Text>
+			<Divider orientation="vertical" { ...args } />
+			<Text>Some text after the divider</Text>
+		</div>
+	);
 };
 
-export const splitMargins = () => {
-	const props = {
-		marginTop: number( 'marginTop', 0 ),
-		marginBottom: number( 'marginBottom', 0 ),
-	};
+export const Horizontal = HorizontalTemplate.bind( {} );
+Horizontal.args = {
+	margin: 2,
+	marginStart: undefined,
+	marginEnd: undefined,
+};
 
-	return <BlackDivider { ...props } />;
+export const Vertical = VerticalTemplate.bind( {} );
+Vertical.args = {
+	...Horizontal.args,
 };

@@ -29,6 +29,12 @@
 		// This is the default font that is going to be used in the content of the areas (blocks).
 		font-family: $default-font;
 
+		// Customize/zero out the gap.
+		.wp-block-navigation__container {
+			// This unsets flex.
+			display: block;
+		}
+
 		// Increase specificity.
 		.wp-block-navigation-item {
 			display: block;
@@ -42,12 +48,16 @@
 				display: none;
 				right: auto;
 				box-sizing: border-box;
+				width: auto;
+				height: auto;
+				overflow: initial;
+				min-width: initial;
 			}
 
 			// Fix focus outlines.
 			&.is-selected > .wp-block-navigation-item__content,
 			&.is-selected:hover > .wp-block-navigation-item__content {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			}
 
 			&.block-editor-block-list__block:not([contenteditable]):focus::after {
@@ -64,18 +74,18 @@
 				}
 			}
 
-			.wp-block-navigation-link__label,
+			.wp-block-navigation-item__label,
 			.wp-block-navigation-link__placeholder-text {
 				padding: $grid-unit-05;
 				padding-left: $grid-unit-10;
+				line-height: 1;
 			}
 
-			.wp-block-navigation-link__label {
+			.wp-block-navigation-item__label {
 				// Without this Links with submenus display a pointer.
 				cursor: text;
 			}
 		}
-
 
 		// Basic Page List support.
 		ul.wp-block-page-list {
@@ -157,12 +167,11 @@
 			flex-direction: column;
 			justify-content: center;
 			height: $grid-unit-50;
-			margin: $grid-unit-10 0;
+			margin: $grid-unit-10 auto $grid-unit-10 0;
 		}
 
 		.block-editor-button-block-appender.block-list-appender__toggle {
-			margin: 0 0 0 $grid-unit-30;
-			padding: 0;
+			margin-left: $grid-unit-30;
 		}
 	}
 

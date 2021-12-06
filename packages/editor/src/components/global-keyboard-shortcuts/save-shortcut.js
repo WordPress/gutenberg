@@ -12,20 +12,19 @@ import { store as editorStore } from '../../store';
 
 function SaveShortcut( { resetBlocksOnSave } ) {
 	const { resetEditorBlocks, savePost } = useDispatch( editorStore );
-	const { isEditedPostDirty, getPostEdits } = useSelect( ( select ) => {
-		const {
-			isEditedPostDirty: _isEditedPostDirty,
-			getPostEdits: _getPostEdits,
-		} = select( editorStore );
-
-		return {
-			isEditedPostDirty: _isEditedPostDirty,
-			getPostEdits: _getPostEdits,
-		};
-	}, [] );
+	const { isEditedPostDirty, getPostEdits, isPostSavingLocked } = useSelect(
+		editorStore
+	);
 
 	useShortcut( 'core/editor/save', ( event ) => {
 		event.preventDefault();
+
+		/**
+		 * Do not save the post if post saving is locked.
+		 */
+		if ( isPostSavingLocked() ) {
+			return;
+		}
 
 		// TODO: This should be handled in the `savePost` effect in
 		// considering `isSaveable`. See note on `isEditedPostSaveable`

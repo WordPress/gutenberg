@@ -16,6 +16,9 @@ import TextControl from '../';
 export default {
 	title: 'Components/TextControl',
 	component: TextControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const TextControlWithState = ( props ) => {

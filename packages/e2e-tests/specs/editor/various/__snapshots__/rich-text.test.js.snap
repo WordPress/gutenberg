@@ -54,6 +54,18 @@ exports[`RichText should navigate arround emoji 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should navigate consecutive format boundaries 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>1</strong><em>2</em></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should navigate consecutive format boundaries 2`] = `
+"<!-- wp:paragraph -->
+<p><strong>1</strong>-<em>2</em></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should not format text after code backtick 1`] = `
 "<!-- wp:paragraph -->
 <p>A <code>backtick</code> and more.</p>
@@ -88,19 +100,39 @@ exports[`RichText should only mutate text data on input 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should paste list contents into paragraph 1`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>2</li></ul></li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>1<br>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should paste paragraph contents into list 1`] = `
+"<!-- wp:paragraph -->
+<p>1<br>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>1</li><li>2</li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`RichText should preserve internal formatting 1`] = `
 "<!-- wp:paragraph -->
-<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`RichText should preserve internal formatting 2`] = `
 "<!-- wp:paragraph -->
-<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 

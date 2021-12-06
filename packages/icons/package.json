@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "5.0.2",
+	"version": "6.1.1",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,7 +28,7 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/element": "file:../element",
 		"@wordpress/primitives": "file:../primitives"
 	},

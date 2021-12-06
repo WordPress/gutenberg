@@ -4,10 +4,9 @@
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
-			"orientation": "horizontal",
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
-			"isResponsive": false
+			"overlayMenu": "mobile"
 		},
 		"innerBlocks": [],
 		"originalContent": ""

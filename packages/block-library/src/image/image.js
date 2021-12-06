@@ -27,6 +27,8 @@ import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	BlockAlignmentControl,
+	__experimentalImageEditor as ImageEditor,
+	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -41,7 +43,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import ImageEditor, { ImageEditingProvider } from './image-editing';
 import { isExternalImage } from './edit';
 
 /**

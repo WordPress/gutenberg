@@ -20,7 +20,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 	protected static $admin_id;
 	protected static $subscriber_id;
-	protected static $route           = '/__experimental/url-details';
+	protected static $route           = '/wp-block-editor/v1/url-details';
 	protected static $url_placeholder = 'https://placeholder-site.com';
 	protected static $request_args    = array();
 
@@ -277,11 +277,11 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function test_will_return_from_cache_if_populated() {
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
 
-		remove_filter( "pre_transient_{$transient_name}", '__return_null' );
+		remove_filter( "pre_site_transient_{$transient_name}", '__return_null' );
 
 		// Force cache to return a known value as the remote URL http response body.
 		add_filter(
-			"pre_transient_{$transient_name}",
+			"pre_site_transient_{$transient_name}",
 			function() {
 				return '<html><head><title>This value from cache.</title></head><body></body></html>';
 			}
@@ -301,7 +301,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		// Data should be that from cache not from mocked network response.
 		$this->assertContains( 'This value from cache', $data['title'] );
 
-		remove_all_filters( "pre_transient_{$transient_name}" );
+		remove_all_filters( "pre_site_transient_{$transient_name}" );
 	}
 
 	public function test_allows_filtering_data_retrieved_for_a_given_url() {
@@ -577,14 +577,14 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'multiline attributes'                  => array(
 				'<link
 					rel="icon"
-					href="https://wordpress.org/favicon.ico" 
+					href="https://wordpress.org/favicon.ico"
 				/>',
 				'https://wordpress.org/favicon.ico',
 			),
 			'multiline attributes in reverse order' => array(
 				'<link
 					rel="icon"
-					href="https://wordpress.org/favicon.ico" 
+					href="https://wordpress.org/favicon.ico"
 				/>',
 				'https://wordpress.org/favicon.ico',
 			),
@@ -634,7 +634,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'multiline with no href'                => array(
 				'<link
 					rel="icon"
-					href="" 
+					href=""
 				/>',
 				'',
 			),
@@ -709,36 +709,41 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'<meta first="first" name="description" third="third" content="description with other attributes" fifth="fifth">',
 				'description with other attributes',
 			),
+			'with open graph'                            => array(
+				'<meta name="og:description" content="This is a OG description." />
+				<meta name="description" content="This is a description.">',
+				'This is a OG description.',
+			),
 
 			// Happy paths with multiline attributes.
 			'with multiline attributes'                  => array(
 				'<meta
-					name="description" 
+					name="description"
 					content="with multiline attributes"
 				>',
 				'with multiline attributes',
 			),
 			'with multiline attributes in reverse order' => array(
-				'<meta 
+				'<meta
 					content="with multiline attributes in reverse order"
 					name="description"
 				>',
 				'with multiline attributes in reverse order',
 			),
 			'with multiline attributes and another element' => array(
-				'<meta 
-					name="description" 
+				'<meta
+					name="description"
 					content="with multiline attributes"
 				>
 				<meta name="viewport" content="width=device-width, initial-scale=1">',
 				'with multiline attributes',
 			),
 			'with multiline and other attributes'        => array(
-				'<meta 
-					first="first" 
-					name="description" 
-					third="third" 
-					content="description with multiline and other attributes" 
+				'<meta
+					first="first"
+					name="description"
+					third="third"
+					content="description with multiline and other attributes"
 					fifth="fifth"
 				>',
 				'description with multiline and other attributes',
@@ -879,22 +884,22 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'https://wordpress.org/images/myimage.jpg',
 			),
 			'with multiline attributes in reverse order'   => array(
-				'<meta 
+				'<meta
 					content="https://wordpress.org/images/myimage.jpg"
 					property="og:image"
 				>',
 				'https://wordpress.org/images/myimage.jpg',
 			),
 			'with multiline attributes and other elements' => array(
-				'<meta 
-					property="og:image:height" 
-					content="720" 
+				'<meta
+					property="og:image:height"
+					content="720"
 				/>
-				<meta 
-					property="og:image:alt" 
-					content="Ignore this please" 
+				<meta
+					property="og:image:alt"
+					content="Ignore this please"
 				/>
-				<meta 
+				<meta
 					property="og:image"
 					content="https://wordpress.org/images/myimage.jpg"
 				>
@@ -902,10 +907,10 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'https://wordpress.org/images/myimage.jpg',
 			),
 			'with multiline and other attributes'          => array(
-				'<meta 
-					first="first" 
-					property="og:image:url" 
-					third="third" 
+				'<meta
+					first="first"
+					property="og:image:url"
+					third="third"
 					content="https://wordpress.org/images/myimage.jpg"
 					fifth="fifth"
 				>',

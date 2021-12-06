@@ -79,7 +79,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				canRemove: canRemoveBlocks( clientIds, rootClientId ),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
-				blockTitle: getBlockType( firstBlockName ).title,
+				blockTitle: getBlockType( firstBlockName )?.title,
 				patterns: __experimentalGetPatternTransformItems(
 					blocks,
 					rootClientId

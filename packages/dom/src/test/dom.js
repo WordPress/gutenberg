@@ -5,7 +5,6 @@ import {
 	isHorizontalEdge,
 	placeCaretAtHorizontalEdge,
 	isTextField,
-	__unstableStripHTML as stripHTML,
 	isNumberInput,
 	removeInvalidHTML,
 	isEmpty,
@@ -192,20 +191,6 @@ describe( 'DOM', () => {
 			expect( isTextField( document.createElement( 'div' ) ) ).toBe(
 				false
 			);
-		} );
-	} );
-
-	describe( 'stripHTML', () => {
-		it( 'removes any HTML from a text string', () => {
-			expect( stripHTML( 'This is <em>emphasized</em>' ) ).toBe(
-				'This is emphasized'
-			);
-		} );
-
-		it( 'removes script tags, but does not execute them', () => {
-			const html = 'This will not <script>throw "Error"</script>';
-			expect( stripHTML( html ) ).toBe( 'This will not throw "Error"' );
-			expect( () => stripHTML( html ) ).not.toThrow();
 		} );
 	} );
 } );

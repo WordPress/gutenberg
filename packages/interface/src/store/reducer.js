@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -89,7 +89,7 @@ export function multipleEnableItems(
  *
  * @return {Object} Updated state.
  */
-export const preferenceDefaults = flow( [ combineReducers ] )( {
+export const preferenceDefaults = combineReducers( {
 	features( state = {}, action ) {
 		if ( action.type === 'SET_FEATURE_DEFAULTS' ) {
 			const { scope, defaults } = action;
@@ -114,7 +114,7 @@ export const preferenceDefaults = flow( [ combineReducers ] )( {
  *
  * @return {Object} Updated state.
  */
-export const preferences = flow( [ combineReducers ] )( {
+export const preferences = combineReducers( {
 	features( state = {}, action ) {
 		if ( action.type === 'SET_FEATURE_VALUE' ) {
 			const { scope, featureName, value } = action;

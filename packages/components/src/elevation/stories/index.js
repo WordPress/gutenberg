@@ -25,6 +25,9 @@ import { useCallback } from '@wordpress/element';
 export default {
 	component: Elevation,
 	title: 'Components (Experimental)/Elevation',
+	parameters: {
+		knobs: { disabled: false },
+	},
 };
 
 const ElevationWrapper = ( { children } ) => (

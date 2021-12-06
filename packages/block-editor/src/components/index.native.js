@@ -18,10 +18,7 @@ export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
-export {
-	default as InnerBlocks,
-	useInnerBlocksProps as __experimentalUseInnerBlocksProps,
-} from './inner-blocks';
+export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
 	default as InspectorControls,
 	InspectorAdvancedControls,

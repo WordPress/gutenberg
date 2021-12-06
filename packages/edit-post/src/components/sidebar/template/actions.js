@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	Modal,
@@ -63,6 +63,11 @@ function PostTemplateActions() {
 
 	async function onCreateTemplate( event ) {
 		event.preventDefault();
+
+		if ( isBusy ) {
+			return;
+		}
+
 		setIsBusy( true );
 
 		const newTemplateContent =
@@ -124,7 +129,10 @@ function PostTemplateActions() {
 					</Button>
 				) }
 				<Button variant="link" onClick={ () => setIsModalOpen( true ) }>
-					{ __( 'New' ) }
+					{
+						/* translators: button to create a new template */
+						_x( 'New', 'action' )
+					}
 				</Button>
 			</div>
 			{ isModalOpen && (
@@ -137,7 +145,7 @@ function PostTemplateActions() {
 					} }
 					overlayClassName="edit-post-template__modal"
 				>
-					<form onSubmit={ isBusy ? undefined : onCreateTemplate }>
+					<form onSubmit={ onCreateTemplate }>
 						<Flex align="flex-start" gap={ 8 }>
 							<FlexItem>
 								<TextControl

@@ -43,6 +43,9 @@ export default function MenuActions( { menus, isLoading } ) {
 					size="body"
 					className="edit-navigation-menu-actions__subtitle"
 					as="h2"
+					limit={ 24 }
+					ellipsizeMode="tail"
+					truncate
 				>
 					{ decodeEntities( menuName ) }
 				</Text>

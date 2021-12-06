@@ -13,17 +13,17 @@ describe( 'adding blocks', () => {
 		await createNewPost();
 	} );
 
-	it( 'Should switch the style of the quote block', async () => {
+	it( 'Should switch to the large style of the quote block', async () => {
 		// Inserting a quote block
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'Quote content' );
 
 		await clickBlockToolbarButton( 'Quote' );
 
-		const styleVariations = await page.$$(
-			'.block-editor-block-styles__item'
+		const largeStyleButton = await page.waitForXPath(
+			'//*[@role="menuitem"][contains(., "Large")]'
 		);
-		await styleVariations[ 1 ].click();
+		await largeStyleButton.click();
 
 		// Check the content
 		const content = await getEditedPostContent();

@@ -1,0 +1,39 @@
+.components-color-palette__custom-color {
+	border: none;
+	background: none;
+	outline: 0;
+	display: block;
+	border-radius: $radius-block-ui;
+	height: $grid-unit-60;
+	text-align: right;
+	width: 100%;
+	background-image:
+		repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
+		repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
+	background-position: 0 0, 25px 25px;
+	background-size: calc(2 * 25px) calc(2 * 25px);
+	box-sizing: border-box;
+	color: $white;
+	cursor: pointer;
+}
+
+.components-dropdown__content.components-color-palette__custom-color-dropdown-content .components-popover__content {
+	overflow: visible;
+	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
+	border: none;
+	border-radius: $radius-block-ui;
+	& > div {
+		padding: 0;
+	}
+	.react-colorful__saturation {
+		border-top-right-radius: $radius-block-ui;
+		border-top-left-radius: $radius-block-ui;
+	}
+}
+
+@include break-medium() {
+	.components-dropdown__content.components-color-palette__custom-color-dropdown-content.is-rendered-in-sidebar.is-from-top .components-popover__content {
+		margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 };
+		margin-top: #{ -($grid-unit-60 + $grid-unit-15) };
+	}
+}

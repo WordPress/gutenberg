@@ -31,7 +31,7 @@ export function useNotifyCopy() {
 		let notice = '';
 		if ( selectedBlockClientIds.length === 1 ) {
 			const clientId = selectedBlockClientIds[ 0 ];
-			const { title } = getBlockType( getBlockName( clientId ) );
+			const title = getBlockType( getBlockName( clientId ) )?.title;
 			notice =
 				eventType === 'copy'
 					? sprintf(

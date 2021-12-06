@@ -19,22 +19,15 @@ import { store as editPostStore } from '../../store';
 
 export default function MetaBoxes( { location } ) {
 	const registry = useRegistry();
-	const {
-		metaBoxes,
-		isVisible,
-		areMetaBoxesInitialized,
-		isEditorReady,
-	} = useSelect(
+	const { metaBoxes, areMetaBoxesInitialized, isEditorReady } = useSelect(
 		( select ) => {
 			const { __unstableIsEditorReady } = select( editorStore );
 			const {
-				isMetaBoxLocationVisible,
 				getMetaBoxesPerLocation,
 				areMetaBoxesInitialized: _areMetaBoxesInitialized,
 			} = select( editPostStore );
 			return {
 				metaBoxes: getMetaBoxesPerLocation( location ),
-				isVisible: isMetaBoxLocationVisible( location ),
 				areMetaBoxesInitialized: _areMetaBoxesInitialized(),
 				isEditorReady: __unstableIsEditorReady(),
 			};
@@ -60,7 +53,7 @@ export default function MetaBoxes( { location } ) {
 			{ map( metaBoxes, ( { id } ) => (
 				<MetaBoxVisibility key={ id } id={ id } />
 			) ) }
-			{ isVisible && <MetaBoxesArea location={ location } /> }
+			<MetaBoxesArea location={ location } />
 		</>
 	);
 }

@@ -25,7 +25,7 @@ Text to be displayed within the panel header. It is also passed along as the
 
 -   Required: Yes
 
-### `resetAll`: `function`
+### `resetAll`: `() => void`
 
 The `resetAll` prop provides the callback to execute when the "Reset all" menu
 item is selected. Its purpose is to facilitate resetting any control values
@@ -33,7 +33,7 @@ for items contained within this header's panel.
 
 -   Required: Yes
 
-### `toggleItem`: `function`
+### `toggleItem`: `( label: string ) => void`
 
 This is executed when an individual control's menu item is toggled. It
 will update the panel's menu item state and call the panel item's `onSelect` or

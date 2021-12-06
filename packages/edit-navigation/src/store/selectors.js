@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { invert } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
@@ -64,20 +59,6 @@ export const hasResolvedNavigationPost = createRegistrySelector(
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId ),
 		] );
-	}
-);
-
-/**
- * Returns a menu item represented by the block with id clientId.
- *
- * @param {number} postId   Navigation post id
- * @param {number} clientId Block clientId
- * @return {Object|null} Menu item entity
- */
-export const getMenuItemForClientId = createRegistrySelector(
-	( select ) => ( state, postId, clientId ) => {
-		const mapping = invert( state.mapping[ postId ] );
-		return select( coreStore ).getMenuItem( mapping[ clientId ] );
 	}
 );
 

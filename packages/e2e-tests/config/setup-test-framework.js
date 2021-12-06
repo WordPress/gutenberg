@@ -71,8 +71,7 @@ jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 // Retry failed tests at most 2 times in CI.
 // This enables `flaky-tests-reporter` and `report-flaky-tests` GitHub action
 // to mark test as flaky and automatically create a tracking issue about it.
-// Currently it will only run on trunk but will roll out to all PRs when mature.
-if ( process.env.CI && process.env.GITHUB_EVENT_NAME !== 'pull_request' ) {
+if ( process.env.CI ) {
 	jest.retryTimes( 2 );
 }
 

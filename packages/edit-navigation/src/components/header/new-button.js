@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 import AddMenu from '../add-menu';
 import { useSelectedMenuId } from '../../hooks';
 
-export default function NewButton( { menus } ) {
+export default function NewButton() {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ , setSelectedMenuId ] = useSelectedMenuId();
 
@@ -27,7 +27,6 @@ export default function NewButton( { menus } ) {
 					onRequestClose={ () => setIsModalOpen( false ) }
 				>
 					<AddMenu
-						menus={ menus }
 						helpText={ __(
 							'A short descriptive name for your menu.'
 						) }

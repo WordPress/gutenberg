@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -8,7 +9,6 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
  * WordPress dependencies
  */
 import { DOWN } from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
 import { menu } from '@wordpress/icons';
 
 /**
@@ -34,35 +34,20 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-function DropdownMenu( {
-	children,
-	className,
-	controls,
-	icon = menu,
-	label,
-	popoverProps,
-	toggleProps,
-	menuProps,
-	disableOpenOnArrowDown = false,
-	text,
-	// The following props exist for backward compatibility.
-	menuLabel,
-	position,
-	noIcons,
-} ) {
-	if ( menuLabel ) {
-		deprecated( '`menuLabel` prop in `DropdownComponent`', {
-			since: '5.3',
-			alternative: '`menuProps` object and its `aria-label` property',
-		} );
-	}
-
-	if ( position ) {
-		deprecated( '`position` prop in `DropdownComponent`', {
-			since: '5.3',
-			alternative: '`popoverProps` object and its `position` property',
-		} );
-	}
+function DropdownMenu( dropdownMenuProps ) {
+	const {
+		children,
+		className,
+		controls,
+		icon = menu,
+		label,
+		popoverProps,
+		toggleProps,
+		menuProps,
+		disableOpenOnArrowDown = false,
+		text,
+		noIcons,
+	} = dropdownMenuProps;
 
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
@@ -79,7 +64,6 @@ function DropdownMenu( {
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
-			position,
 		},
 		popoverProps
 	);
@@ -140,7 +124,7 @@ function DropdownMenu( {
 			renderContent={ ( props ) => {
 				const mergedMenuProps = mergeProps(
 					{
-						'aria-label': menuLabel || label,
+						'aria-label': label,
 						className: classnames(
 							'components-dropdown-menu__menu',
 							{ 'no-icons': noIcons }

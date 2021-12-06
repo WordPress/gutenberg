@@ -7,9 +7,10 @@
 			"alt": "",
 			"hasParallax": false,
 			"isRepeated": false,
-			"dimRatio": 50,
+			"dimRatio": 100,
 			"backgroundType": "image",
-			"customGradient": "linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)"
+			"customGradient": "linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+			"isDark": true
 		},
 		"innerBlocks": [
 			{
@@ -27,6 +28,6 @@
 				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">Cover!</p>"
 			}
 		],
-		"originalContent": "<div class=\"wp-block-cover has-background-dim has-background-gradient\" style=\"background:linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+		"originalContent": "<div class=\"wp-block-cover\">\n\t<span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-background-dim has-background-gradient\" style=\"background:linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
 	}
 ]

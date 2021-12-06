@@ -10,10 +10,7 @@ import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
-
-const NON_BLOCK_CATEGORIES = [ 'reusable' ];
-
-const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
+import { filterInserterItems } from './utils';
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
@@ -21,17 +18,8 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const { blockTypes } = useSelect(
 		( select ) => {
 			const { getInserterItems } = select( blockEditorStore );
-
-			const allItems = getInserterItems( rootClientId );
-			const blockItems = allItems.filter(
-				( { id, category } ) =>
-					! NON_BLOCK_CATEGORIES.includes( category ) &&
-					// We don't want to show all possible embed variations
-					// as different blocks in the inserter. We'll only show a
-					// few popular ones.
-					( category !== 'embed' ||
-						( category === 'embed' &&
-							ALLOWED_EMBED_VARIATIONS.includes( id ) ) )
+			const blockItems = filterInserterItems(
+				getInserterItems( rootClientId )
 			);
 
 			return {

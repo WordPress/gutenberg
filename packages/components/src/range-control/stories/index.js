@@ -16,7 +16,13 @@ import { wordpress } from '@wordpress/icons';
 import RangeControl from '../index';
 import { COLORS } from '../../utils';
 
-export default { title: 'Components/RangeControl', component: RangeControl };
+export default {
+	title: 'Components/RangeControl',
+	component: RangeControl,
+	parameters: {
+		knobs: { disabled: false },
+	},
+};
 
 const RangeControlWithState = ( props ) => {
 	const initialValue = props.value === undefined ? 5 : props.value;
@@ -43,7 +49,7 @@ const DefaultExample = () => {
 		max: number( 'max', 100 ),
 		min: number( 'min', 0 ),
 		showTooltip: boolean( 'showTooltip', false ),
-		step: number( 'step', 1 ),
+		step: text( 'step', 1 ),
 		railColor: text( 'railColor', null ),
 		trackColor: text( 'trackColor', null ),
 		withInputField: boolean( 'withInputField', true ),
@@ -79,6 +85,10 @@ export const InitialValueZero = () => {
 			value={ null }
 		/>
 	);
+};
+
+export const withAnyStep = () => {
+	return <RangeControlWithState label="Brightness" step="any" />;
 };
 
 export const withHelp = () => {
@@ -174,6 +184,10 @@ export const marks = () => {
 			<h2>Negative Range</h2>
 			<Range marks { ...rangeNegative } />
 			<Range marks={ marksWithNegatives } { ...rangeNegative } />
+
+			<h2>Any Step</h2>
+			<Range marks { ...{ ...stepInteger, step: 'any' } } />
+			<Range marks={ marksBase } { ...{ ...stepInteger, step: 'any' } } />
 		</Wrapper>
 	);
 };

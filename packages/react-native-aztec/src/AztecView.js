@@ -170,7 +170,7 @@ class AztecView extends Component {
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
 			this.props.onCaretVerticalPositionChange(
-				event.target,
+				event.nativeEvent.target,
 				caretY,
 				this.selectionEndCaretY
 			);
