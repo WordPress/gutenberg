@@ -1681,6 +1681,9 @@ export const getInserterItems = createSelector(
 		];
 		const hookName = 'blockEditor.getInserterItems';
 		return applyFilters( hookName, computedBlockTypes, rootClientId, {
+			// Pass bound selectors of the current registry. If we're in a nested
+			// context, the data will differ from the one selected from the root
+			// registry.
 			getBlock: getBlock.bind( null, state ),
 			getBlockParentsByBlockName: getBlockParentsByBlockName.bind(
 				null,
