@@ -378,7 +378,6 @@ export function useGlobalStylesOutput() {
 			{
 				css: customProperties,
 				isGlobalStyles: true,
-				__experimentalNoWrapper: true,
 			},
 			{
 				css: globalStyles,
