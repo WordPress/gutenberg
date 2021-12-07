@@ -21,6 +21,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean}       focusMode                              Whether the focus mode is enabled or not
  * @property {Array}         styles                                 Editor Styles
  * @property {boolean}       keepCaretInsideBlock                   Whether caret should move between blocks in edit mode
+ * @property {string}        paragraphPlaceholder                   Empty paragraph placeholder
  * @property {string}        bodyPlaceholder                        Empty post placeholder
  * @property {string}        titlePlaceholder                       Empty title placeholder
  * @property {boolean}       codeEditingEnabled                     Whether or not the user can switch to the code editor

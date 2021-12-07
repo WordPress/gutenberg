@@ -37,6 +37,11 @@ function ParagraphBlock( {
 		...style,
 	};
 
+	const paragraphPlaceholder = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().paragraphPlaceholder;
+	}, [] );
+
 	const onAlignmentChange = useCallback( ( nextAlign ) => {
 		setAttributes( { align: nextAlign } );
 	}, [] );
@@ -81,7 +86,11 @@ function ParagraphBlock( {
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-				placeholder={ placeholder || __( 'Start writing…' ) }
+				placeholder={
+					placeholder ||
+					paragraphPlaceholder ||
+					__( 'Start writing…' )
+				}
 				textAlign={ align }
 				__unstableEmbedURLOnPaste
 			/>
