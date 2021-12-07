@@ -20,6 +20,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { BACKSPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -143,6 +144,12 @@ export default function ReusableBlockConvertButton( {
 									label={ __( 'Name' ) }
 									value={ title }
 									onChange={ setTitle }
+									onKeyDown={ ( event ) => {
+										const { keyCode } = event;
+										if ( keyCode === BACKSPACE ) {
+											event.stopPropagation();
+										}
+									} }
 								/>
 								<Flex
 									className="reusable-blocks-menu-items__convert-modal-actions"
