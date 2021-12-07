@@ -326,7 +326,9 @@ class NativeEditorProvider extends Component {
 	}
 
 	removeAllBlocks() {
-		const allClientIds = this.props.blocks.map( block => block.clientId );
+		const allClientIds = this.props.blocks.map(
+			( block ) => block.clientId
+		);
 		this.props.removeBlocks( allClientIds );
 	}
 

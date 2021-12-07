@@ -353,6 +353,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
         });
 
+        devSupportManager.addCustomDevOption("Remove all blocks", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().removeAllBlocks();
+            }
+        });
+
         devSupportManager.addCustomDevOption("Help", new DevOptionHandler() {
             @Override
             public void onOptionSelected() {
