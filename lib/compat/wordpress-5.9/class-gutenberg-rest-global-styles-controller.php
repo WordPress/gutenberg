@@ -27,7 +27,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		// List themes global styles.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/themes/(?P<stylesheet>[\w\.-]+)',
+			'/' . $this->rest_base . '/themes/(?P<stylesheet>[\/\w\.-]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
