@@ -17,6 +17,7 @@ class Picker extends Component {
 			options,
 			onChange,
 			title,
+			description: message,
 			destructiveButtonIndex,
 			disabledButtonIndices,
 			getAnchor,
@@ -30,6 +31,7 @@ class Picker extends Component {
 		ActionSheetIOS.showActionSheetWithOptions(
 			{
 				title,
+				message,
 				options: fullOptions,
 				cancelButtonIndex: 0,
 				destructiveButtonIndex,
