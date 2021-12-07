@@ -7,7 +7,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -17,6 +17,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import './hooks';
 import './plugins';
 import Editor from './editor';
+import { store as editPostStore } from './store';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -85,7 +86,10 @@ export function initializeEditor(
 		'blockEditor.__unstableCanInsertBlockType',
 		'removeTemplatePartsFromInserter',
 		( can, blockType ) => {
-			if ( blockType.name === 'core/template-part' ) {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/template-part'
+			) {
 				return false;
 			}
 			return can;
