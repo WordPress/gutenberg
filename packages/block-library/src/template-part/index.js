@@ -52,6 +52,7 @@ addFilter(
 );
 
 // Prevent adding template parts inside post templates.
+const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
 addFilter(
 	'blockEditor.__unstableCanInsertBlockType',
 	'removeTemplatePartsFromPostTemplates',
@@ -65,10 +66,15 @@ addFilter(
 			return can;
 		}
 
-		const hasDisallowedParent =
-			getBlock( rootClientId )?.name === 'core/post-template' ||
-			getBlockParentsByBlockName( rootClientId, 'core/post-template' )
-				.length;
-		return ! hasDisallowedParent;
+		for ( const disallowedParentType of DISALLOWED_PARENTS ) {
+			const hasDisallowedParent =
+				getBlock( rootClientId )?.name === disallowedParentType ||
+				getBlockParentsByBlockName( rootClientId, disallowedParentType )
+					.length;
+			if ( hasDisallowedParent ) {
+				return false;
+			}
+		}
+		return true;
 	}
 );
