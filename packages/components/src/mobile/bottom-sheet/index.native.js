@@ -261,7 +261,7 @@ class BottomSheet extends Component {
 		if ( width > height ) {
 			this.setState( {
 				maxHeight: Math.min(
-					0.9 * height - this.headerHeight,
+					0.96 * height - this.headerHeight,
 					maxHeightWithOpenKeyboard
 				),
 			} );
@@ -269,7 +269,7 @@ class BottomSheet extends Component {
 		} else {
 			this.setState( {
 				maxHeight: Math.min(
-					height / 2 - safeAreaBottomInset - this.headerHeight,
+					height * 0.59 - safeAreaBottomInset - this.headerHeight,
 					maxHeightWithOpenKeyboard
 				),
 			} );
