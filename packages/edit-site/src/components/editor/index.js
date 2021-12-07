@@ -119,8 +119,6 @@ function Editor( { onError } ) {
 		setIsEntitiesSavedStatesOpen( false );
 	}, [] );
 
-	useTitle( __( 'Editor (beta)' ) );
-
 	const blockContext = useMemo(
 		() => ( {
 			...page?.context,
@@ -165,6 +163,10 @@ function Editor( { onError } ) {
 		}
 		return null;
 	};
+
+	// Only announce the title once the editor is ready to prevent "Replace"
+	// action in <URlQueryController> from double-announcing.
+	useTitle( isReady && __( 'Editor (beta)' ) );
 
 	return (
 		<>

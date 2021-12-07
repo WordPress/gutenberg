@@ -10,16 +10,26 @@ import { addQueryArgs } from '@wordpress/url';
 
 const history = createBrowserHistory();
 
+const originalHistoryPush = history.push;
+const originalHistoryReplace = history.replace;
+
 function push( params, state ) {
-	history.push( addQueryArgs( window.location.href, params ), state );
+	return originalHistoryPush.call(
+		history,
+		addQueryArgs( window.location.href, params ),
+		state
+	);
 }
 
 function replace( params, state ) {
-	history.replace( addQueryArgs( window.location.href, params ), state );
+	return originalHistoryReplace.call(
+		history,
+		addQueryArgs( window.location.href, params ),
+		state
+	);
 }
 
-export default {
-	...history,
-	push,
-	replace,
-};
+history.push = push;
+history.replace = replace;
+
+export default history;
