@@ -17,7 +17,7 @@ function gutenberg_add_template_loader_filters() {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
 			continue;
 		}
-		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
+		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_locate_block_template', 20, 3 );
 	}
 
 	// Request to resolve a template.
@@ -38,7 +38,7 @@ add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
  * @param array  $templates A list of template candidates, in descending order of priority.
  * @return string The path to the Full Site Editing template canvas file.
  */
-function gutenberg_override_query_template( $template, $type, array $templates ) {
+function gutenberg_locate_block_template( $template, $type, array $templates ) {
 	global $_wp_current_template_content;
 
 	if ( $template ) {
@@ -97,11 +97,12 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 
 	// Render title tag with content, regardless of whether theme has title-tag support.
 	remove_action( 'wp_head', '_wp_render_title_tag', 1 ); // Remove conditional title tag rendering...
+	// Override WP 5.8 title-tag support.
 	remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
 	add_action( 'wp_head', 'gutenberg_render_title_tag', 1 ); // ...and make it unconditional.
 
 	// This file will be included instead of the theme's template file.
-	return gutenberg_dir_path() . 'lib/template-canvas.php';
+	return gutenberg_dir_path() . 'lib/compat/wordpress-5.9/template-canvas.php';
 }
 
 /**
@@ -126,7 +127,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy, $fallb
 	}
 
 	$slugs = array_map(
-		'gutenberg_strip_php_suffix',
+		'gutenberg_strip_template_file_suffix',
 		$template_hierarchy
 	);
 
@@ -224,13 +225,6 @@ function gutenberg_get_the_template_html() {
 }
 
 /**
- * Renders the markup for the current template.
- */
-function gutenberg_render_the_template() {
-	echo gutenberg_get_the_template_html(); // phpcs:ignore WordPress.Security.EscapeOutput
-}
-
-/**
  * Renders a 'viewport' meta tag.
  *
  * This is hooked into {@see 'wp_head'} to decouple its output from the default template canvas.
@@ -247,7 +241,7 @@ function gutenberg_viewport_meta_tag() {
  * @param string $template_file Template file name.
  * @return string Template file name without extension.
  */
-function gutenberg_strip_php_suffix( $template_file ) {
+function gutenberg_strip_template_file_suffix( $template_file ) {
 	return preg_replace( '/\.(php|html)$/', '', $template_file );
 }
 
@@ -274,8 +268,10 @@ function gutenberg_template_render_without_post_block_context( $context ) {
 
 	return $context;
 }
-add_filter( 'render_block_context', 'gutenberg_template_render_without_post_block_context' );
 
+// override WordPress 5.8 filters.
+remove_filter( 'render_block_context', '_block_template_render_without_post_block_context' );
+add_filter( 'render_block_context', 'gutenberg_template_render_without_post_block_context' );
 
 /**
  * Sets the current WP_Query to return auto-draft posts.
