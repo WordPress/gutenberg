@@ -81,7 +81,7 @@ describe( 'Settings sidebar', () => {
 			} );
 			expect( templateCardAfterNavigation ).toMatchObject( {
 				title: '404',
-				description: 'Template shown when no content is found.',
+				description: 'Displays when no content is found.',
 			} );
 		} );
 	} );
