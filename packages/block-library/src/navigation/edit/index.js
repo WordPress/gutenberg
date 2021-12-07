@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import noop from 'lodash';
 
 /**
  * WordPress dependencies
@@ -109,7 +110,8 @@ function Navigation( {
 		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
 
-	let areaMenu, setAreaMenu;
+	let areaMenu,
+		setAreaMenu = noop;
 	// Navigation areas are deprecated and on their way out. Let's not perform
 	// the request unless we're in an environment where the endpoint exists.
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
