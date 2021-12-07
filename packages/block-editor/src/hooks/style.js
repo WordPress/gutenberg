@@ -222,6 +222,19 @@ const skipSerializationPathsSave = {
 };
 
 /**
+ * A dictionary used to normalize feature names between support flags, style
+ * object properties and __experimentSkipSerialization configuration arrays.
+ *
+ * This allows not having to provide a migration for a support flag and possible
+ * backwards compatibility bridges, while still achieving consistency between
+ * the support flag and the skip serialization array.
+ *
+ * @constant
+ * @type {Record<string, string>}
+ */
+const renamedFeatures = { gradients: 'gradient' };
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param {Object}                    props      Additional props applied to save element.
@@ -251,7 +264,8 @@ export function addSaveProps(
 		}
 
 		if ( Array.isArray( skipSerialization ) ) {
-			skipSerialization.forEach( ( feature ) => {
+			skipSerialization.forEach( ( featureName ) => {
+				const feature = renamedFeatures[ featureName ] || featureName;
 				style = omit( style, [ [ ...path, feature ] ] );
 			} );
 		}
