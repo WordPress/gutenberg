@@ -85,11 +85,7 @@ export default function List() {
 			header={ <Header templateType={ templateType } /> }
 			drawer={ <NavigationSidebar.Slot /> }
 			notices={ <EditorSnackbars /> }
-			content={
-				<main className="edit-site-list-main">
-					<Table templateType={ templateType } />
-				</main>
-			}
+			content={ <Table templateType={ templateType } /> }
 			shortcuts={ {
 				previous: previousShortcut,
 				next: nextShortcut,
