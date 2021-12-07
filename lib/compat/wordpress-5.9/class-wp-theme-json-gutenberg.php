@@ -1426,8 +1426,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Replace the presets.
 			foreach ( self::PRESETS_METADATA as $preset ) {
-				$override_preset  = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
-				$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
+				$override_preset = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
 
 				foreach ( self::VALID_ORIGINS as $origin ) {
 					$path    = array_merge( $node['path'], $preset['path'], array( $origin ) );
@@ -1442,7 +1441,8 @@ class WP_Theme_JSON_Gutenberg {
 					) {
 						_wp_array_set( $this->theme_json, $path, $content );
 					} else {
-						$content = self::filter_slugs( $content, $slugs_for_preset );
+						$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
+						$content          = self::filter_slugs( $content, $slugs_for_preset );
 						_wp_array_set( $this->theme_json, $path, $content );
 					}
 				}
