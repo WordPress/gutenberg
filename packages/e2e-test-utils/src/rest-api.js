@@ -35,18 +35,34 @@ Link header: ${ links }` );
 	apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 } )();
 
+const fetchRetry = async ( url, options = {}, retries ) => {
+	const response = await fetch( url, options );
+
+	if ( response.status === 302 ) {
+		return response;
+	}
+	if ( retries > 0 ) {
+		return fetchRetry( url, options, retries - 1 );
+	}
+	throw new Error( response.status );
+};
+
 const setNonce = ( async () => {
 	const formData = new FormData();
 	formData.append( 'log', 'admin' );
 	formData.append( 'pwd', 'password' );
 
 	// Login to admin using fetch.
-	const loginResponse = await fetch( createURL( 'wp-login.php' ), {
-		method: 'POST',
-		headers: formData.getHeaders(),
-		body: formData,
-		redirect: 'manual',
-	} );
+	const loginResponse = await fetchRetry(
+		createURL( 'wp-login.php' ),
+		{
+			method: 'POST',
+			headers: formData.getHeaders(),
+			body: formData,
+			redirect: 'manual',
+		},
+		2
+	);
 
 	// Retrieve the cookies.
 	const cookies = loginResponse.headers.get( 'set-cookie' );
