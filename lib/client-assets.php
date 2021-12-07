@@ -710,7 +710,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 /**
  * Sets the editor styles to be consumed by JS.
  */
-function gutenberg_extend_block_editor_styles_html() {
+function gutenberg_resolve_assets() {
 	global $pagenow;
 
 	$script_handles = array();
@@ -765,16 +765,17 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	$scripts = ob_get_clean();
 
-	$editor_assets = wp_json_encode(
-		array(
-			'styles'  => $styles,
-			'scripts' => $scripts,
-		)
+	return array(
+		'styles'  => $styles,
+		'scripts' => $scripts,
 	);
-
-	echo "<script>window.__editorAssets = $editor_assets</script>";
 }
-add_action( 'admin_footer-appearance_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-widgets.php', 'gutenberg_extend_block_editor_styles_html' );
+
+add_filter(
+	'block_editor_settings_all',
+	function( $settings ) {
+		// In the future we can allow WP Dependency handles to be passed.
+		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets();
+		return $settings;
+	}
+);
