@@ -7,7 +7,7 @@ import { useMemoOne } from 'use-memo-one';
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
-import { useRef, useCallback, useReducer } from '@wordpress/element';
+import { useRef, useCallback, useMemo, useReducer } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
@@ -133,6 +133,11 @@ export default function useSelect( mapSelect, deps ) {
 		[ registry ]
 	);
 
+	// Generate a "flag" for used in the effect dependency array.
+	// It's different than just using `mapSelect` since deps could be undefined,
+	// in that case, we would still want to memoize it.
+	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
+
 	let mapOutput;
 
 	if ( _mapSelect ) {
@@ -234,7 +239,7 @@ export default function useSelect( mapSelect, deps ) {
 		// If you're tempted to eliminate the spread dependencies below don't do it!
 		// We're passing these in from the calling function and want to make sure we're
 		// examining every individual value inside the `deps` array.
-	}, [ registry, trapSelect, hasMappingFunction, ...( deps ?? [] ) ] );
+	}, [ registry, trapSelect, hasMappingFunction, depsChangedFlag ] );
 
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
