@@ -359,6 +359,15 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
             }
         });
+
+        devSupportManager.addCustomDevOption("Pattern Picker", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                Intent intent = new Intent(MainApplication.this, PatternPickerActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

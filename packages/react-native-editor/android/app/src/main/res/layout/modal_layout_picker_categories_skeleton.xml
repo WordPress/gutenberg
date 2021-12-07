@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/categoriesSkeleton"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/mlp_categories_bar_height"
+    android:background="?attr/layoutPickerBackground"
+    android:paddingEnd="@dimen/mlp_layout_card_margin_end"
+    android:paddingStart="@dimen/mlp_layout_card_margin_start">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:shimmer_base_alpha="@dimen/skeleton_shimmer_base_alpha"
+        app:shimmer_highlight_alpha="@dimen/skeleton_shimmer_highlight_alpha">
+
+        <View
+            android:layout_width="@dimen/mlp_layout_skeleton_line_width"
+            android:layout_height="@dimen/mlp_layouts_category_height"
+            android:layout_marginEnd="@dimen/mlp_categories_margin"
+            android:background="@drawable/modal_layout_picker_category_background"
+            android:backgroundTint="?attr/categoriesButtonBackground"
+            android:orientation="horizontal" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+</FrameLayout>

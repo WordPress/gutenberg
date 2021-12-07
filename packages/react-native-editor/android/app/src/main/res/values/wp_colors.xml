@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <color name="wp_blue">#0087be</color>
+    <color name="wp_blue_dark">#005082</color>
+    <color name="wp_blue_light">#78dcfa</color>
+    <color name="wp_blue_medium">#00aadc</color>
+    <color name="wp_grey">#87a6bc</color>
+    <color name="wp_grey_dark">#2e4453</color>
+    <color name="wp_grey_darken_10">#668eaa</color>
+    <color name="wp_grey_darken_20">#4f748e</color>
+    <color name="wp_grey_darken_30">#3d596d</color>
+    <color name="wp_grey_light">#f3f6f8</color>
+    <color name="wp_grey_lighten_10">#a8bece</color>
+    <color name="wp_grey_lighten_20">#c8d7e1</color>
+    <color name="wp_grey_lighten_30">#e9eff3</color>
+
+</resources>

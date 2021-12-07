@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutsSkeleton"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/mlp_layouts_row_height"
+    android:layout_marginTop="@dimen/margin_extra_large"
+    android:background="?attr/layoutPickerBackground">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:shimmer_base_alpha="@dimen/skeleton_shimmer_base_alpha"
+        app:shimmer_highlight_alpha="@dimen/skeleton_shimmer_highlight_alpha">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/mlp_layouts_row_height"
+            android:orientation="vertical">
+
+            <View style="@style/ModalLayoutPickerLayoutsSeparatorLine"
+                android:layout_marginTop="@dimen/margin_extra_large"/>
+
+            <View
+                style="@style/ModalLayoutPickerLayoutsTitle"
+                android:layout_width="@dimen/mlp_layout_skeleton_line_width"
+                android:layout_height="@dimen/mlp_layout_skeleton_line_height"
+                android:layout_marginStart="@dimen/mlp_layout_card_margin_start"
+                android:background="?attr/categoriesButtonBackground" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/LayoutCardView"
+                android:layout_width="@dimen/mlp_layout_card_width"
+                android:layout_height="@dimen/mlp_layout_card_height"
+                android:layout_marginStart="@dimen/mlp_layout_card_margin_start"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:background="?attr/categoriesButtonBackground">
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+</FrameLayout>

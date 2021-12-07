@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="UnusedResources">
+    <color name="black_translucent_20">#33000000</color>
+    <color name="black_translucent_40">#66000000</color>
+    <color name="black_translucent_50">#80000000</color>
+
+    <color name="white_translucent_20">#33ffffff</color>
+    <color name="white_translucent_40">#66ffffff</color>
+    <color name="white_translucent_50">#80ffffff</color>
+    <color name="white_translucent_65">#a6ffffff</color>
+
+    <!-- Use for old Stats.  Will be removed soon. -->
+    <color name="grey_lighten_30_translucent_50">#80e9eff3</color>
+</resources>

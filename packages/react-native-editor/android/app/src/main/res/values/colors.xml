@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="UnusedResources">
+
+    <!-- APPLICATION -->
+    <color name="background_dark">#121212</color>
+    <color name="background_dark_elevated">#2e2e2e</color>
+    <color name="background_default">@color/neutral_0</color>
+    <color name="background_notification_unread">#e6eff3</color>
+    <color name="background_shortcut">#f5f5f5</color>
+    <color name="background_snackbar">@color/neutral_80</color>
+    <color name="link_reader">@color/primary</color>
+    <color name="link_stats">@color/accent</color>
+
+    <!-- Switch to attribute after dropping support for api 21-23 -->
+    <color name="placeholder">#1A000000</color>
+    <color name="p2_author_bg_stroke">#FFF</color>
+
+    <!-- Post History -->
+
+    <color name="post_history_underlying_background">@color/neutral_0</color>
+
+    <!-- Login Prologue -->
+    <color name="promo_indicator_color_default">@color/black_translucent_20</color>
+    <color name="login_prologue_background_circle_purple">@color/purple_20</color>
+    <color name="login_prologue_background_circle_light_purple">@color/purple_10</color>
+    <color name="login_prologue_background_circle_blue">@color/blue_20</color>
+    <color name="login_prologue_background_circle_light_blue">@color/blue_5</color>
+    <color name="login_prologue_background_circle_green">@color/green_5</color>
+    <color name="login_prologue_background_circle_yellow">@color/yellow_10</color>
+    <color name="login_prologue_background_circle_orange">@color/orange_10</color>
+    <color name="login_prologue_background_circle_pink">@color/pink_10</color>
+
+    <!-- Prepublishing Nudges -->
+    <color name="prepublishing_toolbar_icon_color">@color/gray_50</color>
+    <color name="prepublishing_action_type_enabled_color">@color/black</color>
+    <color name="prepublishing_action_result_enabled_color">@color/gray_30</color>
+    <color name="prepublishing_action_type_disabled_color">@color/gray_10</color>
+    <color name="prepublishing_action_result_disabled_color">@color/gray_10</color>
+
+    <!-- Reader -->
+
+    <!--Reader Following empty view -->
+    <color name="reader_following_empty_view_upper_right_plus">@color/yellow_0</color>
+    <color name="reader_following_empty_view_mid_left_plus">@color/green_0</color>
+    <color name="reader_following_empty_view_center_circle">@color/blue_0</color>
+    <color name="reader_following_empty_view_left_lower_plus">@color/blue_0</color>
+    <color name="reader_following_empty_view_outline">@color/gray_10</color>
+    <color name="reader_following_empty_view_middle_plus">@android:color/white</color>
+    <color name="reader_following_empty_view_background">@color/background_default</color>
+
+    <!--Reader Post Card -->
+    <color name="reader_post_list_background">@color/neutral_0</color>
+
+    <!-- Modal Layout Picker -->
+    <color name="mlp_categories_button_background">#ffededed</color>
+    <color name="mlp_categories_button_background_dark">#ff464646</color>
+    <color name="mlp_categories_button_background_selected_dark">#ffdcdcdc</color>
+    <color name="mlp_divider_dark">#ff303030</color>
+    <color name="mlp_categories_background_dark">#ff2d2d2d</color>
+
+    <!-- Collapsing Toolbar Custom Scrim Color -->
+    <color name="collapsing_toolbar_custom_scrim_color">@color/white_translucent_50</color>
+
+    <!-- Scan Threat Context Line Custom Colors -->
+    <color name="context_line_highlighted_row_background">@color/red_5</color>
+
+    <!-- Quick Start Task Cards -->
+    <color name="quick_start_task_card_illustration_background">@color/gray_0</color>
+    <color name="quick_start_task_card_illustration_surface">@color/white</color>
+    <color name="quick_start_task_card_illustration_details">@color/gray_30</color>
+    <color name="quick_start_task_card_illustration_line">@color/blue_5</color>
+    <color name="quick_start_task_card_illustration_area">@color/blue_0</color>
+    <color name="quick_start_task_card_illustration_mountain">@color/gray_5</color>
+    <color name="quick_start_task_card_illustration_sun_fill">#F5E6B3</color>
+    <color name="quick_start_task_card_illustration_sun_stroke">#F0C930</color>
+
+    <color name="quick_start_task_card_illustration_check_site_stats_stroke">@color/pink_5</color>
+    <color name="quick_start_task_card_illustration_edit_site_icon_area">@color/blue_0</color>
+    <color name="quick_start_task_card_illustration_edit_site_icon_mountain_fill">@color/gray_5</color>
+    <color name="quick_start_task_card_illustration_edit_site_icon_mountain_stroke">@color/gray_40</color>
+    <color name="quick_start_task_card_illustration_follow_other_sites_fill">@color/blue_0</color>
+    <color name="quick_start_task_card_illustration_set_site_title_header">@color/blue_0</color>
+    <color name="quick_start_task_card_illustration_set_site_title_body">@color/white</color>
+    <color name="quick_start_task_card_illustration_set_site_title_box_stroke">@color/blue_5</color>
+    <color name="quick_start_task_card_illustration_visit_your_site_star">#FFD60A</color>
+
+    <!-- Reader Topics You Might Like Chips -->
+    <color name="reader_topics_you_might_like_chip_green_stroke">@color/green_5</color>
+    <color name="reader_topics_you_might_like_chip_green_font">@color/green_50</color>
+    <color name="reader_topics_you_might_like_chip_green_fill">@color/green_0</color>
+    <color name="reader_topics_you_might_like_chip_purple_stroke">@color/purple_5</color>
+    <color name="reader_topics_you_might_like_chip_purple_font">@color/purple_50</color>
+    <color name="reader_topics_you_might_like_chip_purple_fill">@color/purple_0</color>
+    <color name="reader_topics_you_might_like_chip_yellow_stroke">@color/yellow_5</color>
+    <color name="reader_topics_you_might_like_chip_yellow_font">@color/yellow_50</color>
+    <color name="reader_topics_you_might_like_chip_yellow_fill">@color/yellow_0</color>
+    <color name="reader_topics_you_might_like_chip_orange_stroke">@color/orange_5</color>
+    <color name="reader_topics_you_might_like_chip_orange_font">@color/orange_50</color>
+    <color name="reader_topics_you_might_like_chip_orange_fill">@color/orange_0</color>
+
+    <!-- These colors were removed from the login library and moved here as they are still being
+    used by some old layouts. They should be replaced here as well, whenever possible. -->
+    <color name="color_primary_dark">#006b98</color>
+    <color name="light_gray">@color/grey_lighten_30</color>
+    <color name="grey_lighten_30">#e9eff3</color>
+    <color name="grey_lighten_20">#c8d7e1</color>
+    <color name="grey_300">#ffe0e0e0</color>
+    <color name="grey_900">#ff212121</color>
+</resources>

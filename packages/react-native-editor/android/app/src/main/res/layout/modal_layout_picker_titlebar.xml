@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/negative_margin_medium"
+        android:backgroundTint="@color/transparent"
+        android:contentDescription="@string/navigate_back_desc"
+        android:src="@drawable/ic_arrow_left_white_24dp"
+        android:tint="?attr/colorOnSurface" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/ModalLayoutPickerHeader"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:text="@string/mlp_choose_layout_title"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/previewTypeSelectorButton"
+        style="@style/WebPreviewNavbarButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="@dimen/margin_extra_large"
+        android:contentDescription="@string/preview_type_desc"
+        android:src="@drawable/ic_devices_white_24dp" />
+</FrameLayout>

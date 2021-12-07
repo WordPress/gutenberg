@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:ignore="InconsistentLayout">
+
+    <include
+        android:id="@+id/modal_layout_picker_title_row"
+        layout="@layout/modal_layout_picker_title_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <include
+        android:id="@+id/modal_layout_picker_subtitle_row"
+        layout="@layout/modal_layout_picker_subtitle_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

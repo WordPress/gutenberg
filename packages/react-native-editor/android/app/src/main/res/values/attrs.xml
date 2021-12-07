@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="longClickHint" format="string" />
+
+    <!-- Semantic colors -->
+    <attr name="wpColorError" format="reference|color" />
+    <attr name="wpColorSuccess" format="reference|color" />
+    <attr name="wpColorNavBar" format="reference|color" />
+    <attr name="wpColorAppBar" format="reference|color" />
+    <attr name="wpColorOnSurfaceMedium" format="reference|color" />
+    <attr name="wpColorOnSurfaceHigh" format="reference|color" />
+
+    <attr name="wpColorWarningDark" format="reference|color" />
+    <attr name="wpColorWarningLight" format="reference|color" />
+    <attr name="wpColorActionModeIcon" format="reference|color" />
+
+    <attr name="wpColorSurfaceSecondary" format="reference|color" />
+    <attr name="wpColorLoginPrologueBg" format="reference|color" />
+
+    <!-- Gutenberg colors-->
+    <attr name="colorGutenbergDivider" format="reference|color" />
+    <attr name="colorGutenbergBackground" format="reference|color" />
+
+    <!-- Modal layout picker colors-->
+    <attr name="layoutPickerBackground" format="reference|color" />
+    <attr name="categoriesButtonBackground" format="reference|color" />
+    <attr name="categoriesButtonBackgroundSelected" format="reference|color" />
+    <attr name="mlpDividerColor" format="reference|color" />
+
+    <!-- SummaryEditTextPreference attributes -->
+    <declare-styleable name="SummaryEditTextPreference">
+        <attr name="summaryLines" format="integer" />
+        <attr name="maxSummaryLines" format="integer" />
+        <attr name="longClickHint" />
+        <attr name="dialogMessage" format="string" />
+        <attr name="iconTint" format="color|reference" />
+        <attr name="switchThumbTint" format="integer" />
+        <attr name="startOffset" format="dimension|reference" />
+    </declare-styleable>
+
+    <!-- DetailListPreference attributes -->
+    <declare-styleable name="DetailListPreference">
+        <attr name="dialogTitle" format="string" />
+        <attr name="dialogHelpUrl" format="string" />
+        <attr name="entryDetails" format="string" />
+        <attr name="longClickHint" />
+    </declare-styleable>
+
+    <declare-styleable name="WPStartOverPreference">
+        <attr name="preficon" format="reference" />
+        <attr name="buttonText" format="string" />
+        <attr name="buttonTextColor" format="reference|color" />
+        <attr name="buttonTextAllCaps" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="LearnMorePreference">
+        <attr name="url" format="string" />
+        <attr name="caption" format="string" />
+        <attr name="button" format="string" />
+        <attr name="icon" format="reference" />
+        <attr name="layout" format="reference" />
+        <attr name="openInDialog" format="boolean" />
+        <attr name="useCustomJsFormatting" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="FlowLayout">
+        <attr name="horizontalSpacing" format="dimension" />
+        <attr name="verticalSpacing" format="dimension" />
+    </declare-styleable>
+    <declare-styleable name="FlowLayout_Layout">
+        <attr name="layout_horizontalSpacing" format="dimension" />
+        <attr name="layout_verticalSpacing" format="dimension" />
+    </declare-styleable>
+
+    <!--
+        WPTextView attributes
+    -->
+    <declare-styleable name="WPTextView">
+        <attr name="fixWidowWords" format="boolean" />
+    </declare-styleable>
+
+    <!--
+        WPLinearLayoutSizeBound attributes
+    -->
+    <declare-styleable name="WPLinearLayoutSizeBound">
+        <attr name="maxWidth" format="dimension" />
+        <attr name="maxHeight" format="dimension" />
+    </declare-styleable>
+
+    <!--
+        ReaderIconCountView attributes
+    -->
+    <declare-styleable name="ReaderIconCountView">
+        <attr name="readerIcon" format="enum">
+            <enum name="like" value="0" />
+            <enum name="comment" value="1" />
+            <enum name="reblog" value="2" />
+        </attr>
+    </declare-styleable>
+
+    <!--
+        ReaderFollowButton attributes
+    -->
+    <declare-styleable name="ReaderFollowButton">
+        <attr name="wpReaderFollowButtonType" format="enum">
+            <enum name="followSite" value="0" />
+            <enum name="followComments" value="1" />
+        </attr>
+        <attr name="wpShowFollowButtonCaption" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="ReaderFollowButtonStyle">
+        <attr name="followButtonStyle" format="reference"/>
+    </declare-styleable>
+
+    <!--
+        PostListButton attributes
+    -->
+    <declare-styleable name="wpPostListButton">
+        <attr name="wpPostButtonType" format="enum">
+            <enum name="edit" value="1" />
+            <enum name="view" value="2" />
+            <enum name="preview" value="3" />
+            <enum name="stats" value="4" />
+            <enum name="trash" value="5" />
+            <enum name="delete" value="6" />
+            <enum name="publish" value="7" />
+            <enum name="sync" value="8" />
+            <enum name="more" value="9" />
+            <enum name="submit" value="10" />
+            <enum name="retry" value="11" />
+            <enum name="moveToDraft" value="12" />
+            <enum name="deletePermanently" value="13"/>
+            <enum name="cancelPendingAutoUpload" value="14"/>
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="wpBoundedWidth">
+        <attr name="bounded_width" format="dimension" />
+    </declare-styleable>
+
+    <!--
+        WPPrefView
+    -->
+    <declare-styleable name="wpPrefView">
+        <attr name="wpPrefType" format="enum">
+            <enum name="text" value="0" />
+            <enum name="toggle" value="1" />
+            <enum name="checklist" value="2" />
+            <enum name="radiolist" value="3" />
+        </attr>
+        <attr name="wpHeading" format="string" />
+        <attr name="wpTitle" format="string" />
+        <attr name="wpSummary" format="string" />
+        <attr name="wpShowDivider" format="boolean" />
+        <attr name="wpTextDialogSubtitle" format="string" />
+    </declare-styleable>
+
+    <!--
+        FilteredRecyclerView
+    -->
+    <declare-styleable name="FilteredRecyclerView">
+        <!-- Optional: Layout resource id for the Filter Spinner main TextView -->
+        <attr name="wpSpinnerItemView" format="reference"/>
+
+        <!-- Optional: Layout resource id for the Filter Spinner dropdown TextView -->
+        <attr name="wpSpinnerDropDownItemView" format="reference"/>
+
+        <!-- Optional: Default is false. Locks the toolbar and prevents scroll to hide/reveal functionality -->
+        <attr name="wpToolbarDisableScrollGestures" format="boolean"/>
+        <!-- Optional: Default to false. Hide the AppBarLayout. This flag was added as part of
+        ReaderPostListFragment refactoring. We don't need to use the FilteredRecyclerView in the
+        Reader anymore, but since it's planned to iteratively rewrite the ReaderPostListFragment
+        it's not worth replacing the FilteredRecyclerView with something else now. Therefore we
+        opted for a simple flag which hides the filtering options from the FilteredRecyclerView -->
+        <attr name="wpHideAppBarLayout" format="boolean"/>
+    </declare-styleable>
+
+    <!--
+    WPTooltipView
+    -->
+    <declare-styleable name="WPTooltipView">
+        <!-- Position of the Tooltip -->
+        <attr name="wpTooltipPosition">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+            <enum name="above" value="2"/>
+            <enum name="below" value="3"/>
+        </attr>
+        <attr name="wpTooltipMessage" format="reference"/>
+        <attr name="wpArrowHorizontalOffsetFromEnd" format="dimension"/>
+        <attr name="wpArrowHorizontalOffsetFromStart" format="dimension"/>
+    </declare-styleable>
+
+    <!--
+        Actionable Empty View
+    -->
+    <declare-styleable name="ActionableEmptyView">
+        <!-- Optional: string text of button -->
+        <attr name="aevButton" format="string"/>
+        <!-- Optional: resource id of image -->
+        <attr name="aevImage" format="reference"/>
+        <!-- Optional: defines if image should be hidden in landscape mode -->
+        <attr name="aevImageHiddenInLandscape" format="boolean" />
+        <!-- Optional: string text of subtitle -->
+        <attr name="aevSubtitle" format="string"/>
+        <!-- Required: string text of title -->
+        <attr name="aevTitle" format="string"/>
+    </declare-styleable>
+
+    <!--
+        Stats Widgets
+    -->
+    <declare-styleable name="statsWidget">
+        <attr name="viewType" format="enum">
+            <enum name="views" value="0"/>
+            <enum name="allTime" value="1"/>
+            <enum name="today" value="2"/>
+        </attr>
+    </declare-styleable>
+
+    <!--
+        Main Switch Toolbar View
+    -->
+    <declare-styleable name="PrefMainSwitchToolbarView">
+        <attr name="mainTitleOn" format="reference" />
+        <attr name="mainTitleOff" format="reference" />
+        <attr name="mainContentDescription" format="reference" />
+        <attr name="mainHintOn" format="reference" />
+        <attr name="mainHintOff" format="reference" />
+        <attr name="mainContentInsetStart" format="dimension" />
+        <attr name="mainOffsetEnd" format="dimension" />
+        <attr name="mainViewStyle" format="enum">
+            <enum name="highlighted" value="0" />
+            <enum name="normal" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <!-- BadgedImageView attributes -->
+    <declare-styleable name="BadgedImageView">
+        <attr name="badgeBackground" format="reference" />
+        <attr name="badgeBackgroundSize" format="dimension" />
+        <attr name="badgeBackgroundBorderWidth" format="dimension" />
+        <attr name="badgeIcon" format="reference" />
+        <attr name="badgeIconSize" format="dimension" />
+        <attr name="badgeHorizontalOffset" format="dimension" />
+        <attr name="badgeVerticalOffset" format="dimension" />
+    </declare-styleable>
+
+    <!--
+    WPEditTextWithChipsOutlined
+    -->
+    <declare-styleable name="WPEditTextWithChipsOutlined">
+        <attr name="wpHint" format="reference"/>
+        <attr name="wpChipifyEnabled" format="boolean"/>
+        <attr name="wpMaxNumberChips" format="integer" />
+    </declare-styleable>
+
+    <!--
+        QuickStartFocusPoint attributes
+    -->
+    <declare-styleable name="QuickStartFocusPoint">
+        <attr name="size" format="enum">
+            <enum name="small" value="0" />
+            <enum name="normal" value="1" />
+        </attr>
+    </declare-styleable>
+</resources>

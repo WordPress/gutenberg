@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="UnusedResources">
+    <color name="accent">@color/pink_50</color>
+    <color name="accent_0">@color/pink_0</color>
+    <color name="accent_5">@color/pink_5</color>
+    <color name="accent_10">@color/pink_10</color>
+    <color name="accent_20">@color/pink_20</color>
+    <color name="accent_30">@color/pink_30</color>
+    <color name="accent_40">@color/pink_40</color>
+    <color name="accent_50">@color/pink_50</color>
+    <color name="accent_60">@color/pink_60</color>
+    <color name="accent_70">@color/pink_70</color>
+    <color name="accent_80">@color/pink_80</color>
+    <color name="accent_90">@color/pink_90</color>
+    <color name="accent_100">@color/pink_100</color>
+    <color name="accent_dark">@color/pink_70</color>
+    <color name="accent_light">@color/pink_30</color>
+
+    <color name="error">@color/red_50</color>
+    <color name="error_0">@color/red_0</color>
+    <color name="error_5">@color/red_5</color>
+    <color name="error_10">@color/red_10</color>
+    <color name="error_20">@color/red_20</color>
+    <color name="error_30">@color/red_30</color>
+    <color name="error_40">@color/red_40</color>
+    <color name="error_50">@color/red_50</color>
+    <color name="error_60">@color/red_60</color>
+    <color name="error_70">@color/red_70</color>
+    <color name="error_80">@color/red_80</color>
+    <color name="error_90">@color/red_90</color>
+    <color name="error_100">@color/red_100</color>
+    <color name="error_dark">@color/red_70</color>
+    <color name="error_light">@color/red_30</color>
+
+    <color name="neutral">@color/gray_50</color>
+    <color name="neutral_0">@color/gray_0</color>
+    <color name="neutral_5">@color/gray_5</color>
+    <color name="neutral_10">@color/gray_10</color>
+    <color name="neutral_20">@color/gray_20</color>
+    <color name="neutral_30">@color/gray_30</color>
+    <color name="neutral_40">@color/gray_40</color>
+    <color name="neutral_50">@color/gray_50</color>
+    <color name="neutral_60">@color/gray_60</color>
+    <color name="neutral_70">@color/gray_70</color>
+    <color name="neutral_80">@color/gray_80</color>
+    <color name="neutral_90">@color/gray_90</color>
+    <color name="neutral_100">@color/gray_100</color>
+
+    <color name="success">@color/green_50</color>
+    <color name="success_0">@color/green_0</color>
+    <color name="success_5">@color/green_5</color>
+    <color name="success_10">@color/green_10</color>
+    <color name="success_20">@color/green_20</color>
+    <color name="success_30">@color/green_30</color>
+    <color name="success_40">@color/green_40</color>
+    <color name="success_50">@color/green_50</color>
+    <color name="success_60">@color/green_60</color>
+    <color name="success_70">@color/green_70</color>
+    <color name="success_80">@color/green_80</color>
+    <color name="success_90">@color/green_90</color>
+    <color name="success_100">@color/green_100</color>
+    <color name="success_dark">@color/green_70</color>
+    <color name="success_light">@color/green_30</color>
+
+    <color name="warning">@color/yellow_20</color>
+    <color name="warning_0">@color/yellow_0</color>
+    <color name="warning_5">@color/yellow_5</color>
+    <color name="warning_10">@color/yellow_10</color>
+    <color name="warning_20">@color/yellow_20</color>
+    <color name="warning_30">@color/yellow_30</color>
+    <color name="warning_40">@color/yellow_40</color>
+    <color name="warning_50">@color/yellow_50</color>
+    <color name="warning_60">@color/yellow_60</color>
+    <color name="warning_70">@color/yellow_70</color>
+    <color name="warning_80">@color/yellow_80</color>
+    <color name="warning_90">@color/yellow_90</color>
+    <color name="warning_100">@color/yellow_100</color>
+    <color name="warning_dark">@color/yellow_40</color>
+    <color name="warning_light">@color/yellow_5</color>
+
+    <color name="divider">@color/gray_5</color>
+
+    <color name="text">@color/gray_80</color>
+    <color name="text_subtle">@color/gray_50</color>
+</resources>

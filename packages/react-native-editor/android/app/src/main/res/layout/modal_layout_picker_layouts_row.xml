@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/mlp_layouts_row_height"
+    android:orientation="vertical">
+
+    <View style="@style/ModalLayoutPickerLayoutsSeparatorLine" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/ModalLayoutPickerLayoutsTitle"
+        android:layout_marginStart="@dimen/mlp_layout_card_margin_start"
+        tools:text="Some layout title" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/layouts_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/mlp_layout_card_margin_start"
+        android:paddingEnd="@dimen/mlp_layout_card_margin_end"
+        android:descendantFocusability="beforeDescendants"
+        android:orientation="horizontal"
+        android:scrollbars="none" />
+</LinearLayout>
