@@ -72,7 +72,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$config = $decoded_file;
 			}
 		}
-		return $config;
+		return apply_filters( 'gutenberg_read_json_file', $config, $decoded_file, $file_path );
 	}
 
 	/**
@@ -231,6 +231,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			);
 			$user_cpt    = get_post( $cpt_post_id, ARRAY_A );
 		}
+		$user_cpt         = apply_filters( 'gutenberg_wp_global_styles', $user_cpt );
 		$cache_expiration = $user_cpt ? DAY_IN_SECONDS : HOUR_IN_SECONDS;
 		wp_cache_set( $cache_key, $user_cpt ? $user_cpt['ID'] : -1, '', $cache_expiration );
 
@@ -387,8 +388,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	private static function get_file_path_from_theme( $file_name, $template = false ) {
 		$path      = $template ? get_template_directory() : get_stylesheet_directory();
 		$candidate = $path . '/' . $file_name;
+		$file_path = is_readable( $candidate ) ? $candidate : '';
 
-		return is_readable( $candidate ) ? $candidate : '';
+		return apply_filters( 'gutenberg_file_path_from_theme', $file_path, $file_name, $template );
 	}
 
 	/**
