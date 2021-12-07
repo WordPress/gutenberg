@@ -1261,17 +1261,13 @@ const canInsertBlockTypeUnmemoized = (
 		parentName
 	);
 
-	if (
-		hasParentAllowedBlock !== null &&
-		hasBlockAllowedParent !== null &&
-		! hasParentAllowedBlock &&
-		! hasBlockAllowedParent
-	) {
-		return false;
-	} else if ( hasParentAllowedBlock !== null && ! hasParentAllowedBlock ) {
-		return false;
-	} else if ( hasBlockAllowedParent !== null && ! hasBlockAllowedParent ) {
-		return false;
+	const canInsert =
+		( hasParentAllowedBlock === null && hasBlockAllowedParent === null ) ||
+		hasParentAllowedBlock === true ||
+		hasBlockAllowedParent === true;
+
+	if ( ! canInsert ) {
+		return canInsert;
 	}
 
 	/**
@@ -1288,7 +1284,7 @@ const canInsertBlockTypeUnmemoized = (
 	 */
 	return applyFilters(
 		'blockEditor.__unstableCanInsertBlockType',
-		true,
+		canInsert,
 		blockType,
 		rootClientId,
 		{
