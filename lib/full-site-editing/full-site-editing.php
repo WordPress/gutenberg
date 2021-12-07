@@ -8,9 +8,17 @@
 /**
  * Returns whether the current theme is an FSE theme or not.
  *
+ * Note: once 5.9 is the minimum supported WordPress version for the Gutenberg
+ * plugin, we must deprecate this function and
+ * use wp_is_block_theme instead.
+ *
  * @return boolean Whether the current theme is an FSE theme or not.
  */
 function gutenberg_is_fse_theme() {
+	if ( function_exists( 'wp_is_block_theme' ) ) {
+		return wp_is_block_theme();
+	}
+
 	return is_readable( get_theme_file_path( '/block-templates/index.html' ) ) ||
 		is_readable( get_theme_file_path( '/templates/index.html' ) );
 }
