@@ -1490,7 +1490,15 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Returns an associative array of slugs per type for the default source.
+	 * Returns the default slugs for all the presets in an associative array
+	 * whose keys are the preset paths and the leafs is the list of slugs.
+	 *
+	 *  array(
+	 *   'color' => array(
+	 *     'palette'   => array( 'slug-1', 'slug-2' ),
+	 *     'gradients' => array( 'slug-3', 'slug-4' ),
+	 *   ),
+	 * )
 	 *
 	 * @param array $data A theme.json like structure.
 	 * @param array $node_path The path to inspect. It's 'settings' by default.
