@@ -104,7 +104,10 @@ export default function useSelect( mapSelect, deps ) {
 	// for `mapSelect`. we'll create this intermediate variable to
 	// fulfill that need and then reference it with our "real"
 	// `_mapSelect` if we can.
-	const callbackMapper = useCallback( hasMappingFunction ? mapSelect : noop, deps );
+	const callbackMapper = useCallback(
+		hasMappingFunction ? mapSelect : noop,
+		deps
+	);
 	const _mapSelect = hasMappingFunction ? callbackMapper : null;
 
 	const registry = useRegistry();
