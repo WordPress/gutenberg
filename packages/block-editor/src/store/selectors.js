@@ -1274,7 +1274,18 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	// Filter to give other packages a chance to affect the outcome.
+	/**
+	 * This filter is an ad-hoc solution to prevent adding template parts inside post content.
+	 * Conceptually, having a filter inside a selector is bad pattern so this code will be
+	 * replaced by a declarative API that doesn't the following drawbacks:
+	 *
+	 * Filters are not reactive: Upon switching between "template mode" and non "template mode",
+	 * the filter and selector won't necessarily be executed again. For now, it doesn't matter much
+	 * because you can't switch between the two modes while the inserter stays open.
+	 *
+	 * Filters are global: Once they're defined, they will affect all editor instances and all registries.
+	 * An ideal API would only affect specific editor instances.
+	 */
 	return applyFilters(
 		'blockEditor.__unstableCanInsertBlockType',
 		true,
