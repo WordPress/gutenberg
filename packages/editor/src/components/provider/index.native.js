@@ -326,10 +326,8 @@ class NativeEditorProvider extends Component {
 	}
 
 	removeAllBlocks() {
-		console.log('***** REMOVE ALL BLOCKS');
-		console.log(this.props)
-		const test = this.props.getAllBlocksWithoutInnerBlocks();
-		console.log(test)
+		const allClientIds = this.props.blocks.map( block => block.clientId );
+		this.props.removeBlocks( allClientIds );
 	}
 
 	updateCapabilitiesAction( capabilities ) {
@@ -380,7 +378,6 @@ export default compose( [
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
 			getSettings: getBlockEditorSettings,
-			__unstableGetBlockWithoutInnerBlocks: getAllBlocksWithoutInnerBlocks,
 		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -391,7 +388,6 @@ export default compose( [
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
 			getBlockEditorSettings,
-			getAllBlocksWithoutInnerBlocks,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
@@ -404,6 +400,7 @@ export default compose( [
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
+			removeBlocks,
 		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
@@ -428,6 +425,7 @@ export default compose( [
 				switchEditorMode( mode );
 			},
 			replaceBlock,
+			removeBlocks,
 		};
 	} ),
 ] )( NativeEditorProvider );
