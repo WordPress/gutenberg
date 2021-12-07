@@ -18,8 +18,8 @@ function render_block_core_query_pagination( $attributes, $content ) {
 		return '';
 	}
 
-	$justifyContent = $attributes['layout']['justifyContent'];
-	$justify_class  = $justifyContent ? 'wp-justify-' . $justifyContent : '';
+	$justify_content = $attributes['layout']['justifyContent'];
+	$justify_class   = isset( $justify_content ) ? 'wp-justify-' . $justify_content : '';
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
