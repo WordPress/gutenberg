@@ -1517,6 +1517,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
+			$slugs_for_preset = array();
 			$slugs_for_preset = array_map(
 				function( $value ) {
 					return isset( $value['slug'] ) ? $value['slug'] : null;
