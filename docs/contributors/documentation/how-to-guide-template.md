@@ -18,7 +18,7 @@ Include other important information here, such as known issues or bugs.
 
 ## Step-by-step guide
 
-The guide should include step-by-step directions. Use code snippets,images, or screenshots to help illustrate each step. Include as many (or as few) steps as needed, try to keep each step short and easy to follow.
+The guide should include step-by-step directions. Use code snippets, images, or screenshots to help illustrate each step. Include as many (or as few) steps as needed, try to keep each step short and easy to follow.
 
 ### Step 1: Optional: title
 
