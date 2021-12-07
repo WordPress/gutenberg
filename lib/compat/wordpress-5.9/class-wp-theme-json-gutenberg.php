@@ -1412,9 +1412,9 @@ class WP_Theme_JSON_Gutenberg {
 		 * we remove it from the theme presets.
 		 */
 		$nodes        = self::get_setting_nodes( $incoming_data );
-		$slugs_global = self::get_slugs_not_to_override( $this->theme_json );
+		$slugs_global = self::get_default_slugs( $this->theme_json, array( 'settings' ) );
 		foreach ( $nodes as $node ) {
-			$slugs_node = self::get_slugs_not_to_override( $this->theme_json, $node['path'] );
+			$slugs_node = self::get_default_slugs( $this->theme_json, $node['path'] );
 			$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
 
 			// Replace the spacing.units.
@@ -1426,6 +1426,9 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Replace the presets.
 			foreach ( self::PRESETS_METADATA as $preset ) {
+				$override_preset  = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
+				$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
+
 				foreach ( self::VALID_ORIGINS as $origin ) {
 					$path    = array_merge( $node['path'], $preset['path'], array( $origin ) );
 					$content = _wp_array_get( $incoming_data, $path, null );
@@ -1433,17 +1436,13 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					$should_override = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
-
 					if (
 						( 'theme' !== $origin ) ||
-						( 'theme' === $origin && $should_override )
+						( 'theme' === $origin && $override_preset )
 					) {
 						_wp_array_set( $this->theme_json, $path, $content );
-					}
-
-					if ( 'theme' === $origin && ! $should_override ) {
-						$content = self::filter_slugs( $content, $preset['path'], $slugs );
+					} else {
+						$content = self::filter_slugs( $content, $slugs_for_preset );
 						_wp_array_set( $this->theme_json, $path, $content );
 					}
 				}
@@ -1464,51 +1463,46 @@ class WP_Theme_JSON_Gutenberg {
 			return $override;
 		}
 
+		// The relationship between whether to override the defaults
+		// and whether the defaults are enabled is inverse:
+		//
+		// - If defaults are enabled  => theme presets should not be overriden
+		// - If defaults are disabled => theme presets should be overriden
+		//
+		// For example, a theme sets defaultPalette to false,
+		// making the default palette hidden from the user.
+		// In that case, we want all the theme presets to be present,
+		// so they should override the defaults.
 		if ( is_array( $override ) ) {
-			// The relationship between whether to override the defaults
-			// and whether the defaults are enabled is inverse:
-			//
-			// - If defaults are enabled  => theme presets should not be overriden
-			// - If defaults are disabled => theme presets should be overriden
-			//
-			// For example, a theme sets defaultPalette to false,
-			// making the default palette hidden from the user.
-			// In that case, we want all the theme presets to be present,
-			// so they should override the defaults.
-			return ! _wp_array_get( $theme_json, array_merge( $path, $override ), true );
+			$value = _wp_array_get( $theme_json, array_merge( $path, $override ) );
+			if ( isset( $value ) ) {
+				return ! $value;
+			}
+
+			// Search the top-level key if none was found for this node.
+			$value = _wp_array_get( $theme_json, array_merge( array( 'settings' ), $override ) );
+			if ( isset( $value ) ) {
+				return ! $value;
+			}
+
+			return true;
 		}
 	}
 
 	/**
-	 * Returns the slugs for all the presets that cannot be overriden
-	 * in the given path. It returns an associative array
-	 * whose keys are the preset paths and the leafs is the list of slugs.
+	 * Returns an associative array of slugs per type for the default source.
 	 *
-	 * For example:
-	 *
-	 * array(
-	 *   'color' => array(
-	 *     'palette'   => array( 'slug-1', 'slug-2' ),
-	 *     'gradients' => array( 'slug-3', 'slug-4' ),
-	 *   ),
-	 * )
-	 *
-	 * @param array $data A theme.json like structure to inspect.
+	 * @param array $data A theme.json like structure.
 	 * @param array $node_path The path to inspect. It's 'settings' by default.
 	 *
-	 * @return array An associative array containing the slugs for the given path.
+	 * @return array
 	 */
-	private static function get_slugs_not_to_override( $data, $node_path = array( 'settings' ) ) {
+	private static function get_default_slugs( $data, $node_path ) {
 		$slugs = array();
-		foreach ( self::PRESETS_METADATA as $metadata ) {
-			$override = self::should_override_preset( $data, $node_path, $metadata['override'] );
-			if ( $override ) {
-				continue;
-			}
 
-			$slugs_for_preset = array();
-			$path             = array_merge( $node_path, $metadata['path'], array( 'default' ) );
-			$preset           = _wp_array_get( $data, $path, null );
+		foreach ( self::PRESETS_METADATA as $metadata ) {
+			$path   = array_merge( $node_path, $metadata['path'], array( 'default' ) );
+			$preset = _wp_array_get( $data, $path, null );
 			if ( ! isset( $preset ) ) {
 				continue;
 			}
@@ -1529,20 +1523,18 @@ class WP_Theme_JSON_Gutenberg {
 	 * Removes the preset values whose slug is equal to any of given slugs.
 	 *
 	 * @param array $node The node with the presets to validate.
-	 * @param array $path The path to the preset type to inspect.
 	 * @param array $slugs The slugs that should not be overriden.
 	 *
 	 * @return array The new node
 	 */
-	private static function filter_slugs( $node, $path, $slugs ) {
-		$slugs_for_preset = _wp_array_get( $slugs, $path, array() );
-		if ( empty( $slugs_for_preset ) ) {
+	private static function filter_slugs( $node, $slugs ) {
+		if ( empty( $slugs ) ) {
 			return $node;
 		}
 
 		$new_node = array();
 		foreach ( $node as $value ) {
-			if ( isset( $value['slug'] ) && ! in_array( $value['slug'], $slugs_for_preset, true ) ) {
+			if ( isset( $value['slug'] ) && ! in_array( $value['slug'], $slugs, true ) ) {
 				$new_node[] = $value;
 			}
 		}
