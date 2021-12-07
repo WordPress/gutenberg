@@ -63,9 +63,11 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 
 .components-custom-gradient-picker__color-picker-popover .components-custom-gradient-picker__remove-control-point {
 	margin-left: auto;
-	margin-right: auto;
+	padding: 0;
+	margin-right: $grid-unit-20;
 	display: block;
-	margin-bottom: $grid-unit-10;
+	min-width: $button-size-small;
+	height: $button-size-small;
 }
 
 .components-custom-gradient-picker__inserter {

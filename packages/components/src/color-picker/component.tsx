@@ -129,14 +129,16 @@ const ColorPicker = (
 						}
 					/>
 				</HStack>
-				<Spacer margin={ 4 } />
 				{ showInputs && (
-					<ColorInput
-						colorType={ colorType }
-						color={ safeColordColor }
-						onChange={ handleChange }
-						enableAlpha={ enableAlpha }
-					/>
+					<>
+						<Spacer margin={ 4 } />
+						<ColorInput
+							colorType={ colorType }
+							color={ safeColordColor }
+							onChange={ handleChange }
+							enableAlpha={ enableAlpha }
+						/>
+					</>
 				) }
 			</AuxiliaryColorArtefactWrapper>
 		</ColorfulWrapper>

@@ -10,7 +10,7 @@ import { colord } from 'colord';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
+import { plus, trash } from '@wordpress/icons';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
@@ -228,6 +228,8 @@ function ControlPoints( {
 							{ ! disableRemove && (
 								<Button
 									className="components-custom-gradient-picker__remove-control-point"
+									icon={ trash }
+									label={ __( 'Remove control point' ) }
 									onClick={ () => {
 										onChange(
 											removeControlPoint(
@@ -237,10 +239,7 @@ function ControlPoints( {
 										);
 										onClose();
 									} }
-									variant="link"
-								>
-									{ __( 'Remove Control Point' ) }
-								</Button>
+								/>
 							) }
 						</>
 					) }
