@@ -40,7 +40,7 @@ if ( ! function_exists( 'get_block_theme_folders' ) ) {
 		$parent_root_dir   = get_theme_root( $parent_theme_name );
 		$parent_theme_dir  = "$parent_root_dir/$parent_theme_name";
 
-		if ( is_readable( $theme_dir . '/block-templates/index.html' ) || is_readable( $parent_theme_dir . '/block-templates/index.html' ) ) {
+		if ( is_readable( $theme_dir . '/block-templates/' ) || is_readable( $parent_theme_dir . '/block-templates/' ) ) {
 			return array(
 				'wp_template'      => 'block-templates',
 				'wp_template_part' => 'block-template-parts',
