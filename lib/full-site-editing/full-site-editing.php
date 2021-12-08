@@ -105,3 +105,13 @@ function gutenberg_site_editor_load_block_editor_scripts_and_styles( $is_block_e
 		: $is_block_editor_screen;
 }
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_site_editor_load_block_editor_scripts_and_styles' );
+
+/**
+ * Note: We have to maintain this function for backward compatibility with WP 5.8.
+ * Only remove once 5.9 is the minimum supported WordPress version for the Gutenberg plugin.
+ *
+ * @return boolean Whether the current theme is a block theme or not.
+ */
+function gutenberg_is_fse_theme() {
+	return wp_is_block_theme();
+}
