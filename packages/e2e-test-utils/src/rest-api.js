@@ -37,7 +37,7 @@ Link header: ${ links }` );
 
 const fetchRetry = async ( url, options = {}, retries ) => {
 	const response = await fetch( url, options );
-
+	console.log( 'url: ', url, 'status: ', response.status );
 	if ( response.ok || response.status === 302 || response.status === 200 ) {
 		return response;
 	}
