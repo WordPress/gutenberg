@@ -44,7 +44,9 @@ const fetchRetry = async ( url, options = {}, retries ) => {
 	if ( retries > 0 ) {
 		return fetchRetry( url, options, retries - 1 );
 	}
-	throw new Error( `Login to get nonce failed: ${ response.status }` );
+	throw new Error(
+		`Fetch api call failed for ${ url }: ${ response.status }`
+	);
 };
 
 const setNonce = ( async () => {
@@ -77,9 +79,13 @@ const setNonce = ( async () => {
 	);
 
 	// Get the initial nonce.
-	const res = await fetch( apiFetch.nonceEndpoint, {
-		headers: { cookie },
-	} );
+	const res = await fetchRetry(
+		apiFetch.nonceEndpoint,
+		{
+			headers: { cookie },
+		},
+		2
+	);
 	const nonce = await res.text();
 
 	// Register the nonce middleware.
