@@ -79,6 +79,7 @@ export default function Image( {
 	context,
 	clientId,
 } ) {
+	const imageRef = useRef();
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
 	const { allowResize = true } = context;
@@ -141,7 +142,6 @@ export default function Image( {
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
-	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
@@ -266,6 +266,43 @@ export default function Image( {
 		}
 	}, [ isSelected ] );
 
+	const filename = getFilename( url );
+	let defaultedAlt;
+
+	if ( alt ) {
+		defaultedAlt = alt;
+	} else if ( filename ) {
+		defaultedAlt = sprintf(
+			/* translators: %s: file name */
+			__( 'This image has an empty alt attribute; its file name is %s' ),
+			filename
+		);
+	} else {
+		defaultedAlt = __( 'This image has an empty alt attribute' );
+	}
+
+	let img = (
+		// Disable reason: Image itself is not meant to be interactive, but
+		// should direct focus to block.
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+		<>
+			<img
+				src={ temporaryURL || url }
+				alt={ defaultedAlt }
+				onError={ () => onImageError() }
+				ref={ imageRef }
+			/>
+			{ temporaryURL && <Spinner /> }
+		</>
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+	);
+
+	let imageWidthWithinContainer;
+	let imageHeightWithinContainer;
+
+	const naturalWidth = imageRef.current?.naturalWidth;
+	const naturalHeight = imageRef.current?.naturalHeight;
+
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
 
@@ -385,47 +422,6 @@ export default function Image( {
 			</InspectorControls>
 		</>
 	);
-
-	const filename = getFilename( url );
-	let defaultedAlt;
-
-	if ( alt ) {
-		defaultedAlt = alt;
-	} else if ( filename ) {
-		defaultedAlt = sprintf(
-			/* translators: %s: file name */
-			__( 'This image has an empty alt attribute; its file name is %s' ),
-			filename
-		);
-	} else {
-		defaultedAlt = __( 'This image has an empty alt attribute' );
-	}
-
-	let img = (
-		// Disable reason: Image itself is not meant to be interactive, but
-		// should direct focus to block.
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		<>
-			<img
-				src={ temporaryURL || url }
-				alt={ defaultedAlt }
-				onError={ () => onImageError() }
-				onLoad={ ( event ) => {
-					setNaturalSize(
-						pick( event.target, [
-							'naturalWidth',
-							'naturalHeight',
-						] )
-					);
-				} }
-			/>
-			{ temporaryURL && <Spinner /> }
-		</>
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-	);
-
-	let imageWidthWithinContainer;
-	let imageHeightWithinContainer;
 
 	if ( clientWidth && naturalWidth && naturalHeight ) {
 		const exceedMaxWidth = naturalWidth > clientWidth;
