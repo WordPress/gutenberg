@@ -19,7 +19,7 @@ if ( ! function_exists( 'wp_is_block_theme' ) ) {
 
 /**
  * Note: We have to maintain this function for backward compatibility with WP 5.8.
- * Only remove once 5.9 is the minimum supported WordPress version for the Gutenberg plugin.
+ * The `validate_theme_requirements` method is using `gutenberg_is_fse_theme` in older versions of WP.
  *
  * @return boolean Whether the current theme is a block theme or not.
  */
