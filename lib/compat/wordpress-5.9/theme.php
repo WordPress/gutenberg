@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( function_exists( 'wp_is_block_theme' ) ) {
+if ( ! function_exists( 'wp_is_block_theme' ) ) {
 	/**
 	 * Returns whether the current theme is an FSE theme or not.
 	 *
