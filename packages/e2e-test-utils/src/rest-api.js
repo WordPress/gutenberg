@@ -44,7 +44,7 @@ const fetchRetry = async ( url, options = {}, retries ) => {
 	if ( retries > 0 ) {
 		return fetchRetry( url, options, retries - 1 );
 	}
-	throw new Error( response.status );
+	throw new Error( `Login to get nonce failed: ${ response.status }` );
 };
 
 const setNonce = ( async () => {
