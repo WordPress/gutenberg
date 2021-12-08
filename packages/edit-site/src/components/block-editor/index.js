@@ -124,6 +124,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					<BlockList
 						className="edit-site-block-editor__block-list wp-site-blocks"
 						__experimentalLayout={ LAYOUT }
+						renderAppender={ isTemplatePart ? false : undefined }
 					/>
 				</ResizableEditor>
 
