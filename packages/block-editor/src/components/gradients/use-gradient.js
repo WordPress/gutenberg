@@ -59,13 +59,15 @@ export function getGradientSlugByValue( gradients, value ) {
 	return gradient && gradient.slug;
 }
 
+const EMPTY_OBJECT = {};
+
 export function __experimentalUseGradient( {
 	gradientAttribute = 'gradient',
 	customGradientAttribute = 'customGradient',
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const { gradients: gradientsPerOrigin } = useSetting( 'color' ) || {};
+	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
 	const allGradients = useMemo(
 		() => [
 			...( gradientsPerOrigin?.custom || [] ),

@@ -5,6 +5,7 @@ import { map } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -34,6 +35,7 @@ function SinglePalette( {
 	const colorOptions = useMemo( () => {
 		return map( colors, ( { color, name } ) => {
 			const colordColor = colord( color );
+
 			return (
 				<CircularOptionPicker.Option
 					key={ color }
@@ -117,6 +119,7 @@ export default function ColorPalette( {
 	onChange,
 	value,
 	__experimentalHasMultipleOrigins = false,
+	__experimentalIsRenderedInSidebar = false,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 	const Component = __experimentalHasMultipleOrigins
@@ -131,10 +134,18 @@ export default function ColorPalette( {
 		/>
 	);
 
+	const colordColor = colord( value );
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
 				<Dropdown
+					contentClassName={ classnames(
+						'components-color-palette__custom-color-dropdown-content',
+						{
+							'is-rendered-in-sidebar': __experimentalIsRenderedInSidebar,
+						}
+					) }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<button
@@ -143,7 +154,14 @@ export default function ColorPalette( {
 							aria-haspopup="true"
 							onClick={ onToggle }
 							aria-label={ __( 'Custom color picker' ) }
-							style={ { background: value } }
+							style={ {
+								background: value,
+								color:
+									colordColor.contrast() >
+									colordColor.contrast( '#000' )
+										? '#fff'
+										: '#000',
+							} }
 						>
 							{ value }
 						</button>

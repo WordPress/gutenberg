@@ -99,7 +99,7 @@ export default function WelcomeGuideStyles() {
 								) }
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/support/article/wordpress-editor/'
+										'https://wordpress.org/support/article/styles-overview/'
 									) }
 								>
 									{ __(

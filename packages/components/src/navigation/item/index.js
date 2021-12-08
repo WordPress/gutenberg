@@ -52,8 +52,10 @@ export default function NavigationItem( props ) {
 		return null;
 	}
 
+	const isActive = item && activeItem === item;
+
 	const classes = classnames( className, {
-		'is-active': item && activeItem === item,
+		'is-active': isActive,
 	} );
 
 	const onItemClick = ( event ) => {
@@ -67,7 +69,13 @@ export default function NavigationItem( props ) {
 	const baseProps = children ? props : { ...props, onClick: undefined };
 	const itemProps = isText
 		? restProps
-		: { as: Button, href, onClick: onItemClick, ...restProps };
+		: {
+				as: Button,
+				href,
+				onClick: onItemClick,
+				'aria-current': isActive ? 'page' : undefined,
+				...restProps,
+		  };
 
 	return (
 		<NavigationItemBase { ...baseProps } className={ classes }>

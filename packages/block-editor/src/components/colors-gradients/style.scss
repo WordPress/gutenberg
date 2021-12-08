@@ -5,13 +5,14 @@
 }
 
 .block-editor-panel-color-gradient-settings {
-	.component-color-indicator {
-		vertical-align: text-bottom;
-	}
+	.block-editor-panel-color-gradient-settings__panel-title {
+		display: flex;
+		gap: $grid-unit-15;
 
-	&__panel-title {
 		.component-color-indicator {
-			display: inline-block;
+			width: $grid-unit-15;
+			height: $grid-unit-15;
+			align-self: center;
 		}
 	}
 

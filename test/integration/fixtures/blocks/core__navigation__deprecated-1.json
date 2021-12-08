@@ -9,7 +9,7 @@
 			"overlayMenu": "mobile",
 			"layout": {
 				"type": "flex",
-				"justifyContent": "left",
+				"setCascadingProperties": "true",
 				"orientation": "horizontal"
 			}
 		},

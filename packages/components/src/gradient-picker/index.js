@@ -110,9 +110,11 @@ export default function GradientPicker( {
 	const clearGradient = useCallback( () => onChange( undefined ), [
 		onChange,
 	] );
-	const Component = __experimentalHasMultipleOrigins
-		? MultipleOrigin
-		: SingleOrigin;
+	const Component =
+		__experimentalHasMultipleOrigins && gradients?.length
+			? MultipleOrigin
+			: SingleOrigin;
+
 	return (
 		<Component
 			className={ className }
@@ -122,7 +124,8 @@ export default function GradientPicker( {
 			onChange={ onChange }
 			value={ value }
 			actions={
-				clearable && (
+				clearable &&
+				( gradients?.length || ! disableCustomGradients ) && (
 					<CircularOptionPicker.ButtonAction
 						onClick={ clearGradient }
 					>

@@ -68,6 +68,7 @@ export default function Actions( { template } ) {
 							/>
 							<MenuItem
 								isDestructive
+								isTertiary
 								onClick={ () => {
 									removeTemplate( template );
 									onClose();
@@ -79,7 +80,7 @@ export default function Actions( { template } ) {
 					) }
 					{ isRevertable && (
 						<MenuItem
-							info={ __( 'Restore template to theme default' ) }
+							info={ __( 'Restore template to default state' ) }
 							onClick={ () => {
 								revertAndSaveTemplate();
 								onClose();

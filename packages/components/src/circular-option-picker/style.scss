@@ -9,6 +9,7 @@ $color-palette-circle-spacing: 12px;
 	.components-circular-option-picker__custom-clear-wrapper {
 		display: flex;
 		justify-content: flex-end;
+		margin-top: $grid-unit-15;
 	}
 
 	.components-circular-option-picker__swatches {

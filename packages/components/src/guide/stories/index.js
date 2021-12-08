@@ -19,7 +19,7 @@ export default {
 	title: 'Components/Guide',
 	component: Guide,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
