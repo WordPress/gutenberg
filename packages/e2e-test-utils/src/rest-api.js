@@ -35,7 +35,7 @@ Link header: ${ links }` );
 	apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 } )();
 
-async function login() {
+async function login( retries = 3 ) {
 	const formData = new FormData();
 	formData.append( 'log', 'admin' );
 	formData.append( 'pwd', 'password' );
@@ -71,8 +71,10 @@ async function login() {
 			cookie,
 		};
 	}
-
-	await login();
+	if ( retries > 0 ) {
+		return login( retries - 1 );
+	}
+	
 
 	throw new Error(
 		`Fetch api call failed for ${ apiFetch.nonceEndpoint }: ${ response.status }`
