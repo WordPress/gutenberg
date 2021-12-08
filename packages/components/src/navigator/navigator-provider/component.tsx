@@ -50,9 +50,9 @@ function NavigatorProvider(
 	const navigatorContextValue: NavigatorContextType = {
 		location: locationHistory[ locationHistory.length - 1 ],
 		push: ( path, options ) => {
-			const { navigationTriggerElement, ...restOptions } = options;
+			const { focusRestorationSelector, ...restOptions } = options;
 
-			// The `navigationTriggerElement` needs to be applied on the current
+			// The `focusRestorationSelector` needs to be applied on the current
 			// location, while the remaining options need to be applied on the
 			// incoming location
 			setLocationHistory( [
@@ -60,7 +60,7 @@ function NavigatorProvider(
 				// Force the `isBack` flag to `true` when navigating back.
 				{
 					...locationHistory[ locationHistory.length - 1 ],
-					navigationTriggerElement,
+					focusRestorationSelector,
 				},
 				{
 					path,

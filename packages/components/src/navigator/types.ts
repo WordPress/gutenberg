@@ -5,13 +5,12 @@
 import type { ReactNode } from 'react';
 
 type NavigateOptions = {
-	navigationTriggerElement?: unknown;
+	focusRestorationSelector?: string;
 };
 
-export type NavigatorLocation = {
+export type NavigatorLocation = NavigateOptions & {
 	isBack?: boolean;
 	path?: string;
-	navigationTriggerElement?: unknown;
 };
 
 export type NavigatorContext = {
