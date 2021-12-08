@@ -127,6 +127,11 @@ async function turnResponsivenessOn() {
 	await saveDraft();
 }
 
+/**
+ * Delete all items for the given REST resources using the REST API.
+ *
+ * @param {*} endpoints The endpoints of the resources to delete.
+ */
 async function deleteAll( endpoints ) {
 	for ( const path of endpoints ) {
 		const items = await rest( { path } );
@@ -140,6 +145,11 @@ async function deleteAll( endpoints ) {
 	}
 }
 
+/**
+ * Create a set of pages using the REST API.
+ *
+ * @param {Array} pages An array of page objects.
+ */
 async function createPages( pages ) {
 	for ( const page of pages ) {
 		await rest( {
