@@ -9,7 +9,7 @@
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	if ( ! gutenberg_supports_block_templates() ) {
+	if ( ! current_theme_supports( 'block-templates' ) ) {
 		return;
 	}
 	$template_type_slugs = array_keys( get_default_block_template_types() );

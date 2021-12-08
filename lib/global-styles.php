@@ -159,7 +159,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
  * @return boolean
  */
 function gutenberg_experimental_is_site_editor_available() {
-	return gutenberg_is_fse_theme();
+	return wp_is_block_theme();
 }
 
 /**
