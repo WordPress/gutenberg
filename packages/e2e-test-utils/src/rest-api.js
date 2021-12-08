@@ -35,7 +35,7 @@ Link header: ${ links }` );
 	apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 } )();
 
-const setNonce = ( async () => {
+async function login() {
 	const formData = new FormData();
 	formData.append( 'log', 'admin' );
 	formData.append( 'pwd', 'password' );
@@ -61,10 +61,29 @@ const setNonce = ( async () => {
 	);
 
 	// Get the initial nonce.
-	const res = await fetch( apiFetch.nonceEndpoint, {
+	const response = await fetch( apiFetch.nonceEndpoint, {
 		headers: { cookie },
 	} );
-	const nonce = await res.text();
+
+	if ( response.ok || response.status === 302 || response.status === 200 ) {
+		return {
+			response,
+			cookie,
+		};
+	}
+
+	login();
+
+	throw new Error(
+		`Fetch api call failed for ${ apiFetch.nonceEndpoint }: ${ response.status }`
+	);
+}
+
+const setNonce = ( async () => {
+	// Get the initial nonce.
+	const res = await login();
+
+	const nonce = await res.response.text();
 
 	// Register the nonce middleware.
 	apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
@@ -75,7 +94,7 @@ const setNonce = ( async () => {
 			...request,
 			headers: {
 				...request.headers,
-				cookie,
+				cookie: res.cookie,
 			},
 		} );
 	} );
