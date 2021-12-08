@@ -167,6 +167,18 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+apply plugin: 'kotlin-parcelize'
+apply plugin: 'kotlin-kapt'
+
+android {
+    dataBinding {
+        enabled = true
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
 dependencies {
     implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
         exclude group: 'org.wordpress', module: 'utils'
@@ -186,8 +198,24 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
-    
+
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
+    kapt 'com.github.bumptech.glide:compiler:4.10.0'
+//    implementation 'com.github.bumptech.glide:volley-integration:4.6.1@aar'
+//    implementation 'com.android.volley:volley:1.1.1'
+
+    implementation "androidx.core:core-ktx:1.7.0"
+    def fragment_version = "1.4.0"
+
+    // Java language implementation
+    implementation "androidx.fragment:fragment:$fragment_version"
+    // Kotlin
+    implementation "androidx.fragment:fragment-ktx:$fragment_version"
+    // Testing Fragments in Isolation
+    debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
+
 }
 
 // Run this once to be able to run the application with BUCK

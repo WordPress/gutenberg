@@ -6,12 +6,12 @@
     android:layout_height="@dimen/mlp_layouts_row_height"
     android:background="?attr/layoutPickerBackground">
 
-    <org.wordpress.android.ui.ActionableEmptyView
-        android:id="@+id/actionableEmptyView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:aevImage="@drawable/img_illustration_empty_results_216dp"
-        app:aevImageHiddenInLandscape="true"
-        app:aevSubtitle="@string/mlp_error_subtitle"
-        app:aevTitle="@string/mlp_error_title" />
+<!--    <org.wordpress.android.ui.ActionableEmptyView-->
+<!--        android:id="@+id/actionableEmptyView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:aevImage="@drawable/img_illustration_empty_results_216dp"-->
+<!--        app:aevImageHiddenInLandscape="true"-->
+<!--        app:aevSubtitle="@string/mlp_error_subtitle"-->
+<!--        app:aevTitle="@string/mlp_error_title" />-->
 </FrameLayout>

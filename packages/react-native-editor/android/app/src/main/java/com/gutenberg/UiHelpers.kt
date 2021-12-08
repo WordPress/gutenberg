@@ -3,7 +3,7 @@ package com.gutenberg
 import android.view.View
 import javax.inject.Inject
 
-class UiHelpers @Inject constructor() {
+class UiHelpers {
     /**
      * Sets the [firstView] visible and the [secondView] invisible with a fade in/out animation and vice versa
      * @param visible if true the [firstView] is shown and the [secondView] is hidden else the other way round

@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    android:focusableInTouchMode="true"
-    app:layout_behavior="@string/bottom_sheet_behavior">
+    android:layout_height="match_parent">
+
+<!--<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:fitsSystemWindows="false"-->
+<!--    android:focusableInTouchMode="true"-->
+<!--    app:layout_behavior="@string/bottom_sheet_behavior">-->
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -42,12 +47,12 @@
                     android:layout_height="@dimen/toolbar_height"
                     android:orientation="vertical">
 
-                    <include
-                        layout="@layout/bottom_sheet_handle_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/margin_extra_large"
-                        android:layout_gravity="top" />
+<!--                    <include-->
+<!--                        layout="@layout/bottom_sheet_handle_view"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginEnd="@dimen/margin_extra_large"-->
+<!--                        android:layout_gravity="top" />-->
 
                     <include
                         android:id="@+id/modal_layout_picker_titlebar"
@@ -124,4 +129,5 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+<!--</androidx.coordinatorlayout.widget.CoordinatorLayout>-->
+</FrameLayout>

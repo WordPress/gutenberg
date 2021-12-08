@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/negative_margin_medium"
-        android:backgroundTint="@color/transparent"
+        android:backgroundTint="@android:color/transparent"
         android:contentDescription="@string/navigate_back_desc"
         android:src="@drawable/ic_arrow_left_white_24dp"
         android:tint="?attr/colorOnSurface" />

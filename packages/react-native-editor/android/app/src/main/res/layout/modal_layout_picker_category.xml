@@ -15,7 +15,7 @@
         android:src="@drawable/ic_done_white_24dp"
         android:tint="?attr/colorOnPrimary"
         android:visibility="gone"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription,UseAppTint" />
 
     <TextView
         android:id="@+id/emoji"

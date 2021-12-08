@@ -3,21 +3,13 @@ package com.gutenberg
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.gutenberg.PreviewMode.MOBILE
+import com.gutenberg.PreviewMode.TABLET
+import com.gutenberg.PreviewMode.valueOf
+import com.gutenberg.LayoutPickerUiState.Content
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.wordpress.android.R
-import org.wordpress.android.R.string
-import org.wordpress.android.ui.PreviewMode
-import org.wordpress.android.ui.PreviewMode.MOBILE
-import org.wordpress.android.ui.PreviewMode.TABLET
-import org.wordpress.android.ui.PreviewMode.valueOf
-import org.wordpress.android.ui.PreviewModeHandler
-import org.wordpress.android.ui.layoutpicker.LayoutPickerUiState.Content
-import org.wordpress.android.ui.layoutpicker.LayoutPickerUiState.Error
-import org.wordpress.android.util.NetworkUtilsWrapper
-import org.wordpress.android.viewmodel.Event
-import org.wordpress.android.viewmodel.ScopedViewModel
-import org.wordpress.android.viewmodel.SingleLiveEvent
 
 private const val FETCHED_LAYOUTS = "FETCHED_LAYOUTS"
 private const val FETCHED_CATEGORIES = "FETCHED_CATEGORIES"
@@ -25,12 +17,7 @@ private const val SELECTED_LAYOUT = "SELECTED_LAYOUT"
 private const val SELECTED_CATEGORIES = "SELECTED_CATEGORIES"
 private const val PREVIEW_MODE = "PREVIEW_MODE"
 
-abstract class PickerViewModel(
-    open val mainDispatcher: CoroutineDispatcher,
-    open val bgDispatcher: CoroutineDispatcher,
-    open val networkUtils: NetworkUtilsWrapper,
-    private val layoutPickerTracker: LayoutPickerTracker
-) : ScopedViewModel(bgDispatcher), PreviewModeHandler {
+abstract class LayoutPickerViewModel: ScopedViewModel(Dispatchers.Default), PreviewModeHandler {
     lateinit var layouts: List<LayoutModel>
     lateinit var categories: List<LayoutCategoryModel>
 
@@ -67,7 +54,7 @@ abstract class PickerViewModel(
 
     var nestedScrollStates: Bundle = Bundle()
 
-    abstract fun fetchLayouts(preferCache: Boolean = false)
+    abstract fun fetchLayouts()
 
     open fun onPreviewChooseTapped() = onDismissPreview()
 
@@ -87,7 +74,6 @@ abstract class PickerViewModel(
 
     override fun onPreviewModeChanged(mode: PreviewMode) {
         if (_previewMode.value !== mode) {
-            layoutPickerTracker.trackPreviewModeChanged(mode.key)
             _previewMode.value = mode
             if (uiState.value is Content) {
                 loadLayouts()
@@ -111,12 +97,10 @@ abstract class PickerViewModel(
                             remove(categorySlug)
                         })
                 )
-                layoutPickerTracker.filterDeselected(categorySlug, state.selectedCategoriesSlugs)
             } else {
                 updateUiState(
                         state.copy(selectedCategoriesSlugs = state.selectedCategoriesSlugs.apply { add(categorySlug) })
                 )
-                layoutPickerTracker.filterSelected(categorySlug, state.selectedCategoriesSlugs)
             }
             loadCategories()
             _onCategorySelectionChanged.postValue(Event(Unit))
@@ -125,7 +109,7 @@ abstract class PickerViewModel(
 
     private fun loadCategories() {
         val state = uiState.value as? Content ?: Content()
-        launch(bgDispatcher) {
+        launch(Dispatchers.Default) {
             val listItems: List<CategoryListItemUiState> = categories.map {
                 CategoryListItemUiState(
                         it.slug,
@@ -134,7 +118,7 @@ abstract class PickerViewModel(
                         state.selectedCategoriesSlugs.contains(it.slug)
                 ) { onCategoryTapped(it.slug) }
             }
-            withContext(mainDispatcher) {
+            withContext(Dispatchers.Main) {
                 updateUiState(state.copy(categories = listItems))
             }
             loadLayouts()
@@ -143,7 +127,7 @@ abstract class PickerViewModel(
 
     private fun loadLayouts() {
         val state = uiState.value as? Content ?: Content()
-        launch(bgDispatcher) {
+        launch(Dispatchers.Default) {
             val listItems = ArrayList<LayoutCategoryUiState>()
 
             val selectedCategories = if (state.selectedCategoriesSlugs.isNotEmpty()) {
@@ -177,7 +161,7 @@ abstract class PickerViewModel(
                         )
                 )
             }
-            withContext(mainDispatcher) {
+            withContext(Dispatchers.Main) {
                 updateUiState(state.copy(layoutCategories = listItems))
             }
         }
@@ -221,7 +205,6 @@ abstract class PickerViewModel(
     }
 
     fun onThumbnailModePressed() {
-        layoutPickerTracker.trackThumbnailModeTapped(selectedPreviewMode().key)
         _onThumbnailModeButtonPressed.call()
     }
 
@@ -230,44 +213,8 @@ abstract class PickerViewModel(
      */
     fun onRetryClicked() = fetchLayouts()
 
-    fun onPreviewLoading() {
-        if (networkUtils.isNetworkAvailable()) {
-            selectedLayout?.let { layout ->
-                _previewState.value = PreviewUiState.Loading(layout.demoUrl)
-                layoutPickerTracker.trackPreviewLoading(layout.slug, selectedPreviewMode().key)
-            }
-        } else {
-            _previewState.value = PreviewUiState.Error(toast = R.string.hpp_retry_error)
-            layoutPickerTracker.trackNoNetworkErrorShown("Preview error")
-        }
-    }
-
-    fun onPreviewLoaded() {
-        selectedLayout?.let { layout ->
-            _previewState.value = PreviewUiState.Loaded
-            layoutPickerTracker.trackPreviewLoaded(layout.slug, selectedPreviewMode().key)
-        }
-    }
-
-    fun onPreviewError() {
-        _previewState.value = PreviewUiState.Error()
-        layoutPickerTracker.trackErrorShown("Preview error")
-    }
-
     fun onPreviewModePressed() {
-        layoutPickerTracker.trackPreviewModeTapped(selectedPreviewMode().key)
         _onPreviewModeButtonPressed.call()
-    }
-
-    fun onPreviewTapped() {
-        selectedLayout?.let { layout ->
-            val template = layout.slug
-            layoutPickerTracker.trackPreviewViewed(template, selectedPreviewMode().key)
-            _onPreviewActionPressed.value = DesignPreviewAction.Show(template, layout.demoUrl)
-            return
-        }
-        layoutPickerTracker.trackErrorShown("Error previewing design")
-        updateUiState(Error(toast = string.hpp_choose_error))
     }
 
     fun onDismissPreview() {
@@ -290,14 +237,16 @@ abstract class PickerViewModel(
     fun loadSavedState(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) return
         val layouts = savedInstanceState.getParcelableArrayList<LayoutModel>(FETCHED_LAYOUTS)
-        val categories = savedInstanceState.getParcelableArrayList<LayoutCategoryModel>(FETCHED_CATEGORIES)
+        val categories = savedInstanceState.getParcelableArrayList<LayoutCategoryModel>(
+            FETCHED_CATEGORIES
+        )
         val selected = savedInstanceState.getString(SELECTED_LAYOUT)
         val selectedCategories = (savedInstanceState.getSerializable(SELECTED_CATEGORIES) as? List<*>)
                 ?.filterIsInstance<String>() ?: listOf()
         val previewMode = savedInstanceState.getString(PREVIEW_MODE, MOBILE.name)
         resetState(selected, ArrayList(selectedCategories.toMutableList()), previewMode)
         if (layouts == null || categories == null || layouts.isEmpty()) {
-            fetchLayouts(preferCache = useCachedData)
+            fetchLayouts()
             return
         }
         handleResponse(layouts, categories)
