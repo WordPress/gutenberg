@@ -42,7 +42,7 @@ const fetchRetry = async ( url, options = {}, retries ) => {
 		return response;
 	}
 	if ( retries > 0 ) {
-		return setTimeout( fetchRetry( url, options, retries - 1 ), 200 );
+		fetchRetry( url, options, retries - 1 );
 	}
 	throw new Error(
 		`Fetch api call failed for ${ url }: ${ response.status }`
