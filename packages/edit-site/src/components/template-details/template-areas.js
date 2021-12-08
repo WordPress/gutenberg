@@ -66,20 +66,15 @@ function TemplatePartItem( {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
-	const { icon, label } = useSelect(
+	const templatePartArea = useSelect(
 		( select ) => {
 			const defaultAreas = select(
 				editorStore
 			).__experimentalGetDefaultTemplatePartAreas();
 
-			const matchedArea = defaultAreas.find(
+			return defaultAreas.find(
 				( defaultArea ) => defaultArea.area === templatePart.area
 			);
-
-			return {
-				icon: matchedArea?.icon,
-				label: matchedArea?.label,
-			};
 		},
 		[ templatePart.area ]
 	);
@@ -93,7 +88,7 @@ function TemplatePartItem( {
 		>
 			<MenuItem
 				role="button"
-				icon={ icon }
+				icon={ templatePartArea?.icon }
 				iconPosition="left"
 				onClick={ () => {
 					selectBlock( clientId );
@@ -103,7 +98,7 @@ function TemplatePartItem( {
 				onFocus={ highlightBlock }
 				onBlur={ cancelHighlightBlock }
 			>
-				{ label }
+				{ templatePartArea?.label }
 			</MenuItem>
 
 			<DropdownMenu

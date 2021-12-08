@@ -19,20 +19,15 @@ function TemplateAreaItem( { area, clientId } ) {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
-	const { icon, label } = useSelect(
+	const templatePartArea = useSelect(
 		( select ) => {
 			const defaultAreas = select(
 				editorStore
 			).__experimentalGetDefaultTemplatePartAreas();
 
-			const matchedArea = defaultAreas.find(
+			return defaultAreas.find(
 				( defaultArea ) => defaultArea.area === area
 			);
-
-			return {
-				icon: matchedArea?.icon,
-				label: matchedArea?.label,
-			};
 		},
 		[ area ]
 	);
@@ -43,7 +38,7 @@ function TemplateAreaItem( { area, clientId } ) {
 	return (
 		<Button
 			className="edit-site-template-card__template-areas-item"
-			icon={ icon }
+			icon={ templatePartArea?.icon }
 			onMouseOver={ highlightBlock }
 			onMouseLeave={ cancelHighlightBlock }
 			onFocus={ highlightBlock }
@@ -52,7 +47,7 @@ function TemplateAreaItem( { area, clientId } ) {
 				selectBlock( clientId );
 			} }
 		>
-			{ label }
+			{ templatePartArea?.label }
 		</Button>
 	);
 }
