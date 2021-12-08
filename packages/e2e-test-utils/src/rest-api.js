@@ -42,10 +42,10 @@ const fetchRetry = async ( url, options = {}, retries ) => {
 		return response;
 	}
 	if ( retries > 0 ) {
-		return fetchRetry( url, options, retries - 1 );
+		return setTimeout( fetchRetry( url, options, retries - 1 ), 200 );
 	}
 	throw new Error(
-		`Fetch api call failed for ${ url }: ${ JSON.stringify( response ) }`
+		`Fetch api call failed for ${ url }: ${ response.status }`
 	);
 };
 
@@ -84,7 +84,7 @@ const setNonce = ( async () => {
 		{
 			headers: { cookie },
 		},
-		2
+		3
 	);
 	const nonce = await res.text();
 
