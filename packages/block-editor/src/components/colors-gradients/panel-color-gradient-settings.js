@@ -17,7 +17,7 @@ import {
 	PanelBody,
 	Dropdown,
 } from '@wordpress/components';
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -136,6 +136,13 @@ export const PanelColorGradientSettingsInner = ( {
 		</span>
 	);
 
+	let dropdownPosition;
+	let popoverProps;
+	if ( __experimentalIsRenderedInSidebar ) {
+		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
+		popoverProps = { __unstableForcePosition: true };
+	}
+
 	return (
 		<PanelBody
 			className={ classnames(
@@ -145,26 +152,35 @@ export const PanelColorGradientSettingsInner = ( {
 			title={ showTitle ? titleElement : undefined }
 			{ ...props }
 		>
-			<ItemGroup isBordered isSeparated>
+			<ItemGroup
+				isBordered
+				isSeparated
+				className="block-editor-panel-color-gradient-settings__item-group"
+			>
 				{ settings.map( ( setting, index ) => (
 					<Dropdown
+						position={ dropdownPosition }
+						popoverProps={ popoverProps }
+						className="block-editor-panel-color-gradient-settings__dropdown"
 						key={ index }
-						contentClassName="block-editor-panel-color-gradient-settings__dropdown"
-						renderToggle={ ( { onToggle } ) => {
+						contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
+						renderToggle={ ( { isOpen, onToggle } ) => {
 							return (
 								<Item
 									onClick={ onToggle }
-									className="block-editor-panel-color-gradient-settings__item"
+									className={ classnames(
+										'block-editor-panel-color-gradient-settings__item',
+										{ 'is-open': isOpen }
+									) }
 								>
 									<HStack justify="flex-start">
-										<FlexItem>
-											<ColorIndicator
-												colorValue={
-													setting.gradientValue ??
-													setting.colorValue
-												}
-											/>
-										</FlexItem>
+										<ColorIndicator
+											className="block-editor-panel-color-gradient-settings__color-indicator"
+											colorValue={
+												setting.gradientValue ??
+												setting.colorValue
+											}
+										/>
 										<FlexItem>{ setting.label }</FlexItem>
 									</HStack>
 								</Item>
