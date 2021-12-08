@@ -100,7 +100,7 @@ function ScreenTypography( { name } ) {
 				</div>
 			) }
 
-			{ /* no typogrpahy elements support yet for blocks */ }
+			{ /* no typography elements support yet for blocks */ }
 			{ !! name && <TypographyPanel name={ name } element="text" /> }
 		</>
 	);
