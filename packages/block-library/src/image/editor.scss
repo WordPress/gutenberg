@@ -78,7 +78,7 @@ figure.wp-block-image:not(.wp-block) {
 		.components-placeholder {
 			grid-column: no-resize;
 		}
-		.components-resizable-box__container {
+		> div:not(.components-placeholder) {
 			grid-column: resized;
 		}
 		> figcaption {
@@ -88,7 +88,7 @@ figure.wp-block-image:not(.wp-block) {
 		}
 	}
 	> .wp-block-image:not(.is-resized) {
-		> .components-resizable-box__container,
+		> div:not(.components-placeholder),
 		> figcaption {
 			grid-column: no-resize;
 		}
