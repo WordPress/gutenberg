@@ -65,14 +65,14 @@ async function login() {
 		headers: { cookie },
 	} );
 
-	if ( response.ok || response.status === 302 || response.status === 200 ) {
+	if ( response.status === 200 ) {
 		return {
 			response,
 			cookie,
 		};
 	}
 
-	login();
+	await login();
 
 	throw new Error(
 		`Fetch api call failed for ${ apiFetch.nonceEndpoint }: ${ response.status }`
