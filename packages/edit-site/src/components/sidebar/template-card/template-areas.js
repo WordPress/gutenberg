@@ -6,7 +6,7 @@ import {
 	Button,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { getTemplatePartIcon } from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -14,19 +14,36 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import { TEMPLATE_PART_AREA_TO_NAME } from '../../../store/constants';
 
 function TemplateAreaItem( { area, clientId } ) {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
+	const { icon, label } = useSelect(
+		( select ) => {
+			const defaultAreas = select(
+				editorStore
+			).__experimentalGetDefaultTemplatePartAreas();
+
+			const matchedArea = defaultAreas.find(
+				( defaultArea ) => defaultArea.area === area
+			);
+
+			return {
+				icon: matchedArea?.icon,
+				label: matchedArea?.label,
+			};
+		},
+		[ area ]
+	);
+
 	const highlightBlock = () => toggleBlockHighlight( clientId, true );
 	const cancelHighlightBlock = () => toggleBlockHighlight( clientId, false );
 
 	return (
 		<Button
 			className="edit-site-template-card__template-areas-item"
-			icon={ getTemplatePartIcon( area ) }
+			icon={ icon }
 			onMouseOver={ highlightBlock }
 			onMouseLeave={ cancelHighlightBlock }
 			onFocus={ highlightBlock }
@@ -35,7 +52,7 @@ function TemplateAreaItem( { area, clientId } ) {
 				selectBlock( clientId );
 			} }
 		>
-			{ TEMPLATE_PART_AREA_TO_NAME[ area ] }
+			{ label }
 		</Button>
 	);
 }
