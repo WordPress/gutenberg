@@ -46,7 +46,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 		// Lists/updates a single global style variation based on the given id.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\/\d]+)',
+			'/' . $this->rest_base . '/(?P<id>[\/\w\.-]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
