@@ -7,9 +7,9 @@
 
 if ( ! function_exists( 'wp_is_block_theme' ) ) {
 	/**
-	 * Returns whether the current theme is an FSE theme or not.
+	 * Returns whether the current theme is a block theme or not.
 	 *
-	 * @return boolean Whether the current theme is an FSE theme or not.
+	 * @return boolean Whether the current theme is a block theme or not.
 	 */
 	function wp_is_block_theme() {
 		return is_readable( get_theme_file_path( '/block-templates/index.html' ) ) ||

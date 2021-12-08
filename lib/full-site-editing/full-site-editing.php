@@ -53,7 +53,7 @@ add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
  */
 function gutenberg_adminbar_items( $wp_admin_bar ) {
 
-	// Early exit if not an FSE theme.
+	// Early exit if not a block theme.
 	if ( ! wp_is_block_theme() ) {
 		return;
 	}

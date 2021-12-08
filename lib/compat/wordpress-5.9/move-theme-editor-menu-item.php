@@ -6,7 +6,7 @@
  */
 
 /**
- * Moves the "theme editor" under "tools" in FSE themes.
+ * Moves the "theme editor" under "tools" in block themes.
  */
 function gutenberg_move_theme_editor_in_block_themes() {
 	if ( ! wp_is_block_theme() || is_multisite() ) {
