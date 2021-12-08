@@ -10,12 +10,19 @@ import tinycolor from 'tinycolor2';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
 
 function ContrastCheckerMessage( {
 	tinyBackgroundColor,
 	tinyTextColor,
 	backgroundColor,
 	textColor,
+	msgStyle,
 } ) {
 	const msg =
 		tinyBackgroundColor.getBrightness() < tinyTextColor.getBrightness()
@@ -34,7 +41,7 @@ function ContrastCheckerMessage( {
 		speak( __( 'This color combination may be hard for people to read.' ) );
 	}, [ backgroundColor, textColor ] );
 
-	return <Text>{ msg }</Text>;
+	return <Text style={ msgStyle }>{ msg }</Text>;
 }
 
 function ContrastChecker( {
@@ -44,6 +51,7 @@ function ContrastChecker( {
 	fontSize, // font size value in pixels
 	isLargeText,
 	textColor,
+	getStylesFromColorScheme,
 } ) {
 	if (
 		! ( backgroundColor || fallbackBackgroundColor ) ||
@@ -51,6 +59,7 @@ function ContrastChecker( {
 	) {
 		return null;
 	}
+
 	const tinyBackgroundColor = tinycolor(
 		backgroundColor || fallbackBackgroundColor
 	);
@@ -71,14 +80,20 @@ function ContrastChecker( {
 		return null;
 	}
 
+	const msgStyle = getStylesFromColorScheme(
+		styles.message,
+		styles.messageDark
+	);
+
 	return (
 		<ContrastCheckerMessage
 			backgroundColor={ backgroundColor }
 			textColor={ textColor }
 			tinyBackgroundColor={ tinyBackgroundColor }
 			tinyTextColor={ tinyTextColor }
+			msgStyle={ msgStyle }
 		/>
 	);
 }
 
-export default ContrastChecker;
+export default withPreferredColorScheme( ContrastChecker );

@@ -1,3 +1,13 @@
 .block-editor-contrast-checker > .components-notice {
 	margin: 0;
 }
+
+.message {
+	margin: 10px 0 5px;
+	font-size: 12px;
+	color: $gray-text-min;
+}
+
+.messageDark {
+	color: #fff;
+}
