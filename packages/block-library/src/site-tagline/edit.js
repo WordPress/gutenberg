@@ -15,6 +15,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { useDebounce } from '@wordpress/compose';
 
 export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 	const { textAlign } = attributes;
@@ -23,6 +24,7 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 		'site',
 		'description'
 	);
+	const debouncedOnChange = useDebounce( setSiteTagline, 500 );
 	const { canUserEdit, readOnlySiteTagLine } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord } = select( coreStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
@@ -41,7 +43,7 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 	const siteTaglineContent = canUserEdit ? (
 		<RichText
 			allowedFormats={ [] }
-			onChange={ setSiteTagline }
+			onChange={ debouncedOnChange }
 			aria-label={ __( 'Site tagline text' ) }
 			placeholder={ __( 'Write site tagline…' ) }
 			tagName="p"

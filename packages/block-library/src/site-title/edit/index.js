@@ -19,6 +19,7 @@ import {
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ export default function SiteTitleEdit( {
 } ) {
 	const { level, textAlign, isLink, linkTarget } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
+	const debouncedOnChange = useDebounce( setTitle, 500 );
 	const { canUserEdit, readOnlyTitle } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord } = select( coreStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
@@ -56,7 +58,7 @@ export default function SiteTitleEdit( {
 				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Write site title…' ) }
 				value={ title }
-				onChange={ setTitle }
+				onChange={ debouncedOnChange }
 				allowedFormats={ [] }
 				disableLineBreaks
 				__unstableOnSplitAtEnd={ () =>
