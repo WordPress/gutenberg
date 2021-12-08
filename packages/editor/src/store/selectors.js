@@ -1166,8 +1166,7 @@ export function getEditorBlocks( state ) {
  */
 export function getEditorSelectionStart( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
-		since: '10.0',
-		plugin: 'Gutenberg',
+		since: '5.8',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionStart;
@@ -1183,8 +1182,7 @@ export function getEditorSelectionStart( state ) {
  */
 export function getEditorSelectionEnd( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
-		since: '10.0',
-		plugin: 'Gutenberg',
+		since: '5.8',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionEnd;

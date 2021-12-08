@@ -36,6 +36,12 @@ The handbook is organized into four sections based on the functional types of do
 -   **Reference guides** - API documentation, purely functional descriptions,
 -   **Explanations** - longer documentation focused on learning, not a specific task.
 
+### Templates
+
+A [how to guide template](https://raw.githubusercontent.com/WordPress/gutenberg/trunk/docs/contributors/documentation/how-to-guide-template.md) is available to provide a common structure to guides. If starting a new how to guide, copy the markdown from the template to get started.
+
+The template is based on examples from The Good Docs Project, see their [template repository for additional examples](https://github.com/thegooddocsproject/templates) to help you create quality documentation.
+
 ### Update a document
 
 To update an existing page:

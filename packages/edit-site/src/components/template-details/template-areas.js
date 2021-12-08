@@ -4,7 +4,7 @@
 import { sprintf, __ } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { getTemplatePartIcon } from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { moreVertical } from '@wordpress/icons';
 
@@ -12,7 +12,6 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { TEMPLATE_PART_AREA_TO_NAME } from '../../store/constants';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 
 function TemplatePartItemMore( {
@@ -67,6 +66,18 @@ function TemplatePartItem( {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
+	const templatePartArea = useSelect(
+		( select ) => {
+			const defaultAreas = select(
+				editorStore
+			).__experimentalGetDefaultTemplatePartAreas();
+
+			return defaultAreas.find(
+				( defaultArea ) => defaultArea.area === templatePart.area
+			);
+		},
+		[ templatePart.area ]
+	);
 	const highlightBlock = () => toggleBlockHighlight( clientId, true );
 	const cancelHighlightBlock = () => toggleBlockHighlight( clientId, false );
 
@@ -77,7 +88,7 @@ function TemplatePartItem( {
 		>
 			<MenuItem
 				role="button"
-				icon={ getTemplatePartIcon( templatePart.area ) }
+				icon={ templatePartArea?.icon }
 				iconPosition="left"
 				onClick={ () => {
 					selectBlock( clientId );
@@ -87,7 +98,7 @@ function TemplatePartItem( {
 				onFocus={ highlightBlock }
 				onBlur={ cancelHighlightBlock }
 			>
-				{ TEMPLATE_PART_AREA_TO_NAME[ templatePart.area ] }
+				{ templatePartArea?.label }
 			</MenuItem>
 
 			<DropdownMenu

@@ -148,11 +148,17 @@ function gutenberg_edit_site_init( $hook ) {
 		}
 	);
 
+	$indexed_template_types = array();
+	foreach ( get_default_block_template_types() as $slug => $template_type ) {
+		$template_type['slug']    = (string) $slug;
+		$indexed_template_types[] = $template_type;
+	}
+
 	$custom_settings = array(
 		'siteUrl'                              => site_url(),
 		'postsPerPage'                         => get_option( 'posts_per_page' ),
 		'styles'                               => gutenberg_get_editor_styles(),
-		'defaultTemplateTypes'                 => gutenberg_get_indexed_default_template_types(),
+		'defaultTemplateTypes'                 => $indexed_template_types,
 		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
 		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
