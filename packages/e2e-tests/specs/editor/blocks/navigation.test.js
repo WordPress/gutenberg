@@ -486,7 +486,7 @@ describe( 'Navigation', () => {
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	it( 'render buttons as the submenu open when the block is set to open on click instead of hover', async () => {
+	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
 		await createClassicMenu( { name: 'Test Menu 2' }, menuItemsFixture );
 		await createNewPost();
 		await insertBlock( 'Navigation' );
