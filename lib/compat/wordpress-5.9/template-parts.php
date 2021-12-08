@@ -18,10 +18,6 @@ if ( ! function_exists( 'wp_is_block_theme' ) ) {
 	 * Registers block editor 'wp_template_part' post type.
 	 */
 	function gutenberg_register_template_part_post_type() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-
 		$labels = array(
 			'name'                  => __( 'Template Parts', 'gutenberg' ),
 			'singular_name'         => __( 'Template Part', 'gutenberg' ),
@@ -75,10 +71,6 @@ if ( ! function_exists( 'wp_is_block_theme' ) ) {
 	 * Registers the 'wp_template_part_area' taxonomy.
 	 */
 	function gutenberg_register_wp_template_part_area_taxonomy() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-
 		register_taxonomy(
 			'wp_template_part_area',
 			array( 'wp_template_part' ),

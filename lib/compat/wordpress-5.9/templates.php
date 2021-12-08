@@ -18,10 +18,6 @@ if ( ! function_exists( 'wp_is_block_theme' ) ) {
 	 * Registers block editor 'wp_template' post type.
 	 */
 	function gutenberg_register_template_post_type() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-
 		$labels = array(
 			'name'                  => __( 'Templates', 'gutenberg' ),
 			'singular_name'         => __( 'Template', 'gutenberg' ),
@@ -76,10 +72,6 @@ if ( ! function_exists( 'wp_is_block_theme' ) ) {
 	 * Registers block editor 'wp_theme' taxonomy.
 	 */
 	function gutenberg_register_wp_theme_taxonomy() {
-		if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			return;
-		}
-
 		register_taxonomy(
 			'wp_theme',
 			array( 'wp_template', 'wp_template_part', 'wp_global_styles' ),
@@ -165,7 +157,7 @@ if ( ! function_exists( 'wp_is_block_theme' ) ) {
 	 */
 	function gutenberg_the_skip_link() {
 		// Early exit if not a block theme.
-		if ( ! gutenberg_supports_block_templates() ) {
+		if ( ! current_theme_supports( 'block-templates' ) ) {
 			return;
 		}
 

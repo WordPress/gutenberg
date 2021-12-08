@@ -6,37 +6,10 @@
  */
 
 /**
- * Returns whether the current theme is an FSE theme or not.
- *
- * Note: once 5.9 is the minimum supported WordPress version for the Gutenberg
- * plugin, we must deprecate this function and
- * use wp_is_block_theme instead.
- *
- * @return boolean Whether the current theme is an FSE theme or not.
- */
-function gutenberg_is_fse_theme() {
-	if ( function_exists( 'wp_is_block_theme' ) ) {
-		return wp_is_block_theme();
-	}
-
-	return is_readable( get_theme_file_path( '/block-templates/index.html' ) ) ||
-		is_readable( get_theme_file_path( '/templates/index.html' ) );
-}
-
-/**
- * Returns whether the current theme is FSE-enabled or not.
- *
- * @return boolean Whether the current theme is FSE-enabled or not.
- */
-function gutenberg_supports_block_templates() {
-	return gutenberg_is_fse_theme() || current_theme_supports( 'block-templates' );
-}
-
-/**
  * Removes legacy pages from FSE themes.
  */
 function gutenberg_remove_legacy_pages() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! wp_is_block_theme() ) {
 		return;
 	}
 
@@ -80,8 +53,8 @@ add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
  */
 function gutenberg_adminbar_items( $wp_admin_bar ) {
 
-	// Early exit if not an FSE theme.
-	if ( ! gutenberg_is_fse_theme() ) {
+	// Early exit if not a block theme.
+	if ( ! wp_is_block_theme() ) {
 		return;
 	}
 
