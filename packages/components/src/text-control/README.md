@@ -132,6 +132,13 @@ A function that receives the value of the input.
 -   Type: `function`
 -   Required: Yes
 
+#### children
+
+The content to be displayed within the `BaseControl`, and as a sibling of `input`.
+
+-   Type: `Element`
+-   Required: No
+
 ## Related components
 
 -   To offer users more constrained options for input, use SelectControl, RadioControl, CheckboxControl, or RangeControl.

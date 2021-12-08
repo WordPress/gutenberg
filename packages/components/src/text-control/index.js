@@ -18,6 +18,7 @@ import BaseControl from '../base-control';
  * @property {string}                  [className]           Classname passed to BaseControl wrapper
  * @property {(value: string) => void} onChange              Handle changes.
  * @property {string}                  [type='text']         Type of the input.
+ * @property {WPElement[]}             children              Children.
  */
 
 /** @typedef {OwnProps & import('react').ComponentProps<'input'>} Props */
