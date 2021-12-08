@@ -33,8 +33,7 @@ function DimensionInput( {
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
 
-	const instanceId = useInstanceId( UnitControl );
-	const inputId = `block-spacer-height-input-${ instanceId }`;
+	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
 	const isPx = unit === 'px';
 
 	// In most contexts the spacer size cannot meaningfully be set to a

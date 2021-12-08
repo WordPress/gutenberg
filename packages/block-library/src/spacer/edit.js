@@ -180,9 +180,9 @@ const SpacerEdit = ( {
 	useEffect( () => {
 		if ( orientation === 'horizontal' && ! width ) {
 			setAttributes( {
-				height: parseFloat( 0 ),
+				height: 0,
 				heightUnit: 'px',
-				width: parseFloat( 72 ),
+				width: 72,
 				widthUnit: 'px',
 			} );
 		}
