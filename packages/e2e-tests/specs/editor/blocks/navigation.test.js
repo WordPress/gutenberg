@@ -287,7 +287,6 @@ describe( 'Navigation', () => {
 		} );
 
 		it( 'does not display the options to create from pages or menus if there are none', async () => {
-			await deleteAllClassicMenus();
 			await createNewPost();
 
 			await insertBlock( 'Navigation' );
