@@ -84,14 +84,26 @@ const setNonce = ( async () => {
 /**
  * Call REST API using `apiFetch` to build and clear test states.
  *
- * @param {Object} options `apiFetch` options.
+ * @param {Object}  options `apiFetch` options.
+ * @param {boolean} runSetup Whether to run setup().
  * @return {Promise<any>} The response value.
  */
-async function rest( options = {} ) {
+async function rest( options = {}, runSetup = true ) {
 	// Only need to set them once but before any requests.
-	await Promise.all( [ setAPIRootURL, setNonce ] );
-
+	if ( runSetup ) {
+		await setup();
+	}
 	return await apiFetch( options );
+}
+
+/**
+ * Call `setAPIRootURL()` and `setNonce()`
+ *
+ * @return {Promise<any>} The response value.
+ */
+async function setup() {
+	// Only need to set them once but before any requests.
+	return await Promise.all( [ setAPIRootURL, setNonce ] );
 }
 
 /**
@@ -113,4 +125,4 @@ async function batch( requests ) {
 	} );
 }
 
-export { rest, batch };
+export { rest, batch, setup };

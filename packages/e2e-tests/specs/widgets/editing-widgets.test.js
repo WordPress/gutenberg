@@ -11,6 +11,7 @@ import {
 	deleteAllWidgets,
 	pressKeyWithModifier,
 	__experimentalRest as rest,
+	__experimentalSetup as setup,
 	openListView,
 	closeListView,
 	openGlobalBlockInserter,
@@ -909,7 +910,10 @@ async function saveWidgets() {
 }
 
 async function getSerializedWidgetAreas() {
-	const widgets = await rest( { path: '/wp/v2/widgets' } );
+	const setupResponse = await setup();
+	// eslint-disable-next-line no-console
+	console.log( 'getSerializedWidgetAreas setup: ', setupResponse );
+	const widgets = await rest( { path: '/wp/v2/widgets' }, false );
 
 	const serializedWidgetAreas = mapValues(
 		groupBy( widgets, 'sidebar' ),

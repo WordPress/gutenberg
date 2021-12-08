@@ -95,6 +95,7 @@ export { deleteAllWidgets } from './widgets';
 export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
+	setup as __experimentalSetup,
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
 
