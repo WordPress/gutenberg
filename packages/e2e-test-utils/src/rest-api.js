@@ -71,10 +71,12 @@ async function login( retries = 3 ) {
 			cookie,
 		};
 	}
+
+	// Sometimes the nonce call will fail if a test has forced a new login
+	// and invalidated the cookie, so retry the login in these instances.
 	if ( retries > 0 ) {
 		return login( retries - 1 );
 	}
-	
 
 	throw new Error(
 		`Fetch api call failed for ${ apiFetch.nonceEndpoint }: ${ response.status }`
@@ -83,9 +85,9 @@ async function login( retries = 3 ) {
 
 const setNonce = ( async () => {
 	// Get the initial nonce.
-	const res = await login();
+	const loginRequest = await login();
 
-	const nonce = await res.response.text();
+	const nonce = await loginRequest.response.text();
 
 	// Register the nonce middleware.
 	apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
@@ -96,7 +98,7 @@ const setNonce = ( async () => {
 			...request,
 			headers: {
 				...request.headers,
-				cookie: res.cookie,
+				cookie: loginRequest.cookie,
 			},
 		} );
 	} );
