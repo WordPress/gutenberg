@@ -14,7 +14,7 @@ function ScreenBlock( { name } ) {
 
 	return (
 		<>
-			<ScreenHeader back="/blocks" title={ blockType.title } />
+			<ScreenHeader title={ blockType.title } />
 			<ContextMenu parentMenu={ '/blocks/' + name } name={ name } />
 		</>
 	);

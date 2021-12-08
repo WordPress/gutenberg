@@ -17,7 +17,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import NavigationButton from './navigation-button';
+import { NavigationButton } from './navigation-button';
 import { useSetting } from './hooks';
 
 const EMPTY_COLORS = [];

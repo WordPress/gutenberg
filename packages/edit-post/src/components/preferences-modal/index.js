@@ -55,19 +55,14 @@ import BlockManager from '../block-manager';
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
 
-function NavigationButton( {
-	as: Tag = Button,
-	path,
-	isBack = false,
-	...props
-} ) {
-	const navigator = useNavigator();
-	return (
-		<Tag
-			onClick={ () => navigator.push( path, { isBack } ) }
-			{ ...props }
-		/>
-	);
+function NavigationButton( { as: Tag = Button, path, ...props } ) {
+	const { push } = useNavigator();
+	return <Tag onClick={ () => push( path ) } { ...props } />;
+}
+
+function NavigationBackButton( { as: Tag = Button, ...props } ) {
+	const { pop } = useNavigator();
+	return <Tag onClick={ pop } { ...props } />;
 }
 
 export default function PreferencesModal() {
@@ -376,12 +371,10 @@ export default function PreferencesModal() {
 									size="small"
 									gap="6"
 								>
-									<NavigationButton
-										path="/"
+									<NavigationBackButton
 										icon={
 											isRTL() ? chevronRight : chevronLeft
 										}
-										isBack
 										aria-label={ __(
 											'Navigate to the previous view'
 										) }

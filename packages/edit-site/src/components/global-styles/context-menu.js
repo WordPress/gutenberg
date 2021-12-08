@@ -12,7 +12,7 @@ import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
-import NavigationButton from './navigation-button';
+import { NavigationButton } from './navigation-button';
 
 function ContextMenu( { name, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( name );

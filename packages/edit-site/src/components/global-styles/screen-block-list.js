@@ -17,7 +17,7 @@ import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import ScreenHeader from './header';
-import NavigationButton from './navigation-button';
+import { NavigationButton } from './navigation-button';
 
 function BlockMenuItem( { block } ) {
 	const hasTypographyPanel = useHasTypographyPanel( block.name );
@@ -48,7 +48,6 @@ function ScreenBlockList() {
 	return (
 		<>
 			<ScreenHeader
-				back="/"
 				title={ __( 'Blocks' ) }
 				description={ __(
 					'Customize the appearance of specific blocks and for the whole site.'

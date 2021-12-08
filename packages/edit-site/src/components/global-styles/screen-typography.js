@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import NavigationButton from './navigation-button';
+import { NavigationButton } from './navigation-button';
 import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
@@ -72,7 +72,6 @@ function ScreenTypography( { name } ) {
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu ? parentMenu : '/' }
 				title={ __( 'Typography' ) }
 				description={ __(
 					'Manage the typography settings for different elements.'

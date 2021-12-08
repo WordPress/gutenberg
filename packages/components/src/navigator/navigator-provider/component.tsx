@@ -43,18 +43,29 @@ function NavigatorProvider(
 	>( [
 		{
 			path: initialPath,
+			isBack: false,
 		},
 	] );
 
 	const navigatorContextValue: NavigatorContextType = {
 		location: locationHistory[ locationHistory.length - 1 ],
 		push: ( path, options ) => {
+			const { navigationTriggerElement, ...restOptions } = options;
+
+			// The `navigationTriggerElement` needs to be applied on the current
+			// location, while the remaining options need to be applied on the
+			// incoming location
 			setLocationHistory( [
-				...locationHistory,
+				...locationHistory.slice( 0, -1 ),
+				// Force the `isBack` flag to `true` when navigating back.
+				{
+					...locationHistory[ locationHistory.length - 1 ],
+					navigationTriggerElement,
+				},
 				{
 					path,
 					isBack: false,
-					navigationTriggerElement: options?.navigationTriggerElement,
+					...restOptions,
 				},
 			] );
 		},
