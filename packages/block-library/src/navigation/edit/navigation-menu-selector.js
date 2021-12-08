@@ -5,6 +5,7 @@ import { MenuGroup, MenuItem, MenuItemsChoice } from '@wordpress/components';
 import { useEntityId } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -44,6 +45,13 @@ export default function NavigationMenuSelector( { onSelect, onCreateNew } ) {
 			<MenuGroup>
 				<MenuItem onClick={ onCreateNew }>
 					{ __( 'Create new menu' ) }
+				</MenuItem>
+				<MenuItem
+					href={ addQueryArgs( 'edit.php', {
+						post_type: 'wp_navigation',
+					} ) }
+				>
+					{ __( 'Manage menus' ) }
 				</MenuItem>
 			</MenuGroup>
 		</>
