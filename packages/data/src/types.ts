@@ -1,10 +1,25 @@
-type MapOf< T > = { [ name: string ]: T };
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { MutableRefObject } from 'react';
+
+export type MapOf< T > = { [ name: string ]: T };
 
 export type ActionCreator = Function | Generator;
 export type Resolver = Function | Generator;
 export type Selector = Function;
 
 export type AnyConfig = ReduxStoreConfig< any, any, any >;
+
+export interface SelectMapper {
+	(
+		select: ( reference: StoreReference ) => MapOf< Function >,
+		registry: DataRegistry
+	): unknown;
+}
+export type SelectChooser = SelectMapper | StoreReference;
+export type StoreReference = StoreDescriptor< any > | string;
 
 export interface StoreInstance< Config extends AnyConfig > {
 	getSelectors: () => SelectorsOf< Config >;
@@ -38,7 +53,17 @@ export interface ReduxStoreConfig<
 }
 
 export interface DataRegistry {
+	__experimentalMarkListeningStores: (
+		callback: ( this: DataRegistry ) => unknown,
+		listeningStores: MutableRefObject< unknown >
+	) => unknown;
+	__experimentalSubscribeStore: (
+		storeName: string,
+		listener: () => void
+	) => ReturnType< DataEmitter[ 'subscribe' ] >;
+
 	register: ( store: StoreDescriptor< any > ) => void;
+	select: ( chooser: SelectChooser, deps?: unknown[] ) => any;
 }
 
 export interface DataEmitter {
