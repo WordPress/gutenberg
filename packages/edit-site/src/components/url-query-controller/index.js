@@ -18,28 +18,48 @@ export default function URLQueryController() {
 	const {
 		params: { postId, postType },
 	} = useLocation();
-	const homeTemplateId = useSelect(
-		( select ) => select( editSiteStore ).getHomeTemplateId(),
-		[]
+	const { getPage, getEditedPostId, getEditedPostType } = useSelect(
+		editSiteStore
 	);
 
 	// Set correct entity on page navigation.
 	useEffect( () => {
+		let isMounted = true;
+
 		if ( 'page' === postType || 'post' === postType ) {
 			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
 		} else if ( 'wp_template' === postType ) {
 			setTemplate( postId );
 		} else if ( 'wp_template_part' === postType ) {
 			setTemplatePart( postId );
-		} else if ( homeTemplateId ) {
-			history.replace( {
-				postType: 'wp_template',
-				postId: homeTemplateId,
-			} );
 		} else {
-			showHomepage();
+			showHomepage().then( () => {
+				if ( ! isMounted ) {
+					return;
+				}
+
+				const page = getPage();
+				const editedPostId = getEditedPostId();
+				const editedPostType = getEditedPostType();
+
+				if ( page?.context?.postId && page?.context?.postType ) {
+					history.replace( {
+						postId: page.context.postId,
+						postType: page.context.postType,
+					} );
+				} else if ( editedPostId && editedPostType ) {
+					history.replace( {
+						postId: editedPostId,
+						postType: editedPostType,
+					} );
+				}
+			} );
 		}
-	}, [ postId, postType, homeTemplateId, history ] );
+
+		return () => {
+			isMounted = false;
+		};
+	}, [ postId, postType ] );
 
 	return null;
 }
