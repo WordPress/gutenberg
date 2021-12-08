@@ -17,10 +17,10 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 
+import type { MapOf, SelectChooser, SelectMapper } from '../../types';
+
 const noop = () => {};
 const renderQueue = createQueue();
-
-/** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
 
 /**
  * Custom react hook for retrieving props from registered selectors.
@@ -28,20 +28,20 @@ const renderQueue = createQueue();
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @param {Function|StoreDescriptor|string} mapSelect Function called on every state change. The
- *                                                    returned value is exposed to the component
- *                                                    implementing this hook. The function receives
- *                                                    the `registry.select` method on the first
- *                                                    argument and the `registry` on the second
- *                                                    argument.
- *                                                    When a store key is passed, all selectors for
- *                                                    the store will be returned. This is only meant
- *                                                    for usage of these selectors in event
- *                                                    callbacks, not for data needed to create the
- *                                                    element tree.
- * @param {Array}                           deps      If provided, this memoizes the mapSelect so the
- *                                                    same `mapSelect` is invoked on every state
- *                                                    change unless the dependencies change.
+ * @param  mapSelect Function called on every state change. The
+ *                   returned value is exposed to the component
+ *                   implementing this hook. The function receives
+ *                   the `registry.select` method on the first
+ *                   argument and the `registry` on the second
+ *                   argument.
+ *                   When a store key is passed, all selectors for
+ *                   the store will be returned. This is only meant
+ *                   for usage of these selectors in event
+ *                   callbacks, not for data needed to create the
+ *                   element tree.
+ * @param  deps      If provided, this memoizes the mapSelect so the
+ *                   same `mapSelect` is invoked on every state
+ *                   change unless the dependencies change.
  *
  * @example
  * ```js
@@ -87,9 +87,12 @@ const renderQueue = createQueue();
  * }
  * ```
  *
- * @return {Function}  A custom react hook.
+ * @return A custom react hook.
  */
-export default function useSelect( mapSelect, deps ) {
+export default function useSelect(
+	mapSelect: SelectChooser,
+	deps?: unknown[]
+): SelectChooser extends SelectMapper ? any : MapOf< Function > {
 	const hasMappingFunction = 'function' === typeof mapSelect;
 
 	// If we're recalling a store by its name or by
@@ -106,7 +109,7 @@ export default function useSelect( mapSelect, deps ) {
 	// `_mapSelect` if we can.
 	const callbackMapper = useCallback(
 		hasMappingFunction ? mapSelect : noop,
-		deps
+		deps ?? []
 	);
 	const _mapSelect = hasMappingFunction ? callbackMapper : null;
 
@@ -118,11 +121,11 @@ export default function useSelect( mapSelect, deps ) {
 	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 
-	const latestMapSelect = useRef();
+	const latestMapSelect = useRef< SelectMapper >();
 	const latestIsAsync = useRef( isAsync );
-	const latestMapOutput = useRef();
-	const latestMapOutputError = useRef();
-	const isMountedAndNotUnsubscribing = useRef();
+	const latestMapOutput = useRef< unknown >();
+	const latestMapOutputError = useRef< Error >();
+	const isMountedAndNotUnsubscribing = useRef( false );
 
 	// Keep track of the stores being selected in the _mapSelect function,
 	// and only subscribe to those stores later.
@@ -141,7 +144,7 @@ export default function useSelect( mapSelect, deps ) {
 	// in that case, we would still want to memoize it.
 	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
 
-	let mapOutput;
+	let mapOutput: unknown;
 
 	if ( _mapSelect ) {
 		mapOutput = latestMapOutput.current;
@@ -154,7 +157,9 @@ export default function useSelect( mapSelect, deps ) {
 					_mapSelect( registry.select, registry )
 				);
 			} catch ( error ) {
-				let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+				let errorMessage = `An error occurred while running 'mapSelect': ${
+					( error as Error ).message
+				}`;
 
 				if ( latestMapOutputError.current ) {
 					errorMessage += `\nThe error may be correlated with this previous error:\n`;
@@ -169,7 +174,7 @@ export default function useSelect( mapSelect, deps ) {
 	}
 
 	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction ) {
+		if ( ! _mapSelect ) {
 			return;
 		}
 
@@ -189,15 +194,17 @@ export default function useSelect( mapSelect, deps ) {
 	} );
 
 	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction ) {
+		if ( ! _mapSelect ) {
 			return;
 		}
 
 		const onStoreChange = () => {
-			if ( isMountedAndNotUnsubscribing.current ) {
+			const currentMapSelect = latestMapSelect.current;
+
+			if ( isMountedAndNotUnsubscribing.current && currentMapSelect ) {
 				try {
 					const newMapOutput = trapSelect( () =>
-						latestMapSelect.current( registry.select, registry )
+						currentMapSelect( registry.select, registry )
 					);
 
 					if (
@@ -207,7 +214,7 @@ export default function useSelect( mapSelect, deps ) {
 					}
 					latestMapOutput.current = newMapOutput;
 				} catch ( error ) {
-					latestMapOutputError.current = error;
+					latestMapOutputError.current = error as Error;
 				}
 				forceRender();
 			}
