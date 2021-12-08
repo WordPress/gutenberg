@@ -45,7 +45,7 @@ const fetchRetry = async ( url, options = {}, retries ) => {
 		return fetchRetry( url, options, retries - 1 );
 	}
 	throw new Error(
-		`Fetch api call failed for ${ url }: ${ response.status }`
+		`Fetch api call failed for ${ url }: ${ JSON.stringify( response ) }`
 	);
 };
 
