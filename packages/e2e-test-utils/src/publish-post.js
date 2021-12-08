@@ -13,11 +13,11 @@ export async function publishPost() {
 	const publishPanelToggle = await page.$(
 		'.editor-post-publish-panel__toggle'
 	);
-	const isPublishingPost = publishPanelToggle.evaluate(
+	const isPublishingPost = await publishPanelToggle.evaluate(
 		( element ) => element.textContent === 'Publish'
 	);
-	const isEntityPublishToggle = publishPanelToggle.evaluate( ( element ) =>
-		element.classList.contains( 'has-changes-dot' )
+	const isEntityPublishToggle = await publishPanelToggle.evaluate(
+		( element ) => element.classList.contains( 'has-changes-dot' )
 	);
 
 	await openPublishPanel();
@@ -36,7 +36,7 @@ export async function publishPost() {
 		const publishButton = await page.waitForSelector(
 			'.editor-post-publish-button:not([aria-disabled="true"])'
 		);
-		publishButton.click();
+		await publishButton.click();
 
 		// A success notice should show up.
 		return page.waitForSelector( '.components-snackbar' );
