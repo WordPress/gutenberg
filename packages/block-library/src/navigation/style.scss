@@ -426,7 +426,10 @@ button.wp-block-navigation-item__content {
 			align-items: var(--layout-justification-setting, inherit);
 
 			// Always align the contents of the menu to the top.
-			justify-content: flex-start;
+			&,
+			.wp-block-navigation__container {
+				justify-content: flex-start;
+			}
 
 			// Allow menu to scroll.
 			overflow: auto;

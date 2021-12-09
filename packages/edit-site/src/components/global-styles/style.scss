@@ -4,15 +4,6 @@
 	justify-content: center;
 	min-height: 152px;
 	line-height: 1;
-
-	.component-color-indicator {
-		border-radius: 50%;
-		border: 0;
-		height: 36px;
-		width: 36px;
-		margin-left: 0;
-		padding: 0;
-	}
 }
 
 .edit-site-typography-panel__preview {
@@ -43,14 +34,6 @@
 	margin: $grid-unit-20;
 
 	.component-color-indicator {
-		margin-left: 0;
-		display: block;
-		border-radius: 50%;
-		height: 24px;
-		width: 24px;
-		padding: 0;
-		border: $border-width solid $gray-300;
-
 		// Show a diagonal line (crossed out) for empty swatches.
 		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 	}

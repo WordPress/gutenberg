@@ -17,7 +17,7 @@ export default {
 	title: 'Components/SelectControl',
 	component: SelectControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

@@ -38,6 +38,7 @@ export { getEditedPostContent } from './get-edited-post-content';
 export { getCurrentPostContent } from './get-current-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
+export { getOption } from './get-option';
 export {
 	insertBlock,
 	insertPattern,
@@ -74,6 +75,7 @@ export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre
 export { saveDraft } from './save-draft';
 export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
+export { setOption } from './set-option';
 export { setPostContent } from './set-post-content';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';

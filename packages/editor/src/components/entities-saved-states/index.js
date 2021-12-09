@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { close as closeIcon } from '@wordpress/icons';
 
@@ -74,6 +75,10 @@ export default function EntitiesSavedStates( { close } ) {
 		saveEditedEntityRecord,
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
+
+	const { __unstableMarkLastChangeAsPersistent } = useDispatch(
+		blockEditorStore
+	);
 
 	// To group entities by type.
 	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
@@ -159,6 +164,8 @@ export default function EntitiesSavedStates( { close } ) {
 				siteItemsToSave
 			);
 		}
+
+		__unstableMarkLastChangeAsPersistent();
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on

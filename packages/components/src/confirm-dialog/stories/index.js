@@ -16,7 +16,7 @@ export default {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

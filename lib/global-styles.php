@@ -71,34 +71,22 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		}
 
 		$new_global_styles = array();
-		$new_presets       = array(
-			array(
-				'css'                     => 'variables',
-				'__unstableType'          => 'presets',
-				'__experimentalNoWrapper' => true,
-			),
-			array(
-				'css'            => 'presets',
+
+		$style_css = wp_get_global_stylesheet( array( 'presets' ) );
+		if ( '' !== $style_css ) {
+			$new_global_styles[] = array(
+				'css'            => $style_css,
 				'__unstableType' => 'presets',
-			),
-		);
-		foreach ( $new_presets as $new_style ) {
-			$style_css = wp_get_global_stylesheet( array( $new_style['css'] ) );
-			if ( '' !== $style_css ) {
-				$new_style['css']    = $style_css;
-				$new_global_styles[] = $new_style;
-			}
+			);
 		}
 
-		$new_block_classes = array(
-			'css'            => 'styles',
-			'__unstableType' => 'theme',
-		);
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$style_css = wp_get_global_stylesheet( array( $new_block_classes['css'] ) );
+			$style_css = wp_get_global_stylesheet( array( 'styles' ) );
 			if ( '' !== $style_css ) {
-				$new_block_classes['css'] = $style_css;
-				$new_global_styles[]      = $new_block_classes;
+				$new_global_styles[] = array(
+					'css'            => $style_css,
+					'__unstableType' => 'theme',
+				);
 			}
 		}
 
@@ -171,7 +159,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
  * @return boolean
  */
 function gutenberg_experimental_is_site_editor_available() {
-	return gutenberg_is_fse_theme();
+	return wp_is_block_theme();
 }
 
 /**
@@ -288,6 +276,16 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
 }
 
+/**
+ * Function to enqueue the CSS Custom Properties
+ * coming from theme.json.
+ */
+function gutenberg_load_css_custom_properties() {
+	wp_register_style( 'global-styles-css-custom-properties', false, array(), true, true );
+	wp_add_inline_style( 'global-styles-css-custom-properties', wp_get_global_stylesheet( array( 'variables' ) ) );
+	wp_enqueue_style( 'global-styles-css-custom-properties' );
+}
+
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.
 if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
@@ -304,3 +302,5 @@ add_action( 'set_current_user', 'gutenberg_global_styles_kses_init' );
 add_filter( 'force_filtered_html_on_import', 'gutenberg_global_styles_force_filtered_html_on_import_filter', 999 );
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_global_styles_include_support_for_wp_variables', 10, 2 );
 // This filter needs to be executed last.
+
+add_filter( 'enqueue_block_editor_assets', 'gutenberg_load_css_custom_properties' );

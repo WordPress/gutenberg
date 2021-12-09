@@ -20,7 +20,7 @@ export default {
 	title: 'Components/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

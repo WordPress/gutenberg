@@ -13,8 +13,6 @@ import {
 	getHomeTemplateId,
 	getEditedPostType,
 	getEditedPostId,
-	getPreviousEditedPostType,
-	getPreviousEditedPostId,
 	getPage,
 	getNavigationPanelActiveMenu,
 	getReusableBlocks,
@@ -152,51 +150,22 @@ describe( 'selectors', () => {
 
 	describe( 'getEditedPostId', () => {
 		it( 'returns the template ID', () => {
-			const state = { editedPost: [ { id: 10 } ] };
+			const state = { editedPost: { id: 10 } };
 			expect( getEditedPostId( state ) ).toBe( 10 );
 		} );
 	} );
 
 	describe( 'getEditedPostType', () => {
 		it( 'returns the template type', () => {
-			const state = { editedPost: [ { type: 'wp_template' } ] };
+			const state = { editedPost: { type: 'wp_template' } };
 			expect( getEditedPostType( state ) ).toBe( 'wp_template' );
-		} );
-	} );
-
-	describe( 'getPreviousEditedPostId', () => {
-		it( 'returns the previous template ID', () => {
-			const state = { editedPost: [ { id: 10 }, { id: 20 } ] };
-			expect( getPreviousEditedPostId( state ) ).toBe( 10 );
-		} );
-
-		it( 'returns undefined when there are no previous pages', () => {
-			const state = { editedPost: [ { id: 10 } ] };
-			expect( getPreviousEditedPostId( state ) ).toBeUndefined();
-		} );
-	} );
-
-	describe( 'getPreviousEditedPostType', () => {
-		it( 'returns the previous template type', () => {
-			const state = {
-				editedPost: [
-					{ type: 'wp_template' },
-					{ type: 'wp_template_part' },
-				],
-			};
-			expect( getPreviousEditedPostType( state ) ).toBe( 'wp_template' );
-		} );
-
-		it( 'returns undefined when there are no previous pages', () => {
-			const state = { editedPost: [ { type: 'wp_template' } ] };
-			expect( getPreviousEditedPostType( state ) ).toBeUndefined();
 		} );
 	} );
 
 	describe( 'getPage', () => {
 		it( 'returns the page object', () => {
 			const page = {};
-			const state = { editedPost: [ { page } ] };
+			const state = { editedPost: { page } };
 			expect( getPage( state ) ).toBe( page );
 		} );
 	} );

@@ -225,7 +225,7 @@ function ControlPoints( {
 									);
 								} }
 							/>
-							{ ! disableRemove && (
+							{ ! disableRemove && controlPoints.length > 2 && (
 								<Button
 									className="components-custom-gradient-picker__remove-control-point"
 									onClick={ () => {

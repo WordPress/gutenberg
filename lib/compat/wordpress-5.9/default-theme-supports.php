@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( gutenberg_is_fse_theme() ) {
+if ( wp_is_block_theme() ) {
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'responsive-embeds' );
 	add_theme_support( 'editor-styles' );

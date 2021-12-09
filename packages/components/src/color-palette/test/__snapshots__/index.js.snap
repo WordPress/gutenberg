@@ -17,6 +17,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   style={
     Object {
       "background": "#f00",
+      "color": "#000",
     }
   }
 >
@@ -44,6 +45,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
       style={
         Object {
           "background": "#f00",
+          "color": "#000",
         }
       }
     >
@@ -196,6 +198,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               style={
                 Object {
                   "background": "#f00",
+                  "color": "#000",
                 }
               }
             >
