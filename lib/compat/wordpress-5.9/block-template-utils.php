@@ -764,9 +764,11 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	// so we have to override it to make sure it's correct.
 	$block_template->id = $id;
 	$block_template->slug = $slug;
-	// TODO: Infer title properly.
-	$block_template->title = $slug;
-	// TODO: Set other fields, such as description, etc?
+	$default_template_types = get_default_block_template_types();
+	if ( array_key_exists( $slug, $default_template_types ) ) {
+		$block_template->title = $default_template_types[ $slug ]['title'];
+		$block_template->description = $default_template_types[ $slug ]['description'];
+	}
 
 	/**
 	 * Filters the queried block template object after it's been fetched.
