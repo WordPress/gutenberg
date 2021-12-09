@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
-import { applyFormat, removeFormat } from '@wordpress/rich-text';
+import {
+	applyFormat,
+	removeFormat,
+	getActiveFormat,
+} from '@wordpress/rich-text';
 import {
 	useSetting,
 	getColorClassName,
@@ -15,7 +19,32 @@ import { BottomSheet, ColorSettings } from '@wordpress/components';
  */
 import { textColor as settings } from './index';
 import { transparentValue } from './index.js';
-import { getActiveColors } from './inline.js';
+import { parseClassName } from './inline.js';
+
+function parseCSS( css = '' ) {
+	return css.split( ';' ).reduce( ( accumulator, rule ) => {
+		if ( rule ) {
+			const [ property, value ] = rule.replace( / /g, '' ).split( ':' );
+			if ( property === 'color' ) accumulator.color = value;
+			if ( property === 'background-color' && value !== transparentValue )
+				accumulator.backgroundColor = value;
+		}
+		return accumulator;
+	}, {} );
+}
+
+function getActiveColors( value, name, colorSettings ) {
+	const activeColorFormat = getActiveFormat( value, name );
+
+	if ( ! activeColorFormat ) {
+		return {};
+	}
+
+	return {
+		...parseCSS( activeColorFormat.attributes.style ),
+		...parseClassName( activeColorFormat.attributes.class, colorSettings ),
+	};
+}
 
 function setColors( value, name, colorSettings, colors ) {
 	const { color, backgroundColor } = {

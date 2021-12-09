@@ -33,7 +33,7 @@ import { textColor as settings, transparentValue } from './index';
 function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
-			const [ property, value ] = rule.replace( / /g, '' ).split( ':' );
+			const [ property, value ] = rule.split( ':' );
 			if ( property === 'color' ) accumulator.color = value;
 			if ( property === 'background-color' && value !== transparentValue )
 				accumulator.backgroundColor = value;
@@ -42,7 +42,7 @@ function parseCSS( css = '' ) {
 	}, {} );
 }
 
-function parseClassName( className = '', colorSettings ) {
+export function parseClassName( className = '', colorSettings ) {
 	return className.split( ' ' ).reduce( ( accumulator, name ) => {
 		// `colorSlug` could contain dashes, so simply match the start and end.
 		if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
