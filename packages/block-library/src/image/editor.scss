@@ -73,24 +73,17 @@ figure.wp-block-image:not(.wp-block) {
 *:not([data-align]) {
 	> .wp-block-image {
 		display: grid;
-		grid-template-rows: auto auto;
-		grid-template-columns: [resized] min-content [no-resize] minmax(0, max-content);
+		grid-template-columns: [image] minmax(0, max-content) [placeholder] auto;
 		.components-placeholder {
-			grid-column: no-resize;
+			grid-column: placeholder;
 		}
 		> div:not(.components-placeholder) {
-			grid-column: resized;
+			grid-column: image;
 		}
 		> figcaption {
-			grid-column: resized;
+			grid-column: image;
 			display: table-caption;
 			caption-side: bottom;
-		}
-	}
-	> .wp-block-image:not(.is-resized) {
-		> div:not(.components-placeholder),
-		> figcaption {
-			grid-column: no-resize;
 		}
 	}
 }
