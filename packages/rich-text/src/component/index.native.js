@@ -1181,7 +1181,7 @@ export default compose( [
 		const colorPalette =
 			experimentalFeatures?.user ??
 			experimentalFeatures?.theme ??
-			experimentalFeatures?.core ??
+			experimentalFeatures?.default ??
 			settings?.colors;
 
 		return {
