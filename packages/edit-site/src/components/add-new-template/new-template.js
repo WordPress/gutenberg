@@ -12,10 +12,16 @@ import {
 	MenuItem,
 	NavigableMenu,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { addQueryArgs } from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+
+/**
+ * Internal dependencies
+ */
+import { useHistory } from '../routes';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
@@ -28,6 +34,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 ];
 
 export default function NewTemplate( { postType } ) {
+	const history = useHistory();
 	const { templates, defaultTemplateTypes, theme } = useSelect(
 		( select ) => ( {
 			templates: select( coreStore ).getEntityRecords(
@@ -42,6 +49,28 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	async function createTemplate( { slug } ) {
+		try {
+			// Navigate to the created template editor.
+			history.push( {
+				postId: theme.stylesheet + '//' + slug.toString(),
+				postType: 'wp_template',
+			} );
+
+			// TODO: Add a success notice?
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while creating the template.' );
+
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	}
 
 	const existingTemplateSlugs = map( templates, 'slug' );
 
@@ -76,15 +105,12 @@ export default function NewTemplate( { postType } ) {
 							missingTemplates,
 							( { title, description, slug } ) => (
 								<MenuItem
-									href={ addQueryArgs( window.location.href, {
-										postId:
-											theme.stylesheet +
-											'//' +
-											slug.toString(),
-										postType: 'wp_template',
-									} ) }
 									info={ description }
 									key={ slug }
+									onClick={ () => {
+										createTemplate( { slug } );
+										// We will be navigated way so no need to close the dropdown.
+									} }
 								>
 									{ title }
 								</MenuItem>
