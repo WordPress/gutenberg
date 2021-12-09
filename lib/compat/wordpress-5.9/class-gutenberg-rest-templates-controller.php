@@ -209,7 +209,22 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
 			$template = get_block_file_template( $request['id'], $this->post_type );
 		} else {
-			$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+			if ( 'wp_template' === $this->post_type ) {
+				$parts = explode( '//', $request['id'], 2 );
+				if ( count( $parts ) < 2 ) {
+					return null;
+				}
+				list( $theme, $slug ) = $parts;
+				$template = resolve_block_template( $slug, array(), '' );
+				if ( ! $template ) {
+					$template = resolve_block_template( 'index', array(), '' );
+				}
+				// This might give us a fallback template with a different ID,
+				// so we have to override it to make sure it's correct.
+				$template->id = $request['id'];
+				$template->slug = $slug;
+				// TODO: Set title, description, ...?
+			}
 		}
 
 		if ( ! $template ) {
