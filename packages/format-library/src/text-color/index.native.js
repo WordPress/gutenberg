@@ -19,6 +19,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getActiveColors } from './inline.js';
+import { transparentValue } from './index.js';
 import { default as InlineColorUI } from './inline';
 import styles from './style.scss';
 
@@ -40,6 +41,8 @@ function getComputedStyleProperty( element, property ) {
 		} else if ( baseColors && baseColors?.color?.background ) {
 			return baseColors?.color?.background;
 		}
+
+		return 'transparent';
 	}
 }
 
@@ -50,10 +53,10 @@ function fillComputedColors( element, { color, backgroundColor } ) {
 
 	return {
 		color: color || getComputedStyleProperty( element, 'color' ),
-		backgroundColor:
-			backgroundColor.replace( / /g, '' ) === 'rgba(0,0,0,0)'
-				? getComputedStyleProperty( element, 'background-color' )
-				: 'transparent',
+		backgroundColor: getComputedStyleProperty(
+			element,
+			'background-color'
+		),
 	};
 }
 
@@ -179,7 +182,7 @@ export const textColor = {
 		if ( key !== 'style' ) return value;
 		// We should not add a background-color if it's already set
 		if ( value && value.includes( 'background-color' ) ) return value;
-		const addedCSS = [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' );
+		const addedCSS = [ 'background-color', transparentValue ].join( ':' );
 		// Prepend `addedCSS` to avoid a double `;;` as any the existing CSS
 		// rules will already include a `;`.
 		return value ? [ addedCSS, value ].join( ';' ) : addedCSS;
