@@ -97,11 +97,10 @@ export function useBlockPreview( {
 	);
 	const disabledRef = useDisabled();
 	const ref = useMergeRefs( [ props.ref, disabledRef ] );
-	const settings = useMemo( () => {
-		const _settings = { ...originalSettings };
-		_settings.__experimentalBlockPatterns = [];
-		return _settings;
-	}, [ originalSettings ] );
+	const settings = useMemo(
+		() => ( { ...originalSettings, __experimentalBlockPatterns: [] } ),
+		[ originalSettings ]
+	);
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 
 	const children = (
