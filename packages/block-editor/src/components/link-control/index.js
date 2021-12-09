@@ -23,6 +23,7 @@ import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
+import { MediaPlaceholder } from '../';
 
 /**
  * Default properties associated with a link control value.
@@ -356,6 +357,25 @@ function LinkControl( {
 					/>
 				</div>
 			) }
+
+			<MediaPlaceholder
+				onSelect={ ( el ) => {
+					if ( ! el?.url?.includes( 'blob:' ) ) {
+						onChange( {
+							type: 'attachment',
+							url: el?.url,
+							id: el?.id,
+							title: internalTextValue || el?.title,
+							image: el?.url,
+						} );
+					}
+				} }
+				multiple={ false }
+				labels={ {
+					title: 'Link to a file',
+				} }
+			/>
+
 			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);
