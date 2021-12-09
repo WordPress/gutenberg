@@ -109,7 +109,7 @@ require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.ph
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/compat/wordpress-5.9/theme.php';
-require __DIR__ . '/full-site-editing/full-site-editing.php';
+require __DIR__ . '/compat/wordpress-5.9/admin-menu.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
