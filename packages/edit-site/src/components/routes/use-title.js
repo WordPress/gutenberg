@@ -43,7 +43,14 @@ export default function useTitle( title ) {
 			document.title = formattedTitle;
 
 			// Announce title on route change for screen readers.
-			speak( document.title, 'assertive' );
+			speak(
+				sprintf(
+					/* translators: The page title that is currently displaying. */
+					__( 'Now displaying: %s' ),
+					document.title
+				),
+				'assertive'
+			);
 		}
 	}, [ title, siteTitle, location ] );
 }
