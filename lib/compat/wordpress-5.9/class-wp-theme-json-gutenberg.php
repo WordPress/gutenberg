@@ -714,6 +714,18 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			/*
+			 * Reset default browser margin on the root body element.
+			 * This is set on the root selector **before** generating the ruleset
+			 * from the `theme.json`. This is to ensure that if the `theme.json` declares
+			 * `margin` in its `spacing` declaration for the `body` element then these
+			 * user-generated values take precedence in the CSS cascade.
+			 * @link https://github.com/WordPress/gutenberg/issues/36147.
+			 */
+			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$block_rules .= 'body { margin: 0; }';
+			}
+
 			// 2. Generate the rules that use the general selector.
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
@@ -724,7 +736,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= 'body { margin: 0; }';
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
