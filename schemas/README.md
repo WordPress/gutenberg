@@ -14,13 +14,4 @@ For example, in your `block.json` file you would add:
 }
 ```
 
-## SchemaStore.org
-
-[SchemaStore.org](https://schemastore.org) is an open collection of schemas, including the WordPress `theme.json` and `block.json` schemas. Any changes to schemas in this package should be mirror there.
-
-To update on SchemaStore, create a PR at their repository [SchemaStore/schemastore](https://github.com/SchemaStore/schemastore/). The files can be found in their reposiory at:
-
--   block.json: `src/schemas/json/block.json`
--   theme.json: `src/schemas/json/theme-v1.json`
-
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
