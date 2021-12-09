@@ -5,6 +5,20 @@
  * @package WordPress
  */
 
+
+/**
+ * Applies the block attributes to the block markup without using a wrapper.
+ *
+ * @return string Returns the styles and classes defined on the block editor for the block.
+ */
+function add_next_comments_link_attributes() {
+	if ( ! function_exists( 'get_block_wrapper_attributes' ) ) {
+		return;
+	}
+	return get_block_wrapper_attributes();
+}
+add_filter( 'next_comments_link_attributes', 'add_next_comments_link_attributes' );
+
 /**
  * Renders the `core/comments-pagination-next` block on the server.
  *
@@ -26,19 +40,12 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 	}
 	$next_comments_link = get_next_comments_link( $label, $max_page );
 
-	$wrapper_attributes = get_block_wrapper_attributes();
-
 	if ( ! isset( $next_comments_link ) ) {
 		return '';
 	}
-
-	// TODO - Apply block wrapper attributes to the link instead of on the wrapper.
-	return sprintf(
-		'<div %1s>%2s</div>',
-		$wrapper_attributes,
-		$next_comments_link
-	);
+	return $next_comments_link;
 }
+
 
 /**
  * Registers the `core/comments-pagination-next` block on the server.
