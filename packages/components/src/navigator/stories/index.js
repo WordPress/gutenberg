@@ -18,15 +18,32 @@ export default {
 	component: NavigatorProvider,
 };
 
-function NavigatorButton( { path, isBack = false, ...props } ) {
-	const navigator = useNavigator();
+function NavigatorButton( { path, ...props } ) {
+	const { push } = useNavigator();
+	const dataAttrName = 'data-navigator-focusable-id';
+	const dataAttrValue = path;
 
-	const handleOnClick = () =>
-		isBack ? navigator.pop() : navigator.push( path );
+	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+
+	const buttonProps = {
+		...props,
+		[ dataAttrName ]: dataAttrValue,
+	};
 
 	return (
-		<Button variant="secondary" onClick={ handleOnClick } { ...props } />
+		<Button
+			variant="secondary"
+			onClick={ () =>
+				push( path, { focusRestorationSelector: dataAttrCssSelector } )
+			}
+			{ ...buttonProps }
+		/>
 	);
+}
+
+function NavigatorBackButton( { ...props } ) {
+	const { pop } = useNavigator();
+	return <Button variant="secondary" onClick={ pop } { ...props } />;
 }
 
 const MyNavigation = () => {
@@ -74,9 +91,7 @@ const MyNavigation = () => {
 				<Card>
 					<CardBody>
 						<p>This is the child screen.</p>
-						<NavigatorButton path="/" isBack>
-							Go back
-						</NavigatorButton>
+						<NavigatorBackButton>Go back</NavigatorBackButton>
 					</CardBody>
 				</Card>
 			</NavigatorScreen>
@@ -84,9 +99,7 @@ const MyNavigation = () => {
 			<NavigatorScreen path="/overflow-child">
 				<Card>
 					<CardBody>
-						<NavigatorButton path="/" isBack>
-							Go back
-						</NavigatorButton>
+						<NavigatorBackButton>Go back</NavigatorBackButton>
 						<div
 							className={ cx(
 								css( `
@@ -114,9 +127,7 @@ const MyNavigation = () => {
 			<NavigatorScreen path="/stickies">
 				<Card>
 					<Sticky as={ CardHeader } z="2">
-						<NavigatorButton path="/" isBack>
-							Go back
-						</NavigatorButton>
+						<NavigatorBackButton>Go back</NavigatorBackButton>
 					</Sticky>
 					<CardBody>
 						<Sticky top="69px" colors="papayawhip/peachpuff">
