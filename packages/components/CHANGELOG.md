@@ -15,6 +15,7 @@
 
 ### Bug Fix
 
+-   Fix alignment of `BorderStyleControl` legend with border width control's label ([#37244](https://github.com/WordPress/gutenberg/pull/37244)).
 -   Improve accessibility and visibility in `ColorPallete` ([#36925](https://github.com/WordPress/gutenberg/pull/36925))
 -   Fixed spacing between `BaseControl` fields and help text within the `ToolsPanel` ([#36334](https://github.com/WordPress/gutenberg/pull/36334))
 -   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
