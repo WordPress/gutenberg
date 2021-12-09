@@ -280,7 +280,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 						'core/group'     => array(
-							'typography'      => array(
+							'typography' => array(
 								'lineHeight' => false,
 							),
 						),
@@ -293,7 +293,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected = array(
 			'appearanceTools' => false,
 			'border'          => array(
-				'width'  => true,
+				'width' => true,
 			),
 			'blocks'          => array(
 				'core/paragraph' => array(
