@@ -13,6 +13,7 @@ import { moreVertical } from '@wordpress/icons';
  */
 import { store as editSiteStore } from '../../store';
 import isTemplateRevertable from '../../utils/is-template-revertable';
+import { useLocation } from '../routes';
 import { useLink } from '../routes/link';
 
 function TemplatePartItemMore( {
@@ -21,10 +22,16 @@ function TemplatePartItemMore( {
 	closeTemplateDetailsDropdown,
 } ) {
 	const { revertTemplate } = useDispatch( editSiteStore );
-	const editLinkProps = useLink( {
-		postId: templatePart.id,
-		postType: templatePart.type,
-	} );
+	const { params } = useLocation();
+	const editLinkProps = useLink(
+		{
+			postId: templatePart.id,
+			postType: templatePart.type,
+		},
+		{
+			fromTemplateId: params.postId,
+		}
+	);
 
 	function editTemplatePart( event ) {
 		editLinkProps.onClick( event );
