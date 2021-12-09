@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
 	Icon,
@@ -39,6 +40,15 @@ function NavigationToggle( { icon } ) {
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
 	const disableMotion = useReducedMotion();
+
+	const navigationToggleRef = useRef();
+
+	useEffect( () => {
+		// Focus the trigger button if close
+		if ( ! isNavigationOpen ) {
+			navigationToggleRef.current.focus();
+		}
+	}, [ isNavigationOpen ] );
 
 	const toggleNavigationPanel = () =>
 		setIsNavigationPanelOpened( ! isNavigationOpen );
@@ -79,6 +89,7 @@ function NavigationToggle( { icon } ) {
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
+				ref={ navigationToggleRef }
 				onClick={ toggleNavigationPanel }
 				showTooltip
 			>
