@@ -128,7 +128,6 @@ export default function SearchEdit( {
 	const getBlockClassNames = () => {
 		return classnames(
 			className,
-			! isButtonPositionInside ? borderProps.className : undefined,
 			isButtonPositionInside
 				? 'wp-block-search__button-inside'
 				: undefined,
