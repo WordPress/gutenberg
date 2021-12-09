@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, find, includes, map } from 'lodash';
+import { filter, includes, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,41 +48,15 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
-	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { getLastEntitySaveError } = useSelect( coreStore );
 
 	async function createTemplate( { slug } ) {
 		try {
-			const { title, description } = find( defaultTemplateTypes, {
-				slug,
-			} );
-
-			const template = await saveEntityRecord(
-				'postType',
-				'wp_template',
-				{
-					excerpt: description,
-					// Slugs need to be strings, so this is for template `404`
-					slug: slug.toString(),
-					status: 'publish',
-					title,
-				}
-			);
-
-			const lastEntitySaveError = getLastEntitySaveError(
-				'postType',
-				'wp_template',
-				template.id
-			);
-			if ( lastEntitySaveError ) {
-				throw lastEntitySaveError;
-			}
-
 			// Navigate to the created template editor.
 			history.push( {
-				postId: template.id,
-				postType: template.type,
+				// TODO: Compute theme name.
+				postId: 'twentytwentytwo//' + slug.toString(),
+				postType: 'wp_template',
 			} );
 
 			// TODO: Add a success notice?
