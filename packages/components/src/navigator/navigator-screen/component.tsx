@@ -10,8 +10,15 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
-import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+	useRef,
+} from '@wordpress/element';
+import { useReducedMotion } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -48,7 +55,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const prefersReducedMotion = useReducedMotion();
 	const { location } = useContext( NavigatorContext );
 	const isMatch = location.path === path;
-	const ref = useFocusOnMount();
+	const wrapperRef = useRef< HTMLDivElement >( null );
 
 	const cx = useCx();
 	const classes = useMemo(
@@ -65,12 +72,40 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 		[ className ]
 	);
 
-	// This flag is used to only apply the focus on mount when the actual path changes.
-	// It avoids the focus to happen on the first render.
-	const [ hasPathChanged, setHasPathChanged ] = useState( false );
+	// Focus restoration
+	const [ isFirstRender, setIsFirstRender ] = useState( true );
 	useEffect( () => {
-		setHasPathChanged( true );
-	}, [ path ] );
+		// Only attempt to restore focus:
+		// - after the first render (to avoid moving focus on page load)
+		// - when the screen becomes visible
+		// - the wrapper ref has been assigned
+		if ( isFirstRender || ! isMatch || ! wrapperRef.current ) {
+			setIsFirstRender( false );
+			return;
+		}
+
+		let elementToFocus: HTMLElement | null = null;
+
+		// When navigating back, if a selector is provided, use it to look for the
+		// target element (assumed to be a node inside the current NavigatorScreen)
+		if ( location.isBack && location.focusRestorationSelector ) {
+			elementToFocus = wrapperRef.current.querySelector(
+				location.focusRestorationSelector
+			);
+		}
+
+		// If the previous query didn't run or find any element to focus, fallback
+		// to the first tabbable element in the screen (or the screen itself).
+		if ( ! elementToFocus ) {
+			const firstTabbable = ( focus.tabbable.find(
+				wrapperRef.current
+			) as HTMLElement[] )[ 0 ];
+
+			elementToFocus = firstTabbable ?? wrapperRef.current;
+		}
+
+		elementToFocus.focus();
+	}, [ isFirstRender, isMatch ] );
 
 	if ( ! isMatch ) {
 		return null;
@@ -121,7 +156,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 	return (
 		<motion.div
-			ref={ hasPathChanged ? ref : undefined }
+			ref={ wrapperRef }
 			className={ classes }
 			{ ...otherProps }
 			{ ...animatedProps }

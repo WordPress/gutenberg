@@ -57,7 +57,6 @@ function NavigatorProvider(
 			// incoming location
 			setLocationHistory( [
 				...locationHistory.slice( 0, -1 ),
-				// Force the `isBack` flag to `true` when navigating back.
 				{
 					...locationHistory[ locationHistory.length - 1 ],
 					focusRestorationSelector,
