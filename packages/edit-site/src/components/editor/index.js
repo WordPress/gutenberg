@@ -15,7 +15,6 @@ import {
 	EditorNotices,
 	EditorSnackbars,
 	EntitiesSavedStates,
-	UnsavedChangesWarning,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
@@ -183,7 +182,6 @@ function Editor( { onError } ) {
 								<BlockContextProvider value={ blockContext }>
 									<GlobalStylesRenderer />
 									<ErrorBoundary onError={ onError }>
-										<UnsavedChangesWarning />
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton

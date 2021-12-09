@@ -8,7 +8,6 @@ import {
 } from '@wordpress/block-library';
 import { dispatch, select } from '@wordpress/data';
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { SlotFillProvider } from '@wordpress/components';
 import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
@@ -23,14 +22,8 @@ import { getQueryArgs } from '@wordpress/url';
 import './plugins';
 import './hooks';
 import { store as editSiteStore } from './store';
-import { Routes } from './components/routes';
-import Editor from './components/editor';
-import List from './components/list';
-import NavigationSidebar from './components/navigation-sidebar';
-
-function getIsListPage( { postId, postType } ) {
-	return !! ( ! postId && postType );
-}
+import EditSiteApp from './components/app';
+import getIsListPage from './utils/get-is-list-page';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -71,35 +64,7 @@ export function reinitializeEditor( target, settings ) {
 		}
 	}
 
-	render(
-		<SlotFillProvider>
-			<Routes>
-				{ ( { params } ) => {
-					const isListPage = getIsListPage( params );
-
-					return (
-						<>
-							{ isListPage ? (
-								<List />
-							) : (
-								<Editor onError={ reboot } />
-							) }
-							{ /* Keep the instance of the sidebar to ensure focus will not be lost
-							 * when navigating to other pages. */ }
-							<NavigationSidebar
-								// Open the navigation sidebar by default when in the list page.
-								isDefaultOpen={ !! isListPage }
-								activeTemplateType={
-									isListPage ? params.postType : undefined
-								}
-							/>
-						</>
-					);
-				} }
-			</Routes>
-		</SlotFillProvider>,
-		target
-	);
+	render( <EditSiteApp reboot={ reboot } />, target );
 }
 
 /**
