@@ -17,7 +17,7 @@ export default {
 	title: 'Components/SelectControl',
 	component: SelectControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
@@ -60,6 +60,7 @@ export const _default = () => {
 			{
 				default: 'default',
 				small: 'small',
+				'__unstable-large': '__unstable-large',
 			},
 			'default'
 		),

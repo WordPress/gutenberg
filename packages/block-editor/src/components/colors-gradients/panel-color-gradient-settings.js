@@ -9,7 +9,6 @@ import { every, isEmpty } from 'lodash';
  */
 import { PanelBody, ColorIndicator } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,6 +17,8 @@ import ColorGradientControl from './control';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
+import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
+import useMultipleOriginColorsAndGradients from './use-multiple-origin-colors-and-gradients';
 
 // translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(%s: color %s)' );
@@ -92,6 +93,8 @@ export const PanelColorGradientSettingsInner = ( {
 	title,
 	showTitle = true,
 	__experimentalHasMultipleOrigins,
+	__experimentalIsRenderedInSidebar,
+	enableAlpha,
 	...props
 } ) => {
 	if (
@@ -143,6 +146,8 @@ export const PanelColorGradientSettingsInner = ( {
 						disableCustomColors,
 						disableCustomGradients,
 						__experimentalHasMultipleOrigins,
+						__experimentalIsRenderedInSidebar,
+						enableAlpha,
 						...setting,
 					} }
 				/>
@@ -151,13 +156,6 @@ export const PanelColorGradientSettingsInner = ( {
 		</PanelBody>
 	);
 };
-
-function useCommonSingleMultipleSelects() {
-	return {
-		disableCustomColors: ! useSetting( 'color.custom' ),
-		disableCustomGradients: ! useSetting( 'color.customGradient' ),
-	};
-}
 
 const PanelColorGradientSettingsSingleSelect = ( props ) => {
 	const colorGradientSettings = useCommonSingleMultipleSelects();
@@ -171,58 +169,7 @@ const PanelColorGradientSettingsSingleSelect = ( props ) => {
 };
 
 const PanelColorGradientSettingsMultipleSelect = ( props ) => {
-	const colorGradientSettings = useCommonSingleMultipleSelects();
-	const userColors = useSetting( 'color.palette.user' );
-	const themeColors = useSetting( 'color.palette.theme' );
-	const coreColors = useSetting( 'color.palette.core' );
-	colorGradientSettings.colors = useMemo( () => {
-		const result = [];
-		if ( coreColors && coreColors.length ) {
-			result.push( {
-				name: __( 'Core' ),
-				colors: coreColors,
-			} );
-		}
-		if ( themeColors && themeColors.length ) {
-			result.push( {
-				name: __( 'Theme' ),
-				colors: themeColors,
-			} );
-		}
-		if ( userColors && userColors.length ) {
-			result.push( {
-				name: __( 'User' ),
-				colors: userColors,
-			} );
-		}
-		return result;
-	}, [ coreColors, themeColors, userColors ] );
-
-	const userGradients = useSetting( 'color.gradients.user' );
-	const themeGradients = useSetting( 'color.gradients.theme' );
-	const coreGradients = useSetting( 'color.gradients.core' );
-	colorGradientSettings.gradients = useMemo( () => {
-		const result = [];
-		if ( coreGradients && coreGradients.length ) {
-			result.push( {
-				name: __( 'Core' ),
-				gradients: coreGradients,
-			} );
-		}
-		if ( themeGradients && themeGradients.length ) {
-			result.push( {
-				name: __( 'Theme' ),
-				gradients: themeGradients,
-			} );
-		}
-		if ( userGradients && userGradients.length ) {
-			result.push( {
-				name: __( 'User' ),
-				gradients: userGradients,
-			} );
-		}
-		return result;
-	}, [ userGradients, themeGradients, coreGradients ] );
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }

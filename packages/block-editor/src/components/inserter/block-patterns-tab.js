@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { fromPairs } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -16,17 +11,87 @@ import { useAsyncList } from '@wordpress/compose';
 import PatternInserterPanel from './pattern-panel';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
+import PatternsExplorerModal from './block-patterns-explorer/explorer';
 
 function BlockPatternsCategory( {
 	rootClientId,
 	onInsert,
 	selectedCategory,
-	onClickCategory,
+	populatedCategories,
 } ) {
-	const [ allPatterns, allCategories, onClick ] = usePatternsState(
+	const [ allPatterns, , onClick ] = usePatternsState(
 		onInsert,
 		rootClientId
 	);
+
+	const getPatternIndex = useCallback(
+		( pattern ) => {
+			if ( ! pattern.categories?.length ) {
+				return Infinity;
+			}
+			const indexedCategories = populatedCategories.reduce(
+				( accumulator, { name }, index ) => {
+					accumulator[ name ] = index;
+					return accumulator;
+				},
+				{}
+			);
+			return Math.min(
+				...pattern.categories.map( ( cat ) =>
+					indexedCategories[ cat ] !== undefined
+						? indexedCategories[ cat ]
+						: Infinity
+				)
+			);
+		},
+		[ populatedCategories ]
+	);
+
+	const currentCategoryPatterns = useMemo(
+		() =>
+			allPatterns.filter( ( pattern ) =>
+				selectedCategory.name === 'uncategorized'
+					? getPatternIndex( pattern ) === Infinity
+					: pattern.categories?.includes( selectedCategory.name )
+			),
+		[ allPatterns, selectedCategory ]
+	);
+
+	// Ordering the patterns is important for the async rendering.
+	const orderedPatterns = useMemo( () => {
+		return currentCategoryPatterns.sort( ( a, b ) => {
+			return getPatternIndex( a ) - getPatternIndex( b );
+		} );
+	}, [ currentCategoryPatterns, getPatternIndex ] );
+
+	const currentShownPatterns = useAsyncList( orderedPatterns );
+
+	if ( ! currentCategoryPatterns.length ) {
+		return null;
+	}
+
+	return (
+		<div className="block-editor-inserter__panel-content">
+			<BlockPatternList
+				shownPatterns={ currentShownPatterns }
+				blockPatterns={ currentCategoryPatterns }
+				onClickPattern={ onClick }
+				label={ selectedCategory.label }
+				orientation="vertical"
+				isDraggable
+			/>
+		</div>
+	);
+}
+
+function BlockPatternsTabs( {
+	rootClientId,
+	onInsert,
+	onClickCategory,
+	selectedCategory,
+} ) {
+	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
+	const [ allPatterns, allCategories ] = usePatternsState();
 
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -77,83 +142,34 @@ function BlockPatternsCategory( {
 		? selectedCategory
 		: populatedCategories[ 0 ];
 
-	const getPatternIndex = useCallback(
-		( pattern ) => {
-			if ( ! pattern.categories || ! pattern.categories.length ) {
-				return Infinity;
-			}
-			const indexedCategories = fromPairs(
-				populatedCategories.map( ( { name }, index ) => [
-					name,
-					index,
-				] )
-			);
-			return Math.min(
-				...pattern.categories.map( ( cat ) =>
-					indexedCategories[ cat ] !== undefined
-						? indexedCategories[ cat ]
-						: Infinity
-				)
-			);
-		},
-		[ populatedCategories ]
-	);
-
-	const currentCategoryPatterns = useMemo(
-		() =>
-			allPatterns.filter( ( pattern ) =>
-				patternCategory.name === 'uncategorized'
-					? getPatternIndex( pattern ) === Infinity
-					: pattern.categories &&
-					  pattern.categories.includes( patternCategory.name )
-			),
-		[ allPatterns, patternCategory ]
-	);
-
-	// Ordering the patterns is important for the async rendering.
-	const orderedPatterns = useMemo( () => {
-		return currentCategoryPatterns.sort( ( a, b ) => {
-			return getPatternIndex( a ) - getPatternIndex( b );
-		} );
-	}, [ currentCategoryPatterns, getPatternIndex ] );
-
-	const currentShownPatterns = useAsyncList( orderedPatterns );
-
 	return (
 		<>
-			{ !! currentCategoryPatterns.length && (
-				<PatternInserterPanel
-					selectedCategory={ patternCategory }
-					patternCategories={ populatedCategories }
-					onClickCategory={ onClickCategory }
-				>
-					<BlockPatternList
-						shownPatterns={ currentShownPatterns }
-						blockPatterns={ currentCategoryPatterns }
-						onClickPattern={ onClick }
-						label={ patternCategory.label }
-						orientation="vertical"
-						isDraggable
+			{ ! showPatternsExplorer && (
+				<>
+					<PatternInserterPanel
+						selectedCategory={ patternCategory }
+						patternCategories={ populatedCategories }
+						onClickCategory={ onClickCategory }
+						openPatternExplorer={ () =>
+							setShowPatternsExplorer( true )
+						}
 					/>
-				</PatternInserterPanel>
+					<BlockPatternsCategory
+						rootClientId={ rootClientId }
+						onInsert={ onInsert }
+						selectedCategory={ patternCategory }
+						populatedCategories={ populatedCategories }
+					/>
+				</>
+			) }
+			{ showPatternsExplorer && (
+				<PatternsExplorerModal
+					initialCategory={ patternCategory }
+					patternCategories={ populatedCategories }
+					onModalClose={ () => setShowPatternsExplorer( false ) }
+				/>
 			) }
 		</>
-	);
-}
-
-function BlockPatternsTabs( {
-	rootClientId,
-	onInsert,
-	onClickCategory,
-	selectedCategory,
-} ) {
-	return (
-		<BlockPatternsCategory
-			rootClientId={ rootClientId }
-			selectedCategory={ selectedCategory }
-			onInsert={ onInsert }
-			onClickCategory={ onClickCategory }
-		/>
 	);
 }
 

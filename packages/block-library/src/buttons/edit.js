@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
@@ -39,10 +38,6 @@ function ButtonsEdit( { attributes: { layout = {} } } ) {
 
 	return (
 		<>
-			<BlockControls
-				group="block"
-				__experimentalShareWithChildBlocks
-			></BlockControls>
 			<div { ...innerBlocksProps } />
 		</>
 	);

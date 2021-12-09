@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.7.0 (2021-11-07)
+
 ### New Features
 
 -   Add $schema definition to generated `block.json` file.

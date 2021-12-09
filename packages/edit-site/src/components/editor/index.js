@@ -26,20 +26,24 @@ import {
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import {
+	ShortcutProvider,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import ErrorBoundary from '../error-boundary';
+import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from './global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
@@ -61,6 +65,8 @@ function Editor( { initialSettings, onError } ) {
 		template,
 		templateResolved,
 		isNavigationOpen,
+		previousShortcut,
+		nextShortcut,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -97,12 +103,19 @@ function Editor( { initialSettings, onError } ) {
 				: false,
 			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/previous-region' ),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
 		};
 	}, [] );
 	const { updateEditorSettings } = useDispatch( editorStore );
 	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
 		editSiteStore
 	);
+
 	useEffect( () => {
 		updateSettings( initialSettings );
 	}, [] );
@@ -200,13 +213,13 @@ function Editor( { initialSettings, onError } ) {
 											<SidebarComplementaryAreaFills />
 											<InterfaceSkeleton
 												labels={ interfaceLabels }
-												drawer={ <NavigationSidebar /> }
 												secondarySidebar={ secondarySidebar() }
 												sidebar={
 													sidebarIsOpened && (
 														<ComplementaryArea.Slot scope="core/edit-site" />
 													)
 												}
+												drawer={ <NavigationSidebar /> }
 												header={
 													<Header
 														openEntitiesSavedStates={
@@ -276,7 +289,12 @@ function Editor( { initialSettings, onError } ) {
 													</>
 												}
 												footer={ <BlockBreadcrumb /> }
+												shortcuts={ {
+													previous: previousShortcut,
+													next: nextShortcut,
+												} }
 											/>
+											<WelcomeGuide />
 											<Popover.Slot />
 											<PluginArea />
 										</ErrorBoundary>

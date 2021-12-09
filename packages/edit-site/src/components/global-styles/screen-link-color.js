@@ -70,6 +70,8 @@ function ScreenLinkColor( { name } ) {
 				disableCustomColors={ ! areCustomSolidsEnabled }
 				__experimentalHasMultipleOrigins
 				showTitle={ false }
+				enableAlpha
+				__experimentalIsRenderedInSidebar
 			/>
 		</>
 	);

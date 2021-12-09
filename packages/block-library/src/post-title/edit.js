@@ -62,7 +62,7 @@ export default function PostTitleEdit( {
 				/>
 			) : (
 				<TagName { ...blockProps }>
-					<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
+					<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
 				</TagName>
 			);
 	}
@@ -92,7 +92,7 @@ export default function PostTitleEdit( {
 						rel={ rel }
 						onClick={ ( event ) => event.preventDefault() }
 					>
-						<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
+						<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
 					</a>
 				</TagName>
 			);

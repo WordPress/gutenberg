@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { serialize, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	Placeholder,
 	Button,
@@ -9,11 +9,10 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
 import { useCallback, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { navigation, chevronDown, Icon } from '@wordpress/icons';
+import { navigation, Icon } from '@wordpress/icons';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -22,8 +21,8 @@ import { navigation, chevronDown, Icon } from '@wordpress/icons';
 import useNavigationEntities from '../../use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import menuItemsToBlocks from '../../menu-items-to-blocks';
-import NavigationMenuNameModal from '../navigation-menu-name-modal';
 import useNavigationMenu from '../../use-navigation-menu';
+import useCreateNavigationMenu from '../use-create-navigation-menu';
 
 const ExistingMenusDropdown = ( {
 	canSwitchNavigationMenu,
@@ -34,21 +33,22 @@ const ExistingMenusDropdown = ( {
 	onCreateFromMenu,
 } ) => {
 	const toggleProps = {
-		variant: 'primary',
+		variant: 'tertiary',
+		iconPosition: 'right',
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 	return (
 		<DropdownMenu
-			text={ __( 'Select existing menu' ) }
-			icon={ chevronDown }
+			text={ __( 'Select menu' ) }
+			icon={ null }
 			toggleProps={ toggleProps }
 			popoverProps={ { isAlternate: true } }
 		>
 			{ ( { onClose } ) => (
 				<>
-					<MenuGroup label="Menus">
+					<MenuGroup label={ __( 'Menus' ) }>
 						{ canSwitchNavigationMenu &&
-							navigationMenus.map( ( menu ) => {
+							navigationMenus?.map( ( menu ) => {
 								return (
 									<MenuItem
 										onClick={ () => {
@@ -58,13 +58,15 @@ const ExistingMenusDropdown = ( {
 										onClose={ onClose }
 										key={ menu.id }
 									>
-										{ menu.title.rendered }
+										{ decodeEntities(
+											menu.title.rendered
+										) }
 									</MenuItem>
 								);
 							} ) }
 					</MenuGroup>
-					<MenuGroup label="Classic Menus">
-						{ menus.map( ( menu ) => {
+					<MenuGroup label={ __( 'Classic Menus' ) }>
+						{ menus?.map( ( menu ) => {
 							return (
 								<MenuItem
 									onClick={ () => {
@@ -74,7 +76,7 @@ const ExistingMenusDropdown = ( {
 									onClose={ onClose }
 									key={ menu.id }
 								>
-									{ menu.name }
+									{ decodeEntities( menu.name ) }
 								</MenuItem>
 							);
 						} ) }
@@ -86,51 +88,25 @@ const ExistingMenusDropdown = ( {
 };
 
 export default function NavigationPlaceholder( {
+	clientId,
 	onFinish,
 	canSwitchNavigationMenu,
 	hasResolvedNavigationMenus,
 } ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
-
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
-
 	const [ menuName, setMenuName ] = useState( '' );
+	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
-	const [ isNewMenuModalVisible, setIsNewMenuModalVisible ] = useState(
-		false
-	);
-
-	const [ createEmpty, setCreateEmpty ] = useState( false );
-
-	const { saveEntityRecord } = useDispatch( coreStore );
-
-	// This callback uses data from the two placeholder steps and only creates
-	// a new navigation menu when the user completes the final step.
-	const createNavigationMenu = useCallback(
-		async ( title = __( 'Untitled Navigation Menu' ), blocks = [] ) => {
-			const record = {
-				title,
-				content: serialize( blocks ),
-				status: 'publish',
-			};
-
-			const navigationMenu = await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				record
-			);
-
-			return navigationMenu;
-		},
-		[ serialize, saveEntityRecord ]
-	);
-
-	const onFinishMenuCreation = async ( navigationMenuTitle, blocks ) => {
+	const onFinishMenuCreation = async (
+		blocks,
+		navigationMenuTitle = null
+	) => {
 		const navigationMenu = await createNavigationMenu(
 			navigationMenuTitle,
 			blocks
 		);
-		onFinish( navigationMenu );
+		onFinish( navigationMenu, blocks );
 	};
 
 	const {
@@ -148,7 +124,7 @@ export default function NavigationPlaceholder( {
 	const createFromMenu = useCallback(
 		( name ) => {
 			const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
-			onFinishMenuCreation( name, blocks );
+			onFinishMenuCreation( blocks, name );
 		},
 		[ menuItems, menuItemsToBlocks, onFinish ]
 	);
@@ -166,14 +142,13 @@ export default function NavigationPlaceholder( {
 		setMenuName( name );
 	};
 
-	const onCreateEmptyMenu = ( name ) => {
-		onFinishMenuCreation( name, [] );
+	const onCreateEmptyMenu = () => {
+		onFinishMenuCreation( [] );
 	};
 
-	const onCreateAllPages = ( name ) => {
+	const onCreateAllPages = () => {
 		const block = [ createBlock( 'core/page-list' ) ];
-		onFinishMenuCreation( name, block );
-		setIsNewMenuModalVisible( true );
+		onFinishMenuCreation( block );
 	};
 
 	useEffect( () => {
@@ -201,56 +176,42 @@ export default function NavigationPlaceholder( {
 								<Icon icon={ navigation } />{ ' ' }
 								{ __( 'Navigation' ) }
 							</div>
+							<hr />
 							{ hasMenus || navigationMenus.length ? (
-								<ExistingMenusDropdown
-									canSwitchNavigationMenu={
-										canSwitchNavigationMenu
-									}
-									navigationMenus={ navigationMenus }
-									setSelectedMenu={ setSelectedMenu }
-									onFinish={ onFinish }
-									menus={ menus }
-									onCreateFromMenu={ onCreateFromMenu }
-								/>
+								<>
+									<ExistingMenusDropdown
+										canSwitchNavigationMenu={
+											canSwitchNavigationMenu
+										}
+										navigationMenus={ navigationMenus }
+										setSelectedMenu={ setSelectedMenu }
+										onFinish={ onFinish }
+										menus={ menus }
+										onCreateFromMenu={ onCreateFromMenu }
+									/>
+									<hr />
+								</>
 							) : undefined }
 							{ hasPages ? (
-								<Button
-									variant={
-										hasMenus || canSwitchNavigationMenu
-											? 'tertiary'
-											: 'primary'
-									}
-									onClick={ () => {
-										setIsNewMenuModalVisible( true );
-										setCreateEmpty( false );
-									} }
-								>
-									{ __( 'Add all pages' ) }
-								</Button>
+								<>
+									<Button
+										variant="tertiary"
+										onClick={ onCreateAllPages }
+									>
+										{ __( 'Add all pages' ) }
+									</Button>
+									<hr />
+								</>
 							) : undefined }
 							<Button
 								variant="tertiary"
-								onClick={ () => {
-									setIsNewMenuModalVisible( true );
-									setCreateEmpty( true );
-								} }
+								onClick={ onCreateEmptyMenu }
 							>
 								{ __( 'Start empty' ) }
 							</Button>
 						</div>
 					</div>
 				</Placeholder>
-			) }
-			{ isNewMenuModalVisible && (
-				<NavigationMenuNameModal
-					title={ __( 'Create your new navigation menu' ) }
-					onRequestClose={ () => {
-						setIsNewMenuModalVisible( false );
-					} }
-					onFinish={
-						createEmpty ? onCreateEmptyMenu : onCreateAllPages
-					}
-				/>
 			) }
 		</>
 	);

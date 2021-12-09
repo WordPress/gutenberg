@@ -13,7 +13,7 @@ import type { WordPressComponentProps } from '../../ui/context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { COLORS, rtl } from '../../utils';
-import type { LabelPosition } from '../types';
+import type { LabelPosition, Size } from '../types';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -105,8 +105,6 @@ export const Container = styled.div< ContainerProps >`
 	${ containerWidthStyles }
 `;
 
-type Size = 'default' | 'small';
-
 type InputProps = {
 	disabled?: boolean;
 	inputSize?: Size;
@@ -126,6 +124,7 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ size as Size ] || sizes.default;
@@ -148,11 +147,22 @@ const sizeStyles = ( { inputSize: size }: InputProps ) => {
 			height: 30,
 			lineHeight: 1,
 			minHeight: 30,
+			paddingLeft: 8,
+			paddingRight: 8,
 		},
 		small: {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
+			paddingLeft: 8,
+			paddingRight: 8,
+		},
+		'__unstable-large': {
+			height: 40,
+			lineHeight: 1,
+			minHeight: 40,
+			paddingLeft: 16,
+			paddingRight: 16,
 		},
 	};
 
@@ -205,8 +215,6 @@ export const Input = styled.input< InputProps >`
 		display: block;
 		margin: 0;
 		outline: none;
-		padding-left: 8px;
-		padding-right: 8px;
 		width: 100%;
 
 		${ dragStyles }
@@ -315,6 +323,8 @@ export const Prefix = styled.span`
 `;
 
 export const Suffix = styled.span`
+	align-items: center;
+	align-self: stretch;
 	box-sizing: border-box;
-	display: block;
+	display: flex;
 `;

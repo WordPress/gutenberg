@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.1.0 (2021-11-07)
+
 ### New Features
 
 -   Added new block icons: `commentAuthorAvatar`, `commentAuthorName`, `commentContent` and `commentReplyLink` ([#36171](https://github.com/WordPress/gutenberg/pull/36171)).

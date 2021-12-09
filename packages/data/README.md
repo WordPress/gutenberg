@@ -16,7 +16,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Registering a Store
 
-Use the `register` function to add your own store to the centralized data registry. This function accepts one argument – a store definition object that can be created with `createReduxStore` factory function. `createReduxStore` accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
+Use the `register` function to add your own store to the centralized data registry. This function accepts one argument – a store descriptor that can be created with `createReduxStore` factory function. `createReduxStore` accepts two arguments: a name to identify the module, and a configuration object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
 import apiFetch from '@wordpress/api-fetch';
@@ -102,7 +102,7 @@ const store = createReduxStore( 'my-shop', {
 register( store );
 ```
 
-The return value of `createReduxStore` is the `WPDataStore` object that contains two properties:
+The return value of `createReduxStore` is the `StoreDescriptor` object that contains two properties:
 
 -   `name` (`string`) – the name of the store
 -   `instantiate` (`Function`) - it returns a [Redux-like store object](https://redux.js.org/basics/store) with the following methods:
@@ -164,43 +164,33 @@ Integrating an existing redux store with its own reducers, store enhancers and m
 _Example:_
 
 ```js
+import { mapValues } from 'lodash';
+import { register } from '@wordpress/data';
 import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
-import { registerGenericStore } from 'wordpress/data';
-
 const reduxStore = createStore();
 
-const mappedSelectors = Object.keys( existingSelectors ).reduce(
-	( acc, selectorKey ) => {
-		acc[ selectorKey ] = ( ...args ) =>
-			existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
-		return acc;
-	},
-	{}
+const boundSelectors = mapValues(
+	existingSelectors,
+	( selector ) => ( ...args ) => selector( reduxStore.getState(), ...args )
 );
 
-const mappedActions = Object.keys( existingActions ).reduce(
-	( acc, actionKey ) => {
-		acc[ actionKey ] = ( ...args ) =>
-			reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
-		return acc;
-	},
-	{}
+const boundActions = mapValues( existingActions, ( action ) => ( ...args ) =>
+	reduxStore.dispatch( action( ...args ) )
 );
 
 const genericStore = {
-	getSelectors() {
-		return mappedSelectors;
-	},
-	getActions() {
-		return mappedActions;
-	},
-	subscribe: reduxStore.subscribe,
+	name: 'existing-app',
+	instantiate: () => ( {
+		getSelectors: () => boundSelectors,
+		getActions: () => boundActions,
+		subscribe: reduxStore.subscribe,
+	} ),
 };
 
-registerGenericStore( 'existing-app', genericStore );
+register( genericStore );
 ```
 
 It is also possible to implement a completely custom store from scratch:
@@ -208,39 +198,49 @@ It is also possible to implement a completely custom store from scratch:
 _Example:_
 
 ```js
-import { registerGenericStore } from '@wordpress/data';
+import { register } from '@wordpress/data';
 
-function createCustomStore() {
-	let storeChanged = () => {};
-	const prices = { hammer: 7.5 };
-
-	const selectors = {
-		getPrice( itemName ) {
-			return prices[ itemName ];
-		},
-	};
-
-	const actions = {
-		setPrice( itemName, price ) {
-			prices[ itemName ] = price;
-			storeChanged();
-		},
-	};
-
+function customStore() {
 	return {
-		getSelectors() {
-			return selectors;
-		},
-		getActions() {
-			return actions;
-		},
-		subscribe( listener ) {
-			storeChanged = listener;
+		name: 'custom-data',
+		instantiate: () => {
+			const listeners = new Set();
+			const prices = { hammer: 7.5 };
+
+			function storeChanged() {
+				for ( const listener of listeners ) {
+					listener();
+				}
+			}
+
+			function subscribe( listener ) {
+				listeners.add( listener );
+				return () => listeners.delete( listener );
+			}
+
+			const selectors = {
+				getPrice( itemName ) {
+					return prices[ itemName ];
+				},
+			};
+
+			const actions = {
+				setPrice( itemName, price ) {
+					prices[ itemName ] = price;
+					storeChanged();
+				},
+			};
+
+			return {
+				getSelectors: () => selectors,
+				getActions: () => actions,
+				subscribe,
+			};
 		},
 	};
 }
 
-registerGenericStore( 'custom-data', createCustomStore() );
+register( customStore );
 ```
 
 ## Comparison with Redux
@@ -350,7 +350,7 @@ Undocumented declaration.
 
 ### createReduxStore
 
-Creates a data store definition for the provided Redux store options containing
+Creates a data store descriptor for the provided Redux store configuration containing
 properties describing reducer, actions, selectors, controls and resolvers.
 
 _Usage_
@@ -369,11 +369,11 @@ const store = createReduxStore( 'demo', {
 _Parameters_
 
 -   _key_ `string`: Unique namespace identifier.
--   _options_ `WPDataReduxStoreConfig`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+-   _options_ `ReduxStoreConfig`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
 
 _Returns_
 
--   `WPDataStore`: Store Object.
+-   `StoreDescriptor`: Store Object.
 
 ### createRegistry
 
@@ -486,7 +486,7 @@ dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
 
 _Returns_
 
@@ -506,7 +506,7 @@ _Type_
 
 ### register
 
-Registers a standard `@wordpress/data` store definition.
+Registers a standard `@wordpress/data` store descriptor.
 
 _Usage_
 
@@ -524,18 +524,18 @@ register( store );
 
 _Parameters_
 
--   _store_ `WPDataStore`: Store definition.
+-   _store_ `StoreDescriptor`: Store descriptor.
 
 ### registerGenericStore
 
-> **Deprecated** Use `register` instead.
+> **Deprecated** Use `register( storeDescriptor )` instead.
 
-Registers a generic store.
+Registers a generic store instance.
 
 _Parameters_
 
--   _key_ `string`: Store registry key.
--   _config_ `Object`: Configuration (getSelectors, getActions, subscribe).
+-   _name_ `string`: Store registry name.
+-   _store_ `Object`: Store instance (`{ getSelectors, getActions, subscribe }`).
 
 ### registerStore
 
@@ -610,7 +610,7 @@ resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then( console.log );
 
 _Parameters_
 
--   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
 
 _Returns_
 
@@ -618,7 +618,7 @@ _Returns_
 
 ### select
 
-Given the name or definition of a registered store, returns an object of the store's selectors.
+Given the name or descriptor of a registered store, returns an object of the store's selectors.
 The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
@@ -632,7 +632,7 @@ select( 'my-shop' ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
 
 _Returns_
 
@@ -717,7 +717,7 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDefinition_ `[string|WPDataStore]`: Optionally provide the name of the store or its definition from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDescriptor_ `[string|StoreDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
@@ -820,7 +820,7 @@ function Paste( { children } ) {
 
 _Parameters_
 
--   _\_mapSelect_ `Function|WPDataStore|string`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
+-   _mapSelect_ `Function|StoreDescriptor|string`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
 -   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_

@@ -22,12 +22,13 @@ const CUSTOM_FONT_SIZE_OPTION = {
  * @return {[number, string]} An array with the numeric value and the unit if exists.
  */
 export function splitValueAndUnitFromSize( size ) {
-	/**
-	 * The first matched result is ignored as it's the left
-	 * hand side of the capturing group in the regex.
-	 */
-	const [ , numericValue, unit ] = size.split( /(\d+)/ );
-	return [ numericValue, unit ];
+	const [ numericValue, unit ] = `${ size }`.match( /[\d\.]+|\D+/g );
+
+	if ( ! isNaN( parseFloat( numericValue ) ) && isFinite( numericValue ) ) {
+		return [ numericValue, unit ];
+	}
+
+	return [];
 }
 
 /**
@@ -38,7 +39,7 @@ export function splitValueAndUnitFromSize( size ) {
  * @return {boolean} Whether the value is a simple css value.
  */
 export function isSimpleCssValue( value ) {
-	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
+	const sizeRegex = /^[\d\.]+(px|em|rem|vw|vh|%)?$/i;
 	return sizeRegex.test( value );
 }
 
@@ -75,7 +76,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		name,
 		size,
 		__experimentalHint:
-			size && isSimpleCssValue( size ) && parseInt( size ),
+			size && isSimpleCssValue( size ) && parseFloat( size ),
 	} ) );
 }
 

@@ -7,19 +7,19 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
-import { serialize } from '@wordpress/blocks';
 import { Disabled, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
+import useCreateNavigationMenu from './use-create-navigation-menu';
 
 const NOOP = () => {};
+const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
 	'postType',
 	'wp_navigation',
@@ -29,10 +29,13 @@ const DRAFT_MENU_PARAMS = [
 export default function UnsavedInnerBlocks( {
 	blockProps,
 	blocks,
+	clientId,
 	hasSavedUnsavedInnerBlocks,
 	onSave,
 	hasSelection,
 } ) {
+	// The block will be disabled in a block preview, use this as a way of
+	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
 	const savingLock = useRef( false );
 
@@ -46,49 +49,38 @@ export default function UnsavedInnerBlocks( {
 		onChange: NOOP,
 		onInput: NOOP,
 	} );
-	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const {
 		isSaving,
 		draftNavigationMenus,
 		hasResolvedDraftNavigationMenus,
-	} = useSelect( ( select ) => {
-		const {
-			getEntityRecords,
-			hasFinishedResolution,
-			isSavingEntityRecord,
-		} = select( coreStore );
+	} = useSelect(
+		( select ) => {
+			if ( isDisabled ) {
+				return EMPTY_OBJECT;
+			}
 
-		return {
-			isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
-			draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
-			hasResolvedDraftNavigationMenus: hasFinishedResolution(
-				'getEntityRecords',
-				DRAFT_MENU_PARAMS
-			),
-		};
-	}, [] );
+			const {
+				getEntityRecords,
+				hasFinishedResolution,
+				isSavingEntityRecord,
+			} = select( coreStore );
+
+			return {
+				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
+				draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
+				hasResolvedDraftNavigationMenus: hasFinishedResolution(
+					'getEntityRecords',
+					DRAFT_MENU_PARAMS
+				),
+			};
+		},
+		[ isDisabled ]
+	);
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
-	const createNavigationMenu = useCallback(
-		async ( title ) => {
-			const record = {
-				title,
-				content: serialize( blocks ),
-				status: 'draft',
-			};
-
-			const navigationMenu = await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				record
-			);
-
-			return navigationMenu;
-		},
-		[ blocks, serialize, saveEntityRecord ]
-	);
+	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( async () => {
@@ -105,8 +97,8 @@ export default function UnsavedInnerBlocks( {
 		// And finally only create the menu when the block is selected,
 		// which is an indication they want to start editing.
 		if (
-			hasSavedUnsavedInnerBlocks ||
 			isDisabled ||
+			hasSavedUnsavedInnerBlocks ||
 			isSaving ||
 			savingLock.current ||
 			! hasResolvedDraftNavigationMenus ||
@@ -117,26 +109,7 @@ export default function UnsavedInnerBlocks( {
 		}
 
 		savingLock.current = true;
-		const title = __( 'Untitled menu' );
-
-		// Determine how many menus start with the untitled title.
-		const matchingMenuTitleCount = [
-			...draftNavigationMenus,
-			...navigationMenus,
-		].reduce(
-			( count, menu ) =>
-				menu?.title?.raw?.startsWith( title ) ? count + 1 : count,
-			0
-		);
-
-		// Append a number to the end of the title if a menu with
-		// the same name exists.
-		const titleWithCount =
-			matchingMenuTitleCount > 0
-				? `${ title } ${ matchingMenuTitleCount + 1 }`
-				: title;
-
-		const menu = await createNavigationMenu( titleWithCount );
+		const menu = await createNavigationMenu( null, blocks );
 		onSave( menu );
 		savingLock.current = false;
 	}, [
@@ -148,6 +121,7 @@ export default function UnsavedInnerBlocks( {
 		navigationMenus,
 		hasSelection,
 		createNavigationMenu,
+		blocks,
 	] );
 
 	return (

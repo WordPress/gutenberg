@@ -21,7 +21,7 @@ const jestE2EConfig = {
 	],
 	setupFilesAfterEnv: [ 'expect-puppeteer' ],
 	testEnvironment: path.join( __dirname, 'jest-environment-puppeteer' ),
-	testMatch: [ '**/specs/**/*.[jt]s', '**/?(*.)spec.[jt]s' ],
+	testMatch: [ '**/specs/**/*.[jt]s?(x)', '**/?(*.)spec.[jt]s?(x)' ],
 	testPathIgnorePatterns: [ '/node_modules/' ],
 	testRunner: 'jest-circus/runner',
 	testTimeout: 30000,
@@ -29,7 +29,7 @@ const jestE2EConfig = {
 
 if ( ! hasBabelConfig() ) {
 	jestE2EConfig.transform = {
-		'^.+\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
+		'\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
 	};
 }
 

@@ -2,9 +2,6 @@
  * External dependencies
  */
 import {
-	get,
-	cloneDeep,
-	set,
 	mergeWith,
 	pickBy,
 	isEmpty,
@@ -23,7 +20,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA } from './utils';
 import { GlobalStylesContext } from './context';
 
 function mergeTreesCustomizer( _, srcValue ) {
@@ -39,29 +35,6 @@ function mergeBaseAndUserConfigs( base, user ) {
 	return mergeWith( {}, base, user, mergeTreesCustomizer );
 }
 
-function addUserOriginToSettings( settingsToAdd ) {
-	const newSettings = cloneDeep( settingsToAdd );
-	PRESET_METADATA.forEach( ( { path } ) => {
-		const presetData = get( newSettings, path );
-		if ( presetData ) {
-			set( newSettings, path, {
-				user: presetData,
-			} );
-		}
-	} );
-	return newSettings;
-}
-
-function removeUserOriginFromSettings( settingsToRemove ) {
-	const newSettings = cloneDeep( settingsToRemove );
-	PRESET_METADATA.forEach( ( { path } ) => {
-		const presetData = get( newSettings, path );
-		if ( presetData ) {
-			set( newSettings, path, ( presetData ?? {} ).user );
-		}
-	} );
-	return newSettings;
-}
 const cleanEmptyObject = ( object ) => {
 	if ( ! isObject( object ) || Array.isArray( object ) ) {
 		return object;
@@ -97,7 +70,7 @@ function useGlobalStylesUserConfig() {
 
 	const config = useMemo( () => {
 		return {
-			settings: addUserOriginToSettings( settings ?? {} ),
+			settings: settings ?? {},
 			styles: styles ?? {},
 		};
 	}, [ settings, styles ] );
@@ -111,15 +84,12 @@ function useGlobalStylesUserConfig() {
 			);
 			const currentConfig = {
 				styles: record?.styles ?? {},
-				settings: addUserOriginToSettings( record?.settings ?? {} ),
+				settings: record?.settings ?? {},
 			};
 			const updatedConfig = callback( currentConfig );
 			editEntityRecord( 'root', 'globalStyles', globalStylesId, {
 				styles: cleanEmptyObject( updatedConfig.styles ) || {},
-				settings:
-					cleanEmptyObject(
-						removeUserOriginFromSettings( updatedConfig.settings )
-					) || {},
+				settings: cleanEmptyObject( updatedConfig.settings ) || {},
 			} );
 		},
 		[ globalStylesId ]
@@ -135,7 +105,7 @@ function useGlobalStylesBaseConfig() {
 		).__experimentalGetCurrentThemeBaseGlobalStyles();
 	}, [] );
 
-	return baseConfig;
+	return [ !! baseConfig, baseConfig ];
 }
 
 function useGlobalStylesContext() {
@@ -144,7 +114,7 @@ function useGlobalStylesContext() {
 		userConfig,
 		setUserConfig,
 	] = useGlobalStylesUserConfig();
-	const baseConfig = useGlobalStylesBaseConfig();
+	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
 			return {};
@@ -153,7 +123,7 @@ function useGlobalStylesContext() {
 	}, [ userConfig, baseConfig ] );
 	const context = useMemo( () => {
 		return {
-			isReady: isUserConfigReady,
+			isReady: isUserConfigReady && isBaseConfigReady,
 			user: userConfig,
 			base: baseConfig,
 			merged: mergedConfig,
@@ -165,6 +135,7 @@ function useGlobalStylesContext() {
 		baseConfig,
 		setUserConfig,
 		isUserConfigReady,
+		isBaseConfigReady,
 	] );
 
 	return context;

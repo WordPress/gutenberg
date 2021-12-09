@@ -390,10 +390,10 @@ function gutenberg_render_duotone_filter_preset( $preset ) {
 	}
 
 	add_action(
-		// Safari doesn't render SVG filters defined in data URIs,
-		// and SVG filters won't render in the head of a document,
-		// so the next best place to put the SVG is in the footer.
-		is_admin() ? 'admin_footer' : 'wp_footer',
+		// SVG filters won't render at all in the head of a document and
+		// Safari incorrectly renders SVG filters in the footer, so the
+		// beginning of the body seems to be the safest place to render.
+		'wp_body_open',
 		function () use ( $svg ) {
 			echo $svg;
 		}

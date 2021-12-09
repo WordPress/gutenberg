@@ -91,7 +91,7 @@ function ScreenBackgroundColor( { name } ) {
 				back={ parentMenu + '/colors' }
 				title={ __( 'Background' ) }
 				description={ __(
-					'Set a background color or gradient for the whole website.'
+					'Set a background color or gradient for the whole site.'
 				) }
 			/>
 
@@ -104,6 +104,8 @@ function ScreenBackgroundColor( { name } ) {
 				disableCustomGradients={ ! areCustomGradientsEnabled }
 				__experimentalHasMultipleOrigins
 				showTitle={ false }
+				enableAlpha
+				__experimentalIsRenderedInSidebar
 			/>
 		</>
 	);

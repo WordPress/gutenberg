@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The bundled `eslint` dependency has been updated from requiring `^7.17.0` to requiring `^8.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The `puppeteer-core` dependency has been updated from requiring `^10.1.0` to requiring `^11.0.0` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
+
+### Bug Fixes
+
+-   Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
+
+## 19.2.0 (2021-11-15)
+
+### New Features
+
+-   Add basic support for TypeScript in `build`, `start`, `test-e2e` and `test-unit-js` commands ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
+
+### Enhancements
+
+-   The bundled `browserslist` dependency has been updated from requiring `^4.16.6` to requiring `^4.17.6` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   Updated the default ESLint config to work correctly with the latest version of `@wordpress/eslint-plugin` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
+## 19.1.0 (2021-11-07)
+
 ### Enhancements
 
 -   Increase the timeout for e2e tests to 30 seconds ([#35983](https://github.com/WordPress/gutenberg/pull/35983)).

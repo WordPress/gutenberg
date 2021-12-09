@@ -30,6 +30,8 @@ import * as commentEditLink from './comment-edit-link';
 import * as commentReplyLink from './comment-reply-link';
 import * as commentTemplate from './comment-template';
 import * as commentsQueryLoop from './comments-query-loop';
+import * as commentsPagination from './comments-pagination';
+import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -47,6 +49,7 @@ import * as mediaText from './media-text';
 import * as missing from './missing';
 import * as more from './more';
 import * as navigation from './navigation';
+import * as navigationArea from './navigation-area';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
@@ -148,53 +151,55 @@ export const __experimentalGetCoreBlocks = () => [
 	html,
 	latestComments,
 	latestPosts,
-	logInOut,
 	mediaText,
 	missing,
 	more,
-	navigation,
-	navigationLink,
-	navigationSubmenu,
 	nextpage,
 	pageList,
 	pattern,
-	postAuthor,
-	postComments,
-	postContent,
-	postDate,
-	postExcerpt,
-	postFeaturedImage,
-	postNavigationLink,
-	postTemplate,
-	postTerms,
-	postTitle,
 	preformatted,
 	pullquote,
-	query,
-	queryPagination,
-	queryPaginationNext,
-	queryPaginationNumbers,
-	queryPaginationPrevious,
-	queryTitle,
 	reusableBlock,
 	rss,
 	search,
 	separator,
 	shortcode,
-	siteLogo,
-	siteTagline,
-	siteTitle,
 	socialLink,
 	socialLinks,
 	spacer,
 	table,
 	// tableOfContents,
 	tagCloud,
-	templatePart,
-	termDescription,
 	textColumns,
 	verse,
 	video,
+
+	// theme blocks
+	navigation,
+	navigationLink,
+	navigationSubmenu,
+	siteLogo,
+	siteTitle,
+	siteTagline,
+	query,
+	templatePart,
+	postTitle,
+	postExcerpt,
+	postFeaturedImage,
+	postContent,
+	postAuthor,
+	postDate,
+	postTerms,
+	postNavigationLink,
+	postTemplate,
+	queryPagination,
+	queryPaginationNext,
+	queryPaginationNumbers,
+	queryPaginationPrevious,
+	postComments,
+	logInOut,
+	termDescription,
+	queryTitle,
 ];
 
 /**
@@ -251,6 +256,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								commentReplyLink,
 								commentTemplate,
 								commentsQueryLoop,
+								commentsPagination,
+								commentsPaginationNumbers,
+								navigationArea,
 								postComment,
 								postCommentsCount,
 								postCommentsForm,
