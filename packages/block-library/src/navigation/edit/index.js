@@ -584,6 +584,11 @@ function Navigation( {
 							/>
 						</MaybeDisabledComponent>
 					) }
+					{ isPlaceholderShown && ! canUserUseBlock && (
+						<MaybeDisabledComponent>
+							<PlaceholderPreview />
+						</MaybeDisabledComponent>
+					) }
 					{ ! isEntityAvailable && ! isPlaceholderShown && (
 						<MaybeDisabledComponent>
 							<PlaceholderPreview isLoading />
