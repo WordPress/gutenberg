@@ -170,10 +170,11 @@ function Navigation( {
 				hasSubmenus: firstSubmenu,
 				innerBlocks: blocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
-				canUserCreateNavigation: select( coreStore ).canUser(
-					'create',
-					'navigation'
-				),
+				// canUserCreateNavigation: select( coreStore ).canUser(
+				// 	'publish',
+				// 	'navigation'
+				// ),
+				canUserCreateNavigation: false,
 				canUserEditNavigationEntity: ref
 					? select( coreStore ).canUser( 'edit', 'navigation', ref )
 					: false,
@@ -182,7 +183,8 @@ function Navigation( {
 		[ clientId ]
 	);
 
-	const userCanCreateNewNavigationBlock = ! ref && canUserCreateNavigation;
+	const userCanCreateNewNavigationBlock =
+		! ref && Boolean( canUserCreateNavigation );
 
 	const hasExistingNavItems = !! innerBlocks.length;
 	const {
@@ -563,23 +565,29 @@ function Navigation( {
 				) }
 				<nav { ...blockProps }>
 					{ isPlaceholderShown && canUserUseBlock && (
-						<PlaceholderComponent
-							onFinish={ ( post ) => {
-								setIsPlaceholderShown( false );
-								if ( post ) {
-									setRef( post.id );
+						<MaybeDisabledComponent>
+							<PlaceholderComponent
+								onFinish={ ( post ) => {
+									setIsPlaceholderShown( false );
+									if ( post ) {
+										setRef( post.id );
+									}
+									selectBlock( clientId );
+								} }
+								canSwitchNavigationMenu={
+									canSwitchNavigationMenu
 								}
-								selectBlock( clientId );
-							} }
-							canSwitchNavigationMenu={ canSwitchNavigationMenu }
-							hasResolvedNavigationMenus={
-								hasResolvedNavigationMenus
-							}
-							clientId={ clientId }
-						/>
+								hasResolvedNavigationMenus={
+									hasResolvedNavigationMenus
+								}
+								clientId={ clientId }
+							/>
+						</MaybeDisabledComponent>
 					) }
 					{ ! isEntityAvailable && ! isPlaceholderShown && (
-						<PlaceholderPreview isLoading />
+						<MaybeDisabledComponent>
+							<PlaceholderPreview isLoading />
+						</MaybeDisabledComponent>
 					) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper
