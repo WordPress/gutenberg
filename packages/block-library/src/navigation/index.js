@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -50,3 +51,24 @@ export const settings = {
 	save,
 	deprecated,
 };
+
+function setInserterVisibility( _settings, _name ) {
+	if ( _name !== 'core/navigation' ) {
+		return _settings;
+	}
+
+	// Todo: remove only if user does not have
+	// create permission.
+	_settings.supports = {
+		..._settings.supports,
+		inserter: false,
+	};
+
+	return _settings;
+}
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/navigation-block/setInserterVisibility',
+	setInserterVisibility
+);
