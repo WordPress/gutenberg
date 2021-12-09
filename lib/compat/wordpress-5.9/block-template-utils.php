@@ -755,18 +755,18 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	if ( count( $parts ) < 2 ) {
 		return null;
 	}
-	list( $theme, $slug ) = $parts;
+	list( , $slug ) = $parts;
 	$block_template = resolve_block_template( $slug, array(), '' );
 	if ( ! $block_template ) {
 		$block_template = resolve_block_template( 'index', array(), '' );
 	}
 	// This might give us a fallback template with a different ID,
 	// so we have to override it to make sure it's correct.
-	$block_template->id = $id;
-	$block_template->slug = $slug;
+	$block_template->id     = $id;
+	$block_template->slug   = $slug;
 	$default_template_types = get_default_block_template_types();
 	if ( array_key_exists( $slug, $default_template_types ) ) {
-		$block_template->title = $default_template_types[ $slug ]['title'];
+		$block_template->title       = $default_template_types[ $slug ]['title'];
 		$block_template->description = $default_template_types[ $slug ]['description'];
 	}
 
