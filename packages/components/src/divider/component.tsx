@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { Separator } from 'reakit';
+import { Separator } from 'ariakit/separator';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 
