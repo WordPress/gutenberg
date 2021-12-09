@@ -11,7 +11,18 @@ import { Routes } from '../routes';
 import Editor from '../editor';
 import List from '../list';
 import NavigationSidebar from '../navigation-sidebar';
+import HomepageRedirect from '../homepage-redirect';
 import getIsListPage from '../../utils/get-is-list-page';
+
+function getNeedsHomepageRedirect( params ) {
+	const { postType } = params;
+	return (
+		! getIsListPage( params ) &&
+		! [ 'post', 'page', 'wp_template', 'wp_template_part' ].includes(
+			postType
+		)
+	);
+}
 
 export default function EditSiteApp( { reboot } ) {
 	return (
@@ -20,6 +31,10 @@ export default function EditSiteApp( { reboot } ) {
 
 			<Routes>
 				{ ( { params } ) => {
+					if ( getNeedsHomepageRedirect( params ) ) {
+						return <HomepageRedirect />;
+					}
+
 					const isListPage = getIsListPage( params );
 
 					return (

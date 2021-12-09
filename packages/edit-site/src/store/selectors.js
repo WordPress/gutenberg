@@ -124,6 +124,51 @@ export const getSettings = createSelector(
 );
 
 /**
+ * Get the homepage query parameters. These are used to redirect the site
+ * editor when entered accessed without postType or postId params.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?Object} An object containing postType and postId properties.
+ */
+export const getHomepageParams = createRegistrySelector(
+	( select ) => ( state ) => {
+		const siteSettings = select( coreDataStore ).getSite();
+		if ( ! siteSettings ) {
+			return;
+		}
+
+		const {
+			show_on_front: showOnFront,
+			page_on_front: frontpageId,
+		} = siteSettings;
+
+		// If the user has set a page as the homepage, use those details.
+		if ( showOnFront === 'page' ) {
+			return {
+				postType: 'page',
+				postId: frontpageId,
+			};
+		}
+
+		// Else get the home template.
+		const { siteUrl } = getSettings( state );
+		const template = select(
+			coreDataStore
+		).__experimentalGetTemplateForLink( siteUrl );
+
+		if ( ! template ) {
+			return;
+		}
+
+		return {
+			postType: 'wp_template',
+			postId: template.id,
+		};
+	}
+);
+
+/**
  * Returns the current home template ID.
  *
  * @param {Object} state Global application state.
