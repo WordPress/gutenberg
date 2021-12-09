@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -13,6 +14,23 @@ import { store as editSiteStore } from '../../store';
 
 export default function WelcomeGuideStyles() {
 	const { toggleFeature } = useDispatch( editSiteStore );
+
+	const { isActive, isStylesOpen } = useSelect( ( select ) => {
+		const sidebar = select( interfaceStore ).getActiveComplementaryArea(
+			editSiteStore.name
+		);
+
+		return {
+			isActive: select( editSiteStore ).isFeatureActive(
+				'welcomeGuideStyles'
+			),
+			isStylesOpen: sidebar === 'edit-site/global-styles',
+		};
+	}, [] );
+
+	if ( ! isActive || ! isStylesOpen ) {
+		return null;
+	}
 
 	return (
 		<Guide

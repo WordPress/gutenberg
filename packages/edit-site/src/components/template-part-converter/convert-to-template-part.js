@@ -50,16 +50,18 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 		createSuccessNotice( __( 'Template part created.' ), {
 			type: 'snackbar',
 		} );
+
+		// The modal and this component will be unmounted because of `replaceBlocks` above,
+		// so no need to call `closeModal` or `onClose`.
 	};
 
 	return (
 		<>
 			<BlockSettingsMenuControls>
-				{ ( { onClose } ) => (
+				{ () => (
 					<MenuItem
 						onClick={ () => {
 							setIsModalOpen( true );
-							onClose();
 						} }
 					>
 						{ __( 'Make template part' ) }

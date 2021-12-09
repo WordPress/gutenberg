@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [**] [iOS] Fix scroll update when typing in RichText component [#36914]
 -   [*] [Preformatted block] Fix an issue where the background color is not showing up for standard themes. [#36883]
+-   [***] Highlight text - enables color customization for specific text within a Pragraph block [#36028]
 
 ## 1.67.0
 -   [**] Adds Clipboard Link Suggestion to Image block and Button block [#35972]
