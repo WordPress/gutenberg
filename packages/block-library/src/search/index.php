@@ -197,9 +197,10 @@ function styles_for_block_core_search( $attributes ) {
 
 	// Add border width styles.
 	$has_border_width = ! empty( $attributes['style']['border']['width'] );
-	$border_width     = $attributes['style']['border']['width'];
 
 	if ( $has_border_width ) {
+		$border_width = $attributes['style']['border']['width'];
+
 		if ( $is_button_inside ) {
 			$wrapper_styles[] = sprintf( 'border-width: %s;', esc_attr( $border_width ) );
 		} else {
