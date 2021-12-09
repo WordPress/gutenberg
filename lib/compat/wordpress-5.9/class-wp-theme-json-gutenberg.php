@@ -714,14 +714,16 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
-			// Reset default browser margin on the root body element.
-			// We set this on the root selector **before** generating the ruleset
-			// from the `theme.json`. This is to ensure that if the `theme.json` declares
-			// `margin` in its `spacing` declaration for the `body` element then these
-			// user-generated values take precedence in the CSS cascade.
-			// See: https://github.com/WordPress/gutenberg/issues/36147.
+			/*
+			 * Reset default browser margin on the root body element.
+			 * This is set on the root selector **before** generating the ruleset
+			 * from the `theme.json`. This is to ensure that if the `theme.json` declares
+			 * `margin` in its `spacing` declaration for the `body` element then these
+			 * user-generated values take precedence in the CSS cascade.
+			 * @link https://github.com/WordPress/gutenberg/issues/36147.
+			 */
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= "body { margin: 0; }\n";
+				$block_rules .= 'body { margin: 0; }';
 			}
 
 			// 2. Generate the rules that use the general selector.
