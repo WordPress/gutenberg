@@ -13,6 +13,7 @@ import {
 	useRef,
 	useCallback,
 	Platform,
+	Fragment,
 } from '@wordpress/element';
 import {
 	InspectorControls,
@@ -36,6 +37,7 @@ import {
 	ToolbarGroup,
 	ToolbarDropdownMenu,
 	Button,
+	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -109,6 +111,8 @@ function Navigation( {
 		showSubmenuIcon,
 		layout: { justifyContent, orientation = 'horizontal' } = {},
 	} = attributes;
+
+	const canUserEdit = false;
 
 	let areaMenu,
 		setAreaMenu = noop;
@@ -370,142 +374,150 @@ function Navigation( {
 		? CustomPlaceholder
 		: Placeholder;
 
+	const MaybeDisabledComponent = canUserEdit ? Fragment : Disabled;
+
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider>
-				<BlockControls>
-					{ ! isDraftNavigationMenu && isEntityAvailable && (
-						<ToolbarGroup>
-							<ToolbarDropdownMenu
-								label={ __( 'Select Menu' ) }
-								text={ __( 'Select Menu' ) }
-								icon={ null }
-							>
-								{ ( { onClose } ) => (
-									<NavigationMenuSelector
-										onSelect={ ( { id } ) => {
-											setRef( id );
-											onClose();
-										} }
-										onCreateNew={ startWithEmptyMenu }
-									/>
-								) }
-							</ToolbarDropdownMenu>
-						</ToolbarGroup>
-					) }
-					<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
-				</BlockControls>
+				{ canUserEdit && (
+					<BlockControls>
+						{ ! isDraftNavigationMenu && isEntityAvailable && (
+							<ToolbarGroup>
+								<ToolbarDropdownMenu
+									label={ __( 'Select Menu' ) }
+									text={ __( 'Select Menu' ) }
+									icon={ null }
+								>
+									{ ( { onClose } ) => (
+										<NavigationMenuSelector
+											onSelect={ ( { id } ) => {
+												setRef( id );
+												onClose();
+											} }
+											onCreateNew={ startWithEmptyMenu }
+										/>
+									) }
+								</ToolbarDropdownMenu>
+							</ToolbarGroup>
+						) }
+						<ToolbarGroup>{ listViewToolbarButton }</ToolbarGroup>
+					</BlockControls>
+				) }
 				{ listViewModal }
-				<InspectorControls>
-					{ hasSubmenuIndicatorSetting && (
-						<PanelBody title={ __( 'Display' ) }>
-							<h3>{ __( 'Overlay Menu' ) }</h3>
-							<ToggleGroupControl
-								label={ __( 'Configure overlay menu' ) }
-								value={ overlayMenu }
-								help={ __(
-									'Collapses the navigation options in a menu icon opening an overlay.'
-								) }
-								onChange={ ( value ) =>
-									setAttributes( { overlayMenu: value } )
-								}
-								isBlock
-								hideLabelFromVision
-							>
-								<ToggleGroupControlOption
-									value="never"
-									label={ __( 'Off' ) }
-								/>
-								<ToggleGroupControlOption
-									value="mobile"
-									label={ __( 'Mobile' ) }
-								/>
-								<ToggleGroupControlOption
-									value="always"
-									label={ __( 'Always' ) }
-								/>
-							</ToggleGroupControl>
-							{ hasSubmenus && (
-								<>
-									<h3>{ __( 'Submenus' ) }</h3>
-									<ToggleControl
-										checked={ openSubmenusOnClick }
-										onChange={ ( value ) => {
-											setAttributes( {
-												openSubmenusOnClick: value,
-												...( value && {
-													showSubmenuIcon: true,
-												} ), // Make sure arrows are shown when we toggle this on.
-											} );
-										} }
-										label={ __( 'Open on click' ) }
+				{ canUserEdit && (
+					<InspectorControls>
+						{ hasSubmenuIndicatorSetting && canUserEdit && (
+							<PanelBody title={ __( 'Display' ) }>
+								<h3>{ __( 'Overlay Menu' ) }</h3>
+								<ToggleGroupControl
+									label={ __( 'Configure overlay menu' ) }
+									value={ overlayMenu }
+									help={ __(
+										'Collapses the navigation options in a menu icon opening an overlay.'
+									) }
+									onChange={ ( value ) =>
+										setAttributes( { overlayMenu: value } )
+									}
+									isBlock
+									hideLabelFromVision
+								>
+									<ToggleGroupControlOption
+										value="never"
+										label={ __( 'Off' ) }
 									/>
+									<ToggleGroupControlOption
+										value="mobile"
+										label={ __( 'Mobile' ) }
+									/>
+									<ToggleGroupControlOption
+										value="always"
+										label={ __( 'Always' ) }
+									/>
+								</ToggleGroupControl>
+								{ hasSubmenus && (
+									<>
+										<h3>{ __( 'Submenus' ) }</h3>
+										<ToggleControl
+											checked={ openSubmenusOnClick }
+											onChange={ ( value ) => {
+												setAttributes( {
+													openSubmenusOnClick: value,
+													...( value && {
+														showSubmenuIcon: true,
+													} ), // Make sure arrows are shown when we toggle this on.
+												} );
+											} }
+											label={ __( 'Open on click' ) }
+										/>
 
-									<ToggleControl
-										checked={ showSubmenuIcon }
-										onChange={ ( value ) => {
-											setAttributes( {
-												showSubmenuIcon: value,
-											} );
-										} }
-										disabled={
-											attributes.openSubmenusOnClick
-										}
-										label={ __( 'Show arrow' ) }
-									/>
-								</>
-							) }
-						</PanelBody>
-					) }
-					{ hasColorSettings && (
-						<PanelColorSettings
-							__experimentalHasMultipleOrigins
-							__experimentalIsRenderedInSidebar
-							title={ __( 'Color' ) }
-							initialOpen={ false }
-							colorSettings={ [
-								{
-									value: textColor.color,
-									onChange: setTextColor,
-									label: __( 'Text' ),
-								},
-								{
-									value: backgroundColor.color,
-									onChange: setBackgroundColor,
-									label: __( 'Background' ),
-								},
-								{
-									value: overlayTextColor.color,
-									onChange: setOverlayTextColor,
-									label: __( 'Submenu & overlay text' ),
-								},
-								{
-									value: overlayBackgroundColor.color,
-									onChange: setOverlayBackgroundColor,
-									label: __( 'Submenu & overlay background' ),
-								},
-							] }
-						>
-							{ enableContrastChecking && (
-								<>
-									<ContrastChecker
-										backgroundColor={
-											detectedBackgroundColor
-										}
-										textColor={ detectedColor }
-									/>
-									<ContrastChecker
-										backgroundColor={
-											detectedOverlayBackgroundColor
-										}
-										textColor={ detectedOverlayColor }
-									/>
-								</>
-							) }
-						</PanelColorSettings>
-					) }
-				</InspectorControls>
-				{ isEntityAvailable && (
+										<ToggleControl
+											checked={ showSubmenuIcon }
+											onChange={ ( value ) => {
+												setAttributes( {
+													showSubmenuIcon: value,
+												} );
+											} }
+											disabled={
+												attributes.openSubmenusOnClick
+											}
+											label={ __( 'Show arrow' ) }
+										/>
+									</>
+								) }
+							</PanelBody>
+						) }
+						{ hasColorSettings && canUserEdit && (
+							<PanelColorSettings
+								__experimentalHasMultipleOrigins
+								__experimentalIsRenderedInSidebar
+								title={ __( 'Color' ) }
+								initialOpen={ false }
+								colorSettings={ [
+									{
+										value: textColor.color,
+										onChange: setTextColor,
+										label: __( 'Text' ),
+									},
+									{
+										value: backgroundColor.color,
+										onChange: setBackgroundColor,
+										label: __( 'Background' ),
+									},
+									{
+										value: overlayTextColor.color,
+										onChange: setOverlayTextColor,
+										label: __( 'Submenu & overlay text' ),
+									},
+									{
+										value: overlayBackgroundColor.color,
+										onChange: setOverlayBackgroundColor,
+										label: __(
+											'Submenu & overlay background'
+										),
+									},
+								] }
+							>
+								{ enableContrastChecking && (
+									<>
+										<ContrastChecker
+											backgroundColor={
+												detectedBackgroundColor
+											}
+											textColor={ detectedColor }
+										/>
+										<ContrastChecker
+											backgroundColor={
+												detectedOverlayBackgroundColor
+											}
+											textColor={ detectedOverlayColor }
+										/>
+									</>
+								) }
+							</PanelColorSettings>
+						) }
+					</InspectorControls>
+				) }
+				{ isEntityAvailable && canUserEdit && (
 					<InspectorControls __experimentalGroup="advanced">
 						<NavigationMenuNameControl />
 						<NavigationMenuDeleteControl
@@ -552,20 +564,27 @@ function Navigation( {
 							styles={ overlayStyles }
 						>
 							{ isEntityAvailable && (
-								<NavigationInnerBlocks
-									isVisible={ ! isPlaceholderShown }
-									clientId={ clientId }
-									appender={ CustomAppender }
-									hasCustomPlaceholder={
-										!! CustomPlaceholder
-									}
-									orientation={ orientation }
-								/>
+								<MaybeDisabledComponent>
+									<NavigationInnerBlocks
+										isVisible={ ! isPlaceholderShown }
+										clientId={ clientId }
+										appender={ CustomAppender }
+										hasCustomPlaceholder={
+											!! CustomPlaceholder
+										}
+										orientation={ orientation }
+									/>
+								</MaybeDisabledComponent>
 							) }
 						</ResponsiveWrapper>
 					) }
 				</nav>
 			</RecursionProvider>
+			{ ! canUserEdit && isSelected && (
+				<Warning>
+					{ __( 'You do not have permission to edit Navigation.' ) }
+				</Warning>
+			) }
 		</EntityProvider>
 	);
 }
