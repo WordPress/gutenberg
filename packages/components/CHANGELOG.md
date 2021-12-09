@@ -12,6 +12,7 @@
 -   Added `__experimentalHideHeader` prop to `Modal` component ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
 -   Added experimental `ConfirmDialog` component ([#34153](https://github.com/WordPress/gutenberg/pull/34153)).
 -   Divider: improve support for vertical orientation and RTL styles, use start/end logical props instead of top/bottom, change border-color to `currentColor` ([#36579](https://github.com/WordPress/gutenberg/pull/36579)).
+-   ToggleGroupControl: Avoid calling `onChange` if radio state changed from an incoming value ([#37224](https://github.com/WordPress/gutenberg/pull/37224/)).
 
 ### Bug Fix
 
