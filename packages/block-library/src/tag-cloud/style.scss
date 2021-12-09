@@ -21,15 +21,8 @@
 
 	&.is-style-pill a {
 		border: 1px solid var(--wp--preset--color--foreground);
-		border-radius: 5px;
 		font-size: var(--wp--preset--font-size--normal);
 		margin-bottom: 10px;
 		padding: 5px 10px;
-
-		&:active,
-		&:hover {
-			background-color: var(--wp--preset--color--foreground);
-			color: var(--wp--preset--color--background);
-		}
 	}
 }
