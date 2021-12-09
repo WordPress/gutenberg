@@ -218,6 +218,11 @@ describe( 'Multi-entity save flow', () => {
 			await page.focus( editableSiteTagLineSelector );
 			await page.keyboard.type( '...' );
 
+			// Wait a bit as the Site Title's and Site Tagline's `onChange` are debounced,
+			// and we can't know when these changes took effect with a selector.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 1000 );
+
 			await clickButton( 'Publish' );
 			await page.waitForSelector( savePanelSelector );
 			let checkboxInputs = await page.$$( checkboxInputSelector );

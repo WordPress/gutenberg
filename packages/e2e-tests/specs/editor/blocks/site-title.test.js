@@ -53,6 +53,10 @@ describe( 'Site Title block', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		await page.keyboard.type( 'New Site Title' );
+		// Wait a bit as the Site Title's onChange is debounced.
+		await page.waitForSelector(
+			'.editor-post-publish-button__button.has-changes-dot'
+		);
 
 		await saveEntities();
 
