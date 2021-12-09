@@ -109,7 +109,7 @@
 				]
 			},
 			{
-			"docs/how-to-guides/javascript/README.md": [
+				"docs/how-to-guides/javascript/README.md": [
 					{
 						"docs/how-to-guides/javascript/plugins-background.md": []
 					},
@@ -144,7 +144,6 @@
 					}
 				]
 			},
-			{ "docs/how-to-guides/native-mobile/osx-setup-guide.md": [] },
 			{ "docs/how-to-guides/notices/README.md": [] },
 			{
 				"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md": [
@@ -318,12 +317,18 @@
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{ "docs/contributors/code/release.md": [] },
-					{ "docs/contributors/code/native-mobile.md": [] },
 					{
-						"docs/contributors/code/native-mobile-integration-test-guide.md": []
-					},
-					{
-						"docs/contributors/code/getting-started-native-mobile.md": []
+						"docs/contributors/code/react-native/README.md": [
+							{
+								"docs/contributors/code/react-native/getting-started-react-native.md": []
+							},
+							{
+								"docs/contributors/code/react-native/osx-setup-guide.md": []
+							},
+							{
+								"docs/contributors/code/react-native/integration-test-guide.md": []
+							}
+						]
 					}
 				]
 			},

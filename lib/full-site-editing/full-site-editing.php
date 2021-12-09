@@ -6,55 +6,44 @@
  */
 
 /**
- * Returns whether the current theme is an FSE theme or not.
- *
- * @return boolean Whether the current theme is an FSE theme or not.
- */
-function gutenberg_is_fse_theme() {
-	return is_readable( get_theme_file_path( '/block-templates/index.html' ) ) ||
-		is_readable( get_theme_file_path( '/templates/index.html' ) );
-}
-
-/**
- * Returns whether the current theme is FSE-enabled or not.
- *
- * @return boolean Whether the current theme is FSE-enabled or not.
- */
-function gutenberg_supports_block_templates() {
-	return gutenberg_is_fse_theme() || current_theme_supports( 'block-templates' );
-}
-
-/**
  * Removes legacy pages from FSE themes.
  */
 function gutenberg_remove_legacy_pages() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! wp_is_block_theme() ) {
 		return;
 	}
 
 	global $submenu;
-	if ( isset( $submenu['themes.php'] ) ) {
-		$indexes_to_remove = array();
-		foreach ( $submenu['themes.php'] as $index => $menu_item ) {
-			if ( false !== strpos( $menu_item[2], 'customize.php' ) && ! gutenberg_site_requires_customizer() ) {
-				$indexes_to_remove[] = $index;
-			}
+	if ( ! isset( $submenu['themes.php'] ) ) {
+		return;
+	}
 
-			if ( false !== strpos( $menu_item[2], 'site-editor.php' ) ) {
-				$indexes_to_remove[] = $index;
-			}
-
-			if ( false !== strpos( $menu_item[2], 'gutenberg-widgets' ) ) {
-				$indexes_to_remove[] = $index;
-			}
+	$indexes_to_remove = array();
+	$customize_menu    = null;
+	foreach ( $submenu['themes.php'] as $index => $menu_item ) {
+		if ( false !== strpos( $menu_item[2], 'customize.php' ) ) {
+			$indexes_to_remove[] = $index;
+			$customize_menu      = $menu_item;
 		}
 
-		foreach ( $indexes_to_remove as $index ) {
-			unset( $submenu['themes.php'][ $index ] );
+		if ( false !== strpos( $menu_item[2], 'site-editor.php' ) ) {
+			$indexes_to_remove[] = $index;
+		}
+
+		if ( false !== strpos( $menu_item[2], 'gutenberg-widgets' ) ) {
+			$indexes_to_remove[] = $index;
 		}
 	}
-}
 
+	foreach ( $indexes_to_remove as $index ) {
+		unset( $submenu['themes.php'][ $index ] );
+	}
+
+	// Add Customizer back but with a new sub-menu position when a site requires this feature.
+	if ( gutenberg_site_requires_customizer() && $customize_menu ) {
+		$submenu['themes.php'][20] = $customize_menu;
+	}
+}
 add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
 
 /**
@@ -64,8 +53,8 @@ add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
  */
 function gutenberg_adminbar_items( $wp_admin_bar ) {
 
-	// Early exit if not an FSE theme.
-	if ( ! gutenberg_is_fse_theme() ) {
+	// Early exit if not a block theme.
+	if ( ! wp_is_block_theme() ) {
 		return;
 	}
 

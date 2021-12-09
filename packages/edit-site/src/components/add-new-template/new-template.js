@@ -15,10 +15,13 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { addQueryArgs } from '@wordpress/url';
-import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+
+/**
+ * Internal dependencies
+ */
+import { useHistory } from '../routes';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
@@ -31,6 +34,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 ];
 
 export default function NewTemplate( { postType } ) {
+	const history = useHistory();
 	const { templates, defaultTemplateTypes } = useSelect(
 		( select ) => ( {
 			templates: select( coreStore ).getEntityRecords(
@@ -44,7 +48,9 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { getLastEntitySaveError } = useSelect( coreStore );
 
 	async function createTemplate( { slug } ) {
 		try {
@@ -52,26 +58,34 @@ export default function NewTemplate( { postType } ) {
 				slug,
 			} );
 
-			const template = await apiFetch( {
-				path: '/wp/v2/templates',
-				method: 'POST',
-				data: {
+			const template = await saveEntityRecord(
+				'postType',
+				'wp_template',
+				{
 					excerpt: description,
 					// Slugs need to be strings, so this is for template `404`
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-				},
-			} );
+				}
+			);
+
+			const lastEntitySaveError = getLastEntitySaveError(
+				'postType',
+				'wp_template',
+				template.id
+			);
+			if ( lastEntitySaveError ) {
+				throw lastEntitySaveError;
+			}
 
 			// Navigate to the created template editor.
-			window.location.href = addQueryArgs( window.location.href, {
+			history.push( {
 				postId: template.id,
-				postType: 'wp_template',
+				postType: template.type,
 			} );
 
-			// Wait for async navigation to happen before closing the modal.
-			await new Promise( () => {} );
+			// TODO: Add a success notice?
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'

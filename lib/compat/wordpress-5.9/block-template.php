@@ -9,15 +9,15 @@
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	if ( ! gutenberg_supports_block_templates() ) {
+	if ( ! current_theme_supports( 'block-templates' ) ) {
 		return;
 	}
-
-	foreach ( gutenberg_get_template_type_slugs() as $template_type ) {
+	$template_type_slugs = array_keys( get_default_block_template_types() );
+	foreach ( $template_type_slugs as $template_type ) {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
 			continue;
 		}
-		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
+		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_locate_block_template', 20, 3 );
 	}
 
 	// Request to resolve a template.
@@ -38,7 +38,7 @@ add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
  * @param array  $templates A list of template candidates, in descending order of priority.
  * @return string The path to the Full Site Editing template canvas file.
  */
-function gutenberg_override_query_template( $template, $type, array $templates ) {
+function gutenberg_locate_block_template( $template, $type, array $templates ) {
 	global $_wp_current_template_content;
 
 	if ( $template ) {
@@ -61,7 +61,7 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 		$templates = array_slice( $templates, 0, $index + 1 );
 	}
 
-	$block_template = gutenberg_resolve_template( $type, $templates );
+	$block_template = gutenberg_resolve_template( $type, $templates, $template );
 
 	if ( $block_template ) {
 		if ( empty( $block_template->content ) && is_user_logged_in() ) {
@@ -97,11 +97,12 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 
 	// Render title tag with content, regardless of whether theme has title-tag support.
 	remove_action( 'wp_head', '_wp_render_title_tag', 1 ); // Remove conditional title tag rendering...
+	// Override WP 5.8 title-tag support.
 	remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
 	add_action( 'wp_head', 'gutenberg_render_title_tag', 1 ); // ...and make it unconditional.
 
 	// This file will be included instead of the theme's template file.
-	return gutenberg_dir_path() . 'lib/template-canvas.php';
+	return gutenberg_dir_path() . 'lib/compat/wordpress-5.9/template-canvas.php';
 }
 
 /**
@@ -109,11 +110,14 @@ function gutenberg_override_query_template( $template, $type, array $templates )
  *
  * Accepts an optional $template_hierarchy argument as a hint.
  *
+ * @since 5.9.0 Added the `$fallback_template` parameter.
+ *
  * @param string   $template_type      The current template type.
  * @param string[] $template_hierarchy (optional) The current template hierarchy, ordered by priority.
+ * @param string   $fallback_template  A PHP fallback template to use if no matching block template is found.
  * @return null|Gutenberg_Block_Template A block template if found. Null if not.
  */
-function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
+function gutenberg_resolve_template( $template_type, $template_hierarchy, $fallback_template ) {
 	if ( ! $template_type ) {
 		return null;
 	}
@@ -123,7 +127,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 	}
 
 	$slugs = array_map(
-		'gutenberg_strip_php_suffix',
+		'gutenberg_strip_template_file_suffix',
 		$template_hierarchy
 	);
 
@@ -144,6 +148,43 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 			return $slug_priorities[ $template_a->slug ] - $slug_priorities[ $template_b->slug ];
 		}
 	);
+
+	$theme_base_path        = get_stylesheet_directory() . DIRECTORY_SEPARATOR;
+	$parent_theme_base_path = get_template_directory() . DIRECTORY_SEPARATOR;
+
+	// Is the current theme a child theme, and is the PHP fallback template part of it?
+	if (
+		strpos( $fallback_template, $theme_base_path ) === 0 &&
+		strpos( $fallback_template, $parent_theme_base_path ) === false
+	) {
+		$fallback_template_slug = substr(
+			$fallback_template,
+			// Starting position of slug.
+			strpos( $fallback_template, $theme_base_path ) + strlen( $theme_base_path ),
+			// Remove '.php' suffix.
+			-4
+		);
+
+		// Is our candidate block template's slug identical to our PHP fallback template's?
+		if (
+			count( $templates ) &&
+			$fallback_template_slug === $templates[0]->slug &&
+			'theme' === $templates[0]->source
+		) {
+			// Unfortunately, we cannot trust $templates[0]->theme, since it will always
+			// be set to the current theme's slug by _build_block_template_result_from_file(),
+			// even if the block template is really coming from the current theme's parent.
+			// (The reason for this is that we want it to be associated with the current theme
+			// -- not its parent -- once we edit it and store it to the DB as a wp_template CPT.)
+			// Instead, we use _get_block_template_file() to locate the block template file.
+			$template_file = _get_block_template_file( 'wp_template', $fallback_template_slug );
+			if ( $template_file && get_template() === $template_file['theme'] ) {
+				// The block template is part of the parent theme, so we
+				// have to give precedence to the child theme's PHP template.
+				array_shift( $templates );
+			}
+		}
+	}
 
 	return count( $templates ) ? $templates[0] : null;
 }
@@ -184,13 +225,6 @@ function gutenberg_get_the_template_html() {
 }
 
 /**
- * Renders the markup for the current template.
- */
-function gutenberg_render_the_template() {
-	echo gutenberg_get_the_template_html(); // phpcs:ignore WordPress.Security.EscapeOutput
-}
-
-/**
  * Renders a 'viewport' meta tag.
  *
  * This is hooked into {@see 'wp_head'} to decouple its output from the default template canvas.
@@ -207,7 +241,7 @@ function gutenberg_viewport_meta_tag() {
  * @param string $template_file Template file name.
  * @return string Template file name without extension.
  */
-function gutenberg_strip_php_suffix( $template_file ) {
+function gutenberg_strip_template_file_suffix( $template_file ) {
 	return preg_replace( '/\.(php|html)$/', '', $template_file );
 }
 
@@ -234,8 +268,10 @@ function gutenberg_template_render_without_post_block_context( $context ) {
 
 	return $context;
 }
-add_filter( 'render_block_context', 'gutenberg_template_render_without_post_block_context' );
 
+// override WordPress 5.8 filters.
+remove_filter( 'render_block_context', '_block_template_render_without_post_block_context' );
+add_filter( 'render_block_context', 'gutenberg_template_render_without_post_block_context' );
 
 /**
  * Sets the current WP_Query to return auto-draft posts.
@@ -266,28 +302,3 @@ function gutenberg_resolve_template_for_new_post( $wp_query ) {
 		$wp_query->set( 'post_status', 'auto-draft' );
 	}
 }
-
-/**
- * Redirect the edit links for templates to the site editor.
- *
- * @param string $link    The original link.
- * @param int    $post_id The custom post id.
- */
-function gutenberg_get_edit_template_link( $link, $post_id ) {
-	$post = get_post( $post_id );
-
-	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
-		return $link;
-	}
-
-	$template = _build_block_template_result_from_post( $post );
-
-	if ( is_wp_error( $template ) ) {
-		return $link;
-	}
-
-	$edit_link = 'themes.php?page=gutenberg-edit-site&postId=%1$s&postType=%2$s';
-
-	return admin_url( sprintf( $edit_link, urlencode( $template->id ), $template->type ) );
-}
-add_filter( 'get_edit_post_link', 'gutenberg_get_edit_template_link', 10, 2 );

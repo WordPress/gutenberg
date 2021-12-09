@@ -92,16 +92,17 @@ export function useColorProps( attributes ) {
 	// Some color settings have a special handling for deprecated flags in `useSetting`,
 	// so we can't unwrap them by doing const { ... } = useSetting('color')
 	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
-	const solidsPerOrigin = useSetting( 'color.palette' ) || EMPTY_OBJECT;
+	const userPalette = useSetting( 'color.palette.custom' ) || [];
+	const themePalette = useSetting( 'color.palette.theme' ) || [];
+	const defaultPalette = useSetting( 'color.palette.default' ) || [];
 	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
-
 	const colors = useMemo(
 		() => [
-			...( solidsPerOrigin?.custom || [] ),
-			...( solidsPerOrigin?.theme || [] ),
-			...( solidsPerOrigin?.default || [] ),
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
 		],
-		[ solidsPerOrigin ]
+		[ userPalette, themePalette, defaultPalette ]
 	);
 	const gradients = useMemo(
 		() => [

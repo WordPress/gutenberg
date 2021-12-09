@@ -35,6 +35,7 @@ function SinglePalette( {
 	const colorOptions = useMemo( () => {
 		return map( colors, ( { color, name } ) => {
 			const colordColor = colord( color );
+
 			return (
 				<CircularOptionPicker.Option
 					key={ color }
@@ -133,6 +134,8 @@ export default function ColorPalette( {
 		/>
 	);
 
+	const colordColor = colord( value );
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
@@ -151,7 +154,14 @@ export default function ColorPalette( {
 							aria-haspopup="true"
 							onClick={ onToggle }
 							aria-label={ __( 'Custom color picker' ) }
-							style={ { background: value } }
+							style={ {
+								background: value,
+								color:
+									colordColor.contrast() >
+									colordColor.contrast( '#000' )
+										? '#fff'
+										: '#000',
+							} }
 						>
 							{ value }
 						</button>

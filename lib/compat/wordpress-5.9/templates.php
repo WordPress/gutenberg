@@ -12,16 +12,12 @@
  */
 
 // Only run any of the code in this file if the version is less than 5.9.
-// wp_is_block_template_theme was introduced in 5.9.
-if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
+// wp_list_users was introduced in 5.9.
+if ( ! function_exists( 'wp_list_users' ) ) {
 	/**
 	 * Registers block editor 'wp_template' post type.
 	 */
 	function gutenberg_register_template_post_type() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-
 		$labels = array(
 			'name'                  => __( 'Templates', 'gutenberg' ),
 			'singular_name'         => __( 'Template', 'gutenberg' ),
@@ -76,10 +72,6 @@ if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
 	 * Registers block editor 'wp_theme' taxonomy.
 	 */
 	function gutenberg_register_wp_theme_taxonomy() {
-		if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			return;
-		}
-
 		register_taxonomy(
 			'wp_theme',
 			array( 'wp_template', 'wp_template_part', 'wp_global_styles' ),
@@ -128,35 +120,6 @@ if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
 	add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
 
 	/**
-	 * Fixes the label of the 'wp_template' admin menu entry.
-	 */
-	function gutenberg_fix_template_admin_menu_entry() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-		global $submenu;
-		if ( ! isset( $submenu['themes.php'] ) ) {
-			return;
-		}
-		$post_type = get_post_type_object( 'wp_template' );
-		if ( ! $post_type ) {
-			return;
-		}
-		foreach ( $submenu['themes.php'] as $key => $submenu_entry ) {
-			if ( $post_type->labels->all_items === $submenu['themes.php'][ $key ][0] ) {
-				$submenu['themes.php'][ $key ][0] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
-				break;
-			}
-		}
-	}
-	add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
-
-	// Customize the `wp_template` admin list.
-	add_filter( 'manage_wp_template_posts_columns', 'gutenberg_templates_lists_custom_columns' );
-	add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
-	add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
-
-	/**
 	 * Sets a custom slug when creating auto-draft templates.
 	 * This is only needed for auto-drafts created by the regular WP editor.
 	 * If this page is to be removed, this won't be necessary.
@@ -194,7 +157,7 @@ if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
 	 */
 	function gutenberg_the_skip_link() {
 		// Early exit if not a block theme.
-		if ( ! gutenberg_supports_block_templates() ) {
+		if ( ! current_theme_supports( 'block-templates' ) ) {
 			return;
 		}
 

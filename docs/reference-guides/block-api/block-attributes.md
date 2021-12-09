@@ -66,7 +66,7 @@ The saved HTML will contain the `title` and `size` in the comment delimiter, and
 <!-- /block:your-block -->
 ```
 
-If an attributes change over time then a [block deprecation](block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
+If an attributes change over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
 
 ## Type Validation
 

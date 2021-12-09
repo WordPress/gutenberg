@@ -12,7 +12,7 @@
 		},
 		"queryPerPage": {
 			"type": "number",
-			"default": 4
+			"default": 50
 		},
 		"tagName": {
 			"type": "string",

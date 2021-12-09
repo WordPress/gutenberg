@@ -15,7 +15,7 @@ export default {
 	component: Scrollable,
 	title: 'Components (Experimental)/Scrollable',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

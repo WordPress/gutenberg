@@ -3,29 +3,29 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { getQueryArg, addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import { useLocation, useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
 export default function URLQueryController() {
 	const { setTemplate, setTemplatePart, showHomepage, setPage } = useDispatch(
 		editSiteStore
 	);
+	const history = useHistory();
+	const {
+		params: { postId, postType },
+	} = useLocation();
+	const { getPage, getEditedPostId, getEditedPostType } = useSelect(
+		editSiteStore
+	);
 
-	// Set correct entity on load.
+	// Set correct entity on page navigation.
 	useEffect( () => {
-		const url = window.location.href;
-		const postId = getQueryArg( url, 'postId' );
+		let isMounted = true;
 
-		if ( ! postId ) {
-			showHomepage();
-			return;
-		}
-
-		const postType = getQueryArg( url, 'postType' );
 		if ( 'page' === postType || 'post' === postType ) {
 			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
 		} else if ( 'wp_template' === postType ) {
@@ -33,44 +33,33 @@ export default function URLQueryController() {
 		} else if ( 'wp_template_part' === postType ) {
 			setTemplatePart( postId );
 		} else {
-			showHomepage();
+			showHomepage().then( () => {
+				if ( ! isMounted ) {
+					return;
+				}
+
+				const page = getPage();
+				const editedPostId = getEditedPostId();
+				const editedPostType = getEditedPostType();
+
+				if ( page?.context?.postId && page?.context?.postType ) {
+					history.replace( {
+						postId: page.context.postId,
+						postType: page.context.postType,
+					} );
+				} else if ( editedPostId && editedPostType ) {
+					history.replace( {
+						postId: editedPostId,
+						postType: editedPostType,
+					} );
+				}
+			} );
 		}
-	}, [] );
 
-	// Update page URL when context changes.
-	const pageContext = useCurrentPageContext();
-	useEffect( () => {
-		const newUrl = pageContext
-			? addQueryArgs( window.location.href, pageContext )
-			: removeQueryArgs( window.location.href, 'postType', 'postId' );
-
-		window.history.replaceState( {}, '', newUrl );
-	}, [ pageContext ] );
+		return () => {
+			isMounted = false;
+		};
+	}, [ postId, postType ] );
 
 	return null;
-}
-
-function useCurrentPageContext() {
-	return useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId, getPage } = select(
-			editSiteStore
-		);
-
-		const page = getPage();
-		let _postId = getEditedPostId(),
-			_postType = getEditedPostType();
-		// This doesn't seem right to me,
-		// we shouldn't be using the "page" and the "template" in the same way.
-		// This need to be investigated.
-		if ( page?.context?.postId && page?.context?.postType ) {
-			_postId = page.context.postId;
-			_postType = page.context.postType;
-		}
-
-		if ( _postId && _postType ) {
-			return { postId: _postId, postType: _postType };
-		}
-
-		return null;
-	}, [] );
 }
