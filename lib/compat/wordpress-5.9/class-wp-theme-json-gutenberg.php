@@ -396,7 +396,9 @@ class WP_Theme_JSON_Gutenberg {
 		);
 
 		foreach ( $to_opt_in as $path ) {
-			if ( null === _wp_array_get( $context, $path, null ) ) {
+			// Use "unset prop" as a marker instead of "null" because
+			// "null" can be a valid value for some props (e.g. blockGap).
+			if ( "unset prop" === _wp_array_get( $context, $path, "unset prop" ) ) {
 				_wp_array_set( $context, $path, true );
 			}
 		}

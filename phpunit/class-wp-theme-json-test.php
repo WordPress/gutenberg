@@ -208,6 +208,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'typography'      => array(
 								'lineHeight' => false, // This should override appearanceTools.
 							),
+							'spacing'         => array(
+								'blockGap' => null,
+							),
 						),
 					),
 				),
@@ -250,7 +253,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'link' => true,
 					),
 					'spacing'    => array(
-						'blockGap' => true,
+						'blockGap' => false,
 						'margin'   => true,
 						'padding'  => true,
 					),
