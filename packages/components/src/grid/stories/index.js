@@ -13,7 +13,7 @@ export default {
 	component: Grid,
 	title: 'Components (Experimental)/Grid',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

@@ -900,7 +900,9 @@ export class RichText extends Component {
 		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
 		// We need to always convert to px units because the selected value
 		// could be coming from the web where it could be stored as a different unit.
-		const selectedPxValue = getPxFromCssUnit( newFontSize, cssUnitOptions );
+		const selectedPxValue =
+			getPxFromCssUnit( newFontSize, cssUnitOptions ) ??
+			DEFAULT_FONT_SIZE;
 
 		return parseFloat( selectedPxValue );
 	}

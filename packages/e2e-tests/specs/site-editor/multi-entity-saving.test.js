@@ -4,8 +4,10 @@
 import {
 	createNewPost,
 	disablePrePublishChecks,
+	getOption,
 	insertBlock,
 	publishPost,
+	setOption,
 	trashAllPosts,
 	activateTheme,
 	clickButton,
@@ -44,14 +46,25 @@ describe( 'Multi-entity save flow', () => {
 		}
 	};
 
+	let originalSiteTitle, originalBlogDescription;
+
 	beforeAll( async () => {
 		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+
+		// Get the current Site Title and Site Tagline, so that we can reset
+		// them back to the original values once the test suite has finished.
+		originalSiteTitle = await getOption( 'blogname' );
+		originalBlogDescription = await getOption( 'blogdescription' );
 	} );
 
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
+
+		// Reset the Site Title and Site Tagline back to their original values.
+		await setOption( 'blogname', originalSiteTitle );
+		await setOption( 'blogdescription', originalBlogDescription );
 	} );
 
 	describe( 'Post Editor', () => {
@@ -185,7 +198,9 @@ describe( 'Multi-entity save flow', () => {
 
 			await insertBlock( 'Site Title' );
 			// Ensure title is retrieved before typing.
-			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
+			await page.waitForXPath(
+				`//a[contains(text(), "${ originalSiteTitle }")]`
+			);
 			const editableSiteTitleSelector =
 				'.wp-block-site-title a[contenteditable="true"]';
 			await page.waitForSelector( editableSiteTitleSelector );
@@ -211,23 +226,16 @@ describe( 'Multi-entity save flow', () => {
 			await checkboxInputs[ 1 ].click();
 			await page.click( entitiesSaveSelector );
 
+			// Wait for the snackbar notice that the post has been published.
+			await page.waitForSelector( '.components-snackbar' );
+
 			await clickButton( 'Update…' );
 			await page.waitForSelector( savePanelSelector );
-			checkboxInputs = await page.$$( checkboxInputSelector );
-			expect( checkboxInputs ).toHaveLength( 1 );
 
-			// Reset site entity to default value to not affect other tests.
-			await page.evaluate( () => {
-				wp.data
-					.dispatch( 'core' )
-					.editEntityRecord( 'root', 'site', undefined, {
-						title: 'gutenberg',
-						description: 'Just another WordPress site',
-					} );
-				wp.data
-					.dispatch( 'core' )
-					.saveEditedEntityRecord( 'root', 'site', undefined );
-			} );
+			await page.waitForSelector( checkboxInputSelector );
+			checkboxInputs = await page.$$( checkboxInputSelector );
+
+			expect( checkboxInputs ).toHaveLength( 1 );
 		} );
 	} );
 

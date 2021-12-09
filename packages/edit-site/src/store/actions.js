@@ -173,20 +173,6 @@ export function setTemplatePart( templatePartId ) {
 }
 
 /**
- * Returns an action object used to push a template part to navigation history.
- *
- * @param {string} templatePartId The template part ID.
- *
- * @return {Object} Action object.
- */
-export function pushTemplatePart( templatePartId ) {
-	return {
-		type: 'PUSH_TEMPLATE_PART',
-		templatePartId,
-	};
-}
-
-/**
  * Updates the homeTemplateId state with the templateId of the page resolved
  * from the given path.
  *
@@ -242,15 +228,6 @@ export function* setPage( page ) {
 		templateId,
 	};
 	return templateId;
-}
-
-/**
- * Go back to the current editing page.
- */
-export function goBack() {
-	return {
-		type: 'GO_BACK',
-	};
 }
 
 /**

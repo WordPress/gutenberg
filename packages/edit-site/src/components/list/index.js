@@ -21,8 +21,14 @@ import Header from './header';
 import NavigationSidebar from '../navigation-sidebar';
 import Table from './table';
 import { store as editSiteStore } from '../../store';
+import { useLocation } from '../routes';
+import useTitle from '../routes/use-title';
 
-export default function List( { templateType } ) {
+export default function List() {
+	const {
+		params: { postType: templateType },
+	} = useLocation();
+
 	useRegisterShortcuts();
 
 	const { previousShortcut, nextShortcut, isNavigationOpen } = useSelect(
@@ -46,6 +52,8 @@ export default function List( { templateType } ) {
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
 	);
+
+	useTitle( postType?.labels?.name );
 
 	// `postType` could load in asynchronously. Only provide the detailed region labels if
 	// the postType has loaded, otherwise `InterfaceSkeleton` will fallback to the defaults.
@@ -75,18 +83,9 @@ export default function List( { templateType } ) {
 				...detailedRegionLabels,
 			} }
 			header={ <Header templateType={ templateType } /> }
-			drawer={
-				<NavigationSidebar
-					activeTemplateType={ templateType }
-					isDefaultOpen
-				/>
-			}
+			drawer={ <NavigationSidebar.Slot /> }
 			notices={ <EditorSnackbars /> }
-			content={
-				<main className="edit-site-list-main">
-					<Table templateType={ templateType } />
-				</main>
-			}
+			content={ <Table templateType={ templateType } /> }
 			shortcuts={ {
 				previous: previousShortcut,
 				next: nextShortcut,

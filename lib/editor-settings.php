@@ -22,9 +22,9 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 	$image_sizes        = wp_list_pluck( $settings['imageSizes'], 'slug' );
 
 	$settings['imageDefaultSize']                      = in_array( $image_default_size, $image_sizes, true ) ? $image_default_size : 'large';
-	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_supports_block_templates();
+	$settings['__unstableEnableFullSiteEditingBlocks'] = current_theme_supports( 'block-templates' );
 
-	if ( gutenberg_is_fse_theme() ) {
+	if ( wp_is_block_theme() ) {
 		$settings['defaultTemplatePartAreas'] = get_allowed_block_template_part_areas();
 	}
 

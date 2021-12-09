@@ -17,7 +17,7 @@ export default {
 	title: 'Components/GradientPicker',
 	component: GradientPicker,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

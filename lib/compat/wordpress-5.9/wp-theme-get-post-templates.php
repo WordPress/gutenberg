@@ -15,7 +15,7 @@
  * @return array (Maybe) modified page templates array.
  */
 function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_type ) {
-	if ( ! gutenberg_supports_block_templates() ) {
+	if ( ! current_theme_supports( 'block-templates' ) ) {
 		return $templates;
 	}
 

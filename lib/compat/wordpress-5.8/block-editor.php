@@ -208,7 +208,7 @@ function gutenberg_get_default_block_editor_settings() {
 	}
 
 	$editor_settings = array(
-		'__unstableEnableFullSiteEditingBlocks' => gutenberg_supports_block_templates(),
+		'__unstableEnableFullSiteEditingBlocks' => current_theme_supports( 'block-templates' ),
 		'alignWide'                             => get_theme_support( 'align-wide' ),
 		'allowedBlockTypes'                     => true,
 		'allowedMimeTypes'                      => get_allowed_mime_types(),

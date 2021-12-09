@@ -363,6 +363,18 @@ _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
 
+### getOption
+
+Returns a site option, from the options admin page.
+
+_Parameters_
+
+-   _setting_ `string`: The option, used to get the option by id.
+
+_Returns_
+
+-   `string`: The value of the option.
+
 ### getPageError
 
 Returns a promise resolving to one of either a string or null. A string will
@@ -632,6 +644,15 @@ _Parameters_
 -   _$1_ `Object`: Options.
 -   _$1.plainText_ `string`: Plain text to set.
 -   _$1.html_ `string`: HTML to set.
+
+### setOption
+
+Sets a site option, from the options-general admin page.
+
+_Parameters_
+
+-   _setting_ `string`: The option, used to get the option by id.
+-   _value_ `string`: The value to set the option to.
 
 ### setPostContent
 

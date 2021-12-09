@@ -7,6 +7,7 @@ import deprecated from '@wordpress/deprecated';
 export default function FocusableIframe( { iframeRef, ...props } ) {
 	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
 	deprecated( 'wp.components.FocusableIframe', {
+		since: '5.9',
 		alternative: 'wp.compose.useFocusableIframe',
 	} );
 	// Disable reason: The rendered iframe is a pass-through component,
