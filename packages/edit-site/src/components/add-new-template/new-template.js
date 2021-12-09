@@ -35,7 +35,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 export default function NewTemplate( { postType } ) {
 	const history = useHistory();
-	const { templates, defaultTemplateTypes } = useSelect(
+	const { templates, defaultTemplateTypes, theme } = useSelect(
 		( select ) => ( {
 			templates: select( coreStore ).getEntityRecords(
 				'postType',
@@ -45,6 +45,7 @@ export default function NewTemplate( { postType } ) {
 			defaultTemplateTypes: select(
 				editorStore
 			).__experimentalGetDefaultTemplateTypes(),
+			theme: select( coreStore ).getCurrentTheme(),
 		} ),
 		[]
 	);
@@ -54,8 +55,7 @@ export default function NewTemplate( { postType } ) {
 		try {
 			// Navigate to the created template editor.
 			history.push( {
-				// TODO: Compute theme name.
-				postId: 'twentytwentytwo//' + slug.toString(),
+				postId: theme.stylesheet + '//' + slug.toString(),
 				postType: 'wp_template',
 			} );
 
