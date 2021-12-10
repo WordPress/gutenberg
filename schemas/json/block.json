@@ -70,6 +70,10 @@
 				"type": "string"
 			}
 		},
+		"version": {
+			"type": "string",
+			"description": "The current version number of the block, such as 1.0 or 1.0.3. It’s similar to how plugins are versioned. This field might be used with block assets to control cache invalidation, and when the block author omits it, then the installed version of WordPress is used instead."
+		},
 		"textdomain": {
 			"type": "string",
 			"description": "The gettext text domain of the plugin/block. More information can be found in the Text Domain section of the How to Internationalize your Plugin page.\n\nhttps://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/"
