@@ -11,6 +11,7 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
+const noop = () => undefined;
 
 // Default props for the tools panel.
 const defaultProps = {
@@ -84,6 +85,23 @@ const GroupedItems = ( {
 			</ToolsPanelItem>
 		</>
 	);
+};
+
+// This context object is used to help simulate different scenarios in which
+// `ToolsPanelItem` registration or deregistration requires testing.
+const panelContext = {
+	panelId: '1234',
+	menuItems: {
+		default: {},
+		optional: { [ altControlProps.label ]: true },
+	},
+	hasMenuItems: false,
+	isResetting: false,
+	shouldRenderPlaceholderItems: false,
+	registerPanelItem: jest.fn(),
+	deregisterPanelItem: jest.fn(),
+	flagItemCustomization: noop,
+	areAllOptionalControlsHidden: true,
 };
 
 // Renders a tools panel including panel items that have been grouped within
@@ -499,6 +517,10 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'registration of panel items', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
 		it( 'should register and deregister items when panelId changes', () => {
 			// This test simulates switching block selection, which causes the
 			// `ToolsPanel` to rerender with a new panelId, necessitating the
@@ -509,23 +531,7 @@ describe( 'ToolsPanel', () => {
 			// themselves, while those for the old panelId deregister.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/36588
-
-			const noop = () => undefined;
-			const context = {
-				panelId: '1234',
-				menuItems: {
-					default: {},
-					optional: { [ altControlProps.label ]: true },
-				},
-				hasMenuItems: false,
-				isResetting: false,
-				shouldRenderPlaceholderItems: false,
-				registerPanelItem: jest.fn(),
-				deregisterPanelItem: jest.fn(),
-				flagItemCustomization: noop,
-				areAllOptionalControlsHidden: true,
-			};
-
+			const context = { ...panelContext };
 			const TestPanel = () => (
 				<ToolsPanelContext.Provider value={ context }>
 					<ToolsPanelItem { ...altControlProps } panelId="1234">
@@ -580,6 +586,51 @@ describe( 'ToolsPanel', () => {
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
 			// deregisterPanelItem has still only been called once.
 			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should register items when ToolsPanel panelId is null', () => {
+			// This test simulates when a panel spans multiple block selections.
+			// Multi-selection means a panel can't have a single id to match
+			// against the item's. Instead the panel gets an id of `null` and
+			// individual items should still render themselves in this case.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/37216
+			const context = { ...panelContext, panelId: null };
+			const TestPanel = () => (
+				<ToolsPanelContext.Provider value={ context }>
+					<ToolsPanelItem { ...altControlProps } panelId="1234">
+						<div>Item</div>
+					</ToolsPanelItem>
+				</ToolsPanelContext.Provider>
+			);
+
+			// On the initial render of the panel, the ToolsPanelItem should
+			// be registered.
+			const { rerender } = render( <TestPanel /> );
+
+			expect( context.registerPanelItem ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					label: altControlProps.label,
+					panelId: '1234',
+				} )
+			);
+			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
+
+			// Simulate a change in panel, e.g. selection of a single block.
+			context.panelId = '4321';
+
+			// Rerender the panel item. Because we have a new non-null panelId,
+			// this panelItem should NOT be registered, but it SHOULD be
+			// deregistered.
+			rerender( <TestPanel /> );
+
+			// registerPanelItem has still only been called once.
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
+			// deregisterPanelItem is called as the current panelId does not
+			// match the item's.
+			expect( context.deregisterPanelItem ).toBeCalledWith(
+				altControlProps.label
+			);
 		} );
 	} );
 
@@ -775,8 +826,6 @@ describe( 'ToolsPanel', () => {
 			// This test simulates this issue by rendering an item within a
 			// contrived `ToolsPanelContext` to reflect the changes the panel
 			// item needs to protect against.
-
-			const noop = () => undefined;
 			const context = {
 				panelId: '1234',
 				menuItems: {
