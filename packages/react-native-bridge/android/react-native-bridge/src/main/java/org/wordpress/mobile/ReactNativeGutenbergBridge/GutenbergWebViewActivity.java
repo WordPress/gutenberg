@@ -341,7 +341,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         });
     }
 
-    private String getOnGutenbergReadyExternalStyles() {
+    protected String getOnGutenbergReadyExternalStyles() {
         return new String();
     }
 
