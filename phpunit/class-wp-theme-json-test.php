@@ -188,12 +188,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected_no_origin, $actual_no_origin );
 	}
 
-	function test_get_settings_using_opt_in_key() {
+	function test_get_settings_appearance_true_opts_in() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'appearanceTools' => true,
+					'spacing'         => array(
+						'blockGap' => false, // This should override appearanceTools.
+					),
 					'blocks'          => array(
 						'core/paragraph' => array(
 							'typography' => array(
@@ -204,6 +207,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'appearanceTools' => true,
 							'typography'      => array(
 								'lineHeight' => false, // This should override appearanceTools.
+							),
+							'spacing'         => array(
+								'blockGap' => null,
 							),
 						),
 					),
@@ -223,7 +229,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'link' => true,
 			),
 			'spacing'    => array(
-				'blockGap' => true,
+				'blockGap' => false,
 				'margin'   => true,
 				'padding'  => true,
 			),
@@ -247,10 +253,58 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'link' => true,
 					),
 					'spacing'    => array(
-						'blockGap' => true,
+						'blockGap' => false,
 						'margin'   => true,
 						'padding'  => true,
 					),
+					'typography' => array(
+						'lineHeight' => false,
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_get_settings_appearance_false_does_not_opt_in() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'appearanceTools' => false,
+					'border'          => array(
+						'width' => true,
+					),
+					'blocks'          => array(
+						'core/paragraph' => array(
+							'typography' => array(
+								'lineHeight' => false,
+							),
+						),
+						'core/group'     => array(
+							'typography' => array(
+								'lineHeight' => false,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual   = $theme_json->get_settings();
+		$expected = array(
+			'appearanceTools' => false,
+			'border'          => array(
+				'width' => true,
+			),
+			'blocks'          => array(
+				'core/paragraph' => array(
+					'typography' => array(
+						'lineHeight' => false,
+					),
+				),
+				'core/group'     => array(
 					'typography' => array(
 						'lineHeight' => false,
 					),
