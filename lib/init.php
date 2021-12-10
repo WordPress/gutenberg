@@ -94,7 +94,7 @@ add_action( 'admin_menu', 'gutenberg_menu', 9 );
  * @since 9.4.0
  */
 function gutenberg_site_editor_menu() {
-	if ( gutenberg_experimental_is_site_editor_available() ) {
+	if ( wp_is_block_theme() ) {
 		add_theme_page(
 			__( 'Editor (beta)', 'gutenberg' ),
 			sprintf(
