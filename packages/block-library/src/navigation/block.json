@@ -78,7 +78,7 @@
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
-		"inserter": true,
+		"inserter": false,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
