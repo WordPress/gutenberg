@@ -12,7 +12,19 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Button, VisuallyHidden } from '../';
+import { Button, Popover, VisuallyHidden } from '../';
+
+const OptionList = ( { anchorRect, isOpen, children } ) => {
+	if ( ! isOpen ) {
+		return children;
+	}
+
+	return (
+		<Popover anchorRect={ anchorRect } position={ 'bottom left' }>
+			{ children }
+		</Popover>
+	);
+};
 
 const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
@@ -104,6 +116,7 @@ export default function CustomSelectControl( {
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
+
 	return (
 		<div
 			className={ classnames(
@@ -125,58 +138,62 @@ export default function CustomSelectControl( {
 					{ label }
 				</label>
 			) }
-			<Button
-				{ ...getToggleButtonProps( {
-					// This is needed because some speech recognition software don't support `aria-labelledby`.
-					'aria-label': label,
-					'aria-labelledby': undefined,
-					className: 'components-custom-select-control__button',
-					isSmall: true,
-					describedBy: getDescribedBy(),
-				} ) }
-			>
-				{ itemToString( selectedItem ) }
-				<Icon
-					icon={ chevronDown }
-					className="components-custom-select-control__button-icon"
-				/>
-			</Button>
-			<ul { ...menuProps }>
-				{ isOpen &&
-					items.map( ( item, index ) => (
-						// eslint-disable-next-line react/jsx-key
-						<li
-							{ ...getItemProps( {
-								item,
-								index,
-								key: item.key,
-								className: classnames(
-									item.className,
-									'components-custom-select-control__item',
-									{
-										'is-highlighted':
-											index === highlightedIndex,
-										'has-hint': !! item.__experimentalHint,
-									}
-								),
-								style: item.style,
-							} ) }
-						>
-							{ item.name }
-							{ item.__experimentalHint && (
-								<span className="components-custom-select-control__item-hint">
-									{ item.__experimentalHint }
-								</span>
-							) }
-							{ item === selectedItem && (
-								<Icon
-									icon={ check }
-									className="components-custom-select-control__item-icon"
-								/>
-							) }
-						</li>
-					) ) }
-			</ul>
+			<div className="components-custom-select-control__inner">
+				<Button
+					{ ...getToggleButtonProps( {
+						// This is needed because some speech recognition software don't support `aria-labelledby`.
+						'aria-label': label,
+						'aria-labelledby': undefined,
+						className: 'components-custom-select-control__button',
+						isSmall: true,
+						describedBy: getDescribedBy(),
+					} ) }
+				>
+					{ itemToString( selectedItem ) }
+					<Icon
+						icon={ chevronDown }
+						className="components-custom-select-control__button-icon"
+					/>
+				</Button>
+				<OptionList isOpen={ isOpen }>
+					<ul { ...menuProps }>
+						{ isOpen &&
+							items.map( ( item, index ) => (
+								// eslint-disable-next-line react/jsx-key
+								<li
+									{ ...getItemProps( {
+										item,
+										index,
+										key: item.key,
+										className: classnames(
+											item.className,
+											'components-custom-select-control__item',
+											{
+												'is-highlighted':
+													index === highlightedIndex,
+												'has-hint': !! item.__experimentalHint,
+											}
+										),
+										style: item.style,
+									} ) }
+								>
+									{ item.name }
+									{ item.__experimentalHint && (
+										<span className="components-custom-select-control__item-hint">
+											{ item.__experimentalHint }
+										</span>
+									) }
+									{ item === selectedItem && (
+										<Icon
+											icon={ check }
+											className="components-custom-select-control__item-icon"
+										/>
+									) }
+								</li>
+							) ) }
+					</ul>
+				</OptionList>
+			</div>
 		</div>
 	);
 }
