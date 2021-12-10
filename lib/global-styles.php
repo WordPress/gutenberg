@@ -154,26 +154,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 }
 
 /**
- * Whether or not the Site Editor is available.
- *
- * @return boolean
- */
-function gutenberg_experimental_is_site_editor_available() {
-	return wp_is_block_theme();
-}
-
-/**
- * Register CPT to store/access user data.
- *
- * @return void
- */
-function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( gutenberg_experimental_is_site_editor_available() ) {
-		register_global_styles_custom_post_type();
-	}
-}
-
-/**
  * Sanitizes global styles user content removing unsafe rules.
  *
  * @param string $content Post content to filter.
@@ -293,7 +273,6 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 }
 
-add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 // kses actions&filters.
