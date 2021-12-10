@@ -36,6 +36,12 @@
 		"color": {
 			"link": true
 		},
+		"spacing": {
+			"margin": [ "top", "bottom" ],
+			"__experimentalDefaultControls": {
+				"margin": true
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
