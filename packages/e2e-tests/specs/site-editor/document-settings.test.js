@@ -13,7 +13,7 @@ async function getDocumentSettingsTitle() {
 		'.edit-site-document-actions__title'
 	);
 
-	return titleElement.evaluate( ( el ) => el.innerText );
+	return titleElement.evaluate( ( el ) => el.textContent );
 }
 
 async function getDocumentSettingsSecondaryTitle() {
@@ -21,7 +21,7 @@ async function getDocumentSettingsSecondaryTitle() {
 		'.edit-site-document-actions__secondary-item'
 	);
 
-	return secondaryTitleElement.evaluate( ( el ) => el.innerText );
+	return secondaryTitleElement.evaluate( ( el ) => el.textContent );
 }
 
 describe( 'Document Settings', () => {
@@ -50,7 +50,7 @@ describe( 'Document Settings', () => {
 			// Evaluate the document settings title
 			const actual = await getDocumentSettingsTitle();
 
-			expect( actual ).toEqual( 'Index' );
+			expect( actual ).toEqual( 'Editing template: Index' );
 		} );
 
 		describe( 'and a template part is clicked in the template', () => {
@@ -70,7 +70,7 @@ describe( 'Document Settings', () => {
 				// Evaluate the document settings secondary title
 				const actual = await getDocumentSettingsSecondaryTitle();
 
-				expect( actual ).toEqual( 'Header' );
+				expect( actual ).toEqual( 'Editing template part: header' );
 			} );
 		} );
 	} );
@@ -86,7 +86,7 @@ describe( 'Document Settings', () => {
 			// Evaluate the document settings title
 			const actual = await getDocumentSettingsTitle();
 
-			expect( actual ).toEqual( 'header' );
+			expect( actual ).toEqual( 'Editing template part: header' );
 		} );
 	} );
 } );
