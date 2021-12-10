@@ -24,7 +24,7 @@ export default function menuItemsToBlocks( menuItems ) {
 	const menuTree = createDataTree( menuItems );
 	const blocks = mapMenuItemsToBlocks( menuTree );
 	return applyFilters(
-		'navigation.__experimentalMenuItemsToBlocks',
+		'blocks.navigation.__unstableMenuItemsToBlocks',
 		blocks,
 		menuItems
 	);
