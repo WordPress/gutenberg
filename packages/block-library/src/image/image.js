@@ -30,7 +30,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { createBlock, switchToBlockType } from '@wordpress/blocks';
@@ -187,18 +187,10 @@ export default function Image( {
 	// width and height. This resolves an issue in Safari where the loaded natural
 	// witdth and height is otherwise lost when switching between alignments.
 	// See: https://github.com/WordPress/gutenberg/pull/37210.
-	const { naturalWidth, naturalHeight } = useMemo( () => {
-		return {
-			naturalWidth:
-				imageRef.current?.naturalWidth ||
-				loadedNaturalWidth ||
-				undefined,
-			naturalHeight:
-				imageRef.current?.naturalHeight ||
-				loadedNaturalHeight ||
-				undefined,
-		};
-	}, [ loadedNaturalWidth, loadedNaturalHeight, imageRef.current ] );
+	const naturalWidth =
+		imageRef.current?.naturalWidth || loadedNaturalWidth || undefined;
+	const naturalHeight =
+		imageRef.current?.nautralHeight || loadedNaturalHeight || undefined;
 
 	function onResizeStart() {
 		toggleSelection( false );
