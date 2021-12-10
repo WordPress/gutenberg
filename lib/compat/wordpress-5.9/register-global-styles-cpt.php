@@ -21,7 +21,7 @@ if ( ! function_exists( 'wp_get_global_settings' ) ) {
 	function register_global_styles_custom_post_type() {
 		$args = array(
 			'label'        => __( 'Global Styles', 'gutenberg' ),
-			'description'  => 'CPT to store user design tokens',
+			'description'  => 'Global styles to include in themes.',
 			'public'       => false,
 			'show_ui'      => false,
 			'show_in_rest' => false,
@@ -45,15 +45,5 @@ if ( ! function_exists( 'wp_get_global_settings' ) ) {
 		register_post_type( 'wp_global_styles', $args );
 	}
 
-	/**
-	 * Register CPT to store/access user data.
-	 *
-	 * @return void
-	 */
-	function maybe_register_global_styles_custom_post_type() {
-		if ( wp_is_block_theme() ) {
-			register_global_styles_custom_post_type();
-		}
-	}
-	add_action( 'init', 'maybe_register_global_styles_custom_post_type' );
+	add_action( 'init', 'register_global_styles_custom_post_type' );
 }
