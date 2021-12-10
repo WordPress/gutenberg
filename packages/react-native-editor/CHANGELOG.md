@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Give multi-line block names central alignment in inserter [#37185]
 -   [**] [iOS] Fix scroll update when typing in RichText component [#36914]
 -   [*] [Preformatted block] Fix an issue where the background color is not showing up for standard themes. [#36883]
 -   [***] Highlight text - enables color customization for specific text within a Pragraph block [#36028]
