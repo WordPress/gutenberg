@@ -22,10 +22,12 @@ export default function useCreateNavigationMenu( clientId, postId ) {
 			if ( ! title ) {
 				title = await generateDefaultTitle();
 			}
+
+			const status = postId ? 'inherit' : 'publish';
 			const record = {
 				title,
 				content: serialize( blocks ),
-				status: 'inherit',
+				status,
 				parent: postId,
 			};
 
