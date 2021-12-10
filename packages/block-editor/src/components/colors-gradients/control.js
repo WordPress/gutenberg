@@ -132,6 +132,9 @@ function ColorGradientControlInner( {
 							__experimentalHasMultipleOrigins={
 								__experimentalHasMultipleOrigins
 							}
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
 							clearable={ clearable }
 						/>
 					) }
