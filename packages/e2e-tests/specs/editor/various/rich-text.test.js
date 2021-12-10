@@ -607,8 +607,10 @@ describe( 'RichText', () => {
 		const viewPostLinks = await page.$x(
 			"//a[contains(text(), 'View Post')]"
 		);
-		await viewPostLinks[ 0 ].click();
-		await page.waitForNavigation();
+		await Promise.all( [
+			page.waitForNavigation(),
+			viewPostLinks[ 0 ].click()
+		] );
 
 		await page.waitForSelector( '.entry-content' );
 
