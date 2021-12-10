@@ -9,8 +9,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import Header from './header';
 import Table from './table';
 import Layout from '../layout';
+import useRegisterShortcuts from './use-register-shortcuts';
 
 function List() {
+	useRegisterShortcuts();
+
 	return <Table />;
 }
 
