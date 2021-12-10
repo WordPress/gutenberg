@@ -359,13 +359,16 @@ class WP_Theme_JSON_Gutenberg {
 	private static function maybe_opt_in_into_settings( $theme_json ) {
 		$new_theme_json = $theme_json;
 
-		if ( isset( $new_theme_json['settings']['appearanceTools'] ) ) {
+		if (
+			isset( $new_theme_json['settings']['appearanceTools'] ) &&
+			true === $new_theme_json['settings']['appearanceTools']
+		) {
 			self::do_opt_in_into_settings( $new_theme_json['settings'] );
 		}
 
 		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
 			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
-				if ( isset( $block['appearanceTools'] ) ) {
+				if ( isset( $block['appearanceTools'] ) && ( true === $block['appearanceTools'] ) ) {
 					self::do_opt_in_into_settings( $block );
 				}
 			}
@@ -393,7 +396,9 @@ class WP_Theme_JSON_Gutenberg {
 		);
 
 		foreach ( $to_opt_in as $path ) {
-			if ( null === _wp_array_get( $context, $path, null ) ) {
+			// Use "unset prop" as a marker instead of "null" because
+			// "null" can be a valid value for some props (e.g. blockGap).
+			if ( 'unset prop' === _wp_array_get( $context, $path, 'unset prop' ) ) {
 				_wp_array_set( $context, $path, true );
 			}
 		}
