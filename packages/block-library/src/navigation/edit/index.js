@@ -174,6 +174,8 @@ function Navigation( {
 				? _uncontrolledInnerBlocks
 				: _controlledInnerBlocks;
 
+			const { canUser, hasFinishedResolution } = select( coreStore );
+
 			return {
 				hasSubmenus: !! innerBlocks.find(
 					( block ) => block.name === 'core/navigation-submenu'
@@ -182,9 +184,16 @@ function Navigation( {
 				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
 				controlledInnerBlocks: _controlledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
+				canUserPublishNavigation: ref
+					? canUser( 'publish', 'navigation', ref )
+					: undefined,
+				hasResolvedcanUserPublishNavigationEntity: hasFinishedResolution(
+					'canUser',
+					[ 'publish', 'navigation', ref ]
+				),
 			};
 		},
-		[ clientId ]
+		[ clientId, ref ]
 	);
 	const {
 		replaceInnerBlocks,
@@ -671,6 +680,15 @@ function Navigation( {
 						</ResponsiveWrapper>
 					) }
 				</nav>
+				{ ref &&
+					hasResolvedcanUserPublishNavigationEntity &&
+					! canUserPublishNavigation && (
+						<Warning>
+							{ __(
+								'You do not have permission to publish Navigations. Any items you add here will not be saved.'
+							) }
+						</Warning>
+					) }
 			</RecursionProvider>
 		</EntityProvider>
 	);
