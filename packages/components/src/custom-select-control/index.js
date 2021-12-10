@@ -14,16 +14,12 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { Button, Popover, VisuallyHidden } from '../';
 
-const OptionList = ( { anchorRect, isOpen, children } ) => {
+const OptionList = ( { isOpen, children } ) => {
 	if ( ! isOpen ) {
 		return children;
 	}
 
-	return (
-		<Popover anchorRect={ anchorRect } position={ 'bottom left' }>
-			{ children }
-		</Popover>
-	);
+	return <Popover position={ 'bottom left' }>{ children }</Popover>;
 };
 
 const itemToString = ( item ) => item?.name;
