@@ -369,9 +369,14 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 					...omit(
 						newState.tree,
 						action.replacedClientIds.concat(
-							action.replacedClientIds.map(
-								( clientId ) => 'controlled||' + clientId
-							)
+							// controlled inner blocks are only removed
+							// if the block don't move to another position
+							// otherwise their content will be lost.
+							action.replacedClientIds
+								.filter( ( clientId ) => ! subTree[ clientId ] )
+								.map(
+									( clientId ) => 'controlled||' + clientId
+								)
 						)
 					),
 					...subTree,
