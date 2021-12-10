@@ -15,26 +15,12 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	MIN_SPACER_HEIGHT,
-	MAX_SPACER_HEIGHT,
-	MIN_SPACER_WIDTH,
-	MAX_SPACER_WIDTH,
-} from './edit';
+import { MAX_SPACER_SIZE } from './edit';
 
-function DimensionInput( {
-	label,
-	onChange,
-	onUnitChange,
-	unit = 'px',
-	value = '',
-	max,
-	min,
-} ) {
+function DimensionInput( { label, onChange, value = '' } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
 
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
-	const isPx = unit === 'px';
 
 	// In most contexts the spacer size cannot meaningfully be set to a
 	// percentage, since this is relative to the parent container. This
@@ -55,24 +41,8 @@ function DimensionInput( {
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
-		let inputValue =
-			unprocessedValue !== ''
-				? parseFloat( unprocessedValue )
-				: undefined;
-
-		if ( isNaN( inputValue ) && inputValue !== undefined ) {
-			setTemporaryInput( unprocessedValue );
-			return;
-		}
 		setTemporaryInput( null );
-
-		if ( isPx ) {
-			inputValue = Math.min( inputValue, max );
-		}
-		onChange( inputValue );
-		if ( inputValue === undefined ) {
-			onUnitChange();
-		}
+		onChange( unprocessedValue );
 	};
 
 	const handleOnBlur = () => {
@@ -82,21 +52,17 @@ function DimensionInput( {
 	};
 
 	const inputValue = temporaryInput !== null ? temporaryInput : value;
-	const minValue = isPx ? min : 0;
-	const maxValue = isPx ? max : undefined;
 
 	return (
 		<BaseControl label={ label } id={ inputId }>
 			<UnitControl
 				id={ inputId }
 				isResetValueOnUnitChange
-				min={ minValue }
-				max={ maxValue }
+				min={ 0 }
+				max={ MAX_SPACER_SIZE }
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
 				style={ { maxWidth: 80 } }
-				unit={ unit }
 				units={ units }
 				value={ inputValue }
 			/>
@@ -109,8 +75,6 @@ export default function SpacerControls( {
 	orientation,
 	height,
 	width,
-	heightUnit,
-	widthUnit,
 } ) {
 	return (
 		<InspectorControls>
@@ -119,16 +83,8 @@ export default function SpacerControls( {
 					<DimensionInput
 						label={ __( 'Width' ) }
 						value={ width }
-						max={ MAX_SPACER_WIDTH }
-						min={ MIN_SPACER_WIDTH }
-						unit={ widthUnit }
 						onChange={ ( nextWidth ) =>
 							setAttributes( { width: nextWidth } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								widthUnit: nextUnit,
-							} )
 						}
 					/>
 				) }
@@ -136,16 +92,8 @@ export default function SpacerControls( {
 					<DimensionInput
 						label={ __( 'Height' ) }
 						value={ height }
-						max={ MAX_SPACER_HEIGHT }
-						min={ MIN_SPACER_HEIGHT }
-						unit={ heightUnit }
 						onChange={ ( nextHeight ) =>
 							setAttributes( { height: nextHeight } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								heightUnit: nextUnit,
-							} )
 						}
 					/>
 				) }

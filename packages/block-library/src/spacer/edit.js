@@ -21,15 +21,11 @@ import { View } from '@wordpress/primitives';
  */
 import SpacerControls from './controls';
 
-export const MIN_SPACER_HEIGHT = 1;
-export const MAX_SPACER_HEIGHT = 500;
-
-export const MIN_SPACER_WIDTH = 1;
-export const MAX_SPACER_WIDTH = 500;
+export const MIN_SPACER_SIZE = 1;
+export const MAX_SPACER_SIZE = 500;
 
 const ResizableSpacer = ( {
 	orientation,
-	max,
 	onResizeStart,
 	onResize,
 	onResizeStop,
@@ -38,10 +34,14 @@ const ResizableSpacer = ( {
 } ) => {
 	const [ isResizing, setIsResizing ] = useState( false );
 
-	const getNextVal = ( elt ) => {
+	const getCurrentSize = ( elt ) => {
 		return orientation === 'horizontal'
 			? elt.clientWidth
 			: elt.clientHeight;
+	};
+
+	const getNextVal = ( elt ) => {
+		return `${ getCurrentSize( elt ) }px`;
 	};
 
 	return (
@@ -63,7 +63,11 @@ const ResizableSpacer = ( {
 				}
 			} }
 			onResizeStop={ ( _event, _direction, elt ) => {
-				onResizeStop( Math.min( getNextVal( elt ), max ) );
+				const nextVal = Math.min(
+					MAX_SPACER_SIZE,
+					getCurrentSize( elt )
+				);
+				onResizeStop( `${ nextVal }px` );
 				setIsResizing( false );
 			} }
 			__experimentalShowTooltip={ true }
@@ -87,22 +91,10 @@ const SpacerEdit = ( {
 	context,
 } ) => {
 	const { orientation } = context;
-	const { height, width, heightUnit, widthUnit } = attributes;
+	const { height, width } = attributes;
 
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
 	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
-
-	const heightWithUnit = heightUnit ? `${ height }${ heightUnit }` : height;
-	const widthWithUnit = widthUnit ? `${ width }${ widthUnit }` : width;
-
-	const handleOnResizeStart = ( _event, _direction, elt ) => {
-		setAttributes( {
-			heightUnit: 'px',
-			widthUnit: 'px',
-		} );
-
-		onResizeStart( _event, _direction, elt );
-	};
 
 	const handleOnVerticalResizeStop = ( newHeight ) => {
 		onResizeStop();
@@ -121,10 +113,10 @@ const SpacerEdit = ( {
 		height:
 			orientation === 'horizontal'
 				? 24
-				: temporaryHeight || heightWithUnit || undefined,
+				: temporaryHeight || height || undefined,
 		width:
 			orientation === 'horizontal'
-				? temporaryWidth || widthWithUnit || undefined
+				? temporaryWidth || width || undefined
 				: undefined,
 	};
 
@@ -132,7 +124,7 @@ const SpacerEdit = ( {
 		if ( blockOrientation === 'horizontal' ) {
 			return (
 				<ResizableSpacer
-					minWidth={ MIN_SPACER_WIDTH }
+					minWidth={ MIN_SPACER_SIZE }
 					enable={ {
 						top: false,
 						right: true,
@@ -144,8 +136,7 @@ const SpacerEdit = ( {
 						topLeft: false,
 					} }
 					orientation={ blockOrientation }
-					max={ MAX_SPACER_WIDTH }
-					onResizeStart={ handleOnResizeStart }
+					onResizeStart={ onResizeStart }
 					onResize={ setTemporaryWidth }
 					onResizeStop={ handleOnHorizontalResizeStop }
 					isSelected={ isSelected }
@@ -167,8 +158,7 @@ const SpacerEdit = ( {
 						topLeft: false,
 					} }
 					orientation={ blockOrientation }
-					max={ MAX_SPACER_HEIGHT }
-					onResizeStart={ handleOnResizeStart }
+					onResizeStart={ onResizeStart }
 					onResize={ setTemporaryHeight }
 					onResizeStop={ handleOnVerticalResizeStop }
 					isSelected={ isSelected }
@@ -180,10 +170,8 @@ const SpacerEdit = ( {
 	useEffect( () => {
 		if ( orientation === 'horizontal' && ! width ) {
 			setAttributes( {
-				height: 0,
-				heightUnit: 'px',
-				width: 72,
-				widthUnit: 'px',
+				height: '0px',
+				width: '72px',
 			} );
 		}
 	}, [] );
@@ -196,9 +184,7 @@ const SpacerEdit = ( {
 			<SpacerControls
 				setAttributes={ setAttributes }
 				height={ temporaryHeight || height }
-				heightUnit={ heightUnit }
 				width={ temporaryWidth || width }
-				widthUnit={ widthUnit }
 				orientation={ orientation }
 			/>
 		</>
