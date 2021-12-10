@@ -30,7 +30,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { createBlock, switchToBlockType } from '@wordpress/blocks';
@@ -187,10 +187,22 @@ export default function Image( {
 	// width and height. This resolves an issue in Safari where the loaded natural
 	// witdth and height is otherwise lost when switching between alignments.
 	// See: https://github.com/WordPress/gutenberg/pull/37210.
-	const naturalWidth =
-		imageRef.current?.naturalWidth || loadedNaturalWidth || undefined;
-	const naturalHeight =
-		imageRef.current?.nautralHeight || loadedNaturalHeight || undefined;
+	const { naturalWidth, naturalHeight } = useMemo( () => {
+		return {
+			naturalWidth:
+				imageRef.current?.naturalWidth ||
+				loadedNaturalWidth ||
+				undefined,
+			naturalHeight:
+				imageRef.current?.naturalHeight ||
+				loadedNaturalHeight ||
+				undefined,
+		};
+	}, [
+		loadedNaturalWidth,
+		loadedNaturalHeight,
+		imageRef.current?.complete,
+	] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -278,43 +290,6 @@ export default function Image( {
 			setIsEditingImage( false );
 		}
 	}, [ isSelected ] );
-
-	const filename = getFilename( url );
-	let defaultedAlt;
-
-	if ( alt ) {
-		defaultedAlt = alt;
-	} else if ( filename ) {
-		defaultedAlt = sprintf(
-			/* translators: %s: file name */
-			__( 'This image has an empty alt attribute; its file name is %s' ),
-			filename
-		);
-	} else {
-		defaultedAlt = __( 'This image has an empty alt attribute' );
-	}
-
-	let img = (
-		// Disable reason: Image itself is not meant to be interactive, but
-		// should direct focus to block.
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		<>
-			<img
-				src={ temporaryURL || url }
-				alt={ defaultedAlt }
-				onError={ () => onImageError() }
-				onLoad={ ( event ) => {
-					setLoadedNaturalSize( {
-						loadedNaturalWidth: event.target?.naturalWidth,
-						loadedNaturalHeight: event.target?.naturalHeight,
-					} );
-				} }
-				ref={ imageRef }
-			/>
-			{ temporaryURL && <Spinner /> }
-		</>
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-	);
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
@@ -434,6 +409,43 @@ export default function Image( {
 				/>
 			</InspectorControls>
 		</>
+	);
+
+	const filename = getFilename( url );
+	let defaultedAlt;
+
+	if ( alt ) {
+		defaultedAlt = alt;
+	} else if ( filename ) {
+		defaultedAlt = sprintf(
+			/* translators: %s: file name */
+			__( 'This image has an empty alt attribute; its file name is %s' ),
+			filename
+		);
+	} else {
+		defaultedAlt = __( 'This image has an empty alt attribute' );
+	}
+
+	let img = (
+		// Disable reason: Image itself is not meant to be interactive, but
+		// should direct focus to block.
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+		<>
+			<img
+				src={ temporaryURL || url }
+				alt={ defaultedAlt }
+				onError={ () => onImageError() }
+				onLoad={ ( event ) => {
+					setLoadedNaturalSize( {
+						loadedNaturalWidth: event.target?.naturalWidth,
+						loadedNaturalHeight: event.target?.naturalHeight,
+					} );
+				} }
+				ref={ imageRef }
+			/>
+			{ temporaryURL && <Spinner /> }
+		</>
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
 
 	let imageWidthWithinContainer;
