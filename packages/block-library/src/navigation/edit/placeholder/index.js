@@ -89,6 +89,7 @@ const ExistingMenusDropdown = ( {
 
 export default function NavigationPlaceholder( {
 	clientId,
+	postId,
 	onFinish,
 	canSwitchNavigationMenu,
 	hasResolvedNavigationMenus,
@@ -96,7 +97,7 @@ export default function NavigationPlaceholder( {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
 	const [ menuName, setMenuName ] = useState( '' );
-	const createNavigationMenu = useCreateNavigationMenu( clientId );
+	const createNavigationMenu = useCreateNavigationMenu( clientId, postId );
 
 	const onFinishMenuCreation = async (
 		blocks,

@@ -23,13 +23,14 @@ const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
 	'postType',
 	'wp_navigation',
-	{ status: 'draft', per_page: -1 },
+	{ status: 'inherit', per_page: -1 },
 ];
 
 export default function UnsavedInnerBlocks( {
 	blockProps,
 	blocks,
 	clientId,
+	postId,
 	hasSavedUnsavedInnerBlocks,
 	onSave,
 	hasSelection,
@@ -80,7 +81,7 @@ export default function UnsavedInnerBlocks( {
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
-	const createNavigationMenu = useCreateNavigationMenu( clientId );
+	const createNavigationMenu = useCreateNavigationMenu( clientId, postId );
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( async () => {
