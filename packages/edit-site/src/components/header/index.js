@@ -31,10 +31,7 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-export default function Header( {
-	openEntitiesSavedStates,
-	isEntitiesSavedStatesOpen,
-} ) {
+export default function Header() {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -173,10 +170,7 @@ export default function Header( {
 							setDeviceType={ setPreviewDeviceType }
 						/>
 					) }
-					<SaveButton
-						openEntitiesSavedStates={ openEntitiesSavedStates }
-						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
-					/>
+					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu />
 				</div>

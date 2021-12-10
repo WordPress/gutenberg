@@ -46,7 +46,7 @@ export function Routes( { children } ) {
 	return (
 		<HistoryContext.Provider value={ history }>
 			<RoutesContext.Provider value={ location }>
-				{ children( location ) }
+				{ children }
 			</RoutesContext.Provider>
 		</HistoryContext.Provider>
 	);

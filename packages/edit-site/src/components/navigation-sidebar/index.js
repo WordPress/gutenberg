@@ -18,11 +18,6 @@ export const {
 	Slot: NavigationPanelPreviewSlot,
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
-const {
-	Fill: NavigationSidebarFill,
-	Slot: NavigationSidebarSlot,
-} = createSlotFill( 'EditSiteNavigationSidebar' );
-
 function NavigationSidebar( { isDefaultOpen = false, activeTemplateType } ) {
 	const isDesktopViewport = useViewportMatch( 'medium' );
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
@@ -35,14 +30,12 @@ function NavigationSidebar( { isDefaultOpen = false, activeTemplateType } ) {
 	);
 
 	return (
-		<NavigationSidebarFill>
+		<>
 			<NavigationToggle />
 			<NavigationPanel activeItem={ activeTemplateType } />
 			<NavigationPanelPreviewSlot />
-		</NavigationSidebarFill>
+		</>
 	);
 }
-
-NavigationSidebar.Slot = NavigationSidebarSlot;
 
 export default NavigationSidebar;

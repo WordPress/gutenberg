@@ -1,60 +1,23 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
-import { InterfaceSkeleton } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { EditorSnackbars } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import useRegisterShortcuts from './use-register-shortcuts';
 import Header from './header';
-import NavigationSidebar from '../navigation-sidebar';
 import Table from './table';
-import { store as editSiteStore } from '../../store';
-import { useLocation } from '../routes';
-import useTitle from '../routes/use-title';
+import Layout from '../layout';
 
-export default function List() {
-	const {
-		params: { postType: templateType },
-	} = useLocation();
+function List() {
+	return <Table />;
+}
 
-	useRegisterShortcuts();
-
-	const { previousShortcut, nextShortcut, isNavigationOpen } = useSelect(
-		( select ) => {
-			return {
-				previousShortcut: select(
-					keyboardShortcutsStore
-				).getAllShortcutKeyCombinations(
-					'core/edit-site/previous-region'
-				),
-				nextShortcut: select(
-					keyboardShortcutsStore
-				).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
-				isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
-			};
-		},
-		[]
-	);
-
-	const postType = useSelect(
-		( select ) => select( coreStore ).getPostType( templateType ),
-		[ templateType ]
-	);
-
-	useTitle( postType?.labels?.name );
-
+List.renderLayout = function renderListLayout( {
+	postType,
+	activeTemplateType,
+} ) {
 	// `postType` could load in asynchronously. Only provide the detailed region labels if
 	// the postType has loaded, otherwise `InterfaceSkeleton` will fallback to the defaults.
 	const itemsListLabel = postType?.labels?.items_list;
@@ -74,22 +37,18 @@ export default function List() {
 		: undefined;
 
 	return (
-		<InterfaceSkeleton
-			className={ classnames( 'edit-site-list', {
-				'is-navigation-open': isNavigationOpen,
-			} ) }
+		<Layout
+			isNavigationDefaultOpen
+			activeTemplateType={ activeTemplateType }
+			className="edit-site-list"
 			labels={ {
 				drawer: __( 'Navigation Sidebar' ),
 				...detailedRegionLabels,
 			} }
-			header={ <Header templateType={ templateType } /> }
-			drawer={ <NavigationSidebar.Slot /> }
-			notices={ <EditorSnackbars /> }
-			content={ <Table templateType={ templateType } /> }
-			shortcuts={ {
-				previous: previousShortcut,
-				next: nextShortcut,
-			} }
+			header={ <Header /> }
+			content={ <List /> }
 		/>
 	);
-}
+};
+
+export default List;

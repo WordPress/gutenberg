@@ -104,6 +104,7 @@ function NavigationToggle( { icon } ) {
 				aria-pressed={ isNavigationOpen }
 				onClick={ toggleNavigationPanel }
 				showTooltip
+				data-route-change-focus-target=""
 			>
 				{ buttonIcon }
 			</Button>

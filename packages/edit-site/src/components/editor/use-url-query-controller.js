@@ -10,7 +10,7 @@ import { useDispatch } from '@wordpress/data';
 import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
 
-export default function URLQueryController() {
+export default function useURLQueryController() {
 	const { setTemplate, setTemplatePart, setPage } = useDispatch(
 		editSiteStore
 	);

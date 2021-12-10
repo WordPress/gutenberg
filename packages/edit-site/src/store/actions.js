@@ -463,3 +463,10 @@ export const switchEditorMode = ( mode ) => ( { dispatch, registry } ) => {
 		speak( __( 'Mosaic view selected' ), 'assertive' );
 	}
 };
+
+export function setIsEntitiesSavedStatesOpen( isOpen ) {
+	return {
+		type: 'SET_IS_ENTITIES_SAVED_STATES_OPEN',
+		isOpen,
+	};
+}

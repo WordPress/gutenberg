@@ -118,7 +118,7 @@
 	}
 }
 
-.edit-site-list.is-navigation-open .components-snackbar-list {
+body.is-navigation-sidebar-open .edit-site-list .components-snackbar-list {
 	@include break-medium() {
 		margin-left: $nav-sidebar-width;
 	}

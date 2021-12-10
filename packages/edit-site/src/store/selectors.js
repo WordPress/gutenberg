@@ -341,3 +341,12 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 export function getEditorMode( state ) {
 	return state.preferences.editorMode || 'visual';
 }
+
+/**
+ * Returns if the entities saves states is open.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Is entities saved states open.
+ */
+export const getIsEntitiesSavedStatesOpen = ( state ) =>
+	state.isEntitiesSavedStatesOpen;

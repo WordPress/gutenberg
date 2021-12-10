@@ -13,11 +13,15 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import { useLocation } from '../routes';
 import Link from '../routes/link';
 import Actions from './actions';
 import AddedBy from './added-by';
 
-export default function Table( { templateType } ) {
+export default function Table() {
+	const {
+		params: { postType: templateType },
+	} = useLocation();
 	const { templates, isLoading, postType } = useSelect(
 		( select ) => {
 			const {

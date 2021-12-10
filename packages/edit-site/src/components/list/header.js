@@ -9,8 +9,12 @@ import { __experimentalHeading as Heading } from '@wordpress/components';
  * Internal dependencies
  */
 import AddNewTemplate from '../add-new-template';
+import { useLocation } from '../routes';
 
-export default function Header( { templateType } ) {
+export default function Header() {
+	const {
+		params: { postType: templateType },
+	} = useLocation();
 	const postType = useSelect(
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]

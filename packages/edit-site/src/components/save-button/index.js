@@ -6,28 +6,37 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-export default function SaveButton( {
-	openEntitiesSavedStates,
-	isEntitiesSavedStatesOpen,
-} ) {
-	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const {
-			__experimentalGetDirtyEntityRecords,
-			isSavingEntityRecord,
-		} = select( coreStore );
-		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-		return {
-			isDirty: dirtyEntityRecords.length > 0,
-			isSaving: some( dirtyEntityRecords, ( record ) =>
-				isSavingEntityRecord( record.kind, record.name, record.key )
-			),
-		};
-	}, [] );
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+
+export default function SaveButton() {
+	const { isDirty, isSaving, isEntitiesSavedStatesOpen } = useSelect(
+		( select ) => {
+			const {
+				__experimentalGetDirtyEntityRecords,
+				isSavingEntityRecord,
+			} = select( coreStore );
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			return {
+				isDirty: dirtyEntityRecords.length > 0,
+				isSaving: some( dirtyEntityRecords, ( record ) =>
+					isSavingEntityRecord( record.kind, record.name, record.key )
+				),
+				isEntitiesSavedStatesOpen: select(
+					editSiteStore
+				).getIsEntitiesSavedStatesOpen(),
+			};
+		},
+		[]
+	);
+	const { setIsEntitiesSavedStatesOpen } = useDispatch( editSiteStore );
 
 	const disabled = ! isDirty || isSaving;
 
@@ -40,7 +49,11 @@ export default function SaveButton( {
 				aria-expanded={ isEntitiesSavedStatesOpen }
 				disabled={ disabled }
 				isBusy={ isSaving }
-				onClick={ disabled ? undefined : openEntitiesSavedStates }
+				onClick={
+					disabled
+						? undefined
+						: () => setIsEntitiesSavedStatesOpen( true )
+				}
 			>
 				{ __( 'Save' ) }
 			</Button>
