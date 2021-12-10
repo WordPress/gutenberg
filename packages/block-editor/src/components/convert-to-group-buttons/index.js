@@ -4,7 +4,7 @@
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,6 +21,10 @@ function ConvertToGroupButton( {
 	onClose = () => {},
 } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { areInnerBlocksControlled, getBlocks } = useSelect(
+		blockEditorStore
+	);
+
 	const onConvertToGroup = () => {
 		// Activate the `transform` on the Grouping Block which does the conversion
 		const newBlocks = switchToBlockType(
@@ -37,7 +41,17 @@ function ConvertToGroupButton( {
 		if ( ! innerBlocks.length ) {
 			return;
 		}
-		replaceBlocks( clientIds, innerBlocks );
+
+		// The blocks in block selection don't include inner blocks for the inner block controller.
+		// We've to add them manually to avoid data loss.
+		const newBlocks = innerBlocks.map( ( block ) => {
+			if ( areInnerBlocksControlled( block.clientId ) ) {
+				block.innerBlocks = getBlocks( block.clientId );
+			}
+
+			return block;
+		} );
+		replaceBlocks( clientIds, newBlocks );
 	};
 
 	if ( ! isGroupable && ! isUngroupable ) {
