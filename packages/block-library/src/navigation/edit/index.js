@@ -586,6 +586,7 @@ function Navigation( {
 					) }
 				</nav>
 				{ ref &&
+					isEntityAvailable &&
 					hasResolvedcanUserUpdateNavigationEntity &&
 					! canUserUpdateNavigationEntity && (
 						<Warning>
