@@ -272,8 +272,11 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 		delete: 'DELETE',
 	};
 
+	const isPublish = action === 'publish';
+
 	const method = methods[ action ];
-	if ( ! method ) {
+
+	if ( ! method && ! isPublish ) {
 		throw new Error( `'${ action }' is not a valid action.` );
 	}
 
@@ -288,7 +291,7 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 			// OPTIONS requests to /posts/:id routes.
 			// https://core.trac.wordpress.org/ticket/45753
 			method: id ? 'GET' : 'OPTIONS',
-			parse: false,
+			parse: isPublish,
 		} );
 	} catch ( error ) {
 		// Do nothing if our OPTIONS request comes back with an API error (4xx or
@@ -296,19 +299,29 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 		return;
 	}
 
-	let allowHeader;
-	if ( hasIn( response, [ 'headers', 'get' ] ) ) {
-		// If the request is fetched using the fetch api, the header can be
-		// retrieved using the 'get' method.
-		allowHeader = response.headers.get( 'allow' );
+	let isAllowed;
+
+	if ( isPublish ) {
+		isAllowed = !! response?.schema?.links?.find( ( link ) =>
+			link.rel.includes( 'action-publish' )
+		);
 	} else {
-		// If the request was preloaded server-side and is returned by the
-		// preloading middleware, the header will be a simple property.
-		allowHeader = get( response, [ 'headers', 'Allow' ], '' );
+		let allowHeader;
+		if ( hasIn( response, [ 'headers', 'get' ] ) ) {
+			// If the request is fetched using the fetch api, the header can be
+			// retrieved using the 'get' method.
+			allowHeader = response.headers.get( 'allow' );
+		} else {
+			// If the request was preloaded server-side and is returned by the
+			// preloading middleware, the header will be a simple property.
+			allowHeader = get( response, [ 'headers', 'Allow' ], '' );
+		}
+
+		isAllowed = includes( allowHeader, method );
 	}
 
 	const key = compact( [ action, resource, id ] ).join( '/' );
-	const isAllowed = includes( allowHeader, method );
+
 	dispatch.receiveUserPermission( key, isAllowed );
 };
 
