@@ -299,7 +299,9 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new RNScreensPackage(),
                         new RNPromptPackage(),
                         new RNCWebViewPackage(),
-                        mRnReactNativeGutenbergBridgePackage);
+                        mRnReactNativeGutenbergBridgePackage,
+                        new PatternPickerPackage()
+                        );
             }
 
             @Override

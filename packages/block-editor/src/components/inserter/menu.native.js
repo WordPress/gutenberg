@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { AccessibilityInfo, TouchableHighlight, Platform } from 'react-native';
+import { AccessibilityInfo, TouchableHighlight, Platform, View, Text  } from 'react-native';
+import { PatternPicker } from '@wordpress/react-native-editor/pattern-picker'
 
 /**
  * WordPress dependencies
@@ -172,6 +173,49 @@ function InserterMenu( {
 
 	const showSearchForm = items.length > MIN_ITEMS_FOR_SEARCH;
 	const isFullScreen = ! isIOS && showSearchForm;
+
+	// set true to add to inserter (crashes 😔) 
+	if (false) {
+		return (
+
+		<BottomSheet
+			isVisible={ true }
+			onClose={ onClose }
+			onKeyboardShow={ onKeyboardShow }
+			onKeyboardHide={ onKeyboardHide }
+			header={
+				<>
+					{ showSearchForm && (
+						<SearchControl
+							onChange={ onChangeSearch }
+							value={ filterValue }
+						/>
+					) }
+					{ showTabs && ! filterValue && (
+						<InserterTabs.Control
+							onChangeTab={ setTabIndex }
+							showReusableBlocks={ showReusableBlocks }
+						/>
+					) }
+				</>
+			}
+			hasNavigation
+			setMinHeightToMaxHeight={ true }
+			contentStyle={ styles[ 'inserter-menu__list' ] }
+			isFullScreen={ isFullScreen }
+			allowDragIndicator={ true }
+		>
+			<BottomSheetConsumer>
+				{ ( { listProps } ) => (
+						<View style={{flex: 1}}>
+							<Text color="green">Hello fragment</Text>
+							<PatternPicker />
+						</View>
+				) }
+			</BottomSheetConsumer>
+		</BottomSheet>
+		)
+	}
 
 	return (
 		<BottomSheet

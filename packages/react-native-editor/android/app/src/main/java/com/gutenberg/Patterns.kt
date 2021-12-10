@@ -1,5 +1,12 @@
 package com.gutenberg
 
+/*
+From:
+let result = await fetch(`https://public-api.wordpress.com/wpcom/v2/common-block-layouts/?supported_blocks=core%2Fparagraph%2Ccore%2Fheading%2Ccore%2Fmore%2Ccore%2Fimage%2Ccore%2Fvideo%2Ccore%2Fnextpage%2Ccore%2Fseparator%2Ccore%2Flist%2Ccore%2Fquote%2Ccore%2Fmedia-text%2Ccore%2Fpreformatted%2Ccore%2Fgallery%2Ccore%2Fcolumns%2Ccore%2Fcolumn%2Ccore%2Fgroup%2Ccore%2Ffreeform%2Ccore%2Fbutton%2Ccore%2Fspacer%2Ccore%2Fshortcode%2Ccore%2Fbuttons%2Ccore%2Flatest-posts%2Ccore%2Fverse%2Ccore%2Fcover%2Ccore%2Fsocial-link%2Ccore%2Fsocial-links%2Ccore%2Fpullquote%2Ccore%2Ffile%2Ccore%2Fsearch%2Ccore%2Fblock%2Cjetpack%2Fcontact-info%2Cjetpack%2Femail%2Cjetpack%2Fphone%2Cjetpack%2Faddress&preview_width=440.0&preview_height=660.0&scale=1.0&type=mobile&is_beta=true`).then(r => r.json())
+with content "pruned" with:
+let pruned = {...result, layouts: result.layouts.map(l => ({...l, content: ""}))}
+ */
+
 class Patterns {
     companion object {
         val gutenbergCategories: List<GutenbergLayoutCategory> = listOf(

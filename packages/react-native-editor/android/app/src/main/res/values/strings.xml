@@ -3220,8 +3220,8 @@
     <string name="prepublishing_nudges_add_category_button">Add Category</string>
 
     <!-- Modal Layout Picker -->
-    <string name="mlp_choose_layout_title">Choose a layout</string>
-    <string name="mlp_choose_layout_subtitle">Get started by choosing from a wide variety of pre-made page layouts. Or just start with a blank page.</string>
+    <string name="mlp_choose_layout_title">Choose a pattern</string>
+    <string name="mlp_choose_layout_subtitle">Add beautifully designed, ready-to-go layouts to your site with a single tap.</string>
     <string name="mlp_create_blank_page">Create blank page</string>
     <string name="mlp_create_page">Create page</string>
     <string name="mlp_preview_page">Preview</string>

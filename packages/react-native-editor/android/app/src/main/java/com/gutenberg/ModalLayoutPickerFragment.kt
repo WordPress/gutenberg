@@ -1,6 +1,7 @@
 package com.gutenberg
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.bridge.WritableNativeMap
+import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.gutenberg.LayoutPickerUiState.Loading
 import com.gutenberg.LayoutPickerUiState.Content
@@ -16,6 +20,7 @@ import com.gutenberg.LayoutPickerUiState.Error
 import com.gutenberg.LayoutPickerViewModel.DesignPreviewAction.*
 import com.gutenberg.databinding.ModalLayoutPickerFragmentBinding
 import org.wordpress.android.util.DisplayUtils
+import java.lang.ref.WeakReference
 
 /**
  * Implements the Modal Layout Picker UI
@@ -27,6 +32,7 @@ class ModalLayoutPickerFragment : Fragment() {
 //    private lateinit var viewModel: ModalLayoutPickerViewModel
     private val viewModel: ModalLayoutPickerViewModel by viewModels()
     private lateinit var previewModeSelectorPopup: PreviewModeSelectorPopup
+    var reactContext: WeakReference<ReactContext>? = null
 
 
 //    override fun onAttach(context: Context) {
@@ -68,23 +74,37 @@ class ModalLayoutPickerFragment : Fragment() {
 
             modalLayoutPickerTitlebar.backButton.setOnClickListener {
 //                closeModal()
-                activity?.finish()
+//                activity?.finish()
             }
 
             modalLayoutPickerBottomToolbar.createBlankPageButton.setOnClickListener {
-                viewModel.onCreatePageClicked()
+//                viewModel.onCreatePageClicked()
             }
             modalLayoutPickerBottomToolbar.createPageButton.setOnClickListener {
-                viewModel.onCreatePageClicked()
+//                viewModel.onCreatePageClicked()
+                Log.d("slug", "emitted")
+                reactContext?.get()?.let {
+                    Log.d("context", "exists")
+                    Log.d("id", id.toString())
+                    Log.d("contextId", context.toString())
+                    Log.d("react contextId", it.toString())
+                    Log.d("contextId as react", (context as? ReactContext).toString())
+                    it.getJSModule(RCTEventEmitter::class.java)
+                        .receiveEvent(id, "onPatternPicked",
+                            WritableNativeMap().apply {
+                                putString("slug", viewModel.selectedLayout?.slug)
+                            }
+                        )
+                }
             }
             modalLayoutPickerBottomToolbar.previewButton.setOnClickListener {
 //                viewModel.onPreviewTapped()
             }
             modalLayoutPickerBottomToolbar.retryButton.setOnClickListener {
-                viewModel.onRetryClicked()
+//                viewModel.onRetryClicked()
             }
             modalLayoutPickerTitlebar.previewTypeSelectorButton.setOnClickListener {
-                viewModel.onThumbnailModePressed()
+//                viewModel.onThumbnailModePressed()
             }
 
             setScrollListener()

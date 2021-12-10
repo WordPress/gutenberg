@@ -264,6 +264,7 @@ export class BlockList extends Component {
 					] }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
+					// nestedScrollEnabled={ true }
 					contentContainerStyle={ [
 						horizontal && styles.horizontalContentContainer,
 						isWider( blockWidth, 'medium' ) &&

@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { Platform, SafeAreaView, View } from 'react-native';
+import { Platform, SafeAreaView, View, Text } from 'react-native';
 import SafeArea from 'react-native-safe-area';
+import { PatternPicker } from '@wordpress/react-native-editor/pattern-picker'
 
 /**
  * WordPress dependencies
@@ -149,6 +150,13 @@ class Layout extends Component {
 				>
 					<AutosaveMonitor disableIntervalChecks />
 					<View style={ editorStyles }>
+					 {/* This entry point is high in the hierarchy (outside of scrollview) */}
+					{ true && (
+						<View>
+							<Text>Hello fragment</Text>
+							<PatternPicker />
+						</View>
+					)}
 						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 						{ ! isHtmlView && Platform.OS === 'android' && (
 							<FloatingToolbar />
