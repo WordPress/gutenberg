@@ -26,7 +26,12 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import { EntityProvider, useEntityProp } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	useEntityProp,
+	store as coreStore,
+} from '@wordpress/core-data';
+
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -142,7 +147,13 @@ function Navigation( {
 		`navigationMenu/${ ref }`
 	);
 
-	const { innerBlocks, isInnerBlockSelected, hasSubmenus } = useSelect(
+	const {
+		canUserUpdateNavigationEntity,
+		hasResolvedcanUserUpdateNavigationEntity,
+		innerBlocks,
+		isInnerBlockSelected,
+		hasSubmenus,
+	} = useSelect(
 		( select ) => {
 			const { getBlocks, hasSelectedInnerBlock } = select(
 				blockEditorStore
@@ -152,10 +163,19 @@ function Navigation( {
 				( block ) => block.name === 'core/navigation-submenu'
 			);
 
+			const { canUser, hasFinishedResolution } = select( coreStore );
+
 			return {
 				hasSubmenus: firstSubmenu,
 				innerBlocks: blocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
+				canUserUpdateNavigationEntity: ref
+					? canUser( 'update', 'navigation', ref )
+					: undefined,
+				hasResolvedcanUserUpdateNavigationEntity: hasFinishedResolution(
+					'canUser',
+					[ 'update', 'navigation', ref ]
+				),
 			};
 		},
 		[ clientId ]
@@ -339,9 +359,25 @@ function Navigation( {
 		);
 	}
 
-	// Show a warning if the selected menu is no longer available.
-	// TODO - the user should be able to select a new one?
+	if (
+		ref &&
+		hasResolvedcanUserUpdateNavigationEntity &&
+		! canUserUpdateNavigationEntity
+	) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __(
+						'You do not have permission to edit this Navigation.'
+					) }
+				</Warning>
+			</div>
+		);
+	}
+
 	if ( ref && isNavigationMenuMissing ) {
+		// Show a warning if the selected menu is no longer available.
+		// TODO - the user should be able to select a new one?
 		return (
 			<div { ...blockProps }>
 				<Warning>
