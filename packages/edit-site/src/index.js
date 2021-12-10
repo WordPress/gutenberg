@@ -15,6 +15,7 @@ import {
 import { store as editorStore } from '@wordpress/editor';
 import { store as viewportStore } from '@wordpress/viewport';
 import { getQueryArgs } from '@wordpress/url';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -81,8 +82,17 @@ export function initializeEditor( id, settings ) {
 
 	const target = document.getElementById( id );
 
+	addFilter(
+		'blocks.registerBlockType',
+		'core/edit-site/block-register',
+		addInsertersupportForNavigationBlock
+	);
+
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
+
+	removeFilter( 'blocks.registerBlockType', 'core/edit-site/block-register' );
+
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: true,
@@ -90,6 +100,19 @@ export function initializeEditor( id, settings ) {
 	}
 
 	reinitializeEditor( target, settings );
+}
+
+function addInsertersupportForNavigationBlock( definition ) {
+	if ( definition.name === 'core/navigation' ) {
+		return {
+			...definition,
+			supports: {
+				...definition.supports,
+				inserter: true,
+			},
+		};
+	}
+	return definition;
 }
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
