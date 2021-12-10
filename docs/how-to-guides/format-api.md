@@ -98,19 +98,19 @@ Update `src/index.js` changing the `onClick` action:
 import { registerFormatType, toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 
-const MyCustomButton = ( props ) => {
+const MyCustomButton = ( { isActive, onChange, value } ) => {
 	return (
 		<RichTextToolbarButton
 			icon="editor-code"
 			title="Sample output"
 			onClick={ () => {
-				props.onChange(
-					toggleFormat( props.value, {
+				onChange(
+					toggleFormat( value, {
 						type: 'my-custom-format/sample-output',
 					} )
 				);
 			} }
-			isActive={ props.isActive }
+			isActive={ isActive }
 		/>
 	);
 };
@@ -140,7 +140,7 @@ import { registerFormatType } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-function ConditionalButton( props ) {
+function ConditionalButton( { isActive, onChange, value } ) {
 	const selectedBlock = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSelectedBlock();
 	}, [] );
@@ -154,13 +154,13 @@ function ConditionalButton( props ) {
 			icon="editor-code"
 			title="Sample output"
 			onClick={ () => {
-				props.onChange(
-					toggleFormat( props.value, {
+				onChange(
+					toggleFormat( value, {
 						type: 'my-custom-format/sample-output',
 					} )
 				);
 			} }
-			isActive={ props.isActive }
+			isActive={ isActive }
 		/>
 	);
 }
