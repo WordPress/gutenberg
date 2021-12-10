@@ -133,7 +133,7 @@ Use the `className` option when registering to add your own custom class to the 
 
 By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc). You can render the button only on blocks of a certain type by using `wp.data.withSelect` together with `wp.compose.ifCondition`.
 
-Here is an example that onle shows the button for Paragraph blocks:
+Here is an example that only shows the button for Paragraph blocks:
 
 ```js
 import { registerFormatType } from '@wordpress/rich-text';
