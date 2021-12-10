@@ -23,7 +23,7 @@ export default function menuItemsToBlocks( menuItems ) {
 
 	const menuTree = createDataTree( menuItems );
 	const blocks = mapMenuItemsToBlocks( menuTree );
-	return applyFilters( 'navigation.menuItemsToBlocks', blocks, menuItems );
+	return applyFilters( 'navigation.__experimentalMenuItemsToBlocks', blocks, menuItems );
 }
 
 /**
