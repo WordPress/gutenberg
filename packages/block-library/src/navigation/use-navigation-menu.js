@@ -28,7 +28,9 @@ export default function useNavigationMenu( ref ) {
 
 			// getEditedEntityRecord will return the post regardless of status.
 			// Therefore if the found post is not published then we should ignore it.
-			if ( [ 'inherit', 'publish' ].includes( navigationMenu?.status ) ) {
+			if (
+				! [ 'inherit', 'publish' ].includes( navigationMenu?.status )
+			) {
 				navigationMenu = null;
 			}
 
