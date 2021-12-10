@@ -359,22 +359,6 @@ function Navigation( {
 		);
 	}
 
-	if (
-		ref &&
-		hasResolvedcanUserUpdateNavigationEntity &&
-		! canUserUpdateNavigationEntity
-	) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __(
-						'You do not have permission to edit this Navigation.'
-					) }
-				</Warning>
-			</div>
-		);
-	}
-
 	if ( ref && isNavigationMenuMissing ) {
 		// Show a warning if the selected menu is no longer available.
 		// TODO - the user should be able to select a new one?
@@ -601,6 +585,15 @@ function Navigation( {
 						</ResponsiveWrapper>
 					) }
 				</nav>
+				{ ref &&
+					hasResolvedcanUserUpdateNavigationEntity &&
+					! canUserUpdateNavigationEntity && (
+						<Warning>
+							{ __(
+								'You do not have permission to edit this Navigation. Any edits made will not be saved.'
+							) }
+						</Warning>
+					) }
 			</RecursionProvider>
 		</EntityProvider>
 	);
