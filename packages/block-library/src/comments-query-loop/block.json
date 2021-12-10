@@ -14,10 +14,15 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"queryOrder": {
+			"type": "string",
+			"default": "desc"
 		}
 	},
 	"providesContext": {
-		"comments/perPage": "perPage"
+		"comments/perPage": "perPage",
+		"comments/order": "order"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

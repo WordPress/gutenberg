@@ -114,7 +114,7 @@ const CommentsList = ( {
 
 export default function CommentTemplateEdit( {
 	clientId,
-	context: { postId, 'comments/perPage': perPage },
+	context: { postId, 'comments/perPage': perPage, 'comments/order': order },
 } ) {
 	const blockProps = useBlockProps();
 
@@ -129,13 +129,13 @@ export default function CommentTemplateEdit( {
 				rawComments: getEntityRecords( 'root', 'comment', {
 					post: postId,
 					status: 'approve',
-					order: 'asc',
+					order,
 					context: 'embed',
 				} ),
 				blocks: getBlocks( clientId ),
 			};
 		},
-		[ postId, clientId ]
+		[ postId, clientId, order ]
 	);
 
 	// TODO: Replicate the logic used on the server.
