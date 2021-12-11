@@ -47,7 +47,7 @@ function hasModuleField( file ) {
 }
 
 // Packages built differently.
-const IGNORED_PACKAGES = [ 'dom-ready' ];
+const IGNORED_PACKAGES = [ 'dom-ready', 'hooks' ];
 
 /**
  * Filter predicate, returning true if the given base file name is to be
