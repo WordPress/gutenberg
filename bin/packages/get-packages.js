@@ -53,6 +53,7 @@ const IGNORED_PACKAGES = [
 	'blob',
 	'block-serialization-default-parser',
 	'deprecated',
+	'dom',
 	'dom-ready',
 	'hooks',
 	'i18n',
