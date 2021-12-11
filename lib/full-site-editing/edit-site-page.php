@@ -227,16 +227,14 @@ function register_site_editor_homepage_settings() {
 add_action( 'init', 'register_site_editor_homepage_settings', 10 );
 
 /**
- * Sets the HTML <title> in the Site Editor list page to be the title of the CPT
- * being edited, e.g. 'Templates'.
+ * Tells the script loader to load the scripts and styles of custom block on site editor screen.
+ *
+ * @param bool $is_block_editor_screen Current decision about loading block assets.
+ * @return bool Filtered decision about loading block assets.
  */
-function gutenberg_set_site_editor_list_page_title() {
-	global $title;
-	if ( gutenberg_is_edit_site_list_page() ) {
-		$post_type = get_post_type_object( $_GET['postType'] );
-		if ( $post_type ) {
-			$title = $post_type->labels->name;
-		}
-	}
+function gutenberg_site_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
+	return ( is_callable( 'get_current_screen' ) && get_current_screen() && 'appearance_page_gutenberg-edit-site' === get_current_screen()->base )
+		? true
+		: $is_block_editor_screen;
 }
-add_action( 'load-appearance_page_gutenberg-edit-site', 'gutenberg_set_site_editor_list_page_title' );
+add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_site_editor_load_block_editor_scripts_and_styles' );

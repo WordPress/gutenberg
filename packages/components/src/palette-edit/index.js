@@ -127,6 +127,7 @@ function Option( {
 					) }
 					{ isGradient && (
 						<CustomGradientPicker
+							__experimentalIsRenderedInSidebar
 							value={ value }
 							onChange={ ( newGradient ) =>
 								onChange( {

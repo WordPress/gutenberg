@@ -359,13 +359,16 @@ class WP_Theme_JSON_Gutenberg {
 	private static function maybe_opt_in_into_settings( $theme_json ) {
 		$new_theme_json = $theme_json;
 
-		if ( isset( $new_theme_json['settings']['appearanceTools'] ) ) {
+		if (
+			isset( $new_theme_json['settings']['appearanceTools'] ) &&
+			true === $new_theme_json['settings']['appearanceTools']
+		) {
 			self::do_opt_in_into_settings( $new_theme_json['settings'] );
 		}
 
 		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
 			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
-				if ( isset( $block['appearanceTools'] ) ) {
+				if ( isset( $block['appearanceTools'] ) && ( true === $block['appearanceTools'] ) ) {
 					self::do_opt_in_into_settings( $block );
 				}
 			}
@@ -393,7 +396,9 @@ class WP_Theme_JSON_Gutenberg {
 		);
 
 		foreach ( $to_opt_in as $path ) {
-			if ( null === _wp_array_get( $context, $path, null ) ) {
+			// Use "unset prop" as a marker instead of "null" because
+			// "null" can be a valid value for some props (e.g. blockGap).
+			if ( 'unset prop' === _wp_array_get( $context, $path, 'unset prop' ) ) {
 				_wp_array_set( $context, $path, true );
 			}
 		}
@@ -714,6 +719,18 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			/*
+			 * Reset default browser margin on the root body element.
+			 * This is set on the root selector **before** generating the ruleset
+			 * from the `theme.json`. This is to ensure that if the `theme.json` declares
+			 * `margin` in its `spacing` declaration for the `body` element then these
+			 * user-generated values take precedence in the CSS cascade.
+			 * @link https://github.com/WordPress/gutenberg/issues/36147.
+			 */
+			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$block_rules .= 'body { margin: 0; }';
+			}
+
 			// 2. Generate the rules that use the general selector.
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
@@ -724,7 +741,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= 'body { margin: 0; }';
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
