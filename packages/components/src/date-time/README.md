@@ -64,3 +64,10 @@ A callback function which receives a Date object representing a day as an argume
 
 -   Type: `Function`
 -   Required: No
+
+### onMonthPreviewed
+
+A callback function to display a new date and keep the focus on the calendar view while changing month.
+
+- Type: `Function`
+- Required: No
