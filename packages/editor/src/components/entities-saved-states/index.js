@@ -13,7 +13,6 @@ import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
-import { close as closeIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -223,10 +222,12 @@ export default function EntitiesSavedStates( { close } ) {
 					{ __( 'Save' ) }
 				</Button>
 				<Button
-					icon={ closeIcon }
+					className="editor-entities-saved-states__cancel-button"
 					onClick={ dismissPanel }
-					label={ __( 'Close panel' ) }
-				/>
+					variant="secondary"
+				>
+					{ __( 'Cancel' ) }
+				</Button>
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
