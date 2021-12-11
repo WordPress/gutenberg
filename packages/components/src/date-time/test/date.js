@@ -43,7 +43,7 @@ describe( 'DatePicker', () => {
 			);
 			const newDate = moment();
 
-			wrapper.instance().onChangeMoment( newDate );
+			wrapper.childAt( 0 ).props().onDateChange( newDate );
 
 			expect( onChangeSpy ).toHaveBeenCalledWith(
 				newDate.format( TIMEZONELESS_FORMAT )
@@ -61,7 +61,7 @@ describe( 'DatePicker', () => {
 				minutes: current.minutes(),
 				seconds: current.seconds(),
 			} );
-			wrapper.instance().onChangeMoment( newDate );
+			wrapper.childAt( 0 ).props().onDateChange( newDate );
 
 			expect(
 				moment( onChangeSpyArgument ).isSame(
@@ -84,7 +84,7 @@ describe( 'DatePicker', () => {
 				minutes: current.minutes(),
 				seconds: current.seconds(),
 			} );
-			wrapper.instance().onChangeMoment( newDate );
+			wrapper.childAt( 0 ).props().onDateChange( newDate );
 
 			expect(
 				moment( onChangeSpyArgument ).isSame(
