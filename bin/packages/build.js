@@ -226,6 +226,7 @@ if ( files.length ) {
 				`**/packages/api-fetch/**`,
 				`**/packages/blob/**`,
 				'**/packages/block-serialization-default-parser/**',
+				`**/packages/deprecated/**`,
 				`**/packages/dom-ready/**`,
 				`**/packages/hooks/**`,
 				`**/packages/i18n/**`,

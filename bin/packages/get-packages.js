@@ -52,6 +52,7 @@ const IGNORED_PACKAGES = [
 	'api-fetch',
 	'blob',
 	'block-serialization-default-parser',
+	'deprecated',
 	'dom-ready',
 	'hooks',
 	'i18n',
