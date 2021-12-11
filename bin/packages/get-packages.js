@@ -50,6 +50,7 @@ function hasModuleField( file ) {
 const IGNORED_PACKAGES = [
 	'a11y',
 	'api-fetch',
+	'blob',
 	'dom-ready',
 	'hooks',
 	'i18n',

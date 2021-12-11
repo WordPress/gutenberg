@@ -224,6 +224,7 @@ if ( files.length ) {
 				`**/{storybook,stories}/**`,
 				`**/packages/a11y/**`,
 				`**/packages/api-fetch/**`,
+				`**/packages/blob/**`,
 				`**/packages/dom-ready/**`,
 				`**/packages/hooks/**`,
 				`**/packages/i18n/**`,
