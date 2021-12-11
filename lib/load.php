@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+define( 'IS_GUTENBERG_PLUGIN', true );
+
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
@@ -98,27 +100,19 @@ require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
+require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-block-template.php';
+require __DIR__ . '/compat/wordpress-5.9/templates.php';
+require __DIR__ . '/compat/wordpress-5.9/template-parts.php';
+require __DIR__ . '/compat/wordpress-5.9/theme-templates.php';
 require __DIR__ . '/editor-settings.php';
-
-if ( ! class_exists( 'WP_Block_Template' ) ) {
-	require __DIR__ . '/full-site-editing/class-wp-block-template.php';
-}
-
-// These are used by some FSE features
-// as well as global styles.
-require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
-
-require __DIR__ . '/full-site-editing/full-site-editing.php';
-require __DIR__ . '/full-site-editing/block-templates.php';
-require __DIR__ . '/full-site-editing/default-template-types.php';
-require __DIR__ . '/full-site-editing/templates-utils.php';
-require __DIR__ . '/full-site-editing/page-templates.php';
-require __DIR__ . '/full-site-editing/templates.php';
-require __DIR__ . '/full-site-editing/template-parts.php';
-require __DIR__ . '/full-site-editing/template-loader.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-schema-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/compat/wordpress-5.9/theme.php';
+require __DIR__ . '/compat/wordpress-5.9/admin-menu.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
+require __DIR__ . '/compat/wordpress-5.9/block-template.php';
+require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
 require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';

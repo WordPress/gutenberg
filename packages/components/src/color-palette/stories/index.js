@@ -17,7 +17,7 @@ export default {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

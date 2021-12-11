@@ -693,7 +693,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
-	$settings['supportsTemplateMode'] = gutenberg_supports_block_templates();
+	$settings['supportsTemplateMode'] = current_theme_supports( 'block-templates' );
 
 	// Enable the new layout options for themes with a theme.json file.
 	$settings['supportsLayout'] = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();

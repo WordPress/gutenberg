@@ -42,6 +42,7 @@ import { toHTMLString } from '../to-html-string';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
+import { getFormatColors } from '../get-format-colors';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
@@ -53,6 +54,7 @@ const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
+	'core/text-color': 'mark',
 };
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
@@ -143,13 +145,26 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { selectionStart: start, selectionEnd: end } = this.props;
+		const {
+			selectionStart: start,
+			selectionEnd: end,
+			colorPalette,
+		} = this.props;
 		const { value } = this.props;
+		const currentValue = this.formatToValue( value );
 
-		const { formats, replacements, text } = this.formatToValue( value );
+		const { formats, replacements, text } = currentValue;
 		const { activeFormats } = this.state;
+		const newFormats = getFormatColors( value, formats, colorPalette );
 
-		return { formats, replacements, text, start, end, activeFormats };
+		return {
+			formats: newFormats,
+			replacements,
+			text,
+			start,
+			end,
+			activeFormats,
+		};
 	}
 
 	/**
@@ -900,7 +915,9 @@ export class RichText extends Component {
 		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
 		// We need to always convert to px units because the selected value
 		// could be coming from the web where it could be stored as a different unit.
-		const selectedPxValue = getPxFromCssUnit( newFontSize, cssUnitOptions );
+		const selectedPxValue =
+			getPxFromCssUnit( newFontSize, cssUnitOptions ) ??
+			DEFAULT_FONT_SIZE;
 
 		return parseFloat( selectedPxValue );
 	}
@@ -1113,6 +1130,7 @@ export class RichText extends Component {
 				{ isSelected && (
 					<>
 						<FormatEdit
+							forwardedRef={ this._editor }
 							formatTypes={ formatTypes }
 							value={ record }
 							onChange={ this.onFormatChange }
@@ -1160,6 +1178,13 @@ export default compose( [
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
+		const experimentalFeatures =
+			settings?.__experimentalFeatures?.color?.palette;
+		const colorPalette =
+			experimentalFeatures?.user ??
+			experimentalFeatures?.theme ??
+			experimentalFeatures?.default ??
+			settings?.colors;
 
 		return {
 			areMentionsSupported:
@@ -1167,6 +1192,7 @@ export default compose( [
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
 			baseGlobalStyles,
+			colorPalette,
 		};
 	} ),
 	withPreferredColorScheme,

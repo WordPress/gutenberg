@@ -280,7 +280,8 @@ describe( 'Template Part', () => {
 		const confirmTitleButtonSelector =
 			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
-		it( 'Should insert new template part on creation', async () => {
+		// Template parts can't be used in posts, so this test needs to be rebuilt for the template editor.
+		it.skip( 'Should insert new template part on creation', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.

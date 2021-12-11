@@ -4,8 +4,10 @@
 import {
 	createNewPost,
 	disablePrePublishChecks,
+	getOption,
 	insertBlock,
 	publishPost,
+	setOption,
 	trashAllPosts,
 	activateTheme,
 	clickButton,
@@ -44,14 +46,25 @@ describe( 'Multi-entity save flow', () => {
 		}
 	};
 
+	let originalSiteTitle, originalBlogDescription;
+
 	beforeAll( async () => {
 		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+
+		// Get the current Site Title and Site Tagline, so that we can reset
+		// them back to the original values once the test suite has finished.
+		originalSiteTitle = await getOption( 'blogname' );
+		originalBlogDescription = await getOption( 'blogdescription' );
 	} );
 
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
+
+		// Reset the Site Title and Site Tagline back to their original values.
+		await setOption( 'blogname', originalSiteTitle );
+		await setOption( 'blogdescription', originalBlogDescription );
 	} );
 
 	describe( 'Post Editor', () => {
@@ -84,8 +97,8 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).toBeNull();
 		};
 
-		it( 'Save flow should work as expected.', async () => {
-			await createNewPost();
+		// Template parts can't be used in posts, so this test needs to be rebuilt using perhaps reusable blocks.
+		it.skip( 'Save flow should work as expected.', async () => {
 			// Edit the page some.
 			await page.click( '.editor-post-title' );
 			await page.keyboard.type( 'Test Post...' );
@@ -185,7 +198,9 @@ describe( 'Multi-entity save flow', () => {
 
 			await insertBlock( 'Site Title' );
 			// Ensure title is retrieved before typing.
-			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
+			await page.waitForXPath(
+				`//a[contains(text(), "${ originalSiteTitle }")]`
+			);
 			const editableSiteTitleSelector =
 				'.wp-block-site-title a[contenteditable="true"]';
 			await page.waitForSelector( editableSiteTitleSelector );
@@ -211,23 +226,16 @@ describe( 'Multi-entity save flow', () => {
 			await checkboxInputs[ 1 ].click();
 			await page.click( entitiesSaveSelector );
 
+			// Wait for the snackbar notice that the post has been published.
+			await page.waitForSelector( '.components-snackbar' );
+
 			await clickButton( 'Update…' );
 			await page.waitForSelector( savePanelSelector );
-			checkboxInputs = await page.$$( checkboxInputSelector );
-			expect( checkboxInputs ).toHaveLength( 1 );
 
-			// Reset site entity to default value to not affect other tests.
-			await page.evaluate( () => {
-				wp.data
-					.dispatch( 'core' )
-					.editEntityRecord( 'root', 'site', undefined, {
-						title: 'gutenberg',
-						description: 'Just another WordPress site',
-					} );
-				wp.data
-					.dispatch( 'core' )
-					.saveEditedEntityRecord( 'root', 'site', undefined );
-			} );
+			await page.waitForSelector( checkboxInputSelector );
+			checkboxInputs = await page.$$( checkboxInputSelector );
+
+			expect( checkboxInputs ).toHaveLength( 1 );
 		} );
 	} );
 
@@ -237,6 +245,19 @@ describe( 'Multi-entity save flow', () => {
 		const activeSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=false]`;
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
+
+		const saveAllChanges = async () => {
+			// Clicking button should open panel with boxes checked.
+			await page.click( activeSaveSiteSelector );
+			await page.waitForSelector( savePanelSelector );
+			await assertAllBoxesChecked();
+
+			// Save a11y button should not be present with save panel open.
+			await assertExistance( saveA11ySelector, false );
+
+			// Saving should result in items being saved.
+			await page.click( entitiesSaveSelector );
+		};
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
@@ -267,20 +288,55 @@ describe( 'Multi-entity save flow', () => {
 			// Save a11y button should be present.
 			await assertExistance( saveA11ySelector, true );
 
-			// Clicking button should open panel with boxes checked.
-			await page.click( activeSaveSiteSelector );
-			await page.waitForSelector( savePanelSelector );
-			await assertAllBoxesChecked();
+			// Save all changes.
+			await saveAllChanges();
 
-			// Save a11y button should not be present with save panel open.
-			await assertExistance( saveA11ySelector, false );
-
-			// Saving should result in items being saved.
-			await page.click( entitiesSaveSelector );
 			const disabledButton = await page.waitForSelector(
 				disabledSaveSiteSelector
 			);
 			expect( disabledButton ).not.toBeNull();
+		} );
+
+		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
+			// Navigate to site editor.
+			await siteEditor.visit( {
+				postId: 'tt1-blocks//index',
+				postType: 'wp_template',
+			} );
+			await siteEditor.disableWelcomeGuide();
+
+			// Insert a paragraph at the bottom.
+			await insertBlock( 'Paragraph' );
+
+			// Open the block settings.
+			await page.click( 'button[aria-label="Settings"]' );
+
+			// Click on font size selector.
+			await page.click( 'button[aria-label="Font size"]' );
+
+			// Click on a different font size.
+			const extraSmallFontSize = await page.waitForXPath(
+				'//li[contains(text(), "Extra small")]'
+			);
+			await extraSmallFontSize.click();
+
+			// Save all changes.
+			await saveAllChanges();
+
+			// Click on font size selector again.
+			await page.click( 'button[aria-label="Font size"]' );
+
+			// Select another font size.
+			const normalFontSize = await page.waitForXPath(
+				'//li[contains(text(), "Normal")]'
+			);
+			await normalFontSize.click();
+
+			// Assert that the save button has been re-enabled.
+			const saveButton = await page.waitForSelector(
+				activeSaveSiteSelector
+			);
+			expect( saveButton ).not.toBeNull();
 		} );
 	} );
 } );

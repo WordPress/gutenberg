@@ -26,7 +26,7 @@ export default {
 	component: Elevation,
 	title: 'Components (Experimental)/Elevation',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

@@ -21,6 +21,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  */
 export default function withState( initialState = {} ) {
 	deprecated( 'wp.compose.withState', {
+		since: '5.8',
 		alternative: 'wp.element.useState',
 	} );
 
