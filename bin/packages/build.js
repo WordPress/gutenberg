@@ -222,6 +222,7 @@ if ( files.length ) {
 				`**/benchmark/**`,
 				`**/{__mocks__,__tests__,test}/**`,
 				`**/{storybook,stories}/**`,
+				`**/packages/a11y/**`,
 				`**/packages/dom-ready/**`,
 				`**/packages/hooks/**`,
 				`**/packages/i18n/**`,
