@@ -23,6 +23,7 @@
 ### Enhancements
 
 -   Wrapped `Modal` in a `forwardRef` call ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+-	Refactor `DateTime` class component to functional component ([#36835](https://github.com/WordPress/gutenberg/pull/36835))
 
 ## 19.1.0
 
