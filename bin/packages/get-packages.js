@@ -47,7 +47,14 @@ function hasModuleField( file ) {
 }
 
 // Packages built differently.
-const IGNORED_PACKAGES = [ 'a11y', 'dom-ready', 'hooks', 'i18n', 'url' ];
+const IGNORED_PACKAGES = [
+	'a11y',
+	'api-fetch',
+	'dom-ready',
+	'hooks',
+	'i18n',
+	'url',
+];
 
 /**
  * Filter predicate, returning true if the given base file name is to be
