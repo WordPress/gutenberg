@@ -29,7 +29,6 @@
 		"pot-to-php": "./tools/pot-to-php.js"
 	},
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
 		"@wordpress/hooks": "file:../hooks",
 		"gettext-parser": "^1.3.1",
 		"lodash": "^4.17.21",
@@ -37,7 +36,22 @@
 		"sprintf-js": "^1.1.1",
 		"tannin": "^1.2.0"
 	},
+	"devDependencies": {
+		"@swc/cli": "^0.1.53",
+		"@swc/core": "^1.2.119",
+		"@wordpress/browserslist-config": "file:../browserslist-config",
+		"chokidar": "^3.5.2"
+	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"scripts": {
+		"dev": "npm run build:es6 -- -w",
+		"build": "npm run build:cjs && npm run build:es6",
+		"build:cjs": "npx swc src -d build -C module.type=commonjs --ignore **/*.test.js -s",
+		"build:es6": "npx swc src -d build-module -C module.type=es6 --ignore **/*.test.js -s"
+	},
+	"browserslist": [
+		"extends @wordpress/browserslist-config"
+	]
 }
