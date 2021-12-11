@@ -235,6 +235,7 @@ if ( files.length ) {
 				`**/packages/i18n/**`,
 				`**/packages/is-shallow-equal/**`,
 				`**/packages/keycodes/**`,
+				`**/packages/priority-queue/**`,
 				`**/packages/url/**`,
 			],
 			onlyFiles: true,

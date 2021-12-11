@@ -61,6 +61,7 @@ const IGNORED_PACKAGES = [
 	'i18n',
 	'is-shallow-equal',
 	'keycodes',
+	'priority-queue',
 	'url',
 ];
 
