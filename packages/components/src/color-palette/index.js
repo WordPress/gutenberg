@@ -110,6 +110,20 @@ function MultiplePalettes( {
 	);
 }
 
+export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+	return (
+		<Dropdown
+			contentClassName={ classnames(
+				'components-color-palette__custom-color-dropdown-content',
+				{
+					'is-rendered-in-sidebar': isRenderedInSidebar,
+				}
+			) }
+			{ ...props }
+		/>
+	);
+}
+
 export default function ColorPalette( {
 	clearable = true,
 	className,
@@ -139,13 +153,8 @@ export default function ColorPalette( {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
-				<Dropdown
-					contentClassName={ classnames(
-						'components-color-palette__custom-color-dropdown-content',
-						{
-							'is-rendered-in-sidebar': __experimentalIsRenderedInSidebar,
-						}
-					) }
+				<CustomColorPickerDropdown
+					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<button
