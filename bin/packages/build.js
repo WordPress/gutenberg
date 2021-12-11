@@ -226,6 +226,7 @@ if ( files.length ) {
 				`**/packages/dom-ready/**`,
 				`**/packages/hooks/**`,
 				`**/packages/i18n/**`,
+				`**/packages/url/**`,
 			],
 			onlyFiles: true,
 		}
