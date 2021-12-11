@@ -55,6 +55,7 @@ const IGNORED_PACKAGES = [
 	'deprecated',
 	'dom',
 	'dom-ready',
+	'element',
 	'escape-html',
 	'hooks',
 	'i18n',

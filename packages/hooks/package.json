@@ -37,8 +37,8 @@
 	"scripts": {
 		"dev": "npm run build:es6 -- -w",
 		"build": "npm run build:cjs && npm run build:es6",
-		"build:cjs": "npx swc src -d build -C module.type=commonjs --ignore **/*.test.js -s",
-		"build:es6": "npx swc src -d build-module -C module.type=es6 --ignore **/*.test.js -s"
+		"build:cjs": "npx swc src -d build -C module.type=commonjs --ignore **/test/**/*.js -s",
+		"build:es6": "npx swc src -d build-module -C module.type=es6 --ignore **/test/**/*.js -s"
 	},
 	"browserslist": [
 		"extends @wordpress/browserslist-config"

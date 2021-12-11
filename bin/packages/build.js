@@ -229,6 +229,7 @@ if ( files.length ) {
 				`**/packages/deprecated/**`,
 				`**/packages/dom/**`,
 				`**/packages/dom-ready/**`,
+				`**/packages/element/**`,
 				`**/packages/escape-html/**`,
 				`**/packages/hooks/**`,
 				`**/packages/i18n/**`,
