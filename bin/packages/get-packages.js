@@ -59,6 +59,7 @@ const IGNORED_PACKAGES = [
 	'escape-html',
 	'hooks',
 	'i18n',
+	'is-shallow-equal',
 	'url',
 ];
 

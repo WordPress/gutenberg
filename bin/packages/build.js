@@ -233,6 +233,7 @@ if ( files.length ) {
 				`**/packages/escape-html/**`,
 				`**/packages/hooks/**`,
 				`**/packages/i18n/**`,
+				`**/packages/is-shallow-equal/**`,
 				`**/packages/url/**`,
 			],
 			onlyFiles: true,
