@@ -51,6 +51,7 @@ const IGNORED_PACKAGES = [
 	'a11y',
 	'api-fetch',
 	'blob',
+	'block-serialization-default-parser',
 	'dom-ready',
 	'hooks',
 	'i18n',
