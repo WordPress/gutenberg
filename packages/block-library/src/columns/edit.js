@@ -7,12 +7,13 @@ import { dropRight, get, times } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Notice,
 	PanelBody,
 	RangeControl,
 	ToggleControl,
+	VisuallyHidden,
 } from '@wordpress/components';
 
 import {
@@ -78,11 +79,15 @@ function ColumnsEditContainer( {
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		orientation: 'horizontal',
-		renderAppender: false,
-	} );
+	const ariaDescribedById = sprintf( '%s-description', clientId );
+	const innerBlocksProps = useInnerBlocksProps(
+		{ ...blockProps, 'aria-describedby': ariaDescribedById, role: 'grid' },
+		{
+			allowedBlocks: ALLOWED_BLOCKS,
+			orientation: 'horizontal',
+			renderAppender: false,
+		}
+	);
 
 	return (
 		<>
@@ -120,6 +125,10 @@ function ColumnsEditContainer( {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
+			<VisuallyHidden as="span" id={ ariaDescribedById }>
+				Use the Left and Right Arrow keys to navigate through the list
+				of columns.
+			</VisuallyHidden>
 		</>
 	);
 }
