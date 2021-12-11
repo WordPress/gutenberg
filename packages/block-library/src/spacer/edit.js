@@ -30,10 +30,10 @@ const ResizableSpacer = ( {
 	onResize,
 	onResizeStop,
 	isSelected,
+	isResizing,
+	setIsResizing,
 	...props
 } ) => {
-	const [ isResizing, setIsResizing ] = useState( false );
-
 	const getCurrentSize = ( elt ) => {
 		return orientation === 'horizontal'
 			? elt.clientWidth
@@ -93,6 +93,7 @@ const SpacerEdit = ( {
 	const { orientation } = context;
 	const { height, width } = attributes;
 
+	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
 	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
 
@@ -140,6 +141,8 @@ const SpacerEdit = ( {
 					onResize={ setTemporaryWidth }
 					onResizeStop={ handleOnHorizontalResizeStop }
 					isSelected={ isSelected }
+					isResizing={ isResizing }
+					setIsResizing={ setIsResizing }
 				/>
 			);
 		}
@@ -162,6 +165,8 @@ const SpacerEdit = ( {
 					onResize={ setTemporaryHeight }
 					onResizeStop={ handleOnVerticalResizeStop }
 					isSelected={ isSelected }
+					isResizing={ isResizing }
+					setIsResizing={ setIsResizing }
 				/>
 			</>
 		);
@@ -186,6 +191,7 @@ const SpacerEdit = ( {
 				height={ temporaryHeight || height }
 				width={ temporaryWidth || width }
 				orientation={ orientation }
+				isResizing={ isResizing }
 			/>
 		</>
 	);

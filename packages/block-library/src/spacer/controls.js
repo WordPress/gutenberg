@@ -17,7 +17,7 @@ import { useState } from '@wordpress/element';
  */
 import { MAX_SPACER_SIZE } from './edit';
 
-function DimensionInput( { label, onChange, value = '' } ) {
+function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
 
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
@@ -63,8 +63,10 @@ function DimensionInput( { label, onChange, value = '' } ) {
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				style={ { maxWidth: 80 } }
-				units={ units }
 				value={ inputValue }
+				units={ units }
+				// Force the unit to update to `px` when the Spacer is being resized.
+				unit={ isResizing ? 'px' : undefined }
 			/>
 		</BaseControl>
 	);
@@ -75,6 +77,7 @@ export default function SpacerControls( {
 	orientation,
 	height,
 	width,
+	isResizing,
 } ) {
 	return (
 		<InspectorControls>
@@ -86,6 +89,7 @@ export default function SpacerControls( {
 						onChange={ ( nextWidth ) =>
 							setAttributes( { width: nextWidth } )
 						}
+						isResizing={ isResizing }
 					/>
 				) }
 				{ orientation !== 'horizontal' && (
@@ -95,6 +99,7 @@ export default function SpacerControls( {
 						onChange={ ( nextHeight ) =>
 							setAttributes( { height: nextHeight } )
 						}
+						isResizing={ isResizing }
 					/>
 				) }
 			</PanelBody>
