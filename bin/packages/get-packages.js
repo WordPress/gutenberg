@@ -60,6 +60,7 @@ const IGNORED_PACKAGES = [
 	'hooks',
 	'i18n',
 	'is-shallow-equal',
+	'keycodes',
 	'url',
 ];
 

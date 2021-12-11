@@ -234,6 +234,7 @@ if ( files.length ) {
 				`**/packages/hooks/**`,
 				`**/packages/i18n/**`,
 				`**/packages/is-shallow-equal/**`,
+				`**/packages/keycodes/**`,
 				`**/packages/url/**`,
 			],
 			onlyFiles: true,
