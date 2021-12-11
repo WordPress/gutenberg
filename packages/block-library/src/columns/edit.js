@@ -81,7 +81,7 @@ function ColumnsEditContainer( {
 	} );
 	const ariaDescribedById = sprintf( '%s-description', clientId );
 	const innerBlocksProps = useInnerBlocksProps(
-		{ ...blockProps, 'aria-describedby': ariaDescribedById, role: 'grid' },
+		{ ...blockProps, 'aria-describedby': ariaDescribedById, role: 'grid', 'aria-readonly': 'false' },
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: 'horizontal',

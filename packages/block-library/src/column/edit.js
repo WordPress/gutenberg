@@ -94,7 +94,7 @@ function ColumnEdit( {
 	);
 
 	const innerBlocksProps = useInnerBlocksProps(
-		{ ...blockProps, 'aria-label': label, role: 'gridcell' },
+		{ ...blockProps, 'aria-label': label, role: 'gridcell', 'aria-readonly': 'false' },
 		{
 			templateLock,
 			allowedBlocks,
