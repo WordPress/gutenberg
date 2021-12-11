@@ -8,7 +8,7 @@
 				"requireEndingPeriod": true
 			}
 		],
-		"prefer-no-devDependencies": "error",
+		"prefer-no-devDependencies": "off",
 		"require-publishConfig": "error",
 		"require-repository-directory": "error",
 		"valid-values-author": [

@@ -46,6 +46,9 @@ function hasModuleField( file ) {
 	return ! isEmpty( pkg.module );
 }
 
+// Packages built differently.
+const IGNORED_PACKAGES = [ 'dom-ready' ];
+
 /**
  * Filter predicate, returning true if the given base file name is to be
  * included in the build.
@@ -65,6 +68,7 @@ function getPackages() {
 	return fs
 		.readdirSync( PACKAGES_DIR )
 		.filter( filterPackages )
+		.filter( ( file ) => ! IGNORED_PACKAGES.includes( file ) )
 		.map( ( file ) => path.resolve( PACKAGES_DIR, file ) );
 }
 
