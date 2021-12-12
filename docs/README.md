@@ -1,41 +1,52 @@
 # Block Editor Handbook
 
-**Gutenberg** is a codename for a whole new paradigm in WordPress site building and publishing, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. The project is right now in the second phase of a four-phase process that will touch every piece of WordPress -- Editing, **Customization** (which includes Full Site Editing, Block Patterns, Block Directory and Block based themes), Collaboration, and Multilingual -- and is focused on a new editing experience, the block editor (which is the topic of the current documentation).
+**Gutenberg** is the project that is revolutionizing the building and publishing experience for WordPress, as Johannes Gutenberg did the printed word.
 
-![Quick view of the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/trunk/docs/assets/quick-view-of-the-block-editor.png)
+With the release of WordPress 5.9, the project is finishing the second phase of a four-phase process that will touch every piece of WordPress. The first phase was the introduction of blocks to the Post and Page editors. The second phase is **Customization** (which includes Full Site Editing, Block Patterns, Block Directory and Block based themes. The next two phases are Collaboration, and Multilingual.
 
-**Legend :**
+Note: Though as it is software, even though a phase is "complete" refinements and improvements will always continue, so they truly are never complete.
 
-1. Block Inserter
-2. Block editor content area
-3. Settings Sidebar
+See this preview video for WordPress 5.9 that shows off some of the great features from the Gutenberg project:
 
-Using a system of Blocks to compose and format content, the new block-based editor is designed to create rich, flexible layouts for websites and digital products. Content is created in the unit of blocks instead of freeform text with inserted media, embeds and Shortcodes (there's a Shortcode block though).
+https://www.youtube.com/watch?v=XvEG9XWD4JI
 
-Blocks treat Paragraphs, Headings, Media, and Embeds all as components that, when strung together, make up the content stored in the WordPress database, replacing the traditional concept of freeform text with embedded media and shortcodes. The new editor is designed with progressive enhancement, meaning that it is back-compatible with all legacy content, and it also offers a process to try to convert and split a Classic block into equivalent blocks using client-side parsing. Finally, the blocks offer enhanced editing and format controls.
+## Overview
 
-The Editor offers rich new value to users with visual, drag-and-drop creation tools and powerful developer enhancements with modern vendor packages, reusable components, rich APIs and hooks to modify and extend the editor through Custom Blocks, Custom Block Styles and Plugins.
+Using a system of Blocks to compose and format content the editors are designed to create rich, flexible layouts for posts, pages, websites and digital products. Content is created in the unit of blocks instead of freeform text with inserted media, embeds and obscure shortcodes.
 
-[Learn to use the block editor](https://wordpress.org/support/article/wordpress-editor/) to create media-rich posts and pages.
+Blocks treat Paragraphs, Headings, Media, and Embeds all as components that, when strung together, make up the content stored in the WordPress database, replacing the traditional unknown blob of markup from posts to theme templates.
 
-## Quick links
+Blocks offer a unified experienced providing the same set of design and format tools for editing posts to building theme templtes. These visual tools offer an easier experience to building richer media, using drag-and-drop, modern color and layout interfaces.
 
-### Create a Block Tutorial
+Gutenberg aims to simplify creationg for authors and developers: allowing for greater reusability using blocks, patterns, and standard settings; enablign greater extendability with new APIs, hooks that can modify and extend the editor through custom blocks, styles and plugins.
 
-[Learn how to create your first block](/docs/getting-started/create-block/README.md) for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
+For writers and creators, [learn to use the block editor](https://wordpress.org/support/article/wordpress-editor/) to create media-rich posts and pages.
+
+## Quick links for developers
+
+The new block editors offer various ways for developers to extend and customize.
+
+### Blocks
+
+The block is the basic building component of Gutenberg [learn how to create your first block](/docs/getting-started/create-block/README.md). From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers what you need to know to get started.
+
+Learn to [create block patterns](/docs/reference-guides/block-api/block-patterns.md) by combining together multiple blocks into reusable units that can insert into posts.
+
+[Introduced in WordPress 5.8](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/), settings and styles bring finer-grain control over managing, colors, layout, typography and more. [Learn about theme.json](/docs/how-to-guides/themes/theme-json.md) and everything it can do.
+
+New in WordPress 5.9, block themes bring blocks to the rest of your site by allowing you to [create theme templates using blocks](/docs/how-to-guides/themes/README.md).
 
 ### Develop for the block editor
 
 Whether you want to extend the functionality of the block editor, or create a plugin based on it, [see the developer documentation](/docs/how-to-guides/README.md) to find all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
 
 -   [Gutenberg Architecture](/docs/explanations/architecture/README.md)
--   [Block Styles](/docs/reference-guides/filters/block-filters.md#block-styles)
--   [Creating Block Patterns](/docs/reference-guides/block-api/block-patterns.md)
--   [Theming for the Block Editor](/docs/how-to-guides/themes/README.md)
+-   [Block Filters](/docs/reference-guides/filters/block-filters.md)
 -   [Block API Reference](/docs/reference-guides/block-api/README.md)
--   [Block Editor Accessibility](/docs/how-to-guides/accessibility.md)
 -   [Internationalization](/docs/how-to-guides/internationalization.md)
 
-### Contribute to the block editor
+## Contribute to the block editor
 
-Everything you need to know to [start contributing to the block editor](/docs/contributors/README.md) . Whether you are interested in the design, code, triage, documentation, support or internationalization of the block editor, you will find here guides to help you.
+You can help the Gutenberg project, from code to documentation, to testing and design, we need your help to build the future of WordPress!
+
+Everything you need to know to [start contributing to the block editor](/docs/contributors/README.md) . Whether you are interested in the design, code, triage, documentation, support or internationalization of the block editor, you will find guides to help you.
