@@ -315,7 +315,7 @@ export default function PaletteEdit( {
 												setIsEditing( true );
 												onClose();
 											} }
-											className="edit-palette-menu-button"
+											className="components-palette-edit__menu-button"
 										>
 											{ __( 'Edit custom colors' ) }
 										</Button>
@@ -328,7 +328,7 @@ export default function PaletteEdit( {
 													onChange();
 													onClose();
 												} }
-												className="edit-palette-menu-button"
+												className="components-palette-edit__menu-button"
 											>
 												{ isGradient
 													? __(
