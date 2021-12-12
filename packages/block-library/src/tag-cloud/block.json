@@ -20,6 +20,14 @@
 		"showTagCounts": {
 			"type": "boolean",
 			"default": false
+		},
+		"smallestFontSize": {
+			"type": "number",
+			"default": 8
+		},
+		"largestFontSize": {
+			"type": "number",
+			"default": 22
 		}
 	},
 	"styles": [

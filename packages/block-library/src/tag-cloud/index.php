@@ -18,6 +18,8 @@ function render_block_core_tag_cloud( $attributes ) {
 		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => $attributes['showTagCounts'],
 		'number'     => $attributes['numberOfTags'],
+		'smallest'   => $attributes['smallestFontSize'],
+		'largest'    => $attributes['largestFontSize'],
 	);
 	$tag_cloud = wp_tag_cloud( $args );
 

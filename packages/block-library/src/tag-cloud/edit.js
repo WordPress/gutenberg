@@ -11,6 +11,7 @@ import {
 	ToggleControl,
 	SelectControl,
 	RangeControl,
+	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -33,7 +34,13 @@ const MIN_TAGS = 1;
 const MAX_TAGS = 100;
 
 function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
-	const { taxonomy, showTagCounts, numberOfTags } = attributes;
+	const {
+		taxonomy,
+		showTagCounts,
+		numberOfTags,
+		smallestFontSize,
+		largestFontSize,
+	} = attributes;
 
 	const getTaxonomyOptions = () => {
 		const selectOption = {
@@ -81,6 +88,20 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					min={ MIN_TAGS }
 					max={ MAX_TAGS }
 					required
+				/>
+				<NumberControl
+					label={ __( 'Smallest Font Size (Pt)' ) }
+					value={ smallestFontSize }
+					onChange={ ( value ) =>
+						setAttributes( { smallestFontSize: value } )
+					}
+				/>
+				<NumberControl
+					label={ __( 'Largeest Font Size (Pt)' ) }
+					value={ largestFontSize }
+					onChange={ ( value ) =>
+						setAttributes( { largestFontSize: value } )
+					}
 				/>
 			</PanelBody>
 		</InspectorControls>
