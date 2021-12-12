@@ -249,11 +249,12 @@ describe( 'Preview', () => {
 		await previewPage.close();
 	} );
 
-	it( 'should not revert title during a preview right after switching from published to draft', async () => {
+	// Verify correct preview. See: https://github.com/WordPress/gutenberg/issues/33616
+	it( 'should display the correct preview when switching between published and draft statuses', async () => {
 		const editorPage = page;
 
 		// Type Lorem in the title field.
-		await editorPage.type( '.editor-post-title__input', 'Lorem' );
+		await editorPage.type( '[aria-label="Add title"]', 'Lorem' );
 
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );
@@ -275,7 +276,7 @@ describe( 'Preview', () => {
 		await page.click( '.editor-post-publish-panel__header button' );
 
 		// Change the title and preview again.
-		await editorPage.type( '.editor-post-title__input', ' Ipsum' );
+		await editorPage.type( '[aria-label="Add title"]', ' Ipsum' );
 		await editorPage.keyboard.press( 'Tab' );
 		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
@@ -295,7 +296,7 @@ describe( 'Preview', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Change the title.
-		await editorPage.type( '.editor-post-title__input', 'Draft ' );
+		await editorPage.type( '[aria-label="Add title"]', 'Draft ' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Open the preview page.
