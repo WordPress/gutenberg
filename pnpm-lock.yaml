@@ -147,6 +147,7 @@ importers:
       deep-freeze: 0.0.1
       dom-scroll-into-view: ^1.2.1
       enzyme: 3.11.0
+      enzyme-to-json: 3.4.4
       equivalent-key-map: 0.2.2
       eslint-import-resolver-node: 0.3.4
       eslint-plugin-eslint-comments: 3.1.2
@@ -273,7 +274,7 @@ importers:
       '@babel/runtime-corejs3': 7.16.0
       '@babel/traverse': 7.16.0
       '@emotion/babel-plugin': 11.3.0_@babel+core@7.16.0
-      '@emotion/jest': 11.3.0
+      '@emotion/jest': 11.3.0_enzyme-to-json@3.4.4
       '@emotion/native': 11.0.0_5418a2aeffb64e8fbf0c1ab535edfe83
       '@octokit/rest': 16.26.0
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.2_ded7f6a019386527601fa1fd9853d4f1
@@ -348,6 +349,7 @@ importers:
       cssnano: 5.0.7_postcss@8.2.15
       deep-freeze: 0.0.1
       enzyme: 3.11.0
+      enzyme-to-json: 3.4.4_enzyme@3.11.0
       equivalent-key-map: 0.2.2
       eslint-import-resolver-node: 0.3.4
       eslint-plugin-eslint-comments: 3.1.2
@@ -3924,7 +3926,7 @@ packages:
       '@emotion/memoize': 0.7.5
     dev: false
 
-  /@emotion/jest/11.3.0:
+  /@emotion/jest/11.3.0_enzyme-to-json@3.4.4:
     resolution: {integrity: sha512-LZqYc3yerhic1IvAcEwBLRs1DsUt3oY7Oz6n+e+HU32iYOK/vpfzlhgmQURE94BHfv6eCOj6DV38f3jSnIkBkQ==}
     peerDependencies:
       '@types/jest': ^26.0.14
@@ -3938,6 +3940,7 @@ packages:
       '@babel/runtime': 7.16.3
       '@emotion/css-prettifier': 1.0.1
       chalk: 4.1.1
+      enzyme-to-json: 3.4.4_enzyme@3.11.0
       specificity: 0.4.1
       stylis: 4.0.13
     dev: true
@@ -13981,6 +13984,17 @@ packages:
     dependencies:
       has: 1.0.3
       object-is: 1.1.5
+
+  /enzyme-to-json/3.4.4_enzyme@3.11.0:
+    resolution: {integrity: sha512-50LELP/SCPJJGic5rAARvU7pgE3m1YaNj7JLM+Qkhl5t7PAs6fiyc8xzc50RnkKPFQCv0EeFVjEWdIFRGPWMsA==}
+    engines: {node: '>=6.0.0'}
+    peerDependencies:
+      enzyme: ^3.4.0
+    dependencies:
+      enzyme: 3.11.0
+      lodash: 4.17.21
+      react-is: 16.13.1
+    dev: true
 
   /enzyme-to-json/3.6.2_enzyme@3.11.0:
     resolution: {integrity: sha512-Ynm6Z6R6iwQ0g2g1YToz6DWhxVnt8Dy1ijR2zynRKxTyBGA8rCDXU3rs2Qc4OKvUvc2Qoe1bcFK6bnPs20TrTg==}

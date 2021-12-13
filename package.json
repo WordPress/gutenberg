@@ -167,6 +167,7 @@
 		"cssnano": "5.0.7",
 		"deep-freeze": "0.0.1",
 		"enzyme": "3.11.0",
+		"enzyme-to-json": "3.4.4",
 		"equivalent-key-map": "0.2.2",
 		"eslint-import-resolver-node": "0.3.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
