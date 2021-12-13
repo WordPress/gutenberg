@@ -6,6 +6,10 @@
 // - .wp-block-navigation-item targets the menu item itself.
 // - .wp-block-navigation-item__content targets the link inside a menu item.
 // - .wp-block-navigation__submenu-icon targets the chevron icon indicating submenus.
+
+// Size of burger and close icons.
+$navigation-icon-size: 24px;
+
 .wp-block-navigation {
 	position: relative;
 
@@ -405,6 +409,10 @@ button.wp-block-navigation-item__content {
 	&.is-menu-open {
 		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
+		background-color: inherit;
+
+		// Use em units to apply padding, so themes can more easily style this in various ways.
+		padding: 2em;
 
 		// Allow modal to scroll.
 		overflow: auto;
@@ -412,11 +420,13 @@ button.wp-block-navigation-item__content {
 		// Give it a z-index just higher than the adminbar.
 		z-index: 100000;
 
-		// Add extra top padding so items don't conflict with close button.
-		padding: 72px 24px 24px 24px;
-		background-color: inherit;
-
 		.wp-block-navigation__responsive-container-content {
+			// Add padding above to accommodate close button.
+			padding-top: calc(2em + #{ $navigation-icon-size });
+
+			// Don't crop the focus style.
+			overflow: visible;
+
 			// Override the container flex layout settings
 			// because we want overlay menu to always display
 			// as a column.
@@ -430,10 +440,6 @@ button.wp-block-navigation-item__content {
 			.wp-block-navigation__container {
 				justify-content: flex-start;
 			}
-
-			// Allow menu to scroll.
-			overflow: auto;
-			padding: 0;
 
 			.wp-block-navigation__submenu-icon {
 				display: none;
@@ -547,8 +553,8 @@ button.wp-block-navigation-item__content {
 		fill: currentColor;
 		pointer-events: none;
 		display: block;
-		width: 24px;
-		height: 24px;
+		width: $navigation-icon-size;
+		height: $navigation-icon-size;
 	}
 }
 
@@ -566,24 +572,29 @@ button.wp-block-navigation-item__content {
 // Button to close the menus.
 .wp-block-navigation__responsive-container-close {
 	position: absolute;
-	top: 24px;
-	right: 24px;
+	top: 0;
+	right: 0;
 	z-index: 2; // Needs to be above the modal z index itself.
 }
 
 // The menu adds wrapping containers.
 .wp-block-navigation__responsive-close {
 	width: 100%;
+	height: 100%;
 }
 
 .is-menu-open .wp-block-navigation__responsive-close,
 .is-menu-open .wp-block-navigation__responsive-dialog,
 .is-menu-open .wp-block-navigation__responsive-container-content {
-	width: 100%;
+	box-sizing: border-box;
 	height: 100%;
 }
 
+.wp-block-navigation__responsive-dialog {
+	position: relative;
+}
+
+// Prevent scrolling of the parent content when the modal is open.
 html.has-modal-open {
 	overflow: hidden;
 }
-
