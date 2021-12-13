@@ -442,11 +442,9 @@ export const __unstableSwitchToTemplateMode = ( newTemplate = false ) => ( {
 export const __unstableCreateTemplate = ( template ) => async ( {
 	registry,
 } ) => {
-	const savedTemplate = await dispatch( coreStore ).saveEntityRecord(
-		'postType',
-		'wp_template',
-		template
-	);
+	const savedTemplate = await registry
+		.dispatch( coreStore )
+		.saveEntityRecord( 'postType', 'wp_template', template );
 	const post = registry.select( editorStore ).getCurrentPost();
 	registry
 		.dispatch( coreStore )
@@ -468,14 +466,11 @@ export const initializeMetaBoxes = () => ( { registry, select, dispatch } ) => {
 	if ( ! isEditorReady ) {
 		return;
 	}
-
-	const postType = registry.select( editorStore ).getCurrentPostType();
-
 	// Only initialize once.
 	if ( metaBoxesInitialized ) {
 		return;
 	}
-
+	const postType = registry.select( editorStore ).getCurrentPostType();
 	if ( window.postboxes.page !== postType ) {
 		window.postboxes.add_postbox_toggles( postType );
 	}
