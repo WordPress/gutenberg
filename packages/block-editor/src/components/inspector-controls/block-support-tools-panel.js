@@ -19,8 +19,10 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			hasMultiSelection,
 		} = select( blockEditorStore );
 
-		// This is `null` if multi-selection and used in `clientId` checks
-		// to still allow panel items to register themselves.
+		// When we currently have a multi-selection, the value returned from
+		// `getSelectedBlockClientId()` is `null`. When a `null` value is used
+		// for the `panelId`, a `ToolsPanel` will still allow panel items to
+		// register themselves despite their panelIds not matching.
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		if ( hasMultiSelection() ) {
