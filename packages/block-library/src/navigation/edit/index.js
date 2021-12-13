@@ -152,7 +152,9 @@ function Navigation( {
 
 	const {
 		canUserUpdateNavigationEntity,
-		hasResolvedcanUserUpdateNavigationEntity,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserDeleteNavigationEntity,
+		hasResolvedCanUserDeleteNavigationEntity,
 		innerBlocks,
 		isInnerBlockSelected,
 		hasSubmenus,
@@ -175,9 +177,16 @@ function Navigation( {
 				canUserUpdateNavigationEntity: ref
 					? canUser( 'update', 'navigation', ref )
 					: undefined,
-				hasResolvedcanUserUpdateNavigationEntity: hasFinishedResolution(
+				hasResolvedCanUserUpdateNavigationEntity: hasFinishedResolution(
 					'canUser',
 					[ 'update', 'navigation', ref ]
+				),
+				canUserDeleteNavigationEntity: ref
+					? canUser( 'delete', 'navigation', ref )
+					: undefined,
+				hasResolvedCanUserDeleteNavigationEntity: hasFinishedResolution(
+					'canUser',
+					[ 'delete', 'navigation', ref ]
 				),
 			};
 		},
@@ -360,7 +369,7 @@ function Navigation( {
 
 		if (
 			( isSelected || isInnerBlockSelected ) &&
-			hasResolvedcanUserUpdateNavigationEntity &&
+			hasResolvedCanUserUpdateNavigationEntity &&
 			! canUserUpdateNavigationEntity
 		) {
 			setPermissionsNotice();
@@ -368,7 +377,7 @@ function Navigation( {
 	}, [
 		ref,
 		isEntityAvailable,
-		hasResolvedcanUserUpdateNavigationEntity,
+		hasResolvedCanUserUpdateNavigationEntity,
 		canUserUpdateNavigationEntity,
 		isSelected,
 		isInnerBlockSelected,
@@ -578,18 +587,24 @@ function Navigation( {
 				</InspectorControls>
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
-						<NavigationMenuNameControl />
-						<NavigationMenuDeleteControl
-							onDelete={ () => {
-								if ( navigationArea ) {
-									setAreaMenu( 0 );
-								}
-								setAttributes( {
-									ref: undefined,
-								} );
-								setIsPlaceholderShown( true );
-							} }
-						/>
+						{ hasResolvedCanUserUpdateNavigationEntity &&
+							canUserUpdateNavigationEntity && (
+								<NavigationMenuNameControl />
+							) }
+						{ hasResolvedCanUserDeleteNavigationEntity &&
+							canUserDeleteNavigationEntity && (
+								<NavigationMenuDeleteControl
+									onDelete={ () => {
+										if ( navigationArea ) {
+											setAreaMenu( 0 );
+										}
+										setAttributes( {
+											ref: undefined,
+										} );
+										setIsPlaceholderShown( true );
+									} }
+								/>
+							) }
 					</InspectorControls>
 				) }
 				<nav { ...blockProps }>
