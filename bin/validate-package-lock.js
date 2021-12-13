@@ -29,7 +29,7 @@ for ( const [ name, dependency ] of dependencies ) {
 ${ red( JSON.stringify( { [ name ]: dependency }, null, '\t' ) ) }
 
 To fix, try removing the node_modules directory and reverting package-lock.json, then run ${ yellow(
-				'npm install'
+				'pnpm install'
 			) }.
 `
 		);

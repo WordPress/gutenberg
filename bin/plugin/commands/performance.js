@@ -162,7 +162,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
 
 	log( '        >> Building the ' + formats.success( branch ) + ' branch' );
 	await runShellScript(
-		'npm install && npm run build',
+		'pnpm install && npm run build',
 		environmentDirectory
 	);
 }
@@ -235,7 +235,7 @@ async function runPerformanceTests( branches, options ) {
 	}
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm install && npm run build:packages',
+		'pnpm install && npm run build:packages',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );

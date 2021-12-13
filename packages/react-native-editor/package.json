@@ -118,7 +118,7 @@
 		"test:e2e:build-app:ios": "npm run preios && SKIP_BUNDLING=true xcodebuild -workspace ios/GutenbergDemo.xcworkspace -configuration Release -scheme GutenbergDemo -destination 'platform=iOS Simulator,name=iPhone 11' -derivedDataPath ios/build/GutenbergDemo",
 		"test:e2e:build-wda": "xcodebuild -project ../../node_modules/appium/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination 'platform=iOS Simulator,name=iPhone 11' -derivedDataPath ios/build/WDA",
 		"test:e2e:ios:local": "npm run test:e2e:bundle:ios && npm run test:e2e:build-app:ios && npm run test:e2e:build-wda && TEST_RN_PLATFORM=ios npm run device-tests:local",
-		"build:gutenberg": "cd gutenberg && npm ci && npm run build",
+		"build:gutenberg": "cd gutenberg && pnpm install && npm run build",
 		"clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:react; npm run clean:watchman",
 		"clean:runtime": "npm run clean:haste; npm run clean:react; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",
 		"clean:build-artifacts": "rm -rf ./ios/build && rm -rf ./ios/Pods",

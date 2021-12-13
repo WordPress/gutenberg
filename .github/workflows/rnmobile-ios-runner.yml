@@ -25,14 +25,16 @@ jobs:
 
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
-
+            - uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: 6.23.6
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@v2
               with:
                   node-version: ${{ matrix.node }}
-                  cache: npm
+                  cache: pnpm
 
-            - run: npm ci
+            - run: pnpm install
 
             - name: Prepare build cache key
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt

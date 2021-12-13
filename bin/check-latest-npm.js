@@ -120,7 +120,7 @@ It is required that you have the expected latest version of npm installed in ord
 Run ${ yellow(
 					`npm install --global npm@${ latest }`
 				) } to install the expected latest version of npm. Before retrying your commit, run ${ yellow(
-					'npm install'
+					'pnpm install'
 				) } once more to ensure the package-lock.json contents are correct. If there are any changes to the file, they should be included in your commit.`
 			);
 		}

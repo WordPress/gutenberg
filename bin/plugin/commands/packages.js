@@ -290,7 +290,7 @@ async function publishPackagesToNpm(
 	releaseType
 ) {
 	log( '>> Installing npm packages.' );
-	await command( 'npm ci', {
+	await command( 'pnpm install', {
 		cwd: gitWorkingDirectoryPath,
 	} );
 

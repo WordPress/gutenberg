@@ -18,24 +18,17 @@ jobs:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
               with:
                   ref: trunk
-
+            - uses: pnpm/action-setup@v2.0.1
+              with:
+                  version: 6.23.6
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@v2
               with:
                   node-version: ${{ matrix.node }}
+                  cache: pnpm
 
-            - name: Cache NPM packages
-              uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
-              with:
-                  # npm cache files are stored in `~/.npm` on Linux/macOS
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ matrix.node }}-npm-pr-automation-cache-${{ hashFiles('**/package-lock.json') }}
-
-            # Changing into the action's directory and running `npm install` is much
-            # faster than a full project-wide `npm ci`.
             - name: Install NPM dependencies
-              run: npm install
-              working-directory: packages/project-management-automation
+              run: pnpm install
 
             - uses: ./packages/project-management-automation
               with:
