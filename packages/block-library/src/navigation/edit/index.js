@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import noop from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,6 +43,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -108,6 +109,8 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
+	const noticeRef = useRef();
+
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
@@ -186,6 +189,8 @@ function Navigation( {
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
+
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
 
 	const [
 		hasSavedUnsavedInnerBlocks,
@@ -322,6 +327,52 @@ function Navigation( {
 		// innerBlocks are intentionally not listed as deps. This function is only concerned
 		// with the snapshot from the time when ref became undefined.
 	}, [ clientId, ref, innerBlocks ] );
+
+	useEffect( () => {
+		const setPermissionsNotice = () => {
+			if ( noticeRef.current ) {
+				return;
+			}
+
+			noticeRef.current = uniqueId( 'navBlockNoEditPermissions' );
+
+			createWarningNotice(
+				__(
+					'You do not have permission to edit this Navigation. Any edits made will not be saved.'
+				),
+				{
+					id: noticeRef.current,
+				}
+			);
+		};
+
+		const removePermissionsNotice = () => {
+			if ( ! noticeRef.current ) {
+				return;
+			}
+			removeNotice( noticeRef.current );
+			noticeRef.current = null;
+		};
+
+		if ( ! isSelected && ! isInnerBlockSelected ) {
+			removePermissionsNotice();
+		}
+
+		if (
+			( isSelected || isInnerBlockSelected ) &&
+			hasResolvedcanUserUpdateNavigationEntity &&
+			! canUserUpdateNavigationEntity
+		) {
+			setPermissionsNotice();
+		}
+	}, [
+		ref,
+		isEntityAvailable,
+		hasResolvedcanUserUpdateNavigationEntity,
+		canUserUpdateNavigationEntity,
+		isSelected,
+		isInnerBlockSelected,
+	] );
 
 	const startWithEmptyMenu = useCallback( () => {
 		if ( navigationArea ) {
@@ -585,16 +636,6 @@ function Navigation( {
 						</ResponsiveWrapper>
 					) }
 				</nav>
-				{ ref &&
-					isEntityAvailable &&
-					hasResolvedcanUserUpdateNavigationEntity &&
-					! canUserUpdateNavigationEntity && (
-						<Warning>
-							{ __(
-								'You do not have permission to edit this Navigation. Any edits made will not be saved.'
-							) }
-						</Warning>
-					) }
 			</RecursionProvider>
 		</EntityProvider>
 	);
