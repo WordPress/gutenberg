@@ -23,6 +23,7 @@ import './hooks';
 import { store as editSiteStore } from './store';
 import EditSiteApp from './components/app';
 import getIsListPage from './utils/get-is-list-page';
+import { redirectToHomepage } from './components/routes/redirect-to-homepage';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -32,7 +33,14 @@ import getIsListPage from './utils/get-is-list-page';
  * @param {Element} target   DOM node in which editor is rendered.
  * @param {?Object} settings Editor settings object.
  */
-export function reinitializeEditor( target, settings ) {
+export async function reinitializeEditor( target, settings ) {
+	// The site editor relies on `postType` and `postId` params in the URL to
+	// define what's being edited. When visiting via the dashboard link, these
+	// won't be present. Do a client side redirect to the 'homepage' if that's
+	// the case. This requires editor settings, so dispatch that first.
+	dispatch( editSiteStore ).updateSettings( settings );
+	await redirectToHomepage();
+
 	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind( null, target, settings );
@@ -40,7 +48,6 @@ export function reinitializeEditor( target, settings ) {
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	{
-		dispatch( editSiteStore ).updateSettings( settings );
 		// Keep the defaultTemplateTypes in the core/editor settings too,
 		// so that they can be selected with core/editor selectors in any editor.
 		// This is needed because edit-site doesn't initialize with EditorProvider,
