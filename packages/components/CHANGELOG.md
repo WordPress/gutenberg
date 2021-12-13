@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.1.4 (2021-12-13)
+
 ### Bug Fix
 
 -   Improve accessibility and visibility in `ColorPallete` ([#36925](https://github.com/WordPress/gutenberg/pull/36925))
