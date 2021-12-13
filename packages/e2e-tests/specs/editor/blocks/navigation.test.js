@@ -200,6 +200,19 @@ async function getNavigationMenuRawContent() {
 	return stripPageIds( response.content.raw );
 }
 
+/**
+ * Enables the navigation block in the post editor.
+ */
+async function enableNavigationBlockInPostEditor() {
+	await page.evaluate( () => {
+		const navBlockType = wp.data
+			.select( 'core/blocks' )
+			.getBlockType( 'core/navigation' );
+		navBlockType.supports.inserter = true;
+		wp.data.dispatch( 'core/blocks' ).addBlockTypes( navBlockType );
+	} );
+}
+
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
@@ -243,8 +256,8 @@ describe( 'Navigation', () => {
 			] );
 
 			await createNewPost();
+			await enableNavigationBlockInPostEditor();
 
-			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 			const allPagesButton = await page.waitForXPath(
 				ADD_ALL_PAGES_XPATH
@@ -265,6 +278,7 @@ describe( 'Navigation', () => {
 			);
 
 			await createNewPost();
+			await enableNavigationBlockInPostEditor();
 			await insertBlock( 'Navigation' );
 			await selectClassicMenu( 'Test Menu 2' );
 
@@ -276,6 +290,7 @@ describe( 'Navigation', () => {
 		it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {
 			await createClassicMenu( { name: 'Test Menu 1' } );
 			await createNewPost();
+			await enableNavigationBlockInPostEditor();
 			await insertBlock( 'Navigation' );
 			await selectClassicMenu( 'Test Menu 1' );
 
@@ -288,6 +303,7 @@ describe( 'Navigation', () => {
 
 		it( 'does not display the options to create from pages or menus if there are none', async () => {
 			await createNewPost();
+			await enableNavigationBlockInPostEditor();
 
 			await insertBlock( 'Navigation' );
 			await page.waitForXPath( START_EMPTY_XPATH );
@@ -304,6 +320,8 @@ describe( 'Navigation', () => {
 
 	it( 'allows an empty navigation block to be created and manually populated using a mixture of internal and external links', async () => {
 		await createNewPost();
+		await enableNavigationBlockInPostEditor();
+
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
 		await startEmptyButton.click();
@@ -374,6 +392,8 @@ describe( 'Navigation', () => {
 
 	it( 'encodes URL when create block if needed', async () => {
 		await createNewPost();
+		await enableNavigationBlockInPostEditor();
+
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
 		await startEmptyButton.click();
@@ -489,6 +509,8 @@ describe( 'Navigation', () => {
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
 		await createClassicMenu( { name: 'Test Menu 2' }, menuItemsFixture );
 		await createNewPost();
+		await enableNavigationBlockInPostEditor();
+
 		await insertBlock( 'Navigation' );
 		await selectClassicMenu( 'Test Menu 2' );
 
@@ -529,6 +551,8 @@ describe( 'Navigation', () => {
 
 	it( 'Shows the quick inserter when the block contains non-navigation specific blocks', async () => {
 		await createNewPost();
+		await enableNavigationBlockInPostEditor();
+
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
 		await startEmptyButton.click();
