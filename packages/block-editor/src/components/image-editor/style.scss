@@ -1,0 +1,11 @@
+.image-editor__crop-toolbar-icon {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+	background-color: $gray-900;
+	color: $white;
+
+    svg {
+        fill: currentColor;
+    }
+}

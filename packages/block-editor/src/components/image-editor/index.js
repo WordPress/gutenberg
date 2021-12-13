@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
+import { Icon, crop } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -32,6 +34,9 @@ export default function ImageEditor( {
 				naturalWidth={ naturalWidth }
 			/>
 			<BlockControls group="alt">
+				<div className="image-editor__crop-toolbar-icon">
+					<Icon icon={ crop } label={ __( 'Crop' ) } />
+				</div>
 				<ToolbarGroup>
 					<ZoomDropdown />
 					<ToolbarItem>
