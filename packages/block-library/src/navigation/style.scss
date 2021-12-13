@@ -437,6 +437,7 @@ button.wp-block-navigation-item__content {
 
 			// Always align the contents of the menu to the top.
 			&,
+			.wp-block-page-list,
 			.wp-block-navigation__container {
 				justify-content: flex-start;
 			}
