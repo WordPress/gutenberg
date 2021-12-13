@@ -53,18 +53,6 @@ export default function GradientPalettePanel( { name } ) {
 			className="edit-site-global-styles-gradient-palette-panel"
 			spacing={ 10 }
 		>
-			<div>
-				<Heading className="edit-site-global-styles-gradient-palette-panel__duotone-heading">
-					{ __( 'Duotone' ) }
-				</Heading>
-				<DuotonePicker
-					duotonePalette={ duotonePalette }
-					disableCustomDuotone={ true }
-					disableCustomColors={ true }
-					clearable={ false }
-					onChange={ noop }
-				/>
-			</div>
 			{ !! themeGradients && !! themeGradients.length && (
 				<PaletteEdit
 					canReset={ themeGradients !== baseThemeGradients }
@@ -94,6 +82,18 @@ export default function GradientPalettePanel( { name } ) {
 				) }
 				slugPrefix="custom-"
 			/>
+			<div>
+				<Heading className="edit-site-global-styles-gradient-palette-panel__duotone-heading">
+					{ __( 'Duotone' ) }
+				</Heading>
+				<DuotonePicker
+					duotonePalette={ duotonePalette }
+					disableCustomDuotone={ true }
+					disableCustomColors={ true }
+					clearable={ false }
+					onChange={ noop }
+				/>
+			</div>
 		</VStack>
 	);
 }
