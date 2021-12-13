@@ -142,6 +142,7 @@ specifiers:
   css-loader: 6.2.0
   cssnano: 5.0.7
   deep-freeze: 0.0.1
+  dom-scroll-into-view: ^1.2.1
   enzyme: 3.11.0
   equivalent-key-map: 0.2.2
   eslint-import-resolver-node: 0.3.4
@@ -161,6 +162,7 @@ specifiers:
   lint-staged: 9.2.5
   lodash: 4.17.21
   make-dir: 3.0.0
+  metro: 0.64.0
   metro-react-native-babel-preset: 0.64.0
   metro-react-native-babel-transformer: 0.64.0
   mkdirp: 0.5.1
@@ -260,6 +262,7 @@ dependencies:
   '@wordpress/warning': link:packages/warning
   '@wordpress/widgets': link:packages/widgets
   '@wordpress/wordcount': link:packages/wordcount
+  dom-scroll-into-view: 1.2.1
 
 devDependencies:
   '@actions/core': 1.4.0
@@ -362,6 +365,7 @@ devDependencies:
   lint-staged: 9.2.5
   lodash: 4.17.21
   make-dir: 3.0.0
+  metro: 0.64.0
   metro-react-native-babel-preset: 0.64.0
   metro-react-native-babel-transformer: 0.64.0
   mkdirp: 0.5.1
@@ -10938,6 +10942,10 @@ packages:
       '@babel/runtime': 7.16.3
       csstype: 3.0.10
     dev: true
+
+  /dom-scroll-into-view/1.2.1:
+    resolution: {integrity: sha1-6PNnMt0ImwIBqI14Fdw/iObWbH4=}
+    dev: false
 
   /dom-serializer/1.3.2:
     resolution: {integrity: sha512-5c54Bk5Dw4qAxNOI1pFEizPSjVsx5+bpJKmL2kPn8JhBUq2q09tTCa3mjijun2NfK78NMouDYNMBkOrPZiS+ig==}
@@ -22124,7 +22132,7 @@ packages:
   /wide-align/1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
     dependencies:
-      string-width: 1.0.2
+      string-width: 4.2.3
     dev: true
 
   /widest-line/3.1.0:

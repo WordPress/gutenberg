@@ -81,7 +81,8 @@
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"dom-scroll-into-view": "^1.2.1"
 	},
 	"devDependencies": {
 		"@actions/core": "1.4.0",
@@ -184,8 +185,9 @@
 		"lint-staged": "9.2.5",
 		"lodash": "4.17.21",
 		"make-dir": "3.0.0",
-		"metro-react-native-babel-preset": "0.66.2",
-		"metro-react-native-babel-transformer": "0.66.2",
+		"metro": "0.64.0",
+		"metro-react-native-babel-preset": "0.64.0",
+		"metro-react-native-babel-transformer": "0.64.0",
 		"mkdirp": "0.5.1",
 		"nock": "12.0.3",
 		"node-watch": "0.7.0",
