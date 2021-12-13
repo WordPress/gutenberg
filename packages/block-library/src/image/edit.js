@@ -90,7 +90,7 @@ function hasDefaultSize( image, defaultSize ) {
 /**
  * Checks if a media attachment object has been "destroyed",
  * that is, removed from the media library. The core Media Library
- * add a `destroyed` property to a deleted attachment object in the media collection.
+ * adds a `destroyed` property to a deleted attachment object in the media collection.
  *
  * @param {number} id The attachment id.
  *
