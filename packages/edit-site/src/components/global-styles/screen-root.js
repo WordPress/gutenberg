@@ -8,6 +8,7 @@ import {
 	Card,
 	CardDivider,
 } from '@wordpress/components';
+import { blockDefault } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -39,7 +40,7 @@ function ScreenRoot() {
 							) }
 						</p>
 					</Item>
-					<NavigationButton path="/blocks">
+					<NavigationButton icon={ blockDefault } path="/blocks">
 						{ __( 'Blocks' ) }
 					</NavigationButton>
 				</ItemGroup>
