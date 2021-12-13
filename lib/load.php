@@ -100,6 +100,7 @@ require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
+require __DIR__ . '/compat/wordpress-5.9/global-styles-assets.php';
 require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/templates.php';
 require __DIR__ . '/compat/wordpress-5.9/template-parts.php';
