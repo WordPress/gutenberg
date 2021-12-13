@@ -49,4 +49,82 @@ describe( 'actions', () => {
 				.getActiveComplementaryArea( 'core/edit-post' )
 		).toBeNull();
 	} );
+	it( 'toggleFeature', () => {
+		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
+		expect(
+			registry
+				.select( interfaceStore )
+				.isFeatureActive( editPostStore.name, 'welcomeGuide' )
+		).toBeTruthy();
+
+		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
+		expect(
+			registry
+				.select( interfaceStore )
+				.isFeatureActive( editPostStore.name, 'welcomeGuide' )
+		).toBeFalsy();
+	} );
+	describe( 'switchEditorMode', () => {
+		it( 'to visual', () => {
+			registry.dispatch( editPostStore ).switchEditorMode( 'visual' );
+			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+		it( 'to text', () => {
+			// Add a selected client id and make sure it's there.
+			const clientId = 'clientId_1';
+			registry.dispatch( blockEditorStore ).selectionChange( clientId );
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientId()
+			).toEqual( clientId );
+
+			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientId()
+			).toBeNull();
+		} );
+	} );
+	it( 'togglePinnedPluginItem', () => {
+		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
+		// Sidebars are pinned by default.
+		// @See https://github.com/WordPress/gutenberg/pull/21645
+		expect(
+			registry
+				.select( interfaceStore )
+				.isItemPinned( editPostStore.name, 'rigatoni' )
+		).toBeFalsy();
+		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
+		expect(
+			registry
+				.select( interfaceStore )
+				.isItemPinned( editPostStore.name, 'rigatoni' )
+		).toBeTruthy();
+	} );
+	describe( '__unstableSwitchToTemplateMode', () => {
+		it( 'welcome guide is active', () => {
+			// Activate `welcomeGuideTemplate` feature.
+			registry
+				.dispatch( editPostStore )
+				.toggleFeature( 'welcomeGuideTemplate' );
+			registry.dispatch( editPostStore ).__unstableSwitchToTemplateMode();
+			expect(
+				registry.select( editPostStore ).isEditingTemplate()
+			).toBeTruthy();
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toHaveLength( 0 );
+		} );
+		it( 'welcome guide is inactive', () => {
+			expect(
+				registry.select( editPostStore ).isEditingTemplate()
+			).toBeFalsy();
+			registry.dispatch( editPostStore ).__unstableSwitchToTemplateMode();
+			expect(
+				registry.select( editPostStore ).isEditingTemplate()
+			).toBeTruthy();
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toHaveLength( 1 );
+			expect( notices[ 0 ].content ).toMatch( 'template' );
+		} );
+	} );
 } );
