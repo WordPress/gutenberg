@@ -50,6 +50,8 @@ import { isExternalImage } from './edit';
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 
+const IMAGE_EDITING_BLOCK_MODE = 'alt';
+
 export default function Image( {
 	temporaryURL,
 	attributes: {
@@ -110,12 +112,14 @@ export default function Image( {
 		imageSizes,
 		maxWidth,
 		mediaUpload,
+		isEditingImage,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getSettings,
 				canInsertBlockType,
+				getBlockMode,
 			} = select( blockEditorStore );
 
 			const rootClientId = getBlockRootClientId( clientId );
@@ -132,11 +136,15 @@ export default function Image( {
 					'core/cover',
 					rootClientId
 				),
+				isEditingImage:
+					getBlockMode( clientId ) === IMAGE_EDITING_BLOCK_MODE,
 			};
 		},
 		[ clientId ]
 	);
-	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
+	const { replaceBlocks, toggleSelection, setBlockMode } = useDispatch(
+		blockEditorStore
+	);
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
@@ -146,7 +154,6 @@ export default function Image( {
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
 	] = useState( {} );
-	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
@@ -156,6 +163,11 @@ export default function Image( {
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
+	const setIsEditingImage = ( isEditing ) =>
+		setBlockMode(
+			clientId,
+			isEditing ? IMAGE_EDITING_BLOCK_MODE : 'visual'
+		);
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,

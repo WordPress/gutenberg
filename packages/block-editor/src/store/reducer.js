@@ -1390,15 +1390,22 @@ export function initialPosition( state = null, action ) {
 }
 
 export function blocksMode( state = {}, action ) {
-	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
-		const { clientId } = action;
-		return {
-			...state,
-			[ clientId ]:
-				state[ clientId ] && state[ clientId ] === 'html'
-					? 'visual'
-					: 'html',
-		};
+	const { clientId } = action;
+
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_MODE':
+			return {
+				...state,
+				[ clientId ]:
+					state[ clientId ] && state[ clientId ] === 'html'
+						? 'visual'
+						: 'html',
+			};
+		case 'SET_BLOCK_MODE':
+			return {
+				...state,
+				[ clientId ]: action.mode,
+			};
 	}
 
 	return state;

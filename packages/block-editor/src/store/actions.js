@@ -897,6 +897,22 @@ export function toggleBlockMode( clientId ) {
 }
 
 /**
+ * Returns an action object used to set alternate editing modes.
+ *
+ * @param {string} clientId Block client ID.
+ * @param {string} mode     Block editing mode.
+ *
+ * @return {Object} Action object.
+ */
+export function setBlockMode( clientId, mode ) {
+	return {
+		type: 'SET_BLOCK_MODE',
+		clientId,
+		mode,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the user has begun to type.
  *
  * @return {Object} Action object.
