@@ -110,6 +110,52 @@ describe( 'Block Grouping', () => {
 			);
 			expect( ungroupButtons ).toHaveLength( 0 );
 		} );
+		it( 'should group and ungroup a controlled block properly', async () => {
+			const getParagraphText = async () => {
+				const paragraphInReusableSelector =
+					'.block-editor-block-list__block[data-type="core/block"] p';
+				await page.waitForSelector( paragraphInReusableSelector );
+				return page.$eval(
+					paragraphInReusableSelector,
+					( element ) => element.innerText
+				);
+			};
+
+			const paragraphText = 'hi';
+			const reusableBlockNameInputSelector =
+				'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( paragraphText );
+
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Add to Reusable blocks' );
+			const nameInput = await page.waitForSelector(
+				reusableBlockNameInputSelector
+			);
+			await nameInput.click();
+			await page.keyboard.type( 'Block' );
+			await page.keyboard.press( 'Enter' );
+
+			// Wait for creation to finish
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block created."]'
+			);
+			// Group
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+
+			let group = await page.$$( '[data-type="core/group"]' );
+			expect( group ).toHaveLength( 1 );
+			// Make sure the paragraph in reusable block exists.
+			expect( await getParagraphText() ).toMatch( paragraphText );
+
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Ungroup' );
+			group = await page.$$( '[data-type="core/group"]' );
+			expect( group ).toHaveLength( 0 );
+			// Make sure the paragraph in reusable block exists.
+			expect( await getParagraphText() ).toEqual( paragraphText );
+		} );
 	} );
 
 	describe( 'Grouping Block availability', () => {
