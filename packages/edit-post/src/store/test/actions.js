@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { createRegistry } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -12,13 +11,7 @@ import { store as editorStore } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import { requestMetaBoxUpdates, setIsListViewOpened } from '../actions';
 import { store as editPostStore } from '..';
-
-jest.mock( '@wordpress/api-fetch', () => ( {
-	__esModule: true,
-	default: jest.fn(),
-} ) );
 
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
@@ -35,24 +28,25 @@ function createRegistryWithStores() {
 }
 
 describe( 'actions', () => {
-	describe( 'openPublishSidebar', () => {} );
-} );
+	let registry;
+	beforeEach( () => {
+		registry = createRegistryWithStores();
+	} );
+	it( 'openGeneralSidebar/closeGeneralSidebar', () => {
+		registry.dispatch( editPostStore ).openGeneralSidebar( 'test/sidebar' );
+		expect(
+			registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core/edit-post' )
+		).toBe( 'test/sidebar' );
 
-// TODO: to remove all below...
-describe( 'actions', () => {
-	describe( 'requestMetaBoxUpdates', () => {
-		it( 'should yield the REQUEST_META_BOX_UPDATES action', () => {
-			const fulfillment = requestMetaBoxUpdates();
-			expect( fulfillment.next() ).toEqual( {
-				done: false,
-				value: {
-					type: 'REQUEST_META_BOX_UPDATES',
-				},
-			} );
-			expect( fulfillment.next() ).toEqual( {
-				done: false,
-				value: controls.select( 'core/editor', 'getCurrentPost' ),
-			} );
-		} );
+		registry
+			.dispatch( editPostStore )
+			.closeGeneralSidebar( 'test/sidebar' );
+		expect(
+			registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core/edit-post' )
+		).toBeNull();
 	} );
 } );
