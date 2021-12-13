@@ -11,9 +11,13 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] Give multi-line block names central alignment in inserter [#37185]
+
+## 1.68.0
+-   [**] Fix undo/redo functionality in links when applying text format [#36861]
 -   [**] [iOS] Fix scroll update when typing in RichText component [#36914]
--   [*] [Preformatted block] Fix an issue where the background color is not showing up for standard themes. [#36883]
--   [***] Highlight text - enables color customization for specific text within a Pragraph block [#36028]
+-   [*] [Preformatted block] Fix an issue where the background color is not showing up for standard themes [#36883]
+-   [**] Update Gallery Block to default to the new format and auto-convert old galleries to the new format [#36191]
+-   [***] Highlight text - enables color customization for specific text within a Paragraph block [#36028]
 
 ## 1.67.0
 -   [**] Adds Clipboard Link Suggestion to Image block and Button block [#35972]
