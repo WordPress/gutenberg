@@ -38,6 +38,7 @@
 		"enzyme-to-json": "^3.4.4"
 	},
 	"peerDependencies": {
+		"@babel/core": ">=7",
 		"jest": ">=26"
 	},
 	"publishConfig": {
