@@ -50,6 +50,9 @@ function gutenberg_register_navigation_post_type() {
 			'editor',
 			'revisions',
 		),
+		'capabilities'          => array(
+			'create_posts' => 'edit_theme_options',
+		),
 	);
 
 	register_post_type( 'wp_navigation', $args );
