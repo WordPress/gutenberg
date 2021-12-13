@@ -300,6 +300,15 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'wp-block-editor-content',
+		gutenberg_url( 'build/block-editor/content.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-reusable-blocks' ),
@@ -715,7 +724,7 @@ function gutenberg_resolve_assets() {
 
 	$script_handles = array();
 	$style_handles  = array(
-		'wp-block-editor',
+		'wp-block-editor-content',
 		'wp-block-library',
 		'wp-block-library-theme',
 		'wp-edit-blocks',
