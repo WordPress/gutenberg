@@ -23,7 +23,7 @@ import './hooks';
 import { store as editSiteStore } from './store';
 import EditSiteApp from './components/app';
 import getIsListPage from './utils/get-is-list-page';
-import { redirectToHomepage } from './components/routes/redirect-to-homepage';
+import redirectToHomepage from './components/routes/redirect-to-homepage';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after

@@ -60,7 +60,7 @@ async function getHomepageParams() {
 	};
 }
 
-export async function redirectToHomepage() {
+export default async function redirectToHomepage() {
 	const searchParams = new URLSearchParams( history.location.search );
 	const params = Object.fromEntries( searchParams.entries() );
 
