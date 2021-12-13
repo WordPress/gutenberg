@@ -184,16 +184,15 @@ function Navigation( {
 				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
 				controlledInnerBlocks: _controlledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
-				canUserPublishNavigation: ref
-					? canUser( 'publish', 'navigation', ref )
-					: undefined,
-				hasResolvedcanUserPublishNavigationEntity: hasFinishedResolution(
+				canUserCreateNavigation:
+					canUser( 'create', 'navigation' ) || undefined,
+				hasResolvedCanUserCreateNavigation: hasFinishedResolution(
 					'canUser',
-					[ 'publish', 'navigation', ref ]
+					[ 'create', 'navigation' ]
 				),
 			};
 		},
-		[ clientId, ref ]
+		[ clientId ]
 	);
 	const {
 		replaceInnerBlocks,
@@ -316,7 +315,7 @@ function Navigation( {
 			setDetectedColor,
 			setDetectedBackgroundColor
 		);
-		const subMenuElement = navRef.current.querySelector(
+		const subMenuElement = navRef.current?.querySelector(
 			'[data-type="core/navigation-link"] [data-type="core/navigation-link"]'
 		);
 		if ( subMenuElement ) {
@@ -651,11 +650,13 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 							clientId={ clientId }
+							canUserCreateNavigation={ canUserCreateNavigation }
 						/>
 					) }
-					{ ! isEntityAvailable && ! isPlaceholderShown && (
-						<PlaceholderPreview isLoading />
-					) }
+					{ ! hasResolvedCanUserCreateNavigation ||
+						( ! isEntityAvailable && ! isPlaceholderShown && (
+							<PlaceholderPreview isLoading />
+						) ) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper
 							id={ clientId }
@@ -680,15 +681,6 @@ function Navigation( {
 						</ResponsiveWrapper>
 					) }
 				</nav>
-				{ ref &&
-					hasResolvedcanUserPublishNavigationEntity &&
-					! canUserPublishNavigation && (
-						<Warning>
-							{ __(
-								'You do not have permission to publish Navigations. Any items you add here will not be saved.'
-							) }
-						</Warning>
-					) }
 			</RecursionProvider>
 		</EntityProvider>
 	);

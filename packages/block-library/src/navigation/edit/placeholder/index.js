@@ -92,6 +92,7 @@ export default function NavigationPlaceholder( {
 	onFinish,
 	canSwitchNavigationMenu,
 	hasResolvedNavigationMenus,
+	canUserCreateNavigation = false,
 } ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -102,6 +103,10 @@ export default function NavigationPlaceholder( {
 		blocks,
 		navigationMenuTitle = null
 	) => {
+		if ( ! canUserCreateNavigation ) {
+			return;
+		}
+
 		const navigationMenu = await createNavigationMenu(
 			navigationMenuTitle,
 			blocks
@@ -192,7 +197,7 @@ export default function NavigationPlaceholder( {
 									<hr />
 								</>
 							) : undefined }
-							{ hasPages ? (
+							{ canUserCreateNavigation && hasPages ? (
 								<>
 									<Button
 										variant="tertiary"
@@ -203,12 +208,15 @@ export default function NavigationPlaceholder( {
 									<hr />
 								</>
 							) : undefined }
-							<Button
-								variant="tertiary"
-								onClick={ onCreateEmptyMenu }
-							>
-								{ __( 'Start empty' ) }
-							</Button>
+
+							{ canUserCreateNavigation && (
+								<Button
+									variant="tertiary"
+									onClick={ onCreateEmptyMenu }
+								>
+									{ __( 'Start empty' ) }
+								</Button>
+							) }
 						</div>
 					</div>
 				</Placeholder>
