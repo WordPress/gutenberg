@@ -1,4 +1,9 @@
 <?php
+/**
+ * Load global styles assets in the front-end.
+ *
+ * @package gutenberg
+ */
 
 /*
  * This code lives in script-loader.php
