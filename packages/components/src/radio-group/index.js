@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useRadioState, RadioGroup as ReakitRadioGroup } from 'reakit/Radio';
+import { useRadioState, RadioGroup as ReakitRadioGroup } from 'ariakit/radio';
 
 /**
  * WordPress dependencies
@@ -19,16 +19,11 @@ function RadioGroup(
 	ref
 ) {
 	const radioState = useRadioState( {
-		state: defaultChecked,
-		baseId: props.id,
+		defaultValue: defaultChecked,
+		value: checked,
+		setValue: onChange,
 	} );
-	const radioContext = {
-		...radioState,
-		disabled,
-		// controlled or uncontrolled
-		state: checked ?? radioState.state,
-		setState: onChange ?? radioState.setState,
-	};
+	const radioContext = { ...radioState, disabled };
 
 	return (
 		<RadioContext.Provider value={ radioContext }>
@@ -36,7 +31,7 @@ function RadioGroup(
 				ref={ ref }
 				as={ ButtonGroup }
 				aria-label={ label }
-				{ ...radioState }
+				state={ radioState }
 				{ ...props }
 			/>
 		</RadioContext.Provider>

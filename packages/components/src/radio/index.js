@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Radio as ReakitRadio } from 'reakit/Radio';
+import { Radio as ReakitRadio } from 'ariakit/radio';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import RadioContext from '../radio-context';
 
 function Radio( { children, value, ...props }, ref ) {
 	const radioContext = useContext( RadioContext );
-	const checked = radioContext.state === value;
+	const checked = radioContext.value === value;
 
 	return (
 		<ReakitRadio
@@ -24,7 +24,7 @@ function Radio( { children, value, ...props }, ref ) {
 			as={ Button }
 			variant={ checked ? 'primary' : 'secondary' }
 			value={ value }
-			{ ...radioContext }
+			disabled={ radioContext.disabled }
 			{ ...props }
 		>
 			{ children || value }
