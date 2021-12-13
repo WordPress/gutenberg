@@ -79,6 +79,7 @@ export default function Image( {
 	containerRef,
 	context,
 	clientId,
+	onImageLoadError,
 } ) {
 	const imageRef = useRef();
 	const captionRef = useRef();
@@ -214,10 +215,17 @@ export default function Image( {
 	}
 
 	function onImageError() {
-		// Check if there's an embed block that handles this URL.
+		// Check if there's an embed block that handles this URL, e.g., instagram URL.
+		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
+		const shouldReplace = undefined !== embedBlock;
+
+		if ( shouldReplace ) {
 			onReplace( embedBlock );
+		}
+
+		if ( onImageLoadError ) {
+			onImageLoadError( { isReplaced: shouldReplace } );
 		}
 	}
 

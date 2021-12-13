@@ -101,25 +101,6 @@ function isMediaDestroyed( id ) {
 	return attachment.destroyed;
 }
 
-/**
- * Runs an error callback if the image does not load.
- * If the error callback is triggered, we infer that that image
- * has been deleted.
- *
- * @param {string}   imageURL An image url for Image.src.
- * @param {Function} onError  A callback function if image load errors.
- */
-function checkImageStatus( imageURL, onError = () => {} ) {
-	if ( ! imageURL ) {
-		return;
-	}
-	const newImage = new window.Image();
-	newImage.src = imageURL;
-	newImage.addEventListener( 'error', function () {
-		onError();
-	} );
-}
-
 export function ImageEdit( {
 	attributes,
 	setAttributes,
@@ -161,13 +142,6 @@ export function ImageEdit( {
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
 
-	// Check onload if the image exists.
-	useEffect( () => {
-		if ( url ) {
-			checkImageStatus( url, clearImageAttributes );
-		}
-	}, [] );
-
 	function clearImageAttributes() {
 		setAttributes( {
 			url: undefined,
@@ -182,6 +156,19 @@ export function ImageEdit( {
 	// fired when the media modal closes.
 	function onCloseModal() {
 		if ( isMediaDestroyed( attributes?.id ) ) {
+			clearImageAttributes();
+		}
+	}
+
+	/*
+		 Runs an error callback if the image does not load.
+		 If the error callback is triggered, we infer that that image
+		 has been deleted.
+	*/
+	function onImageError( { isReplaced } ) {
+		// If the image block was not replaced with an embed,
+		// clear the attributes and trigger the placeholder.
+		if ( ! isReplaced ) {
 			clearImageAttributes();
 		}
 	}
@@ -377,6 +364,7 @@ export function ImageEdit( {
 					context={ context }
 					clientId={ clientId }
 					onCloseModal={ onCloseModal }
+					onImageLoadError={ onImageError }
 				/>
 			) }
 			{ ! url && (
