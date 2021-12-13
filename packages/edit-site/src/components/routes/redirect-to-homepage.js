@@ -2,14 +2,12 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { select } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import history from '../../utils/history';
-import { store as editSiteStore } from '../../store';
 import getIsListPage from '../../utils/get-is-list-page';
 
 function getNeedsHomepageRedirect( params ) {
@@ -22,7 +20,7 @@ function getNeedsHomepageRedirect( params ) {
 	);
 }
 
-async function getHomepageParams() {
+async function getHomepageParams( siteUrl ) {
 	const siteSettings = await apiFetch( { path: '/wp/v2/settings' } );
 	if ( ! siteSettings ) {
 		return;
@@ -44,7 +42,6 @@ async function getHomepageParams() {
 	// Else get the home template.
 	// This matches the logic in `__experimentalGetTemplateForLink`.
 	// (packages/core-data/src/resolvers.js)
-	const { siteUrl } = select( editSiteStore ).getSettings();
 	const template = await window
 		.fetch( addQueryArgs( siteUrl, { '_wp-find-template': true } ) )
 		.then( ( res ) => res.json() )
@@ -60,12 +57,12 @@ async function getHomepageParams() {
 	};
 }
 
-export default async function redirectToHomepage() {
+export default async function redirectToHomepage( siteUrl ) {
 	const searchParams = new URLSearchParams( history.location.search );
 	const params = Object.fromEntries( searchParams.entries() );
 
 	if ( getNeedsHomepageRedirect( params ) ) {
-		const homepageParams = await getHomepageParams();
+		const homepageParams = await getHomepageParams( siteUrl );
 
 		if ( homepageParams ) {
 			history.replace( homepageParams );

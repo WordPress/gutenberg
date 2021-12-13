@@ -37,9 +37,8 @@ export async function reinitializeEditor( target, settings ) {
 	// The site editor relies on `postType` and `postId` params in the URL to
 	// define what's being edited. When visiting via the dashboard link, these
 	// won't be present. Do a client side redirect to the 'homepage' if that's
-	// the case. This requires editor settings, so dispatch that first.
-	dispatch( editSiteStore ).updateSettings( settings );
-	await redirectToHomepage();
+	// the case.
+	await redirectToHomepage( settings.siteUrl );
 
 	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
@@ -48,6 +47,8 @@ export async function reinitializeEditor( target, settings ) {
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	{
+		dispatch( editSiteStore ).updateSettings( settings );
+
 		// Keep the defaultTemplateTypes in the core/editor settings too,
 		// so that they can be selected with core/editor selectors in any editor.
 		// This is needed because edit-site doesn't initialize with EditorProvider,
