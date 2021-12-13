@@ -1,4 +1,8 @@
 <?php
+/**
+ * Loads the CSS Custom Properties in use by Global Styles.
+ * @package Gutenberg
+ */
 
 // This has been ported as part of default-filters.php
 if ( ! function_exists( 'wp_enqueue_global_styles_css_custom_properties' ) ) {
