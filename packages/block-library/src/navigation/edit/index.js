@@ -359,9 +359,9 @@ function Navigation( {
 		);
 	}
 
+	// Show a warning if the selected menu is no longer available.
+	// TODO - the user should be able to select a new one?
 	if ( ref && isNavigationMenuMissing ) {
-		// Show a warning if the selected menu is no longer available.
-		// TODO - the user should be able to select a new one?
 		return (
 			<div { ...blockProps }>
 				<Warning>
