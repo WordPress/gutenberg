@@ -72,19 +72,27 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 		$new_global_styles = array();
 
-		$style_css = wp_get_global_stylesheet( array( 'presets' ) );
-		if ( '' !== $style_css ) {
+		$css_variables = wp_get_global_stylesheet( array( 'variables' ) );
+		if ( '' !== $css_variables ) {
 			$new_global_styles[] = array(
-				'css'            => $style_css,
+				'css'            => $css_variables,
+				'__unstableType' => 'presets',
+			);
+		}
+
+		$css_presets = wp_get_global_stylesheet( array( 'presets' ) );
+		if ( '' !== $css_presets ) {
+			$new_global_styles[] = array(
+				'css'            => $css_presets,
 				'__unstableType' => 'presets',
 			);
 		}
 
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$style_css = wp_get_global_stylesheet( array( 'styles' ) );
-			if ( '' !== $style_css ) {
+			$css_blocks = wp_get_global_stylesheet( array( 'styles' ) );
+			if ( '' !== $css_blocks ) {
 				$new_global_styles[] = array(
-					'css'            => $style_css,
+					'css'            => $css_blocks,
 					'__unstableType' => 'theme',
 				);
 			}
@@ -151,26 +159,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 
 	return $settings;
-}
-
-/**
- * Whether or not the Site Editor is available.
- *
- * @return boolean
- */
-function gutenberg_experimental_is_site_editor_available() {
-	return wp_is_block_theme();
-}
-
-/**
- * Register CPT to store/access user data.
- *
- * @return void
- */
-function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( gutenberg_experimental_is_site_editor_available() ) {
-		register_global_styles_custom_post_type();
-	}
 }
 
 /**
@@ -293,7 +281,6 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 }
 
-add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 // kses actions&filters.

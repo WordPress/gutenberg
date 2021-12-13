@@ -104,7 +104,11 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	);
 };
 
-export default function CustomGradientPicker( { value, onChange } ) {
+export default function CustomGradientPicker( {
+	value,
+	onChange,
+	__experimentalIsRenderedInSidebar,
+} ) {
 	const gradientAST = getGradientAstWithDefault( value );
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
@@ -121,6 +125,9 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	return (
 		<div className="components-custom-gradient-picker">
 			<CustomGradientBar
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
 				background={ background }
 				hasGradient={ hasGradient }
 				value={ controlPoints }
