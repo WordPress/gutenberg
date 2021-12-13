@@ -178,7 +178,7 @@ function Navigation( {
 				),
 			};
 		},
-		[ clientId ]
+		[ clientId, ref ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
 	const {
