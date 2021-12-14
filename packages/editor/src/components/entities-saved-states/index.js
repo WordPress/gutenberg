@@ -9,7 +9,7 @@ import { some, groupBy } from 'lodash';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback, useRef } from '@wordpress/element';
+import { Fragment, useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
@@ -19,6 +19,7 @@ import { close as closeIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
+import DiscardEntityChangesPanel from './discard-entity-changes-panel';
 
 const TRANSLATED_SITE_PROPERTIES = {
 	title: __( 'Title' ),
@@ -100,6 +101,11 @@ export default function EntitiesSavedStates( { close } ) {
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
 
+	// Discard entities?
+	const [ discardEntitiesPanel, showDiscardEntitiesPanel ] = useState(
+		false
+	);
+
 	const setUnselectedEntities = (
 		{ kind, name, key, property },
 		checked
@@ -136,7 +142,13 @@ export default function EntitiesSavedStates( { close } ) {
 			}
 		);
 
-		close( entitiesToSave );
+		if ( entitiesToSave.length === dirtyEntityRecords.length ) {
+			// We're saving all changes and can thus safely return to the editor afterwards.
+			showDiscardEntitiesPanel( false );
+			close( entitiesToSave );
+		} else {
+			showDiscardEntitiesPanel( true );
+		}
 
 		const siteItemsToSave = [];
 		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
@@ -176,33 +188,8 @@ export default function EntitiesSavedStates( { close } ) {
 		onClose: () => dismissPanel(),
 	} );
 
-	return (
-		<div
-			ref={ saveDialogRef }
-			{ ...saveDialogProps }
-			className="entities-saved-states__panel"
-		>
-			<div className="entities-saved-states__panel-header">
-				<Button
-					ref={ saveButtonRef }
-					variant="primary"
-					disabled={
-						dirtyEntityRecords.length -
-							unselectedEntities.length ===
-						0
-					}
-					onClick={ saveCheckedEntities }
-					className="editor-entities-saved-states__save-button"
-				>
-					{ __( 'Save' ) }
-				</Button>
-				<Button
-					icon={ closeIcon }
-					onClick={ dismissPanel }
-					label={ __( 'Close panel' ) }
-				/>
-			</div>
-
+	const SaveEntitiesPanel = () => (
+		<Fragment>
 			<div className="entities-saved-states__text-prompt">
 				<strong>{ __( 'Are you ready to save?' ) }</strong>
 				<p>
@@ -223,6 +210,45 @@ export default function EntitiesSavedStates( { close } ) {
 					/>
 				);
 			} ) }
+		</Fragment>
+	);
+
+	return (
+		<div
+			ref={ saveDialogRef }
+			{ ...saveDialogProps }
+			className="entities-saved-states__panel"
+		>
+			<div className="entities-saved-states__panel-header">
+				{ discardEntitiesPanel ? null : (
+					<Button
+						ref={ saveButtonRef }
+						variant="primary"
+						disabled={
+							dirtyEntityRecords.length -
+								unselectedEntities.length ===
+							0
+						}
+						onClick={ saveCheckedEntities }
+						className="editor-entities-saved-states__save-button"
+					>
+						{ __( 'Save' ) }
+					</Button>
+				) }
+				<Button
+					icon={ closeIcon }
+					onClick={ dismissPanel }
+					label={ __( 'Close panel' ) }
+				/>
+			</div>
+			{ discardEntitiesPanel ? (
+				<DiscardEntityChangesPanel
+					closePanel={ dismissPanel }
+					savables={ sortedPartitionedSavables.flat() }
+				/>
+			) : (
+				<SaveEntitiesPanel />
+			) }
 		</div>
 	);
 }
