@@ -12,6 +12,8 @@ import {
 	clickMenuItem,
 	saveDraft,
 	transformBlockTo,
+	clickPlaceholderButton,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 async function getSelectedFlatIndices() {
@@ -650,12 +652,8 @@ describe( 'Multi-block selection', () => {
 
 	it( 'should gradually multi-select', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '/columns' );
-		await page.keyboard.press( 'Enter' );
-		// Select two columns.
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'Enter' );
+		await insertBlock( 'Columns' );
+		await clickPlaceholderButton( 'Two columns; equal split' );
 		// Navigate to appender.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );

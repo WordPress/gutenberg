@@ -8,6 +8,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	openDocumentSettingsSidebar,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 const createButtonLabel = 'Create Table';
@@ -30,38 +31,16 @@ describe( 'Table', () => {
 	it( 'displays a form for choosing the row and column count of the table', async () => {
 		await insertBlock( 'Table' );
 
-		// Check for existence of the column count field.
-		const columnCountLabel = await page.$x(
-			"//figure[@data-type='core/table']//label[text()='Column count']"
-		);
-		expect( columnCountLabel ).toHaveLength( 1 );
-
-		// Modify the column count.
-		await columnCountLabel[ 0 ].click();
-		const currentColumnCount = await page.evaluate(
-			() => document.activeElement.value
-		);
-		expect( currentColumnCount ).toBe( '2' );
+		await clickPlaceholderButton( 'Column count' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '5' );
 
-		// Check for existence of the row count field.
-		const rowCountLabel = await page.$x(
-			"//figure[@data-type='core/table']//label[text()='Row count']"
-		);
-		expect( rowCountLabel ).toHaveLength( 1 );
-
-		// Modify the row count.
-		await rowCountLabel[ 0 ].click();
-		const currentRowCount = await page.evaluate(
-			() => document.activeElement.value
-		);
-		expect( currentRowCount ).toBe( '2' );
+		await clickPlaceholderButton( 'Row count' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '10' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Expect the post content to have a correctly sized table.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -71,7 +50,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Click the first cell and add some text.
 		await page.click( 'td' );
@@ -107,7 +86,7 @@ describe( 'Table', () => {
 		expect( footerSwitch ).toHaveLength( 0 );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Expect the header and footer switches to be present now that the table has been created.
 		headerSwitch = await page.$x( headerSwitchSelector );
@@ -144,7 +123,7 @@ describe( 'Table', () => {
 		await openDocumentSettingsSidebar();
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Toggle on the switches and add some content.
 		const headerSwitch = await page.$x(
@@ -178,15 +157,12 @@ describe( 'Table', () => {
 	it( 'allows columns to be aligned', async () => {
 		await insertBlock( 'Table' );
 
-		const [ columnCountLabel ] = await page.$x(
-			"//figure[@data-type='core/table']//label[text()='Column count']"
-		);
-		await columnCountLabel.click();
+		await clickPlaceholderButton( 'Column count' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '4' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Click the first cell and add some text. Don't align.
 		const cells = await page.$$( 'td,th' );
@@ -218,7 +194,7 @@ describe( 'Table', () => {
 		await openDocumentSettingsSidebar();
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
 		const [ fixedWidthSwitch ] = await page.$x(
@@ -254,7 +230,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickPlaceholderButton( createButtonLabel );
 
 		// Click the first cell and add some text.
 		await page.click( '.wp-block-table figcaption' );
@@ -267,7 +243,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickPlaceholderButton( createButtonLabel );
 
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( '1' );

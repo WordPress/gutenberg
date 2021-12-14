@@ -16,9 +16,16 @@ import {
 	clickButton,
 } from '@wordpress/e2e-test-utils';
 
-async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+async function placeholderUpload() {
+	const input = await page.waitForFunction( () =>
+		document
+			.querySelector( '.wp-block-gallery .wp-block-editor-placeholder' )
+			?.shadowRoot.querySelector( 'input[type="file"]' )
+	);
+	return upload( input );
+}
+
+async function upload( handle ) {
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -30,7 +37,7 @@ async function upload( selector ) {
 	const filename = uuid();
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
-	await inputElement.uploadFile( tmpFileName );
+	await handle.uploadFile( tmpFileName );
 	await page.waitForSelector(
 		`.wp-block-gallery img[src$="${ filename }.png"]`
 	);
@@ -44,7 +51,7 @@ describe( 'Gallery', () => {
 
 	it( 'can be created using uploaded images', async () => {
 		await insertBlock( 'Gallery' );
-		const filename = await upload( '.wp-block-gallery input[type="file"]' );
+		const filename = await placeholderUpload();
 
 		const regex = new RegExp(
 			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"full\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image size-full\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
@@ -56,7 +63,7 @@ describe( 'Gallery', () => {
 		const galleryCaption = 'Tested gallery caption';
 
 		await insertBlock( 'Gallery' );
-		await upload( '.wp-block-gallery input[type="file"]' );
+		await placeholderUpload();
 
 		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
 		await page.keyboard.type( galleryCaption );
@@ -68,7 +75,7 @@ describe( 'Gallery', () => {
 
 	it( "uploaded images' captions can be edited", async () => {
 		await insertBlock( 'Gallery' );
-		await upload( '.wp-block-gallery input[type="file"]' );
+		await placeholderUpload();
 
 		const figureElement = await page.waitForSelector(
 			'.wp-block-gallery .wp-block-image'

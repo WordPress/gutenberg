@@ -7,8 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Placeholder } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { layout } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import Placeholder from '../placeholder';
 
 function BlockVariationPicker( {
 	icon = layout,

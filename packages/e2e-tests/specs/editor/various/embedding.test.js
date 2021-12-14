@@ -3,7 +3,7 @@
  */
 import {
 	clickBlockAppender,
-	clickButton,
+	clickPlaceholderButton,
 	createEmbeddingMatcher,
 	createJSONResponse,
 	createNewPost,
@@ -167,6 +167,7 @@ async function insertEmbed( URL ) {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Embed')]`
 	);
 	await page.keyboard.press( 'Enter' );
+	await page.evaluate( () => new Promise( requestIdleCallback ) );
 	await page.keyboard.type( URL );
 	await page.keyboard.press( 'Enter' );
 }
@@ -184,22 +185,43 @@ describe( 'Embedding content', () => {
 
 		// Valid provider; invalid content. Should render failed, edit state.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
-		await page.waitForSelector(
-			'input[value="https://twitter.com/wooyaygutenberg123454312"]'
-		);
+		await page.waitForFunction( () => {
+			const embedPlaceholders = document.querySelectorAll(
+				'.wp-block-editor-placeholder'
+			);
+			const lastEmbedPlaceholder =
+				embedPlaceholders[ embedPlaceholders.length - 1 ];
+			return lastEmbedPlaceholder?.shadowRoot.querySelector(
+				'input[value="https://twitter.com/wooyaygutenberg123454312"]'
+			);
+		} );
 
 		// WordPress invalid content. Should render failed, edit state.
 		await insertEmbed( 'https://wordpress.org/gutenberg/handbook/' );
-		await page.waitForSelector(
-			'input[value="https://wordpress.org/gutenberg/handbook/"]'
-		);
+		await page.waitForFunction( () => {
+			const embedPlaceholders = document.querySelectorAll(
+				'.wp-block-editor-placeholder'
+			);
+			const lastEmbedPlaceholder =
+				embedPlaceholders[ embedPlaceholders.length - 1 ];
+			return lastEmbedPlaceholder?.shadowRoot.querySelector(
+				'input[value="https://wordpress.org/gutenberg/handbook/"]'
+			);
+		} );
 
 		// Provider whose oembed API has gone wrong. Should render failed, edit
 		// state.
 		await insertEmbed( 'https://twitter.com/thatbunty' );
-		await page.waitForSelector(
-			'input[value="https://twitter.com/thatbunty"]'
-		);
+		await page.waitForFunction( () => {
+			const embedPlaceholders = document.querySelectorAll(
+				'.wp-block-editor-placeholder'
+			);
+			const lastEmbedPlaceholder =
+				embedPlaceholders[ embedPlaceholders.length - 1 ];
+			return lastEmbedPlaceholder?.shadowRoot.querySelector(
+				'input[value="https://twitter.com/thatbunty"]'
+			);
+		} );
 
 		// WordPress content that can be embedded. Should render valid figure
 		// element.
@@ -227,16 +249,8 @@ describe( 'Embedding content', () => {
 	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
+		await clickPlaceholderButton( 'Convert to link' );
 
-		// Wait for the request to fail and present an error. Since placeholder
-		// has styles applied which depend on resize observer, wait for the
-		// expected size class to settle before clicking, since otherwise a race
-		// condition could occur on the placeholder layout vs. click intent.
-		await page.waitForSelector(
-			'.components-placeholder.is-large .components-placeholder__error'
-		);
-
-		await clickButton( 'Convert to link' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -250,14 +264,7 @@ describe( 'Embedding content', () => {
 	it( 'should allow the user to try embedding a failed URL again', async () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
-
-		// Wait for the request to fail and present an error. Since placeholder
-		// has styles applied which depend on resize observer, wait for the
-		// expected size class to settle before clicking, since otherwise a race
-		// condition could occur on the placeholder layout vs. click intent.
-		await page.waitForSelector(
-			'.components-placeholder.is-large .components-placeholder__error'
-		);
+		await page.evaluate( () => new Promise( requestIdleCallback ) );
 
 		// Set up a different mock to make sure that try again actually does make the request again.
 		await setUpResponseMocking( [
@@ -270,7 +277,7 @@ describe( 'Embedding content', () => {
 				),
 			},
 		] );
-		await clickButton( 'Try again' );
+		await clickPlaceholderButton( 'Try again' );
 		await page.waitForSelector( 'figure.wp-block-embed' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

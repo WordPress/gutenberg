@@ -11,8 +11,9 @@ import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { Placeholder, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
+import { Placeholder } from '@wordpress/block-editor';
 
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {

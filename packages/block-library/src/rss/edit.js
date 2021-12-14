@@ -5,12 +5,12 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
+	Placeholder,
 } from '@wordpress/block-editor';
 import {
 	Button,
 	Disabled,
 	PanelBody,
-	Placeholder,
 	RangeControl,
 	TextControl,
 	ToggleControl,

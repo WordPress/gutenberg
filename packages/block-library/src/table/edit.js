@@ -16,12 +16,12 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	Placeholder,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	PanelBody,
-	Placeholder,
 	TextControl,
 	ToggleControl,
 	ToolbarDropdownMenu,

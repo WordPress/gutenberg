@@ -18,8 +18,8 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarButton,
-	Placeholder,
 	Button,
+	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {

@@ -148,7 +148,8 @@ function filterTabbable( focusables ) {
 }
 
 /**
- * @param {Element} context
+ * @param {Element|Document|ShadowRoot} context
+ *
  * @return {Element[]} Tabbable elements within the context.
  */
 export function find( context ) {
@@ -162,7 +163,9 @@ export function find( context ) {
  *                          to the active element.
  */
 export function findPrevious( element ) {
-	const focusables = findFocusable( element.ownerDocument.body );
+	const focusables = findFocusable(
+		/** @type {Document|ShadowRoot} */ ( element.getRootNode() )
+	);
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables after and including `element`.
@@ -178,7 +181,9 @@ export function findPrevious( element ) {
  *                          to the active element.
  */
 export function findNext( element ) {
-	const focusables = findFocusable( element.ownerDocument.body );
+	const focusables = findFocusable(
+		/** @type {Document|ShadowRoot} */ ( element.getRootNode() )
+	);
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables before and including `element`.

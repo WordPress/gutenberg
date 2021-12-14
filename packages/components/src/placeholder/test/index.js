@@ -12,7 +12,7 @@ import { useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import Placeholder from '../';
+import { Placeholder } from '../';
 
 describe( 'Placeholder', () => {
 	beforeEach( () => {

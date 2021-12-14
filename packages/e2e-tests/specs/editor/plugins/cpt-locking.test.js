@@ -5,6 +5,7 @@ import {
 	activatePlugin,
 	clickBlockToolbarButton,
 	clickMenuItem,
+	clickPlaceholderButton,
 	createNewPost,
 	deactivatePlugin,
 	getEditedPostContent,
@@ -121,7 +122,8 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'can use the global inserter in inner blocks', async () => {
-			await page.click( 'button[aria-label="Two columns; equal split"]' );
+			await clickPlaceholderButton( 'Two columns; equal split' );
+			await page.keyboard.press( 'Enter' );
 			await page.click(
 				'.wp-block-column .block-editor-button-block-appender'
 			);

@@ -9,6 +9,7 @@ import {
 	createEmbeddingMatcher,
 	createJSONResponse,
 	setUpResponseMocking,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_RESPONSES = [
@@ -43,10 +44,7 @@ describe( 'Embed block inside a locked all parent', () => {
 
 	it( 'embed block should be able to embed external content', async () => {
 		await insertBlock( 'Test Inner Blocks Locking All Embed' );
-		const embedInputSelector =
-			'.components-placeholder__input[aria-label="Embed URL"]';
-		await page.waitForSelector( embedInputSelector );
-		await page.click( embedInputSelector );
+		await clickPlaceholderButton( 'Embed URL' );
 		// This URL should not have a trailing slash.
 		await page.keyboard.type( 'https://twitter.com/wordpress' );
 		await page.keyboard.press( 'Enter' );

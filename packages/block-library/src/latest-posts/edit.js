@@ -11,7 +11,6 @@ import { RawHTML } from '@wordpress/element';
 import {
 	BaseControl,
 	PanelBody,
-	Placeholder,
 	QueryControls,
 	RadioControl,
 	RangeControl,
@@ -28,6 +27,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	useBlockProps,
 	store as blockEditorStore,
+	Placeholder,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
