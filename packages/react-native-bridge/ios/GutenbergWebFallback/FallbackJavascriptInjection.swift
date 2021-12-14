@@ -68,11 +68,13 @@ public extension SourceFile {
     }
 }
 
-internal extension String {
+public extension String {
     func toJsScript() -> WKUserScript {
         WKUserScript(source: self, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
     }
+}
 
+internal extension String {
     func removingSpacesAndNewLines() -> String {
         return replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: " ", with: "")
     }

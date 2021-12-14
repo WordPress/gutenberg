@@ -20,7 +20,7 @@ public struct SourceFile {
         self.bundle = bundle
     }
 
-    func getContent() throws -> String {
+    public func getContent() throws -> String {
         guard let path = bundle.path(forResource: name, ofType: type.rawValue) else {
             throw SourceFileError.sourceFileNotFound("\(name).\(type)")
         }
