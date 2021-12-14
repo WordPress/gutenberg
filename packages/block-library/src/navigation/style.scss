@@ -388,10 +388,6 @@ button.wp-block-navigation-item__content {
 
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
-		flex-wrap: var(--layout-wrap, wrap);
-		flex-direction: var(--layout-direction, initial);
-		justify-content: var(--layout-justify, initial);
-		align-items: var(--layout-align, initial);
 	}
 
 	// If the responsive wrapper is present but overlay is not open,
@@ -569,14 +565,24 @@ button.wp-block-navigation-item__content {
 	}
 }
 
+// Show/hide the basic non-modal menu when set to "Mobile".
 .wp-block-navigation__plain-menu {
 	display: none;
 
 	&:not(.always-shown) {
 		@include break-small {
-			display: block;
+			display: flex;
 		}
 	}
+}
+
+// Both the modal inner container, and the plain menu, should inherit layout properties.
+.wp-block-navigation__plain-menu,
+.wp-block-navigation__responsive-container .wp-block-navigation__responsive-container-content {
+	flex-wrap: var(--layout-wrap, wrap);
+	flex-direction: var(--layout-direction, initial);
+	justify-content: var(--layout-justify, initial);
+	align-items: var(--layout-align, initial);
 }
 
 // Button to close the menus.
