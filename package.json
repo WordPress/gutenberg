@@ -179,7 +179,6 @@
 		"jest": "26.6.3",
 		"jest-junit": "11.0.0",
 		"jest-message-util": "27.0.6",
-		"jest-serializer-enzyme": "1.0.0",
 		"jest-watch-typeahead": "0.6.1",
 		"jsdom": "16.4.0",
 		"lerna": "3.22.1",
