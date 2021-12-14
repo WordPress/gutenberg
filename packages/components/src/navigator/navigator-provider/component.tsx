@@ -48,7 +48,7 @@ function NavigatorProvider(
 		},
 	] );
 
-	const push = useCallback(
+	const push: NavigatorContextType[ 'push' ] = useCallback(
 		( path, options ) => {
 			const { focusTargetSelector, ...restOptions } = options;
 
@@ -63,17 +63,17 @@ function NavigatorProvider(
 					focusTargetSelector,
 				},
 				{
+					...restOptions,
 					path,
 					isBack: false,
 					isInitial: false,
-					...restOptions,
 				},
 			] );
 		},
 		[ locationHistory ]
 	);
 
-	const pop = useCallback( () => {
+	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
 		if ( locationHistory.length > 1 ) {
 			setLocationHistory( [
 				...locationHistory.slice( 0, -2 ),
