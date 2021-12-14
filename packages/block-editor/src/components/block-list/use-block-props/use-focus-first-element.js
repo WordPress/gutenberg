@@ -62,6 +62,7 @@ function useInitialPosition( clientId ) {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
+	const isMounting = useRef( true );
 
 	useEffect( () => {
 		if ( initialPosition === undefined || initialPosition === null ) {
@@ -79,16 +80,25 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
-		// Find all tabbables within node.
-		const textInputs = focus.tabbable
-			.find( ref.current )
-			.filter( ( node ) => isTextField( node ) );
+		let target = ref.current;
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
-		const target =
-			( isReverse ? last : first )( textInputs ) || ref.current;
+
+		// Find all text fields or placeholders within the block.
+		const candidates = focus.tabbable
+			.find( target )
+			.filter(
+				( node ) =>
+					isTextField( node ) ||
+					( isMounting.current &&
+						node.classList.contains(
+							'wp-block-editor-placeholder'
+						) )
+			);
+
+		target = ( isReverse ? last : first )( candidates ) || target;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
 			ref.current.focus();
@@ -97,6 +107,10 @@ export function useFocusFirstElement( clientId ) {
 
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition ] );
+
+	useEffect( () => {
+		isMounting.current = false;
+	}, [] );
 
 	return ref;
 }

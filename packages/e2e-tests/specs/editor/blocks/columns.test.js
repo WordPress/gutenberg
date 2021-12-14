@@ -7,6 +7,7 @@ import {
 	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Columns', () => {
@@ -17,7 +18,7 @@ describe( 'Columns', () => {
 	it( 'restricts all blocks inside the columns block', async () => {
 		await insertBlock( 'Columns' );
 		await closeGlobalBlockInserter();
-		await page.click( '[aria-label="Two columns; equal split"]' );
+		await clickPlaceholderButton( 'Two columns; equal split' );
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		const columnBlockMenuItem = (
 			await page.$x(

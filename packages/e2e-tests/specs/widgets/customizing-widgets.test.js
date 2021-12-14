@@ -540,10 +540,11 @@ describe( 'Widgets Customizer', () => {
 		await footer1Section.click();
 
 		const legacyWidgetBlock = await addBlock( 'Legacy Widget' );
-		const selectLegacyWidgets = await find( {
-			role: 'combobox',
-			name: 'Select a legacy widget to display:',
-		} );
+		const selectLegacyWidgets = await page.waitForFunction( () =>
+			document
+				.querySelector( '.wp-block-editor-placeholder' )
+				?.shadowRoot.querySelector( 'select' )
+		);
 		await selectLegacyWidgets.select( 'test_widget' );
 
 		await expect( {

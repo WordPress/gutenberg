@@ -6,6 +6,7 @@ import {
 	pressKeyWithModifier,
 	clickBlockToolbarButton,
 	insertBlock,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 async function focusBlockToolbar() {
@@ -101,7 +102,7 @@ describe( 'Toolbar roving tabindex', () => {
 		// Move focus to the first toolbar item
 		await page.keyboard.press( 'Home' );
 		await expectLabelToHaveFocus( 'Table' );
-		await page.click( '.blocks-table__placeholder-button' );
+		await clickPlaceholderButton( 'Create Table' );
 		await page.keyboard.press( 'Tab' );
 		await testBlockToolbarKeyboardNavigation( 'Body cell text', 'Table' );
 		await wrapCurrentBlockWithGroup( 'Table' );

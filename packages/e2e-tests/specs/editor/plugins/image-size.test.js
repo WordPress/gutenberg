@@ -15,6 +15,7 @@ import {
 	deactivatePlugin,
 	insertBlock,
 	openDocumentSettingsSidebar,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'changing image size', () => {
@@ -29,9 +30,11 @@ describe( 'changing image size', () => {
 
 	it( 'should insert and change my image size', async () => {
 		await insertBlock( 'Image' );
-		const inputElement = await page.waitForSelector(
-			'figure[aria-label="Block: Image"] input[type=file]'
-		);
+		await clickPlaceholderButton( 'Media Library' );
+
+		// Wait for media modal to appear and upload image.
+		await page.waitForSelector( '.media-modal input[type=file]' );
+		const inputElement = await page.$( '.media-modal input[type=file]' );
 		const testImagePath = path.join(
 			__dirname,
 			'..',

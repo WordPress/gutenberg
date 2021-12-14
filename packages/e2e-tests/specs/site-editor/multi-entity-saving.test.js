@@ -11,6 +11,7 @@ import {
 	trashAllPosts,
 	activateTheme,
 	clickButton,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -28,8 +29,6 @@ describe( 'Multi-entity save flow', () => {
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
-	const createNewButtonSelector =
-		'//button[contains(text(), "New template part")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -115,10 +114,8 @@ describe( 'Multi-entity save flow', () => {
 
 			// Add a template part and edit it.
 			await insertBlock( 'Template Part' );
-			const createNewButton = await page.waitForXPath(
-				createNewButtonSelector
-			);
-			await createNewButton.click();
+			await clickPlaceholderButton( 'New template part' );
+
 			const confirmTitleButton = await page.waitForSelector(
 				confirmTitleButtonSelector
 			);

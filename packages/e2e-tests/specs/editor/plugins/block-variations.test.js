@@ -11,6 +11,7 @@ import {
 	openDocumentSettingsSidebar,
 	togglePreferencesOption,
 	toggleMoreMenu,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block variations', () => {
@@ -85,11 +86,8 @@ describe( 'Block variations', () => {
 	} );
 	test( 'Pick the additional variation in the inserted Columns block', async () => {
 		await insertBlock( 'Columns' );
+		await clickPlaceholderButton( 'Four columns' );
 
-		const fourColumnsVariation = await page.waitForSelector(
-			'.wp-block[data-type="core/columns"] .block-editor-block-variation-picker__variation[aria-label="Four columns"]'
-		);
-		await fourColumnsVariation.click();
 		expect(
 			await page.$$(
 				'.wp-block[data-type="core/columns"] .wp-block[data-type="core/column"]'

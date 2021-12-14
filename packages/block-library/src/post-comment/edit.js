@@ -2,10 +2,14 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Placeholder, TextControl, Button } from '@wordpress/components';
+import { TextControl, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	useBlockProps,
+	useInnerBlocksProps,
+	Placeholder,
+} from '@wordpress/block-editor';
 
 const ALLOWED_BLOCKS = [
 	'core/comment-author-avatar',

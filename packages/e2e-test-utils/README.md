@@ -107,6 +107,14 @@ _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
 
+### clickPlaceholderButton
+
+Clicks a button in a placeholder based on the label text.
+
+_Parameters_
+
+-   _buttonText_ `string`: The text that appears on the button to click.
+
 ### closeGlobalBlockInserter
 
 Undocumented declaration.

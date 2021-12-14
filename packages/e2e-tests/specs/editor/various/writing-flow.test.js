@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	insertBlock,
 	clickBlockToolbarButton,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
@@ -26,7 +27,7 @@ const addParagraphsAndColumnsDemo = async () => {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
 	);
 	await page.keyboard.press( 'Enter' );
-	await page.click( ':focus [aria-label="Two columns; equal split"]' );
+	await clickPlaceholderButton( 'Two columns; equal split' );
 	await page.click( ':focus .block-editor-button-block-appender' );
 	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
@@ -554,7 +555,6 @@ describe( 'Writing Flow', () => {
 
 	it( 'should not have a dead zone above an aligned block', async () => {
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
@@ -565,7 +565,9 @@ describe( 'Writing Flow', () => {
 		await wideButton.click();
 
 		// Select the previous block.
-		await page.keyboard.press( 'ArrowUp' );
+		await page.click( '[data-type="core/paragraph"]' );
+
+		await page.keyboard.type( '1' );
 
 		// Confirm correct setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -599,15 +601,8 @@ describe( 'Writing Flow', () => {
 
 	it( 'should only consider the content as one tab stop', async () => {
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '/table' );
-		await page.keyboard.press( 'Enter' );
-		// Move into the placeholder UI.
-		await page.keyboard.press( 'ArrowDown' );
-		// Tab to the "Create table" button.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		// Create the table.
-		await page.keyboard.press( 'Space' );
+		await insertBlock( 'Table' );
+		await clickPlaceholderButton( 'Create Table' );
 		// Return focus after focus loss. This should be fixed.
 		await page.keyboard.press( 'Tab' );
 		// Navigate to the second cell.
@@ -618,10 +613,8 @@ describe( 'Writing Flow', () => {
 		// The content should only have one tab stop.
 		await page.keyboard.press( 'Tab' );
 		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Post' );
+			await page.evaluate( () => document.activeElement.textContent )
+		).toBe( 'Open document settings' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		expect(

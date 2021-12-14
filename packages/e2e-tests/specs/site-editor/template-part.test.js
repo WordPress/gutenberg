@@ -11,6 +11,7 @@ import {
 	selectBlockByClientId,
 	clickBlockToolbarButton,
 	canvas,
+	clickPlaceholderButton,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -273,10 +274,6 @@ describe( 'Template Part', () => {
 		const templatePartSelector = '*[data-type="core/template-part"]';
 		const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
-		const createNewButtonSelector =
-			'//button[contains(text(), "New template part")]';
-		const chooseExistingButtonSelector =
-			'//button[contains(text(), "Choose existing")]';
 		const confirmTitleButtonSelector =
 			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
@@ -286,11 +283,7 @@ describe( 'Template Part', () => {
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
-			await page.waitForXPath( chooseExistingButtonSelector );
-			const [ createNewButton ] = await page.$x(
-				createNewButtonSelector
-			);
-			await createNewButton.click();
+			await clickPlaceholderButton( 'New template part' );
 			const confirmTitleButton = await page.waitForSelector(
 				confirmTitleButtonSelector
 			);
@@ -314,10 +307,7 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			const chooseExistingButton = await page.waitForXPath(
-				chooseExistingButtonSelector
-			);
-			await chooseExistingButton.click();
+			await clickPlaceholderButton( 'Choose existing' );
 			const preview = await page.waitForSelector(
 				'[aria-label="Create New"]'
 			);
