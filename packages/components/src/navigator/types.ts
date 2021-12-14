@@ -44,3 +44,38 @@ export type NavigatorScreenProps = {
 	 */
 	children: ReactNode;
 };
+
+export type NavigatorBackLinkProps = {
+	/**
+	 * The children elements.
+	 */
+	children: ReactNode;
+	/**
+	 * The callback called in response to a `click` event.
+	 */
+	onClick?: React.MouseEventHandler< HTMLElement >;
+};
+
+export type NavigatorLinkProps = NavigatorBackLinkProps & {
+	/**
+	 * The path to navigate to.
+	 */
+	path: string;
+	/**
+	 * The HTML attribute used to identify the `NavigatorLink`, which is used
+	 * by `Navigator` to restore focus.
+	 *
+	 * @default 'data-navigator-focusable-id'
+	 */
+	attributeName?: string;
+	/**
+	 * A function that generates the CSS selector used ny `Navigator` when
+	 * restoring focus.
+	 *
+	 * @default ( attrName, attrValue ) => `[${ attrName }="${ attrValue }"]`;
+	 */
+	selectorFactory?: (
+		attributeName: string,
+		attributeValue: string
+	) => string;
+};

@@ -11,39 +11,24 @@ import { Card, CardBody, CardFooter, CardHeader } from '../../card';
 import { HStack } from '../../h-stack';
 import { Flyout } from '../../flyout';
 import { useCx } from '../../utils/hooks/use-cx';
-import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
+import {
+	NavigatorProvider,
+	NavigatorScreen,
+	NavigatorLink,
+	NavigatorBackLink,
+} from '../';
 
 export default {
 	title: 'Components (Experimental)/Navigator',
 	component: NavigatorProvider,
 };
 
-function NavigatorButton( { path, ...props } ) {
-	const { push } = useNavigator();
-	const dataAttrName = 'data-navigator-focusable-id';
-	const dataAttrValue = path;
-
-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
-
-	const buttonProps = {
-		...props,
-		[ dataAttrName ]: dataAttrValue,
-	};
-
-	return (
-		<Button
-			variant="secondary"
-			onClick={ () =>
-				push( path, { focusTargetSelector: dataAttrCssSelector } )
-			}
-			{ ...buttonProps }
-		/>
-	);
+function NavigatorButton( props ) {
+	return <NavigatorLink as={ Button } variant="secondary" { ...props } />;
 }
 
-function NavigatorBackButton( { ...props } ) {
-	const { pop } = useNavigator();
-	return <Button variant="secondary" onClick={ pop } { ...props } />;
+function NavigatorBackButton( props ) {
+	return <NavigatorBackLink as={ Button } variant="secondary" { ...props } />;
 }
 
 const MyNavigation = () => {

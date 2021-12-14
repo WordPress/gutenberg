@@ -9,7 +9,8 @@ import { get } from 'lodash';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
+	__experimentalNavigatorLink as NavigatorLink,
+	__experimentalNavigatorBackLink as NavigatorBackLink,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
@@ -55,33 +56,33 @@ import BlockManager from '../block-manager';
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
 
-function NavigationButton( { as: Tag = Button, path, ...props } ) {
-	const { push } = useNavigator();
+// function NavigationButton( { as: Tag = Button, path, ...props } ) {
+// 	const { push } = useNavigator();
 
-	const dataAttrName = 'data-navigator-focusable-id';
-	const dataAttrValue = path;
+// 	const dataAttrName = 'data-navigator-focusable-id';
+// 	const dataAttrValue = path;
 
-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+// 	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
 
-	const tagProps = {
-		...props,
-		[ dataAttrName ]: dataAttrValue,
-	};
+// 	const tagProps = {
+// 		...props,
+// 		[ dataAttrName ]: dataAttrValue,
+// 	};
 
-	return (
-		<Tag
-			onClick={ () =>
-				push( path, { focusTargetSelector: dataAttrCssSelector } )
-			}
-			{ ...tagProps }
-		/>
-	);
-}
+// 	return (
+// 		<Tag
+// 			onClick={ () =>
+// 				push( path, { focusTargetSelector: dataAttrCssSelector } )
+// 			}
+// 			{ ...tagProps }
+// 		/>
+// 	);
+// }
 
-function NavigationBackButton( { as: Tag = Button, ...props } ) {
-	const { pop } = useNavigator();
-	return <Tag onClick={ pop } { ...props } />;
-}
+// function NavigationBackButton( { as: Tag = Button, ...props } ) {
+// 	const { pop } = useNavigator();
+// 	return <Tag onClick={ pop } { ...props } />;
+// }
 
 export default function PreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -347,7 +348,7 @@ export default function PreferencesModal() {
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
-										<NavigationButton
+										<NavigatorLink
 											key={ tab.name }
 											path={ tab.name }
 											as={ Item }
@@ -369,7 +370,7 @@ export default function PreferencesModal() {
 													/>
 												</FlexItem>
 											</HStack>
-										</NavigationButton>
+										</NavigatorLink>
 									);
 								} ) }
 							</ItemGroup>
@@ -389,7 +390,8 @@ export default function PreferencesModal() {
 									size="small"
 									gap="6"
 								>
-									<NavigationBackButton
+									<NavigatorBackLink
+										as={ Button }
 										icon={
 											isRTL() ? chevronRight : chevronLeft
 										}
