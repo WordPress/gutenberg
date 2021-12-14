@@ -35,6 +35,11 @@ export default function useResetFocusOnRouteChange( targetRef ) {
 			}
 		}
 
-		targetRef.current?.focus();
+		const activeElement = targetRef.current?.ownerDocument.activeElement;
+
+		// Don't refocus if the activeElement is still on the page (like NavLink).
+		if ( ! activeElement || activeElement === document.body ) {
+			targetRef.current?.focus();
+		}
 	}, [ location, targetRef, history ] );
 }
