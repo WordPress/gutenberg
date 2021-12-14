@@ -101,7 +101,7 @@ require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
 // to make sure we can use the check "function_exists( 'wp_get_global_styles' )".
 // If it loads after, that function will always be present at that point
 // and the global styles assets won't be loaded.
-require __DIR__ . '/compat/wordpress-5.9/global-styles-assets.php';
+require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
