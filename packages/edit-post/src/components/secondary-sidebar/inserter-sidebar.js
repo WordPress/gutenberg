@@ -29,6 +29,7 @@ export default function InserterSidebar() {
 	const { setIsInserterOpened } = useDispatch( editPostStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const TagName = isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 		focusOnMount: 'secondElement',
@@ -40,25 +41,13 @@ export default function InserterSidebar() {
 			{ ...inserterDialogProps }
 			className="edit-post-editor__inserter-panel"
 		>
-			{ isMobileViewport ? (
-				<VisuallyHidden as="div">
-					<div className="edit-post-editor__inserter-panel-header">
-						<Button
-							icon={ close }
-							label={ __( 'Close block inserter' ) }
-							onClick={ () => setIsInserterOpened( false ) }
-						/>
-					</div>
-				</VisuallyHidden>
-			) : (
-				<div className="edit-post-editor__inserter-panel-header">
-					<Button
-						icon={ close }
-						label={ __( 'Close block inserter' ) }
-						onClick={ () => setIsInserterOpened( false ) }
-					/>
-				</div>
-			) }
+		<TagName className="edit-post-editor__inserter-panel-header">
+			<Button
+				icon={ close }
+				label={ __( 'Close block inserter' ) }
+				onClick={ () => setIsInserterOpened( false ) }
+			/>
+		</TagName>
 			<div className="edit-post-editor__inserter-panel-content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
