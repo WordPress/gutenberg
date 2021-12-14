@@ -22,14 +22,14 @@
 	flex-direction: column;
 	height: 100%;
 
-	.components-panel,
-	.components-navigator-provider {
+	&__panel,
+	&__navigator-provider {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
 	}
 
-	.components-navigator-screen {
+	&__navigator-screen {
 		flex: 1;
 	}
 }
