@@ -21,7 +21,7 @@ import { View } from '../../view';
 import useNavigator from '../use-navigator';
 import type { NavigatorLinkProps } from '../types';
 
-const defaultAttributeName = 'data-navigator-focusable-id';
+const defaultAttributeName = 'id';
 const defaultSelectorFactory = ( attrName: string, attrValue: string ) =>
 	`[${ attrName }="${ attrValue }"]`;
 
