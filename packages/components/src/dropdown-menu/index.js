@@ -134,7 +134,7 @@ function DropdownMenu( dropdownMenuProps ) {
 				);
 
 				return (
-					<NavigableMenu { ...mergedMenuProps } role="menu">
+					<NavigableMenu role="menu" { ...mergedMenuProps }>
 						{ isFunction( children ) ? children( props ) : null }
 						{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (

@@ -11,7 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { DropdownMenu, MenuGroup, MenuItem, VisuallyHidden } from '../';
+import { DropdownMenu, MenuItem, VisuallyHidden } from '../';
 
 const itemToString = ( item ) => item?.name;
 
@@ -61,6 +61,10 @@ export default function CustomSelectControlWithDropdownMenu( {
 		),
 	};
 
+	const menuProps = {
+		role: 'select',
+	};
+
 	return (
 		<div
 			className={ classnames(
@@ -85,6 +89,7 @@ export default function CustomSelectControlWithDropdownMenu( {
 					'components-custom-select-control__inner',
 					className
 				) }
+				menuProps={ menuProps }
 				popoverProps={ POPOVER_PROPS }
 				toggleProps={ toggleProps }
 				icon={ null }
@@ -92,10 +97,11 @@ export default function CustomSelectControlWithDropdownMenu( {
 			>
 				{ ( { isOpen, onClose } ) =>
 					isOpen && (
-						<MenuGroup>
+						<>
 							{ items.map( ( item, index ) => (
 								<MenuItem
 									key={ index }
+									role="option"
 									{ ...{
 										className: classnames(
 											item.className,
@@ -126,7 +132,7 @@ export default function CustomSelectControlWithDropdownMenu( {
 									) }
 								</MenuItem>
 							) ) }
-						</MenuGroup>
+						</>
 					)
 				}
 			</DropdownMenu>
