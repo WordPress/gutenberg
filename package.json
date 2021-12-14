@@ -201,6 +201,7 @@
 		"react-native": "0.64.0",
 		"react-native-url-polyfill": "1.1.2",
 		"react-test-renderer": "17.0.1",
+		"redux": "4.1.2",
 		"rimraf": "3.0.2",
 		"rtlcss": "2.6.2",
 		"sass": "1.35.2",
