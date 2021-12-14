@@ -22,11 +22,11 @@
 }
 
 .has-normal-font-size {
-	font-size: var(--wp--preset--font-size--normal);
+	font-size: var(--wp--preset--font-size--normal) !important;
 }
 
 .has-huge-font-size {
-	font-size: var(--wp--preset--font-size--huge);
+	font-size: var(--wp--preset--font-size--huge) !important;
 }
 
 // Text alignments.
