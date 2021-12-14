@@ -16,12 +16,12 @@ const CUSTOM_FONT_SIZE_OPTION = {
 
 /**
  * In case we have at most five font sizes, where at least one the them
- * contain a complex css value(clamp, var, etc..) show a `T-shirt size`
- * alias as a label of the font size. We do this because complex css values
- * cannot be caluclated properly and the `T-shirt size` alias can help the
- * user better mentally map the different available font sizes.
+ * contain a complex css value(clamp, var, etc..) show a incremental sequence
+ * of numbers as a label of the font size. We do this because complex css values
+ * cannot be caluclated properly and the incremental sequence of numbers as labels
+ * can help the user better mentally map the different available font sizes.
  */
-const FONT_SIZES_ALIASES = [ 'S', 'M', 'L', 'XL', 'XXL' ];
+const FONT_SIZES_ALIASES = [ '1', '2', '3', '4', '5' ];
 
 /**
  * Helper util to split a font size to its numeric value

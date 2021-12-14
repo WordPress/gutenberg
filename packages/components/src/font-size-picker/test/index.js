@@ -206,7 +206,7 @@ describe( 'FontSizePicker', () => {
 				expect( element.children ).toHaveLength( 2 );
 				expect( element.children[ 0 ].textContent ).toBe( '1.7' );
 			} );
-			it( 'should use `T-shirt` sizes aliases if we have complex css', () => {
+			it( 'should use incremental sequence of numbers as labels if we have complex css', () => {
 				const fontSizes = [
 					...options,
 					{
@@ -224,7 +224,7 @@ describe( 'FontSizePicker', () => {
 				const element = screen.getByLabelText( 'Large' );
 				expect( element ).toBeInTheDocument();
 				expect( element.children ).toHaveLength( 2 );
-				expect( element.children[ 0 ].textContent ).toBe( 'L' );
+				expect( element.children[ 0 ].textContent ).toBe( '3' );
 			} );
 		} );
 	} );
