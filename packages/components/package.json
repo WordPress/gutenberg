@@ -68,9 +68,6 @@
 		"rememo": "^3.0.0",
 		"uuid": "^8.3.0"
 	},
-	"peerDependencies": {
-		"reakit-utils": "^0.15.1"
-	},
 	"publishConfig": {
 		"access": "public"
 	}
