@@ -102,7 +102,7 @@
 * If the style were set on mobile first, on desktop styles,
 * we would have no way of setting the style again to the inline style.
 */
-@media (max-width: #{ ($break-small) }) {
+@media (max-width: #{ ($break-small - 1) }) {
 	.wp-block-media-text.is-stacked-on-mobile {
 		grid-template-columns: 100% !important;
 		.wp-block-media-text__media {
