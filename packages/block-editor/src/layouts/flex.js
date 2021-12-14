@@ -84,10 +84,12 @@ export default {
 			</BlockControls>
 		);
 	},
-	save: function FlexLayoutStyle( { selector, layout } ) {
+	save: function FlexLayoutStyle( { selector, layout, style } ) {
 		const { orientation = 'horizontal' } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		const blockGapValue =
+			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap, 0.5em )';
 		const justifyContent =
 			justifyContentMap[ layout.justifyContent ] ||
 			justifyContentMap.left;
@@ -110,11 +112,7 @@ export default {
 			<style>{ `
 				${ appendSelectors( selector ) } {
 					display: flex;
-					gap: ${
-						hasBlockGapStylesSupport
-							? 'var( --wp--style--block-gap, 0.5em )'
-							: '0.5em'
-					};
+					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
 					flex-wrap: ${ flexWrap };
 					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
 				}
