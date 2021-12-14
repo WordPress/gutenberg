@@ -39,6 +39,7 @@ const MediaReplaceFlow = ( {
 	onSelect,
 	onSelectURL,
 	onFilesUpload = noop,
+	onCloseModal = noop,
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
@@ -136,6 +137,7 @@ const MediaReplaceFlow = ( {
 							value={ mediaId }
 							onSelect={ ( media ) => selectMedia( media ) }
 							allowedTypes={ allowedTypes }
+							onClose={ onCloseModal }
 							render={ ( { open } ) => (
 								<MenuItem icon={ mediaIcon } onClick={ open }>
 									{ __( 'Open Media Library' ) }
