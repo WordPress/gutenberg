@@ -123,7 +123,6 @@ export function ImageEdit( {
 		height,
 		sizeSlug,
 	} = attributes;
-
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const altRef = useRef();
@@ -142,21 +141,14 @@ export function ImageEdit( {
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
 
-	function clearImageAttributes() {
-		setAttributes( {
-			url: undefined,
-			alt: undefined,
-			id: undefined,
-			title: undefined,
-			caption: undefined,
-		} );
-	}
-
 	// A callback passed to MediaUpload,
 	// fired when the media modal closes.
 	function onCloseModal() {
 		if ( isMediaDestroyed( attributes?.id ) ) {
-			clearImageAttributes();
+			setAttributes( {
+				url: undefined,
+				id: undefined,
+			} );
 		}
 	}
 
@@ -169,7 +161,10 @@ export function ImageEdit( {
 		// If the image block was not replaced with an embed,
 		// clear the attributes and trigger the placeholder.
 		if ( ! isReplaced ) {
-			clearImageAttributes();
+			setAttributes( {
+				url: undefined,
+				id: undefined,
+			} );
 		}
 	}
 
@@ -180,7 +175,14 @@ export function ImageEdit( {
 
 	function onSelectImage( media ) {
 		if ( ! media || ! media.url ) {
-			clearImageAttributes();
+			setAttributes( {
+				url: undefined,
+				alt: undefined,
+				id: undefined,
+				title: undefined,
+				caption: undefined,
+			} );
+
 			return;
 		}
 
