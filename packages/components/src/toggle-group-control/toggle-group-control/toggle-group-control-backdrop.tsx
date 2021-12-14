@@ -35,21 +35,36 @@ function ToggleGroupControlBackdrop( {
 			return;
 		}
 
-		const { x: parentX } = containerNode.getBoundingClientRect();
-		const { width: offsetWidth, x } = targetNode.getBoundingClientRect();
-		const borderWidth = 1;
-		const offsetLeft = x - parentX - borderWidth;
+		const computeDimensions = () => {
+			const {
+				width: offsetWidth,
+				x,
+			} = targetNode.getBoundingClientRect();
 
-		setLeft( offsetLeft );
-		setWidth( offsetWidth );
+			const { x: parentX } = containerNode.getBoundingClientRect();
 
-		let requestId: number;
+			const borderWidth = 1;
+			const offsetLeft = x - parentX - borderWidth;
+
+			setLeft( offsetLeft );
+			setWidth( offsetWidth );
+		};
+		// Fix to make the component appear as expected inside popovers.
+		// If the targetNode width is 0 it means the element was not yet rendered we should allow
+		// some time for the render to happen.
+		// requestAnimationFrame instead of setTimeout with a small time does not seems to work.
+		const dimensionsRequestId = window.setTimeout( computeDimensions, 100 );
+
+		let animationRequestId: number;
 		if ( ! canAnimate ) {
-			requestId = window.requestAnimationFrame( () => {
+			animationRequestId = window.requestAnimationFrame( () => {
 				setCanAnimate( true );
 			} );
 		}
-		return () => window.cancelAnimationFrame( requestId );
+		return () => {
+			window.clearTimeout( dimensionsRequestId );
+			window.cancelAnimationFrame( animationRequestId );
+		};
 	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
 
 	if ( ! renderBackdrop ) {
