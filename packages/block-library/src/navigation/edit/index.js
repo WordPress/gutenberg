@@ -55,6 +55,8 @@ import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 
+const EMPTY_ARRAY = [];
+
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
@@ -146,25 +148,44 @@ function Navigation( {
 		`navigationMenu/${ ref }`
 	);
 
-	const { innerBlocks, isInnerBlockSelected, hasSubmenus } = useSelect(
+	const {
+		hasUncontrolledInnerBlocks,
+		uncontrolledInnerBlocks,
+		controlledInnerBlocks,
+		isInnerBlockSelected,
+		hasSubmenus,
+	} = useSelect(
 		( select ) => {
-			const { getBlocks, hasSelectedInnerBlock } = select(
+			const { getBlock, getBlocks, hasSelectedInnerBlock } = select(
 				blockEditorStore
 			);
-			const blocks = getBlocks( clientId );
-			const firstSubmenu = !! blocks.find(
-				( block ) => block.name === 'core/navigation-submenu'
-			);
+
+			// This relies on the fact that `getBlock` won't return controlled
+			// inner blocks, while `getBlocks` does. It might be more stable to
+			// introduce a selector like `getUncontrolledInnerBlocks`, just in
+			// case `getBlock` is fixed.
+			const _uncontrolledInnerBlocks = getBlock( clientId ).innerBlocks;
+			const _hasUncontrolledInnerBlocks =
+				_uncontrolledInnerBlocks?.length;
+			const _controlledInnerBlocks = _hasUncontrolledInnerBlocks
+				? EMPTY_ARRAY
+				: getBlocks( clientId );
+			const innerBlocks = _hasUncontrolledInnerBlocks
+				? _uncontrolledInnerBlocks
+				: _controlledInnerBlocks;
 
 			return {
-				hasSubmenus: firstSubmenu,
-				innerBlocks: blocks,
+				hasSubmenus: !! innerBlocks.find(
+					( block ) => block.name === 'core/navigation-submenu'
+				),
+				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
+				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
+				controlledInnerBlocks: _controlledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
 		},
 		[ clientId ]
 	);
-	const hasExistingNavItems = !! innerBlocks.length;
 	const {
 		replaceInnerBlocks,
 		selectBlock,
@@ -178,10 +199,10 @@ function Navigation( {
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
-	const isWithinUnassignedArea = navigationArea && ! ref;
+	const isWithinUnassignedArea = !! navigationArea && ! ref;
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems || isWithinUnassignedArea
+		! hasUncontrolledInnerBlocks || isWithinUnassignedArea
 	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
@@ -303,15 +324,17 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
-	// If the ref no longer exists the reset the inner blocks
-	// to provide a clean slate.
+	// If the ref no longer exists the reset the inner blocks to provide a
+	// clean slate.
 	useEffect( () => {
-		if ( ref === undefined && innerBlocks.length > 0 ) {
+		if (
+			! hasUncontrolledInnerBlocks &&
+			controlledInnerBlocks?.length > 0 &&
+			ref === undefined
+		) {
 			replaceInnerBlocks( clientId, [] );
 		}
-		// innerBlocks are intentionally not listed as deps. This function is only concerned
-		// with the snapshot from the time when ref became undefined.
-	}, [ clientId, ref, innerBlocks ] );
+	}, [ clientId, ref, hasUncontrolledInnerBlocks, controlledInnerBlocks ] );
 
 	useEffect( () => {
 		const setPermissionsNotice = () => {
@@ -377,8 +400,7 @@ function Navigation( {
 	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
-	const hasUnsavedBlocks =
-		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
+	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
 			<nav { ...blockProps }>
@@ -393,7 +415,7 @@ function Navigation( {
 				>
 					<UnsavedInnerBlocks
 						blockProps={ blockProps }
-						blocks={ innerBlocks }
+						blocks={ uncontrolledInnerBlocks }
 						clientId={ clientId }
 						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
