@@ -351,6 +351,7 @@ function Navigation( {
 				),
 				{
 					id: noticeRef.current,
+					type: 'snackbar',
 				}
 			);
 		};
