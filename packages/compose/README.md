@@ -209,6 +209,36 @@ _Returns_
 
 -   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
 
+### __experimentalUseDisabled
+
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
+In some circumstances, such as block previews, all focusable DOM elements
+(input fields, links, buttons, etc.) need to be disabled. This hook adds the
+behavior to disable nested DOM elements to the returned ref.
+
+_Usage_
+
+```js
+import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+
+const DisabledExample = () => {
+	const disabledRef = useDisabled();
+	return (
+		<div ref={ disabledRef }>
+			<a href="#">This link will have tabindex set to -1</a>
+			<input placeholder="This input will have the disabled attribute added to it." type="text" />
+		</div>
+	);
+};
+```
+
+_Returns_
+
+-   `import('react').RefCallback<Element>`: Element Ref.
+
 ### useFocusableIframe
 
 Dispatches a bubbling focus event when the iframe receives focus. Use
