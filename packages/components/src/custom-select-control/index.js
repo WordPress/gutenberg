@@ -62,7 +62,7 @@ export default function CustomSelectControlWithDropdownMenu( {
 	};
 
 	const menuProps = {
-		role: 'select',
+		role: 'listbox',
 	};
 
 	return (
