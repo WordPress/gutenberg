@@ -44,6 +44,7 @@ function NavigatorProvider(
 		{
 			path: initialPath,
 			isBack: false,
+			isInitial: true,
 		},
 	] );
 
@@ -59,11 +60,13 @@ function NavigatorProvider(
 				...locationHistory.slice( 0, -1 ),
 				{
 					...locationHistory[ locationHistory.length - 1 ],
+					isBack: false,
 					focusRestorationSelector,
 				},
 				{
 					path,
 					isBack: false,
+					isInitial: false,
 					...restOptions,
 				},
 			] );

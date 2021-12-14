@@ -9,6 +9,7 @@ type NavigateOptions = {
 };
 
 export type NavigatorLocation = NavigateOptions & {
+	isInitial?: boolean;
 	isBack?: boolean;
 	path?: string;
 };

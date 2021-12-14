@@ -11,13 +11,7 @@ import { css } from '@emotion/react';
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import {
-	useContext,
-	useEffect,
-	useMemo,
-	useState,
-	useRef,
-} from '@wordpress/element';
+import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
@@ -73,14 +67,14 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	);
 
 	// Focus restoration
-	const [ isFirstRender, setIsFirstRender ] = useState( true );
+	const isInitialLocation = location.isInitial && ! location.isBack;
+
 	useEffect( () => {
 		// Only attempt to restore focus:
-		// - after the first render (to avoid moving focus on page load)
+		// - if the current location is not the initial one (to avoid moving focus on page load)
 		// - when the screen becomes visible
-		// - the wrapper ref has been assigned
-		if ( isFirstRender || ! isMatch || ! wrapperRef.current ) {
-			setIsFirstRender( false );
+		// - if the wrapper ref has been assigned
+		if ( isInitialLocation || ! isMatch || ! wrapperRef.current ) {
 			return;
 		}
 
@@ -105,7 +99,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 		}
 
 		elementToFocus.focus();
-	}, [ isFirstRender, isMatch ] );
+	}, [ isInitialLocation, isMatch ] );
 
 	if ( ! isMatch ) {
 		return null;
