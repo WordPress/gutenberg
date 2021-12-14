@@ -42,7 +42,10 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 
 		let target = node;
 
-		let firstTabbable = focus.tabbable.find( node )[ 0 ];
+		let firstTabbable = null;
+		if ( focusOnMountRef.current === 'firstElement' ) {
+			firstTabbable = focus.tabbable.find( node )[ 0 ];
+		}
 		if ( focusOnMountRef.current === 'secondElement' ) {
 			firstTabbable = focus.tabbable.find( node )[ 1 ];
 		}
