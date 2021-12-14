@@ -5,7 +5,7 @@
 import type { ReactNode } from 'react';
 
 type NavigateOptions = {
-	focusRestorationSelector?: string;
+	focusTargetSelector?: string;
 };
 
 export type NavigatorLocation = NavigateOptions & {

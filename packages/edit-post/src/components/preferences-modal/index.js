@@ -71,7 +71,7 @@ function NavigationButton( { as: Tag = Button, path, ...props } ) {
 	return (
 		<Tag
 			onClick={ () =>
-				push( path, { focusRestorationSelector: dataAttrCssSelector } )
+				push( path, { focusTargetSelector: dataAttrCssSelector } )
 			}
 			{ ...tagProps }
 		/>

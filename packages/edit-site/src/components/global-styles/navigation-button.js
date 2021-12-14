@@ -41,7 +41,7 @@ function NavigationButton( { path, ...props } ) {
 	return (
 		<GenericNavigationButton
 			onClick={ () =>
-				push( path, { focusRestorationSelector: dataAttrCssSelector } )
+				push( path, { focusTargetSelector: dataAttrCssSelector } )
 			}
 			{ ...buttonProps }
 		/>

@@ -50,9 +50,9 @@ function NavigatorProvider(
 
 	const push = useCallback(
 		( path, options ) => {
-			const { focusRestorationSelector, ...restOptions } = options;
+			const { focusTargetSelector, ...restOptions } = options;
 
-			// The `focusRestorationSelector` needs to be applied on the current
+			// The `focusTargetSelector` needs to be applied on the current
 			// location, while the remaining options need to be applied on the
 			// incoming location
 			setLocationHistory( [
@@ -60,7 +60,7 @@ function NavigatorProvider(
 				{
 					...locationHistory[ locationHistory.length - 1 ],
 					isBack: false,
-					focusRestorationSelector,
+					focusTargetSelector,
 				},
 				{
 					path,

@@ -34,7 +34,7 @@ function NavigatorButton( { path, ...props } ) {
 		<Button
 			variant="secondary"
 			onClick={ () =>
-				push( path, { focusRestorationSelector: dataAttrCssSelector } )
+				push( path, { focusTargetSelector: dataAttrCssSelector } )
 			}
 			{ ...buttonProps }
 		/>
