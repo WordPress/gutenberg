@@ -156,6 +156,6 @@ An example config for using Visual Studio Code and the Prettier extensions:
 
 ## Resources
 
--   [Copy Guidelines](/docs/contributors/copy-guide.md) for writing instructions, documentations, or other contributions to Gutenberg project.
+-   [Copy Guidelines](/docs/contributors/documentation/copy-guide.md) for writing instructions, documentations, or other contributions to Gutenberg project.
 
 -   [Tone and Voice Guide](https://make.wordpress.org/docs/handbook/documentation-team-handbook/tone-and-voice-guide/) from WordPress Documentation.

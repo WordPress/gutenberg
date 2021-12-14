@@ -4,7 +4,8 @@
 import {
 	createJSONResponse,
 	createNewPost,
-	getEditedPostContent,
+	createMenu as createClassicMenu,
+	deleteAllMenus as deleteAllClassicMenus,
 	insertBlock,
 	setUpResponseMocking,
 	pressKeyWithModifier,
@@ -13,74 +14,19 @@ import {
 	openPreviewPage,
 	selectBlockByClientId,
 	getAllBlocks,
+	ensureSidebarOpened,
+	__experimentalRest as rest,
+	publishPost,
 } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
  */
-import menuItemsFixture from '../fixtures/menu-items-response-fixture.json';
+import menuItemsFixture from '../fixtures/menu-items-request-fixture.json';
 
-const menusFixture = [
-	{
-		name: 'Test Menu 1',
-		slug: 'test-menu-1',
-	},
-	{
-		name: 'Test Menu 2',
-		slug: 'test-menu-2',
-	},
-	{
-		name: 'Test Menu 3',
-		slug: 'test-menu-3',
-	},
-];
-
-// Matching against variations of the same URL encoded and non-encoded
-// produces the most reliable mocking.
-const REST_MENUS_ROUTES = [
-	'/wp/v2/menus',
-	`rest_route=${ encodeURIComponent( '/wp/v2/menus' ) }`,
-];
-const REST_MENU_ITEMS_ROUTES = [
-	'/wp/v2/menu-items',
-	`rest_route=${ encodeURIComponent( '/wp/v2/menu-items' ) }`,
-];
-
-const REST_PAGES_ROUTES = [
-	'/wp/v2/pages',
-	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
-];
-
-/**
- * Determines if a given URL matches any of a given collection of
- * routes (extressed as substrings).
- *
- * @param {string} reqUrl the full URL to be tested for matches.
- * @param {Array}  routes array of strings to match against the URL.
- */
-function matchUrlToRoute( reqUrl, routes ) {
-	return routes.some( ( route ) => reqUrl.includes( route ) );
-}
-
-async function mockPagesResponse( pages ) {
-	const mappedPages = pages.map( ( { title, slug }, index ) => ( {
-		id: index + 1,
-		type: 'page',
-		link: `https://this/is/a/test/page/${ slug }`,
-		title: {
-			rendered: title,
-			raw: title,
-		},
-	} ) );
-
-	await setUpResponseMocking( [
-		{
-			match: ( request ) =>
-				matchUrlToRoute( request.url(), REST_PAGES_ROUTES ),
-			onRequestMatch: createJSONResponse( mappedPages ),
-		},
-	] );
-}
+const POSTS_ENDPOINT = '/wp/v2/posts';
+const PAGES_ENDPOINT = '/wp/v2/pages';
+const NAVIGATION_MENUS_ENDPOINT = '/wp/v2/navigation';
 
 async function mockSearchResponse( items ) {
 	const mappedItems = items.map( ( { title, slug }, index ) => ( {
@@ -97,76 +43,6 @@ async function mockSearchResponse( items ) {
 				request.url().includes( `rest_route` ) &&
 				request.url().includes( `search` ),
 			onRequestMatch: createJSONResponse( mappedItems ),
-		},
-	] );
-}
-
-/**
- * Creates mocked REST API responses for calls to menus and menu-items
- * endpoints.
- * Note: this needs to be within a single call to
- * `setUpResponseMocking` as you can only setup response mocking once per test run.
- *
- * @param {Array} menus     menus to provide as mocked responses to menus entity API requests.
- * @param {Array} menuItems menu items to provide as mocked responses to menu-items entity API requests.
- */
-async function mockAllMenusResponses(
-	menus = menusFixture,
-	menuItems = menuItemsFixture
-) {
-	const mappedMenus = menus.length
-		? menus.map( ( menu, index ) => ( {
-				...menu,
-				id: index + 1,
-		  } ) )
-		: [];
-
-	await setUpResponseMocking( [
-		{
-			match: ( request ) =>
-				matchUrlToRoute( request.url(), REST_MENUS_ROUTES ),
-			onRequestMatch: createJSONResponse( mappedMenus ),
-		},
-		{
-			match: ( request ) =>
-				matchUrlToRoute( request.url(), REST_MENU_ITEMS_ROUTES ),
-			onRequestMatch: createJSONResponse( menuItems ),
-		},
-	] );
-}
-
-async function mockEmptyMenusAndPagesResponses() {
-	const emptyResponse = [];
-	await setUpResponseMocking( [
-		{
-			match: ( request ) =>
-				matchUrlToRoute( request.url(), REST_MENUS_ROUTES ),
-			onRequestMatch: createJSONResponse( emptyResponse ),
-		},
-		{
-			match: ( request ) =>
-				matchUrlToRoute( request.url(), REST_PAGES_ROUTES ),
-			onRequestMatch: createJSONResponse( emptyResponse ),
-		},
-	] );
-}
-
-async function mockCreatePageResponse( title, slug ) {
-	const page = {
-		id: 1,
-		title: { raw: title, rendered: title },
-		type: 'page',
-		link: `https://this/is/a/test/create/page/${ slug }`,
-		slug,
-	};
-
-	await setUpResponseMocking( [
-		{
-			match: ( request ) =>
-				request.url().includes( `rest_route` ) &&
-				request.url().includes( `pages` ) &&
-				request.method() === 'POST',
-			onRequestMatch: createJSONResponse( page ),
 		},
 	] );
 }
@@ -220,7 +96,7 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 	}
 }
 
-async function selectDropDownOption( optionText ) {
+async function selectClassicMenu( optionText ) {
 	const dropdown = await page.waitForXPath(
 		"//*[contains(@class, 'wp-block-navigation-placeholder__actions__dropdown')]"
 	);
@@ -236,27 +112,11 @@ const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
 const ADD_ALL_PAGES_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Add all pages']`;
 
-async function createNavBlockWithAllPages() {
-	const allPagesButton = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
-	await allPagesButton.click();
-}
-
-async function createEmptyNavBlock() {
-	const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
-	await startEmptyButton.click();
-}
-
-async function toggleSidebar() {
-	await page.click(
-		'.edit-post-header__settings button[aria-label="Settings"]'
-	);
-}
-
 async function turnResponsivenessOn() {
 	const blocks = await getAllBlocks();
 
 	await selectBlockByClientId( blocks[ 0 ].clientId );
-	await toggleSidebar();
+	await ensureSidebarOpened();
 
 	const [ responsivenessToggleButton ] = await page.$x(
 		'//label[text()[contains(.,"Enable responsive menu")]]'
@@ -267,123 +127,169 @@ async function turnResponsivenessOn() {
 	await saveDraft();
 }
 
-beforeEach( async () => {
-	await createNewPost();
-} );
+/**
+ * Delete all items for the given REST resources using the REST API.
+ *
+ * @param {*} endpoints The endpoints of the resources to delete.
+ */
+async function deleteAll( endpoints ) {
+	for ( const path of endpoints ) {
+		const items = await rest( { path } );
 
-afterEach( async () => {
-	await setUpResponseMocking( [] );
-} );
+		for ( const item of items ) {
+			await rest( {
+				method: 'DELETE',
+				path: `${ path }/${ item.id }?force=true`,
+			} );
+		}
+	}
+}
+
+/**
+ * Create a set of pages using the REST API.
+ *
+ * @param {Array} pages An array of page objects.
+ */
+async function createPages( pages ) {
+	for ( const page of pages ) {
+		await rest( {
+			method: 'POST',
+			path: PAGES_ENDPOINT,
+			data: {
+				status: 'publish',
+				...page,
+			},
+		} );
+	}
+}
+
+/**
+ * Replace unique ids in nav block content, since these won't be consistent
+ * between test runs.
+ *
+ * @param {string} content HTML block content, either raw or rendered.
+ *
+ * @return {string} HTML block content with stripped ids
+ */
+function stripPageIds( content ) {
+	return content
+		.replace( /page_id=\d+/gm, 'page_id=[number]' )
+		.replace( /"id":\d+/gm, '"id":[number]' );
+}
+
+/**
+ * Check navigation block content by fetching the navigation menu.
+ *
+ * @return {string} Menu content.
+ */
+async function getNavigationMenuRawContent() {
+	const menuRef = await page.evaluate( () => {
+		const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
+		const navigationBlock = blocks.find(
+			( block ) => block.name === 'core/navigation'
+		);
+
+		return navigationBlock.attributes.ref;
+	} );
+
+	const response = await rest( {
+		method: 'GET',
+		path: `/wp/v2/navigation/${ menuRef }?context=edit`,
+	} );
+
+	return stripPageIds( response.content.raw );
+}
 
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
-describe.skip( 'Navigation', () => {
-	describe( 'Creating from existing Pages', () => {
+describe( 'Navigation', () => {
+	beforeEach( async () => {
+		await deleteAll( [
+			POSTS_ENDPOINT,
+			PAGES_ENDPOINT,
+			NAVIGATION_MENUS_ENDPOINT,
+		] );
+		await deleteAllClassicMenus();
+	} );
+
+	afterEach( async () => {
+		await setUpResponseMocking( [] );
+	} );
+
+	afterAll( async () => {
+		await deleteAll( [
+			POSTS_ENDPOINT,
+			PAGES_ENDPOINT,
+			NAVIGATION_MENUS_ENDPOINT,
+		] );
+		await deleteAllClassicMenus();
+	} );
+
+	describe( 'placeholder', () => {
 		it( 'allows a navigation block to be created using existing pages', async () => {
-			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
-			// consistent and to test the feature more rigorously than the single default sample page.
-			await mockPagesResponse( [
-				{
-					title: 'Home',
-					slug: 'home',
-				},
+			await createPages( [
 				{
 					title: 'About',
-					slug: 'about',
+					menu_order: 0,
 				},
 				{
 					title: 'Contact Us',
-					slug: 'contact',
+					menu_order: 1,
+				},
+				{
+					title: 'FAQ',
+					menu_order: 2,
 				},
 			] );
 
-			// Add the navigation block.
-			await insertBlock( 'Navigation' );
-
-			await createNavBlockWithAllPages();
-
-			// Snapshot should contain the mocked pages.
-			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
-
-		it( 'does not display option to create from existing Pages if there are no Pages', async () => {
-			// Force no Pages or Menus to be returned by API responses.
-			await mockEmptyMenusAndPagesResponses();
+			await createNewPost();
 
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
-
-			await page.waitForXPath( START_EMPTY_XPATH );
-
-			const placeholderActionsLength = await page.$$eval(
-				`.${ PLACEHOLDER_ACTIONS_CLASS } button`,
-				( els ) => els.length
+			const allPagesButton = await page.waitForXPath(
+				ADD_ALL_PAGES_XPATH
 			);
+			await allPagesButton.click();
 
-			// Should only be showing "Start empty"
-			expect( placeholderActionsLength ).toEqual( 1 );
+			// Wait for the page list block to be present
+			await page.waitForSelector( 'div[aria-label="Block: Page List"]' );
+
+			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
-	} );
 
-	describe( 'Creating from existing Menus', () => {
 		it( 'allows a navigation block to be created from existing menus', async () => {
-			await mockAllMenusResponses();
-
-			// Add the navigation block.
-			await insertBlock( 'Navigation' );
-
-			await selectDropDownOption( 'Test Menu 2' );
-
-			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
-			// block previews.
-			const navLinkSelector =
-				'[aria-label="Editor content"][role="region"] .wp-block-navigation-item';
-
-			await page.waitForSelector( navLinkSelector );
-
-			const navBlockItemsLength = await page.$$eval(
-				navLinkSelector,
-				( els ) => els.length
+			await createClassicMenu( { name: 'Test Menu 1' } );
+			await createClassicMenu(
+				{ name: 'Test Menu 2' },
+				menuItemsFixture
 			);
 
-			// Assert the correct number of Nav Link blocks were inserted.
-			expect( navBlockItemsLength ).toEqual( menuItemsFixture.length );
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+			await selectClassicMenu( 'Test Menu 2' );
 
-			// Snapshot should contain the mocked menu items.
-			expect( await getEditedPostContent() ).toMatchSnapshot();
+			// Wait for a navigation link block before making assertion.
+			await page.waitForSelector( '*[aria-label="Block: Custom Link"]' );
+			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
 
 		it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {
-			// Force mock to return no Menus Items (empty menu)
-			const emptyMenuItems = [];
-			await mockAllMenusResponses( menusFixture, emptyMenuItems );
-
-			// Add the navigation block.
+			await createClassicMenu( { name: 'Test Menu 1' } );
+			await createNewPost();
 			await insertBlock( 'Navigation' );
+			await selectClassicMenu( 'Test Menu 1' );
 
-			await selectDropDownOption( 'Test Menu 1' );
-
-			// Scope element selector to the "Editor content" as otherwise it picks up on
-			// Block Style live previews.
-			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Editor content"][role="region"] li[aria-label="Block: Link"]',
-				( els ) => els.length
+			// Wait for the appender so that we know the navigation menu was created.
+			await page.waitForSelector(
+				'nav[aria-label="Block: Navigation"] button[aria-label="Add block"]'
 			);
-
-			// Assert an empty Nav Block is created.
-			expect( navBlockItemsLength ).toEqual( 0 );
-
-			// Snapshot should contain the mocked menu items.
-			expect( await getEditedPostContent() ).toMatchSnapshot();
+			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
 
-		it( 'does not display option to create from existing menus if there are no menus', async () => {
-			// Force no Menus to be returned by API response.
-			await mockEmptyMenusAndPagesResponses();
+		it( 'does not display the options to create from pages or menus if there are none', async () => {
+			await createNewPost();
 
-			// Add the navigation block.
 			await insertBlock( 'Navigation' );
-
 			await page.waitForXPath( START_EMPTY_XPATH );
 
 			const placeholderActionsLength = await page.$$eval(
@@ -391,21 +297,21 @@ describe.skip( 'Navigation', () => {
 				( els ) => els.length
 			);
 
-			// Should only be showing create empty menu.
+			// Should only be showing "Start empty".
 			expect( placeholderActionsLength ).toEqual( 1 );
 		} );
 	} );
 
 	it( 'allows an empty navigation block to be created and manually populated using a mixture of internal and external links', async () => {
-		// Add the navigation block.
+		await createNewPost();
 		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
 
-		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-
-		await createEmptyNavBlock();
-
-		await page.click( '.wp-block-navigation .block-list-appender' );
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
 
 		// Add a link to the Link block.
 		await updateActiveNavigationLink( {
@@ -414,9 +320,14 @@ describe.skip( 'Navigation', () => {
 			type: 'url',
 		} );
 
+		// Select the parent navigation block to show the appender.
 		await showBlockToolbar();
+		await page.click( 'button[aria-label="Select Navigation"]' );
 
-		await page.click( '.wp-block-navigation .block-list-appender' );
+		const appenderAgain = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appenderAgain.click();
 
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
@@ -436,7 +347,7 @@ describe.skip( 'Navigation', () => {
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
 
-		//click the link placeholder
+		// Click the link placeholder.
 		const placeholder = await page.waitForSelector(
 			'.wp-block-navigation-link__placeholder'
 		);
@@ -455,20 +366,22 @@ describe.skip( 'Navigation', () => {
 			type: 'entity',
 		} );
 
+		await publishPost();
+
 		// Expect a Navigation Block with two Links in the snapshot.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
 	it( 'encodes URL when create block if needed', async () => {
-		// Add the navigation block.
+		await createNewPost();
 		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
 
-		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-
-		await createEmptyNavBlock();
-
-		await page.click( '.wp-block-navigation .block-list-appender' );
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
 
 		// Add a link to the Link block.
 		await updateActiveNavigationLink( {
@@ -477,8 +390,12 @@ describe.skip( 'Navigation', () => {
 		} );
 
 		await showBlockToolbar();
+		await page.click( 'button[aria-label="Select Navigation"]' );
 
-		await page.click( '.wp-block-navigation .block-list-appender' );
+		const appenderAgain = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appenderAgain.click();
 
 		// Wait for URL input to be focused
 		await page.waitForSelector(
@@ -514,46 +431,29 @@ describe.skip( 'Navigation', () => {
 			type: 'entity',
 		} );
 
+		await publishPost();
+
 		// Expect a Navigation Block with two Links in the snapshot.
 		// The 2nd link should not be double encoded.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
-		// Mock request for creating pages and the page search response.
-		// We mock the page search to return no results and we use a very long
-		// page name because if the search returns existing pages then the
-		// "Create" suggestion might be below the scroll fold within the
-		// `LinkControl` search suggestions UI. If this happens then it's not
-		// possible to wait for the element to appear and the test will
-		// erroneously fail.
-		await mockSearchResponse( [] );
-		await mockCreatePageResponse(
-			'A really long page name that will not exist',
-			'my-new-page'
-		);
-
-		// Add the navigation block.
+	// URL details endpoint is throwing a 404, which causes this test to fail.
+	it.skip( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+		await createNewPost();
 		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
 
-		// Create an empty nav block.
-		await createEmptyNavBlock();
-
-		await page.click( '.wp-block-navigation .block-list-appender' );
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
 
 		// Wait for URL input to be focused
 		await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
-
-		// After adding a new block, search input should be shown immediately.
-		const isInURLInput = await page.evaluate(
-			() =>
-				!! document.activeElement.matches(
-					'input.block-editor-url-input__input'
-				)
-		);
-		expect( isInURLInput ).toBe( true );
 
 		// Insert name for the new page.
 		await page.type(
@@ -583,23 +483,17 @@ describe.skip( 'Navigation', () => {
 		await draftLink.click();
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	it( 'allows navigation submenus to open on click instead of hover', async () => {
-		await mockAllMenusResponses();
-
-		// Add the navigation block.
+	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
+		await createClassicMenu( { name: 'Test Menu 2' }, menuItemsFixture );
+		await createNewPost();
 		await insertBlock( 'Navigation' );
+		await selectClassicMenu( 'Test Menu 2' );
 
-		await selectDropDownOption( 'Test Menu 2' );
-
-		// 	const blocks = await getAllBlocks();
-		// await selectBlockByClientId( blocks[ 0 ].clientId );
-
-		await toggleSidebar();
-
-		const [ openOnClickButton ] = await page.$x(
+		await ensureSidebarOpened();
+		const openOnClickButton = await page.waitForXPath(
 			'//label[contains(text(),"Open on click")]'
 		);
 
@@ -634,16 +528,15 @@ describe.skip( 'Navigation', () => {
 	} );
 
 	it( 'Shows the quick inserter when the block contains non-navigation specific blocks', async () => {
-		// Add the navigation block.
+		await createNewPost();
 		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
 
-		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-
-		await createEmptyNavBlock();
-
-		// Add a Link block first.
-		await page.click( '.wp-block-navigation .block-list-appender' );
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
 
 		// Add a link to the Link block.
 		await updateActiveNavigationLink( {
@@ -655,24 +548,20 @@ describe.skip( 'Navigation', () => {
 		// Now add a different block type.
 		await insertBlock( 'Site Title' );
 
-		// Now try inserting another Link block via the quick inserter.
-		await page.focus( '.wp-block-navigation .block-list-appender' );
-
-		await page.click( '.wp-block-navigation .block-list-appender' );
-
-		const linkButton = await page.waitForSelector(
-			'.block-editor-inserter__quick-inserter .editor-block-list-item-navigation-link'
+		await showBlockToolbar();
+		await page.click( 'button[aria-label="Select Navigation"]' );
+		const appenderAgain = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
 		);
-		await linkButton.click();
+		await appenderAgain.click();
 
-		await updateActiveNavigationLink( {
-			url: 'https://wordpress.org/news/',
-			label: 'WP News',
-			type: 'url',
-		} );
+		const quickInserter = await page.waitForSelector(
+			'.block-editor-inserter__quick-inserter'
+		);
 
-		// Expect a Navigation block with two links and a Site Title.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// Expect the quick inserter to be truthy, which it will be because we
+		// waited for it. It's nice to end a test with an assertion though.
+		expect( quickInserter ).toBeTruthy();
 	} );
 
 	// The following tests are unstable, roughly around when https://github.com/WordPress/wordpress-develop/pull/1412
@@ -680,20 +569,20 @@ describe.skip( 'Navigation', () => {
 	it.skip( 'loads frontend code only if the block is present', async () => {
 		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
 		// consistent and to test the feature more rigorously than the single default sample page.
-		await mockPagesResponse( [
-			{
-				title: 'Home',
-				slug: 'home',
-			},
-			{
-				title: 'About',
-				slug: 'about',
-			},
-			{
-				title: 'Contact Us',
-				slug: 'contact',
-			},
-		] );
+		// await mockPagesResponse( [
+		// 	{
+		// 		title: 'Home',
+		// 		slug: 'home',
+		// 	},
+		// 	{
+		// 		title: 'About',
+		// 		slug: 'about',
+		// 	},
+		// 	{
+		// 		title: 'Contact Us',
+		// 		slug: 'contact',
+		// 	},
+		// ] );
 
 		// Create first block at the start in order to enable preview.
 		await insertBlock( 'Navigation' );
@@ -710,9 +599,11 @@ describe.skip( 'Navigation', () => {
 
 		expect( isScriptLoaded ).toBe( false );
 
-		await createNavBlockWithAllPages();
+		const allPagesButton = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
+		await allPagesButton.click();
 		await insertBlock( 'Navigation' );
-		await createNavBlockWithAllPages();
+		const allPagesButton2 = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
+		await allPagesButton2.click();
 		await turnResponsivenessOn();
 
 		await previewPage.reload( {
@@ -735,22 +626,21 @@ describe.skip( 'Navigation', () => {
 		expect( tagCount ).toBe( 1 );
 	} );
 
-	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'loads frontend code only if responsiveness is turned on', async () => {
-		await mockPagesResponse( [
-			{
-				title: 'Home',
-				slug: 'home',
-			},
-			{
-				title: 'About',
-				slug: 'about',
-			},
-			{
-				title: 'Contact Us',
-				slug: 'contact',
-			},
-		] );
+		// await mockPagesResponse( [
+		// 	{
+		// 		title: 'Home',
+		// 		slug: 'home',
+		// 	},
+		// 	{
+		// 		title: 'About',
+		// 		slug: 'about',
+		// 	},
+		// 	{
+		// 		title: 'Contact Us',
+		// 		slug: 'contact',
+		// 	},
+		// ] );
 
 		await insertBlock( 'Navigation' );
 		await saveDraft();
@@ -766,7 +656,8 @@ describe.skip( 'Navigation', () => {
 
 		expect( isScriptLoaded ).toBe( false );
 
-		await createNavBlockWithAllPages();
+		const allPagesButton = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
+		await allPagesButton.click();
 
 		await turnResponsivenessOn();
 
@@ -785,7 +676,7 @@ describe.skip( 'Navigation', () => {
 		expect( isScriptLoaded ).toBe( true );
 	} );
 
-	describe( 'Creating and restarting', () => {
+	describe.skip( 'Creating and restarting', () => {
 		async function populateNavWithOneItem() {
 			// Add a Link block first.
 			await page.waitForSelector(
@@ -814,26 +705,26 @@ describe.skip( 'Navigation', () => {
 		it( 'only update a single entity currently linked with the block', async () => {
 			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
 			// consistent and to test the feature more rigorously than the single default sample page.
-			await mockPagesResponse( [
-				{
-					title: 'Home',
-					slug: 'home',
-				},
-				{
-					title: 'About',
-					slug: 'about',
-				},
-				{
-					title: 'Contact Us',
-					slug: 'contact',
-				},
-			] );
+			// await mockPagesResponse( [
+			// 	{
+			// 		title: 'Home',
+			// 		slug: 'home',
+			// 	},
+			// 	{
+			// 		title: 'About',
+			// 		slug: 'about',
+			// 	},
+			// 	{
+			// 		title: 'Contact Us',
+			// 		slug: 'contact',
+			// 	},
+			// ] );
 
-			// Add the navigation block.
 			await insertBlock( 'Navigation' );
-
-			// Create an empty nav block.
-			await createEmptyNavBlock();
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
 			await populateNavWithOneItem();
 
 			// Let's confirm that the menu entity was updated.
@@ -859,7 +750,10 @@ describe.skip( 'Navigation', () => {
 			await page.focus( '.wp-block-navigation' );
 
 			await resetNavBlockToInitialState();
-			await createEmptyNavBlock();
+			const startEmptyButton2 = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton2.click();
 			await populateNavWithOneItem();
 
 			// Let's confirm that only the last menu entity was updated.

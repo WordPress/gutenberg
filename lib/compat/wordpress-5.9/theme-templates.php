@@ -72,3 +72,16 @@ function gutenberg_filter_wp_template_unique_post_slug( $override_slug, $slug, $
 // Remove 5.8 filter if existant.
 remove_filter( 'pre_wp_unique_post_slug', 'wp_filter_wp_template_unique_post_slug' );
 add_filter( 'pre_wp_unique_post_slug', 'gutenberg_filter_wp_template_unique_post_slug', 10, 5 );
+
+/**
+ * Enable block templates (editor mode) for themes with theme.json.
+ */
+function gutenberg_enable_block_templates() {
+	if ( wp_is_block_theme() || WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		add_theme_support( 'block-templates' );
+	}
+}
+
+// Remove 5.8 filter if existant.
+remove_action( 'setup_theme', 'wp_enable_block_templates' );
+add_action( 'setup_theme', 'gutenberg_enable_block_templates' );

@@ -44,18 +44,13 @@
 
 		.interface-interface-skeleton__content {
 			background: $white;
+			align-items: center;
+			padding: $grid-unit-20;
+
+			@include break-medium() {
+				padding: $grid-unit * 9;
+			}
 		}
-	}
-}
-
-.edit-site-list-main {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: $grid-unit-20;
-
-	@include break-medium() {
-		padding: $grid-unit * 9;
 	}
 }
 

@@ -52,8 +52,6 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 					}
 					setIsSubmitting( true );
 					await onCreate( { title, area } );
-					setIsSubmitting( false );
-					closeModal();
 				} }
 			>
 				<TextControl
