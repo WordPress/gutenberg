@@ -40,7 +40,7 @@ export default function InserterSidebar() {
 			{ ...inserterDialogProps }
 			className="edit-post-editor__inserter-panel"
 		>
-			{ isMobileViewport ?
+			{ isMobileViewport ? (
 				<VisuallyHidden as="div">
 					<div className="edit-post-editor__inserter-panel-header">
 						<Button
@@ -50,7 +50,7 @@ export default function InserterSidebar() {
 						/>
 					</div>
 				</VisuallyHidden>
-			:
+			) : (
 				<div className="edit-post-editor__inserter-panel-header">
 					<Button
 						icon={ close }
@@ -58,7 +58,7 @@ export default function InserterSidebar() {
 						onClick={ () => setIsInserterOpened( false ) }
 					/>
 				</div>
-			}
+			) }
 			<div className="edit-post-editor__inserter-panel-content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
