@@ -151,7 +151,7 @@ function Navigation( {
 		isInnerBlockSelected,
 		hasSubmenus,
 		canUserPublishNavigation,
-		hasResolvedcanUserPublishNavigationEntity,
+		hasResolvedCanUserPublishNavigationEntity,
 	} = useSelect(
 		( select ) => {
 			const { getBlocks, hasSelectedInnerBlock } = select(
@@ -171,7 +171,7 @@ function Navigation( {
 				canUserPublishNavigation: ref
 					? canUser( 'publish', 'navigation', ref )
 					: undefined,
-				hasResolvedcanUserPublishNavigationEntity: hasFinishedResolution(
+				hasResolvedCanUserPublishNavigationEntity: hasFinishedResolution(
 					'canUser',
 					[ 'publish', 'navigation', ref ]
 				),
@@ -644,15 +644,6 @@ function Navigation( {
 						</ResponsiveWrapper>
 					) }
 				</nav>
-				{ ref &&
-					hasResolvedcanUserPublishNavigationEntity &&
-					! canUserPublishNavigation && (
-						<Warning>
-							{ __(
-								'You do not have permission to publish Navigations. Any items you add here will not be saved.'
-							) }
-						</Warning>
-					) }
 			</RecursionProvider>
 		</EntityProvider>
 	);
