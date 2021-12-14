@@ -24,6 +24,7 @@ function InserterLibrary( {
 	__experimentalFilterValue,
 	onSelect = noop,
 	shouldFocusBlock = false,
+	isOpen = false,
 } ) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
@@ -38,6 +39,7 @@ function InserterLibrary( {
 
 	return (
 		<InserterMenu
+			isOpen={ isOpen }
 			onSelect={ onSelect }
 			rootClientId={ destinationRootClientId }
 			clientId={ clientId }

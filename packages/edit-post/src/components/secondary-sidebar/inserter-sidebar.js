@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as editPostStore } from '../../store';
 
-export default function InserterSidebar() {
+export default function InserterSidebar( isOpen = false ) {
 	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
 		const { isFeatureActive, __experimentalGetInsertionPoint } = select(
 			editPostStore
@@ -50,6 +50,7 @@ export default function InserterSidebar() {
 			</TagName>
 			<div className="edit-post-editor__inserter-panel-content">
 				<Library
+					isOpen={ isOpen }
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }

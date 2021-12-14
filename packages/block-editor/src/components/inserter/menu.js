@@ -35,6 +35,7 @@ function InserterMenu( {
 	showMostUsedBlocks,
 	__experimentalFilterValue = '',
 	shouldFocusBlock = true,
+	isOpen = false,
 } ) {
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
@@ -175,15 +176,13 @@ function InserterMenu( {
 	);
 
 	const searchControlRef = useRef();
-	const focusOnceRef = useRef( false );
 	useEffect( () => {
-		// Make sure focus only occurs once
-		if ( focusOnceRef.current ) {
+		// Make sure focus only occurs if open
+		if ( ! isOpen ) {
 			return;
 		}
 		searchControlRef.current.focus();
-		focusOnceRef.current = true;
-	} );
+	}, [ isOpen ] );
 
 	return (
 		<div className="block-editor-inserter__menu">
