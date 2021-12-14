@@ -6,25 +6,6 @@
  */
 
 /**
- * Fetches the preferences for each origin (core, theme, user)
- * and enqueues the resulting stylesheet.
- */
-function gutenberg_experimental_global_styles_enqueue_assets() {
-	$stylesheet = wp_get_global_stylesheet();
-	if ( empty( $stylesheet ) ) {
-		return;
-	}
-
-	if ( isset( wp_styles()->registered['global-styles'] ) ) {
-		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
-	} else {
-		wp_register_style( 'global-styles', false, array(), true, true );
-		wp_add_inline_style( 'global-styles', $stylesheet );
-		wp_enqueue_style( 'global-styles' );
-	}
-}
-
-/**
  * Adds the necessary settings for the Global Styles client UI.
  *
  * @param array $settings Existing block editor settings.
@@ -291,8 +272,6 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 } else {
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 }
-
-add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );
