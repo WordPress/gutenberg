@@ -25,7 +25,7 @@ import { usePopoverScroll } from './use-popover-scroll';
  *
  * @param {HTMLElement} container An HTML element.
  *
- * @return {boolean} Whether the container contains the currently document active element.
+ * @return {boolean} Whether the container contains the currently active element in the document.
  */
 const hasFocusWithin = ( container ) => {
 	return !! container?.contains( container?.ownerDocument?.activeElement );
