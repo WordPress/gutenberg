@@ -65,7 +65,10 @@ export default function BlockTools( {
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
-		if ( ! hasFocusWithin( __unstableContentRef?.current ) ) {
+		if (
+			__unstableContentRef?.current &&
+			! hasFocusWithin( __unstableContentRef?.current )
+		) {
 			return;
 		}
 
