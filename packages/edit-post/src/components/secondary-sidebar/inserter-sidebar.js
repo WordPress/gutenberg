@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { close } from '@wordpress/icons';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ export default function InserterSidebar() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
+		focusOnMount: 'secondElement',
 	} );
 
 	return (
@@ -44,6 +46,12 @@ export default function InserterSidebar() {
 					onClick={ () => setIsInserterOpened( false ) }
 				/>
 			</div>
+			<VisuallyHidden as="div">
+				<Button
+					label={ __( 'Close block inserter' ) }
+					onClick={ () => setIsInserterOpened( false ) }
+				/>
+			</VisuallyHidden>
 			<div className="edit-post-editor__inserter-panel-content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
