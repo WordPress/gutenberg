@@ -52,7 +52,6 @@
 	@include gradient-colors-deprecated();
 	--wp--preset--font-size--normal: 16px;
 	--wp--preset--font-size--huge: 42px;
-	@include font-sizes-deprecated();
 }
 
 // Font sizes (not used now, kept because of backward compatibility).
@@ -65,6 +64,14 @@
 
 .editor-styles-wrapper .has-larger-font-size {
 	font-size: 42px;
+}
+
+.editor-styles-wrapper .has-normal-font-size {
+	font-size: var(--wp--preset--font-size--normal);
+}
+
+.editor-styles-wrapper .has-huge-font-size {
+	font-size: var(--wp--preset--font-size--huge);
 }
 
 /**
