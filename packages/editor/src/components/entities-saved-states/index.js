@@ -80,7 +80,7 @@ export default function EntitiesSavedStates( { close } ) {
 	const { __unstableMarkLastChangeAsPersistent } = useDispatch(
 		blockEditorStore
 	);
-		
+
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
 		noticesStore
 	);
@@ -176,16 +176,22 @@ export default function EntitiesSavedStates( { close } ) {
 		}
 
 		__unstableMarkLastChangeAsPersistent();
-		
-		Promise.all( pendingSavedRecords ).then( ( values ) => {
-			if ( values.some( ( value ) => typeof value === 'undefined' ) ) {
-				createErrorNotice( __( 'Saving failed.' ) );
-			} else {
-				createSuccessNotice( __( 'Site updated.' ), {
-					type: 'snackbar',
-				} );
-			}
-		} );
+
+		Promise.all( pendingSavedRecords )
+			.then( ( values ) => {
+				if (
+					values.some( ( value ) => typeof value === 'undefined' )
+				) {
+					createErrorNotice( __( 'Saving failed.' ) );
+				} else {
+					createSuccessNotice( __( 'Site updated.' ), {
+						type: 'snackbar',
+					} );
+				}
+			} )
+			.catch( ( error ) =>
+				createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` )
+			);
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
