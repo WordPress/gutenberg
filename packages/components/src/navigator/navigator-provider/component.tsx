@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -48,9 +48,8 @@ function NavigatorProvider(
 		},
 	] );
 
-	const navigatorContextValue: NavigatorContextType = {
-		location: locationHistory[ locationHistory.length - 1 ],
-		push: ( path, options ) => {
+	const push = useCallback(
+		( path, options ) => {
 			const { focusRestorationSelector, ...restOptions } = options;
 
 			// The `focusRestorationSelector` needs to be applied on the current
@@ -71,18 +70,26 @@ function NavigatorProvider(
 				},
 			] );
 		},
-		pop: () => {
-			if ( locationHistory.length > 1 ) {
-				setLocationHistory( [
-					...locationHistory.slice( 0, -2 ),
-					// Force the `isBack` flag to `true` when navigating back.
-					{
-						...locationHistory[ locationHistory.length - 2 ],
-						isBack: true,
-					},
-				] );
-			}
-		},
+		[ locationHistory ]
+	);
+
+	const pop = useCallback( () => {
+		if ( locationHistory.length > 1 ) {
+			setLocationHistory( [
+				...locationHistory.slice( 0, -2 ),
+				// Force the `isBack` flag to `true` when navigating back.
+				{
+					...locationHistory[ locationHistory.length - 2 ],
+					isBack: true,
+				},
+			] );
+		}
+	}, [ locationHistory ] );
+
+	const navigatorContextValue: NavigatorContextType = {
+		location: locationHistory[ locationHistory.length - 1 ],
+		push,
+		pop,
 	};
 
 	const cx = useCx();
