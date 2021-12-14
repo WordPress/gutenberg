@@ -166,7 +166,7 @@ const Cover = ( {
 		gradientValue
 	);
 
-	const hasOnlyColorBackground = ! url && hasBackground;
+	const hasOnlyColorBackground = ! url && ( hasBackground || hasInnerBlocks );
 
 	const [
 		isCustomColorPickerShowing,
