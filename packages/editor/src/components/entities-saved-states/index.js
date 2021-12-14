@@ -13,6 +13,7 @@ import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { close as closeIcon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -75,6 +76,10 @@ export default function EntitiesSavedStates( { close } ) {
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
 
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		noticesStore
+	);
+
 	// To group entities by type.
 	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
 
@@ -134,6 +139,7 @@ export default function EntitiesSavedStates( { close } ) {
 		close( entitiesToSave );
 
 		const siteItemsToSave = [];
+		const pendingSavedRecords = [];
 		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToSave.push( property );
@@ -148,17 +154,37 @@ export default function EntitiesSavedStates( { close } ) {
 					editEntityRecord( kind, name, key, { status: 'publish' } );
 				}
 
-				saveEditedEntityRecord( kind, name, key );
+				pendingSavedRecords.push(
+					saveEditedEntityRecord( kind, name, key )
+				);
 			}
 		} );
 		if ( siteItemsToSave.length ) {
-			saveSpecifiedEntityEdits(
-				'root',
-				'site',
-				undefined,
-				siteItemsToSave
+			pendingSavedRecords.push(
+				saveSpecifiedEntityEdits(
+					'root',
+					'site',
+					undefined,
+					siteItemsToSave
+				)
 			);
 		}
+
+		Promise.all( pendingSavedRecords )
+			.then( ( values ) => {
+				if (
+					values.some( ( value ) => typeof value === 'undefined' )
+				) {
+					createErrorNotice( __( 'Saving failed.' ) );
+				} else {
+					createSuccessNotice( __( 'Site updated.' ), {
+						type: 'snackbar',
+					} );
+				}
+			} )
+			.catch( ( error ) =>
+				createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` )
+			);
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on

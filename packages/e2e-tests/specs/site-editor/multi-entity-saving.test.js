@@ -25,7 +25,7 @@ describe( 'Multi-entity save flow', () => {
 	const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
-		'.editor-post-publish-panel__header-cancel-button button';
+		'.editor-post-publish-panel__header-cancel-button button:not(:disabled)';
 	const createNewButtonSelector =
 		'//button[contains(text(), "New template part")]';
 
@@ -145,7 +145,10 @@ describe( 'Multi-entity save flow', () => {
 			await assertExistance( savePanelSelector, false );
 
 			// Close publish panel.
-			await page.click( closePanelButtonSelector );
+			const closePanelButton = await page.waitForSelector(
+				closePanelButtonSelector
+			);
+			await closePanelButton.click();
 
 			// Verify saving is disabled.
 			const draftSaved = await page.waitForSelector( draftSavedSelector );
@@ -154,13 +157,22 @@ describe( 'Multi-entity save flow', () => {
 			await assertExistance( saveA11ySelector, false );
 
 			await publishPost();
+			// Wait for the success notice specifically for the published post.
+			// `publishPost()` has a similar check but it only checks for the
+			// existence of any snackbars. In this case, there's another "Site updated"
+			// notice which will be sufficient for that and thus creating a false-positive.
+			await page.waitForXPath(
+				'//*[@id="a11y-speak-polite"][contains(text(), "Post published")]'
+			);
 
 			// Update the post.
 			await page.click( '.editor-post-title' );
 			await page.keyboard.type( '...more title!' );
 
 			// Verify update button is enabled.
-			const enabledSaveButton = await page.$( enabledSavePostSelector );
+			const enabledSaveButton = await page.waitForSelector(
+				enabledSavePostSelector
+			);
 			expect( enabledSaveButton ).not.toBeNull();
 			// Verify multi-entity saving not enabled.
 			await assertMultiSaveDisabled();
