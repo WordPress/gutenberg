@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
+import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -36,15 +36,6 @@ function ScreenTextColor( { name } ) {
 		return null;
 	}
 
-	const settings = [
-		{
-			colorValue: color,
-			onColorChange: setColor,
-			label: __( 'Text color' ),
-			clearable: color === userColor,
-		},
-	];
-
 	return (
 		<>
 			<ScreenHeader
@@ -54,16 +45,17 @@ function ScreenTextColor( { name } ) {
 					'Set the default color used for text across the site.'
 				) }
 			/>
-
-			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
-				settings={ settings }
+			<ColorGradientControl
+				className="edit-site-screen-text-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
 				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
+				colorValue={ color }
+				onColorChange={ setColor }
+				clearable={ color === userColor }
 			/>
 		</>
 	);

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
+import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -55,7 +55,6 @@ function ScreenBackgroundColor( { name } ) {
 		return null;
 	}
 
-	const settings = [];
 	let backgroundSettings = {};
 	if ( hasBackgroundColor ) {
 		backgroundSettings = {
@@ -79,11 +78,10 @@ function ScreenBackgroundColor( { name } ) {
 		}
 	}
 
-	settings.push( {
+	const controlProps = {
 		...backgroundSettings,
 		...gradientSettings,
-		label: __( 'Background color' ),
-	} );
+	};
 
 	return (
 		<>
@@ -94,10 +92,8 @@ function ScreenBackgroundColor( { name } ) {
 					'Set a background color or gradient for the whole website.'
 				) }
 			/>
-
-			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
-				settings={ settings }
+			<ColorGradientControl
+				className="edit-site-screen-background-color__control"
 				colors={ colorsPerOrigin }
 				gradients={ gradientsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
@@ -106,6 +102,7 @@ function ScreenBackgroundColor( { name } ) {
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
+				{ ...controlProps }
 			/>
 		</>
 	);
