@@ -69,6 +69,8 @@ class WP_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 		$filename = wp_generate_block_templates_export_file();
 
 		if ( is_wp_error( $filename ) ) {
+			$filename->add_data( array( 'status' => 500 ) );
+
 			return $filename;
 		}
 
