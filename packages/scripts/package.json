@@ -32,6 +32,7 @@
 		"wp-scripts": "./bin/wp-scripts.js"
 	},
 	"dependencies": {
+		"@babel/core": "^7.16.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.2",
 		"@svgr/webpack": "^5.5.0",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
