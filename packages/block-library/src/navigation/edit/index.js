@@ -381,19 +381,33 @@ function Navigation( {
 		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
 	if ( hasUnsavedBlocks ) {
 		return (
-			<UnsavedInnerBlocks
-				blockProps={ blockProps }
-				blocks={ innerBlocks }
-				clientId={ clientId }
-				navigationMenus={ navigationMenus }
-				hasSelection={ isSelected || isInnerBlockSelected }
-				hasSavedUnsavedInnerBlocks={ hasSavedUnsavedInnerBlocks }
-				onSave={ ( post ) => {
-					setHasSavedUnsavedInnerBlocks( true );
-					// Switch to using the wp_navigation entity.
-					setRef( post.id );
-				} }
-			/>
+			<nav { ...blockProps }>
+				<ResponsiveWrapper
+					id={ clientId }
+					onToggle={ setResponsiveMenuVisibility }
+					isOpen={ isResponsiveMenuOpen }
+					isResponsive={ 'never' !== overlayMenu }
+					isHiddenByDefault={ 'always' === overlayMenu }
+					classNames={ overlayClassnames }
+					styles={ overlayStyles }
+				>
+					<UnsavedInnerBlocks
+						blockProps={ blockProps }
+						blocks={ innerBlocks }
+						clientId={ clientId }
+						navigationMenus={ navigationMenus }
+						hasSelection={ isSelected || isInnerBlockSelected }
+						hasSavedUnsavedInnerBlocks={
+							hasSavedUnsavedInnerBlocks
+						}
+						onSave={ ( post ) => {
+							setHasSavedUnsavedInnerBlocks( true );
+							// Switch to using the wp_navigation entity.
+							setRef( post.id );
+						} }
+					/>
+				</ResponsiveWrapper>
+			</nav>
 		);
 	}
 
