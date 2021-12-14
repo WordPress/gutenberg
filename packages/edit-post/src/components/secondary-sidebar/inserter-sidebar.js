@@ -32,7 +32,7 @@ export default function InserterSidebar() {
 	const TagName = isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: 'secondElement',
+		focusOnMount: null,
 	} );
 
 	return (
@@ -41,13 +41,13 @@ export default function InserterSidebar() {
 			{ ...inserterDialogProps }
 			className="edit-post-editor__inserter-panel"
 		>
-		<TagName className="edit-post-editor__inserter-panel-header">
-			<Button
-				icon={ close }
-				label={ __( 'Close block inserter' ) }
-				onClick={ () => setIsInserterOpened( false ) }
-			/>
-		</TagName>
+			<TagName className="edit-post-editor__inserter-panel-header">
+				<Button
+					icon={ close }
+					label={ __( 'Close block inserter' ) }
+					onClick={ () => setIsInserterOpened( false ) }
+				/>
+			</TagName>
 			<div className="edit-post-editor__inserter-panel-content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }

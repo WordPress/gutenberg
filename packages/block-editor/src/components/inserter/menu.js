@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -168,6 +174,17 @@ function InserterMenu( {
 		[ blocksTab, patternsTab, reusableBlocksTab ]
 	);
 
+	const searchControlRef = useRef();
+	const focusOnceRef = useRef( false );
+	useEffect( () => {
+		// Make sure focus only occurs once
+		if ( focusOnceRef.current ) {
+			return;
+		}
+		searchControlRef.current.focus();
+		focusOnceRef.current = true;
+	} );
+
 	return (
 		<div className="block-editor-inserter__menu">
 			<div className="block-editor-inserter__main-area">
@@ -175,6 +192,7 @@ function InserterMenu( {
 				<div className="block-editor-inserter__content">
 					<SearchControl
 						className="block-editor-inserter__search"
+						ref={ searchControlRef }
 						onChange={ ( value ) => {
 							if ( hoveredItem ) setHoveredItem( null );
 							setFilterValue( value );
