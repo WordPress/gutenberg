@@ -79,7 +79,7 @@ function NavigationToggle( { icon } ) {
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
-				isPressed={ isNavigationOpen }
+				aria-pressed={ isNavigationOpen }
 				onClick={ toggleNavigationPanel }
 				showTooltip
 			>
