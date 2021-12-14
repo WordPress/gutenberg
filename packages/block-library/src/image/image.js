@@ -43,7 +43,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import { isExternalImage } from './edit';
+import { isExternalImage, isMediaDestroyed } from './edit';
 
 /**
  * Module constants
@@ -224,9 +224,7 @@ export default function Image( {
 			onReplace( embedBlock );
 		}
 
-		if ( onImageLoadError ) {
-			onImageLoadError( { isReplaced: shouldReplace } );
-		}
+		onImageLoadError( shouldReplace );
 	}
 
 	function onSetHref( props ) {
@@ -297,6 +295,9 @@ export default function Image( {
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
+		}
+		if ( isSelected && isMediaDestroyed( id ) ) {
+			onImageLoadError();
 		}
 	}, [ isSelected ] );
 

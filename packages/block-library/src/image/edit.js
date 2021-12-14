@@ -96,7 +96,7 @@ function hasDefaultSize( image, defaultSize ) {
  *
  * @return {boolean} Whether the image has been destroyed.
  */
-function isMediaDestroyed( id ) {
+export function isMediaDestroyed( id ) {
 	const attachment = wp?.media?.attachment( id ) || {};
 	return attachment.destroyed;
 }
@@ -165,7 +165,7 @@ export function ImageEdit( {
 		 If the error callback is triggered, we infer that that image
 		 has been deleted.
 	*/
-	function onImageError( { isReplaced } ) {
+	function onImageError( isReplaced = false ) {
 		// If the image block was not replaced with an embed,
 		// clear the attributes and trigger the placeholder.
 		if ( ! isReplaced ) {
