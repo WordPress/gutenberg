@@ -40,18 +40,25 @@ export default function InserterSidebar() {
 			{ ...inserterDialogProps }
 			className="edit-post-editor__inserter-panel"
 		>
-			<div className="edit-post-editor__inserter-panel-header">
-				<Button
-					icon={ close }
-					onClick={ () => setIsInserterOpened( false ) }
-				/>
-			</div>
-			<VisuallyHidden as="div">
-				<Button
-					label={ __( 'Close block inserter' ) }
-					onClick={ () => setIsInserterOpened( false ) }
-				/>
-			</VisuallyHidden>
+			{ isMobileViewport ?
+				<VisuallyHidden as="div">
+					<div className="edit-post-editor__inserter-panel-header">
+						<Button
+							icon={ close }
+							label={ __( 'Close block inserter' ) }
+							onClick={ () => setIsInserterOpened( false ) }
+						/>
+					</div>
+				</VisuallyHidden>
+			:
+				<div className="edit-post-editor__inserter-panel-header">
+					<Button
+						icon={ close }
+						label={ __( 'Close block inserter' ) }
+						onClick={ () => setIsInserterOpened( false ) }
+					/>
+				</div>
+			}
 			<div className="edit-post-editor__inserter-panel-content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
