@@ -6,6 +6,9 @@
 	@include background-colors-deprecated();
 	@include foreground-colors-deprecated();
 	@include gradient-colors-deprecated();
+	--wp--preset--font-size--normal: 16px;
+	--wp--preset--font-size--huge: 42px;
+	@include font-sizes-deprecated();
 }
 
 // Font sizes (not used now, kept because of backward compatibility).

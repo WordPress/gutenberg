@@ -538,3 +538,13 @@
 	}
 	/* stylelint-enable function-comma-space-after */
 }
+
+// Deprecated from UI, kept for back-compatibility
+@mixin font-sizes-deprecated() {
+	.has-normal-font-size {
+		font-size: var(--wp--preset--font-size--normal);
+	}
+	.has-huge-font-size {
+		font-size: var(--wp--preset--font-size--huge);
+	}
+}
