@@ -217,7 +217,7 @@
 		"unzipper": "0.10.11",
 		"uuid": "8.3.0",
 		"wd": "1.12.1",
-		"webpack": "5.47.1",
+		"webpack": "5.65.0",
 		"webpack-bundle-analyzer": "4.4.2",
 		"worker-farm": "1.7.0"
 	},
