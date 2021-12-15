@@ -16,7 +16,7 @@ import { isEmpty, get } from 'lodash';
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
-import { check } from '@wordpress/icons';
+import { check, cancelCircleFilled, close } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -35,6 +35,7 @@ class BottomSheetCell extends Component {
 		this.state = {
 			isEditingValue: props.autoFocus || false,
 			isScreenReaderEnabled: false,
+			localValue: props.value ? props.value : '',
 		};
 
 		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
@@ -94,6 +95,7 @@ class BottomSheetCell extends Component {
 			accessibilityHint,
 			accessibilityRole,
 			disabled = false,
+			displayClearButton,
 			activeOpacity,
 			onPress,
 			onLongPress,
@@ -189,6 +191,29 @@ class BottomSheetCell extends Component {
 			}
 		};
 
+		const setTextInputValue = (text) => {
+			this.setState({ localValue: text });
+			this.props.onChangeValue(text);
+		}
+
+		const clearButton = () => {
+			return (
+				<>
+					{this.state.localValue !== '' &&
+						<TouchableOpacity
+							onPress={() => setTextInputValue('')}
+						>
+							<Icon
+								icon={ isIOS ? cancelCircleFilled : close }
+								fill={ clearButtonIconStyle.color }
+								size={ 24 }
+							/>
+						</TouchableOpacity>
+					}
+				</>
+			)
+		}
+
 		const separatorStyle = () => {
 			//eslint-disable-next-line @wordpress/no-unused-vars-before-return
 			const defaultSeparatorStyle = this.props.getStylesFromColorScheme(
@@ -237,24 +262,27 @@ class BottomSheetCell extends Component {
 			// We also show the TextInput to display placeholder.
 			const shouldShowPlaceholder = isValueEditable && value === '';
 			return this.state.isEditingValue || shouldShowPlaceholder ? (
-				<TextInput
-					ref={ ( c ) => ( this._valueTextInput = c ) }
-					numberOfLines={ 1 }
-					style={ finalStyle }
-					value={ value }
-					placeholder={ valuePlaceholder }
-					placeholderTextColor={ '#87a6bc' }
-					onChangeText={ onChangeValue }
-					editable={ isValueEditable }
-					pointerEvents={
-						this.state.isEditingValue ? 'auto' : 'none'
-					}
-					onFocus={ startEditing }
-					onBlur={ finishEditing }
-					onSubmitEditing={ onSubmit }
-					keyboardType={ this.typeToKeyboardType( type, step ) }
-					{ ...valueProps }
-				/>
+				<View style={styles.cellTextInputContainer}>
+					<TextInput
+						ref={ ( c ) => ( this._valueTextInput = c ) }
+						numberOfLines={ 1 }
+						style={ finalStyle }
+						value={ this.state.localValue }
+						placeholder={ valuePlaceholder }
+						placeholderTextColor={ '#87a6bc' }
+						onChangeText={(text) => setTextInputValue(text)}
+						editable={ isValueEditable }
+						pointerEvents={
+							this.state.isEditingValue ? 'auto' : 'none'
+						}
+						onFocus={ startEditing }
+						onBlur={ finishEditing }
+						onSubmitEditing={ onSubmit }
+						keyboardType={ this.typeToKeyboardType( type, step ) }
+						{ ...valueProps }
+					/>
+					{displayClearButton && clearButton()}
+				</View>
 			) : (
 				<Text
 					style={ { ...cellValueStyle, ...valueStyle } }
@@ -308,6 +336,10 @@ class BottomSheetCell extends Component {
 		const iconStyleBase = getStylesFromColorScheme(
 			styles.icon,
 			styles.iconDark
+		);
+		const clearButtonIconStyle = getStylesFromColorScheme(
+			styles.clearButtonIcon,
+			styles.clearButtonIconDark
 		);
 		const resetButtonStyle = getStylesFromColorScheme(
 			styles.resetButton,
