@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Radio as ReakitRadio } from 'ariakit/radio';
+import { Radio as AriakitRadio } from 'ariakit/radio';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ function Radio( { children, value, ...props }, ref ) {
 	const checked = radioContext.value === value;
 
 	return (
-		<ReakitRadio
+		<AriakitRadio
 			ref={ ref }
 			as={ Button }
 			variant={ checked ? 'primary' : 'secondary' }
@@ -28,7 +28,7 @@ function Radio( { children, value, ...props }, ref ) {
 			{ ...props }
 		>
 			{ children || value }
-		</ReakitRadio>
+		</AriakitRadio>
 	);
 }
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useRadioState, RadioGroup as ReakitRadioGroup } from 'ariakit/radio';
+import { useRadioState, RadioGroup as AriakitRadioGroup } from 'ariakit/radio';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,7 @@ function RadioGroup(
 
 	return (
 		<RadioContext.Provider value={ radioContext }>
-			<ReakitRadioGroup
+			<AriakitRadioGroup
 				ref={ ref }
 				as={ ButtonGroup }
 				aria-label={ label }
