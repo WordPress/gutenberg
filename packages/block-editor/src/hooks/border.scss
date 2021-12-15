@@ -2,4 +2,9 @@
 	.single-column {
 		grid-column: span 1;
 	}
+
+	.block-editor-panel-color-gradient-settings__dropdown {
+		width: 100%;
+		border: 1px solid rgba(0, 0, 0, 0.1);
+	}
 }
