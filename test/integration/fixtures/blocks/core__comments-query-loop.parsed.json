@@ -2,8 +2,8 @@
 	{
 		"blockName": "core/comments-query-loop",
 		"attrs": {
-			"queryPerPage": 1,
-			"queryOrder": "asc"
+			"perPage": 2,
+			"order": "desc"
 		},
 		"innerBlocks": [
 			{

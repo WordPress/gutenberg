@@ -4,9 +4,9 @@
 		"name": "core/comments-query-loop",
 		"isValid": true,
 		"attributes": {
-			"order": null,
-			"perPage": null,
-			"tagName": "div"
+			"perPage": 2,
+			"tagName": "div",
+			"order": "desc"
 		},
 		"innerBlocks": [
 			{
