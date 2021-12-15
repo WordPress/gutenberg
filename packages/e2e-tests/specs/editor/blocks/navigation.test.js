@@ -819,7 +819,10 @@ describe( 'Navigation', () => {
 			// Tidy up after ourselves.
 			await deleteUser( username );
 
-			// Expect a console 403 for request to Navigation Areas.
+			// Expect a console 403 for request to Navigation Areas for lower permisison users.
+			// This is because reading requires the `edit_theme_options` capability
+			// which the Contributor level user does not have.
+			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
 			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
 			expect( console ).toHaveErrored();
 		} );
