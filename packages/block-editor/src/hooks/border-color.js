@@ -105,7 +105,7 @@ export function BorderColorEdit( props ) {
 	};
 
 	const settings = {
-		label: __( 'Border Color' ),
+		label: __( 'Color' ),
 		onColorChange: onChangeColor,
 		colorValue,
 		clearable: false,
