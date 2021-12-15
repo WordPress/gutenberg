@@ -19,7 +19,7 @@ export default {
 	title: 'Components/UnitControl',
 	component: UnitControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
@@ -45,6 +45,7 @@ function Example() {
 			{
 				default: 'default',
 				small: 'small',
+				'__unstable-large': '__unstable-large',
 			},
 			'default'
 		),
@@ -65,6 +66,23 @@ function Example() {
 
 export const _default = () => {
 	return <Example />;
+};
+
+export const WithSingleUnit = ( props ) => {
+	const [ value, setValue ] = useState( '10px' );
+	return (
+		<ControlWrapperView>
+			<UnitControl
+				{ ...props }
+				value={ value }
+				onChange={ ( v ) => setValue( v ) }
+			/>
+		</ControlWrapperView>
+	);
+};
+WithSingleUnit.args = {
+	label: 'Value',
+	units: CSS_UNITS.slice( 0, 1 ),
 };
 
 export function WithCustomUnits() {

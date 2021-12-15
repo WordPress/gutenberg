@@ -8,7 +8,7 @@
 	"keywords": [ "menu", "navigation", "links" ],
 	"textdomain": "default",
 	"attributes": {
-		"navigationMenuId": {
+		"ref": {
 			"type": "number"
 		},
 		"textColor": {

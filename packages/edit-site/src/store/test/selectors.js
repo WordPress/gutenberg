@@ -13,10 +13,9 @@ import {
 	getHomeTemplateId,
 	getEditedPostType,
 	getEditedPostId,
-	getPreviousEditedPostType,
-	getPreviousEditedPostId,
 	getPage,
 	getNavigationPanelActiveMenu,
+	getReusableBlocks,
 	isNavigationOpened,
 	isInserterOpened,
 	isListViewOpened,
@@ -24,8 +23,12 @@ import {
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
+	const getEntityRecords = jest.fn( () => [] );
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
+	};
+	getReusableBlocks.registry = {
+		select: jest.fn( () => ( { getEntityRecords } ) ),
 	};
 
 	describe( 'isFeatureActive', () => {
@@ -83,6 +86,22 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getReusableBlocks', () => {
+		it( "selects `getEntityRecords( 'postType', 'wp_block' )` from the core store", () => {
+			expect( getReusableBlocks() ).toEqual( [] );
+			expect( getReusableBlocks.registry.select ).toHaveBeenCalledWith(
+				coreDataStore
+			);
+			expect( getEntityRecords ).toHaveBeenCalledWith(
+				'postType',
+				'wp_block',
+				{
+					per_page: -1,
+				}
+			);
+		} );
+	} );
+
 	describe( 'getSettings', () => {
 		it( "returns the settings when the user can't create media", () => {
 			canUser.mockReturnValueOnce( false );
@@ -94,6 +113,7 @@ describe( 'selectors', () => {
 				focusMode: false,
 				hasFixedToolbar: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
+				__experimentalReusableBlocks: [],
 			} );
 		} );
 
@@ -108,12 +128,14 @@ describe( 'selectors', () => {
 				},
 			};
 			const setInserterOpened = () => {};
+
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				outlineMode: true,
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
 				__experimentalSetIsInserterOpened: setInserterOpened,
+				__experimentalReusableBlocks: [],
 				mediaUpload: expect.any( Function ),
 			} );
 		} );
@@ -128,51 +150,22 @@ describe( 'selectors', () => {
 
 	describe( 'getEditedPostId', () => {
 		it( 'returns the template ID', () => {
-			const state = { editedPost: [ { id: 10 } ] };
+			const state = { editedPost: { id: 10 } };
 			expect( getEditedPostId( state ) ).toBe( 10 );
 		} );
 	} );
 
 	describe( 'getEditedPostType', () => {
 		it( 'returns the template type', () => {
-			const state = { editedPost: [ { type: 'wp_template' } ] };
+			const state = { editedPost: { type: 'wp_template' } };
 			expect( getEditedPostType( state ) ).toBe( 'wp_template' );
-		} );
-	} );
-
-	describe( 'getPreviousEditedPostId', () => {
-		it( 'returns the previous template ID', () => {
-			const state = { editedPost: [ { id: 10 }, { id: 20 } ] };
-			expect( getPreviousEditedPostId( state ) ).toBe( 10 );
-		} );
-
-		it( 'returns undefined when there are no previous pages', () => {
-			const state = { editedPost: [ { id: 10 } ] };
-			expect( getPreviousEditedPostId( state ) ).toBeUndefined();
-		} );
-	} );
-
-	describe( 'getPreviousEditedPostType', () => {
-		it( 'returns the previous template type', () => {
-			const state = {
-				editedPost: [
-					{ type: 'wp_template' },
-					{ type: 'wp_template_part' },
-				],
-			};
-			expect( getPreviousEditedPostType( state ) ).toBe( 'wp_template' );
-		} );
-
-		it( 'returns undefined when there are no previous pages', () => {
-			const state = { editedPost: [ { type: 'wp_template' } ] };
-			expect( getPreviousEditedPostType( state ) ).toBeUndefined();
 		} );
 	} );
 
 	describe( 'getPage', () => {
 		it( 'returns the page object', () => {
 			const page = {};
-			const state = { editedPost: [ { page } ] };
+			const state = { editedPost: { page } };
 			expect( getPage( state ) ).toBe( page );
 		} );
 	} );

@@ -4,6 +4,11 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
+/**
+ * Internal dependencies
+ */
+import { rtl } from '../utils';
+
 export const ZStackView = styled.div`
 	display: flex;
 	position: relative;
@@ -16,8 +21,8 @@ export const ZStackChildView = styled.div< {
 } >`
 	${ ( { isLayered, offsetAmount } ) =>
 		isLayered
-			? css( { marginLeft: offsetAmount } )
-			: css( { right: offsetAmount * -1 } ) }
+			? css( rtl( { marginLeft: offsetAmount } )() )
+			: css( rtl( { right: offsetAmount * -1 } )() ) }
 
 	${ ( { isLayered } ) =>
 		isLayered ? positionAbsolute : positionRelative }

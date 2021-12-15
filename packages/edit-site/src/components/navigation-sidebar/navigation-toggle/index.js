@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	Icon,
@@ -17,44 +17,31 @@ import { useReducedMotion } from '@wordpress/compose';
  */
 import { store as editSiteStore } from '../../../store';
 
-function NavigationToggle( { icon, isOpen } ) {
-	const {
-		isRequestingSiteIcon,
-		navigationPanelMenu,
-		siteIconUrl,
-	} = useSelect( ( select ) => {
-		const { getCurrentTemplateNavigationPanelSubMenu } = select(
-			editSiteStore
-		);
-		const { getEntityRecord, isResolving } = select( coreDataStore );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+function NavigationToggle( { icon } ) {
+	const { isNavigationOpen, isRequestingSiteIcon, siteIconUrl } = useSelect(
+		( select ) => {
+			const { getEntityRecord, isResolving } = select( coreDataStore );
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-		return {
-			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
-			navigationPanelMenu: getCurrentTemplateNavigationPanelSubMenu(),
-			siteIconUrl: siteData.site_icon_url,
-		};
-	}, [] );
-
-	const {
-		openNavigationPanelToMenu,
-		setIsNavigationPanelOpened,
-	} = useDispatch( editSiteStore );
+			return {
+				isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
+				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+					'root',
+					'__unstableBase',
+					undefined,
+				] ),
+				siteIconUrl: siteData.site_icon_url,
+			};
+		},
+		[]
+	);
+	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
 	const disableMotion = useReducedMotion();
 
-	const toggleNavigationPanel = () => {
-		if ( isOpen ) {
-			setIsNavigationPanelOpened( false );
-			return;
-		}
-		openNavigationPanelToMenu( navigationPanelMenu );
-	};
+	const toggleNavigationPanel = () =>
+		setIsNavigationPanelOpened( ! isNavigationOpen );
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
@@ -84,13 +71,16 @@ function NavigationToggle( { icon, isOpen } ) {
 	return (
 		<motion.div
 			className={
-				'edit-site-navigation-toggle' + ( isOpen ? ' is-open' : '' )
+				'edit-site-navigation-toggle' +
+				( isNavigationOpen ? ' is-open' : '' )
 			}
 			whileHover="expand"
 		>
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
+				// isPressed will add unwanted styles.
+				aria-pressed={ isNavigationOpen }
 				onClick={ toggleNavigationPanel }
 				showTooltip
 			>

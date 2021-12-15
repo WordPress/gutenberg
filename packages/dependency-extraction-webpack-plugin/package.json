@@ -30,7 +30,7 @@
 	"types": "lib/types.d.ts",
 	"dependencies": {
 		"json2php": "^0.0.4",
-		"webpack-sources": "^2.2.0"
+		"webpack-sources": "^3.2.2"
 	},
 	"peerDependencies": {
 		"webpack": "^4.8.3 || ^5.0.0"

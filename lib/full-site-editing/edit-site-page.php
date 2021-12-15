@@ -32,6 +32,15 @@ function gutenberg_is_edit_site_page( $page ) {
 }
 
 /**
+ * Checks whether the provided page is the templates list page.
+ *
+ * @return bool True for Site Editor pages, false otherwise.
+ */
+function gutenberg_is_edit_site_list_page() {
+	return isset( $_GET['postType'] ) && ! isset( $_GET['postId'] );
+}
+
+/**
  * Load editor styles (this is copied from edit-form-blocks.php).
  * Ideally the code is extracted into a reusable function.
  *
@@ -68,7 +77,7 @@ function gutenberg_get_editor_styles() {
 }
 
 /**
- * Initialize the Gutenberg Edit Site Page.
+ * Initialize the Gutenberg Site Editor.
  *
  * @since 7.2.0
  *
@@ -81,6 +90,14 @@ function gutenberg_edit_site_init( $hook ) {
 		return;
 	}
 
+	if ( gutenberg_is_edit_site_list_page() ) {
+		$post_type = get_post_type_object( $_GET['postType'] );
+
+		if ( ! $post_type ) {
+			wp_die( __( 'Invalid post type.', 'gutenberg' ) );
+		}
+	}
+
 	// Default to is-fullscreen-mode to avoid rendering wp-admin navigation menu while loading and
 	// having jumps in the UI.
 	add_filter(
@@ -88,6 +105,22 @@ function gutenberg_edit_site_init( $hook ) {
 		static function( $classes ) {
 			return "$classes is-fullscreen-mode";
 		}
+	);
+
+	$indexed_template_types = array();
+	foreach ( get_default_block_template_types() as $slug => $template_type ) {
+		$template_type['slug']    = (string) $slug;
+		$indexed_template_types[] = $template_type;
+	}
+
+	$custom_settings = array(
+		'siteUrl'                              => site_url(),
+		'postsPerPage'                         => get_option( 'posts_per_page' ),
+		'styles'                               => gutenberg_get_editor_styles(),
+		'defaultTemplateTypes'                 => $indexed_template_types,
+		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
+		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
+		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 	);
 
 	/**
@@ -98,15 +131,6 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 	$current_screen->is_block_editor( true );
 
-	$custom_settings         = array(
-		'siteUrl'                              => site_url(),
-		'postsPerPage'                         => get_option( 'posts_per_page' ),
-		'styles'                               => gutenberg_get_editor_styles(),
-		'defaultTemplateTypes'                 => gutenberg_get_indexed_default_template_types(),
-		'defaultTemplatePartAreas'             => get_allowed_block_template_part_areas(),
-		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
-		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
-	);
 	$site_editor_context     = new WP_Block_Editor_Context();
 	$settings                = gutenberg_get_block_editor_settings( $custom_settings, $site_editor_context );
 	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
@@ -116,26 +140,27 @@ function gutenberg_edit_site_init( $hook ) {
 		'edit-site',
 		array(
 			'preload_paths'    => array_merge(
-				gutenberg_get_navigation_areas_paths_to_preload(),
 				array(
 					array( '/wp/v2/media', 'OPTIONS' ),
 					'/',
 					'/wp/v2/types?context=edit',
+					'/wp/v2/types/wp_template?context=edit',
+					'/wp/v2/types/wp_template-part?context=edit',
 					'/wp/v2/taxonomies?context=edit',
 					'/wp/v2/pages?context=edit',
 					'/wp/v2/categories?context=edit',
 					'/wp/v2/posts?context=edit',
 					'/wp/v2/tags?context=edit',
-					'/wp/v2/templates?context=edit',
-					'/wp/v2/template-parts?context=edit',
+					'/wp/v2/templates?context=edit&per_page=-1',
+					'/wp/v2/template-parts?context=edit&per_page=-1',
 					'/wp/v2/settings',
 					'/wp/v2/themes?context=edit&status=active',
 					'/wp/v2/global-styles/' . $active_global_styles_id . '?context=edit',
 					'/wp/v2/global-styles/' . $active_global_styles_id,
-					'/wp/v2/themes/' . $active_theme . '/global-styles',
+					'/wp/v2/global-styles/themes/' . $active_theme,
 				)
 			),
-			'initializer_name' => 'initialize',
+			'initializer_name' => 'initializeEditor',
 			'editor_settings'  => $settings,
 		)
 	);
@@ -200,3 +225,16 @@ function register_site_editor_homepage_settings() {
 	);
 }
 add_action( 'init', 'register_site_editor_homepage_settings', 10 );
+
+/**
+ * Tells the script loader to load the scripts and styles of custom block on site editor screen.
+ *
+ * @param bool $is_block_editor_screen Current decision about loading block assets.
+ * @return bool Filtered decision about loading block assets.
+ */
+function gutenberg_site_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
+	return ( is_callable( 'get_current_screen' ) && get_current_screen() && 'appearance_page_gutenberg-edit-site' === get_current_screen()->base )
+		? true
+		: $is_block_editor_screen;
+}
+add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_site_editor_load_block_editor_scripts_and_styles' );

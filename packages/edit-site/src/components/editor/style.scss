@@ -1,3 +1,11 @@
+html #wpadminbar {
+	display: none;
+}
+
+html.wp-toolbar {
+	padding-top: 0;
+}
+
 .edit-site-editor__toggle-save-panel {
 	z-index: z-index(".edit-site-editor__toggle-save-panel");
 	position: fixed !important; // Need to override the default relative positioning

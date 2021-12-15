@@ -104,7 +104,10 @@ export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
 export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
-export { default as BlockPreview } from './block-preview';
+export {
+	default as BlockPreview,
+	useBlockPreview as __experimentalUseBlockPreview,
+} from './block-preview';
 export {
 	default as BlockSelectionClearer,
 	useBlockSelectionClearer as __unstableUseBlockSelectionClearer,
@@ -138,7 +141,6 @@ export {
 } from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
-export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
