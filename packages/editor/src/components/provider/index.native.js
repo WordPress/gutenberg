@@ -75,6 +75,7 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
+
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
 				...settings,
@@ -90,16 +91,10 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			capabilities,
-			locale,
-			updateSettings,
-			galleryWithImageBlocks,
-		} = this.props;
+		const { capabilities, locale, updateSettings } = this.props;
 
 		updateSettings( {
 			...capabilities,
-			...{ __unstableGalleryWithImageBlocks: galleryWithImageBlocks },
 			...this.getThemeColors( this.props ),
 			locale,
 		} );
@@ -149,14 +144,11 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
-			( editorSettings ) => {
-				updateSettings( {
-					...{
-						__unstableGalleryWithImageBlocks:
-							editorSettings.galleryWithImageBlocks,
-					},
-					...this.getThemeColors( editorSettings ),
-				} );
+			( { galleryWithImageBlocks, ...editorSettings } ) => {
+				if ( typeof galleryWithImageBlocks === 'boolean' ) {
+					window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+				}
+				updateSettings( this.getThemeColors( editorSettings ) );
 			}
 		);
 

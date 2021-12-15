@@ -42,6 +42,7 @@ import { toHTMLString } from '../to-html-string';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
+import { getFormatColors } from '../get-format-colors';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
@@ -53,6 +54,7 @@ const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
+	'core/text-color': 'mark',
 };
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
@@ -122,7 +124,7 @@ export class RichText extends Component {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
-			dimensions: Dimensions.get( 'window' ),
+			currentFontSize: this.getFontSize( arguments[ 0 ] ),
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -143,13 +145,26 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { selectionStart: start, selectionEnd: end } = this.props;
+		const {
+			selectionStart: start,
+			selectionEnd: end,
+			colorPalette,
+		} = this.props;
 		const { value } = this.props;
+		const currentValue = this.formatToValue( value );
 
-		const { formats, replacements, text } = this.formatToValue( value );
+		const { formats, replacements, text } = currentValue;
 		const { activeFormats } = this.state;
+		const newFormats = getFormatColors( value, formats, colorPalette );
 
-		return { formats, replacements, text, start, end, activeFormats };
+		return {
+			formats: newFormats,
+			replacements,
+			text,
+			start,
+			end,
+			activeFormats,
+		};
 	}
 
 	/**
@@ -799,6 +814,9 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		const { style } = this.props;
+		const { currentFontSize } = this.state;
+
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
 		}
@@ -816,6 +834,18 @@ export class RichText extends Component {
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
+		}
+
+		const currentFontSizeStyle = parseFloat( style?.fontSize );
+		const prevFontSizeStyle = parseFloat( prevProps?.style?.fontSize );
+		if (
+			currentFontSize &&
+			( currentFontSizeStyle || prevFontSizeStyle ) &&
+			currentFontSizeStyle !== currentFontSize
+		) {
+			this.setState( {
+				currentFontSize: this.getFontSize( this.props ),
+			} );
 		}
 	}
 
@@ -859,33 +889,35 @@ export class RichText extends Component {
 		};
 	}
 
-	getFontSize() {
-		const { baseGlobalStyles, tagName } = this.props;
+	getFontSize( props ) {
+		const { baseGlobalStyles, tagName, fontSize, style } = props;
 		const tagNameFontSize =
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.fontSize;
 
-		let fontSize = DEFAULT_FONT_SIZE;
+		let newFontSize = DEFAULT_FONT_SIZE;
 
 		if ( baseGlobalStyles?.typography?.fontSize ) {
-			fontSize = baseGlobalStyles?.typography?.fontSize;
+			newFontSize = baseGlobalStyles?.typography?.fontSize;
 		}
 
 		if ( tagNameFontSize ) {
-			fontSize = tagNameFontSize;
+			newFontSize = tagNameFontSize;
 		}
 
-		if ( this.props.style?.fontSize ) {
-			fontSize = this.props.style.fontSize;
+		if ( style?.fontSize ) {
+			newFontSize = style.fontSize;
 		}
 
-		if ( this.props.fontSize && ! tagNameFontSize ) {
-			fontSize = this.props.fontSize;
+		if ( fontSize && ! tagNameFontSize ) {
+			newFontSize = fontSize;
 		}
-		const { height, width } = this.state.dimensions;
+		const { height, width } = Dimensions.get( 'window' );
 		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
 		// We need to always convert to px units because the selected value
 		// could be coming from the web where it could be stored as a different unit.
-		const selectedPxValue = getPxFromCssUnit( fontSize, cssUnitOptions );
+		const selectedPxValue =
+			getPxFromCssUnit( newFontSize, cssUnitOptions ) ??
+			DEFAULT_FONT_SIZE;
 
 		return parseFloat( selectedPxValue );
 	}
@@ -931,6 +963,7 @@ export class RichText extends Component {
 			disableEditingMenu = false,
 			baseGlobalStyles,
 		} = this.props;
+		const { currentFontSize } = this.state;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
@@ -942,7 +975,7 @@ export class RichText extends Component {
 		);
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
-		const fontSize = this.getFontSize();
+		const fontSize = currentFontSize;
 		const lineHeight = this.getLineHeight();
 
 		const {
@@ -1097,6 +1130,7 @@ export class RichText extends Component {
 				{ isSelected && (
 					<>
 						<FormatEdit
+							forwardedRef={ this._editor }
 							formatTypes={ formatTypes }
 							value={ record }
 							onChange={ this.onFormatChange }
@@ -1144,6 +1178,13 @@ export default compose( [
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
+		const experimentalFeatures =
+			settings?.__experimentalFeatures?.color?.palette;
+		const colorPalette =
+			experimentalFeatures?.user ??
+			experimentalFeatures?.theme ??
+			experimentalFeatures?.default ??
+			settings?.colors;
 
 		return {
 			areMentionsSupported:
@@ -1151,6 +1192,7 @@ export default compose( [
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
 			baseGlobalStyles,
+			colorPalette,
 		};
 	} ),
 	withPreferredColorScheme,

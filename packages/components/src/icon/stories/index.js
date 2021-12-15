@@ -18,7 +18,7 @@ export default {
 	title: 'Components/Icon',
 	component: Icon,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

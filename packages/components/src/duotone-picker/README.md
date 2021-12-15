@@ -22,7 +22,7 @@ const Example = () => {
 	const [ duotone, setDuotone ] = useState( [ '#000000', '#ffffff' ] );
 	return (
 		<>
-			<DuotoneControl
+			<DuotonePicker
 				duotonePalette={ DUOTONE_PALETTE }
 				colorPalette={ COLOR_PALETTE }
 				value={ duotone }

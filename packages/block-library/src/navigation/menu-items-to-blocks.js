@@ -7,6 +7,7 @@ import { sortBy } from 'lodash';
  * WordPress dependencies
  */
 import { createBlock, parse } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -21,7 +22,12 @@ export default function menuItemsToBlocks( menuItems ) {
 	}
 
 	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
+	const blocks = mapMenuItemsToBlocks( menuTree );
+	return applyFilters(
+		'blocks.navigation.__unstableMenuItemsToBlocks',
+		blocks,
+		menuItems
+	);
 }
 
 /**
@@ -148,14 +154,15 @@ function menuItemToBlockAttributes( {
 			classes.join( ' ' ).trim() && {
 				className: classes.join( ' ' ).trim(),
 			} ),
+		/* eslint-disable camelcase */
 		...( attr_title?.length && {
 			title: attr_title,
 		} ),
-		// eslint-disable-next-line camelcase
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
 			} ),
+		/* eslint-enable camelcase */
 		...( description?.length && {
 			description,
 		} ),

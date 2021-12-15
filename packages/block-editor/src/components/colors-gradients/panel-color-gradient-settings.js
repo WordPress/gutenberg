@@ -7,9 +7,17 @@ import { every, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PanelBody, ColorIndicator } from '@wordpress/components';
-import { sprintf, __, _x } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+	FlexItem,
+	ColorIndicator,
+	PanelBody,
+	Dropdown,
+} from '@wordpress/components';
+import { sprintf, __, isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,6 +26,8 @@ import ColorGradientControl from './control';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
+import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
+import useMultipleOriginColorsAndGradients from './use-multiple-origin-colors-and-gradients';
 
 // translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(%s: color %s)' );
@@ -92,6 +102,7 @@ export const PanelColorGradientSettingsInner = ( {
 	title,
 	showTitle = true,
 	__experimentalHasMultipleOrigins,
+	__experimentalIsRenderedInSidebar,
 	enableAlpha,
 	...props
 } ) => {
@@ -125,6 +136,13 @@ export const PanelColorGradientSettingsInner = ( {
 		</span>
 	);
 
+	let dropdownPosition;
+	let popoverProps;
+	if ( __experimentalIsRenderedInSidebar ) {
+		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
+		popoverProps = { __unstableForcePosition: true };
+	}
+
 	return (
 		<PanelBody
 			className={ classnames(
@@ -134,32 +152,66 @@ export const PanelColorGradientSettingsInner = ( {
 			title={ showTitle ? titleElement : undefined }
 			{ ...props }
 		>
-			{ settings.map( ( setting, index ) => (
-				<ColorGradientControl
-					showTitle={ showTitle }
-					key={ index }
-					{ ...{
-						colors,
-						gradients,
-						disableCustomColors,
-						disableCustomGradients,
-						__experimentalHasMultipleOrigins,
-						enableAlpha,
-						...setting,
-					} }
-				/>
-			) ) }
-			{ children }
+			<ItemGroup
+				isBordered
+				isSeparated
+				className="block-editor-panel-color-gradient-settings__item-group"
+			>
+				{ settings.map( ( setting, index ) => (
+					<Dropdown
+						position={ dropdownPosition }
+						popoverProps={ popoverProps }
+						className="block-editor-panel-color-gradient-settings__dropdown"
+						key={ index }
+						contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
+						renderToggle={ ( { isOpen, onToggle } ) => {
+							return (
+								<Item
+									onClick={ onToggle }
+									className={ classnames(
+										'block-editor-panel-color-gradient-settings__item',
+										{ 'is-open': isOpen }
+									) }
+								>
+									<HStack justify="flex-start">
+										<ColorIndicator
+											className="block-editor-panel-color-gradient-settings__color-indicator"
+											colorValue={
+												setting.gradientValue ??
+												setting.colorValue
+											}
+										/>
+										<FlexItem>{ setting.label }</FlexItem>
+									</HStack>
+								</Item>
+							);
+						} }
+						renderContent={ () => (
+							<ColorGradientControl
+								showTitle={ false }
+								{ ...{
+									colors,
+									gradients,
+									disableCustomColors,
+									disableCustomGradients,
+									__experimentalHasMultipleOrigins,
+									__experimentalIsRenderedInSidebar,
+									enableAlpha,
+									...setting,
+								} }
+							/>
+						) }
+					/>
+				) ) }
+			</ItemGroup>
+			{ !! children && (
+				<>
+					<Spacer marginY={ 4 } /> { children }
+				</>
+			) }
 		</PanelBody>
 	);
 };
-
-function useCommonSingleMultipleSelects() {
-	return {
-		disableCustomColors: ! useSetting( 'color.custom' ),
-		disableCustomGradients: ! useSetting( 'color.customGradient' ),
-	};
-}
 
 const PanelColorGradientSettingsSingleSelect = ( props ) => {
 	const colorGradientSettings = useCommonSingleMultipleSelects();
@@ -173,89 +225,7 @@ const PanelColorGradientSettingsSingleSelect = ( props ) => {
 };
 
 const PanelColorGradientSettingsMultipleSelect = ( props ) => {
-	const colorGradientSettings = useCommonSingleMultipleSelects();
-	const customColors = useSetting( 'color.palette.custom' );
-	const themeColors = useSetting( 'color.palette.theme' );
-	const defaultColors = useSetting( 'color.palette.default' );
-	const shouldDisplayDefaultColors = useSetting( 'color.defaultPalette' );
-
-	colorGradientSettings.colors = useMemo( () => {
-		const result = [];
-		if ( themeColors && themeColors.length ) {
-			result.push( {
-				name: _x(
-					'Theme',
-					'Indicates this palette comes from the theme.'
-				),
-				colors: themeColors,
-			} );
-		}
-		if (
-			shouldDisplayDefaultColors &&
-			defaultColors &&
-			defaultColors.length
-		) {
-			result.push( {
-				name: _x(
-					'Default',
-					'Indicates this palette comes from WordPress.'
-				),
-				colors: defaultColors,
-			} );
-		}
-		if ( customColors && customColors.length ) {
-			result.push( {
-				name: _x(
-					'Custom',
-					'Indicates this palette comes from the theme.'
-				),
-				colors: customColors,
-			} );
-		}
-		return result;
-	}, [ defaultColors, themeColors, customColors ] );
-
-	const customGradients = useSetting( 'color.gradients.custom' );
-	const themeGradients = useSetting( 'color.gradients.theme' );
-	const defaultGradients = useSetting( 'color.gradients.default' );
-	const shouldDisplayDefaultGradients = useSetting(
-		'color.defaultGradients'
-	);
-	colorGradientSettings.gradients = useMemo( () => {
-		const result = [];
-		if ( themeGradients && themeGradients.length ) {
-			result.push( {
-				name: _x(
-					'Theme',
-					'Indicates this palette comes from the theme.'
-				),
-				gradients: themeGradients,
-			} );
-		}
-		if (
-			shouldDisplayDefaultGradients &&
-			defaultGradients &&
-			defaultGradients.length
-		) {
-			result.push( {
-				name: _x(
-					'Default',
-					'Indicates this palette comes from WordPress.'
-				),
-				gradients: defaultGradients,
-			} );
-		}
-		if ( customGradients && customGradients.length ) {
-			result.push( {
-				name: _x(
-					'Custom',
-					'Indicates this palette is created by the user.'
-				),
-				gradients: customGradients,
-			} );
-		}
-		return result;
-	}, [ customGradients, themeGradients, defaultGradients ] );
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }

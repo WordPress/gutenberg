@@ -19,7 +19,7 @@ export default {
 	title: 'Components/Popover',
 	component: Popover,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

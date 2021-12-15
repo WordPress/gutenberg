@@ -7,7 +7,7 @@ import { kebabCase } from 'lodash';
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 
@@ -64,6 +64,7 @@ function Option( {
 } ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = isGradient ? element.gradient : element.color;
+
 	return (
 		<PaletteItem
 			as="div"
@@ -126,6 +127,7 @@ function Option( {
 					) }
 					{ isGradient && (
 						<CustomGradientPicker
+							__experimentalIsRenderedInSidebar
 							value={ value }
 							onChange={ ( newGradient ) =>
 								onChange( {
@@ -240,8 +242,8 @@ export default function PaletteEdit( {
 		editingElement &&
 		elements[ editingElement ] &&
 		! elements[ editingElement ].slug;
-
-	const hasElements = elements.length > 0;
+	const elementsLength = elements.length;
+	const hasElements = elementsLength > 0;
 
 	return (
 		<PaletteEditStyles>
@@ -270,13 +272,18 @@ export default function PaletteEdit( {
 									: __( 'Add color' )
 							}
 							onClick={ () => {
+								const tempOptionName = sprintf(
+									/* translators: %s: is a temporary id for a custom color */
+									__( 'Color %s ' ),
+									elementsLength + 1
+								);
 								onChange( [
 									...elements,
 									{
 										...( isGradient
 											? { gradient: DEFAULT_GRADIENT }
 											: { color: '#000' } ),
-										name: '',
+										name: tempOptionName,
 										slug: '',
 									},
 								] );
@@ -285,22 +292,8 @@ export default function PaletteEdit( {
 							} }
 						/>
 					) }
-					{ ! isEditing && (
-						<Button
-							disabled={ ! hasElements }
-							isSmall
-							icon={ moreVertical }
-							label={
-								isGradient
-									? __( 'Edit gradients' )
-									: __( 'Edit colors' )
-							}
-							onClick={ () => {
-								setIsEditing( true );
-							} }
-						/>
-					) }
-					{ isEditing && ( canReset || ! canOnlyChangeValues ) && (
+
+					{ hasElements && ( canReset || ! canOnlyChangeValues ) && (
 						<DropdownMenu
 							icon={ moreVertical }
 							label={
@@ -315,6 +308,17 @@ export default function PaletteEdit( {
 							{ ( { onClose } ) => (
 								<>
 									<NavigableMenu role="menu">
+										<Button
+											variant="tertiary"
+											disabled={ isEditing }
+											onClick={ () => {
+												setIsEditing( true );
+												onClose();
+											} }
+											className="components-palette-edit__menu-button"
+										>
+											{ __( 'Edit custom colors' ) }
+										</Button>
 										{ ! canOnlyChangeValues && (
 											<Button
 												variant="tertiary"
@@ -324,6 +328,7 @@ export default function PaletteEdit( {
 													onChange();
 													onClose();
 												} }
+												className="components-palette-edit__menu-button"
 											>
 												{ isGradient
 													? __(

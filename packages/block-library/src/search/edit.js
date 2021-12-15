@@ -103,6 +103,7 @@ export default function SearchEdit( {
 	}, [ insertedInNavigationBlock ] );
 	const borderRadius = style?.border?.radius;
 	const borderColor = style?.border?.color;
+	const borderWidth = style?.border?.width;
 	const borderProps = useBorderProps( attributes );
 
 	// Check for old deprecated numerical border radius. Done as a separate
@@ -128,7 +129,6 @@ export default function SearchEdit( {
 	const getBlockClassNames = () => {
 		return classnames(
 			className,
-			! isButtonPositionInside ? borderProps.className : undefined,
 			isButtonPositionInside
 				? 'wp-block-search__button-inside'
 				: undefined,
@@ -389,6 +389,7 @@ export default function SearchEdit( {
 	const getWrapperStyles = () => {
 		const styles = {
 			borderColor,
+			borderWidth: isButtonPositionInside ? borderWidth : undefined,
 		};
 
 		const isNonZeroBorderRadius = parseInt( borderRadius, 10 ) !== 0;

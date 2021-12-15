@@ -12,7 +12,6 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -24,6 +23,8 @@ import {
 } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
+import EditTemplateTitle from './edit-template-title';
+import { useLink } from '../routes/link';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -43,6 +44,12 @@ export default function TemplateDetails( { template, onClose } ) {
 		);
 	}, [ template ] );
 
+	const browseAllLinkProps = useLink( {
+		// TODO: We should update this to filter by template part's areas as well.
+		postType: template.type,
+		postId: undefined,
+	} );
+
 	if ( ! template ) {
 		return null;
 	}
@@ -55,13 +62,17 @@ export default function TemplateDetails( { template, onClose } ) {
 	return (
 		<div className="edit-site-template-details">
 			<div className="edit-site-template-details__group">
-				<Heading
-					level={ 4 }
-					weight={ 600 }
-					className="edit-site-template-details__title"
-				>
-					{ title }
-				</Heading>
+				{ template.is_custom ? (
+					<EditTemplateTitle template={ template } />
+				) : (
+					<Heading
+						level={ 4 }
+						weight={ 600 }
+						className="edit-site-template-details__title"
+					>
+						{ title }
+					</Heading>
+				) }
 
 				{ description && (
 					<Text
@@ -80,7 +91,7 @@ export default function TemplateDetails( { template, onClose } ) {
 				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
 					<MenuItem
 						className="edit-site-template-details__revert-button"
-						info={ __( 'Restore template to theme default' ) }
+						info={ __( 'Restore template to default state' ) }
 						onClick={ revert }
 					>
 						{ __( 'Clear customizations' ) }
@@ -90,11 +101,7 @@ export default function TemplateDetails( { template, onClose } ) {
 
 			<Button
 				className="edit-site-template-details__show-all-button"
-				href={ addQueryArgs( window.location.href, {
-					// TODO: We should update this to filter by template part's areas as well.
-					postId: undefined,
-					postType: template.type,
-				} ) }
+				{ ...browseAllLinkProps }
 			>
 				{ sprintf(
 					/* translators: the template part's area name ("Headers", "Sidebars") or "templates". */

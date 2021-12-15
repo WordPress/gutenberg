@@ -14,7 +14,7 @@ Anchors let you link directly to a specific block on a page. This property adds 
 ```js
 // Declare support for anchor links.
 supports: {
-	anchor: true;
+	anchor: true
 }
 ```
 
@@ -30,14 +30,14 @@ supports: {
 	// Declare support for block's alignment.
 	// This adds support for all the options:
 	// left, center, right, wide, and full.
-	align: true;
+	align: true
 }
 ```
 
 ```js
 supports: {
 	// Declare support for specific alignment options.
-	align: [ 'left', 'right', 'full' ];
+	align: [ 'left', 'right', 'full' ]
 }
 ```
 
@@ -62,7 +62,7 @@ This property allows to enable [wide alignment](/docs/how-to-guides/themes/theme
 ```js
 supports: {
 	// Remove the support for wide alignment.
-	alignWide: false;
+	alignWide: false
 }
 ```
 
@@ -76,7 +76,7 @@ By default, the class `.wp-block-your-block-name` is added to the root element o
 ```js
 supports: {
 	// Remove the support for the generated className.
-	className: false;
+	className: false
 }
 ```
 
@@ -99,7 +99,7 @@ Note that the `background` and `text` keys have a default value of `true`, so if
 supports: {
 	color: {
 		// This also enables text and background UI controls.
-		gradients: true; // Enable gradients UI control.
+		gradients: true // Enable gradients UI control.
 	}
 }
 ```
@@ -406,7 +406,7 @@ This property adds a field to define a custom className for the block's wrapper.
 ```js
 supports: {
 	// Remove the support for the custom className.
-	customClassName: false;
+	customClassName: false
 }
 ```
 
@@ -420,7 +420,7 @@ When the style picker is shown, the user can set a default style for a block typ
 ```js
 supports: {
 	// Remove the Default Style picker.
-	defaultStylePicker: false;
+	defaultStylePicker: false
 }
 ```
 
@@ -434,7 +434,7 @@ By default, a block's markup can be edited individually. To disable this behavio
 ```js
 supports: {
 	// Remove support for an HTML mode.
-	html: false;
+	html: false
 }
 ```
 
@@ -448,7 +448,7 @@ By default, all blocks will appear in the inserter. To hide a block so that it c
 ```js
 supports: {
 	// Hide this block from the inserter.
-	inserter: false;
+	inserter: false
 }
 ```
 
@@ -462,7 +462,7 @@ A non-multiple block can be inserted into each post, one time only. For example,
 ```js
 supports: {
 	// Use the block just once per post
-	multiple: false;
+	multiple: false
 }
 ```
 

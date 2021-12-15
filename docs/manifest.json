@@ -218,26 +218,8 @@
 	{
 		"title": "Formatting Toolbar API",
 		"slug": "format-api",
-		"markdown_source": "../docs/how-to-guides/format-api/README.md",
+		"markdown_source": "../docs/how-to-guides/format-api.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Register a New Format",
-		"slug": "1-register-format",
-		"markdown_source": "../docs/how-to-guides/format-api/1-register-format.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Add a Button to the Toolbar",
-		"slug": "2-toolbar-button",
-		"markdown_source": "../docs/how-to-guides/format-api/2-toolbar-button.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Apply the Format When the Button Is Clicked",
-		"slug": "3-apply-format",
-		"markdown_source": "../docs/how-to-guides/format-api/3-apply-format.md",
-		"parent": "format-api"
 	},
 	{
 		"title": "Getting Started with JavaScript",
@@ -334,12 +316,6 @@
 		"slug": "meta-block-5-finishing",
 		"markdown_source": "../docs/how-to-guides/metabox/meta-block-5-finishing.md",
 		"parent": "metabox"
-	},
-	{
-		"title": "A first-time setup guide to native mobile development (OSX)",
-		"slug": "osx-setup-guide",
-		"markdown_source": "../docs/how-to-guides/native-mobile/osx-setup-guide.md",
-		"parent": "how-to-guides"
 	},
 	{
 		"title": "Notices",
@@ -2040,22 +2016,28 @@
 		"parent": "code"
 	},
 	{
-		"title": "React Native based mobile Gutenberg",
-		"slug": "native-mobile",
-		"markdown_source": "../docs/contributors/code/native-mobile.md",
-		"parent": "code"
-	},
-	{
-		"title": "React Native Integration Test Guide",
-		"slug": "native-mobile-integration-test-guide",
-		"markdown_source": "../docs/contributors/code/native-mobile-integration-test-guide.md",
+		"title": "React Native mobile editor",
+		"slug": "react-native",
+		"markdown_source": "../docs/contributors/code/react-native/README.md",
 		"parent": "code"
 	},
 	{
 		"title": "Getting Started for the React Native based Mobile Gutenberg",
-		"slug": "getting-started-native-mobile",
-		"markdown_source": "../docs/contributors/code/getting-started-native-mobile.md",
-		"parent": "code"
+		"slug": "getting-started-react-native",
+		"markdown_source": "../docs/contributors/code/react-native/getting-started-react-native.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "Setup guide for React Native development (macOS)",
+		"slug": "osx-setup-guide",
+		"markdown_source": "../docs/contributors/code/react-native/osx-setup-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "React Native Integration Test Guide",
+		"slug": "integration-test-guide",
+		"markdown_source": "../docs/contributors/code/react-native/integration-test-guide.md",
+		"parent": "react-native"
 	},
 	{
 		"title": "Design Contributions",

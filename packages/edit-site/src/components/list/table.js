@@ -8,12 +8,13 @@ import {
 	VisuallyHidden,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import Link from '../routes/link';
 import Actions from './actions';
+import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
 	const { templates, isLoading, postType } = useSelect(
@@ -91,20 +92,24 @@ export default function Table( { templateType } ) {
 					>
 						<td className="edit-site-list-table-column" role="cell">
 							<Heading level={ 4 }>
-								<a
-									href={ addQueryArgs( window.location.href, {
+								<Link
+									params={ {
 										postId: template.id,
 										postType: template.type,
-									} ) }
+									} }
 								>
-									{ template.title.rendered }
-								</a>
+									{ template.title?.rendered ||
+										template.slug }
+								</Link>
 							</Heading>
 							{ template.description }
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
-							{ template.theme }
+							<AddedBy
+								templateType={ templateType }
+								template={ template }
+							/>
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
 							<Actions template={ template } />

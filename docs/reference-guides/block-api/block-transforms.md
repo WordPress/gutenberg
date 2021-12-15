@@ -264,7 +264,7 @@ This type of transformations support the _from_ direction, allowing blocks to be
 
 A transformation of type `prefix` is an object that takes the following parameters:
 
--   **type** _(string)_: the value `files`.
+-   **type** _(string)_: the value `prefix`.
 -   **prefix** _(string)_: the character or sequence of characters that match this transfrom.
 -   **transform** _(function)_: a callback that receives the content introduced. It should return a block object or an array of block objects.
 -   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
