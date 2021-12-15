@@ -1168,7 +1168,7 @@ class WP_Theme_JSON_Gutenberg {
 			$new_key = $prefix . str_replace(
 				'/',
 				'-',
-				strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case.
+				strtolower( _wp_to_kebab_case( $property ) )
 			);
 
 			if ( is_array( $value ) ) {
