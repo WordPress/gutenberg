@@ -57,22 +57,44 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				return;
 			}
 
-			const resizeObserver = new iframe.contentWindow.ResizeObserver(
-				() => {
-					setHeight(
-						iframe.contentDocument.querySelector(
-							`.edit-site-block-editor__block-list`
-						).offsetHeight
+			let animationFrame = null;
+
+			function resizeHeight() {
+				if ( ! animationFrame ) {
+					// Throttle the updates on animation frame.
+					animationFrame = iframe.contentWindow.requestAnimationFrame(
+						() => {
+							setHeight(
+								iframe.contentDocument.querySelector(
+									`.edit-site-block-editor__block-list`
+								).scrollHeight
+							);
+							animationFrame = null;
+						}
 					);
 				}
+			}
+
+			const resizeObserver = new iframe.contentWindow.ResizeObserver(
+				resizeHeight
+			);
+			const mutationObserver = new iframe.contentWindow.MutationObserver(
+				resizeHeight
 			);
 
 			// Observing the <html> rather than the <body> because the latter
 			// gets destroyed and remounted after initialization in <Iframe>.
 			resizeObserver.observe( iframe.contentDocument.documentElement );
+			mutationObserver.observe( iframe.contentDocument.documentElement, {
+				subtree: true,
+				childList: true,
+				characterData: true,
+			} );
 
 			return () => {
+				iframe.contentWindow?.cancelAnimationFrame( animationFrame );
 				resizeObserver.disconnect();
+				mutationObserver.disconnect();
 			};
 		},
 		[ enableResizing ]
