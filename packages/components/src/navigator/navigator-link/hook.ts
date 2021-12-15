@@ -21,19 +21,22 @@ export function useNavigatorLink(
 		onClick,
 		as = 'button',
 		attributeName = 'id',
-		selectorFactory = cssSelectorForAttribute,
 		...otherProps
 	} = useContextSystem( props, 'NavigatorLink' );
 
 	const { push } = useNavigator();
-	const focusTargetSelector = selectorFactory( attributeName, path );
 	const handleClick: React.MouseEventHandler< HTMLElement > = useCallback(
 		( e ) => {
 			e.preventDefault();
-			push( path, { focusTargetSelector } );
+			push( path, {
+				focusTargetSelector: cssSelectorForAttribute(
+					attributeName,
+					path
+				),
+			} );
 			onClick?.( e );
 		},
-		[ push, selectorFactory, onClick ]
+		[ push, onClick ]
 	);
 
 	return {

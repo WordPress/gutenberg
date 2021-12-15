@@ -68,14 +68,4 @@ export type NavigatorLinkProps = NavigatorBackLinkProps & {
 	 * @default 'id'
 	 */
 	attributeName?: string;
-	/**
-	 * A function that generates the CSS selector used ny `Navigator` when
-	 * restoring focus.
-	 *
-	 * @default ( attrName, attrValue ) => `[${ attrName }="${ attrValue }"]`;
-	 */
-	selectorFactory?: (
-		attributeName: string,
-		attributeValue: string
-	) => string;
 };
