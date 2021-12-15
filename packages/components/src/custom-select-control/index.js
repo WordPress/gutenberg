@@ -155,64 +155,62 @@ export default function CustomSelectControl( {
 					{ label }
 				</label>
 			) }
-			<div className="components-custom-select-control__inner">
-				<Button
-					ref={ anchorRef }
-					{ ...getToggleButtonProps( {
-						// This is needed because some speech recognition software don't support `aria-labelledby`.
-						'aria-label': label,
-						'aria-labelledby': undefined,
-						className: 'components-custom-select-control__button',
-						isSmall: true,
-						describedBy: getDescribedBy(),
-					} ) }
-				>
-					{ buttonResizeListener }
-					{ itemToString( selectedItem ) }
-					<Icon
-						icon={ chevronDown }
-						className="components-custom-select-control__button-icon"
-					/>
-				</Button>
-				<OptionList isOpen={ isOpen } anchorRef={ anchorRef }>
-					<ul { ...menuProps }>
-						{ isOpen &&
-							items.map( ( item, index ) => (
-								// eslint-disable-next-line react/jsx-key
-								<li
-									{ ...getItemProps( {
-										item,
-										index,
-										key: item.key,
-										className: classnames(
-											item.className,
-											'components-custom-select-control__item',
-											{
-												'is-highlighted':
-													index === highlightedIndex,
-												'has-hint': !! item.__experimentalHint,
-											}
-										),
-										style: item.style,
-									} ) }
-								>
-									{ item.name }
-									{ item.__experimentalHint && (
-										<span className="components-custom-select-control__item-hint">
-											{ item.__experimentalHint }
-										</span>
-									) }
-									{ item === selectedItem && (
-										<Icon
-											icon={ check }
-											className="components-custom-select-control__item-icon"
-										/>
-									) }
-								</li>
-							) ) }
-					</ul>
-				</OptionList>
-			</div>
+			<Button
+				ref={ anchorRef }
+				{ ...getToggleButtonProps( {
+					// This is needed because some speech recognition software don't support `aria-labelledby`.
+					'aria-label': label,
+					'aria-labelledby': undefined,
+					className: 'components-custom-select-control__button',
+					isSmall: true,
+					describedBy: getDescribedBy(),
+				} ) }
+			>
+				{ buttonResizeListener }
+				{ itemToString( selectedItem ) }
+				<Icon
+					icon={ chevronDown }
+					className="components-custom-select-control__button-icon"
+				/>
+			</Button>
+			<OptionList isOpen={ isOpen } anchorRef={ anchorRef }>
+				<ul { ...menuProps }>
+					{ isOpen &&
+						items.map( ( item, index ) => (
+							// eslint-disable-next-line react/jsx-key
+							<li
+								{ ...getItemProps( {
+									item,
+									index,
+									key: item.key,
+									className: classnames(
+										item.className,
+										'components-custom-select-control__item',
+										{
+											'is-highlighted':
+												index === highlightedIndex,
+											'has-hint': !! item.__experimentalHint,
+										}
+									),
+									style: item.style,
+								} ) }
+							>
+								{ item.name }
+								{ item.__experimentalHint && (
+									<span className="components-custom-select-control__item-hint">
+										{ item.__experimentalHint }
+									</span>
+								) }
+								{ item === selectedItem && (
+									<Icon
+										icon={ check }
+										className="components-custom-select-control__item-icon"
+									/>
+								) }
+							</li>
+						) ) }
+				</ul>
+			</OptionList>
 		</div>
 	);
 }
