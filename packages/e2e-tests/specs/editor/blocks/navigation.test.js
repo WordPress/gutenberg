@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import {
+	clickButton,
+	clickOnMoreMenuItem,
 	createJSONResponse,
 	createNewPost,
 	createMenu as createClassicMenu,
@@ -195,6 +197,10 @@ async function getNavigationMenuRawContent() {
 
 		return navigationBlock.attributes.ref;
 	} );
+
+	if ( ! menuRef ) {
+		throw 'getNavigationMenuRawContent was unable to find a ref attribute on the first navigation block';
+	}
 
 	const response = await rest( {
 		method: 'GET',
@@ -579,6 +585,31 @@ describe( 'Navigation', () => {
 		// Expect the quick inserter to be truthy, which it will be because we
 		// waited for it. It's nice to end a test with an assertion though.
 		expect( quickInserter ).toBeTruthy();
+	} );
+
+	it( 'supports navigation blocks that have inner blocks within their markup and converts them to wp_navigation posts', async () => {
+		// Insert 'old-school' inner blocks via the code editor.
+		await createNewPost();
+		await clickOnMoreMenuItem( 'Code editor' );
+		const codeEditorInput = await page.waitForSelector(
+			'.editor-post-text-editor'
+		);
+		await codeEditorInput.click();
+		const markup =
+			'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
+		await page.keyboard.type( markup );
+		await clickButton( 'Exit code editor' );
+		const navBlock = await page.waitForSelector(
+			'nav[aria-label="Block: Navigation"]'
+		);
+		// Select the block to convert to a wp_navigation and publish.
+		// The select menu button shows up when saving is complete.
+		await navBlock.click();
+		await page.waitForSelector( 'button[aria-label="Select Menu"]' );
+		await publishPost();
+
+		// Check that the wp_navigation post has the page list block.
+		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
 	// The following tests are unstable, roughly around when https://github.com/WordPress/wordpress-develop/pull/1412
