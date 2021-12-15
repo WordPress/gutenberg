@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, uniqueId } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -343,7 +343,8 @@ function Navigation( {
 				return;
 			}
 
-			noticeRef.current = uniqueId( 'navBlockNoEditPermissions' );
+			noticeRef.current =
+				'block-library/core/navigation/permissions/update';
 
 			createWarningNotice(
 				__(
