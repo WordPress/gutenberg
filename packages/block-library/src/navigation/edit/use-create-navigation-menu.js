@@ -25,7 +25,7 @@ export default function useCreateNavigationMenu( clientId ) {
 			const record = {
 				title,
 				content: serialize( blocks ),
-				status: 'draft',
+				status: 'publish',
 			};
 
 			return await saveEntityRecord(
