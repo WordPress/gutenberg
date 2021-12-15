@@ -191,17 +191,17 @@ class BottomSheetCell extends Component {
 			}
 		};
 
-		const setTextInputValue = (text) => {
-			this.setState({ localValue: text });
-			this.props.onChangeValue(text);
-		}
+		const setTextInputValue = ( text ) => {
+			this.setState( { localValue: text } );
+			this.props.onChangeValue( text );
+		};
 
 		const clearButton = () => {
 			return (
 				<>
-					{this.state.localValue !== '' &&
+					{ this.state.localValue !== '' && (
 						<TouchableOpacity
-							onPress={() => setTextInputValue('')}
+							onPress={ () => setTextInputValue( '' ) }
 						>
 							<Icon
 								icon={ isIOS ? cancelCircleFilled : close }
@@ -209,10 +209,10 @@ class BottomSheetCell extends Component {
 								size={ 24 }
 							/>
 						</TouchableOpacity>
-					}
+					) }
 				</>
-			)
-		}
+			);
+		};
 
 		const separatorStyle = () => {
 			//eslint-disable-next-line @wordpress/no-unused-vars-before-return
@@ -262,7 +262,7 @@ class BottomSheetCell extends Component {
 			// We also show the TextInput to display placeholder.
 			const shouldShowPlaceholder = isValueEditable && value === '';
 			return this.state.isEditingValue || shouldShowPlaceholder ? (
-				<View style={styles.cellTextInputContainer}>
+				<View style={ styles.cellTextInputContainer }>
 					<TextInput
 						ref={ ( c ) => ( this._valueTextInput = c ) }
 						numberOfLines={ 1 }
@@ -270,7 +270,7 @@ class BottomSheetCell extends Component {
 						value={ this.state.localValue }
 						placeholder={ valuePlaceholder }
 						placeholderTextColor={ '#87a6bc' }
-						onChangeText={(text) => setTextInputValue(text)}
+						onChangeText={ ( text ) => setTextInputValue( text ) }
 						editable={ isValueEditable }
 						pointerEvents={
 							this.state.isEditingValue ? 'auto' : 'none'
@@ -281,7 +281,7 @@ class BottomSheetCell extends Component {
 						keyboardType={ this.typeToKeyboardType( type, step ) }
 						{ ...valueProps }
 					/>
-					{displayClearButton && clearButton()}
+					{ displayClearButton && clearButton() }
 				</View>
 			) : (
 				<Text
