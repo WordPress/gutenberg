@@ -813,7 +813,7 @@ describe( 'Navigation', () => {
 
 			// Make sure the snackbar error shows up
 			await page.waitForXPath(
-				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Navigation. Any edits made will not be saved." ]`
+				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
 
 			// Tidy up after ourselves.
