@@ -57,6 +57,25 @@ const BottomSheetNavigationScreen = ( {
 				onHandleHardwareButtonPress( null );
 				return false;
 			} );
+			/**
+			 * TODO: onHandleHardwareButtonPress stores a single value, which means
+			 * future invocations from sibling screens can replace the callback for
+			 * the currently active screen. Currently, the empty dependency array
+			 * passed to useCallback here is what prevents erroneous callback
+			 * replacements, but leveraging memoization to achieve this is brittle and
+			 * explicitly discouraged in the React documentation.
+			 * https://reactjs.org/docs/hooks-reference.html#usememo
+			 *
+			 * Ideally, we refactor onHandleHardwareButtonPress to manage multiple
+			 * callbacks triggered based upon which screen is currently active.
+			 *
+			 * Related: https://git.io/JD2no
+			 */
+		}, [] )
+	);
+
+	useFocusEffect(
+		useCallback( () => {
 			if ( fullScreen ) {
 				setHeight( '100%' );
 				setIsFullScreen( true );
@@ -67,6 +86,7 @@ const BottomSheetNavigationScreen = ( {
 			return () => {};
 		}, [ setHeight ] )
 	);
+
 	const onLayout = ( { nativeEvent } ) => {
 		if ( fullScreen ) {
 			return;
@@ -78,6 +98,7 @@ const BottomSheetNavigationScreen = ( {
 			setHeightDebounce( height );
 		}
 	};
+
 	return useMemo( () => {
 		return isScrollable || isNested ? (
 			<View
