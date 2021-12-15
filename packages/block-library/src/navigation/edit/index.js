@@ -348,7 +348,7 @@ function Navigation( {
 
 			createWarningNotice(
 				__(
-					'You do not have permission to edit this Navigation. Any edits made will not be saved.'
+					'You do not have permission to edit this Menu. Any changes made will not be saved.'
 				),
 				{
 					id: noticeRef.current,
