@@ -10,9 +10,9 @@ import { lowerCase, startsWith } from 'lodash';
  */
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet } from '@wordpress/components';
 import { getProtocol, isURL, prependHTTP } from '@wordpress/url';
-import { link, cancelCircleFilled } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -74,18 +74,9 @@ export const LinkPicker = ( {
 		pickLink( directEntry );
 	};
 
-	const clear = () => {
-		setValue( { value: '', clipboardUrl } );
-	};
-
 	const omniCellStyle = usePreferredColorSchemeStyle(
 		styles.omniCell,
 		styles.omniCellDark
-	);
-
-	const iconStyle = usePreferredColorSchemeStyle(
-		styles.icon,
-		styles.iconDark
 	);
 
 	useEffect( () => {
@@ -105,6 +96,7 @@ export const LinkPicker = ( {
 			</NavBar>
 			<View style={ styles.contentContainer }>
 				<BottomSheet.Cell
+					displayClearButton={ true }
 					icon={ link }
 					style={ omniCellStyle }
 					valueStyle={ styles.omniInput }
@@ -120,20 +112,7 @@ export const LinkPicker = ( {
 					/* eslint-disable-next-line jsx-a11y/no-autofocus */
 					autoFocus
 					separatorType="none"
-				>
-					{ value !== '' && (
-						<TouchableOpacity
-							onPress={ clear }
-							style={ styles.clearIcon }
-						>
-							<Icon
-								icon={ cancelCircleFilled }
-								fill={ iconStyle.color }
-								size={ 24 }
-							/>
-						</TouchableOpacity>
-					) }
-				</BottomSheet.Cell>
+				/>
 				{ !! clipboardUrl && clipboardUrl !== value && (
 					<BottomSheet.LinkSuggestionItemCell
 						accessible
