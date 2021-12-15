@@ -45,8 +45,8 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const [ currentPath ] = useContext( NavigatorContext );
-	const isMatch = currentPath.path === path;
+	const { location } = useContext( NavigatorContext );
+	const isMatch = location.path === path;
 	const ref = useFocusOnMount();
 
 	const cx = useCx();
@@ -95,8 +95,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const initial = {
 		opacity: 0,
 		x:
-			( isRTL() && currentPath.isBack ) ||
-			( ! isRTL() && ! currentPath.isBack )
+			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
 				? 50
 				: -50,
 	};
@@ -104,8 +103,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 		delay: animationExitDelay,
 		opacity: 0,
 		x:
-			( ! isRTL() && currentPath.isBack ) ||
-			( isRTL() && ! currentPath.isBack )
+			( ! isRTL() && location.isBack ) || ( isRTL() && ! location.isBack )
 				? 50
 				: -50,
 		transition: {
