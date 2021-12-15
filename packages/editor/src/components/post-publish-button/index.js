@@ -45,7 +45,7 @@ export class PostPublishButton extends Component {
 				hasNonPostEntityChanges,
 				setEntitiesSavedStatesCallback,
 			} = this.props;
-			// If a post with non-post entitities is published, but the user
+			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
 			// We also need to check that the `setEntitiesSavedStatesCallback`
