@@ -207,6 +207,17 @@ async function getNavigationMenuRawContent() {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
+	let username;
+	let contribUserPassword;
+
+	beforeAll( async () => {
+		username = 'contributoruser';
+
+		contribUserPassword = await createUser( username, {
+			role: 'contributor',
+		} );
+	} );
+
 	beforeEach( async () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
@@ -227,6 +238,8 @@ describe( 'Navigation', () => {
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
+
+		await deleteUser( username );
 	} );
 
 	describe( 'placeholder', () => {
@@ -787,12 +800,6 @@ describe( 'Navigation', () => {
 			// The Post itself is irrelevant.
 			await publishPost();
 
-			const username = 'contributoruser';
-
-			const contribUserPassword = await createUser( username, {
-				role: 'contributor',
-			} );
-
 			// Switch to a Contributor role user - they should not have
 			// permission to update Navigations.
 			await loginUser( username, contribUserPassword );
@@ -815,9 +822,6 @@ describe( 'Navigation', () => {
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
-
-			// Tidy up after ourselves.
-			await deleteUser( username );
 
 			// Expect a console 403 for request to Navigation Areas for lower permisison users.
 			// This is because reading requires the `edit_theme_options` capability
