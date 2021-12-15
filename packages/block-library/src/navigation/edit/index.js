@@ -26,11 +26,7 @@ import {
 	getColorClassName,
 	Warning,
 } from '@wordpress/block-editor';
-import {
-	EntityProvider,
-	useEntityProp,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { EntityProvider, useEntityProp } from '@wordpress/core-data';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -150,15 +146,7 @@ function Navigation( {
 		`navigationMenu/${ ref }`
 	);
 
-	const {
-		canUserUpdateNavigationEntity,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserDeleteNavigationEntity,
-		hasResolvedCanUserDeleteNavigationEntity,
-		innerBlocks,
-		isInnerBlockSelected,
-		hasSubmenus,
-	} = useSelect(
+	const { innerBlocks, isInnerBlockSelected, hasSubmenus } = useSelect(
 		( select ) => {
 			const { getBlocks, hasSelectedInnerBlock } = select(
 				blockEditorStore
@@ -168,26 +156,10 @@ function Navigation( {
 				( block ) => block.name === 'core/navigation-submenu'
 			);
 
-			const { canUser, hasFinishedResolution } = select( coreStore );
-
 			return {
 				hasSubmenus: firstSubmenu,
 				innerBlocks: blocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
-				canUserUpdateNavigationEntity: ref
-					? canUser( 'update', 'navigation', ref )
-					: undefined,
-				hasResolvedCanUserUpdateNavigationEntity: hasFinishedResolution(
-					'canUser',
-					[ 'update', 'navigation', ref ]
-				),
-				canUserDeleteNavigationEntity: ref
-					? canUser( 'delete', 'navigation', ref )
-					: undefined,
-				hasResolvedCanUserDeleteNavigationEntity: hasFinishedResolution(
-					'canUser',
-					[ 'delete', 'navigation', ref ]
-				),
 			};
 		},
 		[ clientId, ref ]
@@ -223,6 +195,10 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
+		canUserUpdateNavigationEntity,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserDeleteNavigationEntity,
+		hasResolvedCanUserDeleteNavigationEntity,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
