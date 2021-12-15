@@ -4,6 +4,7 @@ import Foundation
 import UIKit
 
 class RCTAztecView: Aztec.TextView {
+    let isForGutenberg = true
     @objc var onBackspace: RCTBubblingEventBlock? = nil
     @objc var onChange: RCTBubblingEventBlock? = nil
     @objc var onKeyDown: RCTBubblingEventBlock? = nil
@@ -102,6 +103,7 @@ class RCTAztecView: Aztec.TextView {
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontFamily: String? = nil
 
+    // TODO: does this comment need to be updated? is this still true?
     /// Font size for all contents.  Once this is set, it will always override the font size for all of its
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontSize: CGFloat? = nil
