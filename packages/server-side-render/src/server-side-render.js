@@ -7,7 +7,13 @@ import { isEqual } from 'lodash';
  * WordPress dependencies
  */
 import { useDebounce, usePrevious } from '@wordpress/compose';
-import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	RawHTML,
+	useEffect,
+	useRef,
+	useState,
+	useCallback,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -81,7 +87,7 @@ export default function ServerSideRender( props ) {
 	const prevProps = usePrevious( props );
 	const [ isLoading, setIsLoading ] = useState( false );
 
-	function fetchData() {
+	const fetchData = useCallback( () => {
 		if ( ! isMountedRef.current ) {
 			return;
 		}
@@ -140,7 +146,7 @@ export default function ServerSideRender( props ) {
 			} ) );
 
 		return fetchRequest;
-	}
+	}, [ isMountedRef, prevProps ] );
 
 	const debouncedFetchData = useDebounce( fetchData, 500 );
 
