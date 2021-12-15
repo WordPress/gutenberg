@@ -67,7 +67,7 @@ A callback function which receives a Date object representing a day as an argume
 
 ### onMonthPreviewed
 
-A callback function to display a new date and keep the focus on the calendar view while changing month.
+A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
 
 - Type: `Function`
 - Required: No
