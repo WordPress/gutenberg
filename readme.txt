@@ -19,7 +19,7 @@ The block editor first became available in December 2018. We’re always hard at
 
 - **User Documentation:** Review the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor documentation</a> for detailed instructions on using the editor as an author to create posts, pages, and more.
 
-- **Developer Documentation:** Explore the <a href="https://developer.wordpress.org/block-editor/developers/">Developer Documentation</a> for extensive tutorials, documentation, and API references on how to extend the editor.
+- **Developer Documentation:** Explore the <a href="https://developer.wordpress.org/block-editor/">Developer Documentation</a> for extensive tutorials, documentation, and API references on how to extend the editor.
 
 - **Contributors:** Gutenberg is an open-source project and welcomes all contributors from code to design, from documentation to triage. See the <a href="https://developer.wordpress.org/block-editor/contributors/">Contributor's Handbook</a> for all the details on how you can help.
 

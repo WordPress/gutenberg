@@ -54,7 +54,7 @@ add_action( 'init', 'register_block_core_post_comments_form' );
  *
  * @return array Returns the modified fields.
  */
-function gutenberg_comment_form_block_form_defaults( $fields ) {
+function post_comments_form_block_form_defaults( $fields ) {
 	if ( wp_is_block_theme() ) {
 		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link" value="%4$s" />';
 		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';
@@ -62,4 +62,4 @@ function gutenberg_comment_form_block_form_defaults( $fields ) {
 
 	return $fields;
 }
-add_filter( 'comment_form_defaults', 'gutenberg_comment_form_block_form_defaults' );
+add_filter( 'comment_form_defaults', 'post_comments_form_block_form_defaults' );

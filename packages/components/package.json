@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "19.1.4",
+	"version": "19.1.5",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -68,9 +68,6 @@
 		"reakit": "^1.3.8",
 		"rememo": "^3.0.0",
 		"uuid": "^8.3.0"
-	},
-	"peerDependencies": {
-		"reakit-utils": "^0.15.1"
 	},
 	"publishConfig": {
 		"access": "public"
