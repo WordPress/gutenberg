@@ -336,7 +336,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function delete_item( $request ) {
 		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
-		if ( ! $template ) {
+		if ( ! $template || $template->id !== $request['id'] ) { // Make sure there is a template for this ID (and not just a fallback one).
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 		if ( 'custom' !== $template->source ) {
