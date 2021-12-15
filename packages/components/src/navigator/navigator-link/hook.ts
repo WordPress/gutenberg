@@ -7,6 +7,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import Button from '../../button';
 import useNavigator from '../use-navigator';
 import type { NavigatorLinkProps } from '../types';
 
@@ -19,7 +20,7 @@ export function useNavigatorLink(
 	const {
 		path,
 		onClick,
-		as = 'button',
+		as = Button,
 		attributeName = 'id',
 		...otherProps
 	} = useContextSystem( props, 'NavigatorLink' );

@@ -19,7 +19,6 @@ import {
 	FlexItem,
 	Modal,
 	TabPanel,
-	Button,
 	Card,
 	CardHeader,
 	CardBody,
@@ -55,34 +54,6 @@ import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
-
-// function NavigationButton( { as: Tag = Button, path, ...props } ) {
-// 	const { push } = useNavigator();
-
-// 	const dataAttrName = 'data-navigator-focusable-id';
-// 	const dataAttrValue = path;
-
-// 	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
-
-// 	const tagProps = {
-// 		...props,
-// 		[ dataAttrName ]: dataAttrValue,
-// 	};
-
-// 	return (
-// 		<Tag
-// 			onClick={ () =>
-// 				push( path, { focusTargetSelector: dataAttrCssSelector } )
-// 			}
-// 			{ ...tagProps }
-// 		/>
-// 	);
-// }
-
-// function NavigationBackButton( { as: Tag = Button, ...props } ) {
-// 	const { pop } = useNavigator();
-// 	return <Tag onClick={ pop } { ...props } />;
-// }
 
 export default function PreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -391,7 +362,6 @@ export default function PreferencesModal() {
 									gap="6"
 								>
 									<NavigatorBackLink
-										as={ Button }
 										icon={
 											isRTL() ? chevronRight : chevronLeft
 										}

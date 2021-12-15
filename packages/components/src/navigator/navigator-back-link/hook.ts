@@ -7,13 +7,14 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import Button from '../../button';
 import useNavigator from '../use-navigator';
 import type { NavigatorBackLinkProps } from '../types';
 
 export function useNavigatorBackLink(
 	props: WordPressComponentProps< NavigatorBackLinkProps, 'button' >
 ) {
-	const { onClick, as = 'button', ...otherProps } = useContextSystem(
+	const { onClick, as = Button, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorBackLink'
 	);

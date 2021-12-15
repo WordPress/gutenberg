@@ -23,14 +23,6 @@ export default {
 	component: NavigatorProvider,
 };
 
-function NavigatorButton( props ) {
-	return <NavigatorLink as={ Button } variant="secondary" { ...props } />;
-}
-
-function NavigatorBackButton( props ) {
-	return <NavigatorBackLink as={ Button } variant="secondary" { ...props } />;
-}
-
 const MyNavigation = () => {
 	const cx = useCx();
 	return (
@@ -44,17 +36,20 @@ const MyNavigation = () => {
 						<p>This is the home screen.</p>
 
 						<HStack justify="flex-start" wrap>
-							<NavigatorButton path="/child">
+							<NavigatorLink variant="secondary" path="/child">
 								Navigate to child screen.
-							</NavigatorButton>
+							</NavigatorLink>
 
-							<NavigatorButton path="/overflow-child">
+							<NavigatorLink
+								variant="secondary"
+								path="/overflow-child"
+							>
 								Navigate to screen with horizontal overflow.
-							</NavigatorButton>
+							</NavigatorLink>
 
-							<NavigatorButton path="/stickies">
+							<NavigatorLink variant="secondary" path="/stickies">
 								Navigate to screen with sticky content.
-							</NavigatorButton>
+							</NavigatorLink>
 
 							<Flyout
 								trigger={
@@ -76,7 +71,9 @@ const MyNavigation = () => {
 				<Card>
 					<CardBody>
 						<p>This is the child screen.</p>
-						<NavigatorBackButton>Go back</NavigatorBackButton>
+						<NavigatorBackLink variant="secondary">
+							Go back
+						</NavigatorBackLink>
 					</CardBody>
 				</Card>
 			</NavigatorScreen>
@@ -84,7 +81,9 @@ const MyNavigation = () => {
 			<NavigatorScreen path="/overflow-child">
 				<Card>
 					<CardBody>
-						<NavigatorBackButton>Go back</NavigatorBackButton>
+						<NavigatorBackLink variant="secondary">
+							Go back
+						</NavigatorBackLink>
 						<div
 							className={ cx(
 								css( `
@@ -112,7 +111,9 @@ const MyNavigation = () => {
 			<NavigatorScreen path="/stickies">
 				<Card>
 					<Sticky as={ CardHeader } z="2">
-						<NavigatorBackButton>Go back</NavigatorBackButton>
+						<NavigatorBackLink variant="secondary">
+							Go back
+						</NavigatorBackLink>
 					</Sticky>
 					<CardBody>
 						<Sticky top="69px" colors="papayawhip/peachpuff">
