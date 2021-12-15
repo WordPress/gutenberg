@@ -611,12 +611,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
 	}
 
-	function test_get_stylesheet_generates_proper_classes_from_slugs() {
+	function test_get_stylesheet_generates_proper_classes_and_css_vars_from_slugs() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'color' => array(
+					'color'  => array(
 						'palette' => array(
 							array(
 								'slug'  => 'grey',
@@ -636,6 +636,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
+					'custom' => array(
+						'white2black' => 'value',
+					),
 				),
 			)
 		);
@@ -645,7 +648,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			$theme_json->get_stylesheet( array( 'presets' ) )
 		);
 		$this->assertEquals(
-			'body{--wp--preset--color--grey: grey;--wp--preset--color--dark-grey: grey;--wp--preset--color--light-grey: grey;--wp--preset--color--white-2-black: grey;}',
+			'body{--wp--preset--color--grey: grey;--wp--preset--color--dark-grey: grey;--wp--preset--color--light-grey: grey;--wp--preset--color--white-2-black: grey;--wp--custom--white-2-black: value;}',
 			$theme_json->get_stylesheet( array( 'variables' ) )
 		);
 
