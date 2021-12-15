@@ -4,7 +4,7 @@
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { RadioGroup, useRadioState } from 'reakit';
+import { RadioGroup, useRadioState } from 'ariakit/radio';
 import useResizeAware from 'react-resize-aware';
 
 /**
@@ -12,7 +12,7 @@ import useResizeAware from 'react-resize-aware';
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useMemo } from '@wordpress/element';
-import { useMergeRefs, useInstanceId, usePrevious } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
-import { useUpdateEffect, useCx } from '../../utils/hooks';
+import { useCx } from '../../utils/hooks';
 import { View } from '../../view';
 import BaseControl from '../../base-control';
 import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
@@ -44,38 +44,17 @@ function ToggleGroupControl(
 		hideLabelFromVision = false,
 		help,
 		onChange = noop,
-		value,
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeAware();
-	const baseId = useInstanceId(
-		ToggleGroupControl,
-		'toggle-group-control'
-	).toString();
-	const radio = useRadioState( {
-		baseId,
-		state: value,
-	} );
-	const previousValue = usePrevious( value );
-
-	// Propagate radio.state change
-	useUpdateEffect( () => {
-		// Avoid calling onChange if radio state changed
-		// from incoming value.
-		if ( previousValue !== radio.state ) {
-			onChange( radio.state );
-		}
-	}, [ radio.state ] );
-
-	// Sync incoming value with radio.state
-	useUpdateEffect( () => {
-		if ( value !== radio.state ) {
-			radio.setState( value );
-		}
-	}, [ value ] );
+	const value =
+		'value' in otherProps && otherProps.value === undefined
+			? null
+			: otherProps.value;
+	const radio = useRadioState( { value, setValue: onChange } );
 
 	const classes = useMemo(
 		() =>
@@ -87,10 +66,11 @@ function ToggleGroupControl(
 			),
 		[ className, isBlock ]
 	);
+
 	return (
 		<BaseControl help={ help }>
 			<ToggleGroupControlContext.Provider
-				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
+				value={ { state: radio, isBlock: ! isAdaptiveWidth } }
 			>
 				{ ! hideLabelFromVision && (
 					<div>
@@ -100,7 +80,7 @@ function ToggleGroupControl(
 					</div>
 				) }
 				<RadioGroup
-					{ ...radio }
+					state={ radio }
 					aria-label={ label }
 					as={ View }
 					className={ classes }

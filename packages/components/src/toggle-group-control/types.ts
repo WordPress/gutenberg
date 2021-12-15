@@ -2,9 +2,14 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { MutableRefObject, ReactNode, ReactText } from 'react';
+import type {
+	MutableRefObject,
+	ReactNode,
+	ReactText,
+	SyntheticEvent,
+} from 'react';
 // eslint-disable-next-line no-restricted-imports
-import type { RadioStateReturn } from 'reakit';
+import type { RadioState } from 'ariakit/radio';
 
 /**
  * Internal dependencies
@@ -13,6 +18,10 @@ import type { FormElementProps } from '../utils/types';
 
 export type ToggleGroupControlOptionProps = {
 	value: ReactText;
+	/**
+	 * Callback function that is called when the radio button state changes.
+	 */
+	onChange?: ( event: SyntheticEvent< HTMLInputElement > ) => void;
 	/**
 	 * Label for the option. If needed, the `aria-label` prop can be used in addition
 	 * to specify a different label for assistive technologies.
@@ -73,7 +82,7 @@ export type ToggleGroupControlProps = Omit<
 	/**
 	 * Callback when a segment is selected.
 	 */
-	onChange?: ( value: ReactText | undefined ) => void;
+	onChange?: ( value: ReactText | null ) => void;
 	/**
 	 * The value of `ToggleGroupControl`
 	 */
@@ -89,7 +98,11 @@ export type ToggleGroupControlProps = Omit<
 	help?: ReactNode;
 };
 
-export type ToggleGroupControlContextProps = RadioStateReturn & {
+export type ToggleGroupControlContextProps = {
+	/**
+	 * Radio state.
+	 */
+	state: RadioState;
 	/**
 	 * Renders `ToggleGroupControl` as a (CSS) block element.
 	 *
@@ -102,5 +115,5 @@ export type ToggleGroupControlBackdropProps = {
 	containerRef: MutableRefObject< HTMLElement | undefined >;
 	containerWidth?: number | null;
 	isAdaptiveWidth?: boolean;
-	state?: any;
+	value?: any;
 };

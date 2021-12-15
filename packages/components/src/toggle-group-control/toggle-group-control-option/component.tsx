@@ -2,9 +2,9 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { FocusEvent, Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { Radio } from 'reakit';
+import { Radio } from 'ariakit/radio';
 
 /**
  * WordPress dependencies
@@ -45,7 +45,7 @@ function ToggleGroupControlOption(
 	const toggleGroupControlContext = useToggleGroupControlContext();
 	const id = useInstanceId(
 		ToggleGroupControlOption,
-		toggleGroupControlContext.baseId || 'toggle-group-control-option'
+		'toggle-group-control-option'
 	) as string;
 	const buttonProps = useContextSystem(
 		{ ...props, id },
@@ -58,13 +58,14 @@ function ToggleGroupControlOption(
 		label,
 		value,
 		showTooltip = false,
+		state,
 		...radioProps
 	} = {
 		...toggleGroupControlContext,
 		...buttonProps,
 	};
 
-	const isActive = radioProps.state === value;
+	const isActive = state.value === value;
 	const cx = useCx();
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx(
@@ -82,6 +83,11 @@ function ToggleGroupControlOption(
 				<Radio
 					{ ...radioProps }
 					as="button"
+					onFocus={ ( event: FocusEvent< HTMLButtonElement > ) => {
+						radioProps.onFocus?.( event );
+						if ( event.defaultPrevented ) return;
+						state.setValue( value );
+					} }
 					aria-label={ optionLabel }
 					className={ classes }
 					data-value={ value }

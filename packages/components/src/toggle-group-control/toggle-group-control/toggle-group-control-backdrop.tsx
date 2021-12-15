@@ -13,7 +13,7 @@ function ToggleGroupControlBackdrop( {
 	containerRef,
 	containerWidth,
 	isAdaptiveWidth,
-	state,
+	value,
 }: ToggleGroupControlBackdropProps ) {
 	const [ left, setLeft ] = useState( 0 );
 	const [ width, setWidth ] = useState( 0 );
@@ -28,7 +28,7 @@ function ToggleGroupControlBackdrop( {
 		 * Workaround for Reakit
 		 */
 		const targetNode = containerNode.querySelector(
-			`[data-value="${ state }"]`
+			`[data-value="${ value }"]`
 		);
 		setRenderBackdrop( !! targetNode );
 		if ( ! targetNode ) {
@@ -50,7 +50,7 @@ function ToggleGroupControlBackdrop( {
 			} );
 		}
 		return () => window.cancelAnimationFrame( requestId );
-	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
+	}, [ canAnimate, containerRef, containerWidth, value, isAdaptiveWidth ] );
 
 	if ( ! renderBackdrop ) {
 		return null;
