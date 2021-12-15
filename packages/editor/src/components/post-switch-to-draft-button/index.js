@@ -1,15 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, useViewportMatch } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+
+function SwitchToDraftConfirm( props ) {
+	let alertMessage;
+	if ( props.isPublished ) {
+		alertMessage = __( 'Are you sure you want to unpublish this post?' );
+	} else if ( props.isScheduled ) {
+		alertMessage = __( 'Are you sure you want to unschedule this post?' );
+	}
+
+	return props.showConfirmDialog ? (
+		<ConfirmDialog onConfirm={ props.onClick }>
+			{ alertMessage }
+		</ConfirmDialog>
+	) : null;
+}
 
 function PostSwitchToDraftButton( {
 	isSaving,
@@ -18,37 +37,31 @@ function PostSwitchToDraftButton( {
 	onClick,
 } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
 	if ( ! isPublished && ! isScheduled ) {
 		return null;
 	}
 
-	const onSwitch = () => {
-		let alertMessage;
-		if ( isPublished ) {
-			alertMessage = __(
-				'Are you sure you want to unpublish this post?'
-			);
-		} else if ( isScheduled ) {
-			alertMessage = __(
-				'Are you sure you want to unschedule this post?'
-			);
-		}
-		// eslint-disable-next-line no-alert
-		if ( window.confirm( alertMessage ) ) {
-			onClick();
-		}
-	};
-
 	return (
-		<Button
-			className="editor-post-switch-to-draft"
-			onClick={ onSwitch }
-			disabled={ isSaving }
-			variant="tertiary"
-		>
-			{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
-		</Button>
+		<>
+			<Button
+				className="editor-post-switch-to-draft"
+				onClick={ () => {
+					setShowConfirmDialog( true );
+				} }
+				disabled={ isSaving }
+				variant="tertiary"
+			>
+				{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
+			</Button>
+			<SwitchToDraftConfirm
+				isPublished={ isPublished }
+				isScheduled={ isScheduled }
+				onClick={ onClick }
+				showConfirmDialog={ showConfirmDialog }
+			/>
+		</>
 	);
 }
 
