@@ -283,14 +283,17 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 	const path = id ? `/wp/v2/${ resource }/${ id }` : `/wp/v2/${ resource }`;
 
 	let response;
+
+	// Ideally this would always be an OPTIONS request, but unfortunately there's
+	// a bug in the REST API which causes the Allow header to not be sent on
+	// OPTIONS requests to /posts/:id routes.
+	// https://core.trac.wordpress.org/ticket/45753
+	const methodForAllowHeader = id ? 'GET' : 'OPTIONS';
+
 	try {
 		response = await apiFetch( {
 			path,
-			// Ideally this would always be an OPTIONS request, but unfortunately there's
-			// a bug in the REST API which causes the Allow header to not be sent on
-			// OPTIONS requests to /posts/:id routes.
-			// https://core.trac.wordpress.org/ticket/45753
-			method: id ? 'GET' : 'OPTIONS',
+			method: isPublish ? 'OPTIONS' : methodForAllowHeader,
 			parse: isPublish,
 		} );
 	} catch ( error ) {
