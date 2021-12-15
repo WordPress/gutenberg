@@ -104,7 +104,10 @@ export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
 export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
-export { default as BlockPreview } from './block-preview';
+export {
+	default as BlockPreview,
+	useBlockPreview as __experimentalUseBlockPreview,
+} from './block-preview';
 export {
 	default as BlockSelectionClearer,
 	useBlockSelectionClearer as __unstableUseBlockSelectionClearer,
