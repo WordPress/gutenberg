@@ -15,9 +15,9 @@
 			"type": "string",
 			"default": "div"
 		},
-		"queryOrder": {
+		"order": {
 			"type": "string",
-			"default": "desc"
+			"default": null
 		}
 	},
 	"providesContext": {

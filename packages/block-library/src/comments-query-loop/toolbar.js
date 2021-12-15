@@ -7,18 +7,23 @@ import {
 	ToolbarButton,
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
-export default function CommentsQueryLoopToolbar( { perPage, setQuery } ) {
+export default function CommentsQueryLoopToolbar( {
+	attributes,
+	setAttributes,
+} ) {
+	const { perPage, order } = attributes;
 	return (
 		<ToolbarGroup>
 			<Dropdown
 				renderToggle={ ( { onToggle } ) => (
 					<ToolbarButton
 						icon={ settings }
-						label={ __( 'Display settings' ) }
+						label={ __( 'Discussion Settings' ) }
 						onClick={ onToggle }
 					/>
 				) }
@@ -40,13 +45,29 @@ export default function CommentsQueryLoopToolbar( { perPage, setQuery } ) {
 									) {
 										return;
 									}
-									setQuery( {
+									setAttributes( {
+										...attributes,
 										perPage: num,
 									} );
 								} }
 								step="1"
 								value={ perPage }
 								isDragEnabled={ false }
+							/>
+						</BaseControl>
+						<BaseControl>
+							<ToggleControl
+								label={ __( 'Newer comments first' ) }
+								checked={ order === 'desc' || order === null } // Settings value not available on REST API.
+								onChange={ () => {
+									setAttributes( {
+										...attributes,
+										order:
+											order === 'desc' || order === null
+												? 'asc'
+												: 'desc',
+									} );
+								} }
 							/>
 						</BaseControl>
 					</>
