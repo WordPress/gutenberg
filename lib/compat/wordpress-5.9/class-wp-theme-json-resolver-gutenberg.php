@@ -274,7 +274,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Returns the user's origin config.
 	 *
-	 * @return WP_Theme_JSON_Gutenberg Entity that holds user data.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds styles for user data.
 	 */
 	public static function get_user_data() {
 		if ( null !== self::$user ) {
