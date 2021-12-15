@@ -28,7 +28,10 @@ import { usePopoverScroll } from './use-popover-scroll';
  * @return {boolean} Whether the container contains the currently active element in the document.
  */
 const hasFocusWithin = ( container ) => {
-	return !! container?.contains( container?.ownerDocument?.activeElement );
+	return (
+		!! container &&
+		!! container?.contains( container?.ownerDocument?.activeElement )
+	);
 };
 
 /**
