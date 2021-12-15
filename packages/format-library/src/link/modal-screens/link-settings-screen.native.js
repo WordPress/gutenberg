@@ -196,7 +196,7 @@ const LinkSettingsScreen = ( {
 					onPress={ onLinkCellPressed }
 				/>
 				<BottomSheet.Cell
-					displayClearButton={true}
+					displayClearButton={ true }
 					icon={ textColor }
 					label={ __( 'Link text' ) }
 					value={ text }

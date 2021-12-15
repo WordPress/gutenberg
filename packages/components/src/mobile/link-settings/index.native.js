@@ -243,7 +243,7 @@ function LinkSettings( {
 						/>
 					) : (
 						<TextControl
-							displayClearButton={true}
+							displayClearButton={ true }
 							icon={ showIcon && link }
 							label={ options.url.label }
 							value={ urlInputValue }
@@ -261,7 +261,7 @@ function LinkSettings( {
 					) ) }
 				{ options.linkLabel && (
 					<TextControl
-						displayClearButton={true}
+						displayClearButton={ true }
 						label={ options.linkLabel.label }
 						value={ labelInputValue }
 						valuePlaceholder={ options.linkLabel.placeholder }
