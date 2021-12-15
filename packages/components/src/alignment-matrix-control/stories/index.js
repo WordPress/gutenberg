@@ -26,7 +26,11 @@ export default {
 
 export const _default = () => {
 	const props = {
-		value: select( 'value', alignmentOptions, 'center center' ),
+		defaultValue: select(
+			'defaultValue',
+			alignmentOptions,
+			'center center'
+		),
 	};
 
 	return <AlignmentMatrixControl { ...props } />;

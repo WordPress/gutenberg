@@ -47,6 +47,12 @@ export {
 	CompositeItem as __unstableCompositeItem,
 	useCompositeState as __unstableUseCompositeState,
 } from './composite';
+export {
+	Composite as __unstableComposite2,
+	CompositeRow as __unstableCompositeRow2,
+	CompositeItem as __unstableCompositeItem2,
+	useCompositeState as __unstableUseCompositeState2,
+} from './composite2';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';

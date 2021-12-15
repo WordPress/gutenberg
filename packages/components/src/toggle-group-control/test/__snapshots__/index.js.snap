@@ -182,7 +182,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
       <div
         class="emotion-6 emotion-7"
         role="presentation"
-        style="transform: translateX(NaNpx); transition: none; width: 0px;"
+        style="transform: translateX(0px); transition: none; width: 0px;"
       />
       <div
         class="emotion-8 emotion-9"

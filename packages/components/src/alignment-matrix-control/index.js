@@ -9,13 +9,13 @@ import classnames from 'classnames';
  */
 import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Cell from './cell';
-import { Composite, CompositeGroup, useCompositeState } from '../composite';
+import { Composite, CompositeRow, useCompositeState } from '../composite2';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId } from './utils';
@@ -41,23 +41,15 @@ export default function AlignmentMatrixControl( {
 } ) {
 	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
 	const baseId = useBaseId( id );
-	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
+	const defaultActiveId = getItemId( baseId, immutableDefaultValue );
+	const activeId =
+		value !== undefined ? getItemId( baseId, value ) : undefined;
 
 	const composite = useCompositeState( {
-		baseId,
-		currentId: initialCurrentId,
+		defaultActiveId,
+		activeId,
 		rtl: isRTL(),
 	} );
-
-	const handleOnChange = ( nextValue ) => {
-		onChange( nextValue );
-	};
-
-	useEffect( () => {
-		if ( typeof value !== 'undefined' ) {
-			composite.setCurrentId( getItemId( baseId, value ) );
-		}
-	}, [ value, composite.setCurrentId ] );
 
 	const classes = classnames(
 		'component-alignment-matrix-control',
@@ -67,7 +59,7 @@ export default function AlignmentMatrixControl( {
 	return (
 		<Composite
 			{ ...props }
-			{ ...composite }
+			state={ composite }
 			aria-label={ label }
 			as={ Root }
 			className={ classes }
@@ -75,29 +67,22 @@ export default function AlignmentMatrixControl( {
 			width={ width }
 		>
 			{ GRID.map( ( cells, index ) => (
-				<CompositeGroup
-					{ ...composite }
-					as={ Row }
-					role="row"
-					key={ index }
-				>
+				<CompositeRow as={ Row } role="row" key={ index }>
 					{ cells.map( ( cell ) => {
 						const cellId = getItemId( baseId, cell );
-						const isActive = composite.currentId === cellId;
-
+						const isActive = composite.activeId === cellId;
 						return (
 							<Cell
-								{ ...composite }
 								id={ cellId }
 								isActive={ isActive }
 								key={ cell }
 								value={ cell }
-								onFocus={ () => handleOnChange( cell ) }
+								onFocus={ () => onChange( cell ) }
 								tabIndex={ isActive ? 0 : -1 }
 							/>
 						);
 					} ) }
-				</CompositeGroup>
+				</CompositeRow>
 			) ) }
 		</Composite>
 	);
