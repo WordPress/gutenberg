@@ -15,6 +15,8 @@ import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 
+const blockedPaths = [ 'color', 'border', 'typography', 'spacing' ];
+
 const deprecatedFlags = {
 	'color.palette': ( settings ) =>
 		settings.colors === undefined ? undefined : settings.colors,
@@ -104,6 +106,13 @@ export default function useSetting( path ) {
 
 	const setting = useSelect(
 		( select ) => {
+			if ( blockedPaths.includes( path ) ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'Top level useSetting paths are disabled. Please use a subpath to query the information needed.'
+				);
+				return undefined;
+			}
 			const settings = select( blockEditorStore ).getSettings();
 
 			// 1 - Use __experimental features, if available.
