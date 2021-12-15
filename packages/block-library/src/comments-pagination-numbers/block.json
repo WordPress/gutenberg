@@ -3,11 +3,11 @@
 	"apiVersion": 2,
 	"name": "core/comments-pagination-numbers",
 	"title": "Comments Pagination Numbers",
-  "category": "theme",
+	"category": "theme",
 	"parent": [ "core/comments-pagination" ],
 	"description": "Displays a list of page numbers for comments pagination.",
 	"textdomain": "default",
-	"usesContext": [ "queryId", "queryPerPage", "postId" ],
+	"usesContext": [ "comments/perPage", "postId" ],
 	"supports": {
 		"reusable": false,
 		"html": false

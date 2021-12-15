@@ -114,7 +114,7 @@ const CommentsList = ( {
 
 export default function CommentTemplateEdit( {
 	clientId,
-	context: { postId, queryPerPage },
+	context: { postId, 'comments/perPage': perPage },
 } ) {
 	const blockProps = useBlockProps();
 
@@ -138,13 +138,16 @@ export default function CommentTemplateEdit( {
 		[ postId, clientId ]
 	);
 
+	// TODO: Replicate the logic used on the server.
+	perPage = perPage || 50;
+
 	// We convert the flat list of comments to tree.
-	// Then, we show only a maximum of `queryPerPage` number of comments.
+	// Then, we show only a maximum of `perPage` number of comments.
 	// This is because passing `per_page` to `getEntityRecords()` does not
 	// take into account nested comments.
 	const comments = useMemo(
-		() => convertToTree( rawComments ).slice( 0, queryPerPage ),
-		[ rawComments, queryPerPage ]
+		() => convertToTree( rawComments ).slice( 0, perPage ),
+		[ rawComments, perPage ]
 	);
 
 	if ( ! rawComments ) {

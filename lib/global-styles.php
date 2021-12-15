@@ -6,25 +6,6 @@
  */
 
 /**
- * Fetches the preferences for each origin (core, theme, user)
- * and enqueues the resulting stylesheet.
- */
-function gutenberg_experimental_global_styles_enqueue_assets() {
-	$stylesheet = wp_get_global_stylesheet();
-	if ( empty( $stylesheet ) ) {
-		return;
-	}
-
-	if ( isset( wp_styles()->registered['global-styles'] ) ) {
-		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
-	} else {
-		wp_register_style( 'global-styles', false, array(), true, true );
-		wp_add_inline_style( 'global-styles', $stylesheet );
-		wp_enqueue_style( 'global-styles' );
-	}
-}
-
-/**
  * Adds the necessary settings for the Global Styles client UI.
  *
  * @param array $settings Existing block editor settings.
@@ -72,19 +53,27 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 		$new_global_styles = array();
 
-		$style_css = wp_get_global_stylesheet( array( 'presets' ) );
-		if ( '' !== $style_css ) {
+		$css_variables = wp_get_global_stylesheet( array( 'variables' ) );
+		if ( '' !== $css_variables ) {
 			$new_global_styles[] = array(
-				'css'            => $style_css,
+				'css'            => $css_variables,
+				'__unstableType' => 'presets',
+			);
+		}
+
+		$css_presets = wp_get_global_stylesheet( array( 'presets' ) );
+		if ( '' !== $css_presets ) {
+			$new_global_styles[] = array(
+				'css'            => $css_presets,
 				'__unstableType' => 'presets',
 			);
 		}
 
 		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-			$style_css = wp_get_global_stylesheet( array( 'styles' ) );
-			if ( '' !== $style_css ) {
+			$css_blocks = wp_get_global_stylesheet( array( 'styles' ) );
+			if ( '' !== $css_blocks ) {
 				$new_global_styles[] = array(
-					'css'            => $style_css,
+					'css'            => $css_blocks,
 					'__unstableType' => 'theme',
 				);
 			}
@@ -256,16 +245,6 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
 }
 
-/**
- * Function to enqueue the CSS Custom Properties
- * coming from theme.json.
- */
-function gutenberg_load_css_custom_properties() {
-	wp_register_style( 'global-styles-css-custom-properties', false, array(), true, true );
-	wp_add_inline_style( 'global-styles-css-custom-properties', wp_get_global_stylesheet( array( 'variables' ) ) );
-	wp_enqueue_style( 'global-styles-css-custom-properties' );
-}
-
 // The else clause can be removed when plugin support requires WordPress 5.8.0+.
 if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
@@ -273,13 +252,9 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 }
 
-add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-
 // kses actions&filters.
 add_action( 'init', 'gutenberg_global_styles_kses_init' );
 add_action( 'set_current_user', 'gutenberg_global_styles_kses_init' );
 add_filter( 'force_filtered_html_on_import', 'gutenberg_global_styles_force_filtered_html_on_import_filter', 999 );
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_global_styles_include_support_for_wp_variables', 10, 2 );
 // This filter needs to be executed last.
-
-add_filter( 'enqueue_block_editor_assets', 'gutenberg_load_css_custom_properties' );
