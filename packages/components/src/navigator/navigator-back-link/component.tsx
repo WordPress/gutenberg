@@ -5,53 +5,20 @@
 import type { Ref } from 'react';
 
 /**
- * WordPress dependencies
- */
-import { useCallback } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { View } from '../../view';
-import useNavigator from '../use-navigator';
+import { useNavigatorBackLink } from './hook';
 import type { NavigatorBackLinkProps } from '../types';
 
 function NavigatorBackLink(
 	props: WordPressComponentProps< NavigatorBackLinkProps, 'button' >,
 	forwardedRef: Ref< any >
 ) {
-	const {
-		children,
-		onClick,
-		as = 'button',
-		...otherProps
-	} = useContextSystem( props, 'NavigatorBackLink' );
+	const navigatorBackLinkProps = useNavigatorBackLink( props );
 
-	const { pop } = useNavigator();
-	const handleClick: React.MouseEventHandler< HTMLElement > = useCallback(
-		( e ) => {
-			e.preventDefault();
-			pop();
-			onClick?.( e );
-		},
-		[ pop, onClick ]
-	);
-
-	return (
-		<View
-			as={ as }
-			ref={ forwardedRef }
-			onClick={ handleClick }
-			{ ...otherProps }
-		>
-			{ children }
-		</View>
-	);
+	return <View ref={ forwardedRef } { ...navigatorBackLinkProps } />;
 }
 
 /**

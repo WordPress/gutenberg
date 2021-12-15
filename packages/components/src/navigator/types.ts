@@ -65,7 +65,7 @@ export type NavigatorLinkProps = NavigatorBackLinkProps & {
 	 * The HTML attribute used to identify the `NavigatorLink`, which is used
 	 * by `Navigator` to restore focus.
 	 *
-	 * @default 'data-navigator-focusable-id'
+	 * @default 'id'
 	 */
 	attributeName?: string;
 	/**
