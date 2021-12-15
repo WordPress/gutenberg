@@ -682,7 +682,7 @@ describe( 'Navigation', () => {
 			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
 		} );
 
-		it( 'only update a single entity currently linked with the block', async () => {
+		it( 'only updates a single entity currently linked with the block', async () => {
 			await createNewPost();
 			await insertBlock( 'Navigation' );
 
