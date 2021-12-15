@@ -772,7 +772,7 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'Permission based restrictions', () => {
-		it( 'shows a warning if user does not have permission to edit / update Navigations', async () => {
+		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
 			await createNewPost();
 			await insertBlock( 'Navigation' );
 
