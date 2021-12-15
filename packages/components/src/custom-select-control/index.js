@@ -1,35 +1,112 @@
 /**
  * External dependencies
  */
+import { useSelect } from 'downshift';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+import { useResizeObserver } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 import { Icon, check, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { DropdownMenu, MenuItem, VisuallyHidden } from '../';
+import { Button, Popover, VisuallyHidden } from '../';
 
-const itemToString = ( item ) => item?.name;
+const OptionList = ( { anchorRef, isOpen, children } ) => {
+	if ( ! isOpen ) {
+		return children;
+	}
 
-const POPOVER_PROPS = {
-	className: 'block-editor-block-settings-menu__popover',
-	position: 'bottom right',
-	isAlternate: true,
+	return (
+		<Popover
+			anchorRef={ anchorRef?.current }
+			className="components-custom-select-control__popover"
+			isAlternate={ true }
+			position={ 'bottom center' }
+		>
+			{ children }
+		</Popover>
+	);
 };
 
-export default function CustomSelectControlWithDropdownMenu( {
+const itemToString = ( item ) => item?.name;
+// This is needed so that in Windows, where
+// the menu does not necessarily open on
+// key up/down, you can still switch between
+// options with the menu closed.
+const stateReducer = (
+	{ selectedItem },
+	{ type, changes, props: { items } }
+) => {
+	switch ( type ) {
+		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
+			// If we already have a selected item, try to select the next one,
+			// without circular navigation. Otherwise, select the first item.
+			return {
+				selectedItem:
+					items[
+						selectedItem
+							? Math.min(
+									items.indexOf( selectedItem ) + 1,
+									items.length - 1
+							  )
+							: 0
+					],
+			};
+		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowUp:
+			// If we already have a selected item, try to select the previous one,
+			// without circular navigation. Otherwise, select the last item.
+			return {
+				selectedItem:
+					items[
+						selectedItem
+							? Math.max( items.indexOf( selectedItem ) - 1, 0 )
+							: items.length - 1
+					],
+			};
+		default:
+			return changes;
+	}
+};
+export default function CustomSelectControl( {
 	className,
 	hideLabelFromVision,
 	label,
 	describedBy,
 	options: items,
 	onChange: onSelectedItemChange,
-	value: selectedItem,
+	value: _selectedItem,
 } ) {
+	const {
+		getLabelProps,
+		getToggleButtonProps,
+		getMenuProps,
+		getItemProps,
+		isOpen,
+		highlightedIndex,
+		selectedItem,
+	} = useSelect( {
+		initialSelectedItem: items[ 0 ],
+		items,
+		itemToString,
+		onSelectedItemChange,
+		...( typeof _selectedItem !== 'undefined' && _selectedItem !== null
+			? { selectedItem: _selectedItem }
+			: undefined ),
+		stateReducer,
+	} );
+
+	const anchorRef = useRef();
+
+	const [
+		buttonResizeListener,
+		{ width: buttonWidth },
+	] = useResizeObserver();
+
 	function getDescribedBy() {
 		if ( describedBy ) {
 			return describedBy;
@@ -43,27 +120,19 @@ export default function CustomSelectControlWithDropdownMenu( {
 		return sprintf( __( 'Currently selected: %s' ), selectedItem.name );
 	}
 
-	const toggleProps = {
-		// This is needed because some speech recognition software don't support `aria-labelledby`.
-		'aria-label': label,
-		'aria-labelledby': undefined,
-		className: 'components-custom-select-control__button',
-		isSmall: true,
-		describedBy: getDescribedBy(),
-		children: (
-			<>
-				{ itemToString( selectedItem ) }
-				<Icon
-					icon={ chevronDown }
-					className="components-custom-select-control__button-icon"
-				/>
-			</>
-		),
-	};
-
-	const menuProps = {
-		role: 'listbox',
-	};
+	const menuProps = getMenuProps( {
+		className: 'components-custom-select-control__menu',
+		'aria-hidden': ! isOpen,
+		style: {
+			width: buttonWidth,
+		},
+	} );
+	// We need this here, because the null active descendant is not fully ARIA compliant.
+	if (
+		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
+	) {
+		delete menuProps[ 'aria-activedescendant' ];
+	}
 
 	return (
 		<div
@@ -73,56 +142,59 @@ export default function CustomSelectControlWithDropdownMenu( {
 			) }
 		>
 			{ hideLabelFromVision ? (
-				<VisuallyHidden as="label">{ label }</VisuallyHidden>
+				<VisuallyHidden as="label" { ...getLabelProps() }>
+					{ label }
+				</VisuallyHidden>
 			) : (
 				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
 				<label
-					{ ...{
+					{ ...getLabelProps( {
 						className: 'components-custom-select-control__label',
-					} }
+					} ) }
 				>
 					{ label }
 				</label>
 			) }
-			<DropdownMenu
-				className={ classnames(
-					'components-custom-select-control__inner',
-					className
-				) }
-				menuProps={ menuProps }
-				popoverProps={ POPOVER_PROPS }
-				toggleProps={ toggleProps }
-				icon={ null }
-				noIcons={ true }
-			>
-				{ ( { isOpen, onClose } ) =>
-					isOpen && (
-						<>
-							{ items.map( ( item, index ) => (
-								<MenuItem
-									key={ index }
-									role="option"
-									{ ...{
+			<div className="components-custom-select-control__inner">
+				<Button
+					ref={ anchorRef }
+					{ ...getToggleButtonProps( {
+						// This is needed because some speech recognition software don't support `aria-labelledby`.
+						'aria-label': label,
+						'aria-labelledby': undefined,
+						className: 'components-custom-select-control__button',
+						isSmall: true,
+						describedBy: getDescribedBy(),
+					} ) }
+				>
+					{ buttonResizeListener }
+					{ itemToString( selectedItem ) }
+					<Icon
+						icon={ chevronDown }
+						className="components-custom-select-control__button-icon"
+					/>
+				</Button>
+				<OptionList isOpen={ isOpen } anchorRef={ anchorRef }>
+					<ul { ...menuProps }>
+						{ isOpen &&
+							items.map( ( item, index ) => (
+								// eslint-disable-next-line react/jsx-key
+								<li
+									{ ...getItemProps( {
+										item,
+										index,
+										key: item.key,
 										className: classnames(
 											item.className,
 											'components-custom-select-control__item',
 											{
 												'is-highlighted':
-													item === selectedItem,
+													index === highlightedIndex,
 												'has-hint': !! item.__experimentalHint,
-												'has-check':
-													item === selectedItem,
 											}
 										),
 										style: item.style,
-									} }
-									onClick={ () => {
-										onSelectedItemChange( {
-											selectedItem: item,
-										} );
-										onClose();
-									} }
-									icon={ item === selectedItem && check }
+									} ) }
 								>
 									{ item.name }
 									{ item.__experimentalHint && (
@@ -130,12 +202,17 @@ export default function CustomSelectControlWithDropdownMenu( {
 											{ item.__experimentalHint }
 										</span>
 									) }
-								</MenuItem>
+									{ item === selectedItem && (
+										<Icon
+											icon={ check }
+											className="components-custom-select-control__item-icon"
+										/>
+									) }
+								</li>
 							) ) }
-						</>
-					)
-				}
-			</DropdownMenu>
+					</ul>
+				</OptionList>
+			</div>
 		</div>
 	);
 }
