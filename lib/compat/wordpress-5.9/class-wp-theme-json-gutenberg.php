@@ -95,53 +95,53 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'                     => array( 'color', 'palette' ),
-			'override'                 => array( 'color', 'defaultPalette' ),
-			'should_use_default_names' => false,
-			'value_key'                => 'color',
-			'css_vars'                 => '--wp--preset--color--$slug',
-			'classes'                  => array(
+			'path'              => array( 'color', 'palette' ),
+			'override'          => array( 'color', 'defaultPalette' ),
+			'use_default_names' => false,
+			'value_key'         => 'color',
+			'css_vars'          => '--wp--preset--color--$slug',
+			'classes'           => array(
 				'.has-$slug-color'            => 'color',
 				'.has-$slug-background-color' => 'background-color',
 				'.has-$slug-border-color'     => 'border-color',
 			),
-			'properties'               => array( 'color', 'background-color', 'border-color' ),
+			'properties'        => array( 'color', 'background-color', 'border-color' ),
 		),
 		array(
-			'path'                     => array( 'color', 'gradients' ),
-			'override'                 => array( 'color', 'defaultGradients' ),
-			'should_use_default_names' => false,
-			'value_key'                => 'gradient',
-			'css_vars'                 => '--wp--preset--gradient--$slug',
-			'classes'                  => array( '.has-$slug-gradient-background' => 'background' ),
-			'properties'               => array( 'background' ),
+			'path'              => array( 'color', 'gradients' ),
+			'override'          => array( 'color', 'defaultGradients' ),
+			'use_default_names' => false,
+			'value_key'         => 'gradient',
+			'css_vars'          => '--wp--preset--gradient--$slug',
+			'classes'           => array( '.has-$slug-gradient-background' => 'background' ),
+			'properties'        => array( 'background' ),
 		),
 		array(
-			'path'                     => array( 'color', 'duotone' ),
-			'override'                 => true,
-			'should_use_default_names' => false,
-			'value_func'               => 'gutenberg_render_duotone_filter_preset',
-			'css_vars'                 => '--wp--preset--duotone--$slug',
-			'classes'                  => array(),
-			'properties'               => array( 'filter' ),
+			'path'              => array( 'color', 'duotone' ),
+			'override'          => true,
+			'use_default_names' => false,
+			'value_func'        => 'gutenberg_render_duotone_filter_preset',
+			'css_vars'          => '--wp--preset--duotone--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'filter' ),
 		),
 		array(
-			'path'                     => array( 'typography', 'fontSizes' ),
-			'override'                 => true,
-			'should_use_default_names' => true,
-			'value_key'                => 'size',
-			'css_vars'                 => '--wp--preset--font-size--$slug',
-			'classes'                  => array( '.has-$slug-font-size' => 'font-size' ),
-			'properties'               => array( 'font-size' ),
+			'path'              => array( 'typography', 'fontSizes' ),
+			'override'          => true,
+			'use_default_names' => true,
+			'value_key'         => 'size',
+			'css_vars'          => '--wp--preset--font-size--$slug',
+			'classes'           => array( '.has-$slug-font-size' => 'font-size' ),
+			'properties'        => array( 'font-size' ),
 		),
 		array(
-			'path'                     => array( 'typography', 'fontFamilies' ),
-			'override'                 => true,
-			'should_use_default_names' => false,
-			'value_key'                => 'fontFamily',
-			'css_vars'                 => '--wp--preset--font-family--$slug',
-			'classes'                  => array( '.has-$slug-font-family' => 'font-family' ),
-			'properties'               => array( 'font-family' ),
+			'path'              => array( 'typography', 'fontFamilies' ),
+			'override'          => true,
+			'use_default_names' => false,
+			'value_key'         => 'fontFamily',
+			'css_vars'          => '--wp--preset--font-family--$slug',
+			'classes'           => array( '.has-$slug-font-family' => 'font-family' ),
+			'properties'        => array( 'font-family' ),
 		),
 	);
 
@@ -1457,7 +1457,7 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					if ( 'theme' === $origin && $preset['should_use_default_names'] ) {
+					if ( 'theme' === $origin && $preset['use_default_names'] ) {
 						foreach ( $content as &$item ) {
 							if ( ! array_key_exists( 'name', $item ) ) {
 								$name = self::get_name_from_defaults( $item['slug'], $base_path );
