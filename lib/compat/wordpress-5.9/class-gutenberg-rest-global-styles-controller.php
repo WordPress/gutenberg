@@ -54,8 +54,8 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
-							'description' => __( 'The id of the global style variation', 'gutenberg' ),
-							'type'        => 'string',
+							'description'       => __( 'The id of the global style variation', 'gutenberg' ),
+							'type'              => 'string',
 							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
 						),
 					),

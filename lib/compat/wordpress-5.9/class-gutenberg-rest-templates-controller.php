@@ -133,7 +133,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	public function _sanitize_template_id( $id ) {
 		// Decode empty space.
 		$last_slash_pos = strrpos( $id, '/' );
-		$id = urldecode( $id );
+		$id             = urldecode( $id );
 
 		if ( false === $last_slash_pos ) {
 			return $id;
