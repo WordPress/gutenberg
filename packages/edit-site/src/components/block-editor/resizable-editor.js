@@ -66,7 +66,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 						() => {
 							setHeight(
 								iframe.contentDocument.querySelector(
-									`.edit-site-block-editor__block-list`
+									'.is-root-container'
 								).scrollHeight
 							);
 							animationFrame = null;
@@ -155,8 +155,15 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 						<style>{
 							// Forming a "block formatting context" to prevent margin collapsing.
 							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-							`.edit-site-block-editor__block-list { display: flow-root; }`
+							`.is-root-container { display: flow-root; }`
 						}</style>
+						{ enableResizing && (
+							// Some themes will have `min-height: 100vh` for the root container,
+							// which isn't a requirement in auto resize mode.
+							<style>
+								{ `.is-root-container { min-height: 0 !important; }` }
+							</style>
+						) }
 					</>
 				}
 				assets={ settings.__unstableResolvedAssets }
