@@ -35,7 +35,6 @@ class BottomSheetCell extends Component {
 		this.state = {
 			isEditingValue: props.autoFocus || false,
 			isScreenReaderEnabled: false,
-			localValue: props.value ? props.value : '',
 		};
 
 		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
