@@ -23,3 +23,11 @@ exports[`color settings sets a gradient overlay background when a solid backgrou
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
+
+exports[`color settings toggles between solid colors and gradients 1`] = `
+"<!-- wp:cover {\\"gradient\\":\\"light-green-cyan-to-vivid-green-cyan\\"} -->
+<div class=\\"wp-block-cover\\"><span aria-hidden=\\"true\\" class=\\"has-background-dim-100 wp-block-cover__gradient-background has-light-green-cyan-to-vivid-green-cyan-gradient-background has-background-dim has-background-gradient has-light-green-cyan-to-vivid-green-cyan-gradient-background\\"></span><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\"} -->
+<p class=\\"has-text-align-center\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;

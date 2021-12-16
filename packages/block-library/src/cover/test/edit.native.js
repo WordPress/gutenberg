@@ -400,6 +400,95 @@ describe( 'color settings', () => {
 		expect( newGradientButton ).toBeDefined();
 		fireEvent.press( newGradientButton );
 
+		// Dismiss the Block Settings modal
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'toggles between solid colors and gradients', async () => {
+		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
+		} );
+
+		const block = await waitFor( () =>
+			getByA11yLabel( 'Cover block. Empty' )
+		);
+		expect( block ).toBeDefined();
+
+		// Select a color from the placeholder palette
+		const colorPalette = await waitFor( () =>
+			getByTestId( 'color-palette' )
+		);
+		const colorButton = within( colorPalette ).getByTestId( COLOR_PINK );
+
+		expect( colorButton ).toBeDefined();
+		fireEvent.press( colorButton );
+
+		// Wait for the block to be created
+		const coverBlockWithOverlay = await waitFor( () =>
+			getByA11yLabel( /Cover Block\. Row 1/ )
+		);
+		fireEvent.press( coverBlockWithOverlay );
+
+		// Open Block Settings
+		const settingsButton = await waitFor( () =>
+			getByA11yLabel( 'Open Settings' )
+		);
+		fireEvent.press( settingsButton );
+
+		// Wait for Block Settings to be visible
+		const blockSettingsModal = getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open the overlay color settings
+		const colorOverlay = await waitFor( () =>
+			getByA11yLabel( 'Color. Empty' )
+		);
+		expect( colorOverlay ).toBeDefined();
+		fireEvent.press( colorOverlay );
+
+		// Find the selected color
+		const colorPaletteButton = await waitFor( () =>
+			getByTestId( COLOR_PINK )
+		);
+		expect( colorPaletteButton ).toBeDefined();
+
+		// Select another color
+		const newColorButton = await waitFor( () => getByTestId( COLOR_RED ) );
+		fireEvent.press( newColorButton );
+
+		// Open the gradients
+		const gradientsButton = await waitFor( () =>
+			getByA11yLabel( 'Gradient' )
+		);
+		expect( gradientsButton ).toBeDefined();
+
+		fireEvent( gradientsButton, 'layout', {
+			nativeEvent: { layout: { width: 80, height: 26 } },
+		} );
+		fireEvent.press( gradientsButton );
+
+		// Find the gradient color
+		const newGradientButton = await waitFor( () =>
+			getByTestId( GRADIENT_GREEN )
+		);
+		expect( newGradientButton ).toBeDefined();
+		fireEvent.press( newGradientButton );
+
+		// Go back to the settings list
+		fireEvent.press( await waitFor( () => getByA11yLabel( 'Go back' ) ) );
+
+		// Find the color setting
+		const colorSetting = await waitFor( () =>
+			getByA11yLabel( 'Color. Empty' )
+		);
+		expect( colorSetting ).toBeDefined();
+		fireEvent.press( colorSetting );
+
+		// Dismiss the Block Settings modal
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
