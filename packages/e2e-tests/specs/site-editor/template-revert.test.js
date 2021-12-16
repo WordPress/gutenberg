@@ -89,7 +89,7 @@ const assertTemplatesAreDeleted = async () => {
 
 describe( 'Template Revert', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );

@@ -46,7 +46,7 @@ describe( 'Multi-entity save flow', () => {
 	let originalSiteTitle, originalBlogDescription;
 
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 		await trashAllPosts( 'wp_block' );
@@ -259,7 +259,7 @@ describe( 'Multi-entity save flow', () => {
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 			await siteEditor.disableWelcomeGuide();
@@ -297,7 +297,7 @@ describe( 'Multi-entity save flow', () => {
 		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
 			// Navigate to site editor.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 			await siteEditor.disableWelcomeGuide();

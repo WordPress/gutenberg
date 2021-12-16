@@ -21,7 +21,7 @@ const templatePartNameInput =
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -40,7 +40,7 @@ describe( 'Template Part', () => {
 		async function navigateToHeader() {
 			// Switch to editing the header template part.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//header',
+				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
 		}
@@ -61,7 +61,7 @@ describe( 'Template Part', () => {
 
 			// Switch back to the Index template.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 		}

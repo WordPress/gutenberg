@@ -103,7 +103,7 @@ describe( 'Font Size Picker', () => {
 	// A different control is rendered based on the available font sizes number.
 	describe( 'More font sizes', () => {
 		beforeAll( async () => {
-			await activateTheme( 'tt1-blocks' );
+			await activateTheme( 'emptytheme' );
 		} );
 		afterAll( async () => {
 			await activateTheme( 'twentytwentyone' );
