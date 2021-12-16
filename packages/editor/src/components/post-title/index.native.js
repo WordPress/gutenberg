@@ -8,7 +8,11 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __experimentalRichText as RichText } from '@wordpress/rich-text';
+import {
+	__experimentalRichText as RichText,
+	create,
+	insert,
+} from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -58,7 +62,7 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
-	onPaste( { html, plainText } ) {
+	onPaste( { value, onChange, plainText, html } ) {
 		const { title, onInsertBlockAfter, onUpdate } = this.props;
 
 		const content = pasteHandler( {
@@ -66,17 +70,22 @@ class PostTitle extends Component {
 			plainText,
 		} );
 
-		if ( typeof content !== 'string' && content.length ) {
-			const [ firstBlock ] = content;
-			if (
-				! title &&
-				( firstBlock.name === 'core/heading' ||
-					firstBlock.name === 'core/paragraph' )
-			) {
-				onUpdate( firstBlock.attributes.content );
-				onInsertBlockAfter( content.slice( 1 ) );
+		if ( content.length ) {
+			if ( typeof content === 'string' ) {
+				const valueToInsert = create( { html: content } );
+				onChange( insert( value, valueToInsert ) );
 			} else {
-				onInsertBlockAfter( content );
+				const [ firstBlock ] = content;
+				if (
+					! title &&
+					( firstBlock.name === 'core/heading' ||
+						firstBlock.name === 'core/paragraph' )
+				) {
+					onUpdate( firstBlock.attributes.content );
+					onInsertBlockAfter( content.slice( 1 ) );
+				} else {
+					onInsertBlockAfter( content );
+				}
 			}
 		}
 	}
