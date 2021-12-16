@@ -79,6 +79,13 @@ export default function useNavigationMenu( ref ) {
 					'canUser',
 					[ 'delete', 'navigation', ref ]
 				),
+				canUserPublishNavigation: ref
+					? canUser( 'publish', 'navigation', ref )
+					: undefined,
+				hasResolvedCanUserPublishNavigationEntity: hasFinishedResolution(
+					'canUser',
+					[ 'publish', 'navigation', ref ]
+				),
 			};
 		},
 		[ ref ]

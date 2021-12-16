@@ -146,13 +146,7 @@ function Navigation( {
 		`navigationMenu/${ ref }`
 	);
 
-	const {
-		innerBlocks,
-		isInnerBlockSelected,
-		hasSubmenus,
-		canUserPublishNavigation,
-		hasResolvedCanUserPublishNavigationEntity,
-	} = useSelect(
+	const { innerBlocks, isInnerBlockSelected, hasSubmenus } = useSelect(
 		( select ) => {
 			const { getBlocks, hasSelectedInnerBlock } = select(
 				blockEditorStore
@@ -162,19 +156,10 @@ function Navigation( {
 				( block ) => block.name === 'core/navigation-submenu'
 			);
 
-			const { canUser, hasFinishedResolution } = select( coreStore );
-
 			return {
 				hasSubmenus: firstSubmenu,
 				innerBlocks: blocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
-				canUserPublishNavigation: ref
-					? canUser( 'publish', 'navigation', ref )
-					: undefined,
-				hasResolvedCanUserPublishNavigationEntity: hasFinishedResolution(
-					'canUser',
-					[ 'publish', 'navigation', ref ]
-				),
 			};
 		},
 		[ clientId, ref ]
