@@ -423,12 +423,13 @@ function Navigation( {
 							hasSavedUnsavedInnerBlocks
 						}
 						onSave={ ( post ) => {
+							// Set some state used as a guard to prevent the creation of multiple posts.
+							setHasSavedUnsavedInnerBlocks( true );
 							// replaceInnerBlocks is required to ensure the block editor store is sync'd
 							// to be aware that there are now no inner blocks (as blocks moved to entity).
 							// This should probably happen automatically with useBlockSync
 							// but there appears to be a bug.
 							replaceInnerBlocks( clientId, [] );
-							setHasSavedUnsavedInnerBlocks( true );
 							// Switch to using the wp_navigation entity.
 							setRef( post.id );
 						} }
