@@ -464,49 +464,46 @@ describe( 'Navigation', () => {
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	// URL details endpoint is throwing a 404, which causes this test to fail.
-	it.skip( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
 		await startEmptyButton.click();
-
 		const appender = await page.waitForSelector(
 			'.wp-block-navigation .block-list-appender'
 		);
 		await appender.click();
 
 		// Wait for URL input to be focused
-		await page.waitForSelector(
-			'input.block-editor-url-input__input:focus'
-		);
-
 		// Insert name for the new page.
-		await page.type(
-			'input[placeholder="Search or type url"]',
-			'A really long page name that will not exist'
-		);
-
-		// Wait for URL input to be focused
-		await page.waitForSelector(
+		const pageTitle = 'A really long page name that will not exist';
+		const input = await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
+		await input.type( pageTitle );
 
 		// Wait for the create button to appear and click it.
-		await page.waitForSelector(
+		const createPageButton = await page.waitForSelector(
 			'.block-editor-link-control__search-create'
 		);
-
-		const createPageButton = await page.$(
-			'.block-editor-link-control__search-create'
-		);
-
 		await createPageButton.click();
 
 		const draftLink = await page.waitForSelector(
 			'.wp-block-navigation-item__content'
 		);
 		await draftLink.click();
+
+		// Creating a draft is async, so wait for a sign of completion. In this
+		// case the link that shows in the URL popover once a link is added.
+		await page.waitForXPath(
+			`//a[contains(@class, "block-editor-link-control__search-item-title") and contains(., "${ pageTitle }")]`
+		);
+
+		// The URL Details endpoint 404s for the created page, since it will
+		// be a draft that is inaccessible publicly. Wait for the HTTP request
+		// to finish, since this seems to make the test more stable.
+		await page.waitForNetworkIdle();
+		expect( console ).toHaveErrored();
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
