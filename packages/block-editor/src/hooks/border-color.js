@@ -14,7 +14,7 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ColorGradientDropdown from '../components/colors-gradients/dropdown';
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import {
 	getColorClassName,
@@ -104,14 +104,16 @@ export function BorderColorEdit( props ) {
 		} );
 	};
 
-	const settings = {
-		label: __( 'Color' ),
-		onColorChange: onChangeColor,
-		colorValue,
-		clearable: false,
-	};
+	const settings = [
+		{
+			label: __( 'Color' ),
+			onColorChange: onChangeColor,
+			colorValue,
+			clearable: false,
+		},
+	];
 	return (
-		<ColorGradientDropdown
+		<ColorGradientSettingsDropdown
 			settings={ settings }
 			disableCustomColors
 			disableCustomGradients

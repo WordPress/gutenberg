@@ -8,7 +8,6 @@ import { every, isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
-	__experimentalItemGroup as ItemGroup,
 	__experimentalSpacer as Spacer,
 	ColorIndicator,
 	PanelBody,
@@ -18,7 +17,7 @@ import { sprintf, __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ColorGradientDropdown from './dropdown';
+import ColorGradientSettingsDropdown from './dropdown';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
@@ -141,27 +140,18 @@ export const PanelColorGradientSettingsInner = ( {
 			title={ showTitle ? titleElement : undefined }
 			{ ...props }
 		>
-			<ItemGroup
-				isBordered
-				isSeparated
-				className="block-editor-panel-color-gradient-settings__item-group"
-			>
-				{ settings.map( ( setting, index ) => (
-					<ColorGradientDropdown
-						key={ index }
-						settings={ setting }
-						{ ...{
-							colors,
-							gradients,
-							disableCustomColors,
-							disableCustomGradients,
-							__experimentalHasMultipleOrigins,
-							__experimentalIsRenderedInSidebar,
-							enableAlpha,
-						} }
-					/>
-				) ) }
-			</ItemGroup>
+			<ColorGradientSettingsDropdown
+				settings={ settings }
+				{ ...{
+					colors,
+					gradients,
+					disableCustomColors,
+					disableCustomGradients,
+					__experimentalHasMultipleOrigins,
+					__experimentalIsRenderedInSidebar,
+					enableAlpha,
+				} }
+			/>
 			{ !! children && (
 				<>
 					<Spacer marginY={ 4 } /> { children }
