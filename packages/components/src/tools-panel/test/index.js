@@ -606,7 +606,7 @@ describe( 'ToolsPanel', () => {
 
 			// On the initial render of the panel, the ToolsPanelItem should
 			// be registered.
-			const { rerender } = render( <TestPanel /> );
+			const { rerender, unmount } = render( <TestPanel /> );
 
 			expect( context.registerPanelItem ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -616,21 +616,37 @@ describe( 'ToolsPanel', () => {
 			);
 			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
-			// Simulate a change in panel, e.g. selection of a single block.
-			context.panelId = '4321';
+			// Simulate a further block selection being added to the
+			// multi-selection. The panelId will remain `null` in this case.
+			rerender( <TestPanel /> );
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
+			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
-			// Rerender the panel item. Because we have a new non-null panelId,
-			// this panelItem should NOT be registered, but it SHOULD be
-			// deregistered.
+			// Simulate a change in panel back to single block selection for
+			// which the item matches panelId.
+			context.panelId = '1234';
+			rerender( <TestPanel /> );
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
+			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
+
+			// Simulate another multi-selection where the panelId is `null`.
+			// Item should re-register itself after it deregistered as the
+			// multi-selection occurred.
+			context.panelId = null;
+			rerender( <TestPanel /> );
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
+			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
+
+			// Simulate a change in panel e.g. back to a single block selection
+			// Where the item's panelId is not a match.
+			context.panelId = '4321';
 			rerender( <TestPanel /> );
 
-			// registerPanelItem has still only been called once.
-			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
-			// deregisterPanelItem is called as the current panelId does not
-			// match the item's.
-			expect( context.deregisterPanelItem ).toBeCalledWith(
-				altControlProps.label
-			);
+			// As the item no longer matches the panelId it should not have
+			// registered again but instead deregistered.
+			unmount();
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
+			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
 
@@ -869,6 +885,59 @@ describe( 'ToolsPanel', () => {
 			);
 
 			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not contain orphaned menu items when panelId changes', async () => {
+			// As fills and the panel can update independently this aims to
+			// test that no orphaned items appear registered in the panel menu.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/34085
+			const TestSlotFillPanel = ( { panelId } ) => (
+				<SlotFillProvider>
+					<ToolsPanelItems>
+						<ToolsPanelItem { ...altControlProps } panelId="1234">
+							<div>Item 1</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanelItems>
+						<ToolsPanelItem { ...controlProps } panelId="9999">
+							<div>Item 2</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanel { ...defaultProps } panelId={ panelId }>
+						<Slot />
+					</ToolsPanel>
+				</SlotFillProvider>
+			);
+
+			const { rerender } = render( <TestSlotFillPanel panelId="1234" /> );
+			await openDropdownMenu();
+
+			// Only the item matching the panelId should have been registered
+			// and appear in the panel menu.
+			let altMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Show Alt',
+			} );
+			let exampleMenuItem = screen.queryByRole( 'menuitemcheckbox', {
+				name: 'Hide and reset Example',
+			} );
+
+			expect( altMenuItem ).toBeInTheDocument();
+			expect( exampleMenuItem ).not.toBeInTheDocument();
+
+			// Re-render the panel with different panelID simulating a block
+			// selection change.
+			rerender( <TestSlotFillPanel panelId="9999" /> );
+
+			altMenuItem = screen.queryByRole( 'menuitemcheckbox', {
+				name: 'Show Alt',
+			} );
+			exampleMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Hide and reset Example',
+			} );
+
+			expect( altMenuItem ).not.toBeInTheDocument();
+			expect( exampleMenuItem ).toBeInTheDocument();
 		} );
 	} );
 

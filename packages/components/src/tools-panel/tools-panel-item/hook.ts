@@ -40,6 +40,7 @@ export function useToolsPanelItem(
 
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+	const previousPanelId = usePrevious( currentPanelId );
 
 	const hasMatchingPanel =
 		currentPanelId === panelId || currentPanelId === null;
@@ -47,7 +48,7 @@ export function useToolsPanelItem(
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
 	useEffect( () => {
-		if ( hasMatchingPanel ) {
+		if ( hasMatchingPanel && previousPanelId !== null ) {
 			registerPanelItem( {
 				hasValue: hasValueCallback,
 				isShownByDefault,
@@ -58,15 +59,21 @@ export function useToolsPanelItem(
 		}
 
 		return () => {
-			if ( hasMatchingPanel ) {
+			if (
+				( previousPanelId === null && !! currentPanelId ) ||
+				currentPanelId === panelId
+			) {
 				deregisterPanelItem( label );
 			}
 		};
 	}, [
+		currentPanelId,
 		hasMatchingPanel,
 		isShownByDefault,
 		label,
 		hasValueCallback,
+		panelId,
+		previousPanelId,
 		resetAllFilterCallback,
 	] );
 
