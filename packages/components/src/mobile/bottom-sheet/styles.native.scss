@@ -148,20 +148,16 @@
 	flex: 1;
 }
 
+.clearIcon {
+	margin-left: 16;
+}
+
 .icon {
 	color: $toolbar-button;
 }
 
 .iconDark {
 	color: #c3c4c7;
-}
-
-.clearButtonIcon {
-	color: $gray-lighten-10;
-}
-
-.clearButtonIconDark {
-	color: $dark-tertiary;
 }
 
 // Footer Message Cell
