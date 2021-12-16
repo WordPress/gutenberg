@@ -13,7 +13,7 @@ In a block's `edit` implementation, render a `<DimensionControl />` component.
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { DimensionControl } from '@wordpress/block-editor';
+import { DimensionControl } from '@wordpress/components';
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...

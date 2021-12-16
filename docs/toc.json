@@ -99,15 +99,7 @@
 				]
 			},
 			{ "docs/how-to-guides/feature-flags.md": [] },
-			{
-				"docs/how-to-guides/format-api/README.md": [
-					{
-						"docs/how-to-guides/format-api/1-register-format.md": []
-					},
-					{ "docs/how-to-guides/format-api/2-toolbar-button.md": [] },
-					{ "docs/how-to-guides/format-api/3-apply-format.md": [] }
-				]
-			},
+			{ "docs/how-to-guides/format-api.md": [] },
 			{
 				"docs/how-to-guides/javascript/README.md": [
 					{

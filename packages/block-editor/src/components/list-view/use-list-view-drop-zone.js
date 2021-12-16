@@ -226,7 +226,7 @@ export default function useListViewDropZone() {
 					return {
 						clientId,
 						rootClientId,
-						blockIndex: getBlockIndex( clientId, rootClientId ),
+						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,
 						isDraggedBlock: isBlockDrag
 							? draggedBlockClientIds.includes( clientId )

@@ -12,6 +12,7 @@
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const { formatResultsErrors } = require( 'jest-message-util' );
+const filenamify = require( 'filenamify' );
 
 class FlakyTestsReporter {
 	constructor( globalConfig, options ) {
@@ -53,7 +54,7 @@ class FlakyTestsReporter {
 					);
 
 					await fs.writeFile(
-						`flaky-tests/${ testTitle }.json`,
+						`flaky-tests/${ filenamify( testTitle ) }.json`,
 						JSON.stringify( {
 							title: testTitle,
 							path: testPath,

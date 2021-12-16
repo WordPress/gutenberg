@@ -31,5 +31,9 @@
 			"link": true
 		}
 	},
-	"style": "wp-block-post-comments"
+	"style": [
+		"wp-block-post-comments",
+		"wp-block-buttons",
+		"wp-block-button"
+	]
 }
