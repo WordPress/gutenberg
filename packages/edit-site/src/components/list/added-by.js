@@ -87,7 +87,7 @@ function AddedByAuthor( { id } ) {
 				<img
 					onLoad={ () => setIsImageLoaded( true ) }
 					alt=""
-					src={ user?.avatar_urls[ 48 ] }
+					src={ user?.avatar_urls?.[ 48 ] }
 				/>
 			</div>
 			<span>{ user?.nickname }</span>
