@@ -228,7 +228,6 @@ export default function EntitiesSavedStates( { close } ) {
 					as={ Button }
 					variant="secondary"
 					onClick={ dismissPanel }
-					className="editor-entities-saved-states__cancel-button"
 				>
 					{ __( 'Cancel' ) }
 				</FlexItem>
