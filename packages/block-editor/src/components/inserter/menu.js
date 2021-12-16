@@ -3,8 +3,7 @@
  */
 import {
 	useState,
-	useRef,
-	useEffect,
+	forwardRef,
 	useCallback,
 	useMemo,
 } from '@wordpress/element';
@@ -35,8 +34,7 @@ function InserterMenu( {
 	showMostUsedBlocks,
 	__experimentalFilterValue = '',
 	shouldFocusBlock = true,
-	isOpen = false,
-} ) {
+}, ref ) {
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
 	);
@@ -175,23 +173,14 @@ function InserterMenu( {
 		[ blocksTab, patternsTab, reusableBlocksTab ]
 	);
 
-	const searchControlRef = useRef();
-	useEffect( () => {
-		// Make sure focus only occurs if open
-		if ( ! isOpen ) {
-			return;
-		}
-		searchControlRef.current.focus();
-	}, [ isOpen ] );
-
 	return (
 		<div className="block-editor-inserter__menu">
 			<div className="block-editor-inserter__main-area">
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
 					<SearchControl
+						ref={ ref }
 						className="block-editor-inserter__search"
-						ref={ searchControlRef }
 						onChange={ ( value ) => {
 							if ( hoveredItem ) setHoveredItem( null );
 							setFilterValue( value );
@@ -236,4 +225,4 @@ function InserterMenu( {
 	);
 }
 
-export default InserterMenu;
+export default forwardRef( InserterMenu );

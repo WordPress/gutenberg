@@ -10,6 +10,7 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,6 +36,14 @@ export default function InserterSidebar( isOpen = false ) {
 		focusOnMount: null,
 	} );
 
+	const inserterRef = useRef();
+
+	useEffect( () => {
+		if ( isOpen ) {
+			inserterRef.current.focus();
+		}
+		}, [ isOpen ] );
+
 	return (
 		<div
 			ref={ inserterDialogRef }
@@ -50,7 +59,7 @@ export default function InserterSidebar( isOpen = false ) {
 			</TagName>
 			<div className="edit-post-editor__inserter-panel-content">
 				<Library
-					isOpen={ isOpen }
+					ref={ inserterRef }
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }
