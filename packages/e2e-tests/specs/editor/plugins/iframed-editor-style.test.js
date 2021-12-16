@@ -31,7 +31,7 @@ describe( 'iframed editor styles', () => {
 	it( 'should load editor styles through the block editor settings', async () => {
 		await insertBlock( 'Paragraph' );
 
-		// expect( await getComputedStyle( page ) ).toBe( '1px' );
+		expect( await getComputedStyle( page ) ).toBe( '1px' );
 
 		await openDocumentSettingsSidebar();
 		await clickButton( 'Page' );
