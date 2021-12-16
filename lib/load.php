@@ -92,14 +92,22 @@ require_once __DIR__ . '/widgets-page.php';
 require __DIR__ . '/compat.php';
 require __DIR__ . '/compat/wordpress-5.8/index.php';
 require __DIR__ . '/compat/wordpress-5.8/utils.php';
+require __DIR__ . '/compat/wordpress-5.8/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.8.1/index.php';
 require __DIR__ . '/compat/wordpress-5.9/blocks.php';
+require __DIR__ . '/compat/wordpress-5.9/block-patterns.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-5.9/default-editor-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
+// Needs to be loaded before get-global-styles-and-settings.php
+// to make sure we can use the check "function_exists( 'wp_get_global_styles' )".
+// If it loads after, that function will always be present at that point
+// and the global styles assets won't be loaded.
+require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
+require __DIR__ . '/compat/wordpress-5.9/global-styles-css-custom-properties.php';
 require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/templates.php';
 require __DIR__ . '/compat/wordpress-5.9/template-parts.php';

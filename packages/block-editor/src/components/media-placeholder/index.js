@@ -75,6 +75,7 @@ export function MediaPlaceholder( {
 	onDoubleClick,
 	onFilesPreUpload = noop,
 	onHTMLDrop = noop,
+	onClose = noop,
 	children,
 	mediaLibraryButton,
 	placeholder,
@@ -328,6 +329,7 @@ export function MediaPlaceholder( {
 				gallery={ multiple && onlyAllowsImages() }
 				multiple={ multiple }
 				onSelect={ onSelect }
+				onClose={ onClose }
 				allowedTypes={ allowedTypes }
 				value={
 					Array.isArray( value )

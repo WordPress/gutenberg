@@ -25,7 +25,11 @@ export default function SiteExport() {
 			const blob = await response.blob();
 
 			downloadjs( blob, 'edit-site-export.zip', 'application/zip' );
-		} catch ( error ) {
+		} catch ( errorResponse ) {
+			let error = {};
+			try {
+				error = await errorResponse.json();
+			} catch ( e ) {}
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message

@@ -313,6 +313,7 @@ _Example:_
 {
 	"scripts": {
 		"start": "wp-scripts start",
+		"start:hot": "wp-scripts start --hot",
 		"start:custom": "wp-scripts start entry-one.js entry-two.js --output-path=custom"
 	}
 }
@@ -321,10 +322,12 @@ _Example:_
 This is how you execute the script with presented setup:
 
 -   `npm start` - starts the build for development.
+-   `npm start:hot` - starts the build for development with "Fast Refresh". The page will automatically reload if you make changes to the code.
 -   `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
+-   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
 -   `--webpack--devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
