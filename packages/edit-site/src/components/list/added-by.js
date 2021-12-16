@@ -14,7 +14,11 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { layout as themeIcon, plugins as pluginIcon } from '@wordpress/icons';
+import {
+	commentAuthorAvatar as authorIcon,
+	layout as themeIcon,
+	plugins as pluginIcon,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
@@ -77,18 +81,26 @@ function AddedByAuthor( { id } ) {
 	] );
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 
+	const hasAvatar = !! user?.avatar_urls?.[ 48 ];
+
 	return (
 		<HStack alignment="left">
 			<div
-				className={ classnames( 'edit-site-list-added-by__avatar', {
+				className={ classnames( {
+					'edit-site-list-added-by__avatar': hasAvatar,
+					'edit-site-list-added-by__icon': ! hasAvatar,
 					'is-loaded': isImageLoaded,
 				} ) }
 			>
-				<img
-					onLoad={ () => setIsImageLoaded( true ) }
-					alt=""
-					src={ user?.avatar_urls?.[ 48 ] }
-				/>
+				{ hasAvatar ? (
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ user?.avatar_urls[ 48 ] }
+					/>
+				) : (
+					<Icon icon={ authorIcon } />
+				) }
 			</div>
 			<span>{ user?.nickname }</span>
 		</HStack>
