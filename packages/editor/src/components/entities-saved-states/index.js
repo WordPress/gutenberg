@@ -6,14 +6,13 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
-import { close as closeIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -208,8 +207,10 @@ export default function EntitiesSavedStates( { close } ) {
 			{ ...saveDialogProps }
 			className="entities-saved-states__panel"
 		>
-			<div className="entities-saved-states__panel-header">
-				<Button
+			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
+				<FlexItem
+					isBlock
+					as={ Button }
 					ref={ saveButtonRef }
 					variant="primary"
 					disabled={
@@ -221,13 +222,16 @@ export default function EntitiesSavedStates( { close } ) {
 					className="editor-entities-saved-states__save-button"
 				>
 					{ __( 'Save' ) }
-				</Button>
-				<Button
-					icon={ closeIcon }
+				</FlexItem>
+				<FlexItem
+					isBlock
+					as={ Button }
+					variant="secondary"
 					onClick={ dismissPanel }
-					label={ __( 'Close panel' ) }
-				/>
-			</div>
+				>
+					{ __( 'Cancel' ) }
+				</FlexItem>
+			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
 				<strong>{ __( 'Are you ready to save?' ) }</strong>
