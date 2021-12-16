@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useResizeObserver } from '@wordpress/compose';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { Icon, check, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
@@ -27,6 +27,7 @@ const OptionList = ( { anchorRef, isOpen, children } ) => {
 			className="components-custom-select-control__popover"
 			isAlternate={ true }
 			position={ 'bottom center' }
+			shouldAnchorIncludePadding
 		>
 			{ children }
 		</Popover>
@@ -124,7 +125,7 @@ export default function CustomSelectControl( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
 		style: {
-			width: buttonWidth,
+			minWidth: buttonWidth,
 		},
 	} );
 	// We need this here, because the null active descendant is not fully ARIA compliant.
@@ -133,6 +134,19 @@ export default function CustomSelectControl( {
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
+
+	const toggleButtonProps = getToggleButtonProps( {
+		// This is needed because some speech recognition software don't support `aria-labelledby`.
+		'aria-label': label,
+		'aria-labelledby': undefined,
+		className: 'components-custom-select-control__button',
+		isSmall: true,
+		describedBy: getDescribedBy(),
+	} );
+
+	// Merge the toggle button's ref and the anchorRef so that the anchorRef can be
+	// used for calculating the Popover position based on the size of the button.
+	const buttonRef = useMergeRefs( [ toggleButtonProps.ref, anchorRef ] );
 
 	return (
 		<div
@@ -155,17 +169,7 @@ export default function CustomSelectControl( {
 					{ label }
 				</label>
 			) }
-			<Button
-				ref={ anchorRef }
-				{ ...getToggleButtonProps( {
-					// This is needed because some speech recognition software don't support `aria-labelledby`.
-					'aria-label': label,
-					'aria-labelledby': undefined,
-					className: 'components-custom-select-control__button',
-					isSmall: true,
-					describedBy: getDescribedBy(),
-				} ) }
-			>
+			<Button { ...toggleButtonProps } ref={ buttonRef }>
 				{ buttonResizeListener }
 				{ itemToString( selectedItem ) }
 				<Icon
