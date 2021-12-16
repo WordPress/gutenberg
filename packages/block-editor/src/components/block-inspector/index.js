@@ -66,7 +66,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				<InspectorControls.Slot />
+				<InspectorControls.Slot bubblesVirtually={ false } />
 			</div>
 		);
 	}

@@ -21,20 +21,6 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import { usePopoverScroll } from './use-popover-scroll';
 
 /**
- * Returns true if the container contains the document active element.
- *
- * @param {HTMLElement} container An HTML element.
- *
- * @return {boolean} Whether the container contains the currently active element in the document.
- */
-const hasFocusWithin = ( container ) => {
-	return (
-		!! container &&
-		!! container?.contains( container?.ownerDocument?.activeElement )
-	);
-};
-
-/**
  * Renders block tools (the block toolbar, select/navigation mode toolbar, the
  * insertion point and a slot for the inline rich text toolbar). Must be wrapped
  * around the block content and editor styles wrapper or iframe.
@@ -68,13 +54,6 @@ export default function BlockTools( {
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
-		if (
-			__unstableContentRef?.current &&
-			! hasFocusWithin( __unstableContentRef?.current )
-		) {
-			return;
-		}
-
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
