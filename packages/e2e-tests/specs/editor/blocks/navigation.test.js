@@ -14,8 +14,6 @@ import {
 	saveDraft,
 	showBlockToolbar,
 	openPreviewPage,
-	selectBlockByClientId,
-	getAllBlocks,
 	ensureSidebarOpened,
 	__experimentalRest as rest,
 	publishPost,
@@ -120,21 +118,6 @@ const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
 const ADD_ALL_PAGES_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Add all pages']`;
 const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
-
-async function turnResponsivenessOn() {
-	const blocks = await getAllBlocks();
-
-	await selectBlockByClientId( blocks[ 0 ].clientId );
-	await ensureSidebarOpened();
-
-	const [ responsivenessToggleButton ] = await page.$x(
-		'//label[text()[contains(.,"Enable responsive menu")]]'
-	);
-
-	await responsivenessToggleButton.click();
-
-	await saveDraft();
-}
 
 /**
  * Delete all items for the given REST resources using the REST API.
@@ -732,29 +715,11 @@ describe( 'Navigation', () => {
 		} );
 	} );
 
-	// The following tests are unstable, roughly around when https://github.com/WordPress/wordpress-develop/pull/1412
-	// landed. The block manually tests well, so let's skip to unblock other PRs and immediately follow up. cc @vcanales
-	it.skip( 'loads frontend code only if the block is present', async () => {
-		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
-		// consistent and to test the feature more rigorously than the single default sample page.
-		// await mockPagesResponse( [
-		// 	{
-		// 		title: 'Home',
-		// 		slug: 'home',
-		// 	},
-		// 	{
-		// 		title: 'About',
-		// 		slug: 'about',
-		// 	},
-		// 	{
-		// 		title: 'Contact Us',
-		// 		slug: 'contact',
-		// 	},
-		// ] );
-
-		// Create first block at the start in order to enable preview.
-		await insertBlock( 'Navigation' );
-		await saveDraft();
+	it( 'does not load the frontend script if no navigation blocks are present', async () => {
+		await createNewPost();
+		await insertBlock( 'Paragraph' );
+		await page.waitForSelector( 'p[data-title="Paragraph"]:focus' );
+		await page.keyboard.type( 'Hello' );
 
 		const previewPage = await openPreviewPage();
 		const isScriptLoaded = await previewPage.evaluate(
@@ -766,22 +731,14 @@ describe( 'Navigation', () => {
 		);
 
 		expect( isScriptLoaded ).toBe( false );
+	} );
 
-		const allPagesButton = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
-		await allPagesButton.click();
+	it( 'loads the frontend script only once even when multiple navigation blocks are present', async () => {
+		await createNewPost();
 		await insertBlock( 'Navigation' );
-		const allPagesButton2 = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
-		await allPagesButton2.click();
-		await turnResponsivenessOn();
+		await insertBlock( 'Navigation' );
+		const previewPage = await openPreviewPage();
 
-		await previewPage.reload( {
-			waitFor: [ 'networkidle0', 'domcontentloaded' ],
-		} );
-
-		/*
-			Count instances of the tag to make sure that it's been loaded only once,
-			regardless of the number of navigation blocks present.
-		*/
 		const tagCount = await previewPage.evaluate(
 			() =>
 				Array.from(
@@ -792,103 +749,5 @@ describe( 'Navigation', () => {
 		);
 
 		expect( tagCount ).toBe( 1 );
-	} );
-
-	it.skip( 'loads frontend code only if responsiveness is turned on', async () => {
-		// await mockPagesResponse( [
-		// 	{
-		// 		title: 'Home',
-		// 		slug: 'home',
-		// 	},
-		// 	{
-		// 		title: 'About',
-		// 		slug: 'about',
-		// 	},
-		// 	{
-		// 		title: 'Contact Us',
-		// 		slug: 'contact',
-		// 	},
-		// ] );
-
-		await insertBlock( 'Navigation' );
-		await saveDraft();
-
-		const previewPage = await openPreviewPage();
-		let isScriptLoaded = await previewPage.evaluate(
-			() =>
-				null !==
-				document.querySelector(
-					'script[src*="navigation/view.min.js"]'
-				)
-		);
-
-		expect( isScriptLoaded ).toBe( false );
-
-		const allPagesButton = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
-		await allPagesButton.click();
-
-		await turnResponsivenessOn();
-
-		await previewPage.reload( {
-			waitFor: [ 'networkidle0', 'domcontentloaded' ],
-		} );
-
-		isScriptLoaded = await previewPage.evaluate(
-			() =>
-				null !==
-				document.querySelector(
-					'script[src*="navigation/view.min.js"]'
-				)
-		);
-
-		expect( isScriptLoaded ).toBe( true );
-	} );
-
-	describe( 'Permission based restrictions', () => {
-		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
-			await createNewPost();
-			await insertBlock( 'Navigation' );
-
-			const startEmptyButton = await page.waitForXPath(
-				START_EMPTY_XPATH
-			);
-
-			// This creates an empty Navigation post type entity.
-			await startEmptyButton.click();
-
-			// Publishing the Post ensures the Navigation entity is saved.
-			// The Post itself is irrelevant.
-			await publishPost();
-
-			// Switch to a Contributor role user - they should not have
-			// permission to update Navigations.
-			await loginUser( username, contribUserPassword );
-
-			await createNewPost();
-
-			await insertBlock( 'Navigation' );
-
-			// Select the Navigation post created by the Admin early
-			// in the test.
-			const navigationPostCreatedByAdminName = 'Navigation';
-			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
-			await dropdown.click();
-			const theOption = await page.waitForXPath(
-				`//*[contains(@class, 'components-menu-item__item')][ text()="${ navigationPostCreatedByAdminName }" ]`
-			);
-			await theOption.click();
-
-			// Make sure the snackbar error shows up
-			await page.waitForXPath(
-				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
-			);
-
-			// Expect a console 403 for request to Navigation Areas for lower permisison users.
-			// This is because reading requires the `edit_theme_options` capability
-			// which the Contributor level user does not have.
-			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
-			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
-			expect( console ).toHaveErrored();
-		} );
 	} );
 } );
