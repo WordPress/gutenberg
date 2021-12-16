@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import noop from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +27,7 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { EntityProvider, useEntityProp } from '@wordpress/core-data';
+
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -38,6 +39,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -103,6 +105,8 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
+	const noticeRef = useRef();
+
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
@@ -161,6 +165,8 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
+
 	const [
 		hasSavedUnsavedInnerBlocks,
 		setHasSavedUnsavedInnerBlocks,
@@ -183,6 +189,10 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
+		canUserUpdateNavigationEntity,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserDeleteNavigationEntity,
+		hasResolvedCanUserDeleteNavigationEntity,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
@@ -296,6 +306,54 @@ function Navigation( {
 		// innerBlocks are intentionally not listed as deps. This function is only concerned
 		// with the snapshot from the time when ref became undefined.
 	}, [ clientId, ref, innerBlocks ] );
+
+	useEffect( () => {
+		const setPermissionsNotice = () => {
+			if ( noticeRef.current ) {
+				return;
+			}
+
+			noticeRef.current =
+				'block-library/core/navigation/permissions/update';
+
+			createWarningNotice(
+				__(
+					'You do not have permission to edit this Menu. Any changes made will not be saved.'
+				),
+				{
+					id: noticeRef.current,
+					type: 'snackbar',
+				}
+			);
+		};
+
+		const removePermissionsNotice = () => {
+			if ( ! noticeRef.current ) {
+				return;
+			}
+			removeNotice( noticeRef.current );
+			noticeRef.current = null;
+		};
+
+		if ( ! isSelected && ! isInnerBlockSelected ) {
+			removePermissionsNotice();
+		}
+
+		if (
+			( isSelected || isInnerBlockSelected ) &&
+			hasResolvedCanUserUpdateNavigationEntity &&
+			! canUserUpdateNavigationEntity
+		) {
+			setPermissionsNotice();
+		}
+	}, [
+		ref,
+		isEntityAvailable,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserUpdateNavigationEntity,
+		isSelected,
+		isInnerBlockSelected,
+	] );
 
 	const startWithEmptyMenu = useCallback( () => {
 		if ( navigationArea ) {
@@ -492,18 +550,24 @@ function Navigation( {
 				</InspectorControls>
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
-						<NavigationMenuNameControl />
-						<NavigationMenuDeleteControl
-							onDelete={ () => {
-								if ( navigationArea ) {
-									setAreaMenu( 0 );
-								}
-								setAttributes( {
-									ref: undefined,
-								} );
-								setIsPlaceholderShown( true );
-							} }
-						/>
+						{ hasResolvedCanUserUpdateNavigationEntity &&
+							canUserUpdateNavigationEntity && (
+								<NavigationMenuNameControl />
+							) }
+						{ hasResolvedCanUserDeleteNavigationEntity &&
+							canUserDeleteNavigationEntity && (
+								<NavigationMenuDeleteControl
+									onDelete={ () => {
+										if ( navigationArea ) {
+											setAreaMenu( 0 );
+										}
+										setAttributes( {
+											ref: undefined,
+										} );
+										setIsPlaceholderShown( true );
+									} }
+								/>
+							) }
 					</InspectorControls>
 				) }
 				<nav { ...blockProps }>
