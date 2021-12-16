@@ -383,6 +383,7 @@ export default function LogoEdit( {
 	const onRemoveLogo = () => {
 		setLogo( null );
 		setLogoUrl( undefined );
+		setAttributes( { width: undefined } );
 	};
 
 	const { createErrorNotice } = useDispatch( noticesStore );
