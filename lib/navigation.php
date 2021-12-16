@@ -51,7 +51,22 @@ function gutenberg_register_navigation_post_type() {
 			'revisions',
 		),
 		'capabilities'          => array(
-			'create_posts' => 'edit_theme_options',
+			// Meta Capabilities.
+			'edit_post'              => 'edit_post',
+			'read_post'              => 'read_post',
+			'delete_post'            => 'delete_post',
+			// Primitive Capabilities.
+			'edit_posts'             => 'edit_theme_options',
+			'edit_others_posts'      => 'edit_theme_options',
+			'delete_posts'           => 'edit_theme_options',
+			'publish_posts'          => 'edit_theme_options',
+			'read_private_posts'     => 'edit_theme_options',
+			'read'                   => 'read',
+			'delete_private_posts'   => 'edit_theme_options',
+			'delete_published_posts' => 'edit_theme_options',
+			'delete_others_posts'    => 'edit_theme_options',
+			'edit_private_posts'     => 'edit_theme_options',
+			'edit_published_posts'   => 'edit_theme_options',
 		),
 	);
 
