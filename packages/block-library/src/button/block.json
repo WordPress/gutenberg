@@ -79,7 +79,10 @@
 		},
 		"__experimentalBorder": {
 			"radius": true,
-			"__experimentalSkipSerialization": true
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"radius": true
+			}
 		},
 		"__experimentalSelector": ".wp-block-button__link"
 	},

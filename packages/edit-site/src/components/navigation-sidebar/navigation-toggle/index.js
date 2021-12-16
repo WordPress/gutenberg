@@ -90,6 +90,8 @@ function NavigationToggle( { icon } ) {
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
 				ref={ navigationToggleRef }
+				// isPressed will add unwanted styles.
+				aria-pressed={ isNavigationOpen }
 				onClick={ toggleNavigationPanel }
 				showTooltip
 			>
