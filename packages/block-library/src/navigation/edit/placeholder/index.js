@@ -181,8 +181,13 @@ export default function NavigationPlaceholder( {
 								<Icon icon={ navigation } />{ ' ' }
 								{ __( 'Navigation' ) }
 							</div>
+
 							<hr />
-							{ hasMenus || navigationMenus.length ? (
+							{ __(
+								'You do not have permission to create Navigation Menus'
+							) }
+							{ canUserCreateNavigation &&
+							( hasMenus || navigationMenus.length ) ? (
 								<>
 									<ExistingMenusDropdown
 										canSwitchNavigationMenu={
