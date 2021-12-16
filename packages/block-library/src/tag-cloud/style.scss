@@ -21,9 +21,10 @@
 
 	&.is-style-pill a {
 		border: 1px solid currentColor;
-		font-size: var(--wp--preset--font-size--normal);
-		margin-bottom: 10px;
-		padding: 5px 10px;
-		text-decoration: none;
+		font-size: var(--wp--preset--font-size--normal) !important; // !important Needed to override the inline styles.
+		margin-bottom: 1ch;
+		margin-right: 1ch;
+		padding: 1ch 2ch;
+		text-decoration: none !important; // !important needed to override generic post content link decoration.
 	}
 }
