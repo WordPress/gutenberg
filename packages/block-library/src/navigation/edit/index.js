@@ -162,7 +162,7 @@ function Navigation( {
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
 		},
-		[ clientId, ref ]
+		[ clientId ]
 	);
 	const hasExistingNavItems = !! innerBlocks.length;
 	const {
