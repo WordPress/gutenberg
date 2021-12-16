@@ -18,6 +18,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import DeleteTemplate from './delete-template';
 import EditTemplateTitle from './edit-template-title';
+import TemplateDescription from './template-description';
 
 function TemplateTitle() {
 	const { template, isEditing, title } = useSelect( ( select ) => {
@@ -51,7 +52,11 @@ function TemplateTitle() {
 		templateTitle = template.slug;
 	}
 
-	const hasOptions = !! ( template.custom || template.wp_id );
+	const hasOptions = !! (
+		template.custom ||
+		template.wp_id ||
+		template.description
+	);
 
 	return (
 		<div className="edit-post-template-top-area">
@@ -89,9 +94,8 @@ function TemplateTitle() {
 					) }
 					renderContent={ () => (
 						<>
-							{ ! template.has_theme_file && (
-								<EditTemplateTitle />
-							) }
+							<EditTemplateTitle />
+							<TemplateDescription />
 							<DeleteTemplate />
 						</>
 					) }
