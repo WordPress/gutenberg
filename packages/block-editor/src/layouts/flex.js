@@ -11,6 +11,7 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -85,10 +86,7 @@ export default {
 		);
 	},
 	save: function FlexLayoutStyle( { selector, layout } ) {
-		const {
-			orientation = 'horizontal',
-			setCascadingProperties = false,
-		} = layout;
+		const { orientation = 'horizontal' } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const justifyContent =
@@ -97,53 +95,43 @@ export default {
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
 			? layout.flexWrap
 			: 'wrap';
-		let rowOrientation = `
+		const rowOrientation = `
 		flex-direction: row;
 		align-items: center;
 		justify-content: ${ justifyContent };
 		`;
-		if ( setCascadingProperties ) {
-			// --layout-justification-setting allows children to inherit the value
-			// regardless or row or column direction.
-			rowOrientation += `
-			--layout-justification-setting: ${ justifyContent };
-			--layout-direction: row;
-			--layout-wrap: ${ flexWrap };
-			--layout-justify: ${ justifyContent };
-			--layout-align: center;
-			`;
-		}
 		const alignItems =
 			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
-		let columnOrientation = `
+		const columnOrientation = `
 		flex-direction: column;
 		align-items: ${ alignItems };
 		`;
-		if ( setCascadingProperties ) {
-			columnOrientation += `
-			--layout-justification-setting: ${ alignItems };
-			--layout-direction: column;
-			--layout-justify: initial;
-			--layout-align: ${ alignItems };
-			`;
+		const styleContent = `
+		${ appendSelectors( selector ) } {
+			display: flex;
+			gap: ${
+				hasBlockGapStylesSupport
+					? 'var( --wp--style--block-gap, 0.5em )'
+					: '0.5em'
+			};
+			flex-wrap: ${ flexWrap };
+			${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
 		}
-		return (
-			<style>{ `
-				${ appendSelectors( selector ) } {
-					display: flex;
-					gap: ${
-						hasBlockGapStylesSupport
-							? 'var( --wp--style--block-gap, 0.5em )'
-							: '0.5em'
-					};
-					flex-wrap: ${ flexWrap };
-					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
-				}
 
-				${ appendSelectors( selector, '> *' ) } {
-					margin: 0;
-				}
-			` }</style>
+		${ appendSelectors( selector, '> *' ) } {
+			margin: 0;
+		}
+	`;
+		return (
+			<style>
+				{ applyFilters(
+					'blockEditor.FlexLayoutStyle',
+					styleContent,
+					selector,
+					appendSelectors,
+					layout
+				) }
+			</style>
 		);
 	},
 	getOrientation( layout ) {

@@ -605,3 +605,48 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 }
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
+
+function block_core_navigation_add_styles_to_layout( $style, $selector, $layout ) {
+	if ( ! isset( $layout['type'] ) || 'flex' !== $layout['type'] ) {
+		return $style;	
+	}
+
+	$custom_properties       =  '';
+	$layout_orientation      = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
+	$justify_content_options = array(
+		'left'   => 'flex-start',
+		'right'  => 'flex-end',
+		'center' => 'center',
+	);
+	$flex_wrap_options       = array( 'wrap', 'nowrap' );
+		$flex_wrap           = ! empty( $layout['flexWrap'] ) && in_array( $layout['flexWrap'], $flex_wrap_options, true ) ?
+			$layout['flexWrap'] :
+			'wrap';
+
+	if ( 'horizontal' === $layout_orientation ) {
+		$custom_properties .= '--layout-direction: row;';
+
+		if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+			// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
+			$custom_properties .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
+			$custom_properties .= "--layout-wrap: $flex_wrap;";
+			$custom_properties .= "--layout-justify: {$justify_content_options[ $layout['justifyContent'] ]};";
+			$custom_properties .= '--layout-align: center;';
+		}
+	} else {
+		$custom_properties .= '--layout-direction: column;';
+
+		if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+			// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
+			$custom_properties .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
+			$custom_properties .= '--layout-justify: initial;';
+			$custom_properties .= "--layout-align: {$justify_content_options[ $layout['justifyContent'] ]};";
+		}
+	}
+
+	$style .= "$selector { $custom_properties }";
+
+	return $style;
+}
+
+add_filter( 'layout_styles', 'block_core_navigation_add_styles_to_layout', 10, 3 );
