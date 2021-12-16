@@ -212,6 +212,14 @@ function LinkSettings( {
 		[ linkRelInputValue ]
 	);
 
+	const clearURLInput = () => {
+		setUrlInputValue( '' );
+	};
+
+	const clearLabelInput = () => {
+		setLabelInputValue( '' );
+	};
+
 	const onChangeLinkRel = useCallback( ( value ) => {
 		setLinkRelInputValue( value );
 	}, [] );
@@ -248,6 +256,7 @@ function LinkSettings( {
 							label={ options.url.label }
 							value={ urlInputValue }
 							valuePlaceholder={ options.url.placeholder }
+							onClear={ () => clearURLInput() }
 							onChange={ onChangeURL }
 							onSubmit={ onCloseSettingsSheet }
 							autoCapitalize="none"
@@ -265,6 +274,7 @@ function LinkSettings( {
 						label={ options.linkLabel.label }
 						value={ labelInputValue }
 						valuePlaceholder={ options.linkLabel.placeholder }
+						onClear={ () => clearLabelInput() }
 						onChange={ onChangeLabel }
 					/>
 				) }

@@ -79,6 +79,10 @@ export const LinkPicker = ( {
 		styles.omniCellDark
 	);
 
+	const clearInput = () => {
+		setValue( { value: '', clipboardUrl } );
+	};
+
 	useEffect( () => {
 		getURLFromClipboard()
 			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
@@ -105,6 +109,7 @@ export const LinkPicker = ( {
 					autoCapitalize="none"
 					autoCorrect={ false }
 					keyboardType="url"
+					onClear={ () => clearInput() }
 					onChangeValue={ ( newValue ) => {
 						setValue( { value: newValue, clipboardUrl } );
 					} }

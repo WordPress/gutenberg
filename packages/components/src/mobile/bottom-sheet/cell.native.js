@@ -110,6 +110,7 @@ class BottomSheetCell extends Component {
 			valueStyle = {},
 			cellContainerStyle = {},
 			cellRowContainerStyle = {},
+			onClear,
 			onChangeValue,
 			onSubmit,
 			children,
@@ -191,26 +192,16 @@ class BottomSheetCell extends Component {
 			}
 		};
 
-		const setTextInputValue = ( text ) => {
-			this.setState( { localValue: text } );
-			this.props.onChangeValue( text );
-		};
-
 		const clearButton = () => {
 			return (
-				<>
-					{ this.state.localValue !== '' && (
-						<TouchableOpacity
-							onPress={ () => setTextInputValue( '' ) }
-						>
-							<Icon
-								icon={ isIOS ? cancelCircleFilled : close }
-								fill={ clearButtonIconStyle.color }
-								size={ 24 }
-							/>
-						</TouchableOpacity>
-					) }
-				</>
+				<TouchableOpacity onPress={ onClear }>
+					<Icon
+						icon={ isIOS ? cancelCircleFilled : close }
+						fill={ iconStyleBase.color }
+						size={ 24 }
+						style={ styles.clearIcon }
+					/>
+				</TouchableOpacity>
 			);
 		};
 
@@ -267,10 +258,10 @@ class BottomSheetCell extends Component {
 						ref={ ( c ) => ( this._valueTextInput = c ) }
 						numberOfLines={ 1 }
 						style={ finalStyle }
-						value={ this.state.localValue }
+						value={ value }
 						placeholder={ valuePlaceholder }
 						placeholderTextColor={ '#87a6bc' }
-						onChangeText={ ( text ) => setTextInputValue( text ) }
+						onChangeText={ onChangeValue }
 						editable={ isValueEditable }
 						pointerEvents={
 							this.state.isEditingValue ? 'auto' : 'none'
@@ -281,7 +272,7 @@ class BottomSheetCell extends Component {
 						keyboardType={ this.typeToKeyboardType( type, step ) }
 						{ ...valueProps }
 					/>
-					{ displayClearButton && clearButton() }
+					{ value !== '' && displayClearButton && clearButton() }
 				</View>
 			) : (
 				<Text
@@ -336,10 +327,6 @@ class BottomSheetCell extends Component {
 		const iconStyleBase = getStylesFromColorScheme(
 			styles.icon,
 			styles.iconDark
-		);
-		const clearButtonIconStyle = getStylesFromColorScheme(
-			styles.clearButtonIcon,
-			styles.clearButtonIconDark
 		);
 		const resetButtonStyle = getStylesFromColorScheme(
 			styles.resetButton,
