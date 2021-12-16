@@ -94,7 +94,7 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
-	context: { navigationArea },
+	context: { navigationArea, postId },
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -129,10 +129,10 @@ function Navigation( {
 	const ref = navigationArea ? navigationAreaMenu : attributes.ref;
 
 	const setRef = useCallback(
-		( postId ) => {
-			setAttributes( { ref: postId } );
+		( navId ) => {
+			setAttributes( { ref: navId } );
 			if ( navigationArea ) {
-				setAreaMenu( postId );
+				setAreaMenu( navId );
 			}
 		},
 		[ navigationArea ]
@@ -327,6 +327,7 @@ function Navigation( {
 				blockProps={ blockProps }
 				blocks={ innerBlocks }
 				clientId={ clientId }
+				postId={ postId }
 				navigationMenus={ navigationMenus }
 				hasSelection={ isSelected || isInnerBlockSelected }
 				hasSavedUnsavedInnerBlocks={ hasSavedUnsavedInnerBlocks }
@@ -536,6 +537,7 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 							clientId={ clientId }
+							postId={ postId }
 						/>
 					) }
 					{ ! isEntityAvailable && ! isPlaceholderShown && (

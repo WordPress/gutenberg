@@ -11,7 +11,7 @@ import { useCallback } from '@wordpress/element';
  */
 import useGenerateDefaultNavigationTitle from './use-generate-default-navigation-title';
 
-export default function useCreateNavigationMenu( clientId ) {
+export default function useCreateNavigationMenu( clientId, postId ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const generateDefaultTitle = useGenerateDefaultNavigationTitle( clientId );
 
@@ -22,10 +22,13 @@ export default function useCreateNavigationMenu( clientId ) {
 			if ( ! title ) {
 				title = await generateDefaultTitle();
 			}
+
+			const status = postId ? 'inherit' : 'publish';
 			const record = {
 				title,
 				content: serialize( blocks ),
-				status: 'publish',
+				status,
+				parent: postId,
 			};
 
 			return await saveEntityRecord(

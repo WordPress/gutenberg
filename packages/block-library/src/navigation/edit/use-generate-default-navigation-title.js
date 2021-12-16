@@ -15,13 +15,13 @@ import useTemplatePartAreaLabel from '../use-template-part-area-label';
 const DRAFT_MENU_PARAMS = [
 	'postType',
 	'wp_navigation',
-	{ status: 'draft', per_page: -1 },
+	{ status: 'inherit', per_page: -1 },
 ];
 
 const PUBLISHED_MENU_PARAMS = [
 	'postType',
 	'wp_navigation',
-	{ per_page: -1, status: 'publish' },
+	{ per_page: -1, status: [ 'inherit', 'publish' ] },
 ];
 
 export default function useGenerateDefaultNavigationTitle( clientId ) {

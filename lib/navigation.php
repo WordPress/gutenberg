@@ -40,11 +40,12 @@ function gutenberg_register_navigation_post_type() {
 		// We should disable UI for non-block themes.
 		'show_ui'               => wp_is_block_theme(),
 		'show_in_menu'          => false,
+		'hierarchical'          => true,
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'map_meta_cap'          => true,
 		'rest_base'             => 'navigation',
-		'rest_controller_class' => WP_REST_Posts_Controller::class,
+		'rest_controller_class' => WP_REST_Navigation_Controller::class,
 		'supports'              => array(
 			'title',
 			'editor',
