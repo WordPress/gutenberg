@@ -29,14 +29,17 @@ function AutoBlockPreview( {
 		useResizeObserver();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const { styles, assets, duotone } = useSelect( ( select ) => {
-		const settings = select( store ).getSettings();
-		return {
-			styles: settings.styles,
-			assets: settings.__unstableResolvedAssets,
-			duotone: settings.__experimentalFeatures?.color?.duotone,
-		};
-	}, [] );
+	const { styles, assets, __unstableResolvedContentStyles, duotone } =
+		useSelect( ( select ) => {
+			const settings = select( store ).getSettings();
+			return {
+				styles: settings.styles,
+				assets: settings.__unstableResolvedAssets,
+				duotone: settings.__experimentalFeatures?.color?.duotone,
+				__unstableResolvedContentStyles:
+					settings.__unstableResolvedContentStyles,
+			};
+		}, [] );
 
 	// Avoid scrollbars for pattern previews.
 	const editorStyles = useMemo( () => {
@@ -77,7 +80,14 @@ function AutoBlockPreview( {
 				} }
 			>
 				<Iframe
-					head={ <EditorStyles styles={ editorStyles } /> }
+					head={
+						<EditorStyles
+							styles={ editorStyles }
+							__unstableResolvedContentStyles={
+								__unstableResolvedContentStyles
+							}
+						/>
+					}
 					assets={ assets }
 					contentRef={ useRefEffect( ( bodyElement ) => {
 						const {

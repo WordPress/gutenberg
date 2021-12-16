@@ -66,7 +66,56 @@ function useDarkThemeBodyClassName( styles ) {
 	);
 }
 
-export default function EditorStyles( { styles } ) {
+function useParsedAssets( html ) {
+	return useMemo( () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = html;
+		return Array.from( doc.body.children );
+	}, [ html ] );
+}
+
+function PrefixedStyle( { tagName, href, id, rel, media, textContent } ) {
+	const TagName = tagName.toLowerCase();
+
+	function onLoad( event ) {
+		const { sheet } = event.target;
+		const { cssRules } = sheet;
+
+		let index = 0;
+
+		for ( const rule of cssRules ) {
+			const { type, STYLE_RULE, selectorText, cssText } = rule;
+
+			if ( type !== STYLE_RULE ) {
+				continue;
+			}
+
+			if ( selectorText.includes( EDITOR_STYLES_SELECTOR ) ) {
+				return;
+			}
+
+			sheet.deleteRule( index );
+			sheet.insertRule(
+				'html :where(.editor-styles-wrapper) ' + cssText,
+				index
+			);
+
+			index++;
+		}
+	}
+
+	if ( TagName === 'style' ) {
+		return <TagName { ...{ id, onLoad } }>{ textContent }</TagName>;
+	}
+
+	return <TagName { ...{ href, id, rel, media, onLoad } } />;
+}
+
+export default function EditorStyles( {
+	styles,
+	__unstableResolvedContentStyles,
+} ) {
+	const _styles = useParsedAssets( __unstableResolvedContentStyles );
 	const transformedStyles = useMemo(
 		() => transformStyles( styles, EDITOR_STYLES_SELECTOR ),
 		[ styles ]
@@ -77,6 +126,21 @@ export default function EditorStyles( { styles } ) {
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
 			<style ref={ useDarkThemeBodyClassName( styles ) } />
+			{ _styles.map(
+				( { tagName, href, id, rel, media, textContent } ) => (
+					<PrefixedStyle
+						key={ id }
+						{ ...{
+							tagName,
+							href,
+							id,
+							rel,
+							media,
+							textContent,
+						} }
+					/>
+				)
+			) }
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }

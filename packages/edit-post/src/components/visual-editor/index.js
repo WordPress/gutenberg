@@ -49,13 +49,19 @@ function MaybeIframe( {
 	styles,
 	assets,
 	style,
+	__unstableResolvedContentStyles,
 } ) {
 	const ref = useMouseMoveTypingReset();
 
 	if ( ! shouldIframe ) {
 		return (
 			<>
-				<EditorStyles styles={ styles } />
+				<EditorStyles
+					styles={ styles }
+					__unstableResolvedContentStyles={
+						__unstableResolvedContentStyles
+					}
+				/>
 				<WritingFlow
 					ref={ contentRef }
 					className="editor-styles-wrapper"
@@ -70,7 +76,14 @@ function MaybeIframe( {
 
 	return (
 		<Iframe
-			head={ <EditorStyles styles={ styles } /> }
+			head={
+				<EditorStyles
+					styles={ styles }
+					__unstableResolvedContentStyles={
+						__unstableResolvedContentStyles
+					}
+				/>
+			}
 			assets={ assets }
 			ref={ ref }
 			contentRef={ contentRef }
@@ -123,6 +136,7 @@ export default function VisualEditor( { styles } ) {
 		themeSupportsLayout,
 		assets,
 		useRootPaddingAwareAlignments,
+		__unstableResolvedContentStyles,
 	} = useSelect( ( select ) => {
 		const _settings = select( blockEditorStore ).getSettings();
 		return {
@@ -131,6 +145,8 @@ export default function VisualEditor( { styles } ) {
 			assets: _settings.__unstableResolvedAssets,
 			useRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+			__unstableResolvedContentStyles:
+				_settings.__unstableResolvedContentStyles,
 		};
 	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -251,6 +267,9 @@ export default function VisualEditor( { styles } ) {
 						styles={ styles }
 						assets={ assets }
 						style={ { paddingBottom } }
+						__unstableResolvedContentStyles={
+							__unstableResolvedContentStyles
+						}
 					>
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&
