@@ -44,7 +44,8 @@ function NavigationToggle( { icon } ) {
 	const navigationToggleRef = useRef();
 
 	useEffect( () => {
-		// Focus the trigger button if close
+		// TODO: Remove this effect when alternative solution is merged.
+		// See: https://github.com/WordPress/gutenberg/pull/37314
 		if ( ! isNavigationOpen ) {
 			navigationToggleRef.current.focus();
 		}
