@@ -183,9 +183,10 @@ export default function NavigationPlaceholder( {
 							</div>
 
 							<hr />
-							{ __(
-								'You do not have permission to create Navigation Menus'
-							) }
+							{ ! canUserCreateNavigation &&
+								__(
+									'You do not have permission to create Navigation Menus'
+								) }
 							{ canUserCreateNavigation &&
 							( hasMenus || navigationMenus.length ) ? (
 								<>
