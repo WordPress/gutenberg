@@ -892,11 +892,11 @@ export function getBlockOrder( state, rootClientId ) {
  *
  * @param {Object}  state        Editor state.
  * @param {string}  clientId     Block client ID.
- * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {number} Index at which block exists in order.
  */
-export function getBlockIndex( state, clientId, rootClientId ) {
+export function getBlockIndex( state, clientId ) {
+	const rootClientId = getBlockRootClientId( state, clientId );
 	return getBlockOrder( state, rootClientId ).indexOf( clientId );
 }
 

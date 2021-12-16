@@ -62,11 +62,10 @@ export function useEventHandlers( clientId ) {
 				event.preventDefault();
 
 				if ( keyCode === ENTER ) {
-					const rootClientId = getBlockRootClientId( clientId );
 					insertDefaultBlock(
 						{},
-						rootClientId,
-						getBlockIndex( clientId, rootClientId ) + 1
+						getBlockRootClientId( clientId ),
+						getBlockIndex( clientId ) + 1
 					);
 				} else {
 					removeBlock( clientId );
