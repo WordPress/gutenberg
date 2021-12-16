@@ -460,20 +460,19 @@ button.wp-block-navigation-item__content {
 				// Position and style.
 				position: static;
 				border: none;
-				padding-left: 32px;
-				padding-right: 32px;
+				padding-left: 2em;
+				padding-right: 2em;
 			}
 
 			// Space unfolded items using gap and padding for submenus.
 			.wp-block-navigation__submenu-container,
 			.wp-block-navigation__container {
 				gap: var(--wp--style--block-gap, 2em);
+			}
 
-				// Apply top padding to nested submenus.
-				.wp-block-navigation__submenu-container,
-				.wp-block-navigation__container {
-					padding-top: var(--wp--style--block-gap, 2em);
-				}
+			// Apply top padding to nested submenus.
+			.wp-block-navigation__submenu-container {
+				padding-top: var(--wp--style--block-gap, 2em);
 			}
 
 			// A default padding is added to submenu items. It's not appropriate inside the modal.
