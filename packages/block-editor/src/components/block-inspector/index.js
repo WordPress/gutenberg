@@ -72,12 +72,12 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 					label={ __( 'Typography' ) }
 				/>
 				<InspectorControls.Slot
-					__experimentalGroup="border"
-					label={ __( 'Border' ) }
-				/>
-				<InspectorControls.Slot
 					__experimentalGroup="dimensions"
 					label={ __( 'Dimensions' ) }
+				/>
+				<InspectorControls.Slot
+					__experimentalGroup="border"
+					label={ __( 'Border' ) }
 				/>
 			</div>
 		);
@@ -144,12 +144,12 @@ const BlockInspectorSingleBlock = ( {
 				label={ __( 'Typography' ) }
 			/>
 			<InspectorControls.Slot
-				__experimentalGroup="border"
-				label={ __( 'Border' ) }
-			/>
-			<InspectorControls.Slot
 				__experimentalGroup="dimensions"
 				label={ __( 'Dimensions' ) }
+			/>
+			<InspectorControls.Slot
+				__experimentalGroup="border"
+				label={ __( 'Border' ) }
 			/>
 			<div>
 				<AdvancedControls />
