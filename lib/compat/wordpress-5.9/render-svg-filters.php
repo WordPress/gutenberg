@@ -6,7 +6,10 @@
  */
 
 /**
- * Render the SVG filters.
+ * Render the SVG filters supplied by theme.json.
+ *
+ * Note that this doesn't render the per-block user-defined
+ * filters which are handled by duotone.php.
  *
  * Safari doesn't render SVG filters defined in data URIs,
  * and SVG filters won't render in the head of a document,
