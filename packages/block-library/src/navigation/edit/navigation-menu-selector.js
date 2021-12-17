@@ -15,7 +15,7 @@ import useNavigationMenu from '../use-navigation-menu';
 export default function NavigationMenuSelector( {
 	onSelect,
 	onCreateNew,
-	canUserCreateNavigation = false,
+	showCreate = false,
 } ) {
 	const { navigationMenus } = useNavigationMenu();
 	const ref = useEntityId( 'postType', 'wp_navigation' );
@@ -46,7 +46,7 @@ export default function NavigationMenuSelector( {
 					} ) }
 				/>
 			</MenuGroup>
-			{ canUserCreateNavigation && (
+			{ showCreate && (
 				<MenuGroup>
 					<MenuItem onClick={ onCreateNew }>
 						{ __( 'Create new menu' ) }
