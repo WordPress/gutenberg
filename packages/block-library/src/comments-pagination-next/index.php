@@ -16,12 +16,18 @@
  * @return string Returns the next comments link for the query pagination.
  */
 function render_block_core_comments_pagination_next( $attributes, $content, $block ) {
-	$comments_per_page = $block->context['queryPerPage'];
-	$comments_number   = (int) get_comments_number();
-	$max_page          = isset( $comments_per_page ) ? (int) floor( $comments_number / $comments_per_page ) : 0;
-	$default_label     = __( 'Next Comments' );
-	$label             = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-	$pagination_arrow  = get_query_pagination_arrow( $block, true );
+	$per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
+	if ( 0 === $per_page && get_option( 'page_comments' ) ) {
+		$per_page = (int) get_query_var( 'comments_per_page' );
+		if ( 0 === $per_page ) {
+			$per_page = (int) get_option( 'comments_per_page' );
+		}
+	}
+	$comments_number  = (int) get_comments_number();
+	$max_page         = isset( $per_page ) ? (int) floor( $comments_number / $per_page ) : 0;
+	$default_label    = __( 'Next Comments' );
+	$label            = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
+	$pagination_arrow = get_query_pagination_arrow( $block, true );
 
 	$filter_link_attributes = function() {
 		return get_block_wrapper_attributes();
