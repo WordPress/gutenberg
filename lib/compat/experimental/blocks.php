@@ -16,9 +16,9 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 	 * @return array Returns the comment query parameters to use with the WP_Comment_Query constructor.
 	 */
 	function build_comment_query_vars_from_block( $block ) {
+
 		$comment_args = array(
 			'orderby'                   => 'comment_date_gmt',
-			'order'                     => 'ASC',
 			'status'                    => 'approve',
 			'no_found_rows'             => false,
 			'update_comment_meta_cache' => false, // We lazy-load comment meta for performance.
@@ -32,6 +32,11 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			$comment_args['hierarchical'] = 'threaded';
 		} else {
 			$comment_args['hierarchical'] = false;
+		}
+
+		// With the fallback option enabled. By default the render won't coincide with the editor.
+		if ( get_option( 'comment_order' ) ) {
+			$comment_args['order'] = get_option( 'comment_order' );
 		}
 
 		$per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
@@ -50,6 +55,11 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			} elseif ( 'oldest' === get_option( 'default_comments_page' ) ) {
 				$comment_args['offset'] = 0;
 			}
+		}
+
+		$order = ! empty( $block->context['comments/order'] ) ? $block->context['comments/order'] : null;
+		if ( $order ) {
+			$comment_args['order'] = $order;
 		}
 
 		return $comment_args;

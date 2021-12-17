@@ -55,21 +55,19 @@ export default function CommentsQueryLoopToolbar( {
 								isDragEnabled={ false }
 							/>
 						</BaseControl>
-						<BaseControl>
-							<ToggleControl
-								label={ __( 'Newer comments first' ) }
-								checked={ order === 'desc' || order === null } // Settings value not available on REST API.
-								onChange={ () => {
-									setAttributes( {
-										...attributes,
-										order:
-											order === 'desc' || order === null
-												? 'asc'
-												: 'desc',
-									} );
-								} }
-							/>
-						</BaseControl>
+						<ToggleControl
+							label={ __( 'Newer comments first' ) }
+							checked={ order === 'desc' || order === null } // Settings value not available on REST API.
+							onChange={ () => {
+								setAttributes( {
+									...attributes,
+									order:
+										order === 'desc' || order === null
+											? 'asc'
+											: 'desc',
+								} );
+							} }
+						/>
 					</>
 				) }
 			/>
