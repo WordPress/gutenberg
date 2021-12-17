@@ -174,8 +174,6 @@ function Navigation( {
 				? _uncontrolledInnerBlocks
 				: _controlledInnerBlocks;
 
-			const { canUser, hasFinishedResolution } = select( coreStore );
-
 			return {
 				hasSubmenus: !! innerBlocks.find(
 					( block ) => block.name === 'core/navigation-submenu'
@@ -184,12 +182,6 @@ function Navigation( {
 				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
 				controlledInnerBlocks: _controlledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
-				canUserCreateNavigation:
-					canUser( 'create', 'navigation' ) || undefined,
-				hasResolvedCanUserCreateNavigation: hasFinishedResolution(
-					'canUser',
-					[ 'create', 'navigation' ]
-				),
 			};
 		},
 		[ clientId ]
@@ -228,6 +220,8 @@ function Navigation( {
 		hasResolvedCanUserUpdateNavigationEntity,
 		canUserDeleteNavigationEntity,
 		hasResolvedCanUserDeleteNavigationEntity,
+		canUserCreateNavigation,
+		hasResolvedCanUserCreateNavigation,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
