@@ -386,24 +386,6 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 }
 
 /**
- * Renders the duotone filter SVG for the preset.
- *
- * @param array $preset Duotone preset value as seen in theme.json.
- */
-function gutenberg_render_duotone_filter( $preset ) {
-	$svg = gutenberg_get_duotone_filter_svg( $preset );
-	add_action(
-		// SVG filters won't render at all in the head of a document and
-		// Safari incorrectly renders SVG filters in the footer, so the
-		// beginning of the body seems to be the safest place to render.
-		'wp_body_open',
-		function () use ( $svg ) {
-			echo $svg;
-		}
-	);
-}
-
-/**
  * Registers the style and colors block attributes for block types that support it.
  *
  * @param WP_Block_Type $block_type Block Type.
@@ -457,6 +439,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	);
 	$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
 	$filter_id       = gutenberg_get_duotone_filter_id( $filter_preset );
+	$filter_svg      = gutenberg_get_duotone_filter_svg( $filter_preset );
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
@@ -477,7 +460,18 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	wp_enqueue_style( $filter_id );
 
 	// Render any custom filter the user may have added.
-	gutenberg_render_duotone_filter( $filter_preset );
+	add_action(
+		// There are a couple of known rendering quirks in Safari.
+		// 1. Filters won't render at all when the SVG is in the head of
+		// the document.
+		// 2. Filters display incorrectly when the SVG is defined after
+		// where the filter is used in the document, so the footer does
+		// not work.
+		'wp_body_open',
+		function () use ( $filter_svg ) {
+			echo $filter_svg;
+		}
+	);
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(
