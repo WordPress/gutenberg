@@ -18,6 +18,7 @@
 
 ### Bug Fix
 
+-   CustomSelectControl: Update to use a Popover component for rendering the menu ([#37272](https://github.com/WordPress/gutenberg/pull/37272)).
 -   Fixed spacing between `BaseControl` fields and help text within the `ToolsPanel` ([#36334](https://github.com/WordPress/gutenberg/pull/36334))
 -   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
 -   Fixed empty `ToolsPanel` height by correcting menu button line-height ([#36895](https://github.com/WordPress/gutenberg/pull/36895)).
