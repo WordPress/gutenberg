@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
+import { useResizeObserver } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { Icon, check, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
@@ -103,10 +103,15 @@ export default function CustomSelectControl( {
 
 	const anchorRef = useRef();
 
+	// Calculate Popover width based on the size of the component's container.
+	// The width will be set for the content of the menu, so factor in the
+	// Popover's border to ensure that the menu lines up with the toggle button.
 	const [
-		buttonResizeListener,
-		{ width: buttonWidth },
+		containerResizeListener,
+		{ width: containerWidth },
 	] = useResizeObserver();
+	const widthMinusBorder =
+		containerWidth >= 2 ? containerWidth - 2 : containerWidth;
 
 	function getDescribedBy() {
 		if ( describedBy ) {
@@ -125,9 +130,10 @@ export default function CustomSelectControl( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
 		style: {
-			minWidth: buttonWidth,
+			minWidth: widthMinusBorder,
 		},
 	} );
+
 	// We need this here, because the null active descendant is not fully ARIA compliant.
 	if (
 		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
@@ -144,17 +150,15 @@ export default function CustomSelectControl( {
 		describedBy: getDescribedBy(),
 	} );
 
-	// Merge the toggle button's ref and the anchorRef so that the anchorRef can be
-	// used for calculating the Popover position based on the size of the button.
-	const buttonRef = useMergeRefs( [ toggleButtonProps.ref, anchorRef ] );
-
 	return (
 		<div
 			className={ classnames(
 				'components-custom-select-control',
 				className
 			) }
+			ref={ anchorRef }
 		>
+			{ containerResizeListener }
 			{ hideLabelFromVision ? (
 				<VisuallyHidden as="label" { ...getLabelProps() }>
 					{ label }
@@ -169,8 +173,7 @@ export default function CustomSelectControl( {
 					{ label }
 				</label>
 			) }
-			<Button { ...toggleButtonProps } ref={ buttonRef }>
-				{ buttonResizeListener }
+			<Button { ...toggleButtonProps }>
 				{ itemToString( selectedItem ) }
 				<Icon
 					icon={ chevronDown }
