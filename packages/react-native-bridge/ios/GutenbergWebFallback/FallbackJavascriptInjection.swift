@@ -60,21 +60,11 @@ public struct FallbackJavascriptInjection {
     }
 }
 
-public extension SourceFile {
-    func jsScript(with argument: String? = nil) throws -> WKUserScript {
-        let content = try getContent()
-        let formatted = String(format: content, argument ?? [])
-        return formatted.toJsScript()
-    }
-}
-
-public extension String {
+internal extension String {
     func toJsScript() -> WKUserScript {
         WKUserScript(source: self, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
     }
-}
 
-internal extension String {
     func removingSpacesAndNewLines() -> String {
         return replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: " ", with: "")
     }

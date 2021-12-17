@@ -29,6 +29,21 @@ public struct SourceFile {
 }
 
 extension SourceFile {
+    public func jsScript(with argument: String? = nil) throws -> WKUserScript {
+        let content = try getContent()
+        let formatted = String(format: content, argument ?? [])
+        
+        switch self.type {
+        case .css:
+            let injectCssScriptTemplate = "window.injectCss(`%@`)"
+            return String(format: injectCssScriptTemplate, formatted).toJsScript()
+        case .js, .json:
+            return formatted.toJsScript()
+        }
+    }
+}
+
+extension SourceFile {
     static let editorStyle = SourceFile(name: "editor-style-overrides", type: .css)
     static let wpBarsStyle = SourceFile(name: "wp-bar-override", type: .css)
     static let injectCss = SourceFile(name: "inject-css", type: .js)
