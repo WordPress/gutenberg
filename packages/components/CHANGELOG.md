@@ -10,6 +10,10 @@
 
 -   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([36588](https://github.com/WordPress/gutenberg/pull/36588)).
 
+### Bug Fix
+
+-   Allowed `ToolsPanel` to register items when `panelId` is `null` due to multiple block selection ([37216](https://github.com/WordPress/gutenberg/pull/37216)).
+
 ## 19.1.4 (2021-12-13)
 
 ### Bug Fix
