@@ -92,7 +92,7 @@ You can add a description by using the description attribute in the [registerBlo
 
 Stick to a single imperative sentence with an action + subject format. Examples:
 
--   Start with the building block of all narrative.
+-   Start with the basic building block of all narrative.
 -   Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
 -   Create a bulleted or numbered list.
 
