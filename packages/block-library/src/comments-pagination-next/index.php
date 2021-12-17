@@ -7,19 +7,6 @@
 
 
 /**
- * Applies the block attributes to the block markup without using a wrapper.
- *
- * @return string Returns the styles and classes defined on the block editor for the block.
- */
-function add_next_comments_link_attributes() {
-	if ( ! function_exists( 'get_block_wrapper_attributes' ) ) {
-		return;
-	}
-	return get_block_wrapper_attributes();
-}
-add_filter( 'next_comments_link_attributes', 'add_next_comments_link_attributes' );
-
-/**
  * Renders the `core/comments-pagination-next` block on the server.
  *
  * @param array    $attributes Block attributes.
@@ -35,10 +22,19 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 	$default_label     = __( 'Next Comments' );
 	$label             = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow  = get_query_pagination_arrow( $block, true );
+
+	$filter_link_attributes = function() {
+		return get_block_wrapper_attributes();
+	};
+	add_filter( 'next_comments_link_attributes', $filter_link_attributes );
+
 	if ( $pagination_arrow ) {
 		$label .= $pagination_arrow;
 	}
+
 	$next_comments_link = get_next_comments_link( $label, $max_page );
+
+	remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
 
 	if ( ! isset( $next_comments_link ) ) {
 		return '';
