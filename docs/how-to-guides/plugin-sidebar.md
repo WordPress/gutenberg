@@ -10,7 +10,7 @@ _Note: this tutorial covers a custom sidebar, if you are looking to add controls
 
 ## Before you start
 
-The tutorial assumes you have an existing plugin setup and ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](/docs/how-to-guides/javascript/README.md) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
+The tutorial assumes you have an existing plugin setup and are ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](/docs/how-to-guides/javascript/README.md) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
 
 ## Step-by-step guide
 
@@ -184,7 +184,7 @@ register_post_meta( 'post', 'sidebar_plugin_meta_block_field', array(
 ) );
 ```
 
-To confirm, query the block editor store to see the field is loaded . After implementing, reload the editor page and open your browser's developer console.Use this JavaScript snippet in the console to confirm:
+To confirm, query the block editor store to see the field is loaded. After implementing, reload the editor page and open your browser's developer console. Use this JavaScript snippet in the console to confirm:
 
 ```js
 wp.data.select( 'core/editor' ).getCurrentPost().meta;
@@ -196,7 +196,7 @@ If the code returns `undefined` make sure your post type supports `custom-fields
 
 ### Step 4: Initialize the Input Control
 
-With the field available in the editor store, it can be surfaced to the UI. We extract the input control to a function to keep the clean as we add functionality.
+With the field available in the editor store, it can now be surfaced to the UI. We extract the input control to a function to keep the code clean as we add functionality.
 
 ```js
 ( function ( wp ) {
@@ -235,9 +235,9 @@ With the field available in the editor store, it can be surfaced to the UI. We e
 } )( window.wp );
 ```
 
-We want initialize the value in the `MetaBlockField` component with the value of `sidebar_plugin_meta_block_field`, and keep it updated when that value changes.
+We want to initialize the value in the `MetaBlockField` component with the value of `sidebar_plugin_meta_block_field`, and keep it updated when that value changes.
 
-The `useSelect` function is used to fetch data when the component loads, and updates if the data changes. Here is the code update with `useSelect`:
+The `useSelect` function is used to fetch data when the component loads and will update if the data changes. Here is the code update with `useSelect`:
 
 ```js
 ( function ( wp ) {
@@ -287,7 +287,7 @@ The `wp.data.useSelect` function is from the `@wordpress/data` package, so `wp-d
 
 Note: The `getEditedPostAttribute` call is used to retrieve the most recent values of the post, including user editions that haven't been yet saved.
 
-Confirm it working by updating the code, reloading, and open the sidebar. The input's content is no longer `Initial value` but a void string. Users can't type values yet, but you can check that the component is updated if the value in the store changes. Open the browser's console, execute
+Confirm it's working by updating the code, reloading, and opening the sidebar. The input's content is no longer `Initial value` but a void string. Users can't type values yet, but you can check that the component is updated if the value in the store changes. Open the browser's console, execute
 
 ```js
 wp.data
@@ -351,9 +351,9 @@ The `useDispatch` function takes a store name as its only argument and returns m
 } )( window.wp );
 ```
 
-After update, when the user types the input control calls `editPost` and updating the editor store on each key stroke.
+After the update, when the user types, the input control calls `editPost` and updates the editor store on each keystroke.
 
-Update the JavaScript, and load the sidebar and you can type in the input field. You can confirm it is saved by typing something in the input control, and execute the JavaScript snipper in your browser's development console:
+Update the JavaScript, load the sidebar, and type in the input field. You can confirm it is saved by typing something in the input control and executing the JavaScript snippet in your browser's development console:
 
 ```js
 wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
@@ -363,11 +363,13 @@ wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
 
 The message displayed should be what you typed in the input.
 
-When saving a post, you can confirm it is stored properly in the database, by reloading after a save and confirm the input control is initialized with the last value you typed.
+When saving a post, you can confirm it is stored properly in the database by reloading after a save and confirming the input control is initialized with the last value you typed.
 
 ## Additional resources
 
-Documentation for working with the [@wordpress/data package](/packages/data/README.md). Functions used in this guie:
+Documentation for working with the [@wordpress/data package](/packages/data/README.md).
+
+Functions used in this guide:
 
 -   [useSelect](/packages/data/README.md#useselect).
 -   [getEditedPostAttribute](/docs/reference-guides/data/data-core-editor.md#geteditedpostattribute)
