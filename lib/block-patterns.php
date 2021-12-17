@@ -19,7 +19,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Standard', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:post-title {"isLink":true} /-->
@@ -37,7 +37,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Image at left', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:columns {"align":"wide"} -->
@@ -57,7 +57,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Small image and title', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:columns {"verticalAlignment":"center"} -->
@@ -76,7 +76,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Grid', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
@@ -199,84 +199,6 @@ function gutenberg_remove_core_patterns() {
 	}
 }
 
-/**
- * Register Core's official patterns from wordpress.org/patterns.
- *
- * @since 5.8.0
- */
-function gutenberg_load_remote_core_patterns() {
-	// This is the core function that provides the same feature.
-	if ( function_exists( '_load_remote_block_patterns' ) ) {
-		return;
-	}
-
-	/**
-	 * Filter to disable remote block patterns.
-	 *
-	 * @since 5.8.0
-	 *
-	 * @param bool $should_load_remote
-	 */
-	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
-
-	if ( $should_load_remote ) {
-		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$core_keyword_id = 11; // 11 is the ID for "core".
-		$request->set_param( 'keyword', $core_keyword_id );
-		$response = rest_do_request( $request );
-		if ( $response->is_error() ) {
-			return;
-		}
-		$patterns = $response->get_data();
-
-		foreach ( $patterns as $settings ) {
-			$pattern_name = 'core/' . sanitize_title( $settings['title'] );
-			register_block_pattern( $pattern_name, (array) $settings );
-		}
-	}
-}
-
-/**
- * Register `Featured` (category) patterns from wordpress.org/patterns.
- *
- * @since 5.9.0
- */
-function gutenberg_load_remote_featured_patterns() {
-	/**
-	 * Filter to disable remote block patterns.
-	 *
-	 * @since 5.8.0
-	 *
-	 * @param bool $should_load_remote
-	 */
-	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
-
-	if ( ! $should_load_remote ) {
-		return;
-	}
-
-	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'featured' ) ) {
-		register_block_pattern_category( 'featured', array( 'label' => __( 'Featured', 'gutenberg' ) ) );
-	}
-	$request             = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-	$request['category'] = 26; // This is the `Featured` category id from pattern directory.
-	$response            = rest_do_request( $request );
-	if ( $response->is_error() ) {
-		return;
-	}
-	$patterns = $response->get_data();
-	foreach ( $patterns as $pattern ) {
-		$pattern_name = sanitize_title( $pattern['title'] );
-		$registry     = WP_Block_Patterns_Registry::get_instance();
-		// Some patterns might be already registerd as `core patterns with the `core` prefix.
-		$is_registered = $registry->is_registered( $pattern_name ) || $registry->is_registered( "core/$pattern_name" );
-		if ( ! $is_registered ) {
-			register_block_pattern( $pattern_name, (array) $pattern );
-		}
-	}
-}
-
-
 add_action(
 	'init',
 	function() {
@@ -285,20 +207,5 @@ add_action(
 		}
 		gutenberg_remove_core_patterns();
 		gutenberg_register_gutenberg_patterns();
-	}
-);
-
-add_action(
-	'current_screen',
-	function( $current_screen ) {
-		if ( ! get_theme_support( 'core-block-patterns' ) ) {
-			return;
-		}
-
-		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
-		if ( $current_screen->is_block_editor || $is_site_editor ) {
-			gutenberg_load_remote_core_patterns();
-			gutenberg_load_remote_featured_patterns();
-		}
 	}
 );
