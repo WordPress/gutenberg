@@ -347,6 +347,18 @@ function Navigation( {
 		ref,
 	} );
 
+	useNavigationNotice( {
+		name: 'block-library/core/navigation/permissions/create',
+		message: __( 'You do not have permission to create Navigation Menus.' ),
+		createOn:
+			( isSelected || isInnerBlockSelected ) &&
+			! ref &&
+			hasResolvedCanUserCreateNavigation &&
+			! canUserCreateNavigation,
+		destroyOn: ref || ( ! isSelected && ! isInnerBlockSelected ),
+		ref,
+	} );
+
 	const startWithEmptyMenu = useCallback( () => {
 		if ( navigationArea ) {
 			setAreaMenu( 0 );
