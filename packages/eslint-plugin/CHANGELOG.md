@@ -14,7 +14,7 @@
 
 ### Bug Fix
 
--   Fix Babel config resolution when a custom ESLint config present ([#37406](https://github.com/WordPress/gutenberg/pull/37406)).
+-   Fix Babel config resolution when a custom ESLint config present ([#37406](https://github.com/WordPress/gutenberg/pull/37406)). Warning: it won't recognize the `babel.config.json` file present in the project until the upstream bug in `cosmiconfig` is fixed.
 
 ## 9.3.0 (2021-11-15)
 

@@ -52,6 +52,8 @@ const config = {
 	},
 };
 
+// It won't recognize the `babel.config.json` file used in the project until the upstream bug in `cosmiconfig` is fixed:
+// https://github.com/davidtheclark/cosmiconfig/issues/246.
 const result = cosmiconfigSync( 'babel' ).search();
 if ( ! result || ! result.filepath ) {
 	config.parserOptions = {
