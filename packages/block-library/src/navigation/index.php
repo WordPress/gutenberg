@@ -456,19 +456,19 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		'left'          => 'items-justified-left',
 		'right'         => 'items-justified-right',
 		'center'        => 'items-justified-center',
-		'space-between' => 'items-justified-space-between'
+		'space-between' => 'items-justified-space-between',
 	);
 
 	// Restore legacy classnames for submenu positioning.
 	$layout_class = '';
 	if ( isset( $attributes['layout']['justifyContent'] ) ) {
-		$layout_class .= $layout_justification[$attributes['layout']['justifyContent']];
+		$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
 	}
-	if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation']) {
+	if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
 		$layout_class .= ' is-vertical';
 	}
 
-	if ( isset( $attributes['layout']['flexWrap'] ) && 'nowrap' === $attributes['layout']['flexWrap']) {
+	if ( isset( $attributes['layout']['flexWrap'] ) && 'nowrap' === $attributes['layout']['flexWrap'] ) {
 		$layout_class .= ' no-wrap';
 	}
 
