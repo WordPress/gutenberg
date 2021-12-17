@@ -137,10 +137,8 @@ export const PanelColorGradientSettingsInner = ( {
 	);
 
 	let dropdownPosition;
-	let popoverProps;
 	if ( __experimentalIsRenderedInSidebar ) {
 		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
-		popoverProps = { __unstableForcePosition: true };
 	}
 
 	return (
@@ -160,7 +158,6 @@ export const PanelColorGradientSettingsInner = ( {
 				{ settings.map( ( setting, index ) => (
 					<Dropdown
 						position={ dropdownPosition }
-						popoverProps={ popoverProps }
 						className="block-editor-panel-color-gradient-settings__dropdown"
 						key={ index }
 						contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"

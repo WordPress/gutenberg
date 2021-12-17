@@ -149,10 +149,8 @@ export default function ColorPalette( {
 	);
 
 	let dropdownPosition;
-	let popoverProps;
 	if ( __experimentalIsRenderedInSidebar ) {
 		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
-		popoverProps = { __unstableForcePosition: true };
 	}
 
 	const colordColor = colord( value );
@@ -164,7 +162,6 @@ export default function ColorPalette( {
 					position={ dropdownPosition }
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
-					popoverProps={ popoverProps }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<button
 							className="components-color-palette__custom-color"
