@@ -90,10 +90,10 @@ function generate_bundles() {
   local IOS_SOURCEMAP_OUTPUT=$5
 
   echo -e "\n\033[1mGenerate Android JS bundle\033[0m"
-  npm run rn-bundle -- --platform android --dev false --entry-file "$ENTRY_FILE" --bundle-output "$ANDROID_BUNDLE_OUTPUT" --sourcemap-output "$ANDROID_SOURCEMAP_OUTPUT"
+  $BUNDLE_CLI --platform android --dev false --entry-file "$ENTRY_FILE" --bundle-output "$ANDROID_BUNDLE_OUTPUT" --sourcemap-output "$ANDROID_SOURCEMAP_OUTPUT"
   
   echo -e "\n\033[1mGenerate iOS JS bundle\033[0m"
-  npm run rn-bundle -- --platform ios --dev false --entry-file "$ENTRY_FILE" --bundle-output "$IOS_BUNDLE_OUTPUT" --sourcemap-output "$IOS_SOURCEMAP_OUTPUT"
+  $BUNDLE_CLI --platform ios --dev false --entry-file "$ENTRY_FILE" --bundle-output "$IOS_BUNDLE_OUTPUT" --sourcemap-output "$IOS_SOURCEMAP_OUTPUT"
 }
 
 function extract_source_from_sourcemap_file() {
@@ -180,6 +180,7 @@ fi
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 GUTENBERG_SOURCE_CODE_DIR="$SCRIPT_DIR/../../.."
 WP_CLI="php -d memory_limit=4G $SCRIPT_DIR/wp-cli.phar"
+BUNDLE_CLI="$GUTENBERG_SOURCE_CODE_DIR/node_modules/.bin/react-native bundle --config $METRO_CONFIG"
 
 # Set target path
 if [[ -n $LOCAL_PATH ]]; then
