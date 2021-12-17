@@ -19,7 +19,7 @@
 		text-decoration: none;
 	}
 
-	&.is-style-pill a {
+	&.is-style-outline a {
 		border: 1px solid currentColor;
 		font-size: unset !important; // !important Needed to override the inline styles.
 		margin-bottom: 1ch;
