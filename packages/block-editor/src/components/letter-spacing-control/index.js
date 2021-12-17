@@ -38,6 +38,7 @@ export default function LetterSpacingControl( {
 			__unstableInputWidth={ __unstableInputWidth }
 			units={ units }
 			onChange={ onChange }
+			preventDeleteBubbling={ true }
 		/>
 	);
 }

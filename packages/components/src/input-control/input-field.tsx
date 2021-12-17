@@ -18,7 +18,7 @@ import type {
  * WordPress dependencies
  */
 import { forwardRef, useRef } from '@wordpress/element';
-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER, DELETE, BACKSPACE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
@@ -39,6 +39,7 @@ function InputField(
 		isDragEnabled = false,
 		isFocused,
 		isPressEnterToChange = false,
+		preventDeleteBubbling = false,
 		onBlur = noop,
 		onChange = noop,
 		onDrag = noop,
@@ -161,6 +162,13 @@ function InputField(
 				if ( isPressEnterToChange ) {
 					event.preventDefault();
 					handleOnCommit( event );
+				}
+				break;
+
+			case DELETE:
+			case BACKSPACE:
+				if ( preventDeleteBubbling ) {
+					event.stopPropagation();
 				}
 				break;
 		}

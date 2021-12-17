@@ -42,6 +42,14 @@ If true, the `ENTER` key press is required in order to trigger an `onChange`. If
 -   Required: No
 -   Default: `false`
 
+### preventDeleteBubbling
+
+If true, the `DELETE` and `BACKSPACE` key presses for the `onKeyDown` event will not bubble up through the DOM.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ### hideLabelFromVision
 
 If true, the label will only be visible to screen readers.

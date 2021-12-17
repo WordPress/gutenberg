@@ -15,6 +15,7 @@ interface ColorInputProps {
 	color: Colord;
 	onChange: ( nextColor: Colord ) => void;
 	enableAlpha: boolean;
+	preventDeleteBubbling?: boolean;
 }
 
 export const ColorInput = ( {
@@ -22,8 +23,9 @@ export const ColorInput = ( {
 	color,
 	onChange,
 	enableAlpha,
+	preventDeleteBubbling,
 }: ColorInputProps ) => {
-	const props = { color, onChange, enableAlpha };
+	const props = { color, onChange, enableAlpha, preventDeleteBubbling };
 	switch ( colorType ) {
 		case 'hsl':
 			return <HslInput { ...props } />;

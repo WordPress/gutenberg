@@ -43,6 +43,7 @@ export interface InputFieldProps extends BaseProps {
 	dragThreshold?: number;
 	isDragEnabled?: boolean;
 	isPressEnterToChange?: boolean;
+	preventDeleteBubbling?: boolean;
 	onChange?: InputChangeCallback;
 	onValidate?: (
 		nextValue: string,

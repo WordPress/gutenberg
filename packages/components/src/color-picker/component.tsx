@@ -136,6 +136,7 @@ const ColorPicker = (
 						color={ safeColordColor }
 						onChange={ handleChange }
 						enableAlpha={ enableAlpha }
+						preventDeleteBubbling={ true }
 					/>
 				) }
 			</AuxiliaryColorArtefactWrapper>
