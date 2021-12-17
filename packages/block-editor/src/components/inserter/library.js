@@ -7,7 +7,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,20 +14,17 @@ import { forwardRef } from '@wordpress/element';
 import InserterMenu from './menu';
 import { store as blockEditorStore } from '../../store';
 
-function InserterLibrary(
-	{
-		rootClientId,
-		clientId,
-		isAppender,
-		showInserterHelpPanel,
-		showMostUsedBlocks = false,
-		__experimentalInsertionIndex,
-		__experimentalFilterValue,
-		onSelect = noop,
-		shouldFocusBlock = false,
-	},
-	ref
-) {
+function InserterLibrary( {
+	rootClientId,
+	clientId,
+	isAppender,
+	showInserterHelpPanel,
+	showMostUsedBlocks = false,
+	__experimentalInsertionIndex,
+	__experimentalFilterValue,
+	onSelect = noop,
+	shouldFocusBlock = false,
+} ) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
 			const { getBlockRootClientId } = select( blockEditorStore );
@@ -42,7 +38,6 @@ function InserterLibrary(
 
 	return (
 		<InserterMenu
-			ref={ ref }
 			onSelect={ onSelect }
 			rootClientId={ destinationRootClientId }
 			clientId={ clientId }
@@ -56,4 +51,4 @@ function InserterLibrary(
 	);
 }
 
-export default forwardRef( InserterLibrary );
+export default InserterLibrary;

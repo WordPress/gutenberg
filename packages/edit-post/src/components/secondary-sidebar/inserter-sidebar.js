@@ -17,7 +17,7 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 import { store as editPostStore } from '../../store';
 
-export default function InserterSidebar( isOpen = false ) {
+export default function InserterSidebar() {
 	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
 		const { isFeatureActive, __experimentalGetInsertionPoint } = select(
 			editPostStore
@@ -30,19 +30,18 @@ export default function InserterSidebar( isOpen = false ) {
 	const { setIsInserterOpened } = useDispatch( editPostStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const TagName = isMobileViewport ? VisuallyHidden : 'div';
+	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 		focusOnMount: null,
 	} );
 
-	const inserterRef = useRef();
-
+	const inserterContentRef = useRef();
 	useEffect( () => {
-		if ( isOpen ) {
-			inserterRef.current.focus();
-		}
-	}, [ isOpen ] );
+		inserterContentRef.current
+			.querySelector( '.block-editor-inserter__search input' )
+			.focus();
+	}, [] );
 
 	return (
 		<div
@@ -57,9 +56,11 @@ export default function InserterSidebar( isOpen = false ) {
 					onClick={ () => setIsInserterOpened( false ) }
 				/>
 			</TagName>
-			<div className="edit-post-editor__inserter-panel-content">
+			<div
+				className="edit-post-editor__inserter-panel-content"
+				ref={ inserterContentRef }
+			>
 				<Library
-					ref={ inserterRef }
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, forwardRef, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -19,20 +19,17 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
 
-function InserterMenu(
-	{
-		rootClientId,
-		clientId,
-		isAppender,
-		__experimentalInsertionIndex,
-		onSelect,
-		showInserterHelpPanel,
-		showMostUsedBlocks,
-		__experimentalFilterValue = '',
-		shouldFocusBlock = true,
-	},
-	ref
-) {
+function InserterMenu( {
+	rootClientId,
+	clientId,
+	isAppender,
+	__experimentalInsertionIndex,
+	onSelect,
+	showInserterHelpPanel,
+	showMostUsedBlocks,
+	__experimentalFilterValue = '',
+	shouldFocusBlock = true,
+} ) {
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
 	);
@@ -177,7 +174,6 @@ function InserterMenu(
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
 					<SearchControl
-						ref={ ref }
 						className="block-editor-inserter__search"
 						onChange={ ( value ) => {
 							if ( hoveredItem ) setHoveredItem( null );
@@ -223,4 +219,4 @@ function InserterMenu(
 	);
 }
 
-export default forwardRef( InserterMenu );
+export default InserterMenu;

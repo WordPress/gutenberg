@@ -170,7 +170,7 @@ function Layout( { styles } ) {
 
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
-			return <InserterSidebar isOpen={ isInserterOpened } />;
+			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;
