@@ -133,18 +133,18 @@ export function BlockSettingsDropdown( {
 					{ ( { onClose } ) => (
 						<>
 							<MenuGroup>
-								{ showConvertToGroupButton && (
-									<ConvertToGroupButton
-										{ ...convertToGroupButtonProps }
-										onClose={ onClose }
-									/>
-								) }
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
 								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
+									/>
+								) }
+								{ showConvertToGroupButton && (
+									<ConvertToGroupButton
+										{ ...convertToGroupButtonProps }
+										onClose={ onClose }
 									/>
 								) }
 								<CopyMenuItem
