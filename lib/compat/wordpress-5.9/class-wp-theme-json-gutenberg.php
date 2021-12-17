@@ -1517,7 +1517,7 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Merge new incoming data.
+	 * Returns whether a presets should be overriden or not.
 	 *
 	 * @param array      $theme_json The theme.json like structure to inspect.
 	 * @param array      $path Path to inspect.
