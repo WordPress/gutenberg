@@ -142,7 +142,11 @@ const SiteLogo = ( {
 		return <div style={ { width, height } }>{ imgWrapper }</div>;
 	}
 
-	const currentWidth = width || imageWidthWithinContainer;
+	// Set the default width to a responsible size.
+	// Note that this width is also set in the attached frontend CSS file.
+	const defaultWidth = 120;
+
+	const currentWidth = width || defaultWidth;
 	const ratio = naturalWidth / naturalHeight;
 	const currentHeight = currentWidth / ratio;
 	const minWidth = naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
@@ -159,10 +163,6 @@ const SiteLogo = ( {
 	// @todo It would be good to revisit this once a content-width variable
 	// becomes available.
 	const maxWidthBuffer = maxWidth * 2.5;
-
-	// Set the default width to a responsible size.
-	// Note that this width is also set in the attached CSS file.
-	const defaultWidth = 120;
 
 	let showRightHandle = false;
 	let showLeftHandle = false;
@@ -383,6 +383,7 @@ export default function LogoEdit( {
 	const onRemoveLogo = () => {
 		setLogo( null );
 		setLogoUrl( undefined );
+		setAttributes( { width: undefined } );
 	};
 
 	const { createErrorNotice } = useDispatch( noticesStore );
