@@ -193,12 +193,14 @@ class BottomSheetCell extends Component {
 
 		const clearButton = () => {
 			return (
-				<TouchableOpacity onPress={ onClear }>
+				<TouchableOpacity
+					onPress={ onClear }
+					style={ styles.clearIconContainer }
+				>
 					<Icon
 						icon={ isIOS ? cancelCircleFilled : close }
 						fill={ iconStyleBase.color }
 						size={ 24 }
-						style={ styles.clearIcon }
 					/>
 				</TouchableOpacity>
 			);
