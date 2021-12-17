@@ -134,9 +134,9 @@ if ( ! function_exists( 'wp_get_global_stylesheet' ) ) {
 }
 
 /**
- * Returns the stylesheet resulting of merging core, theme, and user data.
+ * Returns a string containing the SVGs to be referenced as filters (duotone).
  *
- * @return string Stylesheet.
+ * @return string
  */
 function wp_get_global_styles_svg_filters() {
 	// Return cached value if it can be used and exists.
@@ -151,17 +151,10 @@ function wp_get_global_styles_svg_filters() {
 	}
 
 	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-	$supports_link_color = get_theme_support( 'experimental-link-color' );
 
-	// TODO: Which origins are needed for duotone filters?
-	$origins = array( 'core', 'theme', 'user' );
-	if ( ! $supports_theme_json && ! $supports_link_color ) {
-		// In this case we only enqueue the core presets (CSS Custom Properties + the classes).
-		$origins = array( 'core' );
-	} elseif ( ! $supports_theme_json && $supports_link_color ) {
-		// For the legacy link color feature to work, the CSS Custom Properties
-		// should be in scope (either the core or the theme ones).
-		$origins = array( 'core', 'theme' );
+	$origins = array( 'default', 'theme' );
+	if ( ! $supports_theme_json ) {
+		$origins = array( 'default' );
 	}
 
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
