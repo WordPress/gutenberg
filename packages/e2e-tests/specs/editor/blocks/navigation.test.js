@@ -248,7 +248,7 @@ describe( 'Navigation', () => {
 			await allPagesButton.click();
 
 			// Wait for the page list block to be present
-			await page.waitForSelector( 'div[aria-label="Block: Page List"]' );
+			await page.waitForSelector( 'ul[aria-label="Block: Page List"]' );
 
 			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
@@ -711,6 +711,9 @@ describe( 'Navigation', () => {
 		await page.keyboard.type( 'Hello' );
 
 		const previewPage = await openPreviewPage();
+		await previewPage.bringToFront();
+		await previewPage.waitForNetworkIdle();
+
 		const isScriptLoaded = await previewPage.evaluate(
 			() =>
 				null !==
@@ -726,14 +729,15 @@ describe( 'Navigation', () => {
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		await insertBlock( 'Navigation' );
+
 		const previewPage = await openPreviewPage();
+		await previewPage.bringToFront();
+		await previewPage.waitForNetworkIdle();
 
 		const tagCount = await previewPage.evaluate(
 			() =>
-				Array.from(
-					document.querySelectorAll(
-						'script[src*="navigation/view.min.js"]'
-					)
+				document.querySelectorAll(
+					'script[src*="navigation/view.min.js"]'
 				).length
 		);
 
