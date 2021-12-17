@@ -116,9 +116,9 @@ function block_core_navigation_submenu_render_submenu_icon() {
 /**
  * Renders the `core/navigation-submenu` block.
  *
- * @param array  $attributes The block attributes.
- * @param string $content The saved content.
- * @param object $block The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */

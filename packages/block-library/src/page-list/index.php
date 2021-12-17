@@ -230,9 +230,9 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
 /**
  * Renders the `core/page-list` block on server.
  *
- * @param array $attributes The block attributes.
- * @param array $content The saved content.
- * @param array $block The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param array    $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the page list markup.
  */

@@ -173,6 +173,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
       data-wp-component="VStack"
       isColumn={true}
     >
+      <Noop />
       <div
         className="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
         data-wp-c16t={true}

@@ -161,6 +161,15 @@ _Parameters_
 -   _object.excerpt_ `[string]`: Excerpt of the new post.
 -   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
+### createReusableBlock
+
+Creates a simple reusable block with a paragraph block.
+
+_Parameters_
+
+-   _content_ `string`: Paragraph block's content
+-   _title_ `title`: Reusable block's name.
+
 ### createURL
 
 Creates new URL by parsing base URL, WPPath and query string.

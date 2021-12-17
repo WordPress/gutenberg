@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import noop from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +27,7 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { EntityProvider, useEntityProp } from '@wordpress/core-data';
+
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
@@ -38,6 +39,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -52,6 +54,8 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
+
+const EMPTY_ARRAY = [];
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -103,6 +107,8 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
+	const noticeRef = useRef();
+
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
@@ -142,40 +148,61 @@ function Navigation( {
 		`navigationMenu/${ ref }`
 	);
 
-	const { innerBlocks, isInnerBlockSelected, hasSubmenus } = useSelect(
+	const {
+		hasUncontrolledInnerBlocks,
+		uncontrolledInnerBlocks,
+		controlledInnerBlocks,
+		isInnerBlockSelected,
+		hasSubmenus,
+	} = useSelect(
 		( select ) => {
-			const { getBlocks, hasSelectedInnerBlock } = select(
+			const { getBlock, getBlocks, hasSelectedInnerBlock } = select(
 				blockEditorStore
 			);
-			const blocks = getBlocks( clientId );
-			const firstSubmenu = !! blocks.find(
-				( block ) => block.name === 'core/navigation-submenu'
-			);
+
+			// This relies on the fact that `getBlock` won't return controlled
+			// inner blocks, while `getBlocks` does. It might be more stable to
+			// introduce a selector like `getUncontrolledInnerBlocks`, just in
+			// case `getBlock` is fixed.
+			const _uncontrolledInnerBlocks = getBlock( clientId ).innerBlocks;
+			const _hasUncontrolledInnerBlocks =
+				_uncontrolledInnerBlocks?.length;
+			const _controlledInnerBlocks = _hasUncontrolledInnerBlocks
+				? EMPTY_ARRAY
+				: getBlocks( clientId );
+			const innerBlocks = _hasUncontrolledInnerBlocks
+				? _uncontrolledInnerBlocks
+				: _controlledInnerBlocks;
 
 			return {
-				hasSubmenus: firstSubmenu,
-				innerBlocks: blocks,
+				hasSubmenus: !! innerBlocks.find(
+					( block ) => block.name === 'core/navigation-submenu'
+				),
+				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
+				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
+				controlledInnerBlocks: _controlledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
 		},
 		[ clientId ]
 	);
-	const hasExistingNavItems = !! innerBlocks.length;
 	const {
 		replaceInnerBlocks,
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
+
 	const [
 		hasSavedUnsavedInnerBlocks,
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
-	const isWithinUnassignedArea = navigationArea && ! ref;
+	const isWithinUnassignedArea = !! navigationArea && ! ref;
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
-		! hasExistingNavItems || isWithinUnassignedArea
+		! hasUncontrolledInnerBlocks || isWithinUnassignedArea
 	);
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
@@ -189,6 +216,10 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		navigationMenus,
 		navigationMenu,
+		canUserUpdateNavigationEntity,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserDeleteNavigationEntity,
+		hasResolvedCanUserDeleteNavigationEntity,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
@@ -293,15 +324,65 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
-	// If the ref no longer exists the reset the inner blocks
-	// to provide a clean slate.
+	// If the ref no longer exists the reset the inner blocks to provide a
+	// clean slate.
 	useEffect( () => {
-		if ( ref === undefined && innerBlocks.length > 0 ) {
+		if (
+			! hasUncontrolledInnerBlocks &&
+			controlledInnerBlocks?.length > 0 &&
+			ref === undefined
+		) {
 			replaceInnerBlocks( clientId, [] );
 		}
-		// innerBlocks are intentionally not listed as deps. This function is only concerned
-		// with the snapshot from the time when ref became undefined.
-	}, [ clientId, ref, innerBlocks ] );
+	}, [ clientId, ref, hasUncontrolledInnerBlocks, controlledInnerBlocks ] );
+
+	useEffect( () => {
+		const setPermissionsNotice = () => {
+			if ( noticeRef.current ) {
+				return;
+			}
+
+			noticeRef.current =
+				'block-library/core/navigation/permissions/update';
+
+			createWarningNotice(
+				__(
+					'You do not have permission to edit this Menu. Any changes made will not be saved.'
+				),
+				{
+					id: noticeRef.current,
+					type: 'snackbar',
+				}
+			);
+		};
+
+		const removePermissionsNotice = () => {
+			if ( ! noticeRef.current ) {
+				return;
+			}
+			removeNotice( noticeRef.current );
+			noticeRef.current = null;
+		};
+
+		if ( ! isSelected && ! isInnerBlockSelected ) {
+			removePermissionsNotice();
+		}
+
+		if (
+			( isSelected || isInnerBlockSelected ) &&
+			hasResolvedCanUserUpdateNavigationEntity &&
+			! canUserUpdateNavigationEntity
+		) {
+			setPermissionsNotice();
+		}
+	}, [
+		ref,
+		isEntityAvailable,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserUpdateNavigationEntity,
+		isSelected,
+		isInnerBlockSelected,
+	] );
 
 	const startWithEmptyMenu = useCallback( () => {
 		if ( navigationArea ) {
@@ -319,23 +400,42 @@ function Navigation( {
 	// Either this block was saved in the content or inserted by a pattern.
 	// Consider this 'unsaved'. Offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu.
-	const hasUnsavedBlocks =
-		hasExistingNavItems && ! isEntityAvailable && ! isWithinUnassignedArea;
+	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 	if ( hasUnsavedBlocks ) {
 		return (
-			<UnsavedInnerBlocks
-				blockProps={ blockProps }
-				blocks={ innerBlocks }
-				clientId={ clientId }
-				navigationMenus={ navigationMenus }
-				hasSelection={ isSelected || isInnerBlockSelected }
-				hasSavedUnsavedInnerBlocks={ hasSavedUnsavedInnerBlocks }
-				onSave={ ( post ) => {
-					setHasSavedUnsavedInnerBlocks( true );
-					// Switch to using the wp_navigation entity.
-					setRef( post.id );
-				} }
-			/>
+			<nav { ...blockProps }>
+				<ResponsiveWrapper
+					id={ clientId }
+					onToggle={ setResponsiveMenuVisibility }
+					isOpen={ isResponsiveMenuOpen }
+					isResponsive={ 'never' !== overlayMenu }
+					isHiddenByDefault={ 'always' === overlayMenu }
+					classNames={ overlayClassnames }
+					styles={ overlayStyles }
+				>
+					<UnsavedInnerBlocks
+						blockProps={ blockProps }
+						blocks={ uncontrolledInnerBlocks }
+						clientId={ clientId }
+						navigationMenus={ navigationMenus }
+						hasSelection={ isSelected || isInnerBlockSelected }
+						hasSavedUnsavedInnerBlocks={
+							hasSavedUnsavedInnerBlocks
+						}
+						onSave={ ( post ) => {
+							// Set some state used as a guard to prevent the creation of multiple posts.
+							setHasSavedUnsavedInnerBlocks( true );
+							// replaceInnerBlocks is required to ensure the block editor store is sync'd
+							// to be aware that there are now no inner blocks (as blocks moved to entity).
+							// This should probably happen automatically with useBlockSync
+							// but there appears to be a bug.
+							replaceInnerBlocks( clientId, [] );
+							// Switch to using the wp_navigation entity.
+							setRef( post.id );
+						} }
+					/>
+				</ResponsiveWrapper>
+			</nav>
 		);
 	}
 
@@ -507,18 +607,24 @@ function Navigation( {
 				</InspectorControls>
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
-						<NavigationMenuNameControl />
-						<NavigationMenuDeleteControl
-							onDelete={ () => {
-								if ( navigationArea ) {
-									setAreaMenu( 0 );
-								}
-								setAttributes( {
-									ref: undefined,
-								} );
-								setIsPlaceholderShown( true );
-							} }
-						/>
+						{ hasResolvedCanUserUpdateNavigationEntity &&
+							canUserUpdateNavigationEntity && (
+								<NavigationMenuNameControl />
+							) }
+						{ hasResolvedCanUserDeleteNavigationEntity &&
+							canUserDeleteNavigationEntity && (
+								<NavigationMenuDeleteControl
+									onDelete={ () => {
+										if ( navigationArea ) {
+											setAreaMenu( 0 );
+										}
+										setAttributes( {
+											ref: undefined,
+										} );
+										setIsPlaceholderShown( true );
+									} }
+								/>
+							) }
 					</InspectorControls>
 				) }
 				<nav { ...blockProps }>

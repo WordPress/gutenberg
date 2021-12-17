@@ -41,19 +41,28 @@ export class PostPublishButton extends Component {
 
 	createOnClick( callback ) {
 		return ( ...args ) => {
-			const { hasNonPostEntityChanges } = this.props;
-			if ( hasNonPostEntityChanges ) {
+			const {
+				hasNonPostEntityChanges,
+				setEntitiesSavedStatesCallback,
+			} = this.props;
+			// If a post with non-post entities is published, but the user
+			// elects to not save changes to the non-post entities, those
+			// entities will still be dirty when the Publish button is clicked.
+			// We also need to check that the `setEntitiesSavedStatesCallback`
+			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
+			if ( hasNonPostEntityChanges && setEntitiesSavedStatesCallback ) {
 				// The modal for multiple entity saving will open,
 				// hold the callback for saving/publishing the post
 				// so that we can call it if the post entity is checked.
 				this.setState( {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
+
 				// Open the save panel by setting its callback.
 				// To set a function on the useState hook, we must set it
 				// with another function (() => myFunction). Passing the
 				// function on its own will cause an error when called.
-				this.props.setEntitiesSavedStatesCallback(
+				setEntitiesSavedStatesCallback(
 					() => this.closeEntitiesSavedStates
 				);
 				return noop;

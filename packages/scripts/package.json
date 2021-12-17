@@ -32,6 +32,7 @@
 		"wp-scripts": "./bin/wp-scripts.js"
 	},
 	"dependencies": {
+		"@babel/core": "^7.16.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.2",
 		"@svgr/webpack": "^5.5.0",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
@@ -74,7 +75,7 @@
 		"prettier": "npm:wp-prettier@2.2.1-beta-1",
 		"puppeteer-core": "^11.0.0",
 		"react-refresh": "^0.10.0",
-		"read-pkg-up": "^1.0.1",
+		"read-pkg-up": "^7.0.1",
 		"resolve-bin": "^0.4.0",
 		"sass": "^1.35.2",
 		"sass-loader": "^12.1.0",

@@ -30,7 +30,7 @@
 	"main": "index.js",
 	"dependencies": {
 		"lodash": "^4.17.21",
-		"webpack-sources": "^2.2.0"
+		"webpack-sources": "^3.2.2"
 	},
 	"peerDependencies": {
 		"webpack": "^4.0.0"
