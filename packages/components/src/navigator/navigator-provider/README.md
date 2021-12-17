@@ -35,11 +35,11 @@ const MyNavigation = () => (
 	<NavigatorProvider initialPath="/">
 		<NavigatorScreen path="/">
 			<p>This is the home screen.</p>
-			 <NavigatorButton path="/child">
-				 Navigate to child screen.
+			<NavigatorButton path="/child">
+				Navigate to child screen.
 			</NavigatorButton>
 		</NavigatorScreen>
- *
+
 		<NavigatorScreen path="/child">
 			<p>This is the child screen.</p>
 			<NavigatorBackButton>Go back</NavigatorBackButton>
