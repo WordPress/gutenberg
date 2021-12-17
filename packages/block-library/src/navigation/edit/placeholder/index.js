@@ -31,7 +31,7 @@ const ExistingMenusDropdown = ( {
 	onFinish,
 	menus,
 	onCreateFromMenu,
-	canUserCreateNavigation = false,
+	showClassicMenus = false,
 } ) => {
 	const toggleProps = {
 		variant: 'tertiary',
@@ -66,7 +66,7 @@ const ExistingMenusDropdown = ( {
 								);
 							} ) }
 					</MenuGroup>
-					{ canUserCreateNavigation && (
+					{ showClassicMenus && (
 						<MenuGroup label={ __( 'Classic Menus' ) }>
 							{ menus?.map( ( menu ) => {
 								return (
@@ -198,7 +198,7 @@ export default function NavigationPlaceholder( {
 										onFinish={ onFinish }
 										menus={ menus }
 										onCreateFromMenu={ onCreateFromMenu }
-										canUserCreateNavigation={
+										showClassicMenus={
 											canUserCreateNavigation
 										}
 									/>
