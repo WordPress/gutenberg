@@ -31,6 +31,7 @@ const ExistingMenusDropdown = ( {
 	onFinish,
 	menus,
 	onCreateFromMenu,
+	canUserCreateNavigation = false,
 } ) => {
 	const toggleProps = {
 		variant: 'tertiary',
@@ -65,22 +66,24 @@ const ExistingMenusDropdown = ( {
 								);
 							} ) }
 					</MenuGroup>
-					<MenuGroup label={ __( 'Classic Menus' ) }>
-						{ menus?.map( ( menu ) => {
-							return (
-								<MenuItem
-									onClick={ () => {
-										setSelectedMenu( menu.id );
-										onCreateFromMenu( menu.name );
-									} }
-									onClose={ onClose }
-									key={ menu.id }
-								>
-									{ decodeEntities( menu.name ) }
-								</MenuItem>
-							);
-						} ) }
-					</MenuGroup>
+					{ canUserCreateNavigation && (
+						<MenuGroup label={ __( 'Classic Menus' ) }>
+							{ menus?.map( ( menu ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											setSelectedMenu( menu.id );
+											onCreateFromMenu( menu.name );
+										} }
+										onClose={ onClose }
+										key={ menu.id }
+									>
+										{ decodeEntities( menu.name ) }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
 				</>
 			) }
 		</DropdownMenu>
@@ -195,6 +198,9 @@ export default function NavigationPlaceholder( {
 										onFinish={ onFinish }
 										menus={ menus }
 										onCreateFromMenu={ onCreateFromMenu }
+										canUserCreateNavigation={
+											canUserCreateNavigation
+										}
 									/>
 									<hr />
 								</>
