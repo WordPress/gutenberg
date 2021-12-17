@@ -96,8 +96,8 @@ export default function PageListEdit( { context, clientId } ) {
 
 function useFrontPageId() {
 	return useSelect( ( select ) => {
-		const site =  select( coreStore ).getEntityRecord( 'site', 'root' );
-		return site?.show_on_front === 'page' && site?.page_on_front
+		const site = select( coreStore ).getEntityRecord( 'root', 'site' );
+		return site?.show_on_front === 'page' && site?.page_on_front;
 	}, [] );
 }
 
@@ -163,7 +163,7 @@ const PageItems = memo( function PageItems( {
 					'open-on-hover-click':
 						! context.openSubmenusOnClick &&
 						context.showSubmenuIcon,
-					'menu-item-home': page.id === frontPageId
+					'menu-item-home': page.id === frontPageId,
 				} ) }
 			>
 				{ hasChildren && context.openSubmenusOnClick ? (
