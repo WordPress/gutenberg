@@ -32,6 +32,7 @@ const getStringsFromPotFile = ( potFileName ) => {
 					msgctxt && stringPlural
 						? `${ msgctxt }\u0004${ stringPlural }`
 						: stringPlural,
+				context: msgctxt,
 				comments: comments?.extracted || '',
 				reference: comments?.reference.split( '\n' ) || [],
 			} )
