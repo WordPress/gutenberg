@@ -144,7 +144,6 @@ if ( ! function_exists( 'wp_get_global_styles_svg_filters' ) ) {
 		// It's cached by theme to make sure that theme switching clears the cache.
 		$transient_name = 'gutenberg_global_styles_svg_filters_' . get_stylesheet();
 		$can_use_cached = (
-			( empty( $types ) ) &&
 			( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
 			( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
 			( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
