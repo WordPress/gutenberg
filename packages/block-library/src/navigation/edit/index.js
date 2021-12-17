@@ -334,30 +334,53 @@ function Navigation( {
 		}
 	}, [ clientId, ref, hasUncontrolledInnerBlocks, controlledInnerBlocks ] );
 
-	useNavigationNotice( {
+	const [ showCantEditNotice, hideCantEditNotice ] = useNavigationNotice( {
 		name: 'block-library/core/navigation/permissions/update',
 		message: __(
 			'You do not have permission to edit this Menu. Any changes made will not be saved.'
 		),
-		createOn:
-			( isSelected || isInnerBlockSelected ) &&
-			hasResolvedCanUserUpdateNavigationEntity &&
-			! canUserUpdateNavigationEntity,
-		destroyOn: ! isSelected && ! isInnerBlockSelected,
-		navEntityIdRef: ref,
 	} );
 
-	useNavigationNotice( {
-		name: 'block-library/core/navigation/permissions/create',
-		message: __( 'You do not have permission to create Navigation Menus.' ),
-		createOn:
-			( isSelected || isInnerBlockSelected ) &&
-			! ref &&
-			hasResolvedCanUserCreateNavigation &&
-			! canUserCreateNavigation,
-		destroyOn: ref || ( ! isSelected && ! isInnerBlockSelected ),
-		navEntityIdRef: ref,
-	} );
+	const [ showCantCreateNotice, hideCantCreateNotice ] = useNavigationNotice(
+		{
+			name: 'block-library/core/navigation/permissions/create',
+			message: __(
+				'You do not have permission to create Navigation Menus.'
+			),
+		}
+	);
+
+	useEffect( () => {
+		if ( ! isSelected && ! isInnerBlockSelected ) {
+			hideCantEditNotice();
+			hideCantCreateNotice();
+		}
+
+		if ( isSelected || isInnerBlockSelected ) {
+			if (
+				hasResolvedCanUserUpdateNavigationEntity &&
+				! canUserUpdateNavigationEntity
+			) {
+				showCantEditNotice();
+			}
+
+			if (
+				! ref &&
+				hasResolvedCanUserCreateNavigation &&
+				! canUserCreateNavigation
+			) {
+				showCantCreateNotice();
+			}
+		}
+	}, [
+		isSelected,
+		isInnerBlockSelected,
+		canUserUpdateNavigationEntity,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserCreateNavigation,
+		hasResolvedCanUserCreateNavigation,
+		ref,
+	] );
 
 	const startWithEmptyMenu = useCallback( () => {
 		if ( navigationArea ) {

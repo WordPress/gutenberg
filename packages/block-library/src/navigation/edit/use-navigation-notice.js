@@ -1,51 +1,37 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticeStore } from '@wordpress/notices';
 
-function useNavigationNotice( {
-	name,
-	message,
-	createOn,
-	destroyOn,
-	navEntityIdRef,
-} = {} ) {
+function useNavigationNotice( { name, message } = {} ) {
 	const noticeRef = useRef();
 
 	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
 
-	useEffect( () => {
-		const setPermissionsNotice = () => {
-			if ( noticeRef.current ) {
-				return;
-			}
-
-			noticeRef.current = name;
-
-			createWarningNotice( message, {
-				id: noticeRef.current,
-				type: 'snackbar',
-			} );
-		};
-
-		const removePermissionsNotice = () => {
-			if ( ! noticeRef.current ) {
-				return;
-			}
-			removeNotice( noticeRef.current );
-			noticeRef.current = null;
-		};
-
-		if ( destroyOn ) {
-			removePermissionsNotice();
+	const showNotice = () => {
+		if ( noticeRef.current ) {
+			return;
 		}
 
-		if ( createOn ) {
-			setPermissionsNotice();
+		noticeRef.current = name;
+
+		createWarningNotice( message, {
+			id: noticeRef.current,
+			type: 'snackbar',
+		} );
+	};
+
+	const hideNotice = () => {
+		if ( ! noticeRef.current ) {
+			return;
 		}
-	}, [ navEntityIdRef, createOn, destroyOn ] );
+		removeNotice( noticeRef.current );
+		noticeRef.current = null;
+	};
+
+	return [ showNotice, hideNotice ];
 }
 
 export default useNavigationNotice;
