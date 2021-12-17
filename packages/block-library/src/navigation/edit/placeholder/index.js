@@ -183,12 +183,8 @@ export default function NavigationPlaceholder( {
 							</div>
 
 							<hr />
-							{ ! canUserCreateNavigation &&
-								__(
-									'You do not have permission to create Navigation Menus'
-								) }
-							{ canUserCreateNavigation &&
-							( hasMenus || navigationMenus.length ) ? (
+
+							{ hasMenus || navigationMenus?.length ? (
 								<>
 									<ExistingMenusDropdown
 										canSwitchNavigationMenu={
