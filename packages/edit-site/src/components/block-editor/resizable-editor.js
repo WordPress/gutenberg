@@ -65,9 +65,8 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 					animationFrame = iframe.contentWindow.requestAnimationFrame(
 						() => {
 							setHeight(
-								iframe.contentDocument.querySelector(
-									'.is-root-container'
-								).scrollHeight
+								iframe.contentDocument.documentElement
+									.scrollHeight
 							);
 							animationFrame = null;
 						}
@@ -75,26 +74,46 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				}
 			}
 
-			const resizeObserver = new iframe.contentWindow.ResizeObserver(
-				resizeHeight
-			);
-			const mutationObserver = new iframe.contentWindow.MutationObserver(
-				resizeHeight
-			);
+			let resizeObserver, mutationObserver;
 
-			// Observing the <html> rather than the <body> because the latter
-			// gets destroyed and remounted after initialization in <Iframe>.
-			resizeObserver.observe( iframe.contentDocument.documentElement );
-			mutationObserver.observe( iframe.contentDocument.documentElement, {
-				subtree: true,
-				childList: true,
-				characterData: true,
-			} );
+			function registerObservers() {
+				resizeObserver?.disconnect();
+				mutationObserver?.disconnect();
+
+				resizeObserver = new iframe.contentWindow.ResizeObserver(
+					resizeHeight
+				);
+				mutationObserver = new iframe.contentWindow.MutationObserver(
+					resizeHeight
+				);
+
+				// Observing the <html> rather than the <body> because the latter
+				// gets destroyed and remounted after initialization in <Iframe>.
+				resizeObserver.observe(
+					iframe.contentDocument.documentElement
+				);
+				mutationObserver.observe(
+					iframe.contentDocument.documentElement,
+					{
+						subtree: true,
+						childList: true,
+						characterData: true,
+					}
+				);
+
+				resizeHeight();
+			}
+
+			// This is only required in Firefox for some unknown reasons.
+			iframe.addEventListener( 'load', registerObservers );
+			// This is required in Chrome and Safari.
+			registerObservers();
 
 			return () => {
 				iframe.contentWindow?.cancelAnimationFrame( animationFrame );
-				resizeObserver.disconnect();
-				mutationObserver.disconnect();
+				resizeObserver?.disconnect();
+				mutationObserver?.disconnect();
+				iframe.removeEventListener( 'load', registerObservers );
 			};
 		},
 		[ enableResizing ]
@@ -158,10 +177,16 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 							`.is-root-container { display: flow-root; }`
 						}</style>
 						{ enableResizing && (
-							// Some themes will have `min-height: 100vh` for the root container,
-							// which isn't a requirement in auto resize mode.
 							<style>
-								{ `.is-root-container { min-height: 0 !important; }` }
+								{
+									// Force the <html> and <body>'s heights to fit the content.
+									`html, body { height: -moz-fit-content !important; height: fit-content !important; }`
+								}
+								{
+									// Some themes will have `min-height: 100vh` for the root container,
+									// which isn't a requirement in auto resize mode.
+									`.is-root-container { min-height: 0 !important; }`
+								}
 							</style>
 						) }
 					</>
