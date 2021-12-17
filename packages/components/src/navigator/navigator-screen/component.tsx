@@ -141,34 +141,34 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
  *   __experimentalUseNavigator as useNavigator,
  * } from '@wordpress/components';
  *
- * function NavigatorButton( {
- *   path,
- *   isBack = false,
- *   ...props
- * } ) {
- *   const navigator = useNavigator();
- *   return (
- *   	<Button
- *   	  onClick={ () => navigator.push( path, { isBack } ) }
- *   	  { ...props }
- *   	/>
- *   );
+ * function NavigatorButton( { path, ...props } ) {
+ *  const { push } = useNavigator();
+ *  return (
+ *    <Button
+ *      variant="primary"
+ *      onClick={ () => push( path ) }
+ *      { ...props }
+ *    />
+ *  );
+ * }
+ *
+ * function NavigatorBackButton( props ) {
+ *   const { pop } = useNavigator();
+ *   return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
  * }
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *   	   <NavigatorButton isPrimary path="/child">
+ *   	   <NavigatorButton path="/child">
  *          Navigate to child screen.
  *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorButton isPrimary path="/" isBack>
- *         Go back
- *       </NavigatorButton>
+ *       <NavigatorBackButton>Go back</NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );

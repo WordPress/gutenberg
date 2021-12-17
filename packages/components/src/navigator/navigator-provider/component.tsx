@@ -49,6 +49,10 @@ function NavigatorProvider(
 
 	const push: NavigatorContextType[ 'push' ] = useCallback(
 		( path, options ) => {
+			// Force the `isBack` flag to `false` when navigating forward on both the
+			// previous and the new location.
+			// Also force the `isInitial` flag to `false` for the new location, to make
+			// sure it doesn't get overridden by mistake.
 			setLocationHistory( [
 				...locationHistory.slice( 0, -1 ),
 				{
@@ -68,9 +72,9 @@ function NavigatorProvider(
 
 	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
 		if ( locationHistory.length > 1 ) {
+			// Force the `isBack` flag to `true` when navigating back.
 			setLocationHistory( [
 				...locationHistory.slice( 0, -2 ),
-				// Force the `isBack` flag to `true` when navigating back.
 				{
 					...locationHistory[ locationHistory.length - 2 ],
 					isBack: true,
@@ -103,7 +107,6 @@ function NavigatorProvider(
 
 /**
  * The `NavigatorProvider` component allows rendering nested panels or menus (via the `NavigatorScreen` component) and navigate between these different states (via the `useNavigator` hook).
- * The Global Styles sidebar is an example of this. The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
  *
  * @example
  * ```jsx
@@ -113,34 +116,34 @@ function NavigatorProvider(
  *   __experimentalUseNavigator as useNavigator,
  * } from '@wordpress/components';
  *
- * function NavigatorButton( {
- *   path,
- *   isBack = false,
- *   ...props
- * } ) {
- *   const navigator = useNavigator();
- *   return (
- *   	<Button
- *   	  onClick={ () => navigator.push( path, { isBack } ) }
- *   	  { ...props }
- *   	/>
- *   );
+ * function NavigatorButton( { path, ...props } ) {
+ *  const { push } = useNavigator();
+ *  return (
+ *    <Button
+ *      variant="primary"
+ *      onClick={ () => push( path ) }
+ *      { ...props }
+ *    />
+ *  );
+ * }
+ *
+ * function NavigatorBackButton( props ) {
+ *   const { pop } = useNavigator();
+ *   return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
  * }
  *
  * const MyNavigation = () => (
  *   <NavigatorProvider initialPath="/">
  *     <NavigatorScreen path="/">
  *       <p>This is the home screen.</p>
- *   	   <NavigatorButton isPrimary path="/child">
+ *   	   <NavigatorButton path="/child">
  *          Navigate to child screen.
  *       </NavigatorButton>
  *     </NavigatorScreen>
  *
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorButton isPrimary path="/" isBack>
- *         Go back
- *       </NavigatorButton>
+ *       <NavigatorBackButton>Go back</NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>
  * );
