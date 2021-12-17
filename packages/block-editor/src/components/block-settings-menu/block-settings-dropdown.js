@@ -103,7 +103,7 @@ export function BlockSettingsDropdown( {
 	const convertToGroupButtonProps = useConvertToGroupButtonProps();
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton =
-		( isGroupable || isUngroupable ) && isMultiToolbar;
+		( isGroupable && isMultiToolbar ) || isUngroupable;
 	return (
 		<BlockActions
 			clientIds={ clientIds }
