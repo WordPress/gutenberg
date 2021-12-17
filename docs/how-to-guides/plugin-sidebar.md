@@ -126,9 +126,9 @@ With the new CSS class available you can add a little style. Create a new file i
 }
 ```
 
-For WordPress to load this stylesheet in the editor and front-end, you need to tell it to enqueue it by using the [enqueue_block_editor_assets](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) action hook.
+Register the script and enqueue it to load with `enqueue_block_editor_assets` alongside the JavaScript file.
 
-After those changes, the PHP code should look like this:
+After those changes, the PHP code will look like this:
 
 ```php
 <?php
@@ -157,13 +157,9 @@ add_action( 'init', 'sidebar_plugin_register' );
 
 function sidebar_plugin_script_enqueue() {
 	wp_enqueue_script( 'plugin-sidebar-js' );
-}
-add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
-
-function sidebar_plugin_style_enqueue() {
 	wp_enqueue_style( 'plugin-sidebar-css' );
 }
-add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
+add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 ```
 
 Reload the editor and open the sidebar:
@@ -303,7 +299,7 @@ You can observe the content changing in the input component.
 
 ### Step 5: Update the Meta Field When the Input's Content Changes
 
-The last step is to update the meta field when the input content changes.  
+The last step is to update the meta field when the input content changes.
 The `useDispatch` function takes a store name as its only argument and returns methods that you can use to update the store, in this case we'll use `editPost`
 
 ```js
