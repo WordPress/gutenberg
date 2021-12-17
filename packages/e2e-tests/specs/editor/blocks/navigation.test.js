@@ -199,17 +199,6 @@ async function getNavigationMenuRawContent() {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
-	let username;
-	let contribUserPassword;
-
-	beforeAll( async () => {
-		username = 'contributoruser';
-
-		contribUserPassword = await createUser( username, {
-			role: 'contributor',
-		} );
-	} );
-
 	beforeEach( async () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
@@ -230,8 +219,6 @@ describe( 'Navigation', () => {
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
-
-		await deleteUser( username );
 	} );
 
 	describe( 'placeholder', () => {
@@ -751,5 +738,66 @@ describe( 'Navigation', () => {
 		);
 
 		expect( tagCount ).toBe( 1 );
+	} );
+
+	describe( 'Permission based restrictions', () => {
+		const contributorUsername = 'contributoruser';
+		let contributorPassword;
+
+		beforeAll( async () => {
+			contributorPassword = await createUser( contributorUsername, {
+				role: 'contributor',
+			} );
+		} );
+
+		afterAll( async () => {
+			await deleteUser( contributorUsername );
+		} );
+
+		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+
+			// This creates an empty Navigation post type entity.
+			await startEmptyButton.click();
+
+			// Publishing the Post ensures the Navigation entity is saved.
+			// The Post itself is irrelevant.
+			await publishPost();
+
+			// Switch to a Contributor role user - they should not have
+			// permission to update Navigation menus.
+			await loginUser( contributorUsername, contributorPassword );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			// Select the Navigation post created by the Admin early
+			// in the test.
+			const navigationPostCreatedByAdminName = 'Navigation';
+			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
+			await dropdown.click();
+			const theOption = await page.waitForXPath(
+				`//*[contains(@class, 'components-menu-item__item')][ text()="${ navigationPostCreatedByAdminName }" ]`
+			);
+			await theOption.click();
+
+			// Make sure the snackbar error shows up
+			await page.waitForXPath(
+				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
+			);
+
+			// Expect a console 403 for request to Navigation Areas for lower permission users.
+			// This is because reading requires the `edit_theme_options` capability
+			// which the Contributor level user does not have.
+			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
+			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
+			expect( console ).toHaveErrored();
+		} );
 	} );
 } );
