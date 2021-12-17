@@ -15,17 +15,20 @@ import { forwardRef } from '@wordpress/element';
 import InserterMenu from './menu';
 import { store as blockEditorStore } from '../../store';
 
-function InserterLibrary( {
-	rootClientId,
-	clientId,
-	isAppender,
-	showInserterHelpPanel,
-	showMostUsedBlocks = false,
-	__experimentalInsertionIndex,
-	__experimentalFilterValue,
-	onSelect = noop,
-	shouldFocusBlock = false,
-}, ref ) {
+function InserterLibrary(
+	{
+		rootClientId,
+		clientId,
+		isAppender,
+		showInserterHelpPanel,
+		showMostUsedBlocks = false,
+		__experimentalInsertionIndex,
+		__experimentalFilterValue,
+		onSelect = noop,
+		shouldFocusBlock = false,
+	},
+	ref
+) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
 			const { getBlockRootClientId } = select( blockEditorStore );

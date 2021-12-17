@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	forwardRef,
-	useCallback,
-	useMemo,
-} from '@wordpress/element';
+import { useState, forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -24,17 +19,20 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
 
-function InserterMenu( {
-	rootClientId,
-	clientId,
-	isAppender,
-	__experimentalInsertionIndex,
-	onSelect,
-	showInserterHelpPanel,
-	showMostUsedBlocks,
-	__experimentalFilterValue = '',
-	shouldFocusBlock = true,
-}, ref ) {
+function InserterMenu(
+	{
+		rootClientId,
+		clientId,
+		isAppender,
+		__experimentalInsertionIndex,
+		onSelect,
+		showInserterHelpPanel,
+		showMostUsedBlocks,
+		__experimentalFilterValue = '',
+		shouldFocusBlock = true,
+	},
+	ref
+) {
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
 	);
