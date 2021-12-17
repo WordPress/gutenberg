@@ -43,6 +43,8 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		[ clientIds ]
 	);
 
+	const isMultiToolbar = selectedClientIds.length > 1;
+
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
 	const convertToGroupButtonProps = useConvertToGroupButtonProps();
@@ -55,10 +57,12 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 					return (
 						<MenuGroup>
 							{ fills }
-							<ConvertToGroupButton
-								{ ...convertToGroupButtonProps }
-								onClose={ fillProps?.onClose }
-							/>
+							{ ! isMultiToolbar && (
+								<ConvertToGroupButton
+									{ ...convertToGroupButtonProps }
+									onClose={ fillProps?.onClose }
+								/>
+							) }
 						</MenuGroup>
 					);
 				}

@@ -26,6 +26,11 @@ import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-it
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
 
+import {
+	useConvertToGroupButtonProps,
+	ConvertToGroupButton,
+} from '../convert-to-group-buttons';
+
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
@@ -45,6 +50,7 @@ export function BlockSettingsDropdown( {
 } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
+	const isMultiToolbar = blockClientIds.length > 1;
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const { onlyBlock, title } = useSelect(
 		( select ) => {
@@ -94,6 +100,10 @@ export function BlockSettingsDropdown( {
 	);
 	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 
+	const convertToGroupButtonProps = useConvertToGroupButtonProps();
+	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
+	const showConvertToGroupButton =
+		( isGroupable || isUngroupable ) && isMultiToolbar;
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -123,6 +133,12 @@ export function BlockSettingsDropdown( {
 					{ ( { onClose } ) => (
 						<>
 							<MenuGroup>
+								{ showConvertToGroupButton && (
+									<ConvertToGroupButton
+										{ ...convertToGroupButtonProps }
+										onClose={ onClose }
+									/>
+								) }
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
