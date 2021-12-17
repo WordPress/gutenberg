@@ -22,7 +22,8 @@
 	},
 	"providesContext": {
 		"comments/perPage": "perPage",
-		"comments/order": "order"
+		"comments/order": "order",
+		"comments/inherit": "inherit"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
