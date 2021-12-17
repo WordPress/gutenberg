@@ -6,6 +6,20 @@
  */
 
 /**
+ * Render the SVG filters.
+ *
+ * Safari doesn't render SVG filters defined in data URIs,
+ * and SVG filters won't render in the head of a document,
+ * so the next best place to put the SVG is in the footer.
+ */
+function gutenberg_experimental_global_styles_render_svg_filters() {
+	$filters = gutenberg_get_global_styles_svg_filters();
+	if ( ! empty( $filters ) ) {
+		echo $filters;
+	}
+}
+
+/**
  * Adds the necessary settings for the Global Styles client UI.
  *
  * @param array $settings Existing block editor settings.
