@@ -107,24 +107,22 @@ export default {
 		`;
 
 		return (
-			<style>
-				{ `
-		${ appendSelectors( selector ) } {
-			display: flex;
-			gap: ${
-				hasBlockGapStylesSupport
-					? 'var( --wp--style--block-gap, 0.5em )'
-					: '0.5em'
-			};
-			flex-wrap: ${ flexWrap };
-			${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
-		}
+			<style>{ `
+				${ appendSelectors( selector ) } {
+					display: flex;
+					gap: ${
+						hasBlockGapStylesSupport
+							? 'var( --wp--style--block-gap, 0.5em )'
+							: '0.5em'
+					};
+					flex-wrap: ${ flexWrap };
+					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
+				}
 
-		${ appendSelectors( selector, '> *' ) } {
-			margin: 0;
-		}
-	` }
-			</style>
+				${ appendSelectors( selector, '> *' ) } {
+					margin: 0;
+				}
+			` }</style>
 		);
 	},
 	getOrientation( layout ) {
