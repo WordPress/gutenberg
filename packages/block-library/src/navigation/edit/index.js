@@ -463,6 +463,9 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
+										canUserCreateNavigation={
+											canUserCreateNavigation
+										}
 									/>
 								) }
 							</ToolbarDropdownMenu>
