@@ -69,7 +69,19 @@ const BlockInspector = ( {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+				<InspectorControls.Slot />
+				<InspectorControls.Slot
+					__experimentalGroup="typography"
+					label={ __( 'Typography' ) }
+				/>
+				<InspectorControls.Slot
+					__experimentalGroup="dimensions"
+					label={ __( 'Dimensions' ) }
+				/>
+				<InspectorControls.Slot
+					__experimentalGroup="border"
+					label={ __( 'Border' ) }
+				/>
 			</div>
 		);
 	}
@@ -138,6 +150,10 @@ const BlockInspectorSingleBlock = ( {
 				__experimentalGroup="dimensions"
 				bubblesVirtually={ bubblesVirtually }
 				label={ __( 'Dimensions' ) }
+			/>
+			<InspectorControls.Slot
+				__experimentalGroup="border"
+				label={ __( 'Border' ) }
 			/>
 			<div>
 				<AdvancedControls bubblesVirtually={ bubblesVirtually } />
