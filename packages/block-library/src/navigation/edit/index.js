@@ -39,7 +39,6 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -54,6 +53,7 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
+import useNavigationNotice from './use-navigation-notice';
 
 const EMPTY_ARRAY = [];
 
@@ -107,8 +107,6 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
-	const noticeRef = useRef();
-
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
@@ -191,8 +189,6 @@ function Navigation( {
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
-
-	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
 
 	const [
 		hasSavedUnsavedInnerBlocks,
@@ -338,53 +334,18 @@ function Navigation( {
 		}
 	}, [ clientId, ref, hasUncontrolledInnerBlocks, controlledInnerBlocks ] );
 
-	useEffect( () => {
-		const setPermissionsNotice = () => {
-			if ( noticeRef.current ) {
-				return;
-			}
-
-			noticeRef.current =
-				'block-library/core/navigation/permissions/update';
-
-			createWarningNotice(
-				__(
-					'You do not have permission to edit this Menu. Any changes made will not be saved.'
-				),
-				{
-					id: noticeRef.current,
-					type: 'snackbar',
-				}
-			);
-		};
-
-		const removePermissionsNotice = () => {
-			if ( ! noticeRef.current ) {
-				return;
-			}
-			removeNotice( noticeRef.current );
-			noticeRef.current = null;
-		};
-
-		if ( ! isSelected && ! isInnerBlockSelected ) {
-			removePermissionsNotice();
-		}
-
-		if (
+	useNavigationNotice( {
+		name: 'block-library/core/navigation/permissions/update',
+		message: __(
+			'You do not have permission to edit this Menu. Any changes made will not be saved.'
+		),
+		createOn:
 			( isSelected || isInnerBlockSelected ) &&
 			hasResolvedCanUserUpdateNavigationEntity &&
-			! canUserUpdateNavigationEntity
-		) {
-			setPermissionsNotice();
-		}
-	}, [
+			! canUserUpdateNavigationEntity,
+		destroyOn: ! isSelected && ! isInnerBlockSelected,
 		ref,
-		isEntityAvailable,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserUpdateNavigationEntity,
-		isSelected,
-		isInnerBlockSelected,
-	] );
+	} );
 
 	const startWithEmptyMenu = useCallback( () => {
 		if ( navigationArea ) {
