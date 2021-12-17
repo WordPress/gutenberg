@@ -13,7 +13,7 @@
  * so the next best place to put the SVG is in the footer.
  */
 function gutenberg_experimental_global_styles_render_svg_filters() {
-	$filters = gutenberg_get_global_styles_svg_filters();
+	$filters = wp_get_global_styles_svg_filters();
 	if ( ! empty( $filters ) ) {
 		echo $filters;
 	}

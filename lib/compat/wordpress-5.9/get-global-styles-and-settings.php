@@ -138,7 +138,7 @@ if ( ! function_exists( 'wp_get_global_stylesheet' ) ) {
  *
  * @return string Stylesheet.
  */
-function gutenberg_get_global_styles_svg_filters() {
+function wp_get_global_styles_svg_filters() {
 	// Return cached value if it can be used and exists.
 	// It's cached by theme to make sure that theme switching clears the cache.
 	$transient_name = 'gutenberg_global_styles_svg_filters_' . get_stylesheet();
