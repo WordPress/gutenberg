@@ -382,7 +382,7 @@ export function ColorEdit( props ) {
 				...( hasTextColor
 					? [
 							{
-								label: __( 'Text color' ),
+								label: __( 'Text' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
 									allSolids,
@@ -395,7 +395,7 @@ export function ColorEdit( props ) {
 				...( hasBackgroundColor || hasGradientColor
 					? [
 							{
-								label: __( 'Background color' ),
+								label: __( 'Background' ),
 								onColorChange: hasBackgroundColor
 									? onChangeColor( 'background' )
 									: undefined,
@@ -414,7 +414,7 @@ export function ColorEdit( props ) {
 				...( hasLinkColor
 					? [
 							{
-								label: __( 'Link Color' ),
+								label: __( 'Link' ),
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
 									allSolids,

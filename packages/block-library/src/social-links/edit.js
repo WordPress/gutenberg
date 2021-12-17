@@ -192,7 +192,7 @@ export function SocialLinksEdit( props ) {
 									iconBackgroundColorValue: colorValue,
 								} );
 							},
-							label: __( 'Icon background color' ),
+							label: __( 'Icon background' ),
 						},
 					] }
 				/>
