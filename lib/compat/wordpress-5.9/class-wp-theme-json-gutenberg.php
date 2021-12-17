@@ -120,7 +120,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'              => array( 'color', 'duotone' ),
 			'override'          => true,
 			'use_default_names' => false,
-			'value_func'        => 'gutenberg_render_duotone_filter_preset',
+			'value_func'        => 'gutenberg_get_duotone_filter_property',
 			'css_vars'          => '--wp--preset--duotone--$slug',
 			'classes'           => array(),
 			'properties'        => array( 'filter' ),

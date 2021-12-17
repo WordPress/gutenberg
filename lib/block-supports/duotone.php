@@ -404,18 +404,6 @@ function gutenberg_render_duotone_filter( $preset ) {
 }
 
 /**
- * Renders the duotone filter SVG and returns the CSS filter property to
- * reference the rendered SVG.
- *
- * @param array $preset Duotone preset value as seen in theme.json.
- * @return string Duotone CSS filter property.
- */
-function gutenberg_render_duotone_filter_preset( $preset ) {
-	gutenberg_render_duotone_filter( $preset );
-	return gutenberg_get_duotone_filter_property( $preset );
-}
-
-/**
  * Registers the style and colors block attributes for block types that support it.
  *
  * @param WP_Block_Type $block_type Block Type.
@@ -488,6 +476,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	wp_add_inline_style( $filter_id, $filter_style );
 	wp_enqueue_style( $filter_id );
 
+	// Render any custom filter the user may have added.
 	gutenberg_render_duotone_filter( $filter_preset );
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
