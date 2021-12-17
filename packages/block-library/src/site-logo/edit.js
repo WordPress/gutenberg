@@ -438,8 +438,10 @@ export default function LogoEdit( {
 		};
 	}, [] );
 
-	const setLogo = ( newValue ) => {
-		if ( shouldSyncIcon ) {
+	const setLogo = ( newValue, shouldForceSync = false ) => {
+		// `shouldForceSync` is used to force syncing when the attribute
+		// may not have updated yet.
+		if ( shouldSyncIcon || shouldForceSync ) {
 			setIcon( newValue );
 		}
 
@@ -465,12 +467,19 @@ export default function LogoEdit( {
 		// Initialize the syncSiteIcon toggle. If we currently have no Site logo and no
 		// site icon, automatically sync the logo to the icon.
 		if ( shouldSyncIcon === undefined ) {
-			setAttributes( { shouldSyncIcon: ! siteIconId } );
+			const shouldForceSync = ! siteIconId;
+			setAttributes( { shouldSyncIcon: shouldForceSync } );
+
+			// Because we cannot rely on the `shouldSyncIcon` attribute to have updated by
+			// the time `setLogo` is called, pass an argument to force the syncing.
+			onSelectLogo( media, shouldForceSync );
+			return;
 		}
+
 		onSelectLogo( media );
 	};
 
-	const onSelectLogo = ( media ) => {
+	const onSelectLogo = ( media, shouldForceSync = false ) => {
 		if ( ! media ) {
 			return;
 		}
@@ -482,7 +491,7 @@ export default function LogoEdit( {
 			return;
 		}
 
-		setLogo( media.id );
+		setLogo( media.id, shouldForceSync );
 	};
 
 	const onRemoveLogo = () => {
