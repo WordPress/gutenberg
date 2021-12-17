@@ -5,7 +5,6 @@
  * @package WordPress
  */
 
-
 /**
  * Renders the `core/comments-pagination-next` block on the server.
  *
