@@ -107,7 +107,7 @@ Here is an example `codetabs` section:
 
 The preferred format for code examples is JSX, this should be the default view. The example placed first in source will be shown as the default.
 
-**Note:** It is not required to include plain JavaScript code examples for every guide. The recommendation is to include plain code for beginner tutorials, or short examples; but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem are in JSX that require builds.
+**Note:** It is not required to include plain JavaScript code examples for every guide. The recommendation is to include plain code for beginner tutorials or short examples, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem are in JSX that requires a build process.
 
 ### Callout notices
 

@@ -6,4 +6,4 @@ To follow along with this tutorial, you can [download the accompanying WordPress
 
 Code snippets are provided in two formats "JSX" and "Plain". JSX refers to JavaScript code that uses JSX syntax which requires a build step. Plain refers to "classic" JavaScript that does not require building. You can change between them using tabs found above each code example. Using JSX, does require you to run [the JavaScript build step](/docs/how-to-guides/javascript/js-build-setup/) to compile your code to a browser compatible format.
 
-Note that it is not required to use JSX to create blocks or extend the editor, you can use classic JavaScript. However, once familiar with JSX and the build step, developers find it is easier to read and write, thus most code examples you'll find use the JSX syntax.
+Note that it is not required to use JSX to create blocks or extend the editor, you can use classic JavaScript. However, once familiar with JSX and the build step, many developers tend to find it is easier to read and write, thus most code examples you'll find use the JSX syntax.
