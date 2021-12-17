@@ -20,6 +20,7 @@ import {
 	createUser,
 	loginUser,
 	deleteUser,
+	switchUserToAdmin,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -756,6 +757,7 @@ describe( 'Navigation', () => {
 
 		afterAll( async () => {
 			await deleteUser( contributorUsername );
+			await switchUserToAdmin();
 		} );
 
 		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
