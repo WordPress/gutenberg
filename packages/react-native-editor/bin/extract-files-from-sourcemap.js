@@ -121,7 +121,7 @@ if ( require.main === module ) {
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
 		console.error(
-			'Something went wrong when copying source files to tmp dir:',
+			`Something went wrong when copying source files to "${ targetDir }":`,
 			error
 		);
 	}
