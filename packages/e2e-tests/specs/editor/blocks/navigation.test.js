@@ -435,6 +435,19 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+		// The URL Details endpoint 404s for the created page, since it will
+		// be a draft that is inaccessible publicly. To avoid this we mock
+		// out the endpoint response to be empty which will be handled gracefully
+		// in the UI whilst avoiding any 404s.
+		await setUpResponseMocking( [
+			{
+				match: ( request ) =>
+					request.url().includes( `rest_route` ) &&
+					request.url().includes( `url-details` ),
+				onRequestMatch: createJSONResponse( [] ),
+			},
+		] );
+
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
@@ -468,12 +481,6 @@ describe( 'Navigation', () => {
 		await page.waitForXPath(
 			`//a[contains(@class, "block-editor-link-control__search-item-title") and contains(., "${ pageTitle }")]`
 		);
-
-		// The URL Details endpoint 404s for the created page, since it will
-		// be a draft that is inaccessible publicly. Wait for the HTTP request
-		// to finish, since this seems to make the test more stable.
-		await page.waitForNetworkIdle();
-		expect( console ).toHaveErrored();
 
 		await publishPost();
 
