@@ -42,7 +42,7 @@ export default function InserterSidebar( isOpen = false ) {
 		if ( isOpen ) {
 			inserterRef.current.focus();
 		}
-		}, [ isOpen ] );
+	}, [ isOpen ] );
 
 	return (
 		<div
