@@ -58,9 +58,9 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         return []
     }
 
-    /// Requests a set of CSS styles to be added to the web view when the page has started loading.
+    /// Requests a set of CSS styles to be added to the web view when the editor has started loading.
     /// - Returns: Array of all the styles to be added
-    open func onGutenbergReadyStyles() -> [WKUserScript] {
+    open func onGutenbergLoadStyles() -> [WKUserScript] {
         return []
     }
 
@@ -158,7 +158,7 @@ extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
         evaluateJavascript(jsInjection.injectWPBarsCssScript)
         evaluateJavascript(jsInjection.injectLocalStorageScript)
         onPageLoadScripts().forEach(evaluateJavascript)
-        onGutenbergReadyStyles().forEach(evaluateJavascript)
+        onGutenbergLoadStyles().forEach(evaluateJavascript)
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -167,7 +167,7 @@ extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.injectEditorCssScript)
         evaluateJavascript(jsInjection.gutenbergObserverScript)
-        onGutenbergReadyStyles().forEach(evaluateJavascript)
+        onGutenbergLoadStyles().forEach(evaluateJavascript)
     }
 }
 
