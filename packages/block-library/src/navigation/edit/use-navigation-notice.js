@@ -10,7 +10,7 @@ function useNavigationNotice( {
 	message,
 	createOn,
 	destroyOn,
-	ref,
+	navEntityIdRef,
 } = {} ) {
 	const noticeRef = useRef();
 
@@ -45,7 +45,7 @@ function useNavigationNotice( {
 		if ( createOn ) {
 			setPermissionsNotice();
 		}
-	}, [ ref, createOn, destroyOn ] );
+	}, [ navEntityIdRef, createOn, destroyOn ] );
 }
 
 export default useNavigationNotice;

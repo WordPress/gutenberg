@@ -344,7 +344,7 @@ function Navigation( {
 			hasResolvedCanUserUpdateNavigationEntity &&
 			! canUserUpdateNavigationEntity,
 		destroyOn: ! isSelected && ! isInnerBlockSelected,
-		ref,
+		navEntityIdRef: ref,
 	} );
 
 	useNavigationNotice( {
@@ -356,7 +356,7 @@ function Navigation( {
 			hasResolvedCanUserCreateNavigation &&
 			! canUserCreateNavigation,
 		destroyOn: ref || ( ! isSelected && ! isInnerBlockSelected ),
-		ref,
+		navEntityIdRef: ref,
 	} );
 
 	const startWithEmptyMenu = useCallback( () => {
