@@ -14,8 +14,6 @@ import {
 	saveDraft,
 	showBlockToolbar,
 	openPreviewPage,
-	selectBlockByClientId,
-	getAllBlocks,
 	ensureSidebarOpened,
 	__experimentalRest as rest,
 	publishPost,
@@ -121,21 +119,6 @@ const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start 
 const ADD_ALL_PAGES_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Add all pages']`;
 const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select menu']`;
 
-async function turnResponsivenessOn() {
-	const blocks = await getAllBlocks();
-
-	await selectBlockByClientId( blocks[ 0 ].clientId );
-	await ensureSidebarOpened();
-
-	const [ responsivenessToggleButton ] = await page.$x(
-		'//label[text()[contains(.,"Enable responsive menu")]]'
-	);
-
-	await responsivenessToggleButton.click();
-
-	await saveDraft();
-}
-
 /**
  * Delete all items for the given REST resources using the REST API.
  *
@@ -216,17 +199,6 @@ async function getNavigationMenuRawContent() {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
-	let username;
-	let contribUserPassword;
-
-	beforeAll( async () => {
-		username = 'contributoruser';
-
-		contribUserPassword = await createUser( username, {
-			role: 'contributor',
-		} );
-	} );
-
 	beforeEach( async () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
@@ -247,8 +219,6 @@ describe( 'Navigation', () => {
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
-
-		await deleteUser( username );
 	} );
 
 	describe( 'placeholder', () => {
@@ -278,7 +248,7 @@ describe( 'Navigation', () => {
 			await allPagesButton.click();
 
 			// Wait for the page list block to be present
-			await page.waitForSelector( 'div[aria-label="Block: Page List"]' );
+			await page.waitForSelector( 'ul[aria-label="Block: Page List"]' );
 
 			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
@@ -464,49 +434,48 @@ describe( 'Navigation', () => {
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	// URL details endpoint is throwing a 404, which causes this test to fail.
-	it.skip( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
 		await startEmptyButton.click();
-
 		const appender = await page.waitForSelector(
 			'.wp-block-navigation .block-list-appender'
 		);
 		await appender.click();
 
 		// Wait for URL input to be focused
-		await page.waitForSelector(
-			'input.block-editor-url-input__input:focus'
-		);
-
 		// Insert name for the new page.
-		await page.type(
-			'input[placeholder="Search or type url"]',
-			'A really long page name that will not exist'
-		);
-
-		// Wait for URL input to be focused
-		await page.waitForSelector(
+		const pageTitle = 'A really long page name that will not exist';
+		const input = await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
+		await input.type( pageTitle );
 
 		// Wait for the create button to appear and click it.
-		await page.waitForSelector(
+		const createPageButton = await page.waitForSelector(
 			'.block-editor-link-control__search-create'
 		);
-
-		const createPageButton = await page.$(
-			'.block-editor-link-control__search-create'
-		);
-
 		await createPageButton.click();
 
 		const draftLink = await page.waitForSelector(
 			'.wp-block-navigation-item__content'
 		);
 		await draftLink.click();
+
+		// Creating a draft is async, so wait for a sign of completion. In this
+		// case the link that shows in the URL popover once a link is added.
+		await page.waitForXPath(
+			`//a[contains(@class, "block-editor-link-control__search-item-title") and contains(., "${ pageTitle }")]`
+		);
+
+		// The URL Details endpoint 404s for the created page, since it will
+		// be a draft that is inaccessible publicly. Wait for the HTTP request
+		// to finish, since this seems to make the test more stable.
+		await page.waitForNetworkIdle();
+		expect( console ).toHaveErrored();
+
+		await publishPost();
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
@@ -682,7 +651,7 @@ describe( 'Navigation', () => {
 			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
 		} );
 
-		it( 'only update a single entity currently linked with the block', async () => {
+		it( 'only updates a single entity currently linked with the block', async () => {
 			await createNewPost();
 			await insertBlock( 'Navigation' );
 
@@ -735,31 +704,16 @@ describe( 'Navigation', () => {
 		} );
 	} );
 
-	// The following tests are unstable, roughly around when https://github.com/WordPress/wordpress-develop/pull/1412
-	// landed. The block manually tests well, so let's skip to unblock other PRs and immediately follow up. cc @vcanales
-	it.skip( 'loads frontend code only if the block is present', async () => {
-		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
-		// consistent and to test the feature more rigorously than the single default sample page.
-		// await mockPagesResponse( [
-		// 	{
-		// 		title: 'Home',
-		// 		slug: 'home',
-		// 	},
-		// 	{
-		// 		title: 'About',
-		// 		slug: 'about',
-		// 	},
-		// 	{
-		// 		title: 'Contact Us',
-		// 		slug: 'contact',
-		// 	},
-		// ] );
-
-		// Create first block at the start in order to enable preview.
-		await insertBlock( 'Navigation' );
-		await saveDraft();
+	it( 'does not load the frontend script if no navigation blocks are present', async () => {
+		await createNewPost();
+		await insertBlock( 'Paragraph' );
+		await page.waitForSelector( 'p[data-title="Paragraph"]:focus' );
+		await page.keyboard.type( 'Hello' );
 
 		const previewPage = await openPreviewPage();
+		await previewPage.bringToFront();
+		await previewPage.waitForNetworkIdle();
+
 		const isScriptLoaded = await previewPage.evaluate(
 			() =>
 				null !==
@@ -769,85 +723,41 @@ describe( 'Navigation', () => {
 		);
 
 		expect( isScriptLoaded ).toBe( false );
+	} );
 
-		const allPagesButton = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
-		await allPagesButton.click();
+	it( 'loads the frontend script only once even when multiple navigation blocks are present', async () => {
+		await createNewPost();
 		await insertBlock( 'Navigation' );
-		const allPagesButton2 = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
-		await allPagesButton2.click();
-		await turnResponsivenessOn();
+		await insertBlock( 'Navigation' );
 
-		await previewPage.reload( {
-			waitFor: [ 'networkidle0', 'domcontentloaded' ],
-		} );
+		const previewPage = await openPreviewPage();
+		await previewPage.bringToFront();
+		await previewPage.waitForNetworkIdle();
 
-		/*
-			Count instances of the tag to make sure that it's been loaded only once,
-			regardless of the number of navigation blocks present.
-		*/
 		const tagCount = await previewPage.evaluate(
 			() =>
-				Array.from(
-					document.querySelectorAll(
-						'script[src*="navigation/view.min.js"]'
-					)
+				document.querySelectorAll(
+					'script[src*="navigation/view.min.js"]'
 				).length
 		);
 
 		expect( tagCount ).toBe( 1 );
 	} );
 
-	it.skip( 'loads frontend code only if responsiveness is turned on', async () => {
-		// await mockPagesResponse( [
-		// 	{
-		// 		title: 'Home',
-		// 		slug: 'home',
-		// 	},
-		// 	{
-		// 		title: 'About',
-		// 		slug: 'about',
-		// 	},
-		// 	{
-		// 		title: 'Contact Us',
-		// 		slug: 'contact',
-		// 	},
-		// ] );
+	describe( 'Permission based restrictions', () => {
+		const contributorUsername = 'contributoruser';
+		let contributorPassword;
 
-		await insertBlock( 'Navigation' );
-		await saveDraft();
-
-		const previewPage = await openPreviewPage();
-		let isScriptLoaded = await previewPage.evaluate(
-			() =>
-				null !==
-				document.querySelector(
-					'script[src*="navigation/view.min.js"]'
-				)
-		);
-
-		expect( isScriptLoaded ).toBe( false );
-
-		const allPagesButton = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
-		await allPagesButton.click();
-
-		await turnResponsivenessOn();
-
-		await previewPage.reload( {
-			waitFor: [ 'networkidle0', 'domcontentloaded' ],
+		beforeAll( async () => {
+			contributorPassword = await createUser( contributorUsername, {
+				role: 'contributor',
+			} );
 		} );
 
-		isScriptLoaded = await previewPage.evaluate(
-			() =>
-				null !==
-				document.querySelector(
-					'script[src*="navigation/view.min.js"]'
-				)
-		);
+		afterAll( async () => {
+			await deleteUser( contributorUsername );
+		} );
 
-		expect( isScriptLoaded ).toBe( true );
-	} );
-
-	describe( 'Permission based restrictions', () => {
 		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
 			await createNewPost();
 			await insertBlock( 'Navigation' );
@@ -864,8 +774,8 @@ describe( 'Navigation', () => {
 			await publishPost();
 
 			// Switch to a Contributor role user - they should not have
-			// permission to update Navigations.
-			await loginUser( username, contribUserPassword );
+			// permission to update Navigation menus.
+			await loginUser( contributorUsername, contributorPassword );
 
 			await createNewPost();
 
@@ -886,7 +796,7 @@ describe( 'Navigation', () => {
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
 
-			// Expect a console 403 for request to Navigation Areas for lower permisison users.
+			// Expect a console 403 for request to Navigation Areas for lower permission users.
 			// This is because reading requires the `edit_theme_options` capability
 			// which the Contributor level user does not have.
 			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
