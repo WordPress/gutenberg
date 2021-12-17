@@ -431,8 +431,8 @@ class WP_Theme_JSON_Gutenberg {
 		// Some styles are only meant to be available at the top-level (e.g.: blockGap),
 		// hence, the schema for blocks & elements should not have them.
 		$styles_non_top_level = self::VALID_STYLES;
-		foreach( array_keys( $styles_non_top_level ) as $section ) {
-			foreach( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
+		foreach ( array_keys( $styles_non_top_level ) as $section ) {
+			foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
 				if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
 					unset( $styles_non_top_level[ $section ][ $prop ] );
 				}
