@@ -183,7 +183,7 @@ fi
 
 # Define constants
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-GUTENBERG_SOURCE_CODE_DIR="$SCRIPT_DIR/../.."
+GUTENBERG_SOURCE_CODE_DIR="$SCRIPT_DIR/../../.."
 WP_CLI="php -d memory_limit=4G $SCRIPT_DIR/wp-cli.phar"
 
 # Set target path
@@ -245,4 +245,4 @@ for (( index=0; index<${#PLUGINS[@]}; index+=2 )); do
 done
 
 # Generate POT files for Gutenberg
-generate_pot_files $POT_FILES_DIR "gutenberg" $GUTENBERG_SOURCE_CODE_DIR "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"
+generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR/packages" "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"
