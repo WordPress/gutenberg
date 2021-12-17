@@ -488,6 +488,8 @@ describe( 'Navigation', () => {
 		await page.waitForNetworkIdle();
 		expect( console ).toHaveErrored();
 
+		await publishPost();
+
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
