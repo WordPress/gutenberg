@@ -5,6 +5,23 @@
 #   - {PATH}/{PLUGIN_NAME}-source.pot             [Contains strings referenced in all source code files]
 #   - {PATH}/{PLUGIN_NAME}-used-android.pot       [Contains strings referenced in Android source-map file]
 #   - {PATH}/{PLUGIN_NAME}-used-ios.pot           [Contains strings referenced in iOS source-map file]
+#
+# Usage:
+#   METRO_CONFIG environment variable is recommended to generate the JS bundle without errors.
+#   Example: METRO_CONFIG=<METRO_CONFIG_PATH> generate-pot-files.sh ...
+#
+#   - Generate POT files of Gutenberg to temporary directory:
+#   generate-pot-files.sh
+#
+#   - Generate POT files of Gutenberg to specific path:
+#   generate-pot-files.sh --path <PATH>
+#
+#   - Generate POT files of Gutenberg and other plugins to temporary directory:
+#   generate-pot-files.sh domain-plugin-1 <PLUGIN-1_SOURCE_PATH> domain-plugin-2 <PLUGIN-2_SOURCE_PATH>
+#
+#   - Generate POT files of Gutenberg and other plugins to specific path:
+#   generate-pot-files.sh --path <PATH> domain-plugin-1 <PLUGIN-1_SOURCE_PATH> domain-plugin-2 <PLUGIN-2_SOURCE_PATH>
+#
 
 # Exit if any command fails
 set -e

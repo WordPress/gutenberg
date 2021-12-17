@@ -1,7 +1,32 @@
 #!/usr/bin/env node
 /**
  *
- * Extracts used strings from source-map files
+ * Extracts used strings from source-map files to a JSON file.
+ *
+ * Usage:
+ * 	- Extract used strings referenced in Gutenberg:
+ * 	  node extract-used-strings used-strings.json
+ *
+ * 	- Extract used strings referenced in Gutenberg and other plugins with their own domain:
+ * 	  node extract-used-strings used-strings.json domain-plugin-1 <PLUGIN-1_SOURCE_PATH> domain-plugin-2 <PLUGIN-2_SOURCE_PATH>
+ *
+ * The format of the JSON file is:
+ * {
+ * 	"gutengerg": {
+ * 	  "<string>": {
+ * 	    "string": String value.
+ * 		"stringPlural": String value with its plural form. [optional]
+ * 		"comments": Comments for translators. [default value is an empty string]
+ * 		"reference": Array containing the paths of the source files that reference the string.
+ * 		"platforms": Array containing the platforms where the string is being used, values are "android" | "ios" | "web".
+ * 	  },
+ * 	  ...
+ * 	},
+ * 	"domain-plugin-1": {
+ * 	  ...
+ * 	},
+ * 	...
+ * }
  *
  */
 

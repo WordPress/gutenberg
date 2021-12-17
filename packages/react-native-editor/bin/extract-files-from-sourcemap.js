@@ -3,6 +3,9 @@
  *
  * Extracts and copies the source files referenced in a source-map file to a target directory.
  *
+ * Usage:
+ * 	- Extract source files of source-map file:
+ * 	  node extract-files-from-sourcemap bundle/ios/App.js.map <PATH>
  */
 
 /**
