@@ -124,16 +124,13 @@ export default function CommentTemplateEdit( {
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
+
 			const commentQuery = {
 				post: postId,
 				status: 'approve',
 				context: 'embed',
 			};
-			// We cannot get the order of the discussion settings page.
-			// Without the order defined, the default on the API is DESC
-			// with means show the newest comments first.
-			// By default, in discussion settings, the order is ASC.
-			// So the frontend is showing older comments first, while the editor is showing newer ones.
+
 			if ( order ) {
 				commentQuery.order = order;
 			}

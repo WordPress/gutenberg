@@ -244,3 +244,18 @@ function gutenberg_register_edit_site_export_endpoint() {
 	$editor_settings->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_endpoint' );
+
+/**
+ * Registers the Discussion Setting Comments Order.
+ */
+function register_block_core_comment_template_order_setting() {
+	register_setting(
+		'discussion',
+		'comment_order',
+		array(
+			'show_in_rest' => true,
+		)
+	);
+}
+
+add_action( 'rest_api_init', 'register_block_core_comment_template_order_setting' );

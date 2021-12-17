@@ -19,13 +19,10 @@ export default function CommentsInspectorControls( {
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
 					label={ __( 'Newer comments first' ) }
-					checked={ order === 'desc' || order === null } // Settings value not available on REST API.
+					checked={ order === 'desc' }
 					onChange={ () => {
 						setAttributes( {
-							order:
-								order === 'desc' || order === null
-									? 'asc'
-									: 'desc',
+							order: order === 'desc' ? 'asc' : 'desc',
 						} );
 					} }
 				/>
