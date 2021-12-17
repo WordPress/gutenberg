@@ -21,9 +21,15 @@ interface HexInputProps {
 	color: Colord;
 	onChange: ( nextColor: Colord ) => void;
 	enableAlpha: boolean;
+	preventDeleteBubbling?: boolean;
 }
 
-export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+export const HexInput = ( {
+	color,
+	onChange,
+	enableAlpha,
+	preventDeleteBubbling,
+}: HexInputProps ) => {
 	const handleValidate = ( value: string ) => {
 		if ( ! colord( '#' + value ).isValid() ) {
 			throw new Error( 'Invalid hex color input' );
@@ -50,6 +56,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			maxLength={ enableAlpha ? 8 : 6 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
+			preventDeleteBubbling={ preventDeleteBubbling }
 		/>
 	);
 };
