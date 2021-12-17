@@ -137,7 +137,10 @@ const generatePotFiles = ( plugins, potFilesDir ) => {
 		// TODO: Detect potential parse failures
 		childProcess.execSync(
 			`${ potFilesCommand } --path ${ potFilesDir } ${ potFilesArgs } `,
-			{ stdio: 'inherit' }
+			{
+				stdio: 'inherit',
+				env: { ...process.env },
+			}
 		);
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
