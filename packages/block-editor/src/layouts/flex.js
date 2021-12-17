@@ -11,7 +11,6 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -106,7 +105,10 @@ export default {
 		flex-direction: column;
 		align-items: ${ alignItems };
 		`;
-		const styleContent = `
+
+		return (
+			<style>
+				{ `
 		${ appendSelectors( selector ) } {
 			display: flex;
 			gap: ${
@@ -121,16 +123,7 @@ export default {
 		${ appendSelectors( selector, '> *' ) } {
 			margin: 0;
 		}
-	`;
-		return (
-			<style>
-				{ applyFilters(
-					'blockEditor.FlexLayoutStyle',
-					styleContent,
-					selector,
-					appendSelectors,
-					layout
-				) }
+	` }
 			</style>
 		);
 	},

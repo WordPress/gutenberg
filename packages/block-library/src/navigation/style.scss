@@ -106,6 +106,45 @@ $navigation-icon-size: 24px;
 			height: inherit;
 		}
 	}
+
+	// Custom properties for layout style cascade: default values.
+	--layout-justification-setting: flex-start;
+	--layout-direction: row;
+	--layout-wrap: wrap;
+	--layout-justify: flex-start;
+	--layout-align: center;
+
+	&.is-vertical {
+		--layout-direction: column;
+		--layout-justify: initial;
+	}
+
+	&.no-wrap {
+		--layout-wrap: nowrap;
+	}
+
+	&.items-justified-center {
+		--layout-justification-setting: center;
+		--layout-justify: center;
+
+		&.is-vertical {
+			--layout-align: center;
+		}
+	}
+
+	&.items-justified-right {
+		--layout-justification-setting: flex-end;
+		--layout-justify: flex-end;
+
+		&.is-vertical {
+			--layout-align: flex-end;
+		}
+	}
+
+	&.items-justified-space-between {
+		--layout-justification-setting: space-between;
+		--layout-justify: space-between;
+	}
 }
 
 // Styles for submenu flyout.

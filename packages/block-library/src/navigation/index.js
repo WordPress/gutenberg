@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
-import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -12,7 +11,6 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
-import { addStylesToLayout } from './hooks';
 
 const { name } = metadata;
 
@@ -52,10 +50,3 @@ export const settings = {
 	save,
 	deprecated,
 };
-
-// Importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
-addFilter(
-	'blockEditor.FlexLayoutStyle',
-	'core/navigation',
-	addStylesToLayout
-);
