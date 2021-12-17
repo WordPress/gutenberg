@@ -82,11 +82,6 @@ function setup_wp_cli() {
   fi
 }
 
-function build_gutenberg() {
-  echo -e "\n\033[1mBuild Gutenberg packages\033[0m"
-  npm run build:gutenberg
-}
-
 function generate_bundles() {
   local ENTRY_FILE=$1
   local ANDROID_BUNDLE_OUTPUT=$2
@@ -225,7 +220,6 @@ echo -e "\n\033[1m== Generating POT files in \"$TARGET_PATH\" ==\033[0m"
 setup_wp_cli
 
 # Generate JS bundle
-build_gutenberg
 mkdir -p $ANDROID_BUNDLE_DIR
 mkdir -p $IOS_BUNDLE_DIR
 generate_bundles $BUNDLE_ENTRY_FILE $ANDROID_BUNDLE_PATH $ANDROID_SOURCEMAP_PATH $IOS_BUNDLE_PATH $IOS_SOURCEMAP_PATH
