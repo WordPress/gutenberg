@@ -81,7 +81,8 @@ function AddedByAuthor( { id } ) {
 	] );
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 
-	const hasAvatar = !! user?.avatar_urls?.[ 48 ];
+	const avatarURL = user?.avatar_urls?.[ 48 ];
+	const hasAvatar = !! avatarURL;
 
 	return (
 		<HStack alignment="left">
