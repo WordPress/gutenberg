@@ -696,15 +696,17 @@ export const __experimentalSaveSpecifiedEntityEdits = (
 /**
  * Returns an action object used in signalling that Upload permissions have been received.
  *
- * @param {boolean} hasUploadPermissions Does the user have permission to upload files?
+ * @deprecated since WP 5.9, use receiveUserPermission instead.
  *
  * @return {Object} Action object.
  */
-export function receiveUploadPermissions( hasUploadPermissions ) {
+export function receiveUploadPermissions() {
+	deprecated( "wp.data.dispatch( 'core' ).receiveUploadPermissions", {
+		since: '5.9',
+	} );
+
 	return {
-		type: 'RECEIVE_USER_PERMISSION',
-		key: 'create/media',
-		isAllowed: hasUploadPermissions,
+		type: 'DO_NOTHING',
 	};
 }
 

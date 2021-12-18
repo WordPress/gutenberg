@@ -170,11 +170,9 @@ _Returns_
 
 ### receiveUploadPermissions
 
+> **Deprecated** since WP 5.9, use receiveUserPermission instead.
+
 Returns an action object used in signalling that Upload permissions have been received.
-
-_Parameters_
-
--   _hasUploadPermissions_ `boolean`: Does the user have permission to upload files?
 
 _Returns_
 
