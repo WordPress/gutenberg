@@ -87,9 +87,11 @@ function AddedByAuthor( { id } ) {
 	return (
 		<HStack alignment="left">
 			<div
-				className={ classnames( {
-					'edit-site-list-added-by__avatar': hasAvatar,
-					'edit-site-list-added-by__icon': ! hasAvatar,
+				className={ classnames(
+					hasAvatar 
+						? 'edit-site-list-added-by__avatar'
+						: 'edit-site-list-added-by__icon',
+				{
 					'is-loaded': isImageLoaded,
 				} ) }
 			>
