@@ -41,7 +41,7 @@ function ToggleGroupControlBackdrop( {
 
 		// If the component is being rendered in an animating parent (i.e. popover),
 		// the element's final x/y position may not be available until the parent
-		// finishes rendering. We poll until then and wait for an available frame thereafter
+		// finishes animating. We poll until then and wait for an available frame thereafter
 		let timer = 0;
 		const pollTime = 5;
 		const maxPollTime = 150;
