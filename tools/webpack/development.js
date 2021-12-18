@@ -15,6 +15,7 @@ const sharedConfig = {
 		filename: '[name]/index.min.js',
 		path: join( __dirname, '..', '..', 'build' ),
 	},
+	stats: false,
 };
 
 // See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.

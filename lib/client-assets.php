@@ -92,7 +92,7 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	 *
 	 * See: https://core.trac.wordpress.org/ticket/46089
 	 */
-	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks' ), true ) ) {
+	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks', 'wp-dev-runtime' ), true ) ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
 
@@ -208,8 +208,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		$scripts,
 		'react',
 		'https://unpkg.com/react@17.0.1/umd/react' . $react_suffix . '.js',
-		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
-		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' )
+		array( 'wp-polyfill' )
 	);
 	gutenberg_register_vendor_script(
 		$scripts,

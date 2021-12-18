@@ -169,13 +169,18 @@ class DependencyExtractionWebpackPlugin {
 			entrypoint,
 		] of compilation.entrypoints.entries() ) {
 			const entrypointExternalizedWpDeps = new Set();
+
+			if (
+				typeof this.options.onBeforeExternalizeWpDeps === 'function'
+			) {
+				this.options.onBeforeExternalizeWpDeps(
+					entrypoint,
+					entrypointExternalizedWpDeps
+				);
+			}
+
 			if ( injectPolyfill ) {
-				if (
-					typeof injectPolyfill !== 'function' ||
-					injectPolyfill( entrypointName, entrypoint )
-				) {
-					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
-				}
+				entrypointExternalizedWpDeps.add( 'wp-polyfill' );
 			}
 
 			const processModule = ( { userRequest } ) => {

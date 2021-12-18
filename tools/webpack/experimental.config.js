@@ -13,6 +13,7 @@ const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const IgnoreEmitPlugin = require( 'ignore-emit-webpack-plugin' );
+const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 
 /**
  * WordPress dependencies
@@ -181,6 +182,28 @@ module.exports = {
 				extractComments: false,
 			} ),
 		],
+		// Output a dev-runtime/index.min.js file in development mode.
+		// It contains webpack runtime as well as react refresh runtime.
+		runtimeChunk:
+			mode === 'development'
+				? {
+						name: 'dev-runtime/index',
+				  }
+				: undefined,
+		// Bundle common dev runtime into `dev-runtime/index.min.js`.
+		splitChunks:
+			mode === 'development'
+				? {
+						cacheGroups: {
+							devRuntime: {
+								chunks: 'all',
+								// Ensure the runtime of `@pmmmwh/react-refresh-webpack-plugin` is hoisted.
+								minChunks: 10,
+								name: 'dev-runtime/index',
+							},
+						},
+				  }
+				: undefined,
 	},
 	module: {
 		rules: [
@@ -201,6 +224,14 @@ module.exports = {
 							cacheDirectory:
 								process.env.BABEL_CACHE_DIRECTORY || true,
 							cacheCompression: false,
+							plugins:
+								mode === 'development'
+									? [
+											require.resolve(
+												'react-refresh/babel'
+											),
+									  ]
+									: undefined,
 						},
 					},
 				],
@@ -278,9 +309,22 @@ module.exports = {
 			),
 		} ),
 		mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
+		mode === 'development' && new ReactRefreshWebpackPlugin(),
 		new DependencyExtractionWebpackPlugin( {
-			injectPolyfill: ( entrypointName ) =>
-				entrypointName.endsWith( '/index' ),
+			onBeforeExternalizeWpDeps(
+				entryPoint,
+				entrypointExternalizedWpDeps
+			) {
+				// Add `wp-dev-runtime` to deps for every entry in development mode.
+				if ( mode === 'development' ) {
+					entrypointExternalizedWpDeps.add( 'wp-dev-runtime' );
+				}
+
+				// Add `pw-polyfill` to deps for every "package" entry.
+				if ( entryPoint.name.endsWith( '/index' ) ) {
+					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
+				}
+			},
 		} ),
 		new MiniCSSExtractPlugin( {
 			filename: ( pathData ) => {
@@ -401,6 +445,25 @@ module.exports = {
 		} ),
 		new IgnoreEmitPlugin( /\.css-entry\.js$/ ),
 	].filter( Boolean ),
+	devServer: {
+		devMiddleware: {
+			index: false,
+			writeToDisk: true,
+		},
+		allowedHosts: 'auto',
+		host: 'localhost',
+		port: 8887,
+		hot: 'only',
+		liveReload: false,
+		static: false,
+		// proxy: {
+		// 	'/build': {
+		// 		pathRewrite: {
+		// 			'^/build': '',
+		// 		},
+		// 	},
+		// },
+	},
 	resolve: {
 		extensions: [ '.ts', '.tsx', '...' ],
 		mainFields: [
