@@ -43,6 +43,10 @@
 	}
 }
 
+.block-editor-panel-color-gradient-settings__dropdown {
+	width: 100%;
+}
+
 .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
 	& > div {
 		width: $sidebar-width;

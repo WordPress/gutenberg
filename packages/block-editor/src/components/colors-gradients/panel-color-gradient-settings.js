@@ -8,21 +8,16 @@ import { every, isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
-	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	FlexItem,
 	ColorIndicator,
 	PanelBody,
-	Dropdown,
 } from '@wordpress/components';
-import { sprintf, __, isRTL } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import ColorGradientControl from './control';
+import ColorGradientSettingsDropdown from './dropdown';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
@@ -136,11 +131,6 @@ export const PanelColorGradientSettingsInner = ( {
 		</span>
 	);
 
-	let dropdownPosition;
-	if ( __experimentalIsRenderedInSidebar ) {
-		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
-	}
-
 	return (
 		<PanelBody
 			className={ classnames(
@@ -150,57 +140,18 @@ export const PanelColorGradientSettingsInner = ( {
 			title={ showTitle ? titleElement : undefined }
 			{ ...props }
 		>
-			<ItemGroup
-				isBordered
-				isSeparated
-				className="block-editor-panel-color-gradient-settings__item-group"
-			>
-				{ settings.map( ( setting, index ) => (
-					<Dropdown
-						position={ dropdownPosition }
-						className="block-editor-panel-color-gradient-settings__dropdown"
-						key={ index }
-						contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
-						renderToggle={ ( { isOpen, onToggle } ) => {
-							return (
-								<Item
-									onClick={ onToggle }
-									className={ classnames(
-										'block-editor-panel-color-gradient-settings__item',
-										{ 'is-open': isOpen }
-									) }
-								>
-									<HStack justify="flex-start">
-										<ColorIndicator
-											className="block-editor-panel-color-gradient-settings__color-indicator"
-											colorValue={
-												setting.gradientValue ??
-												setting.colorValue
-											}
-										/>
-										<FlexItem>{ setting.label }</FlexItem>
-									</HStack>
-								</Item>
-							);
-						} }
-						renderContent={ () => (
-							<ColorGradientControl
-								showTitle={ false }
-								{ ...{
-									colors,
-									gradients,
-									disableCustomColors,
-									disableCustomGradients,
-									__experimentalHasMultipleOrigins,
-									__experimentalIsRenderedInSidebar,
-									enableAlpha,
-									...setting,
-								} }
-							/>
-						) }
-					/>
-				) ) }
-			</ItemGroup>
+			<ColorGradientSettingsDropdown
+				settings={ settings }
+				{ ...{
+					colors,
+					gradients,
+					disableCustomColors,
+					disableCustomGradients,
+					__experimentalHasMultipleOrigins,
+					__experimentalIsRenderedInSidebar,
+					enableAlpha,
+				} }
+			/>
 			{ !! children && (
 				<>
 					<Spacer marginY={ 4 } /> { children }
