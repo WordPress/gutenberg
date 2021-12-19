@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, noop } from 'lodash';
 import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 
@@ -11,13 +11,20 @@ import classnames from 'classnames';
 import { useEffect, useState } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';
 
+const emptyList = Object.freeze( [] );
+
+const handleMouseDown = ( e ) => {
+	// By preventing default here, we will not lose focus of <input> when clicking a suggestion
+	e.preventDefault();
+};
+
 function SuggestionsList( {
 	selectedIndex,
 	scrollIntoView,
 	match = '',
-	onHover = () => {},
-	onSelect = () => {},
-	suggestions = Object.freeze( [] ),
+	onHover = noop,
+	onSelect = noop,
+	suggestions = emptyList,
 	displayTransform,
 	instanceId,
 	setTimeout,
@@ -60,11 +67,6 @@ function SuggestionsList( {
 		return () => {
 			onSelect( suggestion );
 		};
-	};
-
-	const handleMouseDown = ( e ) => {
-		// By preventing default here, we will not lose focus of <input> when clicking a suggestion
-		e.preventDefault();
 	};
 
 	const computeSuggestionMatch = ( suggestion ) => {
