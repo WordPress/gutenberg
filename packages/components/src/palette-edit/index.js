@@ -293,71 +293,81 @@ export default function PaletteEdit( {
 						/>
 					) }
 
-					{ hasElements && ( canReset || ! canOnlyChangeValues ) && (
-						<DropdownMenu
-							icon={ moreVertical }
-							label={
-								isGradient
-									? __( 'Gradient options' )
-									: __( 'Color options' )
-							}
-							toggleProps={ {
-								isSmall: true,
-							} }
-						>
-							{ ( { onClose } ) => (
-								<>
-									<NavigableMenu role="menu">
-										<Button
-											variant="tertiary"
-											disabled={ isEditing }
-											onClick={ () => {
-												setIsEditing( true );
-												onClose();
-											} }
-											className="components-palette-edit__menu-button"
-										>
-											{ __( 'Edit custom colors' ) }
-										</Button>
-										{ ! canOnlyChangeValues && (
-											<Button
-												variant="tertiary"
-												onClick={ () => {
-													setEditingElement( null );
-													setIsEditing( false );
-													onChange();
-													onClose();
-												} }
-												className="components-palette-edit__menu-button"
-											>
-												{ isGradient
-													? __(
-															'Remove all gradients'
-													  )
-													: __(
-															'Remove all colors'
-													  ) }
-											</Button>
-										) }
-										{ canReset && (
-											<Button
-												variant="tertiary"
-												onClick={ () => {
-													setEditingElement( null );
-													onChange();
-													onClose();
-												} }
-											>
-												{ isGradient
-													? __( 'Reset gradient' )
-													: __( 'Reset colors' ) }
-											</Button>
-										) }
-									</NavigableMenu>
-								</>
-							) }
-						</DropdownMenu>
-					) }
+					{ hasElements &&
+						( ! isEditing ||
+							! canOnlyChangeValues ||
+							canReset ) && (
+							<DropdownMenu
+								icon={ moreVertical }
+								label={
+									isGradient
+										? __( 'Gradient options' )
+										: __( 'Color options' )
+								}
+								toggleProps={ {
+									isSmall: true,
+								} }
+							>
+								{ ( { onClose } ) => (
+									<>
+										<NavigableMenu role="menu">
+											{ ! isEditing && (
+												<Button
+													variant="tertiary"
+													onClick={ () => {
+														setIsEditing( true );
+														onClose();
+													} }
+													className="components-palette-edit__menu-button"
+												>
+													{ isGradient
+														? __( 'Edit gradients' )
+														: __( 'Edit colors' ) }
+												</Button>
+											) }
+											{ ! canOnlyChangeValues && (
+												<Button
+													variant="tertiary"
+													onClick={ () => {
+														setEditingElement(
+															null
+														);
+														setIsEditing( false );
+														onChange();
+														onClose();
+													} }
+													className="components-palette-edit__menu-button"
+												>
+													{ isGradient
+														? __(
+																'Remove all gradients'
+														  )
+														: __(
+																'Remove all colors'
+														  ) }
+												</Button>
+											) }
+											{ canReset && (
+												<Button
+													variant="tertiary"
+													onClick={ () => {
+														setEditingElement(
+															null
+														);
+														onChange();
+														onClose();
+													} }
+												>
+													{ isGradient
+														? __( 'Reset gradient' )
+														: __( 'Reset colors' ) }
+												</Button>
+											) }
+										</NavigableMenu>
+									</>
+								) }
+							</DropdownMenu>
+						) }
 				</PaletteActionsContainer>
 			</PaletteHStackHeader>
 			{ hasElements && (
