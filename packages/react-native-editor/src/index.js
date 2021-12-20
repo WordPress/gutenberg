@@ -32,8 +32,8 @@ import { getTranslation as getGutenbergTranslation } from '../i18n-cache';
  */
 const registerGutenberg = ( { beforeInitCallback, pluginTranslations } ) => {
 	class Gutenberg extends Component {
-		constructor() {
-			super( ...arguments );
+		constructor( props ) {
+			super( props );
 
 			const parentProps = omit( this.props || {}, [ 'rootTag' ] );
 
