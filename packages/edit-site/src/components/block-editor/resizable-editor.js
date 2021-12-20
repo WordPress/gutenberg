@@ -180,7 +180,7 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 							<style>
 								{
 									// Force the <html> and <body>'s heights to fit the content.
-									`html, body { height: -moz-fit-content !important; height: fit-content !important; }`
+									`html, body { height: -moz-fit-content !important; height: fit-content !important; min-height: 0 !important; }`
 								}
 								{
 									// Some themes will have `min-height: 100vh` for the root container,
