@@ -137,25 +137,7 @@
 				]
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
-			{
-				"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md": [
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-1-up-and-running.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-3-register-meta.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-4-initialize-input.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md": []
-					}
-				]
-			},
+			{ "docs/how-to-guides/plugin-sidebar.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },

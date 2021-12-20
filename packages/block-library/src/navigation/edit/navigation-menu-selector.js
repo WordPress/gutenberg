@@ -12,7 +12,11 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import useNavigationMenu from '../use-navigation-menu';
 
-export default function NavigationMenuSelector( { onSelect, onCreateNew } ) {
+export default function NavigationMenuSelector( {
+	onSelect,
+	onCreateNew,
+	showCreate = false,
+} ) {
 	const { navigationMenus } = useNavigationMenu();
 	const ref = useEntityId( 'postType', 'wp_navigation' );
 
@@ -42,18 +46,20 @@ export default function NavigationMenuSelector( { onSelect, onCreateNew } ) {
 					} ) }
 				/>
 			</MenuGroup>
-			<MenuGroup>
-				<MenuItem onClick={ onCreateNew }>
-					{ __( 'Create new menu' ) }
-				</MenuItem>
-				<MenuItem
-					href={ addQueryArgs( 'edit.php', {
-						post_type: 'wp_navigation',
-					} ) }
-				>
-					{ __( 'Manage menus' ) }
-				</MenuItem>
-			</MenuGroup>
+			{ showCreate && (
+				<MenuGroup>
+					<MenuItem onClick={ onCreateNew }>
+						{ __( 'Create new menu' ) }
+					</MenuItem>
+					<MenuItem
+						href={ addQueryArgs( 'edit.php', {
+							post_type: 'wp_navigation',
+						} ) }
+					>
+						{ __( 'Manage menus' ) }
+					</MenuItem>
+				</MenuGroup>
+			) }
 		</>
 	);
 }
