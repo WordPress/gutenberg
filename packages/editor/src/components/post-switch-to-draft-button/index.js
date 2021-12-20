@@ -24,7 +24,10 @@ function SwitchToDraftConfirm( props ) {
 	}
 
 	return props.showConfirmDialog ? (
-		<ConfirmDialog onConfirm={ props.onClick }>
+		<ConfirmDialog
+			onConfirm={ props.onClick }
+			onCancel={ props.confirmStateResetHandler }
+		>
 			{ alertMessage }
 		</ConfirmDialog>
 	) : null;
@@ -38,6 +41,10 @@ function PostSwitchToDraftButton( {
 } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
+
+	const confirmStateResetHandler = () => {
+		setShowConfirmDialog( false );
+	};
 
 	if ( ! isPublished && ! isScheduled ) {
 		return null;
@@ -60,6 +67,7 @@ function PostSwitchToDraftButton( {
 				isScheduled={ isScheduled }
 				onClick={ onClick }
 				showConfirmDialog={ showConfirmDialog }
+				confirmStateResetHandler={ confirmStateResetHandler }
 			/>
 		</>
 	);
