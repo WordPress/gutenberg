@@ -6,9 +6,6 @@ import { queryPaginationPrevious as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import metadata from './block.json';
 import edit from './edit';
 
