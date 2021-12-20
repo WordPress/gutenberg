@@ -35,6 +35,23 @@ function gutenberg_url( $path ) {
 }
 
 /**
+ * Proxy plugin resources to the webpack-dev-server in localhost:8887.
+ *
+ * @param string $url    The complete URL to the plugins directory including scheme and path.
+ * @param string $path   Path relative to the URL to the plugins directory. Blank string
+ *                       if no path is specified.
+ * @param string $plugin The plugin file path to be relative to. Blank string if no plugin
+ *                       is specified.
+ */
+function proxy_dev_plugins_url( $url, $path, $plugin ) {
+	if ( SCRIPT_DEBUG && __DIR__ === $plugin ) {
+		return 'http://localhost:8887/' . $path;
+	}
+	return $url;
+}
+add_filter( 'plugins_url', 'proxy_dev_plugins_url', 10, 3 );
+
+/**
  * Registers a script according to `wp_register_script`. Honors this request by
  * reassigning internal dependency properties of any script handle already
  * registered by that name. It does not deregister the original script, to

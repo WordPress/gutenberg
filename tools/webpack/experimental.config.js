@@ -160,6 +160,7 @@ module.exports = {
 		path: join( PROJECT_ROOT, 'build' ),
 		enabledLibraryTypes: [ 'window', 'var' ],
 		pathinfo: false,
+		clean: true,
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -182,6 +183,7 @@ module.exports = {
 				extractComments: false,
 			} ),
 		],
+		moduleIds: 'deterministic',
 		// Output a dev-runtime/index.min.js file in development mode.
 		// It contains webpack runtime as well as react refresh runtime.
 		runtimeChunk:
@@ -191,19 +193,19 @@ module.exports = {
 				  }
 				: undefined,
 		// Bundle common dev runtime into `dev-runtime/index.min.js`.
-		splitChunks:
-			mode === 'development'
-				? {
-						cacheGroups: {
-							devRuntime: {
-								chunks: 'all',
-								// Ensure the runtime of `@pmmmwh/react-refresh-webpack-plugin` is hoisted.
-								minChunks: 10,
-								name: 'dev-runtime/index',
-							},
-						},
-				  }
-				: undefined,
+		// splitChunks:
+		// 	mode === 'development'
+		// 		? {
+		// 				cacheGroups: {
+		// 					devRuntime: {
+		// 						chunks: 'all',
+		// 						// Ensure the runtime of `@pmmmwh/react-refresh-webpack-plugin` is hoisted.
+		// 						minChunks: 10,
+		// 						name: 'dev-runtime/index',
+		// 					},
+		// 				},
+		// 		  }
+		// 		: undefined,
 	},
 	module: {
 		rules: [
@@ -447,22 +449,19 @@ module.exports = {
 	].filter( Boolean ),
 	devServer: {
 		devMiddleware: {
+			publicPath: '/build',
 			index: false,
 			writeToDisk: true,
 		},
-		allowedHosts: 'auto',
 		host: 'localhost',
 		port: 8887,
+		headers: {
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Methods': 'GET, OPTIONS',
+		},
 		hot: 'only',
 		liveReload: false,
 		static: false,
-		// proxy: {
-		// 	'/build': {
-		// 		pathRewrite: {
-		// 			'^/build': '',
-		// 		},
-		// 	},
-		// },
 	},
 	resolve: {
 		extensions: [ '.ts', '.tsx', '...' ],
