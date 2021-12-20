@@ -130,8 +130,7 @@ function augmentSupports( supports ) {
  * @return {string} markdown
  */
 function readBlockJSON( filename ) {
-	const data = fs.readFileSync( filename, 'utf8' );
-	const blockjson = JSON.parse( data );
+	const blockjson = require( filename );
 
 	const supportsAugmented = augmentSupports( blockjson.supports );
 	const supportsList = processObjWithInnerKeys( supportsAugmented );
