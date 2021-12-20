@@ -19,6 +19,17 @@ import initialHtml from './initial-html';
 import setupLocale from './setup-locale';
 import { getTranslation as getGutenbergTranslation } from '../i18n-cache';
 
+/**
+ *	Register Gutenberg editor to React Native App registry.
+ *
+ * @typedef {Object} PluginTranslation
+ * @property {string}              domain                       Domain of the plugin.
+ * @property {Function}            getTranslation               Function for retrieving translations for a locale.
+ *
+ * @param    {Object}              arguments
+ * @param    {Function}            arguments.beforeInitCallback Callback executed before the editor initialization.
+ * @param    {PluginTranslation[]} arguments.pluginTranslations Array with plugin translations.
+ */
 const registerGutenberg = ( { beforeInitCallback, pluginTranslations } ) => {
 	class Gutenberg extends Component {
 		constructor() {
