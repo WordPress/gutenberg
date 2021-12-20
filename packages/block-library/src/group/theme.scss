@@ -1,6 +1,5 @@
-.wp-block-group {
-	&:where(.has-background) {
-		// Matches paragraph Block padding
-		padding: $block-bg-padding--v $block-bg-padding--h;
-	}
+// Add low specificity default padding to groups with backgrounds.
+:where(.wp-block-group.has-background) {
+	// Matches paragraph block padding.
+	padding: $block-bg-padding--v $block-bg-padding--h;
 }

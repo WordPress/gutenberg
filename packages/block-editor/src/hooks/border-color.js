@@ -9,12 +9,12 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import ColorGradientControl from '../components/colors-gradients/control';
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import {
 	getColorClassName,
@@ -56,14 +56,29 @@ export function BorderColorEdit( props ) {
 		( colors, origin ) => colors.concat( origin.colors ),
 		[]
 	);
+	const { color: customBorderColor } = style?.border || {};
 	const [ colorValue, setColorValue ] = useState(
 		() =>
 			getColorObjectByAttributeValues(
 				availableColors,
 				borderColor,
-				style?.border?.color
+				customBorderColor
 			)?.color
 	);
+
+	// Detect changes in the color attributes and update the colorValue to keep the
+	// UI in sync. This is necessary for situations when border controls interact with
+	// eachother: eg, setting the border width to zero causes the color and style
+	// selections to be cleared.
+	useEffect( () => {
+		setColorValue(
+			getColorObjectByAttributeValues(
+				availableColors,
+				borderColor,
+				customBorderColor
+			)?.color
+		);
+	}, [ borderColor, customBorderColor, availableColors ] );
 
 	const onChangeColor = ( value ) => {
 		setColorValue( value );
@@ -89,13 +104,22 @@ export function BorderColorEdit( props ) {
 		} );
 	};
 
+	const settings = [
+		{
+			label: __( 'Color' ),
+			onColorChange: onChangeColor,
+			colorValue,
+			clearable: false,
+		},
+	];
 	return (
-		<ColorGradientControl
-			label={ __( 'Color' ) }
-			colorValue={ colorValue }
-			onColorChange={ onChangeColor }
-			clearable={ false }
+		<ColorGradientSettingsDropdown
+			settings={ settings }
+			disableCustomColors
+			disableCustomGradients
 			__experimentalHasMultipleOrigins
+			__experimentalIsRenderedInSidebar
+			enableAlpha
 			{ ...colorGradientSettings }
 		/>
 	);

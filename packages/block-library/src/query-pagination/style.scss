@@ -32,7 +32,17 @@ $pagination-margin: 0.5em;
 		}
 	}
 
-	&.aligncenter {
-		justify-content: center;
+	// Non-clickeable previous and next elements are not visible
+	>span.wp-block-query-pagination-next,
+	>span.wp-block-query-pagination-previous {
+		visibility: hidden;
 	}
+
+	&.wp-justify-left,
+	&.wp-justify-right {
+		> [aria-hidden="true"] {
+			display: none;
+		}
+	}
+
 }

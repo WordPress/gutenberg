@@ -9,8 +9,8 @@ import { noop } from 'lodash';
 import {
 	__experimentalVStack as VStack,
 	__experimentalPaletteEdit as PaletteEdit,
+	__experimentalSpacer as Spacer,
 	DuotonePicker,
-	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -18,6 +18,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useSetting } from './hooks';
+import Subtitle from './subtitle';
 
 export default function GradientPalettePanel( { name } ) {
 	const [ themeGradients, setThemeGradients ] = useSetting(
@@ -53,18 +54,6 @@ export default function GradientPalettePanel( { name } ) {
 			className="edit-site-global-styles-gradient-palette-panel"
 			spacing={ 10 }
 		>
-			<div>
-				<Heading className="edit-site-global-styles-gradient-palette-panel__duotone-heading">
-					{ __( 'Duotone' ) }
-				</Heading>
-				<DuotonePicker
-					duotonePalette={ duotonePalette }
-					disableCustomDuotone={ true }
-					disableCustomColors={ true }
-					clearable={ false }
-					onChange={ noop }
-				/>
-			</div>
 			{ !! themeGradients && !! themeGradients.length && (
 				<PaletteEdit
 					canReset={ themeGradients !== baseThemeGradients }
@@ -94,6 +83,17 @@ export default function GradientPalettePanel( { name } ) {
 				) }
 				slugPrefix="custom-"
 			/>
+			<div>
+				<Subtitle>{ __( 'Duotone' ) }</Subtitle>
+				<Spacer margin={ 3 } />
+				<DuotonePicker
+					duotonePalette={ duotonePalette }
+					disableCustomDuotone={ true }
+					disableCustomColors={ true }
+					clearable={ false }
+					onChange={ noop }
+				/>
+			</div>
 		</VStack>
 	);
 }

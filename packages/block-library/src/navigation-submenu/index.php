@@ -98,7 +98,7 @@ function block_core_navigation_submenu_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
 	}
 
 	return $font_sizes;
@@ -116,9 +116,9 @@ function block_core_navigation_submenu_render_submenu_icon() {
 /**
  * Renders the `core/navigation-submenu` block.
  *
- * @param array  $attributes The block attributes.
- * @param string $content The saved content.
- * @param object $block The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
@@ -188,6 +188,12 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		);
 	}
 
+	$aria_label = sprintf(
+		/* translators: Accessibility text. %s: Parent page title. */
+		__( '%s submenu' ),
+		$label
+	);
+
 	$html = '<li ' . $wrapper_attributes . '>';
 
 	// If Submenus open on hover, we render an anchor tag with attributes.
@@ -226,11 +232,11 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( $show_submenu_indicators ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable elment to open the submenu.
-			$html .= '<button aria-label="' . $label . ' ' . __( 'submenu', 'gutenberg' ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			$html .= '<button aria-label="' . $aria_label . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
 		}
 	} else {
 		// If menus open on click, we render the parent as a button.
-		$html .= '<button aria-label="' . $label . ' ' . __( 'submenu', 'gutenberg' ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
+		$html .= '<button aria-label="' . $aria_label . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
 
 		// Wrap title with span to isolate it from submenu icon.
 		$html .= '<span class="wp-block-navigation-item__label">';

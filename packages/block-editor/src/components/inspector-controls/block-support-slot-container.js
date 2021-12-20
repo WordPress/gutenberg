@@ -6,5 +6,7 @@ import { useContext } from '@wordpress/element';
 
 export default function BlockSupportSlotContainer( { Slot, ...props } ) {
 	const toolsPanelContext = useContext( ToolsPanelContext );
-	return <Slot { ...props } fillProps={ toolsPanelContext } />;
+	return (
+		<Slot { ...props } fillProps={ toolsPanelContext } bubblesVirtually />
+	);
 }

@@ -17,7 +17,7 @@ export default {
 	title: 'Components/TextareaControl',
 	component: TextareaControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

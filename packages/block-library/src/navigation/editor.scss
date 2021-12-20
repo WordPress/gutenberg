@@ -96,6 +96,19 @@
 	}
 }
 
+// Show even when a child is selected. This is an edgecase just for navigation submenus.
+.is-editing > .wp-block-navigation__submenu-container > .block-list-appender {
+	display: block;
+	position: static;
+	width: 100%;
+}
+
+// Hide when hovering.
+.wp-block-navigation__submenu-container .block-list-appender {
+	display: none;
+}
+
+
 /**
  * Colors Selector component
  */
@@ -359,6 +372,7 @@ $color-control-label-height: 20px;
 	font-size: $default-font-size;
 	font-family: $default-font;
 	gap: $grid-unit-15 * 0.5;
+	align-items: center;
 
 	// Margins.
 	.components-dropdown,
