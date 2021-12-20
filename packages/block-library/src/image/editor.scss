@@ -52,6 +52,7 @@ figure.wp-block-image:not(.wp-block) {
 [data-align="wide"] > .wp-block-image,
 [data-align="full"] > .wp-block-image {
 	img {
+		height: auto;
 		width: 100%;
 	}
 }
@@ -63,6 +64,24 @@ figure.wp-block-image:not(.wp-block) {
 		display: table;
 
 		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+}
+
+*:not([data-align]) {
+	> .wp-block-image {
+		display: grid;
+		grid-template-columns: [image] minmax(0, max-content) [placeholder] auto;
+		.components-placeholder {
+			grid-column: placeholder;
+		}
+		> div:not(.components-placeholder) {
+			grid-column: image;
+		}
+		> figcaption {
+			grid-column: image;
 			display: table-caption;
 			caption-side: bottom;
 		}

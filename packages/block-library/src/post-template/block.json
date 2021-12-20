@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/post-template",
 	"title": "Post Template",
@@ -16,7 +17,10 @@
 	"supports": {
 		"reusable": false,
 		"html": false,
-		"align": true
+		"align": true,
+		"__experimentalLayout": {
+			"allowEditing": false
+		}
 	},
 	"style": "wp-block-post-template",
 	"editorStyle": "wp-block-post-template-editor"

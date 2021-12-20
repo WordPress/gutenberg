@@ -1,31 +1,48 @@
 /**
  * WordPress dependencies
  */
+import { useEffect } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as editSiteStore } from '../../store';
 import NavigationPanel from './navigation-panel';
 import NavigationToggle from './navigation-toggle';
-import { store as editSiteStore } from '../../store';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
 	Slot: NavigationPanelPreviewSlot,
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
-export default function NavigationSidebar() {
-	const isNavigationOpen = useSelect( ( select ) => {
-		return select( editSiteStore ).isNavigationOpened();
-	} );
+const {
+	Fill: NavigationSidebarFill,
+	Slot: NavigationSidebarSlot,
+} = createSlotFill( 'EditSiteNavigationSidebar' );
+
+function NavigationSidebar( { isDefaultOpen = false, activeTemplateType } ) {
+	const isDesktopViewport = useViewportMatch( 'medium' );
+	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+
+	useEffect(
+		function autoOpenNavigationPanelOnViewportChange() {
+			setIsNavigationPanelOpened( isDefaultOpen && isDesktopViewport );
+		},
+		[ isDefaultOpen, isDesktopViewport, setIsNavigationPanelOpened ]
+	);
 
 	return (
-		<>
-			<NavigationToggle isOpen={ isNavigationOpen } />
-			<NavigationPanel isOpen={ isNavigationOpen } />
+		<NavigationSidebarFill>
+			<NavigationToggle />
+			<NavigationPanel activeItem={ activeTemplateType } />
 			<NavigationPanelPreviewSlot />
-		</>
+		</NavigationSidebarFill>
 	);
 }
+
+NavigationSidebar.Slot = NavigationSidebarSlot;
+
+export default NavigationSidebar;

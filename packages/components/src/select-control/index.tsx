@@ -21,7 +21,7 @@ import InputBase from '../input-control/input-base';
 import type { InputBaseProps, LabelPosition } from '../input-control/types';
 import { Select, DownArrowWrapper } from './styles/select-control-styles';
 import type { Size } from './types';
-import type { PolymorphicComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -31,7 +31,7 @@ function useUniqueId( idProp?: string ) {
 }
 
 export interface SelectControlProps
-	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
+	extends Omit< InputBaseProps, 'isFocused' > {
 	help?: string;
 	hideLabelFromVision?: boolean;
 	multiple?: boolean;
@@ -68,10 +68,11 @@ function SelectControl(
 		size = 'default',
 		value: valueProp,
 		labelPosition = 'top',
+		children,
 		prefix,
 		suffix,
 		...props
-	}: PolymorphicComponentProps< SelectControlProps, 'select', false >,
+	}: WordPressComponentProps< SelectControlProps, 'select', false >,
 	ref: Ref< HTMLSelectElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -79,7 +80,7 @@ function SelectControl(
 	const helpId = help ? `${ id }__help` : undefined;
 
 	// Disable reason: A select with an onchange throws a warning
-	if ( isEmpty( options ) ) return null;
+	if ( isEmpty( options ) && ! children ) return null;
 
 	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {
 		onBlur( event );
@@ -141,21 +142,22 @@ function SelectControl(
 					selectSize={ size }
 					value={ valueProp }
 				>
-					{ options.map( ( option, index ) => {
-						const key =
-							option.id ||
-							`${ option.label }-${ option.value }-${ index }`;
+					{ children ||
+						options.map( ( option, index ) => {
+							const key =
+								option.id ||
+								`${ option.label }-${ option.value }-${ index }`;
 
-						return (
-							<option
-								key={ key }
-								value={ option.value }
-								disabled={ option.disabled }
-							>
-								{ option.label }
-							</option>
-						);
-					} ) }
+							return (
+								<option
+									key={ key }
+									value={ option.value }
+									disabled={ option.disabled }
+								>
+									{ option.label }
+								</option>
+							);
+						} ) }
 				</Select>
 			</InputBase>
 		</BaseControl>

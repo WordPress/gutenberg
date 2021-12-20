@@ -1,9 +1,70 @@
-// Styles copied from button block styles.
-.wp-block-post-comments-form input[type="submit"] {
-	border: none;
-	box-shadow: none;
-	cursor: pointer;
-	display: inline-block;
-	text-align: center;
-	overflow-wrap: break-word;
+.wp-block-post-comments-form {
+	&[style*="font-weight"] :where(.comment-reply-title) {
+		font-weight: inherit;
+	}
+	&[style*="font-family"] :where(.comment-reply-title) {
+		font-family: inherit;
+	}
+	&[class*="-font-size"] :where(.comment-reply-title),
+	&[style*="font-size"] :where(.comment-reply-title) {
+		font-size: inherit;
+	}
+	&[style*="line-height"] :where(.comment-reply-title) {
+		line-height: inherit;
+	}
+	&[style*="font-style"] :where(.comment-reply-title) {
+		font-style: inherit;
+	}
+	&[style*="letter-spacing"] :where(.comment-reply-title) {
+		letter-spacing: inherit;
+	}
+
+	// Styles copied from button block styles.
+	input[type="submit"] {
+		border: none;
+		box-shadow: none;
+		cursor: pointer;
+		display: inline-block;
+		text-align: center;
+		overflow-wrap: break-word;
+	}
+
+	textarea,
+	input:not([type="submit"]) {
+		border: 1px solid $gray-600;
+		font-size: 1em;
+		font-family: inherit;
+	}
+
+	textarea,
+	input:not([type="submit"]):not([type="checkbox"]) {
+		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
+	}
+
+	.comment-form {
+		textarea,
+		input:not([type="submit"]):not([type="checkbox"]) {
+			display: block;
+			box-sizing: border-box;
+			width: 100%;
+		}
+	}
+
+	.comment-form-author,
+	.comment-form-email,
+	.comment-form-url {
+		label {
+			display: block;
+			margin-bottom: 0.25em;
+		}
+	}
+
+	.comment-form-cookies-consent {
+		display: flex;
+		gap: 0.25em;
+
+		#wp-comment-cookies-consent {
+			margin-top: 0.35em;
+		}
+	}
 }

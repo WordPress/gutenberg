@@ -20,7 +20,7 @@ exports[`props should render alignment 1`] = `
   width: 100%;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-left: calc(4px * 2);
 }
 
@@ -61,7 +61,7 @@ exports[`props should render correctly 1`] = `
   width: 100%;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-left: calc(4px * 2);
 }
 
@@ -102,7 +102,7 @@ exports[`props should render spacing 1`] = `
   width: 100%;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-left: calc(4px * 5);
 }
 

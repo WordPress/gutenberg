@@ -11,7 +11,7 @@ import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
  */
 export function useCardDivider( props ) {
 	const { className, ...otherProps } = useContextSystem(

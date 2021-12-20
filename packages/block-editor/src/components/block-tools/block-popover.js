@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -107,13 +107,11 @@ function BlockPopover( {
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
-		useCallback( () => {
+		() => {
 			setIsToolbarForced( true );
 			stopTyping( true );
-		}, [] ),
+		},
 		{
-			bindGlobal: true,
-			eventName: 'keydown',
 			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);
@@ -213,6 +211,9 @@ function BlockPopover( {
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
 			shouldAnchorIncludePadding
+			// Used to safeguard sticky position behavior against cases where it would permanently
+			// obscure specific sections of a block.
+			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -281,7 +282,7 @@ function wrapperSelector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getBlockRootClientId,
-		__unstableGetBlockWithoutInnerBlocks,
+		getBlock,
 		getBlockParents,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( blockEditorStore );
@@ -293,8 +294,7 @@ function wrapperSelector( select ) {
 		return;
 	}
 
-	const { name, attributes = {}, isValid } =
-		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
+	const { name, attributes = {}, isValid } = getBlock( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
 
 	// Get Block List Settings for all ancestors of the current Block clientId

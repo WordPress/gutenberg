@@ -4,22 +4,24 @@ This folder contains all paste specific logic (filters, converters, normalisers.
 
 ## Support table
 
-| Source           | Formatting | Headings | Lists | Image | Separator | Table |
-| ---------------- | ---------- | -------- | ----- | ----- | --------- | ----- |
-| Google Docs      | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
-| Apple Pages      | ✓          | ✘ [1]    | ✓     | ✘ [1] | n/a       | ✓     |
-| MS Word          | ✓          | ✓        | ✓     | ✘ [2] | n/a       | ✓     |
-| MS Word Online   | ✓          | ✘ [3]    | ✓     | ✓     | n/a       | ✓     |
-| Evernote         | ✓          | ✘ [4]    | ✓     | ✓     | ✓         | ✓     |
-| Markdown         | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
-| Legacy WordPress | ✓          | ✓        | ✓     | … [5] | ✓         | ✓     |
-| Web              | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
+| Source           | Formatting | Headings | Lists | Image | Separator | Table | Footnotes, endnotes |
+| ---------------- | ---------- | -------- | ----- | ----- | --------- | ----- | ------------------- |
+| Google Docs      | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     | ✘ [1]               |
+| Apple Pages      | ✓          | ✘ [2]    | ✓     | ✘ [2] | n/a       | ✓     | ✘ [1]               |
+| MS Word          | ✓          | ✓        | ✓     | ✘ [3] | n/a       | ✓     | ✓                   |
+| MS Word Online   | ✓          | ✘ [4]    | ✓     | ✓     | n/a       | ✓     | ✘ [1]               |
+| LibreOffice      | ✓          | ✓        | ✓     | ✘ [3] | ✓         | ✓     | ✓                   |
+| Evernote         | ✓          | ✘ [5]    | ✓     | ✓     | ✓         | ✓     | n/a                 |
+| Markdown         | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     | n/a                 |
+| Legacy WordPress | ✓          | ✓        | ✓     | … [6] | ✓         | ✓     | n/a                 |
+| Web              | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     | n/a                 |
 
-1. Apple Pages does not pass heading and image information.
-2. MS Word only provides a local file path, which cannot be accessed in JavaScript for security reasons. Image placeholders will be provided instead. Single images, however, _can_ be copied and pasted without any problem.
-3. Still to do for MS Word Online.
-4. Evernote does not have headings.
-5. For caption and gallery shortcodes, see #2874.
+1. Google Docs, Apple Pages and MS Word online don't pass footnote nor endnote information.
+2. Apple Pages does not pass heading and image information.
+3. MS Word and LibreOffice only provide a local file path, which cannot be accessed in JavaScript for security reasons. Image placeholders will be provided instead. Single images, however, _can_ be copied and pasted without any problem.
+4. Still to do for MS Word Online.
+5. Evernote does not have headings.
+6. For caption and gallery shortcodes, see #2874.
 
 ## Other notable capabilities
 

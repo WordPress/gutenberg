@@ -62,6 +62,7 @@ export {
 	getSaveElement,
 	getSaveContent,
 	getBlockProps as __unstableGetBlockProps,
+	getInnerBlocksProps as __unstableGetInnerBlocksProps,
 	__unstableSerializeAndClean,
 } from './serializer';
 
@@ -159,4 +160,5 @@ export { default as node } from './node';
 export {
 	__EXPERIMENTAL_STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS,
+	__EXPERIMENTAL_PATHS_WITH_MERGE,
 } from './constants';

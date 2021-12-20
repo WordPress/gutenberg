@@ -2,17 +2,7 @@
 
 Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
 
-It is designed to provide a standardized UI for the creation of a link throughout the Editor.
-
-## History
-
-Much of the context for this component can be found in [the original Issue](https://github.com/WordPress/gutenberg/issues/17557).
-
-Previously iterations of a hyperlink UI existed within the Gutenberg interface but these tended to be highly tailored to their individual use cases and were not standardized, each having their own implementation.
-
-These older UIs tended to make use of two existing components: `URLInput` and `URLPopover`. When a requirement was raised to implement a new UI for hyperlink creation, an assessment of these existing components was undertaken and it was determined that they were too opinionated as to be easily refactored to accommodate the new use cases required by the new UI. Attempting to do so would also have meant unavoidable breaking changes to the interface of `URLInput` which would have (most probably) caused breaking changes to ripple across not only the Core codebase, but also that of 3rd party Plugins.
-
-As a result, it was agreed that a new component `LinkControl` would be created to realise the new hyperlink creation interface. This new UI would begin life as an experimental component which would consume `URLInput` internally. The API of `URLInput` would be enhanced as required with "experimental" features to facilitate the implementation of the new UI.
+It is designed to provide a standardized UI for the creation of a link throughout the Editor, see History section at bottom for further background.
 
 ## Relationship to `<URLInput>`
 
@@ -29,7 +19,7 @@ The distinction between the two components is perhaps best summarized by the fol
 
 When creating links the `LinkControl` component will handle two kinds of input from users:
 
-1. Entity searches - the user may input free-text based search queries for entities retrieved from remote data sources (in the context of WordPress these are `Pages`). For example, a user might search for a `Page` they have just created by name (eg: About) and the UI will return a matching result if found.
+1. Entity searches - the user may input free-text based search queries for entities retrieved from remote data sources (in the context of WordPress these are post-type entities). For example, a user might search for a `Page` they have just created by name (eg: About) and the UI will return a matching result if found.
 2. Direct entry - the user may also enter any arbitrary URL-like text. This includes full URLs (https://), URL fragements (eg: `#myinternallink`), `tel` protocol links (eg: `tel: 0800 1234`) and `mailto` protocol links (eg: `mailto: hello@wordpress.org`).
 
 In addition, `<LinkControl>` also allows for on the fly creation of links based on the **current content of the `<input>` element**. When enabled, a default "Create new" search suggestion is appended to all non-URL-like search results.
@@ -38,7 +28,9 @@ When this suggestion is selected it will call the `createSuggestion` prop afford
 
 ### Data sources
 
-By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching `Page` post-type entities.
+By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching post-type entities.
+
+By default this provides no functionality and so you must implement and provide this in your own Editor instance ([example](https://github.com/WordPress/gutenberg/blob/65c752816f46a9334b84f4801d80dea00ed76fba/packages/editor/src/components/provider/use-block-editor-settings.js#L114-L115)).
 
 ## Props
 
@@ -63,7 +55,7 @@ The resulting default properties of `value` include:
 -   Required: No
 -   Default:
 
-```
+```js
 [
 	{
 		id: 'opensInNewTab',
@@ -73,6 +65,14 @@ The resulting default properties of `value` include:
 ```
 
 An array of settings objects associated with a link (for example: a setting to determine whether or not the link opens in a new tab). Each object will be used to render a `ToggleControl` for that setting.
+
+To disable settings, pass in an empty array. for example:
+
+```jsx
+<LinkControl
+	settings={ [] }
+/>
+```
 
 ### onChange
 
@@ -104,6 +104,22 @@ Whether to present suggestions when typing the URL.
 -   Default: `false`
 
 Whether to present initial suggestions immediately.
+
+### suggestionsQuery
+
+-   Type: `Object`
+-   Required: No
+
+Controls the query parameters used to search for suggestions. For example, to limit a query to just `Page` types use:
+
+```jsx
+<LinkControl
+	suggestionsQuery={ {
+		type: 'post',
+		subtype: 'page',
+	} }
+/>
+```
 
 ### forceIsEditingLink
 
@@ -176,6 +192,13 @@ A `suggestion` should have the following shape:
 	)}
 />
 ```
+### renderControlBottom 
+
+-   Type: `Function`
+-   Required: No
+-   Default: null
+
+A render prop that can be used to pass optional controls to be rendered at the bottom of the component.
 
 # LinkControlSearchInput
 
@@ -527,3 +550,13 @@ If true, type of the suggestion is rendered (e.g. post, tag)
 The suggestion to render.
 
 See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
+
+## History
+
+Much of the context for this component can be found in [the original Issue](https://github.com/WordPress/gutenberg/issues/17557).
+
+Previously iterations of a hyperlink UI existed within the Gutenberg interface but these tended to be highly tailored to their individual use cases and were not standardized, each having their own implementation.
+
+These older UIs tended to make use of two existing components: `URLInput` and `URLPopover`. When a requirement was raised to implement a new UI for hyperlink creation, an assessment of these existing components was undertaken and it was determined that they were too opinionated as to be easily refactored to accommodate the new use cases required by the new UI. Attempting to do so would also have meant unavoidable breaking changes to the interface of `URLInput` which would have (most probably) caused breaking changes to ripple across not only the Core codebase, but also that of 3rd party Plugins.
+
+As a result, it was agreed that a new component `LinkControl` would be created to realise the new hyperlink creation interface. This new UI would begin life as an experimental component which would consume `URLInput` internally. The API of `URLInput` would be enhanced as required with "experimental" features to facilitate the implementation of the new UI.

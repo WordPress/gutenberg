@@ -23,7 +23,7 @@ function filter_metadata_registration( $metadata ) {
 	$metadata['apiVersion'] = 1;
 	return $metadata;
 };
-add_filter( 'block_type_metadata', 'filter_metadata_registration', 10, 2 );
+add_filter( 'block_type_metadata', 'filter_metadata_registration' );
 
 register_block_type( __DIR__ );
 ```
@@ -266,6 +266,49 @@ wp.hooks.addFilter(
 );
 ```
 
+{% end %}
+
+Adding new properties to the block's wrapper component can be achieved by adding them to the `wrapperProps` property of the returned component.
+
+_Example:_
+
+{% codetabs %}
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
+const withMyWrapperProp = createHigherOrderComponent( ( BlockListBlock ) => {
+	return ( props ) => {
+		const wrapperProps = {
+		    ...props.wrapperProps,
+		    'data-my-property': 'the-value',
+		};
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	};
+}, 'withMyWrapperProp' );
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-my-wrapper-prop', withMyWrapperProp );
+```
+{% ES5 %}
+```js
+var el = wp.element.createElement;
+var hoc = wp.compose.createHigherOrderComponent;
+
+var withMyWrapperProp = hoc( function( BlockListBlock ) {
+	return function( props ) {
+		var newProps = {
+			...props,
+			wrapperProps: {
+				...props.wrapperProps,
+				'data-my-property': 'the-value'
+			}
+		};
+		return el(
+			BlockListBlock,
+			newProps
+		);
+	};
+}, 'withMyWrapperProp' );
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-my-wrapper-prop', withMyWrapperProp );
+```
 {% end %}
 
 ## Removing Blocks

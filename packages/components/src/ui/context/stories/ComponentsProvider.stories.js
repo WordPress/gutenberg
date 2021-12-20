@@ -16,7 +16,7 @@ const useSomeContext = () => useContext( SomeContext );
 
 export default {
 	component: ContextSystemProvider,
-	title: 'G2 Components (Experimental)/ContextSystemProvider',
+	title: 'Components (Experimental)/ContextSystemProvider',
 };
 
 const outerContext = {

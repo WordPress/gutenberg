@@ -1,31 +1,37 @@
 /**
  * External dependencies
  */
-import { number, text } from '@storybook/addon-knobs';
+import { number } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
  */
 import { SVG, Path } from '@wordpress/primitives';
+import { wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Icon from '../';
 
-export default { title: 'Components/Icon', component: Icon };
+export default {
+	title: 'Components/Icon',
+	component: Icon,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 const IconSizeLabel = ( { size } ) => (
 	<div style={ { fontSize: 12 } }>{ size }px</div>
 );
 
 export const _default = () => {
-	const icon = text( 'Icon', 'screenoptions' );
 	const size = number( 'Size', '24' );
 
 	return (
 		<div>
-			<Icon icon={ icon } size={ size } />
+			<Icon icon={ wordpress } size={ size } />
 			<IconSizeLabel size={ size } />
 		</div>
 	);
@@ -41,7 +47,7 @@ export const sizes = () => {
 					key={ size }
 					style={ { padding: 20, display: 'inline-block' } }
 				>
-					<Icon icon="screenoptions" size={ size } />
+					<Icon icon={ wordpress } size={ size } />
 					<IconSizeLabel size={ size } />
 				</div>
 			) ) }
@@ -52,18 +58,18 @@ export const sizes = () => {
 export const colors = () => {
 	const iconColors = [ 'blue', 'purple', 'green' ];
 
-	/**
-	 * The SVG icon inherits the color from a parent selector.
-	 */
-
 	return (
 		<>
 			{ iconColors.map( ( color ) => (
 				<div
 					key={ color }
-					style={ { padding: 20, display: 'inline-block', color } }
+					style={ {
+						padding: 20,
+						display: 'inline-block',
+						fill: color,
+					} }
 				>
-					<Icon icon="screenoptions" />
+					<Icon icon={ wordpress } />
 					<IconSizeLabel size={ 24 } />
 				</div>
 			) ) }

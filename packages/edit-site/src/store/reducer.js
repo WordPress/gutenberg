@@ -72,7 +72,7 @@ export function settings( state = {}, action ) {
  * Reducer keeping track of the currently edited Post Type,
  * Post Id and the context provided to fill the content of the block editor.
  *
- * @param {Object} state  Current state.
+ * @param {Object} state  Current edited post.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.

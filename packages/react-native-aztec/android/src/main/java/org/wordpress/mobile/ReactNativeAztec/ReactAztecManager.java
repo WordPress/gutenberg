@@ -288,6 +288,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                 (int) Math.ceil(PixelUtil.toPixelFromSP(fontSize)));
     }
 
+    @ReactProp(name = ViewProps.LINE_HEIGHT)
+    public void setLineHeight(ReactAztecText view, float lineHeight) {
+        float textSize = view.getTextSize();
+        view.setLineSpacing(textSize * lineHeight, (float) (lineHeight / textSize));
+    }
+
     @ReactProp(name = ViewProps.FONT_FAMILY)
     public void setFontFamily(ReactAztecText view, String fontFamily) {
         int style = Typeface.NORMAL;

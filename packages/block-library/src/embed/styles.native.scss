@@ -19,14 +19,6 @@
 	background-color: $background-dark-secondary;
 }
 
-.embed__icon {
-	fill: $light-secondary;
-}
-
-.embed__icon--dark {
-	fill: $dark-secondary;
-}
-
 .embed__icon--error {
 	margin-bottom: 6;
 	fill: $alert-red;
@@ -78,6 +70,24 @@
 	background-color: $gray-lighten-30;
 	justify-content: center;
 	align-items: center;
+}
+
+.embed-preview__wrapper {
+	flex: 1;
+}
+
+.embed-preview__wrapper--align-left {
+	align-items: flex-start;
+}
+.embed-preview__wrapper--align-right {
+	align-items: flex-end;
+}
+
+.embed-preview__sandbox--align-left {
+	max-width: 360px;
+}
+.embed-preview__sandbox--align-right {
+	max-width: 360px;
 }
 
 .embed-preview__loading--dark {

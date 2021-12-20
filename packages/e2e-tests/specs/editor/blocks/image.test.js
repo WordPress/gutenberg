@@ -103,8 +103,9 @@ describe( 'Image', () => {
 			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
-
-		await page.click( '.wp-block-image img' );
+		// For some reason just clicking the block wrapper causes figcaption to get focus
+		// in puppeteer but not in live browser, so clicking on the image wrapper div here instead.
+		await page.click( '.wp-block-image > div' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
@@ -314,9 +315,13 @@ describe( 'Image', () => {
 
 		// Upload an initial image.
 		const filename = await upload( '.wp-block-image input[type="file"]' );
-
+		await waitForImage( filename );
 		// Resize the Uploaded Image.
 		await openDocumentSettingsSidebar();
+		await page.waitForSelector(
+			'[aria-label="Image size presets"] button:first-child',
+			{ visible: true }
+		);
 		await page.click(
 			'[aria-label="Image size presets"] button:first-child'
 		);
@@ -330,18 +335,21 @@ describe( 'Image', () => {
 
 		// Replace uploaded image with an URL.
 		await clickButton( 'Replace' );
-		await clickButton( 'Edit' );
+
+		const [ editButton ] = await page.$x(
+			'//button[contains(@aria-label, "Edit")]'
+		);
+		await editButton.click();
 
 		await page.waitForSelector( '.block-editor-url-input__input' );
-		await page.evaluate(
-			() =>
-				( document.querySelector(
-					'.block-editor-url-input__input'
-				).value = '' )
-		);
 
+		// Clear the input field. Delay added to account for typing delays.
+		const inputField = await page.$( '.block-editor-url-input__input' );
+		await inputField.click( { clickCount: 3, delay: 200 } );
+
+		// Replace the url. Delay added to account for typing delays.
 		await page.focus( '.block-editor-url-input__input' );
-		await page.keyboard.type( imageUrl );
+		await page.keyboard.type( imageUrl, { delay: 100 } );
 		await page.click( '.block-editor-link-control__search-submit' );
 
 		const regexAfter = new RegExp(

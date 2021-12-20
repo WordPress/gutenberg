@@ -21,7 +21,6 @@ import {
 	useReducer,
 } from '@wordpress/element';
 import { defaultI18n } from '@wordpress/i18n';
-// eslint-disable-next-line no-duplicate-imports
 import type { I18n } from '@wordpress/i18n';
 interface I18nContextProps {
 	__: I18n[ '__' ];

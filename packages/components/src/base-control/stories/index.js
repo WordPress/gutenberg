@@ -9,7 +9,13 @@ import { boolean, text } from '@storybook/addon-knobs';
 import BaseControl from '../';
 import TextareaControl from '../../textarea-control';
 
-export default { title: 'Components/BaseControl', component: BaseControl };
+export default {
+	title: 'Components/BaseControl',
+	component: BaseControl,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const id = text( 'Id', 'textarea-1' );

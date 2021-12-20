@@ -11,21 +11,30 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { close as closeIcon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
 
-const TRANSLATED_SITE_PROTPERTIES = {
+const TRANSLATED_SITE_PROPERTIES = {
 	title: __( 'Title' ),
 	description: __( 'Tagline' ),
 	site_logo: __( 'Logo' ),
 	show_on_front: __( 'Show on front' ),
 	page_on_front: __( 'Page on front' ),
 };
+
+const PUBLISH_ON_SAVE_ENTITIES = [
+	{
+		kind: 'postType',
+		name: 'wp_navigation',
+	},
+];
 
 export default function EntitiesSavedStates( { close } ) {
 	const saveButtonRef = useRef();
@@ -49,7 +58,7 @@ export default function EntitiesSavedStates( { close } ) {
 			siteEditsAsEntities.push( {
 				kind: 'root',
 				name: 'site',
-				title: TRANSLATED_SITE_PROTPERTIES[ property ] || property,
+				title: TRANSLATED_SITE_PROPERTIES[ property ] || property,
 				property,
 			} );
 		}
@@ -63,14 +72,35 @@ export default function EntitiesSavedStates( { close } ) {
 		};
 	}, [] );
 	const {
+		editEntityRecord,
 		saveEditedEntityRecord,
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
 
-	// To group entities by type.
-	const partitionedSavables = Object.values(
-		groupBy( dirtyEntityRecords, 'name' )
+	const { __unstableMarkLastChangeAsPersistent } = useDispatch(
+		blockEditorStore
 	);
+
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		noticesStore
+	);
+
+	// To group entities by type.
+	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
+
+	// Sort entity groups.
+	const {
+		site: siteSavables,
+		wp_template: templateSavables,
+		wp_template_part: templatePartSavables,
+		...contentSavables
+	} = partitionedSavables;
+	const sortedPartitionedSavables = [
+		siteSavables,
+		templateSavables,
+		templatePartSavables,
+		...Object.values( contentSavables ),
+	].filter( Array.isArray );
 
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
@@ -114,14 +144,54 @@ export default function EntitiesSavedStates( { close } ) {
 		close( entitiesToSave );
 
 		const siteItemsToSave = [];
+		const pendingSavedRecords = [];
 		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToSave.push( property );
 			} else {
-				saveEditedEntityRecord( kind, name, key );
+				if (
+					PUBLISH_ON_SAVE_ENTITIES.some(
+						( typeToPublish ) =>
+							typeToPublish.kind === kind &&
+							typeToPublish.name === name
+					)
+				) {
+					editEntityRecord( kind, name, key, { status: 'publish' } );
+				}
+
+				pendingSavedRecords.push(
+					saveEditedEntityRecord( kind, name, key )
+				);
 			}
 		} );
-		saveSpecifiedEntityEdits( 'root', 'site', undefined, siteItemsToSave );
+		if ( siteItemsToSave.length ) {
+			pendingSavedRecords.push(
+				saveSpecifiedEntityEdits(
+					'root',
+					'site',
+					undefined,
+					siteItemsToSave
+				)
+			);
+		}
+
+		__unstableMarkLastChangeAsPersistent();
+
+		Promise.all( pendingSavedRecords )
+			.then( ( values ) => {
+				if (
+					values.some( ( value ) => typeof value === 'undefined' )
+				) {
+					createErrorNotice( __( 'Saving failed.' ) );
+				} else {
+					createSuccessNotice( __( 'Site updated.' ), {
+						type: 'snackbar',
+					} );
+				}
+			} )
+			.catch( ( error ) =>
+				createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` )
+			);
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
@@ -160,15 +230,15 @@ export default function EntitiesSavedStates( { close } ) {
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Select the changes you want to save' ) }</strong>
+				<strong>{ __( 'Are you ready to save?' ) }</strong>
 				<p>
 					{ __(
-						'Some changes may affect other areas of your site.'
+						'The following changes have been made to your site, templates, and content.'
 					) }
 				</p>
 			</div>
 
-			{ partitionedSavables.map( ( list ) => {
+			{ sortedPartitionedSavables.map( ( list ) => {
 				return (
 					<EntityTypeList
 						key={ list[ 0 ].name }

@@ -105,6 +105,11 @@ module.exports = {
 		'jsdoc/require-param-description': 'off',
 		'jsdoc/require-returns': 'off',
 		'jsdoc/require-yields': 'off',
+		'jsdoc/tag-lines': 'off',
+		'jsdoc/no-multi-asterisks': [
+			'error',
+			{ preventAtMiddleLines: false },
+		],
 		'jsdoc/check-access': 'error',
 		'jsdoc/check-alignment': 'error',
 		'jsdoc/check-line-alignment': [

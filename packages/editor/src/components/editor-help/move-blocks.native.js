@@ -16,14 +16,19 @@ import { HelpDetailBodyText, HelpDetailImage } from './view-sections';
 
 const MoveBlocks = () => {
 	return (
-		<View style={ styles.helpDetailContainer }>
-			<HelpDetailImage source={ require( './images/move-blocks.png' ) } />
-			<HelpDetailBodyText
-				text={ __(
-					'You can rearrange blocks by tapping a block and then tapping the up and down arrows that appear on the bottom left side of the block to move it above or below other blocks.'
-				) }
+		<>
+			<HelpDetailImage
+				source={ require( './images/move-light.png' ) }
+				sourceDarkMode={ require( './images/move-dark.png' ) }
 			/>
-		</View>
+			<View style={ styles.helpDetailContainer }>
+				<HelpDetailBodyText
+					text={ __(
+						'You can rearrange blocks by tapping a block and then tapping the up and down arrows that appear on the bottom left side of the block to move it above or below other blocks.'
+					) }
+				/>
+			</View>
+		</>
 	);
 };
 

@@ -53,8 +53,9 @@ function isKeyDownEligibleForStartTyping( event ) {
  * element.
  */
 export function useMouseMoveTypingReset() {
-	const isTyping = useSelect( ( select ) =>
-		select( blockEditorStore ).isTyping()
+	const isTyping = useSelect(
+		( select ) => select( blockEditorStore ).isTyping(),
+		[]
 	);
 	const { stopTyping } = useDispatch( blockEditorStore );
 

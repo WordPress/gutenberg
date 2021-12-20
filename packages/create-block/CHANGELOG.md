@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Internal
+
+-   The bundled `npm-package-arg` dependency has been updated from requiring `^8.0.1` to requiring `^8.1.5` ([#37395](https://github.com/WordPress/gutenberg/pull/37395)).
+
+## 2.7.0 (2021-11-07)
+
+### New Features
+
+-   Add $schema definition to generated `block.json` file.
+
+## 2.6.0 (2021-10-22)
+
+### New Features
+
+-   Add passing local directories to --template. ([#35645](https://github.com/WordPress/gutenberg/pull/35645))
+-   Add `slugPascalCase` to the list of variables that can be used in templates ([#35462](https://github.com/WordPress/gutenberg/pull/35462))
+
 ## 2.5.0 (2021-07-21)
 
 ### Enhancements

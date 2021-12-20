@@ -22,7 +22,7 @@ The following code example shows how to create a dynamic block that shows only t
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-dynamic', {
@@ -31,12 +31,11 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	icon: 'megaphone',
 	category: 'widgets',
 
-	edit: withSelect( ( select ) => {
-		return {
-			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
-		};
-	} )( ( { posts } ) => {
+	edit: () => {
 		const blockProps = useBlockProps();
+		const posts = useSelect( ( select ) => {
+			return select( 'core' ).getEntityRecords( 'postType', 'post' );
+		}, [] );
 
 		return (
 			<div { ...blockProps }>
@@ -49,7 +48,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 				) }
 			</div>
 		);
-	} ),
+	},
 } );
 ```
 
@@ -59,7 +58,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 ( function ( blocks, element, data, blockEditor ) {
 	var el = element.createElement,
 		registerBlockType = blocks.registerBlockType,
-		withSelect = data.withSelect,
+		useSelect = data.useSelect,
 		useBlockProps = blockEditor.useBlockProps;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
@@ -67,24 +66,23 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
-		edit: withSelect( function ( select ) {
-			return {
-				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
-			};
-		} )( function ( props ) {
-			var blockProps = useBlockProps();
+		edit: function () {
 			var content;
-			if ( ! props.posts ) {
+			var blockProps = useBlockProps();
+			var posts = useSelect( function ( select ) {
+				return select( 'core' ).getEntityRecords( 'postType', 'post' );
+			}, [] );
+			if ( ! posts ) {
 				content = 'Loading...';
-			} else if ( props.posts.length === 0 ) {
+			} else if ( posts.length === 0 ) {
 				content = 'No posts';
 			} else {
-				var post = props.posts[ 0 ];
+				var post = posts[ 0 ];
 				content = el( 'a', { href: post.link }, post.title.rendered );
 			}
 
 			return el( 'div', blockProps, content );
-		} ),
+		},
 	} );
 } )(
 	window.wp.blocks,

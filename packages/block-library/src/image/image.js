@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, map, last, pick, includes } from 'lodash';
+import { get, filter, map, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,17 +21,18 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
-	InspectorAdvancedControls,
 	RichText,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	BlockAlignmentControl,
+	__experimentalImageEditor as ImageEditor,
+	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { getPath } from '@wordpress/url';
+import { getFilename } from '@wordpress/url';
 import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -42,20 +43,12 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import ImageEditor, { ImageEditingProvider } from './image-editing';
-import { isExternalImage } from './edit';
+import { isExternalImage, isMediaDestroyed } from './edit';
 
 /**
  * Module constants
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
-
-function getFilename( url ) {
-	const path = getPath( url );
-	if ( path ) {
-		return last( path.split( '/' ) );
-	}
-}
 
 export default function Image( {
 	temporaryURL,
@@ -79,15 +72,21 @@ export default function Image( {
 	isSelected,
 	insertBlocksAfter,
 	onReplace,
+	onCloseModal,
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	context,
 	clientId,
+	onImageLoadError,
 } ) {
+	const imageRef = useRef();
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
+	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
+
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -145,11 +144,14 @@ export default function Image( {
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
-	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
+	const [
+		{ loadedNaturalWidth, loadedNaturalHeight },
+		setLoadedNaturalSize,
+	] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = ! isWideAligned && isLargeViewport;
+	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
@@ -183,6 +185,27 @@ export default function Image( {
 		}
 	}, [ url, prevUrl ] );
 
+	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
+	// width and height. This resolves an issue in Safari where the loaded natural
+	// witdth and height is otherwise lost when switching between alignments.
+	// See: https://github.com/WordPress/gutenberg/pull/37210.
+	const { naturalWidth, naturalHeight } = useMemo( () => {
+		return {
+			naturalWidth:
+				imageRef.current?.naturalWidth ||
+				loadedNaturalWidth ||
+				undefined,
+			naturalHeight:
+				imageRef.current?.naturalHeight ||
+				loadedNaturalHeight ||
+				undefined,
+		};
+	}, [
+		loadedNaturalWidth,
+		loadedNaturalHeight,
+		imageRef.current?.complete,
+	] );
+
 	function onResizeStart() {
 		toggleSelection( false );
 	}
@@ -192,11 +215,16 @@ export default function Image( {
 	}
 
 	function onImageError() {
-		// Check if there's an embed block that handles this URL.
+		// Check if there's an embed block that handles this URL, e.g., instagram URL.
+		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
+		const shouldReplace = undefined !== embedBlock;
+
+		if ( shouldReplace ) {
 			onReplace( embedBlock );
 		}
+
+		onImageLoadError( shouldReplace );
 	}
 
 	function onSetHref( props ) {
@@ -268,6 +296,9 @@ export default function Image( {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
 		}
+		if ( isSelected && isMediaDestroyed( id ) ) {
+			onImageLoadError();
+		}
 	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
@@ -331,6 +362,7 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
+						onCloseModal={ onCloseModal }
 					/>
 				</BlockControls>
 			) }
@@ -368,7 +400,7 @@ export default function Image( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
@@ -386,7 +418,7 @@ export default function Image( {
 						</>
 					}
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 		</>
 	);
 
@@ -415,13 +447,12 @@ export default function Image( {
 				alt={ defaultedAlt }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
-					setNaturalSize(
-						pick( event.target, [
-							'naturalWidth',
-							'naturalHeight',
-						] )
-					);
+					setLoadedNaturalSize( {
+						loadedNaturalWidth: event.target?.naturalWidth,
+						loadedNaturalHeight: event.target?.naturalHeight,
+					} );
 				} }
+				ref={ imageRef }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>

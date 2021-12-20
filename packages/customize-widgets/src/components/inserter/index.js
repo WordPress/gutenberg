@@ -18,8 +18,10 @@ function Inserter( { setIsOpened } ) {
 		Inserter,
 		'customize-widget-layout__inserter-panel-title'
 	);
-	const insertionPoint = useSelect( ( select ) =>
-		select( customizeWidgetsStore ).__experimentalGetInsertionPoint()
+	const insertionPoint = useSelect(
+		( select ) =>
+			select( customizeWidgetsStore ).__experimentalGetInsertionPoint(),
+		[]
 	);
 
 	return (

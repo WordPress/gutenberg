@@ -22,7 +22,8 @@ export const store = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
-	persist: [ 'enableItems' ],
+	persist: [ 'enableItems', 'preferences' ],
+	__experimentalUseThunks: true,
 } );
 
 // Once we build a more generic persistence plugin that works across types of stores
@@ -31,5 +32,6 @@ registerStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
-	persist: [ 'enableItems' ],
+	persist: [ 'enableItems', 'preferences' ],
+	__experimentalUseThunks: true,
 } );

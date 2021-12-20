@@ -82,6 +82,7 @@ describe( 'getQueriedItems', () => {
 			queries: {
 				default: {
 					'': [ 1, 2 ],
+					'include=1': [ 1 ],
 				},
 			},
 		};

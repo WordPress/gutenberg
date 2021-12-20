@@ -350,5 +350,23 @@ describe( 'UnitControl', () => {
 
 			expect( getSelect().value ).toBe( 'px' );
 		} );
+
+		it( 'should display valid CSS unit when not explicitly included in units list', () => {
+			render(
+				<UnitControl
+					value={ '10%' }
+					units={ [
+						{ value: 'px', label: 'px' },
+						{ value: 'em', label: 'em' },
+					] }
+				/>
+			);
+
+			const select = getSelect();
+			const options = select.querySelectorAll( 'option' );
+
+			expect( select.value ).toBe( '%' );
+			expect( options.length ).toBe( 3 );
+		} );
 	} );
 } );

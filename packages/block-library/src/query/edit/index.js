@@ -7,11 +7,11 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
-	InspectorAdvancedControls,
+	InspectorControls,
 	useBlockProps,
 	useSetting,
 	store as blockEditorStore,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
@@ -104,7 +104,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 					setDisplayLayout={ updateDisplayLayout }
 				/>
 			</BlockControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
 					options={ [
@@ -118,7 +118,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 						setAttributes( { tagName: value } )
 					}
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 			<TagName { ...innerBlocksProps } />
 		</>
 	);

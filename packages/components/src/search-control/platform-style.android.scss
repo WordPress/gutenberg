@@ -1,10 +1,7 @@
-.search-control__container {
-	height: 40px;
-}
-
 .search-control__container--active {
 	border-bottom-color: $light-gray-500;
 	border-bottom-width: 1px;
+	margin-bottom: 0;
 	margin-left: 0;
 	margin-right: 0;
 	border-radius: 0;

@@ -11,6 +11,7 @@ import {
 	__experimentalGetEntityRecordNoResolver,
 	hasEntityRecords,
 	getEntityRecords,
+	getRawEntityRecord,
 	__experimentalGetDirtyEntityRecords,
 	__experimentalGetEntitiesBeingSaved,
 	getEntityRecordNonTransientEdits,
@@ -159,14 +160,14 @@ describe( 'hasEntityRecords', () => {
 		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( false );
 	} );
 
-	it( 'returns true if the entity configuration is not known', () => {
+	it( 'returns false if the entity configuration is not known', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {},
 			},
 		} );
 
-		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( true );
+		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( false );
 	} );
 
 	it( 'returns true if entity records have been received', () => {
@@ -204,6 +205,76 @@ describe( 'hasEntityRecords', () => {
 	} );
 } );
 
+describe( 'getRawEntityRecord', () => {
+	const data = {
+		someKind: {
+			someName: {
+				queriedData: {
+					items: {
+						default: {
+							post: {
+								title: {
+									raw: { html: '<h1>post</h1>' },
+									rendered:
+										'<div id="post"><h1>rendered post</h1></div>',
+								},
+							},
+						},
+					},
+					itemIsComplete: {
+						default: {
+							post: true,
+						},
+					},
+					queries: {},
+				},
+			},
+		},
+	};
+	it( 'should preserve the structure of `raw` field by default', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+					},
+				],
+				data: { ...data },
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: {
+				raw: { html: '<h1>post</h1>' },
+				rendered: '<div id="post"><h1>rendered post</h1></div>',
+			},
+		} );
+	} );
+	it( 'should flatten the structure of `raw` field for entities configured with rawAttributes', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						rawAttributes: [ 'title' ],
+					},
+				],
+				data: { ...data },
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: {
+				html: '<h1>post</h1>',
+			},
+		} );
+	} );
+} );
+
 describe( 'getEntityRecords', () => {
 	it( 'should return null by default', () => {
 		const state = deepFreeze( {
@@ -224,14 +295,14 @@ describe( 'getEntityRecords', () => {
 		expect( getEntityRecords( state, 'root', 'postType' ) ).toBe( null );
 	} );
 
-	it( 'should return an empty array for an unknown entity configuration', () => {
+	it( 'should return null for an unknown entity configuration', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {},
 			},
 		} );
 
-		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [] );
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toBe( null );
 	} );
 
 	it( 'should return all the records', () => {
@@ -347,7 +418,7 @@ describe( 'getEntityRecords', () => {
 } );
 
 describe( '__experimentalGetDirtyEntityRecords', () => {
-	it( 'should return a map of objects with each raw edited entity record and its corresponding edits', () => {
+	it( 'returns a map of objects with each raw edited entity record and its corresponding edits', () => {
 		const state = deepFreeze( {
 			entities: {
 				config: [
@@ -380,6 +451,61 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 							},
 							edits: {
 								someKey: {
+									someProperty: 'someEditedValue',
+									someRawProperty: 'someEditedRawValue',
+									someTransientEditProperty:
+										'someEditedTransientEditValue',
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
+			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+		] );
+	} );
+
+	it( 'excludes entity records that no longer exist', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						transientEdits: { someTransientEditProperty: true },
+					},
+				],
+				data: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										someKey: true,
+									},
+								},
+							},
+							edits: {
+								someKey: {
+									someProperty: 'someEditedValue',
+									someRawProperty: 'someEditedRawValue',
+									someTransientEditProperty:
+										'someEditedTransientEditValue',
+								},
+								deletedKey: {
 									someProperty: 'someEditedValue',
 									someRawProperty: 'someEditedRawValue',
 									someTransientEditProperty:

@@ -40,8 +40,6 @@ function Example() {
 
 Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
 
-In the example below, `flex-start` will align the children content to the top.
-
 ##### direction
 
 **Type**: `[ResponsiveCSSValue<CSSProperties['flexDirection']>]`
@@ -65,7 +63,6 @@ Spacing in between each child can be adjusted by using `gap`. The value of `gap`
 **Type**: `[CSSProperties['justifyContent']]`
 
 Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
-In the example below, `flex-start` will align the children content to the left.
 
 ##### wrap
 

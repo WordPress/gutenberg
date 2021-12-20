@@ -14,7 +14,10 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseColorProps as useColorProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -58,6 +61,7 @@ export default function SearchEdit( {
 	setAttributes,
 	toggleSelection,
 	isSelected,
+	clientId,
 } ) {
 	const {
 		label,
@@ -72,8 +76,34 @@ export default function SearchEdit( {
 		style,
 	} = attributes;
 
+	const insertedInNavigationBlock = useSelect(
+		( select ) => {
+			const { getBlockParentsByBlockName, wasBlockJustInserted } = select(
+				blockEditorStore
+			);
+			return (
+				!! getBlockParentsByBlockName( clientId, 'core/navigation' )
+					?.length && wasBlockJustInserted( clientId )
+			);
+		},
+		[ clientId ]
+	);
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
+	useEffect( () => {
+		if ( ! insertedInNavigationBlock ) return;
+		// This side-effect should not create an undo level.
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			showLabel: false,
+			buttonUseIcon: true,
+			buttonPosition: 'button-inside',
+		} );
+	}, [ insertedInNavigationBlock ] );
 	const borderRadius = style?.border?.radius;
 	const borderColor = style?.border?.color;
+	const borderWidth = style?.border?.width;
 	const borderProps = useBorderProps( attributes );
 
 	// Check for old deprecated numerical border radius. Done as a separate
@@ -99,7 +129,6 @@ export default function SearchEdit( {
 	const getBlockClassNames = () => {
 		return classnames(
 			className,
-			! isButtonPositionInside ? borderProps.className : undefined,
 			isButtonPositionInside
 				? 'wp-block-search__button-inside'
 				: undefined,
@@ -360,6 +389,7 @@ export default function SearchEdit( {
 	const getWrapperStyles = () => {
 		const styles = {
 			borderColor,
+			borderWidth: isButtonPositionInside ? borderWidth : undefined,
 		};
 
 		const isNonZeroBorderRadius = parseInt( borderRadius, 10 ) !== 0;

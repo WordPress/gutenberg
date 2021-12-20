@@ -8,6 +8,7 @@ import { boolean, number, text } from '@storybook/addon-knobs';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,7 +16,13 @@ import { useState } from '@wordpress/element';
 import RangeControl from '../index';
 import { COLORS } from '../../utils';
 
-export default { title: 'Components/RangeControl', component: RangeControl };
+export default {
+	title: 'Components/RangeControl',
+	component: RangeControl,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 const RangeControlWithState = ( props ) => {
 	const initialValue = props.value === undefined ? 5 : props.value;
@@ -27,10 +34,13 @@ const RangeControlWithState = ( props ) => {
 const DefaultExample = () => {
 	const [ value, setValue ] = useState( undefined );
 
+	const showBeforeIcon = boolean( 'beforeIcon', false );
+	const showAfterIcon = boolean( 'afterIcon', false );
+
 	const props = {
-		afterIcon: text( 'afterIcon', '' ),
+		afterIcon: showAfterIcon ? wordpress : undefined,
 		allowReset: boolean( 'allowReset', false ),
-		beforeIcon: text( 'beforeIcon', '' ),
+		beforeIcon: showBeforeIcon ? wordpress : undefined,
 		color: text( 'color', COLORS.ui.theme ),
 		disabled: boolean( 'disabled', false ),
 		help: text( 'help', '' ),
@@ -39,7 +49,7 @@ const DefaultExample = () => {
 		max: number( 'max', 100 ),
 		min: number( 'min', 0 ),
 		showTooltip: boolean( 'showTooltip', false ),
-		step: number( 'step', 1 ),
+		step: text( 'step', 1 ),
 		railColor: text( 'railColor', null ),
 		trackColor: text( 'trackColor', null ),
 		withInputField: boolean( 'withInputField', true ),
@@ -77,6 +87,10 @@ export const InitialValueZero = () => {
 	);
 };
 
+export const withAnyStep = () => {
+	return <RangeControlWithState label="Brightness" step="any" />;
+};
+
 export const withHelp = () => {
 	const label = text( 'Label', 'How many columns should this use?' );
 	const help = text(
@@ -97,16 +111,26 @@ export const withMinimumAndMaximumLimits = () => {
 
 export const withIconBefore = () => {
 	const label = text( 'Label', 'How many columns should this use?' );
-	const icon = text( 'Icon', 'wordpress' );
+	const showIcon = boolean( 'icon', true );
 
-	return <RangeControlWithState label={ label } beforeIcon={ icon } />;
+	return (
+		<RangeControlWithState
+			label={ label }
+			beforeIcon={ showIcon ? wordpress : undefined }
+		/>
+	);
 };
 
 export const withIconAfter = () => {
 	const label = text( 'Label', 'How many columns should this use?' );
-	const icon = text( 'Icon', 'wordpress' );
+	const showIcon = boolean( 'icon', true );
 
-	return <RangeControlWithState label={ label } afterIcon={ icon } />;
+	return (
+		<RangeControlWithState
+			label={ label }
+			afterIcon={ showIcon ? wordpress : undefined }
+		/>
+	);
 };
 
 export const withReset = () => {
@@ -160,6 +184,10 @@ export const marks = () => {
 			<h2>Negative Range</h2>
 			<Range marks { ...rangeNegative } />
 			<Range marks={ marksWithNegatives } { ...rangeNegative } />
+
+			<h2>Any Step</h2>
+			<Range marks { ...{ ...stepInteger, step: 'any' } } />
+			<Range marks={ marksBase } { ...{ ...stepInteger, step: 'any' } } />
 		</Wrapper>
 	);
 };

@@ -503,8 +503,12 @@
 
 // Deprecated from UI, kept for back-compat.
 @mixin gradient-colors-deprecated() {
-	/* stylelint-disable function-comma-space-after */
+	/*
+	 * Our classes uses the same values we set for gradient value attributes,
+	 * and we can not use spacing because of WP multi site kses rule.
+	 */
 
+	/* stylelint-disable function-comma-space-after */
 	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
 		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
 	}
@@ -527,6 +531,10 @@
 
 	.has-nightshade-gradient-background {
 		background: linear-gradient(135deg,rgb(51,9,104) 0%,rgb(49,205,207) 100%);
+	}
+
+	.has-midnight-gradient-background {
+		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
 	}
 	/* stylelint-enable function-comma-space-after */
 }

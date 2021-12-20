@@ -1,4 +1,6 @@
 .wp-block-quote {
+	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
+
 	&.is-style-large,
 	&.is-large {
 		margin-bottom: 1em;

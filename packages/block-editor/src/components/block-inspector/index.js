@@ -19,8 +19,10 @@ import { useSelect } from '@wordpress/data';
  */
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
-import InspectorControls from '../inspector-controls';
-import InspectorAdvancedControls from '../inspector-advanced-controls';
+import {
+	default as InspectorControls,
+	InspectorAdvancedControls,
+} from '../inspector-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
@@ -28,10 +30,7 @@ import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
-const BlockInspector = ( {
-	showNoBlockSelectedMessage = true,
-	bubblesVirtually = true,
-} ) => {
+const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const {
 		count,
 		hasBlockStyles,
@@ -67,7 +66,7 @@ const BlockInspector = ( {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+				<InspectorControls.Slot />
 			</div>
 		);
 	}
@@ -98,7 +97,6 @@ const BlockInspector = ( {
 			clientId={ selectedBlockClientId }
 			blockName={ blockType.name }
 			hasBlockStyles={ hasBlockStyles }
-			bubblesVirtually={ bubblesVirtually }
 		/>
 	);
 };
@@ -107,7 +105,6 @@ const BlockInspectorSingleBlock = ( {
 	clientId,
 	blockName,
 	hasBlockStyles,
-	bubblesVirtually,
 } ) => {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
@@ -117,7 +114,10 @@ const BlockInspectorSingleBlock = ( {
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ clientId } />
+						<BlockStyles
+							scope="core/block-inspector"
+							clientId={ clientId }
+						/>
 						{ hasBlockSupport(
 							blockName,
 							'defaultStylePicker',
@@ -126,20 +126,29 @@ const BlockInspectorSingleBlock = ( {
 					</PanelBody>
 				</div>
 			) }
-			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+			<InspectorControls.Slot />
+			<InspectorControls.Slot
+				__experimentalGroup="typography"
+				label={ __( 'Typography' ) }
+			/>
+			<InspectorControls.Slot
+				__experimentalGroup="border"
+				label={ __( 'Border' ) }
+			/>
+			<InspectorControls.Slot
+				__experimentalGroup="dimensions"
+				label={ __( 'Dimensions' ) }
+			/>
 			<div>
-				<AdvancedControls
-					slotName={ InspectorAdvancedControls.slotName }
-					bubblesVirtually={ bubblesVirtually }
-				/>
+				<AdvancedControls />
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);
 };
 
-const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
-	const slot = useSlot( slotName );
+const AdvancedControls = () => {
+	const slot = useSlot( InspectorAdvancedControls.slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {
@@ -152,9 +161,7 @@ const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorAdvancedControls.Slot
-				bubblesVirtually={ bubblesVirtually }
-			/>
+			<InspectorControls.Slot __experimentalGroup="advanced" />
 		</PanelBody>
 	);
 };

@@ -9,19 +9,25 @@ import classnames from 'classnames/dedupe';
  * WordPress dependencies
  */
 import { View } from '@wordpress/primitives';
-
-import { BlockCaption } from '@wordpress/block-editor';
+import {
+	BlockCaption,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { memo, useState } from '@wordpress/element';
 import { SandBox } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
+import WpEmbedPreview from './wp-embed-preview';
+import styles from './styles.scss';
 
 const EmbedPreview = ( {
+	align,
 	className,
 	clientId,
 	icon,
@@ -31,10 +37,19 @@ const EmbedPreview = ( {
 	onFocus,
 	preview,
 	previewable,
+	isProviderPreviewable,
 	type,
 	url,
+	isDefaultEmbedInfo,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+	const { locale } = useSelect( blockEditorStore ).getSettings();
+
+	const wrapperStyle = styles[ 'embed-preview__wrapper' ];
+	const wrapperAlignStyle =
+		styles[ `embed-preview__wrapper--align-${ align }` ];
+	const sandboxAlignStyle =
+		styles[ `embed-preview__sandbox--align-${ align }` ];
 
 	function accessibilityLabelCreator( caption ) {
 		return isEmpty( caption )
@@ -77,33 +92,36 @@ const EmbedPreview = ( {
 		'wp-block-embed__wrapper'
 	);
 
-	const embedWrapper =
-		/* We should render here: <WpEmbedPreview html={ html } /> */
-		'wp-embed' === type ? null : (
-			<>
-				<TouchableWithoutFeedback
-					onPress={ () => {
-						if ( onFocus ) {
-							onFocus();
-						}
-						if ( isCaptionSelected ) {
-							setIsCaptionSelected( false );
-						}
-					} }
+	const PreviewContent = 'wp-embed' === type ? WpEmbedPreview : SandBox;
+	const embedWrapper = (
+		<>
+			<TouchableWithoutFeedback
+				onPress={ () => {
+					if ( onFocus ) {
+						onFocus();
+					}
+					if ( isCaptionSelected ) {
+						setIsCaptionSelected( false );
+					}
+				} }
+			>
+				<View
+					pointerEvents="box-only"
+					style={ [ wrapperStyle, wrapperAlignStyle ] }
 				>
-					<View pointerEvents="box-only">
-						<SandBox
-							html={ html }
-							title={ iframeTitle }
-							type={ sandboxClassnames }
-							providerUrl={ providerUrl }
-							url={ url }
-						/>
-					</View>
-				</TouchableWithoutFeedback>
-			</>
-		);
-
+					<PreviewContent
+						html={ html }
+						lang={ locale }
+						title={ iframeTitle }
+						type={ sandboxClassnames }
+						providerUrl={ providerUrl }
+						url={ url }
+						containerStyle={ sandboxAlignStyle }
+					/>
+				</View>
+			</TouchableWithoutFeedback>
+		</>
+	);
 	return (
 		<TouchableWithoutFeedback
 			accessible={ ! isSelected }
@@ -111,19 +129,18 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				{
-					// eslint-disable-next-line no-undef
-					__DEV__ && previewable ? (
-						embedWrapper
-					) : (
-						<EmbedNoPreview
-							label={ label }
-							icon={ icon }
-							isSelected={ isSelected }
-							onPress={ () => setIsCaptionSelected( false ) }
-						/>
-					)
-				}
+				{ isProviderPreviewable && previewable ? (
+					embedWrapper
+				) : (
+					<EmbedNoPreview
+						label={ label }
+						icon={ icon }
+						isSelected={ isSelected }
+						onPress={ () => setIsCaptionSelected( false ) }
+						previewable={ previewable }
+						isDefaultEmbedInfo={ isDefaultEmbedInfo }
+					/>
+				) }
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
 					accessible

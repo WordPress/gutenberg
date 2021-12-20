@@ -20,6 +20,8 @@ import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
  * @property {?(string[])} fields    Target subset of fields to derive from
  *                                   item objects.
  * @property {?(number[])} include   Specific item IDs to include.
+ * @property {string}      context   Scope under which the request is made;
+ *                                   determines returned fields in response.
  */
 
 /**
@@ -60,12 +62,6 @@ export function getQueryParts( query ) {
 				parts.perPage = Number( value );
 				break;
 
-			case 'include':
-				parts.include = getNormalizedCommaSeparable( value ).map(
-					Number
-				);
-				break;
-
 			case 'context':
 				parts.context = value;
 				break;
@@ -80,6 +76,15 @@ export function getQueryParts( query ) {
 					parts.fields = getNormalizedCommaSeparable( value );
 					// Make sure to normalize value for `stableKey`
 					value = parts.fields.join();
+				}
+
+				// Two requests with different include values cannot have same results.
+				if ( key === 'include' ) {
+					parts.include = getNormalizedCommaSeparable( value ).map(
+						Number
+					);
+					// Normalize value for `stableKey`.
+					value = parts.include.join();
 				}
 
 				// While it could be any deterministic string, for simplicity's

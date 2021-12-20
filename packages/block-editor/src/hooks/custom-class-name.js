@@ -15,7 +15,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { InspectorAdvancedControls } from '../components';
+import { InspectorControls } from '../components';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -59,7 +59,7 @@ export const withInspectorControl = createHigherOrderComponent(
 				return (
 					<>
 						<BlockEdit { ...props } />
-						<InspectorAdvancedControls>
+						<InspectorControls __experimentalGroup="advanced">
 							<TextControl
 								autoComplete="off"
 								label={ __( 'Additional CSS class(es)' ) }
@@ -76,7 +76,7 @@ export const withInspectorControl = createHigherOrderComponent(
 									'Separate multiple classes with spaces.'
 								) }
 							/>
-						</InspectorAdvancedControls>
+						</InspectorControls>
 					</>
 				);
 			}

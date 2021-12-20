@@ -84,7 +84,7 @@ describe( 'converting menu items to blocks', () => {
 				attr_title: '',
 				description: '',
 				type: 'custom',
-				type_label: 'Custom Link',
+				type_label: 'Submenu',
 				object: 'custom',
 				parent: 0,
 				menu_order: 1,
@@ -120,7 +120,7 @@ describe( 'converting menu items to blocks', () => {
 				attr_title: '',
 				description: '',
 				type: 'custom',
-				type_label: 'Custom Link',
+				type_label: 'Submenu',
 				object: 'custom',
 				parent: 1,
 				menu_order: 2,
@@ -138,7 +138,7 @@ describe( 'converting menu items to blocks', () => {
 				attr_title: '',
 				description: '',
 				type: 'custom',
-				type_label: 'Custom Link',
+				type_label: 'Submenu',
 				object: 'custom',
 				parent: 3,
 				menu_order: 1,
@@ -186,7 +186,7 @@ describe( 'converting menu items to blocks', () => {
 
 		expect( actual ).toEqual( [
 			expect.objectContaining( {
-				name: 'core/navigation-link',
+				name: 'core/navigation-submenu',
 				attributes: expect.objectContaining( {
 					label: 'Top Level',
 				} ),
@@ -199,13 +199,13 @@ describe( 'converting menu items to blocks', () => {
 						innerBlocks: [],
 					} ),
 					expect.objectContaining( {
-						name: 'core/navigation-link',
+						name: 'core/navigation-submenu',
 						attributes: expect.objectContaining( {
 							label: 'Child 2',
 						} ),
 						innerBlocks: [
 							expect.objectContaining( {
-								name: 'core/navigation-link',
+								name: 'core/navigation-submenu',
 								attributes: expect.objectContaining( {
 									label: 'Sub Child',
 								} ),

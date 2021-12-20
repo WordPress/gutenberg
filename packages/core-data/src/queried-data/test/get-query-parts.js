@@ -24,7 +24,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
-			stableKey: '',
+			stableKey: 'include=1',
 			fields: null,
 			include: [ 1 ],
 		} );

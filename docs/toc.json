@@ -1,51 +1,105 @@
 [
 	{
-		"docs/README.md": [
+		"docs/README.md": []
+	},
+	{
+		"docs/getting-started/README.md": [
 			{
-				"docs/getting-started/tutorials/README.md": [
+				"docs/getting-started/devenv/README.md": [
 					{
-						"docs/getting-started/tutorials/devenv/README.md": [
-							{
-								"docs/getting-started/tutorials/devenv/docker-ubuntu.md": []
-							}
-						]
+						"docs/getting-started/devenv/docker-ubuntu.md": []
+					}
+				]
+			},
+			{
+				"docs/getting-started/create-block/README.md": [
+					{
+						"docs/getting-started/create-block/wp-plugin.md": []
 					},
 					{
-						"docs/getting-started/tutorials/create-block/README.md": [
-							{
-								"docs/getting-started/tutorials/create-block/wp-plugin.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/block-anatomy.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/attributes.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/block-code.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/author-experience.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/finishing.md": []
-							},
-							{
-								"docs/getting-started/tutorials/create-block/submitting-to-block-directory.md": []
-							}
-						]
+						"docs/getting-started/create-block/block-anatomy.md": []
+					},
+					{
+						"docs/getting-started/create-block/attributes.md": []
+					},
+					{
+						"docs/getting-started/create-block/block-code.md": []
+					},
+					{
+						"docs/getting-started/create-block/author-experience.md": []
+					},
+					{
+						"docs/getting-started/create-block/finishing.md": []
+					},
+					{
+						"docs/getting-started/create-block/submitting-to-block-directory.md": []
 					}
 				]
 			},
 			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/glossary.md": [] },
-			{ "docs/getting-started/faq.md": [] },
-			{ "docs/getting-started/history.md": [] },
 			{ "docs/getting-started/outreach.md": [] }
 		]
 	},
 	{
 		"docs/how-to-guides/README.md": [
+			{ "docs/how-to-guides/accessibility.md": [] },
+
+			{
+				"docs/how-to-guides/backward-compatibility/README.md": [
+					{
+						"docs/how-to-guides/backward-compatibility/deprecations.md": []
+					},
+					{
+						"docs/how-to-guides/backward-compatibility/meta-box.md": []
+					}
+				]
+			},
+			{
+				"docs/how-to-guides/block-tutorial/README.md": [
+					{
+						"docs/how-to-guides/block-tutorial/writing-your-first-block-type.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []
+					}
+				]
+			},
+			{
+				"docs/how-to-guides/designers/README.md": [
+					{ "docs/how-to-guides/designers/block-design.md": [] },
+					{ "docs/how-to-guides/designers/user-interface.md": [] },
+					{ "docs/how-to-guides/designers/design-resources.md": [] },
+					{ "docs/how-to-guides/designers/animation.md": [] }
+				]
+			},
+			{
+				"docs/how-to-guides/platform/README.md": [
+					{
+						"docs/how-to-guides/platform/custom-block-editor/README.md": [
+							{
+								"docs/how-to-guides/platform/custom-block-editor/tutorial.md": []
+							}
+						]
+					}
+				]
+			},
+			{ "docs/how-to-guides/feature-flags.md": [] },
+			{ "docs/how-to-guides/format-api.md": [] },
 			{
 				"docs/how-to-guides/javascript/README.md": [
 					{
@@ -66,6 +120,7 @@
 					{ "docs/how-to-guides/javascript/esnext-js.md": [] }
 				]
 			},
+			{ "docs/how-to-guides/internationalization.md": [] },
 			{
 				"docs/how-to-guides/metabox/README.md": [
 					{ "docs/how-to-guides/metabox/meta-block-1-intro.md": [] },
@@ -98,34 +153,6 @@
 					},
 					{
 						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md": []
-					}
-				]
-			},
-			{
-				"docs/how-to-guides/block-tutorial/README.md": [
-					{
-						"docs/how-to-guides/block-tutorial/writing-your-first-block-type.md": []
-					},
-					{
-						"docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md": []
-					},
-					{
-						"docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md": []
-					},
-					{
-						"docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md": []
-					},
-					{
-						"docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md": []
-					},
-					{
-						"docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md": []
-					},
-					{
-						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []
 					}
 				]
 			},
@@ -137,52 +164,14 @@
 					{ "docs/how-to-guides/themes/theme-support.md": [] }
 				]
 			},
-			{ "docs/how-to-guides/feature-flags.md": [] },
+			{ "docs/how-to-guides/thunks.md": [] },
 			{
-				"docs/how-to-guides/backward-compatibility/README.md": [
-					{
-						"docs/how-to-guides/backward-compatibility/deprecations.md": []
-					},
-					{
-						"docs/how-to-guides/backward-compatibility/meta-box.md": []
-					}
+				"docs/how-to-guides/widgets/README.md": [
+					{ "docs/how-to-guides/widgets/overview.md": [] },
+					{ "docs/how-to-guides/widgets/opting-out.md": [] },
+					{ "docs/how-to-guides/widgets/legacy-widget-block.md": [] }
 				]
-			},
-			{
-				"docs/how-to-guides/format-api/README.md": [
-					{
-						"docs/how-to-guides/format-api/1-register-format.md": []
-					},
-					{ "docs/how-to-guides/format-api/2-toolbar-button.md": [] },
-					{ "docs/how-to-guides/format-api/3-apply-format.md": [] }
-				]
-			},
-			{
-				"docs/how-to-guides/platform/README.md": [
-					{
-						"docs/how-to-guides/platform/custom-block-editor/README.md": [
-							{
-								"docs/how-to-guides/platform/custom-block-editor/tutorial.md": []
-							}
-						]
-					}
-				]
-			},
-			{
-				"docs/how-to-guides/designers/README.md": [
-					{ "docs/how-to-guides/designers/block-design.md": [] },
-					{ "docs/how-to-guides/designers/user-interface.md": [] },
-					{ "docs/how-to-guides/designers/design-resources.md": [] },
-					{ "docs/how-to-guides/designers/animation.md": [] }
-				]
-			},
-			{ "docs/how-to-guides/accessibility.md": [] },
-			{ "docs/how-to-guides/internationalization.md": [] },
-			{ "docs/how-to-guides/widgets/README.md": [
-				{ "docs/how-to-guides/widgets/overview.md": [] },
-				{ "docs/how-to-guides/widgets/opting-out.md": [] },
-				{ "docs/how-to-guides/widgets/legacy-widget-block.md": [] }
-			] }
+			}
 		]
 	},
 	{
@@ -300,7 +289,10 @@
 						"docs/explanations/architecture/full-site-editing-templates.md": []
 					}
 				]
-			}
+			},
+			{ "docs/explanations/faq.md": [] },
+			{ "docs/explanations/glossary.md": [] },
+			{ "docs/explanations/history.md": [] }
 		]
 	},
 	{
@@ -317,9 +309,18 @@
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{ "docs/contributors/code/release.md": [] },
-					{ "docs/contributors/code/native-mobile.md": [] },
 					{
-						"docs/contributors/code/getting-started-native-mobile.md": []
+						"docs/contributors/code/react-native/README.md": [
+							{
+								"docs/contributors/code/react-native/getting-started-react-native.md": []
+							},
+							{
+								"docs/contributors/code/react-native/osx-setup-guide.md": []
+							},
+							{
+								"docs/contributors/code/react-native/integration-test-guide.md": []
+							}
+						]
 					}
 				]
 			},

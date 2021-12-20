@@ -126,6 +126,7 @@ async function emulateClipboard( type ) {
 		document.activeElement.dispatchEvent(
 			new ClipboardEvent( _type, {
 				bubbles: true,
+				cancelable: true,
 				clipboardData: window._clipboardData,
 			} )
 		);

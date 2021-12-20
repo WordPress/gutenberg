@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Corrected expect type of action creators and selectors in Redux store configuration type
+-   Move `redux` to regular dependencies and update it to version `^4.1.2`.
+
+### Internal
+
+-   Changed names of store-related types to better reflect their use and role.
+-   Changed "storeDefinition" to "storeDescriptor" to better reflect its use and role.
+
+## 6.1.0 (2021-09-09)
+
+### New Features
+
+-   Added a `batch` registry method to batch dispatch calls for performance reasons.
+-   Add a new migration for the persistence plugin to migrate edit-widgets preferences to the interface package. As part of this change deprecated migrations for the persistence plugin have been removed ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
+-   Update data controls to accept a data store definition as their first param in addition to a string-based store name value ([#34170](https://github.com/WordPress/gutenberg/pull/34170)).
+
 ## 6.0.0 (2021-07-29)
 
 ### Breaking Change

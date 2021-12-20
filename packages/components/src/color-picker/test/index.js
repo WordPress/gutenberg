@@ -1,118 +1,160 @@
 /**
  * External dependencies
  */
-import TestRenderer from 'react-test-renderer';
-
-/**
- * WordPress dependencies
- */
-import { DOWN, ENTER, UP } from '@wordpress/keycodes';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import ColorPicker from '../';
+import { ColorPicker } from '..';
+
+/**
+ * Ordinarily we'd try to select the compnoent by role but the silder role appears
+ * on several elements and we'd end up encoding assumptions about order when
+ * trying to select the appropriate element. We might as well just use the classname
+ * on the container which will be more durable if, for example, the order changes.
+ *
+ * @param {HTMLElement} container
+ * @return {HTMLElement} The saturation element
+ */
+function getSaturation( container ) {
+	return container.querySelector(
+		'.react-colorful__saturation .react-colorful__interactive'
+	);
+}
+
+// Fix to pass `pageX` and `pageY`
+// See https://github.com/testing-library/react-testing-library/issues/268
+class FakeMouseEvent extends window.MouseEvent {
+	constructor( type, values = {} ) {
+		super( type, { buttons: 1, bubbles: true, ...values } );
+
+		Object.assign( this, {
+			pageX: values.pageX || 0,
+			pageY: values.pageY || 0,
+		} );
+	}
+}
+
+function moveReactColorfulSlider( sliderElement, from, to ) {
+	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
+	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
+}
+
+const sleep = ( ms ) => {
+	const promise = new Promise( ( resolve ) => setTimeout( resolve, ms ) );
+	jest.advanceTimersByTime( ms + 1 );
+	return promise;
+};
+
+const hslaMatcher = expect.objectContaining( {
+	h: expect.any( Number ),
+	s: expect.any( Number ),
+	l: expect.any( Number ),
+	a: expect.any( Number ),
+} );
+
+const legacyColorMatcher = {
+	hex: expect.any( String ),
+	hsl: hslaMatcher,
+	hsv: expect.objectContaining( {
+		h: expect.any( Number ),
+		s: expect.any( Number ),
+		v: expect.any( Number ),
+		a: expect.any( Number ),
+	} ),
+	rgb: expect.objectContaining( {
+		r: expect.any( Number ),
+		g: expect.any( Number ),
+		b: expect.any( Number ),
+		a: expect.any( Number ),
+	} ),
+	oldHue: expect.any( Number ),
+	source: 'hex',
+};
 
 describe( 'ColorPicker', () => {
-	const color = '#FFF';
-	let base;
+	describe( 'legacy props', () => {
+		it( 'should fire onChangeComplete with the legacy color format', async () => {
+			const onChangeComplete = jest.fn();
+			const color = '#fff';
 
-	beforeEach( () => {
-		base = TestRenderer.create(
-			<ColorPicker
-				color={ color }
-				onChangeComplete={ () => {} }
-				disableAlpha
-			/>
+			const { container } = render(
+				<ColorPicker
+					onChangeComplete={ onChangeComplete }
+					color={ color }
+				/>
+			);
+
+			const saturation = getSaturation( container );
+			moveReactColorfulSlider(
+				saturation,
+				{ pageX: 0, pageY: 0 },
+				{ pageX: 10, pageY: 10 }
+			);
+
+			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+			await sleep( 1 );
+
+			expect( onChangeComplete ).toHaveBeenCalledWith(
+				legacyColorMatcher
+			);
+		} );
+	} );
+
+	it( 'should fire onChange with the string value', async () => {
+		const onChange = jest.fn();
+		const color = 'rgba(1, 1, 1, 0.5)';
+
+		const { container } = render(
+			<ColorPicker onChange={ onChange } color={ color } enableAlpha />
+		);
+
+		const saturation = getSaturation( container );
+		moveReactColorfulSlider(
+			saturation,
+			{ pageX: 0, pageY: 0 },
+			{ pageX: 10, pageY: 10 }
+		);
+
+		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+		await sleep( 1 );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
 		);
 	} );
 
-	test( 'should render color picker', () => {
-		expect( base.toJSON() ).toMatchSnapshot();
-	} );
+	it( 'should fire onChange with the HSL value', async () => {
+		const onChange = jest.fn();
+		const color = {
+			h: 125,
+			s: 0.2,
+			l: 0.5,
+			// add alpha to prove it's ignored
+			a: 0.5,
+		};
 
-	test( 'should only update input view for draft changes', () => {
-		const testRenderer = TestRenderer.create(
+		const { container } = render(
 			<ColorPicker
+				onChange={ onChange }
 				color={ color }
-				onChangeComplete={ () => {} }
-				disableAlpha
+				enableAlpha={ false }
 			/>
 		);
-		testRenderer.root
-			.findByType( 'input' )
-			.props.onChange( { target: { value: '#ABC' } } );
 
-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
-	} );
-
-	test( 'should commit changes to all views on blur', () => {
-		const testRenderer = TestRenderer.create(
-			<ColorPicker
-				color={ color }
-				onChangeComplete={ () => {} }
-				disableAlpha
-			/>
+		const saturation = getSaturation( container );
+		moveReactColorfulSlider(
+			saturation,
+			{ pageX: 0, pageY: 0 },
+			{ pageX: 10, pageY: 10 }
 		);
-		testRenderer.root
-			.findByType( 'input' )
-			.props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root.findByType( 'input' ).props.onBlur();
 
-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
-	} );
+		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+		await sleep( 1 );
 
-	test( 'should commit changes to all views on keyDown = UP', () => {
-		const testRenderer = TestRenderer.create(
-			<ColorPicker
-				color={ color }
-				onChangeComplete={ () => {} }
-				disableAlpha
-			/>
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )
 		);
-		testRenderer.root
-			.findByType( 'input' )
-			.props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root
-			.findByType( 'input' )
-			.props.onKeyDown( { keyCode: UP } );
-
-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
-	} );
-
-	test( 'should commit changes to all views on keyDown = DOWN', () => {
-		const testRenderer = TestRenderer.create(
-			<ColorPicker
-				color={ color }
-				onChangeComplete={ () => {} }
-				disableAlpha
-			/>
-		);
-		testRenderer.root
-			.findByType( 'input' )
-			.props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root
-			.findByType( 'input' )
-			.props.onKeyDown( { keyCode: DOWN } );
-
-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
-	} );
-
-	test( 'should commit changes to all views on keyDown = ENTER', () => {
-		const testRenderer = TestRenderer.create(
-			<ColorPicker
-				color={ color }
-				onChangeComplete={ () => {} }
-				disableAlpha
-			/>
-		);
-		testRenderer.root
-			.findByType( 'input' )
-			.props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root
-			.findByType( 'input' )
-			.props.onKeyDown( { keyCode: ENTER } );
-
-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
 	} );
 } );

@@ -18,7 +18,6 @@
 	background: transparent;
 	word-break: break-word;
 	border-radius: $radius-block-ui;
-	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 	position: relative;
@@ -31,8 +30,11 @@
 
 	&:not(:disabled) {
 		&:hover {
-			border-color: var(--wp-admin-theme-color);
 			color: var(--wp-admin-theme-color) !important;
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 
 		&.is-active {

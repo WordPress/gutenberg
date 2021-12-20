@@ -22,7 +22,6 @@ import {
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 	__unstableEditorStyles as EditorStyles,
 	useSetting,
 	__experimentalLayoutStyle as LayoutStyle,
@@ -46,13 +45,14 @@ import { store as editPostStore } from '../../store';
 function MaybeIframe( {
 	children,
 	contentRef,
-	isTemplateMode,
+	shouldIframe,
 	styles,
+	assets,
 	style,
 } ) {
 	const ref = useMouseMoveTypingReset();
 
-	if ( ! isTemplateMode ) {
+	if ( ! shouldIframe ) {
 		return (
 			<>
 				<EditorStyles styles={ styles } />
@@ -71,9 +71,11 @@ function MaybeIframe( {
 	return (
 		<Iframe
 			head={ <EditorStyles styles={ styles } /> }
+			assets={ assets }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
+			name="editor-canvas"
 		>
 			{ children }
 		</Iframe>
@@ -112,9 +114,12 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().supportsLayout;
+	const { themeSupportsLayout, assets } = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			themeSupportsLayout: _settings.supportsLayout,
+			assets: _settings.__unstableResolvedAssets,
+		};
 	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
@@ -158,7 +163,6 @@ export default function VisualEditor( { styles } ) {
 	const contentRef = useMergeRefs( [
 		ref,
 		useClipboardHandler(),
-		useCanvasClickRedirect(),
 		useTypewriter(),
 		useTypingObserver(),
 		useBlockSelectionClearer(),
@@ -216,9 +220,14 @@ export default function VisualEditor( { styles } ) {
 					className={ previewMode }
 				>
 					<MaybeIframe
-						isTemplateMode={ isTemplateMode }
+						shouldIframe={
+							isTemplateMode ||
+							deviceType === 'Tablet' ||
+							deviceType === 'Mobile'
+						}
 						contentRef={ contentRef }
 						styles={ styles }
+						assets={ assets }
 						style={ { paddingBottom } }
 					>
 						{ themeSupportsLayout && ! isTemplateMode && (
@@ -233,7 +242,14 @@ export default function VisualEditor( { styles } ) {
 							</div>
 						) }
 						<RecursionProvider>
-							<BlockList __experimentalLayout={ layout } />
+							<BlockList
+								className={
+									isTemplateMode
+										? 'wp-site-blocks'
+										: undefined
+								}
+								__experimentalLayout={ layout }
+							/>
 						</RecursionProvider>
 					</MaybeIframe>
 				</motion.div>

@@ -16,6 +16,9 @@ import CheckboxControl from '../';
 export default {
 	title: 'Components/CheckboxControl',
 	component: CheckboxControl,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const CheckboxControlWithState = ( { checked, ...props } ) => {

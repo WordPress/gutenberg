@@ -28,8 +28,9 @@ export function sprintf( format, ...args ) {
 	try {
 		return sprintfjs.sprintf( format, ...args );
 	} catch ( error ) {
-		logErrorOnce( 'sprintf error: \n\n' + error.toString() );
-
+		if ( error instanceof Error ) {
+			logErrorOnce( 'sprintf error: \n\n' + error.toString() );
+		}
 		return format;
 	}
 }

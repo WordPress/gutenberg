@@ -22,7 +22,7 @@ import { useEffect } from '@wordpress/element';
  * @param {TFunc}                             fn        The function to throttle.
  * @param {number}                            [wait]    The number of milliseconds to throttle invocations to.
  * @param {import('lodash').ThrottleSettings} [options] The options object. See linked documentation for details.
- * @return {TFunc & import('lodash').Cancelable} Throttled function.
+ * @return {import('lodash').DebouncedFunc<TFunc>} Throttled function.
  */
 export default function useThrottle( fn, wait, options ) {
 	const throttled = useMemoOne( () => throttle( fn, wait, options ), [

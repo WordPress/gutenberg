@@ -8,4 +8,4 @@ export {
 	getConnectNamespace,
 } from './context-connect';
 export { useContextSystem } from './use-context-system';
-export * from './polymorphic-component';
+export * from './wordpress-component';

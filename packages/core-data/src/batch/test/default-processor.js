@@ -11,6 +11,18 @@ import defaultProcessor from '../default-processor';
 jest.mock( '@wordpress/api-fetch' );
 
 describe( 'defaultProcessor', () => {
+	const preflightResponse = {
+		endpoints: [
+			{
+				args: {
+					requests: {
+						maxItems: 25,
+					},
+				},
+			},
+		],
+	};
+
 	const requests = [
 		{
 			path: '/v1/cricketers',
@@ -26,7 +38,12 @@ describe( 'defaultProcessor', () => {
 		},
 	];
 
-	const expectedFetchOptions = {
+	const expectedPreflightOptions = {
+		path: '/batch/v1',
+		method: 'OPTIONS',
+	};
+
+	const expectedBatchOptions = {
 		path: '/batch/v1',
 		method: 'POST',
 		data: {
@@ -49,21 +66,26 @@ describe( 'defaultProcessor', () => {
 	};
 
 	it( 'handles a successful request', async () => {
-		apiFetch.mockImplementation( async () => ( {
-			failed: false,
-			responses: [
-				{
-					status: 200,
-					body: 'Lyon',
-				},
-				{
-					status: 400,
-					body: 'Error!',
-				},
-			],
-		} ) );
+		apiFetch.mockImplementation( async ( { method } ) =>
+			method === 'OPTIONS'
+				? preflightResponse
+				: {
+						failed: false,
+						responses: [
+							{
+								status: 200,
+								body: 'Lyon',
+							},
+							{
+								status: 400,
+								body: 'Error!',
+							},
+						],
+				  }
+		);
 		const results = await defaultProcessor( requests );
-		expect( apiFetch ).toHaveBeenCalledWith( expectedFetchOptions );
+		expect( apiFetch ).toHaveBeenCalledWith( expectedPreflightOptions );
+		expect( apiFetch ).toHaveBeenCalledWith( expectedBatchOptions );
 		expect( results ).toEqual( [
 			{ output: 'Lyon' },
 			{ error: 'Error!' },
@@ -71,18 +93,23 @@ describe( 'defaultProcessor', () => {
 	} );
 
 	it( 'handles a failed request', async () => {
-		apiFetch.mockImplementation( async () => ( {
-			failed: true,
-			responses: [
-				null,
-				{
-					status: 400,
-					body: 'Error!',
-				},
-			],
-		} ) );
+		apiFetch.mockImplementation( async ( { method } ) =>
+			method === 'OPTIONS'
+				? preflightResponse
+				: {
+						failed: true,
+						responses: [
+							null,
+							{
+								status: 400,
+								body: 'Error!',
+							},
+						],
+				  }
+		);
 		const results = await defaultProcessor( requests );
-		expect( apiFetch ).toHaveBeenCalledWith( expectedFetchOptions );
+		expect( apiFetch ).toHaveBeenCalledWith( expectedPreflightOptions );
+		expect( apiFetch ).toHaveBeenCalledWith( expectedBatchOptions );
 		expect( results ).toEqual( [
 			{ error: undefined },
 			{ error: 'Error!' },

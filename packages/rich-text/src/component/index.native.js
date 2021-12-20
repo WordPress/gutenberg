@@ -3,8 +3,8 @@
 /**
  * External dependencies
  */
-import { View, Platform } from 'react-native';
-import { get, pickBy, debounce, isString } from 'lodash';
+import { View, Platform, Dimensions } from 'react-native';
+import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -15,7 +15,7 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { BlockFormatControls } from '@wordpress/block-editor';
+import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -42,6 +42,7 @@ import { toHTMLString } from '../to-html-string';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
+import { getFormatColors } from '../get-format-colors';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
@@ -53,9 +54,11 @@ const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
+	'core/text-color': 'mark',
 };
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
+const DEFAULT_FONT_SIZE = 16;
 
 export class RichText extends Component {
 	constructor( {
@@ -111,9 +114,6 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
-		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
-			this
-		);
 		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
 			this
 		);
@@ -124,6 +124,7 @@ export class RichText extends Component {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
+			currentFontSize: this.getFontSize( arguments[ 0 ] ),
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -144,13 +145,26 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { selectionStart: start, selectionEnd: end } = this.props;
+		const {
+			selectionStart: start,
+			selectionEnd: end,
+			colorPalette,
+		} = this.props;
 		const { value } = this.props;
+		const currentValue = this.formatToValue( value );
 
-		const { formats, replacements, text } = this.formatToValue( value );
+		const { formats, replacements, text } = currentValue;
 		const { activeFormats } = this.state;
+		const newFormats = getFormatColors( value, formats, colorPalette );
 
-		return { formats, replacements, text, start, end, activeFormats };
+		return {
+			formats: newFormats,
+			replacements,
+			text,
+			start,
+			end,
+			activeFormats,
+		};
 	}
 
 	/**
@@ -275,13 +289,6 @@ export class RichText extends Component {
 		return html
 			.replace( openingTagRegexp, '' )
 			.replace( closingTagRegexp, '' );
-	}
-
-	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
-	convertFontSizeFromString( fontSize ) {
-		return fontSize && isString( fontSize ) && fontSize.endsWith( 'px' )
-			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
-			: fontSize;
 	}
 
 	/*
@@ -764,6 +771,20 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
+
+			// For font size changes from a prop value a force refresh
+			// is needed without the selection update
+			if ( nextProps?.fontSize !== this.props?.fontSize ) {
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
+
+			if (
+				nextProps?.style?.fontSize !== this.props?.style?.fontSize ||
+				nextProps?.style?.lineHeight !== this.props?.style?.lineHeight
+			) {
+				this.needsSelectionUpdate = true;
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
 		}
 
 		return true;
@@ -793,6 +814,9 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		const { style } = this.props;
+		const { currentFontSize } = this.state;
+
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
 		}
@@ -810,6 +834,18 @@ export class RichText extends Component {
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
+		}
+
+		const currentFontSizeStyle = parseFloat( style?.fontSize );
+		const prevFontSizeStyle = parseFloat( prevProps?.style?.fontSize );
+		if (
+			currentFontSize &&
+			( currentFontSizeStyle || prevFontSizeStyle ) &&
+			currentFontSizeStyle !== currentFontSize
+		) {
+			this.setState( {
+				currentFontSize: this.getFontSize( this.props ),
+			} );
 		}
 	}
 
@@ -853,6 +889,65 @@ export class RichText extends Component {
 		};
 	}
 
+	getFontSize( props ) {
+		const { baseGlobalStyles, tagName, fontSize, style } = props;
+		const tagNameFontSize =
+			baseGlobalStyles?.elements?.[ tagName ]?.typography?.fontSize;
+
+		let newFontSize = DEFAULT_FONT_SIZE;
+
+		if ( baseGlobalStyles?.typography?.fontSize ) {
+			newFontSize = baseGlobalStyles?.typography?.fontSize;
+		}
+
+		if ( tagNameFontSize ) {
+			newFontSize = tagNameFontSize;
+		}
+
+		if ( style?.fontSize ) {
+			newFontSize = style.fontSize;
+		}
+
+		if ( fontSize && ! tagNameFontSize ) {
+			newFontSize = fontSize;
+		}
+		const { height, width } = Dimensions.get( 'window' );
+		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+		// We need to always convert to px units because the selected value
+		// could be coming from the web where it could be stored as a different unit.
+		const selectedPxValue =
+			getPxFromCssUnit( newFontSize, cssUnitOptions ) ??
+			DEFAULT_FONT_SIZE;
+
+		return parseFloat( selectedPxValue );
+	}
+
+	getLineHeight() {
+		const { baseGlobalStyles, tagName } = this.props;
+		const tagNameLineHeight =
+			baseGlobalStyles?.elements?.[ tagName ]?.typography?.lineHeight;
+		let lineHeight;
+
+		// eslint-disable-next-line no-undef
+		if ( ! __DEV__ ) {
+			return;
+		}
+
+		if ( baseGlobalStyles?.typography?.lineHeight ) {
+			lineHeight = parseFloat( baseGlobalStyles?.typography?.lineHeight );
+		}
+
+		if ( tagNameLineHeight ) {
+			lineHeight = parseFloat( tagNameLineHeight );
+		}
+
+		if ( this.props.style?.lineHeight ) {
+			lineHeight = parseFloat( this.props.style.lineHeight );
+		}
+
+		return lineHeight;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -868,6 +963,7 @@ export class RichText extends Component {
 			disableEditingMenu = false,
 			baseGlobalStyles,
 		} = this.props;
+		const { currentFontSize } = this.state;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
@@ -879,6 +975,8 @@ export class RichText extends Component {
 		);
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
+		const fontSize = currentFontSize;
+		const lineHeight = this.getLineHeight();
 
 		const {
 			color: defaultColor,
@@ -1017,11 +1115,8 @@ export class RichText extends Component {
 					}
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
-					fontSize={
-						this.props.fontSize ||
-						( style &&
-							this.convertFontSizeFromString( style.fontSize ) )
-					}
+					fontSize={ fontSize }
+					lineHeight={ lineHeight }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ disableEditingMenu }
@@ -1035,6 +1130,7 @@ export class RichText extends Component {
 				{ isSelected && (
 					<>
 						<FormatEdit
+							forwardedRef={ this._editor }
 							formatTypes={ formatTypes }
 							value={ record }
 							onChange={ this.onFormatChange }
@@ -1079,8 +1175,16 @@ export default compose( [
 			'attributes',
 			'childrenStyles',
 		] );
-		const baseGlobalStyles = getSettings()
-			?.__experimentalGlobalStylesBaseStyles;
+
+		const settings = getSettings();
+		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
+		const experimentalFeatures =
+			settings?.__experimentalFeatures?.color?.palette;
+		const colorPalette =
+			experimentalFeatures?.user ??
+			experimentalFeatures?.theme ??
+			experimentalFeatures?.default ??
+			settings?.colors;
 
 		return {
 			areMentionsSupported:
@@ -1088,6 +1192,7 @@ export default compose( [
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
 			baseGlobalStyles,
+			colorPalette,
 		};
 	} ),
 	withPreferredColorScheme,

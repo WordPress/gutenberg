@@ -9,7 +9,13 @@ import TimePicker from '../time';
 import { date, boolean } from '@storybook/addon-knobs';
 import { noop } from 'lodash';
 
-export default { title: 'Components/TimePicker', component: TimePicker };
+export default {
+	title: 'Components/TimePicker',
+	component: TimePicker,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	return (

@@ -1,19 +1,23 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch, select } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import './hooks';
 import './plugins';
-export { store } from './store';
 import Editor from './editor';
+import { store as editPostStore } from './store';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -61,11 +65,8 @@ export function reinitializeEditor(
 /**
  * Initializes and returns an instance of Editor.
  *
- * The return value of this function is not necessary if we change where we
- * call initializeEditor(). This is due to metaBox timing.
- *
  * @param {string}  id           Unique identifier for editor instance.
- * @param {Object}  postType     Post type of the post to edit.
+ * @param {string}  postType     Post type of the post to edit.
  * @param {Object}  postId       ID of the post to edit.
  * @param {?Object} settings     Editor settings object.
  * @param {Object}  initialEdits Programmatic edits to apply initially, to be
@@ -79,6 +80,22 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	// Prevent adding template part in the post editor.
+	// Only add the filter when the post editor is initialized, not imported.
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeTemplatePartsFromInserter',
+		( can, blockType ) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/template-part'
+			) {
+				return false;
+			}
+			return can;
+		}
+	);
+
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind(
 		null,
@@ -88,6 +105,19 @@ export function initializeEditor(
 		settings,
 		initialEdits
 	);
+
+	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
+		fixedToolbar: false,
+		welcomeGuide: true,
+		mobileGalleryWarning: true,
+		fullscreenMode: true,
+		showIconLabels: false,
+		themeStyles: true,
+		showBlockBreadcrumbs: true,
+		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
@@ -157,3 +187,4 @@ export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
+export { store } from './store';

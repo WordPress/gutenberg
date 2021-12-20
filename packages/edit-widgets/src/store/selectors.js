@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, keyBy } from 'lodash';
+import { keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,11 @@ import {
 } from './utils';
 import { STORE_NAME as editWidgetsStoreName } from './constants';
 
+/**
+ * Returns all API widgets.
+ *
+ * @return {Object[]} API List of widgets.
+ */
 export const getWidgets = createRegistrySelector( ( select ) => () => {
 	const widgets = select( coreStore ).getEntityRecords(
 		'root',
@@ -48,6 +53,11 @@ export const getWidget = createRegistrySelector(
 	}
 );
 
+/**
+ * Returns all API widget areas.
+ *
+ * @return {Object[]} API List of widget areas.
+ */
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	const query = buildWidgetAreasQuery();
 	return select( coreStore ).getEntityRecords(
@@ -101,6 +111,11 @@ export const getParentWidgetAreaBlock = createRegistrySelector(
 	}
 );
 
+/**
+ * Returns all edited widget area entity records.
+ *
+ * @return {Object[]} List of edited widget area entity records.
+ */
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
 		let widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
@@ -161,6 +176,11 @@ export const getReferenceWidgetBlocks = createRegistrySelector(
 	}
 );
 
+/**
+ * Returns true if any widget area is currently being saved.
+ *
+ * @return {boolean} True if any widget area is currently being saved. False otherwise.
+ */
 export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
 	const widgetAreasIds = select( editWidgetsStoreName )
 		.getWidgetAreas()
@@ -259,17 +279,12 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
 );
 
 /**
- * Returns whether the given feature is enabled or not.
+ * Returns true if the list view is opened.
  *
- * This function is unstable, as it is mostly copied from the edit-post
- * package. Editor features and preferences have a lot of scope for
- * being generalized and refactored.
+ * @param {Object} state Global application state.
  *
- * @param {Object} state   Global application state.
- * @param {string} feature Feature slug.
- *
- * @return {boolean} Is active.
+ * @return {boolean} Whether the list view is opened.
  */
-export function __unstableIsFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
 }

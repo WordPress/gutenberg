@@ -8,9 +8,8 @@ import classnames from 'classnames';
  */
 import {
 	AlignmentToolbar,
-	InspectorAdvancedControls,
+	InspectorControls,
 	BlockControls,
-	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { Spinner, TextControl } from '@wordpress/components';
@@ -53,20 +52,8 @@ export default function PostTermsEdit( {
 		} ),
 	} );
 
-	if ( ! hasPost ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>{ __( 'Post Terms block: post not found.' ) }</Warning>
-			</div>
-		);
-	}
-
-	if ( ! term ) {
-		return (
-			<div { ...blockProps }>
-				{ __( 'Post Terms block: no term specified.' ) }
-			</div>
-		);
+	if ( ! hasPost || ! term ) {
+		return <div { ...blockProps }>{ __( 'Post Terms' ) }</div>;
 	}
 
 	return (
@@ -79,7 +66,7 @@ export default function PostTermsEdit( {
 					} }
 				/>
 			</BlockControls>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					autoComplete="off"
 					label={ __( 'Separator' ) }
@@ -89,7 +76,7 @@ export default function PostTermsEdit( {
 					} }
 					help={ __( 'Enter character(s) used to separate terms.' ) }
 				/>
-			</InspectorAdvancedControls>
+			</InspectorControls>
 			<div { ...blockProps }>
 				{ isLoading && <Spinner /> }
 				{ ! isLoading &&

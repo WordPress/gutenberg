@@ -1,63 +1,66 @@
 /**
  * External dependencies
  */
-import { some } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
-import { TextControl, Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { useState, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { Button, TextControl, withNotices } from '@wordpress/components';
 import { useFocusOnMount } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
-const menuNameMatches = ( menuName ) => ( menu ) =>
-	menu.name.toLowerCase() === menuName.toLowerCase();
+/**
+ * Internal dependencies
+ */
+import { MENU_POST_TYPE, MENU_KIND } from '../../constants';
 
-export default function AddMenu( {
+function AddMenu( {
 	className,
-	menus,
 	onCreate,
 	titleText,
 	helpText,
 	focusInputOnMount = false,
+	noticeUI,
+	noticeOperations,
 } ) {
+	const inputRef = useFocusOnMount( focusInputOnMount );
 	const [ menuName, setMenuName ] = useState( '' );
-	const { createErrorNotice, createInfoNotice, removeNotice } = useDispatch(
-		noticesStore
-	);
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
+	const { createInfoNotice } = useDispatch( noticesStore );
 	const { saveMenu } = useDispatch( coreStore );
 
-	const inputRef = useFocusOnMount( focusInputOnMount );
+	const { createErrorNotice, removeAllNotices } = noticeOperations;
+
+	const lastSaveError = useSelect( ( select ) => {
+		return select( coreStore ).getLastEntitySaveError(
+			MENU_KIND,
+			MENU_POST_TYPE
+		);
+	}, [] );
+
+	useEffect( () => {
+		if ( lastSaveError ) {
+			createErrorNotice( stripHTML( lastSaveError?.message ) );
+		}
+	}, [ lastSaveError ] );
 
 	const createMenu = async ( event ) => {
 		event.preventDefault();
 
-		if ( ! menuName.length ) {
-			return;
-		}
-
-		// Remove any existing notices so duplicates aren't created.
-		removeNotice( 'edit-navigation-error' );
-
-		if ( some( menus, menuNameMatches( menuName ) ) ) {
-			const message = sprintf(
-				// translators: %s: the name of a menu.
-				__(
-					'The menu name %s conflicts with another menu name. Please try another.'
-				),
-				menuName
-			);
-			createErrorNotice( message, { id: 'edit-navigation-error' } );
+		if ( ! menuName.length || isCreatingMenu ) {
 			return;
 		}
 
 		setIsCreatingMenu( true );
+
+		// Remove any existing notices.
+		removeAllNotices();
 
 		const menu = await saveMenu( { name: menuName } );
 
@@ -79,6 +82,7 @@ export default function AddMenu( {
 			className={ classnames( 'edit-navigation-add-menu', className ) }
 			onSubmit={ createMenu }
 		>
+			{ noticeUI }
 			{ titleText && (
 				<h3 className="edit-navigation-add-menu__title">
 					{ titleText }
@@ -98,9 +102,13 @@ export default function AddMenu( {
 				variant="primary"
 				disabled={ ! menuName.length }
 				isBusy={ isCreatingMenu }
+				/* Button is disabled but still focusable */
+				aria-disabled={ ! menuName.length || isCreatingMenu }
 			>
 				{ __( 'Create menu' ) }
 			</Button>
 		</form>
 	);
 }
+
+export default withNotices( AddMenu );

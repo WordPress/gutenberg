@@ -23,7 +23,7 @@ Add this to your `package.json` file:
 Alternatively, add this to `.prettierrc` file:
 
 ```
-extends @wordpress/prettier-config
+extends: ['@wordpress/prettier-config']
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

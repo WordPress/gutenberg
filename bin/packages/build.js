@@ -15,7 +15,9 @@ const files = process.argv.slice( 2 );
  *
  * @type {string}
  */
-const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
+const PACKAGES_DIR = path
+	.resolve( __dirname, '../../packages' )
+	.replace( /\\/g, '/' );
 
 const stylesheetEntryPoints = glob.sync(
 	path.resolve( PACKAGES_DIR, '*/src/*.scss' )
@@ -263,7 +265,8 @@ stream
 				console.error( error );
 			}
 
-			if ( ended && ++complete === files.length ) {
+			++complete;
+			if ( ended && complete === files.length ) {
 				workerFarm.end( worker );
 			}
 		} )

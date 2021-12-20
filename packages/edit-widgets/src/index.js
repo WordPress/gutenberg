@@ -5,7 +5,9 @@ import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	setFreeformContentHandlerName,
+	store as blocksStore,
 } from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import {
 	registerCoreBlocks,
@@ -16,7 +18,9 @@ import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wor
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
+	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -24,6 +28,7 @@ import {
 import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
+
 import Layout from './components/layout';
 import {
 	ALLOW_REUSABLE_BLOCKS,
@@ -33,7 +38,8 @@ import {
 const disabledBlocks = [
 	'core/more',
 	'core/freeform',
-	...( ! ALLOW_REUSABLE_BLOCKS && [ 'core/block' ] ),
+	'core/template-part',
+	...( ALLOW_REUSABLE_BLOCKS ? [] : [ 'core/block' ] ),
 ];
 
 /**
@@ -67,10 +73,19 @@ export function initialize( id, settings ) {
 			disabledBlocks.includes( block.name ) ||
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' )
+			block.name.startsWith( 'core/site' ) ||
+			block.name.startsWith( 'core/navigation' )
 		);
 	} );
 
+	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-widgets', {
+		fixedToolbar: false,
+		welcomeGuide: true,
+		showBlockBreadcrumbs: true,
+		themeStyles: true,
+	} );
+
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
@@ -80,6 +95,8 @@ export function initialize( id, settings ) {
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
+	registerWidgetGroupBlock();
+
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 

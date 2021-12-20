@@ -16,6 +16,9 @@ import FormTokenField from '../';
 export default {
 	title: 'Components/FormTokenField',
 	component: FormTokenField,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const continents = [

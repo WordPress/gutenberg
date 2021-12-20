@@ -1,5 +1,9 @@
-module.exports = {
-	parser: 'babel-eslint',
+/**
+ * Internal dependencies
+ */
+const { isPackageInstalled } = require( '../utils' );
+
+const config = {
 	extends: [
 		require.resolve( './jsx-a11y.js' ),
 		require.resolve( './custom.js' ),
@@ -27,7 +31,10 @@ module.exports = {
 		'import/default': 'warn',
 		'import/named': 'warn',
 	},
-	overrides: [
+};
+
+if ( isPackageInstalled( 'jest' ) ) {
+	config.overrides = [
 		{
 			// Unit test files and their helpers only.
 			files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
@@ -38,5 +45,7 @@ module.exports = {
 			files: [ '**/specs/**/*.js', '**/?(*.)spec.js' ],
 			extends: [ require.resolve( './test-e2e.js' ) ],
 		},
-	],
-};
+	];
+}
+
+module.exports = config;

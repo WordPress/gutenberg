@@ -21,6 +21,7 @@
 
 .wp-block-embed {
 	margin: 0 0 1em 0;
+	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
 
 	// Supply caption styles to embeds, even if the theme hasn't opted in.
 	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,

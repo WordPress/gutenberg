@@ -15,7 +15,7 @@ import type { useDrag } from 'react-use-gesture';
  */
 import type { StateReducer } from './reducer/state';
 import type { FlexProps } from '../flex/types';
-import type { PolymorphicComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
 
 export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
 
@@ -23,23 +23,27 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
 
 export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 
+export type Size = 'default' | 'small' | '__unstable-large';
+
 interface BaseProps {
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	hideLabelFromVision?: boolean;
 	isFocused: boolean;
 	labelPosition?: LabelPosition;
-	size?: 'default' | 'small';
+	size?: Size;
 }
+
+export type InputChangeCallback<
+	E = ChangeEvent< HTMLInputElement >,
+	P = {}
+> = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
 
 export interface InputFieldProps extends BaseProps {
 	dragDirection?: DragDirection;
 	dragThreshold?: number;
 	isDragEnabled?: boolean;
 	isPressEnterToChange?: boolean;
-	onChange?: (
-		nextValue: string | undefined,
-		extra: { event: ChangeEvent< HTMLInputElement > }
-	) => void;
+	onChange?: InputChangeCallback;
 	onValidate?: (
 		nextValue: string,
 		event?: SyntheticEvent< HTMLInputElement >
@@ -65,9 +69,9 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 export interface InputControlProps
 	extends Omit< InputBaseProps, 'children' | 'isFocused' >,
 		/**
-		 * The `prefix` prop in `PolymorphicComponentProps< InputFieldProps, 'input', false >` comes from the
+		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from
-		 * `PolymorphicComponentProps< InputFieldProps, 'input', false >` in order that `InputBaseProps[ 'prefix' ]`
+		 * `WordPressComponentProps< InputFieldProps, 'input', false >` in order that `InputBaseProps[ 'prefix' ]`
 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
 		 * with an unresolvable type.
 		 *
@@ -75,7 +79,7 @@ export interface InputControlProps
 		 * for InputField are passed through.
 		 */
 		Omit<
-			PolymorphicComponentProps< InputFieldProps, 'input', false >,
+			WordPressComponentProps< InputFieldProps, 'input', false >,
 			'stateReducer' | 'prefix' | 'isFocused' | 'setIsFocused'
 		> {
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];

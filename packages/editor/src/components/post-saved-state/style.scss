@@ -7,6 +7,15 @@
 	overflow: hidden;
 	white-space: nowrap;
 
+	// The disabled version of the save state should be legible as an indicator.
+	&.is-saving[aria-disabled="true"],
+	&.is-saving[aria-disabled="true"]:hover,
+	&.is-saved[aria-disabled="true"],
+	&.is-saved[aria-disabled="true"]:hover {
+		background: transparent;
+		color: $gray-700;
+	}
+
 	svg {
 		display: inline-block;
 		flex: 0 0 auto;
@@ -20,7 +29,7 @@
 		text-indent: inherit;
 
 		svg {
-			margin-right: $grid-unit-05;
+			margin-right: 0;
 		}
 	}
 }

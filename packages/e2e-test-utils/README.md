@@ -111,6 +111,10 @@ _Parameters_
 
 Undocumented declaration.
 
+### closeListView
+
+Closes list view
+
 ### createEmbeddingMatcher
 
 Creates a function to determine if a request is embedding a certain URL.
@@ -135,6 +139,15 @@ _Returns_
 
 -   `Promise`: Promise that responds to a request with the mock JSON response.
 
+### createMenu
+
+Create menus and all linked resources for the menu using the REST API.
+
+_Parameters_
+
+-   _menu_ `Object`: Rest payload for the menu
+-   _menuItems_ `?Array`: Data for any menu items to be created.
+
 ### createNewPost
 
 Creates new post.
@@ -147,6 +160,15 @@ _Parameters_
 -   _object.content_ `[string]`: Content of the new post.
 -   _object.excerpt_ `[string]`: Excerpt of the new post.
 -   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
+
+### createReusableBlock
+
+Creates a simple reusable block with a paragraph block.
+
+_Parameters_
+
+-   _content_ `string`: Paragraph block's content
+-   _title_ `title`: Reusable block's name.
 
 ### createURL
 
@@ -197,6 +219,10 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+### deleteAllMenus
+
+Delete all menus using the REST API
+
 ### deleteAllWidgets
 
 Delete all the widgets in the widgets screen.
@@ -224,6 +250,10 @@ _Parameters_
 
 Removes the focus loss listener that `enableFocusLossObservation()` adds.
 
+### disablePageDialogAccept
+
+Disable auto-accepting any dialogs.
+
 ### disablePrePublishChecks
 
 Disables Pre-publish checks.
@@ -250,8 +280,7 @@ loss of focus.
 
 ### enablePageDialogAccept
 
-Enables even listener which accepts a page dialog which
-may appear when navigating away from Gutenberg.
+Enables event listener which auto-accepts all dialogs on the page.
 
 ### enablePrePublishChecks
 
@@ -342,6 +371,18 @@ Returns a promise which resolves with the edited post content (HTML string).
 _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
+
+### getOption
+
+Returns a site option, from the options admin page.
+
+_Parameters_
+
+-   _setting_ `string`: The option, used to get the option by id.
+
+_Returns_
+
+-   `string`: The value of the option.
 
 ### getPageError
 
@@ -492,6 +533,10 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 
 Opens the global block inserter.
 
+### openListView
+
+Opens list view
+
 ### openPreviewPage
 
 Opens the preview page of an edited post.
@@ -507,6 +552,10 @@ _Returns_
 ### openPublishPanel
 
 Opens the publish panel.
+
+### openTypographyToolsPanelMenu
+
+Opens the Typography tools panel menu provided via block supports.
 
 ### pressKeyTimes
 
@@ -604,6 +653,15 @@ _Parameters_
 -   _$1_ `Object`: Options.
 -   _$1.plainText_ `string`: Plain text to set.
 -   _$1.html_ `string`: HTML to set.
+
+### setOption
+
+Sets a site option, from the options-general admin page.
+
+_Parameters_
+
+-   _setting_ `string`: The option, used to get the option by id.
+-   _value_ `string`: The value to set the option to.
 
 ### setPostContent
 

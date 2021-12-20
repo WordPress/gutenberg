@@ -7,14 +7,14 @@ import type { Ref } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useItemGroup } from './hook';
 import { ItemGroupContext, useItemGroupContext } from '../context';
 import { View } from '../../view';
 import type { ItemGroupProps } from '../types';
 
 function ItemGroup(
-	props: PolymorphicComponentProps< ItemGroupProps, 'div' >,
+	props: WordPressComponentProps< ItemGroupProps, 'div' >,
 	forwardedRef: Ref< any >
 ) {
 	const {

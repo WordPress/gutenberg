@@ -30,7 +30,7 @@ export function getBoxShadow( value ) {
 }
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 export function useElevation( props ) {
 	const {

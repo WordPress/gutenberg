@@ -224,7 +224,8 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		const attributes = transform.isMultiBlock
 			? blocks.map( ( block ) => block.attributes )
 			: sourceBlock.attributes;
-		if ( ! transform.isMatch( attributes ) ) {
+		const block = transform.isMultiBlock ? blocks : sourceBlock;
+		if ( ! transform.isMatch( attributes, block ) ) {
 			return false;
 		}
 	}
@@ -288,7 +289,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 
 	const sourceBlock = first( blocks );
 	const blockType = getBlockType( sourceBlock.name );
-	const transformsTo = getBlockTransforms( 'to', blockType.name );
+	const transformsTo = blockType
+		? getBlockTransforms( 'to', blockType.name )
+		: [];
 
 	// filter all 'to' transforms to find those that are possible.
 	const possibleTransforms = filter( transformsTo, ( transform ) => {

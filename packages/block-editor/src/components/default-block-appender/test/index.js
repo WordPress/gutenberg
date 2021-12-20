@@ -14,16 +14,10 @@ describe( 'DefaultBlockAppender', () => {
 		expect( onAppend ).toHaveBeenCalledWith();
 	};
 
-	it( 'should render nothing if not visible', () => {
-		const wrapper = shallow( <DefaultBlockAppender /> );
-
-		expect( wrapper.type() ).toBe( null );
-	} );
-
 	it( 'should match snapshot', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow(
-			<DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt />
+			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
 		);
 
 		expect( wrapper ).toMatchSnapshot();
@@ -32,10 +26,10 @@ describe( 'DefaultBlockAppender', () => {
 	it( 'should append a default block when input focused', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow(
-			<DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt />
+			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
 		);
 
-		wrapper.find( 'p' ).simulate( 'focus' );
+		wrapper.find( 'p' ).simulate( 'click' );
 
 		expect( wrapper ).toMatchSnapshot();
 
@@ -45,11 +39,7 @@ describe( 'DefaultBlockAppender', () => {
 	it( 'should optionally show without prompt', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow(
-			<DefaultBlockAppender
-				isVisible
-				onAppend={ onAppend }
-				showPrompt={ false }
-			/>
+			<DefaultBlockAppender onAppend={ onAppend } showPrompt={ false } />
 		);
 		const input = wrapper.find( 'p' );
 

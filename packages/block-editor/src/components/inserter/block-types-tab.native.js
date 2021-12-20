@@ -10,8 +10,7 @@ import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
-
-const NON_BLOCK_CATEGORIES = [ 'reusable' ];
+import { filterInserterItems } from './utils';
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
@@ -19,10 +18,8 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const { blockTypes } = useSelect(
 		( select ) => {
 			const { getInserterItems } = select( blockEditorStore );
-
-			const allItems = getInserterItems( rootClientId );
-			const blockItems = allItems.filter(
-				( { category } ) => ! NON_BLOCK_CATEGORIES.includes( category )
+			const blockItems = filterInserterItems(
+				getInserterItems( rootClientId )
 			);
 
 			return {

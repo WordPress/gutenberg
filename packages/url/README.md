@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/url --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -131,6 +131,25 @@ _Parameters_
 _Returns_
 
 -   `string|void`: The authority part of the URL.
+
+### getFilename
+
+Returns the filename part of the URL.
+
+_Usage_
+
+```js
+const filename1 = getFilename( 'http://localhost:8080/this/is/a/test.jpg' ); // 'test.jpg'
+const filename2 = getFilename( '/this/is/a/test.png' ); // 'test.png'
+```
+
+_Parameters_
+
+-   _url_ `string`: The full URL.
+
+_Returns_
+
+-   `string|void`: The filename part of the URL.
 
 ### getFragment
 
@@ -429,6 +448,20 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True if the argument contains a valid query string.
+
+### normalizePath
+
+Given a path, returns a normalized path where equal query parameter values
+will be treated as identical, regardless of order they appear in the original
+text.
+
+_Parameters_
+
+-   _path_ `string`: Original path.
+
+_Returns_
+
+-   `string`: Normalized path.
 
 ### prependHTTP
 

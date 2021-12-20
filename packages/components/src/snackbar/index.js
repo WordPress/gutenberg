@@ -53,6 +53,7 @@ function Snackbar(
 		// It is distinct from onRemove, which _looks_ like a callback but is
 		// actually the function to call to remove the snackbar from the UI.
 		onDismiss = noop,
+		listRef,
 	},
 	ref
 ) {
@@ -62,6 +63,9 @@ function Snackbar(
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
 		}
+
+		// Prevent focus loss by moving it to the list element.
+		listRef.current.focus();
 
 		onDismiss();
 		onRemove();

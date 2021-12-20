@@ -16,16 +16,19 @@ import { HelpDetailBodyText, HelpDetailImage } from './view-sections';
 
 const RemoveBlocks = () => {
 	return (
-		<View style={ styles.helpDetailContainer }>
+		<>
 			<HelpDetailImage
-				source={ require( './images/remove-blocks.png' ) }
+				source={ require( './images/options-light.png' ) }
+				sourceDarkMode={ require( './images/options-dark.png' ) }
 			/>
-			<HelpDetailBodyText
-				text={ __(
-					'To remove a block, select the block and click the three dots in the bottom right of the block to view the settings. From there, choose the option to remove the block.'
-				) }
-			/>
-		</View>
+			<View style={ styles.helpDetailContainer }>
+				<HelpDetailBodyText
+					text={ __(
+						'To remove a block, select the block and click the three dots in the bottom right of the block to view the settings. From there, choose the option to remove the block.'
+					) }
+				/>
+			</View>
+		</>
 	);
 };
 

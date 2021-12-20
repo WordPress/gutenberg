@@ -33,11 +33,6 @@
 	height: 32px;
 	justify-content: center;
 	align-items: center;
-	fill: $gray-dark;
-}
-
-.modalIconDark {
-	fill: $white;
 }
 
 .modalItemLabel {
@@ -47,6 +42,7 @@
 	padding-top: 4;
 	padding-bottom: 0;
 	justify-content: center;
+	text-align: center;
 	font-size: 12;
 	color: $gray-dark;
 }

@@ -15,7 +15,13 @@ import { DraggableWrapper } from './_utils';
 import Popover from '../';
 import Button from '../../button';
 
-export default { title: 'Components/Popover', component: Popover };
+export default {
+	title: 'Components/Popover',
+	component: Popover,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const show = boolean( 'Example: Show', true );

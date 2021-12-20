@@ -2,13 +2,72 @@
 
 ## Unreleased
 
-## 18.0.0-next.0 (2021-08-18)
+### Breaking Changes
+
+-   The bundled `eslint` dependency has been updated from requiring `^7.17.0` to requiring `^8.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The `puppeteer-core` dependency has been updated from requiring `^10.1.0` to requiring `^11.0.0` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
+-   Removed support for live reload in the `start` command ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+-   The bundled `webpack-cli` dependency has been updated to the next major version `^4.9.1` ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+
+### New Features
+
+-   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+
+### Bug Fixes
+
+-   Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
+
+### Internal
+
+-   The bundled `read-pkg-up` dependency has been updated from requiring `^1.0.1` to requiring `^7.0.1` ([#37395](https://github.com/WordPress/gutenberg/pull/37395)).
+
+## 19.2.0 (2021-11-15)
+
+### New Features
+
+-   Add basic support for TypeScript in `build`, `start`, `test-e2e` and `test-unit-js` commands ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
+
+### Enhancements
+
+-   The bundled `browserslist` dependency has been updated from requiring `^4.16.6` to requiring `^4.17.6` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   Updated the default ESLint config to work correctly with the latest version of `@wordpress/eslint-plugin` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
+## 19.1.0 (2021-11-07)
+
+### Enhancements
+
+-   Increase the timeout for e2e tests to 30 seconds ([#35983](https://github.com/WordPress/gutenberg/pull/35983)).
+
+## 19.0.0 (2021-10-22)
+
+### Breaking Changes
+
+-   The webpack config was updated to no longer include the polyfill by default when creating the `assets.php` file. If your usage requires the `wp-polyfill`, you must explicitly set it as a dependency ([#34536](https://github.com/WordPress/gutenberg/pull/35436)].
+
+### Enhancements
+
+-   Allow customization of the `ARTIFACTS_PATH` in the `jest-environment-puppeteer` failed test reporter via the `WP_ARTIFACTS_PATH` environment variable ([#35371](https://github.com/WordPress/gutenberg/pull/35371)).
+
+## 18.1.0 (2021-10-12)
+
+### Enhancements
+
+-   The bundled `jest-dev-server` dependency has been updated to the next major version `^5.0.3` ([#34560](https://github.com/WordPress/gutenberg/pull/34560)).
+
+## 18.0.1 (2021-09-09)
+
+### Bug Fixes
+
+-   Bring back support for SVG files in CSS ([#34394](https://github.com/WordPress/gutenberg/pull/34394)). It wasn't correctly migrated when integrating webpack v5.
+-   Convert legacy entry point arguments supported in webpack 4 for compatibility with webpack 5 ([#34264](https://github.com/WordPress/gutenberg/pull/34264)).
+
+## 18.0.0 (2021-08-23)
 
 ### Breaking Changes
 
 -   Increase the minimum Node.js version to v12.13 matching requirements from bundled dependencies ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
--   The bundled `webpack` dependency has been updated to the next major version `^5.47.1` (see [Breaking Changes](https://webpack.js.org/migrate/5/), [##33818](https://github.com/WordPress/gutenberg/pull/#33818)).
--   The bundled `webpack-cli` dependency has been updated to the next major version `^4.7.2` ([##33818](https://github.com/WordPress/gutenberg/pull/#33818)).
+-   The bundled `webpack` dependency has been updated to the next major version `^5.47.1` (see [Breaking Changes](https://webpack.js.org/migrate/5/), [#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   The bundled `webpack-cli` dependency has been updated to the next major version `^4.7.2` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 -   The bundled `css-loader` dependency has been updated from requiring `^5.1.3` to requiring `^6.2.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 -   The bundled `file-loader` dependency has been removed ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 -   The bundled `ignore-emit-webpack-plugin` dependency has been removed ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).

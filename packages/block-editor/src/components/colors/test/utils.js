@@ -5,6 +5,7 @@ import {
 	getColorObjectByAttributeValues,
 	getColorObjectByColorValue,
 	getColorClassName,
+	getMostReadableColor,
 } from '../utils';
 
 describe( 'color utils', () => {
@@ -125,6 +126,46 @@ describe( 'color utils', () => {
 			expect( getColorClassName( 'background', '#abcdef' ) ).toBe(
 				'has-abcdef-background'
 			);
+		} );
+	} );
+
+	describe( 'getMostReadableColor', () => {
+		it( 'should return the most readable color', () => {
+			expect(
+				getMostReadableColor(
+					[
+						{
+							name: 'Red',
+							slug: 'red',
+							color: 'red',
+						},
+						{
+							name: 'Black',
+							slug: 'black',
+							color: 'black',
+						},
+					],
+					'#f3f3f3'
+				)
+			).toBe( 'black' );
+
+			expect(
+				getMostReadableColor(
+					[
+						{
+							name: 'C1',
+							slug: 'c1',
+							color: '#39373b',
+						},
+						{
+							name: 'C2',
+							slug: 'c2',
+							color: '#a25de6',
+						},
+					],
+					'#9853ff'
+				)
+			).toBe( '#39373b' );
 		} );
 	} );
 } );

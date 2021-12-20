@@ -23,7 +23,7 @@ export const GLOBAL_STYLES_PALETTE = [
 ];
 
 export const GLOBAL_STYLES_GRADIENTS = {
-	core: [
+	default: [
 		{
 			name: 'Vivid cyan blue to vivid purple',
 			gradient:
@@ -138,7 +138,7 @@ export const PARSED_GLOBAL_STYLES = {
 export const RAW_FEATURES = {
 	color: {
 		palette: {
-			core: [
+			default: [
 				{
 					name: 'Black',
 					slug: 'black',
@@ -174,7 +174,7 @@ export const RAW_FEATURES = {
 			],
 		},
 		gradients: {
-			core: [
+			default: [
 				{
 					name: 'Vivid cyan blue to vivid purple',
 					gradient:
@@ -204,21 +204,24 @@ export const RAW_FEATURES = {
 	},
 	typography: {
 		fontSizes: {
-			core: [
+			default: [
 				{
 					name: 'Small',
 					slug: 'small',
 					size: '13px',
+					sizePx: '13px',
 				},
 				{
 					name: 'Normal',
 					slug: 'normal',
 					size: '16px',
+					sizePx: '16px',
 				},
 				{
 					name: 'Huge',
 					slug: 'huge',
 					size: '42px',
+					sizePx: '42px',
 				},
 			],
 			theme: [
@@ -226,15 +229,18 @@ export const RAW_FEATURES = {
 					name: 'Normal',
 					slug: 'normal',
 					size: '18px',
+					sizePx: '18px',
 				},
 				{
 					slug: 'extra-large',
 					size: '40px',
+					sizePx: '40px',
 					name: 'Extra large',
 				},
 				{
 					slug: 'gigantic',
 					size: '144px',
+					sizePx: '144px',
 					name: 'Gigantic',
 				},
 			],

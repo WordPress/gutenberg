@@ -54,15 +54,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
-				__unstableGetBlockWithoutInnerBlocks,
+				getBlock,
 				getBlockIndex,
 				hasBlockMovingClientId,
 				getBlockListSettings,
 			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
-			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
-				clientId
-			);
+			const { name, attributes } = getBlock( clientId );
 			const blockMovingMode = hasBlockMovingClientId();
 			return {
 				index,
@@ -102,6 +100,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		getMultiSelectedBlocksEndClientId,
 		getPreviousBlockClientId,
 		getNextBlockClientId,
+		isNavigationMode,
 	} = useSelect( blockEditorStore );
 	const {
 		selectBlock,
@@ -159,7 +158,10 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
-
+		if ( isEscape && isNavigationMode() ) {
+			clearSelectedBlock();
+			event.preventDefault();
+		}
 		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
 			setBlockMovingClientId( null );
 			event.preventDefault();

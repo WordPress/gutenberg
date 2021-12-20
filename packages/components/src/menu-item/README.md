@@ -50,6 +50,14 @@ Refer to documentation for [`label`](#label).
 
 Refer to documentation for [Button's `icon` prop](/packages/components/src/icon-button/README.md#icon).
 
+### `iconPosition`
+
+-   Type: `string`
+-   Required: No
+-   Default: `'right'`
+
+Determines where to display the provided `icon`.
+
 ### `isSelected`
 
 -   Type: `boolean`
@@ -59,10 +67,10 @@ Whether or not the menu item is currently selected.
 
 ### `shortcut`
 
--   Type: `string`
+-   Type: `string` or `object`
 -   Required: No
 
-Refer to documentation for [Shortcut's `shortcut` prop](/packages/components/src/shortcut/README.md#shortcut).
+If shortcut is a string, it is expecting the display text. If shortcut is an object, it will accept the properties of `display` (string) and `ariaLabel` (string).
 
 ### `role`
 

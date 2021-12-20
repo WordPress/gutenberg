@@ -5,7 +5,8 @@
 		"isValid": true,
 		"attributes": {
 			"showSubmenuIcon": true,
-			"isResponsive": false
+			"openSubmenusOnClick": false,
+			"overlayMenu": "mobile"
 		},
 		"innerBlocks": [],
 		"originalContent": ""

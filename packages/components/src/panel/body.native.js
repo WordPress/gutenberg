@@ -13,7 +13,10 @@ export function PanelBody( { children, title, style, titleStyle = {} } ) {
 	return (
 		<View style={ [ styles.panelContainer, style ] }>
 			{ title && (
-				<Text style={ [ styles.sectionHeaderText, titleStyle ] }>
+				<Text
+					accessibilityRole="header"
+					style={ [ styles.sectionHeaderText, titleStyle ] }
+				>
 					{ title }
 				</Text>
 			) }

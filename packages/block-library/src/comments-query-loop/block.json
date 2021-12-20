@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "core/comments-query-loop",
+	"title": "Comments Query Loop",
+	"category": "theme",
+	"description": "An advanced block that allows displaying post comments based on different query parameters and visual configurations.",
+	"textdomain": "default",
+	"attributes": {
+		"perPage": {
+			"type": "number",
+			"default": null
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		}
+	},
+	"providesContext": {
+		"comments/perPage": "perPage"
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		}
+	}
+}

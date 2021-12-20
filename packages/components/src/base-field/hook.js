@@ -23,7 +23,7 @@ import { useCx } from '../utils/hooks/use-cx';
 /** @typedef {import('../flex/types').FlexProps & OwnProps} Props */
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<Props, 'div'>} props
  */
 export function useBaseField( props ) {
 	const {

@@ -17,7 +17,7 @@ import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import {
 	getGradientAstWithDefault,
-	getLinearGradientRepresentationOfARadial,
+	getLinearGradientRepresentation,
 	getGradientAstWithControlPoints,
 	getStopCssColor,
 } from './utils';
@@ -52,8 +52,8 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 	return (
 		<AnglePickerControl
-			hideLabelFromVision
 			onChange={ onAngleChange }
+			labelPosition="top"
 			value={ hasGradient ? angle : '' }
 		/>
 	);
@@ -95,22 +95,25 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		<SelectControl
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
-			labelPosition={ 'side' }
+			labelPosition="top"
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
+			size="__unstable-large"
 			value={ hasGradient && type }
 		/>
 	);
 };
 
-export default function CustomGradientPicker( { value, onChange } ) {
+export default function CustomGradientPicker( {
+	value,
+	onChange,
+	__experimentalIsRenderedInSidebar,
+} ) {
 	const gradientAST = getGradientAstWithDefault( value );
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
-	const background =
-		gradientAST.type === 'radial-gradient'
-			? getLinearGradientRepresentationOfARadial( gradientAST )
-			: gradientAST.value;
+	// On liner gradients the bar represents the color stops from left to right independently of the angle.
+	const background = getLinearGradientRepresentation( gradientAST );
 	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
 	// Control points color option may be hex from presets, custom colors will be rgb.
 	// The position should always be a percentage.
@@ -122,6 +125,9 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	return (
 		<div className="components-custom-gradient-picker">
 			<CustomGradientBar
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
 				background={ background }
 				hasGradient={ hasGradient }
 				value={ controlPoints }

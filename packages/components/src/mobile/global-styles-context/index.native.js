@@ -15,6 +15,7 @@ import {
 	BLOCK_STYLE_ATTRIBUTES,
 	getBlockPaddings,
 	getBlockColors,
+	getBlockTypography,
 } from './utils';
 
 const GlobalStylesContext = createContext( { style: {} } );
@@ -27,7 +28,8 @@ export const getMergedGlobalStyles = (
 	wrapperPropsStyle,
 	blockAttributes,
 	defaultColors,
-	blockName
+	blockName,
+	fontSizes
 ) => {
 	const baseGlobalColors = {
 		baseColors: baseGlobalStyles || {},
@@ -60,8 +62,19 @@ export const getMergedGlobalStyles = (
 		blockStyleAttributes,
 		blockColors
 	);
+	const blockTypography = getBlockTypography(
+		blockStyleAttributes,
+		fontSizes,
+		blockName,
+		baseGlobalStyles
+	);
 
-	return { ...mergedStyle, ...blockPaddings, ...blockColors };
+	return {
+		...mergedStyle,
+		...blockPaddings,
+		...blockColors,
+		...blockTypography,
+	};
 };
 
 export const useGlobalStyles = () => {

@@ -6,7 +6,7 @@ import { find, get, includes, union } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Button, SelectControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
@@ -107,7 +107,11 @@ export default function PostFormat() {
 								onUpdatePostFormat( suggestion.id )
 							}
 						>
-							{ suggestion.caption }
+							{ sprintf(
+								/* translators: %s: post format */
+								__( 'Apply format: %s' ),
+								suggestion.caption
+							) }
 						</Button>
 					</div>
 				) }

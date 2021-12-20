@@ -11,6 +11,7 @@ import {
 	formatItalic,
 	link as linkIcon,
 	more,
+	wordpress,
 } from '@wordpress/icons';
 
 /**
@@ -19,7 +20,13 @@ import {
 import './style.css';
 import Button from '../';
 
-export default { title: 'Components/Button', component: Button };
+export default {
+	title: 'Components/Button',
+	component: Button,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const label = text( 'Label', 'Default Button' );
@@ -133,21 +140,19 @@ export const destructiveLink = () => {
 };
 
 export const icon = () => {
-	const usedIcon = text( 'Icon', 'ellipsis' );
-	const label = text( 'Label', 'More' );
-	const size = number( 'Size' );
+	const label = text( 'Label', 'Code is poetry' );
+	const size = number( 'Size', 24 );
 
-	return <Button icon={ usedIcon } label={ label } iconSize={ size } />;
+	return <Button icon={ wordpress } label={ label } iconSize={ size } />;
 };
 
 export const disabledFocusableIcon = () => {
-	const usedIcon = text( 'Icon', 'ellipsis' );
-	const label = text( 'Label', 'More' );
-	const size = number( 'Size' );
+	const label = text( 'Label', 'Code is poetry' );
+	const size = number( 'Size', 24 );
 
 	return (
 		<Button
-			icon={ usedIcon }
+			icon={ wordpress }
 			label={ label }
 			iconSize={ size }
 			disabled

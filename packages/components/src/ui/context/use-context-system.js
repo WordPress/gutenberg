@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @template TProps
- * @typedef {TProps & { className: string; }} ConnectedProps
+ * @typedef {TProps & { className: string }} ConnectedProps
  */
 
 /**

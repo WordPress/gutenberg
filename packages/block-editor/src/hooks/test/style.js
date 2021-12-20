@@ -24,11 +24,13 @@ describe( 'getInlineStyles', () => {
 					color: '#21759b',
 				},
 				spacing: {
+					blockGap: '1em',
 					padding: { top: '10px' },
 					margin: { bottom: '15px' },
 				},
 			} )
 		).toEqual( {
+			'--wp--style--block-gap': '1em',
 			backgroundColor: 'black',
 			borderColor: '#21759b',
 			borderRadius: '10px',
@@ -96,11 +98,13 @@ describe( 'getInlineStyles', () => {
 		expect(
 			getInlineStyles( {
 				spacing: {
+					blockGap: '1em',
 					margin: '10px',
 					padding: '20px',
 				},
 			} )
 		).toEqual( {
+			'--wp--style--block-gap': '1em',
 			margin: '10px',
 			padding: '20px',
 		} );

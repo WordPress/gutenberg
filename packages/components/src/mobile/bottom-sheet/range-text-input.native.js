@@ -194,6 +194,7 @@ class RangeTextInput extends Component {
 			} ),
 			{
 				width: 50 * fontScale,
+				borderRightWidth: children ? 1 : 0,
 			},
 		];
 

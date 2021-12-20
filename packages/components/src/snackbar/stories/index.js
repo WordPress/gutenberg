@@ -8,7 +8,13 @@ import { text } from '@storybook/addon-knobs';
  */
 import Snackbar from '../';
 
-export default { title: 'Components/Snackbar', component: Snackbar };
+export default {
+	title: 'Components/Snackbar',
+	component: Snackbar,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const content = text(

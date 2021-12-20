@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice } from '@wordpress/components';
+import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
 import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
@@ -93,6 +94,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
+ * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
  */
 
 /**
@@ -119,6 +121,8 @@ function LinkControl( {
 	noURLSuggestion = false,
 	createSuggestionButtonText,
 	hasRichPreviews = false,
+	hasTextControl = false,
+	renderControlBottom = null,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -126,8 +130,13 @@ function LinkControl( {
 
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
+	const textInputRef = useRef();
+
 	const [ internalInputValue, setInternalInputValue ] = useState(
-		( value && value.url ) || ''
+		value?.url || ''
+	);
+	const [ internalTextValue, setInternalTextValue ] = useState(
+		value?.title || ''
 	);
 	const currentInputValue = propInputValue || internalInputValue;
 	const [ isEditingLink, setIsEditingLink ] = useState(
@@ -136,6 +145,8 @@ function LinkControl( {
 			: ! value || ! value.url
 	);
 	const isEndingEditWithFocus = useRef( false );
+
+	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
 	useEffect( () => {
 		if (
@@ -147,21 +158,52 @@ function LinkControl( {
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
+		// We don't auto focus into the Link UI on mount
+		// because otherwise using the keyboard to select text
+		// *within* the link format is not possible.
 		if ( isMounting.current ) {
 			isMounting.current = false;
 			return;
 		}
+		// Unless we are mounting, we always want to focus either:
+		// - the URL input
+		// - the first focusable element in the Link UI.
+		// But in editing mode if there is a text input present then
+		// the URL input is at index 1. If not then it is at index 0.
+		const whichFocusTargetIndex = textInputRef?.current ? 1 : 0;
 
-		// When switching between editable and non editable LinkControl
-		// move focus to the first element to avoid focus loss.
+		// Scenario - when:
+		// - switching between editable and non editable LinkControl
+		// - clicking on a link
+		// ...then move focus to the *first* element to avoid focus loss
+		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[ 0 ] ||
-			wrapperNode.current;
+			focus.focusable.find( wrapperNode.current )[
+				whichFocusTargetIndex
+			] || wrapperNode.current;
 
 		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink ] );
+
+	useEffect( () => {
+		/**
+		 * If the value's `text` property changes then sync this
+		 * back up with state.
+		 */
+		if ( value?.title && value.title !== internalTextValue ) {
+			setInternalTextValue( value.title );
+		}
+
+		/**
+		 * Update the state value internalInputValue if the url value changes
+		 * for example when clicking on another anchor
+		 */
+		if ( value?.url ) {
+			setInternalInputValue( value.url );
+		}
+	}, [ value ] );
 
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
@@ -180,21 +222,46 @@ function LinkControl( {
 	);
 
 	const handleSelectSuggestion = ( updatedValue ) => {
-		onChange( updatedValue );
+		onChange( {
+			...updatedValue,
+			title: internalTextValue || updatedValue?.title,
+		} );
 		stopEditing();
 	};
 
-	const handleSubmitButton = () => {
-		if ( currentInputValue !== value?.url ) {
-			onChange( { url: currentInputValue } );
+	const handleSubmit = () => {
+		if (
+			currentInputValue !== value?.url ||
+			internalTextValue !== value?.title
+		) {
+			onChange( {
+				url: currentInputValue,
+				title: internalTextValue,
+			} );
 		}
 		stopEditing();
+	};
+
+	const handleSubmitWithEnter = ( event ) => {
+		const { keyCode } = event;
+		if (
+			keyCode === ENTER &&
+			! currentInputIsEmpty // disallow submitting empty values.
+		) {
+			event.preventDefault();
+			handleSubmit();
+		}
 	};
 
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
 	const showSettingsDrawer = !! settings?.length;
+
+	// Only show text control once a URL value has been committed
+	// and it isn't just empty whitespace.
+	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
+	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
 	return (
 		<div
@@ -210,10 +277,26 @@ function LinkControl( {
 
 			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
 				<>
-					<div className="block-editor-link-control__search-input-wrapper">
+					<div
+						className={ classnames( {
+							'block-editor-link-control__search-input-wrapper': true,
+							'has-text-control': showTextControl,
+						} ) }
+					>
+						{ showTextControl && (
+							<TextControl
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label="Text"
+								value={ internalTextValue }
+								onChange={ setInternalTextValue }
+								onKeyDown={ handleSubmitWithEnter }
+							/>
+						) }
+
 						<LinkControlSearchInput
 							currentLink={ value }
-							className="block-editor-link-control__search-input"
+							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
 							value={ currentInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
@@ -228,20 +311,15 @@ function LinkControl( {
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}
+							useLabel={ showTextControl }
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
-									onClick={ () => handleSubmitButton() }
-									onKeyDown={ ( event ) => {
-										const { keyCode } = event;
-										if ( keyCode === ENTER ) {
-											event.preventDefault();
-											handleSubmitButton();
-										}
-									} }
+									onClick={ handleSubmit }
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
+									disabled={ currentInputIsEmpty } // disallow submitting empty values.
 								/>
 							</div>
 						</LinkControlSearchInput>
@@ -264,28 +342,21 @@ function LinkControl( {
 					value={ value }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
+					hasUnlinkControl={ shownUnlinkControl }
+					onRemove={ onRemove }
 				/>
 			) }
 
-			{ ( showSettingsDrawer || shownUnlinkControl ) && (
+			{ showSettingsDrawer && (
 				<div className="block-editor-link-control__tools">
 					<LinkControlSettingsDrawer
 						value={ value }
 						settings={ settings }
 						onChange={ onChange }
 					/>
-					{ shownUnlinkControl && (
-						<Button
-							className="block-editor-link-control__unlink"
-							isDestructive
-							variant="link"
-							onClick={ onRemove }
-						>
-							{ __( 'Unlink' ) }
-						</Button>
-					) }
 				</div>
 			) }
+			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);
 }

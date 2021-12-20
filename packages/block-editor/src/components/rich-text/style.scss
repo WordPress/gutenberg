@@ -1,8 +1,4 @@
-.block-editor-rich-text__editable {
-	> p:first-child {
-		margin-top: 0;
-	}
-
+.rich-text {
 	[data-rich-text-placeholder] {
 		pointer-events: none;
 	}
@@ -21,6 +17,12 @@
 		[data-rich-text-format-boundary] {
 			border-radius: 2px;
 		}
+	}
+}
+
+.block-editor-rich-text__editable {
+	> p:first-child {
+		margin-top: 0;
 	}
 }
 

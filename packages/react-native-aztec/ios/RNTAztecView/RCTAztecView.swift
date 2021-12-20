@@ -41,7 +41,7 @@ class RCTAztecView: Aztec.TextView {
         get {
             return super.textAlignment
         }
-    }    
+    }
 
     private var previousContentSize: CGSize = .zero
 
@@ -109,6 +109,10 @@ class RCTAztecView: Aztec.TextView {
     /// Font weight for all contents.  Once this is set, it will always override the font weight for all of its
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontWeight: String? = nil
+    
+    /// Line height for all contents.  Once this is set, it will always override the font size for all of its
+    /// contents, regardless of what HTML is provided to Aztec.
+    private var lineHeight: CGFloat? = nil
 
     // MARK: - Formats
 
@@ -117,6 +121,7 @@ class RCTAztecView: Aztec.TextView {
         .italic: "italic",
         .strikethrough: "strikethrough",
         .link: "link",
+        .mark: "mark"
     ]
 
     override init(defaultFont: UIFont, defaultParagraphStyle: ParagraphStyle, defaultMissingImage: UIImage) {
@@ -588,6 +593,7 @@ class RCTAztecView: Aztec.TextView {
         }
         fontSize = size
         refreshFont()
+        refreshLineHeight()
     }
 
     @objc func setFontWeight(_ weight: String) {
@@ -596,6 +602,14 @@ class RCTAztecView: Aztec.TextView {
         }
         fontWeight = weight
         refreshFont()
+    }
+    
+    @objc func setLineHeight(_ newLineHeight: CGFloat) {
+        guard lineHeight != newLineHeight else {
+            return
+        }
+        lineHeight = newLineHeight
+        refreshLineHeight()
     }
 
     // MARK: - Font Refreshing
@@ -650,8 +664,22 @@ class RCTAztecView: Aztec.TextView {
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let currentFont = font(from: typingAttributes)        
+        let currentFont = font(from: typingAttributes)
         placeholderLabel.font = currentFont
+    }
+    
+    /// This method refreshes the line height.
+    private func refreshLineHeight() {
+        if let lineHeight = lineHeight {
+            let attributeString = NSMutableAttributedString(string: self.text)
+            let style = NSMutableParagraphStyle()
+            let currentFontSize = fontSize ?? defaultFont.pointSize
+            let lineSpacing = ((currentFontSize * lineHeight) / UIScreen.main.scale) - (currentFontSize / lineHeight) / 2
+
+            style.lineSpacing = lineSpacing
+            defaultParagraphStyle.regularLineSpacing = lineSpacing
+            textStorage.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSMakeRange(0, textStorage.length))
+        }
     }
 
     // MARK: - Formatting interface
@@ -662,6 +690,7 @@ class RCTAztecView: Aztec.TextView {
         case "bold": toggleBold(range: emptyRange)
         case "italic": toggleItalic(range: emptyRange)
         case "strikethrough": toggleStrikethrough(range: emptyRange)
+        case "mark": toggleMark(range: emptyRange)
         default: print("Format not recognized")
         }
     }

@@ -34,7 +34,7 @@ export default function HomeEdit( {
 
 	const { textColor, backgroundColor, style } = context;
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: classnames( 'wp-block-navigation-item', {
 			'has-text-color': !! textColor || !! style?.color?.text,
 			[ `has-${ textColor }-color` ]: !! textColor,
 			'has-background': !! backgroundColor || !! style?.color?.background,
@@ -58,7 +58,7 @@ export default function HomeEdit( {
 		<>
 			<div { ...blockProps }>
 				<a
-					className="wp-block-home-link__content"
+					className="wp-block-home-link__content wp-block-navigation-item__content"
 					href={ homeUrl }
 					onClick={ preventDefault }
 				>

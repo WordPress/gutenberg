@@ -51,10 +51,7 @@ export const Edit = ( props ) => {
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
 
-	if (
-		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false )
-	) {
+	if ( blockType.apiVersion > 1 ) {
 		return <Component { ...props } context={ context } />;
 	}
 

@@ -19,7 +19,7 @@ exports[`props should render correctly 1`] = `
   width: 100%;
 }
 
-.emotion-0>*+*:not(marquee) {
+.emotion-0>*+*:not( marquee ) {
   margin-left: -1px;
 }
 

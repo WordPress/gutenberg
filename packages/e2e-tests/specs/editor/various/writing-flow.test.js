@@ -9,12 +9,11 @@ import {
 	pressKeyWithModifier,
 	insertBlock,
 	clickBlockToolbarButton,
-	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
 	page.evaluate(
-		() => wp.data.select( 'core/block-editor' ).getSelectedBlock().name
+		() => wp.data.select( 'core/block-editor' ).getSelectedBlock()?.name
 	);
 
 const addParagraphsAndColumnsDemo = async () => {
@@ -46,9 +45,11 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
 	await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 
-	// Arrow down from last of layouts exits nested context to default
-	// appender of root level.
-	await page.keyboard.press( 'ArrowDown' );
+	await page.keyboard.press( 'Escape' ); // Enter navigation mode
+	await page.keyboard.press( 'ArrowLeft' ); // move to the column block
+	await page.keyboard.press( 'ArrowLeft' ); // move to the columns block
+	await page.keyboard.press( 'Enter' ); // Enter edit mode with the columns block selected
+	await page.keyboard.press( 'Enter' ); // Creates a paragraph after the columns block.
 	await page.keyboard.type( 'Second paragraph' );
 };
 
@@ -289,29 +290,30 @@ describe( 'Writing Flow', () => {
 	it( 'should navigate native inputs vertically, not horizontally', async () => {
 		// See: https://github.com/WordPress/gutenberg/issues/9626
 
-		// Title is within the editor's writing flow, and is a <textarea>
-		await page.click( '.editor-post-title' );
+		await insertBlock( 'Shortcode' );
+		await insertBlock( 'Paragraph' );
+		await await page.click( '.wp-block-shortcode' );
 
 		// Should remain in title upon ArrowRight:
 		await page.keyboard.press( 'ArrowRight' );
-		let isInTitle = await page.evaluate(
-			() => !! document.activeElement.closest( '.editor-post-title' )
+		let isInShortcodeBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-shortcode' )
 		);
-		expect( isInTitle ).toBe( true );
+		expect( isInShortcodeBlock ).toBe( true );
 
 		// Should remain in title upon modifier + ArrowDown:
 		await pressKeyWithModifier( 'primary', 'ArrowDown' );
-		isInTitle = await page.evaluate(
-			() => !! document.activeElement.closest( '.editor-post-title' )
+		isInShortcodeBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-shortcode' )
 		);
-		expect( isInTitle ).toBe( true );
+		expect( isInShortcodeBlock ).toBe( true );
 
-		// Should navigate into blocks list upon ArrowDown:
+		// Should navigate to the next block.
 		await page.keyboard.press( 'ArrowDown' );
-		const isInBlock = await page.evaluate(
-			() => !! document.activeElement.closest( '[data-type]' )
+		const isInParagraphBlock = await page.evaluate(
+			() => !! document.activeElement.closest( '.wp-block-paragraph' )
 		);
-		expect( isInBlock ).toBe( true );
+		expect( isInParagraphBlock ).toBe( true );
 	} );
 
 	it( 'should not delete surrounding space when deleting a word with Backspace', async () => {
@@ -557,7 +559,10 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
 		await clickBlockToolbarButton( 'Align' );
-		await clickButton( 'Wide width' );
+		const wideButton = await page.waitForXPath(
+			`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
+		);
+		await wideButton.click();
 
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
@@ -624,5 +629,25 @@ describe( 'Writing Flow', () => {
 				document.activeElement.getAttribute( 'aria-label' )
 			)
 		).toBe( 'Table' );
+	} );
+
+	it( 'Should unselect all blocks when hitting double escape', async () => {
+		// Add demo content.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Random Paragraph' );
+
+		// Select a block.
+		let activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
+
+		// First escape enters navigaiton mode.
+		await page.keyboard.press( 'Escape' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
+
+		// Second escape unselects the blocks.
+		await page.keyboard.press( 'Escape' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( undefined );
 	} );
 } );

@@ -39,9 +39,11 @@ const MediaReplaceFlow = ( {
 	onSelect,
 	onSelectURL,
 	onFilesUpload = noop,
+	onCloseModal = noop,
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
+	children,
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
@@ -77,8 +79,9 @@ const MediaReplaceFlow = ( {
 	};
 
 	const selectMedia = ( media ) => {
-		onSelect( media );
 		setMediaURLValue( media.url );
+		// Calling `onSelect` after the state update since it might unmount the component.
+		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
 		removeNotice( errorNoticeID );
 	};
@@ -134,6 +137,7 @@ const MediaReplaceFlow = ( {
 							value={ mediaId }
 							onSelect={ ( media ) => selectMedia( media ) }
 							allowedTypes={ allowedTypes }
+							onClose={ onCloseModal }
 							render={ ( { open } ) => (
 								<MenuItem icon={ mediaIcon } onClick={ open }>
 									{ __( 'Open Media Library' ) }
@@ -160,6 +164,7 @@ const MediaReplaceFlow = ( {
 								} }
 							/>
 						</MediaUploadCheck>
+						{ children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
