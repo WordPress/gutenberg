@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/primitives",
-	"version": "3.0.4",
+	"version": "3.0.5-next.33ec3857e2.0",
 	"description": "WordPress cross-platform primitives.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
