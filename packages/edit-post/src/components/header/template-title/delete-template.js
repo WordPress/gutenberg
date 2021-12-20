@@ -25,7 +25,10 @@ import { store as editPostStore } from '../../../store';
 
 function DeleteTemplateConfirm( props ) {
 	return props.showConfirmDialog ? (
-		<ConfirmDialog onConfirm={ props.onConfirm }>
+		<ConfirmDialog
+			onConfirm={ props.onConfirm }
+			onCancel={ props.confirmStateResetHandler }
+		>
 			{ sprintf(
 				/* translators: %s: template name */
 				__(
@@ -61,6 +64,10 @@ export default function DeleteTemplate() {
 	if ( template?.title ) {
 		templateTitle = template.title;
 	}
+
+	const confirmStateResetHandler = () => {
+		setShowConfirmDialog( false );
+	};
 
 	const onDelete = () => {
 		clearSelectedBlock();
@@ -99,6 +106,7 @@ export default function DeleteTemplate() {
 				</MenuItem>
 				<DeleteTemplateConfirm
 					showConfirmDialog={ showConfirmDialog }
+					confirmStateResetHandler={ confirmStateResetHandler }
 					templateTitle={ templateTitle }
 					onConfirm={ onDelete }
 				/>
