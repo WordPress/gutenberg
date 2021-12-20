@@ -25,7 +25,7 @@ export default function InserterSidebar() {
 	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
 
 	const closeInserter = useCallback( () => {
-		return () => setIsInserterOpened( false );
+		return setIsInserterOpened( false );
 	}, [ setIsInserterOpened ] );
 
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
