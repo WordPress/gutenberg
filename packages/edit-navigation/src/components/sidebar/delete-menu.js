@@ -11,7 +11,10 @@ import { useState } from '@wordpress/element';
 
 function DeleteMenuConfirm( props ) {
 	return props.showConfirmDialog ? (
-		<ConfirmDialog onConfirm={ props.onDeleteMenu }>
+		<ConfirmDialog
+			onConfirm={ props.onDeleteMenu }
+			onCancel={ props.confirmStateResetHandler }
+		>
 			Are you sure you want to delete this navigation? This action cannot
 			be undone.
 		</ConfirmDialog>
@@ -20,6 +23,11 @@ function DeleteMenuConfirm( props ) {
 
 export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
+
+	const confirmStateResetHandler = () => {
+		setShowConfirmDialog( false );
+	};
+
 	return (
 		<PanelBody>
 			<>
@@ -37,6 +45,7 @@ export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 				<DeleteMenuConfirm
 					onDeleteMenu={ onDeleteMenu }
 					showConfirmDialog={ showConfirmDialog }
+					confirmStateResetHandler={ confirmStateResetHandler }
 				/>
 			</>
 		</PanelBody>
