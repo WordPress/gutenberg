@@ -52,8 +52,10 @@ const registerGutenberg = ( {
 				beforeInitCallback( parentProps );
 			}
 
-			// Initialize editor
+			// We have to lazy import the setup code to prevent executing any code located
+			// at global scope before the editor is initialized, like translations retrieval.
 			const setup = require( './setup' ).default;
+			// Initialize editor
 			this.editorComponent = setup();
 
 			// Dispatch pre-render hooks
