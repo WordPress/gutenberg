@@ -74,46 +74,32 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				}
 			}
 
-			let resizeObserver, mutationObserver;
+			let resizeObserver;
 
-			function registerObservers() {
+			function registerObserver() {
 				resizeObserver?.disconnect();
-				mutationObserver?.disconnect();
 
 				resizeObserver = new iframe.contentWindow.ResizeObserver(
 					resizeHeight
 				);
-				mutationObserver = new iframe.contentWindow.MutationObserver(
-					resizeHeight
-				);
-
 				// Observing the <html> rather than the <body> because the latter
 				// gets destroyed and remounted after initialization in <Iframe>.
 				resizeObserver.observe(
 					iframe.contentDocument.documentElement
-				);
-				mutationObserver.observe(
-					iframe.contentDocument.documentElement,
-					{
-						subtree: true,
-						childList: true,
-						characterData: true,
-					}
 				);
 
 				resizeHeight();
 			}
 
 			// This is only required in Firefox for some unknown reasons.
-			iframe.addEventListener( 'load', registerObservers );
+			iframe.addEventListener( 'load', registerObserver );
 			// This is required in Chrome and Safari.
-			registerObservers();
+			registerObserver();
 
 			return () => {
 				iframe.contentWindow?.cancelAnimationFrame( animationFrame );
 				resizeObserver?.disconnect();
-				mutationObserver?.disconnect();
-				iframe.removeEventListener( 'load', registerObservers );
+				iframe.removeEventListener( 'load', registerObserver );
 			};
 		},
 		[ enableResizing ]
