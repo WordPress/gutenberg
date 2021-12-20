@@ -18,7 +18,7 @@ const config = {
 	trailingComma: 'es5',
 	bracketSpacing: true,
 	parenSpacing: true,
-	jsxBracketSameLine: false,
+	bracketSameLine: false,
 	semi: true,
 	arrowParens: 'always',
 };
