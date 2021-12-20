@@ -37,7 +37,7 @@ Prompt visitors to take action with a button-style link.
 
 -	**Name:** core/button
 -	**Category:** design
--	**Supports:** align, anchor, color (gradients), spacing (padding), typography (fontSize), ~~alignWide~~, ~~reusable~~
+-	**Supports:** align, anchor, color (background, gradients, text), spacing (padding), typography (fontSize), ~~alignWide~~, ~~reusable~~
 -	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, text, textColor, title, url, width
 
 ## Buttons
@@ -82,7 +82,7 @@ A single column within a columns block.
 
 -	**Name:** core/column
 -	**Category:** text
--	**Supports:** anchor, color (gradients, link), spacing (padding), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (padding), ~~html~~, ~~reusable~~
 -	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
 
 ## Columns
@@ -91,7 +91,7 @@ Display content in multiple columns, with blocks added to each column.
 
 -	**Name:** core/columns
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (gradients, link), spacing (blockGap, margin, padding), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), ~~html~~
 -	**Attributes:** isStackedOnMobile, verticalAlignment
 
 ## Comment Author Avatar
@@ -109,7 +109,7 @@ Add the author name of this comment.
 
 -	**Name:** core/comment-author-name
 -	**Category:** theme
--	**Supports:** color (gradients, link), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, linkTarget, textAlign
 
 ## Comment Content
@@ -118,7 +118,7 @@ Displays the contents of a comment.
 
 -	**Name:** core/comment-content
 -	**Category:** theme
--	**Supports:** color (gradients, link), spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Comment Date
@@ -127,7 +127,7 @@ Add the date of this comment.
 
 -	**Name:** core/comment-date
 -	**Category:** theme
--	**Supports:** color (gradients, link), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** format, isLink
 
 ## Comment Edit Link
@@ -136,7 +136,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
--	**Supports:** color (gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** linkTarget, textAlign
 
 ## Comment Reply Link
@@ -145,7 +145,7 @@ Displays a link to reply to a comment.
 
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
--	**Supports:** color (gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Comment Template
@@ -163,7 +163,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 
 -	**Name:** core/comments-pagination
 -	**Category:** design
--	**Supports:** align, color (gradients, link), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
 ## Comments Pagination Numbers
@@ -181,7 +181,7 @@ An advanced block that allows displaying post comments based on different query 
 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
--	**Supports:** align (full, wide), color (gradients, link), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
 -	**Attributes:** perPage, tagName
 
 ## Cover
@@ -235,7 +235,7 @@ Combine blocks into a group.
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (gradients, link), spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## Heading
@@ -244,7 +244,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 -	**Name:** core/heading
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (link), spacing (margin), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, link, text), spacing (margin), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, level, placeholder, textAlign
 
 ## Home Link
@@ -298,7 +298,7 @@ Create a bulleted or numbered list.
 
 -	**Name:** core/list
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (gradients, link), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## Login/out
@@ -316,7 +316,7 @@ Set media and words side-by-side for a richer layout.
 
 -	**Name:** core/media-text
 -	**Category:** media
--	**Supports:** align (full, wide), anchor, color (gradients, link), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), ~~html~~
 -	**Attributes:** align, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
 
 ## Unsupported
@@ -397,7 +397,7 @@ Start with the building block of all narrative.
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (link), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, link, text), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** align, content, direction, dropCap, placeholder
 
 ## Pattern
@@ -415,7 +415,7 @@ Add the author of this post.
 
 -	**Name:** core/post-author
 -	**Category:** theme
--	**Supports:** color (gradients, link), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** avatarSize, byline, showAvatar, showBio, textAlign
 
 ## Post Comment (deprecated)
@@ -433,7 +433,7 @@ Display a post's comments.
 
 -	**Name:** core/post-comments
 -	**Category:** theme
--	**Supports:** align (full, wide), color (gradients, link), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Post Comments Count
@@ -442,7 +442,7 @@ Display a post's comments count.
 
 -	**Name:** core/post-comments-count
 -	**Category:** theme
--	**Supports:** color (gradients), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Post Comments Form
@@ -451,7 +451,7 @@ Display a post's comments form.
 
 -	**Name:** core/post-comments-form
 -	**Category:** theme
--	**Supports:** color (gradients, link), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Post Comments Link
@@ -460,7 +460,7 @@ Displays the link to the current post comments.
 
 -	**Name:** core/post-comments-link
 -	**Category:** theme
--	**Supports:** color (link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Post Content
@@ -478,7 +478,7 @@ Add the date of this post.
 
 -	**Name:** core/post-date
 -	**Category:** theme
--	**Supports:** color (gradients, link), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** format, isLink, textAlign
 
 ## Post Excerpt
@@ -487,7 +487,7 @@ Display a post's excerpt.
 
 -	**Name:** core/post-excerpt
 -	**Category:** theme
--	**Supports:** color (gradients, link), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** moreText, showMoreOnNewLine, textAlign
 
 ## Post Featured Image
@@ -523,7 +523,7 @@ Post terms.
 
 -	**Name:** core/post-terms
 -	**Category:** theme
--	**Supports:** color (gradients, link), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** separator, term, textAlign
 
 ## Post Title
@@ -532,7 +532,7 @@ Displays the title of a post, page, or any other content-type.
 
 -	**Name:** core/post-title
 -	**Category:** theme
--	**Supports:** align (full, wide), color (gradients, link), spacing (margin), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (margin), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, level, linkTarget, rel, textAlign
 
 ## Preformatted
@@ -541,7 +541,7 @@ Add text that respects your spacing and tabs, and also allows styling.
 
 -	**Name:** core/preformatted
 -	**Category:** text
--	**Supports:** anchor, color (gradients), typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, text), typography (fontSize, lineHeight)
 -	**Attributes:** content
 
 ## Pullquote
@@ -550,7 +550,7 @@ Give special visual emphasis to a quote from your text.
 
 -	**Name:** core/pullquote
 -	**Category:** text
--	**Supports:** align (full, left, right, wide), anchor, color (background, gradients, link), typography (fontSize, lineHeight)
+-	**Supports:** align (full, left, right, wide), anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
 -	**Attributes:** citation, textAlign, value
 
 ## Query Loop
@@ -559,7 +559,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** core/query
 -	**Category:** theme
--	**Supports:** align (full, wide), color (gradients, link), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
 -	**Attributes:** displayLayout, query, queryId, tagName
 
 ## Pagination
@@ -568,7 +568,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable.
 
 -	**Name:** core/query-pagination
 -	**Category:** design
--	**Supports:** align, color (gradients, link), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
 ## Next Page
@@ -577,7 +577,7 @@ Displays the next posts page link.
 
 -	**Name:** core/query-pagination-next
 -	**Category:** design
--	**Supports:** color (gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Page Numbers
@@ -595,7 +595,7 @@ Displays the previous posts page link.
 
 -	**Name:** core/query-pagination-previous
 -	**Category:** design
--	**Supports:** color (gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Query Title
@@ -604,7 +604,7 @@ Display the query title.
 
 -	**Name:** core/query-title
 -	**Category:** theme
--	**Supports:** align (full, wide), color (gradients), spacing (margin), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, text), spacing (margin), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** level, textAlign, type
 
 ## Quote
@@ -631,7 +631,7 @@ Help visitors find your content.
 
 -	**Name:** core/search
 -	**Category:** widgets
--	**Supports:** align (center, left, right), color (gradients), ~~html~~
+-	**Supports:** align (center, left, right), color (background, gradients, text), ~~html~~
 -	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, showLabel, width, widthUnit
 
 ## Separator
@@ -667,7 +667,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 
 -	**Name:** core/site-tagline
 -	**Category:** theme
--	**Supports:** align (full, wide), color (gradients), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Site Title
@@ -676,7 +676,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 -	**Name:** core/site-title
 -	**Category:** theme
--	**Supports:** align (full, wide), color (gradients, link), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, level, linkTarget, textAlign
 
 ## Social Icon
@@ -712,7 +712,7 @@ Create structured content in rows and columns to display information.
 
 -	**Name:** core/table
 -	**Category:** text
--	**Supports:** align, anchor, color (gradients), typography (fontSize, lineHeight)
+-	**Supports:** align, anchor, color (background, gradients, text), typography (fontSize, lineHeight)
 -	**Attributes:** body, caption, foot, hasFixedLayout, head
 
 ## Table of Contents
@@ -748,7 +748,7 @@ Display the description of categories, tags and custom taxonomies when viewing a
 
 -	**Name:** core/term-description
 -	**Category:** theme
--	**Supports:** align (full, wide), color (link), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, link, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Text Columns (deprecated)
@@ -766,7 +766,7 @@ Insert poetry. Use special spacing formats. Or quote song lyrics.
 
 -	**Name:** core/verse
 -	**Category:** text
--	**Supports:** anchor, color (gradients, link), spacing (padding), typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight)
 -	**Attributes:** content, textAlign
 
 ## Video
