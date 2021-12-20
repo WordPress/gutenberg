@@ -4,18 +4,11 @@
 		"name": "core/comments-pagination-previous",
 		"isValid": true,
 		"attributes": {
-			"fontSize": "extra-large",
+			"backgroundColor": "foreground",
+			"fontSize": "medium",
 			"style": {
-				"elements": {
-					"link": {
-						"color": {
-							"text": "#2405ff"
-						}
-					}
-				},
 				"typography": {
-					"fontStyle": "normal",
-					"fontWeight": "600"
+					"textTransform": "uppercase"
 				}
 			}
 		},

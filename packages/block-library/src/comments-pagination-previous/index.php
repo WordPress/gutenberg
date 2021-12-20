@@ -21,19 +21,21 @@ function render_block_core_comments_pagination_previous( $attributes, $content, 
 	if ( $pagination_arrow ) {
 		$label = $pagination_arrow . $label;
 	}
+
+	$filter_link_attributes = function() {
+		return get_block_wrapper_attributes();
+	};
+	add_filter( 'previous_comments_link_attributes', $filter_link_attributes );
+
 	$previous_comments_link = get_previous_comments_link( $label );
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	remove_filter( 'previous_comments_link_attributes', $filter_link_attributes );
 
 	if ( ! isset( $previous_comments_link ) ) {
 		return '';
 	}
 
-	return sprintf(
-		'<div %1s>%2s</div>',
-		$wrapper_attributes,
-		$previous_comments_link
-	);
+	return $previous_comments_link;
 }
 
 /**
