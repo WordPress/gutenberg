@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] Give multi-line block names central alignment in inserter [#37185]
+-   [**] Fix missing translations by refactoring the editor initialization code [#37073]
 
 ## 1.68.0
 -   [**] Fix undo/redo functionality in links when applying text format [#36861]
