@@ -7,7 +7,7 @@
 /**
  * External dependencies
  */
-const { resolve } = require( 'path' );
+const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
 const { keys } = require( 'lodash' );
@@ -16,21 +16,24 @@ const { keys } = require( 'lodash' );
  *
  * @type {string}
  */
-const ROOT_DIR = resolve( __dirname, '../..' );
+const ROOT_DIR = path.resolve( __dirname, '../..' );
 
 /**
  * Path to packages directory.
  *
  * @type {string}
  */
-const BLOCK_LIBRARY_DIR = resolve( ROOT_DIR, 'packages/block-library/src' );
+const BLOCK_LIBRARY_DIR = path.resolve(
+	ROOT_DIR,
+	'packages/block-library/src'
+);
 
 /**
  * Path to docs file.
  *
  * @type {string}
  */
-const BLOCK_LIBRARY_DOCS_FILE = resolve(
+const BLOCK_LIBRARY_DOCS_FILE = path.resolve(
 	ROOT_DIR,
 	'docs/reference-guides/core-blocks.md'
 );
@@ -96,6 +99,30 @@ function processObjWithInnerKeys( obj ) {
 }
 
 /**
+ * Augment supports with additional default props.
+ *
+ * The color support if specified defaults background and text, if
+ * not disabled. So adding { color: 'link' } support also brings along
+ * background and text.
+ *
+ * @param {Object} supports - keys supported by blokc
+ * @return {Object} supports augmented with defaults
+ */
+function augmentSupports( supports ) {
+	if ( 'color' in supports ) {
+		// If backgroud or text is not specified (true or false)
+		// then add it as true.a
+		if ( ! ( 'background' in supports.color ) ) {
+			supports.color.background = true;
+		}
+		if ( ! ( 'text' in supports.color ) ) {
+			supports.color.text = true;
+		}
+	}
+	return supports;
+}
+
+/**
  * Reads block.json file and returns markdown formatted entry.
  *
  * @param {string} filename
@@ -106,7 +133,8 @@ function readBlockJSON( filename ) {
 	const data = fs.readFileSync( filename, 'utf8' );
 	const blockjson = JSON.parse( data );
 
-	const supports = processObjWithInnerKeys( blockjson.supports );
+	const supportsAugmented = augmentSupports( blockjson.supports );
+	const supportsList = processObjWithInnerKeys( supportsAugmented );
 	const attributes = getTruthyKeys( blockjson.attributes );
 
 	return `
@@ -116,13 +144,17 @@ ${ blockjson.description }
 
 -	**Name:** ${ blockjson.name }
 -	**Category:** ${ blockjson.category }
--	**Supports:** ${ supports.sort().join( ', ' ) }
+-	**Supports:** ${ supportsList.sort().join( ', ' ) }
 -	**Attributes:** ${ attributes.sort().join( ', ' ) }
 `;
 }
 
-// Generate block docs
-const files = glob.sync( `${ BLOCK_LIBRARY_DIR }/*/block.json` );
+// Generate block docs.
+// Note: The replace() is to translate Windows back to Unix for fast-glob.
+const files = glob.sync(
+	path.join( BLOCK_LIBRARY_DIR, '*', 'block.json' ).replace( /\\/g, '/' )
+);
+
 let autogen = '';
 
 files.forEach( ( file ) => {
