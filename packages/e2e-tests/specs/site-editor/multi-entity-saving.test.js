@@ -260,8 +260,12 @@ describe( 'Multi-entity save flow', () => {
 			await clickButton( 'Save' );
 			await page.waitForSelector( publishPanelSelector );
 
-			await clickButton( 'Publish' ); // Make sure we can publish.
-			expect( console ).not.toHaveErrored();
+			// Make sure we can publish.
+			page.on( 'pageerror', ( err ) => {
+				// eslint-disable-next-line no-console
+				console.log( 'Error when attempting to publish post:', err );
+			} );
+			await clickButton( 'Publish' );
 
 			// Reset site entity to default value to not affect other tests.
 			await page.evaluate( () => {
