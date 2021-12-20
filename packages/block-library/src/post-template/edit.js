@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { memo, useMemo, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
@@ -40,8 +40,19 @@ function PostTemplateBlockPreview( {
 		blocks,
 	} );
 
-	const handleOnClick = () => {
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	const handleOnClick = ( event ) => {
+		const blockElement = !! event.target.getAttribute( 'data-block' )
+			? event.target
+			: event.target.closest( '[data-block]' );
+		const clientId = blockElement.getAttribute( 'data-block' );
+		event.preventDefault();
+		event.stopPropagation();
 		setActiveBlockContextId( blockContextId );
+		if ( clientId ) {
+			selectBlock( clientId );
+		}
 	};
 
 	const style = {
