@@ -21,7 +21,7 @@ export default (
 	getDefaultTranslation,
 	pluginTranslations
 ) => {
-	const setDomainLocaleData = ( getTranslation, domain = 'default' ) => {
+	const setDomainLocaleData = ( getTranslation, domain ) => {
 		let translations = getTranslation( locale );
 		if ( locale && ! translations ) {
 			// Try stripping out the regional
