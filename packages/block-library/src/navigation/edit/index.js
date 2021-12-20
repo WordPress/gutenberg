@@ -111,7 +111,11 @@ function Navigation( {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
-		layout: { justifyContent, orientation = 'horizontal' } = {},
+		layout: {
+			justifyContent,
+			orientation = 'horizontal',
+			flexWrap = 'wrap',
+		} = {},
 	} = attributes;
 
 	let areaMenu,
@@ -234,6 +238,10 @@ function Navigation( {
 		className: classnames( className, {
 			'items-justified-right': justifyContent === 'right',
 			'items-justified-space-between': justifyContent === 'space-between',
+			'items-justified-left': justifyContent === 'left',
+			'items-justified-center': justifyContent === 'center',
+			'is-vertical': orientation === 'vertical',
+			'no-wrap': flexWrap === 'nowrap',
 			'is-responsive': 'never' !== overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
