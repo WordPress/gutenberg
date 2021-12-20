@@ -368,12 +368,10 @@ export default function LogoEdit( {
 		siteIconId,
 		mediaItemData,
 		isRequestingMediaItem,
-		logoBlockCount,
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } = select(
 			coreStore
 		);
-		const { getGlobalBlockCount } = select( blockEditorStore );
 		const siteSettings = getEditedEntityRecord( 'root', 'site' );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		const _siteLogo = siteSettings?.site_logo;
@@ -404,10 +402,10 @@ export default function LogoEdit( {
 			},
 			isRequestingMediaItem: _isRequestingMediaItem,
 			siteIconId: _siteIconId,
-			logoBlockCount: getGlobalBlockCount( 'core/site-logo' ),
 		};
 	}, [] );
 
+	const { getGlobalBlockCount } = useSelect( blockEditorStore );
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	useEffect( () => {
@@ -427,9 +425,11 @@ export default function LogoEdit( {
 				return;
 			}
 
+			const logoBlockCount = getGlobalBlockCount( 'core/site-logo' );
+
 			// Only discard unsaved changes if we are removing the last Site Logo block
 			// on the page.
-			if ( logoBlockCount === 1 ) {
+			if ( logoBlockCount === 0 ) {
 				editEntityRecord( 'root', 'site', undefined, {
 					site_logo: undefined,
 					site_icon: undefined,
