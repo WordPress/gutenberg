@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.3.3-next.0 (2021-12-20)
+
 ### Internal
 
 -   The bundled `npm-package-arg` dependency has been updated from requiring `^8.0.1` to requiring `^8.1.5` ([#37395](https://github.com/WordPress/gutenberg/pull/37395)).

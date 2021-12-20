@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.9-next.0 (2021-12-20)
+
 ### Bug Fixes
 
 -   `getEntityRecords` no longer returns an empty array for unknown entities but returns `null` instead. `hasEntityRecords` now also returns `false` when the entity configuration is unknown. ([#36984](https://github.com/WordPress/gutenberg/pull/36984))

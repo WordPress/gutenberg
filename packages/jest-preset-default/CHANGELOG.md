@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.1.4-next.0 (2021-12-20)
+
 ### Bug Fixes
 
 -   Allow ESLint to be imported from within Jest (e.g. when using `ruleTester`) ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).

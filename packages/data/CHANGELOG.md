@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.1.5-next.0 (2021-12-20)
+
 ### Bug Fix
 
 -   Corrected expect type of action creators and selectors in Redux store configuration type

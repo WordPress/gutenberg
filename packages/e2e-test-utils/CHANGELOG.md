@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.0.0-next.0 (2021-12-20)
+
 -   Added `createReusableBlock` function to make it easier to create a simple reusable block ([#37333](https://github.com/WordPress/gutenberg/pull/37333)).
 
 ### New Features
