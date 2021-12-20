@@ -20,6 +20,7 @@ import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 import { addAction, addFilter } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
 import { initializeEditor } from '@wordpress/edit-post';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 let editorComponent;
 let blocksRegistered = false;
@@ -121,7 +122,6 @@ const registerBlocks = () => {
 		return;
 	}
 
-	const { registerCoreBlocks } = require( '@wordpress/block-library' );
 	registerCoreBlocks();
 
 	blocksRegistered = true;
