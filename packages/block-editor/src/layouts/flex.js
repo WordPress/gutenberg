@@ -85,10 +85,7 @@ export default {
 		);
 	},
 	save: function FlexLayoutStyle( { selector, layout } ) {
-		const {
-			orientation = 'horizontal',
-			setCascadingProperties = false,
-		} = layout;
+		const { orientation = 'horizontal' } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const justifyContent =
@@ -97,36 +94,18 @@ export default {
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
 			? layout.flexWrap
 			: 'wrap';
-		let rowOrientation = `
+		const rowOrientation = `
 		flex-direction: row;
 		align-items: center;
 		justify-content: ${ justifyContent };
 		`;
-		if ( setCascadingProperties ) {
-			// --layout-justification-setting allows children to inherit the value
-			// regardless or row or column direction.
-			rowOrientation += `
-			--layout-justification-setting: ${ justifyContent };
-			--layout-direction: row;
-			--layout-wrap: ${ flexWrap };
-			--layout-justify: ${ justifyContent };
-			--layout-align: center;
-			`;
-		}
 		const alignItems =
 			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
-		let columnOrientation = `
+		const columnOrientation = `
 		flex-direction: column;
 		align-items: ${ alignItems };
 		`;
-		if ( setCascadingProperties ) {
-			columnOrientation += `
-			--layout-justification-setting: ${ alignItems };
-			--layout-direction: column;
-			--layout-justify: initial;
-			--layout-align: ${ alignItems };
-			`;
-		}
+
 		return (
 			<style>{ `
 				${ appendSelectors( selector ) } {
