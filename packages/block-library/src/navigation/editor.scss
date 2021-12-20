@@ -372,6 +372,7 @@ $color-control-label-height: 20px;
 	font-size: $default-font-size;
 	font-family: $default-font;
 	gap: $grid-unit-15 * 0.5;
+	align-items: center;
 
 	// Margins.
 	.components-dropdown,
