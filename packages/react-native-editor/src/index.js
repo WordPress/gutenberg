@@ -30,7 +30,10 @@ import { getTranslation as getGutenbergTranslation } from '../i18n-cache';
  * @param    {Function}            arguments.beforeInitCallback Callback executed before the editor initialization.
  * @param    {PluginTranslation[]} arguments.pluginTranslations Array with plugin translations.
  */
-const registerGutenberg = ( { beforeInitCallback, pluginTranslations } ) => {
+const registerGutenberg = ( {
+	beforeInitCallback,
+	pluginTranslations = [],
+} = {} ) => {
 	class Gutenberg extends Component {
 		constructor( props ) {
 			super( props );
