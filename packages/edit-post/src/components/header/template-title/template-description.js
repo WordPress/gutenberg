@@ -28,7 +28,12 @@ export default function TemplateDescription() {
 			<Heading level={ 4 } weight={ 600 }>
 				{ title }
 			</Heading>
-			<Text size="body" as="p" style={ { marginTop: '12px' } }>
+			<Text
+				className="edit-post-template-details__description"
+				size="body"
+				as="p"
+				style={ { marginTop: '12px' } }
+			>
 				{ description }
 			</Text>
 		</>
