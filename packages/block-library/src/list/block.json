@@ -55,7 +55,7 @@
 			"link": true
 		},
 		"__unstablePasteTextInline": true,
-		"__experimentalSelector": "ol,ul",
+		"__experimentalSelector": "ol:not([class*='wp-block']),ul:not([class*='wp-block'])",
 		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-list-editor",
