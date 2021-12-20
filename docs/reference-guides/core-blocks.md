@@ -166,11 +166,20 @@ Contains the block elements used to render a comment, like the title, date, auth
 Displays a paginated navigation to next/previous set of comments, when applicable.
 
 -	**Name:** core/comments-pagination
--	**Category:** design
+-	**Category:** theme
 -	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
-## Comments Pagination Numbers
+## Next Page
+
+Displays the next comments page link.
+
+-	**Name:** core/comments-pagination-next
+-	**Category:** theme
+-	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** label
+
+## Page Numbers
 
 Displays a list of page numbers for comments pagination.
 
@@ -239,7 +248,7 @@ Combine blocks into a group.
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## Heading
