@@ -36,7 +36,7 @@ export default function InserterSidebar() {
 		inserterContentRef.current
 			.querySelector( '.block-editor-inserter__search input' )
 			.focus();
-		}, [] );
+	}, [] );
 
 	return (
 		<div

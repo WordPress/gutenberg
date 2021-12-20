@@ -39,7 +39,7 @@ export default function InserterSidebar() {
 		inserterContentRef.current
 			.querySelector( '.block-editor-inserter__search input' )
 			.focus();
-		}, [] );
+	}, [] );
 
 	return (
 		<div
@@ -48,7 +48,11 @@ export default function InserterSidebar() {
 			className="edit-widgets-layout__inserter-panel"
 		>
 			<TagName className="edit-widgets-layout__inserter-panel-header">
-				<Button icon={ close } onClick={ closeInserter } label={ __( 'Close block inserter' ) } />
+				<Button
+					icon={ close }
+					onClick={ closeInserter }
+					label={ __( 'Close block inserter' ) }
+				/>
 			</TagName>
 			<div
 				className="edit-widgets-layout__inserter-panel-content"
