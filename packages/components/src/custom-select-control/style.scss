@@ -44,10 +44,9 @@
 	outline: none;
 	transition: none;
 	max-height: 400px;
-	min-width: 130px;
 	overflow: auto;
 	padding: 0;
-	margin: 0;
+	margin: 0 -$border-width; // Allow width value to include the Popover border width.
 	z-index: z-index(".components-popover");
 }
 

@@ -104,14 +104,10 @@ export default function CustomSelectControl( {
 	const anchorRef = useRef();
 
 	// Calculate Popover width based on the size of the component's container.
-	// The width will be set for the content of the menu, so factor in the
-	// Popover's border to ensure that the menu lines up with the toggle button.
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
 	] = useResizeObserver();
-	const widthMinusBorder =
-		containerWidth >= 2 ? containerWidth - 2 : containerWidth;
 
 	function getDescribedBy() {
 		if ( describedBy ) {
@@ -130,7 +126,7 @@ export default function CustomSelectControl( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
 		style: {
-			minWidth: widthMinusBorder,
+			width: containerWidth,
 		},
 	} );
 
