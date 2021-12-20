@@ -325,8 +325,8 @@
 	},
 	{
 		"title": "Plugin Sidebar",
-		"slug": "plugin-sidebar",
-		"markdown_source": "../docs/how-to-guides/plugin-sidebar.md",
+		"slug": "plugin-sidebar-0",
+		"markdown_source": "../docs/how-to-guides/plugin-sidebar-0.md",
 		"parent": "how-to-guides"
 	},
 	{
