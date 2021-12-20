@@ -17,9 +17,9 @@ import './globals';
 import { omit } from 'lodash';
 import initialHtml from './initial-html';
 import setupLocale from './setup-locale';
-import { getTranslation } from '../i18n-cache';
+import { getTranslation as getGutenbergTranslation } from '../i18n-cache';
 
-const registerGutenberg = ( beforeInitCallback ) => {
+const registerGutenberg = ( { beforeInitCallback, pluginTranslations } ) => {
 	class Gutenberg extends Component {
 		constructor() {
 			super( ...arguments );
@@ -27,11 +27,12 @@ const registerGutenberg = ( beforeInitCallback ) => {
 			const parentProps = omit( this.props || {}, [ 'rootTag' ] );
 
 			// Setup locale
-			setupLocale( {
-				locale: parentProps.locale,
-				extraTranslations: parentProps.translations,
-				getTranslation,
-			} );
+			setupLocale(
+				parentProps.locale,
+				parentProps.translations,
+				getGutenbergTranslation,
+				pluginTranslations
+			);
 
 			if ( beforeInitCallback ) {
 				beforeInitCallback( parentProps );
