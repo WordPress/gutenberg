@@ -87,7 +87,6 @@ function GradientColorPickerDropdown( {
 		if ( isRenderedInSidebar ) {
 			result.anchorRef = gradientPickerDomRef.current;
 			result.position = isRTL() ? 'bottom right' : 'bottom left';
-			result.__unstableForcePosition = true;
 		}
 		return result;
 	}, [ gradientPickerDomRef.current, isRenderedInSidebar ] );

@@ -452,14 +452,24 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	}
 
+	$layout_justification = array(
+		'left'          => 'items-justified-left',
+		'right'         => 'items-justified-right',
+		'center'        => 'items-justified-center',
+		'space-between' => 'items-justified-space-between',
+	);
+
 	// Restore legacy classnames for submenu positioning.
 	$layout_class = '';
 	if ( isset( $attributes['layout']['justifyContent'] ) ) {
-		if ( 'right' === $attributes['layout']['justifyContent'] ) {
-			$layout_class .= 'items-justified-right';
-		} elseif ( 'space-between' === $attributes['layout']['justifyContent'] ) {
-			$layout_class .= 'items-justified-space-between';
-		}
+		$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
+	}
+	if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
+		$layout_class .= ' is-vertical';
+	}
+
+	if ( isset( $attributes['layout']['flexWrap'] ) && 'nowrap' === $attributes['layout']['flexWrap'] ) {
+		$layout_class .= ' no-wrap';
 	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );

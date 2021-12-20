@@ -361,7 +361,7 @@ Attributes may be obtained from a post's meta rather than from the block's repre
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 edit( { attributes, setAttributes } ) {
@@ -373,7 +373,7 @@ edit( { attributes, setAttributes } ) {
 },
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 edit: function( props ) {

@@ -36,6 +36,7 @@ const PaletteScreen = () => {
 		label,
 		onColorChange,
 		onGradientChange,
+		onColorCleared,
 		colorValue,
 		defaultSettings,
 		hideNavigation = false,
@@ -84,6 +85,10 @@ const PaletteScreen = () => {
 			onColorChange( '' );
 		} else {
 			onGradientChange( '' );
+		}
+
+		if ( onColorCleared ) {
+			onColorCleared();
 		}
 	}
 

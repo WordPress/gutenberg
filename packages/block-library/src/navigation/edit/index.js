@@ -39,7 +39,6 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -54,6 +53,7 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
+import useNavigationNotice from './use-navigation-notice';
 
 const EMPTY_ARRAY = [];
 
@@ -107,13 +107,15 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
-	const noticeRef = useRef();
-
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
-		layout: { justifyContent, orientation = 'horizontal' } = {},
+		layout: {
+			justifyContent,
+			orientation = 'horizontal',
+			flexWrap = 'wrap',
+		} = {},
 	} = attributes;
 
 	let areaMenu,
@@ -192,8 +194,6 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
-
 	const [
 		hasSavedUnsavedInnerBlocks,
 		setHasSavedUnsavedInnerBlocks,
@@ -220,6 +220,8 @@ function Navigation( {
 		hasResolvedCanUserUpdateNavigationEntity,
 		canUserDeleteNavigationEntity,
 		hasResolvedCanUserDeleteNavigationEntity,
+		canUserCreateNavigation,
+		hasResolvedCanUserCreateNavigation,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
@@ -237,6 +239,10 @@ function Navigation( {
 		className: classnames( className, {
 			'items-justified-right': justifyContent === 'right',
 			'items-justified-space-between': justifyContent === 'space-between',
+			'items-justified-left': justifyContent === 'left',
+			'items-justified-center': justifyContent === 'center',
+			'is-vertical': orientation === 'vertical',
+			'no-wrap': flexWrap === 'nowrap',
 			'is-responsive': 'never' !== overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
@@ -307,7 +313,7 @@ function Navigation( {
 			setDetectedColor,
 			setDetectedBackgroundColor
 		);
-		const subMenuElement = navRef.current.querySelector(
+		const subMenuElement = navRef.current?.querySelector(
 			'[data-type="core/navigation-link"] [data-type="core/navigation-link"]'
 		);
 		if ( subMenuElement ) {
@@ -336,52 +342,52 @@ function Navigation( {
 		}
 	}, [ clientId, ref, hasUncontrolledInnerBlocks, controlledInnerBlocks ] );
 
+	const [ showCantEditNotice, hideCantEditNotice ] = useNavigationNotice( {
+		name: 'block-library/core/navigation/permissions/update',
+		message: __(
+			'You do not have permission to edit this Menu. Any changes made will not be saved.'
+		),
+	} );
+
+	const [ showCantCreateNotice, hideCantCreateNotice ] = useNavigationNotice(
+		{
+			name: 'block-library/core/navigation/permissions/create',
+			message: __(
+				'You do not have permission to create Navigation Menus.'
+			),
+		}
+	);
+
 	useEffect( () => {
-		const setPermissionsNotice = () => {
-			if ( noticeRef.current ) {
-				return;
-			}
-
-			noticeRef.current =
-				'block-library/core/navigation/permissions/update';
-
-			createWarningNotice(
-				__(
-					'You do not have permission to edit this Menu. Any changes made will not be saved.'
-				),
-				{
-					id: noticeRef.current,
-					type: 'snackbar',
-				}
-			);
-		};
-
-		const removePermissionsNotice = () => {
-			if ( ! noticeRef.current ) {
-				return;
-			}
-			removeNotice( noticeRef.current );
-			noticeRef.current = null;
-		};
-
 		if ( ! isSelected && ! isInnerBlockSelected ) {
-			removePermissionsNotice();
+			hideCantEditNotice();
+			hideCantCreateNotice();
 		}
 
-		if (
-			( isSelected || isInnerBlockSelected ) &&
-			hasResolvedCanUserUpdateNavigationEntity &&
-			! canUserUpdateNavigationEntity
-		) {
-			setPermissionsNotice();
+		if ( isSelected || isInnerBlockSelected ) {
+			if (
+				hasResolvedCanUserUpdateNavigationEntity &&
+				! canUserUpdateNavigationEntity
+			) {
+				showCantEditNotice();
+			}
+
+			if (
+				! ref &&
+				hasResolvedCanUserCreateNavigation &&
+				! canUserCreateNavigation
+			) {
+				showCantCreateNotice();
+			}
 		}
 	}, [
-		ref,
-		isEntityAvailable,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserUpdateNavigationEntity,
 		isSelected,
 		isInnerBlockSelected,
+		canUserUpdateNavigationEntity,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserCreateNavigation,
+		hasResolvedCanUserCreateNavigation,
+		ref,
 	] );
 
 	const startWithEmptyMenu = useCallback( () => {
@@ -488,6 +494,7 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
+										showCreate={ canUserCreateNavigation }
 									/>
 								) }
 							</ToolbarDropdownMenu>
@@ -642,11 +649,13 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 							clientId={ clientId }
+							canUserCreateNavigation={ canUserCreateNavigation }
 						/>
 					) }
-					{ ! isEntityAvailable && ! isPlaceholderShown && (
-						<PlaceholderPreview isLoading />
-					) }
+					{ ! hasResolvedCanUserCreateNavigation ||
+						( ! isEntityAvailable && ! isPlaceholderShown && (
+							<PlaceholderPreview isLoading />
+						) ) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper
 							id={ clientId }

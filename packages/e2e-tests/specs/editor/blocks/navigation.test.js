@@ -20,6 +20,7 @@ import {
 	createUser,
 	loginUser,
 	deleteUser,
+	switchUserToAdmin,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -435,6 +436,19 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+		// The URL Details endpoint 404s for the created page, since it will
+		// be a draft that is inaccessible publicly. To avoid this we mock
+		// out the endpoint response to be empty which will be handled gracefully
+		// in the UI whilst avoiding any 404s.
+		await setUpResponseMocking( [
+			{
+				match: ( request ) =>
+					request.url().includes( `rest_route` ) &&
+					request.url().includes( `url-details` ),
+				onRequestMatch: createJSONResponse( [] ),
+			},
+		] );
+
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
@@ -468,12 +482,6 @@ describe( 'Navigation', () => {
 		await page.waitForXPath(
 			`//a[contains(@class, "block-editor-link-control__search-item-title") and contains(., "${ pageTitle }")]`
 		);
-
-		// The URL Details endpoint 404s for the created page, since it will
-		// be a draft that is inaccessible publicly. Wait for the HTTP request
-		// to finish, since this seems to make the test more stable.
-		await page.waitForNetworkIdle();
-		expect( console ).toHaveErrored();
 
 		await publishPost();
 
@@ -754,6 +762,10 @@ describe( 'Navigation', () => {
 			} );
 		} );
 
+		afterEach( async () => {
+			await switchUserToAdmin();
+		} );
+
 		afterAll( async () => {
 			await deleteUser( contributorUsername );
 		} );
@@ -794,6 +806,29 @@ describe( 'Navigation', () => {
 			// Make sure the snackbar error shows up
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
+			);
+
+			// Expect a console 403 for request to Navigation Areas for lower permission users.
+			// This is because reading requires the `edit_theme_options` capability
+			// which the Contributor level user does not have.
+			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
+			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'shows a warning if user does not have permission to create navigation menus', async () => {
+			const noticeText =
+				'You do not have permission to create Navigation Menus.';
+			// Switch to a Contributor role user - they should not have
+			// permission to update Navigations.
+			await loginUser( contributorUsername, contributorPassword );
+
+			await createNewPost();
+			await insertBlock( 'Navigation' );
+
+			// Make sure the snackbar error shows up
+			await page.waitForXPath(
+				`//*[contains(@class, 'components-snackbar__content')][ text()="${ noticeText }" ]`
 			);
 
 			// Expect a console 403 for request to Navigation Areas for lower permission users.
