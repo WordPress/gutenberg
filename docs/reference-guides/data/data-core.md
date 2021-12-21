@@ -640,6 +640,10 @@ _Returns_
 
 Returns an action object used in signalling that Upload permissions have been received.
 
+_Parameters_
+
+-   _hasUploadPermissions_ `boolean`: Does the user have permission to upload files?
+
 _Returns_
 
 -   `Object`: Action object.
