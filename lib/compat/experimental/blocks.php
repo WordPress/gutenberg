@@ -65,11 +65,11 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 	 * It's used in CommentsPaginationNext and CommentsPaginationPrevious blocks.
 	 *
 	 * @param WP_Block $block   Block instance.
-	 * @param boolean  $is_next Flag for hanlding `next/previous` blocks.
+	 * @param string   $pagination_type Type of the arrow we will be rendering. Default 'next'. Accepts 'next' or 'previous'.
 	 *
 	 * @return string|null Returns the constructed WP_Query arguments.
 	 */
-	function get_comments_pagination_arrow( $block, $is_next ) {
+	function get_comments_pagination_arrow( $block, $pagination_type = 'next' ) {
 		$arrow_map = array(
 			'none'    => '',
 			'arrow'   => array(
@@ -81,8 +81,7 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 				'previous' => '«',
 			),
 		);
-		if ( ! empty( $block->context['comments/paginationArrow'] ) && array_key_exists( $block->context['comments/paginationArrow'], $arrow_map ) && ! empty( $arrow_map[ $block->context['comments/paginationArrow'] ] ) ) {
-			$pagination_type = $is_next ? 'next' : 'previous';
+		if ( ! empty( $block->context['comments/paginationArrow'] ) && ! empty( $arrow_map[ $block->context['comments/paginationArrow'] ][ $pagination_type ] ) ) {
 			$arrow_attribute = $block->context['comments/paginationArrow'];
 			$arrow           = $arrow_map[ $block->context['comments/paginationArrow'] ][ $pagination_type ];
 			$arrow_classes   = "wp-block-comments-pagination-$pagination_type-arrow is-arrow-$arrow_attribute";
