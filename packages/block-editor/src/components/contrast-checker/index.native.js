@@ -12,8 +12,8 @@ import a11yPlugin from 'colord/plugins/a11y';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
 
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -55,8 +55,12 @@ function ContrastChecker( {
 	fontSize, // font size value in pixels
 	isLargeText,
 	textColor,
-	getStylesFromColorScheme,
 } ) {
+	const msgStyle = usePreferredColorSchemeStyle(
+		styles.message,
+		styles.messageDark
+	);
+
 	if (
 		! ( backgroundColor || fallbackBackgroundColor ) ||
 		! ( textColor || fallbackTextColor )
@@ -85,11 +89,6 @@ function ContrastChecker( {
 		return null;
 	}
 
-	const msgStyle = getStylesFromColorScheme(
-		styles.message,
-		styles.messageDark
-	);
-
 	return (
 		<ContrastCheckerMessage
 			backgroundColor={ backgroundColor }
@@ -101,4 +100,4 @@ function ContrastChecker( {
 	);
 }
 
-export default withPreferredColorScheme( ContrastChecker );
+export default ContrastChecker;
