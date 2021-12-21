@@ -18,9 +18,13 @@ _Note:_ It is worth noting that the line height setting option is an opt-in feat
 Renders the markup for the line height setting option in the block inspector.
 
 ```jsx
-import { KeyboardShortcuts } from '@wordpress/block-editor';
+import { LineHeightControl } from '@wordpress/block-editor';
 const MyLineHeightControl = () => (
-	<LineHeightControl value={ lineHeight } onChange={ onChange } />
+	<LineHeightControl
+		value={ lineHeight }
+		onChange={ onChange }
+		__unstableHasLegacyStyles={ false }
+	/>
 );
 ```
 
@@ -37,6 +41,12 @@ The value of the line height.
 -   **Type:** `Function`
 
 A callback function that handles the application of the line height value.
+
+#### `__unstableHasLegacyStyles`
+
+-   **Type:** `boolean`
+
+Whether to use the legacy styling, which is deprecated and will be removed in a future version. Set this to `false` to opt into the new styling, which will soon become the default.
 
 ## Related components
 
