@@ -189,10 +189,10 @@ export default function QueryInspectorControls( {
 					<SelectControl
 						options={ postTypesSelectOptions }
 						value={ postType }
-						label={ __( 'Post Type' ) }
+						label={ __( 'Post type' ) }
 						onChange={ onPostTypeChange }
 						help={ __(
-							'WordPress contains different types of content and they are divided into collections called "Post Types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+							'WordPress contains different types of content and they are divided into collections called "Post types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
 						) }
 					/>
 				) }

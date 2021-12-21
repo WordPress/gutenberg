@@ -18,7 +18,6 @@ import { useContext, useEffect, useRef } from '@wordpress/element';
 import useNavigationMenu from '../use-navigation-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 
-const NOOP = () => {};
 const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
 	'postType',
@@ -41,13 +40,6 @@ export default function UnsavedInnerBlocks( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: hasSelection ? undefined : false,
-
-		// Make the inner blocks 'controlled'. This allows the block to always
-		// work with controlled inner blocks, smoothing out the switch to using
-		// an entity.
-		value: blocks,
-		onChange: NOOP,
-		onInput: NOOP,
 	} );
 
 	const {

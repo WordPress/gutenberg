@@ -29,6 +29,10 @@ export default function EditTemplateTitle() {
 	const { getEditorSettings } = useSelect( editorStore );
 	const { updateEditorSettings } = useDispatch( editorStore );
 
+	if ( template.has_theme_file ) {
+		return null;
+	}
+
 	let templateTitle = __( 'Default' );
 	if ( template?.title ) {
 		templateTitle = template.title;
