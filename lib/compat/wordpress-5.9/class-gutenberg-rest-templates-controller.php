@@ -66,15 +66,15 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
-						'id' => array(
+						'id'      => array(
 							'description'       => __( 'The id of a template', 'gutenberg' ),
 							'type'              => 'string',
 							'sanitize_callback' => array( $this, '_sanitize_template_id' ),
 						),
 						'resolve' => array(
-							'description'       => __( 'Whether to return a fallback template if no template with the given ID exists', 'gutenberg' ),
-							'type'              => 'boolean',
-							'default'           => true,
+							'description' => __( 'Whether to return a fallback template if no template with the given ID exists', 'gutenberg' ),
+							'type'        => 'boolean',
+							'default'     => true,
 						),
 					),
 				),
