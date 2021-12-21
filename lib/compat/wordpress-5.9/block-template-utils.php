@@ -805,6 +805,10 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
  * @return Gutenberg_Block_Template|null Template.
  */
 function gutenberg_get_block_template_with_fallback( $id, $template_type = 'wp_template' ) {
+	// Falling back to the next best template in the template hierarchy only makes sense for `wp_template`s.
+	if ( 'wp_template' !== $template_type ) {
+		return gutenberg_get_block_template( $id, $template_type );
+	}
 	/**
 	 * Filters the block template object before the query takes place.
 	 *

@@ -59,8 +59,7 @@ export function* setTemplate( templateId, templateSlug ) {
 			'getEntityRecord',
 			'postType',
 			'wp_template',
-			templateId,
-			{ resolve: true } // We want the editor to display what the frontend would render.
+			templateId
 		);
 		pageContext.templateSlug = template?.slug;
 	}
