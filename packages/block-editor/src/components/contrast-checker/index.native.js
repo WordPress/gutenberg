@@ -53,9 +53,7 @@ function ContrastCheckerMessage( {
 	return (
 		<View style={ styles[ 'block-editor-contrast-checker' ] }>
 			<Icon style={ iconStyle } icon={ warning } />
-			<Text style={ msgStyle } separatorType={ 'none' }>
-				{ msg }
-			</Text>
+			<Text style={ msgStyle }>{ msg }</Text>
 		</View>
 	);
 }
