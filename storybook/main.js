@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-const path = require( 'path' );
-
 const stories = [
 	process.env.NODE_ENV !== 'test' && './stories/**/*.(js|mdx)',
 	'../packages/block-editor/src/**/stories/*.js',
@@ -11,24 +6,6 @@ const stories = [
 ].filter( Boolean );
 
 const customEnvVariables = {};
-
-const modulesDir = path.join( __dirname, '../node_modules' );
-
-// Workaround for Emotion 11
-// https://github.com/storybookjs/storybook/pull/13300#issuecomment-783268111
-const updateEmotionAliases = ( config ) => ( {
-	...config,
-	resolve: {
-		...config.resolve,
-		alias: {
-			...config.resolve.alias,
-			'@emotion/core': path.join( modulesDir, '@emotion/react' ),
-			'@emotion/styled': path.join( modulesDir, '@emotion/styled' ),
-			'@emotion/styled-base': path.join( modulesDir, '@emotion/styled' ),
-			'emotion-theming': path.join( modulesDir, '@emotion/react' ),
-		},
-	},
-} );
 
 module.exports = {
 	core: {
@@ -47,7 +24,7 @@ module.exports = {
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
 	],
-	managerWebpack: updateEmotionAliases,
+	features: { emotionAlias: false },
 	// Workaround:
 	// https://github.com/storybookjs/storybook/issues/12270
 	webpackFinal: async ( config ) => {
@@ -62,6 +39,6 @@ module.exports = {
 			);
 		} );
 
-		return updateEmotionAliases( config );
+		return config;
 	},
 };
