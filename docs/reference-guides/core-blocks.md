@@ -681,7 +681,7 @@ Display a graphic to represent this site. Update the block, and the changes appl
 -	**Name:** core/site-logo
 -	**Category:** theme
 -	**Supports:** align, color (~~background~~, ~~text~~), ~~alignWide~~, ~~html~~
--	**Attributes:** isLink, linkTarget, width
+-	**Attributes:** isLink, linkTarget, shouldSyncIcon, width
 
 ## Site Tagline
 
