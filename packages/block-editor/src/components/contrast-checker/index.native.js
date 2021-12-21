@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -12,8 +12,8 @@ import a11yPlugin from 'colord/plugins/a11y';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
-
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { Icon, warning } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -45,7 +45,19 @@ function ContrastCheckerMessage( {
 		speak( __( 'This color combination may be hard for people to read.' ) );
 	}, [ backgroundColor, textColor ] );
 
-	return <Text style={ msgStyle }>{ msg }</Text>;
+	const iconStyle = usePreferredColorSchemeStyle(
+		styles[ 'block-editor-contrast-checker__icon' ],
+		styles[ 'block-editor-contrast-checker__icon-dark' ]
+	);
+
+	return (
+		<View style={ styles[ 'block-editor-contrast-checker' ] }>
+			<Icon style={ iconStyle } icon={ warning } />
+			<Text style={ msgStyle } separatorType={ 'none' }>
+				{ msg }
+			</Text>
+		</View>
+	);
 }
 
 function ContrastChecker( {
@@ -57,8 +69,8 @@ function ContrastChecker( {
 	textColor,
 } ) {
 	const msgStyle = usePreferredColorSchemeStyle(
-		styles.message,
-		styles.messageDark
+		styles[ 'block-editor-contrast-checker__notice' ],
+		styles[ 'block-editor-contrast-checker__notice-dark' ]
 	);
 
 	if (
