@@ -6,11 +6,11 @@ import { useBlockProps, PlainText } from '@wordpress/block-editor';
 
 const arrowMap = {
 	none: '',
-	arrow: '→',
-	chevron: '»',
+	arrow: '←',
+	chevron: '«',
 };
 
-export default function CommentsPaginationNextEdit( {
+export default function CommentsPaginationPreviousEdit( {
 	attributes: { label },
 	setAttributes,
 	context: { 'comments/paginationArrow': paginationArrow },
@@ -18,27 +18,27 @@ export default function CommentsPaginationNextEdit( {
 	const displayArrow = arrowMap[ paginationArrow ];
 	return (
 		<a
-			href="#comments-pagination-next-pseudo-link"
+			href="#comments-pagination-previous-pseudo-link"
 			onClick={ ( event ) => event.preventDefault() }
 			{ ...useBlockProps() }
 		>
+			{ displayArrow && (
+				<span
+					className={ `wp-block-comments-pagination-previous-arrow is-arrow-${ paginationArrow }` }
+				>
+					{ displayArrow }
+				</span>
+			) }
 			<PlainText
 				__experimentalVersion={ 2 }
 				tagName="span"
-				aria-label={ __( 'Next comments page link' ) }
-				placeholder={ __( 'Next Comments' ) }
+				aria-label={ __( 'Previous comments page link' ) }
+				placeholder={ __( 'Previous Comments' ) }
 				value={ label }
 				onChange={ ( newLabel ) =>
 					setAttributes( { label: newLabel } )
 				}
 			/>
-			{ displayArrow && (
-				<span
-					className={ `wp-block-comments-pagination-next-arrow is-arrow-${ paginationArrow }` }
-				>
-					{ displayArrow }
-				</span>
-			) }
 		</a>
 	);
 }

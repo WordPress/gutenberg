@@ -188,6 +188,15 @@ Displays a list of page numbers for comments pagination.
 -	**Supports:** ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
+## Previous Page
+
+Displays the previous comments page link.
+
+-	**Name:** core/comments-pagination-previous
+-	**Category:** theme
+-	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** label
+
 ## Comments Query Loop
 
 An advanced block that allows displaying post comments based on different query parameters and visual configurations.

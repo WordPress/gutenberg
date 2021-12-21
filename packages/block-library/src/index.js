@@ -29,6 +29,7 @@ import * as commentDate from './comment-date';
 import * as commentEditLink from './comment-edit-link';
 import * as commentReplyLink from './comment-reply-link';
 import * as commentTemplate from './comment-template';
+import * as commentsPaginationPrevious from './comments-pagination-previous';
 import * as commentsQueryLoop from './comments-query-loop';
 import * as commentsPagination from './comments-pagination';
 import * as commentsPaginationNext from './comments-pagination-next';
@@ -260,6 +261,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								commentsPagination,
 								commentsPaginationNext,
 								commentsPaginationNumbers,
+								commentsPaginationPrevious,
 								navigationArea,
 								postComment,
 								postCommentsCount,
