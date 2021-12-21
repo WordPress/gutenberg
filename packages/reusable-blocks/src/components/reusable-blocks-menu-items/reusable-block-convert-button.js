@@ -20,7 +20,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-import { BACKSPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -146,7 +146,10 @@ export default function ReusableBlockConvertButton( {
 									onChange={ setTitle }
 									onKeyDown={ ( event ) => {
 										const { keyCode } = event;
-										if ( keyCode === BACKSPACE ) {
+										if (
+											keyCode === BACKSPACE ||
+											keyCode === DELETE
+										) {
 											event.stopPropagation();
 										}
 									} }
