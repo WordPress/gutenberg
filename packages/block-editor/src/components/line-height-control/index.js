@@ -6,6 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalNumberControl as NumberControl,
@@ -96,6 +97,14 @@ export default function LineHeightControl( {
 } ) {
 	const isDefined = isLineHeightDefined( lineHeight );
 	const value = isDefined ? lineHeight : RESET_VALUE;
+
+	if ( __unstableHasLegacyStyles ) {
+		deprecated( 'Legacy styles for wp.blockEditor.LineHeightControl', {
+			since: '5.10',
+			hint:
+				'Set the `__unstableHasLegacyStyles` prop to false to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
 
 	return (
 		<div
