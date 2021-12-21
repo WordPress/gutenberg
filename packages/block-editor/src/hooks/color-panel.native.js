@@ -1,12 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useGlobalStyles } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,11 +14,19 @@ import PanelColorGradientSettings from '../components/colors-gradients/panel-col
 import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
 
-const ColorPanel = ( { settings, baseGlobalStyles } ) => {
+const ColorPanel = ( { settings } ) => {
 	const globalStyles = useGlobalStyles();
 
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedTextColor, setDetectedTextColor ] = useState();
+
+	const { baseGlobalStyles } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			baseGlobalStyles: getSettings()
+				?.__experimentalGlobalStylesBaseStyles?.color,
+		};
+	} );
 
 	useEffect( () => {
 		// The following logic is used to determine current text/background colors:
@@ -53,15 +60,4 @@ const ColorPanel = ( { settings, baseGlobalStyles } ) => {
 	);
 };
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		const baseGlobalStyles =
-			settings?.__experimentalGlobalStylesBaseStyles?.color;
-
-		return {
-			baseGlobalStyles,
-		};
-	} ),
-] )( ColorPanel );
+export default ColorPanel;
