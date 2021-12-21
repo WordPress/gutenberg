@@ -49,9 +49,9 @@ export default function PanelColorGradientSettings( {
 	}, [ settings ] );
 
 	return (
-		<PanelBody title={ title }>
-			{ mappedSettings }
-			{ children }
-		</PanelBody>
+		<>
+			<PanelBody title={ title }>{ mappedSettings }</PanelBody>
+			<PanelBody>{ children }</PanelBody>
+		</>
 	);
 }
