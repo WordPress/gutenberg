@@ -130,6 +130,8 @@ export type ToolsPanelContext = {
 	isResetting: boolean;
 	shouldRenderPlaceholderItems: boolean;
 	areAllOptionalControlsHidden: boolean;
+	firstDisplayedItem?: string;
+	lastDisplayedItem?: string;
 };
 
 export type ToolsPanelControlsGroupProps = {

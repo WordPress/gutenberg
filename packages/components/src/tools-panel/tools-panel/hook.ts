@@ -253,13 +253,39 @@ export function useToolsPanel(
 		setMenuItems,
 	] );
 
+	// Assist ItemGroup styling when there are potentially hidden placeholder
+	// items by identifying first & last items that are toggled on for display.
+	const getFirstItem = () => {
+		const optionalItems = menuItems.optional || {};
+		const firstItem = panelItems.find(
+			( item ) => item.isShownByDefault || !! optionalItems[ item.label ]
+		);
+
+		return firstItem?.label;
+	};
+
+	const getLastItem = () => {
+		const reversedPanelItems = [ ...panelItems ].reverse();
+		const optionalItems = menuItems.optional || {};
+		const lastItem = reversedPanelItems.find(
+			( item ) => item.isShownByDefault || !! optionalItems[ item.label ]
+		);
+
+		return lastItem?.label;
+	};
+
+	const firstDisplayedItem = getFirstItem();
+	const lastDisplayedItem = getLastItem();
+
 	const panelContext = useMemo(
 		() => ( {
 			areAllOptionalControlsHidden,
 			deregisterPanelItem,
+			firstDisplayedItem,
 			flagItemCustomization,
 			hasMenuItems: !! panelItems.length,
 			isResetting: isResetting.current,
+			lastDisplayedItem,
 			menuItems,
 			panelId,
 			registerPanelItem,
@@ -268,8 +294,10 @@ export function useToolsPanel(
 		[
 			areAllOptionalControlsHidden,
 			deregisterPanelItem,
+			firstDisplayedItem,
 			flagItemCustomization,
 			isResetting.current,
+			lastDisplayedItem,
 			menuItems,
 			panelId,
 			panelItems,
