@@ -102,8 +102,7 @@
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
-				"type": "flex",
-				"setCascadingProperties": true
+				"type": "flex"
 			}
 		}
 	},

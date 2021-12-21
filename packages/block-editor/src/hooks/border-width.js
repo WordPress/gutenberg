@@ -5,7 +5,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -32,25 +32,12 @@ export const BorderWidthEdit = ( props ) => {
 
 	const { width, color: customBorderColor, style: borderStyle } =
 		style?.border || {};
+
+	// Used to temporarily track previous border color & style selections to be
+	// able to restore them when border width changes from zero value.
 	const [ styleSelection, setStyleSelection ] = useState();
 	const [ colorSelection, setColorSelection ] = useState();
-
-	// Temporarily track previous border color & style selections to be able to
-	// restore them when border width changes from zero value.
-	useEffect( () => {
-		if ( borderStyle !== 'none' ) {
-			setStyleSelection( borderStyle );
-		}
-	}, [ borderStyle ] );
-
-	useEffect( () => {
-		if ( borderColor || customBorderColor ) {
-			setColorSelection( {
-				name: !! borderColor ? borderColor : undefined,
-				color: !! customBorderColor ? customBorderColor : undefined,
-			} );
-		}
-	}, [ borderColor, customBorderColor ] );
+	const [ customColorSelection, setCustomColorSelection ] = useState();
 
 	const onChange = ( newWidth ) => {
 		let newStyle = {
@@ -65,28 +52,39 @@ export const BorderWidthEdit = ( props ) => {
 		let borderPaletteColor = borderColor;
 
 		const hasZeroWidth = parseFloat( newWidth ) === 0;
+		const hadPreviousZeroWidth = parseFloat( width ) === 0;
 
 		// Setting the border width explicitly to zero will also set the
 		// border style to `none` and clear border color attributes.
-		if ( hasZeroWidth ) {
+		if ( hasZeroWidth && ! hadPreviousZeroWidth ) {
+			// Before clearing color and style selections, keep track of
+			// the current selections so they can be restored when the width
+			// changes to a non-zero value.
+			setColorSelection( borderColor );
+			setCustomColorSelection( customBorderColor );
+			setStyleSelection( borderStyle );
+
+			// Clear style and color attributes.
 			borderPaletteColor = undefined;
 			newStyle.border.color = undefined;
 			newStyle.border.style = 'none';
 		}
 
-		// Restore previous border style selection if width is now not zero and
-		// border style was 'none'. This is to support changes to the UI which
-		// change the border style UI to a segmented control without a "none"
-		// option.
-		if ( ! hasZeroWidth && borderStyle === 'none' ) {
-			newStyle.border.style = styleSelection;
-		}
+		if ( ! hasZeroWidth && hadPreviousZeroWidth ) {
+			// Restore previous border style selection if width is now not zero and
+			// border style was 'none'. This is to support changes to the UI which
+			// change the border style UI to a segmented control without a "none"
+			// option.
+			if ( borderStyle === 'none' ) {
+				newStyle.border.style = styleSelection;
+			}
 
-		// Restore previous border color selection if width is no longer zero
-		// and current border color is undefined.
-		if ( ! hasZeroWidth && borderColor === undefined ) {
-			borderPaletteColor = colorSelection?.name;
-			newStyle.border.color = colorSelection?.color;
+			// Restore previous border color selection if width is no longer zero
+			// and current border color is undefined.
+			if ( borderColor === undefined ) {
+				borderPaletteColor = colorSelection;
+				newStyle.border.color = customColorSelection;
+			}
 		}
 
 		// If width was reset, clean out undefined styles.

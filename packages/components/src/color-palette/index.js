@@ -10,7 +10,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -110,6 +110,20 @@ function MultiplePalettes( {
 	);
 }
 
+export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+	return (
+		<Dropdown
+			contentClassName={ classnames(
+				'components-color-palette__custom-color-dropdown-content',
+				{
+					'is-rendered-in-sidebar': isRenderedInSidebar,
+				}
+			) }
+			{ ...props }
+		/>
+	);
+}
+
 export default function ColorPalette( {
 	clearable = true,
 	className,
@@ -134,18 +148,19 @@ export default function ColorPalette( {
 		/>
 	);
 
+	let dropdownPosition;
+	if ( __experimentalIsRenderedInSidebar ) {
+		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
+	}
+
 	const colordColor = colord( value );
 
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
-				<Dropdown
-					contentClassName={ classnames(
-						'components-color-palette__custom-color-dropdown-content',
-						{
-							'is-rendered-in-sidebar': __experimentalIsRenderedInSidebar,
-						}
-					) }
+				<CustomColorPickerDropdown
+					position={ dropdownPosition }
+					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<button

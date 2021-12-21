@@ -121,6 +121,7 @@ class RCTAztecView: Aztec.TextView {
         .italic: "italic",
         .strikethrough: "strikethrough",
         .link: "link",
+        .mark: "mark"
     ]
 
     override init(defaultFont: UIFont, defaultParagraphStyle: ParagraphStyle, defaultMissingImage: UIImage) {
@@ -689,6 +690,7 @@ class RCTAztecView: Aztec.TextView {
         case "bold": toggleBold(range: emptyRange)
         case "italic": toggleItalic(range: emptyRange)
         case "strikethrough": toggleStrikethrough(range: emptyRange)
+        case "mark": toggleMark(range: emptyRange)
         default: print("Format not recognized")
         }
     }

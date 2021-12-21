@@ -24,6 +24,7 @@ export default function GlobalStylesSidebar() {
 			title={ __( 'Styles' ) }
 			icon={ styles }
 			closeLabel={ __( 'Close global styles sidebar' ) }
+			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
 				<Flex>
 					<FlexBlock>

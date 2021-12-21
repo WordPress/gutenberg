@@ -53,25 +53,17 @@ function block_core_comment_template_render_comments( $comments, $block ) {
  * defined by the block's inner blocks.
  */
 function render_block_core_comment_template( $attributes, $content, $block ) {
-
-	$post_id = $block->context['postId'];
-
 	// Bail out early if the post ID is not set for some reason.
-	if ( ! isset( $post_id ) ) {
+	if ( empty( $block->context['postId'] ) ) {
 		return '';
 	}
 
-	$number = $block->context['queryPerPage'];
-
-	// Get an array of comments for the current post.
-	$comments = get_approved_comments(
-		$post_id,
-		array(
-			'number'       => $number,
-			'hierarchical' => 'threaded',
-		)
+	$comment_query = new WP_Comment_Query(
+		build_comment_query_vars_from_block( $block )
 	);
 
+	// Get an array of comments for the current post.
+	$comments = $comment_query->get_comments();
 	if ( count( $comments ) === 0 ) {
 		return '';
 	}

@@ -138,11 +138,8 @@ export default compose(
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
-		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex(
-			last( normalizedClientIds ),
-			rootClientId
-		);
+		const firstIndex = getBlockIndex( firstClientId );
+		const lastIndex = getBlockIndex( last( normalizedClientIds ) );
 
 		return {
 			firstIndex,

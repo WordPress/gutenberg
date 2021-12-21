@@ -11,7 +11,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
-export default function CommentsQueryLoopToolbar( { queryPerPage, setQuery } ) {
+export default function CommentsQueryLoopToolbar( { perPage, setQuery } ) {
 	return (
 		<ToolbarGroup>
 			<Dropdown
@@ -41,11 +41,11 @@ export default function CommentsQueryLoopToolbar( { queryPerPage, setQuery } ) {
 										return;
 									}
 									setQuery( {
-										queryPerPage: num,
+										perPage: num,
 									} );
 								} }
 								step="1"
-								value={ queryPerPage }
+								value={ perPage }
 								isDragEnabled={ false }
 							/>
 						</BaseControl>

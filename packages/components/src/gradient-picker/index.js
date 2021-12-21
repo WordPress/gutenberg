@@ -106,6 +106,7 @@ export default function GradientPicker( {
 	clearable = true,
 	disableCustomGradients = false,
 	__experimentalHasMultipleOrigins,
+	__experimentalIsRenderedInSidebar,
 } ) {
 	const clearGradient = useCallback( () => onChange( undefined ), [
 		onChange,
@@ -136,6 +137,9 @@ export default function GradientPicker( {
 			content={
 				! disableCustomGradients && (
 					<CustomGradientPicker
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
 						value={ value }
 						onChange={ onChange }
 					/>

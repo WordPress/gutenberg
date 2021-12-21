@@ -95,48 +95,53 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'       => array( 'color', 'palette' ),
-			'override'   => false,
-			'value_key'  => 'color',
-			'css_vars'   => '--wp--preset--color--$slug',
-			'classes'    => array(
+			'path'              => array( 'color', 'palette' ),
+			'override'          => array( 'color', 'defaultPalette' ),
+			'use_default_names' => false,
+			'value_key'         => 'color',
+			'css_vars'          => '--wp--preset--color--$slug',
+			'classes'           => array(
 				'.has-$slug-color'            => 'color',
 				'.has-$slug-background-color' => 'background-color',
 				'.has-$slug-border-color'     => 'border-color',
 			),
-			'properties' => array( 'color', 'background-color', 'border-color' ),
+			'properties'        => array( 'color', 'background-color', 'border-color' ),
 		),
 		array(
-			'path'       => array( 'color', 'gradients' ),
-			'override'   => false,
-			'value_key'  => 'gradient',
-			'css_vars'   => '--wp--preset--gradient--$slug',
-			'classes'    => array( '.has-$slug-gradient-background' => 'background' ),
-			'properties' => array( 'background' ),
+			'path'              => array( 'color', 'gradients' ),
+			'override'          => array( 'color', 'defaultGradients' ),
+			'use_default_names' => false,
+			'value_key'         => 'gradient',
+			'css_vars'          => '--wp--preset--gradient--$slug',
+			'classes'           => array( '.has-$slug-gradient-background' => 'background' ),
+			'properties'        => array( 'background' ),
 		),
 		array(
-			'path'       => array( 'color', 'duotone' ),
-			'override'   => true,
-			'value_func' => 'gutenberg_render_duotone_filter_preset',
-			'css_vars'   => '--wp--preset--duotone--$slug',
-			'classes'    => array(),
-			'properties' => array( 'filter' ),
+			'path'              => array( 'color', 'duotone' ),
+			'override'          => true,
+			'use_default_names' => false,
+			'value_func'        => 'gutenberg_get_duotone_filter_property',
+			'css_vars'          => '--wp--preset--duotone--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'filter' ),
 		),
 		array(
-			'path'       => array( 'typography', 'fontSizes' ),
-			'override'   => true,
-			'value_key'  => 'size',
-			'css_vars'   => '--wp--preset--font-size--$slug',
-			'classes'    => array( '.has-$slug-font-size' => 'font-size' ),
-			'properties' => array( 'font-size' ),
+			'path'              => array( 'typography', 'fontSizes' ),
+			'override'          => true,
+			'use_default_names' => true,
+			'value_key'         => 'size',
+			'css_vars'          => '--wp--preset--font-size--$slug',
+			'classes'           => array( '.has-$slug-font-size' => 'font-size' ),
+			'properties'        => array( 'font-size' ),
 		),
 		array(
-			'path'       => array( 'typography', 'fontFamilies' ),
-			'override'   => true,
-			'value_key'  => 'fontFamily',
-			'css_vars'   => '--wp--preset--font-family--$slug',
-			'classes'    => array( '.has-$slug-font-family' => 'font-family' ),
-			'properties' => array( 'font-family' ),
+			'path'              => array( 'typography', 'fontFamilies' ),
+			'override'          => true,
+			'use_default_names' => false,
+			'value_key'         => 'fontFamily',
+			'css_vars'          => '--wp--preset--font-family--$slug',
+			'classes'           => array( '.has-$slug-font-family' => 'font-family' ),
+			'properties'        => array( 'font-family' ),
 		),
 	);
 
@@ -359,13 +364,16 @@ class WP_Theme_JSON_Gutenberg {
 	private static function maybe_opt_in_into_settings( $theme_json ) {
 		$new_theme_json = $theme_json;
 
-		if ( isset( $new_theme_json['settings']['appearanceTools'] ) ) {
+		if (
+			isset( $new_theme_json['settings']['appearanceTools'] ) &&
+			true === $new_theme_json['settings']['appearanceTools']
+		) {
 			self::do_opt_in_into_settings( $new_theme_json['settings'] );
 		}
 
 		if ( isset( $new_theme_json['settings']['blocks'] ) && is_array( $new_theme_json['settings']['blocks'] ) ) {
 			foreach ( $new_theme_json['settings']['blocks'] as &$block ) {
-				if ( isset( $block['appearanceTools'] ) ) {
+				if ( isset( $block['appearanceTools'] ) && ( true === $block['appearanceTools'] ) ) {
 					self::do_opt_in_into_settings( $block );
 				}
 			}
@@ -393,7 +401,9 @@ class WP_Theme_JSON_Gutenberg {
 		);
 
 		foreach ( $to_opt_in as $path ) {
-			if ( null === _wp_array_get( $context, $path, null ) ) {
+			// Use "unset prop" as a marker instead of "null" because
+			// "null" can be a valid value for some props (e.g. blockGap).
+			if ( 'unset prop' === _wp_array_get( $context, $path, 'unset prop' ) ) {
 				_wp_array_set( $context, $path, true );
 			}
 		}
@@ -714,6 +724,18 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			/*
+			 * Reset default browser margin on the root body element.
+			 * This is set on the root selector **before** generating the ruleset
+			 * from the `theme.json`. This is to ensure that if the `theme.json` declares
+			 * `margin` in its `spacing` declaration for the `body` element then these
+			 * user-generated values take precedence in the CSS cascade.
+			 * @link https://github.com/WordPress/gutenberg/issues/36147.
+			 */
+			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$block_rules .= 'body { margin: 0; }';
+			}
+
 			// 2. Generate the rules that use the general selector.
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
@@ -724,7 +746,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= 'body { margin: 0; }';
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 				$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 				$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
@@ -1152,7 +1173,7 @@ class WP_Theme_JSON_Gutenberg {
 			$new_key = $prefix . str_replace(
 				'/',
 				'-',
-				strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case.
+				strtolower( _wp_to_kebab_case( $property ) )
 			);
 
 			if ( is_array( $value ) ) {
@@ -1412,9 +1433,9 @@ class WP_Theme_JSON_Gutenberg {
 		 * we remove it from the theme presets.
 		 */
 		$nodes        = self::get_setting_nodes( $incoming_data );
-		$slugs_global = self::get_slugs_not_to_override( $this->theme_json );
+		$slugs_global = self::get_default_slugs( $this->theme_json, array( 'settings' ) );
 		foreach ( $nodes as $node ) {
-			$slugs_node = self::get_slugs_not_to_override( $this->theme_json, $node['path'] );
+			$slugs_node = self::get_default_slugs( $this->theme_json, $node['path'] );
 			$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
 
 			// Replace the spacing.units.
@@ -1426,22 +1447,35 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Replace the presets.
 			foreach ( self::PRESETS_METADATA as $preset ) {
+				$override_preset = self::should_override_preset( $this->theme_json, $node['path'], $preset['override'] );
+
 				foreach ( self::VALID_ORIGINS as $origin ) {
-					$path    = array_merge( $node['path'], $preset['path'], array( $origin ) );
-					$content = _wp_array_get( $incoming_data, $path, null );
+					$base_path = array_merge( $node['path'], $preset['path'] );
+					$path      = array_merge( $base_path, array( $origin ) );
+					$content   = _wp_array_get( $incoming_data, $path, null );
 					if ( ! isset( $content ) ) {
 						continue;
 					}
 
-					if (
-						( 'theme' !== $origin ) ||
-						( 'theme' === $origin && $preset['override'] )
-					) {
-						_wp_array_set( $this->theme_json, $path, $content );
+					if ( 'theme' === $origin && $preset['use_default_names'] ) {
+						foreach ( $content as &$item ) {
+							if ( ! array_key_exists( 'name', $item ) ) {
+								$name = self::get_name_from_defaults( $item['slug'], $base_path );
+								if ( null !== $name ) {
+									$item['name'] = $name;
+								}
+							}
+						}
 					}
 
-					if ( 'theme' === $origin && ! $preset['override'] ) {
-						$content = self::filter_slugs( $content, $preset['path'], $slugs );
+					if (
+						( 'theme' !== $origin ) ||
+						( 'theme' === $origin && $override_preset )
+					) {
+						_wp_array_set( $this->theme_json, $path, $content );
+					} else {
+						$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
+						$content          = self::filter_slugs( $content, $slugs_for_preset );
 						_wp_array_set( $this->theme_json, $path, $content );
 					}
 				}
@@ -1450,38 +1484,106 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Returns the slugs for all the presets that cannot be overriden
-	 * in the given path. It returns an associative array
+	 * Converts all filter (duotone) presets into SVGs.
+	 *
+	 * @param array $origins List of origins to process.
+	 *
+	 * @return string SVG filters.
+	 */
+	public function get_svg_filters( $origins ) {
+		$blocks_metadata = self::get_blocks_metadata();
+		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		foreach ( $setting_nodes as $metadata ) {
+			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $node['color']['duotone'] ) ) {
+				continue;
+			}
+
+			$duotone_presets = $node['color']['duotone'];
+
+			$filters = '';
+			foreach ( $origins as $origin ) {
+				if ( ! isset( $duotone_presets[ $origin ] ) ) {
+					continue;
+				}
+				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
+					$filters .= gutenberg_get_duotone_filter_svg( $duotone_preset );
+				}
+			}
+		}
+
+		return $filters;
+	}
+
+	/**
+	 * Returns whether a presets should be overriden or not.
+	 *
+	 * @param array      $theme_json The theme.json like structure to inspect.
+	 * @param array      $path Path to inspect.
+	 * @param bool|array $override Data to compute whether to override the preset.
+	 * @return boolean
+	 */
+	private static function should_override_preset( $theme_json, $path, $override ) {
+		if ( is_bool( $override ) ) {
+			return $override;
+		}
+
+		// The relationship between whether to override the defaults
+		// and whether the defaults are enabled is inverse:
+		//
+		// - If defaults are enabled  => theme presets should not be overriden
+		// - If defaults are disabled => theme presets should be overriden
+		//
+		// For example, a theme sets defaultPalette to false,
+		// making the default palette hidden from the user.
+		// In that case, we want all the theme presets to be present,
+		// so they should override the defaults.
+		if ( is_array( $override ) ) {
+			$value = _wp_array_get( $theme_json, array_merge( $path, $override ) );
+			if ( isset( $value ) ) {
+				return ! $value;
+			}
+
+			// Search the top-level key if none was found for this node.
+			$value = _wp_array_get( $theme_json, array_merge( array( 'settings' ), $override ) );
+			if ( isset( $value ) ) {
+				return ! $value;
+			}
+
+			return true;
+		}
+	}
+
+	/**
+	 * Returns the default slugs for all the presets in an associative array
 	 * whose keys are the preset paths and the leafs is the list of slugs.
 	 *
 	 * For example:
 	 *
-	 * array(
+	 *  array(
 	 *   'color' => array(
 	 *     'palette'   => array( 'slug-1', 'slug-2' ),
 	 *     'gradients' => array( 'slug-3', 'slug-4' ),
 	 *   ),
 	 * )
 	 *
-	 * @param array $data A theme.json like structure to inspect.
+	 * @param array $data A theme.json like structure.
 	 * @param array $node_path The path to inspect. It's 'settings' by default.
 	 *
-	 * @return array An associative array containing the slugs for the given path.
+	 * @return array
 	 */
-	private static function get_slugs_not_to_override( $data, $node_path = array( 'settings' ) ) {
+	private static function get_default_slugs( $data, $node_path ) {
 		$slugs = array();
-		foreach ( self::PRESETS_METADATA as $metadata ) {
-			if ( $metadata['override'] ) {
-				continue;
-			}
 
-			$slugs_for_preset = array();
-			$path             = array_merge( $node_path, $metadata['path'], array( 'default' ) );
-			$preset           = _wp_array_get( $data, $path, null );
+		foreach ( self::PRESETS_METADATA as $metadata ) {
+			$path   = array_merge( $node_path, $metadata['path'], array( 'default' ) );
+			$preset = _wp_array_get( $data, $path, null );
 			if ( ! isset( $preset ) ) {
 				continue;
 			}
 
+			$slugs_for_preset = array();
 			$slugs_for_preset = array_map(
 				function( $value ) {
 					return isset( $value['slug'] ) ? $value['slug'] : null;
@@ -1495,23 +1597,43 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Get a `default`'s preset name by a provided slug.
+	 *
+	 * @param string $slug The slug we want to find a match from default presets.
+	 * @param array  $base_path The path to inspect. It's 'settings' by default.
+	 *
+	 * @return string|null
+	 */
+	private function get_name_from_defaults( $slug, $base_path ) {
+		$path            = array_merge( $base_path, array( 'default' ) );
+		$default_content = _wp_array_get( $this->theme_json, $path, null );
+		if ( ! $default_content ) {
+			return null;
+		}
+		foreach ( $default_content as $item ) {
+			if ( $slug === $item['slug'] ) {
+				return $item['name'];
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Removes the preset values whose slug is equal to any of given slugs.
 	 *
 	 * @param array $node The node with the presets to validate.
-	 * @param array $path The path to the preset type to inspect.
 	 * @param array $slugs The slugs that should not be overriden.
 	 *
 	 * @return array The new node
 	 */
-	private static function filter_slugs( $node, $path, $slugs ) {
-		$slugs_for_preset = _wp_array_get( $slugs, $path, array() );
-		if ( empty( $slugs_for_preset ) ) {
+	private static function filter_slugs( $node, $slugs ) {
+		if ( empty( $slugs ) ) {
 			return $node;
 		}
 
 		$new_node = array();
 		foreach ( $node as $value ) {
-			if ( isset( $value['slug'] ) && ! in_array( $value['slug'], $slugs_for_preset, true ) ) {
+			if ( isset( $value['slug'] ) && ! in_array( $value['slug'], $slugs, true ) ) {
 				$new_node[] = $value;
 			}
 		}

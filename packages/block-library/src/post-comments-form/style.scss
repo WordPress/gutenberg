@@ -41,13 +41,15 @@
 		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
 	}
 
-	.comment-form-comment textarea {
-		display: block;
-		box-sizing: border-box;
-		width: 100%;
+	.comment-form {
+		textarea,
+		input:not([type="submit"]):not([type="checkbox"]) {
+			display: block;
+			box-sizing: border-box;
+			width: 100%;
+		}
 	}
 
-	.comment-form-comment,
 	.comment-form-author,
 	.comment-form-email,
 	.comment-form-url {

@@ -9,7 +9,7 @@ The hook `useEntityProp` can be used by the blocks to get or change meta values.
 Add this code to your JavaScript file (this tutorial will call the file `myguten.js`):
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -54,7 +54,7 @@ registerBlockType( 'myguten/meta-block', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( wp ) {
