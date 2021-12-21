@@ -224,8 +224,9 @@
 	},
 	"scripts": {
 		"analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
-		"api-docs:ref": "node ./bin/api-docs/update-api-docs.js",
 		"api-docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",
+		"api-docs:ref": "node ./bin/api-docs/update-api-docs.js",
+		"api-docs:theme-ref": "node ./bin/api-docs/gen-theme-reference.js",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
 		"clean:package-types": "tsc --build --clean",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
