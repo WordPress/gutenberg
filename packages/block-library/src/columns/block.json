@@ -13,6 +13,9 @@
 		"isStackedOnMobile": {
 			"type": "boolean",
 			"default": true
+		},
+		"columnMinWidth": {
+			"type": "string"
 		}
 	},
 	"supports": {
