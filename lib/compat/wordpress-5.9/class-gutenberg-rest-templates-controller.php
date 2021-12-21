@@ -71,6 +71,11 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 							'type'              => 'string',
 							'sanitize_callback' => array( $this, '_sanitize_template_id' ),
 						),
+						'resolve' => array(
+							'description'       => __( 'Whether to return a fallback template if no template with the given ID exists', 'gutenberg' ),
+							'type'              => 'boolean',
+							'default'           => false,
+						),
 					),
 				),
 				array(
@@ -208,6 +213,8 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	public function get_item( $request ) {
 		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
 			$template = get_block_file_template( $request['id'], $this->post_type );
+		} elseif ( isset( $request['resolve'] ) && true === $request['resolve'] ) {
+			$template = gutenberg_get_block_template_with_fallback( $request['id'], $this->post_type );
 		} else {
 			$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		}
@@ -236,7 +243,12 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+		if ( isset( $request['resolve'] ) && true === $request['resolve'] ) {
+			$template = gutenberg_get_block_template_with_fallback( $request['id'], $this->post_type );
+		} else {
+			$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+		}
+
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -336,7 +348,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function delete_item( $request ) {
 		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
-		if ( ! $template || $template->id !== $request['id'] ) { // Make sure there is a template for this ID (and not just a fallback one).
+		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 		if ( 'custom' !== $template->source ) {
