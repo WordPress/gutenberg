@@ -31,7 +31,7 @@ const subject = (
 );
 
 describe( 'Android', () => {
-	it( 'ensures smooth back animation', async () => {
+	it( 'improves back animation performance by dismissing keyboard beforehand', async () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		fireEvent.press(
@@ -47,7 +47,7 @@ describe( 'Android', () => {
 		expect( Keyboard.dismiss ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'ensures smooth apply animation', async () => {
+	it( 'improves apply animation performance by dismissing keyboard beforehand', async () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
@@ -71,7 +71,7 @@ describe( 'iOS', () => {
 		Platform.OS = originalPlatform;
 	} );
 
-	it( 'ensures smooth back animation', async () => {
+	it( 'improves back animation performance by dismissing keyboard beforehand', async () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
@@ -84,7 +84,7 @@ describe( 'iOS', () => {
 		expect( Keyboard.dismiss ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'ensures smooth apply animation', async () => {
+	it( 'improves apply animation performance by dismissing keyboard beforehand', async () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete

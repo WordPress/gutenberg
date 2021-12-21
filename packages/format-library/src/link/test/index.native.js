@@ -30,7 +30,7 @@ beforeAll( () => {
 } );
 
 describe( 'Android', () => {
-	it( 'ensures smooth back animation', async () => {
+	it( 'improves back animation performance by dismissing keyboard beforehand', async () => {
 		const screen = render(
 			<LinkEditSlot
 				activeAttributes={ {} }
@@ -56,7 +56,7 @@ describe( 'Android', () => {
 		expect( Keyboard.dismiss ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'ensures smooth apply animation', async () => {
+	it( 'improves apply animation performance by dismissing keyboard beforehand', async () => {
 		const { getByA11yLabel } = render(
 			<LinkEditSlot
 				activeAttributes={ {} }
@@ -89,7 +89,7 @@ describe( 'iOS', () => {
 		Platform.OS = originalPlatform;
 	} );
 
-	it( 'ensures smooth back animation', async () => {
+	it( 'improves back animation performance by dismissing keyboard beforehand', async () => {
 		const screen = render(
 			<LinkEditSlot
 				activeAttributes={ {} }
@@ -115,7 +115,7 @@ describe( 'iOS', () => {
 		expect( Keyboard.dismiss ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'ensures smooth apply animation', async () => {
+	it( 'improves apply animation performance by dismissing keyboard beforehand', async () => {
 		const { getByA11yLabel } = render(
 			<LinkEditSlot
 				activeAttributes={ {} }
