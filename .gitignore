@@ -12,6 +12,7 @@ coverage
 *.log
 yarn.lock
 /artifacts
+/snapshot
 
 .cache
 *.tsbuildinfo
