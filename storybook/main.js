@@ -24,7 +24,10 @@ module.exports = {
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
 	],
-	features: { emotionAlias: false },
+	features: {
+		babelModeV7: true,
+		emotionAlias: false,
+	},
 	// Workaround:
 	// https://github.com/storybookjs/storybook/issues/12270
 	webpackFinal: async ( config ) => {
