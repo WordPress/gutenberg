@@ -76,19 +76,21 @@ export const StyledSpinner = styled.progress`
 	padding: 2px;
 	width: ${ CONFIG.spinnerSize };
 	height: ${ CONFIG.spinnerSize };
-	color: var(--wp-admin-theme-color);
+	color: var( --wp-admin-theme-color );
 	background-color: transparent;
 	overflow: hidden;
 
 	&:indeterminate {
-		-webkit-mask-image: linear-gradient(transparent 50%, black 50%), linear-gradient(to right, transparent 50%, black 50%);
-		mask-image: linear-gradient(transparent 50%, black 50%), linear-gradient(to right, transparent 50%, black 50%);
-		animation: ${ spinAnimation } 6s infinite cubic-bezier(0.3, 0.6, 1, 1);
+		-webkit-mask-image: linear-gradient( transparent 50%, black 50% ),
+			linear-gradient( to right, transparent 50%, black 50% );
+		mask-image: linear-gradient( transparent 50%, black 50% ),
+			linear-gradient( to right, transparent 50%, black 50% );
+		animation: ${ spinAnimation } 6s infinite cubic-bezier( 0.3, 0.6, 1, 1 );
 	}
 
 	&::before,
 	&:indeterminate::-webkit-progress-value {
-		content: "";
+		content: '';
 		display: block;
 		box-sizing: border-box;
 		margin-bottom: 2px;
