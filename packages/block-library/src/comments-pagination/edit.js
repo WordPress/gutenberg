@@ -17,7 +17,6 @@ import { PanelBody } from '@wordpress/components';
  */
 import { CommentsPaginationArrowControls } from './comments-pagination-arrow-controls';
 
-// TODO: add pagination-previous blocks once they are implemented.
 const TEMPLATE = [
 	[ 'core/comments-pagination-previous' ],
 	[ 'core/comments-pagination-numbers' ],
@@ -44,7 +43,8 @@ export default function QueryPaginationEdit( {
 		const innerBlocks = getBlocks( clientId );
 		/**
 		 * Show the `paginationArrow` control only if a
-		 * Comments Pagination Next block exists.
+		 * Comments Pagination Next or Comments Pagination Previous
+		 * block exists.
 		 */
 		return innerBlocks?.find( ( innerBlock ) => {
 			return [

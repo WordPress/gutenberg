@@ -13,7 +13,7 @@ const arrowMap = {
 export default function CommentsPaginationPreviousEdit( {
 	attributes: { label },
 	setAttributes,
-	context: { paginationArrow },
+	context: { 'comments/paginationArrow': paginationArrow },
 } ) {
 	const displayArrow = arrowMap[ paginationArrow ];
 	return (
@@ -24,7 +24,7 @@ export default function CommentsPaginationPreviousEdit( {
 		>
 			{ displayArrow && (
 				<span
-					className={ `wp-block-query-pagination-previous-arrow is-arrow-${ paginationArrow }` }
+					className={ `wp-block-comments-pagination-previous-arrow is-arrow-${ paginationArrow }` }
 				>
 					{ displayArrow }
 				</span>
