@@ -1,5 +1,5 @@
 const stories = [
-	process.env.NODE_ENV !== 'test' && './stories/**/*.(js|mdx)',
+	process.env.NODE_ENV !== 'test' && './stories/**/*.@(js|mdx)',
 	'../packages/block-editor/src/**/stories/*.js',
 	'../packages/components/src/**/stories/*.js',
 	'../packages/icons/src/**/stories/*.js',
