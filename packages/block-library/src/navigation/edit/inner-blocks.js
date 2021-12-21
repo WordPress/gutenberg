@@ -40,6 +40,7 @@ export default function NavigationInnerBlocks( {
 	appender: CustomAppender,
 	hasCustomPlaceholder,
 	orientation,
+	blockGap,
 } ) {
 	const {
 		isImmediateParentOfSelectedBlock,
@@ -100,6 +101,7 @@ export default function NavigationInnerBlocks( {
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
+			style: { gap: blockGap },
 		},
 		{
 			value: blocks,
