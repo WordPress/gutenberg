@@ -7,41 +7,108 @@ import { keyframes } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG } from '../../utils';
+import { CONFIG } from '../../utils';
 
 const spinAnimation = keyframes`
-	from {
+	0% {
 		transform: rotate(0deg);
 	}
-
-	to {
-		transform: rotate(360deg);
+	12.5% {
+		transform: rotate(180deg);
+		animation-timing-function: linear;
+	}
+	25% {
+		transform: rotate(630deg);
+	}
+	37.5% {
+		transform: rotate(810deg);
+		animation-timing-function: linear;
+	}
+	50% {
+		transform: rotate(1260deg);
+	}
+	62.5% {
+		transform: rotate(1440deg);
+		animation-timing-function: linear;
+	}
+	75% {
+		transform: rotate(1890deg);
+	}
+	87.5% {
+		transform: rotate(2070deg);
+		animation-timing-function: linear;
+	}
+	100% {
+		transform: rotate(2520deg);
 	}
 `;
 
-const topLeft = `calc( ( ${ CONFIG.spinnerSize } - ${ CONFIG.spinnerSize } * ( 2 / 3 ) ) / 2 )`;
+const spinAnimationPseudo = keyframes`
+	0% {
+		transform: rotate(-30deg);
+	}
+	29.4% {
+		border-left-color: transparent;
+	}
+	29.41% {
+		border-left-color: currentColor;
+	}
+	64.7% {
+		border-bottom-color: transparent;
+	}
+	64.71% {
+		border-bottom-color: currentColor;
+	}
+	100% {
+		border-left-color: currentColor;
+		border-bottom-color: currentColor;
+		transform: rotate(225deg);
+	}
+`;
 
-export const StyledSpinner = styled.span`
-	display: inline-block;
-	background-color: ${ COLORS.gray[ 600 ] };
+export const StyledSpinner = styled.progress`
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	box-sizing: border-box;
+	border: none;
+	border-radius: 50%;
+	padding: 2px;
 	width: ${ CONFIG.spinnerSize };
 	height: ${ CONFIG.spinnerSize };
-	opacity: 0.7;
-	margin: 5px 11px 0;
-	border-radius: 100%;
-	position: relative;
+	color: var(--wp-admin-theme-color);
+	background-color: transparent;
+	overflow: hidden;
 
-	&::before {
-		content: '';
-		position: absolute;
-		background-color: ${ COLORS.white };
-		top: ${ topLeft };
-		left: ${ topLeft };
-		width: calc( ${ CONFIG.spinnerSize } / 4.5 );
-		height: calc( ${ CONFIG.spinnerSize } / 4.5 );
-		border-radius: 100%;
-		transform-origin: calc( ${ CONFIG.spinnerSize } / 3 )
-			calc( ${ CONFIG.spinnerSize } / 3 );
-		animation: ${ spinAnimation } 1s infinite linear;
+	&:indeterminate {
+		-webkit-mask-image: linear-gradient(transparent 50%, black 50%), linear-gradient(to right, transparent 50%, black 50%);
+		mask-image: linear-gradient(transparent 50%, black 50%), linear-gradient(to right, transparent 50%, black 50%);
+		animation: ${ spinAnimation } 6s infinite cubic-bezier(0.3, 0.6, 1, 1);
+	}
+
+	&::before,
+	&:indeterminate::-webkit-progress-value {
+		content: "";
+		display: block;
+		box-sizing: border-box;
+		margin-bottom: 2px;
+		border: solid 2px transparent;
+		border-top-color: currentColor;
+		border-radius: 50%;
+		width: 100%;
+		height: 100%;
+		background-color: transparent;
+		animation: ${ spinAnimationPseudo } 0.75s infinite linear alternate;
+	}
+
+	&:indeterminate::-moz-progress-bar {
+		box-sizing: border-box;
+		border: solid 2px transparent;
+		border-top-color: currentColor;
+		border-radius: 50%;
+		width: 100%;
+		height: 100%;
+		background-color: transparent;
+		animation: ${ spinAnimationPseudo } 0.75s infinite linear alternate;
 	}
 `;
