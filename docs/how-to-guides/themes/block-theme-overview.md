@@ -19,12 +19,12 @@ theme
 |__ style.css
 |__ theme.json
 |__ functions.php
-|__ templates
+|__ block-templates
     |__ index.html
     |__ single.html
     |__ archive.html
     |__ ...
-|__ parts
+|__ block-template-parts
     |__ header.html
     |__ footer.html
     |__ sidebar.html
@@ -92,7 +92,7 @@ If you save the templates directly from the temporary Templates admin menu, you'
 
 Example: By using **single** as the title for your template and saving it, this saved template will take precedence over your theme's `single.html` file.
 
-Note that it won't take precedence over any of your theme's templates with higher specificity in the template hierarchy. Resolution goes from most to least specific, looking first for a CPT post and then for a theme template, at each level.
+Note that it won't take precedence over any of your theme's templates with higher specificity in [the template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/). Resolution goes from most to least specific, looking first for a CPT post and then for a theme template, at each level.
 
 ## Theme Blocks
 
