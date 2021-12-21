@@ -12,11 +12,9 @@ import {
 	MenuItem,
 	NavigableMenu,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -49,27 +47,12 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
-	const { createErrorNotice } = useDispatch( noticesStore );
 
-	async function createTemplate( { slug } ) {
-		try {
-			// Navigate to the created template editor.
-			history.push( {
-				postId: theme.stylesheet + '//' + slug.toString(),
-				postType: 'wp_template',
-			} );
-
-			// TODO: Add a success notice?
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while creating the template.' );
-
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		}
+	function createTemplate( { slug } ) {
+		history.push( {
+			postId: theme.stylesheet + '//' + slug.toString(),
+			postType: 'wp_template',
+		} );
 	}
 
 	const existingTemplateSlugs = map( templates, 'slug' );
