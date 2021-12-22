@@ -17,7 +17,12 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 
-import type { MapOf, SelectChooser, SelectMapper } from '../../types';
+import type {
+	AnyConfig,
+	SelectChooser,
+	SelectMapper,
+	UseSelect,
+} from '../../types';
 
 const noop = () => {};
 const renderQueue = createQueue();
@@ -89,10 +94,10 @@ const renderQueue = createQueue();
  *
  * @return A custom react hook.
  */
-export default function useSelect(
-	mapSelect: SelectChooser,
-	deps?: unknown[]
-): SelectChooser extends SelectMapper ? any : MapOf< Function > {
+export function useSelect< Chooser extends SelectChooser< AnyConfig > >(
+	mapSelect: Parameters< UseSelect< Chooser > >[ 0 ],
+	deps?: Parameters< UseSelect< Chooser > >[ 1 ]
+): ReturnType< UseSelect< Chooser > > {
 	const hasMappingFunction = 'function' === typeof mapSelect;
 
 	// If we're recalling a store by its name or by
@@ -121,7 +126,7 @@ export default function useSelect(
 	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 
-	const latestMapSelect = useRef< SelectMapper >();
+	const latestMapSelect = useRef< SelectMapper< any > >();
 	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef< unknown >();
 	const latestMapOutputError = useRef< Error >();

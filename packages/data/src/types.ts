@@ -12,14 +12,24 @@ export type Selector = Function;
 
 export type AnyConfig = ReduxStoreConfig< any, any, any >;
 
-export interface SelectMapper {
+export interface SelectMapper< Config extends AnyConfig > {
 	(
-		select: ( reference: StoreReference ) => MapOf< Function >,
+		select: (
+			reference: StoreReference< Config >
+		) => SelectorsOf< Config >,
 		registry: DataRegistry
 	): unknown;
 }
-export type SelectChooser = SelectMapper | StoreReference;
-export type StoreReference = StoreDescriptor< any > | string;
+
+export type SelectChooser< Config extends AnyConfig > =
+	| SelectMapper< Config >
+	| StoreReference< Config >;
+
+export type StoreReference< Config extends AnyConfig > =
+	| StoreDescriptor< Config >
+	| StoreName< Config >;
+
+export interface StoreName< Config extends AnyConfig > extends String {}
 
 export interface StoreInstance< Config extends AnyConfig > {
 	getSelectors: () => SelectorsOf< Config >;
@@ -58,12 +68,12 @@ export interface DataRegistry {
 		listeningStores: MutableRefObject< unknown >
 	) => unknown;
 	__experimentalSubscribeStore: (
-		storeName: string,
+		storeName: StoreName< any >,
 		listener: () => void
 	) => ReturnType< DataEmitter[ 'subscribe' ] >;
 
 	register: ( store: StoreDescriptor< any > ) => void;
-	select: ( chooser: SelectChooser, deps?: unknown[] ) => any;
+	select: UseSelect;
 }
 
 export interface DataEmitter {
@@ -84,10 +94,21 @@ type ActionCreatorsOf<
 	? { [ name in keyof ActionCreators ]: Function | Generator }
 	: never;
 
-type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
-	any,
-	any,
-	infer Selectors
->
+export type SelectorsOf<
+	Config extends AnyConfig
+> = Config extends ReduxStoreConfig< any, any, infer Selectors >
 	? { [ name in keyof Selectors ]: Function }
 	: never;
+
+/// Interface functions
+
+export interface UseSelect< Chooser extends SelectChooser< AnyConfig > > {
+	(
+		mapSelect: Chooser,
+		deps?: unknown[]
+	): Chooser extends SelectMapper< any >
+		? ReturnType< Chooser >
+		: Chooser extends StoreReference< infer Config >
+		? SelectorsOf< Config >
+		: never;
+}
