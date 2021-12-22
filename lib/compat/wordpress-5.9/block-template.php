@@ -216,6 +216,8 @@ function gutenberg_get_the_template_html() {
 	$content = $wp_embed->autoembed( $content );
 	$content = do_blocks( $content );
 	$content = wptexturize( $content );
+	$content = convert_smilies( $content );
+	$content = shortcode_unautop( $content );
 	$content = wp_filter_content_tags( $content );
 	$content = do_shortcode( $content );
 	$content = str_replace( ']]>', ']]&gt;', $content );
