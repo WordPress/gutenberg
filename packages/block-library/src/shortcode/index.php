@@ -6,7 +6,7 @@
  */
 
 /**
- * Performs wpautop() and do_shortcode() on the shortcode block content.
+ * Performs wpautop() on the shortcode block content.
  *
  * @param array  $attributes The block attributes.
  * @param string $content    The block content.
@@ -14,7 +14,7 @@
  * @return string Returns the block content.
  */
 function render_block_core_shortcode( $attributes, $content ) {
-	return wpautop( do_shortcode( $content ) );
+	return wpautop( $content );
 }
 
 /**
