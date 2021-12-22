@@ -24,7 +24,6 @@ export const settings = {
 			value:
 				'<p>' + __( 'In quoting others, we cite ourselves.' ) + '</p>',
 			citation: 'Julio Cortázar',
-			className: 'is-style-large',
 		},
 	},
 	transforms,
