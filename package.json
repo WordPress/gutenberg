@@ -309,7 +309,7 @@
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
 			"node ./docs/tool/index.js"
 		],
-		"packages/**/*.{js,ts,tsx}": [
+		"packages/**/*.{js,ts,tsx,json}": [
 			"npm-run-all api-docs:*",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
