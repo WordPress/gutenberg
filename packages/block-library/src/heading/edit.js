@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
+import { useEffect, Platform } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
@@ -120,6 +120,7 @@ function HeadingEdit( {
 				aria-label={ __( 'Heading text' ) }
 				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }
+				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
 				{ ...blockProps }
 			/>
 		</>

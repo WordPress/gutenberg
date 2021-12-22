@@ -20,15 +20,13 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 
 /**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
+ * Shared reference to an empty object for cases where it is important to avoid
+ * returning a new object reference on every invocation, as in a connected or
  * other pure component which performs `shouldComponentUpdate` check on props.
  * This should be used as a last resort, since the normalized data should be
  * maintained by the reducer result in state.
- *
- * @type {Array}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -295,16 +293,14 @@ export function hasEntityRecords( state, kind, name, query ) {
  */
 export function getEntityRecords( state, kind, name, query ) {
 	// Queried data state is prepopulated for all known entities. If this is not
-	// assigned for the given parameters, then it is known to not exist. Thus, a
-	// return value of an empty array is used instead of `null` (where `null` is
-	// otherwise used to represent an unknown state).
+	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.data, [
 		kind,
 		name,
 		'queriedData',
 	] );
 	if ( ! queriedState ) {
-		return EMPTY_ARRAY;
+		return null;
 	}
 	return getQueriedItems( queriedState, query );
 }
@@ -326,8 +322,12 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
 					data[ kind ][ name ].edits
-				).filter( ( primaryKey ) =>
-					hasEditsForEntityRecord( state, kind, name, primaryKey )
+				).filter(
+					( primaryKey ) =>
+						// The entity record must exist (not be deleted),
+						// and it must have edits.
+						getEntityRecord( state, kind, name, primaryKey ) &&
+						hasEditsForEntityRecord( state, kind, name, primaryKey )
 				);
 
 				if ( primaryKeys.length ) {
@@ -684,7 +684,18 @@ export function hasRedo( state ) {
  * @return {Object} The current theme.
  */
 export function getCurrentTheme( state ) {
-	return state.themes[ state.currentTheme ];
+	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
+}
+
+/**
+ * Return the ID of the current global styles object.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string} The current global styles ID.
+ */
+export function __experimentalGetCurrentGlobalStylesId( state ) {
+	return state.currentGlobalStylesId;
 }
 
 /**
@@ -695,7 +706,7 @@ export function getCurrentTheme( state ) {
  * @return {*} Index data.
  */
 export function getThemeSupports( state ) {
-	return state.themeSupports;
+	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
 }
 
 /**
@@ -881,4 +892,19 @@ export function __experimentalGetTemplateForLink( state, link ) {
 		);
 	}
 	return template;
+}
+
+/**
+ * Retrieve the current theme's base global styles
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object?} The Global Styles object.
+ */
+export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
+	const currentTheme = getCurrentTheme( state );
+	if ( ! currentTheme ) {
+		return null;
+	}
+	return state.themeBaseGlobalStyles[ currentTheme.stylesheet ];
 }

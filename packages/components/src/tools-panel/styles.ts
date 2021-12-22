@@ -8,30 +8,28 @@ import { css } from '@emotion/react';
  */
 import {
 	StyledField as BaseControlField,
+	StyledHelp as BaseControlHelp,
+	StyledLabel as BaseControlLabel,
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
+import { LabelWrapper } from '../input-control/styles/input-control-styles';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
-	container: css`
+	spacing: css`
 		column-gap: ${ space( 4 ) };
-		display: grid;
-		grid-template-columns: 1fr 1fr;
 		row-gap: ${ space( 6 ) };
 	`,
 	item: {
-		halfWidth: css`
-			grid-column: span 1;
-		`,
 		fullWidth: css`
-			grid-column: span 2;
+			grid-column: 1 / -1;
 		`,
 	},
 };
 
 export const ToolsPanel = css`
-	${ toolsPanelGrid.container };
+	${ toolsPanelGrid.spacing };
 
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
 	margin-top: -1px;
@@ -43,12 +41,17 @@ export const ToolsPanel = css`
  * an inner dom element to be injected. The following rule allows for the
  * CSS grid display to be re-established.
  */
-export const ToolsPanelWithInnerWrapper = css`
-	> div:not( :first-of-type ) {
-		${ toolsPanelGrid.container }
-		${ toolsPanelGrid.item.fullWidth }
-	}
-`;
+
+export const ToolsPanelWithInnerWrapper = ( columns: number ) => {
+	return css`
+		> div:not( :first-of-type ) {
+			display: grid;
+			grid-template-columns: ${ `repeat( ${ columns }, 1fr )` };
+			${ toolsPanelGrid.spacing }
+			${ toolsPanelGrid.item.fullWidth }
+		}
+	`;
+};
 
 export const ToolsPanelHiddenInnerWrapper = css`
 	> div:not( :first-of-type ) {
@@ -69,6 +72,7 @@ export const ToolsPanelHeader = css`
 	 */
 	.components-dropdown-menu {
 		margin: ${ space( -1 ) } 0;
+		line-height: 0;
 	}
 	&&&& .components-dropdown-menu__toggle {
 		padding: 0;
@@ -90,10 +94,6 @@ export const ToolsPanelHeading = css`
 export const ToolsPanelItem = css`
 	${ toolsPanelGrid.item.fullWidth }
 
-	&.single-column {
-		${ toolsPanelGrid.item.halfWidth }
-	}
-
 	/* Clear spacing in and around controls added as panel items. */
 	/* Remove when they can be addressed via context system. */
 	& > div,
@@ -107,9 +107,45 @@ export const ToolsPanelItem = css`
 	&& ${ BaseControlWrapper } {
 		margin-bottom: 0;
 
-		${ BaseControlField } {
+		/**
+		 * To maintain proper spacing within a base control, the field's bottom
+		 * margin should only be removed when there is no help text included and
+		 * it is therefore the last-child.
+		 */
+		${ BaseControlField }:last-child {
 			margin-bottom: 0;
 		}
+	}
+
+	${ BaseControlHelp } {
+		margin-bottom: 0;
+	}
+
+	/**
+	 * Standardize InputControl and BaseControl labels with other labels when
+	 * inside ToolsPanel.
+	 *
+	 * This is a temporary fix until the different control components have their
+	 * labels normalized.
+	 */
+	&& ${ LabelWrapper } {
+		label {
+			margin-bottom: ${ space( 2 ) };
+			padding-bottom: 0;
+			line-height: 1.4em;
+		}
+	}
+
+	/**
+	 * The targeting of .components-custom-select-control__label here is a
+	 * temporary measure only.
+	 *
+	 * It should be replaced once CustomSelectControl component has been
+	 * refactored and can be targeted via component interpolation.
+	 */
+	.components-custom-select-control__label,
+	${ BaseControlLabel } {
+		line-height: 1.4em;
 	}
 `;
 

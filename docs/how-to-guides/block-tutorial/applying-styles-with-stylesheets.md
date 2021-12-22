@@ -5,7 +5,7 @@ In the [previous section](/docs/how-to-guides/block-tutorial/writing-your-first-
 The editor will automatically generate a class name for each block type to simplify styling. It can be accessed from the object argument passed to the edit and save functions. In this section, we will create a stylesheet to use that class name.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -38,7 +38,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, blockEditor ) {

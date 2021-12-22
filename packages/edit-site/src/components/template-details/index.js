@@ -23,6 +23,8 @@ import {
 } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
+import EditTemplateTitle from './edit-template-title';
+import { useLink } from '../routes/link';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -30,9 +32,7 @@ export default function TemplateDetails( { template, onClose } ) {
 			select( editorStore ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
-	const { openNavigationPanelToMenu, revertTemplate } = useDispatch(
-		editSiteStore
-	);
+	const { revertTemplate } = useDispatch( editSiteStore );
 
 	const templateSubMenu = useMemo( () => {
 		if ( template?.type === 'wp_template' ) {
@@ -44,14 +44,15 @@ export default function TemplateDetails( { template, onClose } ) {
 		);
 	}, [ template ] );
 
+	const browseAllLinkProps = useLink( {
+		// TODO: We should update this to filter by template part's areas as well.
+		postType: template.type,
+		postId: undefined,
+	} );
+
 	if ( ! template ) {
 		return null;
 	}
-
-	const showTemplateInSidebar = () => {
-		onClose();
-		openNavigationPanelToMenu( templateSubMenu.menu );
-	};
 
 	const revert = () => {
 		revertTemplate( template );
@@ -61,13 +62,17 @@ export default function TemplateDetails( { template, onClose } ) {
 	return (
 		<div className="edit-site-template-details">
 			<div className="edit-site-template-details__group">
-				<Heading
-					level={ 4 }
-					weight={ 600 }
-					className="edit-site-template-details__title"
-				>
-					{ title }
-				</Heading>
+				{ template.is_custom ? (
+					<EditTemplateTitle template={ template } />
+				) : (
+					<Heading
+						level={ 4 }
+						weight={ 600 }
+						className="edit-site-template-details__title"
+					>
+						{ title }
+					</Heading>
+				) }
 
 				{ description && (
 					<Text
@@ -86,7 +91,7 @@ export default function TemplateDetails( { template, onClose } ) {
 				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
 					<MenuItem
 						className="edit-site-template-details__revert-button"
-						info={ __( 'Restore template to theme default' ) }
+						info={ __( 'Restore template to default state' ) }
 						onClick={ revert }
 					>
 						{ __( 'Clear customizations' ) }
@@ -96,14 +101,7 @@ export default function TemplateDetails( { template, onClose } ) {
 
 			<Button
 				className="edit-site-template-details__show-all-button"
-				onClick={ showTemplateInSidebar }
-				aria-label={ sprintf(
-					/* translators: %1$s: the template part's area name ("Headers", "Sidebars") or "templates". */
-					__(
-						'Browse all %1$s. This will open the %1$s menu in the navigation side panel.'
-					),
-					templateSubMenu.title
-				) }
+				{ ...browseAllLinkProps }
 			>
 				{ sprintf(
 					/* translators: the template part's area name ("Headers", "Sidebars") or "templates". */

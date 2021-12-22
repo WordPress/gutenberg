@@ -53,6 +53,11 @@ import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
 
+/**
+ * Internal dependencies
+ */
+import useMobileWarning from './use-mobile-warning';
+
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
@@ -118,6 +123,16 @@ function GalleryEdit( props ) {
 		[ clientId ]
 	);
 
+	const wasBlockJustInserted = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			);
+		},
+		[ clientId ]
+	);
+
 	const images = useMemo(
 		() =>
 			innerBlockImages?.map( ( block ) => ( {
@@ -134,10 +149,12 @@ function GalleryEdit( props ) {
 
 	const newImages = useGetNewImages( images, imageData );
 
+	useMobileWarning( newImages );
+
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			updateBlockAttributes( newImage.clientId, {
-				...buildImageAttributes( false, newImage.attributes ),
+				...buildImageAttributes( newImage.attributes ),
 				id: newImage.id,
 				align: undefined,
 			} );
@@ -169,26 +186,24 @@ function GalleryEdit( props ) {
 	 * it already existed in the gallery. If the image is in fact new, we need
 	 * to apply the gallery's current settings to the image.
 	 *
-	 * @param {Object} existingBlock Existing Image block that still exists after gallery update.
-	 * @param {Object} image         Media object for the actual image.
-	 * @return {Object}               Attributes to set on the new image block.
+	 * @param {Object} imageAttributes Media object for the actual image.
+	 * @return {Object}                Attributes to set on the new image block.
 	 */
-	function buildImageAttributes( existingBlock, image ) {
-		if ( existingBlock ) {
-			return existingBlock.attributes;
-		}
+	function buildImageAttributes( imageAttributes ) {
+		const image = imageAttributes.id
+			? find( imageData, { id: imageAttributes.id } )
+			: null;
 
 		let newClassName;
-		if ( image.className && image.className !== '' ) {
-			newClassName = image.className;
+		if ( imageAttributes.className && imageAttributes.className !== '' ) {
+			newClassName = imageAttributes.className;
 		} else {
 			newClassName = preferredStyle
 				? `is-style-${ preferredStyle }`
 				: undefined;
 		}
-
 		return {
-			...pickRelevantMediaFiles( image, sizeSlug ),
+			...pickRelevantMediaFiles( imageAttributes, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
 			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
 			className: newClassName,
@@ -430,6 +445,9 @@ function GalleryEdit( props ) {
 			value={ hasImageIds ? images : {} }
 			onError={ onUploadError }
 			notices={ hasImages ? undefined : noticeUI }
+			autoOpenMediaUpload={
+				! hasImages && isSelected && wasBlockJustInserted
+			}
 		/>
 	);
 
@@ -491,7 +509,7 @@ function GalleryEdit( props ) {
 							hideCancelButton={ true }
 						/>
 					) }
-					{ Platform.isWeb && ! imageSizeOptions && (
+					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
 								{ __( 'Image size' ) }

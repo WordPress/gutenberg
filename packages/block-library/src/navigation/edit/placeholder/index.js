@@ -1,80 +1,233 @@
 /**
  * WordPress dependencies
  */
-import { serialize } from '@wordpress/blocks';
-import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { createBlock } from '@wordpress/blocks';
+import {
+	Placeholder,
+	Button,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+} from '@wordpress/components';
+import { useCallback, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-const PLACEHOLDER_STEPS = {
-	selectNavigationPost: 1,
-	createInnerBlocks: 2,
-};
+import { navigation, Icon } from '@wordpress/icons';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
-import SelectNavigationMenuStep from './select-navigation-menu-step';
-import CreateInnerBlocksStep from './create-inner-blocks-step';
 
-export default function Placeholder( {
+import useNavigationEntities from '../../use-navigation-entities';
+import PlaceholderPreview from './placeholder-preview';
+import menuItemsToBlocks from '../../menu-items-to-blocks';
+import useNavigationMenu from '../../use-navigation-menu';
+import useCreateNavigationMenu from '../use-create-navigation-menu';
+
+const ExistingMenusDropdown = ( {
+	canSwitchNavigationMenu,
+	navigationMenus,
+	setSelectedMenu,
+	onFinish,
+	menus,
+	onCreateFromMenu,
+	showClassicMenus = false,
+} ) => {
+	const toggleProps = {
+		variant: 'tertiary',
+		iconPosition: 'right',
+		className: 'wp-block-navigation-placeholder__actions__dropdown',
+	};
+	return (
+		<DropdownMenu
+			text={ __( 'Select menu' ) }
+			icon={ null }
+			toggleProps={ toggleProps }
+			popoverProps={ { isAlternate: true } }
+		>
+			{ ( { onClose } ) => (
+				<>
+					<MenuGroup label={ __( 'Menus' ) }>
+						{ canSwitchNavigationMenu &&
+							navigationMenus?.map( ( menu ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											setSelectedMenu( menu.id );
+											onFinish( menu );
+										} }
+										onClose={ onClose }
+										key={ menu.id }
+									>
+										{ decodeEntities(
+											menu.title.rendered
+										) }
+									</MenuItem>
+								);
+							} ) }
+					</MenuGroup>
+					{ showClassicMenus && (
+						<MenuGroup label={ __( 'Classic Menus' ) }>
+							{ menus?.map( ( menu ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											setSelectedMenu( menu.id );
+											onCreateFromMenu( menu.name );
+										} }
+										onClose={ onClose }
+										key={ menu.id }
+									>
+										{ decodeEntities( menu.name ) }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+				</>
+			) }
+		</DropdownMenu>
+	);
+};
+
+export default function NavigationPlaceholder( {
+	clientId,
 	onFinish,
 	canSwitchNavigationMenu,
-	hasResolvedNavigationMenu,
+	hasResolvedNavigationMenus,
+	canUserCreateNavigation = false,
 } ) {
-	const [ step, setStep ] = useState(
-		PLACEHOLDER_STEPS.selectNavigationPost
-	);
-	const [ navigationMenuTitle, setNavigationMenuTitle ] = useState( '' );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const [ selectedMenu, setSelectedMenu ] = useState();
+	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
+	const [ menuName, setMenuName ] = useState( '' );
+	const createNavigationMenu = useCreateNavigationMenu( clientId );
 
-	// This callback uses data from the two placeholder steps and only creates
-	// a new navigation menu when the user completes the final step.
-	const createNavigationMenu = useCallback(
-		async ( title = __( 'Untitled Navigation Menu' ), blocks = [] ) => {
-			const record = {
-				title,
-				content: serialize( blocks ),
-				status: 'publish',
-			};
+	const onFinishMenuCreation = async (
+		blocks,
+		navigationMenuTitle = null
+	) => {
+		if ( ! canUserCreateNavigation ) {
+			return;
+		}
 
-			const navigationMenu = await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				record
-			);
+		const navigationMenu = await createNavigationMenu(
+			navigationMenuTitle,
+			blocks
+		);
+		onFinish( navigationMenu, blocks );
+	};
 
-			return navigationMenu;
+	const {
+		isResolvingPages,
+		menus,
+		isResolvingMenus,
+		menuItems,
+		hasResolvedMenuItems,
+		hasPages,
+		hasMenus,
+	} = useNavigationEntities( selectedMenu );
+
+	const isStillLoading = isResolvingPages || isResolvingMenus;
+
+	const createFromMenu = useCallback(
+		( name ) => {
+			const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
+			onFinishMenuCreation( blocks, name );
 		},
-		[ serialize, saveEntityRecord ]
+		[ menuItems, menuItemsToBlocks, onFinish ]
 	);
+
+	const onCreateFromMenu = ( name ) => {
+		// If we have menu items, create the block right away.
+		if ( hasResolvedMenuItems ) {
+			createFromMenu( name );
+			return;
+		}
+
+		// Otherwise, create the block when resolution finishes.
+		setIsCreatingFromMenu( true );
+		// Store the name to use later.
+		setMenuName( name );
+	};
+
+	const onCreateEmptyMenu = () => {
+		onFinishMenuCreation( [] );
+	};
+
+	const onCreateAllPages = () => {
+		const block = [ createBlock( 'core/page-list' ) ];
+		onFinishMenuCreation( block );
+	};
+
+	useEffect( () => {
+		// If the user selected a menu but we had to wait for menu items to
+		// finish resolving, then create the block once resolution finishes.
+		if ( isCreatingFromMenu && hasResolvedMenuItems ) {
+			createFromMenu( menuName );
+			setIsCreatingFromMenu( false );
+		}
+	}, [ isCreatingFromMenu, hasResolvedMenuItems, menuName ] );
+
+	const { navigationMenus } = useNavigationMenu();
 
 	return (
 		<>
-			{ step === PLACEHOLDER_STEPS.selectNavigationPost && (
-				<SelectNavigationMenuStep
-					onCreateNew={ ( newTitle ) => {
-						setNavigationMenuTitle( newTitle );
-						setStep( PLACEHOLDER_STEPS.createInnerBlocks );
-					} }
-					onSelectExisting={ ( navigationMenu ) => {
-						onFinish( navigationMenu );
-					} }
-					canSwitchNavigationMenu={ canSwitchNavigationMenu }
-					hasResolvedNavigationMenu={ hasResolvedNavigationMenu }
-				/>
+			{ ( ! hasResolvedNavigationMenus || isStillLoading ) && (
+				<PlaceholderPreview isLoading />
 			) }
-			{ step === PLACEHOLDER_STEPS.createInnerBlocks && (
-				<CreateInnerBlocksStep
-					onFinish={ async ( blocks ) => {
-						const navigationMenu = await createNavigationMenu(
-							navigationMenuTitle,
-							blocks
-						);
-						onFinish( navigationMenu );
-					} }
-				/>
+			{ hasResolvedNavigationMenus && ! isStillLoading && (
+				<Placeholder className="wp-block-navigation-placeholder">
+					<PlaceholderPreview />
+					<div className="wp-block-navigation-placeholder__controls">
+						<div className="wp-block-navigation-placeholder__actions">
+							<div className="wp-block-navigation-placeholder__actions__indicator">
+								<Icon icon={ navigation } />{ ' ' }
+								{ __( 'Navigation' ) }
+							</div>
+
+							<hr />
+
+							{ hasMenus || navigationMenus?.length ? (
+								<>
+									<ExistingMenusDropdown
+										canSwitchNavigationMenu={
+											canSwitchNavigationMenu
+										}
+										navigationMenus={ navigationMenus }
+										setSelectedMenu={ setSelectedMenu }
+										onFinish={ onFinish }
+										menus={ menus }
+										onCreateFromMenu={ onCreateFromMenu }
+										showClassicMenus={
+											canUserCreateNavigation
+										}
+									/>
+									<hr />
+								</>
+							) : undefined }
+							{ canUserCreateNavigation && hasPages ? (
+								<>
+									<Button
+										variant="tertiary"
+										onClick={ onCreateAllPages }
+									>
+										{ __( 'Add all pages' ) }
+									</Button>
+									<hr />
+								</>
+							) : undefined }
+
+							{ canUserCreateNavigation && (
+								<Button
+									variant="tertiary"
+									onClick={ onCreateEmptyMenu }
+								>
+									{ __( 'Start empty' ) }
+								</Button>
+							) }
+						</div>
+					</div>
+				</Placeholder>
 			) }
 		</>
 	);

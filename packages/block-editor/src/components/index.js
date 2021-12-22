@@ -24,6 +24,7 @@ export { default as BlockColorsStyleSelector } from './color-style-selector';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
+export { default as BlockStyles } from './block-styles';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
@@ -48,16 +49,14 @@ export { default as __experimentalLetterSpacingControl } from './letter-spacing-
 export { default as __experimentalTextDecorationControl } from './text-decoration-control';
 export { default as __experimentalTextTransformControl } from './text-transform-control';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
+export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export {
 	default as __experimentalImageEditor,
 	ImageEditingProvider as __experimentalImageEditingProvider,
 } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
-export {
-	default as InnerBlocks,
-	useInnerBlocksProps as __experimentalUseInnerBlocksProps,
-} from './inner-blocks';
+export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
 	default as InspectorControls,
 	InspectorAdvancedControls,
@@ -106,7 +105,10 @@ export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
 export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
-export { default as BlockPreview } from './block-preview';
+export {
+	default as BlockPreview,
+	useBlockPreview as __experimentalUseBlockPreview,
+} from './block-preview';
 export {
 	default as BlockSelectionClearer,
 	useBlockSelectionClearer as __unstableUseBlockSelectionClearer,
@@ -140,7 +142,6 @@ export {
 } from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
-export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';

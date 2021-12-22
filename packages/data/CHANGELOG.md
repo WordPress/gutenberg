@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Corrected expect type of action creators and selectors in Redux store configuration type
+-   Move `redux` to regular dependencies and update it to version `^4.1.2`.
+
+### Internal
+
+-   Changed names of store-related types to better reflect their use and role.
+-   Changed "storeDefinition" to "storeDescriptor" to better reflect its use and role.
+
 ## 6.1.0 (2021-09-09)
 
 ### New Features

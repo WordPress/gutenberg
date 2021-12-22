@@ -20,6 +20,7 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
+	useCachedTruthy,
 } from '@wordpress/block-editor';
 import { Popover, TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -27,25 +28,27 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { textColor as settings } from './index';
+import { textColor as settings, transparentValue } from './index';
 
 function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
 			const [ property, value ] = rule.split( ':' );
 			if ( property === 'color' ) accumulator.color = value;
-			if ( property === 'background-color' )
+			if ( property === 'background-color' && value !== transparentValue )
 				accumulator.backgroundColor = value;
 		}
 		return accumulator;
 	}, {} );
 }
 
-function parseClassName( className = '', colorSettings ) {
+export function parseClassName( className = '', colorSettings ) {
 	return className.split( ' ' ).reduce( ( accumulator, name ) => {
-		const match = name.match( /^has-([^-]+)-color$/ );
-		if ( match ) {
-			const [ , colorSlug ] = name.match( /^has-([^-]+)-color$/ );
+		// `colorSlug` could contain dashes, so simply match the start and end.
+		if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
+			const colorSlug = name
+				.replace( /^has-/, '' )
+				.replace( /-color$/, '' );
 			const colorObject = getColorObjectByAttributeValues(
 				colorSettings,
 				colorSlug
@@ -87,7 +90,7 @@ function setColors( value, name, colorSettings, colors ) {
 		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
 	} else {
 		// Override default browser color for mark element.
-		styles.push( [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' ) );
+		styles.push( [ 'background-color', transparentValue ].join( ':' ) );
 	}
 
 	if ( color ) {
@@ -139,7 +142,17 @@ export default function InlineColorUI( {
 	onClose,
 	contentRef,
 } ) {
-	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
+	/* 
+	 As you change the text color by typing a HEX value into a field,
+	 the return value of document.getSelection jumps to the field you're editing,
+	 not the highlighted text. Given that useAnchorRef uses document.getSelection,
+	 it will return null, since it can't find the <mark> element within the HEX input.
+	 This caches the last truthy value of the selection anchor reference.
+	 */
+	const anchorRef = useCachedTruthy(
+		useAnchorRef( { ref: contentRef, value, settings } )
+	);
+
 	return (
 		<Popover
 			onClose={ onClose }

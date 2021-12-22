@@ -23,7 +23,7 @@ export const defaultEntities = [
 		label: __( 'Base' ),
 		name: '__unstableBase',
 		kind: 'root',
-		baseURL: '',
+		baseURL: '/',
 	},
 	{
 		label: __( 'Site' ),
@@ -104,7 +104,7 @@ export const defaultEntities = [
 	{
 		name: 'menu',
 		kind: 'root',
-		baseURL: '/__experimental/menus',
+		baseURL: '/wp/v2/menus',
 		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
@@ -112,7 +112,7 @@ export const defaultEntities = [
 	{
 		name: 'menuItem',
 		kind: 'root',
-		baseURL: '/__experimental/menu-items',
+		baseURL: '/wp/v2/menu-items',
 		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
@@ -121,11 +121,46 @@ export const defaultEntities = [
 	{
 		name: 'menuLocation',
 		kind: 'root',
-		baseURL: '/__experimental/menu-locations',
+		baseURL: '/wp/v2/menu-locations',
 		baseURLParams: { context: 'edit' },
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
+	},
+	{
+		name: 'navigationArea',
+		kind: 'root',
+		baseURL: '/wp/v2/block-navigation-areas',
+		baseURLParams: { context: 'edit' },
+		plural: 'navigationAreas',
+		label: __( 'Navigation Area' ),
+		key: 'name',
+		getTitle: ( record ) => record?.description,
+	},
+	{
+		label: __( 'Global Styles' ),
+		name: 'globalStyles',
+		kind: 'root',
+		baseURL: '/wp/v2/global-styles',
+		baseURLParams: { context: 'edit' },
+		plural: 'globalStylesVariations', // should be different than name
+		getTitle: ( record ) => record?.title?.rendered || record?.title,
+	},
+	{
+		label: __( 'Themes' ),
+		name: 'theme',
+		kind: 'root',
+		baseURL: '/wp/v2/themes',
+		baseURLParams: { context: 'edit' },
+		key: 'stylesheet',
+	},
+	{
+		label: __( 'Plugins' ),
+		name: 'plugin',
+		kind: 'root',
+		baseURL: '/wp/v2/plugins',
+		baseURLParams: { context: 'edit' },
+		key: 'plugin',
 	},
 ];
 
@@ -175,9 +210,10 @@ async function loadPostTypeEntities() {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
+		const namespace = postType?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'postType',
-			baseURL: '/wp/v2/' + postType.rest_base,
+			baseURL: `/${ namespace }/${ postType.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: postType.labels.singular_name,
@@ -207,9 +243,10 @@ async function loadTaxonomyEntities() {
 		path: '/wp/v2/taxonomies?context=edit',
 	} );
 	return map( taxonomies, ( taxonomy, name ) => {
+		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'taxonomy',
-			baseURL: '/wp/v2/' + taxonomy.rest_base,
+			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: taxonomy.labels.singular_name,

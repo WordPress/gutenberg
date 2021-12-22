@@ -69,11 +69,7 @@ async function readConfig() {
 function getPuppeteer( { browser } ) {
 	switch ( browser.toLowerCase() ) {
 		case 'chromium':
-			try {
-				return require( 'puppeteer' );
-			} catch ( e ) {
-				return require( 'puppeteer-core' );
-			}
+			return require( 'puppeteer-core' );
 		case 'firefox':
 			return require( 'puppeteer-firefox' );
 		default:

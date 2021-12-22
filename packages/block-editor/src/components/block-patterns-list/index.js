@@ -9,22 +9,15 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
-import { store as blockEditorStore } from '../../store';
 
 function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
-	const { name, viewportWidth } = pattern;
-	const { blocks } = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__experimentalGetParsedPattern( name ),
-		[ name ]
-	);
+	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
 

@@ -264,6 +264,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestGotoCustomerSupportOptions() {
         print(#function)
     }
+
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) -> Void {
+        print("Gutenberg requested sending '\(eventName)' event to host with propreties: \(properties).")
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {

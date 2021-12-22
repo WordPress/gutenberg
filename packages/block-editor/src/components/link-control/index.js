@@ -94,6 +94,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
+ * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
  */
 
 /**
@@ -121,6 +122,7 @@ function LinkControl( {
 	createSuggestionButtonText,
 	hasRichPreviews = false,
 	hasTextControl = false,
+	renderControlBottom = null,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -185,13 +187,21 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink ] );
 
-	/**
-	 * If the value's `text` property changes then sync this
-	 * back up with state.
-	 */
 	useEffect( () => {
+		/**
+		 * If the value's `text` property changes then sync this
+		 * back up with state.
+		 */
 		if ( value?.title && value.title !== internalTextValue ) {
 			setInternalTextValue( value.title );
+		}
+
+		/**
+		 * Update the state value internalInputValue if the url value changes
+		 * for example when clicking on another anchor
+		 */
+		if ( value?.url ) {
+			setInternalInputValue( value.url );
 		}
 	}, [ value ] );
 
@@ -251,7 +261,7 @@ function LinkControl( {
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
-	const showTextControl = value?.url?.trim()?.length && hasTextControl;
+	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
 	return (
 		<div
@@ -346,6 +356,7 @@ function LinkControl( {
 					/>
 				</div>
 			) }
+			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);
 }

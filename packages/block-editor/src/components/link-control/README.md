@@ -114,7 +114,7 @@ Controls the query parameters used to search for suggestions. For example, to li
 
 ```jsx
 <LinkControl
-	suggestionQuery={ {
+	suggestionsQuery={ {
 		type: 'post',
 		subtype: 'page',
 	} }
@@ -192,6 +192,13 @@ A `suggestion` should have the following shape:
 	)}
 />
 ```
+### renderControlBottom 
+
+-   Type: `Function`
+-   Required: No
+-   Default: null
+
+A render prop that can be used to pass optional controls to be rendered at the bottom of the component.
 
 # LinkControlSearchInput
 

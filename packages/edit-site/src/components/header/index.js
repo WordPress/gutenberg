@@ -100,6 +100,8 @@ export default function Header( {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
+	const isFocusMode = templateType === 'wp_template_part';
+
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
@@ -157,10 +159,12 @@ export default function Header( {
 
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
-					<PreviewOptions
-						deviceType={ deviceType }
-						setDeviceType={ setPreviewDeviceType }
-					/>
+					{ ! isFocusMode && (
+						<PreviewOptions
+							deviceType={ deviceType }
+							setDeviceType={ setPreviewDeviceType }
+						/>
+					) }
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }

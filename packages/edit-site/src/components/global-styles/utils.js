@@ -59,7 +59,9 @@ export const PRESET_METADATA = [
 		path: [ 'typography', 'fontFamilies' ],
 		valueKey: 'fontFamily',
 		cssVarInfix: 'font-family',
-		classes: [],
+		classes: [
+			{ classSuffix: 'font-family', propertyName: 'font-family' },
+		],
 	},
 ];
 
@@ -88,7 +90,7 @@ function findInPresetsBy(
 	for ( const presetByOrigin of orderedPresetsByOrigin ) {
 		if ( presetByOrigin ) {
 			// Preset origins ordered by priority.
-			const origins = [ 'user', 'theme', 'core' ];
+			const origins = [ 'custom', 'theme', 'default' ];
 			for ( const origin of origins ) {
 				const presets = presetByOrigin[ origin ];
 				if ( presets ) {

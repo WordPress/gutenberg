@@ -19,7 +19,7 @@ import {
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../../experimental-features';
+import { siteEditor } from '../site-editor/utils';
 import {
 	readFile,
 	deleteFile,
@@ -55,6 +55,7 @@ describe( 'Site Editor Performance', () => {
 			inserterOpen: [],
 			inserterHover: [],
 			inserterSearch: [],
+			listViewOpen: [],
 		};
 
 		const html = readFile(
@@ -83,6 +84,7 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		await siteEditor.visit( { postId: id, postType: 'page' } );
+		await siteEditor.disableWelcomeGuide();
 
 		let i = 3;
 

@@ -35,6 +35,8 @@ function ColorGradientControlInner( {
 	gradients,
 	disableCustomColors,
 	disableCustomGradients,
+	__experimentalHasMultipleOrigins,
+	__experimentalIsRenderedInSidebar,
 	className,
 	label,
 	onColorChange,
@@ -43,6 +45,7 @@ function ColorGradientControlInner( {
 	gradientValue,
 	clearable,
 	showTitle = true,
+	enableAlpha,
 } ) {
 	const canChooseAColor =
 		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
@@ -104,7 +107,14 @@ function ColorGradientControlInner( {
 									: onColorChange
 							}
 							{ ...{ colors, disableCustomColors } }
+							__experimentalHasMultipleOrigins={
+								__experimentalHasMultipleOrigins
+							}
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
 							clearable={ clearable }
+							enableAlpha={ enableAlpha }
 						/>
 					) }
 					{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
@@ -119,6 +129,12 @@ function ColorGradientControlInner( {
 									: onGradientChange
 							}
 							{ ...{ gradients, disableCustomGradients } }
+							__experimentalHasMultipleOrigins={
+								__experimentalHasMultipleOrigins
+							}
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
 							clearable={ clearable }
 						/>
 					) }

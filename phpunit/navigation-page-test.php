@@ -44,7 +44,7 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 
 		$menu_id                = mt_rand( 1, 1000 );
 		$expected_preload_paths = array(
-			'/__experimental/menu-locations',
+			'/wp/v2/menu-locations',
 			array(
 				'/wp/v2/pages',
 				'OPTIONS',
@@ -54,7 +54,7 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 				'OPTIONS',
 			),
 			'/wp/v2/types?context=edit',
-			"/__experimental/menu-items?context=edit&menus={$menu_id}&per_page=100&_locale=user",
+			"/wp/v2/menu-items?context=edit&menus={$menu_id}&per_page=100&_locale=user",
 		);
 
 		$this->callback->expects( $this->once() )

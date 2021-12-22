@@ -21,7 +21,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
@@ -508,13 +508,19 @@ export default function NavigationSubmenuEdit( {
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: true,
+
+			// Ensure block toolbar is not too far removed from item
+			// being edited.
+			// see: https://github.com/WordPress/gutenberg/pull/34615.
+			__experimentalCaptureToolbars: true,
+
 			renderAppender:
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				hasDescendants
-					? InnerBlocks.DefaultAppender
+					? InnerBlocks.ButtonBlockAppender
 					: false,
 		}
 	);

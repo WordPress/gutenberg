@@ -5,7 +5,6 @@ import {
 	toggleFeature,
 	setTemplate,
 	addTemplate,
-	removeTemplate,
 	setTemplatePart,
 	setPage,
 	showHomepage,
@@ -73,35 +72,6 @@ describe( 'actions', () => {
 				},
 				done: true,
 			} );
-		} );
-	} );
-
-	describe( 'removeTemplate', () => {
-		it( 'should issue a REST request to delete the template, then read the current page and then set the page with an updated template list', () => {
-			const templateId = 1;
-			const page = { path: '/' };
-
-			const it = removeTemplate( templateId );
-			expect( it.next().value ).toEqual( {
-				type: 'API_FETCH',
-				request: {
-					path: `/wp/v2/templates/${ templateId }`,
-					method: 'DELETE',
-				},
-			} );
-			expect( it.next().value ).toEqual( {
-				type: '@@data/SELECT',
-				storeKey: 'core/edit-site',
-				selectorName: 'getPage',
-				args: [],
-			} );
-			expect( it.next( page ).value ).toEqual( {
-				type: '@@data/DISPATCH',
-				storeKey: 'core/edit-site',
-				actionName: 'setPage',
-				args: [ page ],
-			} );
-			expect( it.next().done ).toBe( true );
 		} );
 	} );
 

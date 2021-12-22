@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/navigation-submenu` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -19,7 +19,7 @@ function block_core_navigation_submenu_build_css_colors( $context, $attributes )
 		'inline_styles' => '',
 	);
 
-	$is_sub_menu = isset( $attributes['isTopLevelLink'] ) ? ( ! $attributes['isTopLevelLink'] ) : false;
+	$is_sub_menu = isset( $attributes['isTopLevelItem'] ) ? ( ! $attributes['isTopLevelItem'] ) : false;
 
 	// Text color.
 	$named_text_color  = null;
@@ -98,7 +98,7 @@ function block_core_navigation_submenu_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
 	}
 
 	return $font_sizes;
@@ -116,9 +116,9 @@ function block_core_navigation_submenu_render_submenu_icon() {
 /**
  * Renders the `core/navigation-submenu` block.
  *
- * @param array $attributes The block attributes.
- * @param array $content The saved content.
- * @param array $block The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
@@ -129,11 +129,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
 
 	// Don't render the block's subtree if it is a draft.
-	if ( $is_post_type && $navigation_link_has_id ) {
-		$post = get_post( $attributes['id'] );
-		if ( 'publish' !== $post->post_status ) {
-			return '';
-		}
+	if ( $is_post_type && $navigation_link_has_id && 'publish' !== get_post_status( $attributes['id'] ) ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.
@@ -153,12 +150,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$has_submenu = count( $block->inner_blocks ) > 0;
 	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
 
-	$class_name = ! empty( $attributes['className'] ) ? implode( ' ', (array) $attributes['className'] ) : false;
-
-	if ( false !== $class_name ) {
-		$css_classes .= ' ' . $class_name;
-	}
-
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
 	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
 	$open_on_hover_and_click = isset( $block->context['openSubmenusOnClick'] ) && ! $block->context['openSubmenusOnClick'] &&
@@ -172,7 +163,38 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			'style' => $style_attribute,
 		)
 	);
-	$html               = '<li ' . $wrapper_attributes . '>';
+
+	$label = '';
+
+	if ( isset( $attributes['label'] ) ) {
+		$label .= wp_kses(
+			$attributes['label'],
+			array(
+				'code'   => array(),
+				'em'     => array(),
+				'img'    => array(
+					'scale' => array(),
+					'class' => array(),
+					'style' => array(),
+					'src'   => array(),
+					'alt'   => array(),
+				),
+				's'      => array(),
+				'span'   => array(
+					'style' => array(),
+				),
+				'strong' => array(),
+			)
+		);
+	}
+
+	$aria_label = sprintf(
+		/* translators: Accessibility text. %s: Parent page title. */
+		__( '%s submenu' ),
+		$label
+	);
+
+	$html = '<li ' . $wrapper_attributes . '>';
 
 	// If Submenus open on hover, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
@@ -180,6 +202,10 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$item_url = isset( $attributes['url'] ) ? esc_url( $attributes['url'] ) : '';
 		// Start appending HTML attributes to anchor tag.
 		$html .= '<a class="wp-block-navigation-item__content" href="' . $item_url . '"';
+
+		if ( $is_active ) {
+			$html .= ' aria-current="page"';
+		}
 
 		if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
@@ -198,27 +224,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '>';
 		// End appending HTML attributes to anchor tag.
 
-		if ( isset( $attributes['label'] ) ) {
-			$html .= wp_kses(
-				$attributes['label'],
-				array(
-					'code'   => array(),
-					'em'     => array(),
-					'img'    => array(
-						'scale' => array(),
-						'class' => array(),
-						'style' => array(),
-						'src'   => array(),
-						'alt'   => array(),
-					),
-					's'      => array(),
-					'span'   => array(
-						'style' => array(),
-					),
-					'strong' => array(),
-				)
-			);
-		}
+		$html .= $label;
 
 		$html .= '</a>';
 		// End anchor tag content.
@@ -226,36 +232,16 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( $show_submenu_indicators ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable elment to open the submenu.
-			$html .= '<button class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			$html .= '<button aria-label="' . $aria_label . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
 		}
 	} else {
 		// If menus open on click, we render the parent as a button.
-		$html .= '<button class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
+		$html .= '<button aria-label="' . $aria_label . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
 
 		// Wrap title with span to isolate it from submenu icon.
 		$html .= '<span class="wp-block-navigation-item__label">';
 
-		if ( isset( $attributes['label'] ) ) {
-			$html .= wp_kses(
-				$attributes['label'],
-				array(
-					'code'   => array(),
-					'em'     => array(),
-					'img'    => array(
-						'scale' => array(),
-						'class' => array(),
-						'style' => array(),
-						'src'   => array(),
-						'alt'   => array(),
-					),
-					's'      => array(),
-					'span'   => array(
-						'style' => array(),
-					),
-					'strong' => array(),
-				)
-			);
-		}
+		$html .= $label;
 
 		$html .= '</span>';
 

@@ -122,7 +122,7 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
-	it( 'Should insert content using the global inserter', async () => {
+	it.skip( 'Should insert content using the global inserter', async () => {
 		const updateButton = await find( {
 			role: 'button',
 			name: 'Update',
@@ -605,7 +605,7 @@ describe( 'Widgets screen', () => {
 		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
-	it( 'Should display legacy widgets', async () => {
+	it.skip( 'Should display legacy widgets', async () => {
 		// Get the default empty instance of a legacy search widget.
 		const { instance: defaultSearchInstance } = await rest( {
 			method: 'POST',

@@ -4,7 +4,7 @@
 import { sprintf, __ } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { getTemplatePartIcon } from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { moreVertical } from '@wordpress/icons';
 
@@ -12,18 +12,29 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { TEMPLATE_PART_AREA_TO_NAME } from '../../store/constants';
 import isTemplateRevertable from '../../utils/is-template-revertable';
+import { useLocation } from '../routes';
+import { useLink } from '../routes/link';
 
 function TemplatePartItemMore( {
 	onClose,
 	templatePart,
 	closeTemplateDetailsDropdown,
 } ) {
-	const { pushTemplatePart, revertTemplate } = useDispatch( editSiteStore );
+	const { revertTemplate } = useDispatch( editSiteStore );
+	const { params } = useLocation();
+	const editLinkProps = useLink(
+		{
+			postId: templatePart.id,
+			postType: templatePart.type,
+		},
+		{
+			fromTemplateId: params.postId,
+		}
+	);
 
-	function editTemplatePart() {
-		pushTemplatePart( templatePart.id );
+	function editTemplatePart( event ) {
+		editLinkProps.onClick( event );
 		onClose();
 		closeTemplateDetailsDropdown();
 	}
@@ -37,7 +48,7 @@ function TemplatePartItemMore( {
 	return (
 		<>
 			<MenuGroup>
-				<MenuItem onClick={ editTemplatePart }>
+				<MenuItem { ...editLinkProps } onClick={ editTemplatePart }>
 					{ sprintf(
 						/* translators: %s: template part title */
 						__( 'Edit %s' ),
@@ -48,7 +59,7 @@ function TemplatePartItemMore( {
 			{ isTemplateRevertable( templatePart ) && (
 				<MenuGroup>
 					<MenuItem
-						info={ __( 'Restore template to theme default' ) }
+						info={ __( 'Restore template to default state' ) }
 						onClick={ clearCustomizations }
 					>
 						{ __( 'Clear customizations' ) }
@@ -67,6 +78,18 @@ function TemplatePartItem( {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
+	const templatePartArea = useSelect(
+		( select ) => {
+			const defaultAreas = select(
+				editorStore
+			).__experimentalGetDefaultTemplatePartAreas();
+
+			return defaultAreas.find(
+				( defaultArea ) => defaultArea.area === templatePart.area
+			);
+		},
+		[ templatePart.area ]
+	);
 	const highlightBlock = () => toggleBlockHighlight( clientId, true );
 	const cancelHighlightBlock = () => toggleBlockHighlight( clientId, false );
 
@@ -77,7 +100,7 @@ function TemplatePartItem( {
 		>
 			<MenuItem
 				role="button"
-				icon={ getTemplatePartIcon( templatePart.area ) }
+				icon={ templatePartArea?.icon }
 				iconPosition="left"
 				onClick={ () => {
 					selectBlock( clientId );
@@ -87,7 +110,7 @@ function TemplatePartItem( {
 				onFocus={ highlightBlock }
 				onBlur={ cancelHighlightBlock }
 			>
-				{ TEMPLATE_PART_AREA_TO_NAME[ templatePart.area ] }
+				{ templatePartArea?.label }
 			</MenuItem>
 
 			<DropdownMenu

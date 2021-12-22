@@ -10,7 +10,7 @@ import { getBlockSupport } from '@wordpress/blocks';
 import { Fragment, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 	ContrastChecker,
@@ -166,6 +166,8 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 				<PanelColorSettings
+					__experimentalHasMultipleOrigins
+					__experimentalIsRenderedInSidebar
 					title={ __( 'Color' ) }
 					colorSettings={ [
 						{
@@ -190,7 +192,7 @@ export function SocialLinksEdit( props ) {
 									iconBackgroundColorValue: colorValue,
 								} );
 							},
-							label: __( 'Icon background color' ),
+							label: __( 'Icon background' ),
 						},
 					] }
 				/>

@@ -6,9 +6,9 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __, _n } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { PanelBody } from '@wordpress/components';
-import { page, layout } from '@wordpress/icons';
+import { PanelBody, PanelRow } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -16,10 +16,25 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import EntityRecordItem from './entity-record-item';
 
-const ENTITY_NAME_ICONS = {
-	site: layout,
-	page,
-};
+function getEntityDescription( entity, length ) {
+	switch ( entity ) {
+		case 'site':
+			return _n(
+				'This change will affect your whole site.',
+				'These changes will affect your whole site.',
+				length
+			);
+		case 'wp_template':
+			return _n(
+				'This change will affect pages and posts that use this template.',
+				'These changes will affect pages and posts that use these templates.',
+				length
+			);
+		case 'page':
+		case 'post':
+			return __( 'The following content has been modified.' );
+	}
+}
 
 export default function EntityTypeList( {
 	list,
@@ -33,13 +48,17 @@ export default function EntityTypeList( {
 			select( coreStore ).getEntity( firstRecord.kind, firstRecord.name ),
 		[ firstRecord.kind, firstRecord.name ]
 	);
-
-	// Set icon based on type of entity.
 	const { name } = firstRecord;
-	const icon = ENTITY_NAME_ICONS[ name ];
+	const entityLabel =
+		name === 'wp_template_part'
+			? _n( 'Template Part', 'Template Parts', list.length )
+			: entity.label;
+	// Set description based on type of entity.
+	const description = getEntityDescription( name, list.length );
 
 	return (
-		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
+		<PanelBody title={ entityLabel } initialOpen={ true }>
+			{ description && <PanelRow>{ description }</PanelRow> }
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordItem
