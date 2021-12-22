@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -12,6 +15,17 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import { visibilityOptions } from './utils';
 import { store as editorStore } from '../../store';
+
+function PublishPrivateConfirm( props ) {
+	return props.showPrivateConfirmDialog ? (
+		<ConfirmDialog
+			onConfirm={ props.confirmPrivateHandler }
+			onCancel={ props.cancelPrivateHandler }
+		>
+			{ __( 'Would you like to privately publish this post now?' ) }
+		</ConfirmDialog>
+	) : null;
+}
 
 export class PostVisibility extends Component {
 	constructor( props ) {
@@ -35,21 +49,20 @@ export class PostVisibility extends Component {
 	}
 
 	setPrivate() {
-		if (
-			// eslint-disable-next-line no-alert
-			! window.confirm(
-				__( 'Would you like to privately publish this post now?' )
-			)
-		) {
-			return;
-		}
+		this.setState( { showPrivateConfirmDialog: true } );
+	}
 
+	confirmPrivateHandler = () => {
 		const { onUpdateVisibility, onSave } = this.props;
 
 		onUpdateVisibility( 'private' );
 		this.setState( { hasPassword: false } );
 		onSave();
-	}
+	};
+
+	cancelPrivateHandler = () => {
+		this.setState( { showPrivateConfirmDialog: false } );
+	};
 
 	setPasswordProtected() {
 		const { visibility, onUpdateVisibility, status, password } = this.props;
@@ -145,6 +158,14 @@ export class PostVisibility extends Component {
 					/>
 				</div>
 			),
+			<PublishPrivateConfirm
+				key={ 'private-publish-confirmation' }
+				showPrivateConfirmDialog={ this.state.showPrivateConfirmDialog }
+				confirmPrivateHandler={ this.confirmPrivateHandler }
+				cancelPrivateHandler={ this.cancelPrivateHandler }
+			>
+				{ __( 'Would you like to privately publish this post now?' ) }
+			</PublishPrivateConfirm>,
 		];
 	}
 }
