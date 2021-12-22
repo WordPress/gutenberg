@@ -20,10 +20,10 @@ describe( 'adding blocks', () => {
 
 		await clickBlockToolbarButton( 'Quote' );
 
-		const largeStyleButton = await page.waitForXPath(
-			'//*[@role="menuitem"][contains(., "Large")]'
+		const plainStyleButton = await page.waitForXPath(
+			'//*[@role="menuitem"][contains(., "Plain")]'
 		);
-		await largeStyleButton.click();
+		await plainStyleButton.click();
 
 		// Check the content
 		const content = await getEditedPostContent();
