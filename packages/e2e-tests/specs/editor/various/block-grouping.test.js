@@ -13,6 +13,7 @@ import {
 	getAvailableBlockTransforms,
 	activatePlugin,
 	deactivatePlugin,
+	createReusableBlock,
 } from '@wordpress/e2e-test-utils';
 
 async function insertBlocksOfSameType() {
@@ -109,6 +110,35 @@ describe( 'Block Grouping', () => {
 				'//button/span[text()="Ungroup"]'
 			);
 			expect( ungroupButtons ).toHaveLength( 0 );
+		} );
+		it( 'should group and ungroup a controlled block properly', async () => {
+			const getParagraphText = async () => {
+				const paragraphInReusableSelector =
+					'.block-editor-block-list__block[data-type="core/block"] p';
+				await page.waitForSelector( paragraphInReusableSelector );
+				return page.$eval(
+					paragraphInReusableSelector,
+					( element ) => element.innerText
+				);
+			};
+
+			const paragraphText = 'hi';
+			await createReusableBlock( paragraphText, 'Block' );
+			// Group
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+
+			let group = await page.$$( '[data-type="core/group"]' );
+			expect( group ).toHaveLength( 1 );
+			// Make sure the paragraph in reusable block exists.
+			expect( await getParagraphText() ).toMatch( paragraphText );
+
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Ungroup' );
+			group = await page.$$( '[data-type="core/group"]' );
+			expect( group ).toHaveLength( 0 );
+			// Make sure the paragraph in reusable block exists.
+			expect( await getParagraphText() ).toEqual( paragraphText );
 		} );
 	} );
 

@@ -99,15 +99,7 @@
 				]
 			},
 			{ "docs/how-to-guides/feature-flags.md": [] },
-			{
-				"docs/how-to-guides/format-api/README.md": [
-					{
-						"docs/how-to-guides/format-api/1-register-format.md": []
-					},
-					{ "docs/how-to-guides/format-api/2-toolbar-button.md": [] },
-					{ "docs/how-to-guides/format-api/3-apply-format.md": [] }
-				]
-			},
+			{ "docs/how-to-guides/format-api.md": [] },
 			{
 				"docs/how-to-guides/javascript/README.md": [
 					{
@@ -145,25 +137,7 @@
 				]
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
-			{
-				"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md": [
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-1-up-and-running.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-3-register-meta.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-4-initialize-input.md": []
-					},
-					{
-						"docs/how-to-guides/sidebar-tutorial/plugin-sidebar-5-update-meta.md": []
-					}
-				]
-			},
+			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
@@ -220,6 +194,7 @@
 					}
 				]
 			},
+			{ "docs/reference-guides/core-blocks.md": [] },
 			{
 				"docs/reference-guides/filters/README.md": [
 					{ "docs/reference-guides/filters/block-filters.md": [] },

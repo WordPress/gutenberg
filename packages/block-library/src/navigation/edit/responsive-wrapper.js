@@ -39,12 +39,20 @@ export default function ResponsiveWrapper( {
 
 	const modalId = `${ id }-modal`;
 
+	const dialogProps = {
+		className: 'wp-block-navigation__responsive-dialog',
+		...( isOpen && {
+			role: 'dialog',
+			'aria-modal': true,
+			'aria-label': __( 'Menu' ),
+		} ),
+	};
+
 	return (
 		<>
 			{ ! isOpen && (
 				<Button
 					aria-haspopup="true"
-					aria-expanded={ isOpen }
 					aria-label={ __( 'Open menu' ) }
 					className={ openButtonClasses }
 					onClick={ () => onToggle( true ) }
@@ -73,12 +81,7 @@ export default function ResponsiveWrapper( {
 					className="wp-block-navigation__responsive-close"
 					tabIndex="-1"
 				>
-					<div
-						className="wp-block-navigation__responsive-dialog"
-						role="dialog"
-						aria-modal="true"
-						aria-labelledby={ `${ modalId }-title` }
-					>
+					<div { ...dialogProps }>
 						<Button
 							className="wp-block-navigation__responsive-container-close"
 							aria-label={ __( 'Close menu' ) }

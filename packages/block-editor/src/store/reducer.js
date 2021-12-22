@@ -14,7 +14,6 @@ import {
 	isEmpty,
 	identity,
 	omitBy,
-	pickBy,
 } from 'lodash';
 
 /**
@@ -120,48 +119,6 @@ function getFlattenedBlocksWithoutAttributes( blocks ) {
  */
 function getFlattenedBlockAttributes( blocks ) {
 	return flattenBlocks( blocks, ( block ) => block.attributes );
-}
-
-/**
- * Given a block order map object, returns *all* of the block client IDs that are
- * a descendant of the given root client ID.
- *
- * Calling this with `rootClientId` set to `''` results in a list of client IDs
- * that are in the post. That is, it excludes blocks like fetched reusable
- * blocks which are stored into state but not visible. It also excludes
- * InnerBlocks controllers, like template parts.
- *
- * It is important to exclude the full inner block controller and not just the
- * inner blocks because in many cases, we need to persist the previous value of
- * an inner block controller. To do so, it must be excluded from the list of
- * client IDs which are considered to be part of the top-level entity.
- *
- * @param {Object}  blocksOrder           Object that maps block client IDs to a list of
- *                                        nested block client IDs.
- * @param {?string} rootClientId          The root client ID to search. Defaults to ''.
- * @param {?Object} controlledInnerBlocks The InnerBlocks controller state.
- *
- * @return {Array} List of descendant client IDs.
- */
-function getNestedBlockClientIds(
-	blocksOrder,
-	rootClientId = '',
-	controlledInnerBlocks = {}
-) {
-	return reduce(
-		blocksOrder[ rootClientId ],
-		( result, clientId ) => {
-			if ( !! controlledInnerBlocks[ clientId ] ) {
-				return result;
-			}
-			return [
-				...result,
-				clientId,
-				...getNestedBlockClientIds( blocksOrder, clientId ),
-			];
-		},
-		[]
-	);
 }
 
 /**
@@ -369,9 +326,14 @@ const withBlockTree = ( reducer ) => ( state = {}, action ) => {
 					...omit(
 						newState.tree,
 						action.replacedClientIds.concat(
-							action.replacedClientIds.map(
-								( clientId ) => 'controlled||' + clientId
-							)
+							// Controlled inner blocks are only removed
+							// if the block doesn't move to another position
+							// otherwise their content will be lost.
+							action.replacedClientIds
+								.filter( ( clientId ) => ! subTree[ clientId ] )
+								.map(
+									( clientId ) => 'controlled||' + clientId
+								)
 						)
 					),
 					...subTree,
@@ -637,70 +599,17 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  */
 const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'RESET_BLOCKS' ) {
-		/**
-		 * A list of client IDs associated with the top level entity (like a
-		 * post or template). It excludes the client IDs of blocks associated
-		 * with other entities, like inner block controllers or reusable blocks.
-		 */
-		const visibleClientIds = getNestedBlockClientIds(
-			state?.order ?? {},
-			'',
-			state?.controlledInnerBlocks ?? {}
-		);
-
-		// pickBy returns only the truthy values from controlledInnerBlocks
-		const controlledInnerBlocks = Object.keys(
-			pickBy( state?.controlledInnerBlocks ?? {} )
-		);
-
-		/**
-		 * Each update operation consists of a few parts:
-		 * 1. First, the client IDs associated with the top level entity are
-		 *    removed from the existing state key, leaving in place controlled
-		 *    blocks (like reusable blocks and inner block controllers).
-		 * 2. Second, the blocks from the reset action are used to calculate the
-		 *    individual state keys. This will re-populate the clientIDs which
-		 *    were removed in step 1.
-		 * 3. In some cases, we remove the recalculated inner block controllers,
-		 *    letting their old values persist. We need to do this because the
-		 *    reset block action from a top-level entity is not aware of any
-		 *    inner blocks inside InnerBlock controllers. So if the new values
-		 *    were used, it would not take into account the existing InnerBlocks
-		 *    which already exist in the state for inner block controllers. For
-		 *    example, `attributes` uses the newly computed value for controllers
-		 *    since attributes are stored in the top-level entity. But `order`
-		 *    uses the previous value for the controllers since the new value
-		 *    does not include the order of controlled inner blocks. So if the
-		 *    new value was used, template parts would disappear from the editor
-		 *    whenever you try to undo a change in the top level entity.
-		 */
 		const newState = {
 			...state,
-			byClientId: {
-				...omit( state?.byClientId, visibleClientIds ),
-				...getFlattenedBlocksWithoutAttributes( action.blocks ),
-			},
-			attributes: {
-				...omit( state?.attributes, visibleClientIds ),
-				...getFlattenedBlockAttributes( action.blocks ),
-			},
-			order: {
-				...omit( state?.order, visibleClientIds ),
-				...omit(
-					mapBlockOrder( action.blocks ),
-					controlledInnerBlocks
-				),
-			},
-			parents: {
-				...omit( state?.parents, visibleClientIds ),
-				...mapBlockParents( action.blocks ),
-			},
-			controlledInnerBlocks: state?.controlledInnerBlocks || {},
+			byClientId: getFlattenedBlocksWithoutAttributes( action.blocks ),
+			attributes: getFlattenedBlockAttributes( action.blocks ),
+			order: mapBlockOrder( action.blocks ),
+			parents: mapBlockParents( action.blocks ),
+			controlledInnerBlocks: {},
 		};
 
 		const subTree = buildBlockTree( newState, action.blocks );
 		newState.tree = {
-			...omit( state?.tree, visibleClientIds ),
 			...subTree,
 			// Root
 			'': {
@@ -828,6 +737,27 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 
 	return reducer( state, action );
 };
+/**
+ * Higher-order reducer which removes blocks from state when switching parent block controlled state.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
+		// when switching a block from controlled to uncontrolled or inverse,
+		// we need to remove its content first.
+		const tempState = reducer( state, {
+			type: 'REPLACE_INNER_BLOCKS',
+			rootClientId: action.clientId,
+			blocks: [],
+		} );
+		return reducer( tempState, action );
+	}
+
+	return reducer( state, action );
+};
 
 /**
  * Reducer returning the blocks state.
@@ -845,7 +775,8 @@ export const blocks = flow(
 	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,
 	withPersistentBlockChange,
-	withIgnoredBlockChange
+	withIgnoredBlockChange,
+	withResetControlledBlocks
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {

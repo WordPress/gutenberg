@@ -9,7 +9,6 @@
 			"overlayMenu": "never",
 			"layout": {
 				"type": "flex",
-				"setCascadingProperties": "true",
 				"justifyContent": "center",
 				"orientation": "vertical"
 			}

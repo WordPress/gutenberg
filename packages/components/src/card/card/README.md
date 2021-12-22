@@ -12,8 +12,8 @@ import {
 	CardHeader,
 	CardBody,
 	CardFooter,
-	Text,
-	Heading,
+	__experimentalText as Text,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 
 function Example() {

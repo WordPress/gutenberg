@@ -31,6 +31,7 @@ const ExistingMenusDropdown = ( {
 	onFinish,
 	menus,
 	onCreateFromMenu,
+	showClassicMenus = false,
 } ) => {
 	const toggleProps = {
 		variant: 'tertiary',
@@ -65,22 +66,24 @@ const ExistingMenusDropdown = ( {
 								);
 							} ) }
 					</MenuGroup>
-					<MenuGroup label={ __( 'Classic Menus' ) }>
-						{ menus?.map( ( menu ) => {
-							return (
-								<MenuItem
-									onClick={ () => {
-										setSelectedMenu( menu.id );
-										onCreateFromMenu( menu.name );
-									} }
-									onClose={ onClose }
-									key={ menu.id }
-								>
-									{ decodeEntities( menu.name ) }
-								</MenuItem>
-							);
-						} ) }
-					</MenuGroup>
+					{ showClassicMenus && (
+						<MenuGroup label={ __( 'Classic Menus' ) }>
+							{ menus?.map( ( menu ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											setSelectedMenu( menu.id );
+											onCreateFromMenu( menu.name );
+										} }
+										onClose={ onClose }
+										key={ menu.id }
+									>
+										{ decodeEntities( menu.name ) }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
 				</>
 			) }
 		</DropdownMenu>
@@ -92,6 +95,7 @@ export default function NavigationPlaceholder( {
 	onFinish,
 	canSwitchNavigationMenu,
 	hasResolvedNavigationMenus,
+	canUserCreateNavigation = false,
 } ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -102,6 +106,10 @@ export default function NavigationPlaceholder( {
 		blocks,
 		navigationMenuTitle = null
 	) => {
+		if ( ! canUserCreateNavigation ) {
+			return;
+		}
+
 		const navigationMenu = await createNavigationMenu(
 			navigationMenuTitle,
 			blocks
@@ -176,8 +184,10 @@ export default function NavigationPlaceholder( {
 								<Icon icon={ navigation } />{ ' ' }
 								{ __( 'Navigation' ) }
 							</div>
+
 							<hr />
-							{ hasMenus || navigationMenus.length ? (
+
+							{ hasMenus || navigationMenus?.length ? (
 								<>
 									<ExistingMenusDropdown
 										canSwitchNavigationMenu={
@@ -188,11 +198,14 @@ export default function NavigationPlaceholder( {
 										onFinish={ onFinish }
 										menus={ menus }
 										onCreateFromMenu={ onCreateFromMenu }
+										showClassicMenus={
+											canUserCreateNavigation
+										}
 									/>
 									<hr />
 								</>
 							) : undefined }
-							{ hasPages ? (
+							{ canUserCreateNavigation && hasPages ? (
 								<>
 									<Button
 										variant="tertiary"
@@ -203,12 +216,15 @@ export default function NavigationPlaceholder( {
 									<hr />
 								</>
 							) : undefined }
-							<Button
-								variant="tertiary"
-								onClick={ onCreateEmptyMenu }
-							>
-								{ __( 'Start empty' ) }
-							</Button>
+
+							{ canUserCreateNavigation && (
+								<Button
+									variant="tertiary"
+									onClick={ onCreateEmptyMenu }
+								>
+									{ __( 'Start empty' ) }
+								</Button>
+							) }
 						</div>
 					</div>
 				</Placeholder>

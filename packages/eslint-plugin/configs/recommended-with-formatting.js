@@ -4,7 +4,6 @@
 const { isPackageInstalled } = require( '../utils' );
 
 const config = {
-	parser: '@babel/eslint-parser',
 	extends: [
 		require.resolve( './jsx-a11y.js' ),
 		require.resolve( './custom.js' ),

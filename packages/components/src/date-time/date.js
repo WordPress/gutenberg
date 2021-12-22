@@ -11,8 +11,13 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
 /**
  * WordPress dependencies
  */
-import { Component, createRef, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { isRTL, _n, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { getMomentDate } from './utils';
 
 /**
  * Module Constants
@@ -70,21 +75,18 @@ function DatePickerDay( { day, events = [] } ) {
 	);
 }
 
-class DatePicker extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onChangeMoment = this.onChangeMoment.bind( this );
-		this.nodeRef = createRef();
-		this.onMonthPreviewedHandler = this.onMonthPreviewedHandler.bind(
-			this
-		);
-	}
-
-	onMonthPreviewedHandler( newMonthDate ) {
-		this.props.onMonthPreviewed?.( newMonthDate.toISOString() );
-		this.keepFocusInside();
-	}
+function DatePicker( {
+	currentDate,
+	onChange,
+	events,
+	isInvalidDate,
+	onMonthPreviewed,
+} ) {
+	const nodeRef = useRef();
+	const onMonthPreviewedHandler = ( newMonthDate ) => {
+		onMonthPreviewed?.( newMonthDate.toISOString() );
+		keepFocusInside();
+	};
 
 	/*
 	 * Todo: We should remove this function ASAP.
@@ -92,21 +94,21 @@ class DatePicker extends Component {
 	 * This focus loss closes the date picker popover.
 	 * Ideally we should add an upstream commit on react-dates to fix this issue.
 	 */
-	keepFocusInside() {
-		if ( ! this.nodeRef.current ) {
+	const keepFocusInside = () => {
+		if ( ! nodeRef.current ) {
 			return;
 		}
 
-		const { ownerDocument } = this.nodeRef.current;
+		const { ownerDocument } = nodeRef.current;
 		const { activeElement } = ownerDocument;
 
 		// If focus was lost.
 		if (
 			! activeElement ||
-			! this.nodeRef.current.contains( ownerDocument.activeElement )
+			! nodeRef.current.contains( ownerDocument.activeElement )
 		) {
 			// Retrieve the focus region div.
-			const focusRegion = this.nodeRef.current.querySelector(
+			const focusRegion = nodeRef.current.querySelector(
 				'.DayPicker_focusRegion'
 			);
 			if ( ! focusRegion ) {
@@ -115,11 +117,9 @@ class DatePicker extends Component {
 			// Keep the focus on focus region.
 			focusRegion.focus();
 		}
-	}
+	};
 
-	onChangeMoment( newDate ) {
-		const { currentDate, onChange } = this.props;
-
+	const onChangeMoment = ( newDate ) => {
 		// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
 		const momentDate = currentDate ? moment( currentDate ) : moment();
 		const momentTime = {
@@ -131,71 +131,54 @@ class DatePicker extends Component {
 		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
 
 		// Keep focus on the date picker.
-		this.keepFocusInside();
-	}
+		keepFocusInside();
+	};
 
-	/**
-	 * Create a Moment object from a date string. With no currentDate supplied, default to a Moment
-	 * object representing now. If a null value is passed, return a null value.
-	 *
-	 * @param {?string} currentDate Date representing the currently selected date or null to signify no selection.
-	 * @return {?moment.Moment} Moment object for selected date or null.
-	 */
-	getMomentDate( currentDate ) {
-		if ( null === currentDate ) {
-			return null;
-		}
-		return currentDate ? moment( currentDate ) : moment();
-	}
-
-	getEventsPerDay( day ) {
-		if ( ! this.props.events?.length ) {
+	const getEventsPerDay = ( day ) => {
+		if ( ! events?.length ) {
 			return [];
 		}
 
-		return this.props.events.filter( ( eventDay ) =>
+		return events.filter( ( eventDay ) =>
 			day.isSame( eventDay.date, 'day' )
 		);
-	}
+	};
 
-	render() {
-		const { currentDate, isInvalidDate } = this.props;
-		const momentDate = this.getMomentDate( currentDate );
+	const momentDate = getMomentDate( currentDate );
 
-		return (
-			<div className="components-datetime__date" ref={ this.nodeRef }>
-				<DayPickerSingleDateController
-					date={ momentDate }
-					daySize={ 30 }
-					focused
-					hideKeyboardShortcutsPanel
-					// This is a hack to force the calendar to update on month or year change
-					// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
-					key={ `datepicker-controller-${
-						momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
-					}` }
-					noBorder
-					numberOfMonths={ 1 }
-					onDateChange={ this.onChangeMoment }
-					transitionDuration={ 0 }
-					weekDayFormat="ddd"
-					dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
-					isRTL={ isRTL() }
-					isOutsideRange={ ( date ) => {
-						return isInvalidDate && isInvalidDate( date.toDate() );
-					} }
-					onPrevMonthClick={ this.onMonthPreviewedHandler }
-					onNextMonthClick={ this.onMonthPreviewedHandler }
-					renderDayContents={ ( day ) => (
-						<DatePickerDay
-							day={ day }
-							events={ this.getEventsPerDay( day ) }
-						/>
-					) }
-				/>
-			</div>
-		);
-	}
+	return (
+		<div className="components-datetime__date" ref={ nodeRef }>
+			<DayPickerSingleDateController
+				date={ momentDate }
+				daySize={ 30 }
+				focused
+				hideKeyboardShortcutsPanel
+				// This is a hack to force the calendar to update on month or year change
+				// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
+				key={ `datepicker-controller-${
+					momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
+				}` }
+				noBorder
+				numberOfMonths={ 1 }
+				onDateChange={ onChangeMoment }
+				transitionDuration={ 0 }
+				weekDayFormat="ddd"
+				dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
+				isRTL={ isRTL() }
+				isOutsideRange={ ( date ) => {
+					return isInvalidDate && isInvalidDate( date.toDate() );
+				} }
+				onPrevMonthClick={ onMonthPreviewedHandler }
+				onNextMonthClick={ onMonthPreviewedHandler }
+				renderDayContents={ ( day ) => (
+					<DatePickerDay
+						day={ day }
+						events={ getEventsPerDay( day ) }
+					/>
+				) }
+			/>
+		</div>
+	);
 }
 
 export default DatePicker;

@@ -188,12 +188,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected_no_origin, $actual_no_origin );
 	}
 
-	function test_get_settings_using_opt_in_key() {
+	function test_get_settings_appearance_true_opts_in() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'appearanceTools' => true,
+					'spacing'         => array(
+						'blockGap' => false, // This should override appearanceTools.
+					),
 					'blocks'          => array(
 						'core/paragraph' => array(
 							'typography' => array(
@@ -204,6 +207,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'appearanceTools' => true,
 							'typography'      => array(
 								'lineHeight' => false, // This should override appearanceTools.
+							),
+							'spacing'         => array(
+								'blockGap' => null,
 							),
 						),
 					),
@@ -223,7 +229,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'link' => true,
 			),
 			'spacing'    => array(
-				'blockGap' => true,
+				'blockGap' => false,
 				'margin'   => true,
 				'padding'  => true,
 			),
@@ -247,10 +253,58 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'link' => true,
 					),
 					'spacing'    => array(
-						'blockGap' => true,
+						'blockGap' => false,
 						'margin'   => true,
 						'padding'  => true,
 					),
+					'typography' => array(
+						'lineHeight' => false,
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_get_settings_appearance_false_does_not_opt_in() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'appearanceTools' => false,
+					'border'          => array(
+						'width' => true,
+					),
+					'blocks'          => array(
+						'core/paragraph' => array(
+							'typography' => array(
+								'lineHeight' => false,
+							),
+						),
+						'core/group'     => array(
+							'typography' => array(
+								'lineHeight' => false,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual   = $theme_json->get_settings();
+		$expected = array(
+			'appearanceTools' => false,
+			'border'          => array(
+				'width' => true,
+			),
+			'blocks'          => array(
+				'core/paragraph' => array(
+					'typography' => array(
+						'lineHeight' => false,
+					),
+				),
+				'core/group'     => array(
 					'typography' => array(
 						'lineHeight' => false,
 					),
@@ -557,12 +611,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
 	}
 
-	function test_get_stylesheet_generates_proper_classes_from_slugs() {
+	function test_get_stylesheet_generates_proper_classes_and_css_vars_from_slugs() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'color' => array(
+					'color'  => array(
 						'palette' => array(
 							array(
 								'slug'  => 'grey',
@@ -582,6 +636,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
+					'custom' => array(
+						'white2black' => 'value',
+					),
 				),
 			)
 		);
@@ -591,7 +648,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			$theme_json->get_stylesheet( array( 'presets' ) )
 		);
 		$this->assertEquals(
-			'body{--wp--preset--color--grey: grey;--wp--preset--color--dark-grey: grey;--wp--preset--color--light-grey: grey;--wp--preset--color--white-2-black: grey;}',
+			'body{--wp--preset--color--grey: grey;--wp--preset--color--dark-grey: grey;--wp--preset--color--light-grey: grey;--wp--preset--color--white-2-black: grey;--wp--custom--white-2-black: value;}',
 			$theme_json->get_stylesheet( array( 'variables' ) )
 		);
 
@@ -1374,6 +1431,97 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$defaults->merge( $theme );
 		$actual = $defaults->get_raw_data();
 
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function test_merge_incoming_data_presets_use_default_names() {
+		$defaults   = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'name' => 'Small',
+								'slug' => 'small',
+								'size' => '12px',
+							),
+							array(
+								'name' => 'Large',
+								'slug' => 'large',
+								'size' => '20px',
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'slug' => 'small',
+								'size' => '1.1rem',
+							),
+							array(
+								'slug' => 'large',
+								'size' => '1.75rem',
+							),
+							array(
+								'name' => 'Huge',
+								'slug' => 'huge',
+								'size' => '3rem',
+							),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+		$expected   = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'typography' => array(
+					'fontSizes' => array(
+						'theme'   => array(
+							array(
+								'name' => 'Small',
+								'slug' => 'small',
+								'size' => '1.1rem',
+							),
+							array(
+								'name' => 'Large',
+								'slug' => 'large',
+								'size' => '1.75rem',
+							),
+							array(
+								'name' => 'Huge',
+								'slug' => 'huge',
+								'size' => '3rem',
+							),
+						),
+						'default' => array(
+							array(
+								'name' => 'Small',
+								'slug' => 'small',
+								'size' => '12px',
+							),
+							array(
+								'name' => 'Large',
+								'slug' => 'large',
+								'size' => '20px',
+							),
+						),
+					),
+				),
+			),
+		);
+		$defaults->merge( $theme_json );
+		$actual = $defaults->get_raw_data();
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
