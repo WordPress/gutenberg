@@ -12,7 +12,6 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -25,6 +24,7 @@ import {
 import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
 import EditTemplateTitle from './edit-template-title';
+import { useLink } from '../routes/link';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -43,6 +43,12 @@ export default function TemplateDetails( { template, onClose } ) {
 			( { area } ) => area === template?.area
 		);
 	}, [ template ] );
+
+	const browseAllLinkProps = useLink( {
+		// TODO: We should update this to filter by template part's areas as well.
+		postType: template.type,
+		postId: undefined,
+	} );
 
 	if ( ! template ) {
 		return null;
@@ -95,11 +101,7 @@ export default function TemplateDetails( { template, onClose } ) {
 
 			<Button
 				className="edit-site-template-details__show-all-button"
-				href={ addQueryArgs( window.location.href, {
-					// TODO: We should update this to filter by template part's areas as well.
-					postId: undefined,
-					postType: template.type,
-				} ) }
+				{ ...browseAllLinkProps }
 			>
 				{ sprintf(
 					/* translators: the template part's area name ("Headers", "Sidebars") or "templates". */

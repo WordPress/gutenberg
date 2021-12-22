@@ -12,16 +12,12 @@
  */
 
 // Only run any of the code in this file if the version is less than 5.9.
-// wp_is_block_template_theme was introduced in 5.9.
-if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
+// wp_list_users was introduced in 5.9.
+if ( ! function_exists( 'wp_list_users' ) ) {
 	/**
 	 * Registers block editor 'wp_template_part' post type.
 	 */
 	function gutenberg_register_template_part_post_type() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-
 		$labels = array(
 			'name'                  => __( 'Template Parts', 'gutenberg' ),
 			'singular_name'         => __( 'Template Part', 'gutenberg' ),
@@ -75,10 +71,6 @@ if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
 	 * Registers the 'wp_template_part_area' taxonomy.
 	 */
 	function gutenberg_register_wp_template_part_area_taxonomy() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-
 		register_taxonomy(
 			'wp_template_part_area',
 			array( 'wp_template_part' ),
@@ -99,36 +91,6 @@ if ( ! function_exists( 'wp_is_block_template_theme' ) ) {
 		);
 	}
 	add_action( 'init', 'gutenberg_register_wp_template_part_area_taxonomy' );
-
-	/**
-	 * Fixes the label of the 'wp_template_part' admin menu entry.
-	 */
-	function gutenberg_fix_template_part_admin_menu_entry() {
-		if ( ! gutenberg_supports_block_templates() ) {
-			return;
-		}
-
-		global $submenu;
-		if ( ! isset( $submenu['themes.php'] ) ) {
-			return;
-		}
-		$post_type = get_post_type_object( 'wp_template_part' );
-		if ( ! $post_type ) {
-			return;
-		}
-		foreach ( $submenu['themes.php'] as $key => $submenu_entry ) {
-			if ( $post_type->labels->all_items === $submenu['themes.php'][ $key ][0] ) {
-				$submenu['themes.php'][ $key ][0] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
-				break;
-			}
-		}
-	}
-	add_action( 'admin_menu', 'gutenberg_fix_template_part_admin_menu_entry' );
-
-	// Customize the `wp_template` admin list.
-	add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_templates_lists_custom_columns' );
-	add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
-	add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_views' );
 
 	/**
 	 * Sets a custom slug when creating auto-draft template parts.

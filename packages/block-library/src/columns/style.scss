@@ -10,10 +10,6 @@
 		flex-wrap: nowrap;
 	}
 
-	&:where(.has-background) {
-		padding: $block-bg-padding--v $block-bg-padding--h;
-	}
-
 	/**
 	* All Columns Alignment
 	*/
@@ -85,8 +81,8 @@
 		> .wp-block-column {
 			// Available space should be divided equally amongst columns.
 			flex-basis: 0;
-			flex-grow: 1;
 
+			flex-grow: 1;
 			// Columns with an explicitly-assigned width should maintain their
 			// `flex-basis` width and not grow.
 			&[style*="flex-basis"] {
@@ -100,6 +96,13 @@
 		}
 	}
 }
+
+// Add low specificity default padding to columns blocks with backgrounds.
+:where(.wp-block-columns.has-background) {
+	// Matches paragraph block padding.
+	padding: $block-bg-padding--v $block-bg-padding--h;
+}
+
 
 .wp-block-column {
 	flex-grow: 1;

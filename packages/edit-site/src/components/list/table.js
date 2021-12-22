@@ -8,11 +8,11 @@ import {
 	VisuallyHidden,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import Link from '../routes/link';
 import Actions from './actions';
 import AddedBy from './added-by';
 
@@ -92,15 +92,15 @@ export default function Table( { templateType } ) {
 					>
 						<td className="edit-site-list-table-column" role="cell">
 							<Heading level={ 4 }>
-								<a
-									href={ addQueryArgs( window.location.href, {
+								<Link
+									params={ {
 										postId: template.id,
 										postType: template.type,
-									} ) }
+									} }
 								>
 									{ template.title?.rendered ||
 										template.slug }
-								</a>
+								</Link>
 							</Heading>
 							{ template.description }
 						</td>

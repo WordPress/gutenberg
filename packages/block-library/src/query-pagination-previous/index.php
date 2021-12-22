@@ -32,6 +32,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 		$filter_link_attributes = function() use ( $wrapper_attributes ) {
 			return $wrapper_attributes;
 		};
+
 		add_filter( 'previous_posts_link_attributes', $filter_link_attributes );
 		$content = get_previous_posts_link( $label );
 		remove_filter( 'previous_posts_link_attributes', $filter_link_attributes );

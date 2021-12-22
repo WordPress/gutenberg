@@ -45,14 +45,19 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			const { palette: colorPerOrigin } = useSetting( 'color' ) || {};
+			// Some color settings have a special handling for deprecated flags in `useSetting`,
+			// so we can't unwrap them by doing const { ... } = useSetting('color')
+			// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
+			const userPalette = useSetting( 'color.palette.custom' );
+			const themePalette = useSetting( 'color.palette.theme' );
+			const defaultPalette = useSetting( 'color.palette.default' );
 			const allColors = useMemo(
 				() => [
-					...( colorPerOrigin?.custom || [] ),
-					...( colorPerOrigin?.theme || [] ),
-					...( colorPerOrigin?.default || [] ),
+					...( userPalette || [] ),
+					...( themePalette || [] ),
+					...( defaultPalette || [] ),
 				],
-				[ colorPerOrigin ]
+				[ userPalette, themePalette, defaultPalette ]
 			);
 			return <WrappedComponent { ...props } colors={ allColors } />;
 		},

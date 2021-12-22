@@ -36,7 +36,7 @@ if ( ! function_exists( 'get_block_theme_folders' ) ) {
 		$root_dir   = get_theme_root( $theme_name );
 		$theme_dir  = "$root_dir/$theme_name";
 
-		if ( is_readable( $theme_dir . '/block-templates/index.html' ) ) {
+		if ( file_exists( $theme_dir . '/block-templates' ) || file_exists( $theme_dir . '/block-template-parts' ) ) {
 			return array(
 				'wp_template'      => 'block-templates',
 				'wp_template_part' => 'block-template-parts',
@@ -462,6 +462,7 @@ if ( ! function_exists( '_remove_theme_attribute_in_block_template_content' ) ) 
 	 */
 	function _remove_theme_attribute_in_block_template_content( $template_content ) {
 		$has_updated_content = false;
+		$new_content         = '';
 		$template_blocks     = parse_blocks( $template_content );
 
 		$blocks = _flatten_blocks( $template_blocks );
@@ -476,7 +477,11 @@ if ( ! function_exists( '_remove_theme_attribute_in_block_template_content' ) ) 
 			return $template_content;
 		}
 
-		return $template_content;
+		foreach ( $template_blocks as $block ) {
+			$new_content .= serialize_block( $block );
+		}
+
+		return $new_content;
 	}
 }
 
@@ -902,7 +907,7 @@ if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
 	 */
 	function wp_generate_block_templates_export_file() {
 		if ( ! class_exists( 'ZipArchive' ) ) {
-			return new WP_Error( __( 'Zip Export not supported.', 'gutenberg' ) );
+			return new WP_Error( 'missing_zip_package', __( 'Zip Export not supported.', 'gutenberg' ) );
 		}
 
 		$obscura  = wp_generate_password( 12, false, false );
@@ -910,7 +915,7 @@ if ( ! function_exists( 'wp_generate_block_templates_export_file' ) ) {
 
 		$zip = new ZipArchive();
 		if ( true !== $zip->open( $filename, ZipArchive::CREATE ) ) {
-			return new WP_Error( __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
+			return new WP_Error( 'unable_to_create_zip', __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
 		}
 
 		$zip->addEmptyDir( 'theme' );

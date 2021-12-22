@@ -21,7 +21,6 @@ const config = {
 	extends: [
 		require.resolve( './recommended-with-formatting.js' ),
 		'plugin:prettier/recommended',
-		'prettier/react',
 	],
 	rules: {
 		'prettier/prettier': [ 'error', prettierConfig ],

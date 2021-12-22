@@ -114,7 +114,7 @@ Controls the query parameters used to search for suggestions. For example, to li
 
 ```jsx
 <LinkControl
-	suggestionQuery={ {
+	suggestionsQuery={ {
 		type: 'post',
 		subtype: 'page',
 	} }

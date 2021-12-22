@@ -4,11 +4,14 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	__experimentalHStack as HStack,
+	FlexItem,
 	CardBody,
 	Card,
 	CardDivider,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
+import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -33,14 +36,21 @@ function ScreenRoot() {
 			<CardBody>
 				<ItemGroup>
 					<Item>
-						<p>
-							{ __(
-								'Customize the appearance of specific blocks for the whole site.'
-							) }
-						</p>
+						{ __(
+							'Customize the appearance of specific blocks for the whole site.'
+						) }
 					</Item>
 					<NavigationButton path="/blocks">
-						{ __( 'Blocks' ) }
+						<HStack justify="space-between">
+							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
+							<FlexItem>
+								<Icon
+									icon={
+										isRTL() ? chevronLeft : chevronRight
+									}
+								/>
+							</FlexItem>
+						</HStack>
 					</NavigationButton>
 				</ItemGroup>
 			</CardBody>

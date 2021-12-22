@@ -3,7 +3,7 @@
 	"apiVersion": 2,
 	"name": "core/comments-pagination",
 	"title": "Comments Pagination",
-	"category": "design",
+	"category": "theme",
 	"parent": [ "core/comments-query-loop" ],
 	"description": "Displays a paginated navigation to next/previous set of comments, when applicable.",
 	"textdomain": "default",
@@ -14,13 +14,12 @@
 		}
 	},
 	"providesContext": {
-		"paginationArrow": "paginationArrow"
+		"comments/paginationArrow": "paginationArrow"
 	},
 	"supports": {
 		"align": true,
 		"reusable": false,
 		"html": false,
-		"inserter": false,
 		"color": {
 			"gradients": true,
 			"link": true

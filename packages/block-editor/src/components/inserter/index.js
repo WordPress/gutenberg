@@ -265,7 +265,7 @@ export default compose( [
 
 					// If the clientId is defined, we insert at the position of the block.
 					if ( clientId ) {
-						return getBlockIndex( clientId, rootClientId );
+						return getBlockIndex( clientId );
 					}
 
 					// If there a selected block, we insert after the selected block.
@@ -275,7 +275,7 @@ export default compose( [
 						end &&
 						getBlockRootClientId( end ) === rootClientId
 					) {
-						return getBlockIndex( end, rootClientId ) + 1;
+						return getBlockIndex( end ) + 1;
 					}
 
 					// Otherwise, we insert at the end of the current rootClientId

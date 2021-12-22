@@ -19,7 +19,7 @@ export default {
 	title: 'Components/Panel',
 	component: Panel,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

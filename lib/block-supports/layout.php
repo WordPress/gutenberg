@@ -39,8 +39,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 	$style = '';
 	if ( 'default' === $layout_type ) {
-		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : null;
-		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : null;
+		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
+		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
 
 		$all_max_width_value  = $content_size ? $content_size : $wide_size;
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
@@ -103,26 +103,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
-				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
-					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
-					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= '--layout-direction: row;';
-					$style .= "--layout-wrap: $flex_wrap;";
-					$style .= "--layout-justify: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= '--layout-align: center;';
-				}
 			}
 		} else {
 			$style .= 'flex-direction: column;';
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
-				if ( ! empty( $layout['setCascadingProperties'] ) && $layout['setCascadingProperties'] ) {
-					// --layout-justification-setting allows children to inherit the value regardless or row or column direction.
-					$style .= "--layout-justification-setting: {$justify_content_options[ $layout['justifyContent'] ]};";
-					$style .= '--layout-direction: column;';
-					$style .= '--layout-justify: initial;';
-					$style .= "--layout-align: {$justify_content_options[ $layout['justifyContent'] ]};";
-				}
 			}
 		}
 		$style .= '}';

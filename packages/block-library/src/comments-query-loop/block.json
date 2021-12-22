@@ -7,12 +7,9 @@
 	"description": "An advanced block that allows displaying post comments based on different query parameters and visual configurations.",
 	"textdomain": "default",
 	"attributes": {
-		"queryId": {
-			"type": "number"
-		},
-		"queryPerPage": {
+		"perPage": {
 			"type": "number",
-			"default": 4
+			"default": null
 		},
 		"tagName": {
 			"type": "string",
@@ -20,8 +17,7 @@
 		}
 	},
 	"providesContext": {
-		"queryId": "queryId",
-		"queryPerPage": "queryPerPage"
+		"comments/perPage": "perPage"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
