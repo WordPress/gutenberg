@@ -310,7 +310,7 @@
 			"node ./docs/tool/index.js"
 		],
 		"packages/**/*.{js,ts,tsx}": [
-			"node ./bin/api-docs/update-api-docs.js",
+			"npm-run-all api-docs:*",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
 		]
