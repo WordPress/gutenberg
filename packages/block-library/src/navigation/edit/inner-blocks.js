@@ -101,7 +101,9 @@ export default function NavigationInnerBlocks( {
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
-			style: { gap: blockGap },
+			style: {
+				gap: blockGap ? blockGap : 'var( --wp--style--block-gap )',
+			},
 		},
 		{
 			value: blocks,
