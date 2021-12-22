@@ -440,6 +440,15 @@ Add the author of this post.
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** avatarSize, byline, showAvatar, showBio, textAlign
 
+## Post Author Name
+
+The author name.
+
+-	**Name:** core/post-author-name
+-	**Category:** theme
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** isLink, linkTarget, textAlign
+
 ## Post Comment (deprecated)
 
 This block is deprecated. Please use the Comments Query Loop block instead.
