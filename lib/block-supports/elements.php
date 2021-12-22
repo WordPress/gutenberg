@@ -5,6 +5,10 @@
  * @package gutenberg
  */
 
+/*function gutenberg_get_nested_level( $block ) {
+	if ( ! empty( $block['innerBlocks'] )
+}*/
+
 /**
  * Render the elements stylesheet.
  *
@@ -13,7 +17,6 @@
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content, $block ) {
-
 	if ( ! $block_content ) {
 		return $block_content;
 	}
@@ -68,11 +71,21 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
 	// See https://core.trac.wordpress.org/ticket/53494.
+
+	// Styles for innerBlocks need to be added after styles for their parents.
+	// This is so that the cascade works as expected.
+	// To do this we work out how many levels of innerBlocks each block has inside it.
+	// First we convert the block to a string.
+	$printed_block = print_r( $block, true );
+	// Then we count the number of instances of innerBlocks inside that string.
+	$number_of_inner_blocks = substr_count( $printed_block, 'innerBlocks' ) - 1;
 	add_action(
 		'wp_footer',
 		function () use ( $style ) {
 			echo $style;
-		}
+		},
+		// If this block has a lot of innerBlocks we need to output the styles earlier so that the child blocks CSS wins.
+		10 - $number_of_inner_blocks
 	);
 
 	return $content;
