@@ -20,6 +20,7 @@ export default function CommentsQueryLoopToolbar( {
 	return (
 		<ToolbarGroup>
 			<Dropdown
+				contentClassName="block-library-comments-toolbar__popover"
 				renderToggle={ ( { onToggle } ) => (
 					<ToolbarButton
 						icon={ settings }
@@ -30,6 +31,16 @@ export default function CommentsQueryLoopToolbar( {
 				renderContent={ () => (
 					<>
 						<BaseControl>
+							<ToggleControl
+								label={ __( 'Newer comments first' ) }
+								checked={ order === 'desc' }
+								onChange={ () => {
+									setAttributes( {
+										order:
+											order === 'desc' ? 'asc' : 'desc',
+									} );
+								} }
+							/>
 							<NumberControl
 								__unstableInputWidth="60px"
 								label={ __( 'Items per Page' ) }
@@ -55,19 +66,6 @@ export default function CommentsQueryLoopToolbar( {
 								isDragEnabled={ false }
 							/>
 						</BaseControl>
-						<ToggleControl
-							label={ __( 'Newer comments first' ) }
-							checked={ order === 'desc' || order === null } // Settings value not available on REST API.
-							onChange={ () => {
-								setAttributes( {
-									...attributes,
-									order:
-										order === 'desc' || order === null
-											? 'asc'
-											: 'desc',
-								} );
-							} }
-						/>
 					</>
 				) }
 			/>

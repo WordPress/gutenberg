@@ -5,14 +5,16 @@ import {
 	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import CommentsToolbar from './edit/toolbar';
+import CommentsToolbar from './edit/comments-toolbar';
 import CommentsInspectorControls from './edit/comments-inspector-controls';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
@@ -27,6 +29,10 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
+
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
 
 	const settingsOrder = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
@@ -43,11 +49,13 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 	} );
 
 	// If we are an admin user and have access to discussion settings,
-	// we set them as the default one if the order has not been defined before.
-
-	if ( settingsOrder && order === null ) {
-		setAttributes( { order: settingsOrder } );
-	}
+	// we initialize the default position from the settings discusion.
+	useEffect( () => {
+		if ( settingsOrder && order === null ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { order: settingsOrder } );
+		}
+	}, [ settingsOrder ] );
 
 	return (
 		<>

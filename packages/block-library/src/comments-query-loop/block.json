@@ -32,5 +32,6 @@
 			"gradients": true,
 			"link": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-comments-editor"
 }
