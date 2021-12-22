@@ -41,6 +41,16 @@ Defaults to `false`. When `true` the color picker will display the alpha channel
 - Required: No
 - Default: `false`
 
+### `getAuxiliaryColorArtefactWrapper`: `(WordPressComponentProps< ColorPickerProps, 'div', false >) => ReactElement`
+
+Defaults to a function that returns `null`. When passed to the color picker, allows
+to replace the bottom part of the color picker editor with a custom React element. Useful
+for using the color picker in more tight spaces when the auxiliary part of the picker
+is not relevant or needs to be swapped with something more minimal.
+
+- Required: No
+- Default: `(props) => null`
+
 ### `defaultValue`: `string | undefined`
 
 An optional default value to use for the color picker.

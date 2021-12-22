@@ -109,6 +109,7 @@ function ControlPoints( {
 	onStartControlPointChange,
 	onStopControlPointChange,
 	__experimentalIsRenderedInSidebar,
+	colorPickerProps = {},
 } ) {
 	const controlPointMoveState = useRef();
 
@@ -252,6 +253,7 @@ function ControlPoints( {
 										)
 									);
 								} }
+								{ ...( colorPickerProps || {} ) }
 							/>
 							{ ! disableRemove && controlPoints.length > 2 && (
 								<Button
@@ -287,6 +289,7 @@ function InsertPoint( {
 	disableAlpha,
 	__experimentalIsRenderedInSidebar,
 	gradientPickerDomRef,
+	colorPickerProps = {},
 } ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
@@ -343,6 +346,7 @@ function InsertPoint( {
 							);
 						}
 					} }
+					{ ...( colorPickerProps || {} ) }
 				/>
 			) }
 		/>

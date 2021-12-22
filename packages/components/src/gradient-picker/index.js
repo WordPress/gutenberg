@@ -104,6 +104,7 @@ export default function GradientPicker( {
 	onChange,
 	value,
 	clearable = true,
+	customGradientPickerProps = {},
 	disableCustomGradients = false,
 	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
@@ -142,6 +143,7 @@ export default function GradientPicker( {
 						}
 						value={ value }
 						onChange={ onChange }
+						{ ...( customGradientPickerProps || {} ) }
 					/>
 				)
 			}

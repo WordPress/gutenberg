@@ -37,10 +37,16 @@ import { useControlledValue } from '../utils/hooks';
 
 import type { ColorType } from './types';
 
+// eslint-disable-next-line no-restricted-imports
+import type { ReactElement } from 'react';
+
 extend( [ namesPlugin ] );
 
 export interface ColorPickerProps {
 	enableAlpha?: boolean;
+	getAuxiliaryColorArtefactWrapper?: (
+		props: WordPressComponentProps< ColorPickerProps, 'div', false >
+	) => ReactElement;
 	color?: string;
 	onChange?: ( color: string ) => void;
 	defaultValue?: string;
@@ -63,6 +69,7 @@ const ColorPicker = (
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
+		getAuxiliaryColorArtefactWrapper = () => null,
 		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
@@ -91,6 +98,10 @@ const ColorPicker = (
 		copyFormat || 'hex'
 	);
 
+	const customAuxiliaryColorArtefactWrapper = getAuxiliaryColorArtefactWrapper(
+		props
+	);
+
 	return (
 		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
 			<Picker
@@ -98,47 +109,51 @@ const ColorPicker = (
 				color={ safeColordColor }
 				enableAlpha={ enableAlpha }
 			/>
-			<AuxiliaryColorArtefactWrapper>
-				<HStack justify="space-between">
-					{ showInputs ? (
-						<SelectControl
-							options={ options }
-							value={ colorType }
-							onChange={ ( nextColorType ) =>
-								setColorType( nextColorType as ColorType )
+			{ customAuxiliaryColorArtefactWrapper ? (
+				customAuxiliaryColorArtefactWrapper
+			) : (
+				<AuxiliaryColorArtefactWrapper>
+					<HStack justify="space-between">
+						{ showInputs ? (
+							<SelectControl
+								options={ options }
+								value={ colorType }
+								onChange={ ( nextColorType ) =>
+									setColorType( nextColorType as ColorType )
+								}
+								label={ __( 'Color format' ) }
+								hideLabelFromVision
+							/>
+						) : (
+							<ColorDisplay
+								color={ safeColordColor }
+								colorType={ copyFormat || colorType }
+								enableAlpha={ enableAlpha }
+							/>
+						) }
+						<DetailsControlButton
+							isSmall
+							onClick={ () => setShowInputs( ! showInputs ) }
+							icon={ settings }
+							isPressed={ showInputs }
+							label={
+								showInputs
+									? __( 'Hide detailed inputs' )
+									: __( 'Show detailed inputs' )
 							}
-							label={ __( 'Color format' ) }
-							hideLabelFromVision
 						/>
-					) : (
-						<ColorDisplay
+					</HStack>
+					<Spacer margin={ 4 } />
+					{ showInputs && (
+						<ColorInput
+							colorType={ colorType }
 							color={ safeColordColor }
-							colorType={ copyFormat || colorType }
+							onChange={ handleChange }
 							enableAlpha={ enableAlpha }
 						/>
 					) }
-					<DetailsControlButton
-						isSmall
-						onClick={ () => setShowInputs( ! showInputs ) }
-						icon={ settings }
-						isPressed={ showInputs }
-						label={
-							showInputs
-								? __( 'Hide detailed inputs' )
-								: __( 'Show detailed inputs' )
-						}
-					/>
-				</HStack>
-				<Spacer margin={ 4 } />
-				{ showInputs && (
-					<ColorInput
-						colorType={ colorType }
-						color={ safeColordColor }
-						onChange={ handleChange }
-						enableAlpha={ enableAlpha }
-					/>
-				) }
-			</AuxiliaryColorArtefactWrapper>
+				</AuxiliaryColorArtefactWrapper>
+			) }
 		</ColorfulWrapper>
 	);
 };

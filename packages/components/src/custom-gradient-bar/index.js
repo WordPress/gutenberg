@@ -79,6 +79,8 @@ export default function CustomGradientBar( {
 	disableInserter = false,
 	disableAlpha = false,
 	__experimentalIsRenderedInSidebar,
+
+	controlPointsProps = {},
 } ) {
 	const gradientPickerDomRef = useRef();
 
@@ -153,6 +155,7 @@ export default function CustomGradientBar( {
 									type: 'CLOSE_INSERTER',
 								} );
 							} }
+							{ ...controlPointsProps }
 						/>
 					) }
 				<ControlPoints
@@ -179,6 +182,7 @@ export default function CustomGradientBar( {
 							type: 'STOP_CONTROL_CHANGE',
 						} );
 					} }
+					{ ...controlPointsProps }
 				/>
 			</div>
 		</div>

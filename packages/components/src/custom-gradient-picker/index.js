@@ -108,6 +108,7 @@ export default function CustomGradientPicker( {
 	value,
 	onChange,
 	__experimentalIsRenderedInSidebar,
+	customGradientBarProps,
 } ) {
 	const gradientAST = getGradientAstWithDefault( value );
 	// On radial gradients the bar should display a linear gradient.
@@ -141,6 +142,7 @@ export default function CustomGradientPicker( {
 						)
 					);
 				} }
+				{ ...( customGradientBarProps || {} ) }
 			/>
 			<Flex
 				gap={ 3 }
