@@ -472,7 +472,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$layout_class .= ' no-wrap';
 	}
 
-	$block_gap = isset( $attributes['style']['spacing']['blockGap'] ) ? 'style="gap: ' . $attributes['style']['spacing']['blockGap'] . '"' : 'style="gap: var( --wp--style--block-gap )"';
+	$block_gap = '';
+	if ( wp_get_global_settings( array( 'spacing', 'blockGap' ) ) ) {
+		$block_gap = isset( $attributes['style']['spacing']['blockGap'] ) ? 'style="gap: ' . $attributes['style']['spacing']['blockGap'] . '"' : 'style="gap: var( --wp--style--block-gap )"';
+	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
