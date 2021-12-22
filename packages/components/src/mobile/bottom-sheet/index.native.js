@@ -257,7 +257,7 @@ class BottomSheet extends Component {
 				statusBarHeight -
 				this.headerHeight );
 
-		// On horizontal mode `maxHeight` has to be set on 90% of width
+		// In landscape orientation, set `maxHeight` to ~96% of the height
 		if ( width > height ) {
 			this.setState( {
 				maxHeight: Math.min(
@@ -265,7 +265,7 @@ class BottomSheet extends Component {
 					maxHeightWithOpenKeyboard
 				),
 			} );
-			//	On vertical mode `maxHeight` has to be set on 50% of width
+			// In portrait orientation, set `maxHeight` to ~59% of the height
 		} else {
 			this.setState( {
 				maxHeight: Math.min(
