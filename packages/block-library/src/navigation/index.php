@@ -472,7 +472,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$layout_class .= ' no-wrap';
 	}
 
-	$block_gap = isset( $attributes['style']['spacing']['blockgap'] ) ? 'style="gap: ' . $attributes['style']['spacing']['blockgap'] . 'px"' : '';
+	$block_gap = isset( $attributes['style']['spacing']['blockGap'] ) ? 'style="gap: ' . $attributes['style']['spacing']['blockGap'] . '"' : '';
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
@@ -489,7 +489,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	foreach ( $inner_blocks as $inner_block ) {
 		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name || 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name || 'core/navigation-submenu' === $inner_block->name ) && ! $is_list_open ) {
 			$is_list_open       = true;
-			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
+			$inner_blocks_html .= '<ul class="wp-block-navigation__container" ' . $block_gap . '>';
 		}
 		if ( 'core/navigation-link' !== $inner_block->name && 'core/home-link' !== $inner_block->name && 'core/site-title' !== $inner_block->name && 'core/site-logo' !== $inner_block->name && 'core/navigation-submenu' !== $inner_block->name && $is_list_open ) {
 			$is_list_open       = false;
@@ -545,7 +545,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
 							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
-						<div class="wp-block-navigation__responsive-container-content" id="modal-%1$s-content">
+						<div class="wp-block-navigation__responsive-container-content" id="modal-%1$s-content" %9$s>
 							%2$s
 						</div>
 					</div>
@@ -558,7 +558,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		implode( ' ', $responsive_container_classes ),
 		implode( ' ', $open_button_classes ),
 		$colors['overlay_inline_styles'],
-		__( 'Menu' )
+		__( 'Menu' ),
+		$block_gap
 	);
 
 	return sprintf(
@@ -613,7 +614,6 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 			}
 		}
 	}
-
 	return $parsed_block;
 }
 
