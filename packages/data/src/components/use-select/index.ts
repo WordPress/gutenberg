@@ -109,7 +109,7 @@ export default function useSelect(
 	// `_mapSelect` if we can.
 	const callbackMapper = useCallback(
 		hasMappingFunction ? mapSelect : noop,
-		deps ?? []
+		deps as unknown[]
 	);
 	const _mapSelect = hasMappingFunction ? callbackMapper : null;
 
