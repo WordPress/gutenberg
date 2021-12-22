@@ -116,9 +116,7 @@ function Navigation( {
 			orientation = 'horizontal',
 			flexWrap = 'wrap',
 		} = {},
-		style: {
-			spacing: { blockGap },
-		},
+		style: { spacing: { blockGap } = {} } = {},
 	} = attributes;
 
 	let areaMenu,
