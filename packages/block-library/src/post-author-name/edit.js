@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 
-function AuthorNameEdit( {
+function PostAuthorNameEdit( {
 	context: { postType, postId },
 	attributes: { textAlign, isLink, linkTarget },
 	setAttributes,
@@ -92,4 +92,4 @@ function AuthorNameEdit( {
 	);
 }
 
-export default AuthorNameEdit;
+export default PostAuthorNameEdit;

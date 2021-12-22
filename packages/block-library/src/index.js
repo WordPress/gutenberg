@@ -14,7 +14,6 @@ import {
  */
 import * as archives from './archives';
 import * as audio from './audio';
-import * as authorName from './author-name';
 import * as button from './button';
 import * as buttons from './buttons';
 import * as calendar from './calendar';
@@ -60,6 +59,7 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
+import * as postAuthorName from './post-author-name';
 import * as postComment from './post-comment';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
@@ -203,7 +203,7 @@ export const __experimentalGetCoreBlocks = () => [
 	logInOut,
 	termDescription,
 	queryTitle,
-	authorName,
+	postAuthorName,
 ];
 
 /**

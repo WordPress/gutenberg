@@ -1,7 +1,8 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"name": "core/author-name",
-	"title": "Author Name",
+	"name": "core/post-author-name",
+	"title": "Post Author Name",
 	"category": "theme",
 	"description": "The author name.",
 	"textdomain": "default",
