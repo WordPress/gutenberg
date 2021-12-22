@@ -66,11 +66,12 @@ function NavigationToggle( { icon } ) {
 
 	if ( siteIconUrl ) {
 		buttonIcon = (
-			<motion.img
+			<motion.div
 				variants={ ! disableMotion && effect }
-				alt={ __( 'Site Icon' ) }
 				className="edit-site-navigation-toggle__site-icon"
-				src={ siteIconUrl }
+				style={ {
+					backgroundImage: `url(${ siteIconUrl })`,
+				} }
 			/>
 		);
 	} else if ( isRequestingSiteIcon ) {

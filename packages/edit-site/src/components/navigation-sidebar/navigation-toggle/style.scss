@@ -62,5 +62,8 @@
 
 .edit-site-navigation-toggle__site-icon {
 	width: $button-size;
+	height: $button-size;
 	border-radius: $radius-block-ui;
+	background-size: cover;
+	margin-top: -1px;
 }
