@@ -9,8 +9,14 @@ import classnames from 'classnames';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
+import {
+	getBlockType,
+	hasBlockSupport,
+	switchToBlockType,
+} from '@wordpress/blocks';
+import { ToolbarGroup, Tooltip, Button } from '@wordpress/components';
+import { group } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,6 +28,7 @@ import BlockControls from '../block-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 
 export default function BlockToolbar( { hideDragHandle } ) {
 	const {
@@ -63,6 +70,26 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			),
 		};
 	}, [] );
+
+	// Handle grouping of blocks
+	const convertToGroupButtonProps = useConvertToGroupButtonProps();
+	const {
+		blocksSelection,
+		groupingBlockName,
+		clientIds,
+	} = convertToGroupButtonProps;
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	// Convert to group
+	const onConvertToGroup = () => {
+		const newBlocks = switchToBlockType(
+			blocksSelection,
+			groupingBlockName
+		);
+		if ( newBlocks ) {
+			replaceBlocks( clientIds, newBlocks );
+		}
+	};
 
 	// Handles highlighting the current block outline on hover or focus of the
 	// block type toolbar area.
@@ -114,6 +141,14 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 						<BlockSwitcher clientIds={ blockClientIds } />
+						{ isMultiToolbar && (
+							<Tooltip text={ __( 'Group' ) }>
+								<Button
+									icon={ group }
+									onClick={ onConvertToGroup }
+								/>
+							</Tooltip>
+						) }
 						<BlockMover
 							clientIds={ blockClientIds }
 							hideDragHandle={ hideDragHandle || hasReducedUI }
