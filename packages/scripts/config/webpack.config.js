@@ -3,6 +3,7 @@
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const browserslist = require( 'browserslist' );
 const { sync: glob } = require( 'fast-glob' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
@@ -232,6 +233,15 @@ const config = {
 			// Prevent it from deleting webpack assets during builds that have
 			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
+		} ),
+		new CopyWebpackPlugin( {
+			patterns: [
+				{
+					from: '**/block.json',
+					context: 'src',
+					noErrorOnMissing: true,
+				},
+			],
 		} ),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
