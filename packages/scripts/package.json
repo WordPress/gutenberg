@@ -72,7 +72,7 @@
 		"npm-package-json-lint": "^5.0.0",
 		"postcss": "^8.2.15",
 		"postcss-loader": "^6.1.1",
-		"prettier": "npm:wp-prettier@2.2.1-beta-1",
+		"prettier": "^2.5.1",
 		"puppeteer-core": "^11.0.0",
 		"react-refresh": "^0.10.0",
 		"read-pkg-up": "^7.0.1",
