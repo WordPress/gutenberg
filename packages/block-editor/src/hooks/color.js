@@ -255,7 +255,6 @@ export function ColorEdit( props ) {
 		! themeGradientPalette ||
 		themeGradientPalette?.length > 0;
 
-
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
 	// synchronously causing our two callbacks to override changes
