@@ -2,8 +2,8 @@
 	{
 		"blockName": "core/spacer",
 		"attrs": {
-			"height": "0px",
-			"width": "72px"
+			"height": 0,
+			"width": 72
 		},
 		"innerBlocks": [],
 		"innerHTML": "\n<div style=\"height:0px;width:72px\" aria-hidden=\"true\" class=\"wp-block-spacer\"></div>\n",
