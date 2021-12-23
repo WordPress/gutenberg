@@ -12,19 +12,27 @@ support details .
 
 Here are two mini-tutorials for creating similar functionality to meta boxes in the block editor.
 
-## Before you start
+## Sidebar Plugin
 
-Include a section on assumptions and prerequisites:
+If you are interested in working with the post meta outside the editor, check out
+the [Sidebar Tutorial](/docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md).
 
--   Pre-requisite one: WordPress development environment
--   Pre-requisite two: familiarity with JavaScript and Gutenberg
--   Pre-requisite three: custom block or theme
+## Use Blocks to Store Meta
 
-Include other important information here, such as known issues or bugs.
+The first method is to use Blocks to store extra data with a post. The data is stored in a post meta field, similar to
+how meta boxes store information.
 
-## Step-by-step guide
+Typically, blocks store their attribute values in the serialised block HTML. However, you can also create a block that
+saves its attribute values as post meta, which can be accessed programmatically anywhere in your template.
 
-The guide should include step-by-step directions. Use code snippets, images, or screenshots to help illustrate each step. Include as many (or as few) steps as needed, try to keep each step short and easy to follow.
+In this short tutorial you will create one of these blocks, which will prompt a user for a single value, and save it
+as post meta.
+
+For background around the thinking of blocks as the interface, please see the
+[key concepts section](/docs/explanations/architecture/key-concepts.md) of the handbook.
+
+Before starting this tutorial, you will need a plugin to hold your code. Please take a look at the first two steps
+of [the JavaScript tutorial](/docs/how-to-guides/javascript/README.md) for information setting up a plugin.
 
 ### Step 1: Register Meta Field
 
@@ -207,10 +215,10 @@ You can now edit a draft post and add a Meta Block to the post. You will see you
 When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by
 saving and reloading your draft, the form will still be filled in on reload.
 
-![Meta Block](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/metabox/meta-block.png)
+![Meta Block](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/meta-block.png)
 
 You can now use the post meta data in a template, or another block. See next section for
-[using post meta data](/docs/how-to-guides/metabox/meta-block-4-use-data.md). You could also confirm the data is saved
+[using post meta data](#step-3-use-post-meta-data). You could also confirm the data is saved
 by checking the database table `wp_postmeta` and confirm the new post id contains the new field data.
 
 ### Step 3: Use Post Meta Data
