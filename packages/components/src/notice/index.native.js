@@ -23,53 +23,53 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const Notice = ( { onNoticeHidden, content, id, status } ) => {
-	const [ width, setWidth ] = useState( Dimensions.get( 'window' ).width );
-	const [ visible, setVisible ] = useState( true );
+const Notice = ({ onNoticeHidden, content, id, status }) => {
+	const [width, setWidth] = useState(Dimensions.get('window').width);
+	const [visible, setVisible] = useState(true);
 
-	const animationValue = useRef( new Animated.Value( 0 ) ).current;
-	const timer = useRef( null );
+	const animationValue = useRef(new Animated.Value(0)).current;
+	const timer = useRef(null);
 	const isIOS = Platform.OS === 'ios';
 
 	const onDimensionsChange = () => {
-		setWidth( Dimensions.get( 'window' ).width );
+		setWidth(Dimensions.get('window').width);
 	};
 
-	useEffect( () => {
-		Dimensions.addEventListener( 'change', onDimensionsChange );
+	useEffect(() => {
+		Dimensions.addEventListener('change', onDimensionsChange);
 		return () => {
-			Dimensions.removeEventListener( 'change', onDimensionsChange );
+			Dimensions.removeEventListener('change', onDimensionsChange);
 		};
-	}, [] );
+	}, []);
 
-	useEffect( () => {
+	useEffect(() => {
 		startAnimation();
 		return () => {
-			clearTimeout( timer?.current );
+			clearTimeout(timer?.current);
 		};
-	}, [ visible, id ] );
+	}, [visible, id]);
 
 	const onHide = () => {
-		setVisible( false );
+		setVisible(false);
 	};
 
 	const startAnimation = () => {
-		Animated.timing( animationValue, {
+		Animated.timing(animationValue, {
 			toValue: visible ? 1 : 0,
 			duration: visible ? 300 : 150,
 			useNativeDriver: true,
-			easing: Easing.out( Easing.quad ),
-		} ).start( () => {
-			if ( visible && onNoticeHidden ) {
-				timer.current = setTimeout( () => {
+			easing: Easing.out(Easing.quad),
+		}).start(() => {
+			if (visible && onNoticeHidden) {
+				timer.current = setTimeout(() => {
 					onHide();
-				}, 3000 );
+				}, 3000);
 			}
 
-			if ( ! visible && onNoticeHidden ) {
-				onNoticeHidden( id );
+			if (!visible && onNoticeHidden) {
+				onNoticeHidden(id);
 			}
-		} );
+		});
 	};
 
 	const noticeSolidStyles = usePreferredColorSchemeStyle(
@@ -95,36 +95,36 @@ const Notice = ( { onNoticeHidden, content, id, status } ) => {
 	return (
 		<>
 			<Animated.View
-				style={ [
+				style={[
 					styles.notice,
-					! isIOS && noticeSolidStyles,
+					!isIOS && noticeSolidStyles,
 					{
 						width,
 						transform: [
 							{
-								translateY: animationValue.interpolate( {
-									inputRange: [ 0, 1 ],
-									outputRange: [ -24, 0 ],
-								} ),
+								translateY: animationValue.interpolate({
+									inputRange: [0, 1],
+									outputRange: [-24, 0],
+								}),
 							},
 						],
 					},
-				] }
+				]}
 			>
-				<TouchableWithoutFeedback onPress={ onHide }>
-					<View style={ styles.noticeContent }>
-						<Text numberOfLines={ 3 } style={ textStyles }>
-							{ content }
+				<TouchableWithoutFeedback onPress={onHide}>
+					<View style={styles.noticeContent}>
+						<Text numberOfLines={3} style={textStyles}>
+							{content}
 						</Text>
 					</View>
 				</TouchableWithoutFeedback>
-				{ isIOS && (
+				{isIOS && (
 					<BlurView
-						style={ styles.blurBackground }
+						style={styles.blurBackground}
 						blurType="prominent"
-						blurAmount={ 10 }
+						blurAmount={10}
 					/>
-				) }
+				)}
 			</Animated.View>
 		</>
 	);

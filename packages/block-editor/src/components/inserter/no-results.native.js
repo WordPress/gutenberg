@@ -20,7 +20,8 @@ function InserterNoResults() {
 		'inserter-search-no-results__text-primary': textPrimaryBaseStyle,
 		'inserter-search-no-results__text-primary--dark': textPrimaryDarkStyle,
 		'inserter-search-no-results__text-secondary': textSecondaryBaseStyle,
-		'inserter-search-no-results__text-secondary--dark': textSecondaryDarkStyle,
+		'inserter-search-no-results__text-secondary--dark':
+			textSecondaryDarkStyle,
 	} = styles;
 	const textPrimaryStyle = usePreferredColorSchemeStyle(
 		textPrimaryBaseStyle,
@@ -33,12 +34,10 @@ function InserterNoResults() {
 
 	return (
 		<View>
-			<View style={ containerStyle }>
-				<Text style={ textPrimaryStyle }>
-					{ __( 'No blocks found' ) }
-				</Text>
-				<Text style={ textSecondaryStyle }>
-					{ __( 'Try another search term' ) }
+			<View style={containerStyle}>
+				<Text style={textPrimaryStyle}>{__('No blocks found')}</Text>
+				<Text style={textSecondaryStyle}>
+					{__('Try another search term')}
 				</Text>
 			</View>
 		</View>

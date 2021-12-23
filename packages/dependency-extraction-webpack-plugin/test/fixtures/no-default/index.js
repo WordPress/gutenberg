@@ -3,4 +3,4 @@
  */
 import _ from 'lodash';
 
-_.map( [], _.identity );
+_.map([], _.identity);

@@ -16,7 +16,7 @@ import { buildNavigationPostId } from './utils';
  * @param {Object} state Global application state.
  * @return {number} The selected menu ID.
  */
-export function getSelectedMenuId( state ) {
+export function getSelectedMenuId(state) {
 	return state.selectedMenuId ?? null;
 }
 
@@ -31,17 +31,17 @@ export function getSelectedMenuId( state ) {
  * @return {null|Object} Post once the resolver fetches it, otherwise null
  */
 export const getNavigationPostForMenu = createRegistrySelector(
-	( select ) => ( state, menuId ) => {
+	(select) => (state, menuId) => {
 		// When the record is unavailable, calling getEditedEntityRecord triggers a http
 		// request via it's related resolver. Let's return nothing until getNavigationPostForMenu
 		// resolver marks the record as resolved.
-		if ( ! hasResolvedNavigationPost( state, menuId ) ) {
+		if (!hasResolvedNavigationPost(state, menuId)) {
 			return null;
 		}
-		return select( coreStore ).getEditedEntityRecord(
+		return select(coreStore).getEditedEntityRecord(
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
-			buildNavigationPostId( menuId )
+			buildNavigationPostId(menuId)
 		);
 	}
 );
@@ -53,12 +53,12 @@ export const getNavigationPostForMenu = createRegistrySelector(
  * @return {boolean} True if the navigation post related to menuId was already resolved, false otherwise.
  */
 export const hasResolvedNavigationPost = createRegistrySelector(
-	( select ) => ( state, menuId ) => {
-		return select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
+	(select) => (state, menuId) => {
+		return select(coreStore).hasFinishedResolution('getEntityRecord', [
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
-			buildNavigationPostId( menuId ),
-		] );
+			buildNavigationPostId(menuId),
+		]);
 	}
 );
 
@@ -68,6 +68,6 @@ export const hasResolvedNavigationPost = createRegistrySelector(
  * @param {Object} state Global application state.
  * @return {boolean} Whether the inserter is opened.
  */
-export function isInserterOpened( state = false ) {
-	return !! state?.blockInserterPanel;
+export function isInserterOpened(state = false) {
+	return !!state?.blockInserterPanel;
 }

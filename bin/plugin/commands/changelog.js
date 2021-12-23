@@ -1,23 +1,23 @@
 /**
  * External dependencies
  */
-const { countBy, groupBy, escapeRegExp, uniq } = require( 'lodash' );
-const Octokit = require( '@octokit/rest' );
-const { sprintf } = require( 'sprintf-js' );
-const semver = require( 'semver' );
+const { countBy, groupBy, escapeRegExp, uniq } = require('lodash');
+const Octokit = require('@octokit/rest');
+const { sprintf } = require('sprintf-js');
+const semver = require('semver');
 
 /**
  * Internal dependencies
  */
-const { getNextMajorVersion } = require( '../lib/version' );
+const { getNextMajorVersion } = require('../lib/version');
 const {
 	getMilestoneByTitle,
 	getIssuesByMilestone,
-} = require( '../lib/milestone' );
-const { log, formats } = require( '../lib/logger' );
-const config = require( '../config' );
+} = require('../lib/milestone');
+const { log, formats } = require('../lib/logger');
+const config = require('../config');
 // @ts-ignore
-const manifest = require( '../../../package.json' );
+const manifest = require('../../../package.json');
 
 const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
 
@@ -168,9 +168,9 @@ const GROUP_TITLE_ORDER = [
  *
  * @type {Map<RegExp,string>}
  */
-const TITLE_TYPE_PATTERNS = new Map( [
-	[ /^(\w+:)?(bug)?\s*fix(es)?(:|\/ )?/i, 'Bug Fixes' ],
-] );
+const TITLE_TYPE_PATTERNS = new Map([
+	[/^(\w+:)?(bug)?\s*fix(es)?(:|\/ )?/i, 'Bug Fixes'],
+]);
 
 /**
  * Map of common technical terms to a corresponding replacement term more
@@ -193,13 +193,11 @@ const REWORD_TERMS = {
  *
  * @return {string[]} Type candidates.
  */
-function getTypesByLabels( labels ) {
+function getTypesByLabels(labels) {
 	return uniq(
 		labels
-			.filter( ( label ) =>
-				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
-			)
-			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+			.filter((label) => Object.keys(LABEL_TYPE_MAPPING).includes(label))
+			.map((label) => LABEL_TYPE_MAPPING[label])
 	);
 }
 
@@ -211,12 +209,10 @@ function getTypesByLabels( labels ) {
  *
  * @return {string[]} Feature candidates.
  */
-function mapLabelsToFeatures( labels ) {
+function mapLabelsToFeatures(labels) {
 	return labels
-		.filter( ( label ) =>
-			Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
-		)
-		.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] );
+		.filter((label) => Object.keys(LABEL_FEATURE_MAPPING).includes(label))
+		.map((label) => LABEL_FEATURE_MAPPING[label]);
 }
 
 /**
@@ -227,8 +223,8 @@ function mapLabelsToFeatures( labels ) {
  *
  * @return {boolean} whether or not the issue's is labbeled as block specific
  */
-function getIsBlockSpecificIssue( labels ) {
-	return !! labels.find( ( label ) => label.startsWith( '[Block] ' ) );
+function getIsBlockSpecificIssue(labels) {
+	return !!labels.find((label) => label.startsWith('[Block] '));
 }
 
 /**
@@ -238,8 +234,8 @@ function getIsBlockSpecificIssue( labels ) {
  *
  * @return {string|undefined} the feature specific label.
  */
-function getFeatureSpecificLabels( labels ) {
-	return labels.find( ( label ) => label.startsWith( '[Feature] ' ) );
+function getFeatureSpecificLabels(labels) {
+	return labels.find((label) => label.startsWith('[Feature] '));
 }
 
 /**
@@ -249,11 +245,11 @@ function getFeatureSpecificLabels( labels ) {
  *
  * @return {string[]} Type candidates.
  */
-function getTypesByTitle( title ) {
+function getTypesByTitle(title) {
 	const types = [];
-	for ( const [ pattern, type ] of TITLE_TYPE_PATTERNS.entries() ) {
-		if ( pattern.test( title ) ) {
-			types.push( type );
+	for (const [pattern, type] of TITLE_TYPE_PATTERNS.entries()) {
+		if (pattern.test(title)) {
+			types.push(type);
 		}
 	}
 
@@ -268,21 +264,21 @@ function getTypesByTitle( title ) {
  *
  * @return {string} Type label.
  */
-function getIssueType( issue ) {
-	const labels = issue.labels.map( ( { name } ) => name );
+function getIssueType(issue) {
+	const labels = issue.labels.map(({ name }) => name);
 
 	const candidates = [
-		...getTypesByLabels( labels ),
-		...getTypesByTitle( issue.title ),
+		...getTypesByLabels(labels),
+		...getTypesByTitle(issue.title),
 	];
 
 	// Force all tasks identified as Documentation tasks
 	// to appear under the main "Documentation" section.
-	if ( candidates.includes( 'Documentation' ) ) {
+	if (candidates.includes('Documentation')) {
 		return 'Documentation';
 	}
 
-	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
+	return candidates.length ? candidates.sort(sortType)[0] : 'Various';
 }
 
 /**
@@ -293,36 +289,36 @@ function getIssueType( issue ) {
  *
  * @return {string} the feature name.
  */
-function getIssueFeature( issue ) {
-	const labels = issue.labels.map( ( { name } ) => name );
+function getIssueFeature(issue) {
+	const labels = issue.labels.map(({ name }) => name);
 
-	const featureCandidates = mapLabelsToFeatures( labels );
+	const featureCandidates = mapLabelsToFeatures(labels);
 
 	// 1. Prefer explicit mapping of label to feature.
-	if ( featureCandidates.length ) {
+	if (featureCandidates.length) {
 		// Get occurances of the feature labels.
-		const featureCounts = countBy( featureCandidates );
+		const featureCounts = countBy(featureCandidates);
 
 		// Check which matching label occurs most often.
-		const rankedFeatures = Object.keys( featureCounts ).sort(
-			( a, b ) => featureCounts[ b ] - featureCounts[ a ]
+		const rankedFeatures = Object.keys(featureCounts).sort(
+			(a, b) => featureCounts[b] - featureCounts[a]
 		);
 
 		// Return the one that appeared most often.
-		return rankedFeatures[ 0 ];
+		return rankedFeatures[0];
 	}
 
 	// 2. `[Feature]` labels
-	const featureSpecificLabel = getFeatureSpecificLabels( labels );
+	const featureSpecificLabel = getFeatureSpecificLabels(labels);
 
-	if ( featureSpecificLabel ) {
-		return removeFeaturePrefix( featureSpecificLabel );
+	if (featureSpecificLabel) {
+		return removeFeaturePrefix(featureSpecificLabel);
 	}
 
 	// 3. Block specific labels.
-	const blockSpecificLabels = getIsBlockSpecificIssue( labels );
+	const blockSpecificLabels = getIsBlockSpecificIssue(labels);
 
-	if ( blockSpecificLabels ) {
+	if (blockSpecificLabels) {
 		return 'Block Library';
 	}
 
@@ -338,10 +334,10 @@ function getIssueFeature( issue ) {
  *
  * @return {number} Sort result.
  */
-function sortType( a, b ) {
-	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
-		return Object.keys( LABEL_TYPE_MAPPING ).indexOf( title );
-	} );
+function sortType(a, b) {
+	const [aIndex, bIndex] = [a, b].map((title) => {
+		return Object.keys(LABEL_TYPE_MAPPING).indexOf(title);
+	});
 
 	return aIndex - bIndex;
 }
@@ -354,11 +350,11 @@ function sortType( a, b ) {
  *
  * @return {number} Sort result.
  */
-function sortGroup( a, b ) {
-	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
-		const index = GROUP_TITLE_ORDER.indexOf( title );
-		return index === -1 ? GROUP_TITLE_ORDER.indexOf( undefined ) : index;
-	} );
+function sortGroup(a, b) {
+	const [aIndex, bIndex] = [a, b].map((title) => {
+		const index = GROUP_TITLE_ORDER.indexOf(title);
+		return index === -1 ? GROUP_TITLE_ORDER.indexOf(undefined) : index;
+	});
 
 	return aIndex - bIndex;
 }
@@ -370,8 +366,8 @@ function sortGroup( a, b ) {
  *
  * @return {string} Text with trailing period.
  */
-function addTrailingPeriod( text ) {
-	return text.replace( /\s*\.?$/, '' ) + '.';
+function addTrailingPeriod(text) {
+	return text.replace(/\s*\.?$/, '') + '.';
 }
 
 /**
@@ -381,13 +377,13 @@ function addTrailingPeriod( text ) {
  *
  * @return {string} Text with reworded terms.
  */
-function reword( text ) {
-	for ( const [ term, replacement ] of Object.entries( REWORD_TERMS ) ) {
+function reword(text) {
+	for (const [term, replacement] of Object.entries(REWORD_TERMS)) {
 		const pattern = new RegExp(
-			'(^| )' + escapeRegExp( term ) + '( |$)',
+			'(^| )' + escapeRegExp(term) + '( |$)',
 			'ig'
 		);
-		text = text.replace( pattern, '$1' + replacement + '$2' );
+		text = text.replace(pattern, '$1' + replacement + '$2');
 	}
 
 	return text;
@@ -401,14 +397,14 @@ function reword( text ) {
  *
  * @return {string} Text with capitalizes last segment.
  */
-function capitalizeAfterColonSeparatedPrefix( text ) {
-	const parts = text.split( ':' );
-	parts[ parts.length - 1 ] = parts[ parts.length - 1 ].replace(
+function capitalizeAfterColonSeparatedPrefix(text) {
+	const parts = text.split(':');
+	parts[parts.length - 1] = parts[parts.length - 1].replace(
 		/^(\s*)([a-z])/,
-		( _match, whitespace, letter ) => whitespace + letter.toUpperCase()
+		(_match, whitespace, letter) => whitespace + letter.toUpperCase()
 	);
 
-	return parts.join( ':' );
+	return parts.join(':');
 }
 
 /**
@@ -420,9 +416,9 @@ function capitalizeAfterColonSeparatedPrefix( text ) {
  *
  * @return {WPChangelogNormalization} Normalization function.
  */
-const createOmitByTitlePrefix = ( prefixes ) => ( title ) =>
-	prefixes.some( ( prefix ) =>
-		new RegExp( '^' + escapeRegExp( prefix ), 'i' ).test( title )
+const createOmitByTitlePrefix = (prefixes) => (title) =>
+	prefixes.some((prefix) =>
+		new RegExp('^' + escapeRegExp(prefix), 'i').test(title)
 	)
 		? undefined
 		: title;
@@ -436,8 +432,8 @@ const createOmitByTitlePrefix = ( prefixes ) => ( title ) =>
  *
  * @return {WPChangelogNormalization} Normalization function.
  */
-const createOmitByLabel = ( labels ) => ( text, issue ) =>
-	issue.labels.some( ( label ) => labels.includes( label.name ) )
+const createOmitByLabel = (labels) => (text, issue) =>
+	issue.labels.some((label) => labels.includes(label.name))
 		? undefined
 		: text;
 
@@ -450,8 +446,8 @@ const createOmitByLabel = ( labels ) => ( text, issue ) =>
  *
  * @return {string} Title with redundant grouping type details removed.
  */
-function removeRedundantTypePrefix( title, issue ) {
-	const type = getIssueType( issue );
+function removeRedundantTypePrefix(title, issue) {
+	const type = getIssueType(issue);
 
 	return title.replace(
 		new RegExp(
@@ -459,7 +455,7 @@ function removeRedundantTypePrefix( title, issue ) {
 				// Naively try to convert to singular form, to match "Bug Fixes"
 				// type as either "Bug Fix" or "Bug Fixes" (technically matches
 				// "Bug Fixs" as well).
-				escapeRegExp( type.replace( /(es|s)$/, '' ) )
+				escapeRegExp(type.replace(/(es|s)$/, ''))
 			}(es|s)?\\]?:?\\s*`,
 			'i'
 		),
@@ -474,8 +470,8 @@ function removeRedundantTypePrefix( title, issue ) {
  *
  * @return {string} the text without the prefix.
  */
-function removeFeaturePrefix( text ) {
-	return text.replace( '[Feature] ', '' );
+function removeFeaturePrefix(text) {
+	return text.replace('[Feature] ', '');
 }
 
 /**
@@ -485,8 +481,8 @@ function removeFeaturePrefix( text ) {
  * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	createOmitByLabel( [ 'Mobile App Android/iOS' ] ),
-	createOmitByTitlePrefix( [ '[rnmobile]', '[mobile]', 'Mobile Release' ] ),
+	createOmitByLabel(['Mobile App Android/iOS']),
+	createOmitByTitlePrefix(['[rnmobile]', '[mobile]', 'Mobile Release']),
 	removeRedundantTypePrefix,
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
@@ -502,12 +498,12 @@ const TITLE_NORMALIZATIONS = [
  *
  * @return {string|undefined} Normalized title.
  */
-function getNormalizedTitle( title, issue ) {
+function getNormalizedTitle(title, issue) {
 	/** @type {string|undefined} */
 	let normalizedTitle = title;
-	for ( const normalize of TITLE_NORMALIZATIONS ) {
-		normalizedTitle = normalize( normalizedTitle, issue );
-		if ( normalizedTitle === undefined ) {
+	for (const normalize of TITLE_NORMALIZATIONS) {
+		normalizedTitle = normalize(normalizedTitle, issue);
+		if (normalizedTitle === undefined) {
 			break;
 		}
 	}
@@ -523,12 +519,12 @@ function getNormalizedTitle( title, issue ) {
  *
  * @return {string=} Formatted changelog entry, or undefined to omit.
  */
-function getEntry( issue ) {
-	const title = getNormalizedTitle( issue.title, issue );
+function getEntry(issue) {
+	const title = getNormalizedTitle(issue.title, issue);
 
 	return title === undefined
 		? title
-		: `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
+		: `- ${title} ([${issue.number}](${issue.html_url}))`;
 }
 
 /**
@@ -540,16 +536,10 @@ function getEntry( issue ) {
  *
  * @return {string=} Formatted changelog entry, or undefined to omit.
  */
-function getFeatureEntry( issue, featureName ) {
-	return getEntry( issue )
-		?.replace(
-			new RegExp( `\\[${ featureName.toLowerCase() } \- `, 'i' ),
-			'['
-		)
-		.replace(
-			new RegExp( `(?<=^- )${ featureName.toLowerCase() }: `, 'i' ),
-			''
-		);
+function getFeatureEntry(issue, featureName) {
+	return getEntry(issue)
+		?.replace(new RegExp(`\\[${featureName.toLowerCase()} \- `, 'i'), '[')
+		.replace(new RegExp(`(?<=^- )${featureName.toLowerCase()}: `, 'i'), '');
 }
 
 /**
@@ -564,25 +554,25 @@ function getFeatureEntry( issue, featureName ) {
  *                                                            requests for the given
  *                                                            milestone.
  */
-async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
-	const releaseOptions = await octokit.repos.listReleases.endpoint.merge( {
+async function getLatestReleaseInSeries(octokit, owner, repo, series) {
+	const releaseOptions = await octokit.repos.listReleases.endpoint.merge({
 		owner,
 		repo,
-	} );
+	});
 
 	let latestReleaseForMilestone;
 
 	/**
 	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').ReposListReleasesResponse>>}
 	 */
-	const releases = octokit.paginate.iterator( releaseOptions );
+	const releases = octokit.paginate.iterator(releaseOptions);
 
-	for await ( const releasesPage of releases ) {
-		latestReleaseForMilestone = releasesPage.data.find( ( release ) =>
-			release.name.startsWith( series )
+	for await (const releasesPage of releases) {
+		latestReleaseForMilestone = releasesPage.data.find((release) =>
+			release.name.startsWith(series)
 		);
 
-		if ( latestReleaseForMilestone ) {
+		if (latestReleaseForMilestone) {
 			return latestReleaseForMilestone;
 		}
 	}
@@ -599,7 +589,7 @@ async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
  * @return {Promise<IssuesListForRepoResponseItem[]>} Promise resolving to array of
  *                                            pull requests.
  */
-async function fetchAllPullRequests( octokit, settings ) {
+async function fetchAllPullRequests(octokit, settings) {
 	const { owner, repo, milestone: milestoneTitle, unreleased } = settings;
 	const milestone = await getMilestoneByTitle(
 		octokit,
@@ -608,15 +598,15 @@ async function fetchAllPullRequests( octokit, settings ) {
 		milestoneTitle
 	);
 
-	if ( ! milestone ) {
+	if (!milestone) {
 		throw new Error(
-			`Cannot find milestone by title: ${ settings.milestone }`
+			`Cannot find milestone by title: ${settings.milestone}`
 		);
 	}
 
-	const series = milestoneTitle.replace( 'Gutenberg ', '' );
+	const series = milestoneTitle.replace('Gutenberg ', '');
 	const latestReleaseInSeries = unreleased
-		? await getLatestReleaseInSeries( octokit, owner, repo, series )
+		? await getLatestReleaseInSeries(octokit, owner, repo, series)
 		: undefined;
 
 	const { number } = milestone;
@@ -628,7 +618,7 @@ async function fetchAllPullRequests( octokit, settings ) {
 		'closed',
 		latestReleaseInSeries ? latestReleaseInSeries.published_at : undefined
 	);
-	return issues.filter( ( issue ) => issue.pull_request );
+	return issues.filter((issue) => issue.pull_request);
 }
 
 /**
@@ -638,14 +628,14 @@ async function fetchAllPullRequests( octokit, settings ) {
  *
  * @return {Promise<string>} Promise resolving to changelog.
  */
-async function getChangelog( settings ) {
-	const octokit = new Octokit( {
+async function getChangelog(settings) {
+	const octokit = new Octokit({
 		auth: settings.token,
-	} );
+	});
 
-	const pullRequests = await fetchAllPullRequests( octokit, settings );
-	if ( ! pullRequests.length ) {
-		if ( settings.unreleased ) {
+	const pullRequests = await fetchAllPullRequests(octokit, settings);
+	if (!pullRequests.length) {
+		if (settings.unreleased) {
 			throw new Error(
 				'There are no unreleased pull requests associated with the milestone.'
 			);
@@ -656,7 +646,7 @@ async function getChangelog( settings ) {
 		}
 	}
 
-	return formatChangelog( pullRequests );
+	return formatChangelog(pullRequests);
 }
 
 /**
@@ -666,20 +656,18 @@ async function getChangelog( settings ) {
  *
  * @return {string} The formatted changelog string.
  */
-function formatChangelog( pullRequests ) {
+function formatChangelog(pullRequests) {
 	let changelog = '';
 
-	const groupedPullRequests = groupBy( pullRequests, getIssueType );
+	const groupedPullRequests = groupBy(pullRequests, getIssueType);
 
-	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
+	const sortedGroups = Object.keys(groupedPullRequests).sort(sortGroup);
 
-	for ( const group of sortedGroups ) {
-		const groupPullRequests = groupedPullRequests[ group ];
-		const groupEntries = groupPullRequests
-			.map( getEntry )
-			.filter( Boolean );
+	for (const group of sortedGroups) {
+		const groupPullRequests = groupedPullRequests[group];
+		const groupEntries = groupPullRequests.map(getEntry).filter(Boolean);
 
-		if ( ! groupEntries.length ) {
+		if (!groupEntries.length) {
 			continue;
 		}
 
@@ -687,21 +675,21 @@ function formatChangelog( pullRequests ) {
 		changelog += '### ' + group + '\n\n';
 
 		// Group PRs within this section into "Features".
-		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
+		const featureGroups = groupBy(groupPullRequests, getIssueFeature);
 
-		const featuredGroupNames = sortFeatureGroups( featureGroups );
+		const featuredGroupNames = sortFeatureGroups(featureGroups);
 
 		// Start output of Features within the section.
-		featuredGroupNames.forEach( ( featureName ) => {
-			const featureGroupPRs = featureGroups[ featureName ];
+		featuredGroupNames.forEach((featureName) => {
+			const featureGroupPRs = featureGroups[featureName];
 
 			const featureGroupEntries = featureGroupPRs
-				.map( ( issue ) => getFeatureEntry( issue, featureName ) )
-				.filter( Boolean )
+				.map((issue) => getFeatureEntry(issue, featureName))
+				.filter(Boolean)
 				.sort();
 
 			// Don't create feature sections when there are no PRs.
-			if ( ! featureGroupEntries.length ) {
+			if (!featureGroupEntries.length) {
 				return;
 			}
 
@@ -716,14 +704,14 @@ function formatChangelog( pullRequests ) {
 			}
 
 			// Add a <li> for each PR in the Feature.
-			featureGroupEntries.forEach( ( entry ) => {
+			featureGroupEntries.forEach((entry) => {
 				// Add a new bullet point to the list.
-				changelog += `${ entry }\n`;
-			} );
+				changelog += `${entry}\n`;
+			});
 
 			// Close the <ul> for the Feature group.
 			changelog += '\n';
-		} );
+		});
 
 		changelog += '\n';
 	}
@@ -738,23 +726,21 @@ function formatChangelog( pullRequests ) {
  * @param {Object.<string, IssuesListForRepoResponseItem[]>} featureGroups feature specific PRs keyed by feature name.
  * @return {string[]} sorted list of feature names.
  */
-function sortFeatureGroups( featureGroups ) {
-	return Object.keys( featureGroups ).sort(
-		( featureAName, featureBName ) => {
-			// Sort "uncategorized" items to *always* be at the top of the section
-			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
-				return -1;
-			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
-				return 1;
-			}
-
-			// Sort by greatest number of PRs in the group first.
-			return (
-				featureGroups[ featureBName ].length -
-				featureGroups[ featureAName ].length
-			);
+function sortFeatureGroups(featureGroups) {
+	return Object.keys(featureGroups).sort((featureAName, featureBName) => {
+		// Sort "uncategorized" items to *always* be at the top of the section
+		if (featureAName === UNKNOWN_FEATURE_FALLBACK_NAME) {
+			return -1;
+		} else if (featureBName === UNKNOWN_FEATURE_FALLBACK_NAME) {
+			return 1;
 		}
-	);
+
+		// Sort by greatest number of PRs in the group first.
+		return (
+			featureGroups[featureBName].length -
+			featureGroups[featureAName].length
+		);
+	});
 }
 
 /**
@@ -762,23 +748,23 @@ function sortFeatureGroups( featureGroups ) {
  *
  * @param {WPChangelogSettings} settings Changelog settings.
  */
-async function createChangelog( settings ) {
+async function createChangelog(settings) {
 	log(
 		formats.title(
-			`\n💃Preparing changelog for milestone: "${ settings.milestone }"\n\n`
+			`\n💃Preparing changelog for milestone: "${settings.milestone}"\n\n`
 		)
 	);
 
 	let changelog;
 	try {
-		changelog = await getChangelog( settings );
-	} catch ( error ) {
-		if ( error instanceof Error ) {
-			changelog = formats.error( error.stack );
+		changelog = await getChangelog(settings);
+	} catch (error) {
+		if (error instanceof Error) {
+			changelog = formats.error(error.stack);
 		}
 	}
 
-	log( changelog );
+	log(changelog);
 }
 
 /**
@@ -786,8 +772,8 @@ async function createChangelog( settings ) {
  *
  * @param {WPChangelogCommandOptions} options
  */
-async function getReleaseChangelog( options ) {
-	await createChangelog( {
+async function getReleaseChangelog(options) {
+	await createChangelog({
 		owner: config.githubRepositoryOwner,
 		repo: config.githubRepositoryName,
 		token: options.token,
@@ -797,18 +783,16 @@ async function getReleaseChangelog( options ) {
 				  // strings are expected to need to be extracted, and thus variables are
 				  // not allowed. This string will not need to be extracted.
 				  // eslint-disable-next-line @wordpress/valid-sprintf
-				  sprintf( config.versionMilestoneFormat, {
+				  sprintf(config.versionMilestoneFormat, {
 						...config,
-						...semver.parse(
-							getNextMajorVersion( manifest.version )
-						),
-				  } )
+						...semver.parse(getNextMajorVersion(manifest.version)),
+				  })
 				: options.milestone,
 		unreleased: options.unreleased,
-	} );
+	});
 }
 
-/** @type {NodeJS.Module} */ ( module ).exports = {
+/** @type {NodeJS.Module} */ (module).exports = {
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
 	createOmitByTitlePrefix,

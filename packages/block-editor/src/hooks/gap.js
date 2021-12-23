@@ -23,9 +23,9 @@ import { cleanEmptyObject } from './utils';
  * @param {string|Object} blockType Block name or Block Type object.
  * @return {boolean}                 Whether there is support.
  */
-export function hasGapSupport( blockType ) {
-	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
-	return !! ( true === support || support?.blockGap );
+export function hasGapSupport(blockType) {
+	const support = getBlockSupport(blockType, SPACING_SUPPORT_KEY);
+	return !!(true === support || support?.blockGap);
 }
 
 /**
@@ -34,7 +34,7 @@ export function hasGapSupport( blockType ) {
  * @param {Object} props Block props.
  * @return {boolean}      Whether or not the block has a gap value set.
  */
-export function hasGapValue( props ) {
+export function hasGapValue(props) {
 	return props.attributes.style?.spacing?.blockGap !== undefined;
 }
 
@@ -46,10 +46,10 @@ export function hasGapValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetGap( { attributes = {}, setAttributes } ) {
+export function resetGap({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
+	setAttributes({
 		style: {
 			...style,
 			spacing: {
@@ -57,7 +57,7 @@ export function resetGap( { attributes = {}, setAttributes } ) {
 				blockGap: undefined,
 			},
 		},
-	} );
+	});
 }
 
 /**
@@ -66,9 +66,9 @@ export function resetGap( { attributes = {}, setAttributes } ) {
  * @param {string} name The name of the block.
  * @return {boolean}     Whether the gap setting is disabled.
  */
-export function useIsGapDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'spacing.blockGap' );
-	return ! hasGapSupport( blockName ) || isDisabled;
+export function useIsGapDisabled({ name: blockName } = {}) {
+	const isDisabled = !useSetting('spacing.blockGap');
+	return !hasGapSupport(blockName) || isDisabled;
 }
 
 /**
@@ -78,30 +78,30 @@ export function useIsGapDisabled( { name: blockName } = {} ) {
  *
  * @return {WPElement} Gap edit element.
  */
-export function GapEdit( props ) {
+export function GapEdit(props) {
 	const {
 		clientId,
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || [
 			'%',
 			'px',
 			'em',
 			'rem',
 			'vw',
 		],
-	} );
+	});
 
-	const ref = useBlockRef( clientId );
+	const ref = useBlockRef(clientId);
 
-	if ( useIsGapDisabled( props ) ) {
+	if (useIsGapDisabled(props)) {
 		return null;
 	}
 
-	const onChange = ( next ) => {
+	const onChange = (next) => {
 		const newStyle = {
 			...style,
 			spacing: {
@@ -110,37 +110,37 @@ export function GapEdit( props ) {
 			},
 		};
 
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
+		setAttributes({
+			style: cleanEmptyObject(newStyle),
+		});
 
 		// In Safari, changing the `gap` CSS value on its own will not trigger the layout
 		// to be recalculated / re-rendered. To force the updated gap to re-render, here
 		// we replace the block's node with itself.
 		const isSafari =
 			window?.navigator.userAgent &&
-			window.navigator.userAgent.includes( 'Safari' ) &&
-			! window.navigator.userAgent.includes( 'Chrome ' ) &&
-			! window.navigator.userAgent.includes( 'Chromium ' );
+			window.navigator.userAgent.includes('Safari') &&
+			!window.navigator.userAgent.includes('Chrome ') &&
+			!window.navigator.userAgent.includes('Chromium ');
 
-		if ( ref.current && isSafari ) {
-			ref.current.parentNode?.replaceChild( ref.current, ref.current );
+		if (ref.current && isSafari) {
+			ref.current.parentNode?.replaceChild(ref.current, ref.current);
 		}
 	};
 
-	return Platform.select( {
+	return Platform.select({
 		web: (
 			<>
 				<UnitControl
-					label={ __( 'Block spacing' ) }
+					label={__('Block spacing')}
 					__unstableInputWidth="80px"
-					min={ 0 }
-					onChange={ onChange }
-					units={ units }
-					value={ style?.spacing?.blockGap }
+					min={0}
+					onChange={onChange}
+					units={units}
+					value={style?.spacing?.blockGap}
 				/>
 			</>
 		),
 		native: null,
-	} );
+	});
 }

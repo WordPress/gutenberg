@@ -15,12 +15,12 @@ import { getInlineStyles } from './style';
  *
  * @return {Object} Spacing block support derived CSS classes & styles.
  */
-export function getSpacingClassesAndStyles( attributes ) {
+export function getSpacingClassesAndStyles(attributes) {
 	const { style } = attributes;
 
 	// Collect inline styles for spacing.
 	const spacingStyles = style?.spacing || {};
-	const styleProp = getInlineStyles( { spacing: spacingStyles } );
+	const styleProp = getInlineStyles({ spacing: spacingStyles });
 
 	return {
 		style: styleProp,

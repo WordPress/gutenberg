@@ -14,21 +14,21 @@ import { withSelect } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
-export function PostVisibilityCheck( { hasPublishAction, render } ) {
+export function PostVisibilityCheck({ hasPublishAction, render }) {
 	const canEdit = hasPublishAction;
-	return render( { canEdit } );
+	return render({ canEdit });
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getCurrentPost, getCurrentPostType } = select( editorStore );
+export default compose([
+	withSelect((select) => {
+		const { getCurrentPost, getCurrentPostType } = select(editorStore);
 		return {
 			hasPublishAction: get(
 				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
+				['_links', 'wp:action-publish'],
 				false
 			),
 			postType: getCurrentPostType(),
 		};
-	} ),
-] )( PostVisibilityCheck );
+	}),
+])(PostVisibilityCheck);

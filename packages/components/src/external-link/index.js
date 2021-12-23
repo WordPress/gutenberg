@@ -22,28 +22,28 @@ export function ExternalLink(
 	ref
 ) {
 	rel = uniq(
-		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
-	).join( ' ' );
-	const classes = classnames( 'components-external-link', className );
+		compact([...rel.split(' '), 'external', 'noreferrer', 'noopener'])
+	).join(' ');
+	const classes = classnames('components-external-link', className);
 	return (
 		/* eslint-disable react/jsx-no-target-blank */
 		<a
-			{ ...additionalProps }
-			className={ classes }
-			href={ href }
+			{...additionalProps}
+			className={classes}
+			href={href}
 			target="_blank"
-			rel={ rel }
-			ref={ ref }
+			rel={rel}
+			ref={ref}
 		>
-			{ children }
+			{children}
 			<VisuallyHidden as="span">
 				{
 					/* translators: accessibility text */
-					__( '(opens in a new tab)' )
+					__('(opens in a new tab)')
 				}
 			</VisuallyHidden>
 			<StyledIcon
-				icon={ external }
+				icon={external}
 				className="components-external-link__icon"
 			/>
 		</a>
@@ -51,4 +51,4 @@ export function ExternalLink(
 	);
 }
 
-export default forwardRef( ExternalLink );
+export default forwardRef(ExternalLink);

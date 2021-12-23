@@ -10,25 +10,25 @@ import remove from './remove';
  *
  * @return {string} The sanitized HTML.
  */
-export default function safeHTML( html ) {
-	const { body } = document.implementation.createHTMLDocument( '' );
+export default function safeHTML(html) {
+	const { body } = document.implementation.createHTMLDocument('');
 	body.innerHTML = html;
-	const elements = body.getElementsByTagName( '*' );
+	const elements = body.getElementsByTagName('*');
 	let elementIndex = elements.length;
 
-	while ( elementIndex-- ) {
-		const element = elements[ elementIndex ];
+	while (elementIndex--) {
+		const element = elements[elementIndex];
 
-		if ( element.tagName === 'SCRIPT' ) {
-			remove( element );
+		if (element.tagName === 'SCRIPT') {
+			remove(element);
 		} else {
 			let attributeIndex = element.attributes.length;
 
-			while ( attributeIndex-- ) {
-				const { name: key } = element.attributes[ attributeIndex ];
+			while (attributeIndex--) {
+				const { name: key } = element.attributes[attributeIndex];
 
-				if ( key.startsWith( 'on' ) ) {
-					element.removeAttribute( key );
+				if (key.startsWith('on')) {
+					element.removeAttribute(key);
 				}
 			}
 		}

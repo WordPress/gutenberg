@@ -9,22 +9,22 @@ import classnames from 'classnames';
  */
 import { Slot, Fill } from '@wordpress/components';
 
-function PinnedItems( { scope, ...props } ) {
-	return <Fill name={ `PinnedItems/${ scope }` } { ...props } />;
+function PinnedItems({ scope, ...props }) {
+	return <Fill name={`PinnedItems/${scope}`} {...props} />;
 }
 
-function PinnedItemsSlot( { scope, className, ...props } ) {
+function PinnedItemsSlot({ scope, className, ...props }) {
 	return (
-		<Slot name={ `PinnedItems/${ scope }` } { ...props }>
-			{ ( fills ) =>
-				! isEmpty( fills ) && (
+		<Slot name={`PinnedItems/${scope}`} {...props}>
+			{(fills) =>
+				!isEmpty(fills) && (
 					<div
-						className={ classnames(
+						className={classnames(
 							className,
 							'interface-pinned-items'
-						) }
+						)}
 					>
-						{ fills }
+						{fills}
 					</div>
 				)
 			}

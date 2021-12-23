@@ -25,8 +25,7 @@
  * @param {number} menuId Menu id.
  * @return {string} An ID.
  */
-export const buildNavigationPostId = ( menuId ) =>
-	`navigation-post-${ menuId }`;
+export const buildNavigationPostId = (menuId) => `navigation-post-${menuId}`;
 
 /**
  * Builds a query to resolve menu items.
@@ -34,7 +33,7 @@ export const buildNavigationPostId = ( menuId ) =>
  * @param {number} menuId Menu id.
  * @return {Object} Query.
  */
-export function menuItemsQuery( menuId ) {
+export function menuItemsQuery(menuId) {
 	return { menus: menuId, per_page: -1 };
 }
 
@@ -49,7 +48,7 @@ export function menuItemsQuery( menuId ) {
  * @param    {Block}      block              The block.
  * @return {string} The internal record id.
  */
-export function getRecordIdFromBlock( block ) {
+export function getRecordIdFromBlock(block) {
 	return block.attributes.__internalRecordId;
 }
 
@@ -60,11 +59,11 @@ export function getRecordIdFromBlock( block ) {
  * @param {string} recordId The record id.
  * @return {Block} The updated block.
  */
-export function addRecordIdToBlock( block, recordId ) {
+export function addRecordIdToBlock(block, recordId) {
 	return {
 		...block,
 		attributes: {
-			...( block.attributes || {} ),
+			...(block.attributes || {}),
 			__internalRecordId: recordId,
 		},
 	};
@@ -76,7 +75,5 @@ export function addRecordIdToBlock( block, recordId ) {
  * @param {Object} block Block to check.
  * @return {boolean} True if a given block should be persisted as a menu item, false otherwise.
  */
-export const isBlockSupportedInNav = ( block ) =>
-	[ 'core/navigation-link', 'core/navigation-submenu' ].includes(
-		block.name
-	);
+export const isBlockSupportedInNav = (block) =>
+	['core/navigation-link', 'core/navigation-submenu'].includes(block.name);

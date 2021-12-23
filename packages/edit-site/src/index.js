@@ -33,38 +33,38 @@ import getIsListPage from './utils/get-is-list-page';
  * @param {Element} target   DOM node in which editor is rendered.
  * @param {?Object} settings Editor settings object.
  */
-export function reinitializeEditor( target, settings ) {
+export function reinitializeEditor(target, settings) {
 	// This will be a no-op if the target doesn't have any React nodes.
-	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, target, settings );
+	unmountComponentAtNode(target);
+	const reboot = reinitializeEditor.bind(null, target, settings);
 
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	{
-		dispatch( editSiteStore ).updateSettings( settings );
+		dispatch(editSiteStore).updateSettings(settings);
 		// Keep the defaultTemplateTypes in the core/editor settings too,
 		// so that they can be selected with core/editor selectors in any editor.
 		// This is needed because edit-site doesn't initialize with EditorProvider,
 		// which internally uses updateEditorSettings as well.
-		dispatch( editorStore ).updateEditorSettings( {
+		dispatch(editorStore).updateEditorSettings({
 			defaultTemplateTypes: settings.defaultTemplateTypes,
 			defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
-		} );
+		});
 
 		const isLandingOnListPage = getIsListPage(
-			getQueryArgs( window.location.href )
+			getQueryArgs(window.location.href)
 		);
 
-		if ( isLandingOnListPage ) {
+		if (isLandingOnListPage) {
 			// Default the navigation panel to be opened when we're in a bigger
 			// screen and land in the list screen.
-			dispatch( editSiteStore ).setIsNavigationPanelOpened(
-				select( viewportStore ).isViewportMatch( 'medium' )
+			dispatch(editSiteStore).setIsNavigationPanelOpened(
+				select(viewportStore).isViewportMatch('medium')
 			);
 		}
 	}
 
-	render( <EditSiteApp reboot={ reboot } />, target );
+	render(<EditSiteApp reboot={reboot} />, target);
 }
 
 /**
@@ -73,23 +73,23 @@ export function reinitializeEditor( target, settings ) {
  * @param {string} id       ID of the root element to render the screen in.
  * @param {Object} settings Editor settings.
  */
-export function initializeEditor( id, settings ) {
-	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
-		fetchLinkSuggestions( search, searchOptions, settings );
+export function initializeEditor(id, settings) {
+	settings.__experimentalFetchLinkSuggestions = (search, searchOptions) =>
+		fetchLinkSuggestions(search, searchOptions, settings);
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
-	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
+	settings.__experimentalSpotlightEntityBlocks = ['core/template-part'];
 
-	const target = document.getElementById( id );
+	const target = document.getElementById(id);
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch(blocksStore).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
+	if (process.env.GUTENBERG_PHASE === 2) {
+		__experimentalRegisterExperimentalCoreBlocks({
 			enableFSEBlocks: true,
-		} );
+		});
 	}
 
-	reinitializeEditor( target, settings );
+	reinitializeEditor(target, settings);
 }
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';

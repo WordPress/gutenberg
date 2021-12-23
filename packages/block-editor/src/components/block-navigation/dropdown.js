@@ -13,25 +13,25 @@ import { listView } from '@wordpress/icons';
 import ListView from '../list-view';
 import { store as blockEditorStore } from '../../store';
 
-function BlockNavigationDropdownToggle( {
+function BlockNavigationDropdownToggle({
 	isEnabled,
 	onToggle,
 	isOpen,
 	innerRef,
 	...props
-} ) {
+}) {
 	return (
 		<Button
-			{ ...props }
-			ref={ innerRef }
-			icon={ listView }
-			aria-expanded={ isOpen }
+			{...props}
+			ref={innerRef}
+			icon={listView}
+			aria-expanded={isOpen}
 			aria-haspopup="true"
-			onClick={ isEnabled ? onToggle : undefined }
+			onClick={isEnabled ? onToggle : undefined}
 			/* translators: button label text should, if possible, be under 16 characters. */
-			label={ __( 'List view' ) }
+			label={__('List view')}
 			className="block-editor-block-navigation"
-			aria-disabled={ ! isEnabled }
+			aria-disabled={!isEnabled}
 		/>
 	);
 }
@@ -41,38 +41,38 @@ function BlockNavigationDropdown(
 	ref
 ) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( blockEditorStore ).getBlockCount(),
+		(select) => !!select(blockEditorStore).getBlockCount(),
 		[]
 	);
-	const isEnabled = hasBlocks && ! isDisabled;
+	const isEnabled = hasBlocks && !isDisabled;
 
 	return (
 		<Dropdown
 			contentClassName="block-editor-block-navigation__popover"
 			position="bottom right"
-			renderToggle={ ( { isOpen, onToggle } ) => (
+			renderToggle={({ isOpen, onToggle }) => (
 				<BlockNavigationDropdownToggle
-					{ ...props }
-					innerRef={ ref }
-					isOpen={ isOpen }
-					onToggle={ onToggle }
-					isEnabled={ isEnabled }
+					{...props}
+					innerRef={ref}
+					isOpen={isOpen}
+					onToggle={onToggle}
+					isEnabled={isEnabled}
 				/>
-			) }
-			renderContent={ () => (
+			)}
+			renderContent={() => (
 				<div className="block-editor-block-navigation__container">
 					<p className="block-editor-block-navigation__label">
-						{ __( 'List view' ) }
+						{__('List view')}
 					</p>
 
 					<ListView
 						showNestedBlocks
-						__experimentalFeatures={ __experimentalFeatures }
+						__experimentalFeatures={__experimentalFeatures}
 					/>
 				</div>
-			) }
+			)}
 		/>
 	);
 }
 
-export default forwardRef( BlockNavigationDropdown );
+export default forwardRef(BlockNavigationDropdown);

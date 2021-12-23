@@ -1,1 +1,1 @@
-module.exports = ( token ) => token.source.value;
+module.exports = (token) => token.source.value;

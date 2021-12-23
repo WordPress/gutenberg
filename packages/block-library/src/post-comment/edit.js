@@ -16,51 +16,49 @@ const ALLOWED_BLOCKS = [
 	'core/comment-reply-link',
 ];
 const TEMPLATE = [
-	[ 'core/comment-author-avatar' ],
-	[ 'core/comment-author-name' ],
-	[ 'core/comment-date' ],
-	[ 'core/comment-content' ],
-	[ 'core/comment-reply-link' ],
-	[ 'core/comment-edit-link' ],
+	['core/comment-author-avatar'],
+	['core/comment-author-name'],
+	['core/comment-date'],
+	['core/comment-content'],
+	['core/comment-reply-link'],
+	['core/comment-edit-link'],
 ];
 
-export default function Edit( { attributes: { commentId }, setAttributes } ) {
-	const [ commentIdInput, setCommentIdInput ] = useState( commentId );
+export default function Edit({ attributes: { commentId }, setAttributes }) {
+	const [commentIdInput, setCommentIdInput] = useState(commentId);
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		template: TEMPLATE,
 		allowedBlocks: ALLOWED_BLOCKS,
-	} );
+	});
 
-	if ( ! commentId ) {
+	if (!commentId) {
 		return (
-			<div { ...blockProps }>
+			<div {...blockProps}>
 				<Placeholder
-					icon={ blockDefault }
-					label={ _x( 'Post Comment', 'block title' ) }
-					instructions={ __(
+					icon={blockDefault}
+					label={_x('Post Comment', 'block title')}
+					instructions={__(
 						'To show a comment, input the comment ID.'
-					) }
+					)}
 				>
 					<TextControl
-						value={ commentId }
-						onChange={ ( val ) =>
-							setCommentIdInput( parseInt( val ) )
-						}
+						value={commentId}
+						onChange={(val) => setCommentIdInput(parseInt(val))}
 					/>
 
 					<Button
 						variant="primary"
-						onClick={ () => {
-							setAttributes( { commentId: commentIdInput } );
-						} }
+						onClick={() => {
+							setAttributes({ commentId: commentIdInput });
+						}}
 					>
-						{ __( 'Save' ) }
+						{__('Save')}
 					</Button>
 				</Placeholder>
 			</div>
 		);
 	}
 
-	return <div { ...innerBlocksProps } />;
+	return <div {...innerBlocksProps} />;
 }

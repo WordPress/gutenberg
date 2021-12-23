@@ -12,37 +12,37 @@ import { __, _x, sprintf } from '@wordpress/i18n';
  */
 import Cell from './cell';
 
-export default function BottomSheetSwitchCell( props ) {
+export default function BottomSheetSwitchCell(props) {
 	const { value, onValueChange, ...cellProps } = props;
 
 	const onPress = () => {
-		onValueChange( ! value );
+		onValueChange(!value);
 	};
 
 	const getAccessibilityLabel = () => {
-		if ( isEmpty( cellProps.help ) ) {
+		if (isEmpty(cellProps.help)) {
 			return value
 				? sprintf(
 						/* translators: accessibility text. Switch setting ON state. %s: Switch title. */
-						_x( '%s. On', 'switch control' ),
+						_x('%s. On', 'switch control'),
 						cellProps.label
 				  )
 				: sprintf(
 						/* translators: accessibility text. Switch setting OFF state. %s: Switch title. */
-						_x( '%s. Off', 'switch control' ),
+						_x('%s. Off', 'switch control'),
 						cellProps.label
 				  );
 		}
 		return value
 			? sprintf(
 					/* translators: accessibility text. Switch setting ON state. %1: Switch title, %2: switch help. */
-					_x( '%1$s, %2$s. On', 'switch control' ),
+					_x('%1$s, %2$s. On', 'switch control'),
 					cellProps.label,
 					cellProps.help
 			  )
 			: sprintf(
 					/* translators: accessibility text. Switch setting OFF state. %1: Switch title, %2: switch help. */
-					_x( '%1$s, %2$s. Off', 'switch control' ),
+					_x('%1$s, %2$s. Off', 'switch control'),
 					cellProps.label,
 					cellProps.help
 			  );
@@ -50,18 +50,18 @@ export default function BottomSheetSwitchCell( props ) {
 
 	return (
 		<Cell
-			{ ...cellProps }
-			accessibilityLabel={ getAccessibilityLabel() }
-			accessibilityRole={ 'none' }
+			{...cellProps}
+			accessibilityLabel={getAccessibilityLabel()}
+			accessibilityRole={'none'}
 			accessibilityHint={
 				/* translators: accessibility text (hint for switches) */
-				__( 'Double tap to toggle setting' )
+				__('Double tap to toggle setting')
 			}
-			onPress={ onPress }
-			editable={ false }
-			value={ '' }
+			onPress={onPress}
+			editable={false}
+			value={''}
 		>
-			<Switch value={ value } onValueChange={ onValueChange } />
+			<Switch value={value} onValueChange={onValueChange} />
 		</Cell>
 	);
 }

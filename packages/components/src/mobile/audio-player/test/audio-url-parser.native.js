@@ -22,32 +22,32 @@ const supportedLocalAudioUrls = [
 	'file:///storage/emulated/0/Download/file.mp3',
 ];
 
-describe( 'supportedAudioUrlsWithExtensions', () => {
-	supportedAudioUrlsWithExtensions.forEach( ( url ) => {
-		it( `supports ${ url }`, () => {
-			const { title, extension } = parseAudioUrl( url );
-			expect( title ).toBe( 'file' );
-			expect( extension ).toBe( 'MP3 ' );
-		} );
-	} );
-} );
+describe('supportedAudioUrlsWithExtensions', () => {
+	supportedAudioUrlsWithExtensions.forEach((url) => {
+		it(`supports ${url}`, () => {
+			const { title, extension } = parseAudioUrl(url);
+			expect(title).toBe('file');
+			expect(extension).toBe('MP3 ');
+		});
+	});
+});
 
-describe( 'supportedAudioUrlsWithoutExtensions', () => {
-	supportedAudioUrlsWithoutExtensions.forEach( ( url ) => {
-		it( `supports ${ url }`, () => {
-			const { title, extension } = parseAudioUrl( url );
-			expect( title ).toBe( 'file' );
-			expect( extension ).toBe( '' );
-		} );
-	} );
-} );
+describe('supportedAudioUrlsWithoutExtensions', () => {
+	supportedAudioUrlsWithoutExtensions.forEach((url) => {
+		it(`supports ${url}`, () => {
+			const { title, extension } = parseAudioUrl(url);
+			expect(title).toBe('file');
+			expect(extension).toBe('');
+		});
+	});
+});
 
-describe( 'supportedLocalAudioUrls', () => {
-	supportedLocalAudioUrls.forEach( ( url ) => {
-		it( `supports ${ url }`, () => {
-			const { title, extension } = parseAudioUrl( url );
-			expect( title ).toBe( 'file' );
-			expect( extension ).toBe( 'MP3 ' );
-		} );
-	} );
-} );
+describe('supportedLocalAudioUrls', () => {
+	supportedLocalAudioUrls.forEach((url) => {
+		it(`supports ${url}`, () => {
+			const { title, extension } = parseAudioUrl(url);
+			expect(title).toBe('file');
+			expect(extension).toBe('MP3 ');
+		});
+	});
+});

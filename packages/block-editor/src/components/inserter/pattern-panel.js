@@ -10,30 +10,30 @@ import { Flex, FlexItem, SelectControl, Button } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 
-function PatternInserterPanel( {
+function PatternInserterPanel({
 	selectedCategory,
 	patternCategories,
 	onClickCategory,
 	openPatternExplorer,
-} ) {
-	const isMobile = useViewportMatch( 'medium', '<' );
+}) {
+	const isMobile = useViewportMatch('medium', '<');
 	const categoryOptions = () => {
 		const options = [];
 
-		patternCategories.map( ( patternCategory ) => {
-			return options.push( {
+		patternCategories.map((patternCategory) => {
+			return options.push({
 				value: patternCategory.name,
 				label: patternCategory.label,
-			} );
-		} );
+			});
+		});
 
 		return options;
 	};
 
-	const onChangeSelect = ( selected ) => {
+	const onChangeSelect = (selected) => {
 		onClickCategory(
 			patternCategories.find(
-				( patternCategory ) => selected === patternCategory.name
+				(patternCategory) => selected === patternCategory.name
 			)
 		);
 	};
@@ -47,8 +47,8 @@ function PatternInserterPanel( {
 	// from a Select element. To prevent closing the useDialog on iOS devices, we
 	// stop propagating the onBlur event if there is no relatedTarget, which means
 	// that the user most likely did not click on an element within the editor canvas.
-	const onBlur = ( event ) => {
-		if ( ! event?.relatedTarget ) {
+	const onBlur = (event) => {
+		if (!event?.relatedTarget) {
 			event.stopPropagation();
 		}
 	};
@@ -58,34 +58,31 @@ function PatternInserterPanel( {
 			justify="space-between"
 			align="start"
 			gap="4"
-			className={ className }
+			className={className}
 		>
 			<FlexItem isBlock>
 				<SelectControl
 					className="block-editor-inserter__panel-dropdown"
-					label={ __( 'Filter patterns' ) }
+					label={__('Filter patterns')}
 					hideLabelFromVision
-					value={ selectedCategory.name }
-					onChange={ onChangeSelect }
-					onBlur={ onBlur }
-					options={ categoryOptions() }
+					value={selectedCategory.name}
+					onChange={onChangeSelect}
+					onBlur={onBlur}
+					options={categoryOptions()}
 				/>
 			</FlexItem>
-			{ ! isMobile && (
+			{!isMobile && (
 				<FlexItem>
 					<Button
 						variant="secondary"
 						className="block-editor-inserter__patterns-explorer-expand"
-						label={ __( 'Explore all patterns' ) }
-						onClick={ () => openPatternExplorer() }
+						label={__('Explore all patterns')}
+						onClick={() => openPatternExplorer()}
 					>
-						{ _x(
-							'Explore',
-							'Label for showing all block patterns'
-						) }
+						{_x('Explore', 'Label for showing all block patterns')}
 					</Button>
 				</FlexItem>
-			) }
+			)}
 		</Flex>
 	);
 }

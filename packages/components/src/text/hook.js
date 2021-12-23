@@ -25,7 +25,7 @@ import { useCx } from '../utils/hooks/use-cx';
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
-export default function useText( props ) {
+export default function useText(props) {
 	const {
 		adjustLineHeightForInnerControls,
 		align,
@@ -49,34 +49,34 @@ export default function useText( props ) {
 		variant,
 		weight = CONFIG.fontWeight,
 		...otherProps
-	} = useContextSystem( props, 'Text' );
+	} = useContextSystem(props, 'Text');
 
 	/** @type {import('react').ReactNode} */
 	let content = children;
-	const isHighlighter = Array.isArray( highlightWords );
+	const isHighlighter = Array.isArray(highlightWords);
 	const isCaption = size === 'caption';
 
-	if ( isHighlighter ) {
-		if ( typeof children !== 'string' ) {
+	if (isHighlighter) {
+		if (typeof children !== 'string') {
 			throw new TypeError(
 				'`children` of `Text` must only be `string` types when `highlightWords` is defined'
 			);
 		}
 
-		content = createHighlighterText( {
+		content = createHighlighterText({
 			autoEscape: highlightEscape,
 			// Disable reason: We need to disable this otherwise it erases the cast
 			// eslint-disable-next-line object-shorthand
-			children: /** @type {string} */ ( children ),
+			children: /** @type {string} */ (children),
 			caseSensitive: highlightCaseSensitive,
 			searchWords: highlightWords,
 			sanitize: highlightSanitize,
-		} );
+		});
 	}
 
 	const cx = useCx();
 
-	const classes = useMemo( () => {
+	const classes = useMemo(() => {
 		const sx = {};
 
 		const lineHeight = getLineHeight(
@@ -84,29 +84,32 @@ export default function useText( props ) {
 			lineHeightProp
 		);
 
-		sx.Base = css( {
+		sx.Base = css({
 			color,
 			display,
-			fontSize: getFontSize( size ),
+			fontSize: getFontSize(size),
 			/* eslint-disable jsdoc/valid-types */
-			fontWeight: /** @type {import('react').CSSProperties['fontWeight']} */ ( weight ),
+			fontWeight:
+				/** @type {import('react').CSSProperties['fontWeight']} */ (
+					weight
+				),
 			/* eslint-enable jsdoc/valid-types */
 			lineHeight,
 			letterSpacing,
 			textAlign: align,
-		} );
+		});
 
-		sx.upperCase = css( { textTransform: 'uppercase' } );
+		sx.upperCase = css({ textTransform: 'uppercase' });
 
 		sx.optimalTextColor = null;
 
-		if ( optimizeReadabilityFor ) {
+		if (optimizeReadabilityFor) {
 			const isOptimalTextColorDark =
-				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
+				getOptimalTextShade(optimizeReadabilityFor) === 'dark';
 
 			sx.optimalTextColor = isOptimalTextColorDark
-				? css( { color: COLORS.black } )
-				: css( { color: COLORS.white } );
+				? css({ color: COLORS.black })
+				: css({ color: COLORS.white });
 		}
 
 		return cx(
@@ -114,10 +117,10 @@ export default function useText( props ) {
 			sx.Base,
 			sx.optimalTextColor,
 			isDestructive && styles.destructive,
-			!! isHighlighter && styles.highlighterText,
+			!!isHighlighter && styles.highlighterText,
 			isBlock && styles.block,
 			isCaption && styles.muted,
-			variant && styles[ variant ],
+			variant && styles[variant],
 			upperCase && sx.upperCase,
 			className
 		);
@@ -138,14 +141,14 @@ export default function useText( props ) {
 		upperCase,
 		variant,
 		weight,
-	] );
+	]);
 
 	/** @type {undefined | 'auto' | 'none'} */
 	let finalEllipsizeMode;
-	if ( truncate === true ) {
+	if (truncate === true) {
 		finalEllipsizeMode = 'auto';
 	}
-	if ( truncate === false ) {
+	if (truncate === false) {
 		finalEllipsizeMode = 'none';
 	}
 
@@ -156,27 +159,27 @@ export default function useText( props ) {
 		ellipsizeMode: ellipsizeMode || finalEllipsizeMode,
 	};
 
-	const truncateProps = useTruncate( finalComponentProps );
+	const truncateProps = useTruncate(finalComponentProps);
 
 	/**
 	 * Enhance child `<Link />` components to inherit font size.
 	 */
-	if ( ! truncate && Array.isArray( children ) ) {
-		content = Children.map( children, ( child ) => {
+	if (!truncate && Array.isArray(children)) {
+		content = Children.map(children, (child) => {
 			// @ts-ignore
-			if ( ! isPlainObject( child ) || ! ( 'props' in child ) ) {
+			if (!isPlainObject(child) || !('props' in child)) {
 				return child;
 			}
 
-			const isLink = hasConnectNamespace( child, [ 'Link' ] );
-			if ( isLink ) {
-				return cloneElement( child, {
+			const isLink = hasConnectNamespace(child, ['Link']);
+			if (isLink) {
+				return cloneElement(child, {
 					size: child.props.size || 'inherit',
-				} );
+				});
 			}
 
 			return child;
-		} );
+		});
 	}
 
 	return {

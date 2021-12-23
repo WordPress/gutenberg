@@ -14,19 +14,19 @@ import { View } from '../../view';
 import type { ItemGroupProps } from '../types';
 
 function ItemGroup(
-	props: WordPressComponentProps< ItemGroupProps, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<ItemGroupProps, 'div'>,
+	forwardedRef: Ref<any>
 ) {
 	const {
 		isBordered,
 		isSeparated,
 		size: sizeProp,
 		...otherProps
-	} = useItemGroup( props );
+	} = useItemGroup(props);
 
 	const { size: contextSize } = useItemGroupContext();
 
-	const spacedAround = ! isBordered && ! isSeparated;
+	const spacedAround = !isBordered && !isSeparated;
 	const size = sizeProp || contextSize;
 
 	const contextValue = {
@@ -35,10 +35,10 @@ function ItemGroup(
 	};
 
 	return (
-		<ItemGroupContext.Provider value={ contextValue }>
-			<View { ...otherProps } ref={ forwardedRef } />
+		<ItemGroupContext.Provider value={contextValue}>
+			<View {...otherProps} ref={forwardedRef} />
 		</ItemGroupContext.Provider>
 	);
 }
 
-export default contextConnect( ItemGroup, 'ItemGroup' );
+export default contextConnect(ItemGroup, 'ItemGroup');

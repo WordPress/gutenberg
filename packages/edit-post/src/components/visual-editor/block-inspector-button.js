@@ -17,34 +17,33 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { store as editPostStore } from '../../store';
 
-export function BlockInspectorButton( { onClick = noop, small = false } ) {
+export function BlockInspectorButton({ onClick = noop, small = false }) {
 	const { shortcut, areAdvancedSettingsOpened } = useSelect(
-		( select ) => ( {
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+		(select) => ({
+			shortcut: select(keyboardShortcutsStore).getShortcutRepresentation(
+				'core/edit-post/toggle-sidebar'
+			),
 			areAdvancedSettingsOpened:
-				select( editPostStore ).getActiveGeneralSidebarName() ===
+				select(editPostStore).getActiveGeneralSidebarName() ===
 				'edit-post/block',
-		} ),
+		}),
 		[]
 	);
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		editPostStore
-	);
+	const { openGeneralSidebar, closeGeneralSidebar } =
+		useDispatch(editPostStore);
 
 	const label = areAdvancedSettingsOpened
-		? __( 'Hide more settings' )
-		: __( 'Show more settings' );
+		? __('Hide more settings')
+		: __('Show more settings');
 
 	return (
 		<MenuItem
-			onClick={ () => {
-				if ( areAdvancedSettingsOpened ) {
+			onClick={() => {
+				if (areAdvancedSettingsOpened) {
 					closeGeneralSidebar();
-					speak( __( 'Block settings closed' ) );
+					speak(__('Block settings closed'));
 				} else {
-					openGeneralSidebar( 'edit-post/block' );
+					openGeneralSidebar('edit-post/block');
 					speak(
 						__(
 							'Additional settings are now available in the Editor block settings sidebar'
@@ -52,10 +51,10 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 					);
 				}
 				onClick();
-			} }
-			shortcut={ shortcut }
+			}}
+			shortcut={shortcut}
 		>
-			{ ! small && label }
+			{!small && label}
 		</MenuItem>
 	);
 }

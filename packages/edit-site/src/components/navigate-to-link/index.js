@@ -9,27 +9,27 @@ import { edit } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-export default function NavigateToLink( {
+export default function NavigateToLink({
 	type,
 	id,
 	activePage,
 	onActivePageChange,
-} ) {
+}) {
 	const post = useSelect(
-		( select ) =>
+		(select) =>
 			type &&
 			id &&
 			type !== 'URL' &&
-			select( coreStore ).getEntityRecord( 'postType', type, id ),
-		[ type, id ]
+			select(coreStore).getEntityRecord('postType', type, id),
+		[type, id]
 	);
 
-	const onClick = useMemo( () => {
-		if ( ! post?.link ) return null;
-		const path = getPathAndQueryString( post.link );
-		if ( path === activePage?.path ) return null;
+	const onClick = useMemo(() => {
+		if (!post?.link) return null;
+		const path = getPathAndQueryString(post.link);
+		if (path === activePage?.path) return null;
 		return () =>
-			onActivePageChange( {
+			onActivePageChange({
 				type,
 				slug: post.slug,
 				path,
@@ -37,15 +37,15 @@ export default function NavigateToLink( {
 					postType: post.type,
 					postId: post.id,
 				},
-			} );
-	}, [ post, activePage?.path, onActivePageChange ] );
+			});
+	}, [post, activePage?.path, onActivePageChange]);
 
 	return (
 		onClick && (
 			<Button
-				icon={ edit }
-				label={ __( 'Edit Page Template' ) }
-				onClick={ onClick }
+				icon={edit}
+				label={__('Edit Page Template')}
+				onClick={onClick}
 			/>
 		)
 	);

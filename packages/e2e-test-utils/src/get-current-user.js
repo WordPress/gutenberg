@@ -6,11 +6,11 @@
 export async function getCurrentUser() {
 	const cookies = await page.cookies();
 	const cookie = cookies.find(
-		( c ) => !! c?.name?.startsWith( 'wordpress_logged_in_' )
+		(c) => !!c?.name?.startsWith('wordpress_logged_in_')
 	);
 
-	if ( ! cookie?.value ) {
+	if (!cookie?.value) {
 		return;
 	}
-	return decodeURIComponent( cookie.value ).split( '|' )[ 0 ];
+	return decodeURIComponent(cookie.value).split('|')[0];
 }

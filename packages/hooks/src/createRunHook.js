@@ -10,31 +10,31 @@
  *
  * @return {(hookName:string, ...args: unknown[]) => unknown} Function that runs hook callbacks.
  */
-function createRunHook( hooks, storeKey, returnFirstArg = false ) {
-	return function runHooks( hookName, ...args ) {
-		const hooksStore = hooks[ storeKey ];
+function createRunHook(hooks, storeKey, returnFirstArg = false) {
+	return function runHooks(hookName, ...args) {
+		const hooksStore = hooks[storeKey];
 
-		if ( ! hooksStore[ hookName ] ) {
-			hooksStore[ hookName ] = {
+		if (!hooksStore[hookName]) {
+			hooksStore[hookName] = {
 				handlers: [],
 				runs: 0,
 			};
 		}
 
-		hooksStore[ hookName ].runs++;
+		hooksStore[hookName].runs++;
 
-		const handlers = hooksStore[ hookName ].handlers;
+		const handlers = hooksStore[hookName].handlers;
 
 		// The following code is stripped from production builds.
-		if ( 'production' !== process.env.NODE_ENV ) {
+		if ('production' !== process.env.NODE_ENV) {
 			// Handle any 'all' hooks registered.
-			if ( 'hookAdded' !== hookName && hooksStore.all ) {
-				handlers.push( ...hooksStore.all.handlers );
+			if ('hookAdded' !== hookName && hooksStore.all) {
+				handlers.push(...hooksStore.all.handlers);
 			}
 		}
 
-		if ( ! handlers || ! handlers.length ) {
-			return returnFirstArg ? args[ 0 ] : undefined;
+		if (!handlers || !handlers.length) {
+			return returnFirstArg ? args[0] : undefined;
 		}
 
 		const hookInfo = {
@@ -42,14 +42,14 @@ function createRunHook( hooks, storeKey, returnFirstArg = false ) {
 			currentIndex: 0,
 		};
 
-		hooksStore.__current.push( hookInfo );
+		hooksStore.__current.push(hookInfo);
 
-		while ( hookInfo.currentIndex < handlers.length ) {
-			const handler = handlers[ hookInfo.currentIndex ];
+		while (hookInfo.currentIndex < handlers.length) {
+			const handler = handlers[hookInfo.currentIndex];
 
-			const result = handler.callback.apply( null, args );
-			if ( returnFirstArg ) {
-				args[ 0 ] = result;
+			const result = handler.callback.apply(null, args);
+			if (returnFirstArg) {
+				args[0] = result;
 			}
 
 			hookInfo.currentIndex++;
@@ -57,8 +57,8 @@ function createRunHook( hooks, storeKey, returnFirstArg = false ) {
 
 		hooksStore.__current.pop();
 
-		if ( returnFirstArg ) {
-			return args[ 0 ];
+		if (returnFirstArg) {
+			return args[0];
 		}
 	};
 }

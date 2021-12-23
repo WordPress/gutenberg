@@ -7,7 +7,7 @@
 // https://github.com/visionmedia/css-parse/pull/49#issuecomment-30088027
 const commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 
-export default function ( css, options ) {
+export default function (css, options) {
 	options = options || {};
 
 	/**
@@ -21,12 +21,12 @@ export default function ( css, options ) {
 	 * Update lineno and column based on `str`.
 	 */
 
-	function updatePosition( str ) {
-		const lines = str.match( /\n/g );
-		if ( lines ) {
+	function updatePosition(str) {
+		const lines = str.match(/\n/g);
+		if (lines) {
 			lineno += lines.length;
 		}
-		const i = str.lastIndexOf( '\n' );
+		const i = str.lastIndexOf('\n');
 		// eslint-disable-next-line no-bitwise
 		column = ~i ? str.length - i : column + str.length;
 	}
@@ -37,8 +37,8 @@ export default function ( css, options ) {
 
 	function position() {
 		const start = { line: lineno, column };
-		return function ( node ) {
-			node.position = new Position( start );
+		return function (node) {
+			node.position = new Position(start);
 			whitespace();
 			return node;
 		};
@@ -48,7 +48,7 @@ export default function ( css, options ) {
 	 * Store position information for a node
 	 */
 
-	function Position( start ) {
+	function Position(start) {
 		this.start = start;
 		this.end = { line: lineno, column };
 		this.source = options.source;
@@ -66,7 +66,7 @@ export default function ( css, options ) {
 
 	const errorsList = [];
 
-	function error( msg ) {
+	function error(msg) {
 		const err = new Error(
 			options.source + ':' + lineno + ':' + column + ': ' + msg
 		);
@@ -76,8 +76,8 @@ export default function ( css, options ) {
 		err.column = column;
 		err.source = css;
 
-		if ( options.silent ) {
-			errorsList.push( err );
+		if (options.silent) {
+			errorsList.push(err);
 		} else {
 			throw err;
 		}
@@ -105,7 +105,7 @@ export default function ( css, options ) {
 	 */
 
 	function open() {
-		return match( /^{\s*/ );
+		return match(/^{\s*/);
 	}
 
 	/**
@@ -113,7 +113,7 @@ export default function ( css, options ) {
 	 */
 
 	function close() {
-		return match( /^}/ );
+		return match(/^}/);
 	}
 
 	/**
@@ -124,15 +124,15 @@ export default function ( css, options ) {
 		let node;
 		const accumulator = [];
 		whitespace();
-		comments( accumulator );
+		comments(accumulator);
 		while (
 			css.length &&
-			css.charAt( 0 ) !== '}' &&
-			( node = atrule() || rule() )
+			css.charAt(0) !== '}' &&
+			(node = atrule() || rule())
 		) {
-			if ( node !== false ) {
-				accumulator.push( node );
-				comments( accumulator );
+			if (node !== false) {
+				accumulator.push(node);
+				comments(accumulator);
 			}
 		}
 		return accumulator;
@@ -142,14 +142,14 @@ export default function ( css, options ) {
 	 * Match `re` and return captures.
 	 */
 
-	function match( re ) {
-		const m = re.exec( css );
-		if ( ! m ) {
+	function match(re) {
+		const m = re.exec(css);
+		if (!m) {
 			return;
 		}
-		const str = m[ 0 ];
-		updatePosition( str );
-		css = css.slice( str.length );
+		const str = m[0];
+		updatePosition(str);
+		css = css.slice(str.length);
 		return m;
 	}
 
@@ -158,20 +158,20 @@ export default function ( css, options ) {
 	 */
 
 	function whitespace() {
-		match( /^\s*/ );
+		match(/^\s*/);
 	}
 
 	/**
 	 * Parse comments;
 	 */
 
-	function comments( accumulator ) {
+	function comments(accumulator) {
 		let c;
 		accumulator = accumulator || [];
 		// eslint-disable-next-line no-cond-assign
-		while ( ( c = comment() ) ) {
-			if ( c !== false ) {
-				accumulator.push( c );
+		while ((c = comment())) {
+			if (c !== false) {
+				accumulator.push(c);
 			}
 		}
 		return accumulator;
@@ -183,33 +183,33 @@ export default function ( css, options ) {
 
 	function comment() {
 		const pos = position();
-		if ( '/' !== css.charAt( 0 ) || '*' !== css.charAt( 1 ) ) {
+		if ('/' !== css.charAt(0) || '*' !== css.charAt(1)) {
 			return;
 		}
 
 		let i = 2;
 		while (
-			'' !== css.charAt( i ) &&
-			( '*' !== css.charAt( i ) || '/' !== css.charAt( i + 1 ) )
+			'' !== css.charAt(i) &&
+			('*' !== css.charAt(i) || '/' !== css.charAt(i + 1))
 		) {
 			++i;
 		}
 		i += 2;
 
-		if ( '' === css.charAt( i - 1 ) ) {
-			return error( 'End of comment missing' );
+		if ('' === css.charAt(i - 1)) {
+			return error('End of comment missing');
 		}
 
-		const str = css.slice( 2, i - 2 );
+		const str = css.slice(2, i - 2);
 		column += 2;
-		updatePosition( str );
-		css = css.slice( i );
+		updatePosition(str);
+		css = css.slice(i);
 		column += 2;
 
-		return pos( {
+		return pos({
 			type: 'comment',
 			comment: str,
-		} );
+		});
 	}
 
 	/**
@@ -217,20 +217,20 @@ export default function ( css, options ) {
 	 */
 
 	function selector() {
-		const m = match( /^([^{]+)/ );
-		if ( ! m ) {
+		const m = match(/^([^{]+)/);
+		if (!m) {
 			return;
 		}
 		// FIXME: Remove all comments from selectors http://ostermiller.org/findcomment.html
-		return trim( m[ 0 ] )
-			.replace( /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '' )
-			.replace( /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function ( matched ) {
-				return matched.replace( /,/g, '\u200C' );
-			} )
-			.split( /\s*(?![^(]*\)),\s*/ )
-			.map( function ( s ) {
-				return s.replace( /\u200C/g, ',' );
-			} );
+		return trim(m[0])
+			.replace(/\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '')
+			.replace(/"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function (matched) {
+				return matched.replace(/,/g, '\u200C');
+			})
+			.split(/\s*(?![^(]*\)),\s*/)
+			.map(function (s) {
+				return s.replace(/\u200C/g, ',');
+			});
 	}
 
 	/**
@@ -241,15 +241,15 @@ export default function ( css, options ) {
 		const pos = position();
 
 		// prop
-		let prop = match( /^(\*?[-#\/\*\\\w]+(\[[0-9a-z_-]+\])?)\s*/ );
-		if ( ! prop ) {
+		let prop = match(/^(\*?[-#\/\*\\\w]+(\[[0-9a-z_-]+\])?)\s*/);
+		if (!prop) {
 			return;
 		}
-		prop = trim( prop[ 0 ] );
+		prop = trim(prop[0]);
 
 		// :
-		if ( ! match( /^:\s*/ ) ) {
-			return error( "property missing ':'" );
+		if (!match(/^:\s*/)) {
+			return error("property missing ':'");
 		}
 
 		// val
@@ -257,14 +257,14 @@ export default function ( css, options ) {
 			/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/
 		);
 
-		const ret = pos( {
+		const ret = pos({
 			type: 'declaration',
-			property: prop.replace( commentre, '' ),
-			value: val ? trim( val[ 0 ] ).replace( commentre, '' ) : '',
-		} );
+			property: prop.replace(commentre, ''),
+			value: val ? trim(val[0]).replace(commentre, '') : '',
+		});
 
 		// ;
-		match( /^[;\s]*/ );
+		match(/^[;\s]*/);
 
 		return ret;
 	}
@@ -276,23 +276,23 @@ export default function ( css, options ) {
 	function declarations() {
 		const decls = [];
 
-		if ( ! open() ) {
-			return error( "missing '{'" );
+		if (!open()) {
+			return error("missing '{'");
 		}
-		comments( decls );
+		comments(decls);
 
 		// declarations
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( ( decl = declaration() ) ) {
-			if ( decl !== false ) {
-				decls.push( decl );
-				comments( decls );
+		while ((decl = declaration())) {
+			if (decl !== false) {
+				decls.push(decl);
+				comments(decls);
 			}
 		}
 
-		if ( ! close() ) {
-			return error( "missing '}'" );
+		if (!close()) {
+			return error("missing '}'");
 		}
 		return decls;
 	}
@@ -307,20 +307,20 @@ export default function ( css, options ) {
 		const pos = position();
 
 		// eslint-disable-next-line no-cond-assign
-		while ( ( m = match( /^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/ ) ) ) {
-			vals.push( m[ 1 ] );
-			match( /^,\s*/ );
+		while ((m = match(/^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/))) {
+			vals.push(m[1]);
+			match(/^,\s*/);
 		}
 
-		if ( ! vals.length ) {
+		if (!vals.length) {
 			return;
 		}
 
-		return pos( {
+		return pos({
 			type: 'keyframe',
 			values: vals,
 			declarations: declarations(),
-		} );
+		});
 	}
 
 	/**
@@ -329,42 +329,42 @@ export default function ( css, options ) {
 
 	function atkeyframes() {
 		const pos = position();
-		let m = match( /^@([-\w]+)?keyframes\s*/ );
+		let m = match(/^@([-\w]+)?keyframes\s*/);
 
-		if ( ! m ) {
+		if (!m) {
 			return;
 		}
-		const vendor = m[ 1 ];
+		const vendor = m[1];
 
 		// identifier
-		m = match( /^([-\w]+)\s*/ );
-		if ( ! m ) {
-			return error( '@keyframes missing name' );
+		m = match(/^([-\w]+)\s*/);
+		if (!m) {
+			return error('@keyframes missing name');
 		}
-		const name = m[ 1 ];
+		const name = m[1];
 
-		if ( ! open() ) {
-			return error( "@keyframes missing '{'" );
+		if (!open()) {
+			return error("@keyframes missing '{'");
 		}
 
 		let frame;
 		let frames = comments();
 		// eslint-disable-next-line no-cond-assign
-		while ( ( frame = keyframe() ) ) {
-			frames.push( frame );
-			frames = frames.concat( comments() );
+		while ((frame = keyframe())) {
+			frames.push(frame);
+			frames = frames.concat(comments());
 		}
 
-		if ( ! close() ) {
-			return error( "@keyframes missing '}'" );
+		if (!close()) {
+			return error("@keyframes missing '}'");
 		}
 
-		return pos( {
+		return pos({
 			type: 'keyframes',
 			name,
 			vendor,
 			keyframes: frames,
-		} );
+		});
 	}
 
 	/**
@@ -373,28 +373,28 @@ export default function ( css, options ) {
 
 	function atsupports() {
 		const pos = position();
-		const m = match( /^@supports *([^{]+)/ );
+		const m = match(/^@supports *([^{]+)/);
 
-		if ( ! m ) {
+		if (!m) {
 			return;
 		}
-		const supports = trim( m[ 1 ] );
+		const supports = trim(m[1]);
 
-		if ( ! open() ) {
-			return error( "@supports missing '{'" );
+		if (!open()) {
+			return error("@supports missing '{'");
 		}
 
-		const style = comments().concat( rules() );
+		const style = comments().concat(rules());
 
-		if ( ! close() ) {
-			return error( "@supports missing '}'" );
+		if (!close()) {
+			return error("@supports missing '}'");
 		}
 
-		return pos( {
+		return pos({
 			type: 'supports',
 			supports,
 			rules: style,
-		} );
+		});
 	}
 
 	/**
@@ -403,26 +403,26 @@ export default function ( css, options ) {
 
 	function athost() {
 		const pos = position();
-		const m = match( /^@host\s*/ );
+		const m = match(/^@host\s*/);
 
-		if ( ! m ) {
+		if (!m) {
 			return;
 		}
 
-		if ( ! open() ) {
-			return error( "@host missing '{'" );
+		if (!open()) {
+			return error("@host missing '{'");
 		}
 
-		const style = comments().concat( rules() );
+		const style = comments().concat(rules());
 
-		if ( ! close() ) {
-			return error( "@host missing '}'" );
+		if (!close()) {
+			return error("@host missing '}'");
 		}
 
-		return pos( {
+		return pos({
 			type: 'host',
 			rules: style,
-		} );
+		});
 	}
 
 	/**
@@ -431,28 +431,28 @@ export default function ( css, options ) {
 
 	function atmedia() {
 		const pos = position();
-		const m = match( /^@media *([^{]+)/ );
+		const m = match(/^@media *([^{]+)/);
 
-		if ( ! m ) {
+		if (!m) {
 			return;
 		}
-		const media = trim( m[ 1 ] );
+		const media = trim(m[1]);
 
-		if ( ! open() ) {
-			return error( "@media missing '{'" );
+		if (!open()) {
+			return error("@media missing '{'");
 		}
 
-		const style = comments().concat( rules() );
+		const style = comments().concat(rules());
 
-		if ( ! close() ) {
-			return error( "@media missing '}'" );
+		if (!close()) {
+			return error("@media missing '}'");
 		}
 
-		return pos( {
+		return pos({
 			type: 'media',
 			media,
 			rules: style,
-		} );
+		});
 	}
 
 	/**
@@ -461,16 +461,16 @@ export default function ( css, options ) {
 
 	function atcustommedia() {
 		const pos = position();
-		const m = match( /^@custom-media\s+(--[^\s]+)\s*([^{;]+);/ );
-		if ( ! m ) {
+		const m = match(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/);
+		if (!m) {
 			return;
 		}
 
-		return pos( {
+		return pos({
 			type: 'custom-media',
-			name: trim( m[ 1 ] ),
-			media: trim( m[ 2 ] ),
-		} );
+			name: trim(m[1]),
+			media: trim(m[2]),
+		});
 	}
 
 	/**
@@ -479,35 +479,35 @@ export default function ( css, options ) {
 
 	function atpage() {
 		const pos = position();
-		const m = match( /^@page */ );
-		if ( ! m ) {
+		const m = match(/^@page */);
+		if (!m) {
 			return;
 		}
 
 		const sel = selector() || [];
 
-		if ( ! open() ) {
-			return error( "@page missing '{'" );
+		if (!open()) {
+			return error("@page missing '{'");
 		}
 		let decls = comments();
 
 		// declarations
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( ( decl = declaration() ) ) {
-			decls.push( decl );
-			decls = decls.concat( comments() );
+		while ((decl = declaration())) {
+			decls.push(decl);
+			decls = decls.concat(comments());
 		}
 
-		if ( ! close() ) {
-			return error( "@page missing '}'" );
+		if (!close()) {
+			return error("@page missing '}'");
 		}
 
-		return pos( {
+		return pos({
 			type: 'page',
 			selectors: sel,
 			declarations: decls,
-		} );
+		});
 	}
 
 	/**
@@ -516,30 +516,30 @@ export default function ( css, options ) {
 
 	function atdocument() {
 		const pos = position();
-		const m = match( /^@([-\w]+)?document *([^{]+)/ );
-		if ( ! m ) {
+		const m = match(/^@([-\w]+)?document *([^{]+)/);
+		if (!m) {
 			return;
 		}
 
-		const vendor = trim( m[ 1 ] );
-		const doc = trim( m[ 2 ] );
+		const vendor = trim(m[1]);
+		const doc = trim(m[2]);
 
-		if ( ! open() ) {
-			return error( "@document missing '{'" );
+		if (!open()) {
+			return error("@document missing '{'");
 		}
 
-		const style = comments().concat( rules() );
+		const style = comments().concat(rules());
 
-		if ( ! close() ) {
-			return error( "@document missing '}'" );
+		if (!close()) {
+			return error("@document missing '}'");
 		}
 
-		return pos( {
+		return pos({
 			type: 'document',
 			document: doc,
 			vendor,
 			rules: style,
-		} );
+		});
 	}
 
 	/**
@@ -548,67 +548,67 @@ export default function ( css, options ) {
 
 	function atfontface() {
 		const pos = position();
-		const m = match( /^@font-face\s*/ );
-		if ( ! m ) {
+		const m = match(/^@font-face\s*/);
+		if (!m) {
 			return;
 		}
 
-		if ( ! open() ) {
-			return error( "@font-face missing '{'" );
+		if (!open()) {
+			return error("@font-face missing '{'");
 		}
 		let decls = comments();
 
 		// declarations
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( ( decl = declaration() ) ) {
-			decls.push( decl );
-			decls = decls.concat( comments() );
+		while ((decl = declaration())) {
+			decls.push(decl);
+			decls = decls.concat(comments());
 		}
 
-		if ( ! close() ) {
-			return error( "@font-face missing '}'" );
+		if (!close()) {
+			return error("@font-face missing '}'");
 		}
 
-		return pos( {
+		return pos({
 			type: 'font-face',
 			declarations: decls,
-		} );
+		});
 	}
 
 	/**
 	 * Parse import
 	 */
 
-	const atimport = _compileAtrule( 'import' );
+	const atimport = _compileAtrule('import');
 
 	/**
 	 * Parse charset
 	 */
 
-	const atcharset = _compileAtrule( 'charset' );
+	const atcharset = _compileAtrule('charset');
 
 	/**
 	 * Parse namespace
 	 */
 
-	const atnamespace = _compileAtrule( 'namespace' );
+	const atnamespace = _compileAtrule('namespace');
 
 	/**
 	 * Parse non-block at-rules
 	 */
 
-	function _compileAtrule( name ) {
-		const re = new RegExp( '^@' + name + '\\s*([^;]+);' );
+	function _compileAtrule(name) {
+		const re = new RegExp('^@' + name + '\\s*([^;]+);');
 		return function () {
 			const pos = position();
-			const m = match( re );
-			if ( ! m ) {
+			const m = match(re);
+			if (!m) {
 				return;
 			}
 			const ret = { type: name };
-			ret[ name ] = m[ 1 ].trim();
-			return pos( ret );
+			ret[name] = m[1].trim();
+			return pos(ret);
 		};
 	}
 
@@ -617,7 +617,7 @@ export default function ( css, options ) {
 	 */
 
 	function atrule() {
-		if ( css[ 0 ] !== '@' ) {
+		if (css[0] !== '@') {
 			return;
 		}
 
@@ -644,55 +644,55 @@ export default function ( css, options ) {
 		const pos = position();
 		const sel = selector();
 
-		if ( ! sel ) {
-			return error( 'selector missing' );
+		if (!sel) {
+			return error('selector missing');
 		}
 		comments();
 
-		return pos( {
+		return pos({
 			type: 'rule',
 			selectors: sel,
 			declarations: declarations(),
-		} );
+		});
 	}
 
-	return addParent( stylesheet() );
+	return addParent(stylesheet());
 }
 
 /**
  * Trim `str`.
  */
 
-function trim( str ) {
-	return str ? str.replace( /^\s+|\s+$/g, '' ) : '';
+function trim(str) {
+	return str ? str.replace(/^\s+|\s+$/g, '') : '';
 }
 
 /**
  * Adds non-enumerable parent node reference to each node.
  */
 
-function addParent( obj, parent ) {
+function addParent(obj, parent) {
 	const isNode = obj && typeof obj.type === 'string';
 	const childParent = isNode ? obj : parent;
 
-	for ( const k in obj ) {
-		const value = obj[ k ];
-		if ( Array.isArray( value ) ) {
-			value.forEach( function ( v ) {
-				addParent( v, childParent );
-			} );
-		} else if ( value && typeof value === 'object' ) {
-			addParent( value, childParent );
+	for (const k in obj) {
+		const value = obj[k];
+		if (Array.isArray(value)) {
+			value.forEach(function (v) {
+				addParent(v, childParent);
+			});
+		} else if (value && typeof value === 'object') {
+			addParent(value, childParent);
 		}
 	}
 
-	if ( isNode ) {
-		Object.defineProperty( obj, 'parent', {
+	if (isNode) {
+		Object.defineProperty(obj, 'parent', {
 			configurable: true,
 			writable: true,
 			enumerable: false,
 			value: parent || null,
-		} );
+		});
 	}
 
 	return obj;

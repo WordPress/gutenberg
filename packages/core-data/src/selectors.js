@@ -38,8 +38,8 @@ const EMPTY_OBJECT = {};
  * @return {boolean} Whether a request is in progress for an embed preview.
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
-	( select ) => ( state, url ) => {
-		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
+	(select) => (state, url) => {
+		return select(STORE_NAME).isResolving('getEmbedPreview', [url]);
 	}
 );
 
@@ -53,17 +53,14 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  *                                 include with request.
  * @return {Array} Authors list.
  */
-export function getAuthors( state, query ) {
-	deprecated( "select( 'core' ).getAuthors()", {
+export function getAuthors(state, query) {
+	deprecated("select( 'core' ).getAuthors()", {
 		since: '5.9',
 		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
-	} );
+	});
 
-	const path = addQueryArgs(
-		'/wp/v2/users/?who=authors&per_page=100',
-		query
-	);
-	return getUserQueryResults( state, path );
+	const path = addQueryArgs('/wp/v2/users/?who=authors&per_page=100', query);
+	return getUserQueryResults(state, path);
 }
 
 /**
@@ -73,7 +70,7 @@ export function getAuthors( state, query ) {
  *
  * @return {Object} Current user object.
  */
-export function getCurrentUser( state ) {
+export function getCurrentUser(state) {
 	return state.currentUser;
 }
 
@@ -86,12 +83,12 @@ export function getCurrentUser( state ) {
  * @return {Array} Users list.
  */
 export const getUserQueryResults = createSelector(
-	( state, queryID ) => {
-		const queryResults = state.users.queries[ queryID ];
+	(state, queryID) => {
+		const queryResults = state.users.queries[queryID];
 
-		return map( queryResults, ( id ) => state.users.byId[ id ] );
+		return map(queryResults, (id) => state.users.byId[id]);
 	},
-	( state, queryID ) => [ state.users.queries[ queryID ], state.users.byId ]
+	(state, queryID) => [state.users.queries[queryID], state.users.byId]
 );
 
 /**
@@ -102,8 +99,8 @@ export const getUserQueryResults = createSelector(
  *
  * @return {Array<Object>} Array of entities with config matching kind.
  */
-export function getEntitiesByKind( state, kind ) {
-	return filter( state.entities.config, { kind } );
+export function getEntitiesByKind(state, kind) {
+	return filter(state.entities.config, { kind });
 }
 
 /**
@@ -115,8 +112,8 @@ export function getEntitiesByKind( state, kind ) {
  *
  * @return {Object} Entity
  */
-export function getEntity( state, kind, name ) {
-	return find( state.entities.config, { kind, name } );
+export function getEntity(state, kind, name) {
+	return find(state.entities.config, { kind, name });
 }
 
 /**
@@ -133,59 +130,59 @@ export function getEntity( state, kind, name ) {
  * @return {Object?} Record.
  */
 export const getEntityRecord = createSelector(
-	( state, kind, name, key, query ) => {
-		const queriedState = get( state.entities.data, [
+	(state, kind, name, key, query) => {
+		const queriedState = get(state.entities.data, [
 			kind,
 			name,
 			'queriedData',
-		] );
-		if ( ! queriedState ) {
+		]);
+		if (!queriedState) {
 			return undefined;
 		}
 		const context = query?.context ?? 'default';
 
-		if ( query === undefined ) {
+		if (query === undefined) {
 			// If expecting a complete item, validate that completeness.
-			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+			if (!queriedState.itemIsComplete[context]?.[key]) {
 				return undefined;
 			}
 
-			return queriedState.items[ context ][ key ];
+			return queriedState.items[context][key];
 		}
 
-		const item = queriedState.items[ context ]?.[ key ];
-		if ( item && query._fields ) {
+		const item = queriedState.items[context]?.[key];
+		if (item && query._fields) {
 			const filteredItem = {};
-			const fields = getNormalizedCommaSeparable( query._fields );
-			for ( let f = 0; f < fields.length; f++ ) {
-				const field = fields[ f ].split( '.' );
-				const value = get( item, field );
-				set( filteredItem, field, value );
+			const fields = getNormalizedCommaSeparable(query._fields);
+			for (let f = 0; f < fields.length; f++) {
+				const field = fields[f].split('.');
+				const value = get(item, field);
+				set(filteredItem, field, value);
 			}
 			return filteredItem;
 		}
 
 		return item;
 	},
-	( state, kind, name, recordId, query ) => {
+	(state, kind, name, recordId, query) => {
 		const context = query?.context ?? 'default';
 		return [
-			get( state.entities.data, [
+			get(state.entities.data, [
 				kind,
 				name,
 				'queriedData',
 				'items',
 				context,
 				recordId,
-			] ),
-			get( state.entities.data, [
+			]),
+			get(state.entities.data, [
 				kind,
 				name,
 				'queriedData',
 				'itemIsComplete',
 				context,
 				recordId,
-			] ),
+			]),
 		];
 	}
 );
@@ -206,7 +203,7 @@ export function __experimentalGetEntityRecordNoResolver(
 	name,
 	key
 ) {
-	return getEntityRecord( state, kind, name, key );
+	return getEntityRecord(state, kind, name, key);
 }
 
 /**
@@ -221,47 +218,43 @@ export function __experimentalGetEntityRecordNoResolver(
  * @return {Object?} Object with the entity's raw attributes.
  */
 export const getRawEntityRecord = createSelector(
-	( state, kind, name, key ) => {
-		const record = getEntityRecord( state, kind, name, key );
+	(state, kind, name, key) => {
+		const record = getEntityRecord(state, kind, name, key);
 		return (
 			record &&
-			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				if ( isRawAttribute( getEntity( state, kind, name ), _key ) ) {
+			Object.keys(record).reduce((accumulator, _key) => {
+				if (isRawAttribute(getEntity(state, kind, name), _key)) {
 					// Because edits are the "raw" attribute values,
 					// we return those from record selectors to make rendering,
 					// comparisons, and joins with edits easier.
-					accumulator[ _key ] = get(
-						record[ _key ],
-						'raw',
-						record[ _key ]
-					);
+					accumulator[_key] = get(record[_key], 'raw', record[_key]);
 				} else {
-					accumulator[ _key ] = record[ _key ];
+					accumulator[_key] = record[_key];
 				}
 				return accumulator;
-			}, {} )
+			}, {})
 		);
 	},
-	( state, kind, name, recordId, query ) => {
+	(state, kind, name, recordId, query) => {
 		const context = query?.context ?? 'default';
 		return [
 			state.entities.config,
-			get( state.entities.data, [
+			get(state.entities.data, [
 				kind,
 				name,
 				'queriedData',
 				'items',
 				context,
 				recordId,
-			] ),
-			get( state.entities.data, [
+			]),
+			get(state.entities.data, [
 				kind,
 				name,
 				'queriedData',
 				'itemIsComplete',
 				context,
 				recordId,
-			] ),
+			]),
 		];
 	}
 );
@@ -277,8 +270,8 @@ export const getRawEntityRecord = createSelector(
  *
  * @return {boolean} Whether entity records have been received.
  */
-export function hasEntityRecords( state, kind, name, query ) {
-	return Array.isArray( getEntityRecords( state, kind, name, query ) );
+export function hasEntityRecords(state, kind, name, query) {
+	return Array.isArray(getEntityRecords(state, kind, name, query));
 }
 
 /**
@@ -291,18 +284,14 @@ export function hasEntityRecords( state, kind, name, query ) {
  *
  * @return {?Array} Records.
  */
-export function getEntityRecords( state, kind, name, query ) {
+export function getEntityRecords(state, kind, name, query) {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
-	const queriedState = get( state.entities.data, [
-		kind,
-		name,
-		'queriedData',
-	] );
-	if ( ! queriedState ) {
+	const queriedState = get(state.entities.data, [kind, name, 'queriedData']);
+	if (!queriedState) {
 		return null;
 	}
-	return getQueriedItems( queriedState, query );
+	return getQueriedItems(queriedState, query);
 }
 
 /**
@@ -313,51 +302,46 @@ export function getEntityRecords( state, kind, name, query ) {
  * @return {[{ title: string, key: string, name: string, kind: string }]} The list of updated records
  */
 export const __experimentalGetDirtyEntityRecords = createSelector(
-	( state ) => {
+	(state) => {
 		const {
 			entities: { data },
 		} = state;
 		const dirtyRecords = [];
-		Object.keys( data ).forEach( ( kind ) => {
-			Object.keys( data[ kind ] ).forEach( ( name ) => {
-				const primaryKeys = Object.keys(
-					data[ kind ][ name ].edits
-				).filter(
-					( primaryKey ) =>
+		Object.keys(data).forEach((kind) => {
+			Object.keys(data[kind]).forEach((name) => {
+				const primaryKeys = Object.keys(data[kind][name].edits).filter(
+					(primaryKey) =>
 						// The entity record must exist (not be deleted),
 						// and it must have edits.
-						getEntityRecord( state, kind, name, primaryKey ) &&
-						hasEditsForEntityRecord( state, kind, name, primaryKey )
+						getEntityRecord(state, kind, name, primaryKey) &&
+						hasEditsForEntityRecord(state, kind, name, primaryKey)
 				);
 
-				if ( primaryKeys.length ) {
-					const entity = getEntity( state, kind, name );
-					primaryKeys.forEach( ( primaryKey ) => {
+				if (primaryKeys.length) {
+					const entity = getEntity(state, kind, name);
+					primaryKeys.forEach((primaryKey) => {
 						const entityRecord = getEditedEntityRecord(
 							state,
 							kind,
 							name,
 							primaryKey
 						);
-						dirtyRecords.push( {
+						dirtyRecords.push({
 							// We avoid using primaryKey because it's transformed into a string
 							// when it's used as an object key.
-							key:
-								entityRecord[
-									entity.key || DEFAULT_ENTITY_KEY
-								],
-							title: entity?.getTitle?.( entityRecord ) || '',
+							key: entityRecord[entity.key || DEFAULT_ENTITY_KEY],
+							title: entity?.getTitle?.(entityRecord) || '',
 							name,
 							kind,
-						} );
-					} );
+						});
+					});
 				}
-			} );
-		} );
+			});
+		});
 
 		return dirtyRecords;
 	},
-	( state ) => [ state.entities.data ]
+	(state) => [state.entities.data]
 );
 
 /**
@@ -368,46 +352,42 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
  * @return {[{ title: string, key: string, name: string, kind: string }]} The list of records being saved.
  */
 export const __experimentalGetEntitiesBeingSaved = createSelector(
-	( state ) => {
+	(state) => {
 		const {
 			entities: { data },
 		} = state;
 		const recordsBeingSaved = [];
-		Object.keys( data ).forEach( ( kind ) => {
-			Object.keys( data[ kind ] ).forEach( ( name ) => {
-				const primaryKeys = Object.keys(
-					data[ kind ][ name ].saving
-				).filter( ( primaryKey ) =>
-					isSavingEntityRecord( state, kind, name, primaryKey )
+		Object.keys(data).forEach((kind) => {
+			Object.keys(data[kind]).forEach((name) => {
+				const primaryKeys = Object.keys(data[kind][name].saving).filter(
+					(primaryKey) =>
+						isSavingEntityRecord(state, kind, name, primaryKey)
 				);
 
-				if ( primaryKeys.length ) {
-					const entity = getEntity( state, kind, name );
-					primaryKeys.forEach( ( primaryKey ) => {
+				if (primaryKeys.length) {
+					const entity = getEntity(state, kind, name);
+					primaryKeys.forEach((primaryKey) => {
 						const entityRecord = getEditedEntityRecord(
 							state,
 							kind,
 							name,
 							primaryKey
 						);
-						recordsBeingSaved.push( {
+						recordsBeingSaved.push({
 							// We avoid using primaryKey because it's transformed into a string
 							// when it's used as an object key.
-							key:
-								entityRecord[
-									entity.key || DEFAULT_ENTITY_KEY
-								],
-							title: entity?.getTitle?.( entityRecord ) || '',
+							key: entityRecord[entity.key || DEFAULT_ENTITY_KEY],
+							title: entity?.getTitle?.(entityRecord) || '',
 							name,
 							kind,
-						} );
-					} );
+						});
+					});
 				}
-			} );
-		} );
+			});
+		});
 		return recordsBeingSaved;
 	},
-	( state ) => [ state.entities.data ]
+	(state) => [state.entities.data]
 );
 
 /**
@@ -420,8 +400,8 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
  *
  * @return {Object?} The entity record's edits.
  */
-export function getEntityRecordEdits( state, kind, name, recordId ) {
-	return get( state.entities.data, [ kind, name, 'edits', recordId ] );
+export function getEntityRecordEdits(state, kind, name, recordId) {
+	return get(state.entities.data, [kind, name, 'edits', recordId]);
 }
 
 /**
@@ -439,22 +419,22 @@ export function getEntityRecordEdits( state, kind, name, recordId ) {
  * @return {Object?} The entity record's non transient edits.
  */
 export const getEntityRecordNonTransientEdits = createSelector(
-	( state, kind, name, recordId ) => {
-		const { transientEdits } = getEntity( state, kind, name ) || {};
-		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
-		if ( ! transientEdits ) {
+	(state, kind, name, recordId) => {
+		const { transientEdits } = getEntity(state, kind, name) || {};
+		const edits = getEntityRecordEdits(state, kind, name, recordId) || {};
+		if (!transientEdits) {
 			return edits;
 		}
-		return Object.keys( edits ).reduce( ( acc, key ) => {
-			if ( ! transientEdits[ key ] ) {
-				acc[ key ] = edits[ key ];
+		return Object.keys(edits).reduce((acc, key) => {
+			if (!transientEdits[key]) {
+				acc[key] = edits[key];
 			}
 			return acc;
-		}, {} );
+		}, {});
 	},
-	( state, kind, name, recordId ) => [
+	(state, kind, name, recordId) => [
 		state.entities.config,
-		get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+		get(state.entities.data, [kind, name, 'edits', recordId]),
 	]
 );
 
@@ -469,11 +449,11 @@ export const getEntityRecordNonTransientEdits = createSelector(
  *
  * @return {boolean} Whether the entity record has edits or not.
  */
-export function hasEditsForEntityRecord( state, kind, name, recordId ) {
+export function hasEditsForEntityRecord(state, kind, name, recordId) {
 	return (
-		isSavingEntityRecord( state, kind, name, recordId ) ||
+		isSavingEntityRecord(state, kind, name, recordId) ||
 		Object.keys(
-			getEntityRecordNonTransientEdits( state, kind, name, recordId )
+			getEntityRecordNonTransientEdits(state, kind, name, recordId)
 		).length > 0
 	);
 }
@@ -489,31 +469,31 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
  * @return {Object?} The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	( state, kind, name, recordId ) => ( {
-		...getRawEntityRecord( state, kind, name, recordId ),
-		...getEntityRecordEdits( state, kind, name, recordId ),
-	} ),
-	( state, kind, name, recordId, query ) => {
+	(state, kind, name, recordId) => ({
+		...getRawEntityRecord(state, kind, name, recordId),
+		...getEntityRecordEdits(state, kind, name, recordId),
+	}),
+	(state, kind, name, recordId, query) => {
 		const context = query?.context ?? 'default';
 		return [
 			state.entities.config,
-			get( state.entities.data, [
+			get(state.entities.data, [
 				kind,
 				name,
 				'queriedData',
 				'items',
 				context,
 				recordId,
-			] ),
-			get( state.entities.data, [
+			]),
+			get(state.entities.data, [
 				kind,
 				name,
 				'queriedData',
 				'itemIsComplete',
 				context,
 				recordId,
-			] ),
-			get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+			]),
+			get(state.entities.data, [kind, name, 'edits', recordId]),
 		];
 	}
 );
@@ -528,13 +508,13 @@ export const getEditedEntityRecord = createSelector(
  *
  * @return {boolean} Whether the entity record is autosaving or not.
  */
-export function isAutosavingEntityRecord( state, kind, name, recordId ) {
+export function isAutosavingEntityRecord(state, kind, name, recordId) {
 	const { pending, isAutosave } = get(
 		state.entities.data,
-		[ kind, name, 'saving', recordId ],
+		[kind, name, 'saving', recordId],
 		{}
 	);
-	return Boolean( pending && isAutosave );
+	return Boolean(pending && isAutosave);
 }
 
 /**
@@ -547,10 +527,10 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
  *
  * @return {boolean} Whether the entity record is saving or not.
  */
-export function isSavingEntityRecord( state, kind, name, recordId ) {
+export function isSavingEntityRecord(state, kind, name, recordId) {
 	return get(
 		state.entities.data,
-		[ kind, name, 'saving', recordId, 'pending' ],
+		[kind, name, 'saving', recordId, 'pending'],
 		false
 	);
 }
@@ -565,10 +545,10 @@ export function isSavingEntityRecord( state, kind, name, recordId ) {
  *
  * @return {boolean} Whether the entity record is deleting or not.
  */
-export function isDeletingEntityRecord( state, kind, name, recordId ) {
+export function isDeletingEntityRecord(state, kind, name, recordId) {
 	return get(
 		state.entities.data,
-		[ kind, name, 'deleting', recordId, 'pending' ],
+		[kind, name, 'deleting', recordId, 'pending'],
 		false
 	);
 }
@@ -583,14 +563,8 @@ export function isDeletingEntityRecord( state, kind, name, recordId ) {
  *
  * @return {Object?} The entity record's save error.
  */
-export function getLastEntitySaveError( state, kind, name, recordId ) {
-	return get( state.entities.data, [
-		kind,
-		name,
-		'saving',
-		recordId,
-		'error',
-	] );
+export function getLastEntitySaveError(state, kind, name, recordId) {
+	return get(state.entities.data, [kind, name, 'saving', recordId, 'error']);
 }
 
 /**
@@ -603,14 +577,14 @@ export function getLastEntitySaveError( state, kind, name, recordId ) {
  *
  * @return {Object?} The entity record's save error.
  */
-export function getLastEntityDeleteError( state, kind, name, recordId ) {
-	return get( state.entities.data, [
+export function getLastEntityDeleteError(state, kind, name, recordId) {
+	return get(state.entities.data, [
 		kind,
 		name,
 		'deleting',
 		recordId,
 		'error',
-	] );
+	]);
 }
 
 /**
@@ -624,7 +598,7 @@ export function getLastEntityDeleteError( state, kind, name, recordId ) {
  *
  * @return {number} The current undo offset.
  */
-function getCurrentUndoOffset( state ) {
+function getCurrentUndoOffset(state) {
 	return state.undo.offset;
 }
 
@@ -636,8 +610,8 @@ function getCurrentUndoOffset( state ) {
  *
  * @return {Object?} The edit.
  */
-export function getUndoEdit( state ) {
-	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
+export function getUndoEdit(state) {
+	return state.undo[state.undo.length - 2 + getCurrentUndoOffset(state)];
 }
 
 /**
@@ -648,8 +622,8 @@ export function getUndoEdit( state ) {
  *
  * @return {Object?} The edit.
  */
-export function getRedoEdit( state ) {
-	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
+export function getRedoEdit(state) {
+	return state.undo[state.undo.length + getCurrentUndoOffset(state)];
 }
 
 /**
@@ -660,8 +634,8 @@ export function getRedoEdit( state ) {
  *
  * @return {boolean} Whether there is a previous edit or not.
  */
-export function hasUndo( state ) {
-	return Boolean( getUndoEdit( state ) );
+export function hasUndo(state) {
+	return Boolean(getUndoEdit(state));
 }
 
 /**
@@ -672,8 +646,8 @@ export function hasUndo( state ) {
  *
  * @return {boolean} Whether there is a next edit or not.
  */
-export function hasRedo( state ) {
-	return Boolean( getRedoEdit( state ) );
+export function hasRedo(state) {
+	return Boolean(getRedoEdit(state));
 }
 
 /**
@@ -683,8 +657,8 @@ export function hasRedo( state ) {
  *
  * @return {Object} The current theme.
  */
-export function getCurrentTheme( state ) {
-	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
+export function getCurrentTheme(state) {
+	return getEntityRecord(state, 'root', 'theme', state.currentTheme);
 }
 
 /**
@@ -694,7 +668,7 @@ export function getCurrentTheme( state ) {
  *
  * @return {string} The current global styles ID.
  */
-export function __experimentalGetCurrentGlobalStylesId( state ) {
+export function __experimentalGetCurrentGlobalStylesId(state) {
 	return state.currentGlobalStylesId;
 }
 
@@ -705,8 +679,8 @@ export function __experimentalGetCurrentGlobalStylesId( state ) {
  *
  * @return {*} Index data.
  */
-export function getThemeSupports( state ) {
-	return getCurrentTheme( state )?.theme_supports ?? EMPTY_OBJECT;
+export function getThemeSupports(state) {
+	return getCurrentTheme(state)?.theme_supports ?? EMPTY_OBJECT;
 }
 
 /**
@@ -717,8 +691,8 @@ export function getThemeSupports( state ) {
  *
  * @return {*} Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
-export function getEmbedPreview( state, url ) {
-	return state.embedPreviews[ url ];
+export function getEmbedPreview(state, url) {
+	return state.embedPreviews[url];
 }
 
 /**
@@ -733,10 +707,10 @@ export function getEmbedPreview( state, url ) {
  *
  * @return {boolean} Is the preview for the URL an oEmbed link fallback.
  */
-export function isPreviewEmbedFallback( state, url ) {
-	const preview = state.embedPreviews[ url ];
+export function isPreviewEmbedFallback(state, url) {
+	const preview = state.embedPreviews[url];
 	const oEmbedLinkCheck = '<a href="' + url + '">' + url + '</a>';
-	if ( ! preview ) {
+	if (!preview) {
 		return false;
 	}
 	return preview.html === oEmbedLinkCheck;
@@ -759,9 +733,9 @@ export function isPreviewEmbedFallback( state, url ) {
  * @return {boolean|undefined} Whether or not the user can perform the action,
  *                             or `undefined` if the OPTIONS request is still being made.
  */
-export function canUser( state, action, resource, id ) {
-	const key = compact( [ action, resource, id ] ).join( '/' );
-	return get( state, [ 'userPermissions', key ] );
+export function canUser(state, action, resource, id) {
+	const key = compact([action, resource, id]).join('/');
+	return get(state, ['userPermissions', key]);
 }
 
 /**
@@ -779,14 +753,14 @@ export function canUser( state, action, resource, id ) {
  * @return {boolean|undefined} Whether or not the user can edit,
  * or `undefined` if the OPTIONS request is still being made.
  */
-export function canUserEditEntityRecord( state, kind, name, recordId ) {
-	const entity = getEntity( state, kind, name );
-	if ( ! entity ) {
+export function canUserEditEntityRecord(state, kind, name, recordId) {
+	const entity = getEntity(state, kind, name);
+	if (!entity) {
 		return false;
 	}
 	const resource = entity.__unstable_rest_base;
 
-	return canUser( state, 'update', resource, recordId );
+	return canUser(state, 'update', resource, recordId);
 }
 
 /**
@@ -801,8 +775,8 @@ export function canUserEditEntityRecord( state, kind, name, recordId ) {
  *
  * @return {?Array} An array of autosaves for the post, or undefined if there is none.
  */
-export function getAutosaves( state, postType, postId ) {
-	return state.autosaves[ postId ];
+export function getAutosaves(state, postType, postId) {
+	return state.autosaves[postId];
 }
 
 /**
@@ -815,13 +789,13 @@ export function getAutosaves( state, postType, postId ) {
  *
  * @return {?Object} The autosave for the post and author.
  */
-export function getAutosave( state, postType, postId, authorId ) {
-	if ( authorId === undefined ) {
+export function getAutosave(state, postType, postId, authorId) {
+	if (authorId === undefined) {
 		return;
 	}
 
-	const autosaves = state.autosaves[ postId ];
-	return find( autosaves, { author: authorId } );
+	const autosaves = state.autosaves[postId];
+	return find(autosaves, { author: authorId });
 }
 
 /**
@@ -834,11 +808,11 @@ export function getAutosave( state, postType, postId, authorId ) {
  * @return {boolean} True if the REST request was completed. False otherwise.
  */
 export const hasFetchedAutosaves = createRegistrySelector(
-	( select ) => ( state, postType, postId ) => {
-		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
+	(select) => (state, postType, postId) => {
+		return select(STORE_NAME).hasFinishedResolution('getAutosaves', [
 			postType,
 			postId,
-		] );
+		]);
 	}
 );
 
@@ -862,11 +836,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
  */
 export const getReferenceByDistinctEdits = createSelector(
 	() => [],
-	( state ) => [
-		state.undo.length,
-		state.undo.offset,
-		state.undo.flattenedUndo,
-	]
+	(state) => [state.undo.length, state.undo.offset, state.undo.flattenedUndo]
 );
 
 /**
@@ -877,13 +847,13 @@ export const getReferenceByDistinctEdits = createSelector(
  *
  * @return {Object?} The template record.
  */
-export function __experimentalGetTemplateForLink( state, link ) {
-	const records = getEntityRecords( state, 'postType', 'wp_template', {
+export function __experimentalGetTemplateForLink(state, link) {
+	const records = getEntityRecords(state, 'postType', 'wp_template', {
 		'find-template': link,
-	} );
+	});
 
-	const template = records?.length ? records[ 0 ] : null;
-	if ( template ) {
+	const template = records?.length ? records[0] : null;
+	if (template) {
 		return getEditedEntityRecord(
 			state,
 			'postType',
@@ -901,10 +871,10 @@ export function __experimentalGetTemplateForLink( state, link ) {
  *
  * @return {Object?} The Global Styles object.
  */
-export function __experimentalGetCurrentThemeBaseGlobalStyles( state ) {
-	const currentTheme = getCurrentTheme( state );
-	if ( ! currentTheme ) {
+export function __experimentalGetCurrentThemeBaseGlobalStyles(state) {
+	const currentTheme = getCurrentTheme(state);
+	if (!currentTheme) {
 		return null;
 	}
-	return state.themeBaseGlobalStyles[ currentTheme.stylesheet ];
+	return state.themeBaseGlobalStyles[currentTheme.stylesheet];
 }

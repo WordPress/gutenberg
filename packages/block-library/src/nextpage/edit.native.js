@@ -15,15 +15,15 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './editor.scss';
 
-export function NextPageEdit( {
+export function NextPageEdit({
 	attributes,
 	isSelected,
 	onFocus,
 	getStylesFromColorScheme,
-} ) {
-	const { customText = __( 'Page break' ) } = attributes;
+}) {
+	const { customText = __('Page break') } = attributes;
 	const accessibilityTitle = attributes.customText || '';
-	const accessibilityState = isSelected ? [ 'selected' ] : [];
+	const accessibilityState = isSelected ? ['selected'] : [];
 	const textStyle = getStylesFromColorScheme(
 		styles.nextpageText,
 		styles.nextpageTextDark
@@ -36,23 +36,23 @@ export function NextPageEdit( {
 	return (
 		<View
 			accessible
-			accessibilityLabel={ sprintf(
+			accessibilityLabel={sprintf(
 				/* translators: accessibility text. %s: Page break text. */
-				__( 'Page break block. %s' ),
+				__('Page break block. %s'),
 				accessibilityTitle
-			) }
-			accessibilityStates={ accessibilityState }
-			onAccessibilityTap={ onFocus }
+			)}
+			accessibilityStates={accessibilityState}
+			onAccessibilityTap={onFocus}
 		>
 			<Hr
-				text={ customText }
-				marginLeft={ 0 }
-				marginRight={ 0 }
-				textStyle={ textStyle }
-				lineStyle={ lineStyle }
+				text={customText}
+				marginLeft={0}
+				marginRight={0}
+				textStyle={textStyle}
+				lineStyle={lineStyle}
 			/>
 		</View>
 	);
 }
 
-export default withPreferredColorScheme( NextPageEdit );
+export default withPreferredColorScheme(NextPageEdit);

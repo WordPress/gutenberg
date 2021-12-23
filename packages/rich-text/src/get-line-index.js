@@ -17,11 +17,11 @@ import { LINE_SEPARATOR } from './special-characters';
  *
  * @return {number|void} The line index. Undefined if not found.
  */
-export function getLineIndex( { start, text }, startIndex = start ) {
+export function getLineIndex({ start, text }, startIndex = start) {
 	let index = startIndex;
 
-	while ( index-- ) {
-		if ( text[ index ] === LINE_SEPARATOR ) {
+	while (index--) {
+		if (text[index] === LINE_SEPARATOR) {
 			return index;
 		}
 	}

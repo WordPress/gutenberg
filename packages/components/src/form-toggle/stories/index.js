@@ -10,15 +10,15 @@ import FormToggle from '../';
 
 export default { title: 'Components/FormToggle', component: FormToggle };
 
-const FormToggleWithState = ( { checked, ...props } ) => {
-	const [ isChecked, setChecked ] = useState( checked );
+const FormToggleWithState = ({ checked, ...props }) => {
+	const [isChecked, setChecked] = useState(checked);
 	return (
 		<FormToggle
-			{ ...props }
-			checked={ isChecked }
-			onChange={ () => {
-				setChecked( ! isChecked );
-			} }
+			{...props}
+			checked={isChecked}
+			onChange={() => {
+				setChecked(!isChecked);
+			}}
 		/>
 	);
 };

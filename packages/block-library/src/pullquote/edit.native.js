@@ -18,10 +18,10 @@ import { createBlock } from '@wordpress/blocks';
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
 
-const getBackgroundColor = ( { attributes, colors, style } ) => {
+const getBackgroundColor = ({ attributes, colors, style }) => {
 	const { backgroundColor } = attributes;
 
-	const colorProps = getColorClassesAndStyles( attributes );
+	const colorProps = getColorClassesAndStyles(attributes);
 	const colorObject = getColorObjectByAttributeValues(
 		colors,
 		backgroundColor
@@ -35,8 +35,8 @@ const getBackgroundColor = ( { attributes, colors, style } ) => {
 	);
 };
 
-const getTextColor = ( { attributes, colors, style } ) => {
-	const colorProps = getColorClassesAndStyles( attributes );
+const getTextColor = ({ attributes, colors, style }) => {
+	const colorProps = getColorClassesAndStyles(attributes);
 	const colorObject = getColorObjectByAttributeValues(
 		colors,
 		attributes.textColor
@@ -48,9 +48,9 @@ const getTextColor = ( { attributes, colors, style } ) => {
 		style?.baseColors?.color?.text
 	);
 };
-const getBorderColor = ( props ) => {
+const getBorderColor = (props) => {
 	const { wrapperProps } = props;
-	const defaultColor = getTextColor( props );
+	const defaultColor = getTextColor(props);
 
 	return wrapperProps?.style?.borderColor || defaultColor;
 };
@@ -58,68 +58,66 @@ const getBorderColor = ( props ) => {
  * Internal dependencies
  */
 
-function PullQuoteEdit( props ) {
+function PullQuoteEdit(props) {
 	const { attributes, setAttributes, isSelected, insertBlocksAfter } = props;
 	const { textAlign, citation, value } = attributes;
 
-	const blockProps = useBlockProps( {
-		backgroundColor: getBackgroundColor( props ),
-		borderColor: getBorderColor( props ),
-	} );
+	const blockProps = useBlockProps({
+		backgroundColor: getBackgroundColor(props),
+		borderColor: getBorderColor(props),
+	});
 
-	const shouldShowCitation = ! RichText.isEmpty( citation ) || isSelected;
+	const shouldShowCitation = !RichText.isEmpty(citation) || isSelected;
 
 	return (
 		<>
 			<BlockControls group="block">
 				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
+					value={textAlign}
+					onChange={(nextAlign) => {
+						setAttributes({ textAlign: nextAlign });
+					}}
 				/>
 			</BlockControls>
-			<Figure { ...blockProps }>
-				<BlockQuote textColor={ getTextColor( props ) }>
+			<Figure {...blockProps}>
+				<BlockQuote textColor={getTextColor(props)}>
 					<RichText
 						identifier="value"
 						multiline
-						value={ value }
-						onChange={ ( nextValue ) =>
-							setAttributes( {
+						value={value}
+						onChange={(nextValue) =>
+							setAttributes({
 								value: nextValue,
-							} )
+							})
 						}
-						aria-label={ __( 'Pullquote text' ) }
+						aria-label={__('Pullquote text')}
 						placeholder={
 							// translators: placeholder text used for the quote
-							__( 'Add quote' )
+							__('Add quote')
 						}
-						textAlign={ textAlign ?? 'center' }
+						textAlign={textAlign ?? 'center'}
 					/>
-					{ shouldShowCitation && (
+					{shouldShowCitation && (
 						<RichText
 							identifier="citation"
-							value={ citation }
-							aria-label={ __( 'Pullquote citation text' ) }
+							value={citation}
+							aria-label={__('Pullquote citation text')}
 							placeholder={
 								// translators: placeholder text used for the citation
-								__( 'Add citation' )
+								__('Add citation')
 							}
-							onChange={ ( nextCitation ) =>
-								setAttributes( {
+							onChange={(nextCitation) =>
+								setAttributes({
 									citation: nextCitation,
-								} )
+								})
 							}
 							__unstableMobileNoFocusOnMount
-							textAlign={ textAlign ?? 'center' }
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( 'core/paragraph' )
-								)
+							textAlign={textAlign ?? 'center'}
+							__unstableOnSplitAtEnd={() =>
+								insertBlocksAfter(createBlock('core/paragraph'))
 							}
 						/>
-					) }
+					)}
 				</BlockQuote>
 			</Figure>
 		</>

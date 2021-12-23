@@ -30,7 +30,7 @@ const colorsAndGradientKeys = [
 	'disableCustomGradients',
 ];
 
-function ColorGradientControlInner( {
+function ColorGradientControlInner({
 	colors,
 	gradients,
 	disableCustomColors,
@@ -46,127 +46,124 @@ function ColorGradientControlInner( {
 	clearable,
 	showTitle = true,
 	enableAlpha,
-} ) {
+}) {
 	const canChooseAColor =
-		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
+		onColorChange && (!isEmpty(colors) || !disableCustomColors);
 	const canChooseAGradient =
-		onGradientChange &&
-		( ! isEmpty( gradients ) || ! disableCustomGradients );
-	const [ currentTab, setCurrentTab ] = useState(
-		gradientValue ? 'gradient' : !! canChooseAColor && 'color'
+		onGradientChange && (!isEmpty(gradients) || !disableCustomGradients);
+	const [currentTab, setCurrentTab] = useState(
+		gradientValue ? 'gradient' : !!canChooseAColor && 'color'
 	);
 
-	if ( ! canChooseAColor && ! canChooseAGradient ) {
+	if (!canChooseAColor && !canChooseAGradient) {
 		return null;
 	}
 	return (
 		<BaseControl
-			className={ classnames(
+			className={classnames(
 				'block-editor-color-gradient-control',
 				className
-			) }
+			)}
 		>
 			<fieldset>
-				<VStack spacing={ 1 }>
-					{ showTitle && (
+				<VStack spacing={1}>
+					{showTitle && (
 						<legend>
 							<div className="block-editor-color-gradient-control__color-indicator">
 								<BaseControl.VisualLabel>
-									{ label }
+									{label}
 								</BaseControl.VisualLabel>
 							</div>
 						</legend>
-					) }
-					{ canChooseAColor && canChooseAGradient && (
+					)}
+					{canChooseAColor && canChooseAGradient && (
 						<ToggleGroupControl
-							value={ currentTab }
-							onChange={ setCurrentTab }
-							label={ __( 'Select color type' ) }
+							value={currentTab}
+							onChange={setCurrentTab}
+							label={__('Select color type')}
 							hideLabelFromVision
 							isBlock
 						>
 							<ToggleGroupControlOption
 								value="color"
-								label={ __( 'Solid' ) }
+								label={__('Solid')}
 							/>
 							<ToggleGroupControlOption
 								value="gradient"
-								label={ __( 'Gradient' ) }
+								label={__('Gradient')}
 							/>
 						</ToggleGroupControl>
-					) }
-					{ ( currentTab === 'color' || ! canChooseAGradient ) && (
+					)}
+					{(currentTab === 'color' || !canChooseAGradient) && (
 						<ColorPalette
-							value={ colorValue }
+							value={colorValue}
 							onChange={
 								canChooseAGradient
-									? ( newColor ) => {
-											onColorChange( newColor );
+									? (newColor) => {
+											onColorChange(newColor);
 											onGradientChange();
 									  }
 									: onColorChange
 							}
-							{ ...{ colors, disableCustomColors } }
+							{...{ colors, disableCustomColors }}
 							__experimentalHasMultipleOrigins={
 								__experimentalHasMultipleOrigins
 							}
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							clearable={ clearable }
-							enableAlpha={ enableAlpha }
+							clearable={clearable}
+							enableAlpha={enableAlpha}
 						/>
-					) }
-					{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
+					)}
+					{(currentTab === 'gradient' || !canChooseAColor) && (
 						<GradientPicker
-							value={ gradientValue }
+							value={gradientValue}
 							onChange={
 								canChooseAColor
-									? ( newGradient ) => {
-											onGradientChange( newGradient );
+									? (newGradient) => {
+											onGradientChange(newGradient);
 											onColorChange();
 									  }
 									: onGradientChange
 							}
-							{ ...{ gradients, disableCustomGradients } }
+							{...{ gradients, disableCustomGradients }}
 							__experimentalHasMultipleOrigins={
 								__experimentalHasMultipleOrigins
 							}
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							clearable={ clearable }
+							clearable={clearable}
 						/>
-					) }
+					)}
 				</VStack>
 			</fieldset>
 		</BaseControl>
 	);
 }
 
-function ColorGradientControlSelect( props ) {
+function ColorGradientControlSelect(props) {
 	const colorGradientSettings = {};
-	colorGradientSettings.colors = useSetting( 'color.palette' );
-	colorGradientSettings.gradients = useSetting( 'color.gradients' );
-	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
-	colorGradientSettings.disableCustomGradients = ! useSetting(
+	colorGradientSettings.colors = useSetting('color.palette');
+	colorGradientSettings.gradients = useSetting('color.gradients');
+	colorGradientSettings.disableCustomColors = !useSetting('color.custom');
+	colorGradientSettings.disableCustomGradients = !useSetting(
 		'color.customGradient'
 	);
 
 	return (
 		<ColorGradientControlInner
-			{ ...{ ...colorGradientSettings, ...props } }
+			{...{ ...colorGradientSettings, ...props }}
 		/>
 	);
 }
 
-function ColorGradientControl( props ) {
-	if (
-		every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) )
-	) {
-		return <ColorGradientControlInner { ...props } />;
+function ColorGradientControl(props) {
+	if (every(colorsAndGradientKeys, (key) => props.hasOwnProperty(key))) {
+		return <ColorGradientControlInner {...props} />;
 	}
-	return <ColorGradientControlSelect { ...props } />;
+	return <ColorGradientControlSelect {...props} />;
 }
 
 export default ColorGradientControl;

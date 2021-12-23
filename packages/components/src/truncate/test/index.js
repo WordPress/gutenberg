@@ -8,36 +8,36 @@ import { render } from '@testing-library/react';
  */
 import { Truncate } from '..';
 
-describe( 'props', () => {
-	test( 'should render correctly', () => {
-		const { container } = render( <Truncate>Lorem ipsum.</Truncate> );
-		expect( container.firstChild.textContent ).toEqual( 'Lorem ipsum.' );
-	} );
+describe('props', () => {
+	test('should render correctly', () => {
+		const { container } = render(<Truncate>Lorem ipsum.</Truncate>);
+		expect(container.firstChild.textContent).toEqual('Lorem ipsum.');
+	});
 
-	test( 'should render limit', () => {
+	test('should render limit', () => {
 		const { container } = render(
-			<Truncate limit={ 1 } ellipsizeMode="tail">
+			<Truncate limit={1} ellipsizeMode="tail">
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild.textContent ).toEqual( 'L…' );
-	} );
+		expect(container.firstChild.textContent).toEqual('L…');
+	});
 
-	test( 'should render custom ellipsis', () => {
+	test('should render custom ellipsis', () => {
 		const { container } = render(
-			<Truncate ellipsis="!!!" limit={ 5 } ellipsizeMode="tail">
+			<Truncate ellipsis="!!!" limit={5} ellipsizeMode="tail">
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild.textContent ).toEqual( 'Lorem!!!' );
-	} );
+		expect(container.firstChild.textContent).toEqual('Lorem!!!');
+	});
 
-	test( 'should render custom ellipsizeMode', () => {
+	test('should render custom ellipsizeMode', () => {
 		const { container } = render(
-			<Truncate ellipsis="!!!" ellipsizeMode="middle" limit={ 5 }>
+			<Truncate ellipsis="!!!" ellipsizeMode="middle" limit={5}>
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild.textContent ).toEqual( 'Lo!!!m.' );
-	} );
-} );
+		expect(container.firstChild.textContent).toEqual('Lo!!!m.');
+	});
+});

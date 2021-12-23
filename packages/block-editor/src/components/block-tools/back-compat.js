@@ -11,24 +11,24 @@ import deprecated from '@wordpress/deprecated';
 import InsertionPoint, { InsertionPointOpenRef } from './insertion-point';
 import BlockPopover from './block-popover';
 
-export default function BlockToolsBackCompat( { children } ) {
-	const openRef = useContext( InsertionPointOpenRef );
-	const isDisabled = useContext( Disabled.Context );
+export default function BlockToolsBackCompat({ children }) {
+	const openRef = useContext(InsertionPointOpenRef);
+	const isDisabled = useContext(Disabled.Context);
 
 	// If context is set, `BlockTools` is a parent component.
-	if ( openRef || isDisabled ) {
+	if (openRef || isDisabled) {
 		return children;
 	}
 
-	deprecated( 'wp.components.Popover.Slot name="block-toolbar"', {
+	deprecated('wp.components.Popover.Slot name="block-toolbar"', {
 		alternative: 'wp.blockEditor.BlockTools',
 		since: '5.8',
-	} );
+	});
 
 	return (
 		<InsertionPoint __unstablePopoverSlot="block-toolbar">
 			<BlockPopover __unstablePopoverSlot="block-toolbar" />
-			{ children }
+			{children}
 		</InsertionPoint>
 	);
 }

@@ -13,7 +13,7 @@ import deprecated from '@wordpress/deprecated';
  *
  * @return {boolean} Whether object is component-like.
  */
-function isComponentLike( object ) {
+function isComponentLike(object) {
 	return object instanceof Component || typeof object === 'function';
 }
 
@@ -30,34 +30,35 @@ function isComponentLike( object ) {
  *
  * @return {Function} Higher Order Component with the focus restauration behaviour.
  */
-export default createHigherOrderComponent( ( options ) => {
-	const HoC = ( { onFocusReturn } = {} ) => ( WrappedComponent ) => {
-		const WithFocusReturn = ( props ) => {
-			const ref = useFocusReturn( onFocusReturn );
-			return (
-				<div ref={ ref }>
-					<WrappedComponent { ...props } />
-				</div>
-			);
+export default createHigherOrderComponent((options) => {
+	const HoC =
+		({ onFocusReturn } = {}) =>
+		(WrappedComponent) => {
+			const WithFocusReturn = (props) => {
+				const ref = useFocusReturn(onFocusReturn);
+				return (
+					<div ref={ref}>
+						<WrappedComponent {...props} />
+					</div>
+				);
+			};
+
+			return WithFocusReturn;
 		};
 
-		return WithFocusReturn;
-	};
-
-	if ( isComponentLike( options ) ) {
+	if (isComponentLike(options)) {
 		const WrappedComponent = options;
-		return HoC()( WrappedComponent );
+		return HoC()(WrappedComponent);
 	}
 
-	return HoC( options );
-}, 'withFocusReturn' );
+	return HoC(options);
+}, 'withFocusReturn');
 
-export const Provider = ( { children } ) => {
-	deprecated( 'wp.components.FocusReturnProvider component', {
+export const Provider = ({ children }) => {
+	deprecated('wp.components.FocusReturnProvider component', {
 		since: '5.7',
-		hint:
-			'This provider is not used anymore. You can just remove it from your codebase',
-	} );
+		hint: 'This provider is not used anymore. You can just remove it from your codebase',
+	});
 
 	return children;
 };

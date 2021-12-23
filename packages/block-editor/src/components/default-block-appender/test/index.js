@@ -8,43 +8,43 @@ import { shallow } from 'enzyme';
  */
 import { DefaultBlockAppender, ZWNBSP } from '../';
 
-describe( 'DefaultBlockAppender', () => {
-	const expectOnAppendCalled = ( onAppend ) => {
-		expect( onAppend ).toHaveBeenCalledTimes( 1 );
-		expect( onAppend ).toHaveBeenCalledWith();
+describe('DefaultBlockAppender', () => {
+	const expectOnAppendCalled = (onAppend) => {
+		expect(onAppend).toHaveBeenCalledTimes(1);
+		expect(onAppend).toHaveBeenCalledWith();
 	};
 
-	it( 'should match snapshot', () => {
+	it('should match snapshot', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow(
-			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
+			<DefaultBlockAppender onAppend={onAppend} showPrompt />
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	it( 'should append a default block when input focused', () => {
+	it('should append a default block when input focused', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow(
-			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
+			<DefaultBlockAppender onAppend={onAppend} showPrompt />
 		);
 
-		wrapper.find( 'p' ).simulate( 'click' );
+		wrapper.find('p').simulate('click');
 
-		expect( wrapper ).toMatchSnapshot();
+		expect(wrapper).toMatchSnapshot();
 
-		expectOnAppendCalled( onAppend );
-	} );
+		expectOnAppendCalled(onAppend);
+	});
 
-	it( 'should optionally show without prompt', () => {
+	it('should optionally show without prompt', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow(
-			<DefaultBlockAppender onAppend={ onAppend } showPrompt={ false } />
+			<DefaultBlockAppender onAppend={onAppend} showPrompt={false} />
 		);
-		const input = wrapper.find( 'p' );
+		const input = wrapper.find('p');
 
-		expect( input.prop( 'children' ) ).toEqual( ZWNBSP );
+		expect(input.prop('children')).toEqual(ZWNBSP);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
+		expect(wrapper).toMatchSnapshot();
+	});
+});

@@ -14,27 +14,27 @@ import { SPACE } from '@wordpress/keycodes';
  * a different solution entirely or remove it entirely.
  */
 export function useSpace() {
-	return useRefEffect( ( element ) => {
-		function onKeyDown( event ) {
+	return useRefEffect((element) => {
+		function onKeyDown(event) {
 			// Don't insert a space if default behaviour is prevented.
-			if ( event.defaultPrevented ) {
+			if (event.defaultPrevented) {
 				return;
 			}
 
 			const { keyCode, altKey, metaKey, ctrlKey } = event;
 
 			// Only consider the space key without modifiers pressed.
-			if ( keyCode !== SPACE || altKey || metaKey || ctrlKey ) {
+			if (keyCode !== SPACE || altKey || metaKey || ctrlKey) {
 				return;
 			}
 
-			event.target.ownerDocument.execCommand( 'insertText', false, ' ' );
+			event.target.ownerDocument.execCommand('insertText', false, ' ');
 			event.preventDefault();
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
+		element.addEventListener('keydown', onKeyDown);
 		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
+			element.removeEventListener('keydown', onKeyDown);
 		};
-	}, [] );
+	}, []);
 }

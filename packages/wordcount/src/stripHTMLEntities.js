@@ -6,6 +6,6 @@
  *
  * @return {string} The manipulated text.
  */
-export default function stripHTMLEntities( settings, text ) {
-	return text.replace( settings.HTMLEntityRegExp, '' );
+export default function stripHTMLEntities(settings, text) {
+	return text.replace(settings.HTMLEntityRegExp, '');
 }

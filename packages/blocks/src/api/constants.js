@@ -17,25 +17,25 @@ export const DEPRECATED_ENTRY_KEYS = [
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	//kept for back-compatibility purposes.
 	'--wp--style--color--link': {
-		value: [ 'color', 'link' ],
-		support: [ 'color', 'link' ],
+		value: ['color', 'link'],
+		support: ['color', 'link'],
 	},
 	background: {
-		value: [ 'color', 'gradient' ],
-		support: [ 'color', 'gradients' ],
+		value: ['color', 'gradient'],
+		support: ['color', 'gradients'],
 	},
 	backgroundColor: {
-		value: [ 'color', 'background' ],
-		support: [ 'color', 'background' ],
+		value: ['color', 'background'],
+		support: ['color', 'background'],
 		requiresOptOut: true,
 	},
 	borderColor: {
-		value: [ 'border', 'color' ],
-		support: [ '__experimentalBorder', 'color' ],
+		value: ['border', 'color'],
+		support: ['__experimentalBorder', 'color'],
 	},
 	borderRadius: {
-		value: [ 'border', 'radius' ],
-		support: [ '__experimentalBorder', 'radius' ],
+		value: ['border', 'radius'],
+		support: ['__experimentalBorder', 'radius'],
 		properties: {
 			borderTopLeftRadius: 'topLeft',
 			borderTopRightRadius: 'topRight',
@@ -44,45 +44,45 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 	},
 	borderStyle: {
-		value: [ 'border', 'style' ],
-		support: [ '__experimentalBorder', 'style' ],
+		value: ['border', 'style'],
+		support: ['__experimentalBorder', 'style'],
 	},
 	borderWidth: {
-		value: [ 'border', 'width' ],
-		support: [ '__experimentalBorder', 'width' ],
+		value: ['border', 'width'],
+		support: ['__experimentalBorder', 'width'],
 	},
 	color: {
-		value: [ 'color', 'text' ],
-		support: [ 'color', 'text' ],
+		value: ['color', 'text'],
+		support: ['color', 'text'],
 		requiresOptOut: true,
 	},
 	linkColor: {
-		value: [ 'elements', 'link', 'color', 'text' ],
-		support: [ 'color', 'link' ],
+		value: ['elements', 'link', 'color', 'text'],
+		support: ['color', 'link'],
 	},
 	fontFamily: {
-		value: [ 'typography', 'fontFamily' ],
-		support: [ 'typography', '__experimentalFontFamily' ],
+		value: ['typography', 'fontFamily'],
+		support: ['typography', '__experimentalFontFamily'],
 	},
 	fontSize: {
-		value: [ 'typography', 'fontSize' ],
-		support: [ 'typography', 'fontSize' ],
+		value: ['typography', 'fontSize'],
+		support: ['typography', 'fontSize'],
 	},
 	fontStyle: {
-		value: [ 'typography', 'fontStyle' ],
-		support: [ 'typography', '__experimentalFontStyle' ],
+		value: ['typography', 'fontStyle'],
+		support: ['typography', '__experimentalFontStyle'],
 	},
 	fontWeight: {
-		value: [ 'typography', 'fontWeight' ],
-		support: [ 'typography', '__experimentalFontWeight' ],
+		value: ['typography', 'fontWeight'],
+		support: ['typography', '__experimentalFontWeight'],
 	},
 	lineHeight: {
-		value: [ 'typography', 'lineHeight' ],
-		support: [ 'typography', 'lineHeight' ],
+		value: ['typography', 'lineHeight'],
+		support: ['typography', 'lineHeight'],
 	},
 	margin: {
-		value: [ 'spacing', 'margin' ],
-		support: [ 'spacing', 'margin' ],
+		value: ['spacing', 'margin'],
+		support: ['spacing', 'margin'],
 		properties: {
 			marginTop: 'top',
 			marginRight: 'right',
@@ -91,8 +91,8 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 	},
 	padding: {
-		value: [ 'spacing', 'padding' ],
-		support: [ 'spacing', 'padding' ],
+		value: ['spacing', 'padding'],
+		support: ['spacing', 'padding'],
 		properties: {
 			paddingTop: 'top',
 			paddingRight: 'right',
@@ -101,20 +101,20 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 	},
 	textDecoration: {
-		value: [ 'typography', 'textDecoration' ],
-		support: [ 'typography', '__experimentalTextDecoration' ],
+		value: ['typography', 'textDecoration'],
+		support: ['typography', '__experimentalTextDecoration'],
 	},
 	textTransform: {
-		value: [ 'typography', 'textTransform' ],
-		support: [ 'typography', '__experimentalTextTransform' ],
+		value: ['typography', 'textTransform'],
+		support: ['typography', '__experimentalTextTransform'],
 	},
 	letterSpacing: {
-		value: [ 'typography', 'letterSpacing' ],
-		support: [ 'typography', '__experimentalLetterSpacing' ],
+		value: ['typography', 'letterSpacing'],
+		support: ['typography', '__experimentalLetterSpacing'],
 	},
 	'--wp--style--block-gap': {
-		value: [ 'spacing', 'blockGap' ],
-		support: [ 'spacing', 'blockGap' ],
+		value: ['spacing', 'blockGap'],
+		support: ['spacing', 'blockGap'],
 	},
 };
 

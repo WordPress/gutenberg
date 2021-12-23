@@ -10,35 +10,33 @@ const arrowMap = {
 	chevron: '»',
 };
 
-export default function QueryPaginationNextEdit( {
+export default function QueryPaginationNextEdit({
 	attributes: { label },
 	setAttributes,
 	context: { paginationArrow },
-} ) {
-	const displayArrow = arrowMap[ paginationArrow ];
+}) {
+	const displayArrow = arrowMap[paginationArrow];
 	return (
 		<a
 			href="#pagination-next-pseudo-link"
-			onClick={ ( event ) => event.preventDefault() }
-			{ ...useBlockProps() }
+			onClick={(event) => event.preventDefault()}
+			{...useBlockProps()}
 		>
 			<PlainText
-				__experimentalVersion={ 2 }
+				__experimentalVersion={2}
 				tagName="span"
-				aria-label={ __( 'Next page link' ) }
-				placeholder={ __( 'Next Page' ) }
-				value={ label }
-				onChange={ ( newLabel ) =>
-					setAttributes( { label: newLabel } )
-				}
+				aria-label={__('Next page link')}
+				placeholder={__('Next Page')}
+				value={label}
+				onChange={(newLabel) => setAttributes({ label: newLabel })}
 			/>
-			{ displayArrow && (
+			{displayArrow && (
 				<span
-					className={ `wp-block-query-pagination-next-arrow is-arrow-${ paginationArrow }` }
+					className={`wp-block-query-pagination-next-arrow is-arrow-${paginationArrow}`}
 				>
-					{ displayArrow }
+					{displayArrow}
 				</span>
-			) }
+			)}
 		</a>
 	);
 }

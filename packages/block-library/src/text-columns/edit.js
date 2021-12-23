@@ -17,72 +17,70 @@ import {
 } from '@wordpress/block-editor';
 import deprecated from '@wordpress/deprecated';
 
-export default function TextColumnsEdit( { attributes, setAttributes } ) {
+export default function TextColumnsEdit({ attributes, setAttributes }) {
 	const { width, content, columns } = attributes;
 
-	deprecated( 'The Text Columns block', {
+	deprecated('The Text Columns block', {
 		since: '5.3',
 		alternative: 'the Columns block',
-	} );
+	});
 
 	return (
 		<>
 			<BlockControls>
 				<BlockAlignmentToolbar
-					value={ width }
-					onChange={ ( nextWidth ) =>
-						setAttributes( { width: nextWidth } )
+					value={width}
+					onChange={(nextWidth) =>
+						setAttributes({ width: nextWidth })
 					}
-					controls={ [ 'center', 'wide', 'full' ] }
+					controls={['center', 'wide', 'full']}
 				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( value ) =>
-							setAttributes( { columns: value } )
-						}
-						min={ 2 }
-						max={ 4 }
+						label={__('Columns')}
+						value={columns}
+						onChange={(value) => setAttributes({ columns: value })}
+						min={2}
+						max={4}
 						required
 					/>
 				</PanelBody>
 			</InspectorControls>
 			<div
-				{ ...useBlockProps( {
-					className: `align${ width } columns-${ columns }`,
-				} ) }
+				{...useBlockProps({
+					className: `align${width} columns-${columns}`,
+				})}
 			>
-				{ times( columns, ( index ) => {
+				{times(columns, (index) => {
 					return (
 						<div
 							className="wp-block-column"
-							key={ `column-${ index }` }
+							key={`column-${index}`}
 						>
 							<RichText
 								tagName="p"
-								value={ get( content, [ index, 'children' ] ) }
-								onChange={ ( nextContent ) => {
-									setAttributes( {
+								value={get(content, [index, 'children'])}
+								onChange={(nextContent) => {
+									setAttributes({
 										content: [
-											...content.slice( 0, index ),
+											...content.slice(0, index),
 											{ children: nextContent },
-											...content.slice( index + 1 ),
+											...content.slice(index + 1),
 										],
-									} );
-								} }
-								aria-label={ sprintf(
+									});
+								}}
+								aria-label={sprintf(
 									// translators: %d: column index (starting with 1)
-									__( 'Column %d text' ),
+									__('Column %d text'),
 									index + 1
-								) }
-								placeholder={ __( 'New Column' ) }
+								)}
+								placeholder={__('New Column')}
 							/>
 						</div>
 					);
-				} ) }
+				})}
 			</div>
 		</>
 	);

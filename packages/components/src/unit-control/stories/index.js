@@ -28,18 +28,18 @@ const ControlWrapperView = styled.div`
 `;
 
 function Example() {
-	const [ value, setValue ] = useState( '10px' );
+	const [value, setValue] = useState('10px');
 
 	const props = {
-		disableUnits: boolean( 'disableUnits', false ),
-		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		isPressEnterToChange: boolean( 'isPressEnterToChange', true ),
-		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
-		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
-		label: text( 'label', 'Value' ),
-		min: number( 'min', 0 ),
-		max: number( 'max', 100 ),
-		shiftStep: number( 'shiftStep', 10 ),
+		disableUnits: boolean('disableUnits', false),
+		hideLabelFromVision: boolean('hideLabelFromVision', false),
+		isPressEnterToChange: boolean('isPressEnterToChange', true),
+		isShiftStepEnabled: boolean('isShiftStepEnabled', true),
+		isUnitSelectTabbable: boolean('isUnitSelectTabbable', true),
+		label: text('label', 'Value'),
+		min: number('min', 0),
+		max: number('max', 100),
+		shiftStep: number('shiftStep', 10),
 		size: select(
 			'size',
 			{
@@ -49,16 +49,16 @@ function Example() {
 			},
 			'default'
 		),
-		step: number( 'step', 1 ),
-		units: object( 'units', CSS_UNITS ),
+		step: number('step', 1),
+		units: object('units', CSS_UNITS),
 	};
 
 	return (
 		<ControlWrapperView>
 			<UnitControl
-				{ ...props }
-				value={ value }
-				onChange={ ( v ) => setValue( v ) }
+				{...props}
+				value={value}
+				onChange={(v) => setValue(v)}
 			/>
 		</ControlWrapperView>
 	);
@@ -68,30 +68,30 @@ export const _default = () => {
 	return <Example />;
 };
 
-export const WithSingleUnit = ( props ) => {
-	const [ value, setValue ] = useState( '10px' );
+export const WithSingleUnit = (props) => {
+	const [value, setValue] = useState('10px');
 	return (
 		<ControlWrapperView>
 			<UnitControl
-				{ ...props }
-				value={ value }
-				onChange={ ( v ) => setValue( v ) }
+				{...props}
+				value={value}
+				onChange={(v) => setValue(v)}
 			/>
 		</ControlWrapperView>
 	);
 };
 WithSingleUnit.args = {
 	label: 'Value',
-	units: CSS_UNITS.slice( 0, 1 ),
+	units: CSS_UNITS.slice(0, 1),
 };
 
 export function WithCustomUnits() {
-	const [ value, setValue ] = useState( '10km' );
+	const [value, setValue] = useState('10km');
 
 	const props = {
-		isResetValueOnUnitChange: boolean( 'isResetValueOnUnitChange', true ),
-		label: text( 'label', 'Distance' ),
-		units: object( 'units', [
+		isResetValueOnUnitChange: boolean('isResetValueOnUnitChange', true),
+		label: text('label', 'Distance'),
+		units: object('units', [
 			{
 				value: 'km',
 				label: 'km',
@@ -112,15 +112,15 @@ export function WithCustomUnits() {
 				label: 'yd',
 				default: 1760,
 			},
-		] ),
+		]),
 	};
 
 	return (
 		<ControlWrapperView>
 			<UnitControl
-				{ ...props }
-				value={ value }
-				onChange={ ( v ) => setValue( v ) }
+				{...props}
+				value={value}
+				onChange={(v) => setValue(v)}
 			/>
 		</ControlWrapperView>
 	);

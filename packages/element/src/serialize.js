@@ -54,24 +54,24 @@ import RawHTML from './raw-html';
 
 /** @typedef {import('./react').WPElement} WPElement */
 
-const { Provider, Consumer } = createContext( undefined );
-const ForwardRef = forwardRef( () => {
+const { Provider, Consumer } = createContext(undefined);
+const ForwardRef = forwardRef(() => {
 	return null;
-} );
+});
 
 /**
  * Valid attribute types.
  *
  * @type {Set<string>}
  */
-const ATTRIBUTES_TYPES = new Set( [ 'string', 'boolean', 'number' ] );
+const ATTRIBUTES_TYPES = new Set(['string', 'boolean', 'number']);
 
 /**
  * Element tags which can be self-closing.
  *
  * @type {Set<string>}
  */
-const SELF_CLOSING_TAGS = new Set( [
+const SELF_CLOSING_TAGS = new Set([
 	'area',
 	'base',
 	'br',
@@ -88,7 +88,7 @@ const SELF_CLOSING_TAGS = new Set( [
 	'source',
 	'track',
 	'wbr',
-] );
+]);
 
 /**
  * Boolean attributes are attributes whose presence as being assigned is
@@ -105,7 +105,7 @@ const SELF_CLOSING_TAGS = new Set( [
  *
  * @type {Set<string>}
  */
-const BOOLEAN_ATTRIBUTES = new Set( [
+const BOOLEAN_ATTRIBUTES = new Set([
 	'allowfullscreen',
 	'allowpaymentrequest',
 	'allowusermedia',
@@ -134,7 +134,7 @@ const BOOLEAN_ATTRIBUTES = new Set( [
 	'reversed',
 	'selected',
 	'typemustmatch',
-] );
+]);
 
 /**
  * Enumerated attributes are attributes which must be of a specific value form.
@@ -156,7 +156,7 @@ const BOOLEAN_ATTRIBUTES = new Set( [
  *
  * @type {Set<string>}
  */
-const ENUMERATED_ATTRIBUTES = new Set( [
+const ENUMERATED_ATTRIBUTES = new Set([
 	'autocapitalize',
 	'autocomplete',
 	'charset',
@@ -179,7 +179,7 @@ const ENUMERATED_ATTRIBUTES = new Set( [
 	'translate',
 	'type',
 	'wrap',
-] );
+]);
 
 /**
  * Set of CSS style properties which support assignment of unitless numbers.
@@ -199,7 +199,7 @@ const ENUMERATED_ATTRIBUTES = new Set( [
  *
  * @type {Set<string>}
  */
-const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
+const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set([
 	'animation',
 	'animationIterationCount',
 	'baselineShift',
@@ -238,7 +238,7 @@ const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
 	'y',
 	'zIndex',
 	'zoom',
-] );
+]);
 
 /**
  * Returns true if the specified string is prefixed by one of an array of
@@ -249,8 +249,8 @@ const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
  *
  * @return {boolean} Whether string has prefix.
  */
-export function hasPrefix( string, prefixes ) {
-	return prefixes.some( ( prefix ) => string.indexOf( prefix ) === 0 );
+export function hasPrefix(string, prefixes) {
+	return prefixes.some((prefix) => string.indexOf(prefix) === 0);
 }
 
 /**
@@ -261,7 +261,7 @@ export function hasPrefix( string, prefixes ) {
  *
  * @return {boolean} Whether attribute should be ignored.
  */
-function isInternalAttribute( attribute ) {
+function isInternalAttribute(attribute) {
 	return 'key' === attribute || 'children' === attribute;
 }
 
@@ -273,10 +273,10 @@ function isInternalAttribute( attribute ) {
  *
  * @return {*} Normalized attribute value.
  */
-function getNormalAttributeValue( attribute, value ) {
-	switch ( attribute ) {
+function getNormalAttributeValue(attribute, value) {
+	switch (attribute) {
 		case 'style':
-			return renderStyle( value );
+			return renderStyle(value);
 	}
 
 	return value;
@@ -289,8 +289,8 @@ function getNormalAttributeValue( attribute, value ) {
  *
  * @return {string} Normalized attribute name.
  */
-function getNormalAttributeName( attribute ) {
-	switch ( attribute ) {
+function getNormalAttributeName(attribute) {
+	switch (attribute) {
 		case 'htmlFor':
 			return 'for';
 
@@ -312,16 +312,16 @@ function getNormalAttributeName( attribute ) {
  *
  * @return {string} Normalized property name.
  */
-function getNormalStylePropertyName( property ) {
-	if ( startsWith( property, '--' ) ) {
+function getNormalStylePropertyName(property) {
+	if (startsWith(property, '--')) {
 		return property;
 	}
 
-	if ( hasPrefix( property, [ 'ms', 'O', 'Moz', 'Webkit' ] ) ) {
-		return '-' + kebabCase( property );
+	if (hasPrefix(property, ['ms', 'O', 'Moz', 'Webkit'])) {
+		return '-' + kebabCase(property);
 	}
 
-	return kebabCase( property );
+	return kebabCase(property);
 }
 
 /**
@@ -333,11 +333,11 @@ function getNormalStylePropertyName( property ) {
  *
  * @return {*} Normalized property value.
  */
-function getNormalStylePropertyValue( property, value ) {
+function getNormalStylePropertyValue(property, value) {
 	if (
 		typeof value === 'number' &&
 		0 !== value &&
-		! CSS_PROPERTIES_SUPPORTS_UNITLESS.has( property )
+		!CSS_PROPERTIES_SUPPORTS_UNITLESS.has(property)
 	) {
 		return value + 'px';
 	}
@@ -354,38 +354,35 @@ function getNormalStylePropertyValue( property, value ) {
  *
  * @return {string} Serialized element.
  */
-export function renderElement( element, context, legacyContext = {} ) {
-	if ( null === element || undefined === element || false === element ) {
+export function renderElement(element, context, legacyContext = {}) {
+	if (null === element || undefined === element || false === element) {
 		return '';
 	}
 
-	if ( Array.isArray( element ) ) {
-		return renderChildren( element, context, legacyContext );
+	if (Array.isArray(element)) {
+		return renderChildren(element, context, legacyContext);
 	}
 
-	switch ( typeof element ) {
+	switch (typeof element) {
 		case 'string':
-			return escapeHTML( element );
+			return escapeHTML(element);
 
 		case 'number':
 			return element.toString();
 	}
 
-	const {
-		type,
-		props,
-	} = /** @type {{type?: any, props?: any}} */ ( element );
+	const { type, props } = /** @type {{type?: any, props?: any}} */ (element);
 
-	switch ( type ) {
+	switch (type) {
 		case StrictMode:
 		case Fragment:
-			return renderChildren( props.children, context, legacyContext );
+			return renderChildren(props.children, context, legacyContext);
 
 		case RawHTML:
 			const { children, ...wrapperProps } = props;
 
 			return renderNativeComponent(
-				isEmpty( wrapperProps ) ? null : 'div',
+				isEmpty(wrapperProps) ? null : 'div',
 				{
 					...wrapperProps,
 					dangerouslySetInnerHTML: { __html: children },
@@ -395,42 +392,35 @@ export function renderElement( element, context, legacyContext = {} ) {
 			);
 	}
 
-	switch ( typeof type ) {
+	switch (typeof type) {
 		case 'string':
-			return renderNativeComponent( type, props, context, legacyContext );
+			return renderNativeComponent(type, props, context, legacyContext);
 
 		case 'function':
-			if (
-				type.prototype &&
-				typeof type.prototype.render === 'function'
-			) {
-				return renderComponent( type, props, context, legacyContext );
+			if (type.prototype && typeof type.prototype.render === 'function') {
+				return renderComponent(type, props, context, legacyContext);
 			}
 
 			return renderElement(
-				type( props, legacyContext ),
+				type(props, legacyContext),
 				context,
 				legacyContext
 			);
 	}
 
-	switch ( type && type.$$typeof ) {
+	switch (type && type.$$typeof) {
 		case Provider.$$typeof:
-			return renderChildren( props.children, props.value, legacyContext );
+			return renderChildren(props.children, props.value, legacyContext);
 
 		case Consumer.$$typeof:
 			return renderElement(
-				props.children( context || type._currentValue ),
+				props.children(context || type._currentValue),
 				context,
 				legacyContext
 			);
 
 		case ForwardRef.$$typeof:
-			return renderElement(
-				type.render( props ),
-				context,
-				legacyContext
-			);
+			return renderElement(type.render(props), context, legacyContext);
 	}
 
 	return '';
@@ -454,29 +444,29 @@ export function renderNativeComponent(
 	legacyContext = {}
 ) {
 	let content = '';
-	if ( type === 'textarea' && props.hasOwnProperty( 'value' ) ) {
+	if (type === 'textarea' && props.hasOwnProperty('value')) {
 		// Textarea children can be assigned as value prop. If it is, render in
 		// place of children. Ensure to omit so it is not assigned as attribute
 		// as well.
-		content = renderChildren( props.value, context, legacyContext );
-		props = omit( props, 'value' );
+		content = renderChildren(props.value, context, legacyContext);
+		props = omit(props, 'value');
 	} else if (
 		props.dangerouslySetInnerHTML &&
 		typeof props.dangerouslySetInnerHTML.__html === 'string'
 	) {
 		// Dangerous content is left unescaped.
 		content = props.dangerouslySetInnerHTML.__html;
-	} else if ( typeof props.children !== 'undefined' ) {
-		content = renderChildren( props.children, context, legacyContext );
+	} else if (typeof props.children !== 'undefined') {
+		content = renderChildren(props.children, context, legacyContext);
 	}
 
-	if ( ! type ) {
+	if (!type) {
 		return content;
 	}
 
-	const attributes = renderAttributes( props );
+	const attributes = renderAttributes(props);
 
-	if ( SELF_CLOSING_TAGS.has( type ) ) {
+	if (SELF_CLOSING_TAGS.has(type)) {
 		return '<' + type + attributes + '/>';
 	}
 
@@ -495,16 +485,10 @@ export function renderNativeComponent(
  *
  * @return {string} Serialized element
  */
-export function renderComponent(
-	Component,
-	props,
-	context,
-	legacyContext = {}
-) {
-	const instance = new /** @type {import('react').ComponentClass} */ ( Component )(
-		props,
-		legacyContext
-	);
+export function renderComponent(Component, props, context, legacyContext = {}) {
+	const instance = new /** @type {import('react').ComponentClass} */ (
+		Component
+	)(props, legacyContext);
 
 	if (
 		typeof (
@@ -515,11 +499,13 @@ export function renderComponent(
 	) {
 		Object.assign(
 			legacyContext,
-			/** @type {{getChildContext?: () => unknown}} */ ( instance ).getChildContext()
+			/** @type {{getChildContext?: () => unknown}} */ (
+				instance
+			).getChildContext()
 		);
 	}
 
-	const html = renderElement( instance.render(), context, legacyContext );
+	const html = renderElement(instance.render(), context, legacyContext);
 
 	return html;
 }
@@ -533,15 +519,15 @@ export function renderComponent(
  *
  * @return {string} Serialized children.
  */
-function renderChildren( children, context, legacyContext = {} ) {
+function renderChildren(children, context, legacyContext = {}) {
 	let result = '';
 
-	children = castArray( children );
+	children = castArray(children);
 
-	for ( let i = 0; i < children.length; i++ ) {
-		const child = children[ i ];
+	for (let i = 0; i < children.length; i++) {
+		const child = children[i];
 
-		result += renderElement( child, context, legacyContext );
+		result += renderElement(child, context, legacyContext);
 	}
 
 	return result;
@@ -554,41 +540,41 @@ function renderChildren( children, context, legacyContext = {} ) {
  *
  * @return {string} Attributes string.
  */
-export function renderAttributes( props ) {
+export function renderAttributes(props) {
 	let result = '';
 
-	for ( const key in props ) {
-		const attribute = getNormalAttributeName( key );
-		if ( ! isValidAttributeName( attribute ) ) {
+	for (const key in props) {
+		const attribute = getNormalAttributeName(key);
+		if (!isValidAttributeName(attribute)) {
 			continue;
 		}
 
-		let value = getNormalAttributeValue( key, props[ key ] );
+		let value = getNormalAttributeValue(key, props[key]);
 
 		// If value is not of serializeable type, skip.
-		if ( ! ATTRIBUTES_TYPES.has( typeof value ) ) {
+		if (!ATTRIBUTES_TYPES.has(typeof value)) {
 			continue;
 		}
 
 		// Don't render internal attribute names.
-		if ( isInternalAttribute( key ) ) {
+		if (isInternalAttribute(key)) {
 			continue;
 		}
 
-		const isBooleanAttribute = BOOLEAN_ATTRIBUTES.has( attribute );
+		const isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attribute);
 
 		// Boolean attribute should be omitted outright if its value is false.
-		if ( isBooleanAttribute && value === false ) {
+		if (isBooleanAttribute && value === false) {
 			continue;
 		}
 
 		const isMeaningfulAttribute =
 			isBooleanAttribute ||
-			hasPrefix( key, [ 'data-', 'aria-' ] ) ||
-			ENUMERATED_ATTRIBUTES.has( attribute );
+			hasPrefix(key, ['data-', 'aria-']) ||
+			ENUMERATED_ATTRIBUTES.has(attribute);
 
 		// Only write boolean value as attribute if meaningful.
-		if ( typeof value === 'boolean' && ! isMeaningfulAttribute ) {
+		if (typeof value === 'boolean' && !isMeaningfulAttribute) {
 			continue;
 		}
 
@@ -596,12 +582,12 @@ export function renderAttributes( props ) {
 
 		// Boolean attributes should write attribute name, but without value.
 		// Mere presence of attribute name is effective truthiness.
-		if ( isBooleanAttribute ) {
+		if (isBooleanAttribute) {
 			continue;
 		}
 
-		if ( typeof value === 'string' ) {
-			value = escapeAttribute( value );
+		if (typeof value === 'string') {
+			value = escapeAttribute(value);
 		}
 
 		result += '="' + value + '"';
@@ -617,28 +603,28 @@ export function renderAttributes( props ) {
  *
  * @return {string} Style attribute value.
  */
-export function renderStyle( style ) {
+export function renderStyle(style) {
 	// Only generate from object, e.g. tolerate string value.
-	if ( ! isPlainObject( style ) ) {
+	if (!isPlainObject(style)) {
 		return style;
 	}
 
 	let result;
 
-	for ( const property in style ) {
-		const value = style[ property ];
-		if ( null === value || undefined === value ) {
+	for (const property in style) {
+		const value = style[property];
+		if (null === value || undefined === value) {
 			continue;
 		}
 
-		if ( result ) {
+		if (result) {
 			result += ';';
 		} else {
 			result = '';
 		}
 
-		const normalName = getNormalStylePropertyName( property );
-		const normalValue = getNormalStylePropertyValue( property, value );
+		const normalName = getNormalStylePropertyName(property);
+		const normalValue = getNormalStylePropertyValue(property, value);
 		result += normalName + ':' + normalValue;
 	}
 

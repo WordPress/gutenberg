@@ -21,10 +21,10 @@ import { useCx } from '../utils/hooks/use-cx';
  * @param {number} value
  * @return {string} The box shadow value.
  */
-export function getBoxShadow( value ) {
-	const boxShadowColor = `rgba(0 ,0, 0, ${ value / 20 })`;
-	const boxShadow = `0 ${ value }px ${ value * 2 }px 0
-	${ boxShadowColor }`;
+export function getBoxShadow(value) {
+	const boxShadowColor = `rgba(0 ,0, 0, ${value / 20})`;
+	const boxShadow = `0 ${value}px ${value * 2}px 0
+	${boxShadowColor}`;
 
 	return boxShadow;
 }
@@ -32,7 +32,7 @@ export function getBoxShadow( value ) {
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
-export function useElevation( props ) {
+export function useElevation(props) {
 	const {
 		active,
 		borderRadius = 'inherit',
@@ -43,22 +43,22 @@ export function useElevation( props ) {
 		offset = 0,
 		value = 0,
 		...otherProps
-	} = useContextSystem( props, 'Elevation' );
+	} = useContextSystem(props, 'Elevation');
 
 	const cx = useCx();
 
-	const classes = useMemo( () => {
+	const classes = useMemo(() => {
 		/** @type {number | undefined} */
-		let hoverValue = ! isNil( hover ) ? hover : value * 2;
+		let hoverValue = !isNil(hover) ? hover : value * 2;
 		/** @type {number | undefined} */
-		let activeValue = ! isNil( active ) ? active : value / 2;
+		let activeValue = !isNil(active) ? active : value / 2;
 
-		if ( ! isInteractive ) {
-			hoverValue = ! isNil( hover ) ? hover : undefined;
-			activeValue = ! isNil( active ) ? active : undefined;
+		if (!isInteractive) {
+			hoverValue = !isNil(hover) ? hover : undefined;
+			activeValue = !isNil(active) ? active : undefined;
 		}
 
-		const transition = `box-shadow ${ CONFIG.transitionDuration } ${ CONFIG.transitionTimingFunction }`;
+		const transition = `box-shadow ${CONFIG.transitionDuration} ${CONFIG.transitionTimingFunction}`;
 
 		const sx = {};
 
@@ -66,36 +66,36 @@ export function useElevation( props ) {
 			{
 				borderRadius,
 				bottom: offset,
-				boxShadow: getBoxShadow( value ),
+				boxShadow: getBoxShadow(value),
 				opacity: CONFIG.elevationIntensity,
 				left: offset,
 				right: offset,
 				top: offset,
 				transition,
 			},
-			reduceMotion( 'transition' )
+			reduceMotion('transition')
 		);
 
-		if ( ! isNil( hoverValue ) ) {
+		if (!isNil(hoverValue)) {
 			sx.hover = css`
 				*:hover > & {
-					box-shadow: ${ getBoxShadow( hoverValue ) };
+					box-shadow: ${getBoxShadow(hoverValue)};
 				}
 			`;
 		}
 
-		if ( ! isNil( activeValue ) ) {
+		if (!isNil(activeValue)) {
 			sx.active = css`
 				*:active > & {
-					box-shadow: ${ getBoxShadow( activeValue ) };
+					box-shadow: ${getBoxShadow(activeValue)};
 				}
 			`;
 		}
 
-		if ( ! isNil( focus ) ) {
+		if (!isNil(focus)) {
 			sx.focus = css`
 				*:focus > & {
-					box-shadow: ${ getBoxShadow( focus ) };
+					box-shadow: ${getBoxShadow(focus)};
 				}
 			`;
 		}
@@ -117,7 +117,7 @@ export function useElevation( props ) {
 		isInteractive,
 		offset,
 		value,
-	] );
+	]);
 
 	return { ...otherProps, className: classes, 'aria-hidden': true };
 }

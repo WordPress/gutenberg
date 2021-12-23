@@ -13,20 +13,20 @@ import { memo } from '@wordpress/element';
 import SwitchCell from '../mobile/bottom-sheet/switch-cell';
 
 const ToggleControl = memo(
-	( { label, checked, help, instanceId, className, onChange, ...props } ) => {
-		const id = `inspector-toggle-control-${ instanceId }`;
+	({ label, checked, help, instanceId, className, onChange, ...props }) => {
+		const id = `inspector-toggle-control-${instanceId}`;
 
-		const helpLabel = help && isFunction( help ) ? help( checked ) : help;
+		const helpLabel = help && isFunction(help) ? help(checked) : help;
 
 		return (
 			<SwitchCell
-				label={ label }
-				id={ id }
-				help={ helpLabel }
-				className={ className }
-				value={ checked }
-				onValueChange={ onChange }
-				{ ...props }
+				label={label}
+				id={id}
+				help={helpLabel}
+				className={className}
+				value={checked}
+				onValueChange={onChange}
+				{...props}
 			/>
 		);
 	}

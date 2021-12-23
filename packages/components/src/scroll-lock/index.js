@@ -15,20 +15,20 @@ let previousScrollTop = 0;
 /**
  * @param {boolean} locked
  */
-function setLocked( locked ) {
+function setLocked(locked) {
 	const scrollingElement = document.scrollingElement || document.body;
 
-	if ( locked ) {
+	if (locked) {
 		previousScrollTop = scrollingElement.scrollTop;
 	}
 
 	const methodName = locked ? 'add' : 'remove';
-	scrollingElement.classList[ methodName ]( 'lockscroll' );
+	scrollingElement.classList[methodName]('lockscroll');
 
 	// Adding the class to the document element seems to be necessary in iOS.
-	document.documentElement.classList[ methodName ]( 'lockscroll' );
+	document.documentElement.classList[methodName]('lockscroll');
 
-	if ( ! locked ) {
+	if (!locked) {
 		scrollingElement.scrollTop = previousScrollTop;
 	}
 }
@@ -41,21 +41,21 @@ let lockCounter = 0;
  * @return {null} Render nothing.
  */
 export default function ScrollLock() {
-	useEffect( () => {
-		if ( lockCounter === 0 ) {
-			setLocked( true );
+	useEffect(() => {
+		if (lockCounter === 0) {
+			setLocked(true);
 		}
 
 		++lockCounter;
 
 		return () => {
-			if ( lockCounter === 1 ) {
-				setLocked( false );
+			if (lockCounter === 1) {
+				setLocked(false);
 			}
 
 			--lockCounter;
 		};
-	}, [] );
+	}, []);
 
 	return null;
 }

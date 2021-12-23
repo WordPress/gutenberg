@@ -40,42 +40,42 @@ export function computePopoverXAxisPosition(
 	const { width } = contentSize;
 
 	// Correct xAxis for RTL support
-	if ( xAxis === 'left' && isRTL() ) {
+	if (xAxis === 'left' && isRTL()) {
 		xAxis = 'right';
-	} else if ( xAxis === 'right' && isRTL() ) {
+	} else if (xAxis === 'right' && isRTL()) {
 		xAxis = 'left';
 	}
 
-	if ( corner === 'left' && isRTL() ) {
+	if (corner === 'left' && isRTL()) {
 		corner = 'right';
-	} else if ( corner === 'right' && isRTL() ) {
+	} else if (corner === 'right' && isRTL()) {
 		corner = 'left';
 	}
 
 	// x axis alignment choices
-	const anchorMidPoint = Math.round( anchorRect.left + anchorRect.width / 2 );
+	const anchorMidPoint = Math.round(anchorRect.left + anchorRect.width / 2);
 	const centerAlignment = {
 		popoverLeft: anchorMidPoint,
 		contentWidth:
-			( anchorMidPoint - width / 2 > 0 ? width / 2 : anchorMidPoint ) +
-			( anchorMidPoint + width / 2 > window.innerWidth
+			(anchorMidPoint - width / 2 > 0 ? width / 2 : anchorMidPoint) +
+			(anchorMidPoint + width / 2 > window.innerWidth
 				? window.innerWidth - anchorMidPoint
-				: width / 2 ),
+				: width / 2),
 	};
 
 	let leftAlignmentX = anchorRect.left;
 
-	if ( corner === 'right' ) {
+	if (corner === 'right') {
 		leftAlignmentX = anchorRect.right;
-	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
+	} else if (chosenYAxis !== 'middle' && !forceXAlignment) {
 		leftAlignmentX = anchorMidPoint;
 	}
 
 	let rightAlignmentX = anchorRect.right;
 
-	if ( corner === 'left' ) {
+	if (corner === 'left') {
 		rightAlignmentX = anchorRect.left;
-	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
+	} else if (chosenYAxis !== 'middle' && !forceXAlignment) {
 		rightAlignmentX = anchorMidPoint;
 	}
 
@@ -95,15 +95,12 @@ export function computePopoverXAxisPosition(
 	let chosenXAxis = xAxis;
 	let contentWidth = null;
 
-	if ( ! stickyBoundaryElement && ! forcePosition ) {
-		if ( xAxis === 'center' && centerAlignment.contentWidth === width ) {
+	if (!stickyBoundaryElement && !forcePosition) {
+		if (xAxis === 'center' && centerAlignment.contentWidth === width) {
 			chosenXAxis = 'center';
-		} else if ( xAxis === 'left' && leftAlignment.contentWidth === width ) {
+		} else if (xAxis === 'left' && leftAlignment.contentWidth === width) {
 			chosenXAxis = 'left';
-		} else if (
-			xAxis === 'right' &&
-			rightAlignment.contentWidth === width
-		) {
+		} else if (xAxis === 'right' && rightAlignment.contentWidth === width) {
 			chosenXAxis = 'right';
 		} else {
 			chosenXAxis =
@@ -116,13 +113,13 @@ export function computePopoverXAxisPosition(
 					: rightAlignment.contentWidth;
 
 			// Limit width of the content to the viewport width
-			if ( width > window.innerWidth ) {
+			if (width > window.innerWidth) {
 				contentWidth = window.innerWidth;
 			}
 
 			// If we can't find any alignment options that could fit
 			// our content, then let's fallback to the center of the viewport.
-			if ( chosenWidth !== width ) {
+			if (chosenWidth !== width) {
 				chosenXAxis = 'center';
 				centerAlignment.popoverLeft = window.innerWidth / 2;
 			}
@@ -130,15 +127,15 @@ export function computePopoverXAxisPosition(
 	}
 
 	let popoverLeft;
-	if ( chosenXAxis === 'center' ) {
+	if (chosenXAxis === 'center') {
 		popoverLeft = centerAlignment.popoverLeft;
-	} else if ( chosenXAxis === 'left' ) {
+	} else if (chosenXAxis === 'left') {
 		popoverLeft = leftAlignment.popoverLeft;
 	} else {
 		popoverLeft = rightAlignment.popoverLeft;
 	}
 
-	if ( boundaryElement ) {
+	if (boundaryElement) {
 		popoverLeft = Math.min(
 			popoverLeft,
 			boundaryElement.offsetLeft + boundaryElement.offsetWidth - width
@@ -146,8 +143,8 @@ export function computePopoverXAxisPosition(
 
 		// Avoid the popover being position beyond the left boundary if the
 		// direction is left to right.
-		if ( ! isRTL() ) {
-			popoverLeft = Math.max( popoverLeft, 0 );
+		if (!isRTL()) {
+			popoverLeft = Math.max(popoverLeft, 0);
 		}
 	}
 
@@ -188,14 +185,14 @@ export function computePopoverYAxisPosition(
 ) {
 	const { height } = contentSize;
 
-	if ( stickyBoundaryElement ) {
+	if (stickyBoundaryElement) {
 		const stickyRect = stickyBoundaryElement.getBoundingClientRect();
 		const stickyPositionTop = stickyRect.top + height - relativeOffsetTop;
 		const stickyPositionBottom =
 			stickyRect.bottom - height - relativeOffsetTop;
 
-		if ( anchorRect.top <= stickyPositionTop ) {
-			if ( editorWrapper ) {
+		if (anchorRect.top <= stickyPositionTop) {
+			if (editorWrapper) {
 				// If a popover cannot be positioned above the anchor, even after scrolling, we must
 				// ensure we use the bottom position instead of the popover slot.  This prevents the
 				// popover from always restricting block content and interaction while selected if the
@@ -204,7 +201,7 @@ export function computePopoverYAxisPosition(
 				const isRoomAboveInCanvas =
 					height + HEIGHT_OFFSET <
 					editorWrapper.scrollTop + anchorRect.top;
-				if ( ! isRoomAboveInCanvas ) {
+				if (!isRoomAboveInCanvas) {
 					return {
 						yAxis: 'bottom',
 						// If the bottom of the block is also below the bottom sticky position (ex -
@@ -223,7 +220,7 @@ export function computePopoverYAxisPosition(
 			// Default sticky behavior.
 			return {
 				yAxis,
-				popoverTop: Math.min( anchorRect.bottom, stickyPositionTop ),
+				popoverTop: Math.min(anchorRect.bottom, stickyPositionTop),
 			};
 		}
 	}
@@ -231,19 +228,19 @@ export function computePopoverYAxisPosition(
 	// y axis alignment choices
 	let anchorMidPoint = anchorRect.top + anchorRect.height / 2;
 
-	if ( corner === 'bottom' ) {
+	if (corner === 'bottom') {
 		anchorMidPoint = anchorRect.bottom;
-	} else if ( corner === 'top' ) {
+	} else if (corner === 'top') {
 		anchorMidPoint = anchorRect.top;
 	}
 
 	const middleAlignment = {
 		popoverTop: anchorMidPoint,
 		contentHeight:
-			( anchorMidPoint - height / 2 > 0 ? height / 2 : anchorMidPoint ) +
-			( anchorMidPoint + height / 2 > window.innerHeight
+			(anchorMidPoint - height / 2 > 0 ? height / 2 : anchorMidPoint) +
+			(anchorMidPoint + height / 2 > window.innerHeight
 				? window.innerHeight - anchorMidPoint
-				: height / 2 ),
+				: height / 2),
 	};
 
 	const topAlignment = {
@@ -265,10 +262,10 @@ export function computePopoverYAxisPosition(
 	let chosenYAxis = yAxis;
 	let contentHeight = null;
 
-	if ( ! stickyBoundaryElement && ! forcePosition ) {
-		if ( yAxis === 'middle' && middleAlignment.contentHeight === height ) {
+	if (!stickyBoundaryElement && !forcePosition) {
+		if (yAxis === 'middle' && middleAlignment.contentHeight === height) {
 			chosenYAxis = 'middle';
-		} else if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
+		} else if (yAxis === 'top' && topAlignment.contentHeight === height) {
 			chosenYAxis = 'top';
 		} else if (
 			yAxis === 'bottom' &&
@@ -289,9 +286,9 @@ export function computePopoverYAxisPosition(
 	}
 
 	let popoverTop;
-	if ( chosenYAxis === 'middle' ) {
+	if (chosenYAxis === 'middle') {
 		popoverTop = middleAlignment.popoverTop;
-	} else if ( chosenYAxis === 'top' ) {
+	} else if (chosenYAxis === 'top') {
 		popoverTop = topAlignment.popoverTop;
 	} else {
 		popoverTop = bottomAlignment.popoverTop;
@@ -335,7 +332,7 @@ export function computePopoverPosition(
 	forceXAlignment,
 	editorWrapper
 ) {
-	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
+	const [yAxis, xAxis = 'center', corner] = position.split(' ');
 
 	const yAxisPosition = computePopoverYAxisPosition(
 		anchorRect,
@@ -378,11 +375,11 @@ export function computePopoverPosition(
  *
  * @return {DOMRect} offsetted bounds
  */
-export function offsetIframe( rect, ownerDocument, container ) {
+export function offsetIframe(rect, ownerDocument, container) {
 	const { defaultView } = ownerDocument;
 	const { frameElement } = defaultView;
 
-	if ( ! frameElement || ownerDocument === container.ownerDocument ) {
+	if (!frameElement || ownerDocument === container.ownerDocument) {
 		return rect;
 	}
 

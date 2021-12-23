@@ -16,15 +16,15 @@ import createRuntime from './runtime';
  *
  * @return {import('redux').Middleware} Co-routine runtime
  */
-export default function createMiddleware( controls = {} ) {
-	return ( store ) => {
-		const runtime = createRuntime( controls, store.dispatch );
-		return ( next ) => ( action ) => {
-			if ( ! isGenerator( action ) ) {
-				return next( action );
+export default function createMiddleware(controls = {}) {
+	return (store) => {
+		const runtime = createRuntime(controls, store.dispatch);
+		return (next) => (action) => {
+			if (!isGenerator(action)) {
+				return next(action);
 			}
 
-			return runtime( action );
+			return runtime(action);
 		};
 	};
 }

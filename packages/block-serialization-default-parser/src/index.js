@@ -44,9 +44,10 @@ let stack;
  * @since 3.8.0
  * @since 4.6.1 added optimization to prevent backtracking on attribute parsing
  */
-const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
+const tokenizer =
+	/<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
 
-function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
+function Block(blockName, attrs, innerBlocks, innerHTML, innerContent) {
 	return {
 		blockName,
 		attrs,
@@ -56,11 +57,11 @@ function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	};
 }
 
-function Freeform( innerHTML ) {
-	return Block( null, {}, [], innerHTML, [ innerHTML ] );
+function Freeform(innerHTML) {
+	return Block(null, {}, [], innerHTML, [innerHTML]);
 }
 
-function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
+function Frame(block, tokenStart, tokenLength, prevOffset, leadingHtmlStart) {
 	return {
 		block,
 		tokenStart,
@@ -147,7 +148,7 @@ function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
  * ```
  * @return {Array} A block-based representation of the input HTML.
  */
-export const parse = ( doc ) => {
+export const parse = (doc) => {
 	document = doc;
 	offset = 0;
 	output = [];
@@ -156,23 +157,23 @@ export const parse = ( doc ) => {
 
 	do {
 		// twiddle our thumbs
-	} while ( proceed() );
+	} while (proceed());
 
 	return output;
 };
 
 function proceed() {
 	const next = nextToken();
-	const [ tokenType, blockName, attrs, startOffset, tokenLength ] = next;
+	const [tokenType, blockName, attrs, startOffset, tokenLength] = next;
 	const stackDepth = stack.length;
 
 	// we may have some HTML soup before the next block
 	const leadingHtmlStart = startOffset > offset ? offset : null;
 
-	switch ( tokenType ) {
+	switch (tokenType) {
 		case 'no-more-tokens':
 			// if not in a block then flush output
-			if ( 0 === stackDepth ) {
+			if (0 === stackDepth) {
 				addFreeform();
 				return false;
 			}
@@ -184,7 +185,7 @@ function proceed() {
 			//  - assume an implicit closer (easiest when not nesting)
 
 			// for the easy case we'll assume an implicit closer
-			if ( 1 === stackDepth ) {
+			if (1 === stackDepth) {
 				addBlockFromStack();
 				return false;
 			}
@@ -192,7 +193,7 @@ function proceed() {
 			// for the nested case where it's more difficult we'll
 			// have to assume that multiple closers are missing
 			// and so we'll collapse the whole stack piecewise
-			while ( 0 < stack.length ) {
+			while (0 < stack.length) {
 				addBlockFromStack();
 			}
 			return false;
@@ -200,8 +201,8 @@ function proceed() {
 		case 'void-block':
 			// easy case is if we stumbled upon a void block
 			// in the top-level of the document
-			if ( 0 === stackDepth ) {
-				if ( null !== leadingHtmlStart ) {
+			if (0 === stackDepth) {
+				if (null !== leadingHtmlStart) {
 					output.push(
 						Freeform(
 							document.substr(
@@ -211,14 +212,14 @@ function proceed() {
 						)
 					);
 				}
-				output.push( Block( blockName, attrs, [], '', [] ) );
+				output.push(Block(blockName, attrs, [], '', []));
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner block
 			addInnerBlock(
-				Block( blockName, attrs, [], '', [] ),
+				Block(blockName, attrs, [], '', []),
 				startOffset,
 				tokenLength
 			);
@@ -229,7 +230,7 @@ function proceed() {
 			// track all newly-opened blocks on the stack
 			stack.push(
 				Frame(
-					Block( blockName, attrs, [], '', [] ),
+					Block(blockName, attrs, [], '', []),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -242,7 +243,7 @@ function proceed() {
 		case 'block-closer':
 			// if we're missing an opener we're in trouble
 			// This is an error
-			if ( 0 === stackDepth ) {
+			if (0 === stackDepth) {
 				// we have options
 				//  - assume an implicit opener
 				//  - assume _this_ is the opener
@@ -252,8 +253,8 @@ function proceed() {
 			}
 
 			// if we're not nesting then this is easy - close the block
-			if ( 1 === stackDepth ) {
-				addBlockFromStack( startOffset );
+			if (1 === stackDepth) {
+				addBlockFromStack(startOffset);
 				offset = startOffset + tokenLength;
 				return true;
 			}
@@ -266,7 +267,7 @@ function proceed() {
 				startOffset - stackTop.prevOffset
 			);
 			stackTop.block.innerHTML += html;
-			stackTop.block.innerContent.push( html );
+			stackTop.block.innerContent.push(html);
 			stackTop.prevOffset = startOffset + tokenLength;
 
 			addInnerBlock(
@@ -295,10 +296,10 @@ function proceed() {
  * @param {string} input JSON input string to parse
  * @return {Object|null} parsed JSON if valid
  */
-function parseJSON( input ) {
+function parseJSON(input) {
 	try {
-		return JSON.parse( input );
-	} catch ( e ) {
+		return JSON.parse(input);
+	} catch (e) {
 		return null;
 	}
 }
@@ -310,11 +311,11 @@ function nextToken() {
 	// block opener and a block closer is the leading `/` before `wp:` (and
 	// a closer has no attributes). we can trap them both and process the
 	// match back in JavaScript to see which one it was.
-	const matches = tokenizer.exec( document );
+	const matches = tokenizer.exec(document);
 
 	// we have no more tokens
-	if ( null === matches ) {
-		return [ 'no-more-tokens' ];
+	if (null === matches) {
+		return ['no-more-tokens'];
 	}
 
 	const startedAt = matches.index;
@@ -329,80 +330,77 @@ function nextToken() {
 	] = matches;
 
 	const length = match.length;
-	const isCloser = !! closerMatch;
-	const isVoid = !! voidMatch;
+	const isCloser = !!closerMatch;
+	const isVoid = !!voidMatch;
 	const namespace = namespaceMatch || 'core/';
 	const name = namespace + nameMatch;
-	const hasAttrs = !! attrsMatch;
-	const attrs = hasAttrs ? parseJSON( attrsMatch ) : {};
+	const hasAttrs = !!attrsMatch;
+	const attrs = hasAttrs ? parseJSON(attrsMatch) : {};
 
 	// This state isn't allowed
 	// This is an error
-	if ( isCloser && ( isVoid || hasAttrs ) ) {
+	if (isCloser && (isVoid || hasAttrs)) {
 		// we can ignore them since they don't hurt anything
 		// we may warn against this at some point or reject it
 	}
 
-	if ( isVoid ) {
-		return [ 'void-block', name, attrs, startedAt, length ];
+	if (isVoid) {
+		return ['void-block', name, attrs, startedAt, length];
 	}
 
-	if ( isCloser ) {
-		return [ 'block-closer', name, null, startedAt, length ];
+	if (isCloser) {
+		return ['block-closer', name, null, startedAt, length];
 	}
 
-	return [ 'block-opener', name, attrs, startedAt, length ];
+	return ['block-opener', name, attrs, startedAt, length];
 }
 
-function addFreeform( rawLength ) {
+function addFreeform(rawLength) {
 	const length = rawLength ? rawLength : document.length - offset;
 
-	if ( 0 === length ) {
+	if (0 === length) {
 		return;
 	}
 
-	output.push( Freeform( document.substr( offset, length ) ) );
+	output.push(Freeform(document.substr(offset, length)));
 }
 
-function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
-	const parent = stack[ stack.length - 1 ];
-	parent.block.innerBlocks.push( block );
+function addInnerBlock(block, tokenStart, tokenLength, lastOffset) {
+	const parent = stack[stack.length - 1];
+	parent.block.innerBlocks.push(block);
 	const html = document.substr(
 		parent.prevOffset,
 		tokenStart - parent.prevOffset
 	);
 
-	if ( html ) {
+	if (html) {
 		parent.block.innerHTML += html;
-		parent.block.innerContent.push( html );
+		parent.block.innerContent.push(html);
 	}
 
-	parent.block.innerContent.push( null );
+	parent.block.innerContent.push(null);
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
-function addBlockFromStack( endOffset ) {
+function addBlockFromStack(endOffset) {
 	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
 	const html = endOffset
-		? document.substr( prevOffset, endOffset - prevOffset )
-		: document.substr( prevOffset );
+		? document.substr(prevOffset, endOffset - prevOffset)
+		: document.substr(prevOffset);
 
-	if ( html ) {
+	if (html) {
 		block.innerHTML += html;
-		block.innerContent.push( html );
+		block.innerContent.push(html);
 	}
 
-	if ( null !== leadingHtmlStart ) {
+	if (null !== leadingHtmlStart) {
 		output.push(
 			Freeform(
-				document.substr(
-					leadingHtmlStart,
-					tokenStart - leadingHtmlStart
-				)
+				document.substr(leadingHtmlStart, tokenStart - leadingHtmlStart)
 			)
 		);
 	}
 
-	output.push( block );
+	output.push(block);
 }

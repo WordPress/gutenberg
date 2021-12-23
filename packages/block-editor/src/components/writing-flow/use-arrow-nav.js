@@ -35,11 +35,11 @@ import { store as blockEditorStore } from '../../store';
  *
  * @return {boolean} Whether element should consider edge navigation.
  */
-export function isNavigationCandidate( element, keyCode, hasModifier ) {
+export function isNavigationCandidate(element, keyCode, hasModifier) {
 	const isVertical = keyCode === UP || keyCode === DOWN;
 
 	// Currently, all elements support unmodified vertical navigation.
-	if ( isVertical && ! hasModifier ) {
+	if (isVertical && !hasModifier) {
 		return true;
 	}
 
@@ -70,37 +70,35 @@ export function getClosestTabbable(
 ) {
 	// Since the current focus target is not guaranteed to be a text field, find
 	// all focusables. Tabbability is considered later.
-	let focusableNodes = focus.focusable.find( containerElement );
+	let focusableNodes = focus.focusable.find(containerElement);
 
-	if ( isReverse ) {
-		focusableNodes = reverse( focusableNodes );
+	if (isReverse) {
+		focusableNodes = reverse(focusableNodes);
 	}
 
 	// Consider as candidates those focusables after the current target. It's
 	// assumed this can only be reached if the target is focusable (on its
 	// keydown event), so no need to verify it exists in the set.
-	focusableNodes = focusableNodes.slice(
-		focusableNodes.indexOf( target ) + 1
-	);
+	focusableNodes = focusableNodes.slice(focusableNodes.indexOf(target) + 1);
 
 	let targetRect;
 
-	if ( onlyVertical ) {
+	if (onlyVertical) {
 		targetRect = target.getBoundingClientRect();
 	}
 
-	function isTabCandidate( node ) {
+	function isTabCandidate(node) {
 		// Not a candidate if the node is not tabbable.
-		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
+		if (!focus.tabbable.isTabbableIndex(node)) {
 			return false;
 		}
 
 		// Skip focusable elements such as links within content editable nodes.
-		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
+		if (node.isContentEditable && node.contentEditable !== 'true') {
 			return false;
 		}
 
-		if ( onlyVertical ) {
+		if (onlyVertical) {
 			const nodeRect = node.getBoundingClientRect();
 
 			if (
@@ -114,7 +112,7 @@ export function getClosestTabbable(
 		return true;
 	}
 
-	return find( focusableNodes, isTabCandidate );
+	return find(focusableNodes, isTabCandidate);
 }
 
 export default function useArrowNav() {
@@ -128,9 +126,9 @@ export default function useArrowNav() {
 		getLastMultiSelectedBlockClientId,
 		getSettings,
 		hasMultiSelection,
-	} = useSelect( blockEditorStore );
-	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
-	return useRefEffect( ( node ) => {
+	} = useSelect(blockEditorStore);
+	const { multiSelect, selectBlock } = useDispatch(blockEditorStore);
+	return useRefEffect((node) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
 		// recreate browser behaviour across blocks.
@@ -140,9 +138,10 @@ export default function useArrowNav() {
 			verticalRect = null;
 		}
 
-		function expandSelection( isReverse ) {
+		function expandSelection(isReverse) {
 			const selectedBlockClientId = getSelectedBlockClientId();
-			const selectionStartClientId = getMultiSelectedBlocksStartClientId();
+			const selectionStartClientId =
+				getMultiSelectedBlocksStartClientId();
 			const selectionEndClientId = getMultiSelectedBlocksEndClientId();
 			const selectionBeforeEndClientId = getPreviousBlockClientId(
 				selectionEndClientId || selectedBlockClientId
@@ -154,9 +153,9 @@ export default function useArrowNav() {
 				? selectionBeforeEndClientId
 				: selectionAfterEndClientId;
 
-			if ( nextSelectionEndClientId ) {
-				if ( selectionStartClientId === nextSelectionEndClientId ) {
-					selectBlock( nextSelectionEndClientId );
+			if (nextSelectionEndClientId) {
+				if (selectionStartClientId === nextSelectionEndClientId) {
+					selectBlock(nextSelectionEndClientId);
 				} else {
 					multiSelect(
 						selectionStartClientId || selectedBlockClientId,
@@ -166,15 +165,15 @@ export default function useArrowNav() {
 			}
 		}
 
-		function moveSelection( isReverse ) {
+		function moveSelection(isReverse) {
 			const selectedFirstClientId = getFirstMultiSelectedBlockClientId();
 			const selectedLastClientId = getLastMultiSelectedBlockClientId();
 			const focusedBlockClientId = isReverse
 				? selectedFirstClientId
 				: selectedLastClientId;
 
-			if ( focusedBlockClientId ) {
-				selectBlock( focusedBlockClientId );
+			if (focusedBlockClientId) {
+				selectBlock(focusedBlockClientId);
 			}
 		}
 
@@ -189,18 +188,12 @@ export default function useArrowNav() {
 		 *
 		 * @return {boolean} Whether field is at edge for tab transition.
 		 */
-		function isTabbableEdge( target, isReverse ) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverse,
-				node
-			);
-			return (
-				! closestTabbable || ! isInSameBlock( target, closestTabbable )
-			);
+		function isTabbableEdge(target, isReverse) {
+			const closestTabbable = getClosestTabbable(target, isReverse, node);
+			return !closestTabbable || !isInSameBlock(target, closestTabbable);
 		}
 
-		function onKeyDown( event ) {
+		function onKeyDown(event) {
 			const { keyCode, target } = event;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
@@ -217,10 +210,10 @@ export default function useArrowNav() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			if ( hasMultiSelection() ) {
-				if ( isNav ) {
+			if (hasMultiSelection()) {
+				if (isNav) {
 					const action = isShift ? expandSelection : moveSelection;
-					action( isReverse );
+					action(isReverse);
 					event.preventDefault();
 				}
 
@@ -234,36 +227,37 @@ export default function useArrowNav() {
 			// exact same position (such as at an empty line), so it wouldn't be
 			// good to compute the position right before any vertical arrow key
 			// press.
-			if ( ! isVertical ) {
+			if (!isVertical) {
 				verticalRect = null;
-			} else if ( ! verticalRect ) {
-				verticalRect = computeCaretRect( defaultView );
+			} else if (!verticalRect) {
+				verticalRect = computeCaretRect(defaultView);
 			}
 
 			// Abort if navigation has already been handled (e.g. RichText
 			// inline boundaries).
-			if ( event.defaultPrevented ) {
+			if (event.defaultPrevented) {
 				return;
 			}
 
-			if ( ! isNav ) {
+			if (!isNav) {
 				return;
 			}
 
 			// Abort if our current target is not a candidate for navigation
 			// (e.g. preserve native input behaviors).
-			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
+			if (!isNavigationCandidate(target, keyCode, hasModifier)) {
 				return;
 			}
 
 			// In the case of RTL scripts, right means previous and left means
 			// next, which is the exact reverse of LTR.
-			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
+			const isReverseDir = isRTL(target) ? !isReverse : isReverse;
 			const { keepCaretInsideBlock } = getSettings();
 			const selectedBlockClientId = getSelectedBlockClientId();
 
-			if ( isShift ) {
-				const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+			if (isShift) {
+				const selectionEndClientId =
+					getMultiSelectedBlocksEndClientId();
 				const selectionBeforeEndClientId = getPreviousBlockClientId(
 					selectionEndClientId || selectedBlockClientId
 				);
@@ -273,20 +267,20 @@ export default function useArrowNav() {
 
 				if (
 					// Ensure that there is a target block.
-					( ( isReverse && selectionBeforeEndClientId ) ||
-						( ! isReverse && selectionAfterEndClientId ) ) &&
-					isTabbableEdge( target, isReverse ) &&
-					isNavEdge( target, isReverse )
+					((isReverse && selectionBeforeEndClientId) ||
+						(!isReverse && selectionAfterEndClientId)) &&
+					isTabbableEdge(target, isReverse) &&
+					isNavEdge(target, isReverse)
 				) {
 					// Shift key is down, and there is multi selection or we're
 					// at the end of the current block.
-					expandSelection( isReverse );
+					expandSelection(isReverse);
 					event.preventDefault();
 				}
 			} else if (
 				isVertical &&
-				isVerticalEdge( target, isReverse ) &&
-				! keepCaretInsideBlock
+				isVerticalEdge(target, isReverse) &&
+				!keepCaretInsideBlock
 			) {
 				const closestTabbable = getClosestTabbable(
 					target,
@@ -295,7 +289,7 @@ export default function useArrowNav() {
 					true
 				);
 
-				if ( closestTabbable ) {
+				if (closestTabbable) {
 					placeCaretAtVerticalEdge(
 						closestTabbable,
 						isReverse,
@@ -306,24 +300,24 @@ export default function useArrowNav() {
 			} else if (
 				isHorizontal &&
 				defaultView.getSelection().isCollapsed &&
-				isHorizontalEdge( target, isReverseDir ) &&
-				! keepCaretInsideBlock
+				isHorizontalEdge(target, isReverseDir) &&
+				!keepCaretInsideBlock
 			) {
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverseDir,
 					node
 				);
-				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+				placeCaretAtHorizontalEdge(closestTabbable, isReverse);
 				event.preventDefault();
 			}
 		}
 
-		node.addEventListener( 'mousedown', onMouseDown );
-		node.addEventListener( 'keydown', onKeyDown );
+		node.addEventListener('mousedown', onMouseDown);
+		node.addEventListener('keydown', onKeyDown);
 		return () => {
-			node.removeEventListener( 'mousedown', onMouseDown );
-			node.removeEventListener( 'keydown', onKeyDown );
+			node.removeEventListener('mousedown', onMouseDown);
+			node.removeEventListener('keydown', onKeyDown);
 		};
-	}, [] );
+	}, []);
 }

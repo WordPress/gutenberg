@@ -48,11 +48,11 @@ export type Props = PopperProps & {
 	 *
 	 * @default 360
 	 */
-	maxWidth?: CSSProperties[ 'maxWidth' ];
+	maxWidth?: CSSProperties['maxWidth'];
 	/**
 	 * Callback for when the `visible` state changes.
 	 */
-	onVisibleChange?: ( ...args: any ) => void;
+	onVisibleChange?: (...args: any) => void;
 	/**
 	 * Element that triggers the `visible` state of `Flyout` when clicked.
 	 *
@@ -63,7 +63,7 @@ export type Props = PopperProps & {
 	 * </Flyout>
 	 * ```
 	 */
-	trigger: FunctionComponentElement< any >;
+	trigger: FunctionComponentElement<any>;
 	/**
 	 * Whether `Flyout` is visible.
 	 *
@@ -80,6 +80,6 @@ export type Props = PopperProps & {
 
 export type ContentProps = {
 	elevation: number;
-	maxWidth: CSSProperties[ 'maxWidth' ];
+	maxWidth: CSSProperties['maxWidth'];
 	children: React.ReactNode;
 };

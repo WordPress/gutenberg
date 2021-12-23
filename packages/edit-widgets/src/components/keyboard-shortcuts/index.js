@@ -16,75 +16,75 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editWidgetsStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { redo, undo } = useDispatch( coreStore );
-	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
+	const { redo, undo } = useDispatch(coreStore);
+	const { saveEditedWidgetAreas } = useDispatch(editWidgetsStore);
 
-	useShortcut( 'core/edit-widgets/undo', ( event ) => {
+	useShortcut('core/edit-widgets/undo', (event) => {
 		undo();
 		event.preventDefault();
-	} );
+	});
 
-	useShortcut( 'core/edit-widgets/redo', ( event ) => {
+	useShortcut('core/edit-widgets/redo', (event) => {
 		redo();
 		event.preventDefault();
-	} );
+	});
 
-	useShortcut( 'core/edit-widgets/save', ( event ) => {
+	useShortcut('core/edit-widgets/save', (event) => {
 		event.preventDefault();
 		saveEditedWidgetAreas();
-	} );
+	});
 
 	return null;
 }
 
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	useEffect( () => {
-		registerShortcut( {
+	const { registerShortcut } = useDispatch(keyboardShortcutsStore);
+	useEffect(() => {
+		registerShortcut({
 			name: 'core/edit-widgets/undo',
 			category: 'global',
-			description: __( 'Undo your last changes.' ),
+			description: __('Undo your last changes.'),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'z',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-widgets/redo',
 			category: 'global',
-			description: __( 'Redo your last undo.' ),
+			description: __('Redo your last undo.'),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: 'z',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-widgets/save',
 			category: 'global',
-			description: __( 'Save your changes.' ),
+			description: __('Save your changes.'),
 			keyCombination: {
 				modifier: 'primary',
 				character: 's',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-widgets/keyboard-shortcuts',
 			category: 'main',
-			description: __( 'Display these keyboard shortcuts.' ),
+			description: __('Display these keyboard shortcuts.'),
 			keyCombination: {
 				modifier: 'access',
 				character: 'h',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-widgets/next-region',
 			category: 'global',
-			description: __( 'Navigate to the next part of the editor.' ),
+			description: __('Navigate to the next part of the editor.'),
 			keyCombination: {
 				modifier: 'ctrl',
 				character: '`',
@@ -95,12 +95,12 @@ function KeyboardShortcutsRegister() {
 					character: 'n',
 				},
 			],
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-widgets/previous-region',
 			category: 'global',
-			description: __( 'Navigate to the previous part of the editor.' ),
+			description: __('Navigate to the previous part of the editor.'),
 			keyCombination: {
 				modifier: 'ctrlShift',
 				character: '`',
@@ -111,8 +111,8 @@ function KeyboardShortcutsRegister() {
 					character: 'p',
 				},
 			],
-		} );
-	}, [ registerShortcut ] );
+		});
+	}, [registerShortcut]);
 
 	return null;
 }

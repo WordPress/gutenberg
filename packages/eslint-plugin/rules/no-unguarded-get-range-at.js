@@ -3,15 +3,15 @@ module.exports = {
 		type: 'problem',
 		schema: [],
 	},
-	create( context ) {
+	create(context) {
 		return {
 			'CallExpression[callee.object.callee.property.name="getSelection"][callee.property.name="getRangeAt"]'(
 				node
 			) {
-				context.report( {
+				context.report({
 					node,
 					message: 'Avoid unguarded getRangeAt',
-				} );
+				});
 			},
 		};
 	},

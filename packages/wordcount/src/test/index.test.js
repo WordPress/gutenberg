@@ -6,11 +6,11 @@ import { count } from '../';
 
 const mockData = {
 	l10n: {
-		shortcodes: [ 'shortcode' ],
+		shortcodes: ['shortcode'],
 	},
 };
 
-describe( 'WordCounter', () => {
+describe('WordCounter', () => {
 	const dataProvider = [
 		{
 			message: 'Basic test.',
@@ -111,12 +111,12 @@ describe( 'WordCounter', () => {
 		'characters_including_spaces',
 	];
 
-	dataProvider.forEach( ( item ) => {
-		types.forEach( ( type ) => {
-			const result = count( item.string, type, mockData );
-			test( item.message + ' (' + type + ')', () => {
-				expect( result ).toBe( item[ type ] );
-			} );
-		} );
-	} );
-} );
+	dataProvider.forEach((item) => {
+		types.forEach((type) => {
+			const result = count(item.string, type, mockData);
+			test(item.message + ' (' + type + ')', () => {
+				expect(result).toBe(item[type]);
+			});
+		});
+	});
+});

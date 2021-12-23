@@ -13,22 +13,22 @@ import createCache from '@emotion/cache';
  */
 import { useCx } from '..';
 
-jest.mock( '@emotion/css', () => ( {
+jest.mock('@emotion/css', () => ({
 	cx: jest.fn(),
-} ) );
+}));
 
-jest.mock( '@emotion/utils', () => ( {
+jest.mock('@emotion/utils', () => ({
 	insertStyles: jest.fn(),
-} ) );
+}));
 
-function Example( { args } ) {
+function Example({ args }) {
 	const cx = useCx();
 
-	return <div className={ cx( ...args ) } />;
+	return <div className={cx(...args)} />;
 }
 
-describe( 'useCx', () => {
-	it( 'should call cx with the built style name and pass serialized styles to insertStyles', () => {
+describe('useCx', () => {
+	it('should call cx with the built style name and pass serialized styles to insertStyles', () => {
 		const serializedStyle = css`
 			color: red;
 		`;
@@ -39,26 +39,26 @@ describe( 'useCx', () => {
 
 		const key = 'test-cache-key';
 
-		const container = document.createElement( 'head' );
+		const container = document.createElement('head');
 
-		const cache = createCache( { container, key } );
+		const cache = createCache({ container, key });
 
 		render(
-			<CacheProvider value={ cache }>
-				<Example args={ [ className, serializedStyle, object ] } />
+			<CacheProvider value={cache}>
+				<Example args={[className, serializedStyle, object]} />
 			</CacheProvider>
 		);
 
-		expect( innerCx ).toHaveBeenCalledWith(
+		expect(innerCx).toHaveBeenCalledWith(
 			className,
-			`${ key }-${ serializedStyle.name }`,
+			`${key}-${serializedStyle.name}`,
 			object
 		);
 
-		expect( insertStyles ).toHaveBeenCalledWith(
+		expect(insertStyles).toHaveBeenCalledWith(
 			cache,
 			serializedStyle,
 			false
 		);
-	} );
-} );
+	});
+});

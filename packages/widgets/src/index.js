@@ -22,7 +22,7 @@ export * from './utils';
  */
 export function registerLegacyWidgetBlock() {
 	const { metadata, settings, name } = legacyWidget;
-	registerBlockType( { name, ...metadata }, settings );
+	registerBlockType({ name, ...metadata }, settings);
 }
 
 /**
@@ -30,7 +30,7 @@ export function registerLegacyWidgetBlock() {
  */
 export function registerWidgetGroupBlock() {
 	const { metadata, settings, name } = widgetGroup;
-	registerBlockType( { name, ...metadata }, settings );
+	registerBlockType({ name, ...metadata }, settings);
 }
 
 export { default as registerLegacyWidgetVariations } from './register-legacy-widget-variations';

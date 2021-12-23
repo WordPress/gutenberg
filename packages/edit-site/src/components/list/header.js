@@ -10,24 +10,24 @@ import { __experimentalHeading as Heading } from '@wordpress/components';
  */
 import AddNewTemplate from '../add-new-template';
 
-export default function Header( { templateType } ) {
+export default function Header({ templateType }) {
 	const postType = useSelect(
-		( select ) => select( coreStore ).getPostType( templateType ),
-		[ templateType ]
+		(select) => select(coreStore).getPostType(templateType),
+		[templateType]
 	);
 
-	if ( ! postType ) {
+	if (!postType) {
 		return null;
 	}
 
 	return (
 		<header className="edit-site-list-header">
-			<Heading level={ 1 } className="edit-site-list-header__title">
-				{ postType.labels?.name }
+			<Heading level={1} className="edit-site-list-header__title">
+				{postType.labels?.name}
 			</Heading>
 
 			<div className="edit-site-list-header__right">
-				<AddNewTemplate templateType={ templateType } />
+				<AddNewTemplate templateType={templateType} />
 			</div>
 		</header>
 	);

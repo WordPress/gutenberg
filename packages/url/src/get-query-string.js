@@ -10,13 +10,13 @@
  *
  * @return {string|void} The query string part of the URL.
  */
-export function getQueryString( url ) {
+export function getQueryString(url) {
 	let query;
 	try {
-		query = new URL( url, 'http://example.com' ).search.substring( 1 );
-	} catch ( error ) {}
+		query = new URL(url, 'http://example.com').search.substring(1);
+	} catch (error) {}
 
-	if ( query ) {
+	if (query) {
 		return query;
 	}
 }

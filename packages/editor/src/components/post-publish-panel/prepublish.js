@@ -25,7 +25,7 @@ import MaybeTagsPanel from './maybe-tags-panel';
 import MaybePostFormatPanel from './maybe-post-format-panel';
 import { store as editorStore } from '../../store';
 
-function PostPublishPanelPrepublish( { children } ) {
+function PostPublishPanelPrepublish({ children }) {
 	const {
 		isBeingScheduled,
 		isRequestingSiteIcon,
@@ -33,64 +33,63 @@ function PostPublishPanelPrepublish( { children } ) {
 		siteIconUrl,
 		siteTitle,
 		siteHome,
-	} = useSelect( ( select ) => {
-		const { getCurrentPost, isEditedPostBeingScheduled } = select(
-			editorStore
-		);
-		const { getEntityRecord, isResolving } = select( coreStore );
+	} = useSelect((select) => {
+		const { getCurrentPost, isEditedPostBeingScheduled } =
+			select(editorStore);
+		const { getEntityRecord, isResolving } = select(coreStore);
 		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+			getEntityRecord('root', '__unstableBase', undefined) || {};
 
 		return {
 			hasPublishAction: get(
 				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
+				['_links', 'wp:action-publish'],
 				false
 			),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			isRequestingSiteIcon: isResolving( 'getEntityRecord', [
+			isRequestingSiteIcon: isResolving('getEntityRecord', [
 				'root',
 				'__unstableBase',
 				undefined,
-			] ),
+			]),
 			siteIconUrl: siteData.site_icon_url,
 			siteTitle: siteData.name,
-			siteHome: siteData.home && filterURLForDisplay( siteData.home ),
+			siteHome: siteData.home && filterURLForDisplay(siteData.home),
 		};
-	}, [] );
+	}, []);
 
 	let siteIcon = (
-		<Icon className="components-site-icon" size="36px" icon={ wordpress } />
+		<Icon className="components-site-icon" size="36px" icon={wordpress} />
 	);
 
-	if ( siteIconUrl ) {
+	if (siteIconUrl) {
 		siteIcon = (
 			<img
-				alt={ __( 'Site Icon' ) }
+				alt={__('Site Icon')}
 				className="components-site-icon"
-				src={ siteIconUrl }
+				src={siteIconUrl}
 			/>
 		);
 	}
 
-	if ( isRequestingSiteIcon ) {
+	if (isRequestingSiteIcon) {
 		siteIcon = null;
 	}
 
 	let prePublishTitle, prePublishBodyText;
 
-	if ( ! hasPublishAction ) {
-		prePublishTitle = __( 'Are you ready to submit for review?' );
+	if (!hasPublishAction) {
+		prePublishTitle = __('Are you ready to submit for review?');
 		prePublishBodyText = __(
 			'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.'
 		);
-	} else if ( isBeingScheduled ) {
-		prePublishTitle = __( 'Are you ready to schedule?' );
+	} else if (isBeingScheduled) {
+		prePublishTitle = __('Are you ready to schedule?');
 		prePublishBodyText = __(
 			'Your work will be published at the specified date and time.'
 		);
 	} else {
-		prePublishTitle = __( 'Are you ready to publish?' );
+		prePublishTitle = __('Are you ready to publish?');
 		prePublishBodyText = __(
 			'Double-check your settings before publishing.'
 		);
@@ -99,53 +98,53 @@ function PostPublishPanelPrepublish( { children } ) {
 	return (
 		<div className="editor-post-publish-panel__prepublish">
 			<div>
-				<strong>{ prePublishTitle }</strong>
+				<strong>{prePublishTitle}</strong>
 			</div>
-			<p>{ prePublishBodyText }</p>
+			<p>{prePublishBodyText}</p>
 			<div className="components-site-card">
-				{ siteIcon }
+				{siteIcon}
 				<div className="components-site-info">
 					<span className="components-site-name">
-						{ decodeEntities( siteTitle ) || __( '(Untitled)' ) }
+						{decodeEntities(siteTitle) || __('(Untitled)')}
 					</span>
-					<span className="components-site-home">{ siteHome }</span>
+					<span className="components-site-home">{siteHome}</span>
 				</div>
 			</div>
-			{ hasPublishAction && (
+			{hasPublishAction && (
 				<>
 					<PanelBody
-						initialOpen={ false }
-						title={ [
-							__( 'Visibility:' ),
+						initialOpen={false}
+						title={[
+							__('Visibility:'),
 							<span
 								className="editor-post-publish-panel__link"
 								key="label"
 							>
 								<PostVisibilityLabel />
 							</span>,
-						] }
+						]}
 					>
 						<PostVisibility />
 					</PanelBody>
 					<PanelBody
-						initialOpen={ false }
-						title={ [
-							__( 'Publish:' ),
+						initialOpen={false}
+						title={[
+							__('Publish:'),
 							<span
 								className="editor-post-publish-panel__link"
 								key="label"
 							>
 								<PostScheduleLabel />
 							</span>,
-						] }
+						]}
 					>
 						<PostSchedule />
 					</PanelBody>
 				</>
-			) }
+			)}
 			<MaybePostFormatPanel />
 			<MaybeTagsPanel />
-			{ children }
+			{children}
 		</div>
 	);
 }

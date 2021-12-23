@@ -17,18 +17,18 @@ const rootSize = () => {
 	const padding = 1.5;
 	const size = 24;
 
-	return css( {
-		gridTemplateRows: `repeat( 3, calc( ${ size - padding * 2 }px / 3))`,
+	return css({
+		gridTemplateRows: `repeat( 3, calc( ${size - padding * 2}px / 3))`,
 		padding,
 		maxHeight: size,
 		maxWidth: size,
-	} );
+	});
 };
 
-const rootPointerEvents = ( { disablePointerEvents } ) => {
-	return css( {
+const rootPointerEvents = ({ disablePointerEvents }) => {
+	return css({
 		pointerEvents: disablePointerEvents ? 'none' : null,
-	} );
+	});
 };
 
 export const Wrapper = styled.div`
@@ -41,16 +41,16 @@ export const Root = styled.div`
 	height: 100%;
 	width: 100%;
 
-	${ rootBase };
-	${ rootSize };
-	${ rootPointerEvents };
+	${rootBase};
+	${rootSize};
+	${rootPointerEvents};
 `;
 
-const pointActive = ( { isActive } ) => {
+const pointActive = ({ isActive }) => {
 	const boxShadow = isActive ? `0 0 0 1px currentColor` : null;
 
 	return css`
-		box-shadow: ${ boxShadow };
+		box-shadow: ${boxShadow};
 		color: currentColor;
 
 		*:hover > & {
@@ -62,8 +62,8 @@ const pointActive = ( { isActive } ) => {
 export const Point = styled.span`
 	height: 2px;
 	width: 2px;
-	${ pointBase };
-	${ pointActive };
+	${pointBase};
+	${pointActive};
 `;
 
 export const Cell = CellBase;

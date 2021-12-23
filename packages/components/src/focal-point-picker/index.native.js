@@ -27,59 +27,59 @@ import { isVideoType } from './utils';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
-const FOCAL_POINT_UNITS = [ { default: '50', label: '%', value: '%' } ];
+const FOCAL_POINT_UNITS = [{ default: '50', label: '%', value: '%' }];
 
-function FocalPointPicker( props ) {
+function FocalPointPicker(props) {
 	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
 
-	const isVideo = isVideoType( url );
+	const isVideo = isVideoType(url);
 
-	const [ containerSize, setContainerSize ] = useState( null );
-	const [ sliderKey, setSliderKey ] = useState( 0 );
-	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
-	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
-	const [ tooltipVisible, setTooltipVisible ] = useState( false );
+	const [containerSize, setContainerSize] = useState(null);
+	const [sliderKey, setSliderKey] = useState(0);
+	const [displayPlaceholder, setDisplayPlaceholder] = useState(true);
+	const [videoNaturalSize, setVideoNaturalSize] = useState(null);
+	const [tooltipVisible, setTooltipVisible] = useState(false);
 
 	let locationPageOffsetX = useRef().current;
 	let locationPageOffsetY = useRef().current;
-	const videoRef = useRef( null );
+	const videoRef = useRef(null);
 
-	useEffect( () => {
-		requestFocalPointPickerTooltipShown( ( tooltipShown ) => {
-			if ( ! tooltipShown ) {
-				setTooltipVisible( true );
-				setFocalPointPickerTooltipShown( true );
+	useEffect(() => {
+		requestFocalPointPickerTooltipShown((tooltipShown) => {
+			if (!tooltipShown) {
+				setTooltipVisible(true);
+				setFocalPointPickerTooltipShown(true);
 			}
-		} );
-	}, [] );
+		});
+	}, []);
 
 	// Animated coordinates for drag handle
-	const pan = useRef( new Animated.ValueXY() ).current;
+	const pan = useRef(new Animated.ValueXY()).current;
 
 	/**
 	 * Set drag handle position anytime focal point coordinates change.
 	 * E.g. initial render, dragging range sliders.
 	 */
-	useEffect( () => {
-		if ( containerSize ) {
-			pan.setValue( {
+	useEffect(() => {
+		if (containerSize) {
+			pan.setValue({
 				x: focalPoint.x * containerSize.width,
 				y: focalPoint.y * containerSize.height,
-			} );
+			});
 		}
-	}, [ focalPoint, containerSize ] );
+	}, [focalPoint, containerSize]);
 
 	// Pan responder to manage drag handle interactivity
 	const panResponder = useMemo(
 		() =>
-			PanResponder.create( {
+			PanResponder.create({
 				onStartShouldSetPanResponder: () => true,
 				onStartShouldSetPanResponderCapture: () => true,
 				onMoveShouldSetPanResponder: () => true,
 				onMoveShouldSetPanResponderCapture: () => true,
 
-				onPanResponderGrant: ( event ) => {
-					shouldEnableBottomSheetScroll( false );
+				onPanResponderGrant: (event) => {
+					shouldEnableBottomSheetScroll(false);
 					const {
 						locationX: x,
 						locationY: y,
@@ -88,16 +88,16 @@ function FocalPointPicker( props ) {
 					} = event.nativeEvent;
 					locationPageOffsetX = pageX - x;
 					locationPageOffsetY = pageY - y;
-					pan.setValue( { x, y } ); // Set cursor to tap location
+					pan.setValue({ x, y }); // Set cursor to tap location
 					pan.extractOffset(); // Set offset to current value
 				},
 				// Move cursor to match delta drag
 				onPanResponderMove: Animated.event(
-					[ null, { dx: pan.x, dy: pan.y } ],
+					[null, { dx: pan.x, dy: pan.y }],
 					{ useNativeDriver: false }
 				),
-				onPanResponderRelease: ( event ) => {
-					shouldEnableBottomSheetScroll( true );
+				onPanResponderRelease: (event) => {
+					shouldEnableBottomSheetScroll(true);
 					pan.flattenOffset(); // Flatten offset into value
 					const { pageX, pageY } = event.nativeEvent;
 					// Ideally, x and y below are merely locationX and locationY from the
@@ -108,19 +108,17 @@ function FocalPointPicker( props ) {
 					// reported. https://git.io/JtWmi
 					const x = pageX - locationPageOffsetX;
 					const y = pageY - locationPageOffsetY;
-					onChange( {
-						x: clamp( x / containerSize?.width, 0, 1 ).toFixed( 2 ),
-						y: clamp( y / containerSize?.height, 0, 1 ).toFixed(
-							2
-						),
-					} );
+					onChange({
+						x: clamp(x / containerSize?.width, 0, 1).toFixed(2),
+						y: clamp(y / containerSize?.height, 0, 1).toFixed(2),
+					});
 					// Slider (child of RangeCell) is uncontrolled, so we must increment a
 					// key to re-mount and sync the pan gesture values to the sliders
 					// https://git.io/JTe4A
-					setSliderKey( ( prevState ) => prevState + 1 );
+					setSliderKey((prevState) => prevState + 1);
 				},
-			} ),
-		[ containerSize ]
+			}),
+		[containerSize]
 	);
 
 	const mediaBackground = usePreferredColorSchemeStyle(
@@ -147,18 +145,18 @@ function FocalPointPicker( props ) {
 		{
 			transform: [
 				{
-					translateX: pan.x.interpolate( {
-						inputRange: [ 0, containerSize?.width || 0 ],
-						outputRange: [ 0, containerSize?.width || 0 ],
+					translateX: pan.x.interpolate({
+						inputRange: [0, containerSize?.width || 0],
+						outputRange: [0, containerSize?.width || 0],
 						extrapolate: 'clamp',
-					} ),
+					}),
 				},
 				{
-					translateY: pan.y.interpolate( {
-						inputRange: [ 0, containerSize?.height || 0 ],
-						outputRange: [ 0, containerSize?.height || 0 ],
+					translateY: pan.y.interpolate({
+						inputRange: [0, containerSize?.height || 0],
+						outputRange: [0, containerSize?.height || 0],
 						extrapolate: 'clamp',
-					} ),
+					}),
 				},
 			],
 		},
@@ -168,108 +166,105 @@ function FocalPointPicker( props ) {
 		styles.focalPoint,
 		{
 			height: FOCAL_POINT_SIZE,
-			marginLeft: -( FOCAL_POINT_SIZE / 2 ),
-			marginTop: -( FOCAL_POINT_SIZE / 2 ),
+			marginLeft: -(FOCAL_POINT_SIZE / 2),
+			marginTop: -(FOCAL_POINT_SIZE / 2),
 			width: FOCAL_POINT_SIZE,
 		},
 	];
 
-	const onTooltipPress = () => setTooltipVisible( false );
-	const onMediaLayout = ( event ) => {
+	const onTooltipPress = () => setTooltipVisible(false);
+	const onMediaLayout = (event) => {
 		const { height, width } = event.nativeEvent.layout;
 
 		if (
 			width !== 0 &&
 			height !== 0 &&
-			( containerSize?.width !== width ||
-				containerSize?.height !== height )
+			(containerSize?.width !== width || containerSize?.height !== height)
 		) {
-			setContainerSize( { width, height } );
+			setContainerSize({ width, height });
 		}
 	};
-	const onImageDataLoad = () => setDisplayPlaceholder( false );
-	const onVideoLoad = ( event ) => {
+	const onImageDataLoad = () => setDisplayPlaceholder(false);
+	const onVideoLoad = (event) => {
 		const { height, width } = event.naturalSize;
-		setVideoNaturalSize( { height, width } );
-		setDisplayPlaceholder( false );
+		setVideoNaturalSize({ height, width });
+		setDisplayPlaceholder(false);
 		// Avoid invisible, paused video on Android, presumably related to
 		// https://git.io/Jt6Dr
-		videoRef?.current.seek( 0 );
+		videoRef?.current.seek(0);
 	};
-	const onXCoordinateChange = ( x ) =>
-		onChange( { x: ( x / 100 ).toFixed( 2 ) } );
-	const onYCoordinateChange = ( y ) =>
-		onChange( { y: ( y / 100 ).toFixed( 2 ) } );
+	const onXCoordinateChange = (x) => onChange({ x: (x / 100).toFixed(2) });
+	const onYCoordinateChange = (y) => onChange({ y: (y / 100).toFixed(2) });
 
 	return (
-		<View style={ styles.container }>
-			<Tooltip onPress={ onTooltipPress } visible={ tooltipVisible }>
-				<View style={ [ styles.media, mediaBackground ] }>
+		<View style={styles.container}>
+			<Tooltip onPress={onTooltipPress} visible={tooltipVisible}>
+				<View style={[styles.media, mediaBackground]}>
 					<View
-						{ ...panResponder.panHandlers }
-						onLayout={ onMediaLayout }
-						style={ styles.mediaContainer }
+						{...panResponder.panHandlers}
+						onLayout={onMediaLayout}
+						style={styles.mediaContainer}
 					>
-						{ ! isVideo && (
+						{!isVideo && (
 							<Image
-								editButton={ false }
-								highlightSelected={ false }
-								isSelected={ ! displayPlaceholder }
+								editButton={false}
+								highlightSelected={false}
+								isSelected={!displayPlaceholder}
 								height="100%"
-								url={ url }
-								style={ imagePreviewStyles }
-								onImageDataLoad={ onImageDataLoad }
+								url={url}
+								style={imagePreviewStyles}
+								onImageDataLoad={onImageDataLoad}
 							/>
-						) }
-						{ isVideo && (
+						)}
+						{isVideo && (
 							<Video
 								muted
 								paused
 								disableFocus
-								onLoad={ onVideoLoad }
-								ref={ videoRef }
+								onLoad={onVideoLoad}
+								ref={videoRef}
 								resizeMode="contain"
-								source={ { uri: url } }
-								style={ videoPreviewStyles }
+								source={{ uri: url }}
+								style={videoPreviewStyles}
 							/>
-						) }
-						{ ! displayPlaceholder && (
+						)}
+						{!displayPlaceholder && (
 							<Animated.View
 								pointerEvents="none"
-								style={ focalPointGroupStyles }
+								style={focalPointGroupStyles}
 							>
 								<Tooltip.Label
-									text={ __( 'Drag to adjust focal point' ) }
-									yOffset={ -( FOCAL_POINT_SIZE / 2 ) }
+									text={__('Drag to adjust focal point')}
+									yOffset={-(FOCAL_POINT_SIZE / 2)}
 								/>
 								<FocalPoint
-									height={ styles.focalPoint?.height }
-									style={ focalPointStyles }
-									width={ styles.focalPoint?.width }
+									height={styles.focalPoint?.height}
+									style={focalPointStyles}
+									width={styles.focalPoint?.width}
 								/>
 							</Animated.View>
-						) }
+						)}
 					</View>
 				</View>
 				<UnitControl
-					key={ `xAxis-${ sliderKey }` }
-					label={ __( 'X-Axis Position' ) }
-					max={ MAX_POSITION_VALUE }
-					min={ MIN_POSITION_VALUE }
-					onChange={ onXCoordinateChange }
+					key={`xAxis-${sliderKey}`}
+					label={__('X-Axis Position')}
+					max={MAX_POSITION_VALUE}
+					min={MIN_POSITION_VALUE}
+					onChange={onXCoordinateChange}
 					unit="%"
-					units={ FOCAL_POINT_UNITS }
-					value={ Math.round( focalPoint.x * 100 ) }
+					units={FOCAL_POINT_UNITS}
+					value={Math.round(focalPoint.x * 100)}
 				/>
 				<UnitControl
-					key={ `yAxis-${ sliderKey }` }
-					label={ __( 'Y-Axis Position' ) }
-					max={ MAX_POSITION_VALUE }
-					min={ MIN_POSITION_VALUE }
-					onChange={ onYCoordinateChange }
+					key={`yAxis-${sliderKey}`}
+					label={__('Y-Axis Position')}
+					max={MAX_POSITION_VALUE}
+					min={MIN_POSITION_VALUE}
+					onChange={onYCoordinateChange}
 					unit="%"
-					units={ FOCAL_POINT_UNITS }
-					value={ Math.round( focalPoint.y * 100 ) }
+					units={FOCAL_POINT_UNITS}
+					value={Math.round(focalPoint.y * 100)}
 				/>
 			</Tooltip>
 		</View>

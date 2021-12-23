@@ -16,15 +16,15 @@ import { renderToString } from '@wordpress/element';
  */
 import InnerBlocks from '../';
 
-describe( 'InnerBlocks', () => {
-	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
+describe('InnerBlocks', () => {
+	afterEach(() => {
+		getBlockTypes().forEach((block) => {
+			unregisterBlockType(block.name);
+		});
+	});
 
-	it( 'should return element as string, with inner blocks', () => {
-		registerBlockType( 'core/fruit', {
+	it('should return element as string, with inner blocks', () => {
+		registerBlockType('core/fruit', {
 			category: 'text',
 
 			title: 'fruit',
@@ -39,26 +39,26 @@ describe( 'InnerBlocks', () => {
 				className: false,
 			},
 
-			save( { attributes } ) {
+			save({ attributes }) {
 				return (
 					<div>
-						{ attributes.fruit }
+						{attributes.fruit}
 						<InnerBlocks.Content />
 					</div>
 				);
 			},
-		} );
+		});
 
 		const saved = renderToString(
-			getSaveElement( 'core/fruit', { fruit: 'Bananas' }, [
-				createBlock( 'core/fruit', { fruit: 'Apples' } ),
-			] )
+			getSaveElement('core/fruit', { fruit: 'Bananas' }, [
+				createBlock('core/fruit', { fruit: 'Apples' }),
+			])
 		);
 
-		expect( saved ).toMatchSnapshot();
-	} );
+		expect(saved).toMatchSnapshot();
+	});
 
-	it( 'should force serialize for invalid block with inner blocks', () => {
+	it('should force serialize for invalid block with inner blocks', () => {
 		const blockType = {
 			attributes: {
 				throw: {
@@ -76,14 +76,14 @@ describe( 'InnerBlocks', () => {
 					type: 'string',
 				},
 			},
-			save( { attributes } ) {
-				if ( attributes.throw ) {
+			save({ attributes }) {
+				if (attributes.throw) {
 					throw new Error();
 				}
 
 				return (
 					<p>
-						{ attributes.content }
+						{attributes.content}
 						<InnerBlocks.Content />
 					</p>
 				);
@@ -91,14 +91,14 @@ describe( 'InnerBlocks', () => {
 			category: 'text',
 			title: 'block title',
 		};
-		registerBlockType( 'core/test-block', blockType );
-		const block = createBlock( 'core/test-block', { content: 'Invalid' }, [
-			createBlock( 'core/test-block' ),
-		] );
+		registerBlockType('core/test-block', blockType);
+		const block = createBlock('core/test-block', { content: 'Invalid' }, [
+			createBlock('core/test-block'),
+		]);
 
 		block.isValid = false;
 		block.originalContent = 'Original';
 
-		expect( serialize( block ) ).toMatchSnapshot();
-	} );
-} );
+		expect(serialize(block)).toMatchSnapshot();
+	});
+});

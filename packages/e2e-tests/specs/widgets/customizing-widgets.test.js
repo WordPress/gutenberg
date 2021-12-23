@@ -23,106 +23,106 @@ const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was n
 For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
 For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
 
-describe( 'Widgets Customizer', () => {
-	beforeEach( async () => {
+describe('Widgets Customizer', () => {
+	beforeEach(async () => {
 		await deleteAllWidgets();
-		await visitAdminPage( 'customize.php' );
+		await visitAdminPage('customize.php');
 
 		// Disable welcome guide if it is enabled.
-		const isWelcomeGuideActive = await page.evaluate( () =>
+		const isWelcomeGuideActive = await page.evaluate(() =>
 			wp.data
-				.select( 'core/interface' )
-				.isFeatureActive( 'core/customize-widgets', 'welcomeGuide' )
+				.select('core/interface')
+				.isFeatureActive('core/customize-widgets', 'welcomeGuide')
 		);
-		if ( isWelcomeGuideActive ) {
-			await page.evaluate( () =>
+		if (isWelcomeGuideActive) {
+			await page.evaluate(() =>
 				wp.data
-					.dispatch( 'core/interface' )
-					.toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
+					.dispatch('core/interface')
+					.toggleFeature('core/customize-widgets', 'welcomeGuide')
 			);
 		}
-	} );
+	});
 
-	beforeAll( async () => {
+	beforeAll(async () => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
-		await activateTheme( 'twentytwenty' );
+		await activateTheme('twentytwenty');
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
 		// Disable the transition timing function to make it "snap".
 		// We can't disable all the transitions yet because of #32024.
-		await page.evaluateOnNewDocument( () => {
-			const style = document.createElement( 'style' );
+		await page.evaluateOnNewDocument(() => {
+			const style = document.createElement('style');
 			style.innerHTML = `
 				* {
 					transition-timing-function: step-start !important;
 					animation-timing-function: step-start !important;
 				}
 			`;
-			window.addEventListener( 'DOMContentLoaded', () => {
-				document.head.appendChild( style );
-			} );
-		} );
-		await activatePlugin( 'gutenberg-test-widgets' );
-	} );
+			window.addEventListener('DOMContentLoaded', () => {
+				document.head.appendChild(style);
+			});
+		});
+		await activatePlugin('gutenberg-test-widgets');
+	});
 
-	afterAll( async () => {
+	afterAll(async () => {
 		await activatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
-		await deactivatePlugin( 'gutenberg-test-widgets' );
-		await activateTheme( 'twentytwentyone' );
-	} );
+		await deactivatePlugin('gutenberg-test-widgets');
+		await activateTheme('twentytwentyone');
+	});
 
-	it( 'should add blocks', async () => {
-		const widgetsPanel = await find( {
+	it('should add blocks', async () => {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
-		await addBlock( 'Paragraph' );
-		await page.keyboard.type( 'First Paragraph' );
+		await addBlock('Paragraph');
+		await page.keyboard.type('First Paragraph');
 
 		await waitForPreviewIframe();
 
-		await addBlock( 'Heading' );
-		await page.keyboard.type( 'My Heading' );
+		await addBlock('Heading');
+		await page.keyboard.type('My Heading');
 
-		const inlineAddBlockButton = await find( {
+		const inlineAddBlockButton = await find({
 			role: 'combobox',
 			name: 'Add block',
 			haspopup: 'menu',
-		} );
+		});
 		await inlineAddBlockButton.click();
 
-		const inlineInserterSearchBox = await find( {
+		const inlineInserterSearchBox = await find({
 			role: 'searchbox',
 			name: 'Search for blocks and patterns',
-		} );
+		});
 
-		await expect( inlineInserterSearchBox ).toHaveFocus();
+		await expect(inlineInserterSearchBox).toHaveFocus();
 
-		await page.keyboard.type( 'Search' );
+		await page.keyboard.type('Search');
 
-		const searchOption = await find( {
+		const searchOption = await find({
 			role: 'option',
 			name: 'Search',
-		} );
+		});
 		await searchOption.click();
 
-		const addedSearchBlock = await find( {
+		const addedSearchBlock = await find({
 			role: 'document',
 			name: 'Block: Search',
-		} );
+		});
 
 		const searchTitle = await find(
 			{
@@ -133,152 +133,152 @@ describe( 'Widgets Customizer', () => {
 		);
 		await searchTitle.focus();
 
-		await page.keyboard.type( 'My ' );
+		await page.keyboard.type('My ');
 
 		await waitForPreviewIframe();
 
 		const findOptions = {
-			root: await find( {
+			root: await find({
 				name: 'Site Preview',
 				selector: 'iframe',
-			} ),
+			}),
 		};
 
 		// Expect the paragraph to be found in the preview iframe.
-		await expect( {
+		await expect({
 			text: 'First Paragraph',
 			selector: '.widget-content p',
-		} ).toBeFound( findOptions );
+		}).toBeFound(findOptions);
 
 		// Expect the heading to be found in the preview iframe.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'My Heading',
 			selector: '.widget-content *',
-		} ).toBeFound( findOptions );
+		}).toBeFound(findOptions);
 
 		// Expect the search box to be found in the preview iframe.
-		await expect( {
+		await expect({
 			role: 'searchbox',
 			name: 'My Search',
 			selector: '.widget-content *',
-		} ).toBeFound( findOptions );
+		}).toBeFound(findOptions);
 
-		expect( console ).toHaveWarned( twentyTwentyError );
-	} );
+		expect(console).toHaveWarned(twentyTwentyError);
+	});
 
-	it( 'should open the inspector panel', async () => {
-		const widgetsPanel = await find( {
+	it('should open the inspector panel', async () => {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
-		await addBlock( 'Paragraph' );
-		await page.keyboard.type( 'First Paragraph' );
+		await addBlock('Paragraph');
+		await page.keyboard.type('First Paragraph');
 
 		await showBlockToolbar();
-		await clickBlockToolbarButton( 'Options' );
-		let showMoreSettingsButton = await find( {
+		await clickBlockToolbarButton('Options');
+		let showMoreSettingsButton = await find({
 			role: 'menuitem',
 			name: 'Show more settings',
-		} );
+		});
 		await showMoreSettingsButton.click();
 
-		const backButton = await find( {
+		const backButton = await find({
 			role: 'button',
 			name: 'Back',
 			focused: true,
-		} );
-		await expect( backButton ).toHaveFocus();
+		});
+		await expect(backButton).toHaveFocus();
 
 		// Expect the inspector panel to be found.
-		let inspectorHeading = await find( {
+		let inspectorHeading = await find({
 			role: 'heading',
 			name: 'Customizing ▸ Widgets ▸ Footer #1 Block Settings',
 			level: 3,
-		} );
+		});
 
 		// Expect the block title to be found.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Paragraph',
 			level: 2,
-		} ).toBeFound();
+		}).toBeFound();
 
 		await backButton.click();
 
 		// Go back to the widgets editor.
-		await find( {
+		await find({
 			role: 'heading',
 			name: 'Customizing ▸ Widgets Footer #1',
 			level: 3,
-		} );
+		});
 
-		await expect( inspectorHeading ).not.toBeVisible();
+		await expect(inspectorHeading).not.toBeVisible();
 
-		await clickBlockToolbarButton( 'Options' );
-		showMoreSettingsButton = await find( {
+		await clickBlockToolbarButton('Options');
+		showMoreSettingsButton = await find({
 			role: 'menuitem',
 			name: 'Show more settings',
-		} );
+		});
 		await showMoreSettingsButton.click();
 
 		// Expect the inspector panel to be found.
-		inspectorHeading = await find( {
+		inspectorHeading = await find({
 			role: 'heading',
 			name: 'Customizing ▸ Widgets ▸ Footer #1 Block Settings',
 			level: 3,
-		} );
+		});
 
 		// Press Escape to close the inspector panel.
-		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press('Escape');
 
 		// Go back to the widgets editor.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Customizing ▸ Widgets Footer #1',
 			level: 3,
-		} ).toBeFound();
+		}).toBeFound();
 
-		await expect( inspectorHeading ).not.toBeVisible();
+		await expect(inspectorHeading).not.toBeVisible();
 
-		expect( console ).toHaveWarned( twentyTwentyError );
-	} );
+		expect(console).toHaveWarned(twentyTwentyError);
+	});
 
-	it( 'should handle the inserter outer section', async () => {
-		const widgetsPanel = await find( {
+	it('should handle the inserter outer section', async () => {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /^Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
 		// We need to make some changes for the publish settings to appear.
-		await addBlock( 'Paragraph' );
-		await page.keyboard.type( 'First Paragraph' );
+		await addBlock('Paragraph');
+		await page.keyboard.type('First Paragraph');
 
 		await waitForPreviewIframe();
 
-		const documentTools = await find( {
+		const documentTools = await find({
 			role: 'toolbar',
 			name: 'Document tools',
-		} );
+		});
 
 		// Open the inserter outer section.
 		const addBlockButton = await find(
@@ -291,111 +291,111 @@ describe( 'Widgets Customizer', () => {
 		await addBlockButton.click();
 
 		// Expect the inserter outer section to be found.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Add a block',
 			level: 2,
-		} ).toBeFound();
+		}).toBeFound();
 
 		// Expect to close the inserter outer section when pressing Escape.
-		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press('Escape');
 
 		// Open the inserter outer section again.
 		await addBlockButton.click();
 
 		// Expect the inserter outer section to be found again.
-		const inserterHeading = await find( {
+		const inserterHeading = await find({
 			role: 'heading',
 			name: 'Add a block',
 			level: 2,
-		} );
+		});
 
 		// Open the Publish Settings.
-		const publishSettingsButton = await find( {
+		const publishSettingsButton = await find({
 			role: 'button',
 			name: 'Publish Settings',
-		} );
+		});
 		await publishSettingsButton.click();
 
 		// Expect the Publish Settings outer section to be found.
-		const publishSettings = await find( {
+		const publishSettings = await find({
 			selector: '#sub-accordion-section-publish_settings',
-		} );
+		});
 
 		// Expect the inserter outer section to be closed.
-		await expect( inserterHeading ).not.toBeVisible();
+		await expect(inserterHeading).not.toBeVisible();
 
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
-		const paragraphBlock = await find( {
+		const paragraphBlock = await find({
 			role: 'document',
 			name: 'Paragraph block',
-		} );
+		});
 		await paragraphBlock.focus();
-		await page.keyboard.type( ' ' );
+		await page.keyboard.type(' ');
 
 		// Open the inserter outer section.
 		await addBlockButton.click();
 
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Add a block',
 			level: 2,
-		} ).toBeFound();
+		}).toBeFound();
 
 		// Expect the Publish Settings section to be closed.
-		await expect( publishSettings ).not.toBeVisible();
+		await expect(publishSettings).not.toBeVisible();
 
 		// Back to the widget areas panel.
-		const backButton = await find( {
+		const backButton = await find({
 			role: 'button',
 			name: 'Back',
-		} );
+		});
 		await backButton.click();
 
 		// Expect the inserter outer section to be closed.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Add a block',
 			level: 2,
-		} ).not.toBeFound();
+		}).not.toBeFound();
 
-		expect( console ).toHaveWarned( twentyTwentyError );
-	} );
+		expect(console).toHaveWarned(twentyTwentyError);
+	});
 
-	it( 'should move focus to the block', async () => {
-		const widgetsPanel = await find( {
+	it('should move focus to the block', async () => {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /^Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
-		await addBlock( 'Paragraph' );
-		await page.keyboard.type( 'First Paragraph' );
+		await addBlock('Paragraph');
+		await page.keyboard.type('First Paragraph');
 
 		await waitForPreviewIframe();
 
-		await addBlock( 'Heading' );
-		await page.keyboard.type( 'First Heading' );
+		await addBlock('Heading');
+		await page.keyboard.type('First Heading');
 
 		// Navigate back to the parent panel.
-		const backButton = await find( { role: 'button', name: 'Back' } );
+		const backButton = await find({ role: 'button', name: 'Back' });
 		await backButton.click();
 
 		await waitForPreviewIframe();
 
-		const iframe = await find( {
+		const iframe = await find({
 			name: 'Site Preview',
 			selector: 'iframe',
-		} );
+		});
 
 		const paragraphWidget = await find(
 			{
@@ -418,16 +418,16 @@ describe( 'Widgets Customizer', () => {
 		);
 		await editParagraphWidget.click();
 
-		const firstParagraphBlock = await find( {
+		const firstParagraphBlock = await find({
 			role: 'document',
 			name: 'Paragraph block',
 			text: 'First Paragraph',
-		} );
-		await expect( firstParagraphBlock ).toHaveFocus();
+		});
+		await expect(firstParagraphBlock).toHaveFocus();
 
 		// Expect to focus on a already focused widget.
 		await editParagraphWidget.click();
-		await expect( firstParagraphBlock ).toHaveFocus();
+		await expect(firstParagraphBlock).toHaveFocus();
 
 		const headingWidget = await find(
 			{
@@ -450,59 +450,59 @@ describe( 'Widgets Customizer', () => {
 		);
 		await editHeadingWidget.click();
 
-		const headingBlock = await find( {
+		const headingBlock = await find({
 			role: 'document',
 			name: 'Block: Heading',
 			text: 'First Heading',
-		} );
-		await expect( headingBlock ).toHaveFocus();
+		});
+		await expect(headingBlock).toHaveFocus();
 
-		expect( console ).toHaveWarned( twentyTwentyError );
-	} );
+		expect(console).toHaveWarned(twentyTwentyError);
+	});
 
-	it( 'should clear block selection', async () => {
-		const widgetsPanel = await find( {
+	it('should clear block selection', async () => {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /^Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
-		const paragraphBlock = await addBlock( 'Paragraph' );
-		await page.keyboard.type( 'First Paragraph' );
+		const paragraphBlock = await addBlock('Paragraph');
+		await page.keyboard.type('First Paragraph');
 		await showBlockToolbar();
 
-		const sectionHeading = await find( {
+		const sectionHeading = await find({
 			role: 'heading',
 			name: 'Customizing ▸ Widgets Footer #1',
 			level: 3,
-		} );
+		});
 		await sectionHeading.click();
 
 		// Expect clicking on the section title should clear the selection.
-		await expect( {
+		await expect({
 			role: 'toolbar',
 			name: 'Block tools',
-		} ).not.toBeFound();
+		}).not.toBeFound();
 
 		await paragraphBlock.focus();
 		await showBlockToolbar();
 
-		const preview = await page.$( '#customize-preview' );
+		const preview = await page.$('#customize-preview');
 		await preview.click();
 
 		// Expect clicking on the preview iframe should clear the selection.
-		await expect( {
+		await expect({
 			role: 'toolbar',
 			name: 'Block tools',
-		} ).not.toBeFound();
+		}).not.toBeFound();
 
 		await paragraphBlock.focus();
 		await showBlockToolbar();
@@ -512,45 +512,45 @@ describe( 'Widgets Customizer', () => {
 		);
 		const { x, y, width, height } = await editorContainer.boundingBox();
 		// Simulate Clicking on the empty space at the end of the editor.
-		await page.mouse.click( x + width / 2, y + height + 10 );
+		await page.mouse.click(x + width / 2, y + height + 10);
 
 		// Expect clicking on the empty space at the end of the editor
 		// should clear the selection.
-		await expect( {
+		await expect({
 			role: 'toolbar',
 			name: 'Block tools',
-		} ).not.toBeFound();
+		}).not.toBeFound();
 
-		expect( console ).toHaveWarned( twentyTwentyError );
-	} );
+		expect(console).toHaveWarned(twentyTwentyError);
+	});
 
-	it( 'should handle legacy widgets', async () => {
-		const widgetsPanel = await find( {
+	it('should handle legacy widgets', async () => {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /^Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
-		const legacyWidgetBlock = await addBlock( 'Legacy Widget' );
-		const selectLegacyWidgets = await find( {
+		const legacyWidgetBlock = await addBlock('Legacy Widget');
+		const selectLegacyWidgets = await find({
 			role: 'combobox',
 			name: 'Select a legacy widget to display:',
-		} );
-		await selectLegacyWidgets.select( 'test_widget' );
+		});
+		await selectLegacyWidgets.select('test_widget');
 
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Test Widget',
 			level: 3,
-		} ).toBeFound( { root: legacyWidgetBlock } );
+		}).toBeFound({ root: legacyWidgetBlock });
 
 		let titleInput = await find(
 			{
@@ -562,52 +562,52 @@ describe( 'Widgets Customizer', () => {
 			}
 		);
 
-		await titleInput.type( 'Hello Title' );
+		await titleInput.type('Hello Title');
 
 		// Unfocus the current legacy widget.
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press('Tab');
 
 		// Disable reason: Sometimes the preview just doesn't fully load,
 		// it's the only way I know for now to ensure that the iframe is ready.
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 2000 );
+		await page.waitForTimeout(2000);
 		await waitForPreviewIframe();
 
 		// Expect the legacy widget to show in the site preview frame.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Hello Title',
-		} ).toBeFound( {
-			root: await find( {
+		}).toBeFound({
+			root: await find({
 				name: 'Site Preview',
 				selector: 'iframe',
-			} ),
-		} );
+			}),
+		});
 
 		// Expect the preview in block to show when unfocusing the legacy widget block.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Hello Title',
-		} ).toBeFound( {
-			root: await find( {
+		}).toBeFound({
+			root: await find({
 				selector: 'iframe',
 				name: 'Legacy Widget Preview',
-			} ),
-		} );
+			}),
+		});
 
 		await legacyWidgetBlock.focus();
 		await showBlockToolbar();
 
 		// Testing removing the block.
-		await clickBlockToolbarButton( 'Options' );
-		const removeBlockButton = await find( {
+		await clickBlockToolbarButton('Options');
+		const removeBlockButton = await find({
 			role: 'menuitem',
 			name: /Remove Legacy Widget/,
-		} );
+		});
 		await removeBlockButton.click();
 
 		// Add it back again using the variant.
-		const testWidgetBlock = await addBlock( 'Test Widget' );
+		const testWidgetBlock = await addBlock('Test Widget');
 
 		titleInput = await find(
 			{
@@ -619,138 +619,138 @@ describe( 'Widgets Customizer', () => {
 			}
 		);
 
-		await titleInput.type( 'Hello again!' );
+		await titleInput.type('Hello again!');
 		// Unfocus the current legacy widget.
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press('Tab');
 
 		// Expect the preview in block to show when unfocusing the legacy widget block.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Hello again!',
-		} ).toBeFound( {
-			root: await find( {
+		}).toBeFound({
+			root: await find({
 				selector: 'iframe',
 				name: 'Legacy Widget Preview',
-			} ),
-		} );
+			}),
+		});
 
-		const publishButton = await find( {
+		const publishButton = await find({
 			role: 'button',
 			name: 'Publish',
-		} );
+		});
 		await publishButton.click();
 
 		// Wait for publishing to finish.
-		await page.waitForResponse( createURL( '/wp-admin/admin-ajax.php' ) );
-		await expect( publishButton ).toMatchQuery( {
+		await page.waitForResponse(createURL('/wp-admin/admin-ajax.php'));
+		await expect(publishButton).toMatchQuery({
 			disabled: true,
-		} );
+		});
 
-		await page.goto( createURL( '/' ) );
+		await page.goto(createURL('/'));
 
 		// Expect the saved widgets to show on frontend.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Hello again!',
-		} ).toBeFound();
-	} );
+		}).toBeFound();
+	});
 
-	it( 'should handle esc key events', async () => {
-		const widgetsPanel = await find( {
+	it('should handle esc key events', async () => {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /^Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
-		const paragraphBlock = await addBlock( 'Paragraph' );
-		await page.keyboard.type( 'First Paragraph' );
+		const paragraphBlock = await addBlock('Paragraph');
+		await page.keyboard.type('First Paragraph');
 		await showBlockToolbar();
 
 		// Open the more menu dropdown in block toolbar.
-		await clickBlockToolbarButton( 'Options' );
-		await expect( {
+		await clickBlockToolbarButton('Options');
+		await expect({
 			role: 'menu',
 			name: 'Options',
-		} ).toBeFound();
+		}).toBeFound();
 
 		// Expect pressing the Escape key to close the dropdown,
 		// but not close the editor.
-		await page.keyboard.press( 'Escape' );
-		await expect( {
+		await page.keyboard.press('Escape');
+		await expect({
 			role: 'menu',
 			name: 'Options',
-		} ).not.toBeFound();
-		await expect( paragraphBlock ).toBeVisible();
+		}).not.toBeFound();
+		await expect(paragraphBlock).toBeVisible();
 
 		await paragraphBlock.focus();
 
 		// Expect pressing the Escape key to enter navigation mode,
 		// but not close the editor.
-		await page.keyboard.press( 'Escape' );
-		await expect( {
+		await page.keyboard.press('Escape');
+		await expect({
 			text: /^You are currently in navigation mode\./,
 			selector: '*[aria-live="polite"][aria-relevant="additions text"]',
-		} ).toBeFound();
-		await expect( paragraphBlock ).toBeVisible();
+		}).toBeFound();
+		await expect(paragraphBlock).toBeVisible();
 
-		expect( console ).toHaveWarned( twentyTwentyError );
-	} );
+		expect(console).toHaveWarned(twentyTwentyError);
+	});
 
-	it( 'should move (inner) blocks to another sidebar', async () => {
-		const widgetsPanel = await find( {
+	it('should move (inner) blocks to another sidebar', async () => {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
-		await addBlock( 'Paragraph' );
-		await page.keyboard.type( 'First Paragraph' );
+		await addBlock('Paragraph');
+		await page.keyboard.type('First Paragraph');
 
 		await showBlockToolbar();
-		await clickBlockToolbarButton( 'Options' );
-		const groupButton = await find( {
+		await clickBlockToolbarButton('Options');
+		const groupButton = await find({
 			role: 'menuitem',
 			name: 'Group',
-		} );
+		});
 		await groupButton.click();
 
 		// Refocus the paragraph block.
-		const paragraphBlock = await find( {
+		const paragraphBlock = await find({
 			role: 'document',
 			name: 'Paragraph block',
 			value: 'First Paragraph',
-		} );
+		});
 		await paragraphBlock.focus();
 		await showBlockToolbar();
-		await clickBlockToolbarButton( 'Move to widget area' );
+		await clickBlockToolbarButton('Move to widget area');
 
-		const footer2Option = await find( {
+		const footer2Option = await find({
 			role: 'menuitemradio',
 			name: 'Footer #2',
-		} );
+		});
 		await footer2Option.click();
 
 		// Should switch to and expand Footer #2.
-		await expect( {
+		await expect({
 			role: 'heading',
 			name: 'Customizing ▸ Widgets Footer #2',
-		} ).toBeFound();
+		}).toBeFound();
 
 		// The paragraph block should be moved to the new sidebar and have focus.
 		const movedParagraphBlockQuery = {
@@ -758,14 +758,14 @@ describe( 'Widgets Customizer', () => {
 			name: 'Paragraph block',
 			value: 'First Paragraph',
 		};
-		await expect( movedParagraphBlockQuery ).toBeFound();
-		const movedParagraphBlock = await find( movedParagraphBlockQuery );
-		await expect( movedParagraphBlock ).toHaveFocus();
+		await expect(movedParagraphBlockQuery).toBeFound();
+		const movedParagraphBlock = await find(movedParagraphBlockQuery);
+		await expect(movedParagraphBlock).toHaveFocus();
 
-		expect( console ).toHaveWarned( twentyTwentyError );
-	} );
+		expect(console).toHaveWarned(twentyTwentyError);
+	});
 
-	it( 'should not render Block Settings sections', async () => {
+	it('should not render Block Settings sections', async () => {
 		// We add Block Settings as a section, but it shouldn't display to
 		// the user as a section on the main menu. It's simply how we
 		// integrate the G sidebar inside the customizer.
@@ -777,65 +777,65 @@ describe( 'Widgets Customizer', () => {
 			},
 			{ timeout: 0 }
 		);
-		await expect( findAllBlockSettingsHeader ).toThrowQueryEmptyError();
-	} );
+		await expect(findAllBlockSettingsHeader).toThrowQueryEmptyError();
+	});
 
-	it( 'should stay in block settings after making a change in that area', async () => {
+	it('should stay in block settings after making a change in that area', async () => {
 		// Open footer block widgets
-		const widgetsPanel = await find( {
+		const widgetsPanel = await find({
 			role: 'heading',
 			name: /Widgets/,
 			level: 3,
-		} );
+		});
 		await widgetsPanel.click();
 
-		const footer1Section = await find( {
+		const footer1Section = await find({
 			role: 'heading',
 			name: /^Footer #1/,
 			level: 3,
-		} );
+		});
 		await footer1Section.click();
 
 		// Add a block to make the publish button active.
-		await addBlock( 'Paragraph' );
-		await page.keyboard.type( 'First Paragraph' );
+		await addBlock('Paragraph');
+		await page.keyboard.type('First Paragraph');
 
 		await waitForPreviewIframe();
 
 		// Click Publish
-		const publishButton = await find( {
+		const publishButton = await find({
 			role: 'button',
 			name: 'Publish',
-		} );
+		});
 		await publishButton.click();
 
 		// Wait for publishing to finish.
-		await page.waitForResponse( createURL( '/wp-admin/admin-ajax.php' ) );
-		await expect( publishButton ).toMatchQuery( {
+		await page.waitForResponse(createURL('/wp-admin/admin-ajax.php'));
+		await expect(publishButton).toMatchQuery({
 			disabled: true,
-		} );
+		});
 
 		// Select the paragraph block
-		const paragraphBlock = await find( {
+		const paragraphBlock = await find({
 			role: 'document',
 			name: 'Paragraph block',
-		} );
+		});
 		await paragraphBlock.focus();
 
 		// Click the three dots button, then click "Show More Settings".
 		await showBlockToolbar();
-		await clickBlockToolbarButton( 'Options' );
-		const showMoreSettingsButton = await find( {
+		await clickBlockToolbarButton('Options');
+		const showMoreSettingsButton = await find({
 			role: 'menuitem',
 			name: 'Show more settings',
-		} );
+		});
 		await showMoreSettingsButton.click();
 
 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
 		await openTypographyToolsPanelMenu();
-		await page.click( 'button[aria-label="Show Drop cap"]' );
+		await page.click('button[aria-label="Show Drop cap"]');
 
-		const [ dropCapToggle ] = await page.$x(
+		const [dropCapToggle] = await page.$x(
 			"//label[contains(text(), 'Drop cap')]"
 		);
 		await dropCapToggle.click();
@@ -843,22 +843,22 @@ describe( 'Widgets Customizer', () => {
 		// Now that we've made a change:
 		// (1) Publish button should be active
 		// (2) We should still be in the "Block Settings" area
-		await find( {
+		await find({
 			role: 'button',
 			name: 'Publish',
-		} );
+		});
 
 		// This fails on 539cea09 and earlier; we get kicked back to the widgets area.
 		// We expect to stay in block settings.
-		await find( {
+		await find({
 			role: 'heading',
 			name: 'Customizing ▸ Widgets ▸ Footer #1 Block Settings',
 			level: 3,
-		} );
+		});
 
-		expect( console ).toHaveWarned( twentyTwentyError );
-	} );
-} );
+		expect(console).toHaveWarned(twentyTwentyError);
+	});
+});
 
 /**
  * Wait when there's only one preview iframe.
@@ -868,39 +868,39 @@ describe( 'Widgets Customizer', () => {
 async function waitForPreviewIframe() {
 	await page.waitForFunction(
 		() =>
-			document.querySelectorAll( '[name^="customize-preview-"]' )
-				.length === 1
+			document.querySelectorAll('[name^="customize-preview-"]').length ===
+			1
 	);
 }
 
-async function addBlock( blockName ) {
+async function addBlock(blockName) {
 	const addBlockButton = await find(
 		{
 			role: 'button',
 			name: 'Add block',
 		},
 		{
-			root: await find( {
+			root: await find({
 				role: 'toolbar',
 				name: 'Document tools',
-			} ),
+			}),
 		}
 	);
 	await addBlockButton.click();
 
-	const searchBox = await find( {
+	const searchBox = await find({
 		role: 'searchbox',
 		name: 'Search for blocks and patterns',
-	} );
+	});
 
 	// Clear the input.
-	await searchBox.evaluate( ( node ) => {
-		if ( node.value ) {
+	await searchBox.evaluate((node) => {
+		if (node.value) {
 			node.value = '';
 		}
-	} );
+	});
 
-	await searchBox.type( blockName );
+	await searchBox.type(blockName);
 
 	// TODO - remove this timeout when the test plugin for disabling CSS
 	// animations in tests works properly.
@@ -910,18 +910,18 @@ async function addBlock( blockName ) {
 	// puppeteer can click on the wrong block.
 	//
 	// eslint-disable-next-line no-restricted-syntax
-	await page.waitForTimeout( 300 );
+	await page.waitForTimeout(300);
 
-	const blockOption = await find( {
+	const blockOption = await find({
 		role: 'option',
 		name: blockName,
-	} );
+	});
 	await blockOption.click();
 
-	const addedBlock = await find( {
+	const addedBlock = await find({
 		role: 'document',
 		selector: '.is-selected[data-block]',
-	} );
+	});
 	await addedBlock.focus();
 
 	return addedBlock;

@@ -25,26 +25,26 @@ const icons = {
 	page: pages,
 };
 
-const getSummaryForType = ( type ) => {
-	switch ( type ) {
+const getSummaryForType = (type) => {
+	switch (type) {
 		case 'clipboard':
-			return __( 'From clipboard' );
+			return __('From clipboard');
 		case 'mailto':
-			return __( 'Add this email link' );
+			return __('Add this email link');
 		case 'tel':
-			return __( 'Add this telephone link' );
+			return __('Add this telephone link');
 		default:
-			return __( 'Add this link' );
+			return __('Add this link');
 	}
 };
 
 // we use some Cell styles here with a column flex-direction
-function LinkSuggestionItemCell( { suggestion, onLinkPicked, ...props } ) {
+function LinkSuggestionItemCell({ suggestion, onLinkPicked, ...props }) {
 	const { title: contentTitle, url, type, isDirectEntry } = suggestion;
 	const title = isDirectEntry ? url : contentTitle;
-	const summary = isDirectEntry ? getSummaryForType( type ) : url;
+	const summary = isDirectEntry ? getSummaryForType(type) : url;
 
-	const pickLink = () => onLinkPicked( suggestion );
+	const pickLink = () => onLinkPicked(suggestion);
 
 	const cellTitleStyle = usePreferredColorSchemeStyle(
 		cellStyles.cellLabel,
@@ -56,33 +56,33 @@ function LinkSuggestionItemCell( { suggestion, onLinkPicked, ...props } ) {
 		cellStyles.cellTextDark
 	);
 
-	const titleStyle = [ cellTitleStyle, suggestionStyles.titleStyle ];
-	const summaryStyle = [ cellSummaryStyle, suggestionStyles.summaryStyle ];
+	const titleStyle = [cellTitleStyle, suggestionStyles.titleStyle];
+	const summaryStyle = [cellSummaryStyle, suggestionStyles.summaryStyle];
 
 	return (
 		<Cell
-			{ ...props }
-			icon={ icons[ type ] || empty }
-			onPress={ pickLink }
-			separatorType={ 'none' }
-			cellContainerStyle={ suggestionStyles.itemContainerStyle }
-			labelStyle={ suggestionStyles.hidden }
-			valueStyle={ suggestionStyles.hidden }
+			{...props}
+			icon={icons[type] || empty}
+			onPress={pickLink}
+			separatorType={'none'}
+			cellContainerStyle={suggestionStyles.itemContainerStyle}
+			labelStyle={suggestionStyles.hidden}
+			valueStyle={suggestionStyles.hidden}
 		>
-			<View style={ suggestionStyles.containerStyle }>
+			<View style={suggestionStyles.containerStyle}>
 				<Text
-					style={ titleStyle }
-					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					style={titleStyle}
+					numberOfLines={1}
+					ellipsizeMode={'middle'}
 				>
-					{ title }
+					{title}
 				</Text>
 				<Text
-					style={ summaryStyle }
-					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					style={summaryStyle}
+					numberOfLines={1}
+					ellipsizeMode={'middle'}
 				>
-					{ summary }
+					{summary}
 				</Text>
 			</View>
 		</Cell>

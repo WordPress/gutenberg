@@ -12,24 +12,24 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { MENU_POST_TYPE, MENU_KIND } from '../constants';
 
-export default function useMenuNotifications( menuId ) {
-	const { createErrorNotice } = useDispatch( noticesStore );
+export default function useMenuNotifications(menuId) {
+	const { createErrorNotice } = useDispatch(noticesStore);
 	const lastDeleteError = useSelect(
-		( select ) => {
-			return select( coreStore ).getLastEntityDeleteError(
+		(select) => {
+			return select(coreStore).getLastEntityDeleteError(
 				MENU_KIND,
 				MENU_POST_TYPE,
 				menuId
 			);
 		},
-		[ menuId ]
+		[menuId]
 	);
 
-	useEffect( () => {
-		if ( lastDeleteError ) {
-			createErrorNotice( stripHTML( lastDeleteError?.message ), {
+	useEffect(() => {
+		if (lastDeleteError) {
+			createErrorNotice(stripHTML(lastDeleteError?.message), {
 				id: 'edit-navigation-error',
-			} );
+			});
 		}
-	}, [ lastDeleteError ] );
+	}, [lastDeleteError]);
 }

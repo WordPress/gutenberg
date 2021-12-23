@@ -27,20 +27,20 @@ import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
 
-const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
-	if ( showTooltip && text ) {
+const WithToolTip = ({ showTooltip, text, children }: WithToolTipProps) => {
+	if (showTooltip && text) {
 		return (
-			<Tooltip text={ text } position="top center">
-				{ children }
+			<Tooltip text={text} position="top center">
+				{children}
 			</Tooltip>
 		);
 	}
-	return <>{ children }</>;
+	return <>{children}</>;
 };
 
 function ToggleGroupControlOption(
-	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<ToggleGroupControlOptionProps, 'button'>,
+	forwardedRef: Ref<any>
 ) {
 	const toggleGroupControlContext = useToggleGroupControlContext();
 	const id = useInstanceId(
@@ -66,31 +66,31 @@ function ToggleGroupControlOption(
 
 	const isActive = radioProps.state === value;
 	const cx = useCx();
-	const labelViewClasses = cx( isBlock && styles.labelBlock );
+	const labelViewClasses = cx(isBlock && styles.labelBlock);
 	const classes = cx(
 		styles.buttonView,
 		className,
 		isActive && styles.buttonActive
 	);
-	const optionLabel = !! radioProps[ 'aria-label' ]
-		? radioProps[ 'aria-label' ]
+	const optionLabel = !!radioProps['aria-label']
+		? radioProps['aria-label']
 		: label;
 
 	return (
-		<LabelView className={ labelViewClasses } data-active={ isActive }>
-			<WithToolTip showTooltip={ showTooltip } text={ optionLabel }>
+		<LabelView className={labelViewClasses} data-active={isActive}>
+			<WithToolTip showTooltip={showTooltip} text={optionLabel}>
 				<Radio
-					{ ...radioProps }
+					{...radioProps}
 					as="button"
-					aria-label={ optionLabel }
-					className={ classes }
-					data-value={ value }
-					ref={ forwardedRef }
-					value={ value }
+					aria-label={optionLabel}
+					className={classes}
+					data-value={value}
+					ref={forwardedRef}
+					value={value}
 				>
-					<ButtonContentView>{ label }</ButtonContentView>
+					<ButtonContentView>{label}</ButtonContentView>
 					<LabelPlaceholderView aria-hidden>
-						{ label }
+						{label}
 					</LabelPlaceholderView>
 				</Radio>
 			</WithToolTip>

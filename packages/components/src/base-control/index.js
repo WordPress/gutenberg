@@ -34,52 +34,50 @@ import {
  * @param {Props} props
  * @return {JSX.Element} Element
  */
-function BaseControl( {
+function BaseControl({
 	id,
 	label,
 	hideLabelFromVision,
 	help,
 	className,
 	children,
-} ) {
+}) {
 	return (
-		<Wrapper
-			className={ classnames( 'components-base-control', className ) }
-		>
+		<Wrapper className={classnames('components-base-control', className)}>
 			<StyledField className="components-base-control__field">
-				{ label &&
+				{label &&
 					id &&
-					( hideLabelFromVision ? (
-						<VisuallyHidden as="label" htmlFor={ id }>
-							{ label }
+					(hideLabelFromVision ? (
+						<VisuallyHidden as="label" htmlFor={id}>
+							{label}
 						</VisuallyHidden>
 					) : (
 						<StyledLabel
 							className="components-base-control__label"
-							htmlFor={ id }
+							htmlFor={id}
 						>
-							{ label }
+							{label}
 						</StyledLabel>
-					) ) }
-				{ label &&
-					! id &&
-					( hideLabelFromVision ? (
-						<VisuallyHidden as="label">{ label }</VisuallyHidden>
+					))}
+				{label &&
+					!id &&
+					(hideLabelFromVision ? (
+						<VisuallyHidden as="label">{label}</VisuallyHidden>
 					) : (
 						<BaseControl.VisualLabel>
-							{ label }
+							{label}
 						</BaseControl.VisualLabel>
-					) ) }
-				{ children }
+					))}
+				{children}
 			</StyledField>
-			{ !! help && (
+			{!!help && (
 				<StyledHelp
-					id={ id ? id + '__help' : undefined }
+					id={id ? id + '__help' : undefined}
 					className="components-base-control__help"
 				>
-					{ help }
+					{help}
 				</StyledHelp>
-			) }
+			)}
 		</Wrapper>
 	);
 }
@@ -94,9 +92,9 @@ function BaseControl( {
  * @param {VisualLabelProps} Props
  * @return {JSX.Element} Element
  */
-BaseControl.VisualLabel = ( { className, children } ) => {
-	className = classnames( 'components-base-control__label', className );
-	return <span className={ className }>{ children }</span>;
+BaseControl.VisualLabel = ({ className, children }) => {
+	className = classnames('components-base-control__label', className);
+	return <span className={className}>{children}</span>;
 };
 
 export default BaseControl;

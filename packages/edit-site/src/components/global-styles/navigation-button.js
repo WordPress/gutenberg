@@ -9,25 +9,19 @@ import {
 } from '@wordpress/components';
 import { Icon } from '@wordpress/icons';
 
-function NavigationButton( {
-	path,
-	icon,
-	children,
-	isBack = false,
-	...props
-} ) {
+function NavigationButton({ path, icon, children, isBack = false, ...props }) {
 	const navigator = useNavigator();
 	return (
-		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
-			{ icon && (
+		<Item onClick={() => navigator.push(path, { isBack })} {...props}>
+			{icon && (
 				<HStack justify="flex-start">
 					<FlexItem>
-						<Icon icon={ icon } size={ 24 } />
+						<Icon icon={icon} size={24} />
 					</FlexItem>
-					<FlexItem>{ children }</FlexItem>
+					<FlexItem>{children}</FlexItem>
 				</HStack>
-			) }
-			{ ! icon && children }
+			)}
+			{!icon && children}
 		</Item>
 	);
 }

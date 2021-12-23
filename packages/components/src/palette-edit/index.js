@@ -42,26 +42,26 @@ import CustomGradientPicker from '../custom-gradient-picker';
 
 const DEFAULT_COLOR = '#000';
 
-function NameInput( { value, onChange, label } ) {
+function NameInput({ value, onChange, label }) {
 	return (
 		<NameInputControl
-			label={ label }
+			label={label}
 			hideLabelFromVision
-			value={ value }
-			onChange={ onChange }
+			value={value}
+			onChange={onChange}
 		/>
 	);
 }
 
-function getNameForPosition( position ) {
+function getNameForPosition(position) {
 	return sprintf(
 		/* translators: %s: is a temporary id for a custom color */
-		__( 'Color %s ' ),
+		__('Color %s '),
 		position + 1
 	);
 }
 
-function Option( {
+function Option({
 	canOnlyChangeValues,
 	element,
 	onChange,
@@ -71,97 +71,97 @@ function Option( {
 	onStopEditing,
 	slugPrefix,
 	isGradient,
-} ) {
-	const focusOutsideProps = useFocusOutside( onStopEditing );
+}) {
+	const focusOutsideProps = useFocusOutside(onStopEditing);
 	const value = isGradient ? element.gradient : element.color;
 
 	return (
 		<PaletteItem
 			as="div"
-			onClick={ onStartEditing }
-			{ ...( isEditing ? focusOutsideProps : {} ) }
+			onClick={onStartEditing}
+			{...(isEditing ? focusOutsideProps : {})}
 		>
 			<HStack justify="flex-start">
 				<FlexItem>
 					<IndicatorStyled
-						style={ { background: value, color: 'transparent' } }
+						style={{ background: value, color: 'transparent' }}
 					/>
 				</FlexItem>
 				<FlexItem>
-					{ isEditing && ! canOnlyChangeValues ? (
+					{isEditing && !canOnlyChangeValues ? (
 						<NameInput
 							label={
 								isGradient
-									? __( 'Gradient name' )
-									: __( 'Color name' )
+									? __('Gradient name')
+									: __('Color name')
 							}
-							value={ element.name }
-							onChange={ ( nextName ) =>
-								onChange( {
+							value={element.name}
+							onChange={(nextName) =>
+								onChange({
 									...element,
 									name: nextName,
-									slug: slugPrefix + kebabCase( nextName ),
-								} )
+									slug: slugPrefix + kebabCase(nextName),
+								})
 							}
 						/>
 					) : (
-						<NameContainer>{ element.name }</NameContainer>
-					) }
+						<NameContainer>{element.name}</NameContainer>
+					)}
 				</FlexItem>
-				{ isEditing && ! canOnlyChangeValues && (
+				{isEditing && !canOnlyChangeValues && (
 					<FlexItem>
 						<RemoveButton
 							isSmall
-							icon={ lineSolid }
-							label={ __( 'Remove color' ) }
-							onClick={ onRemove }
+							icon={lineSolid}
+							label={__('Remove color')}
+							onClick={onRemove}
 						/>
 					</FlexItem>
-				) }
+				)}
 			</HStack>
-			{ isEditing && (
+			{isEditing && (
 				<Popover
 					position="bottom left"
 					className="components-palette-edit__popover"
 				>
-					{ ! isGradient && (
+					{!isGradient && (
 						<ColorPicker
-							color={ value }
-							onChange={ ( newColor ) =>
-								onChange( {
+							color={value}
+							onChange={(newColor) =>
+								onChange({
 									...element,
 									color: newColor,
-								} )
+								})
 							}
 						/>
-					) }
-					{ isGradient && (
+					)}
+					{isGradient && (
 						<CustomGradientPicker
 							__experimentalIsRenderedInSidebar
-							value={ value }
-							onChange={ ( newGradient ) =>
-								onChange( {
+							value={value}
+							onChange={(newGradient) =>
+								onChange({
 									...element,
 									gradient: newGradient,
-								} )
+								})
 							}
 						/>
-					) }
+					)}
 				</Popover>
-			) }
+			)}
 		</PaletteItem>
 	);
 }
 
-function isTemporaryElement( slugPrefix, { slug, color, gradient }, index ) {
+function isTemporaryElement(slugPrefix, { slug, color, gradient }, index) {
 	return (
-		slug === slugPrefix + kebabCase( getNameForPosition( index ) ) &&
-		( ( !! color && color === DEFAULT_COLOR ) ||
-			( !! gradient && gradient === DEFAULT_GRADIENT ) )
+		slug === slugPrefix + kebabCase(getNameForPosition(index)) &&
+		((!!color && color === DEFAULT_COLOR) ||
+			(!!gradient && gradient === DEFAULT_GRADIENT))
 	);
 }
 
-function PaletteEditListView( {
+function PaletteEditListView({
 	elements,
 	onChange,
 	editingElement,
@@ -169,58 +169,56 @@ function PaletteEditListView( {
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
-} ) {
+}) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
 	const elementsReference = useRef();
-	useEffect( () => {
+	useEffect(() => {
 		elementsReference.current = elements;
-	}, [ elements ] );
-	useEffect( () => {
+	}, [elements]);
+	useEffect(() => {
 		return () => {
 			if (
-				elementsReference.current.some( ( element, index ) =>
-					isTemporaryElement( slugPrefix, element, index )
+				elementsReference.current.some((element, index) =>
+					isTemporaryElement(slugPrefix, element, index)
 				)
 			) {
 				const newElements = elementsReference.current.filter(
-					( element, index ) =>
-						! isTemporaryElement( slugPrefix, element, index )
+					(element, index) =>
+						!isTemporaryElement(slugPrefix, element, index)
 				);
-				onChange( newElements.length ? newElements : undefined );
+				onChange(newElements.length ? newElements : undefined);
 			}
 		};
-	}, [] );
+	}, []);
 	return (
-		<VStack spacing={ 3 }>
+		<VStack spacing={3}>
 			<ItemGroup isBordered isSeparated>
-				{ elements.map( ( element, index ) => (
+				{elements.map((element, index) => (
 					<Option
-						isGradient={ isGradient }
-						canOnlyChangeValues={ canOnlyChangeValues }
-						key={ index }
-						element={ element }
-						onStartEditing={ () => {
-							if ( editingElement !== index ) {
-								setEditingElement( index );
+						isGradient={isGradient}
+						canOnlyChangeValues={canOnlyChangeValues}
+						key={index}
+						element={element}
+						onStartEditing={() => {
+							if (editingElement !== index) {
+								setEditingElement(index);
 							}
-						} }
-						onChange={ ( newElement ) => {
+						}}
+						onChange={(newElement) => {
 							onChange(
-								elements.map(
-									( currentElement, currentIndex ) => {
-										if ( currentIndex === index ) {
-											return newElement;
-										}
-										return currentElement;
+								elements.map((currentElement, currentIndex) => {
+									if (currentIndex === index) {
+										return newElement;
 									}
-								)
+									return currentElement;
+								})
 							);
-						} }
-						onRemove={ () => {
-							setEditingElement( null );
+						}}
+						onRemove={() => {
+							setEditingElement(null);
 							const newElements = elements.filter(
-								( _currentElement, currentIndex ) => {
-									if ( currentIndex === index ) {
+								(_currentElement, currentIndex) => {
+									if (currentIndex === index) {
 										return false;
 									}
 									return true;
@@ -229,16 +227,16 @@ function PaletteEditListView( {
 							onChange(
 								newElements.length ? newElements : undefined
 							);
-						} }
-						isEditing={ index === editingElement }
-						onStopEditing={ () => {
-							if ( index === editingElement ) {
-								setEditingElement( null );
+						}}
+						isEditing={index === editingElement}
+						onStopEditing={() => {
+							if (index === editingElement) {
+								setEditingElement(null);
 							}
-						} }
-						slugPrefix={ slugPrefix }
+						}}
+						slugPrefix={slugPrefix}
 					/>
-				) ) }
+				))}
 			</ItemGroup>
 		</VStack>
 	);
@@ -246,7 +244,7 @@ function PaletteEditListView( {
 
 const EMPTY_ARRAY = [];
 
-export default function PaletteEdit( {
+export default function PaletteEdit({
 	gradients,
 	colors = EMPTY_ARRAY,
 	onChange,
@@ -255,176 +253,169 @@ export default function PaletteEdit( {
 	canOnlyChangeValues,
 	canReset,
 	slugPrefix = '',
-} ) {
-	const isGradient = !! gradients;
+}) {
+	const isGradient = !!gradients;
 	const elements = isGradient ? gradients : colors;
-	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingElement, setEditingElement ] = useState( null );
+	const [isEditing, setIsEditing] = useState(false);
+	const [editingElement, setEditingElement] = useState(null);
 	const isAdding =
 		isEditing &&
 		editingElement &&
-		elements[ editingElement ] &&
-		! elements[ editingElement ].slug;
+		elements[editingElement] &&
+		!elements[editingElement].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
 
 	return (
 		<PaletteEditStyles>
 			<PaletteHStackHeader>
-				<PaletteHeading>{ paletteLabel }</PaletteHeading>
+				<PaletteHeading>{paletteLabel}</PaletteHeading>
 				<PaletteActionsContainer>
-					{ isEditing && (
+					{isEditing && (
 						<DoneButton
 							isSmall
-							onClick={ () => {
-								setIsEditing( false );
-								setEditingElement( null );
-							} }
+							onClick={() => {
+								setIsEditing(false);
+								setEditingElement(null);
+							}}
 						>
-							{ __( 'Done' ) }
+							{__('Done')}
 						</DoneButton>
-					) }
-					{ ! canOnlyChangeValues && (
+					)}
+					{!canOnlyChangeValues && (
 						<Button
 							isSmall
-							isPressed={ isAdding }
-							icon={ plus }
+							isPressed={isAdding}
+							icon={plus}
 							label={
 								isGradient
-									? __( 'Add gradient' )
-									: __( 'Add color' )
+									? __('Add gradient')
+									: __('Add color')
 							}
-							onClick={ () => {
-								const tempOptionName = getNameForPosition(
-									elementsLength
-								);
-								onChange( [
+							onClick={() => {
+								const tempOptionName =
+									getNameForPosition(elementsLength);
+								onChange([
 									...elements,
 									{
-										...( isGradient
+										...(isGradient
 											? { gradient: DEFAULT_GRADIENT }
-											: { color: DEFAULT_COLOR } ),
+											: { color: DEFAULT_COLOR }),
 										name: tempOptionName,
 										slug:
 											slugPrefix +
-											kebabCase( tempOptionName ),
+											kebabCase(tempOptionName),
 									},
-								] );
-								setIsEditing( true );
-								setEditingElement( elements.length );
-							} }
+								]);
+								setIsEditing(true);
+								setEditingElement(elements.length);
+							}}
 						/>
-					) }
+					)}
 
-					{ hasElements &&
-						( ! isEditing ||
-							! canOnlyChangeValues ||
-							canReset ) && (
+					{hasElements &&
+						(!isEditing || !canOnlyChangeValues || canReset) && (
 							<DropdownMenu
-								icon={ moreVertical }
+								icon={moreVertical}
 								label={
 									isGradient
-										? __( 'Gradient options' )
-										: __( 'Color options' )
+										? __('Gradient options')
+										: __('Color options')
 								}
-								toggleProps={ {
+								toggleProps={{
 									isSmall: true,
-								} }
+								}}
 							>
-								{ ( { onClose } ) => (
+								{({ onClose }) => (
 									<>
 										<NavigableMenu role="menu">
-											{ ! isEditing && (
+											{!isEditing && (
 												<Button
 													variant="tertiary"
-													onClick={ () => {
-														setIsEditing( true );
+													onClick={() => {
+														setIsEditing(true);
 														onClose();
-													} }
+													}}
 													className="components-palette-edit__menu-button"
 												>
-													{ isGradient
-														? __( 'Edit gradients' )
-														: __( 'Edit colors' ) }
+													{isGradient
+														? __('Edit gradients')
+														: __('Edit colors')}
 												</Button>
-											) }
-											{ ! canOnlyChangeValues && (
+											)}
+											{!canOnlyChangeValues && (
 												<Button
 													variant="tertiary"
-													onClick={ () => {
-														setEditingElement(
-															null
-														);
-														setIsEditing( false );
+													onClick={() => {
+														setEditingElement(null);
+														setIsEditing(false);
 														onChange();
 														onClose();
-													} }
+													}}
 													className="components-palette-edit__menu-button"
 												>
-													{ isGradient
+													{isGradient
 														? __(
 																'Remove all gradients'
 														  )
 														: __(
 																'Remove all colors'
-														  ) }
+														  )}
 												</Button>
-											) }
-											{ canReset && (
+											)}
+											{canReset && (
 												<Button
 													variant="tertiary"
-													onClick={ () => {
-														setEditingElement(
-															null
-														);
+													onClick={() => {
+														setEditingElement(null);
 														onChange();
 														onClose();
-													} }
+													}}
 												>
-													{ isGradient
-														? __( 'Reset gradient' )
-														: __( 'Reset colors' ) }
+													{isGradient
+														? __('Reset gradient')
+														: __('Reset colors')}
 												</Button>
-											) }
+											)}
 										</NavigableMenu>
 									</>
-								) }
+								)}
 							</DropdownMenu>
-						) }
+						)}
 				</PaletteActionsContainer>
 			</PaletteHStackHeader>
-			{ hasElements && (
+			{hasElements && (
 				<>
-					{ isEditing && (
+					{isEditing && (
 						<PaletteEditListView
-							canOnlyChangeValues={ canOnlyChangeValues }
-							elements={ elements }
-							onChange={ onChange }
-							editingElement={ editingElement }
-							setEditingElement={ setEditingElement }
-							slugPrefix={ slugPrefix }
-							isGradient={ isGradient }
+							canOnlyChangeValues={canOnlyChangeValues}
+							elements={elements}
+							onChange={onChange}
+							editingElement={editingElement}
+							setEditingElement={setEditingElement}
+							slugPrefix={slugPrefix}
+							isGradient={isGradient}
 						/>
-					) }
-					{ ! isEditing &&
-						( isGradient ? (
+					)}
+					{!isEditing &&
+						(isGradient ? (
 							<GradientPicker
-								gradients={ gradients }
-								onChange={ () => {} }
-								clearable={ false }
-								disableCustomGradients={ true }
+								gradients={gradients}
+								onChange={() => {}}
+								clearable={false}
+								disableCustomGradients={true}
 							/>
 						) : (
 							<ColorPalette
-								colors={ colors }
-								onChange={ () => {} }
-								clearable={ false }
-								disableCustomColors={ true }
+								colors={colors}
+								onChange={() => {}}
+								clearable={false}
+								disableCustomColors={true}
 							/>
-						) ) }
+						))}
 				</>
-			) }
-			{ ! hasElements && emptyMessage }
+			)}
+			{!hasElements && emptyMessage}
 		</PaletteEditStyles>
 	);
 }

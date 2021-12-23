@@ -10,20 +10,20 @@ import { getClipboard } from '@wordpress/components';
  */
 import { store as blockEditorStore } from '../../../store';
 
-export default function useClipboardBlock( destinationRootClientId ) {
-	const { canInsertBlockType } = useSelect( blockEditorStore );
-	const { getBlockType } = useSelect( blocksStore );
+export default function useClipboardBlock(destinationRootClientId) {
+	const { canInsertBlockType } = useSelect(blockEditorStore);
+	const { getBlockType } = useSelect(blocksStore);
 
 	const clipboard = getClipboard();
-	const clipboardBlock = rawHandler( { HTML: clipboard } )[ 0 ];
+	const clipboardBlock = rawHandler({ HTML: clipboard })[0];
 
 	const canAddClipboardBlock = canInsertBlockType(
 		clipboardBlock?.name,
 		destinationRootClientId
 	);
-	const blockType = getBlockType( clipboardBlock?.name );
+	const blockType = getBlockType(clipboardBlock?.name);
 
-	if ( ! canAddClipboardBlock || ! blockType ) {
+	if (!canAddClipboardBlock || !blockType) {
 		return undefined;
 	}
 

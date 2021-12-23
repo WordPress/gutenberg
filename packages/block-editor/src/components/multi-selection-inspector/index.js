@@ -13,35 +13,35 @@ import { stack } from '@wordpress/icons';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
-function MultiSelectionInspector( { blocks } ) {
-	const words = wordCount( serialize( blocks ), 'words' );
+function MultiSelectionInspector({ blocks }) {
+	const words = wordCount(serialize(blocks), 'words');
 
 	return (
 		<div className="block-editor-multi-selection-inspector__card">
-			<BlockIcon icon={ stack } showColors />
+			<BlockIcon icon={stack} showColors />
 			<div className="block-editor-multi-selection-inspector__card-content">
 				<div className="block-editor-multi-selection-inspector__card-title">
-					{ sprintf(
+					{sprintf(
 						/* translators: %d: number of blocks */
-						_n( '%d block', '%d blocks', blocks.length ),
+						_n('%d block', '%d blocks', blocks.length),
 						blocks.length
-					) }
+					)}
 				</div>
 				<div className="block-editor-multi-selection-inspector__card-description">
-					{ sprintf(
+					{sprintf(
 						/* translators: %d: number of words */
-						_n( '%d word', '%d words', words ),
+						_n('%d word', '%d words', words),
 						words
-					) }
+					)}
 				</div>
 			</div>
 		</div>
 	);
 }
 
-export default withSelect( ( select ) => {
-	const { getMultiSelectedBlocks } = select( blockEditorStore );
+export default withSelect((select) => {
+	const { getMultiSelectedBlocks } = select(blockEditorStore);
 	return {
 		blocks: getMultiSelectedBlocks(),
 	};
-} )( MultiSelectionInspector );
+})(MultiSelectionInspector);

@@ -1,47 +1,47 @@
 /**
  * External dependencies
  */
-const { cosmiconfigSync } = require( 'cosmiconfig' );
+const { cosmiconfigSync } = require('cosmiconfig');
 
 /**
  * WordPress dependencies
  */
-const defaultPrettierConfig = require( '@wordpress/prettier-config' );
+const defaultPrettierConfig = require('@wordpress/prettier-config');
 
 /**
  * Internal dependencies
  */
-const { isPackageInstalled } = require( '../utils' );
+const { isPackageInstalled } = require('../utils');
 
 const { config: localPrettierConfig } =
-	cosmiconfigSync( 'prettier' ).search() || {};
+	cosmiconfigSync('prettier').search() || {};
 const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
 
 const config = {
 	extends: [
-		require.resolve( './recommended-with-formatting.js' ),
+		require.resolve('./recommended-with-formatting.js'),
 		'plugin:prettier/recommended',
 	],
 	rules: {
-		'prettier/prettier': [ 'error', prettierConfig ],
+		'prettier/prettier': ['error', prettierConfig],
 	},
 };
 
-if ( isPackageInstalled( 'typescript' ) ) {
+if (isPackageInstalled('typescript')) {
 	config.settings = {
 		'import/resolver': {
 			node: {
-				extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+				extensions: ['.js', '.jsx', '.ts', '.tsx'],
 			},
 		},
-		'import/core-modules': [ 'react' ],
+		'import/core-modules': ['react'],
 	};
-	config.extends.push( 'plugin:@typescript-eslint/eslint-recommended' );
-	config.ignorePatterns = [ '**/*.d.ts' ];
-	config.plugins = [ '@typescript-eslint' ];
+	config.extends.push('plugin:@typescript-eslint/eslint-recommended');
+	config.ignorePatterns = ['**/*.d.ts'];
+	config.plugins = ['@typescript-eslint'];
 	config.overrides = [
 		{
-			files: [ '**/*.ts', '**/*.tsx' ],
+			files: ['**/*.ts', '**/*.tsx'],
 			parser: '@typescript-eslint/parser',
 			rules: {
 				'no-duplicate-imports': 'off',

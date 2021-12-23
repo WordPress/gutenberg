@@ -11,24 +11,24 @@ import screens from './modal-screens/screens';
 import LinkSettingsScreen from './modal-screens/link-settings-screen';
 import LinkPickerScreen from './modal-screens/link-picker-screen';
 
-const ModalLinkUI = ( { isVisible, ...restProps } ) => {
-	return useMemo( () => {
+const ModalLinkUI = ({ isVisible, ...restProps }) => {
+	return useMemo(() => {
 		return (
 			<BottomSheet
-				isVisible={ isVisible }
+				isVisible={isVisible}
 				hideHeader
-				onClose={ restProps.onClose }
+				onClose={restProps.onClose}
 				hasNavigation
 			>
 				<BottomSheet.NavigationContainer animate main>
-					<BottomSheet.NavigationScreen name={ screens.settings }>
+					<BottomSheet.NavigationScreen name={screens.settings}>
 						<LinkSettingsScreen
-							isVisible={ isVisible }
-							{ ...restProps }
+							isVisible={isVisible}
+							{...restProps}
 						/>
 					</BottomSheet.NavigationScreen>
 					<BottomSheet.NavigationScreen
-						name={ screens.picker }
+						name={screens.picker}
 						isScrollable
 						fullScreen
 					>
@@ -37,7 +37,7 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 				</BottomSheet.NavigationContainer>
 			</BottomSheet>
 		);
-	}, [ isVisible ] );
+	}, [isVisible]);
 };
 
-export default withSpokenMessages( ModalLinkUI );
+export default withSpokenMessages(ModalLinkUI);

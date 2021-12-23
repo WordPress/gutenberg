@@ -9,10 +9,10 @@ import { useControlLabel } from './hook';
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
  * @param {import('react').Ref<any>}                                                              forwardedRef
  */
-function ControlLabel( props, forwardedRef ) {
-	const controlLabelProps = useControlLabel( props );
+function ControlLabel(props, forwardedRef) {
+	const controlLabelProps = useControlLabel(props);
 
-	return <View as="label" { ...controlLabelProps } ref={ forwardedRef } />;
+	return <View as="label" {...controlLabelProps} ref={forwardedRef} />;
 }
 
 /**
@@ -32,6 +32,6 @@ function ControlLabel( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedControlLabel = contextConnect( ControlLabel, 'ControlLabel' );
+const ConnectedControlLabel = contextConnect(ControlLabel, 'ControlLabel');
 
 export default ConnectedControlLabel;

@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
-const util = require( 'util' );
-const fs = require( 'fs' ).promises;
-const path = require( 'path' );
+const dockerCompose = require('docker-compose');
+const util = require('util');
+const fs = require('fs').promises;
+const path = require('path');
 
 /**
  * Promisified dependencies
  */
-const copyDir = util.promisify( require( 'copy-dir' ) );
+const copyDir = util.promisify(require('copy-dir'));
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -24,12 +24,12 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  *
  * @param {WPConfig} config The wp-env config object.
  */
-async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
-	await dockerCompose.run( 'cli', 'wp db check', {
+async function checkDatabaseConnection({ dockerComposeConfigPath, debug }) {
+	await dockerCompose.run('cli', 'wp db check', {
 		config: dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
+		commandOptions: ['--rm'],
 		log: debug,
-	} );
+	});
 }
 
 /**
@@ -41,42 +41,40 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * @param {WPConfig}      config      The wp-env config object.
  * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
-async function configureWordPress( environment, config, spinner ) {
-	const installCommand = `wp core install --url="localhost:${ config.env[ environment ].port }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+async function configureWordPress(environment, config, spinner) {
+	const installCommand = `wp core install --url="localhost:${config.env[environment].port}" --title="${config.name}" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
-	const setupCommands = [ 'set -eo pipefail', installCommand ];
+	const setupCommands = ['set -eo pipefail', installCommand];
 
 	// Set wp-config.php values.
-	for ( let [ key, value ] of Object.entries(
-		config.env[ environment ].config
-	) ) {
+	for (let [key, value] of Object.entries(config.env[environment].config)) {
 		// Add quotes around string values to work with multi-word strings better.
-		value = typeof value === 'string' ? `"${ value }"` : value;
+		value = typeof value === 'string' ? `"${value}"` : value;
 		setupCommands.push(
-			`wp config set ${ key } ${ value } --anchor="define( 'WP_DEBUG',"${
+			`wp config set ${key} ${value} --anchor="define( 'WP_DEBUG',"${
 				typeof value !== 'string' ? ' --raw' : ''
 			}`
 		);
 	}
 
 	// Activate all plugins.
-	for ( const pluginSource of config.env[ environment ].pluginSources ) {
-		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
+	for (const pluginSource of config.env[environment].pluginSources) {
+		setupCommands.push(`wp plugin activate ${pluginSource.basename}`);
 	}
 
-	if ( config.debug ) {
+	if (config.debug) {
 		spinner.info(
-			`Running the following setup commands on the ${ environment } instance:\n - ${ setupCommands.join(
+			`Running the following setup commands on the ${environment} instance:\n - ${setupCommands.join(
 				'\n - '
-			) }\n`
+			)}\n`
 		);
 	}
 
 	// Execute all setup commands in a batch.
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
-		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
+		['bash', '-c', setupCommands.join(' && ')],
 		{
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
@@ -116,58 +114,55 @@ async function configureWordPress( environment, config, spinner ) {
  * @param {WPEnvironmentSelection} environment The environment to clean. Either 'development', 'tests', or 'all'.
  * @param {WPConfig}               config      The wp-env config object.
  */
-async function resetDatabase(
-	environment,
-	{ dockerComposeConfigPath, debug }
-) {
+async function resetDatabase(environment, { dockerComposeConfigPath, debug }) {
 	const options = {
 		config: dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
+		commandOptions: ['--rm'],
 		log: debug,
 	};
 
 	const tasks = [];
 
-	if ( environment === 'all' || environment === 'development' ) {
-		tasks.push( dockerCompose.run( 'cli', 'wp db reset --yes', options ) );
+	if (environment === 'all' || environment === 'development') {
+		tasks.push(dockerCompose.run('cli', 'wp db reset --yes', options));
 	}
 
-	if ( environment === 'all' || environment === 'tests' ) {
+	if (environment === 'all' || environment === 'tests') {
 		tasks.push(
-			dockerCompose.run( 'tests-cli', 'wp db reset --yes', options )
+			dockerCompose.run('tests-cli', 'wp db reset --yes', options)
 		);
 	}
 
-	await Promise.all( tasks );
+	await Promise.all(tasks);
 }
 
-async function setupWordPressDirectories( config ) {
+async function setupWordPressDirectories(config) {
 	if (
 		config.env.development.coreSource &&
-		hasSameCoreSource( [ config.env.development, config.env.tests ] )
+		hasSameCoreSource([config.env.development, config.env.tests])
 	) {
 		await copyCoreFiles(
 			config.env.development.coreSource.path,
 			config.env.development.coreSource.testsPath
 		);
-		await createUploadsDir( config.env.development.coreSource.testsPath );
+		await createUploadsDir(config.env.development.coreSource.testsPath);
 	}
 
 	const checkedPaths = {};
-	for ( const { coreSource } of Object.values( config.env ) ) {
-		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
-			await createUploadsDir( coreSource.path );
-			checkedPaths[ coreSource.path ] = true;
+	for (const { coreSource } of Object.values(config.env)) {
+		if (coreSource && !checkedPaths[coreSource.path]) {
+			await createUploadsDir(coreSource.path);
+			checkedPaths[coreSource.path] = true;
 		}
 	}
 }
 
-async function createUploadsDir( corePath ) {
+async function createUploadsDir(corePath) {
 	// Ensure the tests uploads folder is writeable for travis,
 	// creating the folder if necessary.
-	const uploadPath = path.join( corePath, 'wp-content/uploads' );
-	await fs.mkdir( uploadPath, { recursive: true } );
-	await fs.chmod( uploadPath, 0o0767 );
+	const uploadPath = path.join(corePath, 'wp-content/uploads');
+	await fs.mkdir(uploadPath, { recursive: true });
+	await fs.chmod(uploadPath, 0o0767);
 }
 
 /**
@@ -177,24 +172,21 @@ async function createUploadsDir( corePath ) {
  *
  * @return {boolean} True if all the environments have the same core source.
  */
-function hasSameCoreSource( envs ) {
-	if ( envs.length < 2 ) {
+function hasSameCoreSource(envs) {
+	if (envs.length < 2) {
 		return true;
 	}
-	return ! envs.some( ( env ) =>
-		areCoreSourcesDifferent( envs[ 0 ].coreSource, env.coreSource )
+	return !envs.some((env) =>
+		areCoreSourcesDifferent(envs[0].coreSource, env.coreSource)
 	);
 }
 
-function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
-	if (
-		( ! coreSource1 && coreSource2 ) ||
-		( coreSource1 && ! coreSource2 )
-	) {
+function areCoreSourcesDifferent(coreSource1, coreSource2) {
+	if ((!coreSource1 && coreSource2) || (coreSource1 && !coreSource2)) {
 		return true;
 	}
 
-	if ( coreSource1 && coreSource2 && coreSource1.path !== coreSource2.path ) {
+	if (coreSource1 && coreSource2 && coreSource1.path !== coreSource2.path) {
 		return true;
 	}
 
@@ -208,24 +200,24 @@ function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
  * @param {string} fromPath Path to the WordPress directory to copy.
  * @param {string} toPath   Destination path.
  */
-async function copyCoreFiles( fromPath, toPath ) {
-	await copyDir( fromPath, toPath, {
-		filter( stat, filepath, filename ) {
-			if ( stat === 'symbolicLink' ) {
+async function copyCoreFiles(fromPath, toPath) {
+	await copyDir(fromPath, toPath, {
+		filter(stat, filepath, filename) {
+			if (stat === 'symbolicLink') {
 				return false;
 			}
-			if ( stat === 'directory' && filename === '.git' ) {
+			if (stat === 'directory' && filename === '.git') {
 				return false;
 			}
-			if ( stat === 'directory' && filename === 'node_modules' ) {
+			if (stat === 'directory' && filename === 'node_modules') {
 				return false;
 			}
-			if ( stat === 'file' && filename === 'wp-config.php' ) {
+			if (stat === 'file' && filename === 'wp-config.php') {
 				return false;
 			}
 			return true;
 		},
-	} );
+	});
 }
 
 module.exports = {

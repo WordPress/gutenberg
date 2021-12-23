@@ -14,34 +14,33 @@ import { getRawTransforms } from './get-raw-transforms';
  *
  * @return {Array} An array of blocks.
  */
-export function htmlToBlocks( html ) {
-	const doc = document.implementation.createHTMLDocument( '' );
+export function htmlToBlocks(html) {
+	const doc = document.implementation.createHTMLDocument('');
 
 	doc.body.innerHTML = html;
 
-	return Array.from( doc.body.children ).flatMap( ( node ) => {
-		const rawTransform = findTransform(
-			getRawTransforms(),
-			( { isMatch } ) => isMatch( node )
+	return Array.from(doc.body.children).flatMap((node) => {
+		const rawTransform = findTransform(getRawTransforms(), ({ isMatch }) =>
+			isMatch(node)
 		);
 
-		if ( ! rawTransform ) {
+		if (!rawTransform) {
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
+				getBlockAttributes('core/html', node.outerHTML)
 			);
 		}
 
 		const { transform, blockName } = rawTransform;
 
-		if ( transform ) {
-			return transform( node );
+		if (transform) {
+			return transform(node);
 		}
 
 		return createBlock(
 			blockName,
-			getBlockAttributes( blockName, node.outerHTML )
+			getBlockAttributes(blockName, node.outerHTML)
 		);
-	} );
+	});
 }

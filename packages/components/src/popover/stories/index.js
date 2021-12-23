@@ -24,9 +24,9 @@ export default {
 };
 
 export const _default = () => {
-	const show = boolean( 'Example: Show', true );
-	const children = text( 'children', 'Popover Content' );
-	const animate = boolean( 'animate', false );
+	const show = boolean('Example: Show', true);
+	const children = text('children', 'Popover Content');
+	const animate = boolean('animate', false);
 	const focusOnMount = select(
 		'focusOnMount',
 		{
@@ -35,8 +35,8 @@ export const _default = () => {
 		},
 		'firstElement'
 	);
-	const noArrow = boolean( 'noArrow', false );
-	const isAlternate = boolean( 'isAlternate', false );
+	const noArrow = boolean('noArrow', false);
+	const isAlternate = boolean('isAlternate', false);
 
 	const props = {
 		animate,
@@ -46,32 +46,32 @@ export const _default = () => {
 		isAlternate,
 	};
 
-	if ( ! show ) {
+	if (!show) {
 		return null;
 	}
 
-	return <Popover { ...props } />;
+	return <Popover {...props} />;
 };
 
-const DragExample = ( props ) => {
+const DragExample = (props) => {
 	const { label, content, ...restProps } = props;
 
 	return (
 		<div>
-			<div style={ { position: 'absolute', color: '#555' } }>
+			<div style={{ position: 'absolute', color: '#555' }}>
 				<p>Move the gray box around.</p>
 				<p>
-					The{ ' ' }
-					<strong style={ { background: 'pink' } }>
+					The{' '}
+					<strong style={{ background: 'pink' }}>
 						pink bordered
-					</strong>{ ' ' }
+					</strong>{' '}
 					element is a parent.
 				</p>
 				<p>
-					The{ ' ' }
-					<strong style={ { background: 'cyan' } }>
+					The{' '}
+					<strong style={{ background: 'cyan' }}>
 						cyan bordered
-					</strong>{ ' ' }
+					</strong>{' '}
 					element is a sibling to <strong>Popover</strong>.
 				</p>
 				<p>
@@ -80,25 +80,25 @@ const DragExample = ( props ) => {
 				</p>
 			</div>
 			<div
-				style={ {
+				style={{
 					height: '100vh',
 					width: '100%',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
-				} }
+				}}
 			>
 				<DraggableWrapper
-					style={ {
+					style={{
 						background: '#ddd',
 						border: '2px solid pink',
 						borderRadius: 4,
 						padding: 10,
 						userSelect: 'none',
-					} }
+					}}
 				>
-					<div style={ { border: '2px solid cyan' } }>{ label }</div>
-					<Popover { ...restProps }>{ content }</Popover>
+					<div style={{ border: '2px solid cyan' }}>{label}</div>
+					<Popover {...restProps}>{content}</Popover>
 				</DraggableWrapper>
 			</div>
 		</div>
@@ -106,34 +106,32 @@ const DragExample = ( props ) => {
 };
 
 export const positioning = () => {
-	const label = text( 'Example: Label', 'Drag Me!' );
-	const content = text( 'Example: Content', 'Popover' );
-	const noArrow = boolean( 'noArrow', false );
+	const label = text('Example: Label', 'Drag Me!');
+	const content = text('Example: Content', 'Popover');
+	const noArrow = boolean('noArrow', false);
 
-	return (
-		<DragExample label={ label } content={ content } noArrow={ noArrow } />
-	);
+	return <DragExample label={label} content={content} noArrow={noArrow} />;
 };
 
 function DynamicHeightPopover() {
-	const [ height, setHeight ] = useState( 200 );
-	const increase = () => setHeight( height + 100 );
-	const decrease = () => setHeight( height - 100 );
+	const [height, setHeight] = useState(200);
+	const increase = () => setHeight(height + 100);
+	const decrease = () => setHeight(height - 100);
 
 	return (
-		<div style={ { padding: '20px' } }>
+		<div style={{ padding: '20px' }}>
 			<div>
 				<Button
 					variant="primary"
-					onClick={ increase }
-					style={ {
+					onClick={increase}
+					style={{
 						marginRight: '20px',
-					} }
+					}}
 				>
 					Increase Size
 				</Button>
 
-				<Button variant="primary" onClick={ decrease }>
+				<Button variant="primary" onClick={decrease}>
 					Decrease Size
 				</Button>
 			</div>
@@ -146,11 +144,11 @@ function DynamicHeightPopover() {
 			<div>
 				<Popover>
 					<div
-						style={ {
+						style={{
 							height,
 							background: '#eee',
 							padding: '20px',
-						} }
+						}}
 					>
 						Content with dynamic height
 					</div>

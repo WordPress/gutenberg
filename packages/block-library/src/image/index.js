@@ -24,27 +24,27 @@ export const settings = {
 			sizeSlug: 'large',
 			url: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
 			// translators: Caption accompanying an image of the Mont Blanc, which serves as an example for the Image block.
-			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
+			caption: __('Mont Blanc appears—still, snowy, and serene.'),
 		},
 	},
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
+	__experimentalLabel(attributes, { context }) {
+		if (context === 'accessibility') {
 			const { caption, alt, url } = attributes;
 
-			if ( ! url ) {
-				return __( 'Empty' );
+			if (!url) {
+				return __('Empty');
 			}
 
-			if ( ! alt ) {
+			if (!alt) {
 				return caption || '';
 			}
 
 			// This is intended to be read by a screen reader.
 			// A period simply means a pause, no need to translate it.
-			return alt + ( caption ? '. ' + caption : '' );
+			return alt + (caption ? '. ' + caption : '');
 		}
 	},
-	getEditWrapperProps( attributes ) {
+	getEditWrapperProps(attributes) {
 		return {
 			'data-align': attributes.align,
 		};

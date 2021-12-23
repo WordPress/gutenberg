@@ -42,62 +42,60 @@ const groceries = [
 	},
 ];
 
-const Descender = ( { level } ) => {
-	if ( level === 1 ) {
+const Descender = ({ level }) => {
+	if (level === 1) {
 		return '';
 	}
-	const indentation = '\u00A0'.repeat( ( level - 1 ) * 4 );
+	const indentation = '\u00A0'.repeat((level - 1) * 4);
 
-	return <span aria-hidden="true">{ indentation + '├ ' }</span>;
+	return <span aria-hidden="true">{indentation + '├ '}</span>;
 };
 
-const Rows = ( { items, level = 1 } ) => {
-	return items.map( ( item, index ) => {
-		const hasChildren = !! item.types && !! item.types.length;
+const Rows = ({ items, level = 1 }) => {
+	return items.map((item, index) => {
+		const hasChildren = !!item.types && !!item.types.length;
 		return (
-			<Fragment key={ item.name }>
+			<Fragment key={item.name}>
 				<TreeGridRow
-					positionInSet={ index + 1 }
-					setSize={ items.length }
-					level={ level }
+					positionInSet={index + 1}
+					setSize={items.length}
+					level={level}
 				>
 					<TreeGridCell>
-						{ ( props ) => (
+						{(props) => (
 							<>
-								<Descender level={ level } />
-								<Button variant="primary" { ...props }>
-									{ item.name }
+								<Descender level={level} />
+								<Button variant="primary" {...props}>
+									{item.name}
 								</Button>
 							</>
-						) }
+						)}
 					</TreeGridCell>
 					<TreeGridCell>
-						{ ( props ) => (
-							<Button variant="secondary" { ...props }>
+						{(props) => (
+							<Button variant="secondary" {...props}>
 								Move Up
 							</Button>
-						) }
+						)}
 					</TreeGridCell>
 					<TreeGridCell>
-						{ ( props ) => (
-							<Button variant="secondary" { ...props }>
+						{(props) => (
+							<Button variant="secondary" {...props}>
 								Move Down
 							</Button>
-						) }
+						)}
 					</TreeGridCell>
 				</TreeGridRow>
-				{ hasChildren && (
-					<Rows items={ item.types } level={ level + 1 } />
-				) }
+				{hasChildren && <Rows items={item.types} level={level + 1} />}
 			</Fragment>
 		);
-	} );
+	});
 };
 
 export const _default = () => {
 	return (
 		<TreeGrid>
-			<Rows items={ groceries } />
+			<Rows items={groceries} />
 		</TreeGrid>
 	);
 };

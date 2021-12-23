@@ -3,18 +3,18 @@
  */
 import { getInlineStyles } from '../style';
 
-describe( 'getInlineStyles', () => {
-	it( 'should return an empty object when called with undefined', () => {
-		expect( getInlineStyles() ).toEqual( {} );
-	} );
+describe('getInlineStyles', () => {
+	it('should return an empty object when called with undefined', () => {
+		expect(getInlineStyles()).toEqual({});
+	});
 
-	it( 'should ignore unknown styles', () => {
-		expect( getInlineStyles( { color: 'red' } ) ).toEqual( {} );
-	} );
+	it('should ignore unknown styles', () => {
+		expect(getInlineStyles({ color: 'red' })).toEqual({});
+	});
 
-	it( 'should return the correct inline styles', () => {
+	it('should return the correct inline styles', () => {
 		expect(
-			getInlineStyles( {
+			getInlineStyles({
 				color: { text: 'red', background: 'black' },
 				typography: { lineHeight: 1.5, fontSize: 10 },
 				border: {
@@ -28,8 +28,8 @@ describe( 'getInlineStyles', () => {
 					padding: { top: '10px' },
 					margin: { bottom: '15px' },
 				},
-			} )
-		).toEqual( {
+			})
+		).toEqual({
 			'--wp--style--block-gap': '1em',
 			backgroundColor: 'black',
 			borderColor: '#21759b',
@@ -41,12 +41,12 @@ describe( 'getInlineStyles', () => {
 			fontSize: 10,
 			marginBottom: '15px',
 			paddingTop: '10px',
-		} );
-	} );
+		});
+	});
 
-	it( 'should return individual border radius styles', () => {
+	it('should return individual border radius styles', () => {
 		expect(
-			getInlineStyles( {
+			getInlineStyles({
 				border: {
 					radius: {
 						topLeft: '10px',
@@ -55,18 +55,18 @@ describe( 'getInlineStyles', () => {
 						bottomRight: '1em',
 					},
 				},
-			} )
-		).toEqual( {
+			})
+		).toEqual({
 			borderTopLeftRadius: '10px',
 			borderTopRightRadius: '0.5rem',
 			borderBottomLeftRadius: '0.5em',
 			borderBottomRightRadius: '1em',
-		} );
-	} );
+		});
+	});
 
-	it( 'should support longhand spacing styles', () => {
+	it('should support longhand spacing styles', () => {
 		expect(
-			getInlineStyles( {
+			getInlineStyles({
 				spacing: {
 					margin: {
 						top: '10px',
@@ -81,8 +81,8 @@ describe( 'getInlineStyles', () => {
 						left: '35px',
 					},
 				},
-			} )
-		).toEqual( {
+			})
+		).toEqual({
 			marginTop: '10px',
 			marginRight: '0.5rem',
 			marginBottom: '0.5em',
@@ -91,22 +91,22 @@ describe( 'getInlineStyles', () => {
 			paddingRight: '25px',
 			paddingBottom: '30px',
 			paddingLeft: '35px',
-		} );
-	} );
+		});
+	});
 
-	it( 'should support shorthand spacing styles', () => {
+	it('should support shorthand spacing styles', () => {
 		expect(
-			getInlineStyles( {
+			getInlineStyles({
 				spacing: {
 					blockGap: '1em',
 					margin: '10px',
 					padding: '20px',
 				},
-			} )
-		).toEqual( {
+			})
+		).toEqual({
 			'--wp--style--block-gap': '1em',
 			margin: '10px',
 			padding: '20px',
-		} );
-	} );
-} );
+		});
+	});
+});

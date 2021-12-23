@@ -20,9 +20,9 @@ export interface InputState {
 	value?: string;
 }
 
-export type StateReducer = Reducer< InputState, InputAction >;
+export type StateReducer = Reducer<InputState, InputAction>;
 
-export const initialStateReducer: StateReducer = ( state: InputState ) => state;
+export const initialStateReducer: StateReducer = (state: InputState) => state;
 
 export const initialInputControlState: InputState = {
 	_event: {},

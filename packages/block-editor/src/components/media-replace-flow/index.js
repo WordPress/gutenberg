@@ -31,7 +31,7 @@ import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 
-const MediaReplaceFlow = ( {
+const MediaReplaceFlow = ({
 	mediaURL,
 	mediaId,
 	allowedTypes,
@@ -40,23 +40,23 @@ const MediaReplaceFlow = ( {
 	onSelectURL,
 	onFilesUpload = noop,
 	onCloseModal = noop,
-	name = __( 'Replace' ),
+	name = __('Replace'),
 	createNotice,
 	removeNotice,
 	children,
-} ) => {
-	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
-	const mediaUpload = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().mediaUpload;
-	}, [] );
+}) => {
+	const [mediaURLValue, setMediaURLValue] = useState(mediaURL);
+	const mediaUpload = useSelect((select) => {
+		return select(blockEditorStore).getSettings().mediaUpload;
+	}, []);
 	const editMediaButtonRef = createRef();
 	const errorNoticeID = uniqueId(
 		'block-editor/media-replace-flow/error-notice/'
 	);
 
-	const onError = ( message ) => {
-		const errorElement = document.createElement( 'div' );
-		errorElement.innerHTML = renderToString( message );
+	const onError = (message) => {
+		const errorElement = document.createElement('div');
+		errorElement.innerHTML = renderToString(message);
 		// The default error contains some HTML that,
 		// for example, makes the filename bold.
 		// The notice, by default, accepts strings only and so
@@ -69,43 +69,43 @@ const MediaReplaceFlow = ( {
 		// regains focus once the upload dialog closes.
 		// Otherwise VO simply skips over the notice and announces
 		// the focused element and the open menu.
-		setTimeout( () => {
-			createNotice( 'error', renderMsg, {
+		setTimeout(() => {
+			createNotice('error', renderMsg, {
 				speak: true,
 				id: errorNoticeID,
 				isDismissible: true,
-			} );
-		}, 1000 );
+			});
+		}, 1000);
 	};
 
-	const selectMedia = ( media ) => {
-		setMediaURLValue( media.url );
+	const selectMedia = (media) => {
+		setMediaURLValue(media.url);
 		// Calling `onSelect` after the state update since it might unmount the component.
-		onSelect( media );
-		speak( __( 'The media file has been replaced' ) );
-		removeNotice( errorNoticeID );
+		onSelect(media);
+		speak(__('The media file has been replaced'));
+		removeNotice(errorNoticeID);
 	};
 
-	const selectURL = ( newURL ) => {
-		onSelectURL( newURL );
+	const selectURL = (newURL) => {
+		onSelectURL(newURL);
 	};
 
-	const uploadFiles = ( event ) => {
+	const uploadFiles = (event) => {
 		const files = event.target.files;
-		onFilesUpload( files );
-		const setMedia = ( [ media ] ) => {
-			selectMedia( media );
+		onFilesUpload(files);
+		const setMedia = ([media]) => {
+			selectMedia(media);
 		};
-		mediaUpload( {
+		mediaUpload({
 			allowedTypes,
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
-		} );
+		});
 	};
 
-	const openOnArrowDown = ( event ) => {
-		if ( event.keyCode === DOWN ) {
+	const openOnArrowDown = (event) => {
+		if (event.keyCode === DOWN) {
 			event.preventDefault();
 			event.target.click();
 		}
@@ -117,86 +117,86 @@ const MediaReplaceFlow = ( {
 
 	return (
 		<Dropdown
-			popoverProps={ POPOVER_PROPS }
+			popoverProps={POPOVER_PROPS}
 			contentClassName="block-editor-media-replace-flow__options"
-			renderToggle={ ( { isOpen, onToggle } ) => (
+			renderToggle={({ isOpen, onToggle }) => (
 				<ToolbarButton
-					ref={ editMediaButtonRef }
-					aria-expanded={ isOpen }
+					ref={editMediaButtonRef}
+					aria-expanded={isOpen}
 					aria-haspopup="true"
-					onClick={ onToggle }
-					onKeyDown={ openOnArrowDown }
+					onClick={onToggle}
+					onKeyDown={openOnArrowDown}
 				>
-					{ name }
+					{name}
 				</ToolbarButton>
-			) }
-			renderContent={ ( { onClose } ) => (
+			)}
+			renderContent={({ onClose }) => (
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
 						<MediaUpload
-							value={ mediaId }
-							onSelect={ ( media ) => selectMedia( media ) }
-							allowedTypes={ allowedTypes }
-							onClose={ onCloseModal }
-							render={ ( { open } ) => (
-								<MenuItem icon={ mediaIcon } onClick={ open }>
-									{ __( 'Open Media Library' ) }
+							value={mediaId}
+							onSelect={(media) => selectMedia(media)}
+							allowedTypes={allowedTypes}
+							onClose={onCloseModal}
+							render={({ open }) => (
+								<MenuItem icon={mediaIcon} onClick={open}>
+									{__('Open Media Library')}
 								</MenuItem>
-							) }
+							)}
 						/>
 						<MediaUploadCheck>
 							<FormFileUpload
-								onChange={ ( event ) => {
-									uploadFiles( event, onClose );
-								} }
-								accept={ accept }
-								render={ ( { openFileDialog } ) => {
+								onChange={(event) => {
+									uploadFiles(event, onClose);
+								}}
+								accept={accept}
+								render={({ openFileDialog }) => {
 									return (
 										<MenuItem
-											icon={ upload }
-											onClick={ () => {
+											icon={upload}
+											onClick={() => {
 												openFileDialog();
-											} }
+											}}
 										>
-											{ __( 'Upload' ) }
+											{__('Upload')}
 										</MenuItem>
 									);
-								} }
+								}}
 							/>
 						</MediaUploadCheck>
-						{ children }
+						{children}
 					</NavigableMenu>
-					{ onSelectURL && (
+					{onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
-								{ __( 'Current media URL:' ) }
+								{__('Current media URL:')}
 							</span>
 							<LinkControl
-								value={ { url: mediaURLValue } }
-								settings={ [] }
-								showSuggestions={ false }
-								onChange={ ( { url } ) => {
-									setMediaURLValue( url );
-									selectURL( url );
+								value={{ url: mediaURLValue }}
+								settings={[]}
+								showSuggestions={false}
+								onChange={({ url }) => {
+									setMediaURLValue(url);
+									selectURL(url);
 									editMediaButtonRef.current.focus();
-								} }
+								}}
 							/>
 						</form>
-					) }
+					)}
 				</>
-			) }
+			)}
 		/>
 	);
 };
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { createNotice, removeNotice } = dispatch( noticesStore );
+export default compose([
+	withDispatch((dispatch) => {
+		const { createNotice, removeNotice } = dispatch(noticesStore);
 		return {
 			createNotice,
 			removeNotice,
 		};
-	} ),
-	withFilters( 'editor.MediaReplaceFlow' ),
-] )( MediaReplaceFlow );
+	}),
+	withFilters('editor.MediaReplaceFlow'),
+])(MediaReplaceFlow);

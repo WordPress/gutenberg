@@ -10,14 +10,14 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  *
  * @return {void}
  */
-export default function unwrap( node ) {
+export default function unwrap(node) {
 	const parent = node.parentNode;
 
-	assertIsDefined( parent, 'node.parentNode' );
+	assertIsDefined(parent, 'node.parentNode');
 
-	while ( node.firstChild ) {
-		parent.insertBefore( node.firstChild, node );
+	while (node.firstChild) {
+		parent.insertBefore(node.firstChild, node);
 	}
 
-	parent.removeChild( node );
+	parent.removeChild(node);
 }

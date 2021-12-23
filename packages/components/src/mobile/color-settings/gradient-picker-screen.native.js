@@ -22,13 +22,13 @@ const GradientPickerScreen = () => {
 	return (
 		<View>
 			<NavBar>
-				<NavBar.BackButton onPress={ navigation.goBack } />
-				<NavBar.Heading>{ __( 'Customize Gradient' ) }</NavBar.Heading>
+				<NavBar.BackButton onPress={navigation.goBack} />
+				<NavBar.Heading>{__('Customize Gradient')}</NavBar.Heading>
 			</NavBar>
 			<CustomGradientPicker
-				setColor={ setColor }
-				currentValue={ currentValue }
-				isGradientColor={ isGradientColor }
+				setColor={setColor}
+				currentValue={currentValue}
+				isGradientColor={isGradientColor}
 			/>
 		</View>
 	);

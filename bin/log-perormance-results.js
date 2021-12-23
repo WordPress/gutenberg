@@ -3,27 +3,27 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const path = require( 'path' );
-const https = require( 'https' );
-const [ token, branch, hash, baseHash, timestamp ] = process.argv.slice( 2 );
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
+const [token, branch, hash, baseHash, timestamp] = process.argv.slice(2);
 
 const performanceResults = JSON.parse(
 	fs.readFileSync(
-		path.join( __dirname, '../post-editor-performance-results.json' ),
+		path.join(__dirname, '../post-editor-performance-results.json'),
 		'utf8'
 	)
 );
 
 const data = new TextEncoder().encode(
-	JSON.stringify( {
+	JSON.stringify({
 		branch,
 		hash,
 		baseHash,
-		timestamp: parseInt( timestamp, 10 ),
-		metrics: performanceResults[ hash ],
-		baseMetrics: performanceResults[ baseHash ],
-	} )
+		timestamp: parseInt(timestamp, 10),
+		metrics: performanceResults[hash],
+		baseMetrics: performanceResults[baseHash],
+	})
 );
 
 const options = {
@@ -37,17 +37,17 @@ const options = {
 	},
 };
 
-const req = https.request( options, ( res ) => {
-	console.log( `statusCode: ${ res.statusCode }` );
+const req = https.request(options, (res) => {
+	console.log(`statusCode: ${res.statusCode}`);
 
-	res.on( 'data', ( d ) => {
-		process.stdout.write( d );
-	} );
-} );
+	res.on('data', (d) => {
+		process.stdout.write(d);
+	});
+});
 
-req.on( 'error', ( error ) => {
-	console.error( error );
-} );
+req.on('error', (error) => {
+	console.error(error);
+});
 
-req.write( data );
+req.write(data);
 req.end();

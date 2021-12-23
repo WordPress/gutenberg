@@ -22,13 +22,13 @@ export default {
 };
 
 function Example() {
-	const [ value, setValue ] = useState( '' );
+	const [value, setValue] = useState('');
 
 	const props = {
-		disabled: boolean( 'disabled', false ),
-		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
-		label: text( 'label', 'Value' ),
+		disabled: boolean('disabled', false),
+		hideLabelFromVision: boolean('hideLabelFromVision', false),
+		isPressEnterToChange: boolean('isPressEnterToChange', false),
+		label: text('label', 'Value'),
 		labelPosition: select(
 			'labelPosition',
 			{
@@ -38,7 +38,7 @@ function Example() {
 			},
 			'top'
 		),
-		placeholder: text( 'placeholder', 'Placeholder' ),
+		placeholder: text('placeholder', 'Placeholder'),
 		size: select(
 			'size',
 			{
@@ -48,20 +48,20 @@ function Example() {
 			},
 			'default'
 		),
-		suffix: text( 'suffix', '' ),
-		prefix: text( 'prefix', '' ),
+		suffix: text('suffix', ''),
+		prefix: text('prefix', ''),
 	};
 
-	const suffixMarkup = props.suffix ? <div>{ props.suffix }</div> : null;
-	const prefixMarkup = props.prefix ? <div>{ props.prefix }</div> : null;
+	const suffixMarkup = props.suffix ? <div>{props.suffix}</div> : null;
+	const prefixMarkup = props.prefix ? <div>{props.prefix}</div> : null;
 
 	return (
 		<InputControl
-			{ ...props }
-			onChange={ ( v ) => setValue( v ) }
-			prefix={ prefixMarkup }
-			suffix={ suffixMarkup }
-			value={ value }
+			{...props}
+			onChange={(v) => setValue(v)}
+			prefix={prefixMarkup}
+			suffix={suffixMarkup}
+			value={value}
 		/>
 	);
 }

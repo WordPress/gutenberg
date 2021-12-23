@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
+const path = require('path');
 
-module.exports = function ( api ) {
-	api.cache( true );
+module.exports = function (api) {
+	api.cache(true);
 	return {
-		presets: [ 'module:metro-react-native-babel-preset' ],
+		presets: ['module:metro-react-native-babel-preset'],
 		plugins: [
 			path.resolve(
 				__dirname,
@@ -16,7 +16,7 @@ module.exports = function ( api ) {
 			[
 				'react-native-platform-specific-extensions',
 				{
-					extensions: [ 'css', 'scss', 'sass' ],
+					extensions: ['css', 'scss', 'sass'],
 				},
 			],
 		],
@@ -32,7 +32,8 @@ module.exports = function ( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/(react-native|@react-native-community|@react-navigation)/,
+				exclude:
+					/node_modules\/(react-native|@react-native-community|@react-navigation)/,
 			},
 			{
 				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
@@ -47,15 +48,16 @@ module.exports = function ( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/(react-native|@react-native-community|@react-navigation)/,
+				exclude:
+					/node_modules\/(react-native|@react-native-community|@react-navigation)/,
 			},
 		],
 		env: {
 			development: {
-				plugins: [ '@babel/transform-react-jsx-source' ],
+				plugins: ['@babel/transform-react-jsx-source'],
 			},
 			production: {
-				plugins: [ 'transform-remove-console' ],
+				plugins: ['transform-remove-console'],
 			},
 		},
 	};

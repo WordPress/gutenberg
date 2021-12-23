@@ -9,16 +9,16 @@ import { View } from '../view';
  * @param {import('../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
  * @param {import('react').Ref<any>}                                                                        forwardedRef
  */
-function VisuallyHidden( props, forwardedRef ) {
+function VisuallyHidden(props, forwardedRef) {
 	const { style: styleProp, ...contextProps } = useContextSystem(
 		props,
 		'VisuallyHidden'
 	);
 	return (
 		<View
-			ref={ forwardedRef }
-			{ ...contextProps }
-			style={ { ...visuallyHidden, ...( styleProp || {} ) } }
+			ref={forwardedRef}
+			{...contextProps}
+			style={{ ...visuallyHidden, ...(styleProp || {}) }}
 		/>
 	);
 }

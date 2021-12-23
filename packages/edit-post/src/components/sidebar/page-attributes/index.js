@@ -28,37 +28,36 @@ import { store as editPostStore } from '../../../store';
 const PANEL_NAME = 'page-attributes';
 
 export function PageAttributes() {
-	const { isEnabled, isOpened, postType } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-			editPostStore
-		);
-		const { getPostType } = select( coreStore );
+	const { isEnabled, isOpened, postType } = useSelect((select) => {
+		const { getEditedPostAttribute } = select(editorStore);
+		const { isEditorPanelEnabled, isEditorPanelOpened } =
+			select(editPostStore);
+		const { getPostType } = select(coreStore);
 		return {
-			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
-			isOpened: isEditorPanelOpened( PANEL_NAME ),
-			postType: getPostType( getEditedPostAttribute( 'type' ) ),
+			isEnabled: isEditorPanelEnabled(PANEL_NAME),
+			isOpened: isEditorPanelOpened(PANEL_NAME),
+			postType: getPostType(getEditedPostAttribute('type')),
 		};
-	}, [] );
+	}, []);
 
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch(editPostStore);
 
-	if ( ! isEnabled || ! postType ) {
+	if (!isEnabled || !postType) {
 		return null;
 	}
 
-	const onTogglePanel = partial( toggleEditorPanelOpened, PANEL_NAME );
+	const onTogglePanel = partial(toggleEditorPanelOpened, PANEL_NAME);
 
 	return (
 		<PageAttributesCheck>
 			<PanelBody
-				title={ get(
+				title={get(
 					postType,
-					[ 'labels', 'attributes' ],
-					__( 'Page attributes' )
-				) }
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
+					['labels', 'attributes'],
+					__('Page attributes')
+				)}
+				opened={isOpened}
+				onToggle={onTogglePanel}
 			>
 				<PageAttributesParent />
 				<PanelRow>

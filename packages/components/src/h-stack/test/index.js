@@ -9,34 +9,34 @@ import { render } from '@testing-library/react';
 import { View } from '../../view';
 import { HStack } from '..';
 
-describe( 'props', () => {
-	test( 'should render correctly', () => {
+describe('props', () => {
+	test('should render correctly', () => {
 		const { container } = render(
 			<HStack>
 				<View />
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
-	} );
+		expect(container.firstChild).toMatchSnapshot();
+	});
 
-	test( 'should render alignment', () => {
+	test('should render alignment', () => {
 		const { container } = render(
 			<HStack alignment="center">
 				<View />
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
-	} );
+		expect(container.firstChild).toMatchSnapshot();
+	});
 
-	test( 'should render spacing', () => {
+	test('should render spacing', () => {
 		const { container } = render(
-			<HStack spacing={ 5 }>
+			<HStack spacing={5}>
 				<View />
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
-	} );
-} );
+		expect(container.firstChild).toMatchSnapshot();
+	});
+});

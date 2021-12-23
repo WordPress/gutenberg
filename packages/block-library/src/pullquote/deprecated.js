@@ -48,13 +48,13 @@ const blockAttributes = {
 	},
 };
 
-function parseBorderColor( styleString ) {
-	if ( ! styleString ) {
+function parseBorderColor(styleString) {
+	if (!styleString) {
 		return;
 	}
-	const matches = styleString.match( /border-color:([^;]+)[;]?/ );
-	if ( matches && matches[ 1 ] ) {
-		return matches[ 1 ];
+	const matches = styleString.match(/border-color:([^;]+)[;]?/);
+	if (matches && matches[1]) {
+		return matches[1];
 	}
 }
 
@@ -64,7 +64,7 @@ const deprecated = [
 		attributes: {
 			...blockAttributes,
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				mainColor,
 				customMainColor,
@@ -75,21 +75,21 @@ const deprecated = [
 				className,
 			} = attributes;
 
-			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			const isSolidColorStyle = includes(className, SOLID_COLOR_CLASS);
 
 			let figureClasses, figureStyles;
 
 			// Is solid color style
-			if ( isSolidColorStyle ) {
+			if (isSolidColorStyle) {
 				const backgroundClass = getColorClassName(
 					'background-color',
 					mainColor
 				);
 
-				figureClasses = classnames( {
+				figureClasses = classnames({
 					'has-background': backgroundClass || customMainColor,
-					[ backgroundClass ]: backgroundClass,
-				} );
+					[backgroundClass]: backgroundClass,
+				});
 
 				figureStyles = {
 					backgroundColor: backgroundClass
@@ -97,7 +97,7 @@ const deprecated = [
 						: customMainColor,
 				};
 				// Is normal style and a custom color is being used ( we can set a style directly with its value)
-			} else if ( customMainColor ) {
+			} else if (customMainColor) {
 				figureStyles = {
 					borderColor: customMainColor,
 				};
@@ -107,10 +107,10 @@ const deprecated = [
 				'color',
 				textColor
 			);
-			const blockquoteClasses = classnames( {
+			const blockquoteClasses = classnames({
 				'has-text-color': textColor || customTextColor,
-				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-			} );
+				[blockquoteTextColorClass]: blockquoteTextColorClass,
+			});
 
 			const blockquoteStyles = blockquoteTextColorClass
 				? undefined
@@ -118,38 +118,35 @@ const deprecated = [
 
 			return (
 				<figure
-					{ ...useBlockProps.save( {
+					{...useBlockProps.save({
 						className: figureClasses,
 						style: figureStyles,
-					} ) }
+					})}
 				>
 					<blockquote
-						className={ blockquoteClasses }
-						style={ blockquoteStyles }
+						className={blockquoteClasses}
+						style={blockquoteStyles}
 					>
-						<RichText.Content value={ value } multiline />
-						{ ! RichText.isEmpty( citation ) && (
-							<RichText.Content
-								tagName="cite"
-								value={ citation }
-							/>
-						) }
+						<RichText.Content value={value} multiline />
+						{!RichText.isEmpty(citation) && (
+							<RichText.Content tagName="cite" value={citation} />
+						)}
 					</blockquote>
 				</figure>
 			);
 		},
-		migrate( {
+		migrate({
 			className,
 			mainColor,
 			customMainColor,
 			customTextColor,
 			...attributes
-		} ) {
-			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		}) {
+			const isSolidColorStyle = includes(className, SOLID_COLOR_CLASS);
 			let style;
 
-			if ( customMainColor ) {
-				if ( ! isSolidColorStyle ) {
+			if (customMainColor) {
+				if (!isSolidColorStyle) {
 					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
 					style = {
 						border: {
@@ -167,7 +164,7 @@ const deprecated = [
 			}
 
 			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
-			if ( customTextColor && style ) {
+			if (customTextColor && style) {
 				style.color = {
 					...style.color,
 					text: customTextColor,
@@ -195,7 +192,7 @@ const deprecated = [
 				attribute: 'style',
 			},
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				mainColor,
 				customMainColor,
@@ -207,21 +204,21 @@ const deprecated = [
 				figureStyle,
 			} = attributes;
 
-			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			const isSolidColorStyle = includes(className, SOLID_COLOR_CLASS);
 
 			let figureClasses, figureStyles;
 
 			// Is solid color style
-			if ( isSolidColorStyle ) {
+			if (isSolidColorStyle) {
 				const backgroundClass = getColorClassName(
 					'background-color',
 					mainColor
 				);
 
-				figureClasses = classnames( {
+				figureClasses = classnames({
 					'has-background': backgroundClass || customMainColor,
-					[ backgroundClass ]: backgroundClass,
-				} );
+					[backgroundClass]: backgroundClass,
+				});
 
 				figureStyles = {
 					backgroundColor: backgroundClass
@@ -229,19 +226,19 @@ const deprecated = [
 						: customMainColor,
 				};
 				// Is normal style and a custom color is being used ( we can set a style directly with its value)
-			} else if ( customMainColor ) {
+			} else if (customMainColor) {
 				figureStyles = {
 					borderColor: customMainColor,
 				};
 				// If normal style and a named color are being used, we need to retrieve the color value to set the style,
 				// as there is no expectation that themes create classes that set border colors.
-			} else if ( mainColor ) {
+			} else if (mainColor) {
 				// Previously here we queried the color settings to know the color value
 				// of a named color. This made the save function impure and the block was refactored,
 				// because meanwhile a change in the editor made it impossible to query color settings in the save function.
 				// Here instead of querying the color settings to know the color value, we retrieve the value
 				// directly from the style previously serialized.
-				const borderColor = parseBorderColor( figureStyle );
+				const borderColor = parseBorderColor(figureStyle);
 				figureStyles = {
 					borderColor,
 				};
@@ -252,45 +249,42 @@ const deprecated = [
 				textColor
 			);
 			const blockquoteClasses =
-				( textColor || customTextColor ) &&
-				classnames( 'has-text-color', {
-					[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-				} );
+				(textColor || customTextColor) &&
+				classnames('has-text-color', {
+					[blockquoteTextColorClass]: blockquoteTextColorClass,
+				});
 
 			const blockquoteStyles = blockquoteTextColorClass
 				? undefined
 				: { color: customTextColor };
 
 			return (
-				<figure className={ figureClasses } style={ figureStyles }>
+				<figure className={figureClasses} style={figureStyles}>
 					<blockquote
-						className={ blockquoteClasses }
-						style={ blockquoteStyles }
+						className={blockquoteClasses}
+						style={blockquoteStyles}
 					>
-						<RichText.Content value={ value } multiline />
-						{ ! RichText.isEmpty( citation ) && (
-							<RichText.Content
-								tagName="cite"
-								value={ citation }
-							/>
-						) }
+						<RichText.Content value={value} multiline />
+						{!RichText.isEmpty(citation) && (
+							<RichText.Content tagName="cite" value={citation} />
+						)}
 					</blockquote>
 				</figure>
 			);
 		},
-		migrate( {
+		migrate({
 			className,
 			figureStyle,
 			mainColor,
 			customMainColor,
 			customTextColor,
 			...attributes
-		} ) {
-			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		}) {
+			const isSolidColorStyle = includes(className, SOLID_COLOR_CLASS);
 			let style;
 
-			if ( customMainColor ) {
-				if ( ! isSolidColorStyle ) {
+			if (customMainColor) {
+				if (!isSolidColorStyle) {
 					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
 					style = {
 						border: {
@@ -308,7 +302,7 @@ const deprecated = [
 			}
 
 			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
-			if ( customTextColor && style ) {
+			if (customTextColor && style) {
 				style.color = {
 					...style.color,
 					text: customTextColor,
@@ -317,9 +311,9 @@ const deprecated = [
 			// If is the default style, and a main color is set,
 			// migrate the main color value into a custom border color.
 			// The custom border color value is retrieved by parsing the figure styles.
-			if ( ! isSolidColorStyle && mainColor && figureStyle ) {
-				const borderColor = parseBorderColor( figureStyle );
-				if ( borderColor ) {
+			if (!isSolidColorStyle && mainColor && figureStyle) {
+				const borderColor = parseBorderColor(figureStyle);
+				if (borderColor) {
 					return {
 						...attributes,
 						className,
@@ -344,7 +338,7 @@ const deprecated = [
 	},
 	{
 		attributes: blockAttributes,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				mainColor,
 				customMainColor,
@@ -354,31 +348,28 @@ const deprecated = [
 				citation,
 				className,
 			} = attributes;
-			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			const isSolidColorStyle = includes(className, SOLID_COLOR_CLASS);
 
 			let figureClass, figureStyles;
 			// Is solid color style
-			if ( isSolidColorStyle ) {
-				figureClass = getColorClassName(
-					'background-color',
-					mainColor
-				);
-				if ( ! figureClass ) {
+			if (isSolidColorStyle) {
+				figureClass = getColorClassName('background-color', mainColor);
+				if (!figureClass) {
 					figureStyles = {
 						backgroundColor: customMainColor,
 					};
 				}
 				// Is normal style and a custom color is being used ( we can set a style directly with its value)
-			} else if ( customMainColor ) {
+			} else if (customMainColor) {
 				figureStyles = {
 					borderColor: customMainColor,
 				};
 				// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
 				// as there is no expectation that themes create classes that set border colors.
-			} else if ( mainColor ) {
+			} else if (mainColor) {
 				const colors = get(
-					select( blockEditorStore ).getSettings(),
-					[ 'colors' ],
+					select(blockEditorStore).getSettings(),
+					['colors'],
 					[]
 				);
 				const colorObject = getColorObjectByAttributeValues(
@@ -396,42 +387,40 @@ const deprecated = [
 			);
 			const blockquoteClasses =
 				textColor || customTextColor
-					? classnames( 'has-text-color', {
-							[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-					  } )
+					? classnames('has-text-color', {
+							[blockquoteTextColorClass]:
+								blockquoteTextColorClass,
+					  })
 					: undefined;
 			const blockquoteStyle = blockquoteTextColorClass
 				? undefined
 				: { color: customTextColor };
 			return (
-				<figure className={ figureClass } style={ figureStyles }>
+				<figure className={figureClass} style={figureStyles}>
 					<blockquote
-						className={ blockquoteClasses }
-						style={ blockquoteStyle }
+						className={blockquoteClasses}
+						style={blockquoteStyle}
 					>
-						<RichText.Content value={ value } multiline />
-						{ ! RichText.isEmpty( citation ) && (
-							<RichText.Content
-								tagName="cite"
-								value={ citation }
-							/>
-						) }
+						<RichText.Content value={value} multiline />
+						{!RichText.isEmpty(citation) && (
+							<RichText.Content tagName="cite" value={citation} />
+						)}
 					</blockquote>
 				</figure>
 			);
 		},
-		migrate( {
+		migrate({
 			className,
 			mainColor,
 			customMainColor,
 			customTextColor,
 			...attributes
-		} ) {
-			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		}) {
+			const isSolidColorStyle = includes(className, SOLID_COLOR_CLASS);
 			let style = {};
 
-			if ( customMainColor ) {
-				if ( ! isSolidColorStyle ) {
+			if (customMainColor) {
+				if (!isSolidColorStyle) {
 					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
 					style = {
 						border: {
@@ -449,7 +438,7 @@ const deprecated = [
 			}
 
 			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
-			if ( customTextColor && style ) {
+			if (customTextColor && style) {
 				style.color = {
 					...style.color,
 					text: customTextColor,
@@ -470,14 +459,14 @@ const deprecated = [
 		attributes: {
 			...blockAttributes,
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { value, citation } = attributes;
 			return (
 				<blockquote>
-					<RichText.Content value={ value } multiline />
-					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="cite" value={ citation } />
-					) }
+					<RichText.Content value={value} multiline />
+					{!RichText.isEmpty(citation) && (
+						<RichText.Content tagName="cite" value={citation} />
+					)}
 				</blockquote>
 			);
 		},
@@ -496,15 +485,15 @@ const deprecated = [
 			},
 		},
 
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { value, citation, align } = attributes;
 
 			return (
-				<blockquote className={ `align${ align }` }>
-					<RichText.Content value={ value } multiline />
-					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="footer" value={ citation } />
-					) }
+				<blockquote className={`align${align}`}>
+					<RichText.Content value={value} multiline />
+					{!RichText.isEmpty(citation) && (
+						<RichText.Content tagName="footer" value={citation} />
+					)}
 				</blockquote>
 			);
 		},

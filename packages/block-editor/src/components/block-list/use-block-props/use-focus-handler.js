@@ -15,12 +15,12 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @param {string} clientId Block client ID.
  */
-export function useFocusHandler( clientId ) {
-	const { isBlockSelected } = useSelect( blockEditorStore );
-	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
+export function useFocusHandler(clientId) {
+	const { isBlockSelected } = useSelect(blockEditorStore);
+	const { selectBlock, selectionChange } = useDispatch(blockEditorStore);
 
 	return useRefEffect(
-		( node ) => {
+		(node) => {
 			/**
 			 * Marks the block as selected when focused and not already
 			 * selected. This specifically handles the case where block does not
@@ -29,32 +29,32 @@ export function useFocusHandler( clientId ) {
 			 *
 			 * @param {FocusEvent} event Focus event.
 			 */
-			function onFocus( event ) {
+			function onFocus(event) {
 				// Check synchronously because a non-selected block might be
 				// getting data through `useSelect` asynchronously.
-				if ( isBlockSelected( clientId ) ) {
+				if (isBlockSelected(clientId)) {
 					// Potentially change selection away from rich text.
-					if ( ! event.target.isContentEditable ) {
-						selectionChange( clientId );
+					if (!event.target.isContentEditable) {
+						selectionChange(clientId);
 					}
 					return;
 				}
 
 				// If an inner block is focussed, that block is resposible for
 				// setting the selected block.
-				if ( ! isInsideRootBlock( node, event.target ) ) {
+				if (!isInsideRootBlock(node, event.target)) {
 					return;
 				}
 
-				selectBlock( clientId );
+				selectBlock(clientId);
 			}
 
-			node.addEventListener( 'focusin', onFocus );
+			node.addEventListener('focusin', onFocus);
 
 			return () => {
-				node.removeEventListener( 'focusin', onFocus );
+				node.removeEventListener('focusin', onFocus);
 			};
 		},
-		[ isBlockSelected, selectBlock ]
+		[isBlockSelected, selectBlock]
 	);
 }

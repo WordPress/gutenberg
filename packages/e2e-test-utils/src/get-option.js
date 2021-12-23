@@ -11,14 +11,11 @@ import { switchUserToTest } from './switch-user-to-test';
  * @param {string} setting The option, used to get the option by id.
  * @return {string} The value of the option.
  */
-export async function getOption( setting ) {
+export async function getOption(setting) {
 	await switchUserToAdmin();
-	await visitAdminPage( 'options.php' );
+	await visitAdminPage('options.php');
 
-	const value = await page.$eval(
-		`#${ setting }`,
-		( element ) => element.value
-	);
+	const value = await page.$eval(`#${setting}`, (element) => element.value);
 	await switchUserToTest();
 	return value;
 }

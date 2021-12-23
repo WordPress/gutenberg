@@ -16,25 +16,25 @@ export default function ZoomDropdown() {
 	return (
 		<Dropdown
 			contentClassName="wp-block-image__zoom"
-			popoverProps={ POPOVER_PROPS }
-			renderToggle={ ( { isOpen, onToggle } ) => (
+			popoverProps={POPOVER_PROPS}
+			renderToggle={({ isOpen, onToggle }) => (
 				<ToolbarButton
-					icon={ search }
-					label={ __( 'Zoom' ) }
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-					disabled={ isInProgress }
+					icon={search}
+					label={__('Zoom')}
+					onClick={onToggle}
+					aria-expanded={isOpen}
+					disabled={isInProgress}
 				/>
-			) }
-			renderContent={ () => (
+			)}
+			renderContent={() => (
 				<RangeControl
-					label={ __( 'Zoom' ) }
-					min={ MIN_ZOOM }
-					max={ MAX_ZOOM }
-					value={ Math.round( zoom ) }
-					onChange={ setZoom }
+					label={__('Zoom')}
+					min={MIN_ZOOM}
+					max={MAX_ZOOM}
+					value={Math.round(zoom)}
+					onChange={setZoom}
 				/>
-			) }
+			)}
 		/>
 	);
 }

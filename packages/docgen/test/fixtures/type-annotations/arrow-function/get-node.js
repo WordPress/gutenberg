@@ -1,4 +1,4 @@
-module.exports = () => ( {
+module.exports = () => ({
 	type: 'ExportNamedDeclaration',
 	start: 0,
 	end: 97,
@@ -326,8 +326,7 @@ module.exports = () => ( {
 												name: 'GenericType',
 											},
 											typeParameters: {
-												type:
-													'TSTypeParameterInstantiation',
+												type: 'TSTypeParameterInstantiation',
 												start: 77,
 												end: 82,
 												loc: {
@@ -404,4 +403,4 @@ module.exports = () => ( {
 		],
 		kind: 'const',
 	},
-} );
+});

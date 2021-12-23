@@ -13,14 +13,14 @@ import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 
-extend( [ namesPlugin, a11yPlugin ] );
+extend([namesPlugin, a11yPlugin]);
 
-function ContrastCheckerMessage( {
+function ContrastCheckerMessage({
 	colordBackgroundColor,
 	colordTextColor,
 	backgroundColor,
 	textColor,
-} ) {
+}) {
 	const msg =
 		colordBackgroundColor.brightness() < colordTextColor.brightness()
 			? __(
@@ -34,63 +34,59 @@ function ContrastCheckerMessage( {
 	// prop, but the contrast checker requires granular control over when the
 	// announcements are made. Notably, the message will be re-announced if a
 	// new color combination is selected and the contrast is still insufficient.
-	useEffect( () => {
-		speak( __( 'This color combination may be hard for people to read.' ) );
-	}, [ backgroundColor, textColor ] );
+	useEffect(() => {
+		speak(__('This color combination may be hard for people to read.'));
+	}, [backgroundColor, textColor]);
 
 	return (
 		<div className="block-editor-contrast-checker">
-			<Notice
-				spokenMessage={ null }
-				status="warning"
-				isDismissible={ false }
-			>
-				{ msg }
+			<Notice spokenMessage={null} status="warning" isDismissible={false}>
+				{msg}
 			</Notice>
 		</div>
 	);
 }
 
-function ContrastChecker( {
+function ContrastChecker({
 	backgroundColor,
 	fallbackBackgroundColor,
 	fallbackTextColor,
 	fontSize, // font size value in pixels
 	isLargeText,
 	textColor,
-} ) {
+}) {
 	if (
-		! ( backgroundColor || fallbackBackgroundColor ) ||
-		! ( textColor || fallbackTextColor )
+		!(backgroundColor || fallbackBackgroundColor) ||
+		!(textColor || fallbackTextColor)
 	) {
 		return null;
 	}
 	const colordBackgroundColor = colord(
 		backgroundColor || fallbackBackgroundColor
 	);
-	const colordTextColor = colord( textColor || fallbackTextColor );
+	const colordTextColor = colord(textColor || fallbackTextColor);
 	const hasTransparency =
 		colordBackgroundColor.alpha() !== 1 || colordTextColor.alpha() !== 1;
 
 	if (
 		hasTransparency ||
-		colordTextColor.isReadable( colordBackgroundColor, {
+		colordTextColor.isReadable(colordBackgroundColor, {
 			level: 'AA',
 			size:
-				isLargeText || ( isLargeText !== false && fontSize >= 24 )
+				isLargeText || (isLargeText !== false && fontSize >= 24)
 					? 'large'
 					: 'small',
-		} )
+		})
 	) {
 		return null;
 	}
 
 	return (
 		<ContrastCheckerMessage
-			backgroundColor={ backgroundColor }
-			textColor={ textColor }
-			colordBackgroundColor={ colordBackgroundColor }
-			colordTextColor={ colordTextColor }
+			backgroundColor={backgroundColor}
+			textColor={textColor}
+			colordBackgroundColor={colordBackgroundColor}
+			colordTextColor={colordTextColor}
 		/>
 	);
 }

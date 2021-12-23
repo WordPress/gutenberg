@@ -12,34 +12,32 @@
  *
  * @return {string} sessionStorage key
  */
-function postKey( postId, isPostNew ) {
-	return `wp-autosave-block-editor-post-${
-		isPostNew ? 'auto-draft' : postId
-	}`;
+function postKey(postId, isPostNew) {
+	return `wp-autosave-block-editor-post-${isPostNew ? 'auto-draft' : postId}`;
 }
 
-export function localAutosaveGet( postId, isPostNew ) {
-	return window.sessionStorage.getItem( postKey( postId, isPostNew ) );
+export function localAutosaveGet(postId, isPostNew) {
+	return window.sessionStorage.getItem(postKey(postId, isPostNew));
 }
 
-export function localAutosaveSet( postId, isPostNew, title, content, excerpt ) {
+export function localAutosaveSet(postId, isPostNew, title, content, excerpt) {
 	window.sessionStorage.setItem(
-		postKey( postId, isPostNew ),
-		JSON.stringify( {
+		postKey(postId, isPostNew),
+		JSON.stringify({
 			post_title: title,
 			content,
 			excerpt,
-		} )
+		})
 	);
 }
 
-export function localAutosaveClear( postId, isPostNew ) {
-	window.sessionStorage.removeItem( postKey( postId, isPostNew ) );
+export function localAutosaveClear(postId, isPostNew) {
+	window.sessionStorage.removeItem(postKey(postId, isPostNew));
 }
 
 const controls = {
-	LOCAL_AUTOSAVE_SET( { postId, isPostNew, title, content, excerpt } ) {
-		localAutosaveSet( postId, isPostNew, title, content, excerpt );
+	LOCAL_AUTOSAVE_SET({ postId, isPostNew, title, content, excerpt }) {
+		localAutosaveSet(postId, isPostNew, title, content, excerpt);
 	},
 };
 

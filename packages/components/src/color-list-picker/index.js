@@ -10,64 +10,64 @@ import Button from '../button';
 import ColorPalette from '../color-palette';
 import Swatch from '../swatch';
 
-function ColorOption( {
+function ColorOption({
 	label,
 	value,
 	colors,
 	disableCustomColors,
 	enableAlpha,
 	onChange,
-} ) {
-	const [ isOpen, setIsOpen ] = useState( false );
+}) {
+	const [isOpen, setIsOpen] = useState(false);
 	return (
 		<>
 			<Button
 				className="components-color-list-picker__swatch-button"
-				icon={ <Swatch fill={ value } /> }
-				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
+				icon={<Swatch fill={value} />}
+				onClick={() => setIsOpen((prev) => !prev)}
 			>
-				{ label }
+				{label}
 			</Button>
-			{ isOpen && (
+			{isOpen && (
 				<ColorPalette
 					className="components-color-list-picker__color-picker"
-					colors={ colors }
-					value={ value }
-					clearable={ false }
-					onChange={ onChange }
-					disableCustomColors={ disableCustomColors }
-					enableAlpha={ enableAlpha }
+					colors={colors}
+					value={value}
+					clearable={false}
+					onChange={onChange}
+					disableCustomColors={disableCustomColors}
+					enableAlpha={enableAlpha}
 				/>
-			) }
+			)}
 		</>
 	);
 }
 
-function ColorListPicker( {
+function ColorListPicker({
 	colors,
 	labels,
 	value = [],
 	disableCustomColors,
 	enableAlpha,
 	onChange,
-} ) {
+}) {
 	return (
 		<div className="components-color-list-picker">
-			{ labels.map( ( label, index ) => (
+			{labels.map((label, index) => (
 				<ColorOption
-					key={ index }
-					label={ label }
-					value={ value[ index ] }
-					colors={ colors }
-					disableCustomColors={ disableCustomColors }
-					enableAlpha={ enableAlpha }
-					onChange={ ( newColor ) => {
+					key={index}
+					label={label}
+					value={value[index]}
+					colors={colors}
+					disableCustomColors={disableCustomColors}
+					enableAlpha={enableAlpha}
+					onChange={(newColor) => {
 						const newColors = value.slice();
-						newColors[ index ] = newColor;
-						onChange( newColors );
-					} }
+						newColors[index] = newColor;
+						onChange(newColors);
+					}}
 				/>
-			) ) }
+			))}
 		</div>
 	);
 }

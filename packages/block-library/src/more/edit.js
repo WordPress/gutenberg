@@ -7,35 +7,33 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
-const DEFAULT_TEXT = __( 'Read more' );
+const DEFAULT_TEXT = __('Read more');
 
-export default function MoreEdit( {
+export default function MoreEdit({
 	attributes: { customText, noTeaser },
 	insertBlocksAfter,
 	setAttributes,
-} ) {
-	const onChangeInput = ( event ) => {
-		setAttributes( {
+}) {
+	const onChangeInput = (event) => {
+		setAttributes({
 			customText:
 				event.target.value !== '' ? event.target.value : undefined,
-		} );
+		});
 	};
 
-	const onKeyDown = ( { keyCode } ) => {
-		if ( keyCode === ENTER ) {
-			insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
+	const onKeyDown = ({ keyCode }) => {
+		if (keyCode === ENTER) {
+			insertBlocksAfter([createBlock(getDefaultBlockName())]);
 		}
 	};
 
-	const getHideExcerptHelp = ( checked ) =>
-		checked
-			? __( 'The excerpt is hidden.' )
-			: __( 'The excerpt is visible.' );
+	const getHideExcerptHelp = (checked) =>
+		checked ? __('The excerpt is hidden.') : __('The excerpt is visible.');
 
-	const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
+	const toggleHideExcerpt = () => setAttributes({ noTeaser: !noTeaser });
 
 	const style = {
-		width: `${ ( customText ? customText : DEFAULT_TEXT ).length + 1.2 }em`,
+		width: `${(customText ? customText : DEFAULT_TEXT).length + 1.2}em`,
 	};
 
 	return (
@@ -43,25 +41,23 @@ export default function MoreEdit( {
 			<InspectorControls>
 				<PanelBody>
 					<ToggleControl
-						label={ __(
-							'Hide the excerpt on the full content page'
-						) }
-						checked={ !! noTeaser }
-						onChange={ toggleHideExcerpt }
-						help={ getHideExcerptHelp }
+						label={__('Hide the excerpt on the full content page')}
+						checked={!!noTeaser}
+						onChange={toggleHideExcerpt}
+						help={getHideExcerptHelp}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...useBlockProps() }>
+			<div {...useBlockProps()}>
 				<div className="wp-block-more">
 					<input
-						aria-label={ __( 'Read more link text' ) }
+						aria-label={__('Read more link text')}
 						type="text"
-						value={ customText }
-						placeholder={ DEFAULT_TEXT }
-						onChange={ onChangeInput }
-						onKeyDown={ onKeyDown }
-						style={ style }
+						value={customText}
+						placeholder={DEFAULT_TEXT}
+						onChange={onChangeInput}
+						onKeyDown={onKeyDown}
+						style={style}
 					/>
 				</div>
 			</div>

@@ -14,7 +14,7 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
  *
  * @type {string[]}
  */
-const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
+const INPUT_BUTTON_TYPES = ['button', 'submit'];
 
 /**
  * @typedef {HTMLButtonElement | HTMLLinkElement | HTMLInputElement} FocusNormalizedButton
@@ -32,8 +32,8 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  *
  * @return {eventTarget is FocusNormalizedButton} Whether element is a button.
  */
-function isFocusNormalizedButton( eventTarget ) {
-	switch ( eventTarget.nodeName ) {
+function isFocusNormalizedButton(eventTarget) {
+	switch (eventTarget.nodeName) {
 		case 'A':
 		case 'BUTTON':
 			return true;
@@ -41,7 +41,7 @@ function isFocusNormalizedButton( eventTarget ) {
 		case 'INPUT':
 			return includes(
 				INPUT_BUTTON_TYPES,
-				/** @type {HTMLInputElement} */ ( eventTarget ).type
+				/** @type {HTMLInputElement} */ (eventTarget).type
 			);
 	}
 
@@ -88,13 +88,13 @@ function isFocusNormalizedButton( eventTarget ) {
  *                                   to a wrapping element element to capture when focus moves
  *                                   outside that element.
  */
-export default function useFocusOutside( onFocusOutside ) {
-	const currentOnFocusOutside = useRef( onFocusOutside );
-	useEffect( () => {
+export default function useFocusOutside(onFocusOutside) {
+	const currentOnFocusOutside = useRef(onFocusOutside);
+	useEffect(() => {
 		currentOnFocusOutside.current = onFocusOutside;
-	}, [ onFocusOutside ] );
+	}, [onFocusOutside]);
 
-	const preventBlurCheck = useRef( false );
+	const preventBlurCheck = useRef(false);
 
 	/**
 	 * @type {import('react').MutableRefObject<number | undefined>}
@@ -104,21 +104,21 @@ export default function useFocusOutside( onFocusOutside ) {
 	/**
 	 * Cancel a blur check timeout.
 	 */
-	const cancelBlurCheck = useCallback( () => {
-		clearTimeout( blurCheckTimeoutId.current );
-	}, [] );
+	const cancelBlurCheck = useCallback(() => {
+		clearTimeout(blurCheckTimeoutId.current);
+	}, []);
 
 	// Cancel blur checks on unmount.
-	useEffect( () => {
+	useEffect(() => {
 		return () => cancelBlurCheck();
-	}, [] );
+	}, []);
 
 	// Cancel a blur check if the callback or ref is no longer provided.
-	useEffect( () => {
-		if ( ! onFocusOutside ) {
+	useEffect(() => {
+		if (!onFocusOutside) {
 			cancelBlurCheck();
 		}
-	}, [ onFocusOutside, cancelBlurCheck ] );
+	}, [onFocusOutside, cancelBlurCheck]);
 
 	/**
 	 * Handles a mousedown or mouseup event to respectively assign and
@@ -131,16 +131,16 @@ export default function useFocusOutside( onFocusOutside ) {
 	 *
 	 * @param {SyntheticEvent} event Event for mousedown or mouseup.
 	 */
-	const normalizeButtonFocus = useCallback( ( event ) => {
+	const normalizeButtonFocus = useCallback((event) => {
 		const { type, target } = event;
-		const isInteractionEnd = includes( [ 'mouseup', 'touchend' ], type );
+		const isInteractionEnd = includes(['mouseup', 'touchend'], type);
 
-		if ( isInteractionEnd ) {
+		if (isInteractionEnd) {
 			preventBlurCheck.current = false;
-		} else if ( isFocusNormalizedButton( target ) ) {
+		} else if (isFocusNormalizedButton(target)) {
 			preventBlurCheck.current = true;
 		}
-	}, [] );
+	}, []);
 
 	/**
 	 * A callback triggered when a blur event occurs on the element the handler
@@ -151,22 +151,22 @@ export default function useFocusOutside( onFocusOutside ) {
 	 *
 	 * @param {SyntheticEvent} event Blur event.
 	 */
-	const queueBlurCheck = useCallback( ( event ) => {
+	const queueBlurCheck = useCallback((event) => {
 		// React does not allow using an event reference asynchronously
 		// due to recycling behavior, except when explicitly persisted.
 		event.persist();
 
 		// Skip blur check if clicking button. See `normalizeButtonFocus`.
-		if ( preventBlurCheck.current ) {
+		if (preventBlurCheck.current) {
 			return;
 		}
 
-		blurCheckTimeoutId.current = setTimeout( () => {
-			if ( 'function' === typeof currentOnFocusOutside.current ) {
-				currentOnFocusOutside.current( event );
+		blurCheckTimeoutId.current = setTimeout(() => {
+			if ('function' === typeof currentOnFocusOutside.current) {
+				currentOnFocusOutside.current(event);
 			}
-		}, 0 );
-	}, [] );
+		}, 0);
+	}, []);
 
 	return {
 		onFocus: cancelBlurCheck,

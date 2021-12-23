@@ -19,14 +19,14 @@ const contextValue = { Text: { variant: 'muted' } };
  *
  * @param {Props} props
  */
-function FormGroupHelp( { children } ) {
-	if ( ! children ) return null;
+function FormGroupHelp({ children }) {
+	if (!children) return null;
 
 	return (
-		<ContextSystemProvider value={ contextValue }>
-			{ children }
+		<ContextSystemProvider value={contextValue}>
+			{children}
 		</ContextSystemProvider>
 	);
 }
 
-export default memo( FormGroupHelp );
+export default memo(FormGroupHelp);

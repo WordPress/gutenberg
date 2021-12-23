@@ -38,9 +38,9 @@ import { isURL } from '@wordpress/url';
  */
 import styles from './style.scss';
 
-const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const ALLOWED_MEDIA_TYPES = ['audio'];
 
-function AudioEdit( {
+function AudioEdit({
 	attributes,
 	setAttributes,
 	isSelected,
@@ -48,205 +48,202 @@ function AudioEdit( {
 	onFocus,
 	onBlur,
 	clientId,
-} ) {
+}) {
 	const { id, autoplay, loop, preload, src } = attributes;
 
-	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+	const [isCaptionSelected, setIsCaptionSelected] = useState(false);
 
-	const onFileChange = ( { mediaId, mediaUrl } ) => {
-		setAttributes( { id: mediaId, src: mediaUrl } );
+	const onFileChange = ({ mediaId, mediaUrl }) => {
+		setAttributes({ id: mediaId, src: mediaUrl });
 	};
 
-	const { wasBlockJustInserted } = useSelect( ( select ) => ( {
-		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+	const { wasBlockJustInserted } = useSelect((select) => ({
+		wasBlockJustInserted: select(blockEditorStore).wasBlockJustInserted(
 			clientId,
 			'inserter_menu'
 		),
-	} ) );
+	}));
 
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch(noticesStore);
 
 	const onError = () => {
-		createErrorNotice( __( 'Failed to insert audio file.' ) );
+		createErrorNotice(__('Failed to insert audio file.'));
 	};
 
-	function toggleAttribute( attribute ) {
-		return ( newValue ) => {
-			setAttributes( { [ attribute ]: newValue } );
+	function toggleAttribute(attribute) {
+		return (newValue) => {
+			setAttributes({ [attribute]: newValue });
 		};
 	}
 
-	function onSelectURL( newSrc ) {
-		if ( newSrc !== src ) {
-			if ( isURL( newSrc ) ) {
-				setAttributes( { src: newSrc, id: undefined } );
+	function onSelectURL(newSrc) {
+		if (newSrc !== src) {
+			if (isURL(newSrc)) {
+				setAttributes({ src: newSrc, id: undefined });
 			} else {
-				createErrorNotice( __( 'Invalid URL. Audio file not found.' ) );
+				createErrorNotice(__('Invalid URL. Audio file not found.'));
 			}
 		}
 	}
 
-	function onSelectAudio( media ) {
-		if ( ! media || ! media.url ) {
+	function onSelectAudio(media) {
+		if (!media || !media.url) {
 			// in this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls
-			setAttributes( { src: undefined, id: undefined } );
+			setAttributes({ src: undefined, id: undefined });
 			return;
 		}
 		// sets the block's attribute and updates the edit component from the
 		// selected media, then switches off the editing UI
-		setAttributes( { src: media.url, id: media.id } );
+		setAttributes({ src: media.url, id: media.id });
 	}
 
 	function onAudioPress() {
-		setIsCaptionSelected( false );
+		setIsCaptionSelected(false);
 	}
 
 	function onFocusCaption() {
-		if ( ! isCaptionSelected ) {
-			setIsCaptionSelected( true );
+		if (!isCaptionSelected) {
+			setIsCaptionSelected(true);
 		}
 	}
 
-	if ( ! src ) {
+	if (!src) {
 		return (
 			<View>
 				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					onSelect={ onSelectAudio }
-					onSelectURL={ onSelectURL }
+					icon={<BlockIcon icon={icon} />}
+					onSelect={onSelectAudio}
+					onSelectURL={onSelectURL}
 					accept="audio/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ attributes }
-					onFocus={ onFocus }
-					autoOpenMediaUpload={ isSelected && wasBlockJustInserted }
+					allowedTypes={ALLOWED_MEDIA_TYPES}
+					value={attributes}
+					onFocus={onFocus}
+					autoOpenMediaUpload={isSelected && wasBlockJustInserted}
 				/>
 			</View>
 		);
 	}
 
-	function getBlockControls( open ) {
+	function getBlockControls(open) {
 		return (
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						title={ __( 'Replace audio' ) }
-						icon={ replace }
-						onClick={ open }
+						title={__('Replace audio')}
+						icon={replace}
+						onClick={open}
 					/>
 				</ToolbarGroup>
 			</BlockControls>
 		);
 	}
 
-	function getBlockUI( open, getMediaOptions ) {
+	function getBlockUI(open, getMediaOptions) {
 		return (
 			<MediaUploadProgress
-				mediaId={ id }
-				onFinishMediaUploadWithSuccess={ onFileChange }
-				onFinishMediaUploadWithFailure={ onError }
-				onMediaUploadStateReset={ onFileChange }
-				containerStyle={ styles.progressContainer }
-				progressBarStyle={ styles.progressBar }
-				spinnerStyle={ styles.spinner }
-				renderContent={ ( {
+				mediaId={id}
+				onFinishMediaUploadWithSuccess={onFileChange}
+				onFinishMediaUploadWithFailure={onError}
+				onMediaUploadStateReset={onFileChange}
+				containerStyle={styles.progressContainer}
+				progressBarStyle={styles.progressBar}
+				spinnerStyle={styles.spinner}
+				renderContent={({
 					isUploadInProgress,
 					isUploadFailed,
 					retryMessage,
-				} ) => {
+				}) => {
 					return (
 						<>
-							{ ! isCaptionSelected &&
-								! isUploadInProgress &&
-								getBlockControls( open ) }
-							{ getMediaOptions() }
+							{!isCaptionSelected &&
+								!isUploadInProgress &&
+								getBlockControls(open)}
+							{getMediaOptions()}
 							<AudioPlayer
-								isUploadInProgress={ isUploadInProgress }
-								isUploadFailed={ isUploadFailed }
-								retryMessage={ retryMessage }
-								attributes={ attributes }
-								isSelected={ isSelected }
+								isUploadInProgress={isUploadInProgress}
+								isUploadFailed={isUploadFailed}
+								retryMessage={retryMessage}
+								attributes={attributes}
+								isSelected={isSelected}
 							/>
 						</>
 					);
-				} }
+				}}
 			/>
 		);
 	}
 
 	return (
 		<TouchableWithoutFeedback
-			accessible={ ! isSelected }
-			onPress={ onAudioPress }
-			disabled={ ! isSelected }
+			accessible={!isSelected}
+			onPress={onAudioPress}
+			disabled={!isSelected}
 		>
 			<View>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio settings' ) }>
+					<PanelBody title={__('Audio settings')}>
 						<ToggleControl
-							label={ __( 'Autoplay' ) }
-							onChange={ toggleAttribute( 'autoplay' ) }
-							checked={ autoplay }
-							help={ __(
+							label={__('Autoplay')}
+							onChange={toggleAttribute('autoplay')}
+							checked={autoplay}
+							help={__(
 								'Autoplay may cause usability issues for some users.'
-							) }
+							)}
 						/>
 						<ToggleControl
-							label={ __( 'Loop' ) }
-							onChange={ toggleAttribute( 'loop' ) }
-							checked={ loop }
+							label={__('Loop')}
+							onChange={toggleAttribute('loop')}
+							checked={loop}
 						/>
 						<SelectControl
-							label={ _x(
-								'Preload',
-								'noun; Audio block parameter'
-							) }
-							value={ preload || '' }
+							label={_x('Preload', 'noun; Audio block parameter')}
+							value={preload || ''}
 							// `undefined` is required for the preload attribute to be unset.
-							onChange={ ( value ) =>
-								setAttributes( {
+							onChange={(value) =>
+								setAttributes({
 									preload: value || undefined,
-								} )
+								})
 							}
-							options={ [
-								{ value: '', label: __( 'Browser default' ) },
-								{ value: 'auto', label: __( 'Auto' ) },
-								{ value: 'metadata', label: __( 'Metadata' ) },
+							options={[
+								{ value: '', label: __('Browser default') },
+								{ value: 'auto', label: __('Auto') },
+								{ value: 'metadata', label: __('Metadata') },
 								{
 									value: 'none',
-									label: _x( 'None', '"Preload" value' ),
+									label: _x('None', '"Preload" value'),
 								},
-							] }
-							hideCancelButton={ true }
+							]}
+							hideCancelButton={true}
 						/>
 					</PanelBody>
 				</InspectorControls>
 				<MediaUpload
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					isReplacingMedia={ true }
-					onSelect={ onSelectAudio }
-					onSelectURL={ onSelectURL }
-					render={ ( { open, getMediaOptions } ) => {
-						return getBlockUI( open, getMediaOptions );
-					} }
+					allowedTypes={ALLOWED_MEDIA_TYPES}
+					isReplacingMedia={true}
+					onSelect={onSelectAudio}
+					onSelectURL={onSelectURL}
+					render={({ open, getMediaOptions }) => {
+						return getBlockUI(open, getMediaOptions);
+					}}
 				/>
 				<BlockCaption
-					accessible={ true }
-					accessibilityLabelCreator={ ( caption ) =>
-						isEmpty( caption )
+					accessible={true}
+					accessibilityLabelCreator={(caption) =>
+						isEmpty(caption)
 							? /* translators: accessibility text. Empty Audio caption. */
-							  __( 'Audio caption. Empty' )
+							  __('Audio caption. Empty')
 							: sprintf(
 									/* translators: accessibility text. %s: Audio caption. */
-									__( 'Audio caption. %s' ),
+									__('Audio caption. %s'),
 									caption
 							  )
 					}
-					clientId={ clientId }
-					isSelected={ isCaptionSelected }
-					onFocus={ onFocusCaption }
-					onBlur={ onBlur }
-					insertBlocksAfter={ insertBlocksAfter }
+					clientId={clientId}
+					isSelected={isCaptionSelected}
+					onFocus={onFocusCaption}
+					onBlur={onBlur}
+					insertBlocksAfter={insertBlocksAfter}
 				/>
 			</View>
 		</TouchableWithoutFeedback>

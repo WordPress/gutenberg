@@ -8,22 +8,22 @@ import { isEmpty, each, get } from 'lodash';
  */
 import { NEW_TAB_REL } from './constants';
 
-export function removeNewTabRel( currentRel ) {
+export function removeNewTabRel(currentRel) {
 	let newRel = currentRel;
 
-	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, ( relVal ) => {
-				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-				newRel = newRel.replace( regExp, '' );
-			} );
+	if (currentRel !== undefined && !isEmpty(newRel)) {
+		if (!isEmpty(newRel)) {
+			each(NEW_TAB_REL, (relVal) => {
+				const regExp = new RegExp('\\b' + relVal + '\\b', 'gi');
+				newRel = newRel.replace(regExp, '');
+			});
 
 			// Only trim if NEW_TAB_REL values was replaced.
-			if ( newRel !== currentRel ) {
+			if (newRel !== currentRel) {
 				newRel = newRel.trim();
 			}
 
-			if ( isEmpty( newRel ) ) {
+			if (isEmpty(newRel)) {
 				newRel = undefined;
 			}
 		}
@@ -41,14 +41,14 @@ export function removeNewTabRel( currentRel ) {
  *
  * @return {Object} Updated link target settings.
  */
-export function getUpdatedLinkTargetSettings( value, { rel } ) {
+export function getUpdatedLinkTargetSettings(value, { rel }) {
 	const linkTarget = value ? '_blank' : undefined;
 
 	let updatedRel;
-	if ( ! linkTarget && ! rel ) {
+	if (!linkTarget && !rel) {
 		updatedRel = undefined;
 	} else {
-		updatedRel = removeNewTabRel( rel );
+		updatedRel = removeNewTabRel(rel);
 	}
 
 	return {
@@ -63,10 +63,10 @@ export function getUpdatedLinkTargetSettings( value, { rel } ) {
  * @param {Object} image Media file object for gallery image.
  * @param {string} size  Selected size slug to apply.
  */
-export function getImageSizeAttributes( image, size ) {
-	const url = get( image, [ 'media_details', 'sizes', size, 'source_url' ] );
+export function getImageSizeAttributes(image, size) {
+	const url = get(image, ['media_details', 'sizes', size, 'source_url']);
 
-	if ( url ) {
+	if (url) {
 		return { url, width: undefined, height: undefined, sizeSlug: size };
 	}
 

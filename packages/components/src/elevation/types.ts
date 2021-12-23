@@ -14,7 +14,7 @@ export type Props = {
 	 *
 	 * @default 'inherit'
 	 */
-	borderRadius?: CSSProperties[ 'borderRadius' ];
+	borderRadius?: CSSProperties['borderRadius'];
 	/**
 	 * Size of the shadow value when focused (see the `value` and `isInteractive` props).
 	 */

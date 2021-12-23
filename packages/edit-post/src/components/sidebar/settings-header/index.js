@@ -11,78 +11,77 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { store as editPostStore } from '../../../store';
 
-const SettingsHeader = ( { sidebarName } ) => {
-	const { openGeneralSidebar } = useDispatch( editPostStore );
-	const openDocumentSettings = () =>
-		openGeneralSidebar( 'edit-post/document' );
-	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
+const SettingsHeader = ({ sidebarName }) => {
+	const { openGeneralSidebar } = useDispatch(editPostStore);
+	const openDocumentSettings = () => openGeneralSidebar('edit-post/document');
+	const openBlockSettings = () => openGeneralSidebar('edit-post/block');
 
-	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
-		const postTypeLabel = select( editorStore ).getPostTypeLabel();
+	const { documentLabel, isTemplateMode } = useSelect((select) => {
+		const postTypeLabel = select(editorStore).getPostTypeLabel();
 
 		return {
 			// translators: Default label for the Document sidebar tab, not selected.
-			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
+			documentLabel: postTypeLabel || _x('Document', 'noun'),
+			isTemplateMode: select(editPostStore).isEditingTemplate(),
 		};
-	}, [] );
+	}, []);
 
-	const [ documentAriaLabel, documentActiveClass ] =
+	const [documentAriaLabel, documentActiveClass] =
 		sidebarName === 'edit-post/document'
 			? // translators: ARIA label for the Document sidebar tab, selected. %s: Document label.
-			  [ sprintf( __( '%s (selected)' ), documentLabel ), 'is-active' ]
-			: [ documentLabel, '' ];
+			  [sprintf(__('%s (selected)'), documentLabel), 'is-active']
+			: [documentLabel, ''];
 
-	const [ blockAriaLabel, blockActiveClass ] =
+	const [blockAriaLabel, blockActiveClass] =
 		sidebarName === 'edit-post/block'
 			? // translators: ARIA label for the Block Settings Sidebar tab, selected.
-			  [ __( 'Block (selected)' ), 'is-active' ]
+			  [__('Block (selected)'), 'is-active']
 			: // translators: ARIA label for the Block Settings Sidebar tab, not selected.
-			  [ __( 'Block' ), '' ];
+			  [__('Block'), ''];
 
-	const [ templateAriaLabel, templateActiveClass ] =
+	const [templateAriaLabel, templateActiveClass] =
 		sidebarName === 'edit-post/document'
-			? [ __( 'Template (selected)' ), 'is-active' ]
-			: [ __( 'Template' ), '' ];
+			? [__('Template (selected)'), 'is-active']
+			: [__('Template'), ''];
 
 	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
 		<ul>
-			{ ! isTemplateMode && (
+			{!isTemplateMode && (
 				<li>
 					<Button
-						onClick={ openDocumentSettings }
-						className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
-						aria-label={ documentAriaLabel }
-						data-label={ documentLabel }
+						onClick={openDocumentSettings}
+						className={`edit-post-sidebar__panel-tab ${documentActiveClass}`}
+						aria-label={documentAriaLabel}
+						data-label={documentLabel}
 					>
-						{ documentLabel }
+						{documentLabel}
 					</Button>
 				</li>
-			) }
-			{ isTemplateMode && (
+			)}
+			{isTemplateMode && (
 				<li>
 					<Button
-						onClick={ openDocumentSettings }
-						className={ `edit-post-sidebar__panel-tab ${ templateActiveClass }` }
-						aria-label={ templateAriaLabel }
-						data-label={ __( 'Template' ) }
+						onClick={openDocumentSettings}
+						className={`edit-post-sidebar__panel-tab ${templateActiveClass}`}
+						aria-label={templateAriaLabel}
+						data-label={__('Template')}
 					>
-						{ __( 'Template' ) }
+						{__('Template')}
 					</Button>
 				</li>
-			) }
+			)}
 			<li>
 				<Button
-					onClick={ openBlockSettings }
-					className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
-					aria-label={ blockAriaLabel }
+					onClick={openBlockSettings}
+					className={`edit-post-sidebar__panel-tab ${blockActiveClass}`}
+					aria-label={blockAriaLabel}
 					// translators: Data label for the Block Settings Sidebar tab.
-					data-label={ __( 'Block' ) }
+					data-label={__('Block')}
 				>
 					{
 						// translators: Text label for the Block Settings Sidebar tab.
-						__( 'Block' )
+						__('Block')
 					}
 				</Button>
 			</li>

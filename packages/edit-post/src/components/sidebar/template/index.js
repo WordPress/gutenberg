@@ -35,103 +35,100 @@ export function TemplatePanel() {
 		template,
 		supportsTemplateMode,
 		canUserCreate,
-	} = useSelect( ( select ) => {
+	} = useSelect((select) => {
 		const {
 			isEditorPanelEnabled,
 			isEditorPanelOpened,
 			getEditedPostTemplate,
-		} = select( editPostStore );
+		} = select(editPostStore);
 		const {
 			getEditedPostAttribute,
 			getEditorSettings,
 			getCurrentPostType,
-		} = select( editorStore );
-		const { getPostType, getEntityRecords, canUser } = select( coreStore );
+		} = select(editorStore);
+		const { getPostType, getEntityRecords, canUser } = select(coreStore);
 		const currentPostType = getCurrentPostType();
-		const _isViewable = getPostType( currentPostType )?.viewable ?? false;
+		const _isViewable = getPostType(currentPostType)?.viewable ?? false;
 		const _supportsTemplateMode =
-			select( editorStore ).getEditorSettings().supportsTemplateMode &&
+			select(editorStore).getEditorSettings().supportsTemplateMode &&
 			_isViewable;
 
-		const wpTemplates = getEntityRecords( 'postType', 'wp_template', {
+		const wpTemplates = getEntityRecords('postType', 'wp_template', {
 			post_type: currentPostType,
-		} );
+		});
 
 		const newAvailableTemplates = fromPairs(
-			( wpTemplates || [] ).map( ( { slug, title } ) => [
-				slug,
-				title.rendered,
-			] )
+			(wpTemplates || []).map(({ slug, title }) => [slug, title.rendered])
 		);
 
 		return {
-			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
-			isOpened: isEditorPanelOpened( PANEL_NAME ),
-			selectedTemplate: getEditedPostAttribute( 'template' ),
+			isEnabled: isEditorPanelEnabled(PANEL_NAME),
+			isOpened: isEditorPanelOpened(PANEL_NAME),
+			selectedTemplate: getEditedPostAttribute('template'),
 			availableTemplates: getEditorSettings().availableTemplates,
 			fetchedTemplates: newAvailableTemplates,
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
 			supportsTemplateMode: _supportsTemplateMode,
-			canUserCreate: canUser( 'create', 'templates' ),
+			canUserCreate: canUser('create', 'templates'),
 		};
-	}, [] );
+	}, []);
 
-	const templates = useMemo( () => {
+	const templates = useMemo(() => {
 		return {
 			...availableTemplates,
 			...fetchedTemplates,
 		};
-	}, [ availableTemplates, fetchedTemplates ] );
+	}, [availableTemplates, fetchedTemplates]);
 
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
-	const { editPost } = useDispatch( editorStore );
+	const { toggleEditorPanelOpened } = useDispatch(editPostStore);
+	const { editPost } = useDispatch(editorStore);
 
 	if (
-		! isEnabled ||
-		! isViewable ||
-		( isEmpty( availableTemplates ) &&
-			( ! supportsTemplateMode || ! canUserCreate ) )
+		!isEnabled ||
+		!isViewable ||
+		(isEmpty(availableTemplates) &&
+			(!supportsTemplateMode || !canUserCreate))
 	) {
 		return null;
 	}
 
-	const onTogglePanel = partial( toggleEditorPanelOpened, PANEL_NAME );
+	const onTogglePanel = partial(toggleEditorPanelOpened, PANEL_NAME);
 
-	let panelTitle = __( 'Template' );
-	if ( !! template ) {
+	let panelTitle = __('Template');
+	if (!!template) {
 		panelTitle = sprintf(
 			/* translators: %s: template title */
-			__( 'Template: %s' ),
+			__('Template: %s'),
 			template?.title ?? template.slug
 		);
 	}
 
 	return (
 		<PanelBody
-			title={ panelTitle }
-			opened={ isOpened }
-			onToggle={ onTogglePanel }
+			title={panelTitle}
+			opened={isOpened}
+			onToggle={onTogglePanel}
 		>
 			<SelectControl
 				hideLabelFromVision
-				label={ __( 'Template:' ) }
+				label={__('Template:')}
 				value={
-					Object.keys( templates ).includes( selectedTemplate )
+					Object.keys(templates).includes(selectedTemplate)
 						? selectedTemplate
 						: ''
 				}
-				onChange={ ( templateSlug ) => {
-					editPost( {
+				onChange={(templateSlug) => {
+					editPost({
 						template: templateSlug || '',
-					} );
-				} }
-				options={ map( templates, ( templateName, templateSlug ) => ( {
+					});
+				}}
+				options={map(templates, (templateName, templateSlug) => ({
 					value: templateSlug,
 					label: templateName,
-				} ) ) }
+				}))}
 			/>
-			{ canUserCreate && <PostTemplateActions /> }
+			{canUserCreate && <PostTemplateActions />}
 		</PanelBody>
 	);
 }

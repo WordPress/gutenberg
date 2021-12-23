@@ -9,8 +9,8 @@ export const _default = () => {
 	// create a wrapper box for the absolutely-positioned child component
 	const wrapperStyle = { margin: '24px 0', position: 'relative' };
 	return (
-		<div style={ wrapperStyle }>
-			<BlockDraggableChip count={ 2 } />
+		<div style={wrapperStyle}>
+			<BlockDraggableChip count={2} />
 		</div>
 	);
 };

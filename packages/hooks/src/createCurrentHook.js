@@ -8,13 +8,12 @@
  *
  * @return {() => string | null} Function that returns the current hook name or null.
  */
-function createCurrentHook( hooks, storeKey ) {
+function createCurrentHook(hooks, storeKey) {
 	return function currentHook() {
-		const hooksStore = hooks[ storeKey ];
+		const hooksStore = hooks[storeKey];
 
 		return (
-			hooksStore.__current[ hooksStore.__current.length - 1 ]?.name ??
-			null
+			hooksStore.__current[hooksStore.__current.length - 1]?.name ?? null
 		);
 	};
 }

@@ -13,15 +13,15 @@ import * as ZIndex from '../utils/z-index';
 import CONFIG from '../utils/config-values';
 
 export const FlyoutContentView: StyledComponent<
-	React.ComponentPropsWithoutRef< typeof ReakitPopover >
-> = styled( ReakitPopover )`
-	z-index: ${ ZIndex.Flyout };
+	React.ComponentPropsWithoutRef<typeof ReakitPopover>
+> = styled(ReakitPopover)`
+	z-index: ${ZIndex.Flyout};
 	box-sizing: border-box;
 	opacity: 0;
 	outline: none;
 	position: relative;
 	transform-origin: center center;
-	transition: opacity ${ CONFIG.transitionDurationFastest } linear;
+	transition: opacity ${CONFIG.transitionDurationFastest} linear;
 	width: 100%;
 
 	&[data-enter] {
@@ -34,8 +34,8 @@ export const FlyoutContentView: StyledComponent<
 	}
 `;
 
-export const CardView = styled( Card )`
-	${ CardBody.selector } {
+export const CardView = styled(Card)`
+	${CardBody.selector} {
 		max-height: 80vh;
 	}
 `;

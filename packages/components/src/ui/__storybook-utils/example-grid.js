@@ -7,54 +7,54 @@ import { Text } from '../../text';
 import { View } from '../../view';
 import { VStack } from '../../v-stack';
 
-const Container = ( { children } ) => (
+const Container = ({ children }) => (
 	<div
-		style={ {
+		style={{
 			maxWidth: 1280,
 			width: '100%',
 			marginLeft: 'auto',
 			marginRight: 'auto',
-		} }
+		}}
 	>
-		{ children }
+		{children}
 	</div>
 );
 
-export const ExampleGrid = ( { children } ) => (
+export const ExampleGrid = ({ children }) => (
 	<Container>
-		<Grid columns={ [ 2, 2, 4 ] } gap="1px">
-			{ children }
+		<Grid columns={[2, 2, 4]} gap="1px">
+			{children}
 		</Grid>
 	</Container>
 );
 
-export const ExampleGridItem = ( { children } ) => (
+export const ExampleGridItem = ({ children }) => (
 	<Surface
 		variant="secondary"
-		style={ {
+		style={{
 			padding: 20,
-		} }
+		}}
 	>
-		<VStack alignment="center">{ children }</VStack>
+		<VStack alignment="center">{children}</VStack>
 	</Surface>
 );
 
-export const ExampleMetaContent = ( { title, items = [] } ) => {
+export const ExampleMetaContent = ({ title, items = [] }) => {
 	return (
 		<Grid templateColumns="60px 1fr">
 			<View>
 				<Text size="caption" weight="bold" align="right" isBlock>
-					{ title }
+					{title}
 				</Text>
 			</View>
-			<VStack spacing={ 1 }>
-				{ items.map( ( item, index ) => (
-					<View key={ index }>
+			<VStack spacing={1}>
+				{items.map((item, index) => (
+					<View key={index}>
 						<Text size="caption" isBlock>
-							{ item }
+							{item}
 						</Text>
 					</View>
-				) ) }
+				))}
 			</VStack>
 		</Grid>
 	);

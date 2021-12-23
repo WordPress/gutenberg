@@ -24,12 +24,12 @@ import { deepFilterHTML, getBlockContentSchema } from './utils';
 
 export { pasteHandler } from './paste-handler';
 
-export function deprecatedGetPhrasingContentSchema( context ) {
-	deprecated( 'wp.blocks.getPhrasingContentSchema', {
+export function deprecatedGetPhrasingContentSchema(context) {
+	deprecated('wp.blocks.getPhrasingContentSchema', {
 		since: '5.6',
 		alternative: 'wp.dom.getPhrasingContentSchema',
-	} );
-	return getPhrasingContentSchema( context );
+	});
+	return getPhrasingContentSchema(context);
 }
 
 /**
@@ -40,21 +40,21 @@ export function deprecatedGetPhrasingContentSchema( context ) {
  *
  * @return {Array} A list of blocks.
  */
-export function rawHandler( { HTML = '' } ) {
+export function rawHandler({ HTML = '' }) {
 	// If we detect block delimiters, parse entirely as blocks.
-	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parse( HTML );
+	if (HTML.indexOf('<!-- wp:') !== -1) {
+		return parse(HTML);
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
+	const pieces = shortcodeConverter(HTML);
 	const blockContentSchema = getBlockContentSchema();
 
 	return compact(
-		flatMap( pieces, ( piece ) => {
+		flatMap(pieces, (piece) => {
 			// Already a block from shortcode.
-			if ( typeof piece !== 'string' ) {
+			if (typeof piece !== 'string') {
 				return piece;
 			}
 
@@ -73,10 +73,10 @@ export function rawHandler( { HTML = '' } ) {
 				blockquoteNormaliser,
 			];
 
-			piece = deepFilterHTML( piece, filters, blockContentSchema );
-			piece = normaliseBlocks( piece );
+			piece = deepFilterHTML(piece, filters, blockContentSchema);
+			piece = normaliseBlocks(piece);
 
-			return htmlToBlocks( piece );
-		} )
+			return htmlToBlocks(piece);
+		})
 	);
 }

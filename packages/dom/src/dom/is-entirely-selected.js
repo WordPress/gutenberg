@@ -12,26 +12,26 @@ import isInputOrTextArea from './is-input-or-text-area';
  *
  * @return {boolean} True if entirely selected, false if not.
  */
-export default function isEntirelySelected( element ) {
-	if ( isInputOrTextArea( element ) ) {
+export default function isEntirelySelected(element) {
+	if (isInputOrTextArea(element)) {
 		return (
 			element.selectionStart === 0 &&
 			element.value.length === element.selectionEnd
 		);
 	}
 
-	if ( ! element.isContentEditable ) {
+	if (!element.isContentEditable) {
 		return true;
 	}
 
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
-	assertIsDefined( defaultView, 'defaultView' );
+	assertIsDefined(defaultView, 'defaultView');
 	const selection = defaultView.getSelection();
-	assertIsDefined( selection, 'selection' );
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	assertIsDefined(selection, 'selection');
+	const range = selection.rangeCount ? selection.getRangeAt(0) : null;
 
-	if ( ! range ) {
+	if (!range) {
 		return true;
 	}
 
@@ -47,15 +47,15 @@ export default function isEntirelySelected( element ) {
 	}
 
 	const lastChild = element.lastChild;
-	assertIsDefined( lastChild, 'lastChild' );
+	assertIsDefined(lastChild, 'lastChild');
 	const endContainerContentLength =
 		endContainer.nodeType === endContainer.TEXT_NODE
-			? /** @type {Text} */ ( endContainer ).data.length
+			? /** @type {Text} */ (endContainer).data.length
 			: endContainer.childNodes.length;
 
 	return (
-		isDeepChild( startContainer, element, 'firstChild' ) &&
-		isDeepChild( endContainer, element, 'lastChild' ) &&
+		isDeepChild(startContainer, element, 'firstChild') &&
+		isDeepChild(endContainer, element, 'lastChild') &&
 		startOffset === 0 &&
 		endOffset === endContainerContentLength
 	);
@@ -71,14 +71,14 @@ export default function isEntirelySelected( element ) {
  *
  * @return {boolean} True if query is a deep first/last child of container, false otherwise.
  */
-function isDeepChild( query, container, propName ) {
+function isDeepChild(query, container, propName) {
 	/** @type {HTMLElement | ChildNode | null} */
 	let candidate = container;
 	do {
-		if ( query === candidate ) {
+		if (query === candidate) {
 			return true;
 		}
-		candidate = candidate[ propName ];
-	} while ( candidate );
+		candidate = candidate[propName];
+	} while (candidate);
 	return false;
 }

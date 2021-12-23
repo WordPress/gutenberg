@@ -3,7 +3,7 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-const { Fill, Slot } = createSlotFill( '__unstableAutocompletionItemsSlot' );
+const { Fill, Slot } = createSlotFill('__unstableAutocompletionItemsSlot');
 
 export {
 	Fill as __unstableAutocompletionItemsFill,

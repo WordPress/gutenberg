@@ -15,25 +15,25 @@ import type { ToolsPanelItemProps } from '../types';
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.
 const ToolsPanelItem = (
-	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<ToolsPanelItemProps, 'div'>,
+	forwardedRef: Ref<any>
 ) => {
 	const {
 		children,
 		isShown,
 		shouldRenderPlaceholder,
 		...toolsPanelItemProps
-	} = useToolsPanelItem( props );
+	} = useToolsPanelItem(props);
 
-	if ( ! isShown ) {
+	if (!isShown) {
 		return shouldRenderPlaceholder ? (
-			<View { ...toolsPanelItemProps } ref={ forwardedRef } />
+			<View {...toolsPanelItemProps} ref={forwardedRef} />
 		) : null;
 	}
 
 	return (
-		<View { ...toolsPanelItemProps } ref={ forwardedRef }>
-			{ children }
+		<View {...toolsPanelItemProps} ref={forwardedRef}>
+			{children}
 		</View>
 	);
 };

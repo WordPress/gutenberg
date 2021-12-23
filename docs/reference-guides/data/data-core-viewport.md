@@ -13,8 +13,8 @@ Returns true if the viewport matches the given query, or false otherwise.
 _Usage_
 
 ```js
-isViewportMatch( state, '< huge' );
-isViewPortMatch( state, 'medium' );
+isViewportMatch(state, '< huge');
+isViewPortMatch(state, 'medium');
 ```
 
 _Parameters_

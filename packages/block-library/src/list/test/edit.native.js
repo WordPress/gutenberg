@@ -8,9 +8,9 @@ import { shallow } from 'enzyme';
  */
 import ListEdit from '../edit';
 
-describe( 'ListEdit component', () => {
-	it( 'renders without crashing', () => {
-		const wrapper = shallow( <ListEdit attributes={ {} } /> );
-		expect( wrapper ).toBeTruthy();
-	} );
-} );
+describe('ListEdit component', () => {
+	it('renders without crashing', () => {
+		const wrapper = shallow(<ListEdit attributes={{}} />);
+		expect(wrapper).toBeTruthy();
+	});
+});

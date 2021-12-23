@@ -23,36 +23,36 @@ import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 
-export function BlockPreview( {
+export function BlockPreview({
 	blocks,
 	__experimentalPadding = 0,
 	viewportWidth = 1200,
 	__experimentalLive = false,
 	__experimentalOnClick,
-} ) {
+}) {
 	const originalSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
+		(select) => select(blockEditorStore).getSettings(),
 		[]
 	);
-	const settings = useMemo( () => {
+	const settings = useMemo(() => {
 		const _settings = { ...originalSettings };
 		_settings.__experimentalBlockPatterns = [];
 		return _settings;
-	}, [ originalSettings ] );
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
-	if ( ! blocks || blocks.length === 0 ) {
+	}, [originalSettings]);
+	const renderedBlocks = useMemo(() => castArray(blocks), [blocks]);
+	if (!blocks || blocks.length === 0) {
 		return null;
 	}
 	return (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			{ __experimentalLive ? (
-				<LiveBlockPreview onClick={ __experimentalOnClick } />
+		<BlockEditorProvider value={renderedBlocks} settings={settings}>
+			{__experimentalLive ? (
+				<LiveBlockPreview onClick={__experimentalOnClick} />
 			) : (
 				<AutoHeightBlockPreview
-					viewportWidth={ viewportWidth }
-					__experimentalPadding={ __experimentalPadding }
+					viewportWidth={viewportWidth}
+					__experimentalPadding={__experimentalPadding}
 				/>
-			) }
+			)}
 		</BlockEditorProvider>
 	);
 }
@@ -68,7 +68,7 @@ export function BlockPreview( {
  *
  * @return {WPComponent} The component to be rendered.
  */
-export default memo( BlockPreview );
+export default memo(BlockPreview);
 
 /**
  * This hook is used to lightly mark an element as a block preview wrapper
@@ -86,28 +86,24 @@ export default memo( BlockPreview );
  * @param {Object}    options.__experimentalLayout Layout settings to be used in the preview.
  *
  */
-export function useBlockPreview( {
-	blocks,
-	props = {},
-	__experimentalLayout,
-} ) {
+export function useBlockPreview({ blocks, props = {}, __experimentalLayout }) {
 	const originalSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
+		(select) => select(blockEditorStore).getSettings(),
 		[]
 	);
 	const disabledRef = useDisabled();
-	const ref = useMergeRefs( [ props.ref, disabledRef ] );
+	const ref = useMergeRefs([props.ref, disabledRef]);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __experimentalBlockPatterns: [] } ),
-		[ originalSettings ]
+		() => ({ ...originalSettings, __experimentalBlockPatterns: [] }),
+		[originalSettings]
 	);
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const renderedBlocks = useMemo(() => castArray(blocks), [blocks]);
 
 	const children = (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+		<BlockEditorProvider value={renderedBlocks} settings={settings}>
 			<BlockListItems
-				renderAppender={ false }
-				__experimentalLayout={ __experimentalLayout }
+				renderAppender={false}
+				__experimentalLayout={__experimentalLayout}
 			/>
 		</BlockEditorProvider>
 	);

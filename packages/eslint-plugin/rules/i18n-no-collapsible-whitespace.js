@@ -6,7 +6,7 @@ const {
 	getTextContentFromNode,
 	getTranslateFunctionName,
 	getTranslateFunctionArgs,
-} = require( '../utils' );
+} = require('../utils');
 
 const PROBLEMS_BY_CHAR_CODE = {
 	9: '\\t',
@@ -24,49 +24,45 @@ module.exports = {
 				'Translations should not contain collapsible whitespace{{problem}}',
 		},
 	},
-	create( context ) {
+	create(context) {
 		return {
-			CallExpression( node ) {
+			CallExpression(node) {
 				const { callee, arguments: args } = node;
 
-				const functionName = getTranslateFunctionName( callee );
+				const functionName = getTranslateFunctionName(callee);
 
-				if ( ! TRANSLATION_FUNCTIONS.has( functionName ) ) {
+				if (!TRANSLATION_FUNCTIONS.has(functionName)) {
 					return;
 				}
 
-				const candidates = getTranslateFunctionArgs(
-					functionName,
-					args
-				);
+				const candidates = getTranslateFunctionArgs(functionName, args);
 
-				for ( const arg of candidates ) {
-					const argumentString = getTextContentFromNode( arg );
-					if ( ! argumentString ) {
+				for (const arg of candidates) {
+					const argumentString = getTextContentFromNode(arg);
+					if (!argumentString) {
 						continue;
 					}
 
-					const collapsibleWhitespace = argumentString.match(
-						/(\n|\t|\r| {2})/
-					);
+					const collapsibleWhitespace =
+						argumentString.match(/(\n|\t|\r| {2})/);
 
-					if ( ! collapsibleWhitespace ) {
+					if (!collapsibleWhitespace) {
 						continue;
 					}
 
 					const problem =
 						PROBLEMS_BY_CHAR_CODE[
-							collapsibleWhitespace[ 0 ].charCodeAt( 0 )
+							collapsibleWhitespace[0].charCodeAt(0)
 						];
-					const problemString = problem ? ` (${ problem })` : '';
+					const problemString = problem ? ` (${problem})` : '';
 
-					context.report( {
+					context.report({
 						node,
 						messageId: 'noCollapsibleWhitespace',
 						data: {
 							problem: problemString,
 						},
-					} );
+					});
 				}
 			},
 		};

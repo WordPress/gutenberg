@@ -9,16 +9,16 @@ import { __unstableCompositeGroup as CompositeGroup } from '@wordpress/component
  */
 import InserterListboxContext from './context';
 
-function InserterListboxRow( props, ref ) {
-	const state = useContext( InserterListboxContext );
+function InserterListboxRow(props, ref) {
+	const state = useContext(InserterListboxContext);
 	return (
 		<CompositeGroup
-			state={ state }
+			state={state}
 			role="presentation"
-			ref={ ref }
-			{ ...props }
+			ref={ref}
+			{...props}
 		/>
 	);
 }
 
-export default forwardRef( InserterListboxRow );
+export default forwardRef(InserterListboxRow);

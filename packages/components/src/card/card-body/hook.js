@@ -13,14 +13,14 @@ import { useCx } from '../../utils/hooks/use-cx';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
  */
-export function useCardBody( props ) {
+export function useCardBody(props) {
 	const {
 		className,
 		isScrollable = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps
-	} = useContextSystem( props, 'CardBody' );
+	} = useContextSystem(props, 'CardBody');
 
 	const cx = useCx();
 
@@ -29,13 +29,13 @@ export function useCardBody( props ) {
 			cx(
 				styles.Body,
 				styles.borderRadius,
-				styles.cardPaddings[ size ],
+				styles.cardPaddings[size],
 				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
 				'components-card__body',
 				className
 			),
-		[ className, isShady, size ]
+		[className, isShady, size]
 	);
 
 	return {

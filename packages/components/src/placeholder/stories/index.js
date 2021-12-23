@@ -18,20 +18,20 @@ export default {
 };
 
 export const _default = () => {
-	const icon = text( 'Icon', 'smiley' );
+	const icon = text('Icon', 'smiley');
 	const instructions = text(
 		'Instructions',
 		'Here are instructions you should follow'
 	);
-	const label = text( 'Label', 'My Placeholder Label' );
-	const isColumnLayout = boolean( 'isColumnLayout', false );
+	const label = text('Label', 'My Placeholder Label');
+	const isColumnLayout = boolean('isColumnLayout', false);
 
 	return (
 		<Placeholder
-			icon={ icon }
-			instructions={ instructions }
-			label={ label }
-			isColumnLayout={ isColumnLayout }
+			icon={icon}
+			instructions={instructions}
+			label={label}
+			isColumnLayout={isColumnLayout}
 		>
 			<div>
 				<TextControl

@@ -4,14 +4,14 @@
 import { Popover } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 
-export default function ListViewDropIndicator( {
+export default function ListViewDropIndicator({
 	listViewRef,
 	blockDropTarget,
-} ) {
+}) {
 	const { rootClientId, clientId, dropPosition } = blockDropTarget || {};
 
-	const [ rootBlockElement, blockElement ] = useMemo( () => {
-		if ( ! listViewRef.current ) {
+	const [rootBlockElement, blockElement] = useMemo(() => {
+		if (!listViewRef.current) {
 			return [];
 		}
 
@@ -19,7 +19,7 @@ export default function ListViewDropIndicator( {
 		// block lists, but is undefined when dropping at the root level.
 		const _rootBlockElement = rootClientId
 			? listViewRef.current.querySelector(
-					`[data-block="${ rootClientId }"]`
+					`[data-block="${rootClientId}"]`
 			  )
 			: undefined;
 
@@ -27,21 +27,19 @@ export default function ListViewDropIndicator( {
 		// usually be inserted adjacent to it. It will be undefined when
 		// dropping a block into an empty block list.
 		const _blockElement = clientId
-			? listViewRef.current.querySelector(
-					`[data-block="${ clientId }"]`
-			  )
+			? listViewRef.current.querySelector(`[data-block="${clientId}"]`)
 			: undefined;
 
-		return [ _rootBlockElement, _blockElement ];
-	}, [ rootClientId, clientId ] );
+		return [_rootBlockElement, _blockElement];
+	}, [rootClientId, clientId]);
 
 	// The targetElement is the element that the drop indicator will appear
 	// before or after. When dropping into an empty block list, blockElement
 	// is undefined, so the indicator will appear after the rootBlockElement.
 	const targetElement = blockElement || rootBlockElement;
 
-	const getDropIndicatorIndent = useCallback( () => {
-		if ( ! rootBlockElement ) {
+	const getDropIndicatorIndent = useCallback(() => {
+		if (!rootBlockElement) {
 			return 0;
 		}
 
@@ -54,10 +52,10 @@ export default function ListViewDropIndicator( {
 		);
 		const rootBlockIconRect = rootBlockIconElement.getBoundingClientRect();
 		return rootBlockIconRect.right - targetElementRect.left;
-	}, [ rootBlockElement, targetElement ] );
+	}, [rootBlockElement, targetElement]);
 
-	const style = useMemo( () => {
-		if ( ! targetElement ) {
+	const style = useMemo(() => {
+		if (!targetElement) {
 			return {};
 		}
 
@@ -66,10 +64,10 @@ export default function ListViewDropIndicator( {
 		return {
 			width: targetElement.offsetWidth - indent,
 		};
-	}, [ getDropIndicatorIndent, targetElement ] );
+	}, [getDropIndicatorIndent, targetElement]);
 
-	const getAnchorRect = useCallback( () => {
-		if ( ! targetElement ) {
+	const getAnchorRect = useCallback(() => {
+		if (!targetElement) {
 			return {};
 		}
 
@@ -85,7 +83,7 @@ export default function ListViewDropIndicator( {
 			ownerDocument,
 		};
 
-		if ( dropPosition === 'top' ) {
+		if (dropPosition === 'top') {
 			return {
 				...anchorRect,
 				top: rect.top,
@@ -93,7 +91,7 @@ export default function ListViewDropIndicator( {
 			};
 		}
 
-		if ( dropPosition === 'bottom' || dropPosition === 'inside' ) {
+		if (dropPosition === 'bottom' || dropPosition === 'inside') {
 			return {
 				...anchorRect,
 				top: rect.bottom,
@@ -102,22 +100,22 @@ export default function ListViewDropIndicator( {
 		}
 
 		return {};
-	}, [ targetElement, dropPosition, getDropIndicatorIndent ] );
+	}, [targetElement, dropPosition, getDropIndicatorIndent]);
 
-	if ( ! targetElement ) {
+	if (!targetElement) {
 		return null;
 	}
 
 	return (
 		<Popover
 			noArrow
-			animate={ false }
-			getAnchorRect={ getAnchorRect }
-			focusOnMount={ false }
+			animate={false}
+			getAnchorRect={getAnchorRect}
+			focusOnMount={false}
 			className="block-editor-list-view-drop-indicator"
 		>
 			<div
-				style={ style }
+				style={style}
 				className="block-editor-list-view-drop-indicator__line"
 			/>
 		</Popover>

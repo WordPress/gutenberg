@@ -11,38 +11,36 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-export default function SaveButton( {
+export default function SaveButton({
 	openEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
-} ) {
-	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const {
-			__experimentalGetDirtyEntityRecords,
-			isSavingEntityRecord,
-		} = select( coreStore );
+}) {
+	const { isDirty, isSaving } = useSelect((select) => {
+		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
+			select(coreStore);
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		return {
 			isDirty: dirtyEntityRecords.length > 0,
-			isSaving: some( dirtyEntityRecords, ( record ) =>
-				isSavingEntityRecord( record.kind, record.name, record.key )
+			isSaving: some(dirtyEntityRecords, (record) =>
+				isSavingEntityRecord(record.kind, record.name, record.key)
 			),
 		};
-	}, [] );
+	}, []);
 
-	const disabled = ! isDirty || isSaving;
+	const disabled = !isDirty || isSaving;
 
 	return (
 		<>
 			<Button
 				variant="primary"
 				className="edit-site-save-button__button"
-				aria-disabled={ disabled }
-				aria-expanded={ isEntitiesSavedStatesOpen }
-				disabled={ disabled }
-				isBusy={ isSaving }
-				onClick={ disabled ? undefined : openEntitiesSavedStates }
+				aria-disabled={disabled}
+				aria-expanded={isEntitiesSavedStatesOpen}
+				disabled={disabled}
+				isBusy={isSaving}
+				onClick={disabled ? undefined : openEntitiesSavedStates}
 			>
-				{ __( 'Save' ) }
+				{__('Save')}
 			</Button>
 		</>
 	);

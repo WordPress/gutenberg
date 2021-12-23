@@ -14,20 +14,19 @@ export const ZStackView = styled.div`
 	position: relative;
 `;
 
-export const ZStackChildView = styled.div< {
+export const ZStackChildView = styled.div<{
 	isLayered: boolean;
 	offsetAmount: number;
 	zIndex: number;
-} >`
-	${ ( { isLayered, offsetAmount } ) =>
+}>`
+	${({ isLayered, offsetAmount }) =>
 		isLayered
-			? css( rtl( { marginLeft: offsetAmount } )() )
-			: css( rtl( { right: offsetAmount * -1 } )() ) }
+			? css(rtl({ marginLeft: offsetAmount })())
+			: css(rtl({ right: offsetAmount * -1 })())}
 
-	${ ( { isLayered } ) =>
-		isLayered ? positionAbsolute : positionRelative }
+	${({ isLayered }) => (isLayered ? positionAbsolute : positionRelative)}
 
-	${ ( { zIndex } ) => css( { zIndex } ) }
+	${({ zIndex }) => css({ zIndex })}
 `;
 
 const positionAbsolute = css`

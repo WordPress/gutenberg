@@ -16,19 +16,19 @@ import { LINE_SEPARATOR } from './special-characters';
  *
  * @return {number|void} The parent list line index.
  */
-export function getParentLineIndex( { text, replacements }, lineIndex ) {
-	const startFormats = replacements[ lineIndex ] || [];
+export function getParentLineIndex({ text, replacements }, lineIndex) {
+	const startFormats = replacements[lineIndex] || [];
 
 	let index = lineIndex;
 
-	while ( index-- >= 0 ) {
-		if ( text[ index ] !== LINE_SEPARATOR ) {
+	while (index-- >= 0) {
+		if (text[index] !== LINE_SEPARATOR) {
 			continue;
 		}
 
-		const formatsAtIndex = replacements[ index ] || [];
+		const formatsAtIndex = replacements[index] || [];
 
-		if ( formatsAtIndex.length === startFormats.length - 1 ) {
+		if (formatsAtIndex.length === startFormats.length - 1) {
 			return index;
 		}
 	}

@@ -13,11 +13,11 @@
  *
  * @return {boolean} Whether or not it looks like a URL.
  */
-export function isURL( url ) {
+export function isURL(url) {
 	// A URL can be considered value if the `URL` constructor is able to parse
 	// it. The constructor throws an error for an invalid URL.
 	try {
-		new URL( url );
+		new URL(url);
 		return true;
 	} catch {
 		return false;

@@ -1,16 +1,16 @@
-function getFocalPointOffset( imageRatio, container, imageSize, focusPoint ) {
-	const containerCenter = Math.floor( container / 2 );
-	const scaledImage = Math.floor( imageSize / imageRatio );
-	const focus = Math.floor( focusPoint * scaledImage );
+function getFocalPointOffset(imageRatio, container, imageSize, focusPoint) {
+	const containerCenter = Math.floor(container / 2);
+	const scaledImage = Math.floor(imageSize / imageRatio);
+	const focus = Math.floor(focusPoint * scaledImage);
 	let focusOffset = focus - containerCenter;
 	const offsetRest = scaledImage - focus;
 	const containerRest = container - containerCenter;
 
-	if ( offsetRest < containerRest ) {
+	if (offsetRest < containerRest) {
 		focusOffset -= containerRest - offsetRest;
 	}
 
-	if ( focusOffset < 0 ) {
+	if (focusOffset < 0) {
 		focusOffset = 0;
 	}
 
@@ -23,7 +23,7 @@ export function getImageWithFocalPointStyles(
 	originalImageData
 ) {
 	const imageStyle = {};
-	if ( focalPoint && containerSize && originalImageData ) {
+	if (focalPoint && containerSize && originalImageData) {
 		let horizontalOffset = 0;
 		let verticalOffset = 0;
 		const widthRatio = originalImageData.width / containerSize.width;
@@ -31,7 +31,7 @@ export function getImageWithFocalPointStyles(
 
 		imageStyle.resizeMode = 'stretch';
 
-		if ( widthRatio > heightRatio ) {
+		if (widthRatio > heightRatio) {
 			horizontalOffset = getFocalPointOffset(
 				heightRatio,
 				containerSize.width,
@@ -40,7 +40,7 @@ export function getImageWithFocalPointStyles(
 			);
 			imageStyle.width = undefined;
 			imageStyle.left = horizontalOffset;
-		} else if ( widthRatio < heightRatio ) {
+		} else if (widthRatio < heightRatio) {
 			verticalOffset = getFocalPointOffset(
 				widthRatio,
 				containerSize.height,

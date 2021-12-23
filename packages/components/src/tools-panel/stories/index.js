@@ -26,14 +26,14 @@ export default {
 };
 
 export const _default = () => {
-	const [ height, setHeight ] = useState();
-	const [ minHeight, setMinHeight ] = useState();
-	const [ width, setWidth ] = useState();
+	const [height, setHeight] = useState();
+	const [minHeight, setMinHeight] = useState();
+	const [width, setWidth] = useState();
 
 	const resetAll = () => {
-		setHeight( undefined );
-		setWidth( undefined );
-		setMinHeight( undefined );
+		setHeight(undefined);
+		setWidth(undefined);
+		setMinHeight(undefined);
 	};
 
 	return (
@@ -41,42 +41,42 @@ export const _default = () => {
 			<Panel>
 				<ToolsPanel
 					label="Tools Panel (default example)"
-					resetAll={ resetAll }
+					resetAll={resetAll}
 				>
 					<SingleColumnItem
-						hasValue={ () => !! width }
+						hasValue={() => !!width}
 						label="Width"
-						onDeselect={ () => setWidth( undefined ) }
-						isShownByDefault={ true }
+						onDeselect={() => setWidth(undefined)}
+						isShownByDefault={true}
 					>
 						<UnitControl
 							label="Width"
-							value={ width }
-							onChange={ ( next ) => setWidth( next ) }
+							value={width}
+							onChange={(next) => setWidth(next)}
 						/>
 					</SingleColumnItem>
 					<SingleColumnItem
-						hasValue={ () => !! height }
+						hasValue={() => !!height}
 						label="Height"
-						onDeselect={ () => setHeight( undefined ) }
-						isShownByDefault={ true }
+						onDeselect={() => setHeight(undefined)}
+						isShownByDefault={true}
 					>
 						<UnitControl
 							label="Height"
-							value={ height }
-							onChange={ ( next ) => setHeight( next ) }
+							value={height}
+							onChange={(next) => setHeight(next)}
 						/>
 					</SingleColumnItem>
 					<ToolsPanelItem
-						hasValue={ () => !! minHeight }
+						hasValue={() => !!minHeight}
 						label="Minimum height"
-						onDeselect={ () => setMinHeight( undefined ) }
-						isShownByDefault={ true }
+						onDeselect={() => setMinHeight(undefined)}
+						isShownByDefault={true}
 					>
 						<UnitControl
 							label="Minimum height"
-							value={ minHeight }
-							onChange={ ( next ) => setMinHeight( next ) }
+							value={minHeight}
+							onChange={(next) => setMinHeight(next)}
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
@@ -86,12 +86,12 @@ export const _default = () => {
 };
 
 export const WithNonToolsPanelItems = () => {
-	const [ height, setHeight ] = useState();
-	const [ width, setWidth ] = useState();
+	const [height, setHeight] = useState();
+	const [width, setWidth] = useState();
 
 	const resetAll = () => {
-		setHeight( undefined );
-		setWidth( undefined );
+		setHeight(undefined);
+		setWidth(undefined);
 	};
 
 	return (
@@ -99,34 +99,34 @@ export const WithNonToolsPanelItems = () => {
 			<Panel>
 				<ToolsPanel
 					label="ToolsPanel (with non-menu items)"
-					resetAll={ resetAll }
+					resetAll={resetAll}
 				>
 					<IntroText>
 						This text illustrates not all items must be wrapped in a
 						ToolsPanelItem and represented in the panel menu.
 					</IntroText>
 					<SingleColumnItem
-						hasValue={ () => !! width }
+						hasValue={() => !!width}
 						label="Width"
-						onDeselect={ () => setWidth( undefined ) }
-						isShownByDefault={ true }
+						onDeselect={() => setWidth(undefined)}
+						isShownByDefault={true}
 					>
 						<UnitControl
 							label="Width"
-							value={ width }
-							onChange={ ( next ) => setWidth( next ) }
+							value={width}
+							onChange={(next) => setWidth(next)}
 						/>
 					</SingleColumnItem>
 					<SingleColumnItem
-						hasValue={ () => !! height }
+						hasValue={() => !!height}
 						label="Height"
-						onDeselect={ () => setHeight( undefined ) }
-						isShownByDefault={ true }
+						onDeselect={() => setHeight(undefined)}
+						isShownByDefault={true}
 					>
 						<UnitControl
 							label="Height"
-							value={ height }
-							onChange={ ( next ) => setHeight( next ) }
+							value={height}
+							onChange={(next) => setHeight(next)}
 						/>
 					</SingleColumnItem>
 				</ToolsPanel>
@@ -136,12 +136,12 @@ export const WithNonToolsPanelItems = () => {
 };
 
 export const WithOptionalItemsPlusIcon = () => {
-	const [ height, setHeight ] = useState();
-	const [ width, setWidth ] = useState();
+	const [height, setHeight] = useState();
+	const [width, setWidth] = useState();
 
 	const resetAll = () => {
-		setHeight( undefined );
-		setWidth( undefined );
+		setHeight(undefined);
+		setWidth(undefined);
 	};
 
 	return (
@@ -149,30 +149,30 @@ export const WithOptionalItemsPlusIcon = () => {
 			<Panel>
 				<ToolsPanel
 					label="Tools Panel (optional items only)"
-					resetAll={ resetAll }
+					resetAll={resetAll}
 				>
 					<SingleColumnItem
-						hasValue={ () => !! width }
+						hasValue={() => !!width}
 						label="Width"
-						onDeselect={ () => setWidth( undefined ) }
-						isShownByDefault={ false }
+						onDeselect={() => setWidth(undefined)}
+						isShownByDefault={false}
 					>
 						<UnitControl
 							label="Width"
-							value={ width }
-							onChange={ ( next ) => setWidth( next ) }
+							value={width}
+							onChange={(next) => setWidth(next)}
 						/>
 					</SingleColumnItem>
 					<SingleColumnItem
-						hasValue={ () => !! height }
+						hasValue={() => !!height}
 						label="Height"
-						onDeselect={ () => setHeight( undefined ) }
-						isShownByDefault={ false }
+						onDeselect={() => setHeight(undefined)}
+						isShownByDefault={false}
 					>
 						<UnitControl
 							label="Height"
-							value={ height }
-							onChange={ ( next ) => setHeight( next ) }
+							value={height}
+							onChange={(next) => setHeight(next)}
 						/>
 					</SingleColumnItem>
 				</ToolsPanel>
@@ -181,72 +181,68 @@ export const WithOptionalItemsPlusIcon = () => {
 	);
 };
 
-const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
+const { Fill: ToolsPanelItems, Slot } = createSlotFill('ToolsPanelSlot');
 const panelId = 'unique-tools-panel-id';
 
 export const WithSlotFillItems = () => {
-	const [ attributes, setAttributes ] = useState( {} );
+	const [attributes, setAttributes] = useState({});
 	const { width, height } = attributes;
 
-	const resetAll = ( resetFilters = [] ) => {
+	const resetAll = (resetFilters = []) => {
 		let newAttributes = {};
 
-		resetFilters.forEach( ( resetFilter ) => {
+		resetFilters.forEach((resetFilter) => {
 			newAttributes = {
 				...newAttributes,
-				...resetFilter( newAttributes ),
+				...resetFilter(newAttributes),
 			};
-		} );
+		});
 
-		setAttributes( newAttributes );
+		setAttributes(newAttributes);
 	};
 
-	const updateAttribute = ( name, value ) => {
-		setAttributes( {
+	const updateAttribute = (name, value) => {
+		setAttributes({
 			...attributes,
-			[ name ]: value,
-		} );
+			[name]: value,
+		});
 	};
 
 	return (
 		<SlotFillProvider>
 			<ToolsPanelItems>
 				<SingleColumnItem
-					hasValue={ () => !! width }
+					hasValue={() => !!width}
 					label="Injected Width"
-					onDeselect={ () => updateAttribute( 'width', undefined ) }
-					resetAllFilter={ () => ( { width: undefined } ) }
-					panelId={ panelId }
+					onDeselect={() => updateAttribute('width', undefined)}
+					resetAllFilter={() => ({ width: undefined })}
+					panelId={panelId}
 				>
 					<UnitControl
 						label="Injected Width"
-						value={ width }
-						onChange={ ( next ) =>
-							updateAttribute( 'width', next )
-						}
+						value={width}
+						onChange={(next) => updateAttribute('width', next)}
 					/>
 				</SingleColumnItem>
 				<SingleColumnItem
-					hasValue={ () => !! height }
+					hasValue={() => !!height}
 					label="Injected Height"
-					onDeselect={ () => updateAttribute( 'height', undefined ) }
-					resetAllFilter={ () => ( { height: undefined } ) }
-					panelId={ panelId }
+					onDeselect={() => updateAttribute('height', undefined)}
+					resetAllFilter={() => ({ height: undefined })}
+					panelId={panelId}
 				>
 					<UnitControl
 						label="Injected Height"
-						value={ height }
-						onChange={ ( next ) =>
-							updateAttribute( 'height', next )
-						}
+						value={height}
+						onChange={(next) => updateAttribute('height', next)}
 					/>
 				</SingleColumnItem>
 				<ToolsPanelItem
-					hasValue={ () => true }
+					hasValue={() => true}
 					label="Item for alternate panel"
-					onDeselect={ () => undefined }
-					resetAllFilter={ () => undefined }
-					panelId={ 'intended-for-another-panel-via-shared-slot' }
+					onDeselect={() => undefined}
+					resetAllFilter={() => undefined}
+					panelId={'intended-for-another-panel-via-shared-slot'}
 				>
 					<p>
 						This panel item will not be displayed in the demo as its
@@ -258,8 +254,8 @@ export const WithSlotFillItems = () => {
 				<Panel>
 					<ToolsPanel
 						label="Tools Panel With SlotFill Items"
-						resetAll={ resetAll }
-						panelId={ panelId }
+						resetAll={resetAll}
+						panelId={panelId}
 					>
 						<Slot />
 					</ToolsPanel>
@@ -270,62 +266,58 @@ export const WithSlotFillItems = () => {
 };
 
 export const WithConditionalDefaultControl = () => {
-	const [ attributes, setAttributes ] = useState( {} );
+	const [attributes, setAttributes] = useState({});
 	const { height, scale } = attributes;
 
-	const resetAll = ( resetFilters = [] ) => {
+	const resetAll = (resetFilters = []) => {
 		let newAttributes = {};
 
-		resetFilters.forEach( ( resetFilter ) => {
+		resetFilters.forEach((resetFilter) => {
 			newAttributes = {
 				...newAttributes,
-				...resetFilter( newAttributes ),
+				...resetFilter(newAttributes),
 			};
-		} );
+		});
 
-		setAttributes( newAttributes );
+		setAttributes(newAttributes);
 	};
 
-	const updateAttribute = ( name, value ) => {
-		setAttributes( {
+	const updateAttribute = (name, value) => {
+		setAttributes({
 			...attributes,
-			[ name ]: value,
-		} );
+			[name]: value,
+		});
 	};
 
 	return (
 		<SlotFillProvider>
 			<ToolsPanelItems>
 				<SingleColumnItem
-					hasValue={ () => !! height }
+					hasValue={() => !!height}
 					label="Injected Height"
-					onDeselect={ () => updateAttribute( 'height', undefined ) }
-					resetAllFilter={ () => ( { height: undefined } ) }
-					panelId={ panelId }
-					isShownByDefault={ true }
+					onDeselect={() => updateAttribute('height', undefined)}
+					resetAllFilter={() => ({ height: undefined })}
+					panelId={panelId}
+					isShownByDefault={true}
 				>
 					<UnitControl
 						label="Injected Height"
-						value={ height }
-						onChange={ ( next ) =>
-							updateAttribute( 'height', next )
-						}
+						value={height}
+						onChange={(next) => updateAttribute('height', next)}
 					/>
 				</SingleColumnItem>
 				<ToolsPanelItem
-					hasValue={ () => !! scale }
+					hasValue={() => !!scale}
 					label="Scale"
-					onDeselect={ () => updateAttribute( 'scale', undefined ) }
-					resetAllFilter={ () => ( { scale: undefined } ) }
-					panelId={ panelId }
-					isShownByDefault={ !! height }
+					onDeselect={() => updateAttribute('scale', undefined)}
+					resetAllFilter={() => ({ scale: undefined })}
+					panelId={panelId}
+					isShownByDefault={!!height}
 				>
 					<ToggleGroupControl
 						label="Scale"
-						value={ scale }
-						onChange={ ( next ) =>
-							updateAttribute( 'scale', next )
-						}
+						value={scale}
+						onChange={(next) => updateAttribute('scale', next)}
 						isBlock
 					>
 						<ToggleGroupControlOption value="cover" label="Cover" />
@@ -341,8 +333,8 @@ export const WithConditionalDefaultControl = () => {
 				<Panel>
 					<ToolsPanel
 						label="Tools Panel With Conditional Default via SlotFill"
-						resetAll={ resetAll }
-						panelId={ panelId }
+						resetAll={resetAll}
+						panelId={panelId}
 					>
 						<Slot />
 					</ToolsPanel>
@@ -353,68 +345,62 @@ export const WithConditionalDefaultControl = () => {
 };
 
 export const WithConditionallyRenderedControl = () => {
-	const [ attributes, setAttributes ] = useState( {} );
+	const [attributes, setAttributes] = useState({});
 	const { height, scale } = attributes;
 
-	const resetAll = ( resetFilters = [] ) => {
+	const resetAll = (resetFilters = []) => {
 		let newAttributes = {};
 
-		resetFilters.forEach( ( resetFilter ) => {
+		resetFilters.forEach((resetFilter) => {
 			newAttributes = {
 				...newAttributes,
-				...resetFilter( newAttributes ),
+				...resetFilter(newAttributes),
 			};
-		} );
+		});
 
-		setAttributes( newAttributes );
+		setAttributes(newAttributes);
 	};
 
-	const updateAttribute = ( name, value ) => {
-		setAttributes( {
+	const updateAttribute = (name, value) => {
+		setAttributes({
 			...attributes,
-			[ name ]: value,
-		} );
+			[name]: value,
+		});
 	};
 
 	return (
 		<SlotFillProvider>
 			<ToolsPanelItems>
 				<SingleColumnItem
-					hasValue={ () => !! height }
+					hasValue={() => !!height}
 					label="Injected Height"
-					onDeselect={ () => {
-						updateAttribute( 'scale', undefined );
-						updateAttribute( 'height', undefined );
-					} }
-					resetAllFilter={ () => ( { height: undefined } ) }
-					panelId={ panelId }
-					isShownByDefault={ true }
+					onDeselect={() => {
+						updateAttribute('scale', undefined);
+						updateAttribute('height', undefined);
+					}}
+					resetAllFilter={() => ({ height: undefined })}
+					panelId={panelId}
+					isShownByDefault={true}
 				>
 					<UnitControl
 						label="Injected Height"
-						value={ height }
-						onChange={ ( next ) =>
-							updateAttribute( 'height', next )
-						}
+						value={height}
+						onChange={(next) => updateAttribute('height', next)}
 					/>
 				</SingleColumnItem>
-				{ !! height && (
+				{!!height && (
 					<ToolsPanelItem
-						hasValue={ () => !! scale }
+						hasValue={() => !!scale}
 						label="Scale"
-						onDeselect={ () =>
-							updateAttribute( 'scale', undefined )
-						}
-						resetAllFilter={ () => ( { scale: undefined } ) }
-						panelId={ panelId }
-						isShownByDefault={ true }
+						onDeselect={() => updateAttribute('scale', undefined)}
+						resetAllFilter={() => ({ scale: undefined })}
+						panelId={panelId}
+						isShownByDefault={true}
 					>
 						<ToggleGroupControl
 							label="Scale"
-							value={ scale }
-							onChange={ ( next ) =>
-								updateAttribute( 'scale', next )
-							}
+							value={scale}
+							onChange={(next) => updateAttribute('scale', next)}
 							isBlock
 						>
 							<ToggleGroupControlOption
@@ -431,14 +417,14 @@ export const WithConditionallyRenderedControl = () => {
 							/>
 						</ToggleGroupControl>
 					</ToolsPanelItem>
-				) }
+				)}
 			</ToolsPanelItems>
 			<PanelWrapperView>
 				<Panel>
 					<ToolsPanel
 						label="Tools Panel With Conditionally Rendered Item via SlotFill"
-						resetAll={ resetAll }
-						panelId={ panelId }
+						resetAll={resetAll}
+						panelId={panelId}
 					>
 						<Slot />
 					</ToolsPanel>
@@ -459,7 +445,7 @@ const PanelWrapperView = styled.div`
 	}
 `;
 
-const SingleColumnItem = styled( ToolsPanelItem )`
+const SingleColumnItem = styled(ToolsPanelItem)`
 	grid-column: span 1;
 `;
 

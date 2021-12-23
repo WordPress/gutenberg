@@ -29,7 +29,7 @@ function getAdminNotices() {
 	// The order is reversed to match expectations of rendered order, since a
 	// NoticesList is itself rendered in reverse order (newest to oldest).
 	return Array.from(
-		document.querySelectorAll( '#wpbody-content > .notice' )
+		document.querySelectorAll('#wpbody-content > .notice')
 	).reverse();
 }
 
@@ -40,21 +40,21 @@ function getAdminNotices() {
  *
  * @return {Element} Upgraded notice HTML.
  */
-function getNoticeHTML( element ) {
+function getNoticeHTML(element) {
 	const fragments = [];
 
-	for ( const child of element.childNodes ) {
-		if ( child.nodeType !== child.ELEMENT_NODE ) {
+	for (const child of element.childNodes) {
+		if (child.nodeType !== child.ELEMENT_NODE) {
 			const value = child.nodeValue.trim();
-			if ( value ) {
-				fragments.push( child.nodeValue );
+			if (value) {
+				fragments.push(child.nodeValue);
 			}
-		} else if ( ! child.classList.contains( 'notice-dismiss' ) ) {
-			fragments.push( child.outerHTML );
+		} else if (!child.classList.contains('notice-dismiss')) {
+			fragments.push(child.outerHTML);
 		}
 	}
 
-	return fragments.join( '' );
+	return fragments.join('');
 }
 
 /**
@@ -65,10 +65,10 @@ function getNoticeHTML( element ) {
  *
  * @return {?string} Upgraded status type.
  */
-function getNoticeStatus( element ) {
-	for ( const className of element.classList ) {
-		if ( NOTICE_CLASS_STATUSES.hasOwnProperty( className ) ) {
-			return NOTICE_CLASS_STATUSES[ className ];
+function getNoticeStatus(element) {
+	for (const className of element.classList) {
+		if (NOTICE_CLASS_STATUSES.hasOwnProperty(className)) {
+			return NOTICE_CLASS_STATUSES[className];
 		}
 	}
 }
@@ -80,22 +80,20 @@ export class AdminNotices extends Component {
 
 	convertNotices() {
 		const { createNotice } = this.props;
-		getAdminNotices().forEach( ( element ) => {
+		getAdminNotices().forEach((element) => {
 			// Convert and create.
-			const status = getNoticeStatus( element );
-			const content = getNoticeHTML( element );
-			const isDismissible = element.classList.contains(
-				'is-dismissible'
-			);
-			createNotice( status, content, {
+			const status = getNoticeStatus(element);
+			const content = getNoticeHTML(element);
+			const isDismissible = element.classList.contains('is-dismissible');
+			createNotice(status, content, {
 				speak: false,
 				__unstableHTML: true,
 				isDismissible,
-			} );
+			});
 
 			// Remove (now-redundant) admin notice element.
-			element.parentNode.removeChild( element );
-		} );
+			element.parentNode.removeChild(element);
+		});
 	}
 
 	render() {
@@ -103,8 +101,8 @@ export class AdminNotices extends Component {
 	}
 }
 
-export default withDispatch( ( dispatch ) => {
-	const { createNotice } = dispatch( noticesStore );
+export default withDispatch((dispatch) => {
+	const { createNotice } = dispatch(noticesStore);
 
 	return { createNotice };
-} )( AdminNotices );
+})(AdminNotices);

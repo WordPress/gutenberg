@@ -49,11 +49,11 @@ import useRegistry from '../registry-provider/use-registry';
  * ```
  * @return {Function}  A custom react hook.
  */
-const useDispatch = ( storeNameOrDescriptor ) => {
+const useDispatch = (storeNameOrDescriptor) => {
 	const { dispatch } = useRegistry();
 	return storeNameOrDescriptor === void 0
 		? dispatch
-		: dispatch( storeNameOrDescriptor );
+		: dispatch(storeNameOrDescriptor);
 };
 
 export default useDispatch;

@@ -9,15 +9,15 @@ import { isEmpty, isObject, identity, mapValues, pickBy } from 'lodash';
  * @param {Object} object
  * @return {Object} Object cleaned from empty nodes.
  */
-const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
+const cleanEmptyObject = (object) => {
+	if (!isObject(object) || Array.isArray(object)) {
 		return object;
 	}
 	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
+		mapValues(object, cleanEmptyObject),
 		identity
 	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
+	return isEmpty(cleanedNestedObjects) ? undefined : cleanedNestedObjects;
 };
 
 export default cleanEmptyObject;

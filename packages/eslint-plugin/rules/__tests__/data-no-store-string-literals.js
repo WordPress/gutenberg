@@ -8,12 +8,12 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../data-no-store-string-literals';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
-} );
+});
 
 const valid = [
 	// Callback functions
@@ -38,20 +38,19 @@ const valid = [
 	`import { controls as controlsAlias } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; controlsAlias.resolveSelect( coreStore );`,
 ];
 
-const createSuggestionTestCase = ( code, output ) => ( {
+const createSuggestionTestCase = (code, output) => ({
 	code,
 	errors: [
 		{
 			suggestions: [
 				{
-					desc:
-						'Replace literal with store definition. Import store if neccessary.',
+					desc: 'Replace literal with store definition. Import store if neccessary.',
 					output,
 				},
 			],
 		},
 	],
-} );
+});
 
 const invalid = [
 	// Callback functions
@@ -125,9 +124,9 @@ const errors = [
 	},
 ];
 
-ruleTester.run( 'data-no-store-string-literals', rule, {
-	valid: valid.map( ( code ) => ( { code } ) ),
-	invalid: invalid.map( ( code ) =>
+ruleTester.run('data-no-store-string-literals', rule, {
+	valid: valid.map((code) => ({ code })),
+	invalid: invalid.map((code) =>
 		typeof code === 'string' ? { code, errors } : code
 	),
-} );
+});

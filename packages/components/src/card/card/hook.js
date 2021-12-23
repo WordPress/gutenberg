@@ -15,24 +15,24 @@ import { useCx } from '../../utils/hooks/use-cx';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
  */
-function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
+function useDeprecatedProps({ elevation, isElevated, ...otherProps }) {
 	/**@type {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} */
 	const propsToReturn = {
 		...otherProps,
 	};
 	let computedElevation = elevation;
 
-	if ( isElevated ) {
-		deprecated( 'Card isElevated prop', {
+	if (isElevated) {
+		deprecated('Card isElevated prop', {
 			since: '5.9',
 			alternative: 'elevation',
-		} );
+		});
 		computedElevation ??= 2;
 	}
 
 	// The `elevation` prop should only be passed when it's not `undefined`,
 	// otherwise it will override the value that gets derived from `useContextSystem`.
-	if ( typeof computedElevation !== 'undefined' ) {
+	if (typeof computedElevation !== 'undefined') {
 		propsToReturn.elevation = computedElevation;
 	}
 
@@ -42,7 +42,7 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
  */
-export function useCard( props ) {
+export function useCard(props) {
 	const {
 		className,
 		elevation = 0,
@@ -50,20 +50,20 @@ export function useCard( props ) {
 		isRounded = true,
 		size = 'medium',
 		...otherProps
-	} = useContextSystem( useDeprecatedProps( props ), 'Card' );
+	} = useContextSystem(useDeprecatedProps(props), 'Card');
 
 	const cx = useCx();
 
-	const classes = useMemo( () => {
+	const classes = useMemo(() => {
 		return cx(
 			styles.Card,
 			isBorderless && styles.boxShadowless,
 			isRounded && styles.rounded,
 			className
 		);
-	}, [ className, isBorderless, isRounded ] );
+	}, [className, isBorderless, isRounded]);
 
-	const surfaceProps = useSurface( { ...otherProps, className: classes } );
+	const surfaceProps = useSurface({ ...otherProps, className: classes });
 
 	return {
 		...surfaceProps,

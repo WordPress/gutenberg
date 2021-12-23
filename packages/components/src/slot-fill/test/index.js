@@ -8,21 +8,21 @@ import { shallow } from 'enzyme';
  */
 import { createSlotFill, Fill, Slot } from '../';
 
-describe( 'createSlotFill', () => {
+describe('createSlotFill', () => {
 	const SLOT_NAME = 'MySlotFill';
-	const MySlotFill = createSlotFill( SLOT_NAME );
+	const MySlotFill = createSlotFill(SLOT_NAME);
 
-	test( 'should match snapshot for Fill', () => {
-		const wrapper = shallow( <MySlotFill.Fill /> );
+	test('should match snapshot for Fill', () => {
+		const wrapper = shallow(<MySlotFill.Fill />);
 
-		expect( wrapper.type() ).toBe( Fill );
-		expect( wrapper.prop( 'name' ) ).toBe( SLOT_NAME );
-	} );
+		expect(wrapper.type()).toBe(Fill);
+		expect(wrapper.prop('name')).toBe(SLOT_NAME);
+	});
 
-	test( 'should match snapshot for Slot', () => {
-		const wrapper = shallow( <MySlotFill.Slot /> );
+	test('should match snapshot for Slot', () => {
+		const wrapper = shallow(<MySlotFill.Slot />);
 
-		expect( wrapper.type() ).toBe( Slot );
-		expect( wrapper.prop( 'name' ) ).toBe( SLOT_NAME );
-	} );
-} );
+		expect(wrapper.type()).toBe(Slot);
+		expect(wrapper.prop('name')).toBe(SLOT_NAME);
+	});
+});

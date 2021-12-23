@@ -18,16 +18,16 @@ const FUNCTION_SCOPE_JSX_IDENTIFIERS = new WeakMap();
  *
  * @return {ESLintScope|undefined} Function scope, if known.
  */
-function getClosestFunctionScope( context ) {
+function getClosestFunctionScope(context) {
 	let functionScope = context.getScope();
-	while ( functionScope.type !== 'function' && functionScope.upper ) {
+	while (functionScope.type !== 'function' && functionScope.upper) {
 		functionScope = functionScope.upper;
 	}
 
 	return functionScope;
 }
 
-module.exports = /** @type {import('eslint').Rule} */ ( {
+module.exports = /** @type {import('eslint').Rule} */ ({
 	meta: {
 		type: 'problem',
 		schema: [
@@ -45,8 +45,8 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 	/**
 	 * @param {ESLintRuleContext} context Rule context.
 	 */
-	create( context ) {
-		const options = context.options[ 0 ] || {};
+	create(context) {
+		const options = context.options[0] || {};
 		const { excludePattern } = options;
 
 		/**
@@ -60,7 +60,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 		 *
 		 * @return {boolean} Whether declarator is emempt from consideration.
 		 */
-		function isExemptObjectDestructureDeclarator( node ) {
+		function isExemptObjectDestructureDeclarator(node) {
 			return (
 				node.id.type === 'ObjectPattern' &&
 				node.id.properties.length > 1
@@ -68,33 +68,33 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 		}
 
 		return {
-			JSXIdentifier( node ) {
+			JSXIdentifier(node) {
 				// Currently, a scope's variable references does not include JSX
 				// identifiers. Account for this by visiting JSX identifiers
 				// first, and tracking them in a map per function scope, which
 				// is later merged with the known variable references.
-				const functionScope = getClosestFunctionScope( context );
-				if ( ! functionScope ) {
+				const functionScope = getClosestFunctionScope(context);
+				if (!functionScope) {
 					return;
 				}
 
-				if ( ! FUNCTION_SCOPE_JSX_IDENTIFIERS.has( functionScope ) ) {
+				if (!FUNCTION_SCOPE_JSX_IDENTIFIERS.has(functionScope)) {
 					FUNCTION_SCOPE_JSX_IDENTIFIERS.set(
 						functionScope,
 						new Set()
 					);
 				}
 
-				FUNCTION_SCOPE_JSX_IDENTIFIERS.get( functionScope ).add( node );
+				FUNCTION_SCOPE_JSX_IDENTIFIERS.get(functionScope).add(node);
 			},
-			'ReturnStatement:exit'( node ) {
-				const functionScope = getClosestFunctionScope( context );
-				if ( ! functionScope ) {
+			'ReturnStatement:exit'(node) {
+				const functionScope = getClosestFunctionScope(context);
+				if (!functionScope) {
 					return;
 				}
 
-				for ( const variable of functionScope.variables ) {
-					const declaratorCandidate = variable.defs.find( ( def ) => {
+				for (const variable of functionScope.variables) {
+					const declaratorCandidate = variable.defs.find((def) => {
 						return (
 							def.node.type === 'VariableDeclarator' &&
 							// Allow declarations which are not initialized.
@@ -102,19 +102,19 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 							// Target function calls as "expensive".
 							def.node.init.type === 'CallExpression' &&
 							// Allow unused if part of an object destructuring.
-							! isExemptObjectDestructureDeclarator( def.node ) &&
+							!isExemptObjectDestructureDeclarator(def.node) &&
 							// Only target assignments preceding `return`.
-							def.node.range[ 1 ] < node.range[ 1 ]
+							def.node.range[1] < node.range[1]
 						);
-					} );
+					});
 
-					if ( ! declaratorCandidate ) {
+					if (!declaratorCandidate) {
 						continue;
 					}
 
 					if (
 						excludePattern !== undefined &&
-						new RegExp( excludePattern ).test(
+						new RegExp(excludePattern).test(
 							declaratorCandidate.node.init.callee.name
 						)
 					) {
@@ -124,24 +124,22 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 					// The first entry in `references` is the declaration
 					// itself, which can be ignored.
 					const identifiers = variable.references
-						.slice( 1 )
-						.map( ( reference ) => reference.identifier );
+						.slice(1)
+						.map((reference) => reference.identifier);
 
 					// Merge with any JSX identifiers in scope, if any.
-					if ( FUNCTION_SCOPE_JSX_IDENTIFIERS.has( functionScope ) ) {
-						const jsxIdentifiers = FUNCTION_SCOPE_JSX_IDENTIFIERS.get(
-							functionScope
-						);
+					if (FUNCTION_SCOPE_JSX_IDENTIFIERS.has(functionScope)) {
+						const jsxIdentifiers =
+							FUNCTION_SCOPE_JSX_IDENTIFIERS.get(functionScope);
 
-						identifiers.push( ...jsxIdentifiers );
+						identifiers.push(...jsxIdentifiers);
 					}
 
 					const isUsedBeforeReturn = identifiers.some(
-						( identifier ) =>
-							identifier.range[ 1 ] < node.range[ 1 ]
+						(identifier) => identifier.range[1] < node.range[1]
 					);
 
-					if ( isUsedBeforeReturn ) {
+					if (isUsedBeforeReturn) {
 						continue;
 					}
 
@@ -154,4 +152,4 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 			},
 		};
 	},
-} );
+});

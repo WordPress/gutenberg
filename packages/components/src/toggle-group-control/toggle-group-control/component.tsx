@@ -33,8 +33,8 @@ import * as styles from './styles';
 const noop = () => {};
 
 function ToggleGroupControl(
-	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<ToggleGroupControlProps, 'input'>,
+	forwardedRef: Ref<any>
 ) {
 	const {
 		className,
@@ -47,35 +47,35 @@ function ToggleGroupControl(
 		value,
 		children,
 		...otherProps
-	} = useContextSystem( props, 'ToggleGroupControl' );
+	} = useContextSystem(props, 'ToggleGroupControl');
 	const cx = useCx();
 	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeAware();
+	const [resizeListener, sizes] = useResizeAware();
 	const baseId = useInstanceId(
 		ToggleGroupControl,
 		'toggle-group-control'
 	).toString();
-	const radio = useRadioState( {
+	const radio = useRadioState({
 		baseId,
 		state: value,
-	} );
-	const previousValue = usePrevious( value );
+	});
+	const previousValue = usePrevious(value);
 
 	// Propagate radio.state change
-	useUpdateEffect( () => {
+	useUpdateEffect(() => {
 		// Avoid calling onChange if radio state changed
 		// from incoming value.
-		if ( previousValue !== radio.state ) {
-			onChange( radio.state );
+		if (previousValue !== radio.state) {
+			onChange(radio.state);
 		}
-	}, [ radio.state ] );
+	}, [radio.state]);
 
 	// Sync incoming value with radio.state
-	useUpdateEffect( () => {
-		if ( value !== radio.state ) {
-			radio.setState( value );
+	useUpdateEffect(() => {
+		if (value !== radio.state) {
+			radio.setState(value);
 		}
-	}, [ value ] );
+	}, [value]);
 
 	const classes = useMemo(
 		() =>
@@ -85,36 +85,36 @@ function ToggleGroupControl(
 				'medium',
 				className
 			),
-		[ className, isBlock ]
+		[className, isBlock]
 	);
 	return (
-		<BaseControl help={ help }>
+		<BaseControl help={help}>
 			<ToggleGroupControlContext.Provider
-				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
+				value={{ ...radio, isBlock: !isAdaptiveWidth }}
 			>
-				{ ! hideLabelFromVision && (
+				{!hideLabelFromVision && (
 					<div>
 						<BaseControl.VisualLabel>
-							{ label }
+							{label}
 						</BaseControl.VisualLabel>
 					</div>
-				) }
+				)}
 				<RadioGroup
-					{ ...radio }
-					aria-label={ label }
-					as={ View }
-					className={ classes }
-					{ ...otherProps }
-					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+					{...radio}
+					aria-label={label}
+					as={View}
+					className={classes}
+					{...otherProps}
+					ref={useMergeRefs([containerRef, forwardedRef])}
 				>
-					{ resizeListener }
+					{resizeListener}
 					<ToggleGroupControlBackdrop
-						{ ...radio }
-						containerRef={ containerRef }
-						containerWidth={ sizes.width }
-						isAdaptiveWidth={ isAdaptiveWidth }
+						{...radio}
+						containerRef={containerRef}
+						containerWidth={sizes.width}
+						isAdaptiveWidth={isAdaptiveWidth}
 					/>
-					{ children }
+					{children}
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>
 		</BaseControl>

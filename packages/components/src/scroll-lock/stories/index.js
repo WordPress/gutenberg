@@ -12,56 +12,56 @@ import ScrollLock from '../';
 export default { title: 'Components/ScrollLock', component: ScrollLock };
 
 const Example = () => {
-	const [ isScrollLocked, setScrollLocked ] = useState( false );
-	const toggleLock = () => setScrollLocked( ! isScrollLocked );
+	const [isScrollLocked, setScrollLocked] = useState(false);
+	const toggleLock = () => setScrollLocked(!isScrollLocked);
 
 	return (
 		<StripedBackground>
 			<div>Start scrolling down...</div>
 			<ToggleContainer>
-				<Button variant="secondary" onClick={ toggleLock }>
+				<Button variant="secondary" onClick={toggleLock}>
 					Toggle Scroll Lock
 				</Button>
-				{ isScrollLocked && <ScrollLock /> }
+				{isScrollLocked && <ScrollLock />}
 				<p>
-					Scroll locked:{ ' ' }
-					<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
+					Scroll locked:{' '}
+					<strong>{isScrollLocked ? 'Yes' : 'No'}</strong>
 				</p>
 			</ToggleContainer>
 		</StripedBackground>
 	);
 };
 
-function StripedBackground( props ) {
+function StripedBackground(props) {
 	return (
 		<div
-			style={ {
+			style={{
 				backgroundColor: '#fff',
 				backgroundImage:
 					'linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%)',
 				backgroundSize: '50px 50px',
 				height: 3000,
 				position: 'relative',
-			} }
-			{ ...props }
+			}}
+			{...props}
 		/>
 	);
 }
 
-function ToggleContainer( props ) {
+function ToggleContainer(props) {
 	const { children } = props;
 	return (
 		<div
-			style={ {
+			style={{
 				position: 'sticky',
 				top: 0,
 				padding: 40,
 				display: 'flex',
 				justifyContent: 'center',
 				textAlign: 'center',
-			} }
+			}}
 		>
-			<div>{ children }</div>
+			<div>{children}</div>
 		</div>
 	);
 }

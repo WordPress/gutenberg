@@ -87,13 +87,13 @@ import { useDispatchWithMap } from '../use-dispatch';
  *
  * @return {WPComponent} Enhanced component with merged dispatcher props.
  */
-const withDispatch = ( mapDispatchToProps ) =>
+const withDispatch = (mapDispatchToProps) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( ownProps ) => {
-			const mapDispatch = ( dispatch, registry ) =>
-				mapDispatchToProps( dispatch, ownProps, registry );
-			const dispatchProps = useDispatchWithMap( mapDispatch, [] );
-			return <WrappedComponent { ...ownProps } { ...dispatchProps } />;
+		(WrappedComponent) => (ownProps) => {
+			const mapDispatch = (dispatch, registry) =>
+				mapDispatchToProps(dispatch, ownProps, registry);
+			const dispatchProps = useDispatchWithMap(mapDispatch, []);
+			return <WrappedComponent {...ownProps} {...dispatchProps} />;
 		},
 		'withDispatch'
 	);

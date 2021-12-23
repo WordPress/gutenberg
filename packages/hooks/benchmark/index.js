@@ -1,56 +1,56 @@
 /**
  * External dependencies
  */
-const Benchmark = require( 'benchmark' );
+const Benchmark = require('benchmark');
 
 /**
  * Internal dependencies
  */
-const hooks = require( '../' );
+const hooks = require('../');
 
 const suite = new Benchmark.Suite();
 
-const filter = process.argv[ 2 ];
-const isInFilter = ( key ) => ! filter || filter === key;
+const filter = process.argv[2];
+const isInFilter = (key) => !filter || filter === key;
 
 function reset() {
-	hooks.removeAllFilters( 'example' );
-	hooks.removeAllActions( 'example' );
+	hooks.removeAllFilters('example');
+	hooks.removeAllActions('example');
 }
 
-if ( isInFilter( 'applyFilters' ) ) {
+if (isInFilter('applyFilters')) {
 	function myCallback() {}
 
-	hooks.addFilter( 'example', 'myCallback', myCallback );
+	hooks.addFilter('example', 'myCallback', myCallback);
 
 	suite
-		.add( 'applyFilters - handled', () => {
-			hooks.applyFilters( 'handled' );
-		} )
-		.add( 'applyFilters - unhandled', () => {
-			hooks.applyFilters( 'unhandled' );
-		} );
+		.add('applyFilters - handled', () => {
+			hooks.applyFilters('handled');
+		})
+		.add('applyFilters - unhandled', () => {
+			hooks.applyFilters('unhandled');
+		});
 }
 
-if ( isInFilter( 'addFilter' ) ) {
+if (isInFilter('addFilter')) {
 	let hasSetHighPriority = false;
 
 	suite
-		.add( 'addFilter - append last', () => {
-			hooks.addFilter( 'example', 'myCallback', () => {} );
-		} )
-		.add( 'addFilter - default before higher priority', () => {
-			if ( ! hasSetHighPriority ) {
+		.add('addFilter - append last', () => {
+			hooks.addFilter('example', 'myCallback', () => {});
+		})
+		.add('addFilter - default before higher priority', () => {
+			if (!hasSetHighPriority) {
 				hasSetHighPriority = true;
-				hooks.addFilter( 'example', 'priority', () => {}, 20 );
+				hooks.addFilter('example', 'priority', () => {}, 20);
 			}
 
-			hooks.addFilter( 'example', 'myCallback', () => {} );
-		} );
+			hooks.addFilter('example', 'myCallback', () => {});
+		});
 }
 
 suite
-	.on( 'cycle', reset )
+	.on('cycle', reset)
 	// eslint-disable-next-line no-console
-	.on( 'cycle', ( event ) => console.log( event.target.toString() ) )
-	.run( { async: true } );
+	.on('cycle', (event) => console.log(event.target.toString()))
+	.run({ async: true });

@@ -11,9 +11,9 @@ import {
  */
 import useSetting from '../use-setting';
 
-export default function UnitControl( { units: unitsProp, ...props } ) {
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
+export default function UnitControl({ units: unitsProp, ...props }) {
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || [
 			'%',
 			'px',
 			'em',
@@ -21,7 +21,7 @@ export default function UnitControl( { units: unitsProp, ...props } ) {
 			'vw',
 		],
 		units: unitsProp,
-	} );
+	});
 
-	return <BaseUnitControl units={ units } { ...props } />;
+	return <BaseUnitControl units={units} {...props} />;
 }

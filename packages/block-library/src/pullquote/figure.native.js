@@ -11,23 +11,21 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './figure.scss';
 
-export const Figure = ( { children, backgroundColor, borderColor } ) => {
+export const Figure = ({ children, backgroundColor, borderColor }) => {
 	const wpPullquoteFigure = usePreferredColorSchemeStyle(
 		styles.light,
 		styles.dark
 	);
 
 	const customStyles = {};
-	if ( borderColor ) {
+	if (borderColor) {
 		customStyles.borderTopColor = borderColor;
 		customStyles.borderBottomColor = borderColor;
 	}
 
-	if ( backgroundColor ) {
+	if (backgroundColor) {
 		customStyles.backgroundColor = backgroundColor;
 	}
 
-	return (
-		<View style={ [ wpPullquoteFigure, customStyles ] }>{ children }</View>
-	);
+	return <View style={[wpPullquoteFigure, customStyles]}>{children}</View>;
 };

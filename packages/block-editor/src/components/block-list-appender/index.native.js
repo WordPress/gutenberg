@@ -16,30 +16,30 @@ import DefaultBlockAppender from '../default-block-appender';
 import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
 
-function BlockListAppender( {
+function BlockListAppender({
 	blockClientIds,
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
 	renderAppender: CustomAppender,
 	showSeparator,
-} ) {
-	if ( isLocked ) {
+}) {
+	if (isLocked) {
 		return null;
 	}
 
-	if ( CustomAppender ) {
-		return <CustomAppender showSeparator={ showSeparator } />;
+	if (CustomAppender) {
+		return <CustomAppender showSeparator={showSeparator} />;
 	}
 
-	if ( canInsertDefaultBlock ) {
+	if (canInsertDefaultBlock) {
 		return (
 			<DefaultBlockAppender
-				rootClientId={ rootClientId }
-				lastBlockClientId={ last( blockClientIds ) }
-				containerStyle={ styles.blockListAppender }
-				placeholder={ blockClientIds.length > 0 ? '' : null }
-				showSeparator={ showSeparator }
+				rootClientId={rootClientId}
+				lastBlockClientId={last(blockClientIds)}
+				containerStyle={styles.blockListAppender}
+				placeholder={blockClientIds.length > 0 ? '' : null}
+				showSeparator={showSeparator}
 			/>
 		);
 	}
@@ -47,17 +47,16 @@ function BlockListAppender( {
 	return null;
 }
 
-export default withSelect( ( select, { rootClientId } ) => {
-	const { getBlockOrder, canInsertBlockType, getTemplateLock } = select(
-		blockEditorStore
-	);
+export default withSelect((select, { rootClientId }) => {
+	const { getBlockOrder, canInsertBlockType, getTemplateLock } =
+		select(blockEditorStore);
 
 	return {
-		isLocked: !! getTemplateLock( rootClientId ),
-		blockClientIds: getBlockOrder( rootClientId ),
+		isLocked: !!getTemplateLock(rootClientId),
+		blockClientIds: getBlockOrder(rootClientId),
 		canInsertDefaultBlock: canInsertBlockType(
 			getDefaultBlockName(),
 			rootClientId
 		),
 	};
-} )( BlockListAppender );
+})(BlockListAppender);

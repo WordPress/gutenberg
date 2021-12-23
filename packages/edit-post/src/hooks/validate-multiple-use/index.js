@@ -32,69 +32,66 @@ const enhance = compose(
 	 *
 	 * @return {WPComponent} Enhanced component with merged state data props.
 	 */
-	withSelect( ( select, block ) => {
-		const multiple = hasBlockSupport( block.name, 'multiple', true );
+	withSelect((select, block) => {
+		const multiple = hasBlockSupport(block.name, 'multiple', true);
 
 		// For block types with `multiple` support, there is no "original
 		// block" to be found in the content, as the block itself is valid.
-		if ( multiple ) {
+		if (multiple) {
 			return {};
 		}
 
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
-		const blocks = select( blockEditorStore ).getBlocks();
-		const firstOfSameType = find(
-			blocks,
-			( { name } ) => block.name === name
-		);
+		const blocks = select(blockEditorStore).getBlocks();
+		const firstOfSameType = find(blocks, ({ name }) => block.name === name);
 		const isInvalid =
 			firstOfSameType && firstOfSameType.clientId !== block.clientId;
 		return {
 			originalBlockClientId: isInvalid && firstOfSameType.clientId,
 		};
-	} ),
-	withDispatch( ( dispatch, { originalBlockClientId } ) => ( {
+	}),
+	withDispatch((dispatch, { originalBlockClientId }) => ({
 		selectFirst: () =>
-			dispatch( blockEditorStore ).selectBlock( originalBlockClientId ),
-	} ) )
+			dispatch(blockEditorStore).selectBlock(originalBlockClientId),
+	}))
 );
 
-const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
-	return enhance( ( { originalBlockClientId, selectFirst, ...props } ) => {
-		if ( ! originalBlockClientId ) {
-			return <BlockEdit { ...props } />;
+const withMultipleValidation = createHigherOrderComponent((BlockEdit) => {
+	return enhance(({ originalBlockClientId, selectFirst, ...props }) => {
+		if (!originalBlockClientId) {
+			return <BlockEdit {...props} />;
 		}
 
-		const blockType = getBlockType( props.name );
-		const outboundType = getOutboundType( props.name );
+		const blockType = getBlockType(props.name);
+		const outboundType = getOutboundType(props.name);
 
 		return [
-			<div key="invalid-preview" style={ { minHeight: '60px' } }>
-				<BlockEdit key="block-edit" { ...props } />
+			<div key="invalid-preview" style={{ minHeight: '60px' }}>
+				<BlockEdit key="block-edit" {...props} />
 			</div>,
 			<Warning
 				key="multiple-use-warning"
-				actions={ [
+				actions={[
 					<Button
 						key="find-original"
 						variant="secondary"
-						onClick={ selectFirst }
+						onClick={selectFirst}
 					>
-						{ __( 'Find original' ) }
+						{__('Find original')}
 					</Button>,
 					<Button
 						key="remove"
 						variant="secondary"
-						onClick={ () => props.onReplace( [] ) }
+						onClick={() => props.onReplace([])}
 					>
-						{ __( 'Remove' ) }
+						{__('Remove')}
 					</Button>,
 					outboundType && (
 						<Button
 							key="transform"
 							variant="secondary"
-							onClick={ () =>
+							onClick={() =>
 								props.onReplace(
 									createBlock(
 										outboundType.name,
@@ -103,17 +100,17 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 								)
 							}
 						>
-							{ __( 'Transform into:' ) } { outboundType.title }
+							{__('Transform into:')} {outboundType.title}
 						</Button>
 					),
-				] }
+				]}
 			>
-				<strong>{ blockType?.title }: </strong>
-				{ __( 'This block can only be used once.' ) }
+				<strong>{blockType?.title}: </strong>
+				{__('This block can only be used once.')}
 			</Warning>,
 		];
-	} );
-}, 'withMultipleValidation' );
+	});
+}, 'withMultipleValidation');
 
 /**
  * Given a base block name, returns the default block type to which to offer
@@ -123,18 +120,18 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
  *
  * @return {?Object} The chosen default block type.
  */
-function getOutboundType( blockName ) {
+function getOutboundType(blockName) {
 	// Grab the first outbound transform
 	const transform = findTransform(
-		getBlockTransforms( 'to', blockName ),
-		( { type, blocks } ) => type === 'block' && blocks.length === 1 // What about when .length > 1?
+		getBlockTransforms('to', blockName),
+		({ type, blocks }) => type === 'block' && blocks.length === 1 // What about when .length > 1?
 	);
 
-	if ( ! transform ) {
+	if (!transform) {
 		return null;
 	}
 
-	return getBlockType( transform.blocks[ 0 ] );
+	return getBlockType(transform.blocks[0]);
 }
 
 addFilter(

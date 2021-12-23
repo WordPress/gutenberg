@@ -19,7 +19,7 @@ export { metadata, name };
 export const settings = {
 	icon: addSubmenu,
 
-	__experimentalLabel: ( { label } ) => label,
+	__experimentalLabel: ({ label }) => label,
 
 	edit,
 

@@ -48,22 +48,22 @@ const { console } = window;
  *
  * @return {string} HTML only containing phrasing content.
  */
-function filterInlineHTML( HTML, preserveWhiteSpace ) {
-	HTML = deepFilterHTML( HTML, [
+function filterInlineHTML(HTML, preserveWhiteSpace) {
+	HTML = deepFilterHTML(HTML, [
 		googleDocsUIDRemover,
 		phrasingContentReducer,
 		commentRemover,
-	] );
-	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
+	]);
+	HTML = removeInvalidHTML(HTML, getPhrasingContentSchema('paste'), {
 		inline: true,
-	} );
+	});
 
-	if ( ! preserveWhiteSpace ) {
-		HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
+	if (!preserveWhiteSpace) {
+		HTML = deepFilterHTML(HTML, [htmlFormattingRemover, brRemover]);
 	}
 
 	// Allows us to ask for this information when we get a report.
-	console.log( 'Processed inline HTML:\n\n', HTML );
+	console.log('Processed inline HTML:\n\n', HTML);
 
 	return HTML;
 }
@@ -83,15 +83,15 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export function pasteHandler( {
+export function pasteHandler({
 	HTML = '',
 	plainText = '',
 	mode = 'AUTO',
 	tagName,
 	preserveWhiteSpace,
-} ) {
+}) {
 	// First of all, strip any meta tags.
-	HTML = HTML.replace( /<meta[^>]+>/g, '' );
+	HTML = HTML.replace(/<meta[^>]+>/g, '');
 	// Strip Windows markers.
 	HTML = HTML.replace(
 		/^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i,
@@ -103,12 +103,12 @@ export function pasteHandler( {
 	);
 
 	// If we detect block delimiters in HTML, parse entirely as blocks.
-	if ( mode !== 'INLINE' ) {
+	if (mode !== 'INLINE') {
 		// Check plain text if there is no HTML.
 		const content = HTML ? HTML : plainText;
 
-		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parse( content );
+		if (content.indexOf('<!-- wp:') !== -1) {
+			return parse(content);
 		}
 	}
 
@@ -119,19 +119,19 @@ export function pasteHandler( {
 	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
 	// See: https://core.trac.wordpress.org/ticket/30130
 	// See: https://github.com/WordPress/gutenberg/pull/6983#pullrequestreview-125151075
-	if ( String.prototype.normalize ) {
+	if (String.prototype.normalize) {
 		HTML = HTML.normalize();
 	}
 
 	// Parse Markdown (and encoded HTML) if:
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
-	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
+	if (plainText && (!HTML || isPlain(HTML))) {
 		HTML = plainText;
 
 		// The markdown converter (Showdown) trims whitespace.
-		if ( ! /^\s+$/.test( plainText ) ) {
-			HTML = markdownConverter( HTML );
+		if (!/^\s+$/.test(plainText)) {
+			HTML = markdownConverter(HTML);
 		}
 
 		// Switch to inline mode if:
@@ -141,42 +141,38 @@ export function pasteHandler( {
 		// * The converted text is just a paragraph.
 		if (
 			mode === 'AUTO' &&
-			plainText.indexOf( '\n' ) === -1 &&
-			plainText.indexOf( '<p>' ) !== 0 &&
-			HTML.indexOf( '<p>' ) === 0
+			plainText.indexOf('\n') === -1 &&
+			plainText.indexOf('<p>') !== 0 &&
+			HTML.indexOf('<p>') === 0
 		) {
 			mode = 'INLINE';
 		}
 	}
 
-	if ( mode === 'INLINE' ) {
-		return filterInlineHTML( HTML, preserveWhiteSpace );
+	if (mode === 'INLINE') {
+		return filterInlineHTML(HTML, preserveWhiteSpace);
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
+	const pieces = shortcodeConverter(HTML);
 
 	// The call to shortcodeConverter will always return more than one element
 	// if shortcodes are matched. The reason is when shortcodes are matched
 	// empty HTML strings are included.
 	const hasShortcodes = pieces.length > 1;
 
-	if (
-		mode === 'AUTO' &&
-		! hasShortcodes &&
-		isInlineContent( HTML, tagName )
-	) {
-		return filterInlineHTML( HTML, preserveWhiteSpace );
+	if (mode === 'AUTO' && !hasShortcodes && isInlineContent(HTML, tagName)) {
+		return filterInlineHTML(HTML, preserveWhiteSpace);
 	}
 
-	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
-	const blockContentSchema = getBlockContentSchema( 'paste' );
+	const phrasingContentSchema = getPhrasingContentSchema('paste');
+	const blockContentSchema = getBlockContentSchema('paste');
 
 	const blocks = compact(
-		flatMap( pieces, ( piece ) => {
+		flatMap(pieces, (piece) => {
 			// Already a block from shortcode.
-			if ( typeof piece !== 'string' ) {
+			if (typeof piece !== 'string') {
 				return piece;
 			}
 
@@ -200,20 +196,20 @@ export function pasteHandler( {
 				...phrasingContentSchema,
 			};
 
-			piece = deepFilterHTML( piece, filters, blockContentSchema );
-			piece = removeInvalidHTML( piece, schema );
-			piece = normaliseBlocks( piece );
+			piece = deepFilterHTML(piece, filters, blockContentSchema);
+			piece = removeInvalidHTML(piece, schema);
+			piece = normaliseBlocks(piece);
 			piece = deepFilterHTML(
 				piece,
-				[ htmlFormattingRemover, brRemover, emptyParagraphRemover ],
+				[htmlFormattingRemover, brRemover, emptyParagraphRemover],
 				blockContentSchema
 			);
 
 			// Allows us to ask for this information when we get a report.
-			console.log( 'Processed HTML piece:\n\n', piece );
+			console.log('Processed HTML piece:\n\n', piece);
 
-			return htmlToBlocks( piece );
-		} )
+			return htmlToBlocks(piece);
+		})
 	);
 
 	// If we're allowed to return inline content, and there is only one
@@ -222,17 +218,14 @@ export function pasteHandler( {
 	if (
 		mode === 'AUTO' &&
 		blocks.length === 1 &&
-		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
+		hasBlockSupport(blocks[0].name, '__unstablePasteTextInline', false)
 	) {
 		// Don't catch line breaks at the start or end.
-		const trimmedPlainText = plainText.replace( /^[\n]+|[\n]+$/g, '' );
+		const trimmedPlainText = plainText.replace(/^[\n]+|[\n]+$/g, '');
 
-		if (
-			trimmedPlainText !== '' &&
-			trimmedPlainText.indexOf( '\n' ) === -1
-		) {
+		if (trimmedPlainText !== '' && trimmedPlainText.indexOf('\n') === -1) {
 			return removeInvalidHTML(
-				getBlockInnerHTML( blocks[ 0 ] ),
+				getBlockInnerHTML(blocks[0]),
 				phrasingContentSchema
 			);
 		}

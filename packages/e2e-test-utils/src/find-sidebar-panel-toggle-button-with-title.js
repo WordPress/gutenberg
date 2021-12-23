@@ -12,10 +12,10 @@ import { first } from 'lodash';
  *
  * @return {?ElementHandle} Object that represents an in-page DOM element.
  */
-export async function findSidebarPanelToggleButtonWithTitle( panelTitle ) {
+export async function findSidebarPanelToggleButtonWithTitle(panelTitle) {
 	return first(
 		await page.$x(
-			`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ panelTitle }")]`
+			`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${panelTitle}")]`
 		)
 	);
 }

@@ -13,10 +13,10 @@ export default function FormControls() {
 	const { isInProgress, apply, cancel } = useImageEditingContext();
 	return (
 		<>
-			<ToolbarButton onClick={ apply } disabled={ isInProgress }>
-				{ __( 'Apply' ) }
+			<ToolbarButton onClick={apply} disabled={isInProgress}>
+				{__('Apply')}
 			</ToolbarButton>
-			<ToolbarButton onClick={ cancel }>{ __( 'Cancel' ) }</ToolbarButton>
+			<ToolbarButton onClick={cancel}>{__('Cancel')}</ToolbarButton>
 		</>
 	);
 }

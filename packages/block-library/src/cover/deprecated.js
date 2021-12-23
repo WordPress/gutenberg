@@ -36,16 +36,16 @@ import {
  * @param {number} ratio ratio to use for opacity.
  * @return {string}       background opacity class   .
  */
-function dimRatioToClassV1( ratio ) {
-	return ratio === 0 || ratio === 50 || ! ratio
+function dimRatioToClassV1(ratio) {
+	return ratio === 0 || ratio === 50 || !ratio
 		? null
-		: 'has-background-dim-' + 10 * Math.round( ratio / 10 );
+		: 'has-background-dim-' + 10 * Math.round(ratio / 10);
 }
 
-function migrateDimRatio( attributes ) {
+function migrateDimRatio(attributes) {
 	return {
 		...attributes,
-		dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+		dimRatio: !attributes.url ? 100 : attributes.dimRatio,
 	};
 }
 
@@ -126,7 +126,7 @@ const v7 = {
 			background: false,
 		},
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const {
 			backgroundType,
 			gradient,
@@ -148,24 +148,24 @@ const v7 = {
 			'background-color',
 			overlayColor
 		);
-		const gradientClass = __experimentalGetGradientClass( gradient );
+		const gradientClass = __experimentalGetGradientClass(gradient);
 		const minHeight = minHeightUnit
-			? `${ minHeightProp }${ minHeightUnit }`
+			? `${minHeightProp}${minHeightUnit}`
 			: minHeightProp;
 
 		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-		const isImgElement = ! ( hasParallax || isRepeated );
+		const isImgElement = !(hasParallax || isRepeated);
 
 		const style = {
-			...( isImageBackground && ! isImgElement
-				? backgroundImageStyles( url )
-				: {} ),
-			backgroundColor: ! overlayColorClass
+			...(isImageBackground && !isImgElement
+				? backgroundImageStyles(url)
+				: {}),
+			backgroundColor: !overlayColorClass
 				? customOverlayColor
 				: undefined,
-			background: customGradient && ! url ? customGradient : undefined,
+			background: customGradient && !url ? customGradient : undefined,
 			minHeight: minHeight || undefined,
 		};
 
@@ -176,66 +176,65 @@ const v7 = {
 					: undefined;
 
 		const classes = classnames(
-			dimRatioToClassV1( dimRatio ),
+			dimRatioToClassV1(dimRatio),
 			overlayColorClass,
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 				'is-repeated': isRepeated,
 				'has-background-gradient': gradient || customGradient,
-				[ gradientClass ]: ! url && gradientClass,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				[gradientClass]: !url && gradientClass,
+				'has-custom-content-position':
+					!isContentPositionCenter(contentPosition),
 			},
-			getPositionClassName( contentPosition )
+			getPositionClassName(contentPosition)
 		);
 
 		return (
-			<div { ...useBlockProps.save( { className: classes, style } ) }>
-				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
+			<div {...useBlockProps.save({ className: classes, style })}>
+				{url && (gradient || customGradient) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={classnames(
 							'wp-block-cover__gradient-background',
 							gradientClass
-						) }
+						)}
 						style={
 							customGradient
 								? { background: customGradient }
 								: undefined
 						}
 					/>
-				) }
-				{ isImageBackground && isImgElement && url && (
+				)}
+				{isImageBackground && isImgElement && url && (
 					<img
-						className={ classnames(
+						className={classnames(
 							'wp-block-cover__image-background',
-							id ? `wp-image-${ id }` : null
-						) }
-						alt={ alt }
-						src={ url }
-						style={ { objectPosition } }
+							id ? `wp-image-${id}` : null
+						)}
+						alt={alt}
+						src={url}
+						style={{ objectPosition }}
 						data-object-fit="cover"
-						data-object-position={ objectPosition }
+						data-object-position={objectPosition}
 					/>
-				) }
-				{ isVideoBackground && url && (
+				)}
+				{isVideoBackground && url && (
 					<video
-						className={ classnames(
+						className={classnames(
 							'wp-block-cover__video-background',
 							'intrinsic-ignore'
-						) }
+						)}
 						autoPlay
 						muted
 						loop
 						playsInline
-						src={ url }
-						style={ { objectPosition } }
+						src={url}
+						style={{ objectPosition }}
 						data-object-fit="cover"
-						data-object-position={ objectPosition }
+						data-object-position={objectPosition}
 					/>
-				) }
+				)}
 				<div className="wp-block-cover__inner-container">
 					<InnerBlocks.Content />
 				</div>
@@ -271,7 +270,7 @@ const v6 = {
 	supports: {
 		align: true,
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const {
 			backgroundType,
 			gradient,
@@ -291,85 +290,84 @@ const v6 = {
 			'background-color',
 			overlayColor
 		);
-		const gradientClass = __experimentalGetGradientClass( gradient );
+		const gradientClass = __experimentalGetGradientClass(gradient);
 		const minHeight = minHeightUnit
-			? `${ minHeightProp }${ minHeightUnit }`
+			? `${minHeightProp}${minHeightUnit}`
 			: minHeightProp;
 
 		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-		const style = isImageBackground ? backgroundImageStyles( url ) : {};
+		const style = isImageBackground ? backgroundImageStyles(url) : {};
 		const videoStyle = {};
 
-		if ( ! overlayColorClass ) {
+		if (!overlayColorClass) {
 			style.backgroundColor = customOverlayColor;
 		}
 
-		if ( customGradient && ! url ) {
+		if (customGradient && !url) {
 			style.background = customGradient;
 		}
 		style.minHeight = minHeight || undefined;
 
 		let positionValue;
 
-		if ( focalPoint ) {
-			positionValue = `${ Math.round(
-				focalPoint.x * 100
-			) }% ${ Math.round( focalPoint.y * 100 ) }%`;
+		if (focalPoint) {
+			positionValue = `${Math.round(focalPoint.x * 100)}% ${Math.round(
+				focalPoint.y * 100
+			)}%`;
 
-			if ( isImageBackground && ! hasParallax ) {
+			if (isImageBackground && !hasParallax) {
 				style.backgroundPosition = positionValue;
 			}
 
-			if ( isVideoBackground ) {
+			if (isVideoBackground) {
 				videoStyle.objectPosition = positionValue;
 			}
 		}
 
 		const classes = classnames(
-			dimRatioToClassV1( dimRatio ),
+			dimRatioToClassV1(dimRatio),
 			overlayColorClass,
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 				'is-repeated': isRepeated,
 				'has-background-gradient': gradient || customGradient,
-				[ gradientClass ]: ! url && gradientClass,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				[gradientClass]: !url && gradientClass,
+				'has-custom-content-position':
+					!isContentPositionCenter(contentPosition),
 			},
-			getPositionClassName( contentPosition )
+			getPositionClassName(contentPosition)
 		);
 
 		return (
-			<div { ...useBlockProps.save( { className: classes, style } ) }>
-				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
+			<div {...useBlockProps.save({ className: classes, style })}>
+				{url && (gradient || customGradient) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={classnames(
 							'wp-block-cover__gradient-background',
 							gradientClass
-						) }
+						)}
 						style={
 							customGradient
 								? { background: customGradient }
 								: undefined
 						}
 					/>
-				) }
-				{ isVideoBackground && url && (
+				)}
+				{isVideoBackground && url && (
 					<video
 						className="wp-block-cover__video-background"
 						autoPlay
 						muted
 						loop
 						playsInline
-						src={ url }
-						style={ videoStyle }
+						src={url}
+						style={videoStyle}
 					/>
-				) }
+				)}
 				<div className="wp-block-cover__inner-container">
 					<InnerBlocks.Content />
 				</div>
@@ -395,7 +393,7 @@ const v5 = {
 	supports: {
 		align: true,
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const {
 			backgroundType,
 			gradient,
@@ -412,61 +410,61 @@ const v5 = {
 			'background-color',
 			overlayColor
 		);
-		const gradientClass = __experimentalGetGradientClass( gradient );
+		const gradientClass = __experimentalGetGradientClass(gradient);
 
 		const style =
 			backgroundType === IMAGE_BACKGROUND_TYPE
-				? backgroundImageStyles( url )
+				? backgroundImageStyles(url)
 				: {};
-		if ( ! overlayColorClass ) {
+		if (!overlayColorClass) {
 			style.backgroundColor = customOverlayColor;
 		}
-		if ( focalPoint && ! hasParallax ) {
-			style.backgroundPosition = `${ Math.round(
+		if (focalPoint && !hasParallax) {
+			style.backgroundPosition = `${Math.round(
 				focalPoint.x * 100
-			) }% ${ Math.round( focalPoint.y * 100 ) }%`;
+			)}% ${Math.round(focalPoint.y * 100)}%`;
 		}
-		if ( customGradient && ! url ) {
+		if (customGradient && !url) {
 			style.background = customGradient;
 		}
 		style.minHeight = minHeight || undefined;
 
 		const classes = classnames(
-			dimRatioToClassV1( dimRatio ),
+			dimRatioToClassV1(dimRatio),
 			overlayColorClass,
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 				'has-background-gradient': customGradient,
-				[ gradientClass ]: ! url && gradientClass,
+				[gradientClass]: !url && gradientClass,
 			}
 		);
 
 		return (
-			<div className={ classes } style={ style }>
-				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
+			<div className={classes} style={style}>
+				{url && (gradient || customGradient) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={classnames(
 							'wp-block-cover__gradient-background',
 							gradientClass
-						) }
+						)}
 						style={
 							customGradient
 								? { background: customGradient }
 								: undefined
 						}
 					/>
-				) }
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+				)}
+				{VIDEO_BACKGROUND_TYPE === backgroundType && url && (
 					<video
 						className="wp-block-cover__video-background"
 						autoPlay
 						muted
 						loop
-						src={ url }
+						src={url}
 					/>
-				) }
+				)}
 				<div className="wp-block-cover__inner-container">
 					<InnerBlocks.Content />
 				</div>
@@ -492,7 +490,7 @@ const v4 = {
 	supports: {
 		align: true,
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const {
 			backgroundType,
 			gradient,
@@ -509,61 +507,61 @@ const v4 = {
 			'background-color',
 			overlayColor
 		);
-		const gradientClass = __experimentalGetGradientClass( gradient );
+		const gradientClass = __experimentalGetGradientClass(gradient);
 
 		const style =
 			backgroundType === IMAGE_BACKGROUND_TYPE
-				? backgroundImageStyles( url )
+				? backgroundImageStyles(url)
 				: {};
-		if ( ! overlayColorClass ) {
+		if (!overlayColorClass) {
 			style.backgroundColor = customOverlayColor;
 		}
-		if ( focalPoint && ! hasParallax ) {
-			style.backgroundPosition = `${ focalPoint.x * 100 }% ${
+		if (focalPoint && !hasParallax) {
+			style.backgroundPosition = `${focalPoint.x * 100}% ${
 				focalPoint.y * 100
 			}%`;
 		}
-		if ( customGradient && ! url ) {
+		if (customGradient && !url) {
 			style.background = customGradient;
 		}
 		style.minHeight = minHeight || undefined;
 
 		const classes = classnames(
-			dimRatioToClassV1( dimRatio ),
+			dimRatioToClassV1(dimRatio),
 			overlayColorClass,
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 				'has-background-gradient': customGradient,
-				[ gradientClass ]: ! url && gradientClass,
+				[gradientClass]: !url && gradientClass,
 			}
 		);
 
 		return (
-			<div className={ classes } style={ style }>
-				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
+			<div className={classes} style={style}>
+				{url && (gradient || customGradient) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={classnames(
 							'wp-block-cover__gradient-background',
 							gradientClass
-						) }
+						)}
 						style={
 							customGradient
 								? { background: customGradient }
 								: undefined
 						}
 					/>
-				) }
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+				)}
+				{VIDEO_BACKGROUND_TYPE === backgroundType && url && (
 					<video
 						className="wp-block-cover__video-background"
 						autoPlay
 						muted
 						loop
-						src={ url }
+						src={url}
 					/>
-				) }
+				)}
 				<div className="wp-block-cover__inner-container">
 					<InnerBlocks.Content />
 				</div>
@@ -589,7 +587,7 @@ const v3 = {
 	supports: {
 		align: true,
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const {
 			backgroundType,
 			contentAlign,
@@ -607,63 +605,63 @@ const v3 = {
 		);
 		const style =
 			backgroundType === IMAGE_BACKGROUND_TYPE
-				? backgroundImageStyles( url )
+				? backgroundImageStyles(url)
 				: {};
-		if ( ! overlayColorClass ) {
+		if (!overlayColorClass) {
 			style.backgroundColor = customOverlayColor;
 		}
-		if ( focalPoint && ! hasParallax ) {
-			style.backgroundPosition = `${ focalPoint.x * 100 }% ${
+		if (focalPoint && !hasParallax) {
+			style.backgroundPosition = `${focalPoint.x * 100}% ${
 				focalPoint.y * 100
 			}%`;
 		}
 
 		const classes = classnames(
-			dimRatioToClassV1( dimRatio ),
+			dimRatioToClassV1(dimRatio),
 			overlayColorClass,
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				[`has-${contentAlign}-content`]: contentAlign !== 'center',
 			}
 		);
 
 		return (
-			<div className={ classes } style={ style }>
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+			<div className={classes} style={style}>
+				{VIDEO_BACKGROUND_TYPE === backgroundType && url && (
 					<video
 						className="wp-block-cover__video-background"
 						autoPlay
 						muted
 						loop
-						src={ url }
+						src={url}
 					/>
-				) }
-				{ ! RichText.isEmpty( title ) && (
+				)}
+				{!RichText.isEmpty(title) && (
 					<RichText.Content
 						tagName="p"
 						className="wp-block-cover-text"
-						value={ title }
+						value={title}
 					/>
-				) }
+				)}
 			</div>
 		);
 	},
-	migrate( attributes ) {
+	migrate(attributes) {
 		const newAttribs = {
 			...attributes,
-			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			dimRatio: !attributes.url ? 100 : attributes.dimRatio,
 		};
 
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign' ] ),
+			omit(newAttribs, ['title', 'contentAlign']),
 			[
-				createBlock( 'core/paragraph', {
+				createBlock('core/paragraph', {
 					content: attributes.title,
 					align: attributes.contentAlign,
 					fontSize: 'large',
-					placeholder: __( 'Write title…' ),
-				} ),
+					placeholder: __('Write title…'),
+				}),
 			],
 		];
 	},
@@ -688,7 +686,7 @@ const v2 = {
 	supports: {
 		className: false,
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const {
 			url,
 			title,
@@ -703,49 +701,49 @@ const v2 = {
 			'background-color',
 			overlayColor
 		);
-		const style = backgroundImageStyles( url );
-		if ( ! overlayColorClass ) {
+		const style = backgroundImageStyles(url);
+		if (!overlayColorClass) {
 			style.backgroundColor = customOverlayColor;
 		}
 
 		const classes = classnames(
 			'wp-block-cover-image',
-			dimRatioToClassV1( dimRatio ),
+			dimRatioToClassV1(dimRatio),
 			overlayColorClass,
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				[`has-${contentAlign}-content`]: contentAlign !== 'center',
 			},
-			align ? `align${ align }` : null
+			align ? `align${align}` : null
 		);
 
 		return (
-			<div className={ classes } style={ style }>
-				{ ! RichText.isEmpty( title ) && (
+			<div className={classes} style={style}>
+				{!RichText.isEmpty(title) && (
 					<RichText.Content
 						tagName="p"
 						className="wp-block-cover-image-text"
-						value={ title }
+						value={title}
 					/>
-				) }
+				)}
 			</div>
 		);
 	},
-	migrate( attributes ) {
+	migrate(attributes) {
 		const newAttribs = {
 			...attributes,
-			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			dimRatio: !attributes.url ? 100 : attributes.dimRatio,
 		};
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign', 'align' ] ),
+			omit(newAttribs, ['title', 'contentAlign', 'align']),
 			[
-				createBlock( 'core/paragraph', {
+				createBlock('core/paragraph', {
 					content: attributes.title,
 					align: attributes.contentAlign,
 					fontSize: 'large',
-					placeholder: __( 'Write title…' ),
-				} ),
+					placeholder: __('Write title…'),
+				}),
 			],
 		];
 	},
@@ -770,42 +768,42 @@ const v1 = {
 	supports: {
 		className: false,
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const { url, title, hasParallax, dimRatio, align } = attributes;
-		const style = backgroundImageStyles( url );
+		const style = backgroundImageStyles(url);
 		const classes = classnames(
 			'wp-block-cover-image',
-			dimRatioToClassV1( dimRatio ),
+			dimRatioToClassV1(dimRatio),
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 			},
-			align ? `align${ align }` : null
+			align ? `align${align}` : null
 		);
 
 		return (
-			<section className={ classes } style={ style }>
-				<RichText.Content tagName="h2" value={ title } />
+			<section className={classes} style={style}>
+				<RichText.Content tagName="h2" value={title} />
 			</section>
 		);
 	},
-	migrate( attributes ) {
+	migrate(attributes) {
 		const newAttribs = {
 			...attributes,
-			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			dimRatio: !attributes.url ? 100 : attributes.dimRatio,
 		};
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign', 'align' ] ),
+			omit(newAttribs, ['title', 'contentAlign', 'align']),
 			[
-				createBlock( 'core/paragraph', {
+				createBlock('core/paragraph', {
 					content: attributes.title,
 					align: attributes.contentAlign,
 					fontSize: 'large',
-					placeholder: __( 'Write title…' ),
-				} ),
+					placeholder: __('Write title…'),
+				}),
 			],
 		];
 	},
 };
 
-export default [ v7, v6, v5, v4, v3, v2, v1 ];
+export default [v7, v6, v5, v4, v3, v2, v1];

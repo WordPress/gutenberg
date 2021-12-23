@@ -11,7 +11,7 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  * @param {Node} referenceNode Node after which to perform the insertion.
  * @return {void}
  */
-export default function insertAfter( newNode, referenceNode ) {
-	assertIsDefined( referenceNode.parentNode, 'referenceNode.parentNode' );
-	referenceNode.parentNode.insertBefore( newNode, referenceNode.nextSibling );
+export default function insertAfter(newNode, referenceNode) {
+	assertIsDefined(referenceNode.parentNode, 'referenceNode.parentNode');
+	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }

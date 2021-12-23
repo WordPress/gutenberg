@@ -21,25 +21,25 @@ import type { ComponentType, ComponentClass } from 'react';
  * only rerendering when its props/state change
  */
 const pure: SimpleHigherOrderComponent = createHigherOrderComponent(
-	< TProps, >( Wrapped: ComponentType< TProps > ) => {
-		if ( Wrapped.prototype instanceof Component ) {
-			return class extends ( Wrapped as ComponentClass< TProps > ) {
-				shouldComponentUpdate( nextProps: TProps, nextState: any ) {
+	<TProps,>(Wrapped: ComponentType<TProps>) => {
+		if (Wrapped.prototype instanceof Component) {
+			return class extends (Wrapped as ComponentClass<TProps>) {
+				shouldComponentUpdate(nextProps: TProps, nextState: any) {
 					return (
-						! isShallowEqual( nextProps, this.props ) ||
-						! isShallowEqual( nextState, this.state )
+						!isShallowEqual(nextProps, this.props) ||
+						!isShallowEqual(nextState, this.state)
 					);
 				}
 			};
 		}
 
-		return class extends Component< TProps > {
-			shouldComponentUpdate( nextProps: TProps ) {
-				return ! isShallowEqual( nextProps, this.props );
+		return class extends Component<TProps> {
+			shouldComponentUpdate(nextProps: TProps) {
+				return !isShallowEqual(nextProps, this.props);
 			}
 
 			render() {
-				return <Wrapped { ...this.props } />;
+				return <Wrapped {...this.props} />;
 			}
 		};
 	},

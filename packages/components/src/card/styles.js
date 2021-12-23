@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 
 export const Card = css`
-	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
+	box-shadow: 0 0 0 1px ${CONFIG.surfaceBorderColor};
 	outline: none;
 `;
 
@@ -62,18 +62,18 @@ export const Divider = css`
 
 export const borderRadius = css`
 	&:first-of-type {
-		border-top-left-radius: ${ CONFIG.cardBorderRadius };
-		border-top-right-radius: ${ CONFIG.cardBorderRadius };
+		border-top-left-radius: ${CONFIG.cardBorderRadius};
+		border-top-right-radius: ${CONFIG.cardBorderRadius};
 	}
 
 	&:last-of-type {
-		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
-		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
+		border-bottom-left-radius: ${CONFIG.cardBorderRadius};
+		border-bottom-right-radius: ${CONFIG.cardBorderRadius};
 	}
 `;
 
 export const borderColor = css`
-	border-color: ${ CONFIG.colorDivider };
+	border-color: ${CONFIG.colorDivider};
 `;
 
 export const boxShadowless = css`
@@ -85,22 +85,22 @@ export const borderless = css`
 `;
 
 export const rounded = css`
-	border-radius: ${ CONFIG.cardBorderRadius };
+	border-radius: ${CONFIG.cardBorderRadius};
 `;
 
 const xSmallCardPadding = css`
-	padding: ${ CONFIG.cardPaddingXSmall };
+	padding: ${CONFIG.cardPaddingXSmall};
 `;
 
 export const cardPaddings = {
 	large: css`
-		padding: ${ CONFIG.cardPaddingLarge };
+		padding: ${CONFIG.cardPaddingLarge};
 	`,
 	medium: css`
-		padding: ${ CONFIG.cardPaddingMedium };
+		padding: ${CONFIG.cardPaddingMedium};
 	`,
 	small: css`
-		padding: ${ CONFIG.cardPaddingSmall };
+		padding: ${CONFIG.cardPaddingSmall};
 	`,
 	xSmall: xSmallCardPadding,
 	// The `extraSmall` size is not officially documented, but the following styles
@@ -109,5 +109,5 @@ export const cardPaddings = {
 };
 
 export const shady = css`
-	background-color: ${ COLORS.lightGray[ 200 ] };
+	background-color: ${COLORS.lightGray[200]};
 `;

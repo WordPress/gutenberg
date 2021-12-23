@@ -4,8 +4,8 @@
  * @return {Promise} Promise resolving with an array containing all blocks in the document.
  */
 export async function getAllBlocks() {
-	return page.evaluate( () => {
-		const blocks = window.wp.data.select( 'core/block-editor' ).getBlocks();
+	return page.evaluate(() => {
+		const blocks = window.wp.data.select('core/block-editor').getBlocks();
 		/**
 		 * We are turning the result into a JSON object and back, to turn all the non-serializable
 		 * values into `null`.
@@ -16,6 +16,6 @@ export async function getAllBlocks() {
 		 *
 		 * For more information see: https://github.com/WordPress/gutenberg/pull/31199
 		 */
-		return JSON.parse( JSON.stringify( blocks ) );
-	} );
+		return JSON.parse(JSON.stringify(blocks));
+	});
 }

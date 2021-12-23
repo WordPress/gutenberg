@@ -11,15 +11,15 @@ import { store as coreStore } from '@wordpress/core-data';
 import useBlockEditorSettings from './use-block-editor-settings.js';
 import { store as editorStore } from '../../store';
 
-function useNativeBlockEditorSettings( settings, hasTemplate ) {
+function useNativeBlockEditorSettings(settings, hasTemplate) {
 	const capabilities = settings.capabilities ?? {};
-	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
+	const editorSettings = useBlockEditorSettings(settings, hasTemplate);
 
 	const supportReusableBlock = capabilities.reusableBlock === true;
 	const { reusableBlocks } = useSelect(
-		( select ) => ( {
+		(select) => ({
 			reusableBlocks: supportReusableBlock
-				? select( coreStore ).getEntityRecords(
+				? select(coreStore).getEntityRecords(
 						'postType',
 						'wp_block',
 						// Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
@@ -27,21 +27,21 @@ function useNativeBlockEditorSettings( settings, hasTemplate ) {
 						{ per_page: 100 }
 				  )
 				: [],
-		} ),
-		[ supportReusableBlock ]
+		}),
+		[supportReusableBlock]
 	);
 
-	const { isTitleSelected } = useSelect( ( select ) => ( {
-		isTitleSelected: select( editorStore ).isPostTitleSelected(),
-	} ) );
+	const { isTitleSelected } = useSelect((select) => ({
+		isTitleSelected: select(editorStore).isPostTitleSelected(),
+	}));
 
 	return useMemo(
-		() => ( {
+		() => ({
 			...editorSettings,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalShouldInsertAtTheTop: isTitleSelected,
-		} ),
-		[ editorSettings, reusableBlocks, isTitleSelected ]
+		}),
+		[editorSettings, reusableBlocks, isTitleSelected]
 	);
 }
 

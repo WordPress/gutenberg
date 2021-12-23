@@ -18,54 +18,54 @@ import { store as editorStore } from '@wordpress/editor';
 import BlockTypesChecklist from './checklist';
 import { store as editPostStore } from '../../store';
 
-function BlockManagerCategory( { title, blockTypes } ) {
-	const instanceId = useInstanceId( BlockManagerCategory );
+function BlockManagerCategory({ title, blockTypes }) {
+	const instanceId = useInstanceId(BlockManagerCategory);
 	const { defaultAllowedBlockTypes, hiddenBlockTypes } = useSelect(
-		( select ) => {
-			const { getEditorSettings } = select( editorStore );
-			const { getPreference } = select( editPostStore );
+		(select) => {
+			const { getEditorSettings } = select(editorStore);
+			const { getPreference } = select(editPostStore);
 			return {
-				defaultAllowedBlockTypes: getEditorSettings()
-					.defaultAllowedBlockTypes,
-				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+				defaultAllowedBlockTypes:
+					getEditorSettings().defaultAllowedBlockTypes,
+				hiddenBlockTypes: getPreference('hiddenBlockTypes'),
 			};
 		},
 		[]
 	);
-	const filteredBlockTypes = useMemo( () => {
-		if ( defaultAllowedBlockTypes === true ) {
+	const filteredBlockTypes = useMemo(() => {
+		if (defaultAllowedBlockTypes === true) {
 			return blockTypes;
 		}
-		return blockTypes.filter( ( { name } ) => {
-			return includes( defaultAllowedBlockTypes || [], name );
-		} );
-	}, [ defaultAllowedBlockTypes, blockTypes ] );
-	const { showBlockTypes, hideBlockTypes } = useDispatch( editPostStore );
-	const toggleVisible = useCallback( ( blockName, nextIsChecked ) => {
-		if ( nextIsChecked ) {
-			showBlockTypes( blockName );
+		return blockTypes.filter(({ name }) => {
+			return includes(defaultAllowedBlockTypes || [], name);
+		});
+	}, [defaultAllowedBlockTypes, blockTypes]);
+	const { showBlockTypes, hideBlockTypes } = useDispatch(editPostStore);
+	const toggleVisible = useCallback((blockName, nextIsChecked) => {
+		if (nextIsChecked) {
+			showBlockTypes(blockName);
 		} else {
-			hideBlockTypes( blockName );
+			hideBlockTypes(blockName);
 		}
-	}, [] );
+	}, []);
 	const toggleAllVisible = useCallback(
-		( nextIsChecked ) => {
-			const blockNames = map( blockTypes, 'name' );
-			if ( nextIsChecked ) {
-				showBlockTypes( blockNames );
+		(nextIsChecked) => {
+			const blockNames = map(blockTypes, 'name');
+			if (nextIsChecked) {
+				showBlockTypes(blockNames);
 			} else {
-				hideBlockTypes( blockNames );
+				hideBlockTypes(blockNames);
 			}
 		},
-		[ blockTypes ]
+		[blockTypes]
 	);
 
-	if ( ! filteredBlockTypes.length ) {
+	if (!filteredBlockTypes.length) {
 		return null;
 	}
 
 	const checkedBlockNames = without(
-		map( filteredBlockTypes, 'name' ),
+		map(filteredBlockTypes, 'name'),
 		...hiddenBlockTypes
 	);
 
@@ -74,9 +74,9 @@ function BlockManagerCategory( { title, blockTypes } ) {
 	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
 
 	let ariaChecked;
-	if ( isAllChecked ) {
+	if (isAllChecked) {
 		ariaChecked = 'true';
-	} else if ( checkedBlockNames.length > 0 ) {
+	} else if (checkedBlockNames.length > 0) {
 		ariaChecked = 'mixed';
 	} else {
 		ariaChecked = 'false';
@@ -85,20 +85,20 @@ function BlockManagerCategory( { title, blockTypes } ) {
 	return (
 		<div
 			role="group"
-			aria-labelledby={ titleId }
+			aria-labelledby={titleId}
 			className="edit-post-block-manager__category"
 		>
 			<CheckboxControl
-				checked={ isAllChecked }
-				onChange={ toggleAllVisible }
+				checked={isAllChecked}
+				onChange={toggleAllVisible}
 				className="edit-post-block-manager__category-title"
-				aria-checked={ ariaChecked }
-				label={ <span id={ titleId }>{ title }</span> }
+				aria-checked={ariaChecked}
+				label={<span id={titleId}>{title}</span>}
 			/>
 			<BlockTypesChecklist
-				blockTypes={ filteredBlockTypes }
-				value={ checkedBlockNames }
-				onItemChange={ toggleVisible }
+				blockTypes={filteredBlockTypes}
+				value={checkedBlockNames}
+				onItemChange={toggleVisible}
 			/>
 		</div>
 	);

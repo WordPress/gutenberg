@@ -43,30 +43,27 @@ export default function useNestedSettingsUpdate(
 	orientation,
 	layout
 ) {
-	const { updateBlockListSettings } = useDispatch( blockEditorStore );
+	const { updateBlockListSettings } = useDispatch(blockEditorStore);
 
 	const { blockListSettings, parentLock } = useSelect(
-		( select ) => {
-			const rootClientId = select(
-				blockEditorStore
-			).getBlockRootClientId( clientId );
+		(select) => {
+			const rootClientId =
+				select(blockEditorStore).getBlockRootClientId(clientId);
 			return {
-				blockListSettings: select(
-					blockEditorStore
-				).getBlockListSettings( clientId ),
-				parentLock: select( blockEditorStore ).getTemplateLock(
-					rootClientId
-				),
+				blockListSettings:
+					select(blockEditorStore).getBlockListSettings(clientId),
+				parentLock:
+					select(blockEditorStore).getTemplateLock(rootClientId),
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	// Memoize as inner blocks implementors often pass a new array on every
 	// render.
-	const _allowedBlocks = useMemo( () => allowedBlocks, allowedBlocks );
+	const _allowedBlocks = useMemo(() => allowedBlocks, allowedBlocks);
 
-	useLayoutEffect( () => {
+	useLayoutEffect(() => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
 			templateLock:
@@ -75,29 +72,29 @@ export default function useNestedSettingsUpdate(
 
 		// These values are not defined for RN, so only include them if they
 		// are defined.
-		if ( captureToolbars !== undefined ) {
+		if (captureToolbars !== undefined) {
 			newSettings.__experimentalCaptureToolbars = captureToolbars;
 		}
 
 		// Orientation depends on layout,
 		// ideally the separate orientation prop should be deprecated.
-		if ( orientation !== undefined ) {
+		if (orientation !== undefined) {
 			newSettings.orientation = orientation;
 		} else {
-			const layoutType = getLayoutType( layout?.type );
-			newSettings.orientation = layoutType.getOrientation( layout );
+			const layoutType = getLayoutType(layout?.type);
+			newSettings.orientation = layoutType.getOrientation(layout);
 		}
 
-		if ( __experimentalDefaultBlock !== undefined ) {
+		if (__experimentalDefaultBlock !== undefined) {
 			newSettings.__experimentalDefaultBlock = __experimentalDefaultBlock;
 		}
 
-		if ( __experimentalDirectInsert !== undefined ) {
+		if (__experimentalDirectInsert !== undefined) {
 			newSettings.__experimentalDirectInsert = __experimentalDirectInsert;
 		}
 
-		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
-			updateBlockListSettings( clientId, newSettings );
+		if (!isShallowEqual(blockListSettings, newSettings)) {
+			updateBlockListSettings(clientId, newSettings);
 		}
 	}, [
 		clientId,
@@ -111,5 +108,5 @@ export default function useNestedSettingsUpdate(
 		orientation,
 		updateBlockListSettings,
 		layout,
-	] );
+	]);
 }

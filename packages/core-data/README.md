@@ -22,19 +22,19 @@ Below is an example of a component which simply renders a list of authors:
 const { useSelect } = wp.data;
 
 function MyAuthorsListBase() {
-	const authors = useSelect( ( select ) => {
-		return select( 'core' ).getUsers( { who: 'authors' } );
-	}, [] );
+	const authors = useSelect((select) => {
+		return select('core').getUsers({ who: 'authors' });
+	}, []);
 
-	if ( ! authors ) {
+	if (!authors) {
 		return null;
 	}
 
 	return (
 		<ul>
-			{ authors.map( ( author ) => (
-				<li key={ author.id }>{ author.name }</li>
-			) ) }
+			{authors.map((author) => (
+				<li key={author.id}>{author.name}</li>
+			))}
 		</ul>
 	);
 }

@@ -9,10 +9,10 @@ import useGrid from './hook';
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                        forwardedRef
  */
-function Grid( props, forwardedRef ) {
-	const gridProps = useGrid( props );
+function Grid(props, forwardedRef) {
+	const gridProps = useGrid(props);
 
-	return <View { ...gridProps } ref={ forwardedRef } />;
+	return <View {...gridProps} ref={forwardedRef} />;
 }
 
 /**
@@ -36,6 +36,6 @@ function Grid( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedGrid = contextConnect( Grid, 'Grid' );
+const ConnectedGrid = contextConnect(Grid, 'Grid');
 
 export default ConnectedGrid;

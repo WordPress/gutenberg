@@ -26,13 +26,13 @@ import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
-	const [ blocks, updateBlocks ] = useState( [] );
+	const [blocks, updateBlocks] = useState([]);
 
 	return (
 		<BlockEditorProvider
-			value={ blocks }
-			onInput={ ( blocks ) => updateBlocks( blocks ) }
-			onChange={ ( blocks ) => updateBlocks( blocks ) }
+			value={blocks}
+			onInput={(blocks) => updateBlocks(blocks)}
+			onChange={(blocks) => updateBlocks(blocks)}
 		>
 			<SlotFillProvider>
 				<BlockTools>
@@ -299,10 +299,10 @@ const CUSTOM_COLORS = [
 	{ name: 'Red', slug: 'red', color: '#ff0000' },
 	{ name: 'Blue', slug: 'blue', color: '#0000ff' },
 ];
-const withCustomColors = createCustomColorsHOC( CUSTOM_COLORS );
+const withCustomColors = createCustomColorsHOC(CUSTOM_COLORS);
 // ...
 export default compose(
-	withCustomColors( 'backgroundColor', 'borderColor' ),
+	withCustomColors('backgroundColor', 'borderColor'),
 	MyColorfulComponent
 );
 ```
@@ -723,7 +723,7 @@ It works with nested objects using by finding the value at path.
 _Usage_
 
 ```js
-const isEnabled = useSetting( 'typography.dropCap' );
+const isEnabled = useSetting('typography.dropCap');
 ```
 
 _Parameters_
@@ -778,7 +778,7 @@ _Usage_
 
 ```jsx
 export default compose(
-	withColors( 'backgroundColor', { textColor: 'color' } ),
+	withColors('backgroundColor', { textColor: 'color' }),
 	MyColorfulComponent
 );
 ```

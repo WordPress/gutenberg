@@ -23,11 +23,11 @@ export const settings = {
 		innerBlocks: [
 			{
 				name: 'core/button',
-				attributes: { text: __( 'Find out more' ) },
+				attributes: { text: __('Find out more') },
 			},
 			{
 				name: 'core/button',
-				attributes: { text: __( 'Contact us' ) },
+				attributes: { text: __('Contact us') },
 			},
 		],
 	},

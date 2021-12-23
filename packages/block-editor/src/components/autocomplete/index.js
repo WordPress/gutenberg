@@ -28,24 +28,24 @@ import blockAutocompleter from '../../autocompleters/block';
  */
 const EMPTY_ARRAY = [];
 
-function useCompleters( { completers = EMPTY_ARRAY } ) {
+function useCompleters({ completers = EMPTY_ARRAY }) {
 	const { name } = useBlockEditContext();
-	return useMemo( () => {
+	return useMemo(() => {
 		let filteredCompleters = completers;
 
 		if (
 			name === getDefaultBlockName() ||
-			getBlockSupport( name, '__experimentalSlashInserter', false )
+			getBlockSupport(name, '__experimentalSlashInserter', false)
 		) {
-			filteredCompleters = filteredCompleters.concat( [
+			filteredCompleters = filteredCompleters.concat([
 				blockAutocompleter,
-			] );
+			]);
 		}
 
-		if ( hasFilter( 'editor.Autocomplete.completers' ) ) {
+		if (hasFilter('editor.Autocomplete.completers')) {
 			// Provide copies so filters may directly modify them.
-			if ( filteredCompleters === completers ) {
-				filteredCompleters = filteredCompleters.map( clone );
+			if (filteredCompleters === completers) {
+				filteredCompleters = filteredCompleters.map(clone);
 			}
 
 			filteredCompleters = applyFilters(
@@ -56,14 +56,14 @@ function useCompleters( { completers = EMPTY_ARRAY } ) {
 		}
 
 		return filteredCompleters;
-	}, [ completers, name ] );
+	}, [completers, name]);
 }
 
-export function useBlockEditorAutocompleteProps( props ) {
-	return useAutocompleteProps( {
+export function useBlockEditorAutocompleteProps(props) {
+	return useAutocompleteProps({
 		...props,
-		completers: useCompleters( props ),
-	} );
+		completers: useCompleters(props),
+	});
 }
 
 /**
@@ -72,8 +72,8 @@ export function useBlockEditorAutocompleteProps( props ) {
  *
  * @type {import('react').FC}
  */
-function BlockEditorAutocomplete( props ) {
-	return <Autocomplete { ...props } completers={ useCompleters( props ) } />;
+function BlockEditorAutocomplete(props) {
+	return <Autocomplete {...props} completers={useCompleters(props)} />;
 }
 
 /**

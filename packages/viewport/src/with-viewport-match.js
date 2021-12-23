@@ -35,11 +35,11 @@ import {
  *
  * @return {Function} Higher-order component.
  */
-const withViewportMatch = ( queries ) => {
+const withViewportMatch = (queries) => {
 	const useViewPortQueriesResult = () =>
-		mapValues( queries, ( query ) => {
-			let [ operator, breakpointName ] = query.split( ' ' );
-			if ( breakpointName === undefined ) {
+		mapValues(queries, (query) => {
+			let [operator, breakpointName] = query.split(' ');
+			if (breakpointName === undefined) {
 				breakpointName = operator;
 				operator = '>=';
 			}
@@ -47,14 +47,14 @@ const withViewportMatch = ( queries ) => {
 			// we are respecting that as from the static query of the HOC we generate
 			// a hook that calls other hooks always in the same order (because the query never changes).
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			return useViewportMatch( breakpointName, operator );
-		} );
-	return createHigherOrderComponent( ( WrappedComponent ) => {
-		return pure( ( props ) => {
+			return useViewportMatch(breakpointName, operator);
+		});
+	return createHigherOrderComponent((WrappedComponent) => {
+		return pure((props) => {
 			const queriesResult = useViewPortQueriesResult();
-			return <WrappedComponent { ...props } { ...queriesResult } />;
-		} );
-	}, 'withViewportMatch' );
+			return <WrappedComponent {...props} {...queriesResult} />;
+		});
+	}, 'withViewportMatch');
 };
 
 export default withViewportMatch;

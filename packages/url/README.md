@@ -25,7 +25,7 @@ over) the existing set.
 _Usage_
 
 ```js
-const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://google.com/?q=test
+const newURL = addQueryArgs('https://google.com', { q: 'test' }); // https://google.com/?q=test
 ```
 
 _Parameters_
@@ -47,15 +47,15 @@ with encoding type PHP_QUERY_RFC3986 (spaces as `%20`).
 _Usage_
 
 ```js
-const queryString = buildQueryString( {
+const queryString = buildQueryString({
 	simple: 'is ok',
-	arrays: [ 'are', 'fine', 'too' ],
+	arrays: ['are', 'fine', 'too'],
 	objects: {
 		evenNested: {
 			ok: 'yes',
 		},
 	},
-} );
+});
 // "simple=is%20ok&arrays%5B0%5D=are&arrays%5B1%5D=fine&arrays%5B2%5D=too&objects%5BevenNested%5D%5Bok%5D=yes"
 ```
 
@@ -95,9 +95,7 @@ Returns a URL for display.
 _Usage_
 
 ```js
-const displayUrl = filterURLForDisplay(
-	'https://www.wordpress.org/gutenberg/'
-); // wordpress.org/gutenberg
+const displayUrl = filterURLForDisplay('https://www.wordpress.org/gutenberg/'); // wordpress.org/gutenberg
 const imageUrl = filterURLForDisplay(
 	'https://www.wordpress.org/wp-content/uploads/img.png',
 	20
@@ -120,8 +118,8 @@ Returns the authority part of the URL.
 _Usage_
 
 ```js
-const authority1 = getAuthority( 'https://wordpress.org/help/' ); // 'wordpress.org'
-const authority2 = getAuthority( 'https://localhost:8080/test/' ); // 'localhost:8080'
+const authority1 = getAuthority('https://wordpress.org/help/'); // 'wordpress.org'
+const authority2 = getAuthority('https://localhost:8080/test/'); // 'localhost:8080'
 ```
 
 _Parameters_
@@ -139,8 +137,8 @@ Returns the filename part of the URL.
 _Usage_
 
 ```js
-const filename1 = getFilename( 'http://localhost:8080/this/is/a/test.jpg' ); // 'test.jpg'
-const filename2 = getFilename( '/this/is/a/test.png' ); // 'test.png'
+const filename1 = getFilename('http://localhost:8080/this/is/a/test.jpg'); // 'test.jpg'
+const filename2 = getFilename('/this/is/a/test.png'); // 'test.png'
 ```
 
 _Parameters_
@@ -181,8 +179,8 @@ Returns the path part of the URL.
 _Usage_
 
 ```js
-const path1 = getPath( 'http://localhost:8080/this/is/a/test?query=true' ); // 'this/is/a/test'
-const path2 = getPath( 'https://wordpress.org/help/faq/' ); // 'help/faq'
+const path1 = getPath('http://localhost:8080/this/is/a/test?query=true'); // 'this/is/a/test'
+const path2 = getPath('https://wordpress.org/help/faq/'); // 'help/faq'
 ```
 
 _Parameters_
@@ -223,8 +221,8 @@ Returns the protocol part of the URL.
 _Usage_
 
 ```js
-const protocol1 = getProtocol( 'tel:012345678' ); // 'tel:'
-const protocol2 = getProtocol( 'https://wordpress.org' ); // 'https:'
+const protocol1 = getProtocol('tel:012345678'); // 'tel:'
+const protocol2 = getProtocol('https://wordpress.org'); // 'https:'
 ```
 
 _Parameters_
@@ -242,7 +240,7 @@ Returns a single query argument of the url
 _Usage_
 
 ```js
-const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // bar
+const foo = getQueryArg('https://wordpress.org?foo=bar&bar=baz', 'foo'); // bar
 ```
 
 _Parameters_
@@ -262,7 +260,7 @@ invalid or has no querystring, an empty object is returned.
 _Usage_
 
 ```js
-const foo = getQueryArgs( 'https://wordpress.org?foo=bar&bar=baz' );
+const foo = getQueryArgs('https://wordpress.org?foo=bar&bar=baz');
 // { "foo": "bar", "bar": "baz" }
 ```
 
@@ -301,7 +299,7 @@ Determines whether the URL contains a given query arg.
 _Usage_
 
 ```js
-const hasBar = hasQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'bar' ); // true
+const hasBar = hasQueryArg('https://wordpress.org?foo=bar&bar=baz', 'bar'); // true
 ```
 
 _Parameters_
@@ -320,7 +318,7 @@ Determines whether the given string looks like an email.
 _Usage_
 
 ```js
-const isEmail = isEmail( 'hello@wordpress.org' ); // true
+const isEmail = isEmail('hello@wordpress.org'); // true
 ```
 
 _Parameters_
@@ -343,7 +341,7 @@ _Related_
 _Usage_
 
 ```js
-const isURL = isURL( 'https://wordpress.org' ); // true
+const isURL = isURL('https://wordpress.org'); // true
 ```
 
 _Parameters_
@@ -361,8 +359,8 @@ Checks for invalid characters within the provided authority.
 _Usage_
 
 ```js
-const isValid = isValidAuthority( 'wordpress.org' ); // true
-const isNotValid = isValidAuthority( 'wordpress#org' ); // false
+const isValid = isValidAuthority('wordpress.org'); // true
+const isNotValid = isValidAuthority('wordpress#org'); // false
 ```
 
 _Parameters_
@@ -380,8 +378,8 @@ Checks for invalid characters within the provided fragment.
 _Usage_
 
 ```js
-const isValid = isValidFragment( '#valid-fragment' ); // true
-const isNotValid = isValidFragment( '#invalid-#fragment' ); // false
+const isValid = isValidFragment('#valid-fragment'); // true
+const isNotValid = isValidFragment('#invalid-#fragment'); // false
 ```
 
 _Parameters_
@@ -399,8 +397,8 @@ Checks for invalid characters within the provided path.
 _Usage_
 
 ```js
-const isValid = isValidPath( 'test/path/' ); // true
-const isNotValid = isValidPath( '/invalid?test/path/' ); // false
+const isValid = isValidPath('test/path/'); // true
+const isNotValid = isValidPath('/invalid?test/path/'); // false
 ```
 
 _Parameters_
@@ -418,8 +416,8 @@ Tests if a url protocol is valid.
 _Usage_
 
 ```js
-const isValid = isValidProtocol( 'https:' ); // true
-const isNotValid = isValidProtocol( 'https :' ); // false
+const isValid = isValidProtocol('https:'); // true
+const isNotValid = isValidProtocol('https :'); // false
 ```
 
 _Parameters_
@@ -437,8 +435,8 @@ Checks for invalid characters within the provided query string.
 _Usage_
 
 ```js
-const isValid = isValidQueryString( 'query=true&another=false' ); // true
-const isNotValid = isValidQueryString( 'query=true?another=false' ); // false
+const isValid = isValidQueryString('query=true&another=false'); // true
+const isNotValid = isValidQueryString('query=true?another=false'); // false
 ```
 
 _Parameters_
@@ -470,7 +468,7 @@ Prepends "http\://" to a url, if it looks like something that is meant to be a T
 _Usage_
 
 ```js
-const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
+const actualURL = prependHTTP('wordpress.org'); // http://wordpress.org
 ```
 
 _Parameters_
@@ -512,7 +510,7 @@ Safely decodes a URI with `decodeURI`. Returns the URI unmodified if
 _Usage_
 
 ```js
-const badUri = safeDecodeURI( '%z' ); // does not throw an Error, simply returns '%z'
+const badUri = safeDecodeURI('%z'); // does not throw an Error, simply returns '%z'
 ```
 
 _Parameters_

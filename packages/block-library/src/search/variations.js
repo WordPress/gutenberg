@@ -7,7 +7,7 @@ const variations = [
 	{
 		name: 'default',
 		isDefault: true,
-		attributes: { buttonText: __( 'Search' ), label: __( 'Search' ) },
+		attributes: { buttonText: __('Search'), label: __('Search') },
 	},
 ];
 

@@ -1,25 +1,25 @@
-export function deepCopyLocksTreePath( tree, path ) {
+export function deepCopyLocksTreePath(tree, path) {
 	const newTree = { ...tree };
 	let currentNode = newTree;
-	for ( const branchName of path ) {
+	for (const branchName of path) {
 		currentNode.children = {
 			...currentNode.children,
-			[ branchName ]: {
+			[branchName]: {
 				locks: [],
 				children: {},
-				...currentNode.children[ branchName ],
+				...currentNode.children[branchName],
 			},
 		};
-		currentNode = currentNode.children[ branchName ];
+		currentNode = currentNode.children[branchName];
 	}
 	return newTree;
 }
 
-export function getNode( tree, path ) {
+export function getNode(tree, path) {
 	let currentNode = tree;
-	for ( const branchName of path ) {
-		const nextNode = currentNode.children[ branchName ];
-		if ( ! nextNode ) {
+	for (const branchName of path) {
+		const nextNode = currentNode.children[branchName];
+		if (!nextNode) {
 			return null;
 		}
 		currentNode = nextNode;
@@ -27,12 +27,12 @@ export function getNode( tree, path ) {
 	return currentNode;
 }
 
-export function* iteratePath( tree, path ) {
+export function* iteratePath(tree, path) {
 	let currentNode = tree;
 	yield currentNode;
-	for ( const branchName of path ) {
-		const nextNode = currentNode.children[ branchName ];
-		if ( ! nextNode ) {
+	for (const branchName of path) {
+		const nextNode = currentNode.children[branchName];
+		if (!nextNode) {
 			break;
 		}
 		yield nextNode;
@@ -40,21 +40,21 @@ export function* iteratePath( tree, path ) {
 	}
 }
 
-export function* iterateDescendants( node ) {
-	const stack = Object.values( node.children );
-	while ( stack.length ) {
+export function* iterateDescendants(node) {
+	const stack = Object.values(node.children);
+	while (stack.length) {
 		const childNode = stack.pop();
 		yield childNode;
-		stack.push( ...Object.values( childNode.children ) );
+		stack.push(...Object.values(childNode.children));
 	}
 }
 
-export function hasConflictingLock( { exclusive }, locks ) {
-	if ( exclusive && locks.length ) {
+export function hasConflictingLock({ exclusive }, locks) {
+	if (exclusive && locks.length) {
 		return true;
 	}
 
-	if ( ! exclusive && locks.filter( ( lock ) => lock.exclusive ).length ) {
+	if (!exclusive && locks.filter((lock) => lock.exclusive).length) {
 		return true;
 	}
 

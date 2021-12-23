@@ -28,28 +28,28 @@ function InputRange(
 	},
 	ref
 ) {
-	const hoverInteractions = useDebouncedHoverInteraction( {
+	const hoverInteractions = useDebouncedHoverInteraction({
 		onHide: onHideTooltip,
 		onMouseLeave,
 		onMouseMove,
 		onShow: onShowTooltip,
-	} );
+	});
 
 	return (
 		<BaseInputRange
-			{ ...props }
-			{ ...hoverInteractions }
-			aria-describedby={ describedBy }
-			aria-label={ label }
-			aria-hidden={ false }
-			ref={ ref }
-			tabIndex={ 0 }
+			{...props}
+			{...hoverInteractions}
+			aria-describedby={describedBy}
+			aria-label={label}
+			aria-hidden={false}
+			ref={ref}
+			tabIndex={0}
 			type="range"
-			value={ value }
+			value={value}
 		/>
 	);
 }
 
-const ForwardedComponent = forwardRef( InputRange );
+const ForwardedComponent = forwardRef(InputRange);
 
 export default ForwardedComponent;

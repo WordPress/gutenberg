@@ -21,7 +21,7 @@ import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
 	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducer = (state) => state,
 		className,
 		dragDirection = 'n',
 		hideHTMLArrows = false,
@@ -40,17 +40,17 @@ export function NumberControl(
 	ref
 ) {
 	const isStepAny = step === 'any';
-	const baseStep = isStepAny ? 1 : parseFloat( step );
-	const baseValue = roundClamp( 0, min, max, baseStep );
-	const constrainValue = ( value, stepOverride ) => {
+	const baseStep = isStepAny ? 1 : parseFloat(step);
+	const baseValue = roundClamp(0, min, max, baseStep);
+	const constrainValue = (value, stepOverride) => {
 		// When step is "any" clamp the value, otherwise round and clamp it
 		return isStepAny
-			? Math.min( max, Math.max( min, value ) )
-			: roundClamp( value, min, max, stepOverride ?? baseStep );
+			? Math.min(max, Math.max(min, value))
+			: roundClamp(value, min, max, stepOverride ?? baseStep);
 	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : null;
-	const classes = classNames( 'components-number-control', className );
+	const classes = classNames('components-number-control', className);
 
 	/**
 	 * "Middleware" function that intercepts updates from InputControl.
@@ -61,7 +61,7 @@ export function NumberControl(
 	 * @param {Object} action Action triggering state change
 	 * @return {Object} The updated state to apply to InputControl
 	 */
-	const numberControlStateReducer = ( state, action ) => {
+	const numberControlStateReducer = (state, action) => {
 		const { type, payload } = action;
 		const event = payload?.event;
 		const currentValue = state.value;
@@ -76,22 +76,22 @@ export function NumberControl(
 			const enableShift = event.shiftKey && isShiftStepEnabled;
 
 			const incrementalValue = enableShift
-				? parseFloat( shiftStep ) * baseStep
+				? parseFloat(shiftStep) * baseStep
 				: baseStep;
-			let nextValue = isValueEmpty( currentValue )
+			let nextValue = isValueEmpty(currentValue)
 				? baseValue
 				: currentValue;
 
-			if ( event?.preventDefault ) {
+			if (event?.preventDefault) {
 				event.preventDefault();
 			}
 
-			if ( type === inputControlActionTypes.PRESS_UP ) {
-				nextValue = add( nextValue, incrementalValue );
+			if (type === inputControlActionTypes.PRESS_UP) {
+				nextValue = add(nextValue, incrementalValue);
 			}
 
-			if ( type === inputControlActionTypes.PRESS_DOWN ) {
-				nextValue = subtract( nextValue, incrementalValue );
+			if (type === inputControlActionTypes.PRESS_DOWN) {
+				nextValue = subtract(nextValue, incrementalValue);
 			}
 
 			state.value = constrainValue(
@@ -103,17 +103,17 @@ export function NumberControl(
 		/**
 		 * Handles drag to update events
 		 */
-		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-			const [ x, y ] = payload.delta;
+		if (type === inputControlActionTypes.DRAG && isDragEnabled) {
+			const [x, y] = payload.delta;
 			const enableShift = payload.shiftKey && isShiftStepEnabled;
 			const modifier = enableShift
-				? parseFloat( shiftStep ) * baseStep
+				? parseFloat(shiftStep) * baseStep
 				: baseStep;
 
 			let directionModifier;
 			let delta;
 
-			switch ( dragDirection ) {
+			switch (dragDirection) {
 				case 'n':
 					delta = y;
 					directionModifier = -1;
@@ -135,12 +135,12 @@ export function NumberControl(
 					break;
 			}
 
-			if ( delta !== 0 ) {
-				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
+			if (delta !== 0) {
+				delta = Math.ceil(Math.abs(delta)) * Math.sign(delta);
 				const distance = delta * modifier * directionModifier;
 
 				state.value = constrainValue(
-					add( currentValue, distance ),
+					add(currentValue, distance),
 					enableShift ? modifier : null
 				);
 			}
@@ -157,7 +157,7 @@ export function NumberControl(
 
 			state.value = applyEmptyValue
 				? currentValue
-				: constrainValue( currentValue );
+				: constrainValue(currentValue);
 		}
 
 		return state;
@@ -165,27 +165,27 @@ export function NumberControl(
 
 	return (
 		<Input
-			autoComplete={ autoComplete }
+			autoComplete={autoComplete}
 			inputMode="numeric"
-			{ ...props }
-			className={ classes }
-			dragDirection={ dragDirection }
-			hideHTMLArrows={ hideHTMLArrows }
-			isDragEnabled={ isDragEnabled }
-			label={ label }
-			max={ max }
-			min={ min }
-			ref={ ref }
-			required={ required }
-			step={ step }
-			type={ typeProp }
-			value={ valueProp }
-			__unstableStateReducer={ composeStateReducers(
+			{...props}
+			className={classes}
+			dragDirection={dragDirection}
+			hideHTMLArrows={hideHTMLArrows}
+			isDragEnabled={isDragEnabled}
+			label={label}
+			max={max}
+			min={min}
+			ref={ref}
+			required={required}
+			step={step}
+			type={typeProp}
+			value={valueProp}
+			__unstableStateReducer={composeStateReducers(
 				numberControlStateReducer,
 				stateReducer
-			) }
+			)}
 		/>
 	);
 }
 
-export default forwardRef( NumberControl );
+export default forwardRef(NumberControl);

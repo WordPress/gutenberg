@@ -23,20 +23,20 @@ import { compose } from '@wordpress/compose';
  */
 import migrateFontFamily from '../utils/migrate-font-family';
 
-const migrateBorderRadius = ( attributes ) => {
+const migrateBorderRadius = (attributes) => {
 	const { borderRadius, ...newAttributes } = attributes;
 	// We have to check old property `borderRadius` and if
 	// `styles.border.radius` is a `number`
 	const oldBorderRadius = [
 		borderRadius,
 		newAttributes.style?.border?.radius,
-	].find( ( possibleBorderRadius ) => {
+	].find((possibleBorderRadius) => {
 		return (
 			typeof possibleBorderRadius === 'number' &&
 			possibleBorderRadius !== 0
 		);
-	} );
-	if ( ! oldBorderRadius ) {
+	});
+	if (!oldBorderRadius) {
 		return newAttributes;
 	}
 
@@ -46,55 +46,55 @@ const migrateBorderRadius = ( attributes ) => {
 			...newAttributes.style,
 			border: {
 				...newAttributes.style?.border,
-				radius: `${ oldBorderRadius }px`,
+				radius: `${oldBorderRadius}px`,
 			},
 		},
 	};
 };
 
-const migrateCustomColorsAndGradients = ( attributes ) => {
+const migrateCustomColorsAndGradients = (attributes) => {
 	if (
-		! attributes.customTextColor &&
-		! attributes.customBackgroundColor &&
-		! attributes.customGradient
+		!attributes.customTextColor &&
+		!attributes.customBackgroundColor &&
+		!attributes.customGradient
 	) {
 		return attributes;
 	}
 	const style = { color: {} };
-	if ( attributes.customTextColor ) {
+	if (attributes.customTextColor) {
 		style.color.text = attributes.customTextColor;
 	}
-	if ( attributes.customBackgroundColor ) {
+	if (attributes.customBackgroundColor) {
 		style.color.background = attributes.customBackgroundColor;
 	}
-	if ( attributes.customGradient ) {
+	if (attributes.customGradient) {
 		style.color.gradient = attributes.customGradient;
 	}
 	return {
-		...omit( attributes, [
+		...omit(attributes, [
 			'customTextColor',
 			'customBackgroundColor',
 			'customGradient',
-		] ),
+		]),
 		style,
 	};
 };
 
-const oldColorsMigration = ( attributes ) => {
+const oldColorsMigration = (attributes) => {
 	return migrateCustomColorsAndGradients(
 		omit(
 			{
 				...attributes,
 				customTextColor:
-					attributes.textColor && '#' === attributes.textColor[ 0 ]
+					attributes.textColor && '#' === attributes.textColor[0]
 						? attributes.textColor
 						: undefined,
 				customBackgroundColor:
-					attributes.color && '#' === attributes.color[ 0 ]
+					attributes.color && '#' === attributes.color[0]
 						? attributes.color
 						: undefined,
 			},
-			[ 'color', 'textColor' ]
+			['color', 'textColor']
 		)
 	);
 };
@@ -181,7 +181,7 @@ const v10 = {
 		reusable: false,
 		spacing: {
 			__experimentalSkipSerialization: true,
-			padding: [ 'horizontal', 'vertical' ],
+			padding: ['horizontal', 'vertical'],
 			__experimentalDefaultControls: {
 				padding: true,
 			},
@@ -192,25 +192,17 @@ const v10 = {
 		},
 		__experimentalSelector: '.wp-block-button__link',
 	},
-	save( { attributes, className } ) {
-		const {
-			fontSize,
-			linkTarget,
-			rel,
-			style,
-			text,
-			title,
-			url,
-			width,
-		} = attributes;
+	save({ attributes, className }) {
+		const { fontSize, linkTarget, rel, style, text, title, url, width } =
+			attributes;
 
-		if ( ! text ) {
+		if (!text) {
 			return null;
 		}
 
-		const borderProps = getBorderClassesAndStyles( attributes );
-		const colorProps = getColorClassesAndStyles( attributes );
-		const spacingProps = getSpacingClassesAndStyles( attributes );
+		const borderProps = getBorderClassesAndStyles(attributes);
+		const colorProps = getColorClassesAndStyles(attributes);
+		const spacingProps = getSpacingClassesAndStyles(attributes);
 		const buttonClasses = classnames(
 			'wp-block-button__link',
 			colorProps.className,
@@ -231,28 +223,28 @@ const v10 = {
 		// if it had already been assigned, for the sake of backward-compatibility.
 		// A title will no longer be assigned for new or updated button block links.
 
-		const wrapperClasses = classnames( className, {
-			[ `has-custom-width wp-block-button__width-${ width }` ]: width,
-			[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
-		} );
+		const wrapperClasses = classnames(className, {
+			[`has-custom-width wp-block-button__width-${width}`]: width,
+			[`has-custom-font-size`]: fontSize || style?.typography?.fontSize,
+		});
 
 		return (
-			<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+			<div {...useBlockProps.save({ className: wrapperClasses })}>
 				<RichText.Content
 					tagName="a"
-					className={ buttonClasses }
-					href={ url }
-					title={ title }
-					style={ buttonStyle }
-					value={ text }
-					target={ linkTarget }
-					rel={ rel }
+					className={buttonClasses}
+					href={url}
+					title={title}
+					style={buttonStyle}
+					value={text}
+					target={linkTarget}
+					rel={rel}
 				/>
 			</div>
 		);
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style } ) {
+	isEligible({ style }) {
 		return style?.typography?.fontFamily;
 	},
 };
@@ -305,10 +297,10 @@ const deprecated = [
 				type: 'number',
 			},
 		},
-		isEligible( { style } ) {
+		isEligible({ style }) {
 			return typeof style?.border?.radius === 'number';
 		},
-		save( { attributes, className } ) {
+		save({ attributes, className }) {
 			const {
 				fontSize,
 				linkTarget,
@@ -320,12 +312,12 @@ const deprecated = [
 				width,
 			} = attributes;
 
-			if ( ! text ) {
+			if (!text) {
 				return null;
 			}
 
 			const borderRadius = style?.border?.radius;
-			const colorProps = getColorClassesAndStyles( attributes );
+			const colorProps = getColorClassesAndStyles(attributes);
 			const buttonClasses = classnames(
 				'wp-block-button__link',
 				colorProps.className,
@@ -342,28 +334,28 @@ const deprecated = [
 			// if it had already been assigned, for the sake of backward-compatibility.
 			// A title will no longer be assigned for new or updated button block links.
 
-			const wrapperClasses = classnames( className, {
-				[ `has-custom-width wp-block-button__width-${ width }` ]: width,
-				[ `has-custom-font-size` ]:
+			const wrapperClasses = classnames(className, {
+				[`has-custom-width wp-block-button__width-${width}`]: width,
+				[`has-custom-font-size`]:
 					fontSize || style?.typography?.fontSize,
-			} );
+			});
 
 			return (
-				<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+				<div {...useBlockProps.save({ className: wrapperClasses })}>
 					<RichText.Content
 						tagName="a"
-						className={ buttonClasses }
-						href={ url }
-						title={ title }
-						style={ buttonStyle }
-						value={ text }
-						target={ linkTarget }
-						rel={ rel }
+						className={buttonClasses}
+						href={url}
+						title={title}
+						style={buttonStyle}
+						value={text}
+						target={linkTarget}
+						rel={rel}
 					/>
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(migrateFontFamily, migrateBorderRadius),
 	},
 	{
 		supports: {
@@ -412,17 +404,10 @@ const deprecated = [
 				type: 'number',
 			},
 		},
-		save( { attributes, className } ) {
-			const {
-				borderRadius,
-				linkTarget,
-				rel,
-				text,
-				title,
-				url,
-				width,
-			} = attributes;
-			const colorProps = getColorClassesAndStyles( attributes );
+		save({ attributes, className }) {
+			const { borderRadius, linkTarget, rel, text, title, url, width } =
+				attributes;
+			const colorProps = getColorClassesAndStyles(attributes);
 			const buttonClasses = classnames(
 				'wp-block-button__link',
 				colorProps.className,
@@ -439,26 +424,26 @@ const deprecated = [
 			// if it had already been assigned, for the sake of backward-compatibility.
 			// A title will no longer be assigned for new or updated button block links.
 
-			const wrapperClasses = classnames( className, {
-				[ `has-custom-width wp-block-button__width-${ width }` ]: width,
-			} );
+			const wrapperClasses = classnames(className, {
+				[`has-custom-width wp-block-button__width-${width}`]: width,
+			});
 
 			return (
-				<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+				<div {...useBlockProps.save({ className: wrapperClasses })}>
 					<RichText.Content
 						tagName="a"
-						className={ buttonClasses }
-						href={ url }
-						title={ title }
-						style={ buttonStyle }
-						value={ text }
-						target={ linkTarget }
-						rel={ rel }
+						className={buttonClasses}
+						href={url}
+						title={title}
+						style={buttonStyle}
+						value={text}
+						target={linkTarget}
+						rel={rel}
 					/>
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(migrateFontFamily, migrateBorderRadius),
 	},
 	{
 		supports: {
@@ -507,17 +492,10 @@ const deprecated = [
 				type: 'number',
 			},
 		},
-		save( { attributes, className } ) {
-			const {
-				borderRadius,
-				linkTarget,
-				rel,
-				text,
-				title,
-				url,
-				width,
-			} = attributes;
-			const colorProps = getColorClassesAndStyles( attributes );
+		save({ attributes, className }) {
+			const { borderRadius, linkTarget, rel, text, title, url, width } =
+				attributes;
+			const colorProps = getColorClassesAndStyles(attributes);
 			const buttonClasses = classnames(
 				'wp-block-button__link',
 				colorProps.className,
@@ -534,26 +512,26 @@ const deprecated = [
 			// if it had already been assigned, for the sake of backward-compatibility.
 			// A title will no longer be assigned for new or updated button block links.
 
-			const wrapperClasses = classnames( className, {
-				[ `has-custom-width wp-block-button__width-${ width }` ]: width,
-			} );
+			const wrapperClasses = classnames(className, {
+				[`has-custom-width wp-block-button__width-${width}`]: width,
+			});
 
 			return (
-				<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+				<div {...useBlockProps.save({ className: wrapperClasses })}>
 					<RichText.Content
 						tagName="a"
-						className={ buttonClasses }
-						href={ url }
-						title={ title }
-						style={ buttonStyle }
-						value={ text }
-						target={ linkTarget }
-						rel={ rel }
+						className={buttonClasses}
+						href={url}
+						title={title}
+						style={buttonStyle}
+						value={text}
+						target={linkTarget}
+						rel={rel}
 					/>
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(migrateFontFamily, migrateBorderRadius),
 	},
 	{
 		supports: {
@@ -594,18 +572,12 @@ const deprecated = [
 				type: 'object',
 			},
 		},
-		save( { attributes } ) {
-			const {
-				borderRadius,
-				linkTarget,
-				rel,
-				text,
-				title,
-				url,
-			} = attributes;
-			const buttonClasses = classnames( 'wp-block-button__link', {
+		save({ attributes }) {
+			const { borderRadius, linkTarget, rel, text, title, url } =
+				attributes;
+			const buttonClasses = classnames('wp-block-button__link', {
 				'no-border-radius': borderRadius === 0,
-			} );
+			});
 			const buttonStyle = {
 				borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 			};
@@ -613,13 +585,13 @@ const deprecated = [
 			return (
 				<RichText.Content
 					tagName="a"
-					className={ buttonClasses }
-					href={ url }
-					title={ title }
-					style={ buttonStyle }
-					value={ text }
-					target={ linkTarget }
-					rel={ rel }
+					className={buttonClasses}
+					href={url}
+					title={title}
+					style={buttonStyle}
+					value={text}
+					target={linkTarget}
+					rel={rel}
 				/>
 			);
 		},
@@ -669,15 +641,12 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		isEligible: ( attributes ) =>
-			!! attributes.customTextColor ||
-			!! attributes.customBackgroundColor ||
-			!! attributes.customGradient,
-		migrate: compose(
-			migrateBorderRadius,
-			migrateCustomColorsAndGradients
-		),
-		save( { attributes } ) {
+		isEligible: (attributes) =>
+			!!attributes.customTextColor ||
+			!!attributes.customBackgroundColor ||
+			!!attributes.customGradient,
+		migrate: compose(migrateBorderRadius, migrateCustomColorsAndGradients),
+		save({ attributes }) {
 			const {
 				backgroundColor,
 				borderRadius,
@@ -693,24 +662,24 @@ const deprecated = [
 				url,
 			} = attributes;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 			const backgroundClass =
-				! customGradient &&
-				getColorClassName( 'background-color', backgroundColor );
-			const gradientClass = __experimentalGetGradientClass( gradient );
+				!customGradient &&
+				getColorClassName('background-color', backgroundColor);
+			const gradientClass = __experimentalGetGradientClass(gradient);
 
-			const buttonClasses = classnames( 'wp-block-button__link', {
+			const buttonClasses = classnames('wp-block-button__link', {
 				'has-text-color': textColor || customTextColor,
-				[ textClass ]: textClass,
+				[textClass]: textClass,
 				'has-background':
 					backgroundColor ||
 					customBackgroundColor ||
 					customGradient ||
 					gradient,
-				[ backgroundClass ]: backgroundClass,
+				[backgroundClass]: backgroundClass,
 				'no-border-radius': borderRadius === 0,
-				[ gradientClass ]: gradientClass,
-			} );
+				[gradientClass]: gradientClass,
+			});
 
 			const buttonStyle = {
 				background: customGradient ? customGradient : undefined,
@@ -730,13 +699,13 @@ const deprecated = [
 				<div>
 					<RichText.Content
 						tagName="a"
-						className={ buttonClasses }
-						href={ url }
-						title={ title }
-						style={ buttonStyle }
-						value={ text }
-						target={ linkTarget }
-						rel={ rel }
+						className={buttonClasses}
+						href={url}
+						title={title}
+						style={buttonStyle}
+						value={text}
+						target={linkTarget}
+						rel={rel}
 					/>
 				</div>
 			);
@@ -777,28 +746,28 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		isEligible( attribute ) {
+		isEligible(attribute) {
 			return (
 				attribute.className &&
-				attribute.className.includes( 'is-style-squared' )
+				attribute.className.includes('is-style-squared')
 			);
 		},
-		migrate( attributes ) {
+		migrate(attributes) {
 			let newClassName = attributes.className;
-			if ( newClassName ) {
+			if (newClassName) {
 				newClassName = newClassName
-					.replace( /is-style-squared[\s]?/, '' )
+					.replace(/is-style-squared[\s]?/, '')
 					.trim();
 			}
 			return migrateBorderRadius(
-				migrateCustomColorsAndGradients( {
+				migrateCustomColorsAndGradients({
 					...attributes,
 					className: newClassName ? newClassName : undefined,
 					borderRadius: 0,
-				} )
+				})
 			);
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				backgroundColor,
 				customBackgroundColor,
@@ -811,18 +780,18 @@ const deprecated = [
 				url,
 			} = attributes;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
 
-			const buttonClasses = classnames( 'wp-block-button__link', {
+			const buttonClasses = classnames('wp-block-button__link', {
 				'has-text-color': textColor || customTextColor,
-				[ textClass ]: textClass,
+				[textClass]: textClass,
 				'has-background': backgroundColor || customBackgroundColor,
-				[ backgroundClass ]: backgroundClass,
-			} );
+				[backgroundClass]: backgroundClass,
+			});
 
 			const buttonStyle = {
 				backgroundColor: backgroundClass
@@ -835,13 +804,13 @@ const deprecated = [
 				<div>
 					<RichText.Content
 						tagName="a"
-						className={ buttonClasses }
-						href={ url }
-						title={ title }
-						style={ buttonStyle }
-						value={ text }
-						target={ linkTarget }
-						rel={ rel }
+						className={buttonClasses}
+						href={url}
+						title={title}
+						style={buttonStyle}
+						value={text}
+						target={linkTarget}
+						rel={rel}
 					/>
 				</div>
 			);
@@ -868,7 +837,7 @@ const deprecated = [
 			},
 		},
 		migrate: oldColorsMigration,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				url,
 				text,
@@ -879,18 +848,18 @@ const deprecated = [
 				customTextColor,
 			} = attributes;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
 
-			const buttonClasses = classnames( 'wp-block-button__link', {
+			const buttonClasses = classnames('wp-block-button__link', {
 				'has-text-color': textColor || customTextColor,
-				[ textClass ]: textClass,
+				[textClass]: textClass,
 				'has-background': backgroundColor || customBackgroundColor,
-				[ backgroundClass ]: backgroundClass,
-			} );
+				[backgroundClass]: backgroundClass,
+			});
 
 			const buttonStyle = {
 				backgroundColor: backgroundClass
@@ -903,11 +872,11 @@ const deprecated = [
 				<div>
 					<RichText.Content
 						tagName="a"
-						className={ buttonClasses }
-						href={ url }
-						title={ title }
-						style={ buttonStyle }
-						value={ text }
+						className={buttonClasses}
+						href={url}
+						title={title}
+						style={buttonStyle}
+						value={text}
 					/>
 				</div>
 			);
@@ -927,7 +896,7 @@ const deprecated = [
 				default: 'none',
 			},
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { url, text, title, align, color, textColor } = attributes;
 
 			const buttonStyle = {
@@ -938,14 +907,14 @@ const deprecated = [
 			const linkClass = 'wp-block-button__link';
 
 			return (
-				<div className={ `align${ align }` }>
+				<div className={`align${align}`}>
 					<RichText.Content
 						tagName="a"
-						className={ linkClass }
-						href={ url }
-						title={ title }
-						style={ buttonStyle }
-						value={ text }
+						className={linkClass}
+						href={url}
+						title={title}
+						style={buttonStyle}
+						value={text}
 					/>
 				</div>
 			);
@@ -966,20 +935,20 @@ const deprecated = [
 				default: 'none',
 			},
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { url, text, title, align, color, textColor } = attributes;
 
 			return (
 				<div
-					className={ `align${ align }` }
-					style={ { backgroundColor: color } }
+					className={`align${align}`}
+					style={{ backgroundColor: color }}
 				>
 					<RichText.Content
 						tagName="a"
-						href={ url }
-						title={ title }
-						style={ { color: textColor } }
-						value={ text }
+						href={url}
+						title={title}
+						style={{ color: textColor }}
+						value={text}
 					/>
 				</div>
 			);

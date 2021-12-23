@@ -44,28 +44,28 @@ import CustomizeBlocks from './customize-blocks';
 
 const HELP_TOPICS = [
 	{
-		label: __( 'What is a block?' ),
+		label: __('What is a block?'),
 		icon: helpFilled,
 		view: <IntroToBlocks />,
 	},
 	{
-		label: __( 'Add blocks' ),
+		label: __('Add blocks'),
 		icon: plusCircleFilled,
 		view: <AddBlocks />,
 	},
-	{ label: __( 'Move blocks' ), icon: alignJustifyAlt, view: <MoveBlocks /> },
-	{ label: __( 'Remove blocks' ), icon: trashFilled, view: <RemoveBlocks /> },
+	{ label: __('Move blocks'), icon: alignJustifyAlt, view: <MoveBlocks /> },
+	{ label: __('Remove blocks'), icon: trashFilled, view: <RemoveBlocks /> },
 	{
-		label: __( 'Customize blocks' ),
+		label: __('Customize blocks'),
 		icon: cogAlt,
 		view: <CustomizeBlocks />,
 	},
 ];
 
-function EditorHelpTopics( { close, isVisible, onClose } ) {
-	const { postType } = useSelect( ( select ) => ( {
-		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
-	} ) );
+function EditorHelpTopics({ close, isVisible, onClose }) {
+	const { postType } = useSelect((select) => ({
+		postType: select(editorStore).getEditedPostAttribute('type'),
+	}));
 
 	const sectionTitle = usePreferredColorSchemeStyle(
 		styles.helpDetailSectionHeading,
@@ -74,48 +74,49 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 
 	const title =
 		postType === 'page'
-			? __( 'How to edit your page' )
-			: __( 'How to edit your post' );
+			? __('How to edit your page')
+			: __('How to edit your post');
 
 	return (
 		<BottomSheet
-			isVisible={ isVisible }
-			onClose={ onClose }
+			isVisible={isVisible}
+			onClose={onClose}
 			hideHeader
 			hasNavigation
-			contentStyle={ styles.contentContainer }
+			contentStyle={styles.contentContainer}
 			testID="editor-help-modal"
 		>
 			<SafeAreaView>
 				<BottomSheet.NavigationContainer
 					animate
 					main
-					style={ styles.navigationContainer }
+					style={styles.navigationContainer}
 				>
 					<BottomSheet.NavigationScreen
 						isScrollable
 						fullScreen
 						name="help-topics"
 					>
-						<View style={ styles.container }>
+						<View style={styles.container}>
 							<BottomSheet.NavBar>
 								<BottomSheet.NavBar.DismissButton
-									onPress={ close }
-									iosText={ __( 'Close' ) }
+									onPress={close}
+									iosText={__('Close')}
 								/>
 								<BottomSheet.NavBar.Heading>
-									{ title }
+									{title}
 								</BottomSheet.NavBar.Heading>
 							</BottomSheet.NavBar>
 							<BottomSheetConsumer>
-								{ ( { listProps } ) => {
-									const contentContainerStyle = StyleSheet.flatten(
-										listProps.contentContainerStyle
-									);
+								{({ listProps }) => {
+									const contentContainerStyle =
+										StyleSheet.flatten(
+											listProps.contentContainerStyle
+										);
 									return (
 										<ScrollView
-											{ ...listProps }
-											contentContainerStyle={ {
+											{...listProps}
+											contentContainerStyle={{
 												...contentContainerStyle,
 												paddingBottom: Math.max(
 													listProps.safeAreaBottomInset,
@@ -127,44 +128,39 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 												 * current `BottomSheet` implementation.
 												 */
 												marginTop: 0,
-											} }
+											}}
 										>
 											<PanelBody>
-												<Text style={ sectionTitle }>
-													{ __( 'The basics' ) }
+												<Text style={sectionTitle}>
+													{__('The basics')}
 												</Text>
-												{ /* Print out help topics */ }
-												{ HELP_TOPICS.map(
-													( { label, icon } ) => {
-														const labelSlug = kebabCase(
-															label
-														);
+												{/* Print out help topics */}
+												{HELP_TOPICS.map(
+													({ label, icon }) => {
+														const labelSlug =
+															kebabCase(label);
 														return (
 															<HelpTopicRow
-																key={
-																	labelSlug
-																}
-																label={ label }
-																icon={ icon }
+																key={labelSlug}
+																label={label}
+																icon={icon}
 																screenName={
 																	labelSlug
 																}
 															/>
 														);
 													}
-												) }
+												)}
 												{
-													<Text
-														style={ sectionTitle }
-													>
-														{ __( 'Get support' ) }
+													<Text style={sectionTitle}>
+														{__('Get support')}
 													</Text>
 												}
 												{
 													<HelpGetSupportButton
-														title={ __(
+														title={__(
 															'Contact support'
-														) }
+														)}
 														onPress={
 															requestContactCustomerSupport
 														}
@@ -172,9 +168,9 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 												}
 												{
 													<HelpGetSupportButton
-														title={ __(
+														title={__(
 															'More support options'
-														) }
+														)}
 														onPress={
 															requestGotoCustomerSupportOptions
 														}
@@ -183,26 +179,26 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											</PanelBody>
 										</ScrollView>
 									);
-								} }
+								}}
 							</BottomSheetConsumer>
 						</View>
 					</BottomSheet.NavigationScreen>
-					{ /* Print out help detail screens */ }
-					{ HELP_TOPICS.map( ( { view, label } ) => {
-						const labelSlug = kebabCase( label );
+					{/* Print out help detail screens */}
+					{HELP_TOPICS.map(({ view, label }) => {
+						const labelSlug = kebabCase(label);
 						return (
 							<HelpDetailNavigationScreen
-								key={ labelSlug }
-								name={ labelSlug }
-								content={ view }
-								label={ label }
-								options={ {
+								key={labelSlug}
+								name={labelSlug}
+								content={view}
+								label={label}
+								options={{
 									gestureEnabled: false,
 									...TransitionPresets.DefaultTransition,
-								} }
+								}}
 							/>
 						);
-					} ) }
+					})}
 				</BottomSheet.NavigationContainer>
 			</SafeAreaView>
 		</BottomSheet>

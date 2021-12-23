@@ -15,18 +15,18 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 import DropdownMenu from '../';
 import { MenuItem } from '../../';
 
-function getMenuToggleButton( container ) {
-	return container.querySelector( '.components-dropdown-menu__toggle' );
+function getMenuToggleButton(container) {
+	return container.querySelector('.components-dropdown-menu__toggle');
 }
-function getNavigableMenu( container ) {
-	return container.querySelector( '.components-dropdown-menu__menu' );
+function getNavigableMenu(container) {
+	return container.querySelector('.components-dropdown-menu__menu');
 }
 
-describe( 'DropdownMenu', () => {
-	const children = ( { onClose } ) => <MenuItem onClick={ onClose } />;
+describe('DropdownMenu', () => {
+	const children = ({ onClose }) => <MenuItem onClick={onClose} />;
 
 	let controls;
-	beforeEach( () => {
+	beforeEach(() => {
 		controls = [
 			{
 				title: 'Up',
@@ -49,62 +49,62 @@ describe( 'DropdownMenu', () => {
 				onClick: jest.fn(),
 			},
 		];
-	} );
+	});
 
-	describe( 'basic rendering', () => {
-		it( 'should render a null element when neither controls nor children are assigned', () => {
-			const { container } = render( <DropdownMenu /> );
+	describe('basic rendering', () => {
+		it('should render a null element when neither controls nor children are assigned', () => {
+			const { container } = render(<DropdownMenu />);
 
-			expect( container.firstChild ).toBeNull();
-		} );
+			expect(container.firstChild).toBeNull();
+		});
 
-		it( 'should render a null element when controls are empty and children is not specified', () => {
-			const { container } = render( <DropdownMenu controls={ [] } /> );
+		it('should render a null element when controls are empty and children is not specified', () => {
+			const { container } = render(<DropdownMenu controls={[]} />);
 
-			expect( container.firstChild ).toBeNull();
-		} );
+			expect(container.firstChild).toBeNull();
+		});
 
-		it( 'should open menu on arrow down (controls)', () => {
+		it('should open menu on arrow down (controls)', () => {
 			const {
 				container: { firstChild: dropdownMenuContainer },
-			} = render( <DropdownMenu controls={ controls } /> );
+			} = render(<DropdownMenu controls={controls} />);
 
-			const button = getMenuToggleButton( dropdownMenuContainer );
+			const button = getMenuToggleButton(dropdownMenuContainer);
 			button.focus();
-			fireEvent.keyDown( button, {
+			fireEvent.keyDown(button, {
 				keyCode: DOWN,
 				preventDefault: () => {},
-			} );
-			const menu = getNavigableMenu( dropdownMenuContainer );
-			expect( menu ).toBeTruthy();
+			});
+			const menu = getNavigableMenu(dropdownMenuContainer);
+			expect(menu).toBeTruthy();
 
 			expect(
 				dropdownMenuContainer.querySelectorAll(
 					'.components-dropdown-menu__menu-item'
 				)
-			).toHaveLength( controls.length );
-		} );
+			).toHaveLength(controls.length);
+		});
 
-		it( 'should open menu on arrow down (children)', () => {
+		it('should open menu on arrow down (children)', () => {
 			const {
 				container: { firstChild: dropdownMenuContainer },
-			} = render( <DropdownMenu children={ children } /> );
+			} = render(<DropdownMenu children={children} />);
 
-			const button = getMenuToggleButton( dropdownMenuContainer );
+			const button = getMenuToggleButton(dropdownMenuContainer);
 			button.focus();
-			fireEvent.keyDown( button, {
+			fireEvent.keyDown(button, {
 				keyCode: DOWN,
 				preventDefault: () => {},
-			} );
+			});
 
-			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeTruthy();
+			expect(getNavigableMenu(dropdownMenuContainer)).toBeTruthy();
 
 			const menuItem = dropdownMenuContainer.querySelector(
 				'.components-menu-item__button'
 			);
-			fireEvent.click( menuItem );
+			fireEvent.click(menuItem);
 
-			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeNull();
-		} );
-	} );
-} );
+			expect(getNavigableMenu(dropdownMenuContainer)).toBeNull();
+		});
+	});
+});

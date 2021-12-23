@@ -16,30 +16,29 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @return {string} The custom class name.
  */
-export function useBlockCustomClassName( clientId ) {
+export function useBlockCustomClassName(clientId) {
 	// It's good for this to be a separate selector because it will be executed
 	// on every attribute change, while the other selectors are not re-evaluated
 	// as much.
 	return useSelect(
-		( select ) => {
-			const { getBlockName, getBlockAttributes } = select(
-				blockEditorStore
-			);
-			const attributes = getBlockAttributes( clientId );
+		(select) => {
+			const { getBlockName, getBlockAttributes } =
+				select(blockEditorStore);
+			const attributes = getBlockAttributes(clientId);
 
-			if ( ! attributes?.className ) {
+			if (!attributes?.className) {
 				return;
 			}
 
-			const blockType = getBlockType( getBlockName( clientId ) );
+			const blockType = getBlockType(getBlockName(clientId));
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 
-			if ( ! hasLightBlockWrapper ) {
+			if (!hasLightBlockWrapper) {
 				return;
 			}
 
 			return attributes.className;
 		},
-		[ clientId ]
+		[clientId]
 	);
 }

@@ -15,65 +15,63 @@ import { createElement } from '@wordpress/element';
  *
  * @return {JSX.Element} Circle component
  */
-export const Circle = ( props ) => createElement( 'circle', props );
+export const Circle = (props) => createElement('circle', props);
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'g'>} props
  *
  * @return {JSX.Element} G component
  */
-export const G = ( props ) => createElement( 'g', props );
+export const G = (props) => createElement('g', props);
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'path'>} props
  *
  * @return {JSX.Element} Path component
  */
-export const Path = ( props ) => createElement( 'path', props );
+export const Path = (props) => createElement('path', props);
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'polygon'>} props
  *
  * @return {JSX.Element} Polygon component
  */
-export const Polygon = ( props ) => createElement( 'polygon', props );
+export const Polygon = (props) => createElement('polygon', props);
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'rect'>} props
  *
  * @return {JSX.Element} Rect component
  */
-export const Rect = ( props ) => createElement( 'rect', props );
+export const Rect = (props) => createElement('rect', props);
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'defs'>} props
  *
  * @return {JSX.Element} Defs component
  */
-export const Defs = ( props ) => createElement( 'defs', props );
+export const Defs = (props) => createElement('defs', props);
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'radialGradient'>} props
  *
  * @return {JSX.Element} RadialGradient component
  */
-export const RadialGradient = ( props ) =>
-	createElement( 'radialGradient', props );
+export const RadialGradient = (props) => createElement('radialGradient', props);
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'linearGradient'>} props
  *
  * @return {JSX.Element} LinearGradient component
  */
-export const LinearGradient = ( props ) =>
-	createElement( 'linearGradient', props );
+export const LinearGradient = (props) => createElement('linearGradient', props);
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'stop'>} props
  *
  * @return {JSX.Element} Stop component
  */
-export const Stop = ( props ) => createElement( 'stop', props );
+export const Stop = (props) => createElement('stop', props);
 
 /**
  *
@@ -82,11 +80,11 @@ export const Stop = ( props ) => createElement( 'stop', props );
  *
  * @return {JSX.Element} Stop component
  */
-export const SVG = ( { className, isPressed, ...props } ) => {
+export const SVG = ({ className, isPressed, ...props }) => {
 	const appliedProps = {
 		...props,
 		className:
-			classnames( className, { 'is-pressed': isPressed } ) || undefined,
+			classnames(className, { 'is-pressed': isPressed }) || undefined,
 		role: 'img',
 		'aria-hidden': true,
 		focusable: false,
@@ -94,5 +92,5 @@ export const SVG = ( { className, isPressed, ...props } ) => {
 
 	// Disable reason: We need to have a way to render HTML tag for web.
 	// eslint-disable-next-line react/forbid-elements
-	return <svg { ...appliedProps } />;
+	return <svg {...appliedProps} />;
 };

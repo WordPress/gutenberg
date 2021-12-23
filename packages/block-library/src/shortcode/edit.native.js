@@ -16,7 +16,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 
 import styles from './style.scss';
 
-export function ShortcodeEdit( props ) {
+export function ShortcodeEdit(props) {
 	const {
 		attributes,
 		setAttributes,
@@ -39,24 +39,24 @@ export function ShortcodeEdit( props ) {
 
 	return (
 		<View>
-			<Text style={ titleStyle }>{ __( 'Shortcode' ) }</Text>
+			<Text style={titleStyle}>{__('Shortcode')}</Text>
 			<PlainText
-				value={ attributes.text }
-				style={ shortcodeStyle }
-				multiline={ true }
+				value={attributes.text}
+				style={shortcodeStyle}
+				multiline={true}
 				underlineColorAndroid="transparent"
-				onChange={ ( text ) => setAttributes( { text } ) }
-				placeholder={ __( 'Add a shortcode…' ) }
-				aria-label={ __( 'Shortcode' ) }
-				isSelected={ props.isSelected }
-				onFocus={ onFocus }
-				onBlur={ onBlur }
-				autoCorrect={ false }
+				onChange={(text) => setAttributes({ text })}
+				placeholder={__('Add a shortcode…')}
+				aria-label={__('Shortcode')}
+				isSelected={props.isSelected}
+				onFocus={onFocus}
+				onBlur={onBlur}
+				autoCorrect={false}
 				autoComplete="off"
-				placeholderTextColor={ placeholderStyle.color }
+				placeholderTextColor={placeholderStyle.color}
 			/>
 		</View>
 	);
 }
 
-export default withPreferredColorScheme( ShortcodeEdit );
+export default withPreferredColorScheme(ShortcodeEdit);

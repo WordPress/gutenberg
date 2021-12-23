@@ -13,15 +13,15 @@ import WelcomeGuideImage from './image';
 import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuideDefault() {
-	const { toggleFeature } = useDispatch( editPostStore );
+	const { toggleFeature } = useDispatch(editPostStore);
 
 	return (
 		<Guide
 			className="edit-post-welcome-guide"
-			contentLabel={ __( 'Welcome to the block editor' ) }
-			finishButtonText={ __( 'Get started' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
-			pages={ [
+			contentLabel={__('Welcome to the block editor')}
+			finishButtonText={__('Get started')}
+			onFinish={() => toggleFeature('welcomeGuide')}
+			pages={[
 				{
 					image: (
 						<WelcomeGuideImage
@@ -32,12 +32,12 @@ export default function WelcomeGuideDefault() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Welcome to the block editor' ) }
+								{__('Welcome to the block editor')}
 							</h1>
 							<p className="edit-post-welcome-guide__text">
-								{ __(
+								{__(
 									'In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content.'
-								) }
+								)}
 							</p>
 						</>
 					),
@@ -52,12 +52,12 @@ export default function WelcomeGuideDefault() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Make each block your own' ) }
+								{__('Make each block your own')}
 							</h1>
 							<p className="edit-post-welcome-guide__text">
-								{ __(
+								{__(
 									'Each block comes with its own set of controls for changing things like color, width, and alignment. These will show and hide automatically when you have a block selected.'
-								) }
+								)}
 							</p>
 						</>
 					),
@@ -72,22 +72,22 @@ export default function WelcomeGuideDefault() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Get to know the block library' ) }
+								{__('Get to know the block library')}
 							</h1>
 							<p className="edit-post-welcome-guide__text">
-								{ createInterpolateElement(
+								{createInterpolateElement(
 									__(
 										'All of the blocks available to you live in the block library. You’ll find it wherever you see the <InserterIconImage /> icon.'
 									),
 									{
 										InserterIconImage: (
 											<img
-												alt={ __( 'inserter' ) }
+												alt={__('inserter')}
 												src="data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='18' height='18' rx='2' fill='%231E1E1E'/%3E%3Cpath d='M9.22727 4V14M4 8.77273H14' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E%0A"
 											/>
 										),
 									}
-								) }
+								)}
 							</p>
 						</>
 					),
@@ -102,24 +102,24 @@ export default function WelcomeGuideDefault() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Learn how to use the block editor' ) }
+								{__('Learn how to use the block editor')}
 							</h1>
 							<p className="edit-post-welcome-guide__text">
-								{ __(
+								{__(
 									'New to the block editor? Want to learn more about using it? '
-								) }
+								)}
 								<ExternalLink
-									href={ __(
+									href={__(
 										'https://wordpress.org/support/article/wordpress-editor/'
-									) }
+									)}
 								>
-									{ __( "Here's a detailed guide." ) }
+									{__("Here's a detailed guide.")}
 								</ExternalLink>
 							</p>
 						</>
 					),
 				},
-			] }
+			]}
 		/>
 	);
 }

@@ -1,26 +1,26 @@
 /**
  * External dependencies
  */
-const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { escapeRegExp } = require( 'lodash' );
-const { join, sep } = require( 'path' );
-const fastGlob = require( 'fast-glob' );
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { escapeRegExp } = require('lodash');
+const { join, sep } = require('path');
+const fastGlob = require('fast-glob');
 
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin');
 
 /**
  * Internal dependencies
  */
-const { baseConfig, plugins, stylesTransform } = require( './shared' );
+const { baseConfig, plugins, stylesTransform } = require('./shared');
 
 /*
  * Matches a block's name in paths in the form
  * build-module/<blockName>/view.js
  */
-const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/view))/g );
+const blockNameRegex = new RegExp(/(?<=build-module\/).*(?=(\/view))/g);
 
 const createEntrypoints = () => {
 	/*
@@ -38,14 +38,14 @@ const createEntrypoints = () => {
 	 * Go through the paths found above, in order to define webpack entry points for
 	 * each block's view.js file.
 	 */
-	return blockViewScriptPaths.reduce( ( entries, scriptPath ) => {
-		const [ blockName ] = scriptPath.match( blockNameRegex );
+	return blockViewScriptPaths.reduce((entries, scriptPath) => {
+		const [blockName] = scriptPath.match(blockNameRegex);
 
 		return {
 			...entries,
-			[ 'blocks/' + blockName ]: scriptPath,
+			['blocks/' + blockName]: scriptPath,
 		};
-	}, {} );
+	}, {});
 };
 
 module.exports = {
@@ -55,12 +55,12 @@ module.exports = {
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/block-library/[name]/view.min.js',
-		path: join( __dirname, '..', '..' ),
+		path: join(__dirname, '..', '..'),
 	},
 	plugins: [
 		...plugins,
-		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
-		new CopyWebpackPlugin( {
+		new DependencyExtractionWebpackPlugin({ injectPolyfill: false }),
+		new CopyWebpackPlugin({
 			patterns: [].concat(
 				[
 					'style',
@@ -69,14 +69,14 @@ module.exports = {
 					'editor-rtl',
 					'theme',
 					'theme-rtl',
-				].map( ( filename ) => ( {
-					from: `./packages/block-library/build-style/*/${ filename }.css`,
-					to( { absoluteFilename } ) {
-						const [ , dirname ] = absoluteFilename.match(
+				].map((filename) => ({
+					from: `./packages/block-library/build-style/*/${filename}.css`,
+					to({ absoluteFilename }) {
+						const [, dirname] = absoluteFilename.match(
 							new RegExp(
-								`([\\w-]+)${ escapeRegExp(
+								`([\\w-]+)${escapeRegExp(
 									sep
-								) }${ filename }\\.css$`
+								)}${filename}\\.css$`
 							)
 						);
 
@@ -87,48 +87,44 @@ module.exports = {
 						);
 					},
 					transform: stylesTransform,
-				} ) ),
-				Object.entries( {
+				})),
+				Object.entries({
 					'./packages/block-library/src/':
 						'build/block-library/blocks/',
 					'./packages/edit-widgets/src/blocks/':
 						'build/edit-widgets/blocks/',
 					'./packages/widgets/src/blocks/': 'build/widgets/blocks/',
-				} ).flatMap( ( [ from, to ] ) => [
+				}).flatMap(([from, to]) => [
 					{
-						from: `${ from }/**/index.php`,
-						to( { absoluteFilename } ) {
-							const [ , dirname ] = absoluteFilename.match(
+						from: `${from}/**/index.php`,
+						to({ absoluteFilename }) {
+							const [, dirname] = absoluteFilename.match(
 								new RegExp(
-									`([\\w-]+)${ escapeRegExp(
-										sep
-									) }index\\.php$`
+									`([\\w-]+)${escapeRegExp(sep)}index\\.php$`
 								)
 							);
 
-							return join( to, `${ dirname }.php` );
+							return join(to, `${dirname}.php`);
 						},
-						transform: ( content ) => {
+						transform: (content) => {
 							content = content.toString();
 
 							// Within content, search for any function definitions. For
 							// each, replace every other reference to it in the file.
 							return (
 								Array.from(
-									content.matchAll(
-										/^\s*function ([^\(]+)/gm
-									)
+									content.matchAll(/^\s*function ([^\(]+)/gm)
 								)
-									.reduce( ( result, [ , functionName ] ) => {
+									.reduce((result, [, functionName]) => {
 										// Prepend the Gutenberg prefix, substituting any
 										// other core prefix (e.g. "wp_").
 										return result.replace(
-											new RegExp( functionName, 'g' ),
-											( match ) =>
+											new RegExp(functionName, 'g'),
+											(match) =>
 												'gutenberg_' +
-												match.replace( /^wp_/, '' )
+												match.replace(/^wp_/, '')
 										);
-									}, content )
+									}, content)
 									// The core blocks override procedure takes place in
 									// the init action default priority to ensure that core
 									// blocks would have been registered already. Since the
@@ -146,21 +142,19 @@ module.exports = {
 						noErrorOnMissing: true,
 					},
 					{
-						from: `${ from }/*/block.json`,
-						to( { absoluteFilename } ) {
-							const [ , dirname ] = absoluteFilename.match(
+						from: `${from}/*/block.json`,
+						to({ absoluteFilename }) {
+							const [, dirname] = absoluteFilename.match(
 								new RegExp(
-									`([\\w-]+)${ escapeRegExp(
-										sep
-									) }block\\.json$`
+									`([\\w-]+)${escapeRegExp(sep)}block\\.json$`
 								)
 							);
 
-							return join( to, dirname, 'block.json' );
+							return join(to, dirname, 'block.json');
 						},
 					},
-				] )
+				])
 			),
-		} ),
-	].filter( Boolean ),
+		}),
+	].filter(Boolean),
 };

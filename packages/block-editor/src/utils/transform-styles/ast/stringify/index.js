@@ -20,13 +20,13 @@ import Identity from './identity';
  * @return {string}
  */
 
-export default function ( node, options ) {
+export default function (node, options) {
 	options = options || {};
 
 	const compiler = options.compress
-		? new Compressed( options )
-		: new Identity( options );
+		? new Compressed(options)
+		: new Identity(options);
 
-	const code = compiler.compile( node );
+	const code = compiler.compile(node);
 	return code;
 }

@@ -12,12 +12,12 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  *
  * @param { { onResize?: () => any } } onResize
  */
-export function useFlyoutResizeUpdater( { onResize } ) {
-	const [ resizeListener, sizes ] = useResizeAware();
+export function useFlyoutResizeUpdater({ onResize }) {
+	const [resizeListener, sizes] = useResizeAware();
 
-	useIsomorphicLayoutEffect( () => {
+	useIsomorphicLayoutEffect(() => {
 		onResize?.();
-	}, [ sizes.width, sizes.height ] );
+	}, [sizes.width, sizes.height]);
 
 	return resizeListener;
 }

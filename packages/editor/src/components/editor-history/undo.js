@@ -13,28 +13,28 @@ import { forwardRef } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
-function EditorHistoryUndo( props, ref ) {
+function EditorHistoryUndo(props, ref) {
 	const hasUndo = useSelect(
-		( select ) => select( editorStore ).hasEditorUndo(),
+		(select) => select(editorStore).hasEditorUndo(),
 		[]
 	);
-	const { undo } = useDispatch( editorStore );
+	const { undo } = useDispatch(editorStore);
 	return (
 		<Button
-			{ ...props }
-			ref={ ref }
-			icon={ ! isRTL() ? undoIcon : redoIcon }
+			{...props}
+			ref={ref}
+			icon={!isRTL() ? undoIcon : redoIcon}
 			/* translators: button label text should, if possible, be under 16 characters. */
-			label={ __( 'Undo' ) }
-			shortcut={ displayShortcut.primary( 'z' ) }
+			label={__('Undo')}
+			shortcut={displayShortcut.primary('z')}
 			// If there are no undo levels we don't want to actually disable this
 			// button, because it will remove focus for keyboard users.
 			// See: https://github.com/WordPress/gutenberg/issues/3486
-			aria-disabled={ ! hasUndo }
-			onClick={ hasUndo ? undo : undefined }
+			aria-disabled={!hasUndo}
+			onClick={hasUndo ? undo : undefined}
 			className="editor-history__undo"
 		/>
 	);
 }
 
-export default forwardRef( EditorHistoryUndo );
+export default forwardRef(EditorHistoryUndo);

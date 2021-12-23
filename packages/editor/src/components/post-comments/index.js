@@ -11,30 +11,29 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
-function PostComments( { commentStatus = 'open', ...props } ) {
+function PostComments({ commentStatus = 'open', ...props }) {
 	const onToggleComments = () =>
-		props.editPost( {
+		props.editPost({
 			comment_status: commentStatus === 'open' ? 'closed' : 'open',
-		} );
+		});
 
 	return (
 		<CheckboxControl
-			label={ __( 'Allow comments' ) }
-			checked={ commentStatus === 'open' }
-			onChange={ onToggleComments }
+			label={__('Allow comments')}
+			checked={commentStatus === 'open'}
+			onChange={onToggleComments}
 		/>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		return {
-			commentStatus: select( editorStore ).getEditedPostAttribute(
-				'comment_status'
-			),
+			commentStatus:
+				select(editorStore).getEditedPostAttribute('comment_status'),
 		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( editorStore ).editPost,
-	} ) ),
-] )( PostComments );
+	}),
+	withDispatch((dispatch) => ({
+		editPost: dispatch(editorStore).editPost,
+	})),
+])(PostComments);

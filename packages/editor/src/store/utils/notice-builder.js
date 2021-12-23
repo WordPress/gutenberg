@@ -21,48 +21,48 @@ import { get, includes } from 'lodash';
  * @return {Array} Arguments for dispatch. An empty array signals no
  *                 notification should be sent.
  */
-export function getNotificationArgumentsForSaveSuccess( data ) {
+export function getNotificationArgumentsForSaveSuccess(data) {
 	const { previousPost, post, postType } = data;
 	// Autosaves are neither shown a notice nor redirected.
-	if ( get( data.options, [ 'isAutosave' ] ) ) {
+	if (get(data.options, ['isAutosave'])) {
 		return [];
 	}
 
-	const publishStatus = [ 'publish', 'private', 'future' ];
-	const isPublished = includes( publishStatus, previousPost.status );
-	const willPublish = includes( publishStatus, post.status );
+	const publishStatus = ['publish', 'private', 'future'];
+	const isPublished = includes(publishStatus, previousPost.status);
+	const willPublish = includes(publishStatus, post.status);
 
 	let noticeMessage;
-	let shouldShowLink = get( postType, [ 'viewable' ], false );
+	let shouldShowLink = get(postType, ['viewable'], false);
 
 	// Always should a notice, which will be spoken for accessibility.
-	if ( ! isPublished && ! willPublish ) {
+	if (!isPublished && !willPublish) {
 		// If saving a non-published post, don't show notice.
-		noticeMessage = __( 'Saved' );
+		noticeMessage = __('Saved');
 		shouldShowLink = false;
-	} else if ( isPublished && ! willPublish ) {
+	} else if (isPublished && !willPublish) {
 		// If undoing publish status, show specific notice
 		noticeMessage = postType.labels.item_reverted_to_draft;
 		shouldShowLink = false;
-	} else if ( ! isPublished && willPublish ) {
+	} else if (!isPublished && willPublish) {
 		// If publishing or scheduling a post, show the corresponding
 		// publish message
 		noticeMessage = {
 			publish: postType.labels.item_published,
 			private: postType.labels.item_published_privately,
 			future: postType.labels.item_scheduled,
-		}[ post.status ];
+		}[post.status];
 	} else {
 		// Generic fallback notice
 		noticeMessage = postType.labels.item_updated;
 	}
 
 	const actions = [];
-	if ( shouldShowLink ) {
-		actions.push( {
+	if (shouldShowLink) {
+		actions.push({
 			label: postType.labels.view_item,
 			url: post.link,
-		} );
+		});
 	}
 	return [
 		noticeMessage,
@@ -82,32 +82,32 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
  * @return {Array} Arguments for dispatch. An empty array signals no
  *                 notification should be sent.
  */
-export function getNotificationArgumentsForSaveFail( data ) {
+export function getNotificationArgumentsForSaveFail(data) {
 	const { post, edits, error } = data;
-	if ( error && 'rest_autosave_no_changes' === error.code ) {
+	if (error && 'rest_autosave_no_changes' === error.code) {
 		// Autosave requested a new autosave, but there were no changes. This shouldn't
 		// result in an error notice for the user.
 		return [];
 	}
 
-	const publishStatus = [ 'publish', 'private', 'future' ];
-	const isPublished = publishStatus.indexOf( post.status ) !== -1;
+	const publishStatus = ['publish', 'private', 'future'];
+	const isPublished = publishStatus.indexOf(post.status) !== -1;
 	// If the post was being published, we show the corresponding publish error message
 	// Unless we publish an "updating failed" message
 	const messages = {
-		publish: __( 'Publishing failed.' ),
-		private: __( 'Publishing failed.' ),
-		future: __( 'Scheduling failed.' ),
+		publish: __('Publishing failed.'),
+		private: __('Publishing failed.'),
+		future: __('Scheduling failed.'),
 	};
 	let noticeMessage =
-		! isPublished && publishStatus.indexOf( edits.status ) !== -1
-			? messages[ edits.status ]
-			: __( 'Updating failed.' );
+		!isPublished && publishStatus.indexOf(edits.status) !== -1
+			? messages[edits.status]
+			: __('Updating failed.');
 
 	// Check if message string contains HTML. Notice text is currently only
 	// supported as plaintext, and stripping the tags may muddle the meaning.
-	if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
-		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
+	if (error.message && !/<\/?[^>]*>/.test(error.message)) {
+		noticeMessage = [noticeMessage, error.message].join(' ');
 	}
 	return [
 		noticeMessage,
@@ -124,11 +124,11 @@ export function getNotificationArgumentsForSaveFail( data ) {
  *
  * @return {Array} Arguments for dispatch.
  */
-export function getNotificationArgumentsForTrashFail( data ) {
+export function getNotificationArgumentsForTrashFail(data) {
 	return [
 		data.error.message && data.error.code !== 'unknown_error'
 			? data.error.message
-			: __( 'Trashing failed' ),
+			: __('Trashing failed'),
 		{
 			id: TRASH_POST_NOTICE_ID,
 		},

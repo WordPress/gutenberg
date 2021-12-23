@@ -9,10 +9,10 @@ import useText from './hook';
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
  * @param {import('react').Ref<any>}                                                         forwardedRef
  */
-function Text( props, forwardedRef ) {
-	const textProps = useText( props );
+function Text(props, forwardedRef) {
+	const textProps = useText(props);
 
-	return <View as="span" { ...textProps } ref={ forwardedRef } />;
+	return <View as="span" {...textProps} ref={forwardedRef} />;
 }
 
 /**
@@ -31,6 +31,6 @@ function Text( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedText = contextConnect( Text, 'Text' );
+const ConnectedText = contextConnect(Text, 'Text');
 
 export default ConnectedText;

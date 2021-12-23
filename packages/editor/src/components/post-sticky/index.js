@@ -12,31 +12,29 @@ import { compose } from '@wordpress/compose';
 import PostStickyCheck from './check';
 import { store as editorStore } from '../../store';
 
-export function PostSticky( { onUpdateSticky, postSticky = false } ) {
+export function PostSticky({ onUpdateSticky, postSticky = false }) {
 	return (
 		<PostStickyCheck>
 			<CheckboxControl
-				label={ __( 'Stick to the top of the blog' ) }
-				checked={ postSticky }
-				onChange={ () => onUpdateSticky( ! postSticky ) }
+				label={__('Stick to the top of the blog')}
+				checked={postSticky}
+				onChange={() => onUpdateSticky(!postSticky)}
 			/>
 		</PostStickyCheck>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		return {
-			postSticky: select( editorStore ).getEditedPostAttribute(
-				'sticky'
-			),
+			postSticky: select(editorStore).getEditedPostAttribute('sticky'),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
+	}),
+	withDispatch((dispatch) => {
 		return {
-			onUpdateSticky( postSticky ) {
-				dispatch( editorStore ).editPost( { sticky: postSticky } );
+			onUpdateSticky(postSticky) {
+				dispatch(editorStore).editPost({ sticky: postSticky });
 			},
 		};
-	} ),
-] )( PostSticky );
+	}),
+])(PostSticky);

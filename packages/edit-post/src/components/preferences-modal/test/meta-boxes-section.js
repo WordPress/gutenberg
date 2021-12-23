@@ -8,59 +8,59 @@ import { shallow } from 'enzyme';
  */
 import { MetaBoxesSection } from '../meta-boxes-section';
 
-describe( 'MetaBoxesSection', () => {
-	it( 'does not render if there are no options', () => {
+describe('MetaBoxesSection', () => {
+	it('does not render if there are no options', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
-				areCustomFieldsRegistered={ false }
-				metaBoxes={ [
+				areCustomFieldsRegistered={false}
+				metaBoxes={[
 					{ id: 'postcustom', title: 'This should not render' },
-				] }
+				]}
 			/>
 		);
-		expect( wrapper.isEmptyRender() ).toBe( true );
-	} );
+		expect(wrapper.isEmptyRender()).toBe(true);
+	});
 
-	it( 'renders a Custom Fields option', () => {
+	it('renders a Custom Fields option', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
 				title="Advanced panels"
 				areCustomFieldsRegistered
-				metaBoxes={ [
+				metaBoxes={[
 					{ id: 'postcustom', title: 'This should not render' },
-				] }
+				]}
 			/>
 		);
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	it( 'renders meta box options', () => {
+	it('renders meta box options', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
 				title="Advanced panels"
-				areCustomFieldsRegistered={ false }
-				metaBoxes={ [
+				areCustomFieldsRegistered={false}
+				metaBoxes={[
 					{ id: 'postcustom', title: 'This should not render' },
 					{ id: 'test1', title: 'Meta Box 1' },
 					{ id: 'test2', title: 'Meta Box 2' },
-				] }
+				]}
 			/>
 		);
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	it( 'renders a Custom Fields option and meta box options', () => {
+	it('renders a Custom Fields option and meta box options', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
 				title="Advanced panels"
 				areCustomFieldsRegistered
-				metaBoxes={ [
+				metaBoxes={[
 					{ id: 'postcustom', title: 'This should not render' },
 					{ id: 'test1', title: 'Meta Box 1' },
 					{ id: 'test2', title: 'Meta Box 2' },
-				] }
+				]}
 			/>
 		);
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
+		expect(wrapper).toMatchSnapshot();
+	});
+});

@@ -18,68 +18,64 @@ import { chevronDown } from '@wordpress/icons';
 import { __experimentalGetMatchingVariation as getMatchingVariation } from '../../utils';
 import { store as blockEditorStore } from '../../store';
 
-function __experimentalBlockVariationTransforms( { blockClientId } ) {
-	const [ selectedValue, setSelectedValue ] = useState();
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+function __experimentalBlockVariationTransforms({ blockClientId }) {
+	const [selectedValue, setSelectedValue] = useState();
+	const { updateBlockAttributes } = useDispatch(blockEditorStore);
 	const { variations, blockAttributes } = useSelect(
-		( select ) => {
-			const { getBlockVariations } = select( blocksStore );
-			const { getBlockName, getBlockAttributes } = select(
-				blockEditorStore
-			);
-			const blockName = blockClientId && getBlockName( blockClientId );
+		(select) => {
+			const { getBlockVariations } = select(blocksStore);
+			const { getBlockName, getBlockAttributes } =
+				select(blockEditorStore);
+			const blockName = blockClientId && getBlockName(blockClientId);
 			return {
 				variations:
-					blockName && getBlockVariations( blockName, 'transform' ),
-				blockAttributes: getBlockAttributes( blockClientId ),
+					blockName && getBlockVariations(blockName, 'transform'),
+				blockAttributes: getBlockAttributes(blockClientId),
 			};
 		},
-		[ blockClientId ]
+		[blockClientId]
 	);
-	useEffect( () => {
+	useEffect(() => {
 		setSelectedValue(
-			getMatchingVariation( blockAttributes, variations )?.name
+			getMatchingVariation(blockAttributes, variations)?.name
 		);
-	}, [ blockAttributes, variations ] );
-	if ( ! variations?.length ) return null;
+	}, [blockAttributes, variations]);
+	if (!variations?.length) return null;
 
-	const selectOptions = variations.map(
-		( { name, title, description } ) => ( {
-			value: name,
-			label: title,
-			info: description,
-		} )
-	);
-	const onSelectVariation = ( variationName ) => {
-		updateBlockAttributes( blockClientId, {
-			...variations.find( ( { name } ) => name === variationName )
-				.attributes,
-		} );
+	const selectOptions = variations.map(({ name, title, description }) => ({
+		value: name,
+		label: title,
+		info: description,
+	}));
+	const onSelectVariation = (variationName) => {
+		updateBlockAttributes(blockClientId, {
+			...variations.find(({ name }) => name === variationName).attributes,
+		});
 	};
 	const baseClass = 'block-editor-block-variation-transforms';
 	return (
 		<DropdownMenu
-			className={ baseClass }
-			label={ __( 'Transform to variation' ) }
-			text={ __( 'Transform to variation' ) }
-			popoverProps={ {
+			className={baseClass}
+			label={__('Transform to variation')}
+			text={__('Transform to variation')}
+			popoverProps={{
 				position: 'bottom center',
-				className: `${ baseClass }__popover`,
-			} }
-			icon={ chevronDown }
-			toggleProps={ { iconPosition: 'right' } }
+				className: `${baseClass}__popover`,
+			}}
+			icon={chevronDown}
+			toggleProps={{ iconPosition: 'right' }}
 		>
-			{ () => (
-				<div className={ `${ baseClass }__container` }>
+			{() => (
+				<div className={`${baseClass}__container`}>
 					<MenuGroup>
 						<MenuItemsChoice
-							choices={ selectOptions }
-							value={ selectedValue }
-							onSelect={ onSelectVariation }
+							choices={selectOptions}
+							value={selectedValue}
+							onSelect={onSelectVariation}
 						/>
 					</MenuGroup>
 				</div>
-			) }
+			)}
 		</DropdownMenu>
 	);
 }

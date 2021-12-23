@@ -8,14 +8,14 @@ import { BlurView } from '@react-native-community/blur';
  */
 import styles from './style.scss';
 
-const BackgroundView = ( { children } ) => {
+const BackgroundView = ({ children }) => {
 	return (
 		<BlurView
-			style={ styles[ 'components-autocomplete__background-blur' ] }
+			style={styles['components-autocomplete__background-blur']}
 			blurType="prominent"
-			blurAmount={ 10 }
+			blurAmount={10}
 		>
-			{ children }
+			{children}
 		</BlurView>
 	);
 };

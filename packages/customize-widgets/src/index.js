@@ -43,61 +43,61 @@ const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
  * @param {string} editorName          The editor name.
  * @param {Object} blockEditorSettings Block editor settings.
  */
-export function initialize( editorName, blockEditorSettings ) {
-	dispatch( interfaceStore ).setFeatureDefaults( 'core/customize-widgets', {
+export function initialize(editorName, blockEditorSettings) {
+	dispatch(interfaceStore).setFeatureDefaults('core/customize-widgets', {
 		fixedToolbar: false,
 		welcomeGuide: true,
-	} );
+	});
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
-	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
-		return ! (
-			DISABLED_BLOCKS.includes( block.name ) ||
-			block.name.startsWith( 'core/post' ) ||
-			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' ) ||
-			block.name.startsWith( 'core/navigation' )
+	dispatch(blocksStore).__experimentalReapplyBlockTypeFilters();
+	const coreBlocks = __experimentalGetCoreBlocks().filter((block) => {
+		return !(
+			DISABLED_BLOCKS.includes(block.name) ||
+			block.name.startsWith('core/post') ||
+			block.name.startsWith('core/query') ||
+			block.name.startsWith('core/site') ||
+			block.name.startsWith('core/navigation')
 		);
-	} );
-	registerCoreBlocks( coreBlocks );
+	});
+	registerCoreBlocks(coreBlocks);
 	registerLegacyWidgetBlock();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
+	if (process.env.GUTENBERG_PHASE === 2) {
+		__experimentalRegisterExperimentalCoreBlocks({
 			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
-		} );
+		});
 	}
-	registerLegacyWidgetVariations( blockEditorSettings );
+	registerLegacyWidgetVariations(blockEditorSettings);
 	registerWidgetGroupBlock();
 
 	// As we are unregistering `core/freeform` to avoid the Classic block, we must
 	// replace it with something as the default freeform content handler. Failure to
 	// do this will result in errors in the default block parser.
 	// see: https://github.com/WordPress/gutenberg/issues/33097
-	setFreeformContentHandlerName( 'core/html' );
+	setFreeformContentHandlerName('core/html');
 
-	const SidebarControl = getSidebarControl( blockEditorSettings );
+	const SidebarControl = getSidebarControl(blockEditorSettings);
 
 	wp.customize.sectionConstructor.sidebar = getSidebarSection();
 	wp.customize.controlConstructor.sidebar_block_editor = SidebarControl;
 
-	const container = document.createElement( 'div' );
-	document.body.appendChild( container );
+	const container = document.createElement('div');
+	document.body.appendChild(container);
 
-	wp.customize.bind( 'ready', () => {
+	wp.customize.bind('ready', () => {
 		const sidebarControls = [];
-		wp.customize.control.each( ( control ) => {
-			if ( control instanceof SidebarControl ) {
-				sidebarControls.push( control );
+		wp.customize.control.each((control) => {
+			if (control instanceof SidebarControl) {
+				sidebarControls.push(control);
 			}
-		} );
+		});
 
 		render(
 			<CustomizeWidgets
-				api={ wp.customize }
-				sidebarControls={ sidebarControls }
-				blockEditorSettings={ blockEditorSettings }
+				api={wp.customize}
+				sidebarControls={sidebarControls}
+				blockEditorSettings={blockEditorSettings}
 			/>,
 			container
 		);
-	} );
+	});
 }

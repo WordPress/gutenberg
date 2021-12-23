@@ -21,7 +21,7 @@ import { TooltipShortcut } from './styles';
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                     forwardedRef
  */
-function Tooltip( props, forwardedRef ) {
+function Tooltip(props, forwardedRef) {
 	const {
 		animated = true,
 		animationDuration = 160,
@@ -36,47 +36,47 @@ function Tooltip( props, forwardedRef ) {
 		visible = false,
 		shortcut,
 		...otherProps
-	} = useContextSystem( props, 'Tooltip' );
+	} = useContextSystem(props, 'Tooltip');
 
-	const tooltip = useTooltipState( {
+	const tooltip = useTooltipState({
 		animated: animated ? animationDuration : undefined,
 		baseId: baseId || id,
 		gutter,
 		placement,
 		visible,
 		...otherProps,
-	} );
+	});
 
 	const contextProps = useMemo(
-		() => ( {
+		() => ({
 			tooltip,
-		} ),
-		[ tooltip ]
+		}),
+		[tooltip]
 	);
 
 	return (
-		<TooltipContext.Provider value={ contextProps }>
-			{ content && (
-				<TooltipContent unstable_portal={ modal } ref={ forwardedRef }>
-					{ content }
-					{ shortcut && <TooltipShortcut shortcut={ shortcut } /> }
+		<TooltipContext.Provider value={contextProps}>
+			{content && (
+				<TooltipContent unstable_portal={modal} ref={forwardedRef}>
+					{content}
+					{shortcut && <TooltipShortcut shortcut={shortcut} />}
 				</TooltipContent>
-			) }
-			{ children && (
+			)}
+			{children && (
 				<TooltipReference
-					{ ...tooltip }
-					{ ...children.props }
+					{...tooltip}
+					{...children.props}
 					// @ts-ignore If ref doesn't exist that's fine with us, it'll just be undefined, but it can exist on ReactElement and there's no reason to try to scope this (it'll just overcomplicate things)
-					ref={ children?.ref }
+					ref={children?.ref}
 				>
-					{ ( referenceProps ) => {
-						if ( ! focusable ) {
+					{(referenceProps) => {
+						if (!focusable) {
 							referenceProps.tabIndex = undefined;
 						}
-						return cloneElement( children, referenceProps );
-					} }
+						return cloneElement(children, referenceProps);
+					}}
 				</TooltipReference>
-			) }
+			)}
 		</TooltipContext.Provider>
 	);
 }
@@ -97,6 +97,6 @@ function Tooltip( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedTooltip = contextConnect( Tooltip, 'Tooltip' );
+const ConnectedTooltip = contextConnect(Tooltip, 'Tooltip');
 
 export default ConnectedTooltip;

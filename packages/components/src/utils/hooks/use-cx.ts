@@ -12,10 +12,10 @@ import { cx as innerCx, ClassNamesArg } from '@emotion/css';
  */
 import { useCallback } from '@wordpress/element';
 
-const isSerializedStyles = ( o: any ): o is SerializedStyles =>
+const isSerializedStyles = (o: any): o is SerializedStyles =>
 	typeof o !== 'undefined' &&
 	o !== null &&
-	[ 'name', 'styles' ].every( ( p ) => typeof o[ p ] !== 'undefined' );
+	['name', 'styles'].every((p) => typeof o[p] !== 'undefined');
 
 /**
  * Retrieve a `cx` function that knows how to handle `SerializedStyles`
@@ -42,24 +42,24 @@ export const useCx = () => {
 	const cache = useEmotionCache();
 
 	const cx = useCallback(
-		( ...classNames: ( ClassNamesArg | SerializedStyles )[] ) => {
-			if ( cache === null ) {
+		(...classNames: (ClassNamesArg | SerializedStyles)[]) => {
+			if (cache === null) {
 				throw new Error(
 					'The `useCx` hook should be only used within a valid Emotion Cache Context'
 				);
 			}
 
 			return innerCx(
-				...classNames.map( ( arg ) => {
-					if ( isSerializedStyles( arg ) ) {
-						insertStyles( cache, arg, false );
-						return `${ cache.key }-${ arg.name }`;
+				...classNames.map((arg) => {
+					if (isSerializedStyles(arg)) {
+						insertStyles(cache, arg, false);
+						return `${cache.key}-${arg.name}`;
 					}
 					return arg;
-				} )
+				})
 			);
 		},
-		[ cache ]
+		[cache]
 	);
 
 	return cx;

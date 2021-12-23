@@ -18,43 +18,43 @@ import { useReducedMotion } from '@wordpress/compose';
  */
 import { store as editSiteStore } from '../../../store';
 
-function NavigationToggle( { icon } ) {
+function NavigationToggle({ icon }) {
 	const { isNavigationOpen, isRequestingSiteIcon, siteIconUrl } = useSelect(
-		( select ) => {
-			const { getEntityRecord, isResolving } = select( coreDataStore );
+		(select) => {
+			const { getEntityRecord, isResolving } = select(coreDataStore);
 			const siteData =
-				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+				getEntityRecord('root', '__unstableBase', undefined) || {};
 
 			return {
-				isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
-				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+				isNavigationOpen: select(editSiteStore).isNavigationOpened(),
+				isRequestingSiteIcon: isResolving('core', 'getEntityRecord', [
 					'root',
 					'__unstableBase',
 					undefined,
-				] ),
+				]),
 				siteIconUrl: siteData.site_icon_url,
 			};
 		},
 		[]
 	);
-	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+	const { setIsNavigationPanelOpened } = useDispatch(editSiteStore);
 
 	const disableMotion = useReducedMotion();
 
 	const navigationToggleRef = useRef();
 
-	useEffect( () => {
+	useEffect(() => {
 		// TODO: Remove this effect when alternative solution is merged.
 		// See: https://github.com/WordPress/gutenberg/pull/37314
-		if ( ! isNavigationOpen ) {
+		if (!isNavigationOpen) {
 			navigationToggleRef.current.focus();
 		}
-	}, [ isNavigationOpen ] );
+	}, [isNavigationOpen]);
 
 	const toggleNavigationPanel = () =>
-		setIsNavigationPanelOpened( ! isNavigationOpen );
+		setIsNavigationPanelOpened(!isNavigationOpen);
 
-	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
+	let buttonIcon = <Icon size="36px" icon={wordpress} />;
 
 	const effect = {
 		expand: {
@@ -64,39 +64,39 @@ function NavigationToggle( { icon } ) {
 		},
 	};
 
-	if ( siteIconUrl ) {
+	if (siteIconUrl) {
 		buttonIcon = (
 			<motion.img
-				variants={ ! disableMotion && effect }
-				alt={ __( 'Site Icon' ) }
+				variants={!disableMotion && effect}
+				alt={__('Site Icon')}
 				className="edit-site-navigation-toggle__site-icon"
-				src={ siteIconUrl }
+				src={siteIconUrl}
 			/>
 		);
-	} else if ( isRequestingSiteIcon ) {
+	} else if (isRequestingSiteIcon) {
 		buttonIcon = null;
-	} else if ( icon ) {
-		buttonIcon = <Icon size="36px" icon={ icon } />;
+	} else if (icon) {
+		buttonIcon = <Icon size="36px" icon={icon} />;
 	}
 
 	return (
 		<motion.div
 			className={
 				'edit-site-navigation-toggle' +
-				( isNavigationOpen ? ' is-open' : '' )
+				(isNavigationOpen ? ' is-open' : '')
 			}
 			whileHover="expand"
 		>
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
-				label={ __( 'Toggle navigation' ) }
-				ref={ navigationToggleRef }
+				label={__('Toggle navigation')}
+				ref={navigationToggleRef}
 				// isPressed will add unwanted styles.
-				aria-pressed={ isNavigationOpen }
-				onClick={ toggleNavigationPanel }
+				aria-pressed={isNavigationOpen}
+				onClick={toggleNavigationPanel}
 				showTooltip
 			>
-				{ buttonIcon }
+				{buttonIcon}
 			</Button>
 		</motion.div>
 	);

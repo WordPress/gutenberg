@@ -24,44 +24,44 @@ const EASE_IN_DURATION = 250;
 const EASE_OUT_DURATION = 80;
 const TRANSLATION_RANGE = 8;
 
-const FloatingToolbar = ( {
+const FloatingToolbar = ({
 	selectedClientId,
 	parentId,
 	showFloatingToolbar,
 	onNavigateUp,
 	isRTL,
-} ) => {
-	const opacity = useRef( new Animated.Value( 0 ) ).current;
+}) => {
+	const opacity = useRef(new Animated.Value(0)).current;
 	// Sustain old selection for proper block selection button rendering when exit animation is ongoing.
-	const [ previousSelection, setPreviousSelection ] = useState( {} );
+	const [previousSelection, setPreviousSelection] = useState({});
 
-	useEffect( () => {
-		Animated.timing( opacity, {
+	useEffect(() => {
+		Animated.timing(opacity, {
 			toValue: showFloatingToolbar ? 1 : 0,
 			duration: showFloatingToolbar
 				? EASE_IN_DURATION
 				: EASE_OUT_DURATION,
 			easing: Easing.ease,
 			useNativeDriver: true,
-		} ).start();
-	}, [ showFloatingToolbar ] );
+		}).start();
+	}, [showFloatingToolbar]);
 
-	useEffect( () => {
-		if ( showFloatingToolbar )
-			setPreviousSelection( { clientId: selectedClientId, parentId } );
-	}, [ selectedClientId ] );
+	useEffect(() => {
+		if (showFloatingToolbar)
+			setPreviousSelection({ clientId: selectedClientId, parentId });
+	}, [selectedClientId]);
 
 	const translationRange =
-		( Platform.OS === 'android' ? -1 : 1 ) * TRANSLATION_RANGE;
+		(Platform.OS === 'android' ? -1 : 1) * TRANSLATION_RANGE;
 
-	const translation = opacity.interpolate( {
-		inputRange: [ 0, 1 ],
-		outputRange: [ translationRange, 0 ],
-	} );
+	const translation = opacity.interpolate({
+		inputRange: [0, 1],
+		outputRange: [translationRange, 0],
+	});
 
 	const animationStyle = {
 		opacity,
-		transform: [ { translateY: translation } ],
+		transform: [{ translateY: translation }],
 	};
 
 	const {
@@ -69,70 +69,67 @@ const FloatingToolbar = ( {
 		parentId: previousSelectedParentId,
 	} = previousSelection;
 
-	const showPrevious = previousSelectedClientId && ! showFloatingToolbar;
+	const showPrevious = previousSelectedClientId && !showFloatingToolbar;
 	const blockSelectionButtonClientId = showPrevious
 		? previousSelectedClientId
 		: selectedClientId;
 	const showNavUpButton =
-		!! parentId || ( showPrevious && !! previousSelectedParentId );
+		!!parentId || (showPrevious && !!previousSelectedParentId);
 
 	return (
-		!! opacity && (
+		!!opacity && (
 			<Animated.View
-				style={ [ styles.floatingToolbar, animationStyle ] }
-				pointerEvents={ showFloatingToolbar ? 'auto' : 'none' }
+				style={[styles.floatingToolbar, animationStyle]}
+				pointerEvents={showFloatingToolbar ? 'auto' : 'none'}
 			>
-				{ showNavUpButton && (
-					<ToolbarGroup passedStyle={ styles.toolbar }>
+				{showNavUpButton && (
+					<ToolbarGroup passedStyle={styles.toolbar}>
 						<ToolbarButton
-							title={ __( 'Navigate Up' ) }
+							title={__('Navigate Up')}
 							onClick={
-								! showPrevious &&
-								( () => onNavigateUp( parentId ) )
+								!showPrevious && (() => onNavigateUp(parentId))
 							}
-							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
+							icon={<NavigateUpSVG isRTL={isRTL} />}
 						/>
-						<View style={ styles.pipe } />
+						<View style={styles.pipe} />
 					</ToolbarGroup>
-				) }
-				<BlockSelectionButton
-					clientId={ blockSelectionButtonClientId }
-				/>
+				)}
+				<BlockSelectionButton clientId={blockSelectionButtonClientId} />
 			</Animated.View>
 		)
 	);
 };
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		const {
 			getSelectedBlockClientId,
 			getBlockHierarchyRootClientId,
 			getBlockRootClientId,
 			getBlockCount,
 			getSettings,
-		} = select( blockEditorStore );
+		} = select(blockEditorStore);
 
 		const selectedClientId = getSelectedBlockClientId();
 
-		if ( ! selectedClientId ) return;
+		if (!selectedClientId) return;
 
-		const rootBlockId = getBlockHierarchyRootClientId( selectedClientId );
+		const rootBlockId = getBlockHierarchyRootClientId(selectedClientId);
 
 		return {
 			selectedClientId,
-			showFloatingToolbar: !! getBlockCount( rootBlockId ),
-			parentId: getBlockRootClientId( selectedClientId ),
+			showFloatingToolbar: !!getBlockCount(rootBlockId),
+			parentId: getBlockRootClientId(selectedClientId),
 			isRTL: getSettings().isRTL,
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { selectBlock } = dispatch( blockEditorStore );
+	}),
+	withDispatch((dispatch) => {
+		const { selectBlock } = dispatch(blockEditorStore);
 
 		return {
-			onNavigateUp( clientId, initialPosition ) {
-				selectBlock( clientId, initialPosition );
+			onNavigateUp(clientId, initialPosition) {
+				selectBlock(clientId, initialPosition);
 			},
 		};
-	} ),
-] )( FloatingToolbar );
+	}),
+])(FloatingToolbar);

@@ -14,8 +14,8 @@ class MetaBoxVisibility extends Component {
 		this.updateDOM();
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.isVisible !== prevProps.isVisible ) {
+	componentDidUpdate(prevProps) {
+		if (this.props.isVisible !== prevProps.isVisible) {
 			this.updateDOM();
 		}
 	}
@@ -23,15 +23,15 @@ class MetaBoxVisibility extends Component {
 	updateDOM() {
 		const { id, isVisible } = this.props;
 
-		const element = document.getElementById( id );
-		if ( ! element ) {
+		const element = document.getElementById(id);
+		if (!element) {
 			return;
 		}
 
-		if ( isVisible ) {
-			element.classList.remove( 'is-hidden' );
+		if (isVisible) {
+			element.classList.remove('is-hidden');
 		} else {
-			element.classList.add( 'is-hidden' );
+			element.classList.add('is-hidden');
 		}
 	}
 
@@ -40,8 +40,6 @@ class MetaBoxVisibility extends Component {
 	}
 }
 
-export default withSelect( ( select, { id } ) => ( {
-	isVisible: select( editPostStore ).isEditorPanelEnabled(
-		`meta-box-${ id }`
-	),
-} ) )( MetaBoxVisibility );
+export default withSelect((select, { id }) => ({
+	isVisible: select(editPostStore).isEditorPanelEnabled(`meta-box-${id}`),
+}))(MetaBoxVisibility);

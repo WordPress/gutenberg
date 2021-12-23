@@ -6,6 +6,6 @@
  *
  * @return {boolean} Is the attribute raw
  */
-export default function isRawAttribute( entity, attribute ) {
-	return ( entity.rawAttributes || [] ).includes( attribute );
+export default function isRawAttribute(entity, attribute) {
+	return (entity.rawAttributes || []).includes(attribute);
 }

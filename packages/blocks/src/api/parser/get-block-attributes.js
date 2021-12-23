@@ -26,8 +26,8 @@ import { normalizeBlockType } from '../utils';
  *
  * @return {Function} Enhanced hpq matcher.
  */
-export const toBooleanAttributeMatcher = ( matcher ) =>
-	flow( [
+export const toBooleanAttributeMatcher = (matcher) =>
+	flow([
 		matcher,
 		// Expected values from `attr( 'disabled' )`:
 		//
@@ -42,8 +42,8 @@ export const toBooleanAttributeMatcher = ( matcher ) =>
 		// <input disabled="disabled">
 		// - Value:       `'disabled'`
 		// - Transformed: `true`
-		( value ) => value !== undefined,
-	] );
+		(value) => value !== undefined,
+	]);
 
 /**
  * Returns true if value is of the given JSON schema type, or false otherwise.
@@ -55,8 +55,8 @@ export const toBooleanAttributeMatcher = ( matcher ) =>
  *
  * @return {boolean} Whether value is of type.
  */
-export function isOfType( value, type ) {
-	switch ( type ) {
+export function isOfType(value, type) {
+	switch (type) {
 		case 'string':
 			return typeof value === 'string';
 
@@ -64,13 +64,13 @@ export function isOfType( value, type ) {
 			return typeof value === 'boolean';
 
 		case 'object':
-			return !! value && value.constructor === Object;
+			return !!value && value.constructor === Object;
 
 		case 'null':
 			return value === null;
 
 		case 'array':
-			return Array.isArray( value );
+			return Array.isArray(value);
 
 		case 'integer':
 		case 'number':
@@ -91,8 +91,8 @@ export function isOfType( value, type ) {
  *
  * @return {boolean} Whether value is of types.
  */
-export function isOfTypes( value, types ) {
-	return types.some( ( type ) => isOfType( value, type ) );
+export function isOfTypes(value, types) {
+	return types.some((type) => isOfType(value, type));
 }
 
 /**
@@ -116,12 +116,12 @@ export function getBlockAttribute(
 	const { type, enum: enumSet } = attributeSchema;
 	let value;
 
-	switch ( attributeSchema.source ) {
+	switch (attributeSchema.source) {
 		// An undefined source means that it's an attribute serialized to the
 		// block's "comment".
 		case undefined:
 			value = commentAttributes
-				? commentAttributes[ attributeKey ]
+				? commentAttributes[attributeKey]
 				: undefined;
 			break;
 		case 'attribute':
@@ -132,17 +132,17 @@ export function getBlockAttribute(
 		case 'node':
 		case 'query':
 		case 'tag':
-			value = parseWithAttributeSchema( innerHTML, attributeSchema );
+			value = parseWithAttributeSchema(innerHTML, attributeSchema);
 			break;
 	}
 
-	if ( ! isValidByType( value, type ) || ! isValidByEnum( value, enumSet ) ) {
+	if (!isValidByType(value, type) || !isValidByEnum(value, enumSet)) {
 		// Reject the value if it is not valid. Reverting to the undefined
 		// value ensures the default is respected, if applicable.
 		value = undefined;
 	}
 
-	if ( value === undefined ) {
+	if (value === undefined) {
 		return attributeSchema.default;
 	}
 
@@ -160,8 +160,8 @@ export function getBlockAttribute(
  *
  * @return {boolean} Whether value is valid.
  */
-export function isValidByType( value, type ) {
-	return type === undefined || isOfTypes( value, castArray( type ) );
+export function isValidByType(value, type) {
+	return type === undefined || isOfTypes(value, castArray(type));
 }
 
 /**
@@ -175,8 +175,8 @@ export function isValidByType( value, type ) {
  *
  * @return {boolean} Whether value is valid.
  */
-export function isValidByEnum( value, enumSet ) {
-	return ! Array.isArray( enumSet ) || enumSet.includes( value );
+export function isValidByEnum(value, enumSet) {
+	return !Array.isArray(enumSet) || enumSet.includes(value);
 }
 
 /**
@@ -186,38 +186,37 @@ export function isValidByEnum( value, enumSet ) {
  *
  * @return {Function} A hpq Matcher.
  */
-export function matcherFromSource( sourceConfig ) {
-	switch ( sourceConfig.source ) {
+export function matcherFromSource(sourceConfig) {
+	switch (sourceConfig.source) {
 		case 'attribute':
-			let matcher = attr( sourceConfig.selector, sourceConfig.attribute );
-			if ( sourceConfig.type === 'boolean' ) {
-				matcher = toBooleanAttributeMatcher( matcher );
+			let matcher = attr(sourceConfig.selector, sourceConfig.attribute);
+			if (sourceConfig.type === 'boolean') {
+				matcher = toBooleanAttributeMatcher(matcher);
 			}
 
 			return matcher;
 		case 'html':
-			return html( sourceConfig.selector, sourceConfig.multiline );
+			return html(sourceConfig.selector, sourceConfig.multiline);
 		case 'text':
-			return text( sourceConfig.selector );
+			return text(sourceConfig.selector);
 		case 'children':
-			return children( sourceConfig.selector );
+			return children(sourceConfig.selector);
 		case 'node':
-			return node( sourceConfig.selector );
+			return node(sourceConfig.selector);
 		case 'query':
 			const subMatchers = mapValues(
 				sourceConfig.query,
 				matcherFromSource
 			);
-			return query( sourceConfig.selector, subMatchers );
+			return query(sourceConfig.selector, subMatchers);
 		case 'tag':
-			return flow( [
-				prop( sourceConfig.selector, 'nodeName' ),
-				( nodeName ) =>
-					nodeName ? nodeName.toLowerCase() : undefined,
-			] );
+			return flow([
+				prop(sourceConfig.selector, 'nodeName'),
+				(nodeName) => (nodeName ? nodeName.toLowerCase() : undefined),
+			]);
 		default:
 			// eslint-disable-next-line no-console
-			console.error( `Unknown source type "${ sourceConfig.source }"` );
+			console.error(`Unknown source type "${sourceConfig.source}"`);
 	}
 }
 
@@ -230,8 +229,8 @@ export function matcherFromSource( sourceConfig ) {
  *
  * @return {*} Attribute value.
  */
-export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
-	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+export function parseWithAttributeSchema(innerHTML, attributeSchema) {
+	return hpqParse(innerHTML, matcherFromSource(attributeSchema));
 }
 
 /**
@@ -248,10 +247,10 @@ export function getBlockAttributes(
 	innerHTML,
 	attributes = {}
 ) {
-	const blockType = normalizeBlockType( blockTypeOrName );
+	const blockType = normalizeBlockType(blockTypeOrName);
 	const blockAttributes = mapValues(
 		blockType.attributes,
-		( attributeSchema, attributeKey ) => {
+		(attributeSchema, attributeKey) => {
 			return getBlockAttribute(
 				attributeKey,
 				attributeSchema,

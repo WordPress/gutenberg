@@ -10,30 +10,30 @@ import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import DropdownMenu from '../dropdown-menu';
 
-function ToolbarDropdownMenu( props, ref ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
+function ToolbarDropdownMenu(props, ref) {
+	const accessibleToolbarState = useContext(ToolbarContext);
 
-	if ( ! accessibleToolbarState ) {
-		return <DropdownMenu { ...props } />;
+	if (!accessibleToolbarState) {
+		return <DropdownMenu {...props} />;
 	}
 
 	// ToobarItem will pass all props to the render prop child, which will pass
 	// all props to the toggle of DropdownMenu. This means that ToolbarDropdownMenu
 	// has the same API as DrpodownMenu.
 	return (
-		<ToolbarItem ref={ ref } { ...props.toggleProps }>
-			{ ( toolbarItemProps ) => (
+		<ToolbarItem ref={ref} {...props.toggleProps}>
+			{(toolbarItemProps) => (
 				<DropdownMenu
-					{ ...props }
-					popoverProps={ {
+					{...props}
+					popoverProps={{
 						isAlternate: true,
 						...props.popoverProps,
-					} }
-					toggleProps={ toolbarItemProps }
+					}}
+					toggleProps={toolbarItemProps}
 				/>
-			) }
+			)}
 		</ToolbarItem>
 	);
 }
 
-export default forwardRef( ToolbarDropdownMenu );
+export default forwardRef(ToolbarDropdownMenu);

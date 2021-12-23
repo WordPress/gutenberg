@@ -9,11 +9,11 @@ import { flow } from 'lodash';
  * @param {string} content The content of a code block.
  * @return {string} The given content with some characters escaped.
  */
-export function escape( content ) {
+export function escape(content) {
 	return flow(
 		escapeOpeningSquareBrackets,
 		escapeProtocolInIsolatedUrls
-	)( content || '' );
+	)(content || '');
 }
 
 /**
@@ -29,8 +29,8 @@ export function escape( content ) {
  *                  converted into their HTML entity counterpart
  *                  (i.e. [ => &#91;)
  */
-function escapeOpeningSquareBrackets( content ) {
-	return content.replace( /\[/g, '&#91;' );
+function escapeOpeningSquareBrackets(content) {
+	return content.replace(/\[/g, '&#91;');
 }
 
 /**
@@ -47,7 +47,7 @@ function escapeOpeningSquareBrackets( content ) {
  * @return {string} The given content with its ampersands converted into
  *                  their HTML entity counterpart (i.e. & => &amp;)
  */
-function escapeProtocolInIsolatedUrls( content ) {
+function escapeProtocolInIsolatedUrls(content) {
 	return content.replace(
 		/^(\s*https?:)\/\/([^\s<>"]+\s*)$/m,
 		'$1&#47;&#47;$2'

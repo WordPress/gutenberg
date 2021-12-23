@@ -11,30 +11,29 @@ import { compose } from '@wordpress/compose';
  */
 import { store as editorStore } from '../../store';
 
-function PostPingbacks( { pingStatus = 'open', ...props } ) {
+function PostPingbacks({ pingStatus = 'open', ...props }) {
 	const onTogglePingback = () =>
-		props.editPost( {
+		props.editPost({
 			ping_status: pingStatus === 'open' ? 'closed' : 'open',
-		} );
+		});
 
 	return (
 		<CheckboxControl
-			label={ __( 'Allow pingbacks & trackbacks' ) }
-			checked={ pingStatus === 'open' }
-			onChange={ onTogglePingback }
+			label={__('Allow pingbacks & trackbacks')}
+			checked={pingStatus === 'open'}
+			onChange={onTogglePingback}
 		/>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		return {
-			pingStatus: select( editorStore ).getEditedPostAttribute(
-				'ping_status'
-			),
+			pingStatus:
+				select(editorStore).getEditedPostAttribute('ping_status'),
 		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( editorStore ).editPost,
-	} ) ),
-] )( PostPingbacks );
+	}),
+	withDispatch((dispatch) => ({
+		editPost: dispatch(editorStore).editPost,
+	})),
+])(PostPingbacks);

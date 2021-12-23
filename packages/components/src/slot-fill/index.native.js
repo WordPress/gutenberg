@@ -12,15 +12,15 @@ import Provider from './provider';
 
 export { Fill, Provider };
 
-export function Slot( props ) {
-	return <BaseSlot { ...omit( props, 'bubblesVirtually' ) } />;
+export function Slot(props) {
+	return <BaseSlot {...omit(props, 'bubblesVirtually')} />;
 }
 
-export function createSlotFill( name ) {
-	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
+export function createSlotFill(name) {
+	const FillComponent = (props) => <Fill name={name} {...props} />;
 	FillComponent.displayName = name + 'Fill';
 
-	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
+	const SlotComponent = (props) => <Slot name={name} {...props} />;
 	SlotComponent.displayName = name + 'Slot';
 
 	return {

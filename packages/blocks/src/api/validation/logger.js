@@ -6,16 +6,16 @@ export function createLogger() {
 	 *
 	 * @return {Function} Augmented logger function.
 	 */
-	function createLogHandler( logger ) {
-		let log = ( message, ...args ) =>
-			logger( 'Block validation: ' + message, ...args );
+	function createLogHandler(logger) {
+		let log = (message, ...args) =>
+			logger('Block validation: ' + message, ...args);
 
 		// In test environments, pre-process string substitutions to improve
 		// readability of error messages. We'd prefer to avoid pulling in this
 		// dependency in runtime environments, and it can be dropped by a combo
 		// of Webpack env substitution + UglifyJS dead code elimination.
-		if ( process.env.NODE_ENV === 'test' ) {
-			log = ( ...args ) => logger( require( 'util' ).format( ...args ) );
+		if (process.env.NODE_ENV === 'test') {
+			log = (...args) => logger(require('util').format(...args));
 		}
 
 		return log;
@@ -23,9 +23,9 @@ export function createLogger() {
 
 	return {
 		// eslint-disable-next-line no-console
-		error: createLogHandler( console.error ),
+		error: createLogHandler(console.error),
 		// eslint-disable-next-line no-console
-		warning: createLogHandler( console.warn ),
+		warning: createLogHandler(console.warn),
 		getItems() {
 			return [];
 		},
@@ -43,11 +43,11 @@ export function createQueuedLogger() {
 	const logger = createLogger();
 
 	return {
-		error( ...args ) {
-			queue.push( { log: logger.error, args } );
+		error(...args) {
+			queue.push({ log: logger.error, args });
 		},
-		warning( ...args ) {
-			queue.push( { log: logger.warning, args } );
+		warning(...args) {
+			queue.push({ log: logger.warning, args });
 		},
 		getItems() {
 			return queue;

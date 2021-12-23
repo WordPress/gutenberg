@@ -13,33 +13,33 @@ import { isEqual } from 'lodash';
  *
  * @return {Object} Minimally modified merged item.
  */
-export default function conservativeMapItem( item, nextItem ) {
+export default function conservativeMapItem(item, nextItem) {
 	// Return next item in its entirety if there is no original item.
-	if ( ! item ) {
+	if (!item) {
 		return nextItem;
 	}
 
 	let hasChanges = false;
 	const result = {};
-	for ( const key in nextItem ) {
-		if ( isEqual( item[ key ], nextItem[ key ] ) ) {
-			result[ key ] = item[ key ];
+	for (const key in nextItem) {
+		if (isEqual(item[key], nextItem[key])) {
+			result[key] = item[key];
 		} else {
 			hasChanges = true;
-			result[ key ] = nextItem[ key ];
+			result[key] = nextItem[key];
 		}
 	}
 
-	if ( ! hasChanges ) {
+	if (!hasChanges) {
 		return item;
 	}
 
 	// Only at this point, backfill properties from the original item which
 	// weren't explicitly set into the result above. This is an optimization
 	// to allow `hasChanges` to return early.
-	for ( const key in item ) {
-		if ( ! result.hasOwnProperty( key ) ) {
-			result[ key ] = item[ key ];
+	for (const key in item) {
+		if (!result.hasOwnProperty(key)) {
+			result[key] = item[key];
 		}
 	}
 

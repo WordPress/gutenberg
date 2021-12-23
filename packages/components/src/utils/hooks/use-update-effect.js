@@ -11,16 +11,16 @@ import { useRef, useEffect } from '@wordpress/element';
  * @param {import('react').EffectCallback} effect
  * @param {import('react').DependencyList} deps
  */
-function useUpdateEffect( effect, deps ) {
-	const mounted = useRef( false );
+function useUpdateEffect(effect, deps) {
+	const mounted = useRef(false);
 
-	useEffect( () => {
-		if ( mounted.current ) {
+	useEffect(() => {
+		if (mounted.current) {
 			return effect();
 		}
 		mounted.current = true;
 		return undefined;
-	}, deps );
+	}, deps);
 }
 
 export default useUpdateEffect;

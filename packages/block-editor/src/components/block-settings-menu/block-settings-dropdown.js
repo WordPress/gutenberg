@@ -32,40 +32,37 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-function CopyMenuItem( { blocks, onCopy } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	return <MenuItem ref={ ref }>{ __( 'Copy' ) }</MenuItem>;
+function CopyMenuItem({ blocks, onCopy }) {
+	const ref = useCopyToClipboard(() => serialize(blocks), onCopy);
+	return <MenuItem ref={ref}>{__('Copy')}</MenuItem>;
 }
 
-export function BlockSettingsDropdown( {
+export function BlockSettingsDropdown({
 	clientIds,
 	__experimentalSelectBlock,
 	children,
 	...props
-} ) {
-	const blockClientIds = castArray( clientIds );
+}) {
+	const blockClientIds = castArray(clientIds);
 	const count = blockClientIds.length;
-	const firstBlockClientId = blockClientIds[ 0 ];
+	const firstBlockClientId = blockClientIds[0];
 	const { onlyBlock, title } = useSelect(
-		( select ) => {
-			const { getBlockCount, getBlockName } = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
+		(select) => {
+			const { getBlockCount, getBlockName } = select(blockEditorStore);
+			const { getBlockType } = select(blocksStore);
 			return {
 				onlyBlock: 1 === getBlockCount(),
-				title: getBlockType( getBlockName( firstBlockClientId ) )
-					?.title,
+				title: getBlockType(getBlockName(firstBlockClientId))?.title,
 			};
 		},
-		[ firstBlockClientId ]
+		[firstBlockClientId]
 	);
 
-	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+	const shortcuts = useSelect((select) => {
+		const { getShortcutRepresentation } = select(keyboardShortcutsStore);
 		return {
-			duplicate: getShortcutRepresentation(
-				'core/block-editor/duplicate'
-			),
-			remove: getShortcutRepresentation( 'core/block-editor/remove' ),
+			duplicate: getShortcutRepresentation('core/block-editor/duplicate'),
+			remove: getShortcutRepresentation('core/block-editor/remove'),
 			insertAfter: getShortcutRepresentation(
 				'core/block-editor/insert-after'
 			),
@@ -73,33 +70,33 @@ export function BlockSettingsDropdown( {
 				'core/block-editor/insert-before'
 			),
 		};
-	}, [] );
+	}, []);
 
 	const updateSelection = useCallback(
 		__experimentalSelectBlock
-			? async ( clientIdsPromise ) => {
+			? async (clientIdsPromise) => {
 					const ids = await clientIdsPromise;
-					if ( ids && ids[ 0 ] ) {
-						__experimentalSelectBlock( ids[ 0 ] );
+					if (ids && ids[0]) {
+						__experimentalSelectBlock(ids[0]);
 					}
 			  }
 			: noop,
-		[ __experimentalSelectBlock ]
+		[__experimentalSelectBlock]
 	);
 
 	const label = sprintf(
 		/* translators: %s: block name */
-		__( 'Remove %s' ),
+		__('Remove %s'),
 		title
 	);
-	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
+	const removeBlockLabel = count === 1 ? label : __('Remove blocks');
 
 	return (
 		<BlockActions
-			clientIds={ clientIds }
-			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
+			clientIds={clientIds}
+			__experimentalUpdateSelection={!__experimentalSelectBlock}
 		>
-			{ ( {
+			{({
 				canDuplicate,
 				canInsertDefaultBlock,
 				canMove,
@@ -111,105 +108,100 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onMoveTo,
 				blocks,
-			} ) => (
+			}) => (
 				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'Options' ) }
+					icon={moreVertical}
+					label={__('Options')}
 					className="block-editor-block-settings-menu"
-					popoverProps={ POPOVER_PROPS }
+					popoverProps={POPOVER_PROPS}
 					noIcons
-					{ ...props }
+					{...props}
 				>
-					{ ( { onClose } ) => (
+					{({ onClose }) => (
 						<>
 							<MenuGroup>
 								<__unstableBlockSettingsMenuFirstItem.Slot
-									fillProps={ { onClose } }
+									fillProps={{ onClose }}
 								/>
-								{ count === 1 && (
+								{count === 1 && (
 									<BlockHTMLConvertButton
-										clientId={ firstBlockClientId }
+										clientId={firstBlockClientId}
 									/>
-								) }
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-								/>
-								{ canDuplicate && (
+								)}
+								<CopyMenuItem blocks={blocks} onCopy={onCopy} />
+								{canDuplicate && (
 									<MenuItem
-										onClick={ flow(
+										onClick={flow(
 											onClose,
 											onDuplicate,
 											updateSelection
-										) }
-										shortcut={ shortcuts.duplicate }
+										)}
+										shortcut={shortcuts.duplicate}
 									>
-										{ __( 'Duplicate' ) }
+										{__('Duplicate')}
 									</MenuItem>
-								) }
-								{ canInsertDefaultBlock && (
+								)}
+								{canInsertDefaultBlock && (
 									<>
 										<MenuItem
-											onClick={ flow(
+											onClick={flow(
 												onClose,
 												onInsertBefore
-											) }
-											shortcut={ shortcuts.insertBefore }
+											)}
+											shortcut={shortcuts.insertBefore}
 										>
-											{ __( 'Insert before' ) }
+											{__('Insert before')}
 										</MenuItem>
 										<MenuItem
-											onClick={ flow(
+											onClick={flow(
 												onClose,
 												onInsertAfter
-											) }
-											shortcut={ shortcuts.insertAfter }
+											)}
+											shortcut={shortcuts.insertAfter}
 										>
-											{ __( 'Insert after' ) }
+											{__('Insert after')}
 										</MenuItem>
 									</>
-								) }
-								{ canMove && ! onlyBlock && (
-									<MenuItem
-										onClick={ flow( onClose, onMoveTo ) }
-									>
-										{ __( 'Move to' ) }
+								)}
+								{canMove && !onlyBlock && (
+									<MenuItem onClick={flow(onClose, onMoveTo)}>
+										{__('Move to')}
 									</MenuItem>
-								) }
-								{ count === 1 && (
+								)}
+								{count === 1 && (
 									<BlockModeToggle
-										clientId={ firstBlockClientId }
-										onToggle={ onClose }
+										clientId={firstBlockClientId}
+										onToggle={onClose}
 									/>
-								) }
+								)}
 							</MenuGroup>
 							<BlockSettingsMenuControls.Slot
-								fillProps={ { onClose } }
-								clientIds={ clientIds }
+								fillProps={{ onClose }}
+								clientIds={clientIds}
 							/>
-							{ typeof children === 'function'
-								? children( { onClose } )
-								: Children.map( ( child ) =>
-										cloneElement( child, { onClose } )
-								  ) }
-							{ canRemove && (
+							{typeof children === 'function'
+								? children({ onClose })
+								: Children.map((child) =>
+										cloneElement(child, { onClose })
+								  )}
+							{canRemove && (
 								<MenuGroup>
 									<MenuItem
-										onClick={ flow(
+										onClick={flow(
 											onClose,
 											onRemove,
 											updateSelection
-										) }
-										shortcut={ shortcuts.remove }
+										)}
+										shortcut={shortcuts.remove}
 									>
-										{ removeBlockLabel }
+										{removeBlockLabel}
 									</MenuItem>
 								</MenuGroup>
-							) }
+							)}
 						</>
-					) }
+					)}
 				</DropdownMenu>
-			) }
+			)}
 		</BlockActions>
 	);
 }

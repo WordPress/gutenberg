@@ -24,7 +24,7 @@ const storeConfig = {
 	selectors,
 	resolvers,
 	actions,
-	persist: [ 'selectedMenuId' ],
+	persist: ['selectedMenuId'],
 	__experimentalUseThunks: true,
 };
 
@@ -35,8 +35,8 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const store = createReduxStore(STORE_NAME, storeConfig);
 
 // Once we build a more generic persistence plugin that works across types of stores
 // we'd be able to replace this with a register call.
-registerStore( STORE_NAME, storeConfig );
+registerStore(STORE_NAME, storeConfig);

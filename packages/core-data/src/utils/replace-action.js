@@ -6,8 +6,8 @@
  *
  * @return {Function} Higher-order reducer.
  */
-const replaceAction = ( replacer ) => ( reducer ) => ( state, action ) => {
-	return reducer( state, replacer( action ) );
+const replaceAction = (replacer) => (reducer) => (state, action) => {
+	return reducer(state, replacer(action));
 };
 
 export default replaceAction;

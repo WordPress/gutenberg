@@ -17,54 +17,54 @@ const icons = {
 	'space-between': justifySpaceBetween,
 };
 
-function JustifyContentUI( {
-	allowedControls = [ 'left', 'center', 'right', 'space-between' ],
+function JustifyContentUI({
+	allowedControls = ['left', 'center', 'right', 'space-between'],
 	isCollapsed = true,
 	onChange,
 	value,
 	popoverProps,
 	isToolbar,
-} ) {
+}) {
 	// If the control is already selected we want a click
 	// again on the control to deselect the item, so we
 	// call onChange( undefined )
-	const handleClick = ( next ) => {
-		if ( next === value ) {
-			onChange( undefined );
+	const handleClick = (next) => {
+		if (next === value) {
+			onChange(undefined);
 		} else {
-			onChange( next );
+			onChange(next);
 		}
 	};
 
-	const icon = value ? icons[ value ] : icons.left;
+	const icon = value ? icons[value] : icons.left;
 	const allControls = [
 		{
 			name: 'left',
 			icon: justifyLeft,
-			title: __( 'Justify items left' ),
+			title: __('Justify items left'),
 			isActive: 'left' === value,
-			onClick: () => handleClick( 'left' ),
+			onClick: () => handleClick('left'),
 		},
 		{
 			name: 'center',
 			icon: justifyCenter,
-			title: __( 'Justify items center' ),
+			title: __('Justify items center'),
 			isActive: 'center' === value,
-			onClick: () => handleClick( 'center' ),
+			onClick: () => handleClick('center'),
 		},
 		{
 			name: 'right',
 			icon: justifyRight,
-			title: __( 'Justify items right' ),
+			title: __('Justify items right'),
 			isActive: 'right' === value,
-			onClick: () => handleClick( 'right' ),
+			onClick: () => handleClick('right'),
 		},
 		{
 			name: 'space-between',
 			icon: justifySpaceBetween,
-			title: __( 'Space between items' ),
+			title: __('Space between items'),
 			isActive: 'space-between' === value,
-			onClick: () => handleClick( 'space-between' ),
+			onClick: () => handleClick('space-between'),
 		},
 	];
 
@@ -73,13 +73,13 @@ function JustifyContentUI( {
 
 	return (
 		<UIComponent
-			icon={ icon }
-			popoverProps={ popoverProps }
-			label={ __( 'Change items justification' ) }
-			controls={ allControls.filter( ( elem ) =>
-				allowedControls.includes( elem.name )
-			) }
-			{ ...extraProps }
+			icon={icon}
+			popoverProps={popoverProps}
+			label={__('Change items justification')}
+			controls={allControls.filter((elem) =>
+				allowedControls.includes(elem.name)
+			)}
+			{...extraProps}
 		/>
 	);
 }

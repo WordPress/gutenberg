@@ -259,25 +259,25 @@ export default {
 	component: ComboboxControl,
 };
 
-const mapCountryOption = ( country ) => ( {
+const mapCountryOption = (country) => ({
 	value: country.code,
 	label: country.name,
-} );
+});
 
-const countryOptions = countries.map( mapCountryOption );
+const countryOptions = countries.map(mapCountryOption);
 
 function CountryCodeComboboxControl() {
-	const [ value, setValue ] = useState( null );
+	const [value, setValue] = useState(null);
 
 	return (
 		<>
 			<ComboboxControl
-				value={ value }
-				onChange={ setValue }
+				value={value}
+				onChange={setValue}
 				label="Select a country"
-				options={ countryOptions }
+				options={countryOptions}
 			/>
-			<p>Value: { value }</p>
+			<p>Value: {value}</p>
 		</>
 	);
 }

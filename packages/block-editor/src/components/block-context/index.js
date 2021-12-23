@@ -14,7 +14,7 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
  */
 
 /** @type {import('react').Context<Record<string,*>>} */
-const Context = createContext( {} );
+const Context = createContext({});
 
 /**
  * Component which merges passed value with current consumed block context.
@@ -23,14 +23,14 @@ const Context = createContext( {} );
  *
  * @param {BlockContextProviderProps} props
  */
-export function BlockContextProvider( { value, children } ) {
-	const context = useContext( Context );
-	const nextValue = useMemo( () => ( { ...context, ...value } ), [
-		context,
-		value,
-	] );
+export function BlockContextProvider({ value, children }) {
+	const context = useContext(Context);
+	const nextValue = useMemo(
+		() => ({ ...context, ...value }),
+		[context, value]
+	);
 
-	return <Context.Provider value={ nextValue } children={ children } />;
+	return <Context.Provider value={nextValue} children={children} />;
 }
 
 export default Context;

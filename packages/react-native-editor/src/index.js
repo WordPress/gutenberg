@@ -25,44 +25,44 @@ const reactNativeSetup = () => {
 	// eslint-disable-next-line no-console
 	console.disableYellowBox = true;
 
-	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
+	I18nManager.forceRTL(false); // Change to `true` to debug RTL layout easily.
 };
 
 const gutenbergSetup = () => {
-	const wpData = require( '@wordpress/data' );
+	const wpData = require('@wordpress/data');
 
 	// wp-data
 	const userId = 1;
 	const storageKey = 'WP_DATA_USER_' + userId;
-	wpData.use( wpData.plugins.persistence, { storageKey } );
+	wpData.use(wpData.plugins.persistence, { storageKey });
 
 	setupApiFetch();
 
 	const isHermes = () => global.HermesInternal !== null;
 	// eslint-disable-next-line no-console
-	console.log( 'Hermes is: ' + isHermes() );
+	console.log('Hermes is: ' + isHermes());
 
 	setupInitHooks();
 
-	const initializeEditor = require( '@wordpress/edit-post' ).initializeEditor;
-	initializeEditor( 'gutenberg', 'post', 1 );
+	const initializeEditor = require('@wordpress/edit-post').initializeEditor;
+	initializeEditor('gutenberg', 'post', 1);
 };
 
 const setupInitHooks = () => {
-	const wpHooks = require( '@wordpress/hooks' );
+	const wpHooks = require('@wordpress/hooks');
 
 	wpHooks.addAction(
 		'native.pre-render',
 		'core/react-native-editor',
-		( props ) => {
-			setupLocale( props.locale, props.translations );
+		(props) => {
+			setupLocale(props.locale, props.translations);
 
 			const capabilities = props.capabilities ?? {};
 			if (
-				getBlockType( 'core/block' ) !== undefined &&
+				getBlockType('core/block') !== undefined &&
 				capabilities.reusableBlock !== true
 			) {
-				unregisterBlockType( 'core/block' );
+				unregisterBlockType('core/block');
 			}
 		}
 	);
@@ -72,7 +72,7 @@ const setupInitHooks = () => {
 	wpHooks.addFilter(
 		'native.block_editor_props',
 		'core/react-native-editor',
-		( props ) => {
+		(props) => {
 			const { capabilities = {} } = props;
 			let {
 				initialData,
@@ -87,19 +87,19 @@ const setupInitHooks = () => {
 				locale,
 			} = props;
 
-			if ( initialData === undefined && __DEV__ ) {
+			if (initialData === undefined && __DEV__) {
 				initialData = initialHtml;
 			}
-			if ( initialTitle === undefined ) {
+			if (initialTitle === undefined) {
 				initialTitle = 'Welcome to Gutenberg!';
 			}
-			if ( postType === undefined ) {
+			if (postType === undefined) {
 				postType = 'post';
 			}
 
-			colors = validateThemeColors( colors );
+			colors = validateThemeColors(colors);
 
-			gradients = validateThemeGradients( gradients );
+			gradients = validateThemeGradients(gradients);
 
 			return {
 				initialHtml: initialData,
@@ -121,16 +121,16 @@ const setupInitHooks = () => {
 
 let blocksRegistered = false;
 
-const setupLocale = ( locale, extraTranslations ) => {
-	const setLocaleData = require( '@wordpress/i18n' ).setLocaleData;
+const setupLocale = (locale, extraTranslations) => {
+	const setLocaleData = require('@wordpress/i18n').setLocaleData;
 
-	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
+	I18nManager.forceRTL(false); // Change to `true` to debug RTL layout easily.
 
-	let gutenbergTranslations = getTranslation( locale );
-	if ( locale && ! gutenbergTranslations ) {
+	let gutenbergTranslations = getTranslation(locale);
+	if (locale && !gutenbergTranslations) {
 		// Try stripping out the regional
-		locale = locale.replace( /[-_][A-Za-z]+$/, '' );
-		gutenbergTranslations = getTranslation( locale );
+		locale = locale.replace(/[-_][A-Za-z]+$/, '');
+		gutenbergTranslations = getTranslation(locale);
 	}
 	const translations = Object.assign(
 		{},
@@ -138,18 +138,18 @@ const setupLocale = ( locale, extraTranslations ) => {
 		extraTranslations
 	);
 	// eslint-disable-next-line no-console
-	console.log( 'locale', locale, translations );
+	console.log('locale', locale, translations);
 	// Only change the locale if it's supported by gutenberg
-	if ( gutenbergTranslations || extraTranslations ) {
-		setLocaleData( translations );
+	if (gutenbergTranslations || extraTranslations) {
+		setLocaleData(translations);
 	}
 
-	if ( blocksRegistered ) {
+	if (blocksRegistered) {
 		return;
 	}
 
-	const registerCoreBlocks = require( '@wordpress/block-library' )
-		.registerCoreBlocks;
+	const registerCoreBlocks =
+		require('@wordpress/block-library').registerCoreBlocks;
 	registerCoreBlocks();
 	blocksRegistered = true;
 };

@@ -28,12 +28,11 @@ import { useEffect, useRef } from '@wordpress/element';
  *
  * @return {boolean} True if MacOS; false otherwise.
  */
-function isAppleOS( _window = window ) {
+function isAppleOS(_window = window) {
 	const { platform } = _window.navigator;
 
 	return (
-		platform.indexOf( 'Mac' ) !== -1 ||
-		includes( [ 'iPad', 'iPhone' ], platform )
+		platform.indexOf('Mac') !== -1 || includes(['iPad', 'iPhone'], platform)
 	);
 }
 
@@ -58,13 +57,13 @@ function useKeyboardShortcut(
 		target,
 	} = {}
 ) {
-	const currentCallback = useRef( callback );
-	useEffect( () => {
+	const currentCallback = useRef(callback);
+	useEffect(() => {
 		currentCallback.current = callback;
-	}, [ callback ] );
+	}, [callback]);
 
-	useEffect( () => {
-		if ( isDisabled ) {
+	useEffect(() => {
+		if (isDisabled) {
 			return;
 		}
 		const mousetrap = new Mousetrap(
@@ -73,48 +72,46 @@ function useKeyboardShortcut(
 				: // We were passing `document` here previously, so to successfully cast it to Element we must cast it first to `unknown`.
 				  // Not sure if this is a mistake but it was the behavior previous to the addition of types so we're just doing what's
 				  // necessary to maintain the existing behavior
-				  /** @type {Element} */ (/** @type {unknown} */ ( document ))
+				  /** @type {Element} */ (/** @type {unknown} */ (document))
 		);
-		castArray( shortcuts ).forEach( ( shortcut ) => {
-			const keys = shortcut.split( '+' );
+		castArray(shortcuts).forEach((shortcut) => {
+			const keys = shortcut.split('+');
 			// Determines whether a key is a modifier by the length of the string.
 			// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that
 			// the modifiers are Shift and Cmd because they're not a single character.
-			const modifiers = new Set(
-				keys.filter( ( value ) => value.length > 1 )
-			);
-			const hasAlt = modifiers.has( 'alt' );
-			const hasShift = modifiers.has( 'shift' );
+			const modifiers = new Set(keys.filter((value) => value.length > 1));
+			const hasAlt = modifiers.has('alt');
+			const hasShift = modifiers.has('shift');
 
 			// This should be better moved to the shortcut registration instead.
 			if (
 				isAppleOS() &&
-				( ( modifiers.size === 1 && hasAlt ) ||
-					( modifiers.size === 2 && hasAlt && hasShift ) )
+				((modifiers.size === 1 && hasAlt) ||
+					(modifiers.size === 2 && hasAlt && hasShift))
 			) {
 				throw new Error(
-					`Cannot bind ${ shortcut }. Alt and Shift+Alt modifiers are reserved for character input.`
+					`Cannot bind ${shortcut}. Alt and Shift+Alt modifiers are reserved for character input.`
 				);
 			}
 
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
 			// @ts-ignore `bindGlobal` is an undocumented property
-			mousetrap[ bindFn ](
+			mousetrap[bindFn](
 				shortcut,
 				(
 					/* eslint-disable jsdoc/valid-types */
 					/** @type {[e: import('mousetrap').ExtendedKeyboardEvent, combo: string]} */ ...args
 				) =>
 					/* eslint-enable jsdoc/valid-types */
-					currentCallback.current( ...args ),
+					currentCallback.current(...args),
 				eventName
 			);
-		} );
+		});
 
 		return () => {
 			mousetrap.reset();
 		};
-	}, [ shortcuts, bindGlobal, eventName, target, isDisabled ] );
+	}, [shortcuts, bindGlobal, eventName, target, isDisabled]);
 }
 
 export default useKeyboardShortcut;

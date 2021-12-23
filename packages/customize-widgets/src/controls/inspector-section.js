@@ -4,8 +4,8 @@ export default function getInspectorSection() {
 	} = window;
 
 	return class InspectorSection extends customize.Section {
-		constructor( id, options ) {
-			super( id, options );
+		constructor(id, options) {
+			super(id, options);
 
 			this.parentSection = options.parentSection;
 
@@ -15,58 +15,58 @@ export default function getInspectorSection() {
 		get isOpen() {
 			return this._isOpen;
 		}
-		set isOpen( value ) {
+		set isOpen(value) {
 			this._isOpen = value;
 			this.triggerActiveCallbacks();
 		}
 		ready() {
-			this.contentContainer[ 0 ].classList.add(
+			this.contentContainer[0].classList.add(
 				'customize-widgets-layout__inspector'
 			);
 		}
 		isContextuallyActive() {
 			return this.isOpen;
 		}
-		onChangeExpanded( expanded, args ) {
-			super.onChangeExpanded( expanded, args );
+		onChangeExpanded(expanded, args) {
+			super.onChangeExpanded(expanded, args);
 
-			if ( this.parentSection && ! args.unchanged ) {
-				if ( expanded ) {
-					this.parentSection.collapse( {
+			if (this.parentSection && !args.unchanged) {
+				if (expanded) {
+					this.parentSection.collapse({
 						manualTransition: true,
-					} );
+					});
 				} else {
-					this.parentSection.expand( {
+					this.parentSection.expand({
 						manualTransition: true,
 						completeCallback: () => {
 							// Return focus after finishing the transition.
 							if (
 								this.returnFocusWhenClose &&
-								! this.contentContainer[ 0 ].contains(
+								!this.contentContainer[0].contains(
 									this.returnFocusWhenClose
 								)
 							) {
 								this.returnFocusWhenClose.focus();
 							}
 						},
-					} );
+					});
 				}
 			}
 		}
-		open( { returnFocusWhenClose } = {} ) {
+		open({ returnFocusWhenClose } = {}) {
 			this.isOpen = true;
 			this.returnFocusWhenClose = returnFocusWhenClose;
 
-			this.expand( {
+			this.expand({
 				allowMultiple: true,
-			} );
+			});
 		}
 		close() {
-			this.collapse( {
+			this.collapse({
 				allowMultiple: true,
-			} );
+			});
 		}
-		collapse( options ) {
+		collapse(options) {
 			// Overridden collapse() function. Mostly call the parent collapse(), but also
 			// move our .isOpen to false.
 			// Initially, I tried tracking this with onChangeExpanded(), but it doesn't work
@@ -77,7 +77,7 @@ export default function getInspectorSection() {
 			// inspector-section would run with expanded=true, but I want
 			// isOpen to be false when the block settings is closed.
 			this.isOpen = false;
-			super.collapse( options );
+			super.collapse(options);
 		}
 		triggerActiveCallbacks() {
 			// Manually fire the callbacks associated with moving this.active
@@ -92,7 +92,7 @@ export default function getInspectorSection() {
 			// triggering the "this.active" callbacks, we force the WP
 			// customizer to query our .isContextuallyActive() function and
 			// update its view of our status.
-			this.active.callbacks.fireWith( this.active, [ false, true ] );
+			this.active.callbacks.fireWith(this.active, [false, true]);
 		}
 	};
 }

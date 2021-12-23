@@ -18,38 +18,36 @@ import { compose } from '@wordpress/compose';
 import UngroupIcon from './icon';
 import { store as blockEditorStore } from '../../store';
 
-export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
-	if ( ! isUngroupable ) {
+export function UngroupButton({ onConvertFromGroup, isUngroupable = false }) {
+	if (!isUngroupable) {
 		return null;
 	}
 	return (
 		<ToolbarGroup>
 			<ToolbarButton
-				title={ __( 'Ungroup' ) }
-				icon={ UngroupIcon }
-				onClick={ onConvertFromGroup }
+				title={__('Ungroup')}
+				icon={UngroupIcon}
+				onClick={onConvertFromGroup}
 			/>
 		</ToolbarGroup>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlock } = select(
-			blockEditorStore
-		);
+export default compose([
+	withSelect((select) => {
+		const { getSelectedBlockClientId, getBlock } = select(blockEditorStore);
 
-		const { getGroupingBlockName } = select( blocksStore );
+		const { getGroupingBlockName } = select(blocksStore);
 
 		const selectedId = getSelectedBlockClientId();
-		const selectedBlock = getBlock( selectedId );
+		const selectedBlock = getBlock(selectedId);
 
 		const groupingBlockName = getGroupingBlockName();
 
 		const isUngroupable =
 			selectedBlock &&
 			selectedBlock.innerBlocks &&
-			!! selectedBlock.innerBlocks.length &&
+			!!selectedBlock.innerBlocks.length &&
 			selectedBlock.name === groupingBlockName;
 		const innerBlocks = isUngroupable ? selectedBlock.innerBlocks : [];
 
@@ -58,20 +56,20 @@ export default compose( [
 			clientId: selectedId,
 			innerBlocks,
 		};
-	} ),
-	withDispatch( ( dispatch, { clientId, innerBlocks, onToggle = noop } ) => {
-		const { replaceBlocks } = dispatch( blockEditorStore );
+	}),
+	withDispatch((dispatch, { clientId, innerBlocks, onToggle = noop }) => {
+		const { replaceBlocks } = dispatch(blockEditorStore);
 
 		return {
 			onConvertFromGroup() {
-				if ( ! innerBlocks.length ) {
+				if (!innerBlocks.length) {
 					return;
 				}
 
-				replaceBlocks( clientId, innerBlocks );
+				replaceBlocks(clientId, innerBlocks);
 
 				onToggle();
 			},
 		};
-	} ),
-] )( UngroupButton );
+	}),
+])(UngroupButton);

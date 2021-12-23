@@ -13,13 +13,13 @@ import { toggleMoreMenu } from './toggle-more-menu';
  *
  * @param {string} buttonLabel The label to search the button for.
  */
-export async function clickOnMoreMenuItem( buttonLabel ) {
+export async function clickOnMoreMenuItem(buttonLabel) {
 	await toggleMoreMenu();
 	const moreMenuContainerSelector =
 		'//*[contains(concat(" ", @class, " "), " edit-post-more-menu__content ")]';
 	const elementToClick = first(
 		await page.$x(
-			`${ moreMenuContainerSelector }//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${ buttonLabel }")]`
+			`${moreMenuContainerSelector}//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${buttonLabel}")]`
 		)
 	);
 	await elementToClick.click();

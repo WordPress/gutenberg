@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
  */
-export function useFormGroup( props ) {
+export function useFormGroup(props) {
 	const {
 		alignLabel = 'left',
 		children,
@@ -25,13 +25,13 @@ export function useFormGroup( props ) {
 		labelHidden = false,
 		truncate = false,
 		...otherProps
-	} = useContextSystem( props, 'FormGroup' );
+	} = useContextSystem(props, 'FormGroup');
 
-	const id = useInstanceId( useFormGroup, 'form-group', idProp );
+	const id = useInstanceId(useFormGroup, 'form-group', idProp);
 
 	const cx = useCx();
 
-	const classes = cx( styles.FormGroup, className );
+	const classes = cx(styles.FormGroup, className);
 
 	const contentProps = {
 		alignLabel,

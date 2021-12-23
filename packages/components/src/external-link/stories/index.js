@@ -16,8 +16,8 @@ export default {
 };
 
 export const _default = () => {
-	const title = text( 'children', 'WordPress' );
-	const href = text( 'href', 'https://wordpress.org' );
+	const title = text('children', 'WordPress');
+	const href = text('href', 'https://wordpress.org');
 
-	return <ExternalLink href={ href }>{ title }</ExternalLink>;
+	return <ExternalLink href={href}>{title}</ExternalLink>;
 };

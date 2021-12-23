@@ -35,7 +35,7 @@ const pastedHtmlText = `<!-- wp:paragraph -->
 
 exports.pasteHtmlText = pastedHtmlText;
 
-exports.pasteHtmlTextResult = `${ pastedHtmlText }\n\n${ pastedHtmlText }`;
+exports.pasteHtmlTextResult = `${pastedHtmlText}\n\n${pastedHtmlText}`;
 
 exports.deviceRotationHtml = `<!-- wp:paragraph -->
 <p>The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?</p>

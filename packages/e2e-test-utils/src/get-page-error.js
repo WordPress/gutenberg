@@ -5,7 +5,8 @@
  *
  * @type {RegExp}
  */
-const REGEXP_PHP_ERROR = /(<b>)?(Fatal error|Recoverable fatal error|Warning|Parse error|Notice|Strict Standards|Deprecated|Unknown error)(<\/b>)?: (.*?) in (.*?) on line (<b>)?\d+(<\/b>)?/;
+const REGEXP_PHP_ERROR =
+	/(<b>)?(Fatal error|Recoverable fatal error|Warning|Parse error|Notice|Strict Standards|Deprecated|Unknown error)(<\/b>)?: (.*?) in (.*?) on line (<b>)?\d+(<\/b>)?/;
 
 /**
  * Returns a promise resolving to one of either a string or null. A string will
@@ -20,6 +21,6 @@ const REGEXP_PHP_ERROR = /(<b>)?(Fatal error|Recoverable fatal error|Warning|Par
  */
 export async function getPageError() {
 	const content = await page.content();
-	const match = content.match( REGEXP_PHP_ERROR );
-	return match ? match[ 0 ] : null;
+	const match = content.match(REGEXP_PHP_ERROR);
+	return match ? match[0] : null;
 }

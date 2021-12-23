@@ -9,13 +9,13 @@ import { getBlockType } from '@wordpress/blocks';
 import ContextMenu from './context-menu';
 import ScreenHeader from './header';
 
-function ScreenBlock( { name } ) {
-	const blockType = getBlockType( name );
+function ScreenBlock({ name }) {
+	const blockType = getBlockType(name);
 
 	return (
 		<>
-			<ScreenHeader back="/blocks" title={ blockType.title } />
-			<ContextMenu parentMenu={ '/blocks/' + name } name={ name } />
+			<ScreenHeader back="/blocks" title={blockType.title} />
+			<ContextMenu parentMenu={'/blocks/' + name} name={name} />
 		</>
 	);
 }

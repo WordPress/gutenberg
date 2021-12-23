@@ -7,9 +7,9 @@ import ModalLinkUI from '../modal';
  */
 import { shallow } from 'enzyme';
 
-describe( 'LinksUI', () => {
-	it( 'LinksUI renders', () => {
-		const wrapper = shallow( <ModalLinkUI /> );
-		expect( wrapper ).toBeTruthy();
-	} );
-} );
+describe('LinksUI', () => {
+	it('LinksUI renders', () => {
+		const wrapper = shallow(<ModalLinkUI />);
+		expect(wrapper).toBeTruthy();
+	});
+});

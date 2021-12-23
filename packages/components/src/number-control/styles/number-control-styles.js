@@ -9,8 +9,8 @@ import styled from '@emotion/styled';
  */
 import InputControl from '../../input-control';
 
-const htmlArrowStyles = ( { hideHTMLArrows } ) => {
-	if ( ! hideHTMLArrows ) return ``;
+const htmlArrowStyles = ({ hideHTMLArrows }) => {
+	if (!hideHTMLArrows) return ``;
 
 	return css`
 		input[type='number']::-webkit-outer-spin-button,
@@ -25,6 +25,6 @@ const htmlArrowStyles = ( { hideHTMLArrows } ) => {
 	`;
 };
 
-export const Input = styled( InputControl )`
-	${ htmlArrowStyles };
+export const Input = styled(InputControl)`
+	${htmlArrowStyles};
 `;

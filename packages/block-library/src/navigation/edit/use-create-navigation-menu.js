@@ -11,29 +11,25 @@ import { useCallback } from '@wordpress/element';
  */
 import useGenerateDefaultNavigationTitle from './use-generate-default-navigation-title';
 
-export default function useCreateNavigationMenu( clientId ) {
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const generateDefaultTitle = useGenerateDefaultNavigationTitle( clientId );
+export default function useCreateNavigationMenu(clientId) {
+	const { saveEntityRecord } = useDispatch(coreStore);
+	const generateDefaultTitle = useGenerateDefaultNavigationTitle(clientId);
 
 	// This callback uses data from the two placeholder steps and only creates
 	// a new navigation menu when the user completes the final step.
 	return useCallback(
-		async ( title = null, blocks = [] ) => {
-			if ( ! title ) {
+		async (title = null, blocks = []) => {
+			if (!title) {
 				title = await generateDefaultTitle();
 			}
 			const record = {
 				title,
-				content: serialize( blocks ),
+				content: serialize(blocks),
 				status: 'publish',
 			};
 
-			return await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				record
-			);
+			return await saveEntityRecord('postType', 'wp_navigation', record);
 		},
-		[ serialize, saveEntityRecord ]
+		[serialize, saveEntityRecord]
 	);
 }

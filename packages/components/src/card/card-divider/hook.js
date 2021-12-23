@@ -13,11 +13,8 @@ import { useCx } from '../../utils/hooks/use-cx';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
  */
-export function useCardDivider( props ) {
-	const { className, ...otherProps } = useContextSystem(
-		props,
-		'CardDivider'
-	);
+export function useCardDivider(props) {
+	const { className, ...otherProps } = useContextSystem(props, 'CardDivider');
 
 	const cx = useCx();
 
@@ -30,7 +27,7 @@ export function useCardDivider( props ) {
 				'components-card__divider',
 				className
 			),
-		[ className ]
+		[className]
 	);
 
 	return {

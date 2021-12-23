@@ -17,39 +17,39 @@ import { settingIdToWidgetId } from '../../utils';
 
 const FocusControlContext = createContext();
 
-export default function FocusControl( { api, sidebarControls, children } ) {
-	const [ focusedWidgetIdRef, setFocusedWidgetIdRef ] = useState( {
+export default function FocusControl({ api, sidebarControls, children }) {
+	const [focusedWidgetIdRef, setFocusedWidgetIdRef] = useState({
 		current: null,
-	} );
+	});
 
 	const focusWidget = useCallback(
-		( widgetId ) => {
-			for ( const sidebarControl of sidebarControls ) {
+		(widgetId) => {
+			for (const sidebarControl of sidebarControls) {
 				const widgets = sidebarControl.setting.get();
 
-				if ( widgets.includes( widgetId ) ) {
-					sidebarControl.sectionInstance.expand( {
+				if (widgets.includes(widgetId)) {
+					sidebarControl.sectionInstance.expand({
 						// Schedule it after the complete callback so that
 						// it won't be overridden by the "Back" button focus.
 						completeCallback() {
 							// Create a "ref-like" object every time to ensure
 							// the same widget id can also triggers the focus control.
-							setFocusedWidgetIdRef( { current: widgetId } );
+							setFocusedWidgetIdRef({ current: widgetId });
 						},
-					} );
+					});
 
 					break;
 				}
 			}
 		},
-		[ sidebarControls ]
+		[sidebarControls]
 	);
 
-	useEffect( () => {
-		function handleFocus( settingId ) {
-			const widgetId = settingIdToWidgetId( settingId );
+	useEffect(() => {
+		function handleFocus(settingId) {
+			const widgetId = settingIdToWidgetId(settingId);
 
-			focusWidget( widgetId );
+			focusWidget(widgetId);
 		}
 
 		function handleReady() {
@@ -59,27 +59,27 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 			);
 		}
 
-		api.previewer.bind( 'ready', handleReady );
+		api.previewer.bind('ready', handleReady);
 
 		return () => {
-			api.previewer.unbind( 'ready', handleReady );
+			api.previewer.unbind('ready', handleReady);
 			api.previewer.preview.unbind(
 				'focus-control-for-setting',
 				handleFocus
 			);
 		};
-	}, [ api, focusWidget ] );
+	}, [api, focusWidget]);
 
-	const context = useMemo( () => [ focusedWidgetIdRef, focusWidget ], [
-		focusedWidgetIdRef,
-		focusWidget,
-	] );
+	const context = useMemo(
+		() => [focusedWidgetIdRef, focusWidget],
+		[focusedWidgetIdRef, focusWidget]
+	);
 
 	return (
-		<FocusControlContext.Provider value={ context }>
-			{ children }
+		<FocusControlContext.Provider value={context}>
+			{children}
 		</FocusControlContext.Provider>
 	);
 }
 
-export const useFocusControl = () => useContext( FocusControlContext );
+export const useFocusControl = () => useContext(FocusControlContext);

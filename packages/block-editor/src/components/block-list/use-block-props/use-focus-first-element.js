@@ -26,28 +26,28 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @return {number} The initial position, either 0 (start) or -1 (end).
  */
-function useInitialPosition( clientId ) {
+function useInitialPosition(clientId) {
 	return useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
 				isMultiSelecting,
 				isNavigationMode,
 				isBlockSelected,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 
-			if ( ! isBlockSelected( clientId ) ) {
+			if (!isBlockSelected(clientId)) {
 				return;
 			}
 
-			if ( isMultiSelecting() || isNavigationMode() ) {
+			if (isMultiSelecting() || isNavigationMode()) {
 				return;
 			}
 
 			// If there's no initial position, return 0 to focus the start.
 			return getSelectedBlocksInitialCaretPosition();
 		},
-		[ clientId ]
+		[clientId]
 	);
 }
 
@@ -59,44 +59,43 @@ function useInitialPosition( clientId ) {
  *
  * @return {RefObject} React ref with the block element.
  */
-export function useFocusFirstElement( clientId ) {
+export function useFocusFirstElement(clientId) {
 	const ref = useRef();
-	const initialPosition = useInitialPosition( clientId );
+	const initialPosition = useInitialPosition(clientId);
 
-	useEffect( () => {
-		if ( initialPosition === undefined || initialPosition === null ) {
+	useEffect(() => {
+		if (initialPosition === undefined || initialPosition === null) {
 			return;
 		}
 
-		if ( ! ref.current ) {
+		if (!ref.current) {
 			return;
 		}
 
 		const { ownerDocument } = ref.current;
 
 		// Do not focus the block if it already contains the active element.
-		if ( ref.current.contains( ownerDocument.activeElement ) ) {
+		if (ref.current.contains(ownerDocument.activeElement)) {
 			return;
 		}
 
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
-			.find( ref.current )
-			.filter( ( node ) => isTextField( node ) );
+			.find(ref.current)
+			.filter((node) => isTextField(node));
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
-		const target =
-			( isReverse ? last : first )( textInputs ) || ref.current;
+		const target = (isReverse ? last : first)(textInputs) || ref.current;
 
-		if ( ! isInsideRootBlock( ref.current, target ) ) {
+		if (!isInsideRootBlock(ref.current, target)) {
 			ref.current.focus();
 			return;
 		}
 
-		placeCaretAtHorizontalEdge( target, isReverse );
-	}, [ initialPosition ] );
+		placeCaretAtHorizontalEdge(target, isReverse);
+	}, [initialPosition]);
 
 	return ref;
 }

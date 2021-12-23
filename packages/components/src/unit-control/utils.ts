@@ -11,110 +11,110 @@ import type { Value, WPUnitControlUnit, WPUnitControlUnitList } from './types';
 
 const isWeb = Platform.OS === 'web';
 
-const allUnits: Record< string, WPUnitControlUnit > = {
+const allUnits: Record<string, WPUnitControlUnit> = {
 	px: {
 		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		label: isWeb ? 'px' : __('Pixels (px)'),
 		default: '',
-		a11yLabel: __( 'Pixels (px)' ),
+		a11yLabel: __('Pixels (px)'),
 		step: 1,
 	},
 	'%': {
 		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
+		label: isWeb ? '%' : __('Percentage (%)'),
 		default: '',
-		a11yLabel: __( 'Percent (%)' ),
+		a11yLabel: __('Percent (%)'),
 		step: 0.1,
 	},
 	em: {
 		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
+		label: isWeb ? 'em' : __('Relative to parent font size (em)'),
 		default: '',
-		a11yLabel: _x( 'ems', 'Relative to parent font size (em)' ),
+		a11yLabel: _x('ems', 'Relative to parent font size (em)'),
 		step: 0.01,
 	},
 	rem: {
 		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
+		label: isWeb ? 'rem' : __('Relative to root font size (rem)'),
 		default: '',
-		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
+		a11yLabel: _x('rems', 'Relative to root font size (rem)'),
 		step: 0.01,
 	},
 	vw: {
 		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
+		label: isWeb ? 'vw' : __('Viewport width (vw)'),
 		default: '',
-		a11yLabel: __( 'Viewport width (vw)' ),
+		a11yLabel: __('Viewport width (vw)'),
 		step: 0.1,
 	},
 	vh: {
 		value: 'vh',
-		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
+		label: isWeb ? 'vh' : __('Viewport height (vh)'),
 		default: '',
-		a11yLabel: __( 'Viewport height (vh)' ),
+		a11yLabel: __('Viewport height (vh)'),
 		step: 0.1,
 	},
 	vmin: {
 		value: 'vmin',
-		label: isWeb ? 'vmin' : __( 'Viewport smallest dimension (vmin)' ),
+		label: isWeb ? 'vmin' : __('Viewport smallest dimension (vmin)'),
 		default: '',
-		a11yLabel: __( 'Viewport smallest dimension (vmin)' ),
+		a11yLabel: __('Viewport smallest dimension (vmin)'),
 		step: 0.1,
 	},
 	vmax: {
 		value: 'vmax',
-		label: isWeb ? 'vmax' : __( 'Viewport largest dimension (vmax)' ),
+		label: isWeb ? 'vmax' : __('Viewport largest dimension (vmax)'),
 		default: '',
-		a11yLabel: __( 'Viewport largest dimension (vmax)' ),
+		a11yLabel: __('Viewport largest dimension (vmax)'),
 		step: 0.1,
 	},
 	ch: {
 		value: 'ch',
-		label: isWeb ? 'ch' : __( 'Width of the zero (0) character (ch)' ),
+		label: isWeb ? 'ch' : __('Width of the zero (0) character (ch)'),
 		default: '',
-		a11yLabel: __( 'Width of the zero (0) character (ch)' ),
+		a11yLabel: __('Width of the zero (0) character (ch)'),
 		step: 0.01,
 	},
 	ex: {
 		value: 'ex',
-		label: isWeb ? 'ex' : __( 'x-height of the font (ex)' ),
+		label: isWeb ? 'ex' : __('x-height of the font (ex)'),
 		default: '',
-		a11yLabel: __( 'x-height of the font (ex)' ),
+		a11yLabel: __('x-height of the font (ex)'),
 		step: 0.01,
 	},
 	cm: {
 		value: 'cm',
-		label: isWeb ? 'cm' : __( 'Centimeters (cm)' ),
+		label: isWeb ? 'cm' : __('Centimeters (cm)'),
 		default: '',
-		a11yLabel: __( 'Centimeters (cm)' ),
+		a11yLabel: __('Centimeters (cm)'),
 		step: 0.001,
 	},
 	mm: {
 		value: 'mm',
-		label: isWeb ? 'mm' : __( 'Millimeters (mm)' ),
+		label: isWeb ? 'mm' : __('Millimeters (mm)'),
 		default: '',
-		a11yLabel: __( 'Millimeters (mm)' ),
+		a11yLabel: __('Millimeters (mm)'),
 		step: 0.1,
 	},
 	in: {
 		value: 'in',
-		label: isWeb ? 'in' : __( 'Inches (in)' ),
+		label: isWeb ? 'in' : __('Inches (in)'),
 		default: '',
-		a11yLabel: __( 'Inches (in)' ),
+		a11yLabel: __('Inches (in)'),
 		step: 0.001,
 	},
 	pc: {
 		value: 'pc',
-		label: isWeb ? 'pc' : __( 'Picas (pc)' ),
+		label: isWeb ? 'pc' : __('Picas (pc)'),
 		default: '',
-		a11yLabel: __( 'Picas (pc)' ),
+		a11yLabel: __('Picas (pc)'),
 		step: 1,
 	},
 	pt: {
 		value: 'pt',
-		label: isWeb ? 'pt' : __( 'Points (pt)' ),
+		label: isWeb ? 'pt' : __('Points (pt)'),
 		default: '',
-		a11yLabel: __( 'Points (pt)' ),
+		a11yLabel: __('Points (pt)'),
 		step: 1,
 	},
 };
@@ -122,14 +122,14 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 /**
  * An array of all available CSS length units.
  */
-export const ALL_CSS_UNITS = Object.values( allUnits );
+export const ALL_CSS_UNITS = Object.values(allUnits);
 
 /**
  * Units of measurements. `a11yLabel` is used by screenreaders.
  */
 export const CSS_UNITS = [
 	allUnits.px,
-	allUnits[ '%' ],
+	allUnits['%'],
 	allUnits.em,
 	allUnits.rem,
 	allUnits.vw,
@@ -154,10 +154,10 @@ export function getParsedValue(
 	value: Value,
 	unit?: string,
 	units?: WPUnitControlUnitList
-): [ Value, string | undefined ] {
-	const initialValue = unit ? `${ value }${ unit }` : value;
+): [Value, string | undefined] {
+	const initialValue = unit ? `${value}${unit}` : value;
 
-	return parseUnit( initialValue, units );
+	return parseUnit(initialValue, units);
 }
 
 /**
@@ -166,8 +166,8 @@ export function getParsedValue(
  * @param  units Units to check.
  * @return Whether units are defined.
  */
-export function hasUnits( units: WPUnitControlUnitList ): boolean {
-	return Array.isArray( units ) && !! units.length;
+export function hasUnits(units: WPUnitControlUnitList): boolean {
+	return Array.isArray(units) && !!units.length;
 }
 
 /**
@@ -180,26 +180,26 @@ export function hasUnits( units: WPUnitControlUnitList ): boolean {
 export function parseUnit(
 	initialValue: Value | undefined,
 	units: WPUnitControlUnitList = ALL_CSS_UNITS
-): [ Value, string | undefined ] {
-	const value = String( initialValue ).trim();
+): [Value, string | undefined] {
+	const value = String(initialValue).trim();
 
-	let num: Value = parseFloat( value );
-	num = isNaN( num ) ? '' : num;
+	let num: Value = parseFloat(value);
+	num = isNaN(num) ? '' : num;
 
-	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ );
+	const unitMatch = value.match(/[\d.\-\+]*\s*(.*)/);
 
 	let unit: string | undefined =
-		unitMatch?.[ 1 ] !== undefined ? unitMatch[ 1 ] : '';
+		unitMatch?.[1] !== undefined ? unitMatch[1] : '';
 	unit = unit.toLowerCase();
 
-	if ( hasUnits( units ) && units !== false ) {
-		const match = units.find( ( item ) => item.value === unit );
+	if (hasUnits(units) && units !== false) {
+		const match = units.find((item) => item.value === unit);
 		unit = match?.value;
 	} else {
 		unit = DEFAULT_UNIT.value;
 	}
 
-	return [ num, unit ];
+	return [num, unit];
 }
 
 /**
@@ -217,14 +217,14 @@ export function getValidParsedUnit(
 	units: WPUnitControlUnitList,
 	fallbackValue: Value,
 	fallbackUnit: string | undefined
-): [ Value, string | undefined ] {
-	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
+): [Value, string | undefined] {
+	const [parsedValue, parsedUnit] = parseUnit(next, units);
 	let baseValue = parsedValue;
 	let baseUnit: string | undefined;
 
 	// The parsed value from `parseUnit` should now be either a
 	// real number or an empty string. If not, use the fallback value.
-	if ( ! Number.isFinite( parsedValue ) || parsedValue === '' ) {
+	if (!Number.isFinite(parsedValue) || parsedValue === '') {
 		baseValue = fallbackValue;
 	}
 
@@ -234,11 +234,11 @@ export function getValidParsedUnit(
 	 * If no unit is found, attempt to use the first value from the collection
 	 * of units as a default fallback.
 	 */
-	if ( Array.isArray( units ) && hasUnits( units ) && ! baseUnit ) {
-		baseUnit = units[ 0 ]?.value;
+	if (Array.isArray(units) && hasUnits(units) && !baseUnit) {
+		baseUnit = units[0]?.value;
 	}
 
-	return [ baseValue, baseUnit ];
+	return [baseValue, baseUnit];
 }
 
 /**
@@ -248,8 +248,8 @@ export function getValidParsedUnit(
  * @param  unit Unit value (example: px)
  * @return a11y label for the unit abbreviation
  */
-export function parseA11yLabelForUnit( unit: string ): string | undefined {
-	const match = ALL_CSS_UNITS.find( ( item ) => item.value === unit );
+export function parseA11yLabelForUnit(unit: string): string | undefined {
+	const match = ALL_CSS_UNITS.find((item) => item.value === unit);
 	return match?.a11yLabel ? match?.a11yLabel : match?.value;
 }
 
@@ -262,13 +262,13 @@ export function parseA11yLabelForUnit( unit: string ): string | undefined {
  * @return Filtered units based on settings.
  */
 export function filterUnitsWithSettings(
-	unitSetting: Array< string > = [],
+	unitSetting: Array<string> = [],
 	units: WPUnitControlUnitList
-): Array< WPUnitControlUnit > {
-	return Array.isArray( units )
-		? units.filter( ( unit ) => {
-				return unitSetting.includes( unit.value );
-		  } )
+): Array<WPUnitControlUnit> {
+	return Array.isArray(units)
+		? units.filter((unit) => {
+				return unitSetting.includes(unit.value);
+		  })
 		: [];
 }
 
@@ -284,27 +284,27 @@ export function filterUnitsWithSettings(
  *
  * @return Filtered units based on settings.
  */
-export const useCustomUnits = ( {
+export const useCustomUnits = ({
 	units,
 	availableUnits,
 	defaultValues,
 }: {
 	units?: WPUnitControlUnitList;
-	availableUnits?: Array< string >;
-	defaultValues: Record< string, Value >;
-} ): WPUnitControlUnitList => {
+	availableUnits?: Array<string>;
+	defaultValues: Record<string, Value>;
+}): WPUnitControlUnitList => {
 	units = units || ALL_CSS_UNITS;
 	const usedUnits = filterUnitsWithSettings(
-		! availableUnits ? [] : availableUnits,
+		!availableUnits ? [] : availableUnits,
 		units
 	);
 
-	if ( defaultValues ) {
-		usedUnits.forEach( ( unit, i ) => {
-			if ( defaultValues[ unit.value ] ) {
-				usedUnits[ i ].default = defaultValues[ unit.value ];
+	if (defaultValues) {
+		usedUnits.forEach((unit, i) => {
+			if (defaultValues[unit.value]) {
+				usedUnits[i].default = defaultValues[unit.value];
 			}
-		} );
+		});
 	}
 
 	return usedUnits.length === 0 ? false : usedUnits;
@@ -329,12 +329,12 @@ export function getUnitsWithCurrentUnit(
 	legacyUnit: string | undefined,
 	units: WPUnitControlUnitList = ALL_CSS_UNITS
 ): WPUnitControlUnitList {
-	if ( ! Array.isArray( units ) ) {
+	if (!Array.isArray(units)) {
 		return units;
 	}
 
-	const unitsWithCurrentUnit = [ ...units ];
-	const [ , currentUnit ] = getParsedValue(
+	const unitsWithCurrentUnit = [...units];
+	const [, currentUnit] = getParsedValue(
 		currentValue,
 		legacyUnit,
 		ALL_CSS_UNITS
@@ -342,10 +342,10 @@ export function getUnitsWithCurrentUnit(
 
 	if (
 		currentUnit &&
-		! unitsWithCurrentUnit.some( ( unit ) => unit.value === currentUnit )
+		!unitsWithCurrentUnit.some((unit) => unit.value === currentUnit)
 	) {
-		if ( allUnits[ currentUnit ] ) {
-			unitsWithCurrentUnit.unshift( allUnits[ currentUnit ] );
+		if (allUnits[currentUnit]) {
+			unitsWithCurrentUnit.unshift(allUnits[currentUnit]);
 		}
 	}
 

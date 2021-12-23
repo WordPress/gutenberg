@@ -2,12 +2,12 @@
 /**
  * External dependencies
  */
-const SimpleGit = require( 'simple-git' );
+const SimpleGit = require('simple-git');
 
 /**
  * Internal dependencies
  */
-const { getRandomTemporaryPath } = require( './utils' );
+const { getRandomTemporaryPath } = require('./utils');
 
 /**
  * Clones a Github repository.
@@ -16,13 +16,13 @@ const { getRandomTemporaryPath } = require( './utils' );
  *
  * @return {Promise<string>} Repository local Path
  */
-async function clone( repositoryUrl ) {
+async function clone(repositoryUrl) {
 	const gitWorkingDirectoryPath = getRandomTemporaryPath();
 	const simpleGit = SimpleGit();
-	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath, [
+	await simpleGit.clone(repositoryUrl, gitWorkingDirectoryPath, [
 		'--depth=1',
 		'--no-single-branch',
-	] );
+	]);
 	return gitWorkingDirectoryPath;
 }
 
@@ -32,9 +32,9 @@ async function clone( repositoryUrl ) {
  * @param {string}          gitWorkingDirectoryPath Local repository path.
  * @param {string[]|Object} options                 Git options to apply.
  */
-async function fetch( gitWorkingDirectoryPath, options = [] ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.fetch( options );
+async function fetch(gitWorkingDirectoryPath, options = []) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.fetch(options);
 }
 
 /**
@@ -46,10 +46,10 @@ async function fetch( gitWorkingDirectoryPath, options = [] ) {
  *
  * @return {Promise<string>} Commit Hash
  */
-async function commit( gitWorkingDirectoryPath, message, filesToAdd = [] ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.add( filesToAdd );
-	const commitData = await simpleGit.commit( message );
+async function commit(gitWorkingDirectoryPath, message, filesToAdd = []) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.add(filesToAdd);
+	const commitData = await simpleGit.commit(message);
 	const commitHash = commitData.commit;
 
 	return commitHash;
@@ -61,9 +61,9 @@ async function commit( gitWorkingDirectoryPath, message, filesToAdd = [] ) {
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} branchName              Branch Name
  */
-async function createLocalBranch( gitWorkingDirectoryPath, branchName ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.checkoutLocalBranch( branchName );
+async function createLocalBranch(gitWorkingDirectoryPath, branchName) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.checkoutLocalBranch(branchName);
 }
 
 /**
@@ -72,10 +72,10 @@ async function createLocalBranch( gitWorkingDirectoryPath, branchName ) {
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} branchName              Branch Name
  */
-async function checkoutRemoteBranch( gitWorkingDirectoryPath, branchName ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.fetch( 'origin', branchName );
-	await simpleGit.checkout( branchName );
+async function checkoutRemoteBranch(gitWorkingDirectoryPath, branchName) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.fetch('origin', branchName);
+	await simpleGit.checkout(branchName);
 }
 
 /**
@@ -84,9 +84,9 @@ async function checkoutRemoteBranch( gitWorkingDirectoryPath, branchName ) {
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} tagName                 Tag Name
  */
-async function createLocalTag( gitWorkingDirectoryPath, tagName ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.addTag( tagName );
+async function createLocalTag(gitWorkingDirectoryPath, tagName) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.addTag(tagName);
 }
 
 /**
@@ -95,9 +95,9 @@ async function createLocalTag( gitWorkingDirectoryPath, tagName ) {
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} branchName              Branch Name
  */
-async function pushBranchToOrigin( gitWorkingDirectoryPath, branchName ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.push( 'origin', branchName );
+async function pushBranchToOrigin(gitWorkingDirectoryPath, branchName) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.push('origin', branchName);
 }
 
 /**
@@ -105,9 +105,9 @@ async function pushBranchToOrigin( gitWorkingDirectoryPath, branchName ) {
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
  */
-async function pushTagsToOrigin( gitWorkingDirectoryPath ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.pushTags( 'origin' );
+async function pushTagsToOrigin(gitWorkingDirectoryPath) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.pushTags('origin');
 }
 
 /**
@@ -115,9 +115,9 @@ async function pushTagsToOrigin( gitWorkingDirectoryPath ) {
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
  */
-async function discardLocalChanges( gitWorkingDirectoryPath ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.reset( 'hard' );
+async function discardLocalChanges(gitWorkingDirectoryPath) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.reset('hard');
 }
 
 /**
@@ -130,10 +130,10 @@ async function resetLocalBranchAgainstOrigin(
 	gitWorkingDirectoryPath,
 	branchName
 ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
 	await simpleGit.fetch();
-	await simpleGit.checkout( branchName );
-	await simpleGit.pull( 'origin', branchName );
+	await simpleGit.checkout(branchName);
+	await simpleGit.pull('origin', branchName);
 }
 
 /**
@@ -142,13 +142,10 @@ async function resetLocalBranchAgainstOrigin(
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} commitHash              Branch Name
  */
-async function cherrypickCommitIntoBranch(
-	gitWorkingDirectoryPath,
-	commitHash
-) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.checkout( 'trunk' );
-	await simpleGit.raw( [ 'cherry-pick', commitHash ] );
+async function cherrypickCommitIntoBranch(gitWorkingDirectoryPath, commitHash) {
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.checkout('trunk');
+	await simpleGit.raw(['cherry-pick', commitHash]);
 }
 
 /**
@@ -161,14 +158,9 @@ async function replaceContentFromRemoteBranch(
 	gitWorkingDirectoryPath,
 	sourceBranchName
 ) {
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.raw( [ 'rm', '-r', '.' ] );
-	await simpleGit.raw( [
-		'checkout',
-		`origin/${ sourceBranchName }`,
-		'--',
-		'.',
-	] );
+	const simpleGit = SimpleGit(gitWorkingDirectoryPath);
+	await simpleGit.raw(['rm', '-r', '.']);
+	await simpleGit.raw(['checkout', `origin/${sourceBranchName}`, '--', '.']);
 }
 
 module.exports = {

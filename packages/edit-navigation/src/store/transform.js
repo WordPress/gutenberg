@@ -46,17 +46,17 @@ export function blockToMenuItem(
 	blockPosition,
 	menuId
 ) {
-	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
-	menuItem.content = get( menuItem.content, 'raw', menuItem.content );
+	menuItem = omit(menuItem, 'menus', 'meta', '_links');
+	menuItem.content = get(menuItem.content, 'raw', menuItem.content);
 
 	let attributes;
 
-	if ( isBlockSupportedInNav( block ) ) {
-		attributes = blockAttributesToMenuItem( block.attributes );
+	if (isBlockSupportedInNav(block)) {
+		attributes = blockAttributesToMenuItem(block.attributes);
 	} else {
 		attributes = {
 			type: 'block',
-			content: serialize( block ),
+			content: serialize(block),
 		};
 	}
 
@@ -64,10 +64,10 @@ export function blockToMenuItem(
 		...menuItem,
 		...attributes,
 		content: attributes.content || '',
-		id: getRecordIdFromBlock( block ),
+		id: getRecordIdFromBlock(block),
 		menu_order: blockPosition + 1,
 		menus: menuId,
-		parent: ! parentId ? 0 : parentId,
+		parent: !parentId ? 0 : parentId,
 		status: 'publish',
 	};
 }
@@ -93,7 +93,7 @@ export function blockToMenuItem(
  * @param {boolean} blockAttributes.opensInNewTab whether or not the block's link should open in a new tab.
  * @return {WPNavMenuItem} the menu item (converted from block attributes).
  */
-export const blockAttributesToMenuItem = ( {
+export const blockAttributesToMenuItem = ({
 	label = '',
 	url = '',
 	description,
@@ -104,41 +104,41 @@ export const blockAttributesToMenuItem = ( {
 	id,
 	kind,
 	opensInNewTab,
-} ) => {
+}) => {
 	// For historical reasons, the `core/navigation-link` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
 	// See also inverse equivalent in `menuItemToBlockAttributes`.
-	if ( type && type === 'tag' ) {
+	if (type && type === 'tag') {
 		type = 'post_tag';
 	}
 
 	return {
 		title: label,
 		url,
-		...( description?.length && {
+		...(description?.length && {
 			description,
-		} ),
-		...( rel?.length && {
-			xfn: rel?.trim().split( ' ' ),
-		} ),
-		...( className?.length && {
-			classes: className?.trim().split( ' ' ),
-		} ),
-		...( blockTitleAttr?.length && {
+		}),
+		...(rel?.length && {
+			xfn: rel?.trim().split(' '),
+		}),
+		...(className?.length && {
+			classes: className?.trim().split(' '),
+		}),
+		...(blockTitleAttr?.length && {
 			attr_title: blockTitleAttr,
-		} ),
-		...( type?.length && {
+		}),
+		...(type?.length && {
 			object: type,
-		} ),
-		...( kind?.length && {
-			type: kind?.replace( '-', '_' ),
-		} ),
+		}),
+		...(kind?.length && {
+			type: kind?.replace('-', '_'),
+		}),
 		// Only assign object_id if it's a entity type (ie: not "custom").
-		...( id &&
+		...(id &&
 			'custom' !== type && {
 				object_id: id,
-			} ),
+			}),
 		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
 	};
 };
@@ -150,14 +150,14 @@ export const blockAttributesToMenuItem = ( {
  *
  * @return {WPBlock[]} An array of blocks.
  */
-export function menuItemsToBlocks( menuItems ) {
-	if ( ! menuItems ) {
+export function menuItemsToBlocks(menuItems) {
+	if (!menuItems) {
 		return null;
 	}
 
-	const menuTree = createDataTree( menuItems );
+	const menuTree = createDataTree(menuItems);
 
-	return mapMenuItemsToBlocks( menuTree );
+	return mapMenuItemsToBlocks(menuTree);
 }
 
 /**
@@ -166,27 +166,27 @@ export function menuItemsToBlocks( menuItems ) {
  * @param {WPNavMenuItem[]} menuItems An array of WPNavMenuItem items.
  * @return {Object} Object containing innerBlocks and mapping.
  */
-function mapMenuItemsToBlocks( menuItems ) {
+function mapMenuItemsToBlocks(menuItems) {
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = sortBy( menuItems, 'menu_order' );
+	const sortedItems = sortBy(menuItems, 'menu_order');
 
-	const blocks = sortedItems.map( ( menuItem ) => {
-		if ( menuItem.type === 'block' ) {
-			const [ block ] = parse( menuItem.content.raw );
+	const blocks = sortedItems.map((menuItem) => {
+		if (menuItem.type === 'block') {
+			const [block] = parse(menuItem.content.raw);
 
-			if ( ! block ) {
-				return createBlock( 'core/freeform', {
+			if (!block) {
+				return createBlock('core/freeform', {
 					content: menuItem.content,
-				} );
+				});
 			}
 
 			return block;
 		}
-		const attributes = menuItemToBlockAttributes( menuItem );
+		const attributes = menuItemToBlockAttributes(menuItem);
 
 		// If there are children recurse to build those nested blocks.
 		const nestedBlocks = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
+			? mapMenuItemsToBlocks(menuItem.children)
 			: [];
 
 		// Create a submenu block when there are inner blocks, or just a link
@@ -196,11 +196,11 @@ function mapMenuItemsToBlocks( menuItems ) {
 			: 'core/navigation-link';
 
 		// Create block with nested "innerBlocks".
-		return createBlock( itemBlockName, attributes, nestedBlocks );
-	} );
+		return createBlock(itemBlockName, attributes, nestedBlocks);
+	});
 
-	return zip( blocks, sortedItems ).map( ( [ block, menuItem ] ) =>
-		addRecordIdToBlock( block, menuItem.id )
+	return zip(blocks, sortedItems).map(([block, menuItem]) =>
+		addRecordIdToBlock(block, menuItem.id)
 	);
 }
 
@@ -212,7 +212,7 @@ function mapMenuItemsToBlocks( menuItems ) {
  * @param {WPNavMenuItem} menuItem the menu item to be converted to block attributes.
  * @return {Object} the block attributes converted from the WPNavMenuItem item.
  */
-export function menuItemToBlockAttributes( {
+export function menuItemToBlockAttributes({
 	title: menuItemTitleField,
 	xfn,
 	classes,
@@ -223,43 +223,43 @@ export function menuItemToBlockAttributes( {
 	url,
 	type: menuItemTypeField,
 	target,
-} ) {
+}) {
 	// For historical reasons, the `core/navigation-link` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
 	// See also inverse equivalent in `blockAttributesToMenuItem`.
-	if ( object && object === 'post_tag' ) {
+	if (object && object === 'post_tag') {
 		object = 'tag';
 	}
 
 	return {
 		label: menuItemTitleField?.rendered || '',
-		...( object?.length && {
+		...(object?.length && {
 			type: object,
-		} ),
-		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
+		}),
+		kind: menuItemTypeField?.replace('_', '-') || 'custom',
 		url: url || '',
-		...( xfn?.length &&
-			xfn.join( ' ' ).trim() && {
-				rel: xfn.join( ' ' ).trim(),
-			} ),
-		...( classes?.length &&
-			classes.join( ' ' ).trim() && {
-				className: classes.join( ' ' ).trim(),
-			} ),
-		...( attr_title?.length && {
+		...(xfn?.length &&
+			xfn.join(' ').trim() && {
+				rel: xfn.join(' ').trim(),
+			}),
+		...(classes?.length &&
+			classes.join(' ').trim() && {
+				className: classes.join(' ').trim(),
+			}),
+		...(attr_title?.length && {
 			title: attr_title,
-		} ),
-		...( object_id &&
+		}),
+		...(object_id &&
 			'custom' !== object && {
 				id: object_id,
-			} ),
-		...( description?.length && {
+			}),
+		...(description?.length && {
 			description,
-		} ),
-		...( target === NEW_TAB_TARGET_ATTRIBUTE && {
+		}),
+		...(target === NEW_TAB_TARGET_ATTRIBUTE && {
 			opensInNewTab: true,
-		} ),
+		}),
 	};
 }
 /* eslint-enable camelcase */
@@ -279,26 +279,24 @@ export function menuItemToBlockAttributes( {
  * @param {*}      relation the property which identifies how the current item is related to other items in the data (if at all).
  * @return {Array} a nested array of parent/child relationships
  */
-function createDataTree( dataset, id = 'id', relation = 'parent' ) {
-	const hashTable = Object.create( null );
+function createDataTree(dataset, id = 'id', relation = 'parent') {
+	const hashTable = Object.create(null);
 	const dataTree = [];
 
-	for ( const data of dataset ) {
-		hashTable[ data[ id ] ] = {
+	for (const data of dataset) {
+		hashTable[data[id]] = {
 			...data,
 			children: [],
 		};
 	}
-	for ( const data of dataset ) {
-		if ( data[ relation ] ) {
-			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
-			hashTable[ data[ relation ] ].children =
-				hashTable[ data[ relation ] ].children || [];
-			hashTable[ data[ relation ] ].children.push(
-				hashTable[ data[ id ] ]
-			);
+	for (const data of dataset) {
+		if (data[relation]) {
+			hashTable[data[relation]] = hashTable[data[relation]] || {};
+			hashTable[data[relation]].children =
+				hashTable[data[relation]].children || [];
+			hashTable[data[relation]].children.push(hashTable[data[id]]);
 		} else {
-			dataTree.push( hashTable[ data[ id ] ] );
+			dataTree.push(hashTable[data[id]]);
 		}
 	}
 

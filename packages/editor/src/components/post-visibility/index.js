@@ -14,31 +14,31 @@ import { visibilityOptions } from './utils';
 import { store as editorStore } from '../../store';
 
 export class PostVisibility extends Component {
-	constructor( props ) {
-		super( ...arguments );
+	constructor(props) {
+		super(...arguments);
 
-		this.setPublic = this.setPublic.bind( this );
-		this.setPrivate = this.setPrivate.bind( this );
-		this.setPasswordProtected = this.setPasswordProtected.bind( this );
-		this.updatePassword = this.updatePassword.bind( this );
+		this.setPublic = this.setPublic.bind(this);
+		this.setPrivate = this.setPrivate.bind(this);
+		this.setPasswordProtected = this.setPasswordProtected.bind(this);
+		this.updatePassword = this.updatePassword.bind(this);
 
 		this.state = {
-			hasPassword: !! props.password,
+			hasPassword: !!props.password,
 		};
 	}
 
 	setPublic() {
 		const { visibility, onUpdateVisibility, status } = this.props;
 
-		onUpdateVisibility( visibility === 'private' ? 'draft' : status );
-		this.setState( { hasPassword: false } );
+		onUpdateVisibility(visibility === 'private' ? 'draft' : status);
+		this.setState({ hasPassword: false });
 	}
 
 	setPrivate() {
 		if (
 			// eslint-disable-next-line no-alert
-			! window.confirm(
-				__( 'Would you like to privately publish this post now?' )
+			!window.confirm(
+				__('Would you like to privately publish this post now?')
 			)
 		) {
 			return;
@@ -46,8 +46,8 @@ export class PostVisibility extends Component {
 
 		const { onUpdateVisibility, onSave } = this.props;
 
-		onUpdateVisibility( 'private' );
-		this.setState( { hasPassword: false } );
+		onUpdateVisibility('private');
+		this.setState({ hasPassword: false });
 		onSave();
 	}
 
@@ -58,12 +58,12 @@ export class PostVisibility extends Component {
 			visibility === 'private' ? 'draft' : status,
 			password || ''
 		);
-		this.setState( { hasPassword: true } );
+		this.setState({ hasPassword: true });
 	}
 
-	updatePassword( event ) {
+	updatePassword(event) {
 		const { status, onUpdateVisibility } = this.props;
-		onUpdateVisibility( status, event.target.value );
+		onUpdateVisibility(status, event.target.value);
 	}
 
 	render() {
@@ -72,7 +72,7 @@ export class PostVisibility extends Component {
 		const visibilityHandlers = {
 			public: {
 				onSelect: this.setPublic,
-				checked: visibility === 'public' && ! this.state.hasPassword,
+				checked: visibility === 'public' && !this.state.hasPassword,
 			},
 			private: {
 				onSelect: this.setPrivate,
@@ -90,39 +90,36 @@ export class PostVisibility extends Component {
 				className="editor-post-visibility__dialog-fieldset"
 			>
 				<legend className="editor-post-visibility__dialog-legend">
-					{ __( 'Post Visibility' ) }
+					{__('Post Visibility')}
 				</legend>
-				{ visibilityOptions.map( ( { value, label, info } ) => (
-					<div
-						key={ value }
-						className="editor-post-visibility__choice"
-					>
+				{visibilityOptions.map(({ value, label, info }) => (
+					<div key={value} className="editor-post-visibility__choice">
 						<input
 							type="radio"
-							name={ `editor-post-visibility__setting-${ instanceId }` }
-							value={ value }
-							onChange={ visibilityHandlers[ value ].onSelect }
-							checked={ visibilityHandlers[ value ].checked }
-							id={ `editor-post-${ value }-${ instanceId }` }
-							aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
+							name={`editor-post-visibility__setting-${instanceId}`}
+							value={value}
+							onChange={visibilityHandlers[value].onSelect}
+							checked={visibilityHandlers[value].checked}
+							id={`editor-post-${value}-${instanceId}`}
+							aria-describedby={`editor-post-${value}-${instanceId}-description`}
 							className="editor-post-visibility__dialog-radio"
 						/>
 						<label
-							htmlFor={ `editor-post-${ value }-${ instanceId }` }
+							htmlFor={`editor-post-${value}-${instanceId}`}
 							className="editor-post-visibility__dialog-label"
 						>
-							{ label }
+							{label}
 						</label>
 						{
 							<p
-								id={ `editor-post-${ value }-${ instanceId }-description` }
+								id={`editor-post-${value}-${instanceId}-description`}
 								className="editor-post-visibility__dialog-info"
 							>
-								{ info }
+								{info}
 							</p>
 						}
 					</div>
-				) ) }
+				))}
 			</fieldset>,
 			this.state.hasPassword && (
 				<div
@@ -131,17 +128,17 @@ export class PostVisibility extends Component {
 				>
 					<VisuallyHidden
 						as="label"
-						htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+						htmlFor={`editor-post-visibility__dialog-password-input-${instanceId}`}
 					>
-						{ __( 'Create password' ) }
+						{__('Create password')}
 					</VisuallyHidden>
 					<input
 						className="editor-post-visibility__dialog-password-input"
-						id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+						id={`editor-post-visibility__dialog-password-input-${instanceId}`}
 						type="text"
-						onChange={ this.updatePassword }
-						value={ password }
-						placeholder={ __( 'Use a secure password' ) }
+						onChange={this.updatePassword}
+						value={password}
+						placeholder={__('Use a secure password')}
 					/>
 				</div>
 			),
@@ -149,25 +146,24 @@ export class PostVisibility extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditedPostVisibility } = select(
-			editorStore
-		);
+export default compose([
+	withSelect((select) => {
+		const { getEditedPostAttribute, getEditedPostVisibility } =
+			select(editorStore);
 		return {
-			status: getEditedPostAttribute( 'status' ),
+			status: getEditedPostAttribute('status'),
 			visibility: getEditedPostVisibility(),
-			password: getEditedPostAttribute( 'password' ),
+			password: getEditedPostAttribute('password'),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { savePost, editPost } = dispatch( editorStore );
+	}),
+	withDispatch((dispatch) => {
+		const { savePost, editPost } = dispatch(editorStore);
 		return {
 			onSave: savePost,
-			onUpdateVisibility( status, password = '' ) {
-				editPost( { status, password } );
+			onUpdateVisibility(status, password = '') {
+				editPost({ status, password });
 			},
 		};
-	} ),
+	}),
 	withInstanceId,
-] )( PostVisibility );
+])(PostVisibility);

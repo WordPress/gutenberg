@@ -7,13 +7,13 @@
  *
  * @return {string} HTML content.
  */
-export const getMetaBoxContainer = ( location ) => {
+export const getMetaBoxContainer = (location) => {
 	const area = document.querySelector(
-		`.edit-post-meta-boxes-area.is-${ location } .metabox-location-${ location }`
+		`.edit-post-meta-boxes-area.is-${location} .metabox-location-${location}`
 	);
-	if ( area ) {
+	if (area) {
 		return area;
 	}
 
-	return document.querySelector( '#metaboxes .metabox-location-' + location );
+	return document.querySelector('#metaboxes .metabox-location-' + location);
 };

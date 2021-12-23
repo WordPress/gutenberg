@@ -36,126 +36,124 @@ import styles from './style.scss';
 
 const { compose: stylesCompose } = StyleSheet;
 
-export function getAutoCompleterUI( autocompleter ) {
+export function getAutoCompleterUI(autocompleter) {
 	const useItems = autocompleter.useItems
 		? autocompleter.useItems
-		: getDefaultUseItems( autocompleter );
+		: getDefaultUseItems(autocompleter);
 
-	function AutocompleterUI( {
+	function AutocompleterUI({
 		filterValue,
 		selectedIndex,
 		onChangeOptions,
 		onSelect,
 		value,
 		reset,
-	} ) {
-		const [ items ] = useItems( filterValue );
-		const filteredItems = items.filter( ( item ) => ! item.isDisabled );
+	}) {
+		const [items] = useItems(filterValue);
+		const filteredItems = items.filter((item) => !item.isDisabled);
 		const scrollViewRef = useRef();
-		const animationValue = useRef( new Animated.Value( 0 ) ).current;
-		const [ isVisible, setIsVisible ] = useState( false );
+		const animationValue = useRef(new Animated.Value(0)).current;
+		const [isVisible, setIsVisible] = useState(false);
 		const { text } = value;
 
-		useEffect( () => {
-			if ( ! isVisible && text.length > 0 ) {
-				setIsVisible( true );
+		useEffect(() => {
+			if (!isVisible && text.length > 0) {
+				setIsVisible(true);
 			}
-		}, [ isVisible, text ] );
+		}, [isVisible, text]);
 
-		useLayoutEffect( () => {
-			onChangeOptions( items );
-			scrollViewRef.current?.scrollTo( { x: 0, animated: false } );
+		useLayoutEffect(() => {
+			onChangeOptions(items);
+			scrollViewRef.current?.scrollTo({ x: 0, animated: false });
 
-			if ( isVisible && text.length > 0 ) {
-				startAnimation( true );
-			} else if ( isVisible && text.length === 0 ) {
-				startAnimation( false );
+			if (isVisible && text.length > 0) {
+				startAnimation(true);
+			} else if (isVisible && text.length === 0) {
+				startAnimation(false);
 			}
-		}, [ items, isVisible, text ] );
+		}, [items, isVisible, text]);
 
 		const activeItemStyles = usePreferredColorSchemeStyle(
-			styles[ 'components-autocomplete__item-active' ],
-			styles[ 'components-autocomplete__item-active-dark' ]
+			styles['components-autocomplete__item-active'],
+			styles['components-autocomplete__item-active-dark']
 		);
 
 		const iconStyles = usePreferredColorSchemeStyle(
-			styles[ 'components-autocomplete__icon' ],
-			styles[ 'components-autocomplete__icon-active-dark' ]
+			styles['components-autocomplete__icon'],
+			styles['components-autocomplete__icon-active-dark']
 		);
 
 		const activeIconStyles = usePreferredColorSchemeStyle(
-			styles[ 'components-autocomplete__icon-active ' ],
-			styles[ 'components-autocomplete__icon-active-dark' ]
+			styles['components-autocomplete__icon-active '],
+			styles['components-autocomplete__icon-active-dark']
 		);
 
 		const textStyles = usePreferredColorSchemeStyle(
-			styles[ 'components-autocomplete__text' ],
-			styles[ 'components-autocomplete__text-dark' ]
+			styles['components-autocomplete__text'],
+			styles['components-autocomplete__text-dark']
 		);
 
 		const activeTextStyles = usePreferredColorSchemeStyle(
-			styles[ 'components-autocomplete__text-active' ],
-			styles[ 'components-autocomplete__text-active-dark' ]
+			styles['components-autocomplete__text-active'],
+			styles['components-autocomplete__text-active-dark']
 		);
 
 		const startAnimation = useCallback(
-			( show ) => {
-				Animated.timing( animationValue, {
+			(show) => {
+				Animated.timing(animationValue, {
 					toValue: show ? 1 : 0,
 					duration: show ? 200 : 100,
 					useNativeDriver: true,
-				} ).start( ( { finished } ) => {
-					if ( finished && ! show && isVisible ) {
-						setIsVisible( false );
+				}).start(({ finished }) => {
+					if (finished && !show && isVisible) {
+						setIsVisible(false);
 						reset();
 					}
-				} );
+				});
 			},
-			[ isVisible ]
+			[isVisible]
 		);
 
 		const contentStyles = {
 			transform: [
 				{
-					translateY: animationValue.interpolate( {
-						inputRange: [ 0, 1 ],
+					translateY: animationValue.interpolate({
+						inputRange: [0, 1],
 						outputRange: [
-							styles[ 'components-autocomplete' ].height,
+							styles['components-autocomplete'].height,
 							0,
 						],
-					} ),
+					}),
 				},
 			],
 		};
 
-		if ( ! filteredItems.length > 0 || ! isVisible ) {
+		if (!filteredItems.length > 0 || !isVisible) {
 			return null;
 		}
 
 		return (
 			<AutocompletionItemsFill>
-				<View style={ styles[ 'components-autocomplete' ] }>
-					<Animated.View style={ contentStyles }>
+				<View style={styles['components-autocomplete']}>
+					<Animated.View style={contentStyles}>
 						<BackgroundView>
 							<ScrollView
-								ref={ scrollViewRef }
+								ref={scrollViewRef}
 								horizontal
 								contentContainerStyle={
-									styles[ 'components-autocomplete__content' ]
+									styles['components-autocomplete__content']
 								}
-								showsHorizontalScrollIndicator={ false }
+								showsHorizontalScrollIndicator={false}
 								keyboardShouldPersistTaps="always"
 								accessibilityLabel={
 									// translators: Slash inserter autocomplete results
-									__( 'Slash inserter results' )
+									__('Slash inserter results')
 								}
 							>
-								{ filteredItems.map( ( option, index ) => {
+								{filteredItems.map((option, index) => {
 									const isActive = index === selectedIndex;
 									const itemStyle = stylesCompose(
-										styles[
-											'components-autocomplete__item'
-										],
+										styles['components-autocomplete__item'],
 										isActive && activeItemStyles
 									);
 									const textStyle = stylesCompose(
@@ -172,15 +170,15 @@ export function getAutoCompleterUI( autocompleter ) {
 
 									return (
 										<TouchableOpacity
-											activeOpacity={ 0.5 }
-											style={ itemStyle }
-											key={ index }
-											onPress={ () => onSelect( option ) }
-											accessibilityLabel={ sprintf(
+											activeOpacity={0.5}
+											style={itemStyle}
+											key={index}
+											onPress={() => onSelect(option)}
+											accessibilityLabel={sprintf(
 												// translators: %s: Block name e.g. "Image block"
-												__( '%s block' ),
+												__('%s block'),
 												option?.value?.title
-											) }
+											)}
 										>
 											<View
 												style={
@@ -190,17 +188,17 @@ export function getAutoCompleterUI( autocompleter ) {
 												}
 											>
 												<Icon
-													icon={ iconSource }
-													size={ 24 }
-													style={ iconStyle }
+													icon={iconSource}
+													size={24}
+													style={iconStyle}
 												/>
 											</View>
-											<Text style={ textStyle }>
-												{ option?.value?.title }
+											<Text style={textStyle}>
+												{option?.value?.title}
 											</Text>
 										</TouchableOpacity>
 									);
-								} ) }
+								})}
 							</ScrollView>
 						</BackgroundView>
 					</Animated.View>

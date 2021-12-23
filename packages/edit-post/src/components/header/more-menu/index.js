@@ -22,40 +22,40 @@ const POPOVER_PROPS = {
 	className: 'edit-post-more-menu__content',
 };
 
-const MoreMenu = ( { showIconLabels } ) => {
-	const isLargeViewport = useViewportMatch( 'large' );
+const MoreMenu = ({ showIconLabels }) => {
+	const isLargeViewport = useViewportMatch('large');
 
 	return (
 		<MoreMenuDropdown
 			className="edit-post-more-menu"
-			popoverProps={ POPOVER_PROPS }
-			toggleProps={ {
-				showTooltip: ! showIconLabels,
-				...( showIconLabels && { variant: 'tertiary' } ),
-			} }
+			popoverProps={POPOVER_PROPS}
+			toggleProps={{
+				showTooltip: !showIconLabels,
+				...(showIconLabels && { variant: 'tertiary' }),
+			}}
 		>
-			{ ( { onClose } ) => (
+			{({ onClose }) => (
 				<>
-					{ showIconLabels && ! isLargeViewport && (
+					{showIconLabels && !isLargeViewport && (
 						<PinnedItems.Slot
-							className={ showIconLabels && 'show-icon-labels' }
+							className={showIconLabels && 'show-icon-labels'}
 							scope="core/edit-post"
 						/>
-					) }
+					)}
 					<WritingMenu />
 					<ModeSwitcher />
 					<ActionItem.Slot
 						name="core/edit-post/plugin-more-menu"
-						label={ __( 'Plugins' ) }
-						as={ MenuGroup }
-						fillProps={ { onClick: onClose } }
+						label={__('Plugins')}
+						as={MenuGroup}
+						fillProps={{ onClick: onClose }}
 					/>
-					<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
+					<ToolsMoreMenuGroup.Slot fillProps={{ onClose }} />
 					<MenuGroup>
 						<PreferencesMenuItem />
 					</MenuGroup>
 				</>
-			) }
+			)}
 		</MoreMenuDropdown>
 	);
 };

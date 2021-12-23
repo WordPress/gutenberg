@@ -11,17 +11,17 @@ import {
 
 const TEXT_TRANSFORMS = [
 	{
-		name: __( 'Uppercase' ),
+		name: __('Uppercase'),
 		value: 'uppercase',
 		icon: formatUppercase,
 	},
 	{
-		name: __( 'Lowercase' ),
+		name: __('Lowercase'),
 		value: 'lowercase',
 		icon: formatLowercase,
 	},
 	{
-		name: __( 'Capitalize' ),
+		name: __('Capitalize'),
 		value: 'capitalize',
 		icon: formatCapitalize,
 	},
@@ -36,20 +36,20 @@ const TEXT_TRANSFORMS = [
  *
  * @return {WPElement} Text transform control.
  */
-export default function TextTransformControl( { value, onChange } ) {
+export default function TextTransformControl({ value, onChange }) {
 	return (
 		<fieldset className="block-editor-text-transform-control">
-			<legend>{ __( 'Letter case' ) }</legend>
+			<legend>{__('Letter case')}</legend>
 			<div className="block-editor-text-transform-control__buttons">
-				{ TEXT_TRANSFORMS.map( ( textTransform ) => {
+				{TEXT_TRANSFORMS.map((textTransform) => {
 					return (
 						<Button
-							key={ textTransform.value }
-							icon={ textTransform.icon }
+							key={textTransform.value}
+							icon={textTransform.icon}
 							isSmall
-							isPressed={ value === textTransform.value }
-							aria-label={ textTransform.name }
-							onClick={ () =>
+							isPressed={value === textTransform.value}
+							aria-label={textTransform.name}
+							onClick={() =>
 								onChange(
 									value === textTransform.value
 										? undefined
@@ -58,7 +58,7 @@ export default function TextTransformControl( { value, onChange } ) {
 							}
 						/>
 					);
-				} ) }
+				})}
 			</div>
 		</fieldset>
 	);

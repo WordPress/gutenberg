@@ -15,27 +15,27 @@ const DEFAULT_MAX_ITEMS = 100;
 
 const options = [
 	{
-		label: __( 'Newest to oldest' ),
+		label: __('Newest to oldest'),
 		value: 'date/desc',
 	},
 	{
-		label: __( 'Oldest to newest' ),
+		label: __('Oldest to newest'),
 		value: 'date/asc',
 	},
 	{
 		/* translators: label for ordering posts by title in ascending order */
-		label: __( 'A → Z' ),
+		label: __('A → Z'),
 		value: 'title/asc',
 	},
 	{
 		/* translators: label for ordering posts by title in descending order */
-		label: __( 'Z → A' ),
+		label: __('Z → A'),
 		value: 'title/desc',
 	},
 ];
 
 const QueryControls = memo(
-	( {
+	({
 		categoriesList,
 		selectedCategoryId,
 		numberOfItems,
@@ -47,51 +47,51 @@ const QueryControls = memo(
 		onNumberOfItemsChange,
 		onOrderChange,
 		onOrderByChange,
-	} ) => {
+	}) => {
 		const onChange = useCallback(
-			( value ) => {
-				const [ newOrderBy, newOrder ] = value.split( '/' );
-				if ( newOrder !== order ) {
-					onOrderChange( newOrder );
+			(value) => {
+				const [newOrderBy, newOrder] = value.split('/');
+				if (newOrder !== order) {
+					onOrderChange(newOrder);
 				}
-				if ( newOrderBy !== orderBy ) {
-					onOrderByChange( newOrderBy );
+				if (newOrderBy !== orderBy) {
+					onOrderByChange(newOrderBy);
 				}
 			},
-			[ order, orderBy, onOrderByChange, onOrderChange ]
+			[order, orderBy, onOrderByChange, onOrderChange]
 		);
 
 		return (
 			<>
-				{ onOrderChange && onOrderByChange && (
+				{onOrderChange && onOrderByChange && (
 					<SelectControl
-						label={ __( 'Order by' ) }
-						value={ `${ orderBy }/${ order }` }
-						options={ options }
-						onChange={ onChange }
-						hideCancelButton={ true }
+						label={__('Order by')}
+						value={`${orderBy}/${order}`}
+						options={options}
+						onChange={onChange}
+						hideCancelButton={true}
 					/>
-				) }
-				{ onCategoryChange && (
+				)}
+				{onCategoryChange && (
 					<CategorySelect
-						categoriesList={ categoriesList }
-						label={ __( 'Category' ) }
-						noOptionLabel={ __( 'All' ) }
-						selectedCategoryId={ selectedCategoryId }
-						onChange={ onCategoryChange }
-						hideCancelButton={ true }
+						categoriesList={categoriesList}
+						label={__('Category')}
+						noOptionLabel={__('All')}
+						selectedCategoryId={selectedCategoryId}
+						onChange={onCategoryChange}
+						hideCancelButton={true}
 					/>
-				) }
-				{ onNumberOfItemsChange && (
+				)}
+				{onNumberOfItemsChange && (
 					<RangeControl
-						label={ __( 'Number of items' ) }
-						value={ numberOfItems }
-						onChange={ onNumberOfItemsChange }
-						min={ minItems }
-						max={ maxItems }
+						label={__('Number of items')}
+						value={numberOfItems}
+						onChange={onNumberOfItemsChange}
+						min={minItems}
+						max={maxItems}
 						required
 					/>
-				) }
+				)}
 			</>
 		);
 	}

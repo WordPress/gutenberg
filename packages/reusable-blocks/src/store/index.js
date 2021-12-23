@@ -19,11 +19,11 @@ const STORE_NAME = 'core/reusable-blocks';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore(STORE_NAME, {
 	actions,
 	reducer,
 	selectors,
 	__experimentalUseThunks: true,
-} );
+});
 
-register( store );
+register(store);

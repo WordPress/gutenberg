@@ -10,156 +10,156 @@ import deepFreeze from 'deep-freeze';
 import { applyFormat } from '../apply-format';
 import { getSparseArrayLength } from './helpers';
 
-describe( 'applyFormat', () => {
+describe('applyFormat', () => {
 	const strong = { type: 'strong' };
 	const em = { type: 'em' };
 	const a = { type: 'a', attributes: { href: '#' } };
 	const a2 = { type: 'a', attributes: { href: '#test' } };
 
-	it( 'should apply format', () => {
+	it('should apply format', () => {
 		const record = {
-			formats: [ , , , , ],
+			formats: [, , , ,],
 			text: 'test',
 		};
 		const expected = {
 			...record,
-			activeFormats: [ em ],
-			formats: [ [ em ], [ em ], [ em ], [ em ] ],
+			activeFormats: [em],
+			formats: [[em], [em], [em], [em]],
 		};
-		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
+		const result = applyFormat(deepFreeze(record), em, 0, 4);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+	});
 
-	it( 'should apply format on top of existing format', () => {
+	it('should apply format on top of existing format', () => {
 		const record = {
-			formats: [ [ strong ], [ strong ], [ strong ], [ strong ] ],
+			formats: [[strong], [strong], [strong], [strong]],
 			text: 'test',
 		};
 		const expected = {
 			...record,
-			activeFormats: [ em ],
+			activeFormats: [em],
 			formats: [
-				[ strong, em ],
-				[ strong, em ],
-				[ strong, em ],
-				[ strong, em ],
+				[strong, em],
+				[strong, em],
+				[strong, em],
+				[strong, em],
 			],
 		};
-		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
+		const result = applyFormat(deepFreeze(record), em, 0, 4);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+	});
 
-	it( 'should apply format and remove same format type', () => {
+	it('should apply format and remove same format type', () => {
 		const record = {
-			formats: [ [ strong ], [ em, strong ], [ em, strong ], [ strong ] ],
+			formats: [[strong], [em, strong], [em, strong], [strong]],
 			text: 'test',
 		};
 		const expected = {
 			...record,
-			activeFormats: [ em ],
+			activeFormats: [em],
 			formats: [
-				[ strong, em ],
-				[ strong, em ],
-				[ strong, em ],
-				[ strong, em ],
+				[strong, em],
+				[strong, em],
+				[strong, em],
+				[strong, em],
 			],
 		};
-		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
+		const result = applyFormat(deepFreeze(record), em, 0, 4);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+	});
 
-	it( 'should apply format around existing format', () => {
+	it('should apply format around existing format', () => {
 		const record = {
-			formats: [ , [ em ], [ em ], , ],
+			formats: [, [em], [em], ,],
 			text: 'test',
 		};
 		const expected = {
 			...record,
-			activeFormats: [ strong ],
-			formats: [ [ strong ], [ strong, em ], [ strong, em ], [ strong ] ],
+			activeFormats: [strong],
+			formats: [[strong], [strong, em], [strong, em], [strong]],
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 0, 4 );
+		const result = applyFormat(deepFreeze(record), strong, 0, 4);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+	});
 
-	it( 'should apply format around existing format with edge right', () => {
+	it('should apply format around existing format with edge right', () => {
 		const record = {
-			formats: [ , [ em ], [ em ], , ],
+			formats: [, [em], [em], ,],
 			text: 'test',
 		};
 		const expected = {
 			...record,
-			activeFormats: [ strong ],
-			formats: [ [ strong ], [ strong, em ], [ strong, em ], , ],
+			activeFormats: [strong],
+			formats: [[strong], [strong, em], [strong, em], ,],
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 0, 3 );
+		const result = applyFormat(deepFreeze(record), strong, 0, 3);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(3);
+	});
 
-	it( 'should apply format around existing format with edge left', () => {
+	it('should apply format around existing format with edge left', () => {
 		const record = {
-			formats: [ , [ em ], [ em ], , ],
+			formats: [, [em], [em], ,],
 			text: 'test',
 		};
 		const expected = {
 			...record,
-			activeFormats: [ strong ],
-			formats: [ , [ strong, em ], [ strong, em ], [ strong ] ],
+			activeFormats: [strong],
+			formats: [, [strong, em], [strong, em], [strong]],
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 1, 4 );
+		const result = applyFormat(deepFreeze(record), strong, 1, 4);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(3);
+	});
 
-	it( 'should apply format around existing format with break', () => {
+	it('should apply format around existing format with break', () => {
 		const record = {
-			formats: [ , [ em ], , [ em ] ],
+			formats: [, [em], , [em]],
 			text: 'test',
 		};
 		const expected = {
 			...record,
-			activeFormats: [ strong ],
-			formats: [ , [ strong, em ], [ strong ], [ strong, em ] ],
+			activeFormats: [strong],
+			formats: [, [strong, em], [strong], [strong, em]],
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 1, 4 );
+		const result = applyFormat(deepFreeze(record), strong, 1, 4);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(3);
+	});
 
-	it( 'should apply format crossing existing format', () => {
+	it('should apply format crossing existing format', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			formats: [, , , , [em], [em], [em], , , , , , ,],
 			text: 'one two three',
 		};
 		const expected = {
-			activeFormats: [ strong ],
+			activeFormats: [strong],
 			formats: [
 				,
 				,
 				,
-				[ strong ],
-				[ strong, em ],
-				[ strong, em ],
-				[ em ],
+				[strong],
+				[strong, em],
+				[strong, em],
+				[em],
 				,
 				,
 				,
@@ -169,104 +169,104 @@ describe( 'applyFormat', () => {
 			],
 			text: 'one two three',
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 3, 6 );
+		const result = applyFormat(deepFreeze(record), strong, 3, 6);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+	});
 
-	it( 'should apply format by selection', () => {
+	it('should apply format by selection', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
-			start: 3,
-			end: 6,
-		};
-		const expected = {
-			activeFormats: [ strong ],
-			formats: [
-				,
-				,
-				,
-				[ strong ],
-				[ strong, em ],
-				[ strong, em ],
-				[ em ],
-				,
-				,
-				,
-				,
-				,
-				,
-			],
+			formats: [, , , , [em], [em], [em], , , , , , ,],
 			text: 'one two three',
 			start: 3,
 			end: 6,
 		};
-		const result = applyFormat( deepFreeze( record ), strong );
+		const expected = {
+			activeFormats: [strong],
+			formats: [
+				,
+				,
+				,
+				[strong],
+				[strong, em],
+				[strong, em],
+				[em],
+				,
+				,
+				,
+				,
+				,
+				,
+			],
+			text: 'one two three',
+			start: 3,
+			end: 6,
+		};
+		const result = applyFormat(deepFreeze(record), strong);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+	});
 
-	it( 'should apply format in placeholder if selection is collapsed', () => {
+	it('should apply format in placeholder if selection is collapsed', () => {
 		const record = {
-			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
+			formats: [, , , , [a], [a], [a], , , , , , ,],
 			text: 'one two three',
 			start: 0,
 			end: 0,
 		};
 		const expected = {
 			...record,
-			activeFormats: [ a2 ],
+			activeFormats: [a2],
 		};
-		const result = applyFormat( deepFreeze( record ), a2 );
+		const result = applyFormat(deepFreeze(record), a2);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(3);
+	});
 
-	it( 'should apply format on existing format if selection is collapsed', () => {
+	it('should apply format on existing format if selection is collapsed', () => {
 		const record = {
-			activeFormats: [ a ],
-			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
+			activeFormats: [a],
+			formats: [, , , , [a], [a], [a], , , , , , ,],
 			text: 'one two three',
 			start: 4,
 			end: 4,
 		};
 		const expected = {
-			activeFormats: [ a2 ],
-			formats: [ , , , , [ a2 ], [ a2 ], [ a2 ], , , , , , , ],
+			activeFormats: [a2],
+			formats: [, , , , [a2], [a2], [a2], , , , , , ,],
 			text: 'one two three',
 			start: 4,
 			end: 4,
 		};
-		const result = applyFormat( deepFreeze( record ), a2 );
+		const result = applyFormat(deepFreeze(record), a2);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(3);
+	});
 
-	it( 'should merge equal neighbouring formats', () => {
+	it('should merge equal neighbouring formats', () => {
 		const record = {
 			// Use a different reference but equal content.
-			formats: [ , , [ { ...em } ], [ { ...em } ] ],
+			formats: [, , [{ ...em }], [{ ...em }]],
 			text: 'test',
 		};
 		const expected = {
 			...record,
-			activeFormats: [ em ],
+			activeFormats: [em],
 			// All references should be the same.
-			formats: [ [ em ], [ em ], [ em ], [ em ] ],
+			formats: [[em], [em], [em], [em]],
 		};
-		const result = applyFormat( deepFreeze( record ), em, 0, 2 );
+		const result = applyFormat(deepFreeze(record), em, 0, 2);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-	} );
-} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+	});
+});

@@ -33,40 +33,40 @@ import { parseAudioUrl } from './audio-url-parser.native';
 
 const isIOS = Platform.OS === 'ios';
 
-function Player( {
+function Player({
 	getStylesFromColorScheme,
 	isUploadInProgress,
 	isUploadFailed,
 	attributes,
 	isSelected,
-} ) {
+}) {
 	const { id, src } = attributes;
-	const [ paused, setPaused ] = useState( true );
+	const [paused, setPaused] = useState(true);
 
 	const onPressListen = () => {
-		if ( src ) {
-			if ( isIOS && this.player ) {
+		if (src) {
+			if (isIOS && this.player) {
 				this.player.presentFullscreenPlayer();
 				return;
 			}
 
-			Linking.canOpenURL( src )
-				.then( ( supported ) => {
-					if ( ! supported ) {
+			Linking.canOpenURL(src)
+				.then((supported) => {
+					if (!supported) {
 						Alert.alert(
-							__( 'Problem opening the audio' ),
-							__( 'No application can handle this request.' )
+							__('Problem opening the audio'),
+							__('No application can handle this request.')
 						);
 					} else {
-						return Linking.openURL( src );
+						return Linking.openURL(src);
 					}
-				} )
-				.catch( () => {
+				})
+				.catch(() => {
 					Alert.alert(
-						__( 'Problem opening the audio' ),
-						__( 'An unknown error occurred. Please try again.' )
+						__('Problem opening the audio'),
+						__('An unknown error occurred. Please try again.')
 					);
-				} );
+				});
 		}
 	};
 
@@ -75,7 +75,7 @@ function Player( {
 		styles.containerDark
 	);
 
-	const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+	const iconStyle = getStylesFromColorScheme(styles.icon, styles.iconDark);
 
 	const iconDisabledStyle = getStylesFromColorScheme(
 		styles.iconDisabled,
@@ -86,7 +86,7 @@ function Player( {
 
 	const finalIconStyle = {
 		...iconStyle,
-		...( isDisabled && iconDisabledStyle ),
+		...(isDisabled && iconDisabledStyle),
 	};
 
 	const iconContainerStyle = getStylesFromColorScheme(
@@ -96,13 +96,10 @@ function Player( {
 
 	const titleContainerStyle = {
 		...styles.titleContainer,
-		...( isIOS ? styles.titleContainerIOS : styles.titleContainerAndroid ),
+		...(isIOS ? styles.titleContainerIOS : styles.titleContainerAndroid),
 	};
 
-	const titleStyle = getStylesFromColorScheme(
-		styles.title,
-		styles.titleDark
-	);
+	const titleStyle = getStylesFromColorScheme(styles.title, styles.titleDark);
 
 	const uploadFailedStyle = getStylesFromColorScheme(
 		styles.uploadFailed,
@@ -116,7 +113,7 @@ function Player( {
 
 	const finalSubtitleStyle = {
 		...subtitleStyle,
-		...( isUploadFailed && uploadFailedStyle ),
+		...(isUploadFailed && uploadFailedStyle),
 	};
 
 	const buttonBackgroundStyle = getStylesFromColorScheme(
@@ -127,98 +124,96 @@ function Player( {
 	let title = '';
 	let extension = '';
 
-	if ( src ) {
-		const result = parseAudioUrl( src );
+	if (src) {
+		const result = parseAudioUrl(src);
 		extension = result.extension;
 		title = result.title;
 	}
 
 	const getSubtitleValue = () => {
-		if ( isUploadInProgress ) {
-			return __( 'Uploading…' );
+		if (isUploadInProgress) {
+			return __('Uploading…');
 		}
-		if ( isUploadFailed ) {
-			return __( 'Failed to insert audio file. Please tap for options.' );
+		if (isUploadFailed) {
+			return __('Failed to insert audio file. Please tap for options.');
 		}
 		return (
 			extension +
 			// translators: displays audio file extension. e.g. MP3 audio file
-			__( 'audio file' )
+			__('audio file')
 		);
 	};
 
 	function onAudioUploadCancelDialog() {
-		if ( isUploadInProgress ) {
-			requestImageUploadCancelDialog( id );
-		} else if ( id && getProtocol( src ) === 'file:' ) {
-			requestImageFailedRetryDialog( id );
+		if (isUploadInProgress) {
+			requestImageUploadCancelDialog(id);
+		} else if (id && getProtocol(src) === 'file:') {
+			requestImageFailedRetryDialog(id);
 		}
 	}
 
 	return (
 		<TouchableWithoutFeedback
-			accessible={ ! isSelected }
-			disabled={ ! isSelected }
-			onPress={ onAudioUploadCancelDialog }
+			accessible={!isSelected}
+			disabled={!isSelected}
+			onPress={onAudioUploadCancelDialog}
 		>
-			<View style={ containerStyle }>
-				<View style={ iconContainerStyle }>
-					<Icon icon={ audio } style={ finalIconStyle } size={ 24 } />
+			<View style={containerStyle}>
+				<View style={iconContainerStyle}>
+					<Icon icon={audio} style={finalIconStyle} size={24} />
 				</View>
-				<View style={ titleContainerStyle }>
-					<Text style={ titleStyle }>{ title }</Text>
-					<View style={ styles.subtitleContainer }>
-						{ isUploadFailed && (
+				<View style={titleContainerStyle}>
+					<Text style={titleStyle}>{title}</Text>
+					<View style={styles.subtitleContainer}>
+						{isUploadFailed && (
 							<Icon
-								icon={ warning }
-								style={ {
+								icon={warning}
+								style={{
 									...styles.errorIcon,
 									...uploadFailedStyle,
-								} }
-								size={ 16 }
+								}}
+								size={16}
 							/>
-						) }
-						<Text style={ finalSubtitleStyle }>
-							{ getSubtitleValue() }
+						)}
+						<Text style={finalSubtitleStyle}>
+							{getSubtitleValue()}
 						</Text>
 					</View>
 				</View>
-				{ ! isDisabled && (
+				{!isDisabled && (
 					<TouchableWithoutFeedback
-						accessibilityLabel={ __( 'Audio Player' ) }
-						accessibilityRole={ 'button' }
-						accessibilityHint={ __(
+						accessibilityLabel={__('Audio Player')}
+						accessibilityRole={'button'}
+						accessibilityHint={__(
 							'Double tap to listen the audio file'
-						) }
-						onPress={ onPressListen }
+						)}
+						onPress={onPressListen}
 					>
-						<View style={ buttonBackgroundStyle }>
-							<Text style={ styles.buttonText }>
-								{ __( 'OPEN' ) }
-							</Text>
+						<View style={buttonBackgroundStyle}>
+							<Text style={styles.buttonText}>{__('OPEN')}</Text>
 						</View>
 					</TouchableWithoutFeedback>
-				) }
-				{ isIOS && (
+				)}
+				{isIOS && (
 					<VideoPlayer
-						source={ { uri: src } }
-						paused={ paused }
-						ref={ ( ref ) => {
+						source={{ uri: src }}
+						paused={paused}
+						ref={(ref) => {
 							this.player = ref;
-						} }
-						controls={ false }
-						ignoreSilentSwitch={ 'ignore' }
-						onFullscreenPlayerWillPresent={ () => {
-							setPaused( false );
-						} }
-						onFullscreenPlayerDidDismiss={ () => {
-							setPaused( true );
-						} }
+						}}
+						controls={false}
+						ignoreSilentSwitch={'ignore'}
+						onFullscreenPlayerWillPresent={() => {
+							setPaused(false);
+						}}
+						onFullscreenPlayerDidDismiss={() => {
+							setPaused(true);
+						}}
 					/>
-				) }
+				)}
 			</View>
 		</TouchableWithoutFeedback>
 	);
 }
 
-export default withPreferredColorScheme( Player );
+export default withPreferredColorScheme(Player);

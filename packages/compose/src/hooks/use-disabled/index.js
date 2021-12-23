@@ -51,63 +51,61 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
  */
 export default function useDisabled() {
 	/** @type {import('react').RefObject<HTMLElement>} */
-	const node = useRef( null );
+	const node = useRef(null);
 
 	const disable = () => {
-		if ( ! node.current ) {
+		if (!node.current) {
 			return;
 		}
 
-		focus.focusable.find( node.current ).forEach( ( focusable ) => {
-			if (
-				includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName )
-			) {
-				focusable.setAttribute( 'disabled', '' );
+		focus.focusable.find(node.current).forEach((focusable) => {
+			if (includes(DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName)) {
+				focusable.setAttribute('disabled', '');
 			}
 
-			if ( focusable.nodeName === 'A' ) {
-				focusable.setAttribute( 'tabindex', '-1' );
+			if (focusable.nodeName === 'A') {
+				focusable.setAttribute('tabindex', '-1');
 			}
 
-			const tabIndex = focusable.getAttribute( 'tabindex' );
-			if ( tabIndex !== null && tabIndex !== '-1' ) {
-				focusable.removeAttribute( 'tabindex' );
+			const tabIndex = focusable.getAttribute('tabindex');
+			if (tabIndex !== null && tabIndex !== '-1') {
+				focusable.removeAttribute('tabindex');
 			}
 
-			if ( focusable.hasAttribute( 'contenteditable' ) ) {
-				focusable.setAttribute( 'contenteditable', 'false' );
+			if (focusable.hasAttribute('contenteditable')) {
+				focusable.setAttribute('contenteditable', 'false');
 			}
-		} );
+		});
 	};
 
 	// Debounce re-disable since disabling process itself will incur
 	// additional mutations which should be ignored.
 	const debouncedDisable = useCallback(
-		debounce( disable, undefined, { leading: true } ),
+		debounce(disable, undefined, { leading: true }),
 		[]
 	);
 
-	useLayoutEffect( () => {
+	useLayoutEffect(() => {
 		disable();
 
 		/** @type {MutationObserver | undefined} */
 		let observer;
-		if ( node.current ) {
-			observer = new window.MutationObserver( debouncedDisable );
-			observer.observe( node.current, {
+		if (node.current) {
+			observer = new window.MutationObserver(debouncedDisable);
+			observer.observe(node.current, {
 				childList: true,
 				attributes: true,
 				subtree: true,
-			} );
+			});
 		}
 
 		return () => {
-			if ( observer ) {
+			if (observer) {
 				observer.disconnect();
 			}
 			debouncedDisable.cancel();
 		};
-	}, [] );
+	}, []);
 
 	return node;
 }

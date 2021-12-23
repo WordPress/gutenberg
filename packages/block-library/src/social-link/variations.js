@@ -179,7 +179,7 @@ const variations = [
 		name: 'mail',
 		attributes: { service: 'mail' },
 		title: 'Mail',
-		keywords: [ 'email', 'e-mail' ],
+		keywords: ['email', 'e-mail'],
 		icon: MailIcon,
 	},
 	{
@@ -309,10 +309,10 @@ const variations = [
  * `isActive` function is used to find a variation match from a created
  *  Block by providing its attributes.
  */
-variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
-	variation.isActive = ( blockAttributes, variationAttributes ) =>
+variations.forEach((variation) => {
+	if (variation.isActive) return;
+	variation.isActive = (blockAttributes, variationAttributes) =>
 		blockAttributes.service === variationAttributes.service;
-} );
+});
 
 export default variations;

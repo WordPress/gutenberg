@@ -9,14 +9,14 @@ import { useMemo } from '@wordpress/element';
 import InserterPreviewPanel from '../inserter/preview-panel';
 import { replaceActiveStyle } from './utils';
 
-export default function BlockStylesPreviewPanel( {
+export default function BlockStylesPreviewPanel({
 	genericPreviewBlock,
 	style,
 	className,
 	activeStyle,
-} ) {
-	const styleClassName = replaceActiveStyle( className, activeStyle, style );
-	const previewBlocks = useMemo( () => {
+}) {
+	const styleClassName = replaceActiveStyle(className, activeStyle, style);
+	const previewBlocks = useMemo(() => {
 		return {
 			...genericPreviewBlock,
 			title: style.label || style.name,
@@ -28,9 +28,7 @@ export default function BlockStylesPreviewPanel( {
 					' block-editor-block-styles__block-preview-container',
 			},
 		};
-	}, [ genericPreviewBlock, styleClassName ] );
+	}, [genericPreviewBlock, styleClassName]);
 
-	return (
-		<InserterPreviewPanel item={ previewBlocks } isStylePreview={ true } />
-	);
+	return <InserterPreviewPanel item={previewBlocks} isStylePreview={true} />;
 }

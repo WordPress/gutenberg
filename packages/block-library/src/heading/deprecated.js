@@ -37,8 +37,8 @@ const blockAttributes = {
 	},
 };
 
-const migrateCustomColors = ( attributes ) => {
-	if ( ! attributes.customTextColor ) {
+const migrateCustomColors = (attributes) => {
+	if (!attributes.customTextColor) {
 		return attributes;
 	}
 	const style = {
@@ -47,16 +47,16 @@ const migrateCustomColors = ( attributes ) => {
 		},
 	};
 	return {
-		...omit( attributes, [ 'customTextColor' ] ),
+		...omit(attributes, ['customTextColor']),
 		style,
 	};
 };
 
-const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
+const TEXT_ALIGN_OPTIONS = ['left', 'right', 'center'];
 
-const migrateTextAlign = ( attributes ) => {
+const migrateTextAlign = (attributes) => {
 	const { align, ...rest } = attributes;
-	return TEXT_ALIGN_OPTIONS.includes( align )
+	return TEXT_ALIGN_OPTIONS.includes(align)
 		? { ...rest, textAlign: align }
 		: attributes;
 };
@@ -64,7 +64,7 @@ const migrateTextAlign = ( attributes ) => {
 const deprecated = [
 	{
 		supports: {
-			align: [ 'wide', 'full' ],
+			align: ['wide', 'full'],
 			anchor: true,
 			className: false,
 			color: { link: true },
@@ -81,19 +81,19 @@ const deprecated = [
 			__unstablePasteTextInline: true,
 		},
 		attributes: blockAttributes,
-		isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
+		isEligible: ({ align }) => TEXT_ALIGN_OPTIONS.includes(align),
 		migrate: migrateTextAlign,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { align, content, level } = attributes;
 			const TagName = 'h' + level;
 
-			const className = classnames( {
-				[ `has-text-align-${ align }` ]: align,
-			} );
+			const className = classnames({
+				[`has-text-align-${align}`]: align,
+			});
 
 			return (
-				<TagName { ...useBlockProps.save( { className } ) }>
-					<RichText.Content value={ content } />
+				<TagName {...useBlockProps.save({ className })}>
+					<RichText.Content value={content} />
 				</TagName>
 			);
 		},
@@ -109,34 +109,29 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: ( attributes ) =>
-			migrateCustomColors( migrateTextAlign( attributes ) ),
-		save( { attributes } ) {
-			const {
-				align,
-				content,
-				customTextColor,
-				level,
-				textColor,
-			} = attributes;
+		migrate: (attributes) =>
+			migrateCustomColors(migrateTextAlign(attributes)),
+		save({ attributes }) {
+			const { align, content, customTextColor, level, textColor } =
+				attributes;
 			const tagName = 'h' + level;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 
-			const className = classnames( {
-				[ textClass ]: textClass,
+			const className = classnames({
+				[textClass]: textClass,
 				'has-text-color': textColor || customTextColor,
-				[ `has-text-align-${ align }` ]: align,
-			} );
+				[`has-text-align-${align}`]: align,
+			});
 
 			return (
 				<RichText.Content
-					className={ className ? className : undefined }
-					tagName={ tagName }
-					style={ {
+					className={className ? className : undefined}
+					tagName={tagName}
+					style={{
 						color: textClass ? undefined : customTextColor,
-					} }
-					value={ content }
+					}}
+					value={content}
 				/>
 			);
 		},
@@ -151,33 +146,28 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: ( attributes ) =>
-			migrateCustomColors( migrateTextAlign( attributes ) ),
-		save( { attributes } ) {
-			const {
-				align,
-				content,
-				customTextColor,
-				level,
-				textColor,
-			} = attributes;
+		migrate: (attributes) =>
+			migrateCustomColors(migrateTextAlign(attributes)),
+		save({ attributes }) {
+			const { align, content, customTextColor, level, textColor } =
+				attributes;
 			const tagName = 'h' + level;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 
-			const className = classnames( {
-				[ textClass ]: textClass,
-				[ `has-text-align-${ align }` ]: align,
-			} );
+			const className = classnames({
+				[textClass]: textClass,
+				[`has-text-align-${align}`]: align,
+			});
 
 			return (
 				<RichText.Content
-					className={ className ? className : undefined }
-					tagName={ tagName }
-					style={ {
+					className={className ? className : undefined}
+					tagName={tagName}
+					style={{
 						color: textClass ? undefined : customTextColor,
-					} }
-					value={ content }
+					}}
+					value={content}
 				/>
 			);
 		},
@@ -194,33 +184,28 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: ( attributes ) =>
-			migrateCustomColors( migrateTextAlign( attributes ) ),
-		save( { attributes } ) {
-			const {
-				align,
-				level,
-				content,
-				textColor,
-				customTextColor,
-			} = attributes;
+		migrate: (attributes) =>
+			migrateCustomColors(migrateTextAlign(attributes)),
+		save({ attributes }) {
+			const { align, level, content, textColor, customTextColor } =
+				attributes;
 			const tagName = 'h' + level;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 
-			const className = classnames( {
-				[ textClass ]: textClass,
-			} );
+			const className = classnames({
+				[textClass]: textClass,
+			});
 
 			return (
 				<RichText.Content
-					className={ className ? className : undefined }
-					tagName={ tagName }
-					style={ {
+					className={className ? className : undefined}
+					tagName={tagName}
+					style={{
 						textAlign: align,
 						color: textClass ? undefined : customTextColor,
-					} }
-					value={ content }
+					}}
+					value={content}
 				/>
 			);
 		},

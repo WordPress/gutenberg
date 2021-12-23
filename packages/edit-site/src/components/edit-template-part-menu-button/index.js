@@ -20,36 +20,34 @@ import { useLink } from '../routes/link';
 export default function EditTemplatePartMenuButton() {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds, onClose } ) => (
+			{({ selectedClientIds, onClose }) => (
 				<EditTemplatePartMenuItem
-					selectedClientId={ selectedClientIds[ 0 ] }
-					onClose={ onClose }
+					selectedClientId={selectedClientIds[0]}
+					onClose={onClose}
 				/>
-			) }
+			)}
 		</BlockSettingsMenuControls>
 	);
 }
 
-function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
+function EditTemplatePartMenuItem({ selectedClientId, onClose }) {
 	const { params } = useLocation();
 	const selectedTemplatePart = useSelect(
-		( select ) => {
-			const block = select( blockEditorStore ).getBlock(
-				selectedClientId
-			);
+		(select) => {
+			const block = select(blockEditorStore).getBlock(selectedClientId);
 
-			if ( block && isTemplatePart( block ) ) {
+			if (block && isTemplatePart(block)) {
 				const { theme, slug } = block.attributes;
 
-				return select( coreStore ).getEntityRecord(
+				return select(coreStore).getEntityRecord(
 					'postType',
 					'wp_template_part',
 					// Ideally this should be an official public API.
-					`${ theme }//${ slug }`
+					`${theme}//${slug}`
 				);
 			}
 		},
-		[ selectedClientId ]
+		[selectedClientId]
 	);
 
 	const linkProps = useLink(
@@ -62,21 +60,21 @@ function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
 		}
 	);
 
-	if ( ! selectedTemplatePart ) {
+	if (!selectedTemplatePart) {
 		return null;
 	}
 
 	return (
 		<MenuItem
-			{ ...linkProps }
-			onClick={ ( event ) => {
-				linkProps.onClick( event );
+			{...linkProps}
+			onClick={(event) => {
+				linkProps.onClick(event);
 				onClose();
-			} }
+			}}
 		>
 			{
 				/* translators: %s: template part title */
-				sprintf( __( 'Edit %s' ), selectedTemplatePart.slug )
+				sprintf(__('Edit %s'), selectedTemplatePart.slug)
 			}
 		</MenuItem>
 	);

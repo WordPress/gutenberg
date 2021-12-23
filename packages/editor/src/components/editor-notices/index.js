@@ -16,26 +16,26 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-export function EditorNotices( { notices, onRemove } ) {
-	const dismissibleNotices = filter( notices, {
+export function EditorNotices({ notices, onRemove }) {
+	const dismissibleNotices = filter(notices, {
 		isDismissible: true,
 		type: 'default',
-	} );
-	const nonDismissibleNotices = filter( notices, {
+	});
+	const nonDismissibleNotices = filter(notices, {
 		isDismissible: false,
 		type: 'default',
-	} );
+	});
 
 	return (
 		<>
 			<NoticeList
-				notices={ nonDismissibleNotices }
+				notices={nonDismissibleNotices}
 				className="components-editor-notices__pinned"
 			/>
 			<NoticeList
-				notices={ dismissibleNotices }
+				notices={dismissibleNotices}
 				className="components-editor-notices__dismissible"
-				onRemove={ onRemove }
+				onRemove={onRemove}
 			>
 				<TemplateValidationNotice />
 			</NoticeList>
@@ -43,11 +43,11 @@ export function EditorNotices( { notices, onRemove } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		notices: select( noticesStore ).getNotices(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( noticesStore ).removeNotice,
-	} ) ),
-] )( EditorNotices );
+export default compose([
+	withSelect((select) => ({
+		notices: select(noticesStore).getNotices(),
+	})),
+	withDispatch((dispatch) => ({
+		onRemove: dispatch(noticesStore).removeNotice,
+	})),
+])(EditorNotices);

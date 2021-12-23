@@ -25,7 +25,7 @@ import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { usePopoverScroll } from './use-popover-scroll';
 
-function selector( select ) {
+function selector(select) {
 	const {
 		isNavigationMode,
 		isMultiSelecting,
@@ -34,7 +34,7 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-	} = select( blockEditorStore );
+	} = select(blockEditorStore);
 	return {
 		isNavigationMode: isNavigationMode(),
 		isMultiSelecting: isMultiSelecting(),
@@ -46,7 +46,7 @@ function selector( select ) {
 	};
 }
 
-function BlockPopover( {
+function BlockPopover({
 	clientId,
 	rootClientId,
 	isValid,
@@ -54,7 +54,7 @@ function BlockPopover( {
 	capturingClientId,
 	__unstablePopoverSlot,
 	__unstableContentRef,
-} ) {
+}) {
 	const {
 		isNavigationMode,
 		isMultiSelecting,
@@ -63,100 +63,100 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
-	} = useSelect( selector, [] );
+	} = useSelect(selector, []);
 	const isInsertionPointVisible = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				isBlockInsertionPointVisible,
 				getBlockInsertionPoint,
 				getBlockOrder,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 
-			if ( ! isBlockInsertionPointVisible() ) {
+			if (!isBlockInsertionPointVisible()) {
 				return false;
 			}
 
 			const insertionPoint = getBlockInsertionPoint();
-			const order = getBlockOrder( insertionPoint.rootClientId );
-			return order[ insertionPoint.index ] === clientId;
+			const order = getBlockOrder(insertionPoint.rootClientId);
+			return order[insertionPoint.index] === clientId;
 		},
-		[ clientId ]
+		[clientId]
 	);
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
-	const [ isInserterShown, setIsInserterShown ] = useState( false );
-	const { stopTyping } = useDispatch( blockEditorStore );
+	const isLargeViewport = useViewportMatch('medium');
+	const [isToolbarForced, setIsToolbarForced] = useState(false);
+	const [isInserterShown, setIsInserterShown] = useState(false);
+	const { stopTyping } = useDispatch(blockEditorStore);
 
 	// Controls when the side inserter on empty lines should
 	// be shown, including writing and selection modes.
 	const showEmptyBlockSideInserter =
-		! isTyping && ! isNavigationMode && isEmptyDefaultBlock && isValid;
+		!isTyping && !isNavigationMode && isEmptyDefaultBlock && isValid;
 	const shouldShowBreadcrumb = isNavigationMode;
 	const shouldShowContextualToolbar =
-		! isNavigationMode &&
-		! hasFixedToolbar &&
+		!isNavigationMode &&
+		!hasFixedToolbar &&
 		isLargeViewport &&
-		! showEmptyBlockSideInserter &&
-		! isMultiSelecting &&
-		( ! isTyping || isCaretWithinFormattedText );
+		!showEmptyBlockSideInserter &&
+		!isMultiSelecting &&
+		(!isTyping || isCaretWithinFormattedText);
 	const canFocusHiddenToolbar =
-		! isNavigationMode &&
-		! shouldShowContextualToolbar &&
-		! hasFixedToolbar &&
-		! isEmptyDefaultBlock;
+		!isNavigationMode &&
+		!shouldShowContextualToolbar &&
+		!hasFixedToolbar &&
+		!isEmptyDefaultBlock;
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
 		() => {
-			setIsToolbarForced( true );
-			stopTyping( true );
+			setIsToolbarForced(true);
+			stopTyping(true);
 		},
 		{
-			isDisabled: ! canFocusHiddenToolbar,
+			isDisabled: !canFocusHiddenToolbar,
 		}
 	);
 
-	useEffect( () => {
-		if ( ! shouldShowContextualToolbar ) {
-			setIsToolbarForced( false );
+	useEffect(() => {
+		if (!shouldShowContextualToolbar) {
+			setIsToolbarForced(false);
 		}
-	}, [ shouldShowContextualToolbar ] );
+	}, [shouldShowContextualToolbar]);
 
 	// Stores the active toolbar item index so the block toolbar can return focus
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
-	const selectedElement = useBlockElement( clientId );
-	const lastSelectedElement = useBlockElement( lastClientId );
-	const capturingElement = useBlockElement( capturingClientId );
+	const selectedElement = useBlockElement(clientId);
+	const lastSelectedElement = useBlockElement(lastClientId);
+	const capturingElement = useBlockElement(capturingClientId);
 
-	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+	const popoverScrollRef = usePopoverScroll(__unstableContentRef);
 
 	if (
-		! shouldShowBreadcrumb &&
-		! shouldShowContextualToolbar &&
-		! isToolbarForced &&
-		! showEmptyBlockSideInserter
+		!shouldShowBreadcrumb &&
+		!shouldShowContextualToolbar &&
+		!isToolbarForced &&
+		!showEmptyBlockSideInserter
 	) {
 		return null;
 	}
 
 	let node = selectedElement;
 
-	if ( ! node ) {
+	if (!node) {
 		return null;
 	}
 
-	if ( capturingClientId ) {
+	if (capturingClientId) {
 		node = capturingElement;
 	}
 
 	let anchorRef = node;
 
-	if ( hasMultiSelection ) {
+	if (hasMultiSelection) {
 		// Wait to render the popover until the bottom reference is available
 		// as well.
-		if ( ! lastSelectedElement ) {
+		if (!lastSelectedElement) {
 			return null;
 		}
 
@@ -167,11 +167,11 @@ function BlockPopover( {
 	}
 
 	function onFocus() {
-		setIsInserterShown( true );
+		setIsInserterShown(true);
 	}
 
 	function onBlur() {
-		setIsInserterShown( false );
+		setIsInserterShown(false);
 	}
 
 	// Position above the anchor, pop out towards the right, and position in the
@@ -189,95 +189,95 @@ function BlockPopover( {
 		  // In case of an iframe, this should be the iframe boundary, otherwise
 		  // the scroll container.
 		  ownerDocument.defaultView.frameElement ||
-		  getScrollContainer( node ) ||
+		  getScrollContainer(node) ||
 		  ownerDocument.body;
 
 	return (
 		<Popover
-			ref={ popoverScrollRef }
+			ref={popoverScrollRef}
 			noArrow
-			animate={ false }
-			position={ popoverPosition }
-			focusOnMount={ false }
-			anchorRef={ anchorRef }
-			className={ classnames( 'block-editor-block-list__block-popover', {
+			animate={false}
+			position={popoverPosition}
+			focusOnMount={false}
+			anchorRef={anchorRef}
+			className={classnames('block-editor-block-list__block-popover', {
 				'is-insertion-point-visible': isInsertionPointVisible,
-			} ) }
-			__unstableStickyBoundaryElement={ stickyBoundaryElement }
+			})}
+			__unstableStickyBoundaryElement={stickyBoundaryElement}
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotName={__unstablePopoverSlot || null}
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
-			__unstableObserveElement={ node }
+			__unstableObserveElement={node}
 			shouldAnchorIncludePadding
 			// Used to safeguard sticky position behavior against cases where it would permanently
 			// obscure specific sections of a block.
-			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
+			__unstableEditorCanvasWrapper={__unstableContentRef?.current}
 		>
-			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+			{(shouldShowContextualToolbar || isToolbarForced) && (
 				<div
-					onFocus={ onFocus }
-					onBlur={ onBlur }
+					onFocus={onFocus}
+					onBlur={onBlur}
 					// While ideally it would be enough to capture the
 					// bubbling focus event from the Inserter, due to the
 					// characteristics of click focusing of `button`s in
 					// Firefox and Safari, it is not reliable.
 					//
 					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-					tabIndex={ -1 }
-					className={ classnames(
+					tabIndex={-1}
+					className={classnames(
 						'block-editor-block-list__block-popover-inserter',
 						{
 							'is-visible': isInserterShown,
 						}
-					) }
+					)}
 				>
 					<Inserter
-						clientId={ clientId }
-						rootClientId={ rootClientId }
+						clientId={clientId}
+						rootClientId={rootClientId}
 						__experimentalIsQuick
 					/>
 				</div>
-			) }
-			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+			)}
+			{(shouldShowContextualToolbar || isToolbarForced) && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced }
+					focusOnMount={isToolbarForced}
 					__experimentalInitialIndex={
 						initialToolbarItemIndexRef.current
 					}
-					__experimentalOnIndexChange={ ( index ) => {
+					__experimentalOnIndexChange={(index) => {
 						initialToolbarItemIndexRef.current = index;
-					} }
+					}}
 					// Resets the index whenever the active block changes so
 					// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-					key={ clientId }
+					key={clientId}
 				/>
-			) }
-			{ shouldShowBreadcrumb && (
+			)}
+			{shouldShowBreadcrumb && (
 				<BlockSelectionButton
-					clientId={ clientId }
-					rootClientId={ rootClientId }
-					blockElement={ node }
+					clientId={clientId}
+					rootClientId={rootClientId}
+					blockElement={node}
 				/>
-			) }
-			{ showEmptyBlockSideInserter && (
+			)}
+			{showEmptyBlockSideInserter && (
 				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
 						position="bottom right"
-						rootClientId={ rootClientId }
-						clientId={ clientId }
+						rootClientId={rootClientId}
+						clientId={clientId}
 						__experimentalIsQuick
 					/>
 				</div>
-			) }
+			)}
 		</Popover>
 	);
 }
 
-function wrapperSelector( select ) {
+function wrapperSelector(select) {
 	const {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
@@ -285,17 +285,17 @@ function wrapperSelector( select ) {
 		getBlock,
 		getBlockParents,
 		__experimentalGetBlockListSettingsForBlocks,
-	} = select( blockEditorStore );
+	} = select(blockEditorStore);
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-	if ( ! clientId ) {
+	if (!clientId) {
 		return;
 	}
 
-	const { name, attributes = {}, isValid } = getBlock( clientId ) || {};
-	const blockParentsClientIds = getBlockParents( clientId );
+	const { name, attributes = {}, isValid } = getBlock(clientId) || {};
+	const blockParentsClientIds = getBlockParents(clientId);
 
 	// Get Block List Settings for all ancestors of the current Block clientId
 	const parentBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
@@ -305,29 +305,29 @@ function wrapperSelector( select ) {
 	// Get the clientId of the topmost parent with the capture toolbars setting.
 	const capturingClientId = find(
 		blockParentsClientIds,
-		( parentClientId ) =>
-			parentBlockListSettings[ parentClientId ]
+		(parentClientId) =>
+			parentBlockListSettings[parentClientId]
 				?.__experimentalCaptureToolbars
 	);
 
 	return {
 		clientId,
-		rootClientId: getBlockRootClientId( clientId ),
+		rootClientId: getBlockRootClientId(clientId),
 		name,
 		isValid,
 		isEmptyDefaultBlock:
-			name && isUnmodifiedDefaultBlock( { name, attributes } ),
+			name && isUnmodifiedDefaultBlock({ name, attributes }),
 		capturingClientId,
 	};
 }
 
-export default function WrappedBlockPopover( {
+export default function WrappedBlockPopover({
 	__unstablePopoverSlot,
 	__unstableContentRef,
-} ) {
-	const selected = useSelect( wrapperSelector, [] );
+}) {
+	const selected = useSelect(wrapperSelector, []);
 
-	if ( ! selected ) {
+	if (!selected) {
 		return null;
 	}
 
@@ -340,19 +340,19 @@ export default function WrappedBlockPopover( {
 		capturingClientId,
 	} = selected;
 
-	if ( ! name ) {
+	if (!name) {
 		return null;
 	}
 
 	return (
 		<BlockPopover
-			clientId={ clientId }
-			rootClientId={ rootClientId }
-			isValid={ isValid }
-			isEmptyDefaultBlock={ isEmptyDefaultBlock }
-			capturingClientId={ capturingClientId }
-			__unstablePopoverSlot={ __unstablePopoverSlot }
-			__unstableContentRef={ __unstableContentRef }
+			clientId={clientId}
+			rootClientId={rootClientId}
+			isValid={isValid}
+			isEmptyDefaultBlock={isEmptyDefaultBlock}
+			capturingClientId={capturingClientId}
+			__unstablePopoverSlot={__unstablePopoverSlot}
+			__unstableContentRef={__unstableContentRef}
 		/>
 	);
 }

@@ -12,12 +12,12 @@ import cleanNodeList from './clean-node-list';
  *
  * @return {string} The cleaned up HTML.
  */
-export default function removeInvalidHTML( HTML, schema, inline ) {
-	const doc = document.implementation.createHTMLDocument( '' );
+export default function removeInvalidHTML(HTML, schema, inline) {
+	const doc = document.implementation.createHTMLDocument('');
 
 	doc.body.innerHTML = HTML;
 
-	cleanNodeList( doc.body.childNodes, doc, schema, inline );
+	cleanNodeList(doc.body.childNodes, doc, schema, inline);
 
 	return doc.body.innerHTML;
 }

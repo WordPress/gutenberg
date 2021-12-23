@@ -14,88 +14,88 @@ import { more } from '@wordpress/icons';
  */
 import { MenuItem } from '../';
 
-describe( 'MenuItem', () => {
-	it( 'should match snapshot when only label provided', () => {
-		const wrapper = shallow( <MenuItem>My item</MenuItem> );
+describe('MenuItem', () => {
+	it('should match snapshot when only label provided', () => {
+		const wrapper = shallow(<MenuItem>My item</MenuItem>);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	it( 'should match snapshot when all props provided', () => {
+	it('should match snapshot when all props provided', () => {
 		const wrapper = shallow(
 			<MenuItem
 				className="my-class"
-				icon={ more }
-				isSelected={ true }
+				icon={more}
+				isSelected={true}
 				role="menuitemcheckbox"
-				onClick={ noop }
+				onClick={noop}
 				shortcut="mod+shift+alt+w"
 			>
 				My item
 			</MenuItem>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	it( 'should match snapshot when isSelected and role are optionally provided', () => {
+	it('should match snapshot when isSelected and role are optionally provided', () => {
 		const wrapper = shallow(
 			<MenuItem
 				className="my-class"
-				icon={ more }
-				onClick={ noop }
+				icon={more}
+				onClick={noop}
 				shortcut="mod+shift+alt+w"
 			>
 				My item
 			</MenuItem>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	it( 'should match snapshot when info is provided', () => {
+	it('should match snapshot when info is provided', () => {
 		const wrapper = shallow(
 			<MenuItem info="Extended description of My Item">My item</MenuItem>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	it( 'should avoid using aria-label if only has non-string children', () => {
+	it('should avoid using aria-label if only has non-string children', () => {
 		const wrapper = shallow(
 			<MenuItem>
 				<div />
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-label' ) ).toBeUndefined();
-	} );
+		expect(wrapper.prop('aria-label')).toBeUndefined();
+	});
 
-	it( 'should avoid using aria-checked if only menuitem is set as aria-role', () => {
+	it('should avoid using aria-checked if only menuitem is set as aria-role', () => {
 		const wrapper = shallow(
-			<MenuItem role="menuitem" isSelected={ true }>
+			<MenuItem role="menuitem" isSelected={true}>
 				<div />
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-checked' ) ).toBeUndefined();
-	} );
+		expect(wrapper.prop('aria-checked')).toBeUndefined();
+	});
 
-	it( 'should use aria-checked if menuitemradio or menuitemcheckbox is set as aria-role', () => {
+	it('should use aria-checked if menuitemradio or menuitemcheckbox is set as aria-role', () => {
 		let wrapper = shallow(
-			<MenuItem role="menuitemradio" isSelected={ true }>
+			<MenuItem role="menuitemradio" isSelected={true}>
 				<div />
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
+		expect(wrapper.prop('aria-checked')).toBe(true);
 
 		wrapper = shallow(
-			<MenuItem role="menuitemcheckbox" isSelected={ true }>
+			<MenuItem role="menuitemcheckbox" isSelected={true}>
 				<div />
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
-	} );
-} );
+		expect(wrapper.prop('aria-checked')).toBe(true);
+	});
+});

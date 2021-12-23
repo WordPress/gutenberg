@@ -16,38 +16,36 @@ import {
 import { store as editSiteStore } from '../../store';
 
 export default function InserterSidebar() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { setIsInserterOpened } = useDispatch(editSiteStore);
 	const insertionPoint = useSelect(
-		( select ) => select( editSiteStore ).__experimentalGetInsertionPoint(),
+		(select) => select(editSiteStore).__experimentalGetInsertionPoint(),
 		[]
 	);
 
-	const isMobile = useViewportMatch( 'medium', '<' );
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-	} );
+	const isMobile = useViewportMatch('medium', '<');
+	const [inserterDialogRef, inserterDialogProps] = useDialog({
+		onClose: () => setIsInserterOpened(false),
+	});
 
 	return (
 		<div
-			ref={ inserterDialogRef }
-			{ ...inserterDialogProps }
+			ref={inserterDialogRef}
+			{...inserterDialogProps}
 			className="edit-site-editor__inserter-panel"
 		>
 			<div className="edit-site-editor__inserter-panel-header">
 				<Button
-					icon={ close }
-					onClick={ () => setIsInserterOpened( false ) }
+					icon={close}
+					onClick={() => setIsInserterOpened(false)}
 				/>
 			</div>
 			<div className="edit-site-editor__inserter-panel-content">
 				<Library
 					showInserterHelpPanel
-					shouldFocusBlock={ isMobile }
-					rootClientId={ insertionPoint.rootClientId }
-					__experimentalInsertionIndex={
-						insertionPoint.insertionIndex
-					}
-					__experimentalFilterValue={ insertionPoint.filterValue }
+					shouldFocusBlock={isMobile}
+					rootClientId={insertionPoint.rootClientId}
+					__experimentalInsertionIndex={insertionPoint.insertionIndex}
+					__experimentalFilterValue={insertionPoint.filterValue}
 				/>
 			</div>
 		</div>

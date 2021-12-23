@@ -40,7 +40,7 @@ import {
 	VIDEO_BACKGROUND_TYPE,
 } from './shared';
 
-function Controls( {
+function Controls({
 	attributes,
 	didUploadFail,
 	hasOnlyColorBackground,
@@ -48,7 +48,7 @@ function Controls( {
 	onClearMedia,
 	onSelectMedia,
 	setAttributes,
-} ) {
+}) {
 	const {
 		backgroundType,
 		dimRatio,
@@ -60,16 +60,16 @@ function Controls( {
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 	const onHeightChange = useCallback(
-		( value ) => {
-			if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
-				setAttributes( { minHeight: value } );
+		(value) => {
+			if (minHeight || value !== COVER_DEFAULT_HEIGHT) {
+				setAttributes({ minHeight: value });
 			}
 		},
-		[ minHeight ]
+		[minHeight]
 	);
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || [
 			'px',
 			'em',
 			'rem',
@@ -77,35 +77,35 @@ function Controls( {
 			'vh',
 		],
 		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
-	} );
+	});
 
-	const onOpacityChange = useCallback( ( value ) => {
-		setAttributes( { dimRatio: value } );
-	}, [] );
+	const onOpacityChange = useCallback((value) => {
+		setAttributes({ dimRatio: value });
+	}, []);
 
-	const onChangeUnit = useCallback( ( nextUnit ) => {
-		setAttributes( {
+	const onChangeUnit = useCallback((nextUnit) => {
+		setAttributes({
 			minHeightUnit: nextUnit,
 			minHeight:
 				nextUnit === 'px'
-					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
+					? Math.max(CONTAINER_HEIGHT, COVER_MIN_HEIGHT)
 					: CONTAINER_HEIGHT,
-		} );
-	}, [] );
+		});
+	}, []);
 
-	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
+	const [displayPlaceholder, setDisplayPlaceholder] = useState(true);
 
-	function setFocalPoint( value ) {
-		setAttributes( { focalPoint: value } );
+	function setFocalPoint(value) {
+		setAttributes({ focalPoint: value });
 	}
 
 	const toggleParallax = () => {
-		setAttributes( {
-			hasParallax: ! hasParallax,
-			...( ! hasParallax
+		setAttributes({
+			hasParallax: !hasParallax,
+			...(!hasParallax
 				? { focalPoint: undefined }
-				: { focalPoint: IMAGE_DEFAULT_FOCAL_POINT } ),
-		} );
+				: { focalPoint: IMAGE_DEFAULT_FOCAL_POINT }),
+		});
 	};
 
 	const addMediaButtonStyle = usePreferredColorSchemeStyle(
@@ -113,23 +113,21 @@ function Controls( {
 		styles.addMediaButtonDark
 	);
 
-	function focalPointPosition( { x, y } = IMAGE_DEFAULT_FOCAL_POINT ) {
+	function focalPointPosition({ x, y } = IMAGE_DEFAULT_FOCAL_POINT) {
 		return {
-			left: `${ ( hasParallax ? 0.5 : x ) * 100 }%`,
-			top: `${ ( hasParallax ? 0.5 : y ) * 100 }%`,
+			left: `${(hasParallax ? 0.5 : x) * 100}%`,
+			top: `${(hasParallax ? 0.5 : y) * 100}%`,
 		};
 	}
 
-	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
-	const videoRef = useRef( null );
+	const [videoNaturalSize, setVideoNaturalSize] = useState(null);
+	const videoRef = useRef(null);
 
 	const mediaBackground = usePreferredColorSchemeStyle(
 		styles.mediaBackground,
 		styles.mediaBackgroundDark
 	);
-	const imagePreviewStyles = [
-		displayPlaceholder && styles.imagePlaceholder,
-	];
+	const imagePreviewStyles = [displayPlaceholder && styles.imagePlaceholder];
 	const videoPreviewStyles = [
 		{
 			aspectRatio:
@@ -142,170 +140,165 @@ function Controls( {
 		displayPlaceholder && styles.imagePlaceholder,
 	];
 
-	const focalPointHint = ! hasParallax && ! displayPlaceholder && (
+	const focalPointHint = !hasParallax && !displayPlaceholder && (
 		<Icon
-			icon={ plus }
-			size={ styles.focalPointHint?.width }
-			style={ [
-				styles.focalPointHint,
-				focalPointPosition( focalPoint ),
-			] }
+			icon={plus}
+			size={styles.focalPointHint?.width}
+			style={[styles.focalPointHint, focalPointPosition(focalPoint)]}
 		/>
 	);
 
-	const renderMediaSection = ( {
+	const renderMediaSection = ({
 		open: openMediaOptions,
 		getMediaOptions,
-	} ) => (
+	}) => (
 		<>
-			{ getMediaOptions() }
-			{ url ? (
+			{getMediaOptions()}
+			{url ? (
 				<>
 					<BottomSheet.Cell
-						accessible={ false }
-						cellContainerStyle={ [
+						accessible={false}
+						cellContainerStyle={[
 							styles.mediaPreview,
 							mediaBackground,
-						] }
-						onLongPress={ openMediaOptions }
+						]}
+						onLongPress={openMediaOptions}
 					>
-						<View style={ styles.mediaInner }>
-							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+						<View style={styles.mediaInner}>
+							{IMAGE_BACKGROUND_TYPE === backgroundType && (
 								<Image
-									editButton={ ! displayPlaceholder }
-									highlightSelected={ false }
-									isSelected={ ! displayPlaceholder }
-									isUploadFailed={ didUploadFail }
-									isUploadInProgress={ isUploadInProgress }
-									mediaPickerOptions={ [
+									editButton={!displayPlaceholder}
+									highlightSelected={false}
+									isSelected={!displayPlaceholder}
+									isUploadFailed={didUploadFail}
+									isUploadInProgress={isUploadInProgress}
+									mediaPickerOptions={[
 										{
 											destructiveButton: true,
 											id: 'clearMedia',
-											label: __( 'Clear Media' ),
+											label: __('Clear Media'),
 											onPress: onClearMedia,
 											separated: true,
 											value: 'clearMedia',
 										},
-									] }
-									onImageDataLoad={ () => {
-										setDisplayPlaceholder( false );
-									} }
-									onSelectMediaUploadOption={ onSelectMedia }
-									openMediaOptions={ openMediaOptions }
-									url={ url }
+									]}
+									onImageDataLoad={() => {
+										setDisplayPlaceholder(false);
+									}}
+									onSelectMediaUploadOption={onSelectMedia}
+									openMediaOptions={openMediaOptions}
+									url={url}
 									height="100%"
-									style={ imagePreviewStyles }
-									width={ styles.image?.width }
+									style={imagePreviewStyles}
+									width={styles.image?.width}
 								/>
-							) }
-							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							)}
+							{VIDEO_BACKGROUND_TYPE === backgroundType && (
 								<Video
 									muted
 									paused
 									disableFocus
-									onLoadStart={ () => {
-										setDisplayPlaceholder( true );
-									} }
-									onLoad={ ( event ) => {
-										const {
+									onLoadStart={() => {
+										setDisplayPlaceholder(true);
+									}}
+									onLoad={(event) => {
+										const { height, width } =
+											event.naturalSize;
+										setVideoNaturalSize({
 											height,
 											width,
-										} = event.naturalSize;
-										setVideoNaturalSize( {
-											height,
-											width,
-										} );
-										setDisplayPlaceholder( false );
+										});
+										setDisplayPlaceholder(false);
 										// Avoid invisible, paused video on Android, presumably
 										// related to https://git.io/Jt6Dr
-										videoRef?.current.seek( 0 );
-									} }
-									ref={ videoRef }
-									resizeMode={ 'cover' }
-									source={ { uri: url } }
-									style={ videoPreviewStyles }
+										videoRef?.current.seek(0);
+									}}
+									ref={videoRef}
+									resizeMode={'cover'}
+									source={{ uri: url }}
+									style={videoPreviewStyles}
 								/>
-							) }
-							{ displayPlaceholder ? null : focalPointHint }
+							)}
+							{displayPlaceholder ? null : focalPointHint}
 						</View>
 					</BottomSheet.Cell>
 					<FocalPointSettingsButton
-						disabled={ hasParallax }
-						focalPoint={ focalPoint || IMAGE_DEFAULT_FOCAL_POINT }
-						onFocalPointChange={ setFocalPoint }
-						url={ url }
+						disabled={hasParallax}
+						focalPoint={focalPoint || IMAGE_DEFAULT_FOCAL_POINT}
+						onFocalPointChange={setFocalPoint}
+						url={url}
 					/>
-					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					{IMAGE_BACKGROUND_TYPE === backgroundType && (
 						<ToggleControl
-							label={ __( 'Fixed background' ) }
-							checked={ hasParallax }
-							onChange={ toggleParallax }
+							label={__('Fixed background')}
+							checked={hasParallax}
+							onChange={toggleParallax}
 						/>
-					) }
+					)}
 					<TextControl
 						leftAlign
-						label={ __( 'Clear Media' ) }
-						labelStyle={ styles.clearMediaButton }
-						onPress={ onClearMedia }
+						label={__('Clear Media')}
+						labelStyle={styles.clearMediaButton}
+						onPress={onClearMedia}
 					/>
 				</>
 			) : (
 				<TextControl
-					accessibilityLabel={ __( 'Add image or video' ) }
-					label={ __( 'Add image or video' ) }
-					labelStyle={ addMediaButtonStyle }
+					accessibilityLabel={__('Add image or video')}
+					label={__('Add image or video')}
+					labelStyle={addMediaButtonStyle}
 					leftAlign
-					onPress={ openMediaOptions }
+					onPress={openMediaOptions}
 				/>
-			) }
+			)}
 		</>
 	);
 
 	return (
 		<>
-			<PanelBody title={ __( 'Media' ) }>
+			<PanelBody title={__('Media')}>
 				<MediaUpload
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					isReplacingMedia={ ! hasOnlyColorBackground }
-					onSelect={ onSelectMedia }
-					render={ renderMediaSection }
+					allowedTypes={ALLOWED_MEDIA_TYPES}
+					isReplacingMedia={!hasOnlyColorBackground}
+					onSelect={onSelectMedia}
+					render={renderMediaSection}
 				/>
 			</PanelBody>
 
 			<OverlayColorSettings
-				overlayColor={ attributes.overlayColor }
-				customOverlayColor={ attributes.customOverlayColor }
-				gradient={ attributes.gradient }
-				customGradient={ attributes.customGradient }
-				setAttributes={ setAttributes }
+				overlayColor={attributes.overlayColor}
+				customOverlayColor={attributes.customOverlayColor}
+				gradient={attributes.gradient}
+				customGradient={attributes.customGradient}
+				setAttributes={setAttributes}
 			/>
 
-			{ url ? (
+			{url ? (
 				<PanelBody>
 					<RangeControl
-						label={ __( 'Opacity' ) }
-						minimumValue={ 0 }
-						maximumValue={ 100 }
-						value={ dimRatio }
-						onChange={ onOpacityChange }
-						style={ styles.rangeCellContainer }
-						separatorType={ 'topFullWidth' }
+						label={__('Opacity')}
+						minimumValue={0}
+						maximumValue={100}
+						value={dimRatio}
+						onChange={onOpacityChange}
+						style={styles.rangeCellContainer}
+						separatorType={'topFullWidth'}
 					/>
 				</PanelBody>
-			) : null }
+			) : null}
 
-			<PanelBody title={ __( 'Dimensions' ) }>
+			<PanelBody title={__('Dimensions')}>
 				<UnitControl
-					label={ __( 'Minimum height' ) }
-					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
-					max={ COVER_MAX_HEIGHT }
-					unit={ minHeightUnit }
-					value={ CONTAINER_HEIGHT }
-					onChange={ onHeightChange }
-					onUnitChange={ onChangeUnit }
-					units={ units }
-					style={ styles.rangeCellContainer }
-					key={ minHeightUnit }
+					label={__('Minimum height')}
+					min={minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1}
+					max={COVER_MAX_HEIGHT}
+					unit={minHeightUnit}
+					value={CONTAINER_HEIGHT}
+					onChange={onHeightChange}
+					onUnitChange={onChangeUnit}
+					units={units}
+					style={styles.rangeCellContainer}
+					key={minHeightUnit}
 				/>
 			</PanelBody>
 		</>

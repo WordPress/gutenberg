@@ -17,37 +17,37 @@ import {
  */
 import useBlockControlsFill from './hook';
 
-export default function BlockControlsFill( {
+export default function BlockControlsFill({
 	group = 'default',
 	controls,
 	children,
 	__experimentalShareWithChildBlocks = false,
-} ) {
+}) {
 	const Fill = useBlockControlsFill(
 		group,
 		__experimentalShareWithChildBlocks
 	);
-	if ( ! Fill ) {
+	if (!Fill) {
 		return null;
 	}
 
 	return (
-		<StyleProvider document={ document }>
+		<StyleProvider document={document}>
 			<Fill>
-				{ ( fillProps ) => {
+				{(fillProps) => {
 					// Children passed to BlockControlsFill will not have access to any
 					// React Context whose Provider is part of the BlockControlsSlot tree.
 					// So we re-create the Provider in this subtree.
-					const value = ! isEmpty( fillProps ) ? fillProps : null;
+					const value = !isEmpty(fillProps) ? fillProps : null;
 					return (
-						<ToolbarContext.Provider value={ value }>
-							{ group === 'default' && (
-								<ToolbarGroup controls={ controls } />
-							) }
-							{ children }
+						<ToolbarContext.Provider value={value}>
+							{group === 'default' && (
+								<ToolbarGroup controls={controls} />
+							)}
+							{children}
 						</ToolbarContext.Provider>
 					);
-				} }
+				}}
 			</Fill>
 		</StyleProvider>
 	);

@@ -8,12 +8,12 @@ import {
 } from '../transform';
 
 // Mock createBlock to avoid creating the blocks in test environment.
-jest.mock( '@wordpress/blocks', () => {
-	const blocks = jest.requireActual( '@wordpress/blocks' );
+jest.mock('@wordpress/blocks', () => {
+	const blocks = jest.requireActual('@wordpress/blocks');
 
 	return {
 		...blocks,
-		createBlock( name, attributes, innerBlocks ) {
+		createBlock(name, attributes, innerBlocks) {
 			return {
 				name,
 				attributes,
@@ -21,11 +21,11 @@ jest.mock( '@wordpress/blocks', () => {
 			};
 		},
 	};
-} );
+});
 
-describe( 'converting menu items to blocks', () => {
-	it( 'converts an flat structure of menu item objects to blocks', () => {
-		const actual = menuItemsToBlocks( [
+describe('converting menu items to blocks', () => {
+	it('converts an flat structure of menu item objects to blocks', () => {
+		const actual = menuItemsToBlocks([
 			{
 				id: 1,
 				title: {
@@ -41,8 +41,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 2,
@@ -59,25 +59,25 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 2,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
-		] );
+		]);
 
-		expect( actual ).toEqual( [
-			expect.objectContaining( {
+		expect(actual).toEqual([
+			expect.objectContaining({
 				name: 'core/navigation-link',
 				innerBlocks: [],
-			} ),
-			expect.objectContaining( {
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
 				innerBlocks: [],
-			} ),
-		] );
-	} );
+			}),
+		]);
+	});
 
-	it( 'converts an nested structure of menu item objects to nested blocks', () => {
-		const actual = menuItemsToBlocks( [
+	it('converts an nested structure of menu item objects to nested blocks', () => {
+		const actual = menuItemsToBlocks([
 			{
 				id: 1,
 				title: {
@@ -93,8 +93,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 2,
@@ -111,8 +111,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 1,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 3,
@@ -129,8 +129,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 1,
 				menu_order: 2,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 4,
@@ -147,8 +147,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 3,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 5,
@@ -165,8 +165,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 4,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 6,
@@ -183,62 +183,62 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 2,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
-		] );
+		]);
 
-		expect( actual ).toEqual( [
-			expect.objectContaining( {
+		expect(actual).toEqual([
+			expect.objectContaining({
 				name: 'core/navigation-submenu',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Top Level',
-				} ),
+				}),
 				innerBlocks: [
-					expect.objectContaining( {
+					expect.objectContaining({
 						name: 'core/navigation-link',
-						attributes: expect.objectContaining( {
+						attributes: expect.objectContaining({
 							label: 'Child 1',
-						} ),
+						}),
 						innerBlocks: [],
-					} ),
-					expect.objectContaining( {
+					}),
+					expect.objectContaining({
 						name: 'core/navigation-submenu',
-						attributes: expect.objectContaining( {
+						attributes: expect.objectContaining({
 							label: 'Child 2',
-						} ),
+						}),
 						innerBlocks: [
-							expect.objectContaining( {
+							expect.objectContaining({
 								name: 'core/navigation-submenu',
-								attributes: expect.objectContaining( {
+								attributes: expect.objectContaining({
 									label: 'Sub Child',
-								} ),
+								}),
 								innerBlocks: [
-									expect.objectContaining( {
+									expect.objectContaining({
 										name: 'core/navigation-link',
-										attributes: expect.objectContaining( {
+										attributes: expect.objectContaining({
 											label: 'Sub Sub Child',
-										} ),
+										}),
 										innerBlocks: [],
-									} ),
+									}),
 								],
-							} ),
+							}),
 						],
-					} ),
+					}),
 				],
-			} ),
-			expect.objectContaining( {
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Top Level 2',
-				} ),
+				}),
 				innerBlocks: [],
-			} ),
-		] );
-	} );
+			}),
+		]);
+	});
 
-	it( 'respects menu order when converting to blocks', () => {
-		const actual = menuItemsToBlocks( [
+	it('respects menu order when converting to blocks', () => {
+		const actual = menuItemsToBlocks([
 			{
 				id: 1,
 				title: {
@@ -254,8 +254,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 100,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 2,
@@ -272,8 +272,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 10,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 3,
@@ -290,8 +290,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 30,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 4,
@@ -308,8 +308,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 20,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 5,
@@ -326,52 +326,52 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 0, // capturing 0 edge case.
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
-		] );
+		]);
 
-		expect( actual ).toEqual( [
-			expect.objectContaining( {
+		expect(actual).toEqual([
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 1st',
-				} ),
-			} ),
-			expect.objectContaining( {
+				}),
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 2nd',
-				} ),
-			} ),
-			expect.objectContaining( {
+				}),
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 3rd',
-				} ),
-			} ),
-			expect.objectContaining( {
+				}),
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 4th',
-				} ),
-			} ),
-			expect.objectContaining( {
+				}),
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 5th',
-				} ),
-			} ),
-		] );
-	} );
+				}),
+			}),
+		]);
+	});
 
-	it( 'returns an empty array when menu items argument is an empty array', () => {
-		const actual = menuItemsToBlocks( [] );
-		expect( actual ).toEqual( [] );
-	} );
-} );
+	it('returns an empty array when menu items argument is an empty array', () => {
+		const actual = menuItemsToBlocks([]);
+		expect(actual).toEqual([]);
+	});
+});
 
-describe( 'Mapping block attributes and menu item fields', () => {
+describe('Mapping block attributes and menu item fields', () => {
 	const blocksToMenuItems = [
 		{
 			block: {
@@ -396,8 +396,8 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				title: 'Example Page',
 				url: '/example-page/',
 				description: 'Lorem ipsum dolor sit amet.',
-				xfn: [ 'friend', 'met' ],
-				classes: [ 'my-custom-class-one', 'my-custom-class-two' ],
+				xfn: ['friend', 'met'],
+				classes: ['my-custom-class-one', 'my-custom-class-two'],
 				attr_title: 'Example page link title attribute',
 				object_id: 100,
 				object: 'page',
@@ -428,8 +428,8 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				title: 'Example Post',
 				url: '/example-post/',
 				description: 'Consectetur adipiscing elit.',
-				xfn: [ 'friend' ],
-				classes: [ 'my-custom-class-one' ],
+				xfn: ['friend'],
+				classes: ['my-custom-class-one'],
 				attr_title: 'Example post link title attribute',
 				object_id: 101,
 				object: 'post',
@@ -533,8 +533,8 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				},
 				url: '/example-page/',
 				description: 'Lorem ipsum dolor sit amet.',
-				xfn: [ 'friend', 'met' ],
-				classes: [ 'my-custom-class-one', 'my-custom-class-two' ],
+				xfn: ['friend', 'met'],
+				classes: ['my-custom-class-one', 'my-custom-class-two'],
 				attr_title: 'Example page link title attribute',
 				object_id: 100,
 				object: 'page',
@@ -562,8 +562,8 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				},
 				url: '/example-post/',
 				description: 'Consectetur adipiscing elit.',
-				xfn: [ 'friend' ],
-				classes: [ 'my-custom-class-one' ],
+				xfn: ['friend'],
+				classes: ['my-custom-class-one'],
 				attr_title: 'Example post link title attribute',
 				object_id: 101,
 				object: 'post',
@@ -591,8 +591,8 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				url: '/example-category/',
 				description:
 					'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-				xfn: [ '   ', '   ' ],
-				classes: [ '   ', ' ' ],
+				xfn: ['   ', '   '],
+				classes: ['   ', ' '],
 				attr_title: '',
 				object_id: 102,
 				object: 'category',
@@ -618,8 +618,8 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				},
 				url: '/example-tag/',
 				description: '',
-				xfn: [ '' ],
-				classes: [ '' ],
+				xfn: [''],
+				classes: [''],
 				attr_title: '',
 				object_id: 103,
 				object: 'tag',
@@ -642,8 +642,8 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				},
 				url: 'https://wordpress.org',
 				description: '',
-				xfn: [ '' ],
-				classes: [ '' ],
+				xfn: [''],
+				classes: [''],
 				attr_title: '',
 				object: 'custom',
 				type: 'custom',
@@ -659,23 +659,23 @@ describe( 'Mapping block attributes and menu item fields', () => {
 		},
 	];
 
-	describe( 'mapping block attributes to menu item fields', () => {
-		it( 'maps block attributes to equivalent menu item fields', () => {
-			const [ actual, expected ] = blocksToMenuItems.reduce(
-				( acc, item ) => {
-					acc[ 0 ].push(
-						blockAttributesToMenuItem( item.block.attributes )
+	describe('mapping block attributes to menu item fields', () => {
+		it('maps block attributes to equivalent menu item fields', () => {
+			const [actual, expected] = blocksToMenuItems.reduce(
+				(acc, item) => {
+					acc[0].push(
+						blockAttributesToMenuItem(item.block.attributes)
 					);
-					acc[ 1 ].push( item.menuItem );
+					acc[1].push(item.menuItem);
 					return acc;
 				},
-				[ [], [] ]
+				[[], []]
 			);
 
-			expect( actual ).toEqual( expected );
-		} );
+			expect(actual).toEqual(expected);
+		});
 
-		it( 'does not map block attribute "id" to menu item "object_id" field for custom (non-entity) links', () => {
+		it('does not map block attribute "id" to menu item "object_id" field for custom (non-entity) links', () => {
 			const customLinkBlockAttributes = {
 				id: 12345, // added for test purposes only - should't exist.
 				type: 'custom', // custom type indicates we shouldn't need an `id` field.
@@ -689,24 +689,22 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				opensInNewTab: true,
 			};
 
-			const actual = blockAttributesToMenuItem(
-				customLinkBlockAttributes
-			);
+			const actual = blockAttributesToMenuItem(customLinkBlockAttributes);
 
 			// Check the basic conversion to menuItem happened successfully.
-			expect( actual ).toEqual( {
+			expect(actual).toEqual({
 				title: 'Example Custom Link',
 				url: 'https://wordpress.org',
 				object: 'custom',
 				type: 'custom',
 				target: '_blank',
-			} );
+			});
 
 			// Assert `id` attr has NOT been converted to a `object_id` field for a "custom" type even if present.
-			expect( actual.object_id ).toBeUndefined();
-		} );
+			expect(actual.object_id).toBeUndefined();
+		});
 
-		it( 'correctly maps "tag" block type variation to "post_tag" value as expected in "object" type field', () => {
+		it('correctly maps "tag" block type variation to "post_tag" value as expected in "object" type field', () => {
 			const tagLinkBlockVariation = {
 				id: 12345, // added for test purposes only - should't exist.
 				type: 'tag', // custom type indicates we shouldn't need an `id` field.
@@ -715,12 +713,12 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				url: '/example-tag/',
 			};
 
-			const actual = blockAttributesToMenuItem( tagLinkBlockVariation );
+			const actual = blockAttributesToMenuItem(tagLinkBlockVariation);
 
-			expect( actual.object ).toBe( 'post_tag' );
-		} );
+			expect(actual.object).toBe('post_tag');
+		});
 
-		it( 'gracefully handles undefined values by falling back to menu item defaults', () => {
+		it('gracefully handles undefined values by falling back to menu item defaults', () => {
 			const blockAttrsWithUndefinedValues = {
 				id: undefined,
 				type: undefined,
@@ -739,16 +737,16 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			);
 
 			// Defaults are taken from https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L438.
-			expect( actual ).toEqual(
-				expect.objectContaining( {
+			expect(actual).toEqual(
+				expect.objectContaining({
 					title: '',
 					url: '',
-				} )
+				})
 			);
 
 			// Remaining values should not be present.
-			expect( Object.keys( actual ) ).not.toEqual(
-				expect.arrayContaining( [
+			expect(Object.keys(actual)).not.toEqual(
+				expect.arrayContaining([
 					'description',
 					'xfn',
 					'classes',
@@ -757,13 +755,13 @@ describe( 'Mapping block attributes and menu item fields', () => {
 					'type',
 					'object_id',
 					'target',
-				] )
+				])
 			);
 
-			expect( Object.values( actual ) ).not.toContain( undefined );
-		} );
+			expect(Object.values(actual)).not.toContain(undefined);
+		});
 
-		it( 'allows for setting and unsetting of target property based on opensInNewTab arttribute boolean', () => {
+		it('allows for setting and unsetting of target property based on opensInNewTab arttribute boolean', () => {
 			const shared = {
 				id: 12345, // added for test purposes only - should't exist.
 				type: 'custom', // custom type indicates we shouldn't need an `id` field.
@@ -782,54 +780,53 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				opensInNewTab: false,
 			};
 
-			const shouldOpenInNewTab = blockAttributesToMenuItem(
-				openInNewTabBlock
-			);
+			const shouldOpenInNewTab =
+				blockAttributesToMenuItem(openInNewTabBlock);
 
 			const shouldNotOpenInNewTab = blockAttributesToMenuItem(
 				doNotOpenInNewTabBlock
 			);
 
-			expect( shouldOpenInNewTab.target ).toBe( '_blank' );
+			expect(shouldOpenInNewTab.target).toBe('_blank');
 
 			// Should also allow unsetting of an existing value.
-			expect( shouldNotOpenInNewTab.target ).toBe( '' );
-		} );
-	} );
+			expect(shouldNotOpenInNewTab.target).toBe('');
+		});
+	});
 
-	describe( 'mapping menu item fields to block attributes', () => {
-		it( 'maps menu item fields to equivalent block attributes', () => {
-			const [ actual, expected ] = menuItemsToBlockAttrs.reduce(
-				( acc, item ) => {
-					acc[ 0 ].push( menuItemToBlockAttributes( item.menuItem ) );
-					acc[ 1 ].push( item.blockAttrs );
+	describe('mapping menu item fields to block attributes', () => {
+		it('maps menu item fields to equivalent block attributes', () => {
+			const [actual, expected] = menuItemsToBlockAttrs.reduce(
+				(acc, item) => {
+					acc[0].push(menuItemToBlockAttributes(item.menuItem));
+					acc[1].push(item.blockAttrs);
 					return acc;
 				},
-				[ [], [] ]
+				[[], []]
 			);
 
-			expect( actual ).toEqual( expected );
-		} );
+			expect(actual).toEqual(expected);
+		});
 
-		it( 'does not map menu item "object_id" field to block attribute "id" for custom (non-entity) links', () => {
+		it('does not map menu item "object_id" field to block attribute "id" for custom (non-entity) links', () => {
 			const customLinkMenuItem = {
 				title: 'Example Custom Link',
 				url: 'https://wordpress.org',
 				description: '',
-				xfn: [ '' ],
-				classes: [ '' ],
+				xfn: [''],
+				classes: [''],
 				attr_title: '',
 				object_id: 123456, // added for test purposes.
 				object: 'custom',
 				type: 'custom',
 				target: '_blank',
 			};
-			const actual = menuItemToBlockAttributes( customLinkMenuItem );
+			const actual = menuItemToBlockAttributes(customLinkMenuItem);
 
-			expect( actual.id ).toBeUndefined();
-		} );
+			expect(actual.id).toBeUndefined();
+		});
 
-		it( 'correctly maps "post_tag" menu item object type to "tag" block type variation', () => {
+		it('correctly maps "post_tag" menu item object type to "tag" block type variation', () => {
 			const tagMenuItem = {
 				title: 'Example Tag',
 				url: '/example-tag/',
@@ -838,12 +835,12 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				type: 'taxonomy',
 			};
 
-			const actual = menuItemToBlockAttributes( tagMenuItem );
+			const actual = menuItemToBlockAttributes(tagMenuItem);
 
-			expect( actual.type ).toBe( 'tag' );
-		} );
+			expect(actual.type).toBe('tag');
+		});
 
-		it( 'gracefully handles undefined values by falling back to block attribute defaults', () => {
+		it('gracefully handles undefined values by falling back to block attribute defaults', () => {
 			// Note that whilst Core provides default values for nav_menu_item's it is possible that these
 			// values could be manipulated via Plugins. As such we must account for unexpected values.
 			const menuItemsWithUndefinedValues = {
@@ -863,26 +860,26 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				menuItemsWithUndefinedValues
 			);
 
-			expect( actual ).toEqual(
-				expect.objectContaining( {
+			expect(actual).toEqual(
+				expect.objectContaining({
 					label: '',
 					url: '',
 					kind: 'custom',
-				} )
+				})
 			);
 
-			expect( Object.keys( actual ) ).not.toEqual(
-				expect.arrayContaining( [
+			expect(Object.keys(actual)).not.toEqual(
+				expect.arrayContaining([
 					'rel',
 					'className',
 					'title',
 					'id',
 					'description',
 					'opensInNewTab',
-				] )
+				])
 			);
 
-			expect( Object.values( actual ) ).not.toContain( undefined );
-		} );
-	} );
-} );
+			expect(Object.values(actual)).not.toContain(undefined);
+		});
+	});
+});

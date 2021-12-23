@@ -17,18 +17,18 @@ import { createElement } from './create-element';
  *
  * @return {Array} The path from the root node to the node.
  */
-function createPathToNode( node, rootNode, path ) {
+function createPathToNode(node, rootNode, path) {
 	const parentNode = node.parentNode;
 	let i = 0;
 
-	while ( ( node = node.previousSibling ) ) {
+	while ((node = node.previousSibling)) {
 		i++;
 	}
 
-	path = [ i, ...path ];
+	path = [i, ...path];
 
-	if ( parentNode !== rootNode ) {
-		path = createPathToNode( parentNode, rootNode, path );
+	if (parentNode !== rootNode) {
+		path = createPathToNode(parentNode, rootNode, path);
 	}
 
 	return path;
@@ -42,76 +42,76 @@ function createPathToNode( node, rootNode, path ) {
  *
  * @return {Object} Object with the found node and the remaining offset (if any).
  */
-function getNodeByPath( node, path ) {
-	path = [ ...path ];
+function getNodeByPath(node, path) {
+	path = [...path];
 
-	while ( node && path.length > 1 ) {
-		node = node.childNodes[ path.shift() ];
+	while (node && path.length > 1) {
+		node = node.childNodes[path.shift()];
 	}
 
 	return {
 		node,
-		offset: path[ 0 ],
+		offset: path[0],
 	};
 }
 
-function append( element, child ) {
-	if ( typeof child === 'string' ) {
-		child = element.ownerDocument.createTextNode( child );
+function append(element, child) {
+	if (typeof child === 'string') {
+		child = element.ownerDocument.createTextNode(child);
 	}
 
 	const { type, attributes } = child;
 
-	if ( type ) {
-		child = element.ownerDocument.createElement( type );
+	if (type) {
+		child = element.ownerDocument.createElement(type);
 
-		for ( const key in attributes ) {
-			child.setAttribute( key, attributes[ key ] );
+		for (const key in attributes) {
+			child.setAttribute(key, attributes[key]);
 		}
 	}
 
-	return element.appendChild( child );
+	return element.appendChild(child);
 }
 
-function appendText( node, text ) {
-	node.appendData( text );
+function appendText(node, text) {
+	node.appendData(text);
 }
 
-function getLastChild( { lastChild } ) {
+function getLastChild({ lastChild }) {
 	return lastChild;
 }
 
-function getParent( { parentNode } ) {
+function getParent({ parentNode }) {
 	return parentNode;
 }
 
-function isText( node ) {
+function isText(node) {
 	return node.nodeType === node.TEXT_NODE;
 }
 
-function getText( { nodeValue } ) {
+function getText({ nodeValue }) {
 	return nodeValue;
 }
 
-function remove( node ) {
-	return node.parentNode.removeChild( node );
+function remove(node) {
+	return node.parentNode.removeChild(node);
 }
 
-export function toDom( {
+export function toDom({
 	value,
 	multilineTag,
 	prepareEditableTree,
 	isEditableTree = true,
 	placeholder,
 	doc = document,
-} ) {
+}) {
 	let startPath = [];
 	let endPath = [];
 
-	if ( prepareEditableTree ) {
+	if (prepareEditableTree) {
 		value = {
 			...value,
-			formats: prepareEditableTree( value ),
+			formats: prepareEditableTree(value),
 		};
 	}
 
@@ -125,9 +125,9 @@ export function toDom( {
 	 *
 	 * @return {Object} RichText tree.
 	 */
-	const createEmpty = () => createElement( doc, '' );
+	const createEmpty = () => createElement(doc, '');
 
-	const tree = toTree( {
+	const tree = toTree({
 		value,
 		multilineTag,
 		createEmpty,
@@ -138,19 +138,19 @@ export function toDom( {
 		getText,
 		remove,
 		appendText,
-		onStartIndex( body, pointer ) {
-			startPath = createPathToNode( pointer, body, [
+		onStartIndex(body, pointer) {
+			startPath = createPathToNode(pointer, body, [
 				pointer.nodeValue.length,
-			] );
+			]);
 		},
-		onEndIndex( body, pointer ) {
-			endPath = createPathToNode( pointer, body, [
+		onEndIndex(body, pointer) {
+			endPath = createPathToNode(pointer, body, [
 				pointer.nodeValue.length,
-			] );
+			]);
 		},
 		isEditableTree,
 		placeholder,
-	} );
+	});
 
 	return {
 		body: tree,
@@ -171,86 +171,86 @@ export function toDom( {
  * @param {boolean}       [$1.__unstableDomOnly]   Only apply elements, no selection.
  * @param {string}        [$1.placeholder]         Placeholder text.
  */
-export function apply( {
+export function apply({
 	value,
 	current,
 	multilineTag,
 	prepareEditableTree,
 	__unstableDomOnly,
 	placeholder,
-} ) {
+}) {
 	// Construct a new element tree in memory.
-	const { body, selection } = toDom( {
+	const { body, selection } = toDom({
 		value,
 		multilineTag,
 		prepareEditableTree,
 		placeholder,
 		doc: current.ownerDocument,
-	} );
+	});
 
-	applyValue( body, current );
+	applyValue(body, current);
 
-	if ( value.start !== undefined && ! __unstableDomOnly ) {
-		applySelection( selection, current );
+	if (value.start !== undefined && !__unstableDomOnly) {
+		applySelection(selection, current);
 	}
 }
 
-export function applyValue( future, current ) {
+export function applyValue(future, current) {
 	let i = 0;
 	let futureChild;
 
-	while ( ( futureChild = future.firstChild ) ) {
-		const currentChild = current.childNodes[ i ];
+	while ((futureChild = future.firstChild)) {
+		const currentChild = current.childNodes[i];
 
-		if ( ! currentChild ) {
-			current.appendChild( futureChild );
-		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
+		if (!currentChild) {
+			current.appendChild(futureChild);
+		} else if (!currentChild.isEqualNode(futureChild)) {
 			if (
 				currentChild.nodeName !== futureChild.nodeName ||
-				( currentChild.nodeType === currentChild.TEXT_NODE &&
-					currentChild.data !== futureChild.data )
+				(currentChild.nodeType === currentChild.TEXT_NODE &&
+					currentChild.data !== futureChild.data)
 			) {
-				current.replaceChild( futureChild, currentChild );
+				current.replaceChild(futureChild, currentChild);
 			} else {
 				const currentAttributes = currentChild.attributes;
 				const futureAttributes = futureChild.attributes;
 
-				if ( currentAttributes ) {
+				if (currentAttributes) {
 					let ii = currentAttributes.length;
 
 					// Reverse loop because `removeAttribute` on `currentChild`
 					// changes `currentAttributes`.
-					while ( ii-- ) {
-						const { name } = currentAttributes[ ii ];
+					while (ii--) {
+						const { name } = currentAttributes[ii];
 
-						if ( ! futureChild.getAttribute( name ) ) {
-							currentChild.removeAttribute( name );
+						if (!futureChild.getAttribute(name)) {
+							currentChild.removeAttribute(name);
 						}
 					}
 				}
 
-				if ( futureAttributes ) {
-					for ( let ii = 0; ii < futureAttributes.length; ii++ ) {
-						const { name, value } = futureAttributes[ ii ];
+				if (futureAttributes) {
+					for (let ii = 0; ii < futureAttributes.length; ii++) {
+						const { name, value } = futureAttributes[ii];
 
-						if ( currentChild.getAttribute( name ) !== value ) {
-							currentChild.setAttribute( name, value );
+						if (currentChild.getAttribute(name) !== value) {
+							currentChild.setAttribute(name, value);
 						}
 					}
 				}
 
-				applyValue( futureChild, currentChild );
-				future.removeChild( futureChild );
+				applyValue(futureChild, currentChild);
+				future.removeChild(futureChild);
 			}
 		} else {
-			future.removeChild( futureChild );
+			future.removeChild(futureChild);
 		}
 
 		i++;
 	}
 
-	while ( current.childNodes[ i ] ) {
-		current.removeChild( current.childNodes[ i ] );
+	while (current.childNodes[i]) {
+		current.removeChild(current.childNodes[i]);
 	}
 }
 
@@ -264,7 +264,7 @@ export function applyValue( future, current ) {
  *
  * @return {boolean} Whether the two ranges are equal.
  */
-function isRangeEqual( a, b ) {
+function isRangeEqual(a, b) {
 	return (
 		a.startContainer === b.startContainer &&
 		a.startOffset === b.startOffset &&
@@ -273,7 +273,7 @@ function isRangeEqual( a, b ) {
 	);
 }
 
-export function applySelection( { startPath, endPath }, current ) {
+export function applySelection({ startPath, endPath }, current) {
 	const { node: startContainer, offset: startOffset } = getNodeByPath(
 		current,
 		startPath
@@ -287,33 +287,33 @@ export function applySelection( { startPath, endPath }, current ) {
 	const selection = defaultView.getSelection();
 	const range = ownerDocument.createRange();
 
-	range.setStart( startContainer, startOffset );
-	range.setEnd( endContainer, endOffset );
+	range.setStart(startContainer, startOffset);
+	range.setEnd(endContainer, endOffset);
 
 	const { activeElement } = ownerDocument;
 
-	if ( selection.rangeCount > 0 ) {
+	if (selection.rangeCount > 0) {
 		// If the to be added range and the live range are the same, there's no
 		// need to remove the live range and add the equivalent range.
-		if ( isRangeEqual( range, selection.getRangeAt( 0 ) ) ) {
+		if (isRangeEqual(range, selection.getRangeAt(0))) {
 			return;
 		}
 
 		selection.removeAllRanges();
 	}
 
-	selection.addRange( range );
+	selection.addRange(range);
 
 	// This function is not intended to cause a shift in focus. Since the above
 	// selection manipulations may shift focus, ensure that focus is restored to
 	// its previous state.
-	if ( activeElement !== ownerDocument.activeElement ) {
+	if (activeElement !== ownerDocument.activeElement) {
 		// The `instanceof` checks protect against edge cases where the focused
 		// element is not of the interface HTMLElement (does not have a `focus`
 		// or `blur` property).
 		//
 		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
-		if ( activeElement instanceof defaultView.HTMLElement ) {
+		if (activeElement instanceof defaultView.HTMLElement) {
 			activeElement.focus();
 		}
 	}

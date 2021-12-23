@@ -16,16 +16,16 @@ import { getLineIndex } from './get-line-index';
  *
  * @return {boolean} True if the current list type matches `type`, false if not.
  */
-export function isActiveListType( value, type, rootType ) {
+export function isActiveListType(value, type, rootType) {
 	const { replacements, start } = value;
-	const lineIndex = getLineIndex( value, start );
-	const replacement = replacements[ lineIndex ];
+	const lineIndex = getLineIndex(value, start);
+	const replacement = replacements[lineIndex];
 
-	if ( ! replacement || replacement.length === 0 ) {
+	if (!replacement || replacement.length === 0) {
 		return type === rootType;
 	}
 
-	const lastFormat = replacement[ replacement.length - 1 ];
+	const lastFormat = replacement[replacement.length - 1];
 
 	return lastFormat.type === type;
 }

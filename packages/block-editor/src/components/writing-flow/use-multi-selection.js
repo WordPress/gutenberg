@@ -15,19 +15,19 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
-export function toggleRichText( container, toggle ) {
+export function toggleRichText(container, toggle) {
 	Array.from(
 		container.querySelectorAll(
 			// Exclude the Post Title from multi-select disable.
 			'.rich-text:not( .editor-post-title__input )'
 		)
-	).forEach( ( node ) => {
-		if ( toggle ) {
-			node.setAttribute( 'contenteditable', true );
+	).forEach((node) => {
+		if (toggle) {
+			node.setAttribute('contenteditable', true);
 		} else {
-			node.removeAttribute( 'contenteditable' );
+			node.removeAttribute('contenteditable');
 		}
-	} );
+	});
 }
 
 /**
@@ -37,32 +37,32 @@ export function toggleRichText( container, toggle ) {
  * @param {Element} node Container to search.
  * @param {string}  type 'start' or 'end'.
  */
-function getDeepestNode( node, type ) {
+function getDeepestNode(node, type) {
 	const child = type === 'start' ? 'firstChild' : 'lastChild';
 	const sibling = type === 'start' ? 'nextSibling' : 'previousSibling';
 
-	while ( node[ child ] ) {
-		node = node[ child ];
+	while (node[child]) {
+		node = node[child];
 
 		while (
 			node.nodeType === node.TEXT_NODE &&
-			/^[ \t\n]*$/.test( node.data ) &&
-			node[ sibling ]
+			/^[ \t\n]*$/.test(node.data) &&
+			node[sibling]
 		) {
-			node = node[ sibling ];
+			node = node[sibling];
 		}
 	}
 
 	return node;
 }
 
-function selector( select ) {
+function selector(select) {
 	const {
 		isMultiSelecting,
 		getMultiSelectedBlockClientIds,
 		hasMultiSelection,
 		getSelectedBlockClientId,
-	} = select( blockEditorStore );
+	} = select(blockEditorStore);
 
 	return {
 		isMultiSelecting: isMultiSelecting(),
@@ -78,39 +78,37 @@ export default function useMultiSelection() {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		selectedBlockClientId,
-	} = useSelect( selector, [] );
-	const selectedRef = useBlockRef( selectedBlockClientId );
+	} = useSelect(selector, []);
+	const selectedRef = useBlockRef(selectedBlockClientId);
 	// These must be in the right DOM order.
-	const startRef = useBlockRef( first( multiSelectedBlockClientIds ) );
-	const endRef = useBlockRef( last( multiSelectedBlockClientIds ) );
+	const startRef = useBlockRef(first(multiSelectedBlockClientIds));
+	const endRef = useBlockRef(last(multiSelectedBlockClientIds));
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
 	return useRefEffect(
-		( node ) => {
+		(node) => {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			if ( ! hasMultiSelection || isMultiSelecting ) {
-				if ( ! selectedBlockClientId || isMultiSelecting ) {
+			if (!hasMultiSelection || isMultiSelecting) {
+				if (!selectedBlockClientId || isMultiSelecting) {
 					return;
 				}
 
 				const selection = defaultView.getSelection();
 
-				if ( selection.rangeCount && ! selection.isCollapsed ) {
+				if (selection.rangeCount && !selection.isCollapsed) {
 					const blockNode = selectedRef.current;
-					const {
-						startContainer,
-						endContainer,
-					} = selection.getRangeAt( 0 );
+					const { startContainer, endContainer } =
+						selection.getRangeAt(0);
 
 					if (
-						!! blockNode &&
-						( ! blockNode.contains( startContainer ) ||
-							! blockNode.contains( endContainer ) )
+						!!blockNode &&
+						(!blockNode.contains(startContainer) ||
+							!blockNode.contains(endContainer))
 					) {
 						selection.removeAllRanges();
 					}
@@ -121,13 +119,13 @@ export default function useMultiSelection() {
 
 			const { length } = multiSelectedBlockClientIds;
 
-			if ( length < 2 ) {
+			if (length < 2) {
 				return;
 			}
 
 			// The block refs might not be immediately available
 			// when dragging blocks into another block.
-			if ( ! startRef.current || ! endRef.current ) {
+			if (!startRef.current || !endRef.current) {
 				return;
 			}
 
@@ -141,19 +139,19 @@ export default function useMultiSelection() {
 			// These must be in the right DOM order.
 			// The most stable way to select the whole block contents is to start
 			// and end at the deepest points.
-			const startNode = getDeepestNode( startRef.current, 'start' );
-			const endNode = getDeepestNode( endRef.current, 'end' );
+			const startNode = getDeepestNode(startRef.current, 'start');
+			const endNode = getDeepestNode(endRef.current, 'end');
 
 			// While rich text will be disabled with a delay when there is a multi
 			// selection, we must do it immediately because it's not possible to set
 			// selection across editable hosts.
-			toggleRichText( node, false );
+			toggleRichText(node, false);
 
-			range.setStartBefore( startNode );
-			range.setEndAfter( endNode );
+			range.setStartBefore(startNode);
+			range.setEndAfter(endNode);
 
 			selection.removeAllRanges();
-			selection.addRange( range );
+			selection.addRange(range);
 		},
 		[
 			hasMultiSelection,

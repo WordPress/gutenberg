@@ -21,35 +21,35 @@ import { store as blockEditorStore } from '../../../store';
  * @param {Function} onInsert     function called when inserter a list of blocks.
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
-const useBlockTypesState = ( rootClientId, onInsert ) => {
+const useBlockTypesState = (rootClientId, onInsert) => {
 	const { categories, collections, items } = useSelect(
-		( select ) => {
-			const { getInserterItems } = select( blockEditorStore );
-			const { getCategories, getCollections } = select( blocksStore );
+		(select) => {
+			const { getInserterItems } = select(blockEditorStore);
+			const { getCategories, getCollections } = select(blocksStore);
 
 			return {
 				categories: getCategories(),
 				collections: getCollections(),
-				items: getInserterItems( rootClientId ),
+				items: getInserterItems(rootClientId),
 			};
 		},
-		[ rootClientId ]
+		[rootClientId]
 	);
 
 	const onSelectItem = useCallback(
-		( { name, initialAttributes, innerBlocks }, shouldFocusBlock ) => {
+		({ name, initialAttributes, innerBlocks }, shouldFocusBlock) => {
 			const insertedBlock = createBlock(
 				name,
 				initialAttributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
+				createBlocksFromInnerBlocksTemplate(innerBlocks)
 			);
 
-			onInsert( insertedBlock, undefined, shouldFocusBlock );
+			onInsert(insertedBlock, undefined, shouldFocusBlock);
 		},
-		[ onInsert ]
+		[onInsert]
 	);
 
-	return [ items, categories, collections, onSelectItem ];
+	return [items, categories, collections, onSelectItem];
 };
 
 export default useBlockTypesState;

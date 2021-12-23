@@ -23,16 +23,16 @@ import { getBlockType } from './registration';
  *
  * @return {boolean} Whether the list of blocks matches a templates.
  */
-export function doBlocksMatchTemplate( blocks = [], template = [] ) {
+export function doBlocksMatchTemplate(blocks = [], template = []) {
 	return (
 		blocks.length === template.length &&
-		every( template, ( [ name, , innerBlocksTemplate ], index ) => {
-			const block = blocks[ index ];
+		every(template, ([name, , innerBlocksTemplate], index) => {
+			const block = blocks[index];
 			return (
 				name === block.name &&
-				doBlocksMatchTemplate( block.innerBlocks, innerBlocksTemplate )
+				doBlocksMatchTemplate(block.innerBlocks, innerBlocksTemplate)
 			);
-		} )
+		})
 	);
 }
 
@@ -49,78 +49,67 @@ export function doBlocksMatchTemplate( blocks = [], template = [] ) {
  *
  * @return {Array} Updated Block list.
  */
-export function synchronizeBlocksWithTemplate( blocks = [], template ) {
+export function synchronizeBlocksWithTemplate(blocks = [], template) {
 	// If no template is provided, return blocks unmodified.
-	if ( ! template ) {
+	if (!template) {
 		return blocks;
 	}
 
-	return map(
-		template,
-		( [ name, attributes, innerBlocksTemplate ], index ) => {
-			const block = blocks[ index ];
+	return map(template, ([name, attributes, innerBlocksTemplate], index) => {
+		const block = blocks[index];
 
-			if ( block && block.name === name ) {
-				const innerBlocks = synchronizeBlocksWithTemplate(
-					block.innerBlocks,
-					innerBlocksTemplate
-				);
-				return { ...block, innerBlocks };
+		if (block && block.name === name) {
+			const innerBlocks = synchronizeBlocksWithTemplate(
+				block.innerBlocks,
+				innerBlocksTemplate
+			);
+			return { ...block, innerBlocks };
+		}
+
+		// To support old templates that were using the "children" format
+		// for the attributes using "html" strings now, we normalize the template attributes
+		// before creating the blocks.
+
+		const blockType = getBlockType(name);
+		const isHTMLAttribute = (attributeDefinition) =>
+			get(attributeDefinition, ['source']) === 'html';
+		const isQueryAttribute = (attributeDefinition) =>
+			get(attributeDefinition, ['source']) === 'query';
+
+		const normalizeAttributes = (schema, values) => {
+			return mapValues(values, (value, key) => {
+				return normalizeAttribute(schema[key], value);
+			});
+		};
+		const normalizeAttribute = (definition, value) => {
+			if (isHTMLAttribute(definition) && isArray(value)) {
+				// Introduce a deprecated call at this point
+				// When we're confident that "children" format should be removed from the templates.
+
+				return renderToString(value);
 			}
 
-			// To support old templates that were using the "children" format
-			// for the attributes using "html" strings now, we normalize the template attributes
-			// before creating the blocks.
+			if (isQueryAttribute(definition) && value) {
+				return value.map((subValues) => {
+					return normalizeAttributes(definition.query, subValues);
+				});
+			}
 
-			const blockType = getBlockType( name );
-			const isHTMLAttribute = ( attributeDefinition ) =>
-				get( attributeDefinition, [ 'source' ] ) === 'html';
-			const isQueryAttribute = ( attributeDefinition ) =>
-				get( attributeDefinition, [ 'source' ] ) === 'query';
+			return value;
+		};
 
-			const normalizeAttributes = ( schema, values ) => {
-				return mapValues( values, ( value, key ) => {
-					return normalizeAttribute( schema[ key ], value );
-				} );
-			};
-			const normalizeAttribute = ( definition, value ) => {
-				if ( isHTMLAttribute( definition ) && isArray( value ) ) {
-					// Introduce a deprecated call at this point
-					// When we're confident that "children" format should be removed from the templates.
+		const normalizedAttributes = normalizeAttributes(
+			get(blockType, ['attributes'], {}),
+			attributes
+		);
 
-					return renderToString( value );
-				}
+		const [blockName, blockAttributes] =
+			convertLegacyBlockNameAndAttributes(name, normalizedAttributes);
 
-				if ( isQueryAttribute( definition ) && value ) {
-					return value.map( ( subValues ) => {
-						return normalizeAttributes(
-							definition.query,
-							subValues
-						);
-					} );
-				}
-
-				return value;
-			};
-
-			const normalizedAttributes = normalizeAttributes(
-				get( blockType, [ 'attributes' ], {} ),
-				attributes
-			);
-
-			const [
-				blockName,
-				blockAttributes,
-			] = convertLegacyBlockNameAndAttributes(
-				name,
-				normalizedAttributes
-			);
-
-			return createBlock(
-				blockName,
-				blockAttributes,
-				synchronizeBlocksWithTemplate( [], innerBlocksTemplate )
-			);
-		}
-	);
+		return createBlock(
+			blockName,
+			blockAttributes,
+			synchronizeBlocksWithTemplate([], innerBlocksTemplate)
+		);
+	});
 }

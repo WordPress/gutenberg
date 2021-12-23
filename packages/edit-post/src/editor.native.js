@@ -27,24 +27,24 @@ import Layout from './components/layout';
 import { store as editPostStore } from './store';
 
 class Editor extends Component {
-	constructor( props ) {
-		super( ...arguments );
+	constructor(props) {
+		super(...arguments);
 
 		// need to set this globally to avoid race with deprecations
 		// defaulting to true to avoid issues with a not-yet-cached value
 		const { galleryWithImageBlocks = true } = props;
 		window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
 
-		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
+		if (props.initialHtmlModeEnabled && props.mode === 'visual') {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
-			this.props.switchEditorMode( 'text' );
+			this.props.switchEditorMode('text');
 		}
 
-		this.getEditorSettings = memize( this.getEditorSettings, {
+		this.getEditorSettings = memize(this.getEditorSettings, {
 			maxSize: 1,
-		} );
+		});
 
-		this.setTitleRef = this.setTitleRef.bind( this );
+		this.setTitleRef = this.setTitleRef.bind(this);
 	}
 
 	getEditorSettings(
@@ -62,8 +62,8 @@ class Editor extends Component {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
-			if ( settings.allowedBlockTypes === undefined ) {
+		if (size(hiddenBlockTypes) > 0) {
+			if (settings.allowedBlockTypes === undefined) {
 				// if no specific flags for allowedBlockTypes are set, assume `true`
 				// meaning allow all block types
 				settings.allowedBlockTypes = true;
@@ -73,7 +73,7 @@ class Editor extends Component {
 			// all block types).
 			const defaultAllowedBlockTypes =
 				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
+					? map(blockTypes, 'name')
 					: settings.allowedBlockTypes || [];
 
 			settings.allowedBlockTypes = without(
@@ -90,14 +90,14 @@ class Editor extends Component {
 
 		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle(
 			() => {
-				if ( this.postTitleRef ) {
+				if (this.postTitleRef) {
 					this.postTitleRef.focus();
 				}
 			}
 		);
 
-		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
-			( payload ) => {
+		this.subscriptionParentFeaturedImageIdNativeUpdated =
+			subscribeFeaturedImageIdNativeUpdated((payload) => {
 				editEntityRecord(
 					'postType',
 					postType,
@@ -107,21 +107,20 @@ class Editor extends Component {
 						undoIgnore: true,
 					}
 				);
-			}
-		);
+			});
 	}
 
 	componentWillUnmount() {
-		if ( this.subscriptionParentSetFocusOnTitle ) {
+		if (this.subscriptionParentSetFocusOnTitle) {
 			this.subscriptionParentSetFocusOnTitle.remove();
 		}
 
-		if ( this.subscribeFeaturedImageIdNativeUpdated ) {
+		if (this.subscribeFeaturedImageIdNativeUpdated) {
 			this.subscribeFeaturedImageIdNativeUpdated.remove();
 		}
 	}
 
-	setTitleRef( titleRef ) {
+	setTitleRef(titleRef) {
 		this.postTitleRef = titleRef;
 	}
 
@@ -159,7 +158,7 @@ class Editor extends Component {
 				// make sure the post content is in sync with gutenberg store
 				// to avoid marking the post as modified when simply loaded
 				// For now, let's assume: serialize( parse( html ) ) !== html
-				raw: serialize( parse( initialHtml || '' ) ),
+				raw: serialize(parse(initialHtml || '')),
 			},
 			type: postType,
 			status: 'draft',
@@ -169,45 +168,45 @@ class Editor extends Component {
 		return (
 			<SlotFillProvider>
 				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
+					settings={editorSettings}
+					post={normalizedPost}
+					initialEdits={initialEdits}
+					useSubRegistry={false}
+					{...props}
 				>
-					<Layout setTitleRef={ this.setTitleRef } />
+					<Layout setTitleRef={this.setTitleRef} />
 				</EditorProvider>
 			</SlotFillProvider>
 		);
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		const {
 			isFeatureActive,
 			getEditorMode,
 			getPreference,
 			__experimentalGetPreviewDeviceType,
-		} = select( editPostStore );
-		const { getBlockTypes } = select( blocksStore );
+		} = select(editPostStore);
+		const { getBlockTypes } = select(blocksStore);
 
 		return {
 			hasFixedToolbar:
-				isFeatureActive( 'fixedToolbar' ) ||
+				isFeatureActive('fixedToolbar') ||
 				__experimentalGetPreviewDeviceType() !== 'Desktop',
-			focusMode: isFeatureActive( 'focusMode' ),
+			focusMode: isFeatureActive('focusMode'),
 			mode: getEditorMode(),
-			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+			hiddenBlockTypes: getPreference('hiddenBlockTypes'),
 			blockTypes: getBlockTypes(),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { switchEditorMode } = dispatch( editPostStore );
-		const { editEntityRecord } = dispatch( coreStore );
+	}),
+	withDispatch((dispatch) => {
+		const { switchEditorMode } = dispatch(editPostStore);
+		const { editEntityRecord } = dispatch(coreStore);
 		return {
 			switchEditorMode,
 			editEntityRecord,
 		};
-	} ),
-] )( Editor );
+	}),
+])(Editor);

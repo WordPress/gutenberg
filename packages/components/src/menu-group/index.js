@@ -10,32 +10,32 @@ import classnames from 'classnames';
 import { Children } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
-export function MenuGroup( props ) {
+export function MenuGroup(props) {
 	const { children, className = '', label, hideSeparator } = props;
-	const instanceId = useInstanceId( MenuGroup );
+	const instanceId = useInstanceId(MenuGroup);
 
-	if ( ! Children.count( children ) ) {
+	if (!Children.count(children)) {
 		return null;
 	}
 
-	const labelId = `components-menu-group-label-${ instanceId }`;
-	const classNames = classnames( className, 'components-menu-group', {
+	const labelId = `components-menu-group-label-${instanceId}`;
+	const classNames = classnames(className, 'components-menu-group', {
 		'has-hidden-separator': hideSeparator,
-	} );
+	});
 
 	return (
-		<div className={ classNames }>
-			{ label && (
+		<div className={classNames}>
+			{label && (
 				<div
 					className="components-menu-group__label"
-					id={ labelId }
+					id={labelId}
 					aria-hidden="true"
 				>
-					{ label }
+					{label}
 				</div>
-			) }
-			<div role="group" aria-labelledby={ label ? labelId : null }>
-				{ children }
+			)}
+			<div role="group" aria-labelledby={label ? labelId : null}>
+				{children}
 			</div>
 		</div>
 	);

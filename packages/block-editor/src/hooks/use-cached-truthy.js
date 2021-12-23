@@ -9,12 +9,12 @@ import { useState, useEffect } from '@wordpress/element';
  * @param {any} value
  * @return {any} value
  */
-export function useCachedTruthy( value ) {
-	const [ cachedValue, setCachedValue ] = useState( value );
-	useEffect( () => {
-		if ( value ) {
-			setCachedValue( value );
+export function useCachedTruthy(value) {
+	const [cachedValue, setCachedValue] = useState(value);
+	useEffect(() => {
+		if (value) {
+			setCachedValue(value);
 		}
-	}, [ value ] );
+	}, [value]);
 	return cachedValue;
 }

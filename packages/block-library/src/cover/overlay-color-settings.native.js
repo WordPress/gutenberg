@@ -16,19 +16,19 @@ import {
 } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 
-function OverlayColorSettings( {
+function OverlayColorSettings({
 	overlayColor,
 	customOverlayColor,
 	gradient,
 	customGradient,
 	setAttributes,
-} ) {
+}) {
 	const EMPTY_ARRAY = [];
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors = useSetting('color.palette') || EMPTY_ARRAY;
+	const gradients = useSetting('color.gradients') || EMPTY_ARRAY;
 
 	const gradientValue =
-		customGradient || getGradientValueBySlug( gradients, gradient );
+		customGradient || getGradientValueBySlug(gradients, gradient);
 
 	const colorValue = getColorObjectByAttributeValues(
 		colors,
@@ -36,56 +36,56 @@ function OverlayColorSettings( {
 		customOverlayColor
 	).color;
 
-	const settings = useMemo( () => {
-		const setOverlayAttribute = ( attributeName, value ) => {
-			setAttributes( {
+	const settings = useMemo(() => {
+		const setOverlayAttribute = (attributeName, value) => {
+			setAttributes({
 				// clear all related attributes (only one should be set)
 				overlayColor: undefined,
 				customOverlayColor: undefined,
 				gradient: undefined,
 				customGradient: undefined,
-				[ attributeName ]: value,
-			} );
+				[attributeName]: value,
+			});
 		};
 
-		const onColorChange = ( value ) => {
+		const onColorChange = (value) => {
 			// do nothing for falsy values
-			if ( ! value ) {
+			if (!value) {
 				return;
 			}
-			const colorObject = getColorObjectByColorValue( colors, value );
-			if ( colorObject?.slug ) {
-				setOverlayAttribute( 'overlayColor', colorObject.slug );
+			const colorObject = getColorObjectByColorValue(colors, value);
+			if (colorObject?.slug) {
+				setOverlayAttribute('overlayColor', colorObject.slug);
 			} else {
-				setOverlayAttribute( 'customOverlayColor', value );
+				setOverlayAttribute('customOverlayColor', value);
 			}
 		};
 
-		const onGradientChange = ( value ) => {
+		const onGradientChange = (value) => {
 			// do nothing for falsy values
-			if ( ! value ) {
+			if (!value) {
 				return;
 			}
-			const slug = getGradientSlugByValue( gradients, value );
-			if ( slug ) {
-				setOverlayAttribute( 'gradient', slug );
+			const slug = getGradientSlugByValue(gradients, value);
+			if (slug) {
+				setOverlayAttribute('gradient', slug);
 			} else {
-				setOverlayAttribute( 'customGradient', value );
+				setOverlayAttribute('customGradient', value);
 			}
 		};
 
 		const onColorCleared = () => {
-			setAttributes( {
+			setAttributes({
 				overlayColor: undefined,
 				customOverlayColor: undefined,
 				gradient: undefined,
 				customGradient: undefined,
-			} );
+			});
 		};
 
 		return [
 			{
-				label: __( 'Color' ),
+				label: __('Color'),
 				onColorChange,
 				colorValue,
 				gradientValue,
@@ -93,13 +93,13 @@ function OverlayColorSettings( {
 				onColorCleared,
 			},
 		];
-	}, [ colorValue, gradientValue, colors, gradients ] );
+	}, [colorValue, gradientValue, colors, gradients]);
 
 	return (
 		<PanelColorGradientSettings
-			title={ __( 'Overlay' ) }
-			initialOpen={ false }
-			settings={ settings }
+			title={__('Overlay')}
+			initialOpen={false}
+			settings={settings}
 		/>
 	);
 }

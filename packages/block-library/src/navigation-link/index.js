@@ -22,9 +22,9 @@ export { metadata, name };
 export const settings = {
 	icon: linkIcon,
 
-	__experimentalLabel: ( { label } ) => label,
+	__experimentalLabel: ({ label }) => label,
 
-	merge( leftAttributes, { label: rightLabel = '' } ) {
+	merge(leftAttributes, { label: rightLabel = '' }) {
 		return {
 			...leftAttributes,
 			label: leftAttributes.label + rightLabel,
@@ -37,14 +37,14 @@ export const settings = {
 
 	example: {
 		attributes: {
-			label: _x( 'Example Link', 'navigation link preview example' ),
+			label: _x('Example Link', 'navigation link preview example'),
 			url: 'https://example.com',
 		},
 	},
 
 	deprecated: [
 		{
-			isEligible( attributes ) {
+			isEligible(attributes) {
 				return attributes.nofollow;
 			},
 
@@ -73,7 +73,7 @@ export const settings = {
 				},
 			},
 
-			migrate( { nofollow, ...rest } ) {
+			migrate({ nofollow, ...rest }) {
 				return {
 					rel: nofollow ? 'nofollow' : '',
 					...rest,

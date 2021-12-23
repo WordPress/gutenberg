@@ -16,37 +16,35 @@ function InserterListboxItem(
 	{ isFirst, as: Component, children, ...props },
 	ref
 ) {
-	const state = useContext( InserterListboxContext );
+	const state = useContext(InserterListboxContext);
 	return (
 		<CompositeItem
-			ref={ ref }
-			state={ state }
+			ref={ref}
+			state={state}
 			role="option"
 			// Use the CompositeItem `focusable` prop over Button's
 			// isFocusable. The latter was shown to cause an issue
 			// with tab order in the inserter list.
 			focusable
-			{ ...props }
+			{...props}
 		>
-			{ ( htmlProps ) => {
+			{(htmlProps) => {
 				const propsWithTabIndex = {
 					...htmlProps,
 					tabIndex: isFirst ? 0 : htmlProps.tabIndex,
 				};
-				if ( Component ) {
+				if (Component) {
 					return (
-						<Component { ...propsWithTabIndex }>
-							{ children }
-						</Component>
+						<Component {...propsWithTabIndex}>{children}</Component>
 					);
 				}
-				if ( typeof children === 'function' ) {
-					return children( propsWithTabIndex );
+				if (typeof children === 'function') {
+					return children(propsWithTabIndex);
 				}
-				return <Button { ...propsWithTabIndex }>{ children }</Button>;
-			} }
+				return <Button {...propsWithTabIndex}>{children}</Button>;
+			}}
 		</CompositeItem>
 	);
 }
 
-export default forwardRef( InserterListboxItem );
+export default forwardRef(InserterListboxItem);

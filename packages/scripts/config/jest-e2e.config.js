@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
+const path = require('path');
 
 /**
  * Internal dependencies
  */
-const { hasBabelConfig } = require( '../utils' );
+const { hasBabelConfig } = require('../utils');
 
 const jestE2EConfig = {
-	globalSetup: path.join( __dirname, 'jest-environment-puppeteer', 'setup' ),
+	globalSetup: path.join(__dirname, 'jest-environment-puppeteer', 'setup'),
 	globalTeardown: path.join(
 		__dirname,
 		'jest-environment-puppeteer',
@@ -17,19 +17,19 @@ const jestE2EConfig = {
 	),
 	reporters: [
 		'default',
-		path.join( __dirname, 'jest-github-actions-reporter.js' ),
+		path.join(__dirname, 'jest-github-actions-reporter.js'),
 	],
-	setupFilesAfterEnv: [ 'expect-puppeteer' ],
-	testEnvironment: path.join( __dirname, 'jest-environment-puppeteer' ),
-	testMatch: [ '**/specs/**/*.[jt]s?(x)', '**/?(*.)spec.[jt]s?(x)' ],
-	testPathIgnorePatterns: [ '/node_modules/' ],
+	setupFilesAfterEnv: ['expect-puppeteer'],
+	testEnvironment: path.join(__dirname, 'jest-environment-puppeteer'),
+	testMatch: ['**/specs/**/*.[jt]s?(x)', '**/?(*.)spec.[jt]s?(x)'],
+	testPathIgnorePatterns: ['/node_modules/'],
 	testRunner: 'jest-circus/runner',
 	testTimeout: 30000,
 };
 
-if ( ! hasBabelConfig() ) {
+if (!hasBabelConfig()) {
 	jestE2EConfig.transform = {
-		'\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
+		'\\.[jt]sx?$': path.join(__dirname, 'babel-transform'),
 	};
 }
 

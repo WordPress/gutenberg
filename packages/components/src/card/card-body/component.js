@@ -10,14 +10,14 @@ import { useCardBody } from './hook';
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                                forwardedRef
  */
-function CardBody( props, forwardedRef ) {
-	const { isScrollable, ...otherProps } = useCardBody( props );
+function CardBody(props, forwardedRef) {
+	const { isScrollable, ...otherProps } = useCardBody(props);
 
-	if ( isScrollable ) {
-		return <Scrollable { ...otherProps } ref={ forwardedRef } />;
+	if (isScrollable) {
+		return <Scrollable {...otherProps} ref={forwardedRef} />;
 	}
 
-	return <View { ...otherProps } ref={ forwardedRef } />;
+	return <View {...otherProps} ref={forwardedRef} />;
 }
 
 /**
@@ -35,6 +35,6 @@ function CardBody( props, forwardedRef ) {
  * </Card>
  * ```
  */
-const ConnectedCardBody = contextConnect( CardBody, 'CardBody' );
+const ConnectedCardBody = contextConnect(CardBody, 'CardBody');
 
 export default ConnectedCardBody;

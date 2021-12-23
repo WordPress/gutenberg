@@ -10,9 +10,9 @@ import { isEqual } from 'lodash';
  */
 import { memo } from '@wordpress/element';
 
-const List = memo( FlatList, isEqual );
+const List = memo(FlatList, isEqual);
 
-export const KeyboardAwareFlatList = ( {
+export const KeyboardAwareFlatList = ({
 	extraScrollHeight,
 	shouldPreventAutomaticScroll,
 	innerRef,
@@ -20,32 +20,32 @@ export const KeyboardAwareFlatList = ( {
 	scrollViewStyle,
 	inputAccessoryViewHeight,
 	...listProps
-} ) => (
+}) => (
 	<KeyboardAwareScrollView
-		style={ [ { flex: 1 }, scrollViewStyle ] }
+		style={[{ flex: 1 }, scrollViewStyle]}
 		keyboardDismissMode="none"
-		enableResetScrollToCoords={ false }
+		enableResetScrollToCoords={false}
 		keyboardShouldPersistTaps="handled"
-		extraScrollHeight={ extraScrollHeight }
-		extraHeight={ 0 }
-		inputAccessoryViewHeight={ inputAccessoryViewHeight }
-		enableAutomaticScroll={ autoScroll === undefined ? false : autoScroll }
-		ref={ ( ref ) => {
+		extraScrollHeight={extraScrollHeight}
+		extraHeight={0}
+		inputAccessoryViewHeight={inputAccessoryViewHeight}
+		enableAutomaticScroll={autoScroll === undefined ? false : autoScroll}
+		ref={(ref) => {
 			this.scrollViewRef = ref;
-			innerRef( ref );
-		} }
-		onKeyboardWillHide={ () => {
+			innerRef(ref);
+		}}
+		onKeyboardWillHide={() => {
 			this.keyboardWillShowIndicator = false;
-		} }
-		onKeyboardDidHide={ () => {
-			setTimeout( () => {
+		}}
+		onKeyboardDidHide={() => {
+			setTimeout(() => {
 				if (
-					! this.keyboardWillShowIndicator &&
+					!this.keyboardWillShowIndicator &&
 					this.latestContentOffsetY !== undefined &&
-					! shouldPreventAutomaticScroll()
+					!shouldPreventAutomaticScroll()
 				) {
 					// Reset the content position if keyboard is still closed
-					if ( this.scrollViewRef ) {
+					if (this.scrollViewRef) {
 						this.scrollViewRef.scrollToPosition(
 							0,
 							this.latestContentOffsetY,
@@ -53,17 +53,17 @@ export const KeyboardAwareFlatList = ( {
 						);
 					}
 				}
-			}, 50 );
-		} }
-		onKeyboardWillShow={ () => {
+			}, 50);
+		}}
+		onKeyboardWillShow={() => {
 			this.keyboardWillShowIndicator = true;
-		} }
-		scrollEnabled={ listProps.scrollEnabled }
-		onScroll={ ( event ) => {
+		}}
+		scrollEnabled={listProps.scrollEnabled}
+		onScroll={(event) => {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
-		} }
+		}}
 	>
-		<List { ...listProps } />
+		<List {...listProps} />
 	</KeyboardAwareScrollView>
 );
 
@@ -73,9 +73,9 @@ KeyboardAwareFlatList.handleCaretVerticalPositionChange = (
 	caretY,
 	previousCaretY
 ) => {
-	if ( previousCaretY ) {
+	if (previousCaretY) {
 		//if this is not the first tap
-		scrollView.refreshScrollForField( targetId );
+		scrollView.refreshScrollForField(targetId);
 	}
 };
 

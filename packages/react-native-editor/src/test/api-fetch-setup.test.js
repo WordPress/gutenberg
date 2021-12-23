@@ -32,30 +32,30 @@ const disabledCachingPaths = [
 	'/wp/v2/blocks?per_page=100&context=edit&_locale=user',
 ];
 
-describe( 'isPathSupported', () => {
-	supportedPaths.forEach( ( path ) => {
-		it( `supports ${ path }`, () => {
-			expect( isPathSupported( path ) ).toBe( true );
-		} );
-	} );
+describe('isPathSupported', () => {
+	supportedPaths.forEach((path) => {
+		it(`supports ${path}`, () => {
+			expect(isPathSupported(path)).toBe(true);
+		});
+	});
 
-	unsupportedPaths.forEach( ( path ) => {
-		it( `does not support ${ path }`, () => {
-			expect( isPathSupported( path ) ).toBe( false );
-		} );
-	} );
-} );
+	unsupportedPaths.forEach((path) => {
+		it(`does not support ${path}`, () => {
+			expect(isPathSupported(path)).toBe(false);
+		});
+	});
+});
 
-describe( 'shouldEnableCaching', () => {
-	enabledCachingPaths.forEach( ( path ) => {
-		it( `enables caching for ${ path }`, () => {
-			expect( shouldEnableCaching( path ) ).toBe( true );
-		} );
-	} );
+describe('shouldEnableCaching', () => {
+	enabledCachingPaths.forEach((path) => {
+		it(`enables caching for ${path}`, () => {
+			expect(shouldEnableCaching(path)).toBe(true);
+		});
+	});
 
-	disabledCachingPaths.forEach( ( path ) => {
-		it( `does not enable caching for ${ path }`, () => {
-			expect( shouldEnableCaching( path ) ).toBe( false );
-		} );
-	} );
-} );
+	disabledCachingPaths.forEach((path) => {
+		it(`does not enable caching for ${path}`, () => {
+			expect(shouldEnableCaching(path)).toBe(false);
+		});
+	});
+});

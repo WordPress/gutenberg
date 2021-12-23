@@ -17,36 +17,34 @@ import { store as blockEditorStore } from '../../store';
  * @return {import('react').RefCallback} Ref callback.
  */
 export function useBlockSelectionClearer() {
-	const { hasSelectedBlock, hasMultiSelection } = useSelect(
-		blockEditorStore
-	);
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { hasSelectedBlock, hasMultiSelection } = useSelect(blockEditorStore);
+	const { clearSelectedBlock } = useDispatch(blockEditorStore);
 
 	return useRefEffect(
-		( node ) => {
-			function onMouseDown( event ) {
-				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+		(node) => {
+			function onMouseDown(event) {
+				if (!hasSelectedBlock() && !hasMultiSelection()) {
 					return;
 				}
 
 				// Only handle clicks on the element, not the children.
-				if ( event.target !== node ) {
+				if (event.target !== node) {
 					return;
 				}
 
 				clearSelectedBlock();
 			}
 
-			node.addEventListener( 'mousedown', onMouseDown );
+			node.addEventListener('mousedown', onMouseDown);
 
 			return () => {
-				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener('mousedown', onMouseDown);
 			};
 		},
-		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock ]
+		[hasSelectedBlock, hasMultiSelection, clearSelectedBlock]
 	);
 }
 
-export default function BlockSelectionClearer( props ) {
-	return <div ref={ useBlockSelectionClearer() } { ...props } />;
+export default function BlockSelectionClearer(props) {
+	return <div ref={useBlockSelectionClearer()} {...props} />;
 }

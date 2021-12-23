@@ -16,12 +16,12 @@ import { isGalleryV2Enabled } from './shared';
  * or the refactored version with InnerBlocks. This is to prevent conditional
  * use of hooks lint errors if adding this logic to the top of the edit component.
  */
-function GalleryEditWrapper( props ) {
-	if ( ! isGalleryV2Enabled() ) {
-		return <EditWithoutInnerBlocks { ...props } />;
+function GalleryEditWrapper(props) {
+	if (!isGalleryV2Enabled()) {
+		return <EditWithoutInnerBlocks {...props} />;
 	}
 
-	return <EditWithInnerBlocks { ...props } />;
+	return <EditWithInnerBlocks {...props} />;
 }
 
-export default compose( [ withNotices ] )( GalleryEditWrapper );
+export default compose([withNotices])(GalleryEditWrapper);

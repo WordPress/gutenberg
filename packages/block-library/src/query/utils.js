@@ -39,13 +39,13 @@ import { store as coreStore } from '@wordpress/core-data';
  * @param {WPTerm[]} terms The terms to extract of helper object.
  * @return {QueryTermsInfo} The object with the terms information.
  */
-export const getTermsInfo = ( terms ) => {
+export const getTermsInfo = (terms) => {
 	const mapping = terms?.reduce(
-		( accumulator, term ) => {
+		(accumulator, term) => {
 			const { mapById, mapByName, names } = accumulator;
-			mapById[ term.id ] = term;
-			mapByName[ term.name ] = term;
-			names.push( term.name );
+			mapById[term.id] = term;
+			mapByName[term.name] = term;
+			names.push(term.name);
 			return accumulator;
 		},
 		{ mapById: {}, mapByName: {}, names: [] }
@@ -65,31 +65,31 @@ export const getTermsInfo = ( terms ) => {
  * @return {Object} The helper object related to post types.
  */
 export const usePostTypes = () => {
-	const { postTypes } = useSelect( ( select ) => {
-		const { getPostTypes } = select( coreStore );
-		const excludedPostTypes = [ 'attachment' ];
-		const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
-			( { viewable, slug } ) =>
-				viewable && ! excludedPostTypes.includes( slug )
+	const { postTypes } = useSelect((select) => {
+		const { getPostTypes } = select(coreStore);
+		const excludedPostTypes = ['attachment'];
+		const filteredPostTypes = getPostTypes({ per_page: -1 })?.filter(
+			({ viewable, slug }) =>
+				viewable && !excludedPostTypes.includes(slug)
 		);
 		return {
 			postTypes: filteredPostTypes,
 		};
-	}, [] );
-	const postTypesTaxonomiesMap = useMemo( () => {
-		if ( ! postTypes?.length ) return;
-		return postTypes.reduce( ( accumulator, type ) => {
-			accumulator[ type.slug ] = type.taxonomies;
+	}, []);
+	const postTypesTaxonomiesMap = useMemo(() => {
+		if (!postTypes?.length) return;
+		return postTypes.reduce((accumulator, type) => {
+			accumulator[type.slug] = type.taxonomies;
 			return accumulator;
-		}, {} );
-	}, [ postTypes ] );
+		}, {});
+	}, [postTypes]);
 	const postTypesSelectOptions = useMemo(
 		() =>
-			( postTypes || [] ).map( ( { labels, slug } ) => ( {
+			(postTypes || []).map(({ labels, slug }) => ({
 				label: labels.singular_name,
 				value: slug,
-			} ) ),
-		[ postTypes ]
+			})),
+		[postTypes]
 	);
 	return { postTypesTaxonomiesMap, postTypesSelectOptions };
 };
@@ -101,15 +101,15 @@ export const usePostTypes = () => {
  * @param {WPBlock[]} blocks The list of blocks to look through.
  * @return {string=} The first found Query Loop's clientId.
  */
-export const getFirstQueryClientIdFromBlocks = ( blocks ) => {
-	const blocksQueue = [ ...blocks ];
-	while ( blocksQueue.length > 0 ) {
+export const getFirstQueryClientIdFromBlocks = (blocks) => {
+	const blocksQueue = [...blocks];
+	while (blocksQueue.length > 0) {
 		const block = blocksQueue.shift();
-		if ( block.name === 'core/query' ) {
+		if (block.name === 'core/query') {
 			return block.clientId;
 		}
-		block.innerBlocks?.forEach( ( innerBlock ) => {
-			blocksQueue.push( innerBlock );
-		} );
+		block.innerBlocks?.forEach((innerBlock) => {
+			blocksQueue.push(innerBlock);
+		});
 	}
 };

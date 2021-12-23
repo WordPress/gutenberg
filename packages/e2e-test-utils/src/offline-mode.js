@@ -1,8 +1,8 @@
 let _isOfflineMode = false;
 
-export async function toggleOfflineMode( isOffline ) {
+export async function toggleOfflineMode(isOffline) {
 	_isOfflineMode = isOffline;
-	page.setOfflineMode( isOffline );
+	page.setOfflineMode(isOffline);
 }
 
 export function isOfflineMode() {

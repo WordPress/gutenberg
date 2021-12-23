@@ -14,23 +14,23 @@ let _decodeTextArea;
  *
  * @return {string} The decoded string.
  */
-export function decodeEntities( html ) {
+export function decodeEntities(html) {
 	// not a string, or no entities to decode
-	if ( 'string' !== typeof html || -1 === html.indexOf( '&' ) ) {
+	if ('string' !== typeof html || -1 === html.indexOf('&')) {
 		return html;
 	}
 
 	// create a textarea for decoding entities, that we can reuse
-	if ( undefined === _decodeTextArea ) {
+	if (undefined === _decodeTextArea) {
 		if (
 			document.implementation &&
 			document.implementation.createHTMLDocument
 		) {
 			_decodeTextArea = document.implementation
-				.createHTMLDocument( '' )
-				.createElement( 'textarea' );
+				.createHTMLDocument('')
+				.createElement('textarea');
 		} else {
-			_decodeTextArea = document.createElement( 'textarea' );
+			_decodeTextArea = document.createElement('textarea');
 		}
 	}
 
@@ -55,5 +55,5 @@ export function decodeEntities( html ) {
 	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
 	 */
-	return /** @type {string} */ ( decoded );
+	return /** @type {string} */ (decoded);
 }

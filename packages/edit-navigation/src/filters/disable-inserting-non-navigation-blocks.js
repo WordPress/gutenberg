@@ -7,15 +7,15 @@ import { addFilter } from '@wordpress/hooks';
  */
 import { set } from 'lodash';
 
-function disableInsertingNonNavigationBlocks( settings, name ) {
+function disableInsertingNonNavigationBlocks(settings, name) {
 	if (
-		! [
+		![
 			'core/navigation',
 			'core/navigation-link',
 			'core/navigation-submenu',
-		].includes( name )
+		].includes(name)
 	) {
-		set( settings, [ 'supports', 'inserter' ], false );
+		set(settings, ['supports', 'inserter'], false);
 	}
 	return settings;
 }

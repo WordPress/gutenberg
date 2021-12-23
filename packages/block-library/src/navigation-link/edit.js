@@ -59,44 +59,44 @@ const MAX_NESTING = 5;
  *
  * @return {boolean} Is dragging within the target element.
  */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
+const useIsDraggingWithin = (elementRef) => {
+	const [isDraggingWithin, setIsDraggingWithin] = useState(false);
 
-	useEffect( () => {
+	useEffect(() => {
 		const { ownerDocument } = elementRef.current;
 
-		function handleDragStart( event ) {
+		function handleDragStart(event) {
 			// Check the first time when the dragging starts.
-			handleDragEnter( event );
+			handleDragEnter(event);
 		}
 
 		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
 		function handleDragEnd() {
-			setIsDraggingWithin( false );
+			setIsDraggingWithin(false);
 		}
 
-		function handleDragEnter( event ) {
+		function handleDragEnter(event) {
 			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
+			if (elementRef.current.contains(event.target)) {
+				setIsDraggingWithin(true);
 			} else {
-				setIsDraggingWithin( false );
+				setIsDraggingWithin(false);
 			}
 		}
 
 		// Bind these events to the document to catch all drag events.
 		// Ideally, we can also use `event.relatedTarget`, but sadly that
 		// doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
+		ownerDocument.addEventListener('dragstart', handleDragStart);
+		ownerDocument.addEventListener('dragend', handleDragEnd);
+		ownerDocument.addEventListener('dragenter', handleDragEnter);
 
 		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
+			ownerDocument.removeEventListener('dragstart', handleDragStart);
+			ownerDocument.removeEventListener('dragend', handleDragEnd);
+			ownerDocument.removeEventListener('dragenter', handleDragEnter);
 		};
-	}, [] );
+	}, []);
 
 	return isDraggingWithin;
 };
@@ -109,8 +109,8 @@ const useIsDraggingWithin = ( elementRef ) => {
  * @param {string} kind Link block's entity of kind (post-type|taxonomy)
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
-function getSuggestionsQuery( type, kind ) {
-	switch ( type ) {
+function getSuggestionsQuery(type, kind) {
+	switch (type) {
 		case 'post':
 		case 'page':
 			return { type: 'post', subtype: type };
@@ -121,10 +121,10 @@ function getSuggestionsQuery( type, kind ) {
 		case 'post_format':
 			return { type: 'post-format' };
 		default:
-			if ( kind === 'taxonomy' ) {
+			if (kind === 'taxonomy') {
 				return { type: 'term', subtype: type };
 			}
-			if ( kind === 'post-type' ) {
+			if (kind === 'post-type') {
 				return { type: 'post', subtype: type };
 			}
 			return {};
@@ -144,7 +144,7 @@ function getSuggestionsQuery( type, kind ) {
  * @param {Object}  context
  * @param {boolean} isSubMenu
  */
-function getColors( context, isSubMenu ) {
+function getColors(context, isSubMenu) {
 	const {
 		textColor,
 		customTextColor,
@@ -159,27 +159,27 @@ function getColors( context, isSubMenu ) {
 
 	const colors = {};
 
-	if ( isSubMenu && !! customOverlayTextColor ) {
+	if (isSubMenu && !!customOverlayTextColor) {
 		colors.customTextColor = customOverlayTextColor;
-	} else if ( isSubMenu && !! overlayTextColor ) {
+	} else if (isSubMenu && !!overlayTextColor) {
 		colors.textColor = overlayTextColor;
-	} else if ( !! customTextColor ) {
+	} else if (!!customTextColor) {
 		colors.customTextColor = customTextColor;
-	} else if ( !! textColor ) {
+	} else if (!!textColor) {
 		colors.textColor = textColor;
-	} else if ( !! style?.color?.text ) {
+	} else if (!!style?.color?.text) {
 		colors.customTextColor = style.color.text;
 	}
 
-	if ( isSubMenu && !! customOverlayBackgroundColor ) {
+	if (isSubMenu && !!customOverlayBackgroundColor) {
 		colors.customBackgroundColor = customOverlayBackgroundColor;
-	} else if ( isSubMenu && !! overlayBackgroundColor ) {
+	} else if (isSubMenu && !!overlayBackgroundColor) {
 		colors.backgroundColor = overlayBackgroundColor;
-	} else if ( !! customBackgroundColor ) {
+	} else if (!!customBackgroundColor) {
 		colors.customBackgroundColor = customBackgroundColor;
-	} else if ( !! backgroundColor ) {
+	} else if (!!backgroundColor) {
 		colors.backgroundColor = backgroundColor;
-	} else if ( !! style?.color?.background ) {
+	} else if (!!style?.color?.background) {
 		colors.customTextColor = style.color.background;
 	}
 
@@ -233,36 +233,35 @@ export const updateNavigationLinkBlockAttributes = (
 		kind: newKind = originalKind,
 		type: newType = originalType,
 	} = updatedValue;
-	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
-	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
+	const normalizedTitle = title.replace(/http(s?):\/\//gi, '');
+	const normalizedURL = url.replace(/http(s?):\/\//gi, '');
 	const escapeTitle =
 		title !== '' &&
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 
 	const label = escapeTitle
-		? escape( title )
-		: originalLabel || escape( normalizedURL );
+		? escape(title)
+		: originalLabel || escape(normalizedURL);
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
-	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
+	const type = newType === 'post_tag' ? 'tag' : newType.replace('-', '_');
 
 	const isBuiltInType =
-		[ 'post', 'page', 'tag', 'category' ].indexOf( type ) > -1;
+		['post', 'page', 'tag', 'category'].indexOf(type) > -1;
 
-	const isCustomLink =
-		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
+	const isCustomLink = (!newKind && !isBuiltInType) || newKind === 'custom';
 	const kind = isCustomLink ? 'custom' : newKind;
 
-	setAttributes( {
+	setAttributes({
 		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
-		...( label && { label } ),
-		...( undefined !== opensInNewTab && { opensInNewTab } ),
-		...( id && Number.isInteger( id ) && { id } ),
-		...( kind && { kind } ),
-		...( type && type !== 'URL' && { type } ),
-	} );
+		...(url && { url: encodeURI(safeDecodeURI(url)) }),
+		...(label && { label }),
+		...(undefined !== opensInNewTab && { opensInNewTab }),
+		...(id && Number.isInteger(id) && { id }),
+		...(kind && { kind }),
+		...(type && type !== 'URL' && { type }),
+	});
 };
 
 /**
@@ -275,8 +274,8 @@ export const updateNavigationLinkBlockAttributes = (
  * @param {string} html the string from which HTML should be removed.
  * @return {string} the "cleaned" string.
  */
-function navStripHTML( html ) {
-	const doc = document.implementation.createHTMLDocument( '' );
+function navStripHTML(html) {
+	const doc = document.implementation.createHTMLDocument('');
 	doc.body.innerHTML = html;
 	return doc.body.textContent || '';
 }
@@ -285,40 +284,40 @@ function navStripHTML( html ) {
  * Add transforms to Link Control
  */
 
-function LinkControlTransforms( { block, transforms, replace } ) {
-	if ( ! transforms?.length ) {
+function LinkControlTransforms({ block, transforms, replace }) {
+	if (!transforms?.length) {
 		return null;
 	}
 
 	return (
 		<div className="link-control-transform">
 			<h3 className="link-control-transform__subheading">
-				{ __( 'Transform' ) }
+				{__('Transform')}
 			</h3>
 			<div className="link-control-transform__items">
-				{ transforms.map( ( item, index ) => {
+				{transforms.map((item, index) => {
 					return (
 						<Button
-							key={ `transform-${ index }` }
-							onClick={ () =>
+							key={`transform-${index}`}
+							onClick={() =>
 								replace(
 									block.clientId,
-									switchToBlockType( block, item.name )
+									switchToBlockType(block, item.name)
 								)
 							}
 							className="link-control-transform__item"
 						>
-							<BlockIcon icon={ item.icon } />
-							{ item.title }
+							<BlockIcon icon={item.icon} />
+							{item.title}
 						</Button>
 					);
-				} ) }
+				})}
 			</div>
 		</div>
 	);
 }
 
-export default function NavigationLinkEdit( {
+export default function NavigationLinkEdit({
 	attributes,
 	isSelected,
 	setAttributes,
@@ -327,32 +326,22 @@ export default function NavigationLinkEdit( {
 	onReplace,
 	context,
 	clientId,
-} ) {
-	const {
-		label,
-		type,
-		opensInNewTab,
-		url,
-		description,
-		rel,
-		title,
-		kind,
-	} = attributes;
+}) {
+	const { label, type, opensInNewTab, url, description, rel, title, kind } =
+		attributes;
 
 	const link = {
 		url,
 		opensInNewTab,
-		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
+		title: label && navStripHTML(label), // don't allow HTML to display inside the <LinkControl>
 	};
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const {
-		replaceBlock,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
-	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const listItemRef = useRef( null );
-	const isDraggingWithin = useIsDraggingWithin( listItemRef );
-	const itemLabelPlaceholder = __( 'Add link…' );
+	const { saveEntityRecord } = useDispatch(coreStore);
+	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch(blockEditorStore);
+	const [isLinkOpen, setIsLinkOpen] = useState(false);
+	const listItemRef = useRef(null);
+	const isDraggingWithin = useIsDraggingWithin(listItemRef);
+	const itemLabelPlaceholder = __('Add link…');
 	const ref = useRef();
 
 	const {
@@ -366,7 +355,7 @@ export default function NavigationLinkEdit( {
 		thisBlock,
 		blockTransforms,
 	} = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getBlock,
 				getBlocks,
@@ -377,61 +366,57 @@ export default function NavigationLinkEdit( {
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
 				getBlockTransformItems,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 
 			const selectedBlockId = getSelectedBlockClientId();
 
-			const descendants = getClientIdsOfDescendants( [ clientId ] )
-				.length;
+			const descendants = getClientIdsOfDescendants([clientId]).length;
 
 			return {
-				innerBlocks: getBlocks( clientId ),
+				innerBlocks: getBlocks(clientId),
 				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, [
+					getBlockParentsByBlockName(clientId, [
 						name,
 						'core/navigation-submenu',
-					] ).length >= MAX_NESTING,
+					]).length >= MAX_NESTING,
 				isTopLevelLink:
-					getBlockName( getBlockRootClientId( clientId ) ) ===
+					getBlockName(getBlockRootClientId(clientId)) ===
 					'core/navigation',
-				isParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					true
-				),
+				isParentOfSelectedBlock: hasSelectedInnerBlock(clientId, true),
 				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					false
 				),
-				hasDescendants: !! descendants,
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
+				hasDescendants: !!descendants,
+				selectedBlockHasDescendants: !!getClientIdsOfDescendants([
 					selectedBlockId,
-				] )?.length,
-				userCanCreatePages: select( coreStore ).canUser(
+				])?.length,
+				userCanCreatePages: select(coreStore).canUser(
 					'create',
 					'pages'
 				),
-				userCanCreatePosts: select( coreStore ).canUser(
+				userCanCreatePosts: select(coreStore).canUser(
 					'create',
 					'posts'
 				),
-				thisBlock: getBlock( clientId ),
+				thisBlock: getBlock(clientId),
 				blockTransforms: getBlockTransformItems(
-					[ getBlock( clientId ) ],
-					getBlockRootClientId( clientId )
+					[getBlock(clientId)],
+					getBlockRootClientId(clientId)
 				),
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
-	useEffect( () => {
+	useEffect(() => {
 		// This side-effect should not create an undo level as those should
 		// only be created via user interactions. Mark this change as
 		// not persistent to avoid undo level creation.
 		// See https://github.com/WordPress/gutenberg/issues/34564.
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isTopLevelLink } );
-	}, [ isTopLevelLink ] );
+		setAttributes({ isTopLevelLink });
+	}, [isTopLevelLink]);
 
 	/**
 	 * Transform to submenu block.
@@ -442,7 +427,7 @@ export default function NavigationLinkEdit( {
 			attributes,
 			innerBlocks
 		);
-		replaceBlock( clientId, newSubmenu );
+		replaceBlock(clientId, newSubmenu);
 	}
 
 	const featuredBlocks = [
@@ -450,50 +435,47 @@ export default function NavigationLinkEdit( {
 		'core/social-links',
 		'core/search',
 	];
-	const featuredTransforms = blockTransforms.filter( ( item ) => {
-		return featuredBlocks.includes( item.name );
-	} );
+	const featuredTransforms = blockTransforms.filter((item) => {
+		return featuredBlocks.includes(item.name);
+	});
 
-	useEffect( () => {
+	useEffect(() => {
 		// Show the LinkControl on mount if the URL is empty
 		// ( When adding a new menu item)
 		// This can't be done in the useState call because it conflicts
 		// with the autofocus behavior of the BlockListBlock component.
-		if ( ! url ) {
-			setIsLinkOpen( true );
+		if (!url) {
+			setIsLinkOpen(true);
 		}
 		// If block has inner blocks, transform to Submenu.
-		if ( hasDescendants ) {
+		if (hasDescendants) {
 			transformToSubmenu();
 		}
-	}, [] );
+	}, []);
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
 	 * when selecting a suggestion in the link popover, we force close on block unselection.
 	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
+	useEffect(() => {
+		if (!isSelected) {
+			setIsLinkOpen(false);
 		}
-	}, [ isSelected ] );
+	}, [isSelected]);
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
-	useEffect( () => {
-		if ( isLinkOpen && url ) {
+	useEffect(() => {
+		if (isLinkOpen && url) {
 			// Does this look like a URL and have something TLD-ish?
-			if (
-				isURL( prependHTTP( label ) ) &&
-				/^.+\.[a-z]+/.test( label )
-			) {
+			if (isURL(prependHTTP(label)) && /^.+\.[a-z]+/.test(label)) {
 				// Focus and select the label text.
 				selectLabelText();
 			} else {
 				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
+				placeCaretAtHorizontalEdge(ref.current, true);
 			}
 		}
-	}, [ url ] );
+	}, [url]);
 
 	/**
 	 * Focus the Link label text and select it.
@@ -505,9 +487,9 @@ export default function NavigationLinkEdit( {
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();
 		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
+		range.selectNodeContents(ref.current);
 		selection.removeAllRanges();
-		selection.addRange( range );
+		selection.addRange(range);
 	}
 
 	/**
@@ -515,32 +497,32 @@ export default function NavigationLinkEdit( {
 	 */
 	function removeLink() {
 		// Reset all attributes that comprise the link.
-		setAttributes( {
+		setAttributes({
 			url: '',
 			label: '',
 			id: '',
 			kind: '',
 			type: '',
-		} );
+		});
 
 		// Close the link editing UI.
-		setIsLinkOpen( false );
+		setIsLinkOpen(false);
 	}
 
 	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
+	if (!type || type === 'page') {
 		userCanCreate = userCanCreatePages;
-	} else if ( type === 'post' ) {
+	} else if (type === 'post') {
 		userCanCreate = userCanCreatePosts;
 	}
 
-	async function handleCreate( pageTitle ) {
+	async function handleCreate(pageTitle) {
 		const postType = type || 'page';
 
-		const page = await saveEntityRecord( 'postType', postType, {
+		const page = await saveEntityRecord('postType', postType, {
 			title: pageTitle,
 			status: 'draft',
-		} );
+		});
 
 		return {
 			id: page.id,
@@ -556,68 +538,66 @@ export default function NavigationLinkEdit( {
 		customTextColor,
 		backgroundColor,
 		customBackgroundColor,
-	} = getColors( context, ! isTopLevelLink );
+	} = getColors(context, !isTopLevelLink);
 
-	function onKeyDown( event ) {
+	function onKeyDown(event) {
 		if (
-			isKeyboardEvent.primary( event, 'k' ) ||
-			( ! url && event.keyCode === ENTER )
+			isKeyboardEvent.primary(event, 'k') ||
+			(!url && event.keyCode === ENTER)
 		) {
-			setIsLinkOpen( true );
+			setIsLinkOpen(true);
 		}
 	}
 
-	const blockProps = useBlockProps( {
+	const blockProps = useBlockProps({
 		ref: listItemRef,
-		className: classnames( 'wp-block-navigation-item', {
+		className: classnames('wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
-			'has-link': !! url,
+			'has-link': !!url,
 			'has-child': hasDescendants,
-			'has-text-color': !! textColor || !! customTextColor,
-			[ getColorClassName( 'color', textColor ) ]: !! textColor,
-			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor
-			) ]: !! backgroundColor,
-		} ),
+			'has-text-color': !!textColor || !!customTextColor,
+			[getColorClassName('color', textColor)]: !!textColor,
+			'has-background': !!backgroundColor || customBackgroundColor,
+			[getColorClassName('background-color', backgroundColor)]:
+				!!backgroundColor,
+		}),
 		style: {
-			color: ! textColor && customTextColor,
-			backgroundColor: ! backgroundColor && customBackgroundColor,
+			color: !textColor && customTextColor,
+			backgroundColor: !backgroundColor && customBackgroundColor,
 		},
 		onKeyDown,
-	} );
+	});
 
-	if ( ! url ) {
-		blockProps.onClick = () => setIsLinkOpen( true );
+	if (!url) {
+		blockProps.onClick = () => setIsLinkOpen(true);
 	}
 
-	const classes = classnames( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder': ! url,
-	} );
+	const classes = classnames('wp-block-navigation-item__content', {
+		'wp-block-navigation-link__placeholder': !url,
+	});
 
 	let missingText = '';
-	switch ( type ) {
+	switch (type) {
 		case 'post':
 			/* translators: label for missing post in navigation link block */
-			missingText = __( 'Select post' );
+			missingText = __('Select post');
 			break;
 		case 'page':
 			/* translators: label for missing page in navigation link block */
-			missingText = __( 'Select page' );
+			missingText = __('Select page');
 			break;
 		case 'category':
 			/* translators: label for missing category in navigation link block */
-			missingText = __( 'Select category' );
+			missingText = __('Select category');
 			break;
 		case 'tag':
 			/* translators: label for missing tag in navigation link block */
-			missingText = __( 'Select tag' );
+			missingText = __('Select tag');
 			break;
 		default:
 			/* translators: label for missing values in navigation link block */
-			missingText = __( 'Add link' );
+			missingText = __('Add link');
 	}
 
 	return (
@@ -626,115 +606,115 @@ export default function NavigationLinkEdit( {
 				<ToolbarGroup>
 					<ToolbarButton
 						name="link"
-						icon={ linkIcon }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ () => setIsLinkOpen( true ) }
+						icon={linkIcon}
+						title={__('Link')}
+						shortcut={displayShortcut.primary('k')}
+						onClick={() => setIsLinkOpen(true)}
 					/>
-					{ ! isAtMaxNesting && (
+					{!isAtMaxNesting && (
 						<ToolbarButton
 							name="submenu"
-							icon={ addSubmenu }
-							title={ __( 'Add submenu' ) }
-							onClick={ transformToSubmenu }
+							icon={addSubmenu}
+							title={__('Add submenu')}
+							onClick={transformToSubmenu}
 						/>
-					) }
+					)}
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={__('Link settings')}>
 					<TextareaControl
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( { description: descriptionValue } );
-						} }
-						label={ __( 'Description' ) }
-						help={ __(
+						value={description || ''}
+						onChange={(descriptionValue) => {
+							setAttributes({ description: descriptionValue });
+						}}
+						label={__('Description')}
+						help={__(
 							'The description will be displayed in the menu if the current theme supports it.'
-						) }
+						)}
 					/>
 					<TextControl
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Link title' ) }
+						value={title || ''}
+						onChange={(titleValue) => {
+							setAttributes({ title: titleValue });
+						}}
+						label={__('Link title')}
 						autoComplete="off"
 					/>
 					<TextControl
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
-						label={ __( 'Link rel' ) }
+						value={rel || ''}
+						onChange={(relValue) => {
+							setAttributes({ rel: relValue });
+						}}
+						label={__('Link rel')}
 						autoComplete="off"
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
-				<a className={ classes }>
-					{ /* eslint-enable */ }
-					{ ! url ? (
+			<div {...blockProps}>
+				{/* eslint-disable jsx-a11y/anchor-is-valid */}
+				<a className={classes}>
+					{/* eslint-enable */}
+					{!url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
 							<Tooltip
 								position="top center"
-								text={ __( 'This item is missing a link' ) }
+								text={__('This item is missing a link')}
 							>
-								<span>{ missingText }</span>
+								<span>{missingText}</span>
 							</Tooltip>
 						</div>
 					) : (
 						<RichText
-							ref={ ref }
+							ref={ref}
 							identifier="label"
 							className="wp-block-navigation-item__label"
-							value={ label }
-							onChange={ ( labelValue ) =>
-								setAttributes( {
+							value={label}
+							onChange={(labelValue) =>
+								setAttributes({
 									label: labelValue,
-								} )
+								})
 							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							__unstableOnSplitAtEnd={ () =>
+							onMerge={mergeBlocks}
+							onReplace={onReplace}
+							__unstableOnSplitAtEnd={() =>
 								insertBlocksAfter(
-									createBlock( 'core/navigation-link' )
+									createBlock('core/navigation-link')
 								)
 							}
-							aria-label={ __( 'Navigation link text' ) }
-							placeholder={ itemLabelPlaceholder }
+							aria-label={__('Navigation link text')}
+							placeholder={itemLabelPlaceholder}
 							withoutInteractiveFormatting
-							allowedFormats={ [
+							allowedFormats={[
 								'core/bold',
 								'core/italic',
 								'core/image',
 								'core/strikethrough',
-							] }
-							onClick={ () => {
-								if ( ! url ) {
-									setIsLinkOpen( true );
+							]}
+							onClick={() => {
+								if (!url) {
+									setIsLinkOpen(true);
 								}
-							} }
+							}}
 						/>
-					) }
-					{ isLinkOpen && (
+					)}
+					{isLinkOpen && (
 						<Popover
 							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
-							anchorRef={ listItemRef.current }
+							onClose={() => setIsLinkOpen(false)}
+							anchorRef={listItemRef.current}
 						>
 							<LinkControl
 								hasTextControl
 								hasRichPreviews
 								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								withCreateSuggestion={ userCanCreate }
-								createSuggestion={ handleCreate }
-								createSuggestionButtonText={ ( searchTerm ) => {
+								value={link}
+								showInitialSuggestions={true}
+								withCreateSuggestion={userCanCreate}
+								createSuggestion={handleCreate}
+								createSuggestionButtonText={(searchTerm) => {
 									let format;
-									if ( type === 'post' ) {
+									if (type === 'post') {
 										/* translators: %s: search term. */
 										format = __(
 											'Create draft post: <mark>%s</mark>'
@@ -746,40 +726,40 @@ export default function NavigationLinkEdit( {
 										);
 									}
 									return createInterpolateElement(
-										sprintf( format, searchTerm ),
+										sprintf(format, searchTerm),
 										{ mark: <mark /> }
 									);
-								} }
-								noDirectEntry={ !! type }
-								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery(
+								}}
+								noDirectEntry={!!type}
+								noURLSuggestion={!!type}
+								suggestionsQuery={getSuggestionsQuery(
 									type,
 									kind
-								) }
-								onChange={ ( updatedValue ) =>
+								)}
+								onChange={(updatedValue) =>
 									updateNavigationLinkBlockAttributes(
 										updatedValue,
 										setAttributes,
 										attributes
 									)
 								}
-								onRemove={ removeLink }
+								onRemove={removeLink}
 								renderControlBottom={
-									! url
+									!url
 										? () => (
 												<LinkControlTransforms
-													block={ thisBlock }
+													block={thisBlock}
 													transforms={
 														featuredTransforms
 													}
-													replace={ replaceBlock }
+													replace={replaceBlock}
 												/>
 										  )
 										: null
 								}
 							/>
 						</Popover>
-					) }
+					)}
 				</a>
 			</div>
 		</Fragment>

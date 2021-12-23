@@ -21,49 +21,46 @@ import { visitAdminPage } from './visit-admin-page';
  *
  * @return {string} Password for the newly created user account.
  */
-export async function createUser(
-	username,
-	{ firstName, lastName, role } = {}
-) {
+export async function createUser(username, { firstName, lastName, role } = {}) {
 	await switchUserToAdmin();
-	await visitAdminPage( 'user-new.php' );
-	await page.waitForSelector( '#user_login', { visible: true } );
+	await visitAdminPage('user-new.php');
+	await page.waitForSelector('#user_login', { visible: true });
 	await page.$eval(
 		'#user_login',
-		( el, value ) => ( el.value = value ),
+		(el, value) => (el.value = value),
 		username
 	);
 	await page.$eval(
 		'#email',
-		( el, value ) => ( el.value = value ),
-		snakeCase( username ) + '@example.com'
+		(el, value) => (el.value = value),
+		snakeCase(username) + '@example.com'
 	);
-	if ( firstName ) {
+	if (firstName) {
 		await page.$eval(
 			'#first_name',
-			( el, value ) => ( el.value = value ),
+			(el, value) => (el.value = value),
 			firstName
 		);
 	}
-	if ( lastName ) {
+	if (lastName) {
 		await page.$eval(
 			'#last_name',
-			( el, value ) => ( el.value = value ),
+			(el, value) => (el.value = value),
 			lastName
 		);
 	}
-	if ( role ) {
-		await page.select( '#role', role );
+	if (role) {
+		await page.select('#role', role);
 	}
 
-	await page.click( '#send_user_notification' );
+	await page.click('#send_user_notification');
 
-	const password = await page.$eval( `#pass1`, ( element ) => element.value );
+	const password = await page.$eval(`#pass1`, (element) => element.value);
 
-	await Promise.all( [
-		page.click( '#createusersub' ),
-		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-	] );
+	await Promise.all([
+		page.click('#createusersub'),
+		page.waitForNavigation({ waitUntil: 'networkidle0' }),
+	]);
 	await switchUserToTest();
 	return password;
 }

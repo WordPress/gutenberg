@@ -8,12 +8,12 @@ import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 export default function useRegisterShortcuts() {
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	useEffect( () => {
-		registerShortcut( {
+	const { registerShortcut } = useDispatch(keyboardShortcutsStore);
+	useEffect(() => {
+		registerShortcut({
 			name: 'core/edit-site/next-region',
 			category: 'global',
-			description: __( 'Navigate to the next part of the editor.' ),
+			description: __('Navigate to the next part of the editor.'),
 			keyCombination: {
 				modifier: 'ctrl',
 				character: '`',
@@ -24,12 +24,12 @@ export default function useRegisterShortcuts() {
 					character: 'n',
 				},
 			],
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-site/previous-region',
 			category: 'global',
-			description: __( 'Navigate to the previous part of the editor.' ),
+			description: __('Navigate to the previous part of the editor.'),
 			keyCombination: {
 				modifier: 'ctrlShift',
 				character: '`',
@@ -40,6 +40,6 @@ export default function useRegisterShortcuts() {
 					character: 'p',
 				},
 			],
-		} );
-	}, [] );
+		});
+	}, []);
 }

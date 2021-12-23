@@ -26,39 +26,39 @@ export default {
 	},
 };
 
-const HorizontalTemplate = ( args ) => (
+const HorizontalTemplate = (args) => (
 	<div>
 		<Text>Some text before the divider</Text>
-		<Divider { ...args } />
+		<Divider {...args} />
 		<Text>Some text after the divider</Text>
 	</div>
 );
 
-const VerticalTemplate = ( args ) => {
+const VerticalTemplate = (args) => {
 	const cx = useCx();
-	const wrapperClassName = cx( css`
+	const wrapperClassName = cx(css`
 		display: flex;
 		align-items: stretch;
 		justify-content: start;
-	` );
+	`);
 
 	return (
-		<div className={ wrapperClassName }>
+		<div className={wrapperClassName}>
 			<Text>Some text before the divider</Text>
-			<Divider orientation="vertical" { ...args } />
+			<Divider orientation="vertical" {...args} />
 			<Text>Some text after the divider</Text>
 		</div>
 	);
 };
 
-export const Horizontal = HorizontalTemplate.bind( {} );
+export const Horizontal = HorizontalTemplate.bind({});
 Horizontal.args = {
 	margin: 2,
 	marginStart: undefined,
 	marginEnd: undefined,
 };
 
-export const Vertical = VerticalTemplate.bind( {} );
+export const Vertical = VerticalTemplate.bind({});
 Vertical.args = {
 	...Horizontal.args,
 };

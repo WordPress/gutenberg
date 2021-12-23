@@ -13,7 +13,7 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import '../generated-class-name';
 
-describe( 'generated className', () => {
+describe('generated className', () => {
 	const blockSettings = {
 		name: 'chicken/ribs',
 		save: noop,
@@ -21,13 +21,13 @@ describe( 'generated className', () => {
 		title: 'block title',
 	};
 
-	describe( 'addSaveProps', () => {
+	describe('addSaveProps', () => {
 		const addSaveProps = applyFilters.bind(
 			null,
 			'blocks.getSaveContent.extraProps'
 		);
 
-		it( 'should do nothing if the block settings do not define generated className support', () => {
+		it('should do nothing if the block settings do not define generated className support', () => {
 			const attributes = { className: 'foo' };
 			const extraProps = addSaveProps(
 				{},
@@ -40,10 +40,10 @@ describe( 'generated className', () => {
 				attributes
 			);
 
-			expect( extraProps ).not.toHaveProperty( 'className' );
-		} );
+			expect(extraProps).not.toHaveProperty('className');
+		});
 
-		it( 'should inject the generated className', () => {
+		it('should inject the generated className', () => {
 			const attributes = { className: 'bar' };
 			const extraProps = addSaveProps(
 				{ className: 'foo' },
@@ -51,10 +51,10 @@ describe( 'generated className', () => {
 				attributes
 			);
 
-			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
-		} );
+			expect(extraProps.className).toBe('wp-block-chicken-ribs foo');
+		});
 
-		it( 'should not inject duplicates into className', () => {
+		it('should not inject duplicates into className', () => {
 			const attributes = { className: 'bar' };
 			const extraProps = addSaveProps(
 				{ className: 'foo wp-block-chicken-ribs' },
@@ -62,7 +62,7 @@ describe( 'generated className', () => {
 				attributes
 			);
 
-			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
-		} );
-	} );
-} );
+			expect(extraProps.className).toBe('wp-block-chicken-ribs foo');
+		});
+	});
+});

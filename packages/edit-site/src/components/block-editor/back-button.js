@@ -16,19 +16,19 @@ function BackButton() {
 	const isTemplatePart = location.params.postType === 'wp_template_part';
 	const previousTemplateId = location.state?.fromTemplateId;
 
-	if ( ! isTemplatePart || ! previousTemplateId ) {
+	if (!isTemplatePart || !previousTemplateId) {
 		return null;
 	}
 
 	return (
 		<Button
 			className="edit-site-visual-editor__back-button"
-			icon={ arrowLeft }
-			onClick={ () => {
+			icon={arrowLeft}
+			onClick={() => {
 				history.back();
-			} }
+			}}
 		>
-			{ __( 'Back' ) }
+			{__('Back')}
 		</Button>
 	);
 }

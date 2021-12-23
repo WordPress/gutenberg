@@ -13,9 +13,9 @@ import { normaliseFormats } from './normalise-formats';
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 /** @typedef {import('./create').RichTextFormat} RichTextFormat */
 
-function replace( array, index, value ) {
+function replace(array, index, value) {
 	array = array.slice();
-	array[ index ] = value;
+	array[index] = value;
 	return array;
 }
 
@@ -41,22 +41,22 @@ export function applyFormat(
 	const newFormats = formats.slice();
 
 	// The selection is collapsed.
-	if ( startIndex === endIndex ) {
-		const startFormat = find( newFormats[ startIndex ], {
+	if (startIndex === endIndex) {
+		const startFormat = find(newFormats[startIndex], {
 			type: format.type,
-		} );
+		});
 
 		// If the caret is at a format of the same type, expand start and end to
 		// the edges of the format. This is useful to apply new attributes.
-		if ( startFormat ) {
-			const index = newFormats[ startIndex ].indexOf( startFormat );
+		if (startFormat) {
+			const index = newFormats[startIndex].indexOf(startFormat);
 
 			while (
-				newFormats[ startIndex ] &&
-				newFormats[ startIndex ][ index ] === startFormat
+				newFormats[startIndex] &&
+				newFormats[startIndex][index] === startFormat
 			) {
-				newFormats[ startIndex ] = replace(
-					newFormats[ startIndex ],
+				newFormats[startIndex] = replace(
+					newFormats[startIndex],
 					index,
 					format
 				);
@@ -66,11 +66,11 @@ export function applyFormat(
 			endIndex++;
 
 			while (
-				newFormats[ endIndex ] &&
-				newFormats[ endIndex ][ index ] === startFormat
+				newFormats[endIndex] &&
+				newFormats[endIndex][index] === startFormat
 			) {
-				newFormats[ endIndex ] = replace(
-					newFormats[ endIndex ],
+				newFormats[endIndex] = replace(
+					newFormats[endIndex],
 					index,
 					format
 				);
@@ -81,37 +81,37 @@ export function applyFormat(
 		// Determine the highest position the new format can be inserted at.
 		let position = +Infinity;
 
-		for ( let index = startIndex; index < endIndex; index++ ) {
-			if ( newFormats[ index ] ) {
-				newFormats[ index ] = newFormats[ index ].filter(
-					( { type } ) => type !== format.type
+		for (let index = startIndex; index < endIndex; index++) {
+			if (newFormats[index]) {
+				newFormats[index] = newFormats[index].filter(
+					({ type }) => type !== format.type
 				);
 
-				const length = newFormats[ index ].length;
+				const length = newFormats[index].length;
 
-				if ( length < position ) {
+				if (length < position) {
 					position = length;
 				}
 			} else {
-				newFormats[ index ] = [];
+				newFormats[index] = [];
 				position = 0;
 			}
 		}
 
-		for ( let index = startIndex; index < endIndex; index++ ) {
-			newFormats[ index ].splice( position, 0, format );
+		for (let index = startIndex; index < endIndex; index++) {
+			newFormats[index].splice(position, 0, format);
 		}
 	}
 
-	return normaliseFormats( {
+	return normaliseFormats({
 		...value,
 		formats: newFormats,
 		// Always revise active formats. This serves as a placeholder for new
 		// inputs with the format so new input appears with the format applied,
 		// and ensures a format of the same type uses the latest values.
 		activeFormats: [
-			...reject( activeFormats, { type: format.type } ),
+			...reject(activeFormats, { type: format.type }),
 			format,
 		],
-	} );
+	});
 }

@@ -12,22 +12,22 @@ import {
  */
 import groups from './groups';
 
-export default function BlockControlsSlot( { group = 'default', ...props } ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
-	const Slot = groups[ group ].Slot;
+export default function BlockControlsSlot({ group = 'default', ...props }) {
+	const accessibleToolbarState = useContext(ToolbarContext);
+	const Slot = groups[group].Slot;
 
-	if ( group === 'default' ) {
-		return <Slot { ...props } fillProps={ accessibleToolbarState } />;
+	if (group === 'default') {
+		return <Slot {...props} fillProps={accessibleToolbarState} />;
 	}
 
 	return (
-		<Slot { ...props } fillProps={ accessibleToolbarState }>
-			{ ( fills ) => {
-				if ( ! fills.length ) {
+		<Slot {...props} fillProps={accessibleToolbarState}>
+			{(fills) => {
+				if (!fills.length) {
 					return null;
 				}
-				return <ToolbarGroup>{ fills }</ToolbarGroup>;
-			} }
+				return <ToolbarGroup>{fills}</ToolbarGroup>;
+			}}
 		</Slot>
 	);
 }

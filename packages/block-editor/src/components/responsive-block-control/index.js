@@ -15,7 +15,7 @@ import { ToggleControl } from '@wordpress/components';
  */
 import ResponsiveBlockControlLabel from './label';
 
-function ResponsiveBlockControl( props ) {
+function ResponsiveBlockControl(props) {
 	const {
 		title,
 		property,
@@ -27,25 +27,25 @@ function ResponsiveBlockControl( props ) {
 		defaultLabel = {
 			id: 'all',
 			/* translators: 'Label. Used to signify a layout property (eg: margin, padding) will apply uniformly to all screensizes.' */
-			label: __( 'All' ),
+			label: __('All'),
 		},
 		viewports = [
 			{
 				id: 'small',
-				label: __( 'Small screens' ),
+				label: __('Small screens'),
 			},
 			{
 				id: 'medium',
-				label: __( 'Medium screens' ),
+				label: __('Medium screens'),
 			},
 			{
 				id: 'large',
-				label: __( 'Large screens' ),
+				label: __('Large screens'),
 			},
 		],
 	} = props;
 
-	if ( ! title || ! property || ! renderDefaultControl ) {
+	if (!title || !property || !renderDefaultControl) {
 		return null;
 	}
 
@@ -53,7 +53,7 @@ function ResponsiveBlockControl( props ) {
 		toggleLabel ||
 		sprintf(
 			/* translators: 'Toggle control label. Should the property be the same across all screen sizes or unique per screen size.'. %s property value for the control (eg: margin, padding...etc) */
-			__( 'Use the same %s on all screensizes.' ),
+			__('Use the same %s on all screensizes.'),
 			property
 		);
 
@@ -64,53 +64,53 @@ function ResponsiveBlockControl( props ) {
 
 	const defaultControl = renderDefaultControl(
 		<ResponsiveBlockControlLabel
-			property={ property }
-			viewport={ defaultLabel }
+			property={property}
+			viewport={defaultLabel}
 		/>,
 		defaultLabel
 	);
 
 	const defaultResponsiveControls = () => {
-		return viewports.map( ( viewport ) => (
-			<Fragment key={ viewport.id }>
-				{ renderDefaultControl(
+		return viewports.map((viewport) => (
+			<Fragment key={viewport.id}>
+				{renderDefaultControl(
 					<ResponsiveBlockControlLabel
-						property={ property }
-						viewport={ viewport }
+						property={property}
+						viewport={viewport}
 					/>,
 					viewport
-				) }
+				)}
 			</Fragment>
-		) );
+		));
 	};
 
 	return (
 		<fieldset className="block-editor-responsive-block-control">
 			<legend className="block-editor-responsive-block-control__title">
-				{ title }
+				{title}
 			</legend>
 
 			<div className="block-editor-responsive-block-control__inner">
 				<ToggleControl
 					className="block-editor-responsive-block-control__toggle"
-					label={ toggleControlLabel }
-					checked={ ! isResponsive }
-					onChange={ onIsResponsiveChange }
-					help={ toggleHelpText }
+					label={toggleControlLabel}
+					checked={!isResponsive}
+					onChange={onIsResponsiveChange}
+					help={toggleHelpText}
 				/>
 				<div
-					className={ classnames(
+					className={classnames(
 						'block-editor-responsive-block-control__group',
 						{
 							'is-responsive': isResponsive,
 						}
-					) }
+					)}
 				>
-					{ ! isResponsive && defaultControl }
-					{ isResponsive &&
-						( renderResponsiveControls
-							? renderResponsiveControls( viewports )
-							: defaultResponsiveControls() ) }
+					{!isResponsive && defaultControl}
+					{isResponsive &&
+						(renderResponsiveControls
+							? renderResponsiveControls(viewports)
+							: defaultResponsiveControls())}
 				</div>
 			</div>
 		</fieldset>

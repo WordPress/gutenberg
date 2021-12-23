@@ -33,7 +33,7 @@ import styles from './style.scss';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
-function LinkSettings( {
+function LinkSettings({
 	// Control link settings `BottomSheet` visibility
 	isVisible,
 	// Callback that is called on closing bottom sheet
@@ -89,97 +89,97 @@ function LinkSettings( {
 	label = '',
 	linkTarget,
 	rel = '',
-} ) {
-	const [ urlInputValue, setUrlInputValue ] = useState( '' );
-	const [ labelInputValue, setLabelInputValue ] = useState( '' );
-	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
-	const onCloseSettingsSheetConsumed = useRef( false );
+}) {
+	const [urlInputValue, setUrlInputValue] = useState('');
+	const [labelInputValue, setLabelInputValue] = useState('');
+	const [linkRelInputValue, setLinkRelInputValue] = useState('');
+	const onCloseSettingsSheetConsumed = useRef(false);
 	const prevEditorSidebarOpenedRef = useRef();
 
-	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
-	useEffect( () => {
-		if ( onHandleClosingBottomSheet ) {
-			onHandleClosingBottomSheet( onCloseSettingsSheet );
+	const { onHandleClosingBottomSheet } = useContext(BottomSheetContext);
+	useEffect(() => {
+		if (onHandleClosingBottomSheet) {
+			onHandleClosingBottomSheet(onCloseSettingsSheet);
 		}
-	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
+	}, [urlInputValue, labelInputValue, linkRelInputValue]);
 
-	useEffect( () => {
+	useEffect(() => {
 		prevEditorSidebarOpenedRef.current = editorSidebarOpened;
-	} );
+	});
 	const prevEditorSidebarOpened = prevEditorSidebarOpenedRef.current;
 
-	useEffect( () => {
-		if ( url !== urlInputValue ) {
-			setUrlInputValue( url || '' );
+	useEffect(() => {
+		if (url !== urlInputValue) {
+			setUrlInputValue(url || '');
 		}
-	}, [ url ] );
+	}, [url]);
 
-	useEffect( () => {
-		setLabelInputValue( label || '' );
-	}, [ label ] );
+	useEffect(() => {
+		setLabelInputValue(label || '');
+	}, [label]);
 
-	useEffect( () => {
-		setLinkRelInputValue( rel || '' );
-	}, [ rel ] );
+	useEffect(() => {
+		setLinkRelInputValue(rel || '');
+	}, [rel]);
 
-	useEffect( () => {
+	useEffect(() => {
 		const isSettingSheetOpen = isVisible || editorSidebarOpened;
-		if ( isSettingSheetOpen ) {
+		if (isSettingSheetOpen) {
 			onCloseSettingsSheetConsumed.current = false;
 		}
 
-		if ( options.url.autoFill && isSettingSheetOpen && ! url ) {
+		if (options.url.autoFill && isSettingSheetOpen && !url) {
 			getURLFromClipboard();
 		}
 
-		if ( prevEditorSidebarOpened && ! editorSidebarOpened ) {
+		if (prevEditorSidebarOpened && !editorSidebarOpened) {
 			onSetAttributes();
 		}
-	}, [ editorSidebarOpened, isVisible ] );
+	}, [editorSidebarOpened, isVisible]);
 
-	useEffect( () => {
-		if ( ! urlValue && onEmptyURL ) {
+	useEffect(() => {
+		if (!urlValue && onEmptyURL) {
 			onEmptyURL();
 		}
 
-		if ( prependHTTP( urlValue ) !== url ) {
-			setAttributes( {
-				url: prependHTTP( urlValue ),
-			} );
+		if (prependHTTP(urlValue) !== url) {
+			setAttributes({
+				url: prependHTTP(urlValue),
+			});
 		}
-	}, [ urlValue ] );
+	}, [urlValue]);
 
 	const onChangeURL = useCallback(
-		( value ) => {
-			if ( ! value && onEmptyURL ) {
+		(value) => {
+			if (!value && onEmptyURL) {
 				onEmptyURL();
 			}
-			setUrlInputValue( value );
+			setUrlInputValue(value);
 		},
-		[ onEmptyURL ]
+		[onEmptyURL]
 	);
 
-	const onChangeLabel = useCallback( ( value ) => {
-		setLabelInputValue( value );
-	}, [] );
+	const onChangeLabel = useCallback((value) => {
+		setLabelInputValue(value);
+	}, []);
 
-	const onSetAttributes = useCallback( () => {
-		const newURL = prependHTTP( urlInputValue );
+	const onSetAttributes = useCallback(() => {
+		const newURL = prependHTTP(urlInputValue);
 		if (
 			url !== newURL ||
 			labelInputValue !== label ||
 			linkRelInputValue !== rel
 		) {
-			setAttributes( {
+			setAttributes({
 				url: newURL,
 				label: labelInputValue,
 				rel: linkRelInputValue,
-			} );
+			});
 		}
-	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
+	}, [urlInputValue, labelInputValue, linkRelInputValue, setAttributes]);
 
-	const onCloseSettingsSheet = useCallback( () => {
-		if ( onCloseSettingsSheetConsumed.current ) {
+	const onCloseSettingsSheet = useCallback(() => {
+		if (onCloseSettingsSheetConsumed.current) {
 			return;
 		}
 
@@ -187,140 +187,140 @@ function LinkSettings( {
 
 		onSetAttributes();
 
-		if ( onClose ) {
+		if (onClose) {
 			onClose();
 		}
-	}, [ onClose, onSetAttributes ] );
+	}, [onClose, onSetAttributes]);
 
 	const onChangeOpenInNewTab = useCallback(
-		( value ) => {
+		(value) => {
 			const newLinkTarget = value ? '_blank' : undefined;
 
 			let updatedRel = linkRelInputValue;
-			if ( newLinkTarget && ! linkRelInputValue ) {
+			if (newLinkTarget && !linkRelInputValue) {
 				updatedRel = NEW_TAB_REL;
-			} else if ( ! newLinkTarget && linkRelInputValue === NEW_TAB_REL ) {
+			} else if (!newLinkTarget && linkRelInputValue === NEW_TAB_REL) {
 				updatedRel = undefined;
 			}
 
-			setAttributes( {
+			setAttributes({
 				linkTarget: newLinkTarget,
 				rel: updatedRel,
-			} );
+			});
 		},
-		[ linkRelInputValue ]
+		[linkRelInputValue]
 	);
 
-	const onChangeLinkRel = useCallback( ( value ) => {
-		setLinkRelInputValue( value );
-	}, [] );
+	const onChangeLinkRel = useCallback((value) => {
+		setLinkRelInputValue(value);
+	}, []);
 
 	async function getURLFromClipboard() {
 		const clipboardText = await Clipboard.getString();
 
-		if ( ! clipboardText ) {
+		if (!clipboardText) {
 			return;
 		}
 		// Check if pasted text is URL
-		if ( ! isURL( clipboardText ) ) {
+		if (!isURL(clipboardText)) {
 			return;
 		}
 
-		setAttributes( { url: clipboardText } );
+		setAttributes({ url: clipboardText });
 	}
 
 	function getSettings() {
 		return (
 			<>
-				{ options.url &&
-					( onLinkCellPressed ? (
+				{options.url &&
+					(onLinkCellPressed ? (
 						<BottomSheet.LinkCell
-							showIcon={ showIcon }
-							value={ url }
-							valueMask={ options.url.valueMask }
-							onPress={ onLinkCellPressed }
+							showIcon={showIcon}
+							value={url}
+							valueMask={options.url.valueMask}
+							onPress={onLinkCellPressed}
 						/>
 					) : (
 						<TextControl
-							icon={ showIcon && link }
-							label={ options.url.label }
-							value={ urlInputValue }
-							valuePlaceholder={ options.url.placeholder }
-							onChange={ onChangeURL }
-							onSubmit={ onCloseSettingsSheet }
+							icon={showIcon && link}
+							label={options.url.label}
+							value={urlInputValue}
+							valuePlaceholder={options.url.placeholder}
+							onChange={onChangeURL}
+							onSubmit={onCloseSettingsSheet}
 							autoCapitalize="none"
-							autoCorrect={ false }
+							autoCorrect={false}
 							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={
 								Platform.OS === 'ios' && options.url.autoFocus
 							}
 							keyboardType="url"
 						/>
-					) ) }
-				{ options.linkLabel && (
+					))}
+				{options.linkLabel && (
 					<TextControl
-						label={ options.linkLabel.label }
-						value={ labelInputValue }
-						valuePlaceholder={ options.linkLabel.placeholder }
-						onChange={ onChangeLabel }
+						label={options.linkLabel.label}
+						value={labelInputValue}
+						valuePlaceholder={options.linkLabel.placeholder}
+						onChange={onChangeLabel}
 					/>
-				) }
-				{ !! urlInputValue && (
+				)}
+				{!!urlInputValue && (
 					<>
-						{ options.openInNewTab && (
+						{options.openInNewTab && (
 							<ToggleControl
-								icon={ showIcon && external }
-								label={ options.openInNewTab.label }
-								checked={ linkTarget === '_blank' }
-								onChange={ onChangeOpenInNewTab }
+								icon={showIcon && external}
+								label={options.openInNewTab.label}
+								checked={linkTarget === '_blank'}
+								onChange={onChangeOpenInNewTab}
 							/>
-						) }
-						{ options.linkRel && (
+						)}
+						{options.linkRel && (
 							<TextControl
-								icon={ showIcon && LinkRelIcon }
-								label={ options.linkRel.label }
-								value={ linkRelInputValue }
-								valuePlaceholder={ options.linkRel.placeholder }
-								onChange={ onChangeLinkRel }
-								onSubmit={ onCloseSettingsSheet }
+								icon={showIcon && LinkRelIcon}
+								label={options.linkRel.label}
+								value={linkRelInputValue}
+								valuePlaceholder={options.linkRel.placeholder}
+								onChange={onChangeLinkRel}
+								onSubmit={onCloseSettingsSheet}
 								autoCapitalize="none"
-								autoCorrect={ false }
+								autoCorrect={false}
 								keyboardType="default"
 							/>
-						) }
+						)}
 					</>
-				) }
+				)}
 			</>
 		);
 	}
 
-	if ( ! withBottomSheet ) {
+	if (!withBottomSheet) {
 		return getSettings();
 	}
 
 	return (
 		<>
-			<PanelBody style={ styles.linkSettingsPanel }>
-				{ getSettings() }
+			<PanelBody style={styles.linkSettingsPanel}>
+				{getSettings()}
 			</PanelBody>
-			{ options.footer && (
-				<PanelBody style={ styles.linkSettingsPanel }>
+			{options.footer && (
+				<PanelBody style={styles.linkSettingsPanel}>
 					<FooterMessageControl
-						label={ options.footer.label }
-						separatorType={ options.footer.separatorType }
+						label={options.footer.label}
+						separatorType={options.footer.separatorType}
 					/>
 				</PanelBody>
-			) }
-			{ actions && <PanelActions actions={ actions } /> }
+			)}
+			{actions && <PanelActions actions={actions} />}
 		</>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+export default compose([
+	withSelect((select) => {
+		const { isEditorSidebarOpened } = select('core/edit-post');
 		return {
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
-	} ),
-] )( LinkSettings );
+	}),
+])(LinkSettings);

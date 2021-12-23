@@ -15,14 +15,14 @@ const transforms = {
 			// Paragraph is a fallback and should be matched last.
 			priority: 20,
 			selector: 'p',
-			schema: ( { phrasingContentSchema, isPaste } ) => ( {
+			schema: ({ phrasingContentSchema, isPaste }) => ({
 				p: {
 					children: phrasingContentSchema,
-					attributes: isPaste ? [] : [ 'style', 'id' ],
+					attributes: isPaste ? [] : ['style', 'id'],
 				},
-			} ),
-			transform( node ) {
-				const attributes = getBlockAttributes( name, node.outerHTML );
+			}),
+			transform(node) {
+				const attributes = getBlockAttributes(name, node.outerHTML);
 				const { textAlign } = node.style || {};
 
 				if (
@@ -33,7 +33,7 @@ const transforms = {
 					attributes.align = textAlign;
 				}
 
-				return createBlock( name, attributes );
+				return createBlock(name, attributes);
 			},
 		},
 	],

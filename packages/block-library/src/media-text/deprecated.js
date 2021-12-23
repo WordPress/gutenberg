@@ -16,8 +16,8 @@ import { imageFillStyles } from './media-container';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 
-const migrateCustomColors = ( attributes ) => {
-	if ( ! attributes.customBackgroundColor ) {
+const migrateCustomColors = (attributes) => {
+	if (!attributes.customBackgroundColor) {
 		return attributes;
 	}
 	const style = {
@@ -26,7 +26,7 @@ const migrateCustomColors = ( attributes ) => {
 		},
 	};
 	return {
-		...omit( attributes, [ 'customBackgroundColor' ] ),
+		...omit(attributes, ['customBackgroundColor']),
 		style,
 	};
 };
@@ -114,7 +114,7 @@ export default [
 			},
 		},
 		migrate: migrateCustomColors,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				backgroundColor,
 				customBackgroundColor,
@@ -133,59 +133,60 @@ export default [
 				linkTarget,
 				rel,
 			} = attributes;
-			const newRel = isEmpty( rel ) ? undefined : rel;
+			const newRel = isEmpty(rel) ? undefined : rel;
 
 			let image = (
 				<img
-					src={ mediaUrl }
-					alt={ mediaAlt }
+					src={mediaUrl}
+					alt={mediaAlt}
 					className={
 						mediaId && mediaType === 'image'
-							? `wp-image-${ mediaId }`
+							? `wp-image-${mediaId}`
 							: null
 					}
 				/>
 			);
 
-			if ( href ) {
+			if (href) {
 				image = (
 					<a
-						className={ linkClass }
-						href={ href }
-						target={ linkTarget }
-						rel={ newRel }
+						className={linkClass}
+						href={href}
+						target={linkTarget}
+						rel={newRel}
 					>
-						{ image }
+						{image}
 					</a>
 				);
 			}
 
 			const mediaTypeRenders = {
 				image: () => image,
-				video: () => <video controls src={ mediaUrl } />,
+				video: () => <video controls src={mediaUrl} />,
 			};
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
-			const className = classnames( {
+			const className = classnames({
 				'has-media-on-the-right': 'right' === mediaPosition,
 				'has-background': backgroundClass || customBackgroundColor,
-				[ backgroundClass ]: backgroundClass,
+				[backgroundClass]: backgroundClass,
 				'is-stacked-on-mobile': isStackedOnMobile,
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[`is-vertically-aligned-${verticalAlignment}`]:
+					verticalAlignment,
 				'is-image-fill': imageFill,
-			} );
+			});
 			const backgroundStyles = imageFill
-				? imageFillStyles( mediaUrl, focalPoint )
+				? imageFillStyles(mediaUrl, focalPoint)
 				: {};
 
 			let gridTemplateColumns;
-			if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
+			if (mediaWidth !== DEFAULT_MEDIA_WIDTH) {
 				gridTemplateColumns =
 					'right' === mediaPosition
-						? `auto ${ mediaWidth }%`
-						: `${ mediaWidth }% auto`;
+						? `auto ${mediaWidth}%`
+						: `${mediaWidth}% auto`;
 			}
 			const style = {
 				backgroundColor: backgroundClass
@@ -194,12 +195,12 @@ export default [
 				gridTemplateColumns,
 			};
 			return (
-				<div className={ className } style={ style }>
+				<div className={className} style={style}>
 					<figure
 						className="wp-block-media-text__media"
-						style={ backgroundStyles }
+						style={backgroundStyles}
 					>
-						{ ( mediaTypeRenders[ mediaType ] || noop )() }
+						{(mediaTypeRenders[mediaType] || noop)()}
 					</figure>
 					<div className="wp-block-media-text__content">
 						<InnerBlocks.Content />
@@ -231,7 +232,7 @@ export default [
 			},
 		},
 		migrate: migrateCustomColors,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				backgroundColor,
 				customBackgroundColor,
@@ -249,38 +250,39 @@ export default [
 			const mediaTypeRenders = {
 				image: () => (
 					<img
-						src={ mediaUrl }
-						alt={ mediaAlt }
+						src={mediaUrl}
+						alt={mediaAlt}
 						className={
 							mediaId && mediaType === 'image'
-								? `wp-image-${ mediaId }`
+								? `wp-image-${mediaId}`
 								: null
 						}
 					/>
 				),
-				video: () => <video controls src={ mediaUrl } />,
+				video: () => <video controls src={mediaUrl} />,
 			};
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
-			const className = classnames( {
+			const className = classnames({
 				'has-media-on-the-right': 'right' === mediaPosition,
-				[ backgroundClass ]: backgroundClass,
+				[backgroundClass]: backgroundClass,
 				'is-stacked-on-mobile': isStackedOnMobile,
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[`is-vertically-aligned-${verticalAlignment}`]:
+					verticalAlignment,
 				'is-image-fill': imageFill,
-			} );
+			});
 			const backgroundStyles = imageFill
-				? imageFillStyles( mediaUrl, focalPoint )
+				? imageFillStyles(mediaUrl, focalPoint)
 				: {};
 
 			let gridTemplateColumns;
-			if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
+			if (mediaWidth !== DEFAULT_MEDIA_WIDTH) {
 				gridTemplateColumns =
 					'right' === mediaPosition
-						? `auto ${ mediaWidth }%`
-						: `${ mediaWidth }% auto`;
+						? `auto ${mediaWidth}%`
+						: `${mediaWidth}% auto`;
 			}
 			const style = {
 				backgroundColor: backgroundClass
@@ -289,12 +291,12 @@ export default [
 				gridTemplateColumns,
 			};
 			return (
-				<div className={ className } style={ style }>
+				<div className={className} style={style}>
 					<figure
 						className="wp-block-media-text__media"
-						style={ backgroundStyles }
+						style={backgroundStyles}
 					>
-						{ ( mediaTypeRenders[ mediaType ] || noop )() }
+						{(mediaTypeRenders[mediaType] || noop)()}
 					</figure>
 					<div className="wp-block-media-text__content">
 						<InnerBlocks.Content />
@@ -316,7 +318,7 @@ export default [
 				attribute: 'src',
 			},
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				backgroundColor,
 				customBackgroundColor,
@@ -328,25 +330,25 @@ export default [
 				mediaWidth,
 			} = attributes;
 			const mediaTypeRenders = {
-				image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
-				video: () => <video controls src={ mediaUrl } />,
+				image: () => <img src={mediaUrl} alt={mediaAlt} />,
+				video: () => <video controls src={mediaUrl} />,
 			};
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
-			const className = classnames( {
+			const className = classnames({
 				'has-media-on-the-right': 'right' === mediaPosition,
-				[ backgroundClass ]: backgroundClass,
+				[backgroundClass]: backgroundClass,
 				'is-stacked-on-mobile': isStackedOnMobile,
-			} );
+			});
 
 			let gridTemplateColumns;
-			if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
+			if (mediaWidth !== DEFAULT_MEDIA_WIDTH) {
 				gridTemplateColumns =
 					'right' === mediaPosition
-						? `auto ${ mediaWidth }%`
-						: `${ mediaWidth }% auto`;
+						? `auto ${mediaWidth}%`
+						: `${mediaWidth}% auto`;
 			}
 			const style = {
 				backgroundColor: backgroundClass
@@ -355,9 +357,9 @@ export default [
 				gridTemplateColumns,
 			};
 			return (
-				<div className={ className } style={ style }>
+				<div className={className} style={style}>
 					<figure className="wp-block-media-text__media">
-						{ ( mediaTypeRenders[ mediaType ] || noop )() }
+						{(mediaTypeRenders[mediaType] || noop)()}
 					</figure>
 					<div className="wp-block-media-text__content">
 						<InnerBlocks.Content />

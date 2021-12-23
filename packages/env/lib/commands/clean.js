@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const dockerCompose = require('docker-compose');
 
 /**
  * Internal dependencies
  */
-const initConfig = require( '../init-config' );
-const { configureWordPress, resetDatabase } = require( '../wordpress' );
+const initConfig = require('../init-config');
+const { configureWordPress, resetDatabase } = require('../wordpress');
 
 /**
  * @typedef {import('../wordpress').WPEnvironment} WPEnvironment
@@ -22,40 +22,40 @@ const { configureWordPress, resetDatabase } = require( '../wordpress' );
  * @param {Object}                 options.spinner     A CLI spinner which indicates progress.
  * @param {boolean}                options.debug       True if debug mode is enabled.
  */
-module.exports = async function clean( { environment, spinner, debug } ) {
-	const config = await initConfig( { spinner, debug } );
+module.exports = async function clean({ environment, spinner, debug }) {
+	const config = await initConfig({ spinner, debug });
 
-	const description = `${ environment } environment${
+	const description = `${environment} environment${
 		environment === 'all' ? 's' : ''
 	}`;
-	spinner.text = `Cleaning ${ description }.`;
+	spinner.text = `Cleaning ${description}.`;
 
 	const tasks = [];
 
 	// Start the database first to avoid race conditions where all tasks create
 	// different docker networks with the same name.
-	await dockerCompose.upOne( 'mysql', {
+	await dockerCompose.upOne('mysql', {
 		config: config.dockerComposeConfigPath,
 		log: config.debug,
-	} );
+	});
 
-	if ( environment === 'all' || environment === 'development' ) {
+	if (environment === 'all' || environment === 'development') {
 		tasks.push(
-			resetDatabase( 'development', config )
-				.then( () => configureWordPress( 'development', config ) )
-				.catch( () => {} )
+			resetDatabase('development', config)
+				.then(() => configureWordPress('development', config))
+				.catch(() => {})
 		);
 	}
 
-	if ( environment === 'all' || environment === 'tests' ) {
+	if (environment === 'all' || environment === 'tests') {
 		tasks.push(
-			resetDatabase( 'tests', config )
-				.then( () => configureWordPress( 'tests', config ) )
-				.catch( () => {} )
+			resetDatabase('tests', config)
+				.then(() => configureWordPress('tests', config))
+				.catch(() => {})
 		);
 	}
 
-	await Promise.all( tasks );
+	await Promise.all(tasks);
 
-	spinner.text = `Cleaned ${ description }.`;
+	spinner.text = `Cleaned ${description}.`;
 };

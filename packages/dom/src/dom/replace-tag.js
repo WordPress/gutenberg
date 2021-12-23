@@ -11,15 +11,15 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  *
  * @return {Element} The new node.
  */
-export default function replaceTag( node, tagName ) {
-	const newNode = node.ownerDocument.createElement( tagName );
+export default function replaceTag(node, tagName) {
+	const newNode = node.ownerDocument.createElement(tagName);
 
-	while ( node.firstChild ) {
-		newNode.appendChild( node.firstChild );
+	while (node.firstChild) {
+		newNode.appendChild(node.firstChild);
 	}
 
-	assertIsDefined( node.parentNode, 'node.parentNode' );
-	node.parentNode.replaceChild( newNode, node );
+	assertIsDefined(node.parentNode, 'node.parentNode');
+	node.parentNode.replaceChild(newNode, node);
 
 	return newNode;
 }

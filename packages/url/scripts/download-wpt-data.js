@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-const { get } = require( 'https' );
-const path = require( 'path' );
-const fs = require( 'fs' );
+const { get } = require('https');
+const path = require('path');
+const fs = require('fs');
 
 /**
  * Default file output destination.
@@ -27,7 +27,7 @@ const DATA_URL =
  *
  * @type {string[]}
  */
-const INPUT_EXCEPTIONS_ACTUAL_ABOUT_BLANK_BASE = [ '#x' ];
+const INPUT_EXCEPTIONS_ACTUAL_ABOUT_BLANK_BASE = ['#x'];
 
 /**
  * Given a URL, returns promise resolving to the downloaded URL contents parsed
@@ -37,22 +37,22 @@ const INPUT_EXCEPTIONS_ACTUAL_ABOUT_BLANK_BASE = [ '#x' ];
  *
  * @return {Promise<*>} Promise resolving to result of parsed JSON.
  */
-const fetchJSON = ( url ) =>
-	new Promise( ( resolve, reject ) => {
-		get( url, async ( response ) => {
-			if ( response.statusCode !== 200 ) {
+const fetchJSON = (url) =>
+	new Promise((resolve, reject) => {
+		get(url, async (response) => {
+			if (response.statusCode !== 200) {
 				return reject();
 			}
 
 			let string = '';
 
-			for await ( const chunk of response ) {
+			for await (const chunk of response) {
 				string += chunk.toString();
 			}
 
-			resolve( JSON.parse( string ) );
-		} );
-	} );
+			resolve(JSON.parse(string));
+		});
+	});
 
 /**
  * Returns true if the given value is a test data item.
@@ -61,7 +61,7 @@ const fetchJSON = ( url ) =>
  *
  * @return {boolean} Whether candidate is test data item.
  */
-const isDataItem = ( item ) => item && item.input;
+const isDataItem = (item) => item && item.input;
 
 /**
  * Returns true if the given data item is expected to be used as the base
@@ -71,7 +71,7 @@ const isDataItem = ( item ) => item && item.input;
  *
  * @return {boolean} Whether data item has non-default base.
  */
-const hasBase = ( item ) => item.base !== 'about:blank';
+const hasBase = (item) => item.base !== 'about:blank';
 
 /**
  * Returns true if the given data item is included in the exception set.
@@ -80,39 +80,38 @@ const hasBase = ( item ) => item.base !== 'about:blank';
  *
  * @return {boolean} Whether data item is exception.
  */
-const isException = ( item ) =>
-	INPUT_EXCEPTIONS_ACTUAL_ABOUT_BLANK_BASE.includes( item.input );
+const isException = (item) =>
+	INPUT_EXCEPTIONS_ACTUAL_ABOUT_BLANK_BASE.includes(item.input);
 
 /**
  * Downloads data and writes output file.
  *
  * @param {string} [outFile] Optional output file.
  */
-async function download( outFile = DEFAULT_OUT_FILE ) {
-	const data = await fetchJSON( DATA_URL );
+async function download(outFile = DEFAULT_OUT_FILE) {
+	const data = await fetchJSON(DATA_URL);
 
 	const transformedData = data
 		.filter(
-			( item ) =>
-				isDataItem( item ) && ! hasBase( item ) && ! isException( item )
+			(item) => isDataItem(item) && !hasBase(item) && !isException(item)
 		)
-		.map( ( item ) => ( {
+		.map((item) => ({
 			input: item.input,
 			failure: item.failure,
-		} ) );
+		}));
 
-	const file = fs.createWriteStream( outFile );
-	file.write( JSON.stringify( transformedData ) );
+	const file = fs.createWriteStream(outFile);
+	file.write(JSON.stringify(transformedData));
 	file.close();
 }
 
 module.exports = download;
 
-if ( ! module.parent ) {
+if (!module.parent) {
 	try {
 		download();
-	} catch ( error ) {
-		process.stderr.write( error );
+	} catch (error) {
+		process.stderr.write(error);
 		process.statusCode = 1;
 	}
 }

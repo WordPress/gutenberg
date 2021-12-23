@@ -22,7 +22,7 @@ export const _default = () => {
 		'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.'
 	);
 
-	const textToHighlight = text( 'Text to be highlighted ', 'Gutenberg' );
+	const textToHighlight = text('Text to be highlighted ', 'Gutenberg');
 
-	return <TextHighlight text={ textToMatch } highlight={ textToHighlight } />;
+	return <TextHighlight text={textToMatch} highlight={textToHighlight} />;
 };

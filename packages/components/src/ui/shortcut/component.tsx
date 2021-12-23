@@ -25,23 +25,23 @@ export interface Props {
 }
 
 function Shortcut(
-	props: WordPressComponentProps< Props, 'span' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<Props, 'span'>,
+	forwardedRef: Ref<any>
 ): JSX.Element | null {
 	const {
 		as: asProp = 'span',
 		shortcut,
 		className,
 		...otherProps
-	} = useContextSystem( props, 'Shortcut' );
-	if ( ! shortcut ) {
+	} = useContextSystem(props, 'Shortcut');
+	if (!shortcut) {
 		return null;
 	}
 
 	let displayText: string;
 	let ariaLabel: string | undefined;
 
-	if ( typeof shortcut === 'string' ) {
+	if (typeof shortcut === 'string') {
 		displayText = shortcut;
 	} else {
 		displayText = shortcut.display;
@@ -50,17 +50,17 @@ function Shortcut(
 
 	return (
 		<View
-			as={ asProp }
-			className={ className }
-			aria-label={ ariaLabel }
-			ref={ forwardedRef }
-			{ ...otherProps }
+			as={asProp}
+			className={className}
+			aria-label={ariaLabel}
+			ref={forwardedRef}
+			{...otherProps}
 		>
-			{ displayText }
+			{displayText}
 		</View>
 	);
 }
 
-const ConnectedShortcut = contextConnect( Shortcut, 'Shortcut' );
+const ConnectedShortcut = contextConnect(Shortcut, 'Shortcut');
 
 export default ConnectedShortcut;

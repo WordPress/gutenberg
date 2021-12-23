@@ -13,14 +13,14 @@ const INSERTER_SEARCH_SELECTOR =
  * Opens the global block inserter.
  */
 export async function openGlobalBlockInserter() {
-	if ( await isGlobalInserterOpen() ) {
+	if (await isGlobalInserterOpen()) {
 		// If global inserter is already opened, reset to an initial state where
 		// the default (first) tab is selected.
 		const tab = await page.$(
 			'.block-editor-inserter__tabs .components-tab-panel__tabs-item:nth-of-type(1):not(.is-active)'
 		);
 
-		if ( tab ) {
+		if (tab) {
 			await tab.click();
 		}
 	} else {
@@ -28,21 +28,21 @@ export async function openGlobalBlockInserter() {
 
 		// Waiting here is necessary because sometimes the inserter takes more time to
 		// render than Puppeteer takes to complete the 'click' action
-		await page.waitForSelector( '.block-editor-inserter__menu' );
+		await page.waitForSelector('.block-editor-inserter__menu');
 	}
 }
 
 export async function closeGlobalBlockInserter() {
-	if ( await isGlobalInserterOpen() ) {
+	if (await isGlobalInserterOpen()) {
 		await toggleGlobalBlockInserter();
 	}
 }
 
 async function isGlobalInserterOpen() {
-	return await page.evaluate( () => {
+	return await page.evaluate(() => {
 		// "Add block" selector is required to make sure performance comparison
 		// doesn't fail on older branches where we still had "Add block" as label.
-		return !! document.querySelector(
+		return !!document.querySelector(
 			'.edit-post-header [aria-label="Add block"].is-pressed,' +
 				'.edit-site-header [aria-label="Add block"].is-pressed,' +
 				'.edit-post-header [aria-label="Toggle block inserter"].is-pressed,' +
@@ -50,7 +50,7 @@ async function isGlobalInserterOpen() {
 				'.edit-widgets-header [aria-label="Toggle block inserter"].is-pressed,' +
 				'.edit-widgets-header [aria-label="Add block"].is-pressed'
 		);
-	} );
+	});
 }
 /**
  * Toggles the global inserter.
@@ -73,16 +73,14 @@ export async function toggleGlobalBlockInserter() {
  */
 async function focusSelectedBlock() {
 	// Ideally there shouuld be a UI way to do this. (Focus the selected block)
-	await page.evaluate( () => {
+	await page.evaluate(() => {
 		wp.data
-			.dispatch( 'core/block-editor' )
+			.dispatch('core/block-editor')
 			.selectBlock(
-				wp.data
-					.select( 'core/block-editor' )
-					.getSelectedBlockClientId(),
+				wp.data.select('core/block-editor').getSelectedBlockClientId(),
 				0
 			);
-	} );
+	});
 }
 
 /**
@@ -102,12 +100,12 @@ async function waitForInserterCloseAndContentFocus() {
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
-export async function searchForBlock( searchTerm ) {
+export async function searchForBlock(searchTerm) {
 	await openGlobalBlockInserter();
-	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
-	await page.focus( INSERTER_SEARCH_SELECTOR );
-	await pressKeyWithModifier( 'primary', 'a' );
-	await page.keyboard.type( searchTerm );
+	await page.waitForSelector(INSERTER_SEARCH_SELECTOR);
+	await page.focus(INSERTER_SEARCH_SELECTOR);
+	await pressKeyWithModifier('primary', 'a');
+	await page.keyboard.type(searchTerm);
 }
 
 /**
@@ -115,17 +113,17 @@ export async function searchForBlock( searchTerm ) {
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
-export async function searchForPattern( searchTerm ) {
+export async function searchForPattern(searchTerm) {
 	await openGlobalBlockInserter();
 	// Select the patterns tab
 	const tab = await page.waitForXPath(
 		'//div[contains(@class, "block-editor-inserter__tabs")]//button[.="Patterns"]'
 	);
 	await tab.click();
-	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
-	await page.focus( INSERTER_SEARCH_SELECTOR );
-	await pressKeyWithModifier( 'primary', 'a' );
-	await page.keyboard.type( searchTerm );
+	await page.waitForSelector(INSERTER_SEARCH_SELECTOR);
+	await page.focus(INSERTER_SEARCH_SELECTOR);
+	await pressKeyWithModifier('primary', 'a');
+	await page.keyboard.type(searchTerm);
 }
 
 /**
@@ -133,7 +131,7 @@ export async function searchForPattern( searchTerm ) {
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
-export async function searchForReusableBlock( searchTerm ) {
+export async function searchForReusableBlock(searchTerm) {
 	await openGlobalBlockInserter();
 
 	// The reusable blocks tab won't appear until the reusable blocks have been
@@ -148,10 +146,10 @@ export async function searchForReusableBlock( searchTerm ) {
 		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
 	);
 	await tab.click();
-	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
-	await page.focus( INSERTER_SEARCH_SELECTOR );
-	await pressKeyWithModifier( 'primary', 'a' );
-	await page.keyboard.type( searchTerm );
+	await page.waitForSelector(INSERTER_SEARCH_SELECTOR);
+	await page.focus(INSERTER_SEARCH_SELECTOR);
+	await pressKeyWithModifier('primary', 'a');
+	await page.keyboard.type(searchTerm);
 }
 
 /**
@@ -160,10 +158,10 @@ export async function searchForReusableBlock( searchTerm ) {
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
-export async function insertBlock( searchTerm ) {
-	await searchForBlock( searchTerm );
+export async function insertBlock(searchTerm) {
+	await searchForBlock(searchTerm);
 	const insertButton = await page.waitForXPath(
-		`//button//span[contains(text(), '${ searchTerm }')]`
+		`//button//span[contains(text(), '${searchTerm}')]`
 	);
 	await insertButton.click();
 	await focusSelectedBlock();
@@ -177,10 +175,10 @@ export async function insertBlock( searchTerm ) {
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
-export async function insertPattern( searchTerm ) {
-	await searchForPattern( searchTerm );
+export async function insertPattern(searchTerm) {
+	await searchForPattern(searchTerm);
 	const insertButton = await page.waitForXPath(
-		`//div[@role = 'option']//div[contains(text(), '${ searchTerm }')]`
+		`//div[@role = 'option']//div[contains(text(), '${searchTerm}')]`
 	);
 	await insertButton.click();
 	await focusSelectedBlock();
@@ -195,10 +193,10 @@ export async function insertPattern( searchTerm ) {
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
-export async function insertReusableBlock( searchTerm ) {
-	await searchForReusableBlock( searchTerm );
+export async function insertReusableBlock(searchTerm) {
+	await searchForReusableBlock(searchTerm);
 	const insertButton = await page.waitForXPath(
-		`//button//span[contains(text(), '${ searchTerm }')]`
+		`//button//span[contains(text(), '${searchTerm}')]`
 	);
 	await insertButton.click();
 	await focusSelectedBlock();
@@ -217,8 +215,8 @@ export async function insertReusableBlock( searchTerm ) {
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
-export async function insertBlockDirectoryBlock( searchTerm ) {
-	await searchForBlock( searchTerm );
+export async function insertBlockDirectoryBlock(searchTerm) {
+	await searchForBlock(searchTerm);
 
 	// Grab the first block in the list
 	const insertButton = await page.waitForSelector(
@@ -227,7 +225,7 @@ export async function insertBlockDirectoryBlock( searchTerm ) {
 	await insertButton.click();
 	await page.waitForFunction(
 		() =>
-			! document.body.querySelector(
+			!document.body.querySelector(
 				'.block-directory-downloadable-blocks-list button:first-child.is-busy'
 			)
 	);

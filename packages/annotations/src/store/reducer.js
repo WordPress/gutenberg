@@ -12,8 +12,8 @@ import { isNumber, mapValues } from 'lodash';
  *                              in the array.
  * @return {Array} Filtered array.
  */
-function filterWithReference( collection, predicate ) {
-	const filteredCollection = collection.filter( predicate );
+function filterWithReference(collection, predicate) {
+	const filteredCollection = collection.filter(predicate);
 
 	return collection.length === filteredCollection.length
 		? collection
@@ -26,10 +26,10 @@ function filterWithReference( collection, predicate ) {
  * @param {Object} annotation The annotation to verify.
  * @return {boolean} Whether the given annotation is valid.
  */
-function isValidAnnotationRange( annotation ) {
+function isValidAnnotationRange(annotation) {
 	return (
-		isNumber( annotation.start ) &&
-		isNumber( annotation.end ) &&
+		isNumber(annotation.start) &&
+		isNumber(annotation.end) &&
 		annotation.start <= annotation.end
 	);
 }
@@ -42,8 +42,8 @@ function isValidAnnotationRange( annotation ) {
  *
  * @return {Array} Updated state.
  */
-export function annotations( state = {}, action ) {
-	switch ( action.type ) {
+export function annotations(state = {}, action) {
+	switch (action.type) {
 		case 'ANNOTATION_ADD':
 			const blockClientId = action.blockClientId;
 			const newAnnotation = {
@@ -57,64 +57,62 @@ export function annotations( state = {}, action ) {
 
 			if (
 				newAnnotation.selector === 'range' &&
-				! isValidAnnotationRange( newAnnotation.range )
+				!isValidAnnotationRange(newAnnotation.range)
 			) {
 				return state;
 			}
 
-			const previousAnnotationsForBlock = state?.[ blockClientId ] ?? [];
+			const previousAnnotationsForBlock = state?.[blockClientId] ?? [];
 
 			return {
 				...state,
-				[ blockClientId ]: [
+				[blockClientId]: [
 					...previousAnnotationsForBlock,
 					newAnnotation,
 				],
 			};
 
 		case 'ANNOTATION_REMOVE':
-			return mapValues( state, ( annotationsForBlock ) => {
+			return mapValues(state, (annotationsForBlock) => {
 				return filterWithReference(
 					annotationsForBlock,
-					( annotation ) => {
+					(annotation) => {
 						return annotation.id !== action.annotationId;
 					}
 				);
-			} );
+			});
 
 		case 'ANNOTATION_UPDATE_RANGE':
-			return mapValues( state, ( annotationsForBlock ) => {
+			return mapValues(state, (annotationsForBlock) => {
 				let hasChangedRange = false;
 
-				const newAnnotations = annotationsForBlock.map(
-					( annotation ) => {
-						if ( annotation.id === action.annotationId ) {
-							hasChangedRange = true;
-							return {
-								...annotation,
-								range: {
-									start: action.start,
-									end: action.end,
-								},
-							};
-						}
-
-						return annotation;
+				const newAnnotations = annotationsForBlock.map((annotation) => {
+					if (annotation.id === action.annotationId) {
+						hasChangedRange = true;
+						return {
+							...annotation,
+							range: {
+								start: action.start,
+								end: action.end,
+							},
+						};
 					}
-				);
+
+					return annotation;
+				});
 
 				return hasChangedRange ? newAnnotations : annotationsForBlock;
-			} );
+			});
 
 		case 'ANNOTATION_REMOVE_SOURCE':
-			return mapValues( state, ( annotationsForBlock ) => {
+			return mapValues(state, (annotationsForBlock) => {
 				return filterWithReference(
 					annotationsForBlock,
-					( annotation ) => {
+					(annotation) => {
 						return annotation.source !== action.source;
 					}
 				);
-			} );
+			});
 	}
 
 	return state;

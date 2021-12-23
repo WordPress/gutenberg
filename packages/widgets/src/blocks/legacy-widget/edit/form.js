@@ -16,7 +16,7 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import Control from './control';
 
-export default function Form( {
+export default function Form({
 	title,
 	isVisible,
 	id,
@@ -25,38 +25,38 @@ export default function Form( {
 	isWide,
 	onChangeInstance,
 	onChangeHasPreview,
-} ) {
+}) {
 	const ref = useRef();
 
-	const isMediumLargeViewport = useViewportMatch( 'small' );
+	const isMediumLargeViewport = useViewportMatch('small');
 
 	// We only want to remount the control when the instance changes
 	// *externally*. For example, if the user performs an undo. To do this, we
 	// keep track of changes made to instance by the control itself and then
 	// ignore those.
-	const outgoingInstances = useRef( new Set() );
-	const incomingInstances = useRef( new Set() );
+	const outgoingInstances = useRef(new Set());
+	const incomingInstances = useRef(new Set());
 
-	const { createNotice } = useDispatch( noticesStore );
+	const { createNotice } = useDispatch(noticesStore);
 
-	useEffect( () => {
-		if ( incomingInstances.current.has( instance ) ) {
-			incomingInstances.current.delete( instance );
+	useEffect(() => {
+		if (incomingInstances.current.has(instance)) {
+			incomingInstances.current.delete(instance);
 			return;
 		}
 
-		const control = new Control( {
+		const control = new Control({
 			id,
 			idBase,
 			instance,
-			onChangeInstance( nextInstance ) {
-				outgoingInstances.current.add( instance );
-				incomingInstances.current.add( nextInstance );
-				onChangeInstance( nextInstance );
+			onChangeInstance(nextInstance) {
+				outgoingInstances.current.add(instance);
+				incomingInstances.current.add(nextInstance);
+				onChangeInstance(nextInstance);
 			},
 			onChangeHasPreview,
-			onError( error ) {
-				window.console.error( error );
+			onError(error) {
+				window.console.error(error);
 				createNotice(
 					'error',
 					sprintf(
@@ -68,13 +68,13 @@ export default function Form( {
 					)
 				);
 			},
-		} );
+		});
 
-		ref.current.appendChild( control.element );
+		ref.current.appendChild(control.element);
 
 		return () => {
-			if ( outgoingInstances.current.has( instance ) ) {
-				outgoingInstances.current.delete( instance );
+			if (outgoingInstances.current.has(instance)) {
+				outgoingInstances.current.delete(instance);
 				return;
 			}
 
@@ -87,29 +87,29 @@ export default function Form( {
 		onChangeInstance,
 		onChangeHasPreview,
 		isMediumLargeViewport,
-	] );
+	]);
 
-	if ( isWide && isMediumLargeViewport ) {
+	if (isWide && isMediumLargeViewport) {
 		return (
 			<div
-				className={ classnames( {
+				className={classnames({
 					'wp-block-legacy-widget__container': isVisible,
-				} ) }
+				})}
 			>
-				{ isVisible && (
+				{isVisible && (
 					<h3 className="wp-block-legacy-widget__edit-form-title">
-						{ title }
+						{title}
 					</h3>
-				) }
+				)}
 				<Popover
-					focusOnMount={ false }
+					focusOnMount={false}
 					position="middle right"
 					__unstableForceXAlignment
 				>
 					<div
-						ref={ ref }
+						ref={ref}
 						className="wp-block-legacy-widget__edit-form"
-						hidden={ ! isVisible }
+						hidden={!isVisible}
 					></div>
 				</Popover>
 			</div>
@@ -118,13 +118,11 @@ export default function Form( {
 
 	return (
 		<div
-			ref={ ref }
+			ref={ref}
 			className="wp-block-legacy-widget__edit-form"
-			hidden={ ! isVisible }
+			hidden={!isVisible}
 		>
-			<h3 className="wp-block-legacy-widget__edit-form-title">
-				{ title }
-			</h3>
+			<h3 className="wp-block-legacy-widget__edit-form-title">{title}</h3>
 		</div>
 	);
 }

@@ -23,26 +23,26 @@ import {
 } from '../registration';
 import { createBlock } from '../';
 
-describe( 'block serializer', () => {
-	beforeAll( () => {
+describe('block serializer', () => {
+	beforeAll(() => {
 		// Initialize the block store.
-		require( '../../store' );
-	} );
+		require('../../store');
+	});
 
-	afterEach( () => {
-		setFreeformContentHandlerName( undefined );
-		setUnregisteredTypeHandlerName( undefined );
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
+	afterEach(() => {
+		setFreeformContentHandlerName(undefined);
+		setUnregisteredTypeHandlerName(undefined);
+		getBlockTypes().forEach((block) => {
+			unregisterBlockType(block.name);
+		});
+	});
 
-	describe( 'getSaveContent()', () => {
-		describe( 'function save', () => {
-			const fruitBlockSave = ( { attributes } ) =>
-				createElement( 'div', null, attributes.fruit );
+	describe('getSaveContent()', () => {
+		describe('function save', () => {
+			const fruitBlockSave = ({ attributes }) =>
+				createElement('div', null, attributes.fruit);
 
-			it( 'should return element as string if save returns element', () => {
+			it('should return element as string if save returns element', () => {
 				const saved = getSaveContent(
 					{
 						name: 'core/fruit',
@@ -51,26 +51,26 @@ describe( 'block serializer', () => {
 					{ fruit: 'Bananas' }
 				);
 
-				expect( saved ).toBe( '<div>Bananas</div>' );
-			} );
+				expect(saved).toBe('<div>Bananas</div>');
+			});
 
-			it( 'should work when block type is passed as string', () => {
-				registerBlockType( 'core/fruit', {
+			it('should work when block type is passed as string', () => {
+				registerBlockType('core/fruit', {
 					title: 'Fruit',
 					category: 'widgets',
 					save: fruitBlockSave,
-				} );
+				});
 
-				const saved = getSaveContent( 'core/fruit', {
+				const saved = getSaveContent('core/fruit', {
 					fruit: 'Bananas',
-				} );
+				});
 
-				expect( saved ).toBe( '<div>Bananas</div>' );
-			} );
-		} );
+				expect(saved).toBe('<div>Bananas</div>');
+			});
+		});
 
-		describe( 'component save', () => {
-			it( 'should return element as string', () => {
+		describe('component save', () => {
+			it('should return element as string', () => {
 				const saved = getSaveContent(
 					{
 						save: class extends Component {
@@ -87,19 +87,19 @@ describe( 'block serializer', () => {
 					{ fruit: 'Bananas' }
 				);
 
-				expect( saved ).toBe( '<div>Bananas</div>' );
-			} );
-		} );
-	} );
+				expect(saved).toBe('<div>Bananas</div>');
+			});
+		});
+	});
 
-	describe( 'getCommentAttributes()', () => {
-		it( 'should return an empty set if no attributes provided', () => {
-			const attributes = getCommentAttributes( {}, {} );
+	describe('getCommentAttributes()', () => {
+		it('should return an empty set if no attributes provided', () => {
+			const attributes = getCommentAttributes({}, {});
 
-			expect( attributes ).toEqual( {} );
-		} );
+			expect(attributes).toEqual({});
+		});
 
-		it( 'should only return attributes which are not matched from content', () => {
+		it('should only return attributes which are not matched from content', () => {
 			const attributes = getCommentAttributes(
 				{
 					attributes: {
@@ -122,13 +122,13 @@ describe( 'block serializer', () => {
 				}
 			);
 
-			expect( attributes ).toEqual( {
+			expect(attributes).toEqual({
 				category: 'food',
 				ripeness: 'ripe',
-			} );
-		} );
+			});
+		});
 
-		it( 'should skip attributes whose values are undefined', () => {
+		it('should skip attributes whose values are undefined', () => {
 			const attributes = getCommentAttributes(
 				{
 					attributes: {
@@ -146,105 +146,103 @@ describe( 'block serializer', () => {
 				}
 			);
 
-			expect( attributes ).toEqual( { fruit: 'bananas' } );
-		} );
-	} );
+			expect(attributes).toEqual({ fruit: 'bananas' });
+		});
+	});
 
-	describe( 'serializeAttributes()', () => {
-		it( 'should not break HTML comments', () => {
-			expect( serializeAttributes( { a: '-- and --' } ) ).toBe(
+	describe('serializeAttributes()', () => {
+		it('should not break HTML comments', () => {
+			expect(serializeAttributes({ a: '-- and --' })).toBe(
 				'{"a":"\\u002d\\u002d and \\u002d\\u002d"}'
 			);
-		} );
+		});
 
-		it( 'should not break standard-non-compliant tools for "<"', () => {
-			expect( serializeAttributes( { a: '< and <' } ) ).toBe(
+		it('should not break standard-non-compliant tools for "<"', () => {
+			expect(serializeAttributes({ a: '< and <' })).toBe(
 				'{"a":"\\u003c and \\u003c"}'
 			);
-		} );
+		});
 
-		it( 'should not break standard-non-compliant tools for ">"', () => {
-			expect( serializeAttributes( { a: '> and >' } ) ).toBe(
+		it('should not break standard-non-compliant tools for ">"', () => {
+			expect(serializeAttributes({ a: '> and >' })).toBe(
 				'{"a":"\\u003e and \\u003e"}'
 			);
-		} );
+		});
 
-		it( 'should not break standard-non-compliant tools for "&"', () => {
-			expect( serializeAttributes( { a: '& and &' } ) ).toBe(
+		it('should not break standard-non-compliant tools for "&"', () => {
+			expect(serializeAttributes({ a: '& and &' })).toBe(
 				'{"a":"\\u0026 and \\u0026"}'
 			);
-		} );
+		});
 
-		it( 'should replace quotation marks', () => {
-			expect( serializeAttributes( { a: '" and "' } ) ).toBe(
+		it('should replace quotation marks', () => {
+			expect(serializeAttributes({ a: '" and "' })).toBe(
 				'{"a":"\\u0022 and \\u0022"}'
 			);
-		} );
-	} );
+		});
+	});
 
-	describe( 'getCommentDelimitedContent()', () => {
-		it( 'should generate empty attributes void', () => {
+	describe('getCommentDelimitedContent()', () => {
+		it('should generate empty attributes void', () => {
 			const content = getCommentDelimitedContent(
 				'core/test-block',
 				{},
 				''
 			);
 
-			expect( content ).toBe( '<!-- wp:test-block /-->' );
-		} );
+			expect(content).toBe('<!-- wp:test-block /-->');
+		});
 
-		it( 'should include the namespace for non-core blocks', () => {
+		it('should include the namespace for non-core blocks', () => {
 			const content = getCommentDelimitedContent(
 				'my-wonderful-namespace/test-block',
 				{},
 				''
 			);
 
-			expect( content ).toBe(
+			expect(content).toBe(
 				'<!-- wp:my-wonderful-namespace/test-block /-->'
 			);
-		} );
+		});
 
-		it( 'should generate empty attributes non-void', () => {
+		it('should generate empty attributes non-void', () => {
 			const content = getCommentDelimitedContent(
 				'core/test-block',
 				{},
 				'Delicious'
 			);
 
-			expect( content ).toBe(
+			expect(content).toBe(
 				'<!-- wp:test-block -->\nDelicious\n<!-- /wp:test-block -->'
 			);
-		} );
+		});
 
-		it( 'should generate non-empty attributes void', () => {
+		it('should generate non-empty attributes void', () => {
 			const content = getCommentDelimitedContent(
 				'core/test-block',
 				{ fruit: 'Banana' },
 				''
 			);
 
-			expect( content ).toBe(
-				'<!-- wp:test-block {"fruit":"Banana"} /-->'
-			);
-		} );
+			expect(content).toBe('<!-- wp:test-block {"fruit":"Banana"} /-->');
+		});
 
-		it( 'should generate non-empty attributes non-void', () => {
+		it('should generate non-empty attributes non-void', () => {
 			const content = getCommentDelimitedContent(
 				'core/test-block',
 				{ fruit: 'Banana' },
 				'Delicious'
 			);
 
-			expect( content ).toBe(
+			expect(content).toBe(
 				'<!-- wp:test-block {"fruit":"Banana"} -->\nDelicious\n<!-- /wp:test-block -->'
 			);
-		} );
-	} );
+		});
+	});
 
-	describe( 'serializeBlock()', () => {
-		it( 'serializes the freeform content fallback block without comment delimiters', () => {
-			registerBlockType( 'core/freeform-block', {
+	describe('serializeBlock()', () => {
+		it('serializes the freeform content fallback block without comment delimiters', () => {
+			registerBlockType('core/freeform-block', {
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -252,19 +250,19 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.fruit,
-			} );
-			setFreeformContentHandlerName( 'core/freeform-block' );
-			const block = createBlock( 'core/freeform-block', {
+				save: ({ attributes }) => attributes.fruit,
+			});
+			setFreeformContentHandlerName('core/freeform-block');
+			const block = createBlock('core/freeform-block', {
 				fruit: 'Bananas',
-			} );
+			});
 
-			const content = serializeBlock( block );
+			const content = serializeBlock(block);
 
-			expect( content ).toBe( 'Bananas' );
-		} );
-		it( 'serializes the freeform content fallback block with comment delimiters in nested context', () => {
-			registerBlockType( 'core/freeform-block', {
+			expect(content).toBe('Bananas');
+		});
+		it('serializes the freeform content fallback block with comment delimiters in nested context', () => {
+			registerBlockType('core/freeform-block', {
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -272,23 +270,23 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.fruit,
-			} );
-			setFreeformContentHandlerName( 'core/freeform-block' );
-			const block = createBlock( 'core/freeform-block', {
+				save: ({ attributes }) => attributes.fruit,
+			});
+			setFreeformContentHandlerName('core/freeform-block');
+			const block = createBlock('core/freeform-block', {
 				fruit: 'Bananas',
-			} );
+			});
 
-			const content = serializeBlock( block, { isInnerBlocks: true } );
+			const content = serializeBlock(block, { isInnerBlocks: true });
 
-			expect( content ).toBe(
+			expect(content).toBe(
 				'<!-- wp:freeform-block {"fruit":"Bananas"} -->\n' +
 					'Bananas\n' +
 					'<!-- /wp:freeform-block -->'
 			);
-		} );
-		it( 'serializes the unregistered fallback block without comment delimiters', () => {
-			registerBlockType( 'core/unregistered-block', {
+		});
+		it('serializes the unregistered fallback block without comment delimiters', () => {
+			registerBlockType('core/unregistered-block', {
 				category: 'text',
 				title: 'unregistered block',
 				attributes: {
@@ -296,21 +294,21 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.fruit,
-			} );
-			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
-			const block = createBlock( 'core/unregistered-block', {
+				save: ({ attributes }) => attributes.fruit,
+			});
+			setUnregisteredTypeHandlerName('core/unregistered-block');
+			const block = createBlock('core/unregistered-block', {
 				fruit: 'Bananas',
-			} );
+			});
 
-			const content = serializeBlock( block );
+			const content = serializeBlock(block);
 
-			expect( content ).toBe( 'Bananas' );
-		} );
-	} );
+			expect(content).toBe('Bananas');
+		});
+	});
 
-	describe( 'serialize()', () => {
-		beforeEach( () => {
+	describe('serialize()', () => {
+		beforeEach(() => {
 			const blockType = {
 				attributes: {
 					throw: {
@@ -328,60 +326,60 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save( { attributes } ) {
-					if ( attributes.throw ) {
+				save({ attributes }) {
+					if (attributes.throw) {
 						throw new Error();
 					}
 
-					return <p>{ attributes.content }</p>;
+					return <p>{attributes.content}</p>;
 				},
 				category: 'text',
 				title: 'block title',
 			};
-			registerBlockType( 'core/test-block', blockType );
-		} );
+			registerBlockType('core/test-block', blockType);
+		});
 
-		it( 'should serialize the post content properly', () => {
-			const block = createBlock( 'core/test-block', {
+		it('should serialize the post content properly', () => {
+			const block = createBlock('core/test-block', {
 				content: 'Ribs & Chicken',
 				stuff: 'left & right -- but <not>',
-			} );
+			});
 			const expectedPostContent =
 				'<!-- wp:test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p>Ribs &amp; Chicken</p>\n<!-- /wp:test-block -->';
 
-			expect( serialize( [ block ] ) ).toEqual( expectedPostContent );
-			expect( serialize( block ) ).toEqual( expectedPostContent );
-		} );
+			expect(serialize([block])).toEqual(expectedPostContent);
+			expect(serialize(block)).toEqual(expectedPostContent);
+		});
 
-		it( 'should preserve content for invalid block', () => {
-			const block = createBlock( 'core/test-block', {
+		it('should preserve content for invalid block', () => {
+			const block = createBlock('core/test-block', {
 				content: 'Incorrect',
-			} );
+			});
 
 			block.isValid = false;
 			block.originalContent = 'Correct';
 
-			expect( serialize( block ) ).toEqual(
+			expect(serialize(block)).toEqual(
 				'<!-- wp:test-block -->\nCorrect\n<!-- /wp:test-block -->'
 			);
-		} );
+		});
 
-		it( 'should preserve content for crashing block', () => {
-			const block = createBlock( 'core/test-block', {
+		it('should preserve content for crashing block', () => {
+			const block = createBlock('core/test-block', {
 				content: 'Incorrect',
 				throw: true,
-			} );
+			});
 
 			block.originalContent = 'Correct';
 
-			expect( serialize( block ) ).toEqual(
+			expect(serialize(block)).toEqual(
 				'<!-- wp:test-block {"throw":true} -->\nCorrect\n<!-- /wp:test-block -->'
 			);
-		} );
-	} );
+		});
+	});
 
-	describe( 'getBlockInnerHTML', () => {
-		it( "should return the block's serialized inner HTML", () => {
+	describe('getBlockInnerHTML', () => {
+		it("should return the block's serialized inner HTML", () => {
 			const blockType = {
 				attributes: {
 					content: {
@@ -389,13 +387,13 @@ describe( 'block serializer', () => {
 						source: 'text',
 					},
 				},
-				save( { attributes } ) {
+				save({ attributes }) {
 					return attributes.content;
 				},
 				category: 'text',
 				title: 'block title',
 			};
-			registerBlockType( 'core/chicken', blockType );
+			registerBlockType('core/chicken', blockType);
 			const block = {
 				name: 'core/chicken',
 				attributes: {
@@ -403,7 +401,7 @@ describe( 'block serializer', () => {
 				},
 				isValid: true,
 			};
-			expect( getBlockInnerHTML( block ) ).toBe( 'chicken' );
-		} );
-	} );
-} );
+			expect(getBlockInnerHTML(block)).toBe('chicken');
+		});
+	});
+});

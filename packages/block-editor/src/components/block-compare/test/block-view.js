@@ -9,19 +9,19 @@ import { noop } from 'lodash';
  */
 import BlockView from '../block-view';
 
-describe( 'BlockView', () => {
-	test( 'should match snapshot', () => {
+describe('BlockView', () => {
+	test('should match snapshot', () => {
 		const wrapper = shallow(
 			<BlockView
 				title="title"
 				rawContent="raw"
 				renderedContent="render"
-				action={ noop }
+				action={noop}
 				actionText="action"
 				className="class"
 			/>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
+		expect(wrapper).toMatchSnapshot();
+	});
+});

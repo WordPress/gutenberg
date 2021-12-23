@@ -23,33 +23,31 @@ import {
  *
  * @return {JSX.Element} React element.
  */
-function Edit( { setAttributes, attributes: { textAlign } } ) {
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+function Edit({ setAttributes, attributes: { textAlign } }) {
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+		}),
+	});
 
 	const blockControls = (
 		<BlockControls group="block">
 			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
+				value={textAlign}
+				onChange={(newAlign) => setAttributes({ textAlign: newAlign })}
 			/>
 		</BlockControls>
 	);
 
 	return (
 		<>
-			{ blockControls }
-			<div { ...blockProps }>
+			{blockControls}
+			<div {...blockProps}>
 				<a
 					href="#comment-reply-pseudo-link"
-					onClick={ ( event ) => event.preventDefault() }
+					onClick={(event) => event.preventDefault()}
 				>
-					{ __( 'Reply' ) }
+					{__('Reply')}
 				</a>
 			</div>
 		</>

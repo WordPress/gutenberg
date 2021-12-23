@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-const { setFailed, getInput } = require( '@actions/core' );
-const { getOctokit, context } = require( '@actions/github' );
+const { setFailed, getInput } = require('@actions/core');
+const { getOctokit, context } = require('@actions/github');
 
 /**
  * Internal dependencies
  */
-const assignFixedIssues = require( './tasks/assign-fixed-issues' );
-const firstTimeContributorAccountLink = require( './tasks/first-time-contributor-account-link' );
-const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
-const addMilestone = require( './tasks/add-milestone' );
-const debug = require( './debug' );
+const assignFixedIssues = require('./tasks/assign-fixed-issues');
+const firstTimeContributorAccountLink = require('./tasks/first-time-contributor-account-link');
+const firstTimeContributorLabel = require('./tasks/first-time-contributor-label');
+const addMilestone = require('./tasks/add-milestone');
+const debug = require('./debug');
 
 /**
  * Automation task function.
@@ -54,34 +54,34 @@ const automations = [
 	},
 ];
 
-( async function main() {
-	const token = getInput( 'github_token' );
-	if ( ! token ) {
-		setFailed( 'main: Input `github_token` is required' );
+(async function main() {
+	const token = getInput('github_token');
+	if (!token) {
+		setFailed('main: Input `github_token` is required');
 		return;
 	}
 
-	const octokit = getOctokit( token );
+	const octokit = getOctokit(token);
 
 	debug(
-		`main: Received event = '${ context.eventName }', action = '${ context.payload.action }'`
+		`main: Received event = '${context.eventName}', action = '${context.payload.action}'`
 	);
 
-	for ( const { event, action, task } of automations ) {
+	for (const { event, action, task } of automations) {
 		if (
 			event === context.eventName &&
-			( action === undefined || action === context.payload.action )
+			(action === undefined || action === context.payload.action)
 		) {
 			try {
-				debug( `main: Starting task ${ task.name }` );
-				await task( context.payload, octokit );
-			} catch ( error ) {
+				debug(`main: Starting task ${task.name}`);
+				await task(context.payload, octokit);
+			} catch (error) {
 				setFailed(
-					`main: Task ${ task.name } failed with error: ${ error }`
+					`main: Task ${task.name} failed with error: ${error}`
 				);
 			}
 		}
 	}
 
-	debug( 'main: All done!' );
-} )();
+	debug('main: All done!');
+})();

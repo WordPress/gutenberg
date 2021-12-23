@@ -18,25 +18,25 @@ const { attributes: blockAttributes } = metadata;
 const deprecated = [
 	{
 		attributes: blockAttributes,
-		save( { attributes: { url, caption, type, providerNameSlug } } ) {
-			if ( ! url ) {
+		save({ attributes: { url, caption, type, providerNameSlug } }) {
+			if (!url) {
 				return null;
 			}
 
-			const embedClassName = classnames( 'wp-block-embed', {
-				[ `is-type-${ type }` ]: type,
-				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
-			} );
+			const embedClassName = classnames('wp-block-embed', {
+				[`is-type-${type}`]: type,
+				[`is-provider-${providerNameSlug}`]: providerNameSlug,
+			});
 
 			return (
-				<figure className={ embedClassName }>
-					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ ! RichText.isEmpty( caption ) && (
+				<figure className={embedClassName}>
+					{`\n${url}\n` /* URL needs to be on its own line. */}
+					{!RichText.isEmpty(caption) && (
 						<RichText.Content
 							tagName="figcaption"
-							value={ caption }
+							value={caption}
 						/>
-					) }
+					)}
 				</figure>
 			);
 		},

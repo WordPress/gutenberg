@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '../../..' );
+const DependencyExtractionWebpackPlugin = require('../../..');
 
 module.exports = {
 	entry: {
@@ -9,8 +9,8 @@ module.exports = {
 		fileB: './file-b.js',
 	},
 	plugins: [
-		new DependencyExtractionWebpackPlugin( {
+		new DependencyExtractionWebpackPlugin({
 			combineAssets: true,
-		} ),
+		}),
 	],
 };

@@ -27,20 +27,20 @@ import { store as coreStore } from '@wordpress/core-data';
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 
-function getTitle( post ) {
+function getTitle(post) {
 	return post?.title?.rendered
-		? decodeEntities( post.title.rendered )
-		: `#${ post.id } (${ __( 'no title' ) })`;
+		? decodeEntities(post.title.rendered)
+		: `#${post.id} (${__('no title')})`;
 }
 
-export const getItemPriority = ( name, searchValue ) => {
-	const normalizedName = deburr( name ).toLowerCase();
-	const normalizedSearch = deburr( searchValue ).toLowerCase();
-	if ( normalizedName === normalizedSearch ) {
+export const getItemPriority = (name, searchValue) => {
+	const normalizedName = deburr(name).toLowerCase();
+	const normalizedSearch = deburr(searchValue).toLowerCase();
+	if (normalizedName === normalizedSearch) {
 		return 0;
 	}
 
-	if ( normalizedName.startsWith( normalizedSearch ) ) {
+	if (normalizedName.startsWith(normalizedSearch)) {
 		return normalizedName.length;
 	}
 
@@ -48,21 +48,19 @@ export const getItemPriority = ( name, searchValue ) => {
 };
 
 export function PageAttributesParent() {
-	const { editPost } = useDispatch( editorStore );
-	const [ fieldValue, setFieldValue ] = useState( false );
+	const { editPost } = useDispatch(editorStore);
+	const [fieldValue, setFieldValue] = useState(false);
 	const { parentPost, parentPostId, items, postType } = useSelect(
-		( select ) => {
-			const { getPostType, getEntityRecords, getEntityRecord } = select(
-				coreStore
-			);
-			const { getCurrentPostId, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const postTypeSlug = getEditedPostAttribute( 'type' );
-			const pageId = getEditedPostAttribute( 'parent' );
-			const pType = getPostType( postTypeSlug );
+		(select) => {
+			const { getPostType, getEntityRecords, getEntityRecord } =
+				select(coreStore);
+			const { getCurrentPostId, getEditedPostAttribute } =
+				select(editorStore);
+			const postTypeSlug = getEditedPostAttribute('type');
+			const pageId = getEditedPostAttribute('parent');
+			const pType = getPostType(postTypeSlug);
 			const postId = getCurrentPostId();
-			const isHierarchical = get( pType, [ 'hierarchical' ], false );
+			const isHierarchical = get(pType, ['hierarchical'], false);
 			const query = {
 				per_page: 100,
 				exclude: postId,
@@ -73,77 +71,73 @@ export function PageAttributesParent() {
 			};
 
 			// Perform a search when the field is changed.
-			if ( !! fieldValue ) {
+			if (!!fieldValue) {
 				query.search = fieldValue;
 			}
 
 			return {
 				parentPostId: pageId,
 				parentPost: pageId
-					? getEntityRecord( 'postType', postTypeSlug, pageId )
+					? getEntityRecord('postType', postTypeSlug, pageId)
 					: null,
 				items: isHierarchical
-					? getEntityRecords( 'postType', postTypeSlug, query )
+					? getEntityRecords('postType', postTypeSlug, query)
 					: [],
 				postType: pType,
 			};
 		},
-		[ fieldValue ]
+		[fieldValue]
 	);
 
-	const isHierarchical = get( postType, [ 'hierarchical' ], false );
-	const parentPageLabel = get( postType, [ 'labels', 'parent_item_colon' ] );
+	const isHierarchical = get(postType, ['hierarchical'], false);
+	const parentPageLabel = get(postType, ['labels', 'parent_item_colon']);
 	const pageItems = items || [];
 
-	const parentOptions = useMemo( () => {
-		const getOptionsFromTree = ( tree, level = 0 ) => {
-			const mappedNodes = tree.map( ( treeNode ) => [
+	const parentOptions = useMemo(() => {
+		const getOptionsFromTree = (tree, level = 0) => {
+			const mappedNodes = tree.map((treeNode) => [
 				{
 					value: treeNode.id,
-					label:
-						repeat( '— ', level ) + unescapeString( treeNode.name ),
+					label: repeat('— ', level) + unescapeString(treeNode.name),
 					rawName: treeNode.name,
 				},
-				...getOptionsFromTree( treeNode.children || [], level + 1 ),
-			] );
+				...getOptionsFromTree(treeNode.children || [], level + 1),
+			]);
 
-			const sortedNodes = mappedNodes.sort( ( [ a ], [ b ] ) => {
-				const priorityA = getItemPriority( a.rawName, fieldValue );
-				const priorityB = getItemPriority( b.rawName, fieldValue );
+			const sortedNodes = mappedNodes.sort(([a], [b]) => {
+				const priorityA = getItemPriority(a.rawName, fieldValue);
+				const priorityB = getItemPriority(b.rawName, fieldValue);
 				return priorityA >= priorityB ? 1 : -1;
-			} );
+			});
 
-			return flatten( sortedNodes );
+			return flatten(sortedNodes);
 		};
 
-		let tree = pageItems.map( ( item ) => ( {
+		let tree = pageItems.map((item) => ({
 			id: item.id,
 			parent: item.parent,
-			name: getTitle( item ),
-		} ) );
+			name: getTitle(item),
+		}));
 
 		// Only build a hierarchical tree when not searching.
-		if ( ! fieldValue ) {
-			tree = buildTermsTree( tree );
+		if (!fieldValue) {
+			tree = buildTermsTree(tree);
 		}
 
-		const opts = getOptionsFromTree( tree );
+		const opts = getOptionsFromTree(tree);
 
 		// Ensure the current parent is in the options list.
-		const optsHasParent = find(
-			opts,
-			( item ) => item.value === parentPostId
-		);
-		if ( parentPost && ! optsHasParent ) {
-			opts.unshift( {
+		const optsHasParent = find(opts, (item) => item.value === parentPostId);
+		if (parentPost && !optsHasParent) {
+			opts.unshift({
 				value: parentPostId,
-				label: getTitle( parentPost ),
-			} );
+				label: getTitle(parentPost),
+			});
 		}
 		return opts;
-	}, [ pageItems, fieldValue ] );
+	}, [pageItems, fieldValue]);
 
-	if ( ! isHierarchical || ! parentPageLabel ) {
+	if (!isHierarchical || !parentPageLabel) {
 		return null;
 	}
 	/**
@@ -151,8 +145,8 @@ export function PageAttributesParent() {
 	 *
 	 * @param {string} inputValue The current value of the input field.
 	 */
-	const handleKeydown = ( inputValue ) => {
-		setFieldValue( inputValue );
+	const handleKeydown = (inputValue) => {
+		setFieldValue(inputValue);
 	};
 
 	/**
@@ -160,18 +154,18 @@ export function PageAttributesParent() {
 	 *
 	 * @param {Object} selectedPostId The selected Author.
 	 */
-	const handleChange = ( selectedPostId ) => {
-		editPost( { parent: selectedPostId } );
+	const handleChange = (selectedPostId) => {
+		editPost({ parent: selectedPostId });
 	};
 
 	return (
 		<ComboboxControl
 			className="editor-page-attributes__parent"
-			label={ parentPageLabel }
-			value={ parentPostId }
-			options={ parentOptions }
-			onFilterValueChange={ debounce( handleKeydown, 300 ) }
-			onChange={ handleChange }
+			label={parentPageLabel}
+			value={parentPostId}
+			options={parentOptions}
+			onFilterValueChange={debounce(handleKeydown, 300)}
+			onChange={handleChange}
 		/>
 	);
 }

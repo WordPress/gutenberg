@@ -19,17 +19,14 @@ import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
 
 // must be called to initialize jsdom before patching prototypes
-jsdom.html( '', null, null );
+jsdom.html('', null, null);
 
 const { core } = jsdomLevel1Core.dom.level1;
 const { Node, Element, CharacterData } = core;
 
 // Exception codes
-const {
-	NO_MODIFICATION_ALLOWED_ERR,
-	HIERARCHY_REQUEST_ERR,
-	NOT_FOUND_ERR,
-} = core;
+const { NO_MODIFICATION_ALLOWED_ERR, HIERARCHY_REQUEST_ERR, NOT_FOUND_ERR } =
+	core;
 
 /**
  * Simple recursive implementation of Node.contains method
@@ -42,12 +39,12 @@ const {
  * paths that make use of functions in the Gutenberg (web) project, which has
  * expectation that this is implemented (as it is in the browser environment).
  */
-Node.prototype.contains = function ( otherNode ) {
+Node.prototype.contains = function (otherNode) {
 	return (
 		this === otherNode ||
-		Array.prototype.some.call( this._childNodes, ( childNode ) => {
-			return childNode.contains( otherNode );
-		} )
+		Array.prototype.some.call(this._childNodes, (childNode) => {
+			return childNode.contains(otherNode);
+		})
 	);
 };
 
@@ -68,7 +65,7 @@ Node.prototype.insertBefore = function (
 	/* Node */ newChild,
 	/* Node*/ refChild
 ) {
-	if ( this._readonly === true ) {
+	if (this._readonly === true) {
 		throw new core.DOMException(
 			NO_MODIFICATION_ALLOWED_ERR,
 			'Attempting to modify a read-only node'
@@ -76,7 +73,7 @@ Node.prototype.insertBefore = function (
 	}
 
 	// Adopt unowned children, for weird nodes like DocumentType
-	if ( ! newChild._ownerDocument ) {
+	if (!newChild._ownerDocument) {
 		newChild._ownerDocument = this._ownerDocument;
 	}
 
@@ -90,42 +87,42 @@ Node.prototype.insertBefore = function (
 	}
 	*/
 
-	if ( newChild.nodeType && newChild.nodeType === newChild.ATTRIBUTE_NODE ) {
-		throw new core.DOMException( HIERARCHY_REQUEST_ERR );
+	if (newChild.nodeType && newChild.nodeType === newChild.ATTRIBUTE_NODE) {
+		throw new core.DOMException(HIERARCHY_REQUEST_ERR);
 	}
 
 	// search for parents matching the newChild
 	let current = this;
 	do {
-		if ( current === newChild ) {
-			throw new core.DOMException( HIERARCHY_REQUEST_ERR );
+		if (current === newChild) {
+			throw new core.DOMException(HIERARCHY_REQUEST_ERR);
 		}
-	} while ( ( current = current._parentNode ) );
+	} while ((current = current._parentNode));
 
 	// fragments are merged into the element
-	if ( newChild.nodeType === newChild.DOCUMENT_FRAGMENT_NODE ) {
+	if (newChild.nodeType === newChild.DOCUMENT_FRAGMENT_NODE) {
 		let tmpNode,
 			i = newChild._childNodes.length;
-		while ( i-- > 0 ) {
-			tmpNode = newChild.removeChild( newChild.firstChild );
-			this.insertBefore( tmpNode, refChild );
+		while (i-- > 0) {
+			tmpNode = newChild.removeChild(newChild.firstChild);
+			this.insertBefore(tmpNode, refChild);
 		}
-	} else if ( newChild === refChild ) {
+	} else if (newChild === refChild) {
 		return newChild;
 	} else {
 		// if the newChild is already in the tree elsewhere, remove it first
-		if ( newChild._parentNode ) {
-			newChild._parentNode.removeChild( newChild );
+		if (newChild._parentNode) {
+			newChild._parentNode.removeChild(newChild);
 		}
 
-		if ( refChild === null ) {
+		if (refChild === null) {
 			// eslint-disable-next-line no-var
 			var refChildIndex = this._childNodes.length;
 		} else {
 			// eslint-disable-next-line no-redeclare, no-var
-			var refChildIndex = this._indexOf( refChild );
-			if ( refChildIndex === -1 ) {
-				throw new core.DOMException( NOT_FOUND_ERR );
+			var refChildIndex = this._indexOf(refChild);
+			if (refChildIndex === -1) {
+				throw new core.DOMException(NOT_FOUND_ERR);
 			}
 		}
 
@@ -137,7 +134,7 @@ Node.prototype.insertBefore = function (
 		);
 
 		newChild._parentNode = this;
-		if ( this._attached && newChild._attach ) {
+		if (this._attached && newChild._attach) {
 			newChild._attach();
 		}
 
@@ -161,10 +158,10 @@ Element.prototype.matches = Element.prototype.matchesSelector;
  * Implementation of Element.prototype.closest that it's missing from the jsdom-jscore fork we're using.
  * See https://github.com/wordpress-mobile/gutenberg-mobile/issues/1625
  */
-Element.prototype.closest = function ( selector ) {
+Element.prototype.closest = function (selector) {
 	let el = this;
-	while ( el ) {
-		if ( el.matches( selector ) ) {
+	while (el) {
+		if (el.matches(selector)) {
 			return el;
 		}
 		el = el.parentElement;
@@ -183,12 +180,12 @@ Element.prototype.closest = function ( selector ) {
  * nextElementSibling properties.
  * See: https://dom.spec.whatwg.org/#interface-nondocumenttypechildnode
  */
-function isNonDocumentTypeChildNode( node ) {
+function isNonDocumentTypeChildNode(node) {
 	return node instanceof Element || node instanceof CharacterData;
 }
 
 // $FlowFixMe
-Object.defineProperties( Node.prototype, {
+Object.defineProperties(Node.prototype, {
 	/*
 	 * This defines parentElement property on the Node prototype using a getter.
 	 * See: https://dom.spec.whatwg.org/#parent-element
@@ -197,7 +194,7 @@ Object.defineProperties( Node.prototype, {
 		get() {
 			const parent = this.parentNode;
 
-			if ( parent && parent.nodeType === parent.ELEMENT_NODE ) {
+			if (parent && parent.nodeType === parent.ELEMENT_NODE) {
 				return parent;
 			}
 
@@ -212,13 +209,13 @@ Object.defineProperties( Node.prototype, {
 	previousElementSibling: {
 		get() {
 			// Property is undefined if node is not a NonDocumentTypeChildNode
-			if ( ! isNonDocumentTypeChildNode( this ) ) {
+			if (!isNonDocumentTypeChildNode(this)) {
 				return;
 			}
 
 			let sibling = this.previousSibling;
 
-			while ( sibling && sibling.nodeType !== sibling.ELEMENT_NODE ) {
+			while (sibling && sibling.nodeType !== sibling.ELEMENT_NODE) {
 				sibling = sibling.previousSibling;
 			}
 
@@ -233,27 +230,27 @@ Object.defineProperties( Node.prototype, {
 	nextElementSibling: {
 		get() {
 			// Property is undefined if node is not a NonDocumentTypeChildNode
-			if ( ! isNonDocumentTypeChildNode( this ) ) {
+			if (!isNonDocumentTypeChildNode(this)) {
 				return;
 			}
 
 			let sibling = this.nextSibling;
 
-			while ( sibling && sibling.nodeType !== sibling.ELEMENT_NODE ) {
+			while (sibling && sibling.nodeType !== sibling.ELEMENT_NODE) {
 				sibling = sibling.nextSibling;
 			}
 
 			return sibling;
 		},
 	},
-} );
+});
 
 class DOMParser {
 	// This is required for the stripHTML function, but it doesn't necessarily
 	// conform to the DOM standard.
 	// See https://github.com/wordpress-mobile/gutenberg-mobile/pull/1771
-	parseFromString( string ) {
-		return jsdom.html( string );
+	parseFromString(string) {
+		return jsdom.html(string);
 	}
 }
 

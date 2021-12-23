@@ -9,7 +9,7 @@ import {
 } from '@wordpress/block-editor';
 
 const name = 'core/underline';
-const title = __( 'Underline' );
+const title = __('Underline');
 
 export const underline = {
 	name,
@@ -19,16 +19,16 @@ export const underline = {
 	attributes: {
 		style: 'style',
 	},
-	edit( { value, onChange } ) {
+	edit({ value, onChange }) {
 		const onToggle = () => {
 			onChange(
-				toggleFormat( value, {
+				toggleFormat(value, {
 					type: name,
 					attributes: {
 						style: 'text-decoration: underline;',
 					},
 					title,
-				} )
+				})
 			);
 		};
 
@@ -37,11 +37,11 @@ export const underline = {
 				<RichTextShortcut
 					type="primary"
 					character="u"
-					onUse={ onToggle }
+					onUse={onToggle}
 				/>
 				<__unstableRichTextInputEvent
 					inputType="formatUnderline"
-					onInput={ onToggle }
+					onInput={onToggle}
 				/>
 			</>
 		);

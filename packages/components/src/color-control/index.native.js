@@ -3,20 +3,14 @@
  */
 import ColorCell from '../mobile/bottom-sheet/color-cell';
 
-function ColorControl( {
-	label,
-	onPress,
-	color,
-	withColorIndicator,
-	...props
-} ) {
+function ColorControl({ label, onPress, color, withColorIndicator, ...props }) {
 	return (
 		<ColorCell
-			label={ label }
-			onPress={ onPress }
-			color={ color }
-			withColorIndicator={ withColorIndicator }
-			{ ...props }
+			label={label}
+			onPress={onPress}
+			color={color}
+			withColorIndicator={withColorIndicator}
+			{...props}
 		/>
 	);
 }

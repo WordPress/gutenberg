@@ -1,14 +1,14 @@
 module.exports = {
-	extends: [ 'plugin:react/recommended' ],
+	extends: ['plugin:react/recommended'],
 	parserOptions: {
 		ecmaFeatures: {
 			jsx: true,
 		},
 	},
 	settings: {
-		'import/extensions': [ '.js', '.jsx' ],
+		'import/extensions': ['.js', '.jsx'],
 	},
-	plugins: [ '@wordpress', 'react', 'react-hooks' ],
+	plugins: ['@wordpress', 'react', 'react-hooks'],
 	rules: {
 		'@wordpress/no-unused-vars-before-return': [
 			'error',
@@ -25,8 +25,8 @@ module.exports = {
 			},
 		],
 		'react/jsx-equals-spacing': 'error',
-		'react/jsx-indent': [ 'error', 'tab' ],
-		'react/jsx-indent-props': [ 'error', 'tab' ],
+		'react/jsx-indent': ['error', 'tab'],
+		'react/jsx-indent-props': ['error', 'tab'],
 		'react/jsx-key': 'error',
 		'react/jsx-tag-spacing': 'error',
 		'react/no-children-prop': 'off',

@@ -14,20 +14,20 @@ import { __ } from '@wordpress/i18n';
 import { useNavigationContext } from '../context';
 import { ItemBaseUI, ItemUI } from '../styles/navigation-styles';
 
-export default function NavigationSearchNoResultsFound( { search } ) {
+export default function NavigationSearchNoResultsFound({ search }) {
 	const {
 		navigationTree: { items },
 	} = useNavigationContext();
 
-	const resultsCount = filter( items, '_isVisible' ).length;
+	const resultsCount = filter(items, '_isVisible').length;
 
-	if ( ! search || !! resultsCount ) {
+	if (!search || !!resultsCount) {
 		return null;
 	}
 
 	return (
 		<ItemBaseUI>
-			<ItemUI>{ __( 'No results found.' ) } </ItemUI>
+			<ItemUI>{__('No results found.')} </ItemUI>
 		</ItemBaseUI>
 	);
 }

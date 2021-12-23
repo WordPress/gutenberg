@@ -11,9 +11,9 @@
  *
  * @return {boolean} True if the argument contains a valid authority.
  */
-export function isValidAuthority( authority ) {
-	if ( ! authority ) {
+export function isValidAuthority(authority) {
+	if (!authority) {
 		return false;
 	}
-	return /^[^\s#?]+$/.test( authority );
+	return /^[^\s#?]+$/.test(authority);
 }

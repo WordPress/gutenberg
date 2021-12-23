@@ -24,7 +24,7 @@ import { useCallback, useMemo } from '@wordpress/element';
  */
 import type ColorPicker from './component';
 
-type ColorPickerProps = ComponentProps< typeof ColorPicker >;
+type ColorPickerProps = ComponentProps<typeof ColorPicker>;
 
 /**
  * @deprecated
@@ -54,7 +54,7 @@ export interface LegacyProps {
 	/**
 	 * @deprecated
 	 */
-	onChangeComplete: ( colors: LegacyColor ) => void;
+	onChangeComplete: (colors: LegacyColor) => void;
 	/**
 	 * @deprecated
 	 */
@@ -66,7 +66,7 @@ export interface LegacyProps {
 	disableAlpha: boolean;
 }
 
-function isLegacyProps( props: any ): props is LegacyProps {
+function isLegacyProps(props: any): props is LegacyProps {
 	return (
 		typeof props.onChangeComplete !== 'undefined' ||
 		typeof props.disableAlpha !== 'undefined' ||
@@ -74,21 +74,21 @@ function isLegacyProps( props: any ): props is LegacyProps {
 	);
 }
 
-function getColorFromLegacyProps( props: LegacyProps ): string | undefined {
-	if ( typeof props?.color === 'undefined' ) {
+function getColorFromLegacyProps(props: LegacyProps): string | undefined {
+	if (typeof props?.color === 'undefined') {
 		return undefined;
 	}
-	if ( typeof props.color === 'string' ) {
+	if (typeof props.color === 'string') {
 		return props.color;
 	}
-	if ( props.color.hex ) {
+	if (props.color.hex) {
 		return props.color.hex;
 	}
 }
 
 const transformColorStringToLegacyColor = memoize(
-	( color: string ): LegacyColor => {
-		const colordColor = colord( color );
+	(color: string): LegacyColor => {
+		const colordColor = colord(color);
 		const hex = colordColor.toHex();
 		const rgb = colordColor.toRgb();
 		const hsv = colordColor.toHsv();
@@ -109,38 +109,36 @@ export function useDeprecatedProps(
 	props: LegacyProps | ColorPickerProps
 ): ColorPickerProps {
 	const onChange = useCallback(
-		( color: string ) => {
-			if ( isLegacyProps( props ) ) {
+		(color: string) => {
+			if (isLegacyProps(props)) {
 				return props.onChangeComplete(
-					transformColorStringToLegacyColor( color )
+					transformColorStringToLegacyColor(color)
 				);
 			}
 
-			return props.onChange?.( color );
+			return props.onChange?.(color);
 		},
 		[
-			( props as LegacyProps ).onChangeComplete,
-			( props as ColorPickerProps ).onChange,
+			(props as LegacyProps).onChangeComplete,
+			(props as ColorPickerProps).onChange,
 		]
 	);
 
-	const color = useMemo( () => {
-		return isLegacyProps( props )
-			? getColorFromLegacyProps( props )
+	const color = useMemo(() => {
+		return isLegacyProps(props)
+			? getColorFromLegacyProps(props)
 			: props.color;
-	}, [ props.color ] );
+	}, [props.color]);
 
-	const enableAlpha = useMemo( () => {
-		return isLegacyProps( props )
-			? ! props.disableAlpha
-			: props.enableAlpha;
+	const enableAlpha = useMemo(() => {
+		return isLegacyProps(props) ? !props.disableAlpha : props.enableAlpha;
 	}, [
-		( props as LegacyProps ).disableAlpha,
-		( props as ColorPickerProps ).enableAlpha,
-	] );
+		(props as LegacyProps).disableAlpha,
+		(props as ColorPickerProps).enableAlpha,
+	]);
 
 	return {
-		...( isLegacyProps( props ) ? {} : props ),
+		...(isLegacyProps(props) ? {} : props),
 		onChange,
 		color,
 		enableAlpha,

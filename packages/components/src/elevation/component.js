@@ -9,10 +9,10 @@ import { useElevation } from './hook';
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                        forwardedRef
  */
-function Elevation( props, forwardedRef ) {
-	const elevationProps = useElevation( props );
+function Elevation(props, forwardedRef) {
+	const elevationProps = useElevation(props);
 
-	return <View { ...elevationProps } ref={ forwardedRef } />;
+	return <View {...elevationProps} ref={forwardedRef} />;
 }
 
 /**
@@ -38,6 +38,6 @@ function Elevation( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedElevation = contextConnect( Elevation, 'Elevation' );
+const ConnectedElevation = contextConnect(Elevation, 'Elevation');
 
 export default ConnectedElevation;

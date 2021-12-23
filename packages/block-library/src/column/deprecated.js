@@ -20,26 +20,27 @@ const deprecated = [
 				max: 100,
 			},
 		},
-		isEligible( { width } ) {
-			return isFinite( width );
+		isEligible({ width }) {
+			return isFinite(width);
 		},
-		migrate( attributes ) {
+		migrate(attributes) {
 			return {
 				...attributes,
-				width: `${ attributes.width }%`,
+				width: `${attributes.width}%`,
 			};
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { verticalAlignment, width } = attributes;
 
-			const wrapperClasses = classnames( {
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-			} );
+			const wrapperClasses = classnames({
+				[`is-vertically-aligned-${verticalAlignment}`]:
+					verticalAlignment,
+			});
 
 			const style = { flexBasis: width + '%' };
 
 			return (
-				<div className={ wrapperClasses } style={ style }>
+				<div className={wrapperClasses} style={style}>
 					<InnerBlocks.Content />
 				</div>
 			);

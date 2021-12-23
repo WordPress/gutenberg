@@ -3,9 +3,9 @@
  */
 import { isFeatureActive } from '../selectors';
 
-describe( 'selectors', () => {
-	describe( 'isFeatureActive', () => {
-		it( 'returns false if the there is no state for the feature', () => {
+describe('selectors', () => {
+	describe('isFeatureActive', () => {
+		it('returns false if the there is no state for the feature', () => {
 			const emptyState = {
 				preferenceDefaults: {
 					features: {},
@@ -16,11 +16,11 @@ describe( 'selectors', () => {
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( false );
-		} );
+				isFeatureActive(emptyState, 'test-scope', 'testFeatureName')
+			).toBe(false);
+		});
 
-		it( 'returns false if the the default for a feature is false and there is no preference state', () => {
+		it('returns false if the the default for a feature is false and there is no preference state', () => {
 			const emptyState = {
 				preferenceDefaults: {
 					features: {
@@ -35,11 +35,11 @@ describe( 'selectors', () => {
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( false );
-		} );
+				isFeatureActive(emptyState, 'test-scope', 'testFeatureName')
+			).toBe(false);
+		});
 
-		it( 'returns true if the the default for a feature is true and there is no preference state', () => {
+		it('returns true if the the default for a feature is true and there is no preference state', () => {
 			const emptyState = {
 				preferenceDefaults: {
 					features: {
@@ -54,11 +54,11 @@ describe( 'selectors', () => {
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( true );
-		} );
+				isFeatureActive(emptyState, 'test-scope', 'testFeatureName')
+			).toBe(true);
+		});
 
-		it( 'returns true if the the default for a feature is false but the preference is true', () => {
+		it('returns true if the the default for a feature is false but the preference is true', () => {
 			const emptyState = {
 				preferenceDefaults: {
 					features: {
@@ -77,11 +77,11 @@ describe( 'selectors', () => {
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( true );
-		} );
+				isFeatureActive(emptyState, 'test-scope', 'testFeatureName')
+			).toBe(true);
+		});
 
-		it( 'returns false if the the default for a feature is true but the preference is false', () => {
+		it('returns false if the the default for a feature is true but the preference is false', () => {
 			const emptyState = {
 				preferenceDefaults: {
 					features: {
@@ -100,8 +100,8 @@ describe( 'selectors', () => {
 			};
 
 			expect(
-				isFeatureActive( emptyState, 'test-scope', 'testFeatureName' )
-			).toBe( false );
-		} );
-	} );
-} );
+				isFeatureActive(emptyState, 'test-scope', 'testFeatureName')
+			).toBe(false);
+		});
+	});
+});

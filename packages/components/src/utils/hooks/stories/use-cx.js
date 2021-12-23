@@ -17,11 +17,11 @@ export default {
 	title: 'Components (Experimental)/useCx',
 };
 
-const IFrame = ( { children } ) => {
-	const [ iframeDocument, setIframeDocument ] = useState();
+const IFrame = ({ children }) => {
+	const [iframeDocument, setIframeDocument] = useState();
 
-	const handleRef = ( node ) => {
-		if ( ! node ) {
+	const handleRef = (node) => {
+		if (!node) {
 			return null;
 		}
 
@@ -29,40 +29,40 @@ const IFrame = ( { children } ) => {
 			const { contentDocument } = node;
 			const { readyState } = contentDocument;
 
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
+			if (readyState !== 'interactive' && readyState !== 'complete') {
 				return false;
 			}
 
-			setIframeDocument( contentDocument );
+			setIframeDocument(contentDocument);
 		}
 
-		if ( setIfReady() ) {
+		if (setIfReady()) {
 			return;
 		}
 
-		node.addEventListener( 'load', () => {
+		node.addEventListener('load', () => {
 			// iframe isn't immediately ready in Firefox
 			setIfReady();
-		} );
+		});
 	};
 
 	return (
-		<iframe ref={ handleRef } title="use-cx-test-frame">
-			{ iframeDocument &&
+		<iframe ref={handleRef} title="use-cx-test-frame">
+			{iframeDocument &&
 				createPortal(
-					<StyleProvider document={ iframeDocument }>
-						{ children }
+					<StyleProvider document={iframeDocument}>
+						{children}
 					</StyleProvider>,
 					iframeDocument.body
-				) }
+				)}
 		</iframe>
 	);
 };
 
-const Example = ( { args, children } ) => {
+const Example = ({ args, children }) => {
 	const cx = useCx();
-	const classes = cx( ...args );
-	return <span className={ classes }>{ children }</span>;
+	const classes = cx(...args);
+	return <span className={classes}>{children}</span>;
 };
 
 export const _default = () => {
@@ -71,7 +71,7 @@ export const _default = () => {
 	`;
 	return (
 		<IFrame>
-			<Example args={ [ redText ] }>
+			<Example args={[redText]}>
 				This text is inside an iframe and is red!
 			</Example>
 		</IFrame>

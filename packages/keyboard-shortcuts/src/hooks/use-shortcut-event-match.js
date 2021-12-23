@@ -16,9 +16,7 @@ import { store as keyboardShortcutsStore } from '../store';
  *                    predefined shortcut combination.
  */
 export default function useShortcutEventMatch() {
-	const { getAllShortcutKeyCombinations } = useSelect(
-		keyboardShortcutsStore
-	);
+	const { getAllShortcutKeyCombinations } = useSelect(keyboardShortcutsStore);
 
 	/**
 	 * A function to check if a keyboard event matches a predefined shortcut
@@ -29,10 +27,10 @@ export default function useShortcutEventMatch() {
 	 *
 	 * @return {boolean} True if the event matches any shortcuts, false if not.
 	 */
-	function isMatch( name, event ) {
-		return getAllShortcutKeyCombinations( name ).some(
-			( { modifier, character } ) => {
-				return isKeyboardEvent[ modifier ]( event, character );
+	function isMatch(name, event) {
+		return getAllShortcutKeyCombinations(name).some(
+			({ modifier, character }) => {
+				return isKeyboardEvent[modifier](event, character);
 			}
 		);
 	}

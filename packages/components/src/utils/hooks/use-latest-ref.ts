@@ -19,12 +19,12 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  * @param  value The value to reference
  * @return The prop reference.
  */
-export function useLatestRef< T >( value: T ): RefObject< T > {
-	const ref = useRef( value );
+export function useLatestRef<T>(value: T): RefObject<T> {
+	const ref = useRef(value);
 
-	useIsomorphicLayoutEffect( () => {
+	useIsomorphicLayoutEffect(() => {
 		ref.current = value;
-	} );
+	});
 
 	return ref;
 }

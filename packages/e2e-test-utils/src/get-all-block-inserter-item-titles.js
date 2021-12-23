@@ -14,16 +14,16 @@ export async function getAllBlockInserterItemTitles() {
 	// Ideally, we shouldn't use a timeout and instead check the browser is idle for
 	// a specific duration, but didn't manage to find a simple way to do that.
 	// eslint-disable-next-line no-restricted-syntax
-	await page.waitForTimeout( 500 );
+	await page.waitForTimeout(500);
 
-	const inserterItemTitles = await page.evaluate( () => {
+	const inserterItemTitles = await page.evaluate(() => {
 		return Array.from(
 			document.querySelectorAll(
 				'.block-editor-block-types-list__item-title'
 			)
-		).map( ( inserterItem ) => {
+		).map((inserterItem) => {
 			return inserterItem.innerText;
-		} );
-	} );
-	return sortBy( uniq( inserterItemTitles ) );
+		});
+	});
+	return sortBy(uniq(inserterItemTitles));
 }

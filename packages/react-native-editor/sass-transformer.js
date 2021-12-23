@@ -32,20 +32,20 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const path = require( 'path' );
+const fs = require('fs');
+const path = require('path');
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-const sass = require( 'sass' );
+const sass = require('sass');
 // eslint-disable-next-line import/no-extraneous-dependencies
-const css2rn = require( 'css-to-react-native-transform' ).default;
+const css2rn = require('css-to-react-native-transform').default;
 // eslint-disable-next-line import/no-extraneous-dependencies
-const upstreamTransformer = require( 'metro-react-native-babel-transformer' );
+const upstreamTransformer = require('metro-react-native-babel-transformer');
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config
 const autoImportIncludePaths = [
-	path.join( path.dirname( __filename ), 'src' ),
-	path.join( path.dirname( __filename ), '../base-styles' ),
+	path.join(path.dirname(__filename), 'src'),
+	path.join(path.dirname(__filename), '../base-styles'),
 ];
 const autoImportAssets = [
 	'_variables.scss',
@@ -56,22 +56,21 @@ const autoImportAssets = [
 	'_animations.scss',
 	'_z-index.scss',
 ];
-const imports =
-	'@import "' + autoImportAssets.join( '";\n@import "' ) + '";\n\n';
+const imports = '@import "' + autoImportAssets.join('";\n@import "') + '";\n\n';
 
 // Iterate through the include paths and extensions to find the file variant
-function findVariant( name, extensions, includePaths ) {
-	for ( let i = 0; i < includePaths.length; i++ ) {
-		const includePath = includePaths[ i ];
+function findVariant(name, extensions, includePaths) {
+	for (let i = 0; i < includePaths.length; i++) {
+		const includePath = includePaths[i];
 
 		// try to find the file iterating through the extensions, in order.
-		const foundExtention = extensions.find( ( extension ) => {
+		const foundExtention = extensions.find((extension) => {
 			const fname = includePath + '/' + name + extension;
 			const partialfname = includePath + '/_' + name + extension;
-			return fs.existsSync( fname ) || fs.existsSync( partialfname );
-		} );
+			return fs.existsSync(fname) || fs.existsSync(partialfname);
+		});
 
-		if ( foundExtention ) {
+		if (foundExtention) {
 			return includePath + '/' + name + foundExtention;
 		}
 	}
@@ -81,10 +80,10 @@ function findVariant( name, extensions, includePaths ) {
 
 // Transform function taken from react-native-sass-transformer but extended to have more include paths
 //  and detect and use RN platform specific file variants
-function transform( src, filename, options ) {
-	if ( typeof src === 'object' ) {
+function transform(src, filename, options) {
+	if (typeof src === 'object') {
 		// handle RN >= 0.46
-		( { src, filename, options } = src );
+		({ src, filename, options } = src);
 	}
 
 	const exts = [
@@ -94,57 +93,52 @@ function transform( src, filename, options ) {
 		'.scss',
 	];
 
-	if ( filename.endsWith( '.scss' ) || filename.endsWith( '.sass' ) ) {
-		const result = sass.renderSync( {
+	if (filename.endsWith('.scss') || filename.endsWith('.sass')) {
+		const result = sass.renderSync({
 			data: src,
-			includePaths: [
-				path.dirname( filename ),
-				...autoImportIncludePaths,
-			],
-			importer( url /*, prev, done */ ) {
+			includePaths: [path.dirname(filename), ...autoImportIncludePaths],
+			importer(url /*, prev, done */) {
 				// url is the path in import as is, which LibSass encountered.
 				// prev is the previously resolved path.
 				// done is an optional callback, either consume it or return value synchronously.
 				// this.options contains this options hash, this.callback contains the node-style callback
 
-				const urlPath = path.parse( url );
+				const urlPath = path.parse(url);
 				const importerOptions = this.options;
 				const incPaths = importerOptions.includePaths
-					.slice( 0 )
-					.split( ':' );
-				if ( urlPath.dir.length > 0 ) {
+					.slice(0)
+					.split(':');
+				if (urlPath.dir.length > 0) {
 					incPaths.unshift(
-						path.resolve( path.dirname( filename ), urlPath.dir )
+						path.resolve(path.dirname(filename), urlPath.dir)
 					); // add the file's dir to the search array
 				}
-				const f = findVariant( urlPath.name, exts, incPaths );
+				const f = findVariant(urlPath.name, exts, incPaths);
 
-				if ( f ) {
+				if (f) {
 					return { file: f };
 				}
 
-				return new Error(
-					url + ' could not be resolved in ' + incPaths
-				);
+				return new Error(url + ' could not be resolved in ' + incPaths);
 			},
-		} );
+		});
 		const css = result.css.toString();
-		const cssObject = css2rn( css, { parseMediaQueries: true } );
+		const cssObject = css2rn(css, { parseMediaQueries: true });
 
-		return upstreamTransformer.transform( {
-			src: 'module.exports = ' + JSON.stringify( cssObject ),
+		return upstreamTransformer.transform({
+			src: 'module.exports = ' + JSON.stringify(cssObject),
 			filename,
 			options,
-		} );
+		});
 	}
-	return upstreamTransformer.transform( { src, filename, options } );
+	return upstreamTransformer.transform({ src, filename, options });
 }
 
-module.exports.transform = function ( { src, filename, options } ) {
-	if ( filename.endsWith( '.scss' ) || filename.endsWith( '.sass' ) ) {
+module.exports.transform = function ({ src, filename, options }) {
+	if (filename.endsWith('.scss') || filename.endsWith('.sass')) {
 		// "auto-import" the stylesheets the GB webpack config imports
 		src = imports + src;
-		return transform( { src, filename, options } );
+		return transform({ src, filename, options });
 	}
-	return upstreamTransformer.transform( { src, filename, options } );
+	return upstreamTransformer.transform({ src, filename, options });
 };

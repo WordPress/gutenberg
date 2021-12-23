@@ -9,13 +9,13 @@ import { css } from '@emotion/react';
 import { CONFIG, COLORS } from '../utils';
 
 export const Surface = css`
-	background-color: ${ CONFIG.surfaceColor };
-	color: ${ COLORS.black };
+	background-color: ${CONFIG.surfaceColor};
+	color: ${COLORS.black};
 	position: relative;
 `;
 
 export const background = css`
-	background-color: ${ CONFIG.surfaceBackgroundColor };
+	background-color: ${CONFIG.surfaceBackgroundColor};
 `;
 
 /**
@@ -25,74 +25,70 @@ export const background = css`
  * @param {boolean} [props.borderRight]
  * @param {boolean} [props.borderTop]
  */
-export function getBorders( {
+export function getBorders({
 	borderBottom,
 	borderLeft,
 	borderRight,
 	borderTop,
-} ) {
-	const borderStyle = `1px solid ${ CONFIG.surfaceBorderColor }`;
+}) {
+	const borderStyle = `1px solid ${CONFIG.surfaceBorderColor}`;
 
-	return css( {
+	return css({
 		borderBottom: borderBottom ? borderStyle : undefined,
 		borderLeft: borderLeft ? borderStyle : undefined,
 		borderRight: borderRight ? borderStyle : undefined,
 		borderTop: borderTop ? borderStyle : undefined,
-	} );
+	});
 }
 
 export const primary = css``;
 
 export const secondary = css`
-	background: ${ CONFIG.surfaceBackgroundTintColor };
+	background: ${CONFIG.surfaceBackgroundTintColor};
 `;
 
 export const tertiary = css`
-	background: ${ CONFIG.surfaceBackgroundTertiaryColor };
+	background: ${CONFIG.surfaceBackgroundTertiaryColor};
 `;
 
 /**
  * @param {string} surfaceBackgroundSize
  */
-const customBackgroundSize = ( surfaceBackgroundSize ) =>
-	[ surfaceBackgroundSize, surfaceBackgroundSize ].join( ' ' );
+const customBackgroundSize = (surfaceBackgroundSize) =>
+	[surfaceBackgroundSize, surfaceBackgroundSize].join(' ');
 
 /**
  * @param {string} surfaceBackgroundSizeDotted
  */
-const dottedBackground1 = ( surfaceBackgroundSizeDotted ) =>
+const dottedBackground1 = (surfaceBackgroundSizeDotted) =>
 	[
 		'90deg',
-		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
-			' '
-		),
+		[CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted].join(' '),
 		'transparent 1%',
-	].join( ',' );
+	].join(',');
 
 /**
  * @param {string} surfaceBackgroundSizeDotted
  */
-const dottedBackground2 = ( surfaceBackgroundSizeDotted ) =>
+const dottedBackground2 = (surfaceBackgroundSizeDotted) =>
 	[
-		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
-			' '
-		),
+		[CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted].join(' '),
 		'transparent 1%',
-	].join( ',' );
+	].join(',');
 
 /**
  * @param {string} surfaceBackgroundSizeDotted
  */
-const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted ) =>
+const dottedBackgroundCombined = (surfaceBackgroundSizeDotted) =>
 	[
-		`linear-gradient( ${ dottedBackground1(
+		`linear-gradient( ${dottedBackground1(
 			surfaceBackgroundSizeDotted
-		) } ) center`,
-		`linear-gradient( ${ dottedBackground2(
+		)} ) center`,
+		`linear-gradient( ${dottedBackground2(
 			surfaceBackgroundSizeDotted
-		) } ) center`,
+		)} ) center`,
 		CONFIG.surfaceBorderBoldColor,
-	].join( ',' );
+	].join(',');
 
 /**
  *
@@ -103,35 +99,35 @@ export const getDotted = (
 	surfaceBackgroundSize,
 	surfaceBackgroundSizeDotted
 ) => css`
-	background: ${ dottedBackgroundCombined( surfaceBackgroundSizeDotted ) };
-	background-size: ${ customBackgroundSize( surfaceBackgroundSize ) };
+	background: ${dottedBackgroundCombined(surfaceBackgroundSizeDotted)};
+	background-size: ${customBackgroundSize(surfaceBackgroundSize)};
 `;
 
 const gridBackground1 = [
-	`${ CONFIG.surfaceBorderSubtleColor } 1px`,
+	`${CONFIG.surfaceBorderSubtleColor} 1px`,
 	'transparent 1px',
-].join( ',' );
+].join(',');
 
 const gridBackground2 = [
 	'90deg',
-	`${ CONFIG.surfaceBorderSubtleColor } 1px`,
+	`${CONFIG.surfaceBorderSubtleColor} 1px`,
 	'transparent 1px',
-].join( ',' );
+].join(',');
 
 const gridBackgroundCombined = [
-	`linear-gradient( ${ gridBackground1 } )`,
-	`linear-gradient( ${ gridBackground2 } )`,
-].join( ',' );
+	`linear-gradient( ${gridBackground1} )`,
+	`linear-gradient( ${gridBackground2} )`,
+].join(',');
 
 /**
  * @param {string} surfaceBackgroundSize
  * @return {import('@emotion/react').SerializedStyles} CSS.
  */
-export const getGrid = ( surfaceBackgroundSize ) => {
+export const getGrid = (surfaceBackgroundSize) => {
 	return css`
-		background: ${ CONFIG.surfaceBackgroundColor };
-		background-image: ${ gridBackgroundCombined };
-		background-size: ${ customBackgroundSize( surfaceBackgroundSize ) };
+		background: ${CONFIG.surfaceBackgroundColor};
+		background-image: ${gridBackgroundCombined};
+		background-size: ${customBackgroundSize(surfaceBackgroundSize)};
 	`;
 };
 
@@ -145,7 +141,7 @@ export const getVariant = (
 	surfaceBackgroundSize,
 	surfaceBackgroundSizeDotted
 ) => {
-	switch ( variant ) {
+	switch (variant) {
 		case 'dotted': {
 			return getDotted(
 				surfaceBackgroundSize,
@@ -153,7 +149,7 @@ export const getVariant = (
 			);
 		}
 		case 'grid': {
-			return getGrid( surfaceBackgroundSize );
+			return getGrid(surfaceBackgroundSize);
 		}
 		case 'primary': {
 			return primary;

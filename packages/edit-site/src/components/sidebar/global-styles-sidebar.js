@@ -14,41 +14,41 @@ import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 
 export default function GlobalStylesSidebar() {
-	const [ canReset, onReset ] = useGlobalStylesReset();
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const [canReset, onReset] = useGlobalStylesReset();
+	const { toggleFeature } = useDispatch(editSiteStore);
 
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
 			identifier="edit-site/global-styles"
-			title={ __( 'Styles' ) }
-			icon={ styles }
-			closeLabel={ __( 'Close global styles sidebar' ) }
+			title={__('Styles')}
+			icon={styles}
+			closeLabel={__('Close global styles sidebar')}
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
 				<Flex>
 					<FlexBlock>
-						<strong>{ __( 'Styles' ) }</strong>
+						<strong>{__('Styles')}</strong>
 						<span className="edit-site-global-styles-sidebar__beta">
-							{ __( 'Beta' ) }
+							{__('Beta')}
 						</span>
 					</FlexBlock>
 					<FlexItem>
 						<DropdownMenu
-							icon={ moreVertical }
-							label={ __( 'More Global Styles Actions' ) }
-							toggleProps={ { disabled: ! canReset } }
-							controls={ [
+							icon={moreVertical}
+							label={__('More Global Styles Actions')}
+							toggleProps={{ disabled: !canReset }}
+							controls={[
 								{
-									title: __( 'Reset to defaults' ),
+									title: __('Reset to defaults'),
 									onClick: onReset,
 								},
 								{
-									title: __( 'Welcome Guide' ),
+									title: __('Welcome Guide'),
 									onClick: () =>
-										toggleFeature( 'welcomeGuideStyles' ),
+										toggleFeature('welcomeGuideStyles'),
 								},
-							] }
+							]}
 						/>
 					</FlexItem>
 				</Flex>

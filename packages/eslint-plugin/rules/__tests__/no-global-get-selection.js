@@ -8,13 +8,13 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../no-global-get-selection';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 	},
-} );
+});
 
-ruleTester.run( 'no-global-get-selection', rule, {
+ruleTester.run('no-global-get-selection', rule, {
 	valid: [
 		{
 			code: 'defaultView.getSelection();',
@@ -31,4 +31,4 @@ ruleTester.run( 'no-global-get-selection', rule, {
 			],
 		},
 	],
-} );
+});

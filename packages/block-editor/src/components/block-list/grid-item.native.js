@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import styles from './block-list-item.scss';
 
-function Grid( props ) {
+function Grid(props) {
 	/**
 	 * Since we don't have `calc()`, we must calculate our spacings here in
 	 * order to preserve even spacing between tiles and equal width for tiles
@@ -35,22 +35,22 @@ function Grid( props ) {
 	 */
 	const { numOfColumns, children, tileCount, index, maxWidth } = props;
 	const lastTile = tileCount - 1;
-	const lastRow = Math.floor( lastTile / numOfColumns );
+	const lastRow = Math.floor(lastTile / numOfColumns);
 
-	const row = Math.floor( index / numOfColumns );
+	const row = Math.floor(index / numOfColumns);
 	const rowLength =
-		row === lastRow ? ( lastTile % numOfColumns ) + 1 : numOfColumns;
+		row === lastRow ? (lastTile % numOfColumns) + 1 : numOfColumns;
 
 	return (
 		<View
-			style={ [
+			style={[
 				{
 					width: maxWidth / rowLength,
 				},
 				styles.gridItem,
-			] }
+			]}
 		>
-			{ children }
+			{children}
 		</View>
 	);
 }

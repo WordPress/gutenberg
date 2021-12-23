@@ -14,8 +14,8 @@ export const HORIZONTAL_GRADIENT_ORIENTATION = {
 };
 
 export const GRADIENT_OPTIONS = [
-	{ value: 'linear-gradient', label: __( 'Linear' ) },
-	{ value: 'radial-gradient', label: __( 'Radial' ) },
+	{ value: 'linear-gradient', label: __('Linear') },
+	{ value: 'radial-gradient', label: __('Radial') },
 ];
 
 export const DIRECTIONAL_ORIENTATION_ANGLE_MAP = {

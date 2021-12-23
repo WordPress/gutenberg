@@ -25,26 +25,26 @@ import styles from './style.scss';
 const MAX_ITEM_WIDTH = 120;
 const HALF_COLUMN = 0.5;
 
-function StylePreview( { onPress, isActive, style, url } ) {
-	const [ itemWidth, setItemWidth ] = useState( MAX_ITEM_WIDTH );
+function StylePreview({ onPress, isActive, style, url }) {
+	const [itemWidth, setItemWidth] = useState(MAX_ITEM_WIDTH);
 	const { label, name } = style;
-	const opacity = useRef( new Animated.Value( 1 ) ).current;
+	const opacity = useRef(new Animated.Value(1)).current;
 
 	function onLayout() {
 		const columnsNum =
 			// To indicate scroll availabilty, there is a need to display additional half the column
-			Math.floor( BottomSheet.getWidth() / MAX_ITEM_WIDTH ) + HALF_COLUMN;
-		setItemWidth( BottomSheet.getWidth() / columnsNum );
+			Math.floor(BottomSheet.getWidth() / MAX_ITEM_WIDTH) + HALF_COLUMN;
+		setItemWidth(BottomSheet.getWidth() / columnsNum);
 	}
 
-	useEffect( () => {
+	useEffect(() => {
 		onLayout();
-		Dimensions.addEventListener( 'change', onLayout );
+		Dimensions.addEventListener('change', onLayout);
 
 		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
+			Dimensions.removeEventListener('change', onLayout);
 		};
-	}, [] );
+	}, []);
 
 	const labelStyle = usePreferredColorSchemeStyle(
 		styles.label,
@@ -52,13 +52,13 @@ function StylePreview( { onPress, isActive, style, url } ) {
 	);
 
 	const animateOutline = () => {
-		opacity.setValue( 0 );
-		Animated.timing( opacity, {
+		opacity.setValue(0);
+		Animated.timing(opacity, {
 			toValue: 1,
 			duration: 100,
 			useNativeDriver: true,
 			easing: Easing.linear,
-		} ).start();
+		}).start();
 	};
 
 	const innerOutlineStyle = usePreferredColorSchemeStyle(
@@ -66,36 +66,34 @@ function StylePreview( { onPress, isActive, style, url } ) {
 		styles.innerOutlineDark
 	);
 
-	const getOutline = ( outlineStyles ) =>
-		outlineStyles.map( ( outlineStyle, index ) => {
+	const getOutline = (outlineStyles) =>
+		outlineStyles.map((outlineStyle, index) => {
 			return (
 				<Animated.View
-					style={ [ outlineStyle, { opacity }, styles[ name ] ] }
-					key={ index }
+					style={[outlineStyle, { opacity }, styles[name]]}
+					key={index}
 				/>
 			);
-		} );
+		});
 
 	return (
 		<TouchableWithoutFeedback
-			onPress={ () => {
+			onPress={() => {
 				onPress();
 				animateOutline();
-			} }
+			}}
 		>
-			<View style={ [ styles.container, { width: itemWidth } ] }>
-				<View style={ styles.imageWrapper }>
-					{ isActive &&
-						getOutline( [ styles.outline, innerOutlineStyle ] ) }
+			<View style={[styles.container, { width: itemWidth }]}>
+				<View style={styles.imageWrapper}>
+					{isActive &&
+						getOutline([styles.outline, innerOutlineStyle])}
 					<Image
-						style={ [ styles.image, styles[ name ] ] }
-						source={ { uri: url } }
+						style={[styles.image, styles[name]]}
+						source={{ uri: url }}
 					/>
 				</View>
-				<Text
-					style={ [ labelStyle, isActive && styles.labelSelected ] }
-				>
-					{ label }
+				<Text style={[labelStyle, isActive && styles.labelSelected]}>
+					{label}
 				</Text>
 			</View>
 		</TouchableWithoutFeedback>

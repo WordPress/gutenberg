@@ -16,19 +16,16 @@ export async function loginUser(
 	username = WP_USERNAME,
 	password = WP_PASSWORD
 ) {
-	if ( ! isCurrentURL( 'wp-login.php' ) ) {
-		await page.goto( createURL( 'wp-login.php' ) );
+	if (!isCurrentURL('wp-login.php')) {
+		await page.goto(createURL('wp-login.php'));
 	}
 
-	await page.focus( '#user_login' );
-	await pressKeyWithModifier( 'primary', 'a' );
-	await page.type( '#user_login', username );
-	await page.focus( '#user_pass' );
-	await pressKeyWithModifier( 'primary', 'a' );
-	await page.type( '#user_pass', password );
+	await page.focus('#user_login');
+	await pressKeyWithModifier('primary', 'a');
+	await page.type('#user_login', username);
+	await page.focus('#user_pass');
+	await pressKeyWithModifier('primary', 'a');
+	await page.type('#user_pass', password);
 
-	await Promise.all( [
-		page.waitForNavigation(),
-		page.click( '#wp-submit' ),
-	] );
+	await Promise.all([page.waitForNavigation(), page.click('#wp-submit')]);
 }

@@ -23,7 +23,7 @@ export const paragraphItem = {
 	category: 'text',
 	isDisabled: false,
 	utility: 1,
-	keywords: [ 'random' ],
+	keywords: ['random'],
 };
 
 export const withSingleVariationItem = {
@@ -76,7 +76,7 @@ export const withVariationsItem = {
 		{
 			name: 'variation-three',
 			title: 'Variation Three',
-			keywords: [ 'music', 'random' ],
+			keywords: ['music', 'random'],
 		},
 	],
 };
@@ -117,7 +117,7 @@ export const youtubeItem = {
 	initialAttributes: {},
 	title: 'YouTube',
 	category: 'embed',
-	keywords: [ 'google', 'video' ],
+	keywords: ['google', 'video'],
 	isDisabled: false,
 	utility: 1,
 };

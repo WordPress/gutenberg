@@ -8,7 +8,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
  */
 import Tracks from './tracks';
 
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const {
 		autoplay,
 		caption,
@@ -22,24 +22,24 @@ export default function save( { attributes } ) {
 		tracks,
 	} = attributes;
 	return (
-		<figure { ...useBlockProps.save() }>
-			{ src && (
+		<figure {...useBlockProps.save()}>
+			{src && (
 				<video
-					autoPlay={ autoplay }
-					controls={ controls }
-					loop={ loop }
-					muted={ muted }
-					poster={ poster }
-					preload={ preload !== 'metadata' ? preload : undefined }
-					src={ src }
-					playsInline={ playsInline }
+					autoPlay={autoplay}
+					controls={controls}
+					loop={loop}
+					muted={muted}
+					poster={poster}
+					preload={preload !== 'metadata' ? preload : undefined}
+					src={src}
+					playsInline={playsInline}
 				>
-					<Tracks tracks={ tracks } />
+					<Tracks tracks={tracks} />
 				</video>
-			) }
-			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content tagName="figcaption" value={ caption } />
-			) }
+			)}
+			{!RichText.isEmpty(caption) && (
+				<RichText.Content tagName="figcaption" value={caption} />
+			)}
 		</figure>
 	);
 }

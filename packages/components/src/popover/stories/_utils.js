@@ -7,35 +7,35 @@ export const DraggableWrapper = (
 	props = { role: 'presentation', style: {} }
 ) => {
 	const { role, style, ...restProps } = props;
-	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
-	const [ isDragging, setDragging ] = useState( false );
+	const [position, setPosition] = useState({ x: 0, y: 0 });
+	const [isDragging, setDragging] = useState(false);
 
 	const updatePosition = useCallback(
-		( event ) => {
-			if ( ! isDragging ) {
+		(event) => {
+			if (!isDragging) {
 				return false;
 			}
 			const { movementX, movementY } = event;
-			setPosition( {
+			setPosition({
 				...position,
 				x: position.x + movementX,
 				y: position.y + movementY,
-			} );
+			});
 		},
-		[ isDragging, position ]
+		[isDragging, position]
 	);
 
-	const startDragging = useCallback( () => setDragging( true ), [] );
-	const stopDragging = useCallback( () => setDragging( false ), [] );
+	const startDragging = useCallback(() => setDragging(true), []);
+	const stopDragging = useCallback(() => setDragging(false), []);
 
-	useEffect( () => {
-		document.addEventListener( 'mousemove', updatePosition );
-		document.addEventListener( 'mouseup', stopDragging );
+	useEffect(() => {
+		document.addEventListener('mousemove', updatePosition);
+		document.addEventListener('mouseup', stopDragging);
 		return () => {
-			document.removeEventListener( 'mousemove', updatePosition );
-			document.removeEventListener( 'mouseup', stopDragging );
+			document.removeEventListener('mousemove', updatePosition);
+			document.removeEventListener('mouseup', stopDragging);
 		};
-	}, [ updatePosition, stopDragging ] );
+	}, [updatePosition, stopDragging]);
 
 	const { x, y } = position;
 
@@ -54,11 +54,11 @@ export const DraggableWrapper = (
 
 	return (
 		<div
-			{ ...restProps }
-			onMouseUp={ stopDragging }
-			onMouseDown={ startDragging }
-			role={ role }
-			style={ componentStyle }
+			{...restProps}
+			onMouseUp={stopDragging}
+			onMouseDown={startDragging}
+			role={role}
+			style={componentStyle}
 		/>
 	);
 };

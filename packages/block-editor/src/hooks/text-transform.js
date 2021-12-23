@@ -24,28 +24,28 @@ export const TEXT_TRANSFORM_SUPPORT_KEY =
  *
  * @return {WPElement} Text transform edit element.
  */
-export function TextTransformEdit( props ) {
+export function TextTransformEdit(props) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	function onChange( newTransform ) {
-		setAttributes( {
-			style: cleanEmptyObject( {
+	function onChange(newTransform) {
+		setAttributes({
+			style: cleanEmptyObject({
 				...style,
 				typography: {
 					...style?.typography,
 					textTransform: newTransform,
 				},
-			} ),
-		} );
+			}),
+		});
 	}
 
 	return (
 		<TextTransformControl
-			value={ style?.typography?.textTransform }
-			onChange={ onChange }
+			value={style?.typography?.textTransform}
+			onChange={onChange}
 		/>
 	);
 }
@@ -57,13 +57,13 @@ export function TextTransformEdit( props ) {
  *
  * @return {boolean} Whether or not the setting is disabled.
  */
-export function useIsTextTransformDisabled( { name: blockName } = {} ) {
-	const notSupported = ! hasBlockSupport(
+export function useIsTextTransformDisabled({ name: blockName } = {}) {
+	const notSupported = !hasBlockSupport(
 		blockName,
 		TEXT_TRANSFORM_SUPPORT_KEY
 	);
-	const hasTextTransforms = useSetting( 'typography.textTransform' );
-	return notSupported || ! hasTextTransforms;
+	const hasTextTransforms = useSetting('typography.textTransform');
+	return notSupported || !hasTextTransforms;
 }
 
 /**
@@ -72,8 +72,8 @@ export function useIsTextTransformDisabled( { name: blockName } = {} ) {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a text transform set.
  */
-export function hasTextTransformValue( props ) {
-	return !! props.attributes.style?.typography?.textTransform;
+export function hasTextTransformValue(props) {
+	return !!props.attributes.style?.typography?.textTransform;
 }
 
 /**
@@ -85,16 +85,16 @@ export function hasTextTransformValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetTextTransform( { attributes = {}, setAttributes } ) {
+export function resetTextTransform({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
-		style: cleanEmptyObject( {
+	setAttributes({
+		style: cleanEmptyObject({
 			...style,
 			typography: {
 				...style?.typography,
 				textTransform: undefined,
 			},
-		} ),
-	} );
+		}),
+	});
 }

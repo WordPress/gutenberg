@@ -18,22 +18,22 @@ import {
 	isRequestingDownloadableBlocks,
 } from '../selectors';
 
-describe( 'selectors', () => {
-	describe( 'getInstalledBlockTypes', () => {
-		it( 'should retrieve the block types that are installed', () => {
-			const blockTypes = [ 'fake-type' ];
+describe('selectors', () => {
+	describe('getInstalledBlockTypes', () => {
+		it('should retrieve the block types that are installed', () => {
+			const blockTypes = ['fake-type'];
 			const state = {
 				blockManagement: {
 					installedBlockTypes: blockTypes,
 				},
 			};
-			const installedBlockTypes = getInstalledBlockTypes( state );
-			expect( installedBlockTypes ).toEqual( blockTypes );
-		} );
-	} );
+			const installedBlockTypes = getInstalledBlockTypes(state);
+			expect(installedBlockTypes).toEqual(blockTypes);
+		});
+	});
 
-	describe( 'isRequestingDownloadableBlocks', () => {
-		it( 'should return false if no requests have been made for the block', () => {
+	describe('isRequestingDownloadableBlocks', () => {
+		it('should return false if no requests have been made for the block', () => {
 			const filterValue = 'Awesome Block';
 
 			const state = {
@@ -44,15 +44,15 @@ describe( 'selectors', () => {
 				filterValue
 			);
 
-			expect( isRequesting ).toEqual( false );
-		} );
+			expect(isRequesting).toEqual(false);
+		});
 
-		it( 'should return false if there are no pending requests for the block', () => {
+		it('should return false if there are no pending requests for the block', () => {
 			const filterValue = 'Awesome Block';
 
 			const state = {
 				downloadableBlocks: {
-					[ filterValue ]: {
+					[filterValue]: {
 						isRequesting: false,
 					},
 				},
@@ -62,15 +62,15 @@ describe( 'selectors', () => {
 				filterValue
 			);
 
-			expect( isRequesting ).toEqual( false );
-		} );
+			expect(isRequesting).toEqual(false);
+		});
 
-		it( 'should return true if the block has a pending request', () => {
+		it('should return true if the block has a pending request', () => {
 			const filterValue = 'Awesome Block';
 
 			const state = {
 				downloadableBlocks: {
-					[ filterValue ]: {
+					[filterValue]: {
 						isRequesting: true,
 					},
 					'previous-search-keyword': {
@@ -83,96 +83,84 @@ describe( 'selectors', () => {
 				filterValue
 			);
 
-			expect( isRequesting ).toEqual( true );
-		} );
-	} );
+			expect(isRequesting).toEqual(true);
+		});
+	});
 
-	describe( 'getNewBlockTypes', () => {
-		it( 'should retrieve the block types that are installed and in the post content', () => {
+	describe('getNewBlockTypes', () => {
+		it('should retrieve the block types that are installed and in the post content', () => {
 			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
+				select: jest.fn(() => ({ getBlocks: () => blockList })),
 			};
 			const state = {
 				blockManagement: {
-					installedBlockTypes: [
-						blockTypeInstalled,
-						blockTypeUnused,
-					],
+					installedBlockTypes: [blockTypeInstalled, blockTypeUnused],
 				},
 			};
-			const blockTypes = getNewBlockTypes( state );
-			expect( blockTypes ).toHaveLength( 1 );
-			expect( blockTypes[ 0 ] ).toEqual( blockTypeInstalled );
-		} );
+			const blockTypes = getNewBlockTypes(state);
+			expect(blockTypes).toHaveLength(1);
+			expect(blockTypes[0]).toEqual(blockTypeInstalled);
+		});
 
-		it( 'should return an empty array if no blocks are used', () => {
+		it('should return an empty array if no blocks are used', () => {
 			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
+				select: jest.fn(() => ({ getBlocks: () => [] })),
 			};
 			const state = {
 				blockManagement: {
-					installedBlockTypes: [
-						blockTypeInstalled,
-						blockTypeUnused,
-					],
+					installedBlockTypes: [blockTypeInstalled, blockTypeUnused],
 				},
 			};
-			const blockTypes = getNewBlockTypes( state );
-			expect( blockTypes ).toHaveLength( 0 );
-		} );
-	} );
+			const blockTypes = getNewBlockTypes(state);
+			expect(blockTypes).toHaveLength(0);
+		});
+	});
 
-	describe( 'getUnusedBlockTypes', () => {
-		it( 'should retrieve the block types that are installed but not used', () => {
+	describe('getUnusedBlockTypes', () => {
+		it('should retrieve the block types that are installed but not used', () => {
 			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
+				select: jest.fn(() => ({ getBlocks: () => blockList })),
 			};
 			const state = {
 				blockManagement: {
-					installedBlockTypes: [
-						blockTypeInstalled,
-						blockTypeUnused,
-					],
+					installedBlockTypes: [blockTypeInstalled, blockTypeUnused],
 				},
 			};
-			const blockTypes = getUnusedBlockTypes( state );
-			expect( blockTypes ).toHaveLength( 1 );
-			expect( blockTypes[ 0 ] ).toEqual( blockTypeUnused );
-		} );
+			const blockTypes = getUnusedBlockTypes(state);
+			expect(blockTypes).toHaveLength(1);
+			expect(blockTypes[0]).toEqual(blockTypeUnused);
+		});
 
-		it( 'should return all block types if no blocks are used', () => {
+		it('should return all block types if no blocks are used', () => {
 			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
+				select: jest.fn(() => ({ getBlocks: () => [] })),
 			};
 			const state = {
 				blockManagement: {
-					installedBlockTypes: [
-						blockTypeInstalled,
-						blockTypeUnused,
-					],
+					installedBlockTypes: [blockTypeInstalled, blockTypeUnused],
 				},
 			};
-			const blockTypes = getUnusedBlockTypes( state );
-			expect( blockTypes ).toHaveLength( 2 );
-		} );
-	} );
+			const blockTypes = getUnusedBlockTypes(state);
+			expect(blockTypes).toHaveLength(2);
+		});
+	});
 
-	describe( 'getErrorNotices', () => {
+	describe('getErrorNotices', () => {
 		const state = {
 			errorNotices: {
 				'block/has-error': 'Error notice',
 			},
 		};
 
-		it( 'should retrieve all error notices', () => {
-			const errorNotices = getErrorNotices( state );
-			expect( errorNotices ).toEqual( {
+		it('should retrieve all error notices', () => {
+			const errorNotices = getErrorNotices(state);
+			expect(errorNotices).toEqual({
 				'block/has-error': 'Error notice',
-			} );
-		} );
-	} );
+			});
+		});
+	});
 
-	describe( 'getErrorNoticeForBlock', () => {
+	describe('getErrorNoticeForBlock', () => {
 		const state = {
 			errorNotices: {
 				'block/has-error': {
@@ -182,65 +170,60 @@ describe( 'selectors', () => {
 			},
 		};
 
-		it( 'should retrieve the error notice for a block that has one', () => {
+		it('should retrieve the error notice for a block that has one', () => {
 			const errorNotice = getErrorNoticeForBlock(
 				state,
 				'block/has-error'
 			);
-			expect( errorNotice ).toEqual(
-				state.errorNotices[ 'block/has-error' ]
-			);
-		} );
+			expect(errorNotice).toEqual(state.errorNotices['block/has-error']);
+		});
 
-		it( "should retrieve no error notice for a block that doesn't have one", () => {
-			const errorNotice = getErrorNoticeForBlock(
-				state,
-				'block/no-error'
-			);
-			expect( errorNotice ).toEqual( undefined );
-		} );
-	} );
+		it("should retrieve no error notice for a block that doesn't have one", () => {
+			const errorNotice = getErrorNoticeForBlock(state, 'block/no-error');
+			expect(errorNotice).toEqual(undefined);
+		});
+	});
 
-	describe( 'getDownloadableBlocks', () => {
+	describe('getDownloadableBlocks', () => {
 		const state = {
 			downloadableBlocks: {
 				boxer: {
-					results: [ downloadableBlock ],
+					results: [downloadableBlock],
 				},
 			},
 		};
 
-		it( 'should get the list of available blocks for a query', () => {
-			const blocks = getDownloadableBlocks( state, 'boxer' );
-			expect( blocks ).toHaveLength( 1 );
-		} );
+		it('should get the list of available blocks for a query', () => {
+			const blocks = getDownloadableBlocks(state, 'boxer');
+			expect(blocks).toHaveLength(1);
+		});
 
-		it( 'should get an empty array if no matching query is found', () => {
-			const blocks = getDownloadableBlocks( state, 'not-found' );
-			expect( blocks ).toEqual( [] );
-		} );
-	} );
+		it('should get an empty array if no matching query is found', () => {
+			const blocks = getDownloadableBlocks(state, 'not-found');
+			expect(blocks).toEqual([]);
+		});
+	});
 
-	describe( 'isInstalling', () => {
+	describe('isInstalling', () => {
 		const BLOCK_1_ID = 'box-block-id';
 		const BLOCK_2_ID = 'image-slider-id';
 
 		const state = {
 			blockManagement: {
 				isInstalling: {
-					[ BLOCK_1_ID ]: true,
-					[ BLOCK_2_ID ]: false,
+					[BLOCK_1_ID]: true,
+					[BLOCK_2_ID]: false,
 				},
 			},
 		};
 
-		it( 'should reflect that the block is installing', () => {
-			expect( isInstalling( state, BLOCK_1_ID ) ).toBeTruthy();
-		} );
+		it('should reflect that the block is installing', () => {
+			expect(isInstalling(state, BLOCK_1_ID)).toBeTruthy();
+		});
 
-		it( 'should reflect that the block is not installing', () => {
-			expect( isInstalling( state, 'not-in-state' ) ).toBeFalsy();
-			expect( isInstalling( state, BLOCK_2_ID ) ).toBeFalsy();
-		} );
-	} );
-} );
+		it('should reflect that the block is not installing', () => {
+			expect(isInstalling(state, 'not-in-state')).toBeFalsy();
+			expect(isInstalling(state, BLOCK_2_ID)).toBeFalsy();
+		});
+	});
+});

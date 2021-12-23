@@ -9,15 +9,15 @@ import { MenuGroup } from '@wordpress/components';
  */
 import BlockStylesMenuItems from '../block-styles/menu-items';
 
-export default function BlockStylesMenu( { hoveredBlock, onSwitch } ) {
+export default function BlockStylesMenu({ hoveredBlock, onSwitch }) {
 	const { clientId } = hoveredBlock;
 
 	return (
 		<MenuGroup
-			label={ __( 'Styles' ) }
+			label={__('Styles')}
 			className="block-editor-block-switcher__styles__menugroup"
 		>
-			<BlockStylesMenuItems clientId={ clientId } onSwitch={ onSwitch } />
+			<BlockStylesMenuItems clientId={clientId} onSwitch={onSwitch} />
 		</MenuGroup>
 	);
 }

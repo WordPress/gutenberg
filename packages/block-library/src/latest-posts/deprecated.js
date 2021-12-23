@@ -17,14 +17,14 @@ export default [
 			align: true,
 			html: false,
 		},
-		migrate: ( oldAttributes ) => {
+		migrate: (oldAttributes) => {
 			// This needs the full category object, not just the ID.
 			return {
 				...oldAttributes,
-				categories: [ { id: Number( oldAttributes.categories ) } ],
+				categories: [{ id: Number(oldAttributes.categories) }],
 			};
 		},
-		isEligible: ( { categories } ) =>
+		isEligible: ({ categories }) =>
 			categories && 'string' === typeof categories,
 		save: () => null,
 	},

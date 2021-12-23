@@ -12,33 +12,33 @@ import {
 export function PostVisibility() {
 	return (
 		<PostVisibilityCheck
-			render={ ( { canEdit } ) => (
+			render={({ canEdit }) => (
 				<PanelRow className="edit-post-post-visibility">
-					<span>{ __( 'Visibility' ) }</span>
-					{ ! canEdit && (
+					<span>{__('Visibility')}</span>
+					{!canEdit && (
 						<span>
 							<PostVisibilityLabel />
 						</span>
-					) }
-					{ canEdit && (
+					)}
+					{canEdit && (
 						<Dropdown
 							position="bottom left"
 							contentClassName="edit-post-post-visibility__dialog"
-							renderToggle={ ( { isOpen, onToggle } ) => (
+							renderToggle={({ isOpen, onToggle }) => (
 								<Button
-									aria-expanded={ isOpen }
+									aria-expanded={isOpen}
 									className="edit-post-post-visibility__toggle"
-									onClick={ onToggle }
+									onClick={onToggle}
 									variant="tertiary"
 								>
 									<PostVisibilityLabel />
 								</Button>
-							) }
-							renderContent={ () => <PostVisibilityForm /> }
+							)}
+							renderContent={() => <PostVisibilityForm />}
 						/>
-					) }
+					)}
 				</PanelRow>
-			) }
+			)}
 		/>
 	);
 }

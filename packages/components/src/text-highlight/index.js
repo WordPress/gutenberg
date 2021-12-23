@@ -8,21 +8,18 @@ import { escapeRegExp } from 'lodash';
  */
 import { createInterpolateElement } from '@wordpress/element';
 
-const TextHighlight = ( { text = '', highlight = '' } ) => {
+const TextHighlight = ({ text = '', highlight = '' }) => {
 	const trimmedHighlightText = highlight.trim();
 
-	if ( ! trimmedHighlightText ) {
+	if (!trimmedHighlightText) {
 		return text;
 	}
 
-	const regex = new RegExp(
-		`(${ escapeRegExp( trimmedHighlightText ) })`,
-		'gi'
-	);
+	const regex = new RegExp(`(${escapeRegExp(trimmedHighlightText)})`, 'gi');
 
-	return createInterpolateElement( text.replace( regex, '<mark>$&</mark>' ), {
+	return createInterpolateElement(text.replace(regex, '<mark>$&</mark>'), {
 		mark: <mark />,
-	} );
+	});
 };
 
 export default TextHighlight;

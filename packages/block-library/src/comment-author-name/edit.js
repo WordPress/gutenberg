@@ -31,73 +31,71 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
  *
  * @return {JSX.Element} React element.
  */
-export default function Edit( {
+export default function Edit({
 	attributes: { isLink, linkTarget, textAlign },
 	context: { commentId },
 	setAttributes,
-} ) {
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+}) {
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+		}),
+	});
 	const displayName = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
+		(select) => {
+			const { getEntityRecord } = select(coreStore);
 
-			const comment = getEntityRecord( 'root', 'comment', commentId );
+			const comment = getEntityRecord('root', 'comment', commentId);
 			const authorName = comment?.author_name; // eslint-disable-line camelcase
 
-			if ( comment && ! authorName ) {
-				const user = getEntityRecord( 'root', 'user', comment.author );
-				return user?.name ?? __( 'Anonymous' );
+			if (comment && !authorName) {
+				const user = getEntityRecord('root', 'user', comment.author);
+				return user?.name ?? __('Anonymous');
 			}
 			return authorName ?? '';
 		},
-		[ commentId ]
+		[commentId]
 	);
 
 	const blockControls = (
 		<BlockControls group="block">
 			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
+				value={textAlign}
+				onChange={(newAlign) => setAttributes({ textAlign: newAlign })}
 			/>
 		</BlockControls>
 	);
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Link settings' ) }>
+			<PanelBody title={__('Link settings')}>
 				<ToggleControl
-					label={ __( 'Link to authors URL' ) }
-					onChange={ () => setAttributes( { isLink: ! isLink } ) }
-					checked={ isLink }
+					label={__('Link to authors URL')}
+					onChange={() => setAttributes({ isLink: !isLink })}
+					checked={isLink}
 				/>
-				{ isLink && (
+				{isLink && (
 					<ToggleControl
-						label={ __( 'Open in new tab' ) }
-						onChange={ ( value ) =>
-							setAttributes( {
+						label={__('Open in new tab')}
+						onChange={(value) =>
+							setAttributes({
 								linkTarget: value ? '_blank' : '_self',
-							} )
+							})
 						}
-						checked={ linkTarget === '_blank' }
+						checked={linkTarget === '_blank'}
 					/>
-				) }
+				)}
 			</PanelBody>
 		</InspectorControls>
 	);
 
-	if ( ! commentId || ! displayName ) {
+	if (!commentId || !displayName) {
 		return (
 			<>
-				{ inspectorControls }
-				{ blockControls }
-				<div { ...blockProps }>
-					<p>{ _x( 'Comment Author', 'block title' ) }</p>
+				{inspectorControls}
+				{blockControls}
+				<div {...blockProps}>
+					<p>{_x('Comment Author', 'block title')}</p>
 				</div>
 			</>
 		);
@@ -106,19 +104,19 @@ export default function Edit( {
 	const displayAuthor = isLink ? (
 		<a
 			href="#comment-author-pseudo-link"
-			onClick={ ( event ) => event.preventDefault() }
+			onClick={(event) => event.preventDefault()}
 		>
-			{ displayName }
+			{displayName}
 		</a>
 	) : (
-		<p>{ displayName }</p>
+		<p>{displayName}</p>
 	);
 
 	return (
 		<>
-			{ inspectorControls }
-			{ blockControls }
-			<div { ...blockProps }>{ displayAuthor }</div>
+			{inspectorControls}
+			{blockControls}
+			<div {...blockProps}>{displayAuthor}</div>
 		</>
 	);
 }

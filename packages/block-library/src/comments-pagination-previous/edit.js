@@ -10,34 +10,32 @@ const arrowMap = {
 	chevron: '«',
 };
 
-export default function CommentsPaginationPreviousEdit( {
+export default function CommentsPaginationPreviousEdit({
 	attributes: { label },
 	setAttributes,
 	context: { 'comments/paginationArrow': paginationArrow },
-} ) {
-	const displayArrow = arrowMap[ paginationArrow ];
+}) {
+	const displayArrow = arrowMap[paginationArrow];
 	return (
 		<a
 			href="#comments-pagination-previous-pseudo-link"
-			onClick={ ( event ) => event.preventDefault() }
-			{ ...useBlockProps() }
+			onClick={(event) => event.preventDefault()}
+			{...useBlockProps()}
 		>
-			{ displayArrow && (
+			{displayArrow && (
 				<span
-					className={ `wp-block-comments-pagination-previous-arrow is-arrow-${ paginationArrow }` }
+					className={`wp-block-comments-pagination-previous-arrow is-arrow-${paginationArrow}`}
 				>
-					{ displayArrow }
+					{displayArrow}
 				</span>
-			) }
+			)}
 			<PlainText
-				__experimentalVersion={ 2 }
+				__experimentalVersion={2}
 				tagName="span"
-				aria-label={ __( 'Previous comments page link' ) }
-				placeholder={ __( 'Previous Comments' ) }
-				value={ label }
-				onChange={ ( newLabel ) =>
-					setAttributes( { label: newLabel } )
-				}
+				aria-label={__('Previous comments page link')}
+				placeholder={__('Previous Comments')}
+				value={label}
+				onChange={(newLabel) => setAttributes({ label: newLabel })}
 			/>
 		</a>
 	);

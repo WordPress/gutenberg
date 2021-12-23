@@ -11,7 +11,7 @@ import { registerFormatType } from '../register-format-type';
 import { getFormatTypes } from '../get-format-types';
 import { getFormatType } from '../get-format-type';
 
-describe( 'unregisterFormatType', () => {
+describe('unregisterFormatType', () => {
 	const defaultFormatSettings = {
 		edit: noop,
 		title: 'format title',
@@ -19,37 +19,37 @@ describe( 'unregisterFormatType', () => {
 		className: null,
 	};
 
-	beforeAll( () => {
+	beforeAll(() => {
 		// Initialize the rich-text store.
-		require( '../store' );
-	} );
+		require('../store');
+	});
 
-	afterEach( () => {
-		getFormatTypes().forEach( ( format ) => {
-			unregisterFormatType( format.name );
-		} );
-	} );
+	afterEach(() => {
+		getFormatTypes().forEach((format) => {
+			unregisterFormatType(format.name);
+		});
+	});
 
-	it( 'should fail if the format is not registered', () => {
-		const oldFormat = unregisterFormatType( 'core/test-format' );
-		expect( console ).toHaveErroredWith(
+	it('should fail if the format is not registered', () => {
+		const oldFormat = unregisterFormatType('core/test-format');
+		expect(console).toHaveErroredWith(
 			'Format core/test-format is not registered.'
 		);
-		expect( oldFormat ).toBeUndefined();
-	} );
+		expect(oldFormat).toBeUndefined();
+	});
 
-	it( 'should unregister existing formats', () => {
-		registerFormatType( 'core/test-format', defaultFormatSettings );
-		expect( getFormatType( 'core/test-format' ) ).toEqual( {
+	it('should unregister existing formats', () => {
+		registerFormatType('core/test-format', defaultFormatSettings);
+		expect(getFormatType('core/test-format')).toEqual({
 			name: 'core/test-format',
 			...defaultFormatSettings,
-		} );
-		const oldFormat = unregisterFormatType( 'core/test-format' );
-		expect( console ).not.toHaveErrored();
-		expect( oldFormat ).toEqual( {
+		});
+		const oldFormat = unregisterFormatType('core/test-format');
+		expect(console).not.toHaveErrored();
+		expect(oldFormat).toEqual({
 			name: 'core/test-format',
 			...defaultFormatSettings,
-		} );
-		expect( getFormatTypes() ).toEqual( [] );
-	} );
-} );
+		});
+		expect(getFormatTypes()).toEqual([]);
+	});
+});

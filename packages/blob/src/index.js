@@ -15,10 +15,10 @@ const cache = {};
  *
  * @return {string} The blob URL.
  */
-export function createBlobURL( file ) {
-	const url = createObjectURL( file );
+export function createBlobURL(file) {
+	const url = createObjectURL(file);
 
-	cache[ url ] = file;
+	cache[url] = file;
 
 	return url;
 }
@@ -32,8 +32,8 @@ export function createBlobURL( file ) {
  *
  * @return {File|undefined} The file for the blob URL.
  */
-export function getBlobByURL( url ) {
-	return cache[ url ];
+export function getBlobByURL(url) {
+	return cache[url];
 }
 
 /**
@@ -45,8 +45,8 @@ export function getBlobByURL( url ) {
  *
  * @return {string|undefined} The blob type.
  */
-export function getBlobTypeByURL( url ) {
-	return getBlobByURL( url )?.type.split( '/' )[ 0 ]; // 0: media type , 1: file extension eg ( type: 'image/jpeg' ).
+export function getBlobTypeByURL(url) {
+	return getBlobByURL(url)?.type.split('/')[0]; // 0: media type , 1: file extension eg ( type: 'image/jpeg' ).
 }
 
 /**
@@ -54,12 +54,12 @@ export function getBlobTypeByURL( url ) {
  *
  * @param {string} url The blob URL.
  */
-export function revokeBlobURL( url ) {
-	if ( cache[ url ] ) {
-		revokeObjectURL( url );
+export function revokeBlobURL(url) {
+	if (cache[url]) {
+		revokeObjectURL(url);
 	}
 
-	delete cache[ url ];
+	delete cache[url];
 }
 
 /**
@@ -69,9 +69,9 @@ export function revokeBlobURL( url ) {
  *
  * @return {boolean} Is the url a blob url?
  */
-export function isBlobURL( url ) {
-	if ( ! url || ! url.indexOf ) {
+export function isBlobURL(url) {
+	if (!url || !url.indexOf) {
 		return false;
 	}
-	return url.indexOf( 'blob:' ) === 0;
+	return url.indexOf('blob:') === 0;
 }

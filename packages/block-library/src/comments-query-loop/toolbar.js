@@ -11,46 +11,42 @@ import {
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
-export default function CommentsQueryLoopToolbar( { perPage, setQuery } ) {
+export default function CommentsQueryLoopToolbar({ perPage, setQuery }) {
 	return (
 		<ToolbarGroup>
 			<Dropdown
-				renderToggle={ ( { onToggle } ) => (
+				renderToggle={({ onToggle }) => (
 					<ToolbarButton
-						icon={ settings }
-						label={ __( 'Display settings' ) }
-						onClick={ onToggle }
+						icon={settings}
+						label={__('Display settings')}
+						onClick={onToggle}
 					/>
-				) }
-				renderContent={ () => (
+				)}
+				renderContent={() => (
 					<>
 						<BaseControl>
 							<NumberControl
 								__unstableInputWidth="60px"
-								label={ __( 'Items per Page' ) }
+								label={__('Items per Page')}
 								labelPosition="edge"
-								min={ 1 }
-								max={ 100 }
-								onChange={ ( value ) => {
-									const num = parseInt( value, 10 );
-									if (
-										isNaN( num ) ||
-										num < 1 ||
-										num > 100
-									) {
+								min={1}
+								max={100}
+								onChange={(value) => {
+									const num = parseInt(value, 10);
+									if (isNaN(num) || num < 1 || num > 100) {
 										return;
 									}
-									setQuery( {
+									setQuery({
 										perPage: num,
-									} );
-								} }
+									});
+								}}
 								step="1"
-								value={ perPage }
-								isDragEnabled={ false }
+								value={perPage}
+								isDragEnabled={false}
 							/>
 						</BaseControl>
 					</>
-				) }
+				)}
 			/>
 		</ToolbarGroup>
 	);

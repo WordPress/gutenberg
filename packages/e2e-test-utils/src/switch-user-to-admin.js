@@ -10,8 +10,8 @@ import { WP_ADMIN_USER } from './shared/config';
  * running the test is not already the admin user).
  */
 export async function switchUserToAdmin() {
-	if ( ( await getCurrentUser() ) === WP_ADMIN_USER.username ) {
+	if ((await getCurrentUser()) === WP_ADMIN_USER.username) {
 		return;
 	}
-	await loginUser( WP_ADMIN_USER.username, WP_ADMIN_USER.password );
+	await loginUser(WP_ADMIN_USER.username, WP_ADMIN_USER.password);
 }

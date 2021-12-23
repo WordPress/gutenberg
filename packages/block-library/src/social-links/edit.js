@@ -27,16 +27,16 @@ import {
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
-const ALLOWED_BLOCKS = [ 'core/social-link' ];
+const ALLOWED_BLOCKS = ['core/social-link'];
 
 const sizeOptions = [
-	{ name: __( 'Small' ), value: 'has-small-icon-size' },
-	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
-	{ name: __( 'Large' ), value: 'has-large-icon-size' },
-	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
+	{ name: __('Small'), value: 'has-small-icon-size' },
+	{ name: __('Normal'), value: 'has-normal-icon-size' },
+	{ name: __('Large'), value: 'has-large-icon-size' },
+	{ name: __('Huge'), value: 'has-huge-icon-size' },
 ];
 
-const getDefaultBlockLayout = ( blockTypeOrName ) => {
+const getDefaultBlockLayout = (blockTypeOrName) => {
 	const layoutBlockSupportConfig = getBlockSupport(
 		blockTypeOrName,
 		'__experimentalLayout'
@@ -44,7 +44,7 @@ const getDefaultBlockLayout = ( blockTypeOrName ) => {
 	return layoutBlockSupportConfig?.default;
 };
 
-export function SocialLinksEdit( props ) {
+export function SocialLinksEdit(props) {
 	const {
 		name,
 		attributes,
@@ -63,20 +63,19 @@ export function SocialLinksEdit( props ) {
 		size,
 		layout,
 	} = attributes;
-	const usedLayout = layout || getDefaultBlockLayout( name );
+	const usedLayout = layout || getDefaultBlockLayout(name);
 
 	// Remove icon background color if logos only style selected.
-	const logosOnly =
-		attributes.className?.indexOf( 'is-style-logos-only' ) >= 0;
-	useEffect( () => {
-		if ( logosOnly ) {
-			setAttributes( {
+	const logosOnly = attributes.className?.indexOf('is-style-logos-only') >= 0;
+	useEffect(() => {
+		if (logosOnly) {
+			setAttributes({
 				iconBackgroundColor: undefined,
 				customIconBackgroundColor: undefined,
 				iconBackgroundColorValue: undefined,
-			} );
+			});
 		}
-	}, [ logosOnly, setAttributes ] );
+	}, [logosOnly, setAttributes]);
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
@@ -91,26 +90,26 @@ export function SocialLinksEdit( props ) {
 
 	const SelectedSocialPlaceholder = (
 		<li className="wp-block-social-links__social-prompt">
-			{ __( 'Click plus to add' ) }
+			{__('Click plus to add')}
 		</li>
 	);
 
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
-	const className = classNames( size, {
+	const className = classNames(size, {
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
 			iconBackgroundColor.color || iconBackgroundColorValue,
-	} );
+	});
 
-	const blockProps = useBlockProps( { className } );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+	const blockProps = useBlockProps({ className });
+	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
 		__experimentalLayout: usedLayout,
-	} );
+	});
 
 	const POPOVER_PROPS = {
 		position: 'bottom right',
@@ -120,93 +119,93 @@ export function SocialLinksEdit( props ) {
 		<Fragment>
 			<BlockControls group="other">
 				<ToolbarDropdownMenu
-					label={ __( 'Size' ) }
-					text={ __( 'Size' ) }
-					icon={ null }
-					popoverProps={ POPOVER_PROPS }
+					label={__('Size')}
+					text={__('Size')}
+					icon={null}
+					popoverProps={POPOVER_PROPS}
 				>
-					{ ( { onClose } ) => (
+					{({ onClose }) => (
 						<MenuGroup>
-							{ sizeOptions.map( ( entry ) => {
+							{sizeOptions.map((entry) => {
 								return (
 									<MenuItem
 										icon={
-											( size === entry.value ||
-												( ! size &&
+											(size === entry.value ||
+												(!size &&
 													entry.value ===
-														'has-normal-icon-size' ) ) &&
+														'has-normal-icon-size')) &&
 											check
 										}
-										isSelected={ size === entry.value }
-										key={ entry.value }
-										onClick={ () => {
-											setAttributes( {
+										isSelected={size === entry.value}
+										key={entry.value}
+										onClick={() => {
+											setAttributes({
 												size: entry.value,
-											} );
-										} }
-										onClose={ onClose }
+											});
+										}}
+										onClose={onClose}
 										role="menuitemradio"
 									>
-										{ entry.name }
+										{entry.name}
 									</MenuItem>
 								);
-							} ) }
+							})}
 						</MenuGroup>
-					) }
+					)}
 				</ToolbarDropdownMenu>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={__('Link settings')}>
 					<ToggleControl
-						label={ __( 'Open links in new tab' ) }
-						checked={ openInNewTab }
-						onChange={ () =>
-							setAttributes( { openInNewTab: ! openInNewTab } )
+						label={__('Open links in new tab')}
+						checked={openInNewTab}
+						onChange={() =>
+							setAttributes({ openInNewTab: !openInNewTab })
 						}
 					/>
 				</PanelBody>
 				<PanelColorSettings
 					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
-					title={ __( 'Color' ) }
-					colorSettings={ [
+					title={__('Color')}
+					colorSettings={[
 						{
 							// Use custom attribute as fallback to prevent loss of named color selection when
 							// switching themes to a new theme that does not have a matching named color.
 							value: iconColor.color || iconColorValue,
-							onChange: ( colorValue ) => {
-								setIconColor( colorValue );
-								setAttributes( { iconColorValue: colorValue } );
+							onChange: (colorValue) => {
+								setIconColor(colorValue);
+								setAttributes({ iconColorValue: colorValue });
 							},
-							label: __( 'Icon color' ),
+							label: __('Icon color'),
 						},
-						! logosOnly && {
+						!logosOnly && {
 							// Use custom attribute as fallback to prevent loss of named color selection when
 							// switching themes to a new theme that does not have a matching named color.
 							value:
 								iconBackgroundColor.color ||
 								iconBackgroundColorValue,
-							onChange: ( colorValue ) => {
-								setIconBackgroundColor( colorValue );
-								setAttributes( {
+							onChange: (colorValue) => {
+								setIconBackgroundColor(colorValue);
+								setAttributes({
 									iconBackgroundColorValue: colorValue,
-								} );
+								});
 							},
-							label: __( 'Icon background' ),
+							label: __('Icon background'),
 						},
-					] }
+					]}
 				/>
-				{ ! logosOnly && (
+				{!logosOnly && (
 					<ContrastChecker
-						{ ...{
+						{...{
 							textColor: iconColorValue,
 							backgroundColor: iconBackgroundColorValue,
-						} }
-						isLargeText={ false }
+						}}
+						isLargeText={false}
 					/>
-				) }
+				)}
 			</InspectorControls>
-			<ul { ...innerBlocksProps } />
+			<ul {...innerBlocksProps} />
 		</Fragment>
 	);
 }
@@ -216,4 +215,4 @@ const iconColorAttributes = {
 	iconBackgroundColor: 'icon-background-color',
 };
 
-export default withColors( iconColorAttributes )( SocialLinksEdit );
+export default withColors(iconColorAttributes)(SocialLinksEdit);

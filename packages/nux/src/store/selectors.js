@@ -23,24 +23,22 @@ import { includes, difference, keys, has } from 'lodash';
  * @return {?NUXGuideInfo} Information about the associated guide.
  */
 export const getAssociatedGuide = createSelector(
-	( state, tipId ) => {
-		for ( const tipIds of state.guides ) {
-			if ( includes( tipIds, tipId ) ) {
+	(state, tipId) => {
+		for (const tipIds of state.guides) {
+			if (includes(tipIds, tipId)) {
 				const nonDismissedTips = difference(
 					tipIds,
-					keys( state.preferences.dismissedTips )
+					keys(state.preferences.dismissedTips)
 				);
-				const [
-					currentTipId = null,
-					nextTipId = null,
-				] = nonDismissedTips;
+				const [currentTipId = null, nextTipId = null] =
+					nonDismissedTips;
 				return { tipIds, currentTipId, nextTipId };
 			}
 		}
 
 		return null;
 	},
-	( state ) => [ state.guides, state.preferences.dismissedTips ]
+	(state) => [state.guides, state.preferences.dismissedTips]
 );
 
 /**
@@ -53,17 +51,17 @@ export const getAssociatedGuide = createSelector(
  *
  * @return {boolean} Whether or not the given tip is showing.
  */
-export function isTipVisible( state, tipId ) {
-	if ( ! state.preferences.areTipsEnabled ) {
+export function isTipVisible(state, tipId) {
+	if (!state.preferences.areTipsEnabled) {
 		return false;
 	}
 
-	if ( has( state.preferences.dismissedTips, [ tipId ] ) ) {
+	if (has(state.preferences.dismissedTips, [tipId])) {
 		return false;
 	}
 
-	const associatedGuide = getAssociatedGuide( state, tipId );
-	if ( associatedGuide && associatedGuide.currentTipId !== tipId ) {
+	const associatedGuide = getAssociatedGuide(state, tipId);
+	if (associatedGuide && associatedGuide.currentTipId !== tipId) {
 		return false;
 	}
 
@@ -77,6 +75,6 @@ export function isTipVisible( state, tipId ) {
  *
  * @return {boolean} Whether tips are globally enabled.
  */
-export function areTipsEnabled( state ) {
+export function areTipsEnabled(state) {
 	return state.preferences.areTipsEnabled;
 }

@@ -7,7 +7,7 @@ const {
 	getTranslateFunctionName,
 	getTranslateFunctionArgs,
 	getTextContentFromNode,
-} = require( '../utils' );
+} = require('../utils');
 
 module.exports = {
 	meta: {
@@ -27,9 +27,9 @@ module.exports = {
 				'Multiple sprintf placeholders should be ordered. Mix of ordered and non-ordered placeholders found.',
 		},
 	},
-	create( context ) {
+	create(context) {
 		return {
-			CallExpression( node ) {
+			CallExpression(node) {
 				const { callee, arguments: args } = node;
 
 				const functionName =
@@ -37,57 +37,57 @@ module.exports = {
 						? callee.property.name
 						: callee.name;
 
-				if ( functionName !== 'sprintf' ) {
+				if (functionName !== 'sprintf') {
 					return;
 				}
 
-				if ( ! args.length ) {
-					context.report( {
+				if (!args.length) {
+					context.report({
 						node,
 						messageId: 'noFormatString',
-					} );
+					});
 					return;
 				}
 
-				if ( args.length < 2 ) {
-					if ( args[ 0 ].type === 'SpreadElement' ) {
+				if (args.length < 2) {
+					if (args[0].type === 'SpreadElement') {
 						return;
 					}
 
-					context.report( {
+					context.report({
 						node,
 						messageId: 'noPlaceholderArgs',
-					} );
+					});
 					return;
 				}
 
 				let candidates;
-				switch ( args[ 0 ].type ) {
+				switch (args[0].type) {
 					case 'Literal':
-						candidates = [ args[ 0 ].value ].filter( ( arg ) => {
+						candidates = [args[0].value].filter((arg) => {
 							// Since a Literal may be a number, verify the
 							// value is a string.
 							return typeof arg === 'string';
-						} );
+						});
 						break;
 
 					case 'CallExpression':
 						const argFunctionName = getTranslateFunctionName(
-							args[ 0 ].callee
+							args[0].callee
 						);
 
 						// All possible options (arguments) from a translate
 						// function must be valid.
 						candidates = getTranslateFunctionArgs(
 							argFunctionName,
-							args[ 0 ].arguments,
+							args[0].arguments,
 							false
-						).map( getTextContentFromNode );
+						).map(getTextContentFromNode);
 
 						// An unknown function call may produce a valid string
 						// value. Ideally its result is verified, but this is
 						// not straight-forward to implement. Thus, bail.
-						if ( candidates.filter( Boolean ).length === 0 ) {
+						if (candidates.filter(Boolean).length === 0) {
 							return;
 						}
 
@@ -103,16 +103,16 @@ module.exports = {
 						candidates = [];
 				}
 
-				if ( ! candidates.length ) {
-					context.report( {
+				if (!candidates.length) {
+					context.report({
 						node,
 						messageId: 'invalidFormatString',
-					} );
+					});
 					return;
 				}
 
 				let numPlaceholders;
-				for ( const candidate of candidates ) {
+				for (const candidate of candidates) {
 					const allMatches = candidate.match(
 						REGEXP_SPRINTF_PLACEHOLDER
 					);
@@ -122,13 +122,12 @@ module.exports = {
 					// placeholder from the singular form of pluralization.
 					if (
 						numPlaceholders !== undefined &&
-						( ! allMatches ||
-							numPlaceholders !== allMatches.length )
+						(!allMatches || numPlaceholders !== allMatches.length)
 					) {
-						context.report( {
+						context.report({
 							node,
 							messageId: 'placeholderMismatch',
-						} );
+						});
 						return;
 					}
 
@@ -143,26 +142,26 @@ module.exports = {
 						allMatches.length > 1 &&
 						unorderedMatches.length !== allMatches.length
 					) {
-						context.report( {
+						context.report({
 							node,
 							messageId: 'noOrderedPlaceholders',
-						} );
+						});
 						return;
 					}
 
 					// Catch cases where a string only contains %% (escaped percentage sign).
 					if (
-						! allMatches ||
-						( allMatches.length === 1 && allMatches[ 0 ] === '%%' )
+						!allMatches ||
+						(allMatches.length === 1 && allMatches[0] === '%%')
 					) {
-						context.report( {
+						context.report({
 							node,
 							messageId: 'noPlaceholders',
-						} );
+						});
 						return;
 					}
 
-					if ( numPlaceholders === undefined ) {
+					if (numPlaceholders === undefined) {
 						// Track the number of placeholders discovered in the
 						// string to verify that all other candidate options
 						// have the same number.

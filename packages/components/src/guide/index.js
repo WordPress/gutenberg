@@ -19,110 +19,110 @@ import Button from '../button';
 import PageControl from './page-control';
 import FinishButton from './finish-button';
 
-export default function Guide( {
+export default function Guide({
 	children,
 	className,
 	contentLabel,
 	finishButtonText,
 	onFinish,
 	pages = [],
-} ) {
-	const [ currentPage, setCurrentPage ] = useState( 0 );
+}) {
+	const [currentPage, setCurrentPage] = useState(0);
 
-	useEffect( () => {
-		if ( Children.count( children ) ) {
-			deprecated( 'Passing children to <Guide>', {
+	useEffect(() => {
+		if (Children.count(children)) {
+			deprecated('Passing children to <Guide>', {
 				since: '5.5',
 				alternative: 'the `pages` prop',
-			} );
+			});
 		}
-	}, [ children ] );
+	}, [children]);
 
-	if ( Children.count( children ) ) {
-		pages = Children.map( children, ( child ) => ( { content: child } ) );
+	if (Children.count(children)) {
+		pages = Children.map(children, (child) => ({ content: child }));
 	}
 
 	const canGoBack = currentPage > 0;
 	const canGoForward = currentPage < pages.length - 1;
 
 	const goBack = () => {
-		if ( canGoBack ) {
-			setCurrentPage( currentPage - 1 );
+		if (canGoBack) {
+			setCurrentPage(currentPage - 1);
 		}
 	};
 
 	const goForward = () => {
-		if ( canGoForward ) {
-			setCurrentPage( currentPage + 1 );
+		if (canGoForward) {
+			setCurrentPage(currentPage + 1);
 		}
 	};
 
-	if ( pages.length === 0 ) {
+	if (pages.length === 0) {
 		return null;
 	}
 
 	return (
 		<Modal
-			className={ classnames( 'components-guide', className ) }
-			contentLabel={ contentLabel }
-			onRequestClose={ onFinish }
-			onKeyDown={ ( event ) => {
-				if ( event.keyCode === LEFT ) {
+			className={classnames('components-guide', className)}
+			contentLabel={contentLabel}
+			onRequestClose={onFinish}
+			onKeyDown={(event) => {
+				if (event.keyCode === LEFT) {
 					goBack();
-				} else if ( event.keyCode === RIGHT ) {
+				} else if (event.keyCode === RIGHT) {
 					goForward();
 				}
-			} }
+			}}
 		>
 			<div className="components-guide__container">
 				<div className="components-guide__page">
-					{ pages[ currentPage ].image }
+					{pages[currentPage].image}
 
-					{ pages.length > 1 && (
+					{pages.length > 1 && (
 						<PageControl
-							currentPage={ currentPage }
-							numberOfPages={ pages.length }
-							setCurrentPage={ setCurrentPage }
+							currentPage={currentPage}
+							numberOfPages={pages.length}
+							setCurrentPage={setCurrentPage}
 						/>
-					) }
+					)}
 
-					{ pages[ currentPage ].content }
+					{pages[currentPage].content}
 
-					{ ! canGoForward && (
+					{!canGoForward && (
 						<FinishButton
 							className="components-guide__inline-finish-button"
-							onClick={ onFinish }
+							onClick={onFinish}
 						>
-							{ finishButtonText || __( 'Finish' ) }
+							{finishButtonText || __('Finish')}
 						</FinishButton>
-					) }
+					)}
 				</div>
 
 				<div className="components-guide__footer">
-					{ canGoBack && (
+					{canGoBack && (
 						<Button
 							className="components-guide__back-button"
-							onClick={ goBack }
+							onClick={goBack}
 						>
-							{ __( 'Previous' ) }
+							{__('Previous')}
 						</Button>
-					) }
-					{ canGoForward && (
+					)}
+					{canGoForward && (
 						<Button
 							className="components-guide__forward-button"
-							onClick={ goForward }
+							onClick={goForward}
 						>
-							{ __( 'Next' ) }
+							{__('Next')}
 						</Button>
-					) }
-					{ ! canGoForward && (
+					)}
+					{!canGoForward && (
 						<FinishButton
 							className="components-guide__finish-button"
-							onClick={ onFinish }
+							onClick={onFinish}
 						>
-							{ finishButtonText || __( 'Finish' ) }
+							{finishButtonText || __('Finish')}
 						</FinishButton>
-					) }
+					)}
 				</div>
 			</div>
 		</Modal>

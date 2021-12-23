@@ -9,22 +9,22 @@ import { render } from '@testing-library/react';
 import { View } from '../../view';
 import { Flex, FlexBlock, FlexItem } from '../';
 
-describe( 'props', () => {
+describe('props', () => {
 	let base;
-	beforeEach( () => {
+	beforeEach(() => {
 		base = render(
 			<Flex>
 				<FlexItem />
 				<FlexBlock />
 			</Flex>
 		);
-	} );
+	});
 
-	test( 'should render correctly', () => {
-		expect( base.container.firstChild ).toMatchSnapshot();
-	} );
+	test('should render correctly', () => {
+		expect(base.container.firstChild).toMatchSnapshot();
+	});
 
-	test( 'should render + wrap non Flex children', () => {
+	test('should render + wrap non Flex children', () => {
 		const { container } = render(
 			<Flex>
 				<FlexItem />
@@ -34,44 +34,44 @@ describe( 'props', () => {
 			</Flex>
 		);
 
-		expect( container.firstChild ).toMatchDiffSnapshot(
+		expect(container.firstChild).toMatchDiffSnapshot(
 			base.container.firstChild
 		);
-	} );
+	});
 
-	test( 'should render align', () => {
+	test('should render align', () => {
 		const { container } = render(
 			<Flex align="flex-start">
 				<FlexItem />
 				<FlexBlock />
 			</Flex>
 		);
-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+		expect(container.firstChild).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);
-	} );
+	});
 
-	test( 'should render justify', () => {
+	test('should render justify', () => {
 		const { container } = render(
 			<Flex justify="flex-start">
 				<FlexItem />
 				<FlexBlock />
 			</Flex>
 		);
-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+		expect(container.firstChild).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);
-	} );
+	});
 
-	test( 'should render spacing', () => {
+	test('should render spacing', () => {
 		const { container } = render(
-			<Flex gap={ 5 }>
+			<Flex gap={5}>
 				<View />
 				<View />
 			</Flex>
 		);
-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+		expect(container.firstChild).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);
-	} );
-} );
+	});
+});

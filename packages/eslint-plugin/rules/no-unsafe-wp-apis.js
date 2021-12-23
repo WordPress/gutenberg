@@ -20,14 +20,14 @@ module.exports = {
 			},
 		],
 	},
-	create( context ) {
+	create(context) {
 		/** @type {AllowedImportsMap} */
 		const allowedImports =
-			( context.options &&
-				typeof context.options[ 0 ] === 'object' &&
-				context.options[ 0 ] ) ||
+			(context.options &&
+				typeof context.options[0] === 'object' &&
+				context.options[0]) ||
 			{};
-		const reporter = makeListener( { allowedImports, context } );
+		const reporter = makeListener({ allowedImports, context });
 
 		return { ImportDeclaration: reporter };
 	},
@@ -40,47 +40,47 @@ module.exports = {
  *
  * @return {(node: Node) => void} Listener function
  */
-function makeListener( { allowedImports, context } ) {
-	return function reporter( node ) {
-		if ( node.type !== 'ImportDeclaration' ) {
+function makeListener({ allowedImports, context }) {
+	return function reporter(node) {
+		if (node.type !== 'ImportDeclaration') {
 			return;
 		}
-		if ( typeof node.source.value !== 'string' ) {
+		if (typeof node.source.value !== 'string') {
 			return;
 		}
 
 		const sourceModule = node.source.value.trim();
 
 		// Ignore non-WordPress packages
-		if ( ! sourceModule.startsWith( '@wordpress/' ) ) {
+		if (!sourceModule.startsWith('@wordpress/')) {
 			return;
 		}
 
-		const allowedImportNames = allowedImports[ sourceModule ] || [];
+		const allowedImportNames = allowedImports[sourceModule] || [];
 
-		node.specifiers.forEach( ( specifierNode ) => {
-			if ( specifierNode.type !== 'ImportSpecifier' ) {
+		node.specifiers.forEach((specifierNode) => {
+			if (specifierNode.type !== 'ImportSpecifier') {
 				return;
 			}
 
 			const importedName = specifierNode.imported.name;
 
 			if (
-				! importedName.startsWith( '__unstable' ) &&
-				! importedName.startsWith( '__experimental' )
+				!importedName.startsWith('__unstable') &&
+				!importedName.startsWith('__experimental')
 			) {
 				return;
 			}
 
-			if ( allowedImportNames.includes( importedName ) ) {
+			if (allowedImportNames.includes(importedName)) {
 				return;
 			}
 
-			context.report( {
-				message: `Usage of \`${ importedName }\` from \`${ sourceModule }\` is not allowed.\nSee https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
+			context.report({
+				message: `Usage of \`${importedName}\` from \`${sourceModule}\` is not allowed.\nSee https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
 				node: specifierNode,
-			} );
-		} );
+			});
+		});
 	};
 }
 

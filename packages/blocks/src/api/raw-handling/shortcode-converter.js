@@ -22,47 +22,43 @@ function segmentHTMLToShortcodeBlock(
 	excludedBlockNames = []
 ) {
 	// Get all matches.
-	const transformsFrom = getBlockTransforms( 'from' );
+	const transformsFrom = getBlockTransforms('from');
 
 	const transformation = findTransform(
 		transformsFrom,
-		( transform ) =>
-			excludedBlockNames.indexOf( transform.blockName ) === -1 &&
+		(transform) =>
+			excludedBlockNames.indexOf(transform.blockName) === -1 &&
 			transform.type === 'shortcode' &&
-			some( castArray( transform.tag ), ( tag ) =>
-				regexp( tag ).test( HTML )
-			)
+			some(castArray(transform.tag), (tag) => regexp(tag).test(HTML))
 	);
 
-	if ( ! transformation ) {
-		return [ HTML ];
+	if (!transformation) {
+		return [HTML];
 	}
 
-	const transformTags = castArray( transformation.tag );
-	const transformTag = find( transformTags, ( tag ) =>
-		regexp( tag ).test( HTML )
-	);
+	const transformTags = castArray(transformation.tag);
+	const transformTag = find(transformTags, (tag) => regexp(tag).test(HTML));
 
 	let match;
 	const previousIndex = lastIndex;
 
-	if ( ( match = next( transformTag, HTML, lastIndex ) ) ) {
+	if ((match = next(transformTag, HTML, lastIndex))) {
 		lastIndex = match.index + match.content.length;
-		const beforeHTML = HTML.substr( 0, match.index );
-		const afterHTML = HTML.substr( lastIndex );
+		const beforeHTML = HTML.substr(0, match.index);
+		const afterHTML = HTML.substr(lastIndex);
 
 		// If the shortcode content does not contain HTML and the shortcode is
 		// not on a new line (or in paragraph from Markdown converter),
 		// consider the shortcode as inline text, and thus skip conversion for
 		// this segment.
 		if (
-			! includes( match.shortcode.content || '', '<' ) &&
-			! (
-				/(\n|<p>)\s*$/.test( beforeHTML ) &&
-				/^\s*(\n|<\/p>)/.test( afterHTML )
+			!includes(match.shortcode.content || '', '<') &&
+			!(
+				/(\n|<p>)\s*$/.test(beforeHTML) &&
+				/^\s*(\n|<\/p>)/.test(afterHTML)
 			)
 		) {
-			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
+			return segmentHTMLToShortcodeBlock(HTML, lastIndex);
 		}
 
 		// If a transformation's `isMatch` predicate fails for the inbound
@@ -75,25 +71,25 @@ function segmentHTMLToShortcodeBlock(
 		// valid matches in subsequent fragments.
 		if (
 			transformation.isMatch &&
-			! transformation.isMatch( match.shortcode.attrs )
+			!transformation.isMatch(match.shortcode.attrs)
 		) {
-			return segmentHTMLToShortcodeBlock( HTML, previousIndex, [
+			return segmentHTMLToShortcodeBlock(HTML, previousIndex, [
 				...excludedBlockNames,
 				transformation.blockName,
-			] );
+			]);
 		}
 
 		const attributes = mapValues(
-			pickBy( transformation.attributes, ( schema ) => schema.shortcode ),
+			pickBy(transformation.attributes, (schema) => schema.shortcode),
 			// Passing all of `match` as second argument is intentionally broad
 			// but shouldn't be too relied upon.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
-			( schema ) => schema.shortcode( match.shortcode.attrs, match )
+			(schema) => schema.shortcode(match.shortcode.attrs, match)
 		);
 
 		const transformationBlockType = {
-			...getBlockType( transformation.blockName ),
+			...getBlockType(transformation.blockName),
 			attributes: transformation.attributes,
 		};
 
@@ -107,16 +103,16 @@ function segmentHTMLToShortcodeBlock(
 		);
 		block.originalContent = match.shortcode.content;
 		// Applying the built-in fixes can enhance the attributes with missing content like "className".
-		block = applyBuiltInValidationFixes( block, transformationBlockType );
+		block = applyBuiltInValidationFixes(block, transformationBlockType);
 
 		return [
-			...segmentHTMLToShortcodeBlock( beforeHTML ),
+			...segmentHTMLToShortcodeBlock(beforeHTML),
 			block,
-			...segmentHTMLToShortcodeBlock( afterHTML ),
+			...segmentHTMLToShortcodeBlock(afterHTML),
 		];
 	}
 
-	return [ HTML ];
+	return [HTML];
 }
 
 export default segmentHTMLToShortcodeBlock;

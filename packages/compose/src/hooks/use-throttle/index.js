@@ -24,12 +24,11 @@ import { useEffect } from '@wordpress/element';
  * @param {import('lodash').ThrottleSettings} [options] The options object. See linked documentation for details.
  * @return {import('lodash').DebouncedFunc<TFunc>} Throttled function.
  */
-export default function useThrottle( fn, wait, options ) {
-	const throttled = useMemoOne( () => throttle( fn, wait, options ), [
-		fn,
-		wait,
-		options,
-	] );
-	useEffect( () => () => throttled.cancel(), [ throttled ] );
+export default function useThrottle(fn, wait, options) {
+	const throttled = useMemoOne(
+		() => throttle(fn, wait, options),
+		[fn, wait, options]
+	);
+	useEffect(() => () => throttled.cancel(), [throttled]);
 	return throttled;
 }

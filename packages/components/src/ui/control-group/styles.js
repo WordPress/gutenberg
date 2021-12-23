@@ -36,8 +36,8 @@ export const itemFocus = css`
 `;
 
 export const itemGrid = css`
-	> * + *:not( marquee ) {
+	> * + *:not(marquee) {
 		margin-left: -1px;
-		width: calc( 100% + 1px );
+		width: calc(100% + 1px);
 	}
 `;

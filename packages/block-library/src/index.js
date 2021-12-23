@@ -108,12 +108,12 @@ import * as video from './video';
  * @param {Object} block The block to be registered.
  *
  */
-const registerBlock = ( block ) => {
-	if ( ! block ) {
+const registerBlock = (block) => {
+	if (!block) {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockType( { name, ...metadata }, settings );
+	registerBlockType({ name, ...metadata }, settings);
 };
 
 /**
@@ -218,17 +218,15 @@ export const __experimentalGetCoreBlocks = () => [
  * registerCoreBlocks();
  * ```
  */
-export const registerCoreBlocks = (
-	blocks = __experimentalGetCoreBlocks()
-) => {
-	blocks.forEach( registerBlock );
+export const registerCoreBlocks = (blocks = __experimentalGetCoreBlocks()) => {
+	blocks.forEach(registerBlock);
 
-	setDefaultBlockName( paragraph.name );
-	if ( window.wp && window.wp.oldEditor ) {
-		setFreeformContentHandlerName( classic.name );
+	setDefaultBlockName(paragraph.name);
+	if (window.wp && window.wp.oldEditor) {
+		setFreeformContentHandlerName(classic.name);
 	}
-	setUnregisteredTypeHandlerName( missing.name );
-	setGroupingBlockName( group.name );
+	setUnregisteredTypeHandlerName(missing.name);
+	setGroupingBlockName(group.name);
 };
 
 /**
@@ -244,13 +242,13 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( { enableFSEBlocks } = {} ) => {
+		? ({ enableFSEBlocks } = {}) => {
 				[
 					// Experimental blocks.
 					homeLink,
 
 					// Full Site Editing blocks.
-					...( enableFSEBlocks
+					...(enableFSEBlocks
 						? [
 								commentAuthorAvatar,
 								commentAuthorName,
@@ -270,7 +268,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postCommentsForm,
 								postCommentsLink,
 						  ]
-						: [] ),
-				].forEach( registerBlock );
+						: []),
+				].forEach(registerBlock);
 		  }
 		: undefined;

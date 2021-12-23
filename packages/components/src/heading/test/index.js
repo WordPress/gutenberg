@@ -8,60 +8,60 @@ import { render } from '@testing-library/react';
  */
 import { Heading } from '../';
 
-describe( 'props', () => {
+describe('props', () => {
 	let base;
-	beforeEach( () => {
-		base = render( <Heading>Code is Poetry</Heading> );
-	} );
+	beforeEach(() => {
+		base = render(<Heading>Code is Poetry</Heading>);
+	});
 
-	test( 'should render correctly', () => {
-		expect( base.container.firstChild ).toMatchSnapshot();
-	} );
+	test('should render correctly', () => {
+		expect(base.container.firstChild).toMatchSnapshot();
+	});
 
-	test( 'should render level as a number', () => {
+	test('should render level as a number', () => {
 		const { container } = render(
-			<Heading level={ 4 }>Code is Poetry</Heading>
+			<Heading level={4}>Code is Poetry</Heading>
 		);
-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+		expect(container.firstChild).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);
-	} );
+	});
 
-	test( 'should render level as a string', () => {
+	test('should render level as a string', () => {
 		const { container } = render(
 			<Heading level="4">Code is Poetry</Heading>
 		);
-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+		expect(container.firstChild).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);
-	} );
+	});
 
-	test( 'should allow as prop', () => {
+	test('should allow as prop', () => {
 		const { container } = render(
 			<Heading level="1" as="span">
 				Code is Poetry
 			</Heading>
 		);
-		expect( container.firstChild.tagName ).toBe( 'SPAN' );
-	} );
+		expect(container.firstChild.tagName).toBe('SPAN');
+	});
 
-	test( 'should render a11y props when not using a semantic element', () => {
+	test('should render a11y props when not using a semantic element', () => {
 		const { container } = render(
 			<Heading level="3" as="div">
 				Code is Poetry
 			</Heading>
 		);
-		expect( container.firstChild.getAttribute( 'role' ) ).toBe( 'heading' );
-		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBe( '3' );
-	} );
+		expect(container.firstChild.getAttribute('role')).toBe('heading');
+		expect(container.firstChild.getAttribute('aria-level')).toBe('3');
+	});
 
-	test( 'should not render a11y props when using a semantic element', () => {
+	test('should not render a11y props when using a semantic element', () => {
 		const { container } = render(
 			<Heading level="1" as="h4">
 				Code is Poetry
 			</Heading>
 		);
-		expect( container.firstChild.getAttribute( 'role' ) ).toBeNull();
-		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBeNull();
-	} );
-} );
+		expect(container.firstChild.getAttribute('role')).toBeNull();
+		expect(container.firstChild.getAttribute('aria-level')).toBeNull();
+	});
+});

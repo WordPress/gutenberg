@@ -31,14 +31,14 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as editPostStore } from '../../../store';
 
-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select({
 	web: true,
 	native: false,
-} );
+});
 
 const SettingsSidebar = () => {
 	const { sidebarName, keyboardShortcut, isTemplateMode } = useSelect(
-		( select ) => {
+		(select) => {
 			// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
 			// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
 			// If one of the two sidebars is active the component will contain the content of that sidebar.
@@ -46,26 +46,22 @@ const SettingsSidebar = () => {
 			// component, besides being used to render the sidebar, also renders the toggle button. In that case sidebarName
 			// should contain the sidebar that will be active when the toggle button is pressed. If a block
 			// is selected, that should be edit-post/block otherwise it's edit-post/document.
-			let sidebar = select( interfaceStore ).getActiveComplementaryArea(
+			let sidebar = select(interfaceStore).getActiveComplementaryArea(
 				editPostStore.name
 			);
-			if (
-				! [ 'edit-post/document', 'edit-post/block' ].includes(
-					sidebar
-				)
-			) {
-				if ( select( blockEditorStore ).getBlockSelectionStart() ) {
+			if (!['edit-post/document', 'edit-post/block'].includes(sidebar)) {
+				if (select(blockEditorStore).getBlockSelectionStart()) {
 					sidebar = 'edit-post/block';
 				}
 				sidebar = 'edit-post/document';
 			}
 			const shortcut = select(
 				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
+			).getShortcutRepresentation('core/edit-post/toggle-sidebar');
 			return {
 				sidebarName: sidebar,
 				keyboardShortcut: shortcut,
-				isTemplateMode: select( editPostStore ).isEditingTemplate(),
+				isTemplateMode: select(editPostStore).isEditingTemplate(),
 			};
 		},
 		[]
@@ -73,17 +69,17 @@ const SettingsSidebar = () => {
 
 	return (
 		<PluginSidebarEditPost
-			identifier={ sidebarName }
-			header={ <SettingsHeader sidebarName={ sidebarName } /> }
-			closeLabel={ __( 'Close settings' ) }
+			identifier={sidebarName}
+			header={<SettingsHeader sidebarName={sidebarName} />}
+			closeLabel={__('Close settings')}
 			headerClassName="edit-post-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
-			title={ __( 'Settings' ) }
-			toggleShortcut={ keyboardShortcut }
-			icon={ cog }
-			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			title={__('Settings')}
+			toggleShortcut={keyboardShortcut}
+			icon={cog}
+			isActiveByDefault={SIDEBAR_ACTIVE_BY_DEFAULT}
 		>
-			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (
+			{!isTemplateMode && sidebarName === 'edit-post/document' && (
 				<>
 					<PostStatus />
 					<Template />
@@ -97,11 +93,11 @@ const SettingsSidebar = () => {
 					<PageAttributes />
 					<MetaBoxes location="side" />
 				</>
-			) }
-			{ isTemplateMode && sidebarName === 'edit-post/document' && (
+			)}
+			{isTemplateMode && sidebarName === 'edit-post/document' && (
 				<TemplateSummary />
-			) }
-			{ sidebarName === 'edit-post/block' && <BlockInspector /> }
+			)}
+			{sidebarName === 'edit-post/block' && <BlockInspector />}
 		</PluginSidebarEditPost>
 	);
 };

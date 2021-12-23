@@ -4,7 +4,7 @@
  */
 import { createContext } from '@wordpress/element';
 
-export const SlotFillContext = createContext( {
+export const SlotFillContext = createContext({
 	registerSlot: () => {},
 	unregisterSlot: () => {},
 	registerFill: () => {},
@@ -12,6 +12,6 @@ export const SlotFillContext = createContext( {
 	getSlot: () => {},
 	getFills: () => {},
 	subscribe: () => {},
-} );
+});
 
 export default SlotFillContext;

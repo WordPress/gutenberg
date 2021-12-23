@@ -5,16 +5,16 @@ process.env.NODE_ENV = 'test';
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
 // terminate the Node.js process with a non-zero exit code.
-process.on( 'unhandledRejection', ( err ) => {
+process.on('unhandledRejection', (err) => {
 	throw err;
-} );
+});
 
 /**
  * External dependencies
  */
 /* eslint-disable-next-line jest/no-jest-import */
-const jest = require( 'jest' );
-const { sync: spawn } = require( 'cross-spawn' );
+const jest = require('jest');
+const { sync: spawn } = require('cross-spawn');
 
 /**
  * Internal dependencies
@@ -26,41 +26,41 @@ const {
 	getArgsFromCLI,
 	hasArgInCLI,
 	hasProjectFile,
-} = require( '../utils' );
+} = require('../utils');
 
-const result = spawn( 'node', [ require.resolve( 'puppeteer-core/install' ) ], {
+const result = spawn('node', [require.resolve('puppeteer-core/install')], {
 	stdio: 'inherit',
-} );
+});
 
-if ( result.status > 0 ) {
-	process.exit( result.status );
+if (result.status > 0) {
+	process.exit(result.status);
 }
 
 // Provides a default config path for Puppeteer when jest-puppeteer.config.js
 // wasn't found at the root of the project or a custom path wasn't defined
 // using JEST_PUPPETEER_CONFIG environment variable.
 if (
-	! hasProjectFile( 'jest-puppeteer.config.js' ) &&
-	! process.env.JEST_PUPPETEER_CONFIG
+	!hasProjectFile('jest-puppeteer.config.js') &&
+	!process.env.JEST_PUPPETEER_CONFIG
 ) {
-	process.env.JEST_PUPPETEER_CONFIG = fromConfigRoot( 'puppeteer.config.js' );
+	process.env.JEST_PUPPETEER_CONFIG = fromConfigRoot('puppeteer.config.js');
 }
 
-const configFile = getJestOverrideConfigFile( 'e2e' );
+const configFile = getJestOverrideConfigFile('e2e');
 
 const config = configFile
-	? [ '--config', JSON.stringify( require( configFile ) ) ]
+	? ['--config', JSON.stringify(require(configFile))]
 	: [];
 
-const hasRunInBand = hasArgInCLI( '--runInBand' ) || hasArgInCLI( '-i' );
-const runInBand = ! hasRunInBand ? [ '--runInBand' ] : [];
+const hasRunInBand = hasArgInCLI('--runInBand') || hasArgInCLI('-i');
+const runInBand = !hasRunInBand ? ['--runInBand'] : [];
 
-if ( hasArgInCLI( '--puppeteer-interactive' ) ) {
+if (hasArgInCLI('--puppeteer-interactive')) {
 	process.env.PUPPETEER_HEADLESS = 'false';
-	process.env.PUPPETEER_SLOWMO = getArgFromCLI( '--puppeteer-slowmo' ) || 80;
+	process.env.PUPPETEER_SLOWMO = getArgFromCLI('--puppeteer-slowmo') || 80;
 }
 
-if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
+if (hasArgInCLI('--puppeteer-devtools')) {
 	process.env.PUPPETEER_HEADLESS = 'false';
 	process.env.PUPPETEER_DEVTOOLS = 'true';
 }
@@ -71,12 +71,12 @@ const configsMapping = {
 	WP_PASSWORD: '--wordpress-password',
 };
 
-Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
-	if ( hasArgInCLI( argName ) ) {
-		process.env[ envKey ] = getArgFromCLI( argName );
+Object.entries(configsMapping).forEach(([envKey, argName]) => {
+	if (hasArgInCLI(argName)) {
+		process.env[envKey] = getArgFromCLI(argName);
 	}
-} );
+});
 
-const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
+const cleanUpPrefixes = ['--puppeteer-', '--wordpress-'];
 
-jest.run( [ ...config, ...runInBand, ...getArgsFromCLI( cleanUpPrefixes ) ] );
+jest.run([...config, ...runInBand, ...getArgsFromCLI(cleanUpPrefixes)]);

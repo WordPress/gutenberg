@@ -16,19 +16,19 @@ import BaseDefaultBlockAppender from '../default-block-appender';
 import withClientId from './with-client-id';
 import { store as blockEditorStore } from '../../store';
 
-export const DefaultBlockAppender = ( { clientId } ) => {
-	return <BaseDefaultBlockAppender rootClientId={ clientId } />;
+export const DefaultBlockAppender = ({ clientId }) => {
+	return <BaseDefaultBlockAppender rootClientId={clientId} />;
 };
 
-export default compose( [
+export default compose([
 	withClientId,
-	withSelect( ( select, { clientId } ) => {
-		const { getBlockOrder } = select( blockEditorStore );
+	withSelect((select, { clientId }) => {
+		const { getBlockOrder } = select(blockEditorStore);
 
-		const blockClientIds = getBlockOrder( clientId );
+		const blockClientIds = getBlockOrder(clientId);
 
 		return {
-			lastBlockClientId: last( blockClientIds ),
+			lastBlockClientId: last(blockClientIds),
 		};
-	} ),
-] )( DefaultBlockAppender );
+	}),
+])(DefaultBlockAppender);

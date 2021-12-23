@@ -6,8 +6,8 @@ let id = -1;
 
 const prefix = 'link-control-instance';
 
-function getKey( _id ) {
-	return `${ prefix }-${ _id }`;
+function getKey(_id) {
+	return `${prefix}-${_id}`;
 }
 
 /**
@@ -16,19 +16,19 @@ function getKey( _id ) {
  * @param {Object} instance an unique object reference specific to this link control instance.
  * @return {string} the unique key to use for this link control.
  */
-function useLinkInstanceKey( instance ) {
-	if ( ! instance ) {
+function useLinkInstanceKey(instance) {
+	if (!instance) {
 		return;
 	}
-	if ( weakMap.has( instance ) ) {
-		return getKey( weakMap.get( instance ) );
+	if (weakMap.has(instance)) {
+		return getKey(weakMap.get(instance));
 	}
 
 	id += 1;
 
-	weakMap.set( instance, id );
+	weakMap.set(instance, id);
 
-	return getKey( id );
+	return getKey(id);
 }
 
 export default useLinkInstanceKey;

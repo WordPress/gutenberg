@@ -9,19 +9,19 @@ import { omit } from 'lodash';
  */
 import { forwardRef } from '@wordpress/element';
 
-const UNSUPPORTED_PROPS = [ 'style' ];
+const UNSUPPORTED_PROPS = ['style'];
 
-const RCTAztecView = ( { accessibilityLabel, text, ...rest }, ref ) => {
+const RCTAztecView = ({ accessibilityLabel, text, ...rest }, ref) => {
 	return (
 		<TextInput
-			{ ...omit( rest, UNSUPPORTED_PROPS ) }
+			{...omit(rest, UNSUPPORTED_PROPS)}
 			accessibilityLabel={
-				accessibilityLabel || `Text input. ${ text.text || 'Empty' }`
+				accessibilityLabel || `Text input. ${text.text || 'Empty'}`
 			}
-			ref={ ref }
-			value={ text.text }
+			ref={ref}
+			value={text.text}
 		/>
 	);
 };
 
-export default forwardRef( RCTAztecView );
+export default forwardRef(RCTAztecView);

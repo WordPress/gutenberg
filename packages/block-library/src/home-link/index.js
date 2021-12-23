@@ -24,7 +24,7 @@ export const settings = {
 
 	example: {
 		attributes: {
-			label: _x( 'Home Link', 'block example' ),
+			label: _x('Home Link', 'block example'),
 		},
 	},
 };

@@ -20,59 +20,59 @@ import isInputOrTextArea from './is-input-or-text-area';
  *
  * @return {boolean} True if at the edge, false if not.
  */
-export default function isEdge( container, isReverse, onlyVertical = false ) {
+export default function isEdge(container, isReverse, onlyVertical = false) {
 	if (
-		isInputOrTextArea( container ) &&
+		isInputOrTextArea(container) &&
 		typeof container.selectionStart === 'number'
 	) {
-		if ( container.selectionStart !== container.selectionEnd ) {
+		if (container.selectionStart !== container.selectionEnd) {
 			return false;
 		}
 
-		if ( isReverse ) {
+		if (isReverse) {
 			return container.selectionStart === 0;
 		}
 
 		return container.value.length === container.selectionStart;
 	}
 
-	if ( ! (/** @type {HTMLElement} */ ( container ).isContentEditable) ) {
+	if (!(/** @type {HTMLElement} */ (container).isContentEditable)) {
 		return true;
 	}
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 
-	assertIsDefined( defaultView, 'defaultView' );
+	assertIsDefined(defaultView, 'defaultView');
 	const selection = defaultView.getSelection();
 
-	if ( ! selection || ! selection.rangeCount ) {
+	if (!selection || !selection.rangeCount) {
 		return false;
 	}
 
-	const range = selection.getRangeAt( 0 );
+	const range = selection.getRangeAt(0);
 	const collapsedRange = range.cloneRange();
-	const isForward = isSelectionForward( selection );
+	const isForward = isSelectionForward(selection);
 	const isCollapsed = selection.isCollapsed;
 
 	// Collapse in direction of selection.
-	if ( ! isCollapsed ) {
-		collapsedRange.collapse( ! isForward );
+	if (!isCollapsed) {
+		collapsedRange.collapse(!isForward);
 	}
 
-	const collapsedRangeRect = getRectangleFromRange( collapsedRange );
-	const rangeRect = getRectangleFromRange( range );
+	const collapsedRangeRect = getRectangleFromRange(collapsedRange);
+	const rangeRect = getRectangleFromRange(range);
 
-	if ( ! collapsedRangeRect || ! rangeRect ) {
+	if (!collapsedRangeRect || !rangeRect) {
 		return false;
 	}
 
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge. The selection is multiline if it is taller than the
 	// collapsed  selection.
-	const rangeHeight = getRangeHeight( range );
+	const rangeHeight = getRangeHeight(range);
 	if (
-		! isCollapsed &&
+		!isCollapsed &&
 		rangeHeight &&
 		rangeHeight > collapsedRangeRect.height &&
 		isForward === isReverse
@@ -81,7 +81,7 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 	}
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
-	const isReverseDir = isRTL( container ) ? ! isReverse : isReverse;
+	const isReverseDir = isRTL(container) ? !isReverse : isReverse;
 	const containerRect = container.getBoundingClientRect();
 
 	// To check if a selection is at the edge, we insert a test selection at the
@@ -100,28 +100,28 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 		ownerDocument,
 		x,
 		y,
-		/** @type {HTMLElement} */ ( container )
+		/** @type {HTMLElement} */ (container)
 	);
 
-	if ( ! testRange ) {
+	if (!testRange) {
 		return false;
 	}
 
-	const testRect = getRectangleFromRange( testRange );
+	const testRect = getRectangleFromRange(testRange);
 
-	if ( ! testRect ) {
+	if (!testRect) {
 		return false;
 	}
 
 	const verticalSide = isReverse ? 'top' : 'bottom';
 	const horizontalSide = isReverseDir ? 'left' : 'right';
-	const verticalDiff = testRect[ verticalSide ] - rangeRect[ verticalSide ];
+	const verticalDiff = testRect[verticalSide] - rangeRect[verticalSide];
 	const horizontalDiff =
-		testRect[ horizontalSide ] - collapsedRangeRect[ horizontalSide ];
+		testRect[horizontalSide] - collapsedRangeRect[horizontalSide];
 
 	// Allow the position to be 1px off.
-	const hasVerticalDiff = Math.abs( verticalDiff ) <= 1;
-	const hasHorizontalDiff = Math.abs( horizontalDiff ) <= 1;
+	const hasVerticalDiff = Math.abs(verticalDiff) <= 1;
+	const hasHorizontalDiff = Math.abs(horizontalDiff) <= 1;
 
 	return onlyVertical
 		? hasVerticalDiff

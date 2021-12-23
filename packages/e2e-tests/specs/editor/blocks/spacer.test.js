@@ -8,41 +8,41 @@ import {
 	dragAndResize,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Spacer', () => {
-	beforeEach( async () => {
+describe('Spacer', () => {
+	beforeEach(async () => {
 		await createNewPost();
-	} );
+	});
 
-	it( 'can be created by typing "/spacer"', async () => {
+	it('can be created by typing "/spacer"', async () => {
 		// Create a spacer with the slash block shortcut.
 		await clickBlockAppender();
-		await page.keyboard.type( '/spacer' );
+		await page.keyboard.type('/spacer');
 		await page.waitForXPath(
 			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Spacer')]`
 		);
-		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press('Enter');
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
+		expect(await getEditedPostContent()).toMatchSnapshot();
+	});
 
-	it( 'can be resized using the drag handle and remains selected after being dragged', async () => {
+	it('can be resized using the drag handle and remains selected after being dragged', async () => {
 		// Create a spacer with the slash block shortcut.
 		await clickBlockAppender();
-		await page.keyboard.type( '/spacer' );
+		await page.keyboard.type('/spacer');
 		await page.waitForXPath(
 			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Spacer')]`
 		);
-		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press('Enter');
 
 		const resizableHandle = await page.$(
 			'.block-library-spacer__resize-container .components-resizable-box__handle'
 		);
-		await dragAndResize( resizableHandle, { x: 0, y: 50 } );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		await dragAndResize(resizableHandle, { x: 0, y: 50 });
+		expect(await getEditedPostContent()).toMatchSnapshot();
 
 		const selectedSpacer = await page.$(
 			'[data-type="core/spacer"].is-selected'
 		);
-		expect( selectedSpacer ).not.toBe( null );
-	} );
-} );
+		expect(selectedSpacer).not.toBe(null);
+	});
+});

@@ -24,23 +24,23 @@ const PickerScreen = () => {
 		isBottomSheetContentScrolling,
 		shouldEnableBottomSheetScroll,
 		onHandleHardwareButtonPress,
-	} = useContext( BottomSheetContext );
+	} = useContext(BottomSheetContext);
 	const { setColor, currentValue, isGradientColor } = route.params;
-	return useMemo( () => {
+	return useMemo(() => {
 		return (
 			<ColorPicker
-				onShouldEnableInnerHandling={ onShouldEnableInnerHandling }
+				onShouldEnableInnerHandling={onShouldEnableInnerHandling}
 				shouldEnableBottomSheetMaxHeight={
 					shouldEnableBottomSheetMaxHeight
 				}
-				setColor={ setColor }
-				activeColor={ currentValue }
-				isGradientColor={ isGradientColor }
-				onNavigationBack={ navigation.goBack }
-				onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
-				isBottomSheetContentScrolling={ isBottomSheetContentScrolling }
-				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
-				onHandleHardwareButtonPress={ onHandleHardwareButtonPress }
+				setColor={setColor}
+				activeColor={currentValue}
+				isGradientColor={isGradientColor}
+				onNavigationBack={navigation.goBack}
+				onHandleClosingBottomSheet={onHandleClosingBottomSheet}
+				isBottomSheetContentScrolling={isBottomSheetContentScrolling}
+				shouldEnableBottomSheetScroll={shouldEnableBottomSheetScroll}
+				onHandleHardwareButtonPress={onHandleHardwareButtonPress}
 			/>
 		);
 	}, [
@@ -53,7 +53,7 @@ const PickerScreen = () => {
 		isBottomSheetContentScrolling,
 		shouldEnableBottomSheetScroll,
 		onHandleHardwareButtonPress,
-	] );
+	]);
 };
 
 export default PickerScreen;

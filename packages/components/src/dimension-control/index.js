@@ -20,7 +20,7 @@ import { Fragment } from '@wordpress/element';
  */
 import sizesTable, { findSizeBySlug } from './sizes';
 
-export function DimensionControl( props ) {
+export function DimensionControl(props) {
 	const {
 		label,
 		value,
@@ -30,48 +30,45 @@ export function DimensionControl( props ) {
 		className = '',
 	} = props;
 
-	const onChangeSpacingSize = ( val ) => {
-		const theSize = findSizeBySlug( sizes, val );
+	const onChangeSpacingSize = (val) => {
+		const theSize = findSizeBySlug(sizes, val);
 
-		if ( ! theSize || value === theSize.slug ) {
-			onChange( undefined );
-		} else if ( isFunction( onChange ) ) {
-			onChange( theSize.slug );
+		if (!theSize || value === theSize.slug) {
+			onChange(undefined);
+		} else if (isFunction(onChange)) {
+			onChange(theSize.slug);
 		}
 	};
 
-	const formatSizesAsOptions = ( theSizes ) => {
-		const options = theSizes.map( ( { name, slug } ) => ( {
+	const formatSizesAsOptions = (theSizes) => {
+		const options = theSizes.map(({ name, slug }) => ({
 			label: name,
 			value: slug,
-		} ) );
+		}));
 
 		return [
 			{
-				label: __( 'Default' ),
+				label: __('Default'),
 				value: '',
 			},
-		].concat( options );
+		].concat(options);
 	};
 
 	const selectLabel = (
 		<Fragment>
-			{ icon && <Icon icon={ icon } /> }
-			{ label }
+			{icon && <Icon icon={icon} />}
+			{label}
 		</Fragment>
 	);
 
 	return (
 		<SelectControl
-			className={ classnames(
-				className,
-				'block-editor-dimension-control'
-			) }
-			label={ selectLabel }
-			hideLabelFromVision={ false }
-			value={ value }
-			onChange={ onChangeSpacingSize }
-			options={ formatSizesAsOptions( sizes ) }
+			className={classnames(className, 'block-editor-dimension-control')}
+			label={selectLabel}
+			hideLabelFromVision={false}
+			value={value}
+			onChange={onChangeSpacingSize}
+			options={formatSizesAsOptions(sizes)}
 		/>
 	);
 }

@@ -5,8 +5,8 @@
  *
  * @return {boolean} Whether the inserter is opened.
  */
-export function isInserterOpened( state ) {
-	return !! state.blockInserterPanel;
+export function isInserterOpened(state) {
+	return !!state.blockInserterPanel;
 }
 
 /**
@@ -16,7 +16,7 @@ export function isInserterOpened( state ) {
  *
  * @return {Object} The root client ID and index to insert at.
  */
-export function __experimentalGetInsertionPoint( state ) {
+export function __experimentalGetInsertionPoint(state) {
 	const { rootClientId, insertionIndex } = state.blockInserterPanel;
 	return { rootClientId, insertionIndex };
 }

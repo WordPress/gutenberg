@@ -39,7 +39,7 @@ export function reinitializeEditor(
 	settings,
 	initialEdits
 ) {
-	unmountComponentAtNode( target );
+	unmountComponentAtNode(target);
 	const reboot = reinitializeEditor.bind(
 		null,
 		postType,
@@ -51,11 +51,11 @@ export function reinitializeEditor(
 
 	render(
 		<Editor
-			settings={ settings }
-			onError={ reboot }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
+			settings={settings}
+			onError={reboot}
+			postId={postId}
+			postType={postType}
+			initialEdits={initialEdits}
 			recovery
 		/>,
 		target
@@ -73,21 +73,15 @@ export function reinitializeEditor(
  *                               considered as non-user-initiated (bypass for
  *                               unsaved changes prompt).
  */
-export function initializeEditor(
-	id,
-	postType,
-	postId,
-	settings,
-	initialEdits
-) {
+export function initializeEditor(id, postType, postId, settings, initialEdits) {
 	// Prevent adding template part in the post editor.
 	// Only add the filter when the post editor is initialized, not imported.
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
 		'removeTemplatePartsFromInserter',
-		( can, blockType ) => {
+		(can, blockType) => {
 			if (
-				! select( editPostStore ).isEditingTemplate() &&
+				!select(editPostStore).isEditingTemplate() &&
 				blockType.name === 'core/template-part'
 			) {
 				return false;
@@ -96,7 +90,7 @@ export function initializeEditor(
 		}
 	);
 
-	const target = document.getElementById( id );
+	const target = document.getElementById(id);
 	const reboot = reinitializeEditor.bind(
 		null,
 		postType,
@@ -106,7 +100,7 @@ export function initializeEditor(
 		initialEdits
 	);
 
-	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-post', {
+	dispatch(interfaceStore).setFeatureDefaults('core/edit-post', {
 		fixedToolbar: false,
 		welcomeGuide: true,
 		mobileGalleryWarning: true,
@@ -115,20 +109,20 @@ export function initializeEditor(
 		themeStyles: true,
 		showBlockBreadcrumbs: true,
 		welcomeGuideTemplate: true,
-	} );
+	});
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch(blocksStore).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
+	if (process.env.GUTENBERG_PHASE === 2) {
+		__experimentalRegisterExperimentalCoreBlocks({
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
-		} );
+		});
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =
 		document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';
-	if ( documentMode !== 'Standards' ) {
+	if (documentMode !== 'Standards') {
 		// eslint-disable-next-line no-console
 		console.warn(
 			"Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site's PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins."
@@ -142,36 +136,34 @@ export function initializeEditor(
 	// Specifically, we scroll `interface-interface-skeleton__body` to enable a fixed top toolbar.
 	// But Mobile Safari forces the `html` element to scroll upwards, hiding the toolbar.
 
-	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
-	if ( isIphone ) {
-		window.addEventListener( 'scroll', ( event ) => {
+	const isIphone = window.navigator.userAgent.indexOf('iPhone') !== -1;
+	if (isIphone) {
+		window.addEventListener('scroll', (event) => {
 			const editorScrollContainer = document.getElementsByClassName(
 				'interface-interface-skeleton__body'
-			)[ 0 ];
-			if ( event.target === document ) {
+			)[0];
+			if (event.target === document) {
 				// Scroll element into view by scrolling the editor container by the same amount
 				// that Mobile Safari tried to scroll the html element upwards.
-				if ( window.scrollY > 100 ) {
+				if (window.scrollY > 100) {
 					editorScrollContainer.scrollTop =
 						editorScrollContainer.scrollTop + window.scrollY;
 				}
 				// Undo unwanted scroll on html element, but only in the visual editor.
-				if (
-					document.getElementsByClassName( 'is-mode-visual' )[ 0 ]
-				) {
-					window.scrollTo( 0, 0 );
+				if (document.getElementsByClassName('is-mode-visual')[0]) {
+					window.scrollTo(0, 0);
 				}
 			}
-		} );
+		});
 	}
 
 	render(
 		<Editor
-			settings={ settings }
-			onError={ reboot }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
+			settings={settings}
+			onError={reboot}
+			postId={postId}
+			postType={postType}
+			initialEdits={initialEdits}
 		/>,
 		target
 	);

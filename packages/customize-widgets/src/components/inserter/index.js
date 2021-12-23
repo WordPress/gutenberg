@@ -13,44 +13,42 @@ import { closeSmall } from '@wordpress/icons';
  */
 import { store as customizeWidgetsStore } from '../../store';
 
-function Inserter( { setIsOpened } ) {
+function Inserter({ setIsOpened }) {
 	const inserterTitleId = useInstanceId(
 		Inserter,
 		'customize-widget-layout__inserter-panel-title'
 	);
 	const insertionPoint = useSelect(
-		( select ) =>
-			select( customizeWidgetsStore ).__experimentalGetInsertionPoint(),
+		(select) =>
+			select(customizeWidgetsStore).__experimentalGetInsertionPoint(),
 		[]
 	);
 
 	return (
 		<div
 			className="customize-widgets-layout__inserter-panel"
-			aria-labelledby={ inserterTitleId }
+			aria-labelledby={inserterTitleId}
 		>
 			<div className="customize-widgets-layout__inserter-panel-header">
 				<h2
-					id={ inserterTitleId }
+					id={inserterTitleId}
 					className="customize-widgets-layout__inserter-panel-header-title"
 				>
-					{ __( 'Add a block' ) }
+					{__('Add a block')}
 				</h2>
 				<Button
 					className="customize-widgets-layout__inserter-panel-header-close-button"
-					icon={ closeSmall }
-					onClick={ () => setIsOpened( false ) }
-					aria-label={ __( 'Close inserter' ) }
+					icon={closeSmall}
+					onClick={() => setIsOpened(false)}
+					aria-label={__('Close inserter')}
 				/>
 			</div>
 			<div className="customize-widgets-layout__inserter-panel-content">
 				<Library
-					rootClientId={ insertionPoint.rootClientId }
-					__experimentalInsertionIndex={
-						insertionPoint.insertionIndex
-					}
+					rootClientId={insertionPoint.rootClientId}
+					__experimentalInsertionIndex={insertionPoint.insertionIndex}
 					showInserterHelpPanel
-					onSelect={ () => setIsOpened( false ) }
+					onSelect={() => setIsOpened(false)}
 				/>
 			</div>
 		</div>

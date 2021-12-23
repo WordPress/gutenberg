@@ -40,33 +40,33 @@ function TextControl(
 	},
 	ref
 ) {
-	const instanceId = useInstanceId( TextControl );
-	const id = `inspector-text-control-${ instanceId }`;
+	const instanceId = useInstanceId(TextControl);
+	const id = `inspector-text-control-${instanceId}`;
 	const onChangeValue = (
 		/** @type {import('react').ChangeEvent<HTMLInputElement>} */
 		event
-	) => onChange( event.target.value );
+	) => onChange(event.target.value);
 
 	return (
 		<BaseControl
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-			id={ id }
-			help={ help }
-			className={ className }
+			label={label}
+			hideLabelFromVision={hideLabelFromVision}
+			id={id}
+			help={help}
+			className={className}
 		>
 			<input
 				className="components-text-control__input"
-				type={ type }
-				id={ id }
-				value={ value }
-				onChange={ onChangeValue }
-				aria-describedby={ !! help ? id + '__help' : undefined }
-				ref={ ref }
-				{ ...props }
+				type={type}
+				id={id}
+				value={value}
+				onChange={onChangeValue}
+				aria-describedby={!!help ? id + '__help' : undefined}
+				ref={ref}
+				{...props}
 			/>
 		</BaseControl>
 	);
 }
 
-export default forwardRef( TextControl );
+export default forwardRef(TextControl);

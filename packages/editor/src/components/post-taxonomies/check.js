@@ -15,22 +15,22 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export function PostTaxonomiesCheck( { postType, taxonomies, children } ) {
-	const hasTaxonomies = some( taxonomies, ( taxonomy ) =>
-		includes( taxonomy.types, postType )
+export function PostTaxonomiesCheck({ postType, taxonomies, children }) {
+	const hasTaxonomies = some(taxonomies, (taxonomy) =>
+		includes(taxonomy.types, postType)
 	);
-	if ( ! hasTaxonomies ) {
+	if (!hasTaxonomies) {
 		return null;
 	}
 
 	return children;
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		return {
-			postType: select( editorStore ).getCurrentPostType(),
-			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
+			postType: select(editorStore).getCurrentPostType(),
+			taxonomies: select(coreStore).getTaxonomies({ per_page: -1 }),
 		};
-	} ),
-] )( PostTaxonomiesCheck );
+	}),
+])(PostTaxonomiesCheck);

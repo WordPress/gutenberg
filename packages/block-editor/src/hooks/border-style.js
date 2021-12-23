@@ -12,13 +12,13 @@ import { removeBorderAttribute } from './border';
  *
  * @return {WPElement} Border style edit element.
  */
-export const BorderStyleEdit = ( props ) => {
+export const BorderStyleEdit = (props) => {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const onChange = ( newBorderStyle ) => {
+	const onChange = (newBorderStyle) => {
 		const newStyleAttributes = {
 			...style,
 			border: {
@@ -27,14 +27,11 @@ export const BorderStyleEdit = ( props ) => {
 			},
 		};
 
-		setAttributes( { style: cleanEmptyObject( newStyleAttributes ) } );
+		setAttributes({ style: cleanEmptyObject(newStyleAttributes) });
 	};
 
 	return (
-		<BorderStyleControl
-			value={ style?.border?.style }
-			onChange={ onChange }
-		/>
+		<BorderStyleControl value={style?.border?.style} onChange={onChange} />
 	);
 };
 
@@ -45,8 +42,8 @@ export const BorderStyleEdit = ( props ) => {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a border style value set.
  */
-export function hasBorderStyleValue( props ) {
-	return !! props.attributes.style?.border?.style;
+export function hasBorderStyleValue(props) {
+	return !!props.attributes.style?.border?.style;
 }
 
 /**
@@ -58,7 +55,7 @@ export function hasBorderStyleValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetBorderStyle( { attributes = {}, setAttributes } ) {
+export function resetBorderStyle({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
-	setAttributes( { style: removeBorderAttribute( style, 'style' ) } );
+	setAttributes({ style: removeBorderAttribute(style, 'style') });
 }

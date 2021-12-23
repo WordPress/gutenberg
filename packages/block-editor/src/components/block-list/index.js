@@ -31,14 +31,13 @@ const elementContext = createContext();
 
 export const IntersectionObserver = createContext();
 
-function Root( { className, ...settings } ) {
-	const [ element, setElement ] = useState();
-	const isLargeViewport = useViewportMatch( 'medium' );
+function Root({ className, ...settings }) {
+	const [element, setElement] = useState();
+	const isLargeViewport = useViewportMatch('medium');
 	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
-		( select ) => {
-			const { getSettings, isNavigationMode: _isNavigationMode } = select(
-				blockEditorStore
-			);
+		(select) => {
+			const { getSettings, isNavigationMode: _isNavigationMode } =
+				select(blockEditorStore);
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode,
@@ -50,32 +49,32 @@ function Root( { className, ...settings } ) {
 	);
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			ref: useMergeRefs( [
+			ref: useMergeRefs([
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
 				setElement,
-			] ),
-			className: classnames( 'is-root-container', className, {
+			]),
+			className: classnames('is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': isNavigationMode,
-			} ),
+			}),
 		},
 		settings
 	);
 	return (
-		<elementContext.Provider value={ element }>
-			<div { ...innerBlocksProps } />
+		<elementContext.Provider value={element}>
+			<div {...innerBlocksProps} />
 		</elementContext.Provider>
 	);
 }
 
-export default function BlockList( settings ) {
+export default function BlockList(settings) {
 	usePreParsePatterns();
 	return (
 		<BlockToolsBackCompat>
-			<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
-				<Root { ...settings } />
+			<BlockEditContextProvider value={DEFAULT_BLOCK_EDIT_CONTEXT}>
+				<Root {...settings} />
 			</BlockEditContextProvider>
 		</BlockToolsBackCompat>
 	);
@@ -83,82 +82,81 @@ export default function BlockList( settings ) {
 
 BlockList.__unstableElementContext = elementContext;
 
-function Items( {
+function Items({
 	placeholder,
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
-} ) {
-	const [ intersectingBlocks, setIntersectingBlocks ] = useState( new Set() );
-	const intersectionObserver = useMemo( () => {
+}) {
+	const [intersectingBlocks, setIntersectingBlocks] = useState(new Set());
+	const intersectionObserver = useMemo(() => {
 		const { IntersectionObserver: Observer } = window;
 
-		if ( ! Observer ) {
+		if (!Observer) {
 			return;
 		}
 
-		return new Observer( ( entries ) => {
-			setIntersectingBlocks( ( oldIntersectingBlocks ) => {
-				const newIntersectingBlocks = new Set( oldIntersectingBlocks );
-				for ( const entry of entries ) {
-					const clientId = entry.target.getAttribute( 'data-block' );
+		return new Observer((entries) => {
+			setIntersectingBlocks((oldIntersectingBlocks) => {
+				const newIntersectingBlocks = new Set(oldIntersectingBlocks);
+				for (const entry of entries) {
+					const clientId = entry.target.getAttribute('data-block');
 					const action = entry.isIntersecting ? 'add' : 'delete';
-					newIntersectingBlocks[ action ]( clientId );
+					newIntersectingBlocks[action](clientId);
 				}
 				return newIntersectingBlocks;
-			} );
-		} );
-	}, [ setIntersectingBlocks ] );
+			});
+		});
+	}, [setIntersectingBlocks]);
 	const { order, selectedBlocks } = useSelect(
-		( select ) => {
-			const { getBlockOrder, getSelectedBlockClientIds } = select(
-				blockEditorStore
-			);
+		(select) => {
+			const { getBlockOrder, getSelectedBlockClientIds } =
+				select(blockEditorStore);
 			return {
-				order: getBlockOrder( rootClientId ),
+				order: getBlockOrder(rootClientId),
 				selectedBlocks: getSelectedBlockClientIds(),
 			};
 		},
-		[ rootClientId ]
+		[rootClientId]
 	);
 
 	return (
-		<LayoutProvider value={ layout }>
-			<IntersectionObserver.Provider value={ intersectionObserver }>
-				{ order.map( ( clientId ) => (
+		<LayoutProvider value={layout}>
+			<IntersectionObserver.Provider value={intersectionObserver}>
+				{order.map((clientId) => (
 					<AsyncModeProvider
-						key={ clientId }
+						key={clientId}
 						value={
 							// Only provide data asynchronously if the block is
 							// not visible and not selected.
-							! intersectingBlocks.has( clientId ) &&
-							! selectedBlocks.includes( clientId )
+							!intersectingBlocks.has(clientId) &&
+							!selectedBlocks.includes(clientId)
 						}
 					>
 						<BlockListBlock
-							rootClientId={ rootClientId }
-							clientId={ clientId }
+							rootClientId={rootClientId}
+							clientId={clientId}
 						/>
 					</AsyncModeProvider>
-				) ) }
+				))}
 			</IntersectionObserver.Provider>
-			{ order.length < 1 && placeholder }
+			{order.length < 1 && placeholder}
 			<BlockListAppender
-				tagName={ __experimentalAppenderTagName }
-				rootClientId={ rootClientId }
-				renderAppender={ renderAppender }
+				tagName={__experimentalAppenderTagName}
+				rootClientId={rootClientId}
+				renderAppender={renderAppender}
 			/>
 		</LayoutProvider>
 	);
 }
 
-export function BlockListItems( props ) {
+export function BlockListItems(props) {
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
 	return (
-		<AsyncModeProvider value={ false }>
-			<Items { ...props } />
+		<AsyncModeProvider value={false}>
+			<Items {...props} />
 		</AsyncModeProvider>
 	);
 }

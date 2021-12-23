@@ -28,27 +28,27 @@ function isDev() {
  * }
  * ```
  */
-export default function warning( message ) {
-	if ( ! isDev() ) {
+export default function warning(message) {
+	if (!isDev()) {
 		return;
 	}
 
 	// Skip if already logged.
-	if ( logged.has( message ) ) {
+	if (logged.has(message)) {
 		return;
 	}
 
 	// eslint-disable-next-line no-console
-	console.warn( message );
+	console.warn(message);
 
 	// Throwing an error and catching it immediately to improve debugging
 	// A consumer can use 'pause on caught exceptions'
 	// https://github.com/facebook/react/issues/4216
 	try {
-		throw Error( message );
-	} catch ( x ) {
+		throw Error(message);
+	} catch (x) {
 		// do nothing
 	}
 
-	logged.add( message );
+	logged.add(message);
 }

@@ -8,7 +8,7 @@ import { mount, shallow } from 'enzyme';
  */
 import ColorPalette from '../';
 
-describe( 'ColorPalette', () => {
+describe('ColorPalette', () => {
 	const colors = [
 		{ name: 'red', color: '#f00' },
 		{ name: 'white', color: '#fff' },
@@ -19,100 +19,100 @@ describe( 'ColorPalette', () => {
 
 	const wrapper = mount(
 		<ColorPalette
-			colors={ colors }
-			value={ currentColor }
-			onChange={ onChange }
+			colors={colors}
+			value={currentColor}
+			onChange={onChange}
 		/>
 	);
-	const buttons = wrapper.find( 'Option button' );
+	const buttons = wrapper.find('Option button');
 
-	beforeEach( () => {
+	beforeEach(() => {
 		onChange.mockClear();
-	} );
+	});
 
-	test( 'should render a dynamic toolbar of colors', () => {
-		expect( wrapper ).toMatchSnapshot();
-	} );
+	test('should render a dynamic toolbar of colors', () => {
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	test( 'should render three color button options', () => {
-		expect( buttons ).toHaveLength( 3 );
-	} );
+	test('should render three color button options', () => {
+		expect(buttons).toHaveLength(3);
+	});
 
-	test( 'should call onClick on an active button with undefined', () => {
-		const activeButton = buttons.findWhere( ( button ) =>
-			button.hasClass( 'is-pressed' )
+	test('should call onClick on an active button with undefined', () => {
+		const activeButton = buttons.findWhere((button) =>
+			button.hasClass('is-pressed')
 		);
-		activeButton.simulate( 'click' );
+		activeButton.simulate('click');
 
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		expect( onChange ).toHaveBeenCalledWith( undefined );
-	} );
+		expect(onChange).toHaveBeenCalledTimes(1);
+		expect(onChange).toHaveBeenCalledWith(undefined);
+	});
 
-	test( 'should call onClick on an inactive button', () => {
+	test('should call onClick on an inactive button', () => {
 		const inactiveButton = buttons
-			.findWhere( ( button ) => ! button.hasClass( 'is-pressed' ) )
+			.findWhere((button) => !button.hasClass('is-pressed'))
 			.first();
-		inactiveButton.simulate( 'click' );
+		inactiveButton.simulate('click');
 
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
-	} );
+		expect(onChange).toHaveBeenCalledTimes(1);
+	});
 
-	test( 'should call onClick with undefined, when the clearButton onClick is triggered', () => {
-		const clearButton = wrapper.find( 'ButtonAction button' );
+	test('should call onClick with undefined, when the clearButton onClick is triggered', () => {
+		const clearButton = wrapper.find('ButtonAction button');
 
-		expect( clearButton ).toHaveLength( 1 );
+		expect(clearButton).toHaveLength(1);
 
-		clearButton.simulate( 'click' );
+		clearButton.simulate('click');
 
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		expect( onChange ).toHaveBeenCalledWith( undefined );
-	} );
+		expect(onChange).toHaveBeenCalledTimes(1);
+		expect(onChange).toHaveBeenCalledWith(undefined);
+	});
 
-	test( 'should allow disabling custom color picker', () => {
+	test('should allow disabling custom color picker', () => {
 		expect(
 			shallow(
 				<ColorPalette
-					colors={ colors }
-					disableCustomColors={ true }
-					value={ currentColor }
-					onChange={ onChange }
+					colors={colors}
+					disableCustomColors={true}
+					value={currentColor}
+					onChange={onChange}
 				/>
 			)
 		).toMatchSnapshot();
-	} );
+	});
 
-	describe( 'Dropdown', () => {
-		const dropdown = wrapper.find( 'Dropdown' );
+	describe('Dropdown', () => {
+		const dropdown = wrapper.find('Dropdown');
 
-		test( 'should render it correctly', () => {
-			expect( dropdown ).toMatchSnapshot();
-		} );
+		test('should render it correctly', () => {
+			expect(dropdown).toMatchSnapshot();
+		});
 
-		describe( '.renderToggle', () => {
+		describe('.renderToggle', () => {
 			const isOpen = true;
 			const onToggle = jest.fn();
 
 			const renderedToggleButton = shallow(
-				dropdown.props().renderToggle( { isOpen, onToggle } )
+				dropdown.props().renderToggle({ isOpen, onToggle })
 			);
 
-			test( 'should render dropdown content', () => {
-				expect( renderedToggleButton ).toMatchSnapshot();
-			} );
+			test('should render dropdown content', () => {
+				expect(renderedToggleButton).toMatchSnapshot();
+			});
 
-			test( 'should call onToggle on click.', () => {
-				renderedToggleButton.find( 'button' ).simulate( 'click' );
+			test('should call onToggle on click.', () => {
+				renderedToggleButton.find('button').simulate('click');
 
-				expect( onToggle ).toHaveBeenCalledTimes( 1 );
-			} );
-		} );
+				expect(onToggle).toHaveBeenCalledTimes(1);
+			});
+		});
 
-		describe( '.renderContent', () => {
-			const renderedContent = shallow( dropdown.props().renderContent() );
+		describe('.renderContent', () => {
+			const renderedContent = shallow(dropdown.props().renderContent());
 
-			test( 'should render dropdown content', () => {
-				expect( renderedContent ).toMatchSnapshot();
-			} );
-		} );
-	} );
-} );
+			test('should render dropdown content', () => {
+				expect(renderedContent).toMatchSnapshot();
+			});
+		});
+	});
+});

@@ -10,11 +10,11 @@ import { PanelBody } from '@wordpress/components';
 import { NameEditor } from '../name-editor';
 import AutoAddPages from './auto-add-pages';
 
-export default function MenuSettings( { menuId } ) {
+export default function MenuSettings({ menuId }) {
 	return (
-		<PanelBody title={ __( 'Menu settings' ) }>
+		<PanelBody title={__('Menu settings')}>
 			<NameEditor />
-			<AutoAddPages menuId={ menuId } />
+			<AutoAddPages menuId={menuId} />
 		</PanelBody>
 	);
 }

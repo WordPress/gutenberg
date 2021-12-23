@@ -17,52 +17,49 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 export default function useSelectAll() {
-	const {
-		getBlockOrder,
-		getSelectedBlockClientIds,
-		getBlockRootClientId,
-	} = useSelect( blockEditorStore );
-	const { multiSelect } = useDispatch( blockEditorStore );
+	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
+		useSelect(blockEditorStore);
+	const { multiSelect } = useDispatch(blockEditorStore);
 	const isMatch = useShortcutEventMatch();
 
-	return useRefEffect( ( node ) => {
-		function onKeyDown( event ) {
-			if ( ! isMatch( 'core/block-editor/select-all', event ) ) {
+	return useRefEffect((node) => {
+		function onKeyDown(event) {
+			if (!isMatch('core/block-editor/select-all', event)) {
 				return;
 			}
 
-			if ( ! isEntirelySelected( event.target ) ) {
+			if (!isEntirelySelected(event.target)) {
 				return;
 			}
 
 			const selectedClientIds = getSelectedBlockClientIds();
-			const [ firstSelectedClientId ] = selectedClientIds;
-			const rootClientId = getBlockRootClientId( firstSelectedClientId );
-			let blockClientIds = getBlockOrder( rootClientId );
+			const [firstSelectedClientId] = selectedClientIds;
+			const rootClientId = getBlockRootClientId(firstSelectedClientId);
+			let blockClientIds = getBlockOrder(rootClientId);
 
 			// If we have selected all sibling nested blocks, try selecting up a
 			// level. See: https://github.com/WordPress/gutenberg/pull/31859/
-			if ( selectedClientIds.length === blockClientIds.length ) {
+			if (selectedClientIds.length === blockClientIds.length) {
 				blockClientIds = getBlockOrder(
-					getBlockRootClientId( rootClientId )
+					getBlockRootClientId(rootClientId)
 				);
 			}
 
-			const firstClientId = first( blockClientIds );
-			const lastClientId = last( blockClientIds );
+			const firstClientId = first(blockClientIds);
+			const lastClientId = last(blockClientIds);
 
-			if ( firstClientId === lastClientId ) {
+			if (firstClientId === lastClientId) {
 				return;
 			}
 
-			multiSelect( firstClientId, lastClientId );
+			multiSelect(firstClientId, lastClientId);
 			event.preventDefault();
 		}
 
-		node.addEventListener( 'keydown', onKeyDown );
+		node.addEventListener('keydown', onKeyDown);
 
 		return () => {
-			node.removeEventListener( 'keydown', onKeyDown );
+			node.removeEventListener('keydown', onKeyDown);
 		};
-	}, [] );
+	}, []);
 }

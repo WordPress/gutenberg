@@ -9,10 +9,10 @@ import { useSurface } from './hook';
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                        forwardedRef
  */
-function Surface( props, forwardedRef ) {
-	const surfaceProps = useSurface( props );
+function Surface(props, forwardedRef) {
+	const surfaceProps = useSurface(props);
 
-	return <View { ...surfaceProps } ref={ forwardedRef } />;
+	return <View {...surfaceProps} ref={forwardedRef} />;
 }
 
 /**
@@ -35,6 +35,6 @@ function Surface( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedSurface = contextConnect( Surface, 'Surface' );
+const ConnectedSurface = contextConnect(Surface, 'Surface');
 
 export default ConnectedSurface;

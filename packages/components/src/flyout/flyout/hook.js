@@ -12,7 +12,7 @@ import { useContextSystem } from '../../ui/context';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
  */
-export function useFlyout( props ) {
+export function useFlyout(props) {
 	const {
 		animated = true,
 		animationDuration = 160,
@@ -24,15 +24,15 @@ export function useFlyout( props ) {
 		state,
 		visible,
 		...otherProps
-	} = useContextSystem( props, 'Flyout' );
+	} = useContextSystem(props, 'Flyout');
 
-	const _flyoutState = usePopoverState( {
+	const _flyoutState = usePopoverState({
 		animated: animated ? animationDuration : undefined,
 		baseId: baseId || id,
 		placement,
 		visible,
 		...otherProps,
-	} );
+	});
 
 	const flyoutState = state || _flyoutState;
 

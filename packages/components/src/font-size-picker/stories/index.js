@@ -21,20 +21,16 @@ export default {
 	},
 };
 
-const FontSizePickerWithState = ( { initialValue, ...props } ) => {
-	const [ fontSize, setFontSize ] = useState( initialValue || 16 );
+const FontSizePickerWithState = ({ initialValue, ...props }) => {
+	const [fontSize, setFontSize] = useState(initialValue || 16);
 
 	return (
-		<FontSizePicker
-			{ ...props }
-			value={ fontSize }
-			onChange={ setFontSize }
-		/>
+		<FontSizePicker {...props} value={fontSize} onChange={setFontSize} />
 	);
 };
 
 export const _default = () => {
-	const fontSizes = object( 'Font Sizes', [
+	const fontSizes = object('Font Sizes', [
 		{
 			name: 'Small',
 			slug: 'small',
@@ -50,12 +46,12 @@ export const _default = () => {
 			slug: 'big',
 			size: 26,
 		},
-	] );
-	return <FontSizePickerWithState fontSizes={ fontSizes } />;
+	]);
+	return <FontSizePickerWithState fontSizes={fontSizes} />;
 };
 
 export const withSlider = () => {
-	const fontSizes = object( 'Font Sizes', [
+	const fontSizes = object('Font Sizes', [
 		{
 			name: 'Small',
 			slug: 'small',
@@ -71,19 +67,19 @@ export const withSlider = () => {
 			slug: 'big',
 			size: 26,
 		},
-	] );
-	const fallbackFontSize = number( 'Fallback Font Size - Slider Only', 16 );
+	]);
+	const fallbackFontSize = number('Fallback Font Size - Slider Only', 16);
 	return (
 		<FontSizePickerWithState
-			fontSizes={ fontSizes }
-			fallbackFontSize={ fallbackFontSize }
+			fontSizes={fontSizes}
+			fallbackFontSize={fallbackFontSize}
 			withSlider
 		/>
 	);
 };
 
 export const withoutCustomSizes = () => {
-	const fontSizes = object( 'Font Sizes', [
+	const fontSizes = object('Font Sizes', [
 		{
 			name: 'Small',
 			slug: 'small',
@@ -99,12 +95,9 @@ export const withoutCustomSizes = () => {
 			slug: 'big',
 			size: 26,
 		},
-	] );
+	]);
 	return (
-		<FontSizePickerWithState
-			fontSizes={ fontSizes }
-			disableCustomFontSizes
-		/>
+		<FontSizePickerWithState fontSizes={fontSizes} disableCustomFontSizes />
 	);
 };
 
@@ -141,20 +134,18 @@ export const differentControlBySize = () => {
 			size: 36,
 		},
 	];
-	const optionsWithUnits = options.map( ( option ) => ( {
+	const optionsWithUnits = options.map((option) => ({
 		...option,
-		size: `${ option.size }px`,
-	} ) );
-	const showMoreFontSizes = boolean( 'Add more font sizes', false );
-	const addUnitsToSizes = boolean( 'Add units to font sizes', false );
+		size: `${option.size}px`,
+	}));
+	const showMoreFontSizes = boolean('Add more font sizes', false);
+	const addUnitsToSizes = boolean('Add units to font sizes', false);
 	const _options = addUnitsToSizes ? optionsWithUnits : options;
 	const fontSizes = _options.slice(
 		0,
 		showMoreFontSizes ? _options.length : 4
 	);
-	return (
-		<FontSizePickerWithState fontSizes={ fontSizes } initialValue={ 8 } />
-	);
+	return <FontSizePickerWithState fontSizes={fontSizes} initialValue={8} />;
 };
 
 export const withComplexCSSValues = () => {
@@ -190,30 +181,30 @@ export const withComplexCSSValues = () => {
 			size: '2.8rem',
 		},
 	];
-	const showMoreFontSizes = boolean( 'Add more font sizes', false );
+	const showMoreFontSizes = boolean('Add more font sizes', false);
 	const addComplexCssValues = boolean(
 		'Add some complex css values(calc, var, etc..)',
 		true
 	);
 
-	const _options = options.map( ( option, index ) => {
+	const _options = options.map((option, index) => {
 		const _option = { ...option };
 		// Adding just one complex css value is enough (first element);
-		if ( addComplexCssValues && ! index ) {
+		if (addComplexCssValues && !index) {
 			_option.size = 'clamp(1.75rem, 3vw, 2.25rem)';
 		}
 		return _option;
-	} );
+	});
 
 	const fontSizes = _options.slice(
 		0,
 		showMoreFontSizes ? _options.length : 5
 	);
 	return (
-		<div style={ { maxWidth: '248px' } }>
+		<div style={{ maxWidth: '248px' }}>
 			<FontSizePickerWithState
-				fontSizes={ fontSizes }
-				initialValue={ '1.125rem' }
+				fontSizes={fontSizes}
+				initialValue={'1.125rem'}
 			/>
 		</div>
 	);

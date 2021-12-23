@@ -19,7 +19,7 @@ import { isURL } from '@wordpress/url';
  *
  * @return {boolean} whether or not the value is potentially a URL.
  */
-export default function isURLLike( val ) {
-	const isInternal = startsWith( val, '#' );
-	return isURL( val ) || ( val && val.includes( 'www.' ) ) || isInternal;
+export default function isURLLike(val) {
+	const isInternal = startsWith(val, '#');
+	return isURL(val) || (val && val.includes('www.')) || isInternal;
 }

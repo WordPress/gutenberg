@@ -8,11 +8,11 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export function MediaUploadCheck( { fallback = null, children } ) {
-	const hasUploadPermissions = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return !! getSettings().mediaUpload;
-	}, [] );
+export function MediaUploadCheck({ fallback = null, children }) {
+	const hasUploadPermissions = useSelect((select) => {
+		const { getSettings } = select(blockEditorStore);
+		return !!getSettings().mediaUpload;
+	}, []);
 	return hasUploadPermissions ? children : fallback;
 }
 

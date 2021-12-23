@@ -10,4 +10,4 @@ import { annotation } from './annotation';
 
 const { name, ...settings } = annotation;
 
-registerFormatType( name, settings );
+registerFormatType(name, settings);

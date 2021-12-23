@@ -9,10 +9,10 @@ import { useEffect } from '@wordpress/element';
  * @param  dragDirection The drag direction.
  * @return  The CSS cursor value.
  */
-export function getDragCursor( dragDirection: string ): string {
+export function getDragCursor(dragDirection: string): string {
 	let dragCursor = 'ns-resize';
 
-	switch ( dragDirection ) {
+	switch (dragDirection) {
 		case 'n':
 		case 's':
 			dragCursor = 'ns-resize';
@@ -39,16 +39,16 @@ export function useDragCursor(
 	isDragging: boolean,
 	dragDirection: string
 ): string {
-	const dragCursor = getDragCursor( dragDirection );
+	const dragCursor = getDragCursor(dragDirection);
 
-	useEffect( () => {
-		if ( isDragging ) {
+	useEffect(() => {
+		if (isDragging) {
 			document.documentElement.style.cursor = dragCursor;
 		} else {
 			// @ts-expect-error
 			document.documentElement.style.cursor = null;
 		}
-	}, [ isDragging ] );
+	}, [isDragging]);
 
 	return dragCursor;
 }

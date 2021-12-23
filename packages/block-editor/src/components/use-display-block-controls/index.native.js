@@ -13,13 +13,12 @@ import { store as blockEditorStore } from '../../store';
 export default function useDisplayBlockControls() {
 	const { isSelected, clientId, name } = useBlockEditContext();
 	return useSelect(
-		( select ) => {
-			const { getBlockName, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+		(select) => {
+			const { getBlockName, getBlockRootClientId } =
+				select(blockEditorStore);
 
-			const parentId = getBlockRootClientId( clientId );
-			const parentBlockName = getBlockName( parentId );
+			const parentId = getBlockRootClientId(clientId);
+			const parentBlockName = getBlockName(parentId);
 
 			const hideControls = hasBlockSupport(
 				parentBlockName,
@@ -27,12 +26,12 @@ export default function useDisplayBlockControls() {
 				false
 			);
 
-			if ( ! hideControls && isSelected ) {
+			if (!hideControls && isSelected) {
 				return true;
 			}
 
 			return false;
 		},
-		[ clientId, isSelected, name ]
+		[clientId, isSelected, name]
 	);
 }

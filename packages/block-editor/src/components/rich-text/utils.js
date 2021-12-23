@@ -6,14 +6,14 @@ import deprecated from '@wordpress/deprecated';
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
-export function addActiveFormats( value, activeFormats ) {
-	if ( activeFormats?.length ) {
+export function addActiveFormats(value, activeFormats) {
+	if (activeFormats?.length) {
 		let index = value.formats.length;
 
-		while ( index-- ) {
-			value.formats[ index ] = [
+		while (index--) {
+			value.formats[index] = [
 				...activeFormats,
-				...( value.formats[ index ] || [] ),
+				...(value.formats[index] || []),
 			];
 		}
 	}
@@ -26,42 +26,42 @@ export function addActiveFormats( value, activeFormats ) {
  *
  * @return {?string} The multiline tag.
  */
-export function getMultilineTag( multiline ) {
-	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {
+export function getMultilineTag(multiline) {
+	if (multiline !== true && multiline !== 'p' && multiline !== 'li') {
 		return;
 	}
 
 	return multiline === true ? 'p' : multiline;
 }
 
-export function getAllowedFormats( {
+export function getAllowedFormats({
 	allowedFormats,
 	formattingControls,
 	disableFormats,
-} ) {
-	if ( disableFormats ) {
+}) {
+	if (disableFormats) {
 		return getAllowedFormats.EMPTY_ARRAY;
 	}
 
-	if ( ! allowedFormats && ! formattingControls ) {
+	if (!allowedFormats && !formattingControls) {
 		return;
 	}
 
-	if ( allowedFormats ) {
+	if (allowedFormats) {
 		return allowedFormats;
 	}
 
-	deprecated( 'wp.blockEditor.RichText formattingControls prop', {
+	deprecated('wp.blockEditor.RichText formattingControls prop', {
 		since: '5.4',
 		alternative: 'allowedFormats',
-	} );
+	});
 
-	return formattingControls.map( ( name ) => `core/${ name }` );
+	return formattingControls.map((name) => `core/${name}`);
 }
 
 getAllowedFormats.EMPTY_ARRAY = [];
 
-export const isShortcode = ( text ) => regexp( '.*' ).test( text );
+export const isShortcode = (text) => regexp('.*').test(text);
 
 /**
  * Creates a link from pasted URL.
@@ -70,9 +70,7 @@ export const isShortcode = ( text ) => regexp( '.*' ).test( text );
  * @param {string}   url       The URL that could not be embedded.
  * @param {Function} onReplace Function to call with the created fallback block.
  */
-export function createLinkInParagraph( url, onReplace ) {
-	const link = <a href={ url }>{ url }</a>;
-	onReplace(
-		createBlock( 'core/paragraph', { content: renderToString( link ) } )
-	);
+export function createLinkInParagraph(url, onReplace) {
+	const link = <a href={url}>{url}</a>;
+	onReplace(createBlock('core/paragraph', { content: renderToString(link) }));
 }

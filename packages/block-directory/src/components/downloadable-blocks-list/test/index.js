@@ -14,46 +14,46 @@ import { useSelect } from '@wordpress/data';
 import DownloadableBlocksList from '../';
 import { items } from '../../test/fixtures';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
+jest.mock('@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
 	const mock = jest.fn();
 	return mock;
-} );
+});
 
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: () => ( { installBlockType: jest.fn() } ),
-} ) );
+jest.mock('@wordpress/data/src/components/use-dispatch', () => ({
+	useDispatch: () => ({ installBlockType: jest.fn() }),
+}));
 
-describe( 'DownloadableBlocksList', () => {
-	describe( 'List rendering', () => {
-		useSelect.mockImplementation( () => ( {
+describe('DownloadableBlocksList', () => {
+	describe('List rendering', () => {
+		useSelect.mockImplementation(() => ({
 			isLoading: false,
 			isInstallable: true,
-		} ) );
+		}));
 
-		it( 'should render and empty list', () => {
+		it('should render and empty list', () => {
 			const { container } = render(
 				<DownloadableBlocksList
-					items={ [] }
-					onSelect={ jest.fn() }
-					onHover={ jest.fn() }
+					items={[]}
+					onSelect={jest.fn()}
+					onHover={jest.fn()}
 				/>
 			);
 
-			expect( container.firstChild ).toBe( null );
-		} );
+			expect(container.firstChild).toBe(null);
+		});
 
-		it( 'should render plugins items into the list', () => {
+		it('should render plugins items into the list', () => {
 			const { getAllByRole } = render(
 				<DownloadableBlocksList
-					items={ items }
-					onSelect={ jest.fn() }
-					onHover={ jest.fn() }
+					items={items}
+					onSelect={jest.fn()}
+					onHover={jest.fn()}
 				/>
 			);
-			const downloadableBlocks = getAllByRole( 'option' );
+			const downloadableBlocks = getAllByRole('option');
 
-			expect( downloadableBlocks ).toHaveLength( items.length );
-		} );
-	} );
-} );
+			expect(downloadableBlocks).toHaveLength(items.length);
+		});
+	});
+});

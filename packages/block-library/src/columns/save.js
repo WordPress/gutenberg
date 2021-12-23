@@ -8,16 +8,16 @@ import classnames from 'classnames';
  */
 import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const { isStackedOnMobile, verticalAlignment } = attributes;
 
-	const className = classnames( {
-		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
-	} );
+	const className = classnames({
+		[`are-vertically-aligned-${verticalAlignment}`]: verticalAlignment,
+		[`is-not-stacked-on-mobile`]: !isStackedOnMobile,
+	});
 
-	const blockProps = useBlockProps.save( { className } );
-	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+	const blockProps = useBlockProps.save({ className });
+	const innerBlocksProps = useInnerBlocksProps.save(blockProps);
 
-	return <div { ...innerBlocksProps } />;
+	return <div {...innerBlocksProps} />;
 }

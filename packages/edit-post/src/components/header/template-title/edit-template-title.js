@@ -18,54 +18,54 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../../store';
 
 export default function EditTemplateTitle() {
-	const { template } = useSelect( ( select ) => {
-		const { getEditedPostTemplate } = select( editPostStore );
+	const { template } = useSelect((select) => {
+		const { getEditedPostTemplate } = select(editPostStore);
 		return {
 			template: getEditedPostTemplate(),
 		};
-	}, [] );
+	}, []);
 
-	const { editEntityRecord } = useDispatch( coreStore );
-	const { getEditorSettings } = useSelect( editorStore );
-	const { updateEditorSettings } = useDispatch( editorStore );
+	const { editEntityRecord } = useDispatch(coreStore);
+	const { getEditorSettings } = useSelect(editorStore);
+	const { updateEditorSettings } = useDispatch(editorStore);
 
-	if ( template.has_theme_file ) {
+	if (template.has_theme_file) {
 		return null;
 	}
 
-	let templateTitle = __( 'Default' );
-	if ( template?.title ) {
+	let templateTitle = __('Default');
+	if (template?.title) {
 		templateTitle = template.title;
-	} else if ( !! template ) {
+	} else if (!!template) {
 		templateTitle = template.slug;
 	}
 
 	return (
 		<TextControl
-			label={ __( 'Title' ) }
-			value={ templateTitle }
-			help={ __(
+			label={__('Title')}
+			value={templateTitle}
+			help={__(
 				'Give the template a title that indicates its purpose, e.g. "Full Width".'
-			) }
-			onChange={ ( newTitle ) => {
+			)}
+			onChange={(newTitle) => {
 				const settings = getEditorSettings();
 				const newAvailableTemplates = mapValues(
 					settings.availableTemplates,
-					( existingTitle, id ) => {
-						if ( id !== template.slug ) {
+					(existingTitle, id) => {
+						if (id !== template.slug) {
 							return existingTitle;
 						}
 						return newTitle;
 					}
 				);
-				updateEditorSettings( {
+				updateEditorSettings({
 					...settings,
 					availableTemplates: newAvailableTemplates,
-				} );
-				editEntityRecord( 'postType', 'wp_template', template.id, {
+				});
+				editEntityRecord('postType', 'wp_template', template.id, {
 					title: newTitle,
-				} );
-			} }
+				});
+			}}
 		/>
 	);
 }

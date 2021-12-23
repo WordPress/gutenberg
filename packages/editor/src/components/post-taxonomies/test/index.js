@@ -8,22 +8,22 @@ import { shallow } from 'enzyme';
  */
 import { PostTaxonomies } from '../';
 
-describe( 'PostTaxonomies', () => {
-	it( 'should render no children if taxonomy data not available', () => {
+describe('PostTaxonomies', () => {
+	it('should render no children if taxonomy data not available', () => {
 		const taxonomies = {};
 
 		const wrapper = shallow(
-			<PostTaxonomies postType="page" taxonomies={ taxonomies } />
+			<PostTaxonomies postType="page" taxonomies={taxonomies} />
 		);
 
-		expect( wrapper.at( 0 ) ).toHaveLength( 0 );
-	} );
+		expect(wrapper.at(0)).toHaveLength(0);
+	});
 
-	it( 'should render taxonomy components for taxonomies assigned to post type', () => {
+	it('should render taxonomy components for taxonomies assigned to post type', () => {
 		const genresTaxonomy = {
 			name: 'Genres',
 			slug: 'genre',
-			types: [ 'book' ],
+			types: ['book'],
 			hierarchical: true,
 			rest_base: 'genres',
 			visibility: {
@@ -34,7 +34,7 @@ describe( 'PostTaxonomies', () => {
 		const categoriesTaxonomy = {
 			name: 'Categories',
 			slug: 'category',
-			types: [ 'post', 'page' ],
+			types: ['post', 'page'],
 			hierarchical: true,
 			rest_base: 'categories',
 			visibility: {
@@ -45,33 +45,33 @@ describe( 'PostTaxonomies', () => {
 		const wrapperOne = shallow(
 			<PostTaxonomies
 				postType="book"
-				taxonomies={ [ genresTaxonomy, categoriesTaxonomy ] }
+				taxonomies={[genresTaxonomy, categoriesTaxonomy]}
 			/>
 		);
 
-		expect( wrapperOne ).toHaveLength( 1 );
+		expect(wrapperOne).toHaveLength(1);
 
 		const wrapperTwo = shallow(
 			<PostTaxonomies
 				postType="book"
-				taxonomies={ [
+				taxonomies={[
 					genresTaxonomy,
 					{
 						...categoriesTaxonomy,
-						types: [ 'post', 'page', 'book' ],
+						types: ['post', 'page', 'book'],
 					},
-				] }
+				]}
 			/>
 		);
 
-		expect( wrapperTwo ).toHaveLength( 2 );
-	} );
+		expect(wrapperTwo).toHaveLength(2);
+	});
 
-	it( 'should not render taxonomy components that hide their ui', () => {
+	it('should not render taxonomy components that hide their ui', () => {
 		const genresTaxonomy = {
 			name: 'Genres',
 			slug: 'genre',
-			types: [ 'book' ],
+			types: ['book'],
 			hierarchical: true,
 			rest_base: 'genres',
 			visibility: {
@@ -80,23 +80,23 @@ describe( 'PostTaxonomies', () => {
 		};
 
 		const wrapperOne = shallow(
-			<PostTaxonomies postType="book" taxonomies={ [ genresTaxonomy ] } />
+			<PostTaxonomies postType="book" taxonomies={[genresTaxonomy]} />
 		);
 
-		expect( wrapperOne.at( 0 ) ).toHaveLength( 1 );
+		expect(wrapperOne.at(0)).toHaveLength(1);
 
 		const wrapperTwo = shallow(
 			<PostTaxonomies
 				postType="book"
-				taxonomies={ [
+				taxonomies={[
 					{
 						...genresTaxonomy,
 						visibility: { show_ui: false },
 					},
-				] }
+				]}
 			/>
 		);
 
-		expect( wrapperTwo.at( 0 ) ).toHaveLength( 0 );
-	} );
-} );
+		expect(wrapperTwo.at(0)).toHaveLength(0);
+	});
+});

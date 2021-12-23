@@ -9,7 +9,7 @@ const {
 	hasArgInCLI,
 	hasFileArgInCLI,
 	spawnScript,
-} = require( './cli' );
+} = require('./cli');
 const {
 	getJestOverrideConfigFile,
 	getWebpackArgs,
@@ -18,9 +18,9 @@ const {
 	hasJestConfig,
 	hasPostCSSConfig,
 	hasPrettierConfig,
-} = require( './config' );
-const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
-const { getPackageProp, hasPackageProp } = require( './package' );
+} = require('./config');
+const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require('./file');
+const { getPackageProp, hasPackageProp } = require('./package');
 
 module.exports = {
 	fromProjectRoot,

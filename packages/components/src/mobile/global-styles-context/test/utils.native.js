@@ -17,114 +17,112 @@ import {
 	MAPPED_VALUES,
 } from './fixtures/theme';
 
-describe( 'getBlockPaddings', () => {
+describe('getBlockPaddings', () => {
 	const PADDING = 12;
 
-	it( 'returns no paddings for a block without background color', () => {
+	it('returns no paddings for a block without background color', () => {
 		const paddings = getBlockPaddings(
 			{ color: 'red' },
 			{ backgroundColor: 'red' },
 			{ textColor: 'primary' }
 		);
-		expect( paddings ).toEqual( expect.objectContaining( {} ) );
-	} );
+		expect(paddings).toEqual(expect.objectContaining({}));
+	});
 
-	it( 'returns paddings for a block with background color', () => {
+	it('returns paddings for a block with background color', () => {
 		const paddings = getBlockPaddings(
 			{ color: 'red' },
 			{},
 			{ backgroundColor: 'red', textColor: 'primary' }
 		);
-		expect( paddings ).toEqual(
-			expect.objectContaining( { padding: PADDING } )
-		);
-	} );
+		expect(paddings).toEqual(expect.objectContaining({ padding: PADDING }));
+	});
 
-	it( 'returns no paddings for an inner block without background color within a parent block with background color', () => {
+	it('returns no paddings for an inner block without background color within a parent block with background color', () => {
 		const paddings = getBlockPaddings(
 			{ backgroundColor: 'blue', color: 'yellow', padding: PADDING },
 			{},
 			{ textColor: 'primary' }
 		);
 
-		expect( paddings ).toEqual(
-			expect.not.objectContaining( { padding: PADDING } )
+		expect(paddings).toEqual(
+			expect.not.objectContaining({ padding: PADDING })
 		);
-	} );
-} );
+	});
+});
 
-describe( 'getBlockColors', () => {
-	it( 'returns the theme colors correctly', () => {
+describe('getBlockColors', () => {
+	it('returns the theme colors correctly', () => {
 		const blockColors = getBlockColors(
 			{ backgroundColor: 'accent', textColor: 'secondary' },
 			DEFAULT_COLORS
 		);
-		expect( blockColors ).toEqual(
-			expect.objectContaining( {
+		expect(blockColors).toEqual(
+			expect.objectContaining({
 				backgroundColor: '#cd2653',
 				color: '#6d6d6d',
-			} )
+			})
 		);
-	} );
+	});
 
-	it( 'returns custom background color correctly', () => {
+	it('returns custom background color correctly', () => {
 		const blockColors = getBlockColors(
 			{ backgroundColor: '#222222', textColor: 'accent' },
 			DEFAULT_COLORS
 		);
-		expect( blockColors ).toEqual(
-			expect.objectContaining( {
+		expect(blockColors).toEqual(
+			expect.objectContaining({
 				backgroundColor: '#222222',
 				color: '#cd2653',
-			} )
+			})
 		);
-	} );
+	});
 
-	it( 'returns custom text color correctly', () => {
+	it('returns custom text color correctly', () => {
 		const blockColors = getBlockColors(
 			{ textColor: '#4ddddd' },
 			DEFAULT_COLORS
 		);
-		expect( blockColors ).toEqual(
-			expect.objectContaining( {
+		expect(blockColors).toEqual(
+			expect.objectContaining({
 				color: '#4ddddd',
-			} )
+			})
 		);
-	} );
-} );
+	});
+});
 
-describe( 'parseStylesVariables', () => {
-	it( 'returns the parsed preset values correctly', () => {
+describe('parseStylesVariables', () => {
+	it('returns the parsed preset values correctly', () => {
 		const customValues = parseStylesVariables(
-			JSON.stringify( RAW_FEATURES.custom ),
+			JSON.stringify(RAW_FEATURES.custom),
 			MAPPED_VALUES
 		);
 		const blockColors = parseStylesVariables(
-			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			JSON.stringify(DEFAULT_GLOBAL_STYLES),
 			MAPPED_VALUES,
 			customValues
 		);
-		expect( blockColors ).toEqual(
-			expect.objectContaining( PARSED_GLOBAL_STYLES )
+		expect(blockColors).toEqual(
+			expect.objectContaining(PARSED_GLOBAL_STYLES)
 		);
-	} );
-} );
+	});
+});
 
-describe( 'getGlobalStyles', () => {
-	it( 'returns the global styles data correctly', () => {
-		const rawFeatures = JSON.stringify( RAW_FEATURES );
+describe('getGlobalStyles', () => {
+	it('returns the global styles data correctly', () => {
+		const rawFeatures = JSON.stringify(RAW_FEATURES);
 		const gradients = parseStylesVariables(
-			JSON.stringify( GLOBAL_STYLES_GRADIENTS ),
+			JSON.stringify(GLOBAL_STYLES_GRADIENTS),
 			MAPPED_VALUES
 		);
 
 		const globalStyles = getGlobalStyles(
-			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			JSON.stringify(DEFAULT_GLOBAL_STYLES),
 			rawFeatures
 		);
 
-		expect( globalStyles ).toEqual(
-			expect.objectContaining( {
+		expect(globalStyles).toEqual(
+			expect.objectContaining({
 				colors: RAW_FEATURES.color,
 				gradients,
 				__experimentalFeatures: {
@@ -136,11 +134,11 @@ describe( 'getGlobalStyles', () => {
 					},
 					typography: {
 						fontSizes: RAW_FEATURES.typography.fontSizes,
-						customLineHeight: RAW_FEATURES.custom[ 'line-height' ],
+						customLineHeight: RAW_FEATURES.custom['line-height'],
 					},
 				},
 				__experimentalGlobalStylesBaseStyles: PARSED_GLOBAL_STYLES,
-			} )
+			})
 		);
-	} );
-} );
+	});
+});

@@ -7,7 +7,7 @@ import { memo } from '@wordpress/element';
  */
 import CyclePickerCell from '../bottom-sheet/cycle-picker-cell';
 
-function CycleSelectControl( {
+function CycleSelectControl({
 	help,
 	instanceId,
 	label,
@@ -17,23 +17,23 @@ function CycleSelectControl( {
 	className,
 	hideLabelFromVision,
 	...props
-} ) {
-	const id = `inspector-select-control-${ instanceId }`;
+}) {
+	const id = `inspector-select-control-${instanceId}`;
 
 	return (
 		<CyclePickerCell
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-			id={ id }
-			help={ help }
-			className={ className }
-			onChangeValue={ onChange }
-			aria-describedby={ !! help ? `${ id }__help` : undefined }
-			multiple={ multiple }
-			options={ options }
-			{ ...props }
+			label={label}
+			hideLabelFromVision={hideLabelFromVision}
+			id={id}
+			help={help}
+			className={className}
+			onChangeValue={onChange}
+			aria-describedby={!!help ? `${id}__help` : undefined}
+			multiple={multiple}
+			options={options}
+			{...props}
 		/>
 	);
 }
 
-export default memo( CycleSelectControl );
+export default memo(CycleSelectControl);

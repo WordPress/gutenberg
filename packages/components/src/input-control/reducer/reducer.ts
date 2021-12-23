@@ -28,7 +28,7 @@ import * as actions from './actions';
  * @return Prepared initialState for the reducer
  */
 function mergeInitialState(
-	initialState: Partial< InputState > = initialInputControlState
+	initialState: Partial<InputState> = initialInputControlState
 ): InputState {
 	const { value } = initialState;
 
@@ -46,14 +46,12 @@ function mergeInitialState(
  * @param  fns State reducers.
  * @return The single composed stateReducer.
  */
-export const composeStateReducers = (
-	...fns: StateReducer[]
-): StateReducer => {
-	return ( ...args ) => {
-		return fns.reduceRight( ( state, fn ) => {
-			const fnState = fn( ...args );
-			return isEmpty( fnState ) ? state : { ...state, ...fnState };
-		}, {} as InputState );
+export const composeStateReducers = (...fns: StateReducer[]): StateReducer => {
+	return (...args) => {
+		return fns.reduceRight((state, fn) => {
+			const fnState = fn(...args);
+			return isEmpty(fnState) ? state : { ...state, ...fnState };
+		}, {} as InputState);
 	};
 };
 
@@ -70,10 +68,10 @@ export const composeStateReducers = (
 function inputControlStateReducer(
 	composedStateReducers: StateReducer
 ): StateReducer {
-	return ( state, action ) => {
+	return (state, action) => {
 		const nextState = { ...state };
 
-		switch ( action.type ) {
+		switch (action.type) {
 			/**
 			 * Keyboard events
 			 */
@@ -103,7 +101,7 @@ function inputControlStateReducer(
 				nextState.error = null;
 				nextState.value = action.payload.value;
 
-				if ( state.isPressEnterToChange ) {
+				if (state.isPressEnterToChange) {
 					nextState.isDirty = true;
 				}
 
@@ -133,7 +131,7 @@ function inputControlStateReducer(
 				break;
 		}
 
-		if ( action.payload.event ) {
+		if (action.payload.event) {
 			nextState._event = action.payload.event;
 		}
 
@@ -142,7 +140,7 @@ function inputControlStateReducer(
 		 * this "bridge" mechanism. This allows external stateReducers
 		 * to hook into actions, and modify state if needed.
 		 */
-		return composedStateReducers( nextState, action );
+		return composedStateReducers(nextState, action);
 	};
 }
 
@@ -162,70 +160,72 @@ function inputControlStateReducer(
  */
 export function useInputControlStateReducer(
 	stateReducer: StateReducer = initialStateReducer,
-	initialState: Partial< InputState > = initialInputControlState
+	initialState: Partial<InputState> = initialInputControlState
 ) {
-	const [ state, dispatch ] = useReducer< StateReducer >(
-		inputControlStateReducer( stateReducer ),
-		mergeInitialState( initialState )
+	const [state, dispatch] = useReducer<StateReducer>(
+		inputControlStateReducer(stateReducer),
+		mergeInitialState(initialState)
 	);
 
-	const createChangeEvent = ( type: actions.ChangeEventAction[ 'type' ] ) => (
-		nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
-		event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
-	) => {
-		/**
-		 * Persist allows for the (Synthetic) event to be used outside of
-		 * this function call.
-		 * https://reactjs.org/docs/events.html#event-pooling
-		 */
-		if ( event && event.persist ) {
-			event.persist();
-		}
+	const createChangeEvent =
+		(type: actions.ChangeEventAction['type']) =>
+		(
+			nextValue: actions.ChangeEventAction['payload']['value'],
+			event: actions.ChangeEventAction['payload']['event']
+		) => {
+			/**
+			 * Persist allows for the (Synthetic) event to be used outside of
+			 * this function call.
+			 * https://reactjs.org/docs/events.html#event-pooling
+			 */
+			if (event && event.persist) {
+				event.persist();
+			}
 
-		dispatch( {
-			type,
-			payload: { value: nextValue, event },
-		} as actions.InputAction );
-	};
+			dispatch({
+				type,
+				payload: { value: nextValue, event },
+			} as actions.InputAction);
+		};
 
-	const createKeyEvent = ( type: actions.KeyEventAction[ 'type' ] ) => (
-		event: actions.KeyEventAction[ 'payload' ][ 'event' ]
-	) => {
-		/**
-		 * Persist allows for the (Synthetic) event to be used outside of
-		 * this function call.
-		 * https://reactjs.org/docs/events.html#event-pooling
-		 */
-		if ( event && event.persist ) {
-			event.persist();
-		}
+	const createKeyEvent =
+		(type: actions.KeyEventAction['type']) =>
+		(event: actions.KeyEventAction['payload']['event']) => {
+			/**
+			 * Persist allows for the (Synthetic) event to be used outside of
+			 * this function call.
+			 * https://reactjs.org/docs/events.html#event-pooling
+			 */
+			if (event && event.persist) {
+				event.persist();
+			}
 
-		dispatch( { type, payload: { event } } );
-	};
+			dispatch({ type, payload: { event } });
+		};
 
-	const createDragEvent = ( type: actions.DragEventAction[ 'type' ] ) => (
-		payload: actions.DragEventAction[ 'payload' ]
-	) => {
-		dispatch( { type, payload } );
-	};
+	const createDragEvent =
+		(type: actions.DragEventAction['type']) =>
+		(payload: actions.DragEventAction['payload']) => {
+			dispatch({ type, payload });
+		};
 
 	/**
 	 * Actions for the reducer
 	 */
-	const change = createChangeEvent( actions.CHANGE );
-	const invalidate = ( error: unknown, event: SyntheticEvent ) =>
-		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
-	const reset = createChangeEvent( actions.RESET );
-	const commit = createChangeEvent( actions.COMMIT );
-	const update = createChangeEvent( actions.UPDATE );
+	const change = createChangeEvent(actions.CHANGE);
+	const invalidate = (error: unknown, event: SyntheticEvent) =>
+		dispatch({ type: actions.INVALIDATE, payload: { error, event } });
+	const reset = createChangeEvent(actions.RESET);
+	const commit = createChangeEvent(actions.COMMIT);
+	const update = createChangeEvent(actions.UPDATE);
 
-	const dragStart = createDragEvent( actions.DRAG_START );
-	const drag = createDragEvent( actions.DRAG );
-	const dragEnd = createDragEvent( actions.DRAG_END );
+	const dragStart = createDragEvent(actions.DRAG_START);
+	const drag = createDragEvent(actions.DRAG);
+	const dragEnd = createDragEvent(actions.DRAG_END);
 
-	const pressUp = createKeyEvent( actions.PRESS_UP );
-	const pressDown = createKeyEvent( actions.PRESS_DOWN );
-	const pressEnter = createKeyEvent( actions.PRESS_ENTER );
+	const pressUp = createKeyEvent(actions.PRESS_UP);
+	const pressDown = createKeyEvent(actions.PRESS_DOWN);
+	const pressEnter = createKeyEvent(actions.PRESS_ENTER);
 
 	return {
 		change,

@@ -12,7 +12,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import WebPreformattedEdit from './edit.js';
 import styles from './styles.scss';
 
-export function PreformattedEdit( props ) {
+export function PreformattedEdit(props) {
 	const { style } = props;
 
 	const textBaseStyle = usePreferredColorSchemeStyle(
@@ -24,18 +24,18 @@ export function PreformattedEdit( props ) {
 		styles.wpBlockPreformattedDark
 	);
 	const richTextStyle = {
-		...( ! style?.baseColors && textBaseStyle ),
-		...( style?.fontSize && { fontSize: style.fontSize } ),
-		...( style?.color && { color: style.color } ),
+		...(!style?.baseColors && textBaseStyle),
+		...(style?.fontSize && { fontSize: style.fontSize }),
+		...(style?.color && { color: style.color }),
 	};
 	const hasBaseColors =
-		style?.baseColors && Object.entries( style.baseColors ).length !== 0;
+		style?.baseColors && Object.entries(style.baseColors).length !== 0;
 	const containerStyles = [
 		wpBlockPreformatted,
 		style?.backgroundColor && { backgroundColor: style.backgroundColor },
 		hasBaseColors &&
-			! style?.backgroundColor &&
-			styles[ 'wp-block-preformatted__no-background' ],
+			!style?.backgroundColor &&
+			styles['wp-block-preformatted__no-background'],
 	];
 
 	const propsWithStyle = {
@@ -43,8 +43,8 @@ export function PreformattedEdit( props ) {
 		style: richTextStyle,
 	};
 	return (
-		<View style={ containerStyles }>
-			<WebPreformattedEdit { ...propsWithStyle } />
+		<View style={containerStyles}>
+			<WebPreformattedEdit {...propsWithStyle} />
 		</View>
 	);
 }

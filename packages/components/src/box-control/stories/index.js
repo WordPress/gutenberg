@@ -27,25 +27,25 @@ const defaultSideValues = {
 	left: '10px',
 };
 
-function DemoExample( {
+function DemoExample({
 	sides,
 	defaultValues = defaultSideValues,
 	splitOnAxis = false,
-} ) {
-	const [ values, setValues ] = useState( defaultValues );
-	const [ showVisualizer, setShowVisualizer ] = useState( {} );
+}) {
+	const [values, setValues] = useState(defaultValues);
+	const [showVisualizer, setShowVisualizer] = useState({});
 
 	return (
-		<Container align="top" gap={ 8 }>
+		<Container align="top" gap={8}>
 			<FlexBlock>
 				<Content>
 					<BoxControl
 						label="Padding"
-						values={ values }
-						sides={ sides }
-						onChange={ setValues }
-						onChangeShowVisualizer={ setShowVisualizer }
-						splitOnAxis={ splitOnAxis }
+						values={values}
+						sides={sides}
+						onChange={setValues}
+						onChangeShowVisualizer={setShowVisualizer}
+						splitOnAxis={splitOnAxis}
 					/>
 				</Content>
 			</FlexBlock>
@@ -53,8 +53,8 @@ function DemoExample( {
 				<Content>
 					<BoxContainer>
 						<BoxControlVisualizer
-							showValues={ showVisualizer }
-							values={ values }
+							showValues={showVisualizer}
+							values={values}
 						>
 							<Box />
 						</BoxControlVisualizer>
@@ -72,36 +72,33 @@ export const visualizer = () => {
 export const arbitrarySides = () => {
 	return (
 		<DemoExample
-			sides={ [ 'top', 'bottom' ] }
-			defaultValues={ { top: '10px', bottom: '10px' } }
+			sides={['top', 'bottom']}
+			defaultValues={{ top: '10px', bottom: '10px' }}
 		/>
 	);
 };
 
 export const singleSide = () => {
 	return (
-		<DemoExample
-			sides={ [ 'bottom' ] }
-			defaultValues={ { bottom: '10px' } }
-		/>
+		<DemoExample sides={['bottom']} defaultValues={{ bottom: '10px' }} />
 	);
 };
 
 export const axialControls = () => {
-	return <DemoExample splitOnAxis={ true } />;
+	return <DemoExample splitOnAxis={true} />;
 };
 
 export const axialControlsWithSingleSide = () => {
 	return (
 		<DemoExample
-			sides={ [ 'horizontal' ] }
-			defaultValues={ { left: '10px', right: '10px' } }
-			splitOnAxis={ true }
+			sides={['horizontal']}
+			defaultValues={{ left: '10px', right: '10px' }}
+			splitOnAxis={true}
 		/>
 	);
 };
 
-const Container = styled( Flex )`
+const Container = styled(Flex)`
 	max-width: 780px;
 `;
 

@@ -77,27 +77,26 @@ import { store as editPostStore } from '../../../store';
  * );
  * ```
  */
-export default function PluginSidebarEditPost( { className, ...props } ) {
-	const { postTitle, shortcut, showIconLabels } = useSelect( ( select ) => {
+export default function PluginSidebarEditPost({ className, ...props }) {
+	const { postTitle, shortcut, showIconLabels } = useSelect((select) => {
 		return {
-			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-			showIconLabels: select( editPostStore ).isFeatureActive(
-				'showIconLabels'
+			postTitle: select(editorStore).getEditedPostAttribute('title'),
+			shortcut: select(keyboardShortcutsStore).getShortcutRepresentation(
+				'core/edit-post/toggle-sidebar'
 			),
+			showIconLabels:
+				select(editPostStore).isFeatureActive('showIconLabels'),
 		};
-	}, [] );
+	}, []);
 	return (
 		<ComplementaryArea
-			panelClassName={ className }
+			panelClassName={className}
 			className="edit-post-sidebar"
-			smallScreenTitle={ postTitle || __( '(no title)' ) }
+			smallScreenTitle={postTitle || __('(no title)')}
 			scope="core/edit-post"
-			toggleShortcut={ shortcut }
-			showIconLabels={ showIconLabels }
-			{ ...props }
+			toggleShortcut={shortcut}
+			showIconLabels={showIconLabels}
+			{...props}
 		/>
 	);
 }

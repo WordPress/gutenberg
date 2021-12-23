@@ -23,13 +23,13 @@ const Form = () => (
 		<TextareaControl label="TextArea Control" />
 		<SelectControl
 			label="Select Control"
-			onChange={ () => {} }
-			options={ [
+			onChange={() => {}}
+			options={[
 				{ value: null, label: 'Select an option', disabled: true },
 				{ value: 'a', label: 'Option A' },
 				{ value: 'b', label: 'Option B' },
 				{ value: 'c', label: 'Option C' },
-			] }
+			]}
 		/>
 	</div>
 );
@@ -43,18 +43,18 @@ export const _default = () => {
 };
 
 export const DisabledWithProp = () => {
-	const [ isDisabled, setState ] = useState( true );
+	const [isDisabled, setState] = useState(true);
 	const toggleDisabled = () => {
-		setState( () => ! isDisabled );
+		setState(() => !isDisabled);
 	};
 
 	return (
 		<div>
-			<Disabled isDisabled={ isDisabled }>
+			<Disabled isDisabled={isDisabled}>
 				<Form />
 			</Disabled>
-			<Button variant="primary" onClick={ toggleDisabled }>
-				Set isDisabled to { isDisabled ? 'false' : 'true' }
+			<Button variant="primary" onClick={toggleDisabled}>
+				Set isDisabled to {isDisabled ? 'false' : 'true'}
 			</Button>
 		</div>
 	);

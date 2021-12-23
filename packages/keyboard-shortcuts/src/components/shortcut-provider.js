@@ -17,21 +17,21 @@ const { Provider } = context;
  *
  * @return {import('@wordpress/element').WPElement} Component.
  */
-export function ShortcutProvider( props ) {
-	const keyboardShortcuts = useRef( new Set() );
+export function ShortcutProvider(props) {
+	const keyboardShortcuts = useRef(new Set());
 
-	function onKeyDown( event ) {
-		if ( props.onKeyDown ) props.onKeyDown( event );
+	function onKeyDown(event) {
+		if (props.onKeyDown) props.onKeyDown(event);
 
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
-			keyboardShortcut( event );
+		for (const keyboardShortcut of keyboardShortcuts.current) {
+			keyboardShortcut(event);
 		}
 	}
 
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<Provider value={ keyboardShortcuts }>
-			<div { ...props } onKeyDown={ onKeyDown } />
+		<Provider value={keyboardShortcuts}>
+			<div {...props} onKeyDown={onKeyDown} />
 		</Provider>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */

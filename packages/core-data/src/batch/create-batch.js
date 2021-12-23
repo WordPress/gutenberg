@@ -41,7 +41,7 @@ import defaultProcessor from './default-processor';
  *                               resolves to an array of objects containing
  *                               either `output` or `error`.
  */
-export default function createBatch( processor = defaultProcessor ) {
+export default function createBatch(processor = defaultProcessor) {
 	let lastId = 0;
 	let queue = [];
 	const pending = new ObservableSet();
@@ -73,27 +73,27 @@ export default function createBatch( processor = defaultProcessor ) {
 		 *                       processed. If given a thunk, returns the return
 		 *                       value of that thunk.
 		 */
-		add( inputOrThunk ) {
+		add(inputOrThunk) {
 			const id = ++lastId;
-			pending.add( id );
+			pending.add(id);
 
-			const add = ( input ) =>
-				new Promise( ( resolve, reject ) => {
-					queue.push( {
+			const add = (input) =>
+				new Promise((resolve, reject) => {
+					queue.push({
 						input,
 						resolve,
 						reject,
-					} );
-					pending.delete( id );
-				} );
+					});
+					pending.delete(id);
+				});
 
-			if ( isFunction( inputOrThunk ) ) {
-				return Promise.resolve( inputOrThunk( add ) ).finally( () => {
-					pending.delete( id );
-				} );
+			if (isFunction(inputOrThunk)) {
+				return Promise.resolve(inputOrThunk(add)).finally(() => {
+					pending.delete(id);
+				});
 			}
 
-			return add( inputOrThunk );
+			return add(inputOrThunk);
 		},
 
 		/**
@@ -104,32 +104,30 @@ export default function createBatch( processor = defaultProcessor ) {
 		 *                   if the processor returned no errors.
 		 */
 		async run() {
-			if ( pending.size ) {
-				await new Promise( ( resolve ) => {
-					const unsubscribe = pending.subscribe( () => {
-						if ( ! pending.size ) {
+			if (pending.size) {
+				await new Promise((resolve) => {
+					const unsubscribe = pending.subscribe(() => {
+						if (!pending.size) {
 							unsubscribe();
 							resolve();
 						}
-					} );
-				} );
+					});
+				});
 			}
 
 			let results;
 
 			try {
-				results = await processor(
-					queue.map( ( { input } ) => input )
-				);
+				results = await processor(queue.map(({ input }) => input));
 
-				if ( results.length !== queue.length ) {
+				if (results.length !== queue.length) {
 					throw new Error(
 						'run: Array returned by processor must be same size as input array.'
 					);
 				}
-			} catch ( error ) {
-				for ( const { reject } of queue ) {
-					reject( error );
+			} catch (error) {
+				for (const { reject } of queue) {
+					reject(error);
 				}
 
 				throw error;
@@ -137,15 +135,12 @@ export default function createBatch( processor = defaultProcessor ) {
 
 			let isSuccess = true;
 
-			for ( const [ result, { resolve, reject } ] of zip(
-				results,
-				queue
-			) ) {
-				if ( result?.error ) {
-					reject( result.error );
+			for (const [result, { resolve, reject }] of zip(results, queue)) {
+				if (result?.error) {
+					reject(result.error);
 					isSuccess = false;
 				} else {
-					resolve( result?.output ?? result );
+					resolve(result?.output ?? result);
 				}
 			}
 
@@ -157,8 +152,8 @@ export default function createBatch( processor = defaultProcessor ) {
 }
 
 class ObservableSet {
-	constructor( ...args ) {
-		this.set = new Set( ...args );
+	constructor(...args) {
+		this.set = new Set(...args);
 		this.subscribers = new Set();
 	}
 
@@ -166,22 +161,22 @@ class ObservableSet {
 		return this.set.size;
 	}
 
-	add( ...args ) {
-		this.set.add( ...args );
-		this.subscribers.forEach( ( subscriber ) => subscriber() );
+	add(...args) {
+		this.set.add(...args);
+		this.subscribers.forEach((subscriber) => subscriber());
 		return this;
 	}
 
-	delete( ...args ) {
-		const isSuccess = this.set.delete( ...args );
-		this.subscribers.forEach( ( subscriber ) => subscriber() );
+	delete(...args) {
+		const isSuccess = this.set.delete(...args);
+		this.subscribers.forEach((subscriber) => subscriber());
 		return isSuccess;
 	}
 
-	subscribe( subscriber ) {
-		this.subscribers.add( subscriber );
+	subscribe(subscriber) {
+		this.subscribers.add(subscriber);
 		return () => {
-			this.subscribers.delete( subscriber );
+			this.subscribers.delete(subscriber);
 		};
 	}
 }

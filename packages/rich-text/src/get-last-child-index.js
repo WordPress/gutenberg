@@ -14,23 +14,23 @@ import { LINE_SEPARATOR } from './special-characters';
  *
  * @return {number} The index of the last child.
  */
-export function getLastChildIndex( { text, replacements }, lineIndex ) {
-	const lineFormats = replacements[ lineIndex ] || [];
+export function getLastChildIndex({ text, replacements }, lineIndex) {
+	const lineFormats = replacements[lineIndex] || [];
 	// Use the given line index in case there are no next children.
 	let childIndex = lineIndex;
 
 	// `lineIndex` could be `undefined` if it's the first line.
-	for ( let index = lineIndex || 0; index < text.length; index++ ) {
+	for (let index = lineIndex || 0; index < text.length; index++) {
 		// We're only interested in line indices.
-		if ( text[ index ] !== LINE_SEPARATOR ) {
+		if (text[index] !== LINE_SEPARATOR) {
 			continue;
 		}
 
-		const formatsAtIndex = replacements[ index ] || [];
+		const formatsAtIndex = replacements[index] || [];
 
 		// If the amout of formats is equal or more, store it, then return the
 		// last one if the amount of formats is less.
-		if ( formatsAtIndex.length >= lineFormats.length ) {
+		if (formatsAtIndex.length >= lineFormats.length) {
 			childIndex = index;
 		} else {
 			return childIndex;

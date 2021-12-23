@@ -30,29 +30,29 @@ const continents = [
 	'Oceania',
 ];
 
-const getKnobs = () => ( {
-	showHowTo: boolean( 'Show how to instructions', true ),
-	expandOnFocus: boolean( 'Expand on focus', false ),
-	placeholder: text( 'Placeholder', '' ),
-	enableValidation: boolean( 'Validate that value is in suggestions', false ),
-} );
+const getKnobs = () => ({
+	showHowTo: boolean('Show how to instructions', true),
+	expandOnFocus: boolean('Expand on focus', false),
+	placeholder: text('Placeholder', ''),
+	enableValidation: boolean('Validate that value is in suggestions', false),
+});
 
 const FormTokenFieldExample = () => {
 	const knobs = getKnobs();
-	const [ selectedContinents, setSelectedContinents ] = useState( [] );
+	const [selectedContinents, setSelectedContinents] = useState([]);
 
 	return (
 		<FormTokenField
-			value={ selectedContinents }
-			suggestions={ continents }
-			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
+			value={selectedContinents}
+			suggestions={continents}
+			onChange={(tokens) => setSelectedContinents(tokens)}
 			label="Type a continent"
-			placeholder={ knobs.placeholder }
-			__experimentalExpandOnFocus={ knobs.expandOnFocus }
-			__experimentalShowHowTo={ knobs.showHowTo }
+			placeholder={knobs.placeholder}
+			__experimentalExpandOnFocus={knobs.expandOnFocus}
+			__experimentalShowHowTo={knobs.showHowTo}
 			__experimentalValidateInput={
 				knobs.enableValidation
-					? ( newValue ) => continents.includes( newValue )
+					? (newValue) => continents.includes(newValue)
 					: () => true
 			}
 		/>
@@ -65,32 +65,32 @@ export const _default = () => {
 
 const FormTokenFieldAsyncExample = () => {
 	const knobs = getKnobs();
-	const [ selectedContinents, setSelectedContinents ] = useState( [] );
-	const [ availableContinents, setAvailableContinents ] = useState( [] );
-	const searchContinents = ( input ) => {
-		const timeout = setTimeout( () => {
-			const available = continents.filter( ( continent ) =>
-				continent.toLowerCase().includes( input.toLowerCase() )
+	const [selectedContinents, setSelectedContinents] = useState([]);
+	const [availableContinents, setAvailableContinents] = useState([]);
+	const searchContinents = (input) => {
+		const timeout = setTimeout(() => {
+			const available = continents.filter((continent) =>
+				continent.toLowerCase().includes(input.toLowerCase())
 			);
-			setAvailableContinents( available );
-		}, 1000 );
+			setAvailableContinents(available);
+		}, 1000);
 
-		return () => clearTimeout( timeout );
+		return () => clearTimeout(timeout);
 	};
 
 	return (
 		<FormTokenField
-			value={ selectedContinents }
-			suggestions={ availableContinents }
-			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
-			onInputChange={ searchContinents }
+			value={selectedContinents}
+			suggestions={availableContinents}
+			onChange={(tokens) => setSelectedContinents(tokens)}
+			onInputChange={searchContinents}
 			label="Type a continent"
-			placeholder={ knobs.placeholder }
-			__experimentalExpandOnFocus={ knobs.expandOnFocus }
-			__experimentalShowHowTo={ knobs.showHowTo }
+			placeholder={knobs.placeholder}
+			__experimentalExpandOnFocus={knobs.expandOnFocus}
+			__experimentalShowHowTo={knobs.showHowTo}
 			__experimentalValidateInput={
 				knobs.enableValidation
-					? ( newValue ) => continents.includes( newValue )
+					? (newValue) => continents.includes(newValue)
 					: () => true
 			}
 		/>

@@ -10,15 +10,15 @@ import { visitAdminPage } from './visit-admin-page';
  *
  * @param {string} username User name.
  */
-export async function deleteUser( username ) {
+export async function deleteUser(username) {
 	await switchUserToAdmin();
-	await visitAdminPage( 'users.php' );
+	await visitAdminPage('users.php');
 
-	const [ userLink ] = await page.$x(
-		`//td[@data-colname="Username"]//a[contains(text(), "${ username }")]`
+	const [userLink] = await page.$x(
+		`//td[@data-colname="Username"]//a[contains(text(), "${username}")]`
 	);
 
-	if ( ! userLink ) {
+	if (!userLink) {
 		await switchUserToTest();
 		return;
 	}
@@ -27,26 +27,26 @@ export async function deleteUser( username ) {
 	await userLink.focus();
 
 	// Tab twice to focus 'Delete'
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press('Tab');
+	await page.keyboard.press('Tab');
 
-	await Promise.all( [
-		page.keyboard.press( 'Enter' ),
-		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-	] );
+	await Promise.all([
+		page.keyboard.press('Enter'),
+		page.waitForNavigation({ waitUntil: 'networkidle0' }),
+	]);
 
 	// If there's content owned by this user, delete it.
 	const deleteContentRadioButton = await page.$(
 		'input[type="radio"][name="delete_option"][value="delete"]'
 	);
-	if ( deleteContentRadioButton ) {
+	if (deleteContentRadioButton) {
 		await deleteContentRadioButton.click();
 	}
 
 	// Confirm
-	await Promise.all( [
-		page.click( 'input#submit' ),
-		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-	] );
+	await Promise.all([
+		page.click('input#submit'),
+		page.waitForNavigation({ waitUntil: 'networkidle0' }),
+	]);
 	await switchUserToTest();
 }

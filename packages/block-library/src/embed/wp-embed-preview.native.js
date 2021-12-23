@@ -50,31 +50,27 @@ const observeAndResizeJS = `
         window.addEventListener( 'message', sendResize );
 } )();`;
 
-function WpEmbedPreview( { html, ...rest } ) {
-	const wpEmbedHtml = useMemo( () => {
-		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
-		const iframe = doc.querySelector( 'iframe' );
+function WpEmbedPreview({ html, ...rest }) {
+	const wpEmbedHtml = useMemo(() => {
+		const doc = new window.DOMParser().parseFromString(html, 'text/html');
+		const iframe = doc.querySelector('iframe');
 
-		if ( iframe ) {
-			iframe.removeAttribute( 'style' );
+		if (iframe) {
+			iframe.removeAttribute('style');
 		}
 
-		const blockQuote = doc.querySelector( 'blockquote' );
+		const blockQuote = doc.querySelector('blockquote');
 
-		if ( blockQuote ) {
+		if (blockQuote) {
 			blockQuote.innerHTML = '';
 		}
 
 		return doc.body.innerHTML;
-	}, [ html ] );
+	}, [html]);
 
 	return (
-		<SandBox
-			customJS={ observeAndResizeJS }
-			html={ wpEmbedHtml }
-			{ ...rest }
-		/>
+		<SandBox customJS={observeAndResizeJS} html={wpEmbedHtml} {...rest} />
 	);
 }
 
-export default memo( WpEmbedPreview );
+export default memo(WpEmbedPreview);

@@ -15,39 +15,39 @@ import {
 	setUnregisteredTypeHandlerName,
 } from '../../registration';
 
-describe( 'applyBlockDeprecatedVersions', () => {
+describe('applyBlockDeprecatedVersions', () => {
 	const defaultBlockSettings = {
 		attributes: {
 			fruit: {
 				type: 'string',
 			},
 		},
-		save: ( { attributes } ) => attributes.fruit || null,
+		save: ({ attributes }) => attributes.fruit || null,
 		category: 'text',
 		title: 'block title',
 	};
 
-	beforeAll( () => {
+	beforeAll(() => {
 		// Initialize the block store.
-		require( '../../../store' );
-	} );
+		require('../../../store');
+	});
 
-	afterEach( () => {
-		setFreeformContentHandlerName( undefined );
-		setUnregisteredTypeHandlerName( undefined );
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
+	afterEach(() => {
+		setFreeformContentHandlerName(undefined);
+		setUnregisteredTypeHandlerName(undefined);
+		getBlockTypes().forEach((block) => {
+			unregisterBlockType(block.name);
+		});
+	});
 
-	it( 'should return the original block if it has no deprecated versions', () => {
+	it('should return the original block if it has no deprecated versions', () => {
 		const rawBlock = { attrs: {}, name: 'core/test-block' };
-		const block = deepFreeze( {
+		const block = deepFreeze({
 			name: 'core/test-block',
 			attributes: {},
 			originalContent: '<span class="wp-block-test-block">Bananas</span>',
 			isValid: false,
-		} );
+		});
 		const blockType = registerBlockType(
 			'core/test-block',
 			defaultBlockSettings
@@ -59,18 +59,18 @@ describe( 'applyBlockDeprecatedVersions', () => {
 			blockType
 		);
 
-		expect( migratedBlock ).toBe( block );
-	} );
+		expect(migratedBlock).toBe(block);
+	});
 
-	it( 'should return the original block if no valid deprecated version found', () => {
+	it('should return the original block if no valid deprecated version found', () => {
 		const rawBlock = { attrs: {}, name: 'core/test-block' };
-		const block = deepFreeze( {
+		const block = deepFreeze({
 			name: 'core/test-block',
 			attributes: {},
 			originalContent: '<span class="wp-block-test-block">Bananas</span>',
 			isValid: false,
-		} );
-		const blockType = registerBlockType( 'core/test-block', {
+		});
+		const blockType = registerBlockType('core/test-block', {
 			...defaultBlockSettings,
 			deprecated: [
 				{
@@ -79,7 +79,7 @@ describe( 'applyBlockDeprecatedVersions', () => {
 					},
 				},
 			],
-		} );
+		});
 
 		const migratedBlock = applyBlockDeprecatedVersions(
 			block,
@@ -87,20 +87,20 @@ describe( 'applyBlockDeprecatedVersions', () => {
 			blockType
 		);
 
-		expect( migratedBlock ).toEqual( expect.objectContaining( block ) );
-	} );
+		expect(migratedBlock).toEqual(expect.objectContaining(block));
+	});
 
-	it( 'should return with attributes parsed by the deprecated version', () => {
+	it('should return with attributes parsed by the deprecated version', () => {
 		const rawBlock = { attrs: {}, name: 'core/test-block' };
-		const block = deepFreeze( {
+		const block = deepFreeze({
 			name: 'core/test-block',
 			attributes: {},
 			originalContent: '<span>Bananas</span>',
 			isValid: false,
-		} );
-		const blockType = registerBlockType( 'core/test-block', {
+		});
+		const blockType = registerBlockType('core/test-block', {
 			...defaultBlockSettings,
-			save: ( props ) => <div>{ props.attributes.fruit }</div>,
+			save: (props) => <div>{props.attributes.fruit}</div>,
 			deprecated: [
 				{
 					attributes: {
@@ -110,10 +110,10 @@ describe( 'applyBlockDeprecatedVersions', () => {
 							selector: 'span',
 						},
 					},
-					save: ( props ) => <span>{ props.attributes.fruit }</span>,
+					save: (props) => <span>{props.attributes.fruit}</span>,
 				},
 			],
-		} );
+		});
 
 		const migratedBlock = applyBlockDeprecatedVersions(
 			block,
@@ -121,20 +121,20 @@ describe( 'applyBlockDeprecatedVersions', () => {
 			blockType
 		);
 
-		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
-	} );
+		expect(migratedBlock.attributes).toEqual({ fruit: 'Bananas' });
+	});
 
-	it( 'should be able to migrate attributes and innerBlocks', () => {
+	it('should be able to migrate attributes and innerBlocks', () => {
 		const rawBlock = { attrs: {}, name: 'core/test-block' };
-		const block = deepFreeze( {
+		const block = deepFreeze({
 			name: 'core/test-block',
 			attributes: {},
 			originalContent: '<span>Bananas</span>',
 			isValid: false,
-		} );
-		const blockType = registerBlockType( 'core/test-block', {
+		});
+		const blockType = registerBlockType('core/test-block', {
 			...defaultBlockSettings,
-			save: ( props ) => <div>{ props.attributes.fruit }</div>,
+			save: (props) => <div>{props.attributes.fruit}</div>,
 			deprecated: [
 				{
 					attributes: {
@@ -144,8 +144,8 @@ describe( 'applyBlockDeprecatedVersions', () => {
 							selector: 'span',
 						},
 					},
-					save: ( props ) => <span>{ props.attributes.fruit }</span>,
-					migrate: ( attributes ) => {
+					save: (props) => <span>{props.attributes.fruit}</span>,
+					migrate: (attributes) => {
 						return [
 							{ newFruit: attributes.fruit },
 							[
@@ -158,47 +158,45 @@ describe( 'applyBlockDeprecatedVersions', () => {
 					},
 				},
 			],
-		} );
+		});
 
 		const migratedBlock = applyBlockDeprecatedVersions(
 			block,
 			rawBlock,
 			blockType
 		);
-		expect( migratedBlock.attributes ).toEqual( {
+		expect(migratedBlock.attributes).toEqual({
 			newFruit: 'Bananas',
-		} );
-		expect( migratedBlock.innerBlocks ).toHaveLength( 1 );
-		expect( migratedBlock.innerBlocks[ 0 ].name ).toEqual(
-			'core/test-block'
-		);
-		expect( migratedBlock.innerBlocks[ 0 ].attributes ).toEqual( {
+		});
+		expect(migratedBlock.innerBlocks).toHaveLength(1);
+		expect(migratedBlock.innerBlocks[0].name).toEqual('core/test-block');
+		expect(migratedBlock.innerBlocks[0].attributes).toEqual({
 			aaa: 'bbb',
-		} );
-	} );
+		});
+	});
 
-	it( 'should ignore valid uneligible blocks', () => {
+	it('should ignore valid uneligible blocks', () => {
 		const rawBlock = { attrs: { fruit: 'Bananas' } };
-		const block = deepFreeze( {
+		const block = deepFreeze({
 			name: 'core/test-block',
 			attributes: { fruit: 'Bananas' },
 			originalContent: 'Bananas',
 			isValid: true,
-		} );
-		const blockType = registerBlockType( 'core/test-block', {
+		});
+		const blockType = registerBlockType('core/test-block', {
 			...defaultBlockSettings,
 			deprecated: [
 				{
 					attributes: defaultBlockSettings.attributes,
 					save: defaultBlockSettings.save,
-					migrate( attributes ) {
+					migrate(attributes) {
 						return {
 							fruit: attributes.fruit + '!',
 						};
 					},
 				},
 			],
-		} );
+		});
 
 		const migratedBlock = applyBlockDeprecatedVersions(
 			block,
@@ -206,47 +204,47 @@ describe( 'applyBlockDeprecatedVersions', () => {
 			blockType
 		);
 
-		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
-	} );
+		expect(migratedBlock.attributes).toEqual({ fruit: 'Bananas' });
+	});
 
-	it( 'should allow opt-in eligibility of valid block', () => {
+	it('should allow opt-in eligibility of valid block', () => {
 		const rawBlock = {
 			attrs: { fruit: 'Bananas' },
 			name: 'core/test-block',
 		};
-		const block = deepFreeze( {
+		const block = deepFreeze({
 			name: 'core/test-block',
 			attributes: { fruit: 'Bananas' },
 			originalContent: 'Bananas',
 			isValid: true,
-		} );
-		const blockType = registerBlockType( 'core/test-block', {
+		});
+		const blockType = registerBlockType('core/test-block', {
 			...defaultBlockSettings,
 			deprecated: [
 				{
 					attributes: defaultBlockSettings.attributes,
 					save: defaultBlockSettings.save,
 					isEligible: () => true,
-					migrate( attributes ) {
+					migrate(attributes) {
 						return {
 							fruit: attributes.fruit + '!',
 						};
 					},
 				},
 			],
-		} );
+		});
 
 		const migratedBlock = applyBlockDeprecatedVersions(
 			block,
 			rawBlock,
 			blockType
 		);
-		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas!' } );
-	} );
+		expect(migratedBlock.attributes).toEqual({ fruit: 'Bananas!' });
+	});
 
-	it( 'allows a default attribute to be deprecated', () => {
+	it('allows a default attribute to be deprecated', () => {
 		// The block's default fruit attribute has been changed from 'Bananas' to 'Oranges'.
-		const blockType = registerBlockType( 'core/test-block', {
+		const blockType = registerBlockType('core/test-block', {
 			...defaultBlockSettings,
 			attributes: {
 				fruit: {
@@ -265,7 +263,7 @@ describe( 'applyBlockDeprecatedVersions', () => {
 					save: defaultBlockSettings.save,
 				},
 			],
-		} );
+		});
 
 		// Because the fruits attribute is not sourced, when the block content was parsed no value for the
 		// fruit attribute was found.
@@ -277,12 +275,12 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		// When the block was created, it was given the new default value for the fruit attribute of 'Oranges'.
 		// This is because unchanged default values are not saved to the comment delimeter attributes.
 		// Validation failed because this block was saved when the old default was 'Bananas' as reflected by the originalContent.
-		const block = deepFreeze( {
+		const block = deepFreeze({
 			name: 'core/test-block',
 			attributes: { fruit: 'Oranges' },
 			originalContent: 'Bananas',
 			isValid: false,
-		} );
+		});
 
 		// The migrated block successfully falls back to the old value of 'Bananas', allowing the block to
 		// continue to be used.
@@ -292,6 +290,6 @@ describe( 'applyBlockDeprecatedVersions', () => {
 			blockType
 		);
 
-		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
-	} );
-} );
+		expect(migratedBlock.attributes).toEqual({ fruit: 'Bananas' });
+	});
+});

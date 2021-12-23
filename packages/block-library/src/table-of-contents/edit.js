@@ -44,35 +44,33 @@ import { getHeadingsFromContent, linearToNestedHeadingList } from './utils';
  *
  * @return {WPComponent} The component.
  */
-export default function TableOfContentsEdit( {
+export default function TableOfContentsEdit({
 	attributes: { onlyIncludeCurrentPage },
 	clientId,
 	setAttributes,
-} ) {
+}) {
 	const blockProps = useBlockProps();
 
 	// Local state; not saved to block attributes. The saved block is dynamic and uses PHP to generate its content.
-	const [ headings, setHeadings ] = useState( [] );
-	const [ headingTree, setHeadingTree ] = useState( [] );
+	const [headings, setHeadings] = useState([]);
+	const [headingTree, setHeadingTree] = useState([]);
 
 	const { listBlockExists, postContent } = useSelect(
-		( select ) => ( {
-			listBlockExists: !! select( blocksStore ).getBlockType(
-				'core/list'
-			),
+		(select) => ({
+			listBlockExists: !!select(blocksStore).getBlockType('core/list'),
 			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 			// Blocks can be loaded into a *non-post* block editor.
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			postContent: select( 'core/editor' ).getEditedPostContent(),
-		} ),
+			postContent: select('core/editor').getEditedPostContent(),
+		}),
 		[]
 	);
 
 	// The page this block would be part of on the front-end. For performance
 	// reasons, this is only calculated when onlyIncludeCurrentPage is true.
 	const pageIndex = useSelect(
-		( select ) => {
-			if ( ! onlyIncludeCurrentPage ) {
+		(select) => {
+			if (!onlyIncludeCurrentPage) {
 				return null;
 			}
 
@@ -81,9 +79,9 @@ export default function TableOfContentsEdit( {
 				getBlockIndex,
 				getBlockName,
 				getBlockOrder,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 
-			const blockIndex = getBlockIndex( clientId );
+			const blockIndex = getBlockIndex(clientId);
 			const blockOrder = getBlockOrder();
 
 			// Calculate which page the block will appear in on the front-end by
@@ -95,17 +93,17 @@ export default function TableOfContentsEdit( {
 			// onlyIncludeCurrentPage === true. Thankfully, this issue only
 			// affects the editor implementation.
 			let page = 1;
-			for ( let i = 0; i < blockIndex; i++ ) {
-				const blockName = getBlockName( blockOrder[ i ] );
-				if ( blockName === 'core/nextpage' ) {
+			for (let i = 0; i < blockIndex; i++) {
+				const blockName = getBlockName(blockOrder[i]);
+				if (blockName === 'core/nextpage') {
 					page++;
-				} else if ( blockName === 'core/freeform' ) {
+				} else if (blockName === 'core/freeform') {
 					// Count the page breaks inside the Classic block.
 					const pageBreaks = getBlockAttributes(
-						blockOrder[ i ]
-					).content?.match( /<!--nextpage-->/g );
+						blockOrder[i]
+					).content?.match(/<!--nextpage-->/g);
 
-					if ( pageBreaks !== null && pageBreaks !== undefined ) {
+					if (pageBreaks !== null && pageBreaks !== undefined) {
 						page += pageBreaks.length;
 					}
 				}
@@ -113,48 +111,48 @@ export default function TableOfContentsEdit( {
 
 			return page;
 		},
-		[ clientId, onlyIncludeCurrentPage ]
+		[clientId, onlyIncludeCurrentPage]
 	);
 
-	useEffect( () => {
+	useEffect(() => {
 		let latestHeadings;
 
-		if ( onlyIncludeCurrentPage ) {
-			const pagesOfContent = postContent.split( '<!--nextpage-->' );
+		if (onlyIncludeCurrentPage) {
+			const pagesOfContent = postContent.split('<!--nextpage-->');
 
 			latestHeadings = getHeadingsFromContent(
-				pagesOfContent[ pageIndex - 1 ]
+				pagesOfContent[pageIndex - 1]
 			);
 		} else {
-			latestHeadings = getHeadingsFromContent( postContent );
+			latestHeadings = getHeadingsFromContent(postContent);
 		}
 
-		if ( ! isEqual( headings, latestHeadings ) ) {
-			setHeadings( latestHeadings );
-			setHeadingTree( linearToNestedHeadingList( latestHeadings ) );
+		if (!isEqual(headings, latestHeadings)) {
+			setHeadings(latestHeadings);
+			setHeadingTree(linearToNestedHeadingList(latestHeadings));
 		}
-	}, [ pageIndex, postContent, onlyIncludeCurrentPage ] );
+	}, [pageIndex, postContent, onlyIncludeCurrentPage]);
 
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks } = useDispatch(blockEditorStore);
 
 	const toolbarControls = listBlockExists && (
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
-					onClick={ () =>
+					onClick={() =>
 						replaceBlocks(
 							clientId,
-							createBlock( 'core/list', {
+							createBlock('core/list', {
 								values: renderToString(
 									<TableOfContentsList
-										nestedHeadingList={ headingTree }
+										nestedHeadingList={headingTree}
 									/>
 								),
-							} )
+							})
 						)
 					}
 				>
-					{ __( 'Convert to static list' ) }
+					{__('Convert to static list')}
 				</ToolbarButton>
 			</ToolbarGroup>
 		</BlockControls>
@@ -162,12 +160,12 @@ export default function TableOfContentsEdit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Table of Contents settings' ) }>
+			<PanelBody title={__('Table of Contents settings')}>
 				<ToggleControl
-					label={ __( 'Only include current page' ) }
-					checked={ onlyIncludeCurrentPage }
-					onChange={ ( value ) =>
-						setAttributes( { onlyIncludeCurrentPage: value } )
+					label={__('Only include current page')}
+					checked={onlyIncludeCurrentPage}
+					onChange={(value) =>
+						setAttributes({ onlyIncludeCurrentPage: value })
 					}
 					help={
 						onlyIncludeCurrentPage
@@ -186,32 +184,32 @@ export default function TableOfContentsEdit( {
 	// If there are no headings or the only heading is empty.
 	// Note that the toolbar controls are intentionally omitted since the
 	// "Convert to static list" option is useless to the placeholder state.
-	if ( headings.length === 0 ) {
+	if (headings.length === 0) {
 		return (
 			<>
-				<div { ...blockProps }>
+				<div {...blockProps}>
 					<Placeholder
-						icon={ <BlockIcon icon="list-view" /> }
+						icon={<BlockIcon icon="list-view" />}
 						label="Table of Contents"
-						instructions={ __(
+						instructions={__(
 							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
-						) }
+						)}
 					/>
 				</div>
-				{ inspectorControls }
+				{inspectorControls}
 			</>
 		);
 	}
 
 	return (
 		<>
-			<nav { ...blockProps }>
+			<nav {...blockProps}>
 				<ul>
-					<TableOfContentsList nestedHeadingList={ headingTree } />
+					<TableOfContentsList nestedHeadingList={headingTree} />
 				</ul>
 			</nav>
-			{ toolbarControls }
-			{ inspectorControls }
+			{toolbarControls}
+			{inspectorControls}
 		</>
 	);
 }

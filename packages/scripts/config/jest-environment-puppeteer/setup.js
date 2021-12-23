@@ -1,1 +1,1 @@
-module.exports = require( './global' ).setup;
+module.exports = require('./global').setup;

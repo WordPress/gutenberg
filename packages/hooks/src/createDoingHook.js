@@ -18,18 +18,18 @@
  * @return {DoingHook} Function that returns whether a hook is currently
  *                     being executed.
  */
-function createDoingHook( hooks, storeKey ) {
-	return function doingHook( hookName ) {
-		const hooksStore = hooks[ storeKey ];
+function createDoingHook(hooks, storeKey) {
+	return function doingHook(hookName) {
+		const hooksStore = hooks[storeKey];
 
 		// If the hookName was not passed, check for any current hook.
-		if ( 'undefined' === typeof hookName ) {
-			return 'undefined' !== typeof hooksStore.__current[ 0 ];
+		if ('undefined' === typeof hookName) {
+			return 'undefined' !== typeof hooksStore.__current[0];
 		}
 
 		// Return the __current hook.
-		return hooksStore.__current[ 0 ]
-			? hookName === hooksStore.__current[ 0 ].name
+		return hooksStore.__current[0]
+			? hookName === hooksStore.__current[0].name
 			: false;
 	};
 }

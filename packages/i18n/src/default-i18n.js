@@ -8,7 +8,7 @@ import { createI18n } from './create-i18n';
  */
 import { defaultHooks } from '@wordpress/hooks';
 
-const i18n = createI18n( undefined, undefined, defaultHooks );
+const i18n = createI18n(undefined, undefined, defaultHooks);
 
 /**
  * Default, singleton instance of `I18n`.
@@ -34,7 +34,7 @@ export default i18n;
  * @param {string} [domain] Domain for which to get the data.
  * @return {LocaleData} Locale data.
  */
-export const getLocaleData = i18n.getLocaleData.bind( i18n );
+export const getLocaleData = i18n.getLocaleData.bind(i18n);
 
 /**
  * Merges locale data into the Tannin instance by domain. Accepts data in a
@@ -45,7 +45,7 @@ export const getLocaleData = i18n.getLocaleData.bind( i18n );
  * @param {LocaleData} [data]   Locale data configuration.
  * @param {string}     [domain] Domain for which configuration applies.
  */
-export const setLocaleData = i18n.setLocaleData.bind( i18n );
+export const setLocaleData = i18n.setLocaleData.bind(i18n);
 
 /**
  * Resets all current Tannin instance locale data and sets the specified
@@ -56,7 +56,7 @@ export const setLocaleData = i18n.setLocaleData.bind( i18n );
  * @param {LocaleData} [data]   Locale data configuration.
  * @param {string}     [domain] Domain for which configuration applies.
  */
-export const resetLocaleData = i18n.resetLocaleData.bind( i18n );
+export const resetLocaleData = i18n.resetLocaleData.bind(i18n);
 
 /**
  * Subscribes to changes of locale data
@@ -64,7 +64,7 @@ export const resetLocaleData = i18n.resetLocaleData.bind( i18n );
  * @param {SubscribeCallback} callback Subscription callback
  * @return {UnsubscribeCallback} Unsubscribe callback
  */
-export const subscribe = i18n.subscribe.bind( i18n );
+export const subscribe = i18n.subscribe.bind(i18n);
 
 /**
  * Retrieve the translation of text.
@@ -76,7 +76,7 @@ export const subscribe = i18n.subscribe.bind( i18n );
  *
  * @return {string} Translated text.
  */
-export const __ = i18n.__.bind( i18n );
+export const __ = i18n.__.bind(i18n);
 
 /**
  * Retrieve translated string with gettext context.
@@ -89,7 +89,7 @@ export const __ = i18n.__.bind( i18n );
  *
  * @return {string} Translated context string without pipe.
  */
-export const _x = i18n._x.bind( i18n );
+export const _x = i18n._x.bind(i18n);
 
 /**
  * Translates and retrieves the singular or plural form based on the supplied
@@ -105,7 +105,7 @@ export const _x = i18n._x.bind( i18n );
  *
  * @return {string} The translated singular or plural form.
  */
-export const _n = i18n._n.bind( i18n );
+export const _n = i18n._n.bind(i18n);
 
 /**
  * Translates and retrieves the singular or plural form based on the supplied
@@ -122,7 +122,7 @@ export const _n = i18n._n.bind( i18n );
  *
  * @return {string} The translated singular or plural form.
  */
-export const _nx = i18n._nx.bind( i18n );
+export const _nx = i18n._nx.bind(i18n);
 
 /**
  * Check if current locale is RTL.
@@ -134,7 +134,7 @@ export const _nx = i18n._nx.bind( i18n );
  *
  * @return {boolean} Whether locale is RTL.
  */
-export const isRTL = i18n.isRTL.bind( i18n );
+export const isRTL = i18n.isRTL.bind(i18n);
 
 /**
  * Check if there is a translation for a given string (in singular form).
@@ -144,4 +144,4 @@ export const isRTL = i18n.isRTL.bind( i18n );
  * @param {string} [domain]  Domain to retrieve the translated text.
  * @return {boolean} Whether the translation exists or not.
  */
-export const hasTranslation = i18n.hasTranslation.bind( i18n );
+export const hasTranslation = i18n.hasTranslation.bind(i18n);

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const chalk = require( 'chalk' );
+const chalk = require('chalk');
 
 process.stdout.write(
 	chalk.yellow(
@@ -9,6 +9,6 @@ process.stdout.write(
 	)
 );
 process.stdout.write(
-	chalk.blue( '\nSee: https://www.npmjs.com/package/@wordpress/env\n' )
+	chalk.blue('\nSee: https://www.npmjs.com/package/@wordpress/env\n')
 );
-process.exit( 1 );
+process.exit(1);

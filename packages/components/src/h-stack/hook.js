@@ -10,26 +10,26 @@ import { getValidChildren } from '../ui/utils/get-valid-children';
  *
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
-export function useHStack( props ) {
+export function useHStack(props) {
 	const {
 		alignment = 'edge',
 		children,
 		direction,
 		spacing = 2,
 		...otherProps
-	} = useContextSystem( props, 'HStack' );
+	} = useContextSystem(props, 'HStack');
 
-	const align = getAlignmentProps( alignment, direction );
+	const align = getAlignmentProps(alignment, direction);
 
-	const validChildren = getValidChildren( children );
+	const validChildren = getValidChildren(children);
 	const clonedChildren = validChildren.map(
 		// @ts-ignore
-		( /** @type {import('react').ReactElement} */ child, index ) => {
-			const _key = child.key || `hstack-${ index }`;
-			const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
+		(/** @type {import('react').ReactElement} */ child, index) => {
+			const _key = child.key || `hstack-${index}`;
+			const _isSpacer = hasConnectNamespace(child, ['Spacer']);
 
-			if ( _isSpacer ) {
-				return <FlexItem isBlock key={ _key } { ...child.props } />;
+			if (_isSpacer) {
+				return <FlexItem isBlock key={_key} {...child.props} />;
 			}
 
 			return child;
@@ -45,7 +45,7 @@ export function useHStack( props ) {
 		gap: spacing,
 	};
 
-	const flexProps = useFlex( propsForFlex );
+	const flexProps = useFlex(propsForFlex);
 
 	return flexProps;
 }

@@ -11,9 +11,9 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Array} Updated state.
  */
-export function widgetAreasOpenState( state = {}, action ) {
+export function widgetAreasOpenState(state = {}, action) {
 	const { type } = action;
-	switch ( type ) {
+	switch (type) {
 		case 'SET_WIDGET_AREAS_OPEN_STATE': {
 			return action.widgetAreasOpenState;
 		}
@@ -21,7 +21,7 @@ export function widgetAreasOpenState( state = {}, action ) {
 			const { clientId, isOpen } = action;
 			return {
 				...state,
-				[ clientId ]: isOpen,
+				[clientId]: isOpen,
 			};
 		}
 		default: {
@@ -39,8 +39,8 @@ export function widgetAreasOpenState( state = {}, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
-export function blockInserterPanel( state = false, action ) {
-	switch ( action.type ) {
+export function blockInserterPanel(state = false, action) {
+	switch (action.type) {
 		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
@@ -58,8 +58,8 @@ export function blockInserterPanel( state = false, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
-export function listViewPanel( state = false, action ) {
-	switch ( action.type ) {
+export function listViewPanel(state = false, action) {
+	switch (action.type) {
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value ? false : state;
 		case 'SET_IS_LIST_VIEW_OPENED':
@@ -68,8 +68,8 @@ export function listViewPanel( state = false, action ) {
 	return state;
 }
 
-export default combineReducers( {
+export default combineReducers({
 	blockInserterPanel,
 	listViewPanel,
 	widgetAreasOpenState,
-} );
+});

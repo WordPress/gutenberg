@@ -60,24 +60,24 @@ import useMobileWarning from './use-mobile-warning';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
-	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
-	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
+	{ value: LINK_DESTINATION_ATTACHMENT, label: __('Attachment Page') },
+	{ value: LINK_DESTINATION_MEDIA, label: __('Media File') },
 	{
 		value: LINK_DESTINATION_NONE,
-		label: _x( 'None', 'Media item link option' ),
+		label: _x('None', 'Media item link option'),
 	},
 ];
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const ALLOWED_MEDIA_TYPES = ['image'];
 
 const PLACEHOLDER_TEXT = Platform.isNative
-	? __( 'ADD MEDIA' )
-	: __( 'Drag images, upload new ones or select files from your library.' );
+	? __('ADD MEDIA')
+	: __('Drag images, upload new ones or select files from your library.');
 
 const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
-function GalleryEdit( props ) {
+function GalleryEdit(props) {
 	const {
 		setAttributes,
 		attributes,
@@ -102,80 +102,76 @@ function GalleryEdit( props ) {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
-	} = useDispatch( blockEditorStore );
-	const { createSuccessNotice } = useDispatch( noticesStore );
+	} = useDispatch(blockEditorStore);
+	const { createSuccessNotice } = useDispatch(noticesStore);
 
-	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+	const { getBlock, getSettings, preferredStyle } = useSelect((select) => {
+		const settings = select(blockEditorStore).getSettings();
 		const preferredStyleVariations =
 			settings.__experimentalPreferredStyleVariations;
 		return {
-			getBlock: select( blockEditorStore ).getBlock,
-			getSettings: select( blockEditorStore ).getSettings,
-			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
+			getBlock: select(blockEditorStore).getBlock,
+			getSettings: select(blockEditorStore).getSettings,
+			preferredStyle: preferredStyleVariations?.value?.['core/image'],
 		};
-	}, [] );
+	}, []);
 
 	const innerBlockImages = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
+		(select) => {
+			return select(blockEditorStore).getBlock(clientId)?.innerBlocks;
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	const wasBlockJustInserted = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).wasBlockJustInserted(
+		(select) => {
+			return select(blockEditorStore).wasBlockJustInserted(
 				clientId,
 				'inserter_menu'
 			);
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	const images = useMemo(
 		() =>
-			innerBlockImages?.map( ( block ) => ( {
+			innerBlockImages?.map((block) => ({
 				clientId: block.clientId,
 				id: block.attributes.id,
 				url: block.attributes.url,
 				attributes: block.attributes,
-				fromSavedContent: Boolean( block.originalContent ),
-			} ) ),
-		[ innerBlockImages ]
+				fromSavedContent: Boolean(block.originalContent),
+			})),
+		[innerBlockImages]
 	);
 
-	const imageData = useGetMedia( innerBlockImages );
+	const imageData = useGetMedia(innerBlockImages);
 
-	const newImages = useGetNewImages( images, imageData );
+	const newImages = useGetNewImages(images, imageData);
 
-	useMobileWarning( newImages );
+	useMobileWarning(newImages);
 
-	useEffect( () => {
-		newImages?.forEach( ( newImage ) => {
-			updateBlockAttributes( newImage.clientId, {
-				...buildImageAttributes( newImage.attributes ),
+	useEffect(() => {
+		newImages?.forEach((newImage) => {
+			updateBlockAttributes(newImage.clientId, {
+				...buildImageAttributes(newImage.attributes),
 				id: newImage.id,
 				align: undefined,
-			} );
-		} );
-	}, [ newImages ] );
+			});
+		});
+	}, [newImages]);
 
-	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
+	const shortCodeImages = useShortCodeTransform(shortCodeTransforms);
 
-	useEffect( () => {
-		if ( ! shortCodeTransforms || ! shortCodeImages ) {
+	useEffect(() => {
+		if (!shortCodeTransforms || !shortCodeImages) {
 			return;
 		}
-		updateImages( shortCodeImages );
-		setAttributes( { shortCodeTransforms: undefined } );
-	}, [ shortCodeTransforms, shortCodeImages ] );
+		updateImages(shortCodeImages);
+		setAttributes({ shortCodeTransforms: undefined });
+	}, [shortCodeTransforms, shortCodeImages]);
 
-	const imageSizeOptions = useImageSizes(
-		imageData,
-		isSelected,
-		getSettings
-	);
+	const imageSizeOptions = useImageSizes(imageData, isSelected, getSettings);
 
 	/**
 	 * Determines the image attributes that should be applied to an image block
@@ -189,54 +185,54 @@ function GalleryEdit( props ) {
 	 * @param {Object} imageAttributes Media object for the actual image.
 	 * @return {Object}                Attributes to set on the new image block.
 	 */
-	function buildImageAttributes( imageAttributes ) {
+	function buildImageAttributes(imageAttributes) {
 		const image = imageAttributes.id
-			? find( imageData, { id: imageAttributes.id } )
+			? find(imageData, { id: imageAttributes.id })
 			: null;
 
 		let newClassName;
-		if ( imageAttributes.className && imageAttributes.className !== '' ) {
+		if (imageAttributes.className && imageAttributes.className !== '') {
 			newClassName = imageAttributes.className;
 		} else {
 			newClassName = preferredStyle
-				? `is-style-${ preferredStyle }`
+				? `is-style-${preferredStyle}`
 				: undefined;
 		}
 		return {
-			...pickRelevantMediaFiles( imageAttributes, sizeSlug ),
-			...getHrefAndDestination( image, linkTo ),
-			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
+			...pickRelevantMediaFiles(imageAttributes, sizeSlug),
+			...getHrefAndDestination(image, linkTo),
+			...getUpdatedLinkTargetSettings(linkTarget, attributes),
 			className: newClassName,
 			sizeSlug,
 		};
 	}
 
-	function isValidFileType( file ) {
+	function isValidFileType(file) {
 		return (
 			ALLOWED_MEDIA_TYPES.some(
-				( mediaType ) => file.type?.indexOf( mediaType ) === 0
-			) || file.url?.indexOf( 'blob:' ) === 0
+				(mediaType) => file.type?.indexOf(mediaType) === 0
+			) || file.url?.indexOf('blob:') === 0
 		);
 	}
 
-	function updateImages( selectedImages ) {
+	function updateImages(selectedImages) {
 		const newFileUploads =
-			Object.prototype.toString.call( selectedImages ) ===
+			Object.prototype.toString.call(selectedImages) ===
 			'[object FileList]';
 
 		const imageArray = newFileUploads
-			? Array.from( selectedImages ).map( ( file ) => {
-					if ( ! file.url ) {
-						return pickRelevantMediaFiles( {
-							url: createBlobURL( file ),
-						} );
+			? Array.from(selectedImages).map((file) => {
+					if (!file.url) {
+						return pickRelevantMediaFiles({
+							url: createBlobURL(file),
+						});
 					}
 
 					return file;
-			  } )
+			  })
 			: selectedImages;
 
-		if ( ! imageArray.every( isValidFileType ) ) {
+		if (!imageArray.every(isValidFileType)) {
 			noticeOperations.removeAllNotices();
 			noticeOperations.createErrorNotice(
 				__(
@@ -247,89 +243,86 @@ function GalleryEdit( props ) {
 		}
 
 		const processedImages = imageArray
-			.filter( ( file ) => file.url || isValidFileType( file ) )
-			.map( ( file ) => {
-				if ( ! file.url ) {
-					return pickRelevantMediaFiles( {
-						url: createBlobURL( file ),
-					} );
+			.filter((file) => file.url || isValidFileType(file))
+			.map((file) => {
+				if (!file.url) {
+					return pickRelevantMediaFiles({
+						url: createBlobURL(file),
+					});
 				}
 
 				return file;
-			} );
+			});
 
 		// Because we are reusing existing innerImage blocks any reordering
 		// done in the media library will be lost so we need to reapply that ordering
 		// once the new image blocks are merged in with existing.
 		const newOrderMap = processedImages.reduce(
-			( result, image, index ) => (
-				( result[ image.id ] = index ), result
-			),
+			(result, image, index) => ((result[image.id] = index), result),
 			{}
 		);
 
-		const existingImageBlocks = ! newFileUploads
-			? innerBlockImages.filter( ( block ) =>
+		const existingImageBlocks = !newFileUploads
+			? innerBlockImages.filter((block) =>
 					processedImages.find(
-						( img ) => img.id === block.attributes.id
+						(img) => img.id === block.attributes.id
 					)
 			  )
 			: innerBlockImages;
 
 		const newImageList = processedImages.filter(
-			( img ) =>
-				! existingImageBlocks.find(
-					( existingImg ) => img.id === existingImg.attributes.id
+			(img) =>
+				!existingImageBlocks.find(
+					(existingImg) => img.id === existingImg.attributes.id
 				)
 		);
 
-		const newBlocks = newImageList.map( ( image ) => {
-			return createBlock( 'core/image', {
+		const newBlocks = newImageList.map((image) => {
+			return createBlock('core/image', {
 				id: image.id,
 				url: image.url,
 				caption: image.caption,
 				alt: image.alt,
-			} );
-		} );
+			});
+		});
 
 		replaceInnerBlocks(
 			clientId,
-			concat( existingImageBlocks, newBlocks ).sort(
-				( a, b ) =>
-					newOrderMap[ a.attributes.id ] -
-					newOrderMap[ b.attributes.id ]
+			concat(existingImageBlocks, newBlocks).sort(
+				(a, b) =>
+					newOrderMap[a.attributes.id] - newOrderMap[b.attributes.id]
 			)
 		);
 	}
 
-	function onUploadError( message ) {
+	function onUploadError(message) {
 		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		noticeOperations.createErrorNotice(message);
 	}
 
-	function setLinkTo( value ) {
-		setAttributes( { linkTo: value } );
+	function setLinkTo(value) {
+		setAttributes({ linkTo: value });
 		const changedAttributes = {};
 		const blocks = [];
-		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			blocks.push( block.clientId );
+		getBlock(clientId).innerBlocks.forEach((block) => {
+			blocks.push(block.clientId);
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? find(imageData, { id: block.attributes.id })
 				: null;
-			changedAttributes[ block.clientId ] = getHrefAndDestination(
+			changedAttributes[block.clientId] = getHrefAndDestination(
 				image,
 				value
 			);
-		} );
-		updateBlockAttributes( blocks, changedAttributes, true );
-		const linkToText = [ ...linkOptions ].find(
-			( linkType ) => linkType.value === value
+		});
+		updateBlockAttributes(blocks, changedAttributes, true);
+		const linkToText = [...linkOptions].find(
+			(linkType) => linkType.value === value
 		);
 
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: image size settings */
-				__( 'All gallery image links updated to: %s' ),
+				__('All gallery image links updated to: %s'),
 				linkToText.label
 			),
 			{
@@ -339,65 +332,65 @@ function GalleryEdit( props ) {
 		);
 	}
 
-	function setColumnsNumber( value ) {
-		setAttributes( { columns: value } );
+	function setColumnsNumber(value) {
+		setAttributes({ columns: value });
 	}
 
 	function toggleImageCrop() {
-		setAttributes( { imageCrop: ! imageCrop } );
+		setAttributes({ imageCrop: !imageCrop });
 	}
 
-	function getImageCropHelp( checked ) {
+	function getImageCropHelp(checked) {
 		return checked
-			? __( 'Thumbnails are cropped to align.' )
-			: __( 'Thumbnails are not cropped.' );
+			? __('Thumbnails are cropped to align.')
+			: __('Thumbnails are not cropped.');
 	}
 
-	function toggleOpenInNewTab( openInNewTab ) {
+	function toggleOpenInNewTab(openInNewTab) {
 		const newLinkTarget = openInNewTab ? '_blank' : undefined;
-		setAttributes( { linkTarget: newLinkTarget } );
+		setAttributes({ linkTarget: newLinkTarget });
 		const changedAttributes = {};
 		const blocks = [];
-		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			blocks.push( block.clientId );
-			changedAttributes[ block.clientId ] = getUpdatedLinkTargetSettings(
+		getBlock(clientId).innerBlocks.forEach((block) => {
+			blocks.push(block.clientId);
+			changedAttributes[block.clientId] = getUpdatedLinkTargetSettings(
 				newLinkTarget,
 				block.attributes
 			);
-		} );
-		updateBlockAttributes( blocks, changedAttributes, true );
+		});
+		updateBlockAttributes(blocks, changedAttributes, true);
 		const noticeText = openInNewTab
-			? __( 'All gallery images updated to open in new tab' )
-			: __( 'All gallery images updated to not open in new tab' );
-		createSuccessNotice( noticeText, {
+			? __('All gallery images updated to open in new tab')
+			: __('All gallery images updated to not open in new tab');
+		createSuccessNotice(noticeText, {
 			id: 'gallery-attributes-openInNewTab',
 			type: 'snackbar',
-		} );
+		});
 	}
 
-	function updateImagesSize( newSizeSlug ) {
-		setAttributes( { sizeSlug: newSizeSlug } );
+	function updateImagesSize(newSizeSlug) {
+		setAttributes({ sizeSlug: newSizeSlug });
 		const changedAttributes = {};
 		const blocks = [];
-		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			blocks.push( block.clientId );
+		getBlock(clientId).innerBlocks.forEach((block) => {
+			blocks.push(block.clientId);
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? find(imageData, { id: block.attributes.id })
 				: null;
-			changedAttributes[ block.clientId ] = getImageSizeAttributes(
+			changedAttributes[block.clientId] = getImageSizeAttributes(
 				image,
 				newSizeSlug
 			);
-		} );
-		updateBlockAttributes( blocks, changedAttributes, true );
+		});
+		updateBlockAttributes(blocks, changedAttributes, true);
 		const imageSize = imageSizeOptions.find(
-			( size ) => size.value === newSizeSlug
+			(size) => size.value === newSizeSlug
 		);
 
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: image size settings */
-				__( 'All gallery image sizes updated to: %s' ),
+				__('All gallery image sizes updated to: %s'),
 				imageSize.label
 			),
 			{
@@ -407,56 +400,54 @@ function GalleryEdit( props ) {
 		);
 	}
 
-	useEffect( () => {
+	useEffect(() => {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php
-		if ( ! linkTo ) {
+		if (!linkTo) {
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
+			setAttributes({
 				linkTo:
 					window?.wp?.media?.view?.settings?.defaultProps?.link ||
 					LINK_DESTINATION_NONE,
-			} );
+			});
 		}
-	}, [ linkTo ] );
+	}, [linkTo]);
 
-	const hasImages = !! images.length;
-	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
+	const hasImages = !!images.length;
+	const hasImageIds = hasImages && images.some((image) => !!image.id);
 	const imagesUploading = images.some(
-		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
+		(img) => !img.id && img.url?.indexOf('blob:') === 0
 	);
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImageIds }
-			handleUpload={ false }
-			isAppender={ hasImages }
-			disableMediaButtons={
-				( hasImages && ! isSelected ) || imagesUploading
-			}
-			icon={ ! hasImages && sharedIcon }
-			labels={ {
-				title: ! hasImages && __( 'Gallery' ),
-				instructions: ! hasImages && PLACEHOLDER_TEXT,
-			} }
-			onSelect={ updateImages }
+			addToGallery={hasImageIds}
+			handleUpload={false}
+			isAppender={hasImages}
+			disableMediaButtons={(hasImages && !isSelected) || imagesUploading}
+			icon={!hasImages && sharedIcon}
+			labels={{
+				title: !hasImages && __('Gallery'),
+				instructions: !hasImages && PLACEHOLDER_TEXT,
+			}}
+			onSelect={updateImages}
 			accept="image/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			allowedTypes={ALLOWED_MEDIA_TYPES}
 			multiple
-			value={ hasImageIds ? images : {} }
-			onError={ onUploadError }
-			notices={ hasImages ? undefined : noticeUI }
+			value={hasImageIds ? images : {}}
+			onError={onUploadError}
+			notices={hasImages ? undefined : noticeUI}
 			autoOpenMediaUpload={
-				! hasImages && isSelected && wasBlockJustInserted
+				!hasImages && isSelected && wasBlockJustInserted
 			}
 		/>
 	);
 
-	const blockProps = useBlockProps( {
-		className: classnames( className, 'has-nested-images' ),
-	} );
+	const blockProps = useBlockProps({
+		className: classnames(className, 'has-nested-images'),
+	});
 
-	if ( ! hasImages ) {
-		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
+	if (!hasImages) {
+		return <View {...blockProps}>{mediaPlaceholder}</View>;
 	}
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
@@ -464,76 +455,76 @@ function GalleryEdit( props ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Gallery settings' ) }>
-					{ images.length > 1 && (
+				<PanelBody title={__('Gallery settings')}>
+					{images.length > 1 && (
 						<RangeControl
-							label={ __( 'Columns' ) }
+							label={__('Columns')}
 							value={
 								columns
 									? columns
-									: defaultColumnsNumber( images.length )
+									: defaultColumnsNumber(images.length)
 							}
-							onChange={ setColumnsNumber }
-							min={ 1 }
-							max={ Math.min( MAX_COLUMNS, images.length ) }
-							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
+							onChange={setColumnsNumber}
+							min={1}
+							max={Math.min(MAX_COLUMNS, images.length)}
+							{...MOBILE_CONTROL_PROPS_RANGE_CONTROL}
 							required
 						/>
-					) }
+					)}
 					<ToggleControl
-						label={ __( 'Crop images' ) }
-						checked={ !! imageCrop }
-						onChange={ toggleImageCrop }
-						help={ getImageCropHelp }
+						label={__('Crop images')}
+						checked={!!imageCrop}
+						onChange={toggleImageCrop}
+						help={getImageCropHelp}
 					/>
 					<SelectControl
-						label={ __( 'Link to' ) }
-						value={ linkTo }
-						onChange={ setLinkTo }
-						options={ linkOptions }
-						hideCancelButton={ true }
+						label={__('Link to')}
+						value={linkTo}
+						onChange={setLinkTo}
+						options={linkOptions}
+						hideCancelButton={true}
 					/>
-					{ hasLinkTo && (
+					{hasLinkTo && (
 						<ToggleControl
-							label={ __( 'Open in new tab' ) }
-							checked={ linkTarget === '_blank' }
-							onChange={ toggleOpenInNewTab }
+							label={__('Open in new tab')}
+							checked={linkTarget === '_blank'}
+							onChange={toggleOpenInNewTab}
 						/>
-					) }
-					{ imageSizeOptions?.length > 0 && (
+					)}
+					{imageSizeOptions?.length > 0 && (
 						<SelectControl
-							label={ __( 'Image size' ) }
-							value={ sizeSlug }
-							options={ imageSizeOptions }
-							onChange={ updateImagesSize }
-							hideCancelButton={ true }
+							label={__('Image size')}
+							value={sizeSlug}
+							options={imageSizeOptions}
+							onChange={updateImagesSize}
+							hideCancelButton={true}
 						/>
-					) }
-					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
-						<BaseControl className={ 'gallery-image-sizes' }>
+					)}
+					{Platform.isWeb && !imageSizeOptions && hasImageIds && (
+						<BaseControl className={'gallery-image-sizes'}>
 							<BaseControl.VisualLabel>
-								{ __( 'Image size' ) }
+								{__('Image size')}
 							</BaseControl.VisualLabel>
-							<View className={ 'gallery-image-sizes__loading' }>
+							<View className={'gallery-image-sizes__loading'}>
 								<Spinner />
-								{ __( 'Loading options…' ) }
+								{__('Loading options…')}
 							</View>
 						</BaseControl>
-					) }
+					)}
 				</PanelBody>
 			</InspectorControls>
-			{ noticeUI }
+			{noticeUI}
 			<Gallery
-				{ ...props }
-				images={ images }
-				mediaPlaceholder={ mediaPlaceholder }
-				blockProps={ blockProps }
-				insertBlocksAfter={ insertBlocksAfter }
+				{...props}
+				images={images}
+				mediaPlaceholder={mediaPlaceholder}
+				blockProps={blockProps}
+				insertBlocksAfter={insertBlocksAfter}
 			/>
 		</>
 	);
 }
-export default compose( [
+export default compose([
 	withNotices,
-	withViewportMatch( { isNarrow: '< small' } ),
-] )( GalleryEdit );
+	withViewportMatch({ isNarrow: '< small' }),
+])(GalleryEdit);

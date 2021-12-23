@@ -48,12 +48,12 @@ const CONDITIONS = {
  * @type {Record<WPViewportOperator, (breakpointValue: number, width: number) => boolean>}
  */
 const OPERATOR_EVALUATORS = {
-	'>=': ( breakpointValue, width ) => width >= breakpointValue,
-	'<': ( breakpointValue, width ) => width < breakpointValue,
+	'>=': (breakpointValue, width) => width >= breakpointValue,
+	'<': (breakpointValue, width) => width < breakpointValue,
 };
 
 const ViewportMatchWidthContext = createContext(
-	/** @type {null | number} */ ( null )
+	/** @type {null | number} */ (null)
 );
 
 /**
@@ -71,15 +71,15 @@ const ViewportMatchWidthContext = createContext(
  *
  * @return {boolean} Whether viewport matches query.
  */
-const useViewportMatch = ( breakpoint, operator = '>=' ) => {
-	const simulatedWidth = useContext( ViewportMatchWidthContext );
+const useViewportMatch = (breakpoint, operator = '>=') => {
+	const simulatedWidth = useContext(ViewportMatchWidthContext);
 	const mediaQuery =
-		! simulatedWidth &&
-		`(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
-	const mediaQueryResult = useMediaQuery( mediaQuery || undefined );
-	if ( simulatedWidth ) {
-		return OPERATOR_EVALUATORS[ operator ](
-			BREAKPOINTS[ breakpoint ],
+		!simulatedWidth &&
+		`(${CONDITIONS[operator]}: ${BREAKPOINTS[breakpoint]}px)`;
+	const mediaQueryResult = useMediaQuery(mediaQuery || undefined);
+	if (simulatedWidth) {
+		return OPERATOR_EVALUATORS[operator](
+			BREAKPOINTS[breakpoint],
 			simulatedWidth
 		);
 	}

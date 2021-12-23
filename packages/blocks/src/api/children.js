@@ -26,7 +26,7 @@ import * as node from './node';
  *
  * @return {WPElement} A serialize-capable element.
  */
-export function getSerializeCapableElement( children ) {
+export function getSerializeCapableElement(children) {
 	// The fact that block children are compatible with the element serializer is
 	// merely an implementation detail that currently serves to be true, but
 	// should not be mistaken as being a guarantee on the external API. The
@@ -43,7 +43,7 @@ export function getSerializeCapableElement( children ) {
  *
  * @return {Array<WPBlockNode>} An array of individual block nodes.
  */
-function getChildrenArray( children ) {
+function getChildrenArray(children) {
 	// The fact that block children are compatible with the element serializer
 	// is merely an implementation detail that currently serves to be true, but
 	// should not be mistaken as being a guarantee on the external API.
@@ -58,20 +58,20 @@ function getChildrenArray( children ) {
  *
  * @return {WPBlockChildren} Concatenated block node.
  */
-export function concat( ...blockNodes ) {
+export function concat(...blockNodes) {
 	const result = [];
-	for ( let i = 0; i < blockNodes.length; i++ ) {
-		const blockNode = castArray( blockNodes[ i ] );
-		for ( let j = 0; j < blockNode.length; j++ ) {
-			const child = blockNode[ j ];
+	for (let i = 0; i < blockNodes.length; i++) {
+		const blockNode = castArray(blockNodes[i]);
+		for (let j = 0; j < blockNode.length; j++) {
+			const child = blockNode[j];
 			const canConcatToPreviousString =
 				typeof child === 'string' &&
-				typeof result[ result.length - 1 ] === 'string';
+				typeof result[result.length - 1] === 'string';
 
-			if ( canConcatToPreviousString ) {
-				result[ result.length - 1 ] += child;
+			if (canConcatToPreviousString) {
+				result[result.length - 1] += child;
 			} else {
-				result.push( child );
+				result.push(child);
 			}
 		}
 	}
@@ -87,12 +87,12 @@ export function concat( ...blockNodes ) {
  *
  * @return {WPBlockChildren} Block children equivalent to DOM nodes.
  */
-export function fromDOM( domNodes ) {
+export function fromDOM(domNodes) {
 	const result = [];
-	for ( let i = 0; i < domNodes.length; i++ ) {
+	for (let i = 0; i < domNodes.length; i++) {
 		try {
-			result.push( node.fromDOM( domNodes[ i ] ) );
-		} catch ( error ) {
+			result.push(node.fromDOM(domNodes[i]));
+		} catch (error) {
 			// Simply ignore if DOM node could not be converted.
 		}
 	}
@@ -107,10 +107,10 @@ export function fromDOM( domNodes ) {
  *
  * @return {string} String HTML representation of block node.
  */
-export function toHTML( children ) {
-	const element = getSerializeCapableElement( children );
+export function toHTML(children) {
+	const element = getSerializeCapableElement(children);
 
-	return renderToString( element );
+	return renderToString(element);
 }
 
 /**
@@ -121,16 +121,16 @@ export function toHTML( children ) {
  *
  * @return {Function} hpq matcher.
  */
-export function matcher( selector ) {
-	return ( domNode ) => {
+export function matcher(selector) {
+	return (domNode) => {
 		let match = domNode;
 
-		if ( selector ) {
-			match = domNode.querySelector( selector );
+		if (selector) {
+			match = domNode.querySelector(selector);
 		}
 
-		if ( match ) {
-			return fromDOM( match.childNodes );
+		if (match) {
+			return fromDOM(match.childNodes);
 		}
 
 		return [];

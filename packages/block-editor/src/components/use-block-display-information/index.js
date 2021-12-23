@@ -36,28 +36,26 @@ import { store as blockEditorStore } from '../../store';
  * @return {?WPBlockDisplayInformation} Block's display information, or `null` when the block or its type not found.
  */
 
-export default function useBlockDisplayInformation( clientId ) {
+export default function useBlockDisplayInformation(clientId) {
 	return useSelect(
-		( select ) => {
-			if ( ! clientId ) return null;
-			const { getBlockName, getBlockAttributes } = select(
-				blockEditorStore
-			);
-			const { getBlockType, getActiveBlockVariation } = select(
-				blocksStore
-			);
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
-			if ( ! blockType ) return null;
-			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
+		(select) => {
+			if (!clientId) return null;
+			const { getBlockName, getBlockAttributes } =
+				select(blockEditorStore);
+			const { getBlockType, getActiveBlockVariation } =
+				select(blocksStore);
+			const blockName = getBlockName(clientId);
+			const blockType = getBlockType(blockName);
+			if (!blockType) return null;
+			const attributes = getBlockAttributes(clientId);
+			const match = getActiveBlockVariation(blockName, attributes);
 			const blockTypeInfo = {
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
 				anchor: attributes?.anchor,
 			};
-			if ( ! match ) return blockTypeInfo;
+			if (!match) return blockTypeInfo;
 
 			return {
 				title: match.title || blockType.title,
@@ -65,6 +63,6 @@ export default function useBlockDisplayInformation( clientId ) {
 				description: match.description || blockType.description,
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 }

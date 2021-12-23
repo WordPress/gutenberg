@@ -22,25 +22,24 @@ import {
 } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 
-const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
+const { Fill, Slot } = createSlotFill('BlockSettingsMenuControls');
 
-const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+const BlockSettingsMenuControlsSlot = ({ fillProps, clientIds = null }) => {
 	const { selectedBlocks, selectedClientIds } = useSelect(
-		( select ) => {
-			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
-				blockEditorStore
-			);
+		(select) => {
+			const { getBlocksByClientId, getSelectedBlockClientIds } =
+				select(blockEditorStore);
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
 				selectedBlocks: map(
-					compact( getBlocksByClientId( ids ) ),
-					( block ) => block.name
+					compact(getBlocksByClientId(ids)),
+					(block) => block.name
 				),
 				selectedClientIds: ids,
 			};
 		},
-		[ clientIds ]
+		[clientIds]
 	);
 
 	// Check if current selection of blocks is Groupable or Ungroupable
@@ -49,20 +48,20 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton = isGroupable || isUngroupable;
 	return (
-		<Slot fillProps={ { ...fillProps, selectedBlocks, selectedClientIds } }>
-			{ ( fills ) => {
-				if ( fills?.length > 0 || showConvertToGroupButton ) {
+		<Slot fillProps={{ ...fillProps, selectedBlocks, selectedClientIds }}>
+			{(fills) => {
+				if (fills?.length > 0 || showConvertToGroupButton) {
 					return (
 						<MenuGroup>
-							{ fills }
+							{fills}
 							<ConvertToGroupButton
-								{ ...convertToGroupButtonProps }
-								onClose={ fillProps?.onClose }
+								{...convertToGroupButtonProps}
+								onClose={fillProps?.onClose}
 							/>
 						</MenuGroup>
 					);
 				}
-			} }
+			}}
 		</Slot>
 	);
 };
@@ -73,10 +72,10 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
  * @param {Object} props Fill props.
  * @return {WPElement} Element.
  */
-function BlockSettingsMenuControls( { ...props } ) {
+function BlockSettingsMenuControls({ ...props }) {
 	return (
-		<StyleProvider document={ document }>
-			<Fill { ...props } />
+		<StyleProvider document={document}>
+			<Fill {...props} />
 		</StyleProvider>
 	);
 }

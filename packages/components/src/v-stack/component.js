@@ -9,10 +9,10 @@ import { useVStack } from './hook';
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                        forwardedRef
  */
-function VStack( props, forwardedRef ) {
-	const vStackProps = useVStack( props );
+function VStack(props, forwardedRef) {
+	const vStackProps = useVStack(props);
 
-	return <View { ...vStackProps } ref={ forwardedRef } />;
+	return <View {...vStackProps} ref={forwardedRef} />;
 }
 
 /**
@@ -38,6 +38,6 @@ function VStack( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedVStack = contextConnect( VStack, 'VStack' );
+const ConnectedVStack = contextConnect(VStack, 'VStack');
 
 export default ConnectedVStack;

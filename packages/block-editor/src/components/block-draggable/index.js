@@ -13,56 +13,49 @@ import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
 import { store as blockEditorStore } from '../../store';
 
-const BlockDraggable = ( {
+const BlockDraggable = ({
 	children,
 	clientIds,
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
-} ) => {
+}) => {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
-		( select ) => {
-			const {
-				getBlockRootClientId,
-				getTemplateLock,
-				getBlockName,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+		(select) => {
+			const { getBlockRootClientId, getTemplateLock, getBlockName } =
+				select(blockEditorStore);
+			const rootClientId = getBlockRootClientId(clientIds[0]);
 			const templateLock = rootClientId
-				? getTemplateLock( rootClientId )
+				? getTemplateLock(rootClientId)
 				: null;
-			const blockName = getBlockName( clientIds[ 0 ] );
+			const blockName = getBlockName(clientIds[0]);
 
 			return {
 				srcRootClientId: rootClientId,
 				isDraggable: 'all' !== templateLock,
-				icon: getBlockType( blockName )?.icon,
+				icon: getBlockType(blockName)?.icon,
 			};
 		},
-		[ clientIds ]
+		[clientIds]
 	);
-	const isDragging = useRef( false );
-	const [
-		startScrolling,
-		scrollOnDragOver,
-		stopScrolling,
-	] = useScrollWhenDragging();
+	const isDragging = useRef(false);
+	const [startScrolling, scrollOnDragOver, stopScrolling] =
+		useScrollWhenDragging();
 
-	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const { startDraggingBlocks, stopDraggingBlocks } =
+		useDispatch(blockEditorStore);
 
 	// Stop dragging blocks if the block draggable is unmounted
-	useEffect( () => {
+	useEffect(() => {
 		return () => {
-			if ( isDragging.current ) {
+			if (isDragging.current) {
 				stopDraggingBlocks();
 			}
 		};
-	}, [] );
+	}, []);
 
-	if ( ! isDraggable ) {
-		return children( { isDraggable: false } );
+	if (!isDraggable) {
+		return children({ isDraggable: false });
 	}
 
 	const transferData = {
@@ -73,41 +66,41 @@ const BlockDraggable = ( {
 
 	return (
 		<Draggable
-			cloneClassname={ cloneClassname }
+			cloneClassname={cloneClassname}
 			__experimentalTransferDataType="wp-blocks"
-			transferData={ transferData }
-			onDragStart={ ( event ) => {
-				startDraggingBlocks( clientIds );
+			transferData={transferData}
+			onDragStart={(event) => {
+				startDraggingBlocks(clientIds);
 				isDragging.current = true;
 
-				startScrolling( event );
+				startScrolling(event);
 
-				if ( onDragStart ) {
+				if (onDragStart) {
 					onDragStart();
 				}
-			} }
-			onDragOver={ scrollOnDragOver }
-			onDragEnd={ () => {
+			}}
+			onDragOver={scrollOnDragOver}
+			onDragEnd={() => {
 				stopDraggingBlocks();
 				isDragging.current = false;
 
 				stopScrolling();
 
-				if ( onDragEnd ) {
+				if (onDragEnd) {
 					onDragEnd();
 				}
-			} }
+			}}
 			__experimentalDragComponent={
-				<BlockDraggableChip count={ clientIds.length } icon={ icon } />
+				<BlockDraggableChip count={clientIds.length} icon={icon} />
 			}
 		>
-			{ ( { onDraggableStart, onDraggableEnd } ) => {
-				return children( {
+			{({ onDraggableStart, onDraggableEnd }) => {
+				return children({
 					draggable: true,
 					onDragStart: onDraggableStart,
 					onDragEnd: onDraggableEnd,
-				} );
-			} }
+				});
+			}}
 		</Draggable>
 	);
 };

@@ -4,10 +4,10 @@
 import { createContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-const { Consumer, Provider } = createContext( {
+const { Consumer, Provider } = createContext({
 	name: null,
 	icon: null,
-} );
+});
 
 export { Provider as PluginContextProvider };
 
@@ -21,16 +21,16 @@ export { Provider as PluginContextProvider };
  *
  * @return {WPComponent} Enhanced component with injected context as props.
  */
-export const withPluginContext = ( mapContextToProps ) =>
-	createHigherOrderComponent( ( OriginalComponent ) => {
-		return ( props ) => (
+export const withPluginContext = (mapContextToProps) =>
+	createHigherOrderComponent((OriginalComponent) => {
+		return (props) => (
 			<Consumer>
-				{ ( context ) => (
+				{(context) => (
 					<OriginalComponent
-						{ ...props }
-						{ ...mapContextToProps( context, props ) }
+						{...props}
+						{...mapContextToProps(context, props)}
 					/>
-				) }
+				)}
 			</Consumer>
 		);
-	}, 'withPluginContext' );
+	}, 'withPluginContext');

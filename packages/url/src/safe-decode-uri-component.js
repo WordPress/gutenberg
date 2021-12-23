@@ -6,10 +6,10 @@
  *
  * @return {string} Decoded URI component if possible.
  */
-export function safeDecodeURIComponent( uriComponent ) {
+export function safeDecodeURIComponent(uriComponent) {
 	try {
-		return decodeURIComponent( uriComponent );
-	} catch ( uriComponentError ) {
+		return decodeURIComponent(uriComponent);
+	} catch (uriComponentError) {
 		return uriComponent;
 	}
 }

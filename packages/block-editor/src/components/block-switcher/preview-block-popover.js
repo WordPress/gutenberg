@@ -9,20 +9,20 @@ import { Popover } from '@wordpress/components';
  */
 import BlockPreview from '../block-preview';
 
-export default function PreviewBlockPopover( { blocks } ) {
+export default function PreviewBlockPopover({ blocks }) {
 	return (
 		<div className="block-editor-block-switcher__popover__preview__parent">
 			<div className="block-editor-block-switcher__popover__preview__container">
 				<Popover
 					className="block-editor-block-switcher__preview__popover"
 					position="bottom right"
-					focusOnMount={ false }
+					focusOnMount={false}
 				>
 					<div className="block-editor-block-switcher__preview">
 						<div className="block-editor-block-switcher__preview-title">
-							{ __( 'Preview' ) }
+							{__('Preview')}
 						</div>
-						<BlockPreview viewportWidth={ 500 } blocks={ blocks } />
+						<BlockPreview viewportWidth={500} blocks={blocks} />
 					</div>
 				</Popover>
 			</div>

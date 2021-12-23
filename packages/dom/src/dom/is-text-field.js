@@ -13,7 +13,7 @@ import isHTMLInputElement from './is-html-input-element';
  * @param {Node} node The HTML element.
  * @return {node is HTMLElement} True if the element is an text field, false if not.
  */
-export default function isTextField( node ) {
+export default function isTextField(node) {
 	/* eslint-enable jsdoc/valid-types */
 	const nonTextInputs = [
 		'button',
@@ -28,10 +28,10 @@ export default function isTextField( node ) {
 		'number',
 	];
 	return (
-		( isHTMLInputElement( node ) &&
+		(isHTMLInputElement(node) &&
 			node.type &&
-			! nonTextInputs.includes( node.type ) ) ||
+			!nonTextInputs.includes(node.type)) ||
 		node.nodeName === 'TEXTAREA' ||
-		/** @type {HTMLElement} */ ( node ).contentEditable === 'true'
+		/** @type {HTMLElement} */ (node).contentEditable === 'true'
 	);
 }

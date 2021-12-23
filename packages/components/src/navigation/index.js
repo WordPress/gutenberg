@@ -19,41 +19,41 @@ import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
 import { useCreateNavigationTree } from './use-create-navigation-tree';
 
-export default function Navigation( {
+export default function Navigation({
 	activeItem,
 	activeMenu = ROOT_MENU,
 	children,
 	className,
 	onActivateMenu = noop,
-} ) {
-	const [ menu, setMenu ] = useState( activeMenu );
-	const [ slideOrigin, setSlideOrigin ] = useState();
+}) {
+	const [menu, setMenu] = useState(activeMenu);
+	const [slideOrigin, setSlideOrigin] = useState();
 	const navigationTree = useCreateNavigationTree();
 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
 
-	const setActiveMenu = ( menuId, slideInOrigin = defaultSlideOrigin ) => {
-		if ( ! navigationTree.getMenu( menuId ) ) {
+	const setActiveMenu = (menuId, slideInOrigin = defaultSlideOrigin) => {
+		if (!navigationTree.getMenu(menuId)) {
 			return;
 		}
 
-		setSlideOrigin( slideInOrigin );
-		setMenu( menuId );
-		onActivateMenu( menuId );
+		setSlideOrigin(slideInOrigin);
+		setMenu(menuId);
+		onActivateMenu(menuId);
 	};
 
 	// Used to prevent the sliding animation on mount
-	const isMounted = useRef( false );
-	useEffect( () => {
-		if ( ! isMounted.current ) {
+	const isMounted = useRef(false);
+	useEffect(() => {
+		if (!isMounted.current) {
 			isMounted.current = true;
 		}
-	}, [] );
+	}, []);
 
-	useEffect( () => {
-		if ( activeMenu !== menu ) {
-			setActiveMenu( activeMenu );
+	useEffect(() => {
+		if (activeMenu !== menu) {
+			setActiveMenu(activeMenu);
 		}
-	}, [ activeMenu ] );
+	}, [activeMenu]);
 
 	const context = {
 		activeItem,
@@ -62,22 +62,22 @@ export default function Navigation( {
 		navigationTree,
 	};
 
-	const classes = classnames( 'components-navigation', className );
-	const animateClassName = getAnimateClassName( {
+	const classes = classnames('components-navigation', className);
+	const animateClassName = getAnimateClassName({
 		type: 'slide-in',
 		origin: slideOrigin,
-	} );
+	});
 
 	return (
-		<NavigationUI className={ classes }>
+		<NavigationUI className={classes}>
 			<div
-				key={ menu }
-				className={ classnames( {
-					[ animateClassName ]: isMounted.current && slideOrigin,
-				} ) }
+				key={menu}
+				className={classnames({
+					[animateClassName]: isMounted.current && slideOrigin,
+				})}
 			>
-				<NavigationContext.Provider value={ context }>
-					{ children }
+				<NavigationContext.Provider value={context}>
+					{children}
 				</NavigationContext.Provider>
 			</div>
 		</NavigationUI>

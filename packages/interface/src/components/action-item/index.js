@@ -9,21 +9,21 @@ import { isEmpty, noop } from 'lodash';
 import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
 import { Children } from '@wordpress/element';
 
-function ActionItemSlot( {
+function ActionItemSlot({
 	name,
 	as: Component = ButtonGroup,
 	fillProps = {},
 	bubblesVirtually,
 	...props
-} ) {
+}) {
 	return (
 		<Slot
-			name={ name }
-			bubblesVirtually={ bubblesVirtually }
-			fillProps={ fillProps }
+			name={name}
+			bubblesVirtually={bubblesVirtually}
+			fillProps={fillProps}
 		>
-			{ ( fills ) => {
-				if ( isEmpty( Children.toArray( fills ) ) ) {
+			{(fills) => {
+				if (isEmpty(Children.toArray(fills))) {
 					return null;
 				}
 
@@ -35,17 +35,17 @@ function ActionItemSlot( {
 				const initializedByPlugins = [];
 				Children.forEach(
 					fills,
-					( {
+					({
 						props: { __unstableExplicitMenuItem, __unstableTarget },
-					} ) => {
-						if ( __unstableTarget && __unstableExplicitMenuItem ) {
-							initializedByPlugins.push( __unstableTarget );
+					}) => {
+						if (__unstableTarget && __unstableExplicitMenuItem) {
+							initializedByPlugins.push(__unstableTarget);
 						}
 					}
 				);
-				const children = Children.map( fills, ( child ) => {
+				const children = Children.map(fills, (child) => {
 					if (
-						! child.props.__unstableExplicitMenuItem &&
+						!child.props.__unstableExplicitMenuItem &&
 						initializedByPlugins.includes(
 							child.props.__unstableTarget
 						)
@@ -53,32 +53,32 @@ function ActionItemSlot( {
 						return null;
 					}
 					return child;
-				} );
+				});
 
-				return <Component { ...props }>{ children }</Component>;
-			} }
+				return <Component {...props}>{children}</Component>;
+			}}
 		</Slot>
 	);
 }
 
-function ActionItem( { name, as: Component = Button, onClick, ...props } ) {
+function ActionItem({ name, as: Component = Button, onClick, ...props }) {
 	return (
-		<Fill name={ name }>
-			{ ( { onClick: fpOnClick } ) => {
+		<Fill name={name}>
+			{({ onClick: fpOnClick }) => {
 				return (
 					<Component
 						onClick={
 							onClick || fpOnClick
-								? ( ...args ) => {
-										( onClick || noop )( ...args );
-										( fpOnClick || noop )( ...args );
+								? (...args) => {
+										(onClick || noop)(...args);
+										(fpOnClick || noop)(...args);
 								  }
 								: undefined
 						}
-						{ ...props }
+						{...props}
 					/>
 				);
-			} }
+			}}
 		</Fill>
 	);
 }

@@ -18,35 +18,35 @@ import warning from '@wordpress/warning';
 import useDisplayBlockControls from '../use-display-block-controls';
 import groups from './groups';
 
-export default function InspectorControlsFill( {
+export default function InspectorControlsFill({
 	__experimentalGroup: group = 'default',
 	children,
-} ) {
+}) {
 	const isDisplayed = useDisplayBlockControls();
-	const Fill = groups[ group ]?.Fill;
-	if ( ! Fill ) {
-		warning( `Unknown InspectorControl group "${ group }" provided.` );
+	const Fill = groups[group]?.Fill;
+	if (!Fill) {
+		warning(`Unknown InspectorControl group "${group}" provided.`);
 		return null;
 	}
-	if ( ! isDisplayed ) {
+	if (!isDisplayed) {
 		return null;
 	}
 
 	return (
-		<StyleProvider document={ document }>
+		<StyleProvider document={document}>
 			<Fill>
-				{ ( fillProps ) => {
+				{(fillProps) => {
 					// Children passed to InspectorControlsFill will not have
 					// access to any React Context whose Provider is part of
 					// the InspectorControlsSlot tree. So we re-create the
 					// Provider in this subtree.
-					const value = ! isEmpty( fillProps ) ? fillProps : null;
+					const value = !isEmpty(fillProps) ? fillProps : null;
 					return (
-						<ToolsPanelContext.Provider value={ value }>
-							{ children }
+						<ToolsPanelContext.Provider value={value}>
+							{children}
 						</ToolsPanelContext.Provider>
 					);
-				} }
+				}}
 			</Fill>
 		</StyleProvider>
 	);

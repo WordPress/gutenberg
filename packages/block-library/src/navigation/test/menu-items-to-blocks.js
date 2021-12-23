@@ -4,12 +4,12 @@
 import menuItemsToBlocks from '../menu-items-to-blocks';
 
 // Mock createBlock to avoid creating the blocks in test environment.
-jest.mock( '@wordpress/blocks', () => {
-	const blocks = jest.requireActual( '@wordpress/blocks' );
+jest.mock('@wordpress/blocks', () => {
+	const blocks = jest.requireActual('@wordpress/blocks');
 
 	return {
 		...blocks,
-		createBlock( name, attributes, innerBlocks ) {
+		createBlock(name, attributes, innerBlocks) {
 			return {
 				name,
 				attributes,
@@ -17,11 +17,11 @@ jest.mock( '@wordpress/blocks', () => {
 			};
 		},
 	};
-} );
+});
 
-describe( 'converting menu items to blocks', () => {
-	it( 'converts an flat structure of menu item objects to blocks', () => {
-		const { innerBlocks: actual } = menuItemsToBlocks( [
+describe('converting menu items to blocks', () => {
+	it('converts an flat structure of menu item objects to blocks', () => {
+		const { innerBlocks: actual } = menuItemsToBlocks([
 			{
 				id: 1,
 				title: {
@@ -37,8 +37,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 2,
@@ -55,25 +55,25 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 2,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
-		] );
+		]);
 
-		expect( actual ).toEqual( [
-			expect.objectContaining( {
+		expect(actual).toEqual([
+			expect.objectContaining({
 				name: 'core/navigation-link',
 				innerBlocks: [],
-			} ),
-			expect.objectContaining( {
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
 				innerBlocks: [],
-			} ),
-		] );
-	} );
+			}),
+		]);
+	});
 
-	it( 'converts an nested structure of menu item objects to nested blocks', () => {
-		const { innerBlocks: actual } = menuItemsToBlocks( [
+	it('converts an nested structure of menu item objects to nested blocks', () => {
+		const { innerBlocks: actual } = menuItemsToBlocks([
 			{
 				id: 1,
 				title: {
@@ -89,8 +89,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 2,
@@ -107,8 +107,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 1,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 3,
@@ -125,8 +125,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 1,
 				menu_order: 2,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 4,
@@ -143,8 +143,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 3,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 5,
@@ -161,8 +161,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 4,
 				menu_order: 1,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 6,
@@ -179,62 +179,62 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 2,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
-		] );
+		]);
 
-		expect( actual ).toEqual( [
-			expect.objectContaining( {
+		expect(actual).toEqual([
+			expect.objectContaining({
 				name: 'core/navigation-submenu',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Top Level',
-				} ),
+				}),
 				innerBlocks: [
-					expect.objectContaining( {
+					expect.objectContaining({
 						name: 'core/navigation-link',
-						attributes: expect.objectContaining( {
+						attributes: expect.objectContaining({
 							label: 'Child 1',
-						} ),
+						}),
 						innerBlocks: [],
-					} ),
-					expect.objectContaining( {
+					}),
+					expect.objectContaining({
 						name: 'core/navigation-submenu',
-						attributes: expect.objectContaining( {
+						attributes: expect.objectContaining({
 							label: 'Child 2',
-						} ),
+						}),
 						innerBlocks: [
-							expect.objectContaining( {
+							expect.objectContaining({
 								name: 'core/navigation-submenu',
-								attributes: expect.objectContaining( {
+								attributes: expect.objectContaining({
 									label: 'Sub Child',
-								} ),
+								}),
 								innerBlocks: [
-									expect.objectContaining( {
+									expect.objectContaining({
 										name: 'core/navigation-link',
-										attributes: expect.objectContaining( {
+										attributes: expect.objectContaining({
 											label: 'Sub Sub Child',
-										} ),
+										}),
 										innerBlocks: [],
-									} ),
+									}),
 								],
-							} ),
+							}),
 						],
-					} ),
+					}),
 				],
-			} ),
-			expect.objectContaining( {
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Top Level 2',
-				} ),
+				}),
 				innerBlocks: [],
-			} ),
-		] );
-	} );
+			}),
+		]);
+	});
 
-	it( 'respects menu order when converting to blocks', () => {
-		const { innerBlocks: actual } = menuItemsToBlocks( [
+	it('respects menu order when converting to blocks', () => {
+		const { innerBlocks: actual } = menuItemsToBlocks([
 			{
 				id: 1,
 				title: {
@@ -250,8 +250,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 100,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 2,
@@ -268,8 +268,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 10,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 3,
@@ -286,8 +286,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 30,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 4,
@@ -304,8 +304,8 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 20,
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
 			{
 				id: 5,
@@ -322,47 +322,47 @@ describe( 'converting menu items to blocks', () => {
 				parent: 0,
 				menu_order: 0, // capturing 0 edge case.
 				target: '',
-				classes: [ '' ],
-				xfn: [ '' ],
+				classes: [''],
+				xfn: [''],
 			},
-		] );
+		]);
 
-		expect( actual ).toEqual( [
-			expect.objectContaining( {
+		expect(actual).toEqual([
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 1st',
-				} ),
-			} ),
-			expect.objectContaining( {
+				}),
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 2nd',
-				} ),
-			} ),
-			expect.objectContaining( {
+				}),
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 3rd',
-				} ),
-			} ),
-			expect.objectContaining( {
+				}),
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 4th',
-				} ),
-			} ),
-			expect.objectContaining( {
+				}),
+			}),
+			expect.objectContaining({
 				name: 'core/navigation-link',
-				attributes: expect.objectContaining( {
+				attributes: expect.objectContaining({
 					label: 'Ordered 5th',
-				} ),
-			} ),
-		] );
-	} );
+				}),
+			}),
+		]);
+	});
 
-	it( 'returns an empty array when menu items argument is an empty array', () => {
-		const { innerBlocks: actual } = menuItemsToBlocks( [] );
-		expect( actual ).toEqual( [] );
-	} );
-} );
+	it('returns an empty array when menu items argument is an empty array', () => {
+		const { innerBlocks: actual } = menuItemsToBlocks([]);
+		expect(actual).toEqual([]);
+	});
+});

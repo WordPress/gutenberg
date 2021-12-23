@@ -11,14 +11,14 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  *
  * @return {DOMRect | null} The rectangle.
  */
-export default function computeCaretRect( win ) {
+export default function computeCaretRect(win) {
 	const selection = win.getSelection();
-	assertIsDefined( selection, 'selection' );
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	assertIsDefined(selection, 'selection');
+	const range = selection.rangeCount ? selection.getRangeAt(0) : null;
 
-	if ( ! range ) {
+	if (!range) {
 		return null;
 	}
 
-	return getRectangleFromRange( range );
+	return getRectangleFromRange(range);
 }

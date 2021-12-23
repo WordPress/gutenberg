@@ -25,37 +25,37 @@ const accessibilityHint =
 				'Double tap to open Bottom Sheet to edit, replace, or clear the image'
 		  );
 
-const ImageEditingButton = ( {
+const ImageEditingButton = ({
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	pickerOptions,
 	url,
-} ) => {
+}) => {
 	return (
 		<MediaEdit
-			onSelect={ onSelectMediaUploadOption }
-			source={ { uri: url } }
-			openReplaceMediaOptions={ openMediaOptions }
-			render={ ( { open, mediaOptions } ) => (
+			onSelect={onSelectMediaUploadOption}
+			source={{ uri: url }}
+			openReplaceMediaOptions={openMediaOptions}
+			render={({ open, mediaOptions }) => (
 				<TouchableWithoutFeedback
-					accessibilityHint={ accessibilityHint }
-					accessibilityLabel={ __( 'Edit image' ) }
-					accessibilityRole={ 'button' }
-					onPress={ open }
+					accessibilityHint={accessibilityHint}
+					accessibilityLabel={__('Edit image')}
+					accessibilityRole={'button'}
+					onPress={open}
 				>
-					<View style={ styles.editContainer }>
-						<View style={ styles.edit }>
-							{ mediaOptions() }
+					<View style={styles.editContainer}>
+						<View style={styles.edit}>
+							{mediaOptions()}
 							<Icon
-								size={ 16 }
-								icon={ SvgIconCustomize }
-								{ ...styles.iconCustomise }
+								size={16}
+								icon={SvgIconCustomize}
+								{...styles.iconCustomise}
 							/>
 						</View>
 					</View>
 				</TouchableWithoutFeedback>
-			) }
-			pickerOptions={ pickerOptions }
+			)}
+			pickerOptions={pickerOptions}
 		/>
 	);
 };

@@ -8,13 +8,13 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../no-global-active-element';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 	},
-} );
+});
 
-ruleTester.run( 'no-global-active-element', rule, {
+ruleTester.run('no-global-active-element', rule, {
 	valid: [
 		{
 			code: 'ownerDocument.activeElement;',
@@ -31,4 +31,4 @@ ruleTester.run( 'no-global-active-element', rule, {
 			],
 		},
 	],
-} );
+});

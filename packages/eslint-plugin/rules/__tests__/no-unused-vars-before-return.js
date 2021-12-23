@@ -8,16 +8,16 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../no-unused-vars-before-return';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 		ecmaFeatures: {
 			jsx: true,
 		},
 	},
-} );
+});
 
-ruleTester.run( 'no-unused-vars-before-return', rule, {
+ruleTester.run('no-unused-vars-before-return', rule, {
 	valid: [
 		{
 			code: `
@@ -51,7 +51,7 @@ function example() {
 
 	return number + foo;
 }`,
-			options: [ { excludePattern: '^do' } ],
+			options: [{ excludePattern: '^do' }],
 		},
 		{
 			code: `
@@ -106,7 +106,7 @@ function example() {
 
 	return number + foo;
 }`,
-			options: [ { excludePattern: '^run' } ],
+			options: [{ excludePattern: '^run' }],
 			errors: [
 				{
 					message:
@@ -125,7 +125,7 @@ function example() {
 
 	return number + foo + bar;
 }`,
-			options: [ { excludePattern: '^do' } ],
+			options: [{ excludePattern: '^do' }],
 			errors: [
 				{
 					message:
@@ -134,4 +134,4 @@ function example() {
 			],
 		},
 	],
-} );
+});

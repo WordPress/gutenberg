@@ -34,21 +34,21 @@ const htmlElementMessages = {
 	),
 };
 
-function GroupEdit( { attributes, setAttributes, clientId } ) {
+function GroupEdit({ attributes, setAttributes, clientId }) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
-		( select ) => {
-			const { getBlock, getSettings } = select( blockEditorStore );
-			const block = getBlock( clientId );
+		(select) => {
+			const { getBlock, getSettings } = select(blockEditorStore);
+			const block = getBlock(clientId);
 			return {
-				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				hasInnerBlocks: !!(block && block.innerBlocks.length),
 				themeSupportsLayout: getSettings()?.supportsLayout,
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
-	const defaultLayout = useSetting( 'layout' ) || {};
+	const defaultLayout = useSetting('layout') || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const usedLayout = !!layout && layout.inherit ? defaultLayout : layout;
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
@@ -70,31 +70,29 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		<>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
-					label={ __( 'HTML element' ) }
-					options={ [
-						{ label: __( 'Default (<div>)' ), value: 'div' },
+					label={__('HTML element')}
+					options={[
+						{ label: __('Default (<div>)'), value: 'div' },
 						{ label: '<header>', value: 'header' },
 						{ label: '<main>', value: 'main' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<article>', value: 'article' },
 						{ label: '<aside>', value: 'aside' },
 						{ label: '<footer>', value: 'footer' },
-					] }
-					value={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					help={ htmlElementMessages[ TagName ] }
+					]}
+					value={TagName}
+					onChange={(value) => setAttributes({ tagName: value })}
+					help={htmlElementMessages[TagName]}
 				/>
 			</InspectorControls>
-			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
-			{ /* Ideally this is not needed but it's there for backward compatibility reason
-				to keep this div for themes that might rely on its presence */ }
-			{ ! layoutSupportEnabled && (
-				<TagName { ...blockProps }>
-					<div { ...innerBlocksProps } />
+			{layoutSupportEnabled && <TagName {...innerBlocksProps} />}
+			{/* Ideally this is not needed but it's there for backward compatibility reason
+				to keep this div for themes that might rely on its presence */}
+			{!layoutSupportEnabled && (
+				<TagName {...blockProps}>
+					<div {...innerBlocksProps} />
 				</TagName>
-			) }
+			)}
 		</>
 	);
 }

@@ -29,20 +29,19 @@ import { usePopoverScroll } from './use-popover-scroll';
  * @param {Object} $0.children             The block content and style container.
  * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
  */
-export default function BlockTools( {
+export default function BlockTools({
 	children,
 	__unstableContentRef,
 	...props
-} ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
+}) {
+	const isLargeViewport = useViewportMatch('medium');
 	const hasFixedToolbar = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().hasFixedToolbar,
+		(select) => select(blockEditorStore).getSettings().hasFixedToolbar,
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
-		blockEditorStore
-	);
+	const { getSelectedBlockClientIds, getBlockRootClientId } =
+		useSelect(blockEditorStore);
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -51,69 +50,67 @@ export default function BlockTools( {
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
-	} = useDispatch( blockEditorStore );
+	} = useDispatch(blockEditorStore);
 
-	function onKeyDown( event ) {
-		if ( isMatch( 'core/block-editor/move-up', event ) ) {
+	function onKeyDown(event) {
+		if (isMatch('core/block-editor/move-up', event)) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if (clientIds.length) {
 				event.preventDefault();
-				const rootClientId = getBlockRootClientId( first( clientIds ) );
-				moveBlocksUp( clientIds, rootClientId );
+				const rootClientId = getBlockRootClientId(first(clientIds));
+				moveBlocksUp(clientIds, rootClientId);
 			}
-		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
+		} else if (isMatch('core/block-editor/move-down', event)) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if (clientIds.length) {
 				event.preventDefault();
-				const rootClientId = getBlockRootClientId( first( clientIds ) );
-				moveBlocksDown( clientIds, rootClientId );
+				const rootClientId = getBlockRootClientId(first(clientIds));
+				moveBlocksDown(clientIds, rootClientId);
 			}
-		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
+		} else if (isMatch('core/block-editor/duplicate', event)) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if (clientIds.length) {
 				event.preventDefault();
-				duplicateBlocks( clientIds );
+				duplicateBlocks(clientIds);
 			}
-		} else if ( isMatch( 'core/block-editor/remove', event ) ) {
+		} else if (isMatch('core/block-editor/remove', event)) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if (clientIds.length) {
 				event.preventDefault();
-				removeBlocks( clientIds );
+				removeBlocks(clientIds);
 			}
-		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
+		} else if (isMatch('core/block-editor/insert-after', event)) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if (clientIds.length) {
 				event.preventDefault();
-				insertAfterBlock( last( clientIds ) );
+				insertAfterBlock(last(clientIds));
 			}
-		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
+		} else if (isMatch('core/block-editor/insert-before', event)) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if (clientIds.length) {
 				event.preventDefault();
-				insertBeforeBlock( first( clientIds ) );
+				insertBeforeBlock(first(clientIds));
 			}
-		} else if (
-			isMatch( 'core/block-editor/delete-multi-selection', event )
-		) {
+		} else if (isMatch('core/block-editor/delete-multi-selection', event)) {
 			/**
 			 * Check if the target element is a text area, input or
 			 * event.defaultPrevented and return early. In all these
 			 * cases backspace could be handled elsewhere.
 			 */
 			if (
-				[ 'INPUT', 'TEXTAREA' ].includes( event.target.nodeName ) ||
+				['INPUT', 'TEXTAREA'].includes(event.target.nodeName) ||
 				event.defaultPrevented
 			) {
 				return;
 			}
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length > 1 ) {
+			if (clientIds.length > 1) {
 				event.preventDefault();
-				removeBlocks( clientIds );
+				removeBlocks(clientIds);
 			}
-		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
+		} else if (isMatch('core/block-editor/unselect', event)) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length > 1 ) {
+			if (clientIds.length > 1) {
 				event.preventDefault();
 				clearSelectedBlock();
 				event.target.ownerDocument.defaultView
@@ -125,24 +122,24 @@ export default function BlockTools( {
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div { ...props } onKeyDown={ onKeyDown }>
-			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
-				{ ( hasFixedToolbar || ! isLargeViewport ) && (
+		<div {...props} onKeyDown={onKeyDown}>
+			<InsertionPoint __unstableContentRef={__unstableContentRef}>
+				{(hasFixedToolbar || !isLargeViewport) && (
 					<BlockContextualToolbar isFixed />
-				) }
-				{ /* Even if the toolbar is fixed, the block popover is still
-                 needed for navigation mode. */ }
-				<BlockPopover __unstableContentRef={ __unstableContentRef } />
-				{ /* Used for the inline rich text toolbar. */ }
+				)}
+				{/* Even if the toolbar is fixed, the block popover is still
+                 needed for navigation mode. */}
+				<BlockPopover __unstableContentRef={__unstableContentRef} />
+				{/* Used for the inline rich text toolbar. */}
 				<Popover.Slot
 					name="block-toolbar"
-					ref={ usePopoverScroll( __unstableContentRef ) }
+					ref={usePopoverScroll(__unstableContentRef)}
 				/>
-				{ children }
-				{ /* Used for inline rich text popovers. */ }
+				{children}
+				{/* Used for inline rich text popovers. */}
 				<Popover.Slot
 					name="__unstable-block-tools-after"
-					ref={ usePopoverScroll( __unstableContentRef ) }
+					ref={usePopoverScroll(__unstableContentRef)}
 				/>
 			</InsertionPoint>
 		</div>

@@ -21,15 +21,11 @@ _Example:_
 ```js
 import { addAction } from '@wordpress/hooks';
 
-function addDeprecationAlert( message, { version } ) {
-	alert( `Deprecation: ${ message }. Version: ${ version }` );
+function addDeprecationAlert(message, { version }) {
+	alert(`Deprecation: ${message}. Version: ${version}`);
 }
 
-addAction(
-	'deprecated',
-	'my-plugin/add-deprecation-alert',
-	addDeprecationAlert
-);
+addAction('deprecated', 'my-plugin/add-deprecation-alert', addDeprecationAlert);
 ```
 
 ## API

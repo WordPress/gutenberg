@@ -20,23 +20,19 @@ import styles from './style.scss';
 
 class MenuItem extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
-		this.onPress = this.onPress.bind( this );
+		this.onPress = this.onPress.bind(this);
 	}
 
 	onPress() {
 		const { onSelect, item } = this.props;
-		onSelect( item );
+		onSelect(item);
 	}
 
 	render() {
-		const {
-			getStylesFromColorScheme,
-			item,
-			itemWidth,
-			maxWidth,
-		} = this.props;
+		const { getStylesFromColorScheme, item, itemWidth, maxWidth } =
+			this.props;
 
 		const modalIconWrapperStyle = getStylesFromColorScheme(
 			styles.modalIconWrapper,
@@ -54,13 +50,13 @@ class MenuItem extends Component {
 		);
 
 		const isClipboardBlock = item.id === 'clipboard';
-		const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
+		const blockTitle = isClipboardBlock ? __('Copied block') : item.title;
 		const blockIsNew = item.isNew === true;
 		const accessibilityLabelFormat = blockIsNew
 			? // translators: Newly available block name. %s: The localized block name
-			  __( '%s block, newly available' )
+			  __('%s block, newly available')
 			: // translators: Block name. %s: The localized block name
-			  __( '%s block' );
+			  __('%s block');
 		const accessibilityLabel = sprintf(
 			accessibilityLabelFormat,
 			item.title
@@ -68,42 +64,39 @@ class MenuItem extends Component {
 
 		return (
 			<TouchableHighlight
-				style={ [
+				style={[
 					styles.touchableArea,
 					item.isDisabled ? styles.disabled : null,
-				] }
+				]}
 				underlayColor="transparent"
-				activeOpacity={ 0.5 }
+				activeOpacity={0.5}
 				accessibilityRole="button"
-				accessibilityLabel={ accessibilityLabel }
-				onPress={ this.onPress }
-				disabled={ item.isDisabled }
+				accessibilityLabel={accessibilityLabel}
+				onPress={this.onPress}
+				disabled={item.isDisabled}
 			>
-				<View style={ [ styles.modalItem, { width: maxWidth } ] }>
+				<View style={[styles.modalItem, { width: maxWidth }]}>
 					<View
-						style={ [
+						style={[
 							modalIconWrapperStyle,
 							itemWidth && {
 								width: itemWidth,
 							},
 							isClipboardBlock && clipboardBlockStyles,
-						] }
+						]}
 					>
-						{ blockIsNew && (
-							<Icon
-								icon={ sparkles }
-								style={ styles.newIndicator }
-							/>
-						) }
-						<View style={ modalIconStyle }>
+						{blockIsNew && (
+							<Icon icon={sparkles} style={styles.newIndicator} />
+						)}
+						<View style={modalIconStyle}>
 							<BlockIcon
-								icon={ item.icon }
-								size={ modalIconStyle.width }
+								icon={item.icon}
+								size={modalIconStyle.width}
 							/>
 						</View>
 					</View>
-					<Text numberOfLines={ 3 } style={ modalItemLabelStyle }>
-						{ blockTitle }
+					<Text numberOfLines={3} style={modalItemLabelStyle}>
+						{blockTitle}
 					</Text>
 				</View>
 			</TouchableHighlight>
@@ -111,7 +104,7 @@ class MenuItem extends Component {
 	}
 }
 
-const InserterButton = withPreferredColorScheme( MenuItem );
+const InserterButton = withPreferredColorScheme(MenuItem);
 
 InserterButton.Styles = {
 	modalItem: styles.modalItem,

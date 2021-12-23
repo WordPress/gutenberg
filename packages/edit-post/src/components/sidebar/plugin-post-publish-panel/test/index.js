@@ -9,15 +9,15 @@ import { render } from '@wordpress/element';
  */
 import PluginPostPublishPanel from '../';
 
-describe( 'PluginPostPublishPanel', () => {
-	test( 'renders fill properly', () => {
-		const div = document.createElement( 'div' );
+describe('PluginPostPublishPanel', () => {
+	test('renders fill properly', () => {
+		const div = document.createElement('div');
 		render(
 			<SlotFillProvider>
 				<PluginPostPublishPanel
 					className="my-plugin-post-publish-panel"
 					title="My panel title"
-					initialOpen={ true }
+					initialOpen={true}
 				>
 					My panel content
 				</PluginPostPublishPanel>
@@ -26,6 +26,6 @@ describe( 'PluginPostPublishPanel', () => {
 			div
 		);
 
-		expect( div.innerHTML ).toMatchSnapshot();
-	} );
-} );
+		expect(div.innerHTML).toMatchSnapshot();
+	});
+});

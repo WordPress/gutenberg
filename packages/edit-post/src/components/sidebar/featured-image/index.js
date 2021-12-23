@@ -27,21 +27,21 @@ import { store as editPostStore } from '../../../store';
  */
 const PANEL_NAME = 'featured-image';
 
-function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
-	if ( ! isEnabled ) {
+function FeaturedImage({ isEnabled, isOpened, postType, onTogglePanel }) {
+	if (!isEnabled) {
 		return null;
 	}
 
 	return (
 		<PostFeaturedImageCheck>
 			<PanelBody
-				title={ get(
+				title={get(
 					postType,
-					[ 'labels', 'featured_image' ],
-					__( 'Featured image' )
-				) }
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
+					['labels', 'featured_image'],
+					__('Featured image')
+				)}
+				opened={isOpened}
+				onToggle={onTogglePanel}
 			>
 				<PostFeaturedImage />
 			</PanelBody>
@@ -49,26 +49,24 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 	);
 }
 
-const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( editorStore );
-	const { getPostType } = select( coreStore );
-	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-		editPostStore
-	);
+const applyWithSelect = withSelect((select) => {
+	const { getEditedPostAttribute } = select(editorStore);
+	const { getPostType } = select(coreStore);
+	const { isEditorPanelEnabled, isEditorPanelOpened } = select(editPostStore);
 
 	return {
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
-		isEnabled: isEditorPanelEnabled( PANEL_NAME ),
-		isOpened: isEditorPanelOpened( PANEL_NAME ),
+		postType: getPostType(getEditedPostAttribute('type')),
+		isEnabled: isEditorPanelEnabled(PANEL_NAME),
+		isOpened: isEditorPanelOpened(PANEL_NAME),
 	};
-} );
+});
 
-const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { toggleEditorPanelOpened } = dispatch( editPostStore );
+const applyWithDispatch = withDispatch((dispatch) => {
+	const { toggleEditorPanelOpened } = dispatch(editPostStore);
 
 	return {
-		onTogglePanel: partial( toggleEditorPanelOpened, PANEL_NAME ),
+		onTogglePanel: partial(toggleEditorPanelOpened, PANEL_NAME),
 	};
-} );
+});
 
-export default compose( applyWithSelect, applyWithDispatch )( FeaturedImage );
+export default compose(applyWithSelect, applyWithDispatch)(FeaturedImage);

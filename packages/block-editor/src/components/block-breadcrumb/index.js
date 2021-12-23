@@ -19,22 +19,19 @@ import { store as blockEditorStore } from '../../store';
  * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
  * @return {WPElement}                 Block Breadcrumb.
  */
-function BlockBreadcrumb( { rootLabelText } ) {
-	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
-	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
-		const {
-			getSelectionStart,
-			getSelectedBlockClientId,
-			getBlockParents,
-		} = select( blockEditorStore );
+function BlockBreadcrumb({ rootLabelText }) {
+	const { selectBlock, clearSelectedBlock } = useDispatch(blockEditorStore);
+	const { clientId, parents, hasSelection } = useSelect((select) => {
+		const { getSelectionStart, getSelectedBlockClientId, getBlockParents } =
+			select(blockEditorStore);
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			parents: getBlockParents( selectedBlockClientId ),
+			parents: getBlockParents(selectedBlockClientId),
 			clientId: selectedBlockClientId,
-			hasSelection: !! getSelectionStart().clientId,
+			hasSelection: !!getSelectionStart().clientId,
 		};
-	}, [] );
-	const rootLabel = rootLabelText || __( 'Document' );
+	}, []);
+	const rootLabel = rootLabelText || __('Document');
 
 	/*
 	 * Disable reason: The `list` ARIA role is redundant but
@@ -45,57 +42,57 @@ function BlockBreadcrumb( { rootLabelText } ) {
 		<ul
 			className="block-editor-block-breadcrumb"
 			role="list"
-			aria-label={ __( 'Block breadcrumb' ) }
+			aria-label={__('Block breadcrumb')}
 		>
 			<li
 				className={
-					! hasSelection
+					!hasSelection
 						? 'block-editor-block-breadcrumb__current'
 						: undefined
 				}
-				aria-current={ ! hasSelection ? 'true' : undefined }
+				aria-current={!hasSelection ? 'true' : undefined}
 			>
-				{ hasSelection && (
+				{hasSelection && (
 					<Button
 						className="block-editor-block-breadcrumb__button"
 						variant="tertiary"
-						onClick={ clearSelectedBlock }
+						onClick={clearSelectedBlock}
 					>
-						{ rootLabel }
+						{rootLabel}
 					</Button>
-				) }
-				{ ! hasSelection && rootLabel }
-				{ !! clientId && (
+				)}
+				{!hasSelection && rootLabel}
+				{!!clientId && (
 					<Icon
-						icon={ chevronRightSmall }
+						icon={chevronRightSmall}
 						className="block-editor-block-breadcrumb__separator"
 					/>
-				) }
+				)}
 			</li>
 
-			{ parents.map( ( parentClientId ) => (
-				<li key={ parentClientId }>
+			{parents.map((parentClientId) => (
+				<li key={parentClientId}>
 					<Button
 						className="block-editor-block-breadcrumb__button"
 						variant="tertiary"
-						onClick={ () => selectBlock( parentClientId ) }
+						onClick={() => selectBlock(parentClientId)}
 					>
-						<BlockTitle clientId={ parentClientId } />
+						<BlockTitle clientId={parentClientId} />
 					</Button>
 					<Icon
-						icon={ chevronRightSmall }
+						icon={chevronRightSmall}
 						className="block-editor-block-breadcrumb__separator"
 					/>
 				</li>
-			) ) }
-			{ !! clientId && (
+			))}
+			{!!clientId && (
 				<li
 					className="block-editor-block-breadcrumb__current"
 					aria-current="true"
 				>
-					<BlockTitle clientId={ clientId } />
+					<BlockTitle clientId={clientId} />
 				</li>
-			) }
+			)}
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);

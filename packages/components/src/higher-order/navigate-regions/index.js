@@ -32,73 +32,75 @@ const defaultShortcuts = {
 	],
 };
 
-export function useNavigateRegions( shortcuts = defaultShortcuts ) {
+export function useNavigateRegions(shortcuts = defaultShortcuts) {
 	const ref = useRef();
-	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
+	const [isFocusingRegions, setIsFocusingRegions] = useState(false);
 
-	function focusRegion( offset ) {
+	function focusRegion(offset) {
 		const regions = Array.from(
-			ref.current.querySelectorAll( '[role="region"]' )
+			ref.current.querySelectorAll('[role="region"]')
 		);
-		if ( ! regions.length ) {
+		if (!regions.length) {
 			return;
 		}
-		let nextRegion = regions[ 0 ];
+		let nextRegion = regions[0];
 		const selectedIndex = regions.indexOf(
 			ref.current.ownerDocument.activeElement
 		);
-		if ( selectedIndex !== -1 ) {
+		if (selectedIndex !== -1) {
 			let nextIndex = selectedIndex + offset;
 			nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
 			nextIndex = nextIndex === regions.length ? 0 : nextIndex;
-			nextRegion = regions[ nextIndex ];
+			nextRegion = regions[nextIndex];
 		}
 
 		nextRegion.focus();
-		setIsFocusingRegions( true );
+		setIsFocusingRegions(true);
 	}
 
 	const clickRef = useRefEffect(
-		( element ) => {
+		(element) => {
 			function onClick() {
-				setIsFocusingRegions( false );
+				setIsFocusingRegions(false);
 			}
 
-			element.addEventListener( 'click', onClick );
+			element.addEventListener('click', onClick);
 
 			return () => {
-				element.removeEventListener( 'click', onClick );
+				element.removeEventListener('click', onClick);
 			};
 		},
-		[ setIsFocusingRegions ]
+		[setIsFocusingRegions]
 	);
 
 	return {
-		ref: useMergeRefs( [ ref, clickRef ] ),
+		ref: useMergeRefs([ref, clickRef]),
 		className: isFocusingRegions ? 'is-focusing-regions' : '',
-		onKeyDown( event ) {
+		onKeyDown(event) {
 			if (
-				shortcuts.previous.some( ( { modifier, character } ) => {
-					return isKeyboardEvent[ modifier ]( event, character );
-				} )
+				shortcuts.previous.some(({ modifier, character }) => {
+					return isKeyboardEvent[modifier](event, character);
+				})
 			) {
-				focusRegion( -1 );
+				focusRegion(-1);
 			} else if (
-				shortcuts.next.some( ( { modifier, character } ) => {
-					return isKeyboardEvent[ modifier ]( event, character );
-				} )
+				shortcuts.next.some(({ modifier, character }) => {
+					return isKeyboardEvent[modifier](event, character);
+				})
 			) {
-				focusRegion( 1 );
+				focusRegion(1);
 			}
 		},
 	};
 }
 
 export default createHigherOrderComponent(
-	( Component ) => ( { shortcuts, ...props } ) => (
-		<div { ...useNavigateRegions( shortcuts ) }>
-			<Component { ...props } />
-		</div>
-	),
+	(Component) =>
+		({ shortcuts, ...props }) =>
+			(
+				<div {...useNavigateRegions(shortcuts)}>
+					<Component {...props} />
+				</div>
+			),
 	'navigateRegions'
 );

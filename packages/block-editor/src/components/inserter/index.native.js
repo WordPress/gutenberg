@@ -32,71 +32,67 @@ import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
-const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
+const defaultRenderToggle = ({ onToggle, disabled, style, onLongPress }) => (
 	<ToolbarButton
-		title={ _x( 'Add block', 'Generic label for block inserter button' ) }
+		title={_x('Add block', 'Generic label for block inserter button')}
 		icon={
-			<Icon
-				icon={ plusCircleFilled }
-				style={ style }
-				color={ style.color }
-			/>
+			<Icon icon={plusCircleFilled} style={style} color={style.color} />
 		}
-		onClick={ onToggle }
-		extraProps={ {
-			hint: __( 'Double tap to add a block' ),
+		onClick={onToggle}
+		extraProps={{
+			hint: __('Double tap to add a block'),
 			// testID is present to disambiguate this element for native UI tests. It's not
 			// usually required for components. See: https://git.io/JeQ7G.
 			testID: 'add-block-button',
 			onLongPress,
-		} }
-		isDisabled={ disabled }
+		}}
+		isDisabled={disabled}
 	/>
 );
 
 export class Inserter extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
-		this.onToggle = this.onToggle.bind( this );
-		this.renderInserterToggle = this.renderInserterToggle.bind( this );
-		this.renderContent = this.renderContent.bind( this );
+		this.onToggle = this.onToggle.bind(this);
+		this.renderInserterToggle = this.renderInserterToggle.bind(this);
+		this.renderContent = this.renderContent.bind(this);
 	}
 
 	getInsertionOptions() {
 		const addBeforeOption = {
 			value: 'before',
-			label: __( 'Add Block Before' ),
+			label: __('Add Block Before'),
 			icon: plusCircle,
 		};
 
 		const replaceCurrentOption = {
 			value: 'replace',
-			label: __( 'Replace Current Block' ),
+			label: __('Replace Current Block'),
 			icon: plusCircleFilled,
 		};
 
 		const addAfterOption = {
 			value: 'after',
-			label: __( 'Add Block After' ),
+			label: __('Add Block After'),
 			icon: plusCircle,
 		};
 
 		const addToBeginningOption = {
 			value: 'start',
-			label: __( 'Add To Beginning' ),
+			label: __('Add To Beginning'),
 			icon: insertBefore,
 		};
 
 		const addToEndOption = {
 			value: 'end',
-			label: __( 'Add To End' ),
+			label: __('Add To End'),
 			icon: insertAfter,
 		};
 
 		const { isAnyBlockSelected, isSelectedBlockReplaceable } = this.props;
-		if ( isAnyBlockSelected ) {
-			if ( isSelectedBlockReplaceable ) {
+		if (isAnyBlockSelected) {
+			if (isSelectedBlockReplaceable) {
 				return [
 					addToBeginningOption,
 					addBeforeOption,
@@ -112,10 +108,10 @@ export class Inserter extends Component {
 				addToEndOption,
 			];
 		}
-		return [ addToBeginningOption, addToEndOption ];
+		return [addToBeginningOption, addToEndOption];
 	}
 
-	getInsertionIndex( insertionType ) {
+	getInsertionIndex(insertionType) {
 		const {
 			insertionIndexDefault,
 			insertionIndexStart,
@@ -123,75 +119,75 @@ export class Inserter extends Component {
 			insertionIndexAfter,
 			insertionIndexEnd,
 		} = this.props;
-		if ( insertionType === 'start' ) {
+		if (insertionType === 'start') {
 			return insertionIndexStart;
 		}
-		if ( insertionType === 'before' || insertionType === 'replace' ) {
+		if (insertionType === 'before' || insertionType === 'replace') {
 			return insertionIndexBefore;
 		}
-		if ( insertionType === 'after' ) {
+		if (insertionType === 'after') {
 			return insertionIndexAfter;
 		}
-		if ( insertionType === 'end' ) {
+		if (insertionType === 'end') {
 			return insertionIndexEnd;
 		}
 		return insertionIndexDefault;
 	}
 
-	shouldReplaceBlock( insertionType ) {
+	shouldReplaceBlock(insertionType) {
 		const { isSelectedBlockReplaceable } = this.props;
-		if ( insertionType === 'replace' ) {
+		if (insertionType === 'replace') {
 			return true;
 		}
-		if ( insertionType === 'default' && isSelectedBlockReplaceable ) {
+		if (insertionType === 'default' && isSelectedBlockReplaceable) {
 			return true;
 		}
 		return false;
 	}
 
-	onToggle( isOpen ) {
+	onToggle(isOpen) {
 		const { blockTypeImpressions, onToggle, updateSettings } = this.props;
 
-		if ( ! isOpen ) {
-			const impressionsRemain = Object.values(
-				blockTypeImpressions
-			).some( ( count ) => count > 0 );
+		if (!isOpen) {
+			const impressionsRemain = Object.values(blockTypeImpressions).some(
+				(count) => count > 0
+			);
 
-			if ( impressionsRemain ) {
+			if (impressionsRemain) {
 				const decrementedImpressions = Object.entries(
 					blockTypeImpressions
 				).reduce(
-					( acc, [ blockName, count ] ) => ( {
+					(acc, [blockName, count]) => ({
 						...acc,
-						[ blockName ]: Math.max( count - 1, 0 ),
-					} ),
+						[blockName]: Math.max(count - 1, 0),
+					}),
 					{}
 				);
 
 				// Persist block type impression to JavaScript store
-				updateSettings( {
+				updateSettings({
 					impressions: decrementedImpressions,
-				} );
+				});
 
 				// Persist block type impression count to native app store
-				setBlockTypeImpressions( decrementedImpressions );
+				setBlockTypeImpressions(decrementedImpressions);
 			}
 		}
 
 		// Surface toggle callback to parent component
-		if ( onToggle ) {
-			onToggle( isOpen );
+		if (onToggle) {
+			onToggle(isOpen);
 		}
-		this.onInserterToggledAnnouncement( isOpen );
+		this.onInserterToggledAnnouncement(isOpen);
 	}
 
-	onInserterToggledAnnouncement( isOpen ) {
-		AccessibilityInfo.isScreenReaderEnabled().done( ( isEnabled ) => {
-			if ( isEnabled ) {
+	onInserterToggledAnnouncement(isOpen) {
+		AccessibilityInfo.isScreenReaderEnabled().done((isEnabled) => {
+			if (isEnabled) {
 				const isIOS = Platform.OS === 'ios';
 				const announcement = isOpen
-					? __( 'Scrollable block menu opened. Select a block.' )
-					: __( 'Scrollable block menu closed.' );
+					? __('Scrollable block menu opened. Select a block.')
+					: __('Scrollable block menu closed.');
 				delay(
 					() =>
 						AccessibilityInfo.announceForAccessibility(
@@ -200,7 +196,7 @@ export class Inserter extends Component {
 					isIOS ? VOICE_OVER_ANNOUNCEMENT_DELAY : 0
 				);
 			}
-		} );
+		});
 	}
 
 	/**
@@ -213,14 +209,14 @@ export class Inserter extends Component {
 	 *
 	 * @return {WPElement} Dropdown toggle element.
 	 */
-	renderInserterToggle( { onToggle, isOpen } ) {
+	renderInserterToggle({ onToggle, isOpen }) {
 		const {
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
 			showSeparator,
 		} = this.props;
-		if ( showSeparator && isOpen ) {
+		if (showSeparator && isOpen) {
 			return <BlockInsertionPoint />;
 		}
 		const style = getStylesFromColorScheme(
@@ -232,27 +228,25 @@ export class Inserter extends Component {
 			this.setState(
 				{
 					destinationRootClientId: this.props.destinationRootClientId,
-					shouldReplaceBlock: this.shouldReplaceBlock( 'default' ),
-					insertionIndex: this.getInsertionIndex( 'default' ),
+					shouldReplaceBlock: this.shouldReplaceBlock('default'),
+					insertionIndex: this.getInsertionIndex('default'),
 				},
 				onToggle
 			);
 		};
 
 		const onLongPress = () => {
-			if ( this.picker ) {
+			if (this.picker) {
 				this.picker.presentPicker();
 			}
 		};
 
-		const onPickerSelect = ( insertionType ) => {
+		const onPickerSelect = (insertionType) => {
 			this.setState(
 				{
 					destinationRootClientId: this.props.destinationRootClientId,
-					shouldReplaceBlock: this.shouldReplaceBlock(
-						insertionType
-					),
-					insertionIndex: this.getInsertionIndex( insertionType ),
+					shouldReplaceBlock: this.shouldReplaceBlock(insertionType),
+					insertionIndex: this.getInsertionIndex(insertionType),
 				},
 				onToggle
 			);
@@ -260,17 +254,17 @@ export class Inserter extends Component {
 
 		return (
 			<>
-				{ renderToggle( {
+				{renderToggle({
 					onToggle: onPress,
 					isOpen,
 					disabled,
 					style,
 					onLongPress,
-				} ) }
+				})}
 				<Picker
-					ref={ ( instance ) => ( this.picker = instance ) }
-					options={ this.getInsertionOptions() }
-					onChange={ onPickerSelect }
+					ref={(instance) => (this.picker = instance)}
+					options={this.getInsertionOptions()}
+					onChange={onPickerSelect}
 					hideCancelButton
 				/>
 			</>
@@ -287,23 +281,20 @@ export class Inserter extends Component {
 	 *
 	 * @return {WPElement} Dropdown content element.
 	 */
-	renderContent( { onClose, isOpen } ) {
+	renderContent({ onClose, isOpen }) {
 		const { clientId, isAppender } = this.props;
-		const {
-			destinationRootClientId,
-			shouldReplaceBlock,
-			insertionIndex,
-		} = this.state;
+		const { destinationRootClientId, shouldReplaceBlock, insertionIndex } =
+			this.state;
 		return (
 			<InserterMenu
-				isOpen={ isOpen }
-				onSelect={ onClose }
-				onDismiss={ onClose }
-				rootClientId={ destinationRootClientId }
-				clientId={ clientId }
-				isAppender={ isAppender }
-				shouldReplaceBlock={ shouldReplaceBlock }
-				insertionIndex={ insertionIndex }
+				isOpen={isOpen}
+				onSelect={onClose}
+				onDismiss={onClose}
+				rootClientId={destinationRootClientId}
+				clientId={clientId}
+				isAppender={isAppender}
+				shouldReplaceBlock={shouldReplaceBlock}
+				insertionIndex={insertionIndex}
 			/>
 		);
 	}
@@ -311,21 +302,21 @@ export class Inserter extends Component {
 	render() {
 		return (
 			<Dropdown
-				onToggle={ this.onToggle }
-				headerTitle={ __( 'Add a block' ) }
-				renderToggle={ this.renderInserterToggle }
-				renderContent={ this.renderContent }
+				onToggle={this.onToggle}
+				headerTitle={__('Add a block')}
+				renderToggle={this.renderInserterToggle}
+				renderContent={this.renderContent}
 			/>
 		);
 	}
 }
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { updateSettings } = dispatch( blockEditorStore );
+export default compose([
+	withDispatch((dispatch) => {
+		const { updateSettings } = dispatch(blockEditorStore);
 		return { updateSettings };
-	} ),
-	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
+	}),
+	withSelect((select, { clientId, isAppender, rootClientId }) => {
 		const {
 			getBlockRootClientId,
 			getBlockSelectionEnd,
@@ -333,41 +324,40 @@ export default compose( [
 			getBlockIndex,
 			getBlock,
 			getSettings: getBlockEditorSettings,
-		} = select( blockEditorStore );
+		} = select(blockEditorStore);
 
 		const end = getBlockSelectionEnd();
 		// `end` argument (id) can refer to the component which is removed
 		// due to pressing `undo` button, that's why we need to check
 		// if `getBlock( end) is valid, otherwise `null` is passed
-		const isAnyBlockSelected = ! isAppender && end && getBlock( end );
+		const isAnyBlockSelected = !isAppender && end && getBlock(end);
 		const destinationRootClientId = isAnyBlockSelected
-			? getBlockRootClientId( end )
+			? getBlockRootClientId(end)
 			: rootClientId;
-		const selectedBlockIndex = getBlockIndex( end );
-		const endOfRootIndex = getBlockOrder( rootClientId ).length;
+		const selectedBlockIndex = getBlockIndex(end);
+		const endOfRootIndex = getBlockOrder(rootClientId).length;
 		const isSelectedUnmodifiedDefaultBlock = isAnyBlockSelected
-			? isUnmodifiedDefaultBlock( getBlock( end ) )
+			? isUnmodifiedDefaultBlock(getBlock(end))
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const {
-				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-			} = getBlockEditorSettings();
+			const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } =
+				getBlockEditorSettings();
 
 			// if post title is selected insert as first block
-			if ( shouldInsertAtTheTop ) {
+			if (shouldInsertAtTheTop) {
 				return 0;
 			}
 
 			// If the clientId is defined, we insert at the position of the block.
-			if ( clientId ) {
-				return getBlockIndex( clientId );
+			if (clientId) {
+				return getBlockIndex(clientId);
 			}
 
 			// If there is a selected block,
-			if ( isAnyBlockSelected ) {
+			if (isAnyBlockSelected) {
 				// and the last selected block is unmodified (empty), it will be replaced
-				if ( isSelectedUnmodifiedDefaultBlock ) {
+				if (isSelectedUnmodifiedDefaultBlock) {
 					return selectedBlockIndex;
 				}
 
@@ -399,10 +389,10 @@ export default compose( [
 			insertionIndexAfter,
 			insertionIndexStart,
 			insertionIndexEnd,
-			isAnyBlockSelected: !! isAnyBlockSelected,
+			isAnyBlockSelected: !!isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
 		};
-	} ),
+	}),
 
 	withPreferredColorScheme,
-] )( Inserter );
+])(Inserter);

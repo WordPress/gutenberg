@@ -39,7 +39,7 @@ import SvgIconRetry from './icon-retry';
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
+const ALLOWED_MEDIA_TYPES = [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO];
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
@@ -50,19 +50,16 @@ export { imageFillStyles } from './media-container.js';
 
 class MediaContainer extends Component {
 	constructor() {
-		super( ...arguments );
-		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
-		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
-		this.onMediaPressed = this.onMediaPressed.bind( this );
+		super(...arguments);
+		this.updateMediaProgress = this.updateMediaProgress.bind(this);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind(this);
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind(this);
+		this.mediaUploadStateReset = this.mediaUploadStateReset.bind(this);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind(this);
+		this.onMediaPressed = this.onMediaPressed.bind(this);
 
 		this.state = {
 			isUploadInProgress: false,
@@ -74,20 +71,20 @@ class MediaContainer extends Component {
 
 		// Make sure we mark any temporary images as failed if they failed while
 		// the editor wasn't open
-		if ( mediaId && mediaUrl && getProtocol( mediaUrl ) === 'file:' ) {
+		if (mediaId && mediaUrl && getProtocol(mediaUrl) === 'file:') {
 			mediaUploadSync();
 		}
 	}
 
-	onSelectMediaUploadOption( params ) {
+	onSelectMediaUploadOption(params) {
 		const { id, url, type } = params;
 		const { onSelectMedia } = this.props;
 
-		onSelectMedia( {
+		onSelectMedia({
 			media_type: type,
 			id,
 			url,
-		} );
+		});
 	}
 
 	onMediaPressed() {
@@ -100,21 +97,21 @@ class MediaContainer extends Component {
 			onMediaSelected,
 		} = this.props;
 
-		if ( isUploadInProgress ) {
-			requestImageUploadCancelDialog( mediaId );
-		} else if ( mediaId && getProtocol( mediaUrl ) === 'file:' ) {
-			requestImageFailedRetryDialog( mediaId );
-		} else if ( mediaType === MEDIA_TYPE_IMAGE && isMediaSelected ) {
-			requestImageFullscreenPreview( mediaUrl );
-		} else if ( mediaType === MEDIA_TYPE_IMAGE ) {
+		if (isUploadInProgress) {
+			requestImageUploadCancelDialog(mediaId);
+		} else if (mediaId && getProtocol(mediaUrl) === 'file:') {
+			requestImageFailedRetryDialog(mediaId);
+		} else if (mediaType === MEDIA_TYPE_IMAGE && isMediaSelected) {
+			requestImageFullscreenPreview(mediaUrl);
+		} else if (mediaType === MEDIA_TYPE_IMAGE) {
 			onMediaSelected();
 		}
 	}
 
-	getIcon( iconType ) {
+	getIcon(iconType) {
 		const { mediaType, getStylesFromColorScheme } = this.props;
 		let iconStyle;
-		switch ( iconType ) {
+		switch (iconType) {
 			case ICON_TYPE.RETRY:
 				iconStyle =
 					mediaType === MEDIA_TYPE_IMAGE
@@ -124,7 +121,7 @@ class MediaContainer extends Component {
 								styles.iconRetryVideoDark
 						  );
 
-				return <Icon icon={ SvgIconRetry } { ...iconStyle } />;
+				return <Icon icon={SvgIconRetry} {...iconStyle} />;
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = getStylesFromColorScheme(
 					styles.iconPlaceholder,
@@ -132,41 +129,41 @@ class MediaContainer extends Component {
 				);
 				break;
 		}
-		return <Icon icon={ icon } { ...iconStyle } />;
+		return <Icon icon={icon} {...iconStyle} />;
 	}
 
 	updateMediaProgress() {
-		if ( ! this.state.isUploadInProgress ) {
-			this.setState( { isUploadInProgress: true } );
+		if (!this.state.isUploadInProgress) {
+			this.setState({ isUploadInProgress: true });
 		}
 	}
 
-	finishMediaUploadWithSuccess( payload ) {
+	finishMediaUploadWithSuccess(payload) {
 		const { onMediaUpdate } = this.props;
 
-		onMediaUpdate( {
+		onMediaUpdate({
 			id: payload.mediaServerId,
 			url: payload.mediaUrl,
-		} );
-		this.setState( { isUploadInProgress: false } );
+		});
+		this.setState({ isUploadInProgress: false });
 	}
 
 	finishMediaUploadWithFailure() {
 		const { createErrorNotice } = this.props;
 
-		createErrorNotice( __( 'Failed to insert media.' ) );
+		createErrorNotice(__('Failed to insert media.'));
 
-		this.setState( { isUploadInProgress: false } );
+		this.setState({ isUploadInProgress: false });
 	}
 
 	mediaUploadStateReset() {
 		const { onMediaUpdate } = this.props;
 
-		onMediaUpdate( { id: null, url: null } );
-		this.setState( { isUploadInProgress: false } );
+		onMediaUpdate({ id: null, url: null });
+		this.setState({ isUploadInProgress: false });
 	}
 
-	renderImage( params, openMediaOptions ) {
+	renderImage(params, openMediaOptions) {
 		const { isUploadInProgress } = this.state;
 		const {
 			aligmentStyles,
@@ -180,47 +177,47 @@ class MediaContainer extends Component {
 			shouldStack,
 		} = this.props;
 		const { isUploadFailed, retryMessage } = params;
-		const focalPointValues = ! focalPoint
+		const focalPointValues = !focalPoint
 			? IMAGE_DEFAULT_FOCAL_POINT
 			: focalPoint;
 
 		return (
 			<View
-				style={ [
+				style={[
 					imageFill && styles.imageWithFocalPoint,
 					imageFill &&
 						shouldStack && {
 							height: styles.imageFill.height,
 						},
-				] }
+				]}
 			>
 				<TouchableWithoutFeedback
-					accessible={ ! isSelected }
-					onPress={ this.onMediaPressed }
-					onLongPress={ openMediaOptions }
-					disabled={ ! isSelected }
+					accessible={!isSelected}
+					onPress={this.onMediaPressed}
+					onLongPress={openMediaOptions}
+					disabled={!isSelected}
 				>
 					<View
-						style={ [
+						style={[
 							imageFill && styles.imageCropped,
 							styles.mediaImageContainer,
-							! isUploadInProgress && aligmentStyles,
-						] }
+							!isUploadInProgress && aligmentStyles,
+						]}
 					>
 						<Image
 							align="center"
-							alt={ mediaAlt }
-							focalPoint={ imageFill && focalPointValues }
-							isSelected={ isMediaSelected }
-							isUploadFailed={ isUploadFailed }
-							isUploadInProgress={ isUploadInProgress }
+							alt={mediaAlt}
+							focalPoint={imageFill && focalPointValues}
+							isSelected={isMediaSelected}
+							isUploadFailed={isUploadFailed}
+							isUploadInProgress={isUploadInProgress}
 							onSelectMediaUploadOption={
 								this.onSelectMediaUploadOption
 							}
-							openMediaOptions={ openMediaOptions }
-							retryMessage={ retryMessage }
-							url={ mediaUrl }
-							width={ ! isUploadInProgress && mediaWidth }
+							openMediaOptions={openMediaOptions}
+							retryMessage={retryMessage}
+							url={mediaUrl}
+							width={!isUploadInProgress && mediaWidth}
 						/>
 					</View>
 				</TouchableWithoutFeedback>
@@ -228,7 +225,7 @@ class MediaContainer extends Component {
 		);
 	}
 
-	renderVideo( params, openMediaOptions ) {
+	renderVideo(params, openMediaOptions) {
 		const {
 			aligmentStyles,
 			mediaUrl,
@@ -238,7 +235,7 @@ class MediaContainer extends Component {
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
 		const showVideo =
-			isURL( mediaUrl ) && ! isUploadInProgress && ! isUploadFailed;
+			isURL(mediaUrl) && !isUploadInProgress && !isUploadFailed;
 
 		const videoPlaceholderStyles = getStylesFromColorScheme(
 			styles.videoPlaceholder,
@@ -253,48 +250,48 @@ class MediaContainer extends Component {
 		];
 
 		return (
-			<View style={ styles.mediaVideo }>
+			<View style={styles.mediaVideo}>
 				<TouchableWithoutFeedback
-					accessible={ ! isSelected }
-					onPress={ this.onMediaPressed }
-					onLongPress={ openMediaOptions }
-					disabled={ ! isSelected }
+					accessible={!isSelected}
+					onPress={this.onMediaPressed}
+					onLongPress={openMediaOptions}
+					disabled={!isSelected}
 				>
-					<View style={ [ styles.videoContainer, aligmentStyles ] }>
+					<View style={[styles.videoContainer, aligmentStyles]}>
 						<View
-							style={ [
+							style={[
 								styles.videoContent,
 								{
 									aspectRatio: VIDEO_ASPECT_RATIO,
 								},
-							] }
+							]}
 						>
-							{ showVideo && (
-								<View style={ styles.videoPlayer }>
+							{showVideo && (
+								<View style={styles.videoPlayer}>
 									<VideoPlayer
-										isSelected={ isSelected }
-										style={ styles.video }
-										source={ { uri: mediaUrl } }
-										paused={ true }
+										isSelected={isSelected}
+										style={styles.video}
+										source={{ uri: mediaUrl }}
+										paused={true}
 									/>
 								</View>
-							) }
-							{ ! showVideo && (
-								<View style={ videoPlaceholderStyles }>
-									<View style={ styles.modalIcon }>
-										{ isUploadFailed
-											? this.getIcon( ICON_TYPE.RETRY )
+							)}
+							{!showVideo && (
+								<View style={videoPlaceholderStyles}>
+									<View style={styles.modalIcon}>
+										{isUploadFailed
+											? this.getIcon(ICON_TYPE.RETRY)
 											: this.getIcon(
 													ICON_TYPE.PLACEHOLDER
-											  ) }
+											  )}
 									</View>
-									{ isUploadFailed && (
-										<Text style={ retryVideoTextStyles }>
-											{ retryMessage }
+									{isUploadFailed && (
+										<Text style={retryVideoTextStyles}>
+											{retryMessage}
 										</Text>
-									) }
+									)}
 								</View>
-							) }
+							)}
 						</View>
 					</View>
 				</TouchableWithoutFeedback>
@@ -302,16 +299,16 @@ class MediaContainer extends Component {
 		);
 	}
 
-	renderContent( params, openMediaOptions ) {
+	renderContent(params, openMediaOptions) {
 		const { mediaType } = this.props;
 		let mediaElement = null;
 
-		switch ( mediaType ) {
+		switch (mediaType) {
 			case MEDIA_TYPE_IMAGE:
-				mediaElement = this.renderImage( params, openMediaOptions );
+				mediaElement = this.renderImage(params, openMediaOptions);
 				break;
 			case MEDIA_TYPE_VIDEO:
-				mediaElement = this.renderVideo( params, openMediaOptions );
+				mediaElement = this.renderVideo(params, openMediaOptions);
 				break;
 		}
 		return mediaElement;
@@ -320,13 +317,13 @@ class MediaContainer extends Component {
 	renderPlaceholder() {
 		return (
 			<MediaPlaceholder
-				icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
-				labels={ {
-					title: __( 'Media area' ),
-				} }
-				onSelect={ this.onSelectMediaUploadOption }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				onFocus={ this.props.onFocus }
+				icon={this.getIcon(ICON_TYPE.PLACEHOLDER)}
+				labels={{
+					title: __('Media area'),
+				}}
+				onSelect={this.onSelectMediaUploadOption}
+				allowedTypes={ALLOWED_MEDIA_TYPES}
+				onFocus={this.props.onFocus}
 			/>
 		);
 	}
@@ -335,23 +332,23 @@ class MediaContainer extends Component {
 		const { mediaUrl, mediaId, mediaType, onSetOpenPickerRef } = this.props;
 		const coverUrl = mediaType === MEDIA_TYPE_IMAGE ? mediaUrl : null;
 
-		if ( mediaUrl ) {
+		if (mediaUrl) {
 			return (
 				<MediaUpload
-					isReplacingMedia={ true }
-					onSelect={ this.onSelectMediaUploadOption }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ mediaId }
-					render={ ( { open, getMediaOptions } ) => {
-						onSetOpenPickerRef( open );
+					isReplacingMedia={true}
+					onSelect={this.onSelectMediaUploadOption}
+					allowedTypes={ALLOWED_MEDIA_TYPES}
+					value={mediaId}
+					render={({ open, getMediaOptions }) => {
+						onSetOpenPickerRef(open);
 
 						return (
 							<>
-								{ getMediaOptions() }
+								{getMediaOptions()}
 
 								<MediaUploadProgress
-									coverUrl={ coverUrl }
-									mediaId={ mediaId }
+									coverUrl={coverUrl}
+									mediaId={mediaId}
 									onUpdateMediaProgress={
 										this.updateMediaProgress
 									}
@@ -364,16 +361,13 @@ class MediaContainer extends Component {
 									onMediaUploadStateReset={
 										this.mediaUploadStateReset
 									}
-									renderContent={ ( params ) => {
-										return this.renderContent(
-											params,
-											open
-										);
-									} }
+									renderContent={(params) => {
+										return this.renderContent(params, open);
+									}}
 								/>
 							</>
 						);
-					} }
+					}}
 				/>
 			);
 		}
@@ -381,11 +375,11 @@ class MediaContainer extends Component {
 	}
 }
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { createErrorNotice } = dispatch( noticesStore );
+export default compose([
+	withDispatch((dispatch) => {
+		const { createErrorNotice } = dispatch(noticesStore);
 
 		return { createErrorNotice };
-	} ),
+	}),
 	withPreferredColorScheme,
-] )( MediaContainer );
+])(MediaContainer);

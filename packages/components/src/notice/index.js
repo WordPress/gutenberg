@@ -26,15 +26,15 @@ import { Button } from '../';
  * @param {string|WPElement}     [message]  Message to announce.
  * @param {'polite'|'assertive'} politeness Politeness to announce.
  */
-function useSpokenMessage( message, politeness ) {
+function useSpokenMessage(message, politeness) {
 	const spokenMessage =
-		typeof message === 'string' ? message : renderToString( message );
+		typeof message === 'string' ? message : renderToString(message);
 
-	useEffect( () => {
-		if ( spokenMessage ) {
-			speak( spokenMessage, politeness );
+	useEffect(() => {
+		if (spokenMessage) {
+			speak(spokenMessage, politeness);
 		}
-	}, [ spokenMessage, politeness ] );
+	}, [spokenMessage, politeness]);
 }
 
 /**
@@ -45,8 +45,8 @@ function useSpokenMessage( message, politeness ) {
  *
  * @return {'polite'|'assertive'} Notice politeness.
  */
-function getDefaultPoliteness( status ) {
-	switch ( status ) {
+function getDefaultPoliteness(status) {
+	switch (status) {
 		case 'success':
 		case 'warning':
 		case 'info':
@@ -58,7 +58,7 @@ function getDefaultPoliteness( status ) {
 	}
 }
 
-function Notice( {
+function Notice({
 	className,
 	status = 'info',
 	children,
@@ -66,40 +66,35 @@ function Notice( {
 	onRemove = noop,
 	isDismissible = true,
 	actions = [],
-	politeness = getDefaultPoliteness( status ),
+	politeness = getDefaultPoliteness(status),
 	__unstableHTML,
 	// onDismiss is a callback executed when the notice is dismissed.
 	// It is distinct from onRemove, which _looks_ like a callback but is
 	// actually the function to call to remove the notice from the UI.
 	onDismiss = noop,
-} ) {
-	useSpokenMessage( spokenMessage, politeness );
+}) {
+	useSpokenMessage(spokenMessage, politeness);
 
-	const classes = classnames(
-		className,
-		'components-notice',
-		'is-' + status,
-		{
-			'is-dismissible': isDismissible,
-		}
-	);
+	const classes = classnames(className, 'components-notice', 'is-' + status, {
+		'is-dismissible': isDismissible,
+	});
 
-	if ( __unstableHTML ) {
-		children = <RawHTML>{ children }</RawHTML>;
+	if (__unstableHTML) {
+		children = <RawHTML>{children}</RawHTML>;
 	}
 
-	const onDismissNotice = ( event ) => {
+	const onDismissNotice = (event) => {
 		event?.preventDefault?.();
 		onDismiss();
 		onRemove();
 	};
 
 	return (
-		<div className={ classes }>
+		<div className={classes}>
 			<div className="components-notice__content">
-				{ children }
+				{children}
 				<div className="components-notice__actions">
-					{ actions.map(
+					{actions.map(
 						(
 							{
 								className: buttonCustomClasses,
@@ -113,8 +108,8 @@ function Notice( {
 							index
 						) => {
 							let computedVariant = variant;
-							if ( variant !== 'primary' && ! noDefaultClasses ) {
-								computedVariant = ! url ? 'secondary' : 'link';
+							if (variant !== 'primary' && !noDefaultClasses) {
+								computedVariant = !url ? 'secondary' : 'link';
 							}
 							if (
 								typeof computedVariant === 'undefined' &&
@@ -125,31 +120,31 @@ function Notice( {
 
 							return (
 								<Button
-									key={ index }
-									href={ url }
-									variant={ computedVariant }
-									onClick={ url ? undefined : onClick }
-									className={ classnames(
+									key={index}
+									href={url}
+									variant={computedVariant}
+									onClick={url ? undefined : onClick}
+									className={classnames(
 										'components-notice__action',
 										buttonCustomClasses
-									) }
+									)}
 								>
-									{ label }
+									{label}
 								</Button>
 							);
 						}
-					) }
+					)}
 				</div>
 			</div>
-			{ isDismissible && (
+			{isDismissible && (
 				<Button
 					className="components-notice__dismiss"
-					icon={ close }
-					label={ __( 'Dismiss this notice' ) }
-					onClick={ onDismissNotice }
-					showTooltip={ false }
+					icon={close}
+					label={__('Dismiss this notice')}
+					onClick={onDismissNotice}
+					showTooltip={false}
 				/>
-			) }
+			)}
 		</div>
 	);
 }

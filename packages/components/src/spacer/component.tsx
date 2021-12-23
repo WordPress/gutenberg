@@ -13,12 +13,12 @@ import { useSpacer } from './hook';
 import type { Props } from './types';
 
 function Spacer(
-	props: WordPressComponentProps< Props, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<Props, 'div'>,
+	forwardedRef: Ref<any>
 ) {
-	const spacerProps = useSpacer( props );
+	const spacerProps = useSpacer(props);
 
-	return <View { ...spacerProps } ref={ forwardedRef } />;
+	return <View {...spacerProps} ref={forwardedRef} />;
 }
 
 /**
@@ -44,6 +44,6 @@ function Spacer(
  * }
  * ```
  */
-const ConnectedSpacer = contextConnect( Spacer, 'Spacer' );
+const ConnectedSpacer = contextConnect(Spacer, 'Spacer');
 
 export default ConnectedSpacer;

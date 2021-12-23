@@ -32,7 +32,7 @@ import { apiFetch } from '@wordpress/data-controls';
 // Action generator using apiFetch
 export function* myAction() {
 	const path = '/v2/my-api/items';
-	const items = yield apiFetch( { path } );
+	const items = yield apiFetch({ path });
 	// do something with the items.
 }
 ```
@@ -63,13 +63,13 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
 
-registerStore( 'my-custom-store', {
+registerStore('my-custom-store', {
 	reducer,
 	controls,
 	actions,
 	selectors,
 	resolvers,
-} );
+});
 ```
 
 _Returns_

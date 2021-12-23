@@ -14,30 +14,30 @@ import getComputedStyle from './get-computed-style';
  *
  * @return {Node | null} Offset parent.
  */
-export default function getOffsetParent( node ) {
+export default function getOffsetParent(node) {
 	// Cannot retrieve computed style or offset parent only anything other than
 	// an element node, so find the closest element node.
 	let closestElement;
-	while ( ( closestElement = /** @type {Node} */ ( node.parentNode ) ) ) {
-		if ( closestElement.nodeType === closestElement.ELEMENT_NODE ) {
+	while ((closestElement = /** @type {Node} */ (node.parentNode))) {
+		if (closestElement.nodeType === closestElement.ELEMENT_NODE) {
 			break;
 		}
 	}
 
-	if ( ! closestElement ) {
+	if (!closestElement) {
 		return null;
 	}
 
 	// If the closest element is already positioned, return it, as offsetParent
 	// does not otherwise consider the node itself.
 	if (
-		getComputedStyle( /** @type {Element} */ ( closestElement ) )
-			.position !== 'static'
+		getComputedStyle(/** @type {Element} */ (closestElement)).position !==
+		'static'
 	) {
 		return closestElement;
 	}
 
 	// offsetParent is undocumented/draft
-	return /** @type {Node & { offsetParent: Node }} */ ( closestElement )
+	return /** @type {Node & { offsetParent: Node }} */ (closestElement)
 		.offsetParent;
 }

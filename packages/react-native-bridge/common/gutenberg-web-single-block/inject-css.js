@@ -7,10 +7,10 @@ window.injectCss = (css) => {
 }
 `;
 
-const script = document.createElement( 'script' );
+const script = document.createElement('script');
 script.innerText = injectCss;
 script.type = 'text/javascript';
-document.head.appendChild( script );
+document.head.appendChild(script);
 // We need to return a string or null, otherwise executing this script will error.
 // eslint-disable-next-line no-unused-expressions
-( '' );
+('');

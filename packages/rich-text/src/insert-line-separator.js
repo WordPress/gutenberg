@@ -23,21 +23,21 @@ export function insertLineSeparator(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const beforeText = value.text.slice( 0, startIndex );
-	const previousLineSeparatorIndex = beforeText.lastIndexOf( LINE_SEPARATOR );
+	const beforeText = value.text.slice(0, startIndex);
+	const previousLineSeparatorIndex = beforeText.lastIndexOf(LINE_SEPARATOR);
 	const previousLineSeparatorFormats =
-		value.replacements[ previousLineSeparatorIndex ];
-	let replacements = [ , ];
+		value.replacements[previousLineSeparatorIndex];
+	let replacements = [,];
 
-	if ( previousLineSeparatorFormats ) {
-		replacements = [ previousLineSeparatorFormats ];
+	if (previousLineSeparatorFormats) {
+		replacements = [previousLineSeparatorFormats];
 	}
 
 	const valueToInsert = {
-		formats: [ , ],
+		formats: [,],
 		replacements,
 		text: LINE_SEPARATOR,
 	};
 
-	return insert( value, valueToInsert, startIndex, endIndex );
+	return insert(value, valueToInsert, startIndex, endIndex);
 }

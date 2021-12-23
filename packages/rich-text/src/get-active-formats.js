@@ -14,28 +14,28 @@ export function getActiveFormats(
 	{ formats, start, end, activeFormats },
 	EMPTY_ACTIVE_FORMATS = []
 ) {
-	if ( start === undefined ) {
+	if (start === undefined) {
 		return EMPTY_ACTIVE_FORMATS;
 	}
 
-	if ( start === end ) {
+	if (start === end) {
 		// For a collapsed caret, it is possible to override the active formats.
-		if ( activeFormats ) {
+		if (activeFormats) {
 			return activeFormats;
 		}
 
-		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
-		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
+		const formatsBefore = formats[start - 1] || EMPTY_ACTIVE_FORMATS;
+		const formatsAfter = formats[start] || EMPTY_ACTIVE_FORMATS;
 
 		// By default, select the lowest amount of formats possible (which means
 		// the caret is positioned outside the format boundary). The user can
 		// then use arrow keys to define `activeFormats`.
-		if ( formatsBefore.length < formatsAfter.length ) {
+		if (formatsBefore.length < formatsAfter.length) {
 			return formatsBefore;
 		}
 
 		return formatsAfter;
 	}
 
-	return formats[ start ] || EMPTY_ACTIVE_FORMATS;
+	return formats[start] || EMPTY_ACTIVE_FORMATS;
 }

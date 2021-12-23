@@ -19,6 +19,6 @@ import { MENU_KIND, MENU_POST_TYPE } from '../constants';
  *                         property value and the second is the
  *                         setter.
  */
-export default function useMenuEntityProp( prop, menuId ) {
-	return useEntityProp( MENU_KIND, MENU_POST_TYPE, prop, menuId );
+export default function useMenuEntityProp(prop, menuId) {
+	return useEntityProp(MENU_KIND, MENU_POST_TYPE, prop, menuId);
 }

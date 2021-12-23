@@ -28,7 +28,7 @@ export const settings = {
 					'One of the hardest things to do in technology is disrupt yourself.'
 				) +
 				'</p>',
-			citation: __( 'Matt Mullenweg' ),
+			citation: __('Matt Mullenweg'),
 		},
 	},
 	transforms,

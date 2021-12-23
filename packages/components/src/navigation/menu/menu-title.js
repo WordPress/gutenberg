@@ -19,80 +19,80 @@ import {
 import { useNavigationMenuContext } from './context';
 import { SEARCH_FOCUS_DELAY } from '../constants';
 
-export default function NavigationMenuTitle( {
+export default function NavigationMenuTitle({
 	hasSearch,
 	onSearch,
 	search,
 	title,
 	titleAction,
-} ) {
-	const [ isSearching, setIsSearching ] = useState( false );
+}) {
+	const [isSearching, setIsSearching] = useState(false);
 	const { menu } = useNavigationMenuContext();
 	const searchButtonRef = useRef();
 
-	if ( ! title ) {
+	if (!title) {
 		return null;
 	}
 
 	const onCloseSearch = () => {
-		setIsSearching( false );
+		setIsSearching(false);
 
 		// Wait for the slide-in animation to complete before focusing the search button.
 		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-		setTimeout( () => {
+		setTimeout(() => {
 			searchButtonRef.current.focus();
-		}, SEARCH_FOCUS_DELAY );
+		}, SEARCH_FOCUS_DELAY);
 	};
 
-	const menuTitleId = `components-navigation__menu-title-${ menu }`;
+	const menuTitleId = `components-navigation__menu-title-${menu}`;
 	/* translators: search button label for menu search box. %s: menu title */
-	const searchButtonLabel = sprintf( __( 'Search in %s' ), title );
+	const searchButtonLabel = sprintf(__('Search in %s'), title);
 
 	return (
 		<MenuTitleUI className="components-navigation__menu-title">
-			{ ! isSearching && (
+			{!isSearching && (
 				<GroupTitleUI
 					as="h2"
 					className="components-navigation__menu-title-heading"
-					level={ 3 }
+					level={3}
 				>
-					<span id={ menuTitleId }>{ title }</span>
+					<span id={menuTitleId}>{title}</span>
 
-					{ ( hasSearch || titleAction ) && (
+					{(hasSearch || titleAction) && (
 						<MenuTitleActionsUI>
-							{ titleAction }
+							{titleAction}
 
-							{ hasSearch && (
+							{hasSearch && (
 								<Button
 									isSmall
 									variant="tertiary"
-									label={ searchButtonLabel }
-									onClick={ () => setIsSearching( true ) }
-									ref={ searchButtonRef }
+									label={searchButtonLabel}
+									onClick={() => setIsSearching(true)}
+									ref={searchButtonRef}
 								>
-									<Icon icon={ searchIcon } />
+									<Icon icon={searchIcon} />
 								</Button>
-							) }
+							)}
 						</MenuTitleActionsUI>
-					) }
+					)}
 				</GroupTitleUI>
-			) }
+			)}
 
-			{ isSearching && (
+			{isSearching && (
 				<div
-					className={ getAnimateClassName( {
+					className={getAnimateClassName({
 						type: 'slide-in',
 						origin: 'left',
-					} ) }
+					})}
 				>
 					<MenuTitleSearch
-						onCloseSearch={ onCloseSearch }
-						onSearch={ onSearch }
-						search={ search }
-						title={ title }
+						onCloseSearch={onCloseSearch}
+						onSearch={onSearch}
+						search={search}
+						title={title}
 					/>
 				</div>
-			) }
+			)}
 		</MenuTitleUI>
 	);
 }

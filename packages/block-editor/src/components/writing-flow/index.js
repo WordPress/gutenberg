@@ -21,59 +21,59 @@ import useSelectAll from './use-select-all';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
-	const [ before, ref, after ] = useTabNav();
+	const [before, ref, after] = useTabNav();
 	const hasMultiSelection = useSelect(
-		( select ) => select( blockEditorStore ).hasMultiSelection(),
+		(select) => select(blockEditorStore).hasMultiSelection(),
 		[]
 	);
 
 	return [
 		before,
-		useMergeRefs( [
+		useMergeRefs([
 			ref,
 			useMultiSelection(),
 			useSelectAll(),
 			useArrowNav(),
 			useRefEffect(
-				( node ) => {
+				(node) => {
 					node.tabIndex = -1;
 
-					if ( ! hasMultiSelection ) {
+					if (!hasMultiSelection) {
 						return;
 					}
 
 					node.setAttribute(
 						'aria-label',
-						__( 'Multiple selected blocks' )
+						__('Multiple selected blocks')
 					);
 
 					return () => {
-						node.removeAttribute( 'aria-label' );
+						node.removeAttribute('aria-label');
 					};
 				},
-				[ hasMultiSelection ]
+				[hasMultiSelection]
 			),
-		] ),
+		]),
 		after,
 	];
 }
 
-function WritingFlow( { children, ...props }, forwardedRef ) {
-	const [ before, ref, after ] = useWritingFlow();
+function WritingFlow({ children, ...props }, forwardedRef) {
+	const [before, ref, after] = useWritingFlow();
 	return (
 		<>
-			{ before }
+			{before}
 			<div
-				{ ...props }
-				ref={ useMergeRefs( [ ref, forwardedRef ] ) }
-				className={ classNames(
+				{...props}
+				ref={useMergeRefs([ref, forwardedRef])}
+				className={classNames(
 					props.className,
 					'block-editor-writing-flow'
-				) }
+				)}
 			>
-				{ children }
+				{children}
 			</div>
-			{ after }
+			{after}
 		</>
 	);
 }
@@ -85,4 +85,4 @@ function WritingFlow( { children, ...props }, forwardedRef ) {
  * @param {Object}    props          Component properties.
  * @param {WPElement} props.children Children to be rendered.
  */
-export default forwardRef( WritingFlow );
+export default forwardRef(WritingFlow);

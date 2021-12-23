@@ -13,22 +13,22 @@ import {
  */
 import groups from './groups';
 
-export default function BlockControlsSlot( { group = 'default', ...props } ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
-	const Slot = groups[ group ].Slot;
-	const slot = useSlot( Slot.__unstableName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
+export default function BlockControlsSlot({ group = 'default', ...props }) {
+	const accessibleToolbarState = useContext(ToolbarContext);
+	const Slot = groups[group].Slot;
+	const slot = useSlot(Slot.__unstableName);
+	const hasFills = Boolean(slot.fills && slot.fills.length);
 
-	if ( ! hasFills ) {
+	if (!hasFills) {
 		return null;
 	}
 
-	if ( group === 'default' ) {
+	if (group === 'default') {
 		return (
 			<Slot
-				{ ...props }
+				{...props}
 				bubblesVirtually
-				fillProps={ accessibleToolbarState }
+				fillProps={accessibleToolbarState}
 			/>
 		);
 	}
@@ -36,9 +36,9 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	return (
 		<ToolbarGroup>
 			<Slot
-				{ ...props }
+				{...props}
 				bubblesVirtually
-				fillProps={ accessibleToolbarState }
+				fillProps={accessibleToolbarState}
 			/>
 		</ToolbarGroup>
 	);

@@ -27,33 +27,33 @@ import { useRef, useEffect, useCallback } from '@wordpress/element';
  * }
  * ```
  */
-function useFocusReturn( onFocusReturn ) {
+function useFocusReturn(onFocusReturn) {
 	/** @type {import('react').MutableRefObject<null | HTMLElement>} */
-	const ref = useRef( null );
+	const ref = useRef(null);
 	/** @type {import('react').MutableRefObject<null | Element>} */
-	const focusedBeforeMount = useRef( null );
-	const onFocusReturnRef = useRef( onFocusReturn );
-	useEffect( () => {
+	const focusedBeforeMount = useRef(null);
+	const onFocusReturnRef = useRef(onFocusReturn);
+	useEffect(() => {
 		onFocusReturnRef.current = onFocusReturn;
-	}, [ onFocusReturn ] );
+	}, [onFocusReturn]);
 
-	return useCallback( ( node ) => {
-		if ( node ) {
+	return useCallback((node) => {
+		if (node) {
 			// Set ref to be used when unmounting.
 			ref.current = node;
 
 			// Only set when the node mounts.
-			if ( focusedBeforeMount.current ) {
+			if (focusedBeforeMount.current) {
 				return;
 			}
 
 			focusedBeforeMount.current = node.ownerDocument.activeElement;
-		} else if ( focusedBeforeMount.current ) {
+		} else if (focusedBeforeMount.current) {
 			const isFocused = ref.current?.contains(
 				ref.current?.ownerDocument.activeElement
 			);
 
-			if ( ref.current?.isConnected && ! isFocused ) {
+			if (ref.current?.isConnected && !isFocused) {
 				return;
 			}
 
@@ -61,13 +61,15 @@ function useFocusReturn( onFocusReturn ) {
 			// specified. This allows for support that the `onFocusReturn`
 			// decides to allow the default behavior to occur under some
 			// conditions.
-			if ( onFocusReturnRef.current ) {
+			if (onFocusReturnRef.current) {
 				onFocusReturnRef.current();
 			} else {
-				/** @type {null | HTMLElement} */ ( focusedBeforeMount.current )?.focus();
+				/** @type {null | HTMLElement} */ (
+					focusedBeforeMount.current
+				)?.focus();
 			}
 		}
-	}, [] );
+	}, []);
 }
 
 export default useFocusReturn;

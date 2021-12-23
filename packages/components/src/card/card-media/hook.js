@@ -13,8 +13,8 @@ import { useCx } from '../../utils/hooks/use-cx';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
  */
-export function useCardMedia( props ) {
-	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
+export function useCardMedia(props) {
+	const { className, ...otherProps } = useContextSystem(props, 'CardMedia');
 
 	const cx = useCx();
 
@@ -27,7 +27,7 @@ export function useCardMedia( props ) {
 				'components-card__media',
 				className
 			),
-		[ className ]
+		[className]
 	);
 
 	return {

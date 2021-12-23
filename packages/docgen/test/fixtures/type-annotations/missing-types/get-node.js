@@ -1,4 +1,4 @@
-module.exports = () => ( {
+module.exports = () => ({
 	type: 'VariableDeclaration',
 	start: 0,
 	end: 22,
@@ -101,4 +101,4 @@ module.exports = () => ( {
 		},
 	],
 	kind: 'const',
-} );
+});

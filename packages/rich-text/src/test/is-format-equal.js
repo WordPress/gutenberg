@@ -4,7 +4,7 @@
 
 import { isFormatEqual } from '../is-format-equal';
 
-describe( 'isFormatEqual', () => {
+describe('isFormatEqual', () => {
 	const spec = [
 		{
 			format1: undefined,
@@ -64,10 +64,10 @@ describe( 'isFormatEqual', () => {
 		},
 	];
 
-	spec.forEach( ( { format1, format2, isEqual, description } ) => {
+	spec.forEach(({ format1, format2, isEqual, description }) => {
 		// eslint-disable-next-line jest/valid-title
-		it( description, () => {
-			expect( isFormatEqual( format1, format2 ) ).toBe( isEqual );
-		} );
-	} );
-} );
+		it(description, () => {
+			expect(isFormatEqual(format1, format2)).toBe(isEqual);
+		});
+	});
+});

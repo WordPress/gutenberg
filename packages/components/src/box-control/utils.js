@@ -14,14 +14,14 @@ import { __ } from '@wordpress/i18n';
 import { parseUnit } from '../unit-control/utils';
 
 export const LABELS = {
-	all: __( 'All' ),
-	top: __( 'Top' ),
-	bottom: __( 'Bottom' ),
-	left: __( 'Left' ),
-	right: __( 'Right' ),
-	mixed: __( 'Mixed' ),
-	vertical: __( 'Vertical' ),
-	horizontal: __( 'Horizontal' ),
+	all: __('All'),
+	top: __('Top'),
+	bottom: __('Bottom'),
+	left: __('Left'),
+	right: __('Right'),
+	mixed: __('Mixed'),
+	vertical: __('Vertical'),
+	horizontal: __('Horizontal'),
 };
 
 export const DEFAULT_VALUES = {
@@ -38,7 +38,7 @@ export const DEFAULT_VISUALIZER_VALUES = {
 	left: false,
 };
 
-export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+export const ALL_SIDES = ['top', 'right', 'bottom', 'left'];
 
 /**
  * Gets an items with the most occurrence within an array
@@ -47,12 +47,12 @@ export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
  * @param {Array<any>} arr Array of items to check.
  * @return {any} The item with the most occurrences.
  */
-function mode( arr ) {
+function mode(arr) {
 	return arr
 		.sort(
-			( a, b ) =>
-				arr.filter( ( v ) => v === a ).length -
-				arr.filter( ( v ) => v === b ).length
+			(a, b) =>
+				arr.filter((v) => v === a).length -
+				arr.filter((v) => v === b).length
 		)
 		.pop();
 }
@@ -65,16 +65,16 @@ function mode( arr ) {
  *
  * @return {string} A value + unit for the 'all' input.
  */
-export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
-	const sides = normalizeSides( availableSides );
-	const parsedValues = sides.map( ( side ) => parseUnit( values[ side ] ) );
-	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
+export function getAllValue(values = {}, availableSides = ALL_SIDES) {
+	const sides = normalizeSides(availableSides);
+	const parsedValues = sides.map((side) => parseUnit(values[side]));
+	const allValues = parsedValues.map((value) => value[0]);
+	const allUnits = parsedValues.map((value) => value[1]);
 
-	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
-		? allValues[ 0 ]
+	const value = allValues.every((v) => v === allValues[0])
+		? allValues[0]
 		: '';
-	const unit = mode( allUnits );
+	const unit = mode(allUnits);
 
 	/**
 	 * The isNumber check is important. On reset actions, the incoming value
@@ -85,7 +85,7 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	 * isNumber() is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
-	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
+	const allValue = isNumber(value) ? `${value}${unit}` : null;
 
 	return allValue;
 }
@@ -96,14 +96,14 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
  * @param {Object} selectedUnits Current unit selections for individual sides.
  * @return {string} Most common unit selection.
  */
-export function getAllUnitFallback( selectedUnits ) {
-	if ( ! selectedUnits || typeof selectedUnits !== 'object' ) {
+export function getAllUnitFallback(selectedUnits) {
+	if (!selectedUnits || typeof selectedUnits !== 'object') {
 		return undefined;
 	}
 
-	const filteredUnits = Object.values( selectedUnits ).filter( Boolean );
+	const filteredUnits = Object.values(selectedUnits).filter(Boolean);
 
-	return mode( filteredUnits );
+	return mode(filteredUnits);
 }
 
 /**
@@ -114,9 +114,9 @@ export function getAllUnitFallback( selectedUnits ) {
  *
  * @return {boolean} Whether values are mixed.
  */
-export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
-	const allValue = getAllValue( values, sides );
-	const isMixed = isNaN( parseFloat( allValue ) );
+export function isValuesMixed(values = {}, sides = ALL_SIDES) {
+	const allValue = getAllValue(values, sides);
+	const isMixed = isNaN(parseFloat(allValue));
 
 	return isMixed;
 }
@@ -128,15 +128,15 @@ export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
  *
  * @return {boolean} Whether values are mixed.
  */
-export function isValuesDefined( values ) {
+export function isValuesDefined(values) {
 	return (
 		values !== undefined &&
-		! isEmpty(
-			Object.values( values ).filter(
+		!isEmpty(
+			Object.values(values).filter(
 				// Switching units when input is empty causes values only
 				// containing units. This gives false positive on mixed values
 				// unless filtered.
-				( value ) => !! value && /\d/.test( value )
+				(value) => !!value && /\d/.test(value)
 			)
 		)
 	);
@@ -150,10 +150,10 @@ export function isValuesDefined( values ) {
  * @param {boolean} splitOnAxis Whether splitting by horizontal or vertical axis.
  * @return {string} The initial side.
  */
-export function getInitialSide( isLinked, splitOnAxis ) {
+export function getInitialSide(isLinked, splitOnAxis) {
 	let initialSide = 'all';
 
-	if ( ! isLinked ) {
+	if (!isLinked) {
 		initialSide = splitOnAxis ? 'vertical' : 'top';
 	}
 
@@ -169,20 +169,20 @@ export function getInitialSide( isLinked, splitOnAxis ) {
  * @param {Array} sides Available sides for box control.
  * @return {Array} Normalized sides configuration.
  */
-export function normalizeSides( sides ) {
+export function normalizeSides(sides) {
 	const filteredSides = [];
 
-	if ( ! sides?.length ) {
+	if (!sides?.length) {
 		return ALL_SIDES;
 	}
 
-	if ( sides.includes( 'vertical' ) ) {
-		filteredSides.push( ...[ 'top', 'bottom' ] );
-	} else if ( sides.includes( 'horizontal' ) ) {
-		filteredSides.push( ...[ 'left', 'right' ] );
+	if (sides.includes('vertical')) {
+		filteredSides.push(...['top', 'bottom']);
+	} else if (sides.includes('horizontal')) {
+		filteredSides.push(...['left', 'right']);
 	} else {
-		const newSides = ALL_SIDES.filter( ( side ) => sides.includes( side ) );
-		filteredSides.push( ...newSides );
+		const newSides = ALL_SIDES.filter((side) => sides.includes(side));
+		filteredSides.push(...newSides);
 	}
 
 	return filteredSides;

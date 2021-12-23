@@ -17,7 +17,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import { sprintf, _n } from '@wordpress/i18n';
 
-sprintf( _n( '%d hat', '%d hats', 4, 'text-domain' ), 4 );
+sprintf(_n('%d hat', '%d hats', 4, 'text-domain'), 4);
 // 4 hats
 ```
 

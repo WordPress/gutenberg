@@ -33,85 +33,85 @@ import { store as editSiteStore } from '../../../store';
 
 const SITE_EDITOR_KEY = 'site-editor';
 
-function NavLink( { params, replace, ...props } ) {
-	const linkProps = useLink( params, replace );
+function NavLink({ params, replace, ...props }) {
+	const linkProps = useLink(params, replace);
 
-	return <NavigationItem { ...linkProps } { ...props } />;
+	return <NavigationItem {...linkProps} {...props} />;
 }
 
-const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
-	const { isNavigationOpen, siteTitle } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreDataStore );
+const NavigationPanel = ({ activeItem = SITE_EDITOR_KEY }) => {
+	const { isNavigationOpen, siteTitle } = useSelect((select) => {
+		const { getEntityRecord } = select(coreDataStore);
 
 		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+			getEntityRecord('root', '__unstableBase', undefined) || {};
 
 		return {
 			siteTitle: siteData.name,
-			isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
+			isNavigationOpen: select(editSiteStore).isNavigationOpened(),
 		};
-	}, [] );
-	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+	}, []);
+	const { setIsNavigationPanelOpened } = useDispatch(editSiteStore);
 
-	const closeOnEscape = ( event ) => {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+	const closeOnEscape = (event) => {
+		if (event.keyCode === ESCAPE && !event.defaultPrevented) {
 			event.preventDefault();
-			setIsNavigationPanelOpened( false );
+			setIsNavigationPanelOpened(false);
 		}
 	};
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			className={ classnames( `edit-site-navigation-panel`, {
+			className={classnames(`edit-site-navigation-panel`, {
 				'is-open': isNavigationOpen,
-			} ) }
-			onKeyDown={ closeOnEscape }
+			})}
+			onKeyDown={closeOnEscape}
 		>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
 					<div className="edit-site-navigation-panel__site-title">
-						{ decodeEntities( siteTitle ) }
+						{decodeEntities(siteTitle)}
 					</div>
 				</div>
 				<div className="edit-site-navigation-panel__scroll-container">
-					<Navigation activeItem={ activeItem }>
+					<Navigation activeItem={activeItem}>
 						<MainDashboardButton.Slot>
 							<NavigationBackButton
-								backButtonLabel={ __( 'Dashboard' ) }
+								backButtonLabel={__('Dashboard')}
 								className="edit-site-navigation-panel__back-to-dashboard"
 								href="index.php"
 							/>
 						</MainDashboardButton.Slot>
 
 						<NavigationMenu>
-							<NavigationGroup title={ __( 'Editor' ) }>
+							<NavigationGroup title={__('Editor')}>
 								<NavLink
-									icon={ siteIcon }
-									title={ __( 'Site' ) }
-									item={ SITE_EDITOR_KEY }
-									params={ {
+									icon={siteIcon}
+									title={__('Site')}
+									item={SITE_EDITOR_KEY}
+									params={{
 										postId: undefined,
 										postType: undefined,
-									} }
+									}}
 								/>
 								<NavLink
-									icon={ templateIcon }
-									title={ __( 'Templates' ) }
+									icon={templateIcon}
+									title={__('Templates')}
 									item="wp_template"
-									params={ {
+									params={{
 										postId: undefined,
 										postType: 'wp_template',
-									} }
+									}}
 								/>
 								<NavLink
-									icon={ templatePartIcon }
-									title={ __( 'Template Parts' ) }
+									icon={templatePartIcon}
+									title={__('Template Parts')}
 									item="wp_template_part"
-									params={ {
+									params={{
 										postId: undefined,
 										postType: 'wp_template_part',
-									} }
+									}}
 								/>
 							</NavigationGroup>
 						</NavigationMenu>

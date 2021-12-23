@@ -16,11 +16,11 @@ import { useBlockEditContext } from '../block-edit';
 import useSetting from '../use-setting';
 import { store as blockEditorStore } from '../../store';
 
-export function __experimentalGetGradientClass( gradientSlug ) {
-	if ( ! gradientSlug ) {
+export function __experimentalGetGradientClass(gradientSlug) {
+	if (!gradientSlug) {
 		return undefined;
 	}
-	return `has-${ gradientSlug }-gradient-background`;
+	return `has-${gradientSlug}-gradient-background`;
 }
 
 /**
@@ -31,8 +31,8 @@ export function __experimentalGetGradientClass( gradientSlug ) {
  *
  * @return {string} Gradient value.
  */
-export function getGradientValueBySlug( gradients, slug ) {
-	const gradient = find( gradients, [ 'slug', slug ] );
+export function getGradientValueBySlug(gradients, slug) {
+	const gradient = find(gradients, ['slug', slug]);
 	return gradient && gradient.gradient;
 }
 
@@ -40,7 +40,7 @@ export function __experimentalGetGradientObjectByGradientValue(
 	gradients,
 	value
 ) {
-	const gradient = find( gradients, [ 'gradient', value ] );
+	const gradient = find(gradients, ['gradient', value]);
 	return gradient;
 }
 
@@ -51,7 +51,7 @@ export function __experimentalGetGradientObjectByGradientValue(
  * @param {string} value     Gradient value
  * @return {string} Gradient slug.
  */
-export function getGradientSlugByValue( gradients, value ) {
+export function getGradientSlugByValue(gradients, value) {
 	const gradient = __experimentalGetGradientObjectByGradientValue(
 		gradients,
 		value
@@ -61,59 +61,56 @@ export function getGradientSlugByValue( gradients, value ) {
 
 const EMPTY_OBJECT = {};
 
-export function __experimentalUseGradient( {
+export function __experimentalUseGradient({
 	gradientAttribute = 'gradient',
 	customGradientAttribute = 'customGradient',
-} = {} ) {
+} = {}) {
 	const { clientId } = useBlockEditContext();
 
-	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
+	const gradientsPerOrigin = useSetting('color.gradients') || EMPTY_OBJECT;
 	const allGradients = useMemo(
 		() => [
-			...( gradientsPerOrigin?.custom || [] ),
-			...( gradientsPerOrigin?.theme || [] ),
-			...( gradientsPerOrigin?.default || [] ),
+			...(gradientsPerOrigin?.custom || []),
+			...(gradientsPerOrigin?.theme || []),
+			...(gradientsPerOrigin?.default || []),
 		],
-		[ gradientsPerOrigin ]
+		[gradientsPerOrigin]
 	);
 	const { gradient, customGradient } = useSelect(
-		( select ) => {
-			const { getBlockAttributes } = select( blockEditorStore );
-			const attributes = getBlockAttributes( clientId ) || {};
+		(select) => {
+			const { getBlockAttributes } = select(blockEditorStore);
+			const attributes = getBlockAttributes(clientId) || {};
 			return {
-				customGradient: attributes[ customGradientAttribute ],
-				gradient: attributes[ gradientAttribute ],
+				customGradient: attributes[customGradientAttribute],
+				gradient: attributes[gradientAttribute],
 			};
 		},
-		[ clientId, gradientAttribute, customGradientAttribute ]
+		[clientId, gradientAttribute, customGradientAttribute]
 	);
 
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch(blockEditorStore);
 	const setGradient = useCallback(
-		( newGradientValue ) => {
-			const slug = getGradientSlugByValue(
-				allGradients,
-				newGradientValue
-			);
-			if ( slug ) {
-				updateBlockAttributes( clientId, {
-					[ gradientAttribute ]: slug,
-					[ customGradientAttribute ]: undefined,
-				} );
+		(newGradientValue) => {
+			const slug = getGradientSlugByValue(allGradients, newGradientValue);
+			if (slug) {
+				updateBlockAttributes(clientId, {
+					[gradientAttribute]: slug,
+					[customGradientAttribute]: undefined,
+				});
 				return;
 			}
-			updateBlockAttributes( clientId, {
-				[ gradientAttribute ]: undefined,
-				[ customGradientAttribute ]: newGradientValue,
-			} );
+			updateBlockAttributes(clientId, {
+				[gradientAttribute]: undefined,
+				[customGradientAttribute]: newGradientValue,
+			});
 		},
-		[ allGradients, clientId, updateBlockAttributes ]
+		[allGradients, clientId, updateBlockAttributes]
 	);
 
-	const gradientClass = __experimentalGetGradientClass( gradient );
+	const gradientClass = __experimentalGetGradientClass(gradient);
 	let gradientValue;
-	if ( gradient ) {
-		gradientValue = getGradientValueBySlug( allGradients, gradient );
+	if (gradient) {
+		gradientValue = getGradientValueBySlug(allGradients, gradient);
 	} else {
 		gradientValue = customGradient;
 	}

@@ -13,27 +13,27 @@ import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useBlockTypesState from './hooks/use-block-types-state';
 
-function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
-	const [ items, , , onSelectItem ] = useBlockTypesState(
+function ReusableBlocksList({ onHover, onInsert, rootClientId }) {
+	const [items, , , onSelectItem] = useBlockTypesState(
 		rootClientId,
 		onInsert
 	);
 
-	const filteredItems = useMemo( () => {
-		return items.filter( ( { category } ) => category === 'reusable' );
-	}, [ items ] );
+	const filteredItems = useMemo(() => {
+		return items.filter(({ category }) => category === 'reusable');
+	}, [items]);
 
-	if ( filteredItems.length === 0 ) {
+	if (filteredItems.length === 0) {
 		return <InserterNoResults />;
 	}
 
 	return (
-		<InserterPanel title={ __( 'Reusable blocks' ) }>
+		<InserterPanel title={__('Reusable blocks')}>
 			<BlockTypesList
-				items={ filteredItems }
-				onSelect={ onSelectItem }
-				onHover={ onHover }
-				label={ __( 'Reusable blocks' ) }
+				items={filteredItems}
+				onSelect={onSelectItem}
+				onHover={onHover}
+				label={__('Reusable blocks')}
 			/>
 		</InserterPanel>
 	);
@@ -50,22 +50,22 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
  *
  * @return {WPComponent} The component.
  */
-export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
+export function ReusableBlocksTab({ rootClientId, onInsert, onHover }) {
 	return (
 		<>
 			<ReusableBlocksList
-				onHover={ onHover }
-				onInsert={ onInsert }
-				rootClientId={ rootClientId }
+				onHover={onHover}
+				onInsert={onInsert}
+				rootClientId={rootClientId}
 			/>
 			<div className="block-editor-inserter__manage-reusable-blocks-container">
 				<a
 					className="block-editor-inserter__manage-reusable-blocks"
-					href={ addQueryArgs( 'edit.php', {
+					href={addQueryArgs('edit.php', {
 						post_type: 'wp_block',
-					} ) }
+					})}
 				>
-					{ __( 'Manage Reusable blocks' ) }
+					{__('Manage Reusable blocks')}
 				</a>
 			</div>
 		</>

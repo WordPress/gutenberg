@@ -33,7 +33,7 @@ const v1 = {
 		return null;
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style } ) {
+	isEligible({ style }) {
 		return style?.typography?.fontFamily;
 	},
 };
@@ -46,4 +46,4 @@ const v1 = {
  *
  * See block-deprecation.md
  */
-export default [ v1 ];
+export default [v1];

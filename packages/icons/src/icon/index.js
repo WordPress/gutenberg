@@ -14,12 +14,12 @@ import { cloneElement } from '@wordpress/element';
  *
  * @return {JSX.Element}  Icon component
  */
-function Icon( { icon, size = 24, ...props } ) {
-	return cloneElement( icon, {
+function Icon({ icon, size = 24, ...props }) {
+	return cloneElement(icon, {
 		width: size,
 		height: size,
 		...props,
-	} );
+	});
 }
 
 export default Icon;

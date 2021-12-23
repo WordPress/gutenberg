@@ -7,37 +7,37 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 
-export function QueryPaginationArrowControls( { value, onChange } ) {
+export function QueryPaginationArrowControls({ value, onChange }) {
 	return (
 		<ToggleGroupControl
-			label={ __( 'Arrow' ) }
-			value={ value }
-			onChange={ onChange }
-			help={ __(
+			label={__('Arrow')}
+			value={value}
+			onChange={onChange}
+			help={__(
 				'A decorative arrow appended to the next and previous page link.'
-			) }
+			)}
 			isBlock
 		>
 			<ToggleGroupControlOption
 				value="none"
-				label={ _x(
+				label={_x(
 					'None',
 					'Arrow option for Query Pagination Next/Previous blocks'
-				) }
+				)}
 			/>
 			<ToggleGroupControlOption
 				value="arrow"
-				label={ _x(
+				label={_x(
 					'Arrow',
 					'Arrow option for Query Pagination Next/Previous blocks'
-				) }
+				)}
 			/>
 			<ToggleGroupControlOption
 				value="chevron"
-				label={ _x(
+				label={_x(
 					'Chevron',
 					'Arrow option for Query Pagination Next/Previous blocks'
-				) }
+				)}
 			/>
 		</ToggleGroupControl>
 	);

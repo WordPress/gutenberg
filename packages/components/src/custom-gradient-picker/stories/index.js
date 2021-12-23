@@ -13,13 +13,13 @@ export default {
 	component: CustomGradientPicker,
 };
 
-const CustomGradientPickerWithState = ( props ) => {
-	const [ gradient, setGradient ] = useState();
+const CustomGradientPickerWithState = (props) => {
+	const [gradient, setGradient] = useState();
 	return (
 		<CustomGradientPicker
-			{ ...props }
-			value={ gradient }
-			onChange={ setGradient }
+			{...props}
+			value={gradient}
+			onChange={setGradient}
 		/>
 	);
 };

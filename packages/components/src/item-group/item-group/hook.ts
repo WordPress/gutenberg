@@ -11,7 +11,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemGroupProps } from '../types';
 
 export function useItemGroup(
-	props: WordPressComponentProps< ItemGroupProps, 'div' >
+	props: WordPressComponentProps<ItemGroupProps, 'div'>
 ) {
 	const {
 		className,
@@ -20,7 +20,7 @@ export function useItemGroup(
 		isSeparated = false,
 		role = 'list',
 		...otherProps
-	} = useContextSystem( props, 'ItemGroup' );
+	} = useContextSystem(props, 'ItemGroup');
 
 	const cx = useCx();
 

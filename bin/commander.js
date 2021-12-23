@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-require( './plugin/cli' );
+require('./plugin/cli');

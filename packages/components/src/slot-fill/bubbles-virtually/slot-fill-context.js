@@ -5,7 +5,7 @@
 import { createContext } from '@wordpress/element';
 import warning from '@wordpress/warning';
 
-const SlotFillContext = createContext( {
+const SlotFillContext = createContext({
 	slots: {},
 	fills: {},
 	registerSlot: () => {
@@ -18,6 +18,6 @@ const SlotFillContext = createContext( {
 	unregisterSlot: () => {},
 	registerFill: () => {},
 	unregisterFill: () => {},
-} );
+});
 
 export default SlotFillContext;

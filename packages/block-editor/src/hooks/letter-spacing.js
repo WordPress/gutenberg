@@ -23,29 +23,29 @@ export const LETTER_SPACING_SUPPORT_KEY =
  * @param {Object} props Block properties.
  * @return {WPElement}    Letter-spacing edit element.
  */
-export function LetterSpacingEdit( props ) {
+export function LetterSpacingEdit(props) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	function onChange( newSpacing ) {
-		setAttributes( {
-			style: cleanEmptyObject( {
+	function onChange(newSpacing) {
+		setAttributes({
+			style: cleanEmptyObject({
 				...style,
 				typography: {
 					...style?.typography,
 					letterSpacing: newSpacing,
 				},
-			} ),
-		} );
+			}),
+		});
 	}
 
 	return (
 		<LetterSpacingControl
-			value={ style?.typography?.letterSpacing }
-			onChange={ onChange }
-			__unstableInputWidth={ '100%' }
+			value={style?.typography?.letterSpacing}
+			onChange={onChange}
+			__unstableInputWidth={'100%'}
 		/>
 	);
 }
@@ -56,14 +56,14 @@ export function LetterSpacingEdit( props ) {
  * @param {string} name Name of the block.
  * @return {boolean}     Whether or not the setting is disabled.
  */
-export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {
-	const notSupported = ! hasBlockSupport(
+export function useIsLetterSpacingDisabled({ name: blockName } = {}) {
+	const notSupported = !hasBlockSupport(
 		blockName,
 		LETTER_SPACING_SUPPORT_KEY
 	);
-	const hasLetterSpacing = useSetting( 'typography.letterSpacing' );
+	const hasLetterSpacing = useSetting('typography.letterSpacing');
 
-	return notSupported || ! hasLetterSpacing;
+	return notSupported || !hasLetterSpacing;
 }
 
 /**
@@ -72,8 +72,8 @@ export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a letter spacing set.
  */
-export function hasLetterSpacingValue( props ) {
-	return !! props.attributes.style?.typography?.letterSpacing;
+export function hasLetterSpacingValue(props) {
+	return !!props.attributes.style?.typography?.letterSpacing;
 }
 
 /**
@@ -85,16 +85,16 @@ export function hasLetterSpacingValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetLetterSpacing( { attributes = {}, setAttributes } ) {
+export function resetLetterSpacing({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
-		style: cleanEmptyObject( {
+	setAttributes({
+		style: cleanEmptyObject({
 			...style,
 			typography: {
 				...style?.typography,
 				letterSpacing: undefined,
 			},
-		} ),
-	} );
+		}),
+	});
 }

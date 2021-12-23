@@ -16,21 +16,21 @@
  *
  * @return {Promise<OktokitIssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
  */
-async function getMilestoneByTitle( octokit, owner, repo, title ) {
-	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
+async function getMilestoneByTitle(octokit, owner, repo, title) {
+	const options = octokit.issues.listMilestonesForRepo.endpoint.merge({
 		owner,
 		repo,
-	} );
+	});
 
 	/**
 	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListMilestonesForRepoResponse>>}
 	 */
-	const responses = octokit.paginate.iterator( options );
+	const responses = octokit.paginate.iterator(options);
 
-	for await ( const response of responses ) {
+	for await (const response of responses) {
 		const milestones = response.data;
-		for ( const milestone of milestones ) {
-			if ( milestone.title === title ) {
+		for (const milestone of milestones) {
+			if (milestone.title === title) {
 				return milestone;
 			}
 		}
@@ -59,36 +59,36 @@ async function getIssuesByMilestone(
 	state,
 	closedSince
 ) {
-	const options = octokit.issues.listForRepo.endpoint.merge( {
+	const options = octokit.issues.listForRepo.endpoint.merge({
 		owner,
 		repo,
 		milestone,
 		state,
-		...( closedSince && {
+		...(closedSince && {
 			since: closedSince,
-		} ),
-	} );
+		}),
+	});
 
 	/**
 	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListForRepoResponse>>}
 	 */
-	const responses = octokit.paginate.iterator( options );
+	const responses = octokit.paginate.iterator(options);
 
 	/**
 	 * @type {import('@octokit/rest').IssuesListForRepoResponse}
 	 */
 	const pulls = [];
 
-	for await ( const response of responses ) {
+	for await (const response of responses) {
 		const issues = response.data;
-		pulls.push( ...issues );
+		pulls.push(...issues);
 	}
 
-	if ( closedSince ) {
-		const closedSinceTimestamp = new Date( closedSince );
+	if (closedSince) {
+		const closedSinceTimestamp = new Date(closedSince);
 
 		return pulls.filter(
-			( pull ) =>
+			(pull) =>
 				pull.closed_at &&
 				closedSinceTimestamp <
 					new Date(
@@ -96,7 +96,7 @@ async function getIssuesByMilestone(
 						// https://github.com/octokit/plugin-rest-endpoint-methods.js/issues/64
 						// Fixed in Octokit v18.1.1, see https://github.com/WordPress/gutenberg/pull/29043
 						/** @type {string} */ (
-							/** @type {unknown} */ ( pull.closed_at )
+							/** @type {unknown} */ (pull.closed_at)
 						)
 					)
 		);

@@ -41,22 +41,22 @@ import { createElement } from '@wordpress/element';
  * @return {{[K in keyof T as Lowercase<string & K>]: T[K]}} The mapped props.
  */
 /* eslint-enable jsdoc/valid-types */
-const lowercaseProps = ( object ) => {
+const lowercaseProps = (object) => {
 	/** @type {any} */
 	const mapped = {};
-	for ( const key in object ) {
-		mapped[ key.toLowerCase() ] = object[ key ];
+	for (const key in object) {
+		mapped[key.toLowerCase()] = object[key];
 	}
 	return mapped;
 };
 
-const memoizedLowercaseProps = memoize( lowercaseProps );
+const memoizedLowercaseProps = memoize(lowercaseProps);
 
 /**
  *
  * @param {Options} options
  */
-export function createHighlighterText( {
+export function createHighlighterText({
 	activeClassName = '',
 	activeIndex = -1,
 	activeStyle,
@@ -71,43 +71,42 @@ export function createHighlighterText( {
 	searchWords = [],
 	unhighlightClassName = '',
 	unhighlightStyle,
-} ) {
-	if ( ! children ) return null;
-	if ( typeof children !== 'string' ) return children;
+}) {
+	if (!children) return null;
+	if (typeof children !== 'string') return children;
 
 	const textToHighlight = children;
 
-	const chunks = findAll( {
+	const chunks = findAll({
 		autoEscape,
 		caseSensitive,
 		findChunks,
 		sanitize,
 		searchWords,
 		textToHighlight,
-	} );
+	});
 	const HighlightTag = highlightTag;
 	let highlightIndex = -1;
 	let highlightClassNames = '';
 	let highlightStyles;
 
-	const textContent = chunks.map( ( chunk, index ) => {
+	const textContent = chunks.map((chunk, index) => {
 		const text = textToHighlight.substr(
 			chunk.start,
 			chunk.end - chunk.start
 		);
 
-		if ( chunk.highlight ) {
+		if (chunk.highlight) {
 			highlightIndex++;
 
 			let highlightClass;
-			if ( typeof highlightClassName === 'object' ) {
-				if ( ! caseSensitive ) {
-					highlightClassName = memoizedLowercaseProps(
-						highlightClassName
-					);
-					highlightClass = highlightClassName[ text.toLowerCase() ];
+			if (typeof highlightClassName === 'object') {
+				if (!caseSensitive) {
+					highlightClassName =
+						memoizedLowercaseProps(highlightClassName);
+					highlightClass = highlightClassName[text.toLowerCase()];
 				} else {
-					highlightClass = highlightClassName[ text ];
+					highlightClass = highlightClassName[text];
 				}
 			} else {
 				highlightClass = highlightClassName;
@@ -115,12 +114,12 @@ export function createHighlighterText( {
 
 			const isActive = highlightIndex === +activeIndex;
 
-			highlightClassNames = `${ highlightClass } ${
+			highlightClassNames = `${highlightClass} ${
 				isActive ? activeClassName : ''
 			}`;
 			highlightStyles =
 				isActive === true && activeStyle !== null
-					? Object.assign( {}, highlightStyle, activeStyle )
+					? Object.assign({}, highlightStyle, activeStyle)
 					: highlightStyle;
 
 			/** @type {Record<string, any>} */
@@ -133,19 +132,19 @@ export function createHighlighterText( {
 
 			// Don't attach arbitrary props to DOM elements; this triggers React DEV warnings (https://fb.me/react-unknown-prop)
 			// Only pass through the highlightIndex attribute for custom components.
-			if ( typeof HighlightTag !== 'string' ) {
+			if (typeof HighlightTag !== 'string') {
 				props.highlightIndex = highlightIndex;
 			}
 
-			return createElement( HighlightTag, props );
+			return createElement(HighlightTag, props);
 		}
-		return createElement( 'span', {
+		return createElement('span', {
 			children: text,
 			className: unhighlightClassName,
 			key: index,
 			style: unhighlightStyle,
-		} );
-	} );
+		});
+	});
 
 	return textContent;
 }

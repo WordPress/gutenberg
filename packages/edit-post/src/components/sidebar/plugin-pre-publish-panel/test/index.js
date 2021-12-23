@@ -9,15 +9,15 @@ import { render } from '@wordpress/element';
  */
 import PluginPrePublishPanel from '../';
 
-describe( 'PluginPrePublishPanel', () => {
-	test( 'renders fill properly', () => {
-		const div = document.createElement( 'div' );
+describe('PluginPrePublishPanel', () => {
+	test('renders fill properly', () => {
+		const div = document.createElement('div');
 		render(
 			<SlotFillProvider>
 				<PluginPrePublishPanel
 					className="my-plugin-pre-publish-panel"
 					title="My panel title"
-					initialOpen={ true }
+					initialOpen={true}
 				>
 					My panel content
 				</PluginPrePublishPanel>
@@ -26,6 +26,6 @@ describe( 'PluginPrePublishPanel', () => {
 			div
 		);
 
-		expect( div.innerHTML ).toMatchSnapshot();
-	} );
-} );
+		expect(div.innerHTML).toMatchSnapshot();
+	});
+});

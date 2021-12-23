@@ -7,7 +7,7 @@
  *
  * @return {{ type: 'START_RESOLUTION', selectorName: string, args: unknown[] }} Action object.
  */
-export function startResolution( selectorName, args ) {
+export function startResolution(selectorName, args) {
 	return {
 		type: 'START_RESOLUTION',
 		selectorName,
@@ -24,7 +24,7 @@ export function startResolution( selectorName, args ) {
  *
  * @return {{ type: 'FINISH_RESOLUTION', selectorName: string, args: unknown[] }} Action object.
  */
-export function finishResolution( selectorName, args ) {
+export function finishResolution(selectorName, args) {
 	return {
 		type: 'FINISH_RESOLUTION',
 		selectorName,
@@ -42,7 +42,7 @@ export function finishResolution( selectorName, args ) {
  *
  * @return {{ type: 'START_RESOLUTIONS', selectorName: string, args: unknown[] }} Action object.
  */
-export function startResolutions( selectorName, args ) {
+export function startResolutions(selectorName, args) {
 	return {
 		type: 'START_RESOLUTIONS',
 		selectorName,
@@ -60,7 +60,7 @@ export function startResolutions( selectorName, args ) {
  *
  * @return {{ type: 'FINISH_RESOLUTIONS', selectorName: string, args: unknown[] }} Action object.
  */
-export function finishResolutions( selectorName, args ) {
+export function finishResolutions(selectorName, args) {
 	return {
 		type: 'FINISH_RESOLUTIONS',
 		selectorName,
@@ -76,7 +76,7 @@ export function finishResolutions( selectorName, args ) {
  *
  * @return {{ type: 'INVALIDATE_RESOLUTION', selectorName: string, args: any[] }} Action object.
  */
-export function invalidateResolution( selectorName, args ) {
+export function invalidateResolution(selectorName, args) {
 	return {
 		type: 'INVALIDATE_RESOLUTION',
 		selectorName,
@@ -105,7 +105,7 @@ export function invalidateResolutionForStore() {
  *
  * @return  {{ type: 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR', selectorName: string }} Action object.
  */
-export function invalidateResolutionForStoreSelector( selectorName ) {
+export function invalidateResolutionForStoreSelector(selectorName) {
 	return {
 		type: 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR',
 		selectorName,

@@ -16,8 +16,8 @@ import cleanEmptyObject from './clean-empty-object';
  * @param {Object} attributes The current attributes
  * @return {Object} The updated attributes.
  */
-export default function ( attributes ) {
-	if ( ! attributes?.style?.typography?.fontFamily ) {
+export default function (attributes) {
+	if (!attributes?.style?.typography?.fontFamily) {
 		return attributes;
 	}
 
@@ -25,10 +25,10 @@ export default function ( attributes ) {
 	// below we're not modifying the original
 	// attributes. Because the deprecation may be discarded
 	// we don't want to alter the original attributes.
-	const atts = cloneDeep( attributes );
-	const fontFamily = atts.style.typography.fontFamily.split( '|' ).pop();
+	const atts = cloneDeep(attributes);
+	const fontFamily = atts.style.typography.fontFamily.split('|').pop();
 	delete atts.style.typography.fontFamily;
-	atts.style = cleanEmptyObject( atts.style );
+	atts.style = cleanEmptyObject(atts.style);
 
 	return {
 		...atts,

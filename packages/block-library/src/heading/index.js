@@ -26,23 +26,23 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			content: __( 'Code is Poetry' ),
+			content: __('Code is Poetry'),
 			level: 2,
 		},
 	},
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
+	__experimentalLabel(attributes, { context }) {
+		if (context === 'accessibility') {
 			const { content, level } = attributes;
 
-			return isEmpty( content )
+			return isEmpty(content)
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
-						__( 'Level %s. Empty.' ),
+						__('Level %s. Empty.'),
 						level
 				  )
 				: sprintf(
 						/* translators: accessibility text. 1: heading level. 2: heading content. */
-						__( 'Level %1$s. %2$s' ),
+						__('Level %1$s. %2$s'),
 						level,
 						content
 				  );
@@ -50,11 +50,10 @@ export const settings = {
 	},
 	transforms,
 	deprecated,
-	merge( attributes, attributesToMerge ) {
+	merge(attributes, attributesToMerge) {
 		return {
 			content:
-				( attributes.content || '' ) +
-				( attributesToMerge.content || '' ),
+				(attributes.content || '') + (attributesToMerge.content || ''),
 		};
 	},
 	edit,

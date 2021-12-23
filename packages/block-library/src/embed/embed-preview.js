@@ -24,15 +24,15 @@ import WpEmbedPreview from './wp-embed-preview';
 
 class EmbedPreview extends Component {
 	constructor() {
-		super( ...arguments );
-		this.hideOverlay = this.hideOverlay.bind( this );
+		super(...arguments);
+		this.hideOverlay = this.hideOverlay.bind(this);
 		this.state = {
 			interactive: false,
 		};
 	}
 
-	static getDerivedStateFromProps( nextProps, state ) {
-		if ( ! nextProps.isSelected && state.interactive ) {
+	static getDerivedStateFromProps(nextProps, state) {
+		if (!nextProps.isSelected && state.interactive) {
 			// We only want to change this when the block is not selected, because changing it when
 			// the block becomes selected makes the overlap disappear too early. Hiding the overlay
 			// happens on mouseup when the overlay is clicked.
@@ -48,7 +48,7 @@ class EmbedPreview extends Component {
 		// and the mouse event can end up in the preview content. We can't use onClick on
 		// the overlay to hide it either, because then the editor misses the mouseup event, and
 		// thinks we're multi-selecting blocks.
-		this.setState( { interactive: true } );
+		this.setState({ interactive: true });
 	}
 
 	render() {
@@ -68,14 +68,14 @@ class EmbedPreview extends Component {
 		const { scripts } = preview;
 		const { interactive } = this.state;
 
-		const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-		const parsedHost = new URL( url ).host.split( '.' );
+		const html = 'photo' === type ? getPhotoHtml(preview) : preview.html;
+		const parsedHost = new URL(url).host.split('.');
 		const parsedHostBaseUrl = parsedHost
-			.splice( parsedHost.length - 2, parsedHost.length - 1 )
-			.join( '.' );
+			.splice(parsedHost.length - 2, parsedHost.length - 1)
+			.join('.');
 		const iframeTitle = sprintf(
 			// translators: %s: host providing embed content e.g: www.youtube.com
-			__( 'Embedded content from %s' ),
+			__('Embedded content from %s'),
 			parsedHostBaseUrl
 		);
 		const sandboxClassnames = classnames(
@@ -90,65 +90,65 @@ class EmbedPreview extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		const embedWrapper =
 			'wp-embed' === type ? (
-				<WpEmbedPreview html={ html } />
+				<WpEmbedPreview html={html} />
 			) : (
 				<div className="wp-block-embed__wrapper">
 					<SandBox
-						html={ html }
-						scripts={ scripts }
-						title={ iframeTitle }
-						type={ sandboxClassnames }
-						onFocus={ this.hideOverlay }
+						html={html}
+						scripts={scripts}
+						title={iframeTitle}
+						type={sandboxClassnames}
+						onFocus={this.hideOverlay}
 					/>
-					{ ! interactive && (
+					{!interactive && (
 						<div
 							className="block-library-embed__interactive-overlay"
-							onMouseUp={ this.hideOverlay }
+							onMouseUp={this.hideOverlay}
 						/>
-					) }
+					)}
 				</div>
 			);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 
 		return (
 			<figure
-				className={ classnames( className, 'wp-block-embed', {
+				className={classnames(className, 'wp-block-embed', {
 					'is-type-video': 'video' === type,
-				} ) }
+				})}
 			>
-				{ previewable ? (
+				{previewable ? (
 					embedWrapper
 				) : (
 					<Placeholder
-						icon={ <BlockIcon icon={ icon } showColors /> }
-						label={ label }
+						icon={<BlockIcon icon={icon} showColors />}
+						label={label}
 					>
 						<p className="components-placeholder__error">
-							<a href={ url }>{ url }</a>
+							<a href={url}>{url}</a>
 						</p>
 						<p className="components-placeholder__error">
-							{ sprintf(
+							{sprintf(
 								/* translators: %s: host providing embed content e.g: www.youtube.com */
 								__(
 									"Embedded content from %s can't be previewed in the editor."
 								),
 								parsedHostBaseUrl
-							) }
+							)}
 						</p>
 					</Placeholder>
-				) }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
+				)}
+				{(!RichText.isEmpty(caption) || isSelected) && (
 					<RichText
 						tagName="figcaption"
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ onCaptionChange }
+						placeholder={__('Add caption')}
+						value={caption}
+						onChange={onCaptionChange}
 						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						__unstableOnSplitAtEnd={() =>
+							insertBlocksAfter(createBlock('core/paragraph'))
 						}
 					/>
-				) }
+				)}
 			</figure>
 		);
 	}

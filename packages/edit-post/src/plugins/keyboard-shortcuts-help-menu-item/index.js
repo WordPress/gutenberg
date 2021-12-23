@@ -11,23 +11,23 @@ import { displayShortcut } from '@wordpress/keycodes';
  */
 import { store as editPostStore } from '../../store';
 
-export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
+export function KeyboardShortcutsHelpMenuItem({ openModal }) {
 	return (
 		<MenuItem
-			onClick={ () => {
-				openModal( 'edit-post/keyboard-shortcut-help' );
-			} }
-			shortcut={ displayShortcut.access( 'h' ) }
+			onClick={() => {
+				openModal('edit-post/keyboard-shortcut-help');
+			}}
+			shortcut={displayShortcut.access('h')}
 		>
-			{ __( 'Keyboard shortcuts' ) }
+			{__('Keyboard shortcuts')}
 		</MenuItem>
 	);
 }
 
-export default withDispatch( ( dispatch ) => {
-	const { openModal } = dispatch( editPostStore );
+export default withDispatch((dispatch) => {
+	const { openModal } = dispatch(editPostStore);
 
 	return {
 		openModal,
 	};
-} )( KeyboardShortcutsHelpMenuItem );
+})(KeyboardShortcutsHelpMenuItem);

@@ -33,118 +33,113 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'index',
 ];
 
-export default function NewTemplate( { postType } ) {
+export default function NewTemplate({ postType }) {
 	const history = useHistory();
 	const { templates, defaultTemplateTypes } = useSelect(
-		( select ) => ( {
-			templates: select( coreStore ).getEntityRecords(
+		(select) => ({
+			templates: select(coreStore).getEntityRecords(
 				'postType',
 				'wp_template',
 				{ per_page: -1 }
 			),
-			defaultTemplateTypes: select(
-				editorStore
-			).__experimentalGetDefaultTemplateTypes(),
-		} ),
+			defaultTemplateTypes:
+				select(editorStore).__experimentalGetDefaultTemplateTypes(),
+		}),
 		[]
 	);
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const { getLastEntitySaveError } = useSelect( coreStore );
+	const { saveEntityRecord } = useDispatch(coreStore);
+	const { createErrorNotice } = useDispatch(noticesStore);
+	const { getLastEntitySaveError } = useSelect(coreStore);
 
-	async function createTemplate( { slug } ) {
+	async function createTemplate({ slug }) {
 		try {
-			const { title, description } = find( defaultTemplateTypes, {
+			const { title, description } = find(defaultTemplateTypes, {
 				slug,
-			} );
+			});
 
-			const template = await saveEntityRecord(
-				'postType',
-				'wp_template',
-				{
-					excerpt: description,
-					// Slugs need to be strings, so this is for template `404`
-					slug: slug.toString(),
-					status: 'publish',
-					title,
-				}
-			);
+			const template = await saveEntityRecord('postType', 'wp_template', {
+				excerpt: description,
+				// Slugs need to be strings, so this is for template `404`
+				slug: slug.toString(),
+				status: 'publish',
+				title,
+			});
 
 			const lastEntitySaveError = getLastEntitySaveError(
 				'postType',
 				'wp_template',
 				template.id
 			);
-			if ( lastEntitySaveError ) {
+			if (lastEntitySaveError) {
 				throw lastEntitySaveError;
 			}
 
 			// Navigate to the created template editor.
-			history.push( {
+			history.push({
 				postId: template.id,
 				postType: template.type,
-			} );
+			});
 
 			// TODO: Add a success notice?
-		} catch ( error ) {
+		} catch (error) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while creating the template.' );
+					: __('An error occurred while creating the template.');
 
-			createErrorNotice( errorMessage, {
+			createErrorNotice(errorMessage, {
 				type: 'snackbar',
-			} );
+			});
 		}
 	}
 
-	const existingTemplateSlugs = map( templates, 'slug' );
+	const existingTemplateSlugs = map(templates, 'slug');
 
 	const missingTemplates = filter(
 		defaultTemplateTypes,
-		( template ) =>
-			includes( DEFAULT_TEMPLATE_SLUGS, template.slug ) &&
-			! includes( existingTemplateSlugs, template.slug )
+		(template) =>
+			includes(DEFAULT_TEMPLATE_SLUGS, template.slug) &&
+			!includes(existingTemplateSlugs, template.slug)
 	);
 
-	if ( ! missingTemplates.length ) {
+	if (!missingTemplates.length) {
 		return null;
 	}
 
 	return (
 		<DropdownMenu
 			className="edit-site-new-template-dropdown"
-			icon={ null }
-			text={ postType.labels.add_new }
-			label={ postType.labels.add_new_item }
-			popoverProps={ {
+			icon={null}
+			text={postType.labels.add_new}
+			label={postType.labels.add_new_item}
+			popoverProps={{
 				noArrow: false,
-			} }
-			toggleProps={ {
+			}}
+			toggleProps={{
 				variant: 'primary',
-			} }
+			}}
 		>
-			{ () => (
+			{() => (
 				<NavigableMenu className="edit-site-new-template-dropdown__popover">
-					<MenuGroup label={ postType.labels.add_new_item }>
-						{ map(
+					<MenuGroup label={postType.labels.add_new_item}>
+						{map(
 							missingTemplates,
-							( { title, description, slug } ) => (
+							({ title, description, slug }) => (
 								<MenuItem
-									info={ description }
-									key={ slug }
-									onClick={ () => {
-										createTemplate( { slug } );
+									info={description}
+									key={slug}
+									onClick={() => {
+										createTemplate({ slug });
 										// We will be navigated way so no need to close the dropdown.
-									} }
+									}}
 								>
-									{ title }
+									{title}
 								</MenuItem>
 							)
-						) }
+						)}
 					</MenuGroup>
 				</NavigableMenu>
-			) }
+			)}
 		</DropdownMenu>
 	);
 }

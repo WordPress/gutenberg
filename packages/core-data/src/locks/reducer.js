@@ -19,37 +19,37 @@ const DEFAULT_STATE = {
  *
  * @return {Object} Updated state.
  */
-export default function locks( state = DEFAULT_STATE, action ) {
-	switch ( action.type ) {
+export default function locks(state = DEFAULT_STATE, action) {
+	switch (action.type) {
 		case 'ENQUEUE_LOCK_REQUEST': {
 			const { request } = action;
 			return {
 				...state,
-				requests: [ request, ...state.requests ],
+				requests: [request, ...state.requests],
 			};
 		}
 		case 'GRANT_LOCK_REQUEST': {
 			const { lock, request } = action;
 			const { store, path } = request;
-			const storePath = [ store, ...path ];
+			const storePath = [store, ...path];
 
-			const newTree = deepCopyLocksTreePath( state.tree, storePath );
-			const node = getNode( newTree, storePath );
-			node.locks = [ ...node.locks, lock ];
+			const newTree = deepCopyLocksTreePath(state.tree, storePath);
+			const node = getNode(newTree, storePath);
+			node.locks = [...node.locks, lock];
 
 			return {
 				...state,
-				requests: state.requests.filter( ( r ) => r !== request ),
+				requests: state.requests.filter((r) => r !== request),
 				tree: newTree,
 			};
 		}
 		case 'RELEASE_LOCK': {
 			const { lock } = action;
-			const storePath = [ lock.store, ...lock.path ];
+			const storePath = [lock.store, ...lock.path];
 
-			const newTree = deepCopyLocksTreePath( state.tree, storePath );
-			const node = getNode( newTree, storePath );
-			node.locks = node.locks.filter( ( l ) => l !== lock );
+			const newTree = deepCopyLocksTreePath(state.tree, storePath);
+			const node = getNode(newTree, storePath);
+			node.locks = node.locks.filter((l) => l !== lock);
 
 			return {
 				...state,

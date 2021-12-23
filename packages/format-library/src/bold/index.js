@@ -11,20 +11,20 @@ import {
 import { formatBold } from '@wordpress/icons';
 
 const name = 'core/bold';
-const title = __( 'Bold' );
+const title = __('Bold');
 
 export const bold = {
 	name,
 	title,
 	tagName: 'strong',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit({ isActive, value, onChange, onFocus }) {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name, title } ) );
+			onChange(toggleFormat(value, { type: name, title }));
 		}
 
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange(toggleFormat(value, { type: name }));
 			onFocus();
 		}
 
@@ -33,20 +33,20 @@ export const bold = {
 				<RichTextShortcut
 					type="primary"
 					character="b"
-					onUse={ onToggle }
+					onUse={onToggle}
 				/>
 				<RichTextToolbarButton
 					name="bold"
-					icon={ formatBold }
-					title={ title }
-					onClick={ onClick }
-					isActive={ isActive }
+					icon={formatBold}
+					title={title}
+					onClick={onClick}
+					isActive={isActive}
 					shortcutType="primary"
 					shortcutCharacter="b"
 				/>
 				<__unstableRichTextInputEvent
 					inputType="formatBold"
-					onInput={ onToggle }
+					onInput={onToggle}
 				/>
 			</>
 		);

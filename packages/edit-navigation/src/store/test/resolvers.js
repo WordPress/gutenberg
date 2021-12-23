@@ -14,38 +14,38 @@ import {
 } from '../../constants';
 import { store as editNavigationStore } from '..';
 
-jest.mock( '@wordpress/api-fetch', () => ( {
+jest.mock('@wordpress/api-fetch', () => ({
 	__esModule: true,
 	default: jest.fn(),
-} ) );
+}));
 
 // Mock createBlock to avoid creating block in test environment
-jest.mock( '@wordpress/blocks', () => {
-	const blocks = jest.requireActual( '@wordpress/blocks' );
+jest.mock('@wordpress/blocks', () => {
+	const blocks = jest.requireActual('@wordpress/blocks');
 	let id = 0;
 
 	return {
 		...blocks,
-		createBlock( name, attributes, innerBlocks ) {
+		createBlock(name, attributes, innerBlocks) {
 			return {
-				clientId: `client-id-${ id++ }`,
+				clientId: `client-id-${id++}`,
 				name,
 				attributes,
 				innerBlocks,
 			};
 		},
 	};
-} );
+});
 
 function createRegistryWithStores() {
 	// create a registry and register stores
 	const registry = createRegistry();
 
-	registry.register( editNavigationStore );
-	registry.register( coreStore );
+	registry.register(editNavigationStore);
+	registry.register(coreStore);
 
 	// Set up the navigation post entity.
-	registry.dispatch( coreStore ).addEntities( [
+	registry.dispatch(coreStore).addEntities([
 		{
 			kind: NAVIGATION_POST_KIND,
 			name: NAVIGATION_POST_POST_TYPE,
@@ -53,7 +53,7 @@ function createRegistryWithStores() {
 			label: 'Navigation Post',
 			__experimentalNoFetch: true,
 		},
-	] );
+	]);
 
 	return registry;
 }
@@ -71,8 +71,8 @@ const mockMenuItems = [
 		parent: 0,
 		object_id: 123,
 		object: 'post',
-		classes: [ 'menu', 'classes' ],
-		xfn: [ 'nofollow' ],
+		classes: ['menu', 'classes'],
+		xfn: ['nofollow'],
 		description: 'description',
 		attr_title: 'link title',
 	},
@@ -115,44 +115,44 @@ const mockMenuItems = [
 	},
 ];
 
-describe( 'getNavigationPostForMenu', () => {
+describe('getNavigationPostForMenu', () => {
 	jest.useRealTimers();
 
-	apiFetch.mockImplementation( async ( { path, method = 'GET' } ) => {
-		if ( ! path.startsWith( '/wp/v2/menu-items?' ) ) {
-			throw new Error( `unexpected API endpoint: ${ path }` );
+	apiFetch.mockImplementation(async ({ path, method = 'GET' }) => {
+		if (!path.startsWith('/wp/v2/menu-items?')) {
+			throw new Error(`unexpected API endpoint: ${path}`);
 		}
 
-		if ( method === 'GET' ) {
+		if (method === 'GET') {
 			return mockMenuItems;
 		}
 
-		throw new Error( `unexpected API endpoint method: ${ method }` );
-	} );
+		throw new Error(`unexpected API endpoint method: ${method}`);
+	});
 
-	it( 'returns early when a menuId is not provided', async () => {
+	it('returns early when a menuId is not provided', async () => {
 		const menuId = null;
 
 		const registry = createRegistryWithStores();
 		await registry
-			.resolveSelect( editNavigationStore )
-			.getNavigationPostForMenu( menuId );
+			.resolveSelect(editNavigationStore)
+			.getNavigationPostForMenu(menuId);
 
 		const stubPost = registry
-			.select( coreStore )
-			.getEntityRecord( 'root', 'postType', menuId );
+			.select(coreStore)
+			.getEntityRecord('root', 'postType', menuId);
 
-		expect( stubPost ).toBeFalsy();
-	} );
+		expect(stubPost).toBeFalsy();
+	});
 
-	it( 'creates a stub navigation post for menu id', async () => {
+	it('creates a stub navigation post for menu id', async () => {
 		const menuId = 123;
 
 		const registry = createRegistryWithStores();
 		const stubPost = await registry
-			.resolveSelect( editNavigationStore )
-			.getNavigationPostForMenu( menuId );
+			.resolveSelect(editNavigationStore)
+			.getNavigationPostForMenu(menuId);
 
-		expect( stubPost ).toMatchSnapshot();
-	} );
-} );
+		expect(stubPost).toMatchSnapshot();
+	});
+});

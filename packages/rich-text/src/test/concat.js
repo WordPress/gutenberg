@@ -10,30 +10,30 @@ import deepFreeze from 'deep-freeze';
 import { concat } from '../concat';
 import { getSparseArrayLength } from './helpers';
 
-describe( 'concat', () => {
+describe('concat', () => {
 	const em = { type: 'em' };
 
-	it( 'should merge records', () => {
+	it('should merge records', () => {
 		const one = {
-			formats: [ , , [ em ] ],
-			replacements: [ , , , ],
+			formats: [, , [em]],
+			replacements: [, , ,],
 			text: 'one',
 		};
 		const two = {
-			formats: [ [ em ], , , ],
-			replacements: [ , , , ],
+			formats: [[em], , ,],
+			replacements: [, , ,],
 			text: 'two',
 		};
 		const three = {
-			formats: [ , , [ em ], [ em ], , , ],
-			replacements: [ , , , , , , ],
+			formats: [, , [em], [em], , ,],
+			replacements: [, , , , , ,],
 			text: 'onetwo',
 		};
 
-		const merged = concat( deepFreeze( one ), deepFreeze( two ) );
+		const merged = concat(deepFreeze(one), deepFreeze(two));
 
-		expect( merged ).not.toBe( one );
-		expect( merged ).toEqual( three );
-		expect( getSparseArrayLength( merged.formats ) ).toBe( 2 );
-	} );
-} );
+		expect(merged).not.toBe(one);
+		expect(merged).toEqual(three);
+		expect(getSparseArrayLength(merged.formats)).toBe(2);
+	});
+});

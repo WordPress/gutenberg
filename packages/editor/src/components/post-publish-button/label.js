@@ -15,7 +15,7 @@ import { withSelect } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
-export function PublishButtonLabel( {
+export function PublishButtonLabel({
 	isPublished,
 	isBeingScheduled,
 	isSaving,
@@ -23,33 +23,33 @@ export function PublishButtonLabel( {
 	hasPublishAction,
 	isAutosaving,
 	hasNonPostEntityChanges,
-} ) {
-	if ( isPublishing ) {
+}) {
+	if (isPublishing) {
 		/* translators: button label text should, if possible, be under 16 characters. */
-		return __( 'Publishing…' );
-	} else if ( isPublished && isSaving && ! isAutosaving ) {
+		return __('Publishing…');
+	} else if (isPublished && isSaving && !isAutosaving) {
 		/* translators: button label text should, if possible, be under 16 characters. */
-		return __( 'Updating…' );
-	} else if ( isBeingScheduled && isSaving && ! isAutosaving ) {
+		return __('Updating…');
+	} else if (isBeingScheduled && isSaving && !isAutosaving) {
 		/* translators: button label text should, if possible, be under 16 characters. */
-		return __( 'Scheduling…' );
+		return __('Scheduling…');
 	}
 
-	if ( ! hasPublishAction ) {
+	if (!hasPublishAction) {
 		return hasNonPostEntityChanges
-			? __( 'Submit for Review…' )
-			: __( 'Submit for Review' );
-	} else if ( isPublished ) {
-		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' );
-	} else if ( isBeingScheduled ) {
-		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
+			? __('Submit for Review…')
+			: __('Submit for Review');
+	} else if (isPublished) {
+		return hasNonPostEntityChanges ? __('Update…') : __('Update');
+	} else if (isBeingScheduled) {
+		return hasNonPostEntityChanges ? __('Schedule…') : __('Schedule');
 	}
 
-	return __( 'Publish' );
+	return __('Publish');
 }
 
-export default compose( [
-	withSelect( ( select, { forceIsSaving } ) => {
+export default compose([
+	withSelect((select, { forceIsSaving }) => {
 		const {
 			isCurrentPostPublished,
 			isEditedPostBeingScheduled,
@@ -58,7 +58,7 @@ export default compose( [
 			getCurrentPost,
 			getCurrentPostType,
 			isAutosavingPost,
-		} = select( editorStore );
+		} = select(editorStore);
 		return {
 			isPublished: isCurrentPostPublished(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
@@ -66,11 +66,11 @@ export default compose( [
 			isPublishing: isPublishingPost(),
 			hasPublishAction: get(
 				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
+				['_links', 'wp:action-publish'],
 				false
 			),
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 		};
-	} ),
-] )( PublishButtonLabel );
+	}),
+])(PublishButtonLabel);

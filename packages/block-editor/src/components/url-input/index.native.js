@@ -8,25 +8,25 @@ import { TextInput } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 
-export default function URLInput( {
+export default function URLInput({
 	value = '',
 	autoFocus = true,
 	onChange,
 	...extraProps
-} ) {
+}) {
 	/* eslint-disable jsx-a11y/no-autofocus */
 	return (
 		<TextInput
-			autoFocus={ autoFocus }
+			autoFocus={autoFocus}
 			editable
 			selectTextOnFocus
 			autoCapitalize="none"
-			autoCorrect={ false }
+			autoCorrect={false}
 			textContentType="URL"
-			value={ value }
-			onChangeText={ onChange }
-			placeholder={ __( 'Paste URL' ) }
-			{ ...extraProps }
+			value={value}
+			onChangeText={onChange}
+			placeholder={__('Paste URL')}
+			{...extraProps}
 		/>
 	);
 	/* eslint-enable jsx-a11y/no-autofocus */

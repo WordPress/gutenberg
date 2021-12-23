@@ -24,49 +24,49 @@ export default {
 	},
 };
 
-const RangeControlWithState = ( props ) => {
+const RangeControlWithState = (props) => {
 	const initialValue = props.value === undefined ? 5 : props.value;
-	const [ value, setValue ] = useState( initialValue );
+	const [value, setValue] = useState(initialValue);
 
-	return <RangeControl { ...props } value={ value } onChange={ setValue } />;
+	return <RangeControl {...props} value={value} onChange={setValue} />;
 };
 
 const DefaultExample = () => {
-	const [ value, setValue ] = useState( undefined );
+	const [value, setValue] = useState(undefined);
 
-	const showBeforeIcon = boolean( 'beforeIcon', false );
-	const showAfterIcon = boolean( 'afterIcon', false );
+	const showBeforeIcon = boolean('beforeIcon', false);
+	const showAfterIcon = boolean('afterIcon', false);
 
 	const props = {
 		afterIcon: showAfterIcon ? wordpress : undefined,
-		allowReset: boolean( 'allowReset', false ),
+		allowReset: boolean('allowReset', false),
 		beforeIcon: showBeforeIcon ? wordpress : undefined,
-		color: text( 'color', COLORS.ui.theme ),
-		disabled: boolean( 'disabled', false ),
-		help: text( 'help', '' ),
-		label: text( 'label', 'Range Label' ),
-		marks: boolean( 'marks', false ),
-		max: number( 'max', 100 ),
-		min: number( 'min', 0 ),
-		showTooltip: boolean( 'showTooltip', false ),
-		step: text( 'step', 1 ),
-		railColor: text( 'railColor', null ),
-		trackColor: text( 'trackColor', null ),
-		withInputField: boolean( 'withInputField', true ),
+		color: text('color', COLORS.ui.theme),
+		disabled: boolean('disabled', false),
+		help: text('help', ''),
+		label: text('label', 'Range Label'),
+		marks: boolean('marks', false),
+		max: number('max', 100),
+		min: number('min', 0),
+		showTooltip: boolean('showTooltip', false),
+		step: text('step', 1),
+		railColor: text('railColor', null),
+		trackColor: text('trackColor', null),
+		withInputField: boolean('withInputField', true),
 		value,
 		onChange: setValue,
 	};
 
 	return (
 		<Wrapper>
-			<RangeControl { ...props } />
+			<RangeControl {...props} />
 		</Wrapper>
 	);
 };
 
-const RangeControlLabeledByMarksType = ( props ) => {
-	const label = Array.isArray( props.marks ) ? 'Custom' : 'Automatic';
-	return <RangeControl { ...{ ...props, label } } />;
+const RangeControlLabeledByMarksType = (props) => {
+	const label = Array.isArray(props.marks) ? 'Custom' : 'Automatic';
+	return <RangeControl {...{ ...props, label }} />;
 };
 
 export const _default = () => {
@@ -74,15 +74,15 @@ export const _default = () => {
 };
 
 export const InitialValueZero = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
+	const label = text('Label', 'How many columns should this use?');
 
 	return (
 		<RangeControlWithState
-			initialPosition={ 0 }
-			label={ label }
-			max={ 20 }
-			min={ 0 }
-			value={ null }
+			initialPosition={0}
+			label={label}
+			max={20}
+			min={0}
+			value={null}
 		/>
 	);
 };
@@ -92,51 +92,51 @@ export const withAnyStep = () => {
 };
 
 export const withHelp = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
+	const label = text('Label', 'How many columns should this use?');
 	const help = text(
 		'Help Text',
 		'Please select the number of columns you would like this to contain.'
 	);
 
-	return <RangeControlWithState label={ label } help={ help } />;
+	return <RangeControlWithState label={label} help={help} />;
 };
 
 export const withMinimumAndMaximumLimits = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-	const min = number( 'Min Value', 2 );
-	const max = number( 'Max Value', 10 );
+	const label = text('Label', 'How many columns should this use?');
+	const min = number('Min Value', 2);
+	const max = number('Max Value', 10);
 
-	return <RangeControlWithState label={ label } min={ min } max={ max } />;
+	return <RangeControlWithState label={label} min={min} max={max} />;
 };
 
 export const withIconBefore = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-	const showIcon = boolean( 'icon', true );
+	const label = text('Label', 'How many columns should this use?');
+	const showIcon = boolean('icon', true);
 
 	return (
 		<RangeControlWithState
-			label={ label }
-			beforeIcon={ showIcon ? wordpress : undefined }
+			label={label}
+			beforeIcon={showIcon ? wordpress : undefined}
 		/>
 	);
 };
 
 export const withIconAfter = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
-	const showIcon = boolean( 'icon', true );
+	const label = text('Label', 'How many columns should this use?');
+	const showIcon = boolean('icon', true);
 
 	return (
 		<RangeControlWithState
-			label={ label }
-			afterIcon={ showIcon ? wordpress : undefined }
+			label={label}
+			afterIcon={showIcon ? wordpress : undefined}
 		/>
 	);
 };
 
 export const withReset = () => {
-	const label = text( 'Label', 'How many columns should this use?' );
+	const label = text('Label', 'How many columns should this use?');
 
-	return <RangeControlWithState label={ label } allowReset />;
+	return <RangeControlWithState label={label} allowReset />;
 };
 
 export const marks = () => {
@@ -170,24 +170,24 @@ export const marks = () => {
 	return (
 		<Wrapper>
 			<h2>Integer Step</h2>
-			<Range marks { ...stepInteger } />
-			<Range marks={ marksBase } { ...stepInteger } />
+			<Range marks {...stepInteger} />
+			<Range marks={marksBase} {...stepInteger} />
 
 			<h2>Decimal Step</h2>
-			<Range marks { ...stepDecimal } />
-			<Range marks={ marksWithDecimal } { ...stepDecimal } />
+			<Range marks {...stepDecimal} />
+			<Range marks={marksWithDecimal} {...stepDecimal} />
 
 			<h2>Negative Minimum</h2>
-			<Range marks { ...minNegative } />
-			<Range marks={ marksWithNegatives } { ...minNegative } />
+			<Range marks {...minNegative} />
+			<Range marks={marksWithNegatives} {...minNegative} />
 
 			<h2>Negative Range</h2>
-			<Range marks { ...rangeNegative } />
-			<Range marks={ marksWithNegatives } { ...rangeNegative } />
+			<Range marks {...rangeNegative} />
+			<Range marks={marksWithNegatives} {...rangeNegative} />
 
 			<h2>Any Step</h2>
-			<Range marks { ...{ ...stepInteger, step: 'any' } } />
-			<Range marks={ marksBase } { ...{ ...stepInteger, step: 'any' } } />
+			<Range marks {...{ ...stepInteger, step: 'any' }} />
+			<Range marks={marksBase} {...{ ...stepInteger, step: 'any' }} />
 		</Wrapper>
 	);
 };

@@ -9,8 +9,8 @@ import { remove } from '@wordpress/dom';
  * @param {Node} node The node to be processed.
  * @return {void}
  */
-export default function commentRemover( node ) {
-	if ( node.nodeType === node.COMMENT_NODE ) {
-		remove( node );
+export default function commentRemover(node) {
+	if (node.nodeType === node.COMMENT_NODE) {
+		remove(node);
 	}
 }

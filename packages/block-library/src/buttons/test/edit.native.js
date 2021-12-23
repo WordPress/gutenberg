@@ -15,71 +15,71 @@ import {
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
-beforeAll( () => {
+beforeAll(() => {
 	// Register all core blocks
 	registerCoreBlocks();
-} );
+});
 
-afterAll( () => {
+afterAll(() => {
 	// Clean up registered blocks
-	getBlockTypes().forEach( ( block ) => {
-		unregisterBlockType( block.name );
-	} );
-} );
+	getBlockTypes().forEach((block) => {
+		unregisterBlockType(block.name);
+	});
+});
 
-describe( 'when a button is shown', () => {
-	it( 'adjusts the border radius', async () => {
+describe('when a button is shown', () => {
+	it('adjusts the border radius', async () => {
 		const initialHtml = `<!-- wp:buttons -->
 		<div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":"5px"}}} -->
 		<div class="wp-block-button"><a class="wp-block-button__link" style="border-radius:5px" >Hello</a></div>
 		<!-- /wp:button --></div>
 		<!-- /wp:buttons -->`;
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor({
 			initialHtml,
-		} );
+		});
 
-		const buttonsBlock = await waitFor( () =>
-			getByA11yLabel( /Buttons Block\. Row 1/ )
+		const buttonsBlock = await waitFor(() =>
+			getByA11yLabel(/Buttons Block\. Row 1/)
 		);
-		fireEvent.press( buttonsBlock );
+		fireEvent.press(buttonsBlock);
 
 		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
-		const innerBlockListWrapper = await waitFor( () =>
-			within( buttonsBlock ).getByTestId( 'block-list-wrapper' )
+		const innerBlockListWrapper = await waitFor(() =>
+			within(buttonsBlock).getByTestId('block-list-wrapper')
 		);
-		fireEvent( innerBlockListWrapper, 'layout', {
+		fireEvent(innerBlockListWrapper, 'layout', {
 			nativeEvent: {
 				layout: {
 					width: 100,
 				},
 			},
-		} );
+		});
 
-		const buttonInnerBlock = await waitFor( () =>
-			within( buttonsBlock ).getByA11yLabel( /Button Block\. Row 1/ )
+		const buttonInnerBlock = await waitFor(() =>
+			within(buttonsBlock).getByA11yLabel(/Button Block\. Row 1/)
 		);
-		fireEvent.press( buttonInnerBlock );
+		fireEvent.press(buttonInnerBlock);
 
-		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+		const settingsButton = await waitFor(() =>
+			getByA11yLabel('Open Settings')
 		);
-		fireEvent.press( settingsButton );
+		fireEvent.press(settingsButton);
 
-		const radiusStepper = await waitFor( () =>
-			getByA11yLabel( /Border Radius/ )
+		const radiusStepper = await waitFor(() =>
+			getByA11yLabel(/Border Radius/)
 		);
 
-		const incrementButton = await waitFor( () =>
-			within( radiusStepper ).getByTestId( 'Increment' )
+		const incrementButton = await waitFor(() =>
+			within(radiusStepper).getByTestId('Increment')
 		);
-		fireEvent( incrementButton, 'onPressIn' );
+		fireEvent(incrementButton, 'onPressIn');
 
 		const expectedHtml = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":"6px"}}} -->
 <div class="wp-block-button"><a class="wp-block-button__link" href="" style="border-radius:6px">Hello</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`;
-		expect( getEditorHtml() ).toBe( expectedHtml );
-	} );
-} );
+		expect(getEditorHtml()).toBe(expectedHtml);
+	});
+});

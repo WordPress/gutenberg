@@ -39,9 +39,9 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
-	const instanceId = useInstanceId( ListViewBlockSelectButton );
-	const descriptionId = `list-view-block-select-button__${ instanceId }`;
+	const blockInformation = useBlockDisplayInformation(clientId);
+	const instanceId = useInstanceId(ListViewBlockSelectButton);
+	const descriptionId = `list-view-block-select-button__${instanceId}`;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
 		siblingBlockCount,
@@ -52,58 +52,56 @@ function ListViewBlockSelectButton(
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
 	// We need to clear any HTML drag data to prevent `pasteHandler` from firing
 	// inside the `useOnBlockDrop` hook.
-	const onDragStartHandler = ( event ) => {
+	const onDragStartHandler = (event) => {
 		event.dataTransfer.clearData();
-		onDragStart( event );
+		onDragStart(event);
 	};
 
-	function onKeyDownHandler( event ) {
-		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+	function onKeyDownHandler(event) {
+		if (event.keyCode === ENTER || event.keyCode === SPACE) {
 			event.preventDefault();
-			onClick( event );
+			onClick(event);
 		}
 	}
 
 	return (
 		<>
 			<Button
-				className={ classnames(
+				className={classnames(
 					'block-editor-list-view-block-select-button',
 					className
-				) }
-				onClick={ onClick }
-				onKeyDown={ onKeyDownHandler }
-				aria-describedby={ descriptionId }
-				ref={ ref }
-				tabIndex={ tabIndex }
-				onFocus={ onFocus }
-				onDragStart={ onDragStartHandler }
-				onDragEnd={ onDragEnd }
-				draggable={ draggable }
-				href={ `#block-${ clientId }` }
+				)}
+				onClick={onClick}
+				onKeyDown={onKeyDownHandler}
+				aria-describedby={descriptionId}
+				ref={ref}
+				tabIndex={tabIndex}
+				onFocus={onFocus}
+				onDragStart={onDragStartHandler}
+				onDragEnd={onDragEnd}
+				draggable={draggable}
+				href={`#block-${clientId}`}
 			>
-				<ListViewExpander onClick={ onToggleExpanded } />
-				<BlockIcon icon={ blockInformation?.icon } showColors />
-				<BlockTitle clientId={ clientId } />
-				{ blockInformation?.anchor && (
+				<ListViewExpander onClick={onToggleExpanded} />
+				<BlockIcon icon={blockInformation?.icon} showColors />
+				<BlockTitle clientId={clientId} />
+				{blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor">
-						{ blockInformation.anchor }
+						{blockInformation.anchor}
 					</span>
-				) }
-				{ isSelected && (
-					<VisuallyHidden>
-						{ __( '(selected block)' ) }
-					</VisuallyHidden>
-				) }
+				)}
+				{isSelected && (
+					<VisuallyHidden>{__('(selected block)')}</VisuallyHidden>
+				)}
 			</Button>
 			<div
 				className="block-editor-list-view-block-select-button__description"
-				id={ descriptionId }
+				id={descriptionId}
 			>
-				{ blockPositionDescription }
+				{blockPositionDescription}
 			</div>
 		</>
 	);
 }
 
-export default forwardRef( ListViewBlockSelectButton );
+export default forwardRef(ListViewBlockSelectButton);

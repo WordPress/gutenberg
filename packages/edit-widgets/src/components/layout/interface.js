@@ -23,23 +23,20 @@ import SecondarySidebar from '../secondary-sidebar';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the widgets screen top bar landmark region. */
-	header: __( 'Widgets top bar' ),
+	header: __('Widgets top bar'),
 	/* translators: accessibility text for the widgets screen content landmark region. */
-	body: __( 'Widgets and blocks' ),
+	body: __('Widgets and blocks'),
 	/* translators: accessibility text for the widgets screen settings landmark region. */
-	sidebar: __( 'Widgets settings' ),
+	sidebar: __('Widgets settings'),
 	/* translators: accessibility text for the widgets screen footer landmark region. */
-	footer: __( 'Widgets footer' ),
+	footer: __('Widgets footer'),
 };
 
-function Interface( { blockEditorSettings } ) {
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const {
-		setIsInserterOpened,
-		setIsListViewOpened,
-		closeGeneralSidebar,
-	} = useDispatch( editWidgetsStore );
+function Interface({ blockEditorSettings }) {
+	const isMobileViewport = useViewportMatch('medium', '<');
+	const isHugeViewport = useViewportMatch('huge', '>=');
+	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
+		useDispatch(editWidgetsStore);
 	const {
 		hasBlockBreadCrumbsEnabled,
 		hasSidebarEnabled,
@@ -48,15 +45,16 @@ function Interface( { blockEditorSettings } ) {
 		previousShortcut,
 		nextShortcut,
 	} = useSelect(
-		( select ) => ( {
-			hasSidebarEnabled: !! select(
+		(select) => ({
+			hasSidebarEnabled: !!select(
 				interfaceStore
-			).getActiveComplementaryArea( editWidgetsStore.name ),
-			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
-			isListViewOpened: !! select( editWidgetsStore ).isListViewOpened(),
-			hasBlockBreadCrumbsEnabled: select(
-				interfaceStore
-			).isFeatureActive( 'core/edit-widgets', 'showBlockBreadcrumbs' ),
+			).getActiveComplementaryArea(editWidgetsStore.name),
+			isInserterOpened: !!select(editWidgetsStore).isInserterOpened(),
+			isListViewOpened: !!select(editWidgetsStore).isListViewOpened(),
+			hasBlockBreadCrumbsEnabled: select(interfaceStore).isFeatureActive(
+				'core/edit-widgets',
+				'showBlockBreadcrumbs'
+			),
 			previousShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations(
@@ -64,30 +62,30 @@ function Interface( { blockEditorSettings } ) {
 			),
 			nextShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-widgets/next-region' ),
-		} ),
+			).getAllShortcutKeyCombinations('core/edit-widgets/next-region'),
+		}),
 		[]
 	);
 
 	// Inserter and Sidebars are mutually exclusive
-	useEffect( () => {
-		if ( hasSidebarEnabled && ! isHugeViewport ) {
-			setIsInserterOpened( false );
-			setIsListViewOpened( false );
+	useEffect(() => {
+		if (hasSidebarEnabled && !isHugeViewport) {
+			setIsInserterOpened(false);
+			setIsListViewOpened(false);
 		}
-	}, [ hasSidebarEnabled, isHugeViewport ] );
+	}, [hasSidebarEnabled, isHugeViewport]);
 
-	useEffect( () => {
-		if ( ( isInserterOpened || isListViewOpened ) && ! isHugeViewport ) {
+	useEffect(() => {
+		if ((isInserterOpened || isListViewOpened) && !isHugeViewport) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
+	}, [isInserterOpened, isListViewOpened, isHugeViewport]);
 
 	return (
 		<InterfaceSkeleton
-			labels={ interfaceLabels }
-			header={ <Header /> }
-			secondarySidebar={ <SecondarySidebar /> }
+			labels={interfaceLabels}
+			header={<Header />}
+			secondarySidebar={<SecondarySidebar />}
 			sidebar={
 				hasSidebarEnabled && (
 					<ComplementaryArea.Slot scope="core/edit-widgets" />
@@ -96,23 +94,23 @@ function Interface( { blockEditorSettings } ) {
 			content={
 				<>
 					<WidgetAreasBlockEditorContent
-						blockEditorSettings={ blockEditorSettings }
+						blockEditorSettings={blockEditorSettings}
 					/>
 					<BlockStyles.Slot scope="core/block-inspector" />
 				</>
 			}
 			footer={
 				hasBlockBreadCrumbsEnabled &&
-				! isMobileViewport && (
+				!isMobileViewport && (
 					<div className="edit-widgets-layout__footer">
-						<BlockBreadcrumb rootLabelText={ __( 'Widgets' ) } />
+						<BlockBreadcrumb rootLabelText={__('Widgets')} />
 					</div>
 				)
 			}
-			shortcuts={ {
+			shortcuts={{
 				previous: previousShortcut,
 				next: nextShortcut,
-			} }
+			}}
 		/>
 	);
 }

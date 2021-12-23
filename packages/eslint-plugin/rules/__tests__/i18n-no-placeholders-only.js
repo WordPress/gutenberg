@@ -8,13 +8,13 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../i18n-no-placeholders-only';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 	},
-} );
+});
 
-ruleTester.run( 'i18n-no-placeholders-only', rule, {
+ruleTester.run('i18n-no-placeholders-only', rule, {
 	valid: [
 		{
 			code: `__( 'Hello %s' )`,
@@ -29,15 +29,15 @@ ruleTester.run( 'i18n-no-placeholders-only', rule, {
 	invalid: [
 		{
 			code: `__( '%s' )`,
-			errors: [ { messageId: 'noPlaceholdersOnly' } ],
+			errors: [{ messageId: 'noPlaceholdersOnly' }],
 		},
 		{
 			code: `__( '%s%s' )`,
-			errors: [ { messageId: 'noPlaceholdersOnly' } ],
+			errors: [{ messageId: 'noPlaceholdersOnly' }],
 		},
 		{
 			code: `_x( '%1$s' )`,
-			errors: [ { messageId: 'noPlaceholdersOnly' } ],
+			errors: [{ messageId: 'noPlaceholdersOnly' }],
 		},
 		{
 			code: `_n( '%s', '%s', number)`,
@@ -47,4 +47,4 @@ ruleTester.run( 'i18n-no-placeholders-only', rule, {
 			],
 		},
 	],
-} );
+});

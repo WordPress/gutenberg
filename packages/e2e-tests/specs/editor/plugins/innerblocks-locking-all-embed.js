@@ -13,44 +13,42 @@ import {
 
 const MOCK_RESPONSES = [
 	{
-		match: createEmbeddingMatcher( 'https://twitter.com/wordpress' ),
-		onRequestMatch: createJSONResponse( {
+		match: createEmbeddingMatcher('https://twitter.com/wordpress'),
+		onRequestMatch: createJSONResponse({
 			url: 'https://twitter.com/wordpress',
 			html: '<p>Mock success response.</p>',
 			type: 'rich',
 			provider_name: 'Twitter',
 			provider_url: 'https://twitter.com',
 			version: '1.0',
-		} ),
+		}),
 	},
 ];
 
-describe( 'Embed block inside a locked all parent', () => {
-	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-innerblocks-locking-all-embed' );
-	} );
+describe('Embed block inside a locked all parent', () => {
+	beforeAll(async () => {
+		await activatePlugin('gutenberg-test-innerblocks-locking-all-embed');
+	});
 
-	beforeEach( async () => {
-		await setUpResponseMocking( MOCK_RESPONSES );
+	beforeEach(async () => {
+		await setUpResponseMocking(MOCK_RESPONSES);
 		await createNewPost();
-	} );
+	});
 
-	afterAll( async () => {
-		await deactivatePlugin(
-			'gutenberg-test-innerblocks-locking-all-embed'
-		);
-	} );
+	afterAll(async () => {
+		await deactivatePlugin('gutenberg-test-innerblocks-locking-all-embed');
+	});
 
-	it( 'embed block should be able to embed external content', async () => {
-		await insertBlock( 'Test Inner Blocks Locking All Embed' );
+	it('embed block should be able to embed external content', async () => {
+		await insertBlock('Test Inner Blocks Locking All Embed');
 		const embedInputSelector =
 			'.components-placeholder__input[aria-label="Embed URL"]';
-		await page.waitForSelector( embedInputSelector );
-		await page.click( embedInputSelector );
+		await page.waitForSelector(embedInputSelector);
+		await page.click(embedInputSelector);
 		// This URL should not have a trailing slash.
-		await page.keyboard.type( 'https://twitter.com/wordpress' );
-		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type('https://twitter.com/wordpress');
+		await page.keyboard.press('Enter');
 		// The twitter block should appear correctly.
-		await page.waitForSelector( 'figure.wp-block-embed' );
-	} );
-} );
+		await page.waitForSelector('figure.wp-block-embed');
+	});
+});

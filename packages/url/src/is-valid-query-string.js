@@ -11,9 +11,9 @@
  *
  * @return {boolean} True if the argument contains a valid query string.
  */
-export function isValidQueryString( queryString ) {
-	if ( ! queryString ) {
+export function isValidQueryString(queryString) {
+	if (!queryString) {
 		return false;
 	}
-	return /^[^\s#?\/]+$/.test( queryString );
+	return /^[^\s#?\/]+$/.test(queryString);
 }

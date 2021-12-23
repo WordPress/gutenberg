@@ -1,11 +1,11 @@
-const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
+const tableContentPasteSchema = ({ phrasingContentSchema }) => ({
 	tr: {
 		allowEmpty: true,
 		children: {
 			th: {
 				allowEmpty: true,
 				children: phrasingContentSchema,
-				attributes: [ 'scope' ],
+				attributes: ['scope'],
 			},
 			td: {
 				allowEmpty: true,
@@ -13,26 +13,26 @@ const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
 			},
 		},
 	},
-} );
+});
 
-const tablePasteSchema = ( args ) => ( {
+const tablePasteSchema = (args) => ({
 	table: {
 		children: {
 			thead: {
 				allowEmpty: true,
-				children: tableContentPasteSchema( args ),
+				children: tableContentPasteSchema(args),
 			},
 			tfoot: {
 				allowEmpty: true,
-				children: tableContentPasteSchema( args ),
+				children: tableContentPasteSchema(args),
 			},
 			tbody: {
 				allowEmpty: true,
-				children: tableContentPasteSchema( args ),
+				children: tableContentPasteSchema(args),
 			},
 		},
 	},
-} );
+});
 
 const transforms = {
 	from: [

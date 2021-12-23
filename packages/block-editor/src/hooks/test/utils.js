@@ -13,38 +13,38 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import '../anchor';
 
-describe( 'anchor', () => {
+describe('anchor', () => {
 	const blockSettings = {
 		save: noop,
 		category: 'text',
 		title: 'block title',
 	};
 
-	describe( 'addAttribute()', () => {
+	describe('addAttribute()', () => {
 		const registerBlockType = applyFilters.bind(
 			null,
 			'blocks.registerBlockType'
 		);
 
-		it( 'should do nothing if the block settings do not define anchor support', () => {
-			const settings = registerBlockType( blockSettings );
+		it('should do nothing if the block settings do not define anchor support', () => {
+			const settings = registerBlockType(blockSettings);
 
-			expect( settings.attributes ).toBe( undefined );
-		} );
+			expect(settings.attributes).toBe(undefined);
+		});
 
-		it( 'should assign a new anchor attribute', () => {
-			const settings = registerBlockType( {
+		it('should assign a new anchor attribute', () => {
+			const settings = registerBlockType({
 				...blockSettings,
 				supports: {
 					anchor: true,
 				},
-			} );
+			});
 
-			expect( settings.attributes ).toHaveProperty( 'anchor' );
-		} );
+			expect(settings.attributes).toHaveProperty('anchor');
+		});
 
-		it( 'should not override attributes defined in settings', () => {
-			const settings = registerBlockType( {
+		it('should not override attributes defined in settings', () => {
+			const settings = registerBlockType({
 				...blockSettings,
 				supports: {
 					anchor: true,
@@ -55,22 +55,22 @@ describe( 'anchor', () => {
 						default: 'testAnchor',
 					},
 				},
-			} );
+			});
 
-			expect( settings.attributes.anchor ).toEqual( {
+			expect(settings.attributes.anchor).toEqual({
 				type: 'string',
 				default: 'testAnchor',
-			} );
-		} );
-	} );
+			});
+		});
+	});
 
-	describe( 'addSaveProps', () => {
+	describe('addSaveProps', () => {
 		const getSaveContentExtraProps = applyFilters.bind(
 			null,
 			'blocks.getSaveContent.extraProps'
 		);
 
-		it( 'should do nothing if the block settings do not define anchor support', () => {
+		it('should do nothing if the block settings do not define anchor support', () => {
 			const attributes = { anchor: 'foo' };
 			const extraProps = getSaveContentExtraProps(
 				{},
@@ -78,10 +78,10 @@ describe( 'anchor', () => {
 				attributes
 			);
 
-			expect( extraProps ).not.toHaveProperty( 'id' );
-		} );
+			expect(extraProps).not.toHaveProperty('id');
+		});
 
-		it( 'should inject anchor attribute ID', () => {
+		it('should inject anchor attribute ID', () => {
 			const attributes = { anchor: 'foo' };
 			const extraProps = getSaveContentExtraProps(
 				{},
@@ -94,10 +94,10 @@ describe( 'anchor', () => {
 				attributes
 			);
 
-			expect( extraProps.id ).toBe( 'foo' );
-		} );
+			expect(extraProps.id).toBe('foo');
+		});
 
-		it( 'should remove an anchor attribute ID when feild is cleared', () => {
+		it('should remove an anchor attribute ID when feild is cleared', () => {
 			const attributes = { anchor: '' };
 			const extraProps = getSaveContentExtraProps(
 				{},
@@ -110,7 +110,7 @@ describe( 'anchor', () => {
 				attributes
 			);
 
-			expect( extraProps.id ).toBe( null );
-		} );
-	} );
-} );
+			expect(extraProps.id).toBe(null);
+		});
+	});
+});

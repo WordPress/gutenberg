@@ -8,17 +8,17 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-function usePatternsSetup( clientId, blockName, filterPatternsFn ) {
+function usePatternsSetup(clientId, blockName, filterPatternsFn) {
 	return useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getBlockRootClientId,
 				__experimentalGetPatternsByBlockTypes,
 				__experimentalGetAllowedPatterns,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
-			if ( filterPatternsFn ) {
-				return __experimentalGetAllowedPatterns( rootClientId ).filter(
+			} = select(blockEditorStore);
+			const rootClientId = getBlockRootClientId(clientId);
+			if (filterPatternsFn) {
+				return __experimentalGetAllowedPatterns(rootClientId).filter(
 					filterPatternsFn
 				);
 			}
@@ -27,7 +27,7 @@ function usePatternsSetup( clientId, blockName, filterPatternsFn ) {
 				rootClientId
 			);
 		},
-		[ clientId, blockName, filterPatternsFn ]
+		[clientId, blockName, filterPatternsFn]
 	);
 }
 

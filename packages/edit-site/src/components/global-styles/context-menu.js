@@ -14,39 +14,33 @@ import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import NavigationButton from './navigation-button';
 
-function ContextMenu( { name, parentMenu = '' } ) {
-	const hasTypographyPanel = useHasTypographyPanel( name );
-	const hasColorPanel = useHasColorPanel( name );
-	const hasBorderPanel = useHasBorderPanel( name );
-	const hasDimensionsPanel = useHasDimensionsPanel( name );
+function ContextMenu({ name, parentMenu = '' }) {
+	const hasTypographyPanel = useHasTypographyPanel(name);
+	const hasColorPanel = useHasColorPanel(name);
+	const hasBorderPanel = useHasBorderPanel(name);
+	const hasDimensionsPanel = useHasDimensionsPanel(name);
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 
 	return (
 		<ItemGroup>
-			{ hasTypographyPanel && (
+			{hasTypographyPanel && (
 				<NavigationButton
-					icon={ typography }
-					path={ parentMenu + '/typography' }
+					icon={typography}
+					path={parentMenu + '/typography'}
 				>
-					{ __( 'Typography' ) }
+					{__('Typography')}
 				</NavigationButton>
-			) }
-			{ hasColorPanel && (
-				<NavigationButton
-					icon={ color }
-					path={ parentMenu + '/colors' }
-				>
-					{ __( 'Colors' ) }
+			)}
+			{hasColorPanel && (
+				<NavigationButton icon={color} path={parentMenu + '/colors'}>
+					{__('Colors')}
 				</NavigationButton>
-			) }
-			{ hasLayoutPanel && (
-				<NavigationButton
-					icon={ layout }
-					path={ parentMenu + '/layout' }
-				>
-					{ __( 'Layout' ) }
+			)}
+			{hasLayoutPanel && (
+				<NavigationButton icon={layout} path={parentMenu + '/layout'}>
+					{__('Layout')}
 				</NavigationButton>
-			) }
+			)}
 		</ItemGroup>
 	);
 }

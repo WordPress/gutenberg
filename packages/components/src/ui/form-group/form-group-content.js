@@ -14,7 +14,7 @@ import FormGroupLabel from './form-group-label';
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').FormGroupContentProps, 'label', false>} props
  */
-function FormGroupContent( {
+function FormGroupContent({
 	alignLabel,
 	children,
 	help,
@@ -25,35 +25,32 @@ function FormGroupContent( {
 	spacing = 2,
 	truncate,
 	...props
-} ) {
-	const contextProps = useMemo( () => ( { id, horizontal } ), [
-		id,
-		horizontal,
-	] );
+}) {
+	const contextProps = useMemo(() => ({ id, horizontal }), [id, horizontal]);
 
 	const content = help ? (
-		<VStack expanded={ false } spacing={ spacing }>
-			{ children }
-			<FormGroupHelp>{ help }</FormGroupHelp>
+		<VStack expanded={false} spacing={spacing}>
+			{children}
+			<FormGroupHelp>{help}</FormGroupHelp>
 		</VStack>
 	) : (
 		children
 	);
 
 	return (
-		<FormGroupContext.Provider value={ contextProps }>
+		<FormGroupContext.Provider value={contextProps}>
 			<FormGroupLabel
-				align={ alignLabel }
-				id={ id }
-				labelHidden={ labelHidden }
-				truncate={ truncate }
-				{ ...props }
+				align={alignLabel}
+				id={id}
+				labelHidden={labelHidden}
+				truncate={truncate}
+				{...props}
 			>
-				{ label }
+				{label}
 			</FormGroupLabel>
-			{ content }
+			{content}
 		</FormGroupContext.Provider>
 	);
 }
 
-export default memo( FormGroupContent );
+export default memo(FormGroupContent);

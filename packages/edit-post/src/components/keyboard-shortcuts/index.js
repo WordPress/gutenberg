@@ -17,18 +17,14 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getBlockSelectionStart } = useSelect( blockEditorStore );
-	const {
-		getEditorMode,
-		isEditorSidebarOpened,
-		isListViewOpened,
-	} = useSelect( editPostStore );
-	const isModeToggleDisabled = useSelect( ( select ) => {
-		const { richEditingEnabled, codeEditingEnabled } = select(
-			editorStore
-		).getEditorSettings();
-		return ! richEditingEnabled || ! codeEditingEnabled;
-	}, [] );
+	const { getBlockSelectionStart } = useSelect(blockEditorStore);
+	const { getEditorMode, isEditorSidebarOpened, isListViewOpened } =
+		useSelect(editPostStore);
+	const isModeToggleDisabled = useSelect((select) => {
+		const { richEditingEnabled, codeEditingEnabled } =
+			select(editorStore).getEditorSettings();
+		return !richEditingEnabled || !codeEditingEnabled;
+	}, []);
 
 	const {
 		switchEditorMode,
@@ -36,54 +32,54 @@ function KeyboardShortcuts() {
 		closeGeneralSidebar,
 		toggleFeature,
 		setIsListViewOpened,
-	} = useDispatch( editPostStore );
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+	} = useDispatch(editPostStore);
+	const { registerShortcut } = useDispatch(keyboardShortcutsStore);
 
-	useEffect( () => {
-		registerShortcut( {
+	useEffect(() => {
+		registerShortcut({
 			name: 'core/edit-post/toggle-mode',
 			category: 'global',
-			description: __( 'Switch between visual editor and code editor.' ),
+			description: __('Switch between visual editor and code editor.'),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'm',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-post/toggle-fullscreen',
 			category: 'global',
-			description: __( 'Toggle fullscreen mode.' ),
+			description: __('Toggle fullscreen mode.'),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'f',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-post/toggle-list-view',
 			category: 'global',
-			description: __( 'Open the block list view.' ),
+			description: __('Open the block list view.'),
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-post/toggle-sidebar',
 			category: 'global',
-			description: __( 'Show or hide the settings sidebar.' ),
+			description: __('Show or hide the settings sidebar.'),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-post/next-region',
 			category: 'global',
-			description: __( 'Navigate to the next part of the editor.' ),
+			description: __('Navigate to the next part of the editor.'),
 			keyCombination: {
 				modifier: 'ctrl',
 				character: '`',
@@ -94,12 +90,12 @@ function KeyboardShortcuts() {
 					character: 'n',
 				},
 			],
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-post/previous-region',
 			category: 'global',
-			description: __( 'Navigate to the previous part of the editor.' ),
+			description: __('Navigate to the previous part of the editor.'),
 			keyCombination: {
 				modifier: 'ctrlShift',
 				character: '`',
@@ -110,52 +106,50 @@ function KeyboardShortcuts() {
 					character: 'p',
 				},
 			],
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/edit-post/keyboard-shortcuts',
 			category: 'main',
-			description: __( 'Display these keyboard shortcuts.' ),
+			description: __('Display these keyboard shortcuts.'),
 			keyCombination: {
 				modifier: 'access',
 				character: 'h',
 			},
-		} );
-	}, [] );
+		});
+	}, []);
 
 	useShortcut(
 		'core/edit-post/toggle-mode',
 		() => {
-			switchEditorMode(
-				getEditorMode() === 'visual' ? 'text' : 'visual'
-			);
+			switchEditorMode(getEditorMode() === 'visual' ? 'text' : 'visual');
 		},
 		{
 			isDisabled: isModeToggleDisabled,
 		}
 	);
 
-	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
-		toggleFeature( 'fullscreenMode' );
-	} );
+	useShortcut('core/edit-post/toggle-fullscreen', () => {
+		toggleFeature('fullscreenMode');
+	});
 
-	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
+	useShortcut('core/edit-post/toggle-sidebar', (event) => {
 		// This shortcut has no known clashes, but use preventDefault to prevent any
 		// obscure shortcuts from triggering.
 		event.preventDefault();
 
-		if ( isEditorSidebarOpened() ) {
+		if (isEditorSidebarOpened()) {
 			closeGeneralSidebar();
 		} else {
 			const sidebarToOpen = getBlockSelectionStart()
 				? 'edit-post/block'
 				: 'edit-post/document';
-			openGeneralSidebar( sidebarToOpen );
+			openGeneralSidebar(sidebarToOpen);
 		}
-	} );
+	});
 
-	useShortcut( 'core/edit-post/toggle-list-view', () =>
-		setIsListViewOpened( ! isListViewOpened() )
+	useShortcut('core/edit-post/toggle-list-view', () =>
+		setIsListViewOpened(!isListViewOpened())
 	);
 
 	return null;

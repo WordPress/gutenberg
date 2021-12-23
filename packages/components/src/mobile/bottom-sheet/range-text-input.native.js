@@ -29,21 +29,18 @@ import borderStyles from './borderStyles.scss';
 const isIOS = Platform.OS === 'ios';
 
 class RangeTextInput extends Component {
-	constructor( props ) {
-		super( props );
+	constructor(props) {
+		super(props);
 
-		this.announceCurrentValue = this.announceCurrentValue.bind( this );
-		this.onInputFocus = this.onInputFocus.bind( this );
-		this.onInputBlur = this.onInputBlur.bind( this );
-		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
-		this.onSubmitEditing = this.onSubmitEditing.bind( this );
-		this.onChangeText = this.onChangeText.bind( this );
+		this.announceCurrentValue = this.announceCurrentValue.bind(this);
+		this.onInputFocus = this.onInputFocus.bind(this);
+		this.onInputBlur = this.onInputBlur.bind(this);
+		this.handleChangePixelRatio = this.handleChangePixelRatio.bind(this);
+		this.onSubmitEditing = this.onSubmitEditing.bind(this);
+		this.onChangeText = this.onChangeText.bind(this);
 
 		const { value, defaultValue, min, decimalNum } = props;
-		const initialValue = toFixed(
-			value || defaultValue || min,
-			decimalNum
-		);
+		const initialValue = toFixed(value || defaultValue || min, decimalNum);
 
 		const fontScale = this.getFontScale();
 
@@ -56,28 +53,28 @@ class RangeTextInput extends Component {
 	}
 
 	componentDidMount() {
-		AppState.addEventListener( 'change', this.handleChangePixelRatio );
+		AppState.addEventListener('change', this.handleChangePixelRatio);
 	}
 
 	componentWillUnmount() {
-		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
-		clearTimeout( this.timeoutAnnounceValue );
+		AppState.removeEventListener('change', this.handleChangePixelRatio);
+		clearTimeout(this.timeoutAnnounceValue);
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
+	componentDidUpdate(prevProps, prevState) {
 		const { value } = this.props;
 		const { hasFocus, inputValue } = this.state;
 
-		if ( prevProps.value !== value ) {
-			this.setState( { inputValue: value } );
+		if (prevProps.value !== value) {
+			this.setState({ inputValue: value });
 		}
 
-		if ( prevState.hasFocus !== hasFocus ) {
-			const validValue = this.validateInput( inputValue );
-			this.setState( { inputValue: validValue } );
+		if (prevState.hasFocus !== hasFocus) {
+			const validValue = this.validateInput(inputValue);
+			this.setState({ inputValue: validValue });
 		}
 
-		if ( ! prevState.hasFocus && hasFocus ) {
+		if (!prevState.hasFocus && hasFocus) {
 			this._valueTextInput.focus();
 		}
 	}
@@ -86,85 +83,85 @@ class RangeTextInput extends Component {
 		return PixelRatio.getFontScale() < 1 ? 1 : PixelRatio.getFontScale();
 	}
 
-	handleChangePixelRatio( nextAppState ) {
-		if ( nextAppState === 'active' ) {
-			this.setState( { fontScale: this.getFontScale() } );
+	handleChangePixelRatio(nextAppState) {
+		if (nextAppState === 'active') {
+			this.setState({ fontScale: this.getFontScale() });
 		}
 	}
 
 	onInputFocus() {
-		this.setState( {
+		this.setState({
 			hasFocus: true,
-		} );
+		});
 	}
 
 	onInputBlur() {
 		const { inputValue } = this.state;
-		this.onChangeText( `${ inputValue }` );
-		this.setState( {
+		this.onChangeText(`${inputValue}`);
+		this.setState({
 			hasFocus: false,
-		} );
+		});
 	}
 
-	validateInput( text ) {
+	validateInput(text) {
 		const { min, max, decimalNum } = this.props;
 		let result = min;
-		if ( ! text ) {
+		if (!text) {
 			return min;
 		}
 
-		if ( typeof text === 'number' ) {
-			result = Math.max( text, min );
-			return max ? Math.min( result, max ) : result;
+		if (typeof text === 'number') {
+			result = Math.max(text, min);
+			return max ? Math.min(result, max) : result;
 		}
 
-		result = Math.max( removeNonDigit( text, decimalNum ), min );
-		return max ? Math.min( result, max ) : result;
+		result = Math.max(removeNonDigit(text, decimalNum), min);
+		return max ? Math.min(result, max) : result;
 	}
 
-	updateValue( value ) {
+	updateValue(value) {
 		const { onChange } = this.props;
-		const validValue = this.validateInput( value );
+		const validValue = this.validateInput(value);
 
-		this.announceCurrentValue( `${ validValue }` );
+		this.announceCurrentValue(`${validValue}`);
 
-		onChange( validValue );
+		onChange(validValue);
 	}
 
-	onChangeText( textValue ) {
+	onChangeText(textValue) {
 		const { decimalNum } = this.props;
-		const inputValue = removeNonDigit( textValue, decimalNum );
+		const inputValue = removeNonDigit(textValue, decimalNum);
 
-		textValue = inputValue.replace( ',', '.' );
-		textValue = toFixed( textValue, decimalNum );
-		const value = this.validateInput( textValue );
-		this.setState( {
+		textValue = inputValue.replace(',', '.');
+		textValue = toFixed(textValue, decimalNum);
+		const value = this.validateInput(textValue);
+		this.setState({
 			inputValue,
 			controlValue: value,
-		} );
-		this.updateValue( value );
+		});
+		this.updateValue(value);
 	}
 
-	onSubmitEditing( { nativeEvent: { text } } ) {
+	onSubmitEditing({ nativeEvent: { text } }) {
 		const { decimalNum } = this.props;
 		const { inputValue } = this.state;
 
-		if ( ! isNaN( Number( text ) ) ) {
-			text = toFixed( text.replace( ',', '.' ), decimalNum );
-			const validValue = this.validateInput( text );
+		if (!isNaN(Number(text))) {
+			text = toFixed(text.replace(',', '.'), decimalNum);
+			const validValue = this.validateInput(text);
 
-			if ( inputValue !== validValue ) {
-				this.setState( { inputValue: validValue } );
-				this.announceCurrentValue( `${ validValue }` );
-				this.props.onChange( validValue );
+			if (inputValue !== validValue) {
+				this.setState({ inputValue: validValue });
+				this.announceCurrentValue(`${validValue}`);
+				this.props.onChange(validValue);
 			}
 		}
 	}
 
-	announceCurrentValue( value ) {
+	announceCurrentValue(value) {
 		/* translators: %s: current cell value. */
-		const announcement = sprintf( __( 'Current value is %s' ), value );
-		AccessibilityInfo.announceForAccessibility( announcement );
+		const announcement = sprintf(__('Current value is %s'), value);
+		AccessibilityInfo.announceForAccessibility(announcement);
 	}
 
 	render() {
@@ -188,10 +185,10 @@ class RangeTextInput extends Component {
 		];
 
 		const valueFinalStyle = [
-			Platform.select( {
+			Platform.select({
 				android: inputBorderStyles,
 				ios: textInputIOSStyle,
-			} ),
+			}),
 			{
 				width: 50 * fontScale,
 				borderRightWidth: children ? 1 : 0,
@@ -200,46 +197,46 @@ class RangeTextInput extends Component {
 
 		return (
 			<TouchableWithoutFeedback
-				onPress={ this.onInputFocus }
-				accessible={ false }
+				onPress={this.onInputFocus}
+				accessible={false}
 			>
 				<View
-					style={ [
+					style={[
 						styles.textInputContainer,
 						isIOS && inputBorderStyles,
-					] }
-					accessible={ false }
+					]}
+					accessible={false}
 				>
-					{ isIOS || hasFocus ? (
+					{isIOS || hasFocus ? (
 						<TextInput
-							accessibilityLabel={ label }
-							ref={ ( c ) => ( this._valueTextInput = c ) }
-							style={ valueFinalStyle }
-							onChangeText={ this.onChangeText }
-							onSubmitEditing={ this.onSubmitEditing }
-							onFocus={ this.onInputFocus }
-							onBlur={ this.onInputBlur }
+							accessibilityLabel={label}
+							ref={(c) => (this._valueTextInput = c)}
+							style={valueFinalStyle}
+							onChangeText={this.onChangeText}
+							onSubmitEditing={this.onSubmitEditing}
+							onFocus={this.onInputFocus}
+							onBlur={this.onInputBlur}
 							keyboardType="numeric"
 							returnKeyType="done"
-							numberOfLines={ 1 }
-							defaultValue={ `${ inputValue }` }
-							value={ inputValue.toString() }
-							pointerEvents={ hasFocus ? 'auto' : 'none' }
+							numberOfLines={1}
+							defaultValue={`${inputValue}`}
+							value={inputValue.toString()}
+							pointerEvents={hasFocus ? 'auto' : 'none'}
 						/>
 					) : (
 						<Text
-							style={ valueFinalStyle }
-							numberOfLines={ 1 }
+							style={valueFinalStyle}
+							numberOfLines={1}
 							ellipsizeMode="clip"
 						>
-							{ inputValue }
+							{inputValue}
 						</Text>
-					) }
-					{ children }
+					)}
+					{children}
 				</View>
 			</TouchableWithoutFeedback>
 		);
 	}
 }
 
-export default withPreferredColorScheme( RangeTextInput );
+export default withPreferredColorScheme(RangeTextInput);

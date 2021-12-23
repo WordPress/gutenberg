@@ -15,26 +15,26 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/html',
 		widget: 'custom_html',
-		transform: ( { content } ) => ( {
+		transform: ({ content }) => ({
 			content,
-		} ),
+		}),
 	},
 	{
 		block: 'core/archives',
 		widget: 'archives',
-		transform: ( { count, dropdown } ) => {
+		transform: ({ count, dropdown }) => {
 			return {
-				displayAsDropdown: !! dropdown,
-				showPostCounts: !! count,
+				displayAsDropdown: !!dropdown,
+				showPostCounts: !!count,
 			};
 		},
 	},
 	{
 		block: 'core/latest-posts',
 		widget: 'recent-posts',
-		transform: ( { show_date: displayPostDate, number } ) => {
+		transform: ({ show_date: displayPostDate, number }) => {
 			return {
-				displayPostDate: !! displayPostDate,
+				displayPostDate: !!displayPostDate,
 				postsToShow: number,
 			};
 		},
@@ -42,7 +42,7 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/latest-comments',
 		widget: 'recent-comments',
-		transform: ( { number } ) => {
+		transform: ({ number }) => {
 			return {
 				commentsToShow: number,
 			};
@@ -51,9 +51,9 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/tag-cloud',
 		widget: 'tag_cloud',
-		transform: ( { taxonomy, count } ) => {
+		transform: ({ taxonomy, count }) => {
 			return {
-				showTagCounts: !! count,
+				showTagCounts: !!count,
 				taxonomy,
 			};
 		},
@@ -61,18 +61,18 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/categories',
 		widget: 'categories',
-		transform: ( { count, dropdown, hierarchical } ) => {
+		transform: ({ count, dropdown, hierarchical }) => {
 			return {
-				displayAsDropdown: !! dropdown,
-				showPostCounts: !! count,
-				showHierarchy: !! hierarchical,
+				displayAsDropdown: !!dropdown,
+				showPostCounts: !!count,
+				showHierarchy: !!hierarchical,
 			};
 		},
 	},
 	{
 		block: 'core/audio',
 		widget: 'media_audio',
-		transform: ( { url, preload, loop, attachment_id: id } ) => {
+		transform: ({ url, preload, loop, attachment_id: id }) => {
 			return {
 				src: url,
 				id,
@@ -84,7 +84,7 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/video',
 		widget: 'media_video',
-		transform: ( { url, preload, loop, attachment_id: id } ) => {
+		transform: ({ url, preload, loop, attachment_id: id }) => {
 			return {
 				src: url,
 				id,
@@ -96,7 +96,7 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/image',
 		widget: 'media_image',
-		transform: ( {
+		transform: ({
 			alt,
 			attachment_id: id,
 			caption,
@@ -109,7 +109,7 @@ const legacyWidgetTransforms = [
 			size: sizeSlug,
 			url,
 			width,
-		} ) => {
+		}) => {
 			return {
 				alt,
 				caption,
@@ -129,61 +129,61 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/gallery',
 		widget: 'media_gallery',
-		transform: ( { ids, link_type: linkTo, size, number } ) => {
+		transform: ({ ids, link_type: linkTo, size, number }) => {
 			return {
 				ids,
 				columns: number,
 				linkTo,
 				sizeSlug: size,
-				images: ids.map( ( id ) => ( {
+				images: ids.map((id) => ({
 					id,
-				} ) ),
+				})),
 			};
 		},
 	},
 	{
 		block: 'core/rss',
 		widget: 'rss',
-		transform: ( {
+		transform: ({
 			url,
 			show_author: displayAuthor,
 			show_date: displayDate,
 			show_summary: displayExcerpt,
 			items,
-		} ) => {
+		}) => {
 			return {
 				feedURL: url,
-				displayAuthor: !! displayAuthor,
-				displayDate: !! displayDate,
-				displayExcerpt: !! displayExcerpt,
+				displayAuthor: !!displayAuthor,
+				displayDate: !!displayDate,
+				displayExcerpt: !!displayExcerpt,
 				itemsToShow: items,
 			};
 		},
 	},
-].map( ( { block, widget, transform } ) => {
+].map(({ block, widget, transform }) => {
 	return {
 		type: 'block',
-		blocks: [ block ],
-		isMatch: ( { idBase, instance } ) => {
-			return idBase === widget && !! instance?.raw;
+		blocks: [block],
+		isMatch: ({ idBase, instance }) => {
+			return idBase === widget && !!instance?.raw;
 		},
-		transform: ( { instance } ) => {
+		transform: ({ instance }) => {
 			const transformedBlock = createBlock(
 				block,
-				transform ? transform( instance.raw ) : undefined
+				transform ? transform(instance.raw) : undefined
 			);
-			if ( ! instance.raw?.title ) {
+			if (!instance.raw?.title) {
 				return transformedBlock;
 			}
 			return [
-				createBlock( 'core/heading', {
+				createBlock('core/heading', {
 					content: instance.raw.title,
-				} ),
+				}),
 				transformedBlock,
 			];
 		},
 	};
-} );
+});
 
 const transforms = {
 	to: legacyWidgetTransforms,

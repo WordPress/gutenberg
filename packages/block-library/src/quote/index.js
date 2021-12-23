@@ -21,8 +21,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			value:
-				'<p>' + __( 'In quoting others, we cite ourselves.' ) + '</p>',
+			value: '<p>' + __('In quoting others, we cite ourselves.') + '</p>',
 			citation: 'Julio Cortázar',
 			className: 'is-style-large',
 		},
@@ -30,14 +29,14 @@ export const settings = {
 	transforms,
 	edit,
 	save,
-	merge( attributes, { value, citation } ) {
+	merge(attributes, { value, citation }) {
 		// Quote citations cannot be merged. Pick the second one unless it's
 		// empty.
-		if ( ! citation ) {
+		if (!citation) {
 			citation = attributes.citation;
 		}
 
-		if ( ! value || value === '<p></p>' ) {
+		if (!value || value === '<p></p>') {
 			return {
 				...attributes,
 				citation,

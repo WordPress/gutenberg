@@ -33,7 +33,7 @@ The Viewport module registers itself under the `core/viewport` data namespace an
 import { select } from '@wordpress/data';
 import { store } from '@wordpress/viewport';
 
-const isSmall = select( store ).isViewportMatch( '< medium' );
+const isSmall = select(store).isViewportMatch('< medium');
 ```
 
 The `isViewportMatch` selector accepts a single string argument `query`. It consists of an optional operator and breakpoint name, separated with a space. The operator can be `<` or `>=`, defaulting to `>=`.
@@ -42,9 +42,9 @@ The `isViewportMatch` selector accepts a single string argument `query`. It cons
 import { select } from '@wordpress/data';
 import { store } from '@wordpress/viewport';
 
-const { isViewportMatch } = select( store );
-const isSmall = isViewportMatch( '< medium' );
-const isWideOrHuge = isViewportMatch( '>= wide' );
+const { isViewportMatch } = select(store);
+const isSmall = isViewportMatch('< medium');
+const isWideOrHuge = isViewportMatch('>= wide');
 // Equivalent:
 //  const isWideOrHuge = isViewportMatch( 'wide' );
 ```
@@ -71,7 +71,7 @@ function MyMobileComponent() {
 	return <div>I'm only rendered on mobile viewports!</div>;
 }
 
-MyMobileComponent = ifViewportMatches( '< small' )( MyMobileComponent );
+MyMobileComponent = ifViewportMatches('< small')(MyMobileComponent);
 ```
 
 _Parameters_
@@ -107,11 +107,11 @@ _Related_
 _Usage_
 
 ```jsx
-function MyComponent( { isMobile } ) {
-	return <div>Currently: { isMobile ? 'Mobile' : 'Not Mobile' }</div>;
+function MyComponent({ isMobile }) {
+	return <div>Currently: {isMobile ? 'Mobile' : 'Not Mobile'}</div>;
 }
 
-MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
+MyComponent = withViewportMatch({ isMobile: '< small' })(MyComponent);
 ```
 
 _Parameters_

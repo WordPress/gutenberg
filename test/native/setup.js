@@ -6,13 +6,19 @@ import { Image, NativeModules as RNNativeModules } from 'react-native';
 
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
-RNNativeModules.RNGestureHandlerModule = RNNativeModules.RNGestureHandlerModule || {
-	State: { BEGAN: 'BEGAN', FAILED: 'FAILED', ACTIVE: 'ACTIVE', END: 'END' },
-	attachGestureHandler: jest.fn(),
-	createGestureHandler: jest.fn(),
-	dropGestureHandler: jest.fn(),
-	updateGestureHandler: jest.fn(),
-};
+RNNativeModules.RNGestureHandlerModule =
+	RNNativeModules.RNGestureHandlerModule || {
+		State: {
+			BEGAN: 'BEGAN',
+			FAILED: 'FAILED',
+			ACTIVE: 'ACTIVE',
+			END: 'END',
+		},
+		attachGestureHandler: jest.fn(),
+		createGestureHandler: jest.fn(),
+		dropGestureHandler: jest.fn(),
+		updateGestureHandler: jest.fn(),
+	};
 RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
 	forceTouchAvailable: false,
 };
@@ -20,31 +26,33 @@ RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
 // Mock component to render with props rather than merely a string name so that
 // we may assert against it. ...args is used avoid warnings about ignoring
 // forwarded refs if React.forwardRef happens to be used.
-const mockComponent = ( element ) => ( ...args ) => {
-	const [ props ] = args;
-	const React = require( 'react' );
-	return React.createElement( element, props, props.children );
-};
+const mockComponent =
+	(element) =>
+	(...args) => {
+		const [props] = args;
+		const React = require('react');
+		return React.createElement(element, props, props.children);
+	};
 
-jest.mock( '@wordpress/element', () => {
+jest.mock('@wordpress/element', () => {
 	return {
 		__esModule: true,
-		...jest.requireActual( '@wordpress/element' ),
+		...jest.requireActual('@wordpress/element'),
 		render: jest.fn(),
 	};
-} );
+});
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+jest.mock('@wordpress/api-fetch', () => jest.fn());
 
-jest.mock( '@wordpress/react-native-bridge', () => {
+jest.mock('@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
-		requestBlockTypeImpressions: jest.fn( ( callback ) => {
-			callback( {} );
-		} ),
-		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
+		requestBlockTypeImpressions: jest.fn((callback) => {
+			callback({});
+		}),
+		requestFocalPointPickerTooltipShown: jest.fn(() => true),
 		setBlockTypeImpressions: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
@@ -77,15 +85,16 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		fetchRequest: jest.fn(),
 		requestPreview: jest.fn(),
 	};
-} );
+});
 
-jest.mock( 'react-native-modal', () => ( props ) =>
-	props.isVisible ? mockComponent( 'Modal' )( props ) : null
+jest.mock(
+	'react-native-modal',
+	() => (props) => props.isVisible ? mockComponent('Modal')(props) : null
 );
 
-jest.mock( 'react-native-hr', () => () => 'Hr' );
+jest.mock('react-native-hr', () => () => 'Hr');
 
-jest.mock( 'react-native-svg', () => {
+jest.mock('react-native-svg', () => {
 	return {
 		Svg: () => 'Svg',
 		Path: () => 'Path',
@@ -94,65 +103,65 @@ jest.mock( 'react-native-svg', () => {
 		Polygon: () => 'Polygon',
 		Rect: () => 'Rect',
 	};
-} );
+});
 
-jest.mock( 'react-native-safe-area', () => {
+jest.mock('react-native-safe-area', () => {
 	const addEventListener = jest.fn();
-	addEventListener.mockReturnValue( { remove: () => {} } );
+	addEventListener.mockReturnValue({ remove: () => {} });
 	return {
 		getSafeAreaInsetsForRootView: () => {
-			return new Promise( ( accept ) => {
-				accept( { safeAreaInsets: { bottom: 34 } } );
-			} );
+			return new Promise((accept) => {
+				accept({ safeAreaInsets: { bottom: 34 } });
+			});
 		},
 		addEventListener,
 		removeEventListener: jest.fn(),
 	};
-} );
+});
 
 jest.mock(
 	'@react-native-community/slider',
 	() => {
-		const { forwardRef } = require( 'react' );
-		return forwardRef( mockComponent( 'Slider' ) );
+		const { forwardRef } = require('react');
+		return forwardRef(mockComponent('Slider'));
 	},
 	{ virtual: true }
 );
 
-if ( ! global.window.matchMedia ) {
-	global.window.matchMedia = () => ( {
+if (!global.window.matchMedia) {
+	global.window.matchMedia = () => ({
 		matches: false,
 		addListener: () => {},
 		removeListener: () => {},
-	} );
+	});
 }
 
-jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
+jest.mock('react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
-} );
+});
 
-jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
+jest.mock('react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
 	virtual: true,
-} );
+});
 
-jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
+jest.mock('@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
-} );
+});
 
-jest.mock( 'react-native-reanimated', () => {
-	const Reanimated = require( 'react-native-reanimated/mock' );
+jest.mock('react-native-reanimated', () => {
+	const Reanimated = require('react-native-reanimated/mock');
 
 	// The mock for `call` immediately calls the callback which is incorrect
 	// So we override it with a no-op
 	Reanimated.default.call = () => {};
 
 	return Reanimated;
-} );
+});
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the
 // native animated module is missing. This was added per React Navigation docs.
 // https://reactnavigation.org/docs/testing/#mocking-native-modules
-jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 /**
  * Note: Clipboard has been extracted from react-native core and will be removed in a future release.
@@ -160,59 +169,57 @@ jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
  *
  * @see node_modules/react-native/Libraries/Components/Clipboard/Clipboard.js
  */
-jest.mock( 'react-native/Libraries/Components/Clipboard/Clipboard', () => ( {
-	getString: jest.fn( () => Promise.resolve( '' ) ),
+jest.mock('react-native/Libraries/Components/Clipboard/Clipboard', () => ({
+	getString: jest.fn(() => Promise.resolve('')),
 	setString: jest.fn(),
-} ) );
+}));
 
 // We currently reference TextStateInput (a private module) within
 // react-native-aztec/src/AztecView. Doing so requires that we mock it via its
 // internal path to avoid "TypeError: Cannot read property 'Commands' of
 // undefined." The private module referenced could possibly be replaced with
 // a React ref instead. We could then remove this internal mock.
-jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
+jest.mock('react-native/Libraries/Components/TextInput/TextInputState');
 
 // Mock native modules incompatible with testing environment
-jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
+jest.mock('react-native/Libraries/LayoutAnimation/LayoutAnimation');
 jest.mock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
-	() => ( {
+	() => ({
 		addEventListener: jest.fn(),
 		announceForAccessibility: jest.fn(),
 		removeEventListener: jest.fn(),
-		isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
-		fetch: jest.fn( () => ( {
+		isScreenReaderEnabled: jest.fn(() => Promise.resolve(false)),
+		fetch: jest.fn(() => ({
 			done: jest.fn(),
-		} ) ),
-	} )
+		})),
+	})
 );
-jest.mock( 'react-native/Libraries/Components/Clipboard/Clipboard', () => ( {
-	getString: jest.fn( () => Promise.resolve( '' ) ),
+jest.mock('react-native/Libraries/Components/Clipboard/Clipboard', () => ({
+	getString: jest.fn(() => Promise.resolve('')),
 	setString: jest.fn(),
-} ) );
+}));
 
 // Silences the warning: dispatchCommand was called with a ref that isn't a native
 // component. Use React.forwardRef to get access to the underlying native component.
 // This is a known bug of react-native-testing-library package:
 // https://github.com/callstack/react-native-testing-library/issues/329#issuecomment-737307473
-jest.mock( 'react-native/Libraries/Components/Switch/Switch', () => {
-	const jestMockComponent = require( 'react-native/jest/mockComponent' );
-	return jestMockComponent(
-		'react-native/Libraries/Components/Switch/Switch'
-	);
-} );
+jest.mock('react-native/Libraries/Components/Switch/Switch', () => {
+	const jestMockComponent = require('react-native/jest/mockComponent');
+	return jestMockComponent('react-native/Libraries/Components/Switch/Switch');
+});
 
-jest.mock( '@wordpress/compose', () => {
+jest.mock('@wordpress/compose', () => {
 	return {
-		...jest.requireActual( '@wordpress/compose' ),
+		...jest.requireActual('@wordpress/compose'),
 		useViewportMatch: jest.fn(),
-		useResizeObserver: jest.fn( () => [
-			mockComponent( 'ResizeObserverMock' )( {} ),
+		useResizeObserver: jest.fn(() => [
+			mockComponent('ResizeObserverMock')({}),
 			{ width: 100, height: 100 },
-		] ),
+		]),
 	};
-} );
+});
 
-jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
-	success( 0, 0 )
+jest.spyOn(Image, 'getSize').mockImplementation((url, success) =>
+	success(0, 0)
 );

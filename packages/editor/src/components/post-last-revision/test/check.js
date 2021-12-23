@@ -8,34 +8,34 @@ import { shallow } from 'enzyme';
  */
 import { PostLastRevisionCheck } from '../check';
 
-describe( 'PostLastRevisionCheck', () => {
-	it( 'should not render anything if the last revision ID is unknown', () => {
+describe('PostLastRevisionCheck', () => {
+	it('should not render anything if the last revision ID is unknown', () => {
 		const wrapper = shallow(
-			<PostLastRevisionCheck revisionsCount={ 2 }>
+			<PostLastRevisionCheck revisionsCount={2}>
 				Children
 			</PostLastRevisionCheck>
 		);
 
-		expect( wrapper.type() ).toBe( null );
-	} );
+		expect(wrapper.type()).toBe(null);
+	});
 
-	it( 'should not render anything if there is only one revision', () => {
+	it('should not render anything if there is only one revision', () => {
 		const wrapper = shallow(
-			<PostLastRevisionCheck lastRevisionId={ 1 } revisionsCount={ 1 }>
+			<PostLastRevisionCheck lastRevisionId={1} revisionsCount={1}>
 				Children
 			</PostLastRevisionCheck>
 		);
 
-		expect( wrapper.type() ).toBe( null );
-	} );
+		expect(wrapper.type()).toBe(null);
+	});
 
-	it( 'should render if there are two revisions', () => {
+	it('should render if there are two revisions', () => {
 		const wrapper = shallow(
-			<PostLastRevisionCheck lastRevisionId={ 1 } revisionsCount={ 2 }>
+			<PostLastRevisionCheck lastRevisionId={1} revisionsCount={2}>
 				Children
 			</PostLastRevisionCheck>
 		);
 
-		expect( wrapper.text() ).not.toBe( null );
-	} );
-} );
+		expect(wrapper.text()).not.toBe(null);
+	});
+});

@@ -9,7 +9,7 @@ import { createContext, RawHTML } from '@wordpress/element';
  */
 import { serialize } from '../api';
 
-const { Consumer, Provider } = createContext( () => {} );
+const { Consumer, Provider } = createContext(() => {});
 
 /**
  * An internal block component used in block content serialization to inject
@@ -32,16 +32,16 @@ const { Consumer, Provider } = createContext( () => {} );
  *
  * @return {WPComponent} Element with BlockContent injected via context.
  */
-const BlockContentProvider = ( { children, innerBlocks } ) => {
+const BlockContentProvider = ({ children, innerBlocks }) => {
 	const BlockContent = () => {
 		// Value is an array of blocks, so defer to block serializer
-		const html = serialize( innerBlocks, { isInnerBlocks: true } );
+		const html = serialize(innerBlocks, { isInnerBlocks: true });
 
 		// Use special-cased raw HTML tag to avoid default escaping
-		return <RawHTML>{ html }</RawHTML>;
+		return <RawHTML>{html}</RawHTML>;
 	};
 
-	return <Provider value={ BlockContent }>{ children }</Provider>;
+	return <Provider value={BlockContent}>{children}</Provider>;
 };
 
 /**
@@ -51,12 +51,12 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
  * @return {WPComponent} Enhanced component with injected BlockContent as prop.
  */
 export const withBlockContentContext = createHigherOrderComponent(
-	( OriginalComponent ) => {
-		return ( props ) => (
+	(OriginalComponent) => {
+		return (props) => (
 			<Consumer>
-				{ ( context ) => (
-					<OriginalComponent { ...props } BlockContent={ context } />
-				) }
+				{(context) => (
+					<OriginalComponent {...props} BlockContent={context} />
+				)}
 			</Consumer>
 		);
 	},

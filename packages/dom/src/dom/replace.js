@@ -12,8 +12,8 @@ import remove from './remove';
  * @param {Element} newNode       Node to be inserted in its place.
  * @return {void}
  */
-export default function replace( processedNode, newNode ) {
-	assertIsDefined( processedNode.parentNode, 'processedNode.parentNode' );
-	insertAfter( newNode, processedNode.parentNode );
-	remove( processedNode );
+export default function replace(processedNode, newNode) {
+	assertIsDefined(processedNode.parentNode, 'processedNode.parentNode');
+	insertAfter(newNode, processedNode.parentNode);
+	remove(processedNode);
 }

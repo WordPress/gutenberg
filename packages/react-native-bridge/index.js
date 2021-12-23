@@ -25,8 +25,8 @@ export const actionButtons = {
 
 // Console polyfill from react-native
 
-export function nativeLoggingHook( message, logLevel ) {
-	RNReactNativeGutenbergBridge.editorDidEmitLog( message, logLevel );
+export function nativeLoggingHook(message, logLevel) {
+	RNReactNativeGutenbergBridge.editorDidEmitLog(message, logLevel);
 }
 
 // Send messages
@@ -35,34 +35,34 @@ export function sendNativeEditorDidLayout() {
 	// For now, this is only needed on iOS to solve layout issues with the toolbar.
 	// If this become necessary on Android in the future, we can try to build a registration API from Native
 	// to register messages it wants to receive, similar to the Native -> JS messages listener system.
-	if ( isIOS ) {
+	if (isIOS) {
 		RNReactNativeGutenbergBridge.editorDidLayout();
 	}
 }
 
 // Register listeners
 
-export function subscribeParentGetHtml( callback ) {
-	return gutenbergBridgeEvents.addListener( 'requestGetHtml', callback );
+export function subscribeParentGetHtml(callback) {
+	return gutenbergBridgeEvents.addListener('requestGetHtml', callback);
 }
 
-export function subscribeParentToggleHTMLMode( callback ) {
-	return gutenbergBridgeEvents.addListener( 'toggleHTMLMode', callback );
+export function subscribeParentToggleHTMLMode(callback) {
+	return gutenbergBridgeEvents.addListener('toggleHTMLMode', callback);
 }
 
-export function subscribeSetFocusOnTitle( callback ) {
-	return gutenbergBridgeEvents.addListener( 'setFocusOnTitle', callback );
+export function subscribeSetFocusOnTitle(callback) {
+	return gutenbergBridgeEvents.addListener('setFocusOnTitle', callback);
 }
 
-export function subscribeSetTitle( callback ) {
-	return gutenbergBridgeEvents.addListener( 'setTitle', callback );
+export function subscribeSetTitle(callback) {
+	return gutenbergBridgeEvents.addListener('setTitle', callback);
 }
 
-export function subscribeUpdateHtml( callback ) {
-	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
+export function subscribeUpdateHtml(callback) {
+	return gutenbergBridgeEvents.addListener('updateHtml', callback);
 }
 
-export function subscribeFeaturedImageIdNativeUpdated( callback ) {
+export function subscribeFeaturedImageIdNativeUpdated(callback) {
 	return gutenbergBridgeEvents.addListener(
 		'featuredImageIdNativeUpdated',
 		callback
@@ -84,8 +84,8 @@ export function subscribeFeaturedImageIdNativeUpdated( callback ) {
  *                            MEDIA_UPLOAD_STATE_FAILED: sent in case of saving failure (final state). Takes String mediaId.
  *                            MEDIA_UPLOAD_STATE_RESET: sent when the progress and state needs be reset (a retry for example, for cleanup). Takes String mediaId.
  */
-export function subscribeMediaUpload( callback ) {
-	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
+export function subscribeMediaUpload(callback) {
+	return gutenbergBridgeEvents.addListener('mediaUpload', callback);
 }
 
 /**
@@ -109,40 +109,34 @@ export function subscribeMediaUpload( callback ) {
  *                            MEDIA_SAVE_MEDIAID_CHANGED:	used when changing a media item id from a temporary id to a local file id, and then from a local file
  *                            id to a remote file id.
  */
-export function subscribeMediaSave( callback ) {
-	return gutenbergBridgeEvents.addListener( 'mediaSave', callback );
+export function subscribeMediaSave(callback) {
+	return gutenbergBridgeEvents.addListener('mediaSave', callback);
 }
 
-export function subscribeMediaAppend( callback ) {
-	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
+export function subscribeMediaAppend(callback) {
+	return gutenbergBridgeEvents.addListener('mediaAppend', callback);
 }
 
-export function subscribeAndroidModalClosed( callback ) {
+export function subscribeAndroidModalClosed(callback) {
 	return isAndroid
-		? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback )
+		? gutenbergBridgeEvents.addListener('notifyModalClosed', callback)
 		: undefined;
 }
 
-export function subscribeUpdateEditorSettings( callback ) {
-	return gutenbergBridgeEvents.addListener(
-		'updateEditorSettings',
-		callback
-	);
+export function subscribeUpdateEditorSettings(callback) {
+	return gutenbergBridgeEvents.addListener('updateEditorSettings', callback);
 }
 
-export function subscribePreferredColorScheme( callback ) {
-	return gutenbergBridgeEvents.addListener(
-		'preferredColorScheme',
-		callback
-	);
+export function subscribePreferredColorScheme(callback) {
+	return gutenbergBridgeEvents.addListener('preferredColorScheme', callback);
 }
 
-export function subscribeUpdateCapabilities( callback ) {
-	return gutenbergBridgeEvents.addListener( 'updateCapabilities', callback );
+export function subscribeUpdateCapabilities(callback) {
+	return gutenbergBridgeEvents.addListener('updateCapabilities', callback);
 }
 
-export function subscribeShowNotice( callback ) {
-	return gutenbergBridgeEvents.addListener( 'showNotice', callback );
+export function subscribeShowNotice(callback) {
+	return gutenbergBridgeEvents.addListener('showNotice', callback);
 }
 
 /**
@@ -156,8 +150,8 @@ export function subscribeShowNotice( callback ) {
  *
  * @param {FnReplaceBlockCompletion} callback the completion callback.
  */
-export function subscribeReplaceBlock( callback ) {
-	return gutenbergBridgeEvents.addListener( 'replaceBlock', callback );
+export function subscribeReplaceBlock(callback) {
+	return gutenbergBridgeEvents.addListener('replaceBlock', callback);
 }
 
 /**
@@ -166,8 +160,8 @@ export function subscribeReplaceBlock( callback ) {
  * @param {Function} callback RN Callback function to display the editor
  *                            help topics.
  */
-export function subscribeShowEditorHelp( callback ) {
-	return gutenbergBridgeEvents.addListener( 'showEditorHelp', callback );
+export function subscribeShowEditorHelp(callback) {
+	return gutenbergBridgeEvents.addListener('showEditorHelp', callback);
 }
 
 /**
@@ -180,7 +174,7 @@ export function subscribeShowEditorHelp( callback ) {
  * @param {boolean}       multiple Is multiple selection allowed?
  * @param {Function}      callback RN Callback function to be called with the selected media objects.
  */
-export function requestMediaPicker( source, filter, multiple, callback ) {
+export function requestMediaPicker(source, filter, multiple, callback) {
 	RNReactNativeGutenbergBridge.requestMediaPickFrom(
 		source,
 		filter,
@@ -213,12 +207,12 @@ export function requestUnsupportedBlockFallback(
 	);
 }
 
-export function sendActionButtonPressedAction( buttonType ) {
-	RNReactNativeGutenbergBridge.actionButtonPressed( buttonType );
+export function sendActionButtonPressedAction(buttonType) {
+	RNReactNativeGutenbergBridge.actionButtonPressed(buttonType);
 }
 
-export function requestMediaImport( url, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaImport( url, callback );
+export function requestMediaImport(url, callback) {
+	return RNReactNativeGutenbergBridge.requestMediaImport(url, callback);
 }
 
 /**
@@ -241,38 +235,31 @@ export function mediaSaveSync() {
 	return RNReactNativeGutenbergBridge.mediaSaveSync();
 }
 
-export function requestImageFailedRetryDialog( mediaId ) {
-	return RNReactNativeGutenbergBridge.requestImageFailedRetryDialog(
-		mediaId
-	);
+export function requestImageFailedRetryDialog(mediaId) {
+	return RNReactNativeGutenbergBridge.requestImageFailedRetryDialog(mediaId);
 }
 
-export function requestImageUploadCancelDialog( mediaId ) {
-	return RNReactNativeGutenbergBridge.requestImageUploadCancelDialog(
-		mediaId
-	);
+export function requestImageUploadCancelDialog(mediaId) {
+	return RNReactNativeGutenbergBridge.requestImageUploadCancelDialog(mediaId);
 }
 
-export function requestImageUploadCancel( mediaId ) {
-	return RNReactNativeGutenbergBridge.requestImageUploadCancel( mediaId );
+export function requestImageUploadCancel(mediaId) {
+	return RNReactNativeGutenbergBridge.requestImageUploadCancel(mediaId);
 }
 
-export function setFeaturedImage( mediaId ) {
-	return RNReactNativeGutenbergBridge.setFeaturedImage( mediaId );
+export function setFeaturedImage(mediaId) {
+	return RNReactNativeGutenbergBridge.setFeaturedImage(mediaId);
 }
 
-export function getOtherMediaOptions( filter, callback ) {
-	return RNReactNativeGutenbergBridge.getOtherMediaOptions(
-		filter,
-		callback
-	);
+export function getOtherMediaOptions(filter, callback) {
+	return RNReactNativeGutenbergBridge.getOtherMediaOptions(filter, callback);
 }
 
 export function requestImageFullscreenPreview(
 	currentImageUrl,
 	originalImageUrl
 ) {
-	if ( isIOS ) {
+	if (isIOS) {
 		return RNReactNativeGutenbergBridge.requestImageFullscreenPreview(
 			currentImageUrl,
 			originalImageUrl
@@ -283,18 +270,15 @@ export function requestImageFullscreenPreview(
 	);
 }
 
-export function requestMediaEditor( mediaUrl, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaEditor(
-		mediaUrl,
-		callback
-	);
+export function requestMediaEditor(mediaUrl, callback) {
+	return RNReactNativeGutenbergBridge.requestMediaEditor(mediaUrl, callback);
 }
 
-export function fetchRequest( path, enableCaching = true ) {
-	if ( isAndroid ) {
-		return RNReactNativeGutenbergBridge.fetchRequest( path, enableCaching );
+export function fetchRequest(path, enableCaching = true) {
+	if (isAndroid) {
+		return RNReactNativeGutenbergBridge.fetchRequest(path, enableCaching);
 	}
-	return RNReactNativeGutenbergBridge.fetchRequest( path );
+	return RNReactNativeGutenbergBridge.fetchRequest(path);
 }
 
 export function showUserSuggestions() {
@@ -314,7 +298,7 @@ export function showXpostSuggestions() {
  * @param {Array<Map>} mediaFiles    the mediaFiles attribute of the block, containing data about each media item.
  * @param {string}     blockClientId the clientId of the block.
  */
-export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
+export function requestMediaFilesEditorLoad(mediaFiles, blockClientId) {
 	RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
 		mediaFiles,
 		blockClientId
@@ -330,10 +314,8 @@ export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
  *
  * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
  */
-export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesFailedRetryDialog(
-		mediaFiles
-	);
+export function requestMediaFilesFailedRetryDialog(mediaFiles) {
+	RNReactNativeGutenbergBridge.requestMediaFilesFailedRetryDialog(mediaFiles);
 }
 
 /**
@@ -344,7 +326,7 @@ export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
  *
  * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
  */
-export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
+export function requestMediaFilesUploadCancelDialog(mediaFiles) {
 	RNReactNativeGutenbergBridge.requestMediaFilesUploadCancelDialog(
 		mediaFiles
 	);
@@ -358,10 +340,8 @@ export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
  *
  * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
  */
-export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(
-		mediaFiles
-	);
+export function requestMediaFilesSaveCancelDialog(mediaFiles) {
+	RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(mediaFiles);
 }
 
 /**
@@ -371,20 +351,20 @@ export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
  * @param {Array<Map>} mediaFiles    the mediaFiles attribute of the block, containing data about each media item.
  * @param {string}     blockClientId the clientId of the block.
  */
-export function mediaFilesBlockReplaceSync( mediaFiles, blockClientId ) {
+export function mediaFilesBlockReplaceSync(mediaFiles, blockClientId) {
 	RNReactNativeGutenbergBridge.mediaFilesBlockReplaceSync(
 		mediaFiles,
 		blockClientId
 	);
 }
 
-export function requestFocalPointPickerTooltipShown( callback ) {
+export function requestFocalPointPickerTooltipShown(callback) {
 	return RNReactNativeGutenbergBridge.requestFocalPointPickerTooltipShown(
 		callback
 	);
 }
 
-export function setFocalPointPickerTooltipShown( tooltipShown ) {
+export function setFocalPointPickerTooltipShown(tooltipShown) {
 	return RNReactNativeGutenbergBridge.setFocalPointPickerTooltipShown(
 		tooltipShown
 	);
@@ -400,8 +380,8 @@ export function requestPreview() {
  * @param {Function} callback Callback invoked with object containing counts for each block type.
  * @return {void}
  */
-export function requestBlockTypeImpressions( callback ) {
-	return RNReactNativeGutenbergBridge.requestBlockTypeImpressions( callback );
+export function requestBlockTypeImpressions(callback) {
+	return RNReactNativeGutenbergBridge.requestBlockTypeImpressions(callback);
 }
 
 /**
@@ -410,8 +390,8 @@ export function requestBlockTypeImpressions( callback ) {
  * @param {Object} impressions Key-value pairs of block type name and impression count.
  * @return {void}
  */
-export function setBlockTypeImpressions( impressions ) {
-	return RNReactNativeGutenbergBridge.setBlockTypeImpressions( impressions );
+export function setBlockTypeImpressions(impressions) {
+	return RNReactNativeGutenbergBridge.setBlockTypeImpressions(impressions);
 }
 
 export function requestContactCustomerSupport() {
@@ -429,11 +409,8 @@ export function requestGotoCustomerSupportOptions() {
  * @param {Object} properties Key-value pairs of event properties.
  * @return {void}
  */
-export function sendEventToHost( eventName, properties ) {
-	return RNReactNativeGutenbergBridge.sendEventToHost(
-		eventName,
-		properties
-	);
+export function sendEventToHost(eventName, properties) {
+	return RNReactNativeGutenbergBridge.sendEventToHost(eventName, properties);
 }
 
 export default RNReactNativeGutenbergBridge;

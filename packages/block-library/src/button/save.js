@@ -14,25 +14,17 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 
-export default function save( { attributes, className } ) {
-	const {
-		fontSize,
-		linkTarget,
-		rel,
-		style,
-		text,
-		title,
-		url,
-		width,
-	} = attributes;
+export default function save({ attributes, className }) {
+	const { fontSize, linkTarget, rel, style, text, title, url, width } =
+		attributes;
 
-	if ( ! text ) {
+	if (!text) {
 		return null;
 	}
 
-	const borderProps = getBorderClassesAndStyles( attributes );
-	const colorProps = getColorClassesAndStyles( attributes );
-	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const borderProps = getBorderClassesAndStyles(attributes);
+	const colorProps = getColorClassesAndStyles(attributes);
+	const spacingProps = getSpacingClassesAndStyles(attributes);
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
@@ -53,22 +45,22 @@ export default function save( { attributes, className } ) {
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
-	const wrapperClasses = classnames( className, {
-		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
-		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
-	} );
+	const wrapperClasses = classnames(className, {
+		[`has-custom-width wp-block-button__width-${width}`]: width,
+		[`has-custom-font-size`]: fontSize || style?.typography?.fontSize,
+	});
 
 	return (
-		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+		<div {...useBlockProps.save({ className: wrapperClasses })}>
 			<RichText.Content
 				tagName="a"
-				className={ buttonClasses }
-				href={ url }
-				title={ title }
-				style={ buttonStyle }
-				value={ text }
-				target={ linkTarget }
-				rel={ rel }
+				className={buttonClasses}
+				href={url}
+				title={title}
+				style={buttonStyle}
+				value={text}
+				target={linkTarget}
+				rel={rel}
 			/>
 		</div>
 	);

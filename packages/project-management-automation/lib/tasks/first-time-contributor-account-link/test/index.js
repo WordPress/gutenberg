@@ -4,12 +4,12 @@
 import firstTimeContributorAccountLink from '../';
 import hasWordPressProfile from '../../../has-wordpress-profile';
 
-jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
+jest.mock('../../../has-wordpress-profile', () => jest.fn());
 
-describe( 'firstTimeContributorAccountLink', () => {
-	beforeEach( () => {
+describe('firstTimeContributorAccountLink', () => {
+	beforeEach(() => {
 		hasWordPressProfile.mockReset();
-	} );
+	});
 
 	const payload = {
 		ref: 'refs/heads/trunk',
@@ -32,7 +32,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 		},
 	};
 
-	it( 'does nothing if not a commit to trunk', async () => {
+	it('does nothing if not a commit to trunk', async () => {
 		const payloadForBranchPush = {
 			...payload,
 			ref: 'refs/heads/update/chicken-branch',
@@ -46,12 +46,12 @@ describe( 'firstTimeContributorAccountLink', () => {
 			},
 		};
 
-		await firstTimeContributorAccountLink( payloadForBranchPush, octokit );
+		await firstTimeContributorAccountLink(payloadForBranchPush, octokit);
 
-		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
-	} );
+		expect(octokit.rest.repos.listCommits).not.toHaveBeenCalled();
+	});
 
-	it( 'does nothing if commit pull request undeterminable', async () => {
+	it('does nothing if commit pull request undeterminable', async () => {
 		const payloadDirectToTrunk = {
 			...payload,
 			commits: [
@@ -74,28 +74,26 @@ describe( 'firstTimeContributorAccountLink', () => {
 			},
 		};
 
-		await firstTimeContributorAccountLink( payloadDirectToTrunk, octokit );
+		await firstTimeContributorAccountLink(payloadDirectToTrunk, octokit);
 
-		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
-	} );
+		expect(octokit.rest.repos.listCommits).not.toHaveBeenCalled();
+	});
 
-	it( 'does nothing if the user has multiple commits', async () => {
+	it('does nothing if the user has multiple commits', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( {
+					listCommits: jest.fn(() =>
+						Promise.resolve({
 							data: [
 								{
-									sha:
-										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 								},
 								{
-									sha:
-										'59b07cc57adff90630fc9d5cf2317269a0f4f158',
+									sha: '59b07cc57adff90630fc9d5cf2317269a0f4f158',
 								},
 							],
-						} )
+						})
 					),
 				},
 				issues: {
@@ -104,29 +102,28 @@ describe( 'firstTimeContributorAccountLink', () => {
 			},
 		};
 
-		await firstTimeContributorAccountLink( payload, octokit );
+		await firstTimeContributorAccountLink(payload, octokit);
 
-		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
+		expect(octokit.rest.repos.listCommits).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
-	} );
+		});
+		expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
+	});
 
-	it( 'aborts if the request to retrieve WordPress.org user profile fails', async () => {
+	it('aborts if the request to retrieve WordPress.org user profile fails', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( {
+					listCommits: jest.fn(() =>
+						Promise.resolve({
 							data: [
 								{
-									sha:
-										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 								},
 							],
-						} )
+						})
 					),
 				},
 				issues: {
@@ -135,33 +132,32 @@ describe( 'firstTimeContributorAccountLink', () => {
 			},
 		};
 
-		hasWordPressProfile.mockImplementation( () => {
-			return Promise.reject( new Error( 'Whoops!' ) );
-		} );
+		hasWordPressProfile.mockImplementation(() => {
+			return Promise.reject(new Error('Whoops!'));
+		});
 
-		await firstTimeContributorAccountLink( payload, octokit );
+		await firstTimeContributorAccountLink(payload, octokit);
 
-		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
+		expect(octokit.rest.repos.listCommits).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
-	} );
+		});
+		expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
+	});
 
-	it( 'prompts the user to link their GitHub account to their WordPress.org profile', async () => {
+	it('prompts the user to link their GitHub account to their WordPress.org profile', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( {
+					listCommits: jest.fn(() =>
+						Promise.resolve({
 							data: [
 								{
-									sha:
-										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 								},
 							],
-						} )
+						})
 					),
 				},
 				issues: {
@@ -170,20 +166,20 @@ describe( 'firstTimeContributorAccountLink', () => {
 			},
 		};
 
-		hasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
+		hasWordPressProfile.mockReturnValue(Promise.resolve(false));
 
-		await firstTimeContributorAccountLink( payload, octokit );
+		await firstTimeContributorAccountLink(payload, octokit);
 
-		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
+		expect(octokit.rest.repos.listCommits).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
+		});
+		expect(octokit.rest.issues.createComment).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
-			body: expect.stringMatching( /^Congratulations/ ),
-		} );
-	} );
-} );
+			body: expect.stringMatching(/^Congratulations/),
+		});
+	});
+});

@@ -21,17 +21,17 @@ import { store as editPostStore } from '../../../store';
  */
 const PANEL_NAME = 'discussion-panel';
 
-function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
-	if ( ! isEnabled ) {
+function DiscussionPanel({ isEnabled, isOpened, onTogglePanel }) {
+	if (!isEnabled) {
 		return null;
 	}
 
 	return (
-		<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
+		<PostTypeSupportCheck supportKeys={['comments', 'trackbacks']}>
 			<PanelBody
-				title={ __( 'Discussion' ) }
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
+				title={__('Discussion')}
+				opened={isOpened}
+				onToggle={onTogglePanel}
 			>
 				<PostTypeSupportCheck supportKeys="comments">
 					<PanelRow>
@@ -49,20 +49,16 @@ function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		return {
-			isEnabled: select( editPostStore ).isEditorPanelEnabled(
-				PANEL_NAME
-			),
-			isOpened: select( editPostStore ).isEditorPanelOpened( PANEL_NAME ),
+			isEnabled: select(editPostStore).isEditorPanelEnabled(PANEL_NAME),
+			isOpened: select(editPostStore).isEditorPanelOpened(PANEL_NAME),
 		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
+	}),
+	withDispatch((dispatch) => ({
 		onTogglePanel() {
-			return dispatch( editPostStore ).toggleEditorPanelOpened(
-				PANEL_NAME
-			);
+			return dispatch(editPostStore).toggleEditorPanelOpened(PANEL_NAME);
 		},
-	} ) ),
-] )( DiscussionPanel );
+	})),
+])(DiscussionPanel);

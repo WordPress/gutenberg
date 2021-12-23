@@ -18,8 +18,8 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
+	__experimentalLabel(attributes, { context }) {
+		if (context === 'accessibility') {
 			return attributes.customText;
 		}
 	},

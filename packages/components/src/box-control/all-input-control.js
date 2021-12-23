@@ -15,7 +15,7 @@ import {
 	isValuesDefined,
 } from './utils';
 
-export default function AllInputControl( {
+export default function AllInputControl({
 	onChange = noop,
 	onFocus = noop,
 	onHoverOn = noop,
@@ -25,92 +25,92 @@ export default function AllInputControl( {
 	selectedUnits,
 	setSelectedUnits,
 	...props
-} ) {
-	const allValue = getAllValue( values, sides );
-	const hasValues = isValuesDefined( values );
-	const isMixed = hasValues && isValuesMixed( values, sides );
+}) {
+	const allValue = getAllValue(values, sides);
+	const hasValues = isValuesDefined(values);
+	const isMixed = hasValues && isValuesMixed(values, sides);
 	const allPlaceholder = isMixed ? LABELS.mixed : null;
 
 	// Set meaningful unit selection if no allValue and user has previously
 	// selected units without assigning values while controls were unlinked.
-	const allUnitFallback = ! allValue
-		? getAllUnitFallback( selectedUnits )
+	const allUnitFallback = !allValue
+		? getAllUnitFallback(selectedUnits)
 		: undefined;
 
-	const handleOnFocus = ( event ) => {
-		onFocus( event, { side: 'all' } );
+	const handleOnFocus = (event) => {
+		onFocus(event, { side: 'all' });
 	};
 
 	// Applies a value to an object representing top, right, bottom and left
 	// sides while taking into account any custom side configuration.
-	const applyValueToSides = ( currentValues, newValue ) => {
+	const applyValueToSides = (currentValues, newValue) => {
 		const newValues = { ...currentValues };
 
-		if ( sides?.length ) {
-			sides.forEach( ( side ) => {
-				if ( side === 'vertical' ) {
+		if (sides?.length) {
+			sides.forEach((side) => {
+				if (side === 'vertical') {
 					newValues.top = newValue;
 					newValues.bottom = newValue;
-				} else if ( side === 'horizontal' ) {
+				} else if (side === 'horizontal') {
 					newValues.left = newValue;
 					newValues.right = newValue;
 				} else {
-					newValues[ side ] = newValue;
+					newValues[side] = newValue;
 				}
-			} );
+			});
 		} else {
-			ALL_SIDES.forEach( ( side ) => ( newValues[ side ] = newValue ) );
+			ALL_SIDES.forEach((side) => (newValues[side] = newValue));
 		}
 
 		return newValues;
 	};
 
-	const handleOnChange = ( next ) => {
-		const isNumeric = ! isNaN( parseFloat( next ) );
+	const handleOnChange = (next) => {
+		const isNumeric = !isNaN(parseFloat(next));
 		const nextValue = isNumeric ? next : undefined;
-		const nextValues = applyValueToSides( values, nextValue );
+		const nextValues = applyValueToSides(values, nextValue);
 
-		onChange( nextValues );
+		onChange(nextValues);
 	};
 
 	// Set selected unit so it can be used as fallback by unlinked controls
 	// when individual sides do not have a value containing a unit.
-	const handleOnUnitChange = ( unit ) => {
-		const newUnits = applyValueToSides( selectedUnits, unit );
-		setSelectedUnits( newUnits );
+	const handleOnUnitChange = (unit) => {
+		const newUnits = applyValueToSides(selectedUnits, unit);
+		setSelectedUnits(newUnits);
 	};
 
 	const handleOnHoverOn = () => {
-		onHoverOn( {
+		onHoverOn({
 			top: true,
 			bottom: true,
 			left: true,
 			right: true,
-		} );
+		});
 	};
 
 	const handleOnHoverOff = () => {
-		onHoverOff( {
+		onHoverOff({
 			top: false,
 			bottom: false,
 			left: false,
 			right: false,
-		} );
+		});
 	};
 
 	return (
 		<UnitControl
-			{ ...props }
-			disableUnits={ isMixed }
+			{...props}
+			disableUnits={isMixed}
 			isOnly
-			value={ allValue }
-			unit={ allUnitFallback }
-			onChange={ handleOnChange }
-			onUnitChange={ handleOnUnitChange }
-			onFocus={ handleOnFocus }
-			onHoverOn={ handleOnHoverOn }
-			onHoverOff={ handleOnHoverOff }
-			placeholder={ allPlaceholder }
+			value={allValue}
+			unit={allUnitFallback}
+			onChange={handleOnChange}
+			onUnitChange={handleOnUnitChange}
+			onFocus={handleOnFocus}
+			onHoverOn={handleOnHoverOn}
+			onHoverOff={handleOnHoverOff}
+			placeholder={allPlaceholder}
 		/>
 	);
 }

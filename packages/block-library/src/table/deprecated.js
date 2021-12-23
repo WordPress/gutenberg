@@ -154,7 +154,7 @@ const deprecated = [
 			align: true,
 			__experimentalSelector: '.wp-block-table > table',
 		},
-		save: ( { attributes } ) => {
+		save: ({ attributes }) => {
 			const {
 				hasFixedLayout,
 				head,
@@ -163,9 +163,9 @@ const deprecated = [
 				backgroundColor,
 				caption,
 			} = attributes;
-			const isEmpty = ! head.length && ! body.length && ! foot.length;
+			const isEmpty = !head.length && !body.length && !foot.length;
 
-			if ( isEmpty ) {
+			if (isEmpty) {
 				return null;
 			}
 
@@ -174,32 +174,32 @@ const deprecated = [
 				backgroundColor
 			);
 
-			const classes = classnames( backgroundClass, {
+			const classes = classnames(backgroundClass, {
 				'has-fixed-layout': hasFixedLayout,
-				'has-background': !! backgroundClass,
-			} );
+				'has-background': !!backgroundClass,
+			});
 
-			const hasCaption = ! RichText.isEmpty( caption );
+			const hasCaption = !RichText.isEmpty(caption);
 
-			const Section = ( { type, rows } ) => {
-				if ( ! rows.length ) {
+			const Section = ({ type, rows }) => {
+				if (!rows.length) {
 					return null;
 				}
 
-				const Tag = `t${ type }`;
+				const Tag = `t${type}`;
 
 				return (
 					<Tag>
-						{ rows.map( ( { cells }, rowIndex ) => (
-							<tr key={ rowIndex }>
-								{ cells.map(
+						{rows.map(({ cells }, rowIndex) => (
+							<tr key={rowIndex}>
+								{cells.map(
 									(
 										{ content, tag, scope, align },
 										cellIndex
 									) => {
-										const cellClasses = classnames( {
-											[ `has-text-align-${ align }` ]: align,
-										} );
+										const cellClasses = classnames({
+											[`has-text-align-${align}`]: align,
+										});
 
 										return (
 											<RichText.Content
@@ -208,10 +208,10 @@ const deprecated = [
 														? cellClasses
 														: undefined
 												}
-												data-align={ align }
-												tagName={ tag }
-												value={ content }
-												key={ cellIndex }
+												data-align={align}
+												tagName={tag}
+												value={content}
+												key={cellIndex}
 												scope={
 													tag === 'th'
 														? scope
@@ -220,42 +220,42 @@ const deprecated = [
 											/>
 										);
 									}
-								) }
+								)}
 							</tr>
-						) ) }
+						))}
 					</Tag>
 				);
 			};
 
 			return (
-				<figure { ...useBlockProps.save() }>
-					<table className={ classes === '' ? undefined : classes }>
-						<Section type="head" rows={ head } />
-						<Section type="body" rows={ body } />
-						<Section type="foot" rows={ foot } />
+				<figure {...useBlockProps.save()}>
+					<table className={classes === '' ? undefined : classes}>
+						<Section type="head" rows={head} />
+						<Section type="body" rows={body} />
+						<Section type="foot" rows={foot} />
 					</table>
-					{ hasCaption && (
+					{hasCaption && (
 						<RichText.Content
 							tagName="figcaption"
-							value={ caption }
+							value={caption}
 						/>
-					) }
+					)}
 				</figure>
 			);
 		},
-		isEligible: ( attributes ) => {
-			return attributes.backgroundColor && ! attributes.style;
+		isEligible: (attributes) => {
+			return attributes.backgroundColor && !attributes.style;
 		},
 
 		// This version is the first to introduce the style attribute to the
 		// table block. As a result, we'll explicitly override that.
-		migrate: ( attributes ) => {
+		migrate: (attributes) => {
 			return {
 				...attributes,
 				backgroundColor: undefined,
 				style: {
 					color: {
-						background: oldColors[ attributes.backgroundColor ],
+						background: oldColors[attributes.backgroundColor],
 					},
 				},
 			};
@@ -362,17 +362,12 @@ const deprecated = [
 			},
 		},
 		supports,
-		save( { attributes } ) {
-			const {
-				hasFixedLayout,
-				head,
-				body,
-				foot,
-				backgroundColor,
-			} = attributes;
-			const isEmpty = ! head.length && ! body.length && ! foot.length;
+		save({ attributes }) {
+			const { hasFixedLayout, head, body, foot, backgroundColor } =
+				attributes;
+			const isEmpty = !head.length && !body.length && !foot.length;
 
-			if ( isEmpty ) {
+			if (isEmpty) {
 				return null;
 			}
 
@@ -381,45 +376,45 @@ const deprecated = [
 				backgroundColor
 			);
 
-			const classes = classnames( backgroundClass, {
+			const classes = classnames(backgroundClass, {
 				'has-fixed-layout': hasFixedLayout,
-				'has-background': !! backgroundClass,
-			} );
+				'has-background': !!backgroundClass,
+			});
 
-			const Section = ( { type, rows } ) => {
-				if ( ! rows.length ) {
+			const Section = ({ type, rows }) => {
+				if (!rows.length) {
 					return null;
 				}
 
-				const Tag = `t${ type }`;
+				const Tag = `t${type}`;
 
 				return (
 					<Tag>
-						{ rows.map( ( { cells }, rowIndex ) => (
-							<tr key={ rowIndex }>
-								{ cells.map(
-									( { content, tag, scope }, cellIndex ) => (
+						{rows.map(({ cells }, rowIndex) => (
+							<tr key={rowIndex}>
+								{cells.map(
+									({ content, tag, scope }, cellIndex) => (
 										<RichText.Content
-											tagName={ tag }
-											value={ content }
-											key={ cellIndex }
+											tagName={tag}
+											value={content}
+											key={cellIndex}
 											scope={
 												tag === 'th' ? scope : undefined
 											}
 										/>
 									)
-								) }
+								)}
 							</tr>
-						) ) }
+						))}
 					</Tag>
 				);
 			};
 
 			return (
-				<table className={ classes }>
-					<Section type="head" rows={ head } />
-					<Section type="body" rows={ body } />
-					<Section type="foot" rows={ foot } />
+				<table className={classes}>
+					<Section type="head" rows={head} />
+					<Section type="body" rows={body} />
+					<Section type="foot" rows={foot} />
 				</table>
 			);
 		},

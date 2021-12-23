@@ -10,9 +10,9 @@ import { includes } from 'lodash';
  *
  * @return {boolean} True if MacOS; false otherwise.
  */
-export function isAppleOS( _window = null ) {
-	if ( ! _window ) {
-		if ( typeof window === 'undefined' ) {
+export function isAppleOS(_window = null) {
+	if (!_window) {
+		if (typeof window === 'undefined') {
 			return false;
 		}
 
@@ -22,7 +22,6 @@ export function isAppleOS( _window = null ) {
 	const { platform } = _window.navigator;
 
 	return (
-		platform.indexOf( 'Mac' ) !== -1 ||
-		includes( [ 'iPad', 'iPhone' ], platform )
+		platform.indexOf('Mac') !== -1 || includes(['iPad', 'iPhone'], platform)
 	);
 }

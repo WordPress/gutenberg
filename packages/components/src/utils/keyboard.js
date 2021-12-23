@@ -6,7 +6,7 @@ import { RIGHT, UP, DOWN, LEFT } from '@wordpress/keycodes';
 /**
  * @type {number[]}
  */
-const arrowKeys = [ RIGHT, UP, DOWN, LEFT ];
+const arrowKeys = [RIGHT, UP, DOWN, LEFT];
 
 /**
  * Normalizes the 'key' property of a KeyboardEvent in IE/Edge
@@ -18,11 +18,11 @@ const arrowKeys = [ RIGHT, UP, DOWN, LEFT ];
  *
  * @return {string} The keyboard key
  */
-export function normalizeArrowKey( event ) {
+export function normalizeArrowKey(event) {
 	const { key, keyCode } = event;
 
-	if ( arrowKeys.includes( keyCode ) && key.indexOf( 'Arrow' ) !== 0 ) {
-		return `Arrow${ key }`;
+	if (arrowKeys.includes(keyCode) && key.indexOf('Arrow') !== 0) {
+		return `Arrow${key}`;
 	}
 	return key;
 }

@@ -16,7 +16,7 @@ import { store as blocksStore } from '../store';
  * @return {WPBlockCategory[]} Block categories.
  */
 export function getCategories() {
-	return select( blocksStore ).getCategories();
+	return select(blocksStore).getCategories();
 }
 
 /**
@@ -24,8 +24,8 @@ export function getCategories() {
  *
  * @param {WPBlockCategory[]} categories Block categories.
  */
-export function setCategories( categories ) {
-	dispatch( blocksStore ).setCategories( categories );
+export function setCategories(categories) {
+	dispatch(blocksStore).setCategories(categories);
 }
 
 /**
@@ -35,6 +35,6 @@ export function setCategories( categories ) {
  * @param {WPBlockCategory} category Object containing the category properties
  *                                   that should be updated.
  */
-export function updateCategory( slug, category ) {
-	dispatch( blocksStore ).updateCategory( slug, category );
+export function updateCategory(slug, category) {
+	dispatch(blocksStore).updateCategory(slug, category);
 }

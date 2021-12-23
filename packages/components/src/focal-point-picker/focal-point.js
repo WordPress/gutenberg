@@ -13,13 +13,11 @@ import {
  */
 import classnames from 'classnames';
 
-export default function FocalPoint( {
+export default function FocalPoint({
 	coordinates = { left: '50%', top: '50%' },
 	...props
-} ) {
-	const classes = classnames(
-		'components-focal-point-picker__icon_container'
-	);
+}) {
+	const classes = classnames('components-focal-point-picker__icon_container');
 
 	const style = {
 		left: coordinates.left,
@@ -27,7 +25,7 @@ export default function FocalPoint( {
 	};
 
 	return (
-		<FocalPointWrapper { ...props } className={ classes } style={ style }>
+		<FocalPointWrapper {...props} className={classes} style={style}>
 			<PointerIconSVG
 				className="components-focal-point-picker__icon"
 				xmlns="http://www.w3.org/2000/svg"

@@ -28,7 +28,7 @@ const DEFAULT_STATE = {
 };
 
 const actions = {
-	setPrice( item, price ) {
+	setPrice(item, price) {
 		return {
 			type: 'SET_PRICE',
 			item,
@@ -36,14 +36,14 @@ const actions = {
 		};
 	},
 
-	startSale( discountPercent ) {
+	startSale(discountPercent) {
 		return {
 			type: 'START_SALE',
 			discountPercent,
 		};
 	},
 
-	fetchFromAPI( path ) {
+	fetchFromAPI(path) {
 		return {
 			type: 'FETCH_FROM_API',
 			path,
@@ -51,15 +51,15 @@ const actions = {
 	},
 };
 
-const store = createReduxStore( 'my-shop', {
-	reducer( state = DEFAULT_STATE, action ) {
-		switch ( action.type ) {
+const store = createReduxStore('my-shop', {
+	reducer(state = DEFAULT_STATE, action) {
+		switch (action.type) {
 			case 'SET_PRICE':
 				return {
 					...state,
 					prices: {
 						...state.prices,
-						[ action.item ]: action.price,
+						[action.item]: action.price,
 					},
 				};
 
@@ -76,30 +76,30 @@ const store = createReduxStore( 'my-shop', {
 	actions,
 
 	selectors: {
-		getPrice( state, item ) {
+		getPrice(state, item) {
 			const { prices, discountPercent } = state;
-			const price = prices[ item ];
+			const price = prices[item];
 
-			return price * ( 1 - 0.01 * discountPercent );
+			return price * (1 - 0.01 * discountPercent);
 		},
 	},
 
 	controls: {
-		FETCH_FROM_API( action ) {
-			return apiFetch( { path: action.path } );
+		FETCH_FROM_API(action) {
+			return apiFetch({ path: action.path });
 		},
 	},
 
 	resolvers: {
-		*getPrice( item ) {
+		*getPrice(item) {
 			const path = '/wp/v2/prices/' + item;
-			const price = yield actions.fetchFromAPI( path );
-			return actions.setPrice( item, price );
+			const price = yield actions.fetchFromAPI(path);
+			return actions.setPrice(item, price);
 		},
 	},
-} );
+});
 
-register( store );
+register(store);
 ```
 
 The return value of `createReduxStore` is the `StoreDescriptor` object that contains two properties:
@@ -174,23 +174,28 @@ const reduxStore = createStore();
 
 const boundSelectors = mapValues(
 	existingSelectors,
-	( selector ) => ( ...args ) => selector( reduxStore.getState(), ...args )
+	(selector) =>
+		(...args) =>
+			selector(reduxStore.getState(), ...args)
 );
 
-const boundActions = mapValues( existingActions, ( action ) => ( ...args ) =>
-	reduxStore.dispatch( action( ...args ) )
+const boundActions = mapValues(
+	existingActions,
+	(action) =>
+		(...args) =>
+			reduxStore.dispatch(action(...args))
 );
 
 const genericStore = {
 	name: 'existing-app',
-	instantiate: () => ( {
+	instantiate: () => ({
 		getSelectors: () => boundSelectors,
 		getActions: () => boundActions,
 		subscribe: reduxStore.subscribe,
-	} ),
+	}),
 };
 
-register( genericStore );
+register(genericStore);
 ```
 
 It is also possible to implement a completely custom store from scratch:
@@ -208,25 +213,25 @@ function customStore() {
 			const prices = { hammer: 7.5 };
 
 			function storeChanged() {
-				for ( const listener of listeners ) {
+				for (const listener of listeners) {
 					listener();
 				}
 			}
 
-			function subscribe( listener ) {
-				listeners.add( listener );
-				return () => listeners.delete( listener );
+			function subscribe(listener) {
+				listeners.add(listener);
+				return () => listeners.delete(listener);
 			}
 
 			const selectors = {
-				getPrice( itemName ) {
-					return prices[ itemName ];
+				getPrice(itemName) {
+					return prices[itemName];
 				},
 			};
 
 			const actions = {
-				setPrice( itemName, price ) {
-					prices[ itemName ] = price;
+				setPrice(itemName, price) {
+					prices[itemName] = price;
 					storeChanged();
 				},
 			};
@@ -240,7 +245,7 @@ function customStore() {
 	};
 }
 
-register( customStore );
+register(customStore);
 ```
 
 ## Comparison with Redux
@@ -275,16 +280,16 @@ _Usage_
 import { useSelect, AsyncModeProvider } from '@wordpress/data';
 
 function BlockCount() {
-	const count = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlockCount();
-	}, [] );
+	const count = useSelect((select) => {
+		return select('core/block-editor').getBlockCount();
+	}, []);
 
 	return count;
 }
 
 function App() {
 	return (
-		<AsyncModeProvider value={ true }>
+		<AsyncModeProvider value={true}>
 			<BlockCount />
 		</AsyncModeProvider>
 	);
@@ -314,26 +319,26 @@ _Usage_
 ```js
 import { combineReducers, createReduxStore, register } from '@wordpress/data';
 
-const prices = ( state = {}, action ) => {
+const prices = (state = {}, action) => {
 	return action.type === 'SET_PRICE'
 		? {
 				...state,
-				[ action.item ]: action.price,
+				[action.item]: action.price,
 		  }
 		: state;
 };
 
-const discountPercent = ( state = 0, action ) => {
+const discountPercent = (state = 0, action) => {
 	return action.type === 'START_SALE' ? action.discountPercent : state;
 };
 
-const store = createReduxStore( 'my-shop', {
-	reducer: combineReducers( {
+const store = createReduxStore('my-shop', {
+	reducer: combineReducers({
 		prices,
 		discountPercent,
-	} ),
-} );
-register( store );
+	}),
+});
+register(store);
 ```
 
 _Parameters_
@@ -358,12 +363,12 @@ _Usage_
 ```js
 import { createReduxStore } from '@wordpress/data';
 
-const store = createReduxStore( 'demo', {
-	reducer: ( state = 'OK' ) => state,
+const store = createReduxStore('demo', {
+	reducer: (state = 'OK') => state,
 	selectors: {
-		getValue: ( state ) => state,
+		getValue: (state) => state,
 	},
-} );
+});
 ```
 
 _Parameters_
@@ -395,13 +400,13 @@ Creates a control function that takes additional curried argument with the `regi
 While a regular control has signature
 
 ```js
-( action ) => iteratorOrPromise;
+(action) => iteratorOrPromise;
 ```
 
 where the control works with the `action` that it's bound to, a registry control has signature:
 
 ```js
-( registry ) => ( action ) => iteratorOrPromise;
+(registry) => (action) => iteratorOrPromise;
 ```
 
 A registry control is typically used to select data or dispatch an action to a registered
@@ -424,14 +429,16 @@ Creates a selector function that takes additional curried argument with the
 registry `select` function. While a regular selector has signature
 
 ```js
-( state, ...selectorArgs ) => result;
+(state, ...selectorArgs) => result;
 ```
 
 that allows to select data from the store's `state`, a registry selector
 has signature:
 
 ```js
-( select ) => ( state, ...selectorArgs ) => result;
+(select) =>
+	(state, ...selectorArgs) =>
+		result;
 ```
 
 that supports also selecting from other registered stores.
@@ -439,20 +446,16 @@ that supports also selecting from other registered stores.
 _Usage_
 
 ```js
-const getCurrentPostId = createRegistrySelector( ( select ) => ( state ) => {
-	return select( 'core/editor' ).getCurrentPostId();
-} );
+const getCurrentPostId = createRegistrySelector((select) => (state) => {
+	return select('core/editor').getCurrentPostId();
+});
 
-const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
+const getPostEdits = createRegistrySelector((select) => (state) => {
 	// calling another registry selector just like any other function
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	return select( 'core' ).getEntityRecordEdits(
-		'postType',
-		postType,
-		postId
-	);
-} );
+	const postType = getCurrentPostType(state);
+	const postId = getCurrentPostId(state);
+	return select('core').getEntityRecordEdits('postType', postType, postId);
+});
 ```
 
 Note how the `getCurrentPostId` selector can be called just like any other function,
@@ -481,7 +484,7 @@ _Usage_
 ```js
 import { dispatch } from '@wordpress/data';
 
-dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
+dispatch('my-shop').setPrice('hammer', 9.75);
 ```
 
 _Parameters_
@@ -513,13 +516,13 @@ _Usage_
 ```js
 import { createReduxStore, register } from '@wordpress/data';
 
-const store = createReduxStore( 'demo', {
-	reducer: ( state = 'OK' ) => state,
+const store = createReduxStore('demo', {
+	reducer: (state = 'OK') => state,
 	selectors: {
-		getValue: ( state ) => state,
+		getValue: (state) => state,
 	},
-} );
-register( store );
+});
+register(store);
 ```
 
 _Parameters_
@@ -605,7 +608,7 @@ _Usage_
 ```js
 import { resolveSelect } from '@wordpress/data';
 
-resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then( console.log );
+resolveSelect('my-shop').getPrice('hammer').then(console.log);
 ```
 
 _Parameters_
@@ -627,7 +630,7 @@ _Usage_
 ```js
 import { select } from '@wordpress/data';
 
-select( 'my-shop' ).getPrice( 'hammer' );
+select('my-shop').getPrice('hammer');
 ```
 
 _Parameters_
@@ -649,10 +652,10 @@ _Usage_
 ```js
 import { subscribe } from '@wordpress/data';
 
-const unsubscribe = subscribe( () => {
+const unsubscribe = subscribe(() => {
 	// You could use this opportunity to test whether the derived result of a
 	// selector has subsequently changed as the result of a state update.
-} );
+});
 
 // Later, if necessary...
 unsubscribe();
@@ -689,25 +692,25 @@ action.
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 
-function Button( { onClick, children } ) {
+function Button({ onClick, children }) {
 	return (
-		<button type="button" onClick={ onClick }>
-			{ children }
+		<button type="button" onClick={onClick}>
+			{children}
 		</button>
 	);
 }
 
-const SaleButton = ( { children } ) => {
+const SaleButton = ({ children }) => {
 	const { stockNumber } = useSelect(
-		( select ) => select( 'my-shop' ).getStockNumber(),
+		(select) => select('my-shop').getStockNumber(),
 		[]
 	);
-	const { startSale } = useDispatch( 'my-shop' );
-	const onClick = useCallback( () => {
+	const { startSale } = useDispatch('my-shop');
+	const onClick = useCallback(() => {
 		const discountPercent = stockNumber > 50 ? 10 : 20;
-		startSale( discountPercent );
-	}, [ stockNumber ] );
-	return <Button onClick={ onClick }>{ children }</Button>;
+		startSale(discountPercent);
+	}, [stockNumber]);
+	return <Button onClick={onClick}>{children}</Button>;
 };
 
 // Rendered somewhere in the application:
@@ -743,17 +746,17 @@ _Usage_
 ```js
 import { RegistryProvider, createRegistry, useRegistry } from '@wordpress/data';
 
-const registry = createRegistry( {} );
+const registry = createRegistry({});
 
-const SomeChildUsingRegistry = ( props ) => {
+const SomeChildUsingRegistry = (props) => {
 	const registry = useRegistry();
 	// ...logic implementing the registry in other react hooks.
 };
 
-const ParentProvidingRegistry = ( props ) => {
+const ParentProvidingRegistry = (props) => {
 	return (
-		<RegistryProvider value={ registry }>
-			<SomeChildUsingRegistry { ...props } />
+		<RegistryProvider value={registry}>
+			<SomeChildUsingRegistry {...props} />
 		</RegistryProvider>
 	);
 };
@@ -775,17 +778,17 @@ _Usage_
 ```js
 import { useSelect } from '@wordpress/data';
 
-function HammerPriceDisplay( { currency } ) {
+function HammerPriceDisplay({ currency }) {
 	const price = useSelect(
-		( select ) => {
-			return select( 'my-shop' ).getPrice( 'hammer', currency );
+		(select) => {
+			return select('my-shop').getPrice('hammer', currency);
 		},
-		[ currency ]
+		[currency]
 	);
-	return new Intl.NumberFormat( 'en-US', {
+	return new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency,
-	} ).format( price );
+	}).format(price);
 }
 
 // Rendered in the application:
@@ -808,13 +811,13 @@ function because your component won't re-render on a data change.**
 ```js
 import { useSelect } from '@wordpress/data';
 
-function Paste( { children } ) {
-	const { getSettings } = useSelect( 'my-shop' );
+function Paste({ children }) {
+	const { getSettings } = useSelect('my-shop');
 	function onPaste() {
 		// Do something with the settings.
 		const settings = getSettings();
 	}
-	return <div onPaste={ onPaste }>{ children }</div>;
+	return <div onPaste={onPaste}>{children}</div>;
 }
 ```
 
@@ -835,26 +838,26 @@ creators.
 _Usage_
 
 ```jsx
-function Button( { onClick, children } ) {
+function Button({ onClick, children }) {
 	return (
-		<button type="button" onClick={ onClick }>
-			{ children }
+		<button type="button" onClick={onClick}>
+			{children}
 		</button>
 	);
 }
 
 import { withDispatch } from '@wordpress/data';
 
-const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( 'my-shop' );
+const SaleButton = withDispatch((dispatch, ownProps) => {
+	const { startSale } = dispatch('my-shop');
 	const { discountPercent } = ownProps;
 
 	return {
 		onClick() {
-			startSale( discountPercent );
+			startSale(discountPercent);
 		},
 	};
-} )( Button );
+})(Button);
 
 // Rendered in the application:
 //
@@ -875,27 +878,27 @@ Keep in mind, that `mapDispatchToProps` must return an object with functions
 only.
 
 ```jsx
-function Button( { onClick, children } ) {
+function Button({ onClick, children }) {
 	return (
-		<button type="button" onClick={ onClick }>
-			{ children }
+		<button type="button" onClick={onClick}>
+			{children}
 		</button>
 	);
 }
 
 import { withDispatch } from '@wordpress/data';
 
-const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
+const SaleButton = withDispatch((dispatch, ownProps, { select }) => {
 	// Stock number changes frequently.
-	const { getStockNumber } = select( 'my-shop' );
-	const { startSale } = dispatch( 'my-shop' );
+	const { getStockNumber } = select('my-shop');
+	const { startSale } = dispatch('my-shop');
 	return {
 		onClick() {
 			const discountPercent = getStockNumber() > 50 ? 10 : 20;
-			startSale( discountPercent );
+			startSale(discountPercent);
 		},
 	};
-} )( Button );
+})(Button);
 
 // Rendered in the application:
 //
@@ -937,21 +940,21 @@ _Usage_
 ```js
 import { withSelect } from '@wordpress/data';
 
-function PriceDisplay( { price, currency } ) {
-	return new Intl.NumberFormat( 'en-US', {
+function PriceDisplay({ price, currency }) {
+	return new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency,
-	} ).format( price );
+	}).format(price);
 }
 
-const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
-	const { getPrice } = select( 'my-shop' );
+const HammerPriceDisplay = withSelect((select, ownProps) => {
+	const { getPrice } = select('my-shop');
 	const { currency } = ownProps;
 
 	return {
-		price: getPrice( 'hammer', currency ),
+		price: getPrice('hammer', currency),
 	};
-} )( PriceDisplay );
+})(PriceDisplay);
 
 // Rendered in the application:
 //
@@ -992,13 +995,13 @@ function Component() {
 
 	function callback() {
 		// This will only rerender the components once.
-		registry.batch( () => {
-			registry.dispatch( someStore ).someAction();
-			registry.dispatch( someStore ).someOtherAction();
-		} );
+		registry.batch(() => {
+			registry.dispatch(someStore).someAction();
+			registry.dispatch(someStore).someOtherAction();
+		});
 	}
 
-	return <button onClick={ callback }>Click me</button>;
+	return <button onClick={callback}>Click me</button>;
 }
 ```
 

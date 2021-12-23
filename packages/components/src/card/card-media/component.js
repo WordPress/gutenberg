@@ -9,10 +9,10 @@ import { useCardMedia } from './hook';
  * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
  * @param {import('react').Ref<any>}                                                                           forwardedRef
  */
-function CardMedia( props, forwardedRef ) {
-	const cardMediaProps = useCardMedia( props );
+function CardMedia(props, forwardedRef) {
+	const cardMediaProps = useCardMedia(props);
 
-	return <View { ...cardMediaProps } ref={ forwardedRef } />;
+	return <View {...cardMediaProps} ref={forwardedRef} />;
 }
 
 /**
@@ -32,6 +32,6 @@ function CardMedia( props, forwardedRef ) {
  * );
  * ```
  */
-const ConnectedCardMedia = contextConnect( CardMedia, 'CardMedia' );
+const ConnectedCardMedia = contextConnect(CardMedia, 'CardMedia');
 
 export default ConnectedCardMedia;

@@ -12,7 +12,7 @@ export const _default = () => (
 	<>
 		<VisuallyHidden>This should not show.</VisuallyHidden>
 		<div>
-			This text will{ ' ' }
+			This text will{' '}
 			<VisuallyHidden as="span">but not inline </VisuallyHidden> always
 			show.
 		</div>
@@ -22,9 +22,9 @@ export const _default = () => (
 export const withForwardedProps = () => (
 	<>
 		Additional props can be passed to VisuallyHidden and are forwarded to
-		the rendered element.{ ' ' }
+		the rendered element.{' '}
 		<VisuallyHidden as="span" data-id="test">
-			Check out my data attribute!{ ' ' }
+			Check out my data attribute!{' '}
 		</VisuallyHidden>
 		Inspect the HTML to see!
 	</>
@@ -33,9 +33,9 @@ export const withForwardedProps = () => (
 export const withAdditionalClassNames = () => (
 	<>
 		Additional class names passed to VisuallyHidden extend the component
-		class name.{ ' ' }
+		class name.{' '}
 		<VisuallyHidden as="label" className="test-input">
-			Check out my class!{ ' ' }
+			Check out my class!{' '}
 		</VisuallyHidden>
 		Inspect the HTML to see!
 	</>

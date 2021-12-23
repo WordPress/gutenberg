@@ -9,14 +9,14 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import NameDisplay from '../components/name-display';
 
 const addMenuNameEditor = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		if ( props.name !== 'core/navigation' ) {
-			return <BlockEdit { ...props } />;
+	(BlockEdit) => (props) => {
+		if (props.name !== 'core/navigation') {
+			return <BlockEdit {...props} />;
 		}
 		return (
 			<>
 				<NameDisplay />
-				<BlockEdit { ...props } />
+				<BlockEdit {...props} />
 			</>
 		);
 	},

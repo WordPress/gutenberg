@@ -13,7 +13,7 @@ import {
 	getFormatTypeForClassName,
 } from '../selectors';
 
-describe( 'selectors', () => {
+describe('selectors', () => {
 	const formatType = {
 		name: 'core/test-format',
 		className: null,
@@ -29,7 +29,7 @@ describe( 'selectors', () => {
 		className: null,
 		tagName: 'strong',
 	};
-	const defaultState = deepFreeze( {
+	const defaultState = deepFreeze({
 		formatTypes: {
 			'core/test-format': formatType,
 			'core/test-format-class-name': formatTypeClassName,
@@ -37,46 +37,43 @@ describe( 'selectors', () => {
 			// `core/test-format-class-name` is not considered bare.
 			'core/test-format-bare-tag': formatTypeBareTag,
 		},
-	} );
+	});
 
-	describe( 'getFormatTypes', () => {
-		it( 'should get format types', () => {
+	describe('getFormatTypes', () => {
+		it('should get format types', () => {
 			const expected = [
 				formatType,
 				formatTypeClassName,
 				formatTypeBareTag,
 			];
-			expect( getFormatTypes( defaultState ) ).toEqual( expected );
-		} );
-	} );
+			expect(getFormatTypes(defaultState)).toEqual(expected);
+		});
+	});
 
-	describe( 'getFormatType', () => {
-		it( 'should get a format type', () => {
-			const result = getFormatType( defaultState, 'core/test-format' );
+	describe('getFormatType', () => {
+		it('should get a format type', () => {
+			const result = getFormatType(defaultState, 'core/test-format');
 
-			expect( result ).toEqual( formatType );
-		} );
-	} );
+			expect(result).toEqual(formatType);
+		});
+	});
 
-	describe( 'getFormatTypeForBareElement', () => {
-		it( 'should get a format type', () => {
-			const result = getFormatTypeForBareElement(
-				defaultState,
-				'strong'
-			);
+	describe('getFormatTypeForBareElement', () => {
+		it('should get a format type', () => {
+			const result = getFormatTypeForBareElement(defaultState, 'strong');
 
-			expect( result ).toEqual( formatTypeBareTag );
-		} );
-	} );
+			expect(result).toEqual(formatTypeBareTag);
+		});
+	});
 
-	describe( 'getFormatTypeForClassName', () => {
-		it( 'should get a format type', () => {
+	describe('getFormatTypeForClassName', () => {
+		it('should get a format type', () => {
 			const result = getFormatTypeForClassName(
 				defaultState,
 				'class-name'
 			);
 
-			expect( result ).toEqual( formatTypeClassName );
-		} );
-	} );
-} );
+			expect(result).toEqual(formatTypeClassName);
+		});
+	});
+});

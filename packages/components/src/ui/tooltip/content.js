@@ -20,26 +20,26 @@ const { TooltipPopoverView } = styles;
  * @param {import('../context').WordPressComponentProps<import('./types').ContentProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                            forwardedRef
  */
-function TooltipContent( props, forwardedRef ) {
+function TooltipContent(props, forwardedRef) {
 	const { children, className, ...otherProps } = useContextSystem(
 		props,
 		'TooltipContent'
 	);
 	const { tooltip } = useTooltipContext();
 	const cx = useCx();
-	const classes = cx( styles.TooltipContent, className );
+	const classes = cx(styles.TooltipContent, className);
 
 	return (
 		<ReakitTooltip
-			as={ View }
-			{ ...otherProps }
-			{ ...tooltip }
-			className={ classes }
-			ref={ forwardedRef }
+			as={View}
+			{...otherProps}
+			{...tooltip}
+			className={classes}
+			ref={forwardedRef}
 		>
-			<TooltipPopoverView>{ children }</TooltipPopoverView>
+			<TooltipPopoverView>{children}</TooltipPopoverView>
 		</ReakitTooltip>
 	);
 }
 
-export default contextConnect( TooltipContent, 'TooltipContent' );
+export default contextConnect(TooltipContent, 'TooltipContent');

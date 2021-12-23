@@ -15,37 +15,35 @@ import { store as editorStore } from '../../store';
 import { AUTHORS_QUERY } from './constants';
 
 function PostAuthorSelect() {
-	const { editPost } = useDispatch( editorStore );
-	const { postAuthor, authors } = useSelect( ( select ) => {
+	const { editPost } = useDispatch(editorStore);
+	const { postAuthor, authors } = useSelect((select) => {
 		return {
-			postAuthor: select( editorStore ).getEditedPostAttribute(
-				'author'
-			),
-			authors: select( coreStore ).getUsers( AUTHORS_QUERY ),
+			postAuthor: select(editorStore).getEditedPostAttribute('author'),
+			authors: select(coreStore).getUsers(AUTHORS_QUERY),
 		};
-	}, [] );
+	}, []);
 
-	const authorOptions = useMemo( () => {
-		return ( authors ?? [] ).map( ( author ) => {
+	const authorOptions = useMemo(() => {
+		return (authors ?? []).map((author) => {
 			return {
 				value: author.id,
-				label: decodeEntities( author.name ),
+				label: decodeEntities(author.name),
 			};
-		} );
-	}, [ authors ] );
+		});
+	}, [authors]);
 
-	const setAuthorId = ( value ) => {
-		const author = Number( value );
-		editPost( { author } );
+	const setAuthorId = (value) => {
+		const author = Number(value);
+		editPost({ author });
 	};
 
 	return (
 		<SelectControl
 			className="post-author-selector"
-			label={ __( 'Author' ) }
-			options={ authorOptions }
-			onChange={ setAuthorId }
-			value={ postAuthor }
+			label={__('Author')}
+			options={authorOptions}
+			onChange={setAuthorId}
+			value={postAuthor}
 		/>
 	);
 }

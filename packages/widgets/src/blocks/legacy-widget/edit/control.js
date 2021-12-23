@@ -31,14 +31,14 @@ export default class Control {
 	 * @param {Function} params.onChangeHasPreview
 	 * @param {Function} params.onError
 	 */
-	constructor( {
+	constructor({
 		id,
 		idBase,
 		instance,
 		onChangeInstance,
 		onChangeHasPreview,
 		onError,
-	} ) {
+	}) {
 		this.id = id;
 		this.idBase = idBase;
 		this._instance = instance;
@@ -52,11 +52,8 @@ export default class Control {
 		// a fake but unique number.
 		this.number = ++lastNumber;
 
-		this.handleFormChange = debounce(
-			this.handleFormChange.bind( this ),
-			200
-		);
-		this.handleFormSubmit = this.handleFormSubmit.bind( this );
+		this.handleFormChange = debounce(this.handleFormChange.bind(this), 200);
+		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 
 		this.initDOM();
 		this.bindEvents();
@@ -81,42 +78,42 @@ export default class Control {
 	 * @access private
 	 */
 	initDOM() {
-		this.element = el( 'div', { class: 'widget open' }, [
-			el( 'div', { class: 'widget-inside' }, [
-				( this.form = el( 'form', { class: 'form', method: 'post' }, [
+		this.element = el('div', { class: 'widget open' }, [
+			el('div', { class: 'widget-inside' }, [
+				(this.form = el('form', { class: 'form', method: 'post' }, [
 					// These hidden form inputs are what most widgets' scripts
 					// use to access data about the widget.
-					el( 'input', {
+					el('input', {
 						class: 'widget-id',
 						type: 'hidden',
 						name: 'widget-id',
-						value: this.id ?? `${ this.idBase }-${ this.number }`,
-					} ),
-					el( 'input', {
+						value: this.id ?? `${this.idBase}-${this.number}`,
+					}),
+					el('input', {
 						class: 'id_base',
 						type: 'hidden',
 						name: 'id_base',
 						value: this.idBase ?? this.id,
-					} ),
-					el( 'input', {
+					}),
+					el('input', {
 						class: 'widget-width',
 						type: 'hidden',
 						name: 'widget-width',
 						value: '250',
-					} ),
-					el( 'input', {
+					}),
+					el('input', {
 						class: 'widget-height',
 						type: 'hidden',
 						name: 'widget-height',
 						value: '200',
-					} ),
-					el( 'input', {
+					}),
+					el('input', {
 						class: 'widget_number',
 						type: 'hidden',
 						name: 'widget_number',
 						value: this.idBase ? this.number.toString() : '',
-					} ),
-					( this.content = el( 'div', { class: 'widget-content' } ) ),
+					}),
+					(this.content = el('div', { class: 'widget-content' })),
 					// Non-multi widgets can be saved via a Save button.
 					this.id &&
 						el(
@@ -125,11 +122,11 @@ export default class Control {
 								class: 'button is-primary',
 								type: 'submit',
 							},
-							__( 'Save' )
+							__('Save')
 						),
-				] ) ),
-			] ),
-		] );
+				])),
+			]),
+		]);
 	}
 
 	/**
@@ -140,15 +137,15 @@ export default class Control {
 	bindEvents() {
 		// Prefer jQuery 'change' event instead of the native 'change' event
 		// because many widgets use jQuery's event bus to trigger an update.
-		if ( window.jQuery ) {
+		if (window.jQuery) {
 			const { jQuery: $ } = window;
-			$( this.form ).on( 'change', null, this.handleFormChange );
-			$( this.form ).on( 'input', null, this.handleFormChange );
-			$( this.form ).on( 'submit', this.handleFormSubmit );
+			$(this.form).on('change', null, this.handleFormChange);
+			$(this.form).on('input', null, this.handleFormChange);
+			$(this.form).on('submit', this.handleFormSubmit);
 		} else {
-			this.form.addEventListener( 'change', this.handleFormChange );
-			this.form.addEventListener( 'input', this.handleFormChange );
-			this.form.addEventListener( 'submit', this.handleFormSubmit );
+			this.form.addEventListener('change', this.handleFormChange);
+			this.form.addEventListener('input', this.handleFormChange);
+			this.form.addEventListener('submit', this.handleFormSubmit);
 		}
 	}
 
@@ -158,15 +155,15 @@ export default class Control {
 	 * @access private
 	 */
 	unbindEvents() {
-		if ( window.jQuery ) {
+		if (window.jQuery) {
 			const { jQuery: $ } = window;
-			$( this.form ).off( 'change', null, this.handleFormChange );
-			$( this.form ).off( 'input', null, this.handleFormChange );
-			$( this.form ).off( 'submit', this.handleFormSubmit );
+			$(this.form).off('change', null, this.handleFormChange);
+			$(this.form).off('input', null, this.handleFormChange);
+			$(this.form).off('submit', this.handleFormSubmit);
 		} else {
-			this.form.removeEventListener( 'change', this.handleFormChange );
-			this.form.removeEventListener( 'input', this.handleFormChange );
-			this.form.removeEventListener( 'submit', this.handleFormSubmit );
+			this.form.removeEventListener('change', this.handleFormChange);
+			this.form.removeEventListener('input', this.handleFormChange);
+			this.form.removeEventListener('submit', this.handleFormSubmit);
 		}
 	}
 
@@ -178,27 +175,27 @@ export default class Control {
 	 */
 	async loadContent() {
 		try {
-			if ( this.id ) {
-				const { form } = await saveWidget( this.id );
+			if (this.id) {
+				const { form } = await saveWidget(this.id);
 				this.content.innerHTML = form;
-			} else if ( this.idBase ) {
-				const { form, preview } = await encodeWidget( {
+			} else if (this.idBase) {
+				const { form, preview } = await encodeWidget({
 					idBase: this.idBase,
 					instance: this.instance,
 					number: this.number,
-				} );
+				});
 				this.content.innerHTML = form;
-				this.hasPreview = ! isEmptyHTML( preview );
+				this.hasPreview = !isEmptyHTML(preview);
 
 				// If we don't have an instance, perform a save right away. This
 				// happens when creating a new Legacy Widget block.
-				if ( ! this.instance.hash ) {
-					const { instance } = await encodeWidget( {
+				if (!this.instance.hash) {
+					const { instance } = await encodeWidget({
 						idBase: this.idBase,
 						instance: this.instance,
 						number: this.number,
-						formData: serializeForm( this.form ),
-					} );
+						formData: serializeForm(this.form),
+					});
 					this.instance = instance;
 				}
 			}
@@ -208,12 +205,12 @@ export default class Control {
 			// must be fired using jQuery's event bus as this is what widget
 			// scripts expect. If jQuery is not loaded, do nothing - some
 			// widgets will still work regardless.
-			if ( window.jQuery ) {
+			if (window.jQuery) {
 				const { jQuery: $ } = window;
-				$( document ).trigger( 'widget-added', [ $( this.element ) ] );
+				$(document).trigger('widget-added', [$(this.element)]);
 			}
-		} catch ( error ) {
-			this.onError( error );
+		} catch (error) {
+			this.onError(error);
 		}
 	}
 
@@ -224,7 +221,7 @@ export default class Control {
 	 * @access private
 	 */
 	handleFormChange() {
-		if ( this.idBase ) {
+		if (this.idBase) {
 			this.saveForm();
 		}
 	}
@@ -235,7 +232,7 @@ export default class Control {
 	 * @access private
 	 * @param {Event} event
 	 */
-	handleFormSubmit( event ) {
+	handleFormSubmit(event) {
 		event.preventDefault();
 		this.saveForm();
 	}
@@ -247,31 +244,29 @@ export default class Control {
 	 * @access private
 	 */
 	async saveForm() {
-		const formData = serializeForm( this.form );
+		const formData = serializeForm(this.form);
 
 		try {
-			if ( this.id ) {
-				const { form } = await saveWidget( this.id, formData );
+			if (this.id) {
+				const { form } = await saveWidget(this.id, formData);
 				this.content.innerHTML = form;
 
-				if ( window.jQuery ) {
+				if (window.jQuery) {
 					const { jQuery: $ } = window;
-					$( document ).trigger( 'widget-updated', [
-						$( this.element ),
-					] );
+					$(document).trigger('widget-updated', [$(this.element)]);
 				}
-			} else if ( this.idBase ) {
-				const { instance, preview } = await encodeWidget( {
+			} else if (this.idBase) {
+				const { instance, preview } = await encodeWidget({
 					idBase: this.idBase,
 					instance: this.instance,
 					number: this.number,
 					formData,
-				} );
+				});
 				this.instance = instance;
-				this.hasPreview = ! isEmptyHTML( preview );
+				this.hasPreview = !isEmptyHTML(preview);
 			}
-		} catch ( error ) {
-			this.onError( error );
+		} catch (error) {
+			this.onError(error);
 		}
 	}
 
@@ -289,10 +284,10 @@ export default class Control {
 	 *
 	 * @access private
 	 */
-	set instance( instance ) {
-		if ( this._instance !== instance ) {
+	set instance(instance) {
+		if (this._instance !== instance) {
 			this._instance = instance;
-			this.onChangeInstance( instance );
+			this.onChangeInstance(instance);
 		}
 	}
 
@@ -310,62 +305,62 @@ export default class Control {
 	 *
 	 * @access private
 	 */
-	set hasPreview( hasPreview ) {
-		if ( this._hasPreview !== hasPreview ) {
+	set hasPreview(hasPreview) {
+		if (this._hasPreview !== hasPreview) {
 			this._hasPreview = hasPreview;
-			this.onChangeHasPreview( hasPreview );
+			this.onChangeHasPreview(hasPreview);
 		}
 	}
 }
 
 let lastNumber = 0;
 
-function el( tagName, attributes = {}, content = null ) {
-	const element = document.createElement( tagName );
-	for ( const [ attribute, value ] of Object.entries( attributes ) ) {
-		element.setAttribute( attribute, value );
+function el(tagName, attributes = {}, content = null) {
+	const element = document.createElement(tagName);
+	for (const [attribute, value] of Object.entries(attributes)) {
+		element.setAttribute(attribute, value);
 	}
-	if ( Array.isArray( content ) ) {
-		for ( const child of content ) {
-			if ( child ) {
-				element.appendChild( child );
+	if (Array.isArray(content)) {
+		for (const child of content) {
+			if (child) {
+				element.appendChild(child);
 			}
 		}
-	} else if ( typeof content === 'string' ) {
+	} else if (typeof content === 'string') {
 		element.innerText = content;
 	}
 	return element;
 }
 
-async function saveWidget( id, formData = null ) {
+async function saveWidget(id, formData = null) {
 	let widget;
-	if ( formData ) {
-		widget = await apiFetch( {
-			path: `/wp/v2/widgets/${ id }?context=edit`,
+	if (formData) {
+		widget = await apiFetch({
+			path: `/wp/v2/widgets/${id}?context=edit`,
 			method: 'PUT',
 			data: {
 				form_data: formData,
 			},
-		} );
+		});
 	} else {
-		widget = await apiFetch( {
-			path: `/wp/v2/widgets/${ id }?context=edit`,
+		widget = await apiFetch({
+			path: `/wp/v2/widgets/${id}?context=edit`,
 			method: 'GET',
-		} );
+		});
 	}
 	return { form: widget.rendered_form };
 }
 
-async function encodeWidget( { idBase, instance, number, formData = null } ) {
-	const response = await apiFetch( {
-		path: `/wp/v2/widget-types/${ idBase }/encode`,
+async function encodeWidget({ idBase, instance, number, formData = null }) {
+	const response = await apiFetch({
+		path: `/wp/v2/widget-types/${idBase}/encode`,
 		method: 'POST',
 		data: {
 			instance,
 			number,
 			form_data: formData,
 		},
-	} );
+	});
 	return {
 		instance: response.instance,
 		form: response.form,
@@ -373,14 +368,14 @@ async function encodeWidget( { idBase, instance, number, formData = null } ) {
 	};
 }
 
-function isEmptyHTML( html ) {
-	const element = document.createElement( 'div' );
+function isEmptyHTML(html) {
+	const element = document.createElement('div');
 	element.innerHTML = html;
-	return isEmptyNode( element );
+	return isEmptyNode(element);
 }
 
-function isEmptyNode( node ) {
-	switch ( node.nodeType ) {
+function isEmptyNode(node) {
+	switch (node.nodeType) {
 		case node.TEXT_NODE:
 			// Text nodes are empty if it's entirely whitespace.
 			return node.nodeValue.trim() === '';
@@ -398,23 +393,23 @@ function isEmptyNode( node ) {
 					'OBJECT',
 					'SVG',
 					'VIDEO',
-				].includes( node.tagName )
+				].includes(node.tagName)
 			) {
 				return false;
 			}
 			// Elements with no children are empty.
-			if ( ! node.hasChildNodes() ) {
+			if (!node.hasChildNodes()) {
 				return true;
 			}
 			// Elements with children are empty if all their children are empty.
-			return Array.from( node.childNodes ).every( isEmptyNode );
+			return Array.from(node.childNodes).every(isEmptyNode);
 		default:
 			return true;
 	}
 }
 
-function serializeForm( form ) {
+function serializeForm(form) {
 	return new window.URLSearchParams(
-		Array.from( new window.FormData( form ) )
+		Array.from(new window.FormData(form))
 	).toString();
 }

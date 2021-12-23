@@ -9,14 +9,14 @@ import {
 
 /** @typedef {import('puppeteer-core').ElementHandle} ElementHandle */
 
-describe( 'adding patterns', () => {
-	beforeEach( async () => {
+describe('adding patterns', () => {
+	beforeEach(async () => {
 		await createNewPost();
-	} );
+	});
 
-	it( 'should insert a block pattern', async () => {
-		await insertPattern( 'Social links with a shared background color' );
+	it('should insert a block pattern', async () => {
+		await insertPattern('Social links with a shared background color');
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-} );
+		expect(await getEditedPostContent()).toMatchSnapshot();
+	});
+});

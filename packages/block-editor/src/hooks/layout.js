@@ -32,13 +32,13 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
-function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+function LayoutPanel({ setAttributes, attributes, name: blockName }) {
 	const { layout } = attributes;
-	const defaultThemeLayout = useSetting( 'layout' );
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+	const defaultThemeLayout = useSetting('layout');
+	const themeSupportsLayout = useSelect((select) => {
+		const { getSettings } = select(blockEditorStore);
 		return getSettings().supportsLayout;
-	}, [] );
+	}, []);
 
 	const layoutBlockSupport = getBlockSupport(
 		blockName,
@@ -52,7 +52,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;
 
-	if ( ! allowEditing ) {
+	if (!allowEditing) {
 		return null;
 	}
 
@@ -63,73 +63,72 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	 * layout and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
-	if ( type === 'default' && ! themeSupportsLayout ) {
+	if (type === 'default' && !themeSupportsLayout) {
 		return null;
 	}
-	const layoutType = getLayoutType( type );
+	const layoutType = getLayoutType(type);
 
-	const onChangeType = ( newType ) =>
-		setAttributes( { layout: { type: newType } } );
-	const onChangeLayout = ( newLayout ) =>
-		setAttributes( { layout: newLayout } );
+	const onChangeType = (newType) =>
+		setAttributes({ layout: { type: newType } });
+	const onChangeLayout = (newLayout) => setAttributes({ layout: newLayout });
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Layout' ) }>
-					{ allowInheriting && !! defaultThemeLayout && (
+				<PanelBody title={__('Layout')}>
+					{allowInheriting && !!defaultThemeLayout && (
 						<ToggleControl
-							label={ __( 'Inherit default layout' ) }
-							checked={ !! inherit }
-							onChange={ () =>
-								setAttributes( {
-									layout: { inherit: ! inherit },
-								} )
+							label={__('Inherit default layout')}
+							checked={!!inherit}
+							onChange={() =>
+								setAttributes({
+									layout: { inherit: !inherit },
+								})
 							}
 						/>
-					) }
+					)}
 
-					{ ! inherit && allowSwitching && (
+					{!inherit && allowSwitching && (
 						<LayoutTypeSwitcher
-							type={ type }
-							onChange={ onChangeType }
+							type={type}
+							onChange={onChangeType}
 						/>
-					) }
+					)}
 
-					{ ! inherit && layoutType && (
+					{!inherit && layoutType && (
 						<layoutType.inspectorControls
-							layout={ usedLayout }
-							onChange={ onChangeLayout }
-							layoutBlockSupport={ layoutBlockSupport }
+							layout={usedLayout}
+							onChange={onChangeLayout}
+							layoutBlockSupport={layoutBlockSupport}
 						/>
-					) }
+					)}
 				</PanelBody>
 			</InspectorControls>
-			{ ! inherit && layoutType && (
+			{!inherit && layoutType && (
 				<layoutType.toolBarControls
-					layout={ usedLayout }
-					onChange={ onChangeLayout }
-					layoutBlockSupport={ layoutBlockSupport }
+					layout={usedLayout}
+					onChange={onChangeLayout}
+					layoutBlockSupport={layoutBlockSupport}
 				/>
-			) }
+			)}
 		</>
 	);
 }
 
-function LayoutTypeSwitcher( { type, onChange } ) {
+function LayoutTypeSwitcher({ type, onChange }) {
 	return (
 		<ButtonGroup>
-			{ getLayoutTypes().map( ( { name, label } ) => {
+			{getLayoutTypes().map(({ name, label }) => {
 				return (
 					<Button
-						key={ name }
-						isPressed={ type === name }
-						onClick={ () => onChange( name ) }
+						key={name}
+						isPressed={type === name}
+						onClick={() => onChange(name)}
 					>
-						{ label }
+						{label}
 					</Button>
 				);
-			} ) }
+			})}
 		</ButtonGroup>
 	);
 }
@@ -141,11 +140,11 @@ function LayoutTypeSwitcher( { type, onChange } ) {
  *
  * @return {Object} Filtered block settings.
  */
-export function addAttribute( settings ) {
-	if ( has( settings.attributes, [ 'layout', 'type' ] ) ) {
+export function addAttribute(settings) {
+	if (has(settings.attributes, ['layout', 'type'])) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
+	if (hasBlockSupport(settings, layoutBlockSupportKey)) {
 		settings.attributes = {
 			...settings.attributes,
 			layout: {
@@ -165,16 +164,13 @@ export function addAttribute( settings ) {
  * @return {Function} Wrapped component.
  */
 export const withInspectorControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
+	(BlockEdit) => (props) => {
 		const { name: blockName } = props;
-		const supportLayout = hasBlockSupport(
-			blockName,
-			layoutBlockSupportKey
-		);
+		const supportLayout = hasBlockSupport(blockName, layoutBlockSupportKey);
 
 		return [
-			supportLayout && <LayoutPanel key="layout" { ...props } />,
-			<BlockEdit key="edit" { ...props } />,
+			supportLayout && <LayoutPanel key="layout" {...props} />,
+			<BlockEdit key="edit" {...props} />,
 		];
 	},
 	'withInspectorControls'
@@ -188,47 +184,43 @@ export const withInspectorControls = createHigherOrderComponent(
  * @return {Function} Wrapped component.
  */
 export const withLayoutStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
+	(BlockListBlock) => (props) => {
 		const { name, attributes } = props;
 		const shouldRenderLayoutStyles = hasBlockSupport(
 			name,
 			layoutBlockSupportKey
 		);
-		const id = useInstanceId( BlockListBlock );
-		const defaultThemeLayout = useSetting( 'layout' ) || {};
-		const element = useContext( BlockList.__unstableElementContext );
+		const id = useInstanceId(BlockListBlock);
+		const defaultThemeLayout = useSetting('layout') || {};
+		const element = useContext(BlockList.__unstableElementContext);
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
-			getBlockSupport( name, layoutBlockSupportKey ) || {};
+			getBlockSupport(name, layoutBlockSupportKey) || {};
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
-		const className = classnames( props?.className, {
-			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
-		} );
+		const className = classnames(props?.className, {
+			[`wp-container-${id}`]: shouldRenderLayoutStyles,
+		});
 
 		return (
 			<>
-				{ shouldRenderLayoutStyles &&
+				{shouldRenderLayoutStyles &&
 					element &&
 					createPortal(
 						<LayoutStyle
-							selector={ `.wp-container-${ id }` }
-							layout={ usedLayout }
+							selector={`.wp-container-${id}`}
+							layout={usedLayout}
 						/>,
 						element
-					) }
-				<BlockListBlock { ...props } className={ className } />
+					)}
+				<BlockListBlock {...props} className={className} />
 			</>
 		);
 	}
 );
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/layout/addAttribute',
-	addAttribute
-);
+addFilter('blocks.registerBlockType', 'core/layout/addAttribute', addAttribute);
 addFilter(
 	'editor.BlockListBlock',
 	'core/editor/layout/with-layout-styles',

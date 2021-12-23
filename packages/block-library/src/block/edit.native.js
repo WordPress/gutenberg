@@ -43,16 +43,14 @@ import { store as noticesStore } from '@wordpress/notices';
 import styles from './editor.scss';
 import EditTitle from './edit-title';
 
-export default function ReusableBlockEdit( {
+export default function ReusableBlockEdit({
 	attributes: { ref },
 	clientId,
 	isSelected,
-} ) {
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		ref
-	);
+}) {
+	const [hasAlreadyRendered, RecursionProvider] = useNoRecursiveRenders(ref);
 
-	const [ showHelp, setShowHelp ] = useState( false );
+	const [showHelp, setShowHelp] = useState(false);
 	const infoTextStyle = usePreferredColorSchemeStyle(
 		styles.infoText,
 		styles.infoTextDark
@@ -79,57 +77,54 @@ export default function ReusableBlockEdit( {
 	);
 
 	const { hasResolved, isEditing, isMissing } = useSelect(
-		( select ) => {
-			const persistedBlock = select( coreStore ).getEntityRecord(
+		(select) => {
+			const persistedBlock = select(coreStore).getEntityRecord(
 				'postType',
 				'wp_block',
 				ref
 			);
-			const hasResolvedBlock = select(
-				coreStore
-			).hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_block',
-				ref,
-			] );
+			const hasResolvedBlock = select(coreStore).hasFinishedResolution(
+				'getEntityRecord',
+				['postType', 'wp_block', ref]
+			);
 			return {
 				hasResolved: hasResolvedBlock,
-				isEditing: select(
-					reusableBlocksStore
-				).__experimentalIsEditingReusableBlock( clientId ),
-				isMissing: hasResolvedBlock && ! persistedBlock,
+				isEditing:
+					select(
+						reusableBlocksStore
+					).__experimentalIsEditingReusableBlock(clientId),
+				isMissing: hasResolvedBlock && !persistedBlock,
 			};
 		},
-		[ ref, clientId ]
+		[ref, clientId]
 	);
 
-	const { createSuccessNotice } = useDispatch( noticesStore );
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { createSuccessNotice } = useDispatch(noticesStore);
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch(reusableBlocksStore);
+	const { clearSelectedBlock } = useDispatch(blockEditorStore);
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const [blocks, onInput, onChange] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
 	);
 
-	const [ title ] = useEntityProp( 'postType', 'wp_block', 'title', ref );
+	const [title] = useEntityProp('postType', 'wp_block', 'title', ref);
 
 	function openSheet() {
-		setShowHelp( true );
+		setShowHelp(true);
 	}
 
 	function closeSheet() {
-		setShowHelp( false );
+		setShowHelp(false);
 	}
 
-	const onConvertToRegularBlocks = useCallback( () => {
+	const onConvertToRegularBlocks = useCallback(() => {
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: name of the reusable block */
-				__( '%s converted to regular blocks' ),
+				__('%s converted to regular blocks'),
 				title
 			)
 		);
@@ -137,8 +132,8 @@ export default function ReusableBlockEdit( {
 		clearSelectedBlock();
 		// Convert action is executed at the end of the current JavaScript execution block
 		// to prevent issues related to undo/redo actions.
-		setImmediate( () => convertBlockToStatic( clientId ) );
-	}, [ title, clientId ] );
+		setImmediate(() => convertBlockToStatic(clientId));
+	}, [title, clientId]);
 
 	function renderSheet() {
 		const infoTitle =
@@ -151,85 +146,75 @@ export default function ReusableBlockEdit( {
 				  );
 
 		return (
-			<BottomSheet
-				isVisible={ showHelp }
-				hideHeader
-				onClose={ closeSheet }
-			>
-				<View style={ styles.infoContainer }>
+			<BottomSheet isVisible={showHelp} hideHeader onClose={closeSheet}>
+				<View style={styles.infoContainer}>
 					<Icon
-						icon={ help }
-						color={ infoSheetIconStyle.color }
-						size={ styles.infoSheetIcon.size }
+						icon={help}
+						color={infoSheetIconStyle.color}
+						size={styles.infoSheetIcon.size}
 					/>
-					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
-						{ infoTitle }
+					<Text style={[infoTextStyle, infoTitleStyle]}>
+						{infoTitle}
 					</Text>
-					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ __(
+					<Text style={[infoTextStyle, infoDescriptionStyle]}>
+						{__(
 							'Alternatively, you can detach and edit these blocks separately by tapping "Convert to regular blocks".'
-						) }
+						)}
 					</Text>
 					<TextControl
-						label={ __( 'Convert to regular blocks' ) }
+						label={__('Convert to regular blocks')}
 						separatorType="topFullWidth"
-						onPress={ onConvertToRegularBlocks }
-						labelStyle={ actionButtonStyle }
+						onPress={onConvertToRegularBlocks}
+						labelStyle={actionButtonStyle}
 					/>
 				</View>
 			</BottomSheet>
 		);
 	}
 
-	if ( hasAlreadyRendered ) {
+	if (hasAlreadyRendered) {
+		return (
+			<Warning message={__('Block cannot be rendered inside itself.')} />
+		);
+	}
+
+	if (isMissing) {
 		return (
 			<Warning
-				message={ __( 'Block cannot be rendered inside itself.' ) }
+				message={__('Block has been deleted or is unavailable.')}
 			/>
 		);
 	}
 
-	if ( isMissing ) {
+	if (!hasResolved) {
 		return (
-			<Warning
-				message={ __( 'Block has been deleted or is unavailable.' ) }
-			/>
-		);
-	}
-
-	if ( ! hasResolved ) {
-		return (
-			<View style={ spinnerStyle }>
+			<View style={spinnerStyle}>
 				<ActivityIndicator animating />
 			</View>
 		);
 	}
 
 	let element = (
-		<InnerBlocks
-			value={ blocks }
-			onChange={ onChange }
-			onInput={ onInput }
-		/>
+		<InnerBlocks value={blocks} onChange={onChange} onInput={onInput} />
 	);
 
-	if ( ! isEditing ) {
-		element = <Disabled>{ element }</Disabled>;
+	if (!isEditing) {
+		element = <Disabled>{element}</Disabled>;
 	}
 
 	return (
 		<RecursionProvider>
 			<TouchableWithoutFeedback
-				disabled={ ! isSelected }
-				accessibilityLabel={ __( 'Help button' ) }
-				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Tap here to show help' ) }
-				onPress={ openSheet }
+				disabled={!isSelected}
+				accessibilityLabel={__('Help button')}
+				accessibilityRole={'button'}
+				accessibilityHint={__('Tap here to show help')}
+				onPress={openSheet}
 			>
 				<View>
-					{ isSelected && <EditTitle title={ title } /> }
-					{ element }
-					{ renderSheet() }
+					{isSelected && <EditTitle title={title} />}
+					{element}
+					{renderSheet()}
 				</View>
 			</TouchableWithoutFeedback>
 		</RecursionProvider>

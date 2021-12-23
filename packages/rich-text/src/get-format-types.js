@@ -15,5 +15,5 @@ import { store as richTextStore } from './store';
  * @return {Array<RichTextFormatType>} Format settings.
  */
 export function getFormatTypes() {
-	return select( richTextStore ).getFormatTypes();
+	return select(richTextStore).getFormatTypes();
 }

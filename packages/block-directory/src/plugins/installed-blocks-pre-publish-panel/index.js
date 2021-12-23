@@ -14,36 +14,32 @@ import { store as blockDirectoryStore } from '../../store';
 
 export default function InstalledBlocksPrePublishPanel() {
 	const newBlockTypes = useSelect(
-		( select ) => select( blockDirectoryStore ).getNewBlockTypes(),
+		(select) => select(blockDirectoryStore).getNewBlockTypes(),
 		[]
 	);
 
-	if ( ! newBlockTypes.length ) {
+	if (!newBlockTypes.length) {
 		return null;
 	}
 
 	return (
 		<PluginPrePublishPanel
-			icon={ blockDefault }
-			title={ sprintf(
+			icon={blockDefault}
+			title={sprintf(
 				// translators: %d: number of blocks (number).
-				_n(
-					'Added: %d block',
-					'Added: %d blocks',
-					newBlockTypes.length
-				),
+				_n('Added: %d block', 'Added: %d blocks', newBlockTypes.length),
 				newBlockTypes.length
-			) }
-			initialOpen={ true }
+			)}
+			initialOpen={true}
 		>
 			<p className="installed-blocks-pre-publish-panel__copy">
-				{ _n(
+				{_n(
 					'The following block has been added to your site.',
 					'The following blocks have been added to your site.',
 					newBlockTypes.length
-				) }
+				)}
 			</p>
-			<CompactList items={ newBlockTypes } />
+			<CompactList items={newBlockTypes} />
 		</PluginPrePublishPanel>
 	);
 }

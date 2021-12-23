@@ -13,24 +13,24 @@ import { HexInput } from './hex-input';
 interface ColorInputProps {
 	colorType: 'hsl' | 'hex' | 'rgb';
 	color: Colord;
-	onChange: ( nextColor: Colord ) => void;
+	onChange: (nextColor: Colord) => void;
 	enableAlpha: boolean;
 }
 
-export const ColorInput = ( {
+export const ColorInput = ({
 	colorType,
 	color,
 	onChange,
 	enableAlpha,
-}: ColorInputProps ) => {
+}: ColorInputProps) => {
 	const props = { color, onChange, enableAlpha };
-	switch ( colorType ) {
+	switch (colorType) {
 		case 'hsl':
-			return <HslInput { ...props } />;
+			return <HslInput {...props} />;
 		case 'rgb':
-			return <RgbInput { ...props } />;
+			return <RgbInput {...props} />;
 		default:
 		case 'hex':
-			return <HexInput { ...props } />;
+			return <HexInput {...props} />;
 	}
 };

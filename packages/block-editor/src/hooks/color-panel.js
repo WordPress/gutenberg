@@ -12,33 +12,33 @@ import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
-function getComputedStyle( node ) {
-	return node.ownerDocument.defaultView.getComputedStyle( node );
+function getComputedStyle(node) {
+	return node.ownerDocument.defaultView.getComputedStyle(node);
 }
 
-export default function ColorPanel( {
+export default function ColorPanel({
 	settings,
 	clientId,
 	enableContrastChecking = true,
 	showTitle = true,
-} ) {
-	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
-	const [ detectedColor, setDetectedColor ] = useState();
-	const ref = useBlockRef( clientId );
+}) {
+	const [detectedBackgroundColor, setDetectedBackgroundColor] = useState();
+	const [detectedColor, setDetectedColor] = useState();
+	const ref = useBlockRef(clientId);
 
-	useEffect( () => {
-		if ( ! enableContrastChecking ) {
+	useEffect(() => {
+		if (!enableContrastChecking) {
 			return;
 		}
 
-		if ( ! ref.current ) {
+		if (!ref.current) {
 			return;
 		}
-		setDetectedColor( getComputedStyle( ref.current ).color );
+		setDetectedColor(getComputedStyle(ref.current).color);
 
 		let backgroundColorNode = ref.current;
-		let backgroundColor = getComputedStyle( backgroundColorNode )
-			.backgroundColor;
+		let backgroundColor =
+			getComputedStyle(backgroundColorNode).backgroundColor;
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
@@ -46,29 +46,29 @@ export default function ColorPanel( {
 				backgroundColorNode.parentNode.ELEMENT_NODE
 		) {
 			backgroundColorNode = backgroundColorNode.parentNode;
-			backgroundColor = getComputedStyle( backgroundColorNode )
-				.backgroundColor;
+			backgroundColor =
+				getComputedStyle(backgroundColorNode).backgroundColor;
 		}
 
-		setDetectedBackgroundColor( backgroundColor );
-	} );
+		setDetectedBackgroundColor(backgroundColor);
+	});
 
 	return (
 		<InspectorControls>
 			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
-				initialOpen={ false }
-				settings={ settings }
-				showTitle={ showTitle }
+				title={__('Color')}
+				initialOpen={false}
+				settings={settings}
+				showTitle={showTitle}
 				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
 			>
-				{ enableContrastChecking && (
+				{enableContrastChecking && (
 					<ContrastChecker
-						backgroundColor={ detectedBackgroundColor }
-						textColor={ detectedColor }
+						backgroundColor={detectedBackgroundColor}
+						textColor={detectedColor}
 					/>
-				) }
+				)}
 			</PanelColorGradientSettings>
 		</InspectorControls>
 	);

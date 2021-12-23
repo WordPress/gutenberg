@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '../../..' );
+const DependencyExtractionWebpackPlugin = require('../../..');
 
 module.exports = {
-	plugins: [
-		new DependencyExtractionWebpackPlugin( { useDefaults: false } ),
-	],
+	plugins: [new DependencyExtractionWebpackPlugin({ useDefaults: false })],
 };

@@ -12,12 +12,12 @@ import { dispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 
-export function stripFirstImage( attributes, { shortcode } ) {
-	const { body } = document.implementation.createHTMLDocument( '' );
+export function stripFirstImage(attributes, { shortcode }) {
+	const { body } = document.implementation.createHTMLDocument('');
 
 	body.innerHTML = shortcode.content;
 
-	let nodeToRemove = body.querySelector( 'img' );
+	let nodeToRemove = body.querySelector('img');
 
 	// if an image has parents, find the topmost node to remove
 	while (
@@ -28,28 +28,28 @@ export function stripFirstImage( attributes, { shortcode } ) {
 		nodeToRemove = nodeToRemove.parentNode;
 	}
 
-	if ( nodeToRemove ) {
-		nodeToRemove.parentNode.removeChild( nodeToRemove );
+	if (nodeToRemove) {
+		nodeToRemove.parentNode.removeChild(nodeToRemove);
 	}
 
 	return body.innerHTML.trim();
 }
 
-function getFirstAnchorAttributeFormHTML( html, attributeName ) {
-	const { body } = document.implementation.createHTMLDocument( '' );
+function getFirstAnchorAttributeFormHTML(html, attributeName) {
+	const { body } = document.implementation.createHTMLDocument('');
 
 	body.innerHTML = html;
 
 	const { firstElementChild } = body;
 
-	if ( firstElementChild && firstElementChild.nodeName === 'A' ) {
-		return firstElementChild.getAttribute( attributeName ) || undefined;
+	if (firstElementChild && firstElementChild.nodeName === 'A') {
+		return firstElementChild.getAttribute(attributeName) || undefined;
 	}
 }
 
 const imageSchema = {
 	img: {
-		attributes: [ 'src', 'alt', 'title' ],
+		attributes: ['src', 'alt', 'title'],
 		classes: [
 			'alignleft',
 			'aligncenter',
@@ -60,13 +60,13 @@ const imageSchema = {
 	},
 };
 
-const schema = ( { phrasingContentSchema } ) => ( {
+const schema = ({ phrasingContentSchema }) => ({
 	figure: {
-		require: [ 'img' ],
+		require: ['img'],
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'href', 'rel', 'target' ],
+				attributes: ['href', 'rel', 'target'],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -74,32 +74,29 @@ const schema = ( { phrasingContentSchema } ) => ( {
 			},
 		},
 	},
-} );
+});
 
 const transforms = {
 	from: [
 		{
 			type: 'raw',
-			isMatch: ( node ) =>
-				node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
+			isMatch: (node) =>
+				node.nodeName === 'FIGURE' && !!node.querySelector('img'),
 			schema,
-			transform: ( node ) => {
+			transform: (node) => {
 				// Search both figure and image classes. Alignment could be
 				// set on either. ID is set on the image.
 				const className =
-					node.className +
-					' ' +
-					node.querySelector( 'img' ).className;
-				const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
-					className
-				);
+					node.className + ' ' + node.querySelector('img').className;
+				const alignMatches =
+					/(?:^|\s)align(left|center|right)(?:$|\s)/.exec(className);
 				const anchor = node.id === '' ? undefined : node.id;
-				const align = alignMatches ? alignMatches[ 1 ] : undefined;
+				const align = alignMatches ? alignMatches[1] : undefined;
 				const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec(
 					className
 				);
-				const id = idMatches ? Number( idMatches[ 1 ] ) : undefined;
-				const anchorElement = node.querySelector( 'a' );
+				const id = idMatches ? Number(idMatches[1]) : undefined;
+				const anchorElement = node.querySelector('a');
 				const linkDestination =
 					anchorElement && anchorElement.href ? 'custom' : undefined;
 				const href =
@@ -127,7 +124,7 @@ const transforms = {
 						anchor,
 					}
 				);
-				return createBlock( 'core/image', attributes );
+				return createBlock('core/image', attributes);
 			},
 		},
 		{
@@ -135,17 +132,13 @@ const transforms = {
 			// gallery transform in order to add new images to the gallery instead of
 			// creating a new gallery.
 			type: 'files',
-			isMatch( files ) {
+			isMatch(files) {
 				// The following check is intended to catch non-image files when dropped together with images.
 				if (
-					files.some(
-						( file ) => file.type.indexOf( 'image/' ) === 0
-					) &&
-					files.some(
-						( file ) => file.type.indexOf( 'image/' ) !== 0
-					)
+					files.some((file) => file.type.indexOf('image/') === 0) &&
+					files.some((file) => file.type.indexOf('image/') !== 0)
 				) {
-					const { createErrorNotice } = dispatch( noticesStore );
+					const { createErrorNotice } = dispatch(noticesStore);
 					createErrorNotice(
 						__(
 							'If uploading to a gallery all files need to be image formats'
@@ -155,15 +148,15 @@ const transforms = {
 				}
 				return every(
 					files,
-					( file ) => file.type.indexOf( 'image/' ) === 0
+					(file) => file.type.indexOf('image/') === 0
 				);
 			},
-			transform( files ) {
-				const blocks = files.map( ( file ) => {
-					return createBlock( 'core/image', {
-						url: createBlobURL( file ),
-					} );
-				} );
+			transform(files) {
+				const blocks = files.map((file) => {
+					return createBlock('core/image', {
+						url: createBlobURL(file),
+					});
+				});
 				return blocks;
 			},
 		},
@@ -187,7 +180,7 @@ const transforms = {
 					shortcode: stripFirstImage,
 				},
 				href: {
-					shortcode: ( attributes, { shortcode } ) => {
+					shortcode: (attributes, { shortcode }) => {
 						return getFirstAnchorAttributeFormHTML(
 							shortcode.content,
 							'href'
@@ -195,7 +188,7 @@ const transforms = {
 					},
 				},
 				rel: {
-					shortcode: ( attributes, { shortcode } ) => {
+					shortcode: (attributes, { shortcode }) => {
 						return getFirstAnchorAttributeFormHTML(
 							shortcode.content,
 							'rel'
@@ -203,7 +196,7 @@ const transforms = {
 					},
 				},
 				linkClass: {
-					shortcode: ( attributes, { shortcode } ) => {
+					shortcode: (attributes, { shortcode }) => {
 						return getFirstAnchorAttributeFormHTML(
 							shortcode.content,
 							'class'
@@ -212,18 +205,18 @@ const transforms = {
 				},
 				id: {
 					type: 'number',
-					shortcode: ( { named: { id } } ) => {
-						if ( ! id ) {
+					shortcode: ({ named: { id } }) => {
+						if (!id) {
 							return;
 						}
 
-						return parseInt( id.replace( 'attachment_', '' ), 10 );
+						return parseInt(id.replace('attachment_', ''), 10);
 					},
 				},
 				align: {
 					type: 'string',
-					shortcode: ( { named: { align = 'alignnone' } } ) => {
-						return align.replace( 'align', '' );
+					shortcode: ({ named: { align = 'alignnone' } }) => {
+						return align.replace('align', '');
 					},
 				},
 			},

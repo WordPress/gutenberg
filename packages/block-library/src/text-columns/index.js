@@ -12,9 +12,9 @@ export { metadata, name };
 
 export const settings = {
 	transforms,
-	getEditWrapperProps( attributes ) {
+	getEditWrapperProps(attributes) {
 		const { width } = attributes;
-		if ( 'wide' === width || 'full' === width ) {
+		if ('wide' === width || 'full' === width) {
 			return { 'data-align': width };
 		}
 	},

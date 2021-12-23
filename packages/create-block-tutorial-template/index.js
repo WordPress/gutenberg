@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { join } = require( 'path' );
+const { join } = require('path');
 
 module.exports = {
 	defaultValues: {
@@ -29,6 +29,6 @@ module.exports = {
 			'@wordpress/i18n',
 		],
 	},
-	templatesPath: join( __dirname, 'templates' ),
-	assetsPath: join( __dirname, 'assets' ),
+	templatesPath: join(__dirname, 'templates'),
+	assetsPath: join(__dirname, 'assets'),
 };

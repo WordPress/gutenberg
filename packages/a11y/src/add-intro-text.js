@@ -12,11 +12,11 @@ import { __ } from '@wordpress/i18n';
  * @return {HTMLParagraphElement} The explanatory text HTML element.
  */
 export default function addIntroText() {
-	const introText = document.createElement( 'p' );
+	const introText = document.createElement('p');
 
 	introText.id = 'a11y-speak-intro-text';
 	introText.className = 'a11y-speak-intro-text';
-	introText.textContent = __( 'Notifications' );
+	introText.textContent = __('Notifications');
 
 	introText.setAttribute(
 		'style',
@@ -32,11 +32,11 @@ export default function addIntroText() {
 			'border: 0;' +
 			'word-wrap: normal !important;'
 	);
-	introText.setAttribute( 'hidden', 'hidden' );
+	introText.setAttribute('hidden', 'hidden');
 
 	const { body } = document;
-	if ( body ) {
-		body.appendChild( introText );
+	if (body) {
+		body.appendChild(introText);
 	}
 
 	return introText;

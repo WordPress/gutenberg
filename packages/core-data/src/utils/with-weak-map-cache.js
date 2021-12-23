@@ -12,21 +12,21 @@ import { isObjectLike } from 'lodash';
  *
  * @return {Function} Enhanced caching function.
  */
-function withWeakMapCache( fn ) {
+function withWeakMapCache(fn) {
 	const cache = new WeakMap();
 
-	return ( key ) => {
+	return (key) => {
 		let value;
-		if ( cache.has( key ) ) {
-			value = cache.get( key );
+		if (cache.has(key)) {
+			value = cache.get(key);
 		} else {
-			value = fn( key );
+			value = fn(key);
 
 			// Can reach here if key is not valid for WeakMap, since `has`
 			// will return false for invalid key. Since `set` will throw,
 			// ensure that key is valid before setting into cache.
-			if ( isObjectLike( key ) ) {
-				cache.set( key, value );
+			if (isObjectLike(key)) {
+				cache.set(key, value);
 			}
 		}
 

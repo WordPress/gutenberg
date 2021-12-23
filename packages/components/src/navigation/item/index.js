@@ -19,7 +19,7 @@ import { ItemUI, ItemIconUI } from '../styles/navigation-styles';
 import NavigationItemBaseContent from './base-content';
 import NavigationItemBase from './base';
 
-export default function NavigationItem( props ) {
+export default function NavigationItem(props) {
 	const {
 		badge,
 		children,
@@ -47,23 +47,23 @@ export default function NavigationItem( props ) {
 	if (
 		hideIfTargetMenuEmpty &&
 		navigateToMenu &&
-		isMenuEmpty( navigateToMenu )
+		isMenuEmpty(navigateToMenu)
 	) {
 		return null;
 	}
 
 	const isActive = item && activeItem === item;
 
-	const classes = classnames( className, {
+	const classes = classnames(className, {
 		'is-active': isActive,
-	} );
+	});
 
-	const onItemClick = ( event ) => {
-		if ( navigateToMenu ) {
-			setActiveMenu( navigateToMenu );
+	const onItemClick = (event) => {
+		if (navigateToMenu) {
+			setActiveMenu(navigateToMenu);
 		}
 
-		onClick( event );
+		onClick(event);
 	};
 	const navigationIcon = isRTL() ? chevronLeft : chevronRight;
 	const baseProps = children ? props : { ...props, onClick: undefined };
@@ -78,23 +78,20 @@ export default function NavigationItem( props ) {
 		  };
 
 	return (
-		<NavigationItemBase { ...baseProps } className={ classes }>
-			{ children || (
-				<ItemUI { ...itemProps }>
-					{ icon && (
+		<NavigationItemBase {...baseProps} className={classes}>
+			{children || (
+				<ItemUI {...itemProps}>
+					{icon && (
 						<ItemIconUI>
-							<Icon icon={ icon } />
+							<Icon icon={icon} />
 						</ItemIconUI>
-					) }
+					)}
 
-					<NavigationItemBaseContent
-						title={ title }
-						badge={ badge }
-					/>
+					<NavigationItemBaseContent title={title} badge={badge} />
 
-					{ navigateToMenu && <Icon icon={ navigationIcon } /> }
+					{navigateToMenu && <Icon icon={navigationIcon} />}
 				</ItemUI>
-			) }
+			)}
 		</NavigationItemBase>
 	);
 }

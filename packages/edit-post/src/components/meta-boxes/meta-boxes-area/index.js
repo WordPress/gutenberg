@@ -22,46 +22,42 @@ import { store as editPostStore } from '../../../store';
  * @param {string} props.location metabox location.
  * @return {WPComponent} The component to be rendered.
  */
-function MetaBoxesArea( { location } ) {
-	const container = useRef( null );
-	const formRef = useRef( null );
+function MetaBoxesArea({ location }) {
+	const container = useRef(null);
+	const formRef = useRef(null);
 
-	useEffect( () => {
+	useEffect(() => {
 		formRef.current = document.querySelector(
 			'.metabox-location-' + location
 		);
 
-		if ( formRef.current ) {
-			container.current.appendChild( formRef.current );
+		if (formRef.current) {
+			container.current.appendChild(formRef.current);
 		}
 
 		return () => {
-			if ( formRef.current ) {
+			if (formRef.current) {
 				document
-					.querySelector( '#metaboxes' )
-					.appendChild( formRef.current );
+					.querySelector('#metaboxes')
+					.appendChild(formRef.current);
 			}
 		};
-	}, [ location ] );
+	}, [location]);
 
-	const isSaving = useSelect( ( select ) => {
-		return select( editPostStore ).isSavingMetaBoxes();
-	}, [] );
+	const isSaving = useSelect((select) => {
+		return select(editPostStore).isSavingMetaBoxes();
+	}, []);
 
-	const classes = classnames(
-		'edit-post-meta-boxes-area',
-		`is-${ location }`,
-		{
-			'is-loading': isSaving,
-		}
-	);
+	const classes = classnames('edit-post-meta-boxes-area', `is-${location}`, {
+		'is-loading': isSaving,
+	});
 
 	return (
-		<div className={ classes }>
-			{ isSaving && <Spinner /> }
+		<div className={classes}>
+			{isSaving && <Spinner />}
 			<div
 				className="edit-post-meta-boxes-area__container"
-				ref={ container }
+				ref={container}
 			/>
 			<div className="edit-post-meta-boxes-area__clear" />
 		</div>

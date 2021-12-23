@@ -7,13 +7,13 @@ import { shallow } from 'enzyme';
  */
 import Platform from '../platform';
 
-describe( 'Platform', () => {
-	it( 'is chooses the right thing', () => {
-		const element = Platform.select( {
-			web: shallow( <div></div> ),
-			native: shallow( <button></button> ),
-		} );
+describe('Platform', () => {
+	it('is chooses the right thing', () => {
+		const element = Platform.select({
+			web: shallow(<div></div>),
+			native: shallow(<button></button>),
+		});
 
-		expect( element.type() ).toBe( 'div' );
-	} );
-} );
+		expect(element.type()).toBe('div');
+	});
+});

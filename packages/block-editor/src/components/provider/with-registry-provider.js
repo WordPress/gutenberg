@@ -15,42 +15,29 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { storeConfig } from '../../store';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 
-const withRegistryProvider = createHigherOrderComponent(
-	( WrappedComponent ) => {
-		return withRegistry(
-			( { useSubRegistry = true, registry, ...props } ) => {
-				if ( ! useSubRegistry ) {
-					return (
-						<WrappedComponent registry={ registry } { ...props } />
-					);
-				}
+const withRegistryProvider = createHigherOrderComponent((WrappedComponent) => {
+	return withRegistry(({ useSubRegistry = true, registry, ...props }) => {
+		if (!useSubRegistry) {
+			return <WrappedComponent registry={registry} {...props} />;
+		}
 
-				const [ subRegistry, setSubRegistry ] = useState( null );
-				useEffect( () => {
-					const newRegistry = createRegistry( {}, registry );
-					newRegistry.registerStore(
-						blockEditorStoreName,
-						storeConfig
-					);
-					setSubRegistry( newRegistry );
-				}, [ registry ] );
+		const [subRegistry, setSubRegistry] = useState(null);
+		useEffect(() => {
+			const newRegistry = createRegistry({}, registry);
+			newRegistry.registerStore(blockEditorStoreName, storeConfig);
+			setSubRegistry(newRegistry);
+		}, [registry]);
 
-				if ( ! subRegistry ) {
-					return null;
-				}
+		if (!subRegistry) {
+			return null;
+		}
 
-				return (
-					<RegistryProvider value={ subRegistry }>
-						<WrappedComponent
-							registry={ subRegistry }
-							{ ...props }
-						/>
-					</RegistryProvider>
-				);
-			}
+		return (
+			<RegistryProvider value={subRegistry}>
+				<WrappedComponent registry={subRegistry} {...props} />
+			</RegistryProvider>
 		);
-	},
-	'withRegistryProvider'
-);
+	});
+}, 'withRegistryProvider');
 
 export default withRegistryProvider;

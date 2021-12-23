@@ -11,8 +11,8 @@ import { isPlainObject, isString } from 'lodash';
  *
  * @return {object is import('redux').AnyAction}  Whether object is an action.
  */
-export function isAction( object ) {
-	return isPlainObject( object ) && isString( object.type );
+export function isAction(object) {
+	return isPlainObject(object) && isString(object.type);
 }
 
 /**
@@ -24,7 +24,7 @@ export function isAction( object ) {
  *
  * @return {object is import('redux').AnyAction} Whether object is an action and is of specific type.
  */
-export function isActionOfType( object, expectedType ) {
+export function isActionOfType(object, expectedType) {
 	/* eslint-enable jsdoc/valid-types */
-	return isAction( object ) && object.type === expectedType;
+	return isAction(object) && object.type === expectedType;
 }

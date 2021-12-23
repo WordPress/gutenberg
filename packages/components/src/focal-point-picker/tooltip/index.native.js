@@ -21,9 +21,9 @@ import styles from './style.scss';
 
 const TooltipContext = createContext();
 
-function Tooltip( { children, onPress, style, visible } ) {
+function Tooltip({ children, onPress, style, visible }) {
 	const panResponder = useRef(
-		PanResponder.create( {
+		PanResponder.create({
 			/**
 			 * To allow dimissing the tooltip on press while also avoiding blocking
 			 * interactivity within the child context, we place this `onPress` side
@@ -34,59 +34,55 @@ function Tooltip( { children, onPress, style, visible } ) {
 			 * becomes the controlling responder. https://bit.ly/2J3ugKF
 			 */
 			onStartShouldSetPanResponderCapture: () => {
-				if ( onPress ) {
+				if (onPress) {
 					onPress();
 				}
 				return false;
 			},
-		} )
+		})
 	).current;
 
 	return (
-		<TooltipContext.Provider value={ visible }>
-			<View
-				{ ...( visible ? panResponder.panHandlers : {} ) }
-				style={ style }
-			>
-				{ children }
+		<TooltipContext.Provider value={visible}>
+			<View {...(visible ? panResponder.panHandlers : {})} style={style}>
+				{children}
 			</View>
 		</TooltipContext.Provider>
 	);
 }
 
-function Label( { align, text, xOffset, yOffset } ) {
-	const animationValue = useRef( new Animated.Value( 0 ) ).current;
-	const [ dimensions, setDimensions ] = useState( null );
-	const visible = useContext( TooltipContext );
+function Label({ align, text, xOffset, yOffset }) {
+	const animationValue = useRef(new Animated.Value(0)).current;
+	const [dimensions, setDimensions] = useState(null);
+	const visible = useContext(TooltipContext);
 
-	if ( typeof visible === 'undefined' ) {
+	if (typeof visible === 'undefined') {
 		throw new Error(
 			'Tooltip.Label cannot be rendered outside of the Tooltip component'
 		);
 	}
 
-	useEffect( () => {
+	useEffect(() => {
 		startAnimation();
-	}, [ visible ] );
+	}, [visible]);
 
 	const startAnimation = () => {
-		Animated.timing( animationValue, {
+		Animated.timing(animationValue, {
 			toValue: visible ? 1 : 0,
 			duration: visible ? 300 : 150,
 			useNativeDriver: true,
 			delay: visible ? 500 : 0,
-			easing: Easing.out( Easing.quad ),
-		} ).start();
+			easing: Easing.out(Easing.quad),
+		}).start();
 	};
 
 	// Transforms rely upon onLayout to enable custom offsets additions
 	let tooltipTransforms;
-	if ( dimensions ) {
+	if (dimensions) {
 		tooltipTransforms = [
 			{
 				translateX:
-					( align === 'center' ? -dimensions.width / 2 : 0 ) +
-					xOffset,
+					(align === 'center' ? -dimensions.width / 2 : 0) + xOffset,
 			},
 			{ translateY: -dimensions.height + yOffset },
 		];
@@ -114,27 +110,27 @@ function Label( { align, text, xOffset, yOffset } ) {
 
 	return (
 		<Animated.View
-			style={ {
+			style={{
 				opacity: animationValue,
 				transform: [
 					{
-						translateY: animationValue.interpolate( {
-							inputRange: [ 0, 1 ],
-							outputRange: [ visible ? 4 : -8, -8 ],
-						} ),
+						translateY: animationValue.interpolate({
+							inputRange: [0, 1],
+							outputRange: [visible ? 4 : -8, -8],
+						}),
 					},
 				],
-			} }
+			}}
 		>
 			<View
-				onLayout={ ( { nativeEvent } ) => {
+				onLayout={({ nativeEvent }) => {
 					const { height, width } = nativeEvent.layout;
-					setDimensions( { height, width } );
-				} }
-				style={ tooltipStyles }
+					setDimensions({ height, width });
+				}}
+				style={tooltipStyles}
 			>
-				<Text style={ styles.text }>{ text }</Text>
-				<View style={ arrowStyles } />
+				<Text style={styles.text}>{text}</Text>
+				<View style={arrowStyles} />
 			</View>
 		</Animated.View>
 	);

@@ -17,6 +17,6 @@ import { create } from './create';
  *
  * @return {RichTextValue} A new value with the content removed.
  */
-export function remove( value, startIndex, endIndex ) {
-	return insert( value, create(), startIndex, endIndex );
+export function remove(value, startIndex, endIndex) {
+	return insert(value, create(), startIndex, endIndex);
 }

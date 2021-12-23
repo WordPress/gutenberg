@@ -17,39 +17,36 @@ import { speak } from '@wordpress/a11y';
  */
 import { store as editSiteStore } from '../../../store';
 
-export default function FeatureToggle( {
+export default function FeatureToggle({
 	feature,
 	label,
 	info,
 	messageActivated,
 	messageDeactivated,
-} ) {
+}) {
 	const speakMessage = () => {
-		if ( isActive ) {
-			speak( messageDeactivated || __( 'Feature deactivated' ) );
+		if (isActive) {
+			speak(messageDeactivated || __('Feature deactivated'));
 		} else {
-			speak( messageActivated || __( 'Feature activated' ) );
+			speak(messageActivated || __('Feature activated'));
 		}
 	};
 
-	const isActive = useSelect( ( select ) => {
-		return select( editSiteStore ).isFeatureActive( feature );
-	}, [] );
+	const isActive = useSelect((select) => {
+		return select(editSiteStore).isFeatureActive(feature);
+	}, []);
 
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggleFeature } = useDispatch(editSiteStore);
 
 	return (
 		<MenuItem
-			icon={ isActive && check }
-			isSelected={ isActive }
-			onClick={ flow(
-				toggleFeature.bind( null, feature ),
-				speakMessage
-			) }
+			icon={isActive && check}
+			isSelected={isActive}
+			onClick={flow(toggleFeature.bind(null, feature), speakMessage)}
 			role="menuitemcheckbox"
-			info={ info }
+			info={info}
 		>
-			{ label }
+			{label}
 		</MenuItem>
 	);
 }

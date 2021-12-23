@@ -1,7 +1,7 @@
 const createClipboard = () => {
 	let currentClipboard;
 
-	const setClipboard = ( clipboard ) => {
+	const setClipboard = (clipboard) => {
 		currentClipboard = clipboard;
 	};
 

@@ -18,18 +18,18 @@ import { SelectControl } from '@wordpress/components';
 import ResponsiveBlockControl from '../index';
 
 let container = null;
-beforeEach( () => {
+beforeEach(() => {
 	// setup a DOM element as a render target
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
+	container = document.createElement('div');
+	document.body.appendChild(container);
+});
 
-afterEach( () => {
+afterEach(() => {
 	// cleanup on exiting
-	unmountComponentAtNode( container );
+	unmountComponentAtNode(container);
 	container.remove();
 	container = null;
-} );
+});
 
 const inputId = uniqueId();
 
@@ -52,53 +52,52 @@ const sizeOptions = [
 	},
 ];
 
-const renderTestDefaultControlComponent = ( labelComponent, device ) => {
+const renderTestDefaultControlComponent = (labelComponent, device) => {
 	return (
 		<Fragment>
-			<SelectControl label={ labelComponent } options={ sizeOptions } />
-			<p id={ device.id }>
-				{ device.label } is used here for testing purposes to ensure we
+			<SelectControl label={labelComponent} options={sizeOptions} />
+			<p id={device.id}>
+				{device.label} is used here for testing purposes to ensure we
 				have access to details about the device.
 			</p>
 		</Fragment>
 	);
 };
 
-describe( 'Basic rendering', () => {
-	it( 'should render with required props', () => {
-		act( () => {
+describe('Basic rendering', () => {
+	it('should render with required props', () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
+					renderDefaultControl={renderTestDefaultControlComponent}
 				/>,
 				container
 			);
-		} );
+		});
 
 		const activePropertyLabel = Array.from(
-			container.querySelectorAll( 'legend' )
-		).find( ( legend ) => legend.innerHTML === 'Padding' );
+			container.querySelectorAll('legend')
+		).find((legend) => legend.innerHTML === 'Padding');
 
 		const activeViewportLabel = Array.from(
-			container.querySelectorAll( 'label' )
-		).find( ( label ) => label.innerHTML.includes( 'All' ) );
+			container.querySelectorAll('label')
+		).find((label) => label.innerHTML.includes('All'));
 
 		const defaultControl = container.querySelector(
-			`#${ activeViewportLabel.getAttribute( 'for' ) }`
+			`#${activeViewportLabel.getAttribute('for')}`
 		);
 
 		const toggleLabel = Array.from(
-			container.querySelectorAll( 'label' )
-		).filter( ( label ) =>
-			label.innerHTML.includes(
-				'Use the same padding on all screensizes'
-			)
+			container.querySelectorAll('label')
+		).filter((label) =>
+			label.innerHTML.includes('Use the same padding on all screensizes')
 		);
 
-		const toggleState = container.querySelector( 'input[type="checkbox"]' )
-			.checked;
+		const toggleState = container.querySelector(
+			'input[type="checkbox"]'
+		).checked;
 
 		const defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -108,115 +107,115 @@ describe( 'Basic rendering', () => {
 			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
-		expect( container.innerHTML ).not.toBe( '' );
+		expect(container.innerHTML).not.toBe('');
 
-		expect( defaultControlGroup ).not.toBeNull();
-		expect( responsiveControlGroup ).toBeNull();
+		expect(defaultControlGroup).not.toBeNull();
+		expect(responsiveControlGroup).toBeNull();
 
-		expect( activeViewportLabel ).not.toBeNull();
-		expect( activePropertyLabel ).not.toBeNull();
-		expect( defaultControl ).not.toBeNull();
-		expect( toggleLabel ).not.toBeNull();
-		expect( toggleState ).toBe( true );
-	} );
+		expect(activeViewportLabel).not.toBeNull();
+		expect(activePropertyLabel).not.toBeNull();
+		expect(defaultControl).not.toBeNull();
+		expect(toggleLabel).not.toBeNull();
+		expect(toggleState).toBe(true);
+	});
 
-	it( 'should not render without valid legend', () => {
-		act( () => {
+	it('should not render without valid legend', () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl
 					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
+					renderDefaultControl={renderTestDefaultControlComponent}
 				/>,
 				container
 			);
-		} );
+		});
 
-		expect( container.innerHTML ).toBe( '' );
-	} );
+		expect(container.innerHTML).toBe('');
+	});
 
-	it( 'should not render without valid property', () => {
-		act( () => {
+	it('should not render without valid property', () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl
 					title="Padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
+					renderDefaultControl={renderTestDefaultControlComponent}
 				/>,
 				container
 			);
-		} );
+		});
 
-		expect( container.innerHTML ).toBe( '' );
-	} );
+		expect(container.innerHTML).toBe('');
+	});
 
-	it( 'should not render without valid default control render prop', () => {
-		act( () => {
+	it('should not render without valid default control render prop', () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl title="Padding" property="padding" />,
 				container
 			);
-		} );
+		});
 
-		expect( container.innerHTML ).toBe( '' );
-	} );
+		expect(container.innerHTML).toBe('');
+	});
 
-	it( 'should render with custom label for toggle control when provided', () => {
+	it('should render with custom label for toggle control when provided', () => {
 		const customToggleLabel =
 			'Utilise a matching padding value on all viewports';
-		act( () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
-					toggleLabel={ customToggleLabel }
+					renderDefaultControl={renderTestDefaultControlComponent}
+					toggleLabel={customToggleLabel}
 				/>,
 				container
 			);
-		} );
+		});
 
 		const actualToggleLabel = container.querySelector(
 			'label.components-toggle-control__label'
 		).innerHTML;
 
-		expect( actualToggleLabel ).toEqual( customToggleLabel );
-	} );
+		expect(actualToggleLabel).toEqual(customToggleLabel);
+	});
 
-	it( 'should pass custom label for default control group to the renderDefaultControl function when provided', () => {
+	it('should pass custom label for default control group to the renderDefaultControl function when provided', () => {
 		const customDefaultControlGroupLabel = 'Everything';
 
-		act( () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
-					defaultLabel={ customDefaultControlGroupLabel }
+					renderDefaultControl={renderTestDefaultControlComponent}
+					defaultLabel={customDefaultControlGroupLabel}
 				/>,
 				container
 			);
-		} );
+		});
 
 		const defaultControlLabel = Array.from(
-			container.querySelectorAll( 'label' )
-		).find( ( label ) => label.innerHTML.includes( 'Everything' ) );
+			container.querySelectorAll('label')
+		).find((label) => label.innerHTML.includes('Everything'));
 
-		expect( defaultControlLabel ).not.toBeNull();
-	} );
-} );
+		expect(defaultControlLabel).not.toBeNull();
+	});
+});
 
-describe( 'Default and Responsive modes', () => {
-	it( 'should render in responsive mode when isResponsive prop is set to true', () => {
-		act( () => {
+describe('Default and Responsive modes', () => {
+	it('should render in responsive mode when isResponsive prop is set to true', () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					isResponsive={ true }
-					renderDefaultControl={ renderTestDefaultControlComponent }
+					isResponsive={true}
+					renderDefaultControl={renderTestDefaultControlComponent}
 				/>,
 				container
 			);
-		} );
+		});
 
 		const defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -225,11 +224,11 @@ describe( 'Default and Responsive modes', () => {
 			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
-		expect( defaultControlGroup ).toBeNull();
-		expect( responsiveControlGroup ).not.toBeNull();
-	} );
+		expect(defaultControlGroup).toBeNull();
+		expect(responsiveControlGroup).not.toBeNull();
+	});
 
-	it( 'should render controls for a set of custom viewports in responsive mode when provided', () => {
+	it('should render controls for a set of custom viewports in responsive mode when provided', () => {
 		const customViewportSet = [
 			{
 				id: 'tiny',
@@ -253,60 +252,60 @@ describe( 'Default and Responsive modes', () => {
 			renderTestDefaultControlComponent
 		);
 
-		act( () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					isResponsive={ true }
-					renderDefaultControl={ mockRenderDefaultControl }
-					viewports={ customViewportSet }
+					isResponsive={true}
+					renderDefaultControl={mockRenderDefaultControl}
+					viewports={customViewportSet}
 				/>,
 				container
 			);
-		} );
+		});
 
 		const defaultRenderControlCall = 1;
 
 		// Get array of labels which match those in the custom viewports provided
 		const responsiveViewportsLabels = Array.from(
-			container.querySelectorAll( 'label' )
-		).filter( ( label ) => {
+			container.querySelectorAll('label')
+		).filter((label) => {
 			const labelText = label.innerHTML;
 			// Is the label one of those in the custom device set?
-			return !! customViewportSet.find( ( deviceName ) =>
-				labelText.includes( deviceName.label )
+			return !!customViewportSet.find((deviceName) =>
+				labelText.includes(deviceName.label)
 			);
-		} );
+		});
 
-		expect( responsiveViewportsLabels ).toHaveLength(
+		expect(responsiveViewportsLabels).toHaveLength(
 			customViewportSet.length
 		);
-		expect( mockRenderDefaultControl ).toHaveBeenCalledTimes(
+		expect(mockRenderDefaultControl).toHaveBeenCalledTimes(
 			customViewportSet.length + defaultRenderControlCall
 		);
-	} );
+	});
 
-	it( 'should switch between default and responsive modes when interacting with toggle control', () => {
+	it('should switch between default and responsive modes when interacting with toggle control', () => {
 		const ResponsiveBlockControlConsumer = () => {
-			const [ isResponsive, setIsResponsive ] = useState( false );
+			const [isResponsive, setIsResponsive] = useState(false);
 
 			return (
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					isResponsive={ isResponsive }
-					onIsResponsiveChange={ () => {
-						setIsResponsive( ! isResponsive );
-					} }
-					renderDefaultControl={ renderTestDefaultControlComponent }
+					isResponsive={isResponsive}
+					onIsResponsiveChange={() => {
+						setIsResponsive(!isResponsive);
+					}}
+					renderDefaultControl={renderTestDefaultControlComponent}
 				/>
 			);
 		};
 
-		act( () => {
-			render( <ResponsiveBlockControlConsumer />, container );
-		} );
+		act(() => {
+			render(<ResponsiveBlockControlConsumer />, container);
+		});
 
 		let defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -317,24 +316,22 @@ describe( 'Default and Responsive modes', () => {
 
 		// Select elements based on what the user can see
 		const toggleLabel = Array.from(
-			container.querySelectorAll( 'label' )
-		).find( ( label ) =>
-			label.innerHTML.includes(
-				'Use the same padding on all screensizes'
-			)
+			container.querySelectorAll('label')
+		).find((label) =>
+			label.innerHTML.includes('Use the same padding on all screensizes')
 		);
 		const toggleInput = container.querySelector(
-			`#${ toggleLabel.getAttribute( 'for' ) }`
+			`#${toggleLabel.getAttribute('for')}`
 		);
 
 		// Initial mode (default)
-		expect( defaultControlGroup ).not.toBeNull();
-		expect( responsiveControlGroup ).toBeNull();
+		expect(defaultControlGroup).not.toBeNull();
+		expect(responsiveControlGroup).toBeNull();
 
 		// Toggle to "responsive" mode
-		act( () => {
-			Simulate.change( toggleInput, { target: { checked: false } } );
-		} );
+		act(() => {
+			Simulate.change(toggleInput, { target: { checked: false } });
+		});
 
 		defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -343,13 +340,13 @@ describe( 'Default and Responsive modes', () => {
 			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
-		expect( defaultControlGroup ).toBeNull();
-		expect( responsiveControlGroup ).not.toBeNull();
+		expect(defaultControlGroup).toBeNull();
+		expect(responsiveControlGroup).not.toBeNull();
 
 		// Toggle back to "default" mode
-		act( () => {
-			Simulate.change( toggleInput, { target: { checked: true } } );
-		} );
+		act(() => {
+			Simulate.change(toggleInput, { target: { checked: true } });
+		});
 
 		defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -358,54 +355,54 @@ describe( 'Default and Responsive modes', () => {
 			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
-		expect( defaultControlGroup ).not.toBeNull();
-		expect( responsiveControlGroup ).toBeNull();
-	} );
+		expect(defaultControlGroup).not.toBeNull();
+		expect(responsiveControlGroup).toBeNull();
+	});
 
-	it( 'should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode', () => {
+	it('should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode', () => {
 		const spyRenderDefaultControl = jest.fn();
 
-		const mockRenderResponsiveControls = jest.fn( ( viewports ) => {
-			return viewports.map( ( { id, label } ) => {
+		const mockRenderResponsiveControls = jest.fn((viewports) => {
+			return viewports.map(({ id, label }) => {
 				return (
-					<Fragment key={ `${ inputId }-${ id }` }>
-						<label htmlFor={ `${ inputId }-${ id }` }>
-							Custom Viewport { label }
+					<Fragment key={`${inputId}-${id}`}>
+						<label htmlFor={`${inputId}-${id}`}>
+							Custom Viewport {label}
 						</label>
 						<input
-							id={ `${ inputId }-${ id }` }
-							defaultValue={ label }
+							id={`${inputId}-${id}`}
+							defaultValue={label}
 							type="range"
 						/>
 					</Fragment>
 				);
-			} );
-		} );
+			});
+		});
 
-		act( () => {
+		act(() => {
 			render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					isResponsive={ true }
-					renderDefaultControl={ spyRenderDefaultControl }
-					renderResponsiveControls={ mockRenderResponsiveControls }
+					isResponsive={true}
+					renderDefaultControl={spyRenderDefaultControl}
+					renderResponsiveControls={mockRenderResponsiveControls}
 				/>,
 				container
 			);
-		} );
+		});
 
 		// The user should see "range" controls so we can legitimately query for them here
 		const customControls = Array.from(
-			container.querySelectorAll( 'input[type="range"]' )
+			container.querySelectorAll('input[type="range"]')
 		);
 
 		// Also called because default control rendeer function is always called
 		// (for convenience) even though it's not displayed in output.
-		expect( spyRenderDefaultControl ).toHaveBeenCalledTimes( 1 );
+		expect(spyRenderDefaultControl).toHaveBeenCalledTimes(1);
 
-		expect( mockRenderResponsiveControls ).toHaveBeenCalledTimes( 1 );
+		expect(mockRenderResponsiveControls).toHaveBeenCalledTimes(1);
 
-		expect( customControls ).toHaveLength( 3 );
-	} );
-} );
+		expect(customControls).toHaveLength(3);
+	});
+});

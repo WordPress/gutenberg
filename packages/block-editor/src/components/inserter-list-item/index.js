@@ -27,16 +27,15 @@ import InserterDraggableBlocks from '../inserter-draggable-blocks';
  *
  * @return {boolean} True if MacOS; false otherwise.
  */
-function isAppleOS( _window = window ) {
+function isAppleOS(_window = window) {
 	const { platform } = _window.navigator;
 
 	return (
-		platform.indexOf( 'Mac' ) !== -1 ||
-		[ 'iPad', 'iPhone' ].includes( platform )
+		platform.indexOf('Mac') !== -1 || ['iPad', 'iPhone'].includes(platform)
 	);
 }
 
-function InserterListItem( {
+function InserterListItem({
 	className,
 	isFirst,
 	item,
@@ -44,104 +43,104 @@ function InserterListItem( {
 	onHover,
 	isDraggable,
 	...props
-} ) {
-	const isDragging = useRef( false );
+}) {
+	const isDragging = useRef(false);
 	const itemIconStyle = item.icon
 		? {
 				backgroundColor: item.icon.background,
 				color: item.icon.foreground,
 		  }
 		: {};
-	const blocks = useMemo( () => {
+	const blocks = useMemo(() => {
 		return [
 			createBlock(
 				item.name,
 				item.initialAttributes,
-				createBlocksFromInnerBlocksTemplate( item.innerBlocks )
+				createBlocksFromInnerBlocksTemplate(item.innerBlocks)
 			),
 		];
-	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
+	}, [item.name, item.initialAttributes, item.initialAttributes]);
 
 	return (
 		<InserterDraggableBlocks
-			isEnabled={ isDraggable && ! item.disabled }
-			blocks={ blocks }
-			icon={ item.icon }
+			isEnabled={isDraggable && !item.disabled}
+			blocks={blocks}
+			icon={item.icon}
 		>
-			{ ( { draggable, onDragStart, onDragEnd } ) => (
+			{({ draggable, onDragStart, onDragEnd }) => (
 				<div
 					className="block-editor-block-types-list__list-item"
-					draggable={ draggable }
-					onDragStart={ ( event ) => {
+					draggable={draggable}
+					onDragStart={(event) => {
 						isDragging.current = true;
-						if ( onDragStart ) {
-							onHover( null );
-							onDragStart( event );
+						if (onDragStart) {
+							onHover(null);
+							onDragStart(event);
 						}
-					} }
-					onDragEnd={ ( event ) => {
+					}}
+					onDragEnd={(event) => {
 						isDragging.current = false;
-						if ( onDragEnd ) {
-							onDragEnd( event );
+						if (onDragEnd) {
+							onDragEnd(event);
 						}
-					} }
+					}}
 				>
 					<InserterListboxItem
-						isFirst={ isFirst }
-						className={ classnames(
+						isFirst={isFirst}
+						className={classnames(
 							'block-editor-block-types-list__item',
 							className
-						) }
-						disabled={ item.isDisabled }
-						onClick={ ( event ) => {
+						)}
+						disabled={item.isDisabled}
+						onClick={(event) => {
 							event.preventDefault();
 							onSelect(
 								item,
 								isAppleOS() ? event.metaKey : event.ctrlKey
 							);
-							onHover( null );
-						} }
-						onKeyDown={ ( event ) => {
+							onHover(null);
+						}}
+						onKeyDown={(event) => {
 							const { keyCode } = event;
-							if ( keyCode === ENTER ) {
+							if (keyCode === ENTER) {
 								event.preventDefault();
 								onSelect(
 									item,
 									isAppleOS() ? event.metaKey : event.ctrlKey
 								);
-								onHover( null );
+								onHover(null);
 							}
-						} }
-						onFocus={ () => {
-							if ( isDragging.current ) {
+						}}
+						onFocus={() => {
+							if (isDragging.current) {
 								return;
 							}
-							onHover( item );
-						} }
-						onMouseEnter={ () => {
-							if ( isDragging.current ) {
+							onHover(item);
+						}}
+						onMouseEnter={() => {
+							if (isDragging.current) {
 								return;
 							}
-							onHover( item );
-						} }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
-						{ ...props }
+							onHover(item);
+						}}
+						onMouseLeave={() => onHover(null)}
+						onBlur={() => onHover(null)}
+						{...props}
 					>
 						<span
 							className="block-editor-block-types-list__item-icon"
-							style={ itemIconStyle }
+							style={itemIconStyle}
 						>
-							<BlockIcon icon={ item.icon } showColors />
+							<BlockIcon icon={item.icon} showColors />
 						</span>
 						<span className="block-editor-block-types-list__item-title">
-							{ item.title }
+							{item.title}
 						</span>
 					</InserterListboxItem>
 				</div>
-			) }
+			)}
 		</InserterDraggableBlocks>
 	);
 }
 
-export default memo( InserterListItem );
+export default memo(InserterListItem);

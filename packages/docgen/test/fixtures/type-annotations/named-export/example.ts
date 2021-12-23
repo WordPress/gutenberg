@@ -1,1 +1,1 @@
-export function fn( foo: string ): string {}
+export function fn(foo: string): string {}

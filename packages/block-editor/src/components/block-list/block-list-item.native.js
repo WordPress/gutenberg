@@ -37,32 +37,28 @@ export class BlockListItem extends Component {
 			parentWidth,
 			blockWidth,
 		} = this.props;
-		const {
-			isFullWidth,
-			isWideWidth,
-			isWider,
-			isContainerRelated,
-		} = alignmentHelpers;
+		const { isFullWidth, isWideWidth, isWider, isContainerRelated } =
+			alignmentHelpers;
 
-		if ( isFullWidth( blockAlignment ) ) {
-			if ( ! hasParents ) {
+		if (isFullWidth(blockAlignment)) {
+			if (!hasParents) {
 				return 0;
 			}
 			return marginHorizontal;
 		}
-		if ( isWideWidth( blockAlignment ) ) {
+		if (isWideWidth(blockAlignment)) {
 			return marginHorizontal;
 		}
 
-		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+		const screenWidth = Math.floor(Dimensions.get('window').width);
 
 		if (
-			isFullWidth( parentBlockAlignment ) &&
-			! isWider( blockWidth, 'medium' )
+			isFullWidth(parentBlockAlignment) &&
+			!isWider(blockWidth, 'medium')
 		) {
 			if (
-				isContainerRelated( blockName ) ||
-				isWider( screenWidth, 'mobile' )
+				isContainerRelated(blockName) ||
+				isWider(screenWidth, 'mobile')
 			) {
 				return marginHorizontal;
 			}
@@ -70,11 +66,11 @@ export class BlockListItem extends Component {
 		}
 
 		if (
-			isContainerRelated( parentBlockName ) &&
-			! isContainerRelated( blockName )
+			isContainerRelated(parentBlockName) &&
+			!isContainerRelated(blockName)
 		) {
 			const isScreenWidthEqual = parentWidth === screenWidth;
-			if ( isScreenWidthEqual || isWider( screenWidth, 'mobile' ) ) {
+			if (isScreenWidthEqual || isWider(screenWidth, 'mobile')) {
 				return marginHorizontal;
 			}
 		}
@@ -82,25 +78,21 @@ export class BlockListItem extends Component {
 		return marginHorizontal;
 	}
 
-	getContentStyles( readableContentViewStyle ) {
-		const {
-			blockAlignment,
-			blockName,
-			hasParents,
-			parentBlockName,
-		} = this.props;
+	getContentStyles(readableContentViewStyle) {
+		const { blockAlignment, blockName, hasParents, parentBlockName } =
+			this.props;
 		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 
 		return [
 			readableContentViewStyle,
-			isFullWidth( blockAlignment ) &&
-				! hasParents && {
+			isFullWidth(blockAlignment) &&
+				!hasParents && {
 					width: styles.fullAlignment.width,
 				},
-			! blockAlignment &&
+			!blockAlignment &&
 				hasParents &&
-				! isContainerRelated( parentBlockName ) &&
-				isContainerRelated( blockName ) && {
+				!isContainerRelated(parentBlockName) &&
+				isContainerRelated(blockName) && {
 					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
 		];
@@ -127,62 +119,55 @@ export class BlockListItem extends Component {
 
 		return (
 			<ReadableContentView
-				align={ blockAlignment }
-				style={ [
+				align={blockAlignment}
+				style={[
 					readableContentViewStyle,
-					isContainerRelated( blockName ) &&
+					isContainerRelated(blockName) &&
 						parentWidth && {
 							maxWidth: parentWidth + 2 * marginHorizontal,
 						},
-				] }
+				]}
 			>
 				<View
-					style={ this.getContentStyles( readableContentViewStyle ) }
-					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
+					style={this.getContentStyles(readableContentViewStyle)}
+					pointerEvents={isReadOnly ? 'box-only' : 'auto'}
 				>
-					{ shouldShowInsertionPointBefore && (
-						<BlockInsertionPoint />
-					) }
+					{shouldShowInsertionPointBefore && <BlockInsertionPoint />}
 					<BlockListBlock
-						key={ clientId }
-						showTitle={ false }
-						clientId={ clientId }
-						parentWidth={ parentWidth }
-						{ ...restProps }
-						marginHorizontal={ this.getMarginHorizontal() }
-						blockWidth={ blockWidth }
+						key={clientId}
+						showTitle={false}
+						clientId={clientId}
+						parentWidth={parentWidth}
+						{...restProps}
+						marginHorizontal={this.getMarginHorizontal()}
+						blockWidth={blockWidth}
 					/>
-					{ ! shouldShowInnerBlockAppender() &&
+					{!shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (
 							<BlockInsertionPoint />
-						) }
+						)}
 				</View>
 			</ReadableContentView>
 		);
 	}
 
 	render() {
-		const {
-			gridProperties,
-			clientId,
-			parentWidth,
-			items,
-			blockWidth,
-		} = this.props;
+		const { gridProperties, clientId, parentWidth, items, blockWidth } =
+			this.props;
 
-		if ( ! blockWidth ) {
+		if (!blockWidth) {
 			return null;
 		}
 
-		if ( gridProperties ) {
+		if (gridProperties) {
 			return (
 				<Grid
-					numOfColumns={ gridProperties.numColumns }
-					tileCount={ items.length }
-					index={ items.indexOf( clientId ) }
-					maxWidth={ parentWidth }
+					numOfColumns={gridProperties.numColumns}
+					tileCount={items.length}
+					index={items.indexOf(clientId)}
+					maxWidth={parentWidth}
 				>
-					{ this.renderContent() }
+					{this.renderContent()}
 				</Grid>
 			);
 		}
@@ -190,60 +175,57 @@ export class BlockListItem extends Component {
 	}
 }
 
-export default compose( [
-	withSelect(
-		( select, { rootClientId, isStackedHorizontally, clientId } ) => {
-			const {
-				getBlockOrder,
-				getBlockInsertionPoint,
-				isBlockInsertionPointVisible,
-				getSettings,
-				getBlockParents,
-				getBlock,
-			} = select( blockEditorStore );
+export default compose([
+	withSelect((select, { rootClientId, isStackedHorizontally, clientId }) => {
+		const {
+			getBlockOrder,
+			getBlockInsertionPoint,
+			isBlockInsertionPointVisible,
+			getSettings,
+			getBlockParents,
+			getBlock,
+		} = select(blockEditorStore);
 
-			const blockClientIds = getBlockOrder( rootClientId );
-			const insertionPoint = getBlockInsertionPoint();
-			const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
-			const shouldShowInsertionPointBefore =
-				! isStackedHorizontally &&
-				blockInsertionPointIsVisible &&
-				insertionPoint.rootClientId === rootClientId &&
-				// if list is empty, show the insertion point (via the default appender)
-				( blockClientIds.length === 0 ||
-					// or if the insertion point is right before the denoted block
-					blockClientIds[ insertionPoint.index ] === clientId );
+		const blockClientIds = getBlockOrder(rootClientId);
+		const insertionPoint = getBlockInsertionPoint();
+		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
+		const shouldShowInsertionPointBefore =
+			!isStackedHorizontally &&
+			blockInsertionPointIsVisible &&
+			insertionPoint.rootClientId === rootClientId &&
+			// if list is empty, show the insertion point (via the default appender)
+			(blockClientIds.length === 0 ||
+				// or if the insertion point is right before the denoted block
+				blockClientIds[insertionPoint.index] === clientId);
 
-			const shouldShowInsertionPointAfter =
-				! isStackedHorizontally &&
-				blockInsertionPointIsVisible &&
-				insertionPoint.rootClientId === rootClientId &&
-				// if the insertion point is at the end of the list
-				blockClientIds.length === insertionPoint.index &&
-				// and the denoted block is the last one on the list, show the indicator at the end of the block
-				blockClientIds[ insertionPoint.index - 1 ] === clientId;
+		const shouldShowInsertionPointAfter =
+			!isStackedHorizontally &&
+			blockInsertionPointIsVisible &&
+			insertionPoint.rootClientId === rootClientId &&
+			// if the insertion point is at the end of the list
+			blockClientIds.length === insertionPoint.index &&
+			// and the denoted block is the last one on the list, show the indicator at the end of the block
+			blockClientIds[insertionPoint.index - 1] === clientId;
 
-			const isReadOnly = getSettings().readOnly;
+		const isReadOnly = getSettings().readOnly;
 
-			const { attributes, name } = getBlock( clientId ) || {};
-			const { align } = attributes || {};
-			const parents = getBlockParents( clientId, true );
-			const hasParents = !! parents.length;
-			const parentBlock = hasParents ? getBlock( parents[ 0 ] ) : {};
-			const { align: parentBlockAlignment } =
-				parentBlock?.attributes || {};
-			const { name: parentBlockName } = parentBlock || {};
+		const { attributes, name } = getBlock(clientId) || {};
+		const { align } = attributes || {};
+		const parents = getBlockParents(clientId, true);
+		const hasParents = !!parents.length;
+		const parentBlock = hasParents ? getBlock(parents[0]) : {};
+		const { align: parentBlockAlignment } = parentBlock?.attributes || {};
+		const { name: parentBlockName } = parentBlock || {};
 
-			return {
-				shouldShowInsertionPointBefore,
-				shouldShowInsertionPointAfter,
-				isReadOnly,
-				hasParents,
-				blockAlignment: align,
-				parentBlockAlignment,
-				blockName: name,
-				parentBlockName,
-			};
-		}
-	),
-] )( BlockListItem );
+		return {
+			shouldShowInsertionPointBefore,
+			shouldShowInsertionPointAfter,
+			isReadOnly,
+			hasParents,
+			blockAlignment: align,
+			parentBlockAlignment,
+			blockName: name,
+			parentBlockName,
+		};
+	}),
+])(BlockListItem);

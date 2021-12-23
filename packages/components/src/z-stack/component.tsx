@@ -43,8 +43,8 @@ export interface ZStackProps {
 }
 
 function ZStack(
-	props: WordPressComponentProps< ZStackProps, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<ZStackProps, 'div'>,
+	forwardedRef: Ref<any>
 ) {
 	const {
 		children,
@@ -53,38 +53,34 @@ function ZStack(
 		isReversed = false,
 		offset = 0,
 		...otherProps
-	} = useContextSystem( props, 'ZStack' );
+	} = useContextSystem(props, 'ZStack');
 
-	const validChildren = getValidChildren( children );
+	const validChildren = getValidChildren(children);
 	const childrenLastIndex = validChildren.length - 1;
 
-	const clonedChildren = validChildren.map( ( child, index ) => {
+	const clonedChildren = validChildren.map((child, index) => {
 		const zIndex = isReversed ? childrenLastIndex - index : index;
 		const offsetAmount = offset * index;
 
-		const key = isValidElement( child ) ? child.key : index;
+		const key = isValidElement(child) ? child.key : index;
 
 		return (
 			<ZStackChildView
-				isLayered={ isLayered }
-				offsetAmount={ offsetAmount }
-				zIndex={ zIndex }
-				key={ key }
+				isLayered={isLayered}
+				offsetAmount={offsetAmount}
+				zIndex={zIndex}
+				key={key}
 			>
-				{ child }
+				{child}
 			</ZStackChildView>
 		);
-	} );
+	});
 
 	return (
-		<ZStackView
-			{ ...otherProps }
-			className={ className }
-			ref={ forwardedRef }
-		>
-			{ clonedChildren }
+		<ZStackView {...otherProps} className={className} ref={forwardedRef}>
+			{clonedChildren}
 		</ZStackView>
 	);
 }
 
-export default contextConnect( ZStack, 'ZStack' );
+export default contextConnect(ZStack, 'ZStack');

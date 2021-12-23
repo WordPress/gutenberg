@@ -17,20 +17,20 @@ import RedoButton from './redo-button';
 import InserterToggle from './inserter-toggle';
 import MoreMenu from './more-menu';
 
-export default function Header( {
+export default function Header({
 	isMenuSelected,
 	menus,
 	isPending,
 	navigationPost,
-} ) {
-	const isMediumViewport = useViewportMatch( 'medium' );
+}) {
+	const isMediumViewport = useViewportMatch('medium');
 
-	if ( ! isMenuSelected ) {
+	if (!isMenuSelected) {
 		return (
 			<div className="edit-navigation-header">
 				<div className="edit-navigation-header__toolbar-wrapper">
 					<h1 className="edit-navigation-header__title">
-						{ __( 'Navigation' ) }
+						{__('Navigation')}
 					</h1>
 				</div>
 			</div>
@@ -40,31 +40,31 @@ export default function Header( {
 	return (
 		<div className="edit-navigation-header">
 			<div className="edit-navigation-header__toolbar-wrapper">
-				{ isMediumViewport && (
+				{isMediumViewport && (
 					<h1 className="edit-navigation-header__title">
-						{ __( 'Navigation' ) }
+						{__('Navigation')}
 					</h1>
-				) }
+				)}
 
 				<NavigableToolbar
 					className="edit-navigation-header__toolbar"
-					aria-label={ __( 'Document tools' ) }
+					aria-label={__('Document tools')}
 				>
 					<InserterToggle />
-					{ isMediumViewport && (
+					{isMediumViewport && (
 						<>
 							<UndoButton />
 							<RedoButton />
 						</>
-					) }
+					)}
 				</NavigableToolbar>
 			</div>
 
-			<MenuActions menus={ menus } isLoading={ isPending } />
+			<MenuActions menus={menus} isLoading={isPending} />
 
 			<div className="edit-navigation-header__actions">
-				{ isMediumViewport && <NewButton /> }
-				<SaveButton navigationPost={ navigationPost } />
+				{isMediumViewport && <NewButton />}
+				<SaveButton navigationPost={navigationPost} />
 				<PinnedItems.Slot scope="core/edit-navigation" />
 				<MoreMenu />
 			</div>

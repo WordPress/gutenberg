@@ -13,32 +13,31 @@ import WelcomeGuideImage from './image';
 import { store as editSiteStore } from '../../store';
 
 export default function WelcomeGuideStyles() {
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggleFeature } = useDispatch(editSiteStore);
 
-	const { isActive, isStylesOpen } = useSelect( ( select ) => {
-		const sidebar = select( interfaceStore ).getActiveComplementaryArea(
+	const { isActive, isStylesOpen } = useSelect((select) => {
+		const sidebar = select(interfaceStore).getActiveComplementaryArea(
 			editSiteStore.name
 		);
 
 		return {
-			isActive: select( editSiteStore ).isFeatureActive(
-				'welcomeGuideStyles'
-			),
+			isActive:
+				select(editSiteStore).isFeatureActive('welcomeGuideStyles'),
 			isStylesOpen: sidebar === 'edit-site/global-styles',
 		};
-	}, [] );
+	}, []);
 
-	if ( ! isActive || ! isStylesOpen ) {
+	if (!isActive || !isStylesOpen) {
 		return null;
 	}
 
 	return (
 		<Guide
 			className="edit-site-welcome-guide"
-			contentLabel={ __( 'Welcome to styles' ) }
-			finishButtonText={ __( 'Get Started' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuideStyles' ) }
-			pages={ [
+			contentLabel={__('Welcome to styles')}
+			finishButtonText={__('Get Started')}
+			onFinish={() => toggleFeature('welcomeGuideStyles')}
+			pages={[
 				{
 					image: (
 						<WelcomeGuideImage
@@ -49,12 +48,12 @@ export default function WelcomeGuideStyles() {
 					content: (
 						<>
 							<h1 className="edit-site-welcome-guide__heading">
-								{ __( 'Welcome to Styles' ) }
+								{__('Welcome to Styles')}
 							</h1>
 							<p className="edit-site-welcome-guide__text">
-								{ __(
+								{__(
 									'Tweak your site, or give it a whole new look! Get creative — how about a new color palette for your buttons, or choosing a new font? Take a look at what you can do here.'
-								) }
+								)}
 							</p>
 						</>
 					),
@@ -69,12 +68,12 @@ export default function WelcomeGuideStyles() {
 					content: (
 						<>
 							<h1 className="edit-site-welcome-guide__heading">
-								{ __( 'Set the design' ) }
+								{__('Set the design')}
 							</h1>
 							<p className="edit-site-welcome-guide__text">
-								{ __(
+								{__(
 									'You can customize your site as much as you like with different colors, typography, and layouts. Or if you prefer, just leave it up to your theme to handle! '
-								) }
+								)}
 							</p>
 						</>
 					),
@@ -89,12 +88,12 @@ export default function WelcomeGuideStyles() {
 					content: (
 						<>
 							<h1 className="edit-site-welcome-guide__heading">
-								{ __( 'Personalize blocks' ) }
+								{__('Personalize blocks')}
 							</h1>
 							<p className="edit-site-welcome-guide__text">
-								{ __(
+								{__(
 									'You can adjust your blocks to ensure a cohesive experience across your site — add your unique colors to a branded Button block, or adjust the Heading block to your preferred size.'
-								) }
+								)}
 							</p>
 						</>
 					),
@@ -109,26 +108,26 @@ export default function WelcomeGuideStyles() {
 					content: (
 						<>
 							<h1 className="edit-site-welcome-guide__heading">
-								{ __( 'Learn more' ) }
+								{__('Learn more')}
 							</h1>
 							<p className="edit-site-welcome-guide__text">
-								{ __(
+								{__(
 									'New to block themes and styling your site? '
-								) }
+								)}
 								<ExternalLink
-									href={ __(
+									href={__(
 										'https://wordpress.org/support/article/styles-overview/'
-									) }
+									)}
 								>
-									{ __(
+									{__(
 										'Here’s a detailed guide to learn how to make the most of it.'
-									) }
+									)}
 								</ExternalLink>
 							</p>
 						</>
 					),
 				},
-			] }
+			]}
 		/>
 	);
 }

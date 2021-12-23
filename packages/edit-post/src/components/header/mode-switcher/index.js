@@ -20,11 +20,11 @@ import { store as editPostStore } from '../../../store';
 const MODES = [
 	{
 		value: 'visual',
-		label: __( 'Visual editor' ),
+		label: __('Visual editor'),
 	},
 	{
 		value: 'text',
-		label: __( 'Code editor' ),
+		label: __('Code editor'),
 	},
 ];
 
@@ -36,42 +36,42 @@ function ModeSwitcher() {
 		isEditingTemplate,
 		mode,
 	} = useSelect(
-		( select ) => ( {
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
-			isRichEditingEnabled: select( editorStore ).getEditorSettings()
-				.richEditingEnabled,
-			isCodeEditingEnabled: select( editorStore ).getEditorSettings()
-				.codeEditingEnabled,
-			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
-			mode: select( editPostStore ).getEditorMode(),
-		} ),
+		(select) => ({
+			shortcut: select(keyboardShortcutsStore).getShortcutRepresentation(
+				'core/edit-post/toggle-mode'
+			),
+			isRichEditingEnabled:
+				select(editorStore).getEditorSettings().richEditingEnabled,
+			isCodeEditingEnabled:
+				select(editorStore).getEditorSettings().codeEditingEnabled,
+			isEditingTemplate: select(editPostStore).isEditingTemplate(),
+			mode: select(editPostStore).getEditorMode(),
+		}),
 		[]
 	);
-	const { switchEditorMode } = useDispatch( editPostStore );
+	const { switchEditorMode } = useDispatch(editPostStore);
 
-	if ( isEditingTemplate ) {
+	if (isEditingTemplate) {
 		return null;
 	}
 
-	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
+	if (!isRichEditingEnabled || !isCodeEditingEnabled) {
 		return null;
 	}
 
-	const choices = MODES.map( ( choice ) => {
-		if ( choice.value !== mode ) {
+	const choices = MODES.map((choice) => {
+		if (choice.value !== mode) {
 			return { ...choice, shortcut };
 		}
 		return choice;
-	} );
+	});
 
 	return (
-		<MenuGroup label={ __( 'Editor' ) }>
+		<MenuGroup label={__('Editor')}>
 			<MenuItemsChoice
-				choices={ choices }
-				value={ mode }
-				onSelect={ switchEditorMode }
+				choices={choices}
+				value={mode}
+				onSelect={switchEditorMode}
 			/>
 		</MenuGroup>
 	);

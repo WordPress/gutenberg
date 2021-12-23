@@ -23,7 +23,7 @@ import { useCx } from '../../utils/hooks/use-cx';
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                            forwardedRef
  */
-function Card( props, forwardedRef ) {
+function Card(props, forwardedRef) {
 	const {
 		children,
 		elevation,
@@ -31,17 +31,17 @@ function Card( props, forwardedRef ) {
 		isRounded,
 		size,
 		...otherProps
-	} = useCard( props );
+	} = useCard(props);
 	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
 
 	const cx = useCx();
 
 	const elevationClassName = useMemo(
-		() => cx( css( { borderRadius: elevationBorderRadius } ) ),
-		[ elevationBorderRadius ]
+		() => cx(css({ borderRadius: elevationBorderRadius })),
+		[elevationBorderRadius]
 	);
 
-	const contextProviderValue = useMemo( () => {
+	const contextProviderValue = useMemo(() => {
 		const contextProps = {
 			size,
 			isBorderless,
@@ -51,21 +51,21 @@ function Card( props, forwardedRef ) {
 			CardHeader: contextProps,
 			CardFooter: contextProps,
 		};
-	}, [ isBorderless, size ] );
+	}, [isBorderless, size]);
 
 	return (
-		<ContextSystemProvider value={ contextProviderValue }>
-			<View { ...otherProps } ref={ forwardedRef }>
-				<View className={ cx( styles.Content ) }>{ children }</View>
+		<ContextSystemProvider value={contextProviderValue}>
+			<View {...otherProps} ref={forwardedRef}>
+				<View className={cx(styles.Content)}>{children}</View>
 				<Elevation
-					className={ elevationClassName }
-					isInteractive={ false }
-					value={ elevation ? 1 : 0 }
+					className={elevationClassName}
+					isInteractive={false}
+					value={elevation ? 1 : 0}
 				/>
 				<Elevation
-					className={ elevationClassName }
-					isInteractive={ false }
-					value={ elevation }
+					className={elevationClassName}
+					isInteractive={false}
+					value={elevation}
 				/>
 			</View>
 		</ContextSystemProvider>
@@ -105,6 +105,6 @@ function Card( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedCard = contextConnect( Card, 'Card' );
+const ConnectedCard = contextConnect(Card, 'Card');
 
 export default ConnectedCard;

@@ -15,31 +15,27 @@ import { keyboardReturn } from '@wordpress/icons';
  */
 import URLInput from '../url-input';
 
-export default function LinkEditor( {
+export default function LinkEditor({
 	autocompleteRef,
 	className,
 	onChangeInputValue,
 	value,
 	...props
-} ) {
+}) {
 	return (
 		<form
-			className={ classnames(
+			className={classnames(
 				'block-editor-url-popover__link-editor',
 				className
-			) }
-			{ ...props }
+			)}
+			{...props}
 		>
 			<URLInput
-				value={ value }
-				onChange={ onChangeInputValue }
-				autocompleteRef={ autocompleteRef }
+				value={value}
+				onChange={onChangeInputValue}
+				autocompleteRef={autocompleteRef}
 			/>
-			<Button
-				icon={ keyboardReturn }
-				label={ __( 'Apply' ) }
-				type="submit"
-			/>
+			<Button icon={keyboardReturn} label={__('Apply')} type="submit" />
 		</form>
 	);
 }

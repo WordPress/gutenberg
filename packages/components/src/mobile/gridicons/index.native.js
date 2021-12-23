@@ -3,9 +3,9 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const fromPathData24x24 = ( pathData ) => (
+const fromPathData24x24 = (pathData) => (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d={ pathData } />
+		<Path d={pathData} />
 	</SVG>
 );
 

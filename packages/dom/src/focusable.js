@@ -28,7 +28,7 @@
  *
  * @return {string} CSS selector.
  */
-function buildSelector( sequential ) {
+function buildSelector(sequential) {
 	return [
 		sequential ? '[tabindex]:not([tabindex^="-"])' : '[tabindex]',
 		'a[href]',
@@ -41,7 +41,7 @@ function buildSelector( sequential ) {
 		'embed',
 		'area[href]',
 		'[contenteditable]:not([contenteditable=false])',
-	].join( ',' );
+	].join(',');
 }
 
 /**
@@ -52,7 +52,7 @@ function buildSelector( sequential ) {
  *
  * @return {boolean} Whether element is visible.
  */
-function isVisible( element ) {
+function isVisible(element) {
 	return (
 		element.offsetWidth > 0 ||
 		element.offsetHeight > 0 ||
@@ -69,10 +69,10 @@ function isVisible( element ) {
  *
  * @return {boolean} Whether area element is valid for focus.
  */
-function isValidFocusableArea( element ) {
+function isValidFocusableArea(element) {
 	/** @type {HTMLMapElement | null} */
-	const map = element.closest( 'map[name]' );
-	if ( ! map ) {
+	const map = element.closest('map[name]');
+	if (!map) {
 		return false;
 	}
 
@@ -80,7 +80,7 @@ function isValidFocusableArea( element ) {
 	const img = element.ownerDocument.querySelector(
 		'img[usemap="#' + map.name + '"]'
 	);
-	return !! img && isVisible( img );
+	return !!img && isVisible(img);
 }
 
 /**
@@ -97,24 +97,24 @@ function isValidFocusableArea( element ) {
  *
  * @return {Element[]} Focusable elements.
  */
-export function find( context, { sequential = false } = {} ) {
+export function find(context, { sequential = false } = {}) {
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {NodeListOf<HTMLElement>} */
 	/* eslint-enable jsdoc/no-undefined-types */
-	const elements = context.querySelectorAll( buildSelector( sequential ) );
+	const elements = context.querySelectorAll(buildSelector(sequential));
 
-	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) ) {
+	return Array.from(elements).filter((element) => {
+		if (!isVisible(element)) {
 			return false;
 		}
 
 		const { nodeName } = element;
-		if ( 'AREA' === nodeName ) {
+		if ('AREA' === nodeName) {
 			return isValidFocusableArea(
-				/** @type {HTMLAreaElement} */ ( element )
+				/** @type {HTMLAreaElement} */ (element)
 			);
 		}
 
 		return true;
-	} );
+	});
 }

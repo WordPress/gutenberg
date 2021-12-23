@@ -29,12 +29,12 @@ const DEFAULT_OPTIONS = {
  *
  * @return {Object} Babel transform plugin.
  */
-module.exports = ( babel ) => {
+module.exports = (babel) => {
 	const { types: t } = babel;
 
-	function getOptions( state ) {
-		if ( ! state._options ) {
-			state._options = Object.assign( {}, DEFAULT_OPTIONS, state.opts );
+	function getOptions(state) {
+		if (!state._options) {
+			state._options = Object.assign({}, DEFAULT_OPTIONS, state.opts);
 		}
 
 		return state._options;
@@ -42,73 +42,71 @@ module.exports = ( babel ) => {
 
 	return {
 		visitor: {
-			JSX( path, state ) {
-				if ( state.hasUndeclaredScopeVariable ) {
+			JSX(path, state) {
+				if (state.hasUndeclaredScopeVariable) {
 					return;
 				}
 
-				const { scopeVariable } = getOptions( state );
-				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding(
-					scopeVariable
-				);
+				const { scopeVariable } = getOptions(state);
+				state.hasUndeclaredScopeVariable =
+					!path.scope.hasBinding(scopeVariable);
 			},
-			JSXFragment( path, state ) {
-				if ( state.hasUndeclaredScopeVariableFrag ) {
+			JSXFragment(path, state) {
+				if (state.hasUndeclaredScopeVariableFrag) {
 					return;
 				}
 
-				const { scopeVariableFrag } = getOptions( state );
-				if ( scopeVariableFrag === null ) {
+				const { scopeVariableFrag } = getOptions(state);
+				if (scopeVariableFrag === null) {
 					return;
 				}
 
-				state.hasUndeclaredScopeVariableFrag = ! path.scope.hasBinding(
-					scopeVariableFrag
-				);
+				state.hasUndeclaredScopeVariableFrag =
+					!path.scope.hasBinding(scopeVariableFrag);
 			},
 			Program: {
-				exit( path, state ) {
+				exit(path, state) {
 					const {
 						scopeVariable,
 						scopeVariableFrag,
 						source,
 						isDefault,
-					} = getOptions( state );
+					} = getOptions(state);
 
 					let scopeVariableSpecifier;
 					let scopeVariableFragSpecifier;
 
-					if ( state.hasUndeclaredScopeVariable ) {
-						if ( isDefault ) {
+					if (state.hasUndeclaredScopeVariable) {
+						if (isDefault) {
 							scopeVariableSpecifier = t.importDefaultSpecifier(
-								t.identifier( scopeVariable )
+								t.identifier(scopeVariable)
 							);
 						} else {
 							scopeVariableSpecifier = t.importSpecifier(
-								t.identifier( scopeVariable ),
-								t.identifier( scopeVariable )
+								t.identifier(scopeVariable),
+								t.identifier(scopeVariable)
 							);
 						}
 					}
 
-					if ( state.hasUndeclaredScopeVariableFrag ) {
+					if (state.hasUndeclaredScopeVariableFrag) {
 						scopeVariableFragSpecifier = t.importSpecifier(
-							t.identifier( scopeVariableFrag ),
-							t.identifier( scopeVariableFrag )
+							t.identifier(scopeVariableFrag),
+							t.identifier(scopeVariableFrag)
 						);
 					}
 
 					const importDeclarationSpecifiers = [
 						scopeVariableSpecifier,
 						scopeVariableFragSpecifier,
-					].filter( Boolean );
-					if ( importDeclarationSpecifiers.length ) {
+					].filter(Boolean);
+					if (importDeclarationSpecifiers.length) {
 						const importDeclaration = t.importDeclaration(
 							importDeclarationSpecifiers,
-							t.stringLiteral( source )
+							t.stringLiteral(source)
 						);
 
-						path.unshiftContainer( 'body', importDeclaration );
+						path.unshiftContainer('body', importDeclaration);
 					}
 				},
 			},

@@ -20,9 +20,9 @@ import { find as findFocusable } from './focusable';
  *
  * @return {number} Tab index of element (default 0).
  */
-function getTabIndex( element ) {
-	const tabIndex = element.getAttribute( 'tabindex' );
-	return tabIndex === null ? 0 : parseInt( tabIndex, 10 );
+function getTabIndex(element) {
+	const tabIndex = element.getAttribute('tabindex');
+	return tabIndex === null ? 0 : parseInt(tabIndex, 10);
 }
 
 /**
@@ -32,8 +32,8 @@ function getTabIndex( element ) {
  *
  * @return {boolean} Whether element is tabbable.
  */
-export function isTabbableIndex( element ) {
-	return getTabIndex( element ) !== -1;
+export function isTabbableIndex(element) {
+	return getTabIndex(element) !== -1;
 }
 
 /** @typedef {Element & { type?: string, checked?: boolean, name?: string }} MaybeHTMLInputElement */
@@ -57,29 +57,29 @@ function createStatefulCollapseRadioGroup() {
 		const { nodeName, type, checked, name } = element;
 
 		// For all non-radio tabbables, construct to array by concatenating.
-		if ( nodeName !== 'INPUT' || type !== 'radio' || ! name ) {
-			return result.concat( element );
+		if (nodeName !== 'INPUT' || type !== 'radio' || !name) {
+			return result.concat(element);
 		}
 
-		const hasChosen = CHOSEN_RADIO_BY_NAME.hasOwnProperty( name );
+		const hasChosen = CHOSEN_RADIO_BY_NAME.hasOwnProperty(name);
 
 		// Omit by skipping concatenation if the radio element is not chosen.
-		const isChosen = checked || ! hasChosen;
-		if ( ! isChosen ) {
+		const isChosen = checked || !hasChosen;
+		if (!isChosen) {
 			return result;
 		}
 
 		// At this point, if there had been a chosen element, the current
 		// element is checked and should take priority. Retroactively remove
 		// the element which had previously been considered the chosen one.
-		if ( hasChosen ) {
-			const hadChosenElement = CHOSEN_RADIO_BY_NAME[ name ];
-			result = without( result, hadChosenElement );
+		if (hasChosen) {
+			const hadChosenElement = CHOSEN_RADIO_BY_NAME[name];
+			result = without(result, hadChosenElement);
 		}
 
-		CHOSEN_RADIO_BY_NAME[ name ] = element;
+		CHOSEN_RADIO_BY_NAME[name] = element;
 
-		return result.concat( element );
+		return result.concat(element);
 	};
 }
 
@@ -94,7 +94,7 @@ function createStatefulCollapseRadioGroup() {
  *
  * @return {{ element: Element, index: number }} Mapped object with element, index.
  */
-function mapElementToObjectTabbable( element, index ) {
+function mapElementToObjectTabbable(element, index) {
 	return { element, index };
 }
 
@@ -106,7 +106,7 @@ function mapElementToObjectTabbable( element, index ) {
  *
  * @return {Element} Mapped object element.
  */
-function mapObjectTabbableToElement( object ) {
+function mapObjectTabbableToElement(object) {
 	return object.element;
 }
 
@@ -120,11 +120,11 @@ function mapObjectTabbableToElement( object ) {
  *
  * @return {number} Comparator result.
  */
-function compareObjectTabbables( a, b ) {
-	const aTabIndex = getTabIndex( a.element );
-	const bTabIndex = getTabIndex( b.element );
+function compareObjectTabbables(a, b) {
+	const aTabIndex = getTabIndex(a.element);
+	const bTabIndex = getTabIndex(b.element);
 
-	if ( aTabIndex === bTabIndex ) {
+	if (aTabIndex === bTabIndex) {
 		return a.index - b.index;
 	}
 
@@ -138,21 +138,21 @@ function compareObjectTabbables( a, b ) {
  *
  * @return {Element[]} Tabbable elements.
  */
-function filterTabbable( focusables ) {
+function filterTabbable(focusables) {
 	return focusables
-		.filter( isTabbableIndex )
-		.map( mapElementToObjectTabbable )
-		.sort( compareObjectTabbables )
-		.map( mapObjectTabbableToElement )
-		.reduce( createStatefulCollapseRadioGroup(), [] );
+		.filter(isTabbableIndex)
+		.map(mapElementToObjectTabbable)
+		.sort(compareObjectTabbables)
+		.map(mapObjectTabbableToElement)
+		.reduce(createStatefulCollapseRadioGroup(), []);
 }
 
 /**
  * @param {Element} context
  * @return {Element[]} Tabbable elements within the context.
  */
-export function find( context ) {
-	return filterTabbable( findFocusable( context ) );
+export function find(context) {
+	return filterTabbable(findFocusable(context));
 }
 
 /**
@@ -161,14 +161,14 @@ export function find( context ) {
  * @param {Element} element The focusable element before which to look. Defaults
  *                          to the active element.
  */
-export function findPrevious( element ) {
-	const focusables = findFocusable( element.ownerDocument.body );
-	const index = focusables.indexOf( element );
+export function findPrevious(element) {
+	const focusables = findFocusable(element.ownerDocument.body);
+	const index = focusables.indexOf(element);
 
 	// Remove all focusables after and including `element`.
 	focusables.length = index;
 
-	return last( filterTabbable( focusables ) );
+	return last(filterTabbable(focusables));
 }
 
 /**
@@ -177,12 +177,12 @@ export function findPrevious( element ) {
  * @param {Element} element The focusable element after which to look. Defaults
  *                          to the active element.
  */
-export function findNext( element ) {
-	const focusables = findFocusable( element.ownerDocument.body );
-	const index = focusables.indexOf( element );
+export function findNext(element) {
+	const focusables = findFocusable(element.ownerDocument.body);
+	const index = focusables.indexOf(element);
 
 	// Remove all focusables before and including `element`.
-	const remaining = focusables.slice( index + 1 );
+	const remaining = focusables.slice(index + 1);
 
-	return first( filterTabbable( remaining ) );
+	return first(filterTabbable(remaining));
 }

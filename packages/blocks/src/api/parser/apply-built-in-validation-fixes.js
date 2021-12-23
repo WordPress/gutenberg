@@ -14,7 +14,7 @@ import { fixCustomClassname } from './fix-custom-classname';
  *
  * @return {WPBlock} Fixed block object
  */
-export function applyBuiltInValidationFixes( block, blockType ) {
+export function applyBuiltInValidationFixes(block, blockType) {
 	const updatedBlockAttributes = fixCustomClassname(
 		block.attributes,
 		blockType,

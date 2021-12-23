@@ -13,35 +13,35 @@ import { closeSmall } from '@wordpress/icons';
  */
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 
-const ComplementaryAreaHeader = ( {
+const ComplementaryAreaHeader = ({
 	smallScreenTitle,
 	children,
 	className,
 	toggleButtonProps,
-} ) => {
+}) => {
 	const toggleButton = (
-		<ComplementaryAreaToggle icon={ closeSmall } { ...toggleButtonProps } />
+		<ComplementaryAreaToggle icon={closeSmall} {...toggleButtonProps} />
 	);
 	return (
 		<>
 			<div className="components-panel__header interface-complementary-area-header__small">
-				{ smallScreenTitle && (
+				{smallScreenTitle && (
 					<span className="interface-complementary-area-header__small-title">
-						{ smallScreenTitle }
+						{smallScreenTitle}
 					</span>
-				) }
-				{ toggleButton }
+				)}
+				{toggleButton}
 			</div>
 			<div
-				className={ classnames(
+				className={classnames(
 					'components-panel__header',
 					'interface-complementary-area-header',
 					className
-				) }
-				tabIndex={ -1 }
+				)}
+				tabIndex={-1}
 			>
-				{ children }
-				{ toggleButton }
+				{children}
+				{toggleButton}
 			</div>
 		</>
 	);

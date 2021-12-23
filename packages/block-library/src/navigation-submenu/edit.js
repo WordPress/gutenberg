@@ -48,9 +48,9 @@ import { speak } from '@wordpress/a11y';
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 
-const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
+const ALLOWED_BLOCKS = ['core/navigation-link', 'core/navigation-submenu'];
 
-const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+const DEFAULT_BLOCK = ['core/navigation-link'];
 
 const MAX_NESTING = 5;
 
@@ -63,44 +63,44 @@ const MAX_NESTING = 5;
  *
  * @return {boolean} Is dragging within the target element.
  */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
+const useIsDraggingWithin = (elementRef) => {
+	const [isDraggingWithin, setIsDraggingWithin] = useState(false);
 
-	useEffect( () => {
+	useEffect(() => {
 		const { ownerDocument } = elementRef.current;
 
-		function handleDragStart( event ) {
+		function handleDragStart(event) {
 			// Check the first time when the dragging starts.
-			handleDragEnter( event );
+			handleDragEnter(event);
 		}
 
 		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
 		function handleDragEnd() {
-			setIsDraggingWithin( false );
+			setIsDraggingWithin(false);
 		}
 
-		function handleDragEnter( event ) {
+		function handleDragEnter(event) {
 			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
+			if (elementRef.current.contains(event.target)) {
+				setIsDraggingWithin(true);
 			} else {
-				setIsDraggingWithin( false );
+				setIsDraggingWithin(false);
 			}
 		}
 
 		// Bind these events to the document to catch all drag events.
 		// Ideally, we can also use `event.relatedTarget`, but sadly that
 		// doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
+		ownerDocument.addEventListener('dragstart', handleDragStart);
+		ownerDocument.addEventListener('dragend', handleDragEnd);
+		ownerDocument.addEventListener('dragenter', handleDragEnter);
 
 		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
+			ownerDocument.removeEventListener('dragstart', handleDragStart);
+			ownerDocument.removeEventListener('dragend', handleDragEnd);
+			ownerDocument.removeEventListener('dragenter', handleDragEnter);
 		};
-	}, [] );
+	}, []);
 
 	return isDraggingWithin;
 };
@@ -113,8 +113,8 @@ const useIsDraggingWithin = ( elementRef ) => {
  * @param {string} kind Link block's entity of kind (post-type|taxonomy)
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
-function getSuggestionsQuery( type, kind ) {
-	switch ( type ) {
+function getSuggestionsQuery(type, kind) {
+	switch (type) {
 		case 'post':
 		case 'page':
 			return { type: 'post', subtype: type };
@@ -125,10 +125,10 @@ function getSuggestionsQuery( type, kind ) {
 		case 'post_format':
 			return { type: 'post-format' };
 		default:
-			if ( kind === 'taxonomy' ) {
+			if (kind === 'taxonomy') {
 				return { type: 'term', subtype: type };
 			}
-			if ( kind === 'post-type' ) {
+			if (kind === 'post-type') {
 				return { type: 'post', subtype: type };
 			}
 			return {};
@@ -148,7 +148,7 @@ function getSuggestionsQuery( type, kind ) {
  * @param {Object}  context
  * @param {boolean} isSubMenu
  */
-function getColors( context, isSubMenu ) {
+function getColors(context, isSubMenu) {
 	const {
 		textColor,
 		customTextColor,
@@ -163,27 +163,27 @@ function getColors( context, isSubMenu ) {
 
 	const colors = {};
 
-	if ( isSubMenu && !! customOverlayTextColor ) {
+	if (isSubMenu && !!customOverlayTextColor) {
 		colors.customTextColor = customOverlayTextColor;
-	} else if ( isSubMenu && !! overlayTextColor ) {
+	} else if (isSubMenu && !!overlayTextColor) {
 		colors.textColor = overlayTextColor;
-	} else if ( !! customTextColor ) {
+	} else if (!!customTextColor) {
 		colors.customTextColor = customTextColor;
-	} else if ( !! textColor ) {
+	} else if (!!textColor) {
 		colors.textColor = textColor;
-	} else if ( !! style?.color?.text ) {
+	} else if (!!style?.color?.text) {
 		colors.customTextColor = style.color.text;
 	}
 
-	if ( isSubMenu && !! customOverlayBackgroundColor ) {
+	if (isSubMenu && !!customOverlayBackgroundColor) {
 		colors.customBackgroundColor = customOverlayBackgroundColor;
-	} else if ( isSubMenu && !! overlayBackgroundColor ) {
+	} else if (isSubMenu && !!overlayBackgroundColor) {
 		colors.backgroundColor = overlayBackgroundColor;
-	} else if ( !! customBackgroundColor ) {
+	} else if (!!customBackgroundColor) {
 		colors.customBackgroundColor = customBackgroundColor;
-	} else if ( !! backgroundColor ) {
+	} else if (!!backgroundColor) {
 		colors.backgroundColor = backgroundColor;
-	} else if ( !! style?.color?.background ) {
+	} else if (!!style?.color?.background) {
 		colors.customTextColor = style.color.background;
 	}
 
@@ -236,38 +236,37 @@ export const updateNavigationLinkBlockAttributes = (
 		type: newType = originalType,
 	} = updatedValue;
 
-	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
-	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
+	const normalizedTitle = title.replace(/http(s?):\/\//gi, '');
+	const normalizedURL = url.replace(/http(s?):\/\//gi, '');
 	const escapeTitle =
 		title !== '' &&
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 	const label = escapeTitle
-		? escape( title )
-		: originalLabel || escape( normalizedURL );
+		? escape(title)
+		: originalLabel || escape(normalizedURL);
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
-	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
+	const type = newType === 'post_tag' ? 'tag' : newType.replace('-', '_');
 
 	const isBuiltInType =
-		[ 'post', 'page', 'tag', 'category' ].indexOf( type ) > -1;
+		['post', 'page', 'tag', 'category'].indexOf(type) > -1;
 
-	const isCustomLink =
-		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
+	const isCustomLink = (!newKind && !isBuiltInType) || newKind === 'custom';
 	const kind = isCustomLink ? 'custom' : newKind;
 
-	setAttributes( {
+	setAttributes({
 		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
-		...( label && { label } ),
-		...( undefined !== opensInNewTab && { opensInNewTab } ),
-		...( id && Number.isInteger( id ) && { id } ),
-		...( kind && { kind } ),
-		...( type && type !== 'URL' && { type } ),
-	} );
+		...(url && { url: encodeURI(safeDecodeURI(url)) }),
+		...(label && { label }),
+		...(undefined !== opensInNewTab && { opensInNewTab }),
+		...(id && Number.isInteger(id) && { id }),
+		...(kind && { kind }),
+		...(type && type !== 'URL' && { type }),
+	});
 };
 
-export default function NavigationSubmenuEdit( {
+export default function NavigationSubmenuEdit({
 	attributes,
 	isSelected,
 	setAttributes,
@@ -275,30 +274,21 @@ export default function NavigationSubmenuEdit( {
 	onReplace,
 	context,
 	clientId,
-} ) {
-	const {
-		label,
-		type,
-		opensInNewTab,
-		url,
-		description,
-		rel,
-		title,
-		kind,
-	} = attributes;
+}) {
+	const { label, type, opensInNewTab, url, description, rel, title, kind } =
+		attributes;
 	const link = {
 		url,
 		opensInNewTab,
 	};
 	const { showSubmenuIcon, openSubmenusOnClick } = context;
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
-	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const listItemRef = useRef( null );
-	const isDraggingWithin = useIsDraggingWithin( listItemRef );
-	const itemLabelPlaceholder = __( 'Add text…' );
+	const { saveEntityRecord } = useDispatch(coreStore);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch(blockEditorStore);
+	const [isLinkOpen, setIsLinkOpen] = useState(false);
+	const listItemRef = useRef(null);
+	const isDraggingWithin = useIsDraggingWithin(listItemRef);
+	const itemLabelPlaceholder = __('Add text…');
 	const ref = useRef();
 
 	const {
@@ -311,96 +301,89 @@ export default function NavigationSubmenuEdit( {
 		userCanCreatePages,
 		userCanCreatePosts,
 	} = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 
 			const selectedBlockId = getSelectedBlockClientId();
 
-			const descendants = getClientIdsOfDescendants( [ clientId ] )
-				.length;
+			const descendants = getClientIdsOfDescendants([clientId]).length;
 
 			return {
 				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, name ).length >=
+					getBlockParentsByBlockName(clientId, name).length >=
 					MAX_NESTING,
 				isTopLevelItem:
-					getBlockParentsByBlockName( clientId, name ).length === 0,
-				isParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					true
-				),
+					getBlockParentsByBlockName(clientId, name).length === 0,
+				isParentOfSelectedBlock: hasSelectedInnerBlock(clientId, true),
 				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					false
 				),
-				hasDescendants: !! descendants,
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
+				hasDescendants: !!descendants,
+				selectedBlockHasDescendants: !!getClientIdsOfDescendants([
 					selectedBlockId,
-				] )?.length,
-				userCanCreatePages: select( coreStore ).canUser(
+				])?.length,
+				userCanCreatePages: select(coreStore).canUser(
 					'create',
 					'pages'
 				),
-				userCanCreatePosts: select( coreStore ).canUser(
+				userCanCreatePosts: select(coreStore).canUser(
 					'create',
 					'posts'
 				),
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
 	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
-	useEffect( () => {
-		if ( ! openSubmenusOnClick && ! url ) {
-			setIsLinkOpen( true );
+	useEffect(() => {
+		if (!openSubmenusOnClick && !url) {
+			setIsLinkOpen(true);
 		}
-	}, [] );
+	}, []);
 
 	// Store the colors from context as attributes for rendering
-	useEffect( () => {
+	useEffect(() => {
 		// This side-effect should not create an undo level as those should
 		// only be created via user interactions. Mark this change as
 		// not persistent to avoid undo level creation.
 		// See https://github.com/WordPress/gutenberg/issues/34564.
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isTopLevelItem } );
-	}, [ isTopLevelItem ] );
+		setAttributes({ isTopLevelItem });
+	}, [isTopLevelItem]);
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
 	 * when selecting a suggestion in the link popover, we force close on block unselection.
 	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
+	useEffect(() => {
+		if (!isSelected) {
+			setIsLinkOpen(false);
 		}
-	}, [ isSelected ] );
+	}, [isSelected]);
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
-	useEffect( () => {
-		if ( isLinkOpen && url ) {
+	useEffect(() => {
+		if (isLinkOpen && url) {
 			// Does this look like a URL and have something TLD-ish?
-			if (
-				isURL( prependHTTP( label ) ) &&
-				/^.+\.[a-z]+/.test( label )
-			) {
+			if (isURL(prependHTTP(label)) && /^.+\.[a-z]+/.test(label)) {
 				// Focus and select the label text.
 				selectLabelText();
 			} else {
 				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
+				placeCaretAtHorizontalEdge(ref.current, true);
 			}
 		}
-	}, [ url ] );
+	}, [url]);
 
 	/**
 	 * Focus the Link label text and select it.
@@ -412,25 +395,25 @@ export default function NavigationSubmenuEdit( {
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();
 		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
+		range.selectNodeContents(ref.current);
 		selection.removeAllRanges();
-		selection.addRange( range );
+		selection.addRange(range);
 	}
 
 	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
+	if (!type || type === 'page') {
 		userCanCreate = userCanCreatePages;
-	} else if ( type === 'post' ) {
+	} else if (type === 'post') {
 		userCanCreate = userCanCreatePosts;
 	}
 
-	async function handleCreate( pageTitle ) {
+	async function handleCreate(pageTitle) {
 		const postType = type || 'page';
 
-		const page = await saveEntityRecord( 'postType', postType, {
+		const page = await saveEntityRecord('postType', postType, {
 			title: pageTitle,
 			status: 'draft',
-		} );
+		});
 
 		return {
 			id: page.id,
@@ -446,59 +429,59 @@ export default function NavigationSubmenuEdit( {
 		customTextColor,
 		backgroundColor,
 		customBackgroundColor,
-	} = getColors( context, ! isTopLevelItem );
+	} = getColors(context, !isTopLevelItem);
 
-	function onKeyDown( event ) {
-		if ( isKeyboardEvent.primary( event, 'k' ) ) {
-			setIsLinkOpen( true );
+	function onKeyDown(event) {
+		if (isKeyboardEvent.primary(event, 'k')) {
+			setIsLinkOpen(true);
 		}
 	}
 
-	const blockProps = useBlockProps( {
+	const blockProps = useBlockProps({
 		ref: listItemRef,
-		className: classnames( 'wp-block-navigation-item', {
+		className: classnames('wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
-			'has-link': !! url,
+			'has-link': !!url,
 			'has-child': hasDescendants,
-			'has-text-color': !! textColor || !! customTextColor,
-			[ getColorClassName( 'color', textColor ) ]: !! textColor,
-			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor
-			) ]: !! backgroundColor,
+			'has-text-color': !!textColor || !!customTextColor,
+			[getColorClassName('color', textColor)]: !!textColor,
+			'has-background': !!backgroundColor || customBackgroundColor,
+			[getColorClassName('background-color', backgroundColor)]:
+				!!backgroundColor,
 			'open-on-click': openSubmenusOnClick,
-		} ),
+		}),
 		style: {
-			color: ! textColor && customTextColor,
-			backgroundColor: ! backgroundColor && customBackgroundColor,
+			color: !textColor && customTextColor,
+			backgroundColor: !backgroundColor && customBackgroundColor,
 		},
 		onKeyDown,
-	} );
+	});
 
 	// Always use overlay colors for submenus
-	const innerBlocksColors = getColors( context, true );
+	const innerBlocksColors = getColors(context, true);
 
-	if ( isAtMaxNesting ) {
-		pull( ALLOWED_BLOCKS, 'core/navigation-submenu' );
+	if (isAtMaxNesting) {
+		pull(ALLOWED_BLOCKS, 'core/navigation-submenu');
 	}
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-navigation__submenu-container', {
+			className: classnames('wp-block-navigation__submenu-container', {
 				'is-parent-of-selected-block': isParentOfSelectedBlock,
-				'has-text-color': !! (
+				'has-text-color': !!(
 					innerBlocksColors.textColor ||
 					innerBlocksColors.customTextColor
 				),
-				[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
-				'has-background': !! (
+				[`has-${innerBlocksColors.textColor}-color`]:
+					!!innerBlocksColors.textColor,
+				'has-background': !!(
 					innerBlocksColors.backgroundColor ||
 					innerBlocksColors.customBackgroundColor
 				),
-				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
-			} ),
+				[`has-${innerBlocksColors.backgroundColor}-background-color`]:
+					!!innerBlocksColors.backgroundColor,
+			}),
 			style: {
 				color: innerBlocksColors.customTextColor,
 				backgroundColor: innerBlocksColors.customBackgroundColor,
@@ -516,8 +499,8 @@ export default function NavigationSubmenuEdit( {
 
 			renderAppender:
 				isSelected ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
+				(isImmediateParentOfSelectedBlock &&
+					!selectedBlockHasDescendants) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				hasDescendants
 					? InnerBlocks.ButtonBlockAppender
@@ -531,95 +514,95 @@ export default function NavigationSubmenuEdit( {
 		<Fragment>
 			<BlockControls>
 				<ToolbarGroup>
-					{ ! openSubmenusOnClick && (
+					{!openSubmenusOnClick && (
 						<ToolbarButton
 							name="link"
-							icon={ linkIcon }
-							title={ __( 'Link' ) }
-							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ () => setIsLinkOpen( true ) }
+							icon={linkIcon}
+							title={__('Link')}
+							shortcut={displayShortcut.primary('k')}
+							onClick={() => setIsLinkOpen(true)}
 						/>
-					) }
+					)}
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={__('Link settings')}>
 					<TextareaControl
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( {
+						value={description || ''}
+						onChange={(descriptionValue) => {
+							setAttributes({
 								description: descriptionValue,
-							} );
-						} }
-						label={ __( 'Description' ) }
-						help={ __(
+							});
+						}}
+						label={__('Description')}
+						help={__(
 							'The description will be displayed in the menu if the current theme supports it.'
-						) }
+						)}
 					/>
 					<TextControl
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Link title' ) }
+						value={title || ''}
+						onChange={(titleValue) => {
+							setAttributes({ title: titleValue });
+						}}
+						label={__('Link title')}
 						autoComplete="off"
 					/>
 					<TextControl
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
-						label={ __( 'Link rel' ) }
+						value={rel || ''}
+						onChange={(relValue) => {
+							setAttributes({ rel: relValue });
+						}}
+						label={__('Link rel')}
 						autoComplete="off"
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
+			<div {...blockProps}>
+				{/* eslint-disable jsx-a11y/anchor-is-valid */}
 				<ParentElement className="wp-block-navigation-item__content">
-					{ /* eslint-enable */ }
+					{/* eslint-enable */}
 					{
 						<RichText
-							ref={ ref }
+							ref={ref}
 							identifier="label"
 							className="wp-block-navigation-item__label"
-							value={ label }
-							onChange={ ( labelValue ) =>
-								setAttributes( { label: labelValue } )
+							value={label}
+							onChange={(labelValue) =>
+								setAttributes({ label: labelValue })
 							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							aria-label={ __( 'Navigation link text' ) }
-							placeholder={ itemLabelPlaceholder }
+							onMerge={mergeBlocks}
+							onReplace={onReplace}
+							aria-label={__('Navigation link text')}
+							placeholder={itemLabelPlaceholder}
 							withoutInteractiveFormatting
-							allowedFormats={ [
+							allowedFormats={[
 								'core/bold',
 								'core/italic',
 								'core/image',
 								'core/strikethrough',
-							] }
-							onClick={ () => {
-								if ( ! openSubmenusOnClick && ! url ) {
-									setIsLinkOpen( true );
+							]}
+							onClick={() => {
+								if (!openSubmenusOnClick && !url) {
+									setIsLinkOpen(true);
 								}
-							} }
+							}}
 						/>
 					}
-					{ ! openSubmenusOnClick && isLinkOpen && (
+					{!openSubmenusOnClick && isLinkOpen && (
 						<Popover
 							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
-							anchorRef={ listItemRef.current }
+							onClose={() => setIsLinkOpen(false)}
+							anchorRef={listItemRef.current}
 						>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								withCreateSuggestion={ userCanCreate }
-								createSuggestion={ handleCreate }
-								createSuggestionButtonText={ ( searchTerm ) => {
+								value={link}
+								showInitialSuggestions={true}
+								withCreateSuggestion={userCanCreate}
+								createSuggestion={handleCreate}
+								createSuggestionButtonText={(searchTerm) => {
 									let format;
-									if ( type === 'post' ) {
+									if (type === 'post') {
 										/* translators: %s: search term. */
 										format = __(
 											'Create draft post: <mark>%s</mark>'
@@ -631,37 +614,37 @@ export default function NavigationSubmenuEdit( {
 										);
 									}
 									return createInterpolateElement(
-										sprintf( format, searchTerm ),
+										sprintf(format, searchTerm),
 										{ mark: <mark /> }
 									);
-								} }
-								noDirectEntry={ !! type }
-								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery(
+								}}
+								noDirectEntry={!!type}
+								noURLSuggestion={!!type}
+								suggestionsQuery={getSuggestionsQuery(
 									type,
 									kind
-								) }
-								onChange={ ( updatedValue ) =>
+								)}
+								onChange={(updatedValue) =>
 									updateNavigationLinkBlockAttributes(
 										updatedValue,
 										setAttributes,
 										attributes
 									)
 								}
-								onRemove={ () => {
-									setAttributes( { url: '' } );
-									speak( __( 'Link removed.' ), 'assertive' );
-								} }
+								onRemove={() => {
+									setAttributes({ url: '' });
+									speak(__('Link removed.'), 'assertive');
+								}}
 							/>
 						</Popover>
-					) }
-					{ ( showSubmenuIcon || openSubmenusOnClick ) && (
+					)}
+					{(showSubmenuIcon || openSubmenusOnClick) && (
 						<span className="wp-block-navigation__submenu-icon">
 							<ItemSubmenuIcon />
 						</span>
-					) }
+					)}
 				</ParentElement>
-				<div { ...innerBlocksProps } />
+				<div {...innerBlocksProps} />
 			</div>
 		</Fragment>
 	);

@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-const {
-	TRANSLATION_FUNCTIONS,
-	getTranslateFunctionName,
-} = require( '../utils' );
+const { TRANSLATION_FUNCTIONS, getTranslateFunctionName } = require('../utils');
 
 /**
  * Returns the text domain passed to the given translation function.
@@ -13,16 +10,16 @@ const {
  * @param {Array}  args         Function arguments.
  * @return {undefined|*} Text domain argument.
  */
-function getTextDomain( functionName, args ) {
-	switch ( functionName ) {
+function getTextDomain(functionName, args) {
+	switch (functionName) {
 		case '__':
-			return args[ 1 ];
+			return args[1];
 		case '_x':
-			return args[ 2 ];
+			return args[2];
 		case '_n':
-			return args[ 3 ];
+			return args[3];
 		case '_nx':
-			return args[ 4 ];
+			return args[4];
 		default:
 			return undefined;
 	}
@@ -65,96 +62,96 @@ module.exports = {
 		},
 		fixable: 'code',
 	},
-	create( context ) {
-		const options = context.options[ 0 ] || {};
+	create(context) {
+		const options = context.options[0] || {};
 		const { allowedTextDomain } = options;
-		const allowedTextDomains = Array.isArray( allowedTextDomain )
+		const allowedTextDomains = Array.isArray(allowedTextDomain)
 			? allowedTextDomain
-			: [ allowedTextDomain ].filter( ( value ) => value );
+			: [allowedTextDomain].filter((value) => value);
 		const canFixTextDomain = allowedTextDomains.length === 1;
 		const allowDefault =
 			allowedTextDomains.length === 0 ||
-			allowedTextDomains.includes( 'default' );
+			allowedTextDomains.includes('default');
 
 		return {
-			CallExpression( node ) {
+			CallExpression(node) {
 				const { callee, arguments: args } = node;
 
-				const functionName = getTranslateFunctionName( callee );
+				const functionName = getTranslateFunctionName(callee);
 
-				if ( ! TRANSLATION_FUNCTIONS.has( functionName ) ) {
+				if (!TRANSLATION_FUNCTIONS.has(functionName)) {
 					return;
 				}
 
-				const textDomain = getTextDomain( functionName, args );
+				const textDomain = getTextDomain(functionName, args);
 
-				if ( textDomain === undefined ) {
-					if ( ! allowDefault ) {
-						const addMissingTextDomain = ( fixer ) => {
-							const lastArg = args[ args.length - 1 ];
+				if (textDomain === undefined) {
+					if (!allowDefault) {
+						const addMissingTextDomain = (fixer) => {
+							const lastArg = args[args.length - 1];
 							return fixer.insertTextAfter(
 								lastArg,
-								`, '${ allowedTextDomains[ 0 ] }'`
+								`, '${allowedTextDomains[0]}'`
 							);
 						};
 
-						context.report( {
+						context.report({
 							node,
 							messageId: 'missing',
 							fix: canFixTextDomain ? addMissingTextDomain : null,
-						} );
+						});
 					}
 					return;
 				}
 
 				const { type, value, range } = textDomain;
 
-				if ( type !== 'Literal' ) {
-					context.report( {
+				if (type !== 'Literal') {
+					context.report({
 						node,
 						messageId: 'invalidType',
-					} );
+					});
 					return;
 				}
 
-				if ( 'default' === value && allowDefault ) {
-					const removeDefaultTextDomain = ( fixer ) => {
-						const previousArgIndex = args.indexOf( textDomain ) - 1;
-						const previousArg = args[ previousArgIndex ];
-						return fixer.removeRange( [
-							previousArg.range[ 1 ],
-							range[ 1 ],
-						] );
+				if ('default' === value && allowDefault) {
+					const removeDefaultTextDomain = (fixer) => {
+						const previousArgIndex = args.indexOf(textDomain) - 1;
+						const previousArg = args[previousArgIndex];
+						return fixer.removeRange([
+							previousArg.range[1],
+							range[1],
+						]);
 					};
 
-					context.report( {
+					context.report({
 						node,
 						messageId: 'unnecessaryDefault',
 						fix: removeDefaultTextDomain,
-					} );
+					});
 					return;
 				}
 
 				if (
 					allowedTextDomains.length &&
-					! allowedTextDomains.includes( value )
+					!allowedTextDomains.includes(value)
 				) {
-					const replaceTextDomain = ( fixer ) => {
+					const replaceTextDomain = (fixer) => {
 						return fixer.replaceTextRange(
 							// account for quotes.
-							[ range[ 0 ] + 1, range[ 1 ] - 1 ],
-							allowedTextDomains[ 0 ]
+							[range[0] + 1, range[1] - 1],
+							allowedTextDomains[0]
 						);
 					};
 
-					context.report( {
+					context.report({
 						node,
 						messageId: 'invalidValue',
 						data: {
 							textDomain: value,
 						},
 						fix: canFixTextDomain ? replaceTextDomain : null,
-					} );
+					});
 				}
 			},
 		};

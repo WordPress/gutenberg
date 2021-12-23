@@ -203,20 +203,20 @@ export { Suspense };
  *
  * @return {Array} The concatenated value.
  */
-export function concatChildren( ...childrenArguments ) {
-	return childrenArguments.reduce( ( accumulator, children, i ) => {
-		Children.forEach( children, ( child, j ) => {
-			if ( child && 'string' !== typeof child ) {
-				child = cloneElement( child, {
-					key: [ i, j ].join(),
-				} );
+export function concatChildren(...childrenArguments) {
+	return childrenArguments.reduce((accumulator, children, i) => {
+		Children.forEach(children, (child, j) => {
+			if (child && 'string' !== typeof child) {
+				child = cloneElement(child, {
+					key: [i, j].join(),
+				});
 			}
 
-			accumulator.push( child );
-		} );
+			accumulator.push(child);
+		});
 
 		return accumulator;
-	}, [] );
+	}, []);
 }
 
 /**
@@ -227,12 +227,12 @@ export function concatChildren( ...childrenArguments ) {
  *
  * @return {?Object} The updated children object.
  */
-export function switchChildrenNodeName( children, nodeName ) {
+export function switchChildrenNodeName(children, nodeName) {
 	return (
 		children &&
-		Children.map( children, ( elt, index ) => {
-			if ( isString( elt ) ) {
-				return createElement( nodeName, { key: index }, elt );
+		Children.map(children, (elt, index) => {
+			if (isString(elt)) {
+				return createElement(nodeName, { key: index }, elt);
 			}
 			const { children: childrenProp, ...props } = elt.props;
 			return createElement(
@@ -240,6 +240,6 @@ export function switchChildrenNodeName( children, nodeName ) {
 				{ key: index, ...props },
 				childrenProp
 			);
-		} )
+		})
 	);
 }

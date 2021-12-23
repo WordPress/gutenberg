@@ -39,20 +39,20 @@ const PROPS = [
 
 const BlackBox = () => (
 	<div
-		style={ { backgroundColor: 'black', width: '100px', height: '100px' } }
+		style={{ backgroundColor: 'black', width: '100px', height: '100px' }}
 	/>
 );
 
 export const _default = () => {
 	const props = PROPS.reduce(
-		( acc, prop ) => ( { ...acc, [ prop ]: number( prop, undefined ) } ),
+		(acc, prop) => ({ ...acc, [prop]: number(prop, undefined) }),
 		{}
 	);
 
 	return (
 		<>
 			<BlackBox />
-			<Spacer { ...props }>This is the spacer</Spacer>
+			<Spacer {...props}>This is the spacer</Spacer>
 			<BlackBox />
 		</>
 	);

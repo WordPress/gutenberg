@@ -50,82 +50,82 @@ import {
  * @constant
  * @type {string[]}
  */
-const ALLOWED_BLOCKS = [ 'core/column' ];
+const ALLOWED_BLOCKS = ['core/column'];
 
-function ColumnsEditContainer( {
+function ColumnsEditContainer({
 	attributes,
 	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
-} ) {
+}) {
 	const { isStackedOnMobile, verticalAlignment } = attributes;
 
 	const { count } = useSelect(
-		( select ) => {
+		(select) => {
 			return {
-				count: select( blockEditorStore ).getBlockCount( clientId ),
+				count: select(blockEditorStore).getBlockCount(clientId),
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
-	const classes = classnames( {
-		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
-	} );
+	const classes = classnames({
+		[`are-vertically-aligned-${verticalAlignment}`]: verticalAlignment,
+		[`is-not-stacked-on-mobile`]: !isStackedOnMobile,
+	});
 
-	const blockProps = useBlockProps( {
+	const blockProps = useBlockProps({
 		className: classes,
-	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+	});
+	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
 		renderAppender: false,
-	} );
+	});
 
 	return (
 		<>
 			<BlockControls>
 				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
+					onChange={updateAlignment}
+					value={verticalAlignment}
 				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ count }
-						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 1 }
-						max={ Math.max( 6, count ) }
+						label={__('Columns')}
+						value={count}
+						onChange={(value) => updateColumns(count, value)}
+						min={1}
+						max={Math.max(6, count)}
 					/>
-					{ count > 6 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
+					{count > 6 && (
+						<Notice status="warning" isDismissible={false}>
+							{__(
 								'This column count exceeds the recommended amount and may cause visual breakage.'
-							) }
+							)}
 						</Notice>
-					) }
+					)}
 					<ToggleControl
-						label={ __( 'Stack on mobile' ) }
-						checked={ isStackedOnMobile }
-						onChange={ () =>
-							setAttributes( {
-								isStackedOnMobile: ! isStackedOnMobile,
-							} )
+						label={__('Stack on mobile')}
+						checked={isStackedOnMobile}
+						onChange={() =>
+							setAttributes({
+								isStackedOnMobile: !isStackedOnMobile,
+							})
 						}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...innerBlocksProps } />
+			<div {...innerBlocksProps} />
 		</>
 	);
 }
 
 const ColumnsEditContainerWrapper = withDispatch(
-	( dispatch, ownProps, registry ) => ( {
+	(dispatch, ownProps, registry) => ({
 		/**
 		 * Update all child Column blocks with a new vertical alignment setting
 		 * based on whatever alignment is passed in. This allows change to parent
@@ -133,21 +133,21 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 *
 		 * @param {string} verticalAlignment the vertical alignment setting
 		 */
-		updateAlignment( verticalAlignment ) {
+		updateAlignment(verticalAlignment) {
 			const { clientId, setAttributes } = ownProps;
-			const { updateBlockAttributes } = dispatch( blockEditorStore );
-			const { getBlockOrder } = registry.select( blockEditorStore );
+			const { updateBlockAttributes } = dispatch(blockEditorStore);
+			const { getBlockOrder } = registry.select(blockEditorStore);
 
 			// Update own alignment.
-			setAttributes( { verticalAlignment } );
+			setAttributes({ verticalAlignment });
 
 			// Update all child Column Blocks to match
-			const innerBlockClientIds = getBlockOrder( clientId );
-			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
-				updateBlockAttributes( innerBlockClientId, {
+			const innerBlockClientIds = getBlockOrder(clientId);
+			innerBlockClientIds.forEach((innerBlockClientId) => {
+				updateBlockAttributes(innerBlockClientId, {
 					verticalAlignment,
-				} );
-			} );
+				});
+			});
 		},
 
 		/**
@@ -157,23 +157,22 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 * @param {number} previousColumns Previous column count.
 		 * @param {number} newColumns      New column count.
 		 */
-		updateColumns( previousColumns, newColumns ) {
+		updateColumns(previousColumns, newColumns) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( blockEditorStore );
-			const { getBlocks } = registry.select( blockEditorStore );
+			const { replaceInnerBlocks } = dispatch(blockEditorStore);
+			const { getBlocks } = registry.select(blockEditorStore);
 
-			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitPercentColumnWidths(
-				innerBlocks
-			);
+			let innerBlocks = getBlocks(clientId);
+			const hasExplicitWidths =
+				hasExplicitPercentColumnWidths(innerBlocks);
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
 
-			if ( isAddingColumn && hasExplicitWidths ) {
+			if (isAddingColumn && hasExplicitWidths) {
 				// If adding a new column, assign width to the new column equal to
 				// as if it were `1 / columns` of the total available space.
-				const newColumnWidth = toWidthPrecision( 100 / newColumns );
+				const newColumnWidth = toWidthPrecision(100 / newColumns);
 
 				// Redistribute in consideration of pending block insertion as
 				// constraining the available working width.
@@ -183,19 +182,19 @@ const ColumnsEditContainerWrapper = withDispatch(
 				);
 
 				innerBlocks = [
-					...getMappedColumnWidths( innerBlocks, widths ),
-					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column', {
-							width: `${ newColumnWidth }%`,
-						} );
-					} ),
+					...getMappedColumnWidths(innerBlocks, widths),
+					...times(newColumns - previousColumns, () => {
+						return createBlock('core/column', {
+							width: `${newColumnWidth}%`,
+						});
+					}),
 				];
-			} else if ( isAddingColumn ) {
+			} else if (isAddingColumn) {
 				innerBlocks = [
 					...innerBlocks,
-					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column' );
-					} ),
+					...times(newColumns - previousColumns, () => {
+						return createBlock('core/column');
+					}),
 				];
 			} else {
 				// The removed column will be the last of the inner blocks.
@@ -204,53 +203,53 @@ const ColumnsEditContainerWrapper = withDispatch(
 					previousColumns - newColumns
 				);
 
-				if ( hasExplicitWidths ) {
+				if (hasExplicitWidths) {
 					// Redistribute as if block is already removed.
 					const widths = getRedistributedColumnWidths(
 						innerBlocks,
 						100
 					);
 
-					innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+					innerBlocks = getMappedColumnWidths(innerBlocks, widths);
 				}
 			}
 
-			replaceInnerBlocks( clientId, innerBlocks );
+			replaceInnerBlocks(clientId, innerBlocks);
 		},
-	} )
-)( ColumnsEditContainer );
+	})
+)(ColumnsEditContainer);
 
-function Placeholder( { clientId, name, setAttributes } ) {
+function Placeholder({ clientId, name, setAttributes }) {
 	const { blockType, defaultVariation, variations } = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( blocksStore );
+			} = select(blocksStore);
 
 			return {
-				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: getBlockVariations( name, 'block' ),
+				blockType: getBlockType(name),
+				defaultVariation: getDefaultBlockVariation(name, 'block'),
+				variations: getBlockVariations(name, 'block'),
 			};
 		},
-		[ name ]
+		[name]
 	);
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
 	const blockProps = useBlockProps();
 
 	return (
-		<div { ...blockProps }>
+		<div {...blockProps}>
 			<__experimentalBlockVariationPicker
-				icon={ get( blockType, [ 'icon', 'src' ] ) }
-				label={ get( blockType, [ 'title' ] ) }
-				variations={ variations }
-				onSelect={ ( nextVariation = defaultVariation ) => {
-					if ( nextVariation.attributes ) {
-						setAttributes( nextVariation.attributes );
+				icon={get(blockType, ['icon', 'src'])}
+				label={get(blockType, ['title'])}
+				variations={variations}
+				onSelect={(nextVariation = defaultVariation) => {
+					if (nextVariation.attributes) {
+						setAttributes(nextVariation.attributes);
 					}
-					if ( nextVariation.innerBlocks ) {
+					if (nextVariation.innerBlocks) {
 						replaceInnerBlocks(
 							clientId,
 							createBlocksFromInnerBlocksTemplate(
@@ -259,25 +258,24 @@ function Placeholder( { clientId, name, setAttributes } ) {
 							true
 						);
 					}
-				} }
+				}}
 				allowSkip
 			/>
 		</div>
 	);
 }
 
-const ColumnsEdit = ( props ) => {
+const ColumnsEdit = (props) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlocks( clientId ).length > 0,
-		[ clientId ]
+		(select) => select(blockEditorStore).getBlocks(clientId).length > 0,
+		[clientId]
 	);
 	const Component = hasInnerBlocks
 		? ColumnsEditContainerWrapper
 		: Placeholder;
 
-	return <Component { ...props } />;
+	return <Component {...props} />;
 };
 
 export default ColumnsEdit;

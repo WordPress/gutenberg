@@ -25,7 +25,7 @@ import {
 	getPositionClassName,
 } from './shared';
 
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const {
 		backgroundType,
 		gradient,
@@ -48,25 +48,25 @@ export default function save( { attributes } ) {
 		'background-color',
 		overlayColor
 	);
-	const gradientClass = __experimentalGetGradientClass( gradient );
+	const gradientClass = __experimentalGetGradientClass(gradient);
 	const minHeight = minHeightUnit
-		? `${ minHeightProp }${ minHeightUnit }`
+		? `${minHeightProp}${minHeightUnit}`
 		: minHeightProp;
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const isImgElement = ! ( hasParallax || isRepeated );
+	const isImgElement = !(hasParallax || isRepeated);
 
 	const style = {
-		...( isImageBackground && ! isImgElement
-			? backgroundImageStyles( url )
-			: {} ),
+		...(isImageBackground && !isImgElement
+			? backgroundImageStyles(url)
+			: {}),
 		minHeight: minHeight || undefined,
 	};
 
 	const bgStyle = {
-		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
+		backgroundColor: !overlayColorClass ? customOverlayColor : undefined,
 		background: customGradient ? customGradient : undefined,
 	};
 
@@ -78,67 +78,66 @@ export default function save( { attributes } ) {
 
 	const classes = classnames(
 		{
-			'is-light': ! isDark,
+			'is-light': !isDark,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			'has-custom-content-position': ! isContentPositionCenter(
-				contentPosition
-			),
+			'has-custom-content-position':
+				!isContentPositionCenter(contentPosition),
 		},
-		getPositionClassName( contentPosition )
+		getPositionClassName(contentPosition)
 	);
 
 	return (
-		<div { ...useBlockProps.save( { className: classes, style } ) }>
+		<div {...useBlockProps.save({ className: classes, style })}>
 			<span
 				aria-hidden="true"
-				className={ classnames(
+				className={classnames(
 					overlayColorClass,
-					dimRatioToClass( dimRatio ),
+					dimRatioToClass(dimRatio),
 					'wp-block-cover__gradient-background',
 					gradientClass,
 					{
 						'has-background-dim': dimRatio !== undefined,
 						'has-background-gradient': gradient || customGradient,
-						[ gradientClass ]: ! url && gradientClass,
+						[gradientClass]: !url && gradientClass,
 					}
-				) }
-				style={ bgStyle }
+				)}
+				style={bgStyle}
 			/>
 
-			{ isImageBackground && isImgElement && url && (
+			{isImageBackground && isImgElement && url && (
 				<img
-					className={ classnames(
+					className={classnames(
 						'wp-block-cover__image-background',
-						id ? `wp-image-${ id }` : null
-					) }
-					alt={ alt }
-					src={ url }
-					style={ { objectPosition } }
+						id ? `wp-image-${id}` : null
+					)}
+					alt={alt}
+					src={url}
+					style={{ objectPosition }}
 					data-object-fit="cover"
-					data-object-position={ objectPosition }
+					data-object-position={objectPosition}
 				/>
-			) }
-			{ isVideoBackground && url && (
+			)}
+			{isVideoBackground && url && (
 				<video
-					className={ classnames(
+					className={classnames(
 						'wp-block-cover__video-background',
 						'intrinsic-ignore'
-					) }
+					)}
 					autoPlay
 					muted
 					loop
 					playsInline
-					src={ url }
-					style={ { objectPosition } }
+					src={url}
+					style={{ objectPosition }}
 					data-object-fit="cover"
-					data-object-position={ objectPosition }
+					data-object-position={objectPosition}
 				/>
-			) }
+			)}
 			<div
-				{ ...useInnerBlocksProps.save( {
+				{...useInnerBlocksProps.save({
 					className: 'wp-block-cover__inner-container',
-				} ) }
+				})}
 			/>
 		</div>
 	);

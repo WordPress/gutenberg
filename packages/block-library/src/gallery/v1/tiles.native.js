@@ -13,16 +13,16 @@ import { Children } from '@wordpress/element';
  */
 import styles from './tiles-styles.scss';
 
-function Tiles( props ) {
+function Tiles(props) {
 	const { columns, children, spacing = 10, style } = props;
 
 	const { compose } = StyleSheet;
 
-	const tileCount = Children.count( children );
+	const tileCount = Children.count(children);
 	const lastTile = tileCount - 1;
-	const lastRow = Math.floor( lastTile / columns );
+	const lastRow = Math.floor(lastTile / columns);
 
-	const wrappedChildren = Children.map( children, ( child, index ) => {
+	const wrappedChildren = Children.map(children, (child, index) => {
 		/**
 		 * Since we don't have `calc()`, we must calculate our spacings here in
 		 * order to preserve even spacing between tiles and equal width for tiles
@@ -47,33 +47,32 @@ function Tiles( props ) {
 		 * row).
 		 */
 
-		const row = Math.floor( index / columns );
-		const rowLength =
-			row === lastRow ? ( lastTile % columns ) + 1 : columns;
+		const row = Math.floor(index / columns);
+		const rowLength = row === lastRow ? (lastTile % columns) + 1 : columns;
 		const indexInRow = index % columns;
 
 		return (
 			<View
-				style={ [
+				style={[
 					styles.tileStyle,
 					{
-						width: `${ 100 / rowLength }%`,
-						paddingLeft: spacing * ( indexInRow / rowLength ),
+						width: `${100 / rowLength}%`,
+						paddingLeft: spacing * (indexInRow / rowLength),
 						paddingRight:
-							spacing * ( 1 - ( indexInRow + 1 ) / rowLength ),
+							spacing * (1 - (indexInRow + 1) / rowLength),
 						paddingTop: row === 0 ? 0 : spacing / 2,
 						paddingBottom: row === lastRow ? 0 : spacing / 2,
 					},
-				] }
+				]}
 			>
-				{ child }
+				{child}
 			</View>
 		);
-	} );
+	});
 
-	const containerStyle = compose( styles.containerStyle, style );
+	const containerStyle = compose(styles.containerStyle, style);
 
-	return <View style={ containerStyle }>{ wrappedChildren }</View>;
+	return <View style={containerStyle}>{wrappedChildren}</View>;
 }
 
 export default Tiles;

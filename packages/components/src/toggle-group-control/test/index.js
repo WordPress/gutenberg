@@ -8,7 +8,7 @@ import { render, fireEvent, screen } from '@testing-library/react';
  */
 import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
 
-describe( 'ToggleGroupControl', () => {
+describe('ToggleGroupControl', () => {
 	const options = (
 		<>
 			<ToggleGroupControlOption value="rigas" label="R" />
@@ -21,7 +21,7 @@ describe( 'ToggleGroupControl', () => {
 				value="gnocchi"
 				label="Delicious Gnocchi"
 				aria-label="Click for Delicious Gnocchi"
-				showTooltip={ true }
+				showTooltip={true}
 			/>
 			<ToggleGroupControlOption
 				value="caponata"
@@ -31,57 +31,55 @@ describe( 'ToggleGroupControl', () => {
 		</>
 	);
 
-	it( 'should render correctly', () => {
+	it('should render correctly', () => {
 		const { container } = render(
 			<ToggleGroupControl label="Test Toggle Group Control">
-				{ options }
+				{options}
 			</ToggleGroupControl>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
-	} );
+		expect(container.firstChild).toMatchSnapshot();
+	});
 
-	it( 'should call onChange with proper value', () => {
+	it('should call onChange with proper value', () => {
 		const mockOnChange = jest.fn();
 
 		render(
 			<ToggleGroupControl
 				value="jack"
-				onChange={ mockOnChange }
+				onChange={mockOnChange}
 				label="Test Toggle Group Control"
 			>
-				{ options }
+				{options}
 			</ToggleGroupControl>
 		);
 
-		const firstRadio = screen.getByRole( 'radio', { name: 'R' } );
+		const firstRadio = screen.getByRole('radio', { name: 'R' });
 
-		fireEvent.click( firstRadio );
+		fireEvent.click(firstRadio);
 
-		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
-	} );
-	it( 'should render tooltip where `showTooltip` === `true`', () => {
+		expect(mockOnChange).toHaveBeenCalledWith('rigas');
+	});
+	it('should render tooltip where `showTooltip` === `true`', () => {
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
-				{ optionsWithTooltip }
+				{optionsWithTooltip}
 			</ToggleGroupControl>
 		);
 
-		const firstRadio = screen.getByLabelText(
-			'Click for Delicious Gnocchi'
-		);
+		const firstRadio = screen.getByLabelText('Click for Delicious Gnocchi');
 
-		fireEvent.focus( firstRadio );
+		fireEvent.focus(firstRadio);
 
 		expect(
-			screen.getByText( 'Click for Delicious Gnocchi' )
+			screen.getByText('Click for Delicious Gnocchi')
 		).toBeInTheDocument();
-	} );
+	});
 
-	it( 'should not render tooltip', () => {
+	it('should not render tooltip', () => {
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
-				{ optionsWithTooltip }
+				{optionsWithTooltip}
 			</ToggleGroupControl>
 		);
 
@@ -89,10 +87,10 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Sumptuous Caponata'
 		);
 
-		fireEvent.focus( secondRadio );
+		fireEvent.focus(secondRadio);
 
 		expect(
-			screen.queryByText( 'Click for Sumptuous Caponata' )
+			screen.queryByText('Click for Sumptuous Caponata')
 		).not.toBeInTheDocument();
-	} );
-} );
+	});
+});

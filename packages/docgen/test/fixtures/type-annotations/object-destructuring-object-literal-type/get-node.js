@@ -1,4 +1,4 @@
-module.exports = () => ( {
+module.exports = () => ({
 	type: 'FunctionDeclaration',
 	start: 0,
 	end: 73,
@@ -312,4 +312,4 @@ module.exports = () => ( {
 		],
 		directives: [],
 	},
-} );
+});

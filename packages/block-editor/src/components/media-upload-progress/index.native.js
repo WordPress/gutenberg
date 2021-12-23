@@ -22,8 +22,8 @@ export const MEDIA_UPLOAD_STATE_FAILED = 3;
 export const MEDIA_UPLOAD_STATE_RESET = 4;
 
 export class MediaUploadProgress extends Component {
-	constructor( props ) {
-		super( props );
+	constructor(props) {
+		super(props);
 
 		this.state = {
 			progress: 0,
@@ -31,7 +31,7 @@ export class MediaUploadProgress extends Component {
 			isUploadFailed: false,
 		};
 
-		this.mediaUpload = this.mediaUpload.bind( this );
+		this.mediaUpload = this.mediaUpload.bind(this);
 	}
 
 	componentDidMount() {
@@ -42,75 +42,73 @@ export class MediaUploadProgress extends Component {
 		this.removeMediaUploadListener();
 	}
 
-	mediaUpload( payload ) {
+	mediaUpload(payload) {
 		const { mediaId } = this.props;
 
-		if ( payload.mediaId !== mediaId ) {
+		if (payload.mediaId !== mediaId) {
 			return;
 		}
 
-		switch ( payload.state ) {
+		switch (payload.state) {
 			case MEDIA_UPLOAD_STATE_UPLOADING:
-				this.updateMediaProgress( payload );
+				this.updateMediaProgress(payload);
 				break;
 			case MEDIA_UPLOAD_STATE_SUCCEEDED:
-				this.finishMediaUploadWithSuccess( payload );
+				this.finishMediaUploadWithSuccess(payload);
 				break;
 			case MEDIA_UPLOAD_STATE_FAILED:
-				this.finishMediaUploadWithFailure( payload );
+				this.finishMediaUploadWithFailure(payload);
 				break;
 			case MEDIA_UPLOAD_STATE_RESET:
-				this.mediaUploadStateReset( payload );
+				this.mediaUploadStateReset(payload);
 				break;
 		}
 	}
 
-	updateMediaProgress( payload ) {
-		this.setState( {
+	updateMediaProgress(payload) {
+		this.setState({
 			progress: payload.progress,
 			isUploadInProgress: true,
 			isUploadFailed: false,
-		} );
-		if ( this.props.onUpdateMediaProgress ) {
-			this.props.onUpdateMediaProgress( payload );
+		});
+		if (this.props.onUpdateMediaProgress) {
+			this.props.onUpdateMediaProgress(payload);
 		}
 	}
 
-	finishMediaUploadWithSuccess( payload ) {
-		this.setState( { isUploadInProgress: false } );
-		if ( this.props.onFinishMediaUploadWithSuccess ) {
-			this.props.onFinishMediaUploadWithSuccess( payload );
+	finishMediaUploadWithSuccess(payload) {
+		this.setState({ isUploadInProgress: false });
+		if (this.props.onFinishMediaUploadWithSuccess) {
+			this.props.onFinishMediaUploadWithSuccess(payload);
 		}
 	}
 
-	finishMediaUploadWithFailure( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
-		if ( this.props.onFinishMediaUploadWithFailure ) {
-			this.props.onFinishMediaUploadWithFailure( payload );
+	finishMediaUploadWithFailure(payload) {
+		this.setState({ isUploadInProgress: false, isUploadFailed: true });
+		if (this.props.onFinishMediaUploadWithFailure) {
+			this.props.onFinishMediaUploadWithFailure(payload);
 		}
 	}
 
-	mediaUploadStateReset( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
-		if ( this.props.onMediaUploadStateReset ) {
-			this.props.onMediaUploadStateReset( payload );
+	mediaUploadStateReset(payload) {
+		this.setState({ isUploadInProgress: false, isUploadFailed: false });
+		if (this.props.onMediaUploadStateReset) {
+			this.props.onMediaUploadStateReset(payload);
 		}
 	}
 
 	addMediaUploadListener() {
 		//if we already have a subscription not worth doing it again
-		if ( this.subscriptionParentMediaUpload ) {
+		if (this.subscriptionParentMediaUpload) {
 			return;
 		}
-		this.subscriptionParentMediaUpload = subscribeMediaUpload(
-			( payload ) => {
-				this.mediaUpload( payload );
-			}
-		);
+		this.subscriptionParentMediaUpload = subscribeMediaUpload((payload) => {
+			this.mediaUpload(payload);
+		});
 	}
 
 	removeMediaUploadListener() {
-		if ( this.subscriptionParentMediaUpload ) {
+		if (this.subscriptionParentMediaUpload) {
 			this.subscriptionParentMediaUpload.remove();
 		}
 	}
@@ -133,25 +131,22 @@ export class MediaUploadProgress extends Component {
 
 		return (
 			<View
-				style={ [
-					styles.mediaUploadProgress,
-					this.props.containerStyle,
-				] }
+				style={[styles.mediaUploadProgress, this.props.containerStyle]}
 				pointerEvents="box-none"
 			>
-				<View style={ progressBarStyle }>
-					{ showSpinner && (
+				<View style={progressBarStyle}>
+					{showSpinner && (
 						<Spinner
-							progress={ progress }
-							style={ this.props.spinnerStyle }
+							progress={progress}
+							style={this.props.spinnerStyle}
 						/>
-					) }
+					)}
 				</View>
-				{ renderContent( {
+				{renderContent({
 					isUploadInProgress,
 					isUploadFailed,
 					retryMessage,
-				} ) }
+				})}
 			</View>
 		);
 	}

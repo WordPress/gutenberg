@@ -18,11 +18,11 @@ export type ControlGroupContext = {
 	styles?: string;
 };
 
-export type Props = Pick< FlexProps, 'direction' > & {
+export type Props = Pick<FlexProps, 'direction'> & {
 	/**
 	 * Adjust the layout (width) of content using CSS grid (`grid-template-columns`).
 	 */
-	templateColumns?: CSSProperties[ 'gridTemplateColumns' ];
+	templateColumns?: CSSProperties['gridTemplateColumns'];
 	/**
 	 * The children elements.
 	 */

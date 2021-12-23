@@ -12,7 +12,7 @@ import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
 // Force register 'core/editor' store.
 import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
 
-jest.mock( '../components/layout', () => () => 'Layout' );
+jest.mock('../components/layout', () => () => 'Layout');
 
 /**
  * Internal dependencies
@@ -26,36 +26,36 @@ const unsupportedBlock = `
 <!-- /wp:notablock -->
 `;
 
-describe( 'Editor', () => {
-	beforeAll( registerCoreBlocks );
+describe('Editor', () => {
+	beforeAll(registerCoreBlocks);
 
-	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
+	it('detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
 		jest.useFakeTimers();
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
 
-		const appContainer = renderEditorWith( unsupportedBlock );
+		const appContainer = renderEditorWith(unsupportedBlock);
 		// for some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord
-		act( () => {
+		act(() => {
 			jest.runAllTicks();
-		} );
+		});
 		appContainer.unmount();
 
 		expect(
 			RNReactNativeGutenbergBridge.editorDidMount
-		).toHaveBeenCalledTimes( 1 );
+		).toHaveBeenCalledTimes(1);
 		expect(
 			RNReactNativeGutenbergBridge.editorDidMount
-		).toHaveBeenCalledWith( [ 'core/notablock' ] );
-	} );
-} );
+		).toHaveBeenCalledWith(['core/notablock']);
+	});
+});
 
 // Utilities
-const renderEditorWith = ( content ) => {
+const renderEditorWith = (content) => {
 	return mount(
 		<Editor
-			initialHtml={ content }
-			initialHtmlModeEnabled={ false }
-			initialTitle={ '' }
+			initialHtml={content}
+			initialHtmlModeEnabled={false}
+			initialTitle={''}
 			postType="post"
 			postId="1"
 		/>

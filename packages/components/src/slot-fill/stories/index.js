@@ -38,40 +38,40 @@ export const _default = () => {
 };
 
 export const withFillProps = () => {
-	const name = text( 'name', 'Grace' );
-	const age = number( 'age', 33 );
+	const name = text('name', 'Grace');
+	const age = number('age', 33);
 	return (
 		<Provider>
 			<h2>Profile</h2>
 			<p>
-				Name:{ ' ' }
+				Name:{' '}
 				<Slot
 					bubblesVirtually
 					as="span"
 					name="name"
-					fillProps={ { name } }
+					fillProps={{ name }}
 				/>
 			</p>
 			<p>
-				Age:{ ' ' }
+				Age:{' '}
 				<Slot
 					bubblesVirtually
 					as="span"
 					name="age"
-					fillProps={ { age } }
+					fillProps={{ age }}
 				/>
 			</p>
-			<Fill name="name">{ ( fillProps ) => fillProps.name }</Fill>
-			<Fill name="age">{ ( fillProps ) => fillProps.age }</Fill>
+			<Fill name="name">{(fillProps) => fillProps.name}</Fill>
+			<Fill name="age">{(fillProps) => fillProps.age}</Fill>
 		</Provider>
 	);
 };
 
 export const withContext = () => {
 	const Context = createContext();
-	const ContextFill = ( { name } ) => {
-		const value = useContext( Context );
-		return <Fill name={ name }>{ value }</Fill>;
+	const ContextFill = ({ name }) => {
+		const value = useContext(Context);
+		return <Fill name={name}>{value}</Fill>;
 	};
 	return (
 		<Provider>
@@ -85,7 +85,7 @@ export const withContext = () => {
 			<Context.Provider value="Grace">
 				<ContextFill name="name" />
 			</Context.Provider>
-			<Context.Provider value={ 33 }>
+			<Context.Provider value={33}>
 				<ContextFill name="age" />
 			</Context.Provider>
 		</Provider>

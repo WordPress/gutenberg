@@ -28,180 +28,174 @@ import { ItemSubmenuIcon } from '../navigation-link/icons';
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-export default function PageListEdit( { context, clientId } ) {
+export default function PageListEdit({ context, clientId }) {
 	const { pagesByParentId, totalPages } = usePagesByParentId();
 
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const allowConvertToLinks =
 		isNavigationChild && totalPages <= MAX_PAGE_COUNT;
 
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal = () => setOpen( false );
+	const [isOpen, setOpen] = useState(false);
+	const openModal = () => setOpen(true);
+	const closeModal = () => setOpen(false);
 
-	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-page-list', {
-			'has-text-color': !! context.textColor,
-			[ getColorClassName(
-				'color',
-				context.textColor
-			) ]: !! context.textColor,
-			'has-background': !! context.backgroundColor,
-			[ getColorClassName(
-				'background-color',
-				context.backgroundColor
-			) ]: !! context.backgroundColor,
-		} ),
+	const blockProps = useBlockProps({
+		className: classnames('wp-block-page-list', {
+			'has-text-color': !!context.textColor,
+			[getColorClassName('color', context.textColor)]:
+				!!context.textColor,
+			'has-background': !!context.backgroundColor,
+			[getColorClassName('background-color', context.backgroundColor)]:
+				!!context.backgroundColor,
+		}),
 		style: { ...context.style?.color },
-	} );
+	});
 
 	return (
 		<>
-			{ allowConvertToLinks && (
+			{allowConvertToLinks && (
 				<BlockControls group="other">
-					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-						{ __( 'Edit' ) }
+					<ToolbarButton title={__('Edit')} onClick={openModal}>
+						{__('Edit')}
 					</ToolbarButton>
 				</BlockControls>
-			) }
-			{ allowConvertToLinks && isOpen && (
-				<ConvertToLinksModal
-					onClose={ closeModal }
-					clientId={ clientId }
-				/>
-			) }
-			{ totalPages === undefined && (
-				<div { ...blockProps }>
+			)}
+			{allowConvertToLinks && isOpen && (
+				<ConvertToLinksModal onClose={closeModal} clientId={clientId} />
+			)}
+			{totalPages === undefined && (
+				<div {...blockProps}>
 					<Placeholder>
 						<Spinner />
 					</Placeholder>
 				</div>
-			) }
-			{ totalPages === 0 && (
-				<div { ...blockProps }>
-					<span>{ __( 'Page List: No pages to show.' ) }</span>
+			)}
+			{totalPages === 0 && (
+				<div {...blockProps}>
+					<span>{__('Page List: No pages to show.')}</span>
 				</div>
-			) }
-			{ totalPages > 0 && (
-				<ul { ...blockProps }>
+			)}
+			{totalPages > 0 && (
+				<ul {...blockProps}>
 					<PageItems
-						context={ context }
-						pagesByParentId={ pagesByParentId }
+						context={context}
+						pagesByParentId={pagesByParentId}
 					/>
 				</ul>
-			) }
+			)}
 		</>
 	);
 }
 
 function usePagesByParentId() {
-	const { pages } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
+	const { pages } = useSelect((select) => {
+		const { getEntityRecords } = select(coreStore);
 
 		return {
-			pages: getEntityRecords( 'postType', 'page', {
+			pages: getEntityRecords('postType', 'page', {
 				orderby: 'menu_order',
 				order: 'asc',
-				_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
+				_fields: ['id', 'link', 'parent', 'title', 'menu_order'],
 				per_page: -1,
-			} ),
+			}),
 		};
-	}, [] );
+	}, []);
 
-	return useMemo( () => {
+	return useMemo(() => {
 		// TODO: Once the REST API supports passing multiple values to
 		// 'orderby', this can be removed.
 		// https://core.trac.wordpress.org/ticket/39037
-		const sortedPages = sortBy( pages, [ 'menu_order', 'title.rendered' ] );
-		const pagesByParentId = sortedPages.reduce( ( accumulator, page ) => {
+		const sortedPages = sortBy(pages, ['menu_order', 'title.rendered']);
+		const pagesByParentId = sortedPages.reduce((accumulator, page) => {
 			const { parent } = page;
-			if ( accumulator.has( parent ) ) {
-				accumulator.get( parent ).push( page );
+			if (accumulator.has(parent)) {
+				accumulator.get(parent).push(page);
 			} else {
-				accumulator.set( parent, [ page ] );
+				accumulator.set(parent, [page]);
 			}
 			return accumulator;
-		}, new Map() );
+		}, new Map());
 
 		return {
 			pagesByParentId,
 			totalPages: pages?.length,
 		};
-	}, [ pages ] );
+	}, [pages]);
 }
 
-const PageItems = memo( function PageItems( {
+const PageItems = memo(function PageItems({
 	context,
 	pagesByParentId,
 	parentId = 0,
 	depth = 0,
-} ) {
-	const pages = pagesByParentId.get( parentId );
+}) {
+	const pages = pagesByParentId.get(parentId);
 
-	if ( ! pages?.length ) {
+	if (!pages?.length) {
 		return [];
 	}
 
-	return pages.map( ( page ) => {
-		const hasChildren = pagesByParentId.has( page.id );
+	return pages.map((page) => {
+		const hasChildren = pagesByParentId.has(page.id);
 		const isNavigationChild = 'showSubmenuIcon' in context;
 		return (
 			<li
-				key={ page.id }
-				className={ classnames( 'wp-block-pages-list__item', {
+				key={page.id}
+				className={classnames('wp-block-pages-list__item', {
 					'has-child': hasChildren,
 					'wp-block-navigation-item': isNavigationChild,
 					'open-on-click': context.openSubmenusOnClick,
 					'open-on-hover-click':
-						! context.openSubmenusOnClick &&
-						context.showSubmenuIcon,
-				} ) }
+						!context.openSubmenusOnClick && context.showSubmenuIcon,
+				})}
 			>
-				{ hasChildren && context.openSubmenusOnClick ? (
-					<ItemSubmenuToggle title={ page.title?.rendered } />
+				{hasChildren && context.openSubmenusOnClick ? (
+					<ItemSubmenuToggle title={page.title?.rendered} />
 				) : (
 					<a
-						className={ classnames(
+						className={classnames(
 							'wp-block-pages-list__item__link',
 							{
-								'wp-block-navigation-item__content': isNavigationChild,
+								'wp-block-navigation-item__content':
+									isNavigationChild,
 							}
-						) }
-						href={ page.link }
+						)}
+						href={page.link}
 					>
-						{ page.title?.rendered }
+						{page.title?.rendered}
 					</a>
-				) }
-				{ hasChildren && (
+				)}
+				{hasChildren && (
 					<>
-						{ ! context.openSubmenusOnClick &&
-							context.showSubmenuIcon && <ItemSubmenuToggle /> }
+						{!context.openSubmenusOnClick &&
+							context.showSubmenuIcon && <ItemSubmenuToggle />}
 						<ul
-							className={ classnames( 'submenu-container', {
-								'wp-block-navigation__submenu-container': isNavigationChild,
-							} ) }
+							className={classnames('submenu-container', {
+								'wp-block-navigation__submenu-container':
+									isNavigationChild,
+							})}
 						>
 							<PageItems
-								context={ context }
-								pagesByParentId={ pagesByParentId }
-								parentId={ page.id }
-								depth={ depth + 1 }
+								context={context}
+								pagesByParentId={pagesByParentId}
+								parentId={page.id}
+								depth={depth + 1}
 							/>
 						</ul>
 					</>
-				) }
+				)}
 			</li>
 		);
-	} );
-} );
+	});
+});
 
-function ItemSubmenuToggle( { title } ) {
+function ItemSubmenuToggle({ title }) {
 	return (
 		<button
 			className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
 			aria-expanded="false"
 		>
-			{ title }
+			{title}
 			<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
 				<ItemSubmenuIcon />
 			</span>

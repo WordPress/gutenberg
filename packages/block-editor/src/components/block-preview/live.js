@@ -8,14 +8,9 @@ import { Disabled } from '@wordpress/components';
  */
 import BlockList from '../block-list';
 
-export default function LiveBlockPreview( { onClick } ) {
+export default function LiveBlockPreview({ onClick }) {
 	return (
-		<div
-			tabIndex={ 0 }
-			role="button"
-			onClick={ onClick }
-			onKeyPress={ onClick }
-		>
+		<div tabIndex={0} role="button" onClick={onClick} onKeyPress={onClick}>
 			<Disabled>
 				<BlockList />
 			</Disabled>

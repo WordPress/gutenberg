@@ -24,11 +24,11 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  *
  * @return {import(".").WPBlock} Migrated block object.
  */
-export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
+export function applyBlockDeprecatedVersions(block, rawBlock, blockType) {
 	const parsedAttributes = rawBlock.attrs;
 	const { deprecated: deprecatedDefinitions } = blockType;
 	// Bail early if there are no registered deprecations to be handled.
-	if ( ! deprecatedDefinitions || ! deprecatedDefinitions.length ) {
+	if (!deprecatedDefinitions || !deprecatedDefinitions.length) {
 		return block;
 	}
 
@@ -38,15 +38,12 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 	// valid result. This mechanism seeks to avoid polluting the user-space with
 	// machine-specific code. An invalid block is thus a block that could not be
 	// matched successfully with any of the registered deprecation definitions.
-	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
+	for (let i = 0; i < deprecatedDefinitions.length; i++) {
 		// A block can opt into a migration even if the block is valid by
 		// defining `isEligible` on its deprecation. If the block is both valid
 		// and does not opt to migrate, skip.
-		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
-		if (
-			block.isValid &&
-			! isEligible( parsedAttributes, block.innerBlocks )
-		) {
+		const { isEligible = stubFalse } = deprecatedDefinitions[i];
+		if (block.isValid && !isEligible(parsedAttributes, block.innerBlocks)) {
 			continue;
 		}
 
@@ -54,8 +51,8 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		// parsing are not considered in the deprecated block type by default,
 		// and must be explicitly provided.
 		const deprecatedBlockType = Object.assign(
-			omit( blockType, DEPRECATED_ENTRY_KEYS ),
-			deprecatedDefinitions[ i ]
+			omit(blockType, DEPRECATED_ENTRY_KEYS),
+			deprecatedDefinitions[i]
 		);
 
 		let migratedBlock = {
@@ -68,20 +65,20 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		};
 
 		// Ignore the deprecation if it produces a block which is not valid.
-		let [ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
+		let [isValid] = validateBlock(migratedBlock, deprecatedBlockType);
 
 		// If the migrated block is not valid intiailly, try the built-in fixes.
-		if ( ! isValid ) {
+		if (!isValid) {
 			migratedBlock = applyBuiltInValidationFixes(
 				migratedBlock,
 				deprecatedBlockType
 			);
-			[ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
+			[isValid] = validateBlock(migratedBlock, deprecatedBlockType);
 		}
 
 		// An invalid block does not imply incorrect HTML but the fact block
 		// source information could be lost on reserialization.
-		if ( ! isValid ) {
+		if (!isValid) {
 			continue;
 		}
 
@@ -91,11 +88,11 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		// A block may provide custom behavior to assign new attributes and/or
 		// inner blocks.
 		const { migrate } = deprecatedBlockType;
-		if ( migrate ) {
+		if (migrate) {
 			[
 				migratedAttributes = parsedAttributes,
 				migratedInnerBlocks = block.innerBlocks,
-			] = castArray( migrate( migratedAttributes, block.innerBlocks ) );
+			] = castArray(migrate(migratedAttributes, block.innerBlocks));
 		}
 
 		block = {

@@ -1,6 +1,6 @@
 export interface APIFetchOptions extends RequestInit {
 	// Override headers, we only accept it as an object due to the `nonce` middleware
-	headers?: Record< string, string >;
+	headers?: Record<string, string>;
 	path?: string;
 	url?: string;
 	/**
@@ -14,5 +14,5 @@ export interface APIFetchOptions extends RequestInit {
 
 export type APIFetchMiddleware = (
 	options: APIFetchOptions,
-	next: ( nextOptions: APIFetchOptions ) => Promise< any >
-) => Promise< any >;
+	next: (nextOptions: APIFetchOptions) => Promise<any>
+) => Promise<any>;

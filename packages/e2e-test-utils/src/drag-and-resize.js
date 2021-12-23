@@ -8,10 +8,10 @@
  *
  * @return {Promise} Promise resolving when drag completes.
  */
-export async function dragAndResize( element, delta ) {
+export async function dragAndResize(element, delta) {
 	const elementPoint = await element.clickablePoint();
-	await page.mouse.move( elementPoint.x, elementPoint.y );
+	await page.mouse.move(elementPoint.x, elementPoint.y);
 	await page.mouse.down();
-	await page.mouse.move( elementPoint.x + delta.x, elementPoint.y + delta.y );
+	await page.mouse.move(elementPoint.x + delta.x, elementPoint.y + delta.y);
 	await page.mouse.up();
 }

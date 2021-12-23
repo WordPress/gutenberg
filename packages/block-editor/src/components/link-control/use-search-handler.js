@@ -17,33 +17,33 @@ import isURLLike from './is-url-like';
 import { CREATE_TYPE } from './constants';
 import { store as blockEditorStore } from '../../store';
 
-export const handleNoop = () => Promise.resolve( [] );
+export const handleNoop = () => Promise.resolve([]);
 
-export const handleDirectEntry = ( val ) => {
+export const handleDirectEntry = (val) => {
 	let type = 'URL';
 
-	const protocol = getProtocol( val ) || '';
+	const protocol = getProtocol(val) || '';
 
-	if ( protocol.includes( 'mailto' ) ) {
+	if (protocol.includes('mailto')) {
 		type = 'mailto';
 	}
 
-	if ( protocol.includes( 'tel' ) ) {
+	if (protocol.includes('tel')) {
 		type = 'tel';
 	}
 
-	if ( startsWith( val, '#' ) ) {
+	if (startsWith(val, '#')) {
 		type = 'internal';
 	}
 
-	return Promise.resolve( [
+	return Promise.resolve([
 		{
 			id: val,
 			title: val,
-			url: type === 'URL' ? prependHTTP( val ) : val,
+			url: type === 'URL' ? prependHTTP(val) : val,
 			type,
 		},
-	] );
+	]);
 };
 
 const handleEntitySearch = async (
@@ -56,24 +56,24 @@ const handleEntitySearch = async (
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
 
-	let results = await Promise.all( [
-		fetchSearchSuggestions( val, suggestionsQuery ),
-		directEntryHandler( val ),
-	] );
+	let results = await Promise.all([
+		fetchSearchSuggestions(val, suggestionsQuery),
+		directEntryHandler(val),
+	]);
 
-	const couldBeURL = ! val.includes( ' ' );
+	const couldBeURL = !val.includes(' ');
 
 	// If it's potentially a URL search then concat on a URL search suggestion
 	// just for good measure. That way once the actual results run out we always
 	// have a URL option to fallback on.
-	if ( couldBeURL && withURLSuggestion && ! isInitialSuggestions ) {
-		results = results[ 0 ].concat( results[ 1 ] );
+	if (couldBeURL && withURLSuggestion && !isInitialSuggestions) {
+		results = results[0].concat(results[1]);
 	} else {
-		results = results[ 0 ];
+		results = results[0];
 	}
 
 	// If displaying initial suggestions just return plain results.
-	if ( isInitialSuggestions ) {
+	if (isInitialSuggestions) {
 		return results;
 	}
 
@@ -91,16 +91,16 @@ const handleEntitySearch = async (
 	// to the text value of the `<input>`. This is because `title` is used
 	// when creating the suggestion. Similarly `url` is used when using keyboard to select
 	// the suggestion (the <form> `onSubmit` handler falls-back to `url`).
-	return isURLLike( val ) || ! withCreateSuggestion
+	return isURLLike(val) || !withCreateSuggestion
 		? results
-		: results.concat( {
+		: results.concat({
 				// the `id` prop is intentionally ommitted here because it
 				// is never exposed as part of the component's public API.
 				// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
 				title: val, // must match the existing `<input>`s text value
 				url: val, // must match the existing `<input>`s text value
 				type: CREATE_TYPE,
-		  } );
+		  });
 };
 
 export default function useSearchHandler(
@@ -109,22 +109,22 @@ export default function useSearchHandler(
 	withCreateSuggestion,
 	withURLSuggestion
 ) {
-	const { fetchSearchSuggestions } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+	const { fetchSearchSuggestions } = useSelect((select) => {
+		const { getSettings } = select(blockEditorStore);
 		return {
-			fetchSearchSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
+			fetchSearchSuggestions:
+				getSettings().__experimentalFetchLinkSuggestions,
 		};
-	}, [] );
+	}, []);
 
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
 		: handleNoop;
 
 	return useCallback(
-		( val, { isInitialSuggestions } ) => {
-			return isURLLike( val )
-				? directEntryHandler( val, { isInitialSuggestions } )
+		(val, { isInitialSuggestions }) => {
+			return isURLLike(val)
+				? directEntryHandler(val, { isInitialSuggestions })
 				: handleEntitySearch(
 						val,
 						{ ...suggestionsQuery, isInitialSuggestions },
@@ -134,6 +134,6 @@ export default function useSearchHandler(
 						withURLSuggestion
 				  );
 		},
-		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]
+		[directEntryHandler, fetchSearchSuggestions, withCreateSuggestion]
 	);
 }

@@ -81,21 +81,21 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 ```js
 // block.js
-( function ( blocks, element, blockEditor ) {
+(function (blocks, element, blockEditor) {
 	var el = element.createElement,
 		source = blocks.source,
 		useBlockProps = blockEditor.useBlockProps;
 
-	function RandomImage( props ) {
+	function RandomImage(props) {
 		var src = 'http://lorempixel.com/400/200/' + props.category;
 
-		return el( 'img', {
+		return el('img', {
 			src: src,
 			alt: props.category,
-		} );
+		});
 	}
 
-	blocks.registerBlockType( 'myplugin/random-image', {
+	blocks.registerBlockType('myplugin/random-image', {
 		apiVersion: 2,
 
 		title: 'Random Image',
@@ -113,45 +113,45 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 			},
 		},
 
-		edit: function ( props ) {
+		edit: function (props) {
 			var blockProps = useBlockProps();
 			var category = props.attributes.category,
 				children;
 
-			function setCategory( event ) {
-				var selected = event.target.querySelector( 'option:checked' );
-				props.setAttributes( { category: selected.value } );
+			function setCategory(event) {
+				var selected = event.target.querySelector('option:checked');
+				props.setAttributes({ category: selected.value });
 				event.preventDefault();
 			}
 
 			children = [];
-			if ( category ) {
-				children.push( RandomImage( { category: category } ) );
+			if (category) {
+				children.push(RandomImage({ category: category }));
 			}
 
 			children.push(
 				el(
 					'select',
 					{ value: category, onChange: setCategory },
-					el( 'option', null, '- Select -' ),
-					el( 'option', { value: 'sports' }, 'Sports' ),
-					el( 'option', { value: 'animals' }, 'Animals' ),
-					el( 'option', { value: 'nature' }, 'Nature' )
+					el('option', null, '- Select -'),
+					el('option', { value: 'sports' }, 'Sports'),
+					el('option', { value: 'animals' }, 'Animals'),
+					el('option', { value: 'nature' }, 'Nature')
 				)
 			);
 
 			return el(
 				'form',
-				Object.assign( blockProps, { onSubmit: setCategory } ),
+				Object.assign(blockProps, { onSubmit: setCategory }),
 				children
 			);
 		},
 
-		save: function ( props ) {
-			return RandomImage( { category: props.attributes.category } );
+		save: function (props) {
+			return RandomImage({ category: props.attributes.category });
 		},
-	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+	});
+})(window.wp.blocks, window.wp.element, window.wp.blockEditor);
 ```
 
 _[(Example in ES2015+, JSX)](https://gist.github.com/aduth/fb1cc9a2296110a62b96383e4b2e8a7c)_

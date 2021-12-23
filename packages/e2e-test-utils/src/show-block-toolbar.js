@@ -7,7 +7,7 @@ export async function showBlockToolbar() {
 	// mousemove events for it to work across windows (iframe). With three
 	// moves, it's a guarantee that at least two will be in the same window.
 	// Two events are required for the flag to be unset.
-	await page.mouse.move( 50, 50 );
-	await page.mouse.move( 75, 75 );
-	await page.mouse.move( 100, 100 );
+	await page.mouse.move(50, 50);
+	await page.mouse.move(75, 75);
+	await page.mouse.move(100, 100);
 }

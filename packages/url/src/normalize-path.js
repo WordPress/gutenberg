@@ -7,11 +7,11 @@
  *
  * @return {string} Normalized path.
  */
-export function normalizePath( path ) {
-	const splitted = path.split( '?' );
-	const query = splitted[ 1 ];
-	const base = splitted[ 0 ];
-	if ( ! query ) {
+export function normalizePath(path) {
+	const splitted = path.split('?');
+	const query = splitted[1];
+	const base = splitted[0];
+	if (!query) {
 		return base;
 	}
 
@@ -21,14 +21,14 @@ export function normalizePath( path ) {
 		'?' +
 		query
 			// [ 'b=1', 'c=2', 'a=5' ]
-			.split( '&' )
+			.split('&')
 			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-			.map( ( entry ) => entry.split( '=' ) )
+			.map((entry) => entry.split('='))
 			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-			.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
+			.sort((a, b) => a[0].localeCompare(b[0]))
 			// [ 'a=5', 'b=1', 'c=2' ]
-			.map( ( pair ) => pair.join( '=' ) )
+			.map((pair) => pair.join('='))
 			// 'a=5&b=1&c=2'
-			.join( '&' )
+			.join('&')
 	);
 }

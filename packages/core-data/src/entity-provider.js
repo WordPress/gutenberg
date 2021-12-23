@@ -23,28 +23,28 @@ const EMPTY_ARRAY = [];
 import { defaultEntities, kinds } from './entities';
 
 const entities = {
-	...defaultEntities.reduce( ( acc, entity ) => {
-		if ( ! acc[ entity.kind ] ) {
-			acc[ entity.kind ] = {};
+	...defaultEntities.reduce((acc, entity) => {
+		if (!acc[entity.kind]) {
+			acc[entity.kind] = {};
 		}
-		acc[ entity.kind ][ entity.name ] = { context: createContext() };
+		acc[entity.kind][entity.name] = { context: createContext() };
 		return acc;
-	}, {} ),
-	...kinds.reduce( ( acc, kind ) => {
-		acc[ kind.name ] = {};
+	}, {}),
+	...kinds.reduce((acc, kind) => {
+		acc[kind.name] = {};
 		return acc;
-	}, {} ),
+	}, {}),
 };
-const getEntity = ( kind, type ) => {
-	if ( ! entities[ kind ] ) {
-		throw new Error( `Missing entity config for kind: ${ kind }.` );
+const getEntity = (kind, type) => {
+	if (!entities[kind]) {
+		throw new Error(`Missing entity config for kind: ${kind}.`);
 	}
 
-	if ( ! entities[ kind ][ type ] ) {
-		entities[ kind ][ type ] = { context: createContext() };
+	if (!entities[kind][type]) {
+		entities[kind][type] = { context: createContext() };
 	}
 
-	return entities[ kind ][ type ];
+	return entities[kind][type];
 };
 
 /**
@@ -60,9 +60,9 @@ const getEntity = ( kind, type ) => {
  * @return {Object} The provided children, wrapped with
  *                   the entity's context provider.
  */
-export default function EntityProvider( { kind, type, id, children } ) {
-	const Provider = getEntity( kind, type ).context.Provider;
-	return <Provider value={ id }>{ children }</Provider>;
+export default function EntityProvider({ kind, type, id, children }) {
+	const Provider = getEntity(kind, type).context.Provider;
+	return <Provider value={id}>{children}</Provider>;
 }
 
 /**
@@ -72,8 +72,8 @@ export default function EntityProvider( { kind, type, id, children } ) {
  * @param {string} kind The entity kind.
  * @param {string} type The entity type.
  */
-export function useEntityId( kind, type ) {
-	return useContext( getEntity( kind, type ).context );
+export function useEntityId(kind, type) {
+	return useContext(getEntity(kind, type).context);
 }
 
 /**
@@ -93,37 +93,36 @@ export function useEntityId( kind, type ) {
  * 							  information like `raw`, `rendered` and
  * 							  `protected` props.
  */
-export function useEntityProp( kind, type, prop, _id ) {
-	const providerId = useEntityId( kind, type );
+export function useEntityProp(kind, type, prop, _id) {
+	const providerId = useEntityId(kind, type);
 	const id = _id ?? providerId;
 
 	const { value, fullValue } = useSelect(
-		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } = select(
-				STORE_NAME
-			);
-			const entity = getEntityRecord( kind, type, id ); // Trigger resolver.
-			const editedEntity = getEditedEntityRecord( kind, type, id );
+		(select) => {
+			const { getEntityRecord, getEditedEntityRecord } =
+				select(STORE_NAME);
+			const entity = getEntityRecord(kind, type, id); // Trigger resolver.
+			const editedEntity = getEditedEntityRecord(kind, type, id);
 			return entity && editedEntity
 				? {
-						value: editedEntity[ prop ],
-						fullValue: entity[ prop ],
+						value: editedEntity[prop],
+						fullValue: entity[prop],
 				  }
 				: {};
 		},
-		[ kind, type, id, prop ]
+		[kind, type, id, prop]
 	);
-	const { editEntityRecord } = useDispatch( STORE_NAME );
+	const { editEntityRecord } = useDispatch(STORE_NAME);
 	const setValue = useCallback(
-		( newValue ) => {
-			editEntityRecord( kind, type, id, {
-				[ prop ]: newValue,
-			} );
+		(newValue) => {
+			editEntityRecord(kind, type, id, {
+				[prop]: newValue,
+			});
 		},
-		[ kind, type, id, prop ]
+		[kind, type, id, prop]
 	);
 
-	return [ value, setValue, fullValue ];
+	return [value, setValue, fullValue];
 }
 
 /**
@@ -144,30 +143,29 @@ export function useEntityProp( kind, type, prop, _id ) {
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
-	const providerId = useEntityId( kind, type );
+export function useEntityBlockEditor(kind, type, { id: _id } = {}) {
+	const providerId = useEntityId(kind, type);
 	const id = _id ?? providerId;
 	const { content, blocks } = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord } = select( STORE_NAME );
-			const editedEntity = getEditedEntityRecord( kind, type, id );
+		(select) => {
+			const { getEditedEntityRecord } = select(STORE_NAME);
+			const editedEntity = getEditedEntityRecord(kind, type, id);
 			return {
 				blocks: editedEntity.blocks,
 				content: editedEntity.content,
 			};
 		},
-		[ kind, type, id ]
+		[kind, type, id]
 	);
-	const { __unstableCreateUndoLevel, editEntityRecord } = useDispatch(
-		STORE_NAME
-	);
+	const { __unstableCreateUndoLevel, editEntityRecord } =
+		useDispatch(STORE_NAME);
 
-	useEffect( () => {
+	useEffect(() => {
 		// Load the blocks from the content if not already in state
 		// Guard against other instances that might have
 		// set content to a function already or the blocks are already in state.
-		if ( content && typeof content !== 'function' && ! blocks ) {
-			const parsedContent = parse( content );
+		if (content && typeof content !== 'function' && !blocks) {
+			const parsedContent = parse(content);
 			editEntityRecord(
 				kind,
 				type,
@@ -178,37 +176,37 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 				{ undoIgnore: true }
 			);
 		}
-	}, [ content ] );
+	}, [content]);
 
 	const onChange = useCallback(
-		( newBlocks, options ) => {
+		(newBlocks, options) => {
 			const { selection } = options;
 			const edits = { blocks: newBlocks, selection };
 
 			const noChange = blocks === edits.blocks;
-			if ( noChange ) {
-				return __unstableCreateUndoLevel( kind, type, id );
+			if (noChange) {
+				return __unstableCreateUndoLevel(kind, type, id);
 			}
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
-			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-				__unstableSerializeAndClean( blocksForSerialization );
+			edits.content = ({ blocks: blocksForSerialization = [] }) =>
+				__unstableSerializeAndClean(blocksForSerialization);
 
-			editEntityRecord( kind, type, id, edits );
+			editEntityRecord(kind, type, id, edits);
 		},
-		[ kind, type, id, blocks ]
+		[kind, type, id, blocks]
 	);
 
 	const onInput = useCallback(
-		( newBlocks, options ) => {
+		(newBlocks, options) => {
 			const { selection } = options;
 			const edits = { blocks: newBlocks, selection };
-			editEntityRecord( kind, type, id, edits );
+			editEntityRecord(kind, type, id, edits);
 		},
-		[ kind, type, id ]
+		[kind, type, id]
 	);
 
-	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
+	return [blocks ?? EMPTY_ARRAY, onInput, onChange];
 }

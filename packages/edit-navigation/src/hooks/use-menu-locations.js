@@ -13,66 +13,66 @@ import { merge } from 'lodash';
  */
 import { useMenuEntity, useSelectedMenuId } from './index';
 
-const locationsForMenuId = ( menuLocationsByName, id ) =>
-	Object.values( menuLocationsByName )
-		.filter( ( { menu } ) => menu === id )
-		.map( ( { name } ) => name );
+const locationsForMenuId = (menuLocationsByName, id) =>
+	Object.values(menuLocationsByName)
+		.filter(({ menu }) => menu === id)
+		.map(({ name }) => name);
 
 export default function useMenuLocations() {
-	const [ menuLocationsByName, setMenuLocationsByName ] = useState( null );
+	const [menuLocationsByName, setMenuLocationsByName] = useState(null);
 
-	const [ menuId ] = useSelectedMenuId();
-	const { editMenuEntityRecord, menuEntityData } = useMenuEntity( menuId );
-	useEffect( () => {
+	const [menuId] = useSelectedMenuId();
+	const { editMenuEntityRecord, menuEntityData } = useMenuEntity(menuId);
+	useEffect(() => {
 		let isMounted = true;
 
 		const fetchMenuLocationsByName = async () => {
-			const newMenuLocationsByName = await apiFetch( {
+			const newMenuLocationsByName = await apiFetch({
 				method: 'GET',
 				path: '/wp/v2/menu-locations',
-			} );
+			});
 
-			if ( isMounted ) {
-				setMenuLocationsByName( newMenuLocationsByName );
+			if (isMounted) {
+				setMenuLocationsByName(newMenuLocationsByName);
 			}
 		};
 
 		fetchMenuLocationsByName();
-		return () => ( isMounted = false );
-	}, [] );
+		return () => (isMounted = false);
+	}, []);
 
 	const assignMenuToLocation = useCallback(
-		async ( locationName, newMenuId ) => {
-			const oldMenuId = menuLocationsByName[ locationName ].menu;
+		async (locationName, newMenuId) => {
+			const oldMenuId = menuLocationsByName[locationName].menu;
 
-			const newMenuLocationsByName = merge( menuLocationsByName, {
-				[ locationName ]: { menu: newMenuId },
-			} );
+			const newMenuLocationsByName = merge(menuLocationsByName, {
+				[locationName]: { menu: newMenuId },
+			});
 
-			setMenuLocationsByName( newMenuLocationsByName );
+			setMenuLocationsByName(newMenuLocationsByName);
 
 			const activeMenuId = newMenuId || oldMenuId;
-			editMenuEntityRecord( ...menuEntityData, {
+			editMenuEntityRecord(...menuEntityData, {
 				locations: locationsForMenuId(
 					newMenuLocationsByName,
 					activeMenuId
 				),
-			} );
+			});
 		},
-		[ menuLocationsByName ]
+		[menuLocationsByName]
 	);
 
-	const toggleMenuLocationAssignment = ( locationName, newMenuId ) => {
+	const toggleMenuLocationAssignment = (locationName, newMenuId) => {
 		const idToSet =
-			menuLocationsByName[ locationName ].menu === newMenuId
+			menuLocationsByName[locationName].menu === newMenuId
 				? 0
 				: newMenuId;
-		assignMenuToLocation( locationName, idToSet );
+		assignMenuToLocation(locationName, idToSet);
 	};
 
 	const menuLocations = useMemo(
-		() => Object.values( menuLocationsByName || {} ),
-		[ menuLocationsByName ]
+		() => Object.values(menuLocationsByName || {}),
+		[menuLocationsByName]
 	);
 
 	return {

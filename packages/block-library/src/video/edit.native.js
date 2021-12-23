@@ -52,33 +52,30 @@ const ICON_TYPE = {
 };
 
 class VideoEdit extends Component {
-	constructor( props ) {
-		super( props );
+	constructor(props) {
+		super(props);
 
 		this.state = {
 			isCaptionSelected: false,
 			videoContainerHeight: 0,
 		};
 
-		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
-		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.onVideoPressed = this.onVideoPressed.bind( this );
-		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
-		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.mediaUploadStateReset = this.mediaUploadStateReset.bind(this);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind(this);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind(this);
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind(this);
+		this.updateMediaProgress = this.updateMediaProgress.bind(this);
+		this.onVideoPressed = this.onVideoPressed.bind(this);
+		this.onVideoContanerLayout = this.onVideoContanerLayout.bind(this);
+		this.onFocusCaption = this.onFocusCaption.bind(this);
 	}
 
 	componentDidMount() {
 		const { attributes } = this.props;
-		if ( attributes.id && getProtocol( attributes.src ) === 'file:' ) {
+		if (attributes.id && getProtocol(attributes.src) === 'file:') {
 			mediaUploadSync();
 		}
 	}
@@ -86,7 +83,7 @@ class VideoEdit extends Component {
 	componentWillUnmount() {
 		// this action will only exist if the user pressed the trash button on the block holder
 		if (
-			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
+			hasAction('blocks.onRemoveBlockCheckUpload') &&
 			this.state.isUploadInProgress
 		) {
 			doAction(
@@ -96,7 +93,7 @@ class VideoEdit extends Component {
 		}
 	}
 
-	static getDerivedStateFromProps( props, state ) {
+	static getDerivedStateFromProps(props, state) {
 		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
 		// is updated immediately any time the isSelected prop becomes false
 		return {
@@ -107,72 +104,69 @@ class VideoEdit extends Component {
 	onVideoPressed() {
 		const { attributes } = this.props;
 
-		if ( this.state.isUploadInProgress ) {
-			requestImageUploadCancelDialog( attributes.id );
-		} else if (
-			attributes.id &&
-			getProtocol( attributes.src ) === 'file:'
-		) {
-			requestImageFailedRetryDialog( attributes.id );
+		if (this.state.isUploadInProgress) {
+			requestImageUploadCancelDialog(attributes.id);
+		} else if (attributes.id && getProtocol(attributes.src) === 'file:') {
+			requestImageFailedRetryDialog(attributes.id);
 		}
 
-		this.setState( {
+		this.setState({
 			isCaptionSelected: false,
-		} );
+		});
 	}
 
 	onFocusCaption() {
-		if ( ! this.state.isCaptionSelected ) {
-			this.setState( { isCaptionSelected: true } );
+		if (!this.state.isCaptionSelected) {
+			this.setState({ isCaptionSelected: true });
 		}
 	}
 
-	updateMediaProgress( payload ) {
+	updateMediaProgress(payload) {
 		const { setAttributes } = this.props;
-		if ( payload.mediaUrl ) {
-			setAttributes( { url: payload.mediaUrl } );
+		if (payload.mediaUrl) {
+			setAttributes({ url: payload.mediaUrl });
 		}
-		if ( ! this.state.isUploadInProgress ) {
-			this.setState( { isUploadInProgress: true } );
+		if (!this.state.isUploadInProgress) {
+			this.setState({ isUploadInProgress: true });
 		}
 	}
 
-	finishMediaUploadWithSuccess( payload ) {
+	finishMediaUploadWithSuccess(payload) {
 		const { setAttributes } = this.props;
-		setAttributes( { src: payload.mediaUrl, id: payload.mediaServerId } );
-		this.setState( { isUploadInProgress: false } );
+		setAttributes({ src: payload.mediaUrl, id: payload.mediaServerId });
+		this.setState({ isUploadInProgress: false });
 	}
 
-	finishMediaUploadWithFailure( payload ) {
+	finishMediaUploadWithFailure(payload) {
 		const { setAttributes } = this.props;
-		setAttributes( { id: payload.mediaId } );
-		this.setState( { isUploadInProgress: false } );
+		setAttributes({ id: payload.mediaId });
+		this.setState({ isUploadInProgress: false });
 	}
 
 	mediaUploadStateReset() {
 		const { setAttributes } = this.props;
-		setAttributes( { id: null, src: null } );
-		this.setState( { isUploadInProgress: false } );
+		setAttributes({ id: null, src: null });
+		this.setState({ isUploadInProgress: false });
 	}
 
-	onSelectMediaUploadOption( { id, url } ) {
+	onSelectMediaUploadOption({ id, url }) {
 		const { setAttributes } = this.props;
-		setAttributes( { id, src: url } );
+		setAttributes({ id, src: url });
 	}
 
-	onVideoContanerLayout( event ) {
+	onVideoContanerLayout(event) {
 		const { width } = event.nativeEvent.layout;
 		const height = width / VIDEO_ASPECT_RATIO;
-		if ( height !== this.state.videoContainerHeight ) {
-			this.setState( { videoContainerHeight: height } );
+		if (height !== this.state.videoContainerHeight) {
+			this.setState({ videoContainerHeight: height });
 		}
 	}
 
-	getIcon( iconType ) {
+	getIcon(iconType) {
 		let iconStyle;
-		switch ( iconType ) {
+		switch (iconType) {
 			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...style.icon } />;
+				return <Icon icon={SvgIconRetry} {...style.icon} />;
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = this.props.getStylesFromColorScheme(
 					style.icon,
@@ -187,50 +181,44 @@ class VideoEdit extends Component {
 				break;
 		}
 
-		return <Icon icon={ SvgIcon } { ...iconStyle } />;
+		return <Icon icon={SvgIcon} {...iconStyle} />;
 	}
 
 	render() {
-		const {
-			setAttributes,
-			attributes,
-			isSelected,
-			wasBlockJustInserted,
-		} = this.props;
+		const { setAttributes, attributes, isSelected, wasBlockJustInserted } =
+			this.props;
 		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
 			<MediaUpload
-				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
-				isReplacingMedia={ true }
-				onSelect={ this.onSelectMediaUploadOption }
-				render={ ( { open, getMediaOptions } ) => {
+				allowedTypes={[MEDIA_TYPE_VIDEO]}
+				isReplacingMedia={true}
+				onSelect={this.onSelectMediaUploadOption}
+				render={({ open, getMediaOptions }) => {
 					return (
 						<ToolbarGroup>
-							{ getMediaOptions() }
+							{getMediaOptions()}
 							<ToolbarButton
-								label={ __( 'Edit video' ) }
-								icon={ replace }
-								onClick={ open }
+								label={__('Edit video')}
+								icon={replace}
+								onClick={open}
 							/>
 						</ToolbarGroup>
 					);
-				} }
+				}}
 			></MediaUpload>
 		);
 
-		if ( ! id ) {
+		if (!id) {
 			return (
-				<View style={ { flex: 1 } }>
+				<View style={{ flex: 1 }}>
 					<MediaPlaceholder
-						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
-						onSelect={ this.onSelectMediaUploadOption }
-						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
-						onFocus={ this.props.onFocus }
-						autoOpenMediaUpload={
-							isSelected && wasBlockJustInserted
-						}
+						allowedTypes={[MEDIA_TYPE_VIDEO]}
+						onSelect={this.onSelectMediaUploadOption}
+						icon={this.getIcon(ICON_TYPE.PLACEHOLDER)}
+						onFocus={this.props.onFocus}
+						autoOpenMediaUpload={isSelected && wasBlockJustInserted}
 					/>
 				</View>
 			);
@@ -238,43 +226,43 @@ class VideoEdit extends Component {
 
 		return (
 			<TouchableWithoutFeedback
-				accessible={ ! isSelected }
-				onPress={ this.onVideoPressed }
-				disabled={ ! isSelected }
+				accessible={!isSelected}
+				onPress={this.onVideoPressed}
+				disabled={!isSelected}
 			>
-				<View style={ { flex: 1 } }>
-					{ ! this.state.isCaptionSelected && (
-						<BlockControls>{ toolbarEditButton }</BlockControls>
-					) }
-					{ isSelected && (
+				<View style={{ flex: 1 }}>
+					{!this.state.isCaptionSelected && (
+						<BlockControls>{toolbarEditButton}</BlockControls>
+					)}
+					{isSelected && (
 						<InspectorControls>
-							<PanelBody title={ __( 'Video settings' ) }>
+							<PanelBody title={__('Video settings')}>
 								<VideoCommonSettings
-									setAttributes={ setAttributes }
-									attributes={ attributes }
+									setAttributes={setAttributes}
+									attributes={attributes}
 								/>
 							</PanelBody>
 						</InspectorControls>
-					) }
+					)}
 					<MediaUploadProgress
-						mediaId={ id }
+						mediaId={id}
 						onFinishMediaUploadWithSuccess={
 							this.finishMediaUploadWithSuccess
 						}
 						onFinishMediaUploadWithFailure={
 							this.finishMediaUploadWithFailure
 						}
-						onUpdateMediaProgress={ this.updateMediaProgress }
-						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( {
+						onUpdateMediaProgress={this.updateMediaProgress}
+						onMediaUploadStateReset={this.mediaUploadStateReset}
+						renderContent={({
 							isUploadInProgress,
 							isUploadFailed,
 							retryMessage,
-						} ) => {
+						}) => {
 							const showVideo =
-								isURL( src ) &&
-								! isUploadInProgress &&
-								! isUploadFailed;
+								isURL(src) &&
+								!isUploadInProgress &&
+								!isUploadFailed;
 							const icon = this.getIcon(
 								isUploadFailed
 									? ICON_TYPE.RETRY
@@ -285,9 +273,7 @@ class VideoEdit extends Component {
 								: style.modalIcon;
 
 							const iconContainer = (
-								<View style={ styleIconContainer }>
-									{ icon }
-								</View>
+								<View style={styleIconContainer}>{icon}</View>
 							);
 
 							const videoStyle = {
@@ -302,68 +288,68 @@ class VideoEdit extends Component {
 
 							return (
 								<View
-									onLayout={ this.onVideoContanerLayout }
-									style={ containerStyle }
+									onLayout={this.onVideoContanerLayout}
+									style={containerStyle}
 								>
-									{ showVideo && (
-										<View style={ style.videoContainer }>
+									{showVideo && (
+										<View style={style.videoContainer}>
 											<VideoPlayer
 												isSelected={
 													isSelected &&
-													! this.state
+													!this.state
 														.isCaptionSelected
 												}
-												style={ videoStyle }
-												source={ { uri: src } }
-												paused={ true }
+												style={videoStyle}
+												source={{ uri: src }}
+												paused={true}
 											/>
 										</View>
-									) }
-									{ ! showVideo && (
+									)}
+									{!showVideo && (
 										<View
-											style={ {
+											style={{
 												height: videoContainerHeight,
 												width: '100%',
 												...this.props.getStylesFromColorScheme(
 													style.placeholderContainer,
 													style.placeholderContainerDark
 												),
-											} }
+											}}
 										>
-											{ videoContainerHeight > 0 &&
-												iconContainer }
-											{ isUploadFailed && (
+											{videoContainerHeight > 0 &&
+												iconContainer}
+											{isUploadFailed && (
 												<Text
 													style={
 														style.uploadFailedText
 													}
 												>
-													{ retryMessage }
+													{retryMessage}
 												</Text>
-											) }
+											)}
 										</View>
-									) }
+									)}
 								</View>
 							);
-						} }
+						}}
 					/>
 					<BlockCaption
-						accessible={ true }
-						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption )
+						accessible={true}
+						accessibilityLabelCreator={(caption) =>
+							isEmpty(caption)
 								? /* translators: accessibility text. Empty video caption. */
-								  __( 'Video caption. Empty' )
+								  __('Video caption. Empty')
 								: sprintf(
 										/* translators: accessibility text. %s: video caption. */
-										__( 'Video caption. %s' ),
+										__('Video caption. %s'),
 										caption
 								  )
 						}
-						clientId={ this.props.clientId }
-						isSelected={ this.state.isCaptionSelected }
-						onFocus={ this.onFocusCaption }
-						onBlur={ this.props.onBlur } // always assign onBlur as props
-						insertBlocksAfter={ this.props.insertBlocksAfter }
+						clientId={this.props.clientId}
+						isSelected={this.state.isCaptionSelected}
+						onFocus={this.onFocusCaption}
+						onBlur={this.props.onBlur} // always assign onBlur as props
+						insertBlocksAfter={this.props.insertBlocksAfter}
 					/>
 				</View>
 			</TouchableWithoutFeedback>
@@ -371,12 +357,12 @@ class VideoEdit extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => ( {
-		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+export default compose([
+	withSelect((select, { clientId }) => ({
+		wasBlockJustInserted: select(blockEditorStore).wasBlockJustInserted(
 			clientId,
 			'inserter_menu'
 		),
-	} ) ),
+	})),
 	withPreferredColorScheme,
-] )( VideoEdit );
+])(VideoEdit);

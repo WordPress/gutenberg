@@ -7,49 +7,49 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
-			blocks: [ 'core/navigation-link' ],
-			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
-			transform: ( attributes ) =>
-				createBlock( 'core/navigation-link', attributes ),
+			blocks: ['core/navigation-link'],
+			isMatch: (attributes, block) => block?.innerBlocks?.length === 0,
+			transform: (attributes) =>
+				createBlock('core/navigation-link', attributes),
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/spacer' ],
-			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
+			blocks: ['core/spacer'],
+			isMatch: (attributes, block) => block?.innerBlocks?.length === 0,
 			transform: () => {
-				return createBlock( 'core/spacer' );
+				return createBlock('core/spacer');
 			},
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/site-logo' ],
-			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
+			blocks: ['core/site-logo'],
+			isMatch: (attributes, block) => block?.innerBlocks?.length === 0,
 			transform: () => {
-				return createBlock( 'core/site-logo' );
+				return createBlock('core/site-logo');
 			},
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/home-link' ],
-			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
+			blocks: ['core/home-link'],
+			isMatch: (attributes, block) => block?.innerBlocks?.length === 0,
 			transform: () => {
-				return createBlock( 'core/home-link' );
+				return createBlock('core/home-link');
 			},
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/social-links' ],
-			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
+			blocks: ['core/social-links'],
+			isMatch: (attributes, block) => block?.innerBlocks?.length === 0,
 			transform: () => {
-				return createBlock( 'core/social-links' );
+				return createBlock('core/social-links');
 			},
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/search' ],
-			isMatch: ( attributes, block ) => block?.innerBlocks?.length === 0,
+			blocks: ['core/search'],
+			isMatch: (attributes, block) => block?.innerBlocks?.length === 0,
 			transform: () => {
-				return createBlock( 'core/search' );
+				return createBlock('core/search');
 			},
 		},
 	],

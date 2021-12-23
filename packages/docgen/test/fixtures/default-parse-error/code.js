@@ -5,7 +5,7 @@
  *
  * @param {(timestamp:number)=>void} callback Callback function.
  */
-export default function invokeCallbackAfterDelay( callback ) {
-	setTimeout( () => callback( Date.now() ), 1000 );
+export default function invokeCallbackAfterDelay(callback) {
+	setTimeout(() => callback(Date.now()), 1000);
 }
 /* eslint-enable jsdoc/valid-types */

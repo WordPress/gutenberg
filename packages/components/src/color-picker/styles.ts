@@ -20,24 +20,24 @@ import {
 import InputControl from '../input-control';
 import CONFIG from '../utils/config-values';
 
-export const NumberControlWrapper = styled( NumberControl )`
-	${ InputControlContainer } {
-		width: ${ space( 24 ) };
+export const NumberControlWrapper = styled(NumberControl)`
+	${InputControlContainer} {
+		width: ${space(24)};
 	}
 `;
 
-export const SelectControl = styled( InnerSelectControl )`
-	margin-left: ${ space( -2 ) };
+export const SelectControl = styled(InnerSelectControl)`
+	margin-left: ${space(-2)};
 	width: 5em;
-	${ BackdropUI } {
+	${BackdropUI} {
 		display: none;
 	}
 `;
 
-export const RangeControl = styled( InnerRangeControl )`
+export const RangeControl = styled(InnerRangeControl)`
 	flex: 1;
 
-	${ StyledField } {
+	${StyledField} {
 		margin-bottom: 0;
 	}
 `;
@@ -46,19 +46,19 @@ export const RangeControl = styled( InnerRangeControl )`
 // That involves changing heights of multiple input types probably buttons too etc.
 // So until that is done we are already using the new height on the color picker so it matches the mockups.
 const inputHeightStyle = `
-&&& ${ Input } {
+&&& ${Input} {
 	height: 40px;
 }`;
 
 // Make the Hue circle picker not go out of the bar
 const interactiveHueStyles = `
 .react-colorful__interactive {
-	width: calc( 100% - ${ space( 2 ) } );
-	margin-left: ${ space( 1 ) };
+	width: calc( 100% - ${space(2)} );
+	margin-left: ${space(1)};
 }`;
 
 export const AuxiliaryColorArtefactWrapper = styled.div`
-	padding: ${ space( 2 ) } ${ space( 4 ) };
+	padding: ${space(2)} ${space(4)};
 `;
 
 export const ColorfulWrapper = styled.div`
@@ -76,7 +76,7 @@ export const ColorfulWrapper = styled.div`
 		width: 100%;
 		border-radius: 0;
 		height: 216px;
-		margin-bottom: ${ space( 4 ) };
+		margin-bottom: ${space(4)};
 		border-bottom: none;
 	}
 
@@ -85,39 +85,39 @@ export const ColorfulWrapper = styled.div`
 		width: 184px;
 		height: 16px;
 		border-radius: 16px;
-		margin-bottom: ${ space( 2 ) };
+		margin-bottom: ${space(2)};
 	}
 
 	.react-colorful__pointer {
 		height: 16px;
 		width: 16px;
 		border: none;
-		box-shadow: 0 0 2px 0 rgba( 0, 0, 0, 0.25 );
+		box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.25);
 
 		// Shown instead of box-shadow to Windows high contrast mode.
 		outline: 2px solid transparent;
 	}
 
 	.react-colorful__pointer-fill {
-		box-shadow: inset 0 0 0 ${ CONFIG.borderWidthFocus } #fff;
+		box-shadow: inset 0 0 0 ${CONFIG.borderWidthFocus} #fff;
 	}
 
-	${ interactiveHueStyles }
+	${interactiveHueStyles}
 
-	${ StyledField } {
+	${StyledField} {
 		margin-bottom: 0;
 	}
 
-	${ inputHeightStyle }
+	${inputHeightStyle}
 `;
 
-export const DetailsControlButton = styled( Button )`
+export const DetailsControlButton = styled(Button)`
 	&&&&& {
-		min-width: ${ space( 6 ) };
+		min-width: ${space(6)};
 		padding: 0;
 	}
 `;
 
-export const ColorHexInputControl = styled( InputControl )`
+export const ColorHexInputControl = styled(InputControl)`
 	width: 8em;
 `;

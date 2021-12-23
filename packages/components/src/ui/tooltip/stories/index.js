@@ -14,11 +14,11 @@ export const _default = () => {
 		<Tooltip
 			content="Tooltip"
 			visible
-			gutter={ 10 }
-			shortcut={ {
+			gutter={10}
+			shortcut={{
 				display: 'meta + 1',
 				ariaLabel: 'shortcut-aria-label',
-			} }
+			}}
 		>
 			<Text>Hello</Text>
 		</Tooltip>

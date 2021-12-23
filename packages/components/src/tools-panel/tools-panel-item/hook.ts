@@ -14,7 +14,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
 export function useToolsPanelItem(
-	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
+	props: WordPressComponentProps<ToolsPanelItemProps, 'div'>
 ) {
 	const {
 		className,
@@ -26,7 +26,7 @@ export function useToolsPanelItem(
 		onDeselect,
 		onSelect,
 		...otherProps
-	} = useContextSystem( props, 'ToolsPanelItem' );
+	} = useContextSystem(props, 'ToolsPanelItem');
 
 	const {
 		panelId: currentPanelId,
@@ -38,32 +38,32 @@ export function useToolsPanelItem(
 		shouldRenderPlaceholderItems: shouldRenderPlaceholder,
 	} = useToolsPanelContext();
 
-	const hasValueCallback = useCallback( hasValue, [ panelId ] );
-	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
-	const previousPanelId = usePrevious( currentPanelId );
+	const hasValueCallback = useCallback(hasValue, [panelId]);
+	const resetAllFilterCallback = useCallback(resetAllFilter, [panelId]);
+	const previousPanelId = usePrevious(currentPanelId);
 
 	const hasMatchingPanel =
 		currentPanelId === panelId || currentPanelId === null;
 
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
-	useEffect( () => {
-		if ( hasMatchingPanel && previousPanelId !== null ) {
-			registerPanelItem( {
+	useEffect(() => {
+		if (hasMatchingPanel && previousPanelId !== null) {
+			registerPanelItem({
 				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
 				resetAllFilter: resetAllFilterCallback,
 				panelId,
-			} );
+			});
 		}
 
 		return () => {
 			if (
-				( previousPanelId === null && !! currentPanelId ) ||
+				(previousPanelId === null && !!currentPanelId) ||
 				currentPanelId === panelId
 			) {
-				deregisterPanelItem( label );
+				deregisterPanelItem(label);
 			}
 		};
 	}, [
@@ -75,37 +75,37 @@ export function useToolsPanelItem(
 		panelId,
 		previousPanelId,
 		resetAllFilterCallback,
-	] );
+	]);
 
 	const isValueSet = hasValue();
-	const wasValueSet = usePrevious( isValueSet );
+	const wasValueSet = usePrevious(isValueSet);
 
 	// If this item represents a default control it will need to notify the
 	// panel when a custom value has been set.
-	useEffect( () => {
-		if ( isShownByDefault && isValueSet && ! wasValueSet ) {
-			flagItemCustomization( label );
+	useEffect(() => {
+		if (isShownByDefault && isValueSet && !wasValueSet) {
+			flagItemCustomization(label);
 		}
-	}, [ isValueSet, wasValueSet, isShownByDefault, label ] );
+	}, [isValueSet, wasValueSet, isShownByDefault, label]);
 
 	// Note: `label` is used as a key when building menu item state in
 	// `ToolsPanel`.
 	const menuGroup = isShownByDefault ? 'default' : 'optional';
-	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
-	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
+	const isMenuItemChecked = menuItems?.[menuGroup]?.[label];
+	const wasMenuItemChecked = usePrevious(isMenuItemChecked);
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
-	useEffect( () => {
-		if ( isResetting || ! hasMatchingPanel ) {
+	useEffect(() => {
+		if (isResetting || !hasMatchingPanel) {
 			return;
 		}
 
-		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
+		if (isMenuItemChecked && !isValueSet && !wasMenuItemChecked) {
 			onSelect?.();
 		}
 
-		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
+		if (!isMenuItemChecked && wasMenuItemChecked) {
 			onDeselect?.();
 		}
 	}, [
@@ -114,23 +114,23 @@ export function useToolsPanelItem(
 		isResetting,
 		isValueSet,
 		wasMenuItemChecked,
-	] );
+	]);
 
 	// The item is shown if it is a default control regardless of whether it
 	// has a value. Optional items are shown when they are checked or have
 	// a value.
 	const isShown = isShownByDefault
-		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
+		? menuItems?.[menuGroup]?.[label] !== undefined
 		: isMenuItemChecked;
 
 	const cx = useCx();
-	const classes = useMemo( () => {
+	const classes = useMemo(() => {
 		const placeholderStyle =
 			shouldRenderPlaceholder &&
-			! isShown &&
+			!isShown &&
 			styles.ToolsPanelItemPlaceholder;
-		return cx( styles.ToolsPanelItem, placeholderStyle, className );
-	}, [ isShown, shouldRenderPlaceholder, className ] );
+		return cx(styles.ToolsPanelItem, placeholderStyle, className);
+	}, [isShown, shouldRenderPlaceholder, className]);
 
 	return {
 		...otherProps,

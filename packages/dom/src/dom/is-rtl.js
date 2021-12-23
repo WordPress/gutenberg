@@ -10,6 +10,6 @@ import getComputedStyle from './get-computed-style';
  *
  * @return {boolean} True if rtl, false if ltr.
  */
-export default function isRTL( element ) {
-	return getComputedStyle( element ).direction === 'rtl';
+export default function isRTL(element) {
+	return getComputedStyle(element).direction === 'rtl';
 }

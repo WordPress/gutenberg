@@ -11,6 +11,6 @@ export const CREATE_TYPE = '__CREATE__';
 export const DEFAULT_LINK_SETTINGS = [
 	{
 		id: 'opensInNewTab',
-		title: __( 'Open in new tab' ),
+		title: __('Open in new tab'),
 	},
 ];

@@ -9,14 +9,14 @@ import { render } from '@testing-library/react';
 import { ControlGroup } from '..';
 import Button from '../../../button';
 
-describe( 'props', () => {
-	test( 'should render correctly', () => {
+describe('props', () => {
+	test('should render correctly', () => {
 		const { container } = render(
 			<ControlGroup>
 				<Button>Code is Poetry</Button>
 				<Button>WordPress.org</Button>
 			</ControlGroup>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
-	} );
-} );
+		expect(container.firstChild).toMatchSnapshot();
+	});
+});

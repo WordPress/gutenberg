@@ -23,61 +23,61 @@ import { BlockIcon } from '@wordpress/block-editor';
  */
 import styles from './styles.scss';
 
-const EmbedNoPreview = ( {
+const EmbedNoPreview = ({
 	label,
 	icon,
 	isSelected,
 	onPress,
 	previewable,
 	isDefaultEmbedInfo,
-} ) => {
-	const shouldRequestReview = useRef( false );
-	const [ isSheetVisible, setIsSheetVisible ] = useState( false );
+}) => {
+	const shouldRequestReview = useRef(false);
+	const [isSheetVisible, setIsSheetVisible] = useState(false);
 
-	const { postType } = useSelect( ( select ) => ( {
-		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
-	} ) );
+	const { postType } = useSelect((select) => ({
+		postType: select(editorStore).getEditedPostAttribute('type'),
+	}));
 
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
-		styles[ 'embed__container--dark' ]
+		styles['embed__container--dark']
 	);
 	const labelStyle = usePreferredColorSchemeStyle(
 		styles.embed__label,
-		styles[ 'embed__label--dark' ]
+		styles['embed__label--dark']
 	);
 	const descriptionStyle = usePreferredColorSchemeStyle(
 		styles.embed__description,
-		styles[ 'embed__description--dark' ]
+		styles['embed__description--dark']
 	);
 	const helpIconStyle = usePreferredColorSchemeStyle(
-		styles[ 'embed-no-preview__help-icon' ],
-		styles[ 'embed-no-preview__help-icon--dark' ]
+		styles['embed-no-preview__help-icon'],
+		styles['embed-no-preview__help-icon--dark']
 	);
 
 	const sheetIconStyle = usePreferredColorSchemeStyle(
-		styles[ 'embed-no-preview__sheet-icon' ],
-		styles[ 'embed-no-preview__sheet-icon--dark' ]
+		styles['embed-no-preview__sheet-icon'],
+		styles['embed-no-preview__sheet-icon--dark']
 	);
 	const sheetTitleStyle = usePreferredColorSchemeStyle(
-		styles[ 'embed-no-preview__sheet-title' ],
-		styles[ 'embed-no-preview__sheet-title--dark' ]
+		styles['embed-no-preview__sheet-title'],
+		styles['embed-no-preview__sheet-title--dark']
 	);
 	const sheetDescriptionStyle = usePreferredColorSchemeStyle(
-		styles[ 'embed-no-preview__sheet-description' ],
-		styles[ 'embed-no-preview__sheet-description--dark' ]
+		styles['embed-no-preview__sheet-description'],
+		styles['embed-no-preview__sheet-description--dark']
 	);
 	const sheetButtonStyle = usePreferredColorSchemeStyle(
-		styles[ 'embed-no-preview__sheet-button' ],
-		styles[ 'embed-no-preview__sheet-button--dark' ]
+		styles['embed-no-preview__sheet-button'],
+		styles['embed-no-preview__sheet-button--dark']
 	);
 
 	const previewButtonA11yHint =
 		postType === 'page'
-			? __( 'Double tap to preview page.' )
-			: __( 'Double tap to preview post.' );
+			? __('Double tap to preview page.')
+			: __('Double tap to preview post.');
 	const previewButtonText =
-		postType === 'page' ? __( 'Preview page' ) : __( 'Preview post' );
+		postType === 'page' ? __('Preview page') : __('Preview post');
 	const comingSoonDescription =
 		postType === 'page'
 			? sprintf(
@@ -96,17 +96,17 @@ const EmbedNoPreview = ( {
 			  );
 
 	function onOpenSheet() {
-		setIsSheetVisible( true );
+		setIsSheetVisible(true);
 	}
 
 	function onCloseSheet() {
-		setIsSheetVisible( false );
+		setIsSheetVisible(false);
 	}
 
 	function onDismissSheet() {
 		// The preview request has to be done after the bottom sheet modal is dismissed,
 		// otherwise the preview native modal is not displayed.
-		if ( shouldRequestReview.current ) {
+		if (shouldRequestReview.current) {
 			requestPreview();
 		}
 		shouldRequestReview.current = false;
@@ -124,84 +124,84 @@ const EmbedNoPreview = ( {
 	const embedNoProviderPreview = (
 		<>
 			<TouchableWithoutFeedback
-				accessibilityRole={ 'button' }
-				accessibilityHint={ previewButtonA11yHint }
-				disabled={ ! isSelected }
-				onPress={ onPressContainer }
+				accessibilityRole={'button'}
+				accessibilityHint={previewButtonA11yHint}
+				disabled={!isSelected}
+				onPress={onPressContainer}
 			>
-				<View style={ containerStyle }>
-					<BlockIcon icon={ icon } />
-					<Text style={ labelStyle }>{ label }</Text>
-					<Text style={ descriptionStyle }>
-						{ sprintf(
+				<View style={containerStyle}>
+					<BlockIcon icon={icon} />
+					<Text style={labelStyle}>{label}</Text>
+					<Text style={descriptionStyle}>
+						{sprintf(
 							// translators: %s: embed block variant's label e.g: "Twitter".
-							__( '%s previews not yet available' ),
+							__('%s previews not yet available'),
 							label
-						) }
+						)}
 					</Text>
-					<Text style={ styles.embed__action }>
-						{ previewButtonText.toUpperCase() }
+					<Text style={styles.embed__action}>
+						{previewButtonText.toUpperCase()}
 					</Text>
 					<TouchableOpacity
-						accessibilityHint={ __( 'Tap here to show help' ) }
-						accessibilityLabel={ __( 'Help button' ) }
-						accessibilityRole={ 'button' }
-						disabled={ ! isSelected }
-						onPress={ onPressHelp }
-						style={ helpIconStyle }
+						accessibilityHint={__('Tap here to show help')}
+						accessibilityLabel={__('Help button')}
+						accessibilityRole={'button'}
+						disabled={!isSelected}
+						onPress={onPressHelp}
+						style={helpIconStyle}
 					>
 						<Icon
-							icon={ help }
-							fill={ helpIconStyle.fill }
-							size={ helpIconStyle.width }
+							icon={help}
+							fill={helpIconStyle.fill}
+							size={helpIconStyle.width}
 						/>
 					</TouchableOpacity>
 				</View>
 			</TouchableWithoutFeedback>
 			<BottomSheet
-				isVisible={ isSheetVisible }
+				isVisible={isSheetVisible}
 				hideHeader
-				onDismiss={ onDismissSheet }
-				onClose={ onCloseSheet }
+				onDismiss={onDismissSheet}
+				onClose={onCloseSheet}
 				testID="embed-no-preview-modal"
 			>
-				<View style={ styles[ 'embed-no-preview__container' ] }>
-					<View style={ sheetIconStyle }>
+				<View style={styles['embed-no-preview__container']}>
+					<View style={sheetIconStyle}>
 						<Icon
-							icon={ help }
-							fill={ sheetIconStyle.fill }
-							size={ sheetIconStyle.width }
+							icon={help}
+							fill={sheetIconStyle.fill}
+							size={sheetIconStyle.width}
 						/>
 					</View>
-					<Text style={ sheetTitleStyle }>
-						{ isDefaultEmbedInfo
-							? __( 'Embed block previews are coming soon' )
+					<Text style={sheetTitleStyle}>
+						{isDefaultEmbedInfo
+							? __('Embed block previews are coming soon')
 							: sprintf(
 									// translators: %s: embed block variant's label e.g: "Twitter".
 									__(
 										'%s embed block previews are coming soon'
 									),
 									label
-							  ) }
+							  )}
 					</Text>
-					<Text style={ sheetDescriptionStyle }>
-						{ comingSoonDescription }
+					<Text style={sheetDescriptionStyle}>
+						{comingSoonDescription}
 					</Text>
 				</View>
 				<TextControl
-					label={ previewButtonText }
+					label={previewButtonText}
 					separatorType="topFullWidth"
-					onPress={ () => {
+					onPress={() => {
 						shouldRequestReview.current = true;
 						onCloseSheet();
-					} }
-					labelStyle={ sheetButtonStyle }
+					}}
+					labelStyle={sheetButtonStyle}
 				/>
 				<TextControl
-					label={ __( 'Dismiss' ) }
+					label={__('Dismiss')}
 					separatorType="topFullWidth"
-					onPress={ onCloseSheet }
-					labelStyle={ sheetButtonStyle }
+					onPress={onCloseSheet}
+					labelStyle={sheetButtonStyle}
 				/>
 			</BottomSheet>
 		</>
@@ -209,16 +209,14 @@ const EmbedNoPreview = ( {
 
 	return (
 		<>
-			{ previewable ? (
+			{previewable ? (
 				embedNoProviderPreview
 			) : (
-				<View style={ containerStyle }>
-					<BlockIcon icon={ icon } />
-					<Text style={ labelStyle }>
-						{ __( 'No preview available' ) }
-					</Text>
+				<View style={containerStyle}>
+					<BlockIcon icon={icon} />
+					<Text style={labelStyle}>{__('No preview available')}</Text>
 				</View>
-			) }
+			)}
 		</>
 	);
 };

@@ -30,7 +30,7 @@ Let's render a customized greeting into an empty element:
 ```html
 <div id="greeting"></div>
 <script>
-	function Greeting( props ) {
+	function Greeting(props) {
 		return wp.element.createElement(
 			'span',
 			null,
@@ -39,8 +39,8 @@ Let's render a customized greeting into an empty element:
 	}
 
 	wp.element.render(
-		wp.element.createElement( Greeting, { toWhom: 'World' } ),
-		document.getElementById( 'greeting' )
+		wp.element.createElement(Greeting, { toWhom: 'World' }),
+		document.getElementById('greeting')
 	);
 </script>
 ```
@@ -277,12 +277,10 @@ _Usage_
 ```js
 import { Platform } from '@wordpress/element';
 
-const placeholderLabel = Platform.select( {
-	native: __( 'Add media' ),
-	web: __(
-		'Drag images, upload new ones or select files from your library.'
-	),
-} );
+const placeholderLabel = Platform.select({
+	native: __('Add media'),
+	web: __('Drag images, upload new ones or select files from your library.'),
+});
 ```
 
 ### RawHTML

@@ -28,7 +28,7 @@ _Usage_
 
 ```js
 import { autop } from '@wordpress/autop';
-autop( 'my text' ); // "<p>my text</p>"
+autop('my text'); // "<p>my text</p>"
 ```
 
 _Parameters_
@@ -51,7 +51,7 @@ _Usage_
 
 ```js
 import { removep } from '@wordpress/autop';
-removep( '<p>my text</p>' ); // "my text"
+removep('<p>my text</p>'); // "my text"
 ```
 
 _Parameters_

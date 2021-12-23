@@ -30,45 +30,45 @@ const selectIcon = (
 	</SVG>
 );
 
-function ToolSelector( props, ref ) {
+function ToolSelector(props, ref) {
 	const isNavigationTool = useSelect(
-		( select ) => select( blockEditorStore ).isNavigationMode(),
+		(select) => select(blockEditorStore).isNavigationMode(),
 		[]
 	);
-	const { setNavigationMode } = useDispatch( blockEditorStore );
+	const { setNavigationMode } = useDispatch(blockEditorStore);
 
-	const onSwitchMode = ( mode ) => {
-		setNavigationMode( mode === 'edit' ? false : true );
+	const onSwitchMode = (mode) => {
+		setNavigationMode(mode === 'edit' ? false : true);
 	};
 
 	return (
 		<Dropdown
-			renderToggle={ ( { isOpen, onToggle } ) => (
+			renderToggle={({ isOpen, onToggle }) => (
 				<Button
-					{ ...props }
-					ref={ ref }
-					icon={ isNavigationTool ? selectIcon : editIcon }
-					aria-expanded={ isOpen }
+					{...props}
+					ref={ref}
+					icon={isNavigationTool ? selectIcon : editIcon}
+					aria-expanded={isOpen}
 					aria-haspopup="true"
-					onClick={ onToggle }
+					onClick={onToggle}
 					/* translators: button label text should, if possible, be under 16 characters. */
-					label={ __( 'Tools' ) }
+					label={__('Tools')}
 				/>
-			) }
+			)}
 			position="bottom right"
-			renderContent={ () => (
+			renderContent={() => (
 				<>
-					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
+					<NavigableMenu role="menu" aria-label={__('Tools')}>
 						<MenuItemsChoice
-							value={ isNavigationTool ? 'select' : 'edit' }
-							onSelect={ onSwitchMode }
-							choices={ [
+							value={isNavigationTool ? 'select' : 'edit'}
+							onSelect={onSwitchMode}
+							choices={[
 								{
 									value: 'edit',
 									label: (
 										<>
-											<Icon icon={ editIcon } />
-											{ __( 'Edit' ) }
+											<Icon icon={editIcon} />
+											{__('Edit')}
 										</>
 									),
 								},
@@ -76,23 +76,23 @@ function ToolSelector( props, ref ) {
 									value: 'select',
 									label: (
 										<>
-											{ selectIcon }
-											{ __( 'Select' ) }
+											{selectIcon}
+											{__('Select')}
 										</>
 									),
 								},
-							] }
+							]}
 						/>
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
-						{ __(
+						{__(
 							'Tools provide different interactions for selecting, navigating, and editing blocks. Toggle between select and edit by pressing Escape and Enter.'
-						) }
+						)}
 					</div>
 				</>
-			) }
+			)}
 		/>
 	);
 }
 
-export default forwardRef( ToolSelector );
+export default forwardRef(ToolSelector);

@@ -13,8 +13,8 @@ import { SlotFillProvider } from '@wordpress/components';
  */
 import PluginPostStatusInfo from '../';
 
-describe( 'PluginPostStatusInfo', () => {
-	test( 'renders fill properly', () => {
+describe('PluginPostStatusInfo', () => {
+	test('renders fill properly', () => {
 		const tree = ReactTestRenderer.create(
 			<SlotFillProvider>
 				<PluginPostStatusInfo className="my-plugin-post-status-info">
@@ -24,6 +24,6 @@ describe( 'PluginPostStatusInfo', () => {
 			</SlotFillProvider>
 		).toJSON();
 
-		expect( tree ).toMatchSnapshot();
-	} );
-} );
+		expect(tree).toMatchSnapshot();
+	});
+});

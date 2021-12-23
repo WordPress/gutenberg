@@ -32,19 +32,19 @@ const textContentSchema = {
 	s: {},
 	del: {},
 	ins: {},
-	a: { attributes: [ 'href', 'target', 'rel', 'id' ] },
+	a: { attributes: ['href', 'target', 'rel', 'id'] },
 	code: {},
-	abbr: { attributes: [ 'title' ] },
+	abbr: { attributes: ['title'] },
 	sub: {},
 	sup: {},
 	br: {},
 	small: {},
 	// To do: fix blockquote.
 	// cite: {},
-	q: { attributes: [ 'cite' ] },
-	dfn: { attributes: [ 'title' ] },
-	data: { attributes: [ 'value' ] },
-	time: { attributes: [ 'datetime' ] },
+	q: { attributes: ['cite'] },
+	dfn: { attributes: ['title'] },
+	data: { attributes: ['value'] },
+	time: { attributes: ['datetime'] },
 	var: {},
 	samp: {},
 	kbd: {},
@@ -55,8 +55,8 @@ const textContentSchema = {
 	ruby: {},
 	rt: {},
 	rp: {},
-	bdi: { attributes: [ 'dir' ] },
-	bdo: { attributes: [ 'dir' ] },
+	bdi: { attributes: ['dir'] },
+	bdo: { attributes: ['dir'] },
 	wbr: {},
 	'#text': {},
 };
@@ -64,9 +64,9 @@ const textContentSchema = {
 // Recursion is needed.
 // Possible: strong > em > strong.
 // Impossible: strong > strong.
-without( Object.keys( textContentSchema ), '#text', 'br' ).forEach( ( tag ) => {
-	textContentSchema[ tag ].children = omit( textContentSchema, tag );
-} );
+without(Object.keys(textContentSchema), '#text', 'br').forEach((tag) => {
+	textContentSchema[tag].children = omit(textContentSchema, tag);
+});
 
 /**
  * Embedded content elements.
@@ -86,8 +86,8 @@ const embeddedContentSchema = {
 			'muted',
 		],
 	},
-	canvas: { attributes: [ 'width', 'height' ] },
-	embed: { attributes: [ 'src', 'type', 'width', 'height' ] },
+	canvas: { attributes: ['width', 'height'] },
+	embed: { attributes: ['src', 'type', 'width', 'height'] },
 	img: {
 		attributes: [
 			'alt',
@@ -146,8 +146,8 @@ const phrasingContentSchema = {
  *
  * @return {Partial<ContentSchema>} Schema.
  */
-export function getPhrasingContentSchema( context ) {
-	if ( context !== 'paste' ) {
+export function getPhrasingContentSchema(context) {
+	if (context !== 'paste') {
 		return phrasingContentSchema;
 	}
 
@@ -180,16 +180,16 @@ export function getPhrasingContentSchema( context ) {
  *
  * @return {boolean} True if phrasing content, false if not.
  */
-export function isPhrasingContent( node ) {
+export function isPhrasingContent(node) {
 	const tag = node.nodeName.toLowerCase();
-	return getPhrasingContentSchema().hasOwnProperty( tag ) || tag === 'span';
+	return getPhrasingContentSchema().hasOwnProperty(tag) || tag === 'span';
 }
 
 /**
  * @param {Node} node
  * @return {boolean} Node is text content
  */
-export function isTextContent( node ) {
+export function isTextContent(node) {
 	const tag = node.nodeName.toLowerCase();
-	return textContentSchema.hasOwnProperty( tag ) || tag === 'span';
+	return textContentSchema.hasOwnProperty(tag) || tag === 'span';
 }

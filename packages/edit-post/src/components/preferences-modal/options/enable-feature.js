@@ -11,13 +11,13 @@ import BaseOption from './base';
 import { store as editPostStore } from '../../../store';
 
 export default compose(
-	withSelect( ( select, { featureName } ) => {
-		const { isFeatureActive } = select( editPostStore );
+	withSelect((select, { featureName }) => {
+		const { isFeatureActive } = select(editPostStore);
 		return {
-			isChecked: isFeatureActive( featureName ),
+			isChecked: isFeatureActive(featureName),
 		};
-	} ),
-	withDispatch( ( dispatch, { featureName } ) => ( {
-		onChange: () => dispatch( editPostStore ).toggleFeature( featureName ),
-	} ) )
-)( BaseOption );
+	}),
+	withDispatch((dispatch, { featureName }) => ({
+		onChange: () => dispatch(editPostStore).toggleFeature(featureName),
+	}))
+)(BaseOption);

@@ -33,9 +33,9 @@ const ctx1 = {};
 const ctx2 = {};
 
 // For a given context in the queue, only the last callback is executed.
-queue.add( ctx1, () => console.log( 'This will be printed first' ) );
-queue.add( ctx2, () => console.log( "This won't be printed" ) );
-queue.add( ctx2, () => console.log( 'This will be printed second' ) );
+queue.add(ctx1, () => console.log('This will be printed first'));
+queue.add(ctx2, () => console.log("This won't be printed"));
+queue.add(ctx2, () => console.log('This will be printed second'));
 ```
 
 _Returns_

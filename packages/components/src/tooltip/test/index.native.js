@@ -16,88 +16,88 @@ import { SlotFillProvider } from '@wordpress/components';
 import Tooltip from '../index';
 
 // Minimal tree to render tooltip
-const TooltipSlot = ( { children } ) => (
+const TooltipSlot = ({ children }) => (
 	<SlotFillProvider>
-		<Tooltip.Slot>{ children }</Tooltip.Slot>
+		<Tooltip.Slot>{children}</Tooltip.Slot>
 	</SlotFillProvider>
 );
 
 let keyboardAddListenerSpy;
 const keyboardHandlers = [];
 
-beforeAll( () => {
+beforeAll(() => {
 	keyboardAddListenerSpy = jest
-		.spyOn( Keyboard, 'addListener' )
-		.mockImplementation( ( event, handler ) => {
-			const length = keyboardHandlers.push( [ event, handler ] );
+		.spyOn(Keyboard, 'addListener')
+		.mockImplementation((event, handler) => {
+			const length = keyboardHandlers.push([event, handler]);
 			return {
 				remove: () => {
-					keyboardHandlers.splice( length - 1 );
+					keyboardHandlers.splice(length - 1);
 				},
 			};
-		} );
-} );
+		});
+});
 
-afterAll( () => {
+afterAll(() => {
 	keyboardAddListenerSpy.mockRestore();
-} );
+});
 
-it( 'displays the message', () => {
+it('displays the message', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible={true} text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>
 	);
 
-	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
-} );
+	expect(screen.getByText('A helpful message')).toBeTruthy();
+});
 
-it( 'dismisses when the screen is tapped', () => {
+it('dismisses when the screen is tapped', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible={true} text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>
 	);
 
-	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
+	expect(screen.getByText('A helpful message')).toBeTruthy();
 
-	fireEvent( screen.getByTestId( 'tooltip-overlay' ), 'touchStart' );
+	fireEvent(screen.getByTestId('tooltip-overlay'), 'touchStart');
 
-	expect( screen.queryByText( 'A helpful message' ) ).toBeNull();
-} );
+	expect(screen.queryByText('A helpful message')).toBeNull();
+});
 
-it( 'dismisses when the keyboard closes', () => {
+it('dismisses when the keyboard closes', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible={true} text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>
 	);
 
 	// Show keyboard
-	act( () => {
-		keyboardHandlers.forEach( ( [ event, handler ] ) => {
-			if ( event === 'keyboardDidShow' ) {
+	act(() => {
+		keyboardHandlers.forEach(([event, handler]) => {
+			if (event === 'keyboardDidShow') {
 				handler();
 			}
-		} );
-	} );
+		});
+	});
 
-	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
+	expect(screen.getByText('A helpful message')).toBeTruthy();
 
 	// Hide keyboard
-	act( () => {
-		keyboardHandlers.forEach( ( [ event, handler ] ) => {
-			if ( event === 'keyboardDidHide' ) {
+	act(() => {
+		keyboardHandlers.forEach(([event, handler]) => {
+			if (event === 'keyboardDidHide') {
 				handler();
 			}
-		} );
-	} );
+		});
+	});
 
-	expect( screen.queryByText( 'A helpful message' ) ).toBeNull();
-} );
+	expect(screen.queryByText('A helpful message')).toBeNull();
+});

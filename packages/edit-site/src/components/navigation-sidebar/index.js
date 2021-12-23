@@ -16,28 +16,26 @@ import NavigationToggle from './navigation-toggle';
 export const {
 	Fill: NavigationPanelPreviewFill,
 	Slot: NavigationPanelPreviewSlot,
-} = createSlotFill( 'EditSiteNavigationPanelPreview' );
+} = createSlotFill('EditSiteNavigationPanelPreview');
 
-const {
-	Fill: NavigationSidebarFill,
-	Slot: NavigationSidebarSlot,
-} = createSlotFill( 'EditSiteNavigationSidebar' );
+const { Fill: NavigationSidebarFill, Slot: NavigationSidebarSlot } =
+	createSlotFill('EditSiteNavigationSidebar');
 
-function NavigationSidebar( { isDefaultOpen = false, activeTemplateType } ) {
-	const isDesktopViewport = useViewportMatch( 'medium' );
-	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+function NavigationSidebar({ isDefaultOpen = false, activeTemplateType }) {
+	const isDesktopViewport = useViewportMatch('medium');
+	const { setIsNavigationPanelOpened } = useDispatch(editSiteStore);
 
 	useEffect(
 		function autoOpenNavigationPanelOnViewportChange() {
-			setIsNavigationPanelOpened( isDefaultOpen && isDesktopViewport );
+			setIsNavigationPanelOpened(isDefaultOpen && isDesktopViewport);
 		},
-		[ isDefaultOpen, isDesktopViewport, setIsNavigationPanelOpened ]
+		[isDefaultOpen, isDesktopViewport, setIsNavigationPanelOpened]
 	);
 
 	return (
 		<NavigationSidebarFill>
 			<NavigationToggle />
-			<NavigationPanel activeItem={ activeTemplateType } />
+			<NavigationPanel activeItem={activeTemplateType} />
 			<NavigationPanelPreviewSlot />
 		</NavigationSidebarFill>
 	);

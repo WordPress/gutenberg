@@ -21,16 +21,16 @@ import type { HigherOrderComponent } from '../../utils/create-higher-order-compo
  *
  * @return Higher-order component.
  */
-const ifCondition = < TProps, >(
-	predicate: ( props: TProps ) => boolean
-): HigherOrderComponent< TProps, TProps > =>
+const ifCondition = <TProps,>(
+	predicate: (props: TProps) => boolean
+): HigherOrderComponent<TProps, TProps> =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props: TProps ) => {
-			if ( ! predicate( props ) ) {
+		(WrappedComponent) => (props: TProps) => {
+			if (!predicate(props)) {
 				return null;
 			}
 
-			return <WrappedComponent { ...props } />;
+			return <WrappedComponent {...props} />;
 		},
 		'ifCondition'
 	);

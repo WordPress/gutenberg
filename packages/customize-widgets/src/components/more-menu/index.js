@@ -24,12 +24,10 @@ const POPOVER_PROPS = {
 };
 
 export default function MoreMenu() {
-	const [
-		isKeyboardShortcutsModalActive,
-		setIsKeyboardShortcutsModalVisible,
-	] = useState( false );
+	const [isKeyboardShortcutsModalActive, setIsKeyboardShortcutsModalVisible] =
+		useState(false);
 	const toggleKeyboardShortcutsModal = () =>
-		setIsKeyboardShortcutsModalVisible( ! isKeyboardShortcutsModalActive );
+		setIsKeyboardShortcutsModalVisible(!isKeyboardShortcutsModalActive);
 
 	useShortcut(
 		'core/customize-widgets/keyboard-shortcuts',
@@ -39,84 +37,80 @@ export default function MoreMenu() {
 	return (
 		<>
 			<MoreMenuDropdown
-				as={ ToolbarDropdownMenu }
+				as={ToolbarDropdownMenu}
 				className="customize-widgets-more-menu"
-				popoverProps={ POPOVER_PROPS }
+				popoverProps={POPOVER_PROPS}
 			>
-				{ () => (
+				{() => (
 					<>
-						<MenuGroup label={ _x( 'View', 'noun' ) }>
+						<MenuGroup label={_x('View', 'noun')}>
 							<MoreMenuFeatureToggle
 								scope="core/customize-widgets"
 								feature="fixedToolbar"
-								label={ __( 'Top toolbar' ) }
-								info={ __(
+								label={__('Top toolbar')}
+								info={__(
 									'Access all block and document tools in a single place'
-								) }
-								messageActivated={ __(
-									'Top toolbar activated'
-								) }
-								messageDeactivated={ __(
+								)}
+								messageActivated={__('Top toolbar activated')}
+								messageDeactivated={__(
 									'Top toolbar deactivated'
-								) }
+								)}
 							/>
 						</MenuGroup>
-						<MenuGroup label={ __( 'Tools' ) }>
+						<MenuGroup label={__('Tools')}>
 							<MenuItem
-								onClick={ () => {
-									setIsKeyboardShortcutsModalVisible( true );
-								} }
-								shortcut={ displayShortcut.access( 'h' ) }
+								onClick={() => {
+									setIsKeyboardShortcutsModalVisible(true);
+								}}
+								shortcut={displayShortcut.access('h')}
 							>
-								{ __( 'Keyboard shortcuts' ) }
+								{__('Keyboard shortcuts')}
 							</MenuItem>
 							<MoreMenuFeatureToggle
 								scope="core/customize-widgets"
 								feature="welcomeGuide"
-								label={ __( 'Welcome Guide' ) }
+								label={__('Welcome Guide')}
 							/>
 							<MenuItem
 								role="menuitem"
-								icon={ external }
-								href={ __(
+								icon={external}
+								href={__(
 									'https://wordpress.org/support/article/block-based-widgets-editor/'
-								) }
+								)}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{ __( 'Help' ) }
+								{__('Help')}
 								<VisuallyHidden as="span">
 									{
 										/* translators: accessibility text */
-										__( '(opens in a new tab)' )
+										__('(opens in a new tab)')
 									}
 								</VisuallyHidden>
 							</MenuItem>
 						</MenuGroup>
-						<MenuGroup label={ __( 'Preferences' ) }>
+						<MenuGroup label={__('Preferences')}>
 							<MoreMenuFeatureToggle
 								scope="core/customize-widgets"
 								feature="keepCaretInsideBlock"
-								label={ __(
-									'Contain text cursor inside block'
-								) }
-								info={ __(
+								label={__('Contain text cursor inside block')}
+								info={__(
 									'Aids screen readers by stopping text caret from leaving blocks.'
-								) }
-								messageActivated={ __(
+								)}
+								messageActivated={__(
 									'Contain text cursor inside block activated'
-								) }
-								messageDeactivated={ __(
+								)}
+								messageDeactivated={__(
 									'Contain text cursor inside block deactivated'
-								) }
+								)}
 							/>
 						</MenuGroup>
 					</>
-				) }
+				)}
 			</MoreMenuDropdown>
 			<KeyboardShortcutHelpModal
-				isModalActive={ isKeyboardShortcutsModalActive }
-				toggleModal={ toggleKeyboardShortcutsModal }
+				isModalActive={isKeyboardShortcutsModalActive}
+				toggleModal={toggleKeyboardShortcutsModal}
 			/>
 		</>
 	);

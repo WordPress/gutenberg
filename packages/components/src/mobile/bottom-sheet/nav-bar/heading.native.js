@@ -13,19 +13,19 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-function Heading( { children } ) {
+function Heading({ children }) {
 	const headingStyle = usePreferredColorSchemeStyle(
 		styles.heading,
-		styles[ 'heading-dark' ]
+		styles['heading-dark']
 	);
 
 	return (
 		<Text
 			accessibilityRole="header"
-			style={ headingStyle }
-			maxFontSizeMultiplier={ 3 }
+			style={headingStyle}
+			maxFontSizeMultiplier={3}
 		>
-			{ children }
+			{children}
 		</Text>
 	);
 }

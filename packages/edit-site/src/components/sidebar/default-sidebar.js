@@ -6,7 +6,7 @@ import {
 	ComplementaryAreaMoreMenuItem,
 } from '@wordpress/interface';
 
-export default function DefaultSidebar( {
+export default function DefaultSidebar({
 	className,
 	identifier,
 	title,
@@ -16,28 +16,28 @@ export default function DefaultSidebar( {
 	header,
 	headerClassName,
 	panelClassName,
-} ) {
+}) {
 	return (
 		<>
 			<ComplementaryArea
-				className={ className }
+				className={className}
 				scope="core/edit-site"
-				identifier={ identifier }
-				title={ title }
-				icon={ icon }
-				closeLabel={ closeLabel }
-				header={ header }
-				headerClassName={ headerClassName }
-				panelClassName={ panelClassName }
+				identifier={identifier}
+				title={title}
+				icon={icon}
+				closeLabel={closeLabel}
+				header={header}
+				headerClassName={headerClassName}
+				panelClassName={panelClassName}
 			>
-				{ children }
+				{children}
 			</ComplementaryArea>
 			<ComplementaryAreaMoreMenuItem
 				scope="core/edit-site"
-				identifier={ identifier }
-				icon={ icon }
+				identifier={identifier}
+				icon={icon}
 			>
-				{ title }
+				{title}
 			</ComplementaryAreaMoreMenuItem>
 		</>
 	);

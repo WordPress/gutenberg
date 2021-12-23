@@ -21,25 +21,25 @@ import {
  */
 import styles from './styles.scss';
 
-const BottomSheetTextControl = ( {
+const BottomSheetTextControl = ({
 	initialValue,
 	onChange,
 	placeholder,
 	label,
 	icon,
 	footerNote,
-} ) => {
-	const [ showSubSheet, setShowSubSheet ] = useState( false );
+}) => {
+	const [showSubSheet, setShowSubSheet] = useState(false);
 	const navigation = useNavigation();
 
 	const goBack = () => {
-		setShowSubSheet( false );
+		setShowSubSheet(false);
 		navigation.goBack();
 	};
 
 	const openSubSheet = () => {
-		navigation.navigate( BottomSheet.SubSheet.screenName );
-		setShowSubSheet( true );
+		navigation.navigate(BottomSheet.SubSheet.screenName);
+		setShowSubSheet(true);
 	};
 
 	const horizontalBorderStyle = usePreferredColorSchemeStyle(
@@ -56,46 +56,43 @@ const BottomSheetTextControl = ( {
 		<BottomSheet.SubSheet
 			navigationButton={
 				<BottomSheet.Cell
-					icon={ icon }
-					placeholder={ placeholder }
-					label={ label }
-					onPress={ openSubSheet }
-					value={ initialValue || '' }
+					icon={icon}
+					placeholder={placeholder}
+					label={label}
+					onPress={openSubSheet}
+					value={initialValue || ''}
 				>
-					<Icon icon={ chevronRight }></Icon>
+					<Icon icon={chevronRight}></Icon>
 				</BottomSheet.Cell>
 			}
-			showSheet={ showSubSheet }
+			showSheet={showSubSheet}
 		>
 			<>
 				<BottomSheet.NavBar>
-					<BottomSheet.NavBar.BackButton onPress={ goBack } />
+					<BottomSheet.NavBar.BackButton onPress={goBack} />
 					<BottomSheet.NavBar.Heading>
-						{ label }
+						{label}
 					</BottomSheet.NavBar.Heading>
 				</BottomSheet.NavBar>
-				<PanelBody style={ horizontalBorderStyle }>
+				<PanelBody style={horizontalBorderStyle}>
 					<TextInput
-						label={ label }
-						onChangeText={ ( text ) => onChange( text ) }
-						defaultValue={ initialValue }
-						multiline={ true }
-						placeholder={ placeholder }
-						placeholderTextColor={ '#87a6bc' }
-						style={ textEditorStyle }
-						textAlignVertical={ 'top' }
+						label={label}
+						onChangeText={(text) => onChange(text)}
+						defaultValue={initialValue}
+						multiline={true}
+						placeholder={placeholder}
+						placeholderTextColor={'#87a6bc'}
+						style={textEditorStyle}
+						textAlignVertical={'top'}
 					/>
 				</PanelBody>
 			</>
 
-			{ footerNote && (
-				<PanelBody style={ styles.textFooternote }>
-					<FooterMessageControl
-						label={ footerNote }
-						textAlign="left"
-					/>
+			{footerNote && (
+				<PanelBody style={styles.textFooternote}>
+					<FooterMessageControl label={footerNote} textAlign="left" />
 				</PanelBody>
-			) }
+			)}
 		</BottomSheet.SubSheet>
 	);
 };

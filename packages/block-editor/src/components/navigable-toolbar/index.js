@@ -13,27 +13,27 @@ import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
-function hasOnlyToolbarItem( elements ) {
+function hasOnlyToolbarItem(elements) {
 	const dataProp = 'toolbarItem';
-	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
+	return !elements.some((element) => !(dataProp in element.dataset));
 }
 
-function getAllToolbarItemsIn( container ) {
-	return Array.from( container.querySelectorAll( '[data-toolbar-item]' ) );
+function getAllToolbarItemsIn(container) {
+	return Array.from(container.querySelectorAll('[data-toolbar-item]'));
 }
 
-function hasFocusWithin( container ) {
-	return container.contains( container.ownerDocument.activeElement );
+function hasFocusWithin(container) {
+	return container.contains(container.ownerDocument.activeElement);
 }
 
-function focusFirstTabbableIn( container ) {
-	const [ firstTabbable ] = focus.tabbable.find( container );
-	if ( firstTabbable ) {
+function focusFirstTabbableIn(container) {
+	const [firstTabbable] = focus.tabbable.find(container);
+	if (firstTabbable) {
 		firstTabbable.focus();
 	}
 }
 
-function useIsAccessibleToolbar( ref ) {
+function useIsAccessibleToolbar(ref) {
 	/*
 	 * By default, we'll assume the starting accessible state of the Toolbar
 	 * is true, as it seems to be the most common case.
@@ -52,34 +52,33 @@ function useIsAccessibleToolbar( ref ) {
 	// inside the toolbar are ToolbarItem components (or derived components like
 	// ToolbarButton), then we can wrap them with the accessible Toolbar
 	// component.
-	const [ isAccessibleToolbar, setIsAccessibleToolbar ] = useState(
+	const [isAccessibleToolbar, setIsAccessibleToolbar] = useState(
 		initialAccessibleToolbarState
 	);
 
-	const determineIsAccessibleToolbar = useCallback( () => {
-		const tabbables = focus.tabbable.find( ref.current );
-		const onlyToolbarItem = hasOnlyToolbarItem( tabbables );
-		if ( ! onlyToolbarItem ) {
-			deprecated( 'Using custom components as toolbar controls', {
+	const determineIsAccessibleToolbar = useCallback(() => {
+		const tabbables = focus.tabbable.find(ref.current);
+		const onlyToolbarItem = hasOnlyToolbarItem(tabbables);
+		if (!onlyToolbarItem) {
+			deprecated('Using custom components as toolbar controls', {
 				since: '5.6',
 				alternative:
 					'ToolbarItem, ToolbarButton or ToolbarDropdownMenu components',
-				link:
-					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
-			} );
+				link: 'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
+			});
 		}
-		setIsAccessibleToolbar( onlyToolbarItem );
-	}, [] );
+		setIsAccessibleToolbar(onlyToolbarItem);
+	}, []);
 
-	useLayoutEffect( () => {
+	useLayoutEffect(() => {
 		// Toolbar buttons may be rendered asynchronously, so we use
 		// MutationObserver to check if the toolbar subtree has been modified
 		const observer = new window.MutationObserver(
 			determineIsAccessibleToolbar
 		);
-		observer.observe( ref.current, { childList: true, subtree: true } );
+		observer.observe(ref.current, { childList: true, subtree: true });
 		return () => observer.disconnect();
-	}, [ isAccessibleToolbar ] );
+	}, [isAccessibleToolbar]);
 
 	return isAccessibleToolbar;
 }
@@ -92,58 +91,58 @@ function useToolbarFocus(
 	onIndexChange
 ) {
 	// Make sure we don't use modified versions of this prop
-	const [ initialFocusOnMount ] = useState( focusOnMount );
-	const [ initialIndex ] = useState( defaultIndex );
+	const [initialFocusOnMount] = useState(focusOnMount);
+	const [initialIndex] = useState(defaultIndex);
 
-	const focusToolbar = useCallback( () => {
-		focusFirstTabbableIn( ref.current );
-	}, [] );
+	const focusToolbar = useCallback(() => {
+		focusFirstTabbableIn(ref.current);
+	}, []);
 
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible
-	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar );
+	useShortcut('core/block-editor/focus-toolbar', focusToolbar);
 
-	useEffect( () => {
-		if ( initialFocusOnMount ) {
+	useEffect(() => {
+		if (initialFocusOnMount) {
 			focusToolbar();
 		}
-	}, [ isAccessibleToolbar, initialFocusOnMount, focusToolbar ] );
+	}, [isAccessibleToolbar, initialFocusOnMount, focusToolbar]);
 
-	useEffect( () => {
+	useEffect(() => {
 		// If initialIndex is passed, we focus on that toolbar item when the
 		// toolbar gets mounted and initial focus is not forced.
 		// We have to wait for the next browser paint because block controls aren't
 		// rendered right away when the toolbar gets mounted.
 		let raf = 0;
-		if ( initialIndex && ! initialFocusOnMount ) {
-			raf = window.requestAnimationFrame( () => {
-				const items = getAllToolbarItemsIn( ref.current );
+		if (initialIndex && !initialFocusOnMount) {
+			raf = window.requestAnimationFrame(() => {
+				const items = getAllToolbarItemsIn(ref.current);
 				const index = initialIndex || 0;
-				if ( items[ index ] && hasFocusWithin( ref.current ) ) {
-					items[ index ].focus();
+				if (items[index] && hasFocusWithin(ref.current)) {
+					items[index].focus();
 				}
-			} );
+			});
 		}
 		return () => {
-			window.cancelAnimationFrame( raf );
-			if ( ! onIndexChange || ! ref.current ) return;
+			window.cancelAnimationFrame(raf);
+			if (!onIndexChange || !ref.current) return;
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
-			const items = getAllToolbarItemsIn( ref.current );
-			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
-			onIndexChange( index );
+			const items = getAllToolbarItemsIn(ref.current);
+			const index = items.findIndex((item) => item.tabIndex === 0);
+			onIndexChange(index);
 		};
-	}, [ initialIndex, initialFocusOnMount ] );
+	}, [initialIndex, initialFocusOnMount]);
 }
 
-function NavigableToolbar( {
+function NavigableToolbar({
 	children,
 	focusOnMount,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
 	...props
-} ) {
+}) {
 	const ref = useRef();
-	const isAccessibleToolbar = useIsAccessibleToolbar( ref );
+	const isAccessibleToolbar = useIsAccessibleToolbar(ref);
 
 	useToolbarFocus(
 		ref,
@@ -153,10 +152,10 @@ function NavigableToolbar( {
 		onIndexChange
 	);
 
-	if ( isAccessibleToolbar ) {
+	if (isAccessibleToolbar) {
 		return (
-			<Toolbar label={ props[ 'aria-label' ] } ref={ ref } { ...props }>
-				{ children }
+			<Toolbar label={props['aria-label']} ref={ref} {...props}>
+				{children}
 			</Toolbar>
 		);
 	}
@@ -165,10 +164,10 @@ function NavigableToolbar( {
 		<NavigableMenu
 			orientation="horizontal"
 			role="toolbar"
-			ref={ ref }
-			{ ...props }
+			ref={ref}
+			{...props}
 		>
-			{ children }
+			{children}
 		</NavigableMenu>
 	);
 }

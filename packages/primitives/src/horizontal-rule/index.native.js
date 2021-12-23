@@ -13,17 +13,17 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-const HR = ( { getStylesFromColorScheme, ...props } ) => {
-	const lineStyle = getStylesFromColorScheme( styles.line, styles.lineDark );
+const HR = ({ getStylesFromColorScheme, ...props }) => {
+	const lineStyle = getStylesFromColorScheme(styles.line, styles.lineDark);
 
 	return (
 		<Hr
-			{ ...props }
-			lineStyle={ [ lineStyle, props.lineStyle ] }
-			marginLeft={ 0 }
-			marginRight={ 0 }
+			{...props}
+			lineStyle={[lineStyle, props.lineStyle]}
+			marginLeft={0}
+			marginRight={0}
 		/>
 	);
 };
 
-export const HorizontalRule = withPreferredColorScheme( HR );
+export const HorizontalRule = withPreferredColorScheme(HR);

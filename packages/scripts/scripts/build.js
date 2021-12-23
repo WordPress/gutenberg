@@ -1,25 +1,25 @@
 /**
  * External dependencies
  */
-const { sync: spawn } = require( 'cross-spawn' );
-const { sync: resolveBin } = require( 'resolve-bin' );
+const { sync: spawn } = require('cross-spawn');
+const { sync: resolveBin } = require('resolve-bin');
 
 /**
  * Internal dependencies
  */
-const { getWebpackArgs, hasArgInCLI } = require( '../utils' );
+const { getWebpackArgs, hasArgInCLI } = require('../utils');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
-if ( hasArgInCLI( '--webpack-no-externals' ) ) {
+if (hasArgInCLI('--webpack-no-externals')) {
 	process.env.WP_NO_EXTERNALS = true;
 }
 
-if ( hasArgInCLI( '--webpack-bundle-analyzer' ) ) {
+if (hasArgInCLI('--webpack-bundle-analyzer')) {
 	process.env.WP_BUNDLE_ANALYZER = true;
 }
 
-const { status } = spawn( resolveBin( 'webpack' ), getWebpackArgs(), {
+const { status } = spawn(resolveBin('webpack'), getWebpackArgs(), {
 	stdio: 'inherit',
-} );
-process.exit( status );
+});
+process.exit(status);

@@ -20,7 +20,7 @@ import { useCx } from '../utils/hooks/use-cx';
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
-export default function useGrid( props ) {
+export default function useGrid(props) {
 	const {
 		align,
 		alignment,
@@ -35,27 +35,27 @@ export default function useGrid( props ) {
 		templateColumns,
 		templateRows,
 		...otherProps
-	} = useContextSystem( props, 'Grid' );
+	} = useContextSystem(props, 'Grid');
 
-	const columnsAsArray = Array.isArray( columns ) ? columns : [ columns ];
-	const column = useResponsiveValue( columnsAsArray );
-	const rowsAsArray = Array.isArray( rows ) ? rows : [ rows ];
-	const row = useResponsiveValue( rowsAsArray );
+	const columnsAsArray = Array.isArray(columns) ? columns : [columns];
+	const column = useResponsiveValue(columnsAsArray);
+	const rowsAsArray = Array.isArray(rows) ? rows : [rows];
+	const row = useResponsiveValue(rowsAsArray);
 
 	const gridTemplateColumns =
-		templateColumns || ( !! columns && `repeat( ${ column }, 1fr )` );
+		templateColumns || (!!columns && `repeat( ${column}, 1fr )`);
 	const gridTemplateRows =
-		templateRows || ( !! rows && `repeat( ${ row }, 1fr )` );
+		templateRows || (!!rows && `repeat( ${row}, 1fr )`);
 
 	const cx = useCx();
 
-	const classes = useMemo( () => {
-		const alignmentProps = getAlignmentProps( alignment );
+	const classes = useMemo(() => {
+		const alignmentProps = getAlignmentProps(alignment);
 
-		const gridClasses = css( {
+		const gridClasses = css({
 			alignItems: align,
 			display: isInline ? 'inline-grid' : 'grid',
-			gap: `calc( ${ CONFIG.gridBase } * ${ gap } )`,
+			gap: `calc( ${CONFIG.gridBase} * ${gap} )`,
 			gridTemplateColumns: gridTemplateColumns || undefined,
 			gridTemplateRows: gridTemplateRows || undefined,
 			gridRowGap: rowGap,
@@ -63,9 +63,9 @@ export default function useGrid( props ) {
 			justifyContent: justify,
 			verticalAlign: isInline ? 'middle' : undefined,
 			...alignmentProps,
-		} );
+		});
 
-		return cx( gridClasses, className );
+		return cx(gridClasses, className);
 	}, [
 		align,
 		alignment,
@@ -77,7 +77,7 @@ export default function useGrid( props ) {
 		isInline,
 		justify,
 		rowGap,
-	] );
+	]);
 
 	return { ...otherProps, className: classes };
 }

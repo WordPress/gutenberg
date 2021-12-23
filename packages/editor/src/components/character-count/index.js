@@ -11,9 +11,9 @@ import { store as editorStore } from '../../store';
 
 export default function CharacterCount() {
 	const content = useSelect(
-		( select ) => select( editorStore ).getEditedPostAttribute( 'content' ),
+		(select) => select(editorStore).getEditedPostAttribute('content'),
 		[]
 	);
 
-	return characterCount( content, 'characters_including_spaces' );
+	return characterCount(content, 'characters_including_spaces');
 }

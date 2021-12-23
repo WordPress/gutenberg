@@ -14,32 +14,32 @@ const linkSettingsScreens = {
 	linkPicker: 'linkPicker',
 };
 
-function LinkSettingsNavigation( props ) {
-	if ( ! props.withBottomSheet ) {
-		return <LinkSettingsScreen { ...props } />;
+function LinkSettingsNavigation(props) {
+	if (!props.withBottomSheet) {
+		return <LinkSettingsScreen {...props} />;
 	}
 	return (
 		<BottomSheet
-			isVisible={ props.isVisible }
-			onClose={ props.onClose }
-			onDismiss={ props.onDismiss }
-			testID={ props.testID }
+			isVisible={props.isVisible}
+			onClose={props.onClose}
+			onDismiss={props.onDismiss}
+			testID={props.testID}
 			hideHeader
 			hasNavigation
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
-					name={ linkSettingsScreens.settings }
+					name={linkSettingsScreens.settings}
 				>
-					<LinkSettingsScreen { ...props } withBottomSheet />
+					<LinkSettingsScreen {...props} withBottomSheet />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
-					name={ linkSettingsScreens.linkPicker }
+					name={linkSettingsScreens.linkPicker}
 					isScrollable
 					fullScreen
 				>
 					<LinkPickerScreen
-						returnScreenName={ linkSettingsScreens.settings }
+						returnScreenName={linkSettingsScreens.settings}
 					/>
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
@@ -47,4 +47,4 @@ function LinkSettingsNavigation( props ) {
 	);
 }
 
-export default memo( LinkSettingsNavigation );
+export default memo(LinkSettingsNavigation);

@@ -27,31 +27,31 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
-const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+const DEFAULT_BLOCK = ['core/navigation-link'];
 
 const LAYOUT = {
 	type: 'default',
 	alignments: [],
 };
 
-export default function NavigationInnerBlocks( {
+export default function NavigationInnerBlocks({
 	isVisible,
 	clientId,
 	appender: CustomAppender,
 	hasCustomPlaceholder,
 	orientation,
-} ) {
+}) {
 	const {
 		isImmediateParentOfSelectedBlock,
 		selectedBlockHasDescendants,
 		isSelected,
 	} = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 			const selectedBlockId = getSelectedBlockClientId();
 
 			return {
@@ -59,19 +59,19 @@ export default function NavigationInnerBlocks( {
 					clientId,
 					false
 				),
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
+				selectedBlockHasDescendants: !!getClientIdsOfDescendants([
 					selectedBlockId,
-				] )?.length,
+				])?.length,
 
 				// This prop is already available but computing it here ensures it's
 				// fresh compared to isImmediateParentOfSelectedBlock
 				isSelected: selectedBlockId === clientId,
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const [blocks, onInput, onChange] = useEntityBlockEditor(
 		'postType',
 		'wp_navigation'
 	);
@@ -79,12 +79,12 @@ export default function NavigationInnerBlocks( {
 	const shouldDirectInsert = useMemo(
 		() =>
 			blocks.every(
-				( { name } ) =>
+				({ name }) =>
 					name === 'core/navigation-link' ||
 					name === 'core/navigation-submenu' ||
 					name === 'core/page-list'
 			),
-		[ blocks ]
+		[blocks]
 	);
 
 	// When the block is selected itself or has a top level item selected that
@@ -92,10 +92,10 @@ export default function NavigationInnerBlocks( {
 	// appender.
 	const parentOrChildHasSelection =
 		isSelected ||
-		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants );
+		(isImmediateParentOfSelectedBlock && !selectedBlockHasDescendants);
 	const appender = isVisible && parentOrChildHasSelection ? undefined : false;
 
-	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
+	const placeholder = useMemo(() => <PlaceholderPreview />, []);
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -116,15 +116,15 @@ export default function NavigationInnerBlocks( {
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
 			placeholder:
-				! isVisible || hasCustomPlaceholder ? undefined : placeholder,
+				!isVisible || hasCustomPlaceholder ? undefined : placeholder,
 		}
 	);
 
 	return (
 		<BlockContentOverlay
-			clientId={ clientId }
-			tagName={ 'div' }
-			wrapperProps={ innerBlocksProps }
+			clientId={clientId}
+			tagName={'div'}
+			wrapperProps={innerBlocksProps}
 		/>
 	);
 }

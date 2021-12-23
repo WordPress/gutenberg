@@ -16,7 +16,7 @@ import styles from './style.scss';
 
 export default class PlainText extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 		this.isAndroid = Platform.OS === 'android';
 	}
 
@@ -27,30 +27,30 @@ export default class PlainText extends Component {
 			this._input.isFocused() === false &&
 			this.props.isSelected
 		) {
-			if ( this.isAndroid ) {
+			if (this.isAndroid) {
 				/*
 				 * There seems to be an issue in React Native where the keyboard doesn't show if called shortly after rendering.
 				 * As a common work around this delay is used.
 				 * https://github.com/facebook/react-native/issues/19366#issuecomment-400603928
 				 */
-				this.timeoutID = setTimeout( () => {
+				this.timeoutID = setTimeout(() => {
 					this._input.focus();
-				}, 100 );
+				}, 100);
 			} else {
 				this._input.focus();
 			}
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( ! this.props.isSelected && prevProps.isSelected ) {
+	componentDidUpdate(prevProps) {
+		if (!this.props.isSelected && prevProps.isSelected) {
 			this._input.blur();
 		}
 	}
 
 	componentWillUnmount() {
-		if ( this.isAndroid ) {
-			clearTimeout( this.timeoutID );
+		if (this.isAndroid) {
+			clearTimeout(this.timeoutID);
 		}
 	}
 
@@ -65,16 +65,16 @@ export default class PlainText extends Component {
 	getFontSize() {
 		const { style } = this.props;
 
-		if ( ! style?.fontSize ) {
+		if (!style?.fontSize) {
 			return;
 		}
 
-		const { width, height } = Dimensions.get( 'window' );
+		const { width, height } = Dimensions.get('window');
 		const cssUnitOptions = { height, width };
 
 		return {
 			fontSize: parseFloat(
-				getPxFromCssUnit( style.fontSize, cssUnitOptions )
+				getPxFromCssUnit(style.fontSize, cssUnitOptions)
 			),
 		};
 	}
@@ -82,25 +82,25 @@ export default class PlainText extends Component {
 	render() {
 		const { style } = this.props;
 		const textStyles = [
-			style || styles[ 'block-editor-plain-text' ],
+			style || styles['block-editor-plain-text'],
 			this.getFontSize(),
 		];
 
 		return (
 			<TextInput
-				{ ...this.props }
-				ref={ ( x ) => ( this._input = x ) }
-				onChange={ ( event ) => {
-					this.props.onChange( event.nativeEvent.text );
-				} }
-				onFocus={ this.props.onFocus } // always assign onFocus as a props
-				onBlur={ this.props.onBlur } // always assign onBlur as a props
+				{...this.props}
+				ref={(x) => (this._input = x)}
+				onChange={(event) => {
+					this.props.onChange(event.nativeEvent.text);
+				}}
+				onFocus={this.props.onFocus} // always assign onFocus as a props
+				onBlur={this.props.onBlur} // always assign onBlur as a props
 				fontFamily={
-					( this.props.style && this.props.style.fontFamily ) ||
-					styles[ 'block-editor-plain-text' ].fontFamily
+					(this.props.style && this.props.style.fontFamily) ||
+					styles['block-editor-plain-text'].fontFamily
 				}
-				style={ textStyles }
-				scrollEnabled={ false }
+				style={textStyles}
+				scrollEnabled={false}
 			/>
 		);
 	}

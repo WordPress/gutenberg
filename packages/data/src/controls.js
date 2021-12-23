@@ -37,10 +37,10 @@ const DISPATCH = '@@data/DISPATCH';
  *
  * @return {Object} The control descriptor.
  */
-function select( storeNameOrDescriptor, selectorName, ...args ) {
+function select(storeNameOrDescriptor, selectorName, ...args) {
 	return {
 		type: SELECT,
-		storeKey: isObject( storeNameOrDescriptor )
+		storeKey: isObject(storeNameOrDescriptor)
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor,
 		selectorName,
@@ -72,10 +72,10 @@ function select( storeNameOrDescriptor, selectorName, ...args ) {
  *
  * @return {Object} The control descriptor.
  */
-function resolveSelect( storeNameOrDescriptor, selectorName, ...args ) {
+function resolveSelect(storeNameOrDescriptor, selectorName, ...args) {
 	return {
 		type: RESOLVE_SELECT,
-		storeKey: isObject( storeNameOrDescriptor )
+		storeKey: isObject(storeNameOrDescriptor)
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor,
 		selectorName,
@@ -103,10 +103,10 @@ function resolveSelect( storeNameOrDescriptor, selectorName, ...args ) {
  *
  * @return {Object}  The control descriptor.
  */
-function dispatch( storeNameOrDescriptor, actionName, ...args ) {
+function dispatch(storeNameOrDescriptor, actionName, ...args) {
 	return {
 		type: DISPATCH,
-		storeKey: isObject( storeNameOrDescriptor )
+		storeKey: isObject(storeNameOrDescriptor)
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor,
 		actionName,
@@ -117,21 +117,24 @@ function dispatch( storeNameOrDescriptor, actionName, ...args ) {
 export const controls = { select, resolveSelect, dispatch };
 
 export const builtinControls = {
-	[ SELECT ]: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) =>
-			registry.select( storeKey )[ selectorName ]( ...args )
+	[SELECT]: createRegistryControl(
+		(registry) =>
+			({ storeKey, selectorName, args }) =>
+				registry.select(storeKey)[selectorName](...args)
 	),
-	[ RESOLVE_SELECT ]: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			const method = registry.select( storeKey )[ selectorName ]
-				.hasResolver
-				? 'resolveSelect'
-				: 'select';
-			return registry[ method ]( storeKey )[ selectorName ]( ...args );
-		}
+	[RESOLVE_SELECT]: createRegistryControl(
+		(registry) =>
+			({ storeKey, selectorName, args }) => {
+				const method = registry.select(storeKey)[selectorName]
+					.hasResolver
+					? 'resolveSelect'
+					: 'select';
+				return registry[method](storeKey)[selectorName](...args);
+			}
 	),
-	[ DISPATCH ]: createRegistryControl(
-		( registry ) => ( { storeKey, actionName, args } ) =>
-			registry.dispatch( storeKey )[ actionName ]( ...args )
+	[DISPATCH]: createRegistryControl(
+		(registry) =>
+			({ storeKey, actionName, args }) =>
+				registry.dispatch(storeKey)[actionName](...args)
 	),
 };

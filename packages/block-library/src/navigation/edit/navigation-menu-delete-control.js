@@ -11,13 +11,11 @@ import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
-export default function NavigationMenuDeleteControl( { onDelete } ) {
-	const [ isConfirmModalVisible, setIsConfirmModalVisible ] = useState(
-		false
-	);
-	const id = useEntityId( 'postType', 'wp_navigation' );
-	const [ title ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
-	const { deleteEntityRecord } = useDispatch( coreStore );
+export default function NavigationMenuDeleteControl({ onDelete }) {
+	const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
+	const id = useEntityId('postType', 'wp_navigation');
+	const [title] = useEntityProp('postType', 'wp_navigation', 'title');
+	const { deleteEntityRecord } = useDispatch(coreStore);
 
 	return (
 		<>
@@ -25,42 +23,42 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 				className="wp-block-navigation-delete-menu-button"
 				variant="secondary"
 				isDestructive
-				onClick={ () => {
-					setIsConfirmModalVisible( true );
-				} }
+				onClick={() => {
+					setIsConfirmModalVisible(true);
+				}}
 			>
-				{ __( 'Delete menu' ) }
+				{__('Delete menu')}
 			</Button>
-			{ isConfirmModalVisible && (
+			{isConfirmModalVisible && (
 				<Modal
-					title={ sprintf(
+					title={sprintf(
 						/* translators: %s: the name of a menu to delete */
-						__( 'Delete %s' ),
+						__('Delete %s'),
 						title
-					) }
-					closeLabel={ __( 'Cancel' ) }
-					onRequestClose={ () => setIsConfirmModalVisible( false ) }
+					)}
+					closeLabel={__('Cancel')}
+					onRequestClose={() => setIsConfirmModalVisible(false)}
 				>
 					<p>
-						{ __(
+						{__(
 							'Are you sure you want to delete this navigation menu?'
-						) }
+						)}
 					</p>
 					<Flex justify="flex-end">
 						<FlexItem>
 							<Button
 								variant="secondary"
-								onClick={ () => {
-									setIsConfirmModalVisible( false );
-								} }
+								onClick={() => {
+									setIsConfirmModalVisible(false);
+								}}
 							>
-								{ __( 'Cancel' ) }
+								{__('Cancel')}
 							</Button>
 						</FlexItem>
 						<FlexItem>
 							<Button
 								variant="primary"
-								onClick={ () => {
+								onClick={() => {
 									deleteEntityRecord(
 										'postType',
 										'wp_navigation',
@@ -68,14 +66,14 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 										{ force: true }
 									);
 									onDelete();
-								} }
+								}}
 							>
-								{ __( 'Confirm' ) }
+								{__('Confirm')}
 							</Button>
 						</FlexItem>
 					</Flex>
 				</Modal>
-			) }
+			)}
 		</>
 	);
 }

@@ -36,86 +36,83 @@ function createBlockCompleter() {
 		className: 'block-editor-autocompleters__block',
 		triggerPrefix: '/',
 
-		useItems( filterValue ) {
-			const { rootClientId, selectedBlockName } = useSelect(
-				( select ) => {
-					const {
-						getSelectedBlockClientId,
-						getBlockName,
-						getBlockInsertionPoint,
-					} = select( blockEditorStore );
-					const selectedBlockClientId = getSelectedBlockClientId();
-					return {
-						selectedBlockName: selectedBlockClientId
-							? getBlockName( selectedBlockClientId )
-							: null,
-						rootClientId: getBlockInsertionPoint().rootClientId,
-					};
-				},
-				[]
-			);
-			const [ items, categories, collections ] = useBlockTypesState(
+		useItems(filterValue) {
+			const { rootClientId, selectedBlockName } = useSelect((select) => {
+				const {
+					getSelectedBlockClientId,
+					getBlockName,
+					getBlockInsertionPoint,
+				} = select(blockEditorStore);
+				const selectedBlockClientId = getSelectedBlockClientId();
+				return {
+					selectedBlockName: selectedBlockClientId
+						? getBlockName(selectedBlockClientId)
+						: null,
+					rootClientId: getBlockInsertionPoint().rootClientId,
+				};
+			}, []);
+			const [items, categories, collections] = useBlockTypesState(
 				rootClientId,
 				noop
 			);
 
-			const filteredItems = useMemo( () => {
-				const initialFilteredItems = !! filterValue.trim()
+			const filteredItems = useMemo(() => {
+				const initialFilteredItems = !!filterValue.trim()
 					? searchBlockItems(
 							items,
 							categories,
 							collections,
 							filterValue
 					  )
-					: orderBy( items, [ 'frecency' ], [ 'desc' ] );
+					: orderBy(items, ['frecency'], ['desc']);
 
 				return initialFilteredItems
-					.filter( ( item ) => item.name !== selectedBlockName )
-					.slice( 0, SHOWN_BLOCK_TYPES );
+					.filter((item) => item.name !== selectedBlockName)
+					.slice(0, SHOWN_BLOCK_TYPES);
 			}, [
 				filterValue,
 				selectedBlockName,
 				items,
 				categories,
 				collections,
-			] );
+			]);
 
 			const options = useMemo(
 				() =>
-					filteredItems.map( ( blockItem ) => {
+					filteredItems.map((blockItem) => {
 						const { title, icon, isDisabled } = blockItem;
 						return {
-							key: `block-${ blockItem.id }`,
+							key: `block-${blockItem.id}`,
 							value: blockItem,
 							label: (
 								<>
 									<BlockIcon
 										key="icon"
-										icon={ icon }
+										icon={icon}
 										showColors
 									/>
-									{ title }
+									{title}
 								</>
 							),
 							isDisabled,
 						};
-					} ),
-				[ filteredItems ]
+					}),
+				[filteredItems]
 			);
 
-			return [ options ];
+			return [options];
 		},
-		allowContext( before, after ) {
-			return ! ( /\S/.test( before ) || /\S/.test( after ) );
+		allowContext(before, after) {
+			return !(/\S/.test(before) || /\S/.test(after));
 		},
-		getOptionCompletion( inserterItem ) {
+		getOptionCompletion(inserterItem) {
 			const { name, initialAttributes, innerBlocks } = inserterItem;
 			return {
 				action: 'replace',
 				value: createBlock(
 					name,
 					initialAttributes,
-					createBlocksFromInnerBlocksTemplate( innerBlocks )
+					createBlocksFromInnerBlocksTemplate(innerBlocks)
 				),
 			};
 		},

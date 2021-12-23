@@ -24,49 +24,45 @@ const MIN_COMMENTS = 1;
  */
 const MAX_COMMENTS = 100;
 
-export default function LatestComments( { attributes, setAttributes } ) {
-	const {
-		commentsToShow,
-		displayAvatar,
-		displayDate,
-		displayExcerpt,
-	} = attributes;
+export default function LatestComments({ attributes, setAttributes }) {
+	const { commentsToShow, displayAvatar, displayDate, displayExcerpt } =
+		attributes;
 
 	return (
-		<div { ...useBlockProps() }>
+		<div {...useBlockProps()}>
 			<InspectorControls>
-				<PanelBody title={ __( 'Latest comments settings' ) }>
+				<PanelBody title={__('Latest comments settings')}>
 					<ToggleControl
-						label={ __( 'Display avatar' ) }
-						checked={ displayAvatar }
-						onChange={ () =>
-							setAttributes( { displayAvatar: ! displayAvatar } )
+						label={__('Display avatar')}
+						checked={displayAvatar}
+						onChange={() =>
+							setAttributes({ displayAvatar: !displayAvatar })
 						}
 					/>
 					<ToggleControl
-						label={ __( 'Display date' ) }
-						checked={ displayDate }
-						onChange={ () =>
-							setAttributes( { displayDate: ! displayDate } )
+						label={__('Display date')}
+						checked={displayDate}
+						onChange={() =>
+							setAttributes({ displayDate: !displayDate })
 						}
 					/>
 					<ToggleControl
-						label={ __( 'Display excerpt' ) }
-						checked={ displayExcerpt }
-						onChange={ () =>
-							setAttributes( {
-								displayExcerpt: ! displayExcerpt,
-							} )
+						label={__('Display excerpt')}
+						checked={displayExcerpt}
+						onChange={() =>
+							setAttributes({
+								displayExcerpt: !displayExcerpt,
+							})
 						}
 					/>
 					<RangeControl
-						label={ __( 'Number of comments' ) }
-						value={ commentsToShow }
-						onChange={ ( value ) =>
-							setAttributes( { commentsToShow: value } )
+						label={__('Number of comments')}
+						value={commentsToShow}
+						onChange={(value) =>
+							setAttributes({ commentsToShow: value })
 						}
-						min={ MIN_COMMENTS }
-						max={ MAX_COMMENTS }
+						min={MIN_COMMENTS}
+						max={MAX_COMMENTS}
 						required
 					/>
 				</PanelBody>
@@ -74,11 +70,11 @@ export default function LatestComments( { attributes, setAttributes } ) {
 			<Disabled>
 				<ServerSideRender
 					block="core/latest-comments"
-					attributes={ attributes }
+					attributes={attributes}
 					// The preview uses the site's locale to make it more true to how
 					// the block appears on the frontend. Setting the locale
 					// explicitly prevents any middleware from setting it to 'user'.
-					urlQueryArgs={ { _locale: 'site' } }
+					urlQueryArgs={{ _locale: 'site' }}
 				/>
 			</Disabled>
 		</div>

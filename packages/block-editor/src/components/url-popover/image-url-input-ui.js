@@ -29,7 +29,7 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
+const NEW_TAB_REL = ['noreferrer', 'noopener'];
 
 const icon = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -39,7 +39,7 @@ const icon = (
 	</SVG>
 );
 
-const ImageURLInputUI = ( {
+const ImageURLInputUI = ({
 	linkDestination,
 	onChangeUrl,
 	url,
@@ -49,53 +49,53 @@ const ImageURLInputUI = ( {
 	linkTarget,
 	linkClass,
 	rel,
-} ) => {
-	const [ isOpen, setIsOpen ] = useState( false );
-	const openLinkUI = useCallback( () => {
-		setIsOpen( true );
-	} );
+}) => {
+	const [isOpen, setIsOpen] = useState(false);
+	const openLinkUI = useCallback(() => {
+		setIsOpen(true);
+	});
 
-	const [ isEditingLink, setIsEditingLink ] = useState( false );
-	const [ urlInput, setUrlInput ] = useState( null );
+	const [isEditingLink, setIsEditingLink] = useState(false);
+	const [urlInput, setUrlInput] = useState(null);
 
-	const autocompleteRef = useRef( null );
+	const autocompleteRef = useRef(null);
 
-	const startEditLink = useCallback( () => {
+	const startEditLink = useCallback(() => {
 		if (
 			linkDestination === LINK_DESTINATION_MEDIA ||
 			linkDestination === LINK_DESTINATION_ATTACHMENT
 		) {
-			setUrlInput( '' );
+			setUrlInput('');
 		}
-		setIsEditingLink( true );
-	} );
+		setIsEditingLink(true);
+	});
 
-	const stopEditLink = useCallback( () => {
-		setIsEditingLink( false );
-	} );
+	const stopEditLink = useCallback(() => {
+		setIsEditingLink(false);
+	});
 
-	const closeLinkUI = useCallback( () => {
-		setUrlInput( null );
+	const closeLinkUI = useCallback(() => {
+		setUrlInput(null);
 		stopEditLink();
-		setIsOpen( false );
-	} );
+		setIsOpen(false);
+	});
 
-	const removeNewTabRel = ( currentRel ) => {
+	const removeNewTabRel = (currentRel) => {
 		let newRel = currentRel;
 
-		if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-			if ( ! isEmpty( newRel ) ) {
-				each( NEW_TAB_REL, ( relVal ) => {
-					const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-					newRel = newRel.replace( regExp, '' );
-				} );
+		if (currentRel !== undefined && !isEmpty(newRel)) {
+			if (!isEmpty(newRel)) {
+				each(NEW_TAB_REL, (relVal) => {
+					const regExp = new RegExp('\\b' + relVal + '\\b', 'gi');
+					newRel = newRel.replace(regExp, '');
+				});
 
 				// Only trim if NEW_TAB_REL values was replaced.
-				if ( newRel !== currentRel ) {
+				if (newRel !== currentRel) {
 					newRel = newRel.trim();
 				}
 
-				if ( isEmpty( newRel ) ) {
+				if (isEmpty(newRel)) {
 					newRel = undefined;
 				}
 			}
@@ -104,14 +104,14 @@ const ImageURLInputUI = ( {
 		return newRel;
 	};
 
-	const getUpdatedLinkTargetSettings = ( value ) => {
+	const getUpdatedLinkTargetSettings = (value) => {
 		const newLinkTarget = value ? '_blank' : undefined;
 
 		let updatedRel;
-		if ( ! newLinkTarget && ! rel ) {
+		if (!newLinkTarget && !rel) {
 			updatedRel = undefined;
 		} else {
-			updatedRel = removeNewTabRel( rel );
+			updatedRel = removeNewTabRel(rel);
 		}
 
 		return {
@@ -120,8 +120,8 @@ const ImageURLInputUI = ( {
 		};
 	};
 
-	const onFocusOutside = useCallback( () => {
-		return ( event ) => {
+	const onFocusOutside = useCallback(() => {
+		return (event) => {
 			// The autocomplete suggestions list renders in a separate popover (in a portal),
 			// so onFocusOutside fails to detect that a click on a suggestion occurred in the
 			// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
@@ -129,57 +129,57 @@ const ImageURLInputUI = ( {
 			const autocompleteElement = autocompleteRef.current;
 			if (
 				autocompleteElement &&
-				autocompleteElement.contains( event.target )
+				autocompleteElement.contains(event.target)
 			) {
 				return;
 			}
-			setIsOpen( false );
-			setUrlInput( null );
+			setIsOpen(false);
+			setUrlInput(null);
 			stopEditLink();
 		};
-	} );
+	});
 
-	const onSubmitLinkChange = useCallback( () => {
-		return ( event ) => {
-			if ( urlInput ) {
+	const onSubmitLinkChange = useCallback(() => {
+		return (event) => {
+			if (urlInput) {
 				// It is possible the entered URL actually matches a named link destination.
 				// This check will ensure our link destination is correct.
 				const selectedDestination =
 					getLinkDestinations().find(
-						( destination ) => destination.url === urlInput
+						(destination) => destination.url === urlInput
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
-				onChangeUrl( {
+				onChangeUrl({
 					href: urlInput,
 					linkDestination: selectedDestination,
-				} );
+				});
 			}
 			stopEditLink();
-			setUrlInput( null );
+			setUrlInput(null);
 			event.preventDefault();
 		};
-	} );
+	});
 
-	const onLinkRemove = useCallback( () => {
-		onChangeUrl( {
+	const onLinkRemove = useCallback(() => {
+		onChangeUrl({
 			linkDestination: LINK_DESTINATION_NONE,
 			href: '',
-		} );
-	} );
+		});
+	});
 
 	const getLinkDestinations = () => {
 		const linkDestinations = [
 			{
 				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Media File' ),
+				title: __('Media File'),
 				url: mediaType === 'image' ? mediaUrl : undefined,
 				icon,
 			},
 		];
-		if ( mediaType === 'image' && mediaLink ) {
-			linkDestinations.push( {
+		if (mediaType === 'image' && mediaLink) {
+			linkDestinations.push({
 				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Attachment Page' ),
+				title: __('Attachment Page'),
 				url: mediaType === 'image' ? mediaLink : undefined,
 				icon: (
 					<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -187,58 +187,58 @@ const ImageURLInputUI = ( {
 						<Path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z" />
 					</SVG>
 				),
-			} );
+			});
 		}
 		return linkDestinations;
 	};
 
-	const onSetHref = ( value ) => {
+	const onSetHref = (value) => {
 		const linkDestinations = getLinkDestinations();
 		let linkDestinationInput;
-		if ( ! value ) {
+		if (!value) {
 			linkDestinationInput = LINK_DESTINATION_NONE;
 		} else {
 			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
+				find(linkDestinations, (destination) => {
 					return destination.url === value;
-				} ) || { linkDestination: LINK_DESTINATION_CUSTOM }
+				}) || { linkDestination: LINK_DESTINATION_CUSTOM }
 			).linkDestination;
 		}
-		onChangeUrl( {
+		onChangeUrl({
 			linkDestination: linkDestinationInput,
 			href: value,
-		} );
+		});
 	};
 
-	const onSetNewTab = ( value ) => {
-		const updatedLinkTarget = getUpdatedLinkTargetSettings( value );
-		onChangeUrl( updatedLinkTarget );
+	const onSetNewTab = (value) => {
+		const updatedLinkTarget = getUpdatedLinkTargetSettings(value);
+		onChangeUrl(updatedLinkTarget);
 	};
 
-	const onSetLinkRel = ( value ) => {
-		onChangeUrl( { rel: value } );
+	const onSetLinkRel = (value) => {
+		onChangeUrl({ rel: value });
 	};
 
-	const onSetLinkClass = ( value ) => {
-		onChangeUrl( { linkClass: value } );
+	const onSetLinkClass = (value) => {
+		onChangeUrl({ linkClass: value });
 	};
 
 	const advancedOptions = (
 		<>
 			<ToggleControl
-				label={ __( 'Open in new tab' ) }
-				onChange={ onSetNewTab }
-				checked={ linkTarget === '_blank' }
+				label={__('Open in new tab')}
+				onChange={onSetNewTab}
+				checked={linkTarget === '_blank'}
 			/>
 			<TextControl
-				label={ __( 'Link Rel' ) }
-				value={ removeNewTabRel( rel ) || '' }
-				onChange={ onSetLinkRel }
+				label={__('Link Rel')}
+				value={removeNewTabRel(rel) || ''}
+				onChange={onSetLinkRel}
 			/>
 			<TextControl
-				label={ __( 'Link CSS Class' ) }
-				value={ linkClass || '' }
-				onChange={ onSetLinkClass }
+				label={__('Link CSS Class')}
+				value={linkClass || ''}
+				onChange={onSetLinkClass}
 			/>
 		</>
 	);
@@ -246,70 +246,69 @@ const ImageURLInputUI = ( {
 	const linkEditorValue = urlInput !== null ? urlInput : url;
 
 	const urlLabel = (
-		find( getLinkDestinations(), [ 'linkDestination', linkDestination ] ) ||
-		{}
+		find(getLinkDestinations(), ['linkDestination', linkDestination]) || {}
 	).title;
 
 	return (
 		<>
 			<ToolbarButton
-				icon={ linkIcon }
+				icon={linkIcon}
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
-				aria-expanded={ isOpen }
-				onClick={ openLinkUI }
+				label={url ? __('Edit link') : __('Insert link')}
+				aria-expanded={isOpen}
+				onClick={openLinkUI}
 			/>
-			{ isOpen && (
+			{isOpen && (
 				<URLPopover
-					onFocusOutside={ onFocusOutside() }
-					onClose={ closeLinkUI }
-					renderSettings={ () => advancedOptions }
+					onFocusOutside={onFocusOutside()}
+					onClose={closeLinkUI}
+					renderSettings={() => advancedOptions}
 					additionalControls={
-						! linkEditorValue && (
+						!linkEditorValue && (
 							<NavigableMenu>
-								{ map( getLinkDestinations(), ( link ) => (
+								{map(getLinkDestinations(), (link) => (
 									<MenuItem
-										key={ link.linkDestination }
-										icon={ link.icon }
-										onClick={ () => {
-											setUrlInput( null );
-											onSetHref( link.url );
+										key={link.linkDestination}
+										icon={link.icon}
+										onClick={() => {
+											setUrlInput(null);
+											onSetHref(link.url);
 											stopEditLink();
-										} }
+										}}
 									>
-										{ link.title }
+										{link.title}
 									</MenuItem>
-								) ) }
+								))}
 							</NavigableMenu>
 						)
 					}
 				>
-					{ ( ! url || isEditingLink ) && (
+					{(!url || isEditingLink) && (
 						<URLPopover.LinkEditor
 							className="block-editor-format-toolbar__link-container-content"
-							value={ linkEditorValue }
-							onChangeInputValue={ setUrlInput }
-							onSubmit={ onSubmitLinkChange() }
-							autocompleteRef={ autocompleteRef }
+							value={linkEditorValue}
+							onChangeInputValue={setUrlInput}
+							onSubmit={onSubmitLinkChange()}
+							autocompleteRef={autocompleteRef}
 						/>
-					) }
-					{ url && ! isEditingLink && (
+					)}
+					{url && !isEditingLink && (
 						<>
 							<URLPopover.LinkViewer
 								className="block-editor-format-toolbar__link-container-content"
-								url={ url }
-								onEditLinkClick={ startEditLink }
-								urlLabel={ urlLabel }
+								url={url}
+								onEditLinkClick={startEditLink}
+								urlLabel={urlLabel}
 							/>
 							<Button
-								icon={ close }
-								label={ __( 'Remove link' ) }
-								onClick={ onLinkRemove }
+								icon={close}
+								label={__('Remove link')}
+								onClick={onLinkRemove}
 							/>
 						</>
-					) }
+					)}
 				</URLPopover>
-			) }
+			)}
 		</>
 	);
 };

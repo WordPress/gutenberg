@@ -14,20 +14,20 @@ import { useRef, useEffect, useState } from '@wordpress/element';
  */
 import Popover from '../popover';
 
-function useObservableState( initialState, onStateChange ) {
-	const [ state, setState ] = useState( initialState );
+function useObservableState(initialState, onStateChange) {
+	const [state, setState] = useState(initialState);
 	return [
 		state,
-		( value ) => {
-			setState( value );
-			if ( onStateChange ) {
-				onStateChange( value );
+		(value) => {
+			setState(value);
+			if (onStateChange) {
+				onStateChange(value);
 			}
 		},
 	];
 }
 
-export default function Dropdown( {
+export default function Dropdown({
 	renderContent,
 	renderToggle,
 	position = 'bottom right',
@@ -39,21 +39,21 @@ export default function Dropdown( {
 	popoverProps,
 	onClose,
 	onToggle,
-} ) {
+}) {
 	const containerRef = useRef();
-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+	const [isOpen, setIsOpen] = useObservableState(false, onToggle);
 
 	useEffect(
 		() => () => {
-			if ( onToggle ) {
-				onToggle( false );
+			if (onToggle) {
+				onToggle(false);
 			}
 		},
 		[]
 	);
 
 	function toggle() {
-		setIsOpen( ! isOpen );
+		setIsOpen(!isOpen);
 	}
 
 	/**
@@ -64,55 +64,53 @@ export default function Dropdown( {
 	 */
 	function closeIfFocusOutside() {
 		const { ownerDocument } = containerRef.current;
-		const dialog = ownerDocument.activeElement.closest( '[role="dialog"]' );
+		const dialog = ownerDocument.activeElement.closest('[role="dialog"]');
 		if (
-			! containerRef.current.contains( ownerDocument.activeElement ) &&
-			( ! dialog || dialog.contains( containerRef.current ) )
+			!containerRef.current.contains(ownerDocument.activeElement) &&
+			(!dialog || dialog.contains(containerRef.current))
 		) {
 			close();
 		}
 	}
 
 	function close() {
-		if ( onClose ) {
+		if (onClose) {
 			onClose();
 		}
-		setIsOpen( false );
+		setIsOpen(false);
 	}
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
 
 	return (
 		<div
-			className={ classnames( 'components-dropdown', className ) }
-			ref={ containerRef }
+			className={classnames('components-dropdown', className)}
+			ref={containerRef}
 			// Some UAs focus the closest focusable parent when the toggle is
 			// clicked. Making this div focusable ensures such UAs will focus
 			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
 			tabIndex="-1"
 		>
-			{ renderToggle( args ) }
-			{ isOpen && (
+			{renderToggle(args)}
+			{isOpen && (
 				<Popover
-					position={ position }
-					onClose={ close }
-					onFocusOutside={ closeIfFocusOutside }
-					expandOnMobile={ expandOnMobile }
-					headerTitle={ headerTitle }
-					focusOnMount={ focusOnMount }
-					{ ...popoverProps }
-					anchorRef={
-						popoverProps?.anchorRef ?? containerRef.current
-					}
-					className={ classnames(
+					position={position}
+					onClose={close}
+					onFocusOutside={closeIfFocusOutside}
+					expandOnMobile={expandOnMobile}
+					headerTitle={headerTitle}
+					focusOnMount={focusOnMount}
+					{...popoverProps}
+					anchorRef={popoverProps?.anchorRef ?? containerRef.current}
+					className={classnames(
 						'components-dropdown__content',
 						popoverProps ? popoverProps.className : undefined,
 						contentClassName
-					) }
+					)}
 				>
-					{ renderContent( args ) }
+					{renderContent(args)}
 				</Popover>
-			) }
+			)}
 		</div>
 	);
 }

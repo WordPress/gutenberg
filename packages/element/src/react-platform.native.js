@@ -14,14 +14,14 @@ import { applyFilters, doAction } from '@wordpress/hooks';
  */
 import { Component, cloneElement } from './react';
 
-const render = ( element, id ) => {
+const render = (element, id) => {
 	class App extends Component {
 		constructor() {
-			super( ...arguments );
+			super(...arguments);
 
-			const parentProps = omit( this.props || {}, [ 'rootTag' ] );
+			const parentProps = omit(this.props || {}, ['rootTag']);
 
-			doAction( 'native.pre-render', parentProps );
+			doAction('native.pre-render', parentProps);
 
 			this.filteredProps = applyFilters(
 				'native.block_editor_props',
@@ -30,15 +30,15 @@ const render = ( element, id ) => {
 		}
 
 		componentDidMount() {
-			doAction( 'native.render', this.filteredProps );
+			doAction('native.render', this.filteredProps);
 		}
 
 		render() {
-			return cloneElement( element, this.filteredProps );
+			return cloneElement(element, this.filteredProps);
 		}
 	}
 
-	AppRegistry.registerComponent( id, () => App );
+	AppRegistry.registerComponent(id, () => App);
 };
 
 /**

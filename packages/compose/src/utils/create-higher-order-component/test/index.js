@@ -8,56 +8,56 @@ import { Component } from '@wordpress/element';
  */
 import createHigherOrderComponent from '../';
 
-describe( 'createHigherOrderComponent', () => {
-	it( 'should use default name for anonymous function', () => {
+describe('createHigherOrderComponent', () => {
+	it('should use default name for anonymous function', () => {
 		const TestComponent = createHigherOrderComponent(
-			( OriginalComponent ) => OriginalComponent,
+			(OriginalComponent) => OriginalComponent,
 			'withTest'
-		)( () => <div /> );
+		)(() => <div />);
 
-		expect( TestComponent.displayName ).toBe( 'WithTest(Component)' );
-	} );
+		expect(TestComponent.displayName).toBe('WithTest(Component)');
+	});
 
-	it( 'should use camel case starting with upper for wrapper prefix', () => {
+	it('should use camel case starting with upper for wrapper prefix', () => {
 		const TestComponent = createHigherOrderComponent(
-			( OriginalComponent ) => OriginalComponent,
+			(OriginalComponent) => OriginalComponent,
 			'with-one-two_threeFOUR'
-		)( () => <div /> );
+		)(() => <div />);
 
-		expect( TestComponent.displayName ).toBe(
+		expect(TestComponent.displayName).toBe(
 			'WithOneTwoThreeFour(Component)'
 		);
-	} );
+	});
 
-	it( 'should use function name', () => {
+	it('should use function name', () => {
 		function SomeComponent() {
 			return <div />;
 		}
 		const TestComponent = createHigherOrderComponent(
-			( OriginalComponent ) => OriginalComponent,
+			(OriginalComponent) => OriginalComponent,
 			'withTest'
-		)( SomeComponent );
+		)(SomeComponent);
 
-		expect( TestComponent.displayName ).toBe( 'WithTest(SomeComponent)' );
-	} );
+		expect(TestComponent.displayName).toBe('WithTest(SomeComponent)');
+	});
 
-	it( 'should use component class name', () => {
+	it('should use component class name', () => {
 		class SomeAnotherComponent extends Component {
 			render() {
 				return <div />;
 			}
 		}
 		const TestComponent = createHigherOrderComponent(
-			( OriginalComponent ) => OriginalComponent,
+			(OriginalComponent) => OriginalComponent,
 			'withTest'
-		)( SomeAnotherComponent );
+		)(SomeAnotherComponent);
 
-		expect( TestComponent.displayName ).toBe(
+		expect(TestComponent.displayName).toBe(
 			'WithTest(SomeAnotherComponent)'
 		);
-	} );
+	});
 
-	it( 'should use displayName property', () => {
+	it('should use displayName property', () => {
 		class SomeYetAnotherComponent extends Component {
 			render() {
 				return <div />;
@@ -65,12 +65,10 @@ describe( 'createHigherOrderComponent', () => {
 		}
 		SomeYetAnotherComponent.displayName = 'CustomDisplayName';
 		const TestComponent = createHigherOrderComponent(
-			( OriginalComponent ) => OriginalComponent,
+			(OriginalComponent) => OriginalComponent,
 			'withTest'
-		)( SomeYetAnotherComponent );
+		)(SomeYetAnotherComponent);
 
-		expect( TestComponent.displayName ).toBe(
-			'WithTest(CustomDisplayName)'
-		);
-	} );
-} );
+		expect(TestComponent.displayName).toBe('WithTest(CustomDisplayName)');
+	});
+});

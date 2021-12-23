@@ -16,13 +16,13 @@ import { applyFilters } from '@wordpress/hooks';
  *
  * @return {WPBlock[]} An array of blocks.
  */
-export default function menuItemsToBlocks( menuItems ) {
-	if ( ! menuItems ) {
+export default function menuItemsToBlocks(menuItems) {
+	if (!menuItems) {
 		return null;
 	}
 
-	const menuTree = createDataTree( menuItems );
-	const blocks = mapMenuItemsToBlocks( menuTree );
+	const menuTree = createDataTree(menuItems);
+	const blocks = mapMenuItemsToBlocks(menuTree);
 	return applyFilters(
 		'blocks.navigation.__unstableMenuItemsToBlocks',
 		blocks,
@@ -36,33 +36,33 @@ export default function menuItemsToBlocks( menuItems ) {
  * @param {WPNavMenuItem[]} menuItems An array of WPNavMenuItem items.
  * @return {Object} Object containing innerBlocks and mapping.
  */
-function mapMenuItemsToBlocks( menuItems ) {
+function mapMenuItemsToBlocks(menuItems) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = sortBy( menuItems, 'menu_order' );
+	const sortedItems = sortBy(menuItems, 'menu_order');
 
-	const innerBlocks = sortedItems.map( ( menuItem ) => {
-		if ( menuItem.type === 'block' ) {
-			const [ block ] = parse( menuItem.content.raw );
+	const innerBlocks = sortedItems.map((menuItem) => {
+		if (menuItem.type === 'block') {
+			const [block] = parse(menuItem.content.raw);
 
-			if ( ! block ) {
-				return createBlock( 'core/freeform', {
+			if (!block) {
+				return createBlock('core/freeform', {
 					content: menuItem.content,
-				} );
+				});
 			}
 
 			return block;
 		}
 
-		const attributes = menuItemToBlockAttributes( menuItem );
+		const attributes = menuItemToBlockAttributes(menuItem);
 
 		// If there are children recurse to build those nested blocks.
 		const {
 			innerBlocks: nestedBlocks = [], // alias to avoid shadowing
 			mapping: nestedMapping = {}, // alias to avoid shadowing
 		} = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
+			? mapMenuItemsToBlocks(menuItem.children)
 			: {};
 
 		// Update parent mapping with nested mapping.
@@ -76,13 +76,13 @@ function mapMenuItemsToBlocks( menuItems ) {
 			: 'core/navigation-link';
 
 		// Create block with nested "innerBlocks".
-		const block = createBlock( blockType, attributes, nestedBlocks );
+		const block = createBlock(blockType, attributes, nestedBlocks);
 
 		// Create mapping for menuItem -> block
-		mapping[ menuItem.id ] = block.clientId;
+		mapping[menuItem.id] = block.clientId;
 
 		return block;
-	} );
+	});
 
 	return {
 		innerBlocks,
@@ -117,7 +117,7 @@ function mapMenuItemsToBlocks( menuItems ) {
  * @param {WPNavMenuItem} menuItem the menu item to be converted to block attributes.
  * @return {Object} the block attributes converted from the WPNavMenuItem item.
  */
-function menuItemToBlockAttributes( {
+function menuItemToBlockAttributes({
 	title: menuItemTitleField,
 	xfn,
 	classes,
@@ -130,45 +130,45 @@ function menuItemToBlockAttributes( {
 	url,
 	type: menuItemTypeField,
 	target,
-} ) {
+}) {
 	// For historical reasons, the `core/navigation-link` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
 	// See also inverse equivalent in `blockAttributesToMenuItem`.
-	if ( object && object === 'post_tag' ) {
+	if (object && object === 'post_tag') {
 		object = 'tag';
 	}
 
 	return {
 		label: menuItemTitleField?.rendered || '',
-		...( object?.length && {
+		...(object?.length && {
 			type: object,
-		} ),
-		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
+		}),
+		kind: menuItemTypeField?.replace('_', '-') || 'custom',
 		url: url || '',
-		...( xfn?.length &&
-			xfn.join( ' ' ).trim() && {
-				rel: xfn.join( ' ' ).trim(),
-			} ),
-		...( classes?.length &&
-			classes.join( ' ' ).trim() && {
-				className: classes.join( ' ' ).trim(),
-			} ),
+		...(xfn?.length &&
+			xfn.join(' ').trim() && {
+				rel: xfn.join(' ').trim(),
+			}),
+		...(classes?.length &&
+			classes.join(' ').trim() && {
+				className: classes.join(' ').trim(),
+			}),
 		/* eslint-disable camelcase */
-		...( attr_title?.length && {
+		...(attr_title?.length && {
 			title: attr_title,
-		} ),
-		...( object_id &&
+		}),
+		...(object_id &&
 			'custom' !== object && {
 				id: object_id,
-			} ),
+			}),
 		/* eslint-enable camelcase */
-		...( description?.length && {
+		...(description?.length && {
 			description,
-		} ),
-		...( target === '_blank' && {
+		}),
+		...(target === '_blank' && {
 			opensInNewTab: true,
-		} ),
+		}),
 	};
 }
 
@@ -187,24 +187,22 @@ function menuItemToBlockAttributes( {
  * @param {*}      relation the property which identifies how the current item is related to other items in the data (if at all).
  * @return {Array} a nested array of parent/child relationships
  */
-function createDataTree( dataset, id = 'id', relation = 'parent' ) {
-	const hashTable = Object.create( null );
+function createDataTree(dataset, id = 'id', relation = 'parent') {
+	const hashTable = Object.create(null);
 	const dataTree = [];
 
-	for ( const data of dataset ) {
-		hashTable[ data[ id ] ] = {
+	for (const data of dataset) {
+		hashTable[data[id]] = {
 			...data,
 			children: [],
 		};
-		if ( data[ relation ] ) {
-			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
-			hashTable[ data[ relation ] ].children =
-				hashTable[ data[ relation ] ].children || [];
-			hashTable[ data[ relation ] ].children.push(
-				hashTable[ data[ id ] ]
-			);
+		if (data[relation]) {
+			hashTable[data[relation]] = hashTable[data[relation]] || {};
+			hashTable[data[relation]].children =
+				hashTable[data[relation]].children || [];
+			hashTable[data[relation]].children.push(hashTable[data[id]]);
 		} else {
-			dataTree.push( hashTable[ data[ id ] ] );
+			dataTree.push(hashTable[data[id]]);
 		}
 	}
 

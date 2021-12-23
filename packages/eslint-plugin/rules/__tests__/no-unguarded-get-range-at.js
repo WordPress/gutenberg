@@ -8,13 +8,13 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../no-unguarded-get-range-at';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 	},
-} );
+});
 
-ruleTester.run( 'no-unguarded-get-range-at', rule, {
+ruleTester.run('no-unguarded-get-range-at', rule, {
 	valid: [
 		{
 			code: `const selection = defaultView.getSelection(); const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;`,
@@ -23,7 +23,7 @@ ruleTester.run( 'no-unguarded-get-range-at', rule, {
 	invalid: [
 		{
 			code: `defaultView.getSelection().getRangeAt( 0 );`,
-			errors: [ { message: 'Avoid unguarded getRangeAt' } ],
+			errors: [{ message: 'Avoid unguarded getRangeAt' }],
 		},
 	],
-} );
+});

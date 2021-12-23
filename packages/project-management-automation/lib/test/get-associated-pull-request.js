@@ -26,12 +26,12 @@ const INVALID_COMMIT = {
 	message: 'Add basic placeholder content to post title, content, and date.',
 };
 
-describe( 'getAssociatedPullRequest', () => {
-	it( 'should return the pull request number associated with a commit', () => {
-		expect( getAssociatedPullRequest( VALID_COMMIT ) ).toBe( 21205 );
-	} );
+describe('getAssociatedPullRequest', () => {
+	it('should return the pull request number associated with a commit', () => {
+		expect(getAssociatedPullRequest(VALID_COMMIT)).toBe(21205);
+	});
 
-	it( 'should return null if a pull request cannot be determined', () => {
-		expect( getAssociatedPullRequest( INVALID_COMMIT ) ).toBeNull();
-	} );
-} );
+	it('should return null if a pull request cannot be determined', () => {
+		expect(getAssociatedPullRequest(INVALID_COMMIT)).toBeNull();
+	});
+});

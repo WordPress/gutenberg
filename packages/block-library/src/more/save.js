@@ -8,12 +8,10 @@ import { compact } from 'lodash';
  */
 import { RawHTML } from '@wordpress/element';
 
-export default function save( { attributes: { customText, noTeaser } } ) {
-	const moreTag = customText ? `<!--more ${ customText }-->` : '<!--more-->';
+export default function save({ attributes: { customText, noTeaser } }) {
+	const moreTag = customText ? `<!--more ${customText}-->` : '<!--more-->';
 
 	const noTeaserTag = noTeaser ? '<!--noteaser-->' : '';
 
-	return (
-		<RawHTML>{ compact( [ moreTag, noTeaserTag ] ).join( '\n' ) }</RawHTML>
-	);
+	return <RawHTML>{compact([moreTag, noTeaserTag]).join('\n')}</RawHTML>;
 }

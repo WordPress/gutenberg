@@ -21,29 +21,28 @@ import {
  *
  * @param {number} postId The current post id.
  */
-export const useBlockSelectionListener = ( postId ) => {
+export const useBlockSelectionListener = (postId) => {
 	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
-		( select ) => ( {
-			hasBlockSelection: !! select(
-				blockEditorStore
-			).getBlockSelectionStart(),
-			isEditorSidebarOpened: select( STORE_NAME ).isEditorSidebarOpened(),
-		} ),
-		[ postId ]
+		(select) => ({
+			hasBlockSelection:
+				!!select(blockEditorStore).getBlockSelectionStart(),
+			isEditorSidebarOpened: select(STORE_NAME).isEditorSidebarOpened(),
+		}),
+		[postId]
 	);
 
-	const { openGeneralSidebar } = useDispatch( STORE_NAME );
+	const { openGeneralSidebar } = useDispatch(STORE_NAME);
 
-	useEffect( () => {
-		if ( ! isEditorSidebarOpened ) {
+	useEffect(() => {
+		if (!isEditorSidebarOpened) {
 			return;
 		}
-		if ( hasBlockSelection ) {
-			openGeneralSidebar( 'edit-post/block' );
+		if (hasBlockSelection) {
+			openGeneralSidebar('edit-post/block');
 		} else {
-			openGeneralSidebar( 'edit-post/document' );
+			openGeneralSidebar('edit-post/document');
 		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+	}, [hasBlockSelection, isEditorSidebarOpened]);
 };
 
 /**
@@ -52,25 +51,25 @@ export const useBlockSelectionListener = ( postId ) => {
  *
  * @param {number} postId
  */
-export const useUpdatePostLinkListener = ( postId ) => {
+export const useUpdatePostLinkListener = (postId) => {
 	const { newPermalink } = useSelect(
-		( select ) => ( {
-			newPermalink: select( editorStore ).getCurrentPost().link,
-		} ),
-		[ postId ]
+		(select) => ({
+			newPermalink: select(editorStore).getCurrentPost().link,
+		}),
+		[postId]
 	);
 	const nodeToUpdate = useRef();
 
-	useEffect( () => {
+	useEffect(() => {
 		nodeToUpdate.current =
-			document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
-			document.querySelector( VIEW_AS_LINK_SELECTOR );
-	}, [ postId ] );
+			document.querySelector(VIEW_AS_PREVIEW_LINK_SELECTOR) ||
+			document.querySelector(VIEW_AS_LINK_SELECTOR);
+	}, [postId]);
 
-	useEffect( () => {
-		if ( ! newPermalink || ! nodeToUpdate.current ) {
+	useEffect(() => {
+		if (!newPermalink || !nodeToUpdate.current) {
 			return;
 		}
-		nodeToUpdate.current.setAttribute( 'href', newPermalink );
-	}, [ newPermalink ] );
+		nodeToUpdate.current.setAttribute('href', newPermalink);
+	}, [newPermalink]);
 };

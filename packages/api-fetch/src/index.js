@@ -61,8 +61,8 @@ const middlewares = [
  *
  * @param {import('./types').APIFetchMiddleware} middleware
  */
-function registerMiddleware( middleware ) {
-	middlewares.unshift( middleware );
+function registerMiddleware(middleware) {
+	middlewares.unshift(middleware);
 }
 
 /**
@@ -72,8 +72,8 @@ function registerMiddleware( middleware ) {
  * @param {Response} response
  * @return {Response} The response if the status is in the 200 range.
  */
-const checkStatus = ( response ) => {
-	if ( response.status >= 200 && response.status < 300 ) {
+const checkStatus = (response) => {
+	if (response.status >= 200 && response.status < 300) {
 		return response;
 	}
 
@@ -85,7 +85,7 @@ const checkStatus = ( response ) => {
 /**
  * @type {FetchHandler}
  */
-const defaultFetchHandler = ( nextOptions ) => {
+const defaultFetchHandler = (nextOptions) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
 
@@ -93,9 +93,9 @@ const defaultFetchHandler = ( nextOptions ) => {
 	headers = { ...DEFAULT_HEADERS, ...headers };
 
 	// The `data` property is a shorthand for sending a JSON body.
-	if ( data ) {
-		body = JSON.stringify( data );
-		headers[ 'Content-Type' ] = 'application/json';
+	if (data) {
+		body = JSON.stringify(data);
+		headers['Content-Type'] = 'application/json';
 	}
 
 	const responsePromise = window.fetch(
@@ -110,16 +110,16 @@ const defaultFetchHandler = ( nextOptions ) => {
 	);
 
 	return responsePromise.then(
-		( value ) =>
-			Promise.resolve( value )
-				.then( checkStatus )
-				.catch( ( response ) => parseAndThrowError( response, parse ) )
-				.then( ( response ) =>
-					parseResponseAndNormalizeError( response, parse )
+		(value) =>
+			Promise.resolve(value)
+				.then(checkStatus)
+				.catch((response) => parseAndThrowError(response, parse))
+				.then((response) =>
+					parseResponseAndNormalizeError(response, parse)
 				),
-		( err ) => {
+		(err) => {
 			// Re-throw AbortError for the users to handle it themselves.
-			if ( err && err.name === 'AbortError' ) {
+			if (err && err.name === 'AbortError') {
 				throw err;
 			}
 
@@ -127,7 +127,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 			// Unfortunately the message might depend on the browser.
 			throw {
 				code: 'fetch_error',
-				message: __( 'You are probably offline.' ),
+				message: __('You are probably offline.'),
 			};
 		}
 	);
@@ -142,7 +142,7 @@ let fetchHandler = defaultFetchHandler;
  *
  * @param {FetchHandler} newFetchHandler The new fetch handler
  */
-function setFetchHandler( newFetchHandler ) {
+function setFetchHandler(newFetchHandler) {
 	fetchHandler = newFetchHandler;
 }
 
@@ -151,38 +151,38 @@ function setFetchHandler( newFetchHandler ) {
  * @param {import('./types').APIFetchOptions} options
  * @return {Promise<T>} A promise representing the request processed via the registered middlewares.
  */
-function apiFetch( options ) {
+function apiFetch(options) {
 	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
 	// converting `middlewares = [ m1, m2, m3 ]` into:
 	// ```
 	// opts1 => m1( opts1, opts2 => m2( opts2, opts3 => m3( opts3, fetchHandler ) ) );
 	// ```
-	const enhancedHandler = middlewares.reduceRight( (
-		/** @type {FetchHandler} */ next,
-		middleware
-	) => {
-		return ( workingOptions ) => middleware( workingOptions, next );
-	}, fetchHandler );
+	const enhancedHandler = middlewares.reduceRight(
+		(/** @type {FetchHandler} */ next, middleware) => {
+			return (workingOptions) => middleware(workingOptions, next);
+		},
+		fetchHandler
+	);
 
-	return enhancedHandler( options ).catch( ( error ) => {
-		if ( error.code !== 'rest_cookie_invalid_nonce' ) {
-			return Promise.reject( error );
+	return enhancedHandler(options).catch((error) => {
+		if (error.code !== 'rest_cookie_invalid_nonce') {
+			return Promise.reject(error);
 		}
 
 		// If the nonce is invalid, refresh it and try again.
 		return (
 			window
 				// @ts-ignore
-				.fetch( apiFetch.nonceEndpoint )
-				.then( checkStatus )
-				.then( ( data ) => data.text() )
-				.then( ( text ) => {
+				.fetch(apiFetch.nonceEndpoint)
+				.then(checkStatus)
+				.then((data) => data.text())
+				.then((text) => {
 					// @ts-ignore
 					apiFetch.nonceMiddleware.nonce = text;
-					return apiFetch( options );
-				} )
+					return apiFetch(options);
+				})
 		);
-	} );
+	});
 }
 
 apiFetch.use = registerMiddleware;

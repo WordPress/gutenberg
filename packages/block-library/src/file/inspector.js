@@ -15,7 +15,7 @@ import { InspectorControls } from '@wordpress/block-editor';
  */
 import { MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT } from './edit';
 
-export default function FileBlockInspector( {
+export default function FileBlockInspector({
 	hrefs,
 	openInNewWindow,
 	showDownloadButton,
@@ -26,24 +26,24 @@ export default function FileBlockInspector( {
 	changeDisplayPreview,
 	previewHeight,
 	changePreviewHeight,
-} ) {
+}) {
 	const { href, textLinkHref, attachmentPage } = hrefs;
 
-	let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
-	if ( attachmentPage ) {
+	let linkDestinationOptions = [{ value: href, label: __('URL') }];
+	if (attachmentPage) {
 		linkDestinationOptions = [
-			{ value: href, label: __( 'Media file' ) },
-			{ value: attachmentPage, label: __( 'Attachment page' ) },
+			{ value: href, label: __('Media file') },
+			{ value: attachmentPage, label: __('Attachment page') },
 		];
 	}
 
 	return (
 		<>
 			<InspectorControls>
-				{ href.endsWith( '.pdf' ) && (
-					<PanelBody title={ __( 'PDF settings' ) }>
+				{href.endsWith('.pdf') && (
+					<PanelBody title={__('PDF settings')}>
 						<ToggleControl
-							label={ __( 'Show inline embed' ) }
+							label={__('Show inline embed')}
 							help={
 								displayPreview
 									? __(
@@ -51,41 +51,41 @@ export default function FileBlockInspector( {
 									  )
 									: null
 							}
-							checked={ !! displayPreview }
-							onChange={ changeDisplayPreview }
+							checked={!!displayPreview}
+							onChange={changeDisplayPreview}
 						/>
-						{ displayPreview && (
+						{displayPreview && (
 							<RangeControl
-								label={ __( 'Height in pixels' ) }
-								min={ MIN_PREVIEW_HEIGHT }
-								max={ Math.max(
+								label={__('Height in pixels')}
+								min={MIN_PREVIEW_HEIGHT}
+								max={Math.max(
 									MAX_PREVIEW_HEIGHT,
 									previewHeight
-								) }
-								value={ previewHeight }
-								onChange={ changePreviewHeight }
+								)}
+								value={previewHeight}
+								onChange={changePreviewHeight}
 							/>
-						) }
+						)}
 					</PanelBody>
-				) }
-				<PanelBody title={ __( 'Text link settings' ) }>
+				)}
+				<PanelBody title={__('Text link settings')}>
 					<SelectControl
-						label={ __( 'Link to' ) }
-						value={ textLinkHref }
-						options={ linkDestinationOptions }
-						onChange={ changeLinkDestinationOption }
+						label={__('Link to')}
+						value={textLinkHref}
+						options={linkDestinationOptions}
+						onChange={changeLinkDestinationOption}
 					/>
 					<ToggleControl
-						label={ __( 'Open in new tab' ) }
-						checked={ openInNewWindow }
-						onChange={ changeOpenInNewWindow }
+						label={__('Open in new tab')}
+						checked={openInNewWindow}
+						onChange={changeOpenInNewWindow}
 					/>
 				</PanelBody>
-				<PanelBody title={ __( 'Download button settings' ) }>
+				<PanelBody title={__('Download button settings')}>
 					<ToggleControl
-						label={ __( 'Show download button' ) }
-						checked={ showDownloadButton }
-						onChange={ changeShowDownloadButton }
+						label={__('Show download button')}
+						checked={showDownloadButton}
+						onChange={changeShowDownloadButton}
 					/>
 				</PanelBody>
 			</InspectorControls>

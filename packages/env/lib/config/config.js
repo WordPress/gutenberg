@@ -2,18 +2,18 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' ).promises;
-const path = require( 'path' );
-const os = require( 'os' );
+const fs = require('fs').promises;
+const path = require('path');
+const os = require('os');
 
 /**
  * Internal dependencies
  */
-const detectDirectoryType = require( './detect-directory-type' );
-const { validateConfig, ValidationError } = require( './validate-config' );
-const readRawConfigFile = require( './read-raw-config-file' );
-const parseConfig = require( './parse-config' );
-const md5 = require( '../md5' );
+const detectDirectoryType = require('./detect-directory-type');
+const { validateConfig, ValidationError } = require('./validate-config');
+const readRawConfigFile = require('./read-raw-config-file');
+const parseConfig = require('./parse-config');
+const md5 = require('../md5');
 
 /**
  * wp-env configuration.
@@ -60,11 +60,11 @@ const md5 = require( '../md5' );
  *
  * @return {WPConfig} A parsed and validated wp-env config object.
  */
-module.exports = async function readConfig( configPath ) {
-	const configDirectoryPath = path.dirname( configPath );
+module.exports = async function readConfig(configPath) {
+	const configDirectoryPath = path.dirname(configPath);
 	const workDirectoryPath = path.resolve(
 		await getHomeDirectory(),
-		md5( configPath )
+		md5(configPath)
 	);
 
 	// Default configuration which is overridden by .wp-env.json files.
@@ -98,75 +98,75 @@ module.exports = async function readConfig( configPath ) {
 	// The specified base configuration from .wp-env.json or from the local
 	// source type which was automatically detected.
 	const baseConfig =
-		( await readRawConfigFile( '.wp-env.json', configPath ) ) ||
-		( await getDefaultBaseConfig( configPath ) );
+		(await readRawConfigFile('.wp-env.json', configPath)) ||
+		(await getDefaultBaseConfig(configPath));
 
 	// Overriden .wp-env.json on a per-user case.
 	const overrideConfig =
-		( await readRawConfigFile(
+		(await readRawConfigFile(
 			'.wp-env.override.json',
-			configPath.replace( /\.wp-env\.json$/, '.wp-env.override.json' )
-		) ) || {};
+			configPath.replace(/\.wp-env\.json$/, '.wp-env.override.json')
+		)) || {};
 
 	const detectedLocalConfig =
-		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
+		Object.keys({ ...baseConfig, ...overrideConfig }).length > 0;
 
 	// A quick validation before merging on a service by service level allows us
 	// to check the root configuration options and provide more helpful errors.
 	validateConfig(
-		mergeWpServiceConfigs( [
+		mergeWpServiceConfigs([
 			defaultConfiguration,
 			baseConfig,
 			overrideConfig,
-		] )
+		])
 	);
 
 	// A unique array of the environments specified in the config options.
 	// Needed so that we can override settings per-environment, rather than
 	// overwriting each environment key.
-	const getEnvKeys = ( config ) => Object.keys( config.env || {} );
+	const getEnvKeys = (config) => Object.keys(config.env || {});
 	const allEnvs = [
-		...new Set( [
-			...getEnvKeys( defaultConfiguration ),
-			...getEnvKeys( baseConfig ),
-			...getEnvKeys( overrideConfig ),
-		] ),
+		...new Set([
+			...getEnvKeys(defaultConfiguration),
+			...getEnvKeys(baseConfig),
+			...getEnvKeys(overrideConfig),
+		]),
 	];
 
 	// Returns a pair with the root config options and the specific environment config options.
-	const getEnvConfig = ( config, envName ) => [
+	const getEnvConfig = (config, envName) => [
 		config,
-		config.env && config.env[ envName ] ? config.env[ envName ] : {},
+		config.env && config.env[envName] ? config.env[envName] : {},
 	];
 
 	// Merge each of the specified environment-level overrides.
 	const allPorts = new Set(); // Keep track of unique ports for validation.
-	const env = allEnvs.reduce( ( result, environment ) => {
-		result[ environment ] = parseConfig(
+	const env = allEnvs.reduce((result, environment) => {
+		result[environment] = parseConfig(
 			validateConfig(
-				mergeWpServiceConfigs( [
-					...getEnvConfig( defaultConfiguration, environment ),
-					...getEnvConfig( baseConfig, environment ),
-					...getEnvConfig( overrideConfig, environment ),
-				] ),
+				mergeWpServiceConfigs([
+					...getEnvConfig(defaultConfiguration, environment),
+					...getEnvConfig(baseConfig, environment),
+					...getEnvConfig(overrideConfig, environment),
+				]),
 				environment
 			),
 			{
 				workDirectoryPath,
 			}
 		);
-		allPorts.add( result[ environment ].port );
+		allPorts.add(result[environment].port);
 		return result;
-	}, {} );
+	}, {});
 
-	if ( allPorts.size !== allEnvs.length ) {
+	if (allPorts.size !== allEnvs.length) {
 		throw new ValidationError(
 			'Invalid .wp-env.json: Each port value must be unique.'
 		);
 	}
 
-	return withOverrides( {
-		name: path.basename( configDirectoryPath ),
+	return withOverrides({
+		name: path.basename(configDirectoryPath),
 		dockerComposeConfigPath: path.resolve(
 			workDirectoryPath,
 			'docker-compose.yml'
@@ -175,7 +175,7 @@ module.exports = async function readConfig( configPath ) {
 		workDirectoryPath,
 		detectedLocalConfig,
 		env,
-	} );
+	});
 };
 
 /**
@@ -188,28 +188,28 @@ module.exports = async function readConfig( configPath ) {
  *
  * @return {Object} The merged configuration object.
  */
-function mergeWpServiceConfigs( configs ) {
+function mergeWpServiceConfigs(configs) {
 	// Returns an array of nested values in the config object. For example,
 	// an array of all the wp-config objects.
-	const mergeNestedObjs = ( key ) =>
+	const mergeNestedObjs = (key) =>
 		Object.assign(
 			{},
-			...configs.map( ( config ) => {
-				if ( ! config[ key ] ) {
+			...configs.map((config) => {
+				if (!config[key]) {
 					return {};
-				} else if ( typeof config[ key ] === 'object' ) {
-					return config[ key ];
+				} else if (typeof config[key] === 'object') {
+					return config[key];
 				}
 				throw new ValidationError(
-					`Invalid .wp-env.json: "${ key }" must be an object.`
+					`Invalid .wp-env.json: "${key}" must be an object.`
 				);
-			} )
+			})
 		);
 
 	const mergedConfig = {
-		...Object.assign( {}, ...configs ),
-		config: mergeNestedObjs( 'config' ),
-		mappings: mergeNestedObjs( 'mappings' ),
+		...Object.assign({}, ...configs),
+		config: mergeNestedObjs('config'),
+		mappings: mergeNestedObjs('mappings'),
 	};
 
 	delete mergedConfig.env;
@@ -225,16 +225,16 @@ function mergeWpServiceConfigs( configs ) {
  * @return {Object} Basic config options for the detected source type. Empty
  *                  object if no config detected.
  */
-async function getDefaultBaseConfig( configPath ) {
-	const configDirectoryPath = path.dirname( configPath );
-	const type = await detectDirectoryType( configDirectoryPath );
+async function getDefaultBaseConfig(configPath) {
+	const configDirectoryPath = path.dirname(configPath);
+	const type = await detectDirectoryType(configDirectoryPath);
 
-	if ( type === 'core' ) {
+	if (type === 'core') {
 		return { core: '.' };
-	} else if ( type === 'plugin' ) {
-		return { plugins: [ '.' ] };
-	} else if ( type === 'theme' ) {
-		return { themes: [ '.' ] };
+	} else if (type === 'plugin') {
+		return { plugins: ['.'] };
+	} else if (type === 'theme') {
+		return { themes: ['.'] };
 	}
 
 	return {};
@@ -247,14 +247,12 @@ async function getDefaultBaseConfig( configPath ) {
  * @param {WPConfig} config fully parsed configuration object.
  * @return {WPConfig} configuration object with overrides applied.
  */
-function withOverrides( config ) {
+function withOverrides(config) {
 	// Override port numbers with environment variables.
 	config.env.development.port =
-		getNumberFromEnvVariable( 'WP_ENV_PORT' ) ||
-		config.env.development.port;
+		getNumberFromEnvVariable('WP_ENV_PORT') || config.env.development.port;
 	config.env.tests.port =
-		getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) ||
-		config.env.tests.port;
+		getNumberFromEnvVariable('WP_ENV_TESTS_PORT') || config.env.tests.port;
 
 	// Override PHP version with environment variable.
 	config.env.development.phpVersion =
@@ -262,31 +260,29 @@ function withOverrides( config ) {
 	config.env.tests.phpVersion =
 		process.env.WP_ENV_PHP_VERSION || config.env.tests.phpVersion;
 
-	const updateEnvUrl = ( configKey ) => {
-		[ 'development', 'tests' ].forEach( ( envKey ) => {
+	const updateEnvUrl = (configKey) => {
+		['development', 'tests'].forEach((envKey) => {
 			try {
-				const baseUrl = new URL(
-					config.env[ envKey ].config[ configKey ]
-				);
+				const baseUrl = new URL(config.env[envKey].config[configKey]);
 
 				// Don't overwrite the port of WP_HOME when set.
-				if ( ! ( configKey === 'WP_HOME' && !! baseUrl.port ) ) {
-					baseUrl.port = config.env[ envKey ].port;
+				if (!(configKey === 'WP_HOME' && !!baseUrl.port)) {
+					baseUrl.port = config.env[envKey].port;
 				}
 
-				config.env[ envKey ].config[ configKey ] = baseUrl.toString();
-			} catch ( error ) {
+				config.env[envKey].config[configKey] = baseUrl.toString();
+			} catch (error) {
 				throw new ValidationError(
-					`Invalid .wp-env.json: config.${ configKey } must be a valid URL.`
+					`Invalid .wp-env.json: config.${configKey} must be a valid URL.`
 				);
 			}
-		} );
+		});
 	};
 
 	// Update wp config options to include the correct port number in the URL.
-	updateEnvUrl( 'WP_TESTS_DOMAIN' );
-	updateEnvUrl( 'WP_SITEURL' );
-	updateEnvUrl( 'WP_HOME' );
+	updateEnvUrl('WP_TESTS_DOMAIN');
+	updateEnvUrl('WP_SITEURL');
+	updateEnvUrl('WP_HOME');
 
 	return config;
 }
@@ -300,18 +296,18 @@ function withOverrides( config ) {
  * @param {string} varName The environment variable to check (e.g. WP_ENV_PORT).
  * @return {null|number} The number. Null if it does not exist.
  */
-function getNumberFromEnvVariable( varName ) {
+function getNumberFromEnvVariable(varName) {
 	// Allow use of the default if it does not exist.
-	if ( ! process.env[ varName ] ) {
+	if (!process.env[varName]) {
 		return null;
 	}
 
-	const maybeNumber = parseInt( process.env[ varName ] );
+	const maybeNumber = parseInt(process.env[varName]);
 
 	// Throw an error if it is not parseable as a number.
-	if ( isNaN( maybeNumber ) ) {
+	if (isNaN(maybeNumber)) {
 		throw new ValidationError(
-			`Invalid environment variable: ${ varName } must be a number.`
+			`Invalid environment variable: ${varName} must be a number.`
 		);
 	}
 
@@ -328,8 +324,8 @@ function getNumberFromEnvVariable( varName ) {
  */
 async function getHomeDirectory() {
 	// Allow user to override download location.
-	if ( process.env.WP_ENV_HOME ) {
-		return path.resolve( process.env.WP_ENV_HOME );
+	if (process.env.WP_ENV_HOME) {
+		return path.resolve(process.env.WP_ENV_HOME);
 	}
 
 	/**
@@ -341,8 +337,6 @@ async function getHomeDirectory() {
 	 */
 	return path.resolve(
 		os.homedir(),
-		!! ( await fs.stat( '/snap' ).catch( () => false ) )
-			? 'wp-env'
-			: '.wp-env'
+		!!(await fs.stat('/snap').catch(() => false)) ? 'wp-env' : '.wp-env'
 	);
 }

@@ -7,7 +7,7 @@ const {
 	getTranslateFunctionName,
 	getTranslateFunctionArgs,
 	getTextContentFromNode,
-} = require( '../utils' );
+} = require('../utils');
 
 module.exports = {
 	meta: {
@@ -17,9 +17,9 @@ module.exports = {
 				'Translation function with placeholders is missing preceding translator comment',
 		},
 	},
-	create( context ) {
+	create(context) {
 		return {
-			CallExpression( node ) {
+			CallExpression(node) {
 				const {
 					callee,
 					loc: {
@@ -29,32 +29,32 @@ module.exports = {
 					arguments: args,
 				} = node;
 
-				const functionName = getTranslateFunctionName( callee );
+				const functionName = getTranslateFunctionName(callee);
 
-				if ( ! TRANSLATION_FUNCTIONS.has( functionName ) ) {
+				if (!TRANSLATION_FUNCTIONS.has(functionName)) {
 					return;
 				}
 
 				const candidates = getTranslateFunctionArgs(
 					functionName,
 					args
-				).map( getTextContentFromNode );
+				).map(getTextContentFromNode);
 
-				if ( candidates.filter( Boolean ).length === 0 ) {
+				if (candidates.filter(Boolean).length === 0) {
 					return;
 				}
 
-				const hasPlaceholders = candidates.some( ( candidate ) =>
-					REGEXP_SPRINTF_PLACEHOLDER.test( candidate )
+				const hasPlaceholders = candidates.some((candidate) =>
+					REGEXP_SPRINTF_PLACEHOLDER.test(candidate)
 				);
 				// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test#Using_test()_on_a_regex_with_the_global_flag.
 				REGEXP_SPRINTF_PLACEHOLDER.lastIndex = 0;
 
-				if ( ! hasPlaceholders ) {
+				if (!hasPlaceholders) {
 					return;
 				}
 
-				const comments = context.getCommentsBefore( node ).slice();
+				const comments = context.getCommentsBefore(node).slice();
 
 				let parentNode = parent;
 
@@ -68,13 +68,13 @@ module.exports = {
 				while (
 					parentNode &&
 					parentNode.type !== 'Program' &&
-					Math.abs( parentNode.loc.start.line - currentLine ) <= 1
+					Math.abs(parentNode.loc.start.line - currentLine) <= 1
 				) {
-					comments.push( ...context.getCommentsBefore( parentNode ) );
+					comments.push(...context.getCommentsBefore(parentNode));
 					parentNode = parentNode.parent;
 				}
 
-				for ( const comment of comments ) {
+				for (const comment of comments) {
 					const {
 						value: commentText,
 						loc: {
@@ -93,19 +93,19 @@ module.exports = {
 						)
 					);
 					 */
-					if ( Math.abs( commentLine - currentLine ) > 1 ) {
+					if (Math.abs(commentLine - currentLine) > 1) {
 						break;
 					}
 
-					if ( /translators:\s*\S+/i.test( commentText ) ) {
+					if (/translators:\s*\S+/i.test(commentText)) {
 						return;
 					}
 				}
 
-				context.report( {
+				context.report({
 					node,
 					messageId: 'missing',
-				} );
+				});
 			},
 		};
 	},

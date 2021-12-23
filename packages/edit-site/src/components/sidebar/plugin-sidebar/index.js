@@ -68,13 +68,13 @@ import { ComplementaryArea } from '@wordpress/interface';
  * );
  * ```
  */
-export default function PluginSidebarEditSite( { className, ...props } ) {
+export default function PluginSidebarEditSite({ className, ...props }) {
 	return (
 		<ComplementaryArea
-			panelClassName={ className }
+			panelClassName={className}
 			className="edit-site-sidebar"
 			scope="core/edit-site"
-			{ ...props }
+			{...props}
 		/>
 	);
 }

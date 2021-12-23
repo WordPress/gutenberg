@@ -9,10 +9,10 @@ import { useCardHeader } from './hook';
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                                  forwardedRef
  */
-function CardHeader( props, forwardedRef ) {
-	const headerProps = useCardHeader( props );
+function CardHeader(props, forwardedRef) {
+	const headerProps = useCardHeader(props);
 
-	return <Flex { ...headerProps } ref={ forwardedRef } />;
+	return <Flex {...headerProps} ref={forwardedRef} />;
 }
 
 /**
@@ -28,6 +28,6 @@ function CardHeader( props, forwardedRef ) {
  * </Card>
  * ```
  */
-const ConnectedCardHeader = contextConnect( CardHeader, 'CardHeader' );
+const ConnectedCardHeader = contextConnect(CardHeader, 'CardHeader');
 
 export default ConnectedCardHeader;

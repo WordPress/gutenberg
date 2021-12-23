@@ -11,39 +11,37 @@ import exportReusableBlock from './utils/export';
 import ImportDropdown from './components/import-dropdown';
 
 // Setup Export Links
-document.body.addEventListener( 'click', ( event ) => {
-	if (
-		! event.target.classList.contains( 'wp-list-reusable-blocks__export' )
-	) {
+document.body.addEventListener('click', (event) => {
+	if (!event.target.classList.contains('wp-list-reusable-blocks__export')) {
 		return;
 	}
 	event.preventDefault();
-	exportReusableBlock( event.target.dataset.id );
-} );
+	exportReusableBlock(event.target.dataset.id);
+});
 
 // Setup Import Form
-document.addEventListener( 'DOMContentLoaded', () => {
-	const button = document.querySelector( '.page-title-action' );
-	if ( ! button ) {
+document.addEventListener('DOMContentLoaded', () => {
+	const button = document.querySelector('.page-title-action');
+	if (!button) {
 		return;
 	}
 
 	const showNotice = () => {
-		const notice = document.createElement( 'div' );
+		const notice = document.createElement('div');
 		notice.className = 'notice notice-success is-dismissible';
-		notice.innerHTML = `<p>${ __(
+		notice.innerHTML = `<p>${__(
 			'Reusable block imported successfully!'
-		) }</p>`;
+		)}</p>`;
 
-		const headerEnd = document.querySelector( '.wp-header-end' );
-		if ( ! headerEnd ) {
+		const headerEnd = document.querySelector('.wp-header-end');
+		if (!headerEnd) {
 			return;
 		}
-		headerEnd.parentNode.insertBefore( notice, headerEnd );
+		headerEnd.parentNode.insertBefore(notice, headerEnd);
 	};
 
-	const container = document.createElement( 'div' );
+	const container = document.createElement('div');
 	container.className = 'list-reusable-blocks__container';
-	button.parentNode.insertBefore( container, button );
-	render( <ImportDropdown onUpload={ showNotice } />, container );
-} );
+	button.parentNode.insertBefore(container, button);
+	render(<ImportDropdown onUpload={showNotice} />, container);
+});

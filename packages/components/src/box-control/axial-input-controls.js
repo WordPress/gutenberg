@@ -5,9 +5,9 @@ import UnitControl from './unit-control';
 import { LABELS } from './utils';
 import { Layout } from './styles/box-control-styles';
 
-const groupedSides = [ 'vertical', 'horizontal' ];
+const groupedSides = ['vertical', 'horizontal'];
 
-export default function AxialInputControls( {
+export default function AxialInputControls({
 	onChange,
 	onFocus,
 	onHoverOn,
@@ -17,123 +17,123 @@ export default function AxialInputControls( {
 	setSelectedUnits,
 	sides,
 	...props
-} ) {
-	const createHandleOnFocus = ( side ) => ( event ) => {
-		if ( ! onFocus ) {
+}) {
+	const createHandleOnFocus = (side) => (event) => {
+		if (!onFocus) {
 			return;
 		}
-		onFocus( event, { side } );
+		onFocus(event, { side });
 	};
 
-	const createHandleOnHoverOn = ( side ) => () => {
-		if ( ! onHoverOn ) {
+	const createHandleOnHoverOn = (side) => () => {
+		if (!onHoverOn) {
 			return;
 		}
-		if ( side === 'vertical' ) {
-			onHoverOn( {
+		if (side === 'vertical') {
+			onHoverOn({
 				top: true,
 				bottom: true,
-			} );
+			});
 		}
-		if ( side === 'horizontal' ) {
-			onHoverOn( {
+		if (side === 'horizontal') {
+			onHoverOn({
 				left: true,
 				right: true,
-			} );
+			});
 		}
 	};
 
-	const createHandleOnHoverOff = ( side ) => () => {
-		if ( ! onHoverOff ) {
+	const createHandleOnHoverOff = (side) => () => {
+		if (!onHoverOff) {
 			return;
 		}
-		if ( side === 'vertical' ) {
-			onHoverOff( {
+		if (side === 'vertical') {
+			onHoverOff({
 				top: false,
 				bottom: false,
-			} );
+			});
 		}
-		if ( side === 'horizontal' ) {
-			onHoverOff( {
+		if (side === 'horizontal') {
+			onHoverOff({
 				left: false,
 				right: false,
-			} );
+			});
 		}
 	};
 
-	const createHandleOnChange = ( side ) => ( next ) => {
-		if ( ! onChange ) {
+	const createHandleOnChange = (side) => (next) => {
+		if (!onChange) {
 			return;
 		}
 		const nextValues = { ...values };
-		const isNumeric = ! isNaN( parseFloat( next ) );
+		const isNumeric = !isNaN(parseFloat(next));
 		const nextValue = isNumeric ? next : undefined;
 
-		if ( side === 'vertical' ) {
+		if (side === 'vertical') {
 			nextValues.top = nextValue;
 			nextValues.bottom = nextValue;
 		}
 
-		if ( side === 'horizontal' ) {
+		if (side === 'horizontal') {
 			nextValues.left = nextValue;
 			nextValues.right = nextValue;
 		}
 
-		onChange( nextValues );
+		onChange(nextValues);
 	};
 
-	const createHandleOnUnitChange = ( side ) => ( next ) => {
+	const createHandleOnUnitChange = (side) => (next) => {
 		const newUnits = { ...selectedUnits };
 
-		if ( side === 'vertical' ) {
+		if (side === 'vertical') {
 			newUnits.top = next;
 			newUnits.bottom = next;
 		}
 
-		if ( side === 'horizontal' ) {
+		if (side === 'horizontal') {
 			newUnits.left = next;
 			newUnits.right = next;
 		}
 
-		setSelectedUnits( newUnits );
+		setSelectedUnits(newUnits);
 	};
 
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
-		? groupedSides.filter( ( side ) => sides.includes( side ) )
+		? groupedSides.filter((side) => sides.includes(side))
 		: groupedSides;
 
-	const first = filteredSides[ 0 ];
-	const last = filteredSides[ filteredSides.length - 1 ];
+	const first = filteredSides[0];
+	const last = filteredSides[filteredSides.length - 1];
 	const only = first === last;
 
 	return (
 		<Layout
-			gap={ 0 }
+			gap={0}
 			align="top"
 			className="component-box-control__vertical-horizontal-input-controls"
 		>
-			{ filteredSides.map( ( side ) => (
+			{filteredSides.map((side) => (
 				<UnitControl
-					{ ...props }
-					isFirst={ first === side }
-					isLast={ last === side }
-					isOnly={ only === side }
-					value={ side === 'vertical' ? values.top : values.left }
+					{...props}
+					isFirst={first === side}
+					isLast={last === side}
+					isOnly={only === side}
+					value={side === 'vertical' ? values.top : values.left}
 					unit={
 						side === 'vertical'
 							? selectedUnits.top
 							: selectedUnits.left
 					}
-					onChange={ createHandleOnChange( side ) }
-					onUnitChange={ createHandleOnUnitChange( side ) }
-					onFocus={ createHandleOnFocus( side ) }
-					onHoverOn={ createHandleOnHoverOn( side ) }
-					onHoverOff={ createHandleOnHoverOff( side ) }
-					label={ LABELS[ side ] }
-					key={ side }
+					onChange={createHandleOnChange(side)}
+					onUnitChange={createHandleOnUnitChange(side)}
+					onFocus={createHandleOnFocus(side)}
+					onHoverOn={createHandleOnHoverOn(side)}
+					onHoverOff={createHandleOnHoverOff(side)}
+					label={LABELS[side]}
+					key={side}
 				/>
-			) ) }
+			))}
 		</Layout>
 	);
 }

@@ -27,27 +27,27 @@ export {
 } from 'react-native-svg';
 
 const AnimatedSvg = Animated.createAnimatedComponent(
-	forwardRef( ( props, ref ) => <Svg ref={ ref } { ...props } /> )
+	forwardRef((props, ref) => <Svg ref={ref} {...props} />)
 );
 
-export const SVG = ( {
+export const SVG = ({
 	className = '',
 	isPressed,
 	animated = false,
 	...props
-} ) => {
+}) => {
 	const colorScheme = props.colorScheme || 'light';
 	const stylesFromClasses = className
-		.split( ' ' )
-		.map( ( element ) => styles[ element ] )
-		.filter( Boolean );
+		.split(' ')
+		.map((element) => styles[element])
+		.filter(Boolean);
 	const defaultStyle = isPressed
-		? styles[ 'is-pressed' ]
-		: styles[ 'components-toolbar__control-' + colorScheme ];
-	const propStyle = Array.isArray( props.style )
-		? props.style.reduce( ( acc, el ) => {
+		? styles['is-pressed']
+		: styles['components-toolbar__control-' + colorScheme];
+	const propStyle = Array.isArray(props.style)
+		? props.style.reduce((acc, el) => {
 				return { ...acc, ...el };
-		  }, {} )
+		  }, {})
 		: props.style;
 	const styleValues = Object.assign(
 		{},
@@ -63,10 +63,10 @@ export const SVG = ( {
 	return (
 		<SvgWrapper
 			//We want to re-render when style color is changed
-			key={ appliedProps.style.color }
+			key={appliedProps.style.color}
 			height="100%"
 			width="100%"
-			{ ...appliedProps }
+			{...appliedProps}
 		/>
 	);
 };

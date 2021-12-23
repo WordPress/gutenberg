@@ -7,9 +7,9 @@ import InlineLinkUI from '../inline';
  */
 import { shallow } from 'enzyme';
 
-describe( 'InlineLinkUI', () => {
-	it( 'InlineLinkUI renders', () => {
-		const wrapper = shallow( <InlineLinkUI /> );
-		expect( wrapper ).toBeTruthy();
-	} );
-} );
+describe('InlineLinkUI', () => {
+	it('InlineLinkUI renders', () => {
+		const wrapper = shallow(<InlineLinkUI />);
+		expect(wrapper).toBeTruthy();
+	});
+});

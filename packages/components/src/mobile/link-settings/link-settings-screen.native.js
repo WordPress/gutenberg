@@ -13,31 +13,31 @@ import { useMemo } from '@wordpress/element';
  */
 import LinkSettings from './';
 
-const LinkSettingsScreen = ( props ) => {
+const LinkSettingsScreen = (props) => {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const { url = '' } = props;
 	const { inputValue = url } = route.params || {};
 
 	const onLinkCellPressed = () => {
-		if ( props.onLinkCellPressed ) {
-			props.onLinkCellPressed( { navigation } );
+		if (props.onLinkCellPressed) {
+			props.onLinkCellPressed({ navigation });
 		} else {
-			navigation.navigate( 'linkPicker', { inputValue } );
+			navigation.navigate('linkPicker', { inputValue });
 		}
 	};
 
-	return useMemo( () => {
+	return useMemo(() => {
 		return (
 			<LinkSettings
-				{ ...props }
+				{...props}
 				onLinkCellPressed={
 					props.hasPicker ? onLinkCellPressed : undefined
 				}
-				urlValue={ inputValue }
+				urlValue={inputValue}
 			/>
 		);
-	}, [ props, inputValue, navigation, route ] );
+	}, [props, inputValue, navigation, route]);
 };
 
 export default LinkSettingsScreen;

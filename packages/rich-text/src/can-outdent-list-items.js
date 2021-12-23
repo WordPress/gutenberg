@@ -13,8 +13,8 @@ import { getLineIndex } from './get-line-index';
  *
  * @return {boolean} Whether or not the selected list item can be outdented.
  */
-export function canOutdentListItems( value ) {
+export function canOutdentListItems(value) {
 	const { replacements, start } = value;
-	const startingLineIndex = getLineIndex( value, start );
-	return replacements[ startingLineIndex ] !== undefined;
+	const startingLineIndex = getLineIndex(value, start);
+	return replacements[startingLineIndex] !== undefined;
 }

@@ -11,12 +11,12 @@ import { gallery as icon } from '@wordpress/icons';
 import styles from './styles.scss';
 
 const IconWithColorScheme = withPreferredColorScheme(
-	( { getStylesFromColorScheme } ) => {
+	({ getStylesFromColorScheme }) => {
 		const colorSchemeStyles = getStylesFromColorScheme(
 			styles.icon,
 			styles.iconDark
 		);
-		return <Icon icon={ icon } { ...colorSchemeStyles } />;
+		return <Icon icon={icon} {...colorSchemeStyles} />;
 	}
 );
 

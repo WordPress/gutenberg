@@ -22,59 +22,59 @@ import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
 
 // this creates a search suggestion for adding a url directly
-export const createDirectEntry = ( value ) => {
+export const createDirectEntry = (value) => {
 	let type = 'URL';
 
-	const protocol = lowerCase( getProtocol( value ) ) || '';
+	const protocol = lowerCase(getProtocol(value)) || '';
 
-	if ( protocol.includes( 'mailto' ) ) {
+	if (protocol.includes('mailto')) {
 		type = 'mailto';
 	}
 
-	if ( protocol.includes( 'tel' ) ) {
+	if (protocol.includes('tel')) {
 		type = 'tel';
 	}
 
-	if ( startsWith( value, '#' ) ) {
+	if (startsWith(value, '#')) {
 		type = 'internal';
 	}
 
 	return {
 		isDirectEntry: true,
 		title: value,
-		url: type === 'URL' ? prependHTTP( value ) : value,
+		url: type === 'URL' ? prependHTTP(value) : value,
 		type,
 	};
 };
 
 const getURLFromClipboard = async () => {
 	const text = await Clipboard.getString();
-	return !! text && isURL( text ) ? text : '';
+	return !!text && isURL(text) ? text : '';
 };
 
-export const LinkPicker = ( {
+export const LinkPicker = ({
 	value: initialValue,
 	onLinkPicked,
 	onCancel: cancel,
-} ) => {
-	const [ { value, clipboardUrl }, setValue ] = useState( {
+}) => {
+	const [{ value, clipboardUrl }, setValue] = useState({
 		value: initialValue,
 		clipboardUrl: '',
-	} );
-	const directEntry = createDirectEntry( value );
+	});
+	const directEntry = createDirectEntry(value);
 
 	// the title of a direct entry is displayed as the raw input value, but if we
 	// are replacing empty text, we want to use the generated url
-	const pickLink = ( { title, url, isDirectEntry } ) => {
-		onLinkPicked( { title: isDirectEntry ? url : title, url } );
+	const pickLink = ({ title, url, isDirectEntry }) => {
+		onLinkPicked({ title: isDirectEntry ? url : title, url });
 	};
 
 	const onSubmit = () => {
-		pickLink( directEntry );
+		pickLink(directEntry);
 	};
 
 	const clear = () => {
-		setValue( { value: '', clipboardUrl } );
+		setValue({ value: '', clipboardUrl });
 	};
 
 	const omniCellStyle = usePreferredColorSchemeStyle(
@@ -87,75 +87,75 @@ export const LinkPicker = ( {
 		styles.iconDark
 	);
 
-	useEffect( () => {
+	useEffect(() => {
 		getURLFromClipboard()
-			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
-			.catch( () => setValue( { value, clipboardUrl: '' } ) );
-	}, [] );
+			.then((url) => setValue({ value, clipboardUrl: url }))
+			.catch(() => setValue({ value, clipboardUrl: '' }));
+	}, []);
 
 	// TODO: Localize the accessibility label.
 	// TODO: Decide on if `LinkSuggestionItemCell` with `isDirectEntry` makes sense.
 	return (
-		<SafeAreaView style={ styles.safeArea }>
+		<SafeAreaView style={styles.safeArea}>
 			<NavBar>
-				<NavBar.DismissButton onPress={ cancel } />
-				<NavBar.Heading>{ __( 'Link to' ) }</NavBar.Heading>
-				<NavBar.ApplyButton onPress={ onSubmit } />
+				<NavBar.DismissButton onPress={cancel} />
+				<NavBar.Heading>{__('Link to')}</NavBar.Heading>
+				<NavBar.ApplyButton onPress={onSubmit} />
 			</NavBar>
-			<View style={ styles.contentContainer }>
+			<View style={styles.contentContainer}>
 				<BottomSheet.Cell
-					icon={ link }
-					style={ omniCellStyle }
-					valueStyle={ styles.omniInput }
-					value={ value }
-					placeholder={ __( 'Search or type URL' ) }
+					icon={link}
+					style={omniCellStyle}
+					valueStyle={styles.omniInput}
+					value={value}
+					placeholder={__('Search or type URL')}
 					autoCapitalize="none"
-					autoCorrect={ false }
+					autoCorrect={false}
 					keyboardType="url"
-					onChangeValue={ ( newValue ) => {
-						setValue( { value: newValue, clipboardUrl } );
-					} }
-					onSubmit={ onSubmit }
+					onChangeValue={(newValue) => {
+						setValue({ value: newValue, clipboardUrl });
+					}}
+					onSubmit={onSubmit}
 					/* eslint-disable-next-line jsx-a11y/no-autofocus */
 					autoFocus
 					separatorType="none"
 				>
-					{ value !== '' && (
+					{value !== '' && (
 						<TouchableOpacity
-							onPress={ clear }
-							style={ styles.clearIcon }
+							onPress={clear}
+							style={styles.clearIcon}
 						>
 							<Icon
-								icon={ cancelCircleFilled }
-								fill={ iconStyle.color }
-								size={ 24 }
+								icon={cancelCircleFilled}
+								fill={iconStyle.color}
+								size={24}
 							/>
 						</TouchableOpacity>
-					) }
+					)}
 				</BottomSheet.Cell>
-				{ !! clipboardUrl && clipboardUrl !== value && (
+				{!!clipboardUrl && clipboardUrl !== value && (
 					<BottomSheet.LinkSuggestionItemCell
 						accessible
-						accessibilityLabel={ sprintf(
+						accessibilityLabel={sprintf(
 							/* translators: Copy URL from the clipboard, https://sample.url */
-							__( 'Copy URL from the clipboard, %s' ),
+							__('Copy URL from the clipboard, %s'),
 							clipboardUrl
-						) }
-						suggestion={ {
+						)}
+						suggestion={{
 							type: 'clipboard',
 							url: clipboardUrl,
 							isDirectEntry: true,
-						} }
-						onLinkPicked={ pickLink }
+						}}
+						onLinkPicked={pickLink}
 					/>
-				) }
-				{ !! value && (
+				)}
+				{!!value && (
 					<LinkPickerResults
-						query={ value }
-						onLinkPicked={ pickLink }
-						directEntry={ directEntry }
+						query={value}
+						onLinkPicked={pickLink}
+						directEntry={directEntry}
 					/>
-				) }
+				)}
 			</View>
 		</SafeAreaView>
 	);

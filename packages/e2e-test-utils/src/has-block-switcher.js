@@ -4,7 +4,7 @@
  * @return {Promise} Promise resolving with a boolean.
  */
 export const hasBlockSwitcher = async () => {
-	return page.evaluate( ( blockSwitcherSelector ) => {
-		return !! document.querySelector( blockSwitcherSelector );
-	}, '.block-editor-block-toolbar .block-editor-block-switcher' );
+	return page.evaluate((blockSwitcherSelector) => {
+		return !!document.querySelector(blockSwitcherSelector);
+	}, '.block-editor-block-toolbar .block-editor-block-switcher');
 };

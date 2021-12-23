@@ -12,56 +12,52 @@ function KeyboardShortcuts() {
 
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	useEffect( () => {
-		registerShortcut( {
+	const { registerShortcut } = useDispatch(keyboardShortcutsStore);
+	useEffect(() => {
+		registerShortcut({
 			name: 'core/block-editor/duplicate',
 			category: 'block',
-			description: __( 'Duplicate the selected block(s).' ),
+			description: __('Duplicate the selected block(s).'),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: 'd',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/remove',
 			category: 'block',
-			description: __( 'Remove the selected block(s).' ),
+			description: __('Remove the selected block(s).'),
 			keyCombination: {
 				modifier: 'access',
 				character: 'z',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/insert-before',
 			category: 'block',
-			description: __(
-				'Insert a new block before the selected block(s).'
-			),
+			description: __('Insert a new block before the selected block(s).'),
 			keyCombination: {
 				modifier: 'primaryAlt',
 				character: 't',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/insert-after',
 			category: 'block',
-			description: __(
-				'Insert a new block after the selected block(s).'
-			),
+			description: __('Insert a new block after the selected block(s).'),
 			keyCombination: {
 				modifier: 'primaryAlt',
 				character: 'y',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/delete-multi-selection',
 			category: 'block',
-			description: __( 'Remove multiple selected blocks.' ),
+			description: __('Remove multiple selected blocks.'),
 			keyCombination: {
 				character: 'del',
 			},
@@ -70,9 +66,9 @@ function KeyboardShortcutsRegister() {
 					character: 'backspace',
 				},
 			],
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/select-all',
 			category: 'selection',
 			description: __(
@@ -82,47 +78,47 @@ function KeyboardShortcutsRegister() {
 				modifier: 'primary',
 				character: 'a',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/unselect',
 			category: 'selection',
-			description: __( 'Clear selection.' ),
+			description: __('Clear selection.'),
 			keyCombination: {
 				character: 'escape',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/focus-toolbar',
 			category: 'global',
-			description: __( 'Navigate to the nearest toolbar.' ),
+			description: __('Navigate to the nearest toolbar.'),
 			keyCombination: {
 				modifier: 'alt',
 				character: 'F10',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/move-up',
 			category: 'block',
-			description: __( 'Move the selected block(s) up.' ),
+			description: __('Move the selected block(s) up.'),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 't',
 			},
-		} );
+		});
 
-		registerShortcut( {
+		registerShortcut({
 			name: 'core/block-editor/move-down',
 			category: 'block',
-			description: __( 'Move the selected block(s) down.' ),
+			description: __('Move the selected block(s) down.'),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'y',
 			},
-		} );
-	}, [ registerShortcut ] );
+		});
+	}, [registerShortcut]);
 
 	return null;
 }

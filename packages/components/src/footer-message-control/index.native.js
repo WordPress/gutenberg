@@ -7,8 +7,8 @@ import { memo } from '@wordpress/element';
  */
 import FooterMessageCell from '../mobile/bottom-sheet/footer-message-cell';
 
-function FooterMessageControl( { ...props } ) {
-	return <FooterMessageCell { ...props } />;
+function FooterMessageControl({ ...props }) {
+	return <FooterMessageCell {...props} />;
 }
 
-export default memo( FooterMessageControl );
+export default memo(FooterMessageControl);

@@ -13,34 +13,34 @@ import { check } from '@wordpress/icons';
  */
 import MenuItem from '../menu-item';
 
-export default function MenuItemsChoice( {
+export default function MenuItemsChoice({
 	choices = [],
 	onHover = noop,
 	onSelect,
 	value,
-} ) {
-	return choices.map( ( item ) => {
+}) {
+	return choices.map((item) => {
 		const isSelected = value === item.value;
 		return (
 			<MenuItem
-				key={ item.value }
+				key={item.value}
 				role="menuitemradio"
-				icon={ isSelected && check }
-				info={ item.info }
-				isSelected={ isSelected }
-				shortcut={ item.shortcut }
+				icon={isSelected && check}
+				info={item.info}
+				isSelected={isSelected}
+				shortcut={item.shortcut}
 				className="components-menu-items-choice"
-				onClick={ () => {
-					if ( ! isSelected ) {
-						onSelect( item.value );
+				onClick={() => {
+					if (!isSelected) {
+						onSelect(item.value);
 					}
-				} }
-				onMouseEnter={ () => onHover( item.value ) }
-				onMouseLeave={ () => onHover( null ) }
-				aria-label={ item[ 'aria-label' ] }
+				}}
+				onMouseEnter={() => onHover(item.value)}
+				onMouseLeave={() => onHover(null)}
+				aria-label={item['aria-label']}
 			>
-				{ item.label }
+				{item.label}
 			</MenuItem>
 		);
-	} );
+	});
 }

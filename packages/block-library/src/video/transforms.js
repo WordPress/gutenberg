@@ -8,20 +8,19 @@ const transforms = {
 	from: [
 		{
 			type: 'files',
-			isMatch( files ) {
+			isMatch(files) {
 				return (
-					files.length === 1 &&
-					files[ 0 ].type.indexOf( 'video/' ) === 0
+					files.length === 1 && files[0].type.indexOf('video/') === 0
 				);
 			},
-			transform( files ) {
-				const file = files[ 0 ];
+			transform(files) {
+				const file = files[0];
 				// We don't need to upload the media directly here
 				// It's already done as part of the `componentDidMount`
 				// in the video block
-				const block = createBlock( 'core/video', {
-					src: createBlobURL( file ),
-				} );
+				const block = createBlock('core/video', {
+					src: createBlobURL(file),
+				});
 				return block;
 			},
 		},
@@ -31,33 +30,33 @@ const transforms = {
 			attributes: {
 				src: {
 					type: 'string',
-					shortcode: ( {
+					shortcode: ({
 						named: { src, mp4, m4v, webm, ogv, flv },
-					} ) => {
+					}) => {
 						return src || mp4 || m4v || webm || ogv || flv;
 					},
 				},
 				poster: {
 					type: 'string',
-					shortcode: ( { named: { poster } } ) => {
+					shortcode: ({ named: { poster } }) => {
 						return poster;
 					},
 				},
 				loop: {
 					type: 'string',
-					shortcode: ( { named: { loop } } ) => {
+					shortcode: ({ named: { loop } }) => {
 						return loop;
 					},
 				},
 				autoplay: {
 					type: 'string',
-					shortcode: ( { named: { autoplay } } ) => {
+					shortcode: ({ named: { autoplay } }) => {
 						return autoplay;
 					},
 				},
 				preload: {
 					type: 'string',
-					shortcode: ( { named: { preload } } ) => {
+					shortcode: ({ named: { preload } }) => {
 						return preload;
 					},
 				},

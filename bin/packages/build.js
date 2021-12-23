@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const path = require( 'path' );
-const glob = require( 'fast-glob' );
-const ProgressBar = require( 'progress' );
-const workerFarm = require( 'worker-farm' );
-const { Readable, Transform } = require( 'stream' );
+const fs = require('fs');
+const path = require('path');
+const glob = require('fast-glob');
+const ProgressBar = require('progress');
+const workerFarm = require('worker-farm');
+const { Readable, Transform } = require('stream');
 
-const files = process.argv.slice( 2 );
+const files = process.argv.slice(2);
 
 /**
  * Path to packages directory.
@@ -16,11 +16,11 @@ const files = process.argv.slice( 2 );
  * @type {string}
  */
 const PACKAGES_DIR = path
-	.resolve( __dirname, '../../packages' )
-	.replace( /\\/g, '/' );
+	.resolve(__dirname, '../../packages')
+	.replace(/\\/g, '/');
 
 const stylesheetEntryPoints = glob.sync(
-	path.resolve( PACKAGES_DIR, '*/src/*.scss' )
+	path.resolve(PACKAGES_DIR, '*/src/*.scss')
 );
 
 /**
@@ -30,8 +30,8 @@ const stylesheetEntryPoints = glob.sync(
  *
  * @return {string} Package name.
  */
-function getPackageName( file ) {
-	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
+function getPackageName(file) {
+	return path.relative(PACKAGES_DIR, file).split(path.sep)[0];
 }
 
 /**
@@ -41,20 +41,18 @@ function getPackageName( file ) {
  *
  * @return {Array} List of Import Statements in a file.
  */
-function parseImportStatements( file ) {
-	const fileContent = fs.readFileSync( file, 'utf8' );
-	return fileContent.toString().match( /@import "(.*?)"/g );
+function parseImportStatements(file) {
+	const fileContent = fs.readFileSync(file, 'utf8');
+	return fileContent.toString().match(/@import "(.*?)"/g);
 }
 
-function isFileImportedInStyleEntry( file, importStatements ) {
-	const packageName = getPackageName( file );
-	const regex = new RegExp( `/${ packageName }/`, 'g' );
+function isFileImportedInStyleEntry(file, importStatements) {
+	const packageName = getPackageName(file);
+	const regex = new RegExp(`/${packageName}/`, 'g');
 
 	return (
 		importStatements &&
-		importStatements.find( ( importStatement ) =>
-			importStatement.match( regex )
-		)
+		importStatements.find((importStatement) => importStatement.match(regex))
 	);
 }
 
@@ -66,17 +64,14 @@ function isFileImportedInStyleEntry( file, importStatements ) {
  *
  * @return {Array} List of entry points that import the styles from the file.
  */
-function findStyleEntriesThatImportFile( file ) {
+function findStyleEntriesThatImportFile(file) {
 	const entriesWithImport = stylesheetEntryPoints.reduce(
-		( acc, entryPoint ) => {
-			const styleEntryImportStatements = parseImportStatements(
-				entryPoint
-			);
+		(acc, entryPoint) => {
+			const styleEntryImportStatements =
+				parseImportStatements(entryPoint);
 
-			if (
-				isFileImportedInStyleEntry( file, styleEntryImportStatements )
-			) {
-				acc.push( entryPoint );
+			if (isFileImportedInStyleEntry(file, styleEntryImportStatements)) {
+				acc.push(entryPoint);
 			}
 
 			return acc;
@@ -98,53 +93,53 @@ function findStyleEntriesThatImportFile( file ) {
 function createStyleEntryTransform() {
 	const packages = new Set();
 
-	return new Transform( {
+	return new Transform({
 		objectMode: true,
-		async transform( file, encoding, callback ) {
+		async transform(file, encoding, callback) {
 			// Only stylesheets are subject to this transform.
-			if ( path.extname( file ) !== '.scss' ) {
-				this.push( file );
+			if (path.extname(file) !== '.scss') {
+				this.push(file);
 				callback();
 				return;
 			}
 
 			// Only operate once per package, assuming entries are common.
-			const packageName = getPackageName( file );
-			if ( packages.has( packageName ) ) {
+			const packageName = getPackageName(file);
+			if (packages.has(packageName)) {
 				callback();
 				return;
 			}
 
-			packages.add( packageName );
+			packages.add(packageName);
 			const entries = await glob(
-				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+				path.resolve(PACKAGES_DIR, packageName, 'src/*.scss')
 			);
 
 			// Account for the specific case where block styles in
 			// block-library package also need rebuilding.
 			if (
 				packageName === 'block-library' &&
-				[ 'style.scss', 'editor.scss', 'theme.scss' ].includes(
-					path.basename( file )
+				['style.scss', 'editor.scss', 'theme.scss'].includes(
+					path.basename(file)
 				)
 			) {
-				entries.push( file );
+				entries.push(file);
 			}
 
-			entries.forEach( ( entry ) => this.push( entry ) );
+			entries.forEach((entry) => this.push(entry));
 
 			// Find other stylesheets that need to be rebuilt because
 			// they import the styles that are being transformed
-			const styleEntries = findStyleEntriesThatImportFile( file );
+			const styleEntries = findStyleEntriesThatImportFile(file);
 
 			// Rebuild stylesheets that import the styles being transformed
-			if ( styleEntries.length ) {
-				styleEntries.forEach( ( entry ) => stream.push( entry ) );
+			if (styleEntries.length) {
+				styleEntries.forEach((entry) => stream.push(entry));
 			}
 
 			callback();
 		},
-	} );
+	});
 }
 
 /**
@@ -158,66 +153,65 @@ function createStyleEntryTransform() {
 function createBlockJsonEntryTransform() {
 	const blocks = new Set();
 
-	return new Transform( {
+	return new Transform({
 		objectMode: true,
-		async transform( file, encoding, callback ) {
-			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
-				file
-			);
-			const blockName = matches ? matches[ 1 ] : undefined;
+		async transform(file, encoding, callback) {
+			const matches =
+				/block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(file);
+			const blockName = matches ? matches[1] : undefined;
 
 			// Only block.json files in the block-library folder are subject to this transform.
-			if ( ! blockName ) {
-				this.push( file );
+			if (!blockName) {
+				this.push(file);
 				callback();
 				return;
 			}
 
 			// Only operate once per block, assuming entries are common.
-			if ( blockName && blocks.has( blockName ) ) {
+			if (blockName && blocks.has(blockName)) {
 				callback();
 				return;
 			}
 
-			blocks.add( blockName );
-			this.push( file.replace( 'block.json', 'index.js' ) );
+			blocks.add(blockName);
+			this.push(file.replace('block.json', 'index.js'));
 			callback();
 		},
-	} );
+	});
 }
 
 let onFileComplete = () => {};
 
 let stream;
 
-if ( files.length ) {
-	stream = new Readable( { encoding: 'utf8' } );
-	files.forEach( ( file ) => {
-		stream.push( file );
-	} );
+if (files.length) {
+	stream = new Readable({ encoding: 'utf8' });
+	files.forEach((file) => {
+		stream.push(file);
+	});
 
-	stream.push( null );
+	stream.push(null);
 	stream = stream
-		.pipe( createStyleEntryTransform() )
-		.pipe( createBlockJsonEntryTransform() );
+		.pipe(createStyleEntryTransform())
+		.pipe(createBlockJsonEntryTransform());
 } else {
-	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
+	const bar = new ProgressBar('Build Progress: [:bar] :percent', {
 		width: 30,
 		incomplete: ' ',
 		total: 1,
-	} );
+	});
 
-	bar.tick( 0 );
+	bar.tick(0);
 
 	stream = glob.stream(
 		[
-			`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
-			`${ PACKAGES_DIR }/*/src/*.scss`,
-			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
-			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
-			`${ PACKAGES_DIR }/block-library/src/*/theme.scss`,
-			`${ PACKAGES_DIR }/block-library/src/*/editor.scss`,
-			`${ PACKAGES_DIR }/block-library/src/*.scss`,
+			`${PACKAGES_DIR}/*/src/**/*.{js,ts,tsx}`,
+			`${PACKAGES_DIR}/*/src/*.scss`,
+			`${PACKAGES_DIR}/block-library/src/**/*.js`,
+			`${PACKAGES_DIR}/block-library/src/*/style.scss`,
+			`${PACKAGES_DIR}/block-library/src/*/theme.scss`,
+			`${PACKAGES_DIR}/block-library/src/*/editor.scss`,
+			`${PACKAGES_DIR}/block-library/src/*.scss`,
 		],
 		{
 			ignore: [
@@ -233,26 +227,26 @@ if ( files.length ) {
 	// but should wait until worker processing below.
 	//
 	// See: https://nodejs.org/api/stream.html#stream_two_reading_modes
-	stream.pause().on( 'data', ( file ) => {
-		bar.total = files.push( file );
-	} );
+	stream.pause().on('data', (file) => {
+		bar.total = files.push(file);
+	});
 
 	onFileComplete = () => {
 		bar.tick();
 	};
 }
 
-const worker = workerFarm( require.resolve( './build-worker' ) );
+const worker = workerFarm(require.resolve('./build-worker'));
 
 let ended = false,
 	complete = 0;
 
 stream
-	.on( 'data', ( file ) =>
-		worker( file, ( error ) => {
+	.on('data', (file) =>
+		worker(file, (error) => {
 			onFileComplete();
 
-			if ( error ) {
+			if (error) {
 				// If an error occurs, the process can't be ended immediately since
 				// other workers are likely pending. Optimally, it would end at the
 				// earliest opportunity (after the current round of workers has had
@@ -262,14 +256,14 @@ stream
 				// fact that an error had occurred.
 				process.exitCode = 1;
 
-				console.error( error );
+				console.error(error);
 			}
 
 			++complete;
-			if ( ended && complete === files.length ) {
-				workerFarm.end( worker );
+			if (ended && complete === files.length) {
+				workerFarm.end(worker);
 			}
-		} )
+		})
 	)
-	.on( 'end', () => ( ended = true ) )
+	.on('end', () => (ended = true))
 	.resume();

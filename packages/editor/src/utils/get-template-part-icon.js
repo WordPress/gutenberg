@@ -14,12 +14,12 @@ import {
  *
  * @return {Object} The corresponding icon.
  */
-export function getTemplatePartIcon( iconName ) {
-	if ( 'header' === iconName ) {
+export function getTemplatePartIcon(iconName) {
+	if ('header' === iconName) {
 		return headerIcon;
-	} else if ( 'footer' === iconName ) {
+	} else if ('footer' === iconName) {
 		return footerIcon;
-	} else if ( 'sidebar' === iconName ) {
+	} else if ('sidebar' === iconName) {
 		return sidebarIcon;
 	}
 	return symbolFilledIcon;

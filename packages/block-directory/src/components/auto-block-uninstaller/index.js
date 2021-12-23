@@ -12,26 +12,26 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as blockDirectoryStore } from '../../store';
 
 export default function AutoBlockUninstaller() {
-	const { uninstallBlockType } = useDispatch( blockDirectoryStore );
+	const { uninstallBlockType } = useDispatch(blockDirectoryStore);
 
-	const shouldRemoveBlockTypes = useSelect( ( select ) => {
-		const { isAutosavingPost, isSavingPost } = select( editorStore );
-		return isSavingPost() && ! isAutosavingPost();
-	}, [] );
+	const shouldRemoveBlockTypes = useSelect((select) => {
+		const { isAutosavingPost, isSavingPost } = select(editorStore);
+		return isSavingPost() && !isAutosavingPost();
+	}, []);
 
 	const unusedBlockTypes = useSelect(
-		( select ) => select( blockDirectoryStore ).getUnusedBlockTypes(),
+		(select) => select(blockDirectoryStore).getUnusedBlockTypes(),
 		[]
 	);
 
-	useEffect( () => {
-		if ( shouldRemoveBlockTypes && unusedBlockTypes.length ) {
-			unusedBlockTypes.forEach( ( blockType ) => {
-				uninstallBlockType( blockType );
-				unregisterBlockType( blockType.name );
-			} );
+	useEffect(() => {
+		if (shouldRemoveBlockTypes && unusedBlockTypes.length) {
+			unusedBlockTypes.forEach((blockType) => {
+				uninstallBlockType(blockType);
+				unregisterBlockType(blockType.name);
+			});
 		}
-	}, [ shouldRemoveBlockTypes ] );
+	}, [shouldRemoveBlockTypes]);
 
 	return null;
 }

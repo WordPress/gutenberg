@@ -1,1 +1,1 @@
-module.exports = require( './scripts/setup-test-framework' );
+module.exports = require('./scripts/setup-test-framework');

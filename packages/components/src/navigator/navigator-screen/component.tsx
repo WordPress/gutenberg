@@ -35,18 +35,18 @@ const animationExitDelay = 0;
 // Props specific to `framer-motion` can't be currently passed to `NavigatorScreen`,
 // as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
 type Props = Omit<
-	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
+	WordPressComponentProps<NavigatorScreenProps, 'div', false>,
 	keyof MotionProps
 >;
 
-function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+function NavigatorScreen(props: Props, forwardedRef: Ref<any>) {
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const [ currentPath ] = useContext( NavigatorContext );
+	const [currentPath] = useContext(NavigatorContext);
 	const isMatch = currentPath.path === path;
 	const ref = useFocusOnMount();
 
@@ -54,32 +54,32 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const classes = useMemo(
 		() =>
 			cx(
-				css( {
+				css({
 					// Ensures horizontal overflow is visually accessible
 					overflowX: 'auto',
 					// In case the root has a height, it should not be exceeded
 					maxHeight: '100%',
-				} ),
+				}),
 				className
 			),
-		[ className ]
+		[className]
 	);
 
 	// This flag is used to only apply the focus on mount when the actual path changes.
 	// It avoids the focus to happen on the first render.
-	const [ hasPathChanged, setHasPathChanged ] = useState( false );
-	useEffect( () => {
-		setHasPathChanged( true );
-	}, [ path ] );
+	const [hasPathChanged, setHasPathChanged] = useState(false);
+	useEffect(() => {
+		setHasPathChanged(true);
+	}, [path]);
 
-	if ( ! isMatch ) {
+	if (!isMatch) {
 		return null;
 	}
 
-	if ( prefersReducedMotion ) {
+	if (prefersReducedMotion) {
 		return (
-			<View ref={ forwardedRef } className={ classes } { ...otherProps }>
-				{ children }
+			<View ref={forwardedRef} className={classes} {...otherProps}>
+				{children}
 			</View>
 		);
 	}
@@ -96,8 +96,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 	const initial = {
 		opacity: 0,
 		x:
-			( isRTL() && currentPath.isBack ) ||
-			( ! isRTL() && ! currentPath.isBack )
+			(isRTL() && currentPath.isBack) || (!isRTL() && !currentPath.isBack)
 				? 50
 				: -50,
 	};
@@ -105,8 +104,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 		delay: animationExitDelay,
 		opacity: 0,
 		x:
-			( ! isRTL() && currentPath.isBack ) ||
-			( isRTL() && ! currentPath.isBack )
+			(!isRTL() && currentPath.isBack) || (isRTL() && !currentPath.isBack)
 				? 50
 				: -50,
 		transition: {
@@ -123,12 +121,12 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 	return (
 		<motion.div
-			ref={ hasPathChanged ? ref : undefined }
-			className={ classes }
-			{ ...otherProps }
-			{ ...animatedProps }
+			ref={hasPathChanged ? ref : undefined}
+			className={classes}
+			{...otherProps}
+			{...animatedProps}
 		>
-			{ children }
+			{children}
 		</motion.div>
 	);
 }

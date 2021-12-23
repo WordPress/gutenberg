@@ -26,10 +26,10 @@ export const FocalPointWrapper = styled.div`
 	will-change: transform;
 	z-index: 10000;
 
-	${ ( { isDragging } ) => isDragging && 'cursor: grabbing;' }
+	${({ isDragging }) => isDragging && 'cursor: grabbing;'}
 `;
 
-export const PointerIconSVG = styled( SVG )`
+export const PointerIconSVG = styled(SVG)`
 	display: block;
 	height: 100%;
 	left: 0;
@@ -38,11 +38,11 @@ export const PointerIconSVG = styled( SVG )`
 	width: 100%;
 `;
 
-export const PointerIconPathOutline = styled( Path )`
+export const PointerIconPathOutline = styled(Path)`
 	fill: white;
 `;
 
-export const PointerIconPathFill = styled( Path )`
-	fill: ${ COLORS.blue.wordpress[ 700 ] };
-	fill: ${ COLORS.ui.theme };
+export const PointerIconPathFill = styled(Path)`
+	fill: ${COLORS.blue.wordpress[700]};
+	fill: ${COLORS.ui.theme};
 `;

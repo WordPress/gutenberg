@@ -14,15 +14,15 @@ import { store as blockEditorStore } from '../../store';
  */
 import classnames from 'classnames';
 
-export default function BlockContentOverlay( {
+export default function BlockContentOverlay({
 	clientId,
 	tagName: TagName = 'div',
 	wrapperProps,
 	className,
-} ) {
+}) {
 	const baseClassName = 'block-editor-block-content-overlay';
-	const [ isOverlayActive, setIsOverlayActive ] = useState( true );
-	const [ isHovered, setIsHovered ] = useState( false );
+	const [isOverlayActive, setIsOverlayActive] = useState(true);
+	const [isHovered, setIsHovered] = useState(false);
 
 	const {
 		isParentSelected,
@@ -30,21 +30,21 @@ export default function BlockContentOverlay( {
 		isDraggingBlocks,
 		isParentHighlighted,
 	} = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				isDraggingBlocks: _isDraggingBlocks,
 				isBlockHighlighted,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 			return {
-				isParentSelected: isBlockSelected( clientId ),
-				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
+				isParentSelected: isBlockSelected(clientId),
+				hasChildSelected: hasSelectedInnerBlock(clientId, true),
 				isDraggingBlocks: _isDraggingBlocks(),
-				isParentHighlighted: isBlockHighlighted( clientId ),
+				isParentHighlighted: isBlockHighlighted(clientId),
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	const classes = classnames(
@@ -58,24 +58,24 @@ export default function BlockContentOverlay( {
 		}
 	);
 
-	useEffect( () => {
+	useEffect(() => {
 		// Reenable when blocks are not in use.
-		if ( ! isParentSelected && ! hasChildSelected && ! isOverlayActive ) {
-			setIsOverlayActive( true );
+		if (!isParentSelected && !hasChildSelected && !isOverlayActive) {
+			setIsOverlayActive(true);
 		}
 		// Disable if parent selected by another means (such as list view).
 		// We check hover to ensure the overlay click interaction is not taking place.
 		// Trying to click the overlay will select the parent block via its 'focusin'
 		// listener on the wrapper, so if the block is selected while hovered we will
 		// let the mouseup disable the overlay instead.
-		if ( isParentSelected && ! isHovered && isOverlayActive ) {
-			setIsOverlayActive( false );
+		if (isParentSelected && !isHovered && isOverlayActive) {
+			setIsOverlayActive(false);
 		}
 		// Ensure overlay is disabled if a child block is selected.
-		if ( hasChildSelected && isOverlayActive ) {
-			setIsOverlayActive( false );
+		if (hasChildSelected && isOverlayActive) {
+			setIsOverlayActive(false);
 		}
-	}, [ isParentSelected, hasChildSelected, isOverlayActive, isHovered ] );
+	}, [isParentSelected, hasChildSelected, isOverlayActive, isHovered]);
 
 	// Disabled because the overlay div doesn't actually have a role or functionality
 	// as far as the a11y is concerned. We're just catching the first click so that
@@ -83,15 +83,15 @@ export default function BlockContentOverlay( {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<TagName
-			{ ...wrapperProps }
-			className={ classes }
-			onMouseEnter={ () => setIsHovered( true ) }
-			onMouseLeave={ () => setIsHovered( false ) }
+			{...wrapperProps}
+			className={classes}
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}
 			onMouseUp={
-				isOverlayActive ? () => setIsOverlayActive( false ) : undefined
+				isOverlayActive ? () => setIsOverlayActive(false) : undefined
 			}
 		>
-			{ wrapperProps?.children }
+			{wrapperProps?.children}
 		</TagName>
 	);
 }

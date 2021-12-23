@@ -9,29 +9,28 @@ import { useState, useEffect } from '@wordpress/element';
  * @param {string} [query] Media Query.
  * @return {boolean} return value of the media query.
  */
-export default function useMediaQuery( query ) {
-	const [ match, setMatch ] = useState(
+export default function useMediaQuery(query) {
+	const [match, setMatch] = useState(
 		() =>
-			!! (
+			!!(
 				query &&
 				typeof window !== 'undefined' &&
-				window.matchMedia( query ).matches
+				window.matchMedia(query).matches
 			)
 	);
 
-	useEffect( () => {
-		if ( ! query ) {
+	useEffect(() => {
+		if (!query) {
 			return;
 		}
-		const updateMatch = () =>
-			setMatch( window.matchMedia( query ).matches );
+		const updateMatch = () => setMatch(window.matchMedia(query).matches);
 		updateMatch();
-		const list = window.matchMedia( query );
-		list.addListener( updateMatch );
+		const list = window.matchMedia(query);
+		list.addListener(updateMatch);
 		return () => {
-			list.removeListener( updateMatch );
+			list.removeListener(updateMatch);
 		};
-	}, [ query ] );
+	}, [query]);
 
-	return !! query && match;
+	return !!query && match;
 }

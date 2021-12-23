@@ -21,28 +21,28 @@ import { _x } from '@wordpress/i18n';
  *
  * @return {Object} the matching size definition.
  */
-export const findSizeBySlug = ( sizes, slug ) =>
-	sizes.find( ( size ) => slug === size.slug );
+export const findSizeBySlug = (sizes, slug) =>
+	sizes.find((size) => slug === size.slug);
 
 export default [
 	{
-		name: _x( 'None', 'Size of a UI element' ),
+		name: _x('None', 'Size of a UI element'),
 		slug: 'none',
 	},
 	{
-		name: _x( 'Small', 'Size of a UI element' ),
+		name: _x('Small', 'Size of a UI element'),
 		slug: 'small',
 	},
 	{
-		name: _x( 'Medium', 'Size of a UI element' ),
+		name: _x('Medium', 'Size of a UI element'),
 		slug: 'medium',
 	},
 	{
-		name: _x( 'Large', 'Size of a UI element' ),
+		name: _x('Large', 'Size of a UI element'),
 		slug: 'large',
 	},
 	{
-		name: _x( 'Extra Large', 'Size of a UI element' ),
+		name: _x('Extra Large', 'Size of a UI element'),
 		slug: 'xlarge',
 	},
 ];

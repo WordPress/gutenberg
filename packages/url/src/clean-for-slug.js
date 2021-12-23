@@ -19,14 +19,14 @@ import { deburr, trim } from 'lodash';
  *
  * @return {string} Processed string.
  */
-export function cleanForSlug( string ) {
-	if ( ! string ) {
+export function cleanForSlug(string) {
+	if (!string) {
 		return '';
 	}
 	return trim(
-		deburr( string )
-			.replace( /[\s\./]+/g, '-' )
-			.replace( /[^\w-]+/g, '' )
+		deburr(string)
+			.replace(/[\s\./]+/g, '-')
+			.replace(/[^\w-]+/g, '')
 			.toLowerCase(),
 		'-'
 	);

@@ -16,32 +16,32 @@ Here's a simplified example of **compose** in use from Gutenberg's [`PluginSideb
 Using compose:
 
 ```js
-const applyWithSelect = withSelect( ( select, ownProps ) => {
-	return doSomething( select, ownProps );
-} );
-const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
-	return doSomethingElse( dispatch, ownProps );
-} );
+const applyWithSelect = withSelect((select, ownProps) => {
+	return doSomething(select, ownProps);
+});
+const applyWithDispatch = withDispatch((dispatch, ownProps) => {
+	return doSomethingElse(dispatch, ownProps);
+});
 
 export default compose(
 	withPluginContext,
 	applyWithSelect,
 	applyWithDispatch
-)( PluginSidebarMoreMenuItem );
+)(PluginSidebarMoreMenuItem);
 ```
 
 Without `compose`, the code would look like this:
 
 ```js
-const applyWithSelect = withSelect( ( select, ownProps ) => {
-	return doSomething( select, ownProps );
-} );
-const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
-	return doSomethingElse( dispatch, ownProps );
-} );
+const applyWithSelect = withSelect((select, ownProps) => {
+	return doSomething(select, ownProps);
+});
+const applyWithDispatch = withDispatch((dispatch, ownProps) => {
+	return doSomethingElse(dispatch, ownProps);
+});
 
 export default withPluginContext(
-	applyWithSelect( applyWithDispatch( PluginSidebarMoreMenuItem ) )
+	applyWithSelect(applyWithDispatch(PluginSidebarMoreMenuItem))
 );
 ```
 
@@ -95,10 +95,10 @@ _Usage_
 
 ```ts
 type Props = { foo: string };
-const Component = ( props: Props ) => <div>{ props.foo }</div>;
+const Component = (props: Props) => <div>{props.foo}</div>;
 const ConditionalComponent = ifCondition(
-	( props: Props ) => props.foo.length !== 0
-)( Component );
+	(props: Props) => props.foo.length !== 0
+)(Component);
 <ConditionalComponent foo="" />; // => null
 <ConditionalComponent foo="bar" />; // => <div>bar</div>;
 ```
@@ -147,7 +147,7 @@ import { useConstrainedTabbing } from '@wordpress/compose';
 const ConstrainedTabbingExample = () => {
 	const constrainedTabbingRef = useConstrainedTabbing();
 	return (
-		<div ref={ constrainedTabbingRef }>
+		<div ref={constrainedTabbingRef}>
 			<Button />
 			<Button />
 		</div>
@@ -230,7 +230,7 @@ import { useFocusOnMount } from '@wordpress/compose';
 const WithFocusOnMount = () => {
 	const ref = useFocusOnMount();
 	return (
-		<div ref={ ref }>
+		<div ref={ref}>
 			<Button />
 			<Button />
 		</div>
@@ -261,7 +261,7 @@ import { useFocusReturn } from '@wordpress/compose';
 const WithFocusReturn = () => {
 	const ref = useFocusReturn();
 	return (
-		<div ref={ ref }>
+		<div ref={ref}>
 			<Button />
 			<Button />
 		</div>
@@ -431,11 +431,11 @@ _Usage_
 
 ```js
 const App = () => {
-	const [ resizeListener, sizes ] = useResizeObserver();
+	const [resizeListener, sizes] = useResizeObserver();
 
 	return (
 		<div>
-			{ resizeListener }
+			{resizeListener}
 			Your content here
 		</div>
 	);
@@ -470,8 +470,8 @@ Returns true if the viewport matches the given query, or false otherwise.
 _Usage_
 
 ```js
-useViewportMatch( 'huge', '<' );
-useViewportMatch( 'medium' );
+useViewportMatch('huge', '<');
+useViewportMatch('medium');
 ```
 
 _Parameters_
@@ -492,8 +492,8 @@ this is useful in performance related work, to check why a component re-renders.
 _Usage_
 
 ```jsx
-function MyComponent( props ) {
-	useWarnOnChange( props );
+function MyComponent(props) {
+	useWarnOnChange(props);
 
 	return 'Something';
 }

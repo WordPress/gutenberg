@@ -28,32 +28,32 @@ import useRegistry from '../registry-provider/use-registry';
  * @return {Object}  An object mapping props to functions created by the passed
  *                   in dispatchMap.
  */
-const useDispatchWithMap = ( dispatchMap, deps ) => {
+const useDispatchWithMap = (dispatchMap, deps) => {
 	const registry = useRegistry();
-	const currentDispatchMap = useRef( dispatchMap );
+	const currentDispatchMap = useRef(dispatchMap);
 
-	useIsomorphicLayoutEffect( () => {
+	useIsomorphicLayoutEffect(() => {
 		currentDispatchMap.current = dispatchMap;
-	} );
+	});
 
-	return useMemo( () => {
+	return useMemo(() => {
 		const currentDispatchProps = currentDispatchMap.current(
 			registry.dispatch,
 			registry
 		);
-		return mapValues( currentDispatchProps, ( dispatcher, propName ) => {
-			if ( typeof dispatcher !== 'function' ) {
+		return mapValues(currentDispatchProps, (dispatcher, propName) => {
+			if (typeof dispatcher !== 'function') {
 				// eslint-disable-next-line no-console
 				console.warn(
-					`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
+					`Property ${propName} returned from dispatchMap in useDispatchWithMap must be a function.`
 				);
 			}
-			return ( ...args ) =>
+			return (...args) =>
 				currentDispatchMap
-					.current( registry.dispatch, registry )
-					[ propName ]( ...args );
-		} );
-	}, [ registry, ...deps ] );
+					.current(registry.dispatch, registry)
+					[propName](...args);
+		});
+	}, [registry, ...deps]);
 };
 
 export default useDispatchWithMap;

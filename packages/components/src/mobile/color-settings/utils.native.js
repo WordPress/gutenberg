@@ -8,10 +8,10 @@ const gradientOptions = [
 	{ label: 'Radial', value: gradients.radial },
 ];
 
-const getGradientType = ( color ) => {
-	if ( color?.includes( gradients.radial ) ) {
+const getGradientType = (color) => {
+	if (color?.includes(gradients.radial)) {
 		return gradients.radial;
-	} else if ( color?.includes( gradients.linear ) ) {
+	} else if (color?.includes(gradients.linear)) {
 		return gradients.linear;
 	}
 	return false;
@@ -23,9 +23,9 @@ export const colorsUtils = {
 		picker: 'Picker',
 		palette: 'Palette',
 	},
-	segments: [ 'Solid', 'Gradient' ],
+	segments: ['Solid', 'Gradient'],
 	gradients,
 	gradientOptions,
 	getGradientType,
-	isGradient: ( color ) => !! getGradientType( color ),
+	isGradient: (color) => !!getGradientType(color),
 };

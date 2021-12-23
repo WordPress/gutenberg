@@ -46,18 +46,18 @@ const EMPTY_ARRAY = [];
  *
  * @return {WPElement} Border color edit element.
  */
-export function BorderColorEdit( props ) {
+export function BorderColorEdit(props) {
 	const {
 		attributes: { borderColor, style },
 		setAttributes,
 	} = props;
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const availableColors = colorGradientSettings.colors.reduce(
-		( colors, origin ) => colors.concat( origin.colors ),
+		(colors, origin) => colors.concat(origin.colors),
 		[]
 	);
 	const { color: customBorderColor } = style?.border || {};
-	const [ colorValue, setColorValue ] = useState(
+	const [colorValue, setColorValue] = useState(
 		() =>
 			getColorObjectByAttributeValues(
 				availableColors,
@@ -70,7 +70,7 @@ export function BorderColorEdit( props ) {
 	// UI in sync. This is necessary for situations when border controls interact with
 	// eachother: eg, setting the border width to zero causes the color and style
 	// selections to be cleared.
-	useEffect( () => {
+	useEffect(() => {
 		setColorValue(
 			getColorObjectByAttributeValues(
 				availableColors,
@@ -78,15 +78,12 @@ export function BorderColorEdit( props ) {
 				customBorderColor
 			)?.color
 		);
-	}, [ borderColor, customBorderColor, availableColors ] );
+	}, [borderColor, customBorderColor, availableColors]);
 
-	const onChangeColor = ( value ) => {
-		setColorValue( value );
+	const onChangeColor = (value) => {
+		setColorValue(value);
 
-		const colorObject = getColorObjectByColorValue(
-			availableColors,
-			value
-		);
+		const colorObject = getColorObjectByColorValue(availableColors, value);
 		const newStyle = {
 			...style,
 			border: {
@@ -98,15 +95,15 @@ export function BorderColorEdit( props ) {
 		// If empty slug, ensure undefined to remove attribute.
 		const newNamedColor = colorObject?.slug ? colorObject.slug : undefined;
 
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
+		setAttributes({
+			style: cleanEmptyObject(newStyle),
 			borderColor: newNamedColor,
-		} );
+		});
 	};
 
 	const settings = [
 		{
-			label: __( 'Color' ),
+			label: __('Color'),
 			onColorChange: onChangeColor,
 			colorValue,
 			clearable: false,
@@ -114,13 +111,13 @@ export function BorderColorEdit( props ) {
 	];
 	return (
 		<ColorGradientSettingsDropdown
-			settings={ settings }
+			settings={settings}
 			disableCustomColors
 			disableCustomGradients
 			__experimentalHasMultipleOrigins
 			__experimentalIsRenderedInSidebar
 			enableAlpha
-			{ ...colorGradientSettings }
+			{...colorGradientSettings}
 		/>
 	);
 }
@@ -132,12 +129,12 @@ export function BorderColorEdit( props ) {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a border color value set.
  */
-export function hasBorderColorValue( props ) {
+export function hasBorderColorValue(props) {
 	const {
 		attributes: { borderColor, style },
 	} = props;
 
-	return !! borderColor || !! style?.border?.color;
+	return !!borderColor || !!style?.border?.color;
 }
 
 /**
@@ -149,13 +146,13 @@ export function hasBorderColorValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetBorderColor( { attributes = {}, setAttributes } ) {
+export function resetBorderColor({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
+	setAttributes({
 		borderColor: undefined,
-		style: removeBorderAttribute( style, 'color' ),
-	} );
+		style: removeBorderAttribute(style, 'color'),
+	});
 }
 
 /**
@@ -166,13 +163,13 @@ export function resetBorderColor( { attributes = {}, setAttributes } ) {
  *
  * @return {Object} Updated block settings.
  */
-function addAttributes( settings ) {
-	if ( ! hasBorderSupport( settings, 'color' ) ) {
+function addAttributes(settings) {
+	if (!hasBorderSupport(settings, 'color')) {
 		return settings;
 	}
 
 	// Allow blocks to specify default value if needed.
-	if ( settings.attributes.borderColor ) {
+	if (settings.attributes.borderColor) {
 		return settings;
 	}
 
@@ -197,21 +194,21 @@ function addAttributes( settings ) {
  *
  * @return {Object} Filtered props to apply to save element.
  */
-function addSaveProps( props, blockType, attributes ) {
+function addSaveProps(props, blockType, attributes) {
 	if (
-		! hasBorderSupport( blockType, 'color' ) ||
-		shouldSkipSerialization( blockType )
+		!hasBorderSupport(blockType, 'color') ||
+		shouldSkipSerialization(blockType)
 	) {
 		return props;
 	}
 
 	const { borderColor, style } = attributes;
-	const borderColorClass = getColorClassName( 'border-color', borderColor );
+	const borderColorClass = getColorClassName('border-color', borderColor);
 
-	const newClassName = classnames( props.className, {
+	const newClassName = classnames(props.className, {
 		'has-border-color': borderColor || style?.border?.color,
-		[ borderColorClass ]: !! borderColorClass,
-	} );
+		[borderColorClass]: !!borderColorClass,
+	});
 
 	// If we are clearing the last of the previous classes in `className`
 	// set it to `undefined` to avoid rendering empty DOM attributes.
@@ -228,23 +225,23 @@ function addSaveProps( props, blockType, attributes ) {
  *
  * @return {Object} Filtered block settings.
  */
-function addEditProps( settings ) {
+function addEditProps(settings) {
 	if (
-		! hasBorderSupport( settings, 'color' ) ||
-		shouldSkipSerialization( settings )
+		!hasBorderSupport(settings, 'color') ||
+		shouldSkipSerialization(settings)
 	) {
 		return settings;
 	}
 
 	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
+	settings.getEditWrapperProps = (attributes) => {
 		let props = {};
 
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
+		if (existingGetEditWrapperProps) {
+			props = existingGetEditWrapperProps(attributes);
 		}
 
-		return addSaveProps( props, settings, attributes );
+		return addSaveProps(props, settings, attributes);
 	};
 
 	return settings;
@@ -259,21 +256,18 @@ function addEditProps( settings ) {
  * @return {Function} Wrapped component.
  */
 export const withBorderColorPaletteStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
+	(BlockListBlock) => (props) => {
 		const { name, attributes } = props;
 		const { borderColor } = attributes;
-		const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+		const colors = useSetting('color.palette') || EMPTY_ARRAY;
 
-		if (
-			! hasBorderSupport( name, 'color' ) ||
-			shouldSkipSerialization( name )
-		) {
-			return <BlockListBlock { ...props } />;
+		if (!hasBorderSupport(name, 'color') || shouldSkipSerialization(name)) {
+			return <BlockListBlock {...props} />;
 		}
 
 		const extraStyles = {
 			borderColor: borderColor
-				? getColorObjectByAttributeValues( colors, borderColor )?.color
+				? getColorObjectByAttributeValues(colors, borderColor)?.color
 				: undefined,
 		};
 
@@ -286,7 +280,7 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 			},
 		};
 
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+		return <BlockListBlock {...props} wrapperProps={wrapperProps} />;
 	}
 );
 
@@ -302,11 +296,7 @@ addFilter(
 	addSaveProps
 );
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/border/addEditProps',
-	addEditProps
-);
+addFilter('blocks.registerBlockType', 'core/border/addEditProps', addEditProps);
 
 addFilter(
 	'editor.BlockListBlock',

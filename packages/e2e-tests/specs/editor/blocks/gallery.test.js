@@ -16,9 +16,9 @@ import {
 	clickButton,
 } from '@wordpress/e2e-test-utils';
 
-async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+async function upload(selector) {
+	await page.waitForSelector(selector);
+	const inputElement = await page.$(selector);
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -28,47 +28,45 @@ async function upload( selector ) {
 		'10x10_e2e_test_image_z9T8jK.png'
 	);
 	const filename = uuid();
-	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
-	fs.copyFileSync( testImagePath, tmpFileName );
-	await inputElement.uploadFile( tmpFileName );
-	await page.waitForSelector(
-		`.wp-block-gallery img[src$="${ filename }.png"]`
-	);
+	const tmpFileName = path.join(os.tmpdir(), filename + '.png');
+	fs.copyFileSync(testImagePath, tmpFileName);
+	await inputElement.uploadFile(tmpFileName);
+	await page.waitForSelector(`.wp-block-gallery img[src$="${filename}.png"]`);
 	return filename;
 }
 
-describe( 'Gallery', () => {
-	beforeEach( async () => {
+describe('Gallery', () => {
+	beforeEach(async () => {
 		await createNewPost();
-	} );
+	});
 
-	it( 'can be created using uploaded images', async () => {
-		await insertBlock( 'Gallery' );
-		const filename = await upload( '.wp-block-gallery input[type="file"]' );
+	it('can be created using uploaded images', async () => {
+		await insertBlock('Gallery');
+		const filename = await upload('.wp-block-gallery input[type="file"]');
 
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"full\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image size-full\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"full\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image size-full\\"><img src=\\"[^"]+\/${filename}\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
-		expect( await getEditedPostContent() ).toMatch( regex );
-	} );
+		expect(await getEditedPostContent()).toMatch(regex);
+	});
 
-	it( 'gallery caption can be edited', async () => {
+	it('gallery caption can be edited', async () => {
 		const galleryCaption = 'Tested gallery caption';
 
-		await insertBlock( 'Gallery' );
-		await upload( '.wp-block-gallery input[type="file"]' );
+		await insertBlock('Gallery');
+		await upload('.wp-block-gallery input[type="file"]');
 
-		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
-		await page.keyboard.type( galleryCaption );
+		await page.click('.wp-block-gallery>.blocks-gallery-caption');
+		await page.keyboard.type(galleryCaption);
 
-		expect( await getEditedPostContent() ).toMatch(
-			new RegExp( `<figcaption.*?>${ galleryCaption }</figcaption>` )
+		expect(await getEditedPostContent()).toMatch(
+			new RegExp(`<figcaption.*?>${galleryCaption}</figcaption>`)
 		);
-	} );
+	});
 
-	it( "uploaded images' captions can be edited", async () => {
-		await insertBlock( 'Gallery' );
-		await upload( '.wp-block-gallery input[type="file"]' );
+	it("uploaded images' captions can be edited", async () => {
+		await insertBlock('Gallery');
+		await upload('.wp-block-gallery input[type="file"]');
 
 		const figureElement = await page.waitForSelector(
 			'.wp-block-gallery .wp-block-image'
@@ -83,12 +81,12 @@ describe( 'Gallery', () => {
 		const caption = 'Tested caption';
 
 		await captionElement.click();
-		await page.keyboard.type( caption );
+		await page.keyboard.type(caption);
 
-		expect( await getEditedPostContent() ).toMatch(
-			new RegExp( `<figcaption.*?>${ caption }</figcaption>` )
+		expect(await getEditedPostContent()).toMatch(
+			new RegExp(`<figcaption.*?>${caption}</figcaption>`)
 		);
-	} );
+	});
 
 	// Disable reason:
 	// This test would be good to enable, but the media modal contains an
@@ -101,20 +99,20 @@ describe( 'Gallery', () => {
 	//
 	// This test could be re-enabled once the trac ticket is solved.
 	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'when initially added the media library shows the Create Gallery view', async () => {
-		await insertBlock( 'Gallery' );
-		await clickButton( 'Media Library' );
-		await page.waitForSelector( '.media-frame' );
+	it.skip('when initially added the media library shows the Create Gallery view', async () => {
+		await insertBlock('Gallery');
+		await clickButton('Media Library');
+		await page.waitForSelector('.media-frame');
 		const mediaLibraryHeaderText = await page.$eval(
 			'.media-frame-title h1',
-			( element ) => element.textContent
+			(element) => element.textContent
 		);
 		const mediaLibraryButtonText = await page.$eval(
 			'.media-toolbar-primary button',
-			( element ) => element.textContent
+			(element) => element.textContent
 		);
 
-		expect( mediaLibraryHeaderText ).toBe( 'Create Gallery' );
-		expect( mediaLibraryButtonText ).toBe( 'Create a new gallery' );
-	} );
-} );
+		expect(mediaLibraryHeaderText).toBe('Create Gallery');
+		expect(mediaLibraryButtonText).toBe('Create a new gallery');
+	});
+});

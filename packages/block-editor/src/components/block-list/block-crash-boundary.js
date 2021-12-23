@@ -5,7 +5,7 @@ import { Component } from '@wordpress/element';
 
 class BlockCrashBoundary extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
 		this.state = {
 			hasError: false,
@@ -13,13 +13,13 @@ class BlockCrashBoundary extends Component {
 	}
 
 	componentDidCatch() {
-		this.setState( {
+		this.setState({
 			hasError: true,
-		} );
+		});
 	}
 
 	render() {
-		if ( this.state.hasError ) {
+		if (this.state.hasError) {
 			return this.props.fallback;
 		}
 

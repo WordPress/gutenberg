@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
+const path = require('path');
 
 /**
  * WordPress dependencies
  */
-const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
+const postcssPlugins = require('@wordpress/postcss-plugins-preset');
 
-const scssLoaders = ( { isLazy } ) => [
+const scssLoaders = ({ isLazy }) => [
 	{
 		loader: 'style-loader',
 		options: { injectType: isLazy ? 'lazyStyleTag' : 'styleTag' },
@@ -26,23 +26,23 @@ const scssLoaders = ( { isLazy } ) => [
 	'sass-loader',
 ];
 
-module.exports = ( { config } ) => {
+module.exports = ({ config }) => {
 	config.module.rules.push(
 		{
 			test: /\/stories\/.+\.js$/,
-			loader: require.resolve( '@storybook/source-loader' ),
+			loader: require.resolve('@storybook/source-loader'),
 			enforce: 'pre',
 		},
 		{
 			test: /\.scss$/,
 			exclude: /\.lazy\.scss$/,
-			use: scssLoaders( { isLazy: false } ),
-			include: path.resolve( __dirname ),
+			use: scssLoaders({ isLazy: false }),
+			include: path.resolve(__dirname),
 		},
 		{
 			test: /\.lazy\.scss$/,
-			use: scssLoaders( { isLazy: true } ),
-			include: path.resolve( __dirname ),
+			use: scssLoaders({ isLazy: true }),
+			include: path.resolve(__dirname),
 		}
 	);
 

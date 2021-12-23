@@ -35,7 +35,7 @@ const QUERY_DEFAULT_ATTRIBUTES = {
 const variations = [
 	{
 		name: 'posts-list',
-		title: __( 'Posts List' ),
+		title: __('Posts List'),
 		description: __(
 			'Display a list of your most recent posts, excluding sticky posts.'
 		),
@@ -56,41 +56,41 @@ const variations = [
 				inherit: false,
 			},
 		},
-		scope: [ 'inserter' ],
+		scope: ['inserter'],
 	},
 	{
 		name: 'title-date',
-		title: __( 'Title & Date' ),
+		title: __('Title & Date'),
 		icon: titleDate,
 		attributes: { ...QUERY_DEFAULT_ATTRIBUTES },
 		innerBlocks: [
 			[
 				'core/post-template',
 				{},
-				[ [ 'core/post-title' ], [ 'core/post-date' ] ],
+				[['core/post-title'], ['core/post-date']],
 			],
-			[ 'core/query-pagination' ],
+			['core/query-pagination'],
 		],
-		scope: [ 'block' ],
+		scope: ['block'],
 	},
 	{
 		name: 'title-excerpt',
-		title: __( 'Title & Excerpt' ),
+		title: __('Title & Excerpt'),
 		icon: titleExcerpt,
 		attributes: { ...QUERY_DEFAULT_ATTRIBUTES },
 		innerBlocks: [
 			[
 				'core/post-template',
 				{},
-				[ [ 'core/post-title' ], [ 'core/post-excerpt' ] ],
+				[['core/post-title'], ['core/post-excerpt']],
 			],
-			[ 'core/query-pagination' ],
+			['core/query-pagination'],
 		],
-		scope: [ 'block' ],
+		scope: ['block'],
 	},
 	{
 		name: 'title-date-excerpt',
-		title: __( 'Title, Date, & Excerpt' ),
+		title: __('Title, Date, & Excerpt'),
 		icon: titleDateExcerpt,
 		attributes: { ...QUERY_DEFAULT_ATTRIBUTES },
 		innerBlocks: [
@@ -98,18 +98,18 @@ const variations = [
 				'core/post-template',
 				{},
 				[
-					[ 'core/post-title' ],
-					[ 'core/post-date' ],
-					[ 'core/post-excerpt' ],
+					['core/post-title'],
+					['core/post-date'],
+					['core/post-excerpt'],
 				],
 			],
-			[ 'core/query-pagination' ],
+			['core/query-pagination'],
 		],
-		scope: [ 'block' ],
+		scope: ['block'],
 	},
 	{
 		name: 'image-date-title',
-		title: __( 'Image, Date, & Title' ),
+		title: __('Image, Date, & Title'),
 		icon: imageDateTitle,
 		attributes: { ...QUERY_DEFAULT_ATTRIBUTES },
 		innerBlocks: [
@@ -117,14 +117,14 @@ const variations = [
 				'core/post-template',
 				{},
 				[
-					[ 'core/post-featured-image' ],
-					[ 'core/post-date' ],
-					[ 'core/post-title' ],
+					['core/post-featured-image'],
+					['core/post-date'],
+					['core/post-title'],
 				],
 			],
-			[ 'core/query-pagination' ],
+			['core/query-pagination'],
 		],
-		scope: [ 'block' ],
+		scope: ['block'],
 	},
 ];
 

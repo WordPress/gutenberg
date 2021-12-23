@@ -14,9 +14,9 @@ import { __experimentalTreeGridRow as TreeGridRow } from '@wordpress/components'
  */
 import useMovingAnimation from '../use-moving-animation';
 
-const AnimatedTreeGridRow = animated( TreeGridRow );
+const AnimatedTreeGridRow = animated(TreeGridRow);
 
-export default function ListViewLeaf( {
+export default function ListViewLeaf({
 	isSelected,
 	position,
 	level,
@@ -25,24 +25,24 @@ export default function ListViewLeaf( {
 	className,
 	path,
 	...props
-} ) {
-	const ref = useMovingAnimation( {
+}) {
+	const ref = useMovingAnimation({
 		isSelected,
 		adjustScrolling: false,
 		enableAnimation: true,
 		triggerAnimationOnChange: path,
-	} );
+	});
 
 	return (
 		<AnimatedTreeGridRow
-			ref={ ref }
-			className={ classnames( 'block-editor-list-view-leaf', className ) }
-			level={ level }
-			positionInSet={ position }
-			setSize={ rowCount }
-			{ ...props }
+			ref={ref}
+			className={classnames('block-editor-list-view-leaf', className)}
+			level={level}
+			positionInSet={position}
+			setSize={rowCount}
+			{...props}
 		>
-			{ children }
+			{children}
 		</AnimatedTreeGridRow>
 	);
 }

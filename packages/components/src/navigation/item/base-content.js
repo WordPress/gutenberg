@@ -3,26 +3,26 @@
  */
 import { ItemBadgeUI, ItemTitleUI } from '../styles/navigation-styles';
 
-export default function NavigationItemBaseContent( props ) {
+export default function NavigationItemBaseContent(props) {
 	const { badge, title } = props;
 
 	return (
 		<>
-			{ title && (
+			{title && (
 				<ItemTitleUI
 					className="components-navigation__item-title"
 					variant="body.small"
 					as="span"
 				>
-					{ title }
+					{title}
 				</ItemTitleUI>
-			) }
+			)}
 
-			{ badge && (
+			{badge && (
 				<ItemBadgeUI className="components-navigation__item-badge">
-					{ badge }
+					{badge}
 				</ItemBadgeUI>
-			) }
+			)}
 		</>
 	);
 }

@@ -16,54 +16,54 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-export default function SiteTaglineEdit( { attributes, setAttributes } ) {
+export default function SiteTaglineEdit({ attributes, setAttributes }) {
 	const { textAlign } = attributes;
-	const [ siteTagline, setSiteTagline ] = useEntityProp(
+	const [siteTagline, setSiteTagline] = useEntityProp(
 		'root',
 		'site',
 		'description'
 	);
-	const { canUserEdit, readOnlySiteTagLine } = useSelect( ( select ) => {
-		const { canUser, getEntityRecord } = select( coreStore );
-		const siteData = getEntityRecord( 'root', '__unstableBase' );
+	const { canUserEdit, readOnlySiteTagLine } = useSelect((select) => {
+		const { canUser, getEntityRecord } = select(coreStore);
+		const siteData = getEntityRecord('root', '__unstableBase');
 		return {
-			canUserEdit: canUser( 'update', 'settings' ),
+			canUserEdit: canUser('update', 'settings'),
 			readOnlySiteTagLine: siteData?.description,
 		};
-	}, [] );
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
+	}, []);
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
 			'wp-block-site-tagline__placeholder':
-				! canUserEdit && ! readOnlySiteTagLine,
-		} ),
-	} );
+				!canUserEdit && !readOnlySiteTagLine,
+		}),
+	});
 	const siteTaglineContent = canUserEdit ? (
 		<RichText
-			allowedFormats={ [] }
-			onChange={ setSiteTagline }
-			aria-label={ __( 'Site tagline text' ) }
-			placeholder={ __( 'Write site tagline…' ) }
+			allowedFormats={[]}
+			onChange={setSiteTagline}
+			aria-label={__('Site tagline text')}
+			placeholder={__('Write site tagline…')}
 			tagName="p"
-			value={ siteTagline }
-			{ ...blockProps }
+			value={siteTagline}
+			{...blockProps}
 		/>
 	) : (
-		<p { ...blockProps }>
-			{ readOnlySiteTagLine || __( 'Site Tagline placeholder' ) }
+		<p {...blockProps}>
+			{readOnlySiteTagLine || __('Site Tagline placeholder')}
 		</p>
 	);
 	return (
 		<>
 			<BlockControls group="block">
 				<AlignmentControl
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
+					onChange={(newAlign) =>
+						setAttributes({ textAlign: newAlign })
 					}
-					value={ textAlign }
+					value={textAlign}
 				/>
 			</BlockControls>
-			{ siteTaglineContent }
+			{siteTaglineContent}
 		</>
 	);
 }

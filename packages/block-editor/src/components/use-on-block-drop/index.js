@@ -24,7 +24,7 @@ import { store as blockEditorStore } from '../../store';
  *
  * @return {Object} An object with block drag and drop data.
  */
-export function parseDropEvent( event ) {
+export function parseDropEvent(event) {
 	let result = {
 		srcRootClientId: null,
 		srcClientIds: null,
@@ -33,16 +33,16 @@ export function parseDropEvent( event ) {
 		blocks: null,
 	};
 
-	if ( ! event.dataTransfer ) {
+	if (!event.dataTransfer) {
 		return result;
 	}
 
 	try {
 		result = Object.assign(
 			result,
-			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
+			JSON.parse(event.dataTransfer.getData('wp-blocks'))
 		);
-	} catch ( err ) {
+	} catch (err) {
 		return result;
 	}
 
@@ -70,20 +70,18 @@ export function onBlockDrop(
 	insertBlocks,
 	clearSelectedBlock
 ) {
-	return ( event ) => {
+	return (event) => {
 		const {
 			srcRootClientId: sourceRootClientId,
 			srcClientIds: sourceClientIds,
 			type: dropType,
 			blocks,
-		} = parseDropEvent( event );
+		} = parseDropEvent(event);
 
 		// If the user is inserting a block
-		if ( dropType === 'inserter' ) {
+		if (dropType === 'inserter') {
 			clearSelectedBlock();
-			const blocksToInsert = blocks.map( ( block ) =>
-				cloneBlock( block )
-			);
+			const blocksToInsert = blocks.map((block) => cloneBlock(block));
 			insertBlocks(
 				blocksToInsert,
 				targetBlockIndex,
@@ -94,8 +92,8 @@ export function onBlockDrop(
 		}
 
 		// If the user is moving a block
-		if ( dropType === 'block' ) {
-			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
+		if (dropType === 'block') {
+			const sourceBlockIndex = getBlockIndex(sourceClientIds[0]);
 
 			// If the user is dropping to the same position, return early.
 			if (
@@ -109,9 +107,9 @@ export function onBlockDrop(
 			// nested blocks, return early as this would create infinite
 			// recursion.
 			if (
-				sourceClientIds.includes( targetRootClientId ) ||
-				getClientIdsOfDescendants( sourceClientIds ).some(
-					( id ) => id === targetRootClientId
+				sourceClientIds.includes(targetRootClientId) ||
+				getClientIdsOfDescendants(sourceClientIds).some(
+					(id) => id === targetRootClientId
 				)
 			) {
 				return;
@@ -158,25 +156,25 @@ export function onFilesDrop(
 	canInsertBlockType,
 	insertBlocks
 ) {
-	return ( files ) => {
-		if ( ! hasUploadPermissions ) {
+	return (files) => {
+		if (!hasUploadPermissions) {
 			return;
 		}
 
 		const transformation = findTransform(
-			getBlockTransforms( 'from' ),
-			( transform ) =>
+			getBlockTransforms('from'),
+			(transform) =>
 				transform.type === 'files' &&
-				canInsertBlockType( transform.blockName, targetRootClientId ) &&
-				transform.isMatch( files )
+				canInsertBlockType(transform.blockName, targetRootClientId) &&
+				transform.isMatch(files)
 		);
 
-		if ( transformation ) {
+		if (transformation) {
 			const blocks = transformation.transform(
 				files,
 				updateBlockAttributes
 			);
-			insertBlocks( blocks, targetBlockIndex, targetRootClientId );
+			insertBlocks(blocks, targetBlockIndex, targetRootClientId);
 		}
 	};
 }
@@ -190,16 +188,12 @@ export function onFilesDrop(
  *
  * @return {Function} The event handler for a block-related HTML drop event.
  */
-export function onHTMLDrop(
-	targetRootClientId,
-	targetBlockIndex,
-	insertBlocks
-) {
-	return ( HTML ) => {
-		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+export function onHTMLDrop(targetRootClientId, targetBlockIndex, insertBlocks) {
+	return (HTML) => {
+		const blocks = pasteHandler({ HTML, mode: 'BLOCKS' });
 
-		if ( blocks.length ) {
-			insertBlocks( blocks, targetBlockIndex, targetRootClientId );
+		if (blocks.length) {
+			insertBlocks(blocks, targetBlockIndex, targetRootClientId);
 		}
 	};
 }
@@ -212,22 +206,19 @@ export function onHTMLDrop(
  *
  * @return {Object} An object that contains the event handlers `onDrop`, `onFilesDrop` and `onHTMLDrop`.
  */
-export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
+export default function useOnBlockDrop(targetRootClientId, targetBlockIndex) {
 	const hasUploadPermissions = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		(select) => select(blockEditorStore).getSettings().mediaUpload,
 		[]
 	);
-	const {
-		canInsertBlockType,
-		getBlockIndex,
-		getClientIdsOfDescendants,
-	} = useSelect( blockEditorStore );
+	const { canInsertBlockType, getBlockIndex, getClientIdsOfDescendants } =
+		useSelect(blockEditorStore);
 	const {
 		insertBlocks,
 		moveBlocksToPosition,
 		updateBlockAttributes,
 		clearSelectedBlock,
-	} = useDispatch( blockEditorStore );
+	} = useDispatch(blockEditorStore);
 
 	const _onDrop = onBlockDrop(
 		targetRootClientId,
@@ -252,20 +243,20 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		insertBlocks
 	);
 
-	return ( event ) => {
-		const files = getFilesFromDataTransfer( event.dataTransfer );
-		const html = event.dataTransfer.getData( 'text/html' );
+	return (event) => {
+		const files = getFilesFromDataTransfer(event.dataTransfer);
+		const html = event.dataTransfer.getData('text/html');
 
 		/**
 		 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
 		 * The order of the checks is important to recognise the HTML drop.
 		 */
-		if ( html ) {
-			_onHTMLDrop( html );
-		} else if ( files.length ) {
-			_onFilesDrop( files );
+		if (html) {
+			_onHTMLDrop(html);
+		} else if (files.length) {
+			_onFilesDrop(files);
 		} else {
-			_onDrop( event );
+			_onDrop(event);
 		}
 	};
 }

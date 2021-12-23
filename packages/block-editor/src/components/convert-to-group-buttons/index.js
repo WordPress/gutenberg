@@ -12,63 +12,60 @@ import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';
 
-function ConvertToGroupButton( {
+function ConvertToGroupButton({
 	clientIds,
 	isGroupable,
 	isUngroupable,
 	blocksSelection,
 	groupingBlockName,
 	onClose = () => {},
-} ) {
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+}) {
+	const { replaceBlocks } = useDispatch(blockEditorStore);
 	const onConvertToGroup = () => {
 		// Activate the `transform` on the Grouping Block which does the conversion
-		const newBlocks = switchToBlockType(
-			blocksSelection,
-			groupingBlockName
-		);
-		if ( newBlocks ) {
-			replaceBlocks( clientIds, newBlocks );
+		const newBlocks = switchToBlockType(blocksSelection, groupingBlockName);
+		if (newBlocks) {
+			replaceBlocks(clientIds, newBlocks);
 		}
 	};
 
 	const onConvertFromGroup = () => {
-		const innerBlocks = blocksSelection[ 0 ].innerBlocks;
-		if ( ! innerBlocks.length ) {
+		const innerBlocks = blocksSelection[0].innerBlocks;
+		if (!innerBlocks.length) {
 			return;
 		}
-		replaceBlocks( clientIds, innerBlocks );
+		replaceBlocks(clientIds, innerBlocks);
 	};
 
-	if ( ! isGroupable && ! isUngroupable ) {
+	if (!isGroupable && !isUngroupable) {
 		return null;
 	}
 
 	return (
 		<>
-			{ isGroupable && (
+			{isGroupable && (
 				<MenuItem
-					onClick={ () => {
+					onClick={() => {
 						onConvertToGroup();
 						onClose();
-					} }
+					}}
 				>
-					{ _x( 'Group', 'verb' ) }
+					{_x('Group', 'verb')}
 				</MenuItem>
-			) }
-			{ isUngroupable && (
+			)}
+			{isUngroupable && (
 				<MenuItem
-					onClick={ () => {
+					onClick={() => {
 						onConvertFromGroup();
 						onClose();
-					} }
+					}}
 				>
-					{ _x(
+					{_x(
 						'Ungroup',
 						'Ungrouping blocks from within a Group block back into individual blocks within the Editor '
-					) }
+					)}
 				</MenuItem>
-			) }
+			)}
 		</>
 	);
 }

@@ -26,20 +26,20 @@ import { store as editorStore } from '../../store';
  * @param {Function} $0.onError           Function called when an error happens.
  * @param {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  */
-export default function mediaUpload( {
+export default function mediaUpload({
 	additionalData = {},
 	allowedTypes,
 	filesList,
 	maxUploadFileSize,
 	onError = noop,
 	onFileChange,
-} ) {
-	const { getCurrentPostId, getEditorSettings } = select( editorStore );
+}) {
+	const { getCurrentPostId, getEditorSettings } = select(editorStore);
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
-	uploadMedia( {
+	uploadMedia({
 		allowedTypes,
 		filesList,
 		onFileChange,
@@ -48,7 +48,7 @@ export default function mediaUpload( {
 			...additionalData,
 		},
 		maxUploadFileSize,
-		onError: ( { message } ) => onError( message ),
+		onError: ({ message }) => onError(message),
 		wpAllowedMimeTypes,
-	} );
+	});
 }

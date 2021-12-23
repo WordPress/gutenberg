@@ -11,7 +11,7 @@ import { Button } from '@wordpress/components';
 import { SVG, Rect } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
 
-export default function ResponsiveWrapper( {
+export default function ResponsiveWrapper({
 	children,
 	id,
 	isOpen,
@@ -20,8 +20,8 @@ export default function ResponsiveWrapper( {
 	isHiddenByDefault,
 	classNames,
 	styles,
-} ) {
-	if ( ! isResponsive ) {
+}) {
+	if (!isResponsive) {
 		return children;
 	}
 	const responsiveContainerClasses = classnames(
@@ -37,25 +37,25 @@ export default function ResponsiveWrapper( {
 		{ 'always-shown': isHiddenByDefault }
 	);
 
-	const modalId = `${ id }-modal`;
+	const modalId = `${id}-modal`;
 
 	const dialogProps = {
 		className: 'wp-block-navigation__responsive-dialog',
-		...( isOpen && {
+		...(isOpen && {
 			role: 'dialog',
 			'aria-modal': true,
-			'aria-label': __( 'Menu' ),
-		} ),
+			'aria-label': __('Menu'),
+		}),
 	};
 
 	return (
 		<>
-			{ ! isOpen && (
+			{!isOpen && (
 				<Button
 					aria-haspopup="true"
-					aria-label={ __( 'Open menu' ) }
-					className={ openButtonClasses }
-					onClick={ () => onToggle( true ) }
+					aria-label={__('Open menu')}
+					className={openButtonClasses}
+					onClick={() => onToggle(true)}
 				>
 					<SVG
 						xmlns="http://www.w3.org/2000/svg"
@@ -70,30 +70,30 @@ export default function ResponsiveWrapper( {
 						<Rect x="4" y="15" width="16" height="1.5" />
 					</SVG>
 				</Button>
-			) }
+			)}
 
 			<div
-				className={ responsiveContainerClasses }
-				style={ styles }
-				id={ modalId }
+				className={responsiveContainerClasses}
+				style={styles}
+				id={modalId}
 			>
 				<div
 					className="wp-block-navigation__responsive-close"
 					tabIndex="-1"
 				>
-					<div { ...dialogProps }>
+					<div {...dialogProps}>
 						<Button
 							className="wp-block-navigation__responsive-container-close"
-							aria-label={ __( 'Close menu' ) }
-							onClick={ () => onToggle( false ) }
+							aria-label={__('Close menu')}
+							onClick={() => onToggle(false)}
 						>
-							<Icon icon={ close } />
+							<Icon icon={close} />
 						</Button>
 						<div
 							className="wp-block-navigation__responsive-container-content"
-							id={ `${ modalId }-content` }
+							id={`${modalId}-content`}
 						>
-							{ children }
+							{children}
 						</div>
 					</div>
 				</div>

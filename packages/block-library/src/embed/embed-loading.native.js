@@ -15,12 +15,12 @@ import styles from './styles.scss';
 
 const EmbedLoading = () => {
 	const style = usePreferredColorSchemeStyle(
-		styles[ 'embed-preview__loading' ],
-		styles[ 'embed-preview__loading--dark' ]
+		styles['embed-preview__loading'],
+		styles['embed-preview__loading--dark']
 	);
 
 	return (
-		<View style={ style }>
+		<View style={style}>
 			<ActivityIndicator animating />
 		</View>
 	);

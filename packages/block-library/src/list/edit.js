@@ -36,144 +36,138 @@ import {
 import { name } from './';
 import OrderedListSettings from './ordered-list-settings';
 
-export default function ListEdit( {
+export default function ListEdit({
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
 	style,
-} ) {
+}) {
 	const { ordered, values, type, reversed, start, placeholder } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
-	const controls = ( { value, onChange, onFocus } ) => (
+	const controls = ({ value, onChange, onFocus }) => (
 		<>
 			<RichTextShortcut
 				type="primary"
 				character="["
-				onUse={ () => {
-					onChange( outdentListItems( value ) );
-				} }
+				onUse={() => {
+					onChange(outdentListItems(value));
+				}}
 			/>
 			<RichTextShortcut
 				type="primary"
 				character="]"
-				onUse={ () => {
-					onChange( indentListItems( value, { type: tagName } ) );
-				} }
+				onUse={() => {
+					onChange(indentListItems(value, { type: tagName }));
+				}}
 			/>
 			<RichTextShortcut
 				type="primary"
 				character="m"
-				onUse={ () => {
-					onChange( indentListItems( value, { type: tagName } ) );
-				} }
+				onUse={() => {
+					onChange(indentListItems(value, { type: tagName }));
+				}}
 			/>
 			<RichTextShortcut
 				type="primaryShift"
 				character="m"
-				onUse={ () => {
-					onChange( outdentListItems( value ) );
-				} }
+				onUse={() => {
+					onChange(outdentListItems(value));
+				}}
 			/>
 			<BlockControls group="block">
 				<ToolbarButton
-					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
-					title={ __( 'Unordered' ) }
-					describedBy={ __( 'Convert to unordered list' ) }
-					isActive={ isActiveListType( value, 'ul', tagName ) }
-					onClick={ () => {
-						onChange( changeListType( value, { type: 'ul' } ) );
+					icon={isRTL() ? formatListBulletsRTL : formatListBullets}
+					title={__('Unordered')}
+					describedBy={__('Convert to unordered list')}
+					isActive={isActiveListType(value, 'ul', tagName)}
+					onClick={() => {
+						onChange(changeListType(value, { type: 'ul' }));
 						onFocus();
 
-						if ( isListRootSelected( value ) ) {
-							setAttributes( { ordered: false } );
+						if (isListRootSelected(value)) {
+							setAttributes({ ordered: false });
 						}
-					} }
+					}}
 				/>
 				<ToolbarButton
-					icon={
-						isRTL() ? formatListNumberedRTL : formatListNumbered
-					}
-					title={ __( 'Ordered' ) }
-					describedBy={ __( 'Convert to ordered list' ) }
-					isActive={ isActiveListType( value, 'ol', tagName ) }
-					onClick={ () => {
-						onChange( changeListType( value, { type: 'ol' } ) );
+					icon={isRTL() ? formatListNumberedRTL : formatListNumbered}
+					title={__('Ordered')}
+					describedBy={__('Convert to ordered list')}
+					isActive={isActiveListType(value, 'ol', tagName)}
+					onClick={() => {
+						onChange(changeListType(value, { type: 'ol' }));
 						onFocus();
 
-						if ( isListRootSelected( value ) ) {
-							setAttributes( { ordered: true } );
+						if (isListRootSelected(value)) {
+							setAttributes({ ordered: true });
 						}
-					} }
+					}}
 				/>
 				<ToolbarButton
-					icon={ isRTL() ? formatOutdentRTL : formatOutdent }
-					title={ __( 'Outdent' ) }
-					describedBy={ __( 'Outdent list item' ) }
-					shortcut={ _x( 'Backspace', 'keyboard key' ) }
-					isDisabled={ ! canOutdentListItems( value ) }
-					onClick={ () => {
-						onChange( outdentListItems( value ) );
+					icon={isRTL() ? formatOutdentRTL : formatOutdent}
+					title={__('Outdent')}
+					describedBy={__('Outdent list item')}
+					shortcut={_x('Backspace', 'keyboard key')}
+					isDisabled={!canOutdentListItems(value)}
+					onClick={() => {
+						onChange(outdentListItems(value));
 						onFocus();
-					} }
+					}}
 				/>
 				<ToolbarButton
-					icon={ isRTL() ? formatIndentRTL : formatIndent }
-					title={ __( 'Indent' ) }
-					describedBy={ __( 'Indent list item' ) }
-					shortcut={ _x( 'Space', 'keyboard key' ) }
-					isDisabled={ ! canIndentListItems( value ) }
-					onClick={ () => {
-						onChange( indentListItems( value, { type: tagName } ) );
+					icon={isRTL() ? formatIndentRTL : formatIndent}
+					title={__('Indent')}
+					describedBy={__('Indent list item')}
+					shortcut={_x('Space', 'keyboard key')}
+					isDisabled={!canIndentListItems(value)}
+					onClick={() => {
+						onChange(indentListItems(value, { type: tagName }));
 						onFocus();
-					} }
+					}}
 				/>
 			</BlockControls>
 		</>
 	);
 
-	const blockProps = useBlockProps( {
+	const blockProps = useBlockProps({
 		style,
-	} );
+	});
 
 	return (
 		<>
 			<RichText
 				identifier="values"
 				multiline="li"
-				tagName={ tagName }
-				onChange={ ( nextValues ) =>
-					setAttributes( { values: nextValues } )
+				tagName={tagName}
+				onChange={(nextValues) => setAttributes({ values: nextValues })}
+				value={values}
+				aria-label={__('List text')}
+				placeholder={placeholder || __('List')}
+				onMerge={mergeBlocks}
+				onSplit={(value) =>
+					createBlock(name, { ...attributes, values: value })
 				}
-				value={ values }
-				aria-label={ __( 'List text' ) }
-				placeholder={ placeholder || __( 'List' ) }
-				onMerge={ mergeBlocks }
-				onSplit={ ( value ) =>
-					createBlock( name, { ...attributes, values: value } )
-				}
-				__unstableOnSplitMiddle={ () =>
-					createBlock( 'core/paragraph' )
-				}
-				onReplace={ onReplace }
-				onRemove={ () => onReplace( [] ) }
-				start={ start }
-				reversed={ reversed }
-				type={ type }
-				{ ...blockProps }
+				__unstableOnSplitMiddle={() => createBlock('core/paragraph')}
+				onReplace={onReplace}
+				onRemove={() => onReplace([])}
+				start={start}
+				reversed={reversed}
+				type={type}
+				{...blockProps}
 			>
-				{ controls }
+				{controls}
 			</RichText>
-			{ ordered && (
+			{ordered && (
 				<OrderedListSettings
-					setAttributes={ setAttributes }
-					ordered={ ordered }
-					reversed={ reversed }
-					start={ start }
-					placeholder={ placeholder }
+					setAttributes={setAttributes}
+					ordered={ordered}
+					reversed={reversed}
+					start={start}
+					placeholder={placeholder}
 				/>
-			) }
+			)}
 		</>
 	);
 }

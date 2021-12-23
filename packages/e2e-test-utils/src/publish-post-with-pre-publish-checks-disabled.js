@@ -5,6 +5,6 @@
  * @return {Promise} Promise resolving when publish is complete.
  */
 export async function publishPostWithPrePublishChecksDisabled() {
-	await page.click( '.editor-post-publish-button' );
-	return page.waitForSelector( '.components-snackbar' );
+	await page.click('.editor-post-publish-button');
+	return page.waitForSelector('.components-snackbar');
 }

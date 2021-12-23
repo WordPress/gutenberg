@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const pkg = require( './package.json' );
+const pkg = require('./package.json');
 
 /**
  * Babel plugin which transforms `warning` function calls to wrap within a
@@ -11,18 +11,18 @@ const pkg = require( './package.json' );
  *
  * @return {import('@babel/core').PluginObj} Babel plugin object.
  */
-function babelPlugin( { types: t } ) {
+function babelPlugin({ types: t }) {
 	const seen = Symbol();
 
 	const typeofProcessExpression = t.binaryExpression(
 		'!==',
-		t.unaryExpression( 'typeof', t.identifier( 'process' ), false ),
-		t.stringLiteral( 'undefined' )
+		t.unaryExpression('typeof', t.identifier('process'), false),
+		t.stringLiteral('undefined')
 	);
 
 	const processEnvExpression = t.memberExpression(
-		t.identifier( 'process' ),
-		t.identifier( 'env' ),
+		t.identifier('process'),
+		t.identifier('env'),
 		false
 	);
 
@@ -30,10 +30,10 @@ function babelPlugin( { types: t } ) {
 		'!==',
 		t.memberExpression(
 			processEnvExpression,
-			t.identifier( 'NODE_ENV' ),
+			t.identifier('NODE_ENV'),
 			false
 		),
-		t.stringLiteral( 'production' )
+		t.stringLiteral('production')
 	);
 
 	const logicalExpression = t.logicalExpression(
@@ -48,46 +48,44 @@ function babelPlugin( { types: t } ) {
 
 	return {
 		visitor: {
-			ImportDeclaration( path, state ) {
+			ImportDeclaration(path, state) {
 				const { node } = path;
 				const isThisPackageImport =
-					node.source.value.indexOf( pkg.name ) !== -1;
+					node.source.value.indexOf(pkg.name) !== -1;
 
-				if ( ! isThisPackageImport ) {
+				if (!isThisPackageImport) {
 					return;
 				}
 
 				const defaultSpecifier = node.specifiers.find(
-					( specifier ) => specifier.type === 'ImportDefaultSpecifier'
+					(specifier) => specifier.type === 'ImportDefaultSpecifier'
 				);
 
-				if ( defaultSpecifier && defaultSpecifier.local ) {
+				if (defaultSpecifier && defaultSpecifier.local) {
 					const { name } = defaultSpecifier.local;
 					state.callee = name;
 				}
 			},
-			CallExpression( path, state ) {
+			CallExpression(path, state) {
 				const { node } = path;
 
 				// Ignore if it's already been processed
-				if ( node[ seen ] ) {
+				if (node[seen]) {
 					return;
 				}
 
 				const name = state.callee || state.opts.callee;
 
-				if ( path.get( 'callee' ).isIdentifier( { name } ) ) {
+				if (path.get('callee').isIdentifier({ name })) {
 					// Turns this code:
 					// warning(argument);
 					// into this:
 					// typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(argument) : void 0;
-					node[ seen ] = true;
+					node[seen] = true;
 					path.replaceWith(
 						t.ifStatement(
 							logicalExpression,
-							t.blockStatement( [
-								t.expressionStatement( node ),
-							] )
+							t.blockStatement([t.expressionStatement(node)])
 						)
 					);
 				}

@@ -7,9 +7,9 @@
  *
  * @return {Function} Higher-order reducer.
  */
-const ifMatchingAction = ( isMatch ) => ( reducer ) => ( state, action ) => {
-	if ( state === undefined || isMatch( action ) ) {
-		return reducer( state, action );
+const ifMatchingAction = (isMatch) => (reducer) => (state, action) => {
+	if (state === undefined || isMatch(action)) {
+		return reducer(state, action);
 	}
 
 	return state;

@@ -15,108 +15,108 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 
-function Option( {
+function Option({
 	className,
 	isSelected,
 	selectedIconProps,
 	tooltipText,
 	...additionalProps
-} ) {
+}) {
 	const optionButton = (
 		<Button
-			isPressed={ isSelected }
+			isPressed={isSelected}
 			className="components-circular-option-picker__option"
-			{ ...additionalProps }
+			{...additionalProps}
 		/>
 	);
 	return (
 		<div
-			className={ classnames(
+			className={classnames(
 				className,
 				'components-circular-option-picker__option-wrapper'
-			) }
+			)}
 		>
-			{ tooltipText ? (
-				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
+			{tooltipText ? (
+				<Tooltip text={tooltipText}>{optionButton}</Tooltip>
 			) : (
 				optionButton
-			) }
-			{ isSelected && (
+			)}
+			{isSelected && (
 				<Icon
-					icon={ check }
-					{ ...( selectedIconProps ? selectedIconProps : {} ) }
+					icon={check}
+					{...(selectedIconProps ? selectedIconProps : {})}
 				/>
-			) }
+			)}
 		</div>
 	);
 }
 
-function DropdownLinkAction( {
+function DropdownLinkAction({
 	buttonProps,
 	className,
 	dropdownProps,
 	linkText,
-} ) {
+}) {
 	return (
 		<Dropdown
-			className={ classnames(
+			className={classnames(
 				'components-circular-option-picker__dropdown-link-action',
 				className
-			) }
-			renderToggle={ ( { isOpen, onToggle } ) => (
+			)}
+			renderToggle={({ isOpen, onToggle }) => (
 				<Button
-					aria-expanded={ isOpen }
+					aria-expanded={isOpen}
 					aria-haspopup="true"
-					onClick={ onToggle }
+					onClick={onToggle}
 					variant="link"
-					{ ...buttonProps }
+					{...buttonProps}
 				>
-					{ linkText }
+					{linkText}
 				</Button>
-			) }
-			{ ...dropdownProps }
+			)}
+			{...dropdownProps}
 		/>
 	);
 }
 
-function ButtonAction( { className, children, ...additionalProps } ) {
+function ButtonAction({ className, children, ...additionalProps }) {
 	return (
 		<Button
-			className={ classnames(
+			className={classnames(
 				'components-circular-option-picker__clear',
 				className
-			) }
+			)}
 			isSmall
 			variant="secondary"
-			{ ...additionalProps }
+			{...additionalProps}
 		>
-			{ children }
+			{children}
 		</Button>
 	);
 }
 
-export default function CircularOptionPicker( {
+export default function CircularOptionPicker({
 	actions,
 	className,
 	options,
 	children,
-} ) {
+}) {
 	return (
 		<div
-			className={ classnames(
+			className={classnames(
 				'components-circular-option-picker',
 				className
-			) }
+			)}
 		>
 			<div className="components-circular-option-picker__swatches">
-				{ options }
+				{options}
 			</div>
-			{ children }
-			{ actions && (
+			{children}
+			{actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">
-					{ actions }
+					{actions}
 				</div>
-			) }
+			)}
 		</div>
 	);
 }

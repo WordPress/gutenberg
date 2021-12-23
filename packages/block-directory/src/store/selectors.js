@@ -17,8 +17,8 @@ import hasBlockType from './utils/has-block-type';
  *
  * @return {boolean} Whether a request is in progress for the blocks list.
  */
-export function isRequestingDownloadableBlocks( state, filterValue ) {
-	return state.downloadableBlocks[ filterValue ]?.isRequesting ?? false;
+export function isRequestingDownloadableBlocks(state, filterValue) {
+	return state.downloadableBlocks[filterValue]?.isRequesting ?? false;
 }
 
 /**
@@ -29,8 +29,8 @@ export function isRequestingDownloadableBlocks( state, filterValue ) {
  *
  * @return {Array} Downloadable blocks.
  */
-export function getDownloadableBlocks( state, filterValue ) {
-	return state.downloadableBlocks[ filterValue ]?.results ?? [];
+export function getDownloadableBlocks(state, filterValue) {
+	return state.downloadableBlocks[filterValue]?.results ?? [];
 }
 
 /**
@@ -41,7 +41,7 @@ export function getDownloadableBlocks( state, filterValue ) {
  *
  * @return {Array} Block type items
  */
-export function getInstalledBlockTypes( state ) {
+export function getInstalledBlockTypes(state) {
 	return state.blockManagement.installedBlockTypes;
 }
 
@@ -53,16 +53,14 @@ export function getInstalledBlockTypes( state ) {
  *
  * @return {Array} Block type items.
  */
-export const getNewBlockTypes = createRegistrySelector(
-	( select ) => ( state ) => {
-		const usedBlockTree = select( blockEditorStore ).getBlocks();
-		const installedBlockTypes = getInstalledBlockTypes( state );
+export const getNewBlockTypes = createRegistrySelector((select) => (state) => {
+	const usedBlockTree = select(blockEditorStore).getBlocks();
+	const installedBlockTypes = getInstalledBlockTypes(state);
 
-		return installedBlockTypes.filter( ( blockType ) =>
-			hasBlockType( blockType, usedBlockTree )
-		);
-	}
-);
+	return installedBlockTypes.filter((blockType) =>
+		hasBlockType(blockType, usedBlockTree)
+	);
+});
 
 /**
  * Returns the block types that have been installed on the server but are not
@@ -73,12 +71,12 @@ export const getNewBlockTypes = createRegistrySelector(
  * @return {Array} Block type items.
  */
 export const getUnusedBlockTypes = createRegistrySelector(
-	( select ) => ( state ) => {
-		const usedBlockTree = select( blockEditorStore ).getBlocks();
-		const installedBlockTypes = getInstalledBlockTypes( state );
+	(select) => (state) => {
+		const usedBlockTree = select(blockEditorStore).getBlocks();
+		const installedBlockTypes = getInstalledBlockTypes(state);
 
 		return installedBlockTypes.filter(
-			( blockType ) => ! hasBlockType( blockType, usedBlockTree )
+			(blockType) => !hasBlockType(blockType, usedBlockTree)
 		);
 	}
 );
@@ -91,8 +89,8 @@ export const getUnusedBlockTypes = createRegistrySelector(
  *
  * @return {boolean} Whether this block is currently being installed.
  */
-export function isInstalling( state, blockId ) {
-	return state.blockManagement.isInstalling[ blockId ] || false;
+export function isInstalling(state, blockId) {
+	return state.blockManagement.isInstalling[blockId] || false;
 }
 
 /**
@@ -102,7 +100,7 @@ export function isInstalling( state, blockId ) {
  *
  * @return {Object} Object with error notices.
  */
-export function getErrorNotices( state ) {
+export function getErrorNotices(state) {
 	return state.errorNotices;
 }
 
@@ -114,6 +112,6 @@ export function getErrorNotices( state ) {
  *
  * @return {string|boolean} The error text, or false if no error.
  */
-export function getErrorNoticeForBlock( state, blockId ) {
-	return state.errorNotices[ blockId ];
+export function getErrorNoticeForBlock(state, blockId) {
+	return state.errorNotices[blockId];
 }

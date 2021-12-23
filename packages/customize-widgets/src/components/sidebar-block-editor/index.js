@@ -35,23 +35,23 @@ import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import BlockAppender from '../block-appender';
 
-export default function SidebarBlockEditor( {
+export default function SidebarBlockEditor({
 	blockEditorSettings,
 	sidebar,
 	inserter,
 	inspector,
-} ) {
-	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
+}) {
+	const [isInserterOpened, setIsInserterOpened] = useInserter(inserter);
 	const {
 		hasUploadPermissions,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
 		isWelcomeGuideActive,
-	} = useSelect( ( select ) => {
-		const { isFeatureActive } = select( interfaceStore );
+	} = useSelect((select) => {
+		const { isFeatureActive } = select(interfaceStore);
 		return {
 			hasUploadPermissions: defaultTo(
-				select( coreStore ).canUser( 'create', 'media' ),
+				select(coreStore).canUser('create', 'media'),
 				true
 			),
 			isFixedToolbarActive: isFeatureActive(
@@ -67,16 +67,16 @@ export default function SidebarBlockEditor( {
 				'welcomeGuide'
 			),
 		};
-	}, [] );
-	const settings = useMemo( () => {
+	}, []);
+	const settings = useMemo(() => {
 		let mediaUploadBlockEditor;
-		if ( hasUploadPermissions ) {
-			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
-				uploadMedia( {
+		if (hasUploadPermissions) {
+			mediaUploadBlockEditor = ({ onError, ...argumentsObject }) => {
+				uploadMedia({
 					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
+					onError: ({ message }) => onError(message),
 					...argumentsObject,
-				} );
+				});
 			};
 		}
 
@@ -94,10 +94,10 @@ export default function SidebarBlockEditor( {
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
 		setIsInserterOpened,
-	] );
+	]);
 
-	if ( isWelcomeGuideActive ) {
-		return <WelcomeGuide sidebar={ sidebar } />;
+	if (isWelcomeGuideActive) {
+		return <WelcomeGuide sidebar={sidebar} />;
 	}
 
 	return (
@@ -105,53 +105,51 @@ export default function SidebarBlockEditor( {
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 
-			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
+			<SidebarEditorProvider sidebar={sidebar} settings={settings}>
 				<KeyboardShortcuts
-					undo={ sidebar.undo }
-					redo={ sidebar.redo }
-					save={ sidebar.save }
+					undo={sidebar.undo}
+					redo={sidebar.redo}
+					save={sidebar.save}
 				/>
 
 				<Header
-					sidebar={ sidebar }
-					inserter={ inserter }
-					isInserterOpened={ isInserterOpened }
-					setIsInserterOpened={ setIsInserterOpened }
-					isFixedToolbarActive={ isFixedToolbarActive }
+					sidebar={sidebar}
+					inserter={inserter}
+					isInserterOpened={isInserterOpened}
+					setIsInserterOpened={setIsInserterOpened}
+					isFixedToolbarActive={isFixedToolbarActive}
 				/>
 
 				<CopyHandler>
 					<BlockTools>
-						<EditorStyles styles={ settings.defaultEditorStyles } />
+						<EditorStyles styles={settings.defaultEditorStyles} />
 						<BlockSelectionClearer>
 							<WritingFlow className="editor-styles-wrapper">
 								<ObserveTyping>
-									<BlockList
-										renderAppender={ BlockAppender }
-									/>
+									<BlockList renderAppender={BlockAppender} />
 								</ObserveTyping>
 							</WritingFlow>
 						</BlockSelectionClearer>
 					</BlockTools>
 				</CopyHandler>
 
-				{ createPortal(
+				{createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>
 					// from submitting form when type="button" is not specified.
-					<form onSubmit={ ( event ) => event.preventDefault() }>
+					<form onSubmit={(event) => event.preventDefault()}>
 						<BlockInspector />
 					</form>,
-					inspector.contentContainer[ 0 ]
-				) }
+					inspector.contentContainer[0]
+				)}
 			</SidebarEditorProvider>
 
 			<__unstableBlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => (
+				{({ onClose }) => (
 					<BlockInspectorButton
-						inspector={ inspector }
-						closeMenu={ onClose }
+						inspector={inspector}
+						closeMenu={onClose}
 					/>
-				) }
+				)}
 			</__unstableBlockSettingsMenuFirstItem>
 		</>
 	);

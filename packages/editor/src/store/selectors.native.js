@@ -21,7 +21,7 @@ export * from './selectors.js';
  *
  * @return {boolean} Whether current post title is selected.
  */
-export function isPostTitleSelected( state ) {
+export function isPostTitleSelected(state) {
 	return state.postTitle.isSelected;
 }
 
@@ -34,9 +34,9 @@ export function isPostTitleSelected( state ) {
  * @return {boolean} Whether the post can be autosaved.
  */
 export const isEditedPostAutosaveable = createRegistrySelector(
-	() => ( state ) => {
+	() => (state) => {
 		// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
-		if ( ! isEditedPostSaveable( state ) ) {
+		if (!isEditedPostSaveable(state)) {
 			return false;
 		}
 
@@ -44,11 +44,11 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		// flag in place of content field comparison against the known autosave.
 		// This is not strictly accurate, and relies on a tolerance toward autosave
 		// request failures for unnecessary saves.
-		if ( hasChangedContent( state ) ) {
+		if (hasChangedContent(state)) {
 			return true;
 		}
 
-		if ( isEditedPostDirty( state ) ) {
+		if (isEditedPostDirty(state)) {
 			return true;
 		}
 

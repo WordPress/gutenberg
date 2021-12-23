@@ -24,15 +24,15 @@ For example, consider a common case where we need to issue a network request. We
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 import createMiddleware from '@wordpress/redux-routine';
 
-const middleware = createMiddleware( {
-	async FETCH_JSON( action ) {
-		const response = await window.fetch( action.url );
+const middleware = createMiddleware({
+	async FETCH_JSON(action) {
+		const response = await window.fetch(action.url);
 		return response.json();
 	},
-} );
+});
 
-function temperature( state = null, action ) {
-	switch ( action.type ) {
+function temperature(state = null, action) {
+	switch (action.type) {
 		case 'SET_TEMPERATURE':
 			return action.temperature;
 	}
@@ -40,16 +40,16 @@ function temperature( state = null, action ) {
 	return state;
 }
 
-const reducer = combineReducers( { temperature } );
+const reducer = combineReducers({ temperature });
 
-const store = createStore( reducer, applyMiddleware( middleware ) );
+const store = createStore(reducer, applyMiddleware(middleware));
 
 function* retrieveTemperature() {
 	const result = yield { type: 'FETCH_JSON', url: 'https://' };
 	return { type: 'SET_TEMPERATURE', temperature: result.value };
 }
 
-store.dispatch( retrieveTemperature() );
+store.dispatch(retrieveTemperature());
 ```
 
 In this example, when we dispatch `retrieveTemperature`, it will trigger the control handler to take effect, issuing the network request and assigning the result into the `result` variable. Only once the
@@ -108,16 +108,16 @@ import { deepEqual } from 'assert';
 
 const action = retrieveTemperature();
 
-deepEqual( action.next().value, {
+deepEqual(action.next().value, {
 	type: 'FETCH_JSON',
 	url: 'https://',
-} );
+});
 
 const jsonResult = { value: 10 };
-deepEqual( action.next( jsonResult ).value, {
+deepEqual(action.next(jsonResult).value, {
 	type: 'SET_TEMPERATURE',
 	temperature: 10,
-} );
+});
 ```
 
 If your action creator does not assign the yielded result into a variable, you can also use `Array.from` to create an array from the result of the action creator.

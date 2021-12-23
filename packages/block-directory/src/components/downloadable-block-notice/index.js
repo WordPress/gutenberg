@@ -9,24 +9,24 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockDirectoryStore } from '../../store';
 
-export const DownloadableBlockNotice = ( { block } ) => {
+export const DownloadableBlockNotice = ({ block }) => {
 	const errorNotice = useSelect(
-		( select ) =>
-			select( blockDirectoryStore ).getErrorNoticeForBlock( block.id ),
-		[ block ]
+		(select) =>
+			select(blockDirectoryStore).getErrorNoticeForBlock(block.id),
+		[block]
 	);
 
-	if ( ! errorNotice ) {
+	if (!errorNotice) {
 		return null;
 	}
 
 	return (
 		<div className="block-directory-downloadable-block-notice">
 			<div className="block-directory-downloadable-block-notice__content">
-				{ errorNotice.message }
-				{ errorNotice.isFatal
-					? ' ' + __( 'Try reloading the page.' )
-					: null }
+				{errorNotice.message}
+				{errorNotice.isFatal
+					? ' ' + __('Try reloading the page.')
+					: null}
 			</div>
 		</div>
 	);

@@ -13,28 +13,28 @@ import { forwardRef } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
-function EditorHistoryRedo( props, ref ) {
+function EditorHistoryRedo(props, ref) {
 	const hasRedo = useSelect(
-		( select ) => select( editorStore ).hasEditorRedo(),
+		(select) => select(editorStore).hasEditorRedo(),
 		[]
 	);
-	const { redo } = useDispatch( editorStore );
+	const { redo } = useDispatch(editorStore);
 	return (
 		<Button
-			{ ...props }
-			ref={ ref }
-			icon={ ! isRTL() ? redoIcon : undoIcon }
+			{...props}
+			ref={ref}
+			icon={!isRTL() ? redoIcon : undoIcon}
 			/* translators: button label text should, if possible, be under 16 characters. */
-			label={ __( 'Redo' ) }
-			shortcut={ displayShortcut.primaryShift( 'z' ) }
+			label={__('Redo')}
+			shortcut={displayShortcut.primaryShift('z')}
 			// If there are no redo levels we don't want to actually disable this
 			// button, because it will remove focus for keyboard users.
 			// See: https://github.com/WordPress/gutenberg/issues/3486
-			aria-disabled={ ! hasRedo }
-			onClick={ hasRedo ? redo : undefined }
+			aria-disabled={!hasRedo}
+			onClick={hasRedo ? redo : undefined}
 			className="editor-history__redo"
 		/>
 	);
 }
 
-export default forwardRef( EditorHistoryRedo );
+export default forwardRef(EditorHistoryRedo);

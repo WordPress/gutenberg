@@ -27,14 +27,14 @@ import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
 
-const preventDefault = ( event ) => {
+const preventDefault = (event) => {
 	event.preventDefault();
 };
 
-export default function Header( {
+export default function Header({
 	openEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
-} ) {
+}) {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -45,28 +45,27 @@ export default function Header( {
 		isListViewOpen,
 		listViewShortcut,
 		isLoaded,
-	} = useSelect( ( select ) => {
+	} = useSelect((select) => {
 		const {
 			__experimentalGetPreviewDeviceType,
 			getEditedPostType,
 			getEditedPostId,
 			isInserterOpened,
 			isListViewOpened,
-		} = select( editSiteStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			editorStore
-		);
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		} = select(editSiteStore);
+		const { getEditedEntityRecord } = select(coreStore);
+		const { __experimentalGetTemplateInfo: getTemplateInfo } =
+			select(editorStore);
+		const { getShortcutRepresentation } = select(keyboardShortcutsStore);
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
-		const record = getEditedEntityRecord( 'postType', postType, postId );
-		const _isLoaded = !! postId;
+		const record = getEditedEntityRecord('postType', postType, postId);
+		const _isLoaded = !!postId;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			entityTitle: getTemplateInfo( record ).title,
+			entityTitle: getTemplateInfo(record).title,
 			isLoaded: _isLoaded,
 			template: record,
 			templateType: postType,
@@ -76,28 +75,28 @@ export default function Header( {
 				'core/edit-site/toggle-list-view'
 			),
 		};
-	}, [] );
+	}, []);
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
 		setIsListViewOpened,
-	} = useDispatch( editSiteStore );
+	} = useDispatch(editSiteStore);
 
-	const isLargeViewport = useViewportMatch( 'medium' );
+	const isLargeViewport = useViewportMatch('medium');
 
-	const openInserter = useCallback( () => {
-		if ( isInserterOpen ) {
+	const openInserter = useCallback(() => {
+		if (isInserterOpen) {
 			// Focusing the inserter button closes the inserter popover
 			inserterButton.current.focus();
 		} else {
-			setIsInserterOpened( true );
+			setIsInserterOpened(true);
 		}
-	}, [ isInserterOpen, setIsInserterOpened ] );
+	}, [isInserterOpen, setIsInserterOpened]);
 
 	const toggleListView = useCallback(
-		() => setIsListViewOpened( ! isListViewOpen ),
-		[ setIsListViewOpened, isListViewOpen ]
+		() => setIsListViewOpened(!isListViewOpen),
+		[setIsListViewOpened, isListViewOpen]
 	);
 
 	const isFocusMode = templateType === 'wp_template_part';
@@ -107,67 +106,67 @@ export default function Header( {
 			<div className="edit-site-header_start">
 				<div className="edit-site-header__toolbar">
 					<Button
-						ref={ inserterButton }
+						ref={inserterButton}
 						variant="primary"
-						isPressed={ isInserterOpen }
+						isPressed={isInserterOpen}
 						className="edit-site-header-toolbar__inserter-toggle"
-						onMouseDown={ preventDefault }
-						onClick={ openInserter }
-						icon={ plus }
-						label={ _x(
+						onMouseDown={preventDefault}
+						onClick={openInserter}
+						icon={plus}
+						label={_x(
 							'Toggle block inserter',
 							'Generic label for block inserter button'
-						) }
+						)}
 					/>
-					{ isLargeViewport && (
+					{isLargeViewport && (
 						<>
 							<ToolSelector />
 							<UndoButton />
 							<RedoButton />
 							<Button
 								className="edit-site-header-toolbar__list-view-toggle"
-								icon={ listView }
-								isPressed={ isListViewOpen }
+								icon={listView}
+								isPressed={isListViewOpen}
 								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'List View' ) }
-								onClick={ toggleListView }
-								shortcut={ listViewShortcut }
+								label={__('List View')}
+								onClick={toggleListView}
+								shortcut={listViewShortcut}
 							/>
 						</>
-					) }
+					)}
 				</div>
 			</div>
 
 			<div className="edit-site-header_center">
 				<DocumentActions
-					entityTitle={ entityTitle }
+					entityTitle={entityTitle}
 					entityLabel={
 						templateType === 'wp_template_part'
 							? 'template part'
 							: 'template'
 					}
-					isLoaded={ isLoaded }
+					isLoaded={isLoaded}
 				>
-					{ ( { onClose } ) => (
+					{({ onClose }) => (
 						<TemplateDetails
-							template={ template }
-							onClose={ onClose }
+							template={template}
+							onClose={onClose}
 						/>
-					) }
+					)}
 				</DocumentActions>
 			</div>
 
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
-					{ ! isFocusMode && (
+					{!isFocusMode && (
 						<PreviewOptions
-							deviceType={ deviceType }
-							setDeviceType={ setPreviewDeviceType }
+							deviceType={deviceType}
+							setDeviceType={setPreviewDeviceType}
 						/>
-					) }
+					)}
 					<SaveButton
-						openEntitiesSavedStates={ openEntitiesSavedStates }
-						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
+						openEntitiesSavedStates={openEntitiesSavedStates}
+						isEntitiesSavedStatesOpen={isEntitiesSavedStatesOpen}
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu />

@@ -25,21 +25,21 @@ const searchItems = [
 ];
 
 export function SearchStory() {
-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
-	const [ search, setSearch ] = useState( '' );
+	const [activeItem, setActiveItem] = useState('item-1');
+	const [search, setSearch] = useState('');
 
 	return (
-		<Navigation activeItem={ activeItem } className="navigation-story">
+		<Navigation activeItem={activeItem} className="navigation-story">
 			<NavigationMenu hasSearch title="Home">
 				<NavigationGroup title="Items">
-					{ searchItems.map( ( { item, title } ) => (
+					{searchItems.map(({ item, title }) => (
 						<NavigationItem
-							item={ `item-${ item }` }
-							key={ `item-${ item }` }
-							onClick={ () => setActiveItem( `item-${ item }` ) }
-							title={ title }
+							item={`item-${item}`}
+							key={`item-${item}`}
+							onClick={() => setActiveItem(`item-${item}`)}
+							title={title}
 						/>
-					) ) }
+					))}
 				</NavigationGroup>
 
 				<NavigationGroup title="More Examples">
@@ -54,23 +54,21 @@ export function SearchStory() {
 			<NavigationMenu
 				hasSearch
 				menu="controlled-search"
-				onSearch={ ( value ) => setSearch( value ) }
+				onSearch={(value) => setSearch(value)}
 				parentMenu="root"
-				search={ search }
+				search={search}
 				title="Controlled Search"
 			>
-				{ searchItems
-					.filter( ( { title } ) =>
-						normalizedSearch( title, search )
-					)
-					.map( ( { item, title } ) => (
+				{searchItems
+					.filter(({ title }) => normalizedSearch(title, search))
+					.map(({ item, title }) => (
 						<NavigationItem
-							item={ `child-${ item }` }
-							key={ `child-${ item }` }
-							onClick={ () => setActiveItem( `child-${ item }` ) }
-							title={ title }
+							item={`child-${item}`}
+							key={`child-${item}`}
+							onClick={() => setActiveItem(`child-${item}`)}
+							title={title}
 						/>
-					) ) }
+					))}
 			</NavigationMenu>
 		</Navigation>
 	);

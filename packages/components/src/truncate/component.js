@@ -9,10 +9,10 @@ import useTruncate from './hook';
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
  * @param {import('react').Ref<any>}                                                         forwardedRef
  */
-function Truncate( props, forwardedRef ) {
-	const truncateProps = useTruncate( props );
+function Truncate(props, forwardedRef) {
+	const truncateProps = useTruncate(props);
 
-	return <View as="span" { ...truncateProps } ref={ forwardedRef } />;
+	return <View as="span" {...truncateProps} ref={forwardedRef} />;
 }
 
 /**
@@ -36,6 +36,6 @@ function Truncate( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedTruncate = contextConnect( Truncate, 'Truncate' );
+const ConnectedTruncate = contextConnect(Truncate, 'Truncate');
 
 export default ConnectedTruncate;

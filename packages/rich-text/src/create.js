@@ -43,44 +43,42 @@ function createEmptyValue() {
 	};
 }
 
-function toFormat( { type, attributes } ) {
+function toFormat({ type, attributes }) {
 	let formatType;
 
-	if ( attributes && attributes.class ) {
-		formatType = select( richTextStore ).getFormatTypeForClassName(
+	if (attributes && attributes.class) {
+		formatType = select(richTextStore).getFormatTypeForClassName(
 			attributes.class
 		);
 
-		if ( formatType ) {
+		if (formatType) {
 			// Preserve any additional classes.
-			attributes.class = ` ${ attributes.class } `
-				.replace( ` ${ formatType.className } `, ' ' )
+			attributes.class = ` ${attributes.class} `
+				.replace(` ${formatType.className} `, ' ')
 				.trim();
 
-			if ( ! attributes.class ) {
+			if (!attributes.class) {
 				delete attributes.class;
 			}
 		}
 	}
 
-	if ( ! formatType ) {
-		formatType = select( richTextStore ).getFormatTypeForBareElement(
-			type
-		);
+	if (!formatType) {
+		formatType = select(richTextStore).getFormatTypeForBareElement(type);
 	}
 
-	if ( ! formatType ) {
+	if (!formatType) {
 		return attributes ? { type, attributes } : { type };
 	}
 
 	if (
 		formatType.__experimentalCreatePrepareEditableTree &&
-		! formatType.__experimentalCreateOnChangeEditableValue
+		!formatType.__experimentalCreateOnChangeEditableValue
 	) {
 		return null;
 	}
 
-	if ( ! attributes ) {
+	if (!attributes) {
 		return { type: formatType.name };
 	}
 
@@ -88,31 +86,30 @@ function toFormat( { type, attributes } ) {
 	const unregisteredAttributes = {};
 	const _attributes = { ...attributes };
 
-	for ( const key in formatType.attributes ) {
-		const name = formatType.attributes[ key ];
+	for (const key in formatType.attributes) {
+		const name = formatType.attributes[key];
 
-		registeredAttributes[ key ] = _attributes[ name ];
+		registeredAttributes[key] = _attributes[name];
 
-		if ( formatType.__unstableFilterAttributeValue ) {
-			registeredAttributes[
-				key
-			] = formatType.__unstableFilterAttributeValue(
-				key,
-				registeredAttributes[ key ]
-			);
+		if (formatType.__unstableFilterAttributeValue) {
+			registeredAttributes[key] =
+				formatType.__unstableFilterAttributeValue(
+					key,
+					registeredAttributes[key]
+				);
 		}
 
 		// delete the attribute and what's left is considered
 		// to be unregistered.
-		delete _attributes[ name ];
+		delete _attributes[name];
 
-		if ( typeof registeredAttributes[ key ] === 'undefined' ) {
-			delete registeredAttributes[ key ];
+		if (typeof registeredAttributes[key] === 'undefined') {
+			delete registeredAttributes[key];
 		}
 	}
 
-	for ( const name in _attributes ) {
-		unregisteredAttributes[ name ] = attributes[ name ];
+	for (const name in _attributes) {
+		unregisteredAttributes[name] = attributes[name];
 	}
 
 	return {
@@ -165,7 +162,7 @@ function toFormat( { type, attributes } ) {
  *
  * @return {RichTextValue} A rich text value.
  */
-export function create( {
+export function create({
 	element,
 	text,
 	html,
@@ -174,42 +171,42 @@ export function create( {
 	multilineWrapperTags,
 	__unstableIsEditableTree: isEditableTree,
 	preserveWhiteSpace,
-} = {} ) {
-	if ( typeof text === 'string' && text.length > 0 ) {
+} = {}) {
+	if (typeof text === 'string' && text.length > 0) {
 		return {
-			formats: Array( text.length ),
-			replacements: Array( text.length ),
+			formats: Array(text.length),
+			replacements: Array(text.length),
 			text,
 		};
 	}
 
-	if ( typeof html === 'string' && html.length > 0 ) {
+	if (typeof html === 'string' && html.length > 0) {
 		// It does not matter which document this is, we're just using it to
 		// parse.
-		element = createElement( document, html );
+		element = createElement(document, html);
 	}
 
-	if ( typeof element !== 'object' ) {
+	if (typeof element !== 'object') {
 		return createEmptyValue();
 	}
 
-	if ( ! multilineTag ) {
-		return createFromElement( {
+	if (!multilineTag) {
+		return createFromElement({
 			element,
 			range,
 			isEditableTree,
 			preserveWhiteSpace,
-		} );
+		});
 	}
 
-	return createFromMultilineElement( {
+	return createFromMultilineElement({
 		element,
 		range,
 		multilineTag,
 		multilineWrapperTags,
 		isEditableTree,
 		preserveWhiteSpace,
-	} );
+	});
 }
 
 /**
@@ -221,8 +218,8 @@ export function create( {
  * @param {Range}  range       Range to create value with.
  * @param {Object} value       Value that is being accumulated.
  */
-function accumulateSelection( accumulator, node, range, value ) {
-	if ( ! range ) {
+function accumulateSelection(accumulator, node, range, value) {
+	if (!range) {
 		return;
 	}
 
@@ -231,48 +228,48 @@ function accumulateSelection( accumulator, node, range, value ) {
 	const currentLength = accumulator.text.length;
 
 	// Selection can be extracted from value.
-	if ( value.start !== undefined ) {
+	if (value.start !== undefined) {
 		accumulator.start = currentLength + value.start;
 		// Range indicates that the current node has selection.
-	} else if ( node === startContainer && node.nodeType === node.TEXT_NODE ) {
+	} else if (node === startContainer && node.nodeType === node.TEXT_NODE) {
 		accumulator.start = currentLength + startOffset;
 		// Range indicates that the current node is selected.
 	} else if (
 		parentNode === startContainer &&
-		node === startContainer.childNodes[ startOffset ]
+		node === startContainer.childNodes[startOffset]
 	) {
 		accumulator.start = currentLength;
 		// Range indicates that the selection is after the current node.
 	} else if (
 		parentNode === startContainer &&
-		node === startContainer.childNodes[ startOffset - 1 ]
+		node === startContainer.childNodes[startOffset - 1]
 	) {
 		accumulator.start = currentLength + value.text.length;
 		// Fallback if no child inside handled the selection.
-	} else if ( node === startContainer ) {
+	} else if (node === startContainer) {
 		accumulator.start = currentLength;
 	}
 
 	// Selection can be extracted from value.
-	if ( value.end !== undefined ) {
+	if (value.end !== undefined) {
 		accumulator.end = currentLength + value.end;
 		// Range indicates that the current node has selection.
-	} else if ( node === endContainer && node.nodeType === node.TEXT_NODE ) {
+	} else if (node === endContainer && node.nodeType === node.TEXT_NODE) {
 		accumulator.end = currentLength + endOffset;
 		// Range indicates that the current node is selected.
 	} else if (
 		parentNode === endContainer &&
-		node === endContainer.childNodes[ endOffset - 1 ]
+		node === endContainer.childNodes[endOffset - 1]
 	) {
 		accumulator.end = currentLength + value.text.length;
 		// Range indicates that the selection is before the current node.
 	} else if (
 		parentNode === endContainer &&
-		node === endContainer.childNodes[ endOffset ]
+		node === endContainer.childNodes[endOffset]
 	) {
 		accumulator.end = currentLength;
 		// Fallback if no child inside handled the selection.
-	} else if ( node === endContainer ) {
+	} else if (node === endContainer) {
 		accumulator.end = currentLength + endOffset;
 	}
 }
@@ -286,20 +283,20 @@ function accumulateSelection( accumulator, node, range, value ) {
  *
  * @return {Object|void} Object containing range properties.
  */
-function filterRange( node, range, filter ) {
-	if ( ! range ) {
+function filterRange(node, range, filter) {
+	if (!range) {
 		return;
 	}
 
 	const { startContainer, endContainer } = range;
 	let { startOffset, endOffset } = range;
 
-	if ( node === startContainer ) {
-		startOffset = filter( node.nodeValue.slice( 0, startOffset ) ).length;
+	if (node === startContainer) {
+		startOffset = filter(node.nodeValue.slice(0, startOffset)).length;
 	}
 
-	if ( node === endContainer ) {
-		endOffset = filter( node.nodeValue.slice( 0, endOffset ) ).length;
+	if (node === endContainer) {
+		endOffset = filter(node.nodeValue.slice(0, endOffset)).length;
 	}
 
 	return { startContainer, startOffset, endContainer, endOffset };
@@ -311,8 +308,8 @@ function filterRange( node, range, filter ) {
  *
  * @param {string} string
  */
-function collapseWhiteSpace( string ) {
-	return string.replace( /[\n\r\t]+/g, ' ' );
+function collapseWhiteSpace(string) {
+	return string.replace(/[\n\r\t]+/g, ' ');
 }
 
 /**
@@ -320,10 +317,10 @@ function collapseWhiteSpace( string ) {
  *
  * @param {string} string
  */
-export function removeReservedCharacters( string ) {
+export function removeReservedCharacters(string) {
 	//with the global flag, note that we should create a new regex each time OR reset lastIndex state.
 	return string.replace(
-		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
+		new RegExp(`[${ZWNBSP}${OBJECT_REPLACEMENT_CHARACTER}]`, 'gu'),
 		''
 	);
 }
@@ -345,7 +342,7 @@ export function removeReservedCharacters( string ) {
  *
  * @return {RichTextValue} A rich text value.
  */
-function createFromElement( {
+function createFromElement({
 	element,
 	range,
 	multilineTag,
@@ -353,36 +350,36 @@ function createFromElement( {
 	currentWrapperTags = [],
 	isEditableTree,
 	preserveWhiteSpace,
-} ) {
+}) {
 	const accumulator = createEmptyValue();
 
-	if ( ! element ) {
+	if (!element) {
 		return accumulator;
 	}
 
-	if ( ! element.hasChildNodes() ) {
-		accumulateSelection( accumulator, element, range, createEmptyValue() );
+	if (!element.hasChildNodes()) {
+		accumulateSelection(accumulator, element, range, createEmptyValue());
 		return accumulator;
 	}
 
 	const length = element.childNodes.length;
 
 	// Optimise for speed.
-	for ( let index = 0; index < length; index++ ) {
-		const node = element.childNodes[ index ];
+	for (let index = 0; index < length; index++) {
+		const node = element.childNodes[index];
 		const type = node.nodeName.toLowerCase();
 
-		if ( node.nodeType === node.TEXT_NODE ) {
+		if (node.nodeType === node.TEXT_NODE) {
 			let filter = removeReservedCharacters;
 
-			if ( ! preserveWhiteSpace ) {
-				filter = ( string ) =>
-					removeReservedCharacters( collapseWhiteSpace( string ) );
+			if (!preserveWhiteSpace) {
+				filter = (string) =>
+					removeReservedCharacters(collapseWhiteSpace(string));
 			}
 
-			const text = filter( node.nodeValue );
-			range = filterRange( node, range, filter );
-			accumulateSelection( accumulator, node, range, { text } );
+			const text = filter(node.nodeValue);
+			range = filterRange(node, range, filter);
+			accumulateSelection(accumulator, node, range, { text });
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
 			accumulator.formats.length += text.length;
@@ -391,104 +388,99 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( node.nodeType !== node.ELEMENT_NODE ) {
+		if (node.nodeType !== node.ELEMENT_NODE) {
 			continue;
 		}
 
 		if (
 			isEditableTree &&
 			// Ignore any placeholders.
-			( node.getAttribute( 'data-rich-text-placeholder' ) ||
+			(node.getAttribute('data-rich-text-placeholder') ||
 				// Ignore any line breaks that are not inserted by us.
-				( type === 'br' &&
-					! node.getAttribute( 'data-rich-text-line-break' ) ) )
+				(type === 'br' &&
+					!node.getAttribute('data-rich-text-line-break')))
 		) {
-			accumulateSelection( accumulator, node, range, createEmptyValue() );
+			accumulateSelection(accumulator, node, range, createEmptyValue());
 			continue;
 		}
 
-		if ( type === 'script' ) {
+		if (type === 'script') {
 			const value = {
-				formats: [ , ],
+				formats: [,],
 				replacements: [
 					{
 						type,
 						attributes: {
 							'data-rich-text-script':
-								node.getAttribute( 'data-rich-text-script' ) ||
-								encodeURIComponent( node.innerHTML ),
+								node.getAttribute('data-rich-text-script') ||
+								encodeURIComponent(node.innerHTML),
 						},
 					},
 				],
 				text: OBJECT_REPLACEMENT_CHARACTER,
 			};
-			accumulateSelection( accumulator, node, range, value );
-			mergePair( accumulator, value );
+			accumulateSelection(accumulator, node, range, value);
+			mergePair(accumulator, value);
 			continue;
 		}
 
-		if ( type === 'br' ) {
-			accumulateSelection( accumulator, node, range, createEmptyValue() );
-			mergePair( accumulator, create( { text: '\n' } ) );
+		if (type === 'br') {
+			accumulateSelection(accumulator, node, range, createEmptyValue());
+			mergePair(accumulator, create({ text: '\n' }));
 			continue;
 		}
 
-		const format = toFormat( {
+		const format = toFormat({
 			type,
-			attributes: getAttributes( { element: node } ),
-		} );
+			attributes: getAttributes({ element: node }),
+		});
 
-		if (
-			multilineWrapperTags &&
-			multilineWrapperTags.indexOf( type ) !== -1
-		) {
-			const value = createFromMultilineElement( {
+		if (multilineWrapperTags && multilineWrapperTags.indexOf(type) !== -1) {
+			const value = createFromMultilineElement({
 				element: node,
 				range,
 				multilineTag,
 				multilineWrapperTags,
-				currentWrapperTags: [ ...currentWrapperTags, format ],
+				currentWrapperTags: [...currentWrapperTags, format],
 				isEditableTree,
 				preserveWhiteSpace,
-			} );
+			});
 
-			accumulateSelection( accumulator, node, range, value );
-			mergePair( accumulator, value );
+			accumulateSelection(accumulator, node, range, value);
+			mergePair(accumulator, value);
 			continue;
 		}
 
-		const value = createFromElement( {
+		const value = createFromElement({
 			element: node,
 			range,
 			multilineTag,
 			multilineWrapperTags,
 			isEditableTree,
 			preserveWhiteSpace,
-		} );
+		});
 
-		accumulateSelection( accumulator, node, range, value );
+		accumulateSelection(accumulator, node, range, value);
 
-		if ( ! format ) {
-			mergePair( accumulator, value );
-		} else if ( value.text.length === 0 ) {
-			if ( format.attributes ) {
-				mergePair( accumulator, {
-					formats: [ , ],
-					replacements: [ format ],
+		if (!format) {
+			mergePair(accumulator, value);
+		} else if (value.text.length === 0) {
+			if (format.attributes) {
+				mergePair(accumulator, {
+					formats: [,],
+					replacements: [format],
 					text: OBJECT_REPLACEMENT_CHARACTER,
-				} );
+				});
 			}
 		} else {
 			// Indices should share a reference to the same formats array.
 			// Only create a new reference if `formats` changes.
-			function mergeFormats( formats ) {
-				if ( mergeFormats.formats === formats ) {
+			function mergeFormats(formats) {
+				if (mergeFormats.formats === formats) {
 					return mergeFormats.newFormats;
 				}
 
-				const newFormats = formats
-					? [ format, ...formats ]
-					: [ format ];
+				const newFormats = formats ? [format, ...formats] : [format];
 
 				mergeFormats.formats = formats;
 				mergeFormats.newFormats = newFormats;
@@ -498,12 +490,12 @@ function createFromElement( {
 
 			// Since the formats parameter can be `undefined`, preset
 			// `mergeFormats` with a new reference.
-			mergeFormats.newFormats = [ format ];
+			mergeFormats.newFormats = [format];
 
-			mergePair( accumulator, {
+			mergePair(accumulator, {
 				...value,
-				formats: Array.from( value.formats, mergeFormats ),
-			} );
+				formats: Array.from(value.formats, mergeFormats),
+			});
 		}
 	}
 
@@ -529,7 +521,7 @@ function createFromElement( {
  *
  * @return {RichTextValue} A rich text value.
  */
-function createFromMultilineElement( {
+function createFromMultilineElement({
 	element,
 	range,
 	multilineTag,
@@ -537,24 +529,24 @@ function createFromMultilineElement( {
 	currentWrapperTags = [],
 	isEditableTree,
 	preserveWhiteSpace,
-} ) {
+}) {
 	const accumulator = createEmptyValue();
 
-	if ( ! element || ! element.hasChildNodes() ) {
+	if (!element || !element.hasChildNodes()) {
 		return accumulator;
 	}
 
 	const length = element.children.length;
 
 	// Optimise for speed.
-	for ( let index = 0; index < length; index++ ) {
-		const node = element.children[ index ];
+	for (let index = 0; index < length; index++) {
+		const node = element.children[index];
 
-		if ( node.nodeName.toLowerCase() !== multilineTag ) {
+		if (node.nodeName.toLowerCase() !== multilineTag) {
 			continue;
 		}
 
-		const value = createFromElement( {
+		const value = createFromElement({
 			element: node,
 			range,
 			multilineTag,
@@ -562,22 +554,20 @@ function createFromMultilineElement( {
 			currentWrapperTags,
 			isEditableTree,
 			preserveWhiteSpace,
-		} );
+		});
 
 		// Multiline value text should be separated by a line separator.
-		if ( index !== 0 || currentWrapperTags.length > 0 ) {
-			mergePair( accumulator, {
-				formats: [ , ],
+		if (index !== 0 || currentWrapperTags.length > 0) {
+			mergePair(accumulator, {
+				formats: [,],
 				replacements:
-					currentWrapperTags.length > 0
-						? [ currentWrapperTags ]
-						: [ , ],
+					currentWrapperTags.length > 0 ? [currentWrapperTags] : [,],
 				text: LINE_SEPARATOR,
-			} );
+			});
 		}
 
-		accumulateSelection( accumulator, node, range, value );
-		mergePair( accumulator, value );
+		accumulateSelection(accumulator, node, range, value);
+		mergePair(accumulator, value);
 	}
 
 	return accumulator;
@@ -592,8 +582,8 @@ function createFromMultilineElement( {
  * @return {Object|void} Attribute object or `undefined` if the element has no
  *                       attributes.
  */
-function getAttributes( { element } ) {
-	if ( ! element.hasAttributes() ) {
+function getAttributes({ element }) {
+	if (!element.hasAttributes()) {
 		return;
 	}
 
@@ -601,19 +591,19 @@ function getAttributes( { element } ) {
 	let accumulator;
 
 	// Optimise for speed.
-	for ( let i = 0; i < length; i++ ) {
-		const { name, value } = element.attributes[ i ];
+	for (let i = 0; i < length; i++) {
+		const { name, value } = element.attributes[i];
 
-		if ( name.indexOf( 'data-rich-text-' ) === 0 ) {
+		if (name.indexOf('data-rich-text-') === 0) {
 			continue;
 		}
 
-		const safeName = /^on/i.test( name )
+		const safeName = /^on/i.test(name)
 			? 'data-disable-rich-text-' + name
 			: name;
 
 		accumulator = accumulator || {};
-		accumulator[ safeName ] = value;
+		accumulator[safeName] = value;
 	}
 
 	return accumulator;

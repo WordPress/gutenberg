@@ -14,10 +14,10 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  *
  * @return {boolean} True if there is selection, false if not.
  */
-export default function documentHasTextSelection( doc ) {
-	assertIsDefined( doc.defaultView, 'doc.defaultView' );
+export default function documentHasTextSelection(doc) {
+	assertIsDefined(doc.defaultView, 'doc.defaultView');
 	const selection = doc.defaultView.getSelection();
-	assertIsDefined( selection, 'selection' );
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	return !! range && ! range.collapsed;
+	assertIsDefined(selection, 'selection');
+	const range = selection.rangeCount ? selection.getRangeAt(0) : null;
+	return !!range && !range.collapsed;
 }

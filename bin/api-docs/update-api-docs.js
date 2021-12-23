@@ -1,11 +1,11 @@
 /**
  * External dependencies
  */
-const { join, relative, resolve, sep, dirname } = require( 'path' );
-const glob = require( 'fast-glob' );
-const execa = require( 'execa' );
-const { Transform } = require( 'stream' );
-const { readFile } = require( 'fs' ).promises;
+const { join, relative, resolve, sep, dirname } = require('path');
+const glob = require('fast-glob');
+const execa = require('execa');
+const { Transform } = require('stream');
+const { readFile } = require('fs').promises;
 
 /**
  * README file tokens, defined as a tuple of token identifier, source path.
@@ -24,21 +24,21 @@ const { readFile } = require( 'fs' ).promises;
  *
  * @type {string}
  */
-const ROOT_DIR = resolve( __dirname, '../..' );
+const ROOT_DIR = resolve(__dirname, '../..');
 
 /**
  * Path to packages directory.
  *
  * @type {string}
  */
-const PACKAGES_DIR = resolve( ROOT_DIR, 'packages' );
+const PACKAGES_DIR = resolve(ROOT_DIR, 'packages');
 
 /**
  * Path to data documentation directory.
  *
  * @type {string}
  */
-const DATA_DOCS_DIR = resolve( ROOT_DIR, 'docs/reference-guides/data' );
+const DATA_DOCS_DIR = resolve(ROOT_DIR, 'docs/reference-guides/data');
 
 /**
  * Pattern matching start token of a README file.
@@ -64,8 +64,8 @@ const TOKEN_PATTERN = /<!-- START TOKEN\((.+?(?:\|(.+?))?)\) -->/g;
  *
  * @return {string} Package name.
  */
-function getFilePackage( file ) {
-	return relative( PACKAGES_DIR, file ).split( sep )[ 0 ];
+function getFilePackage(file) {
+	return relative(PACKAGES_DIR, file).split(sep)[0];
 }
 
 /**
@@ -77,15 +77,15 @@ function getFilePackage( file ) {
  *
  * @return {string} Packages glob pattern.
  */
-function getPackagePattern( files ) {
-	if ( ! files.length ) {
+function getPackagePattern(files) {
+	if (!files.length) {
 		return '*';
 	}
 
 	// Since brace expansion doesn't work with a single package, special-case
 	// the pattern for the singular match.
-	const packages = Array.from( new Set( files.map( getFilePackage ) ) );
-	return packages.length === 1 ? packages[ 0 ] : '{' + packages.join() + '}';
+	const packages = Array.from(new Set(files.map(getFilePackage)));
+	return packages.length === 1 ? packages[0] : '{' + packages.join() + '}';
 }
 
 /**
@@ -95,9 +95,9 @@ function getPackagePattern( files ) {
  *
  * @return {string} Store name.
  */
-function getPackageStoreName( packageName ) {
+function getPackageStoreName(packageName) {
 	let storeName = 'core';
-	if ( packageName !== 'core-data' ) {
+	if (packageName !== 'core-data') {
 		storeName += '/' + packageName;
 	}
 
@@ -111,9 +111,9 @@ function getPackageStoreName( packageName ) {
  *
  * @return {string} Documentation file name.
  */
-function getDataDocumentationFile( packageName ) {
-	const storeName = getPackageStoreName( packageName );
-	return `data-${ storeName.replace( '/', '-' ) }.md`;
+function getDataDocumentationFile(packageName) {
+	const storeName = getPackageStoreName(packageName);
+	return `data-${storeName.replace('/', '-')}.md`;
 }
 
 /**
@@ -125,17 +125,17 @@ function getDataDocumentationFile( packageName ) {
  *
  * @return {string} Packages glob pattern.
  */
-function getDataDocumentationPattern( files ) {
-	if ( ! files.length ) {
+function getDataDocumentationPattern(files) {
+	if (!files.length) {
 		return '*';
 	}
 
 	// Since brace expansion doesn't work with a single package, special-case
 	// the pattern for the singular match.
-	const filePackages = Array.from( new Set( files.map( getFilePackage ) ) );
-	const docFiles = filePackages.map( getDataDocumentationFile );
+	const filePackages = Array.from(new Set(files.map(getFilePackage)));
+	const docFiles = filePackages.map(getDataDocumentationFile);
 
-	return docFiles.length === 1 ? docFiles[ 0 ] : '{' + docFiles.join() + '}';
+	return docFiles.length === 1 ? docFiles[0] : '{' + docFiles.join() + '}';
 }
 
 /**
@@ -145,31 +145,31 @@ function getDataDocumentationPattern( files ) {
  *
  * @type {Transform}
  */
-const filterTokenTransform = new Transform( {
+const filterTokenTransform = new Transform({
 	objectMode: true,
 
-	async transform( file, _encoding, callback ) {
+	async transform(file, _encoding, callback) {
 		let content;
 		try {
-			content = await readFile( file, 'utf8' );
+			content = await readFile(file, 'utf8');
 		} catch {}
 
-		if ( content ) {
+		if (content) {
 			const tokens = [];
 
-			for ( const match of content.matchAll( TOKEN_PATTERN ) ) {
-				const [ , token, path ] = match;
-				tokens.push( [ token, path ] );
+			for (const match of content.matchAll(TOKEN_PATTERN)) {
+				const [, token, path] = match;
+				tokens.push([token, path]);
 			}
 
-			if ( tokens.length ) {
-				this.push( [ file, tokens ] );
+			if (tokens.length) {
+				this.push([file, tokens]);
 			}
 		}
 
 		callback();
 	},
-} );
+});
 
 /**
  * Find default source file (`src/index.{js,ts,tsx}`) in a specified package directory
@@ -177,15 +177,15 @@ const filterTokenTransform = new Transform( {
  * @param {string} dir Package directory to search in
  * @return {string} Name of matching file
  */
-function findDefaultSourcePath( dir ) {
-	const defaultPathMatches = glob.sync( 'src/index.{js,ts,tsx}', {
+function findDefaultSourcePath(dir) {
+	const defaultPathMatches = glob.sync('src/index.{js,ts,tsx}', {
 		cwd: dir,
-	} );
-	if ( ! defaultPathMatches.length ) {
-		throw new Error( `Cannot find default source file in ${ dir }` );
+	});
+	if (!defaultPathMatches.length) {
+		throw new Error(`Cannot find default source file in ${dir}`);
 	}
 	// @ts-ignore
-	return defaultPathMatches[ 0 ];
+	return defaultPathMatches[0];
 }
 
 /**
@@ -193,50 +193,50 @@ function findDefaultSourcePath( dir ) {
  *
  * @type {string[]}
  */
-const files = process.argv.slice( 2 );
+const files = process.argv.slice(2);
 
-glob.stream( [
-	`${ PACKAGES_DIR }/${ getPackagePattern( files ) }/README.md`,
-	`${ DATA_DOCS_DIR }/${ getDataDocumentationPattern( files ) }`,
-] )
-	.pipe( filterTokenTransform )
-	.on( 'data', async ( /** @type {WPReadmeFileData} */ data ) => {
-		const [ file, tokens ] = data;
-		const output = relative( ROOT_DIR, file );
+glob.stream([
+	`${PACKAGES_DIR}/${getPackagePattern(files)}/README.md`,
+	`${DATA_DOCS_DIR}/${getDataDocumentationPattern(files)}`,
+])
+	.pipe(filterTokenTransform)
+	.on('data', async (/** @type {WPReadmeFileData} */ data) => {
+		const [file, tokens] = data;
+		const output = relative(ROOT_DIR, file);
 
 		// Each file can have more than one placeholder content to update, each
 		// represented by tokens. The docgen script updates one token at a time,
 		// so the tokens must be replaced in sequence to prevent the processes
 		// from overriding each other.
 		try {
-			for ( const [
+			for (const [
 				token,
-				path = findDefaultSourcePath( dirname( file ) ),
-			] of tokens ) {
+				path = findDefaultSourcePath(dirname(file)),
+			] of tokens) {
 				await execa(
-					`"${ join(
+					`"${join(
 						__dirname,
 						'..',
 						'..',
 						'node_modules',
 						'.bin',
 						'docgen'
-					) }"`,
+					)}"`,
 					[
-						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
-						`--output ${ output }`,
+						relative(ROOT_DIR, resolve(dirname(file), path)),
+						`--output ${output}`,
 						'--to-token',
-						`--use-token "${ token }"`,
+						`--use-token "${token}"`,
 						'--ignore "/unstable|experimental/i"',
 					],
 					{ shell: true }
 				);
 			}
-			await execa( 'npm', [ 'run', 'format', output ], {
+			await execa('npm', ['run', 'format', output], {
 				shell: true,
-			} );
-		} catch ( error ) {
-			console.error( error );
-			process.exit( 1 );
+			});
+		} catch (error) {
+			console.error(error);
+			process.exit(1);
 		}
-	} );
+	});

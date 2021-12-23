@@ -25,9 +25,9 @@ const DEFAULT_QUERY = {
 	context: 'view',
 };
 
-export default function MostUsedTerms( { onSelect, taxonomy } ) {
-	const { _terms, showTerms } = useSelect( ( select ) => {
-		const mostUsedTerms = select( coreStore ).getEntityRecords(
+export default function MostUsedTerms({ onSelect, taxonomy }) {
+	const { _terms, showTerms } = useSelect((select) => {
+		const mostUsedTerms = select(coreStore).getEntityRecords(
 			'taxonomy',
 			taxonomy.slug,
 			DEFAULT_QUERY
@@ -36,41 +36,38 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 			_terms: mostUsedTerms,
 			showTerms: mostUsedTerms?.length === MAX_MOST_USED_TERMS,
 		};
-	}, [] );
+	}, []);
 
-	if ( ! showTerms ) {
+	if (!showTerms) {
 		return null;
 	}
 
-	const terms = unescapeTerms( _terms );
-	const label = get( taxonomy, [ 'labels', 'most_used' ] );
+	const terms = unescapeTerms(_terms);
+	const label = get(taxonomy, ['labels', 'most_used']);
 
 	return (
 		<div className="editor-post-taxonomies__flat-term-most-used">
 			<h3 className="editor-post-taxonomies__flat-term-most-used-label">
-				{ label }
+				{label}
 			</h3>
-			{ /*
+			{/*
 			 * Disable reason: The `list` ARIA role is redundant but
 			 * Safari+VoiceOver won't announce the list otherwise.
 			 */
-			/* eslint-disable jsx-a11y/no-redundant-roles */ }
+			/* eslint-disable jsx-a11y/no-redundant-roles */}
 			<ul
 				role="list"
 				className="editor-post-taxonomies__flat-term-most-used-list"
 			>
-				{ terms.map( ( term ) => (
-					<li key={ term.id }>
-						<Button
-							variant="link"
-							onClick={ () => onSelect( term ) }
-						>
-							{ term.name }
+				{terms.map((term) => (
+					<li key={term.id}>
+						<Button variant="link" onClick={() => onSelect(term)}>
+							{term.name}
 						</Button>
 					</li>
-				) ) }
+				))}
 			</ul>
-			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+			{/* eslint-enable jsx-a11y/no-redundant-roles */}
 		</div>
 	);
 }

@@ -26,9 +26,9 @@ const VIDEO_EXTENSIONS = [
  * @param {string} filename The file name.
  * @return {string} The extension of the file name.
  */
-export function getExtension( filename = '' ) {
-	const parts = filename.split( '.' );
-	return parts[ parts.length - 1 ];
+export function getExtension(filename = '') {
+	const parts = filename.split('.');
+	return parts[parts.length - 1];
 }
 
 /**
@@ -37,9 +37,9 @@ export function getExtension( filename = '' ) {
  * @param {string} filename The file name.
  * @return {boolean} Whether the file is a video.
  */
-export function isVideoType( filename = '' ) {
-	if ( ! filename ) return false;
-	return VIDEO_EXTENSIONS.includes( getExtension( filename ) );
+export function isVideoType(filename = '') {
+	if (!filename) return false;
+	return VIDEO_EXTENSIONS.includes(getExtension(filename));
 }
 
 /**
@@ -48,6 +48,6 @@ export function isVideoType( filename = '' ) {
  * @param {number} fraction The fraction value.
  * @return {number} A percentage value.
  */
-export function fractionToPercentage( fraction ) {
-	return Math.round( fraction * 100 );
+export function fractionToPercentage(fraction) {
+	return Math.round(fraction * 100);
 }

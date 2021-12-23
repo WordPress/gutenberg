@@ -7,9 +7,9 @@ import { useFlexItem } from '../flex-item';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
  */
-export function useFlexBlock( props ) {
-	const otherProps = useContextSystem( props, 'FlexBlock' );
-	const flexItemProps = useFlexItem( { isBlock: true, ...otherProps } );
+export function useFlexBlock(props) {
+	const otherProps = useContextSystem(props, 'FlexBlock');
+	const flexItemProps = useFlexItem({ isBlock: true, ...otherProps });
 
 	return flexItemProps;
 }

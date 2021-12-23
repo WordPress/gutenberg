@@ -13,7 +13,7 @@ import { createContext, useContext } from '@wordpress/element';
  */
 import { ROOT_MENU } from './constants';
 
-export const NavigationContext = createContext( {
+export const NavigationContext = createContext({
 	activeItem: undefined,
 	activeMenu: ROOT_MENU,
 	setActiveMenu: noop,
@@ -33,5 +33,5 @@ export const NavigationContext = createContext( {
 		traverseMenu: noop,
 		isMenuEmpty: noop,
 	},
-} );
-export const useNavigationContext = () => useContext( NavigationContext );
+});
+export const useNavigationContext = () => useContext(NavigationContext);

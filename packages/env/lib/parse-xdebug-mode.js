@@ -18,31 +18,31 @@ const XDEBUG_MODES = [
  * @param {string|undefined} value The user-set mode of Xdebug; undefined if there is no --xdebug flag.
  * @return {string} The Xdebug mode to use with defaults applied.
  */
-module.exports = function parseXdebugMode( value ) {
-	if ( value === undefined ) {
+module.exports = function parseXdebugMode(value) {
+	if (value === undefined) {
 		return 'off';
 	}
-	if ( typeof value !== 'string' ) {
-		throwXdebugModeError( value );
+	if (typeof value !== 'string') {
+		throwXdebugModeError(value);
 	}
 
-	if ( value.length === 0 ) {
+	if (value.length === 0) {
 		return 'debug';
 	}
 
-	const modes = value.split( ',' );
-	modes.forEach( ( userMode ) => {
-		if ( ! XDEBUG_MODES.some( ( realMode ) => realMode === userMode ) ) {
-			throwXdebugModeError( userMode );
+	const modes = value.split(',');
+	modes.forEach((userMode) => {
+		if (!XDEBUG_MODES.some((realMode) => realMode === userMode)) {
+			throwXdebugModeError(userMode);
 		}
-	} );
+	});
 	return value;
 };
 
-function throwXdebugModeError( value ) {
+function throwXdebugModeError(value) {
 	throw new Error(
-		`"${ value }" is not a mode recognized by Xdebug. Valid modes are: ${ XDEBUG_MODES.join(
+		`"${value}" is not a mode recognized by Xdebug. Valid modes are: ${XDEBUG_MODES.join(
 			', '
-		) }`
+		)}`
 	);
 }

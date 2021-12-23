@@ -17,75 +17,73 @@ import styles from './styles.scss';
 import ActionButton from './action-button';
 import chevronBack from './../chevron-back';
 
-function Button( { onPress, icon, text } ) {
+function Button({ onPress, icon, text }) {
 	const buttonTextStyle = usePreferredColorSchemeStyle(
-		styles[ 'button-text' ],
-		styles[ 'button-text-dark' ]
+		styles['button-text'],
+		styles['button-text-dark']
 	);
 
 	return (
-		<View style={ styles[ 'back-button' ] }>
+		<View style={styles['back-button']}>
 			<ActionButton
-				onPress={ onPress }
-				accessibilityLabel={ __( 'Go back' ) }
-				accessibilityHint={ __(
+				onPress={onPress}
+				accessibilityLabel={__('Go back')}
+				accessibilityHint={__(
 					'Navigates to the previous content sheet'
-				) }
+				)}
 			>
-				{ icon }
-				{ text && (
-					<Text style={ buttonTextStyle } maxFontSizeMultiplier={ 2 }>
-						{ text }
+				{icon}
+				{text && (
+					<Text style={buttonTextStyle} maxFontSizeMultiplier={2}>
+						{text}
 					</Text>
-				) }
+				)}
 			</ActionButton>
 		</View>
 	);
 }
 
-function BackButton( { onPress } ) {
+function BackButton({ onPress }) {
 	const chevronLeftStyle = usePreferredColorSchemeStyle(
-		styles[ 'chevron-left-icon' ],
-		styles[ 'chevron-left-icon-dark' ]
+		styles['chevron-left-icon'],
+		styles['chevron-left-icon-dark']
 	);
 	const arrowLeftStyle = usePreferredColorSchemeStyle(
-		styles[ 'arrow-left-icon' ],
-		styles[ 'arrow-left-icon-dark' ]
+		styles['arrow-left-icon'],
+		styles['arrow-left-icon-dark']
 	);
 
 	let backIcon;
 	let backText;
 
-	if ( Platform.OS === 'ios' ) {
+	if (Platform.OS === 'ios') {
 		backIcon = (
-			<Icon icon={ chevronBack } size={ 21 } style={ chevronLeftStyle } />
+			<Icon icon={chevronBack} size={21} style={chevronLeftStyle} />
 		);
-		backText = __( 'Back' );
+		backText = __('Back');
 	} else {
-		backIcon = (
-			<Icon icon={ arrowLeft } size={ 24 } style={ arrowLeftStyle } />
-		);
+		backIcon = <Icon icon={arrowLeft} size={24} style={arrowLeftStyle} />;
 	}
 
-	return <Button onPress={ onPress } icon={ backIcon } text={ backText } />;
+	return <Button onPress={onPress} icon={backIcon} text={backText} />;
 }
 
-function DismissButton( { onPress, iosText } ) {
+function DismissButton({ onPress, iosText }) {
 	const arrowLeftStyle = usePreferredColorSchemeStyle(
-		styles[ 'arrow-left-icon' ],
-		styles[ 'arrow-left-icon-dark' ]
+		styles['arrow-left-icon'],
+		styles['arrow-left-icon-dark']
 	);
 
 	let backIcon;
 	let backText;
 
-	if ( Platform.OS === 'ios' ) {
-		backText = iosText ? iosText : __( 'Cancel' );
+	if (Platform.OS === 'ios') {
+		backText = iosText ? iosText : __('Cancel');
 	} else {
-		backIcon = <Icon icon={ close } size={ 24 } style={ arrowLeftStyle } />;
+		backIcon = <Icon icon={close} size={24} style={arrowLeftStyle} />;
 	}
 
-	return <Button onPress={ onPress } icon={ backIcon } text={ backText } />;
+	return <Button onPress={onPress} icon={backIcon} text={backText} />;
 }
 
 Button.Back = BackButton;

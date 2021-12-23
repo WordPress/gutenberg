@@ -11,7 +11,7 @@ import { Gradient, colorsUtils } from '@wordpress/components';
  */
 import styles from './editor.scss';
 
-function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
+function ColorBackground({ children, borderRadiusValue, backgroundColor }) {
 	const { isGradient } = colorsUtils;
 	const wrapperStyles = [
 		styles.richTextWrapper,
@@ -22,18 +22,18 @@ function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 	];
 
 	return (
-		<View style={ wrapperStyles }>
-			{ isGradient( backgroundColor ) && (
+		<View style={wrapperStyles}>
+			{isGradient(backgroundColor) && (
 				<Gradient
-					gradientValue={ backgroundColor }
-					angleCenter={ { x: 0.5, y: 0.5 } }
-					style={ [
+					gradientValue={backgroundColor}
+					angleCenter={{ x: 0.5, y: 0.5 }}
+					style={[
 						styles.linearGradient,
 						{ borderRadius: borderRadiusValue },
-					] }
+					]}
 				/>
-			) }
-			{ children }
+			)}
+			{children}
 		</View>
 	);
 }

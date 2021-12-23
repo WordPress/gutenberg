@@ -112,43 +112,43 @@ const plugins = {};
  *
  * @return {WPPlugin} The final plugin settings object.
  */
-export function registerPlugin( name, settings ) {
-	if ( typeof settings !== 'object' ) {
-		console.error( 'No settings object provided!' );
+export function registerPlugin(name, settings) {
+	if (typeof settings !== 'object') {
+		console.error('No settings object provided!');
 		return null;
 	}
-	if ( typeof name !== 'string' ) {
-		console.error( 'Plugin name must be string.' );
+	if (typeof name !== 'string') {
+		console.error('Plugin name must be string.');
 		return null;
 	}
-	if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
+	if (!/^[a-z][a-z0-9-]*$/.test(name)) {
 		console.error(
 			'Plugin name must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
 		);
 		return null;
 	}
-	if ( plugins[ name ] ) {
-		console.error( `Plugin "${ name }" is already registered.` );
+	if (plugins[name]) {
+		console.error(`Plugin "${name}" is already registered.`);
 	}
 
-	settings = applyFilters( 'plugins.registerPlugin', settings, name );
+	settings = applyFilters('plugins.registerPlugin', settings, name);
 
 	const { render, scope } = settings;
 
-	if ( ! isFunction( render ) ) {
+	if (!isFunction(render)) {
 		console.error(
 			'The "render" property must be specified and must be a valid function.'
 		);
 		return null;
 	}
 
-	if ( scope ) {
-		if ( typeof scope !== 'string' ) {
-			console.error( 'Plugin scope must be string.' );
+	if (scope) {
+		if (typeof scope !== 'string') {
+			console.error('Plugin scope must be string.');
 			return null;
 		}
 
-		if ( ! /^[a-z][a-z0-9-]*$/.test( scope ) ) {
+		if (!/^[a-z][a-z0-9-]*$/.test(scope)) {
 			console.error(
 				'Plugin scope must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-page".'
 			);
@@ -156,13 +156,13 @@ export function registerPlugin( name, settings ) {
 		}
 	}
 
-	plugins[ name ] = {
+	plugins[name] = {
 		name,
 		icon: pluginsIcon,
 		...settings,
 	};
 
-	doAction( 'plugins.pluginRegistered', settings, name );
+	doAction('plugins.pluginRegistered', settings, name);
 
 	return settings;
 }
@@ -191,15 +191,15 @@ export function registerPlugin( name, settings ) {
  * @return {?WPPlugin} The previous plugin settings object, if it has been
  *                     successfully unregistered; otherwise `undefined`.
  */
-export function unregisterPlugin( name ) {
-	if ( ! plugins[ name ] ) {
-		console.error( 'Plugin "' + name + '" is not registered.' );
+export function unregisterPlugin(name) {
+	if (!plugins[name]) {
+		console.error('Plugin "' + name + '" is not registered.');
 		return;
 	}
-	const oldPlugin = plugins[ name ];
-	delete plugins[ name ];
+	const oldPlugin = plugins[name];
+	delete plugins[name];
 
-	doAction( 'plugins.pluginUnregistered', oldPlugin, name );
+	doAction('plugins.pluginUnregistered', oldPlugin, name);
 
 	return oldPlugin;
 }
@@ -211,8 +211,8 @@ export function unregisterPlugin( name ) {
  *
  * @return {?WPPlugin} Plugin setting.
  */
-export function getPlugin( name ) {
-	return plugins[ name ];
+export function getPlugin(name) {
+	return plugins[name];
 }
 
 /**
@@ -223,8 +223,6 @@ export function getPlugin( name ) {
  *
  * @return {WPPlugin[]} The list of plugins without a scope or for a given scope.
  */
-export function getPlugins( scope ) {
-	return Object.values( plugins ).filter(
-		( plugin ) => plugin.scope === scope
-	);
+export function getPlugins(scope) {
+	return Object.values(plugins).filter((plugin) => plugin.scope === scope);
 }

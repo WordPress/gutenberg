@@ -24,50 +24,50 @@ import ManageLocations from './manage-locations';
 import DeleteMenu from './delete-menu';
 import { SIDEBAR_BLOCK, SIDEBAR_MENU, SIDEBAR_SCOPE } from '../../constants';
 
-export default function Sidebar( {
+export default function Sidebar({
 	menuId,
 	menus,
 	isMenuBeingDeleted,
 	onDeleteMenu,
 	onSelectMenu,
-} ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
+}) {
+	const isLargeViewport = useViewportMatch('medium');
 	const { sidebar, hasBlockSelection, hasSidebarEnabled } = useSelect(
-		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( SIDEBAR_SCOPE );
+		(select) => {
+			const _sidebar =
+				select(interfaceStore).getActiveComplementaryArea(
+					SIDEBAR_SCOPE
+				);
 
-			const _hasSidebarEnabled = [ SIDEBAR_MENU, SIDEBAR_BLOCK ].includes(
+			const _hasSidebarEnabled = [SIDEBAR_MENU, SIDEBAR_BLOCK].includes(
 				_sidebar
 			);
 
 			return {
 				sidebar: _sidebar,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
+				hasBlockSelection:
+					!!select(blockEditorStore).getBlockSelectionStart(),
 				hasSidebarEnabled: _hasSidebarEnabled,
 			};
 		},
 		[]
 	);
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea } = useDispatch(interfaceStore);
 
-	useEffect( () => {
-		if ( ! hasSidebarEnabled ) {
+	useEffect(() => {
+		if (!hasSidebarEnabled) {
 			return;
 		}
 
-		if ( hasBlockSelection ) {
-			enableComplementaryArea( SIDEBAR_SCOPE, SIDEBAR_BLOCK );
+		if (hasBlockSelection) {
+			enableComplementaryArea(SIDEBAR_SCOPE, SIDEBAR_BLOCK);
 		} else {
-			enableComplementaryArea( SIDEBAR_SCOPE, SIDEBAR_MENU );
+			enableComplementaryArea(SIDEBAR_SCOPE, SIDEBAR_MENU);
 		}
-	}, [ hasBlockSelection, hasSidebarEnabled ] );
+	}, [hasBlockSelection, hasSidebarEnabled]);
 
 	let sidebarName = sidebar;
-	if ( ! hasSidebarEnabled ) {
+	if (!hasSidebarEnabled) {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_MENU;
 	}
 
@@ -75,31 +75,31 @@ export default function Sidebar( {
 		<ComplementaryArea
 			className="edit-navigation-sidebar"
 			/* translators: button label text should, if possible, be under 16 characters. */
-			title={ __( 'Settings' ) }
-			closeLabel={ __( 'Close settings' ) }
-			scope={ SIDEBAR_SCOPE }
-			identifier={ sidebarName }
-			icon={ cog }
-			isActiveByDefault={ isLargeViewport }
-			header={ <SidebarHeader sidebarName={ sidebarName } /> }
+			title={__('Settings')}
+			closeLabel={__('Close settings')}
+			scope={SIDEBAR_SCOPE}
+			identifier={sidebarName}
+			icon={cog}
+			isActiveByDefault={isLargeViewport}
+			header={<SidebarHeader sidebarName={sidebarName} />}
 			headerClassName="edit-navigation-sidebar__panel-tabs"
 			isPinnable
 		>
-			{ sidebarName === SIDEBAR_MENU && (
+			{sidebarName === SIDEBAR_MENU && (
 				<>
-					<MenuSettings menuId={ menuId } />
+					<MenuSettings menuId={menuId} />
 					<ManageLocations
-						menus={ menus }
-						selectedMenuId={ menuId }
-						onSelectMenu={ onSelectMenu }
+						menus={menus}
+						selectedMenuId={menuId}
+						onSelectMenu={onSelectMenu}
 					/>
 					<DeleteMenu
-						onDeleteMenu={ onDeleteMenu }
-						isMenuBeingDeleted={ isMenuBeingDeleted }
+						onDeleteMenu={onDeleteMenu}
+						isMenuBeingDeleted={isMenuBeingDeleted}
 					/>
 				</>
-			) }
-			{ sidebarName === SIDEBAR_BLOCK && <BlockInspector /> }
+			)}
+			{sidebarName === SIDEBAR_BLOCK && <BlockInspector />}
 		</ComplementaryArea>
 	);
 }

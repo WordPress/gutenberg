@@ -15,37 +15,37 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
  */
 import { metadata, settings, name } from '../index';
 
-const Code = ( { clientId, ...props } ) => (
-	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
+const Code = ({ clientId, ...props }) => (
+	<BlockEdit name={name} clientId={clientId || 0} {...props} />
 );
 
-describe( 'Code', () => {
-	beforeAll( () => {
-		registerBlockType( name, {
+describe('Code', () => {
+	beforeAll(() => {
+		registerBlockType(name, {
 			...metadata,
 			...settings,
-		} );
-	} );
+		});
+	});
 
-	afterAll( () => {
-		unregisterBlockType( name );
-	} );
+	afterAll(() => {
+		unregisterBlockType(name);
+	});
 
-	it( 'renders without crashing', () => {
+	it('renders without crashing', () => {
 		const component = renderer.create(
-			<Code attributes={ { content: '' } } />
+			<Code attributes={{ content: '' }} />
 		);
 		const rendered = component.toJSON();
-		expect( rendered ).toBeTruthy();
-	} );
+		expect(rendered).toBeTruthy();
+	});
 
-	it( 'renders given text without crashing', () => {
+	it('renders given text without crashing', () => {
 		const component = renderer.create(
-			<Code attributes={ { content: 'sample text' } } />
+			<Code attributes={{ content: 'sample text' }} />
 		);
 		const testInstance = component.root;
-		const textInput = testInstance.findByType( TextInput );
-		expect( textInput ).toBeTruthy();
-		expect( textInput.props.value ).toBe( 'sample text' );
-	} );
-} );
+		const textInput = testInstance.findByType(TextInput);
+		expect(textInput).toBeTruthy();
+		expect(textInput.props.value).toBe('sample text');
+	});
+});

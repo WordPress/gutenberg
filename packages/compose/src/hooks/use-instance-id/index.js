@@ -17,9 +17,9 @@ const instanceMap = new WeakMap();
  * @param {object} object Object reference to create an id for.
  * @return {number} The instance id (index).
  */
-function createId( object ) {
-	const instances = instanceMap.get( object ) || 0;
-	instanceMap.set( object, instances + 1 );
+function createId(object) {
+	const instances = instanceMap.get(object) || 0;
+	instanceMap.set(object, instances + 1);
 	return instances;
 }
 
@@ -31,12 +31,12 @@ function createId( object ) {
  * @param {string | number} [preferredId=''] Default ID to use.
  * @return {string | number} The unique instance id.
  */
-export default function useInstanceId( object, prefix, preferredId = '' ) {
-	return useMemo( () => {
-		if ( preferredId ) return preferredId;
-		const id = createId( object );
+export default function useInstanceId(object, prefix, preferredId = '') {
+	return useMemo(() => {
+		if (preferredId) return preferredId;
+		const id = createId(object);
 
-		return prefix ? `${ prefix }-${ id }` : id;
-	}, [ object ] );
+		return prefix ? `${prefix}-${id}` : id;
+	}, [object]);
 }
 /* eslint-enable jsdoc/check-types */

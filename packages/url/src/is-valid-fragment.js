@@ -11,9 +11,9 @@
  *
  * @return {boolean} True if the argument contains a valid fragment.
  */
-export function isValidFragment( fragment ) {
-	if ( ! fragment ) {
+export function isValidFragment(fragment) {
+	if (!fragment) {
 		return false;
 	}
-	return /^#[^\s#?\/]*$/.test( fragment );
+	return /^#[^\s#?\/]*$/.test(fragment);
 }

@@ -12,7 +12,7 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 
-function isFormElement( element ) {
+function isFormElement(element) {
 	const { tagName } = element;
 	return (
 		tagName === 'INPUT' ||
@@ -27,70 +27,67 @@ export default function useTabNav() {
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 	const lastFocus = useRef();
-	const {
-		hasMultiSelection,
-		getSelectedBlockClientId,
-		getBlockCount,
-	} = useSelect( blockEditorStore );
-	const { setNavigationMode } = useDispatch( blockEditorStore );
+	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
+		useSelect(blockEditorStore);
+	const { setNavigationMode } = useDispatch(blockEditorStore);
 	const isNavigationMode = useSelect(
-		( select ) => select( blockEditorStore ).isNavigationMode(),
+		(select) => select(blockEditorStore).isNavigationMode(),
 		[]
 	);
 
 	// Don't allow tabbing to this element in Navigation mode.
-	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
+	const focusCaptureTabIndex = !isNavigationMode ? '0' : undefined;
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
 	const noCapture = useRef();
 
-	function onFocusCapture( event ) {
+	function onFocusCapture(event) {
 		// Do not capture incoming focus if set by us in WritingFlow.
-		if ( noCapture.current ) {
+		if (noCapture.current) {
 			noCapture.current = null;
-		} else if ( hasMultiSelection() ) {
+		} else if (hasMultiSelection()) {
 			container.current.focus();
-		} else if ( getSelectedBlockClientId() ) {
+		} else if (getSelectedBlockClientId()) {
 			lastFocus.current.focus();
 		} else {
-			setNavigationMode( true );
+			setNavigationMode(true);
 
 			const isBefore =
 				// eslint-disable-next-line no-bitwise
-				event.target.compareDocumentPosition( container.current ) &
+				event.target.compareDocumentPosition(container.current) &
 				event.target.DOCUMENT_POSITION_FOLLOWING;
 			const action = isBefore ? 'findNext' : 'findPrevious';
 
-			focus.tabbable[ action ]( event.target ).focus();
+			focus.tabbable[action](event.target).focus();
 		}
 	}
 
 	const before = (
 		<div
-			ref={ focusCaptureBeforeRef }
-			tabIndex={ focusCaptureTabIndex }
-			onFocus={ onFocusCapture }
+			ref={focusCaptureBeforeRef}
+			tabIndex={focusCaptureTabIndex}
+			onFocus={onFocusCapture}
 		/>
 	);
 
 	const after = (
 		<div
-			ref={ focusCaptureAfterRef }
-			tabIndex={ focusCaptureTabIndex }
-			onFocus={ onFocusCapture }
+			ref={focusCaptureAfterRef}
+			tabIndex={focusCaptureTabIndex}
+			onFocus={onFocusCapture}
 		/>
 	);
 
-	const ref = useRefEffect( ( node ) => {
-		function onKeyDown( event ) {
-			if ( event.defaultPrevented ) {
+	const ref = useRefEffect((node) => {
+		function onKeyDown(event) {
+			if (event.defaultPrevented) {
 				return;
 			}
 
-			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
+			if (event.keyCode === ESCAPE && !hasMultiSelection()) {
 				event.preventDefault();
-				setNavigationMode( true );
+				setNavigationMode(true);
 				return;
 			}
 
@@ -100,21 +97,21 @@ export default function useTabNav() {
 			// content, which is normally the block toolbar.
 			// Arrow keys can be used, and Tab and arrow keys can be used in
 			// Navigation mode (press Esc), to navigate through blocks.
-			if ( event.keyCode !== TAB ) {
+			if (event.keyCode !== TAB) {
 				return;
 			}
 
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
 
-			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
+			if (!hasMultiSelection() && !getSelectedBlockClientId()) {
 				// Preserve the behaviour of entering navigation mode when
 				// tabbing into the content without a block selection.
 				// `onFocusCapture` already did this previously, but we need to
 				// do it again here because after clearing block selection,
 				// focus land on the writing flow container and pressing Tab
 				// will no longer send focus through the focus capture element.
-				if ( event.target === node ) setNavigationMode( true );
+				if (event.target === node) setNavigationMode(true);
 				return;
 			}
 
@@ -124,8 +121,8 @@ export default function useTabNav() {
 			// these are not rendered in the content and perhaps in the
 			// future they can be rendered in an iframe or shadow DOM.
 			if (
-				isFormElement( event.target ) &&
-				isFormElement( focus.tabbable[ direction ]( event.target ) )
+				isFormElement(event.target) &&
+				isFormElement(focus.tabbable[direction](event.target))
 			) {
 				return;
 			}
@@ -140,10 +137,10 @@ export default function useTabNav() {
 			// Focusing the focus capture element, which is located above and
 			// below the editor, should not scroll the page all the way up or
 			// down.
-			next.current.focus( { preventScroll: true } );
+			next.current.focus({ preventScroll: true });
 		}
 
-		function onFocusOut( event ) {
+		function onFocusOut(event) {
 			lastFocus.current = event.target;
 
 			const { ownerDocument } = node;
@@ -151,7 +148,7 @@ export default function useTabNav() {
 			// If focus disappears due to there being no blocks, move focus to
 			// the writing flow wrapper.
 			if (
-				! event.relatedTarget &&
+				!event.relatedTarget &&
 				ownerDocument.activeElement === ownerDocument.body &&
 				getBlockCount() === 0
 			) {
@@ -167,45 +164,45 @@ export default function useTabNav() {
 		// Note that it isn't possible to disable scrolling in the onFocus event. We need to intercept this
 		// earlier in the keypress handler, and call focus( { preventScroll: true } ) instead.
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLOrForeignElement/focus#parameters
-		function preventScrollOnTab( event ) {
-			if ( event.keyCode !== TAB ) {
+		function preventScrollOnTab(event) {
+			if (event.keyCode !== TAB) {
 				return;
 			}
 
-			if ( event.target?.getAttribute( 'role' ) === 'region' ) {
+			if (event.target?.getAttribute('role') === 'region') {
 				return;
 			}
 
-			if ( container.current === event.target ) {
+			if (container.current === event.target) {
 				return;
 			}
 
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
-			const target = focus.tabbable[ direction ]( event.target );
+			const target = focus.tabbable[direction](event.target);
 			// only do something when the next tabbable is a focus capture div (before/after)
 			if (
 				target === focusCaptureBeforeRef.current ||
 				target === focusCaptureAfterRef.current
 			) {
 				event.preventDefault();
-				target.focus( { preventScroll: true } );
+				target.focus({ preventScroll: true });
 			}
 		}
 
 		const { ownerDocument } = node;
 		const { defaultView } = ownerDocument;
-		defaultView.addEventListener( 'keydown', preventScrollOnTab );
-		node.addEventListener( 'keydown', onKeyDown );
-		node.addEventListener( 'focusout', onFocusOut );
+		defaultView.addEventListener('keydown', preventScrollOnTab);
+		node.addEventListener('keydown', onKeyDown);
+		node.addEventListener('focusout', onFocusOut);
 		return () => {
-			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
-			node.removeEventListener( 'keydown', onKeyDown );
-			node.removeEventListener( 'focusout', onFocusOut );
+			defaultView.removeEventListener('keydown', preventScrollOnTab);
+			node.removeEventListener('keydown', onKeyDown);
+			node.removeEventListener('focusout', onFocusOut);
 		};
-	}, [] );
+	}, []);
 
-	const mergedRefs = useMergeRefs( [ container, ref ] );
+	const mergedRefs = useMergeRefs([container, ref]);
 
-	return [ before, mergedRefs, after ];
+	return [before, mergedRefs, after];
 }

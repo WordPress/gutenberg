@@ -29,18 +29,18 @@ const EMPTY_ARRAY = [];
  *
  * @return {Object} Border block support derived CSS classes & styles.
  */
-export function getBorderClassesAndStyles( { borderColor, style } ) {
+export function getBorderClassesAndStyles({ borderColor, style }) {
 	const borderStyles = style?.border || {};
-	const borderClass = getColorClassName( 'border-color', borderColor );
+	const borderClass = getColorClassName('border-color', borderColor);
 
-	const className = classnames( {
-		[ borderClass ]: !! borderClass,
+	const className = classnames({
+		[borderClass]: !!borderClass,
 		'has-border-color': borderColor || style?.border?.color,
-	} );
+	});
 
 	return {
 		className: className || undefined,
-		style: getInlineStyles( { border: borderStyles } ),
+		style: getInlineStyles({ border: borderStyles }),
 	};
 }
 
@@ -55,13 +55,13 @@ export function getBorderClassesAndStyles( { borderColor, style } ) {
  *
  * @return {Object} ClassName & style props from border block support.
  */
-export function useBorderProps( attributes ) {
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const borderProps = getBorderClassesAndStyles( attributes );
+export function useBorderProps(attributes) {
+	const colors = useSetting('color.palette') || EMPTY_ARRAY;
+	const borderProps = getBorderClassesAndStyles(attributes);
 
 	// Force inline style to apply border color when themes do not load their
 	// color stylesheets in the editor.
-	if ( attributes.borderColor ) {
+	if (attributes.borderColor) {
 		const borderColorObject = getColorObjectByAttributeValues(
 			colors,
 			attributes.borderColor

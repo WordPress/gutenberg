@@ -20,12 +20,12 @@ import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
  *
  * @return {RichTextValue} A new value with the object inserted.
  */
-export function insertObject( value, formatToInsert, startIndex, endIndex ) {
+export function insertObject(value, formatToInsert, startIndex, endIndex) {
 	const valueToInsert = {
-		formats: [ , ],
-		replacements: [ formatToInsert ],
+		formats: [,],
+		replacements: [formatToInsert],
 		text: OBJECT_REPLACEMENT_CHARACTER,
 	};
 
-	return insert( value, valueToInsert, startIndex, endIndex );
+	return insert(value, valueToInsert, startIndex, endIndex);
 }

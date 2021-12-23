@@ -39,8 +39,8 @@ import {
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
+export function isFeatureActive(state, feature) {
+	return get(state.preferences.features, [feature], false);
 }
 
 /**
@@ -50,7 +50,7 @@ export function isFeatureActive( state, feature ) {
  *
  * @return {string} Device type.
  */
-export function __experimentalGetPreviewDeviceType( state ) {
+export function __experimentalGetPreviewDeviceType(state) {
 	return state.deviceType;
 }
 
@@ -61,8 +61,8 @@ export function __experimentalGetPreviewDeviceType( state ) {
  *
  * @return {Object} Whether the current user can create media or not.
  */
-export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
-	select( coreDataStore ).canUser( 'create', 'media' )
+export const getCanUserCreateMedia = createRegistrySelector(
+	(select) => () => select(coreDataStore).canUser('create', 'media')
 );
 
 /**
@@ -72,14 +72,14 @@ export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
  *
  * @return {Array} The available reusable blocks.
  */
-export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
+export const getReusableBlocks = createRegistrySelector((select) => () => {
 	const isWeb = Platform.OS === 'web';
 	return isWeb
-		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
+		? select(coreDataStore).getEntityRecords('postType', 'wp_block', {
 				per_page: -1,
-		  } )
+		  })
 		: [];
-} );
+});
 
 /**
  * Returns the settings, taking into account active features and permissions.
@@ -90,36 +90,36 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
  * @return {Object} Settings.
  */
 export const getSettings = createSelector(
-	( state, setIsInserterOpen ) => {
+	(state, setIsInserterOpen) => {
 		const settings = {
 			...state.settings,
 			outlineMode: true,
-			focusMode: isFeatureActive( state, 'focusMode' ),
-			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+			focusMode: isFeatureActive(state, 'focusMode'),
+			hasFixedToolbar: isFeatureActive(state, 'fixedToolbar'),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
-			__experimentalReusableBlocks: getReusableBlocks( state ),
+			__experimentalReusableBlocks: getReusableBlocks(state),
 		};
 
-		const canUserCreateMedia = getCanUserCreateMedia( state );
-		if ( ! canUserCreateMedia ) {
+		const canUserCreateMedia = getCanUserCreateMedia(state);
+		if (!canUserCreateMedia) {
 			return settings;
 		}
 
-		settings.mediaUpload = ( { onError, ...rest } ) => {
-			uploadMedia( {
+		settings.mediaUpload = ({ onError, ...rest }) => {
+			uploadMedia({
 				wpAllowedMimeTypes: state.settings.allowedMimeTypes,
-				onError: ( { message } ) => onError( message ),
+				onError: ({ message }) => onError(message),
 				...rest,
-			} );
+			});
 		};
 		return settings;
 	},
-	( state ) => [
-		getCanUserCreateMedia( state ),
+	(state) => [
+		getCanUserCreateMedia(state),
 		state.settings,
-		isFeatureActive( state, 'focusMode' ),
-		isFeatureActive( state, 'fixedToolbar' ),
-		getReusableBlocks( state ),
+		isFeatureActive(state, 'focusMode'),
+		isFeatureActive(state, 'fixedToolbar'),
+		getReusableBlocks(state),
 	]
 );
 
@@ -130,11 +130,11 @@ export const getSettings = createSelector(
  *
  * @return {number?} Home template ID.
  */
-export function getHomeTemplateId( state ) {
+export function getHomeTemplateId(state) {
 	return state.homeTemplateId;
 }
 
-function getCurrentEditedPost( state ) {
+function getCurrentEditedPost(state) {
 	return state.editedPost;
 }
 
@@ -145,8 +145,8 @@ function getCurrentEditedPost( state ) {
  *
  * @return {TemplateType?} Template type.
  */
-export function getEditedPostType( state ) {
-	return getCurrentEditedPost( state ).type;
+export function getEditedPostType(state) {
+	return getCurrentEditedPost(state).type;
 }
 
 /**
@@ -156,8 +156,8 @@ export function getEditedPostType( state ) {
  *
  * @return {string?} Post ID.
  */
-export function getEditedPostId( state ) {
-	return getCurrentEditedPost( state ).id;
+export function getEditedPostId(state) {
+	return getCurrentEditedPost(state).id;
 }
 
 /**
@@ -167,8 +167,8 @@ export function getEditedPostId( state ) {
  *
  * @return {Object} Page.
  */
-export function getPage( state ) {
-	return getCurrentEditedPost( state ).page;
+export function getPage(state) {
+	return getCurrentEditedPost(state).page;
 }
 
 /**
@@ -178,7 +178,7 @@ export function getPage( state ) {
  *
  * @return {string} Active menu.
  */
-export function getNavigationPanelActiveMenu( state ) {
+export function getNavigationPanelActiveMenu(state) {
 	return state.navigationPanel.menu;
 }
 
@@ -191,34 +191,34 @@ export function getNavigationPanelActiveMenu( state ) {
  * @return {string} The current template or template part's sub menu.
  */
 export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
-	( select ) => ( state ) => {
-		const templateType = getEditedPostType( state );
-		const templateId = getEditedPostId( state );
+	(select) => (state) => {
+		const templateType = getEditedPostType(state);
+		const templateId = getEditedPostId(state);
 		const template = templateId
-			? select( coreDataStore ).getEntityRecord(
+			? select(coreDataStore).getEntityRecord(
 					'postType',
 					templateType,
 					templateId
 			  )
 			: null;
 
-		if ( ! template ) {
+		if (!template) {
 			return MENU_ROOT;
 		}
 
-		if ( 'wp_template_part' === templateType ) {
+		if ('wp_template_part' === templateType) {
 			return (
 				TEMPLATE_PARTS_SUB_MENUS.find(
-					( submenu ) => submenu.area === template?.area
+					(submenu) => submenu.area === template?.area
 				)?.menu || MENU_TEMPLATE_PARTS
 			);
 		}
 
-		const templates = select( coreDataStore ).getEntityRecords(
+		const templates = select(coreDataStore).getEntityRecords(
 			'postType',
 			'wp_template'
 		);
-		const showOnFront = select( coreDataStore ).getEditedEntityRecord(
+		const showOnFront = select(coreDataStore).getEditedEntityRecord(
 			'root',
 			'site'
 		).show_on_front;
@@ -226,14 +226,14 @@ export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
 		if (
 			isTemplateSuperseded(
 				template.slug,
-				map( templates, 'slug' ),
+				map(templates, 'slug'),
 				showOnFront
 			)
 		) {
 			return MENU_TEMPLATES_UNUSED;
 		}
 
-		return getTemplateLocation( template.slug );
+		return getTemplateLocation(template.slug);
 	}
 );
 
@@ -244,7 +244,7 @@ export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
  *
  * @return {boolean} True if the navigation panel should be open; false if closed.
  */
-export function isNavigationOpened( state ) {
+export function isNavigationOpened(state) {
 	return state.navigationPanel.isOpen;
 }
 
@@ -255,8 +255,8 @@ export function isNavigationOpened( state ) {
  *
  * @return {boolean} True if the inserter panel should be open; false if closed.
  */
-export function isInserterOpened( state ) {
-	return !! state.blockInserterPanel;
+export function isInserterOpened(state) {
+	return !!state.blockInserterPanel;
 }
 
 /**
@@ -266,12 +266,9 @@ export function isInserterOpened( state ) {
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export function __experimentalGetInsertionPoint( state ) {
-	const {
-		rootClientId,
-		insertionIndex,
-		filterValue,
-	} = state.blockInserterPanel;
+export function __experimentalGetInsertionPoint(state) {
+	const { rootClientId, insertionIndex, filterValue } =
+		state.blockInserterPanel;
 	return { rootClientId, insertionIndex, filterValue };
 }
 
@@ -282,7 +279,7 @@ export function __experimentalGetInsertionPoint( state ) {
  *
  * @return {boolean} True if the list view panel should be open; false if closed.
  */
-export function isListViewOpened( state ) {
+export function isListViewOpened(state) {
 	return state.listViewPanel;
 }
 
@@ -293,37 +290,39 @@ export function isListViewOpened( state ) {
  * @return {Array} Template parts and their blocks in an array.
  */
 export const getCurrentTemplateTemplateParts = createRegistrySelector(
-	( select ) => ( state ) => {
-		const templateType = getEditedPostType( state );
-		const templateId = getEditedPostId( state );
-		const template = select( coreDataStore ).getEditedEntityRecord(
+	(select) => (state) => {
+		const templateType = getEditedPostType(state);
+		const templateId = getEditedPostId(state);
+		const template = select(coreDataStore).getEditedEntityRecord(
 			'postType',
 			templateType,
 			templateId
 		);
 
-		const templateParts = select(
-			coreDataStore
-		).getEntityRecords( 'postType', 'wp_template_part', { per_page: -1 } );
+		const templateParts = select(coreDataStore).getEntityRecords(
+			'postType',
+			'wp_template_part',
+			{ per_page: -1 }
+		);
 		const templatePartsById = keyBy(
 			templateParts,
-			( templatePart ) => templatePart.id
+			(templatePart) => templatePart.id
 		);
 
-		return ( template.blocks ?? [] )
-			.filter( ( block ) => isTemplatePart( block ) )
-			.map( ( block ) => {
+		return (template.blocks ?? [])
+			.filter((block) => isTemplatePart(block))
+			.map((block) => {
 				const {
 					attributes: { theme, slug },
 				} = block;
-				const templatePartId = `${ theme }//${ slug }`;
-				const templatePart = templatePartsById[ templatePartId ];
+				const templatePartId = `${theme}//${slug}`;
+				const templatePart = templatePartsById[templatePartId];
 
 				return {
 					templatePart,
 					block,
 				};
-			} )
-			.filter( ( { templatePart } ) => !! templatePart );
+			})
+			.filter(({ templatePart }) => !!templatePart);
 	}
 );

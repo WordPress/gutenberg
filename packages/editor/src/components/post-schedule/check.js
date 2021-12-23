@@ -14,24 +14,24 @@ import { withSelect } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
-export function PostScheduleCheck( { hasPublishAction, children } ) {
-	if ( ! hasPublishAction ) {
+export function PostScheduleCheck({ hasPublishAction, children }) {
+	if (!hasPublishAction) {
 		return null;
 	}
 
 	return children;
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getCurrentPost, getCurrentPostType } = select( editorStore );
+export default compose([
+	withSelect((select) => {
+		const { getCurrentPost, getCurrentPostType } = select(editorStore);
 		return {
 			hasPublishAction: get(
 				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
+				['_links', 'wp:action-publish'],
 				false
 			),
 			postType: getCurrentPostType(),
 		};
-	} ),
-] )( PostScheduleCheck );
+	}),
+])(PostScheduleCheck);

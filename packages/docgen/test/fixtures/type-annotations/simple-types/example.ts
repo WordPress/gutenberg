@@ -1,1 +1,1 @@
-function fn( foo: any ): any {}
+function fn(foo: any): any {}

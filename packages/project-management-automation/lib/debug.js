@@ -3,9 +3,9 @@
  *
  * @param {string} message The message to print.
  */
-function debug( message ) {
-	if ( process.env.NODE_ENV !== 'test' ) {
-		process.stdout.write( message + '\n' );
+function debug(message) {
+	if (process.env.NODE_ENV !== 'test') {
+		process.stdout.write(message + '\n');
 	}
 }
 

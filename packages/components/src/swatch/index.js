@@ -8,11 +8,11 @@ import { swatch } from '@wordpress/icons';
  */
 import Icon from '../icon';
 
-function Swatch( { fill } ) {
+function Swatch({ fill }) {
 	return fill ? (
-		<span className="components-swatch" style={ { background: fill } } />
+		<span className="components-swatch" style={{ background: fill }} />
 	) : (
-		<Icon icon={ swatch } />
+		<Icon icon={swatch} />
 	);
 }
 

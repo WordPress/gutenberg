@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
 import { CONFIG } from '../utils';
 
 export const scrollableScrollbar = css`
-	@media only screen and ( min-device-width: 40em ) {
+	@media only screen and (min-device-width: 40em) {
 		&::-webkit-scrollbar {
 			height: 12px;
 			width: 12px;
@@ -20,19 +20,19 @@ export const scrollableScrollbar = css`
 		}
 
 		&::-webkit-scrollbar-track {
-			background: ${ CONFIG.colorScrollbarTrack };
+			background: ${CONFIG.colorScrollbarTrack};
 			border-radius: 8px;
 		}
 
 		&::-webkit-scrollbar-thumb {
 			background-clip: padding-box;
-			background-color: ${ CONFIG.colorScrollbarThumb };
-			border: 2px solid rgba( 0, 0, 0, 0 );
+			background-color: ${CONFIG.colorScrollbarThumb};
+			border: 2px solid rgba(0, 0, 0, 0);
 			border-radius: 7px;
 		}
 
 		&:hover::-webkit-scrollbar-thumb {
-			background-color: ${ CONFIG.colorScrollbarThumbHover };
+			background-color: ${CONFIG.colorScrollbarThumbHover};
 		}
 	}
 `;

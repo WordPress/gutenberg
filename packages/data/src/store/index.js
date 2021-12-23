@@ -1,13 +1,17 @@
 const coreDataStore = {
 	name: 'core/data',
-	instantiate( registry ) {
-		const getCoreDataSelector = ( selectorName ) => ( key, ...args ) => {
-			return registry.select( key )[ selectorName ]( ...args );
-		};
+	instantiate(registry) {
+		const getCoreDataSelector =
+			(selectorName) =>
+			(key, ...args) => {
+				return registry.select(key)[selectorName](...args);
+			};
 
-		const getCoreDataAction = ( actionName ) => ( key, ...args ) => {
-			return registry.dispatch( key )[ actionName ]( ...args );
-		};
+		const getCoreDataAction =
+			(actionName) =>
+			(key, ...args) => {
+				return registry.dispatch(key)[actionName](...args);
+			};
 
 		return {
 			getSelectors() {
@@ -18,10 +22,10 @@ const coreDataStore = {
 						'hasFinishedResolution',
 						'isResolving',
 						'getCachedResolvers',
-					].map( ( selectorName ) => [
+					].map((selectorName) => [
 						selectorName,
-						getCoreDataSelector( selectorName ),
-					] )
+						getCoreDataSelector(selectorName),
+					])
 				);
 			},
 
@@ -33,10 +37,10 @@ const coreDataStore = {
 						'invalidateResolution',
 						'invalidateResolutionForStore',
 						'invalidateResolutionForStoreSelector',
-					].map( ( actionName ) => [
+					].map((actionName) => [
 						actionName,
-						getCoreDataAction( actionName ),
-					] )
+						getCoreDataAction(actionName),
+					])
 				);
 			},
 

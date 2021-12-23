@@ -11,14 +11,14 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-function FooterMessageLink( { href, value } ) {
+function FooterMessageLink({ href, value }) {
 	const textStyle = usePreferredColorSchemeStyle(
 		styles.footerMessageLink,
 		styles.footerMessageLinkDark
 	);
 	return (
-		<Text style={ textStyle } onPress={ () => Linking.openURL( href ) }>
-			{ value }
+		<Text style={textStyle} onPress={() => Linking.openURL(href)}>
+			{value}
 		</Text>
 	);
 }

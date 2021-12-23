@@ -45,7 +45,7 @@ export type WithToolTipProps = {
 };
 
 export type ToggleGroupControlProps = Omit<
-	FormElementProps< any >,
+	FormElementProps<any>,
 	'defaultValue'
 > & {
 	/**
@@ -73,7 +73,7 @@ export type ToggleGroupControlProps = Omit<
 	/**
 	 * Callback when a segment is selected.
 	 */
-	onChange?: ( value: ReactText | undefined ) => void;
+	onChange?: (value: ReactText | undefined) => void;
 	/**
 	 * The value of `ToggleGroupControl`
 	 */
@@ -99,7 +99,7 @@ export type ToggleGroupControlContextProps = RadioStateReturn & {
 };
 
 export type ToggleGroupControlBackdropProps = {
-	containerRef: MutableRefObject< HTMLElement | undefined >;
+	containerRef: MutableRefObject<HTMLElement | undefined>;
 	containerWidth?: number | null;
 	isAdaptiveWidth?: boolean;
 	state?: any;

@@ -16,7 +16,7 @@ import Tannin from 'tannin';
 const DEFAULT_LOCALE_DATA = {
 	'': {
 		/** @param {number} n */
-		plural_forms( n ) {
+		plural_forms(n) {
 			return n === 1 ? 0 : 1;
 		},
 	},
@@ -139,18 +139,18 @@ const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
  *
  * @return {I18n} I18n instance.
  */
-export const createI18n = ( initialData, initialDomain, hooks ) => {
+export const createI18n = (initialData, initialDomain, hooks) => {
 	/**
 	 * The underlying instance of Tannin to which exported functions interface.
 	 *
 	 * @type {Tannin}
 	 */
-	const tannin = new Tannin( {} );
+	const tannin = new Tannin({});
 
 	const listeners = new Set();
 
 	const notifyListeners = () => {
-		listeners.forEach( ( listener ) => listener() );
+		listeners.forEach((listener) => listener());
 	};
 
 	/**
@@ -159,48 +159,48 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	 * @param {SubscribeCallback} callback Subscription callback.
 	 * @return {UnsubscribeCallback} Unsubscribe callback.
 	 */
-	const subscribe = ( callback ) => {
-		listeners.add( callback );
-		return () => listeners.delete( callback );
+	const subscribe = (callback) => {
+		listeners.add(callback);
+		return () => listeners.delete(callback);
 	};
 
 	/** @type {GetLocaleData} */
-	const getLocaleData = ( domain = 'default' ) => tannin.data[ domain ];
+	const getLocaleData = (domain = 'default') => tannin.data[domain];
 
 	/**
 	 * @param {LocaleData} [data]
 	 * @param {string}     [domain]
 	 */
-	const doSetLocaleData = ( data, domain = 'default' ) => {
-		tannin.data[ domain ] = {
+	const doSetLocaleData = (data, domain = 'default') => {
+		tannin.data[domain] = {
 			...DEFAULT_LOCALE_DATA,
-			...tannin.data[ domain ],
+			...tannin.data[domain],
 			...data,
 		};
 
 		// Populate default domain configuration (supported locale date which omits
 		// a plural forms expression).
-		tannin.data[ domain ][ '' ] = {
-			...DEFAULT_LOCALE_DATA[ '' ],
-			...tannin.data[ domain ][ '' ],
+		tannin.data[domain][''] = {
+			...DEFAULT_LOCALE_DATA[''],
+			...tannin.data[domain][''],
 		};
 	};
 
 	/** @type {SetLocaleData} */
-	const setLocaleData = ( data, domain ) => {
-		doSetLocaleData( data, domain );
+	const setLocaleData = (data, domain) => {
+		doSetLocaleData(data, domain);
 		notifyListeners();
 	};
 
 	/** @type {ResetLocaleData} */
-	const resetLocaleData = ( data, domain ) => {
+	const resetLocaleData = (data, domain) => {
 		// Reset all current Tannin locale data.
 		tannin.data = {};
 
 		// Reset cached plural forms functions cache.
 		tannin.pluralForms = {};
 
-		setLocaleData( data, domain );
+		setLocaleData(data, domain);
 	};
 
 	/**
@@ -225,21 +225,21 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		plural,
 		number
 	) => {
-		if ( ! tannin.data[ domain ] ) {
+		if (!tannin.data[domain]) {
 			// use `doSetLocaleData` to set silently, without notifying listeners
-			doSetLocaleData( undefined, domain );
+			doSetLocaleData(undefined, domain);
 		}
 
-		return tannin.dcnpgettext( domain, context, single, plural, number );
+		return tannin.dcnpgettext(domain, context, single, plural, number);
 	};
 
 	/** @type {GetFilterDomain} */
-	const getFilterDomain = ( domain = 'default' ) => domain;
+	const getFilterDomain = (domain = 'default') => domain;
 
 	/** @type {__} */
-	const __ = ( text, domain ) => {
-		let translation = dcnpgettext( domain, undefined, text );
-		if ( ! hooks ) {
+	const __ = (text, domain) => {
+		let translation = dcnpgettext(domain, undefined, text);
+		if (!hooks) {
 			return translation;
 		}
 
@@ -260,7 +260,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		);
 		return /** @type {string} */ (
 			/** @type {*} */ hooks.applyFilters(
-				'i18n.gettext_' + getFilterDomain( domain ),
+				'i18n.gettext_' + getFilterDomain(domain),
 				translation,
 				text,
 				domain
@@ -269,9 +269,9 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	};
 
 	/** @type {_x} */
-	const _x = ( text, context, domain ) => {
-		let translation = dcnpgettext( domain, context, text );
-		if ( ! hooks ) {
+	const _x = (text, context, domain) => {
+		let translation = dcnpgettext(domain, context, text);
+		if (!hooks) {
 			return translation;
 		}
 
@@ -294,7 +294,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		);
 		return /** @type {string} */ (
 			/** @type {*} */ hooks.applyFilters(
-				'i18n.gettext_with_context_' + getFilterDomain( domain ),
+				'i18n.gettext_with_context_' + getFilterDomain(domain),
 				translation,
 				text,
 				context,
@@ -304,7 +304,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	};
 
 	/** @type {_n} */
-	const _n = ( single, plural, number, domain ) => {
+	const _n = (single, plural, number, domain) => {
 		let translation = dcnpgettext(
 			domain,
 			undefined,
@@ -312,7 +312,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 			plural,
 			number
 		);
-		if ( ! hooks ) {
+		if (!hooks) {
 			return translation;
 		}
 
@@ -337,7 +337,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		);
 		return /** @type {string} */ (
 			/** @type {*} */ hooks.applyFilters(
-				'i18n.ngettext_' + getFilterDomain( domain ),
+				'i18n.ngettext_' + getFilterDomain(domain),
 				translation,
 				single,
 				plural,
@@ -348,15 +348,9 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	};
 
 	/** @type {_nx} */
-	const _nx = ( single, plural, number, context, domain ) => {
-		let translation = dcnpgettext(
-			domain,
-			context,
-			single,
-			plural,
-			number
-		);
-		if ( ! hooks ) {
+	const _nx = (single, plural, number, context, domain) => {
+		let translation = dcnpgettext(domain, context, single, plural, number);
+		if (!hooks) {
 			return translation;
 		}
 
@@ -384,7 +378,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 
 		return /** @type {string} */ (
 			/** @type {*} */ hooks.applyFilters(
-				'i18n.ngettext_with_context_' + getFilterDomain( domain ),
+				'i18n.ngettext_with_context_' + getFilterDomain(domain),
 				translation,
 				single,
 				plural,
@@ -397,14 +391,14 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 
 	/** @type {IsRtl} */
 	const isRTL = () => {
-		return 'rtl' === _x( 'ltr', 'text direction' );
+		return 'rtl' === _x('ltr', 'text direction');
 	};
 
 	/** @type {HasTranslation} */
-	const hasTranslation = ( single, context, domain ) => {
+	const hasTranslation = (single, context, domain) => {
 		const key = context ? context + '\u0004' + single : single;
-		let result = !! tannin.data?.[ domain ?? 'default' ]?.[ key ];
-		if ( hooks ) {
+		let result = !!tannin.data?.[domain ?? 'default']?.[key];
+		if (hooks) {
 			/**
 			 * Filters the presence of a translation in the locale data.
 			 *
@@ -425,7 +419,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 
 			result = /** @type { boolean } */ (
 				/** @type {*} */ hooks.applyFilters(
-					'i18n.has_translation_' + getFilterDomain( domain ),
+					'i18n.has_translation_' + getFilterDomain(domain),
 					result,
 					single,
 					context,
@@ -436,22 +430,22 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		return result;
 	};
 
-	if ( initialData ) {
-		setLocaleData( initialData, initialDomain );
+	if (initialData) {
+		setLocaleData(initialData, initialDomain);
 	}
 
-	if ( hooks ) {
+	if (hooks) {
 		/**
 		 * @param {string} hookName
 		 */
-		const onHookAddedOrRemoved = ( hookName ) => {
-			if ( I18N_HOOK_REGEXP.test( hookName ) ) {
+		const onHookAddedOrRemoved = (hookName) => {
+			if (I18N_HOOK_REGEXP.test(hookName)) {
 				notifyListeners();
 			}
 		};
 
-		hooks.addAction( 'hookAdded', 'core/i18n', onHookAddedOrRemoved );
-		hooks.addAction( 'hookRemoved', 'core/i18n', onHookAddedOrRemoved );
+		hooks.addAction('hookAdded', 'core/i18n', onHookAddedOrRemoved);
+		hooks.addAction('hookRemoved', 'core/i18n', onHookAddedOrRemoved);
 	}
 
 	return {

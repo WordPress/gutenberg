@@ -10,227 +10,224 @@ import withDispatch from '../';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
 
-describe( 'withDispatch', () => {
+describe('withDispatch', () => {
 	let registry;
-	beforeEach( () => {
+	beforeEach(() => {
 		registry = createRegistry();
-	} );
+	});
 
-	it( 'passes the relevant data to the component', () => {
-		const store = registry.registerStore( 'counter', {
-			reducer: ( state = 0, action ) => {
-				if ( action.type === 'increment' ) {
+	it('passes the relevant data to the component', () => {
+		const store = registry.registerStore('counter', {
+			reducer: (state = 0, action) => {
+				if (action.type === 'increment') {
 					return state + action.count;
 				}
 				return state;
 			},
 			actions: {
-				increment: ( count = 1 ) => ( { type: 'increment', count } ),
+				increment: (count = 1) => ({ type: 'increment', count }),
 			},
-		} );
+		});
 
-		const Component = withDispatch( ( _dispatch, ownProps ) => {
+		const Component = withDispatch((_dispatch, ownProps) => {
 			const { count } = ownProps;
 
 			return {
 				increment: () => {
 					const actionReturnedFromDispatch = Promise.resolve(
-						_dispatch( 'counter' ).increment( count )
+						_dispatch('counter').increment(count)
 					);
-					return expect(
-						actionReturnedFromDispatch
-					).resolves.toEqual( {
+					return expect(actionReturnedFromDispatch).resolves.toEqual({
 						type: 'increment',
 						count,
-					} );
+					});
 				},
 			};
-		} )( ( props ) => <button onClick={ props.increment } /> );
+		})((props) => <button onClick={props.increment} />);
 
 		let testRenderer;
-		act( () => {
+		act(() => {
 			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					<Component count={ 0 } />
+				<RegistryProvider value={registry}>
+					<Component count={0} />
 				</RegistryProvider>
 			);
-		} );
+		});
 		const testInstance = testRenderer.root;
 
-		const incrementBeforeSetProps = testInstance.findByType( 'button' )
-			.props.onClick;
+		const incrementBeforeSetProps =
+			testInstance.findByType('button').props.onClick;
 
 		// Verify that dispatch respects props at the time of being invoked by
 		// changing props after the initial mount.
-		act( () => {
+		act(() => {
 			testRenderer.update(
-				<RegistryProvider value={ registry }>
-					<Component count={ 2 } />
+				<RegistryProvider value={registry}>
+					<Component count={2} />
 				</RegistryProvider>
 			);
-		} );
+		});
 
 		// Function value reference should not have changed in props update.
-		expect( testInstance.findByType( 'button' ).props.onClick ).toBe(
+		expect(testInstance.findByType('button').props.onClick).toBe(
 			incrementBeforeSetProps
 		);
 
-		act( () => {
+		act(() => {
 			incrementBeforeSetProps();
-		} );
+		});
 
-		expect( store.getState() ).toBe( 2 );
-	} );
+		expect(store.getState()).toBe(2);
+	});
 
-	it( 'calls dispatch on the correct registry if updated', () => {
-		const reducer = ( state = null ) => state;
-		const noop = () => ( { type: '__INERT__' } );
-		const firstRegistryAction = jest.fn().mockImplementation( noop );
-		const secondRegistryAction = jest.fn().mockImplementation( noop );
+	it('calls dispatch on the correct registry if updated', () => {
+		const reducer = (state = null) => state;
+		const noop = () => ({ type: '__INERT__' });
+		const firstRegistryAction = jest.fn().mockImplementation(noop);
+		const secondRegistryAction = jest.fn().mockImplementation(noop);
 
 		const firstRegistry = registry;
-		firstRegistry.registerStore( 'demo', {
+		firstRegistry.registerStore('demo', {
 			reducer,
 			actions: {
 				noop: firstRegistryAction,
 			},
-		} );
+		});
 
-		const Component = withDispatch( ( _dispatch ) => {
-			const noopByReference = _dispatch( 'demo' ).noop;
+		const Component = withDispatch((_dispatch) => {
+			const noopByReference = _dispatch('demo').noop;
 
 			return {
 				noop() {
-					_dispatch( 'demo' ).noop();
+					_dispatch('demo').noop();
 					noopByReference();
 				},
 			};
-		} )( ( props ) => <button onClick={ props.noop } /> );
+		})((props) => <button onClick={props.noop} />);
 
 		let testRenderer;
-		act( () => {
+		act(() => {
 			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ firstRegistry }>
+				<RegistryProvider value={firstRegistry}>
 					<Component />
 				</RegistryProvider>
 			);
-		} );
+		});
 		const testInstance = testRenderer.root;
 
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
-		expect( firstRegistryAction ).toHaveBeenCalledTimes( 2 );
-		expect( secondRegistryAction ).toHaveBeenCalledTimes( 0 );
+		act(() => {
+			testInstance.findByType('button').props.onClick();
+		});
+		expect(firstRegistryAction).toHaveBeenCalledTimes(2);
+		expect(secondRegistryAction).toHaveBeenCalledTimes(0);
 
 		const secondRegistry = createRegistry();
-		secondRegistry.registerStore( 'demo', {
+		secondRegistry.registerStore('demo', {
 			reducer,
 			actions: {
 				noop: secondRegistryAction,
 			},
-		} );
+		});
 
-		act( () => {
+		act(() => {
 			testRenderer.update(
-				<RegistryProvider value={ secondRegistry }>
+				<RegistryProvider value={secondRegistry}>
 					<Component />
 				</RegistryProvider>
 			);
-		} );
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
-		expect( firstRegistryAction ).toHaveBeenCalledTimes( 2 );
-		expect( secondRegistryAction ).toHaveBeenCalledTimes( 2 );
-	} );
+		});
+		act(() => {
+			testInstance.findByType('button').props.onClick();
+		});
+		expect(firstRegistryAction).toHaveBeenCalledTimes(2);
+		expect(secondRegistryAction).toHaveBeenCalledTimes(2);
+	});
 
 	it(
 		'always calls select with the latest state in the handler passed to ' +
 			'the component',
 		() => {
-			const store = registry.registerStore( 'counter', {
-				reducer: ( state = 0, action ) => {
-					if ( action.type === 'update' ) {
+			const store = registry.registerStore('counter', {
+				reducer: (state = 0, action) => {
+					if (action.type === 'update') {
 						return action.count;
 					}
 					return state;
 				},
 				actions: {
-					update: ( count ) => ( { type: 'update', count } ),
+					update: (count) => ({ type: 'update', count }),
 				},
 				selectors: {
-					getCount: ( state ) => state,
+					getCount: (state) => state,
 				},
-			} );
+			});
 
 			const Component = withDispatch(
-				( _dispatch, ownProps, { select: _select } ) => {
-					const outerCount = _select( 'counter' ).getCount();
+				(_dispatch, ownProps, { select: _select }) => {
+					const outerCount = _select('counter').getCount();
 					return {
 						update: () => {
-							const innerCount = _select( 'counter' ).getCount();
-							expect( innerCount ).toBe( outerCount );
+							const innerCount = _select('counter').getCount();
+							expect(innerCount).toBe(outerCount);
 							const actionReturnedFromDispatch = Promise.resolve(
-								_dispatch( 'counter' ).update( innerCount + 1 )
+								_dispatch('counter').update(innerCount + 1)
 							);
 							return expect(
 								actionReturnedFromDispatch
-							).resolves.toEqual( {
+							).resolves.toEqual({
 								type: 'update',
 								count: innerCount + 1,
-							} );
+							});
 						},
 					};
 				}
-			)( ( props ) => <button onClick={ props.update } /> );
+			)((props) => <button onClick={props.update} />);
 
 			let testRenderer;
-			act( () => {
+			act(() => {
 				testRenderer = TestRenderer.create(
-					<RegistryProvider value={ registry }>
+					<RegistryProvider value={registry}>
 						<Component />
 					</RegistryProvider>
 				);
-			} );
+			});
 
-			const counterUpdateHandler = testRenderer.root.findByType(
-				'button'
-			).props.onClick;
+			const counterUpdateHandler =
+				testRenderer.root.findByType('button').props.onClick;
 
-			act( () => {
+			act(() => {
 				counterUpdateHandler();
-			} );
-			expect( store.getState() ).toBe( 1 );
+			});
+			expect(store.getState()).toBe(1);
 
-			act( () => {
+			act(() => {
 				counterUpdateHandler();
-			} );
-			expect( store.getState() ).toBe( 2 );
+			});
+			expect(store.getState()).toBe(2);
 
-			act( () => {
+			act(() => {
 				counterUpdateHandler();
-			} );
-			expect( store.getState() ).toBe( 3 );
+			});
+			expect(store.getState()).toBe(3);
 		}
 	);
 
-	it( 'warns when mapDispatchToProps returns non-function property', () => {
-		const Component = withDispatch( () => {
+	it('warns when mapDispatchToProps returns non-function property', () => {
+		const Component = withDispatch(() => {
 			return {
 				count: 3,
 			};
-		} )( () => null );
+		})(() => null);
 
-		act( () => {
+		act(() => {
 			TestRenderer.create(
-				<RegistryProvider value={ registry }>
+				<RegistryProvider value={registry}>
 					<Component />
 				</RegistryProvider>
 			);
-		} );
-		expect( console ).toHaveWarnedWith(
+		});
+		expect(console).toHaveWarnedWith(
 			'Property count returned from dispatchMap in useDispatchWithMap must be a function.'
 		);
-	} );
-} );
+	});
+});

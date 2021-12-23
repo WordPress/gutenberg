@@ -14,46 +14,46 @@ import { image } from '@wordpress/icons';
  */
 import BlockIcon from '../';
 
-describe( 'BlockIcon', () => {
-	it( 'renders a Icon', () => {
-		const wrapper = shallow( <BlockIcon icon={ image } /> );
+describe('BlockIcon', () => {
+	it('renders a Icon', () => {
+		const wrapper = shallow(<BlockIcon icon={image} />);
 
-		expect(
-			wrapper.containsMatchingElement( <Icon icon={ image } /> )
-		).toBe( true );
-	} );
+		expect(wrapper.containsMatchingElement(<Icon icon={image} />)).toBe(
+			true
+		);
+	});
 
-	it( 'renders a span without the has-colors classname', () => {
-		const wrapper = shallow( <BlockIcon icon={ image } /> );
+	it('renders a span without the has-colors classname', () => {
+		const wrapper = shallow(<BlockIcon icon={image} />);
 
-		expect( wrapper.find( 'span' ).hasClass( 'has-colors' ) ).toBe( false );
-	} );
+		expect(wrapper.find('span').hasClass('has-colors')).toBe(false);
+	});
 
-	it( 'renders a span with the has-colors classname', () => {
-		const wrapper = shallow( <BlockIcon icon={ image } showColors /> );
+	it('renders a span with the has-colors classname', () => {
+		const wrapper = shallow(<BlockIcon icon={image} showColors />);
 
-		expect( wrapper.find( 'span' ).hasClass( 'has-colors' ) ).toBe( true );
-	} );
+		expect(wrapper.find('span').hasClass('has-colors')).toBe(true);
+	});
 
-	it( 'skips adding background and foreground styles when colors are not enabled', () => {
+	it('skips adding background and foreground styles when colors are not enabled', () => {
 		const wrapper = shallow(
-			<BlockIcon icon={ { background: 'white', foreground: 'black' } } />
+			<BlockIcon icon={{ background: 'white', foreground: 'black' }} />
 		);
 
-		expect( wrapper.find( 'span' ).prop( 'style' ) ).toEqual( {} );
-	} );
+		expect(wrapper.find('span').prop('style')).toEqual({});
+	});
 
-	it( 'adds background and foreground styles when colors are enabled', () => {
+	it('adds background and foreground styles when colors are enabled', () => {
 		const wrapper = shallow(
 			<BlockIcon
-				icon={ { background: 'white', foreground: 'black' } }
+				icon={{ background: 'white', foreground: 'black' }}
 				showColors
 			/>
 		);
 
-		expect( wrapper.find( 'span' ).prop( 'style' ) ).toEqual( {
+		expect(wrapper.find('span').prop('style')).toEqual({
 			backgroundColor: 'white',
 			color: 'black',
-		} );
-	} );
-} );
+		});
+	});
+});

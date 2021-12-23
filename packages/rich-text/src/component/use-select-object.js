@@ -4,12 +4,12 @@
 import { useRefEffect } from '@wordpress/compose';
 
 export function useSelectObject() {
-	return useRefEffect( ( element ) => {
-		function onClick( event ) {
+	return useRefEffect((element) => {
+		function onClick(event) {
 			const { target } = event;
 
 			// If the child element has no text content, it must be an object.
-			if ( target === element || target.textContent ) {
+			if (target === element || target.textContent) {
 				return;
 			}
 
@@ -18,14 +18,14 @@ export function useSelectObject() {
 			const range = ownerDocument.createRange();
 			const selection = defaultView.getSelection();
 
-			range.selectNode( target );
+			range.selectNode(target);
 			selection.removeAllRanges();
-			selection.addRange( range );
+			selection.addRange(range);
 		}
 
-		element.addEventListener( 'click', onClick );
+		element.addEventListener('click', onClick);
 		return () => {
-			element.removeEventListener( 'click', onClick );
+			element.removeEventListener('click', onClick);
 		};
-	}, [] );
+	}, []);
 }

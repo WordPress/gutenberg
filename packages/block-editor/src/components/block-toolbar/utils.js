@@ -21,68 +21,68 @@ const DEBOUNCE_TIMEOUT = 200;
  * @param {number}   [props.debounceTimeout=250] Debounce timeout in milliseconds.
  * @param {Function} [props.onChange=noop]       Callback function.
  */
-export function useDebouncedShowMovers( {
+export function useDebouncedShowMovers({
 	ref,
 	isFocused,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
 	onChange = noop,
-} ) {
-	const [ showMovers, setShowMovers ] = useState( false );
+}) {
+	const [showMovers, setShowMovers] = useState(false);
 	const timeoutRef = useRef();
 
-	const handleOnChange = ( nextIsFocused ) => {
-		if ( ref?.current ) {
-			setShowMovers( nextIsFocused );
+	const handleOnChange = (nextIsFocused) => {
+		if (ref?.current) {
+			setShowMovers(nextIsFocused);
 		}
 
-		onChange( nextIsFocused );
+		onChange(nextIsFocused);
 	};
 
 	const getIsHovered = () => {
-		return ref?.current && ref.current.matches( ':hover' );
+		return ref?.current && ref.current.matches(':hover');
 	};
 
 	const shouldHideMovers = () => {
 		const isHovered = getIsHovered();
 
-		return ! isFocused && ! isHovered;
+		return !isFocused && !isHovered;
 	};
 
 	const clearTimeoutRef = () => {
 		const timeout = timeoutRef.current;
 
-		if ( timeout && clearTimeout ) {
-			clearTimeout( timeout );
+		if (timeout && clearTimeout) {
+			clearTimeout(timeout);
 		}
 	};
 
-	const debouncedShowMovers = ( event ) => {
-		if ( event ) {
+	const debouncedShowMovers = (event) => {
+		if (event) {
 			event.stopPropagation();
 		}
 
 		clearTimeoutRef();
 
-		if ( ! showMovers ) {
-			handleOnChange( true );
+		if (!showMovers) {
+			handleOnChange(true);
 		}
 	};
 
-	const debouncedHideMovers = ( event ) => {
-		if ( event ) {
+	const debouncedHideMovers = (event) => {
+		if (event) {
 			event.stopPropagation();
 		}
 
 		clearTimeoutRef();
 
-		timeoutRef.current = setTimeout( () => {
-			if ( shouldHideMovers() ) {
-				handleOnChange( false );
+		timeoutRef.current = setTimeout(() => {
+			if (shouldHideMovers()) {
+				handleOnChange(false);
 			}
-		}, debounceTimeout );
+		}, debounceTimeout);
 	};
 
-	useEffect( () => () => clearTimeoutRef(), [] );
+	useEffect(() => () => clearTimeoutRef(), []);
 
 	return {
 		showMovers,
@@ -100,40 +100,37 @@ export function useDebouncedShowMovers( {
  * @param {number}   [props.debounceTimeout=250] Debounce timeout in milliseconds.
  * @param {Function} [props.onChange=noop]       Callback function.
  */
-export function useShowMoversGestures( {
+export function useShowMoversGestures({
 	ref,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
 	onChange = noop,
-} ) {
-	const [ isFocused, setIsFocused ] = useState( false );
-	const {
-		showMovers,
-		debouncedShowMovers,
-		debouncedHideMovers,
-	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
+}) {
+	const [isFocused, setIsFocused] = useState(false);
+	const { showMovers, debouncedShowMovers, debouncedHideMovers } =
+		useDebouncedShowMovers({ ref, debounceTimeout, isFocused, onChange });
 
-	const registerRef = useRef( false );
+	const registerRef = useRef(false);
 
 	const isFocusedWithin = () => {
 		return (
 			ref?.current &&
-			ref.current.contains( ref.current.ownerDocument.activeElement )
+			ref.current.contains(ref.current.ownerDocument.activeElement)
 		);
 	};
 
-	useEffect( () => {
+	useEffect(() => {
 		const node = ref.current;
 
 		const handleOnFocus = () => {
-			if ( isFocusedWithin() ) {
-				setIsFocused( true );
+			if (isFocusedWithin()) {
+				setIsFocused(true);
 				debouncedShowMovers();
 			}
 		};
 
 		const handleOnBlur = () => {
-			if ( ! isFocusedWithin() ) {
-				setIsFocused( false );
+			if (!isFocusedWithin()) {
+				setIsFocused(false);
 				debouncedHideMovers();
 			}
 		};
@@ -142,16 +139,16 @@ export function useShowMoversGestures( {
 		 * Events are added via DOM events (vs. React synthetic events),
 		 * as the child React components swallow mouse events.
 		 */
-		if ( node && ! registerRef.current ) {
-			node.addEventListener( 'focus', handleOnFocus, true );
-			node.addEventListener( 'blur', handleOnBlur, true );
+		if (node && !registerRef.current) {
+			node.addEventListener('focus', handleOnFocus, true);
+			node.addEventListener('blur', handleOnBlur, true);
 			registerRef.current = true;
 		}
 
 		return () => {
-			if ( node ) {
-				node.removeEventListener( 'focus', handleOnFocus );
-				node.removeEventListener( 'blur', handleOnBlur );
+			if (node) {
+				node.removeEventListener('focus', handleOnFocus);
+				node.removeEventListener('blur', handleOnBlur);
 			}
 		};
 	}, [
@@ -160,7 +157,7 @@ export function useShowMoversGestures( {
 		setIsFocused,
 		debouncedShowMovers,
 		debouncedHideMovers,
-	] );
+	]);
 
 	return {
 		showMovers,

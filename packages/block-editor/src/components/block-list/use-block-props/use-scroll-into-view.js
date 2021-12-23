@@ -18,56 +18,54 @@ import { getScrollContainer } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../../store';
 
-export function useScrollIntoView( clientId ) {
+export function useScrollIntoView(clientId) {
 	const ref = useRef();
 	const isSelectionEnd = useSelect(
-		( select ) => {
-			const { isBlockSelected, getBlockSelectionEnd } = select(
-				blockEditorStore
-			);
+		(select) => {
+			const { isBlockSelected, getBlockSelectionEnd } =
+				select(blockEditorStore);
 
 			return (
-				isBlockSelected( clientId ) ||
-				getBlockSelectionEnd() === clientId
+				isBlockSelected(clientId) || getBlockSelectionEnd() === clientId
 			);
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	// Note that we can't use `useRefEffect` here, since an element change does
 	// not mean we can scroll. `isSelectionEnd` should be the sole dependency,
 	// while with `useRefEffect`, the element is a dependency as well.
-	useEffect( () => {
-		if ( ! isSelectionEnd ) {
+	useEffect(() => {
+		if (!isSelectionEnd) {
 			return;
 		}
 
 		const extentNode = ref.current;
 
-		if ( ! extentNode ) {
+		if (!extentNode) {
 			return;
 		}
 
 		// If the block is focused, the browser will already have scrolled into
 		// view if necessary.
-		if ( extentNode.contains( extentNode.ownerDocument.activeElement ) ) {
+		if (extentNode.contains(extentNode.ownerDocument.activeElement)) {
 			return;
 		}
 
 		const scrollContainer =
-			getScrollContainer( extentNode ) ||
+			getScrollContainer(extentNode) ||
 			extentNode.ownerDocument.defaultView;
 
 		// If there's no scroll container, it follows that there's no scrollbar
 		// and thus there's no need to try to scroll into view.
-		if ( ! scrollContainer ) {
+		if (!scrollContainer) {
 			return;
 		}
 
-		scrollIntoView( extentNode, scrollContainer, {
+		scrollIntoView(extentNode, scrollContainer, {
 			onlyScrollIfNeeded: true,
-		} );
-	}, [ isSelectionEnd ] );
+		});
+	}, [isSelectionEnd]);
 
 	return ref;
 }

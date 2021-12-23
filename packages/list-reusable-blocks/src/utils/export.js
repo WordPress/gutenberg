@@ -18,11 +18,11 @@ import { download } from './file';
  *
  * @param {number} id
  */
-async function exportReusableBlock( id ) {
-	const postType = await apiFetch( { path: `/wp/v2/types/wp_block` } );
-	const post = await apiFetch( {
-		path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit`,
-	} );
+async function exportReusableBlock(id) {
+	const postType = await apiFetch({ path: `/wp/v2/types/wp_block` });
+	const post = await apiFetch({
+		path: `/wp/v2/${postType.rest_base}/${id}?context=edit`,
+	});
 	const title = post.title.raw;
 	const content = post.content.raw;
 	const fileContent = JSON.stringify(
@@ -34,9 +34,9 @@ async function exportReusableBlock( id ) {
 		null,
 		2
 	);
-	const fileName = kebabCase( title ) + '.json';
+	const fileName = kebabCase(title) + '.json';
 
-	download( fileName, fileContent, 'application/json' );
+	download(fileName, fileContent, 'application/json');
 }
 
 export default exportReusableBlock;

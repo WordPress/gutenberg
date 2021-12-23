@@ -9,9 +9,9 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { useBlockEditContext } from '../block-edit/context';
 
 const withClientId = createHigherOrderComponent(
-	( WrappedComponent ) => ( props ) => {
+	(WrappedComponent) => (props) => {
 		const { clientId } = useBlockEditContext();
-		return <WrappedComponent { ...props } clientId={ clientId } />;
+		return <WrappedComponent {...props} clientId={clientId} />;
 	},
 	'withClientId'
 );

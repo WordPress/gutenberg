@@ -9,7 +9,7 @@ import { doAction } from '@wordpress/hooks';
  *
  * @type {Record<string, true | undefined>}
  */
-export const logged = Object.create( null );
+export const logged = Object.create(null);
 
 /**
  * Logs a message to notify developers about a deprecated feature.
@@ -38,23 +38,23 @@ export const logged = Object.create( null );
  * // Logs: 'Eating meat is deprecated since version 2019.01.01 and will be removed from the earth in version 2020.01.01. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
  * ```
  */
-export default function deprecated( feature, options = {} ) {
+export default function deprecated(feature, options = {}) {
 	const { since, version, alternative, plugin, link, hint } = options;
 
-	const pluginMessage = plugin ? ` from ${ plugin }` : '';
-	const sinceMessage = since ? ` since version ${ since }` : '';
+	const pluginMessage = plugin ? ` from ${plugin}` : '';
+	const sinceMessage = since ? ` since version ${since}` : '';
 	const versionMessage = version
-		? ` and will be removed${ pluginMessage } in version ${ version }`
+		? ` and will be removed${pluginMessage} in version ${version}`
 		: '';
 	const useInsteadMessage = alternative
-		? ` Please use ${ alternative } instead.`
+		? ` Please use ${alternative} instead.`
 		: '';
-	const linkMessage = link ? ` See: ${ link }` : '';
-	const hintMessage = hint ? ` Note: ${ hint }` : '';
-	const message = `${ feature } is deprecated${ sinceMessage }${ versionMessage }.${ useInsteadMessage }${ linkMessage }${ hintMessage }`;
+	const linkMessage = link ? ` See: ${link}` : '';
+	const hintMessage = hint ? ` Note: ${hint}` : '';
+	const message = `${feature} is deprecated${sinceMessage}${versionMessage}.${useInsteadMessage}${linkMessage}${hintMessage}`;
 
 	// Skip if already logged.
-	if ( message in logged ) {
+	if (message in logged) {
 		return;
 	}
 
@@ -71,12 +71,12 @@ export default function deprecated( feature, options = {} ) {
 	 * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
 	 * @param {?string} message             Message sent to console.warn
 	 */
-	doAction( 'deprecated', feature, options, message );
+	doAction('deprecated', feature, options, message);
 
 	// eslint-disable-next-line no-console
-	console.warn( message );
+	console.warn(message);
 
-	logged[ message ] = true;
+	logged[message] = true;
 }
 
 /** @typedef {import('utility-types').NonUndefined<Parameters<typeof deprecated>[1]>} DeprecatedOptions */

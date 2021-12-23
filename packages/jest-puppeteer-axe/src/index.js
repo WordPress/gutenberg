@@ -16,42 +16,42 @@ import AxePuppeteer from '@axe-core/puppeteer';
  *
  * @return {string} The user friendly message to display when the matcher fails.
  */
-function formatViolations( violations ) {
+function formatViolations(violations) {
 	return violations
-		.map( ( { help, helpUrl, id, nodes } ) => {
+		.map(({ help, helpUrl, id, nodes }) => {
 			let output =
-				`Rule: "${ id }" (${ help })\n` +
-				`Help: ${ helpUrl }\n` +
+				`Rule: "${id}" (${help})\n` +
+				`Help: ${helpUrl}\n` +
 				'Affected Nodes:\n';
 
-			nodes.forEach( ( node ) => {
-				if ( node.any.length ) {
-					output += `  ${ node.target }\n`;
+			nodes.forEach((node) => {
+				if (node.any.length) {
+					output += `  ${node.target}\n`;
 					output += '    Fix ANY of the following:\n';
-					node.any.forEach( ( item ) => {
-						output += `    - ${ item.message }\n`;
-					} );
+					node.any.forEach((item) => {
+						output += `    - ${item.message}\n`;
+					});
 				}
 
-				if ( node.all.length ) {
-					output += `  ${ node.target }\n`;
+				if (node.all.length) {
+					output += `  ${node.target}\n`;
 					output += '    Fix ALL of the following:\n';
-					node.all.forEach( ( item ) => {
-						output += `      - ${ item.message }.\n`;
-					} );
+					node.all.forEach((item) => {
+						output += `      - ${item.message}.\n`;
+					});
 				}
 
-				if ( node.none.length ) {
-					output += `  ${ node.target }\n`;
+				if (node.none.length) {
+					output += `  ${node.target}\n`;
 					output += '    Fix ALL of the following:\n';
-					node.none.forEach( ( item ) => {
-						output += `      - ${ item.message }.\n`;
-					} );
+					node.none.forEach((item) => {
+						output += `      - ${item.message}.\n`;
+					});
 				}
-			} );
+			});
 			return output;
-		} )
-		.join( '\n' );
+		})
+		.join('\n');
 }
 
 /**
@@ -80,26 +80,26 @@ async function toPassAxeTests(
 	page,
 	{ include, exclude, disabledRules, options, config } = {}
 ) {
-	const axe = new AxePuppeteer( page );
+	const axe = new AxePuppeteer(page);
 
-	if ( include ) {
-		axe.include( include );
+	if (include) {
+		axe.include(include);
 	}
 
-	if ( exclude ) {
-		axe.exclude( exclude );
+	if (exclude) {
+		axe.exclude(exclude);
 	}
 
-	if ( options ) {
-		axe.options( options );
+	if (options) {
+		axe.options(options);
 	}
 
-	if ( disabledRules ) {
-		axe.disableRules( disabledRules );
+	if (disabledRules) {
+		axe.disableRules(disabledRules);
 	}
 
-	if ( config ) {
-		axe.configure( config );
+	if (config) {
+		axe.configure(config);
 	}
 
 	const { violations } = await axe.analyze();
@@ -108,7 +108,7 @@ async function toPassAxeTests(
 	const message = pass
 		? () => {
 				return (
-					this.utils.matcherHint( '.not.toPassAxeTests' ) +
+					this.utils.matcherHint('.not.toPassAxeTests') +
 					'\n\n' +
 					'Expected page to contain accessibility check violations.\n' +
 					'No violations found.'
@@ -116,11 +116,11 @@ async function toPassAxeTests(
 		  }
 		: () => {
 				return (
-					this.utils.matcherHint( '.toPassAxeTests' ) +
+					this.utils.matcherHint('.toPassAxeTests') +
 					'\n\n' +
 					'Expected page to pass Axe accessibility tests.\n' +
 					'Violations found:\n' +
-					this.utils.RECEIVED_COLOR( formatViolations( violations ) )
+					this.utils.RECEIVED_COLOR(formatViolations(violations))
 				);
 		  };
 
@@ -130,6 +130,6 @@ async function toPassAxeTests(
 	};
 }
 
-expect.extend( {
+expect.extend({
 	toPassAxeTests,
-} );
+});

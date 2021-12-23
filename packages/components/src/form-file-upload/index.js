@@ -8,36 +8,36 @@ import { useRef } from '@wordpress/element';
  */
 import Button from '../button';
 
-function FormFileUpload( {
+function FormFileUpload({
 	accept,
 	children,
 	multiple = false,
 	onChange,
 	render,
 	...props
-} ) {
+}) {
 	const ref = useRef();
 	const openFileDialog = () => {
 		ref.current.click();
 	};
 
 	const ui = render ? (
-		render( { openFileDialog } )
+		render({ openFileDialog })
 	) : (
-		<Button onClick={ openFileDialog } { ...props }>
-			{ children }
+		<Button onClick={openFileDialog} {...props}>
+			{children}
 		</Button>
 	);
 	return (
 		<div className="components-form-file-upload">
-			{ ui }
+			{ui}
 			<input
 				type="file"
-				ref={ ref }
-				multiple={ multiple }
-				style={ { display: 'none' } }
-				accept={ accept }
-				onChange={ onChange }
+				ref={ref}
+				multiple={multiple}
+				style={{ display: 'none' }}
+				accept={accept}
+				onChange={onChange}
 			/>
 		</div>
 	);

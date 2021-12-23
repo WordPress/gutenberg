@@ -21,7 +21,7 @@ import useSearchHandler from './use-search-handler';
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
 // which will cause an unintended http request.
-const noopSearchHandler = () => Promise.resolve( [] );
+const noopSearchHandler = () => Promise.resolve([]);
 
 const LinkControlSearchInput = forwardRef(
 	(
@@ -36,8 +36,8 @@ const LinkControlSearchInput = forwardRef(
 			onChange = noop,
 			onSelect = noop,
 			showSuggestions = true,
-			renderSuggestions = ( props ) => (
-				<LinkControlSearchResults { ...props } />
+			renderSuggestions = (props) => (
+				<LinkControlSearchResults {...props} />
 			),
 			fetchSuggestions = null,
 			allowDirectEntry = true,
@@ -60,8 +60,8 @@ const LinkControlSearchInput = forwardRef(
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
 
-		const instanceId = useInstanceId( LinkControlSearchInput );
-		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
+		const instanceId = useInstanceId(LinkControlSearchInput);
+		const [focusedSuggestion, setFocusedSuggestion] = useState();
 
 		/**
 		 * Handles the user moving between different suggestions. Does not handle
@@ -70,90 +70,90 @@ const LinkControlSearchInput = forwardRef(
 		 * @param {string} selection  the url of the selected suggestion.
 		 * @param {Object} suggestion the suggestion object.
 		 */
-		const onInputChange = ( selection, suggestion ) => {
-			onChange( selection );
-			setFocusedSuggestion( suggestion );
+		const onInputChange = (selection, suggestion) => {
+			onChange(selection);
+			setFocusedSuggestion(suggestion);
 		};
 
-		const handleRenderSuggestions = ( props ) =>
-			renderSuggestions( {
+		const handleRenderSuggestions = (props) =>
+			renderSuggestions({
 				...props,
 				instanceId,
 				withCreateSuggestion,
 				currentInputValue: value,
 				createSuggestionButtonText,
 				suggestionsQuery,
-				handleSuggestionClick: ( suggestion ) => {
-					if ( props.handleSuggestionClick ) {
-						props.handleSuggestionClick( suggestion );
+				handleSuggestionClick: (suggestion) => {
+					if (props.handleSuggestionClick) {
+						props.handleSuggestionClick(suggestion);
 					}
-					onSuggestionSelected( suggestion );
+					onSuggestionSelected(suggestion);
 				},
-			} );
+			});
 
-		const onSuggestionSelected = async ( selectedSuggestion ) => {
+		const onSuggestionSelected = async (selectedSuggestion) => {
 			let suggestion = selectedSuggestion;
-			if ( CREATE_TYPE === selectedSuggestion.type ) {
+			if (CREATE_TYPE === selectedSuggestion.type) {
 				// Create a new page and call onSelect with the output from the onCreateSuggestion callback
 				try {
 					suggestion = await onCreateSuggestion(
 						selectedSuggestion.title
 					);
-					if ( suggestion?.url ) {
-						onSelect( suggestion );
+					if (suggestion?.url) {
+						onSelect(suggestion);
 					}
-				} catch ( e ) {}
+				} catch (e) {}
 				return;
 			}
 
 			if (
 				allowDirectEntry ||
-				( suggestion && Object.keys( suggestion ).length >= 1 )
+				(suggestion && Object.keys(suggestion).length >= 1)
 			) {
 				onSelect(
 					// Some direct entries don't have types or IDs, and we still need to clear the previous ones.
-					{ ...omit( currentLink, 'id', 'url' ), ...suggestion },
+					{ ...omit(currentLink, 'id', 'url'), ...suggestion },
 					suggestion
 				);
 			}
 		};
 
-		const inputClasses = classnames( className, {
-			'has-no-label': ! useLabel,
-		} );
+		const inputClasses = classnames(className, {
+			'has-no-label': !useLabel,
+		});
 
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
-					label={ useLabel ? 'URL' : undefined }
-					className={ inputClasses }
-					value={ value }
-					onChange={ onInputChange }
-					placeholder={ placeholder ?? __( 'Search or type url' ) }
+					label={useLabel ? 'URL' : undefined}
+					className={inputClasses}
+					value={value}
+					onChange={onInputChange}
+					placeholder={placeholder ?? __('Search or type url')}
 					__experimentalRenderSuggestions={
 						showSuggestions ? handleRenderSuggestions : null
 					}
-					__experimentalFetchLinkSuggestions={ searchHandler }
-					__experimentalHandleURLSuggestions={ true }
+					__experimentalFetchLinkSuggestions={searchHandler}
+					__experimentalHandleURLSuggestions={true}
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
-					onSubmit={ ( suggestion, event ) => {
+					onSubmit={(suggestion, event) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 
 						// If there is no suggestion and the value (ie: any manually entered URL) is empty
 						// then don't allow submission otherwise we get empty links.
-						if ( ! hasSuggestion && ! value?.trim()?.length ) {
+						if (!hasSuggestion && !value?.trim()?.length) {
 							event.preventDefault();
 						} else {
 							onSuggestionSelected(
 								hasSuggestion || { url: value }
 							);
 						}
-					} }
-					ref={ ref }
+					}}
+					ref={ref}
 				/>
-				{ children }
+				{children}
 			</div>
 		);
 	}

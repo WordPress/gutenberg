@@ -16,81 +16,80 @@ import isTemplateRemovable from '../../../utils/is-template-removable';
 import isTemplateRevertable from '../../../utils/is-template-revertable';
 import RenameMenuItem from './rename-menu-item';
 
-export default function Actions( { template } ) {
-	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+export default function Actions({ template }) {
+	const { removeTemplate, revertTemplate } = useDispatch(editSiteStore);
+	const { saveEditedEntityRecord } = useDispatch(coreStore);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch(noticesStore);
 
-	const isRemovable = isTemplateRemovable( template );
-	const isRevertable = isTemplateRevertable( template );
+	const isRemovable = isTemplateRemovable(template);
+	const isRevertable = isTemplateRevertable(template);
 
-	if ( ! isRemovable && ! isRevertable ) {
+	if (!isRemovable && !isRevertable) {
 		return null;
 	}
 
 	async function revertAndSaveTemplate() {
 		try {
-			await revertTemplate( template, { allowUndo: false } );
+			await revertTemplate(template, { allowUndo: false });
 			await saveEditedEntityRecord(
 				'postType',
 				template.type,
 				template.id
 			);
 
-			createSuccessNotice( __( 'Entity reverted.' ), {
+			createSuccessNotice(__('Entity reverted.'), {
 				type: 'snackbar',
-			} );
-		} catch ( error ) {
+			});
+		} catch (error) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while reverting the entity.' );
+					: __('An error occurred while reverting the entity.');
 
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
+			createErrorNotice(errorMessage, { type: 'snackbar' });
 		}
 	}
 
 	return (
 		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Actions' ) }
+			icon={moreVertical}
+			label={__('Actions')}
 			className="edit-site-list-table__actions"
 		>
-			{ ( { onClose } ) => (
+			{({ onClose }) => (
 				<MenuGroup>
-					{ isRemovable && (
+					{isRemovable && (
 						<>
 							<RenameMenuItem
-								template={ template }
-								onClose={ onClose }
+								template={template}
+								onClose={onClose}
 							/>
 							<MenuItem
 								isDestructive
 								isTertiary
-								onClick={ () => {
-									removeTemplate( template );
+								onClick={() => {
+									removeTemplate(template);
 									onClose();
-								} }
+								}}
 							>
-								{ __( 'Delete' ) }
+								{__('Delete')}
 							</MenuItem>
 						</>
-					) }
-					{ isRevertable && (
+					)}
+					{isRevertable && (
 						<MenuItem
-							info={ __( 'Restore to default state' ) }
-							onClick={ () => {
+							info={__('Restore to default state')}
+							onClick={() => {
 								revertAndSaveTemplate();
 								onClose();
-							} }
+							}}
 						>
-							{ __( 'Clear customizations' ) }
+							{__('Clear customizations')}
 						</MenuItem>
-					) }
+					)}
 				</MenuGroup>
-			) }
+			)}
 		</DropdownMenu>
 	);
 }

@@ -23,47 +23,47 @@ import { ESCAPE } from '@wordpress/keycodes';
 import { store as editWidgetsStore } from '../../store';
 
 export default function ListViewSidebar() {
-	const { setIsListViewOpened } = useDispatch( editWidgetsStore );
+	const { setIsListViewOpened } = useDispatch(editWidgetsStore);
 
-	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
-	async function selectEditorBlock( clientId ) {
+	const { clearSelectedBlock, selectBlock } = useDispatch(blockEditorStore);
+	async function selectEditorBlock(clientId) {
 		await clearSelectedBlock();
-		selectBlock( clientId, -1 );
+		selectBlock(clientId, -1);
 	}
 
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const focusOnMountRef = useFocusOnMount('firstElement');
 	const focusReturnRef = useFocusReturn();
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+	function closeOnEscape(event) {
+		if (event.keyCode === ESCAPE && !event.defaultPrevented) {
 			event.preventDefault();
-			setIsListViewOpened( false );
+			setIsListViewOpened(false);
 		}
 	}
 
-	const instanceId = useInstanceId( ListViewSidebar );
-	const labelId = `edit-widgets-editor__list-view-panel-label-${ instanceId }`;
+	const instanceId = useInstanceId(ListViewSidebar);
+	const labelId = `edit-widgets-editor__list-view-panel-label-${instanceId}`;
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			aria-labelledby={ labelId }
+			aria-labelledby={labelId}
 			className="edit-widgets-editor__list-view-panel"
-			onKeyDown={ closeOnEscape }
+			onKeyDown={closeOnEscape}
 		>
 			<div className="edit-widgets-editor__list-view-panel-header">
-				<strong id={ labelId }>{ __( 'List view' ) }</strong>
+				<strong id={labelId}>{__('List view')}</strong>
 				<Button
-					icon={ closeSmall }
-					label={ __( 'Close list view sidebar' ) }
-					onClick={ () => setIsListViewOpened( false ) }
+					icon={closeSmall}
+					label={__('Close list view sidebar')}
+					onClick={() => setIsListViewOpened(false)}
 				/>
 			</div>
 			<div
 				className="edit-widgets-editor__list-view-panel-content"
-				ref={ useMergeRefs( [ focusReturnRef, focusOnMountRef ] ) }
+				ref={useMergeRefs([focusReturnRef, focusOnMountRef])}
 			>
 				<ListView
-					onSelect={ selectEditorBlock }
+					onSelect={selectEditorBlock}
 					showNestedBlocks
 					__experimentalHideContainerBlockActions
 					__experimentalFeatures

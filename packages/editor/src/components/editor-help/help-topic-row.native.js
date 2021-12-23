@@ -9,11 +9,11 @@ import { useNavigation } from '@react-navigation/native';
 import { TextControl, Icon } from '@wordpress/components';
 import { chevronRight } from '@wordpress/icons';
 
-const HelpTopicRow = ( { label, icon, screenName } ) => {
+const HelpTopicRow = ({ label, icon, screenName }) => {
 	const navigation = useNavigation();
 
 	const openSubSheet = () => {
-		navigation.navigate( screenName );
+		navigation.navigate(screenName);
 	};
 
 	return (
@@ -21,11 +21,11 @@ const HelpTopicRow = ( { label, icon, screenName } ) => {
 			separatorType="leftMargin"
 			customActionButton
 			leftAlign
-			onPress={ openSubSheet }
-			label={ label }
-			icon={ icon }
+			onPress={openSubSheet}
+			label={label}
+			icon={icon}
 		>
-			<Icon icon={ chevronRight } />
+			<Icon icon={chevronRight} />
 		</TextControl>
 	);
 };

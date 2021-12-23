@@ -24,19 +24,19 @@ import { applyFormat } from './apply-format';
  *
  * @return {RichTextValue} A new value with the format applied or removed.
  */
-export function toggleFormat( value, format ) {
-	if ( getActiveFormat( value, format.type ) ) {
+export function toggleFormat(value, format) {
+	if (getActiveFormat(value, format.type)) {
 		// For screen readers, will announce if formatting control is disabled.
-		if ( format.title ) {
+		if (format.title) {
 			// translators: %s: title of the formatting control
-			speak( sprintf( __( '%s removed.' ), format.title ), 'assertive' );
+			speak(sprintf(__('%s removed.'), format.title), 'assertive');
 		}
-		return removeFormat( value, format.type );
+		return removeFormat(value, format.type);
 	}
 	// For screen readers, will announce if formatting control is enabled.
-	if ( format.title ) {
+	if (format.title) {
 		// translators: %s: title of the formatting control
-		speak( sprintf( __( '%s applied.' ), format.title ), 'assertive' );
+		speak(sprintf(__('%s applied.'), format.title), 'assertive');
 	}
-	return applyFormat( value, format );
+	return applyFormat(value, format);
 }

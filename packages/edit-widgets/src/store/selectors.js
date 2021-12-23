@@ -29,15 +29,15 @@ import { STORE_NAME as editWidgetsStoreName } from './constants';
  *
  * @return {Object[]} API List of widgets.
  */
-export const getWidgets = createRegistrySelector( ( select ) => () => {
-	const widgets = select( coreStore ).getEntityRecords(
+export const getWidgets = createRegistrySelector((select) => () => {
+	const widgets = select(coreStore).getEntityRecords(
 		'root',
 		'widget',
 		buildWidgetsQuery()
 	);
 
-	return keyBy( widgets, 'id' );
-} );
+	return keyBy(widgets, 'id');
+});
 
 /**
  * Returns API widget data for a particular widget ID.
@@ -46,26 +46,24 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
  *
  * @return {Object} API widget data for a particular widget ID.
  */
-export const getWidget = createRegistrySelector(
-	( select ) => ( state, id ) => {
-		const widgets = select( editWidgetsStoreName ).getWidgets();
-		return widgets[ id ];
-	}
-);
+export const getWidget = createRegistrySelector((select) => (state, id) => {
+	const widgets = select(editWidgetsStoreName).getWidgets();
+	return widgets[id];
+});
 
 /**
  * Returns all API widget areas.
  *
  * @return {Object[]} API List of widget areas.
  */
-export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
+export const getWidgetAreas = createRegistrySelector((select) => () => {
 	const query = buildWidgetAreasQuery();
-	return select( coreStore ).getEntityRecords(
+	return select(coreStore).getEntityRecords(
 		KIND,
 		WIDGET_AREA_ENTITY_TYPE,
 		query
 	);
-} );
+});
 
 /**
  * Returns widgetArea containing a block identify by given widgetId
@@ -74,19 +72,19 @@ export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
  * @return {Object} Containing widget area.
  */
 export const getWidgetAreaForWidgetId = createRegistrySelector(
-	( select ) => ( state, widgetId ) => {
-		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
-		return widgetAreas.find( ( widgetArea ) => {
-			const post = select( coreStore ).getEditedEntityRecord(
+	(select) => (state, widgetId) => {
+		const widgetAreas = select(editWidgetsStoreName).getWidgetAreas();
+		return widgetAreas.find((widgetArea) => {
+			const post = select(coreStore).getEditedEntityRecord(
 				KIND,
 				POST_TYPE,
-				buildWidgetAreaPostId( widgetArea.id )
+				buildWidgetAreaPostId(widgetArea.id)
 			);
-			const blockWidgetIds = post.blocks.map( ( block ) =>
-				getWidgetIdFromBlock( block )
+			const blockWidgetIds = post.blocks.map((block) =>
+				getWidgetIdFromBlock(block)
 			);
-			return blockWidgetIds.includes( widgetId );
-		} );
+			return blockWidgetIds.includes(widgetId);
+		});
 	}
 );
 
@@ -98,16 +96,15 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
  * @return {WPBlock} The widget area block.
  */
 export const getParentWidgetAreaBlock = createRegistrySelector(
-	( select ) => ( state, clientId ) => {
-		const { getBlock, getBlockName, getBlockParents } = select(
-			blockEditorStore
-		);
-		const blockParents = getBlockParents( clientId );
+	(select) => (state, clientId) => {
+		const { getBlock, getBlockName, getBlockParents } =
+			select(blockEditorStore);
+		const blockParents = getBlockParents(clientId);
 		const widgetAreaClientId = blockParents.find(
-			( parentClientId ) =>
-				getBlockName( parentClientId ) === 'core/widget-area'
+			(parentClientId) =>
+				getBlockName(parentClientId) === 'core/widget-area'
 		);
-		return getBlock( widgetAreaClientId );
+		return getBlock(widgetAreaClientId);
 	}
 );
 
@@ -117,26 +114,24 @@ export const getParentWidgetAreaBlock = createRegistrySelector(
  * @return {Object[]} List of edited widget area entity records.
  */
 export const getEditedWidgetAreas = createRegistrySelector(
-	( select ) => ( state, ids ) => {
-		let widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
-		if ( ! widgetAreas ) {
+	(select) => (state, ids) => {
+		let widgetAreas = select(editWidgetsStoreName).getWidgetAreas();
+		if (!widgetAreas) {
 			return [];
 		}
-		if ( ids ) {
-			widgetAreas = widgetAreas.filter( ( { id } ) =>
-				ids.includes( id )
-			);
+		if (ids) {
+			widgetAreas = widgetAreas.filter(({ id }) => ids.includes(id));
 		}
 		return widgetAreas
-			.filter( ( { id } ) =>
-				select( coreStore ).hasEditsForEntityRecord(
+			.filter(({ id }) =>
+				select(coreStore).hasEditsForEntityRecord(
 					KIND,
 					POST_TYPE,
-					buildWidgetAreaPostId( id )
+					buildWidgetAreaPostId(id)
 				)
 			)
-			.map( ( { id } ) =>
-				select( coreStore ).getEditedEntityRecord(
+			.map(({ id }) =>
+				select(coreStore).getEditedEntityRecord(
 					KIND,
 					WIDGET_AREA_ENTITY_TYPE,
 					id
@@ -152,28 +147,29 @@ export const getEditedWidgetAreas = createRegistrySelector(
  * @return {Array}  List of all blocks representing reference widgets
  */
 export const getReferenceWidgetBlocks = createRegistrySelector(
-	( select ) => ( state, referenceWidgetName = null ) => {
-		const results = [];
-		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
-		for ( const _widgetArea of widgetAreas ) {
-			const post = select( coreStore ).getEditedEntityRecord(
-				KIND,
-				POST_TYPE,
-				buildWidgetAreaPostId( _widgetArea.id )
-			);
-			for ( const block of post.blocks ) {
-				if (
-					block.name === 'core/legacy-widget' &&
-					( ! referenceWidgetName ||
-						block.attributes?.referenceWidgetName ===
-							referenceWidgetName )
-				) {
-					results.push( block );
+	(select) =>
+		(state, referenceWidgetName = null) => {
+			const results = [];
+			const widgetAreas = select(editWidgetsStoreName).getWidgetAreas();
+			for (const _widgetArea of widgetAreas) {
+				const post = select(coreStore).getEditedEntityRecord(
+					KIND,
+					POST_TYPE,
+					buildWidgetAreaPostId(_widgetArea.id)
+				);
+				for (const block of post.blocks) {
+					if (
+						block.name === 'core/legacy-widget' &&
+						(!referenceWidgetName ||
+							block.attributes?.referenceWidgetName ===
+								referenceWidgetName)
+					) {
+						results.push(block);
+					}
 				}
 			}
+			return results;
 		}
-		return results;
-	}
 );
 
 /**
@@ -181,42 +177,42 @@ export const getReferenceWidgetBlocks = createRegistrySelector(
  *
  * @return {boolean} True if any widget area is currently being saved. False otherwise.
  */
-export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
-	const widgetAreasIds = select( editWidgetsStoreName )
+export const isSavingWidgetAreas = createRegistrySelector((select) => () => {
+	const widgetAreasIds = select(editWidgetsStoreName)
 		.getWidgetAreas()
-		?.map( ( { id } ) => id );
-	if ( ! widgetAreasIds ) {
+		?.map(({ id }) => id);
+	if (!widgetAreasIds) {
 		return false;
 	}
 
-	for ( const id of widgetAreasIds ) {
-		const isSaving = select( coreStore ).isSavingEntityRecord(
+	for (const id of widgetAreasIds) {
+		const isSaving = select(coreStore).isSavingEntityRecord(
 			KIND,
 			WIDGET_AREA_ENTITY_TYPE,
 			id
 		);
-		if ( isSaving ) {
+		if (isSaving) {
 			return true;
 		}
 	}
 
 	const widgetIds = [
-		...Object.keys( select( editWidgetsStoreName ).getWidgets() ),
+		...Object.keys(select(editWidgetsStoreName).getWidgets()),
 		undefined, // account for new widgets without an ID
 	];
-	for ( const id of widgetIds ) {
-		const isSaving = select( coreStore ).isSavingEntityRecord(
+	for (const id of widgetIds) {
+		const isSaving = select(coreStore).isSavingEntityRecord(
 			'root',
 			'widget',
 			id
 		);
-		if ( isSaving ) {
+		if (isSaving) {
 			return true;
 		}
 	}
 
 	return false;
-} );
+});
 
 /**
  * Gets whether the widget area is opened.
@@ -226,9 +222,9 @@ export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
  *
  * @return {boolean} True if the widget area is open.
  */
-export const getIsWidgetAreaOpen = ( state, clientId ) => {
+export const getIsWidgetAreaOpen = (state, clientId) => {
 	const { widgetAreasOpenState } = state;
-	return !! widgetAreasOpenState[ clientId ];
+	return !!widgetAreasOpenState[clientId];
 };
 
 /**
@@ -238,8 +234,8 @@ export const getIsWidgetAreaOpen = ( state, clientId ) => {
  *
  * @return {boolean} Whether the inserter is opened.
  */
-export function isInserterOpened( state ) {
-	return !! state.blockInserterPanel;
+export function isInserterOpened(state) {
+	return !!state.blockInserterPanel;
 }
 
 /**
@@ -249,7 +245,7 @@ export function isInserterOpened( state ) {
  *
  * @return {Object} The root client ID and index to insert at.
  */
-export function __experimentalGetInsertionPoint( state ) {
+export function __experimentalGetInsertionPoint(state) {
 	const { rootClientId, insertionIndex } = state.blockInserterPanel;
 	return { rootClientId, insertionIndex };
 }
@@ -263,15 +259,15 @@ export function __experimentalGetInsertionPoint( state ) {
  * @return {boolean} True if the block can be inserted in a widget area.
  */
 export const canInsertBlockInWidgetArea = createRegistrySelector(
-	( select ) => ( state, blockName ) => {
+	(select) => (state, blockName) => {
 		// Widget areas are always top-level blocks, which getBlocks will return.
-		const widgetAreas = select( blockEditorStore ).getBlocks();
+		const widgetAreas = select(blockEditorStore).getBlocks();
 
 		// Makes an assumption that a block that can be inserted into one
 		// widget area can be inserted into any widget area. Uses the first
 		// widget area for testing whether the block can be inserted.
-		const [ firstWidgetArea ] = widgetAreas;
-		return select( blockEditorStore ).canInsertBlockType(
+		const [firstWidgetArea] = widgetAreas;
+		return select(blockEditorStore).canInsertBlockType(
 			blockName,
 			firstWidgetArea.clientId
 		);
@@ -285,6 +281,6 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
  *
  * @return {boolean} Whether the list view is opened.
  */
-export function isListViewOpened( state ) {
+export function isListViewOpened(state) {
 	return state.listViewPanel;
 }

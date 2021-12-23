@@ -10,9 +10,7 @@ import type { CSSProperties } from 'react';
 import type { ResponsiveCSSValue } from '../ui/utils/types';
 import type { SpaceInput } from '../ui/utils/space';
 
-export type FlexDirection = ResponsiveCSSValue<
-	CSSProperties[ 'flexDirection' ]
->;
+export type FlexDirection = ResponsiveCSSValue<CSSProperties['flexDirection']>;
 
 export type FlexProps = {
 	/**
@@ -22,7 +20,7 @@ export type FlexProps = {
 	 *
 	 * @default 'center'
 	 */
-	align?: CSSProperties[ 'alignItems' ];
+	align?: CSSProperties['alignItems'];
 	/**
 	 * The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
 	 *
@@ -46,7 +44,7 @@ export type FlexProps = {
 	 *
 	 * @default 'space-between'
 	 */
-	justify?: CSSProperties[ 'justifyContent' ];
+	justify?: CSSProperties['justifyContent'];
 	/**
 	 * Determines if children should wrap.
 	 *
@@ -67,7 +65,7 @@ export type FlexItemProps = {
 	/**
 	 * The (CSS) display of the `FlexItem`.
 	 */
-	display?: CSSProperties[ 'display' ];
+	display?: CSSProperties['display'];
 	/**
 	 * Determines if `FlexItem` should render as an adaptive full-width block.
 	 *
@@ -80,4 +78,4 @@ export type FlexItemProps = {
 	children: React.ReactNode;
 };
 
-export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;
+export type FlexBlockProps = Omit<FlexItemProps, 'isBlock'>;

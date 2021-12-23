@@ -10,15 +10,15 @@ import { View } from '../../view';
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                                forwardedRef
  */
-function Flex( props, forwardedRef ) {
-	const { children, isColumn, ...otherProps } = useFlex( props );
+function Flex(props, forwardedRef) {
+	const { children, isColumn, ...otherProps } = useFlex(props);
 
 	return (
 		<FlexContext.Provider
-			value={ { flexItemDisplay: isColumn ? 'block' : undefined } }
+			value={{ flexItemDisplay: isColumn ? 'block' : undefined }}
 		>
-			<View { ...otherProps } ref={ forwardedRef }>
-				{ children }
+			<View {...otherProps} ref={forwardedRef}>
+				{children}
 			</View>
 		</FlexContext.Provider>
 	);
@@ -55,6 +55,6 @@ function Flex( props, forwardedRef ) {
  * ```
  *
  */
-const ConnectedFlex = contextConnect( Flex, 'Flex' );
+const ConnectedFlex = contextConnect(Flex, 'Flex');
 
 export default ConnectedFlex;

@@ -25,8 +25,8 @@ export const buttonView = css`
 	appearance: none;
 	background: transparent;
 	border: none;
-	border-radius: ${ CONFIG.controlBorderRadius };
-	color: ${ COLORS.gray[ 700 ] };
+	border-radius: ${CONFIG.controlBorderRadius};
+	color: ${COLORS.gray[700]};
 	cursor: pointer;
 	display: flex;
 	height: 100%;
@@ -36,9 +36,9 @@ export const buttonView = css`
 	padding: 0 12px;
 	position: relative;
 	text-align: center;
-	transition: background ${ CONFIG.transitionDurationFast } linear,
-		color ${ CONFIG.transitionDurationFast } linear, font-weight 60ms linear;
-	${ reduceMotion( 'transition' ) }
+	transition: background ${CONFIG.transitionDurationFast} linear,
+		color ${CONFIG.transitionDurationFast} linear, font-weight 60ms linear;
+	${reduceMotion('transition')}
 	user-select: none;
 	width: 100%;
 	z-index: 2;
@@ -48,24 +48,24 @@ export const buttonView = css`
 	}
 
 	&:active {
-		background: ${ CONFIG.toggleGroupControlBackgroundColor };
+		background: ${CONFIG.toggleGroupControlBackgroundColor};
 	}
 `;
 
 export const buttonActive = css`
-	color: ${ COLORS.white };
+	color: ${COLORS.white};
 	&:active {
 		background: transparent;
 	}
 `;
 
 export const ButtonContentView = styled.div`
-	font-size: ${ CONFIG.fontSize };
+	font-size: ${CONFIG.fontSize};
 	line-height: 1;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate( -50%, -50% );
+	transform: translate(-50%, -50%);
 `;
 
 export const separatorActive = css`
@@ -73,7 +73,7 @@ export const separatorActive = css`
 `;
 
 export const LabelPlaceholderView = styled.div`
-	font-size: ${ CONFIG.fontSize };
+	font-size: ${CONFIG.fontSize};
 	font-weight: bold;
 	height: 0;
 	overflow: hidden;
@@ -81,5 +81,5 @@ export const LabelPlaceholderView = styled.div`
 `;
 
 export const medium = css`
-	min-height: ${ CONFIG.controlHeight };
+	min-height: ${CONFIG.controlHeight};
 `;

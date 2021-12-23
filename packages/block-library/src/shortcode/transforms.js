@@ -18,8 +18,8 @@ const transforms = {
 			attributes: {
 				text: {
 					type: 'string',
-					shortcode: ( attrs, { content } ) => {
-						return removep( autop( content ) );
+					shortcode: (attrs, { content }) => {
+						return removep(autop(content));
 					},
 				},
 			},

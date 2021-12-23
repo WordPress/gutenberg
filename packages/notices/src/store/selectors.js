@@ -51,6 +51,6 @@ const DEFAULT_NOTICES = [];
  *
  * @return {WPNotice[]} Array of notices.
  */
-export function getNotices( state, context = DEFAULT_CONTEXT ) {
-	return state[ context ] || DEFAULT_NOTICES;
+export function getNotices(state, context = DEFAULT_CONTEXT) {
+	return state[context] || DEFAULT_NOTICES;
 }

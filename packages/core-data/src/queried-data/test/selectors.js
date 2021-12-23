@@ -3,20 +3,20 @@
  */
 import { getQueriedItems } from '../selectors';
 
-describe( 'getQueriedItems', () => {
-	it( 'should return null if requesting but no item IDs', () => {
+describe('getQueriedItems', () => {
+	it('should return null if requesting but no item IDs', () => {
 		const state = {
 			items: {},
 			itemIsComplete: {},
 			queries: {},
 		};
 
-		const result = getQueriedItems( state );
+		const result = getQueriedItems(state);
 
-		expect( result ).toBe( null );
-	} );
+		expect(result).toBe(null);
+	});
 
-	it( 'should return an array of items', () => {
+	it('should return an array of items', () => {
 		const state = {
 			items: {
 				default: {
@@ -32,17 +32,17 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'': [ 1, 2 ],
+					'': [1, 2],
 				},
 			},
 		};
 
-		const result = getQueriedItems( state );
+		const result = getQueriedItems(state);
 
-		expect( result ).toEqual( [ { id: 1 }, { id: 2 } ] );
-	} );
+		expect(result).toEqual([{ id: 1 }, { id: 2 }]);
+	});
 
-	it( 'should cache on query by state', () => {
+	it('should cache on query by state', () => {
 		const state = {
 			items: {
 				default: {
@@ -56,16 +56,16 @@ describe( 'getQueriedItems', () => {
 					2: true,
 				},
 			},
-			queries: [ 1, 2 ],
+			queries: [1, 2],
 		};
 
-		const resultA = getQueriedItems( state, {} );
-		const resultB = getQueriedItems( state, {} );
+		const resultA = getQueriedItems(state, {});
+		const resultB = getQueriedItems(state, {});
 
-		expect( resultA ).toBe( resultB );
-	} );
+		expect(resultA).toBe(resultB);
+	});
 
-	it( 'should return items queried by include', () => {
+	it('should return items queried by include', () => {
 		const state = {
 			items: {
 				default: {
@@ -81,18 +81,18 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'': [ 1, 2 ],
-					'include=1': [ 1 ],
+					'': [1, 2],
+					'include=1': [1],
 				},
 			},
 		};
 
-		const result = getQueriedItems( state, { include: [ 1 ] } );
+		const result = getQueriedItems(state, { include: [1] });
 
-		expect( result ).toEqual( [ { id: 1 } ] );
-	} );
+		expect(result).toEqual([{ id: 1 }]);
+	});
 
-	it( 'should dynamically construct fields-filtered item from available data', () => {
+	it('should dynamically construct fields-filtered item from available data', () => {
 		const state = {
 			items: {
 				default: {
@@ -116,20 +116,17 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'_fields=content': [ 1, 2 ],
+					'_fields=content': [1, 2],
 				},
 			},
 		};
 
-		const result = getQueriedItems( state, { _fields: [ 'content' ] } );
+		const result = getQueriedItems(state, { _fields: ['content'] });
 
-		expect( result ).toEqual( [
-			{ content: 'chicken' },
-			{ content: 'ribs' },
-		] );
-	} );
+		expect(result).toEqual([{ content: 'chicken' }, { content: 'ribs' }]);
+	});
 
-	it( 'should dynamically construct fields-filtered item from available data with nested fields', () => {
+	it('should dynamically construct fields-filtered item from available data with nested fields', () => {
 		const state = {
 			items: {
 				default: {
@@ -161,22 +158,22 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'_fields=content%2Cmeta.template': [ 1, 2 ],
+					'_fields=content%2Cmeta.template': [1, 2],
 				},
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			_fields: [ 'content', 'meta.template' ],
-		} );
+		const result = getQueriedItems(state, {
+			_fields: ['content', 'meta.template'],
+		});
 
-		expect( result ).toEqual( [
+		expect(result).toEqual([
 			{ content: 'chicken', meta: { template: 'single' } },
 			{ content: 'ribs', meta: { template: 'single' } },
-		] );
-	} );
+		]);
+	});
 
-	it( 'should return null if attempting to filter by yet-unknown fields', () => {
+	it('should return null if attempting to filter by yet-unknown fields', () => {
 		const state = {
 			items: {
 				default: {
@@ -198,17 +195,17 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'': [ 1, 2 ],
+					'': [1, 2],
 				},
 			},
 		};
 
-		const result = getQueriedItems( state, { _fields: [ 'content' ] } );
+		const result = getQueriedItems(state, { _fields: ['content'] });
 
-		expect( result ).toBe( null );
-	} );
+		expect(result).toBe(null);
+	});
 
-	it( 'should return null if querying non-filtered data for incomplete item', () => {
+	it('should return null if querying non-filtered data for incomplete item', () => {
 		const state = {
 			items: {
 				default: {
@@ -230,13 +227,13 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'': [ 1, 2 ],
+					'': [1, 2],
 				},
 			},
 		};
 
-		const result = getQueriedItems( state );
+		const result = getQueriedItems(state);
 
-		expect( result ).toBe( null );
-	} );
-} );
+		expect(result).toBe(null);
+	});
+});

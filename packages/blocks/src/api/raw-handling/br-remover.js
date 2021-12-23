@@ -8,14 +8,14 @@ import { getSibling } from './utils';
  *
  * @param {Element} node Node to check.
  */
-export default function brRemover( node ) {
-	if ( node.nodeName !== 'BR' ) {
+export default function brRemover(node) {
+	if (node.nodeName !== 'BR') {
 		return;
 	}
 
-	if ( getSibling( node, 'next' ) ) {
+	if (getSibling(node, 'next')) {
 		return;
 	}
 
-	node.parentNode.removeChild( node );
+	node.parentNode.removeChild(node);
 }

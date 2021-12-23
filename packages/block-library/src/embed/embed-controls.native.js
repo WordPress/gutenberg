@@ -11,7 +11,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 import { store as editPostStore } from '@wordpress/edit-post';
 
-function getResponsiveHelp( checked ) {
+function getResponsiveHelp(checked) {
 	return checked
 		? __(
 				'This embed will preserve its aspect ratio when the browser is resized.'
@@ -21,7 +21,7 @@ function getResponsiveHelp( checked ) {
 		  );
 }
 
-const EmbedControls = ( {
+const EmbedControls = ({
 	blockSupportsResponsive,
 	themeSupportsResponsive,
 	allowResponsive,
@@ -29,32 +29,31 @@ const EmbedControls = ( {
 	url,
 	linkLabel,
 	onEditURL,
-} ) => {
-	const { closeGeneralSidebar: closeSettingsBottomSheet } = useDispatch(
-		editPostStore
-	);
+}) => {
+	const { closeGeneralSidebar: closeSettingsBottomSheet } =
+		useDispatch(editPostStore);
 
 	return (
 		<>
 			<InspectorControls>
-				{ themeSupportsResponsive && blockSupportsResponsive && (
-					<PanelBody title={ __( 'Media settings' ) }>
+				{themeSupportsResponsive && blockSupportsResponsive && (
+					<PanelBody title={__('Media settings')}>
 						<ToggleControl
-							label={ __( 'Resize for smaller devices' ) }
-							checked={ allowResponsive }
-							help={ getResponsiveHelp }
-							onChange={ toggleResponsive }
+							label={__('Resize for smaller devices')}
+							checked={allowResponsive}
+							help={getResponsiveHelp}
+							onChange={toggleResponsive}
 						/>
 					</PanelBody>
-				) }
-				<PanelBody title={ __( 'Link settings' ) }>
+				)}
+				<PanelBody title={__('Link settings')}>
 					<EmbedLinkSettings
-						value={ url }
-						label={ linkLabel }
-						onSubmit={ ( value ) => {
+						value={url}
+						label={linkLabel}
+						onSubmit={(value) => {
 							closeSettingsBottomSheet();
-							onEditURL( value );
-						} }
+							onEditURL(value);
+						}}
 					/>
 				</PanelBody>
 			</InspectorControls>

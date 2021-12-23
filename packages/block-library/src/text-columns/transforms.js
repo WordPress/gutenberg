@@ -7,8 +7,8 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
-			blocks: [ 'core/columns' ],
-			transform: ( { className, columns, content, width } ) =>
+			blocks: ['core/columns'],
+			transform: ({ className, columns, content, width }) =>
 				createBlock(
 					'core/columns',
 					{
@@ -19,12 +19,12 @@ const transforms = {
 						className,
 						columns,
 					},
-					content.map( ( { children } ) =>
-						createBlock( 'core/column', {}, [
-							createBlock( 'core/paragraph', {
+					content.map(({ children }) =>
+						createBlock('core/column', {}, [
+							createBlock('core/paragraph', {
 								content: children,
-							} ),
-						] )
+							}),
+						])
 					)
 				),
 		},

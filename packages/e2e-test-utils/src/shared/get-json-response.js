@@ -4,9 +4,9 @@
  * @param {Object} obj Object to seralise for response.
  * @return {Object} Response for use with `request.respond`.
  */
-export function getJSONResponse( obj ) {
+export function getJSONResponse(obj) {
 	return {
 		contentType: 'application/json',
-		body: JSON.stringify( obj ),
+		body: JSON.stringify(obj),
 	};
 }

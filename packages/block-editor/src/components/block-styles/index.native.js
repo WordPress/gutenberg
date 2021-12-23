@@ -20,36 +20,36 @@ import StylePreview from './preview';
 import containerStyles from './style.scss';
 import { store as blockEditorStore } from '../../store';
 
-function BlockStyles( { clientId, url } ) {
-	const selector = ( select ) => {
-		const { getBlock } = select( blockEditorStore );
-		const { getBlockStyles } = select( blocksStore );
-		const block = getBlock( clientId );
+function BlockStyles({ clientId, url }) {
+	const selector = (select) => {
+		const { getBlock } = select(blockEditorStore);
+		const { getBlockStyles } = select(blocksStore);
+		const block = getBlock(clientId);
 		return {
-			styles: getBlockStyles( block.name ),
+			styles: getBlockStyles(block.name),
 			className: block.attributes.className || '',
 		};
 	};
 
-	const { styles, className } = useSelect( selector, [ clientId ] );
+	const { styles, className } = useSelect(selector, [clientId]);
 
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch(blockEditorStore);
 
-	const renderedStyles = find( styles, 'isDefault' )
+	const renderedStyles = find(styles, 'isDefault')
 		? styles
 		: [
 				{
 					name: 'default',
-					label: _x( 'Default', 'block style' ),
+					label: _x('Default', 'block style'),
 					isDefault: true,
 				},
 				...styles,
 		  ];
 
-	const mappedRenderedStyles = useMemo( () => {
-		const activeStyle = getActiveStyle( renderedStyles, className );
+	const mappedRenderedStyles = useMemo(() => {
+		const activeStyle = getActiveStyle(renderedStyles, className);
 
-		return renderedStyles.map( ( style ) => {
+		return renderedStyles.map((style) => {
 			const styleClassName = replaceActiveStyle(
 				className,
 				activeStyle,
@@ -58,34 +58,34 @@ function BlockStyles( { clientId, url } ) {
 			const isActive = activeStyle === style;
 
 			const onStylePress = () => {
-				updateBlockAttributes( clientId, {
+				updateBlockAttributes(clientId, {
 					className: styleClassName,
-				} );
+				});
 			};
 
 			return (
 				<StylePreview
-					onPress={ onStylePress }
-					isActive={ isActive }
-					key={ style.name }
-					style={ style }
-					url={ url }
+					onPress={onStylePress}
+					isActive={isActive}
+					key={style.name}
+					style={style}
+					url={url}
 				/>
 			);
-		} );
-	}, [ renderedStyles, className, clientId ] );
+		});
+	}, [renderedStyles, className, clientId]);
 
-	if ( ! styles || styles.length === 0 ) {
+	if (!styles || styles.length === 0) {
 		return null;
 	}
 
 	return (
 		<ScrollView
 			horizontal
-			showsHorizontalScrollIndicator={ false }
-			contentContainerStyle={ containerStyles.content }
+			showsHorizontalScrollIndicator={false}
+			contentContainerStyle={containerStyles.content}
 		>
-			{ mappedRenderedStyles }
+			{mappedRenderedStyles}
 		</ScrollView>
 	);
 }

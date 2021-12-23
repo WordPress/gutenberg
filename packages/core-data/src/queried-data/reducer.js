@@ -20,13 +20,13 @@ import {
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
 
-function getContextFromAction( action ) {
+function getContextFromAction(action) {
 	const { query } = action;
-	if ( ! query ) {
+	if (!query) {
 		return 'default';
 	}
 
-	const queryParts = getQueryParts( query );
+	const queryParts = getQueryParts(query);
 	return queryParts.context;
 }
 
@@ -41,12 +41,12 @@ function getContextFromAction( action ) {
  *
  * @return {number[]} Merged array of item IDs.
  */
-export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
+export function getMergedItemIds(itemIds, nextItemIds, page, perPage) {
 	const receivedAllIds = page === 1 && perPage === -1;
-	if ( receivedAllIds ) {
+	if (receivedAllIds) {
 		return nextItemIds;
 	}
-	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
+	const nextItemIdsStartIndex = (page - 1) * perPage;
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
@@ -56,17 +56,17 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	);
 
 	// Preallocate array since size is known.
-	const mergedItemIds = new Array( size );
+	const mergedItemIds = new Array(size);
 
-	for ( let i = 0; i < size; i++ ) {
+	for (let i = 0; i < size; i++) {
 		// Preserve existing item ID except for subset of range of next items.
 		const isInNextItemsRange =
 			i >= nextItemIdsStartIndex &&
 			i < nextItemIdsStartIndex + nextItemIds.length;
 
-		mergedItemIds[ i ] = isInNextItemsRange
-			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds[ i ];
+		mergedItemIds[i] = isInNextItemsRange
+			? nextItemIds[i - nextItemIdsStartIndex]
+			: itemIds[i];
 	}
 
 	return mergedItemIds;
@@ -81,29 +81,29 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
  *
  * @return {Object} Next state.
  */
-export function items( state = {}, action ) {
-	switch ( action.type ) {
+export function items(state = {}, action) {
+	switch (action.type) {
 		case 'RECEIVE_ITEMS': {
-			const context = getContextFromAction( action );
+			const context = getContextFromAction(action);
 			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
-				[ context ]: {
-					...state[ context ],
-					...action.items.reduce( ( accumulator, value ) => {
-						const itemId = value[ key ];
-						accumulator[ itemId ] = conservativeMapItem(
-							state?.[ context ]?.[ itemId ],
+				[context]: {
+					...state[context],
+					...action.items.reduce((accumulator, value) => {
+						const itemId = value[key];
+						accumulator[itemId] = conservativeMapItem(
+							state?.[context]?.[itemId],
 							value
 						);
 						return accumulator;
-					}, {} ),
+					}, {}),
 				},
 			};
 		}
 		case 'REMOVE_ITEMS':
-			return mapValues( state, ( contextState ) =>
-				omit( contextState, action.itemIds )
+			return mapValues(state, (contextState) =>
+				omit(contextState, action.itemIds)
 			);
 	}
 	return state;
@@ -121,10 +121,10 @@ export function items( state = {}, action ) {
  *
  * @return {Object<string,boolean>} Next state.
  */
-export function itemIsComplete( state = {}, action ) {
-	switch ( action.type ) {
+export function itemIsComplete(state = {}, action) {
+	switch (action.type) {
 		case 'RECEIVE_ITEMS': {
-			const context = getContextFromAction( action );
+			const context = getContextFromAction(action);
 			const { query, key = DEFAULT_ENTITY_KEY } = action;
 
 			// An item is considered complete if it is received without an associated
@@ -133,30 +133,29 @@ export function itemIsComplete( state = {}, action ) {
 			// fields are not consistent across all entity types, this would require
 			// introspection on the REST schema for each entity to know which fields
 			// compose a complete item for that entity.
-			const queryParts = query ? getQueryParts( query ) : {};
-			const isCompleteQuery =
-				! query || ! Array.isArray( queryParts.fields );
+			const queryParts = query ? getQueryParts(query) : {};
+			const isCompleteQuery = !query || !Array.isArray(queryParts.fields);
 
 			return {
 				...state,
-				[ context ]: {
-					...state[ context ],
-					...action.items.reduce( ( result, item ) => {
-						const itemId = item[ key ];
+				[context]: {
+					...state[context],
+					...action.items.reduce((result, item) => {
+						const itemId = item[key];
 
 						// Defer to completeness if already assigned. Technically the
 						// data may be outdated if receiving items for a field subset.
-						result[ itemId ] =
-							state?.[ context ]?.[ itemId ] || isCompleteQuery;
+						result[itemId] =
+							state?.[context]?.[itemId] || isCompleteQuery;
 
 						return result;
-					}, {} ),
+					}, {}),
 				},
 			};
 		}
 		case 'REMOVE_ITEMS':
-			return mapValues( state, ( contextState ) =>
-				omit( contextState, action.itemIds )
+			return mapValues(state, (contextState) =>
+				omit(contextState, action.itemIds)
 			);
 	}
 
@@ -172,45 +171,40 @@ export function itemIsComplete( state = {}, action ) {
  *
  * @return {Object} Next state.
  */
-const receiveQueries = flowRight( [
+const receiveQueries = flowRight([
 	// Limit to matching action type so we don't attempt to replace action on
 	// an unhandled action.
-	ifMatchingAction( ( action ) => 'query' in action ),
+	ifMatchingAction((action) => 'query' in action),
 
 	// Inject query parts into action for use both in `onSubKey` and reducer.
-	replaceAction( ( action ) => {
+	replaceAction((action) => {
 		// `ifMatchingAction` still passes on initialization, where state is
 		// undefined and a query is not assigned. Avoid attempting to parse
 		// parts. `onSubKey` will omit by lack of `stableKey`.
-		if ( action.query ) {
+		if (action.query) {
 			return {
 				...action,
-				...getQueryParts( action.query ),
+				...getQueryParts(action.query),
 			};
 		}
 
 		return action;
-	} ),
+	}),
 
-	onSubKey( 'context' ),
+	onSubKey('context'),
 
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
-	onSubKey( 'stableKey' ),
-] )( ( state = null, action ) => {
+	onSubKey('stableKey'),
+])((state = null, action) => {
 	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
 
-	if ( type !== 'RECEIVE_ITEMS' ) {
+	if (type !== 'RECEIVE_ITEMS') {
 		return state;
 	}
 
-	return getMergedItemIds(
-		state || [],
-		map( action.items, key ),
-		page,
-		perPage
-	);
-} );
+	return getMergedItemIds(state || [], map(action.items, key), page, perPage);
+});
 
 /**
  * Reducer tracking queries state.
@@ -220,30 +214,30 @@ const receiveQueries = flowRight( [
  *
  * @return {Object} Next state.
  */
-const queries = ( state = {}, action ) => {
-	switch ( action.type ) {
+const queries = (state = {}, action) => {
+	switch (action.type) {
 		case 'RECEIVE_ITEMS':
-			return receiveQueries( state, action );
+			return receiveQueries(state, action);
 		case 'REMOVE_ITEMS':
-			const removedItems = action.itemIds.reduce( ( result, itemId ) => {
-				result[ itemId ] = true;
+			const removedItems = action.itemIds.reduce((result, itemId) => {
+				result[itemId] = true;
 				return result;
-			}, {} );
+			}, {});
 
-			return mapValues( state, ( contextQueries ) => {
-				return mapValues( contextQueries, ( queryItems ) => {
-					return filter( queryItems, ( queryId ) => {
-						return ! removedItems[ queryId ];
-					} );
-				} );
-			} );
+			return mapValues(state, (contextQueries) => {
+				return mapValues(contextQueries, (queryItems) => {
+					return filter(queryItems, (queryId) => {
+						return !removedItems[queryId];
+					});
+				});
+			});
 		default:
 			return state;
 	}
 };
 
-export default combineReducers( {
+export default combineReducers({
 	items,
 	itemIsComplete,
 	queries,
-} );
+});

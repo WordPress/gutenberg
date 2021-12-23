@@ -20,23 +20,23 @@ import Notice from './';
  *
  * @return {Object} The rendered notices list.
  */
-function NoticeList( { notices, onRemove = noop, className, children } ) {
-	const removeNotice = ( id ) => () => onRemove( id );
+function NoticeList({ notices, onRemove = noop, className, children }) {
+	const removeNotice = (id) => () => onRemove(id);
 
-	className = classnames( 'components-notice-list', className );
+	className = classnames('components-notice-list', className);
 
 	return (
-		<div className={ className }>
-			{ children }
-			{ [ ...notices ].reverse().map( ( notice ) => (
+		<div className={className}>
+			{children}
+			{[...notices].reverse().map((notice) => (
 				<Notice
-					{ ...omit( notice, [ 'content' ] ) }
-					key={ notice.id }
-					onRemove={ removeNotice( notice.id ) }
+					{...omit(notice, ['content'])}
+					key={notice.id}
+					onRemove={removeNotice(notice.id)}
 				>
-					{ notice.content }
+					{notice.content}
 				</Notice>
-			) ) }
+			))}
 		</div>
 	);
 }

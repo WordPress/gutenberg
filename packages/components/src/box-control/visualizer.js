@@ -15,68 +15,68 @@ import {
 } from './styles/box-control-visualizer-styles';
 import { DEFAULT_VALUES, DEFAULT_VISUALIZER_VALUES } from './utils';
 
-export default function BoxControlVisualizer( {
+export default function BoxControlVisualizer({
 	children,
 	showValues = DEFAULT_VISUALIZER_VALUES,
 	values: valuesProp = DEFAULT_VALUES,
 	...props
-} ) {
-	const isPositionAbsolute = ! children;
+}) {
+	const isPositionAbsolute = !children;
 	return (
 		<Container
-			{ ...props }
-			isPositionAbsolute={ isPositionAbsolute }
+			{...props}
+			isPositionAbsolute={isPositionAbsolute}
 			aria-hidden="true"
 		>
-			<Sides showValues={ showValues } values={ valuesProp } />
-			{ children }
+			<Sides showValues={showValues} values={valuesProp} />
+			{children}
 		</Container>
 	);
 }
 
-function Sides( { showValues = DEFAULT_VISUALIZER_VALUES, values } ) {
+function Sides({ showValues = DEFAULT_VISUALIZER_VALUES, values }) {
 	const { top, right, bottom, left } = values;
 
 	return (
 		<>
-			<Top isVisible={ showValues.top } value={ top } />
-			<Right isVisible={ showValues.right } value={ right } />
-			<Bottom isVisible={ showValues.bottom } value={ bottom } />
-			<Left isVisible={ showValues.left } value={ left } />
+			<Top isVisible={showValues.top} value={top} />
+			<Right isVisible={showValues.right} value={right} />
+			<Bottom isVisible={showValues.bottom} value={bottom} />
+			<Left isVisible={showValues.left} value={left} />
 		</>
 	);
 }
 
-function Top( { isVisible = false, value } ) {
+function Top({ isVisible = false, value }) {
 	const height = value;
-	const animationProps = useSideAnimation( height );
+	const animationProps = useSideAnimation(height);
 	const isActive = animationProps.isActive || isVisible;
 
-	return <TopView isActive={ isActive } style={ { height } } />;
+	return <TopView isActive={isActive} style={{ height }} />;
 }
 
-function Right( { isVisible = false, value } ) {
+function Right({ isVisible = false, value }) {
 	const width = value;
-	const animationProps = useSideAnimation( width );
+	const animationProps = useSideAnimation(width);
 	const isActive = animationProps.isActive || isVisible;
 
-	return <RightView isActive={ isActive } style={ { width } } />;
+	return <RightView isActive={isActive} style={{ width }} />;
 }
 
-function Bottom( { isVisible = false, value } ) {
+function Bottom({ isVisible = false, value }) {
 	const height = value;
-	const animationProps = useSideAnimation( height );
+	const animationProps = useSideAnimation(height);
 	const isActive = animationProps.isActive || isVisible;
 
-	return <BottomView isActive={ isActive } style={ { height } } />;
+	return <BottomView isActive={isActive} style={{ height }} />;
 }
 
-function Left( { isVisible = false, value } ) {
+function Left({ isVisible = false, value }) {
 	const width = value;
-	const animationProps = useSideAnimation( width );
+	const animationProps = useSideAnimation(width);
 	const isActive = animationProps.isActive || isVisible;
 
-	return <LeftView isActive={ isActive } style={ { width } } />;
+	return <LeftView isActive={isActive} style={{ width }} />;
 }
 
 /**
@@ -84,31 +84,31 @@ function Left( { isVisible = false, value } ) {
  *
  * @param {string} value Value of (box) side.
  */
-function useSideAnimation( value ) {
-	const [ isActive, setIsActive ] = useState( false );
-	const valueRef = useRef( value );
+function useSideAnimation(value) {
+	const [isActive, setIsActive] = useState(false);
+	const valueRef = useRef(value);
 	const timeoutRef = useRef();
 
 	const clearTimer = () => {
-		if ( timeoutRef.current ) {
-			window.clearTimeout( timeoutRef.current );
+		if (timeoutRef.current) {
+			window.clearTimeout(timeoutRef.current);
 		}
 	};
 
-	useEffect( () => {
-		if ( value !== valueRef.current ) {
-			setIsActive( true );
+	useEffect(() => {
+		if (value !== valueRef.current) {
+			setIsActive(true);
 			valueRef.current = value;
 
 			clearTimer();
 
-			timeoutRef.current = setTimeout( () => {
-				setIsActive( false );
-			}, 400 );
+			timeoutRef.current = setTimeout(() => {
+				setIsActive(false);
+			}, 400);
 		}
 
 		return () => clearTimer();
-	}, [ value ] );
+	}, [value]);
 
 	return {
 		isActive,

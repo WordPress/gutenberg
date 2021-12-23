@@ -19,41 +19,41 @@ import { space } from '../ui/utils/space';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
 
-export default function AnglePickerControl( {
+export default function AnglePickerControl({
 	className,
-	label = __( 'Angle' ),
+	label = __('Angle'),
 	onChange,
 	value,
-} ) {
-	const handleOnNumberChange = ( unprocessedValue ) => {
+}) {
+	const handleOnNumberChange = (unprocessedValue) => {
 		const inputValue =
-			unprocessedValue !== '' ? parseInt( unprocessedValue, 10 ) : 0;
-		onChange( inputValue );
+			unprocessedValue !== '' ? parseInt(unprocessedValue, 10) : 0;
+		onChange(inputValue);
 	};
 
-	const classes = classnames( 'components-angle-picker-control', className );
+	const classes = classnames('components-angle-picker-control', className);
 
 	return (
-		<Root className={ classes }>
+		<Root className={classes}>
 			<FlexBlock>
 				<NumberControl
-					label={ label }
+					label={label}
 					className="components-angle-picker-control__input-field"
-					max={ 360 }
-					min={ 0 }
-					onChange={ handleOnNumberChange }
+					max={360}
+					min={0}
+					onChange={handleOnNumberChange}
 					size="__unstable-large"
 					step="1"
-					value={ value }
+					value={value}
 					hideHTMLArrows
 					suffix={
 						<Spacer
-							as={ Text }
-							marginBottom={ 0 }
-							marginRight={ space( 3 ) }
-							style={ {
+							as={Text}
+							marginBottom={0}
+							marginRight={space(3)}
+							style={{
 								color: 'var( --wp-admin-theme-color )',
-							} }
+							}}
 						>
 							°
 						</Spacer>
@@ -61,16 +61,16 @@ export default function AnglePickerControl( {
 				/>
 			</FlexBlock>
 			<FlexItem
-				style={ {
-					marginLeft: space( 4 ),
-					marginBottom: space( 1 ),
+				style={{
+					marginLeft: space(4),
+					marginBottom: space(1),
 					marginTop: 'auto',
-				} }
+				}}
 			>
 				<AngleCircle
 					aria-hidden="true"
-					value={ value }
-					onChange={ onChange }
+					value={value}
+					onChange={onChange}
 				/>
 			</FlexItem>
 		</Root>

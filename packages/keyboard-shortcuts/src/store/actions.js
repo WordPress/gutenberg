@@ -28,13 +28,13 @@
  *
  * @return {Object} action.
  */
-export function registerShortcut( {
+export function registerShortcut({
 	name,
 	category,
 	description,
 	keyCombination,
 	aliases,
-} ) {
+}) {
 	return {
 		type: 'REGISTER_SHORTCUT',
 		name,
@@ -52,7 +52,7 @@ export function registerShortcut( {
  *
  * @return {Object} action.
  */
-export function unregisterShortcut( name ) {
+export function unregisterShortcut(name) {
 	return {
 		type: 'UNREGISTER_SHORTCUT',
 		name,

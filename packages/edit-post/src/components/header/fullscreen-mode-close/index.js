@@ -24,25 +24,24 @@ import { useReducedMotion } from '@wordpress/compose';
  */
 import { store as editPostStore } from '../../../store';
 
-function FullscreenModeClose( { showTooltip, icon, href } ) {
+function FullscreenModeClose({ showTooltip, icon, href }) {
 	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
-		( select ) => {
-			const { getCurrentPostType } = select( editorStore );
-			const { isFeatureActive } = select( editPostStore );
-			const { getEntityRecord, getPostType, isResolving } = select(
-				coreStore
-			);
+		(select) => {
+			const { getCurrentPostType } = select(editorStore);
+			const { isFeatureActive } = select(editPostStore);
+			const { getEntityRecord, getPostType, isResolving } =
+				select(coreStore);
 			const siteData =
-				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+				getEntityRecord('root', '__unstableBase', undefined) || {};
 
 			return {
-				isActive: isFeatureActive( 'fullscreenMode' ),
-				isRequestingSiteIcon: isResolving( 'getEntityRecord', [
+				isActive: isFeatureActive('fullscreenMode'),
+				isRequestingSiteIcon: isResolving('getEntityRecord', [
 					'root',
 					'__unstableBase',
 					undefined,
-				] ),
-				postType: getPostType( getCurrentPostType() ),
+				]),
+				postType: getPostType(getCurrentPostType()),
 				siteIconUrl: siteData.site_icon_url,
 			};
 		},
@@ -51,11 +50,11 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 
 	const disableMotion = useReducedMotion();
 
-	if ( ! isActive || ! postType ) {
+	if (!isActive || !postType) {
 		return null;
 	}
 
-	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
+	let buttonIcon = <Icon size="36px" icon={wordpress} />;
 
 	const effect = {
 		expand: {
@@ -65,24 +64,24 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		},
 	};
 
-	if ( siteIconUrl ) {
+	if (siteIconUrl) {
 		buttonIcon = (
 			<motion.img
-				variants={ ! disableMotion && effect }
-				alt={ __( 'Site Icon' ) }
+				variants={!disableMotion && effect}
+				alt={__('Site Icon')}
 				className="edit-post-fullscreen-mode-close_site-icon"
-				src={ siteIconUrl }
+				src={siteIconUrl}
 			/>
 		);
 	}
 
-	if ( isRequestingSiteIcon ) {
+	if (isRequestingSiteIcon) {
 		buttonIcon = null;
 	}
 
 	// Override default icon if custom icon is provided via props.
-	if ( icon ) {
-		buttonIcon = <Icon size="36px" icon={ icon } />;
+	if (icon) {
+		buttonIcon = <Icon size="36px" icon={icon} />;
 	}
 
 	return (
@@ -91,18 +90,14 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 				className="edit-post-fullscreen-mode-close has-icon"
 				href={
 					href ??
-					addQueryArgs( 'edit.php', {
+					addQueryArgs('edit.php', {
 						post_type: postType.slug,
-					} )
+					})
 				}
-				label={ get(
-					postType,
-					[ 'labels', 'view_items' ],
-					__( 'Back' )
-				) }
-				showTooltip={ showTooltip }
+				label={get(postType, ['labels', 'view_items'], __('Back'))}
+				showTooltip={showTooltip}
 			>
-				{ buttonIcon }
+				{buttonIcon}
 			</Button>
 		</motion.div>
 	);

@@ -19,26 +19,26 @@ import { useHasTypographyPanel } from './typography-panel';
 import ScreenHeader from './header';
 import NavigationButton from './navigation-button';
 
-function BlockMenuItem( { block } ) {
-	const hasTypographyPanel = useHasTypographyPanel( block.name );
-	const hasColorPanel = useHasColorPanel( block.name );
-	const hasBorderPanel = useHasBorderPanel( block.name );
-	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
+function BlockMenuItem({ block }) {
+	const hasTypographyPanel = useHasTypographyPanel(block.name);
+	const hasColorPanel = useHasColorPanel(block.name);
+	const hasBorderPanel = useHasBorderPanel(block.name);
+	const hasDimensionsPanel = useHasDimensionsPanel(block.name);
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 	const hasBlockMenuItem =
 		hasTypographyPanel || hasColorPanel || hasLayoutPanel;
 
-	if ( ! hasBlockMenuItem ) {
+	if (!hasBlockMenuItem) {
 		return null;
 	}
 
 	return (
-		<NavigationButton path={ '/blocks/' + block.name }>
+		<NavigationButton path={'/blocks/' + block.name}>
 			<HStack justify="flex-start">
 				<FlexItem>
-					<BlockIcon icon={ block.icon } />
+					<BlockIcon icon={block.icon} />
 				</FlexItem>
-				<FlexItem>{ block.title }</FlexItem>
+				<FlexItem>{block.title}</FlexItem>
 			</HStack>
 		</NavigationButton>
 	);
@@ -49,17 +49,17 @@ function ScreenBlockList() {
 		<>
 			<ScreenHeader
 				back="/"
-				title={ __( 'Blocks' ) }
-				description={ __(
+				title={__('Blocks')}
+				description={__(
 					'Customize the appearance of specific blocks and for the whole site.'
-				) }
+				)}
 			/>
-			{ getBlockTypes().map( ( block ) => (
+			{getBlockTypes().map((block) => (
 				<BlockMenuItem
-					block={ block }
-					key={ 'menu-itemblock-' + block.name }
+					block={block}
+					key={'menu-itemblock-' + block.name}
 				/>
-			) ) }
+			))}
 		</>
 	);
 }

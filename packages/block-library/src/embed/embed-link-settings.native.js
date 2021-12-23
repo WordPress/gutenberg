@@ -11,7 +11,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
-const EmbedLinkSettings = ( {
+const EmbedLinkSettings = ({
 	autoFocus,
 	value,
 	label,
@@ -19,79 +19,77 @@ const EmbedLinkSettings = ( {
 	onClose,
 	onSubmit,
 	withBottomSheet,
-} ) => {
-	const url = useRef( value );
-	const [ inputURL, setInputURL ] = useState( value );
-	const { createErrorNotice } = useDispatch( noticesStore );
+}) => {
+	const url = useRef(value);
+	const [inputURL, setInputURL] = useState(value);
+	const { createErrorNotice } = useDispatch(noticesStore);
 
 	const linkSettingsOptions = {
 		url: {
 			label: sprintf(
 				// translators: %s: embed block variant's label e.g: "Twitter".
-				__( '%s link' ),
+				__('%s link'),
 				label
 			),
-			placeholder: __( 'Add link' ),
+			placeholder: __('Add link'),
 			autoFocus,
 			autoFill: true,
 		},
 		footer: {
 			label: (
 				<FooterMessageLink
-					href={ __(
-						'https://wordpress.org/support/article/embeds/'
-					) }
-					value={ __( 'Learn more about embeds' ) }
+					href={__('https://wordpress.org/support/article/embeds/')}
+					value={__('Learn more about embeds')}
 				/>
 			),
 			separatorType: 'topFullWidth',
 		},
 	};
 
-	const onDismiss = useCallback( () => {
-		if ( ! isURL( url.current ) && url.current !== '' ) {
-			createErrorNotice( __( 'Invalid URL. Please enter a valid URL.' ) );
+	const onDismiss = useCallback(() => {
+		if (!isURL(url.current) && url.current !== '') {
+			createErrorNotice(__('Invalid URL. Please enter a valid URL.'));
 			// If the URL was already defined, we submit it to stop showing the embed placeholder.
-			onSubmit( value );
+			onSubmit(value);
 			return;
 		}
-		onSubmit( url.current );
-	}, [ onSubmit, value ] );
+		onSubmit(url.current);
+	}, [onSubmit, value]);
 
-	useEffect( () => {
+	useEffect(() => {
 		url.current = value;
-		setInputURL( value );
-	}, [ value ] );
+		setInputURL(value);
+	}, [value]);
 
 	/**
 	 * If the Embed Bottom Sheet component does not utilize a bottom sheet then the onDismiss action is not
 	 * called. Here we are wiring the onDismiss to the onClose callback that gets triggered when input is submitted.
 	 */
-	const performOnCloseOperations = useCallback( () => {
-		if ( onClose ) {
+	const performOnCloseOperations = useCallback(() => {
+		if (onClose) {
 			onClose();
 		}
 
-		if ( ! withBottomSheet ) {
+		if (!withBottomSheet) {
 			onDismiss();
 		}
-	}, [ onClose ] );
+	}, [onClose]);
 
-	const onSetAttributes = useCallback( ( attributes ) => {
+	const onSetAttributes = useCallback((attributes) => {
 		url.current = attributes.url;
-		setInputURL( attributes.url );
-	}, [] );
+		setInputURL(attributes.url);
+	}, []);
 
 	return (
 		<LinkSettingsNavigation
-			isVisible={ isVisible }
-			url={ inputURL }
-			onClose={ performOnCloseOperations }
-			onDismiss={ onDismiss }
-			setAttributes={ onSetAttributes }
-			options={ linkSettingsOptions }
+			isVisible={isVisible}
+			url={inputURL}
+			onClose={performOnCloseOperations}
+			onDismiss={onDismiss}
+			setAttributes={onSetAttributes}
+			options={linkSettingsOptions}
 			testID="embed-edit-url-modal"
-			withBottomSheet={ withBottomSheet }
+			withBottomSheet={withBottomSheet}
 			showIcon
 		/>
 	);

@@ -37,19 +37,18 @@ export const settings = {
 			dropCap: true,
 		},
 	},
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
+	__experimentalLabel(attributes, { context }) {
+		if (context === 'accessibility') {
 			const { content } = attributes;
-			return isEmpty( content ) ? __( 'Empty' ) : content;
+			return isEmpty(content) ? __('Empty') : content;
 		}
 	},
 	transforms,
 	deprecated,
-	merge( attributes, attributesToMerge ) {
+	merge(attributes, attributesToMerge) {
 		return {
 			content:
-				( attributes.content || '' ) +
-				( attributesToMerge.content || '' ),
+				(attributes.content || '') + (attributesToMerge.content || ''),
 		};
 	},
 	edit,

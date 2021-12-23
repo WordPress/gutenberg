@@ -19,18 +19,18 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useHistory } from '../routes';
 import CreateTemplatePartModal from '../create-template-part-modal';
 
-export default function NewTemplatePart( { postType } ) {
+export default function NewTemplatePart({ postType }) {
 	const history = useHistory();
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { getLastEntitySaveError } = useSelect( coreStore );
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const { createErrorNotice } = useDispatch(noticesStore);
+	const { saveEntityRecord } = useDispatch(coreStore);
+	const { getLastEntitySaveError } = useSelect(coreStore);
 
-	async function createTemplatePart( { title, area } ) {
-		if ( ! title ) {
-			createErrorNotice( __( 'Title is not defined.' ), {
+	async function createTemplatePart({ title, area }) {
+		if (!title) {
+			createErrorNotice(__('Title is not defined.'), {
 				type: 'snackbar',
-			} );
+			});
 			return;
 		}
 
@@ -39,7 +39,7 @@ export default function NewTemplatePart( { postType } ) {
 				'postType',
 				'wp_template_part',
 				{
-					slug: kebabCase( title ),
+					slug: kebabCase(title),
 					title,
 					content: '',
 					area,
@@ -51,30 +51,28 @@ export default function NewTemplatePart( { postType } ) {
 				'wp_template_part',
 				templatePart.id
 			);
-			if ( lastEntitySaveError ) {
+			if (lastEntitySaveError) {
 				throw lastEntitySaveError;
 			}
 
-			setIsModalOpen( false );
+			setIsModalOpen(false);
 
 			// Navigate to the created template part editor.
-			history.push( {
+			history.push({
 				postId: templatePart.id,
 				postType: templatePart.type,
-			} );
+			});
 
 			// TODO: Add a success notice?
-		} catch ( error ) {
+		} catch (error) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __(
-							'An error occurred while creating the template part.'
-					  );
+					: __('An error occurred while creating the template part.');
 
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
+			createErrorNotice(errorMessage, { type: 'snackbar' });
 
-			setIsModalOpen( false );
+			setIsModalOpen(false);
 		}
 	}
 
@@ -82,18 +80,18 @@ export default function NewTemplatePart( { postType } ) {
 		<>
 			<Button
 				variant="primary"
-				onClick={ () => {
-					setIsModalOpen( true );
-				} }
+				onClick={() => {
+					setIsModalOpen(true);
+				}}
 			>
-				{ postType.labels.add_new }
+				{postType.labels.add_new}
 			</Button>
-			{ isModalOpen && (
+			{isModalOpen && (
 				<CreateTemplatePartModal
-					closeModal={ () => setIsModalOpen( false ) }
-					onCreate={ createTemplatePart }
+					closeModal={() => setIsModalOpen(false)}
+					onCreate={createTemplatePart}
 				/>
-			) }
+			)}
 		</>
 	);
 }

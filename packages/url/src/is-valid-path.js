@@ -11,9 +11,9 @@
  *
  * @return {boolean} True if the argument contains a valid path
  */
-export function isValidPath( path ) {
-	if ( ! path ) {
+export function isValidPath(path) {
+	if (!path) {
 		return false;
 	}
-	return /^[^\s#?]+$/.test( path );
+	return /^[^\s#?]+$/.test(path);
 }

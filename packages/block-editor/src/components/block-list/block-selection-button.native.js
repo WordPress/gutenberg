@@ -21,76 +21,75 @@ import SubdirectorSVG from './subdirectory-icon';
 import { store as blockEditorStore } from '../../store';
 import styles from './block-selection-button.scss';
 
-const BlockSelectionButton = ( {
+const BlockSelectionButton = ({
 	clientId,
 	rootClientId,
 	rootBlockIcon,
 	isRTL,
-} ) => {
-	const blockInformation = useBlockDisplayInformation( clientId );
+}) => {
+	const blockInformation = useBlockDisplayInformation(clientId);
 	return (
 		<View
-			style={ [
+			style={[
 				styles.selectionButtonContainer,
 				rootClientId && styles.densedPaddingLeft,
-			] }
+			]}
 		>
 			<TouchableOpacity
-				style={ styles.button }
-				onPress={ () => {
+				style={styles.button}
+				onPress={() => {
 					/* Open BottomSheet with markup */
-				} }
+				}}
 				disabled={
 					true
 				} /* Disable temporarily since onPress function is empty */
 			>
-				{ rootClientId &&
+				{rootClientId &&
 					rootBlockIcon && [
 						<Icon
 							key="parent-icon"
-							size={ 24 }
-							icon={ rootBlockIcon.src }
-							fill={ styles.icon.color }
+							size={24}
+							icon={rootBlockIcon.src}
+							fill={styles.icon.color}
 						/>,
-						<View key="subdirectory-icon" style={ styles.arrow }>
+						<View key="subdirectory-icon" style={styles.arrow}>
 							<SubdirectorSVG
-								fill={ styles.arrow.color }
-								isRTL={ isRTL }
+								fill={styles.arrow.color}
+								isRTL={isRTL}
 							/>
 						</View>,
-					] }
-				{ blockInformation?.icon && (
+					]}
+				{blockInformation?.icon && (
 					<BlockIcon
-						size={ 24 }
-						icon={ blockInformation.icon }
-						fill={ styles.icon.color }
+						size={24}
+						icon={blockInformation.icon}
+						fill={styles.icon.color}
 					/>
-				) }
+				)}
 				<Text
-					maxFontSizeMultiplier={ 1.25 }
+					maxFontSizeMultiplier={1.25}
 					ellipsizeMode="tail"
-					numberOfLines={ 1 }
-					style={ styles.selectionButtonTitle }
+					numberOfLines={1}
+					style={styles.selectionButtonTitle}
 				>
-					<BlockTitle clientId={ clientId } />
+					<BlockTitle clientId={clientId} />
 				</Text>
 			</TouchableOpacity>
 		</View>
 	);
 };
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getBlockRootClientId, getBlockName, getSettings } = select(
-			blockEditorStore
-		);
-		const rootClientId = getBlockRootClientId( clientId );
+export default compose([
+	withSelect((select, { clientId }) => {
+		const { getBlockRootClientId, getBlockName, getSettings } =
+			select(blockEditorStore);
+		const rootClientId = getBlockRootClientId(clientId);
 
-		if ( ! rootClientId ) {
+		if (!rootClientId) {
 			return { clientId };
 		}
-		const rootBlockName = getBlockName( rootClientId );
-		const rootBlockType = getBlockType( rootBlockName );
+		const rootBlockName = getBlockName(rootClientId);
+		const rootBlockType = getBlockType(rootBlockName);
 		const rootBlockIcon = rootBlockType ? rootBlockType.icon : {};
 
 		return {
@@ -99,5 +98,5 @@ export default compose( [
 			rootBlockIcon,
 			isRTL: getSettings().isRTL,
 		};
-	} ),
-] )( BlockSelectionButton );
+	}),
+])(BlockSelectionButton);

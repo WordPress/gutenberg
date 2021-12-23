@@ -5,23 +5,23 @@ import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 import { createSlotFill, PanelBody } from '@wordpress/components';
 
-const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
+const { Fill, Slot } = createSlotFill('PluginPostPublishPanel');
 
-const PluginPostPublishPanelFill = ( {
+const PluginPostPublishPanelFill = ({
 	children,
 	className,
 	title,
 	initialOpen = false,
 	icon,
-} ) => (
+}) => (
 	<Fill>
 		<PanelBody
-			className={ className }
-			initialOpen={ initialOpen || ! title }
-			title={ title }
-			icon={ icon }
+			className={className}
+			initialOpen={initialOpen || !title}
+			title={title}
+			icon={icon}
 		>
-			{ children }
+			{children}
 		</PanelBody>
 	</Fill>
 );
@@ -75,12 +75,12 @@ const PluginPostPublishPanelFill = ( {
  */
 
 const PluginPostPublishPanel = compose(
-	withPluginContext( ( context, ownProps ) => {
+	withPluginContext((context, ownProps) => {
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} )
-)( PluginPostPublishPanelFill );
+	})
+)(PluginPostPublishPanelFill);
 
 PluginPostPublishPanel.Slot = Slot;
 

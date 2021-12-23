@@ -11,19 +11,19 @@ import NavigationItem from '../item';
 import NavigationMenu from '../menu';
 
 export function DefaultStory() {
-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+	const [activeItem, setActiveItem] = useState('item-1');
 
 	return (
-		<Navigation activeItem={ activeItem } className="navigation-story">
+		<Navigation activeItem={activeItem} className="navigation-story">
 			<NavigationMenu title="Home">
 				<NavigationItem
 					item="item-1"
-					onClick={ () => setActiveItem( 'item-1' ) }
+					onClick={() => setActiveItem('item-1')}
 					title="Item 1"
 				/>
 				<NavigationItem
 					item="item-2"
-					onClick={ () => setActiveItem( 'item-2' ) }
+					onClick={() => setActiveItem('item-2')}
 					title="Item 2"
 				/>
 				<NavigationItem>
@@ -43,12 +43,12 @@ export function DefaultStory() {
 			<NavigationMenu menu="sub-menu" parentMenu="root" title="Sub-Menu">
 				<NavigationItem
 					item="child-1"
-					onClick={ () => setActiveItem( 'child-1' ) }
+					onClick={() => setActiveItem('child-1')}
 					title="Child 1"
 				/>
 				<NavigationItem
 					item="child-2"
-					onClick={ () => setActiveItem( 'child-2' ) }
+					onClick={() => setActiveItem('child-2')}
 					title="Child 2"
 				/>
 				<NavigationItem
@@ -64,12 +64,12 @@ export function DefaultStory() {
 			>
 				<NavigationItem
 					item="sub-child-1"
-					onClick={ () => setActiveItem( 'sub-child-1' ) }
+					onClick={() => setActiveItem('sub-child-1')}
 					title="Sub-Child 1"
 				/>
 				<NavigationItem
 					item="sub-child-2"
-					onClick={ () => setActiveItem( 'sub-child-2' ) }
+					onClick={() => setActiveItem('sub-child-2')}
 					title="Sub-Child 2"
 				/>
 			</NavigationMenu>

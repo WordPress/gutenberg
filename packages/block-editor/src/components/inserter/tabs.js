@@ -8,34 +8,34 @@ import { __ } from '@wordpress/i18n';
 const blocksTab = {
 	name: 'blocks',
 	/* translators: Blocks tab title in the block inserter. */
-	title: __( 'Blocks' ),
+	title: __('Blocks'),
 };
 const patternsTab = {
 	name: 'patterns',
 	/* translators: Patterns tab title in the block inserter. */
-	title: __( 'Patterns' ),
+	title: __('Patterns'),
 };
 const reusableBlocksTab = {
 	name: 'reusable',
 	/* translators: Reusable blocks tab title in the block inserter. */
-	title: __( 'Reusable' ),
+	title: __('Reusable'),
 };
 
-function InserterTabs( {
+function InserterTabs({
 	children,
 	showPatterns = false,
 	showReusableBlocks = false,
 	onSelect,
-} ) {
-	const tabs = useMemo( () => {
-		const tempTabs = [ blocksTab ];
+}) {
+	const tabs = useMemo(() => {
+		const tempTabs = [blocksTab];
 
-		if ( showPatterns ) {
-			tempTabs.push( patternsTab );
+		if (showPatterns) {
+			tempTabs.push(patternsTab);
 		}
 
-		if ( showReusableBlocks ) {
-			tempTabs.push( reusableBlocksTab );
+		if (showReusableBlocks) {
+			tempTabs.push(reusableBlocksTab);
 		}
 
 		return tempTabs;
@@ -45,15 +45,15 @@ function InserterTabs( {
 		patternsTab,
 		showReusableBlocks,
 		reusableBlocksTab,
-	] );
+	]);
 
 	return (
 		<TabPanel
 			className="block-editor-inserter__tabs"
-			tabs={ tabs }
-			onSelect={ onSelect }
+			tabs={tabs}
+			onSelect={onSelect}
 		>
-			{ children }
+			{children}
 		</TabPanel>
 	);
 }

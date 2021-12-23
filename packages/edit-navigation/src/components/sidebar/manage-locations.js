@@ -21,93 +21,90 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { useMenuLocations } from '../../hooks';
 
-export default function ManageLocations( {
+export default function ManageLocations({
 	menus,
 	selectedMenuId,
 	onSelectMenu,
-} ) {
+}) {
 	const {
 		menuLocations,
 		assignMenuToLocation,
 		toggleMenuLocationAssignment,
 	} = useMenuLocations();
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const openModal = () => setIsModalOpen( true );
-	const closeModal = () => setIsModalOpen( false );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const openModal = () => setIsModalOpen(true);
+	const closeModal = () => setIsModalOpen(false);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch(noticesStore);
 
-	const validateBatchResponse = ( batchResponse ) => {
-		if ( batchResponse.failed ) {
+	const validateBatchResponse = (batchResponse) => {
+		if (batchResponse.failed) {
 			return false;
 		}
 
-		const errorResponses = batchResponse.responses.filter( ( response ) => {
+		const errorResponses = batchResponse.responses.filter((response) => {
 			return 200 > response.status || 300 <= response.status;
-		} );
+		});
 
 		return 1 > errorResponses.length;
 	};
 
 	const handleUpdateMenuLocations = async () => {
 		const method = 'POST';
-		const batchRequests = menus.map( ( { id } ) => {
+		const batchRequests = menus.map(({ id }) => {
 			const locations = menuLocations
-				.filter( ( menuLocation ) => menuLocation.menu === id )
-				.map( ( menuLocation ) => menuLocation.name );
+				.filter((menuLocation) => menuLocation.menu === id)
+				.map((menuLocation) => menuLocation.name);
 
 			return {
-				path: `/wp/v2/menus/${ id }`,
+				path: `/wp/v2/menus/${id}`,
 				body: {
 					locations,
 				},
 				method,
 			};
-		} );
+		});
 
-		const batchResponse = await apiFetch( {
+		const batchResponse = await apiFetch({
 			path: 'batch/v1',
 			data: {
 				validation: 'require-all-validate',
 				requests: batchRequests,
 			},
 			method,
-		} );
+		});
 
-		const isSuccess = validateBatchResponse( batchResponse );
+		const isSuccess = validateBatchResponse(batchResponse);
 
-		if ( isSuccess ) {
-			createSuccessNotice( __( 'Menu locations have been updated.' ), {
+		if (isSuccess) {
+			createSuccessNotice(__('Menu locations have been updated.'), {
 				type: 'snackbar',
-			} );
+			});
 			closeModal();
 			return;
 		}
 
 		createErrorNotice(
-			__( 'An error occurred while trying to update menu locations.' ),
+			__('An error occurred while trying to update menu locations.'),
 			{ type: 'snackbar' }
 		);
 	};
 
-	if ( ! menuLocations || ! menus?.length ) {
+	if (!menuLocations || !menus?.length) {
 		return <Spinner />;
 	}
 
-	if ( ! menuLocations.length ) {
+	if (!menuLocations.length) {
 		return (
-			<PanelBody title={ __( 'Theme locations' ) }>
-				<p>{ __( 'There are no available menu locations.' ) }</p>
+			<PanelBody title={__('Theme locations')}>
+				<p>{__('There are no available menu locations.')}</p>
 			</PanelBody>
 		);
 	}
 
 	const themeLocationCountTextMain = sprintf(
 		// translators: Number of available theme locations.
-		__(
-			'Your current theme provides %d different locations to place menu.'
-		),
+		__('Your current theme provides %d different locations to place menu.'),
 		menuLocations.length
 	);
 
@@ -120,29 +117,29 @@ export default function ManageLocations( {
 	);
 
 	const menusWithSelection = menuLocations.map(
-		( { name, description, menu } ) => {
+		({ name, description, menu }) => {
 			const menuOnLocation = menus
-				.filter( ( { id } ) => ! [ 0, selectedMenuId ].includes( id ) )
-				.find( ( { id } ) => id === menu );
+				.filter(({ id }) => ![0, selectedMenuId].includes(id))
+				.find(({ id }) => id === menu);
 
 			return (
 				<li
-					key={ name }
+					key={name}
 					className="edit-navigation-manage-locations__checklist-item"
 				>
 					<CheckboxControl
 						className="edit-navigation-manage-locations__menu-location-checkbox"
-						checked={ menu === selectedMenuId }
-						onChange={ () =>
-							toggleMenuLocationAssignment( name, selectedMenuId )
+						checked={menu === selectedMenuId}
+						onChange={() =>
+							toggleMenuLocationAssignment(name, selectedMenuId)
 						}
-						label={ description }
+						label={description}
 						help={
 							menuOnLocation &&
 							sprintf(
 								// translators: menu name.
-								__( 'Currently using %s' ),
-								decodeEntities( menuOnLocation.name )
+								__('Currently using %s'),
+								decodeEntities(menuOnLocation.name)
 							)
 						}
 					/>
@@ -151,79 +148,77 @@ export default function ManageLocations( {
 		}
 	);
 
-	const menuLocationCard = menuLocations.map( ( menuLocation ) => (
+	const menuLocationCard = menuLocations.map((menuLocation) => (
 		<div
-			key={ menuLocation.name }
+			key={menuLocation.name}
 			className="edit-navigation-manage-locations__menu-entry"
 		>
 			<SelectControl
-				key={ menuLocation.name }
+				key={menuLocation.name}
 				className="edit-navigation-manage-locations__select-menu"
-				label={ menuLocation.description }
+				label={menuLocation.description}
 				labelPosition="top"
-				value={ decodeEntities( menuLocation.menu ) }
-				options={ [
-					{ value: 0, label: __( 'Select a Menu' ), key: 0 },
-					...menus.map( ( { id, name } ) => ( {
+				value={decodeEntities(menuLocation.menu)}
+				options={[
+					{ value: 0, label: __('Select a Menu'), key: 0 },
+					...menus.map(({ id, name }) => ({
 						key: id,
 						value: id,
-						label: decodeEntities( name ),
-					} ) ),
-				] }
-				onChange={ ( menuId ) => {
-					assignMenuToLocation( menuLocation.name, Number( menuId ) );
-				} }
+						label: decodeEntities(name),
+					})),
+				]}
+				onChange={(menuId) => {
+					assignMenuToLocation(menuLocation.name, Number(menuId));
+				}}
 			/>
 			<Button
 				variant="secondary"
-				style={ {
-					visibility: !! menuLocation.menu ? 'visible' : 'hidden',
-				} }
+				style={{
+					visibility: !!menuLocation.menu ? 'visible' : 'hidden',
+				}}
 				className="edit-navigation-manage-locations__edit-button"
-				onClick={ () => (
-					closeModal(), onSelectMenu( menuLocation.menu )
-				) }
+				onClick={() => (closeModal(), onSelectMenu(menuLocation.menu))}
 			>
-				{ __( 'Edit' ) }
+				{__('Edit')}
 			</Button>
 		</div>
-	) );
+	));
 
 	return (
-		<PanelBody title={ __( 'Theme locations' ) }>
+		<PanelBody title={__('Theme locations')}>
 			<div className="edit-navigation-manage-locations__theme-location-text-main">
-				{ themeLocationCountTextMain }
+				{themeLocationCountTextMain}
 			</div>
 			<ul className="edit-navigation-manage-locations__checklist">
-				{ menusWithSelection }
+				{menusWithSelection}
 			</ul>
 			<Button
 				variant="secondary"
 				className="edit-navigation-manage-locations__open-menu-locations-modal-button"
-				aria-expanded={ isModalOpen }
-				onClick={ openModal }
+				aria-expanded={isModalOpen}
+				onClick={openModal}
 			>
-				{ __( 'Manage locations' ) }
+				{__('Manage locations')}
 			</Button>
-			{ isModalOpen && (
+			{isModalOpen && (
 				<Modal
 					className="edit-navigation-manage-locations__modal"
-					title={ __( 'Manage locations' ) }
-					onRequestClose={ closeModal }
+					title={__('Manage locations')}
+					onRequestClose={closeModal}
 				>
 					<div className="edit-navigation-manage-locations__theme-location-text-modal">
-						{ themeLocationCountTextModal }
+						{themeLocationCountTextModal}
 					</div>
-					{ menuLocationCard }
+					{menuLocationCard}
 					<Button
 						className="edit-navigation-manage-locations__save-button"
 						variant="primary"
-						onClick={ handleUpdateMenuLocations }
+						onClick={handleUpdateMenuLocations}
 					>
-						{ __( 'Update' ) }
+						{__('Update')}
 					</Button>
 				</Modal>
-			) }
+			)}
 		</PanelBody>
 	);
 }

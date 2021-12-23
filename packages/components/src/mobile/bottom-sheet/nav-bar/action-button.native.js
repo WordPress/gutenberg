@@ -9,20 +9,20 @@ import { View, TouchableWithoutFeedback } from 'react-native';
 import styles from './styles.scss';
 
 // Action button component is used by both Back and Apply Button componenets.
-function ActionButton( {
+function ActionButton({
 	onPress,
 	accessibilityLabel,
 	accessibilityHint,
 	children,
-} ) {
+}) {
 	return (
 		<TouchableWithoutFeedback
-			onPress={ onPress }
-			accessibilityRole={ 'button' }
-			accessibilityLabel={ accessibilityLabel }
-			accessibilityHint={ accessibilityHint }
+			onPress={onPress}
+			accessibilityRole={'button'}
+			accessibilityLabel={accessibilityLabel}
+			accessibilityHint={accessibilityHint}
 		>
-			<View style={ styles[ 'action-button' ] }>{ children }</View>
+			<View style={styles['action-button']}>{children}</View>
 		</TouchableWithoutFeedback>
 	);
 }

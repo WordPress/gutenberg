@@ -11,10 +11,10 @@ import { sumBy, merge, mapValues } from 'lodash';
  *
  * @return {number} Value rounded to standard precision.
  */
-export const toWidthPrecision = ( value ) => {
-	const unitlessValue = parseFloat( value );
-	return Number.isFinite( unitlessValue )
-		? parseFloat( unitlessValue.toFixed( 2 ) )
+export const toWidthPrecision = (value) => {
+	const unitlessValue = parseFloat(value);
+	return Number.isFinite(unitlessValue)
+		? parseFloat(unitlessValue.toFixed(2))
 		: undefined;
 };
 /**
@@ -26,9 +26,9 @@ export const toWidthPrecision = ( value ) => {
  *
  * @return {number} Effective column width.
  */
-export function getEffectiveColumnWidth( block, totalBlockCount ) {
+export function getEffectiveColumnWidth(block, totalBlockCount) {
 	const { width = 100 / totalBlockCount } = block.attributes;
-	return toWidthPrecision( width );
+	return toWidthPrecision(width);
 }
 
 /**
@@ -40,12 +40,9 @@ export function getEffectiveColumnWidth( block, totalBlockCount ) {
  *
  * @return {number} Total width occupied by blocks.
  */
-export function getTotalColumnsWidth(
-	blocks,
-	totalBlockCount = blocks.length
-) {
-	return sumBy( blocks, ( block ) =>
-		getEffectiveColumnWidth( block, totalBlockCount )
+export function getTotalColumnsWidth(blocks, totalBlockCount = blocks.length) {
+	return sumBy(blocks, (block) =>
+		getEffectiveColumnWidth(block, totalBlockCount)
 	);
 }
 
@@ -58,11 +55,11 @@ export function getTotalColumnsWidth(
  *
  * @return {Object<string,number>} Column widths.
  */
-export function getColumnWidths( blocks, totalBlockCount = blocks.length ) {
-	return blocks.reduce( ( accumulator, block ) => {
-		const width = getEffectiveColumnWidth( block, totalBlockCount );
-		return Object.assign( accumulator, { [ block.clientId ]: width } );
-	}, {} );
+export function getColumnWidths(blocks, totalBlockCount = blocks.length) {
+	return blocks.reduce((accumulator, block) => {
+		const width = getEffectiveColumnWidth(block, totalBlockCount);
+		return Object.assign(accumulator, { [block.clientId]: width });
+	}, {});
 }
 
 /**
@@ -82,12 +79,12 @@ export function getRedistributedColumnWidths(
 	availableWidth,
 	totalBlockCount = blocks.length
 ) {
-	const totalWidth = getTotalColumnsWidth( blocks, totalBlockCount );
+	const totalWidth = getTotalColumnsWidth(blocks, totalBlockCount);
 
-	return mapValues( getColumnWidths( blocks, totalBlockCount ), ( width ) => {
-		const newWidth = ( availableWidth * width ) / totalWidth;
-		return toWidthPrecision( newWidth );
-	} );
+	return mapValues(getColumnWidths(blocks, totalBlockCount), (width) => {
+		const newWidth = (availableWidth * width) / totalWidth;
+		return toWidthPrecision(newWidth);
+	});
 }
 
 /**
@@ -98,15 +95,13 @@ export function getRedistributedColumnWidths(
  *
  * @return {boolean} Whether columns have explicit widths.
  */
-export function hasExplicitPercentColumnWidths( blocks ) {
-	return blocks.every( ( block ) => {
+export function hasExplicitPercentColumnWidths(blocks) {
+	return blocks.every((block) => {
 		const blockWidth = block.attributes.width;
 		return Number.isFinite(
-			blockWidth?.endsWith?.( '%' )
-				? parseFloat( blockWidth )
-				: blockWidth
+			blockWidth?.endsWith?.('%') ? parseFloat(blockWidth) : blockWidth
 		);
-	} );
+	});
 }
 
 /**
@@ -118,13 +113,13 @@ export function hasExplicitPercentColumnWidths( blocks ) {
  *
  * @return {WPBlock[]} blocks Mapped block objects.
  */
-export function getMappedColumnWidths( blocks, widths ) {
-	return blocks.map( ( block ) =>
-		merge( {}, block, {
+export function getMappedColumnWidths(blocks, widths) {
+	return blocks.map((block) =>
+		merge({}, block, {
 			attributes: {
-				width: `${ widths[ block.clientId ] }%`,
+				width: `${widths[block.clientId]}%`,
 			},
-		} )
+		})
 	);
 }
 
@@ -136,13 +131,13 @@ export function getMappedColumnWidths( blocks, widths ) {
  *
  * @return {Array<number,string>} Column widths.
  */
-export function getWidths( blocks, withParsing = true ) {
-	return blocks.map( ( innerColumn ) => {
+export function getWidths(blocks, withParsing = true) {
+	return blocks.map((innerColumn) => {
 		const innerColumnWidth =
 			innerColumn.attributes.width || 100 / blocks.length;
 
-		return withParsing ? parseFloat( innerColumnWidth ) : innerColumnWidth;
-	} );
+		return withParsing ? parseFloat(innerColumnWidth) : innerColumnWidth;
+	});
 }
 
 /**
@@ -153,14 +148,14 @@ export function getWidths( blocks, withParsing = true ) {
  *
  * @return {string} Column width with unit.
  */
-export function getWidthWithUnit( width, unit ) {
-	width = 0 > parseFloat( width ) ? '0' : width;
+export function getWidthWithUnit(width, unit) {
+	width = 0 > parseFloat(width) ? '0' : width;
 
-	if ( isPercentageUnit( unit ) ) {
-		width = Math.min( width, 100 );
+	if (isPercentageUnit(unit)) {
+		width = Math.min(width, 100);
 	}
 
-	return `${ width }${ unit }`;
+	return `${width}${unit}`;
 }
 
 /**
@@ -170,6 +165,6 @@ export function getWidthWithUnit( width, unit ) {
  *
  * @return {boolean} 	Whether unit is '%'.
  */
-export function isPercentageUnit( unit ) {
+export function isPercentageUnit(unit) {
 	return unit === '%';
 }

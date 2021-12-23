@@ -15,16 +15,16 @@ import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import ltrStyles from '../style-ltr.lazy.scss';
 import rtlStyles from '../style-rtl.lazy.scss';
 
-export const WithRTL = ( Story, context ) => {
+export const WithRTL = (Story, context) => {
 	const ref = useRef();
 
-	useEffect( () => {
+	useEffect(() => {
 		// Override the return value of i18n.isRTL()
 		addFilter(
 			'i18n.gettext_with_context',
 			'storybook',
-			( translation, text, _context ) => {
-				if ( text === 'ltr' && _context === 'text direction' ) {
+			(translation, text, _context) => {
+				if (text === 'ltr' && _context === 'text direction') {
 					return context.globals.direction;
 				}
 				return translation;
@@ -38,11 +38,11 @@ export const WithRTL = ( Story, context ) => {
 
 		forceReRender();
 
-		return () => removeFilter( 'i18n.gettext_with_context', 'storybook' );
-	}, [ context.globals.direction ] );
+		return () => removeFilter('i18n.gettext_with_context', 'storybook');
+	}, [context.globals.direction]);
 
-	useLayoutEffect( () => {
-		if ( context.globals.direction === 'rtl' ) {
+	useLayoutEffect(() => {
+		if (context.globals.direction === 'rtl') {
 			rtlStyles.use();
 		} else {
 			ltrStyles.use();
@@ -52,11 +52,11 @@ export const WithRTL = ( Story, context ) => {
 			ltrStyles.unuse();
 			rtlStyles.unuse();
 		};
-	}, [ context.globals.direction ] );
+	}, [context.globals.direction]);
 
 	return (
-		<div ref={ ref }>
-			<Story { ...context } />
+		<div ref={ref}>
+			<Story {...context} />
 		</div>
 	);
 };

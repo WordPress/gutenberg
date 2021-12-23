@@ -26,9 +26,9 @@ const DropdownAndDropdownMenuExample = () => {
 			<div>
 				<p>This is a DropdownMenu component:</p>
 				<DropdownMenu
-					icon={ more }
+					icon={more}
 					label="Select a direction"
-					controls={ [
+					controls={[
 						{
 							title: 'Up',
 							icon: arrowUp,
@@ -45,7 +45,7 @@ const DropdownAndDropdownMenuExample = () => {
 							title: 'Left',
 							icon: arrowLeft,
 						},
-					] }
+					]}
 				/>
 			</div>
 			<div>
@@ -54,22 +54,22 @@ const DropdownAndDropdownMenuExample = () => {
 					className="my-container-class-name"
 					contentClassName="my-popover-content-classname"
 					position="bottom right"
-					renderToggle={ ( { isOpen, onToggle } ) => (
+					renderToggle={({ isOpen, onToggle }) => (
 						<Button
-							icon={ more }
-							onClick={ onToggle }
-							aria-expanded={ isOpen }
+							icon={more}
+							onClick={onToggle}
+							aria-expanded={isOpen}
 							label="Select a direction"
 						/>
-					) }
-					renderContent={ () => (
+					)}
+					renderContent={() => (
 						<MenuGroup>
-							<MenuItem icon={ arrowUp }>Up</MenuItem>
-							<MenuItem icon={ arrowDown }>Down</MenuItem>
-							<MenuItem icon={ arrowLeft }>Left</MenuItem>
-							<MenuItem icon={ arrowRight }>Right</MenuItem>
+							<MenuItem icon={arrowUp}>Up</MenuItem>
+							<MenuItem icon={arrowDown}>Down</MenuItem>
+							<MenuItem icon={arrowLeft}>Left</MenuItem>
+							<MenuItem icon={arrowRight}>Right</MenuItem>
 						</MenuGroup>
-					) }
+					)}
 				/>
 			</div>
 		</>

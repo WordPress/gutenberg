@@ -10,20 +10,20 @@ import { addWidgetIdToBlock } from '@wordpress/widgets';
  * @param {Object} widget The widget entity record.
  * @return {Object} a block (converted from the entity record).
  */
-export function transformWidgetToBlock( widget ) {
-	if ( widget.id_base === 'block' ) {
-		const parsedBlocks = parse( widget.instance.raw.content );
-		if ( ! parsedBlocks.length ) {
+export function transformWidgetToBlock(widget) {
+	if (widget.id_base === 'block') {
+		const parsedBlocks = parse(widget.instance.raw.content);
+		if (!parsedBlocks.length) {
 			return addWidgetIdToBlock(
-				createBlock( 'core/paragraph', {}, [] ),
+				createBlock('core/paragraph', {}, []),
 				widget.id
 			);
 		}
-		return addWidgetIdToBlock( parsedBlocks[ 0 ], widget.id );
+		return addWidgetIdToBlock(parsedBlocks[0], widget.id);
 	}
 
 	let attributes;
-	if ( widget._embedded.about[ 0 ].is_multi ) {
+	if (widget._embedded.about[0].is_multi) {
 		attributes = {
 			idBase: widget.id_base,
 			instance: widget.instance,
@@ -35,7 +35,7 @@ export function transformWidgetToBlock( widget ) {
 	}
 
 	return addWidgetIdToBlock(
-		createBlock( 'core/legacy-widget', attributes, [] ),
+		createBlock('core/legacy-widget', attributes, []),
 		widget.id
 	);
 }
@@ -47,14 +47,14 @@ export function transformWidgetToBlock( widget ) {
  * @param {Object?} relatedWidget A related widget entity record from the API (optional).
  * @return {Object} the widget object (converted from block).
  */
-export function transformBlockToWidget( block, relatedWidget = {} ) {
+export function transformBlockToWidget(block, relatedWidget = {}) {
 	let widget;
 
 	const isValidLegacyWidgetBlock =
 		block.name === 'core/legacy-widget' &&
-		( block.attributes.id || block.attributes.instance );
+		(block.attributes.id || block.attributes.instance);
 
-	if ( isValidLegacyWidgetBlock ) {
+	if (isValidLegacyWidgetBlock) {
 		widget = {
 			...relatedWidget,
 			id: block.attributes.id ?? relatedWidget.id,
@@ -67,7 +67,7 @@ export function transformBlockToWidget( block, relatedWidget = {} ) {
 			id_base: 'block',
 			instance: {
 				raw: {
-					content: serialize( block ),
+					content: serialize(block),
 				},
 			},
 		};

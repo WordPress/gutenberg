@@ -5,26 +5,26 @@ import { __experimentalUnitControl as UnitControl } from '@wordpress/components'
 import { __ } from '@wordpress/i18n';
 
 const CORNERS = {
-	topLeft: __( 'Top left' ),
-	topRight: __( 'Top right' ),
-	bottomLeft: __( 'Bottom left' ),
-	bottomRight: __( 'Bottom right' ),
+	topLeft: __('Top left'),
+	topRight: __('Top right'),
+	bottomLeft: __('Bottom left'),
+	bottomRight: __('Bottom right'),
 };
 
-export default function BoxInputControls( {
+export default function BoxInputControls({
 	onChange,
 	values: valuesProp,
 	...props
-} ) {
-	const createHandleOnChange = ( corner ) => ( next ) => {
-		if ( ! onChange ) {
+}) {
+	const createHandleOnChange = (corner) => (next) => {
+		if (!onChange) {
 			return;
 		}
 
-		onChange( {
+		onChange({
 			...values,
-			[ corner ]: next ? next : undefined,
-		} );
+			[corner]: next ? next : undefined,
+		});
 	};
 
 	// For shorthand style & backwards compatibility, handle flat string value.
@@ -41,15 +41,15 @@ export default function BoxInputControls( {
 	// Controls are wrapped in tooltips as visible labels aren't desired here.
 	return (
 		<div className="components-border-radius-control__input-controls-wrapper">
-			{ Object.entries( CORNERS ).map( ( [ key, label ] ) => (
+			{Object.entries(CORNERS).map(([key, label]) => (
 				<UnitControl
-					{ ...props }
-					key={ key }
-					aria-label={ label }
-					value={ values[ key ] }
-					onChange={ createHandleOnChange( key ) }
+					{...props}
+					key={key}
+					aria-label={label}
+					value={values[key]}
+					onChange={createHandleOnChange(key)}
 				/>
-			) ) }
+			))}
 		</div>
 	);
 }

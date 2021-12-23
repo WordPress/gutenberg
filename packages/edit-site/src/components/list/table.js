@@ -16,42 +16,39 @@ import Link from '../routes/link';
 import Actions from './actions';
 import AddedBy from './added-by';
 
-export default function Table( { templateType } ) {
+export default function Table({ templateType }) {
 	const { templates, isLoading, postType } = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				hasFinishedResolution,
-				getPostType,
-			} = select( coreStore );
+		(select) => {
+			const { getEntityRecords, hasFinishedResolution, getPostType } =
+				select(coreStore);
 
 			return {
-				templates: getEntityRecords( 'postType', templateType, {
+				templates: getEntityRecords('postType', templateType, {
 					per_page: -1,
-				} ),
-				isLoading: ! hasFinishedResolution( 'getEntityRecords', [
+				}),
+				isLoading: !hasFinishedResolution('getEntityRecords', [
 					'postType',
 					templateType,
 					{ per_page: -1 },
-				] ),
-				postType: getPostType( templateType ),
+				]),
+				postType: getPostType(templateType),
 			};
 		},
-		[ templateType ]
+		[templateType]
 	);
 
-	if ( ! templates || isLoading ) {
+	if (!templates || isLoading) {
 		return null;
 	}
 
-	if ( ! templates.length ) {
+	if (!templates.length) {
 		return (
 			<div>
-				{ sprintf(
+				{sprintf(
 					// translators: The template type name, should be either "templates" or "template parts".
-					__( 'No %s found.' ),
+					__('No %s found.'),
 					postType?.labels?.name?.toLowerCase()
-				) }
+				)}
 			</div>
 		);
 	}
@@ -66,56 +63,55 @@ export default function Table( { templateType } ) {
 						className="edit-site-list-table-column"
 						role="columnheader"
 					>
-						{ __( 'Template' ) }
+						{__('Template')}
 					</th>
 					<th
 						className="edit-site-list-table-column"
 						role="columnheader"
 					>
-						{ __( 'Added by' ) }
+						{__('Added by')}
 					</th>
 					<th
 						className="edit-site-list-table-column"
 						role="columnheader"
 					>
-						<VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>
+						<VisuallyHidden>{__('Actions')}</VisuallyHidden>
 					</th>
 				</tr>
 			</thead>
 
 			<tbody>
-				{ templates.map( ( template ) => (
+				{templates.map((template) => (
 					<tr
-						key={ template.id }
+						key={template.id}
 						className="edit-site-list-table-row"
 						role="row"
 					>
 						<td className="edit-site-list-table-column" role="cell">
-							<Heading level={ 4 }>
+							<Heading level={4}>
 								<Link
-									params={ {
+									params={{
 										postId: template.id,
 										postType: template.type,
-									} }
+									}}
 								>
-									{ template.title?.rendered ||
-										template.slug }
+									{template.title?.rendered || template.slug}
 								</Link>
 							</Heading>
-							{ template.description }
+							{template.description}
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
 							<AddedBy
-								templateType={ templateType }
-								template={ template }
+								templateType={templateType}
+								template={template}
 							/>
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
-							<Actions template={ template } />
+							<Actions template={template} />
 						</td>
 					</tr>
-				) ) }
+				))}
 			</tbody>
 		</table>
 	);

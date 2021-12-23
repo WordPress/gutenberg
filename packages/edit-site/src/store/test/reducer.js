@@ -25,78 +25,78 @@ import {
 	setIsListViewOpened,
 } from '../actions';
 
-describe( 'state', () => {
-	describe( 'preferences()', () => {
-		it( 'should apply all defaults', () => {
-			const state = preferences( undefined, {} );
+describe('state', () => {
+	describe('preferences()', () => {
+		it('should apply all defaults', () => {
+			const state = preferences(undefined, {});
 
-			expect( state ).toEqual( PREFERENCES_DEFAULTS );
-		} );
+			expect(state).toEqual(PREFERENCES_DEFAULTS);
+		});
 
-		it( 'should toggle a feature flag', () => {
+		it('should toggle a feature flag', () => {
 			const state = preferences(
-				deepFreeze( { features: { chicken: true } } ),
+				deepFreeze({ features: { chicken: true } }),
 				{
 					type: 'TOGGLE_FEATURE',
 					feature: 'chicken',
 				}
 			);
 
-			expect( state.features ).toEqual( { chicken: false } );
-		} );
-	} );
+			expect(state.features).toEqual({ chicken: false });
+		});
+	});
 
-	describe( 'settings()', () => {
-		it( 'should apply default state', () => {
-			expect( settings( undefined, {} ) ).toEqual( {} );
-		} );
+	describe('settings()', () => {
+		it('should apply default state', () => {
+			expect(settings(undefined, {})).toEqual({});
+		});
 
-		it( 'should default to returning the same state', () => {
+		it('should default to returning the same state', () => {
 			const state = {};
-			expect( settings( state, {} ) ).toBe( state );
-		} );
+			expect(settings(state, {})).toBe(state);
+		});
 
-		it( 'should update settings with a shallow merge', () => {
+		it('should update settings with a shallow merge', () => {
 			expect(
 				settings(
-					deepFreeze( {
+					deepFreeze({
 						setting: { key: 'value' },
 						otherSetting: 'value',
-					} ),
+					}),
 					{
 						type: 'UPDATE_SETTINGS',
 						settings: { setting: { newKey: 'newValue' } },
 					}
 				)
-			).toEqual( {
+			).toEqual({
 				setting: { newKey: 'newValue' },
 				otherSetting: 'value',
-			} );
-		} );
-	} );
+			});
+		});
+	});
 
-	describe( 'homeTemplateId()', () => {
-		it( 'should apply default state', () => {
-			expect( homeTemplateId( undefined, {} ) ).toEqual( undefined );
-		} );
+	describe('homeTemplateId()', () => {
+		it('should apply default state', () => {
+			expect(homeTemplateId(undefined, {})).toEqual(undefined);
+		});
 
-		it( 'should default to returning the same state', () => {
+		it('should default to returning the same state', () => {
 			const state = {};
-			expect( homeTemplateId( state, {} ) ).toBe( state );
-		} );
-	} );
+			expect(homeTemplateId(state, {})).toBe(state);
+		});
+	});
 
-	describe( 'editedPost()', () => {
-		it( 'should apply default state', () => {
-			expect( editedPost( undefined, {} ) ).toEqual( {} );
-		} );
+	describe('editedPost()', () => {
+		it('should apply default state', () => {
+			expect(editedPost(undefined, {})).toEqual({});
+		});
 
-		it( 'should default to returning the same state', () => {
+		it('should default to returning the same state', () => {
 			const state = [];
-			expect( editedPost( state, {} ) ).toBe( state );
-		} );
+			expect(editedPost(state, {})).toBe(state);
+		});
 
-		it( 'should update when a template is set', () => {
+		it('should update when a template is set', () => {
 			expect(
 				editedPost(
 					{ id: 1, type: 'wp_template' },
@@ -105,10 +105,10 @@ describe( 'state', () => {
 						templateId: 2,
 					}
 				)
-			).toEqual( { id: 2, type: 'wp_template' } );
-		} );
+			).toEqual({ id: 2, type: 'wp_template' });
+		});
 
-		it( 'should update when a page is set', () => {
+		it('should update when a page is set', () => {
 			expect(
 				editedPost(
 					{ id: 1, type: 'wp_template' },
@@ -118,10 +118,10 @@ describe( 'state', () => {
 						page: {},
 					}
 				)
-			).toEqual( { id: 2, type: 'wp_template', page: {} } );
-		} );
+			).toEqual({ id: 2, type: 'wp_template', page: {} });
+		});
 
-		it( 'should update when a template part is set', () => {
+		it('should update when a template part is set', () => {
 			expect(
 				editedPost(
 					{ id: 1, type: 'wp_template' },
@@ -130,215 +130,203 @@ describe( 'state', () => {
 						templatePartId: 2,
 					}
 				)
-			).toEqual( { id: 2, type: 'wp_template_part' } );
-		} );
-	} );
+			).toEqual({ id: 2, type: 'wp_template_part' });
+		});
+	});
 
-	describe( 'navigationPanel()', () => {
-		it( 'should apply default state', () => {
-			expect( navigationPanel( undefined, {} ) ).toEqual( {
+	describe('navigationPanel()', () => {
+		it('should apply default state', () => {
+			expect(navigationPanel(undefined, {})).toEqual({
 				menu: 'root',
 				isOpen: false,
-			} );
-		} );
+			});
+		});
 
-		it( 'should default to returning the same state', () => {
+		it('should default to returning the same state', () => {
 			const state = { test: 1 };
-			expect( navigationPanel( state, {} ) ).toBe( state );
-		} );
+			expect(navigationPanel(state, {})).toBe(state);
+		});
 
-		it( 'should set the active navigation panel', () => {
+		it('should set the active navigation panel', () => {
 			expect(
 				navigationPanel(
 					undefined,
-					setNavigationPanelActiveMenu( 'test-menu' )
+					setNavigationPanelActiveMenu('test-menu')
 				)
-			).toEqual( {
+			).toEqual({
 				isOpen: false,
 				menu: 'test-menu',
-			} );
-		} );
+			});
+		});
 
-		it( 'should be able to open the navigation panel to a menu', () => {
+		it('should be able to open the navigation panel to a menu', () => {
 			expect(
 				navigationPanel(
 					undefined,
-					openNavigationPanelToMenu( 'test-menu' )
+					openNavigationPanelToMenu('test-menu')
 				)
-			).toEqual( {
+			).toEqual({
 				isOpen: true,
 				menu: 'test-menu',
-			} );
-		} );
+			});
+		});
 
-		it( 'should be able to open the navigation panel', () => {
+		it('should be able to open the navigation panel', () => {
 			expect(
-				navigationPanel( undefined, setIsNavigationPanelOpened( true ) )
-			).toEqual( {
+				navigationPanel(undefined, setIsNavigationPanelOpened(true))
+			).toEqual({
 				isOpen: true,
 				menu: 'root',
-			} );
-		} );
+			});
+		});
 
-		it( 'should change the menu to root when closing the panel', () => {
+		it('should change the menu to root when closing the panel', () => {
 			const state = navigationPanel(
 				undefined,
-				openNavigationPanelToMenu( 'test-menu' )
+				openNavigationPanelToMenu('test-menu')
 			);
 
-			expect( state.menu ).toEqual( 'test-menu' );
+			expect(state.menu).toEqual('test-menu');
 			expect(
-				navigationPanel( state, setIsNavigationPanelOpened( false ) )
-			).toEqual( {
+				navigationPanel(state, setIsNavigationPanelOpened(false))
+			).toEqual({
 				isOpen: false,
 				menu: 'root',
-			} );
-		} );
+			});
+		});
 
-		it( 'should close the navigation panel when opening the inserter and change the menu to root', () => {
+		it('should close the navigation panel when opening the inserter and change the menu to root', () => {
 			const state = navigationPanel(
 				undefined,
-				openNavigationPanelToMenu( 'test-menu' )
+				openNavigationPanelToMenu('test-menu')
 			);
 
-			expect( state.menu ).toEqual( 'test-menu' );
-			expect(
-				navigationPanel( state, setIsInserterOpened( true ) )
-			).toEqual( {
+			expect(state.menu).toEqual('test-menu');
+			expect(navigationPanel(state, setIsInserterOpened(true))).toEqual({
 				isOpen: false,
 				menu: 'root',
-			} );
-		} );
+			});
+		});
 
-		it( 'should close the navigation panel when opening the list view and change the menu to root', () => {
+		it('should close the navigation panel when opening the list view and change the menu to root', () => {
 			const state = navigationPanel(
 				undefined,
-				openNavigationPanelToMenu( 'test-menu' )
+				openNavigationPanelToMenu('test-menu')
 			);
 
-			expect( state.menu ).toEqual( 'test-menu' );
-			expect(
-				navigationPanel( state, setIsListViewOpened( true ) )
-			).toEqual( {
+			expect(state.menu).toEqual('test-menu');
+			expect(navigationPanel(state, setIsListViewOpened(true))).toEqual({
 				isOpen: false,
 				menu: 'root',
-			} );
-		} );
+			});
+		});
 
-		it( 'should not change the state when closing the inserter', () => {
+		it('should not change the state when closing the inserter', () => {
 			const state = navigationPanel(
 				undefined,
-				openNavigationPanelToMenu( 'test-menu' )
+				openNavigationPanelToMenu('test-menu')
 			);
 
-			expect( state.menu ).toEqual( 'test-menu' );
-			expect(
-				navigationPanel( state, setIsInserterOpened( false ) )
-			).toEqual( state );
-		} );
+			expect(state.menu).toEqual('test-menu');
+			expect(navigationPanel(state, setIsInserterOpened(false))).toEqual(
+				state
+			);
+		});
 
-		it( 'should not change the state when closing the list view', () => {
+		it('should not change the state when closing the list view', () => {
 			const state = navigationPanel(
 				undefined,
-				openNavigationPanelToMenu( 'test-menu' )
+				openNavigationPanelToMenu('test-menu')
 			);
 
-			expect( state.menu ).toEqual( 'test-menu' );
-			expect(
-				navigationPanel( state, setIsListViewOpened( false ) )
-			).toEqual( state );
-		} );
-	} );
+			expect(state.menu).toEqual('test-menu');
+			expect(navigationPanel(state, setIsListViewOpened(false))).toEqual(
+				state
+			);
+		});
+	});
 
-	describe( 'blockInserterPanel()', () => {
-		it( 'should apply default state', () => {
-			expect( blockInserterPanel( undefined, {} ) ).toEqual( false );
-		} );
+	describe('blockInserterPanel()', () => {
+		it('should apply default state', () => {
+			expect(blockInserterPanel(undefined, {})).toEqual(false);
+		});
 
-		it( 'should default to returning the same state', () => {
-			expect( blockInserterPanel( true, {} ) ).toBe( true );
-		} );
+		it('should default to returning the same state', () => {
+			expect(blockInserterPanel(true, {})).toBe(true);
+		});
 
-		it( 'should set the open state of the inserter panel', () => {
-			expect(
-				blockInserterPanel( false, setIsInserterOpened( true ) )
-			).toBe( true );
-			expect(
-				blockInserterPanel( true, setIsInserterOpened( false ) )
-			).toBe( false );
-		} );
-
-		it( 'should close the inserter when opening the nav panel', () => {
-			expect(
-				blockInserterPanel( true, openNavigationPanelToMenu( 'noop' ) )
-			).toBe( false );
-			expect(
-				blockInserterPanel( true, setIsNavigationPanelOpened( true ) )
-			).toBe( false );
-		} );
-
-		it( 'should close the inserter when opening the list view panel', () => {
-			expect(
-				blockInserterPanel( true, setIsListViewOpened( true ) )
-			).toBe( false );
-		} );
-
-		it( 'should not change the state when closing the nav panel', () => {
-			expect(
-				blockInserterPanel( true, setIsNavigationPanelOpened( false ) )
-			).toBe( true );
-		} );
-
-		it( 'should not change the state when closing the list view panel', () => {
-			expect(
-				blockInserterPanel( true, setIsListViewOpened( false ) )
-			).toBe( true );
-		} );
-	} );
-
-	describe( 'listViewPanel()', () => {
-		it( 'should apply default state', () => {
-			expect( listViewPanel( undefined, {} ) ).toEqual( false );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			expect( listViewPanel( true, {} ) ).toBe( true );
-		} );
-
-		it( 'should set the open state of the list view panel', () => {
-			expect( listViewPanel( false, setIsListViewOpened( true ) ) ).toBe(
+		it('should set the open state of the inserter panel', () => {
+			expect(blockInserterPanel(false, setIsInserterOpened(true))).toBe(
 				true
 			);
-			expect( listViewPanel( true, setIsListViewOpened( false ) ) ).toBe(
+			expect(blockInserterPanel(true, setIsInserterOpened(false))).toBe(
 				false
 			);
-		} );
+		});
 
-		it( 'should close the list view when opening the nav panel', () => {
+		it('should close the inserter when opening the nav panel', () => {
 			expect(
-				listViewPanel( true, openNavigationPanelToMenu( 'noop' ) )
-			).toBe( false );
+				blockInserterPanel(true, openNavigationPanelToMenu('noop'))
+			).toBe(false);
 			expect(
-				listViewPanel( true, setIsNavigationPanelOpened( true ) )
-			).toBe( false );
-		} );
+				blockInserterPanel(true, setIsNavigationPanelOpened(true))
+			).toBe(false);
+		});
 
-		it( 'should close the list view when opening the inserter panel', () => {
-			expect( listViewPanel( true, setIsInserterOpened( true ) ) ).toBe(
+		it('should close the inserter when opening the list view panel', () => {
+			expect(blockInserterPanel(true, setIsListViewOpened(true))).toBe(
 				false
 			);
-		} );
+		});
 
-		it( 'should not change the state when closing the nav panel', () => {
+		it('should not change the state when closing the nav panel', () => {
 			expect(
-				listViewPanel( true, setIsNavigationPanelOpened( false ) )
-			).toBe( true );
-		} );
+				blockInserterPanel(true, setIsNavigationPanelOpened(false))
+			).toBe(true);
+		});
 
-		it( 'should not change the state when closing the inserter panel', () => {
-			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
+		it('should not change the state when closing the list view panel', () => {
+			expect(blockInserterPanel(true, setIsListViewOpened(false))).toBe(
 				true
 			);
-		} );
-	} );
-} );
+		});
+	});
+
+	describe('listViewPanel()', () => {
+		it('should apply default state', () => {
+			expect(listViewPanel(undefined, {})).toEqual(false);
+		});
+
+		it('should default to returning the same state', () => {
+			expect(listViewPanel(true, {})).toBe(true);
+		});
+
+		it('should set the open state of the list view panel', () => {
+			expect(listViewPanel(false, setIsListViewOpened(true))).toBe(true);
+			expect(listViewPanel(true, setIsListViewOpened(false))).toBe(false);
+		});
+
+		it('should close the list view when opening the nav panel', () => {
+			expect(listViewPanel(true, openNavigationPanelToMenu('noop'))).toBe(
+				false
+			);
+			expect(listViewPanel(true, setIsNavigationPanelOpened(true))).toBe(
+				false
+			);
+		});
+
+		it('should close the list view when opening the inserter panel', () => {
+			expect(listViewPanel(true, setIsInserterOpened(true))).toBe(false);
+		});
+
+		it('should not change the state when closing the nav panel', () => {
+			expect(listViewPanel(true, setIsNavigationPanelOpened(false))).toBe(
+				true
+			);
+		});
+
+		it('should not change the state when closing the inserter panel', () => {
+			expect(listViewPanel(true, setIsInserterOpened(false))).toBe(true);
+		});
+	});
+});

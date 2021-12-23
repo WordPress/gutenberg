@@ -26,11 +26,11 @@ import * as metadataActions from './metadata/actions';
 /** @typedef {import('../types').StoreDescriptor} StoreDescriptor */
 /** @typedef {import('../types').ReduxStoreConfig} ReduxStoreConfig */
 
-const trimUndefinedValues = ( array ) => {
-	const result = [ ...array ];
-	for ( let i = result.length - 1; i >= 0; i-- ) {
-		if ( result[ i ] === undefined ) {
-			result.splice( i, 1 );
+const trimUndefinedValues = (array) => {
+	const result = [...array];
+	for (let i = result.length - 1; i >= 0; i--) {
+		if (result[i] === undefined) {
+			result.splice(i, 1);
 		}
 	}
 	return result;
@@ -44,25 +44,25 @@ const trimUndefinedValues = ( array ) => {
 function createResolversCache() {
 	const cache = {};
 	return {
-		isRunning( selectorName, args ) {
+		isRunning(selectorName, args) {
 			return (
-				cache[ selectorName ] &&
-				cache[ selectorName ].get( trimUndefinedValues( args ) )
+				cache[selectorName] &&
+				cache[selectorName].get(trimUndefinedValues(args))
 			);
 		},
 
-		clear( selectorName, args ) {
-			if ( cache[ selectorName ] ) {
-				cache[ selectorName ].delete( trimUndefinedValues( args ) );
+		clear(selectorName, args) {
+			if (cache[selectorName]) {
+				cache[selectorName].delete(trimUndefinedValues(args));
 			}
 		},
 
-		markAsRunning( selectorName, args ) {
-			if ( ! cache[ selectorName ] ) {
-				cache[ selectorName ] = new EquivalentKeyMap();
+		markAsRunning(selectorName, args) {
+			if (!cache[selectorName]) {
+				cache[selectorName] = new EquivalentKeyMap();
 			}
 
-			cache[ selectorName ].set( trimUndefinedValues( args ), true );
+			cache[selectorName].set(trimUndefinedValues(args), true);
 		},
 	};
 }
@@ -90,23 +90,23 @@ function createResolversCache() {
  *
  * @return {StoreDescriptor} Store Object.
  */
-export default function createReduxStore( key, options ) {
+export default function createReduxStore(key, options) {
 	return {
 		name: key,
-		instantiate: ( registry ) => {
+		instantiate: (registry) => {
 			const reducer = options.reducer;
 			const thunkArgs = {
 				registry,
 				get dispatch() {
 					return Object.assign(
-						( action ) => store.dispatch( action ),
+						(action) => store.dispatch(action),
 						getActions()
 					);
 				},
 				get select() {
 					return Object.assign(
-						( selector ) =>
-							selector( store.__unstableOriginalGetState() ),
+						(selector) =>
+							selector(store.__unstableOriginalGetState()),
 						getSelectors()
 					);
 				},
@@ -136,21 +136,22 @@ export default function createReduxStore( key, options ) {
 				{
 					...mapValues(
 						metadataSelectors,
-						( selector ) => ( state, ...args ) =>
-							selector( state.metadata, ...args )
+						(selector) =>
+							(state, ...args) =>
+								selector(state.metadata, ...args)
 					),
-					...mapValues( options.selectors, ( selector ) => {
-						if ( selector.isRegistrySelector ) {
+					...mapValues(options.selectors, (selector) => {
+						if (selector.isRegistrySelector) {
 							selector.registry = registry;
 						}
 
-						return ( state, ...args ) =>
-							selector( state.root, ...args );
-					} ),
+						return (state, ...args) =>
+							selector(state.root, ...args);
+					}),
 				},
 				store
 			);
-			if ( options.resolvers ) {
+			if (options.resolvers) {
 				const result = mapResolvers(
 					options.resolvers,
 					selectors,
@@ -161,7 +162,7 @@ export default function createReduxStore( key, options ) {
 				selectors = result.selectors;
 			}
 
-			const resolveSelectors = mapResolveSelectors( selectors, store );
+			const resolveSelectors = mapResolveSelectors(selectors, store);
 
 			const getSelectors = () => selectors;
 			const getActions = () => actions;
@@ -177,18 +178,18 @@ export default function createReduxStore( key, options ) {
 			// not on every dispatch.
 			const subscribe =
 				store &&
-				( ( listener ) => {
+				((listener) => {
 					let lastState = store.__unstableOriginalGetState();
-					return store.subscribe( () => {
+					return store.subscribe(() => {
 						const state = store.__unstableOriginalGetState();
 						const hasChanged = state !== lastState;
 						lastState = state;
 
-						if ( hasChanged ) {
+						if (hasChanged) {
 							listener();
 						}
-					} );
-				} );
+					});
+				});
 
 			// This can be simplified to just { subscribe, getSelectors, getActions }
 			// Once we remove the use function.
@@ -218,49 +219,46 @@ export default function createReduxStore( key, options ) {
  * @param {Object}       thunkArgs Argument object for the thunk middleware.
  * @return {Object} Newly created redux store.
  */
-function instantiateReduxStore( key, options, registry, thunkArgs ) {
+function instantiateReduxStore(key, options, registry, thunkArgs) {
 	const controls = {
 		...options.controls,
 		...builtinControls,
 	};
 
-	const normalizedControls = mapValues( controls, ( control ) =>
-		control.isRegistryControl ? control( registry ) : control
+	const normalizedControls = mapValues(controls, (control) =>
+		control.isRegistryControl ? control(registry) : control
 	);
 
 	const middlewares = [
-		createResolversCacheMiddleware( registry, key ),
+		createResolversCacheMiddleware(registry, key),
 		promise,
-		createReduxRoutineMiddleware( normalizedControls ),
+		createReduxRoutineMiddleware(normalizedControls),
 	];
 
-	if ( options.__experimentalUseThunks ) {
-		middlewares.push( createThunkMiddleware( thunkArgs ) );
+	if (options.__experimentalUseThunks) {
+		middlewares.push(createThunkMiddleware(thunkArgs));
 	}
 
-	const enhancers = [ applyMiddleware( ...middlewares ) ];
-	if (
-		typeof window !== 'undefined' &&
-		window.__REDUX_DEVTOOLS_EXTENSION__
-	) {
+	const enhancers = [applyMiddleware(...middlewares)];
+	if (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__) {
 		enhancers.push(
-			window.__REDUX_DEVTOOLS_EXTENSION__( {
+			window.__REDUX_DEVTOOLS_EXTENSION__({
 				name: key,
 				instanceId: key,
-			} )
+			})
 		);
 	}
 
 	const { reducer, initialState } = options;
-	const enhancedReducer = combineReducers( {
+	const enhancedReducer = combineReducers({
 		metadata: metadataReducer,
 		root: reducer,
-	} );
+	});
 
 	return createStore(
 		enhancedReducer,
 		{ root: initialState },
-		flowRight( enhancers )
+		flowRight(enhancers)
 	);
 }
 
@@ -273,8 +271,8 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
  * @param {Object} store     The store to which the selectors should be mapped.
  * @return {Object} Selectors mapped to the provided store.
  */
-function mapSelectors( selectors, store ) {
-	const createStateSelector = ( registrySelector ) => {
+function mapSelectors(selectors, store) {
+	const createStateSelector = (registrySelector) => {
 		const selector = function runSelector() {
 			// This function is an optimized implementation of:
 			//
@@ -284,19 +282,19 @@ function mapSelectors( selectors, store ) {
 			// the logic here instead efficiently constructs an arguments array via
 			// direct assignment.
 			const argsLength = arguments.length;
-			const args = new Array( argsLength + 1 );
-			args[ 0 ] = store.__unstableOriginalGetState();
-			for ( let i = 0; i < argsLength; i++ ) {
-				args[ i + 1 ] = arguments[ i ];
+			const args = new Array(argsLength + 1);
+			args[0] = store.__unstableOriginalGetState();
+			for (let i = 0; i < argsLength; i++) {
+				args[i + 1] = arguments[i];
 			}
 
-			return registrySelector( ...args );
+			return registrySelector(...args);
 		};
 		selector.hasResolver = false;
 		return selector;
 	};
 
-	return mapValues( selectors, createStateSelector );
+	return mapValues(selectors, createStateSelector);
 }
 
 /**
@@ -307,12 +305,14 @@ function mapSelectors( selectors, store ) {
  *
  * @return {Object} Actions mapped to the redux store provided.
  */
-function mapActions( actions, store ) {
-	const createBoundAction = ( action ) => ( ...args ) => {
-		return Promise.resolve( store.dispatch( action( ...args ) ) );
-	};
+function mapActions(actions, store) {
+	const createBoundAction =
+		(action) =>
+		(...args) => {
+			return Promise.resolve(store.dispatch(action(...args)));
+		};
 
-	return mapValues( actions, createBoundAction );
+	return mapValues(actions, createBoundAction);
 }
 
 /**
@@ -323,33 +323,34 @@ function mapActions( actions, store ) {
  *
  * @return {Object} Selectors mapped to their resolution functions.
  */
-function mapResolveSelectors( selectors, store ) {
+function mapResolveSelectors(selectors, store) {
 	return mapValues(
-		omit( selectors, [
+		omit(selectors, [
 			'getIsResolving',
 			'hasStartedResolution',
 			'hasFinishedResolution',
 			'isResolving',
 			'getCachedResolvers',
-		] ),
-		( selector, selectorName ) => ( ...args ) =>
-			new Promise( ( resolve ) => {
-				const hasFinished = () =>
-					selectors.hasFinishedResolution( selectorName, args );
-				const getResult = () => selector.apply( null, args );
-				// trigger the selector (to trigger the resolver)
-				const result = getResult();
-				if ( hasFinished() ) {
-					return resolve( result );
-				}
-
-				const unsubscribe = store.subscribe( () => {
-					if ( hasFinished() ) {
-						unsubscribe();
-						resolve( getResult() );
+		]),
+		(selector, selectorName) =>
+			(...args) =>
+				new Promise((resolve) => {
+					const hasFinished = () =>
+						selectors.hasFinishedResolution(selectorName, args);
+					const getResult = () => selector.apply(null, args);
+					// trigger the selector (to trigger the resolver)
+					const result = getResult();
+					if (hasFinished()) {
+						return resolve(result);
 					}
-				} );
-			} )
+
+					const unsubscribe = store.subscribe(() => {
+						if (hasFinished()) {
+							unsubscribe();
+							resolve(getResult());
+						}
+					});
+				})
 	);
 }
 
@@ -363,12 +364,12 @@ function mapResolveSelectors( selectors, store ) {
  * @param {Object} store          The redux store to which the resolvers should be mapped.
  * @param {Object} resolversCache Resolvers Cache.
  */
-function mapResolvers( resolvers, selectors, store, resolversCache ) {
+function mapResolvers(resolvers, selectors, store, resolversCache) {
 	// The `resolver` can be either a function that does the resolution, or, in more advanced
 	// cases, an object with a `fullfill` method and other optional methods like `isFulfilled`.
 	// Here we normalize the `resolver` function to an object with `fulfill` method.
-	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
-		if ( resolver.fulfill ) {
+	const mappedResolvers = mapValues(resolvers, (resolver) => {
+		if (resolver.fulfill) {
 			return resolver;
 		}
 
@@ -376,23 +377,23 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 			...resolver, // copy the enumerable properties of the resolver function
 			fulfill: resolver, // add the fulfill method
 		};
-	} );
+	});
 
-	const mapSelector = ( selector, selectorName ) => {
-		const resolver = resolvers[ selectorName ];
-		if ( ! resolver ) {
+	const mapSelector = (selector, selectorName) => {
+		const resolver = resolvers[selectorName];
+		if (!resolver) {
 			selector.hasResolver = false;
 			return selector;
 		}
 
-		const selectorResolver = ( ...args ) => {
+		const selectorResolver = (...args) => {
 			async function fulfillSelector() {
 				const state = store.getState();
 
 				if (
-					resolversCache.isRunning( selectorName, args ) ||
-					( typeof resolver.isFulfilled === 'function' &&
-						resolver.isFulfilled( state, ...args ) )
+					resolversCache.isRunning(selectorName, args) ||
+					(typeof resolver.isFulfilled === 'function' &&
+						resolver.isFulfilled(state, ...args))
 				) {
 					return;
 				}
@@ -409,12 +410,12 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 					return;
 				}
 
-				resolversCache.markAsRunning( selectorName, args );
+				resolversCache.markAsRunning(selectorName, args);
 
-				setTimeout( async () => {
-					resolversCache.clear( selectorName, args );
+				setTimeout(async () => {
+					resolversCache.clear(selectorName, args);
 					store.dispatch(
-						metadataActions.startResolution( selectorName, args )
+						metadataActions.startResolution(selectorName, args)
 					);
 					await fulfillResolver(
 						store,
@@ -423,13 +424,13 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 						...args
 					);
 					store.dispatch(
-						metadataActions.finishResolution( selectorName, args )
+						metadataActions.finishResolution(selectorName, args)
 					);
-				} );
+				});
 			}
 
-			fulfillSelector( ...args );
-			return selector( ...args );
+			fulfillSelector(...args);
+			return selector(...args);
 		};
 		selectorResolver.hasResolver = true;
 		return selectorResolver;
@@ -437,7 +438,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 
 	return {
 		resolvers: mappedResolvers,
-		selectors: mapValues( selectors, mapSelector ),
+		selectors: mapValues(selectors, mapSelector),
 	};
 }
 
@@ -449,14 +450,14 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
  * @param {string} selectorName Selector name to fulfill.
  * @param {Array}  args         Selector Arguments.
  */
-async function fulfillResolver( store, resolvers, selectorName, ...args ) {
-	const resolver = get( resolvers, [ selectorName ] );
-	if ( ! resolver ) {
+async function fulfillResolver(store, resolvers, selectorName, ...args) {
+	const resolver = get(resolvers, [selectorName]);
+	if (!resolver) {
 		return;
 	}
 
-	const action = resolver.fulfill( ...args );
-	if ( action ) {
-		await store.dispatch( action );
+	const action = resolver.fulfill(...args);
+	if (action) {
+		await store.dispatch(action);
 	}
 }

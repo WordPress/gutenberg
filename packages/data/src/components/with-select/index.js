@@ -47,15 +47,15 @@ import useSelect from '../use-select';
  *
  * @return {WPComponent} Enhanced component with merged state data props.
  */
-const withSelect = ( mapSelectToProps ) =>
+const withSelect = (mapSelectToProps) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) =>
-			pure( ( ownProps ) => {
-				const mapSelect = ( select, registry ) =>
-					mapSelectToProps( select, ownProps, registry );
-				const mergeProps = useSelect( mapSelect );
-				return <WrappedComponent { ...ownProps } { ...mergeProps } />;
-			} ),
+		(WrappedComponent) =>
+			pure((ownProps) => {
+				const mapSelect = (select, registry) =>
+					mapSelectToProps(select, ownProps, registry);
+				const mergeProps = useSelect(mapSelect);
+				return <WrappedComponent {...ownProps} {...mergeProps} />;
+			}),
 		'withSelect'
 	);
 

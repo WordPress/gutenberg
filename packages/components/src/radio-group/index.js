@@ -18,10 +18,10 @@ function RadioGroup(
 	{ label, checked, defaultChecked, disabled, onChange, ...props },
 	ref
 ) {
-	const radioState = useRadioState( {
+	const radioState = useRadioState({
 		state: defaultChecked,
 		baseId: props.id,
-	} );
+	});
 	const radioContext = {
 		...radioState,
 		disabled,
@@ -31,16 +31,16 @@ function RadioGroup(
 	};
 
 	return (
-		<RadioContext.Provider value={ radioContext }>
+		<RadioContext.Provider value={radioContext}>
 			<ReakitRadioGroup
-				ref={ ref }
-				as={ ButtonGroup }
-				aria-label={ label }
-				{ ...radioState }
-				{ ...props }
+				ref={ref}
+				as={ButtonGroup}
+				aria-label={label}
+				{...radioState}
+				{...props}
 			/>
 		</RadioContext.Provider>
 	);
 }
 
-export default forwardRef( RadioGroup );
+export default forwardRef(RadioGroup);

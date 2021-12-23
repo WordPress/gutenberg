@@ -56,23 +56,23 @@ const SNACKBAR_REDUCE_MOTION_VARIANTS = {
  *
  * @return {Object} The rendered notices list.
  */
-function SnackbarList( { notices, className, children, onRemove = noop } ) {
+function SnackbarList({ notices, className, children, onRemove = noop }) {
 	const listRef = useRef();
 	const isReducedMotion = useReducedMotion();
-	className = classnames( 'components-snackbar-list', className );
-	const removeNotice = ( notice ) => () => onRemove( notice.id );
+	className = classnames('components-snackbar-list', className);
+	const removeNotice = (notice) => () => onRemove(notice.id);
 	return (
-		<div className={ className } tabIndex={ -1 } ref={ listRef }>
-			{ children }
+		<div className={className} tabIndex={-1} ref={listRef}>
+			{children}
 			<AnimatePresence>
-				{ notices.map( ( notice ) => {
+				{notices.map((notice) => {
 					return (
 						<motion.div
-							layout={ ! isReducedMotion } //see https://www.framer.com/docs/animation/#layout-animations
-							initial={ 'init' }
-							animate={ 'open' }
-							exit={ 'exit' }
-							key={ notice.id }
+							layout={!isReducedMotion} //see https://www.framer.com/docs/animation/#layout-animations
+							initial={'init'}
+							animate={'open'}
+							exit={'exit'}
+							key={notice.id}
 							variants={
 								isReducedMotion
 									? SNACKBAR_REDUCE_MOTION_VARIANTS
@@ -81,16 +81,16 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 						>
 							<div className="components-snackbar-list__notice-container">
 								<Snackbar
-									{ ...omit( notice, [ 'content' ] ) }
-									onRemove={ removeNotice( notice ) }
-									listRef={ listRef }
+									{...omit(notice, ['content'])}
+									onRemove={removeNotice(notice)}
+									listRef={listRef}
 								>
-									{ notice.content }
+									{notice.content}
 								</Snackbar>
 							</div>
 						</motion.div>
 					);
-				} ) }
+				})}
 			</AnimatePresence>
 		</div>
 	);

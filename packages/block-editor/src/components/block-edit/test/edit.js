@@ -19,106 +19,104 @@ import {
 import { Edit } from '../edit';
 import { BlockContextProvider } from '../../block-context';
 
-describe( 'Edit', () => {
-	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
+describe('Edit', () => {
+	afterEach(() => {
+		getBlockTypes().forEach((block) => {
+			unregisterBlockType(block.name);
+		});
+	});
 
-	it( 'should return null if block type not defined', () => {
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+	it('should return null if block type not defined', () => {
+		const wrapper = shallow(<Edit name="core/test-block" />);
 
-		expect( wrapper.type() ).toBe( null );
-	} );
+		expect(wrapper.type()).toBe(null);
+	});
 
-	it( 'should use edit implementation of block', () => {
+	it('should use edit implementation of block', () => {
 		const edit = () => <div />;
-		registerBlockType( 'core/test-block', {
+		registerBlockType('core/test-block', {
 			save: noop,
 			category: 'text',
 			title: 'block title',
 			edit,
-		} );
+		});
 
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		const wrapper = shallow(<Edit name="core/test-block" />);
 
-		expect( wrapper.exists( edit ) ).toBe( true );
-	} );
+		expect(wrapper.exists(edit)).toBe(true);
+	});
 
-	it( 'should use save implementation of block as fallback', () => {
+	it('should use save implementation of block as fallback', () => {
 		const save = () => <div />;
-		registerBlockType( 'core/test-block', {
+		registerBlockType('core/test-block', {
 			save,
 			category: 'text',
 			title: 'block title',
-		} );
+		});
 
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		const wrapper = shallow(<Edit name="core/test-block" />);
 
-		expect( wrapper.exists( save ) ).toBe( true );
-	} );
+		expect(wrapper.exists(save)).toBe(true);
+	});
 
-	it( 'should combine the default class name with a custom one', () => {
-		const edit = ( { className } ) => <div className={ className } />;
+	it('should combine the default class name with a custom one', () => {
+		const edit = ({ className }) => <div className={className} />;
 		const attributes = {
 			className: 'my-class',
 		};
-		registerBlockType( 'core/test-block', {
+		registerBlockType('core/test-block', {
 			edit,
 			save: noop,
 			category: 'text',
 			title: 'block title',
-		} );
+		});
 
 		const wrapper = shallow(
-			<Edit name="core/test-block" attributes={ attributes } />
+			<Edit name="core/test-block" attributes={attributes} />
 		);
 
-		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe(
-			true
-		);
-		expect( wrapper.find( edit ).hasClass( 'my-class' ) ).toBe( true );
-	} );
+		expect(wrapper.find(edit).hasClass('wp-block-test-block')).toBe(true);
+		expect(wrapper.find(edit).hasClass('my-class')).toBe(true);
+	});
 
-	it( 'should assign context', () => {
-		const edit = ( { context } ) => context.value;
-		registerBlockType( 'core/test-block', {
+	it('should assign context', () => {
+		const edit = ({ context }) => context.value;
+		registerBlockType('core/test-block', {
 			category: 'text',
 			title: 'block title',
-			usesContext: [ 'value' ],
+			usesContext: ['value'],
 			edit,
 			save: noop,
-		} );
+		});
 
 		const wrapper = mount(
-			<BlockContextProvider value={ { value: 'Ok' } }>
+			<BlockContextProvider value={{ value: 'Ok' }}>
 				<Edit name="core/test-block" />
 			</BlockContextProvider>
 		);
 
-		expect( wrapper.html() ).toBe( 'Ok' );
-	} );
+		expect(wrapper.html()).toBe('Ok');
+	});
 
-	describe( 'light wrapper', () => {
-		it( 'should assign context', () => {
-			const edit = ( { context } ) => context.value;
-			registerBlockType( 'core/test-block', {
+	describe('light wrapper', () => {
+		it('should assign context', () => {
+			const edit = ({ context }) => context.value;
+			registerBlockType('core/test-block', {
 				apiVersion: 2,
 				category: 'text',
 				title: 'block title',
-				usesContext: [ 'value' ],
+				usesContext: ['value'],
 				edit,
 				save: noop,
-			} );
+			});
 
 			const wrapper = mount(
-				<BlockContextProvider value={ { value: 'Ok' } }>
+				<BlockContextProvider value={{ value: 'Ok' }}>
 					<Edit name="core/test-block" />
 				</BlockContextProvider>
 			);
 
-			expect( wrapper.html() ).toBe( 'Ok' );
-		} );
-	} );
-} );
+			expect(wrapper.html()).toBe('Ok');
+		});
+	});
+});

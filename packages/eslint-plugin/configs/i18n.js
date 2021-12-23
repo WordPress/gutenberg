@@ -1,5 +1,5 @@
 module.exports = {
-	plugins: [ '@wordpress' ],
+	plugins: ['@wordpress'],
 	rules: {
 		'@wordpress/valid-sprintf': 'error',
 		'@wordpress/i18n-translator-comments': 'error',

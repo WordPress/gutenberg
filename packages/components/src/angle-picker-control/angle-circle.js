@@ -13,7 +13,7 @@ import {
 	CircleIndicator,
 } from './styles/angle-picker-control-styles';
 
-function AngleCircle( { value, onChange, ...props } ) {
+function AngleCircle({ value, onChange, ...props }) {
 	const angleCircleRef = useRef();
 	const angleCircleCenter = useRef();
 	const previousCursorValue = useRef();
@@ -26,7 +26,7 @@ function AngleCircle( { value, onChange, ...props } ) {
 		};
 	};
 
-	const changeAngleToPosition = ( event ) => {
+	const changeAngleToPosition = (event) => {
 		const { x: centerX, y: centerY } = angleCircleCenter.current;
 		const { ownerDocument } = angleCircleRef.current;
 		// Prevent (drag) mouse events from selecting and accidentally
@@ -34,21 +34,21 @@ function AngleCircle( { value, onChange, ...props } ) {
 		event.preventDefault();
 		// Ensure the input isn't focused as preventDefault would leave it
 		ownerDocument.activeElement.blur();
-		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
+		onChange(getAngle(centerX, centerY, event.clientX, event.clientY));
 	};
 
-	const { startDrag, isDragging } = useDragging( {
-		onDragStart: ( event ) => {
+	const { startDrag, isDragging } = useDragging({
+		onDragStart: (event) => {
 			setAngleCircleCenter();
-			changeAngleToPosition( event );
+			changeAngleToPosition(event);
 		},
 		onDragMove: changeAngleToPosition,
 		onDragEnd: changeAngleToPosition,
-	} );
+	});
 
-	useEffect( () => {
-		if ( isDragging ) {
-			if ( previousCursorValue.current === undefined ) {
+	useEffect(() => {
+		if (isDragging) {
+			if (previousCursorValue.current === undefined) {
 				previousCursorValue.current = document.body.style.cursor;
 			}
 			document.body.style.cursor = 'grabbing';
@@ -56,21 +56,19 @@ function AngleCircle( { value, onChange, ...props } ) {
 			document.body.style.cursor = previousCursorValue.current || null;
 			previousCursorValue.current = undefined;
 		}
-	}, [ isDragging ] );
+	}, [isDragging]);
 
 	return (
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<CircleRoot
-			ref={ angleCircleRef }
-			onMouseDown={ startDrag }
+			ref={angleCircleRef}
+			onMouseDown={startDrag}
 			className="components-angle-picker-control__angle-circle"
-			style={ isDragging ? { cursor: 'grabbing' } : undefined }
-			{ ...props }
+			style={isDragging ? { cursor: 'grabbing' } : undefined}
+			{...props}
 		>
 			<CircleIndicatorWrapper
-				style={
-					value ? { transform: `rotate(${ value }deg)` } : undefined
-				}
+				style={value ? { transform: `rotate(${value}deg)` } : undefined}
 				className="components-angle-picker-control__angle-circle-indicator-wrapper"
 			>
 				<CircleIndicator className="components-angle-picker-control__angle-circle-indicator" />
@@ -80,13 +78,13 @@ function AngleCircle( { value, onChange, ...props } ) {
 	);
 }
 
-function getAngle( centerX, centerY, pointX, pointY ) {
+function getAngle(centerX, centerY, pointX, pointY) {
 	const y = pointY - centerY;
 	const x = pointX - centerX;
 
-	const angleInRadians = Math.atan2( y, x );
-	const angleInDeg = Math.round( angleInRadians * ( 180 / Math.PI ) ) + 90;
-	if ( angleInDeg < 0 ) {
+	const angleInRadians = Math.atan2(y, x);
+	const angleInDeg = Math.round(angleInRadians * (180 / Math.PI)) + 90;
+	if (angleInDeg < 0) {
 		return 360 + angleInDeg;
 	}
 	return angleInDeg;

@@ -16,92 +16,92 @@ import { BottomSheet } from '@wordpress/components';
  */
 import styles from './style.scss';
 
-const BottomSheetSelectControl = ( {
+const BottomSheetSelectControl = ({
 	label,
 	icon,
 	options: items,
 	onChange,
 	value: selectedValue,
-} ) => {
-	const [ showSubSheet, setShowSubSheet ] = useState( false );
+}) => {
+	const [showSubSheet, setShowSubSheet] = useState(false);
 	const navigation = useNavigation();
 
-	const onChangeValue = ( value ) => {
+	const onChangeValue = (value) => {
 		return () => {
 			goBack();
-			onChange( value );
+			onChange(value);
 		};
 	};
 
 	const selectedOption = items.find(
-		( option ) => option.value === selectedValue
+		(option) => option.value === selectedValue
 	);
 
 	const goBack = () => {
-		setShowSubSheet( false );
+		setShowSubSheet(false);
 		navigation.goBack();
 	};
 
 	const openSubSheet = () => {
-		navigation.navigate( BottomSheet.SubSheet.screenName );
-		setShowSubSheet( true );
+		navigation.navigate(BottomSheet.SubSheet.screenName);
+		setShowSubSheet(true);
 	};
 
 	return (
 		<BottomSheet.SubSheet
 			navigationButton={
 				<BottomSheet.Cell
-					label={ label }
+					label={label}
 					separatorType="none"
-					icon={ icon }
-					value={ selectedOption.label }
-					onPress={ openSubSheet }
-					accessibilityRole={ 'button' }
-					accessibilityLabel={ selectedOption.label }
-					accessibilityHint={ sprintf(
+					icon={icon}
+					value={selectedOption.label}
+					onPress={openSubSheet}
+					accessibilityRole={'button'}
+					accessibilityLabel={selectedOption.label}
+					accessibilityHint={sprintf(
 						// translators: %s: Select control button label e.g. "Button width"
-						__( 'Navigates to select %s' ),
+						__('Navigates to select %s'),
 						selectedOption.label
-					) }
+					)}
 				>
-					<Icon icon={ chevronRight }></Icon>
+					<Icon icon={chevronRight}></Icon>
 				</BottomSheet.Cell>
 			}
-			showSheet={ showSubSheet }
+			showSheet={showSubSheet}
 		>
 			<>
 				<BottomSheet.NavBar>
-					<BottomSheet.NavBar.BackButton onPress={ goBack } />
+					<BottomSheet.NavBar.BackButton onPress={goBack} />
 					<BottomSheet.NavBar.Heading>
-						{ label }
+						{label}
 					</BottomSheet.NavBar.Heading>
 				</BottomSheet.NavBar>
-				<View style={ styles.selectControl }>
-					{ items.map( ( item, index ) => (
+				<View style={styles.selectControl}>
+					{items.map((item, index) => (
 						<BottomSheet.Cell
 							customActionButton
 							separatorType="none"
-							label={ item.label }
-							onPress={ onChangeValue( item.value ) }
-							leftAlign={ true }
-							key={ index }
-							accessibilityRole={ 'button' }
+							label={item.label}
+							onPress={onChangeValue(item.value)}
+							leftAlign={true}
+							key={index}
+							accessibilityRole={'button'}
 							accessibilityLabel={
 								item.value === selectedValue
 									? sprintf(
 											// translators: %s: Select control option value e.g: "Auto, 25%".
-											__( 'Selected: %s' ),
+											__('Selected: %s'),
 											item.label
 									  )
 									: item.label
 							}
-							accessibilityHint={ __( 'Double tap to select' ) }
+							accessibilityHint={__('Double tap to select')}
 						>
-							{ item.value === selectedValue && (
-								<Icon icon={ check }></Icon>
-							) }
+							{item.value === selectedValue && (
+								<Icon icon={check}></Icon>
+							)}
 						</BottomSheet.Cell>
-					) ) }
+					))}
 				</View>
 			</>
 		</BottomSheet.SubSheet>

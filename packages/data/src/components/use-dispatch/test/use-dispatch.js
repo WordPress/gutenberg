@@ -11,165 +11,165 @@ import createReduxStore from '../../../redux-store';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
 
-describe( 'useDispatch', () => {
+describe('useDispatch', () => {
 	let registry;
-	beforeEach( () => {
+	beforeEach(() => {
 		registry = createRegistry();
-	} );
+	});
 
-	it( 'returns dispatch function from store with no store name provided', () => {
-		registry.registerStore( 'demoStore', {
-			reducer: ( state ) => state,
+	it('returns dispatch function from store with no store name provided', () => {
+		registry.registerStore('demoStore', {
+			reducer: (state) => state,
 			actions: {
 				foo: () => 'bar',
 			},
-		} );
+		});
 		const TestComponent = () => {
 			return <div></div>;
 		};
 		const Component = () => {
 			const dispatch = useDispatch();
-			return <TestComponent dispatch={ dispatch } />;
+			return <TestComponent dispatch={dispatch} />;
 		};
 
 		let testRenderer;
-		act( () => {
+		act(() => {
 			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
+				<RegistryProvider value={registry}>
 					<Component />
 				</RegistryProvider>
 			);
-		} );
+		});
 
 		const testInstance = testRenderer.root;
 
-		expect( testInstance.findByType( TestComponent ).props.dispatch ).toBe(
+		expect(testInstance.findByType(TestComponent).props.dispatch).toBe(
 			registry.dispatch
 		);
-	} );
-	it( 'returns expected action creators from store for given storeName', () => {
-		const noop = () => ( { type: '__INERT__' } );
-		const testAction = jest.fn().mockImplementation( noop );
-		const store = createReduxStore( 'demoStore', {
-			reducer: ( state ) => state,
+	});
+	it('returns expected action creators from store for given storeName', () => {
+		const noop = () => ({ type: '__INERT__' });
+		const testAction = jest.fn().mockImplementation(noop);
+		const store = createReduxStore('demoStore', {
+			reducer: (state) => state,
 			actions: {
 				foo: testAction,
 			},
-		} );
-		registry.register( store );
+		});
+		registry.register(store);
 
 		const TestComponent = () => {
-			const { foo } = useDispatch( store );
-			return <button onClick={ foo } />;
+			const { foo } = useDispatch(store);
+			return <button onClick={foo} />;
 		};
 
 		let testRenderer;
 
-		act( () => {
+		act(() => {
 			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
+				<RegistryProvider value={registry}>
 					<TestComponent />
 				</RegistryProvider>
 			);
-		} );
+		});
 
 		const testInstance = testRenderer.root;
 
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
+		act(() => {
+			testInstance.findByType('button').props.onClick();
+		});
 
-		expect( testAction ).toHaveBeenCalledTimes( 1 );
-	} );
+		expect(testAction).toHaveBeenCalledTimes(1);
+	});
 
-	it( 'returns expected action creators from store for given store descriptor', () => {
-		const noop = () => ( { type: '__INERT__' } );
-		const testAction = jest.fn().mockImplementation( noop );
-		registry.registerStore( 'demoStore', {
-			reducer: ( state ) => state,
+	it('returns expected action creators from store for given store descriptor', () => {
+		const noop = () => ({ type: '__INERT__' });
+		const testAction = jest.fn().mockImplementation(noop);
+		registry.registerStore('demoStore', {
+			reducer: (state) => state,
 			actions: {
 				foo: testAction,
 			},
-		} );
+		});
 		const TestComponent = () => {
-			const { foo } = useDispatch( 'demoStore' );
-			return <button onClick={ foo } />;
+			const { foo } = useDispatch('demoStore');
+			return <button onClick={foo} />;
 		};
 
 		let testRenderer;
 
-		act( () => {
+		act(() => {
 			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
+				<RegistryProvider value={registry}>
 					<TestComponent />
 				</RegistryProvider>
 			);
-		} );
+		});
 
 		const testInstance = testRenderer.root;
 
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
+		act(() => {
+			testInstance.findByType('button').props.onClick();
+		});
 
-		expect( testAction ).toHaveBeenCalledTimes( 1 );
-	} );
+		expect(testAction).toHaveBeenCalledTimes(1);
+	});
 
-	it( 'returns dispatch from correct registry if registries change', () => {
-		const reducer = ( state ) => state;
-		const noop = () => ( { type: '__INERT__' } );
-		const firstRegistryAction = jest.fn().mockImplementation( noop );
-		const secondRegistryAction = jest.fn().mockImplementation( noop );
+	it('returns dispatch from correct registry if registries change', () => {
+		const reducer = (state) => state;
+		const noop = () => ({ type: '__INERT__' });
+		const firstRegistryAction = jest.fn().mockImplementation(noop);
+		const secondRegistryAction = jest.fn().mockImplementation(noop);
 
 		const firstRegistry = registry;
-		firstRegistry.registerStore( 'demo', {
+		firstRegistry.registerStore('demo', {
 			reducer,
 			actions: {
 				noop: firstRegistryAction,
 			},
-		} );
+		});
 
 		const TestComponent = () => {
 			const dispatch = useDispatch();
-			return <button onClick={ () => dispatch( 'demo' ).noop() } />;
+			return <button onClick={() => dispatch('demo').noop()} />;
 		};
 
 		let testRenderer;
-		act( () => {
+		act(() => {
 			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ firstRegistry }>
+				<RegistryProvider value={firstRegistry}>
 					<TestComponent />
 				</RegistryProvider>
 			);
-		} );
+		});
 		const testInstance = testRenderer.root;
 
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
+		act(() => {
+			testInstance.findByType('button').props.onClick();
+		});
 
-		expect( firstRegistryAction ).toHaveBeenCalledTimes( 1 );
-		expect( secondRegistryAction ).toHaveBeenCalledTimes( 0 );
+		expect(firstRegistryAction).toHaveBeenCalledTimes(1);
+		expect(secondRegistryAction).toHaveBeenCalledTimes(0);
 
 		const secondRegistry = createRegistry();
-		secondRegistry.registerStore( 'demo', {
+		secondRegistry.registerStore('demo', {
 			reducer,
 			actions: {
 				noop: secondRegistryAction,
 			},
-		} );
+		});
 
-		act( () => {
+		act(() => {
 			testRenderer.update(
-				<RegistryProvider value={ secondRegistry }>
+				<RegistryProvider value={secondRegistry}>
 					<TestComponent />
 				</RegistryProvider>
 			);
-		} );
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
-		expect( firstRegistryAction ).toHaveBeenCalledTimes( 1 );
-		expect( secondRegistryAction ).toHaveBeenCalledTimes( 1 );
-	} );
-} );
+		});
+		act(() => {
+			testInstance.findByType('button').props.onClick();
+		});
+		expect(firstRegistryAction).toHaveBeenCalledTimes(1);
+		expect(secondRegistryAction).toHaveBeenCalledTimes(1);
+	});
+});

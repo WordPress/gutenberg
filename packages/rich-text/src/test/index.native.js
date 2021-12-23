@@ -1,4 +1,4 @@
-jest.mock( '@wordpress/data/src/components/use-select' );
+jest.mock('@wordpress/data/src/components/use-select');
 /**
  * External dependencies
  */
@@ -26,172 +26,171 @@ const mockGlobalSettings = (
 		__experimentalGlobalStylesBaseStyles: { typography: { fontSize } },
 	};
 	const selectMock = {
-		getFormatTypes: jest.fn().mockReturnValue( [] ),
+		getFormatTypes: jest.fn().mockReturnValue([]),
 		getBlockParents: jest.fn(),
 		getBlock: jest.fn(),
-		getSettings: jest.fn().mockReturnValue( DEFAULT_GLOBAL_STYLES ),
+		getSettings: jest.fn().mockReturnValue(DEFAULT_GLOBAL_STYLES),
 	};
 
-	useSelect.mockImplementation( ( callback ) => {
-		return callback( () => selectMock );
-	} );
+	useSelect.mockImplementation((callback) => {
+		return callback(() => selectMock);
+	});
 };
 
-describe( '<RichText/>', () => {
+describe('<RichText/>', () => {
 	/**
 	 * Capture initial `window` dimensions before our integration tests modify them to stage runtime fixtures.
 	 * Reset to the initial `window` dimensions after each test is executed in case they were modified.
 	 */
-	const window = Dimensions.get( 'window' );
+	const window = Dimensions.get('window');
 
 	const decimalUnitsData = [
-		[ '1.125rem', 18 ],
-		[ '10.52px', 11 ],
-		[ '2.3136em', 37 ],
-		[ '1.42vh', 19 ],
+		['1.125rem', 18],
+		['10.52px', 11],
+		['2.3136em', 37],
+		['1.42vh', 19],
 	];
 
-	beforeEach( () => {
-		mockGlobalSettings( {} );
-	} );
+	beforeEach(() => {
+		mockGlobalSettings({});
+	});
 
-	afterEach( () => {
-		Dimensions.set( { window } );
-	} );
+	afterEach(() => {
+		Dimensions.set({ window });
+	});
 
-	describe( 'Font Size', () => {
-		it( 'should display rich text at the DEFAULT font size.', () => {
+	describe('Font Size', () => {
+		it('should display rich text at the DEFAULT font size.', () => {
 			// Arrange
 			const expectedFontSize = 16;
 			// Act
 			const { getByA11yLabel } = render(
-				<RichText accessibilityLabel={ 'editor' } />
+				<RichText accessibilityLabel={'editor'} />
 			);
 			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
+			const actualFontSize = getByA11yLabel('editor').props.fontSize;
+			expect(actualFontSize).toBe(expectedFontSize);
+		});
 
-		it( 'should display rich text at the PROVIDED font size computed from the LOCAL `fontSize` CSS.', () => {
+		it('should display rich text at the PROVIDED font size computed from the LOCAL `fontSize` CSS.', () => {
 			// Arrange
 			const expectedFontSize = 32;
 			// Act
 			const { getByA11yLabel } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
-					fontSize={ 'min(2em, 3em)' }
+					accessibilityLabel={'editor'}
+					fontSize={'min(2em, 3em)'}
 				/>
 			);
 			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
+			const actualFontSize = getByA11yLabel('editor').props.fontSize;
+			expect(actualFontSize).toBe(expectedFontSize);
+		});
 
-		it( 'should display rich text at the PROVIDED font size computed from the LOCAL `style.fontSize` CSS.', () => {
+		it('should display rich text at the PROVIDED font size computed from the LOCAL `style.fontSize` CSS.', () => {
 			// Arrange
 			const expectedFontSize = 32;
 			// Act
 			const { getByA11yLabel } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
-					style={ { fontSize: 'min(2em, 3em)' } }
+					accessibilityLabel={'editor'}
+					style={{ fontSize: 'min(2em, 3em)' }}
 				/>
 			);
 			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
+			const actualFontSize = getByA11yLabel('editor').props.fontSize;
+			expect(actualFontSize).toBe(expectedFontSize);
+		});
 
-		it( `should display rich text at the PROVIDED font size computed from the selected GLOBAL
+		it(`should display rich text at the PROVIDED font size computed from the selected GLOBAL
 		\`__experimentalGlobalStylesBaseStyles.typography.fontSize\` CSS.`, () => {
 			// Arrange
 			const expectedFontSize = 32;
-			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
+			mockGlobalSettings({ fontSize: 'min(2em, 3em)' });
 			// Act
 			const { getByA11yLabel } = render(
-				<RichText accessibilityLabel={ 'editor' } />
+				<RichText accessibilityLabel={'editor'} />
 			);
 			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
+			const actualFontSize = getByA11yLabel('editor').props.fontSize;
+			expect(actualFontSize).toBe(expectedFontSize);
+		});
 
-		test.each( decimalUnitsData )(
+		test.each(decimalUnitsData)(
 			`should display rich text at the PROVIDED font size computed from the selected GLOBAL
 		\`__experimentalGlobalStylesBaseStyles.typography.fontSize\` CSS with decimal value: %s`,
-			( unit, expected ) => {
+			(unit, expected) => {
 				// Arrange
-				mockGlobalSettings( { fontSize: unit } );
+				mockGlobalSettings({ fontSize: unit });
 				// Act
 				const { getByA11yLabel } = render(
-					<RichText accessibilityLabel={ 'editor' } />
+					<RichText accessibilityLabel={'editor'} />
 				);
 				// Assert
-				const actualFontSize = getByA11yLabel( 'editor' ).props
-					.fontSize;
-				expect( actualFontSize ).toBe( expected );
+				const actualFontSize = getByA11yLabel('editor').props.fontSize;
+				expect(actualFontSize).toBe(expected);
 			}
 		);
 
-		it( `should display rich text at the font size computed from the LOCAL \`fontSize\` CSS with HIGHEST PRIORITY
+		it(`should display rich text at the font size computed from the LOCAL \`fontSize\` CSS with HIGHEST PRIORITY
 		when CSS is provided ambiguously from ALL possible sources.`, () => {
 			// Arrange
 			const expectedFontSize = 2;
-			mockGlobalSettings( { fontSize: '0' } );
+			mockGlobalSettings({ fontSize: '0' });
 			// Act
 			const { getByA11yLabel } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
-					style={ { fontSize: '1' } }
-					fontSize={ '2' }
+					accessibilityLabel={'editor'}
+					style={{ fontSize: '1' }}
+					fontSize={'2'}
 				/>
 			);
 			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
+			const actualFontSize = getByA11yLabel('editor').props.fontSize;
+			expect(actualFontSize).toBe(expectedFontSize);
+		});
 
-		it( `should display rich text at the font size computed from the LOCAL \`style.fontSize\` CSS with
+		it(`should display rich text at the font size computed from the LOCAL \`style.fontSize\` CSS with
 		NEXT PRIORITY when CSS is provided ambiguously from MULTIPLE possible sources EXCLUDING \`fontSize\`.`, () => {
 			// Arrange
 			const expectedFontSize = 1;
-			mockGlobalSettings( { fontSize: '0' } );
+			mockGlobalSettings({ fontSize: '0' });
 			// Act
 			const { getByA11yLabel } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
-					style={ { fontSize: '1' } }
+					accessibilityLabel={'editor'}
+					style={{ fontSize: '1' }}
 				/>
 			);
 			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
+			const actualFontSize = getByA11yLabel('editor').props.fontSize;
+			expect(actualFontSize).toBe(expectedFontSize);
+		});
 
-		it( 'should display rich text at the font size computed from CSS relative to the VIEWPORT WIDTH.', () => {
+		it('should display rich text at the font size computed from CSS relative to the VIEWPORT WIDTH.', () => {
 			// Arrange
 			const expectedFontSize = 3;
-			Dimensions.set( { window: { ...window, width: 300 } } );
+			Dimensions.set({ window: { ...window, width: 300 } });
 			// Act
 			const { getByA11yLabel } = render(
-				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vw' } />
+				<RichText accessibilityLabel={'editor'} fontSize={'1vw'} />
 			);
 			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
+			const actualFontSize = getByA11yLabel('editor').props.fontSize;
+			expect(actualFontSize).toBe(expectedFontSize);
+		});
 
-		it( 'should display rich text at the font size computed from CSS relative to the VIEWPORT HEIGHT.', () => {
+		it('should display rich text at the font size computed from CSS relative to the VIEWPORT HEIGHT.', () => {
 			// Arrange
 			const expectedFontSize = 3;
-			Dimensions.set( { window: { ...window, height: 300 } } );
+			Dimensions.set({ window: { ...window, height: 300 } });
 			// Act
 			const { getByA11yLabel } = render(
-				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vh' } />
+				<RichText accessibilityLabel={'editor'} fontSize={'1vh'} />
 			);
 			// Assert
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-		} );
-	} );
-} );
+			const actualFontSize = getByA11yLabel('editor').props.fontSize;
+			expect(actualFontSize).toBe(expectedFontSize);
+		});
+	});
+});

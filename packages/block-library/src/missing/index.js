@@ -16,15 +16,15 @@ export { metadata, name };
 
 export const settings = {
 	name,
-	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
+	__experimentalLabel(attributes, { context }) {
+		if (context === 'accessibility') {
 			const { originalName } = attributes;
 
 			const originalBlockType = originalName
-				? getBlockType( originalName )
+				? getBlockType(originalName)
 				: undefined;
 
-			if ( originalBlockType ) {
+			if (originalBlockType) {
 				return originalBlockType.settings.title || originalName;
 			}
 

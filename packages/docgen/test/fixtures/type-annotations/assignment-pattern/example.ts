@@ -1,3 +1,3 @@
-function fn( [ foo ]: string = '' ): string {
+function fn([foo]: string = ''): string {
 	return foo;
 }

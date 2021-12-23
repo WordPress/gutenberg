@@ -30,16 +30,16 @@ import { store as editorStore } from '../../store';
 
 export class PostPublishPanel extends Component {
 	constructor() {
-		super( ...arguments );
-		this.onSubmit = this.onSubmit.bind( this );
+		super(...arguments);
+		this.onSubmit = this.onSubmit.bind(this);
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate(prevProps) {
 		// Automatically collapse the publish sidebar when a post
 		// is published and the user makes an edit.
 		if (
 			prevProps.isPublished &&
-			! this.props.isSaving &&
+			!this.props.isSaving &&
 			this.props.isDirty
 		) {
 			this.props.onClose();
@@ -48,7 +48,7 @@ export class PostPublishPanel extends Component {
 
 	onSubmit() {
 		const { onClose, hasPublishAction, isPostTypeViewable } = this.props;
-		if ( ! hasPublishAction || ! isPostTypeViewable ) {
+		if (!hasPublishAction || !isPostTypeViewable) {
 			onClose();
 		}
 	}
@@ -69,64 +69,64 @@ export class PostPublishPanel extends Component {
 			PrePublishExtension,
 			...additionalProps
 		} = this.props;
-		const propsForPanel = omit( additionalProps, [
+		const propsForPanel = omit(additionalProps, [
 			'hasPublishAction',
 			'isDirty',
 			'isPostTypeViewable',
-		] );
+		]);
 		const isPublishedOrScheduled =
-			isPublished || ( isScheduled && isBeingScheduled );
-		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
-		const isPostPublish = isPublishedOrScheduled && ! isSaving;
+			isPublished || (isScheduled && isBeingScheduled);
+		const isPrePublish = !isPublishedOrScheduled && !isSaving;
+		const isPostPublish = isPublishedOrScheduled && !isSaving;
 		return (
-			<div className="editor-post-publish-panel" { ...propsForPanel }>
+			<div className="editor-post-publish-panel" {...propsForPanel}>
 				<div className="editor-post-publish-panel__header">
-					{ isPostPublish ? (
+					{isPostPublish ? (
 						<Button
-							onClick={ onClose }
-							icon={ closeSmall }
-							label={ __( 'Close panel' ) }
+							onClick={onClose}
+							icon={closeSmall}
+							label={__('Close panel')}
 						/>
 					) : (
 						<>
 							<div className="editor-post-publish-panel__header-publish-button">
 								<PostPublishButton
-									focusOnMount={ true }
-									onSubmit={ this.onSubmit }
-									forceIsDirty={ forceIsDirty }
-									forceIsSaving={ forceIsSaving }
+									focusOnMount={true}
+									onSubmit={this.onSubmit}
+									forceIsDirty={forceIsDirty}
+									forceIsSaving={forceIsSaving}
 								/>
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
 								<Button
-									disabled={ isSavingNonPostEntityChanges }
-									onClick={ onClose }
+									disabled={isSavingNonPostEntityChanges}
+									onClick={onClose}
 									variant="secondary"
 								>
-									{ __( 'Cancel' ) }
+									{__('Cancel')}
 								</Button>
 							</div>
 						</>
-					) }
+					)}
 				</div>
 				<div className="editor-post-publish-panel__content">
-					{ isPrePublish && (
+					{isPrePublish && (
 						<PostPublishPanelPrepublish>
-							{ PrePublishExtension && <PrePublishExtension /> }
+							{PrePublishExtension && <PrePublishExtension />}
 						</PostPublishPanelPrepublish>
-					) }
-					{ isPostPublish && (
-						<PostPublishPanelPostpublish focusOnMount={ true }>
-							{ PostPublishExtension && <PostPublishExtension /> }
+					)}
+					{isPostPublish && (
+						<PostPublishPanelPostpublish focusOnMount={true}>
+							{PostPublishExtension && <PostPublishExtension />}
 						</PostPublishPanelPostpublish>
-					) }
-					{ isSaving && <Spinner /> }
+					)}
+					{isSaving && <Spinner />}
 				</div>
 				<div className="editor-post-publish-panel__footer">
 					<CheckboxControl
-						label={ __( 'Always show pre-publish checks.' ) }
-						checked={ isPublishSidebarEnabled }
-						onChange={ onTogglePublishSidebar }
+						label={__('Always show pre-publish checks.')}
+						checked={isPublishSidebarEnabled}
+						onChange={onTogglePublishSidebar}
 					/>
 				</div>
 			</div>
@@ -134,9 +134,9 @@ export class PostPublishPanel extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getPostType } = select( coreStore );
+export default compose([
+	withSelect((select) => {
+		const { getPostType } = select(coreStore);
 		const {
 			getCurrentPost,
 			getEditedPostAttribute,
@@ -146,17 +146,17 @@ export default compose( [
 			isEditedPostDirty,
 			isSavingPost,
 			isSavingNonPostEntityChanges,
-		} = select( editorStore );
-		const { isPublishSidebarEnabled } = select( editorStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		} = select(editorStore);
+		const { isPublishSidebarEnabled } = select(editorStore);
+		const postType = getPostType(getEditedPostAttribute('type'));
 
 		return {
 			hasPublishAction: get(
 				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
+				['_links', 'wp:action-publish'],
 				false
 			),
-			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+			isPostTypeViewable: get(postType, ['viewable'], false),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isDirty: isEditedPostDirty(),
 			isPublished: isCurrentPostPublished(),
@@ -165,21 +165,20 @@ export default compose( [
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 		};
-	} ),
-	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
-		const { disablePublishSidebar, enablePublishSidebar } = dispatch(
-			editorStore
-		);
+	}),
+	withDispatch((dispatch, { isPublishSidebarEnabled }) => {
+		const { disablePublishSidebar, enablePublishSidebar } =
+			dispatch(editorStore);
 		return {
 			onTogglePublishSidebar: () => {
-				if ( isPublishSidebarEnabled ) {
+				if (isPublishSidebarEnabled) {
 					disablePublishSidebar();
 				} else {
 					enablePublishSidebar();
 				}
 			},
 		};
-	} ),
+	}),
 	withFocusReturn,
 	withConstrainedTabbing,
-] )( PostPublishPanel );
+])(PostPublishPanel);

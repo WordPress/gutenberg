@@ -6,9 +6,9 @@
  *
  * @return {string} The manipulated text.
  */
-export default function stripShortcodes( settings, text ) {
-	if ( settings.shortcodesRegExp ) {
-		return text.replace( settings.shortcodesRegExp, '\n' );
+export default function stripShortcodes(settings, text) {
+	if (settings.shortcodesRegExp) {
+		return text.replace(settings.shortcodesRegExp, '\n');
 	}
 	return text;
 }

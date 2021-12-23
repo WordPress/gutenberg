@@ -13,8 +13,8 @@ import { store as editorStore } from '@wordpress/editor';
  *
  * @return {string} Post edit URL.
  */
-export function getPostEditURL( postId ) {
-	return addQueryArgs( 'post.php', { post: postId, action: 'edit' } );
+export function getPostEditURL(postId) {
+	return addQueryArgs('post.php', { post: postId, action: 'edit' });
 }
 
 /**
@@ -25,40 +25,40 @@ export function getPostEditURL( postId ) {
  *
  * @return {string} Post trashed URL.
  */
-export function getPostTrashedURL( postId, postType ) {
-	return addQueryArgs( 'edit.php', {
+export function getPostTrashedURL(postId, postType) {
+	return addQueryArgs('edit.php', {
 		trashed: 1,
 		post_type: postType,
 		ids: postId,
-	} );
+	});
 }
 
 export class BrowserURL extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
 		this.state = {
 			historyId: null,
 		};
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate(prevProps) {
 		const { postId, postStatus, postType, isSavingPost } = this.props;
 		const { historyId } = this.state;
 
 		// Posts are still dirty while saving so wait for saving to finish
 		// to avoid the unsaved changes warning when trashing posts.
-		if ( postStatus === 'trash' && ! isSavingPost ) {
-			this.setTrashURL( postId, postType );
+		if (postStatus === 'trash' && !isSavingPost) {
+			this.setTrashURL(postId, postType);
 			return;
 		}
 
 		if (
-			( postId !== prevProps.postId || postId !== historyId ) &&
+			(postId !== prevProps.postId || postId !== historyId) &&
 			postStatus !== 'auto-draft' &&
 			postId
 		) {
-			this.setBrowserURL( postId );
+			this.setBrowserURL(postId);
 		}
 	}
 
@@ -68,8 +68,8 @@ export class BrowserURL extends Component {
 	 * @param {number} postId   Post ID.
 	 * @param {string} postType Post Type.
 	 */
-	setTrashURL( postId, postType ) {
-		window.location.href = getPostTrashedURL( postId, postType );
+	setTrashURL(postId, postType) {
+		window.location.href = getPostTrashedURL(postId, postType);
 	}
 
 	/**
@@ -81,16 +81,16 @@ export class BrowserURL extends Component {
 	 *
 	 * @param {number} postId Post ID for which to generate post editor URL.
 	 */
-	setBrowserURL( postId ) {
+	setBrowserURL(postId) {
 		window.history.replaceState(
 			{ id: postId },
 			'Post ' + postId,
-			getPostEditURL( postId )
+			getPostEditURL(postId)
 		);
 
-		this.setState( () => ( {
+		this.setState(() => ({
 			historyId: postId,
-		} ) );
+		}));
 	}
 
 	render() {
@@ -98,12 +98,12 @@ export class BrowserURL extends Component {
 	}
 }
 
-export default withSelect( ( select ) => {
-	const { getCurrentPost, isSavingPost } = select( editorStore );
+export default withSelect((select) => {
+	const { getCurrentPost, isSavingPost } = select(editorStore);
 	const post = getCurrentPost();
 	let { id, status, type } = post;
-	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes( type );
-	if ( isTemplate ) {
+	const isTemplate = ['wp_template', 'wp_template_part'].includes(type);
+	if (isTemplate) {
 		id = post.wp_id;
 	}
 
@@ -113,4 +113,4 @@ export default withSelect( ( select ) => {
 		postType: type,
 		isSavingPost: isSavingPost(),
 	};
-} )( BrowserURL );
+})(BrowserURL);

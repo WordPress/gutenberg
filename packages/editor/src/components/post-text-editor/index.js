@@ -20,18 +20,18 @@ import { store as editorStore } from '../../store';
 
 export default function PostTextEditor() {
 	const postContent = useSelect(
-		( select ) => select( editorStore ).getEditedPostContent(),
+		(select) => select(editorStore).getEditedPostContent(),
 		[]
 	);
 
-	const { editPost, resetEditorBlocks } = useDispatch( editorStore );
+	const { editPost, resetEditorBlocks } = useDispatch(editorStore);
 
-	const [ value, setValue ] = useState( postContent );
-	const [ isDirty, setIsDirty ] = useState( false );
-	const instanceId = useInstanceId( PostTextEditor );
+	const [value, setValue] = useState(postContent);
+	const [isDirty, setIsDirty] = useState(false);
+	const instanceId = useInstanceId(PostTextEditor);
 
-	if ( ! isDirty && value !== postContent ) {
-		setValue( postContent );
+	if (!isDirty && value !== postContent) {
+		setValue(postContent);
 	}
 
 	/**
@@ -45,11 +45,11 @@ export default function PostTextEditor() {
 	 *
 	 * @param {Event} event Change event.
 	 */
-	const onChange = ( event ) => {
+	const onChange = (event) => {
 		const newValue = event.target.value;
-		editPost( { content: newValue } );
-		setValue( newValue );
-		setIsDirty( true );
+		editPost({ content: newValue });
+		setValue(newValue);
+		setIsDirty(true);
 	};
 
 	/**
@@ -58,30 +58,27 @@ export default function PostTextEditor() {
 	 * callback and resetting dirty state.
 	 */
 	const stopEditing = () => {
-		if ( isDirty ) {
-			const blocks = parse( value );
-			resetEditorBlocks( blocks );
-			setIsDirty( false );
+		if (isDirty) {
+			const blocks = parse(value);
+			resetEditorBlocks(blocks);
+			setIsDirty(false);
 		}
 	};
 
 	return (
 		<>
-			<VisuallyHidden
-				as="label"
-				htmlFor={ `post-content-${ instanceId }` }
-			>
-				{ __( 'Type text or HTML' ) }
+			<VisuallyHidden as="label" htmlFor={`post-content-${instanceId}`}>
+				{__('Type text or HTML')}
 			</VisuallyHidden>
 			<Textarea
 				autoComplete="off"
 				dir="auto"
-				value={ value }
-				onChange={ onChange }
-				onBlur={ stopEditing }
+				value={value}
+				onChange={onChange}
+				onBlur={stopEditing}
 				className="editor-post-text-editor"
-				id={ `post-content-${ instanceId }` }
-				placeholder={ __( 'Start writing with text or HTML' ) }
+				id={`post-content-${instanceId}`}
+				placeholder={__('Start writing with text or HTML')}
 			/>
 		</>
 	);

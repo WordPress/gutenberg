@@ -37,7 +37,7 @@ import useSetting from '../components/use-setting';
  *
  * @return {Object} Color block support derived CSS classes & styles.
  */
-export function getColorClassesAndStyles( attributes ) {
+export function getColorClassesAndStyles(attributes) {
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
 	// Collect color CSS classes.
@@ -45,15 +45,15 @@ export function getColorClassesAndStyles( attributes ) {
 		'background-color',
 		backgroundColor
 	);
-	const textClass = getColorClassName( 'color', textColor );
+	const textClass = getColorClassName('color', textColor);
 
-	const gradientClass = __experimentalGetGradientClass( gradient );
+	const gradientClass = __experimentalGetGradientClass(gradient);
 	const hasGradient = gradientClass || style?.color?.gradient;
 
 	// Determine color CSS class name list.
-	const className = classnames( textClass, gradientClass, {
+	const className = classnames(textClass, gradientClass, {
 		// Don't apply the background class if there's a gradient.
-		[ backgroundClass ]: ! hasGradient && !! backgroundClass,
+		[backgroundClass]: !hasGradient && !!backgroundClass,
 		'has-text-color': textColor || style?.color?.text,
 		'has-background':
 			backgroundColor ||
@@ -61,11 +61,11 @@ export function getColorClassesAndStyles( attributes ) {
 			gradient ||
 			style?.color?.gradient,
 		'has-link-color': style?.elements?.link?.color,
-	} );
+	});
 
 	// Collect inline styles for colors.
 	const colorStyles = style?.color || {};
-	const styleProp = getInlineStyles( { color: colorStyles } );
+	const styleProp = getInlineStyles({ color: colorStyles });
 
 	return {
 		className: className || undefined,
@@ -86,38 +86,38 @@ const EMPTY_OBJECT = {};
  *
  * @return {Object} ClassName & style props from colors block support.
  */
-export function useColorProps( attributes ) {
+export function useColorProps(attributes) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
 	// Some color settings have a special handling for deprecated flags in `useSetting`,
 	// so we can't unwrap them by doing const { ... } = useSetting('color')
 	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
-	const userPalette = useSetting( 'color.palette.custom' ) || [];
-	const themePalette = useSetting( 'color.palette.theme' ) || [];
-	const defaultPalette = useSetting( 'color.palette.default' ) || [];
-	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
+	const userPalette = useSetting('color.palette.custom') || [];
+	const themePalette = useSetting('color.palette.theme') || [];
+	const defaultPalette = useSetting('color.palette.default') || [];
+	const gradientsPerOrigin = useSetting('color.gradients') || EMPTY_OBJECT;
 	const colors = useMemo(
 		() => [
-			...( userPalette || [] ),
-			...( themePalette || [] ),
-			...( defaultPalette || [] ),
+			...(userPalette || []),
+			...(themePalette || []),
+			...(defaultPalette || []),
 		],
-		[ userPalette, themePalette, defaultPalette ]
+		[userPalette, themePalette, defaultPalette]
 	);
 	const gradients = useMemo(
 		() => [
-			...( gradientsPerOrigin?.custom || [] ),
-			...( gradientsPerOrigin?.theme || [] ),
-			...( gradientsPerOrigin?.default || [] ),
+			...(gradientsPerOrigin?.custom || []),
+			...(gradientsPerOrigin?.theme || []),
+			...(gradientsPerOrigin?.default || []),
 		],
-		[ gradientsPerOrigin ]
+		[gradientsPerOrigin]
 	);
 
-	const colorProps = getColorClassesAndStyles( attributes );
+	const colorProps = getColorClassesAndStyles(attributes);
 
 	// Force inline styles to apply colors when themes do not load their color
 	// stylesheets in the editor.
-	if ( backgroundColor ) {
+	if (backgroundColor) {
 		const backgroundColorObject = getColorObjectByAttributeValues(
 			colors,
 			backgroundColor
@@ -126,14 +126,14 @@ export function useColorProps( attributes ) {
 		colorProps.style.backgroundColor = backgroundColorObject.color;
 	}
 
-	if ( gradient ) {
+	if (gradient) {
 		colorProps.style.background = getGradientValueBySlug(
 			gradients,
 			gradient
 		);
 	}
 
-	if ( textColor ) {
+	if (textColor) {
 		const textColorObject = getColorObjectByAttributeValues(
 			colors,
 			textColor

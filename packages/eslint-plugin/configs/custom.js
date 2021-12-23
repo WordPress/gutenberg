@@ -1,5 +1,5 @@
 module.exports = {
-	plugins: [ '@wordpress' ],
+	plugins: ['@wordpress'],
 	rules: {
 		'@wordpress/no-unused-vars-before-return': 'error',
 		'@wordpress/no-base-control-with-label-without-id': 'error',
@@ -10,7 +10,7 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '*.native.js' ],
+			files: ['*.native.js'],
 			rules: {
 				'@wordpress/no-base-control-with-label-without-id': 'off',
 			},

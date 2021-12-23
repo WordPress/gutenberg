@@ -10,8 +10,8 @@ import { combineReducers } from '@wordpress/data';
  * @param {Object} action Dispatched action.
  * @return {Object} Updated state.
  */
-export function selectedMenuId( state = null, action ) {
-	switch ( action.type ) {
+export function selectedMenuId(state = null, action) {
+	switch (action.type) {
 		case 'SET_SELECTED_MENU_ID':
 			return action.menuId;
 	}
@@ -27,15 +27,15 @@ export function selectedMenuId( state = null, action ) {
  * @param {string}         action.type  String indicating action type.
  * @param {boolean}        action.value Flag indicating whether the panel should be open/close.
  */
-function blockInserterPanel( state = false, action ) {
-	switch ( action.type ) {
+function blockInserterPanel(state = false, action) {
+	switch (action.type) {
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value;
 	}
 	return state;
 }
 
-export default combineReducers( {
+export default combineReducers({
 	selectedMenuId,
 	blockInserterPanel,
-} );
+});

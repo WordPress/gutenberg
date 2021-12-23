@@ -7,7 +7,7 @@ window.onShowContextMenu = () => {
 };
 window.onHideContextMenu = () => {
 	isContextMenuVisible = false;
-	while ( hideContextMenuListeners.length > 0 ) {
+	while (hideContextMenuListeners.length > 0) {
 		const listener = hideContextMenuListeners.pop();
 		listener();
 	}
@@ -24,9 +24,9 @@ https://github.com/WordPress/gutenberg/pull/34668
 */
 window.addEventListener(
 	'click',
-	( event ) => {
+	(event) => {
 		const selected = document.getSelection();
-		if ( ! isContextMenuVisible || ! selected || ! selected.toString() ) {
+		if (!isContextMenuVisible || !selected || !selected.toString()) {
 			return;
 		}
 
@@ -36,8 +36,8 @@ window.addEventListener(
 			'.components-dropdown-menu > button'
 		);
 		let currentToggle;
-		for ( const node of dropdownToggles.values() ) {
-			if ( node.contains( event.target ) ) {
+		for (const node of dropdownToggles.values()) {
+			if (node.contains(event.target)) {
 				currentToggle = node;
 				break;
 			}
@@ -49,9 +49,9 @@ window.addEventListener(
 		// NOTE: The event propagation is prevented because
 		// it will be dispatched after the context menu
 		// is hidden.
-		if ( currentToggle ) {
+		if (currentToggle) {
 			event.stopPropagation();
-			hideContextMenuListeners.push( () => currentToggle.click() );
+			hideContextMenuListeners.push(() => currentToggle.click());
 			window.wpwebkit.hideTextSelectionContextMenu();
 		}
 	},

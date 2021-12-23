@@ -8,49 +8,49 @@ import deepFreeze from 'deep-freeze';
  */
 import locks from '../reducer';
 
-const buildNode = ( children = {} ) => ( {
+const buildNode = (children = {}) => ({
 	locks: [],
 	children,
-} );
+});
 
-describe( 'locks', () => {
-	it( 'Enqueues lock requests', () => {
+describe('locks', () => {
+	it('Enqueues lock requests', () => {
 		const request = {};
-		const state = deepFreeze( {
+		const state = deepFreeze({
 			requests: [],
-		} );
+		});
 
 		expect(
-			locks( state, {
+			locks(state, {
 				type: 'ENQUEUE_LOCK_REQUEST',
 				request,
-			} )
-		).toEqual( {
-			requests: [ request ],
-		} );
-	} );
+			})
+		).toEqual({
+			requests: [request],
+		});
+	});
 
-	it( 'Grants lock requests', () => {
+	it('Grants lock requests', () => {
 		const red = buildNode();
 		const blue = buildNode();
 		const green = buildNode();
-		const bird = buildNode( { red, blue, green } );
-		const tree = buildNode( { bird } );
+		const bird = buildNode({ red, blue, green });
+		const tree = buildNode({ bird });
 
-		const request = { store: 'bird', path: [ 'green' ] };
-		const state = deepFreeze( {
-			requests: [ request ],
+		const request = { store: 'bird', path: ['green'] };
+		const state = deepFreeze({
+			requests: [request],
 			tree,
-		} );
+		});
 
 		const lock = {};
 		expect(
-			locks( state, {
+			locks(state, {
 				type: 'GRANT_LOCK_REQUEST',
 				lock,
 				request,
-			} )
-		).toEqual( {
+			})
+		).toEqual({
 			// Should remove the request...
 			requests: [],
 			tree: {
@@ -63,24 +63,24 @@ describe( 'locks', () => {
 							blue,
 							green: {
 								// ...and add the lock
-								locks: [ lock ],
+								locks: [lock],
 								children: {},
 							},
 						},
 					},
 				},
 			},
-		} );
-	} );
+		});
+	});
 
-	it( 'Releases acquired locks', () => {
+	it('Releases acquired locks', () => {
 		const red = buildNode();
 		const blue = buildNode();
 		const lock = {
 			store: 'bird',
-			path: [ 'green' ],
+			path: ['green'],
 		};
-		const state = deepFreeze( {
+		const state = deepFreeze({
 			// Should remove the request...
 			requests: [],
 			tree: {
@@ -93,21 +93,21 @@ describe( 'locks', () => {
 							blue,
 							green: {
 								// ...and add the lock
-								locks: [ lock ],
+								locks: [lock],
 								children: {},
 							},
 						},
 					},
 				},
 			},
-		} );
+		});
 
 		expect(
-			locks( state, {
+			locks(state, {
 				type: 'RELEASE_LOCK',
 				lock,
-			} )
-		).toEqual( {
+			})
+		).toEqual({
 			requests: [],
 			tree: {
 				locks: [],
@@ -126,6 +126,6 @@ describe( 'locks', () => {
 					},
 				},
 			},
-		} );
-	} );
-} );
+		});
+	});
+});

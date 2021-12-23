@@ -37,13 +37,13 @@ import { store } from './store';
  *
  * @return {Function} Higher-order component.
  */
-const withViewportMatch = ( queries ) =>
+const withViewportMatch = (queries) =>
 	createHigherOrderComponent(
-		withSelect( ( select ) => {
-			return mapValues( queries, ( query ) => {
-				return select( store ).isViewportMatch( query );
-			} );
-		} ),
+		withSelect((select) => {
+			return mapValues(queries, (query) => {
+				return select(store).isViewportMatch(query);
+			});
+		}),
 		'withViewportMatch'
 	);
 

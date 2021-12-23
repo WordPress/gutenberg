@@ -7,7 +7,7 @@
  *
  * @return {Object} Action object.
  */
-function setSingleEnableItem( itemType, scope, item ) {
+function setSingleEnableItem(itemType, scope, item) {
 	return {
 		type: 'SET_SINGLE_ENABLE_ITEM',
 		itemType,
@@ -24,8 +24,8 @@ function setSingleEnableItem( itemType, scope, item ) {
  *
  * @return {Object} Action object.
  */
-export function enableComplementaryArea( scope, area ) {
-	return setSingleEnableItem( 'complementaryArea', scope, area );
+export function enableComplementaryArea(scope, area) {
+	return setSingleEnableItem('complementaryArea', scope, area);
 }
 
 /**
@@ -35,8 +35,8 @@ export function enableComplementaryArea( scope, area ) {
  *
  * @return {Object} Action object.
  */
-export function disableComplementaryArea( scope ) {
-	return setSingleEnableItem( 'complementaryArea', scope, undefined );
+export function disableComplementaryArea(scope) {
+	return setSingleEnableItem('complementaryArea', scope, undefined);
 }
 
 /**
@@ -49,7 +49,7 @@ export function disableComplementaryArea( scope ) {
  *
  * @return {Object} Action object.
  */
-function setMultipleEnableItem( itemType, scope, item, isEnable ) {
+function setMultipleEnableItem(itemType, scope, item, isEnable) {
 	return {
 		type: 'SET_MULTIPLE_ENABLE_ITEM',
 		itemType,
@@ -67,8 +67,8 @@ function setMultipleEnableItem( itemType, scope, item, isEnable ) {
  *
  * @return {Object} Action object.
  */
-export function pinItem( scope, itemId ) {
-	return setMultipleEnableItem( 'pinnedItems', scope, itemId, true );
+export function pinItem(scope, itemId) {
+	return setMultipleEnableItem('pinnedItems', scope, itemId, true);
 }
 
 /**
@@ -79,8 +79,8 @@ export function pinItem( scope, itemId ) {
  *
  * @return {Object} Action object.
  */
-export function unpinItem( scope, itemId ) {
-	return setMultipleEnableItem( 'pinnedItems', scope, itemId, false );
+export function unpinItem(scope, itemId) {
+	return setMultipleEnableItem('pinnedItems', scope, itemId, false);
 }
 
 /**
@@ -89,10 +89,10 @@ export function unpinItem( scope, itemId ) {
  * @param {string} scope       The feature scope (e.g. core/edit-post).
  * @param {string} featureName The feature name.
  */
-export function toggleFeature( scope, featureName ) {
-	return function ( { select, dispatch } ) {
-		const currentValue = select.isFeatureActive( scope, featureName );
-		dispatch.setFeatureValue( scope, featureName, ! currentValue );
+export function toggleFeature(scope, featureName) {
+	return function ({ select, dispatch }) {
+		const currentValue = select.isFeatureActive(scope, featureName);
+		dispatch.setFeatureValue(scope, featureName, !currentValue);
 	};
 }
 
@@ -106,12 +106,12 @@ export function toggleFeature( scope, featureName ) {
  *
  * @return {Object} Action object.
  */
-export function setFeatureValue( scope, featureName, value ) {
+export function setFeatureValue(scope, featureName, value) {
 	return {
 		type: 'SET_FEATURE_VALUE',
 		scope,
 		featureName,
-		value: !! value,
+		value: !!value,
 	};
 }
 
@@ -123,7 +123,7 @@ export function setFeatureValue( scope, featureName, value ) {
  *
  * @return {Object} Action object.
  */
-export function setFeatureDefaults( scope, defaults ) {
+export function setFeatureDefaults(scope, defaults) {
 	return {
 		type: 'SET_FEATURE_DEFAULTS',
 		scope,

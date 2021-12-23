@@ -14,7 +14,7 @@ import { useConvertUnitToMobile } from '@wordpress/components';
  */
 import styles from './editor.scss';
 
-function ColumnPreviewItem( { index, selectedColumnIndex, width } ) {
+function ColumnPreviewItem({ index, selectedColumnIndex, width }) {
 	const columnIndicatorStyle = usePreferredColorSchemeStyle(
 		styles.columnIndicator,
 		styles.columnIndicatorDark
@@ -22,35 +22,35 @@ function ColumnPreviewItem( { index, selectedColumnIndex, width } ) {
 
 	const isSelectedColumn = index === selectedColumnIndex;
 
-	const convertedWidth = useConvertUnitToMobile( width );
+	const convertedWidth = useConvertUnitToMobile(width);
 	return (
 		<View
-			style={ [
+			style={[
 				isSelectedColumn && columnIndicatorStyle,
 				{ flex: convertedWidth },
-			] }
-			key={ index }
+			]}
+			key={index}
 		/>
 	);
 }
 
-function ColumnsPreview( { columnWidths, selectedColumnIndex } ) {
+function ColumnsPreview({ columnWidths, selectedColumnIndex }) {
 	const columnsPreviewStyle = usePreferredColorSchemeStyle(
 		styles.columnsPreview,
 		styles.columnsPreviewDark
 	);
 	return (
-		<View style={ columnsPreviewStyle }>
-			{ columnWidths.map( ( width, index ) => {
+		<View style={columnsPreviewStyle}>
+			{columnWidths.map((width, index) => {
 				return (
 					<ColumnPreviewItem
-						index={ index }
-						selectedColumnIndex={ selectedColumnIndex }
-						width={ width }
-						key={ index }
+						index={index}
+						selectedColumnIndex={selectedColumnIndex}
+						width={width}
+						key={index}
 					/>
 				);
-			} ) }
+			})}
 		</View>
 	);
 }

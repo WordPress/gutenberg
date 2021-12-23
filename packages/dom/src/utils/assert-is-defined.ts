@@ -1,13 +1,13 @@
-export function assertIsDefined< T >(
+export function assertIsDefined<T>(
 	val: T,
 	name: string
-): asserts val is NonNullable< T > {
+): asserts val is NonNullable<T> {
 	if (
 		process.env.NODE_ENV !== 'production' &&
-		( val === undefined || val === null )
+		(val === undefined || val === null)
 	) {
 		throw new Error(
-			`Expected '${ name }' to be defined, but received ${ val }`
+			`Expected '${name}' to be defined, but received ${val}`
 		);
 	}
 }

@@ -17,19 +17,19 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @return {string} The class name, e.g. `wp-block-paragraph`.
  */
-export function useBlockDefaultClassName( clientId ) {
+export function useBlockDefaultClassName(clientId) {
 	return useSelect(
-		( select ) => {
-			const name = select( blockEditorStore ).getBlockName( clientId );
-			const blockType = getBlockType( name );
+		(select) => {
+			const name = select(blockEditorStore).getBlockName(clientId);
+			const blockType = getBlockType(name);
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 
-			if ( ! hasLightBlockWrapper ) {
+			if (!hasLightBlockWrapper) {
 				return;
 			}
 
-			return getBlockDefaultClassName( name );
+			return getBlockDefaultClassName(name);
 		},
-		[ clientId ]
+		[clientId]
 	);
 }

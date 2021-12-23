@@ -18,8 +18,8 @@ import { addQueryArgs } from '@wordpress/url';
  *
  * @return {string} WPAdmin URL.
  */
-export function getWPAdminURL( page, query ) {
-	return addQueryArgs( page, query );
+export function getWPAdminURL(page, query) {
+	return addQueryArgs(page, query);
 }
 
 /**
@@ -38,14 +38,14 @@ export function getWPAdminURL( page, query ) {
  *
  * @return {string} Processed string
  */
-export function cleanForSlug( string ) {
-	if ( ! string ) {
+export function cleanForSlug(string) {
+	if (!string) {
 		return '';
 	}
 	return trim(
-		deburr( string )
-			.replace( /[\s\./]+/g, '-' )
-			.replace( /[^\p{L}\p{N}_-]+/gu, '' )
+		deburr(string)
+			.replace(/[\s\./]+/g, '-')
+			.replace(/[^\p{L}\p{N}_-]+/gu, '')
 			.toLowerCase(),
 		'-'
 	);

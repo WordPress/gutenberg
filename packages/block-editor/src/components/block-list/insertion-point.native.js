@@ -14,7 +14,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const BlockInsertionPoint = ( { getStylesFromColorScheme } ) => {
+const BlockInsertionPoint = ({ getStylesFromColorScheme }) => {
 	const lineStyle = getStylesFromColorScheme(
 		styles.lineStyleAddHere,
 		styles.lineStyleAddHereDark
@@ -25,12 +25,12 @@ const BlockInsertionPoint = ( { getStylesFromColorScheme } ) => {
 	);
 
 	return (
-		<View style={ styles.containerStyleAddHere }>
-			<View style={ lineStyle }></View>
-			<Text style={ labelStyle }>{ __( 'ADD BLOCK HERE' ) }</Text>
-			<View style={ lineStyle }></View>
+		<View style={styles.containerStyleAddHere}>
+			<View style={lineStyle}></View>
+			<Text style={labelStyle}>{__('ADD BLOCK HERE')}</Text>
+			<View style={lineStyle}></View>
 		</View>
 	);
 };
 
-export default withPreferredColorScheme( BlockInsertionPoint );
+export default withPreferredColorScheme(BlockInsertionPoint);

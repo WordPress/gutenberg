@@ -42,7 +42,7 @@ import { store as blockEditorStore } from '../../store';
  *
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
  */
-export function useInnerBlocksProps( props = {}, options = {} ) {
+export function useInnerBlocksProps(props = {}, options = {}) {
 	const fallbackRef = useRef();
 	const { clientId } = useBlockEditContext();
 
@@ -56,11 +56,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		...props,
 		ref,
 		children: (
-			<InnerBlocks
-				{ ...options }
-				clientId={ clientId }
-				wrapperRef={ ref }
-			/>
+			<InnerBlocks {...options} clientId={clientId} wrapperRef={ref} />
 		),
 	};
 }
@@ -73,7 +69,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
  *
  * @param {Object} props The component props.
  */
-function UncontrolledInnerBlocks( props ) {
+function UncontrolledInnerBlocks(props) {
 	const {
 		clientId,
 		allowedBlocks,
@@ -99,11 +95,11 @@ function UncontrolledInnerBlocks( props ) {
 	} = props;
 
 	const block = useSelect(
-		( select ) => select( blockEditorStore ).getBlock( clientId ),
-		[ clientId ]
+		(select) => select(blockEditorStore).getBlock(clientId),
+		[clientId]
 	) || { innerBlocks: [] };
 
-	useNestedSettingsUpdate( clientId, allowedBlocks, templateLock );
+	useNestedSettingsUpdate(clientId, allowedBlocks, templateLock);
 
 	useInnerBlockTemplateSync(
 		clientId,
@@ -114,35 +110,35 @@ function UncontrolledInnerBlocks( props ) {
 
 	let blockList = (
 		<BlockList
-			marginVertical={ marginVertical }
-			marginHorizontal={ marginHorizontal }
-			rootClientId={ clientId }
-			renderAppender={ renderAppender }
-			renderFooterAppender={ renderFooterAppender }
-			withFooter={ false }
-			orientation={ orientation }
-			parentWidth={ parentWidth }
-			horizontalAlignment={ horizontalAlignment }
-			horizontal={ horizontal }
-			contentResizeMode={ contentResizeMode }
-			contentStyle={ contentStyle }
-			onAddBlock={ onAddBlock }
-			onDeleteBlock={ onDeleteBlock }
-			filterInnerBlocks={ filterInnerBlocks }
-			gridProperties={ gridProperties }
-			blockWidth={ blockWidth }
+			marginVertical={marginVertical}
+			marginHorizontal={marginHorizontal}
+			rootClientId={clientId}
+			renderAppender={renderAppender}
+			renderFooterAppender={renderFooterAppender}
+			withFooter={false}
+			orientation={orientation}
+			parentWidth={parentWidth}
+			horizontalAlignment={horizontalAlignment}
+			horizontal={horizontal}
+			contentResizeMode={contentResizeMode}
+			contentStyle={contentStyle}
+			onAddBlock={onAddBlock}
+			onDeleteBlock={onDeleteBlock}
+			filterInnerBlocks={filterInnerBlocks}
+			gridProperties={gridProperties}
+			blockWidth={blockWidth}
 		/>
 	);
 
 	// Wrap context provider if (and only if) block has context to provide.
-	const blockType = getBlockType( block.name );
-	if ( blockType && blockType.providesContext ) {
-		const context = getBlockContext( block.attributes, blockType );
+	const blockType = getBlockType(block.name);
+	if (blockType && blockType.providesContext) {
+		const context = getBlockContext(block.attributes, blockType);
 
 		blockList = (
-			<LayoutProvider value={ layout }>
-				<BlockContextProvider value={ context }>
-					{ blockList }
+			<LayoutProvider value={layout}>
+				<BlockContextProvider value={context}>
+					{blockList}
 				</BlockContextProvider>
 			</LayoutProvider>
 		);
@@ -160,9 +156,9 @@ function UncontrolledInnerBlocks( props ) {
  *
  * @param {Object} props The component props.
  */
-function ControlledInnerBlocks( props ) {
-	useBlockSync( props );
-	return <UncontrolledInnerBlocks { ...props } />;
+function ControlledInnerBlocks(props) {
+	useBlockSync(props);
+	return <UncontrolledInnerBlocks {...props} />;
 }
 
 /**
@@ -172,7 +168,7 @@ function ControlledInnerBlocks( props ) {
  *
  * @param {Object} props The component props.
  */
-const InnerBlocks = ( props ) => {
+const InnerBlocks = (props) => {
 	const { clientId } = useBlockEditContext();
 
 	const allProps = {
@@ -182,9 +178,9 @@ const InnerBlocks = ( props ) => {
 
 	// Detects if the InnerBlocks should be controlled by an incoming value.
 	return props.value && props.onChange ? (
-		<ControlledInnerBlocks { ...allProps } />
+		<ControlledInnerBlocks {...allProps} />
 	) : (
-		<UncontrolledInnerBlocks { ...allProps } />
+		<UncontrolledInnerBlocks {...allProps} />
 	);
 };
 

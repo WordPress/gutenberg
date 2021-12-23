@@ -10,6 +10,6 @@ import type { CSSProperties } from 'react';
 import type { HStackAlignment, Props as HStackProps } from '../h-stack/types';
 
 export type Props = HStackProps & {
-	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
-	spacing?: CSSProperties[ 'width' ];
+	alignment?: HStackAlignment | CSSProperties['alignItems'];
+	spacing?: CSSProperties['width'];
 };

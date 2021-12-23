@@ -25,17 +25,17 @@ import {
 	MEDIA_SAVE_MEDIAID_CHANGED,
 } from '../';
 
-jest.mock( '@wordpress/react-native-bridge', () => {
-	const callUploadCallback = ( payload ) => {
-		this.uploadCallBack( payload );
+jest.mock('@wordpress/react-native-bridge', () => {
+	const callUploadCallback = (payload) => {
+		this.uploadCallBack(payload);
 	};
-	const callSaveCallback = ( payload ) => {
-		this.saveCallBack( payload );
+	const callSaveCallback = (payload) => {
+		this.saveCallBack(payload);
 	};
-	const subscribeMediaUpload = ( callback ) => {
+	const subscribeMediaUpload = (callback) => {
 		this.uploadCallBack = callback;
 	};
-	const subscribeMediaSave = ( callback ) => {
+	const subscribeMediaSave = (callback) => {
 		this.saveCallBack = callback;
 	};
 	const mediaSources = {
@@ -50,7 +50,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		sendMediaSave: callSaveCallback,
 		mediaSources,
 	};
-} );
+});
 
 const MEDIAID_LOCAL = 2;
 const MEDIAID_TEMP = 'tempid-0-1';
@@ -97,15 +97,15 @@ const localMediaFiles = [
 	},
 ];
 
-describe( 'BlockMediaUpdateProgress component', () => {
-	it( 'renders without crashing', () => {
+describe('BlockMediaUpdateProgress component', () => {
+	it('renders without crashing', () => {
 		const wrapper = shallow(
-			<BlockMediaUpdateProgress renderContent={ () => {} } />
+			<BlockMediaUpdateProgress renderContent={() => {}} />
 		);
-		expect( wrapper ).toBeTruthy();
-	} );
+		expect(wrapper).toBeTruthy();
+	});
 
-	it( 'upload: onUpdateMediaUploadProgress is called when a progress update payload is received', () => {
+	it('upload: onUpdateMediaUploadProgress is called when a progress update payload is received', () => {
 		const progress = 10;
 		const payload = {
 			state: MEDIA_UPLOAD_STATE_UPLOADING,
@@ -117,23 +117,23 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onUpdateMediaUploadProgress={ onUpdateMediaUploadProgress }
-				mediaFiles={ localMediaFiles }
-				renderContent={ () => {} }
+				onUpdateMediaUploadProgress={onUpdateMediaUploadProgress}
+				mediaFiles={localMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaUpload( payload );
+		sendMediaUpload(payload);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
-		expect( wrapper.instance().state.isUploadInProgress ).toEqual( true );
-		expect( wrapper.instance().state.isUploadFailed ).toEqual( false );
-		expect( onUpdateMediaUploadProgress ).toHaveBeenCalledTimes( 1 );
-		expect( onUpdateMediaUploadProgress ).toHaveBeenCalledWith( payload );
-	} );
+		expect(wrapper.instance().state.progress).toEqual(progress);
+		expect(wrapper.instance().state.isUploadInProgress).toEqual(true);
+		expect(wrapper.instance().state.isUploadFailed).toEqual(false);
+		expect(onUpdateMediaUploadProgress).toHaveBeenCalledTimes(1);
+		expect(onUpdateMediaUploadProgress).toHaveBeenCalledWith(payload);
+	});
 
 	// UPLOAD tests
-	it( 'upload does not get affected by unrelated media uploads', () => {
+	it('upload does not get affected by unrelated media uploads', () => {
 		const payload = {
 			state: MEDIA_UPLOAD_STATE_UPLOADING,
 			mediaId: 432, // id not belonging to assigned mediaFiles collection in test
@@ -142,19 +142,19 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const onUpdateMediaUploadProgress = jest.fn();
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onUpdateMediaUploadProgress={ onUpdateMediaUploadProgress }
-				mediaFiles={ localMediaFiles }
-				renderContent={ () => {} }
+				onUpdateMediaUploadProgress={onUpdateMediaUploadProgress}
+				mediaFiles={localMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaUpload( payload );
+		sendMediaUpload(payload);
 
-		expect( wrapper.instance().state.progress ).toEqual( 0 );
-		expect( onUpdateMediaUploadProgress ).toHaveBeenCalledTimes( 0 );
-	} );
+		expect(wrapper.instance().state.progress).toEqual(0);
+		expect(onUpdateMediaUploadProgress).toHaveBeenCalledTimes(0);
+	});
 
-	it( 'upload: onFinishMediaUploadWithSuccess is called when a success payload is received', () => {
+	it('upload: onFinishMediaUploadWithSuccess is called when a success payload is received', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_UPLOAD_STATE_SUCCEEDED,
@@ -170,28 +170,26 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onFinishMediaUploadWithSuccess={
-					onFinishMediaUploadWithSuccess
-				}
-				mediaFiles={ localMediaFiles }
-				renderContent={ () => {} }
+				onFinishMediaUploadWithSuccess={onFinishMediaUploadWithSuccess}
+				mediaFiles={localMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaUpload( payloadUploading );
+		sendMediaUpload(payloadUploading);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaUpload( payloadSuccess );
+		sendMediaUpload(payloadSuccess);
 
-		expect( wrapper.instance().state.isUploadInProgress ).toEqual( false );
-		expect( onFinishMediaUploadWithSuccess ).toHaveBeenCalledTimes( 1 );
-		expect( onFinishMediaUploadWithSuccess ).toHaveBeenCalledWith(
+		expect(wrapper.instance().state.isUploadInProgress).toEqual(false);
+		expect(onFinishMediaUploadWithSuccess).toHaveBeenCalledTimes(1);
+		expect(onFinishMediaUploadWithSuccess).toHaveBeenCalledWith(
 			payloadSuccess
 		);
-	} );
+	});
 
-	it( 'upload: onFinishMediaUploadWithFailure is called when a failed payload is received', () => {
+	it('upload: onFinishMediaUploadWithFailure is called when a failed payload is received', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_UPLOAD_STATE_FAILED,
@@ -207,29 +205,27 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onFinishMediaUploadWithFailure={
-					onFinishMediaUploadWithFailure
-				}
-				mediaFiles={ localMediaFiles }
-				renderContent={ () => {} }
+				onFinishMediaUploadWithFailure={onFinishMediaUploadWithFailure}
+				mediaFiles={localMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaUpload( payloadUploading );
+		sendMediaUpload(payloadUploading);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaUpload( payloadFail );
+		sendMediaUpload(payloadFail);
 
-		expect( wrapper.instance().state.isUploadInProgress ).toEqual( false );
-		expect( wrapper.instance().state.isUploadFailed ).toEqual( true );
-		expect( onFinishMediaUploadWithFailure ).toHaveBeenCalledTimes( 1 );
-		expect( onFinishMediaUploadWithFailure ).toHaveBeenCalledWith(
+		expect(wrapper.instance().state.isUploadInProgress).toEqual(false);
+		expect(wrapper.instance().state.isUploadFailed).toEqual(true);
+		expect(onFinishMediaUploadWithFailure).toHaveBeenCalledTimes(1);
+		expect(onFinishMediaUploadWithFailure).toHaveBeenCalledWith(
 			payloadFail
 		);
-	} );
+	});
 
-	it( 'upload: onMediaUploadStateReset is called when a reset payload is received', () => {
+	it('upload: onMediaUploadStateReset is called when a reset payload is received', () => {
 		const progress = 10;
 		const payloadReset = {
 			state: MEDIA_UPLOAD_STATE_RESET,
@@ -245,26 +241,26 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onMediaUploadStateReset={ onMediaUploadStateReset }
-				mediaFiles={ localMediaFiles }
-				renderContent={ () => {} }
+				onMediaUploadStateReset={onMediaUploadStateReset}
+				mediaFiles={localMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaUpload( payloadUploading );
+		sendMediaUpload(payloadUploading);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaUpload( payloadReset );
+		sendMediaUpload(payloadReset);
 
-		expect( wrapper.instance().state.isUploadInProgress ).toEqual( false );
-		expect( wrapper.instance().state.isUploadFailed ).toEqual( false );
-		expect( onMediaUploadStateReset ).toHaveBeenCalledTimes( 1 );
-		expect( onMediaUploadStateReset ).toHaveBeenCalledWith( payloadReset );
-	} );
+		expect(wrapper.instance().state.isUploadInProgress).toEqual(false);
+		expect(wrapper.instance().state.isUploadFailed).toEqual(false);
+		expect(onMediaUploadStateReset).toHaveBeenCalledTimes(1);
+		expect(onMediaUploadStateReset).toHaveBeenCalledWith(payloadReset);
+	});
 
 	// SAVE tests
-	it( 'save does not get affected by unrelated media save events', () => {
+	it('save does not get affected by unrelated media save events', () => {
 		const payload = {
 			state: MEDIA_SAVE_STATE_SAVING,
 			mediaId: 'tempid-432', // id not belonging to assigned mediaFiles collection in test
@@ -273,19 +269,19 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const onUpdateMediaSaveProgress = jest.fn();
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onUpdateMediaSaveProgress={ onUpdateMediaSaveProgress }
-				mediaFiles={ tempMediaFiles }
-				renderContent={ () => {} }
+				onUpdateMediaSaveProgress={onUpdateMediaSaveProgress}
+				mediaFiles={tempMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaSave( payload );
+		sendMediaSave(payload);
 
-		expect( wrapper.instance().state.progress ).toEqual( 0 );
-		expect( onUpdateMediaSaveProgress ).toHaveBeenCalledTimes( 0 );
-	} );
+		expect(wrapper.instance().state.progress).toEqual(0);
+		expect(onUpdateMediaSaveProgress).toHaveBeenCalledTimes(0);
+	});
 
-	it( 'save: onFinishMediaSaveWithSuccess is called when a success payload is received', () => {
+	it('save: onFinishMediaSaveWithSuccess is called when a success payload is received', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_SAVE_STATE_SUCCEEDED,
@@ -301,26 +297,26 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onFinishMediaSaveWithSuccess={ onFinishMediaSaveWithSuccess }
-				mediaFiles={ tempMediaFiles }
-				renderContent={ () => {} }
+				onFinishMediaSaveWithSuccess={onFinishMediaSaveWithSuccess}
+				mediaFiles={tempMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaSave( payloadSaving );
+		sendMediaSave(payloadSaving);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaSave( payloadSuccess );
+		sendMediaSave(payloadSuccess);
 
-		expect( wrapper.instance().state.isSaveInProgress ).toEqual( false );
-		expect( onFinishMediaSaveWithSuccess ).toHaveBeenCalledTimes( 1 );
-		expect( onFinishMediaSaveWithSuccess ).toHaveBeenCalledWith(
+		expect(wrapper.instance().state.isSaveInProgress).toEqual(false);
+		expect(onFinishMediaSaveWithSuccess).toHaveBeenCalledTimes(1);
+		expect(onFinishMediaSaveWithSuccess).toHaveBeenCalledWith(
 			payloadSuccess
 		);
-	} );
+	});
 
-	it( 'save: onFinishMediaSaveWithFailure is called when a failed payload is received', () => {
+	it('save: onFinishMediaSaveWithFailure is called when a failed payload is received', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_SAVE_STATE_FAILED,
@@ -336,27 +332,25 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onFinishMediaSaveWithFailure={ onFinishMediaSaveWithFailure }
-				mediaFiles={ tempMediaFiles }
-				renderContent={ () => {} }
+				onFinishMediaSaveWithFailure={onFinishMediaSaveWithFailure}
+				mediaFiles={tempMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaSave( payloadSaving );
+		sendMediaSave(payloadSaving);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaSave( payloadFail );
+		sendMediaSave(payloadFail);
 
-		expect( wrapper.instance().state.isSaveInProgress ).toEqual( false );
-		expect( wrapper.instance().state.isSaveFailed ).toEqual( true );
-		expect( onFinishMediaSaveWithFailure ).toHaveBeenCalledTimes( 1 );
-		expect( onFinishMediaSaveWithFailure ).toHaveBeenCalledWith(
-			payloadFail
-		);
-	} );
+		expect(wrapper.instance().state.isSaveInProgress).toEqual(false);
+		expect(wrapper.instance().state.isSaveFailed).toEqual(true);
+		expect(onFinishMediaSaveWithFailure).toHaveBeenCalledTimes(1);
+		expect(onFinishMediaSaveWithFailure).toHaveBeenCalledWith(payloadFail);
+	});
 
-	it( 'save: onMediaSaveStateReset is called when a reset payload is received', () => {
+	it('save: onMediaSaveStateReset is called when a reset payload is received', () => {
 		const progress = 10;
 		const payloadReset = {
 			state: MEDIA_SAVE_STATE_RESET,
@@ -372,25 +366,25 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onMediaSaveStateReset={ onMediaSaveStateReset }
-				mediaFiles={ tempMediaFiles }
-				renderContent={ () => {} }
+				onMediaSaveStateReset={onMediaSaveStateReset}
+				mediaFiles={tempMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaSave( payloadSaving );
+		sendMediaSave(payloadSaving);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaSave( payloadReset );
+		sendMediaSave(payloadReset);
 
-		expect( wrapper.instance().state.isSaveInProgress ).toEqual( false );
-		expect( wrapper.instance().state.isSaveFailed ).toEqual( false );
-		expect( onMediaSaveStateReset ).toHaveBeenCalledTimes( 1 );
-		expect( onMediaSaveStateReset ).toHaveBeenCalledWith( payloadReset );
-	} );
+		expect(wrapper.instance().state.isSaveInProgress).toEqual(false);
+		expect(wrapper.instance().state.isSaveFailed).toEqual(false);
+		expect(onMediaSaveStateReset).toHaveBeenCalledTimes(1);
+		expect(onMediaSaveStateReset).toHaveBeenCalledWith(payloadReset);
+	});
 
-	it( 'save: onFinalSaveResult is called with fail result when fail result is received', () => {
+	it('save: onFinalSaveResult is called with fail result when fail result is received', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_SAVE_FINAL_STATE_RESULT,
@@ -407,25 +401,25 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onFinalSaveResult={ onFinalSaveResult }
-				mediaFiles={ tempMediaFiles }
-				renderContent={ () => {} }
+				onFinalSaveResult={onFinalSaveResult}
+				mediaFiles={tempMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaSave( payloadSaving );
+		sendMediaSave(payloadSaving);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaSave( payloadFail );
+		sendMediaSave(payloadFail);
 
-		expect( wrapper.instance().state.isSaveInProgress ).toEqual( false );
-		expect( wrapper.instance().state.isSaveFailed ).toEqual( true );
-		expect( onFinalSaveResult ).toHaveBeenCalledTimes( 1 );
-		expect( onFinalSaveResult ).toHaveBeenCalledWith( payloadFail );
-	} );
+		expect(wrapper.instance().state.isSaveInProgress).toEqual(false);
+		expect(wrapper.instance().state.isSaveFailed).toEqual(true);
+		expect(onFinalSaveResult).toHaveBeenCalledTimes(1);
+		expect(onFinalSaveResult).toHaveBeenCalledWith(payloadFail);
+	});
 
-	it( 'save: onFinalSaveResult is called with success result when success result is received', () => {
+	it('save: onFinalSaveResult is called with success result when success result is received', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_SAVE_FINAL_STATE_RESULT,
@@ -442,25 +436,25 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onFinalSaveResult={ onFinalSaveResult }
-				mediaFiles={ tempMediaFiles }
-				renderContent={ () => {} }
+				onFinalSaveResult={onFinalSaveResult}
+				mediaFiles={tempMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaSave( payloadSaving );
+		sendMediaSave(payloadSaving);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaSave( payloadSuccess );
+		sendMediaSave(payloadSuccess);
 
-		expect( wrapper.instance().state.isSaveInProgress ).toEqual( false );
-		expect( wrapper.instance().state.isSaveFailed ).toEqual( false );
-		expect( onFinalSaveResult ).toHaveBeenCalledTimes( 1 );
-		expect( onFinalSaveResult ).toHaveBeenCalledWith( payloadSuccess );
-	} );
+		expect(wrapper.instance().state.isSaveInProgress).toEqual(false);
+		expect(wrapper.instance().state.isSaveFailed).toEqual(false);
+		expect(onFinalSaveResult).toHaveBeenCalledTimes(1);
+		expect(onFinalSaveResult).toHaveBeenCalledWith(payloadSuccess);
+	});
 
-	it( 'save: listens to mediaId change and passes it up', () => {
+	it('save: listens to mediaId change and passes it up', () => {
 		const progress = 10;
 		const payloadMediaIdChange = {
 			state: MEDIA_SAVE_MEDIAID_CHANGED,
@@ -478,23 +472,23 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onMediaIdChanged={ onMediaIdChanged }
-				mediaFiles={ tempMediaFiles }
-				renderContent={ () => {} }
+				onMediaIdChanged={onMediaIdChanged}
+				mediaFiles={tempMediaFiles}
+				renderContent={() => {}}
 			/>
 		);
 
-		sendMediaSave( payloadSaving );
+		sendMediaSave(payloadSaving);
 
-		expect( wrapper.instance().state.progress ).toEqual( progress );
+		expect(wrapper.instance().state.progress).toEqual(progress);
 
-		sendMediaSave( payloadMediaIdChange );
+		sendMediaSave(payloadMediaIdChange);
 
-		expect( wrapper.instance().state.isSaveInProgress ).toEqual( false );
-		expect( wrapper.instance().state.isSaveFailed ).toEqual( false );
-		expect( wrapper.instance().state.isUploadInProgress ).toEqual( false );
-		expect( wrapper.instance().state.isUploadFailed ).toEqual( false );
-		expect( onMediaIdChanged ).toHaveBeenCalledTimes( 1 );
-		expect( onMediaIdChanged ).toHaveBeenCalledWith( payloadMediaIdChange );
-	} );
-} );
+		expect(wrapper.instance().state.isSaveInProgress).toEqual(false);
+		expect(wrapper.instance().state.isSaveFailed).toEqual(false);
+		expect(wrapper.instance().state.isUploadInProgress).toEqual(false);
+		expect(wrapper.instance().state.isUploadFailed).toEqual(false);
+		expect(onMediaIdChanged).toHaveBeenCalledTimes(1);
+		expect(onMediaIdChanged).toHaveBeenCalledWith(payloadMediaIdChange);
+	});
+});

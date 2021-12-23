@@ -11,10 +11,10 @@
  *
  * @return {string} Decoded URI if possible.
  */
-export function safeDecodeURI( uri ) {
+export function safeDecodeURI(uri) {
 	try {
-		return decodeURI( uri );
-	} catch ( uriError ) {
+		return decodeURI(uri);
+	} catch (uriError) {
 		return uri;
 	}
 }

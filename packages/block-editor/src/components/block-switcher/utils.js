@@ -22,16 +22,16 @@ export const getMatchingBlockByName = (
 ) => {
 	const { clientId, name, innerBlocks = [] } = block;
 	// Check if block has been consumed already.
-	if ( consumedBlocks.has( clientId ) ) return;
-	if ( name === selectedBlockName ) return block;
+	if (consumedBlocks.has(clientId)) return;
+	if (name === selectedBlockName) return block;
 	// Try to find a matching block from InnerBlocks recursively.
-	for ( const innerBlock of innerBlocks ) {
+	for (const innerBlock of innerBlocks) {
 		const match = getMatchingBlockByName(
 			innerBlock,
 			selectedBlockName,
 			consumedBlocks
 		);
-		if ( match ) return match;
+		if (match) return match;
 	}
 };
 
@@ -45,13 +45,13 @@ export const getMatchingBlockByName = (
  * @param {Object} attributes Selected block's attributes.
  * @return {Object} The block's attributes to retain.
  */
-export const getRetainedBlockAttributes = ( name, attributes ) => {
-	const contentAttributes = getBlockAttributesNamesByRole( name, 'content' );
-	if ( ! contentAttributes?.length ) return attributes;
+export const getRetainedBlockAttributes = (name, attributes) => {
+	const contentAttributes = getBlockAttributesNamesByRole(name, 'content');
+	if (!contentAttributes?.length) return attributes;
 
-	return contentAttributes.reduce( ( _accumulator, attribute ) => {
-		if ( attributes[ attribute ] )
-			_accumulator[ attribute ] = attributes[ attribute ];
+	return contentAttributes.reduce((_accumulator, attribute) => {
+		if (attributes[attribute])
+			_accumulator[attribute] = attributes[attribute];
 		return _accumulator;
-	}, {} );
+	}, {});
 };

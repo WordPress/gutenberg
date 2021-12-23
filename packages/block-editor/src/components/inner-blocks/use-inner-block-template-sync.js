@@ -40,32 +40,31 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const { getSelectedBlocksInitialCaretPosition } = useSelect(
-		blockEditorStore
-	);
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { getSelectedBlocksInitialCaretPosition } =
+		useSelect(blockEditorStore);
+	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
 	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( clientId ),
-		[ clientId ]
+		(select) => select(blockEditorStore).getBlocks(clientId),
+		[clientId]
 	);
 
 	// Maintain a reference to the previous value so we can do a deep equality check.
-	const existingTemplate = useRef( null );
-	useLayoutEffect( () => {
+	const existingTemplate = useRef(null);
+	useLayoutEffect(() => {
 		// Only synchronize innerBlocks with template if innerBlocks are empty or
 		// a locking all exists directly on the block.
-		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
-			const hasTemplateChanged = ! isEqual(
+		if (innerBlocks.length === 0 || templateLock === 'all') {
+			const hasTemplateChanged = !isEqual(
 				template,
 				existingTemplate.current
 			);
-			if ( hasTemplateChanged ) {
+			if (hasTemplateChanged) {
 				existingTemplate.current = template;
 				const nextBlocks = synchronizeBlocksWithTemplate(
 					innerBlocks,
 					template
 				);
-				if ( ! isEqual( nextBlocks, innerBlocks ) ) {
+				if (!isEqual(nextBlocks, innerBlocks)) {
 					replaceInnerBlocks(
 						clientId,
 						nextBlocks,
@@ -81,5 +80,5 @@ export default function useInnerBlockTemplateSync(
 				}
 			}
 		}
-	}, [ innerBlocks, template, templateLock, clientId ] );
+	}, [innerBlocks, template, templateLock, clientId]);
 }

@@ -15,18 +15,18 @@ import SlotFillContext from './context';
  * @param {string} name Slot name.
  * @return {Object} Slot object.
  */
-const useSlot = ( name ) => {
-	const { getSlot, subscribe } = useContext( SlotFillContext );
-	const [ slot, setSlot ] = useState( getSlot( name ) );
+const useSlot = (name) => {
+	const { getSlot, subscribe } = useContext(SlotFillContext);
+	const [slot, setSlot] = useState(getSlot(name));
 
-	useEffect( () => {
-		setSlot( getSlot( name ) );
-		const unsubscribe = subscribe( () => {
-			setSlot( getSlot( name ) );
-		} );
+	useEffect(() => {
+		setSlot(getSlot(name));
+		const unsubscribe = subscribe(() => {
+			setSlot(getSlot(name));
+		});
 
 		return unsubscribe;
-	}, [ name ] );
+	}, [name]);
 
 	return slot;
 };

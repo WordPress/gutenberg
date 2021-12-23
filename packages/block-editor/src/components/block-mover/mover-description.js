@@ -30,14 +30,14 @@ export function getBlockMoverDescription(
 ) {
 	const position = firstIndex + 1;
 
-	const getMovementDirection = ( moveDirection ) => {
-		if ( moveDirection === 'up' ) {
-			if ( orientation === 'horizontal' ) {
+	const getMovementDirection = (moveDirection) => {
+		if (moveDirection === 'up') {
+			if (orientation === 'horizontal') {
 				return isRTL() ? 'right' : 'left';
 			}
 			return 'up';
-		} else if ( moveDirection === 'down' ) {
-			if ( orientation === 'horizontal' ) {
+		} else if (moveDirection === 'down') {
+			if (orientation === 'horizontal') {
 				return isRTL() ? 'left' : 'right';
 			}
 			return 'down';
@@ -45,7 +45,7 @@ export function getBlockMoverDescription(
 		return null;
 	};
 
-	if ( selectedCount > 1 ) {
+	if (selectedCount > 1) {
 		return getMultiBlockMoverDescription(
 			selectedCount,
 			firstIndex,
@@ -55,48 +55,42 @@ export function getBlockMoverDescription(
 		);
 	}
 
-	if ( isFirst && isLast ) {
+	if (isFirst && isLast) {
 		return sprintf(
 			// translators: %s: Type of block (i.e. Text, Image etc)
-			__( 'Block %s is the only block, and cannot be moved' ),
+			__('Block %s is the only block, and cannot be moved'),
 			type
 		);
 	}
 
-	if ( dir > 0 && ! isLast ) {
+	if (dir > 0 && !isLast) {
 		// moving down
-		const movementDirection = getMovementDirection( 'down' );
+		const movementDirection = getMovementDirection('down');
 
-		if ( movementDirection === 'down' ) {
+		if (movementDirection === 'down') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
-				__(
-					'Move %1$s block from position %2$d down to position %3$d'
-				),
+				__('Move %1$s block from position %2$d down to position %3$d'),
 				type,
 				position,
 				position + 1
 			);
 		}
 
-		if ( movementDirection === 'left' ) {
+		if (movementDirection === 'left') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
-				__(
-					'Move %1$s block from position %2$d left to position %3$d'
-				),
+				__('Move %1$s block from position %2$d left to position %3$d'),
 				type,
 				position,
 				position + 1
 			);
 		}
 
-		if ( movementDirection === 'right' ) {
+		if (movementDirection === 'right') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
-				__(
-					'Move %1$s block from position %2$d right to position %3$d'
-				),
+				__('Move %1$s block from position %2$d right to position %3$d'),
 				type,
 				position,
 				position + 1
@@ -104,11 +98,11 @@ export function getBlockMoverDescription(
 		}
 	}
 
-	if ( dir > 0 && isLast ) {
+	if (dir > 0 && isLast) {
 		// moving down, and is the last item
-		const movementDirection = getMovementDirection( 'down' );
+		const movementDirection = getMovementDirection('down');
 
-		if ( movementDirection === 'down' ) {
+		if (movementDirection === 'down') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
@@ -118,7 +112,7 @@ export function getBlockMoverDescription(
 			);
 		}
 
-		if ( movementDirection === 'left' ) {
+		if (movementDirection === 'left') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
@@ -128,7 +122,7 @@ export function getBlockMoverDescription(
 			);
 		}
 
-		if ( movementDirection === 'right' ) {
+		if (movementDirection === 'right') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
@@ -139,38 +133,34 @@ export function getBlockMoverDescription(
 		}
 	}
 
-	if ( dir < 0 && ! isFirst ) {
+	if (dir < 0 && !isFirst) {
 		// moving up
-		const movementDirection = getMovementDirection( 'up' );
+		const movementDirection = getMovementDirection('up');
 
-		if ( movementDirection === 'up' ) {
+		if (movementDirection === 'up') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
-				__( 'Move %1$s block from position %2$d up to position %3$d' ),
+				__('Move %1$s block from position %2$d up to position %3$d'),
 				type,
 				position,
 				position - 1
 			);
 		}
 
-		if ( movementDirection === 'left' ) {
+		if (movementDirection === 'left') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
-				__(
-					'Move %1$s block from position %2$d left to position %3$d'
-				),
+				__('Move %1$s block from position %2$d left to position %3$d'),
 				type,
 				position,
 				position - 1
 			);
 		}
 
-		if ( movementDirection === 'right' ) {
+		if (movementDirection === 'right') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
-				__(
-					'Move %1$s block from position %2$d right to position %3$d'
-				),
+				__('Move %1$s block from position %2$d right to position %3$d'),
 				type,
 				position,
 				position - 1
@@ -178,11 +168,11 @@ export function getBlockMoverDescription(
 		}
 	}
 
-	if ( dir < 0 && isFirst ) {
+	if (dir < 0 && isFirst) {
 		// moving up, and is the first item
-		const movementDirection = getMovementDirection( 'up' );
+		const movementDirection = getMovementDirection('up');
 
-		if ( movementDirection === 'up' ) {
+		if (movementDirection === 'up') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
@@ -192,7 +182,7 @@ export function getBlockMoverDescription(
 			);
 		}
 
-		if ( movementDirection === 'left' ) {
+		if (movementDirection === 'left') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
@@ -202,7 +192,7 @@ export function getBlockMoverDescription(
 			);
 		}
 
-		if ( movementDirection === 'right' ) {
+		if (movementDirection === 'right') {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
@@ -235,17 +225,17 @@ export function getMultiBlockMoverDescription(
 ) {
 	const position = firstIndex + 1;
 
-	if ( dir < 0 && isFirst ) {
-		return __( 'Blocks cannot be moved up as they are already at the top' );
+	if (dir < 0 && isFirst) {
+		return __('Blocks cannot be moved up as they are already at the top');
 	}
 
-	if ( dir > 0 && isLast ) {
+	if (dir > 0 && isLast) {
 		return __(
 			'Blocks cannot be moved down as they are already at the bottom'
 		);
 	}
 
-	if ( dir < 0 && ! isFirst ) {
+	if (dir < 0 && !isFirst) {
 		return sprintf(
 			// translators: 1: Number of selected blocks, 2: Position of selected blocks
 			_n(
@@ -258,7 +248,7 @@ export function getMultiBlockMoverDescription(
 		);
 	}
 
-	if ( dir > 0 && ! isLast ) {
+	if (dir > 0 && !isLast) {
 		return sprintf(
 			// translators: 1: Number of selected blocks, 2: Position of selected blocks
 			_n(

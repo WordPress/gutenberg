@@ -40,7 +40,7 @@ const AnimationSpec = {
 	},
 };
 
-const fadeConfig = ( { current } ) => {
+const fadeConfig = ({ current }) => {
 	return {
 		cardStyle: {
 			opacity: current.progress,
@@ -60,16 +60,16 @@ const options = {
 
 const ANIMATION_DURATION = 190;
 
-function BottomSheetNavigationContainer( {
+function BottomSheetNavigationContainer({
 	children,
 	animate,
 	main,
 	theme,
 	style,
-} ) {
-	const Stack = useRef( createStackNavigator() ).current;
-	const context = useContext( BottomSheetNavigationContext );
-	const [ currentHeight, setCurrentHeight ] = useState(
+}) {
+	const Stack = useRef(createStackNavigator()).current;
+	const context = useContext(BottomSheetNavigationContext);
+	const [currentHeight, setCurrentHeight] = useState(
 		context.currentHeight || 1
 	);
 
@@ -87,11 +87,11 @@ function BottomSheetNavigationContainer( {
 	};
 
 	const setHeight = useCallback(
-		( height ) => {
+		(height) => {
 			// The screen is fullHeight or changing from fullScreen to the default mode
 			if (
-				( typeof currentHeight === 'string' &&
-					typeof height !== 'string' ) ||
+				(typeof currentHeight === 'string' &&
+					typeof height !== 'string') ||
 				typeof height === 'string'
 			) {
 				// Animating the opacity for the initial modal results in the backdrop
@@ -99,72 +99,72 @@ function BottomSheetNavigationContainer( {
 				// to partially opaque black. The core issue was not idenfited, but it
 				// may relate to the experimental state of LayoutAnimation for Android.
 				// https://reactnative.dev/docs/layoutanimation
-				if ( ! Platform.isAndroid || currentHeight !== 1 ) {
-					performLayoutAnimation( ANIMATION_DURATION );
+				if (!Platform.isAndroid || currentHeight !== 1) {
+					performLayoutAnimation(ANIMATION_DURATION);
 				}
-				setCurrentHeight( height );
+				setCurrentHeight(height);
 
 				return;
 			}
 
-			if ( height > 1 ) {
-				if ( currentHeight === 1 ) {
-					setCurrentHeight( height );
-				} else if ( animate ) {
-					performLayoutAnimation( ANIMATION_DURATION );
-					setCurrentHeight( height );
+			if (height > 1) {
+				if (currentHeight === 1) {
+					setCurrentHeight(height);
+				} else if (animate) {
+					performLayoutAnimation(ANIMATION_DURATION);
+					setCurrentHeight(height);
 				} else {
-					setCurrentHeight( height );
+					setCurrentHeight(height);
 				}
 			}
 		},
-		[ currentHeight ]
+		[currentHeight]
 	);
 
-	const screens = useMemo( () => {
-		return Children.map( children, ( child ) => {
+	const screens = useMemo(() => {
+		return Children.map(children, (child) => {
 			let screen = child;
 			const { name, ...otherProps } = child.props;
-			if ( ! main ) {
-				screen = cloneElement( child, {
+			if (!main) {
+				screen = cloneElement(child, {
 					...child.props,
 					isNested: true,
-				} );
+				});
 			}
 			return (
 				<Stack.Screen
-					name={ name }
-					{ ...otherProps }
-					children={ () => screen }
+					name={name}
+					{...otherProps}
+					children={() => screen}
 				/>
 			);
-		} );
-	}, [ children ] );
+		});
+	}, [children]);
 
-	return useMemo( () => {
+	return useMemo(() => {
 		return (
-			<View style={ [ style, { height: currentHeight } ] }>
+			<View style={[style, { height: currentHeight }]}>
 				<BottomSheetNavigationProvider
-					value={ {
+					value={{
 						setHeight,
 						currentHeight,
-					} }
+					}}
 				>
-					{ main ? (
-						<NavigationContainer theme={ _theme }>
-							<Stack.Navigator screenOptions={ options }>
-								{ screens }
+					{main ? (
+						<NavigationContainer theme={_theme}>
+							<Stack.Navigator screenOptions={options}>
+								{screens}
 							</Stack.Navigator>
 						</NavigationContainer>
 					) : (
-						<Stack.Navigator screenOptions={ options }>
-							{ screens }
+						<Stack.Navigator screenOptions={options}>
+							{screens}
 						</Stack.Navigator>
-					) }
+					)}
 				</BottomSheetNavigationProvider>
 			</View>
 		);
-	}, [ currentHeight, _theme ] );
+	}, [currentHeight, _theme]);
 }
 
 export default BottomSheetNavigationContainer;

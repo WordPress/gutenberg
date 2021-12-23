@@ -13,11 +13,11 @@ import documentHasTextSelection from './document-has-text-selection';
  *
  * @return {boolean} True if there is selection, false if not.
  */
-export default function documentHasSelection( doc ) {
+export default function documentHasSelection(doc) {
 	return (
-		!! doc.activeElement &&
-		( isTextField( doc.activeElement ) ||
-			isNumberInput( doc.activeElement ) ||
-			documentHasTextSelection( doc ) )
+		!!doc.activeElement &&
+		(isTextField(doc.activeElement) ||
+			isNumberInput(doc.activeElement) ||
+			documentHasTextSelection(doc))
 	);
 }

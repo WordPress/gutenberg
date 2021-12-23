@@ -11,27 +11,26 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {
-	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
-		const { getEditedWidgetAreas, isSavingWidgetAreas } = select(
-			editWidgetsStore
-		);
+	const { hasEditedWidgetAreaIds, isSaving } = useSelect((select) => {
+		const { getEditedWidgetAreas, isSavingWidgetAreas } =
+			select(editWidgetsStore);
 
 		return {
 			hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
 			isSaving: isSavingWidgetAreas(),
 		};
-	}, [] );
-	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
+	}, []);
+	const { saveEditedWidgetAreas } = useDispatch(editWidgetsStore);
 
 	return (
 		<Button
 			variant="primary"
-			isBusy={ isSaving }
-			aria-disabled={ isSaving }
-			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
-			disabled={ ! hasEditedWidgetAreaIds }
+			isBusy={isSaving}
+			aria-disabled={isSaving}
+			onClick={isSaving ? undefined : saveEditedWidgetAreas}
+			disabled={!hasEditedWidgetAreaIds}
 		>
-			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
+			{isSaving ? __('Saving…') : __('Update')}
 		</Button>
 	);
 }

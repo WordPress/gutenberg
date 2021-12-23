@@ -13,24 +13,24 @@ import { withColors, useBlockProps } from '@wordpress/block-editor';
  */
 import SeparatorSettings from './separator-settings';
 
-function SeparatorEdit( { color, setColor, className } ) {
+function SeparatorEdit({ color, setColor, className }) {
 	return (
 		<>
 			<HorizontalRule
-				{ ...useBlockProps( {
-					className: classnames( className, {
+				{...useBlockProps({
+					className: classnames(className, {
 						'has-background': color.color,
-						[ color.class ]: color.class,
-					} ),
+						[color.class]: color.class,
+					}),
 					style: {
 						backgroundColor: color.color,
 						color: color.color,
 					},
-				} ) }
+				})}
 			/>
-			<SeparatorSettings color={ color } setColor={ setColor } />
+			<SeparatorSettings color={color} setColor={setColor} />
 		</>
 	);
 }
 
-export default withColors( 'color', { textColor: 'color' } )( SeparatorEdit );
+export default withColors('color', { textColor: 'color' })(SeparatorEdit);

@@ -20,17 +20,17 @@ import { store as editPostStore } from '../../../store';
  */
 const PANEL_NAME = 'post-excerpt';
 
-function PostExcerpt( { isEnabled, isOpened, onTogglePanel } ) {
-	if ( ! isEnabled ) {
+function PostExcerpt({ isEnabled, isOpened, onTogglePanel }) {
+	if (!isEnabled) {
 		return null;
 	}
 
 	return (
 		<PostExcerptCheck>
 			<PanelBody
-				title={ __( 'Excerpt' ) }
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
+				title={__('Excerpt')}
+				opened={isOpened}
+				onToggle={onTogglePanel}
 			>
 				<PostExcerptForm />
 			</PanelBody>
@@ -38,20 +38,16 @@ function PostExcerpt( { isEnabled, isOpened, onTogglePanel } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		return {
-			isEnabled: select( editPostStore ).isEditorPanelEnabled(
-				PANEL_NAME
-			),
-			isOpened: select( editPostStore ).isEditorPanelOpened( PANEL_NAME ),
+			isEnabled: select(editPostStore).isEditorPanelEnabled(PANEL_NAME),
+			isOpened: select(editPostStore).isEditorPanelOpened(PANEL_NAME),
 		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
+	}),
+	withDispatch((dispatch) => ({
 		onTogglePanel() {
-			return dispatch( editPostStore ).toggleEditorPanelOpened(
-				PANEL_NAME
-			);
+			return dispatch(editPostStore).toggleEditorPanelOpened(PANEL_NAME);
 		},
-	} ) ),
-] )( PostExcerpt );
+	})),
+])(PostExcerpt);

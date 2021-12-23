@@ -12,9 +12,9 @@ import { Icon as BaseIcon } from '@wordpress/icons';
 import AlignmentMatrixControl from '../';
 import { ALIGNMENTS } from '../utils';
 
-const alignmentOptions = ALIGNMENTS.reduce( ( options, item ) => {
-	return { ...options, [ item ]: item };
-}, {} );
+const alignmentOptions = ALIGNMENTS.reduce((options, item) => {
+	return { ...options, [item]: item };
+}, {});
 
 export default {
 	title: 'Components/AlignmentMatrixControl',
@@ -26,22 +26,22 @@ export default {
 
 export const _default = () => {
 	const props = {
-		value: select( 'value', alignmentOptions, 'center center' ),
+		value: select('value', alignmentOptions, 'center center'),
 	};
 
-	return <AlignmentMatrixControl { ...props } />;
+	return <AlignmentMatrixControl {...props} />;
 };
 
 export const icon = () => {
 	const props = {
-		value: select( 'value', alignmentOptions, 'center center' ),
-		size: number( 'size', 24 ),
+		value: select('value', alignmentOptions, 'center center'),
+		size: number('size', 24),
 	};
 
 	return (
 		<BaseIcon
-			icon={ <AlignmentMatrixControl.Icon size={ props.size } /> }
-			{ ...props }
+			icon={<AlignmentMatrixControl.Icon size={props.size} />}
+			{...props}
 		/>
 	);
 };

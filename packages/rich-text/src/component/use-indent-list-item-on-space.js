@@ -12,17 +12,14 @@ import { isCollapsed } from '../is-collapsed';
 import { LINE_SEPARATOR } from '../special-characters';
 import { indentListItems } from '../indent-list-items';
 
-export function useIndentListItemOnSpace( props ) {
-	const propsRef = useRef( props );
+export function useIndentListItemOnSpace(props) {
+	const propsRef = useRef(props);
 	propsRef.current = props;
-	return useRefEffect( ( element ) => {
-		function onKeyDown( event ) {
+	return useRefEffect((element) => {
+		function onKeyDown(event) {
 			const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-			const {
-				multilineTag,
-				createRecord,
-				handleChange,
-			} = propsRef.current;
+			const { multilineTag, createRecord, handleChange } =
+				propsRef.current;
 
 			if (
 				// Only override when no modifiers are pressed.
@@ -38,29 +35,29 @@ export function useIndentListItemOnSpace( props ) {
 
 			const currentValue = createRecord();
 
-			if ( ! isCollapsed( currentValue ) ) {
+			if (!isCollapsed(currentValue)) {
 				return;
 			}
 
 			const { text, start } = currentValue;
-			const characterBefore = text[ start - 1 ];
+			const characterBefore = text[start - 1];
 
 			// The caret must be at the start of a line.
-			if ( characterBefore && characterBefore !== LINE_SEPARATOR ) {
+			if (characterBefore && characterBefore !== LINE_SEPARATOR) {
 				return;
 			}
 
 			handleChange(
-				indentListItems( currentValue, {
+				indentListItems(currentValue, {
 					type: element.tagName.toLowerCase(),
-				} )
+				})
 			);
 			event.preventDefault();
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
+		element.addEventListener('keydown', onKeyDown);
 		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
+			element.removeEventListener('keydown', onKeyDown);
 		};
-	}, [] );
+	}, []);
 }

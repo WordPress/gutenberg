@@ -27,8 +27,8 @@ export const TRUNCATE_DEFAULT_PROPS = {
  * @param {number} tailLength
  * @param {string} ellipsis
  */
-export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
-	if ( typeof word !== 'string' ) {
+export function truncateMiddle(word, headLength, tailLength, ellipsis) {
+	if (typeof word !== 'string') {
 		return '';
 	}
 	const wordLength = word.length;
@@ -38,22 +38,22 @@ export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
 	// eslint-disable-next-line no-bitwise
 	const backLength = ~~tailLength;
 	/* istanbul ignore next */
-	const truncateStr = ! isNil( ellipsis ) ? ellipsis : TRUNCATE_ELLIPSIS;
+	const truncateStr = !isNil(ellipsis) ? ellipsis : TRUNCATE_ELLIPSIS;
 
 	if (
-		( frontLength === 0 && backLength === 0 ) ||
+		(frontLength === 0 && backLength === 0) ||
 		frontLength >= wordLength ||
 		backLength >= wordLength ||
 		frontLength + backLength >= wordLength
 	) {
 		return word;
-	} else if ( backLength === 0 ) {
-		return word.slice( 0, frontLength ) + truncateStr;
+	} else if (backLength === 0) {
+		return word.slice(0, frontLength) + truncateStr;
 	}
 	return (
-		word.slice( 0, frontLength ) +
+		word.slice(0, frontLength) +
 		truncateStr +
-		word.slice( wordLength - backLength )
+		word.slice(wordLength - backLength)
 	);
 }
 
@@ -62,25 +62,25 @@ export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
  * @param {string}                        words
  * @param {typeof TRUNCATE_DEFAULT_PROPS} props
  */
-export function truncateContent( words = '', props ) {
+export function truncateContent(words = '', props) {
 	const mergedProps = { ...TRUNCATE_DEFAULT_PROPS, ...props };
 	const { ellipsis, ellipsizeMode, limit } = mergedProps;
 
-	if ( ellipsizeMode === TRUNCATE_TYPE.none ) {
+	if (ellipsizeMode === TRUNCATE_TYPE.none) {
 		return words;
 	}
 
 	let truncateHead;
 	let truncateTail;
 
-	switch ( ellipsizeMode ) {
+	switch (ellipsizeMode) {
 		case TRUNCATE_TYPE.head:
 			truncateHead = 0;
 			truncateTail = limit;
 			break;
 		case TRUNCATE_TYPE.middle:
-			truncateHead = Math.floor( limit / 2 );
-			truncateTail = Math.floor( limit / 2 );
+			truncateHead = Math.floor(limit / 2);
+			truncateTail = Math.floor(limit / 2);
 			break;
 		default:
 			truncateHead = limit;
@@ -89,7 +89,7 @@ export function truncateContent( words = '', props ) {
 
 	const truncatedContent =
 		ellipsizeMode !== TRUNCATE_TYPE.auto
-			? truncateMiddle( words, truncateHead, truncateTail, ellipsis )
+			? truncateMiddle(words, truncateHead, truncateTail, ellipsis)
 			: words;
 
 	return truncatedContent;

@@ -33,4 +33,4 @@ const OPERATORS = {
 	'>=': 'min-width',
 };
 
-addDimensionsEventListener( BREAKPOINTS, OPERATORS );
+addDimensionsEventListener(BREAKPOINTS, OPERATORS);

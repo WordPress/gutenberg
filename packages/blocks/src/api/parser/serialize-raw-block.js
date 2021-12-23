@@ -24,7 +24,7 @@ import { getCommentDelimitedContent } from '../serializer';
  *
  * @return {string} An HTML string representing a block.
  */
-export function serializeRawBlock( rawBlock, options = {} ) {
+export function serializeRawBlock(rawBlock, options = {}) {
 	const { isCommentDelimited = true } = options;
 	const {
 		blockName,
@@ -35,17 +35,17 @@ export function serializeRawBlock( rawBlock, options = {} ) {
 
 	let childIndex = 0;
 	const content = innerContent
-		.map( ( item ) =>
+		.map((item) =>
 			// `null` denotes a nested block, otherwise we have an HTML fragment.
 			item !== null
 				? item
-				: serializeRawBlock( innerBlocks[ childIndex++ ], options )
+				: serializeRawBlock(innerBlocks[childIndex++], options)
 		)
-		.join( '\n' )
-		.replace( /\n+/g, '\n' )
+		.join('\n')
+		.replace(/\n+/g, '\n')
 		.trim();
 
 	return isCommentDelimited
-		? getCommentDelimitedContent( blockName, attrs, content )
+		? getCommentDelimitedContent(blockName, attrs, content)
 		: content;
 }

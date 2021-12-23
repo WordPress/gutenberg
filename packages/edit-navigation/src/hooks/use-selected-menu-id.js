@@ -17,10 +17,10 @@ import { store as editNavigationStore } from '../store';
  */
 export default function useSelectedMenuId() {
 	const selectedMenuId = useSelect(
-		( select ) => select( editNavigationStore ).getSelectedMenuId(),
+		(select) => select(editNavigationStore).getSelectedMenuId(),
 		[]
 	);
-	const { setSelectedMenuId } = useDispatch( editNavigationStore );
+	const { setSelectedMenuId } = useDispatch(editNavigationStore);
 
-	return [ selectedMenuId, setSelectedMenuId ];
+	return [selectedMenuId, setSelectedMenuId];
 }

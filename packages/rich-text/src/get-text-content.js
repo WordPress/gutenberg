@@ -16,8 +16,8 @@ import {
  *
  * @return {string} The text content.
  */
-export function getTextContent( { text } ) {
+export function getTextContent({ text }) {
 	return text
-		.replace( new RegExp( OBJECT_REPLACEMENT_CHARACTER, 'g' ), '' )
-		.replace( new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
+		.replace(new RegExp(OBJECT_REPLACEMENT_CHARACTER, 'g'), '')
+		.replace(new RegExp(LINE_SEPARATOR, 'g'), '\n');
 }

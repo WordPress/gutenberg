@@ -15,10 +15,10 @@ export default function RotationButton() {
 	const { isInProgress, rotateClockwise } = useImageEditingContext();
 	return (
 		<ToolbarButton
-			icon={ rotateRightIcon }
-			label={ __( 'Rotate' ) }
-			onClick={ rotateClockwise }
-			disabled={ isInProgress }
+			icon={rotateRightIcon}
+			label={__('Rotate')}
+			onClick={rotateClockwise}
+			disabled={isInProgress}
 		/>
 	);
 }

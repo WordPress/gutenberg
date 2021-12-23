@@ -12,8 +12,8 @@ import { get } from 'lodash';
  *
  * @return {?string|null} The item that is enabled in the passed scope and type.
  */
-function getSingleEnableItem( state, itemType, scope ) {
-	return get( state.enableItems.singleEnableItems, [ itemType, scope ] );
+function getSingleEnableItem(state, itemType, scope) {
+	return get(state.enableItems.singleEnableItems, [itemType, scope]);
 }
 
 /**
@@ -24,8 +24,8 @@ function getSingleEnableItem( state, itemType, scope ) {
  *
  * @return {string} The complementary area that is active in the given scope.
  */
-export function getActiveComplementaryArea( state, scope ) {
-	return getSingleEnableItem( state, 'complementaryArea', scope );
+export function getActiveComplementaryArea(state, scope) {
+	return getSingleEnableItem(state, 'complementaryArea', scope);
 }
 
 /**
@@ -38,12 +38,8 @@ export function getActiveComplementaryArea( state, scope ) {
  *
  * @return {boolean|undefined} True if the item is enabled, false otherwise if the item is explicitly disabled, and undefined if there is no information for that item.
  */
-function isMultipleEnabledItemEnabled( state, itemType, scope, item ) {
-	return get( state.enableItems.multipleEnableItems, [
-		itemType,
-		scope,
-		item,
-	] );
+function isMultipleEnabledItemEnabled(state, itemType, scope, item) {
+	return get(state.enableItems.multipleEnableItems, [itemType, scope, item]);
 }
 
 /**
@@ -55,9 +51,9 @@ function isMultipleEnabledItemEnabled( state, itemType, scope, item ) {
  *
  * @return {boolean} True if the item is pinned and false otherwise.
  */
-export function isItemPinned( state, scope, item ) {
+export function isItemPinned(state, scope, item) {
 	return (
-		isMultipleEnabledItemEnabled( state, 'pinnedItems', scope, item ) !==
+		isMultipleEnabledItemEnabled(state, 'pinnedItems', scope, item) !==
 		false
 	);
 }
@@ -72,12 +68,12 @@ export function isItemPinned( state, scope, item ) {
  *
  * @return {boolean} Is the feature enabled?
  */
-export function isFeatureActive( state, scope, featureName ) {
-	const featureValue = state.preferences.features[ scope ]?.[ featureName ];
+export function isFeatureActive(state, scope, featureName) {
+	const featureValue = state.preferences.features[scope]?.[featureName];
 	const defaultedFeatureValue =
 		featureValue !== undefined
 			? featureValue
-			: state.preferenceDefaults.features[ scope ]?.[ featureName ];
+			: state.preferenceDefaults.features[scope]?.[featureName];
 
-	return !! defaultedFeatureValue;
+	return !!defaultedFeatureValue;
 }

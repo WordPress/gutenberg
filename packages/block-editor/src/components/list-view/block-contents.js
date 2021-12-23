@@ -33,47 +33,47 @@ const ListViewBlockContents = forwardRef(
 		const { clientId } = block;
 
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
-			( select ) => {
+			(select) => {
 				const {
 					getBlockRootClientId,
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
-				} = select( blockEditorStore );
+				} = select(blockEditorStore);
 				return {
-					rootClientId: getBlockRootClientId( clientId ) || '',
+					rootClientId: getBlockRootClientId(clientId) || '',
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
 				};
 			},
-			[ clientId ]
+			[clientId]
 		);
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
 
-		const className = classnames( 'block-editor-list-view-block-contents', {
+		const className = classnames('block-editor-list-view-block-contents', {
 			'is-dropping-before': isBlockMoveTarget,
-		} );
+		});
 
 		return (
-			<BlockDraggable clientIds={ [ block.clientId ] }>
-				{ ( { draggable, onDragStart, onDragEnd } ) => (
+			<BlockDraggable clientIds={[block.clientId]}>
+				{({ draggable, onDragStart, onDragEnd }) => (
 					<ListViewBlockSelectButton
-						ref={ ref }
-						className={ className }
-						block={ block }
-						onClick={ onClick }
-						onToggleExpanded={ onToggleExpanded }
-						isSelected={ isSelected }
-						position={ position }
-						siblingBlockCount={ siblingBlockCount }
-						level={ level }
-						draggable={ draggable }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-						{ ...props }
+						ref={ref}
+						className={className}
+						block={block}
+						onClick={onClick}
+						onToggleExpanded={onToggleExpanded}
+						isSelected={isSelected}
+						position={position}
+						siblingBlockCount={siblingBlockCount}
+						level={level}
+						draggable={draggable}
+						onDragStart={onDragStart}
+						onDragEnd={onDragEnd}
+						{...props}
 					/>
-				) }
+				)}
 			</BlockDraggable>
 		);
 	}

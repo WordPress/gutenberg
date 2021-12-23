@@ -6,6 +6,6 @@
  *
  * @return {string} The manipulated text.
  */
-export default function stripTags( settings, text ) {
-	return text.replace( settings.HTMLRegExp, '\n' );
+export default function stripTags(settings, text) {
+	return text.replace(settings.HTMLRegExp, '\n');
 }

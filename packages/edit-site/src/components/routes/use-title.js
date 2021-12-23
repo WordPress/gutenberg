@@ -12,30 +12,29 @@ import { speak } from '@wordpress/a11y';
  */
 import { useLocation } from './index';
 
-export default function useTitle( title ) {
+export default function useTitle(title) {
 	const location = useLocation();
 	const siteTitle = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
+		(select) => select(coreStore).getEntityRecord('root', 'site')?.title,
 		[]
 	);
-	const isInitialLocationRef = useRef( true );
+	const isInitialLocationRef = useRef(true);
 
-	useEffect( () => {
+	useEffect(() => {
 		isInitialLocationRef.current = false;
-	}, [ location ] );
+	}, [location]);
 
-	useEffect( () => {
+	useEffect(() => {
 		// Don't update or announce the title for initial page load.
-		if ( isInitialLocationRef.current ) {
+		if (isInitialLocationRef.current) {
 			return;
 		}
 
-		if ( title && siteTitle ) {
+		if (title && siteTitle) {
 			// @see https://github.com/WordPress/wordpress-develop/blob/94849898192d271d533e09756007e176feb80697/src/wp-admin/admin-header.php#L67-L68
 			const formattedTitle = sprintf(
 				/* translators: Admin screen title. 1: Admin screen name, 2: Network or site name. */
-				__( '%1$s ‹ %2$s — WordPress' ),
+				__('%1$s ‹ %2$s — WordPress'),
 				title,
 				siteTitle
 			);
@@ -46,11 +45,11 @@ export default function useTitle( title ) {
 			speak(
 				sprintf(
 					/* translators: The page title that is currently displaying. */
-					__( 'Now displaying: %s' ),
+					__('Now displaying: %s'),
 					document.title
 				),
 				'assertive'
 			);
 		}
-	}, [ title, siteTitle, location ] );
+	}, [title, siteTitle, location]);
 }

@@ -21,7 +21,7 @@ import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
 import { useSpace } from './use-space';
 
-export function useRichText( {
+export function useRichText({
 	value = '',
 	selectionStart,
 	selectionEnd,
@@ -36,9 +36,9 @@ export function useRichText( {
 	__unstableAfterParse,
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
-} ) {
+}) {
 	const registry = useRegistry();
-	const [ , forceRender ] = useReducer( () => ( {} ) );
+	const [, forceRender] = useReducer(() => ({}));
 	const ref = useRef();
 
 	function createRecord() {
@@ -46,60 +46,59 @@ export function useRichText( {
 			ownerDocument: { defaultView },
 		} = ref.current;
 		const selection = defaultView.getSelection();
-		const range =
-			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
+		const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
-		return create( {
+		return create({
 			element: ref.current,
 			range,
 			multilineTag,
 			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+				multilineTag === 'li' ? ['ul', 'ol'] : undefined,
 			__unstableIsEditableTree: true,
 			preserveWhiteSpace,
-		} );
+		});
 	}
 
-	function applyRecord( newRecord, { domOnly } = {} ) {
-		apply( {
+	function applyRecord(newRecord, { domOnly } = {}) {
+		apply({
 			value: newRecord,
 			current: ref.current,
 			multilineTag,
 			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+				multilineTag === 'li' ? ['ul', 'ol'] : undefined,
 			prepareEditableTree: __unstableAddInvisibleFormats,
 			__unstableDomOnly: domOnly,
 			placeholder,
-		} );
+		});
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
-	const _value = useRef( value );
+	const _value = useRef(value);
 	const record = useRef();
 
 	function setRecordFromProps() {
 		_value.current = value;
-		record.current = create( {
+		record.current = create({
 			html: value,
 			multilineTag,
 			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+				multilineTag === 'li' ? ['ul', 'ol'] : undefined,
 			preserveWhiteSpace,
-		} );
-		if ( disableFormats ) {
-			record.current.formats = Array( value.length );
-			record.current.replacements = Array( value.length );
+		});
+		if (disableFormats) {
+			record.current.formats = Array(value.length);
+			record.current.replacements = Array(value.length);
 		}
-		if ( __unstableAfterParse ) {
-			record.current.formats = __unstableAfterParse( record.current );
+		if (__unstableAfterParse) {
+			record.current.formats = __unstableAfterParse(record.current);
 		}
 		record.current.start = selectionStart;
 		record.current.end = selectionEnd;
 	}
 
-	const hadSelectionUpdate = useRef( false );
+	const hadSelectionUpdate = useRef(false);
 
-	if ( ! record.current ) {
+	if (!record.current) {
 		setRecordFromProps();
 		// Sometimes formats are added programmatically and we need to make
 		// sure it's persisted to the block store / markup. If these formats
@@ -111,10 +110,10 @@ export function useRichText( {
 		// @todo find a less-hacky way of solving this.
 
 		const hasRelevantInitFormat =
-			record.current?.formats[ 0 ]?.[ 0 ]?.type === 'core/text-color';
+			record.current?.formats[0]?.[0]?.type === 'core/text-color';
 
-		if ( hasRelevantInitFormat ) {
-			handleChangesUponInit( record.current );
+		if (hasRelevantInitFormat) {
+			handleChangesUponInit(record.current);
 		}
 	} else if (
 		selectionStart !== record.current.start ||
@@ -134,23 +133,23 @@ export function useRichText( {
 	 *
 	 * @param {Object} newRecord The record to sync and apply.
 	 */
-	function handleChange( newRecord ) {
+	function handleChange(newRecord) {
 		record.current = newRecord;
-		applyRecord( newRecord );
+		applyRecord(newRecord);
 
-		if ( disableFormats ) {
+		if (disableFormats) {
 			_value.current = newRecord.text;
 		} else {
-			_value.current = toHTMLString( {
+			_value.current = toHTMLString({
 				value: __unstableBeforeSerialize
 					? {
 							...newRecord,
-							formats: __unstableBeforeSerialize( newRecord ),
+							formats: __unstableBeforeSerialize(newRecord),
 					  }
 					: newRecord,
 				multilineTag,
 				preserveWhiteSpace,
-			} );
+			});
 		}
 
 		const { start, end, formats, text } = newRecord;
@@ -158,96 +157,96 @@ export function useRichText( {
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
 		// We batch both calls to only attempt to rerender once.
-		registry.batch( () => {
-			onSelectionChange( start, end );
-			onChange( _value.current, {
+		registry.batch(() => {
+			onSelectionChange(start, end);
+			onChange(_value.current, {
 				__unstableFormats: formats,
 				__unstableText: text,
-			} );
-		} );
+			});
+		});
 		forceRender();
 	}
 
-	function handleChangesUponInit( newRecord ) {
+	function handleChangesUponInit(newRecord) {
 		record.current = newRecord;
 
-		_value.current = toHTMLString( {
+		_value.current = toHTMLString({
 			value: __unstableBeforeSerialize
 				? {
 						...newRecord,
-						formats: __unstableBeforeSerialize( newRecord ),
+						formats: __unstableBeforeSerialize(newRecord),
 				  }
 				: newRecord,
 			multilineTag,
 			preserveWhiteSpace,
-		} );
+		});
 
 		const { formats, text } = newRecord;
 
-		registry.batch( () => {
-			onChange( _value.current, {
+		registry.batch(() => {
+			onChange(_value.current, {
 				__unstableFormats: formats,
 				__unstableText: text,
-			} );
-		} );
+			});
+		});
 		forceRender();
 	}
 
 	function applyFromProps() {
 		setRecordFromProps();
-		applyRecord( record.current );
+		applyRecord(record.current);
 	}
 
-	const didMount = useRef( false );
+	const didMount = useRef(false);
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
-	useLayoutEffect( () => {
-		if ( didMount.current && value !== _value.current ) {
+	useLayoutEffect(() => {
+		if (didMount.current && value !== _value.current) {
 			applyFromProps();
 		}
-	}, [ value ] );
+	}, [value]);
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
-	useLayoutEffect( () => {
-		if ( ! hadSelectionUpdate.current ) {
+	useLayoutEffect(() => {
+		if (!hadSelectionUpdate.current) {
 			return;
 		}
 
 		applyFromProps();
 		hadSelectionUpdate.current = false;
-	}, [ hadSelectionUpdate.current ] );
+	}, [hadSelectionUpdate.current]);
 
-	const mergedRefs = useMergeRefs( [
+	const mergedRefs = useMergeRefs([
 		ref,
 		useDefaultStyle(),
-		useBoundaryStyle( { record } ),
-		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+		useBoundaryStyle({ record }),
+		useCopyHandler({ record, multilineTag, preserveWhiteSpace }),
 		useSelectObject(),
-		useFormatBoundaries( { record, applyRecord } ),
-		useDelete( {
+		useFormatBoundaries({ record, applyRecord }),
+		useDelete({
 			createRecord,
 			handleChange,
 			multilineTag,
-		} ),
-		useIndentListItemOnSpace( {
+		}),
+		useIndentListItemOnSpace({
 			multilineTag,
 			createRecord,
 			handleChange,
-		} ),
-		useInputAndSelection( {
+		}),
+		useInputAndSelection({
 			record,
 			applyRecord,
 			createRecord,
 			handleChange,
 			isSelected,
 			onSelectionChange,
-		} ),
+		}),
 		useSpace(),
-		useRefEffect( () => {
+		useRefEffect(() => {
 			applyFromProps();
 			didMount.current = true;
-		}, [ placeholder, ...__unstableDependencies ] ),
-	] );
+		}, [placeholder, ...__unstableDependencies]),
+	]);
 
 	return {
 		value: record.current,

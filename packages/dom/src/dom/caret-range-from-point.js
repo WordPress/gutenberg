@@ -10,27 +10,27 @@
  *
  * @return {Range | null} The best range for the given point.
  */
-export default function caretRangeFromPoint( doc, x, y ) {
-	if ( doc.caretRangeFromPoint ) {
-		return doc.caretRangeFromPoint( x, y );
+export default function caretRangeFromPoint(doc, x, y) {
+	if (doc.caretRangeFromPoint) {
+		return doc.caretRangeFromPoint(x, y);
 	}
 
-	if ( ! doc.caretPositionFromPoint ) {
+	if (!doc.caretPositionFromPoint) {
 		return null;
 	}
 
-	const point = doc.caretPositionFromPoint( x, y );
+	const point = doc.caretPositionFromPoint(x, y);
 
 	// If x or y are negative, outside viewport, or there is no text entry node.
 	// https://developer.mozilla.org/en-US/docs/Web/API/Document/caretRangeFromPoint
-	if ( ! point ) {
+	if (!point) {
 		return null;
 	}
 
 	const range = doc.createRange();
 
-	range.setStart( point.offsetNode, point.offset );
-	range.collapse( true );
+	range.setStart(point.offsetNode, point.offset);
+	range.collapse(true);
 
 	return range;
 }

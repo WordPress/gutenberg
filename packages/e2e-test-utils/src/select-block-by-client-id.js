@@ -3,8 +3,8 @@
  *
  * @param {string} clientId Identified of the block.
  */
-export async function selectBlockByClientId( clientId ) {
-	await page.evaluate( ( id ) => {
-		wp.data.dispatch( 'core/block-editor' ).selectBlock( id );
-	}, clientId );
+export async function selectBlockByClientId(clientId) {
+	await page.evaluate((id) => {
+		wp.data.dispatch('core/block-editor').selectBlock(id);
+	}, clientId);
 }

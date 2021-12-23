@@ -17,16 +17,16 @@ import { store as coreStore } from '@wordpress/core-data';
  *
  * @return {Array} An array of extended image data objects for each of the shortcode transform images.
  */
-export default function useShortCodeTransform( shortCodeTransforms ) {
+export default function useShortCodeTransform(shortCodeTransforms) {
 	const newImageData = useSelect(
-		( select ) => {
-			if ( ! shortCodeTransforms || shortCodeTransforms.length === 0 ) {
+		(select) => {
+			if (!shortCodeTransforms || shortCodeTransforms.length === 0) {
 				return;
 			}
-			const getMedia = select( coreStore ).getMedia;
-			return shortCodeTransforms.map( ( image ) => {
-				const imageData = getMedia( image.id );
-				if ( imageData ) {
+			const getMedia = select(coreStore).getMedia;
+			return shortCodeTransforms.map((image) => {
+				const imageData = getMedia(image.id);
+				if (imageData) {
 					return {
 						id: imageData.id,
 						type: 'image',
@@ -37,16 +37,16 @@ export default function useShortCodeTransform( shortCodeTransforms ) {
 					};
 				}
 				return undefined;
-			} );
+			});
 		},
-		[ shortCodeTransforms ]
+		[shortCodeTransforms]
 	);
 
-	if ( ! newImageData ) {
+	if (!newImageData) {
 		return;
 	}
 
-	if ( every( newImageData, ( img ) => img && img.url ) ) {
+	if (every(newImageData, (img) => img && img.url)) {
 		return newImageData;
 	}
 }

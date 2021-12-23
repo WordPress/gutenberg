@@ -9,21 +9,20 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as editorStore } from '@wordpress/editor';
 
 export default function CopyContentMenuItem() {
-	const { createNotice } = useDispatch( noticesStore );
+	const { createNotice } = useDispatch(noticesStore);
 	const getText = useSelect(
-		( select ) => () =>
-			select( editorStore ).getEditedPostAttribute( 'content' ),
+		(select) => () => select(editorStore).getEditedPostAttribute('content'),
 		[]
 	);
 
 	function onSuccess() {
-		createNotice( 'info', __( 'All content copied.' ), {
+		createNotice('info', __('All content copied.'), {
 			isDismissible: true,
 			type: 'snackbar',
-		} );
+		});
 	}
 
-	const ref = useCopyToClipboard( getText, onSuccess );
+	const ref = useCopyToClipboard(getText, onSuccess);
 
-	return <MenuItem ref={ ref }>{ __( 'Copy all content' ) }</MenuItem>;
+	return <MenuItem ref={ref}>{__('Copy all content')}</MenuItem>;
 }

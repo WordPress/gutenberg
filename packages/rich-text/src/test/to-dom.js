@@ -15,28 +15,28 @@ import { spec } from './helpers';
 const { window } = new JSDOM();
 const { document } = window;
 
-describe( 'recordToDom', () => {
-	beforeAll( () => {
+describe('recordToDom', () => {
+	beforeAll(() => {
 		// Initialize the rich-text store.
-		require( '../store' );
-	} );
+		require('../store');
+	});
 
 	spec.forEach(
-		( { description, multilineTag, record, startPath, endPath } ) => {
+		({ description, multilineTag, record, startPath, endPath }) => {
 			// eslint-disable-next-line jest/valid-title
-			it( description, () => {
-				const { body, selection } = toDom( {
+			it(description, () => {
+				const { body, selection } = toDom({
 					value: record,
 					multilineTag,
-				} );
-				expect( body ).toMatchSnapshot();
-				expect( selection ).toEqual( { startPath, endPath } );
-			} );
+				});
+				expect(body).toMatchSnapshot();
+				expect(selection).toEqual({ startPath, endPath });
+			});
 		}
 	);
-} );
+});
 
-describe( 'applyValue', () => {
+describe('applyValue', () => {
 	const cases = [
 		{
 			current: 'test',
@@ -94,20 +94,18 @@ describe( 'applyValue', () => {
 		},
 	];
 
-	cases.forEach( ( { current, future, description, movedCount } ) => {
+	cases.forEach(({ current, future, description, movedCount }) => {
 		// eslint-disable-next-line jest/valid-title
-		it( description, () => {
-			const body = createElement( document, current ).cloneNode( true );
-			const futureBody = createElement( document, future ).cloneNode(
-				true
-			);
-			const childNodes = Array.from( futureBody.childNodes );
-			applyValue( futureBody, body );
-			const count = childNodes.reduce( ( acc, { parentNode } ) => {
+		it(description, () => {
+			const body = createElement(document, current).cloneNode(true);
+			const futureBody = createElement(document, future).cloneNode(true);
+			const childNodes = Array.from(futureBody.childNodes);
+			applyValue(futureBody, body);
+			const count = childNodes.reduce((acc, { parentNode }) => {
 				return parentNode === body ? acc + 1 : acc;
-			}, 0 );
-			expect( body.innerHTML ).toEqual( future );
-			expect( count ).toEqual( movedCount );
-		} );
-	} );
-} );
+			}, 0);
+			expect(body.innerHTML).toEqual(future);
+			expect(count).toEqual(movedCount);
+		});
+	});
+});

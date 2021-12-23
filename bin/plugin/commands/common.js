@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const rimraf = require( 'rimraf' );
-const semver = require( 'semver' );
+const fs = require('fs');
+const rimraf = require('rimraf');
+const semver = require('semver');
 
 /**
  * Internal dependencies
  */
-const { log, formats } = require( '../lib/logger' );
-const { runStep, readJSONFile } = require( '../lib/utils' );
-const git = require( '../lib/git' );
-const config = require( '../config' );
+const { log, formats } = require('../lib/logger');
+const { runStep, readJSONFile } = require('../lib/utils');
+const git = require('../lib/git');
+const config = require('../config');
 
 /**
  * Clone the repository and returns the working directory.
@@ -20,17 +20,17 @@ const config = require( '../config' );
  *
  * @return {Promise<string>} Repository local path.
  */
-async function runGitRepositoryCloneStep( abortMessage ) {
+async function runGitRepositoryCloneStep(abortMessage) {
 	// Cloning the repository
 	let gitWorkingDirectoryPath;
-	await runStep( 'Cloning the Git repository', abortMessage, async () => {
-		log( '>> Cloning the Git repository' );
-		gitWorkingDirectoryPath = await git.clone( config.gitRepositoryURL );
+	await runStep('Cloning the Git repository', abortMessage, async () => {
+		log('>> Cloning the Git repository');
+		gitWorkingDirectoryPath = await git.clone(config.gitRepositoryURL);
 		log(
 			'>> The Git repository has been successfully cloned in the following temporary folder: ' +
-				formats.success( gitWorkingDirectoryPath )
+				formats.success(gitWorkingDirectoryPath)
 		);
-	} );
+	});
 
 	return gitWorkingDirectoryPath;
 }
@@ -41,20 +41,20 @@ async function runGitRepositoryCloneStep( abortMessage ) {
  * @param {string[]} folders      Folders to clean.
  * @param {string}   abortMessage Abort message.
  */
-async function runCleanLocalFoldersStep( folders, abortMessage ) {
-	await runStep( 'Cleaning the temporary folders', abortMessage, async () => {
+async function runCleanLocalFoldersStep(folders, abortMessage) {
+	await runStep('Cleaning the temporary folders', abortMessage, async () => {
 		await Promise.all(
-			folders.map( async ( directoryPath ) => {
-				if ( fs.existsSync( directoryPath ) ) {
-					await rimraf( directoryPath, ( err ) => {
-						if ( err ) {
+			folders.map(async (directoryPath) => {
+				if (fs.existsSync(directoryPath)) {
+					await rimraf(directoryPath, (err) => {
+						if (err) {
 							throw err;
 						}
-					} );
+					});
 				}
-			} )
+			})
 		);
-	} );
+	});
 }
 
 /**
@@ -65,9 +65,9 @@ async function runCleanLocalFoldersStep( folders, abortMessage ) {
  *
  * @return {string} Name of the release branch.
  */
-function findReleaseBranchName( packageJsonPath ) {
-	const mainPackageJson = readJSONFile( packageJsonPath );
-	const mainParsedVersion = semver.parse( mainPackageJson.version );
+function findReleaseBranchName(packageJsonPath) {
+	const mainPackageJson = readJSONFile(packageJsonPath);
+	const mainParsedVersion = semver.parse(mainPackageJson.version);
 
 	return 'release/' + mainParsedVersion.major + '.' + mainParsedVersion.minor;
 }
@@ -88,36 +88,36 @@ function calculateVersionBumpFromChangelog(
 ) {
 	let changesDetected = false;
 	let versionBump = null;
-	for ( const line of lines ) {
+	for (const line of lines) {
 		const lineNormalized = line.toLowerCase().trimLeft();
 		// Detect unpublished changes first.
-		if ( lineNormalized.startsWith( '## unreleased' ) ) {
+		if (lineNormalized.startsWith('## unreleased')) {
 			changesDetected = true;
 			continue;
 		}
 
 		// Skip all lines until unpublished changes found.
-		if ( ! changesDetected ) {
+		if (!changesDetected) {
 			continue;
 		}
 
 		// A previous published version detected. Stop processing.
-		if ( lineNormalized.startsWith( '## ' ) ) {
+		if (lineNormalized.startsWith('## ')) {
 			break;
 		}
 
 		// A major version bump required. Stop processing.
-		if ( lineNormalized.startsWith( '### breaking change' ) ) {
+		if (lineNormalized.startsWith('### breaking change')) {
 			versionBump = 'major';
 			break;
 		}
 
 		// A minor version bump required. Proceed to the next line.
 		if (
-			lineNormalized.startsWith( '### deprecation' ) ||
-			lineNormalized.startsWith( '### enhancement' ) ||
-			lineNormalized.startsWith( '### new api' ) ||
-			lineNormalized.startsWith( '### new feature' )
+			lineNormalized.startsWith('### deprecation') ||
+			lineNormalized.startsWith('### enhancement') ||
+			lineNormalized.startsWith('### new api') ||
+			lineNormalized.startsWith('### new feature')
 		) {
 			versionBump = 'minor';
 			continue;
@@ -126,8 +126,7 @@ function calculateVersionBumpFromChangelog(
 		// A version bump required. Found new changelog section.
 		if (
 			versionBump !== 'minor' &&
-			( lineNormalized.startsWith( '### ' ) ||
-				lineNormalized.includes( '- ' ) )
+			(lineNormalized.startsWith('### ') || lineNormalized.includes('- '))
 		) {
 			versionBump = minimumVersionBump;
 		}

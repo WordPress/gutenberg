@@ -7,15 +7,15 @@
  *
  * @return {boolean} Whether the blockType is found.
  */
-export default function hasBlockType( blockType, blocks = [] ) {
-	if ( ! blocks.length ) {
+export default function hasBlockType(blockType, blocks = []) {
+	if (!blocks.length) {
 		return false;
 	}
-	if ( blocks.some( ( { name } ) => name === blockType.name ) ) {
+	if (blocks.some(({ name }) => name === blockType.name)) {
 		return true;
 	}
-	for ( let i = 0; i < blocks.length; i++ ) {
-		if ( hasBlockType( blockType, blocks[ i ].innerBlocks ) ) {
+	for (let i = 0; i < blocks.length; i++) {
+		if (hasBlockType(blockType, blocks[i].innerBlocks)) {
 			return true;
 		}
 	}

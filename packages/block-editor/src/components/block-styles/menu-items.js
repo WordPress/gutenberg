@@ -14,36 +14,36 @@ import { check } from '@wordpress/icons';
  */
 import useStylesForBlocks from './use-styles-for-block';
 
-export default function BlockStylesMenuItems( { clientId, onSwitch = noop } ) {
-	const { onSelect, stylesToRender, activeStyle } = useStylesForBlocks( {
+export default function BlockStylesMenuItems({ clientId, onSwitch = noop }) {
+	const { onSelect, stylesToRender, activeStyle } = useStylesForBlocks({
 		clientId,
 		onSwitch,
-	} );
+	});
 
-	if ( ! stylesToRender || stylesToRender.length === 0 ) {
+	if (!stylesToRender || stylesToRender.length === 0) {
 		return null;
 	}
 	return (
 		<>
-			{ stylesToRender.map( ( style ) => {
+			{stylesToRender.map((style) => {
 				const menuItemText = style.label || style.name;
 				return (
 					<MenuItem
-						key={ style.name }
-						icon={ activeStyle.name === style.name ? check : null }
-						onClick={ () => onSelect( style ) }
+						key={style.name}
+						icon={activeStyle.name === style.name ? check : null}
+						onClick={() => onSelect(style)}
 					>
 						<Text
 							as="span"
-							limit={ 18 }
+							limit={18}
 							ellipsizeMode="tail"
 							truncate
 						>
-							{ menuItemText }
+							{menuItemText}
 						</Text>
 					</MenuItem>
 				);
-			} ) }
+			})}
 		</>
 	);
 }

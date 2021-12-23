@@ -18,10 +18,10 @@ import styles from './editor.scss';
 
 export class MoreEdit extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
 		this.state = {
-			defaultText: __( 'Read more' ),
+			defaultText: __('Read more'),
 		};
 	}
 
@@ -43,15 +43,15 @@ export class MoreEdit extends Component {
 		return (
 			<View>
 				<Hr
-					text={ content }
-					marginLeft={ 0 }
-					marginRight={ 0 }
-					textStyle={ textStyle }
-					lineStyle={ lineStyle }
+					text={content}
+					marginLeft={0}
+					marginRight={0}
+					textStyle={textStyle}
+					lineStyle={lineStyle}
 				/>
 			</View>
 		);
 	}
 }
 
-export default withPreferredColorScheme( MoreEdit );
+export default withPreferredColorScheme(MoreEdit);

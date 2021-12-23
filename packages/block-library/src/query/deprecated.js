@@ -43,9 +43,9 @@ const deprecated = [
 		supports: {
 			html: false,
 		},
-		migrate( attributes ) {
+		migrate(attributes) {
 			return {
-				...omit( attributes, [ 'layout' ] ),
+				...omit(attributes, ['layout']),
 				displayLayout: attributes.layout,
 			};
 		},

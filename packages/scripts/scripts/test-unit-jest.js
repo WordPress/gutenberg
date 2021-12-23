@@ -5,25 +5,25 @@ process.env.NODE_ENV = 'test';
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
 // terminate the Node.js process with a non-zero exit code.
-process.on( 'unhandledRejection', ( err ) => {
+process.on('unhandledRejection', (err) => {
 	throw err;
-} );
+});
 
 /**
  * External dependencies
  */
 /* eslint-disable-next-line jest/no-jest-import */
-const jest = require( 'jest' );
+const jest = require('jest');
 
 /**
  * Internal dependencies
  */
-const { getJestOverrideConfigFile, getArgsFromCLI } = require( '../utils' );
+const { getJestOverrideConfigFile, getArgsFromCLI } = require('../utils');
 
-const configFile = getJestOverrideConfigFile( 'unit' );
+const configFile = getJestOverrideConfigFile('unit');
 
 const config = configFile
-	? [ '--config', JSON.stringify( require( configFile ) ) ]
+	? ['--config', JSON.stringify(require(configFile))]
 	: [];
 
-jest.run( [ ...config, ...getArgsFromCLI() ] );
+jest.run([...config, ...getArgsFromCLI()]);

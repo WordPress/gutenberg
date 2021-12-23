@@ -14,36 +14,36 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export function ThemeSupportCheck( {
+export function ThemeSupportCheck({
 	themeSupports,
 	children,
 	postType,
 	supportKeys,
-} ) {
-	const isSupported = some( castArray( supportKeys ), ( key ) => {
-		const supported = get( themeSupports, [ key ], false );
+}) {
+	const isSupported = some(castArray(supportKeys), (key) => {
+		const supported = get(themeSupports, [key], false);
 		// 'post-thumbnails' can be boolean or an array of post types.
 		// In the latter case, we need to verify `postType` exists
 		// within `supported`. If `postType` isn't passed, then the check
 		// should fail.
-		if ( 'post-thumbnails' === key && isArray( supported ) ) {
-			return includes( supported, postType );
+		if ('post-thumbnails' === key && isArray(supported)) {
+			return includes(supported, postType);
 		}
 		return supported;
-	} );
+	});
 
-	if ( ! isSupported ) {
+	if (!isSupported) {
 		return null;
 	}
 
 	return children;
 }
 
-export default withSelect( ( select ) => {
-	const { getThemeSupports } = select( coreStore );
-	const { getEditedPostAttribute } = select( editorStore );
+export default withSelect((select) => {
+	const { getThemeSupports } = select(coreStore);
+	const { getEditedPostAttribute } = select(editorStore);
 	return {
-		postType: getEditedPostAttribute( 'type' ),
+		postType: getEditedPostAttribute('type'),
 		themeSupports: getThemeSupports(),
 	};
-} )( ThemeSupportCheck );
+})(ThemeSupportCheck);

@@ -104,7 +104,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  *
  * @param {WPLinkControlProps} props Component props.
  */
-function LinkControl( {
+function LinkControl({
 	searchInputPlaceholder,
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
@@ -123,45 +123,45 @@ function LinkControl( {
 	hasRichPreviews = false,
 	hasTextControl = false,
 	renderControlBottom = null,
-} ) {
-	if ( withCreateSuggestion === undefined && createSuggestion ) {
+}) {
+	if (withCreateSuggestion === undefined && createSuggestion) {
 		withCreateSuggestion = true;
 	}
 
-	const isMounting = useRef( true );
+	const isMounting = useRef(true);
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 
-	const [ internalInputValue, setInternalInputValue ] = useState(
+	const [internalInputValue, setInternalInputValue] = useState(
 		value?.url || ''
 	);
-	const [ internalTextValue, setInternalTextValue ] = useState(
+	const [internalTextValue, setInternalTextValue] = useState(
 		value?.title || ''
 	);
 	const currentInputValue = propInputValue || internalInputValue;
-	const [ isEditingLink, setIsEditingLink ] = useState(
+	const [isEditingLink, setIsEditingLink] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
-			: ! value || ! value.url
+			: !value || !value.url
 	);
-	const isEndingEditWithFocus = useRef( false );
+	const isEndingEditWithFocus = useRef(false);
 
-	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
+	const currentInputIsEmpty = !currentInputValue?.trim()?.length;
 
-	useEffect( () => {
+	useEffect(() => {
 		if (
 			forceIsEditingLink !== undefined &&
 			forceIsEditingLink !== isEditingLink
 		) {
-			setIsEditingLink( forceIsEditingLink );
+			setIsEditingLink(forceIsEditingLink);
 		}
-	}, [ forceIsEditingLink ] );
+	}, [forceIsEditingLink]);
 
-	useEffect( () => {
+	useEffect(() => {
 		// We don't auto focus into the Link UI on mount
 		// because otherwise using the keyboard to select text
 		// *within* the link format is not possible.
-		if ( isMounting.current ) {
+		if (isMounting.current) {
 			isMounting.current = false;
 			return;
 		}
@@ -178,54 +178,52 @@ function LinkControl( {
 		// ...then move focus to the *first* element to avoid focus loss
 		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[
-				whichFocusTargetIndex
-			] || wrapperNode.current;
+			focus.focusable.find(wrapperNode.current)[whichFocusTargetIndex] ||
+			wrapperNode.current;
 
 		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
-	}, [ isEditingLink ] );
+	}, [isEditingLink]);
 
-	useEffect( () => {
+	useEffect(() => {
 		/**
 		 * If the value's `text` property changes then sync this
 		 * back up with state.
 		 */
-		if ( value?.title && value.title !== internalTextValue ) {
-			setInternalTextValue( value.title );
+		if (value?.title && value.title !== internalTextValue) {
+			setInternalTextValue(value.title);
 		}
 
 		/**
 		 * Update the state value internalInputValue if the url value changes
 		 * for example when clicking on another anchor
 		 */
-		if ( value?.url ) {
-			setInternalInputValue( value.url );
+		if (value?.url) {
+			setInternalInputValue(value.url);
 		}
-	}, [ value ] );
+	}, [value]);
 
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
 	function stopEditing() {
-		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
+		isEndingEditWithFocus.current = !!wrapperNode.current?.contains(
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
-		setIsEditingLink( false );
+		setIsEditingLink(false);
 	}
 
-	const { createPage, isCreatingPage, errorMessage } = useCreatePage(
-		createSuggestion
-	);
+	const { createPage, isCreatingPage, errorMessage } =
+		useCreatePage(createSuggestion);
 
-	const handleSelectSuggestion = ( updatedValue ) => {
-		onChange( {
+	const handleSelectSuggestion = (updatedValue) => {
+		onChange({
 			...updatedValue,
 			title: internalTextValue || updatedValue?.title,
-		} );
+		});
 		stopEditing();
 	};
 
@@ -234,19 +232,19 @@ function LinkControl( {
 			currentInputValue !== value?.url ||
 			internalTextValue !== value?.title
 		) {
-			onChange( {
+			onChange({
 				url: currentInputValue,
 				title: internalTextValue,
-			} );
+			});
 		}
 		stopEditing();
 	};
 
-	const handleSubmitWithEnter = ( event ) => {
+	const handleSubmitWithEnter = (event) => {
 		const { keyCode } = event;
 		if (
 			keyCode === ENTER &&
-			! currentInputIsEmpty // disallow submitting empty values.
+			!currentInputIsEmpty // disallow submitting empty values.
 		) {
 			event.preventDefault();
 			handleSubmit();
@@ -254,9 +252,9 @@ function LinkControl( {
 	};
 
 	const shownUnlinkControl =
-		onRemove && value && ! isEditingLink && ! isCreatingPage;
+		onRemove && value && !isEditingLink && !isCreatingPage;
 
-	const showSettingsDrawer = !! settings?.length;
+	const showSettingsDrawer = !!settings?.length;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
@@ -265,98 +263,98 @@ function LinkControl( {
 
 	return (
 		<div
-			tabIndex={ -1 }
-			ref={ wrapperNode }
+			tabIndex={-1}
+			ref={wrapperNode}
 			className="block-editor-link-control"
 		>
-			{ isCreatingPage && (
+			{isCreatingPage && (
 				<div className="block-editor-link-control__loading">
-					<Spinner /> { __( 'Creating' ) }…
+					<Spinner /> {__('Creating')}…
 				</div>
-			) }
+			)}
 
-			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
+			{(isEditingLink || !value) && !isCreatingPage && (
 				<>
 					<div
-						className={ classnames( {
+						className={classnames({
 							'block-editor-link-control__search-input-wrapper': true,
 							'has-text-control': showTextControl,
-						} ) }
+						})}
 					>
-						{ showTextControl && (
+						{showTextControl && (
 							<TextControl
-								ref={ textInputRef }
+								ref={textInputRef}
 								className="block-editor-link-control__field block-editor-link-control__text-content"
 								label="Text"
-								value={ internalTextValue }
-								onChange={ setInternalTextValue }
-								onKeyDown={ handleSubmitWithEnter }
+								value={internalTextValue}
+								onChange={setInternalTextValue}
+								onKeyDown={handleSubmitWithEnter}
 							/>
-						) }
+						)}
 
 						<LinkControlSearchInput
-							currentLink={ value }
+							currentLink={value}
 							className="block-editor-link-control__field block-editor-link-control__search-input"
-							placeholder={ searchInputPlaceholder }
-							value={ currentInputValue }
-							withCreateSuggestion={ withCreateSuggestion }
-							onCreateSuggestion={ createPage }
-							onChange={ setInternalInputValue }
-							onSelect={ handleSelectSuggestion }
-							showInitialSuggestions={ showInitialSuggestions }
-							allowDirectEntry={ ! noDirectEntry }
-							showSuggestions={ showSuggestions }
-							suggestionsQuery={ suggestionsQuery }
-							withURLSuggestion={ ! noURLSuggestion }
+							placeholder={searchInputPlaceholder}
+							value={currentInputValue}
+							withCreateSuggestion={withCreateSuggestion}
+							onCreateSuggestion={createPage}
+							onChange={setInternalInputValue}
+							onSelect={handleSelectSuggestion}
+							showInitialSuggestions={showInitialSuggestions}
+							allowDirectEntry={!noDirectEntry}
+							showSuggestions={showSuggestions}
+							suggestionsQuery={suggestionsQuery}
+							withURLSuggestion={!noURLSuggestion}
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}
-							useLabel={ showTextControl }
+							useLabel={showTextControl}
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
-									onClick={ handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
+									onClick={handleSubmit}
+									label={__('Submit')}
+									icon={keyboardReturn}
 									className="block-editor-link-control__search-submit"
-									disabled={ currentInputIsEmpty } // disallow submitting empty values.
+									disabled={currentInputIsEmpty} // disallow submitting empty values.
 								/>
 							</div>
 						</LinkControlSearchInput>
 					</div>
-					{ errorMessage && (
+					{errorMessage && (
 						<Notice
 							className="block-editor-link-control__search-error"
 							status="error"
-							isDismissible={ false }
+							isDismissible={false}
 						>
-							{ errorMessage }
+							{errorMessage}
 						</Notice>
-					) }
+					)}
 				</>
-			) }
+			)}
 
-			{ value && ! isEditingLink && ! isCreatingPage && (
+			{value && !isEditingLink && !isCreatingPage && (
 				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
-					onEditClick={ () => setIsEditingLink( true ) }
-					hasRichPreviews={ hasRichPreviews }
-					hasUnlinkControl={ shownUnlinkControl }
-					onRemove={ onRemove }
+					key={value?.url} // force remount when URL changes to avoid race conditions for rich previews
+					value={value}
+					onEditClick={() => setIsEditingLink(true)}
+					hasRichPreviews={hasRichPreviews}
+					hasUnlinkControl={shownUnlinkControl}
+					onRemove={onRemove}
 				/>
-			) }
+			)}
 
-			{ showSettingsDrawer && (
+			{showSettingsDrawer && (
 				<div className="block-editor-link-control__tools">
 					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
+						value={value}
+						settings={settings}
+						onChange={onChange}
 					/>
 				</div>
-			) }
-			{ renderControlBottom && renderControlBottom() }
+			)}
+			{renderControlBottom && renderControlBottom()}
 		</div>
 	);
 }

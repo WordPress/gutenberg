@@ -8,12 +8,12 @@ import { render } from '@testing-library/react';
  */
 import { VisuallyHidden } from '..';
 
-describe( 'VisuallyHidden', () => {
-	it( 'should render correctly', () => {
+describe('VisuallyHidden', () => {
+	it('should render correctly', () => {
 		const { container } = render(
 			<VisuallyHidden>This is hidden</VisuallyHidden>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
-	} );
-} );
+		expect(container.firstChild).toMatchSnapshot();
+	});
+});

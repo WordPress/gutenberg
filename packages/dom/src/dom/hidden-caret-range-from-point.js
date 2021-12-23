@@ -16,20 +16,20 @@ import getComputedStyle from './get-computed-style';
  *
  * @return {?Range} The best range for the given point.
  */
-export default function hiddenCaretRangeFromPoint( doc, x, y, container ) {
+export default function hiddenCaretRangeFromPoint(doc, x, y, container) {
 	const originalZIndex = container.style.zIndex;
 	const originalPosition = container.style.position;
 
-	const { position = 'static' } = getComputedStyle( container );
+	const { position = 'static' } = getComputedStyle(container);
 
 	// A z-index only works if the element position is not static.
-	if ( position === 'static' ) {
+	if (position === 'static') {
 		container.style.position = 'relative';
 	}
 
 	container.style.zIndex = '10000';
 
-	const range = caretRangeFromPoint( doc, x, y );
+	const range = caretRangeFromPoint(doc, x, y);
 
 	container.style.zIndex = originalZIndex;
 	container.style.position = originalPosition;

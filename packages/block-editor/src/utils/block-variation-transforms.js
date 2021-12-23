@@ -21,11 +21,11 @@ export const __experimentalGetMatchingVariation = (
 	blockAttributes,
 	variations
 ) => {
-	if ( ! variations || ! blockAttributes ) return;
-	const matches = variations.filter( ( { attributes } ) => {
-		if ( ! attributes || ! Object.keys( attributes ).length ) return false;
-		return isMatch( blockAttributes, attributes );
-	} );
-	if ( matches.length !== 1 ) return;
-	return matches[ 0 ];
+	if (!variations || !blockAttributes) return;
+	const matches = variations.filter(({ attributes }) => {
+		if (!attributes || !Object.keys(attributes).length) return false;
+		return isMatch(blockAttributes, attributes);
+	});
+	if (matches.length !== 1) return;
+	return matches[0];
 };

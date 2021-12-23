@@ -8,13 +8,13 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../i18n-translator-comments';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 	},
-} );
+});
 
-ruleTester.run( 'i18n-translator-comments', rule, {
+ruleTester.run('i18n-translator-comments', rule, {
 	valid: [
 		{
 			code: `
@@ -39,7 +39,7 @@ i18n.sprintf( i18n.__( 'Color: %s' ), color );`,
 		{
 			code: `
 sprintf( __( 'Color: %s' ), color );`,
-			errors: [ { messageId: 'missing' } ],
+			errors: [{ messageId: 'missing' }],
 		},
 		{
 			code: `
@@ -47,14 +47,14 @@ sprintf(
 	__( 'Address: %s' ),
 	address
 );`,
-			errors: [ { messageId: 'missing' } ],
+			errors: [{ messageId: 'missing' }],
 		},
 		{
 			code: `
 // translators: %s: Name
 var name = '';
 sprintf( __( 'Name: %s' ), name );`,
-			errors: [ { messageId: 'missing' } ],
+			errors: [{ messageId: 'missing' }],
 		},
 		{
 			code: `
@@ -62,7 +62,7 @@ sprintf( __( 'Name: %s' ), name );`,
 console.log(
 	sprintf( __( 'Surname: %s' ), name )
 );`,
-			errors: [ { messageId: 'missing' } ],
+			errors: [{ messageId: 'missing' }],
 		},
 		{
 			code: `
@@ -73,12 +73,12 @@ console.log(
 		preference
 	)
 );`,
-			errors: [ { messageId: 'missing' } ],
+			errors: [{ messageId: 'missing' }],
 		},
 		{
 			code: `
 i18n.sprintf( i18n.__( 'Color: %s' ), color );`,
-			errors: [ { messageId: 'missing' } ],
+			errors: [{ messageId: 'missing' }],
 		},
 	],
-} );
+});

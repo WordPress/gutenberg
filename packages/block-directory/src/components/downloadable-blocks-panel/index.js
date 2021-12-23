@@ -16,7 +16,7 @@ import DownloadableBlocksInserterPanel from './inserter-panel';
 import DownloadableBlocksNoResults from './no-results';
 import { store as blockDirectoryStore } from '../../store';
 
-function DownloadableBlocksPanel( {
+function DownloadableBlocksPanel({
 	downloadableItems,
 	onSelect,
 	onHover,
@@ -24,20 +24,20 @@ function DownloadableBlocksPanel( {
 	hasPermission,
 	isLoading,
 	isTyping,
-} ) {
-	if ( typeof hasPermission === 'undefined' || isLoading || isTyping ) {
+}) {
+	if (typeof hasPermission === 'undefined' || isLoading || isTyping) {
 		return (
 			<>
-				{ hasPermission && ! hasLocalBlocks && (
+				{hasPermission && !hasLocalBlocks && (
 					<>
 						<p className="block-directory-downloadable-blocks-panel__no-local">
-							{ __(
+							{__(
 								'No results available from your installed blocks.'
-							) }
+							)}
 						</p>
 						<div className="block-editor-inserter__quick-inserter-separator" />
 					</>
-				) }
+				)}
 				<div className="block-directory-downloadable-blocks-panel has-blocks-loading">
 					<Spinner />
 				</div>
@@ -45,58 +45,56 @@ function DownloadableBlocksPanel( {
 		);
 	}
 
-	if ( false === hasPermission ) {
-		if ( ! hasLocalBlocks ) {
+	if (false === hasPermission) {
+		if (!hasLocalBlocks) {
 			return <DownloadableBlocksNoResults />;
 		}
 
 		return null;
 	}
 
-	return !! downloadableItems.length ? (
+	return !!downloadableItems.length ? (
 		<DownloadableBlocksInserterPanel
-			downloadableItems={ downloadableItems }
-			hasLocalBlocks={ hasLocalBlocks }
+			downloadableItems={downloadableItems}
+			hasLocalBlocks={hasLocalBlocks}
 		>
 			<DownloadableBlocksList
-				items={ downloadableItems }
-				onSelect={ onSelect }
-				onHover={ onHover }
+				items={downloadableItems}
+				onSelect={onSelect}
+				onHover={onHover}
 			/>
 		</DownloadableBlocksInserterPanel>
 	) : (
-		! hasLocalBlocks && <DownloadableBlocksNoResults />
+		!hasLocalBlocks && <DownloadableBlocksNoResults />
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { filterValue, rootClientId = null } ) => {
-		const {
-			getDownloadableBlocks,
-			isRequestingDownloadableBlocks,
-		} = select( blockDirectoryStore );
-		const { canInsertBlockType } = select( blockEditorStore );
+export default compose([
+	withSelect((select, { filterValue, rootClientId = null }) => {
+		const { getDownloadableBlocks, isRequestingDownloadableBlocks } =
+			select(blockDirectoryStore);
+		const { canInsertBlockType } = select(blockEditorStore);
 
-		const hasPermission = select( coreStore ).canUser(
+		const hasPermission = select(coreStore).canUser(
 			'read',
 			'block-directory/search'
 		);
 
-		function getInstallableBlocks( term ) {
-			return getDownloadableBlocks( term ).filter( ( block ) =>
-				canInsertBlockType( block, rootClientId, true )
+		function getInstallableBlocks(term) {
+			return getDownloadableBlocks(term).filter((block) =>
+				canInsertBlockType(block, rootClientId, true)
 			);
 		}
 
 		const downloadableItems = hasPermission
-			? getInstallableBlocks( filterValue )
+			? getInstallableBlocks(filterValue)
 			: [];
-		const isLoading = isRequestingDownloadableBlocks( filterValue );
+		const isLoading = isRequestingDownloadableBlocks(filterValue);
 
 		return {
 			downloadableItems,
 			hasPermission,
 			isLoading,
 		};
-	} ),
-] )( DownloadableBlocksPanel );
+	}),
+])(DownloadableBlocksPanel);

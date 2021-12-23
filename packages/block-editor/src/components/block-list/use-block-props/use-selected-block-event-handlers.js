@@ -19,19 +19,17 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @param {string} clientId Block client ID.
  */
-export function useEventHandlers( clientId ) {
+export function useEventHandlers(clientId) {
 	const isSelected = useSelect(
-		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
-		[ clientId ]
+		(select) => select(blockEditorStore).isBlockSelected(clientId),
+		[clientId]
 	);
-	const { getBlockRootClientId, getBlockIndex } = useSelect(
-		blockEditorStore
-	);
-	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
+	const { getBlockRootClientId, getBlockIndex } = useSelect(blockEditorStore);
+	const { insertDefaultBlock, removeBlock } = useDispatch(blockEditorStore);
 
 	return useRefEffect(
-		( node ) => {
-			if ( ! isSelected ) {
+		(node) => {
+			if (!isSelected) {
 				return;
 			}
 
@@ -44,7 +42,7 @@ export function useEventHandlers( clientId ) {
 			 *
 			 * @param {KeyboardEvent} event Keydown event.
 			 */
-			function onKeyDown( event ) {
+			function onKeyDown(event) {
 				const { keyCode, target } = event;
 
 				if (
@@ -55,20 +53,20 @@ export function useEventHandlers( clientId ) {
 					return;
 				}
 
-				if ( target !== node || isTextField( target ) ) {
+				if (target !== node || isTextField(target)) {
 					return;
 				}
 
 				event.preventDefault();
 
-				if ( keyCode === ENTER ) {
+				if (keyCode === ENTER) {
 					insertDefaultBlock(
 						{},
-						getBlockRootClientId( clientId ),
-						getBlockIndex( clientId ) + 1
+						getBlockRootClientId(clientId),
+						getBlockIndex(clientId) + 1
 					);
 				} else {
-					removeBlock( clientId );
+					removeBlock(clientId);
 				}
 			}
 
@@ -78,16 +76,16 @@ export function useEventHandlers( clientId ) {
 			 *
 			 * @param {DragEvent} event Drag event.
 			 */
-			function onDragStart( event ) {
+			function onDragStart(event) {
 				event.preventDefault();
 			}
 
-			node.addEventListener( 'keydown', onKeyDown );
-			node.addEventListener( 'dragstart', onDragStart );
+			node.addEventListener('keydown', onKeyDown);
+			node.addEventListener('dragstart', onDragStart);
 
 			return () => {
-				node.removeEventListener( 'keydown', onKeyDown );
-				node.removeEventListener( 'dragstart', onDragStart );
+				node.removeEventListener('keydown', onKeyDown);
+				node.removeEventListener('dragstart', onDragStart);
 			};
 		},
 		[

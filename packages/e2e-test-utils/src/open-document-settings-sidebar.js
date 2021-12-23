@@ -6,8 +6,8 @@ export async function openDocumentSettingsSidebar() {
 		'.edit-post-header__settings button[aria-label="Settings"][aria-expanded="false"]'
 	);
 
-	if ( openButton ) {
+	if (openButton) {
 		await openButton.click();
-		await page.waitForSelector( '.edit-post-sidebar' );
+		await page.waitForSelector('.edit-post-sidebar');
 	}
 }

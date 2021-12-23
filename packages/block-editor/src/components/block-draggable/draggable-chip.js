@@ -10,7 +10,7 @@ import { dragHandle } from '@wordpress/icons';
  */
 import BlockIcon from '../block-icon';
 
-export default function BlockDraggableChip( { count, icon } ) {
+export default function BlockDraggableChip({ count, icon }) {
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper">
 			<div className="block-editor-block-draggable-chip">
@@ -19,18 +19,18 @@ export default function BlockDraggableChip( { count, icon } ) {
 					className="block-editor-block-draggable-chip__content"
 				>
 					<FlexItem>
-						{ icon ? (
-							<BlockIcon icon={ icon } />
+						{icon ? (
+							<BlockIcon icon={icon} />
 						) : (
 							sprintf(
 								/* translators: %d: Number of blocks. */
-								_n( '%d block', '%d blocks', count ),
+								_n('%d block', '%d blocks', count),
 								count
 							)
-						) }
+						)}
 					</FlexItem>
 					<FlexItem>
-						<BlockIcon icon={ dragHandle } />
+						<BlockIcon icon={dragHandle} />
 					</FlexItem>
 				</Flex>
 			</div>

@@ -24,31 +24,27 @@ import { NavigatorContext } from '../context';
 import type { NavigatorProviderProps, NavigatorPath } from '../types';
 
 function NavigatorProvider(
-	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<NavigatorProviderProps, 'div'>,
+	forwardedRef: Ref<any>
 ) {
-	const {
-		initialPath,
-		children,
-		className,
-		...otherProps
-	} = useContextSystem( props, 'NavigatorProvider' );
+	const { initialPath, children, className, ...otherProps } =
+		useContextSystem(props, 'NavigatorProvider');
 
-	const [ path, setPath ] = useState< NavigatorPath >( {
+	const [path, setPath] = useState<NavigatorPath>({
 		path: initialPath,
-	} );
+	});
 
 	const cx = useCx();
 	const classes = useMemo(
 		// Prevents horizontal overflow while animating screen transitions
-		() => cx( css( { overflowX: 'hidden' } ), className ),
-		[ className ]
+		() => cx(css({ overflowX: 'hidden' }), className),
+		[className]
 	);
 
 	return (
-		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
-			<NavigatorContext.Provider value={ [ path, setPath ] }>
-				{ children }
+		<View ref={forwardedRef} className={classes} {...otherProps}>
+			<NavigatorContext.Provider value={[path, setPath]}>
+				{children}
 			</NavigatorContext.Provider>
 		</View>
 	);

@@ -3,8 +3,8 @@
  */
 import { serializeRawBlock } from '../serialize-raw-block';
 
-describe( 'serializeRawBlock', () => {
-	it( 'reserializes block nodes', () => {
+describe('serializeRawBlock', () => {
+	it('reserializes block nodes', () => {
 		const expected = `<!-- wp:columns -->
 			<div class="wp-block-columns has-2-columns">
 				<!-- wp:column -->
@@ -29,7 +29,7 @@ describe( 'serializeRawBlock', () => {
 				</div>
 				<!-- /wp:column -->
 			</div>
-			<!-- /wp:columns -->`.replace( /\t/g, '' );
+			<!-- /wp:columns -->`.replace(/\t/g, '');
 		const input = {
 			blockName: 'core/columns',
 			attrs: {},
@@ -43,7 +43,7 @@ describe( 'serializeRawBlock', () => {
 							attrs: {},
 							innerBlocks: [],
 							innerHTML: '<p>A</p>',
-							innerContent: [ '<p>A</p>' ],
+							innerContent: ['<p>A</p>'],
 						},
 					],
 					innerHTML: '<div class="wp-block-column"></div>',
@@ -75,7 +75,7 @@ describe( 'serializeRawBlock', () => {
 									attrs: {},
 									innerBlocks: [],
 									innerHTML: '<p>D</p>',
-									innerContent: [ '<p>D</p>' ],
+									innerContent: ['<p>D</p>'],
 								},
 							],
 							innerHTML: '<div class="wp-block-group"></div>',
@@ -105,8 +105,8 @@ describe( 'serializeRawBlock', () => {
 				'</div>',
 			],
 		};
-		const actual = serializeRawBlock( input );
+		const actual = serializeRawBlock(input);
 
-		expect( actual ).toEqual( expected );
-	} );
-} );
+		expect(actual).toEqual(expected);
+	});
+});

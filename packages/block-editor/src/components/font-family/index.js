@@ -14,38 +14,38 @@ import { __ } from '@wordpress/i18n';
  */
 import useSetting from '../use-setting';
 
-export default function FontFamilyControl( {
+export default function FontFamilyControl({
 	value = '',
 	onChange,
 	fontFamilies,
 	...props
-} ) {
-	const blockLevelFontFamilies = useSetting( 'typography.fontFamilies' );
-	if ( ! fontFamilies ) {
+}) {
+	const blockLevelFontFamilies = useSetting('typography.fontFamilies');
+	if (!fontFamilies) {
 		fontFamilies = blockLevelFontFamilies;
 	}
 
-	if ( isEmpty( fontFamilies ) ) {
+	if (isEmpty(fontFamilies)) {
 		return null;
 	}
 
 	const options = [
-		{ value: '', label: __( 'Default' ) },
-		...fontFamilies.map( ( { fontFamily, name } ) => {
+		{ value: '', label: __('Default') },
+		...fontFamilies.map(({ fontFamily, name }) => {
 			return {
 				value: fontFamily,
 				label: name || fontFamily,
 			};
-		} ),
+		}),
 	];
 	return (
 		<SelectControl
-			label={ __( 'Font family' ) }
-			options={ options }
-			value={ value }
-			onChange={ onChange }
+			label={__('Font family')}
+			options={options}
+			value={value}
+			onChange={onChange}
 			labelPosition="top"
-			{ ...props }
+			{...props}
 		/>
 	);
 }

@@ -17,19 +17,19 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export const downloadableBlocks = ( state = {}, action ) => {
-	switch ( action.type ) {
+export const downloadableBlocks = (state = {}, action) => {
+	switch (action.type) {
 		case 'FETCH_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				[ action.filterValue ]: {
+				[action.filterValue]: {
 					isRequesting: true,
 				},
 			};
 		case 'RECEIVE_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				[ action.filterValue ]: {
+				[action.filterValue]: {
 					results: action.downloadableBlocks,
 					isRequesting: false,
 				},
@@ -53,7 +53,7 @@ export const blockManagement = (
 	},
 	action
 ) => {
-	switch ( action.type ) {
+	switch (action.type) {
 		case 'ADD_INSTALLED_BLOCK_TYPE':
 			return {
 				...state,
@@ -66,7 +66,7 @@ export const blockManagement = (
 			return {
 				...state,
 				installedBlockTypes: state.installedBlockTypes.filter(
-					( blockType ) => blockType.name !== action.item.name
+					(blockType) => blockType.name !== action.item.name
 				),
 			};
 		case 'SET_INSTALLING_BLOCK':
@@ -74,7 +74,7 @@ export const blockManagement = (
 				...state,
 				isInstalling: {
 					...state.isInstalling,
-					[ action.blockId ]: action.isInstalling,
+					[action.blockId]: action.isInstalling,
 				},
 			};
 	}
@@ -89,24 +89,24 @@ export const blockManagement = (
  *
  * @return {Object} Updated state.
  */
-export const errorNotices = ( state = {}, action ) => {
-	switch ( action.type ) {
+export const errorNotices = (state = {}, action) => {
+	switch (action.type) {
 		case 'SET_ERROR_NOTICE':
 			return {
 				...state,
-				[ action.blockId ]: {
+				[action.blockId]: {
 					message: action.message,
 					isFatal: action.isFatal,
 				},
 			};
 		case 'CLEAR_ERROR_NOTICE':
-			return omit( state, action.blockId );
+			return omit(state, action.blockId);
 	}
 	return state;
 };
 
-export default combineReducers( {
+export default combineReducers({
 	downloadableBlocks,
 	blockManagement,
 	errorNotices,
-} );
+});

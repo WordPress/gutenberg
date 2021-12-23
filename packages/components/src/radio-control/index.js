@@ -14,7 +14,7 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import BaseControl from '../base-control';
 
-export default function RadioControl( {
+export default function RadioControl({
 	label,
 	className,
 	selected,
@@ -23,46 +23,41 @@ export default function RadioControl( {
 	hideLabelFromVision,
 	options = [],
 	...props
-} ) {
-	const instanceId = useInstanceId( RadioControl );
-	const id = `inspector-radio-control-${ instanceId }`;
-	const onChangeValue = ( event ) => onChange( event.target.value );
+}) {
+	const instanceId = useInstanceId(RadioControl);
+	const id = `inspector-radio-control-${instanceId}`;
+	const onChangeValue = (event) => onChange(event.target.value);
 
 	return (
-		! isEmpty( options ) && (
+		!isEmpty(options) && (
 			<BaseControl
-				label={ label }
-				id={ id }
-				hideLabelFromVision={ hideLabelFromVision }
-				help={ help }
-				className={ classnames(
-					className,
-					'components-radio-control'
-				) }
+				label={label}
+				id={id}
+				hideLabelFromVision={hideLabelFromVision}
+				help={help}
+				className={classnames(className, 'components-radio-control')}
 			>
-				{ options.map( ( option, index ) => (
+				{options.map((option, index) => (
 					<div
-						key={ `${ id }-${ index }` }
+						key={`${id}-${index}`}
 						className="components-radio-control__option"
 					>
 						<input
-							id={ `${ id }-${ index }` }
+							id={`${id}-${index}`}
 							className="components-radio-control__input"
 							type="radio"
-							name={ id }
-							value={ option.value }
-							onChange={ onChangeValue }
-							checked={ option.value === selected }
+							name={id}
+							value={option.value}
+							onChange={onChangeValue}
+							checked={option.value === selected}
 							aria-describedby={
-								!! help ? `${ id }__help` : undefined
+								!!help ? `${id}__help` : undefined
 							}
-							{ ...props }
+							{...props}
 						/>
-						<label htmlFor={ `${ id }-${ index }` }>
-							{ option.label }
-						</label>
+						<label htmlFor={`${id}-${index}`}>{option.label}</label>
 					</div>
-				) ) }
+				))}
 			</BaseControl>
 		)
 	);

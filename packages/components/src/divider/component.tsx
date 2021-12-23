@@ -18,18 +18,12 @@ import { DividerView } from './styles';
 import type { Props } from './types';
 
 function Divider(
-	props: WordPressComponentProps< Props, 'hr', false >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<Props, 'hr', false>,
+	forwardedRef: Ref<any>
 ) {
-	const contextProps = useContextSystem( props, 'Divider' );
+	const contextProps = useContextSystem(props, 'Divider');
 
-	return (
-		<Separator
-			as={ DividerView }
-			{ ...contextProps }
-			ref={ forwardedRef }
-		/>
-	);
+	return <Separator as={DividerView} {...contextProps} ref={forwardedRef} />;
 }
 
 /**
@@ -54,6 +48,6 @@ function Divider(
  * }
  * ```
  */
-const ConnectedDivider = contextConnect( Divider, 'Divider' );
+const ConnectedDivider = contextConnect(Divider, 'Divider');
 
 export default ConnectedDivider;

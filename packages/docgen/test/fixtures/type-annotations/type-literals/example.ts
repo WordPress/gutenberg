@@ -1,11 +1,11 @@
-function fn( foo: {
-	( bar: string ): void;
+function fn(foo: {
+	(bar: string): void;
 	bar: string;
 	optionalBar?: 'left' | 'right';
-	[ key: number ]: string;
-} ): {
-	( bar: string ): void;
+	[key: number]: string;
+}): {
+	(bar: string): void;
 	bar: string;
 	optionalBar?: 'left' | 'right';
-	[ key: number ]: string;
+	[key: number]: string;
 } {}

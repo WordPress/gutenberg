@@ -11,6 +11,6 @@ import isEdge from './is-edge';
  *
  * @return {boolean} True if at the vertical edge, false if not.
  */
-export default function isVerticalEdge( container, isReverse ) {
-	return isEdge( container, isReverse, true );
+export default function isVerticalEdge(container, isReverse) {
+	return isEdge(container, isReverse, true);
 }

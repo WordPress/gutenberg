@@ -16,20 +16,20 @@ import { RovingTabIndexProvider } from './roving-tab-index-context';
  * @param {Object}    props          Component props.
  * @param {WPElement} props.children Children to be rendered
  */
-export default function RovingTabIndex( { children } ) {
-	const [ lastFocusedElement, setLastFocusedElement ] = useState();
+export default function RovingTabIndex({ children }) {
+	const [lastFocusedElement, setLastFocusedElement] = useState();
 
 	// Use `useMemo` to avoid creation of a new object for the providerValue
 	// on every render. Only create a new object when the `lastFocusedElement`
 	// value changes.
 	const providerValue = useMemo(
-		() => ( { lastFocusedElement, setLastFocusedElement } ),
-		[ lastFocusedElement ]
+		() => ({ lastFocusedElement, setLastFocusedElement }),
+		[lastFocusedElement]
 	);
 
 	return (
-		<RovingTabIndexProvider value={ providerValue }>
-			{ children }
+		<RovingTabIndexProvider value={providerValue}>
+			{children}
 		</RovingTabIndexProvider>
 	);
 }

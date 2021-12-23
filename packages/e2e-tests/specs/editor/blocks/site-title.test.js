@@ -20,63 +20,63 @@ const saveEntities = async () => {
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
 
-	await page.click( savePostSelector );
-	await page.waitForSelector( savePanelSelector );
-	await page.click( entitiesSaveSelector );
-	await page.waitForSelector( publishPanelSelector );
+	await page.click(savePostSelector);
+	await page.waitForSelector(savePanelSelector);
+	await page.click(entitiesSaveSelector);
+	await page.waitForSelector(publishPanelSelector);
 	await page.waitForSelector(
 		'.editor-post-publish-panel__header-cancel-button button:not([disabled])'
 	);
-	await page.click( closePanelButtonSelector );
+	await page.click(closePanelButtonSelector);
 };
 
-describe( 'Site Title block', () => {
+describe('Site Title block', () => {
 	let originalSiteTitle, password;
 	const username = 'testuser';
-	beforeAll( async () => {
-		originalSiteTitle = await getOption( 'blogname' );
-		password = await createUser( username, { role: 'editor' } );
-	} );
+	beforeAll(async () => {
+		originalSiteTitle = await getOption('blogname');
+		password = await createUser(username, { role: 'editor' });
+	});
 
-	afterAll( async () => {
-		await deleteUser( username );
-		await setOption( 'blogname', originalSiteTitle );
-	} );
+	afterAll(async () => {
+		await deleteUser(username);
+		await setOption('blogname', originalSiteTitle);
+	});
 
-	it( 'Can edit the site title as admin', async () => {
+	it('Can edit the site title as admin', async () => {
 		await createNewPost();
-		await insertBlock( 'Site Title' );
+		await insertBlock('Site Title');
 		const editableSiteTitleSelector =
 			'[aria-label="Block: Site Title"] a[contenteditable="true"]';
-		await page.waitForSelector( editableSiteTitleSelector );
-		await page.focus( editableSiteTitleSelector );
-		await pressKeyWithModifier( 'primary', 'a' );
+		await page.waitForSelector(editableSiteTitleSelector);
+		await page.focus(editableSiteTitleSelector);
+		await pressKeyWithModifier('primary', 'a');
 
-		await page.keyboard.type( 'New Site Title' );
+		await page.keyboard.type('New Site Title');
 
 		await saveEntities();
 
-		const siteTitle = await getOption( 'blogname' );
-		expect( siteTitle ).toEqual( 'New Site Title' );
-	} );
+		const siteTitle = await getOption('blogname');
+		expect(siteTitle).toEqual('New Site Title');
+	});
 
 	// FIXME: Fix https://github.com/WordPress/gutenberg/issues/33003 and enable this test.
 	// I tried adding an `expect( console ).toHaveErroredWith()` as a workaround, but
 	// the error occurs only sporadically (e.g. locally in interactive mode, but not in
 	// headless mode).
-	it.skip( 'Cannot edit the site title as editor', async () => {
-		await loginUser( username, password );
+	it.skip('Cannot edit the site title as editor', async () => {
+		await loginUser(username, password);
 
 		await createNewPost();
-		await insertBlock( 'Site Title' );
+		await insertBlock('Site Title');
 
 		const editableSiteTitleSelector = '[aria-label="Block: Site Title"] a';
-		await page.waitForSelector( editableSiteTitleSelector );
+		await page.waitForSelector(editableSiteTitleSelector);
 
 		const editable = await page.$eval(
 			editableSiteTitleSelector,
-			( element ) => element.contentEditable
+			(element) => element.contentEditable
 		);
-		expect( editable ).toBe( 'inherit' );
-	} );
-} );
+		expect(editable).toBe('inherit');
+	});
+});

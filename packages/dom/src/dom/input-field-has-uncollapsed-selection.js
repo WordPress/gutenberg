@@ -17,18 +17,16 @@ import isNumberInput from './is-number-input';
  *
  * @return {boolean} Whether the input/textareaa element has some "selection".
  */
-export default function inputFieldHasUncollapsedSelection( element ) {
-	if ( ! isTextField( element ) && ! isNumberInput( element ) ) {
+export default function inputFieldHasUncollapsedSelection(element) {
+	if (!isTextField(element) && !isNumberInput(element)) {
 		return false;
 	}
 	try {
-		const {
-			selectionStart,
-			selectionEnd,
-		} = /** @type {HTMLInputElement | HTMLTextAreaElement} */ ( element );
+		const { selectionStart, selectionEnd } =
+			/** @type {HTMLInputElement | HTMLTextAreaElement} */ (element);
 
 		return selectionStart !== null && selectionStart !== selectionEnd;
-	} catch ( error ) {
+	} catch (error) {
 		// Safari throws an exception when trying to get `selectionStart`
 		// on non-text <input> elements (which, understandably, don't
 		// have the text selection API). We catch this via a try/catch

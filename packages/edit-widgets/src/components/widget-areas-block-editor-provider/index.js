@@ -29,49 +29,49 @@ import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area
 import { store as editWidgetsStore } from '../../store';
 import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 
-export default function WidgetAreasBlockEditorProvider( {
+export default function WidgetAreasBlockEditorProvider({
 	blockEditorSettings,
 	children,
 	...props
-} ) {
+}) {
 	const {
 		hasUploadPermissions,
 		reusableBlocks,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
 	} = useSelect(
-		( select ) => ( {
+		(select) => ({
 			hasUploadPermissions: defaultTo(
-				select( coreStore ).canUser( 'create', 'media' ),
+				select(coreStore).canUser('create', 'media'),
 				true
 			),
-			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-			widgets: select( editWidgetsStore ).getWidgets(),
+			widgetAreas: select(editWidgetsStore).getWidgetAreas(),
+			widgets: select(editWidgetsStore).getWidgets(),
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
-				? select( coreStore ).getEntityRecords( 'postType', 'wp_block' )
+				? select(coreStore).getEntityRecords('postType', 'wp_block')
 				: [],
-			isFixedToolbarActive: select( interfaceStore ).isFeatureActive(
+			isFixedToolbarActive: select(interfaceStore).isFeatureActive(
 				'core/edit-widgets',
 				'fixedToolbar'
 			),
-			keepCaretInsideBlock: select( interfaceStore ).isFeatureActive(
+			keepCaretInsideBlock: select(interfaceStore).isFeatureActive(
 				'core/edit-widgets',
 				'keepCaretInsideBlock'
 			),
-		} ),
+		}),
 		[]
 	);
-	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
+	const { setIsInserterOpened } = useDispatch(editWidgetsStore);
 
-	const settings = useMemo( () => {
+	const settings = useMemo(() => {
 		let mediaUploadBlockEditor;
-		if ( hasUploadPermissions ) {
-			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
-				uploadMedia( {
+		if (hasUploadPermissions) {
+			mediaUploadBlockEditor = ({ onError, ...argumentsObject }) => {
+				uploadMedia({
 					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
+					onError: ({ message }) => onError(message),
 					...argumentsObject,
-				} );
+				});
 			};
 		}
 		return {
@@ -90,15 +90,13 @@ export default function WidgetAreasBlockEditorProvider( {
 		hasUploadPermissions,
 		reusableBlocks,
 		setIsInserterOpened,
-	] );
+	]);
 
 	const widgetAreaId = useLastSelectedWidgetArea();
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		KIND,
-		POST_TYPE,
-		{ id: buildWidgetAreasPostId() }
-	);
+	const [blocks, onInput, onChange] = useEntityBlockEditor(KIND, POST_TYPE, {
+		id: buildWidgetAreasPostId(),
+	});
 
 	return (
 		<ShortcutProvider>
@@ -106,15 +104,15 @@ export default function WidgetAreasBlockEditorProvider( {
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<BlockEditorProvider
-					value={ blocks }
-					onInput={ onInput }
-					onChange={ onChange }
-					settings={ settings }
-					useSubRegistry={ false }
-					{ ...props }
+					value={blocks}
+					onInput={onInput}
+					onChange={onChange}
+					settings={settings}
+					useSubRegistry={false}
+					{...props}
 				>
-					<CopyHandler>{ children }</CopyHandler>
-					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
+					<CopyHandler>{children}</CopyHandler>
+					<ReusableBlocksMenuItems rootClientId={widgetAreaId} />
 				</BlockEditorProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>

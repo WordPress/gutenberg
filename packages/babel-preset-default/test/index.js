@@ -10,18 +10,18 @@ import { transform } from '@babel/core';
  */
 import babelPresetDefault from '../';
 
-describe( 'Babel preset default', () => {
-	test( 'transpilation works properly', () => {
-		const filename = path.join( __dirname, '/fixtures/input.js' );
-		const input = readFileSync( filename );
+describe('Babel preset default', () => {
+	test('transpilation works properly', () => {
+		const filename = path.join(__dirname, '/fixtures/input.js');
+		const input = readFileSync(filename);
 
-		const output = transform( input, {
+		const output = transform(input, {
 			filename,
 			configFile: false,
 			envName: 'production',
-			presets: [ babelPresetDefault ],
-		} );
+			presets: [babelPresetDefault],
+		});
 
-		expect( output.code ).toMatchSnapshot();
-	} );
-} );
+		expect(output.code).toMatchSnapshot();
+	});
+});

@@ -31,71 +31,71 @@ const ANIMATION_DURATION = 400;
 
 const linkSettingsOptions = {
 	url: {
-		label: __( 'URL' ),
-		placeholder: __( 'Add URL' ),
+		label: __('URL'),
+		placeholder: __('Add URL'),
 		autoFocus: true,
 	},
 	linkLabel: {
-		label: __( 'Link label' ),
-		placeholder: __( 'None' ),
+		label: __('Link label'),
+		placeholder: __('None'),
 	},
 	footer: {
-		label: __( 'Briefly describe the link to help screen reader user' ),
+		label: __('Briefly describe the link to help screen reader user'),
 	},
 };
 
-const SocialLinkEdit = ( {
+const SocialLinkEdit = ({
 	attributes,
 	setAttributes,
 	isSelected,
 	onFocus,
 	name,
-} ) => {
+}) => {
 	const { url, service = name } = attributes;
-	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
-	const [ hasUrl, setHasUrl ] = useState( !! url );
+	const [isLinkSheetVisible, setIsLinkSheetVisible] = useState(false);
+	const [hasUrl, setHasUrl] = useState(!!url);
 
 	const activeIcon =
-		styles[ `wp-social-link-${ service }` ] || styles[ `wp-social-link` ];
+		styles[`wp-social-link-${service}`] || styles[`wp-social-link`];
 
 	const inactiveIcon = usePreferredColorSchemeStyle(
 		styles.inactiveIcon,
 		styles.inactiveIconDark
 	);
 
-	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
+	const animatedValue = useRef(new Animated.Value(0)).current;
 
-	const IconComponent = getIconBySite( service )();
-	const socialLinkName = getNameBySite( service );
+	const IconComponent = getIconBySite(service)();
+	const socialLinkName = getNameBySite(service);
 
 	// When new social icon is added link sheet is opened automatically
-	useEffect( () => {
-		if ( isSelected && ! url ) {
-			setIsLinkSheetVisible( true );
+	useEffect(() => {
+		if (isSelected && !url) {
+			setIsLinkSheetVisible(true);
 		}
-	}, [] );
+	}, []);
 
-	useEffect( () => {
-		if ( ! url ) {
-			setHasUrl( false );
-			animatedValue.setValue( 0 );
-		} else if ( url ) {
+	useEffect(() => {
+		if (!url) {
+			setHasUrl(false);
+			animatedValue.setValue(0);
+		} else if (url) {
 			animateColors();
 		}
-	}, [ url ] );
+	}, [url]);
 
 	const interpolationColors = {
-		backgroundColor: animatedValue.interpolate( {
-			inputRange: [ 0, 1 ],
+		backgroundColor: animatedValue.interpolate({
+			inputRange: [0, 1],
 			outputRange: [
 				inactiveIcon.backgroundColor,
 				activeIcon.backgroundColor,
 			],
-		} ),
-		color: animatedValue.interpolate( {
-			inputRange: [ 0, 1 ],
-			outputRange: [ inactiveIcon.color, activeIcon.color ],
-		} ),
+		}),
+		color: animatedValue.interpolate({
+			inputRange: [0, 1],
+			outputRange: [inactiveIcon.color, activeIcon.color],
+		}),
 		stroke: '',
 	};
 
@@ -104,32 +104,32 @@ const SocialLinkEdit = ( {
 		: interpolationColors;
 
 	function animateColors() {
-		Animated.sequence( [
-			Animated.delay( ANIMATION_DELAY ),
-			Animated.timing( animatedValue, {
+		Animated.sequence([
+			Animated.delay(ANIMATION_DELAY),
+			Animated.timing(animatedValue, {
 				toValue: 1,
 				duration: ANIMATION_DURATION,
 				easing: Easing.circle,
-			} ),
-		] ).start( () => setHasUrl( true ) );
+			}),
+		]).start(() => setHasUrl(true));
 	}
 
-	const onCloseSettingsSheet = useCallback( () => {
-		setIsLinkSheetVisible( false );
-	}, [] );
+	const onCloseSettingsSheet = useCallback(() => {
+		setIsLinkSheetVisible(false);
+	}, []);
 
-	const onOpenSettingsSheet = useCallback( () => {
-		setIsLinkSheetVisible( true );
-	}, [] );
+	const onOpenSettingsSheet = useCallback(() => {
+		setIsLinkSheetVisible(true);
+	}, []);
 
-	const onEmptyURL = useCallback( () => {
-		animatedValue.setValue( 0 );
-		setHasUrl( false );
-	}, [ animatedValue ] );
+	const onEmptyURL = useCallback(() => {
+		animatedValue.setValue(0);
+		setHasUrl(false);
+	}, [animatedValue]);
 
 	function onIconPress() {
-		if ( isSelected ) {
-			setIsLinkSheetVisible( true );
+		if (isSelected) {
+			setIsLinkSheetVisible(true);
 		} else {
 			onFocus();
 		}
@@ -138,64 +138,64 @@ const SocialLinkEdit = ( {
 	const accessibilityHint = url
 		? sprintf(
 				// translators: %s: social link name e.g: "Instagram".
-				__( '%s has URL set' ),
+				__('%s has URL set'),
 				socialLinkName
 		  )
 		: sprintf(
 				// translators: %s: social link name e.g: "Instagram".
-				__( '%s has no URL set' ),
+				__('%s has no URL set'),
 				socialLinkName
 		  );
 
 	return (
 		<View>
-			{ isSelected && (
+			{isSelected && (
 				<>
 					<BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton
-								title={ sprintf(
+								title={sprintf(
 									// translators: %s: social link name e.g: "Instagram".
-									__( 'Add link to %s' ),
+									__('Add link to %s'),
 									socialLinkName
-								) }
-								icon={ link }
-								onClick={ onOpenSettingsSheet }
-								isActive={ url }
+								)}
+								icon={link}
+								onClick={onOpenSettingsSheet}
+								isActive={url}
 							/>
 						</ToolbarGroup>
 					</BlockControls>
 					<LinkSettingsNavigation
-						isVisible={ isLinkSheetVisible }
-						url={ attributes.url }
-						label={ attributes.label }
-						rel={ attributes.rel }
-						onEmptyURL={ onEmptyURL }
-						onClose={ onCloseSettingsSheet }
-						setAttributes={ setAttributes }
-						options={ linkSettingsOptions }
+						isVisible={isLinkSheetVisible}
+						url={attributes.url}
+						label={attributes.label}
+						rel={attributes.rel}
+						onEmptyURL={onEmptyURL}
+						onClose={onCloseSettingsSheet}
+						setAttributes={setAttributes}
+						options={linkSettingsOptions}
 						withBottomSheet
 					/>
 				</>
-			) }
+			)}
 
 			<TouchableWithoutFeedback
-				onPress={ onIconPress }
-				accessibilityRole={ 'button' }
-				accessibilityLabel={ sprintf(
+				onPress={onIconPress}
+				accessibilityRole={'button'}
+				accessibilityLabel={sprintf(
 					// translators: %s: social link name e.g: "Instagram".
-					__( '%s social icon' ),
+					__('%s social icon'),
 					socialLinkName
-				) }
-				accessibilityHint={ accessibilityHint }
+				)}
+				accessibilityHint={accessibilityHint}
 			>
 				<Animated.View
-					style={ [ styles.iconContainer, { backgroundColor } ] }
+					style={[styles.iconContainer, { backgroundColor }]}
 				>
 					<Icon
 						animated
-						icon={ IconComponent }
-						style={ { stroke, color } }
+						icon={IconComponent}
+						style={{ stroke, color }}
 					/>
 				</Animated.View>
 			</TouchableWithoutFeedback>
@@ -203,15 +203,15 @@ const SocialLinkEdit = ( {
 	);
 };
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getBlock } = select( blockEditorStore );
+export default compose([
+	withSelect((select, { clientId }) => {
+		const { getBlock } = select(blockEditorStore);
 
-		const block = getBlock( clientId );
-		const name = block?.name.substring( 17 );
+		const block = getBlock(clientId);
+		const name = block?.name.substring(17);
 
 		return {
 			name,
 		};
-	} ),
-] )( SocialLinkEdit );
+	}),
+])(SocialLinkEdit);

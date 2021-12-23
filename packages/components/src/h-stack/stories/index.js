@@ -11,7 +11,7 @@ export default {
 
 export const _default = () => {
 	return (
-		<HStack spacing={ 3 }>
+		<HStack spacing={3}>
 			<View>One</View>
 			<View>Two</View>
 			<View>Three</View>

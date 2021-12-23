@@ -12,10 +12,10 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Array} Updated state.
  */
-export function guides( state = [], action ) {
-	switch ( action.type ) {
+export function guides(state = [], action) {
+	switch (action.type) {
 		case 'TRIGGER_GUIDE':
-			return [ ...state, action.tipIds ];
+			return [...state, action.tipIds];
 	}
 
 	return state;
@@ -29,8 +29,8 @@ export function guides( state = [], action ) {
  *
  * @return {boolean} Updated state.
  */
-export function areTipsEnabled( state = true, action ) {
-	switch ( action.type ) {
+export function areTipsEnabled(state = true, action) {
+	switch (action.type) {
 		case 'DISABLE_TIPS':
 			return false;
 
@@ -50,12 +50,12 @@ export function areTipsEnabled( state = true, action ) {
  *
  * @return {Object} Updated state.
  */
-export function dismissedTips( state = {}, action ) {
-	switch ( action.type ) {
+export function dismissedTips(state = {}, action) {
+	switch (action.type) {
 		case 'DISMISS_TIP':
 			return {
 				...state,
-				[ action.id ]: true,
+				[action.id]: true,
 			};
 
 		case 'ENABLE_TIPS':
@@ -65,6 +65,6 @@ export function dismissedTips( state = {}, action ) {
 	return state;
 }
 
-const preferences = combineReducers( { areTipsEnabled, dismissedTips } );
+const preferences = combineReducers({ areTipsEnabled, dismissedTips });
 
-export default combineReducers( { guides, preferences } );
+export default combineReducers({ guides, preferences });

@@ -15,10 +15,10 @@ import supportedMatchers from './supported-matchers';
  * @param {string} matcherName Name of Jest matcher.
  * @param {string} methodName  Name of console method.
  */
-const setConsoleMethodSpy = ( matcherName, methodName ) => {
+const setConsoleMethodSpy = (matcherName, methodName) => {
 	const spy = jest
-		.spyOn( console, methodName )
-		.mockName( `console.${ methodName }` );
+		.spyOn(console, methodName)
+		.mockName(`console.${methodName}`);
 
 	/**
 	 * Resets the spy to its initial state.
@@ -32,19 +32,19 @@ const setConsoleMethodSpy = ( matcherName, methodName ) => {
 	 * Verifies that the spy has only been called if expected.
 	 */
 	function assertExpectedCalls() {
-		if ( spy.assertionsNumber === 0 && spy.mock.calls.length > 0 ) {
-			expect( console ).not[ matcherName ]();
+		if (spy.assertionsNumber === 0 && spy.mock.calls.length > 0) {
+			expect(console).not[matcherName]();
 		}
 	}
 
-	beforeAll( resetSpy );
+	beforeAll(resetSpy);
 
-	beforeEach( () => {
+	beforeEach(() => {
 		assertExpectedCalls();
 		resetSpy();
-	} );
+	});
 
-	afterEach( assertExpectedCalls );
+	afterEach(assertExpectedCalls);
 };
 
-forEach( supportedMatchers, setConsoleMethodSpy );
+forEach(supportedMatchers, setConsoleMethodSpy);

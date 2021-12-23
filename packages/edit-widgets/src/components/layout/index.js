@@ -14,13 +14,13 @@ import Interface from './interface';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import WelcomeGuide from '../welcome-guide';
 
-function Layout( { blockEditorSettings, onError } ) {
+function Layout({ blockEditorSettings, onError }) {
 	return (
-		<ErrorBoundary onError={ onError }>
+		<ErrorBoundary onError={onError}>
 			<WidgetAreasBlockEditorProvider
-				blockEditorSettings={ blockEditorSettings }
+				blockEditorSettings={blockEditorSettings}
 			>
-				<Interface blockEditorSettings={ blockEditorSettings } />
+				<Interface blockEditorSettings={blockEditorSettings} />
 				<Sidebar />
 				<Popover.Slot />
 				<PluginArea />

@@ -18,11 +18,11 @@ import { STORE_NAME } from './constants';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore(STORE_NAME, {
 	reducer,
 	selectors,
 	actions,
 	__experimentalUseThunks: true,
-} );
+});
 
-register( store );
+register(store);

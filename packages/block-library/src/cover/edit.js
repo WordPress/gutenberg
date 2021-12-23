@@ -66,17 +66,17 @@ import {
 	getPositionClassName,
 } from './shared';
 
-extend( [ namesPlugin ] );
+extend([namesPlugin]);
 
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
-function getInnerBlocksTemplate( attributes ) {
+function getInnerBlocksTemplate(attributes) {
 	return [
 		[
 			'core/paragraph',
 			{
 				align: 'center',
-				placeholder: __( 'Write title…' ),
+				placeholder: __('Write title…'),
 				...attributes,
 			},
 		],
@@ -84,26 +84,21 @@ function getInnerBlocksTemplate( attributes ) {
 }
 
 function retrieveFastAverageColor() {
-	if ( ! retrieveFastAverageColor.fastAverageColor ) {
+	if (!retrieveFastAverageColor.fastAverageColor) {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
 	}
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
-function CoverHeightInput( {
-	onChange,
-	onUnitChange,
-	unit = 'px',
-	value = '',
-} ) {
-	const [ temporaryInput, setTemporaryInput ] = useState( null );
+function CoverHeightInput({ onChange, onUnitChange, unit = 'px', value = '' }) {
+	const [temporaryInput, setTemporaryInput] = useState(null);
 
-	const instanceId = useInstanceId( UnitControl );
-	const inputId = `block-cover-height-input-${ instanceId }`;
+	const instanceId = useInstanceId(UnitControl);
+	const inputId = `block-cover-height-input-${instanceId}`;
 	const isPx = unit === 'px';
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || [
 			'px',
 			'em',
 			'rem',
@@ -111,28 +106,26 @@ function CoverHeightInput( {
 			'vh',
 		],
 		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
-	} );
+	});
 
-	const handleOnChange = ( unprocessedValue ) => {
+	const handleOnChange = (unprocessedValue) => {
 		const inputValue =
-			unprocessedValue !== ''
-				? parseFloat( unprocessedValue )
-				: undefined;
+			unprocessedValue !== '' ? parseFloat(unprocessedValue) : undefined;
 
-		if ( isNaN( inputValue ) && inputValue !== undefined ) {
-			setTemporaryInput( unprocessedValue );
+		if (isNaN(inputValue) && inputValue !== undefined) {
+			setTemporaryInput(unprocessedValue);
 			return;
 		}
-		setTemporaryInput( null );
-		onChange( inputValue );
-		if ( inputValue === undefined ) {
+		setTemporaryInput(null);
+		onChange(inputValue);
+		if (inputValue === undefined) {
 			onUnitChange();
 		}
 	};
 
 	const handleOnBlur = () => {
-		if ( temporaryInput !== null ) {
-			setTemporaryInput( null );
+		if (temporaryInput !== null) {
+			setTemporaryInput(null);
 		}
 	};
 
@@ -140,18 +133,18 @@ function CoverHeightInput( {
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
+		<BaseControl label={__('Minimum height of cover')} id={inputId}>
 			<UnitControl
-				id={ inputId }
+				id={inputId}
 				isResetValueOnUnitChange
-				min={ min }
-				onBlur={ handleOnBlur }
-				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
-				style={ { maxWidth: 80 } }
-				unit={ unit }
-				units={ units }
-				value={ inputValue }
+				min={min}
+				onBlur={handleOnBlur}
+				onChange={handleOnChange}
+				onUnitChange={onUnitChange}
+				style={{ maxWidth: 80 }}
+				unit={unit}
+				units={units}
+				value={inputValue}
 			/>
 		</BaseControl>
 	);
@@ -168,36 +161,36 @@ const RESIZABLE_BOX_ENABLE_OPTION = {
 	topLeft: false,
 };
 
-function ResizableCover( {
+function ResizableCover({
 	className,
 	onResizeStart,
 	onResize,
 	onResizeStop,
 	...props
-} ) {
-	const [ isResizing, setIsResizing ] = useState( false );
+}) {
+	const [isResizing, setIsResizing] = useState(false);
 
 	return (
 		<ResizableBox
-			className={ classnames( className, {
+			className={classnames(className, {
 				'is-resizing': isResizing,
-			} ) }
-			enable={ RESIZABLE_BOX_ENABLE_OPTION }
-			onResizeStart={ ( _event, _direction, elt ) => {
-				onResizeStart( elt.clientHeight );
-				onResize( elt.clientHeight );
-			} }
-			onResize={ ( _event, _direction, elt ) => {
-				onResize( elt.clientHeight );
-				if ( ! isResizing ) {
-					setIsResizing( true );
+			})}
+			enable={RESIZABLE_BOX_ENABLE_OPTION}
+			onResizeStart={(_event, _direction, elt) => {
+				onResizeStart(elt.clientHeight);
+				onResize(elt.clientHeight);
+			}}
+			onResize={(_event, _direction, elt) => {
+				onResize(elt.clientHeight);
+				if (!isResizing) {
+					setIsResizing(true);
 				}
-			} }
-			onResizeStop={ ( _event, _direction, elt ) => {
-				onResizeStop( elt.clientHeight );
-				setIsResizing( false );
-			} }
-			{ ...props }
+			}}
+			onResizeStop={(_event, _direction, elt) => {
+				onResizeStop(elt.clientHeight);
+				setIsResizing(false);
+			}}
+			{...props}
 		/>
 	);
 }
@@ -216,43 +209,43 @@ function ResizableCover( {
  *
  * @return {boolean} True if the cover background is considered "dark" and false otherwise.
  */
-function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
-	const [ isDark, setIsDark ] = useState( false );
-	useEffect( () => {
+function useCoverIsDark(url, dimRatio = 50, overlayColor, elementRef) {
+	const [isDark, setIsDark] = useState(false);
+	useEffect(() => {
 		// If opacity is lower than 50 the dominant color is the image or video color,
 		// so use that color for the dark mode computation.
-		if ( url && dimRatio <= 50 && elementRef.current ) {
+		if (url && dimRatio <= 50 && elementRef.current) {
 			retrieveFastAverageColor().getColorAsync(
 				elementRef.current,
-				( color ) => {
-					setIsDark( color.isDark );
+				(color) => {
+					setIsDark(color.isDark);
 				}
 			);
 		}
-	}, [ url, url && dimRatio <= 50 && elementRef.current, setIsDark ] );
-	useEffect( () => {
+	}, [url, url && dimRatio <= 50 && elementRef.current, setIsDark]);
+	useEffect(() => {
 		// If opacity is greater than 50 the dominant color is the overlay color,
 		// so use that color for the dark mode computation.
-		if ( dimRatio > 50 || ! url ) {
-			if ( ! overlayColor ) {
+		if (dimRatio > 50 || !url) {
+			if (!overlayColor) {
 				// If no overlay color exists the overlay color is black (isDark )
-				setIsDark( true );
+				setIsDark(true);
 				return;
 			}
-			setIsDark( colord( overlayColor ).isDark() );
+			setIsDark(colord(overlayColor).isDark());
 		}
-	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
-	useEffect( () => {
-		if ( ! url && ! overlayColor ) {
+	}, [overlayColor, dimRatio > 50 || !url, setIsDark]);
+	useEffect(() => {
+		if (!url && !overlayColor) {
 			// Reset isDark
-			setIsDark( false );
+			setIsDark(false);
 		}
-	}, [ ! url && ! overlayColor, setIsDark ] );
+	}, [!url && !overlayColor, setIsDark]);
 	return isDark;
 }
 
-function mediaPosition( { x, y } ) {
-	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+function mediaPosition({ x, y }) {
+	return `${Math.round(x * 100)}% ${Math.round(y * 100)}%`;
 }
 
 /**
@@ -264,43 +257,43 @@ function mediaPosition( { x, y } ) {
  *
  * @return {boolean} Is the URL a Blob URL.
  */
-const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
+const isTemporaryMedia = (id, url) => !id && isBlobURL(url);
 
-function CoverPlaceholder( {
+function CoverPlaceholder({
 	disableMediaButtons = false,
 	children,
 	noticeUI,
 	noticeOperations,
 	onSelectMedia,
 	style,
-} ) {
+}) {
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
 		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } /> }
-			labels={ {
-				title: __( 'Cover' ),
+			icon={<BlockIcon icon={icon} />}
+			labels={{
+				title: __('Cover'),
 				instructions: __(
 					'Drag and drop onto this block, upload, or select existing media from your library.'
 				),
-			} }
-			onSelect={ onSelectMedia }
+			}}
+			onSelect={onSelectMedia}
 			accept="image/*,video/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			notices={ noticeUI }
-			disableMediaButtons={ disableMediaButtons }
-			onError={ ( message ) => {
+			allowedTypes={ALLOWED_MEDIA_TYPES}
+			notices={noticeUI}
+			disableMediaButtons={disableMediaButtons}
+			onError={(message) => {
 				removeAllNotices();
-				createErrorNotice( message );
-			} }
-			style={ style }
+				createErrorNotice(message);
+			}}
+			style={style}
 		>
-			{ children }
+			{children}
 		</MediaPlaceholder>
 	);
 }
 
-function CoverEdit( {
+function CoverEdit({
 	attributes,
 	clientId,
 	isSelected,
@@ -311,7 +304,7 @@ function CoverEdit( {
 	setOverlayColor,
 	toggleSelection,
 	markNextChangeAsNotPersistent,
-} ) {
+}) {
 	const {
 		contentPosition,
 		id,
@@ -329,58 +322,53 @@ function CoverEdit( {
 		allowedBlocks,
 		templateLock,
 	} = attributes;
-	const {
-		gradientClass,
-		gradientValue,
-		setGradient,
-	} = __experimentalUseGradient();
-	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
-	const isUploadingMedia = isTemporaryMedia( id, url );
+	const { gradientClass, gradientValue, setGradient } =
+		__experimentalUseGradient();
+	const onSelectMedia = attributesFromMedia(setAttributes, dimRatio);
+	const isUploadingMedia = isTemporaryMedia(id, url);
 
-	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
-	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
-		minHeightUnit
-	);
+	const [prevMinHeightValue, setPrevMinHeightValue] = useState(minHeight);
+	const [prevMinHeightUnit, setPrevMinHeightUnit] = useState(minHeightUnit);
 	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
 
 	const toggleMinFullHeight = () => {
-		if ( isMinFullHeight ) {
+		if (isMinFullHeight) {
 			// If there aren't previous values, take the default ones.
-			if ( prevMinHeightUnit === 'vh' && prevMinHeightValue === 100 ) {
-				return setAttributes( {
+			if (prevMinHeightUnit === 'vh' && prevMinHeightValue === 100) {
+				return setAttributes({
 					minHeight: undefined,
 					minHeightUnit: undefined,
-				} );
+				});
 			}
 
 			// Set the previous values of height.
-			return setAttributes( {
+			return setAttributes({
 				minHeight: prevMinHeightValue,
 				minHeightUnit: prevMinHeightUnit,
-			} );
+			});
 		}
 
-		setPrevMinHeightValue( minHeight );
-		setPrevMinHeightUnit( minHeightUnit );
+		setPrevMinHeightValue(minHeight);
+		setPrevMinHeightUnit(minHeightUnit);
 
 		// Set full height.
-		return setAttributes( {
+		return setAttributes({
 			minHeight: 100,
 			minHeightUnit: 'vh',
-		} );
+		});
 	};
 
 	const toggleParallax = () => {
-		setAttributes( {
-			hasParallax: ! hasParallax,
-			...( ! hasParallax ? { focalPoint: undefined } : {} ),
-		} );
+		setAttributes({
+			hasParallax: !hasParallax,
+			...(!hasParallax ? { focalPoint: undefined } : {}),
+		});
 	};
 
 	const toggleIsRepeated = () => {
-		setAttributes( {
-			isRepeated: ! isRepeated,
-		} );
+		setAttributes({
+			isRepeated: !isRepeated,
+		});
 	};
 
 	const isDarkElement = useRef();
@@ -391,217 +379,214 @@ function CoverEdit( {
 		isDarkElement
 	);
 
-	useEffect( () => {
+	useEffect(() => {
 		// This side-effect should not create an undo level.
 		markNextChangeAsNotPersistent();
-		setAttributes( { isDark: isCoverDark } );
-	}, [ isCoverDark ] );
+		setAttributes({ isDark: isCoverDark });
+	}, [isCoverDark]);
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
+	const [temporaryMinHeight, setTemporaryMinHeight] = useState(null);
 
 	const minHeightWithUnit = minHeightUnit
-		? `${ minHeight }${ minHeightUnit }`
+		? `${minHeight}${minHeightUnit}`
 		: minHeight;
 
-	const isImgElement = ! ( hasParallax || isRepeated );
+	const isImgElement = !(hasParallax || isRepeated);
 
 	const style = {
-		...( isImageBackground && ! isImgElement
-			? backgroundImageStyles( url )
-			: undefined ),
+		...(isImageBackground && !isImgElement
+			? backgroundImageStyles(url)
+			: undefined),
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
 	const bgStyle = { backgroundColor: overlayColor.color };
 	const mediaStyle = {
 		objectPosition:
-			focalPoint && isImgElement
-				? mediaPosition( focalPoint )
-				: undefined,
+			focalPoint && isImgElement ? mediaPosition(focalPoint) : undefined,
 	};
 
-	const hasBackground = !! ( url || overlayColor.color || gradientValue );
+	const hasBackground = !!(url || overlayColor.color || gradientValue);
 	const showFocalPointPicker =
 		isVideoBackground ||
-		( isImageBackground && ( ! hasParallax || isRepeated ) );
+		(isImageBackground && (!hasParallax || isRepeated));
 
-	const imperativeFocalPointPreview = ( value ) => {
-		const [ styleOfRef, property ] = isDarkElement.current
-			? [ isDarkElement.current.style, 'objectPosition' ]
-			: [ ref.current.style, 'backgroundPosition' ];
-		styleOfRef[ property ] = mediaPosition( value );
+	const imperativeFocalPointPreview = (value) => {
+		const [styleOfRef, property] = isDarkElement.current
+			? [isDarkElement.current.style, 'objectPosition']
+			: [ref.current.style, 'backgroundPosition'];
+		styleOfRef[property] = mediaPosition(value);
 	};
 
 	const hasInnerBlocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
-			0,
-		[ clientId ]
+		(select) =>
+			select(blockEditorStore).getBlock(clientId).innerBlocks.length > 0,
+		[clientId]
 	);
 
 	const controls = (
 		<>
 			<BlockControls group="block">
 				<BlockAlignmentMatrixControl
-					label={ __( 'Change content position' ) }
-					value={ contentPosition }
-					onChange={ ( nextPosition ) =>
-						setAttributes( {
+					label={__('Change content position')}
+					value={contentPosition}
+					onChange={(nextPosition) =>
+						setAttributes({
 							contentPosition: nextPosition,
-						} )
+						})
 					}
-					isDisabled={ ! hasInnerBlocks }
+					isDisabled={!hasInnerBlocks}
 				/>
 				<FullHeightAlignmentControl
-					isActive={ isMinFullHeight }
-					onToggle={ toggleMinFullHeight }
-					isDisabled={ ! hasInnerBlocks }
+					isActive={isMinFullHeight}
+					onToggle={toggleMinFullHeight}
+					isDisabled={!hasInnerBlocks}
 				/>
 			</BlockControls>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					mediaId={id}
+					mediaURL={url}
+					allowedTypes={ALLOWED_MEDIA_TYPES}
 					accept="image/*,video/*"
-					onSelect={ onSelectMedia }
-					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+					onSelect={onSelectMedia}
+					name={!url ? __('Add Media') : __('Replace')}
 				/>
 			</BlockControls>
 			<InspectorControls>
-				{ !! url && (
-					<PanelBody title={ __( 'Media settings' ) }>
-						{ isImageBackground && (
+				{!!url && (
+					<PanelBody title={__('Media settings')}>
+						{isImageBackground && (
 							<Fragment>
 								<ToggleControl
-									label={ __( 'Fixed background' ) }
-									checked={ hasParallax }
-									onChange={ toggleParallax }
+									label={__('Fixed background')}
+									checked={hasParallax}
+									onChange={toggleParallax}
 								/>
 
 								<ToggleControl
-									label={ __( 'Repeated background' ) }
-									checked={ isRepeated }
-									onChange={ toggleIsRepeated }
+									label={__('Repeated background')}
+									checked={isRepeated}
+									onChange={toggleIsRepeated}
 								/>
 							</Fragment>
-						) }
-						{ showFocalPointPicker && (
+						)}
+						{showFocalPointPicker && (
 							<FocalPointPicker
-								label={ __( 'Focal point picker' ) }
-								url={ url }
-								value={ focalPoint }
-								onDragStart={ imperativeFocalPointPreview }
-								onDrag={ imperativeFocalPointPreview }
-								onChange={ ( newFocalPoint ) =>
-									setAttributes( {
+								label={__('Focal point picker')}
+								url={url}
+								value={focalPoint}
+								onDragStart={imperativeFocalPointPreview}
+								onDrag={imperativeFocalPointPreview}
+								onChange={(newFocalPoint) =>
+									setAttributes({
 										focalPoint: newFocalPoint,
-									} )
+									})
 								}
 							/>
-						) }
-						{ url && isImageBackground && isImgElement && (
+						)}
+						{url && isImageBackground && isImgElement && (
 							<TextareaControl
-								label={ __( 'Alt text (alternative text)' ) }
-								value={ alt }
-								onChange={ ( newAlt ) =>
-									setAttributes( { alt: newAlt } )
+								label={__('Alt text (alternative text)')}
+								value={alt}
+								onChange={(newAlt) =>
+									setAttributes({ alt: newAlt })
 								}
 								help={
 									<>
 										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-											{ __(
+											{__(
 												'Describe the purpose of the image'
-											) }
+											)}
 										</ExternalLink>
-										{ __(
+										{__(
 											'Leave empty if the image is purely decorative.'
-										) }
+										)}
 									</>
 								}
 							/>
-						) }
+						)}
 						<PanelRow>
 							<Button
 								variant="secondary"
 								isSmall
 								className="block-library-cover__reset-button"
-								onClick={ () =>
-									setAttributes( {
+								onClick={() =>
+									setAttributes({
 										url: undefined,
 										id: undefined,
 										backgroundType: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
 										isRepeated: undefined,
-									} )
+									})
 								}
 							>
-								{ __( 'Clear Media' ) }
+								{__('Clear Media')}
 							</Button>
 						</PanelRow>
 					</PanelBody>
-				) }
+				)}
 				<PanelColorGradientSettings
 					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
-					title={ __( 'Overlay' ) }
-					initialOpen={ true }
-					settings={ [
+					title={__('Overlay')}
+					initialOpen={true}
+					settings={[
 						{
 							colorValue: overlayColor.color,
 							gradientValue,
 							onColorChange: setOverlayColor,
 							onGradientChange: setGradient,
-							label: __( 'Color' ),
+							label: __('Color'),
 						},
-					] }
+					]}
 				>
 					<RangeControl
-						label={ __( 'Opacity' ) }
-						value={ dimRatio }
-						onChange={ ( newDimRation ) =>
-							setAttributes( {
+						label={__('Opacity')}
+						value={dimRatio}
+						onChange={(newDimRation) =>
+							setAttributes({
 								dimRatio: newDimRation,
-							} )
+							})
 						}
-						min={ 0 }
-						max={ 100 }
-						step={ 10 }
+						min={0}
+						max={100}
+						step={10}
 						required
 					/>
 				</PanelColorGradientSettings>
 			</InspectorControls>
 			<InspectorControls __experimentalGroup="dimensions">
 				<ToolsPanelItem
-					hasValue={ () => !! minHeight }
-					label={ __( 'Minimum height' ) }
-					onDeselect={ () =>
-						setAttributes( {
+					hasValue={() => !!minHeight}
+					label={__('Minimum height')}
+					onDeselect={() =>
+						setAttributes({
 							minHeight: undefined,
 							minHeightUnit: undefined,
-						} )
+						})
 					}
-					resetAllFilter={ () => ( {
+					resetAllFilter={() => ({
 						minHeight: undefined,
 						minHeightUnit: undefined,
-					} ) }
-					isShownByDefault={ true }
-					panelId={ clientId }
+					})}
+					isShownByDefault={true}
+					panelId={clientId}
 				>
 					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
+						value={temporaryMinHeight || minHeight}
+						unit={minHeightUnit}
+						onChange={(newMinHeight) =>
+							setAttributes({ minHeight: newMinHeight })
 						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
+						onUnitChange={(nextUnit) =>
+							setAttributes({
 								minHeightUnit: nextUnit,
-							} )
+							})
 						}
 					/>
 				</ToolsPanelItem>
@@ -610,13 +595,13 @@ function CoverEdit( {
 	);
 
 	const ref = useRef();
-	const blockProps = useBlockProps( { ref } );
+	const blockProps = useBlockProps({ ref });
 
 	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
-	const innerBlocksTemplate = getInnerBlocksTemplate( {
+	const hasFontSizes = !!useSetting('typography.fontSizes')?.length;
+	const innerBlocksTemplate = getInnerBlocksTemplate({
 		fontSize: hasFontSizes ? 'large' : undefined,
-	} );
+	});
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -630,50 +615,50 @@ function CoverEdit( {
 		}
 	);
 
-	if ( ! hasInnerBlocks && ! hasBackground ) {
+	if (!hasInnerBlocks && !hasBackground) {
 		return (
 			<>
-				{ controls }
+				{controls}
 				<div
-					{ ...blockProps }
-					className={ classnames(
+					{...blockProps}
+					className={classnames(
 						'is-placeholder',
 						blockProps.className
-					) }
+					)}
 				>
 					<CoverPlaceholder
-						noticeUI={ noticeUI }
-						onSelectMedia={ onSelectMedia }
-						noticeOperations={ noticeOperations }
-						style={ {
+						noticeUI={noticeUI}
+						onSelectMedia={onSelectMedia}
+						noticeOperations={noticeOperations}
+						style={{
 							minHeight:
 								temporaryMinHeight ||
 								minHeightWithUnit ||
 								undefined,
-						} }
+						}}
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
-								disableCustomColors={ true }
-								value={ overlayColor.color }
-								onChange={ setOverlayColor }
-								clearable={ false }
+								disableCustomColors={true}
+								value={overlayColor.color}
+								onChange={setOverlayColor}
+								clearable={false}
 							/>
 						</div>
 					</CoverPlaceholder>
 					<ResizableCover
 						className="block-library-cover__resize-container"
-						onResizeStart={ () => {
-							setAttributes( { minHeightUnit: 'px' } );
-							toggleSelection( false );
-						} }
-						onResize={ setTemporaryMinHeight }
-						onResizeStop={ ( newMinHeight ) => {
-							toggleSelection( true );
-							setAttributes( { minHeight: newMinHeight } );
-							setTemporaryMinHeight( null );
-						} }
-						showHandle={ isSelected }
+						onResizeStart={() => {
+							setAttributes({ minHeightUnit: 'px' });
+							toggleSelection(false);
+						}}
+						onResize={setTemporaryMinHeight}
+						onResizeStop={(newMinHeight) => {
+							toggleSelection(true);
+							setAttributes({ minHeight: newMinHeight });
+							setTemporaryMinHeight(null);
+						}}
+						showHandle={isSelected}
 					/>
 				</div>
 			</>
@@ -683,108 +668,106 @@ function CoverEdit( {
 	const classes = classnames(
 		{
 			'is-dark-theme': isDark,
-			'is-light': ! isDark,
+			'is-light': !isDark,
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			'has-custom-content-position': ! isContentPositionCenter(
-				contentPosition
-			),
+			'has-custom-content-position':
+				!isContentPositionCenter(contentPosition),
 		},
-		getPositionClassName( contentPosition )
+		getPositionClassName(contentPosition)
 	);
 
 	return (
 		<>
-			{ controls }
+			{controls}
 			<div
-				{ ...blockProps }
-				className={ classnames( classes, blockProps.className ) }
-				style={ { ...style, ...blockProps.style } }
-				data-url={ url }
+				{...blockProps}
+				className={classnames(classes, blockProps.className)}
+				style={{ ...style, ...blockProps.style }}
+				data-url={url}
 			>
 				<BoxControlVisualizer
-					values={ styleAttribute?.spacing?.padding }
-					showValues={ styleAttribute?.visualizers?.padding }
+					values={styleAttribute?.spacing?.padding}
+					showValues={styleAttribute?.visualizers?.padding}
 					className="block-library-cover__padding-visualizer"
 				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
-					onResizeStart={ () => {
-						setAttributes( { minHeightUnit: 'px' } );
-						toggleSelection( false );
-					} }
-					onResize={ setTemporaryMinHeight }
-					onResizeStop={ ( newMinHeight ) => {
-						toggleSelection( true );
-						setAttributes( { minHeight: newMinHeight } );
-						setTemporaryMinHeight( null );
-					} }
-					showHandle={ isSelected }
+					onResizeStart={() => {
+						setAttributes({ minHeightUnit: 'px' });
+						toggleSelection(false);
+					}}
+					onResize={setTemporaryMinHeight}
+					onResizeStop={(newMinHeight) => {
+						toggleSelection(true);
+						setAttributes({ minHeight: newMinHeight });
+						setTemporaryMinHeight(null);
+					}}
+					showHandle={isSelected}
 				/>
 
 				<span
 					aria-hidden="true"
-					className={ classnames(
-						dimRatioToClass( dimRatio ),
-						{ [ overlayColor.class ]: overlayColor.class },
+					className={classnames(
+						dimRatioToClass(dimRatio),
+						{ [overlayColor.class]: overlayColor.class },
 						'wp-block-cover__gradient-background',
 						gradientClass,
 						{
 							'has-background-dim': dimRatio !== undefined,
 							'has-background-gradient': gradientValue,
-							[ gradientClass ]: ! url && gradientClass,
+							[gradientClass]: !url && gradientClass,
 						}
-					) }
-					style={ { backgroundImage: gradientValue, ...bgStyle } }
+					)}
+					style={{ backgroundImage: gradientValue, ...bgStyle }}
 				/>
 
-				{ url && isImageBackground && isImgElement && (
+				{url && isImageBackground && isImgElement && (
 					<img
-						ref={ isDarkElement }
+						ref={isDarkElement}
 						className="wp-block-cover__image-background"
-						alt={ alt }
-						src={ url }
-						style={ mediaStyle }
+						alt={alt}
+						src={url}
+						style={mediaStyle}
 					/>
-				) }
-				{ url && isVideoBackground && (
+				)}
+				{url && isVideoBackground && (
 					<video
-						ref={ isDarkElement }
+						ref={isDarkElement}
 						className="wp-block-cover__video-background"
 						autoPlay
 						muted
 						loop
-						src={ url }
-						style={ mediaStyle }
+						src={url}
+						style={mediaStyle}
 					/>
-				) }
-				{ isUploadingMedia && <Spinner /> }
+				)}
+				{isUploadingMedia && <Spinner />}
 				<CoverPlaceholder
 					disableMediaButtons
-					noticeUI={ noticeUI }
-					onSelectMedia={ onSelectMedia }
-					noticeOperations={ noticeOperations }
+					noticeUI={noticeUI}
+					onSelectMedia={onSelectMedia}
+					noticeOperations={noticeOperations}
 				/>
-				<div { ...innerBlocksProps } />
+				<div {...innerBlocksProps} />
 			</div>
 		</>
 	);
 }
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const {
-			toggleSelection,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = dispatch( blockEditorStore );
+export default compose([
+	withDispatch((dispatch) => {
+		const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
+			dispatch(blockEditorStore);
 
 		return {
 			toggleSelection,
-			markNextChangeAsNotPersistent: __unstableMarkNextChangeAsNotPersistent,
+			markNextChangeAsNotPersistent:
+				__unstableMarkNextChangeAsNotPersistent,
 		};
-	} ),
-	withColors( { overlayColor: 'background-color' } ),
+	}),
+	withColors({ overlayColor: 'background-color' }),
 	withNotices,
 	withInstanceId,
-] )( CoverEdit );
+])(CoverEdit);

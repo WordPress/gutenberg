@@ -19,38 +19,34 @@ export default {
 	},
 };
 
-const Avatar = ( { backgroundColor } ) => {
+const Avatar = ({ backgroundColor }) => {
 	return (
 		<View>
 			<View
-				style={ {
+				style={{
 					border: '3px solid black',
 					borderRadius: '9999px',
 					height: '48px',
 					width: '48px',
 					backgroundColor,
-				} }
+				}}
 			/>
-			<Elevation
-				borderRadius={ 9999 }
-				isInteractive={ false }
-				value={ 3 }
-			/>
+			<Elevation borderRadius={9999} isInteractive={false} value={3} />
 		</View>
 	);
 };
 
 const AnimatedAvatars = () => {
 	const props = {
-		offset: number( 'offset', 20 ),
-		isLayered: boolean( 'isLayered', true ),
-		isReversed: boolean( 'isReversed', false ),
+		offset: number('offset', 20),
+		isLayered: boolean('isLayered', true),
+		isReversed: boolean('isReversed', false),
 	};
 
 	return (
 		<HStack>
 			<View>
-				<ZStack { ...props }>
+				<ZStack {...props}>
 					<Avatar backgroundColor="#444" />
 					<Avatar backgroundColor="#777" />
 					<Avatar backgroundColor="#aaa" />

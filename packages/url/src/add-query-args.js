@@ -20,23 +20,23 @@ import { buildQueryString } from './build-query-string';
  *
  * @return {string} URL with arguments applied.
  */
-export function addQueryArgs( url = '', args ) {
+export function addQueryArgs(url = '', args) {
 	// If no arguments are to be appended, return original URL.
-	if ( ! args || ! Object.keys( args ).length ) {
+	if (!args || !Object.keys(args).length) {
 		return url;
 	}
 
 	let baseUrl = url;
 
 	// Determine whether URL already had query arguments.
-	const queryStringIndex = url.indexOf( '?' );
-	if ( queryStringIndex !== -1 ) {
+	const queryStringIndex = url.indexOf('?');
+	if (queryStringIndex !== -1) {
 		// Merge into existing query arguments.
-		args = Object.assign( getQueryArgs( url ), args );
+		args = Object.assign(getQueryArgs(url), args);
 
 		// Change working base URL to omit previous query arguments.
-		baseUrl = baseUrl.substr( 0, queryStringIndex );
+		baseUrl = baseUrl.substr(0, queryStringIndex);
 	}
 
-	return baseUrl + '?' + buildQueryString( args );
+	return baseUrl + '?' + buildQueryString(args);
 }

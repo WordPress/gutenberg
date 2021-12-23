@@ -15,40 +15,40 @@ import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 
-const blockedPaths = [ 'color', 'border', 'typography', 'spacing' ];
+const blockedPaths = ['color', 'border', 'typography', 'spacing'];
 
 const deprecatedFlags = {
-	'color.palette': ( settings ) =>
+	'color.palette': (settings) =>
 		settings.colors === undefined ? undefined : settings.colors,
-	'color.gradients': ( settings ) =>
+	'color.gradients': (settings) =>
 		settings.gradients === undefined ? undefined : settings.gradients,
-	'color.custom': ( settings ) =>
+	'color.custom': (settings) =>
 		settings.disableCustomColors === undefined
 			? undefined
-			: ! settings.disableCustomColors,
-	'color.customGradient': ( settings ) =>
+			: !settings.disableCustomColors,
+	'color.customGradient': (settings) =>
 		settings.disableCustomGradients === undefined
 			? undefined
-			: ! settings.disableCustomGradients,
-	'typography.fontSizes': ( settings ) =>
+			: !settings.disableCustomGradients,
+	'typography.fontSizes': (settings) =>
 		settings.fontSizes === undefined ? undefined : settings.fontSizes,
-	'typography.customFontSize': ( settings ) =>
+	'typography.customFontSize': (settings) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined
-			: ! settings.disableCustomFontSizes,
-	'typography.lineHeight': ( settings ) => settings.enableCustomLineHeight,
-	'spacing.units': ( settings ) => {
-		if ( settings.enableCustomUnits === undefined ) {
+			: !settings.disableCustomFontSizes,
+	'typography.lineHeight': (settings) => settings.enableCustomLineHeight,
+	'spacing.units': (settings) => {
+		if (settings.enableCustomUnits === undefined) {
 			return;
 		}
 
-		if ( settings.enableCustomUnits === true ) {
-			return [ 'px', 'em', 'rem', 'vh', 'vw', '%' ];
+		if (settings.enableCustomUnits === true) {
+			return ['px', 'em', 'rem', 'vh', 'vw', '%'];
 		}
 
 		return settings.enableCustomUnits;
 	},
-	'spacing.padding': ( settings ) => settings.enableCustomSpacing,
+	'spacing.padding': (settings) => settings.enableCustomSpacing,
 };
 
 const prefixedFlags = {
@@ -86,8 +86,8 @@ const prefixedFlags = {
  * @param {string} path Path to desired value in settings.
  * @return {string}     The value for defined setting.
  */
-const removeCustomPrefixes = ( path ) => {
-	return prefixedFlags[ path ] || path;
+const removeCustomPrefixes = (path) => {
+	return prefixedFlags[path] || path;
 };
 
 /**
@@ -101,30 +101,30 @@ const removeCustomPrefixes = ( path ) => {
  * const isEnabled = useSetting( 'typography.dropCap' );
  * ```
  */
-export default function useSetting( path ) {
+export default function useSetting(path) {
 	const { name: blockName } = useBlockEditContext();
 
 	const setting = useSelect(
-		( select ) => {
-			if ( blockedPaths.includes( path ) ) {
+		(select) => {
+			if (blockedPaths.includes(path)) {
 				// eslint-disable-next-line no-console
 				console.warn(
 					'Top level useSetting paths are disabled. Please use a subpath to query the information needed.'
 				);
 				return undefined;
 			}
-			const settings = select( blockEditorStore ).getSettings();
+			const settings = select(blockEditorStore).getSettings();
 
 			// 1 - Use __experimental features, if available.
 			// We cascade to the all value if the block one is not available.
-			const normalizedPath = removeCustomPrefixes( path );
-			const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
-			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
+			const normalizedPath = removeCustomPrefixes(path);
+			const defaultsPath = `__experimentalFeatures.${normalizedPath}`;
+			const blockPath = `__experimentalFeatures.blocks.${blockName}.${normalizedPath}`;
 			const experimentalFeaturesResult =
-				get( settings, blockPath ) ?? get( settings, defaultsPath );
+				get(settings, blockPath) ?? get(settings, defaultsPath);
 
-			if ( experimentalFeaturesResult !== undefined ) {
-				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
+			if (experimentalFeaturesResult !== undefined) {
+				if (PATHS_WITH_MERGE[normalizedPath]) {
 					return (
 						experimentalFeaturesResult.custom ??
 						experimentalFeaturesResult.theme ??
@@ -135,10 +135,10 @@ export default function useSetting( path ) {
 			}
 
 			// 2 - Use deprecated settings, otherwise.
-			const deprecatedSettingsValue = deprecatedFlags[ normalizedPath ]
-				? deprecatedFlags[ normalizedPath ]( settings )
+			const deprecatedSettingsValue = deprecatedFlags[normalizedPath]
+				? deprecatedFlags[normalizedPath](settings)
 				: undefined;
-			if ( deprecatedSettingsValue !== undefined ) {
+			if (deprecatedSettingsValue !== undefined) {
 				return deprecatedSettingsValue;
 			}
 
@@ -148,7 +148,7 @@ export default function useSetting( path ) {
 			// To remove when __experimentalFeatures are ported to core.
 			return normalizedPath === 'typography.dropCap' ? true : undefined;
 		},
-		[ blockName, path ]
+		[blockName, path]
 	);
 
 	return setting;

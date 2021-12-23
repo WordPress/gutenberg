@@ -49,12 +49,12 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *
  * @return {Object} Action object.
  */
-export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+export function createNotice(status = DEFAULT_STATUS, content, options = {}) {
 	const {
 		speak = true,
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
-		id = uniqueId( context ),
+		id = uniqueId(context),
 		actions = [],
 		type = 'default',
 		__unstableHTML,
@@ -66,7 +66,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 	// The supported value shape of content is currently limited to plain text
 	// strings. To avoid setting expectation that e.g. a WPElement could be
 	// supported, cast to a string.
-	content = String( content );
+	content = String(content);
 
 	return {
 		type: 'CREATE_NOTICE',
@@ -98,8 +98,8 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  *
  * @return {Object} Action object.
  */
-export function createSuccessNotice( content, options ) {
-	return createNotice( 'success', content, options );
+export function createSuccessNotice(content, options) {
+	return createNotice('success', content, options);
 }
 
 /**
@@ -113,8 +113,8 @@ export function createSuccessNotice( content, options ) {
  *
  * @return {Object} Action object.
  */
-export function createInfoNotice( content, options ) {
-	return createNotice( 'info', content, options );
+export function createInfoNotice(content, options) {
+	return createNotice('info', content, options);
 }
 
 /**
@@ -128,8 +128,8 @@ export function createInfoNotice( content, options ) {
  *
  * @return {Object} Action object.
  */
-export function createErrorNotice( content, options ) {
-	return createNotice( 'error', content, options );
+export function createErrorNotice(content, options) {
+	return createNotice('error', content, options);
 }
 
 /**
@@ -143,8 +143,8 @@ export function createErrorNotice( content, options ) {
  *
  * @return {Object} Action object.
  */
-export function createWarningNotice( content, options ) {
-	return createNotice( 'warning', content, options );
+export function createWarningNotice(content, options) {
+	return createNotice('warning', content, options);
 }
 
 /**
@@ -156,7 +156,7 @@ export function createWarningNotice( content, options ) {
  *
  * @return {Object} Action object.
  */
-export function removeNotice( id, context = DEFAULT_CONTEXT ) {
+export function removeNotice(id, context = DEFAULT_CONTEXT) {
 	return {
 		type: 'REMOVE_NOTICE',
 		id,

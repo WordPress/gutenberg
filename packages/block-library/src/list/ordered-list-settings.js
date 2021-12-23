@@ -5,33 +5,33 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { TextControl, PanelBody, ToggleControl } from '@wordpress/components';
 
-const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
+const OrderedListSettings = ({ setAttributes, reversed, start }) => (
 	<InspectorControls>
-		<PanelBody title={ __( 'Ordered list settings' ) }>
+		<PanelBody title={__('Ordered list settings')}>
 			<TextControl
-				label={ __( 'Start value' ) }
+				label={__('Start value')}
 				type="number"
-				onChange={ ( value ) => {
-					const int = parseInt( value, 10 );
+				onChange={(value) => {
+					const int = parseInt(value, 10);
 
-					setAttributes( {
+					setAttributes({
 						// It should be possible to unset the value,
 						// e.g. with an empty string.
-						start: isNaN( int ) ? undefined : int,
-					} );
-				} }
-				value={ Number.isInteger( start ) ? start.toString( 10 ) : '' }
+						start: isNaN(int) ? undefined : int,
+					});
+				}}
+				value={Number.isInteger(start) ? start.toString(10) : ''}
 				step="1"
 			/>
 			<ToggleControl
-				label={ __( 'Reverse list numbering' ) }
-				checked={ reversed || false }
-				onChange={ ( value ) => {
-					setAttributes( {
+				label={__('Reverse list numbering')}
+				checked={reversed || false}
+				onChange={(value) => {
+					setAttributes({
 						// Unset the attribute if not reversed.
 						reversed: value || undefined,
-					} );
-				} }
+					});
+				}}
 			/>
 		</PanelBody>
 	</InspectorControls>

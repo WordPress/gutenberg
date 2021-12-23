@@ -25,11 +25,11 @@ import styles from './style.scss';
 
 export class HTMLTextInput extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
-		this.edit = this.edit.bind( this );
-		this.stopEditing = this.stopEditing.bind( this );
-		this.getHTMLForParent = this.getHTMLForParent.bind( this );
+		this.edit = this.edit.bind(this);
+		this.stopEditing = this.stopEditing.bind(this);
+		this.getHTMLForParent = this.getHTMLForParent.bind(this);
 		addFilter(
 			'native.persist-html',
 			'html-text-input',
@@ -39,8 +39,8 @@ export class HTMLTextInput extends Component {
 		this.state = {};
 	}
 
-	static getDerivedStateFromProps( props, state ) {
-		if ( state.isDirty ) {
+	static getDerivedStateFromProps(props, state) {
+		if (state.isDirty) {
 			return null;
 		}
 
@@ -51,14 +51,14 @@ export class HTMLTextInput extends Component {
 	}
 
 	componentWillUnmount() {
-		removeFilter( 'native.persist-html', 'html-text-input' );
+		removeFilter('native.persist-html', 'html-text-input');
 		//TODO: Blocking main thread
 		this.stopEditing();
 	}
 
-	edit( html ) {
-		this.props.onChange( html );
-		this.setState( { value: html, isDirty: true } );
+	edit(html) {
+		this.props.onChange(html);
+		this.setState({ value: html, isDirty: true });
 	}
 
 	getHTMLForParent() {
@@ -66,9 +66,9 @@ export class HTMLTextInput extends Component {
 	}
 
 	stopEditing() {
-		if ( this.state.isDirty ) {
-			this.props.onPersist( this.state.value );
-			this.setState( { isDirty: false } );
+		if (this.state.isDirty) {
+			this.props.onPersist(this.state.value);
+			this.setState({ isDirty: false });
 		}
 	}
 
@@ -79,7 +79,7 @@ export class HTMLTextInput extends Component {
 			style?.text && { color: style.text },
 		];
 		const htmlStyle = [
-			getStylesFromColorScheme( styles.htmlView, styles.htmlViewDark ),
+			getStylesFromColorScheme(styles.htmlView, styles.htmlViewDark),
 			style?.text && { color: style.text },
 		];
 		const placeholderStyle = {
@@ -87,65 +87,64 @@ export class HTMLTextInput extends Component {
 				styles.placeholder,
 				styles.placeholderDark
 			),
-			...( style?.text && { color: style.text } ),
+			...(style?.text && { color: style.text }),
 		};
 		return (
-			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
+			<HTMLInputContainer parentHeight={this.props.parentHeight}>
 				<TextInput
-					autoCorrect={ false }
+					autoCorrect={false}
 					accessibilityLabel="html-view-title"
 					textAlignVertical="center"
-					numberOfLines={ 1 }
-					style={ titleStyle }
-					value={ this.props.title }
-					placeholder={ __( 'Add title' ) }
-					placeholderTextColor={ placeholderStyle.color }
-					onChangeText={ this.props.editTitle }
+					numberOfLines={1}
+					style={titleStyle}
+					value={this.props.title}
+					placeholder={__('Add title')}
+					placeholderTextColor={placeholderStyle.color}
+					onChangeText={this.props.editTitle}
 				/>
 				<TextInput
-					autoCorrect={ false }
+					autoCorrect={false}
 					accessibilityLabel="html-view-content"
 					textAlignVertical="top"
 					multiline
-					style={ htmlStyle }
-					value={ this.state.value }
-					onChangeText={ this.edit }
-					onBlur={ this.stopEditing }
-					placeholder={ __( 'Start writing…' ) }
-					placeholderTextColor={ placeholderStyle.color }
-					scrollEnabled={ HTMLInputContainer.scrollEnabled }
+					style={htmlStyle}
+					value={this.state.value}
+					onChangeText={this.edit}
+					onBlur={this.stopEditing}
+					placeholder={__('Start writing…')}
+					placeholderTextColor={placeholderStyle.color}
+					scrollEnabled={HTMLInputContainer.scrollEnabled}
 				/>
 			</HTMLInputContainer>
 		);
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditedPostContent } = select(
-			'core/editor'
-		);
+export default compose([
+	withSelect((select) => {
+		const { getEditedPostAttribute, getEditedPostContent } =
+			select('core/editor');
 
 		return {
-			title: getEditedPostAttribute( 'title' ),
+			title: getEditedPostAttribute('title'),
 			value: getEditedPostContent(),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+	}),
+	withDispatch((dispatch) => {
+		const { editPost, resetEditorBlocks } = dispatch('core/editor');
 		return {
-			editTitle( title ) {
-				editPost( { title } );
+			editTitle(title) {
+				editPost({ title });
 			},
-			onChange( content ) {
-				editPost( { content } );
+			onChange(content) {
+				editPost({ content });
 			},
-			onPersist( content ) {
-				const blocks = parse( content );
-				resetEditorBlocks( blocks );
+			onPersist(content) {
+				const blocks = parse(content);
+				resetEditorBlocks(blocks);
 			},
 		};
-	} ),
+	}),
 	withInstanceId,
 	withPreferredColorScheme,
-] )( HTMLTextInput );
+])(HTMLTextInput);

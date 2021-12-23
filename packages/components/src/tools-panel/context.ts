@@ -10,7 +10,7 @@ import type { ToolsPanelContext as ToolsPanelContextType } from './types';
 
 const noop = () => undefined;
 
-export const ToolsPanelContext = createContext< ToolsPanelContextType >( {
+export const ToolsPanelContext = createContext<ToolsPanelContextType>({
 	menuItems: { default: {}, optional: {} },
 	hasMenuItems: false,
 	isResetting: false,
@@ -19,7 +19,7 @@ export const ToolsPanelContext = createContext< ToolsPanelContextType >( {
 	deregisterPanelItem: noop,
 	flagItemCustomization: noop,
 	areAllOptionalControlsHidden: true,
-} );
+});
 
 export const useToolsPanelContext = () =>
-	useContext< ToolsPanelContextType >( ToolsPanelContext );
+	useContext<ToolsPanelContextType>(ToolsPanelContext);

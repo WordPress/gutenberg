@@ -37,12 +37,12 @@ import { useControlledValue } from '../utils/hooks';
 
 import type { ColorType } from './types';
 
-extend( [ namesPlugin ] );
+extend([namesPlugin]);
 
 export interface ColorPickerProps {
 	enableAlpha?: boolean;
 	color?: string;
-	onChange?: ( color: string ) => void;
+	onChange?: (color: string) => void;
 	defaultValue?: string;
 	copyFormat?: ColorType;
 }
@@ -54,8 +54,8 @@ const options = [
 ];
 
 const ColorPicker = (
-	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<ColorPickerProps, 'div', false>,
+	forwardedRef: Ref<any>
 ) => {
 	const {
 		enableAlpha = false,
@@ -64,85 +64,83 @@ const ColorPicker = (
 		defaultValue = '#fff',
 		copyFormat,
 		...divProps
-	} = useContextSystem( props, 'ColorPicker' );
+	} = useContextSystem(props, 'ColorPicker');
 
 	// Use a safe default value for the color and remove the possibility of `undefined`.
-	const [ color, setColor ] = useControlledValue( {
+	const [color, setColor] = useControlledValue({
 		onChange,
 		value: colorProp,
 		defaultValue,
-	} );
+	});
 
-	const safeColordColor = useMemo( () => {
-		return colord( color );
-	}, [ color ] );
+	const safeColordColor = useMemo(() => {
+		return colord(color);
+	}, [color]);
 
-	const debouncedSetColor = useDebounce( setColor );
+	const debouncedSetColor = useDebounce(setColor);
 
 	const handleChange = useCallback(
-		( nextValue: Colord ) => {
-			debouncedSetColor( nextValue.toHex() );
+		(nextValue: Colord) => {
+			debouncedSetColor(nextValue.toHex());
 		},
-		[ debouncedSetColor ]
+		[debouncedSetColor]
 	);
 
-	const [ showInputs, setShowInputs ] = useState< boolean >( false );
-	const [ colorType, setColorType ] = useState< ColorType >(
-		copyFormat || 'hex'
-	);
+	const [showInputs, setShowInputs] = useState<boolean>(false);
+	const [colorType, setColorType] = useState<ColorType>(copyFormat || 'hex');
 
 	return (
-		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+		<ColorfulWrapper ref={forwardedRef} {...divProps}>
 			<Picker
-				onChange={ handleChange }
-				color={ safeColordColor }
-				enableAlpha={ enableAlpha }
+				onChange={handleChange}
+				color={safeColordColor}
+				enableAlpha={enableAlpha}
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<HStack justify="space-between">
-					{ showInputs ? (
+					{showInputs ? (
 						<SelectControl
-							options={ options }
-							value={ colorType }
-							onChange={ ( nextColorType ) =>
-								setColorType( nextColorType as ColorType )
+							options={options}
+							value={colorType}
+							onChange={(nextColorType) =>
+								setColorType(nextColorType as ColorType)
 							}
-							label={ __( 'Color format' ) }
+							label={__('Color format')}
 							hideLabelFromVision
 						/>
 					) : (
 						<ColorDisplay
-							color={ safeColordColor }
-							colorType={ copyFormat || colorType }
-							enableAlpha={ enableAlpha }
+							color={safeColordColor}
+							colorType={copyFormat || colorType}
+							enableAlpha={enableAlpha}
 						/>
-					) }
+					)}
 					<DetailsControlButton
 						isSmall
-						onClick={ () => setShowInputs( ! showInputs ) }
-						icon={ settings }
-						isPressed={ showInputs }
+						onClick={() => setShowInputs(!showInputs)}
+						icon={settings}
+						isPressed={showInputs}
 						label={
 							showInputs
-								? __( 'Hide detailed inputs' )
-								: __( 'Show detailed inputs' )
+								? __('Hide detailed inputs')
+								: __('Show detailed inputs')
 						}
 					/>
 				</HStack>
-				<Spacer margin={ 4 } />
-				{ showInputs && (
+				<Spacer margin={4} />
+				{showInputs && (
 					<ColorInput
-						colorType={ colorType }
-						color={ safeColordColor }
-						onChange={ handleChange }
-						enableAlpha={ enableAlpha }
+						colorType={colorType}
+						color={safeColordColor}
+						onChange={handleChange}
+						enableAlpha={enableAlpha}
 					/>
-				) }
+				)}
 			</AuxiliaryColorArtefactWrapper>
 		</ColorfulWrapper>
 	);
 };
 
-const ConnectedColorPicker = contextConnect( ColorPicker, 'ColorPicker' );
+const ConnectedColorPicker = contextConnect(ColorPicker, 'ColorPicker');
 
 export default ConnectedColorPicker;

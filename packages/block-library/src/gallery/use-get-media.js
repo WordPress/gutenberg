@@ -13,41 +13,41 @@ import { store as coreStore } from '@wordpress/core-data';
  *
  * @return {Array} An array of media info options for each gallery image.
  */
-export default function useGetMedia( innerBlockImages ) {
-	const [ currentImageMedia, setCurrentImageMedia ] = useState( [] );
+export default function useGetMedia(innerBlockImages) {
+	const [currentImageMedia, setCurrentImageMedia] = useState([]);
 
 	const imageMedia = useSelect(
-		( select ) => {
-			if ( ! innerBlockImages?.length ) {
+		(select) => {
+			if (!innerBlockImages?.length) {
 				return currentImageMedia;
 			}
 
 			const imageIds = innerBlockImages
-				.map( ( imageBlock ) => imageBlock.attributes.id )
-				.filter( ( id ) => id !== undefined );
+				.map((imageBlock) => imageBlock.attributes.id)
+				.filter((id) => id !== undefined);
 
-			if ( imageIds.length === 0 ) {
+			if (imageIds.length === 0) {
 				return currentImageMedia;
 			}
 
-			return select( coreStore ).getMediaItems( {
-				include: imageIds.join( ',' ),
+			return select(coreStore).getMediaItems({
+				include: imageIds.join(','),
 				per_page: -1,
-			} );
+			});
 		},
-		[ innerBlockImages ]
+		[innerBlockImages]
 	);
 
 	if (
 		imageMedia?.length !== currentImageMedia?.length ||
 		imageMedia?.some(
-			( newImage ) =>
-				! currentImageMedia.find(
-					( currentImage ) => currentImage.id === newImage.id
+			(newImage) =>
+				!currentImageMedia.find(
+					(currentImage) => currentImage.id === newImage.id
 				)
 		)
 	) {
-		setCurrentImageMedia( imageMedia );
+		setCurrentImageMedia(imageMedia);
 		return imageMedia;
 	}
 	return currentImageMedia;

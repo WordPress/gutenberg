@@ -32,7 +32,7 @@ export default function List() {
 	useRegisterShortcuts();
 
 	const { previousShortcut, nextShortcut, isNavigationOpen } = useSelect(
-		( select ) => {
+		(select) => {
 			return {
 				previousShortcut: select(
 					keyboardShortcutsStore
@@ -41,19 +41,19 @@ export default function List() {
 				),
 				nextShortcut: select(
 					keyboardShortcutsStore
-				).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
-				isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
+				).getAllShortcutKeyCombinations('core/edit-site/next-region'),
+				isNavigationOpen: select(editSiteStore).isNavigationOpened(),
 			};
 		},
 		[]
 	);
 
 	const postType = useSelect(
-		( select ) => select( coreStore ).getPostType( templateType ),
-		[ templateType ]
+		(select) => select(coreStore).getPostType(templateType),
+		[templateType]
 	);
 
-	useTitle( postType?.labels?.name );
+	useTitle(postType?.labels?.name);
 
 	// `postType` could load in asynchronously. Only provide the detailed region labels if
 	// the postType has loaded, otherwise `InterfaceSkeleton` will fallback to the defaults.
@@ -62,12 +62,12 @@ export default function List() {
 		? {
 				header: sprintf(
 					// translators: %s - the name of the page, 'Header' as in the header area of that page.
-					__( '%s - Header' ),
+					__('%s - Header'),
 					itemsListLabel
 				),
 				body: sprintf(
 					// translators: %s - the name of the page, 'Content' as in the content area of that page.
-					__( '%s - Content' ),
+					__('%s - Content'),
 					itemsListLabel
 				),
 		  }
@@ -75,21 +75,21 @@ export default function List() {
 
 	return (
 		<InterfaceSkeleton
-			className={ classnames( 'edit-site-list', {
+			className={classnames('edit-site-list', {
 				'is-navigation-open': isNavigationOpen,
-			} ) }
-			labels={ {
-				drawer: __( 'Navigation Sidebar' ),
+			})}
+			labels={{
+				drawer: __('Navigation Sidebar'),
 				...detailedRegionLabels,
-			} }
-			header={ <Header templateType={ templateType } /> }
-			drawer={ <NavigationSidebar.Slot /> }
-			notices={ <EditorSnackbars /> }
-			content={ <Table templateType={ templateType } /> }
-			shortcuts={ {
+			}}
+			header={<Header templateType={templateType} />}
+			drawer={<NavigationSidebar.Slot />}
+			notices={<EditorSnackbars />}
+			content={<Table templateType={templateType} />}
+			shortcuts={{
 				previous: previousShortcut,
 				next: nextShortcut,
-			} }
+			}}
 		/>
 	);
 }

@@ -49,34 +49,34 @@ import useBlockDisplayInformation from '../use-block-display-information';
  *
  * @return {WPComponent} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
+function BlockSelectionButton({ clientId, rootClientId, blockElement }) {
+	const blockInformation = useBlockDisplayInformation(clientId);
 	const selected = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getBlock,
 				getBlockIndex,
 				hasBlockMovingClientId,
 				getBlockListSettings,
-			} = select( blockEditorStore );
-			const index = getBlockIndex( clientId );
-			const { name, attributes } = getBlock( clientId );
+			} = select(blockEditorStore);
+			const index = getBlockIndex(clientId);
+			const { name, attributes } = getBlock(clientId);
 			const blockMovingMode = hasBlockMovingClientId();
 			return {
 				index,
 				name,
 				attributes,
 				blockMovingMode,
-				orientation: getBlockListSettings( rootClientId )?.orientation,
+				orientation: getBlockListSettings(rootClientId)?.orientation,
 			};
 		},
-		[ clientId, rootClientId ]
+		[clientId, rootClientId]
 	);
 	const { index, name, attributes, blockMovingMode, orientation } = selected;
-	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
+	const { setNavigationMode, removeBlock } = useDispatch(blockEditorStore);
 	const ref = useRef();
 
-	const blockType = getBlockType( name );
+	const blockType = getBlockType(name);
 	const label = getAccessibleBlockLabel(
 		blockType,
 		attributes,
@@ -85,11 +85,11 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	);
 
 	// Focus the breadcrumb in navigation mode.
-	useEffect( () => {
+	useEffect(() => {
 		ref.current.focus();
 
-		speak( label );
-	}, [ label ] );
+		speak(label);
+	}, [label]);
 
 	const {
 		hasBlockMovingClientId,
@@ -101,15 +101,15 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		getPreviousBlockClientId,
 		getNextBlockClientId,
 		isNavigationMode,
-	} = useSelect( blockEditorStore );
+	} = useSelect(blockEditorStore);
 	const {
 		selectBlock,
 		clearSelectedBlock,
 		setBlockMovingClientId,
 		moveBlockToPosition,
-	} = useDispatch( blockEditorStore );
+	} = useDispatch(blockEditorStore);
 
-	function onKeyDown( event ) {
+	function onKeyDown(event) {
 		const { keyCode } = event;
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
@@ -121,8 +121,8 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		const isSpace = keyCode === SPACE;
 		const isShift = event.shiftKey;
 
-		if ( keyCode === BACKSPACE || keyCode === DELETE ) {
-			removeBlock( clientId );
+		if (keyCode === BACKSPACE || keyCode === DELETE) {
+			removeBlock(clientId);
 			event.preventDefault();
 			return;
 		}
@@ -136,41 +136,41 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			selectionEndClientId || selectedBlockClientId
 		);
 
-		const navigateUp = ( isTab && isShift ) || isUp;
-		const navigateDown = ( isTab && ! isShift ) || isDown;
+		const navigateUp = (isTab && isShift) || isUp;
+		const navigateDown = (isTab && !isShift) || isDown;
 		// Move out of current nesting level (no effect if at root level).
 		const navigateOut = isLeft;
 		// Move into next nesting level (no effect if the current block has no innerBlocks).
 		const navigateIn = isRight;
 
 		let focusedBlockUid;
-		if ( navigateUp ) {
+		if (navigateUp) {
 			focusedBlockUid = selectionBeforeEndClientId;
-		} else if ( navigateDown ) {
+		} else if (navigateDown) {
 			focusedBlockUid = selectionAfterEndClientId;
-		} else if ( navigateOut ) {
+		} else if (navigateOut) {
 			focusedBlockUid =
-				getBlockRootClientId( selectedBlockClientId ) ??
+				getBlockRootClientId(selectedBlockClientId) ??
 				selectedBlockClientId;
-		} else if ( navigateIn ) {
+		} else if (navigateIn) {
 			focusedBlockUid =
-				getClientIdsOfDescendants( [ selectedBlockClientId ] )[ 0 ] ??
+				getClientIdsOfDescendants([selectedBlockClientId])[0] ??
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
-		if ( isEscape && isNavigationMode() ) {
+		if (isEscape && isNavigationMode()) {
 			clearSelectedBlock();
 			event.preventDefault();
 		}
-		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
-			setBlockMovingClientId( null );
+		if (isEscape && startingBlockClientId && !event.defaultPrevented) {
+			setBlockMovingClientId(null);
 			event.preventDefault();
 		}
-		if ( ( isEnter || isSpace ) && startingBlockClientId ) {
-			const sourceRoot = getBlockRootClientId( startingBlockClientId );
-			const destRoot = getBlockRootClientId( selectedBlockClientId );
-			const sourceBlockIndex = getBlockIndex( startingBlockClientId );
-			let destinationBlockIndex = getBlockIndex( selectedBlockClientId );
+		if ((isEnter || isSpace) && startingBlockClientId) {
+			const sourceRoot = getBlockRootClientId(startingBlockClientId);
+			const destRoot = getBlockRootClientId(selectedBlockClientId);
+			const sourceBlockIndex = getBlockIndex(startingBlockClientId);
+			let destinationBlockIndex = getBlockIndex(selectedBlockClientId);
 			if (
 				sourceBlockIndex < destinationBlockIndex &&
 				sourceRoot === destRoot
@@ -183,29 +183,29 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				destRoot,
 				destinationBlockIndex
 			);
-			selectBlock( startingBlockClientId );
-			setBlockMovingClientId( null );
+			selectBlock(startingBlockClientId);
+			setBlockMovingClientId(null);
 		}
-		if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
-			if ( focusedBlockUid ) {
+		if (navigateDown || navigateUp || navigateOut || navigateIn) {
+			if (focusedBlockUid) {
 				event.preventDefault();
-				selectBlock( focusedBlockUid );
-			} else if ( isTab && selectedBlockClientId ) {
+				selectBlock(focusedBlockUid);
+			} else if (isTab && selectedBlockClientId) {
 				let nextTabbable;
 
-				if ( navigateDown ) {
-					nextTabbable = focus.tabbable.findNext( blockElement );
+				if (navigateDown) {
+					nextTabbable = focus.tabbable.findNext(blockElement);
 
-					if ( ! nextTabbable ) {
+					if (!nextTabbable) {
 						nextTabbable =
 							blockElement.ownerDocument.defaultView.frameElement;
-						nextTabbable = focus.tabbable.findNext( nextTabbable );
+						nextTabbable = focus.tabbable.findNext(nextTabbable);
 					}
 				} else {
-					nextTabbable = focus.tabbable.findPrevious( blockElement );
+					nextTabbable = focus.tabbable.findPrevious(blockElement);
 				}
 
-				if ( nextTabbable ) {
+				if (nextTabbable) {
 					event.preventDefault();
 					nextTabbable.focus();
 					clearSelectedBlock();
@@ -217,46 +217,46 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	const classNames = classnames(
 		'block-editor-block-list__block-selection-button',
 		{
-			'is-block-moving-mode': !! blockMovingMode,
+			'is-block-moving-mode': !!blockMovingMode,
 		}
 	);
 
-	const dragHandleLabel = __( 'Drag' );
+	const dragHandleLabel = __('Drag');
 
 	return (
-		<div className={ classNames }>
+		<div className={classNames}>
 			<Flex
 				justify="center"
 				className="block-editor-block-list__block-selection-button__content"
 			>
 				<FlexItem>
-					<BlockIcon icon={ blockInformation?.icon } showColors />
+					<BlockIcon icon={blockInformation?.icon} showColors />
 				</FlexItem>
 				<FlexItem>
-					<BlockDraggable clientIds={ [ clientId ] }>
-						{ ( draggableProps ) => (
+					<BlockDraggable clientIds={[clientId]}>
+						{(draggableProps) => (
 							<Button
-								icon={ dragHandle }
+								icon={dragHandle}
 								className="block-selection-button_drag-handle"
 								aria-hidden="true"
-								label={ dragHandleLabel }
+								label={dragHandleLabel}
 								// Should not be able to tab to drag handle as this
 								// button can only be used with a pointer device.
 								tabIndex="-1"
-								{ ...draggableProps }
+								{...draggableProps}
 							/>
-						) }
+						)}
 					</BlockDraggable>
 				</FlexItem>
 				<FlexItem>
 					<Button
-						ref={ ref }
-						onClick={ () => setNavigationMode( false ) }
-						onKeyDown={ onKeyDown }
-						label={ label }
+						ref={ref}
+						onClick={() => setNavigationMode(false)}
+						onKeyDown={onKeyDown}
+						label={label}
 						className="block-selection-button_select-button"
 					>
-						<BlockTitle clientId={ clientId } />
+						<BlockTitle clientId={clientId} />
 					</Button>
 				</FlexItem>
 			</Flex>

@@ -23,67 +23,67 @@ import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
 
-const defaultRenderToggle = ( {
+const defaultRenderToggle = ({
 	onToggle,
 	disabled,
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
 	toggleProps = {},
-} ) => {
+}) => {
 	let label;
-	if ( hasSingleBlockType ) {
+	if (hasSingleBlockType) {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
-			_x( 'Add %s', 'directly add the only allowed block' ),
+			_x('Add %s', 'directly add the only allowed block'),
 			blockTitle
 		);
 	} else {
-		label = _x( 'Add block', 'Generic label for block inserter button' );
+		label = _x('Add block', 'Generic label for block inserter button');
 	}
 
 	const { onClick, ...rest } = toggleProps;
 
 	// Handle both onClick functions from the toggle and the parent component
-	function handleClick( event ) {
-		if ( onToggle ) {
-			onToggle( event );
+	function handleClick(event) {
+		if (onToggle) {
+			onToggle(event);
 		}
-		if ( onClick ) {
-			onClick( event );
+		if (onClick) {
+			onClick(event);
 		}
 	}
 
 	return (
 		<Button
-			icon={ plus }
-			label={ label }
+			icon={plus}
+			label={label}
 			tooltipPosition="bottom"
-			onClick={ handleClick }
+			onClick={handleClick}
 			className="block-editor-inserter__toggle"
-			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
-			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
-			disabled={ disabled }
-			{ ...rest }
+			aria-haspopup={!hasSingleBlockType ? 'true' : false}
+			aria-expanded={!hasSingleBlockType ? isOpen : false}
+			disabled={disabled}
+			{...rest}
 		/>
 	);
 };
 
 class Inserter extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
-		this.onToggle = this.onToggle.bind( this );
-		this.renderToggle = this.renderToggle.bind( this );
-		this.renderContent = this.renderContent.bind( this );
+		this.onToggle = this.onToggle.bind(this);
+		this.renderToggle = this.renderToggle.bind(this);
+		this.renderContent = this.renderContent.bind(this);
 	}
 
-	onToggle( isOpen ) {
+	onToggle(isOpen) {
 		const { onToggle } = this.props;
 
 		// Surface toggle callback to parent component
-		if ( onToggle ) {
-			onToggle( isOpen );
+		if (onToggle) {
+			onToggle(isOpen);
 		}
 	}
 
@@ -97,7 +97,7 @@ class Inserter extends Component {
 	 *
 	 * @return {WPElement} Dropdown toggle element.
 	 */
-	renderToggle( { onToggle, isOpen } ) {
+	renderToggle({ onToggle, isOpen }) {
 		const {
 			disabled,
 			blockTitle,
@@ -108,15 +108,15 @@ class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		return renderToggle( {
+		return renderToggle({
 			onToggle,
 			isOpen,
-			disabled: disabled || ! hasItems,
+			disabled: disabled || !hasItems,
 			blockTitle,
 			hasSingleBlockType,
 			directInsertBlock,
 			toggleProps,
-		} );
+		});
 	}
 
 	/**
@@ -128,7 +128,7 @@ class Inserter extends Component {
 	 *
 	 * @return {WPElement} Dropdown content element.
 	 */
-	renderContent( { onClose } ) {
+	renderContent({ onClose }) {
 		const {
 			rootClientId,
 			clientId,
@@ -140,28 +140,28 @@ class Inserter extends Component {
 			__experimentalIsQuick: isQuick,
 		} = this.props;
 
-		if ( isQuick ) {
+		if (isQuick) {
 			return (
 				<QuickInserter
-					onSelect={ () => {
+					onSelect={() => {
 						onClose();
-					} }
-					rootClientId={ rootClientId }
-					clientId={ clientId }
-					isAppender={ isAppender }
+					}}
+					rootClientId={rootClientId}
+					clientId={clientId}
+					isAppender={isAppender}
 				/>
 			);
 		}
 
 		return (
 			<InserterMenu
-				onSelect={ () => {
+				onSelect={() => {
 					onClose();
-				} }
-				rootClientId={ rootClientId }
-				clientId={ clientId }
-				isAppender={ isAppender }
-				showInserterHelpPanel={ showInserterHelpPanel }
+				}}
+				rootClientId={rootClientId}
+				clientId={clientId}
+				isAppender={isAppender}
+				showInserterHelpPanel={showInserterHelpPanel}
 			/>
 		);
 	}
@@ -176,69 +176,65 @@ class Inserter extends Component {
 			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType || directInsertBlock?.length ) {
-			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
+		if (hasSingleBlockType || directInsertBlock?.length) {
+			return this.renderToggle({ onToggle: insertOnlyAllowedBlock });
 		}
 
 		return (
 			<Dropdown
 				className="block-editor-inserter"
-				contentClassName={ classnames(
-					'block-editor-inserter__popover',
-					{ 'is-quick': isQuick }
-				) }
-				position={ position }
-				onToggle={ this.onToggle }
+				contentClassName={classnames('block-editor-inserter__popover', {
+					'is-quick': isQuick,
+				})}
+				position={position}
+				onToggle={this.onToggle}
 				expandOnMobile
-				headerTitle={ __( 'Add a block' ) }
-				renderToggle={ this.renderToggle }
-				renderContent={ this.renderContent }
-				onClose={ onSelectOrClose }
+				headerTitle={__('Add a block')}
+				renderToggle={this.renderToggle}
+				renderContent={this.renderContent}
+				onClose={onSelectOrClose}
 			/>
 		);
 	}
 }
 
-export default compose( [
-	withSelect( ( select, { clientId, rootClientId } ) => {
+export default compose([
+	withSelect((select, { clientId, rootClientId }) => {
 		const {
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 			__experimentalGetDirectInsertBlock,
-		} = select( blockEditorStore );
-		const { getBlockVariations } = select( blocksStore );
+		} = select(blockEditorStore);
+		const { getBlockVariations } = select(blocksStore);
 
 		rootClientId =
-			rootClientId || getBlockRootClientId( clientId ) || undefined;
+			rootClientId || getBlockRootClientId(clientId) || undefined;
 
-		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
+		const allowedBlocks = __experimentalGetAllowedBlocks(rootClientId);
 
-		const directInsertBlock = __experimentalGetDirectInsertBlock(
-			rootClientId
-		);
+		const directInsertBlock =
+			__experimentalGetDirectInsertBlock(rootClientId);
 
 		const hasSingleBlockType =
-			size( allowedBlocks ) === 1 &&
-			size(
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-			) === 0;
+			size(allowedBlocks) === 1 &&
+			size(getBlockVariations(allowedBlocks[0].name, 'inserter')) === 0;
 
 		let allowedBlockType = false;
-		if ( hasSingleBlockType ) {
-			allowedBlockType = allowedBlocks[ 0 ];
+		if (hasSingleBlockType) {
+			allowedBlockType = allowedBlocks[0];
 		}
 
 		return {
-			hasItems: hasInserterItems( rootClientId ),
+			hasItems: hasInserterItems(rootClientId),
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
 			directInsertBlock,
 			rootClientId,
 		};
-	} ),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
+	}),
+	withDispatch((dispatch, ownProps, { select }) => {
 		return {
 			insertOnlyAllowedBlock() {
 				const {
@@ -251,7 +247,7 @@ export default compose( [
 					onSelectOrClose,
 				} = ownProps;
 
-				if ( ! hasSingleBlockType && ! directInsertBlock?.length ) {
+				if (!hasSingleBlockType && !directInsertBlock?.length) {
 					return;
 				}
 
@@ -261,52 +257,52 @@ export default compose( [
 						getBlockSelectionEnd,
 						getBlockOrder,
 						getBlockRootClientId,
-					} = select( blockEditorStore );
+					} = select(blockEditorStore);
 
 					// If the clientId is defined, we insert at the position of the block.
-					if ( clientId ) {
-						return getBlockIndex( clientId );
+					if (clientId) {
+						return getBlockIndex(clientId);
 					}
 
 					// If there a selected block, we insert after the selected block.
 					const end = getBlockSelectionEnd();
 					if (
-						! isAppender &&
+						!isAppender &&
 						end &&
-						getBlockRootClientId( end ) === rootClientId
+						getBlockRootClientId(end) === rootClientId
 					) {
-						return getBlockIndex( end ) + 1;
+						return getBlockIndex(end) + 1;
 					}
 
 					// Otherwise, we insert at the end of the current rootClientId
-					return getBlockOrder( rootClientId ).length;
+					return getBlockOrder(rootClientId).length;
 				}
 
-				const { insertBlock } = dispatch( blockEditorStore );
+				const { insertBlock } = dispatch(blockEditorStore);
 
 				const blockToInsert = directInsertBlock?.length
-					? createBlock( ...directInsertBlock )
-					: createBlock( allowedBlockType.name );
+					? createBlock(...directInsertBlock)
+					: createBlock(allowedBlockType.name);
 
-				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
+				insertBlock(blockToInsert, getInsertionIndex(), rootClientId);
 
-				if ( onSelectOrClose ) {
+				if (onSelectOrClose) {
 					onSelectOrClose();
 				}
 
 				const message = sprintf(
 					// translators: %s: the name of the block that has been added
-					__( '%s block added' ),
+					__('%s block added'),
 					allowedBlockType.title
 				);
-				speak( message );
+				speak(message);
 			},
 		};
-	} ),
+	}),
 	// The global inserter should always be visible, we are using ( ! isAppender && ! rootClientId && ! clientId ) as
 	// a way to detect the global Inserter.
 	ifCondition(
-		( { hasItems, isAppender, rootClientId, clientId } ) =>
-			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
+		({ hasItems, isAppender, rootClientId, clientId }) =>
+			hasItems || (!isAppender && !rootClientId && !clientId)
 	),
-] )( Inserter );
+])(Inserter);

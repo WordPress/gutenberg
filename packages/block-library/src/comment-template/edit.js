@@ -20,12 +20,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import { convertToTree } from './util';
 
 const TEMPLATE = [
-	[ 'core/comment-author-avatar' ],
-	[ 'core/comment-author-name' ],
-	[ 'core/comment-date' ],
-	[ 'core/comment-content' ],
-	[ 'core/comment-reply-link' ],
-	[ 'core/comment-edit-link' ],
+	['core/comment-author-avatar'],
+	['core/comment-author-name'],
+	['core/comment-date'],
+	['core/comment-content'],
+	['core/comment-reply-link'],
+	['core/comment-edit-link'],
 ];
 
 /**
@@ -40,36 +40,36 @@ const TEMPLATE = [
  *                                          getBlocks() in parent .
  * @return {WPElement}                 		Inner blocks of the Comment Template
  */
-function CommentTemplateInnerBlocks( {
+function CommentTemplateInnerBlocks({
 	comment,
 	activeComment,
 	setActiveComment,
 	firstBlock,
 	blocks,
-} ) {
+}) {
 	const { children, ...innerBlocksProps } = useInnerBlocksProps(
 		{},
 		{ template: TEMPLATE }
 	);
 	return (
-		<li { ...innerBlocksProps }>
-			{ comment === ( activeComment || firstBlock ) ? (
+		<li {...innerBlocksProps}>
+			{comment === (activeComment || firstBlock) ? (
 				children
 			) : (
 				<BlockPreview
-					blocks={ blocks }
+					blocks={blocks}
 					__experimentalLive
-					__experimentalOnClick={ () => setActiveComment( comment ) }
+					__experimentalOnClick={() => setActiveComment(comment)}
 				/>
-			) }
-			{ comment?.children?.length > 0 ? (
+			)}
+			{comment?.children?.length > 0 ? (
 				<CommentsList
-					comments={ comment.children }
-					activeComment={ activeComment }
-					setActiveComment={ setActiveComment }
-					blocks={ blocks }
+					comments={comment.children}
+					activeComment={activeComment}
+					setActiveComment={setActiveComment}
+					blocks={blocks}
 				/>
-			) : null }
+			) : null}
 		</li>
 	);
 }
@@ -86,56 +86,53 @@ function CommentTemplateInnerBlocks( {
  *                                          getBlocks() in parent .
  * @return {WPElement}                 		List of comments.
  */
-const CommentsList = ( {
+const CommentsList = ({
 	comments,
 	blockProps,
 	activeComment,
 	setActiveComment,
 	blocks,
-} ) => (
-	<ol { ...blockProps }>
-		{ comments &&
-			comments.map( ( comment ) => (
-				<BlockContextProvider
-					key={ comment.commentId }
-					value={ comment }
-				>
+}) => (
+	<ol {...blockProps}>
+		{comments &&
+			comments.map((comment) => (
+				<BlockContextProvider key={comment.commentId} value={comment}>
 					<CommentTemplateInnerBlocks
-						comment={ comment }
-						activeComment={ activeComment }
-						setActiveComment={ setActiveComment }
-						blocks={ blocks }
-						firstBlock={ comments[ 0 ] }
+						comment={comment}
+						activeComment={activeComment}
+						setActiveComment={setActiveComment}
+						blocks={blocks}
+						firstBlock={comments[0]}
 					/>
 				</BlockContextProvider>
-			) ) }
+			))}
 	</ol>
 );
 
-export default function CommentTemplateEdit( {
+export default function CommentTemplateEdit({
 	clientId,
 	context: { postId, 'comments/perPage': perPage },
-} ) {
+}) {
 	const blockProps = useBlockProps();
 
-	const [ activeComment, setActiveComment ] = useState();
+	const [activeComment, setActiveComment] = useState();
 
 	const { rawComments, blocks } = useSelect(
-		( select ) => {
-			const { getEntityRecords } = select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
+		(select) => {
+			const { getEntityRecords } = select(coreStore);
+			const { getBlocks } = select(blockEditorStore);
 
 			return {
-				rawComments: getEntityRecords( 'root', 'comment', {
+				rawComments: getEntityRecords('root', 'comment', {
 					post: postId,
 					status: 'approve',
 					order: 'asc',
 					context: 'embed',
-				} ),
-				blocks: getBlocks( clientId ),
+				}),
+				blocks: getBlocks(clientId),
 			};
 		},
-		[ postId, clientId ]
+		[postId, clientId]
 	);
 
 	// TODO: Replicate the logic used on the server.
@@ -146,29 +143,29 @@ export default function CommentTemplateEdit( {
 	// This is because passing `per_page` to `getEntityRecords()` does not
 	// take into account nested comments.
 	const comments = useMemo(
-		() => convertToTree( rawComments ).slice( 0, perPage ),
-		[ rawComments, perPage ]
+		() => convertToTree(rawComments).slice(0, perPage),
+		[rawComments, perPage]
 	);
 
-	if ( ! rawComments ) {
+	if (!rawComments) {
 		return (
-			<p { ...blockProps }>
+			<p {...blockProps}>
 				<Spinner />
 			</p>
 		);
 	}
 
-	if ( ! comments.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
+	if (!comments.length) {
+		return <p {...blockProps}> {__('No results found.')}</p>;
 	}
 
 	return (
 		<CommentsList
-			comments={ comments }
-			blockProps={ blockProps }
-			blocks={ blocks }
-			activeComment={ activeComment }
-			setActiveComment={ setActiveComment }
+			comments={comments}
+			blockProps={blockProps}
+			blocks={blocks}
+			activeComment={activeComment}
+			setActiveComment={setActiveComment}
 		/>
 	);
 }

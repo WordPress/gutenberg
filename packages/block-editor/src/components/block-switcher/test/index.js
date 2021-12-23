@@ -17,29 +17,29 @@ import { stack } from '@wordpress/icons';
  */
 import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock('@wordpress/data/src/components/use-select', () => jest.fn());
 
-describe( 'BlockSwitcher', () => {
-	test( 'should not render block switcher without blocks', () => {
-		useSelect.mockImplementation( () => ( {} ) );
-		const wrapper = shallow( <BlockSwitcher /> );
-		expect( wrapper.html() ).toBeNull();
-	} );
+describe('BlockSwitcher', () => {
+	test('should not render block switcher without blocks', () => {
+		useSelect.mockImplementation(() => ({}));
+		const wrapper = shallow(<BlockSwitcher />);
+		expect(wrapper.html()).toBeNull();
+	});
 
-	test( 'should not render block switcher with null blocks', () => {
-		useSelect.mockImplementation( () => ( { blocks: [ null ] } ) );
+	test('should not render block switcher with null blocks', () => {
+		useSelect.mockImplementation(() => ({ blocks: [null] }));
 		const wrapper = shallow(
 			<BlockSwitcher
-				clientIds={ [ 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9' ] }
+				clientIds={['a1303fd6-3e60-4fff-a770-0e0ea656c5b9']}
 			/>
 		);
-		expect( wrapper.html() ).toBeNull();
-	} );
-} );
-describe( 'BlockSwitcherDropdownMenu', () => {
+		expect(wrapper.html()).toBeNull();
+	});
+});
+describe('BlockSwitcherDropdownMenu', () => {
 	const headingBlock1 = {
 		attributes: {
-			content: [ 'How are you?' ],
+			content: ['How are you?'],
 			level: 2,
 		},
 		isValid: true,
@@ -50,7 +50,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 
 	const textBlock = {
 		attributes: {
-			content: [ 'I am great!' ],
+			content: ['I am great!'],
 		},
 		isValid: true,
 		name: 'core/paragraph',
@@ -60,7 +60,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 
 	const headingBlock2 = {
 		attributes: {
-			content: [ 'I am the greatest!' ],
+			content: ['I am the greatest!'],
 			level: 3,
 		},
 		isValid: true,
@@ -69,8 +69,8 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 		clientId: 'c2403fd2-4e63-5ffa-b71c-1e0ea656c5b0',
 	};
 
-	beforeAll( () => {
-		registerBlockType( 'core/heading', {
+	beforeAll(() => {
+		registerBlockType('core/heading', {
 			category: 'text',
 			title: 'Heading',
 			edit: () => {},
@@ -79,20 +79,20 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				to: [
 					{
 						type: 'block',
-						blocks: [ 'core/paragraph' ],
+						blocks: ['core/paragraph'],
 						transform: () => {},
 					},
 					{
 						type: 'block',
-						blocks: [ 'core/paragraph' ],
+						blocks: ['core/paragraph'],
 						transform: () => {},
 						isMultiBlock: true,
 					},
 				],
 			},
-		} );
+		});
 
-		registerBlockType( 'core/paragraph', {
+		registerBlockType('core/paragraph', {
 			category: 'text',
 			title: 'Paragraph',
 			edit: () => {},
@@ -101,135 +101,133 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				to: [
 					{
 						type: 'block',
-						blocks: [ 'core/heading' ],
+						blocks: ['core/heading'],
 						transform: () => {},
 					},
 				],
 			},
-		} );
-	} );
+		});
+	});
 
-	afterAll( () => {
-		unregisterBlockType( 'core/heading' );
-		unregisterBlockType( 'core/paragraph' );
-	} );
+	afterAll(() => {
+		unregisterBlockType('core/heading');
+		unregisterBlockType('core/paragraph');
+	});
 
-	test( 'should render switcher with blocks', () => {
-		useSelect.mockImplementation( () => ( {
+	test('should render switcher with blocks', () => {
+		useSelect.mockImplementation(() => ({
 			possibleBlockTransformations: [
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
 			canRemove: true,
-		} ) );
+		}));
 		const wrapper = shallow(
-			<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+			<BlockSwitcherDropdownMenu blocks={[headingBlock1]} />
 		);
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	test( 'should render disabled block switcher with multi block of different types when no transforms', () => {
-		useSelect.mockImplementation( () => ( {
+	test('should render disabled block switcher with multi block of different types when no transforms', () => {
+		useSelect.mockImplementation(() => ({
 			possibleBlockTransformations: [],
 			icon: stack,
-		} ) );
+		}));
 		const wrapper = shallow(
-			<BlockSwitcherDropdownMenu
-				blocks={ [ headingBlock1, textBlock ] }
-			/>
+			<BlockSwitcherDropdownMenu blocks={[headingBlock1, textBlock]} />
 		);
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	test( 'should render enabled block switcher with multi block when transforms exist', () => {
-		useSelect.mockImplementation( () => ( {
+	test('should render enabled block switcher with multi block when transforms exist', () => {
+		useSelect.mockImplementation(() => ({
 			possibleBlockTransformations: [
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
 			canRemove: true,
-		} ) );
+		}));
 		const wrapper = shallow(
 			<BlockSwitcherDropdownMenu
-				blocks={ [ headingBlock1, headingBlock2 ] }
+				blocks={[headingBlock1, headingBlock2]}
 			/>
 		);
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	describe( 'Dropdown', () => {
-		beforeAll( () => {
-			useSelect.mockImplementation( () => ( {
+	describe('Dropdown', () => {
+		beforeAll(() => {
+			useSelect.mockImplementation(() => ({
 				possibleBlockTransformations: [
 					{ name: 'core/paragraph', frecency: 3 },
 				],
 				canRemove: true,
-			} ) );
-		} );
+			}));
+		});
 		const getDropdown = () =>
-			mount(
-				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
-			).find( 'Dropdown' );
+			mount(<BlockSwitcherDropdownMenu blocks={[headingBlock1]} />).find(
+				'Dropdown'
+			);
 
-		test( 'should dropdown exist', () => {
-			expect( getDropdown() ).toHaveLength( 1 );
-		} );
+		test('should dropdown exist', () => {
+			expect(getDropdown()).toHaveLength(1);
+		});
 
-		describe( '.renderToggle', () => {
+		describe('.renderToggle', () => {
 			const onToggleStub = jest.fn();
 			const mockKeyDown = {
 				preventDefault: () => {},
 				keyCode: DOWN,
 			};
 
-			afterEach( () => {
+			afterEach(() => {
 				onToggleStub.mockReset();
-			} );
+			});
 
-			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
+			test('should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
 				const toggleClosed = mount(
-					getDropdown().props().renderToggle( {
+					getDropdown().props().renderToggle({
 						onToggle: onToggleStub,
 						isOpen: false,
-					} )
+					})
 				);
-				const iconButtonClosed = toggleClosed.find( Button );
+				const iconButtonClosed = toggleClosed.find(Button);
 
-				iconButtonClosed.simulate( 'keydown', mockKeyDown );
+				iconButtonClosed.simulate('keydown', mockKeyDown);
 
-				expect( onToggleStub ).toHaveBeenCalledTimes( 1 );
-			} );
+				expect(onToggleStub).toHaveBeenCalledTimes(1);
+			});
 
-			test( 'should simulate a click event, which should call onToggle.', () => {
+			test('should simulate a click event, which should call onToggle.', () => {
 				const toggleOpen = mount(
-					getDropdown().props().renderToggle( {
+					getDropdown().props().renderToggle({
 						onToggle: onToggleStub,
 						isOpen: true,
-					} )
+					})
 				);
-				const iconButtonOpen = toggleOpen.find( Button );
+				const iconButtonOpen = toggleOpen.find(Button);
 
-				iconButtonOpen.simulate( 'keydown', mockKeyDown );
+				iconButtonOpen.simulate('keydown', mockKeyDown);
 
-				expect( onToggleStub ).toHaveBeenCalledTimes( 0 );
-			} );
-		} );
+				expect(onToggleStub).toHaveBeenCalledTimes(0);
+			});
+		});
 
-		describe( '.renderContent', () => {
-			test( 'should create the transform items for the chosen block. A heading block will have 3 items', () => {
+		describe('.renderContent', () => {
+			test('should create the transform items for the chosen block. A heading block will have 3 items', () => {
 				const onCloseStub = jest.fn();
 				const content = shallow(
 					<div>
-						{ getDropdown()
+						{getDropdown()
 							.props()
-							.renderContent( { onClose: onCloseStub } ) }
+							.renderContent({ onClose: onCloseStub })}
 					</div>
 				);
-				const blockList = content.find( 'BlockTransformationsMenu' );
+				const blockList = content.find('BlockTransformationsMenu');
 				expect(
-					blockList.prop( 'possibleBlockTransformations' )
-				).toHaveLength( 1 );
-			} );
-		} );
-	} );
-} );
+					blockList.prop('possibleBlockTransformations')
+				).toHaveLength(1);
+			});
+		});
+	});
+});

@@ -21,10 +21,10 @@ import { cog } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select({
 	web: true,
 	native: false,
-} );
+});
 
 const BLOCK_INSPECTOR_IDENTIFIER = 'edit-widgets/block-inspector';
 
@@ -38,51 +38,48 @@ const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
 import WidgetAreas from './widget-areas';
 import { store as editWidgetsStore } from '../../store';
 
-function ComplementaryAreaTab( { identifier, label, isActive } ) {
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+function ComplementaryAreaTab({ identifier, label, isActive }) {
+	const { enableComplementaryArea } = useDispatch(interfaceStore);
 	return (
 		<Button
-			onClick={ () =>
-				enableComplementaryArea( editWidgetsStore.name, identifier )
+			onClick={() =>
+				enableComplementaryArea(editWidgetsStore.name, identifier)
 			}
-			className={ classnames( 'edit-widgets-sidebar__panel-tab', {
+			className={classnames('edit-widgets-sidebar__panel-tab', {
 				'is-active': isActive,
-			} ) }
+			})}
 			aria-label={
 				isActive
 					? // translators: %s: sidebar label e.g: "Widget Areas".
-					  sprintf( __( '%s (selected)' ), label )
+					  sprintf(__('%s (selected)'), label)
 					: label
 			}
-			data-label={ label }
+			data-label={label}
 		>
-			{ label }
+			{label}
 		</Button>
 	);
 }
 
 export default function Sidebar() {
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea } = useDispatch(interfaceStore);
 	const {
 		currentArea,
 		hasSelectedNonAreaBlock,
 		isGeneralSidebarOpen,
 		selectedWidgetAreaBlock,
-	} = useSelect( ( select ) => {
-		const {
-			getSelectedBlock,
-			getBlock,
-			getBlockParentsByBlockName,
-		} = select( blockEditorStore );
-		const { getActiveComplementaryArea } = select( interfaceStore );
+	} = useSelect((select) => {
+		const { getSelectedBlock, getBlock, getBlockParentsByBlockName } =
+			select(blockEditorStore);
+		const { getActiveComplementaryArea } = select(interfaceStore);
 
 		const selectedBlock = getSelectedBlock();
 
-		const activeArea = getActiveComplementaryArea( editWidgetsStore.name );
+		const activeArea = getActiveComplementaryArea(editWidgetsStore.name);
 
 		let currentSelection = activeArea;
-		if ( ! currentSelection ) {
-			if ( selectedBlock ) {
+		if (!currentSelection) {
+			if (selectedBlock) {
 				currentSelection = BLOCK_INSPECTOR_IDENTIFIER;
 			} else {
 				currentSelection = WIDGET_AREAS_IDENTIFIER;
@@ -90,32 +87,32 @@ export default function Sidebar() {
 		}
 
 		let widgetAreaBlock;
-		if ( selectedBlock ) {
-			if ( selectedBlock.name === 'core/widget-area' ) {
+		if (selectedBlock) {
+			if (selectedBlock.name === 'core/widget-area') {
 				widgetAreaBlock = selectedBlock;
 			} else {
 				widgetAreaBlock = getBlock(
 					getBlockParentsByBlockName(
 						selectedBlock.clientId,
 						'core/widget-area'
-					)[ 0 ]
+					)[0]
 				);
 			}
 		}
 
 		return {
 			currentArea: currentSelection,
-			hasSelectedNonAreaBlock: !! (
+			hasSelectedNonAreaBlock: !!(
 				selectedBlock && selectedBlock.name !== 'core/widget-area'
 			),
-			isGeneralSidebarOpen: !! activeArea,
+			isGeneralSidebarOpen: !!activeArea,
 			selectedWidgetAreaBlock: widgetAreaBlock,
 		};
-	}, [] );
+	}, []);
 
 	// currentArea, and isGeneralSidebarOpen are intentionally left out from the dependencies,
 	// because we want to run the effect when a block is selected/unselected and not when the sidebar state changes.
-	useEffect( () => {
+	useEffect(() => {
 		if (
 			hasSelectedNonAreaBlock &&
 			currentArea === WIDGET_AREAS_IDENTIFIER &&
@@ -127,7 +124,7 @@ export default function Sidebar() {
 			);
 		}
 		if (
-			! hasSelectedNonAreaBlock &&
+			!hasSelectedNonAreaBlock &&
 			currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
 			isGeneralSidebarOpen
 		) {
@@ -136,7 +133,7 @@ export default function Sidebar() {
 				WIDGET_AREAS_IDENTIFIER
 			);
 		}
-	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
+	}, [hasSelectedNonAreaBlock, enableComplementaryArea]);
 
 	return (
 		<ComplementaryArea
@@ -145,19 +142,19 @@ export default function Sidebar() {
 				<ul>
 					<li>
 						<ComplementaryAreaTab
-							identifier={ WIDGET_AREAS_IDENTIFIER }
+							identifier={WIDGET_AREAS_IDENTIFIER}
 							label={
 								selectedWidgetAreaBlock
 									? selectedWidgetAreaBlock.attributes.name
-									: __( 'Widget Areas' )
+									: __('Widget Areas')
 							}
-							isActive={ currentArea === WIDGET_AREAS_IDENTIFIER }
+							isActive={currentArea === WIDGET_AREAS_IDENTIFIER}
 						/>
 					</li>
 					<li>
 						<ComplementaryAreaTab
-							identifier={ BLOCK_INSPECTOR_IDENTIFIER }
-							label={ __( 'Block' ) }
+							identifier={BLOCK_INSPECTOR_IDENTIFIER}
+							label={__('Block')}
 							isActive={
 								currentArea === BLOCK_INSPECTOR_IDENTIFIER
 							}
@@ -167,30 +164,30 @@ export default function Sidebar() {
 			}
 			headerClassName="edit-widgets-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
-			title={ __( 'Settings' ) }
-			closeLabel={ __( 'Close settings' ) }
+			title={__('Settings')}
+			closeLabel={__('Close settings')}
 			scope="core/edit-widgets"
-			identifier={ currentArea }
-			icon={ cog }
-			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			identifier={currentArea}
+			icon={cog}
+			isActiveByDefault={SIDEBAR_ACTIVE_BY_DEFAULT}
 		>
-			{ currentArea === WIDGET_AREAS_IDENTIFIER && (
+			{currentArea === WIDGET_AREAS_IDENTIFIER && (
 				<WidgetAreas
 					selectedWidgetAreaId={
 						selectedWidgetAreaBlock?.attributes.id
 					}
 				/>
-			) }
-			{ currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
-				( hasSelectedNonAreaBlock ? (
+			)}
+			{currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
+				(hasSelectedNonAreaBlock ? (
 					<BlockInspector />
 				) : (
 					// Pretend that Widget Areas are part of the UI by not
 					// showing the Block Inspector when one is selected.
 					<span className="block-editor-block-inspector__no-blocks">
-						{ __( 'No block selected.' ) }
+						{__('No block selected.')}
 					</span>
-				) ) }
+				))}
 		</ComplementaryArea>
 	);
 }

@@ -13,17 +13,17 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
 		icon: alignLeft,
-		title: __( 'Align text left' ),
+		title: __('Align text left'),
 		align: 'left',
 	},
 	{
 		icon: alignCenter,
-		title: __( 'Align text center' ),
+		title: __('Align text center'),
 		align: 'center',
 	},
 	{
 		icon: alignRight,
-		title: __( 'Align text right' ),
+		title: __('Align text right'),
 		align: 'right',
 	},
 ];
@@ -33,26 +33,26 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-function AlignmentUI( {
+function AlignmentUI({
 	value,
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-	label = __( 'Align' ),
-	describedBy = __( 'Change text alignment' ),
+	label = __('Align'),
+	describedBy = __('Change text alignment'),
 	isCollapsed = true,
 	isToolbar,
-} ) {
-	function applyOrUnset( align ) {
-		return () => onChange( value === align ? undefined : align );
+}) {
+	function applyOrUnset(align) {
+		return () => onChange(value === align ? undefined : align);
 	}
 
 	const activeAlignment = find(
 		alignmentControls,
-		( control ) => control.align === value
+		(control) => control.align === value
 	);
 
 	function setIcon() {
-		if ( activeAlignment ) return activeAlignment.icon;
+		if (activeAlignment) return activeAlignment.icon;
 		return isRTL() ? alignRight : alignLeft;
 	}
 
@@ -61,11 +61,11 @@ function AlignmentUI( {
 
 	return (
 		<UIComponent
-			icon={ setIcon() }
-			label={ label }
-			toggleProps={ { describedBy } }
-			popoverProps={ POPOVER_PROPS }
-			controls={ alignmentControls.map( ( control ) => {
+			icon={setIcon()}
+			label={label}
+			toggleProps={{ describedBy }}
+			popoverProps={POPOVER_PROPS}
+			controls={alignmentControls.map((control) => {
 				const { align } = control;
 				const isActive = value === align;
 
@@ -73,10 +73,10 @@ function AlignmentUI( {
 					...control,
 					isActive,
 					role: isCollapsed ? 'menuitemradio' : undefined,
-					onClick: applyOrUnset( align ),
+					onClick: applyOrUnset(align),
 				};
-			} ) }
-			{ ...extraProps }
+			})}
+			{...extraProps}
 		/>
 	);
 }

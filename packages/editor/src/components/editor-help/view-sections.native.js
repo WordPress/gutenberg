@@ -16,36 +16,36 @@ import {
  */
 import styles from './style.scss';
 
-export const HelpDetailBodyText = ( { text } ) => {
+export const HelpDetailBodyText = ({ text }) => {
 	const bodyStyle = usePreferredColorSchemeStyle(
 		styles.helpDetailBody,
 		styles.helpDetailBodyDark
 	);
 	return (
-		<Text selectable style={ bodyStyle }>
-			{ text }
+		<Text selectable style={bodyStyle}>
+			{text}
 		</Text>
 	);
 };
 
-export const HelpDetailSectionHeadingText = ( { text } ) => {
+export const HelpDetailSectionHeadingText = ({ text }) => {
 	const headingStyle = usePreferredColorSchemeStyle(
 		styles.helpDetailSectionHeading,
 		styles.helpDetailSectionHeadingDark
 	);
 	return (
-		<Text accessibilityRole="header" selectable style={ headingStyle }>
-			{ text }
+		<Text accessibilityRole="header" selectable style={headingStyle}>
+			{text}
 		</Text>
 	);
 };
 
-export const HelpDetailImage = ( {
+export const HelpDetailImage = ({
 	accessible,
 	accessibilityLabel,
 	source,
 	sourceDarkMode,
-} ) => {
+}) => {
 	const imageStyle = usePreferredColorSchemeStyle(
 		styles.helpDetailImage,
 		styles.helpDetailImageDark
@@ -53,12 +53,10 @@ export const HelpDetailImage = ( {
 	const darkModeEnabled = usePreferredColorScheme() === 'dark';
 	return (
 		<Image
-			accessible={ accessible }
-			accessibilityLabel={ accessibilityLabel }
-			source={
-				darkModeEnabled && sourceDarkMode ? sourceDarkMode : source
-			}
-			style={ imageStyle }
+			accessible={accessible}
+			accessibilityLabel={accessibilityLabel}
+			source={darkModeEnabled && sourceDarkMode ? sourceDarkMode : source}
+			style={imageStyle}
 		/>
 	);
 };

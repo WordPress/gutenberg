@@ -13,15 +13,15 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const Badge = ( { label, children, show = true } ) => {
+const Badge = ({ label, children, show = true }) => {
 	return (
 		<>
-			{ children }
-			<View style={ styles.badgeContainer }>
-				{ show && <Text style={ styles.badge }>{ label }</Text> }
+			{children}
+			<View style={styles.badgeContainer}>
+				{show && <Text style={styles.badge}>{label}</Text>}
 			</View>
 		</>
 	);
 };
 
-export default withPreferredColorScheme( Badge );
+export default withPreferredColorScheme(Badge);

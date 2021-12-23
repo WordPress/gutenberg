@@ -3,18 +3,18 @@
  */
 import { unwrap } from '@wordpress/dom';
 
-function isList( node ) {
+function isList(node) {
 	return node.nodeName === 'OL' || node.nodeName === 'UL';
 }
 
-function shallowTextContent( element ) {
-	return Array.from( element.childNodes )
-		.map( ( { nodeValue = '' } ) => nodeValue )
-		.join( '' );
+function shallowTextContent(element) {
+	return Array.from(element.childNodes)
+		.map(({ nodeValue = '' }) => nodeValue)
+		.join('');
 }
 
-export default function listReducer( node ) {
-	if ( ! isList( node ) ) {
+export default function listReducer(node) {
+	if (!isList(node)) {
 		return;
 	}
 
@@ -30,11 +30,11 @@ export default function listReducer( node ) {
 		list.children.length === 1
 	) {
 		// Move all child nodes, including any text nodes, if any.
-		while ( list.firstChild ) {
-			prevElement.appendChild( list.firstChild );
+		while (list.firstChild) {
+			prevElement.appendChild(list.firstChild);
 		}
 
-		list.parentNode.removeChild( list );
+		list.parentNode.removeChild(list);
 	}
 
 	const parentElement = node.parentNode;
@@ -44,29 +44,29 @@ export default function listReducer( node ) {
 		parentElement &&
 		parentElement.nodeName === 'LI' &&
 		parentElement.children.length === 1 &&
-		! /\S/.test( shallowTextContent( parentElement ) )
+		!/\S/.test(shallowTextContent(parentElement))
 	) {
 		const parentListItem = parentElement;
 		const prevListItem = parentListItem.previousElementSibling;
 		const parentList = parentListItem.parentNode;
 
-		if ( prevListItem ) {
-			prevListItem.appendChild( list );
-			parentList.removeChild( parentListItem );
+		if (prevListItem) {
+			prevListItem.appendChild(list);
+			parentList.removeChild(parentListItem);
 		} else {
-			parentList.parentNode.insertBefore( list, parentList );
-			parentList.parentNode.removeChild( parentList );
+			parentList.parentNode.insertBefore(list, parentList);
+			parentList.parentNode.removeChild(parentList);
 		}
 	}
 
 	// Invalid: OL/UL > OL/UL.
-	if ( parentElement && isList( parentElement ) ) {
+	if (parentElement && isList(parentElement)) {
 		const prevListItem = node.previousElementSibling;
 
-		if ( prevListItem ) {
-			prevListItem.appendChild( node );
+		if (prevListItem) {
+			prevListItem.appendChild(node);
 		} else {
-			unwrap( node );
+			unwrap(node);
 		}
 	}
 }

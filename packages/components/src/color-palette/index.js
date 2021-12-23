@@ -22,30 +22,30 @@ import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from './styles';
 
-extend( [ namesPlugin, a11yPlugin ] );
+extend([namesPlugin, a11yPlugin]);
 
-function SinglePalette( {
+function SinglePalette({
 	className,
 	clearColor,
 	colors,
 	onChange,
 	value,
 	actions,
-} ) {
-	const colorOptions = useMemo( () => {
-		return map( colors, ( { color, name } ) => {
-			const colordColor = colord( color );
+}) {
+	const colorOptions = useMemo(() => {
+		return map(colors, ({ color, name }) => {
+			const colordColor = colord(color);
 
 			return (
 				<CircularOptionPicker.Option
-					key={ color }
-					isSelected={ value === color }
+					key={color}
+					isSelected={value === color}
 					selectedIconProps={
 						value === color
 							? {
 									fill:
 										colordColor.contrast() >
-										colordColor.contrast( '#000' )
+										colordColor.contrast('#000')
 											? '#fff'
 											: '#000',
 							  }
@@ -54,77 +54,77 @@ function SinglePalette( {
 					tooltipText={
 						name ||
 						// translators: %s: color hex code e.g: "#f00".
-						sprintf( __( 'Color code: %s' ), color )
+						sprintf(__('Color code: %s'), color)
 					}
-					style={ { backgroundColor: color, color } }
+					style={{ backgroundColor: color, color }}
 					onClick={
-						value === color ? clearColor : () => onChange( color )
+						value === color ? clearColor : () => onChange(color)
 					}
 					aria-label={
 						name
 							? // translators: %s: The name of the color e.g: "vivid red".
-							  sprintf( __( 'Color: %s' ), name )
+							  sprintf(__('Color: %s'), name)
 							: // translators: %s: color hex code e.g: "#f00".
-							  sprintf( __( 'Color code: %s' ), color )
+							  sprintf(__('Color code: %s'), color)
 					}
 				/>
 			);
-		} );
-	}, [ colors, value, onChange, clearColor ] );
+		});
+	}, [colors, value, onChange, clearColor]);
 	return (
 		<CircularOptionPicker
-			className={ className }
-			options={ colorOptions }
-			actions={ actions }
+			className={className}
+			options={colorOptions}
+			actions={actions}
 		/>
 	);
 }
 
-function MultiplePalettes( {
+function MultiplePalettes({
 	className,
 	clearColor,
 	colors,
 	onChange,
 	value,
 	actions,
-} ) {
+}) {
 	return (
-		<VStack spacing={ 3 } className={ className }>
-			{ colors.map( ( { name, colors: colorPalette }, index ) => {
+		<VStack spacing={3} className={className}>
+			{colors.map(({ name, colors: colorPalette }, index) => {
 				return (
-					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading>{ name }</ColorHeading>
+					<VStack spacing={2} key={index}>
+						<ColorHeading>{name}</ColorHeading>
 						<SinglePalette
-							clearColor={ clearColor }
-							colors={ colorPalette }
-							onChange={ onChange }
-							value={ value }
+							clearColor={clearColor}
+							colors={colorPalette}
+							onChange={onChange}
+							value={value}
 							actions={
 								colors.length === index + 1 ? actions : null
 							}
 						/>
 					</VStack>
 				);
-			} ) }
+			})}
 		</VStack>
 	);
 }
 
-export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+export function CustomColorPickerDropdown({ isRenderedInSidebar, ...props }) {
 	return (
 		<Dropdown
-			contentClassName={ classnames(
+			contentClassName={classnames(
 				'components-color-palette__custom-color-dropdown-content',
 				{
 					'is-rendered-in-sidebar': isRenderedInSidebar,
 				}
-			) }
-			{ ...props }
+			)}
+			{...props}
 		/>
 	);
 }
 
-export default function ColorPalette( {
+export default function ColorPalette({
 	clearable = true,
 	className,
 	colors,
@@ -134,67 +134,65 @@ export default function ColorPalette( {
 	value,
 	__experimentalHasMultipleOrigins = false,
 	__experimentalIsRenderedInSidebar = false,
-} ) {
-	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+}) {
+	const clearColor = useCallback(() => onChange(undefined), [onChange]);
 	const Component = __experimentalHasMultipleOrigins
 		? MultiplePalettes
 		: SinglePalette;
 
 	const renderCustomColorPicker = () => (
 		<ColorPicker
-			color={ value }
-			onChange={ ( color ) => onChange( color ) }
-			enableAlpha={ enableAlpha }
+			color={value}
+			onChange={(color) => onChange(color)}
+			enableAlpha={enableAlpha}
 		/>
 	);
 
 	let dropdownPosition;
-	if ( __experimentalIsRenderedInSidebar ) {
+	if (__experimentalIsRenderedInSidebar) {
 		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
 	}
 
-	const colordColor = colord( value );
+	const colordColor = colord(value);
 
 	return (
-		<VStack spacing={ 3 } className={ className }>
-			{ ! disableCustomColors && (
+		<VStack spacing={3} className={className}>
+			{!disableCustomColors && (
 				<CustomColorPickerDropdown
-					position={ dropdownPosition }
-					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
-					renderContent={ renderCustomColorPicker }
-					renderToggle={ ( { isOpen, onToggle } ) => (
+					position={dropdownPosition}
+					isRenderedInSidebar={__experimentalIsRenderedInSidebar}
+					renderContent={renderCustomColorPicker}
+					renderToggle={({ isOpen, onToggle }) => (
 						<button
 							className="components-color-palette__custom-color"
-							aria-expanded={ isOpen }
+							aria-expanded={isOpen}
 							aria-haspopup="true"
-							onClick={ onToggle }
-							aria-label={ __( 'Custom color picker' ) }
-							style={ {
+							onClick={onToggle}
+							aria-label={__('Custom color picker')}
+							style={{
 								background: value,
 								color:
 									colordColor.contrast() >
-									colordColor.contrast( '#000' )
+									colordColor.contrast('#000')
 										? '#fff'
 										: '#000',
-							} }
+							}}
 						>
-							{ value }
+							{value}
 						</button>
-					) }
+					)}
 				/>
-			) }
+			)}
 			<Component
-				clearable={ clearable }
-				clearColor={ clearColor }
-				colors={ colors }
-				onChange={ onChange }
-				value={ value }
+				clearable={clearable}
+				clearColor={clearColor}
+				colors={colors}
+				onChange={onChange}
+				value={value}
 				actions={
-					!! clearable && (
-						<CircularOptionPicker.ButtonAction
-							onClick={ clearColor }
-						>
-							{ __( 'Clear' ) }
+					!!clearable && (
+						<CircularOptionPicker.ButtonAction onClick={clearColor}>
+							{__('Clear')}
 						</CircularOptionPicker.ButtonAction>
 					)
 				}

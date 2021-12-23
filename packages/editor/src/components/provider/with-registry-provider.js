@@ -16,39 +16,39 @@ import { storeConfig as blockEditorStoreConfig } from '@wordpress/block-editor';
 import { storeConfig } from '../../store';
 
 const withRegistryProvider = createHigherOrderComponent(
-	( WrappedComponent ) =>
-		withRegistry( ( props ) => {
+	(WrappedComponent) =>
+		withRegistry((props) => {
 			const {
 				useSubRegistry = true,
 				registry,
 				...additionalProps
 			} = props;
-			if ( ! useSubRegistry ) {
-				return <WrappedComponent { ...additionalProps } />;
+			if (!useSubRegistry) {
+				return <WrappedComponent {...additionalProps} />;
 			}
 
-			const [ subRegistry, setSubRegistry ] = useState( null );
-			useEffect( () => {
+			const [subRegistry, setSubRegistry] = useState(null);
+			useEffect(() => {
 				const newRegistry = createRegistry(
 					{
 						'core/block-editor': blockEditorStoreConfig,
 					},
 					registry
 				);
-				newRegistry.registerStore( 'core/editor', storeConfig );
-				setSubRegistry( newRegistry );
-			}, [ registry ] );
+				newRegistry.registerStore('core/editor', storeConfig);
+				setSubRegistry(newRegistry);
+			}, [registry]);
 
-			if ( ! subRegistry ) {
+			if (!subRegistry) {
 				return null;
 			}
 
 			return (
-				<RegistryProvider value={ subRegistry }>
-					<WrappedComponent { ...additionalProps } />
+				<RegistryProvider value={subRegistry}>
+					<WrappedComponent {...additionalProps} />
 				</RegistryProvider>
 			);
-		} ),
+		}),
 	'withRegistryProvider'
 );
 

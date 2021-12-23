@@ -10,20 +10,20 @@ import deepFreeze from 'deep-freeze';
 import { removeFormat } from '../remove-format';
 import { getSparseArrayLength } from './helpers';
 
-describe( 'removeFormat', () => {
+describe('removeFormat', () => {
 	const strong = { type: 'strong' };
 	const em = { type: 'em' };
 
-	it( 'should remove format', () => {
+	it('should remove format', () => {
 		const record = {
 			formats: [
 				,
 				,
 				,
-				[ strong ],
-				[ em, strong ],
-				[ em, strong ],
-				[ em ],
+				[strong],
+				[em, strong],
+				[em, strong],
+				[em],
 				,
 				,
 				,
@@ -34,27 +34,27 @@ describe( 'removeFormat', () => {
 			text: 'one two three',
 		};
 		const expected = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			formats: [, , , , [em], [em], [em], , , , , , ,],
 			activeFormats: [],
 			text: 'one two three',
 		};
-		const result = removeFormat( deepFreeze( record ), 'strong', 3, 6 );
+		const result = removeFormat(deepFreeze(record), 'strong', 3, 6);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(3);
+	});
 
-	it( 'should remove format for collased selection', () => {
+	it('should remove format for collased selection', () => {
 		const record = {
 			formats: [
 				,
 				,
 				,
-				[ strong ],
-				[ em, strong ],
-				[ em, strong ],
-				[ em ],
+				[strong],
+				[em, strong],
+				[em, strong],
+				[em],
 				,
 				,
 				,
@@ -65,14 +65,14 @@ describe( 'removeFormat', () => {
 			text: 'one two three',
 		};
 		const expected = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			formats: [, , , , [em], [em], [em], , , , , , ,],
 			activeFormats: [],
 			text: 'one two three',
 		};
-		const result = removeFormat( deepFreeze( record ), 'strong', 4, 4 );
+		const result = removeFormat(deepFreeze(record), 'strong', 4, 4);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-	} );
-} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(3);
+	});
+});

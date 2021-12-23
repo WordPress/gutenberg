@@ -23,13 +23,13 @@ export type HStackAlignment =
 	| 'topRight';
 
 export type AlignmentProps = {
-	justify?: CSSProperties[ 'justifyContent' ];
-	align?: CSSProperties[ 'alignItems' ];
+	justify?: CSSProperties['justifyContent'];
+	align?: CSSProperties['alignItems'];
 };
 
-export type Alignments = Record< HStackAlignment, AlignmentProps >;
+export type Alignments = Record<HStackAlignment, AlignmentProps>;
 
-export type Props = Omit< FlexProps, 'align' | 'gap' > & {
+export type Props = Omit<FlexProps, 'align' | 'gap'> & {
 	/**
 	 * Determines how the child elements are aligned.
 	 *
@@ -47,12 +47,12 @@ export type Props = Omit< FlexProps, 'align' | 'gap' > & {
 	 *
 	 * @default 'edge'
 	 */
-	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
+	alignment?: HStackAlignment | CSSProperties['alignItems'];
 	/**
 	 * The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
 	 * The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
 	 *
 	 * @default 2
 	 */
-	spacing?: CSSProperties[ 'width' ];
+	spacing?: CSSProperties['width'];
 };

@@ -10,6 +10,6 @@ import placeCaretAtEdge from './place-caret-at-edge';
  * @param {boolean}     isReverse True for bottom, false for top.
  * @param {DOMRect}     [rect]    The rectangle to position the caret with.
  */
-export default function placeCaretAtVerticalEdge( container, isReverse, rect ) {
-	return placeCaretAtEdge( container, isReverse, rect?.left );
+export default function placeCaretAtVerticalEdge(container, isReverse, rect) {
+	return placeCaretAtEdge(container, isReverse, rect?.left);
 }

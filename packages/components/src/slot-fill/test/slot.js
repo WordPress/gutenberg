@@ -16,7 +16,7 @@ import { Component } from '@wordpress/element';
 
 class Filler extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
 		this.state = {
 			num: 1,
@@ -27,17 +27,17 @@ class Filler extends Component {
 			<button
 				key="1"
 				type="button"
-				onClick={ () => this.setState( { num: this.state.num + 1 } ) }
+				onClick={() => this.setState({ num: this.state.num + 1 })}
 			/>,
-			<Fill name={ this.props.name } key="2">
-				{ this.props.text || this.state.num.toString() }
+			<Fill name={this.props.name} key="2">
+				{this.props.text || this.state.num.toString()}
 			</Fill>,
 		];
 	}
 }
 
-describe( 'Slot', () => {
-	it( 'should render empty Fills', () => {
+describe('Slot', () => {
+	it('should render empty Fills', () => {
 		const { container } = render(
 			<Provider>
 				<div>
@@ -47,10 +47,10 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'should render a string Fill', () => {
+	it('should render a string Fill', () => {
 		const { container } = render(
 			<Provider>
 				<div>
@@ -60,10 +60,10 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'should render a Fill containing an element', () => {
+	it('should render a Fill containing an element', () => {
 		const { container } = render(
 			<Provider>
 				<div>
@@ -75,54 +75,52 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'should render a Fill containing an array', () => {
+	it('should render a Fill containing an array', () => {
 		const { container } = render(
 			<Provider>
 				<div>
 					<Slot name="chicken" />
 				</div>
 				<Fill name="chicken">
-					{ [ <span key="1" />, <div key="2" />, 'text' ] }
+					{[<span key="1" />, <div key="2" />, 'text']}
 				</Fill>
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
+	it('calls the functions passed as the Slot’s fillProps in the Fill', () => {
 		const onClose = jest.fn();
 
 		const { getByText } = render(
 			<Provider>
-				<Slot name="chicken" fillProps={ { onClose } } />
+				<Slot name="chicken" fillProps={{ onClose }} />
 				<Fill name="chicken">
-					{ ( props ) => {
+					{(props) => {
 						return (
-							<button onClick={ props.onClose }>Click me</button>
+							<button onClick={props.onClose}>Click me</button>
 						);
-					} }
+					}}
 				</Fill>
 			</Provider>
 		);
 
-		fireEvent.click( getByText( 'Click me' ) );
+		fireEvent.click(getByText('Click me'));
 
-		expect( onClose ).toHaveBeenCalledTimes( 1 );
-	} );
+		expect(onClose).toHaveBeenCalledTimes(1);
+	});
 
-	it( 'should render empty Fills without HTML wrapper when render props used', () => {
+	it('should render empty Fills without HTML wrapper when render props used', () => {
 		const { container } = render(
 			<Provider>
 				<div>
 					<Slot name="chicken">
-						{ ( fills ) =>
-							! isEmpty( fills ) && (
-								<blockquote>{ fills }</blockquote>
-							)
+						{(fills) =>
+							!isEmpty(fills) && <blockquote>{fills}</blockquote>
 						}
 					</Slot>
 				</div>
@@ -130,27 +128,25 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'should render a string Fill with HTML wrapper when render props used', () => {
+	it('should render a string Fill with HTML wrapper when render props used', () => {
 		const { container } = render(
 			<Provider>
 				<div>
 					<Slot name="chicken">
-						{ ( fills ) =>
-							fills && <blockquote>{ fills }</blockquote>
-						}
+						{(fills) => fills && <blockquote>{fills}</blockquote>}
 					</Slot>
 				</div>
 				<Fill name="chicken">content</Fill>
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'should re-render Slot when not bubbling virtually', () => {
+	it('should re-render Slot when not bubbling virtually', () => {
 		const { container, getByRole } = render(
 			<Provider>
 				<div>
@@ -160,14 +156,14 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
 
-		fireEvent.click( getByRole( 'button' ) );
+		fireEvent.click(getByRole('button'));
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'should render in expected order when fills always mounted', () => {
+	it('should render in expected order when fills always mounted', () => {
 		const { container, rerender } = render(
 			<Provider>
 				<div key="slot">
@@ -225,10 +221,10 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'should render in expected order when fills unmounted', () => {
+	it('should render in expected order when fills unmounted', () => {
 		const { container, rerender } = render(
 			<Provider>
 				<div key="slot">
@@ -269,10 +265,10 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( container ).toMatchSnapshot();
-	} );
+		expect(container).toMatchSnapshot();
+	});
 
-	it( 'should warn without a Provider', () => {
+	it('should warn without a Provider', () => {
 		const { container } = render(
 			<>
 				<div>
@@ -282,102 +278,78 @@ describe( 'Slot', () => {
 			</>
 		);
 
-		expect( container ).toMatchSnapshot();
-		expect( console ).toHaveWarned();
-	} );
+		expect(container).toMatchSnapshot();
+		expect(console).toHaveWarned();
+	});
 
-	describe.each( [ false, true ] )(
-		'bubblesVirtually %p',
-		( bubblesVirtually ) => {
-			it( 'should subsume another slot by the same name', () => {
-				const { container, rerender } = render(
-					<Provider>
-						<div data-position="first">
-							<Slot
-								name="egg"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<div data-position="second"></div>
-						<Fill name="egg">Content</Fill>
-					</Provider>
-				);
+	describe.each([false, true])('bubblesVirtually %p', (bubblesVirtually) => {
+		it('should subsume another slot by the same name', () => {
+			const { container, rerender } = render(
+				<Provider>
+					<div data-position="first">
+						<Slot name="egg" bubblesVirtually={bubblesVirtually} />
+					</div>
+					<div data-position="second"></div>
+					<Fill name="egg">Content</Fill>
+				</Provider>
+			);
 
-				rerender(
-					<Provider>
-						<div data-position="first">
-							<Slot
-								name="egg"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<div data-position="second">
-							<Slot
-								name="egg"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<Fill name="egg">Content</Fill>
-					</Provider>
-				);
+			rerender(
+				<Provider>
+					<div data-position="first">
+						<Slot name="egg" bubblesVirtually={bubblesVirtually} />
+					</div>
+					<div data-position="second">
+						<Slot name="egg" bubblesVirtually={bubblesVirtually} />
+					</div>
+					<Fill name="egg">Content</Fill>
+				</Provider>
+			);
 
-				expect( container ).toMatchSnapshot();
+			expect(container).toMatchSnapshot();
 
-				rerender(
-					<Provider>
-						<div data-position="first"></div>
-						<div data-position="second">
-							<Slot
-								name="egg"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<Fill name="egg">Content</Fill>
-					</Provider>
-				);
+			rerender(
+				<Provider>
+					<div data-position="first"></div>
+					<div data-position="second">
+						<Slot name="egg" bubblesVirtually={bubblesVirtually} />
+					</div>
+					<Fill name="egg">Content</Fill>
+				</Provider>
+			);
 
-				expect( container ).toMatchSnapshot();
-			} );
+			expect(container).toMatchSnapshot();
+		});
 
-			it( 'should unmount two slots with the same name', () => {
-				const { rerender, container } = render(
-					<Provider>
-						<div data-position="first">
-							<Slot
-								name="egg"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<div data-position="second">
-							<Slot
-								name="egg"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<Fill name="egg">Content</Fill>
-					</Provider>
-				);
-				rerender(
-					<Provider>
-						<div data-position="first">
-							<Slot
-								name="egg"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<div data-position="second" />
-						<Fill name="egg">Content</Fill>
-					</Provider>
-				);
-				rerender(
-					<Provider>
-						<div data-position="first" />
-						<div data-position="second" />
-						<Fill name="egg">Content</Fill>
-					</Provider>
-				);
-				expect( container ).toMatchSnapshot();
-			} );
-		}
-	);
-} );
+		it('should unmount two slots with the same name', () => {
+			const { rerender, container } = render(
+				<Provider>
+					<div data-position="first">
+						<Slot name="egg" bubblesVirtually={bubblesVirtually} />
+					</div>
+					<div data-position="second">
+						<Slot name="egg" bubblesVirtually={bubblesVirtually} />
+					</div>
+					<Fill name="egg">Content</Fill>
+				</Provider>
+			);
+			rerender(
+				<Provider>
+					<div data-position="first">
+						<Slot name="egg" bubblesVirtually={bubblesVirtually} />
+					</div>
+					<div data-position="second" />
+					<Fill name="egg">Content</Fill>
+				</Provider>
+			);
+			rerender(
+				<Provider>
+					<div data-position="first" />
+					<div data-position="second" />
+					<Fill name="egg">Content</Fill>
+				</Provider>
+			);
+			expect(container).toMatchSnapshot();
+		});
+	});
+});

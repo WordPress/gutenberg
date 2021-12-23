@@ -14,50 +14,50 @@ export const rootBase = () => {
 		border-radius: 2px;
 		box-sizing: border-box;
 		display: grid;
-		grid-template-columns: repeat( 3, 1fr );
+		grid-template-columns: repeat(3, 1fr);
 		outline: none;
 	`;
 };
 
-const rootSize = ( { size = 92 } ) => {
+const rootSize = ({ size = 92 }) => {
 	return css`
-		grid-template-rows: repeat( 3, calc( ${ size }px / 3 ) );
-		width: ${ size }px;
+		grid-template-rows: repeat(3, calc(${size}px / 3));
+		width: ${size}px;
 	`;
 };
 
 export const Root = styled.div`
-	${ rootBase };
+	${rootBase};
 
 	border: 1px solid transparent;
 	cursor: pointer;
 	grid-template-columns: auto;
 
-	${ rootSize };
+	${rootSize};
 `;
 
 export const Row = styled.div`
 	box-sizing: border-box;
 	display: grid;
-	grid-template-columns: repeat( 3, 1fr );
+	grid-template-columns: repeat(3, 1fr);
 `;
 
-const pointActive = ( { isActive } ) => {
-	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.black }` : null;
-	const pointColor = isActive ? COLORS.black : COLORS.lightGray[ 800 ];
+const pointActive = ({ isActive }) => {
+	const boxShadow = isActive ? `0 0 0 2px ${COLORS.black}` : null;
+	const pointColor = isActive ? COLORS.black : COLORS.lightGray[800];
 	const pointColorHover = isActive ? COLORS.black : COLORS.blue.medium.focus;
 
 	return css`
-		box-shadow: ${ boxShadow };
-		color: ${ pointColor };
+		box-shadow: ${boxShadow};
+		color: ${pointColor};
 
 		*:hover > & {
-			color: ${ pointColorHover };
+			color: ${pointColorHover};
 		}
 	`;
 };
 
-export const pointBase = ( props ) => {
+export const pointBase = (props) => {
 	return css`
 		background: currentColor;
 		box-sizing: border-box;
@@ -65,15 +65,15 @@ export const pointBase = ( props ) => {
 		margin: auto;
 		transition: all 120ms linear;
 
-		${ reduceMotion( 'transition' ) }
-		${ pointActive( props ) }
+		${reduceMotion('transition')}
+		${pointActive(props)}
 	`;
 };
 
 export const Point = styled.span`
 	height: 6px;
 	width: 6px;
-	${ pointBase }
+	${pointBase}
 `;
 
 export const Cell = styled.span`

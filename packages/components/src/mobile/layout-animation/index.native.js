@@ -5,7 +5,7 @@ import { LayoutAnimation } from 'react-native';
 
 const ANIMATION_DURATION = 300;
 
-export function performLayoutAnimation( duration = ANIMATION_DURATION ) {
+export function performLayoutAnimation(duration = ANIMATION_DURATION) {
 	LayoutAnimation.configureNext(
 		LayoutAnimation.create(
 			duration,

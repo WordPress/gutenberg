@@ -26,56 +26,56 @@ import {
  *
  * @return {boolean} Is the href invalid?
  */
-export function isValidHref( href ) {
-	if ( ! href ) {
+export function isValidHref(href) {
+	if (!href) {
 		return false;
 	}
 
 	const trimmedHref = href.trim();
 
-	if ( ! trimmedHref ) {
+	if (!trimmedHref) {
 		return false;
 	}
 
 	// Does the href start with something that looks like a URL protocol?
-	if ( /^\S+:/.test( trimmedHref ) ) {
-		const protocol = getProtocol( trimmedHref );
-		if ( ! isValidProtocol( protocol ) ) {
+	if (/^\S+:/.test(trimmedHref)) {
+		const protocol = getProtocol(trimmedHref);
+		if (!isValidProtocol(protocol)) {
 			return false;
 		}
 
 		// Add some extra checks for http(s) URIs, since these are the most common use-case.
 		// This ensures URIs with an http protocol have exactly two forward slashes following the protocol.
 		if (
-			startsWith( protocol, 'http' ) &&
-			! /^https?:\/\/[^\/\s]/i.test( trimmedHref )
+			startsWith(protocol, 'http') &&
+			!/^https?:\/\/[^\/\s]/i.test(trimmedHref)
 		) {
 			return false;
 		}
 
-		const authority = getAuthority( trimmedHref );
-		if ( ! isValidAuthority( authority ) ) {
+		const authority = getAuthority(trimmedHref);
+		if (!isValidAuthority(authority)) {
 			return false;
 		}
 
-		const path = getPath( trimmedHref );
-		if ( path && ! isValidPath( path ) ) {
+		const path = getPath(trimmedHref);
+		if (path && !isValidPath(path)) {
 			return false;
 		}
 
-		const queryString = getQueryString( trimmedHref );
-		if ( queryString && ! isValidQueryString( queryString ) ) {
+		const queryString = getQueryString(trimmedHref);
+		if (queryString && !isValidQueryString(queryString)) {
 			return false;
 		}
 
-		const fragment = getFragment( trimmedHref );
-		if ( fragment && ! isValidFragment( fragment ) ) {
+		const fragment = getFragment(trimmedHref);
+		if (fragment && !isValidFragment(fragment)) {
 			return false;
 		}
 	}
 
 	// Validate anchor links.
-	if ( startsWith( trimmedHref, '#' ) && ! isValidFragment( trimmedHref ) ) {
+	if (startsWith(trimmedHref, '#') && !isValidFragment(trimmedHref)) {
 		return false;
 	}
 
@@ -93,7 +93,7 @@ export function isValidHref( href ) {
  *
  * @return {Object} The final format object.
  */
-export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
+export function createLinkFormat({ url, type, id, opensInNewWindow }) {
 	const format = {
 		type: 'core/link',
 		attributes: {
@@ -101,10 +101,10 @@ export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
 		},
 	};
 
-	if ( type ) format.attributes.type = type;
-	if ( id ) format.attributes.id = id;
+	if (type) format.attributes.type = type;
+	if (id) format.attributes.id = id;
 
-	if ( opensInNewWindow ) {
+	if (opensInNewWindow) {
 		format.attributes.target = '_blank';
 		format.attributes.rel = 'noreferrer noopener';
 	}
@@ -139,34 +139,34 @@ export function getFormatBoundary(
 	let targetFormat;
 	let initialIndex;
 
-	if ( ! formats?.length ) {
+	if (!formats?.length) {
 		return EMPTY_BOUNDARIES;
 	}
 
 	// Clone formats to avoid modifying source formats.
 	const newFormats = formats.slice();
 
-	const formatAtStart = find( newFormats[ startIndex ], {
+	const formatAtStart = find(newFormats[startIndex], {
 		type: format.type,
-	} );
+	});
 
-	const formatAtEnd = find( newFormats[ endIndex ], {
+	const formatAtEnd = find(newFormats[endIndex], {
 		type: format.type,
-	} );
+	});
 
-	const formatAtEndMinusOne = find( newFormats[ endIndex - 1 ], {
+	const formatAtEndMinusOne = find(newFormats[endIndex - 1], {
 		type: format.type,
-	} );
+	});
 
-	if ( !! formatAtStart ) {
+	if (!!formatAtStart) {
 		// Set values to conform to "start"
 		targetFormat = formatAtStart;
 		initialIndex = startIndex;
-	} else if ( !! formatAtEnd ) {
+	} else if (!!formatAtEnd) {
 		// Set values to conform to "end"
 		targetFormat = formatAtEnd;
 		initialIndex = endIndex;
-	} else if ( !! formatAtEndMinusOne ) {
+	} else if (!!formatAtEndMinusOne) {
 		// This is an edge case which will occur if you create a format, then place
 		// the caret just before the format and hit the back ARROW key. The resulting
 		// value object will have start and end +1 beyond the edge of the format boundary.
@@ -176,15 +176,15 @@ export function getFormatBoundary(
 		return EMPTY_BOUNDARIES;
 	}
 
-	const index = newFormats[ initialIndex ].indexOf( targetFormat );
+	const index = newFormats[initialIndex].indexOf(targetFormat);
 
-	const walkingArgs = [ newFormats, initialIndex, targetFormat, index ];
+	const walkingArgs = [newFormats, initialIndex, targetFormat, index];
 
 	// Walk the startIndex "backwards" to the leading "edge" of the matching format.
-	startIndex = walkToStart( ...walkingArgs );
+	startIndex = walkToStart(...walkingArgs);
 
 	// Walk the endIndex "forwards" until the trailing "edge" of the matching format.
-	endIndex = walkToEnd( ...walkingArgs );
+	endIndex = walkToEnd(...walkingArgs);
 
 	// Safe guard: start index cannot be less than 0
 	startIndex = startIndex < 0 ? 0 : startIndex;
@@ -221,13 +221,10 @@ function walkToBoundary(
 		backwards: -1,
 	};
 
-	const directionIncrement = directions[ direction ] || 1; // invalid direction arg default to forwards
+	const directionIncrement = directions[direction] || 1; // invalid direction arg default to forwards
 	const inverseDirectionIncrement = directionIncrement * -1;
 
-	while (
-		formats[ index ] &&
-		formats[ index ][ formatIndex ] === targetFormatRef
-	) {
+	while (formats[index] && formats[index][formatIndex] === targetFormatRef) {
 		// Increment/decrement in the direction of operation.
 		index = index + directionIncrement;
 	}
@@ -239,6 +236,6 @@ function walkToBoundary(
 	return index;
 }
 
-const walkToStart = partialRight( walkToBoundary, 'backwards' );
+const walkToStart = partialRight(walkToBoundary, 'backwards');
 
-const walkToEnd = partialRight( walkToBoundary, 'forwards' );
+const walkToEnd = partialRight(walkToBoundary, 'forwards');

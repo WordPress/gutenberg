@@ -35,45 +35,43 @@ export function removeFormat(
 
 	// If the selection is collapsed, expand start and end to the edges of the
 	// format.
-	if ( startIndex === endIndex ) {
-		const format = find( newFormats[ startIndex ], { type: formatType } );
+	if (startIndex === endIndex) {
+		const format = find(newFormats[startIndex], { type: formatType });
 
-		if ( format ) {
-			while ( find( newFormats[ startIndex ], format ) ) {
-				filterFormats( newFormats, startIndex, formatType );
+		if (format) {
+			while (find(newFormats[startIndex], format)) {
+				filterFormats(newFormats, startIndex, formatType);
 				startIndex--;
 			}
 
 			endIndex++;
 
-			while ( find( newFormats[ endIndex ], format ) ) {
-				filterFormats( newFormats, endIndex, formatType );
+			while (find(newFormats[endIndex], format)) {
+				filterFormats(newFormats, endIndex, formatType);
 				endIndex++;
 			}
 		}
 	} else {
-		for ( let i = startIndex; i < endIndex; i++ ) {
-			if ( newFormats[ i ] ) {
-				filterFormats( newFormats, i, formatType );
+		for (let i = startIndex; i < endIndex; i++) {
+			if (newFormats[i]) {
+				filterFormats(newFormats, i, formatType);
 			}
 		}
 	}
 
-	return normaliseFormats( {
+	return normaliseFormats({
 		...value,
 		formats: newFormats,
-		activeFormats: reject( activeFormats, { type: formatType } ),
-	} );
+		activeFormats: reject(activeFormats, { type: formatType }),
+	});
 }
 
-function filterFormats( formats, index, formatType ) {
-	const newFormats = formats[ index ].filter(
-		( { type } ) => type !== formatType
-	);
+function filterFormats(formats, index, formatType) {
+	const newFormats = formats[index].filter(({ type }) => type !== formatType);
 
-	if ( newFormats.length ) {
-		formats[ index ] = newFormats;
+	if (newFormats.length) {
+		formats[index] = newFormats;
 	} else {
-		delete formats[ index ];
+		delete formats[index];
 	}
 }

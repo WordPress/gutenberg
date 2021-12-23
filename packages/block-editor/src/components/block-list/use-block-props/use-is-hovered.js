@@ -9,15 +9,15 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../../store';
 
-function listener( event ) {
-	if ( event.defaultPrevented ) {
+function listener(event) {
+	if (event.defaultPrevented) {
 		return;
 	}
 
 	const action = event.type === 'mouseover' ? 'add' : 'remove';
 
 	event.preventDefault();
-	event.currentTarget.classList[ action ]( 'is-hovered' );
+	event.currentTarget.classList[action]('is-hovered');
 }
 
 /**
@@ -25,26 +25,26 @@ function listener( event ) {
  * outline mode.
  */
 export function useIsHovered() {
-	const isEnabled = useSelect( ( select ) => {
-		const { isNavigationMode, getSettings } = select( blockEditorStore );
+	const isEnabled = useSelect((select) => {
+		const { isNavigationMode, getSettings } = select(blockEditorStore);
 		return isNavigationMode() || getSettings().outlineMode;
-	}, [] );
+	}, []);
 
 	return useRefEffect(
-		( node ) => {
-			if ( isEnabled ) {
-				node.addEventListener( 'mouseout', listener );
-				node.addEventListener( 'mouseover', listener );
+		(node) => {
+			if (isEnabled) {
+				node.addEventListener('mouseout', listener);
+				node.addEventListener('mouseover', listener);
 
 				return () => {
-					node.removeEventListener( 'mouseout', listener );
-					node.removeEventListener( 'mouseover', listener );
+					node.removeEventListener('mouseout', listener);
+					node.removeEventListener('mouseover', listener);
 
 					// Remove class in case it lingers.
-					node.classList.remove( 'is-hovered' );
+					node.classList.remove('is-hovered');
 				};
 			}
 		},
-		[ isEnabled ]
+		[isEnabled]
 	);
 }

@@ -6,23 +6,23 @@
  *
  * @return {boolean} Whether the two objects are shallow equal.
  */
-export default function isShallowEqualObjects( a, b ) {
-	if ( a === b ) {
+export default function isShallowEqualObjects(a, b) {
+	if (a === b) {
 		return true;
 	}
 
-	const aKeys = Object.keys( a );
-	const bKeys = Object.keys( b );
+	const aKeys = Object.keys(a);
+	const bKeys = Object.keys(b);
 
-	if ( aKeys.length !== bKeys.length ) {
+	if (aKeys.length !== bKeys.length) {
 		return false;
 	}
 
 	let i = 0;
 
-	while ( i < aKeys.length ) {
-		const key = aKeys[ i ];
-		const aValue = a[ key ];
+	while (i < aKeys.length) {
+		const key = aKeys[i];
+		const aValue = a[key];
 
 		if (
 			// In iterating only the keys of the first object after verifying
@@ -30,8 +30,8 @@ export default function isShallowEqualObjects( a, b ) {
 			// value in the first is implicitly undefined in the second.
 			//
 			// Example: isShallowEqualObjects( { a: undefined }, { b: 5 } )
-			( aValue === undefined && ! b.hasOwnProperty( key ) ) ||
-			aValue !== b[ key ]
+			(aValue === undefined && !b.hasOwnProperty(key)) ||
+			aValue !== b[key]
 		) {
 			return false;
 		}

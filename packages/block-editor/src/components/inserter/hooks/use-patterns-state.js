@@ -25,39 +25,38 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-const usePatternsState = ( onInsert, rootClientId ) => {
+const usePatternsState = (onInsert, rootClientId) => {
 	const { patternCategories, patterns } = useSelect(
-		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } = select(
-				blockEditorStore
-			);
+		(select) => {
+			const { __experimentalGetAllowedPatterns, getSettings } =
+				select(blockEditorStore);
 			return {
-				patterns: __experimentalGetAllowedPatterns( rootClientId ),
-				patternCategories: getSettings()
-					.__experimentalBlockPatternCategories,
+				patterns: __experimentalGetAllowedPatterns(rootClientId),
+				patternCategories:
+					getSettings().__experimentalBlockPatternCategories,
 			};
 		},
-		[ rootClientId ]
+		[rootClientId]
 	);
-	const { createSuccessNotice } = useDispatch( noticesStore );
-	const onClickPattern = useCallback( ( pattern, blocks ) => {
+	const { createSuccessNotice } = useDispatch(noticesStore);
+	const onClickPattern = useCallback((pattern, blocks) => {
 		onInsert(
-			map( blocks, ( block ) => cloneBlock( block ) ),
+			map(blocks, (block) => cloneBlock(block)),
 			pattern.name
 		);
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: block pattern title. */
-				__( 'Block pattern "%s" inserted.' ),
+				__('Block pattern "%s" inserted.'),
 				pattern.title
 			),
 			{
 				type: 'snackbar',
 			}
 		);
-	}, [] );
+	}, []);
 
-	return [ patterns, patternCategories, onClickPattern ];
+	return [patterns, patternCategories, onClickPattern];
 };
 
 export default usePatternsState;

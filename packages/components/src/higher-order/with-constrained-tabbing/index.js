@@ -7,12 +7,12 @@ import {
 } from '@wordpress/compose';
 
 const withConstrainedTabbing = createHigherOrderComponent(
-	( WrappedComponent ) =>
-		function ComponentWithConstrainedTabbing( props ) {
+	(WrappedComponent) =>
+		function ComponentWithConstrainedTabbing(props) {
 			const ref = useConstrainedTabbing();
 			return (
-				<div ref={ ref } tabIndex="-1">
-					<WrappedComponent { ...props } />
+				<div ref={ref} tabIndex="-1">
+					<WrappedComponent {...props} />
 				</div>
 			);
 		},

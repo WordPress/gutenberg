@@ -16,12 +16,12 @@ import isTemplateRevertable from '../../utils/is-template-revertable';
 import { useLocation } from '../routes';
 import { useLink } from '../routes/link';
 
-function TemplatePartItemMore( {
+function TemplatePartItemMore({
 	onClose,
 	templatePart,
 	closeTemplateDetailsDropdown,
-} ) {
-	const { revertTemplate } = useDispatch( editSiteStore );
+}) {
+	const { revertTemplate } = useDispatch(editSiteStore);
 	const { params } = useLocation();
 	const editLinkProps = useLink(
 		{
@@ -33,14 +33,14 @@ function TemplatePartItemMore( {
 		}
 	);
 
-	function editTemplatePart( event ) {
-		editLinkProps.onClick( event );
+	function editTemplatePart(event) {
+		editLinkProps.onClick(event);
 		onClose();
 		closeTemplateDetailsDropdown();
 	}
 
 	function clearCustomizations() {
-		revertTemplate( templatePart );
+		revertTemplate(templatePart);
 		onClose();
 		closeTemplateDetailsDropdown();
 	}
@@ -48,50 +48,47 @@ function TemplatePartItemMore( {
 	return (
 		<>
 			<MenuGroup>
-				<MenuItem { ...editLinkProps } onClick={ editTemplatePart }>
-					{ sprintf(
+				<MenuItem {...editLinkProps} onClick={editTemplatePart}>
+					{sprintf(
 						/* translators: %s: template part title */
-						__( 'Edit %s' ),
+						__('Edit %s'),
 						templatePart.title?.rendered
-					) }
+					)}
 				</MenuItem>
 			</MenuGroup>
-			{ isTemplateRevertable( templatePart ) && (
+			{isTemplateRevertable(templatePart) && (
 				<MenuGroup>
 					<MenuItem
-						info={ __( 'Restore template to default state' ) }
-						onClick={ clearCustomizations }
+						info={__('Restore template to default state')}
+						onClick={clearCustomizations}
 					>
-						{ __( 'Clear customizations' ) }
+						{__('Clear customizations')}
 					</MenuItem>
 				</MenuGroup>
-			) }
+			)}
 		</>
 	);
 }
 
-function TemplatePartItem( {
+function TemplatePartItem({
 	templatePart,
 	clientId,
 	closeTemplateDetailsDropdown,
-} ) {
-	const { selectBlock, toggleBlockHighlight } = useDispatch(
-		blockEditorStore
-	);
+}) {
+	const { selectBlock, toggleBlockHighlight } = useDispatch(blockEditorStore);
 	const templatePartArea = useSelect(
-		( select ) => {
-			const defaultAreas = select(
-				editorStore
-			).__experimentalGetDefaultTemplatePartAreas();
+		(select) => {
+			const defaultAreas =
+				select(editorStore).__experimentalGetDefaultTemplatePartAreas();
 
 			return defaultAreas.find(
-				( defaultArea ) => defaultArea.area === templatePart.area
+				(defaultArea) => defaultArea.area === templatePart.area
 			);
 		},
-		[ templatePart.area ]
+		[templatePart.area]
 	);
-	const highlightBlock = () => toggleBlockHighlight( clientId, true );
-	const cancelHighlightBlock = () => toggleBlockHighlight( clientId, false );
+	const highlightBlock = () => toggleBlockHighlight(clientId, true);
+	const cancelHighlightBlock = () => toggleBlockHighlight(clientId, false);
 
 	return (
 		<div
@@ -100,63 +97,61 @@ function TemplatePartItem( {
 		>
 			<MenuItem
 				role="button"
-				icon={ templatePartArea?.icon }
+				icon={templatePartArea?.icon}
 				iconPosition="left"
-				onClick={ () => {
-					selectBlock( clientId );
-				} }
-				onMouseOver={ highlightBlock }
-				onMouseLeave={ cancelHighlightBlock }
-				onFocus={ highlightBlock }
-				onBlur={ cancelHighlightBlock }
+				onClick={() => {
+					selectBlock(clientId);
+				}}
+				onMouseOver={highlightBlock}
+				onMouseLeave={cancelHighlightBlock}
+				onFocus={highlightBlock}
+				onBlur={cancelHighlightBlock}
 			>
-				{ templatePartArea?.label }
+				{templatePartArea?.label}
 			</MenuItem>
 
 			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'More options' ) }
+				icon={moreVertical}
+				label={__('More options')}
 				className="edit-site-template-details__template-areas-item-more"
 			>
-				{ ( { onClose } ) => (
+				{({ onClose }) => (
 					<TemplatePartItemMore
-						onClose={ onClose }
-						templatePart={ templatePart }
+						onClose={onClose}
+						templatePart={templatePart}
 						closeTemplateDetailsDropdown={
 							closeTemplateDetailsDropdown
 						}
 					/>
-				) }
+				)}
 			</DropdownMenu>
 		</div>
 	);
 }
 
-export default function TemplateAreas( { closeTemplateDetailsDropdown } ) {
+export default function TemplateAreas({ closeTemplateDetailsDropdown }) {
 	const templateParts = useSelect(
-		( select ) => select( editSiteStore ).getCurrentTemplateTemplateParts(),
+		(select) => select(editSiteStore).getCurrentTemplateTemplateParts(),
 		[]
 	);
 
-	if ( ! templateParts.length ) {
+	if (!templateParts.length) {
 		return null;
 	}
 
 	return (
 		<MenuGroup
-			label={ __( 'Areas' ) }
+			label={__('Areas')}
 			className="edit-site-template-details__group edit-site-template-details__template-areas"
 		>
-			{ templateParts.map( ( { templatePart, block } ) => (
+			{templateParts.map(({ templatePart, block }) => (
 				<TemplatePartItem
-					key={ templatePart.slug }
-					clientId={ block.clientId }
-					templatePart={ templatePart }
-					closeTemplateDetailsDropdown={
-						closeTemplateDetailsDropdown
-					}
+					key={templatePart.slug}
+					clientId={block.clientId}
+					templatePart={templatePart}
+					closeTemplateDetailsDropdown={closeTemplateDetailsDropdown}
 				/>
-			) ) }
+			))}
 		</MenuGroup>
 	);
 }

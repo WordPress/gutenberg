@@ -46,12 +46,12 @@ const DEFAULT_STORAGE_KEY = 'WP_DATA';
  *
  * @return {Function} Enhanced reducer.
  */
-export const withLazySameState = ( reducer ) => ( state, action ) => {
-	if ( action.nextState === state ) {
+export const withLazySameState = (reducer) => (state, action) => {
+	if (action.nextState === state) {
 		return state;
 	}
 
-	return reducer( state, action );
+	return reducer(state, action);
 };
 
 /**
@@ -62,11 +62,9 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
  *
  * @return {Object} Persistence interface.
  */
-export function createPersistenceInterface( options ) {
-	const {
-		storage = DEFAULT_STORAGE,
-		storageKey = DEFAULT_STORAGE_KEY,
-	} = options;
+export function createPersistenceInterface(options) {
+	const { storage = DEFAULT_STORAGE, storageKey = DEFAULT_STORAGE_KEY } =
+		options;
 
 	let data;
 
@@ -76,16 +74,16 @@ export function createPersistenceInterface( options ) {
 	 * @return {Object} Persisted data.
 	 */
 	function getData() {
-		if ( data === undefined ) {
+		if (data === undefined) {
 			// If unset, getItem is expected to return null. Fall back to
 			// empty object.
-			const persisted = storage.getItem( storageKey );
-			if ( persisted === null ) {
+			const persisted = storage.getItem(storageKey);
+			if (persisted === null) {
 				data = {};
 			} else {
 				try {
-					data = JSON.parse( persisted );
-				} catch ( error ) {
+					data = JSON.parse(persisted);
+				} catch (error) {
 					// Similarly, should any error be thrown during parse of
 					// the string (malformed JSON), fall back to empty object.
 					data = {};
@@ -102,9 +100,9 @@ export function createPersistenceInterface( options ) {
 	 * @param {string} key   Key to update.
 	 * @param {*}      value Updated value.
 	 */
-	function setData( key, value ) {
-		data = { ...data, [ key ]: value };
-		storage.setItem( storageKey, JSON.stringify( data ) );
+	function setData(key, value) {
+		data = { ...data, [key]: value };
+		storage.setItem(storageKey, JSON.stringify(data));
 	}
 
 	return {
@@ -121,8 +119,8 @@ export function createPersistenceInterface( options ) {
  *
  * @return {WPDataPlugin} Data plugin.
  */
-function persistencePlugin( registry, pluginOptions ) {
-	const persistence = createPersistenceInterface( pluginOptions );
+function persistencePlugin(registry, pluginOptions) {
+	const persistence = createPersistenceInterface(pluginOptions);
 
 	/**
 	 * Creates an enhanced store dispatch function, triggering the state of the
@@ -134,67 +132,65 @@ function persistencePlugin( registry, pluginOptions ) {
 	 *
 	 * @return {Function} Enhanced dispatch function.
 	 */
-	function createPersistOnChange( getState, storeName, keys ) {
+	function createPersistOnChange(getState, storeName, keys) {
 		let getPersistedState;
-		if ( Array.isArray( keys ) ) {
+		if (Array.isArray(keys)) {
 			// Given keys, the persisted state should by produced as an object
 			// of the subset of keys. This implementation uses combineReducers
 			// to leverage its behavior of returning the same object when none
 			// of the property values changes. This allows a strict reference
 			// equality to bypass a persistence set on an unchanging state.
 			const reducers = keys.reduce(
-				( accumulator, key ) =>
-					Object.assign( accumulator, {
-						[ key ]: ( state, action ) => action.nextState[ key ],
-					} ),
+				(accumulator, key) =>
+					Object.assign(accumulator, {
+						[key]: (state, action) => action.nextState[key],
+					}),
 				{}
 			);
 
-			getPersistedState = withLazySameState(
-				combineReducers( reducers )
-			);
+			getPersistedState = withLazySameState(combineReducers(reducers));
 		} else {
-			getPersistedState = ( state, action ) => action.nextState;
+			getPersistedState = (state, action) => action.nextState;
 		}
 
-		let lastState = getPersistedState( undefined, {
+		let lastState = getPersistedState(undefined, {
 			nextState: getState(),
-		} );
+		});
 
 		return () => {
-			const state = getPersistedState( lastState, {
+			const state = getPersistedState(lastState, {
 				nextState: getState(),
-			} );
-			if ( state !== lastState ) {
-				persistence.set( storeName, state );
+			});
+			if (state !== lastState) {
+				persistence.set(storeName, state);
 				lastState = state;
 			}
 		};
 	}
 
 	return {
-		registerStore( storeName, options ) {
-			if ( ! options.persist ) {
-				return registry.registerStore( storeName, options );
+		registerStore(storeName, options) {
+			if (!options.persist) {
+				return registry.registerStore(storeName, options);
 			}
 
 			// Load from persistence to use as initial state.
-			const persistedState = persistence.get()[ storeName ];
-			if ( persistedState !== undefined ) {
-				let initialState = options.reducer( options.initialState, {
+			const persistedState = persistence.get()[storeName];
+			if (persistedState !== undefined) {
+				let initialState = options.reducer(options.initialState, {
 					type: '@@WP/PERSISTENCE_RESTORE',
-				} );
+				});
 
 				if (
-					isPlainObject( initialState ) &&
-					isPlainObject( persistedState )
+					isPlainObject(initialState) &&
+					isPlainObject(persistedState)
 				) {
 					// If state is an object, ensure that:
 					// - Other keys are left intact when persisting only a
 					//   subset of keys.
 					// - New keys in what would otherwise be used as initial
 					//   state are deeply merged as base for persisted value.
-					initialState = merge( {}, initialState, persistedState );
+					initialState = merge({}, initialState, persistedState);
 				} else {
 					// If there is a mismatch in object-likeness of default
 					// initial or persisted state, defer to persisted value.
@@ -207,7 +203,7 @@ function persistencePlugin( registry, pluginOptions ) {
 				};
 			}
 
-			const store = registry.registerStore( storeName, options );
+			const store = registry.registerStore(storeName, options);
 
 			store.subscribe(
 				createPersistOnChange(
@@ -237,34 +233,33 @@ export function migrateFeaturePreferencesToInterfaceStore(
 ) {
 	const interfaceStoreName = 'core/interface';
 	const state = persistence.get();
-	const sourcePreferences = state[ sourceStoreName ]?.preferences;
+	const sourcePreferences = state[sourceStoreName]?.preferences;
 	const sourceFeatures = sourcePreferences?.features;
 
-	if ( sourceFeatures ) {
-		const targetFeatures =
-			state[ interfaceStoreName ]?.preferences?.features;
+	if (sourceFeatures) {
+		const targetFeatures = state[interfaceStoreName]?.preferences?.features;
 
 		// Avoid migrating features again if they've previously been migrated.
-		if ( ! targetFeatures?.[ sourceStoreName ] ) {
+		if (!targetFeatures?.[sourceStoreName]) {
 			// Set the feature values in the interface store, the features
 			// object is keyed by 'scope', which matches the store name for
 			// the source.
-			persistence.set( interfaceStoreName, {
+			persistence.set(interfaceStoreName, {
 				preferences: {
 					features: {
 						...targetFeatures,
-						[ sourceStoreName ]: sourceFeatures,
+						[sourceStoreName]: sourceFeatures,
 					},
 				},
-			} );
+			});
 
 			// Remove feature preferences from the source.
-			persistence.set( sourceStoreName, {
+			persistence.set(sourceStoreName, {
 				preferences: {
 					...sourcePreferences,
 					features: undefined,
 				},
-			} );
+			});
 		}
 	}
 }
@@ -274,18 +269,15 @@ export function migrateFeaturePreferencesToInterfaceStore(
  * it once WordPress 6.0 is released.
  */
 
-persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
-	const persistence = createPersistenceInterface( pluginOptions );
+persistencePlugin.__unstableMigrate = (pluginOptions) => {
+	const persistence = createPersistenceInterface(pluginOptions);
 
-	migrateFeaturePreferencesToInterfaceStore(
-		persistence,
-		'core/edit-widgets'
-	);
+	migrateFeaturePreferencesToInterfaceStore(persistence, 'core/edit-widgets');
 	migrateFeaturePreferencesToInterfaceStore(
 		persistence,
 		'core/customize-widgets'
 	);
-	migrateFeaturePreferencesToInterfaceStore( persistence, 'core/edit-post' );
+	migrateFeaturePreferencesToInterfaceStore(persistence, 'core/edit-post');
 };
 
 export default persistencePlugin;

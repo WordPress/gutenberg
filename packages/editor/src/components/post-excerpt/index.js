@@ -11,33 +11,33 @@ import { compose } from '@wordpress/compose';
  */
 import { store as editorStore } from '../../store';
 
-function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
+function PostExcerpt({ excerpt, onUpdateExcerpt }) {
 	return (
 		<div className="editor-post-excerpt">
 			<TextareaControl
-				label={ __( 'Write an excerpt (optional)' ) }
+				label={__('Write an excerpt (optional)')}
 				className="editor-post-excerpt__textarea"
-				onChange={ ( value ) => onUpdateExcerpt( value ) }
-				value={ excerpt }
+				onChange={(value) => onUpdateExcerpt(value)}
+				value={excerpt}
 			/>
 			<ExternalLink
-				href={ __( 'https://wordpress.org/support/article/excerpt/' ) }
+				href={__('https://wordpress.org/support/article/excerpt/')}
 			>
-				{ __( 'Learn more about manual excerpts' ) }
+				{__('Learn more about manual excerpts')}
 			</ExternalLink>
 		</div>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		return {
-			excerpt: select( editorStore ).getEditedPostAttribute( 'excerpt' ),
+			excerpt: select(editorStore).getEditedPostAttribute('excerpt'),
 		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateExcerpt( excerpt ) {
-			dispatch( editorStore ).editPost( { excerpt } );
+	}),
+	withDispatch((dispatch) => ({
+		onUpdateExcerpt(excerpt) {
+			dispatch(editorStore).editPost({ excerpt });
 		},
-	} ) ),
-] )( PostExcerpt );
+	})),
+])(PostExcerpt);

@@ -15,37 +15,36 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '../../store';
 import complementaryAreaContext from '../complementary-area-context';
 
-function ComplementaryAreaToggle( {
+function ComplementaryAreaToggle({
 	as = Button,
 	scope,
 	identifier,
 	icon,
 	selectedIcon,
 	...props
-} ) {
+}) {
 	const ComponentToUse = as;
 	const isSelected = useSelect(
-		( select ) =>
-			select( interfaceStore ).getActiveComplementaryArea( scope ) ===
+		(select) =>
+			select(interfaceStore).getActiveComplementaryArea(scope) ===
 			identifier,
-		[ identifier ]
+		[identifier]
 	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		interfaceStore
-	);
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch(interfaceStore);
 	return (
 		<ComponentToUse
-			icon={ selectedIcon && isSelected ? selectedIcon : icon }
-			onClick={ () => {
-				if ( isSelected ) {
-					disableComplementaryArea( scope );
+			icon={selectedIcon && isSelected ? selectedIcon : icon}
+			onClick={() => {
+				if (isSelected) {
+					disableComplementaryArea(scope);
 				} else {
-					enableComplementaryArea( scope, identifier );
+					enableComplementaryArea(scope, identifier);
 				}
-			} }
-			{ ...omit( props, [ 'name' ] ) }
+			}}
+			{...omit(props, ['name'])}
 		/>
 	);
 }
 
-export default complementaryAreaContext( ComplementaryAreaToggle );
+export default complementaryAreaContext(ComplementaryAreaToggle);

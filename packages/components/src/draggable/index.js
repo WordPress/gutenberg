@@ -36,7 +36,7 @@ const bodyClass = 'is-dragging-components-draggable';
  * @param {Props} props
  * @return {JSX.Element} A draggable component.
  */
-export default function Draggable( {
+export default function Draggable({
 	children,
 	onDragStart,
 	onDragOver,
@@ -46,22 +46,22 @@ export default function Draggable( {
 	transferData,
 	__experimentalTransferDataType: transferDataType = 'text',
 	__experimentalDragComponent: dragComponent,
-} ) {
+}) {
 	/** @type {import('react').MutableRefObject<HTMLDivElement | null>} */
-	const dragComponentRef = useRef( null );
-	const cleanup = useRef( () => {} );
+	const dragComponentRef = useRef(null);
+	const cleanup = useRef(() => {});
 
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
 	 *
 	 * @param {import('react').DragEvent} event The non-custom DragEvent.
 	 */
-	function end( event ) {
+	function end(event) {
 		event.preventDefault();
 		cleanup.current();
 
-		if ( onDragEnd ) {
-			onDragEnd( event );
+		if (onDragEnd) {
+			onDragEnd(event);
 		}
 	}
 
@@ -75,83 +75,83 @@ export default function Draggable( {
 	 *
 	 * @param {import('react').DragEvent} event The non-custom DragEvent.
 	 */
-	function start( event ) {
+	function start(event) {
 		// @ts-ignore We know that ownerDocument does exist on an Element
 		const { ownerDocument } = event.target;
 
 		event.dataTransfer.setData(
 			transferDataType,
-			JSON.stringify( transferData )
+			JSON.stringify(transferData)
 		);
 
-		const cloneWrapper = ownerDocument.createElement( 'div' );
+		const cloneWrapper = ownerDocument.createElement('div');
 		// Reset position to 0,0. Natural stacking order will position this lower, even with a transform otherwise.
 		cloneWrapper.style.top = 0;
 		cloneWrapper.style.left = 0;
 
-		const dragImage = ownerDocument.createElement( 'div' );
+		const dragImage = ownerDocument.createElement('div');
 
 		// Set a fake drag image to avoid browser defaults. Remove from DOM
 		// right after. event.dataTransfer.setDragImage is not supported yet in
 		// IE, we need to check for its existence first.
-		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			dragImage.classList.add( dragImageClass );
-			ownerDocument.body.appendChild( dragImage );
-			event.dataTransfer.setDragImage( dragImage, 0, 0 );
+		if ('function' === typeof event.dataTransfer.setDragImage) {
+			dragImage.classList.add(dragImageClass);
+			ownerDocument.body.appendChild(dragImage);
+			event.dataTransfer.setDragImage(dragImage, 0, 0);
 		}
 
-		cloneWrapper.classList.add( cloneWrapperClass );
+		cloneWrapper.classList.add(cloneWrapperClass);
 
-		if ( cloneClassname ) {
-			cloneWrapper.classList.add( cloneClassname );
+		if (cloneClassname) {
+			cloneWrapper.classList.add(cloneClassname);
 		}
 
 		let x = 0;
 		let y = 0;
 		// If a dragComponent is defined, the following logic will clone the
 		// HTML node and inject it into the cloneWrapper.
-		if ( dragComponentRef.current ) {
+		if (dragComponentRef.current) {
 			// Position dragComponent at the same position as the cursor.
 			x = event.clientX;
 			y = event.clientY;
-			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
+			cloneWrapper.style.transform = `translate( ${x}px, ${y}px )`;
 
-			const clonedDragComponent = ownerDocument.createElement( 'div' );
+			const clonedDragComponent = ownerDocument.createElement('div');
 			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
-			cloneWrapper.appendChild( clonedDragComponent );
+			cloneWrapper.appendChild(clonedDragComponent);
 
 			// Inject the cloneWrapper into the DOM.
-			ownerDocument.body.appendChild( cloneWrapper );
+			ownerDocument.body.appendChild(cloneWrapper);
 		} else {
-			const element = ownerDocument.getElementById( elementId );
+			const element = ownerDocument.getElementById(elementId);
 
 			// Prepare element clone and append to element wrapper.
 			const elementRect = element.getBoundingClientRect();
 			const elementWrapper = element.parentNode;
-			const elementTopOffset = parseInt( elementRect.top, 10 );
-			const elementLeftOffset = parseInt( elementRect.left, 10 );
+			const elementTopOffset = parseInt(elementRect.top, 10);
+			const elementLeftOffset = parseInt(elementRect.left, 10);
 
 			cloneWrapper.style.width = `${
 				elementRect.width + clonePadding * 2
 			}px`;
 
-			const clone = element.cloneNode( true );
-			clone.id = `clone-${ elementId }`;
+			const clone = element.cloneNode(true);
+			clone.id = `clone-${elementId}`;
 
 			// Position clone right over the original element (20px padding).
 			x = elementLeftOffset - clonePadding;
 			y = elementTopOffset - clonePadding;
-			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
+			cloneWrapper.style.transform = `translate( ${x}px, ${y}px )`;
 
 			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-			Array.from(
-				clone.querySelectorAll( 'iframe' )
-			).forEach( ( child ) => child.parentNode.removeChild( child ) );
+			Array.from(clone.querySelectorAll('iframe')).forEach((child) =>
+				child.parentNode.removeChild(child)
+			);
 
-			cloneWrapper.appendChild( clone );
+			cloneWrapper.appendChild(clone);
 
 			// Inject the cloneWrapper into the DOM.
-			elementWrapper.appendChild( cloneWrapper );
+			elementWrapper.appendChild(cloneWrapper);
 		}
 
 		// Mark the current cursor coordinates.
@@ -161,31 +161,31 @@ export default function Draggable( {
 		/**
 		 * @param {import('react').DragEvent<Element>} e
 		 */
-		function over( e ) {
+		function over(e) {
 			//Skip doing any work if mouse has not moved.
-			if ( cursorLeft === e.clientX && cursorTop === e.clientY ) {
+			if (cursorLeft === e.clientX && cursorTop === e.clientY) {
 				return;
 			}
 			const nextX = x + e.clientX - cursorLeft;
 			const nextY = y + e.clientY - cursorTop;
-			cloneWrapper.style.transform = `translate( ${ nextX }px, ${ nextY }px )`;
+			cloneWrapper.style.transform = `translate( ${nextX}px, ${nextY}px )`;
 			cursorLeft = e.clientX;
 			cursorTop = e.clientY;
 			x = nextX;
 			y = nextY;
-			if ( onDragOver ) {
-				onDragOver( e );
+			if (onDragOver) {
+				onDragOver(e);
 			}
 		}
 
 		// Aim for 60fps (16 ms per frame) for now. We can potentially use requestAnimationFrame (raf) instead,
 		// note that browsers may throttle raf below 60fps in certain conditions.
-		const throttledDragOver = throttle( over, 16 );
+		const throttledDragOver = throttle(over, 16);
 
-		ownerDocument.addEventListener( 'dragover', throttledDragOver );
+		ownerDocument.addEventListener('dragover', throttledDragOver);
 
 		// Update cursor to 'grabbing', document wide.
-		ownerDocument.body.classList.add( bodyClass );
+		ownerDocument.body.classList.add(bodyClass);
 
 		// Allow the Synthetic Event to be accessed from asynchronous code.
 		// https://reactjs.org/docs/events.html#event-pooling
@@ -194,26 +194,26 @@ export default function Draggable( {
 		/** @type {number | undefined} */
 		let timerId;
 
-		if ( onDragStart ) {
-			timerId = setTimeout( () => onDragStart( event ) );
+		if (onDragStart) {
+			timerId = setTimeout(() => onDragStart(event));
 		}
 
 		cleanup.current = () => {
 			// Remove drag clone
-			if ( cloneWrapper && cloneWrapper.parentNode ) {
-				cloneWrapper.parentNode.removeChild( cloneWrapper );
+			if (cloneWrapper && cloneWrapper.parentNode) {
+				cloneWrapper.parentNode.removeChild(cloneWrapper);
 			}
 
-			if ( dragImage && dragImage.parentNode ) {
-				dragImage.parentNode.removeChild( dragImage );
+			if (dragImage && dragImage.parentNode) {
+				dragImage.parentNode.removeChild(dragImage);
 			}
 
 			// Reset cursor.
-			ownerDocument.body.classList.remove( bodyClass );
+			ownerDocument.body.classList.remove(bodyClass);
 
-			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
+			ownerDocument.removeEventListener('dragover', throttledDragOver);
 
-			clearTimeout( timerId );
+			clearTimeout(timerId);
 		};
 	}
 
@@ -226,19 +226,19 @@ export default function Draggable( {
 
 	return (
 		<>
-			{ children( {
+			{children({
 				onDraggableStart: start,
 				onDraggableEnd: end,
-			} ) }
-			{ dragComponent && (
+			})}
+			{dragComponent && (
 				<div
 					className="components-draggable-drag-component-root"
-					style={ { display: 'none' } }
-					ref={ dragComponentRef }
+					style={{ display: 'none' }}
+					ref={dragComponentRef}
 				>
-					{ dragComponent }
+					{dragComponent}
 				</div>
-			) }
+			)}
 		</>
 	);
 }

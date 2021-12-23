@@ -6,6 +6,6 @@
  *
  * @return {string} The manipulated text.
  */
-export default function stripSpaces( settings, text ) {
-	return text.replace( settings.spaceRegExp, ' ' );
+export default function stripSpaces(settings, text) {
+	return text.replace(settings.spaceRegExp, ' ');
 }

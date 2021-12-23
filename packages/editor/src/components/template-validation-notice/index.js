@@ -7,8 +7,8 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function TemplateValidationNotice( { isValid, ...props } ) {
-	if ( isValid ) {
+function TemplateValidationNotice({ isValid, ...props }) {
+	if (isValid) {
 		return null;
 	}
 
@@ -28,37 +28,36 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 	return (
 		<Notice
 			className="editor-template-validation-notice"
-			isDismissible={ false }
+			isDismissible={false}
 			status="warning"
-			actions={ [
+			actions={[
 				{
-					label: __( 'Keep it as is' ),
+					label: __('Keep it as is'),
 					onClick: props.resetTemplateValidity,
 				},
 				{
-					label: __( 'Reset the template' ),
+					label: __('Reset the template'),
 					onClick: confirmSynchronization,
 				},
-			] }
+			]}
 		>
-			{ __(
+			{__(
 				'The content of your post doesn’t match the template assigned to your post type.'
-			) }
+			)}
 		</Notice>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		isValid: select( blockEditorStore ).isValidTemplate(),
-	} ) ),
-	withDispatch( ( dispatch ) => {
-		const { setTemplateValidity, synchronizeTemplate } = dispatch(
-			blockEditorStore
-		);
+export default compose([
+	withSelect((select) => ({
+		isValid: select(blockEditorStore).isValidTemplate(),
+	})),
+	withDispatch((dispatch) => {
+		const { setTemplateValidity, synchronizeTemplate } =
+			dispatch(blockEditorStore);
 		return {
-			resetTemplateValidity: () => setTemplateValidity( true ),
+			resetTemplateValidity: () => setTemplateValidity(true),
 			synchronizeTemplate,
 		};
-	} ),
-] )( TemplateValidationNotice );
+	}),
+])(TemplateValidationNotice);

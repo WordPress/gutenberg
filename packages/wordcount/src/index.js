@@ -36,14 +36,14 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
  *
  * @return {WPWordCountSettings} The combined settings object to be used.
  */
-function loadSettings( type, userSettings ) {
-	const settings = extend( {}, defaultSettings, userSettings );
+function loadSettings(type, userSettings) {
+	const settings = extend({}, defaultSettings, userSettings);
 
 	settings.shortcodes = settings.l10n?.shortcodes ?? [];
 
-	if ( settings.shortcodes && settings.shortcodes.length ) {
+	if (settings.shortcodes && settings.shortcodes.length) {
 		settings.shortcodesRegExp = new RegExp(
-			'\\[\\/?(?:' + settings.shortcodes.join( '|' ) + ')[^\\]]*?\\]',
+			'\\[\\/?(?:' + settings.shortcodes.join('|') + ')[^\\]]*?\\]',
 			'g'
 		);
 	}
@@ -69,18 +69,18 @@ function loadSettings( type, userSettings ) {
  *
  * @return {number} Count of words.
  */
-function countWords( text, regex, settings ) {
+function countWords(text, regex, settings) {
 	text = flow(
-		stripTags.bind( null, settings ),
-		stripHTMLComments.bind( null, settings ),
-		stripShortcodes.bind( null, settings ),
-		stripSpaces.bind( null, settings ),
-		stripHTMLEntities.bind( null, settings ),
-		stripConnectors.bind( null, settings ),
-		stripRemovables.bind( null, settings )
-	)( text );
+		stripTags.bind(null, settings),
+		stripHTMLComments.bind(null, settings),
+		stripShortcodes.bind(null, settings),
+		stripSpaces.bind(null, settings),
+		stripHTMLEntities.bind(null, settings),
+		stripConnectors.bind(null, settings),
+		stripRemovables.bind(null, settings)
+	)(text);
 	text = text + '\n';
-	return text.match( regex )?.length ?? 0;
+	return text.match(regex)?.length ?? 0;
 }
 
 /**
@@ -92,17 +92,17 @@ function countWords( text, regex, settings ) {
  *
  * @return {number} Count of characters.
  */
-function countCharacters( text, regex, settings ) {
+function countCharacters(text, regex, settings) {
 	text = flow(
-		stripTags.bind( null, settings ),
-		stripHTMLComments.bind( null, settings ),
-		stripShortcodes.bind( null, settings ),
-		transposeAstralsToCountableChar.bind( null, settings ),
-		stripSpaces.bind( null, settings ),
-		transposeHTMLEntitiesToCountableChars.bind( null, settings )
-	)( text );
+		stripTags.bind(null, settings),
+		stripHTMLComments.bind(null, settings),
+		stripShortcodes.bind(null, settings),
+		transposeAstralsToCountableChar.bind(null, settings),
+		stripSpaces.bind(null, settings),
+		transposeHTMLEntitiesToCountableChars.bind(null, settings)
+	)(text);
 	text = text + '\n';
-	return text.match( regex )?.length ?? 0;
+	return text.match(regex)?.length ?? 0;
 }
 
 /**
@@ -120,19 +120,19 @@ function countCharacters( text, regex, settings ) {
  *
  * @return {number} The word or character count.
  */
-export function count( text, type, userSettings ) {
-	const settings = loadSettings( type, userSettings );
+export function count(text, type, userSettings) {
+	const settings = loadSettings(type, userSettings);
 	let matchRegExp;
-	switch ( settings.type ) {
+	switch (settings.type) {
 		case 'words':
 			matchRegExp = settings.wordsRegExp;
-			return countWords( text, matchRegExp, settings );
+			return countWords(text, matchRegExp, settings);
 		case 'characters_including_spaces':
 			matchRegExp = settings.characters_including_spacesRegExp;
-			return countCharacters( text, matchRegExp, settings );
+			return countCharacters(text, matchRegExp, settings);
 		case 'characters_excluding_spaces':
 			matchRegExp = settings.characters_excluding_spacesRegExp;
-			return countCharacters( text, matchRegExp, settings );
+			return countCharacters(text, matchRegExp, settings);
 		default:
 			return 0;
 	}

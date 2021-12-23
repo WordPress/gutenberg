@@ -10,19 +10,16 @@ import { withSelect } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
-export function PostScheduleLabel( { date, isFloating } ) {
+export function PostScheduleLabel({ date, isFloating }) {
 	const settings = __experimentalGetSettings();
-	return date && ! isFloating
-		? format(
-				`${ settings.formats.date } ${ settings.formats.time }`,
-				date
-		  )
-		: __( 'Immediately' );
+	return date && !isFloating
+		? format(`${settings.formats.date} ${settings.formats.time}`, date)
+		: __('Immediately');
 }
 
-export default withSelect( ( select ) => {
+export default withSelect((select) => {
 	return {
-		date: select( editorStore ).getEditedPostAttribute( 'date' ),
-		isFloating: select( editorStore ).isEditedPostDateFloating(),
+		date: select(editorStore).getEditedPostAttribute('date'),
+		isFloating: select(editorStore).isEditedPostDateFloating(),
 	};
-} )( PostScheduleLabel );
+})(PostScheduleLabel);

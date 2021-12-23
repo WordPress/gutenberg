@@ -3,26 +3,26 @@
  */
 import { annotations } from '../reducer';
 
-describe( 'annotations', () => {
+describe('annotations', () => {
 	const initialState = {};
 
-	it( 'returns all annotations and annotation IDs per block', () => {
-		const state = annotations( undefined, {} );
+	it('returns all annotations and annotation IDs per block', () => {
+		const state = annotations(undefined, {});
 
-		expect( state ).toEqual( initialState );
-	} );
+		expect(state).toEqual(initialState);
+	});
 
-	it( 'returns a state with an annotation that has been added', () => {
-		const state = annotations( undefined, {
+	it('returns a state with an annotation that has been added', () => {
+		const state = annotations(undefined, {
 			type: 'ANNOTATION_ADD',
 			id: 'annotationId',
 			blockClientId: 'blockClientId',
 			richTextIdentifier: 'identifier',
 			source: 'default',
 			selector: 'block',
-		} );
+		});
 
-		expect( state ).toEqual( {
+		expect(state).toEqual({
 			blockClientId: [
 				{
 					id: 'annotationId',
@@ -32,10 +32,10 @@ describe( 'annotations', () => {
 					selector: 'block',
 				},
 			],
-		} );
-	} );
+		});
+	});
 
-	it( 'allows an annotation to be removed', () => {
+	it('allows an annotation to be removed', () => {
 		const state = annotations(
 			{
 				blockClientId: [
@@ -54,10 +54,10 @@ describe( 'annotations', () => {
 			}
 		);
 
-		expect( state ).toEqual( { blockClientId: [] } );
-	} );
+		expect(state).toEqual({ blockClientId: [] });
+	});
 
-	it( 'allows an annotation to be removed by its source', () => {
+	it('allows an annotation to be removed by its source', () => {
 		const annotation1 = {
 			id: 'annotationId',
 			blockClientId: 'blockClientId',
@@ -74,8 +74,8 @@ describe( 'annotations', () => {
 		};
 		const state = annotations(
 			{
-				blockClientId: [ annotation1 ],
-				blockClientId2: [ annotation2 ],
+				blockClientId: [annotation1],
+				blockClientId2: [annotation2],
 			},
 			{
 				type: 'ANNOTATION_REMOVE_SOURCE',
@@ -83,14 +83,14 @@ describe( 'annotations', () => {
 			}
 		);
 
-		expect( state ).toEqual( {
+		expect(state).toEqual({
 			blockClientId: [],
-			blockClientId2: [ annotation2 ],
-		} );
-	} );
+			blockClientId2: [annotation2],
+		});
+	});
 
-	it( 'allows a range selector', () => {
-		const state = annotations( undefined, {
+	it('allows a range selector', () => {
+		const state = annotations(undefined, {
 			type: 'ANNOTATION_ADD',
 			id: 'annotationId',
 			blockClientId: 'blockClientId',
@@ -101,9 +101,9 @@ describe( 'annotations', () => {
 				start: 0,
 				end: 100,
 			},
-		} );
+		});
 
-		expect( state ).toEqual( {
+		expect(state).toEqual({
 			blockClientId: [
 				{
 					id: 'annotationId',
@@ -117,10 +117,10 @@ describe( 'annotations', () => {
 					},
 				},
 			],
-		} );
-	} );
+		});
+	});
 
-	it( 'moves annotations when said action is dispatched', () => {
+	it('moves annotations when said action is dispatched', () => {
 		const state = annotations(
 			{
 				blockClientId: [
@@ -145,7 +145,7 @@ describe( 'annotations', () => {
 			}
 		);
 
-		expect( state ).toEqual( {
+		expect(state).toEqual({
 			blockClientId: [
 				{
 					id: 'annotationId',
@@ -159,11 +159,11 @@ describe( 'annotations', () => {
 					},
 				},
 			],
-		} );
-	} );
+		});
+	});
 
-	it( 'rejects invalid annotations', () => {
-		let state = annotations( undefined, {
+	it('rejects invalid annotations', () => {
+		let state = annotations(undefined, {
 			type: 'ANNOTATION_ADD',
 			source: 'default',
 			selector: 'range',
@@ -171,8 +171,8 @@ describe( 'annotations', () => {
 				start: 5,
 				end: 4,
 			},
-		} );
-		state = annotations( state, {
+		});
+		state = annotations(state, {
 			type: 'ANNOTATION_ADD',
 			source: 'default',
 			selector: 'range',
@@ -180,8 +180,8 @@ describe( 'annotations', () => {
 				start: 'not a number',
 				end: 100,
 			},
-		} );
-		state = annotations( state, {
+		});
+		state = annotations(state, {
 			type: 'ANNOTATION_ADD',
 			source: 'default',
 			selector: 'range',
@@ -189,8 +189,8 @@ describe( 'annotations', () => {
 				start: 100,
 				end: 'not a number',
 			},
-		} );
+		});
 
-		expect( state ).toEqual( initialState );
-	} );
-} );
+		expect(state).toEqual(initialState);
+	});
+});

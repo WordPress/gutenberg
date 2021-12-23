@@ -18,64 +18,62 @@ import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
 
 const FocalPointSettingsPanelMemo = memo(
-	( {
+	({
 		focalPoint,
 		onFocalPointChange,
 		shouldEnableBottomSheetScroll,
 		url,
-	} ) => {
+	}) => {
 		const navigation = useNavigation();
 
-		function onButtonPress( action ) {
+		function onButtonPress(action) {
 			navigation.goBack();
-			if ( action === 'apply' ) {
-				onFocalPointChange( draftFocalPoint );
+			if (action === 'apply') {
+				onFocalPointChange(draftFocalPoint);
 			}
 		}
 
-		const [ draftFocalPoint, setDraftFocalPoint ] = useState( focalPoint );
-		function setPosition( coordinates ) {
-			setDraftFocalPoint( ( prevState ) => ( {
+		const [draftFocalPoint, setDraftFocalPoint] = useState(focalPoint);
+		function setPosition(coordinates) {
+			setDraftFocalPoint((prevState) => ({
 				...prevState,
 				...coordinates,
-			} ) );
+			}));
 		}
 
 		return (
-			<SafeAreaView style={ styles.safearea }>
+			<SafeAreaView style={styles.safearea}>
 				<NavBar>
 					<NavBar.DismissButton
-						onPress={ () => onButtonPress( 'cancel' ) }
+						onPress={() => onButtonPress('cancel')}
 					/>
-					<NavBar.Heading>
-						{ __( 'Edit focal point' ) }
-					</NavBar.Heading>
+					<NavBar.Heading>{__('Edit focal point')}</NavBar.Heading>
 					<NavBar.ApplyButton
-						onPress={ () => onButtonPress( 'apply' ) }
+						onPress={() => onButtonPress('apply')}
 					/>
 				</NavBar>
 				<FocalPointPicker
-					focalPoint={ draftFocalPoint }
-					onChange={ setPosition }
+					focalPoint={draftFocalPoint}
+					onChange={setPosition}
 					shouldEnableBottomSheetScroll={
 						shouldEnableBottomSheetScroll
 					}
-					url={ url }
+					url={url}
 				/>
 			</SafeAreaView>
 		);
 	}
 );
 
-function FocalPointSettingsPanel( props ) {
+function FocalPointSettingsPanel(props) {
 	const route = useRoute();
-	const { shouldEnableBottomSheetScroll } = useContext( BottomSheetContext );
+	const { shouldEnableBottomSheetScroll } = useContext(BottomSheetContext);
 
 	return (
 		<FocalPointSettingsPanelMemo
-			shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
-			{ ...props }
-			{ ...route.params }
+			shouldEnableBottomSheetScroll={shouldEnableBottomSheetScroll}
+			{...props}
+			{...route.params}
 		/>
 	);
 }

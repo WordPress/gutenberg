@@ -32,7 +32,7 @@ const defaultOptions = [
 	},
 ];
 export const _default = () => (
-	<CustomSelectControl label="Font size" options={ defaultOptions } />
+	<CustomSelectControl label="Font size" options={defaultOptions} />
 );
 
 const longLabelOptions = [
@@ -46,14 +46,13 @@ const longLabelOptions = [
 	},
 	{
 		key: 'reallylonglabel3',
-		name:
-			'That really is ok though because you should stress test your UIs.',
+		name: 'That really is ok though because you should stress test your UIs.',
 	},
 ];
 
 export const longLabels = () => (
 	<CustomSelectControl
 		label="Testing long labels"
-		options={ longLabelOptions }
+		options={longLabelOptions}
 	/>
 );

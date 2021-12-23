@@ -29,47 +29,40 @@ import { store as editorStore } from '../../store';
  *
  * @return {Object} Block Editor Settings.
  */
-function useBlockEditorSettings( settings, hasTemplate ) {
+function useBlockEditorSettings(settings, hasTemplate) {
 	const {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
-	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML } = select( editorStore );
+	} = useSelect((select) => {
+		const { canUserUseUnfilteredHTML } = select(editorStore);
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getUnstableBase, hasFinishedResolution } = select(
-			coreStore
-		);
+		const { canUser, getUnstableBase, hasFinishedResolution } =
+			select(coreStore);
 
 		const siteData = getUnstableBase();
 
-		const hasFinishedResolvingSiteData = hasFinishedResolution(
-			'getUnstableBase'
-		);
+		const hasFinishedResolvingSiteData =
+			hasFinishedResolution('getUnstableBase');
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			reusableBlocks: isWeb
-				? select( coreStore ).getEntityRecords(
-						'postType',
-						'wp_block',
-						{ per_page: -1 }
-				  )
+				? select(coreStore).getEntityRecords('postType', 'wp_block', {
+						per_page: -1,
+				  })
 				: [], // Reusable blocks are fetched in the native version of this hook.
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
+			hasUploadPermissions: defaultTo(canUser('create', 'media'), true),
 			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
 			baseUrl: siteData?.url || '',
-			userCanCreatePages: canUser( 'create', 'pages' ),
+			userCanCreatePages: canUser('create', 'pages'),
 		};
-	}, [] );
+	}, []);
 
-	const { undo } = useDispatch( editorStore );
+	const { undo } = useDispatch(editorStore);
 
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord } = useDispatch(coreStore);
 
 	/**
 	 * Creates a Post entity.
@@ -78,18 +71,18 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
 	 * @return {Object} the post type object that was created.
 	 */
-	const createPageEntity = ( options ) => {
-		if ( ! userCanCreatePages ) {
-			return Promise.reject( {
-				message: __( 'You do not have permission to create Pages.' ),
-			} );
+	const createPageEntity = (options) => {
+		if (!userCanCreatePages) {
+			return Promise.reject({
+				message: __('You do not have permission to create Pages.'),
+			});
 		}
-		return saveEntityRecord( 'postType', 'page', options );
+		return saveEntityRecord('postType', 'page', options);
 	};
 
 	return useMemo(
-		() => ( {
-			...pick( settings, [
+		() => ({
+			...pick(settings, [
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatternCategories',
 				'__experimentalBlockPatterns',
@@ -128,18 +121,18 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'supportsLayout',
 				'widgetTypesToHideFromLegacyWidgetBlock',
 				'__unstableResolvedAssets',
-			] ),
+			]),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
-				fetchLinkSuggestions( search, searchOptions, settings ),
+			__experimentalFetchLinkSuggestions: (search, searchOptions) =>
+				fetchLinkSuggestions(search, searchOptions, settings),
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
-		} ),
+		}),
 		[
 			settings,
 			hasUploadPermissions,

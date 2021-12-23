@@ -4,7 +4,7 @@
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
-extend( [ namesPlugin ] );
+extend([namesPlugin]);
 
 /**
  * Generating a CSS compliant rgba() color value.
@@ -17,6 +17,6 @@ extend( [ namesPlugin ] );
  * rgba( '#000000', 0.5 )
  * // rgba(0, 0, 0, 0.5)
  */
-export function rgba( hexValue = '', alpha = 1 ) {
-	return colord( hexValue ).alpha( alpha ).toRgbString();
+export function rgba(hexValue = '', alpha = 1) {
+	return colord(hexValue).alpha(alpha).toRgbString();
 }

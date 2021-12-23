@@ -18,59 +18,51 @@ import { isActionOfType, isAction } from './is-action';
  * @param  dispatch Unhandled action dispatch.
  */
 export default function createRuntime(
-	controls: Record<
-		string,
-		( value: any ) => Promise< boolean > | boolean
-	> = {},
+	controls: Record<string, (value: any) => Promise<boolean> | boolean> = {},
 	dispatch: Dispatch
 ) {
 	const rungenControls = map(
 		controls,
-		( control, actionType ): Control => (
-			value,
-			next,
-			iterate,
-			yieldNext,
-			yieldError
-		) => {
-			if ( ! isActionOfType( value, actionType ) ) {
-				return false;
+		(control, actionType): Control =>
+			(value, next, iterate, yieldNext, yieldError) => {
+				if (!isActionOfType(value, actionType)) {
+					return false;
+				}
+				const routine = control(value);
+				if (isPromise(routine)) {
+					// Async control routine awaits resolution.
+					routine.then(yieldNext, yieldError);
+				} else {
+					yieldNext(routine);
+				}
+				return true;
 			}
-			const routine = control( value );
-			if ( isPromise( routine ) ) {
-				// Async control routine awaits resolution.
-				routine.then( yieldNext, yieldError );
-			} else {
-				yieldNext( routine );
-			}
-			return true;
-		}
 	);
 
 	const unhandledActionControl = (
 		value: AnyAction | unknown,
 		next: () => void
 	) => {
-		if ( ! isAction( value ) ) {
+		if (!isAction(value)) {
 			return false;
 		}
-		dispatch( value );
+		dispatch(value);
 		next();
 		return true;
 	};
-	rungenControls.push( unhandledActionControl );
+	rungenControls.push(unhandledActionControl);
 
-	const rungenRuntime = create( rungenControls );
+	const rungenRuntime = create(rungenControls);
 
-	return ( action: AnyAction | Generator ) =>
-		new Promise( ( resolve, reject ) =>
+	return (action: AnyAction | Generator) =>
+		new Promise((resolve, reject) =>
 			rungenRuntime(
 				action,
-				( result ) => {
-					if ( isAction( result ) ) {
-						dispatch( result );
+				(result) => {
+					if (isAction(result)) {
+						dispatch(result);
 					}
-					resolve( result );
+					resolve(result);
 				},
 				reject
 			)

@@ -10,6 +10,4 @@ export const DEFAULT_GLOBAL_STYLES_CONTEXT = {
 	setUserConfig: () => {},
 };
 
-export const GlobalStylesContext = createContext(
-	DEFAULT_GLOBAL_STYLES_CONTEXT
-);
+export const GlobalStylesContext = createContext(DEFAULT_GLOBAL_STYLES_CONTEXT);

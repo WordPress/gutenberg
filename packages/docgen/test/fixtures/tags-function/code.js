@@ -19,6 +19,6 @@
  *
  * @return {number} The result of adding the two params.
  */
-export const sum = ( firstParam, secondParam ) => {
+export const sum = (firstParam, secondParam) => {
 	return firstParam + secondParam;
 };

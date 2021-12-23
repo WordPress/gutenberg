@@ -8,20 +8,20 @@ import namesPlugin from 'colord/plugins/names';
 /** @type {HTMLDivElement} */
 let colorComputationNode;
 
-extend( [ namesPlugin ] );
+extend([namesPlugin]);
 
 /**
  * @return {HTMLDivElement | undefined} The HTML element for color computation.
  */
 function getColorComputationNode() {
-	if ( typeof document === 'undefined' ) return;
+	if (typeof document === 'undefined') return;
 
-	if ( ! colorComputationNode ) {
+	if (!colorComputationNode) {
 		// Create a temporary element for style computation.
-		const el = document.createElement( 'div' );
-		el.setAttribute( 'data-g2-color-computation-node', '' );
+		const el = document.createElement('div');
+		el.setAttribute('data-g2-color-computation-node', '');
 		// Inject for window computed style.
-		document.body.appendChild( el );
+		document.body.appendChild(el);
 		colorComputationNode = el;
 	}
 
@@ -33,9 +33,9 @@ function getColorComputationNode() {
  *
  * @return {boolean} Whether the value is a valid color.
  */
-function isColor( value ) {
-	if ( typeof value !== 'string' ) return false;
-	const test = colord( value );
+function isColor(value) {
+	if (typeof value !== 'string') return false;
+	const test = colord(value);
 
 	return test.isValid();
 }
@@ -48,28 +48,28 @@ function isColor( value ) {
  *
  * @return {string} The computed background color.
  */
-function _getComputedBackgroundColor( backgroundColor ) {
-	if ( typeof backgroundColor !== 'string' ) return '';
+function _getComputedBackgroundColor(backgroundColor) {
+	if (typeof backgroundColor !== 'string') return '';
 
-	if ( isColor( backgroundColor ) ) return backgroundColor;
+	if (isColor(backgroundColor)) return backgroundColor;
 
-	if ( ! backgroundColor.includes( 'var(' ) ) return '';
-	if ( typeof document === 'undefined' ) return '';
+	if (!backgroundColor.includes('var(')) return '';
+	if (typeof document === 'undefined') return '';
 
 	// Attempts to gracefully handle CSS variables color values.
 	const el = getColorComputationNode();
-	if ( ! el ) return '';
+	if (!el) return '';
 
 	el.style.background = backgroundColor;
 	// Grab the style
-	const computedColor = window?.getComputedStyle( el ).background;
+	const computedColor = window?.getComputedStyle(el).background;
 	// Reset
 	el.style.background = '';
 
 	return computedColor || '';
 }
 
-const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
+const getComputedBackgroundColor = memoize(_getComputedBackgroundColor);
 
 /**
  * Get the text shade optimized for readability, based on a background color.
@@ -78,10 +78,10 @@ const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
  *
  * @return {string} The optimized text color (black or white).
  */
-export function getOptimalTextColor( backgroundColor ) {
-	const background = getComputedBackgroundColor( backgroundColor );
+export function getOptimalTextColor(backgroundColor) {
+	const background = getComputedBackgroundColor(backgroundColor);
 
-	return colord( background ).isLight() ? '#000000' : '#ffffff';
+	return colord(background).isLight() ? '#000000' : '#ffffff';
 }
 
 /**
@@ -91,8 +91,8 @@ export function getOptimalTextColor( backgroundColor ) {
  *
  * @return {string} The optimized text shade (dark or light).
  */
-export function getOptimalTextShade( backgroundColor ) {
-	const result = getOptimalTextColor( backgroundColor );
+export function getOptimalTextShade(backgroundColor) {
+	const result = getOptimalTextColor(backgroundColor);
 
 	return result === '#000000' ? 'dark' : 'light';
 }

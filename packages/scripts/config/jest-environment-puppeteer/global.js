@@ -21,74 +21,74 @@ const {
 	teardown: teardownServer,
 	ERROR_TIMEOUT,
 	ERROR_NO_COMMAND,
-} = require( 'jest-dev-server' );
-const chalk = require( 'chalk' );
+} = require('jest-dev-server');
+const chalk = require('chalk');
 
 /**
  * Internal dependencies
  */
-const { readConfig, getPuppeteer } = require( './config' );
+const { readConfig, getPuppeteer } = require('./config');
 
 let browser;
 
 let didAlreadyRunInWatchMode = false;
 
-async function setup( jestConfig = {} ) {
+async function setup(jestConfig = {}) {
 	const config = await readConfig();
-	const puppeteer = getPuppeteer( config );
-	if ( config.connect ) {
-		browser = await puppeteer.connect( config.connect );
+	const puppeteer = getPuppeteer(config);
+	if (config.connect) {
+		browser = await puppeteer.connect(config.connect);
 	} else {
-		browser = await puppeteer.launch( config.launch );
+		browser = await puppeteer.launch(config.launch);
 	}
 	process.env.PUPPETEER_WS_ENDPOINT = browser.wsEndpoint();
 
 	// If we are in watch mode, - only setupServer() once.
-	if ( jestConfig.watch || jestConfig.watchAll ) {
-		if ( didAlreadyRunInWatchMode ) return;
+	if (jestConfig.watch || jestConfig.watchAll) {
+		if (didAlreadyRunInWatchMode) return;
 		didAlreadyRunInWatchMode = true;
 	}
 
-	if ( config.server ) {
+	if (config.server) {
 		try {
-			await setupServer( config.server );
-		} catch ( error ) {
+			await setupServer(config.server);
+		} catch (error) {
 			const { error: printError } = console;
-			if ( error.code === ERROR_TIMEOUT ) {
-				printError( '' );
-				printError( chalk.red( error.message ) );
+			if (error.code === ERROR_TIMEOUT) {
+				printError('');
+				printError(chalk.red(error.message));
 				printError(
 					chalk.blue(
 						`\n☝️ You can set "server.launchTimeout" in jest-puppeteer.config.js`
 					)
 				);
-				process.exit( 1 );
+				process.exit(1);
 			}
-			if ( error.code === ERROR_NO_COMMAND ) {
-				printError( '' );
-				printError( chalk.red( error.message ) );
+			if (error.code === ERROR_NO_COMMAND) {
+				printError('');
+				printError(chalk.red(error.message));
 				printError(
 					chalk.blue(
 						`\n☝️ You must set "server.command" in jest-puppeteer.config.js`
 					)
 				);
-				process.exit( 1 );
+				process.exit(1);
 			}
 			throw error;
 		}
 	}
 }
 
-async function teardown( jestConfig = {} ) {
+async function teardown(jestConfig = {}) {
 	const config = await readConfig();
 
-	if ( config.connect ) {
+	if (config.connect) {
 		await browser.disconnect();
 	} else {
 		await browser.close();
 	}
 
-	if ( ! jestConfig.watch && ! jestConfig.watchAll ) {
+	if (!jestConfig.watch && !jestConfig.watchAll) {
 		await teardownServer();
 	}
 }

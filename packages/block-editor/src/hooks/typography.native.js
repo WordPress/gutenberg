@@ -30,35 +30,35 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_SIZE_SUPPORT_KEY,
 ];
 
-export function TypographyPanel( props ) {
-	const isDisabled = useIsTypographyDisabled( props );
-	const isSupported = hasTypographySupport( props.name );
+export function TypographyPanel(props) {
+	const isDisabled = useIsTypographyDisabled(props);
+	const isSupported = hasTypographySupport(props.name);
 
 	// only enable TypographyPanel for development
 	// eslint-disable-next-line no-undef
-	if ( isDisabled || ! isSupported || ! __DEV__ ) return null;
+	if (isDisabled || !isSupported || !__DEV__) return null;
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Typography' ) }>
-				<FontSizeEdit { ...props } />
-				<LineHeightEdit { ...props } />
+			<PanelBody title={__('Typography')}>
+				<FontSizeEdit {...props} />
+				<LineHeightEdit {...props} />
 			</PanelBody>
 		</InspectorControls>
 	);
 }
 
-const hasTypographySupport = ( blockName ) => {
-	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
-		hasBlockSupport( blockName, key )
+const hasTypographySupport = (blockName) => {
+	return TYPOGRAPHY_SUPPORT_KEYS.some((key) =>
+		hasBlockSupport(blockName, key)
 	);
 };
 
-function useIsTypographyDisabled( props = {} ) {
+function useIsTypographyDisabled(props = {}) {
 	const configs = [
-		useIsFontSizeDisabled( props ),
-		useIsLineHeightDisabled( props ),
+		useIsFontSizeDisabled(props),
+		useIsLineHeightDisabled(props),
 	];
 
-	return configs.filter( Boolean ).length === configs.length;
+	return configs.filter(Boolean).length === configs.length;
 }

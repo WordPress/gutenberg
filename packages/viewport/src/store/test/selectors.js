@@ -3,9 +3,9 @@
  */
 import { isViewportMatch } from '../selectors';
 
-describe( 'selectors', () => {
-	describe( 'isViewportMatch()', () => {
-		it( 'should return with omitted operator defaulting to >=', () => {
+describe('selectors', () => {
+	describe('isViewportMatch()', () => {
+		it('should return with omitted operator defaulting to >=', () => {
 			const result = isViewportMatch(
 				{
 					'>= wide': true,
@@ -14,10 +14,10 @@ describe( 'selectors', () => {
 				'wide'
 			);
 
-			expect( result ).toBe( true );
-		} );
+			expect(result).toBe(true);
+		});
 
-		it( 'should return with known query value', () => {
+		it('should return with known query value', () => {
 			const result = isViewportMatch(
 				{
 					'>= wide': false,
@@ -26,7 +26,7 @@ describe( 'selectors', () => {
 				'< wide'
 			);
 
-			expect( result ).toBe( true );
-		} );
-	} );
-} );
+			expect(result).toBe(true);
+		});
+	});
+});

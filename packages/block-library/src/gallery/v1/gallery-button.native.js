@@ -13,7 +13,7 @@ import { Icon } from '@wordpress/components';
  */
 import style from './gallery-image-style.scss';
 
-export function Button( props ) {
+export function Button(props) {
 	const {
 		icon,
 		iconSize = 24,
@@ -24,7 +24,7 @@ export function Button( props ) {
 		style: customStyle,
 	} = props;
 
-	const buttonStyle = StyleSheet.compose( style.buttonActive, customStyle );
+	const buttonStyle = StyleSheet.compose(style.buttonActive, customStyle);
 
 	const isDisabled = disabled || ariaDisabled;
 
@@ -32,14 +32,14 @@ export function Button( props ) {
 
 	return (
 		<TouchableOpacity
-			style={ buttonStyle }
-			activeOpacity={ 0.7 }
-			accessibilityLabel={ accessibilityLabel }
-			accessibilityRole={ 'button' }
-			onPress={ onClick }
-			disabled={ isDisabled }
+			style={buttonStyle}
+			activeOpacity={0.7}
+			accessibilityLabel={accessibilityLabel}
+			accessibilityRole={'button'}
+			onPress={onClick}
+			disabled={isDisabled}
 		>
-			<Icon icon={ icon } fill={ fill } size={ iconSize } />
+			<Icon icon={icon} fill={fill} size={iconSize} />
 		</TouchableOpacity>
 	);
 }

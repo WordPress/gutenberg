@@ -17,7 +17,7 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const {
 		isStackedOnMobile,
 		mediaAlt,
@@ -35,70 +35,66 @@ export default function save( { attributes } ) {
 		rel,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
-	const newRel = isEmpty( rel ) ? undefined : rel;
+	const newRel = isEmpty(rel) ? undefined : rel;
 
-	const imageClasses = classnames( {
-		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
-		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
-	} );
+	const imageClasses = classnames({
+		[`wp-image-${mediaId}`]: mediaId && mediaType === 'image',
+		[`size-${mediaSizeSlug}`]: mediaId && mediaType === 'image',
+	});
 
 	let image = (
-		<img
-			src={ mediaUrl }
-			alt={ mediaAlt }
-			className={ imageClasses || null }
-		/>
+		<img src={mediaUrl} alt={mediaAlt} className={imageClasses || null} />
 	);
 
-	if ( href ) {
+	if (href) {
 		image = (
 			<a
-				className={ linkClass }
-				href={ href }
-				target={ linkTarget }
-				rel={ newRel }
+				className={linkClass}
+				href={href}
+				target={linkTarget}
+				rel={newRel}
 			>
-				{ image }
+				{image}
 			</a>
 		);
 	}
 
 	const mediaTypeRenders = {
 		image: () => image,
-		video: () => <video controls src={ mediaUrl } />,
+		video: () => <video controls src={mediaUrl} />,
 	};
-	const className = classnames( {
+	const className = classnames({
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-stacked-on-mobile': isStackedOnMobile,
-		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		[`is-vertically-aligned-${verticalAlignment}`]: verticalAlignment,
 		'is-image-fill': imageFill,
-	} );
+	});
 	const backgroundStyles = imageFill
-		? imageFillStyles( mediaUrl, focalPoint )
+		? imageFillStyles(mediaUrl, focalPoint)
 		: {};
 
 	let gridTemplateColumns;
-	if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
+	if (mediaWidth !== DEFAULT_MEDIA_WIDTH) {
 		gridTemplateColumns =
 			'right' === mediaPosition
-				? `auto ${ mediaWidth }%`
-				: `${ mediaWidth }% auto`;
+				? `auto ${mediaWidth}%`
+				: `${mediaWidth}% auto`;
 	}
 	const style = {
 		gridTemplateColumns,
 	};
 	return (
-		<div { ...useBlockProps.save( { className, style } ) }>
+		<div {...useBlockProps.save({ className, style })}>
 			<figure
 				className="wp-block-media-text__media"
-				style={ backgroundStyles }
+				style={backgroundStyles}
 			>
-				{ ( mediaTypeRenders[ mediaType ] || noop )() }
+				{(mediaTypeRenders[mediaType] || noop)()}
 			</figure>
 			<div
-				{ ...useInnerBlocksProps.save( {
+				{...useInnerBlocksProps.save({
 					className: 'wp-block-media-text__content',
-				} ) }
+				})}
 			/>
 		</div>
 	);

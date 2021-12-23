@@ -22,7 +22,7 @@ export const _default = () => {
 		'Use Snackbars to communicate low priority, non-interruptive messages to the user.'
 	);
 
-	return <Snackbar>{ content }</Snackbar>;
+	return <Snackbar>{content}</Snackbar>;
 };
 
 export const withActions = () => {
@@ -32,12 +32,12 @@ export const withActions = () => {
 	);
 	const actions = [
 		{
-			label: text( 'Label', 'Open WP.org' ),
-			url: text( 'URL', 'https://wordpress.org' ),
+			label: text('Label', 'Open WP.org'),
+			url: text('URL', 'https://wordpress.org'),
 		},
 	];
 
-	return <Snackbar actions={ actions }>{ content }</Snackbar>;
+	return <Snackbar actions={actions}>{content}</Snackbar>;
 };
 
 export const withIcon = () => {
@@ -45,17 +45,17 @@ export const withIcon = () => {
 		'Content',
 		'Add an icon to make your snackbar stand out'
 	);
-	const icon = text( 'Icon (as unicode emoji)', '🌮' );
+	const icon = text('Icon (as unicode emoji)', '🌮');
 
 	return (
 		<Snackbar
 			icon={
-				<span role="img" aria-label="Icon" style={ { fontSize: 21 } }>
-					{ icon }
+				<span role="img" aria-label="Icon" style={{ fontSize: 21 }}>
+					{icon}
 				</span>
 			}
 		>
-			{ content }
+			{content}
 		</Snackbar>
 	);
 };
@@ -66,7 +66,7 @@ export const withExplicitDismiss = () => {
 		'Add a cross to explicitly close the snackbar, and do not hide it automatically'
 	);
 
-	return <Snackbar explicitDismiss={ true }>{ content }</Snackbar>;
+	return <Snackbar explicitDismiss={true}>{content}</Snackbar>;
 };
 
 export const withActionAndExpicitDismiss = () => {
@@ -76,14 +76,14 @@ export const withActionAndExpicitDismiss = () => {
 	);
 	const actions = [
 		{
-			label: text( 'Label', 'Open WP.org' ),
-			url: text( 'URL', 'https://wordpress.org' ),
+			label: text('Label', 'Open WP.org'),
+			url: text('URL', 'https://wordpress.org'),
 		},
 	];
 
 	return (
-		<Snackbar actions={ actions } explicitDismiss={ true }>
-			{ content }
+		<Snackbar actions={actions} explicitDismiss={true}>
+			{content}
 		</Snackbar>
 	);
 };

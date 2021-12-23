@@ -22,18 +22,18 @@ export default {
 };
 
 export const _default = () => {
-	const [ value, setValue ] = useState();
-	const label = text( 'Label', 'Label Text' );
-	const hideLabelFromVision = boolean( 'Hide Label From Vision', true );
-	const help = text( 'Help Text', 'Help text to explain the input.' );
+	const [value, setValue] = useState();
+	const label = text('Label', 'Label Text');
+	const hideLabelFromVision = boolean('Hide Label From Vision', true);
+	const help = text('Help Text', 'Help text to explain the input.');
 
 	return (
 		<SearchControl
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			value={ value }
-			onChange={ setValue }
+			label={label}
+			hideLabelFromVision={hideLabelFromVision}
+			help={help}
+			value={value}
+			onChange={setValue}
 		/>
 	);
 };

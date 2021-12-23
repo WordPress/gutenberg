@@ -14,23 +14,23 @@ import config from './fixtures/webpack.config.js';
 /**
  * Local variables
  */
-const accessAsync = promisify( access );
-const unlinkAsync = promisify( unlink );
-const webpackAsync = promisify( webpack );
+const accessAsync = promisify(access);
+const unlinkAsync = promisify(unlink);
+const webpackAsync = promisify(webpack);
 
-describe( 'CustomTemplatedPathPlugin', () => {
-	const outputFile = path.join( __dirname, '/fixtures/build/entry-42.js' );
+describe('CustomTemplatedPathPlugin', () => {
+	const outputFile = path.join(__dirname, '/fixtures/build/entry-42.js');
 
-	beforeAll( async () => {
+	beforeAll(async () => {
 		// Remove output file so as not to report false positive from previous
 		// test. Absorb error since the file may not exist (unlink will throw).
 		try {
-			await unlinkAsync( outputFile );
-		} catch ( error ) {}
-	} );
+			await unlinkAsync(outputFile);
+		} catch (error) {}
+	});
 
-	it( 'should resolve with basename output', async () => {
-		await webpackAsync( config );
-		await accessAsync( outputFile );
-	} );
-} );
+	it('should resolve with basename output', async () => {
+		await webpackAsync(config);
+		await accessAsync(outputFile);
+	});
+});

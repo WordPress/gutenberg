@@ -11,10 +11,10 @@ import { castArray } from 'lodash';
  *
  * @return {Object} Action object.
  */
-export function addFormatTypes( formatTypes ) {
+export function addFormatTypes(formatTypes) {
 	return {
 		type: 'ADD_FORMAT_TYPES',
-		formatTypes: castArray( formatTypes ),
+		formatTypes: castArray(formatTypes),
 	};
 }
 
@@ -25,9 +25,9 @@ export function addFormatTypes( formatTypes ) {
  *
  * @return {Object} Action object.
  */
-export function removeFormatTypes( names ) {
+export function removeFormatTypes(names) {
 	return {
 		type: 'REMOVE_FORMAT_TYPES',
-		names: castArray( names ),
+		names: castArray(names),
 	};
 }

@@ -27,26 +27,26 @@ export const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
  *
  * @return {WPElement} Font appearance edit element.
  */
-export function FontAppearanceEdit( props ) {
+export function FontAppearanceEdit(props) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const hasFontStyles = ! useIsFontStyleDisabled( props );
-	const hasFontWeights = ! useIsFontWeightDisabled( props );
+	const hasFontStyles = !useIsFontStyleDisabled(props);
+	const hasFontWeights = !useIsFontWeightDisabled(props);
 
-	const onChange = ( newStyles ) => {
-		setAttributes( {
-			style: cleanEmptyObject( {
+	const onChange = (newStyles) => {
+		setAttributes({
+			style: cleanEmptyObject({
 				...style,
 				typography: {
 					...style?.typography,
 					fontStyle: newStyles.fontStyle,
 					fontWeight: newStyles.fontWeight,
 				},
-			} ),
-		} );
+			}),
+		});
 	};
 
 	const fontStyle = style?.typography?.fontStyle;
@@ -54,10 +54,10 @@ export function FontAppearanceEdit( props ) {
 
 	return (
 		<FontAppearanceControl
-			onChange={ onChange }
-			hasFontStyles={ hasFontStyles }
-			hasFontWeights={ hasFontWeights }
-			value={ { fontStyle, fontWeight } }
+			onChange={onChange}
+			hasFontStyles={hasFontStyles}
+			hasFontWeights={hasFontWeights}
+			value={{ fontStyle, fontWeight }}
 		/>
 	);
 }
@@ -71,11 +71,11 @@ export function FontAppearanceEdit( props ) {
  *
  * @return {boolean} Whether font style support has been disabled.
  */
-export function useIsFontStyleDisabled( { name: blockName } = {} ) {
-	const styleSupport = hasBlockSupport( blockName, FONT_STYLE_SUPPORT_KEY );
-	const hasFontStyles = useSetting( 'typography.fontStyle' );
+export function useIsFontStyleDisabled({ name: blockName } = {}) {
+	const styleSupport = hasBlockSupport(blockName, FONT_STYLE_SUPPORT_KEY);
+	const hasFontStyles = useSetting('typography.fontStyle');
 
-	return ! styleSupport || ! hasFontStyles;
+	return !styleSupport || !hasFontStyles;
 }
 
 /**
@@ -87,11 +87,11 @@ export function useIsFontStyleDisabled( { name: blockName } = {} ) {
  *
  * @return {boolean} Whether font weight support has been disabled.
  */
-export function useIsFontWeightDisabled( { name: blockName } = {} ) {
-	const weightSupport = hasBlockSupport( blockName, FONT_WEIGHT_SUPPORT_KEY );
-	const hasFontWeights = useSetting( 'typography.fontWeight' );
+export function useIsFontWeightDisabled({ name: blockName } = {}) {
+	const weightSupport = hasBlockSupport(blockName, FONT_WEIGHT_SUPPORT_KEY);
+	const hasFontWeights = useSetting('typography.fontWeight');
 
-	return ! weightSupport || ! hasFontWeights;
+	return !weightSupport || !hasFontWeights;
 }
 
 /**
@@ -101,9 +101,9 @@ export function useIsFontWeightDisabled( { name: blockName } = {} ) {
  *
  * @return {boolean} Whether font appearance support has been disabled.
  */
-export function useIsFontAppearanceDisabled( props ) {
-	const stylesDisabled = useIsFontStyleDisabled( props );
-	const weightsDisabled = useIsFontWeightDisabled( props );
+export function useIsFontAppearanceDisabled(props) {
+	const stylesDisabled = useIsFontStyleDisabled(props);
+	const weightsDisabled = useIsFontWeightDisabled(props);
 
 	return stylesDisabled && weightsDisabled;
 }
@@ -115,9 +115,9 @@ export function useIsFontAppearanceDisabled( props ) {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a font style or weight.
  */
-export function hasFontAppearanceValue( props ) {
+export function hasFontAppearanceValue(props) {
 	const { fontStyle, fontWeight } = props.attributes.style?.typography || {};
-	return !! fontStyle || !! fontWeight;
+	return !!fontStyle || !!fontWeight;
 }
 
 /**
@@ -129,17 +129,17 @@ export function hasFontAppearanceValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetFontAppearance( { attributes = {}, setAttributes } ) {
+export function resetFontAppearance({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
-		style: cleanEmptyObject( {
+	setAttributes({
+		style: cleanEmptyObject({
 			...style,
 			typography: {
 				...style?.typography,
 				fontStyle: undefined,
 				fontWeight: undefined,
 			},
-		} ),
-	} );
+		}),
+	});
 }

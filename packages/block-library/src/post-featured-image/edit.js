@@ -39,22 +39,22 @@ const placeholderIllustration = (
 	</SVG>
 );
 
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const ALLOWED_MEDIA_TYPES = ['image'];
 const placeholderChip = (
 	<div className="wp-block-post-featured-image__placeholder">
-		{ placeholderIllustration }
+		{placeholderIllustration}
 	</div>
 );
 
-function PostFeaturedImageDisplay( {
+function PostFeaturedImageDisplay({
 	clientId,
 	attributes,
 	setAttributes,
 	context: { postId, postType, queryId },
-} ) {
-	const isDescendentOfQueryLoop = !! queryId;
+}) {
+	const isDescendentOfQueryLoop = !!queryId;
 	const { isLink, height, width, scale } = attributes;
-	const [ featuredImage, setFeaturedImage ] = useEntityProp(
+	const [featuredImage, setFeaturedImage] = useEntityProp(
 		'postType',
 		postType,
 		'featured_media',
@@ -62,76 +62,76 @@ function PostFeaturedImageDisplay( {
 	);
 
 	const media = useSelect(
-		( select ) =>
+		(select) =>
 			featuredImage &&
-			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
-		[ featuredImage ]
+			select(coreStore).getMedia(featuredImage, { context: 'view' }),
+		[featuredImage]
 	);
 
-	const blockProps = useBlockProps( {
+	const blockProps = useBlockProps({
 		style: { width, height },
-	} );
+	});
 
-	const placeholder = ( content ) => {
+	const placeholder = (content) => {
 		return (
 			<Placeholder className="block-editor-media-placeholder">
-				{ placeholderIllustration }
-				{ content }
+				{placeholderIllustration}
+				{content}
 			</Placeholder>
 		);
 	};
 
-	const onSelectImage = ( value ) => {
-		if ( value?.id ) {
-			setFeaturedImage( value.id );
+	const onSelectImage = (value) => {
+		if (value?.id) {
+			setFeaturedImage(value.id);
 		}
 	};
 
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const onUploadError = ( message ) => {
-		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
+	const { createErrorNotice } = useDispatch(noticesStore);
+	const onUploadError = (message) => {
+		createErrorNotice(message[2], { type: 'snackbar' });
 	};
 
 	let image;
-	if ( ! featuredImage && isDescendentOfQueryLoop ) {
-		return <div { ...blockProps }>{ placeholderChip }</div>;
+	if (!featuredImage && isDescendentOfQueryLoop) {
+		return <div {...blockProps}>{placeholderChip}</div>;
 	}
 
-	const label = __( 'Add a featured image' );
+	const label = __('Add a featured image');
 
-	if ( ! featuredImage ) {
+	if (!featuredImage) {
 		image = (
 			<MediaPlaceholder
-				onSelect={ onSelectImage }
+				onSelect={onSelectImage}
 				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				onError={ onUploadError }
-				placeholder={ placeholder }
-				mediaLibraryButton={ ( { open } ) => {
+				allowedTypes={ALLOWED_MEDIA_TYPES}
+				onError={onUploadError}
+				placeholder={placeholder}
+				mediaLibraryButton={({ open }) => {
 					return (
 						<Button
-							icon={ upload }
+							icon={upload}
 							variant="primary"
-							label={ label }
+							label={label}
 							showTooltip
 							tooltipPosition="top center"
-							onClick={ () => {
+							onClick={() => {
 								open();
-							} }
+							}}
 						/>
 					);
-				} }
+				}}
 			/>
 		);
 	} else {
 		// We have a Featured image so show a Placeholder if is loading.
-		image = ! media ? (
+		image = !media ? (
 			placeholderChip
 		) : (
 			<img
-				src={ media.source_url }
-				alt={ media.alt_text || __( 'Featured image' ) }
-				style={ { height, objectFit: height && scale } }
+				src={media.source_url}
+				alt={media.alt_text || __('Featured image')}
+				style={{ height, objectFit: height && scale }}
 			/>
 		);
 	}
@@ -139,48 +139,48 @@ function PostFeaturedImageDisplay( {
 	return (
 		<>
 			<DimensionControls
-				clientId={ clientId }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
+				clientId={clientId}
+				attributes={attributes}
+				setAttributes={setAttributes}
 			/>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={__('Link settings')}>
 					<ToggleControl
-						label={ sprintf(
+						label={sprintf(
 							// translators: %s: Name of the post type e.g: "post".
-							__( 'Link to %s' ),
+							__('Link to %s'),
 							postType
-						) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
+						)}
+						onChange={() => setAttributes({ isLink: !isLink })}
+						checked={isLink}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ !! media && ! isDescendentOfQueryLoop && (
+			{!!media && !isDescendentOfQueryLoop && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
-						mediaId={ featuredImage }
-						mediaURL={ media.source_url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						mediaId={featuredImage}
+						mediaURL={media.source_url}
+						allowedTypes={ALLOWED_MEDIA_TYPES}
 						accept="image/*"
-						onSelect={ onSelectImage }
-						onError={ onUploadError }
+						onSelect={onSelectImage}
+						onError={onUploadError}
 					>
-						<MenuItem onClick={ () => setFeaturedImage( 0 ) }>
-							{ __( 'Reset' ) }
+						<MenuItem onClick={() => setFeaturedImage(0)}>
+							{__('Reset')}
 						</MenuItem>
 					</MediaReplaceFlow>
 				</BlockControls>
-			) }
-			<figure { ...blockProps }>{ image }</figure>
+			)}
+			<figure {...blockProps}>{image}</figure>
 		</>
 	);
 }
 
-export default function PostFeaturedImageEdit( props ) {
+export default function PostFeaturedImageEdit(props) {
 	const blockProps = useBlockProps();
-	if ( ! props.context?.postId ) {
-		return <div { ...blockProps }>{ placeholderChip }</div>;
+	if (!props.context?.postId) {
+		return <div {...blockProps}>{placeholderChip}</div>;
 	}
-	return <PostFeaturedImageDisplay { ...props } />;
+	return <PostFeaturedImageDisplay {...props} />;
 }

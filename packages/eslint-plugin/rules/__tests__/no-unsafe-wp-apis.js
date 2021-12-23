@@ -8,18 +8,18 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../no-unsafe-wp-apis';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
-} );
+});
 
 const options = [
-	{ '@wordpress/package': [ '__experimentalSafe', '__unstableSafe' ] },
+	{ '@wordpress/package': ['__experimentalSafe', '__unstableSafe'] },
 ];
 
-ruleTester.run( 'no-unsafe-wp-apis', rule, {
+ruleTester.run('no-unsafe-wp-apis', rule, {
 	valid: [
 		{ code: "import _ from 'lodash';", options },
 		{ code: "import { map } from 'lodash';", options },
@@ -46,8 +46,7 @@ ruleTester.run( 'no-unsafe-wp-apis', rule, {
 			options,
 		},
 		{
-			code:
-				"import { feature, __experimentalSafe } from '@wordpress/package';",
+			code: "import { feature, __experimentalSafe } from '@wordpress/package';",
 			options,
 		},
 		{
@@ -81,8 +80,7 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 			],
 		},
 		{
-			code:
-				"import { feature, __experimentalSafe } from '@wordpress/unsafe';",
+			code: "import { feature, __experimentalSafe } from '@wordpress/unsafe';",
 			options,
 			errors: [
 				{
@@ -93,8 +91,7 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 			],
 		},
 		{
-			code:
-				"import s, { __experimentalUnsafe } from '@wordpress/package';",
+			code: "import s, { __experimentalUnsafe } from '@wordpress/package';",
 			options,
 			errors: [
 				{
@@ -116,4 +113,4 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 			],
 		},
 	],
-} );
+});

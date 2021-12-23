@@ -11,7 +11,7 @@ import sprintfjs from 'sprintf-js';
  *
  * @param {...*} args Arguments to pass to `console.error`
  */
-const logErrorOnce = memoize( console.error ); // eslint-disable-line no-console
+const logErrorOnce = memoize(console.error); // eslint-disable-line no-console
 
 /**
  * Returns a formatted string. If an error occurs in applying the format, the
@@ -24,12 +24,12 @@ const logErrorOnce = memoize( console.error ); // eslint-disable-line no-console
  *
  * @return {string} The formatted string.
  */
-export function sprintf( format, ...args ) {
+export function sprintf(format, ...args) {
 	try {
-		return sprintfjs.sprintf( format, ...args );
-	} catch ( error ) {
-		if ( error instanceof Error ) {
-			logErrorOnce( 'sprintf error: \n\n' + error.toString() );
+		return sprintfjs.sprintf(format, ...args);
+	} catch (error) {
+		if (error instanceof Error) {
+			logErrorOnce('sprintf error: \n\n' + error.toString());
 		}
 		return format;
 	}

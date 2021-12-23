@@ -10,29 +10,27 @@ import DropdownMenu from '../dropdown-menu';
 import ToolbarContext from '../toolbar-context';
 import ToolbarItem from '../toolbar-item';
 
-function ToolbarGroupCollapsed( { controls = [], toggleProps, ...props } ) {
+function ToolbarGroupCollapsed({ controls = [], toggleProps, ...props }) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar label="label" />`
-	const accessibleToolbarState = useContext( ToolbarContext );
+	const accessibleToolbarState = useContext(ToolbarContext);
 
-	const renderDropdownMenu = ( internalToggleProps ) => (
+	const renderDropdownMenu = (internalToggleProps) => (
 		<DropdownMenu
-			controls={ controls }
-			toggleProps={ {
+			controls={controls}
+			toggleProps={{
 				...internalToggleProps,
 				'data-toolbar-item': true,
-			} }
-			{ ...props }
+			}}
+			{...props}
 		/>
 	);
 
-	if ( accessibleToolbarState ) {
-		return (
-			<ToolbarItem { ...toggleProps }>{ renderDropdownMenu }</ToolbarItem>
-		);
+	if (accessibleToolbarState) {
+		return <ToolbarItem {...toggleProps}>{renderDropdownMenu}</ToolbarItem>;
 	}
 
-	return renderDropdownMenu( toggleProps );
+	return renderDropdownMenu(toggleProps);
 }
 
 export default ToolbarGroupCollapsed;

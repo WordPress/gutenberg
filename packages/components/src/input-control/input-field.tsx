@@ -49,12 +49,12 @@ function InputField(
 		onValidate = noop,
 		size = 'default',
 		setIsFocused,
-		stateReducer = ( state: any ) => state,
+		stateReducer = (state: any) => state,
 		value: valueProp,
 		type,
 		...props
-	}: WordPressComponentProps< InputFieldProps, 'input', false >,
-	ref: Ref< HTMLInputElement >
+	}: WordPressComponentProps<InputFieldProps, 'input', false>,
+	ref: Ref<HTMLInputElement>
 ) {
 	const {
 		// State
@@ -71,16 +71,16 @@ function InputField(
 		pressUp,
 		reset,
 		update,
-	} = useInputControlStateReducer( stateReducer, {
+	} = useInputControlStateReducer(stateReducer, {
 		isDragEnabled,
 		value: valueProp,
 		isPressEnterToChange,
-	} );
+	});
 
 	const { _event, value, isDragging, isDirty } = state;
-	const wasDirtyOnBlur = useRef( false );
+	const wasDirtyOnBlur = useRef(false);
 
-	const dragCursor = useDragCursor( isDragging, dragDirection );
+	const dragCursor = useDragCursor(isDragging, dragDirection);
 
 	/*
 	 * Handles synchronization of external and internal value state.
@@ -89,109 +89,109 @@ function InputField(
 	 * a dirty value[1] propagates the value and event through onChange.
 	 * [1] value is only made dirty if isPressEnterToChange is true
 	 */
-	useUpdateEffect( () => {
-		if ( valueProp === value ) {
+	useUpdateEffect(() => {
+		if (valueProp === value) {
 			return;
 		}
-		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
-			update( valueProp, _event as SyntheticEvent );
-		} else if ( ! isDirty ) {
-			onChange( value, {
-				event: _event as ChangeEvent< HTMLInputElement >,
-			} );
+		if (!isFocused && !wasDirtyOnBlur.current) {
+			update(valueProp, _event as SyntheticEvent);
+		} else if (!isDirty) {
+			onChange(value, {
+				event: _event as ChangeEvent<HTMLInputElement>,
+			});
 			wasDirtyOnBlur.current = false;
 		}
-	}, [ value, isDirty, isFocused, valueProp ] );
+	}, [value, isDirty, isFocused, valueProp]);
 
-	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
-		onBlur( event );
-		setIsFocused?.( false );
+	const handleOnBlur = (event: FocusEvent<HTMLInputElement>) => {
+		onBlur(event);
+		setIsFocused?.(false);
 
 		/**
 		 * If isPressEnterToChange is set, this commits the value to
 		 * the onChange callback.
 		 */
-		if ( isPressEnterToChange && isDirty ) {
+		if (isPressEnterToChange && isDirty) {
 			wasDirtyOnBlur.current = true;
-			if ( ! isValueEmpty( value ) ) {
-				handleOnCommit( event );
+			if (!isValueEmpty(value)) {
+				handleOnCommit(event);
 			} else {
-				reset( valueProp, event );
+				reset(valueProp, event);
 			}
 		}
 	};
 
-	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
-		onFocus( event );
-		setIsFocused?.( true );
+	const handleOnFocus = (event: FocusEvent<HTMLInputElement>) => {
+		onFocus(event);
+		setIsFocused?.(true);
 	};
 
-	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
+	const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const nextValue = event.target.value;
-		change( nextValue, event );
+		change(nextValue, event);
 	};
 
-	const handleOnCommit = ( event: SyntheticEvent< HTMLInputElement > ) => {
+	const handleOnCommit = (event: SyntheticEvent<HTMLInputElement>) => {
 		const nextValue = event.currentTarget.value;
 
 		try {
-			onValidate( nextValue );
-			commit( nextValue, event );
-		} catch ( err ) {
-			invalidate( err, event );
+			onValidate(nextValue);
+			commit(nextValue, event);
+		} catch (err) {
+			invalidate(err, event);
 		}
 	};
 
-	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
+	const handleOnKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		const { keyCode } = event;
-		onKeyDown( event );
+		onKeyDown(event);
 
-		switch ( keyCode ) {
+		switch (keyCode) {
 			case UP:
-				pressUp( event );
+				pressUp(event);
 				break;
 
 			case DOWN:
-				pressDown( event );
+				pressDown(event);
 				break;
 
 			case ENTER:
-				pressEnter( event );
+				pressEnter(event);
 
-				if ( isPressEnterToChange ) {
+				if (isPressEnterToChange) {
 					event.preventDefault();
-					handleOnCommit( event );
+					handleOnCommit(event);
 				}
 				break;
 		}
 	};
 
-	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
-		( dragProps ) => {
+	const dragGestureProps = useDrag<PointerEvent<HTMLInputElement>>(
+		(dragProps) => {
 			const { distance, dragging, event } = dragProps;
 			// The event is persisted to prevent errors in components using this
 			// to check if a modifier key was held while dragging.
 			event.persist();
 
-			if ( ! distance ) return;
+			if (!distance) return;
 			event.stopPropagation();
 
 			/**
 			 * Quick return if no longer dragging.
 			 * This prevents unnecessary value calculations.
 			 */
-			if ( ! dragging ) {
-				onDragEnd( dragProps );
-				dragEnd( dragProps );
+			if (!dragging) {
+				onDragEnd(dragProps);
+				dragEnd(dragProps);
 				return;
 			}
 
-			onDrag( dragProps );
-			drag( dragProps );
+			onDrag(dragProps);
+			drag(dragProps);
 
-			if ( ! isDragging ) {
-				onDragStart( dragProps );
-				dragStart( dragProps );
+			if (!isDragging) {
+				onDragStart(dragProps);
+				dragStart(dragProps);
 			}
 		},
 		{
@@ -206,9 +206,9 @@ function InputField(
 	 * type=number when their spinner arrows are pressed.
 	 */
 	let handleOnMouseDown;
-	if ( type === 'number' ) {
-		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
-			props.onMouseDown?.( event );
+	if (type === 'number') {
+		handleOnMouseDown = (event: MouseEvent<HTMLInputElement>) => {
+			props.onMouseDown?.(event);
 			if (
 				event.currentTarget !==
 				event.currentTarget.ownerDocument.activeElement
@@ -220,26 +220,26 @@ function InputField(
 
 	return (
 		<Input
-			{ ...props }
-			{ ...dragProps }
+			{...props}
+			{...dragProps}
 			className="components-input-control__input"
-			disabled={ disabled }
-			dragCursor={ dragCursor }
-			isDragging={ isDragging }
-			id={ id }
-			onBlur={ handleOnBlur }
-			onChange={ handleOnChange }
-			onFocus={ handleOnFocus }
-			onKeyDown={ handleOnKeyDown }
-			onMouseDown={ handleOnMouseDown }
-			ref={ ref }
-			inputSize={ size }
-			value={ value }
-			type={ type }
+			disabled={disabled}
+			dragCursor={dragCursor}
+			isDragging={isDragging}
+			id={id}
+			onBlur={handleOnBlur}
+			onChange={handleOnChange}
+			onFocus={handleOnFocus}
+			onKeyDown={handleOnKeyDown}
+			onMouseDown={handleOnMouseDown}
+			ref={ref}
+			inputSize={size}
+			value={value}
+			type={type}
 		/>
 	);
 }
 
-const ForwardedComponent = forwardRef( InputField );
+const ForwardedComponent = forwardRef(InputField);
 
 export default ForwardedComponent;

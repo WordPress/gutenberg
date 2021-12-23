@@ -13,7 +13,7 @@ import { useCx } from '../utils/hooks/use-cx';
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
-export function useSurface( props ) {
+export function useSurface(props) {
 	const {
 		backgroundSize = 12,
 		borderBottom = false,
@@ -23,27 +23,27 @@ export function useSurface( props ) {
 		className,
 		variant = 'primary',
 		...otherProps
-	} = useContextSystem( props, 'Surface' );
+	} = useContextSystem(props, 'Surface');
 
 	const cx = useCx();
 
-	const classes = useMemo( () => {
+	const classes = useMemo(() => {
 		const sx = {};
 
-		sx.borders = styles.getBorders( {
+		sx.borders = styles.getBorders({
 			borderBottom,
 			borderLeft,
 			borderRight,
 			borderTop,
-		} );
+		});
 
 		return cx(
 			styles.Surface,
 			sx.borders,
 			styles.getVariant(
 				variant,
-				`${ backgroundSize }px`,
-				`${ backgroundSize - 1 }px`
+				`${backgroundSize}px`,
+				`${backgroundSize - 1}px`
 			),
 			className
 		);
@@ -55,7 +55,7 @@ export function useSurface( props ) {
 		borderTop,
 		className,
 		variant,
-	] );
+	]);
 
 	return { ...otherProps, className: classes };
 }

@@ -1,14 +1,14 @@
-module.exports = ( api ) => {
-	api.cache( true );
+module.exports = (api) => {
+	api.cache(true);
 	return {
-		presets: [ 'module:metro-react-native-babel-preset' ],
+		presets: ['module:metro-react-native-babel-preset'],
 		plugins: [
 			'@babel/plugin-proposal-async-generator-functions',
 			'@babel/plugin-transform-runtime',
 			[
 				'react-native-platform-specific-extensions',
 				{
-					extensions: [ 'css', 'scss', 'sass' ],
+					extensions: ['css', 'scss', 'sass'],
 				},
 			],
 		],
@@ -44,7 +44,7 @@ module.exports = ( api ) => {
 		],
 		env: {
 			development: {
-				plugins: [ '@babel/transform-react-jsx-source' ],
+				plugins: ['@babel/transform-react-jsx-source'],
 			},
 		},
 	};

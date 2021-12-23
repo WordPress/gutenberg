@@ -33,12 +33,12 @@ const ANCHOR_REGEX = /[\s#]/g;
  *
  * @return {Object} Filtered block settings.
  */
-export function addAttribute( settings ) {
+export function addAttribute(settings) {
 	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( has( settings.attributes, [ 'anchor', 'type' ] ) ) {
+	if (has(settings.attributes, ['anchor', 'type'])) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, 'anchor' ) ) {
+	if (hasBlockSupport(settings, 'anchor')) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -62,77 +62,74 @@ export function addAttribute( settings ) {
  *
  * @return {WPComponent} Wrapped component.
  */
-export const withInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
+export const withInspectorControl = createHigherOrderComponent((BlockEdit) => {
+	return (props) => {
+		const hasAnchor = hasBlockSupport(props.name, 'anchor');
 
-			if ( hasAnchor && props.isSelected ) {
-				const isWeb = Platform.OS === 'web';
-				const textControl = (
-					<TextControl
-						className="html-anchor-control"
-						label={ __( 'HTML anchor' ) }
-						help={
-							<>
-								{ __(
-									'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
-								) }
+		if (hasAnchor && props.isSelected) {
+			const isWeb = Platform.OS === 'web';
+			const textControl = (
+				<TextControl
+					className="html-anchor-control"
+					label={__('HTML anchor')}
+					help={
+						<>
+							{__(
+								'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+							)}
 
-								{ isWeb && (
-									<ExternalLink
-										href={ __(
-											'https://wordpress.org/support/article/page-jumps/'
-										) }
-									>
-										{ __( 'Learn more about anchors' ) }
-									</ExternalLink>
-								) }
-							</>
-						}
-						value={ props.attributes.anchor || '' }
-						placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
-						onChange={ ( nextValue ) => {
-							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-							props.setAttributes( {
-								anchor: nextValue,
-							} );
-						} }
-						autoCapitalize="none"
-						autoComplete="off"
-					/>
-				);
+							{isWeb && (
+								<ExternalLink
+									href={__(
+										'https://wordpress.org/support/article/page-jumps/'
+									)}
+								>
+									{__('Learn more about anchors')}
+								</ExternalLink>
+							)}
+						</>
+					}
+					value={props.attributes.anchor || ''}
+					placeholder={!isWeb ? __('Add an anchor') : null}
+					onChange={(nextValue) => {
+						nextValue = nextValue.replace(ANCHOR_REGEX, '-');
+						props.setAttributes({
+							anchor: nextValue,
+						});
+					}}
+					autoCapitalize="none"
+					autoComplete="off"
+				/>
+			);
 
-				return (
-					<>
-						<BlockEdit { ...props } />
-						{ isWeb && (
-							<InspectorControls __experimentalGroup="advanced">
-								{ textControl }
-							</InspectorControls>
-						) }
-						{ /*
-						 * We plan to remove scoping anchors to 'core/heading' to support
-						 * anchors for all eligble blocks. Additionally we plan to explore
-						 * leveraging InspectorAdvancedControls instead of a custom
-						 * PanelBody title. https://git.io/Jtcov
-						 */ }
-						{ ! isWeb && props.name === 'core/heading' && (
-							<InspectorControls>
-								<PanelBody title={ __( 'Heading settings' ) }>
-									{ textControl }
-								</PanelBody>
-							</InspectorControls>
-						) }
-					</>
-				);
-			}
+			return (
+				<>
+					<BlockEdit {...props} />
+					{isWeb && (
+						<InspectorControls __experimentalGroup="advanced">
+							{textControl}
+						</InspectorControls>
+					)}
+					{/*
+					 * We plan to remove scoping anchors to 'core/heading' to support
+					 * anchors for all eligble blocks. Additionally we plan to explore
+					 * leveraging InspectorAdvancedControls instead of a custom
+					 * PanelBody title. https://git.io/Jtcov
+					 */}
+					{!isWeb && props.name === 'core/heading' && (
+						<InspectorControls>
+							<PanelBody title={__('Heading settings')}>
+								{textControl}
+							</PanelBody>
+						</InspectorControls>
+					)}
+				</>
+			);
+		}
 
-			return <BlockEdit { ...props } />;
-		};
-	},
-	'withInspectorControl'
-);
+		return <BlockEdit {...props} />;
+	};
+}, 'withInspectorControl');
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -145,15 +142,15 @@ export const withInspectorControl = createHigherOrderComponent(
  *
  * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'anchor' ) ) {
+export function addSaveProps(extraProps, blockType, attributes) {
+	if (hasBlockSupport(blockType, 'anchor')) {
 		extraProps.id = attributes.anchor === '' ? null : attributes.anchor;
 	}
 
 	return extraProps;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
+addFilter('blocks.registerBlockType', 'core/anchor/attribute', addAttribute);
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/anchor/with-inspector-control',

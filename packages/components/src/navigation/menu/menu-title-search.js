@@ -19,13 +19,13 @@ import { useNavigationContext } from '../context';
 import { MenuTitleSearchUI } from '../styles/navigation-styles';
 import { SEARCH_FOCUS_DELAY } from '../constants';
 
-function MenuTitleSearch( {
+function MenuTitleSearch({
 	debouncedSpeak,
 	onCloseSearch,
 	onSearch,
 	search,
 	title,
-} ) {
+}) {
 	const {
 		navigationTree: { items },
 	} = useNavigationContext();
@@ -34,46 +34,46 @@ function MenuTitleSearch( {
 
 	// Wait for the slide-in animation to complete before autofocusing the input.
 	// This prevents scrolling to the input during the animation.
-	useEffect( () => {
-		const delayedFocus = setTimeout( () => {
+	useEffect(() => {
+		const delayedFocus = setTimeout(() => {
 			inputRef.current.focus();
-		}, SEARCH_FOCUS_DELAY );
+		}, SEARCH_FOCUS_DELAY);
 
 		return () => {
-			clearTimeout( delayedFocus );
+			clearTimeout(delayedFocus);
 		};
-	}, [] );
+	}, []);
 
-	useEffect( () => {
-		if ( ! search ) {
+	useEffect(() => {
+		if (!search) {
 			return;
 		}
 
-		const count = filter( items, '_isVisible' ).length;
+		const count = filter(items, '_isVisible').length;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
-			_n( '%d result found.', '%d results found.', count ),
+			_n('%d result found.', '%d results found.', count),
 			count
 		);
-		debouncedSpeak( resultsFoundMessage );
-	}, [ items, search ] );
+		debouncedSpeak(resultsFoundMessage);
+	}, [items, search]);
 
 	const onClose = () => {
-		onSearch( '' );
+		onSearch('');
 		onCloseSearch();
 	};
 
-	function onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+	function onKeyDown(event) {
+		if (event.keyCode === ESCAPE && !event.defaultPrevented) {
 			event.preventDefault();
 			onClose();
 		}
 	}
 
-	const inputId = `components-navigation__menu-title-search-${ menu }`;
+	const inputId = `components-navigation__menu-title-search-${menu}`;
 	const placeholder = sprintf(
 		/* translators: placeholder for menu search box. %s: menu title */
-		__( 'Search %s' ),
+		__('Search %s'),
 		title?.toLowerCase()
 	).trim();
 
@@ -82,17 +82,17 @@ function MenuTitleSearch( {
 			<MenuTitleSearchUI
 				autoComplete="off"
 				className="components-navigation__menu-search-input"
-				id={ inputId }
-				onChange={ ( value ) => onSearch( value ) }
-				onKeyDown={ onKeyDown }
-				placeholder={ placeholder }
-				onClose={ onClose }
-				ref={ inputRef }
+				id={inputId}
+				onChange={(value) => onSearch(value)}
+				onKeyDown={onKeyDown}
+				placeholder={placeholder}
+				onClose={onClose}
+				ref={inputRef}
 				type="search"
-				value={ search }
+				value={search}
 			/>
 		</div>
 	);
 }
 
-export default withSpokenMessages( MenuTitleSearch );
+export default withSpokenMessages(MenuTitleSearch);

@@ -8,12 +8,12 @@ import { shallow } from 'enzyme';
  */
 import ColorIndicator from '../';
 
-describe( 'ColorIndicator', () => {
-	it( 'matches the snapshot', () => {
+describe('ColorIndicator', () => {
+	it('matches the snapshot', () => {
 		const wrapper = shallow(
 			<ColorIndicator aria-label="sample label" colorValue="#fff" />
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
+		expect(wrapper).toMatchSnapshot();
+	});
+});

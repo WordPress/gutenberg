@@ -6,7 +6,7 @@
  *
  * @return {Object} Action object.
  */
-export function triggerGuide( tipIds ) {
+export function triggerGuide(tipIds) {
 	return {
 		type: 'TRIGGER_GUIDE',
 		tipIds,
@@ -21,7 +21,7 @@ export function triggerGuide( tipIds ) {
  *
  * @return {Object} Action object.
  */
-export function dismissTip( id ) {
+export function dismissTip(id) {
 	return {
 		type: 'DISMISS_TIP',
 		id,

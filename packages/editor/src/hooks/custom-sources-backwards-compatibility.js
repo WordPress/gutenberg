@@ -40,57 +40,58 @@ import { store as editorStore } from '../store';
  *
  * @return {WPHigherOrderComponent} Higher-order component.
  */
-const createWithMetaAttributeSource = ( metaAttributes ) =>
+const createWithMetaAttributeSource = (metaAttributes) =>
 	createHigherOrderComponent(
-		( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
-			const postType = useSelect(
-				( select ) => select( editorStore ).getCurrentPostType(),
-				[]
-			);
-			const [ meta, setMeta ] = useEntityProp(
-				'postType',
-				postType,
-				'meta'
-			);
+		(BlockEdit) =>
+			({ attributes, setAttributes, ...props }) => {
+				const postType = useSelect(
+					(select) => select(editorStore).getCurrentPostType(),
+					[]
+				);
+				const [meta, setMeta] = useEntityProp(
+					'postType',
+					postType,
+					'meta'
+				);
 
-			const mergedAttributes = useMemo(
-				() => ( {
-					...attributes,
-					...mapValues(
-						metaAttributes,
-						( metaKey ) => meta[ metaKey ]
-					),
-				} ),
-				[ attributes, meta ]
-			);
+				const mergedAttributes = useMemo(
+					() => ({
+						...attributes,
+						...mapValues(
+							metaAttributes,
+							(metaKey) => meta[metaKey]
+						),
+					}),
+					[attributes, meta]
+				);
 
-			return (
-				<BlockEdit
-					attributes={ mergedAttributes }
-					setAttributes={ ( nextAttributes ) => {
-						const nextMeta = mapKeys(
-							// Filter to intersection of keys between the updated
-							// attributes and those with an associated meta key.
-							pickBy(
-								nextAttributes,
-								( value, key ) => metaAttributes[ key ]
-							),
+				return (
+					<BlockEdit
+						attributes={mergedAttributes}
+						setAttributes={(nextAttributes) => {
+							const nextMeta = mapKeys(
+								// Filter to intersection of keys between the updated
+								// attributes and those with an associated meta key.
+								pickBy(
+									nextAttributes,
+									(value, key) => metaAttributes[key]
+								),
 
-							// Rename the keys to the expected meta key name.
-							( value, attributeKey ) =>
-								metaAttributes[ attributeKey ]
-						);
+								// Rename the keys to the expected meta key name.
+								(value, attributeKey) =>
+									metaAttributes[attributeKey]
+							);
 
-						if ( ! isEmpty( nextMeta ) ) {
-							setMeta( nextMeta );
-						}
+							if (!isEmpty(nextMeta)) {
+								setMeta(nextMeta);
+							}
 
-						setAttributes( nextAttributes );
-					} }
-					{ ...props }
-				/>
-			);
-		},
+							setAttributes(nextAttributes);
+						}}
+						{...props}
+					/>
+				);
+			},
 		'withMetaAttributeSource'
 	);
 
@@ -102,14 +103,14 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
  *
  * @return {WPBlockSettings} Filtered block settings.
  */
-function shimAttributeSource( settings ) {
+function shimAttributeSource(settings) {
 	/** @type {WPMetaAttributeMapping} */
 	const metaAttributes = mapValues(
-		pickBy( settings.attributes, { source: 'meta' } ),
+		pickBy(settings.attributes, { source: 'meta' }),
 		'meta'
 	);
-	if ( ! isEmpty( metaAttributes ) ) {
-		settings.edit = createWithMetaAttributeSource( metaAttributes )(
+	if (!isEmpty(metaAttributes)) {
+		settings.edit = createWithMetaAttributeSource(metaAttributes)(
 			settings.edit
 		);
 	}
@@ -141,7 +142,7 @@ addFilter(
 //
 // In the future, we could support updating block settings, at which point this
 // implementation could use that mechanism instead.
-globalSelect( blocksStore )
+globalSelect(blocksStore)
 	.getBlockTypes()
-	.map( ( { name } ) => globalSelect( blocksStore ).getBlockType( name ) )
-	.forEach( shimAttributeSource );
+	.map(({ name }) => globalSelect(blocksStore).getBlockType(name))
+	.forEach(shimAttributeSource);

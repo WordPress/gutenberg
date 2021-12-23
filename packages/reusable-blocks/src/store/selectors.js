@@ -5,6 +5,6 @@
  * @param {number} clientId the clientID of the block.
  * @return {boolean} Whether the reusable block is in the editing state.
  */
-export function __experimentalIsEditingReusableBlock( state, clientId ) {
-	return state.isEditingReusableBlock[ clientId ];
+export function __experimentalIsEditingReusableBlock(state, clientId) {
+	return state.isEditingReusableBlock[clientId];
 }

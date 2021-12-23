@@ -17,24 +17,24 @@ import { getPageError } from './get-page-error';
  * @param {string} adminPath String to be serialized as pathname.
  * @param {string} query     String to be serialized as query portion of URL.
  */
-export async function visitAdminPage( adminPath, query ) {
-	await page.goto( createURL( join( 'wp-admin', adminPath ), query ) );
+export async function visitAdminPage(adminPath, query) {
+	await page.goto(createURL(join('wp-admin', adminPath), query));
 
 	// Handle upgrade required screen
-	if ( isCurrentURL( 'wp-admin/upgrade.php' ) ) {
+	if (isCurrentURL('wp-admin/upgrade.php')) {
 		// Click update
-		await page.click( '.button.button-large.button-primary' );
+		await page.click('.button.button-large.button-primary');
 		// Click continue
-		await page.click( '.button.button-large' );
+		await page.click('.button.button-large');
 	}
 
-	if ( isCurrentURL( 'wp-login.php' ) ) {
+	if (isCurrentURL('wp-login.php')) {
 		await loginUser();
-		await visitAdminPage( adminPath, query );
+		await visitAdminPage(adminPath, query);
 	}
 
 	const error = await getPageError();
-	if ( error ) {
-		throw new Error( 'Unexpected error in page content: ' + error );
+	if (error) {
+		throw new Error('Unexpected error in page content: ' + error);
 	}
 }

@@ -12,19 +12,19 @@ import BlockConvertButton from './block-convert-button';
 import { store as blockEditorStore } from '../../store';
 
 export default compose(
-	withSelect( ( select, { clientId } ) => {
-		const block = select( blockEditorStore ).getBlock( clientId );
+	withSelect((select, { clientId }) => {
+		const block = select(blockEditorStore).getBlock(clientId);
 
 		return {
 			block,
 			shouldRender: block && block.name === 'core/html',
 		};
-	} ),
-	withDispatch( ( dispatch, { block } ) => ( {
+	}),
+	withDispatch((dispatch, { block }) => ({
 		onClick: () =>
-			dispatch( blockEditorStore ).replaceBlocks(
+			dispatch(blockEditorStore).replaceBlocks(
 				block.clientId,
-				rawHandler( { HTML: getBlockContent( block ) } )
+				rawHandler({ HTML: getBlockContent(block) })
 			),
-	} ) )
-)( BlockConvertButton );
+	}))
+)(BlockConvertButton);

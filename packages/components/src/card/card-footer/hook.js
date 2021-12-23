@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
  */
-export function useCardFooter( props ) {
+export function useCardFooter(props) {
 	const {
 		className,
 		justify,
@@ -21,7 +21,7 @@ export function useCardFooter( props ) {
 		isShady = false,
 		size = 'medium',
 		...otherProps
-	} = useContextSystem( props, 'CardFooter' );
+	} = useContextSystem(props, 'CardFooter');
 
 	const cx = useCx();
 
@@ -31,14 +31,14 @@ export function useCardFooter( props ) {
 				styles.Footer,
 				styles.borderRadius,
 				styles.borderColor,
-				styles.cardPaddings[ size ],
+				styles.cardPaddings[size],
 				isBorderless && styles.borderless,
 				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
 				'components-card__footer',
 				className
 			),
-		[ className, isBorderless, isShady, size ]
+		[className, isBorderless, isShady, size]
 	);
 
 	return {

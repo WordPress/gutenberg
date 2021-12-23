@@ -13,7 +13,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const HelpGetSupportButton = ( { onPress, title } ) => {
+const HelpGetSupportButton = ({ onPress, title }) => {
 	const buttonStyle = usePreferredColorSchemeStyle(
 		styles.button,
 		styles.buttonDark
@@ -26,11 +26,11 @@ const HelpGetSupportButton = ( { onPress, title } ) => {
 
 	return (
 		<Pressable
-			style={ buttonStyle }
-			onPress={ onPress }
-			accessibilityRole={ 'button' }
+			style={buttonStyle}
+			onPress={onPress}
+			accessibilityRole={'button'}
 		>
-			<Text style={ textStyle }>{ title }</Text>
+			<Text style={textStyle}>{title}</Text>
 		</Pressable>
 	);
 };

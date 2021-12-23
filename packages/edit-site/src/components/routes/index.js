@@ -17,36 +17,36 @@ const RoutesContext = createContext();
 const HistoryContext = createContext();
 
 export function useLocation() {
-	return useContext( RoutesContext );
+	return useContext(RoutesContext);
 }
 
 export function useHistory() {
-	return useContext( HistoryContext );
+	return useContext(HistoryContext);
 }
 
-function getLocationWithParams( location ) {
-	const searchParams = new URLSearchParams( location.search );
+function getLocationWithParams(location) {
+	const searchParams = new URLSearchParams(location.search);
 	return {
 		...location,
-		params: Object.fromEntries( searchParams.entries() ),
+		params: Object.fromEntries(searchParams.entries()),
 	};
 }
 
-export function Routes( { children } ) {
-	const [ location, setLocation ] = useState( () =>
-		getLocationWithParams( history.location )
+export function Routes({ children }) {
+	const [location, setLocation] = useState(() =>
+		getLocationWithParams(history.location)
 	);
 
-	useEffect( () => {
-		return history.listen( ( { location: updatedLocation } ) => {
-			setLocation( getLocationWithParams( updatedLocation ) );
-		} );
-	}, [] );
+	useEffect(() => {
+		return history.listen(({ location: updatedLocation }) => {
+			setLocation(getLocationWithParams(updatedLocation));
+		});
+	}, []);
 
 	return (
-		<HistoryContext.Provider value={ history }>
-			<RoutesContext.Provider value={ location }>
-				{ children( location ) }
+		<HistoryContext.Provider value={history}>
+			<RoutesContext.Provider value={location}>
+				{children(location)}
 			</RoutesContext.Provider>
 		</HistoryContext.Provider>
 	);

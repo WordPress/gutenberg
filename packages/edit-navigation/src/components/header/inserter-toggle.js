@@ -17,39 +17,37 @@ function InserterToggle() {
 	const { navBlockClientId } = useNavigationEditorRootBlock();
 
 	const { isInserterOpened, hasInserterItems } = useSelect(
-		( select ) => {
+		(select) => {
 			return {
-				hasInserterItems: select( blockEditorStore ).hasInserterItems(
-					navBlockClientId
-				),
-				isInserterOpened: select(
-					editNavigationStore
-				).isInserterOpened(),
+				hasInserterItems:
+					select(blockEditorStore).hasInserterItems(navBlockClientId),
+				isInserterOpened:
+					select(editNavigationStore).isInserterOpened(),
 			};
 		},
-		[ navBlockClientId ]
+		[navBlockClientId]
 	);
 
-	const { setIsInserterOpened } = useDispatch( editNavigationStore );
+	const { setIsInserterOpened } = useDispatch(editNavigationStore);
 
 	return (
 		<ToolbarItem
-			as={ Button }
+			as={Button}
 			className="edit-navigation-header-inserter-toggle"
 			variant="primary"
-			isPressed={ isInserterOpened }
-			onMouseDown={ ( event ) => {
+			isPressed={isInserterOpened}
+			onMouseDown={(event) => {
 				event.preventDefault();
-			} }
-			onClick={ () => setIsInserterOpened( ! isInserterOpened ) }
-			icon={ plus }
+			}}
+			onClick={() => setIsInserterOpened(!isInserterOpened)}
+			icon={plus}
 			/* translators: button label text should, if possible, be under 16
 					characters. */
-			label={ _x(
+			label={_x(
 				'Toggle block inserter',
 				'Generic label for block inserter button'
-			) }
-			disabled={ ! hasInserterItems }
+			)}
+			disabled={!hasInserterItems}
 		/>
 	);
 }

@@ -12,7 +12,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-export const BlockQuotation = withPreferredColorScheme( ( props ) => {
+export const BlockQuotation = withPreferredColorScheme((props) => {
 	const { getStylesFromColorScheme, style } = props;
 
 	const blockQuoteStyle = [
@@ -26,22 +26,22 @@ export const BlockQuotation = withPreferredColorScheme( ( props ) => {
 	];
 	const colorStyle = style?.color ? { color: style.color } : {};
 
-	const newChildren = Children.map( props.children, ( child ) => {
-		if ( child && child.props.identifier === 'citation' ) {
-			return cloneElement( child, {
+	const newChildren = Children.map(props.children, (child) => {
+		if (child && child.props.identifier === 'citation') {
+			return cloneElement(child, {
 				style: {
 					...styles.wpBlockQuoteCitation,
 					...colorStyle,
 				},
-			} );
+			});
 		}
-		if ( child && child.props.identifier === 'value' ) {
-			return cloneElement( child, {
-				tagsToEliminate: [ 'div' ],
+		if (child && child.props.identifier === 'value') {
+			return cloneElement(child, {
+				tagsToEliminate: ['div'],
 				style: colorStyle,
-			} );
+			});
 		}
 		return child;
-	} );
-	return <View style={ blockQuoteStyle }>{ newChildren }</View>;
-} );
+	});
+	return <View style={blockQuoteStyle}>{newChildren}</View>;
+});

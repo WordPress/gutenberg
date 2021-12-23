@@ -18,36 +18,36 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockIcon from '../block-icon';
 
-export default function ListViewListItem( {
+export default function ListViewListItem({
 	block,
 	onClick,
 	isSelected,
 	wrapperComponent: WrapperComponent,
 	children,
-} ) {
-	const blockType = getBlockType( block.name );
+}) {
+	const blockType = getBlockType(block.name);
 	const blockLabel = blockType
-		? getBlockLabel( blockType, block.attributes )
+		? getBlockLabel(blockType, block.attributes)
 		: null;
 
 	return (
 		<div className="block-editor-list-view__list-item">
 			<WrapperComponent
-				className={ classnames(
+				className={classnames(
 					'block-editor-list-view__list-item-button',
 					{
 						'is-selected': isSelected,
 					}
-				) }
-				onClick={ onClick }
+				)}
+				onClick={onClick}
 			>
-				<BlockIcon icon={ blockType?.icon } showColors />
-				{ children ? children : blockLabel }
-				{ isSelected && (
+				<BlockIcon icon={blockType?.icon} showColors />
+				{children ? children : blockLabel}
+				{isSelected && (
 					<VisuallyHidden as="span">
-						{ __( '(selected block)' ) }
+						{__('(selected block)')}
 					</VisuallyHidden>
-				) }
+				)}
 			</WrapperComponent>
 		</div>
 	);
@@ -55,5 +55,5 @@ export default function ListViewListItem( {
 
 ListViewListItem.defaultProps = {
 	onClick: () => {},
-	wrapperComponent: ( props ) => <Button { ...props } />,
+	wrapperComponent: (props) => <Button {...props} />,
 };

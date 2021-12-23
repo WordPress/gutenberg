@@ -23,14 +23,14 @@ import {
 import BlockStylesPreviewPanel from './preview-panel';
 import useStylesForBlocks from './use-styles-for-block';
 
-function BlockStylesPreviewPanelSlot( { scope } ) {
-	return <Slot name={ `BlockStylesPreviewPanel/${ scope }` } />;
+function BlockStylesPreviewPanelSlot({ scope }) {
+	return <Slot name={`BlockStylesPreviewPanel/${scope}`} />;
 }
 
-function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
+function BlockStylesPreviewPanelFill({ children, scope, ...props }) {
 	return (
-		<Fill name={ `BlockStylesPreviewPanel/${ scope }` }>
-			<div { ...props }>{ children }</div>
+		<Fill name={`BlockStylesPreviewPanel/${scope}`}>
+			<div {...props}>{children}</div>
 		</Fill>
 	);
 }
@@ -41,119 +41,119 @@ function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
 const DEFAULT_POSITION_TOP = 16;
 
 // Block Styles component for the Settings Sidebar.
-function BlockStyles( {
+function BlockStyles({
 	clientId,
 	onSwitch = noop,
 	onHoverClassName = noop,
 	scope,
-} ) {
+}) {
 	const {
 		onSelect,
 		stylesToRender,
 		activeStyle,
 		genericPreviewBlock,
 		className: previewClassName,
-	} = useStylesForBlocks( {
+	} = useStylesForBlocks({
 		clientId,
 		onSwitch,
-	} );
-	const [ hoveredStyle, setHoveredStyle ] = useState( null );
-	const [ containerScrollTop, setContainerScrollTop ] = useState( 0 );
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	});
+	const [hoveredStyle, setHoveredStyle] = useState(null);
+	const [containerScrollTop, setContainerScrollTop] = useState(0);
+	const isMobileViewport = useViewportMatch('medium', '<');
 
-	useLayoutEffect( () => {
+	useLayoutEffect(() => {
 		const scrollContainer = document.querySelector(
 			'.interface-interface-skeleton__content'
 		);
 		const scrollTop = scrollContainer?.scrollTop || 0;
-		setContainerScrollTop( scrollTop + DEFAULT_POSITION_TOP );
-	}, [ hoveredStyle ] );
+		setContainerScrollTop(scrollTop + DEFAULT_POSITION_TOP);
+	}, [hoveredStyle]);
 
-	if ( ! stylesToRender || stylesToRender.length === 0 ) {
+	if (!stylesToRender || stylesToRender.length === 0) {
 		return null;
 	}
 
-	const debouncedSetHoveredStyle = debounce( setHoveredStyle, 250 );
+	const debouncedSetHoveredStyle = debounce(setHoveredStyle, 250);
 
-	const onSelectStylePreview = ( style ) => {
-		onSelect( style );
-		onHoverClassName( null );
-		setHoveredStyle( null );
+	const onSelectStylePreview = (style) => {
+		onSelect(style);
+		onHoverClassName(null);
+		setHoveredStyle(null);
 		debouncedSetHoveredStyle.cancel();
 	};
 
-	const styleItemHandler = ( item ) => {
-		if ( hoveredStyle === item ) {
+	const styleItemHandler = (item) => {
+		if (hoveredStyle === item) {
 			debouncedSetHoveredStyle.cancel();
 			return;
 		}
-		debouncedSetHoveredStyle( item );
-		onHoverClassName( item?.name ?? null );
+		debouncedSetHoveredStyle(item);
+		onHoverClassName(item?.name ?? null);
 	};
 
 	return (
 		<div className="block-editor-block-styles">
 			<div className="block-editor-block-styles__variants">
-				{ stylesToRender.map( ( style ) => {
+				{stylesToRender.map((style) => {
 					const buttonText = style.label || style.name;
 
 					return (
 						<Button
-							className={ classnames(
+							className={classnames(
 								'block-editor-block-styles__item',
 								{
 									'is-active':
 										activeStyle.name === style.name,
 								}
-							) }
-							key={ style.name }
+							)}
+							key={style.name}
 							variant="secondary"
-							label={ buttonText }
-							onMouseEnter={ () => styleItemHandler( style ) }
-							onFocus={ () => styleItemHandler( style ) }
-							onMouseLeave={ () => styleItemHandler( null ) }
-							onBlur={ () => styleItemHandler( null ) }
-							onKeyDown={ ( event ) => {
+							label={buttonText}
+							onMouseEnter={() => styleItemHandler(style)}
+							onFocus={() => styleItemHandler(style)}
+							onMouseLeave={() => styleItemHandler(null)}
+							onBlur={() => styleItemHandler(null)}
+							onKeyDown={(event) => {
 								if (
 									ENTER === event.keyCode ||
 									SPACE === event.keyCode
 								) {
 									event.preventDefault();
-									onSelectStylePreview( style );
+									onSelectStylePreview(style);
 								}
-							} }
-							onClick={ () => onSelectStylePreview( style ) }
+							}}
+							onClick={() => onSelectStylePreview(style)}
 							role="button"
 							tabIndex="0"
 						>
 							<Text
 								as="span"
-								limit={ 12 }
+								limit={12}
 								ellipsizeMode="tail"
 								className="block-editor-block-styles__item-text"
 								truncate
 							>
-								{ buttonText }
+								{buttonText}
 							</Text>
 						</Button>
 					);
-				} ) }
+				})}
 			</div>
-			{ hoveredStyle && ! isMobileViewport && (
+			{hoveredStyle && !isMobileViewport && (
 				<BlockStylesPreviewPanelFill
-					scope={ scope }
+					scope={scope}
 					className="block-editor-block-styles__preview-panel"
-					style={ { top: containerScrollTop } }
-					onMouseLeave={ () => styleItemHandler( null ) }
+					style={{ top: containerScrollTop }}
+					onMouseLeave={() => styleItemHandler(null)}
 				>
 					<BlockStylesPreviewPanel
-						activeStyle={ activeStyle }
-						className={ previewClassName }
-						genericPreviewBlock={ genericPreviewBlock }
-						style={ hoveredStyle }
+						activeStyle={activeStyle}
+						className={previewClassName}
+						genericPreviewBlock={genericPreviewBlock}
+						style={hoveredStyle}
 					/>
 				</BlockStylesPreviewPanelFill>
-			) }
+			)}
 		</div>
 	);
 }

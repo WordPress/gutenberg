@@ -32,9 +32,9 @@ const whiteSpace = 'pre-wrap';
 const minWidth = '1px';
 
 export function useDefaultStyle() {
-	return useCallback( ( element ) => {
-		if ( ! element ) return;
+	return useCallback((element) => {
+		if (!element) return;
 		element.style.whiteSpace = whiteSpace;
 		element.style.minWidth = minWidth;
-	}, [] );
+	}, []);
 }

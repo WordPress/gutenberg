@@ -10,10 +10,10 @@ import { createURL } from './create-url';
  * @param {?string} query  String to be serialized as query portion of URL.
  * @return {boolean} Boolean represents whether current URL is or not a WordPress path.
  */
-export function isCurrentURL( WPPath, query = '' ) {
-	const currentURL = new URL( page.url() );
+export function isCurrentURL(WPPath, query = '') {
+	const currentURL = new URL(page.url());
 
 	currentURL.search = query;
 
-	return createURL( WPPath, query ) === currentURL.href;
+	return createURL(WPPath, query) === currentURL.href;
 }

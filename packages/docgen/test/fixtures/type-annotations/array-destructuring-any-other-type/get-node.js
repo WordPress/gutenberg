@@ -1,4 +1,4 @@
-module.exports = () => ( {
+module.exports = () => ({
 	type: 'FunctionDeclaration',
 	start: 74,
 	end: 144,
@@ -15,8 +15,7 @@ module.exports = () => ( {
 	leadingComments: [
 		{
 			type: 'CommentBlock',
-			value:
-				'*\n * @param param0\n * @param param0.0\n * @param param0.1\n * @return\n ',
+			value: '*\n * @param param0\n * @param param0.0\n * @param param0.1\n * @return\n ',
 			start: 0,
 			end: 73,
 			loc: {
@@ -360,4 +359,4 @@ module.exports = () => ( {
 		],
 		directives: [],
 	},
-} );
+});

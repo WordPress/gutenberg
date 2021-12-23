@@ -7,16 +7,16 @@ import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { button } from '@wordpress/icons';
 
 const name = 'core/keyboard';
-const title = __( 'Keyboard input' );
+const title = __('Keyboard input');
 
 export const keyboard = {
 	name,
 	title,
 	tagName: 'kbd',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit({ isActive, value, onChange, onFocus }) {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name, title } ) );
+			onChange(toggleFormat(value, { type: name, title }));
 		}
 
 		function onClick() {
@@ -26,10 +26,10 @@ export const keyboard = {
 
 		return (
 			<RichTextToolbarButton
-				icon={ button }
-				title={ title }
-				onClick={ onClick }
-				isActive={ isActive }
+				icon={button}
+				title={title}
+				onClick={onClick}
+				isActive={isActive}
 				role="menuitemcheckbox"
 			/>
 		);

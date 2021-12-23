@@ -15,8 +15,8 @@ import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import type { ToolsPanelProps } from '../types';
 
 const ToolsPanel = (
-	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<ToolsPanelProps, 'div'>,
+	forwardedRef: Ref<any>
 ) => {
 	const {
 		children,
@@ -25,22 +25,22 @@ const ToolsPanel = (
 		resetAllItems,
 		toggleItem,
 		...toolsPanelProps
-	} = useToolsPanel( props );
+	} = useToolsPanel(props);
 
 	return (
-		<Grid { ...toolsPanelProps } columns={ 2 } ref={ forwardedRef }>
-			<ToolsPanelContext.Provider value={ panelContext }>
+		<Grid {...toolsPanelProps} columns={2} ref={forwardedRef}>
+			<ToolsPanelContext.Provider value={panelContext}>
 				<ToolsPanelHeader
-					label={ label }
-					resetAll={ resetAllItems }
-					toggleItem={ toggleItem }
+					label={label}
+					resetAll={resetAllItems}
+					toggleItem={toggleItem}
 				/>
-				{ children }
+				{children}
 			</ToolsPanelContext.Provider>
 		</Grid>
 	);
 };
 
-const ConnectedToolsPanel = contextConnect( ToolsPanel, 'ToolsPanel' );
+const ConnectedToolsPanel = contextConnect(ToolsPanel, 'ToolsPanel');
 
 export default ConnectedToolsPanel;

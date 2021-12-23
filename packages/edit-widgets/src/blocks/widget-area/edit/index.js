@@ -19,69 +19,68 @@ import useIsDraggingWithin from './use-is-dragging-within';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
-export default function WidgetAreaEdit( {
+export default function WidgetAreaEdit({
 	clientId,
 	className,
 	attributes: { id, name },
-} ) {
+}) {
 	const isOpen = useSelect(
-		( select ) =>
-			select( editWidgetsStore ).getIsWidgetAreaOpen( clientId ),
-		[ clientId ]
+		(select) => select(editWidgetsStore).getIsWidgetAreaOpen(clientId),
+		[clientId]
 	);
-	const { setIsWidgetAreaOpen } = useDispatch( editWidgetsStore );
+	const { setIsWidgetAreaOpen } = useDispatch(editWidgetsStore);
 
 	const wrapper = useRef();
 	const setOpen = useCallback(
-		( openState ) => setIsWidgetAreaOpen( clientId, openState ),
-		[ clientId ]
+		(openState) => setIsWidgetAreaOpen(clientId, openState),
+		[clientId]
 	);
-	const isDragging = useIsDragging( wrapper );
-	const isDraggingWithin = useIsDraggingWithin( wrapper );
+	const isDragging = useIsDragging(wrapper);
+	const isDraggingWithin = useIsDraggingWithin(wrapper);
 
-	const [ openedWhileDragging, setOpenedWhileDragging ] = useState( false );
-	useEffect( () => {
-		if ( ! isDragging ) {
-			setOpenedWhileDragging( false );
+	const [openedWhileDragging, setOpenedWhileDragging] = useState(false);
+	useEffect(() => {
+		if (!isDragging) {
+			setOpenedWhileDragging(false);
 			return;
 		}
 
-		if ( isDraggingWithin && ! isOpen ) {
-			setOpen( true );
-			setOpenedWhileDragging( true );
-		} else if ( ! isDraggingWithin && isOpen && openedWhileDragging ) {
-			setOpen( false );
+		if (isDraggingWithin && !isOpen) {
+			setOpen(true);
+			setOpenedWhileDragging(true);
+		} else if (!isDraggingWithin && isOpen && openedWhileDragging) {
+			setOpen(false);
 		}
-	}, [ isOpen, isDragging, isDraggingWithin, openedWhileDragging ] );
+	}, [isOpen, isDragging, isDraggingWithin, openedWhileDragging]);
 
 	return (
-		<Panel className={ className } ref={ wrapper }>
+		<Panel className={className} ref={wrapper}>
 			<PanelBody
-				title={ name }
-				opened={ isOpen }
-				onToggle={ () => {
-					setIsWidgetAreaOpen( clientId, ! isOpen );
-				} }
-				scrollAfterOpen={ ! isDragging }
+				title={name}
+				opened={isOpen}
+				onToggle={() => {
+					setIsWidgetAreaOpen(clientId, !isOpen);
+				}}
+				scrollAfterOpen={!isDragging}
 			>
-				{ ( { opened } ) => (
+				{({ opened }) => (
 					// This is required to ensure LegacyWidget blocks are not
 					// unmounted when the panel is collapsed. Unmounting legacy
 					// widgets may have unintended consequences (e.g.  TinyMCE
 					// not being properly reinitialized)
 					<DisclosureContent
 						className="wp-block-widget-area__panel-body-content"
-						visible={ opened }
+						visible={opened}
 					>
 						<EntityProvider
 							kind="root"
 							type="postType"
-							id={ `widget-area-${ id }` }
+							id={`widget-area-${id}`}
 						>
-							<WidgetAreaInnerBlocks id={ id } />
+							<WidgetAreaInnerBlocks id={id} />
 						</EntityProvider>
 					</DisclosureContent>
-				) }
+				)}
 			</PanelBody>
 		</Panel>
 	);
@@ -94,28 +93,28 @@ export default function WidgetAreaEdit( {
  *
  * @return {boolean} Is dragging within the entire document.
  */
-const useIsDragging = ( elementRef ) => {
-	const [ isDragging, setIsDragging ] = useState( false );
+const useIsDragging = (elementRef) => {
+	const [isDragging, setIsDragging] = useState(false);
 
-	useEffect( () => {
+	useEffect(() => {
 		const { ownerDocument } = elementRef.current;
 
 		function handleDragStart() {
-			setIsDragging( true );
+			setIsDragging(true);
 		}
 
 		function handleDragEnd() {
-			setIsDragging( false );
+			setIsDragging(false);
 		}
 
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
+		ownerDocument.addEventListener('dragstart', handleDragStart);
+		ownerDocument.addEventListener('dragend', handleDragEnd);
 
 		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
+			ownerDocument.removeEventListener('dragstart', handleDragStart);
+			ownerDocument.removeEventListener('dragend', handleDragEnd);
 		};
-	}, [] );
+	}, []);
 
 	return isDragging;
 };

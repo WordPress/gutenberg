@@ -7,72 +7,71 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-export function TemplatePartAdvancedControls( {
+export function TemplatePartAdvancedControls({
 	tagName,
 	setAttributes,
 	isEntityAvailable,
 	templatePartId,
 	defaultWrapper,
-} ) {
-	const [ area, setArea ] = useEntityProp(
+}) {
+	const [area, setArea] = useEntityProp(
 		'postType',
 		'wp_template_part',
 		'area',
 		templatePartId
 	);
 
-	const [ title, setTitle ] = useEntityProp(
+	const [title, setTitle] = useEntityProp(
 		'postType',
 		'wp_template_part',
 		'title',
 		templatePartId
 	);
 
-	const { areaOptions } = useSelect( ( select ) => {
+	const { areaOptions } = useSelect((select) => {
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const definedAreas = select(
-			'core/editor'
-		).__experimentalGetDefaultTemplatePartAreas();
+		const definedAreas =
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			select('core/editor').__experimentalGetDefaultTemplatePartAreas();
 		return {
-			areaOptions: definedAreas.map( ( { label, area: _area } ) => ( {
+			areaOptions: definedAreas.map(({ label, area: _area }) => ({
 				label,
 				value: _area,
-			} ) ),
+			})),
 		};
-	}, [] );
+	}, []);
 
 	return (
 		<InspectorControls __experimentalGroup="advanced">
-			{ isEntityAvailable && (
+			{isEntityAvailable && (
 				<>
 					<TextControl
-						label={ __( 'Title' ) }
-						value={ title }
-						onChange={ ( value ) => {
-							setTitle( value );
-						} }
-						onFocus={ ( event ) => event.target.select() }
+						label={__('Title')}
+						value={title}
+						onChange={(value) => {
+							setTitle(value);
+						}}
+						onFocus={(event) => event.target.select()}
 					/>
 
 					<SelectControl
-						label={ __( 'Area' ) }
+						label={__('Area')}
 						labelPosition="top"
-						options={ areaOptions }
-						value={ area }
-						onChange={ setArea }
+						options={areaOptions}
+						value={area}
+						onChange={setArea}
 					/>
 				</>
-			) }
+			)}
 			<SelectControl
-				label={ __( 'HTML element' ) }
-				options={ [
+				label={__('HTML element')}
+				options={[
 					{
 						label: sprintf(
 							/* translators: %s: HTML tag based on area. */
-							__( 'Default based on area (%s)' ),
-							`<${ defaultWrapper }>`
+							__('Default based on area (%s)'),
+							`<${defaultWrapper}>`
 						),
 						value: '',
 					},
@@ -83,9 +82,9 @@ export function TemplatePartAdvancedControls( {
 					{ label: '<aside>', value: 'aside' },
 					{ label: '<footer>', value: 'footer' },
 					{ label: '<div>', value: 'div' },
-				] }
-				value={ tagName || '' }
-				onChange={ ( value ) => setAttributes( { tagName: value } ) }
+				]}
+				value={tagName || ''}
+				onChange={(value) => setAttributes({ tagName: value })}
 			/>
 		</InspectorControls>
 	);

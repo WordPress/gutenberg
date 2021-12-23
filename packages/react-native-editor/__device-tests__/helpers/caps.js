@@ -7,7 +7,7 @@ const ios = {
 	appiumVersion: '1.20.1', // Sauce Labs requires appiumVersion to be specified.
 	app: undefined, // will be set later, locally this is relative to root of project
 	processArguments: {
-		args: [ 'uitesting' ],
+		args: ['uitesting'],
 	},
 };
 

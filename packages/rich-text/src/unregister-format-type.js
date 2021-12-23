@@ -19,15 +19,15 @@ import { store as richTextStore } from './store';
  *                                        been successfully unregistered;
  *                                        otherwise `undefined`.
  */
-export function unregisterFormatType( name ) {
-	const oldFormat = select( richTextStore ).getFormatType( name );
+export function unregisterFormatType(name) {
+	const oldFormat = select(richTextStore).getFormatType(name);
 
-	if ( ! oldFormat ) {
-		window.console.error( `Format ${ name } is not registered.` );
+	if (!oldFormat) {
+		window.console.error(`Format ${name} is not registered.`);
 		return;
 	}
 
-	dispatch( richTextStore ).removeFormatTypes( name );
+	dispatch(richTextStore).removeFormatTypes(name);
 
 	return oldFormat;
 }

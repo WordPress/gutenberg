@@ -30,15 +30,15 @@ const blockAttributes = {
 const deprecated = [
 	{
 		attributes: blockAttributes,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { align, value, citation } = attributes;
 
 			return (
-				<blockquote style={ { textAlign: align ? align : null } }>
-					<RichText.Content multiline value={ value } />
-					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="cite" value={ citation } />
-					) }
+				<blockquote style={{ textAlign: align ? align : null }}>
+					<RichText.Content multiline value={value} />
+					{!RichText.isEmpty(citation) && (
+						<RichText.Content tagName="cite" value={citation} />
+					)}
 				</blockquote>
 			);
 		},
@@ -52,10 +52,10 @@ const deprecated = [
 			},
 		},
 
-		migrate( attributes ) {
-			if ( attributes.style === 2 ) {
+		migrate(attributes) {
+			if (attributes.style === 2) {
 				return {
-					...omit( attributes, [ 'style' ] ),
+					...omit(attributes, ['style']),
 					className: attributes.className
 						? attributes.className + ' is-style-large'
 						: 'is-style-large',
@@ -65,18 +65,18 @@ const deprecated = [
 			return attributes;
 		},
 
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { align, value, citation, style } = attributes;
 
 			return (
 				<blockquote
-					className={ style === 2 ? 'is-large' : '' }
-					style={ { textAlign: align ? align : null } }
+					className={style === 2 ? 'is-large' : ''}
+					style={{ textAlign: align ? align : null }}
 				>
-					<RichText.Content multiline value={ value } />
-					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="cite" value={ citation } />
-					) }
+					<RichText.Content multiline value={value} />
+					{!RichText.isEmpty(citation) && (
+						<RichText.Content tagName="cite" value={citation} />
+					)}
 				</blockquote>
 			);
 		},
@@ -96,28 +96,28 @@ const deprecated = [
 			},
 		},
 
-		migrate( attributes ) {
-			if ( ! isNaN( parseInt( attributes.style ) ) ) {
+		migrate(attributes) {
+			if (!isNaN(parseInt(attributes.style))) {
 				return {
-					...omit( attributes, [ 'style' ] ),
+					...omit(attributes, ['style']),
 				};
 			}
 
 			return attributes;
 		},
 
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { align, value, citation, style } = attributes;
 
 			return (
 				<blockquote
-					className={ `blocks-quote-style-${ style }` }
-					style={ { textAlign: align ? align : null } }
+					className={`blocks-quote-style-${style}`}
+					style={{ textAlign: align ? align : null }}
 				>
-					<RichText.Content multiline value={ value } />
-					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="footer" value={ citation } />
-					) }
+					<RichText.Content multiline value={value} />
+					{!RichText.isEmpty(citation) && (
+						<RichText.Content tagName="footer" value={citation} />
+					)}
 				</blockquote>
 			);
 		},

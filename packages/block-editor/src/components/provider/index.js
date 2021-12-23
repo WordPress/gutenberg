@@ -14,18 +14,18 @@ import { BlockRefsProvider } from './block-refs-provider';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
-function BlockEditorProvider( props ) {
+function BlockEditorProvider(props) {
 	const { children, settings } = props;
 
-	const { updateSettings } = useDispatch( blockEditorStore );
-	useEffect( () => {
-		updateSettings( settings );
-	}, [ settings ] );
+	const { updateSettings } = useDispatch(blockEditorStore);
+	useEffect(() => {
+		updateSettings(settings);
+	}, [settings]);
 
 	// Syncs the entity provider with changes in the block-editor store.
-	useBlockSync( props );
+	useBlockSync(props);
 
-	return <BlockRefsProvider>{ children }</BlockRefsProvider>;
+	return <BlockRefsProvider>{children}</BlockRefsProvider>;
 }
 
-export default withRegistryProvider( BlockEditorProvider );
+export default withRegistryProvider(BlockEditorProvider);

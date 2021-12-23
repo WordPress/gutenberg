@@ -22,86 +22,85 @@ import { useSelect } from '@wordpress/data';
 import InnerBlocks from './inner-blocks';
 import PlaceholderPreview from '../navigation/edit/placeholder/placeholder-preview';
 
-function NavigationAreaBlock( { attributes, setAttributes } ) {
+function NavigationAreaBlock({ attributes, setAttributes }) {
 	const { area } = attributes;
 
 	const { navigationAreas, hasResolvedNavigationAreas } = useSelect(
-		( select ) => {
-			const { getEntityRecords, hasFinishedResolution } = select(
-				coreStore
-			);
+		(select) => {
+			const { getEntityRecords, hasFinishedResolution } =
+				select(coreStore);
 			return {
-				navigationAreas: getEntityRecords( 'root', 'navigationArea' ),
+				navigationAreas: getEntityRecords('root', 'navigationArea'),
 				hasResolvedNavigationAreas: hasFinishedResolution(
 					'getEntityRecords',
-					[ 'root', 'navigationArea' ]
+					['root', 'navigationArea']
 				),
 			};
 		}
 	);
 	const navigationMenuId = navigationAreas?.length
-		? navigationAreas[ area ]
+		? navigationAreas[area]
 		: undefined;
 
 	const choices = useMemo(
 		() =>
-			navigationAreas?.map( ( { name, description } ) => ( {
+			navigationAreas?.map(({ name, description }) => ({
 				label: description,
 				value: name,
-			} ) ),
-		[ navigationAreas ]
+			})),
+		[navigationAreas]
 	);
 
-	deprecated( 'wp.blockLibrary.NavigationArea', {
+	deprecated('wp.blockLibrary.NavigationArea', {
 		since: '12.0',
 		plugin: 'gutenberg',
-	} );
+	});
 
 	return (
 		<>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarDropdownMenu
-						label={ __( 'Select Area' ) }
-						text={ __( 'Select Area' ) }
-						icon={ null }
+						label={__('Select Area')}
+						text={__('Select Area')}
+						icon={null}
 					>
-						{ ( { onClose } ) => (
+						{({ onClose }) => (
 							<MenuGroup>
 								<MenuItemsChoice
-									value={ area }
-									onSelect={ ( selectedArea ) => {
-										setAttributes( { area: selectedArea } );
+									value={area}
+									onSelect={(selectedArea) => {
+										setAttributes({ area: selectedArea });
 										onClose();
-									} }
-									choices={ choices }
+									}}
+									choices={choices}
 								/>
 							</MenuGroup>
-						) }
+						)}
 					</ToolbarDropdownMenu>
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Options' ) }>
+				<PanelBody title={__('Options')}>
 					<SelectControl
-						label={ _x( 'Area' ) }
-						value={ area }
+						label={_x('Area')}
+						value={area}
 						// `undefined` is required for the preload attribute to be unset.
-						onChange={ ( value ) =>
-							setAttributes( {
+						onChange={(value) =>
+							setAttributes({
 								area: value,
-							} )
+							})
 						}
-						options={ choices }
+						options={choices}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ ! hasResolvedNavigationAreas && <PlaceholderPreview isLoading /> }
+			{!hasResolvedNavigationAreas && <PlaceholderPreview isLoading />}
 			{
 				// Render inner blocks only when navigationMenuId is known so
 				// that inner blocks template is correct from the start.
 				hasResolvedNavigationAreas && (
-					<InnerBlocks navigationMenuId={ navigationMenuId } />
+					<InnerBlocks navigationMenuId={navigationMenuId} />
 				)
 			}
 		</>

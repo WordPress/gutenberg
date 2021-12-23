@@ -29,30 +29,30 @@ import { useState, useCallback } from '@wordpress/element';
  *
  */
 const useResizeObserver = () => {
-	const [ measurements, setMeasurements ] = useState( null );
+	const [measurements, setMeasurements] = useState(null);
 
-	const onLayout = useCallback( ( { nativeEvent } ) => {
+	const onLayout = useCallback(({ nativeEvent }) => {
 		const { width, height } = nativeEvent.layout;
-		setMeasurements( ( prevState ) => {
+		setMeasurements((prevState) => {
 			if (
-				! prevState ||
+				!prevState ||
 				prevState.width !== width ||
 				prevState.height !== height
 			) {
 				return {
-					width: Math.floor( width ),
-					height: Math.floor( height ),
+					width: Math.floor(width),
+					height: Math.floor(height),
 				};
 			}
 			return prevState;
-		} );
-	}, [] );
+		});
+	}, []);
 
 	const observer = (
-		<View style={ StyleSheet.absoluteFill } onLayout={ onLayout } />
+		<View style={StyleSheet.absoluteFill} onLayout={onLayout} />
 	);
 
-	return [ observer, measurements ];
+	return [observer, measurements];
 };
 
 export default useResizeObserver;

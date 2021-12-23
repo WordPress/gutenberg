@@ -59,10 +59,13 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
-		BlockListBlockContext
-	);
+export function useBlockProps(props = {}, { __unstableIsHtml } = {}) {
+	const {
+		clientId,
+		className,
+		wrapperProps = {},
+		isAligned,
+	} = useContext(BlockListBlockContext);
 	const {
 		index,
 		mode,
@@ -73,7 +76,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		adjustScrolling,
 		enableAnimation,
 	} = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getBlockIndex,
 				getBlockMode,
@@ -84,59 +87,59 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected,
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
-			} = select( blockEditorStore );
-			const isSelected = isBlockSelected( clientId );
+			} = select(blockEditorStore);
+			const isSelected = isBlockSelected(clientId);
 			const isPartOfMultiSelection =
-				isBlockMultiSelected( clientId ) ||
-				isAncestorMultiSelected( clientId );
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
+				isBlockMultiSelected(clientId) ||
+				isAncestorMultiSelected(clientId);
+			const blockName = getBlockName(clientId);
+			const blockType = getBlockType(blockName);
 
 			return {
-				index: getBlockIndex( clientId ),
-				mode: getBlockMode( clientId ),
+				index: getBlockIndex(clientId),
+				mode: getBlockMode(clientId),
 				name: blockName,
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: blockType?.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
-					isSelected || isFirstMultiSelectedBlock( clientId ),
+					isSelected || isFirstMultiSelectedBlock(clientId),
 				enableAnimation:
-					! isTyping() &&
+					!isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
-	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
-	const mergedRefs = useMergeRefs( [
+	const blockLabel = sprintf(__('Block: %s'), blockTitle);
+	const htmlSuffix = mode === 'html' && !__unstableIsHtml ? '-visual' : '';
+	const mergedRefs = useMergeRefs([
 		props.ref,
-		useFocusFirstElement( clientId ),
+		useFocusFirstElement(clientId),
 		// Must happen after focus because we check for focus in the block.
-		useScrollIntoView( clientId ),
-		useBlockRefProvider( clientId ),
-		useFocusHandler( clientId ),
-		useMultiSelection( clientId ),
-		useEventHandlers( clientId ),
-		useNavModeExit( clientId ),
+		useScrollIntoView(clientId),
+		useBlockRefProvider(clientId),
+		useFocusHandler(clientId),
+		useMultiSelection(clientId),
+		useEventHandlers(clientId),
+		useNavModeExit(clientId),
 		useIsHovered(),
 		useIntersectionObserver(),
-		useMovingAnimation( {
+		useMovingAnimation({
 			isSelected: isPartOfSelection,
 			adjustScrolling,
 			enableAnimation,
 			triggerAnimationOnChange: index,
-		} ),
-	] );
+		}),
+	]);
 
 	const blockEditContext = useBlockEditContext();
 	// Ensures it warns only inside the `edit` implementation for the block.
-	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
+	if (blockApiVersion < 2 && clientId === blockEditContext.clientId) {
 		warning(
-			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
+			`Block type "${name}" must support API version 2 or higher to work correctly with "useBlockProps" method.`
 		);
 	}
 
@@ -144,7 +147,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
-		id: `block-${ clientId }${ htmlSuffix }`,
+		id: `block-${clientId}${htmlSuffix}`,
 		tabIndex: 0,
 		role: 'document',
 		'aria-label': blockLabel,
@@ -153,16 +156,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-title': blockTitle,
 		className: classnames(
 			// The wp-block className is important for editor styles.
-			classnames( 'block-editor-block-list__block', {
-				'wp-block': ! isAligned,
-			} ),
+			classnames('block-editor-block-list__block', {
+				'wp-block': !isAligned,
+			}),
 			className,
 			props.className,
 			wrapperProps.className,
-			useBlockClassNames( clientId ),
-			useBlockDefaultClassName( clientId ),
-			useBlockCustomClassName( clientId ),
-			useBlockMovingModeClassNames( clientId )
+			useBlockClassNames(clientId),
+			useBlockDefaultClassName(clientId),
+			useBlockCustomClassName(clientId),
+			useBlockMovingModeClassNames(clientId)
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

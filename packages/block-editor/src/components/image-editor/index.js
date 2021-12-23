@@ -13,31 +13,31 @@ import AspectRatioDropdown from './aspect-ratio-dropdown';
 import RotationButton from './rotation-button';
 import FormControls from './form-controls';
 
-export default function ImageEditor( {
+export default function ImageEditor({
 	url,
 	width,
 	height,
 	clientWidth,
 	naturalHeight,
 	naturalWidth,
-} ) {
+}) {
 	return (
 		<>
 			<Cropper
-				url={ url }
-				width={ width }
-				height={ height }
-				clientWidth={ clientWidth }
-				naturalHeight={ naturalHeight }
-				naturalWidth={ naturalWidth }
+				url={url}
+				width={width}
+				height={height}
+				clientWidth={clientWidth}
+				naturalHeight={naturalHeight}
+				naturalWidth={naturalWidth}
 			/>
 			<BlockControls>
 				<ToolbarGroup>
 					<ZoomDropdown />
 					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<AspectRatioDropdown toggleProps={ toggleProps } />
-						) }
+						{(toggleProps) => (
+							<AspectRatioDropdown toggleProps={toggleProps} />
+						)}
 					</ToolbarItem>
 					<RotationButton />
 				</ToolbarGroup>

@@ -10,12 +10,12 @@ import usePreferredColorScheme from '../../hooks/use-preferred-color-scheme';
 import { useCallback } from '@wordpress/element';
 
 const withPreferredColorScheme = createHigherOrderComponent(
-	( WrappedComponent ) => ( props ) => {
+	(WrappedComponent) => (props) => {
 		const colorScheme = usePreferredColorScheme();
 		const isDarkMode = colorScheme === 'dark';
 
 		const getStyles = useCallback(
-			( lightStyles, darkStyles ) => {
+			(lightStyles, darkStyles) => {
 				const finalDarkStyles = {
 					...lightStyles,
 					...darkStyles,
@@ -23,14 +23,14 @@ const withPreferredColorScheme = createHigherOrderComponent(
 
 				return isDarkMode ? finalDarkStyles : lightStyles;
 			},
-			[ isDarkMode ]
+			[isDarkMode]
 		);
 
 		return (
 			<WrappedComponent
-				preferredColorScheme={ colorScheme }
-				getStylesFromColorScheme={ getStyles }
-				{ ...props }
+				preferredColorScheme={colorScheme}
+				getStylesFromColorScheme={getStyles}
+				{...props}
 			/>
 		);
 	},

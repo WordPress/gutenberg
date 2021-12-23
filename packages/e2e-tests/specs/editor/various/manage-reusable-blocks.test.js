@@ -8,7 +8,7 @@ import path from 'path';
  */
 import { visitAdminPage } from '@wordpress/e2e-test-utils';
 
-describe( 'Managing reusable blocks', () => {
+describe('Managing reusable blocks', () => {
 	/**
 	 * Returns a Promise which resolves to the number of post list entries on
 	 * the current page.
@@ -16,20 +16,18 @@ describe( 'Managing reusable blocks', () => {
 	 * @return {Promise} Promise resolving to number of post list entries.
 	 */
 	async function getNumberOfEntries() {
-		return page.evaluate(
-			() => document.querySelectorAll( '.hentry' ).length
-		);
+		return page.evaluate(() => document.querySelectorAll('.hentry').length);
 	}
 
-	beforeAll( async () => {
-		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
-	} );
+	beforeAll(async () => {
+		await visitAdminPage('edit.php', 'post_type=wp_block');
+	});
 
-	it( 'Should import reusable blocks', async () => {
+	it('Should import reusable blocks', async () => {
 		const originalEntries = await getNumberOfEntries();
 
 		// Import Reusable block
-		await page.waitForSelector( '.list-reusable-blocks__container' );
+		await page.waitForSelector('.list-reusable-blocks__container');
 		const importButton = await page.$(
 			'.list-reusable-blocks__container button'
 		);
@@ -44,8 +42,8 @@ describe( 'Managing reusable blocks', () => {
 			'assets',
 			'greeting-reusable-block.json'
 		);
-		const input = await page.$( '.list-reusable-blocks-import-form input' );
-		await input.uploadFile( testReusableBlockFile );
+		const input = await page.$('.list-reusable-blocks-import-form input');
+		await input.uploadFile(testReusableBlockFile);
 
 		// Submit the form
 		const button = await page.$(
@@ -54,21 +52,19 @@ describe( 'Managing reusable blocks', () => {
 		await button.click();
 
 		// Wait for the success notice
-		await page.waitForSelector( '.notice-success' );
+		await page.waitForSelector('.notice-success');
 		const noticeContent = await page.$eval(
 			'.notice-success',
-			( element ) => element.textContent
+			(element) => element.textContent
 		);
-		expect( noticeContent ).toEqual(
-			'Reusable block imported successfully!'
-		);
+		expect(noticeContent).toEqual('Reusable block imported successfully!');
 
 		// Refresh the page
-		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
+		await visitAdminPage('edit.php', 'post_type=wp_block');
 
 		const expectedEntries = originalEntries + 1;
 		const actualEntries = await getNumberOfEntries();
 
-		expect( actualEntries ).toBe( expectedEntries );
-	} );
-} );
+		expect(actualEntries).toBe(expectedEntries);
+	});
+});

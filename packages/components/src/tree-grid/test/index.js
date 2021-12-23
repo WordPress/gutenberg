@@ -8,8 +8,8 @@ import TestRenderer from 'react-test-renderer';
  */
 import TreeGrid from '../';
 
-describe( 'TreeGrid', () => {
-	it( 'renders a table, tbody and any child elements', () => {
+describe('TreeGrid', () => {
+	it('renders a table, tbody and any child elements', () => {
 		const renderer = TestRenderer.create(
 			<TreeGrid>
 				<tr>
@@ -18,6 +18,6 @@ describe( 'TreeGrid', () => {
 			</TreeGrid>
 		);
 
-		expect( renderer.toJSON() ).toMatchSnapshot();
-	} );
-} );
+		expect(renderer.toJSON()).toMatchSnapshot();
+	});
+});

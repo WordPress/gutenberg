@@ -46,24 +46,24 @@ export default function useFixedWindowList(
 	const initWindowSize = options?.initWindowSize ?? DEFAULT_INIT_WINDOW_SIZE;
 	const useWindowing = options?.useWindowing ?? true;
 
-	const [ fixedListWindow, setFixedListWindow ] = useState( {
+	const [fixedListWindow, setFixedListWindow] = useState({
 		visibleItems: initWindowSize,
 		start: 0,
 		end: initWindowSize,
-		itemInView: ( /** @type {number} */ index ) => {
+		itemInView: (/** @type {number} */ index) => {
 			return index >= 0 && index <= initWindowSize;
 		},
-	} );
+	});
 
-	useLayoutEffect( () => {
-		if ( ! useWindowing ) {
+	useLayoutEffect(() => {
+		if (!useWindowing) {
 			return;
 		}
-		const scrollContainer = getScrollContainer( elementRef.current );
+		const scrollContainer = getScrollContainer(elementRef.current);
 		const measureWindow = (
 			/** @type {boolean | undefined} */ initRender
 		) => {
-			if ( ! scrollContainer ) {
+			if (!scrollContainer) {
 				return;
 			}
 			const visibleItems = Math.ceil(
@@ -76,17 +76,17 @@ export default function useFixedWindowList(
 			const firstViewableIndex = Math.floor(
 				scrollContainer.scrollTop / itemHeight
 			);
-			const start = Math.max( 0, firstViewableIndex - windowOverscan );
+			const start = Math.max(0, firstViewableIndex - windowOverscan);
 			const end = Math.min(
 				totalItems - 1,
 				firstViewableIndex + visibleItems + windowOverscan
 			);
-			setFixedListWindow( ( lastWindow ) => {
+			setFixedListWindow((lastWindow) => {
 				const nextWindow = {
 					visibleItems,
 					start,
 					end,
-					itemInView: ( /** @type {number} */ index ) => {
+					itemInView: (/** @type {number} */ index) => {
 						return start <= index && index <= end;
 					},
 				};
@@ -98,14 +98,14 @@ export default function useFixedWindowList(
 					return nextWindow;
 				}
 				return lastWindow;
-			} );
+			});
 		};
 
-		measureWindow( true );
-		const debounceMeasureList = debounce( () => {
+		measureWindow(true);
+		const debounceMeasureList = debounce(() => {
 			measureWindow();
-		}, 16 );
-		scrollContainer?.addEventListener( 'scroll', debounceMeasureList );
+		}, 16);
+		scrollContainer?.addEventListener('scroll', debounceMeasureList);
 		scrollContainer?.ownerDocument?.defaultView?.addEventListener(
 			'resize',
 			debounceMeasureList
@@ -116,45 +116,42 @@ export default function useFixedWindowList(
 		);
 
 		return () => {
-			scrollContainer?.removeEventListener(
-				'scroll',
-				debounceMeasureList
-			);
+			scrollContainer?.removeEventListener('scroll', debounceMeasureList);
 			scrollContainer?.ownerDocument?.defaultView?.removeEventListener(
 				'resize',
 				debounceMeasureList
 			);
 		};
-	}, [ itemHeight, elementRef, totalItems ] );
+	}, [itemHeight, elementRef, totalItems]);
 
-	useLayoutEffect( () => {
-		if ( ! useWindowing ) {
+	useLayoutEffect(() => {
+		if (!useWindowing) {
 			return;
 		}
-		const scrollContainer = getScrollContainer( elementRef.current );
-		const handleKeyDown = ( /** @type {KeyboardEvent} */ event ) => {
-			switch ( event.keyCode ) {
+		const scrollContainer = getScrollContainer(elementRef.current);
+		const handleKeyDown = (/** @type {KeyboardEvent} */ event) => {
+			switch (event.keyCode) {
 				case HOME: {
-					return scrollContainer?.scrollTo( { top: 0 } );
+					return scrollContainer?.scrollTo({ top: 0 });
 				}
 				case END: {
-					return scrollContainer?.scrollTo( {
+					return scrollContainer?.scrollTo({
 						top: totalItems * itemHeight,
-					} );
+					});
 				}
 				case PAGEUP: {
-					return scrollContainer?.scrollTo( {
+					return scrollContainer?.scrollTo({
 						top:
 							scrollContainer.scrollTop -
 							fixedListWindow.visibleItems * itemHeight,
-					} );
+					});
 				}
 				case PAGEDOWN: {
-					return scrollContainer?.scrollTo( {
+					return scrollContainer?.scrollTo({
 						top:
 							scrollContainer.scrollTop +
 							fixedListWindow.visibleItems * itemHeight,
-					} );
+					});
 				}
 			}
 		};
@@ -168,7 +165,7 @@ export default function useFixedWindowList(
 				handleKeyDown
 			);
 		};
-	}, [ totalItems, itemHeight, elementRef, fixedListWindow.visibleItems ] );
+	}, [totalItems, itemHeight, elementRef, fixedListWindow.visibleItems]);
 
-	return [ fixedListWindow, setFixedListWindow ];
+	return [fixedListWindow, setFixedListWindow];
 }

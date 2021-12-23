@@ -11,7 +11,7 @@
  * @param    {Block}      block              The block.
  * @return {string} The internal widget id.
  */
-export function getWidgetIdFromBlock( block ) {
+export function getWidgetIdFromBlock(block) {
 	return block.attributes.__internalWidgetId;
 }
 
@@ -22,11 +22,11 @@ export function getWidgetIdFromBlock( block ) {
  * @param {string} widgetId The widget id.
  * @return {Block} The updated block.
  */
-export function addWidgetIdToBlock( block, widgetId ) {
+export function addWidgetIdToBlock(block, widgetId) {
 	return {
 		...block,
 		attributes: {
-			...( block.attributes || {} ),
+			...(block.attributes || {}),
 			__internalWidgetId: widgetId,
 		},
 	};

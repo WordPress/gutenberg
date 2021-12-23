@@ -18,13 +18,13 @@ export default {
 	component: NavigatorProvider,
 };
 
-function NavigatorButton( { path, isBack = false, ...props } ) {
+function NavigatorButton({ path, isBack = false, ...props }) {
 	const navigator = useNavigator();
 	return (
 		<Button
 			variant="secondary"
-			onClick={ () => navigator.push( path, { isBack } ) }
-			{ ...props }
+			onClick={() => navigator.push(path, { isBack })}
+			{...props}
 		/>
 	);
 }
@@ -34,7 +34,7 @@ const MyNavigation = () => {
 	return (
 		<NavigatorProvider
 			initialPath="/"
-			className={ cx( css( `height: 100vh; max-height: 450px;` ) ) }
+			className={cx(css(`height: 100vh; max-height: 450px;`))}
 		>
 			<NavigatorScreen path="/">
 				<Card>
@@ -88,21 +88,21 @@ const MyNavigation = () => {
 							Go back
 						</NavigatorButton>
 						<div
-							className={ cx(
-								css( `
+							className={cx(
+								css(`
 									display: inline-block;
 									background: papayawhip;
-								` )
-							) }
+								`)
+							)}
 						>
 							<span
-								className={ cx(
-									css( `
+								className={cx(
+									css(`
 										color: palevioletred;
 										white-space: nowrap;
 										font-size: 42vw;
-									` )
-								) }
+									`)
+								)}
 							>
 								¯\_(ツ)_/¯
 							</span>
@@ -113,7 +113,7 @@ const MyNavigation = () => {
 
 			<NavigatorScreen path="/stickies">
 				<Card>
-					<Sticky as={ CardHeader } z="2">
+					<Sticky as={CardHeader} z="2">
 						<NavigatorButton path="/" isBack>
 							Go back
 						</NavigatorButton>
@@ -122,15 +122,15 @@ const MyNavigation = () => {
 						<Sticky top="69px" colors="papayawhip/peachpuff">
 							<h2>A wild sticky element appears</h2>
 						</Sticky>
-						<MetaphorIpsum quantity={ 3 } />
+						<MetaphorIpsum quantity={3} />
 					</CardBody>
 					<CardBody>
 						<Sticky top="69px" colors="azure/paleturquoise">
 							<h2>Another wild sticky element appears</h2>
 						</Sticky>
-						<MetaphorIpsum quantity={ 3 } />
+						<MetaphorIpsum quantity={3} />
 					</CardBody>
-					<Sticky as={ CardFooter } colors="mistyrose/pink">
+					<Sticky as={CardFooter} colors="mistyrose/pink">
 						<Button variant="primary">Primary noop</Button>
 					</Sticky>
 				</Card>
@@ -143,46 +143,46 @@ export const _default = () => {
 	return <MyNavigation />;
 };
 
-function Sticky( {
+function Sticky({
 	as: Tag = 'div',
 	bottom = 0,
 	colors = 'whitesmoke/lightgrey',
 	top = 0,
 	z: zIndex = 1,
 	...props
-} ) {
+}) {
 	const cx = useCx();
-	const [ bgColor, dotColor ] = colors.split( '/' );
+	const [bgColor, dotColor] = colors.split('/');
 	const className = cx(
-		css( {
+		css({
 			top,
 			bottom,
 			zIndex,
 			display: 'flex',
 			position: 'sticky',
-			background: `radial-gradient(${ dotColor } 1px, ${ bgColor } 2px) 50%/1em 1em`,
-		} ),
+			background: `radial-gradient(${dotColor} 1px, ${bgColor} 2px) 50%/1em 1em`,
+		}),
 		props.className
 	);
 	const propsOut = { ...props, className };
-	return <Tag { ...propsOut } />;
+	return <Tag {...propsOut} />;
 }
 
-function MetaphorIpsum( { quantity } ) {
+function MetaphorIpsum({ quantity }) {
 	const cx = useCx();
 	const list = [
 		'A loopy clarinet’s year comes with it the thought that the fenny step-son is an ophthalmologist. The literature would have us believe that a glabrate country is not but a rhythm. A beech is a rub from the right perspective. In ancient times few can name an unglossed walrus that isn’t an unspilt trial.',
 		'Authors often misinterpret the afterthought as a roseless mother-in-law, when in actuality it feels more like an uncapped thunderstorm. In recent years, some posit the tarry bottle to be less than acerb. They were lost without the unkissed timbale that composed their customer. A donna is a springtime breath.',
 		'It’s an undeniable fact, really; their museum was, in this moment, a snotty beef. The swordfishes could be said to resemble prowessed lasagnas. However, the rainier authority comes from a cureless soup. Unfortunately, that is wrong; on the contrary, the cover is a powder.',
 	];
-	quantity = Math.min( list.length, quantity );
+	quantity = Math.min(list.length, quantity);
 	return (
 		<>
-			{ list.slice( 0, quantity ).map( ( text, key ) => (
-				<p className={ cx( css( `max-width: 20em;` ) ) } key={ key }>
-					{ text }
+			{list.slice(0, quantity).map((text, key) => (
+				<p className={cx(css(`max-width: 20em;`))} key={key}>
+					{text}
 				</p>
-			) ) }
+			))}
 		</>
 	);
 }

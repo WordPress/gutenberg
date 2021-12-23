@@ -10,20 +10,20 @@ import getComputedStyle from './get-computed-style';
  *
  * @return {Element | undefined} Scrollable container node, if found.
  */
-export default function getScrollContainer( node ) {
-	if ( ! node ) {
+export default function getScrollContainer(node) {
+	if (!node) {
 		return undefined;
 	}
 
 	// Scrollable if scrollable height exceeds displayed...
-	if ( node.scrollHeight > node.clientHeight ) {
+	if (node.scrollHeight > node.clientHeight) {
 		// ...except when overflow is defined to be hidden or visible
-		const { overflowY } = getComputedStyle( node );
-		if ( /(auto|scroll)/.test( overflowY ) ) {
+		const { overflowY } = getComputedStyle(node);
+		if (/(auto|scroll)/.test(overflowY)) {
 			return node;
 		}
 	}
 
 	// Continue traversing
-	return getScrollContainer( /** @type {Element} */ ( node.parentNode ) );
+	return getScrollContainer(/** @type {Element} */ (node.parentNode));
 }

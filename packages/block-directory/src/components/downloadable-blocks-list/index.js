@@ -20,46 +20,46 @@ import { useDispatch } from '@wordpress/data';
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 import { store as blockDirectoryStore } from '../../store';
 
-function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
+function DownloadableBlocksList({ items, onHover = noop, onSelect }) {
 	const composite = useCompositeState();
-	const { installBlockType } = useDispatch( blockDirectoryStore );
+	const { installBlockType } = useDispatch(blockDirectoryStore);
 
-	if ( ! items.length ) {
+	if (!items.length) {
 		return null;
 	}
 
 	return (
 		<Composite
-			{ ...composite }
+			{...composite}
 			role="listbox"
 			className="block-directory-downloadable-blocks-list"
-			aria-label={ __( 'Blocks available for install' ) }
+			aria-label={__('Blocks available for install')}
 		>
-			{ items.map( ( item ) => {
+			{items.map((item) => {
 				return (
 					<DownloadableBlockListItem
-						key={ item.id }
-						composite={ composite }
-						onClick={ () => {
+						key={item.id}
+						composite={composite}
+						onClick={() => {
 							// Check if the block is registered (`getBlockType`
 							// will return an object). If so, insert the block.
 							// This prevents installing existing plugins.
-							if ( getBlockType( item.name ) ) {
-								onSelect( item );
+							if (getBlockType(item.name)) {
+								onSelect(item);
 							} else {
-								installBlockType( item ).then( ( success ) => {
-									if ( success ) {
-										onSelect( item );
+								installBlockType(item).then((success) => {
+									if (success) {
+										onSelect(item);
 									}
-								} );
+								});
 							}
-							onHover( null );
-						} }
-						onHover={ onHover }
-						item={ item }
+							onHover(null);
+						}}
+						onHover={onHover}
+						item={item}
 					/>
 				);
-			} ) }
+			})}
 		</Composite>
 	);
 }

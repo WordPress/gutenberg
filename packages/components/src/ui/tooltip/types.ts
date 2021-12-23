@@ -14,7 +14,7 @@ import type { ShortcutProps } from '../shortcut';
 
 export type Props = TooltipInitialState &
 	PopperProps &
-	Pick< ShortcutProps, 'shortcut' > & {
+	Pick<ShortcutProps, 'shortcut'> & {
 		/**
 		 * Determines if `Tooltip` has animations.
 		 */

@@ -26,88 +26,87 @@ import TemplateAreas from './template-areas';
 import EditTemplateTitle from './edit-template-title';
 import { useLink } from '../routes/link';
 
-export default function TemplateDetails( { template, onClose } ) {
+export default function TemplateDetails({ template, onClose }) {
 	const { title, description } = useSelect(
-		( select ) =>
-			select( editorStore ).__experimentalGetTemplateInfo( template ),
+		(select) => select(editorStore).__experimentalGetTemplateInfo(template),
 		[]
 	);
-	const { revertTemplate } = useDispatch( editSiteStore );
+	const { revertTemplate } = useDispatch(editSiteStore);
 
-	const templateSubMenu = useMemo( () => {
-		if ( template?.type === 'wp_template' ) {
-			return { title: __( 'templates' ), menu: MENU_TEMPLATES };
+	const templateSubMenu = useMemo(() => {
+		if (template?.type === 'wp_template') {
+			return { title: __('templates'), menu: MENU_TEMPLATES };
 		}
 
 		return TEMPLATE_PARTS_SUB_MENUS.find(
-			( { area } ) => area === template?.area
+			({ area }) => area === template?.area
 		);
-	}, [ template ] );
+	}, [template]);
 
-	const browseAllLinkProps = useLink( {
+	const browseAllLinkProps = useLink({
 		// TODO: We should update this to filter by template part's areas as well.
 		postType: template.type,
 		postId: undefined,
-	} );
+	});
 
-	if ( ! template ) {
+	if (!template) {
 		return null;
 	}
 
 	const revert = () => {
-		revertTemplate( template );
+		revertTemplate(template);
 		onClose();
 	};
 
 	return (
 		<div className="edit-site-template-details">
 			<div className="edit-site-template-details__group">
-				{ template.is_custom ? (
-					<EditTemplateTitle template={ template } />
+				{template.is_custom ? (
+					<EditTemplateTitle template={template} />
 				) : (
 					<Heading
-						level={ 4 }
-						weight={ 600 }
+						level={4}
+						weight={600}
 						className="edit-site-template-details__title"
 					>
-						{ title }
+						{title}
 					</Heading>
-				) }
+				)}
 
-				{ description && (
+				{description && (
 					<Text
 						size="body"
 						className="edit-site-template-details__description"
 						as="p"
 					>
-						{ description }
+						{description}
 					</Text>
-				) }
+				)}
 			</div>
 
-			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
+			<TemplateAreas closeTemplateDetailsDropdown={onClose} />
 
-			{ isTemplateRevertable( template ) && (
+			{isTemplateRevertable(template) && (
 				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
 					<MenuItem
 						className="edit-site-template-details__revert-button"
-						info={ __( 'Restore template to default state' ) }
-						onClick={ revert }
+						info={__('Restore template to default state')}
+						onClick={revert}
 					>
-						{ __( 'Clear customizations' ) }
+						{__('Clear customizations')}
 					</MenuItem>
 				</MenuGroup>
-			) }
+			)}
 
 			<Button
 				className="edit-site-template-details__show-all-button"
-				{ ...browseAllLinkProps }
+				{...browseAllLinkProps}
 			>
-				{ sprintf(
+				{sprintf(
 					/* translators: the template part's area name ("Headers", "Sidebars") or "templates". */
-					__( 'Browse all %s' ),
+					__('Browse all %s'),
 					templateSubMenu.title
-				) }
+				)}
 			</Button>
 		</div>
 	);

@@ -14,7 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { Button, VisuallyHidden } from '../';
 
-const itemToString = ( item ) => item?.name;
+const itemToString = (item) => item?.name;
 // This is needed so that in Windows, where
 // the menu does not necessarily open on
 // key up/down, you can still switch between
@@ -23,7 +23,7 @@ const stateReducer = (
 	{ selectedItem },
 	{ type, changes, props: { items } }
 ) => {
-	switch ( type ) {
+	switch (type) {
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
 			// If we already have a selected item, try to select the next one,
 			// without circular navigation. Otherwise, select the first item.
@@ -32,7 +32,7 @@ const stateReducer = (
 					items[
 						selectedItem
 							? Math.min(
-									items.indexOf( selectedItem ) + 1,
+									items.indexOf(selectedItem) + 1,
 									items.length - 1
 							  )
 							: 0
@@ -45,7 +45,7 @@ const stateReducer = (
 				selectedItem:
 					items[
 						selectedItem
-							? Math.max( items.indexOf( selectedItem ) - 1, 0 )
+							? Math.max(items.indexOf(selectedItem) - 1, 0)
 							: items.length - 1
 					],
 			};
@@ -53,7 +53,7 @@ const stateReducer = (
 			return changes;
 	}
 };
-export default function CustomSelectControl( {
+export default function CustomSelectControl({
 	className,
 	hideLabelFromVision,
 	label,
@@ -61,7 +61,7 @@ export default function CustomSelectControl( {
 	options: items,
 	onChange: onSelectedItemChange,
 	value: _selectedItem,
-} ) {
+}) {
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -70,83 +70,81 @@ export default function CustomSelectControl( {
 		isOpen,
 		highlightedIndex,
 		selectedItem,
-	} = useSelect( {
-		initialSelectedItem: items[ 0 ],
+	} = useSelect({
+		initialSelectedItem: items[0],
 		items,
 		itemToString,
 		onSelectedItemChange,
-		...( typeof _selectedItem !== 'undefined' && _selectedItem !== null
+		...(typeof _selectedItem !== 'undefined' && _selectedItem !== null
 			? { selectedItem: _selectedItem }
-			: undefined ),
+			: undefined),
 		stateReducer,
-	} );
+	});
 
 	function getDescribedBy() {
-		if ( describedBy ) {
+		if (describedBy) {
 			return describedBy;
 		}
 
-		if ( ! selectedItem ) {
-			return __( 'No selection' );
+		if (!selectedItem) {
+			return __('No selection');
 		}
 
 		// translators: %s: The selected option.
-		return sprintf( __( 'Currently selected: %s' ), selectedItem.name );
+		return sprintf(__('Currently selected: %s'), selectedItem.name);
 	}
 
-	const menuProps = getMenuProps( {
+	const menuProps = getMenuProps({
 		className: 'components-custom-select-control__menu',
-		'aria-hidden': ! isOpen,
-	} );
+		'aria-hidden': !isOpen,
+	});
 	// We need this here, because the null active descendant is not fully ARIA compliant.
-	if (
-		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
-	) {
-		delete menuProps[ 'aria-activedescendant' ];
+	if (menuProps['aria-activedescendant']?.startsWith('downshift-null')) {
+		delete menuProps['aria-activedescendant'];
 	}
 	return (
 		<div
-			className={ classnames(
+			className={classnames(
 				'components-custom-select-control',
 				className
-			) }
+			)}
 		>
-			{ hideLabelFromVision ? (
-				<VisuallyHidden as="label" { ...getLabelProps() }>
-					{ label }
+			{hideLabelFromVision ? (
+				<VisuallyHidden as="label" {...getLabelProps()}>
+					{label}
 				</VisuallyHidden>
 			) : (
 				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
 				<label
-					{ ...getLabelProps( {
+					{...getLabelProps({
 						className: 'components-custom-select-control__label',
-					} ) }
+					})}
 				>
-					{ label }
+					{label}
 				</label>
-			) }
+			)}
 			<Button
-				{ ...getToggleButtonProps( {
+				{...getToggleButtonProps({
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
 					'aria-labelledby': undefined,
 					className: 'components-custom-select-control__button',
 					isSmall: true,
 					describedBy: getDescribedBy(),
-				} ) }
+				})}
 			>
-				{ itemToString( selectedItem ) }
+				{itemToString(selectedItem)}
 				<Icon
-					icon={ chevronDown }
+					icon={chevronDown}
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
-			<ul { ...menuProps }>
-				{ isOpen &&
-					items.map( ( item, index ) => (
+			<ul {...menuProps}>
+				{isOpen &&
+					items.map((item, index) => (
 						// eslint-disable-next-line react/jsx-key
 						<li
-							{ ...getItemProps( {
+							{...getItemProps({
 								item,
 								index,
 								key: item.key,
@@ -156,26 +154,26 @@ export default function CustomSelectControl( {
 									{
 										'is-highlighted':
 											index === highlightedIndex,
-										'has-hint': !! item.__experimentalHint,
+										'has-hint': !!item.__experimentalHint,
 									}
 								),
 								style: item.style,
-							} ) }
+							})}
 						>
-							{ item.name }
-							{ item.__experimentalHint && (
+							{item.name}
+							{item.__experimentalHint && (
 								<span className="components-custom-select-control__item-hint">
-									{ item.__experimentalHint }
+									{item.__experimentalHint}
 								</span>
-							) }
-							{ item === selectedItem && (
+							)}
+							{item === selectedItem && (
 								<Icon
-									icon={ check }
+									icon={check}
 									className="components-custom-select-control__item-icon"
 								/>
-							) }
+							)}
 						</li>
-					) ) }
+					))}
 			</ul>
 		</div>
 	);

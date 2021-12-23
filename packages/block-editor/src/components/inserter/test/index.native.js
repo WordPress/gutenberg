@@ -13,15 +13,15 @@ const getStylesFromColorScheme = () => {
 	return { color: 'white' };
 };
 
-describe( 'Inserter', () => {
-	it( 'button contains the testID "add-block-button"', () => {
+describe('Inserter', () => {
+	it('button contains the testID "add-block-button"', () => {
 		const testRenderer = renderer.create(
-			<Inserter getStylesFromColorScheme={ getStylesFromColorScheme } />
+			<Inserter getStylesFromColorScheme={getStylesFromColorScheme} />
 		);
 		const testInstance = testRenderer.root;
 
-		expect( () => {
-			testInstance.findByProps( { testID: 'add-block-button' } );
-		} ).not.toThrow();
-	} );
-} );
+		expect(() => {
+			testInstance.findByProps({ testID: 'add-block-button' });
+		}).not.toThrow();
+	});
+});

@@ -21,34 +21,31 @@ const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	textTransform: 'var:preset|text-transform|',
 };
 
-const migrateIdToRef = ( { navigationMenuId, ...attributes } ) => {
+const migrateIdToRef = ({ navigationMenuId, ...attributes }) => {
 	return {
 		...attributes,
 		ref: navigationMenuId,
 	};
 };
 
-const migrateWithLayout = ( attributes ) => {
-	if ( !! attributes.layout ) {
+const migrateWithLayout = (attributes) => {
+	if (!!attributes.layout) {
 		return attributes;
 	}
 
-	const {
-		itemsJustification,
-		orientation,
-		...updatedAttributes
-	} = attributes;
+	const { itemsJustification, orientation, ...updatedAttributes } =
+		attributes;
 
-	if ( itemsJustification || orientation ) {
-		Object.assign( updatedAttributes, {
+	if (itemsJustification || orientation) {
+		Object.assign(updatedAttributes, {
 			layout: {
 				type: 'flex',
-				...( itemsJustification && {
+				...(itemsJustification && {
 					justifyContent: itemsJustification,
-				} ),
-				...( orientation && { orientation } ),
+				}),
+				...(orientation && { orientation }),
 			},
-		} );
+		});
 	}
 
 	return updatedAttributes;
@@ -106,7 +103,7 @@ const v6 = {
 		},
 	},
 	supports: {
-		align: [ 'wide', 'full' ],
+		align: ['wide', 'full'],
 		anchor: true,
 		html: false,
 		inserter: true,
@@ -124,7 +121,7 @@ const v6 = {
 		},
 		spacing: {
 			blockGap: true,
-			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			units: ['px', 'em', 'rem', 'vh', 'vw'],
 			__experimentalDefaultControls: {
 				blockGap: true,
 			},
@@ -140,7 +137,7 @@ const v6 = {
 	save() {
 		return <InnerBlocks.Content />;
 	},
-	isEligible: ( { navigationMenuId } ) => !! navigationMenuId,
+	isEligible: ({ navigationMenuId }) => !!navigationMenuId,
 	migrate: migrateIdToRef,
 };
 
@@ -203,7 +200,7 @@ const v5 = {
 		},
 	},
 	supports: {
-		align: [ 'wide', 'full' ],
+		align: ['wide', 'full'],
 		anchor: true,
 		html: false,
 		inserter: true,
@@ -221,7 +218,7 @@ const v5 = {
 		},
 		spacing: {
 			blockGap: true,
-			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			units: ['px', 'em', 'rem', 'vh', 'vw'],
 			__experimentalDefaultControls: {
 				blockGap: true,
 			},
@@ -230,9 +227,9 @@ const v5 = {
 	save() {
 		return <InnerBlocks.Content />;
 	},
-	isEligible: ( { itemsJustification, orientation } ) =>
-		!! itemsJustification || !! orientation,
-	migrate: compose( migrateIdToRef, migrateWithLayout ),
+	isEligible: ({ itemsJustification, orientation }) =>
+		!!itemsJustification || !!orientation,
+	migrate: compose(migrateIdToRef, migrateWithLayout),
 };
 
 const v4 = {
@@ -291,7 +288,7 @@ const v4 = {
 		},
 	},
 	supports: {
-		align: [ 'wide', 'full' ],
+		align: ['wide', 'full'],
 		anchor: true,
 		html: false,
 		inserter: true,
@@ -306,7 +303,7 @@ const v4 = {
 		},
 		spacing: {
 			blockGap: true,
-			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			units: ['px', 'em', 'rem', 'vh', 'vw'],
 			__experimentalDefaultControls: {
 				blockGap: true,
 			},
@@ -315,13 +312,13 @@ const v4 = {
 	save() {
 		return <InnerBlocks.Content />;
 	},
-	migrate: compose( migrateIdToRef, migrateWithLayout, migrateFontFamily ),
-	isEligible( { style } ) {
+	migrate: compose(migrateIdToRef, migrateWithLayout, migrateFontFamily),
+	isEligible({ style }) {
 		return style?.typography?.fontFamily;
 	},
 };
 
-const migrateIsResponsive = function ( attributes ) {
+const migrateIsResponsive = function (attributes) {
 	delete attributes.isResponsive;
 	return {
 		...attributes,
@@ -329,28 +326,25 @@ const migrateIsResponsive = function ( attributes ) {
 	};
 };
 
-const migrateTypographyPresets = function ( attributes ) {
+const migrateTypographyPresets = function (attributes) {
 	return {
 		...attributes,
 		style: {
 			...attributes.style,
-			typography: mapValues(
-				attributes.style.typography,
-				( value, key ) => {
-					const prefix = TYPOGRAPHY_PRESET_DEPRECATION_MAP[ key ];
-					if ( prefix && value.startsWith( prefix ) ) {
-						const newValue = value.slice( prefix.length );
-						if (
-							'textDecoration' === key &&
-							'strikethrough' === newValue
-						) {
-							return 'line-through';
-						}
-						return newValue;
+			typography: mapValues(attributes.style.typography, (value, key) => {
+				const prefix = TYPOGRAPHY_PRESET_DEPRECATION_MAP[key];
+				if (prefix && value.startsWith(prefix)) {
+					const newValue = value.slice(prefix.length);
+					if (
+						'textDecoration' === key &&
+						'strikethrough' === newValue
+					) {
+						return 'line-through';
 					}
-					return value;
+					return newValue;
 				}
-			),
+				return value;
+			}),
 		},
 	};
 };
@@ -416,7 +410,7 @@ const deprecated = [
 			},
 		},
 		supports: {
-			align: [ 'wide', 'full' ],
+			align: ['wide', 'full'],
 			anchor: true,
 			html: false,
 			inserter: true,
@@ -430,7 +424,7 @@ const deprecated = [
 				__experimentalTextDecoration: true,
 			},
 		},
-		isEligible( attributes ) {
+		isEligible(attributes) {
 			return attributes.isResponsive;
 		},
 		migrate: compose(
@@ -475,7 +469,7 @@ const deprecated = [
 			},
 		},
 		supports: {
-			align: [ 'wide', 'full' ],
+			align: ['wide', 'full'],
 			anchor: true,
 			html: false,
 			inserter: true,
@@ -490,17 +484,17 @@ const deprecated = [
 		save() {
 			return <InnerBlocks.Content />;
 		},
-		isEligible( attributes ) {
-			if ( ! attributes.style || ! attributes.style.typography ) {
+		isEligible(attributes) {
+			if (!attributes.style || !attributes.style.typography) {
 				return false;
 			}
-			for ( const styleAttribute in TYPOGRAPHY_PRESET_DEPRECATION_MAP ) {
+			for (const styleAttribute in TYPOGRAPHY_PRESET_DEPRECATION_MAP) {
 				const attributeValue =
-					attributes.style.typography[ styleAttribute ];
+					attributes.style.typography[styleAttribute];
 				if (
 					attributeValue &&
 					attributeValue.startsWith(
-						TYPOGRAPHY_PRESET_DEPRECATION_MAP[ styleAttribute ]
+						TYPOGRAPHY_PRESET_DEPRECATION_MAP[styleAttribute]
 					)
 				) {
 					return true;
@@ -545,18 +539,18 @@ const deprecated = [
 				type: 'boolean',
 			},
 		},
-		isEligible( attribute ) {
+		isEligible(attribute) {
 			return attribute.rgbTextColor || attribute.rgbBackgroundColor;
 		},
 		supports: {
-			align: [ 'wide', 'full' ],
+			align: ['wide', 'full'],
 			anchor: true,
 			html: false,
 			inserter: true,
 		},
-		migrate: compose( migrateIdToRef, ( attributes ) => {
+		migrate: compose(migrateIdToRef, (attributes) => {
 			return {
-				...omit( attributes, [ 'rgbTextColor', 'rgbBackgroundColor' ] ),
+				...omit(attributes, ['rgbTextColor', 'rgbBackgroundColor']),
 				customTextColor: attributes.textColor
 					? undefined
 					: attributes.rgbTextColor,
@@ -564,7 +558,7 @@ const deprecated = [
 					? undefined
 					: attributes.rgbBackgroundColor,
 			};
-		} ),
+		}),
 		save() {
 			return <InnerBlocks.Content />;
 		},

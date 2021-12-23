@@ -19,19 +19,19 @@ import { remove, replace } from '@wordpress/dom';
  * @param {Document} doc  The document of the node.
  * @return {void}
  */
-export default function specialCommentConverter( node, doc ) {
-	if ( node.nodeType !== node.COMMENT_NODE ) {
+export default function specialCommentConverter(node, doc) {
+	if (node.nodeType !== node.COMMENT_NODE) {
 		return;
 	}
 
-	if ( node.nodeValue === 'nextpage' ) {
-		replace( node, createNextpage( doc ) );
+	if (node.nodeValue === 'nextpage') {
+		replace(node, createNextpage(doc));
 		return;
 	}
 
-	if ( node.nodeValue.indexOf( 'more' ) === 0 ) {
+	if (node.nodeValue.indexOf('more') === 0) {
 		// Grab any custom text in the comment.
-		const customText = node.nodeValue.slice( 4 ).trim();
+		const customText = node.nodeValue.slice(4).trim();
 
 		/*
 		 * When a `<!--more-->` comment is found, we need to look for any
@@ -40,36 +40,36 @@ export default function specialCommentConverter( node, doc ) {
 		 */
 		let sibling = node;
 		let noTeaser = false;
-		while ( ( sibling = sibling.nextSibling ) ) {
+		while ((sibling = sibling.nextSibling)) {
 			if (
 				sibling.nodeType === sibling.COMMENT_NODE &&
 				sibling.nodeValue === 'noteaser'
 			) {
 				noTeaser = true;
-				remove( sibling );
+				remove(sibling);
 				break;
 			}
 		}
 
-		replace( node, createMore( customText, noTeaser, doc ) );
+		replace(node, createMore(customText, noTeaser, doc));
 	}
 }
 
-function createMore( customText, noTeaser, doc ) {
-	const node = doc.createElement( 'wp-block' );
+function createMore(customText, noTeaser, doc) {
+	const node = doc.createElement('wp-block');
 	node.dataset.block = 'core/more';
-	if ( customText ) {
+	if (customText) {
 		node.dataset.customText = customText;
 	}
-	if ( noTeaser ) {
+	if (noTeaser) {
 		// "Boolean" data attribute
 		node.dataset.noTeaser = '';
 	}
 	return node;
 }
 
-function createNextpage( doc ) {
-	const node = doc.createElement( 'wp-block' );
+function createNextpage(doc) {
+	const node = doc.createElement('wp-block');
 	node.dataset.block = 'core/nextpage';
 
 	return node;

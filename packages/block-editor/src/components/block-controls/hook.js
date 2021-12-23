@@ -12,32 +12,31 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit/context';
 import useDisplayBlockControls from '../use-display-block-controls';
 
-export default function useBlockControlsFill( group, shareWithChildBlocks ) {
+export default function useBlockControlsFill(group, shareWithChildBlocks) {
 	const isDisplayed = useDisplayBlockControls();
 	const { clientId } = useBlockEditContext();
 	const isParentDisplayed = useSelect(
-		( select ) => {
-			const { getBlockName, hasSelectedInnerBlock } = select(
-				blockEditorStore
-			);
-			const { hasBlockSupport } = select( blocksStore );
+		(select) => {
+			const { getBlockName, hasSelectedInnerBlock } =
+				select(blockEditorStore);
+			const { hasBlockSupport } = select(blocksStore);
 			return (
 				shareWithChildBlocks &&
 				hasBlockSupport(
-					getBlockName( clientId ),
+					getBlockName(clientId),
 					'__experimentalExposeControlsToChildren',
 					false
 				) &&
-				hasSelectedInnerBlock( clientId )
+				hasSelectedInnerBlock(clientId)
 			);
 		},
-		[ shareWithChildBlocks, clientId ]
+		[shareWithChildBlocks, clientId]
 	);
 
-	if ( isDisplayed ) {
-		return groups[ group ]?.Fill;
+	if (isDisplayed) {
+		return groups[group]?.Fill;
 	}
-	if ( isParentDisplayed ) {
+	if (isParentDisplayed) {
 		return groups.parent.Fill;
 	}
 	return null;

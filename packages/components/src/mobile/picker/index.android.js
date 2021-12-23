@@ -23,14 +23,14 @@ function Separator() {
 		styles.separatorDark
 	);
 
-	return <View style={ separatorStyle } />;
+	return <View style={separatorStyle} />;
 }
 
 export default class Picker extends Component {
 	constructor() {
-		super( ...arguments );
-		this.onClose = this.onClose.bind( this );
-		this.onCellPress = this.onCellPress.bind( this );
+		super(...arguments);
+		this.onClose = this.onClose.bind(this);
+		this.onCellPress = this.onCellPress.bind(this);
 
 		this.state = {
 			isVisible: false,
@@ -38,36 +38,36 @@ export default class Picker extends Component {
 	}
 
 	presentPicker() {
-		this.setState( { isVisible: true } );
+		this.setState({ isVisible: true });
 	}
 
 	onClose() {
-		this.setState( { isVisible: false } );
+		this.setState({ isVisible: false });
 	}
 
-	onCellPress( value ) {
+	onCellPress(value) {
 		const { onChange } = this.props;
-		onChange( value );
+		onChange(value);
 		this.onClose();
 	}
 
 	getOptions() {
 		const { options, leftAlign } = this.props;
 
-		return options.map( ( option ) => (
-			<Fragment key={ `${ option.label }-${ option.value }` }>
-				{ options.length > 1 && option.separated && <Separator /> }
+		return options.map((option) => (
+			<Fragment key={`${option.label}-${option.value}`}>
+				{options.length > 1 && option.separated && <Separator />}
 				<BottomSheet.Cell
-					icon={ option.icon }
-					leftAlign={ leftAlign }
-					label={ option.label }
-					separatorType={ 'none' }
-					onPress={ () => this.onCellPress( option.value ) }
-					disabled={ option.disabled }
-					style={ option.disabled && styles.disabled }
+					icon={option.icon}
+					leftAlign={leftAlign}
+					label={option.label}
+					separatorType={'none'}
+					onPress={() => this.onCellPress(option.value)}
+					disabled={option.disabled}
+					style={option.disabled && styles.disabled}
 				/>
 			</Fragment>
-		) );
+		));
 	}
 
 	render() {
@@ -76,21 +76,21 @@ export default class Picker extends Component {
 
 		return (
 			<BottomSheet
-				isVisible={ isVisible }
-				onClose={ this.onClose }
-				style={ { paddingBottom: 20 } }
+				isVisible={isVisible}
+				onClose={this.onClose}
+				style={{ paddingBottom: 20 }}
 				hideHeader
-				testID={ testID }
+				testID={testID}
 			>
-				<PanelBody title={ title } style={ styles.panelBody }>
-					{ this.getOptions() }
-					{ ! hideCancelButton && (
+				<PanelBody title={title} style={styles.panelBody}>
+					{this.getOptions()}
+					{!hideCancelButton && (
 						<TextControl
-							label={ __( 'Cancel' ) }
-							onPress={ this.onClose }
-							separatorType={ 'none' }
+							label={__('Cancel')}
+							onPress={this.onClose}
+							separatorType={'none'}
 						/>
-					) }
+					)}
 				</PanelBody>
 			</BottomSheet>
 		);

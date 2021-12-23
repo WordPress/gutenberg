@@ -8,47 +8,47 @@ import { Warning } from '@wordpress/block-editor';
 
 class ErrorBoundary extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
-		this.reboot = this.reboot.bind( this );
+		this.reboot = this.reboot.bind(this);
 
 		this.state = {
 			error: null,
 		};
 	}
 
-	componentDidCatch( error ) {
-		this.setState( { error } );
+	componentDidCatch(error) {
+		this.setState({ error });
 	}
 
 	reboot() {
-		if ( this.props.onError ) {
+		if (this.props.onError) {
 			this.props.onError();
 		}
 	}
 
 	render() {
 		const { error } = this.state;
-		if ( ! error ) {
+		if (!error) {
 			return this.props.children;
 		}
 
 		return (
 			<Warning
 				className="navigation-editor-error-boundary"
-				actions={ [
+				actions={[
 					<Button
 						key="recovery"
-						onClick={ this.reboot }
+						onClick={this.reboot}
 						variant="secondary"
 					>
-						{ __( 'Attempt Recovery' ) }
+						{__('Attempt Recovery')}
 					</Button>,
-				] }
+				]}
 			>
-				{ __(
+				{__(
 					'The navigation editor has encountered an unexpected error.'
-				) }
+				)}
 			</Warning>
 		);
 	}

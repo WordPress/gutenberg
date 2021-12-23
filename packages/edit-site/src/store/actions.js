@@ -23,7 +23,7 @@ import isTemplateRevertable from '../utils/is-template-revertable';
  *
  * @return {Object} Action object.
  */
-export function toggleFeature( feature ) {
+export function toggleFeature(feature) {
 	return {
 		type: 'TOGGLE_FEATURE',
 		feature,
@@ -37,7 +37,7 @@ export function toggleFeature( feature ) {
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
+export function __experimentalSetPreviewDeviceType(deviceType) {
 	return {
 		type: 'SET_PREVIEW_DEVICE_TYPE',
 		deviceType,
@@ -51,9 +51,9 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
  * @param {string} templateSlug The template slug.
  * @return {Object} Action object.
  */
-export function* setTemplate( templateId, templateSlug ) {
+export function* setTemplate(templateId, templateSlug) {
 	const pageContext = { templateSlug };
-	if ( ! templateSlug ) {
+	if (!templateSlug) {
 		const template = yield controls.resolveSelect(
 			coreStore,
 			'getEntityRecord',
@@ -77,7 +77,7 @@ export function* setTemplate( templateId, templateSlug ) {
  *
  * @return {Object} Action object used to set the current template.
  */
-export function* addTemplate( template ) {
+export function* addTemplate(template) {
 	const newTemplate = yield controls.dispatch(
 		coreStore,
 		'saveEntityRecord',
@@ -86,14 +86,14 @@ export function* addTemplate( template ) {
 		template
 	);
 
-	if ( template.content ) {
+	if (template.content) {
 		yield controls.dispatch(
 			coreStore,
 			'editEntityRecord',
 			'postType',
 			'wp_template',
 			newTemplate.id,
-			{ blocks: parse( template.content ) },
+			{ blocks: parse(template.content) },
 			{ undoIgnore: true }
 		);
 	}
@@ -110,7 +110,7 @@ export function* addTemplate( template ) {
  *
  * @param {Object} template The template object.
  */
-export function* removeTemplate( template ) {
+export function* removeTemplate(template) {
 	try {
 		yield controls.dispatch(
 			coreStore,
@@ -129,7 +129,7 @@ export function* removeTemplate( template ) {
 			template.id
 		);
 
-		if ( lastError ) {
+		if (lastError) {
 			throw lastError;
 		}
 
@@ -138,16 +138,16 @@ export function* removeTemplate( template ) {
 			'createSuccessNotice',
 			sprintf(
 				/* translators: The template/part's name. */
-				__( '"%s" removed.' ),
+				__('"%s" removed.'),
 				template.title.rendered
 			),
 			{ type: 'snackbar' }
 		);
-	} catch ( error ) {
+	} catch (error) {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'
 				? error.message
-				: __( 'An error occurred while deleting the template.' );
+				: __('An error occurred while deleting the template.');
 
 		yield controls.dispatch(
 			noticesStore,
@@ -165,7 +165,7 @@ export function* removeTemplate( template ) {
  *
  * @return {Object} Action object.
  */
-export function setTemplatePart( templatePartId ) {
+export function setTemplatePart(templatePartId) {
 	return {
 		type: 'SET_TEMPLATE_PART',
 		templatePartId,
@@ -178,7 +178,7 @@ export function setTemplatePart( templatePartId ) {
  *
  * @param {number} homeTemplateId The template ID for the homepage.
  */
-export function setHomeTemplateId( homeTemplateId ) {
+export function setHomeTemplateId(homeTemplateId) {
 	return {
 		type: 'SET_HOME_TEMPLATE',
 		homeTemplateId,
@@ -197,8 +197,8 @@ export function setHomeTemplateId( homeTemplateId ) {
  *
  * @return {number} The resolved template ID for the page route.
  */
-export function* setPage( page ) {
-	if ( ! page.path && page.context?.postId ) {
+export function* setPage(page) {
+	if (!page.path && page.context?.postId) {
 		const entity = yield controls.resolveSelect(
 			coreStore,
 			'getEntityRecord',
@@ -207,7 +207,7 @@ export function* setPage( page ) {
 			page.context.postId
 		);
 
-		page.path = getPathAndQueryString( entity.link );
+		page.path = getPathAndQueryString(entity.link);
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
 		coreStore,
@@ -216,7 +216,7 @@ export function* setPage( page ) {
 	);
 	yield {
 		type: 'SET_PAGE',
-		page: ! templateSlug
+		page: !templateSlug
 			? page
 			: {
 					...page,
@@ -234,20 +234,15 @@ export function* setPage( page ) {
  * Displays the site homepage for editing in the editor.
  */
 export function* showHomepage() {
-	const {
-		show_on_front: showOnFront,
-		page_on_front: frontpageId,
-	} = yield controls.resolveSelect(
-		coreStore,
-		'getEntityRecord',
-		'root',
-		'site'
-	);
+	const { show_on_front: showOnFront, page_on_front: frontpageId } =
+		yield controls.resolveSelect(
+			coreStore,
+			'getEntityRecord',
+			'root',
+			'site'
+		);
 
-	const { siteUrl } = yield controls.select(
-		editSiteStoreName,
-		'getSettings'
-	);
+	const { siteUrl } = yield controls.select(editSiteStoreName, 'getSettings');
 
 	const page = {
 		path: siteUrl,
@@ -260,8 +255,8 @@ export function* showHomepage() {
 				: {},
 	};
 
-	const homeTemplate = yield* setPage( page );
-	yield setHomeTemplateId( homeTemplate );
+	const homeTemplate = yield* setPage(page);
+	yield setHomeTemplateId(homeTemplate);
 }
 
 /**
@@ -271,7 +266,7 @@ export function* showHomepage() {
  *
  * @return {Object} Action object.
  */
-export function setNavigationPanelActiveMenu( menu ) {
+export function setNavigationPanelActiveMenu(menu) {
 	return {
 		type: 'SET_NAVIGATION_PANEL_ACTIVE_MENU',
 		menu,
@@ -283,7 +278,7 @@ export function setNavigationPanelActiveMenu( menu ) {
  *
  * @param {string} menu Identifies the menu to open.
  */
-export function openNavigationPanelToMenu( menu ) {
+export function openNavigationPanelToMenu(menu) {
 	return {
 		type: 'OPEN_NAVIGATION_PANEL_TO_MENU',
 		menu,
@@ -296,7 +291,7 @@ export function openNavigationPanelToMenu( menu ) {
  * @param {boolean} isOpen If true, opens the nav panel. If false, closes it. It
  *                         does not toggle the state, but sets it directly.
  */
-export function setIsNavigationPanelOpened( isOpen ) {
+export function setIsNavigationPanelOpened(isOpen) {
 	return {
 		type: 'SET_IS_NAVIGATION_PANEL_OPENED',
 		isOpen,
@@ -315,7 +310,7 @@ export function setIsNavigationPanelOpened( isOpen ) {
  *
  * @return {Object} Action object.
  */
-export function setIsInserterOpened( value ) {
+export function setIsInserterOpened(value) {
 	return {
 		type: 'SET_IS_INSERTER_OPENED',
 		value,
@@ -329,7 +324,7 @@ export function setIsInserterOpened( value ) {
  *
  * @return {Object} Action object.
  */
-export function updateSettings( settings ) {
+export function updateSettings(settings) {
 	return {
 		type: 'UPDATE_SETTINGS',
 		settings,
@@ -342,7 +337,7 @@ export function updateSettings( settings ) {
  * @param {boolean} isOpen If true, opens the list view. If false, closes it.
  *                         It does not toggle the state, but sets it directly.
  */
-export function setIsListViewOpened( isOpen ) {
+export function setIsListViewOpened(isOpen) {
 	return {
 		type: 'SET_IS_LIST_VIEW_OPENED',
 		isOpen,
@@ -357,12 +352,12 @@ export function setIsListViewOpened( isOpen ) {
  * @param {boolean} [options.allowUndo] Whether to allow the user to undo
  *                                      reverting the template. Default true.
  */
-export function* revertTemplate( template, { allowUndo = true } = {} ) {
-	if ( ! isTemplateRevertable( template ) ) {
+export function* revertTemplate(template, { allowUndo = true } = {}) {
+	if (!isTemplateRevertable(template)) {
 		yield controls.dispatch(
 			noticesStore,
 			'createErrorNotice',
-			__( 'This template is not revertable.' ),
+			__('This template is not revertable.'),
 			{ type: 'snackbar' }
 		);
 		return;
@@ -375,7 +370,7 @@ export function* revertTemplate( template, { allowUndo = true } = {} ) {
 			'postType',
 			template.type
 		);
-		if ( ! templateEntity ) {
+		if (!templateEntity) {
 			yield controls.dispatch(
 				noticesStore,
 				'createErrorNotice',
@@ -388,11 +383,11 @@ export function* revertTemplate( template, { allowUndo = true } = {} ) {
 		}
 
 		const fileTemplatePath = addQueryArgs(
-			`${ templateEntity.baseURL }/${ template.id }`,
+			`${templateEntity.baseURL}/${template.id}`,
 			{ context: 'edit', source: 'theme' }
 		);
-		const fileTemplate = yield apiFetch( { path: fileTemplatePath } );
-		if ( ! fileTemplate ) {
+		const fileTemplate = yield apiFetch({ path: fileTemplatePath });
+		if (!fileTemplate) {
 			yield controls.dispatch(
 				noticesStore,
 				'createErrorNotice',
@@ -404,8 +399,8 @@ export function* revertTemplate( template, { allowUndo = true } = {} ) {
 			return;
 		}
 
-		const serializeBlocks = ( { blocks: blocksForSerialization = [] } ) =>
-			__unstableSerializeAndClean( blocksForSerialization );
+		const serializeBlocks = ({ blocks: blocksForSerialization = [] }) =>
+			__unstableSerializeAndClean(blocksForSerialization);
 		const edited = yield controls.select(
 			coreStore,
 			'getEditedEntityRecord',
@@ -431,7 +426,7 @@ export function* revertTemplate( template, { allowUndo = true } = {} ) {
 			}
 		);
 
-		const blocks = parse( fileTemplate?.content?.raw );
+		const blocks = parse(fileTemplate?.content?.raw);
 		yield controls.dispatch(
 			coreStore,
 			'editEntityRecord',
@@ -445,9 +440,9 @@ export function* revertTemplate( template, { allowUndo = true } = {} ) {
 			}
 		);
 
-		if ( allowUndo ) {
+		if (allowUndo) {
 			const undoRevert = async () => {
-				await dispatch( coreStore ).editEntityRecord(
+				await dispatch(coreStore).editEntityRecord(
 					'postType',
 					template.type,
 					edited.id,
@@ -461,12 +456,12 @@ export function* revertTemplate( template, { allowUndo = true } = {} ) {
 			yield controls.dispatch(
 				noticesStore,
 				'createSuccessNotice',
-				__( 'Template reverted.' ),
+				__('Template reverted.'),
 				{
 					type: 'snackbar',
 					actions: [
 						{
-							label: __( 'Undo' ),
+							label: __('Undo'),
 							onClick: undoRevert,
 						},
 					],
@@ -476,14 +471,14 @@ export function* revertTemplate( template, { allowUndo = true } = {} ) {
 			yield controls.dispatch(
 				noticesStore,
 				'createSuccessNotice',
-				__( 'Template reverted.' )
+				__('Template reverted.')
 			);
 		}
-	} catch ( error ) {
+	} catch (error) {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'
 				? error.message
-				: __( 'Template revert failed. Please reload.' );
+				: __('Template revert failed. Please reload.');
 		yield controls.dispatch(
 			noticesStore,
 			'createErrorNotice',
@@ -499,7 +494,7 @@ export function* revertTemplate( template, { allowUndo = true } = {} ) {
  *
  * @yield {Object} Action object.
  */
-export function* openGeneralSidebar( name ) {
+export function* openGeneralSidebar(name) {
 	yield controls.dispatch(
 		interfaceStore,
 		'enableComplementaryArea',

@@ -9,10 +9,10 @@ import { useFlexItem } from './hook';
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                                    forwardedRef
  */
-function FlexItem( props, forwardedRef ) {
-	const flexItemProps = useFlexItem( props );
+function FlexItem(props, forwardedRef) {
+	const flexItemProps = useFlexItem(props);
 
-	return <View { ...flexItemProps } ref={ forwardedRef } />;
+	return <View {...flexItemProps} ref={forwardedRef} />;
 }
 
 /**
@@ -25,6 +25,6 @@ function FlexItem( props, forwardedRef ) {
  * </Flex>
  * ```
  */
-const ConnectedFlexItem = contextConnect( FlexItem, 'FlexItem' );
+const ConnectedFlexItem = contextConnect(FlexItem, 'FlexItem');
 
 export default ConnectedFlexItem;

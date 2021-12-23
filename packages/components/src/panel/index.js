@@ -13,14 +13,14 @@ import { forwardRef } from '@wordpress/element';
  */
 import PanelHeader from './header';
 
-function Panel( { header, className, children }, ref ) {
-	const classNames = classnames( className, 'components-panel' );
+function Panel({ header, className, children }, ref) {
+	const classNames = classnames(className, 'components-panel');
 	return (
-		<div className={ classNames } ref={ ref }>
-			{ header && <PanelHeader label={ header } /> }
-			{ children }
+		<div className={classNames} ref={ref}>
+			{header && <PanelHeader label={header} />}
+			{children}
 		</div>
 	);
 }
 
-export default forwardRef( Panel );
+export default forwardRef(Panel);

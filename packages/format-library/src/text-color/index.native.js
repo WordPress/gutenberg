@@ -24,21 +24,21 @@ import { default as InlineColorUI } from './inline';
 import styles from './style.scss';
 
 const name = 'core/text-color';
-const title = __( 'Text color' );
+const title = __('Text color');
 
 const EMPTY_ARRAY = [];
 
-function getComputedStyleProperty( element, property ) {
+function getComputedStyleProperty(element, property) {
 	const {
 		props: { style = {} },
 	} = element;
 
-	if ( property === 'background-color' ) {
+	if (property === 'background-color') {
 		const { backgroundColor, baseColors } = style;
 
-		if ( backgroundColor !== 'transparent' ) {
+		if (backgroundColor !== 'transparent') {
 			return backgroundColor;
-		} else if ( baseColors && baseColors?.color?.background ) {
+		} else if (baseColors && baseColors?.color?.background) {
 			return baseColors?.color?.background;
 		}
 
@@ -46,89 +46,88 @@ function getComputedStyleProperty( element, property ) {
 	}
 }
 
-function fillComputedColors( element, { color, backgroundColor } ) {
-	if ( ! color && ! backgroundColor ) {
+function fillComputedColors(element, { color, backgroundColor }) {
+	if (!color && !backgroundColor) {
 		return;
 	}
 
 	return {
-		color: color || getComputedStyleProperty( element, 'color' ),
-		backgroundColor: getComputedStyleProperty(
-			element,
-			'background-color'
-		),
+		color: color || getComputedStyleProperty(element, 'color'),
+		backgroundColor: getComputedStyleProperty(element, 'background-color'),
 	};
 }
 
-function TextColorEdit( {
+function TextColorEdit({
 	value,
 	onChange,
 	isActive,
 	activeAttributes,
 	contentRef,
-} ) {
-	const allowCustomControl = useSetting( 'color.custom' );
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
-		setIsAddingColor,
-	] );
-	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
-		setIsAddingColor,
-	] );
+}) {
+	const allowCustomControl = useSetting('color.custom');
+	const colors = useSetting('color.palette') || EMPTY_ARRAY;
+	const [isAddingColor, setIsAddingColor] = useState(false);
+	const enableIsAddingColor = useCallback(
+		() => setIsAddingColor(true),
+		[setIsAddingColor]
+	);
+	const disableIsAddingColor = useCallback(
+		() => setIsAddingColor(false),
+		[setIsAddingColor]
+	);
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
 				contentRef,
-				getActiveColors( value, name, colors )
+				getActiveColors(value, name, colors)
 			),
-		[ value, colors ]
+		[value, colors]
 	);
 
-	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
+	const hasColorsToChoose = !isEmpty(colors) || !allowCustomControl;
 
-	const onPressButton = useCallback( () => {
-		if ( hasColorsToChoose ) {
+	const onPressButton = useCallback(() => {
+		if (hasColorsToChoose) {
 			enableIsAddingColor();
 		} else {
-			onChange( removeFormat( value, name ) );
+			onChange(removeFormat(value, name));
 		}
-	}, [ hasColorsToChoose, value ] );
+	}, [hasColorsToChoose, value]);
 
 	const outlineStyle = usePreferredColorSchemeStyle(
-		styles[ 'components-inline-color__outline' ],
-		styles[ 'components-inline-color__outline--dark' ]
+		styles['components-inline-color__outline'],
+		styles['components-inline-color__outline--dark']
 	);
 
-	if ( ! hasColorsToChoose && ! isActive ) {
+	if (!hasColorsToChoose && !isActive) {
 		return null;
 	}
 
 	const isActiveStyle = {
 		...colorIndicatorStyle,
-		...( ! colorIndicatorStyle?.backgroundColor
+		...(!colorIndicatorStyle?.backgroundColor
 			? { backgroundColor: 'transparent' }
-			: {} ),
-		...styles[ 'components-inline-color--is-active' ],
+			: {}),
+		...styles['components-inline-color--is-active'],
 	};
 
 	const customContainerStyles =
-		styles[ 'components-inline-color__button-container' ];
+		styles['components-inline-color__button-container'];
 
 	return (
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					{ isActive && (
-						<View style={ outlineStyle } pointerEvents="none" />
-					) }
+					{isActive && (
+						<View style={outlineStyle} pointerEvents="none" />
+					)}
 
 					<ToolbarButton
 						name="text-color"
-						isActive={ isActive }
+						isActive={isActive}
 						icon={
 							<Icon
-								icon={ textColorIcon }
+								icon={textColorIcon}
 								style={
 									colorIndicatorStyle?.color && {
 										color: colorIndicatorStyle.color,
@@ -136,26 +135,26 @@ function TextColorEdit( {
 								}
 							/>
 						}
-						title={ title }
-						extraProps={ {
+						title={title}
+						extraProps={{
 							isActiveStyle,
 							customContainerStyles,
-						} }
+						}}
 						// If has no colors to choose but a color is active remove the color onClick
-						onClick={ onPressButton }
+						onClick={onPressButton}
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			{ isAddingColor && (
+			{isAddingColor && (
 				<InlineColorUI
-					name={ name }
-					onClose={ disableIsAddingColor }
-					activeAttributes={ activeAttributes }
-					value={ value }
-					onChange={ onChange }
-					contentRef={ contentRef }
+					name={name}
+					onClose={disableIsAddingColor}
+					activeAttributes={activeAttributes}
+					value={value}
+					onChange={onChange}
+					contentRef={contentRef}
 				/>
-			) }
+			)}
 		</>
 	);
 }
@@ -178,14 +177,14 @@ export const textColor = {
 	 *
 	 * @see https://github.com/WordPress/gutenberg/pull/35516
 	 */
-	__unstableFilterAttributeValue( key, value ) {
-		if ( key !== 'style' ) return value;
+	__unstableFilterAttributeValue(key, value) {
+		if (key !== 'style') return value;
 		// We should not add a background-color if it's already set
-		if ( value && value.includes( 'background-color' ) ) return value;
-		const addedCSS = [ 'background-color', transparentValue ].join( ':' );
+		if (value && value.includes('background-color')) return value;
+		const addedCSS = ['background-color', transparentValue].join(':');
 		// Prepend `addedCSS` to avoid a double `;;` as any the existing CSS
 		// rules will already include a `;`.
-		return value ? [ addedCSS, value ].join( ';' ) : addedCSS;
+		return value ? [addedCSS, value].join(';') : addedCSS;
 	},
 	edit: TextColorEdit,
 };

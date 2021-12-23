@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const globals = require( 'globals' );
+const globals = require('globals');
 
 /**
  * The temporary list of types defined in Gutenberg which are allowed to avoid
@@ -32,7 +32,7 @@ const temporaryWordPressInternalTypes = [
  * should be removed once the related issues is fixed:
  * https://github.com/WordPress/gutenberg/issues/18045
  */
-const temporaryExternalTypes = [ 'DOMHighResTimeStamp', 'espree' ];
+const temporaryExternalTypes = ['DOMHighResTimeStamp', 'espree'];
 
 /**
  * Helpful utilities that are globally defined and known to the TypeScript compiler.
@@ -70,7 +70,7 @@ const typescriptUtilityTypes = [
 ];
 
 module.exports = {
-	extends: [ 'plugin:jsdoc/recommended' ],
+	extends: ['plugin:jsdoc/recommended'],
 	settings: {
 		jsdoc: {
 			preferredTypes: {
@@ -90,8 +90,8 @@ module.exports = {
 					// Required to reference browser types because we don't have the `browser` environment enabled for the project.
 					// Here we filter out all browser globals that don't begin with an uppercase letter because those
 					// generally refer to window-level event listeners and are not a valid type to reference (e.g. `onclick`).
-					...Object.keys( globals.browser ).filter( ( k ) =>
-						/^[A-Z]/.test( k )
+					...Object.keys(globals.browser).filter((k) =>
+						/^[A-Z]/.test(k)
 					),
 					...typescriptUtilityTypes,
 					...temporaryWordPressInternalTypes,
@@ -106,17 +106,14 @@ module.exports = {
 		'jsdoc/require-returns': 'off',
 		'jsdoc/require-yields': 'off',
 		'jsdoc/tag-lines': 'off',
-		'jsdoc/no-multi-asterisks': [
-			'error',
-			{ preventAtMiddleLines: false },
-		],
+		'jsdoc/no-multi-asterisks': ['error', { preventAtMiddleLines: false }],
 		'jsdoc/check-access': 'error',
 		'jsdoc/check-alignment': 'error',
 		'jsdoc/check-line-alignment': [
 			'warn',
 			'always',
 			{
-				tags: [ 'param', 'arg', 'argument', 'property', 'prop' ],
+				tags: ['param', 'arg', 'argument', 'property', 'prop'],
 				preserveMainDescriptionPostDelimiter: true,
 			},
 		],

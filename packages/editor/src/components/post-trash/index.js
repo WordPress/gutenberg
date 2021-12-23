@@ -11,39 +11,36 @@ import { compose } from '@wordpress/compose';
  */
 import { store as editorStore } from '../../store';
 
-function PostTrash( { isNew, postId, postType, ...props } ) {
-	if ( isNew || ! postId ) {
+function PostTrash({ isNew, postId, postType, ...props }) {
+	if (isNew || !postId) {
 		return null;
 	}
 
-	const onClick = () => props.trashPost( postId, postType );
+	const onClick = () => props.trashPost(postId, postType);
 
 	return (
 		<Button
 			className="editor-post-trash"
 			isDestructive
 			variant="secondary"
-			onClick={ onClick }
+			onClick={onClick}
 		>
-			{ __( 'Move to trash' ) }
+			{__('Move to trash')}
 		</Button>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const {
-			isEditedPostNew,
-			getCurrentPostId,
-			getCurrentPostType,
-		} = select( editorStore );
+export default compose([
+	withSelect((select) => {
+		const { isEditedPostNew, getCurrentPostId, getCurrentPostType } =
+			select(editorStore);
 		return {
 			isNew: isEditedPostNew(),
 			postId: getCurrentPostId(),
 			postType: getCurrentPostType(),
 		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		trashPost: dispatch( editorStore ).trashPost,
-	} ) ),
-] )( PostTrash );
+	}),
+	withDispatch((dispatch) => ({
+		trashPost: dispatch(editorStore).trashPost,
+	})),
+])(PostTrash);

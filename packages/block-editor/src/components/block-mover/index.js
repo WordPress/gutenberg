@@ -22,7 +22,7 @@ import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import { store as blockEditorStore } from '../../store';
 
-function BlockMover( {
+function BlockMover({
 	isFirst,
 	isLast,
 	clientIds,
@@ -31,17 +31,17 @@ function BlockMover( {
 	rootClientId,
 	orientation,
 	hideDragHandle,
-} ) {
-	const [ isFocused, setIsFocused ] = useState( false );
+}) {
+	const [isFocused, setIsFocused] = useState(false);
 
-	const onFocus = () => setIsFocused( true );
-	const onBlur = () => setIsFocused( false );
+	const onFocus = () => setIsFocused(true);
+	const onBlur = () => setIsFocused(false);
 
-	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
+	if (!canMove || (isFirst && isLast && !rootClientId)) {
 		return null;
 	}
 
-	const dragHandleLabel = __( 'Drag' );
+	const dragHandleLabel = __('Drag');
 
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the buttons while it has focus causes the screen to change
@@ -49,53 +49,53 @@ function BlockMover( {
 	// the rendering parent, leaving it unable to react to focus out.
 	return (
 		<div
-			className={ classnames( 'block-editor-block-mover', {
-				'is-visible': isFocused || ! isHidden,
+			className={classnames('block-editor-block-mover', {
+				'is-visible': isFocused || !isHidden,
 				'is-horizontal': orientation === 'horizontal',
-			} ) }
+			})}
 		>
-			{ ! hideDragHandle && (
+			{!hideDragHandle && (
 				<BlockDraggable
-					clientIds={ clientIds }
+					clientIds={clientIds}
 					cloneClassname="block-editor-block-mover__drag-clone"
 				>
-					{ ( draggableProps ) => (
+					{(draggableProps) => (
 						<Button
-							icon={ dragHandle }
+							icon={dragHandle}
 							className="block-editor-block-mover__drag-handle"
 							aria-hidden="true"
-							label={ dragHandleLabel }
+							label={dragHandleLabel}
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
 							tabIndex="-1"
-							{ ...draggableProps }
+							{...draggableProps}
 						/>
-					) }
+					)}
 				</BlockDraggable>
-			) }
+			)}
 			<ToolbarGroup className="block-editor-block-mover__move-button-container">
-				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
-					{ ( itemProps ) => (
+				<ToolbarItem onFocus={onFocus} onBlur={onBlur}>
+					{(itemProps) => (
 						<BlockMoverUpButton
-							clientIds={ clientIds }
-							{ ...itemProps }
+							clientIds={clientIds}
+							{...itemProps}
 						/>
-					) }
+					)}
 				</ToolbarItem>
-				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
-					{ ( itemProps ) => (
+				<ToolbarItem onFocus={onFocus} onBlur={onBlur}>
+					{(itemProps) => (
 						<BlockMoverDownButton
-							clientIds={ clientIds }
-							{ ...itemProps }
+							clientIds={clientIds}
+							{...itemProps}
 						/>
-					) }
+					)}
 				</ToolbarItem>
 			</ToolbarGroup>
 		</div>
 	);
 }
 
-export default withSelect( ( select, { clientIds } ) => {
+export default withSelect((select, { clientIds }) => {
 	const {
 		getBlock,
 		getBlockIndex,
@@ -103,24 +103,24 @@ export default withSelect( ( select, { clientIds } ) => {
 		canMoveBlocks,
 		getBlockOrder,
 		getBlockRootClientId,
-	} = select( blockEditorStore );
-	const normalizedClientIds = castArray( clientIds );
-	const firstClientId = first( normalizedClientIds );
-	const block = getBlock( firstClientId );
-	const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
-	const firstIndex = getBlockIndex( firstClientId );
-	const lastIndex = getBlockIndex( last( normalizedClientIds ) );
-	const blockOrder = getBlockOrder( rootClientId );
+	} = select(blockEditorStore);
+	const normalizedClientIds = castArray(clientIds);
+	const firstClientId = first(normalizedClientIds);
+	const block = getBlock(firstClientId);
+	const rootClientId = getBlockRootClientId(first(normalizedClientIds));
+	const firstIndex = getBlockIndex(firstClientId);
+	const lastIndex = getBlockIndex(last(normalizedClientIds));
+	const blockOrder = getBlockOrder(rootClientId);
 	const isFirst = firstIndex === 0;
 	const isLast = lastIndex === blockOrder.length - 1;
 
 	return {
-		blockType: block ? getBlockType( block.name ) : null,
-		canMove: canMoveBlocks( clientIds, rootClientId ),
+		blockType: block ? getBlockType(block.name) : null,
+		canMove: canMoveBlocks(clientIds, rootClientId),
 		rootClientId,
 		firstIndex,
 		isFirst,
 		isLast,
-		orientation: getBlockListSettings( rootClientId )?.orientation,
+		orientation: getBlockListSettings(rootClientId)?.orientation,
 	};
-} )( BlockMover );
+})(BlockMover);

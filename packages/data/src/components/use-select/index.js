@@ -89,13 +89,13 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( mapSelect, deps ) {
+export default function useSelect(mapSelect, deps) {
 	const hasMappingFunction = 'function' === typeof mapSelect;
 
 	// If we're recalling a store by its name or by
 	// its descriptor then we won't be caching the
 	// calls to `mapSelect` because we won't be calling it.
-	if ( ! hasMappingFunction ) {
+	if (!hasMappingFunction) {
 		deps = [];
 	}
 
@@ -115,61 +115,61 @@ export default function useSelect( mapSelect, deps ) {
 	// React can sometimes clear the `useMemo` cache.
 	// We use the cache-stable `useMemoOne` to avoid
 	// losing queues.
-	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
-	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
+	const queueContext = useMemoOne(() => ({ queue: true }), [registry]);
+	const [, forceRender] = useReducer((s) => s + 1, 0);
 
 	const latestMapSelect = useRef();
-	const latestIsAsync = useRef( isAsync );
+	const latestIsAsync = useRef(isAsync);
 	const latestMapOutput = useRef();
 	const latestMapOutputError = useRef();
 	const isMountedAndNotUnsubscribing = useRef();
 
 	// Keep track of the stores being selected in the _mapSelect function,
 	// and only subscribe to those stores later.
-	const listeningStores = useRef( [] );
+	const listeningStores = useRef([]);
 	const trapSelect = useCallback(
-		( callback ) =>
+		(callback) =>
 			registry.__experimentalMarkListeningStores(
 				callback,
 				listeningStores
 			),
-		[ registry ]
+		[registry]
 	);
 
 	// Generate a "flag" for used in the effect dependency array.
 	// It's different than just using `mapSelect` since deps could be undefined,
 	// in that case, we would still want to memoize it.
-	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
+	const depsChangedFlag = useMemo(() => ({}), deps || []);
 
 	let mapOutput;
 
-	if ( _mapSelect ) {
+	if (_mapSelect) {
 		mapOutput = latestMapOutput.current;
 		const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
-		const lastMapSelectFailed = !! latestMapOutputError.current;
+		const lastMapSelectFailed = !!latestMapOutputError.current;
 
-		if ( hasReplacedMapSelect || lastMapSelectFailed ) {
+		if (hasReplacedMapSelect || lastMapSelectFailed) {
 			try {
-				mapOutput = trapSelect( () =>
-					_mapSelect( registry.select, registry )
+				mapOutput = trapSelect(() =>
+					_mapSelect(registry.select, registry)
 				);
-			} catch ( error ) {
-				let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+			} catch (error) {
+				let errorMessage = `An error occurred while running 'mapSelect': ${error.message}`;
 
-				if ( latestMapOutputError.current ) {
+				if (latestMapOutputError.current) {
 					errorMessage += `\nThe error may be correlated with this previous error:\n`;
-					errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
+					errorMessage += `${latestMapOutputError.current.stack}\n\n`;
 					errorMessage += 'Original stack trace:';
 				}
 
 				// eslint-disable-next-line no-console
-				console.error( errorMessage );
+				console.error(errorMessage);
 			}
 		}
 	}
 
-	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction ) {
+	useIsomorphicLayoutEffect(() => {
+		if (!hasMappingFunction) {
 			return;
 		}
 
@@ -182,31 +182,29 @@ export default function useSelect( mapSelect, deps ) {
 		// to avoid using stale values in the flushed
 		// callbacks or potentially overwriting a
 		// changed `latestMapOutput.current`.
-		if ( latestIsAsync.current !== isAsync ) {
+		if (latestIsAsync.current !== isAsync) {
 			latestIsAsync.current = isAsync;
-			renderQueue.flush( queueContext );
+			renderQueue.flush(queueContext);
 		}
-	} );
+	});
 
-	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction ) {
+	useIsomorphicLayoutEffect(() => {
+		if (!hasMappingFunction) {
 			return;
 		}
 
 		const onStoreChange = () => {
-			if ( isMountedAndNotUnsubscribing.current ) {
+			if (isMountedAndNotUnsubscribing.current) {
 				try {
-					const newMapOutput = trapSelect( () =>
-						latestMapSelect.current( registry.select, registry )
+					const newMapOutput = trapSelect(() =>
+						latestMapSelect.current(registry.select, registry)
 					);
 
-					if (
-						isShallowEqual( latestMapOutput.current, newMapOutput )
-					) {
+					if (isShallowEqual(latestMapOutput.current, newMapOutput)) {
 						return;
 					}
 					latestMapOutput.current = newMapOutput;
-				} catch ( error ) {
+				} catch (error) {
 					latestMapOutputError.current = error;
 				}
 				forceRender();
@@ -215,34 +213,34 @@ export default function useSelect( mapSelect, deps ) {
 
 		// catch any possible state changes during mount before the subscription
 		// could be set.
-		if ( latestIsAsync.current ) {
-			renderQueue.add( queueContext, onStoreChange );
+		if (latestIsAsync.current) {
+			renderQueue.add(queueContext, onStoreChange);
 		} else {
 			onStoreChange();
 		}
 
 		const onChange = () => {
-			if ( latestIsAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
+			if (latestIsAsync.current) {
+				renderQueue.add(queueContext, onStoreChange);
 			} else {
 				onStoreChange();
 			}
 		};
 
-		const unsubscribers = listeningStores.current.map( ( storeName ) =>
-			registry.__experimentalSubscribeStore( storeName, onChange )
+		const unsubscribers = listeningStores.current.map((storeName) =>
+			registry.__experimentalSubscribeStore(storeName, onChange)
 		);
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
 			// The return value of the subscribe function could be undefined if the store is a custom generic store.
-			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
-			renderQueue.flush( queueContext );
+			unsubscribers.forEach((unsubscribe) => unsubscribe?.());
+			renderQueue.flush(queueContext);
 		};
 		// If you're tempted to eliminate the spread dependencies below don't do it!
 		// We're passing these in from the calling function and want to make sure we're
 		// examining every individual value inside the `deps` array.
-	}, [ registry, trapSelect, hasMappingFunction, depsChangedFlag ] );
+	}, [registry, trapSelect, hasMappingFunction, depsChangedFlag]);
 
-	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
+	return hasMappingFunction ? mapOutput : registry.select(mapSelect);
 }

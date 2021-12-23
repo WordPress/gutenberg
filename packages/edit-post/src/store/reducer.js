@@ -21,8 +21,8 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  *
  * @return {Function} Higher-order reducer.
  */
-const createWithInitialState = ( initialState ) => ( reducer ) => {
-	return ( state = initialState, action ) => reducer( state, action );
+const createWithInitialState = (initialState) => (reducer) => {
+	return (state = initialState, action) => reducer(state, action);
 };
 
 /**
@@ -44,19 +44,19 @@ const createWithInitialState = ( initialState ) => ( reducer ) => {
  *
  * @return {Object} Updated state.
  */
-export const preferences = flow( [
+export const preferences = flow([
 	combineReducers,
-	createWithInitialState( PREFERENCES_DEFAULTS ),
-] )( {
-	panels( state, action ) {
-		switch ( action.type ) {
+	createWithInitialState(PREFERENCES_DEFAULTS),
+])({
+	panels(state, action) {
+		switch (action.type) {
 			case 'TOGGLE_PANEL_ENABLED': {
 				const { panelName } = action;
 				return {
 					...state,
-					[ panelName ]: {
-						...state[ panelName ],
-						enabled: ! get( state, [ panelName, 'enabled' ], true ),
+					[panelName]: {
+						...state[panelName],
+						enabled: !get(state, [panelName, 'enabled'], true),
 					},
 				};
 			}
@@ -64,13 +64,13 @@ export const preferences = flow( [
 			case 'TOGGLE_PANEL_OPENED': {
 				const { panelName } = action;
 				const isOpen =
-					state[ panelName ] === true ||
-					get( state, [ panelName, 'opened' ], false );
+					state[panelName] === true ||
+					get(state, [panelName, 'opened'], false);
 				return {
 					...state,
-					[ panelName ]: {
-						...state[ panelName ],
-						opened: ! isOpen,
+					[panelName]: {
+						...state[panelName],
+						opened: !isOpen,
 					},
 				};
 			}
@@ -78,50 +78,50 @@ export const preferences = flow( [
 
 		return state;
 	},
-	editorMode( state, action ) {
-		if ( action.type === 'SWITCH_MODE' ) {
+	editorMode(state, action) {
+		if (action.type === 'SWITCH_MODE') {
 			return action.mode;
 		}
 
 		return state;
 	},
-	hiddenBlockTypes( state, action ) {
-		switch ( action.type ) {
+	hiddenBlockTypes(state, action) {
+		switch (action.type) {
 			case 'SHOW_BLOCK_TYPES':
-				return without( state, ...action.blockNames );
+				return without(state, ...action.blockNames);
 
 			case 'HIDE_BLOCK_TYPES':
-				return union( state, action.blockNames );
+				return union(state, action.blockNames);
 		}
 
 		return state;
 	},
-	preferredStyleVariations( state, action ) {
-		switch ( action.type ) {
+	preferredStyleVariations(state, action) {
+		switch (action.type) {
 			case 'UPDATE_PREFERRED_STYLE_VARIATIONS': {
-				if ( ! action.blockName ) {
+				if (!action.blockName) {
 					return state;
 				}
-				if ( ! action.blockStyle ) {
-					return omit( state, [ action.blockName ] );
+				if (!action.blockStyle) {
+					return omit(state, [action.blockName]);
 				}
 				return {
 					...state,
-					[ action.blockName ]: action.blockStyle,
+					[action.blockName]: action.blockStyle,
 				};
 			}
 		}
 		return state;
 	},
-	localAutosaveInterval( state, action ) {
-		switch ( action.type ) {
+	localAutosaveInterval(state, action) {
+		switch (action.type) {
 			case 'UPDATE_LOCAL_AUTOSAVE_INTERVAL':
 				return action.interval;
 		}
 
 		return state;
 	},
-} );
+});
 
 /**
  * Reducer storing the list of all programmatically removed panels.
@@ -131,11 +131,11 @@ export const preferences = flow( [
  *
  * @return {Array} Updated state.
  */
-export function removedPanels( state = [], action ) {
-	switch ( action.type ) {
+export function removedPanels(state = [], action) {
+	switch (action.type) {
 		case 'REMOVE_PANEL':
-			if ( ! includes( state, action.panelName ) ) {
-				return [ ...state, action.panelName ];
+			if (!includes(state, action.panelName)) {
+				return [...state, action.panelName];
 			}
 	}
 
@@ -150,8 +150,8 @@ export function removedPanels( state = [], action ) {
  *
  * @return {Object} Updated state
  */
-export function activeModal( state = null, action ) {
-	switch ( action.type ) {
+export function activeModal(state = null, action) {
+	switch (action.type) {
 		case 'OPEN_MODAL':
 			return action.name;
 		case 'CLOSE_MODAL':
@@ -161,14 +161,14 @@ export function activeModal( state = null, action ) {
 	return state;
 }
 
-export function publishSidebarActive( state = false, action ) {
-	switch ( action.type ) {
+export function publishSidebarActive(state = false, action) {
+	switch (action.type) {
 		case 'OPEN_PUBLISH_SIDEBAR':
 			return true;
 		case 'CLOSE_PUBLISH_SIDEBAR':
 			return false;
 		case 'TOGGLE_PUBLISH_SIDEBAR':
-			return ! state;
+			return !state;
 	}
 	return state;
 }
@@ -183,8 +183,8 @@ export function publishSidebarActive( state = false, action ) {
  *
  * @return {Object} Updated state.
  */
-export function isSavingMetaBoxes( state = false, action ) {
-	switch ( action.type ) {
+export function isSavingMetaBoxes(state = false, action) {
+	switch (action.type) {
 		case 'REQUEST_META_BOX_UPDATES':
 			return true;
 		case 'META_BOX_UPDATES_SUCCESS':
@@ -203,8 +203,8 @@ export function isSavingMetaBoxes( state = false, action ) {
  *
  * @return {Object} Updated state.
  */
-export function metaBoxLocations( state = {}, action ) {
-	switch ( action.type ) {
+export function metaBoxLocations(state = {}, action) {
+	switch (action.type) {
 		case 'SET_META_BOXES_PER_LOCATIONS':
 			return action.metaBoxesPerLocation;
 	}
@@ -220,8 +220,8 @@ export function metaBoxLocations( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function deviceType( state = 'Desktop', action ) {
-	switch ( action.type ) {
+export function deviceType(state = 'Desktop', action) {
+	switch (action.type) {
 		case 'SET_PREVIEW_DEVICE_TYPE':
 			return action.deviceType;
 	}
@@ -238,8 +238,8 @@ export function deviceType( state = 'Desktop', action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
-export function blockInserterPanel( state = false, action ) {
-	switch ( action.type ) {
+export function blockInserterPanel(state = false, action) {
+	switch (action.type) {
 		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
@@ -257,8 +257,8 @@ export function blockInserterPanel( state = false, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
-export function listViewPanel( state = false, action ) {
-	switch ( action.type ) {
+export function listViewPanel(state = false, action) {
+	switch (action.type) {
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value ? false : state;
 		case 'SET_IS_LIST_VIEW_OPENED':
@@ -273,8 +273,8 @@ export function listViewPanel( state = false, action ) {
  * @param {boolean} state
  * @param {Object}  action
  */
-function isEditingTemplate( state = false, action ) {
-	switch ( action.type ) {
+function isEditingTemplate(state = false, action) {
+	switch (action.type) {
 		case 'SET_IS_EDITING_TEMPLATE':
 			return action.value;
 	}
@@ -289,21 +289,21 @@ function isEditingTemplate( state = false, action ) {
  *
  * @return {boolean} Updated state.
  */
-function metaBoxesInitialized( state = false, action ) {
-	switch ( action.type ) {
+function metaBoxesInitialized(state = false, action) {
+	switch (action.type) {
 		case 'META_BOXES_INITIALIZED':
 			return true;
 	}
 	return state;
 }
 
-const metaBoxes = combineReducers( {
+const metaBoxes = combineReducers({
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
 	initialized: metaBoxesInitialized,
-} );
+});
 
-export default combineReducers( {
+export default combineReducers({
 	activeModal,
 	metaBoxes,
 	preferences,
@@ -313,4 +313,4 @@ export default combineReducers( {
 	blockInserterPanel,
 	listViewPanel,
 	isEditingTemplate,
-} );
+});

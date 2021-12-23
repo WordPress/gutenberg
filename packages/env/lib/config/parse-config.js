@@ -2,13 +2,13 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
-const os = require( 'os' );
+const path = require('path');
+const os = require('os');
 
 /**
  * Internal dependencies
  */
-const { ValidationError } = require( './validate-config' );
+const { ValidationError } = require('./validate-config');
 
 /**
  * @typedef {import('./config').WPServiceConfig} WPServiceConfig
@@ -19,7 +19,7 @@ const { ValidationError } = require( './validate-config' );
  * The string at the beginning of a source path that points to a home-relative
  * directory. Will be '~/' on unix environments and '~\' on Windows.
  */
-const HOME_PATH_PREFIX = `~${ path.sep }`;
+const HOME_PATH_PREFIX = `~${path.sep}`;
 
 /**
  * Parses a config object. Takes environment-level configuration in the format
@@ -32,25 +32,25 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  * @return {WPServiceConfig} Parsed environment-level configuration.
  */
-module.exports = function parseConfig( config, options ) {
+module.exports = function parseConfig(config, options) {
 	return {
 		port: config.port,
 		phpVersion: config.phpVersion,
 		coreSource: includeTestsPath(
-			parseSourceString( config.core, options ),
+			parseSourceString(config.core, options),
 			options
 		),
-		pluginSources: config.plugins.map( ( sourceString ) =>
-			parseSourceString( sourceString, options )
+		pluginSources: config.plugins.map((sourceString) =>
+			parseSourceString(sourceString, options)
 		),
-		themeSources: config.themes.map( ( sourceString ) =>
-			parseSourceString( sourceString, options )
+		themeSources: config.themes.map((sourceString) =>
+			parseSourceString(sourceString, options)
 		),
 		config: config.config,
-		mappings: Object.entries( config.mappings ).reduce(
-			( result, [ wpDir, localDir ] ) => {
-				const source = parseSourceString( localDir, options );
-				result[ wpDir ] = source;
+		mappings: Object.entries(config.mappings).reduce(
+			(result, [wpDir, localDir]) => {
+				const source = parseSourceString(localDir, options);
+				result[wpDir] = source;
 				return result;
 			},
 			{}
@@ -67,26 +67,26 @@ module.exports = function parseConfig( config, options ) {
  *
  * @return {?WPSource} A source object.
  */
-function parseSourceString( sourceString, { workDirectoryPath } ) {
-	if ( sourceString === null ) {
+function parseSourceString(sourceString, { workDirectoryPath }) {
+	if (sourceString === null) {
 		return null;
 	}
 
 	if (
-		sourceString.startsWith( '.' ) ||
-		sourceString.startsWith( HOME_PATH_PREFIX ) ||
-		path.isAbsolute( sourceString )
+		sourceString.startsWith('.') ||
+		sourceString.startsWith(HOME_PATH_PREFIX) ||
+		path.isAbsolute(sourceString)
 	) {
 		let sourcePath;
-		if ( sourceString.startsWith( HOME_PATH_PREFIX ) ) {
+		if (sourceString.startsWith(HOME_PATH_PREFIX)) {
 			sourcePath = path.resolve(
 				os.homedir(),
-				sourceString.slice( HOME_PATH_PREFIX.length )
+				sourceString.slice(HOME_PATH_PREFIX.length)
 			);
 		} else {
-			sourcePath = path.resolve( sourceString );
+			sourcePath = path.resolve(sourceString);
 		}
-		const basename = path.basename( sourcePath );
+		const basename = path.basename(sourcePath);
 		return {
 			type: 'local',
 			path: sourcePath,
@@ -98,18 +98,18 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
 	);
 
-	if ( zipFields ) {
+	if (zipFields) {
 		const wpOrgFields = sourceString.match(
 			/^https?:\/\/downloads\.wordpress\.org\/(?:plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
 		);
 		const basename = wpOrgFields
-			? encodeURIComponent( wpOrgFields[ 1 ] )
-			: encodeURIComponent( path.basename( zipFields[ 1 ] ) );
+			? encodeURIComponent(wpOrgFields[1])
+			: encodeURIComponent(path.basename(zipFields[1]));
 
 		return {
 			type: 'zip',
 			url: sourceString,
-			path: path.resolve( workDirectoryPath, basename ),
+			path: path.resolve(workDirectoryPath, basename),
 			basename,
 		};
 	}
@@ -117,23 +117,23 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	const gitHubFields = sourceString.match(
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
 	);
-	if ( gitHubFields ) {
+	if (gitHubFields) {
 		return {
 			type: 'git',
-			url: `https://github.com/${ gitHubFields[ 1 ] }/${ gitHubFields[ 2 ] }.git`,
-			ref: gitHubFields[ 5 ] || 'master',
+			url: `https://github.com/${gitHubFields[1]}/${gitHubFields[2]}.git`,
+			ref: gitHubFields[5] || 'master',
 			path: path.resolve(
 				workDirectoryPath,
-				gitHubFields[ 2 ],
-				gitHubFields[ 4 ] || '.'
+				gitHubFields[2],
+				gitHubFields[4] || '.'
 			),
-			clonePath: path.resolve( workDirectoryPath, gitHubFields[ 2 ] ),
-			basename: gitHubFields[ 4 ] || gitHubFields[ 2 ],
+			clonePath: path.resolve(workDirectoryPath, gitHubFields[2]),
+			basename: gitHubFields[4] || gitHubFields[2],
 		};
 	}
 
 	throw new ValidationError(
-		`Invalid or unrecognized source: "${ sourceString }".`
+		`Invalid or unrecognized source: "${sourceString}".`
 	);
 }
 
@@ -147,8 +147,8 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
  *
  * @return {?WPSource} A source object.
  */
-function includeTestsPath( source, { workDirectoryPath } ) {
-	if ( source === null ) {
+function includeTestsPath(source, { workDirectoryPath }) {
+	if (source === null) {
 		return null;
 	}
 
@@ -156,7 +156,7 @@ function includeTestsPath( source, { workDirectoryPath } ) {
 		...source,
 		testsPath: path.resolve(
 			workDirectoryPath,
-			'tests-' + path.basename( source.path )
+			'tests-' + path.basename(source.path)
 		),
 	};
 }

@@ -30,28 +30,28 @@ import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
-const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
+const BlockInspector = ({ showNoBlockSelectedMessage = true }) => {
 	const {
 		count,
 		hasBlockStyles,
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
-	} = useSelect( ( select ) => {
+	} = useSelect((select) => {
 		const {
 			getSelectedBlockClientId,
 			getSelectedBlockCount,
 			getBlockName,
-		} = select( blockEditorStore );
-		const { getBlockStyles } = select( blocksStore );
+		} = select(blockEditorStore);
+		const { getBlockStyles } = select(blocksStore);
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
-			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
+			_selectedBlockClientId && getBlockName(_selectedBlockClientId);
 		const _blockType =
-			_selectedBlockName && getBlockType( _selectedBlockName );
+			_selectedBlockName && getBlockType(_selectedBlockName);
 		const blockStyles =
-			_selectedBlockName && getBlockStyles( _selectedBlockName );
+			_selectedBlockName && getBlockStyles(_selectedBlockName);
 
 		return {
 			count: getSelectedBlockCount(),
@@ -60,24 +60,24 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			blockType: _blockType,
 			hasBlockStyles: blockStyles && blockStyles.length > 0,
 		};
-	}, [] );
+	}, []);
 
-	if ( count > 1 ) {
+	if (count > 1) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
 				<InspectorControls.Slot />
 				<InspectorControls.Slot
 					__experimentalGroup="typography"
-					label={ __( 'Typography' ) }
+					label={__('Typography')}
 				/>
 				<InspectorControls.Slot
 					__experimentalGroup="dimensions"
-					label={ __( 'Dimensions' ) }
+					label={__('Dimensions')}
 				/>
 				<InspectorControls.Slot
 					__experimentalGroup="border"
-					label={ __( 'Border' ) }
+					label={__('Border')}
 				/>
 			</div>
 		);
@@ -90,15 +90,11 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	 * If the selected block is of an unregistered type, avoid showing it as an actual selection
 	 * because we want the user to focus on the unregistered block warning, not block settings.
 	 */
-	if (
-		! blockType ||
-		! selectedBlockClientId ||
-		isSelectedBlockUnregistered
-	) {
-		if ( showNoBlockSelectedMessage ) {
+	if (!blockType || !selectedBlockClientId || isSelectedBlockUnregistered) {
+		if (showNoBlockSelectedMessage) {
 			return (
 				<span className="block-editor-block-inspector__no-blocks">
-					{ __( 'No block selected.' ) }
+					{__('No block selected.')}
 				</span>
 			);
 		}
@@ -106,50 +102,46 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	}
 	return (
 		<BlockInspectorSingleBlock
-			clientId={ selectedBlockClientId }
-			blockName={ blockType.name }
-			hasBlockStyles={ hasBlockStyles }
+			clientId={selectedBlockClientId}
+			blockName={blockType.name}
+			hasBlockStyles={hasBlockStyles}
 		/>
 	);
 };
 
-const BlockInspectorSingleBlock = ( {
-	clientId,
-	blockName,
-	hasBlockStyles,
-} ) => {
-	const blockInformation = useBlockDisplayInformation( clientId );
+const BlockInspectorSingleBlock = ({ clientId, blockName, hasBlockStyles }) => {
+	const blockInformation = useBlockDisplayInformation(clientId);
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard { ...blockInformation } />
-			<BlockVariationTransforms blockClientId={ clientId } />
-			{ hasBlockStyles && (
+			<BlockCard {...blockInformation} />
+			<BlockVariationTransforms blockClientId={clientId} />
+			{hasBlockStyles && (
 				<div>
-					<PanelBody title={ __( 'Styles' ) }>
+					<PanelBody title={__('Styles')}>
 						<BlockStyles
 							scope="core/block-inspector"
-							clientId={ clientId }
+							clientId={clientId}
 						/>
-						{ hasBlockSupport(
+						{hasBlockSupport(
 							blockName,
 							'defaultStylePicker',
 							true
-						) && <DefaultStylePicker blockName={ blockName } /> }
+						) && <DefaultStylePicker blockName={blockName} />}
 					</PanelBody>
 				</div>
-			) }
+			)}
 			<InspectorControls.Slot />
 			<InspectorControls.Slot
 				__experimentalGroup="typography"
-				label={ __( 'Typography' ) }
+				label={__('Typography')}
 			/>
 			<InspectorControls.Slot
 				__experimentalGroup="dimensions"
-				label={ __( 'Dimensions' ) }
+				label={__('Dimensions')}
 			/>
 			<InspectorControls.Slot
 				__experimentalGroup="border"
-				label={ __( 'Border' ) }
+				label={__('Border')}
 			/>
 			<div>
 				<AdvancedControls />
@@ -160,18 +152,18 @@ const BlockInspectorSingleBlock = ( {
 };
 
 const AdvancedControls = () => {
-	const slot = useSlot( InspectorAdvancedControls.slotName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
+	const slot = useSlot(InspectorAdvancedControls.slotName);
+	const hasFills = Boolean(slot.fills && slot.fills.length);
 
-	if ( ! hasFills ) {
+	if (!hasFills) {
 		return null;
 	}
 
 	return (
 		<PanelBody
 			className="block-editor-block-inspector__advanced"
-			title={ __( 'Advanced' ) }
-			initialOpen={ false }
+			title={__('Advanced')}
+			initialOpen={false}
 		>
 			<InspectorControls.Slot __experimentalGroup="advanced" />
 		</PanelBody>

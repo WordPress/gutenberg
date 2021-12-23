@@ -18,34 +18,34 @@ import { isFormatEqual } from './is-format-equal';
  *
  * @return {RichTextValue} Mutated value.
  */
-export function updateFormats( { value, start, end, formats } ) {
+export function updateFormats({ value, start, end, formats }) {
 	// Start and end may be switched in case of delete.
-	const min = Math.min( start, end );
-	const max = Math.max( start, end );
-	const formatsBefore = value.formats[ min - 1 ] || [];
-	const formatsAfter = value.formats[ max ] || [];
+	const min = Math.min(start, end);
+	const max = Math.max(start, end);
+	const formatsBefore = value.formats[min - 1] || [];
+	const formatsAfter = value.formats[max] || [];
 
 	// First, fix the references. If any format right before or after are
 	// equal, the replacement format should use the same reference.
-	value.activeFormats = formats.map( ( format, index ) => {
-		if ( formatsBefore[ index ] ) {
-			if ( isFormatEqual( format, formatsBefore[ index ] ) ) {
-				return formatsBefore[ index ];
+	value.activeFormats = formats.map((format, index) => {
+		if (formatsBefore[index]) {
+			if (isFormatEqual(format, formatsBefore[index])) {
+				return formatsBefore[index];
 			}
-		} else if ( formatsAfter[ index ] ) {
-			if ( isFormatEqual( format, formatsAfter[ index ] ) ) {
-				return formatsAfter[ index ];
+		} else if (formatsAfter[index]) {
+			if (isFormatEqual(format, formatsAfter[index])) {
+				return formatsAfter[index];
 			}
 		}
 
 		return format;
-	} );
+	});
 
-	while ( --end >= start ) {
-		if ( value.activeFormats.length > 0 ) {
-			value.formats[ end ] = value.activeFormats;
+	while (--end >= start) {
+		if (value.activeFormats.length > 0) {
+			value.formats[end] = value.activeFormats;
 		} else {
-			delete value.formats[ end ];
+			delete value.formats[end];
 		}
 	}
 

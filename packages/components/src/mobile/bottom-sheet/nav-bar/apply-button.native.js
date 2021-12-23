@@ -16,35 +16,31 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './styles.scss';
 import ActionButton from './action-button';
 
-function ApplyButton( { onPress } ) {
+function ApplyButton({ onPress }) {
 	const buttonTextStyle = usePreferredColorSchemeStyle(
-		styles[ 'button-text' ],
-		styles[ 'button-text-dark' ]
+		styles['button-text'],
+		styles['button-text-dark']
 	);
 
 	const applyButtonStyle = usePreferredColorSchemeStyle(
-		styles[ 'apply-button-icon' ],
-		styles[ 'apply-button-icon-dark' ]
+		styles['apply-button-icon'],
+		styles['apply-button-icon-dark']
 	);
 
 	return (
-		<View style={ styles[ 'apply-button' ] }>
+		<View style={styles['apply-button']}>
 			<ActionButton
-				onPress={ onPress }
-				accessibilityLabel={ __( 'Apply' ) }
-				accessibilityHint={ __( 'Applies the setting' ) }
+				onPress={onPress}
+				accessibilityLabel={__('Apply')}
+				accessibilityHint={__('Applies the setting')}
 			>
-				{ Platform.OS === 'ios' ? (
-					<Text style={ buttonTextStyle } maxFontSizeMultiplier={ 2 }>
-						{ __( 'Apply' ) }
+				{Platform.OS === 'ios' ? (
+					<Text style={buttonTextStyle} maxFontSizeMultiplier={2}>
+						{__('Apply')}
 					</Text>
 				) : (
-					<Icon
-						icon={ check }
-						size={ 24 }
-						style={ applyButtonStyle }
-					/>
-				) }
+					<Icon icon={check} size={24} style={applyButtonStyle} />
+				)}
 			</ActionButton>
 		</View>
 	);

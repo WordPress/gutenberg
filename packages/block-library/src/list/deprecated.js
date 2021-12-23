@@ -20,7 +20,7 @@ const v1 = {
 			source: 'html',
 			selector: 'ol,ul',
 			multiline: 'li',
-			__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
+			__unstableMultilineWrapperTags: ['ol', 'ul'],
 			default: '',
 			__experimentalRole: 'content',
 		},
@@ -52,18 +52,18 @@ const v1 = {
 		__experimentalSelector: 'ol,ul',
 		__experimentalSlashInserter: true,
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const { ordered, values, type, reversed, start } = attributes;
 		const TagName = ordered ? 'ol' : 'ul';
 
 		return (
-			<TagName { ...useBlockProps.save( { type, reversed, start } ) }>
-				<RichText.Content value={ values } multiline="li" />
+			<TagName {...useBlockProps.save({ type, reversed, start })}>
+				<RichText.Content value={values} multiline="li" />
 			</TagName>
 		);
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style } ) {
+	isEligible({ style }) {
 		return style?.typography?.fontFamily;
 	},
 };
@@ -76,4 +76,4 @@ const v1 = {
  *
  * See block-deprecation.md
  */
-export default [ v1 ];
+export default [v1];

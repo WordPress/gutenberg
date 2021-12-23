@@ -16,20 +16,20 @@ import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/con
  * @param {Object} action Dispatched action.
  * @return {Object} Updated state.
  */
-export const preferences = combineReducers( {
-	features( state = PREFERENCES_DEFAULTS.features, action ) {
-		switch ( action.type ) {
+export const preferences = combineReducers({
+	features(state = PREFERENCES_DEFAULTS.features, action) {
+		switch (action.type) {
 			case 'TOGGLE_FEATURE': {
 				return {
 					...state,
-					[ action.feature ]: ! state[ action.feature ],
+					[action.feature]: !state[action.feature],
 				};
 			}
 			default:
 				return state;
 		}
 	},
-} );
+});
 
 /**
  * Reducer returning the editing canvas device type.
@@ -39,8 +39,8 @@ export const preferences = combineReducers( {
  *
  * @return {Object} Updated state.
  */
-export function deviceType( state = 'Desktop', action ) {
-	switch ( action.type ) {
+export function deviceType(state = 'Desktop', action) {
+	switch (action.type) {
 		case 'SET_PREVIEW_DEVICE_TYPE':
 			return action.deviceType;
 	}
@@ -56,8 +56,8 @@ export function deviceType( state = 'Desktop', action ) {
  *
  * @return {Object} Updated state.
  */
-export function settings( state = {}, action ) {
-	switch ( action.type ) {
+export function settings(state = {}, action) {
+	switch (action.type) {
 		case 'UPDATE_SETTINGS':
 			return {
 				...state,
@@ -77,8 +77,8 @@ export function settings( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function editedPost( state = {}, action ) {
-	switch ( action.type ) {
+export function editedPost(state = {}, action) {
+	switch (action.type) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':
 			return {
@@ -104,8 +104,8 @@ export function editedPost( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function homeTemplateId( state, action ) {
-	switch ( action.type ) {
+export function homeTemplateId(state, action) {
+	switch (action.type) {
 		case 'SET_HOME_TEMPLATE':
 			return action.homeTemplateId;
 	}
@@ -127,7 +127,7 @@ export function navigationPanel(
 	state = { menu: MENU_ROOT, isOpen: false },
 	action
 ) {
-	switch ( action.type ) {
+	switch (action.type) {
 		case 'SET_NAVIGATION_PANEL_ACTIVE_MENU':
 			return {
 				...state,
@@ -142,7 +142,7 @@ export function navigationPanel(
 		case 'SET_IS_NAVIGATION_PANEL_OPENED':
 			return {
 				...state,
-				menu: ! action.isOpen ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
+				menu: !action.isOpen ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
 				isOpen: action.isOpen,
 			};
 		case 'SET_IS_LIST_VIEW_OPENED':
@@ -170,8 +170,8 @@ export function navigationPanel(
  * @param {boolean|Object} state  Current state.
  * @param {Object}         action Dispatched action.
  */
-export function blockInserterPanel( state = false, action ) {
-	switch ( action.type ) {
+export function blockInserterPanel(state = false, action) {
+	switch (action.type) {
 		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
 			return false;
 		case 'SET_IS_NAVIGATION_PANEL_OPENED':
@@ -192,8 +192,8 @@ export function blockInserterPanel( state = false, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
-export function listViewPanel( state = false, action ) {
-	switch ( action.type ) {
+export function listViewPanel(state = false, action) {
+	switch (action.type) {
 		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
 			return false;
 		case 'SET_IS_NAVIGATION_PANEL_OPENED':
@@ -206,7 +206,7 @@ export function listViewPanel( state = false, action ) {
 	return state;
 }
 
-export default combineReducers( {
+export default combineReducers({
 	preferences,
 	deviceType,
 	settings,
@@ -215,4 +215,4 @@ export default combineReducers( {
 	navigationPanel,
 	blockInserterPanel,
 	listViewPanel,
-} );
+});

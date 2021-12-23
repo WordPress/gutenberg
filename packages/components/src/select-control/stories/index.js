@@ -21,24 +21,20 @@ export default {
 	},
 };
 
-const SelectControlWithState = ( props ) => {
-	const [ selection, setSelection ] = useState();
+const SelectControlWithState = (props) => {
+	const [selection, setSelection] = useState();
 
 	return (
-		<SelectControl
-			{ ...props }
-			value={ selection }
-			onChange={ setSelection }
-		/>
+		<SelectControl {...props} value={selection} onChange={setSelection} />
 	);
 };
 
 export const _default = () => {
 	const props = {
-		disabled: boolean( 'disabled', false ),
-		help: text( 'help', 'Help text to explain the select control.' ),
-		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		label: text( 'label', 'Value' ),
+		disabled: boolean('disabled', false),
+		help: text('help', 'Help text to explain the select control.'),
+		hideLabelFromVision: boolean('hideLabelFromVision', false),
+		label: text('label', 'Value'),
 		labelPosition: select(
 			'labelPosition',
 			{
@@ -48,13 +44,13 @@ export const _default = () => {
 			},
 			'top'
 		),
-		multiple: boolean( 'multiple', false ),
-		options: object( 'Options', [
+		multiple: boolean('multiple', false),
+		options: object('Options', [
 			{ value: null, label: 'Select an Option', disabled: true },
 			{ value: 'a', label: 'Option A' },
 			{ value: 'b', label: 'Option B' },
 			{ value: 'c', label: 'Option C' },
-		] ),
+		]),
 		size: select(
 			'size',
 			{
@@ -66,7 +62,7 @@ export const _default = () => {
 		),
 	};
 
-	return <SelectControlWithState { ...props } />;
+	return <SelectControlWithState {...props} />;
 };
 
 export const withNativeChildren = () => {

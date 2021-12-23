@@ -7,14 +7,14 @@ import { addFilter } from '@wordpress/hooks';
 const { wp } = window;
 
 const withWideWidgetDisplay = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
+	(BlockEdit) => (props) => {
 		const { idBase } = props.attributes;
 		const isWide =
 			wp.customize.Widgets.data.availableWidgets.find(
-				( widget ) => widget.id_base === idBase
+				(widget) => widget.id_base === idBase
 			)?.is_wide ?? false;
 
-		return <BlockEdit { ...props } isWide={ isWide } />;
+		return <BlockEdit {...props} isWide={isWide} />;
 	},
 	'withWideWidgetDisplay'
 );

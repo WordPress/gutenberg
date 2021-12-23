@@ -27,30 +27,30 @@
  *
  * @return {Object[]} Nested list of comment objects with a `children` property.
  */
-export const convertToTree = ( data ) => {
+export const convertToTree = (data) => {
 	const table = {};
-	if ( ! data ) return [];
+	if (!data) return [];
 
 	// First create a hash table of { [id]: { ...comment, children: [] }}
-	data.forEach( ( item ) => {
-		table[ item.id ] = { commentId: item.id, children: [] };
-	} );
+	data.forEach((item) => {
+		table[item.id] = { commentId: item.id, children: [] };
+	});
 
 	const tree = [];
 
 	// Iterate over the original comments again
-	data.forEach( ( item ) => {
-		if ( item.parent ) {
+	data.forEach((item) => {
+		if (item.parent) {
 			// If the comment has a "parent", then find that parent in the table that
 			// we have created above and push the current comment to the array of its
 			// children.
-			table[ item.parent ].children.push( table[ item.id ] );
+			table[item.parent].children.push(table[item.id]);
 		} else {
 			// Otherwise, if the comment has no parent (also works if parent is 0)
 			// that means that it's a top-level comment so we can find it in the table
 			// and push it to the final tree.
-			tree.push( table[ item.id ] );
+			tree.push(table[item.id]);
 		}
-	} );
+	});
 	return tree;
 };

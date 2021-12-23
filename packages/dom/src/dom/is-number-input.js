@@ -12,11 +12,11 @@ import isHTMLInputElement from './is-html-input-element';
  *
  * @return {node is HTMLInputElement} True if the node is input and holds a number.
  */
-export default function isNumberInput( node ) {
+export default function isNumberInput(node) {
 	/* eslint-enable jsdoc/valid-types */
 	return (
-		isHTMLInputElement( node ) &&
+		isHTMLInputElement(node) &&
 		node.type === 'number' &&
-		!! node.valueAsNumber
+		!!node.valueAsNumber
 	);
 }

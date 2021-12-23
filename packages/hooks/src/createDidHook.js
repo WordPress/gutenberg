@@ -22,16 +22,16 @@ import validateHookName from './validateHookName.js';
  *
  * @return {DidHook} Function that returns a hook's call count.
  */
-function createDidHook( hooks, storeKey ) {
-	return function didHook( hookName ) {
-		const hooksStore = hooks[ storeKey ];
+function createDidHook(hooks, storeKey) {
+	return function didHook(hookName) {
+		const hooksStore = hooks[storeKey];
 
-		if ( ! validateHookName( hookName ) ) {
+		if (!validateHookName(hookName)) {
 			return;
 		}
 
-		return hooksStore[ hookName ] && hooksStore[ hookName ].runs
-			? hooksStore[ hookName ].runs
+		return hooksStore[hookName] && hooksStore[hookName].runs
+			? hooksStore[hookName].runs
 			: 0;
 	};
 }

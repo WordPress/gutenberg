@@ -6,10 +6,10 @@
  *
  * @return {HTMLElement} Layout-emulated element.
  */
-export default function createElement( type ) {
-	const element = document.createElement( type );
+export default function createElement(type) {
+	const element = document.createElement(type);
 
-	const ifNotHidden = ( value, elseValue ) =>
+	const ifNotHidden = (value, elseValue) =>
 		function () {
 			let isHidden = false;
 			let node = this;
@@ -19,23 +19,19 @@ export default function createElement( type ) {
 					node.style.visibility === 'hidden';
 
 				node = node.parentNode;
-			} while (
-				! isHidden &&
-				node &&
-				node.nodeType === node.ELEMENT_NODE
-			);
+			} while (!isHidden && node && node.nodeType === node.ELEMENT_NODE);
 
 			return isHidden ? elseValue : value;
 		};
 
-	Object.defineProperties( element, {
+	Object.defineProperties(element, {
 		offsetHeight: {
-			get: ifNotHidden( 10, 0 ),
+			get: ifNotHidden(10, 0),
 		},
 		offsetWidth: {
-			get: ifNotHidden( 10, 0 ),
+			get: ifNotHidden(10, 0),
 		},
-	} );
+	});
 
 	element.getClientRects = ifNotHidden(
 		[

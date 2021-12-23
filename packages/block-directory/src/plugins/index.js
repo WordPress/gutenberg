@@ -12,7 +12,7 @@ import InserterMenuDownloadableBlocksPanel from './inserter-menu-downloadable-bl
 import InstalledBlocksPrePublishPanel from './installed-blocks-pre-publish-panel';
 import getInstallMissing from './get-install-missing';
 
-registerPlugin( 'block-directory', {
+registerPlugin('block-directory', {
 	render() {
 		return (
 			<>
@@ -22,16 +22,16 @@ registerPlugin( 'block-directory', {
 			</>
 		);
 	},
-} );
+});
 
 addFilter(
 	'blocks.registerBlockType',
 	'block-directory/fallback',
-	( settings, name ) => {
-		if ( name !== 'core/missing' ) {
+	(settings, name) => {
+		if (name !== 'core/missing') {
 			return settings;
 		}
-		settings.edit = getInstallMissing( settings.edit );
+		settings.edit = getInstallMissing(settings.edit);
 
 		return settings;
 	}

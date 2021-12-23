@@ -12,24 +12,21 @@ import {
 } from '@wordpress/compose';
 
 export default createHigherOrderComponent(
-	( WrappedComponent ) => ( props ) => {
-		const [ handleFocusOutside, setHandleFocusOutside ] = useState();
+	(WrappedComponent) => (props) => {
+		const [handleFocusOutside, setHandleFocusOutside] = useState();
 		const bindFocusOutsideHandler = useCallback(
-			( node ) =>
-				setHandleFocusOutside( () =>
+			(node) =>
+				setHandleFocusOutside(() =>
 					node?.handleFocusOutside
-						? node.handleFocusOutside.bind( node )
+						? node.handleFocusOutside.bind(node)
 						: undefined
 				),
 			[]
 		);
 
 		return (
-			<View { ...useFocusOutside( handleFocusOutside ) }>
-				<WrappedComponent
-					ref={ bindFocusOutsideHandler }
-					{ ...props }
-				/>
+			<View {...useFocusOutside(handleFocusOutside)}>
+				<WrappedComponent ref={bindFocusOutsideHandler} {...props} />
 			</View>
 		);
 	},

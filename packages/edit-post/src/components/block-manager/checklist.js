@@ -9,26 +9,26 @@ import { partial } from 'lodash';
 import { BlockIcon } from '@wordpress/block-editor';
 import { CheckboxControl } from '@wordpress/components';
 
-function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
+function BlockTypesChecklist({ blockTypes, value, onItemChange }) {
 	return (
 		<ul className="edit-post-block-manager__checklist">
-			{ blockTypes.map( ( blockType ) => (
+			{blockTypes.map((blockType) => (
 				<li
-					key={ blockType.name }
+					key={blockType.name}
 					className="edit-post-block-manager__checklist-item"
 				>
 					<CheckboxControl
 						label={
 							<>
-								{ blockType.title }
-								<BlockIcon icon={ blockType.icon } />
+								{blockType.title}
+								<BlockIcon icon={blockType.icon} />
 							</>
 						}
-						checked={ value.includes( blockType.name ) }
-						onChange={ partial( onItemChange, blockType.name ) }
+						checked={value.includes(blockType.name)}
+						onChange={partial(onItemChange, blockType.name)}
 					/>
 				</li>
-			) ) }
+			))}
 		</ul>
 	);
 }

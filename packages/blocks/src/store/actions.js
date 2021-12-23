@@ -40,7 +40,7 @@ const LEGACY_CATEGORY_MAPPING = {
  *
  * @return {?WPBlockType} The block, if it has been successfully registered; otherwise `undefined`.
  */
-const processBlockType = ( blockType, { select } ) => {
+const processBlockType = (blockType, { select }) => {
 	const { name } = blockType;
 
 	const settings = applyFilters(
@@ -49,8 +49,8 @@ const processBlockType = ( blockType, { select } ) => {
 		name
 	);
 
-	if ( settings.deprecated ) {
-		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
+	if (settings.deprecated) {
+		settings.deprecated = settings.deprecated.map((deprecation) =>
 			pick(
 				// Only keep valid deprecation keys.
 				applyFilters(
@@ -61,7 +61,7 @@ const processBlockType = ( blockType, { select } ) => {
 					{
 						// Omit deprecation keys here so that deprecations
 						// can opt out of specific keys like "supports".
-						...omit( blockType, DEPRECATED_ENTRY_KEYS ),
+						...omit(blockType, DEPRECATED_ENTRY_KEYS),
 						...deprecation,
 					},
 					name
@@ -71,30 +71,30 @@ const processBlockType = ( blockType, { select } ) => {
 		);
 	}
 
-	if ( ! isPlainObject( settings ) ) {
-		error( 'Block settings must be a valid object.' );
+	if (!isPlainObject(settings)) {
+		error('Block settings must be a valid object.');
 		return;
 	}
 
-	if ( ! isFunction( settings.save ) ) {
-		error( 'The "save" property must be a valid function.' );
+	if (!isFunction(settings.save)) {
+		error('The "save" property must be a valid function.');
 		return;
 	}
-	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
-		error( 'The "edit" property must be a valid function.' );
+	if ('edit' in settings && !isFunction(settings.edit)) {
+		error('The "edit" property must be a valid function.');
 		return;
 	}
 
 	// Canonicalize legacy categories to equivalent fallback.
-	if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
-		settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
+	if (LEGACY_CATEGORY_MAPPING.hasOwnProperty(settings.category)) {
+		settings.category = LEGACY_CATEGORY_MAPPING[settings.category];
 	}
 
 	if (
 		'category' in settings &&
-		! some( select.getCategories(), {
+		!some(select.getCategories(), {
 			slug: settings.category,
-		} )
+		})
 	) {
 		warn(
 			'The block "' +
@@ -106,17 +106,17 @@ const processBlockType = ( blockType, { select } ) => {
 		delete settings.category;
 	}
 
-	if ( ! ( 'title' in settings ) || settings.title === '' ) {
-		error( 'The block "' + name + '" must have a title.' );
+	if (!('title' in settings) || settings.title === '') {
+		error('The block "' + name + '" must have a title.');
 		return;
 	}
-	if ( typeof settings.title !== 'string' ) {
-		error( 'Block titles must be strings.' );
+	if (typeof settings.title !== 'string') {
+		error('Block titles must be strings.');
 		return;
 	}
 
-	settings.icon = normalizeIconObject( settings.icon );
-	if ( ! isValidIcon( settings.icon.src ) ) {
+	settings.icon = normalizeIconObject(settings.icon);
+	if (!isValidIcon(settings.icon.src)) {
 		error(
 			'The icon passed is invalid. ' +
 				'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
@@ -134,10 +134,10 @@ const processBlockType = ( blockType, { select } ) => {
  *
  * @return {Object} Action object.
  */
-export function addBlockTypes( blockTypes ) {
+export function addBlockTypes(blockTypes) {
 	return {
 		type: 'ADD_BLOCK_TYPES',
-		blockTypes: castArray( blockTypes ),
+		blockTypes: castArray(blockTypes),
 	};
 }
 
@@ -146,21 +146,20 @@ export function addBlockTypes( blockTypes ) {
  *
  * @param {WPBlockType} blockType Unprocessed block type settings.
  */
-export const __experimentalRegisterBlockType = ( blockType ) => ( {
-	dispatch,
-	select,
-} ) => {
-	dispatch( {
-		type: 'ADD_UNPROCESSED_BLOCK_TYPE',
-		blockType,
-	} );
+export const __experimentalRegisterBlockType =
+	(blockType) =>
+	({ dispatch, select }) => {
+		dispatch({
+			type: 'ADD_UNPROCESSED_BLOCK_TYPE',
+			blockType,
+		});
 
-	const processedBlockType = processBlockType( blockType, { select } );
-	if ( ! processedBlockType ) {
-		return;
-	}
-	dispatch.addBlockTypes( processedBlockType );
-};
+		const processedBlockType = processBlockType(blockType, { select });
+		if (!processedBlockType) {
+			return;
+		}
+		dispatch.addBlockTypes(processedBlockType);
+	};
 
 /**
  * Signals that all block types should be computed again.
@@ -176,32 +175,32 @@ export const __experimentalRegisterBlockType = ( blockType ) => ( {
  *   7. Filter G.
  * In this scenario some filters would not get applied for all blocks because they are registered too late.
  */
-export const __experimentalReapplyBlockTypeFilters = () => ( {
-	dispatch,
-	select,
-} ) => {
-	const unprocessedBlockTypes = select.__experimentalGetUnprocessedBlockTypes();
+export const __experimentalReapplyBlockTypeFilters =
+	() =>
+	({ dispatch, select }) => {
+		const unprocessedBlockTypes =
+			select.__experimentalGetUnprocessedBlockTypes();
 
-	const processedBlockTypes = Object.keys( unprocessedBlockTypes ).reduce(
-		( accumulator, blockName ) => {
-			const result = processBlockType(
-				unprocessedBlockTypes[ blockName ],
-				{ select }
-			);
-			if ( result ) {
-				accumulator.push( result );
-			}
-			return accumulator;
-		},
-		[]
-	);
+		const processedBlockTypes = Object.keys(unprocessedBlockTypes).reduce(
+			(accumulator, blockName) => {
+				const result = processBlockType(
+					unprocessedBlockTypes[blockName],
+					{ select }
+				);
+				if (result) {
+					accumulator.push(result);
+				}
+				return accumulator;
+			},
+			[]
+		);
 
-	if ( ! processedBlockTypes.length ) {
-		return;
-	}
+		if (!processedBlockTypes.length) {
+			return;
+		}
 
-	dispatch.addBlockTypes( processedBlockTypes );
-};
+		dispatch.addBlockTypes(processedBlockTypes);
+	};
 
 /**
  * Returns an action object used to remove a registered block type.
@@ -210,10 +209,10 @@ export const __experimentalReapplyBlockTypeFilters = () => ( {
  *
  * @return {Object} Action object.
  */
-export function removeBlockTypes( names ) {
+export function removeBlockTypes(names) {
 	return {
 		type: 'REMOVE_BLOCK_TYPES',
-		names: castArray( names ),
+		names: castArray(names),
 	};
 }
 
@@ -225,10 +224,10 @@ export function removeBlockTypes( names ) {
  *
  * @return {Object} Action object.
  */
-export function addBlockStyles( blockName, styles ) {
+export function addBlockStyles(blockName, styles) {
 	return {
 		type: 'ADD_BLOCK_STYLES',
-		styles: castArray( styles ),
+		styles: castArray(styles),
 		blockName,
 	};
 }
@@ -241,10 +240,10 @@ export function addBlockStyles( blockName, styles ) {
  *
  * @return {Object} Action object.
  */
-export function removeBlockStyles( blockName, styleNames ) {
+export function removeBlockStyles(blockName, styleNames) {
 	return {
 		type: 'REMOVE_BLOCK_STYLES',
-		styleNames: castArray( styleNames ),
+		styleNames: castArray(styleNames),
 		blockName,
 	};
 }
@@ -257,10 +256,10 @@ export function removeBlockStyles( blockName, styleNames ) {
  *
  * @return {Object} Action object.
  */
-export function addBlockVariations( blockName, variations ) {
+export function addBlockVariations(blockName, variations) {
 	return {
 		type: 'ADD_BLOCK_VARIATIONS',
-		variations: castArray( variations ),
+		variations: castArray(variations),
 		blockName,
 	};
 }
@@ -273,10 +272,10 @@ export function addBlockVariations( blockName, variations ) {
  *
  * @return {Object} Action object.
  */
-export function removeBlockVariations( blockName, variationNames ) {
+export function removeBlockVariations(blockName, variationNames) {
 	return {
 		type: 'REMOVE_BLOCK_VARIATIONS',
-		variationNames: castArray( variationNames ),
+		variationNames: castArray(variationNames),
 		blockName,
 	};
 }
@@ -288,7 +287,7 @@ export function removeBlockVariations( blockName, variationNames ) {
  *
  * @return {Object} Action object.
  */
-export function setDefaultBlockName( name ) {
+export function setDefaultBlockName(name) {
 	return {
 		type: 'SET_DEFAULT_BLOCK_NAME',
 		name,
@@ -303,7 +302,7 @@ export function setDefaultBlockName( name ) {
  *
  * @return {Object} Action object.
  */
-export function setFreeformFallbackBlockName( name ) {
+export function setFreeformFallbackBlockName(name) {
 	return {
 		type: 'SET_FREEFORM_FALLBACK_BLOCK_NAME',
 		name,
@@ -318,7 +317,7 @@ export function setFreeformFallbackBlockName( name ) {
  *
  * @return {Object} Action object.
  */
-export function setUnregisteredFallbackBlockName( name ) {
+export function setUnregisteredFallbackBlockName(name) {
 	return {
 		type: 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME',
 		name,
@@ -334,7 +333,7 @@ export function setUnregisteredFallbackBlockName( name ) {
  *
  * @return {Object} Action object.
  */
-export function setGroupingBlockName( name ) {
+export function setGroupingBlockName(name) {
 	return {
 		type: 'SET_GROUPING_BLOCK_NAME',
 		name,
@@ -348,7 +347,7 @@ export function setGroupingBlockName( name ) {
  *
  * @return {Object} Action object.
  */
-export function setCategories( categories ) {
+export function setCategories(categories) {
 	return {
 		type: 'SET_CATEGORIES',
 		categories,
@@ -363,7 +362,7 @@ export function setCategories( categories ) {
  *
  * @return {Object} Action object.
  */
-export function updateCategory( slug, category ) {
+export function updateCategory(slug, category) {
 	return {
 		type: 'UPDATE_CATEGORY',
 		slug,
@@ -380,7 +379,7 @@ export function updateCategory( slug, category ) {
  *
  * @return {Object} Action object.
  */
-export function addBlockCollection( namespace, title, icon ) {
+export function addBlockCollection(namespace, title, icon) {
 	return {
 		type: 'ADD_BLOCK_COLLECTION',
 		namespace,
@@ -396,7 +395,7 @@ export function addBlockCollection( namespace, title, icon ) {
  *
  * @return {Object} Action object.
  */
-export function removeBlockCollection( namespace ) {
+export function removeBlockCollection(namespace) {
 	return {
 		type: 'REMOVE_BLOCK_COLLECTION',
 		namespace,

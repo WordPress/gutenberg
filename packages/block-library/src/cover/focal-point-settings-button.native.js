@@ -17,34 +17,34 @@ import { chevronRight } from '@wordpress/icons';
  */
 import styles from './style.scss';
 
-function FocalPointSettingsButton( {
+function FocalPointSettingsButton({
 	disabled,
 	focalPoint,
 	onFocalPointChange,
 	url,
-} ) {
+}) {
 	const navigation = useNavigation();
 	return (
 		<BottomSheet.Cell
 			customActionButton
-			disabled={ disabled }
-			labelStyle={ disabled && styles.dimmedActionButton }
+			disabled={disabled}
+			labelStyle={disabled && styles.dimmedActionButton}
 			leftAlign
-			label={ __( 'Edit focal point' ) }
-			onPress={ () => {
-				navigation.navigate( blockSettingsScreens.focalPoint, {
+			label={__('Edit focal point')}
+			onPress={() => {
+				navigation.navigate(blockSettingsScreens.focalPoint, {
 					focalPoint,
 					onFocalPointChange,
 					url,
-				} );
-			} }
+				});
+			}}
 		>
-			{ /*
+			{/*
 			 * Wrapper View element used around Icon as workaround for SVG opacity
 			 * issue: https://git.io/JtuXD
-			 */ }
-			<View style={ disabled && styles.dimmedActionButton }>
-				<Icon icon={ chevronRight } />
+			 */}
+			<View style={disabled && styles.dimmedActionButton}>
+				<Icon icon={chevronRight} />
 			</View>
 		</BottomSheet.Cell>
 	);

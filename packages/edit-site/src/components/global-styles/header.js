@@ -16,33 +16,33 @@ import { chevronRight, chevronLeft, Icon } from '@wordpress/icons';
  */
 import NavigationButton from './navigation-button';
 
-function ScreenHeader( { back, title, description } ) {
+function ScreenHeader({ back, title, description }) {
 	return (
-		<VStack spacing={ 2 }>
-			<HStack spacing={ 2 }>
+		<VStack spacing={2}>
+			<HStack spacing={2}>
 				<View>
 					<NavigationButton
-						path={ back }
+						path={back}
 						icon={
 							<Icon
-								icon={ isRTL() ? chevronRight : chevronLeft }
+								icon={isRTL() ? chevronRight : chevronLeft}
 								variant="muted"
 							/>
 						}
 						size="small"
 						isBack
-						aria-label={ __( 'Navigate to the previous view' ) }
+						aria-label={__('Navigate to the previous view')}
 					/>
 				</View>
 				<Spacer>
-					<Heading level={ 5 }>{ title }</Heading>
+					<Heading level={5}>{title}</Heading>
 				</Spacer>
 			</HStack>
-			{ description && (
+			{description && (
 				<p className="edit-site-global-styles-header__description">
-					{ description }
+					{description}
 				</p>
-			) }
+			)}
 		</VStack>
 	);
 }

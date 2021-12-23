@@ -13,26 +13,26 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 
-const migrateAttributes = ( attributes ) => {
-	if ( ! attributes.tagName ) {
+const migrateAttributes = (attributes) => {
+	if (!attributes.tagName) {
 		attributes = {
 			...attributes,
 			tagName: 'div',
 		};
 	}
 
-	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
+	if (!attributes.customTextColor && !attributes.customBackgroundColor) {
 		return attributes;
 	}
 	const style = { color: {} };
-	if ( attributes.customTextColor ) {
+	if (attributes.customTextColor) {
 		style.color.text = attributes.customTextColor;
 	}
-	if ( attributes.customBackgroundColor ) {
+	if (attributes.customBackgroundColor) {
 		style.color.background = attributes.customBackgroundColor;
 	}
 	return {
-		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		...omit(attributes, ['customTextColor', 'customBackgroundColor']),
 		style,
 	};
 };
@@ -50,7 +50,7 @@ const deprecated = [
 			},
 		},
 		supports: {
-			align: [ 'wide', 'full' ],
+			align: ['wide', 'full'],
 			anchor: true,
 			color: {
 				gradients: true,
@@ -63,11 +63,11 @@ const deprecated = [
 				radius: true,
 			},
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { tagName: Tag } = attributes;
 
 			return (
-				<Tag { ...useBlockProps.save() }>
+				<Tag {...useBlockProps.save()}>
 					<div className="wp-block-group__inner-container">
 						<InnerBlocks.Content />
 					</div>
@@ -92,12 +92,12 @@ const deprecated = [
 			},
 		},
 		supports: {
-			align: [ 'wide', 'full' ],
+			align: ['wide', 'full'],
 			anchor: true,
 			html: false,
 		},
 		migrate: migrateAttributes,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				backgroundColor,
 				customBackgroundColor,
@@ -109,11 +109,11 @@ const deprecated = [
 				'background-color',
 				backgroundColor
 			);
-			const textClass = getColorClassName( 'color', textColor );
-			const className = classnames( backgroundClass, textClass, {
+			const textClass = getColorClassName('color', textColor);
+			const className = classnames(backgroundClass, textClass, {
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
-			} );
+			});
 
 			const styles = {
 				backgroundColor: backgroundClass
@@ -123,7 +123,7 @@ const deprecated = [
 			};
 
 			return (
-				<div className={ className } style={ styles }>
+				<div className={className} style={styles}>
 					<div className="wp-block-group__inner-container">
 						<InnerBlocks.Content />
 					</div>
@@ -149,11 +149,11 @@ const deprecated = [
 		},
 		migrate: migrateAttributes,
 		supports: {
-			align: [ 'wide', 'full' ],
+			align: ['wide', 'full'],
 			anchor: true,
 			html: false,
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				backgroundColor,
 				customBackgroundColor,
@@ -165,11 +165,11 @@ const deprecated = [
 				'background-color',
 				backgroundColor
 			);
-			const textClass = getColorClassName( 'color', textColor );
-			const className = classnames( backgroundClass, {
+			const textClass = getColorClassName('color', textColor);
+			const className = classnames(backgroundClass, {
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
-			} );
+			});
 
 			const styles = {
 				backgroundColor: backgroundClass
@@ -179,7 +179,7 @@ const deprecated = [
 			};
 
 			return (
-				<div className={ className } style={ styles }>
+				<div className={className} style={styles}>
 					<div className="wp-block-group__inner-container">
 						<InnerBlocks.Content />
 					</div>
@@ -198,21 +198,21 @@ const deprecated = [
 			},
 		},
 		supports: {
-			align: [ 'wide', 'full' ],
+			align: ['wide', 'full'],
 			anchor: true,
 			html: false,
 		},
 		migrate: migrateAttributes,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const { backgroundColor, customBackgroundColor } = attributes;
 
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
-			const className = classnames( backgroundClass, {
+			const className = classnames(backgroundClass, {
 				'has-background': backgroundColor || customBackgroundColor,
-			} );
+			});
 
 			const styles = {
 				backgroundColor: backgroundClass
@@ -221,7 +221,7 @@ const deprecated = [
 			};
 
 			return (
-				<div className={ className } style={ styles }>
+				<div className={className} style={styles}>
 					<InnerBlocks.Content />
 				</div>
 			);

@@ -16,6 +16,6 @@ import { getQueryArg } from './get-query-arg';
  *
  * @return {boolean} Whether or not the URL contains the query arg.
  */
-export function hasQueryArg( url, arg ) {
-	return getQueryArg( url, arg ) !== undefined;
+export function hasQueryArg(url, arg) {
+	return getQueryArg(url, arg) !== undefined;
 }

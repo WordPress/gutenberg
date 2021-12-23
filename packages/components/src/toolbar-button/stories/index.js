@@ -23,11 +23,11 @@ export default {
 };
 
 export const _default = () => {
-	const label = text( 'Label', 'This is an example label.' );
+	const label = text('Label', 'This is an example label.');
 
 	return (
 		<Toolbar label="Example Toolbar">
-			<ToolbarButton icon={ wordpress } label={ label } />
+			<ToolbarButton icon={wordpress} label={label} />
 		</Toolbar>
 	);
 };

@@ -28,40 +28,33 @@ import {
  *
  * @return {JSX.Element} React element.
  */
-export default function Edit( {
+export default function Edit({
 	setAttributes,
 	attributes: { textAlign },
 	context: { commentId },
-} ) {
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
-	const [ content ] = useEntityProp(
-		'root',
-		'comment',
-		'content',
-		commentId
-	);
+}) {
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+		}),
+	});
+	const [content] = useEntityProp('root', 'comment', 'content', commentId);
 
 	const blockControls = (
 		<BlockControls group="block">
 			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
+				value={textAlign}
+				onChange={(newAlign) => setAttributes({ textAlign: newAlign })}
 			/>
 		</BlockControls>
 	);
 
-	if ( ! commentId || ! content ) {
+	if (!commentId || !content) {
 		return (
 			<>
-				{ blockControls }
-				<div { ...blockProps }>
-					<p>{ _x( 'Comment Content', 'block title' ) }</p>
+				{blockControls}
+				<div {...blockProps}>
+					<p>{_x('Comment Content', 'block title')}</p>
 				</div>
 			</>
 		);
@@ -69,10 +62,10 @@ export default function Edit( {
 
 	return (
 		<>
-			{ blockControls }
-			<div { ...blockProps }>
+			{blockControls}
+			<div {...blockProps}>
 				<Disabled>
-					<RawHTML key="html">{ content.rendered }</RawHTML>
+					<RawHTML key="html">{content.rendered}</RawHTML>
 				</Disabled>
 			</div>
 		</>

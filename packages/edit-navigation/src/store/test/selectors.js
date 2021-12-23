@@ -18,15 +18,15 @@ import {
 
 import { buildNavigationPostId } from '../utils';
 
-describe( 'getNavigationPostForMenu', () => {
-	it( 'gets navigation post for menu', () => {
-		const getEditedEntityRecord = jest.fn( () => 'record' );
-		const hasFinishedResolution = jest.fn( () => true );
+describe('getNavigationPostForMenu', () => {
+	it('gets navigation post for menu', () => {
+		const getEditedEntityRecord = jest.fn(() => 'record');
+		const hasFinishedResolution = jest.fn(() => true);
 		const registry = {
-			select: jest.fn( () => ( {
+			select: jest.fn(() => ({
 				getEditedEntityRecord,
 				hasFinishedResolution,
-			} ) ),
+			})),
 		};
 
 		const menuId = 123;
@@ -35,27 +35,27 @@ describe( 'getNavigationPostForMenu', () => {
 		getNavigationPostForMenu.registry = registry;
 		hasResolvedNavigationPost.registry = registry;
 
-		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( 'record' );
+		expect(getNavigationPostForMenu('state', menuId)).toBe('record');
 
-		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
-		expect( getEditedEntityRecord ).toHaveBeenCalledWith(
+		expect(registry.select).toHaveBeenCalledWith(coreDataStore);
+		expect(getEditedEntityRecord).toHaveBeenCalledWith(
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
-			buildNavigationPostId( menuId )
+			buildNavigationPostId(menuId)
 		);
 
 		getNavigationPostForMenu.registry = defaultRegistry;
 		hasResolvedNavigationPost.registry = defaultRegistry;
-	} );
+	});
 
-	it( 'returns null if has not resolved navigation post yet', () => {
-		const getEditedEntityRecord = jest.fn( () => 'record' );
-		const hasFinishedResolution = jest.fn( () => false );
+	it('returns null if has not resolved navigation post yet', () => {
+		const getEditedEntityRecord = jest.fn(() => 'record');
+		const hasFinishedResolution = jest.fn(() => false);
 		const registry = {
-			select: jest.fn( () => ( {
+			select: jest.fn(() => ({
 				getEditedEntityRecord,
 				hasFinishedResolution,
-			} ) ),
+			})),
 		};
 
 		const menuId = 123;
@@ -64,23 +64,23 @@ describe( 'getNavigationPostForMenu', () => {
 		getNavigationPostForMenu.registry = registry;
 		hasResolvedNavigationPost.registry = registry;
 
-		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( null );
+		expect(getNavigationPostForMenu('state', menuId)).toBe(null);
 
-		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
-		expect( getEditedEntityRecord ).not.toHaveBeenCalled();
+		expect(registry.select).toHaveBeenCalledWith(coreDataStore);
+		expect(getEditedEntityRecord).not.toHaveBeenCalled();
 
 		getNavigationPostForMenu.registry = defaultRegistry;
 		hasResolvedNavigationPost.registry = defaultRegistry;
-	} );
-} );
+	});
+});
 
-describe( 'hasResolvedNavigationPost', () => {
-	it( 'returns if it has resolved navigation post yet', () => {
-		const hasFinishedResolution = jest.fn( () => true );
+describe('hasResolvedNavigationPost', () => {
+	it('returns if it has resolved navigation post yet', () => {
+		const hasFinishedResolution = jest.fn(() => true);
 		const registry = {
-			select: jest.fn( () => ( {
+			select: jest.fn(() => ({
 				hasFinishedResolution,
-			} ) ),
+			})),
 		};
 
 		const menuId = 123;
@@ -88,30 +88,27 @@ describe( 'hasResolvedNavigationPost', () => {
 		const defaultRegistry = getNavigationPostForMenu.registry;
 		hasResolvedNavigationPost.registry = registry;
 
-		expect( hasResolvedNavigationPost( 'state', menuId ) ).toBe( true );
+		expect(hasResolvedNavigationPost('state', menuId)).toBe(true);
 
-		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
-		expect( hasFinishedResolution ).toHaveBeenCalledWith(
-			'getEntityRecord',
-			[
-				NAVIGATION_POST_KIND,
-				NAVIGATION_POST_POST_TYPE,
-				buildNavigationPostId( menuId ),
-			]
-		);
+		expect(registry.select).toHaveBeenCalledWith(coreDataStore);
+		expect(hasFinishedResolution).toHaveBeenCalledWith('getEntityRecord', [
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
+			buildNavigationPostId(menuId),
+		]);
 
 		hasResolvedNavigationPost.registry = defaultRegistry;
-	} );
-} );
+	});
+});
 
-describe( 'getSelectedMenuId', () => {
-	it( 'returns default selected menu ID (zero)', () => {
+describe('getSelectedMenuId', () => {
+	it('returns default selected menu ID (zero)', () => {
 		const state = {};
-		expect( getSelectedMenuId( state ) ).toBe( null );
-	} );
+		expect(getSelectedMenuId(state)).toBe(null);
+	});
 
-	it( 'returns selected menu ID', () => {
+	it('returns selected menu ID', () => {
 		const state = { selectedMenuId: 10 };
-		expect( getSelectedMenuId( state ) ).toBe( 10 );
-	} );
-} );
+		expect(getSelectedMenuId(state)).toBe(10);
+	});
+});

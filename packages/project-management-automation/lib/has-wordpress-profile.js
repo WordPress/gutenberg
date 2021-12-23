@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { request } = require( 'https' );
+const { request } = require('https');
 
 /**
  * Endpoint hostname for WordPress.org profile lookup by GitHub username.
@@ -26,8 +26,8 @@ const BASE_PROFILE_LOOKUP_API_BASE_PATH = '/wp-json/wporg-github/v1/lookup/';
  * @return {Promise<boolean>} Promise resolving to whether WordPress profile is
  *                            known.
  */
-async function hasWordPressProfile( githubUsername ) {
-	return new Promise( ( resolve, reject ) => {
+async function hasWordPressProfile(githubUsername) {
+	return new Promise((resolve, reject) => {
 		const options = {
 			hostname: BASE_PROFILE_LOOKUP_API_HOSTNAME,
 			path: BASE_PROFILE_LOOKUP_API_BASE_PATH + githubUsername,
@@ -37,10 +37,10 @@ async function hasWordPressProfile( githubUsername ) {
 			},
 		};
 
-		request( options, ( res ) => resolve( res.statusCode === 200 ) )
-			.on( 'error', ( error ) => reject( error ) )
+		request(options, (res) => resolve(res.statusCode === 200))
+			.on('error', (error) => reject(error))
 			.end();
-	} );
+	});
 }
 
 module.exports = hasWordPressProfile;

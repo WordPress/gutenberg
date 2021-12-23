@@ -25,18 +25,18 @@ export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
  * @param {Object} settings Original block settings
  * @return {Object}         Filtered block settings
  */
-function addAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
+function addAttributes(settings) {
+	if (!hasBlockSupport(settings, FONT_FAMILY_SUPPORT_KEY)) {
 		return settings;
 	}
 
 	// Allow blocks to specify a default value if needed.
-	if ( ! settings.attributes.fontFamily ) {
-		Object.assign( settings.attributes, {
+	if (!settings.attributes.fontFamily) {
+		Object.assign(settings.attributes, {
 			fontFamily: {
 				type: 'string',
 			},
-		} );
+		});
 	}
 
 	return settings;
@@ -50,27 +50,24 @@ function addAttributes( settings ) {
  * @param {Object} attributes Block attributes
  * @return {Object}           Filtered props applied to save element
  */
-function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasBlockSupport( blockType, FONT_FAMILY_SUPPORT_KEY ) ) {
+function addSaveProps(props, blockType, attributes) {
+	if (!hasBlockSupport(blockType, FONT_FAMILY_SUPPORT_KEY)) {
 		return props;
 	}
 
 	if (
-		hasBlockSupport(
-			blockType,
-			'typography.__experimentalSkipSerialization'
-		)
+		hasBlockSupport(blockType, 'typography.__experimentalSkipSerialization')
 	) {
 		return props;
 	}
 
-	if ( ! attributes?.fontFamily ) {
+	if (!attributes?.fontFamily) {
 		return props;
 	}
 
 	// Use TokenList to dedupe classes.
-	const classes = new TokenList( props.className );
-	classes.add( `has-${ kebabCase( attributes?.fontFamily ) }-font-family` );
+	const classes = new TokenList(props.className);
+	classes.add(`has-${kebabCase(attributes?.fontFamily)}-font-family`);
 	const newClassName = classes.value;
 	props.className = newClassName ? newClassName : undefined;
 
@@ -85,48 +82,47 @@ function addSaveProps( props, blockType, attributes ) {
  *
  * @return {Object} Filtered block settings.
  */
-function addEditProps( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
+function addEditProps(settings) {
+	if (!hasBlockSupport(settings, FONT_FAMILY_SUPPORT_KEY)) {
 		return settings;
 	}
 
 	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
+	settings.getEditWrapperProps = (attributes) => {
 		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
+		if (existingGetEditWrapperProps) {
+			props = existingGetEditWrapperProps(attributes);
 		}
-		return addSaveProps( props, settings, attributes );
+		return addSaveProps(props, settings, attributes);
 	};
 
 	return settings;
 }
 
-export function FontFamilyEdit( {
-	setAttributes,
-	attributes: { fontFamily },
-} ) {
-	const fontFamilies = useSetting( 'typography.fontFamilies' );
+export function FontFamilyEdit({ setAttributes, attributes: { fontFamily } }) {
+	const fontFamilies = useSetting('typography.fontFamilies');
 
-	const value = find( fontFamilies, ( { slug } ) => fontFamily === slug )
-		?.fontFamily;
+	const value = find(
+		fontFamilies,
+		({ slug }) => fontFamily === slug
+	)?.fontFamily;
 
-	function onChange( newValue ) {
+	function onChange(newValue) {
 		const predefinedFontFamily = find(
 			fontFamilies,
-			( { fontFamily: f } ) => f === newValue
+			({ fontFamily: f }) => f === newValue
 		);
-		setAttributes( {
+		setAttributes({
 			fontFamily: predefinedFontFamily?.slug,
-		} );
+		});
 	}
 
 	return (
 		<FontFamilyControl
 			className="block-editor-hooks-font-family-control"
-			fontFamilies={ fontFamilies }
-			value={ value }
-			onChange={ onChange }
+			fontFamilies={fontFamilies}
+			value={value}
+			onChange={onChange}
 		/>
 	);
 }
@@ -137,12 +133,12 @@ export function FontFamilyEdit( {
  * @param {string} name The name of the block.
  * @return {boolean} Whether setting is disabled.
  */
-export function useIsFontFamilyDisabled( { name } ) {
-	const fontFamilies = useSetting( 'typography.fontFamilies' );
+export function useIsFontFamilyDisabled({ name }) {
+	const fontFamilies = useSetting('typography.fontFamilies');
 	return (
-		! fontFamilies ||
+		!fontFamilies ||
 		fontFamilies.length === 0 ||
-		! hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY )
+		!hasBlockSupport(name, FONT_FAMILY_SUPPORT_KEY)
 	);
 }
 
@@ -152,8 +148,8 @@ export function useIsFontFamilyDisabled( { name } ) {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a font family value set.
  */
-export function hasFontFamilyValue( props ) {
-	return !! props.attributes.fontFamily;
+export function hasFontFamilyValue(props) {
+	return !!props.attributes.fontFamily;
 }
 
 /**
@@ -164,8 +160,8 @@ export function hasFontFamilyValue( props ) {
  * @param {Object} props               Block props.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetFontFamily( { setAttributes } ) {
-	setAttributes( { fontFamily: undefined } );
+export function resetFontFamily({ setAttributes }) {
+	setAttributes({ fontFamily: undefined });
 }
 
 addFilter(

@@ -25,70 +25,70 @@ function SearchControl(
 		onKeyDown,
 		value,
 		label,
-		placeholder = __( 'Search' ),
+		placeholder = __('Search'),
 		hideLabelFromVision = true,
 		help,
 		onClose,
 	},
 	ref
 ) {
-	const instanceId = useInstanceId( SearchControl );
-	const searchInput = useCombinedRef( ref );
-	const id = `components-search-control-${ instanceId }`;
+	const instanceId = useInstanceId(SearchControl);
+	const searchInput = useCombinedRef(ref);
+	const id = `components-search-control-${instanceId}`;
 
 	const renderRightButton = () => {
-		if ( onClose ) {
+		if (onClose) {
 			return (
 				<Button
-					icon={ closeSmall }
-					label={ __( 'Close search' ) }
-					onClick={ onClose }
+					icon={closeSmall}
+					label={__('Close search')}
+					onClick={onClose}
 				/>
 			);
 		}
 
-		if ( !! value ) {
+		if (!!value) {
 			return (
 				<Button
-					icon={ closeSmall }
-					label={ __( 'Reset search' ) }
-					onClick={ () => {
-						onChange( '' );
+					icon={closeSmall}
+					label={__('Reset search')}
+					onClick={() => {
+						onChange('');
 						searchInput.current.focus();
-					} }
+					}}
 				/>
 			);
 		}
 
-		return <Icon icon={ search } />;
+		return <Icon icon={search} />;
 	};
 
 	return (
 		<BaseControl
-			label={ label }
-			id={ id }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			className={ classnames( className, 'components-search-control' ) }
+			label={label}
+			id={id}
+			hideLabelFromVision={hideLabelFromVision}
+			help={help}
+			className={classnames(className, 'components-search-control')}
 		>
 			<div className="components-search-control__input-wrapper">
 				<input
-					ref={ searchInput }
+					ref={searchInput}
 					className="components-search-control__input"
-					id={ id }
+					id={id}
 					type="search"
-					placeholder={ placeholder }
-					onChange={ ( event ) => onChange( event.target.value ) }
-					onKeyDown={ onKeyDown }
+					placeholder={placeholder}
+					onChange={(event) => onChange(event.target.value)}
+					onKeyDown={onKeyDown}
 					autoComplete="off"
-					value={ value || '' }
+					value={value || ''}
 				/>
 				<div className="components-search-control__icon">
-					{ renderRightButton() }
+					{renderRightButton()}
 				</div>
 			</div>
 		</BaseControl>
 	);
 }
 
-export default forwardRef( SearchControl );
+export default forwardRef(SearchControl);

@@ -3,11 +3,11 @@
  */
 import { autop, removep } from '../';
 
-test( 'empty string', () => {
-	expect( autop( '' ) ).toBe( '' );
-} );
+test('empty string', () => {
+	expect(autop('')).toBe('');
+});
 
-test( 'first post', () => {
+test('first post', () => {
 	const expected = `<p>Welcome to WordPress!  This post contains important information.  After you read it, you can make it private to hide it from visitors but still have the information handy for future reference.</p>
 <p>First things first:</p>
 <ul>
@@ -57,41 +57,41 @@ Thank you for selecting WordPress.  We wish you happy publishing!
 PS.  Not yet subscribed for update notifications?  <a href="%1$s" title="Subscribe to the WordPress mailing list for Release Notifications">Do it now!</a>
 `;
 
-	expect( autop( testData ) ).toBe( expected );
-} );
+	expect(autop(testData)).toBe(expected);
+});
 
-test( 'skip pre elements', () => {
+test('skip pre elements', () => {
 	const code = `(function(){
 
 done = 0;
 });`;
 
 	// Not wrapped in <p> tags
-	let str = `<pre>${ code }</pre>`;
-	expect( autop( str ).trim() ).toBe( str );
+	let str = `<pre>${code}</pre>`;
+	expect(autop(str).trim()).toBe(str);
 
 	// Text before/after is wrapped in <p> tags
-	str = `Look at this code\n\n<pre>${ code }</pre>\n\nIsn't that cool?`;
+	str = `Look at this code\n\n<pre>${code}</pre>\n\nIsn't that cool?`;
 
 	// Expected text after autop
-	let expected = `<p>Look at this code</p>\n<pre>${ code }</pre>\n<p>Isn't that cool?</p>`;
-	expect( autop( str ).trim() ).toBe( expected );
+	let expected = `<p>Look at this code</p>\n<pre>${code}</pre>\n<p>Isn't that cool?</p>`;
+	expect(autop(str).trim()).toBe(expected);
 
 	// Make sure HTML breaks are maintained if manually inserted
 	str =
 		'Look at this code\n\n<pre>Line1<br />Line2<br>Line3<br/>Line4\nActual Line 2\nActual Line 3</pre>\n\nCool, huh?';
 	expected =
 		'<p>Look at this code</p>\n<pre>Line1<br />Line2<br>Line3<br/>Line4\nActual Line 2\nActual Line 3</pre>\n<p>Cool, huh?</p>';
-	expect( autop( str ).trim() ).toBe( expected );
-} );
+	expect(autop(str).trim()).toBe(expected);
+});
 
-test( 'skip input elements', () => {
+test('skip input elements', () => {
 	const str =
 		'Username: <input type="text" id="username" name="username" /><br />Password: <input type="password" id="password1" name="password1" />';
-	expect( autop( str ).trim() ).toBe( '<p>' + str + '</p>' );
-} );
+	expect(autop(str).trim()).toBe('<p>' + str + '</p>');
+});
 
-test( 'source_track_elements', () => {
+test('source_track_elements', () => {
 	const content = `Paragraph one.
 
 <video class="wp-video-shortcode" id="video-0-1" width="640" height="360" preload="metadata" controls="controls">
@@ -175,12 +175,12 @@ Paragraph two.`;
 		'[/video]</p>\n' +
 		'<p>Paragraph two.</p>';
 
-	expect( autop( content ).trim() ).toBe( expected );
-	expect( autop( content2 ).trim() ).toBe( expected );
-	expect( autop( shortcodeContent ).trim() ).toBe( shortcodeExpected );
-} );
+	expect(autop(content).trim()).toBe(expected);
+	expect(autop(content2).trim()).toBe(expected);
+	expect(autop(shortcodeContent).trim()).toBe(shortcodeExpected);
+});
 
-test( 'param embed elements', () => {
+test('param embed elements', () => {
 	const content1 = `Paragraph one.
 
 <object width="400" height="224" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0">
@@ -250,18 +250,18 @@ Paragraph two.`;
 		'</object></div>\n' +
 		'<p>Paragraph two.</p>';
 
-	expect( autop( content1 ).trim() ).toBe( expected1 );
-	expect( autop( content2 ).trim() ).toBe( expected2 );
-} );
+	expect(autop(content1).trim()).toBe(expected1);
+	expect(autop(content2).trim()).toBe(expected2);
+});
 
-test( 'skip select option elements', () => {
+test('skip select option elements', () => {
 	const str =
 		'Country: <select id="state" name="state"><option value="1">Alabama</option><option value="2">Alaska</option><option value="3">Arizona</option><option value="4">Arkansas</option><option value="5">California</option></select>';
 
-	expect( autop( str ).trim() ).toBe( '<p>' + str + '</p>' );
-} );
+	expect(autop(str).trim()).toBe('<p>' + str + '</p>');
+});
 
-test( 'that_autop_treats_block_level_elements_as_blocks', () => {
+test('that_autop_treats_block_level_elements_as_blocks', () => {
 	const blocks = [
 		'table',
 		'thead',
@@ -313,52 +313,52 @@ test( 'that_autop_treats_block_level_elements_as_blocks', () => {
 	// Check whitespace normalization.
 	let content = [];
 
-	blocks.forEach( ( block ) => {
-		content.push( `<${ block }>foo</${ block }>` );
-	} );
+	blocks.forEach((block) => {
+		content.push(`<${block}>foo</${block}>`);
+	});
 
-	let expected = content.join( '\n' );
-	let input = content.join( '\n\n' ); // WS difference
+	let expected = content.join('\n');
+	let input = content.join('\n\n'); // WS difference
 
-	expect( autop( input ).trim() ).toBe( expected );
+	expect(autop(input).trim()).toBe(expected);
 
-	input = content.join( '' ); // WS difference
+	input = content.join(''); // WS difference
 
-	expect( autop( input ).trim() ).toBe( expected );
+	expect(autop(input).trim()).toBe(expected);
 
 	// Check whitespace addition.
 	content = [];
 
-	blocks.forEach( ( block ) => {
-		content.push( `<${ block }/>` );
-	} );
+	blocks.forEach((block) => {
+		content.push(`<${block}/>`);
+	});
 
-	expected = content.join( '\n' );
-	input = content.join( '' );
+	expected = content.join('\n');
+	input = content.join('');
 
-	expect( autop( input ).trim() ).toBe( expected );
+	expect(autop(input).trim()).toBe(expected);
 
 	// Check whitespace addition with attributes.
 	content = [];
 
-	blocks.forEach( ( block ) => {
-		content.push( `<${ block } attr='value'>foo</${ block }>` );
-	} );
+	blocks.forEach((block) => {
+		content.push(`<${block} attr='value'>foo</${block}>`);
+	});
 
-	expected = content.join( '\n' );
-	input = content.join( '' );
+	expected = content.join('\n');
+	input = content.join('');
 
-	expect( autop( input ).trim() ).toBe( expected );
-} );
+	expect(autop(input).trim()).toBe(expected);
+});
 
-test( 'autop does not wrap blockquotes but does autop their contents', () => {
+test('autop does not wrap blockquotes but does autop their contents', () => {
 	const content = '<blockquote>foo</blockquote>';
 	const expected = '<blockquote><p>foo</p></blockquote>';
 
-	expect( autop( content ).trim() ).toBe( expected );
-} );
+	expect(autop(content).trim()).toBe(expected);
+});
 
-test( 'that autop treats inline elements as inline', () => {
+test('that autop treats inline elements as inline', () => {
 	const inlines = [
 		'a',
 		'em',
@@ -391,20 +391,20 @@ test( 'that autop treats inline elements as inline', () => {
 	let content = [];
 	let expected = [];
 
-	inlines.forEach( ( inline ) => {
-		content.push( `<${ inline }>foo</${ inline }>` );
-		expected.push( `<p><${ inline }>foo</${ inline }></p>` );
-	} );
+	inlines.forEach((inline) => {
+		content.push(`<${inline}>foo</${inline}>`);
+		expected.push(`<p><${inline}>foo</${inline}></p>`);
+	});
 
-	content = content.join( '\n\n' );
-	expected = expected.join( '\n' );
+	content = content.join('\n\n');
+	expected = expected.join('\n');
 
-	expect( autop( content ).trim() ).toBe( expected );
-} );
+	expect(autop(content).trim()).toBe(expected);
+});
 
-test( 'element sanity', () => {
+test('element sanity', () => {
 	[
-		[ 'Hello <a\nhref="world">', '<p>Hello <a\nhref="world"></p>\n' ],
+		['Hello <a\nhref="world">', '<p>Hello <a\nhref="world"></p>\n'],
 		[
 			'Hello <!-- a\nhref="world" -->',
 			'<p>Hello <!-- a\nhref="world" --></p>\n',
@@ -439,12 +439,12 @@ test( 'element sanity', () => {
 			'Hello <![CDATA[ <!-- a\nhttps://youtu.be/jgz0uSaOZbE\n a\n9 --> a\n9 ]]>',
 			'<p>Hello <![CDATA[ <!-- a\nhttps://youtu.be/jgz0uSaOZbE\n a\n9 --> a\n9 ]]></p>\n',
 		],
-	].forEach( ( [ input, output ] ) => {
-		expect( autop( input ) ).toBe( output );
-	} );
-} );
+	].forEach(([input, output]) => {
+		expect(autop(input)).toBe(output);
+	});
+});
 
-test( 'that autop skips line breaks after br', () => {
+test('that autop skips line breaks after br', () => {
 	const content = `
 line 1<br>
 line 2<br/>
@@ -459,10 +459,10 @@ line 3<br />
 line 4<br />
 line 5</p>`;
 
-	expect( autop( content ).trim() ).toBe( expected );
-} );
+	expect(autop(content).trim()).toBe(expected);
+});
 
-test( 'that autop adds a paragraph after multiple br', () => {
+test('that autop adds a paragraph after multiple br', () => {
 	const content = `
 line 1<br>
 <br/>
@@ -473,17 +473,17 @@ line 2<br/>
 	const expected = `<p>line 1</p>
 <p>line 2</p>`;
 
-	expect( autop( content ).trim() ).toBe( expected );
-} );
+	expect(autop(content).trim()).toBe(expected);
+});
 
-test( 'that text before blocks is peed', () => {
+test('that text before blocks is peed', () => {
 	const content = 'a<div>b</div>';
 	const expected = '<p>a</p>\n<div>b</div>';
 
-	expect( autop( content ).trim() ).toBe( expected );
-} );
+	expect(autop(content).trim()).toBe(expected);
+});
 
-test( 'that autop doses not add extra closing p in figure', () => {
+test('that autop doses not add extra closing p in figure', () => {
 	const content1 =
 		'<figure><img src="example.jpg" /><figcaption>Caption</figcaption></figure>';
 	const expected1 = content1;
@@ -496,24 +496,24 @@ test( 'that autop doses not add extra closing p in figure', () => {
 	const expected2 = `<figure>
 <img src="example.jpg" /><figcaption>Caption</figcaption></figure>`;
 
-	expect( autop( content1 ).trim() ).toBe( expected1 );
-	expect( autop( content2 ).trim() ).toBe( expected2 );
-} );
+	expect(autop(content1).trim()).toBe(expected1);
+	expect(autop(content2).trim()).toBe(expected2);
+});
 
-test( 'that autop correctly adds a start and end tag when followed by a div', () => {
+test('that autop correctly adds a start and end tag when followed by a div', () => {
 	const content =
 		'Testing autop with a div\n<div class="wp-some-class">content</div>';
 	const expected =
 		'<p>Testing autop with a div</p>\n<div class="wp-some-class">content</div>';
 
-	expect( autop( content ).trim() ).toBe( expected );
-} );
+	expect(autop(content).trim()).toBe(expected);
+});
 
-describe( 'removep', () => {
-	test( 'preserves paragraphs with attributes', () => {
+describe('removep', () => {
+	test('preserves paragraphs with attributes', () => {
 		const content = '<p style="text-align: center">\nHello World\n</p>';
 		const expected = '<p style="text-align: center">\nHello World</p>';
 
-		expect( removep( content ) ).toBe( expected );
-	} );
-} );
+		expect(removep(content)).toBe(expected);
+	});
+});

@@ -16,9 +16,9 @@ import { create } from './create';
  *
  * @return {Object} `a`, mutated.
  */
-export function mergePair( a, b ) {
-	a.formats = a.formats.concat( b.formats );
-	a.replacements = a.replacements.concat( b.replacements );
+export function mergePair(a, b) {
+	a.formats = a.formats.concat(b.formats);
+	a.replacements = a.replacements.concat(b.replacements);
 	a.text += b.text;
 
 	return a;
@@ -32,6 +32,6 @@ export function mergePair( a, b ) {
  *
  * @return {RichTextValue} A new value combining all given records.
  */
-export function concat( ...values ) {
-	return normaliseFormats( values.reduce( mergePair, create() ) );
+export function concat(...values) {
+	return normaliseFormats(values.reduce(mergePair, create()));
 }

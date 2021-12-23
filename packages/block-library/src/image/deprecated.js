@@ -71,120 +71,95 @@ const blockAttributes = {
 const deprecated = [
 	{
 		attributes: blockAttributes,
-		save( { attributes } ) {
-			const {
-				url,
-				alt,
-				caption,
-				align,
-				href,
-				width,
-				height,
-				id,
-			} = attributes;
+		save({ attributes }) {
+			const { url, alt, caption, align, href, width, height, id } =
+				attributes;
 
-			const classes = classnames( {
-				[ `align${ align }` ]: align,
+			const classes = classnames({
+				[`align${align}`]: align,
 				'is-resized': width || height,
-			} );
+			});
 
 			const image = (
 				<img
-					src={ url }
-					alt={ alt }
-					className={ id ? `wp-image-${ id }` : null }
-					width={ width }
-					height={ height }
+					src={url}
+					alt={alt}
+					className={id ? `wp-image-${id}` : null}
+					width={width}
+					height={height}
 				/>
 			);
 
 			return (
-				<figure className={ classes }>
-					{ href ? <a href={ href }>{ image }</a> : image }
-					{ ! RichText.isEmpty( caption ) && (
+				<figure className={classes}>
+					{href ? <a href={href}>{image}</a> : image}
+					{!RichText.isEmpty(caption) && (
 						<RichText.Content
 							tagName="figcaption"
-							value={ caption }
+							value={caption}
 						/>
-					) }
+					)}
 				</figure>
 			);
 		},
 	},
 	{
 		attributes: blockAttributes,
-		save( { attributes } ) {
-			const {
-				url,
-				alt,
-				caption,
-				align,
-				href,
-				width,
-				height,
-				id,
-			} = attributes;
+		save({ attributes }) {
+			const { url, alt, caption, align, href, width, height, id } =
+				attributes;
 
 			const image = (
 				<img
-					src={ url }
-					alt={ alt }
-					className={ id ? `wp-image-${ id }` : null }
-					width={ width }
-					height={ height }
+					src={url}
+					alt={alt}
+					className={id ? `wp-image-${id}` : null}
+					width={width}
+					height={height}
 				/>
 			);
 
 			return (
-				<figure className={ align ? `align${ align }` : null }>
-					{ href ? <a href={ href }>{ image }</a> : image }
-					{ ! RichText.isEmpty( caption ) && (
+				<figure className={align ? `align${align}` : null}>
+					{href ? <a href={href}>{image}</a> : image}
+					{!RichText.isEmpty(caption) && (
 						<RichText.Content
 							tagName="figcaption"
-							value={ caption }
+							value={caption}
 						/>
-					) }
+					)}
 				</figure>
 			);
 		},
 	},
 	{
 		attributes: blockAttributes,
-		save( { attributes } ) {
-			const {
-				url,
-				alt,
-				caption,
-				align,
-				href,
-				width,
-				height,
-			} = attributes;
+		save({ attributes }) {
+			const { url, alt, caption, align, href, width, height } =
+				attributes;
 			const extraImageProps = width || height ? { width, height } : {};
-			const image = (
-				<img src={ url } alt={ alt } { ...extraImageProps } />
-			);
+			const image = <img src={url} alt={alt} {...extraImageProps} />;
 
 			let figureStyle = {};
 
-			if ( width ) {
+			if (width) {
 				figureStyle = { width };
-			} else if ( align === 'left' || align === 'right' ) {
+			} else if (align === 'left' || align === 'right') {
 				figureStyle = { maxWidth: '50%' };
 			}
 
 			return (
 				<figure
-					className={ align ? `align${ align }` : null }
-					style={ figureStyle }
+					className={align ? `align${align}` : null}
+					style={figureStyle}
 				>
-					{ href ? <a href={ href }>{ image }</a> : image }
-					{ ! RichText.isEmpty( caption ) && (
+					{href ? <a href={href}>{image}</a> : image}
+					{!RichText.isEmpty(caption) && (
 						<RichText.Content
 							tagName="figcaption"
-							value={ caption }
+							value={caption}
 						/>
-					) }
+					)}
 				</figure>
 			);
 		},

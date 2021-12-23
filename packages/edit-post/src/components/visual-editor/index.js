@@ -42,27 +42,27 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( {
+function MaybeIframe({
 	children,
 	contentRef,
 	shouldIframe,
 	styles,
 	assets,
 	style,
-} ) {
+}) {
 	const ref = useMouseMoveTypingReset();
 
-	if ( ! shouldIframe ) {
+	if (!shouldIframe) {
 		return (
 			<>
-				<EditorStyles styles={ styles } />
+				<EditorStyles styles={styles} />
 				<WritingFlow
-					ref={ contentRef }
+					ref={contentRef}
 					className="editor-styles-wrapper"
-					style={ { flex: '1', ...style } }
-					tabIndex={ -1 }
+					style={{ flex: '1', ...style }}
+					tabIndex={-1}
 				>
-					{ children }
+					{children}
 				</WritingFlow>
 			</>
 		);
@@ -70,59 +70,54 @@ function MaybeIframe( {
 
 	return (
 		<Iframe
-			head={ <EditorStyles styles={ styles } /> }
-			assets={ assets }
-			ref={ ref }
-			contentRef={ contentRef }
-			style={ { width: '100%', height: '100%', display: 'block' } }
+			head={<EditorStyles styles={styles} />}
+			assets={assets}
+			ref={ref}
+			contentRef={contentRef}
+			style={{ width: '100%', height: '100%', display: 'block' }}
 			name="editor-canvas"
 		>
-			{ children }
+			{children}
 		</Iframe>
 	);
 }
 
-export default function VisualEditor( { styles } ) {
-	const {
-		deviceType,
-		isTemplateMode,
-		wrapperBlockName,
-		wrapperUniqueId,
-	} = useSelect( ( select ) => {
-		const {
-			isEditingTemplate,
-			__experimentalGetPreviewDeviceType,
-		} = select( editPostStore );
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
-		const _isTemplateMode = isEditingTemplate();
-		let _wrapperBlockName;
+export default function VisualEditor({ styles }) {
+	const { deviceType, isTemplateMode, wrapperBlockName, wrapperUniqueId } =
+		useSelect((select) => {
+			const { isEditingTemplate, __experimentalGetPreviewDeviceType } =
+				select(editPostStore);
+			const { getCurrentPostId, getCurrentPostType } =
+				select(editorStore);
+			const _isTemplateMode = isEditingTemplate();
+			let _wrapperBlockName;
 
-		if ( getCurrentPostType() === 'wp_block' ) {
-			_wrapperBlockName = 'core/block';
-		} else if ( ! _isTemplateMode ) {
-			_wrapperBlockName = 'core/post-content';
-		}
+			if (getCurrentPostType() === 'wp_block') {
+				_wrapperBlockName = 'core/block';
+			} else if (!_isTemplateMode) {
+				_wrapperBlockName = 'core/post-content';
+			}
 
-		return {
-			deviceType: __experimentalGetPreviewDeviceType(),
-			isTemplateMode: _isTemplateMode,
-			wrapperBlockName: _wrapperBlockName,
-			wrapperUniqueId: getCurrentPostId(),
-		};
-	}, [] );
+			return {
+				deviceType: __experimentalGetPreviewDeviceType(),
+				isTemplateMode: _isTemplateMode,
+				wrapperBlockName: _wrapperBlockName,
+				wrapperUniqueId: getCurrentPostId(),
+			};
+		}, []);
 	const hasMetaBoxes = useSelect(
-		( select ) => select( editPostStore ).hasMetaBoxes(),
+		(select) => select(editPostStore).hasMetaBoxes(),
 		[]
 	);
-	const { themeSupportsLayout, assets } = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
+	const { themeSupportsLayout, assets } = useSelect((select) => {
+		const _settings = select(blockEditorStore).getSettings();
 		return {
 			themeSupportsLayout: _settings.supportsLayout,
 			assets: _settings.__unstableResolvedAssets,
 		};
-	}, [] );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const { setIsEditingTemplate } = useDispatch( editPostStore );
+	}, []);
+	const { clearSelectedBlock } = useDispatch(blockEditorStore);
+	const { setIsEditingTemplate } = useDispatch(editPostStore);
 	const desktopCanvasStyles = {
 		// We intentionally omit a 100% height here. The container is a flex item, so the 100% height is granted by default.
 		// If a percentage height is present, older browsers such as Safari 13 apply that, but do so incorrectly as the inheritance is buggy.
@@ -140,14 +135,14 @@ export default function VisualEditor( { styles } ) {
 		border: '1px solid #ddd',
 		borderBottom: 0,
 	};
-	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
-	const defaultLayout = useSetting( 'layout' );
+	const resizedCanvasStyles = useResizeCanvas(deviceType, isTemplateMode);
+	const defaultLayout = useSetting('layout');
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
 		? templateModeStyles
 		: desktopCanvasStyles;
-	if ( resizedCanvasStyles ) {
+	if (resizedCanvasStyles) {
 		animatedStyles = resizedCanvasStyles;
 	}
 
@@ -155,69 +150,69 @@ export default function VisualEditor( { styles } ) {
 
 	// Add a constant padding for the typewritter effect. When typing at the
 	// bottom, there needs to be room to scroll up.
-	if ( ! hasMetaBoxes && ! resizedCanvasStyles && ! isTemplateMode ) {
+	if (!hasMetaBoxes && !resizedCanvasStyles && !isTemplateMode) {
 		paddingBottom = '40vh';
 	}
 
 	const ref = useRef();
-	const contentRef = useMergeRefs( [
+	const contentRef = useMergeRefs([
 		ref,
 		useClipboardHandler(),
 		useTypewriter(),
 		useTypingObserver(),
 		useBlockSelectionClearer(),
-	] );
+	]);
 
 	const blockSelectionClearerRef = useBlockSelectionClearer();
 
-	const [ , RecursionProvider ] = useNoRecursiveRenders(
+	const [, RecursionProvider] = useNoRecursiveRenders(
 		wrapperUniqueId,
 		wrapperBlockName
 	);
 
-	const layout = useMemo( () => {
-		if ( isTemplateMode ) {
+	const layout = useMemo(() => {
+		if (isTemplateMode) {
 			return { type: 'default' };
 		}
 
-		if ( themeSupportsLayout ) {
+		if (themeSupportsLayout) {
 			return defaultLayout;
 		}
 
 		return undefined;
-	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
+	}, [isTemplateMode, themeSupportsLayout, defaultLayout]);
 
 	return (
 		<BlockTools
-			__unstableContentRef={ ref }
-			className={ classnames( 'edit-post-visual-editor', {
+			__unstableContentRef={ref}
+			className={classnames('edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
-			} ) }
+			})}
 		>
 			<VisualEditorGlobalKeyboardShortcuts />
 			<motion.div
 				className="edit-post-visual-editor__content-area"
-				animate={ {
+				animate={{
 					padding: isTemplateMode ? '48px 48px 0' : '0',
-				} }
-				ref={ blockSelectionClearerRef }
+				}}
+				ref={blockSelectionClearerRef}
 			>
-				{ isTemplateMode && (
+				{isTemplateMode && (
 					<Button
 						className="edit-post-visual-editor__exit-template-mode"
-						icon={ arrowLeft }
-						onClick={ () => {
+						icon={arrowLeft}
+						onClick={() => {
 							clearSelectedBlock();
-							setIsEditingTemplate( false );
-						} }
+							setIsEditingTemplate(false);
+						}}
 					>
-						{ __( 'Back' ) }
+						{__('Back')}
 					</Button>
-				) }
+				)}
 				<motion.div
-					animate={ animatedStyles }
-					initial={ desktopCanvasStyles }
-					className={ previewMode }
+					animate={animatedStyles}
+					initial={desktopCanvasStyles}
+					className={previewMode}
 				>
 					<MaybeIframe
 						shouldIframe={
@@ -225,22 +220,22 @@ export default function VisualEditor( { styles } ) {
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'
 						}
-						contentRef={ contentRef }
-						styles={ styles }
-						assets={ assets }
-						style={ { paddingBottom } }
+						contentRef={contentRef}
+						styles={styles}
+						assets={assets}
+						style={{ paddingBottom }}
 					>
-						{ themeSupportsLayout && ! isTemplateMode && (
+						{themeSupportsLayout && !isTemplateMode && (
 							<LayoutStyle
 								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-								layout={ defaultLayout }
+								layout={defaultLayout}
 							/>
-						) }
-						{ ! isTemplateMode && (
+						)}
+						{!isTemplateMode && (
 							<div className="edit-post-visual-editor__post-title-wrapper">
 								<PostTitle />
 							</div>
-						) }
+						)}
 						<RecursionProvider>
 							<BlockList
 								className={
@@ -248,16 +243,14 @@ export default function VisualEditor( { styles } ) {
 										? 'wp-site-blocks'
 										: undefined
 								}
-								__experimentalLayout={ layout }
+								__experimentalLayout={layout}
 							/>
 						</RecursionProvider>
 					</MaybeIframe>
 				</motion.div>
 			</motion.div>
 			<__unstableBlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => (
-					<BlockInspectorButton onClick={ onClose } />
-				) }
+				{({ onClose }) => <BlockInspectorButton onClick={onClose} />}
 			</__unstableBlockSettingsMenuFirstItem>
 		</BlockTools>
 	);

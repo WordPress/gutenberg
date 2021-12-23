@@ -4,12 +4,12 @@
  * @param {string} packageName The name of npm package.
  * @return {boolean} Returns true when the package is installed or false otherwise.
  */
-const isPackageInstalled = ( packageName ) => {
+const isPackageInstalled = (packageName) => {
 	try {
-		if ( require.resolve( packageName ) ) {
+		if (require.resolve(packageName)) {
 			return true;
 		}
-	} catch ( error ) {}
+	} catch (error) {}
 	return false;
 };
 

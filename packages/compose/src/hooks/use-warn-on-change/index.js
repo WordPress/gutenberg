@@ -24,20 +24,20 @@ import usePrevious from '../use-previous';
  * @param {object} object Object which changes to compare.
  * @param {string} prefix Just a prefix to show when console logging.
  */
-function useWarnOnChange( object, prefix = 'Change detection' ) {
-	const previousValues = usePrevious( object );
+function useWarnOnChange(object, prefix = 'Change detection') {
+	const previousValues = usePrevious(object);
 
-	Object.entries( previousValues ?? [] ).forEach( ( [ key, value ] ) => {
-		if ( value !== object[ /** @type {keyof typeof object} */ ( key ) ] ) {
+	Object.entries(previousValues ?? []).forEach(([key, value]) => {
+		if (value !== object[/** @type {keyof typeof object} */ (key)]) {
 			// eslint-disable-next-line no-console
 			console.warn(
-				`${ prefix }: ${ key } key changed:`,
+				`${prefix}: ${key} key changed:`,
 				value,
-				object[ /** @type {keyof typeof object} */ ( key ) ]
+				object[/** @type {keyof typeof object} */ (key)]
 				/* eslint-enable jsdoc/check-types */
 			);
 		}
-	} );
+	});
 }
 
 export default useWarnOnChange;

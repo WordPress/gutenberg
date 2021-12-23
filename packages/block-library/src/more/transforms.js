@@ -8,22 +8,22 @@ const transforms = {
 		{
 			type: 'raw',
 			schema: {
-				'wp-block': { attributes: [ 'data-block' ] },
+				'wp-block': { attributes: ['data-block'] },
 			},
-			isMatch: ( node ) =>
+			isMatch: (node) =>
 				node.dataset && node.dataset.block === 'core/more',
-			transform( node ) {
+			transform(node) {
 				const { customText, noTeaser } = node.dataset;
 				const attrs = {};
 				// Don't copy unless defined and not an empty string
-				if ( customText ) {
+				if (customText) {
 					attrs.customText = customText;
 				}
 				// Special handling for boolean
-				if ( noTeaser === '' ) {
+				if (noTeaser === '') {
 					attrs.noTeaser = true;
 				}
-				return createBlock( 'core/more', attrs );
+				return createBlock('core/more', attrs);
 			},
 		},
 	],

@@ -24,6 +24,6 @@ import { getQueryArgs } from './get-query-args';
  *
  * @return {QueryArgParsed|void} Query arg value.
  */
-export function getQueryArg( url, arg ) {
-	return getQueryArgs( url )[ arg ];
+export function getQueryArg(url, arg) {
+	return getQueryArgs(url)[arg];
 }

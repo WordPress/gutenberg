@@ -12,7 +12,7 @@ export * from './actions.js';
  *
  * @return {Object} Action object.
  */
-export function togglePostTitleSelection( isSelected = true ) {
+export function togglePostTitleSelection(isSelected = true) {
 	return {
 		type: 'TOGGLE_POST_TITLE_SELECTION',
 		isSelected,

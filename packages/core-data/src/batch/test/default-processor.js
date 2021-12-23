@@ -8,9 +8,9 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import defaultProcessor from '../default-processor';
 
-jest.mock( '@wordpress/api-fetch' );
+jest.mock('@wordpress/api-fetch');
 
-describe( 'defaultProcessor', () => {
+describe('defaultProcessor', () => {
 	const preflightResponse = {
 		endpoints: [
 			{
@@ -65,8 +65,8 @@ describe( 'defaultProcessor', () => {
 		},
 	};
 
-	it( 'handles a successful request', async () => {
-		apiFetch.mockImplementation( async ( { method } ) =>
+	it('handles a successful request', async () => {
+		apiFetch.mockImplementation(async ({ method }) =>
 			method === 'OPTIONS'
 				? preflightResponse
 				: {
@@ -83,17 +83,14 @@ describe( 'defaultProcessor', () => {
 						],
 				  }
 		);
-		const results = await defaultProcessor( requests );
-		expect( apiFetch ).toHaveBeenCalledWith( expectedPreflightOptions );
-		expect( apiFetch ).toHaveBeenCalledWith( expectedBatchOptions );
-		expect( results ).toEqual( [
-			{ output: 'Lyon' },
-			{ error: 'Error!' },
-		] );
-	} );
+		const results = await defaultProcessor(requests);
+		expect(apiFetch).toHaveBeenCalledWith(expectedPreflightOptions);
+		expect(apiFetch).toHaveBeenCalledWith(expectedBatchOptions);
+		expect(results).toEqual([{ output: 'Lyon' }, { error: 'Error!' }]);
+	});
 
-	it( 'handles a failed request', async () => {
-		apiFetch.mockImplementation( async ( { method } ) =>
+	it('handles a failed request', async () => {
+		apiFetch.mockImplementation(async ({ method }) =>
 			method === 'OPTIONS'
 				? preflightResponse
 				: {
@@ -107,12 +104,9 @@ describe( 'defaultProcessor', () => {
 						],
 				  }
 		);
-		const results = await defaultProcessor( requests );
-		expect( apiFetch ).toHaveBeenCalledWith( expectedPreflightOptions );
-		expect( apiFetch ).toHaveBeenCalledWith( expectedBatchOptions );
-		expect( results ).toEqual( [
-			{ error: undefined },
-			{ error: 'Error!' },
-		] );
-	} );
-} );
+		const results = await defaultProcessor(requests);
+		expect(apiFetch).toHaveBeenCalledWith(expectedPreflightOptions);
+		expect(apiFetch).toHaveBeenCalledWith(expectedBatchOptions);
+		expect(results).toEqual([{ error: undefined }, { error: 'Error!' }]);
+	});
+});

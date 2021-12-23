@@ -8,13 +8,13 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../valid-sprintf';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 	},
-} );
+});
 
-ruleTester.run( 'valid-sprintf', rule, {
+ruleTester.run('valid-sprintf', rule, {
 	valid: [
 		{
 			code: `sprintf( '%s', 'substitute' )`,
@@ -75,35 +75,35 @@ sprintf(
 	invalid: [
 		{
 			code: `sprintf()`,
-			errors: [ { messageId: 'noFormatString' } ],
+			errors: [{ messageId: 'noFormatString' }],
 		},
 		{
 			code: `sprintf( '%s' )`,
-			errors: [ { messageId: 'noPlaceholderArgs' } ],
+			errors: [{ messageId: 'noPlaceholderArgs' }],
 		},
 		{
 			code: `sprintf( 1, 'substitute' )`,
-			errors: [ { messageId: 'invalidFormatString' } ],
+			errors: [{ messageId: 'invalidFormatString' }],
 		},
 		{
 			code: `sprintf( [], 'substitute' )`,
-			errors: [ { messageId: 'invalidFormatString' } ],
+			errors: [{ messageId: 'invalidFormatString' }],
 		},
 		{
 			code: `sprintf( '%%', 'substitute' )`,
-			errors: [ { messageId: 'noPlaceholders' } ],
+			errors: [{ messageId: 'noPlaceholders' }],
 		},
 		{
 			code: `sprintf( __( '%%' ), 'substitute' )`,
-			errors: [ { messageId: 'noPlaceholders' } ],
+			errors: [{ messageId: 'noPlaceholders' }],
 		},
 		{
 			code: `sprintf( _n( '%s', '' ), 'substitute' )`,
-			errors: [ { messageId: 'placeholderMismatch' } ],
+			errors: [{ messageId: 'placeholderMismatch' }],
 		},
 		{
 			code: `sprintf( _n( '%s', '%s %s' ), 'substitute' )`,
-			errors: [ { messageId: 'placeholderMismatch' } ],
+			errors: [{ messageId: 'placeholderMismatch' }],
 		},
 		{
 			code: `
@@ -117,15 +117,15 @@ sprintf(
 	authorBlockCount,
 	authorBlockRating
 );`,
-			errors: [ { messageId: 'noOrderedPlaceholders' } ],
+			errors: [{ messageId: 'noOrderedPlaceholders' }],
 		},
 		{
 			code: `i18n.sprintf()`,
-			errors: [ { messageId: 'noFormatString' } ],
+			errors: [{ messageId: 'noFormatString' }],
 		},
 		{
 			code: `i18n.sprintf( i18n.__( '%%' ), 'substitute' )`,
-			errors: [ { messageId: 'noPlaceholders' } ],
+			errors: [{ messageId: 'noPlaceholders' }],
 		},
 	],
-} );
+});

@@ -8,8 +8,8 @@ import { isPlainObject } from 'lodash';
  */
 import config from '../lib/';
 
-describe( 'prettier config tests', () => {
-	it( 'should be an object', () => {
-		expect( isPlainObject( config ) ).toBeTruthy();
-	} );
-} );
+describe('prettier config tests', () => {
+	it('should be an object', () => {
+		expect(isPlainObject(config)).toBeTruthy();
+	});
+});

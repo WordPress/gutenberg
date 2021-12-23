@@ -7,7 +7,7 @@ import { memo } from '@wordpress/element';
  */
 import Cell from '../mobile/bottom-sheet/cell';
 
-function TextControl( {
+function TextControl({
 	label,
 	hideLabelFromVision,
 	value,
@@ -18,24 +18,24 @@ function TextControl( {
 	type = 'text',
 	placeholder,
 	...props
-} ) {
-	const id = `inspector-text-control-${ instanceId }`;
+}) {
+	const id = `inspector-text-control-${instanceId}`;
 
 	return (
 		<Cell
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-			id={ id }
-			help={ help }
-			className={ className }
-			type={ type }
-			value={ value }
-			onChangeValue={ onChange }
-			aria-describedby={ !! help ? id + '__help' : undefined }
-			valuePlaceholder={ placeholder }
-			{ ...props }
+			label={label}
+			hideLabelFromVision={hideLabelFromVision}
+			id={id}
+			help={help}
+			className={className}
+			type={type}
+			value={value}
+			onChangeValue={onChange}
+			aria-describedby={!!help ? id + '__help' : undefined}
+			valuePlaceholder={placeholder}
+			{...props}
 		/>
 	);
 }
 
-export default memo( TextControl );
+export default memo(TextControl);

@@ -3,12 +3,12 @@
  */
 import fetchLinkSuggestions from '../__experimental-fetch-link-suggestions';
 
-jest.mock( '@wordpress/api-fetch', () =>
-	jest.fn( ( { path } ) => {
-		switch ( path ) {
+jest.mock('@wordpress/api-fetch', () =>
+	jest.fn(({ path }) => {
+		switch (path) {
 			case '/wp/v2/search?search=&per_page=20&type=post':
 			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
-				return Promise.resolve( [
+				return Promise.resolve([
 					{
 						id: 37,
 						title: 'Contact Page',
@@ -16,10 +16,10 @@ jest.mock( '@wordpress/api-fetch', () =>
 						type: 'post',
 						subtype: 'page',
 					},
-				] );
+				]);
 			case '/wp/v2/search?search=&per_page=20&type=term':
 			case '/wp/v2/search?search=cat&per_page=20&type=term&subtype=category':
-				return Promise.resolve( [
+				return Promise.resolve([
 					{
 						id: 9,
 						title: 'Cats',
@@ -32,9 +32,9 @@ jest.mock( '@wordpress/api-fetch', () =>
 						url: 'http://wordpress.local/category/uncategorized/',
 						type: 'category',
 					},
-				] );
+				]);
 			case '/wp/v2/search?search=&per_page=20&type=post-format':
-				return Promise.resolve( [
+				return Promise.resolve([
 					{
 						id: 'gallery',
 						title: 'Gallery',
@@ -49,9 +49,9 @@ jest.mock( '@wordpress/api-fetch', () =>
 						type: 'post-format',
 						kind: 'taxonomy',
 					},
-				] );
+				]);
 			case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
-				return Promise.resolve( [
+				return Promise.resolve([
 					{
 						id: 11,
 						title: 'Limit Case',
@@ -59,9 +59,9 @@ jest.mock( '@wordpress/api-fetch', () =>
 						type: 'post',
 						subtype: 'page',
 					},
-				] );
+				]);
 			case '/wp/v2/search?search=&page=11&per_page=20&type=post&subtype=page':
-				return Promise.resolve( [
+				return Promise.resolve([
 					{
 						id: 22,
 						title: 'Page Case',
@@ -69,27 +69,27 @@ jest.mock( '@wordpress/api-fetch', () =>
 						type: 'post',
 						subtype: 'page',
 					},
-				] );
+				]);
 			default:
-				return Promise.resolve( [
+				return Promise.resolve([
 					{
 						id: -1,
 						title: 'missing case or failed',
 						url: path,
 						type: 'missing case or failed',
 					},
-				] );
+				]);
 		}
-	} )
+	})
 );
 
-describe( 'fetchLinkSuggestions', () => {
-	it( 'filters suggestions by post-type', () => {
-		return fetchLinkSuggestions( 'Contact', {
+describe('fetchLinkSuggestions', () => {
+	it('filters suggestions by post-type', () => {
+		return fetchLinkSuggestions('Contact', {
 			type: 'post',
 			subtype: 'page',
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
+		}).then((suggestions) =>
+			expect(suggestions).toEqual([
 				{
 					id: 37,
 					title: 'Contact Page',
@@ -97,15 +97,15 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/contact-page/',
 					kind: 'post-type',
 				},
-			] )
+			])
 		);
-	} );
-	it( 'filters suggestions by term', () => {
-		return fetchLinkSuggestions( 'cat', {
+	});
+	it('filters suggestions by term', () => {
+		return fetchLinkSuggestions('cat', {
 			type: 'term',
 			subtype: 'category',
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
+		}).then((suggestions) =>
+			expect(suggestions).toEqual([
 				{
 					id: 9,
 					title: 'Cats',
@@ -120,14 +120,14 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'category',
 					kind: 'taxonomy',
 				},
-			] )
+			])
 		);
-	} );
-	it( 'filters suggestions by post-format', () => {
-		return fetchLinkSuggestions( '', {
+	});
+	it('filters suggestions by post-format', () => {
+		return fetchLinkSuggestions('', {
 			type: 'post-format',
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
+		}).then((suggestions) =>
+			expect(suggestions).toEqual([
 				{
 					id: 'gallery',
 					title: 'Gallery',
@@ -142,21 +142,21 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'post-format',
 					kind: 'taxonomy',
 				},
-			] )
+			])
 		);
-	} );
-	it( 'filters does not return post-format suggestions when formats are not supported', () => {
+	});
+	it('filters does not return post-format suggestions when formats are not supported', () => {
 		return fetchLinkSuggestions(
 			'',
 			{
 				type: 'post-format',
 			},
 			{ disablePostFormats: true }
-		).then( ( suggestions ) => expect( suggestions ).toEqual( [] ) );
-	} );
-	it( 'returns suggestions from post, term, and post-format', () => {
-		return fetchLinkSuggestions( '', {} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
+		).then((suggestions) => expect(suggestions).toEqual([]));
+	});
+	it('returns suggestions from post, term, and post-format', () => {
+		return fetchLinkSuggestions('', {}).then((suggestions) =>
+			expect(suggestions).toEqual([
 				{
 					id: 37,
 					title: 'Contact Page',
@@ -192,16 +192,16 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'post-format',
 					kind: 'taxonomy',
 				},
-			] )
+			])
 		);
-	} );
-	it( 'initial search suggestions limits results', () => {
-		return fetchLinkSuggestions( '', {
+	});
+	it('initial search suggestions limits results', () => {
+		return fetchLinkSuggestions('', {
 			type: 'post',
 			subtype: 'page',
 			isInitialSuggestions: true,
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
+		}).then((suggestions) =>
+			expect(suggestions).toEqual([
 				{
 					id: 11,
 					title: 'Limit Case',
@@ -209,16 +209,16 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'page',
 					kind: 'post-type',
 				},
-			] )
+			])
 		);
-	} );
-	it( 'allows searching from a page', () => {
-		return fetchLinkSuggestions( '', {
+	});
+	it('allows searching from a page', () => {
+		return fetchLinkSuggestions('', {
 			type: 'post',
 			subtype: 'page',
 			page: 11,
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
+		}).then((suggestions) =>
+			expect(suggestions).toEqual([
 				{
 					id: 22,
 					title: 'Page Case',
@@ -226,7 +226,7 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'page',
 					kind: 'post-type',
 				},
-			] )
+			])
 		);
-	} );
-} );
+	});
+});

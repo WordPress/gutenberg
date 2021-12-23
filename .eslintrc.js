@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
-const glob = require( 'glob' ).sync;
-const { join } = require( 'path' );
+const { escapeRegExp } = require('lodash');
+const glob = require('glob').sync;
+const { join } = require('path');
 
 /**
  * Internal dependencies
  */
-const { version } = require( './package' );
+const { version } = require('./package');
 
 /**
  * Regular expression string matching a SemVer string with equal major/minor to
@@ -17,7 +17,7 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	escapeRegExp(version.replace(/\.\d+$/, '')) + '(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -32,9 +32,9 @@ const developmentFiles = [
 ];
 
 // All files from packages that have types provided with TypeScript.
-const typedFiles = glob( 'packages/*/package.json' )
-	.filter( ( fileName ) => require( join( __dirname, fileName ) ).types )
-	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
+const typedFiles = glob('packages/*/package.json')
+	.filter((fileName) => require(join(__dirname, fileName)).types)
+	.map((fileName) => fileName.replace('package.json', '**/*.js'));
 
 module.exports = {
 	root: true,
@@ -49,7 +49,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
-		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
+		'import/resolver': require.resolve('./tools/eslint/import-resolver'),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
@@ -77,7 +77,7 @@ module.exports = {
 					},
 					{
 						name: 'lodash',
-						importNames: [ 'memoize' ],
+						importNames: ['memoize'],
 						message: 'Please use `memize` instead.',
 					},
 					{
@@ -92,7 +92,7 @@ module.exports = {
 					},
 					{
 						name: 'redux',
-						importNames: [ 'combineReducers' ],
+						importNames: ['combineReducers'],
 						message:
 							'Please use `combineReducers` from `@wordpress/data` instead.',
 					},
@@ -183,13 +183,13 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/react-native-*/**/*.js' ],
+			files: ['packages/react-native-*/**/*.js'],
 			settings: {
-				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
+				'import/ignore': ['react-native'], // Workaround for https://github.com/facebook/react-native/issues/28549
 			},
 		},
 		{
-			files: [ 'packages/**/*.js' ],
+			files: ['packages/**/*.js'],
 			excludedFiles: [
 				'packages/block-library/src/*/save.js',
 				...developmentFiles,
@@ -199,35 +199,35 @@ module.exports = {
 					'error',
 					{
 						forbid: [
-							[ 'circle', 'Circle' ],
-							[ 'g', 'G' ],
-							[ 'path', 'Path' ],
-							[ 'polygon', 'Polygon' ],
-							[ 'rect', 'Rect' ],
-							[ 'svg', 'SVG' ],
-						].map( ( [ element, componentName ] ) => {
+							['circle', 'Circle'],
+							['g', 'G'],
+							['path', 'Path'],
+							['polygon', 'Polygon'],
+							['rect', 'Rect'],
+							['svg', 'SVG'],
+						].map(([element, componentName]) => {
 							return {
 								element,
-								message: `use cross-platform <${ componentName } /> component instead.`,
+								message: `use cross-platform <${componentName} /> component instead.`,
 							};
-						} ),
+						}),
 					},
 				],
 			},
 		},
 		{
-			files: [ 'packages/jest*/**/*.js' ],
-			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
+			files: ['packages/jest*/**/*.js'],
+			extends: ['plugin:@wordpress/eslint-plugin/test-unit'],
 		},
 		{
-			files: [ 'packages/e2e-test*/**/*.js' ],
-			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
+			files: ['packages/e2e-test*/**/*.js'],
+			extends: ['plugin:@wordpress/eslint-plugin/test-e2e'],
 			rules: {
 				'jest/expect-expect': 'off',
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: ['bin/**/*.js', 'packages/env/**'],
 			rules: {
 				'no-console': 'off',
 			},

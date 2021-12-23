@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import { Heading } from '../heading';
 
-export const ColorHeading = styled( Heading )`
+export const ColorHeading = styled(Heading)`
 	text-transform: uppercase;
 	line-height: 24px;
 	font-weight: 500;

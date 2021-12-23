@@ -38,7 +38,7 @@ import type { StateReducer } from '../input-control/reducer/state';
 
 function UnitControl(
 	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducer = (state) => state,
 		autoComplete = 'off',
 		className,
 		disabled = false,
@@ -55,33 +55,27 @@ function UnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		...props
-	}: WordPressComponentProps< UnitControlProps, 'input', false >,
-	forwardedRef: Ref< any >
+	}: WordPressComponentProps<UnitControlProps, 'input', false>,
+	forwardedRef: Ref<any>
 ) {
 	const units = useMemo(
-		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),
-		[ valueProp, unitProp, unitsProp ]
+		() => getUnitsWithCurrentUnit(valueProp, unitProp, unitsProp),
+		[valueProp, unitProp, unitsProp]
 	);
-	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
-	const [ unit, setUnit ] = useControlledState< string | undefined >(
-		unitProp,
-		{
-			initial: initialUnit,
-			fallback: '',
-		}
-	);
+	const [value, initialUnit] = getParsedValue(valueProp, unitProp, units);
+	const [unit, setUnit] = useControlledState<string | undefined>(unitProp, {
+		initial: initialUnit,
+		fallback: '',
+	});
 
 	// Stores parsed value for hand-off in state reducer
-	const refParsedValue = useRef< string | null >( null );
+	const refParsedValue = useRef<string | null>(null);
 
-	const classes = classnames( 'components-unit-control', className );
+	const classes = classnames('components-unit-control', className);
 
-	const handleOnChange: UnitControlOnChangeCallback = (
-		next,
-		changeProps
-	) => {
-		if ( next === '' ) {
-			onChange( '', changeProps );
+	const handleOnChange: UnitControlOnChangeCallback = (next, changeProps) => {
+		if (next === '') {
+			onChange('', changeProps);
 			return;
 		}
 
@@ -89,9 +83,9 @@ function UnitControl(
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
 		 */
-		next = getValidParsedUnit( next, units, value, unit ).join( '' );
+		next = getValidParsedUnit(next, units, value, unit).join('');
 
-		onChange( next, changeProps );
+		onChange(next, changeProps);
 	};
 
 	const handleOnUnitChange: UnitControlOnChangeCallback = (
@@ -100,24 +94,24 @@ function UnitControl(
 	) => {
 		const { data } = changeProps;
 
-		let nextValue = `${ value }${ next }`;
+		let nextValue = `${value}${next}`;
 
-		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
-			nextValue = `${ data.default }${ next }`;
+		if (isResetValueOnUnitChange && data?.default !== undefined) {
+			nextValue = `${data.default}${next}`;
 		}
 
-		onChange( nextValue, changeProps );
-		onUnitChange( next, changeProps );
+		onChange(nextValue, changeProps);
+		onUnitChange(next, changeProps);
 
-		setUnit( next );
+		setUnit(next);
 	};
 
-	const mayUpdateUnit = ( event: SyntheticEvent< HTMLInputElement > ) => {
-		if ( ! isNaN( Number( event.currentTarget.value ) ) ) {
+	const mayUpdateUnit = (event: SyntheticEvent<HTMLInputElement>) => {
+		if (!isNaN(Number(event.currentTarget.value))) {
 			refParsedValue.current = null;
 			return;
 		}
-		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
+		const [parsedValue, parsedUnit] = getValidParsedUnit(
 			event.currentTarget.value,
 			units,
 			value,
@@ -126,25 +120,25 @@ function UnitControl(
 
 		refParsedValue.current = parsedValue.toString();
 
-		if ( isPressEnterToChange && parsedUnit !== unit ) {
-			const data = Array.isArray( units )
-				? units.find( ( option ) => option.value === parsedUnit )
+		if (isPressEnterToChange && parsedUnit !== unit) {
+			const data = Array.isArray(units)
+				? units.find((option) => option.value === parsedUnit)
 				: undefined;
 			const changeProps = { event, data };
 
-			onChange( `${ parsedValue }${ parsedUnit }`, changeProps );
-			onUnitChange( parsedUnit, changeProps );
+			onChange(`${parsedValue}${parsedUnit}`, changeProps);
+			onUnitChange(parsedUnit, changeProps);
 
-			setUnit( parsedUnit );
+			setUnit(parsedUnit);
 		}
 	};
 
-	const handleOnBlur: FocusEventHandler< HTMLInputElement > = mayUpdateUnit;
+	const handleOnBlur: FocusEventHandler<HTMLInputElement> = mayUpdateUnit;
 
-	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
+	const handleOnKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		const { keyCode } = event;
-		if ( keyCode === ENTER ) {
-			mayUpdateUnit( event );
+		if (keyCode === ENTER) {
+			mayUpdateUnit(event);
 		}
 	};
 
@@ -157,14 +151,14 @@ function UnitControl(
 	 * @param  action Action triggering state change
 	 * @return The updated state to apply to InputControl
 	 */
-	const unitControlStateReducer: StateReducer = ( state, action ) => {
+	const unitControlStateReducer: StateReducer = (state, action) => {
 		/*
 		 * On commits (when pressing ENTER and on blur if
 		 * isPressEnterToChange is true), if a parse has been performed
 		 * then use that result to update the state.
 		 */
-		if ( action.type === inputControlActionTypes.COMMIT ) {
-			if ( refParsedValue.current !== null ) {
+		if (action.type === inputControlActionTypes.COMMIT) {
+			if (refParsedValue.current !== null) {
 				state.value = refParsedValue.current;
 				refParsedValue.current = null;
 			}
@@ -173,15 +167,15 @@ function UnitControl(
 		return state;
 	};
 
-	const inputSuffix = ! disableUnits ? (
+	const inputSuffix = !disableUnits ? (
 		<UnitSelectControl
-			aria-label={ __( 'Select unit' ) }
-			disabled={ disabled }
-			isUnitSelectTabbable={ isUnitSelectTabbable }
-			onChange={ handleOnUnitChange }
-			size={ size }
-			unit={ unit }
-			units={ units }
+			aria-label={__('Select unit')}
+			disabled={disabled}
+			isUnitSelectTabbable={isUnitSelectTabbable}
+			onChange={handleOnUnitChange}
+			size={size}
+			unit={unit}
+			units={units}
 		/>
 	) : null;
 
@@ -191,35 +185,35 @@ function UnitControl(
 	 * If no step prop has been passed, lookup the active unit and
 	 * try to get step from `units`, or default to a value of `1`
 	 */
-	if ( ! step && units ) {
-		const activeUnit = units.find( ( option ) => option.value === unit );
+	if (!step && units) {
+		const activeUnit = units.find((option) => option.value === unit);
 		step = activeUnit?.step ?? 1;
 	}
 
 	return (
-		<Root className="components-unit-control-wrapper" style={ style }>
+		<Root className="components-unit-control-wrapper" style={style}>
 			<ValueInput
-				aria-label={ label }
-				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...omit( props, [ 'children' ] ) }
-				autoComplete={ autoComplete }
-				className={ classes }
-				disabled={ disabled }
-				disableUnits={ disableUnits }
-				isPressEnterToChange={ isPressEnterToChange }
-				label={ label }
-				onBlur={ handleOnBlur }
-				onKeyDown={ handleOnKeyDown }
-				onChange={ handleOnChange }
-				ref={ forwardedRef }
-				size={ size }
-				suffix={ inputSuffix }
-				value={ value }
-				step={ step }
-				__unstableStateReducer={ composeStateReducers(
+				aria-label={label}
+				type={isPressEnterToChange ? 'text' : 'number'}
+				{...omit(props, ['children'])}
+				autoComplete={autoComplete}
+				className={classes}
+				disabled={disabled}
+				disableUnits={disableUnits}
+				isPressEnterToChange={isPressEnterToChange}
+				label={label}
+				onBlur={handleOnBlur}
+				onKeyDown={handleOnKeyDown}
+				onChange={handleOnChange}
+				ref={forwardedRef}
+				size={size}
+				suffix={inputSuffix}
+				value={value}
+				step={step}
+				__unstableStateReducer={composeStateReducers(
 					unitControlStateReducer,
 					stateReducer
-				) }
+				)}
 			/>
 		</Root>
 	);
@@ -241,7 +235,7 @@ function UnitControl(
  * };
  * ```
  */
-const ForwardedUnitControl = forwardRef( UnitControl );
+const ForwardedUnitControl = forwardRef(UnitControl);
 
 export { parseUnit, useCustomUnits } from './utils';
 export default ForwardedUnitControl;

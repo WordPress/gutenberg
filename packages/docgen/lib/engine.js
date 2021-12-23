@@ -1,35 +1,35 @@
 /**
  * External dependencies
  */
-const babel = require( '@babel/core' );
+const babel = require('@babel/core');
 
 /**
  * Internal dependencies
  */
-const getIntermediateRepresentation = require( './get-intermediate-representation' );
+const getIntermediateRepresentation = require('./get-intermediate-representation');
 
-const getAST = ( source, filename ) => {
-	return babel.parse( source, { filename } ).program;
+const getAST = (source, filename) => {
+	return babel.parse(source, { filename }).program;
 };
 
-const getExportTokens = ( ast ) =>
-	ast.body.filter( ( node ) =>
+const getExportTokens = (ast) =>
+	ast.body.filter((node) =>
 		[
 			'ExportNamedDeclaration',
 			'ExportDefaultDeclaration',
 			'ExportAllDeclaration',
-		].includes( node.type )
+		].includes(node.type)
 	);
 
-const engine = ( path, code, getIRFromPath = () => {} ) => {
-	if ( ! path || ! code ) {
+const engine = (path, code, getIRFromPath = () => {}) => {
+	if (!path || !code) {
 		return { ast: null, tokens: null, ir: [] };
 	}
 
-	const ast = getAST( code, path );
-	const tokens = getExportTokens( ast );
-	const ir = tokens.flatMap( ( token ) =>
-		getIntermediateRepresentation( path, token, ast, getIRFromPath )
+	const ast = getAST(code, path);
+	const tokens = getExportTokens(ast);
+	const ir = tokens.flatMap((token) =>
+		getIntermediateRepresentation(path, token, ast, getIRFromPath)
 	);
 
 	return { ast, tokens, ir };

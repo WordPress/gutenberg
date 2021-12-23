@@ -18,20 +18,20 @@ const {
 	specialSuggestions: { default: suggestions },
 } = fixtures;
 
-function unescapeAndFormatSpaces( str ) {
-	const nbsp = String.fromCharCode( 160 );
-	return unescape( str ).replace( / /g, nbsp );
+function unescapeAndFormatSpaces(str) {
+	const nbsp = String.fromCharCode(160);
+	return unescape(str).replace(/ /g, nbsp);
 }
 
 class TokenFieldWrapper extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 		this.state = {
 			tokenSuggestions: suggestions,
-			tokens: Object.freeze( [ 'foo', 'bar' ] ),
+			tokens: Object.freeze(['foo', 'bar']),
 			isExpanded: false,
 		};
-		this.onTokensChange = this.onTokensChange.bind( this );
+		this.onTokensChange = this.onTokensChange.bind(this);
 	}
 
 	render() {
@@ -40,16 +40,16 @@ class TokenFieldWrapper extends Component {
 				suggestions={
 					this.state.isExpanded ? this.state.tokenSuggestions : null
 				}
-				value={ this.state.tokens }
-				displayTransform={ unescapeAndFormatSpaces }
-				onChange={ this.onTokensChange }
-				{ ...this.props }
+				value={this.state.tokens}
+				displayTransform={unescapeAndFormatSpaces}
+				onChange={this.onTokensChange}
+				{...this.props}
 			/>
 		);
 	}
 
-	onTokensChange( value ) {
-		this.setState( { tokens: value } );
+	onTokensChange(value) {
+		this.setState({ tokens: value });
 	}
 }
 

@@ -15,7 +15,7 @@ import { space } from '../../ui/utils/space';
 const rangeHeightValue = 30;
 const railHeight = 4;
 const rangeHeight = () =>
-	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
+	css({ height: rangeHeightValue, minHeight: rangeHeightValue });
 const thumbSize = 12;
 
 export const Root = styled.div`
@@ -30,89 +30,88 @@ export const Root = styled.div`
 	width: 100%;
 `;
 
-const wrapperColor = ( { color: colorProp = COLORS.ui.borderFocus } ) => {
-	return css( { color: colorProp } );
+const wrapperColor = ({ color: colorProp = COLORS.ui.borderFocus }) => {
+	return css({ color: colorProp });
 };
-const wrapperMargin = ( { marks } ) =>
-	css( { marginBottom: marks ? 16 : null } );
+const wrapperMargin = ({ marks }) => css({ marginBottom: marks ? 16 : null });
 
 export const Wrapper = styled.div`
 	box-sizing: border-box;
-	color: ${ COLORS.blue.medium.focus };
+	color: ${COLORS.blue.medium.focus};
 	display: block;
 	flex: 1;
 	position: relative;
 	width: 100%;
 
-	${ wrapperColor };
-	${ rangeHeight };
-	${ wrapperMargin };
+	${wrapperColor};
+	${rangeHeight};
+	${wrapperMargin};
 `;
 
 export const BeforeIconWrapper = styled.span`
-	margin-top: ${ railHeight }px;
+	margin-top: ${railHeight}px;
 
-	${ rtl( { marginRight: 6 } ) }
+	${rtl({ marginRight: 6 })}
 `;
 
 export const AfterIconWrapper = styled.span`
-	margin-top: ${ railHeight }px;
+	margin-top: ${railHeight}px;
 
-	${ rtl( { marginLeft: 16 } ) }
+	${rtl({ marginLeft: 16 })}
 `;
 
-const railBackgroundColor = ( { disabled, railColor } ) => {
+const railBackgroundColor = ({ disabled, railColor }) => {
 	let background = railColor || null;
 
-	if ( disabled ) {
-		background = COLORS.lightGray[ 400 ];
+	if (disabled) {
+		background = COLORS.lightGray[400];
 	}
 
-	return css( {
+	return css({
 		background,
-	} );
+	});
 };
 
 export const Rail = styled.span`
-	background-color: ${ COLORS.lightGray[ 600 ] };
+	background-color: ${COLORS.lightGray[600]};
 	box-sizing: border-box;
 	left: 0;
 	pointer-events: none;
 	right: 0;
 	display: block;
-	height: ${ railHeight }px;
+	height: ${railHeight}px;
 	position: absolute;
-	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
+	margin-top: ${(rangeHeightValue - railHeight) / 2}px;
 	top: 0;
-	border-radius: ${ railHeight }px;
+	border-radius: ${railHeight}px;
 
-	${ railBackgroundColor };
+	${railBackgroundColor};
 `;
 
-const trackBackgroundColor = ( { disabled, trackColor } ) => {
+const trackBackgroundColor = ({ disabled, trackColor }) => {
 	let background = trackColor || 'currentColor';
 
-	if ( disabled ) {
-		background = COLORS.lightGray[ 800 ];
+	if (disabled) {
+		background = COLORS.lightGray[800];
 	}
 
-	return css( {
+	return css({
 		background,
-	} );
+	});
 };
 
 export const Track = styled.span`
 	background-color: currentColor;
-	border-radius: ${ railHeight }px;
+	border-radius: ${railHeight}px;
 	box-sizing: border-box;
-	height: ${ railHeight }px;
+	height: ${railHeight}px;
 	pointer-events: none;
 	display: block;
 	position: absolute;
-	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
+	margin-top: ${(rangeHeightValue - railHeight) / 2}px;
 	top: 0;
 
-	${ trackBackgroundColor };
+	${trackBackgroundColor};
 `;
 
 export const MarksWrapper = styled.span`
@@ -124,91 +123,91 @@ export const MarksWrapper = styled.span`
 	user-select: none;
 `;
 
-const markFill = ( { disabled, isFilled } ) => {
-	let backgroundColor = isFilled ? 'currentColor' : COLORS.lightGray[ 600 ];
+const markFill = ({ disabled, isFilled }) => {
+	let backgroundColor = isFilled ? 'currentColor' : COLORS.lightGray[600];
 
-	if ( disabled ) {
-		backgroundColor = COLORS.lightGray[ 800 ];
+	if (disabled) {
+		backgroundColor = COLORS.lightGray[800];
 	}
 
-	return css( {
+	return css({
 		backgroundColor,
-	} );
+	});
 };
 
 export const Mark = styled.span`
 	box-sizing: border-box;
-	height: ${ thumbSize }px;
+	height: ${thumbSize}px;
 	left: 0;
 	position: absolute;
 	top: -4px;
 	width: 1px;
 
-	${ markFill };
+	${markFill};
 `;
 
-const markLabelFill = ( { isFilled } ) => {
-	return css( {
-		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
-	} );
+const markLabelFill = ({ isFilled }) => {
+	return css({
+		color: isFilled ? COLORS.darkGray[300] : COLORS.lightGray[600],
+	});
 };
 
 export const MarkLabel = styled.span`
 	box-sizing: border-box;
-	color: ${ COLORS.lightGray[ 600 ] };
+	color: ${COLORS.lightGray[600]};
 	left: 0;
 	font-size: 11px;
 	position: absolute;
 	top: 12px;
-	transform: translateX( -50% );
+	transform: translateX(-50%);
 	white-space: nowrap;
 
-	${ markLabelFill };
+	${markLabelFill};
 `;
 
-const thumbColor = ( { disabled } ) =>
+const thumbColor = ({ disabled }) =>
 	disabled
 		? css`
-				background-color: ${ COLORS.lightGray[ 800 ] };
+				background-color: ${COLORS.lightGray[800]};
 		  `
 		: css`
-				background-color: var( --wp-admin-theme-color );
+				background-color: var(--wp-admin-theme-color);
 		  `;
 
 export const ThumbWrapper = styled.span`
 	align-items: center;
 	box-sizing: border-box;
 	display: flex;
-	height: ${ thumbSize }px;
+	height: ${thumbSize}px;
 	justify-content: center;
-	margin-top: ${ ( rangeHeightValue - thumbSize ) / 2 }px;
+	margin-top: ${(rangeHeightValue - thumbSize) / 2}px;
 	outline: 0;
 	pointer-events: none;
 	position: absolute;
 	top: 0;
 	user-select: none;
-	width: ${ thumbSize }px;
+	width: ${thumbSize}px;
 	border-radius: 50%;
 
-	${ thumbColor };
-	${ rtl( { marginLeft: -10 } ) };
-	${ rtl(
+	${thumbColor};
+	${rtl({ marginLeft: -10 })};
+	${rtl(
 		{ transform: 'translateX( 4.5px )' },
 		{ transform: 'translateX( -4.5px )' }
-	) };
+	)};
 `;
 
-const thumbFocus = ( { isFocused } ) => {
+const thumbFocus = ({ isFocused }) => {
 	return isFocused
 		? css`
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: var( --wp-admin-theme-color );
+					background-color: var(--wp-admin-theme-color);
 					opacity: 0.4;
 					border-radius: 50%;
-					height: ${ thumbSize + 8 }px;
-					width: ${ thumbSize + 8 }px;
+					height: ${thumbSize + 8}px;
+					width: ${thumbSize + 8}px;
 					top: -4px;
 					left: -4px;
 				}
@@ -226,8 +225,8 @@ export const Thumb = styled.span`
 	user-select: none;
 	width: 100%;
 
-	${ thumbColor };
-	${ thumbFocus };
+	${thumbColor};
+	${thumbFocus};
 `;
 
 export const InputRange = styled.input`
@@ -236,25 +235,25 @@ export const InputRange = styled.input`
 	display: block;
 	height: 100%;
 	left: 0;
-	margin: 0 -${ thumbSize / 2 }px;
+	margin: 0 -${thumbSize / 2}px;
 	opacity: 0;
 	outline: none;
 	position: absolute;
 	right: 0;
 	top: 0;
-	width: calc( 100% + ${ thumbSize }px );
+	width: calc(100% + ${thumbSize}px);
 `;
 
-const tooltipShow = ( { show } ) => {
-	return css( {
+const tooltipShow = ({ show }) => {
+	return css({
 		opacity: show ? 1 : 0,
-	} );
+	});
 };
 
-const tooltipPosition = ( { position } ) => {
+const tooltipPosition = ({ position }) => {
 	const isBottom = position === 'bottom';
 
-	if ( isBottom ) {
+	if (isBottom) {
 		return css`
 			bottom: -80%;
 		`;
@@ -266,7 +265,7 @@ const tooltipPosition = ( { position } ) => {
 };
 
 export const Tooltip = styled.span`
-	background: rgba( 0, 0, 0, 0.8 );
+	background: rgba(0, 0, 0, 0.8);
 	border-radius: 2px;
 	box-sizing: border-box;
 	color: white;
@@ -282,29 +281,26 @@ export const Tooltip = styled.span`
 	user-select: none;
 	line-height: 1.4;
 
-	${ tooltipShow };
-	${ tooltipPosition };
-	${ reduceMotion( 'transition' ) };
-	${ rtl(
-		{ transform: 'translateX(-50%)' },
-		{ transform: 'translateX(50%)' }
-	) }
+	${tooltipShow};
+	${tooltipPosition};
+	${reduceMotion('transition')};
+	${rtl({ transform: 'translateX(-50%)' }, { transform: 'translateX(50%)' })}
 `;
 
 // @todo: Refactor RangeControl with latest HStack configuration
 // @wordpress/components/ui/hstack
-export const InputNumber = styled( NumberControl )`
+export const InputNumber = styled(NumberControl)`
 	box-sizing: border-box;
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
-	width: ${ space( 16 ) } !important;
+	width: ${space(16)} !important;
 
 	input[type='number']& {
-		${ rangeHeight };
+		${rangeHeight};
 	}
 
-	${ rtl( { marginLeft: `${ space( 4 ) } !important` } ) }
+	${rtl({ marginLeft: `${space(4)} !important` })}
 `;
 
 export const ActionRightWrapper = styled.span`
@@ -315,8 +311,8 @@ export const ActionRightWrapper = styled.span`
 	button,
 	button.is-small {
 		margin-left: 0;
-		${ rangeHeight };
+		${rangeHeight};
 	}
 
-	${ rtl( { marginLeft: 8 } ) }
+	${rtl({ marginLeft: 8 })}
 `;

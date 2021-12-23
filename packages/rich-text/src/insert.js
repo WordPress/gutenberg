@@ -28,27 +28,24 @@ export function insert(
 ) {
 	const { formats, replacements, text } = value;
 
-	if ( typeof valueToInsert === 'string' ) {
-		valueToInsert = create( { text: valueToInsert } );
+	if (typeof valueToInsert === 'string') {
+		valueToInsert = create({ text: valueToInsert });
 	}
 
 	const index = startIndex + valueToInsert.text.length;
 
-	return normaliseFormats( {
+	return normaliseFormats({
 		formats: formats
-			.slice( 0, startIndex )
-			.concat( valueToInsert.formats, formats.slice( endIndex ) ),
+			.slice(0, startIndex)
+			.concat(valueToInsert.formats, formats.slice(endIndex)),
 		replacements: replacements
-			.slice( 0, startIndex )
-			.concat(
-				valueToInsert.replacements,
-				replacements.slice( endIndex )
-			),
+			.slice(0, startIndex)
+			.concat(valueToInsert.replacements, replacements.slice(endIndex)),
 		text:
-			text.slice( 0, startIndex ) +
+			text.slice(0, startIndex) +
 			valueToInsert.text +
-			text.slice( endIndex ),
+			text.slice(endIndex),
 		start: index,
 		end: index,
-	} );
+	});
 }

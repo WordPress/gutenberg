@@ -17,36 +17,36 @@ const fallbackVariations = [
 	{
 		name: 'link',
 		isDefault: true,
-		title: __( 'Custom Link' ),
-		description: __( 'A link to a custom URL.' ),
+		title: __('Custom Link'),
+		description: __('A link to a custom URL.'),
 		attributes: {},
 	},
 	{
 		name: 'post',
 		icon: postIcon,
-		title: __( 'Post Link' ),
-		description: __( 'A link to a post.' ),
+		title: __('Post Link'),
+		description: __('A link to a post.'),
 		attributes: { type: 'post', kind: 'post-type' },
 	},
 	{
 		name: 'page',
 		icon: pageIcon,
-		title: __( 'Page Link' ),
-		description: __( 'A link to a page.' ),
+		title: __('Page Link'),
+		description: __('A link to a page.'),
 		attributes: { type: 'page', kind: 'post-type' },
 	},
 	{
 		name: 'category',
 		icon: categoryIcon,
-		title: __( 'Category Link' ),
-		description: __( 'A link to a category.' ),
+		title: __('Category Link'),
+		description: __('A link to a category.'),
 		attributes: { type: 'category', kind: 'taxonomy' },
 	},
 	{
 		name: 'tag',
 		icon: tagIcon,
-		title: __( 'Tag Link' ),
-		description: __( 'A link to a tag.' ),
+		title: __('Tag Link'),
+		description: __('A link to a tag.'),
 		attributes: { type: 'tag', kind: 'taxonomy' },
 	},
 ];
@@ -56,10 +56,10 @@ const fallbackVariations = [
  * `isActive` function is used to find a variation match from a created
  *  Block by providing its attributes.
  */
-fallbackVariations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
-	variation.isActive = ( blockAttributes, variationAttributes ) =>
+fallbackVariations.forEach((variation) => {
+	if (variation.isActive) return;
+	variation.isActive = (blockAttributes, variationAttributes) =>
 		blockAttributes.type === variationAttributes.type;
-} );
+});
 
 export default fallbackVariations;

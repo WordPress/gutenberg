@@ -20,7 +20,7 @@ export default {
 };
 
 export const _default = () => {
-	const targetRef = React.useRef( null );
+	const targetRef = React.useRef(null);
 
 	const onButtonClick = () => {
 		targetRef.current?.focus();
@@ -47,11 +47,11 @@ export const _default = () => {
 
 	return (
 		<Scrollable
-			style={ { height: containerHeight, width: containerWidth } }
-			{ ...otherProps }
+			style={{ height: containerHeight, width: containerWidth }}
+			{...otherProps}
 		>
 			<View
-				style={ {
+				style={{
 					backgroundColor: '#eee',
 					height:
 						otherProps.scrollDirection === 'x'
@@ -62,20 +62,20 @@ export const _default = () => {
 							? containerWidth
 							: 1000,
 					position: 'relative',
-				} }
+				}}
 			>
-				<button onClick={ onButtonClick }>
+				<button onClick={onButtonClick}>
 					Move focus to an element out of view
 				</button>
 				<input
-					ref={ targetRef }
-					style={ {
+					ref={targetRef}
+					style={{
 						position: 'absolute',
 						bottom:
 							otherProps.scrollDirection === 'x' ? 'initial' : 0,
 						right:
 							otherProps.scrollDirection === 'y' ? 'initial' : 0,
-					} }
+					}}
 					type="text"
 					value="Focus me"
 				/>

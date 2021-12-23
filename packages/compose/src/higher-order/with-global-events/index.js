@@ -40,66 +40,68 @@ const listener = new Listener();
  *
  * @return {any} Higher-order component.
  */
-export default function withGlobalEvents( eventTypesToHandlers ) {
-	deprecated( 'wp.compose.withGlobalEvents', {
+export default function withGlobalEvents(eventTypesToHandlers) {
+	deprecated('wp.compose.withGlobalEvents', {
 		since: '5.7',
 		alternative: 'useEffect',
-	} );
+	});
 
-	return createHigherOrderComponent( ( WrappedComponent ) => {
+	return createHigherOrderComponent((WrappedComponent) => {
 		class Wrapper extends Component {
-			constructor( /** @type {any} */ props ) {
-				super( props );
+			constructor(/** @type {any} */ props) {
+				super(props);
 
-				this.handleEvent = this.handleEvent.bind( this );
-				this.handleRef = this.handleRef.bind( this );
+				this.handleEvent = this.handleEvent.bind(this);
+				this.handleRef = this.handleRef.bind(this);
 			}
 
 			componentDidMount() {
-				forEach( eventTypesToHandlers, ( _, eventType ) => {
-					listener.add( eventType, this );
-				} );
+				forEach(eventTypesToHandlers, (_, eventType) => {
+					listener.add(eventType, this);
+				});
 			}
 
 			componentWillUnmount() {
-				forEach( eventTypesToHandlers, ( _, eventType ) => {
-					listener.remove( eventType, this );
-				} );
+				forEach(eventTypesToHandlers, (_, eventType) => {
+					listener.remove(eventType, this);
+				});
 			}
 
-			handleEvent( /** @type {any} */ event ) {
+			handleEvent(/** @type {any} */ event) {
 				const handler =
 					eventTypesToHandlers[
-						/** @type {keyof GlobalEventHandlersEventMap} */ ( event.type )
+						/** @type {keyof GlobalEventHandlersEventMap} */ (
+							event.type
+						)
 						/* eslint-enable jsdoc/no-undefined-types */
 					];
-				if ( typeof this.wrappedRef[ handler ] === 'function' ) {
-					this.wrappedRef[ handler ]( event );
+				if (typeof this.wrappedRef[handler] === 'function') {
+					this.wrappedRef[handler](event);
 				}
 			}
 
-			handleRef( /** @type {any} */ el ) {
+			handleRef(/** @type {any} */ el) {
 				this.wrappedRef = el;
 				// Any component using `withGlobalEvents` that is not setting a `ref`
 				// will cause `this.props.forwardedRef` to be `null`, so we need this
 				// check.
-				if ( this.props.forwardedRef ) {
-					this.props.forwardedRef( el );
+				if (this.props.forwardedRef) {
+					this.props.forwardedRef(el);
 				}
 			}
 
 			render() {
 				return (
 					<WrappedComponent
-						{ ...this.props.ownProps }
-						ref={ this.handleRef }
+						{...this.props.ownProps}
+						ref={this.handleRef}
 					/>
 				);
 			}
 		}
 
-		return forwardRef( ( props, ref ) => {
-			return <Wrapper ownProps={ props } forwardedRef={ ref } />;
-		} );
-	}, 'withGlobalEvents' );
+		return forwardRef((props, ref) => {
+			return <Wrapper ownProps={props} forwardedRef={ref} />;
+		});
+	}, 'withGlobalEvents');
 }

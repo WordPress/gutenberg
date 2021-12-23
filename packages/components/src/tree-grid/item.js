@@ -8,13 +8,10 @@ import { forwardRef } from '@wordpress/element';
  */
 import RovingTabIndexItem from './roving-tab-index-item';
 
-export default forwardRef( function TreeGridItem(
-	{ children, ...props },
-	ref
-) {
+export default forwardRef(function TreeGridItem({ children, ...props }, ref) {
 	return (
-		<RovingTabIndexItem ref={ ref } { ...props }>
-			{ children }
+		<RovingTabIndexItem ref={ref} {...props}>
+			{children}
 		</RovingTabIndexItem>
 	);
-} );
+});

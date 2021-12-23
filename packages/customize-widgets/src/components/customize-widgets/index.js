@@ -14,46 +14,44 @@ import FocusControl from '../focus-control';
 import SidebarControls from '../sidebar-controls';
 import useClearSelectedBlock from './use-clear-selected-block';
 
-export default function CustomizeWidgets( {
+export default function CustomizeWidgets({
 	api,
 	sidebarControls,
 	blockEditorSettings,
-} ) {
-	const [ activeSidebarControl, setActiveSidebarControl ] = useState( null );
-	const parentContainer = document.getElementById(
-		'customize-theme-controls'
-	);
+}) {
+	const [activeSidebarControl, setActiveSidebarControl] = useState(null);
+	const parentContainer = document.getElementById('customize-theme-controls');
 	const popoverRef = useRef();
 
-	useClearSelectedBlock( activeSidebarControl, popoverRef );
+	useClearSelectedBlock(activeSidebarControl, popoverRef);
 
-	useEffect( () => {
-		const unsubscribers = sidebarControls.map( ( sidebarControl ) =>
-			sidebarControl.subscribe( ( expanded ) => {
-				if ( expanded ) {
-					setActiveSidebarControl( sidebarControl );
+	useEffect(() => {
+		const unsubscribers = sidebarControls.map((sidebarControl) =>
+			sidebarControl.subscribe((expanded) => {
+				if (expanded) {
+					setActiveSidebarControl(sidebarControl);
 				}
-			} )
+			})
 		);
 
 		return () => {
-			unsubscribers.forEach( ( unsubscriber ) => unsubscriber() );
+			unsubscribers.forEach((unsubscriber) => unsubscriber());
 		};
-	}, [ sidebarControls ] );
+	}, [sidebarControls]);
 
 	const activeSidebar =
 		activeSidebarControl &&
 		createPortal(
 			<ErrorBoundary>
 				<SidebarBlockEditor
-					key={ activeSidebarControl.id }
-					blockEditorSettings={ blockEditorSettings }
-					sidebar={ activeSidebarControl.sidebarAdapter }
-					inserter={ activeSidebarControl.inserter }
-					inspector={ activeSidebarControl.inspector }
+					key={activeSidebarControl.id}
+					blockEditorSettings={blockEditorSettings}
+					sidebar={activeSidebarControl.sidebarAdapter}
+					inserter={activeSidebarControl.inserter}
+					inspector={activeSidebarControl.inspector}
 				/>
 			</ErrorBoundary>,
-			activeSidebarControl.container[ 0 ]
+			activeSidebarControl.container[0]
 		);
 
 	// We have to portal this to the parent of both the editor and the inspector,
@@ -61,7 +59,7 @@ export default function CustomizeWidgets( {
 	const popover =
 		parentContainer &&
 		createPortal(
-			<div className="customize-widgets-popover" ref={ popoverRef }>
+			<div className="customize-widgets-popover" ref={popoverRef}>
 				<Popover.Slot />
 			</div>,
 			parentContainer
@@ -71,15 +69,12 @@ export default function CustomizeWidgets( {
 		<ShortcutProvider>
 			<SlotFillProvider>
 				<SidebarControls
-					sidebarControls={ sidebarControls }
-					activeSidebarControl={ activeSidebarControl }
+					sidebarControls={sidebarControls}
+					activeSidebarControl={activeSidebarControl}
 				>
-					<FocusControl
-						api={ api }
-						sidebarControls={ sidebarControls }
-					>
-						{ activeSidebar }
-						{ popover }
+					<FocusControl api={api} sidebarControls={sidebarControls}>
+						{activeSidebar}
+						{popover}
 					</FocusControl>
 				</SidebarControls>
 			</SlotFillProvider>

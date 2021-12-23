@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 import InserterMenu from './menu';
 import { store as blockEditorStore } from '../../store';
 
-function InserterLibrary( {
+function InserterLibrary({
 	rootClientId,
 	clientId,
 	isAppender,
@@ -24,29 +24,27 @@ function InserterLibrary( {
 	__experimentalFilterValue,
 	onSelect = noop,
 	shouldFocusBlock = false,
-} ) {
+}) {
 	const destinationRootClientId = useSelect(
-		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
+		(select) => {
+			const { getBlockRootClientId } = select(blockEditorStore);
 
-			return (
-				rootClientId || getBlockRootClientId( clientId ) || undefined
-			);
+			return rootClientId || getBlockRootClientId(clientId) || undefined;
 		},
-		[ clientId, rootClientId ]
+		[clientId, rootClientId]
 	);
 
 	return (
 		<InserterMenu
-			onSelect={ onSelect }
-			rootClientId={ destinationRootClientId }
-			clientId={ clientId }
-			isAppender={ isAppender }
-			showInserterHelpPanel={ showInserterHelpPanel }
-			showMostUsedBlocks={ showMostUsedBlocks }
-			__experimentalInsertionIndex={ __experimentalInsertionIndex }
-			__experimentalFilterValue={ __experimentalFilterValue }
-			shouldFocusBlock={ shouldFocusBlock }
+			onSelect={onSelect}
+			rootClientId={destinationRootClientId}
+			clientId={clientId}
+			isAppender={isAppender}
+			showInserterHelpPanel={showInserterHelpPanel}
+			showMostUsedBlocks={showMostUsedBlocks}
+			__experimentalInsertionIndex={__experimentalInsertionIndex}
+			__experimentalFilterValue={__experimentalFilterValue}
+			shouldFocusBlock={shouldFocusBlock}
 		/>
 	);
 }

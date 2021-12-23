@@ -25,8 +25,8 @@ export const POST_TYPE = 'postType';
  * @param {number} widgetAreaId Widget area id.
  * @return {string} An ID.
  */
-export const buildWidgetAreaPostId = ( widgetAreaId ) =>
-	`widget-area-${ widgetAreaId }`;
+export const buildWidgetAreaPostId = (widgetAreaId) =>
+	`widget-area-${widgetAreaId}`;
 
 /**
  * Builds an ID for a global widget areas post.
@@ -66,7 +66,7 @@ export function buildWidgetsQuery() {
  * @param {Array}  blocks The list of blocks.
  * @return {Object} A stub post object formatted in compliance with the data layer.
  */
-export const createStubPost = ( id, blocks ) => ( {
+export const createStubPost = (id, blocks) => ({
 	id,
 	slug: id,
 	status: 'draft',
@@ -75,4 +75,4 @@ export const createStubPost = ( id, blocks ) => ( {
 	meta: {
 		widgetAreaId: id,
 	},
-} );
+});

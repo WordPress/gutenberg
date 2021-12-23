@@ -24,4 +24,4 @@ export interface OwnProps {
 	marginEnd?: SpaceInput;
 }
 
-export interface Props extends Omit< SeparatorProps, 'children' >, OwnProps {}
+export interface Props extends Omit<SeparatorProps, 'children'>, OwnProps {}

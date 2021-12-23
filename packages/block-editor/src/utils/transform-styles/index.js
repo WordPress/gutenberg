@@ -22,21 +22,21 @@ import wrap from './transforms/wrap';
  * @param {string} wrapperClassName Wrapper Class Name.
  * @return {Array} converted rules.
  */
-const transformStyles = ( styles, wrapperClassName = '' ) => {
-	return map( styles, ( { css, baseURL } ) => {
+const transformStyles = (styles, wrapperClassName = '') => {
+	return map(styles, ({ css, baseURL }) => {
 		const transforms = [];
-		if ( wrapperClassName ) {
-			transforms.push( wrap( wrapperClassName ) );
+		if (wrapperClassName) {
+			transforms.push(wrap(wrapperClassName));
 		}
-		if ( baseURL ) {
-			transforms.push( urlRewrite( baseURL ) );
+		if (baseURL) {
+			transforms.push(urlRewrite(baseURL));
 		}
-		if ( transforms.length ) {
-			return traverse( css, compose( transforms ) );
+		if (transforms.length) {
+			return traverse(css, compose(transforms));
 		}
 
 		return css;
-	} );
+	});
 };
 
 export default transformStyles;

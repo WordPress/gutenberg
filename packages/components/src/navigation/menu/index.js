@@ -21,7 +21,7 @@ import NavigationSearchNoResultsFound from './search-no-results-found';
 import { NavigableMenu } from '../../navigable-container';
 import { MenuUI } from '../styles/navigation-styles';
 
-export default function NavigationMenu( props ) {
+export default function NavigationMenu(props) {
 	const {
 		backButtonLabel,
 		children,
@@ -36,8 +36,8 @@ export default function NavigationMenu( props ) {
 		title,
 		titleAction,
 	} = props;
-	const [ uncontrolledSearch, setUncontrolledSearch ] = useState( '' );
-	useNavigationTreeMenu( props );
+	const [uncontrolledSearch, setUncontrolledSearch] = useState('');
+	useNavigationTreeMenu(props);
 	const { activeMenu } = useNavigationContext();
 
 	const context = {
@@ -46,50 +46,50 @@ export default function NavigationMenu( props ) {
 	};
 
 	// Keep the children rendered to make sure invisible items are included in the navigation tree
-	if ( activeMenu !== menu ) {
+	if (activeMenu !== menu) {
 		return (
-			<NavigationMenuContext.Provider value={ context }>
-				{ children }
+			<NavigationMenuContext.Provider value={context}>
+				{children}
 			</NavigationMenuContext.Provider>
 		);
 	}
 
-	const isControlledSearch = !! setControlledSearch;
+	const isControlledSearch = !!setControlledSearch;
 	const search = isControlledSearch ? controlledSearch : uncontrolledSearch;
 	const onSearch = isControlledSearch
 		? setControlledSearch
 		: setUncontrolledSearch;
 
-	const menuTitleId = `components-navigation__menu-title-${ menu }`;
-	const classes = classnames( 'components-navigation__menu', className );
+	const menuTitleId = `components-navigation__menu-title-${menu}`;
+	const classes = classnames('components-navigation__menu', className);
 
 	return (
-		<NavigationMenuContext.Provider value={ context }>
-			<MenuUI className={ classes }>
-				{ ( parentMenu || onBackButtonClick ) && (
+		<NavigationMenuContext.Provider value={context}>
+			<MenuUI className={classes}>
+				{(parentMenu || onBackButtonClick) && (
 					<NavigationBackButton
-						backButtonLabel={ backButtonLabel }
-						parentMenu={ parentMenu }
-						onClick={ onBackButtonClick }
+						backButtonLabel={backButtonLabel}
+						parentMenu={parentMenu}
+						onClick={onBackButtonClick}
 					/>
-				) }
+				)}
 
-				{ title && (
+				{title && (
 					<NavigationMenuTitle
-						hasSearch={ hasSearch }
-						onSearch={ onSearch }
-						search={ search }
-						title={ title }
-						titleAction={ titleAction }
+						hasSearch={hasSearch}
+						onSearch={onSearch}
+						search={search}
+						title={title}
+						titleAction={titleAction}
 					/>
-				) }
+				)}
 
 				<NavigableMenu>
-					<ul aria-labelledby={ menuTitleId }>
-						{ children }
-						{ search && ! isSearchDebouncing && (
-							<NavigationSearchNoResultsFound search={ search } />
-						) }
+					<ul aria-labelledby={menuTitleId}>
+						{children}
+						{search && !isSearchDebouncing && (
+							<NavigationSearchNoResultsFound search={search} />
+						)}
 					</ul>
 				</NavigableMenu>
 			</MenuUI>

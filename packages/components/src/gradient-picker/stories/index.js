@@ -21,22 +21,18 @@ export default {
 	},
 };
 
-const GradientPickerWithState = ( props ) => {
-	const [ gradient, setGradient ] = useState();
+const GradientPickerWithState = (props) => {
+	const [gradient, setGradient] = useState();
 	return (
-		<GradientPicker
-			{ ...props }
-			value={ gradient }
-			onChange={ setGradient }
-		/>
+		<GradientPicker {...props} value={gradient} onChange={setGradient} />
 	);
 };
 
 export const _default = () => {
-	const disableCustomGradients = boolean( 'Disable Custom Gradients', false );
-	const clearable = boolean( 'Clearable', true );
-	const className = text( 'Class Name', '' );
-	const gradients = object( 'Gradients', [
+	const disableCustomGradients = boolean('Disable Custom Gradients', false);
+	const clearable = boolean('Clearable', true);
+	const className = text('Class Name', '');
+	const gradients = object('Gradients', [
 		{
 			name: 'Vivid cyan blue to vivid purple',
 			gradient:
@@ -73,37 +69,35 @@ export const _default = () => {
 				'linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)',
 			slug: 'cool-to-warm-spectrum',
 		},
-	] );
+	]);
 
 	return (
 		<GradientPickerWithState
-			disableCustomGradients={ disableCustomGradients }
-			gradients={ gradients }
-			clearable={ clearable }
-			className={ className }
+			disableCustomGradients={disableCustomGradients}
+			gradients={gradients}
+			clearable={clearable}
+			className={className}
 		/>
 	);
 };
 
 export const WithNoExistingGradients = () => {
-	const disableCustomGradients = boolean( 'Disable Custom Gradients', false );
+	const disableCustomGradients = boolean('Disable Custom Gradients', false);
 	const __experimentalHasMultipleOrigins = boolean(
 		'Experimental Has Multiple Origins',
 		true
 	);
-	const clearable = boolean( 'Clearable', true );
-	const className = text( 'Class Name', '' );
-	const gradients = object( 'Gradients', [] );
+	const clearable = boolean('Clearable', true);
+	const className = text('Class Name', '');
+	const gradients = object('Gradients', []);
 
 	return (
 		<GradientPickerWithState
-			__experimentalHasMultipleOrigins={
-				__experimentalHasMultipleOrigins
-			}
-			disableCustomGradients={ disableCustomGradients }
-			gradients={ gradients }
-			clearable={ clearable }
-			className={ className }
+			__experimentalHasMultipleOrigins={__experimentalHasMultipleOrigins}
+			disableCustomGradients={disableCustomGradients}
+			gradients={gradients}
+			clearable={clearable}
+			className={className}
 		/>
 	);
 };

@@ -9,35 +9,35 @@ import { useSelect, useDispatch, select as selectStore } from '@wordpress/data';
  */
 import { store as customizeWidgetsStore } from '../../store';
 
-export default function useInserter( inserter ) {
+export default function useInserter(inserter) {
 	const isInserterOpened = useSelect(
-		( select ) => select( customizeWidgetsStore ).isInserterOpened(),
+		(select) => select(customizeWidgetsStore).isInserterOpened(),
 		[]
 	);
-	const { setIsInserterOpened } = useDispatch( customizeWidgetsStore );
+	const { setIsInserterOpened } = useDispatch(customizeWidgetsStore);
 
-	useEffect( () => {
-		if ( isInserterOpened ) {
+	useEffect(() => {
+		if (isInserterOpened) {
 			inserter.open();
 		} else {
 			inserter.close();
 		}
-	}, [ inserter, isInserterOpened ] );
+	}, [inserter, isInserterOpened]);
 
 	return [
 		isInserterOpened,
 		useCallback(
-			( updater ) => {
+			(updater) => {
 				let isOpen = updater;
-				if ( typeof updater === 'function' ) {
+				if (typeof updater === 'function') {
 					isOpen = updater(
-						selectStore( customizeWidgetsStore ).isInserterOpened()
+						selectStore(customizeWidgetsStore).isInserterOpened()
 					);
 				}
 
-				setIsInserterOpened( isOpen );
+				setIsInserterOpened(isOpen);
 			},
-			[ setIsInserterOpened ]
+			[setIsInserterOpened]
 		),
 	];
 }

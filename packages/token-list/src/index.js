@@ -14,7 +14,7 @@ export default class TokenList {
 	 *
 	 * @param {string} initialValue Initial value to assign.
 	 */
-	constructor( initialValue = '' ) {
+	constructor(initialValue = '') {
 		this.value = initialValue;
 
 		// Disable reason: These are type hints on the class.
@@ -30,29 +30,29 @@ export default class TokenList {
 	/**
 	 * @param {Parameters<Array<string>['entries']>} args
 	 */
-	entries( ...args ) {
-		return this._valueAsArray.entries( ...args );
+	entries(...args) {
+		return this._valueAsArray.entries(...args);
 	}
 
 	/**
 	 * @param {Parameters<Array<string>['forEach']>} args
 	 */
-	forEach( ...args ) {
-		return this._valueAsArray.forEach( ...args );
+	forEach(...args) {
+		return this._valueAsArray.forEach(...args);
 	}
 
 	/**
 	 * @param {Parameters<Array<string>['keys']>} args
 	 */
-	keys( ...args ) {
-		return this._valueAsArray.keys( ...args );
+	keys(...args) {
+		return this._valueAsArray.keys(...args);
 	}
 
 	/**
 	 * @param {Parameters<Array<string>['values']>} args
 	 */
-	values( ...args ) {
-		return this._valueAsArray.values( ...args );
+	values(...args) {
+		return this._valueAsArray.values(...args);
 	}
 
 	/**
@@ -73,10 +73,10 @@ export default class TokenList {
 	 *
 	 * @param {string} value New token set as string.
 	 */
-	set value( value ) {
-		value = String( value );
-		this._valueAsArray = uniq( compact( value.split( /\s+/g ) ) );
-		this._currentValue = this._valueAsArray.join( ' ' );
+	set value(value) {
+		value = String(value);
+		this._valueAsArray = uniq(compact(value.split(/\s+/g)));
+		this._currentValue = this._valueAsArray.join(' ');
 	}
 
 	/**
@@ -109,7 +109,7 @@ export default class TokenList {
 	 *
 	 * @return {IterableIterator<string>} TokenList iterator.
 	 */
-	*[ Symbol.iterator ]() {
+	*[Symbol.iterator]() {
 		return yield* this._valueAsArray;
 	}
 
@@ -122,8 +122,8 @@ export default class TokenList {
 	 *
 	 * @return {string|undefined} Token at index.
 	 */
-	item( index ) {
-		return this._valueAsArray[ index ];
+	item(index) {
+		return this._valueAsArray[index];
 	}
 
 	/**
@@ -135,8 +135,8 @@ export default class TokenList {
 	 *
 	 * @return {boolean} Whether token is present.
 	 */
-	contains( item ) {
-		return this._valueAsArray.indexOf( item ) !== -1;
+	contains(item) {
+		return this._valueAsArray.indexOf(item) !== -1;
 	}
 
 	/**
@@ -146,8 +146,8 @@ export default class TokenList {
 	 *
 	 * @param {...string} items Items to add.
 	 */
-	add( ...items ) {
-		this.value += ' ' + items.join( ' ' );
+	add(...items) {
+		this.value += ' ' + items.join(' ');
 	}
 
 	/**
@@ -157,8 +157,8 @@ export default class TokenList {
 	 *
 	 * @param {...string} items Items to remove.
 	 */
-	remove( ...items ) {
-		this.value = without( this._valueAsArray, ...items ).join( ' ' );
+	remove(...items) {
+		this.value = without(this._valueAsArray, ...items).join(' ');
 	}
 
 	/**
@@ -174,15 +174,15 @@ export default class TokenList {
 	 *
 	 * @return {boolean} Whether token is present after toggle.
 	 */
-	toggle( token, force ) {
-		if ( undefined === force ) {
-			force = ! this.contains( token );
+	toggle(token, force) {
+		if (undefined === force) {
+			force = !this.contains(token);
 		}
 
-		if ( force ) {
-			this.add( token );
+		if (force) {
+			this.add(token);
 		} else {
-			this.remove( token );
+			this.remove(token);
 		}
 
 		return force;
@@ -199,13 +199,13 @@ export default class TokenList {
 	 *
 	 * @return {boolean} Whether replacement occurred.
 	 */
-	replace( token, newToken ) {
-		if ( ! this.contains( token ) ) {
+	replace(token, newToken) {
+		if (!this.contains(token)) {
 			return false;
 		}
 
-		this.remove( token );
-		this.add( newToken );
+		this.remove(token);
+		this.add(newToken);
 
 		return true;
 	}

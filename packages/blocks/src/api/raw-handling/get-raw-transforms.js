@@ -9,15 +9,15 @@ import { filter } from 'lodash';
 import { getBlockTransforms } from '../factory';
 
 export function getRawTransforms() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
-		( transform ) => {
+	return filter(getBlockTransforms('from'), { type: 'raw' }).map(
+		(transform) => {
 			return transform.isMatch
 				? transform
 				: {
 						...transform,
-						isMatch: ( node ) =>
+						isMatch: (node) =>
 							transform.selector &&
-							node.matches( transform.selector ),
+							node.matches(transform.selector),
 				  };
 		}
 	);

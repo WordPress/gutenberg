@@ -12,31 +12,31 @@ import NavigationItem from '../item';
 import NavigationMenu from '../menu';
 
 export function ControlledStateStory() {
-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
-	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+	const [activeItem, setActiveItem] = useState('item-1');
+	const [activeMenu, setActiveMenu] = useState('root');
 
 	// Mock navigation link
-	const MockLink = ( { href, children } ) => (
+	const MockLink = ({ href, children }) => (
 		<Button
-			href={ href }
+			href={href}
 			// Since we're not actually navigating pages, simulate it with on onClick
-			onClick={ ( event ) => {
+			onClick={(event) => {
 				event.preventDefault();
-				const item = href.replace( 'https://example.com/', '' );
-				setActiveItem( item );
-			} }
+				const item = href.replace('https://example.com/', '');
+				setActiveItem(item);
+			}}
 		>
-			{ children }
+			{children}
 		</Button>
 	);
 
 	return (
 		<>
 			<Navigation
-				activeItem={ activeItem }
-				activeMenu={ activeMenu }
+				activeItem={activeItem}
+				activeMenu={activeMenu}
 				className="navigation-story"
-				onActivateMenu={ setActiveMenu }
+				onActivateMenu={setActiveMenu}
 			>
 				<NavigationMenu title="Home">
 					<NavigationItem item="item-1" title="Item 1">
@@ -62,12 +62,12 @@ export function ControlledStateStory() {
 				>
 					<NavigationItem
 						item="child-1"
-						onClick={ () => setActiveItem( 'child-1' ) }
+						onClick={() => setActiveItem('child-1')}
 						title="Child 1"
 					/>
 					<NavigationItem
 						item="child-2"
-						onClick={ () => setActiveItem( 'child-2' ) }
+						onClick={() => setActiveItem('child-2')}
 						title="Child 2"
 					/>
 					<NavigationItem
@@ -83,12 +83,12 @@ export function ControlledStateStory() {
 				>
 					<NavigationItem
 						item="sub-child-1"
-						onClick={ () => setActiveItem( 'sub-child-1' ) }
+						onClick={() => setActiveItem('sub-child-1')}
 						title="Sub-Child 1"
 					/>
 					<NavigationItem
 						item="sub-child-2"
-						onClick={ () => setActiveItem( 'sub-child-2' ) }
+						onClick={() => setActiveItem('sub-child-2')}
 						title="Sub-Child 2"
 					/>
 				</NavigationMenu>
@@ -96,16 +96,16 @@ export function ControlledStateStory() {
 
 			<div className="navigation-story__aside">
 				<p>
-					Menu <code>{ activeMenu }</code> is active.
+					Menu <code>{activeMenu}</code> is active.
 					<br />
-					Item <code>{ activeItem }</code> is active.
+					Item <code>{activeItem}</code> is active.
 				</p>
 				<p>
 					<Button
 						variant="secondary"
-						onClick={ () => {
-							setActiveMenu( 'nested-sub-menu' );
-						} }
+						onClick={() => {
+							setActiveMenu('nested-sub-menu');
+						}}
 					>
 						Open the Nested Sub-Menu menu
 					</Button>
@@ -113,10 +113,10 @@ export function ControlledStateStory() {
 				<p>
 					<Button
 						variant="secondary"
-						onClick={ () => {
-							setActiveItem( 'child-2' );
-							setActiveMenu( 'sub-menu' );
-						} }
+						onClick={() => {
+							setActiveItem('child-2');
+							setActiveMenu('sub-menu');
+						}}
 					>
 						Navigate to Child 2 item
 					</Button>

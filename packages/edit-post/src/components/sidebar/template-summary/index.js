@@ -11,12 +11,12 @@ import { Flex, FlexItem, FlexBlock, PanelBody } from '@wordpress/components';
 import { store as editPostStore } from '../../../store';
 
 function TemplateSummary() {
-	const template = useSelect( ( select ) => {
-		const { getEditedPostTemplate } = select( editPostStore );
+	const template = useSelect((select) => {
+		const { getEditedPostTemplate } = select(editPostStore);
 		return getEditedPostTemplate();
-	}, [] );
+	}, []);
 
-	if ( ! template ) {
+	if (!template) {
 		return null;
 	}
 
@@ -24,14 +24,14 @@ function TemplateSummary() {
 		<PanelBody>
 			<Flex align="flex-start" gap="3">
 				<FlexItem>
-					<Icon icon={ layout } />
+					<Icon icon={layout} />
 				</FlexItem>
 
 				<FlexBlock>
 					<h2 className="edit-post-template-summary__title">
-						{ template?.title || template?.slug }
+						{template?.title || template?.slug}
 					</h2>
-					<p>{ template?.description }</p>
+					<p>{template?.description}</p>
 				</FlexBlock>
 			</Flex>
 		</PanelBody>

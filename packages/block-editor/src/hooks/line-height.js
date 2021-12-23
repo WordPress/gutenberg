@@ -19,13 +19,13 @@ export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
  *
  * @return {WPElement} Line height edit element.
  */
-export function LineHeightEdit( props ) {
+export function LineHeightEdit(props) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const onChange = ( newLineHeightValue ) => {
+	const onChange = (newLineHeightValue) => {
 		const newStyle = {
 			...style,
 			typography: {
@@ -34,12 +34,12 @@ export function LineHeightEdit( props ) {
 			},
 		};
 
-		setAttributes( { style: cleanEmptyObject( newStyle ) } );
+		setAttributes({ style: cleanEmptyObject(newStyle) });
 	};
 	return (
 		<LineHeightControl
-			value={ style?.typography?.lineHeight }
-			onChange={ onChange }
+			value={style?.typography?.lineHeight}
+			onChange={onChange}
 		/>
 	);
 }
@@ -50,12 +50,10 @@ export function LineHeightEdit( props ) {
  * @param {string} name The name of the block.
  * @return {boolean} Whether setting is disabled.
  */
-export function useIsLineHeightDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'typography.lineHeight' );
+export function useIsLineHeightDisabled({ name: blockName } = {}) {
+	const isDisabled = !useSetting('typography.lineHeight');
 
-	return (
-		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) || isDisabled
-	);
+	return !hasBlockSupport(blockName, LINE_HEIGHT_SUPPORT_KEY) || isDisabled;
 }
 
 /**
@@ -64,8 +62,8 @@ export function useIsLineHeightDisabled( { name: blockName } = {} ) {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a line height value set.
  */
-export function hasLineHeightValue( props ) {
-	return !! props.attributes.style?.typography?.lineHeight;
+export function hasLineHeightValue(props) {
+	return !!props.attributes.style?.typography?.lineHeight;
 }
 
 /**
@@ -77,16 +75,16 @@ export function hasLineHeightValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetLineHeight( { attributes = {}, setAttributes } ) {
+export function resetLineHeight({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
-		style: cleanEmptyObject( {
+	setAttributes({
+		style: cleanEmptyObject({
 			...style,
 			typography: {
 				...style?.typography,
 				lineHeight: undefined,
 			},
-		} ),
-	} );
+		}),
+	});
 }

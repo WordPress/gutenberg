@@ -5,6 +5,6 @@
  *
  * @return {number} Heading level.
  */
-export function getLevelFromHeadingNodeName( nodeName ) {
-	return Number( nodeName.substr( 1 ) );
+export function getLevelFromHeadingNodeName(nodeName) {
+	return Number(nodeName.substr(1));
 }

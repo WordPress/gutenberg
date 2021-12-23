@@ -21,31 +21,29 @@ const POPOVER_PROPS = {
 const FormatToolbar = () => {
 	return (
 		<>
-			{ [ 'bold', 'italic', 'link' ].map( ( format ) => (
+			{['bold', 'italic', 'link'].map((format) => (
 				<Slot
-					name={ `RichText.ToolbarControls.${ format }` }
-					key={ format }
+					name={`RichText.ToolbarControls.${format}`}
+					key={format}
 				/>
-			) ) }
+			))}
 			<Slot name="RichText.ToolbarControls">
-				{ ( fills ) => {
-					if ( ! fills.length ) {
+				{(fills) => {
+					if (!fills.length) {
 						return null;
 					}
 
-					const allProps = fills.map( ( [ { props } ] ) => props );
-					const hasActive = allProps.some(
-						( { isActive } ) => isActive
-					);
+					const allProps = fills.map(([{ props }]) => props);
+					const hasActive = allProps.some(({ isActive }) => isActive);
 
 					return (
 						<ToolbarItem>
-							{ ( toggleProps ) => (
+							{(toggleProps) => (
 								<DropdownMenu
-									icon={ chevronDown }
+									icon={chevronDown}
 									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'More' ) }
-									toggleProps={ {
+									label={__('More')}
+									toggleProps={{
 										...toggleProps,
 										className: classnames(
 											toggleProps.className,
@@ -54,17 +52,17 @@ const FormatToolbar = () => {
 										describedBy: __(
 											'Displays more block tools'
 										),
-									} }
-									controls={ orderBy(
-										fills.map( ( [ { props } ] ) => props ),
+									}}
+									controls={orderBy(
+										fills.map(([{ props }]) => props),
 										'title'
-									) }
-									popoverProps={ POPOVER_PROPS }
+									)}
+									popoverProps={POPOVER_PROPS}
 								/>
-							) }
+							)}
 						</ToolbarItem>
 					);
-				} }
+				}}
 			</Slot>
 		</>
 	);

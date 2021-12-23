@@ -14,95 +14,93 @@ import { Component } from '@wordpress/element';
 import withGlobalEvents from '../';
 import Listener from '../listener';
 
-jest.mock( '../listener', () => {
-	const ActualListener = jest.requireActual( '../listener' ).default;
+jest.mock('../listener', () => {
+	const ActualListener = jest.requireActual('../listener').default;
 
 	return class extends ActualListener {
 		constructor() {
-			super( ...arguments );
+			super(...arguments);
 
 			this.constructor._instance = this;
 
-			jest.spyOn( this, 'add' );
-			jest.spyOn( this, 'remove' );
+			jest.spyOn(this, 'add');
+			jest.spyOn(this, 'remove');
 		}
 	};
-} );
+});
 
-describe( 'withGlobalEvents', () => {
+describe('withGlobalEvents', () => {
 	let wrapper;
 
 	class OriginalComponent extends Component {
-		handleResize( event ) {
-			this.props.onResize( event );
+		handleResize(event) {
+			this.props.onResize(event);
 		}
 
 		render() {
-			return <div>{ this.props.children }</div>;
+			return <div>{this.props.children}</div>;
 		}
 	}
 
-	beforeAll( () => {
-		jest.spyOn( OriginalComponent.prototype, 'handleResize' );
-	} );
+	beforeAll(() => {
+		jest.spyOn(OriginalComponent.prototype, 'handleResize');
+	});
 
-	beforeEach( () => {
+	beforeEach(() => {
 		jest.clearAllMocks();
-	} );
+	});
 
-	afterEach( () => {
-		if ( wrapper ) {
+	afterEach(() => {
+		if (wrapper) {
 			wrapper.unmount();
 			wrapper = null;
 		}
-	} );
+	});
 
-	function mountEnhancedComponent( props = {} ) {
-		const EnhancedComponent = withGlobalEvents( {
+	function mountEnhancedComponent(props = {}) {
+		const EnhancedComponent = withGlobalEvents({
 			resize: 'handleResize',
-		} )( OriginalComponent );
+		})(OriginalComponent);
 
 		props.ref = () => {};
 
 		wrapper = TestRenderer.create(
-			<EnhancedComponent { ...props }>Hello</EnhancedComponent>
+			<EnhancedComponent {...props}>Hello</EnhancedComponent>
 		);
 	}
 
-	it( 'renders with original component', () => {
+	it('renders with original component', () => {
 		mountEnhancedComponent();
 
-		expect( console ).toHaveWarned();
-		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe(
-			'Hello'
-		);
-	} );
+		expect(console).toHaveWarned();
+		expect(wrapper.root.findByType('div').children[0]).toBe('Hello');
+	});
 
-	it( 'binds events from passed object', () => {
+	it('binds events from passed object', () => {
 		mountEnhancedComponent();
 
 		// Get the HOC wrapper instance
-		const hocInstance = wrapper.root.findByType( OriginalComponent ).parent
-			.instance;
+		const hocInstance =
+			wrapper.root.findByType(OriginalComponent).parent.instance;
 
-		expect( Listener._instance.add ).toHaveBeenCalledWith(
+		expect(Listener._instance.add).toHaveBeenCalledWith(
 			'resize',
 			hocInstance
 		);
-	} );
+	});
 
-	it( 'handles events', () => {
+	it('handles events', () => {
 		const onResize = jest.fn();
 
-		mountEnhancedComponent( { onResize } );
+		mountEnhancedComponent({ onResize });
 
 		const event = { type: 'resize' };
 
-		Listener._instance.handleEvent( event );
+		Listener._instance.handleEvent(event);
 
-		expect( OriginalComponent.prototype.handleResize ).toHaveBeenCalledWith(
+		expect(OriginalComponent.prototype.handleResize).toHaveBeenCalledWith(
 			event
 		);
-		expect( onResize ).toHaveBeenCalledWith( event );
-	} );
-} );
+		expect(onResize).toHaveBeenCalledWith(event);
+	});
+});

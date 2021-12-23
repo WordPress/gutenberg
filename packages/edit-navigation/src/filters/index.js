@@ -14,7 +14,7 @@ export const addFilters = (
 	addNavigationEditorCustomAppender();
 	addNavigationEditorPlaceholder();
 	addMenuNameEditor();
-	if ( shouldAddDisableInsertingNonNavigationBlocksFilter ) {
+	if (shouldAddDisableInsertingNonNavigationBlocksFilter) {
 		disableInsertingNonNavigationBlocks();
 	}
 	removeEditUnsupportedFeatures();

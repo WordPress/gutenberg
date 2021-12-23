@@ -9,24 +9,24 @@ import { useEffect, useContext, useRef } from '@wordpress/element';
  */
 import { keyboardShortcutContext } from './';
 
-export function RichTextShortcut( { character, type, onUse } ) {
-	const keyboardShortcuts = useContext( keyboardShortcutContext );
+export function RichTextShortcut({ character, type, onUse }) {
+	const keyboardShortcuts = useContext(keyboardShortcutContext);
 	const onUseRef = useRef();
 	onUseRef.current = onUse;
 
-	useEffect( () => {
-		function callback( event ) {
-			if ( isKeyboardEvent[ type ]( event, character ) ) {
+	useEffect(() => {
+		function callback(event) {
+			if (isKeyboardEvent[type](event, character)) {
 				onUseRef.current();
 				event.preventDefault();
 			}
 		}
 
-		keyboardShortcuts.current.add( callback );
+		keyboardShortcuts.current.add(callback);
 		return () => {
-			keyboardShortcuts.current.delete( callback );
+			keyboardShortcuts.current.delete(callback);
 		};
-	}, [ character, type ] );
+	}, [character, type]);
 
 	return null;
 }

@@ -10,38 +10,38 @@ import { groupBy, map, unescape as lodashUnescapeString } from 'lodash';
  *
  * @return {Array} Array of terms in tree format.
  */
-export function buildTermsTree( flatTerms ) {
-	const flatTermsWithParentAndChildren = flatTerms.map( ( term ) => {
+export function buildTermsTree(flatTerms) {
+	const flatTermsWithParentAndChildren = flatTerms.map((term) => {
 		return {
 			children: [],
 			parent: null,
 			...term,
 		};
-	} );
+	});
 
-	const termsByParent = groupBy( flatTermsWithParentAndChildren, 'parent' );
-	if ( termsByParent.null && termsByParent.null.length ) {
+	const termsByParent = groupBy(flatTermsWithParentAndChildren, 'parent');
+	if (termsByParent.null && termsByParent.null.length) {
 		return flatTermsWithParentAndChildren;
 	}
-	const fillWithChildren = ( terms ) => {
-		return terms.map( ( term ) => {
-			const children = termsByParent[ term.id ];
+	const fillWithChildren = (terms) => {
+		return terms.map((term) => {
+			const children = termsByParent[term.id];
 			return {
 				...term,
 				children:
 					children && children.length
-						? fillWithChildren( children )
+						? fillWithChildren(children)
 						: [],
 			};
-		} );
+		});
 	};
 
-	return fillWithChildren( termsByParent[ '0' ] || [] );
+	return fillWithChildren(termsByParent['0'] || []);
 }
 
 // Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
-export const unescapeString = ( arg ) => {
-	return lodashUnescapeString( arg.replace( '&#039;', "'" ) );
+export const unescapeString = (arg) => {
+	return lodashUnescapeString(arg.replace('&#039;', "'"));
 };
 
 /**
@@ -52,10 +52,10 @@ export const unescapeString = ( arg ) => {
  *
  * @return {Object} Term object with name property unescaped.
  */
-export const unescapeTerm = ( term ) => {
+export const unescapeTerm = (term) => {
 	return {
 		...term,
-		name: unescapeString( term.name ),
+		name: unescapeString(term.name),
 	};
 };
 
@@ -67,6 +67,6 @@ export const unescapeTerm = ( term ) => {
  *
  * @return {Object[]} Array of term objects unescaped.
  */
-export const unescapeTerms = ( terms ) => {
-	return map( terms, unescapeTerm );
+export const unescapeTerms = (terms) => {
+	return map(terms, unescapeTerm);
 };

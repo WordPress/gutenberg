@@ -17,9 +17,9 @@ export default {
 };
 
 export const _default = () => {
-	const numberOfLines = number( 'numberOfLines', 2 );
+	const numberOfLines = number('numberOfLines', 2);
 	return (
-		<Truncate numberOfLines={ numberOfLines }>
+		<Truncate numberOfLines={numberOfLines}>
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
 			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
 			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.

@@ -16,10 +16,8 @@ import { Children, isValidElement } from '@wordpress/element';
  *
  * @return An array of available children.
  */
-export function getValidChildren( children: ReactNode ): ReactNodeArray {
-	if ( typeof children === 'string' ) return [ children ];
+export function getValidChildren(children: ReactNode): ReactNodeArray {
+	if (typeof children === 'string') return [children];
 
-	return Children.toArray( children ).filter( ( child ) =>
-		isValidElement( child )
-	);
+	return Children.toArray(children).filter((child) => isValidElement(child));
 }

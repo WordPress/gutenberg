@@ -27,34 +27,31 @@
  * @param {DOMRect}    rect  A DOM Rect containing edge positions.
  * @param {WPEdgeName} edge  The edge to measure to.
  */
-export function getDistanceFromPointToEdge( point, rect, edge ) {
+export function getDistanceFromPointToEdge(point, rect, edge) {
 	const isHorizontal = edge === 'top' || edge === 'bottom';
 	const { x, y } = point;
 	const pointLateralPosition = isHorizontal ? x : y;
 	const pointForwardPosition = isHorizontal ? y : x;
 	const edgeStart = isHorizontal ? rect.left : rect.top;
 	const edgeEnd = isHorizontal ? rect.right : rect.bottom;
-	const edgeForwardPosition = rect[ edge ];
+	const edgeForwardPosition = rect[edge];
 
 	// Measure the straight line distance to the edge of the rect, when the
 	// point is adjacent to the edge.
 	// Else, if the point is positioned diagonally to the edge of the rect,
 	// measure diagonally to the nearest corner that the edge meets.
 	let edgeLateralPosition;
-	if (
-		pointLateralPosition >= edgeStart &&
-		pointLateralPosition <= edgeEnd
-	) {
+	if (pointLateralPosition >= edgeStart && pointLateralPosition <= edgeEnd) {
 		edgeLateralPosition = pointLateralPosition;
-	} else if ( pointLateralPosition < edgeEnd ) {
+	} else if (pointLateralPosition < edgeEnd) {
 		edgeLateralPosition = edgeStart;
 	} else {
 		edgeLateralPosition = edgeEnd;
 	}
 
 	return Math.sqrt(
-		( pointLateralPosition - edgeLateralPosition ) ** 2 +
-			( pointForwardPosition - edgeForwardPosition ) ** 2
+		(pointLateralPosition - edgeLateralPosition) ** 2 +
+			(pointForwardPosition - edgeForwardPosition) ** 2
 	);
 }
 
@@ -73,19 +70,19 @@ export function getDistanceFromPointToEdge( point, rect, edge ) {
 export function getDistanceToNearestEdge(
 	point,
 	rect,
-	allowedEdges = [ 'top', 'bottom', 'left', 'right' ]
+	allowedEdges = ['top', 'bottom', 'left', 'right']
 ) {
 	let candidateDistance;
 	let candidateEdge;
 
-	allowedEdges.forEach( ( edge ) => {
-		const distance = getDistanceFromPointToEdge( point, rect, edge );
+	allowedEdges.forEach((edge) => {
+		const distance = getDistanceFromPointToEdge(point, rect, edge);
 
-		if ( candidateDistance === undefined || distance < candidateDistance ) {
+		if (candidateDistance === undefined || distance < candidateDistance) {
 			candidateDistance = distance;
 			candidateEdge = edge;
 		}
-	} );
+	});
 
-	return [ candidateDistance, candidateEdge ];
+	return [candidateDistance, candidateEdge];
 }

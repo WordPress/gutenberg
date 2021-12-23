@@ -19,7 +19,7 @@ import { useRef } from '@wordpress/element';
 import styles from './styles.scss';
 import { noticeOutline } from '../../../components/src/mobile/gridicons';
 
-const EmbedPlaceholder = ( {
+const EmbedPlaceholder = ({
 	icon,
 	isSelected,
 	label,
@@ -28,60 +28,60 @@ const EmbedPlaceholder = ( {
 	fallback,
 	tryAgain,
 	openEmbedLinkSettings,
-} ) => {
+}) => {
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
-		styles[ 'embed__container--dark' ]
+		styles['embed__container--dark']
 	);
 	const labelStyle = usePreferredColorSchemeStyle(
 		styles.embed__label,
-		styles[ 'embed__label--dark' ]
+		styles['embed__label--dark']
 	);
 	const descriptionStyle = styles.embed__description;
-	const descriptionErrorStyle = styles[ 'embed__description--error' ];
+	const descriptionErrorStyle = styles['embed__description--error'];
 	const actionStyle = usePreferredColorSchemeStyle(
 		styles.embed__action,
-		styles[ 'embed__action--dark' ]
+		styles['embed__action--dark']
 	);
-	const embedIconErrorStyle = styles[ 'embed__icon--error' ];
+	const embedIconErrorStyle = styles['embed__icon--error'];
 
 	const cannotEmbedMenuPickerRef = useRef();
 
 	const errorPickerOptions = {
 		retry: {
 			id: 'retryOption',
-			label: __( 'Retry' ),
+			label: __('Retry'),
 			value: 'retryOption',
 			onSelect: tryAgain,
 		},
 		convertToLink: {
 			id: 'convertToLinkOption',
-			label: __( 'Convert to link' ),
+			label: __('Convert to link'),
 			value: 'convertToLinkOption',
 			onSelect: fallback,
 		},
 		editLink: {
 			id: 'editLinkOption',
-			label: __( 'Edit link' ),
+			label: __('Edit link'),
 			value: 'editLinkOption',
 			onSelect: openEmbedLinkSettings,
 		},
 	};
 
-	const options = compact( [
+	const options = compact([
 		cannotEmbed && errorPickerOptions.retry,
 		cannotEmbed && errorPickerOptions.convertToLink,
 		cannotEmbed && errorPickerOptions.editLink,
-	] );
+	]);
 
-	function onPickerSelect( value ) {
-		const selectedItem = options.find( ( item ) => item.value === value );
+	function onPickerSelect(value) {
+		const selectedItem = options.find((item) => item.value === value);
 		selectedItem.onSelect();
 	}
 
 	// When the content cannot be embedded the onPress should trigger the Picker instead of the onPress prop.
 	function resolveOnPressEvent() {
-		if ( cannotEmbed ) {
+		if (cannotEmbed) {
 			cannotEmbedMenuPickerRef.current?.presentPicker();
 		} else {
 			onPress();
@@ -91,52 +91,50 @@ const EmbedPlaceholder = ( {
 	return (
 		<>
 			<TouchableWithoutFeedback
-				accessibilityRole={ 'button' }
+				accessibilityRole={'button'}
 				accessibilityHint={
 					cannotEmbed
-						? __( 'Double tap to view embed options.' )
-						: __( 'Double tap to add a link.' )
+						? __('Double tap to view embed options.')
+						: __('Double tap to add a link.')
 				}
-				onPress={ resolveOnPressEvent }
-				disabled={ ! isSelected }
+				onPress={resolveOnPressEvent}
+				disabled={!isSelected}
 			>
-				<View style={ containerStyle }>
-					{ cannotEmbed ? (
+				<View style={containerStyle}>
+					{cannotEmbed ? (
 						<>
 							<Icon
-								icon={ noticeOutline }
-								fill={ embedIconErrorStyle.fill }
-								style={ embedIconErrorStyle }
+								icon={noticeOutline}
+								fill={embedIconErrorStyle.fill}
+								style={embedIconErrorStyle}
 							/>
 							<Text
-								style={ [
+								style={[
 									descriptionStyle,
 									descriptionErrorStyle,
-								] }
+								]}
 							>
-								{ __( 'Unable to embed media' ) }
+								{__('Unable to embed media')}
 							</Text>
-							<Text style={ actionStyle }>
-								{ __( 'More options' ) }
+							<Text style={actionStyle}>
+								{__('More options')}
 							</Text>
 							<Picker
-								title={ __( 'Embed options' ) }
-								ref={ cannotEmbedMenuPickerRef }
-								options={ options }
-								onChange={ onPickerSelect }
+								title={__('Embed options')}
+								ref={cannotEmbedMenuPickerRef}
+								options={options}
+								onChange={onPickerSelect}
 								hideCancelButton
 								leftAlign
 							/>
 						</>
 					) : (
 						<>
-							<BlockIcon icon={ icon } />
-							<Text style={ labelStyle }>{ label }</Text>
-							<Text style={ actionStyle }>
-								{ __( 'ADD LINK' ) }
-							</Text>
+							<BlockIcon icon={icon} />
+							<Text style={labelStyle}>{label}</Text>
+							<Text style={actionStyle}>{__('ADD LINK')}</Text>
 						</>
-					) }
+					)}
 				</View>
 			</TouchableWithoutFeedback>
 		</>

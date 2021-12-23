@@ -9,5 +9,5 @@ import { wpDataSelect } from './wp-data-select';
  * @return {Promise<boolean>} Boolean which represents the state of prepublish checks.
  */
 export async function arePrePublishChecksEnabled() {
-	return wpDataSelect( 'core/editor', 'isPublishSidebarEnabled' );
+	return wpDataSelect('core/editor', 'isPublishSidebarEnabled');
 }

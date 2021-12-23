@@ -11,12 +11,12 @@ import { omit } from 'lodash';
  *
  * @return {Object} Updated state.
  */
-function reducer( state = {}, action ) {
-	switch ( action.type ) {
+function reducer(state = {}, action) {
+	switch (action.type) {
 		case 'REGISTER_SHORTCUT':
 			return {
 				...state,
-				[ action.name ]: {
+				[action.name]: {
 					category: action.category,
 					keyCombination: action.keyCombination,
 					aliases: action.aliases,
@@ -24,7 +24,7 @@ function reducer( state = {}, action ) {
 				},
 			};
 		case 'UNREGISTER_SHORTCUT':
-			return omit( state, action.name );
+			return omit(state, action.name);
 	}
 
 	return state;

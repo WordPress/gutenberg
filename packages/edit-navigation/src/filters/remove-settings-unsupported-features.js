@@ -3,8 +3,8 @@
  */
 import { addFilter } from '@wordpress/hooks';
 
-function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
-	if ( name !== 'core/navigation' ) {
+function removeNavigationBlockSettingsUnsupportedFeatures(settings, name) {
+	if (name !== 'core/navigation') {
 		return settings;
 	}
 

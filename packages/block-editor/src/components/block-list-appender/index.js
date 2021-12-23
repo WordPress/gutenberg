@@ -16,7 +16,7 @@ import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
 
-function BlockListAppender( {
+function BlockListAppender({
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
@@ -24,34 +24,34 @@ function BlockListAppender( {
 	className,
 	selectedBlockClientId,
 	tagName: TagName = 'div',
-} ) {
-	if ( isLocked || CustomAppender === false ) {
+}) {
+	if (isLocked || CustomAppender === false) {
 		return null;
 	}
 
 	let appender;
-	if ( CustomAppender ) {
+	if (CustomAppender) {
 		// Prefer custom render prop if provided.
 		appender = <CustomAppender />;
 	} else {
 		const isParentSelected =
 			selectedBlockClientId === rootClientId ||
-			( ! rootClientId && ! selectedBlockClientId );
+			(!rootClientId && !selectedBlockClientId);
 
-		if ( ! isParentSelected ) {
+		if (!isParentSelected) {
 			return null;
 		}
 
-		if ( canInsertDefaultBlock ) {
+		if (canInsertDefaultBlock) {
 			// Render the default block appender when renderAppender has not been
 			// provided and the context supports use of the default appender.
-			appender = <DefaultBlockAppender rootClientId={ rootClientId } />;
+			appender = <DefaultBlockAppender rootClientId={rootClientId} />;
 		} else {
 			// Fallback in the case no renderAppender has been provided and the
 			// default block can't be inserted.
 			appender = (
 				<ButtonBlockAppender
-					rootClientId={ rootClientId }
+					rootClientId={rootClientId}
 					className="block-list-appender__toggle"
 				/>
 			);
@@ -68,11 +68,8 @@ function BlockListAppender( {
 			// captured as a focus, without also adding an extra tab stop.
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-			tabIndex={ -1 }
-			className={ classnames(
-				'block-list-appender wp-block',
-				className
-			) }
+			tabIndex={-1}
+			className={classnames('block-list-appender wp-block', className)}
 			// The appender exists to let you add the first Paragraph before
 			// any is inserted. To that end, this appender should visually be
 			// presented as a block. That means theme CSS should style it as if
@@ -82,24 +79,21 @@ function BlockListAppender( {
 			// have commonly targeted that attribute for margins.
 			data-block
 		>
-			{ appender }
+			{appender}
 		</TagName>
 	);
 }
 
-export default withSelect( ( select, { rootClientId } ) => {
-	const {
-		canInsertBlockType,
-		getTemplateLock,
-		getSelectedBlockClientId,
-	} = select( blockEditorStore );
+export default withSelect((select, { rootClientId }) => {
+	const { canInsertBlockType, getTemplateLock, getSelectedBlockClientId } =
+		select(blockEditorStore);
 
 	return {
-		isLocked: !! getTemplateLock( rootClientId ),
+		isLocked: !!getTemplateLock(rootClientId),
 		canInsertDefaultBlock: canInsertBlockType(
 			getDefaultBlockName(),
 			rootClientId
 		),
 		selectedBlockClientId: getSelectedBlockClientId(),
 	};
-} )( BlockListAppender );
+})(BlockListAppender);

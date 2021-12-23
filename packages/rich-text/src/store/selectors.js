@@ -12,8 +12,8 @@ import { find } from 'lodash';
  * @return {Array} Format types.
  */
 export const getFormatTypes = createSelector(
-	( state ) => Object.values( state.formatTypes ),
-	( state ) => [ state.formatTypes ]
+	(state) => Object.values(state.formatTypes),
+	(state) => [state.formatTypes]
 );
 
 /**
@@ -24,8 +24,8 @@ export const getFormatTypes = createSelector(
  *
  * @return {Object?} Format type.
  */
-export function getFormatType( state, name ) {
-	return state.formatTypes[ name ];
+export function getFormatType(state, name) {
+	return state.formatTypes[name];
 }
 
 /**
@@ -37,10 +37,10 @@ export function getFormatType( state, name ) {
  *                                    format type for.
  * @return {?Object} Format type.
  */
-export function getFormatTypeForBareElement( state, bareElementTagName ) {
-	return find( getFormatTypes( state ), ( { className, tagName } ) => {
+export function getFormatTypeForBareElement(state, bareElementTagName) {
+	return find(getFormatTypes(state), ({ className, tagName }) => {
 		return className === null && bareElementTagName === tagName;
-	} );
+	});
 }
 
 /**
@@ -51,12 +51,12 @@ export function getFormatTypeForBareElement( state, bareElementTagName ) {
  *                                  type for.
  * @return {?Object} Format type.
  */
-export function getFormatTypeForClassName( state, elementClassName ) {
-	return find( getFormatTypes( state ), ( { className } ) => {
-		if ( className === null ) {
+export function getFormatTypeForClassName(state, elementClassName) {
+	return find(getFormatTypes(state), ({ className }) => {
+		if (className === null) {
 			return false;
 		}
 
-		return ` ${ elementClassName } `.indexOf( ` ${ className } ` ) >= 0;
-	} );
+		return ` ${elementClassName} `.indexOf(` ${className} `) >= 0;
+	});
 }

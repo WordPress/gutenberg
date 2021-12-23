@@ -11,19 +11,19 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
  */
 import { store as blockEditorStore } from '../../store';
 
-const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
-const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
+const isIE = window.navigator.userAgent.indexOf('Trident') !== -1;
+const arrowKeyCodes = new Set([UP, DOWN, LEFT, RIGHT]);
 const initialTriggerPercentage = 0.75;
 
 export function useTypewriter() {
 	const hasSelectedBlock = useSelect(
-		( select ) => select( blockEditorStore ).hasSelectedBlock(),
+		(select) => select(blockEditorStore).hasSelectedBlock(),
 		[]
 	);
 
 	return useRefEffect(
-		( node ) => {
-			if ( ! hasSelectedBlock ) {
+		(node) => {
+			if (!hasSelectedBlock) {
 				return;
 			}
 
@@ -36,27 +36,27 @@ export function useTypewriter() {
 			let caretRect;
 
 			function onScrollResize() {
-				if ( scrollResizeRafId ) {
+				if (scrollResizeRafId) {
 					return;
 				}
 
-				scrollResizeRafId = defaultView.requestAnimationFrame( () => {
+				scrollResizeRafId = defaultView.requestAnimationFrame(() => {
 					computeCaretRectangle();
 					scrollResizeRafId = null;
-				} );
+				});
 			}
 
-			function onKeyDown( event ) {
+			function onKeyDown(event) {
 				// Ensure the any remaining request is cancelled.
-				if ( onKeyDownRafId ) {
-					defaultView.cancelAnimationFrame( onKeyDownRafId );
+				if (onKeyDownRafId) {
+					defaultView.cancelAnimationFrame(onKeyDownRafId);
 				}
 
 				// Use an animation frame for a smooth result.
-				onKeyDownRafId = defaultView.requestAnimationFrame( () => {
-					maintainCaretPosition( event );
+				onKeyDownRafId = defaultView.requestAnimationFrame(() => {
+					maintainCaretPosition(event);
 					onKeyDownRafId = null;
-				} );
+				});
 			}
 
 			/**
@@ -65,20 +65,20 @@ export function useTypewriter() {
 			 *
 			 * @param {KeyboardEvent} event Keyboard event.
 			 */
-			function maintainCaretPosition( { keyCode } ) {
-				if ( ! isSelectionEligibleForScroll() ) {
+			function maintainCaretPosition({ keyCode }) {
+				if (!isSelectionEligibleForScroll()) {
 					return;
 				}
 
-				const currentCaretRect = computeCaretRect( defaultView );
+				const currentCaretRect = computeCaretRect(defaultView);
 
-				if ( ! currentCaretRect ) {
+				if (!currentCaretRect) {
 					return;
 				}
 
 				// If for some reason there is no position set to be scrolled to, let
 				// this be the position to be scrolled to in the future.
-				if ( ! caretRect ) {
+				if (!caretRect) {
 					caretRect = currentCaretRect;
 					return;
 				}
@@ -86,7 +86,7 @@ export function useTypewriter() {
 				// Even though enabling the typewriter effect for arrow keys results in
 				// a pleasant experience, it may not be the case for everyone, so, for
 				// now, let's disable it.
-				if ( arrowKeyCodes.has( keyCode ) ) {
+				if (arrowKeyCodes.has(keyCode)) {
 					// Reset the caret position to maintain.
 					caretRect = currentCaretRect;
 					return;
@@ -94,14 +94,14 @@ export function useTypewriter() {
 
 				const diff = currentCaretRect.top - caretRect.top;
 
-				if ( diff === 0 ) {
+				if (diff === 0) {
 					return;
 				}
 
-				const scrollContainer = getScrollContainer( node );
+				const scrollContainer = getScrollContainer(node);
 
 				// The page must be scrollable.
-				if ( ! scrollContainer ) {
+				if (!scrollContainer) {
 					return;
 				}
 
@@ -114,8 +114,8 @@ export function useTypewriter() {
 					: scrollContainer.getBoundingClientRect().top;
 				const relativeScrollPosition = windowScroll
 					? caretRect.top / defaultView.innerHeight
-					: ( caretRect.top - scrollContainerY ) /
-					  ( defaultView.innerHeight - scrollContainerY );
+					: (caretRect.top - scrollContainerY) /
+					  (defaultView.innerHeight - scrollContainerY);
 
 				// If the scroll position is at the start, the active editable element
 				// is the last one, and the caret is positioned within the initial
@@ -151,8 +151,8 @@ export function useTypewriter() {
 					return;
 				}
 
-				if ( windowScroll ) {
-					defaultView.scrollBy( 0, diff );
+				if (windowScroll) {
+					defaultView.scrollBy(0, diff);
 				} else {
 					scrollContainer.scrollTop += diff;
 				}
@@ -185,8 +185,8 @@ export function useTypewriter() {
 			 * Resets the scroll position to be maintained.
 			 */
 			function computeCaretRectangle() {
-				if ( isSelectionEligibleForScroll() ) {
-					caretRect = computeCaretRect( defaultView );
+				if (isSelectionEligibleForScroll()) {
+					caretRect = computeCaretRect(defaultView);
 				}
 			}
 
@@ -198,7 +198,7 @@ export function useTypewriter() {
 			 */
 			function isSelectionEligibleForScroll() {
 				return (
-					node.contains( ownerDocument.activeElement ) &&
+					node.contains(ownerDocument.activeElement) &&
 					ownerDocument.activeElement.isContentEditable
 				);
 			}
@@ -208,34 +208,26 @@ export function useTypewriter() {
 					'[contenteditable="true"]'
 				);
 				const lastEditableNode =
-					editableNodes[ editableNodes.length - 1 ];
+					editableNodes[editableNodes.length - 1];
 				return lastEditableNode === ownerDocument.activeElement;
 			}
 
 			// When the user scrolls or resizes, the scroll position should be
 			// reset.
-			defaultView.addEventListener( 'scroll', onScrollResize, true );
-			defaultView.addEventListener( 'resize', onScrollResize, true );
+			defaultView.addEventListener('scroll', onScrollResize, true);
+			defaultView.addEventListener('resize', onScrollResize, true);
 
-			node.addEventListener( 'keydown', onKeyDown );
-			node.addEventListener( 'keyup', maintainCaretPosition );
-			node.addEventListener( 'mousedown', addSelectionChangeListener );
-			node.addEventListener( 'touchstart', addSelectionChangeListener );
+			node.addEventListener('keydown', onKeyDown);
+			node.addEventListener('keyup', maintainCaretPosition);
+			node.addEventListener('mousedown', addSelectionChangeListener);
+			node.addEventListener('touchstart', addSelectionChangeListener);
 
 			return () => {
-				defaultView.removeEventListener(
-					'scroll',
-					onScrollResize,
-					true
-				);
-				defaultView.removeEventListener(
-					'resize',
-					onScrollResize,
-					true
-				);
+				defaultView.removeEventListener('scroll', onScrollResize, true);
+				defaultView.removeEventListener('resize', onScrollResize, true);
 
-				node.removeEventListener( 'keydown', onKeyDown );
-				node.removeEventListener( 'keyup', maintainCaretPosition );
+				node.removeEventListener('keydown', onKeyDown);
+				node.removeEventListener('keyup', maintainCaretPosition);
 				node.removeEventListener(
 					'mousedown',
 					addSelectionChangeListener
@@ -250,18 +242,18 @@ export function useTypewriter() {
 					computeCaretRectOnSelectionChange
 				);
 
-				defaultView.cancelAnimationFrame( scrollResizeRafId );
-				defaultView.cancelAnimationFrame( onKeyDownRafId );
+				defaultView.cancelAnimationFrame(scrollResizeRafId);
+				defaultView.cancelAnimationFrame(onKeyDownRafId);
 			};
 		},
-		[ hasSelectedBlock ]
+		[hasSelectedBlock]
 	);
 }
 
-function Typewriter( { children } ) {
+function Typewriter({ children }) {
 	return (
-		<div ref={ useTypewriter() } className="block-editor__typewriter">
-			{ children }
+		<div ref={useTypewriter()} className="block-editor__typewriter">
+			{children}
 		</div>
 	);
 }
@@ -273,7 +265,7 @@ function Typewriter( { children } ) {
  *
  * @type {WPComponent}
  */
-const TypewriterOrIEBypass = isIE ? ( props ) => props.children : Typewriter;
+const TypewriterOrIEBypass = isIE ? (props) => props.children : Typewriter;
 
 /**
  * Ensures that the text selection keeps the same vertical distance from the

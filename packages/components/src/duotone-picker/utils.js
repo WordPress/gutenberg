@@ -4,7 +4,7 @@
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
-extend( [ namesPlugin ] );
+extend([namesPlugin]);
 
 /**
  * Object representation for a color.
@@ -22,25 +22,25 @@ extend( [ namesPlugin ] );
  *
  * @return {string[]} Tuple of the darkest color and brightest color.
  */
-export function getDefaultColors( palette ) {
+export function getDefaultColors(palette) {
 	// A default dark and light color are required.
-	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
+	if (!palette || palette.length < 2) return ['#000', '#fff'];
 
 	return palette
-		.map( ( { color } ) => ( {
+		.map(({ color }) => ({
 			color,
-			brightness: colord( color ).brightness(),
-		} ) )
+			brightness: colord(color).brightness(),
+		}))
 		.reduce(
-			( [ min, max ], current ) => {
+			([min, max], current) => {
 				return [
 					current.brightness <= min.brightness ? current : min,
 					current.brightness >= max.brightness ? current : max,
 				];
 			},
-			[ { brightness: 1 }, { brightness: 0 } ]
+			[{ brightness: 1 }, { brightness: 0 }]
 		)
-		.map( ( { color } ) => color );
+		.map(({ color }) => color);
 }
 
 /**
@@ -51,14 +51,14 @@ export function getDefaultColors( palette ) {
  *
  * @return {string} CSS gradient string for the duotone swatch.
  */
-export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
+export function getGradientFromCSSColors(colors = [], angle = '90deg') {
 	const l = 100 / colors.length;
 
 	const stops = colors
-		.map( ( c, i ) => `${ c } ${ i * l }%, ${ c } ${ ( i + 1 ) * l }%` )
-		.join( ', ' );
+		.map((c, i) => `${c} ${i * l}%, ${c} ${(i + 1) * l}%`)
+		.join(', ');
 
-	return `linear-gradient( ${ angle }, ${ stops } )`;
+	return `linear-gradient( ${angle}, ${stops} )`;
 }
 
 /**
@@ -68,11 +68,11 @@ export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
  *
  * @return {Object[]} Color stop information.
  */
-export function getColorStopsFromColors( colors ) {
-	return colors.map( ( color, i ) => ( {
-		position: ( i * 100 ) / ( colors.length - 1 ),
+export function getColorStopsFromColors(colors) {
+	return colors.map((color, i) => ({
+		position: (i * 100) / (colors.length - 1),
 		color,
-	} ) );
+	}));
 }
 
 /**
@@ -82,6 +82,6 @@ export function getColorStopsFromColors( colors ) {
  *
  * @return {string[]} CSS colors array.
  */
-export function getColorsFromColorStops( colorStops = [] ) {
-	return colorStops.map( ( { color } ) => color );
+export function getColorsFromColorStops(colorStops = []) {
+	return colorStops.map(({ color }) => color);
 }

@@ -10,12 +10,10 @@ import RadioControl from '../';
 
 export default { title: 'Components/RadioControl', component: RadioControl };
 
-const RadioControlWithState = ( props ) => {
-	const [ option, setOption ] = useState( 'public' );
+const RadioControlWithState = (props) => {
+	const [option, setOption] = useState('public');
 
-	return (
-		<RadioControl { ...props } selected={ option } onChange={ setOption } />
-	);
+	return <RadioControl {...props} selected={option} onChange={setOption} />;
 };
 
 const options = [
@@ -25,9 +23,7 @@ const options = [
 ];
 
 export const _default = () => {
-	return (
-		<RadioControlWithState label="Post visibility" options={ options } />
-	);
+	return <RadioControlWithState label="Post visibility" options={options} />;
 };
 
 export const withHelp = () => {
@@ -35,7 +31,7 @@ export const withHelp = () => {
 		<RadioControlWithState
 			help="The visibility level for the current post"
 			label="Post visibility"
-			options={ options }
+			options={options}
 		/>
 	);
 };

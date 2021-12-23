@@ -14,39 +14,39 @@ import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 export default function SiteExport() {
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch(noticesStore);
 
 	async function handleExport() {
 		try {
-			const response = await apiFetch( {
+			const response = await apiFetch({
 				path: '/wp-block-editor/v1/export',
 				parse: false,
-			} );
+			});
 			const blob = await response.blob();
 
-			downloadjs( blob, 'edit-site-export.zip', 'application/zip' );
-		} catch ( errorResponse ) {
+			downloadjs(blob, 'edit-site-export.zip', 'application/zip');
+		} catch (errorResponse) {
 			let error = {};
 			try {
 				error = await errorResponse.json();
-			} catch ( e ) {}
+			} catch (e) {}
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while creating the site export.' );
+					: __('An error occurred while creating the site export.');
 
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
+			createErrorNotice(errorMessage, { type: 'snackbar' });
 		}
 	}
 
 	return (
 		<MenuItem
 			role="menuitem"
-			icon={ download }
-			onClick={ handleExport }
-			info={ __( 'Download your templates and template parts.' ) }
+			icon={download}
+			onClick={handleExport}
+			info={__('Download your templates and template parts.')}
 		>
-			{ __( 'Export' ) }
+			{__('Export')}
 		</MenuItem>
 	);
 }

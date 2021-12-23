@@ -17,40 +17,40 @@ import Section from './section';
 import { EnableCustomFieldsOption, EnablePanelOption } from './options';
 import { store as editPostStore } from '../../store';
 
-export function MetaBoxesSection( {
+export function MetaBoxesSection({
 	areCustomFieldsRegistered,
 	metaBoxes,
 	...sectionProps
-} ) {
+}) {
 	// The 'Custom Fields' meta box is a special case that we handle separately.
 	const thirdPartyMetaBoxes = filter(
 		metaBoxes,
-		( { id } ) => id !== 'postcustom'
+		({ id }) => id !== 'postcustom'
 	);
 
-	if ( ! areCustomFieldsRegistered && thirdPartyMetaBoxes.length === 0 ) {
+	if (!areCustomFieldsRegistered && thirdPartyMetaBoxes.length === 0) {
 		return null;
 	}
 
 	return (
-		<Section { ...sectionProps }>
-			{ areCustomFieldsRegistered && (
-				<EnableCustomFieldsOption label={ __( 'Custom fields' ) } />
-			) }
-			{ map( thirdPartyMetaBoxes, ( { id, title } ) => (
+		<Section {...sectionProps}>
+			{areCustomFieldsRegistered && (
+				<EnableCustomFieldsOption label={__('Custom fields')} />
+			)}
+			{map(thirdPartyMetaBoxes, ({ id, title }) => (
 				<EnablePanelOption
-					key={ id }
-					label={ title }
-					panelName={ `meta-box-${ id }` }
+					key={id}
+					label={title}
+					panelName={`meta-box-${id}`}
 				/>
-			) ) }
+			))}
 		</Section>
 	);
 }
 
-export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( editorStore );
-	const { getAllMetaBoxes } = select( editPostStore );
+export default withSelect((select) => {
+	const { getEditorSettings } = select(editorStore);
+	const { getAllMetaBoxes } = select(editPostStore);
 
 	return {
 		// This setting should not live in the block editor's store.
@@ -58,4 +58,4 @@ export default withSelect( ( select ) => {
 			getEditorSettings().enableCustomFields !== undefined,
 		metaBoxes: getAllMetaBoxes(),
 	};
-} )( MetaBoxesSection );
+})(MetaBoxesSection);

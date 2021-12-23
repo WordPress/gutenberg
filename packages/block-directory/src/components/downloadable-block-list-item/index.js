@@ -26,27 +26,27 @@ function getDownloadableBlockLabel(
 	{ title, rating, ratingCount },
 	{ hasNotice, isInstalled, isInstalling }
 ) {
-	const stars = Math.round( rating / 0.5 ) * 0.5;
+	const stars = Math.round(rating / 0.5) * 0.5;
 
-	if ( ! isInstalled && hasNotice ) {
+	if (!isInstalled && hasNotice) {
 		/* translators: %1$s: block title */
-		return sprintf( 'Retry installing %s.', decodeEntities( title ) );
+		return sprintf('Retry installing %s.', decodeEntities(title));
 	}
 
-	if ( isInstalled ) {
+	if (isInstalled) {
 		/* translators: %1$s: block title */
-		return sprintf( 'Add %s.', decodeEntities( title ) );
+		return sprintf('Add %s.', decodeEntities(title));
 	}
 
-	if ( isInstalling ) {
+	if (isInstalling) {
 		/* translators: %1$s: block title */
-		return sprintf( 'Installing %s.', decodeEntities( title ) );
+		return sprintf('Installing %s.', decodeEntities(title));
 	}
 
 	// No ratings yet, just use the title.
-	if ( ratingCount < 1 ) {
+	if (ratingCount < 1) {
 		/* translators: %1$s: block title */
-		return sprintf( 'Install %s.', decodeEntities( title ) );
+		return sprintf('Install %s.', decodeEntities(title));
 	}
 
 	return sprintf(
@@ -56,78 +56,76 @@ function getDownloadableBlockLabel(
 			'Install %1$s. %2$s stars with %3$s reviews.',
 			ratingCount
 		),
-		decodeEntities( title ),
+		decodeEntities(title),
 		stars,
 		ratingCount
 	);
 }
 
-function DownloadableBlockListItem( { composite, item, onClick } ) {
+function DownloadableBlockListItem({ composite, item, onClick }) {
 	const { author, description, icon, rating, title } = item;
 	// getBlockType returns a block object if this block exists, or null if not.
-	const isInstalled = !! getBlockType( item.name );
+	const isInstalled = !!getBlockType(item.name);
 
 	const { hasNotice, isInstalling, isInstallable } = useSelect(
-		( select ) => {
-			const {
-				getErrorNoticeForBlock,
-				isInstalling: isBlockInstalling,
-			} = select( blockDirectoryStore );
-			const notice = getErrorNoticeForBlock( item.id );
+		(select) => {
+			const { getErrorNoticeForBlock, isInstalling: isBlockInstalling } =
+				select(blockDirectoryStore);
+			const notice = getErrorNoticeForBlock(item.id);
 			const hasFatal = notice && notice.isFatal;
 			return {
-				hasNotice: !! notice,
-				isInstalling: isBlockInstalling( item.id ),
-				isInstallable: ! hasFatal,
+				hasNotice: !!notice,
+				isInstalling: isBlockInstalling(item.id),
+				isInstallable: !hasFatal,
 			};
 		},
-		[ item ]
+		[item]
 	);
 
 	let statusText = '';
-	if ( isInstalled ) {
-		statusText = __( 'Installed!' );
-	} else if ( isInstalling ) {
-		statusText = __( 'Installing…' );
+	if (isInstalled) {
+		statusText = __('Installed!');
+	} else if (isInstalling) {
+		statusText = __('Installing…');
 	}
 
 	return (
 		<CompositeItem
 			role="option"
-			as={ Button }
-			{ ...composite }
+			as={Button}
+			{...composite}
 			className="block-directory-downloadable-block-list-item"
-			onClick={ ( event ) => {
+			onClick={(event) => {
 				event.preventDefault();
 				onClick();
-			} }
-			isBusy={ isInstalling }
-			disabled={ isInstalling || ! isInstallable }
-			label={ getDownloadableBlockLabel( item, {
+			}}
+			isBusy={isInstalling}
+			disabled={isInstalling || !isInstallable}
+			label={getDownloadableBlockLabel(item, {
 				hasNotice,
 				isInstalled,
 				isInstalling,
-			} ) }
-			showTooltip={ true }
+			})}
+			showTooltip={true}
 			tooltipPosition="top center"
 		>
 			<div className="block-directory-downloadable-block-list-item__icon">
-				<DownloadableBlockIcon icon={ icon } title={ title } />
-				{ isInstalling ? (
+				<DownloadableBlockIcon icon={icon} title={title} />
+				{isInstalling ? (
 					<span className="block-directory-downloadable-block-list-item__spinner">
 						<Spinner />
 					</span>
 				) : (
-					<BlockRatings rating={ rating } />
-				) }
+					<BlockRatings rating={rating} />
+				)}
 			</div>
 			<span className="block-directory-downloadable-block-list-item__details">
 				<span className="block-directory-downloadable-block-list-item__title">
-					{ createInterpolateElement(
+					{createInterpolateElement(
 						sprintf(
 							/* translators: %1$s: block title, %2$s: author name. */
-							__( '%1$s <span>by %2$s</span>' ),
-							decodeEntities( title ),
+							__('%1$s <span>by %2$s</span>'),
+							decodeEntities(title),
 							author
 						),
 						{
@@ -135,25 +133,24 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 								<span className="block-directory-downloadable-block-list-item__author" />
 							),
 						}
-					) }
+					)}
 				</span>
-				{ hasNotice ? (
-					<DownloadableBlockNotice block={ item } />
+				{hasNotice ? (
+					<DownloadableBlockNotice block={item} />
 				) : (
 					<>
 						<span className="block-directory-downloadable-block-list-item__desc">
-							{ !! statusText
+							{!!statusText
 								? statusText
-								: decodeEntities( description ) }
+								: decodeEntities(description)}
 						</span>
-						{ isInstallable &&
-							! ( isInstalled || isInstalling ) && (
-								<VisuallyHidden>
-									{ __( 'Install block' ) }
-								</VisuallyHidden>
-							) }
+						{isInstallable && !(isInstalled || isInstalling) && (
+							<VisuallyHidden>
+								{__('Install block')}
+							</VisuallyHidden>
+						)}
 					</>
-				) }
+				)}
 			</span>
 		</CompositeItem>
 	);

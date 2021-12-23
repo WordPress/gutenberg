@@ -3,11 +3,11 @@
  */
 import { blockNames } from './pages/editor-page';
 
-describe( 'Gutenberg Editor tests for Block insertion 2', () => {
-	it( 'adds new block at the end of post', async () => {
-		await editorPage.addNewBlock( blockNames.heading );
+describe('Gutenberg Editor tests for Block insertion 2', () => {
+	it('adds new block at the end of post', async () => {
+		await editorPage.addNewBlock(blockNames.heading);
 
-		await editorPage.addNewBlock( blockNames.list );
+		await editorPage.addNewBlock(blockNames.list);
 
 		const expectedHtml = `<!-- wp:heading -->
 <h2></h2>
@@ -18,17 +18,17 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 <!-- /wp:list -->`;
 
 		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe( expectedHtml );
-	} );
+		expect(html.toLowerCase()).toBe(expectedHtml);
+	});
 
-	it( 'inserts between 2 existing blocks', async () => {
+	it('inserts between 2 existing blocks', async () => {
 		const headingBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.heading
 		);
 
 		await headingBlockElement.click();
 
-		await editorPage.addNewBlock( blockNames.separator );
+		await editorPage.addNewBlock(blockNames.separator);
 
 		const expectedHtml = `<!-- wp:heading -->
 <h2></h2>
@@ -43,18 +43,18 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 <!-- /wp:list -->`;
 
 		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe( expectedHtml );
-	} );
+		expect(html.toLowerCase()).toBe(expectedHtml);
+	});
 
-	it( 'inserts block before selected block', async () => {
+	it('inserts block before selected block', async () => {
 		const separatorBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.separator,
 			2
 		);
 		await separatorBlockElement.click();
 
-		await editorPage.addNewBlock( blockNames.image, 'before' );
-		await editorPage.driver.sleep( 1000 );
+		await editorPage.addNewBlock(blockNames.image, 'before');
+		await editorPage.driver.sleep(1000);
 		await editorPage.closePicker();
 
 		const expectedHtml = `<!-- wp:heading -->
@@ -74,11 +74,11 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 <!-- /wp:list -->`;
 
 		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe( expectedHtml );
-	} );
+		expect(html.toLowerCase()).toBe(expectedHtml);
+	});
 
-	it( 'inserts block at the end of post when no block is selected', async () => {
-		await editorPage.addNewBlock( blockNames.more );
+	it('inserts block at the end of post when no block is selected', async () => {
+		await editorPage.addNewBlock(blockNames.more);
 
 		const expectedHtml = `<!-- wp:heading -->
 <h2></h2>
@@ -101,10 +101,10 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 <!-- /wp:more -->`;
 
 		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe( expectedHtml );
-	} );
+		expect(html.toLowerCase()).toBe(expectedHtml);
+	});
 
-	it( 'creates a new Paragraph block tapping on the empty area below the last block', async () => {
+	it('creates a new Paragraph block tapping on the empty area below the last block', async () => {
 		await editorPage.addParagraphBlockByTappingEmptyAreaBelowLastBlock();
 
 		const expectedHtml = `<!-- wp:heading -->
@@ -132,6 +132,6 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 <!-- /wp:paragraph -->`;
 
 		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe( expectedHtml );
-	} );
-} );
+		expect(html.toLowerCase()).toBe(expectedHtml);
+	});
+});

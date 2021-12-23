@@ -8,15 +8,15 @@ import {
 
 const slotName = '__experimentalMainDashboardButton';
 
-const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill( slotName );
+const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill(slotName);
 
 const MainDashboardButton = Fill;
 
-const Slot = ( { children } ) => {
-	const slot = useSlot( slotName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
+const Slot = ({ children }) => {
+	const slot = useSlot(slotName);
+	const hasFills = Boolean(slot.fills && slot.fills.length);
 
-	if ( ! hasFills ) {
+	if (!hasFills) {
 		return children;
 	}
 

@@ -10,26 +10,26 @@ import { useEffect, useState } from '@wordpress/element';
  *
  * @return {Object} Inline styles to be added to resizable container.
  */
-export default function useResizeCanvas( deviceType ) {
-	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );
+export default function useResizeCanvas(deviceType) {
+	const [actualWidth, updateActualWidth] = useState(window.innerWidth);
 
-	useEffect( () => {
-		if ( deviceType === 'Desktop' ) {
+	useEffect(() => {
+		if (deviceType === 'Desktop') {
 			return;
 		}
 
-		const resizeListener = () => updateActualWidth( window.innerWidth );
-		window.addEventListener( 'resize', resizeListener );
+		const resizeListener = () => updateActualWidth(window.innerWidth);
+		window.addEventListener('resize', resizeListener);
 
 		return () => {
-			window.removeEventListener( 'resize', resizeListener );
+			window.removeEventListener('resize', resizeListener);
 		};
-	}, [ deviceType ] );
+	}, [deviceType]);
 
-	const getCanvasWidth = ( device ) => {
+	const getCanvasWidth = (device) => {
 		let deviceWidth;
 
-		switch ( device ) {
+		switch (device) {
 			case 'Tablet':
 				deviceWidth = 780;
 				break;
@@ -43,15 +43,15 @@ export default function useResizeCanvas( deviceType ) {
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
-	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
+	const marginValue = () => (window.innerHeight < 800 ? 36 : 72);
 
-	const contentInlineStyles = ( device ) => {
+	const contentInlineStyles = (device) => {
 		const height = device === 'Mobile' ? '768px' : '1024px';
-		switch ( device ) {
+		switch (device) {
 			case 'Tablet':
 			case 'Mobile':
 				return {
-					width: getCanvasWidth( device ),
+					width: getCanvasWidth(device),
 					margin: marginValue() + 'px auto',
 					height,
 					borderRadius: '2px 2px 2px 2px',
@@ -63,5 +63,5 @@ export default function useResizeCanvas( deviceType ) {
 		}
 	};
 
-	return contentInlineStyles( deviceType );
+	return contentInlineStyles(deviceType);
 }

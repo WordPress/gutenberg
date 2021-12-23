@@ -9,15 +9,15 @@ import { Popover, ToolbarGroup } from '@wordpress/components';
 import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 
-const FormatToolbarContainer = ( { inline, anchorRef } ) => {
-	if ( inline ) {
+const FormatToolbarContainer = ({ inline, anchorRef }) => {
+	if (inline) {
 		// Render in popover
 		return (
 			<Popover
 				noArrow
 				position="top center"
-				focusOnMount={ false }
-				anchorRef={ anchorRef }
+				focusOnMount={false}
+				anchorRef={anchorRef}
 				className="block-editor-rich-text__inline-format-toolbar"
 				__unstableSlotName="block-toolbar"
 			>

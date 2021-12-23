@@ -28,12 +28,12 @@ import { usePopoverScroll } from './use-popover-scroll';
 
 export const InsertionPointOpenRef = createContext();
 
-function InsertionPointPopover( {
+function InsertionPointPopover({
 	__unstablePopoverSlot,
 	__unstableContentRef,
-} ) {
-	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
-	const openRef = useContext( InsertionPointOpenRef );
+}) {
+	const { selectBlock, hideInsertionPoint } = useDispatch(blockEditorStore);
+	const openRef = useContext(InsertionPointOpenRef);
 	const ref = useRef();
 	const {
 		orientation,
@@ -41,7 +41,7 @@ function InsertionPointPopover( {
 		nextClientId,
 		rootClientId,
 		isInserterShown,
-	} = useSelect( ( select ) => {
+	} = useSelect((select) => {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
@@ -49,40 +49,40 @@ function InsertionPointPopover( {
 			isBlockBeingDragged,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
-		} = select( blockEditorStore );
+		} = select(blockEditorStore);
 		const insertionPoint = getBlockInsertionPoint();
-		const order = getBlockOrder( insertionPoint.rootClientId );
+		const order = getBlockOrder(insertionPoint.rootClientId);
 
-		if ( ! order.length ) {
+		if (!order.length) {
 			return {};
 		}
 
-		let _previousClientId = order[ insertionPoint.index - 1 ];
-		let _nextClientId = order[ insertionPoint.index ];
+		let _previousClientId = order[insertionPoint.index - 1];
+		let _nextClientId = order[insertionPoint.index];
 
-		while ( isBlockBeingDragged( _previousClientId ) ) {
-			_previousClientId = getPreviousBlockClientId( _previousClientId );
+		while (isBlockBeingDragged(_previousClientId)) {
+			_previousClientId = getPreviousBlockClientId(_previousClientId);
 		}
 
-		while ( isBlockBeingDragged( _nextClientId ) ) {
-			_nextClientId = getNextBlockClientId( _nextClientId );
+		while (isBlockBeingDragged(_nextClientId)) {
+			_nextClientId = getNextBlockClientId(_nextClientId);
 		}
 
 		return {
 			previousClientId: _previousClientId,
 			nextClientId: _nextClientId,
 			orientation:
-				getBlockListSettings( insertionPoint.rootClientId )
+				getBlockListSettings(insertionPoint.rootClientId)
 					?.orientation || 'vertical',
 			rootClientId: insertionPoint.rootClientId,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
-	}, [] );
-	const previousElement = useBlockElement( previousClientId );
-	const nextElement = useBlockElement( nextClientId );
+	}, []);
+	const previousElement = useBlockElement(previousClientId);
+	const nextElement = useBlockElement(nextClientId);
 	const isVertical = orientation === 'vertical';
-	const style = useMemo( () => {
-		if ( ! previousElement && ! nextElement ) {
+	const style = useMemo(() => {
+		if (!previousElement && !nextElement) {
 			return {};
 		}
 
@@ -93,7 +93,7 @@ function InsertionPointPopover( {
 			? nextElement.getBoundingClientRect()
 			: null;
 
-		if ( isVertical ) {
+		if (isVertical) {
 			return {
 				width: previousElement
 					? previousElement.offsetWidth
@@ -106,7 +106,7 @@ function InsertionPointPopover( {
 		}
 
 		let width = 0;
-		if ( previousRect && nextRect ) {
+		if (previousRect && nextRect) {
 			width = isRTL()
 				? previousRect.left - nextRect.right
 				: nextRect.left - previousRect.right;
@@ -118,10 +118,10 @@ function InsertionPointPopover( {
 				? previousElement.offsetHeight
 				: nextElement.offsetHeight,
 		};
-	}, [ previousElement, nextElement ] );
+	}, [previousElement, nextElement]);
 
-	const getAnchorRect = useCallback( () => {
-		if ( ! previousElement && ! nextElement ) {
+	const getAnchorRect = useCallback(() => {
+		if (!previousElement && !nextElement) {
 			return {};
 		}
 
@@ -134,8 +134,8 @@ function InsertionPointPopover( {
 			? nextElement.getBoundingClientRect()
 			: null;
 
-		if ( isVertical ) {
-			if ( isRTL() ) {
+		if (isVertical) {
+			if (isRTL()) {
 				return {
 					top: previousRect ? previousRect.bottom : nextRect.top,
 					left: previousRect ? previousRect.right : nextRect.right,
@@ -154,7 +154,7 @@ function InsertionPointPopover( {
 			};
 		}
 
-		if ( isRTL() ) {
+		if (isRTL()) {
 			return {
 				top: previousRect ? previousRect.top : nextRect.top,
 				left: previousRect ? previousRect.left : nextRect.right,
@@ -171,9 +171,9 @@ function InsertionPointPopover( {
 			bottom: previousRect ? previousRect.bottom : nextRect.bottom,
 			ownerDocument,
 		};
-	}, [ previousElement, nextElement ] );
+	}, [previousElement, nextElement]);
 
-	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+	const popoverScrollRef = usePopoverScroll(__unstableContentRef);
 	const disableMotion = useReducedMotion();
 
 	const className = classnames(
@@ -181,24 +181,24 @@ function InsertionPointPopover( {
 		'is-' + orientation
 	);
 
-	function onClick( event ) {
-		if ( event.target === ref.current && nextClientId ) {
-			selectBlock( nextClientId, -1 );
+	function onClick(event) {
+		if (event.target === ref.current && nextClientId) {
+			selectBlock(nextClientId, -1);
 		}
 	}
 
-	function onFocus( event ) {
+	function onFocus(event) {
 		// Only handle click on the wrapper specifically, and not an event
 		// bubbled from the inserter itself.
-		if ( event.target !== ref.current ) {
+		if (event.target !== ref.current) {
 			openRef.current = true;
 		}
 	}
 
-	function maybeHideInserterPoint( event ) {
+	function maybeHideInserterPoint(event) {
 		// Only hide the inserter if it's triggered on the wrapper,
 		// and the inserter is not open.
-		if ( event.target === ref.current && ! openRef.current ) {
+		if (event.target === ref.current && !openRef.current) {
 			hideInsertionPoint();
 		}
 	}
@@ -252,19 +252,19 @@ function InsertionPointPopover( {
 	const lineVariants = {
 		// Initial position starts from the center and invisible.
 		start: {
-			...( ! isVertical ? horizontalLine.start : verticalLine.start ),
+			...(!isVertical ? horizontalLine.start : verticalLine.start),
 			opacity: 0,
 		},
 		// The line expands to fill the container. If the inserter is visible it
 		// is delayed so it appears orchestrated.
 		rest: {
-			...( ! isVertical ? horizontalLine.rest : verticalLine.rest ),
+			...(!isVertical ? horizontalLine.rest : verticalLine.rest),
 			opacity: 1,
 			borderRadius: '2px',
 			transition: { delay: showInsertionPointInserter ? 0.4 : 0 },
 		},
 		hover: {
-			...( ! isVertical ? horizontalLine.hover : verticalLine.hover ),
+			...(!isVertical ? horizontalLine.hover : verticalLine.hover),
 			opacity: 1,
 			borderRadius: '2px',
 			transition: { delay: 0.4 },
@@ -290,85 +290,85 @@ function InsertionPointPopover( {
 	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	return (
 		<Popover
-			ref={ popoverScrollRef }
+			ref={popoverScrollRef}
 			noArrow
-			animate={ false }
-			getAnchorRect={ getAnchorRect }
-			focusOnMount={ false }
+			animate={false}
+			getAnchorRect={getAnchorRect}
+			focusOnMount={false}
 			className="block-editor-block-list__insertion-point-popover"
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotName={__unstablePopoverSlot || null}
 			// Forces a remount of the popover when its position changes
 			// This makes sure the popover doesn't animate from its previous position.
-			key={ nextClientId + '--' + rootClientId }
+			key={nextClientId + '--' + rootClientId}
 		>
 			<motion.div
-				layout={ ! disableMotion }
-				initial={ disableMotion ? 'rest' : 'start' }
+				layout={!disableMotion}
+				initial={disableMotion ? 'rest' : 'start'}
 				animate="rest"
 				whileHover="hover"
 				whileTap="pressed"
 				exit="start"
-				ref={ ref }
-				tabIndex={ -1 }
-				onClick={ onClick }
-				onFocus={ onFocus }
-				className={ classnames( className, {
+				ref={ref}
+				tabIndex={-1}
+				onClick={onClick}
+				onFocus={onFocus}
+				className={classnames(className, {
 					'is-with-inserter': showInsertionPointInserter,
-				} ) }
-				onHoverEnd={ maybeHideInserterPoint }
-				style={ style }
+				})}
+				onHoverEnd={maybeHideInserterPoint}
+				style={style}
 			>
 				<motion.div
-					variants={ lineVariants }
+					variants={lineVariants}
 					className="block-editor-block-list__insertion-point-indicator"
 				/>
-				{ showInsertionPointInserter && (
+				{showInsertionPointInserter && (
 					<motion.div
-						variants={ inserterVariants }
-						className={ classnames(
+						variants={inserterVariants}
+						className={classnames(
 							'block-editor-block-list__insertion-point-inserter'
-						) }
+						)}
 					>
 						<Inserter
 							position="bottom center"
-							clientId={ nextClientId }
-							rootClientId={ rootClientId }
+							clientId={nextClientId}
+							rootClientId={rootClientId}
 							__experimentalIsQuick
-							onToggle={ ( isOpen ) => {
+							onToggle={(isOpen) => {
 								openRef.current = isOpen;
-							} }
-							onSelectOrClose={ () => {
+							}}
+							onSelectOrClose={() => {
 								openRef.current = false;
-							} }
+							}}
 						/>
 					</motion.div>
-				) }
+				)}
 			</motion.div>
 		</Popover>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
-export default function InsertionPoint( {
+export default function InsertionPoint({
 	children,
 	__unstablePopoverSlot,
 	__unstableContentRef,
-} ) {
-	const isVisible = useSelect( ( select ) => {
-		return select( blockEditorStore ).isBlockInsertionPointVisible();
-	}, [] );
+}) {
+	const isVisible = useSelect((select) => {
+		return select(blockEditorStore).isBlockInsertionPointVisible();
+	}, []);
 
 	return (
-		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-			{ isVisible && (
+		<InsertionPointOpenRef.Provider value={useRef(false)}>
+			{isVisible && (
 				<InsertionPointPopover
-					__unstablePopoverSlot={ __unstablePopoverSlot }
-					__unstableContentRef={ __unstableContentRef }
+					__unstablePopoverSlot={__unstablePopoverSlot}
+					__unstableContentRef={__unstableContentRef}
 				/>
-			) }
-			{ children }
+			)}
+			{children}
 		</InsertionPointOpenRef.Provider>
 	);
 }

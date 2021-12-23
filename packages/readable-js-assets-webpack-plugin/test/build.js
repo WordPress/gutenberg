@@ -1,58 +1,56 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const glob = require( 'glob' ).sync;
-const mkdirp = require( 'mkdirp' ).sync;
-const path = require( 'path' );
-const rimraf = require( 'rimraf' ).sync;
-const webpack = require( 'webpack' );
+const fs = require('fs');
+const glob = require('glob').sync;
+const mkdirp = require('mkdirp').sync;
+const path = require('path');
+const rimraf = require('rimraf').sync;
+const webpack = require('webpack');
 
-const testDirectory = path.join( __dirname, 'fixtures' );
+const testDirectory = path.join(__dirname, 'fixtures');
 
-afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
+afterAll(() => rimraf(path.join(__dirname, 'build')));
 
-describe( 'ReadableJsAssetsWebpackPlugin', () => {
-	const outputDirectory = path.join( __dirname, 'build' );
+describe('ReadableJsAssetsWebpackPlugin', () => {
+	const outputDirectory = path.join(__dirname, 'build');
 
-	beforeEach( () => {
-		rimraf( outputDirectory );
-		mkdirp( outputDirectory );
-	} );
+	beforeEach(() => {
+		rimraf(outputDirectory);
+		mkdirp(outputDirectory);
+	});
 
 	// This afterEach is necessary to prevent watched tests from retriggering on every run.
-	afterEach( () => rimraf( outputDirectory ) );
+	afterEach(() => rimraf(outputDirectory));
 
-	test( 'should produce the expected output', () =>
-		new Promise( ( resolve ) => {
+	test('should produce the expected output', () =>
+		new Promise((resolve) => {
 			const options = Object.assign(
 				{
 					context: testDirectory,
 				},
-				require( path.join( testDirectory, 'webpack.config.js' ) )
+				require(path.join(testDirectory, 'webpack.config.js'))
 			);
 			options.output.path = outputDirectory;
 
-			webpack( options, ( err ) => {
-				expect( err ).toBeNull();
+			webpack(options, (err) => {
+				expect(err).toBeNull();
 
-				const assetFiles = glob( `${ outputDirectory }/*.js` );
+				const assetFiles = glob(`${outputDirectory}/*.js`);
 
-				expect( assetFiles ).toHaveLength( 4 );
+				expect(assetFiles).toHaveLength(4);
 
 				// Asset files should match.
-				assetFiles.forEach( ( assetFile ) => {
-					expect(
-						fs.readFileSync( assetFile, 'utf-8' )
-					).toMatchSnapshot(
-						`Asset file ${ path.relative(
+				assetFiles.forEach((assetFile) => {
+					expect(fs.readFileSync(assetFile, 'utf-8')).toMatchSnapshot(
+						`Asset file ${path.relative(
 							outputDirectory,
 							assetFile
-						) } should match snapshot`
+						)} should match snapshot`
 					);
-				} );
+				});
 
 				resolve();
-			} );
-		} ) );
-} );
+			});
+		}));
+});

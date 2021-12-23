@@ -15,13 +15,13 @@ import { useCx } from '../utils/hooks/use-cx';
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 /* eslint-enable jsdoc/valid-types */
-export function useScrollable( props ) {
+export function useScrollable(props) {
 	const {
 		className,
 		scrollDirection = 'y',
 		smoothScroll = false,
 		...otherProps
-	} = useContextSystem( props, 'Scrollable' );
+	} = useContextSystem(props, 'Scrollable');
 
 	const cx = useCx();
 
@@ -36,7 +36,7 @@ export function useScrollable( props ) {
 				scrollDirection === 'auto' && styles.scrollAuto,
 				className
 			),
-		[ className, scrollDirection, smoothScroll ]
+		[className, scrollDirection, smoothScroll]
 	);
 
 	return { ...otherProps, className: classes };

@@ -34,113 +34,113 @@ import styles from './style.scss';
 const RIGHT_ALIGN_ARROW_OFFSET = 16;
 const TOOLTIP_VERTICAL_OFFSET = 2;
 
-const TooltipContext = createContext( {
+const TooltipContext = createContext({
 	onHandleScreenTouch: () => {},
-} );
-const { Fill, Slot } = createSlotFill( 'Tooltip' );
+});
+const { Fill, Slot } = createSlotFill('Tooltip');
 
 const useKeyboardVisibility = () => {
-	const [ keyboardVisible, setKeyboardVisible ] = useState( false );
-	const previousKeyboardVisible = usePrevious( keyboardVisible );
+	const [keyboardVisible, setKeyboardVisible] = useState(false);
+	const previousKeyboardVisible = usePrevious(keyboardVisible);
 
-	useEffect( () => {
-		const showListener = Keyboard.addListener( 'keyboardDidShow', () => {
-			if ( previousKeyboardVisible !== true ) {
-				setKeyboardVisible( true );
+	useEffect(() => {
+		const showListener = Keyboard.addListener('keyboardDidShow', () => {
+			if (previousKeyboardVisible !== true) {
+				setKeyboardVisible(true);
 			}
-		} );
-		const keyboardHideEvent = Platform.select( {
+		});
+		const keyboardHideEvent = Platform.select({
 			android: 'keyboardDidHide',
 			ios: 'keyboardWillHide',
-		} );
-		const hideListener = Keyboard.addListener( keyboardHideEvent, () => {
-			if ( previousKeyboardVisible !== false ) {
-				setKeyboardVisible( false );
+		});
+		const hideListener = Keyboard.addListener(keyboardHideEvent, () => {
+			if (previousKeyboardVisible !== false) {
+				setKeyboardVisible(false);
 			}
-		} );
+		});
 		return () => {
 			showListener.remove();
 			hideListener.remove();
 		};
-	}, [] );
+	}, []);
 
 	return keyboardVisible;
 };
 
-const Tooltip = ( {
+const Tooltip = ({
 	children,
 	position = 'top',
 	text,
 	visible: initialVisible = false,
-} ) => {
-	const referenceElementRef = useRef( null );
-	const animationValue = useRef( new Animated.Value( 0 ) ).current;
-	const [ , horizontalPosition = 'center' ] = position.split( ' ' );
-	const [ visible, setVisible ] = useState( initialVisible );
-	const [ animating, setAnimating ] = useState( false );
-	const hidden = ! visible && ! animating;
-	const previousVisible = usePrevious( visible );
-	const [ referenceLayout, setReferenceLayout ] = useState( {
+}) => {
+	const referenceElementRef = useRef(null);
+	const animationValue = useRef(new Animated.Value(0)).current;
+	const [, horizontalPosition = 'center'] = position.split(' ');
+	const [visible, setVisible] = useState(initialVisible);
+	const [animating, setAnimating] = useState(false);
+	const hidden = !visible && !animating;
+	const previousVisible = usePrevious(visible);
+	const [referenceLayout, setReferenceLayout] = useState({
 		height: 0,
 		width: 0,
 		x: 0,
 		y: 0,
-	} );
-	const [ tooltipLayout, setTooltipLayout ] = useState( {
+	});
+	const [tooltipLayout, setTooltipLayout] = useState({
 		height: 0,
 		width: 0,
-	} );
-	const { onHandleScreenTouch } = useContext( TooltipContext );
+	});
+	const { onHandleScreenTouch } = useContext(TooltipContext);
 	const keyboardVisible = useKeyboardVisibility();
 
 	// Register callback to dismiss the tooltip whenever the screen is touched
-	useEffect( () => {
-		if ( visible ) {
-			onHandleScreenTouch( () => {
-				setAnimating( true );
-				setVisible( false );
-			} );
+	useEffect(() => {
+		if (visible) {
+			onHandleScreenTouch(() => {
+				setAnimating(true);
+				setVisible(false);
+			});
 		}
-		return () => onHandleScreenTouch( null );
-	}, [ visible ] );
+		return () => onHandleScreenTouch(null);
+	}, [visible]);
 
 	// Manage visibility animation
-	useEffect( () => {
+	useEffect(() => {
 		if (
 			// Initial render and visibility enabled, animate show
-			( typeof previousVisible === 'undefined' && visible ) ||
+			(typeof previousVisible === 'undefined' && visible) ||
 			// Previously visible, animate hide
-			( previousVisible && previousVisible !== visible )
+			(previousVisible && previousVisible !== visible)
 		) {
-			setAnimating( true );
+			setAnimating(true);
 			startAnimation();
 		}
-	}, [ visible ] );
+	}, [visible]);
 
 	// Manage tooltip visibility and position in relation to keyboard
-	useEffect( () => {
-		if ( ! visible ) {
+	useEffect(() => {
+		if (!visible) {
 			return;
 		}
 
 		// Update tooltip position if keyboard is visible
-		if ( keyboardVisible ) {
+		if (keyboardVisible) {
 			getReferenceElementPosition();
 		}
 
 		// Hide tooltip if keyboard hides
-		if ( typeof previousVisible !== 'undefined' && ! keyboardVisible ) {
-			setAnimating( true );
-			setVisible( false );
+		if (typeof previousVisible !== 'undefined' && !keyboardVisible) {
+			setAnimating(true);
+			setVisible(false);
 		}
-	}, [ visible, keyboardVisible ] );
+	}, [visible, keyboardVisible]);
 
 	// Manage tooltip position during keyboard frame changes
-	useEffect( () => {
+	useEffect(() => {
 		const frameListener = Keyboard.addListener(
 			'keyboardWillChangeFrame',
 			() => {
-				if ( visible ) {
+				if (visible) {
 					getReferenceElementPosition();
 				}
 			}
@@ -149,18 +149,18 @@ const Tooltip = ( {
 		return () => {
 			frameListener.remove();
 		};
-	}, [ visible ] );
+	}, [visible]);
 
 	const startAnimation = () => {
-		Animated.timing( animationValue, {
+		Animated.timing(animationValue, {
 			toValue: visible ? 1 : 0,
 			duration: visible ? 300 : 150,
 			useNativeDriver: true,
 			delay: visible ? 500 : 0,
-			easing: Easing.out( Easing.quad ),
-		} ).start( () => {
-			setAnimating( false );
-		} );
+			easing: Easing.out(Easing.quad),
+		}).start(() => {
+			setAnimating(false);
+		});
 	};
 
 	const tooltipStyles = [
@@ -168,10 +168,10 @@ const Tooltip = ( {
 		{
 			left:
 				referenceLayout.x +
-				Math.floor( referenceLayout.width / 2 ) -
-				( horizontalPosition === 'right'
+				Math.floor(referenceLayout.width / 2) -
+				(horizontalPosition === 'right'
 					? RIGHT_ALIGN_ARROW_OFFSET
-					: Math.floor( tooltipLayout.width / 2 ) ),
+					: Math.floor(tooltipLayout.width / 2)),
 			top:
 				referenceLayout.y -
 				tooltipLayout.height -
@@ -180,7 +180,7 @@ const Tooltip = ( {
 	];
 	const tooltipBoxStyles = [
 		styles.tooltip__box,
-		horizontalPosition === 'right' && styles[ 'tooltip--rightAlign' ],
+		horizontalPosition === 'right' && styles['tooltip--rightAlign'],
 		{
 			elevation: 2,
 			opacity: animationValue,
@@ -190,59 +190,58 @@ const Tooltip = ( {
 			shadowRadius: 2,
 			transform: [
 				{
-					translateY: animationValue.interpolate( {
-						inputRange: [ 0, 1 ],
-						outputRange: [ visible ? 4 : -8, -8 ],
-					} ),
+					translateY: animationValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [visible ? 4 : -8, -8],
+					}),
 				},
 			],
 		},
 	];
 	const arrowStyles = [
 		styles.tooltip__arrow,
-		horizontalPosition === 'right' &&
-			styles[ 'tooltip__arrow--rightAlign' ],
+		horizontalPosition === 'right' && styles['tooltip__arrow--rightAlign'],
 	];
 
 	const getReferenceElementPosition = () => {
 		// rAF allows render to complete before calculating layout
 		// eslint-disable-next-line no-undef
-		requestAnimationFrame( () => {
-			if ( ! referenceElementRef.current ) {
+		requestAnimationFrame(() => {
+			if (!referenceElementRef.current) {
 				return;
 			}
 			referenceElementRef.current.measure(
-				( _x, _y, width, height, pageX, pageY ) => {
-					setReferenceLayout( {
+				(_x, _y, width, height, pageX, pageY) => {
+					setReferenceLayout({
 						height,
 						width,
 						x: pageX,
 						y: pageY,
-					} );
+					});
 				}
 			);
-		} );
+		});
 	};
-	const getTooltipLayout = ( { nativeEvent } ) => {
+	const getTooltipLayout = ({ nativeEvent }) => {
 		const { height, width } = nativeEvent.layout;
-		setTooltipLayout( { height, width } );
+		setTooltipLayout({ height, width });
 	};
 
-	if ( hidden ) {
+	if (hidden) {
 		return children;
 	}
 
 	return (
 		<>
-			{ cloneElement( children, {
+			{cloneElement(children, {
 				ref: referenceElementRef,
 				onLayout: getReferenceElementPosition,
-			} ) }
+			})}
 			<Fill>
-				<View onLayout={ getTooltipLayout } style={ tooltipStyles }>
-					<Animated.View style={ tooltipBoxStyles }>
-						<Text style={ styles.tooltip__text }>{ text }</Text>
-						<View style={ arrowStyles } />
+				<View onLayout={getTooltipLayout} style={tooltipStyles}>
+					<Animated.View style={tooltipBoxStyles}>
+						<Text style={styles.tooltip__text}>{text}</Text>
+						<View style={arrowStyles} />
 					</Animated.View>
 				</View>
 			</Fill>
@@ -250,21 +249,21 @@ const Tooltip = ( {
 	);
 };
 
-const TooltipSlot = ( { children, ...rest } ) => {
-	const [ handleScreenTouch, setHandleScreenTouch ] = useState( null );
-	const onHandleScreenTouch = ( callback ) => {
+const TooltipSlot = ({ children, ...rest }) => {
+	const [handleScreenTouch, setHandleScreenTouch] = useState(null);
+	const onHandleScreenTouch = (callback) => {
 		// Must use function to set state below as `callback` is a function itself
-		setHandleScreenTouch( () => callback );
+		setHandleScreenTouch(() => callback);
 	};
 	const handleTouchStart = () => {
 		handleScreenTouch();
-		setHandleScreenTouch( null );
+		setHandleScreenTouch(null);
 	};
 	// Memoize context value to avoid unnecessary rerenders of the Provider's children
-	const value = useMemo( () => ( { onHandleScreenTouch } ) );
+	const value = useMemo(() => ({ onHandleScreenTouch }));
 
 	return (
-		<TooltipContext.Provider value={ value }>
+		<TooltipContext.Provider value={value}>
 			<View
 				onTouchStart={
 					typeof handleScreenTouch === 'function'
@@ -272,11 +271,11 @@ const TooltipSlot = ( { children, ...rest } ) => {
 						: undefined
 				}
 				pointerEvents="box-none"
-				style={ StyleSheet.absoluteFill }
+				style={StyleSheet.absoluteFill}
 				testID="tooltip-overlay"
 			>
-				{ children }
-				<Slot { ...rest } />
+				{children}
+				<Slot {...rest} />
 			</View>
 		</TooltipContext.Provider>
 	);

@@ -6,7 +6,7 @@
  * @param {Object} callee
  * @return {string} Function name.
  */
-function getTranslateFunctionName( callee ) {
+function getTranslateFunctionName(callee) {
 	return callee.property && callee.property.name
 		? callee.property.name
 		: callee.name;

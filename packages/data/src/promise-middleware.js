@@ -8,16 +8,16 @@ import isPromise from 'is-promise';
  *
  * @type {import('redux').Middleware}
  */
-const promiseMiddleware = () => ( next ) => ( action ) => {
-	if ( isPromise( action ) ) {
-		return action.then( ( resolvedAction ) => {
-			if ( resolvedAction ) {
-				return next( resolvedAction );
+const promiseMiddleware = () => (next) => (action) => {
+	if (isPromise(action)) {
+		return action.then((resolvedAction) => {
+			if (resolvedAction) {
+				return next(resolvedAction);
 			}
-		} );
+		});
 	}
 
-	return next( action );
+	return next(action);
 };
 
 export default promiseMiddleware;

@@ -29,42 +29,36 @@ import {
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
 
-export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		ref
-	);
+export default function ReusableBlockEdit({ attributes: { ref }, clientId }) {
+	const [hasAlreadyRendered, RecursionProvider] = useNoRecursiveRenders(ref);
 	const { isMissing, hasResolved } = useSelect(
-		( select ) => {
-			const persistedBlock = select( coreStore ).getEntityRecord(
+		(select) => {
+			const persistedBlock = select(coreStore).getEntityRecord(
 				'postType',
 				'wp_block',
 				ref
 			);
-			const hasResolvedBlock = select(
-				coreStore
-			).hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_block',
-				ref,
-			] );
+			const hasResolvedBlock = select(coreStore).hasFinishedResolution(
+				'getEntityRecord',
+				['postType', 'wp_block', ref]
+			);
 			return {
 				hasResolved: hasResolvedBlock,
-				isMissing: hasResolvedBlock && ! persistedBlock,
+				isMissing: hasResolvedBlock && !persistedBlock,
 			};
 		},
-		[ ref, clientId ]
+		[ref, clientId]
 	);
 
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch(reusableBlocksStore);
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const [blocks, onInput, onChange] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
 	);
-	const [ title, setTitle ] = useEntityProp(
+	const [title, setTitle] = useEntityProp(
 		'postType',
 		'wp_block',
 		'title',
@@ -85,29 +79,29 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		}
 	);
 
-	if ( hasAlreadyRendered ) {
+	if (hasAlreadyRendered) {
 		return (
-			<div { ...blockProps }>
+			<div {...blockProps}>
 				<Warning>
-					{ __( 'Block cannot be rendered inside itself.' ) }
+					{__('Block cannot be rendered inside itself.')}
 				</Warning>
 			</div>
 		);
 	}
 
-	if ( isMissing ) {
+	if (isMissing) {
 		return (
-			<div { ...blockProps }>
+			<div {...blockProps}>
 				<Warning>
-					{ __( 'Block has been deleted or is unavailable.' ) }
+					{__('Block has been deleted or is unavailable.')}
 				</Warning>
 			</div>
 		);
 	}
 
-	if ( ! hasResolved ) {
+	if (!hasResolved) {
 		return (
-			<div { ...blockProps }>
+			<div {...blockProps}>
 				<Placeholder>
 					<Spinner />
 				</Placeholder>
@@ -117,13 +111,13 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	return (
 		<RecursionProvider>
-			<div { ...blockProps }>
+			<div {...blockProps}>
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
-							onClick={ () => convertBlockToStatic( clientId ) }
-							label={ __( 'Convert to regular blocks' ) }
-							icon={ ungroup }
+							onClick={() => convertBlockToStatic(clientId)}
+							label={__('Convert to regular blocks')}
+							icon={ungroup}
 							showTooltip
 						/>
 					</ToolbarGroup>
@@ -131,15 +125,15 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				<InspectorControls>
 					<PanelBody>
 						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
+							label={__('Name')}
+							value={title}
+							onChange={setTitle}
 						/>
 					</PanelBody>
 				</InspectorControls>
 				<BlockContentOverlay
-					clientId={ clientId }
-					wrapperProps={ innerBlocksProps }
+					clientId={clientId}
+					wrapperProps={innerBlocksProps}
 					className="block-library-block__reusable-block-container"
 				/>
 			</div>

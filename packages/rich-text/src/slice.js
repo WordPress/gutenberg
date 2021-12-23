@@ -11,16 +11,16 @@
  *
  * @return {RichTextValue} A new extracted value.
  */
-export function slice( value, startIndex = value.start, endIndex = value.end ) {
+export function slice(value, startIndex = value.start, endIndex = value.end) {
 	const { formats, replacements, text } = value;
 
-	if ( startIndex === undefined || endIndex === undefined ) {
+	if (startIndex === undefined || endIndex === undefined) {
 		return { ...value };
 	}
 
 	return {
-		formats: formats.slice( startIndex, endIndex ),
-		replacements: replacements.slice( startIndex, endIndex ),
-		text: text.slice( startIndex, endIndex ),
+		formats: formats.slice(startIndex, endIndex),
+		replacements: replacements.slice(startIndex, endIndex),
+		text: text.slice(startIndex, endIndex),
 	};
 }

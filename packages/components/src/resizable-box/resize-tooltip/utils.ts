@@ -18,7 +18,7 @@ export const POSITIONS = {
 	corner: 'corner',
 } as const;
 
-export type Position = typeof POSITIONS[ keyof typeof POSITIONS ];
+export type Position = typeof POSITIONS[keyof typeof POSITIONS];
 
 interface UseResizeLabelProps {
 	/** The label value. */
@@ -30,7 +30,7 @@ interface UseResizeLabelProps {
 interface UseResizeLabelArgs {
 	axis?: Axis;
 	fadeTimeout: number;
-	onResize( data: { width: number | null; height: number | null } ): void;
+	onResize(data: { width: number | null; height: number | null }): void;
 	position: Position;
 	showPx: boolean;
 }
@@ -48,79 +48,79 @@ interface UseResizeLabelArgs {
  *
  * @return Properties for hook.
  */
-export function useResizeLabel( {
+export function useResizeLabel({
 	axis,
 	fadeTimeout = 180,
 	onResize = noop,
 	position = POSITIONS.bottom,
 	showPx = false,
-}: UseResizeLabelArgs ): UseResizeLabelProps {
+}: UseResizeLabelArgs): UseResizeLabelProps {
 	/*
 	 * The width/height values derive from this special useResizeAware hook.
 	 * This custom hook uses injects an iFrame into the element, allowing it
 	 * to tap into the onResize (window) callback events.
 	 */
-	const [ resizeListener, sizes ] = useResizeAware();
+	const [resizeListener, sizes] = useResizeAware();
 
 	/*
 	 * Indicates if the x/y axis is preferred.
 	 * If set, we will avoid resetting the moveX and moveY values.
 	 * This will allow for the preferred axis values to persist in the label.
 	 */
-	const isAxisControlled = !! axis;
+	const isAxisControlled = !!axis;
 
 	/*
 	 * The moveX and moveY values are used to track whether the label should
 	 * display width, height, or width x height.
 	 */
-	const [ moveX, setMoveX ] = useState( false );
-	const [ moveY, setMoveY ] = useState( false );
+	const [moveX, setMoveX] = useState(false);
+	const [moveY, setMoveY] = useState(false);
 
 	/*
 	 * Cached dimension values to check for width/height updates from the
 	 * sizes property from useResizeAware()
 	 */
 	const { width, height } = sizes;
-	const heightRef = useRef( height );
-	const widthRef = useRef( width );
+	const heightRef = useRef(height);
+	const widthRef = useRef(width);
 
 	/*
 	 * This timeout is used with setMoveX and setMoveY to determine of
 	 * both width and height values have changed at (roughly) the same time.
 	 */
-	const moveTimeoutRef = useRef< number >();
+	const moveTimeoutRef = useRef<number>();
 
 	const unsetMoveXY = () => {
 		/*
 		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
 		 * This will allow for the preferred axis values to persist in the label.
 		 */
-		if ( isAxisControlled ) return;
-		setMoveX( false );
-		setMoveY( false );
+		if (isAxisControlled) return;
+		setMoveX(false);
+		setMoveY(false);
 	};
 
 	const debounceUnsetMoveXY = () => {
-		if ( moveTimeoutRef.current ) {
-			clearTimeout( moveTimeoutRef.current );
+		if (moveTimeoutRef.current) {
+			clearTimeout(moveTimeoutRef.current);
 		}
 
-		moveTimeoutRef.current = setTimeout( unsetMoveXY, fadeTimeout );
+		moveTimeoutRef.current = setTimeout(unsetMoveXY, fadeTimeout);
 	};
 
-	useEffect( () => {
+	useEffect(() => {
 		/*
 		 * On the initial render of useResizeAware, the height and width values are
 		 * null. They are calculated then set using via an internal useEffect hook.
 		 */
 		const isRendered = width !== null || height !== null;
 
-		if ( ! isRendered ) return;
+		if (!isRendered) return;
 
 		const didWidthChange = width !== widthRef.current;
 		const didHeightChange = height !== heightRef.current;
 
-		if ( ! didWidthChange && ! didHeightChange ) return;
+		if (!didWidthChange && !didHeightChange) return;
 
 		/*
 		 * After the initial render, the useResizeAware will set the first
@@ -128,7 +128,7 @@ export function useResizeLabel( {
 		 * width and height refs. However, we shouldn't render our Tooltip
 		 * label on this first cycle.
 		 */
-		if ( width && ! widthRef.current && height && ! heightRef.current ) {
+		if (width && !widthRef.current && height && !heightRef.current) {
 			widthRef.current = width;
 			heightRef.current = height;
 			return;
@@ -137,21 +137,21 @@ export function useResizeLabel( {
 		/*
 		 * After the first cycle, we can track width and height changes.
 		 */
-		if ( didWidthChange ) {
-			setMoveX( true );
+		if (didWidthChange) {
+			setMoveX(true);
 			widthRef.current = width;
 		}
 
-		if ( didHeightChange ) {
-			setMoveY( true );
+		if (didHeightChange) {
+			setMoveY(true);
 			heightRef.current = height;
 		}
 
-		onResize( { width, height } );
+		onResize({ width, height });
 		debounceUnsetMoveXY();
-	}, [ width, height ] );
+	}, [width, height]);
 
-	const label = getSizeLabel( {
+	const label = getSizeLabel({
 		axis,
 		height,
 		moveX,
@@ -159,7 +159,7 @@ export function useResizeLabel( {
 		position,
 		showPx,
 		width,
-	} );
+	});
 
 	return {
 		label,
@@ -191,7 +191,7 @@ interface GetSizeLabelArgs {
  *
  * @return The rendered label.
  */
-function getSizeLabel( {
+function getSizeLabel({
 	axis,
 	height,
 	moveX = false,
@@ -199,15 +199,15 @@ function getSizeLabel( {
 	position = POSITIONS.bottom,
 	showPx = false,
 	width,
-}: GetSizeLabelArgs ): string | undefined {
-	if ( ! moveX && ! moveY ) return undefined;
+}: GetSizeLabelArgs): string | undefined {
+	if (!moveX && !moveY) return undefined;
 
 	/*
 	 * Corner position...
 	 * We want the label to appear like width x height.
 	 */
-	if ( position === POSITIONS.corner ) {
-		return `${ width } x ${ height }`;
+	if (position === POSITIONS.corner) {
+		return `${width} x ${height}`;
 	}
 
 	/*
@@ -220,23 +220,23 @@ function getSizeLabel( {
 	 */
 	const labelUnit = showPx ? ' px' : '';
 
-	if ( axis ) {
-		if ( axis === 'x' && moveX ) {
-			return `${ width }${ labelUnit }`;
+	if (axis) {
+		if (axis === 'x' && moveX) {
+			return `${width}${labelUnit}`;
 		}
-		if ( axis === 'y' && moveY ) {
-			return `${ height }${ labelUnit }`;
+		if (axis === 'y' && moveY) {
+			return `${height}${labelUnit}`;
 		}
 	}
 
-	if ( moveX && moveY ) {
-		return `${ width } x ${ height }`;
+	if (moveX && moveY) {
+		return `${width} x ${height}`;
 	}
-	if ( moveX ) {
-		return `${ width }${ labelUnit }`;
+	if (moveX) {
+		return `${width}${labelUnit}`;
 	}
-	if ( moveY ) {
-		return `${ height }${ labelUnit }`;
+	if (moveY) {
+		return `${height}${labelUnit}`;
 	}
 
 	return undefined;

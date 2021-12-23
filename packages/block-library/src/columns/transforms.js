@@ -13,31 +13,31 @@ const transforms = {
 		{
 			type: 'block',
 			isMultiBlock: true,
-			blocks: [ '*' ],
-			__experimentalConvert: ( blocks ) => {
-				const columnWidth = +( 100 / blocks.length ).toFixed( 2 );
+			blocks: ['*'],
+			__experimentalConvert: (blocks) => {
+				const columnWidth = +(100 / blocks.length).toFixed(2);
 				const innerBlocksTemplate = blocks.map(
-					( { name, attributes, innerBlocks } ) => [
+					({ name, attributes, innerBlocks }) => [
 						'core/column',
-						{ width: `${ columnWidth }%` },
-						[ [ name, { ...attributes }, innerBlocks ] ],
+						{ width: `${columnWidth}%` },
+						[[name, { ...attributes }, innerBlocks]],
 					]
 				);
 				return createBlock(
 					'core/columns',
 					{},
-					createBlocksFromInnerBlocksTemplate( innerBlocksTemplate )
+					createBlocksFromInnerBlocksTemplate(innerBlocksTemplate)
 				);
 			},
-			isMatch: ( { length: selectedBlocksLength } ) =>
+			isMatch: ({ length: selectedBlocksLength }) =>
 				selectedBlocksLength &&
 				selectedBlocksLength <= MAXIMUM_SELECTED_BLOCKS,
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/media-text' ],
+			blocks: ['core/media-text'],
 			priority: 1,
-			transform: ( attributes, innerBlocks ) => {
+			transform: (attributes, innerBlocks) => {
 				const {
 					align,
 					backgroundColor,
@@ -53,7 +53,7 @@ const transforms = {
 					verticalAlignment,
 				} = attributes;
 				let media;
-				if ( mediaType === 'image' || ! mediaType ) {
+				if (mediaType === 'image' || !mediaType) {
 					const imageAttrs = { id, alt, url, sizeSlug };
 					const linkAttrs = {
 						href: attributes.href,
@@ -62,19 +62,19 @@ const transforms = {
 						linkTarget: attributes.linkTarget,
 						rel: attributes.rel,
 					};
-					media = [ 'core/image', { ...imageAttrs, ...linkAttrs } ];
+					media = ['core/image', { ...imageAttrs, ...linkAttrs }];
 				} else {
-					media = [ 'core/video', { id, src: url } ];
+					media = ['core/video', { id, src: url }];
 				}
 				const innerBlocksTemplate = [
-					[ 'core/column', { width: `${ mediaWidth }%` }, [ media ] ],
+					['core/column', { width: `${mediaWidth}%` }, [media]],
 					[
 						'core/column',
-						{ width: `${ 100 - mediaWidth }%` },
+						{ width: `${100 - mediaWidth}%` },
 						innerBlocks,
 					],
 				];
-				if ( mediaPosition === 'right' ) {
+				if (mediaPosition === 'right') {
 					innerBlocksTemplate.reverse();
 				}
 				return createBlock(
@@ -86,7 +86,7 @@ const transforms = {
 						style,
 						verticalAlignment,
 					},
-					createBlocksFromInnerBlocksTemplate( innerBlocksTemplate )
+					createBlocksFromInnerBlocksTemplate(innerBlocksTemplate)
 				);
 			},
 		},

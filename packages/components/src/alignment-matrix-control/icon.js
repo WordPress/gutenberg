@@ -15,16 +15,16 @@ import {
 
 const BASE_SIZE = 24;
 
-export default function AlignmentMatrixControlIcon( {
+export default function AlignmentMatrixControlIcon({
 	className,
 	disablePointerEvents = true,
 	size = BASE_SIZE,
 	style = {},
 	value = 'center',
 	...props
-} ) {
-	const alignIndex = getAlignmentIndex( value );
-	const scale = ( size / BASE_SIZE ).toFixed( 2 );
+}) {
+	const alignIndex = getAlignmentIndex(value);
+	const scale = (size / BASE_SIZE).toFixed(2);
 
 	const classes = classnames(
 		'component-alignment-matrix-control-icon',
@@ -33,27 +33,27 @@ export default function AlignmentMatrixControlIcon( {
 
 	const styles = {
 		...style,
-		transform: `scale(${ scale })`,
+		transform: `scale(${scale})`,
 	};
 
 	return (
 		<Root
-			{ ...props }
-			className={ classes }
-			disablePointerEvents={ disablePointerEvents }
+			{...props}
+			className={classes}
+			disablePointerEvents={disablePointerEvents}
 			role="presentation"
-			size={ size }
-			style={ styles }
+			size={size}
+			style={styles}
 		>
-			{ ALIGNMENTS.map( ( align, index ) => {
+			{ALIGNMENTS.map((align, index) => {
 				const isActive = alignIndex === index;
 
 				return (
-					<Cell key={ align }>
-						<Point isActive={ isActive } />
+					<Cell key={align}>
+						<Point isActive={isActive} />
 					</Cell>
 				);
-			} ) }
+			})}
 		</Root>
 	);
 }

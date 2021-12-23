@@ -5,14 +5,14 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor tests for List block', () => {
-	it( 'should be able to add a new List block', async () => {
-		await editorPage.addNewBlock( blockNames.list );
+describe('Gutenberg Editor tests for List block', () => {
+	it('should be able to add a new List block', async () => {
+		await editorPage.addNewBlock(blockNames.list);
 		const listBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.list
 		);
 		// Click List block on Android to force EditText focus
-		if ( isAndroid() ) {
+		if (isAndroid()) {
 			await listBlockElement.click();
 		}
 
@@ -23,7 +23,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		);
 
 		// send an Enter
-		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
+		await editorPage.sendTextToListBlock(listBlockElement, '\n');
 
 		// Send the second list item text
 		await editorPage.sendTextToListBlock(
@@ -33,11 +33,11 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		// switch to html and verify html
 		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe( testData.listHtml.toLowerCase() );
-	} );
+		expect(html.toLowerCase()).toBe(testData.listHtml.toLowerCase());
+	});
 
 	// This test depends on being run immediately after 'should be able to add a new List block'
-	it( 'should update format to ordered list, using toolbar button', async () => {
+	it('should update format to ordered list, using toolbar button', async () => {
 		let listBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.list
 		);
@@ -50,14 +50,10 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		// switch to html and verify html
 		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe(
-			testData.listHtmlOrdered.toLowerCase()
-		);
+		expect(html.toLowerCase()).toBe(testData.listHtmlOrdered.toLowerCase());
 		// Remove list block to return editor to empty state
-		listBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.list
-		);
+		listBlockElement = await editorPage.getBlockAtPosition(blockNames.list);
 		await listBlockElement.click();
-		await editorPage.removeBlockAtPosition( blockNames.list );
-	} );
-} );
+		await editorPage.removeBlockAtPosition(blockNames.list);
+	});
+});

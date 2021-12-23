@@ -5,8 +5,8 @@
  *
  * @return {boolean} is remote path.
  */
-function isRemotePath( filePath ) {
-	return /^(?:https?:)?\/\//.test( filePath );
+function isRemotePath(filePath) {
+	return /^(?:https?:)?\/\//.test(filePath);
 }
 
 /**
@@ -16,8 +16,8 @@ function isRemotePath( filePath ) {
  *
  * @return {boolean} is absolute path.
  */
-function isAbsolutePath( filePath ) {
-	return /^\/(?!\/)/.test( filePath );
+function isAbsolutePath(filePath) {
+	return /^\/(?!\/)/.test(filePath);
 }
 
 /**
@@ -27,21 +27,18 @@ function isAbsolutePath( filePath ) {
  *
  * @return {boolean} is valid.
  */
-function isValidURL( meta ) {
+function isValidURL(meta) {
 	// ignore hashes or data uris
-	if (
-		meta.value.indexOf( 'data:' ) === 0 ||
-		meta.value.indexOf( '#' ) === 0
-	) {
+	if (meta.value.indexOf('data:') === 0 || meta.value.indexOf('#') === 0) {
 		return false;
 	}
 
-	if ( isAbsolutePath( meta.value ) ) {
+	if (isAbsolutePath(meta.value)) {
 		return false;
 	}
 
 	// do not handle the http/https urls if `includeRemote` is false
-	if ( isRemotePath( meta.value ) ) {
+	if (isRemotePath(meta.value)) {
 		return false;
 	}
 
@@ -56,8 +53,8 @@ function isValidURL( meta ) {
  *
  * @return {string} the full path to the file
  */
-function getResourcePath( str, baseURL ) {
-	return new URL( str, baseURL ).toString();
+function getResourcePath(str, baseURL) {
+	return new URL(str, baseURL).toString();
 }
 
 /**
@@ -67,18 +64,18 @@ function getResourcePath( str, baseURL ) {
  *
  * @return {Promise} the Promise.
  */
-function processURL( baseURL ) {
-	return ( meta ) => ( {
+function processURL(baseURL) {
+	return (meta) => ({
 		...meta,
 		newUrl:
 			'url(' +
 			meta.before +
 			meta.quote +
-			getResourcePath( meta.value, baseURL ) +
+			getResourcePath(meta.value, baseURL) +
 			meta.quote +
 			meta.after +
 			')',
-	} );
+	});
 }
 
 /**
@@ -88,21 +85,21 @@ function processURL( baseURL ) {
  *
  * @return {Array} the urls.
  */
-function getURLs( value ) {
+function getURLs(value) {
 	const reg = /url\((\s*)(['"]?)(.+?)\2(\s*)\)/g;
 	let match;
 	const URLs = [];
 
-	while ( ( match = reg.exec( value ) ) !== null ) {
+	while ((match = reg.exec(value)) !== null) {
 		const meta = {
-			source: match[ 0 ],
-			before: match[ 1 ],
-			quote: match[ 2 ],
-			value: match[ 3 ],
-			after: match[ 4 ],
+			source: match[0],
+			before: match[1],
+			quote: match[2],
+			value: match[3],
+			after: match[4],
 		};
-		if ( isValidURL( meta ) ) {
-			URLs.push( meta );
+		if (isValidURL(meta)) {
+			URLs.push(meta);
 		}
 	}
 	return URLs;
@@ -116,20 +113,20 @@ function getURLs( value ) {
  *
  * @return {string} the new value.
  */
-function replaceURLs( raw, URLs ) {
-	URLs.forEach( ( item ) => {
-		raw = raw.replace( item.source, item.newUrl );
-	} );
+function replaceURLs(raw, URLs) {
+	URLs.forEach((item) => {
+		raw = raw.replace(item.source, item.newUrl);
+	});
 
 	return raw;
 }
 
-const rewrite = ( rootURL ) => ( node ) => {
-	if ( node.type === 'declaration' ) {
-		const updatedURLs = getURLs( node.value ).map( processURL( rootURL ) );
+const rewrite = (rootURL) => (node) => {
+	if (node.type === 'declaration') {
+		const updatedURLs = getURLs(node.value).map(processURL(rootURL));
 		return {
 			...node,
-			value: replaceURLs( node.value, updatedURLs ),
+			value: replaceURLs(node.value, updatedURLs),
 		};
 	}
 

@@ -17,10 +17,10 @@ export default {
 };
 
 export const _default = () => {
-	const tipText = text( 'Text', 'An example tip' );
+	const tipText = text('Text', 'An example tip');
 	return (
 		<Tip>
-			<p>{ tipText }</p>
+			<p>{tipText}</p>
 		</Tip>
 	);
 };

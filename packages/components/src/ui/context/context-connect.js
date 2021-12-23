@@ -31,42 +31,42 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
  * @param {boolean}                                                         [options.memo=false]
  * @return {import('./wordpress-component').WordPressComponentFromProps<P>} The connected WordPressComponent
  */
-export function contextConnect( Component, namespace, options = {} ) {
+export function contextConnect(Component, namespace, options = {}) {
 	/* eslint-enable jsdoc/valid-types */
 	const { memo: memoProp = false } = options;
 
-	let WrappedComponent = forwardRef( Component );
-	if ( memoProp ) {
+	let WrappedComponent = forwardRef(Component);
+	if (memoProp) {
 		// @ts-ignore
-		WrappedComponent = memo( WrappedComponent );
+		WrappedComponent = memo(WrappedComponent);
 	}
 
-	if ( typeof namespace === 'undefined' ) {
-		warn( 'contextConnect: Please provide a namespace' );
+	if (typeof namespace === 'undefined') {
+		warn('contextConnect: Please provide a namespace');
 	}
 
 	// @ts-ignore internal property
-	let mergedNamespace = WrappedComponent[ CONNECT_STATIC_NAMESPACE ] || [
+	let mergedNamespace = WrappedComponent[CONNECT_STATIC_NAMESPACE] || [
 		namespace,
 	];
 
 	/**
 	 * Consolidate (merge) namespaces before attaching it to the WrappedComponent.
 	 */
-	if ( Array.isArray( namespace ) ) {
-		mergedNamespace = [ ...mergedNamespace, ...namespace ];
+	if (Array.isArray(namespace)) {
+		mergedNamespace = [...mergedNamespace, ...namespace];
 	}
-	if ( typeof namespace === 'string' ) {
-		mergedNamespace = [ ...mergedNamespace, namespace ];
+	if (typeof namespace === 'string') {
+		mergedNamespace = [...mergedNamespace, namespace];
 	}
 
 	WrappedComponent.displayName = namespace;
 
 	// @ts-ignore internal property
-	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = uniq( mergedNamespace );
+	WrappedComponent[CONNECT_STATIC_NAMESPACE] = uniq(mergedNamespace);
 
 	// @ts-ignore WordPressComponent property
-	WrappedComponent.selector = `.${ getStyledClassNameFromKey( namespace ) }`;
+	WrappedComponent.selector = `.${getStyledClassNameFromKey(namespace)}`;
 
 	// @ts-ignore
 	return WrappedComponent;
@@ -78,21 +78,21 @@ export function contextConnect( Component, namespace, options = {} ) {
  * @param {import('react').ReactChild | undefined | {}} Component The component to retrieve a namespace from.
  * @return {Array<string>} The connected namespaces.
  */
-export function getConnectNamespace( Component ) {
-	if ( ! Component ) return [];
+export function getConnectNamespace(Component) {
+	if (!Component) return [];
 
 	let namespaces = [];
 
 	// @ts-ignore internal property
-	if ( Component[ CONNECT_STATIC_NAMESPACE ] ) {
+	if (Component[CONNECT_STATIC_NAMESPACE]) {
 		// @ts-ignore internal property
-		namespaces = Component[ CONNECT_STATIC_NAMESPACE ];
+		namespaces = Component[CONNECT_STATIC_NAMESPACE];
 	}
 
 	// @ts-ignore
-	if ( Component.type && Component.type[ CONNECT_STATIC_NAMESPACE ] ) {
+	if (Component.type && Component.type[CONNECT_STATIC_NAMESPACE]) {
 		// @ts-ignore
-		namespaces = Component.type[ CONNECT_STATIC_NAMESPACE ];
+		namespaces = Component.type[CONNECT_STATIC_NAMESPACE];
 	}
 
 	return namespaces;
@@ -105,15 +105,15 @@ export function getConnectNamespace( Component ) {
  * @param {Array<string>|string}      match     The namespace to check.
  * @return {boolean} The result.
  */
-export function hasConnectNamespace( Component, match ) {
-	if ( ! Component ) return false;
+export function hasConnectNamespace(Component, match) {
+	if (!Component) return false;
 
-	if ( typeof match === 'string' ) {
-		return getConnectNamespace( Component ).includes( match );
+	if (typeof match === 'string') {
+		return getConnectNamespace(Component).includes(match);
 	}
-	if ( Array.isArray( match ) ) {
-		return match.some( ( result ) =>
-			getConnectNamespace( Component ).includes( result )
+	if (Array.isArray(match)) {
+		return match.some((result) =>
+			getConnectNamespace(Component).includes(result)
 		);
 	}
 

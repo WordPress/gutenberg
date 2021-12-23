@@ -30,11 +30,11 @@ export const TooltipWrapper = styled.div`
 `;
 
 export const Tooltip = styled.div`
-	background: ${ COLORS.ui.border };
+	background: ${COLORS.ui.border};
 	border-radius: 2px;
 	box-sizing: border-box;
 	font-size: 12px;
-	color: ${ COLORS.ui.textDark };
+	color: ${COLORS.ui.textDark};
 	padding: 4px 8px;
 	position: relative;
 `;
@@ -42,9 +42,9 @@ export const Tooltip = styled.div`
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
-export const LabelText = styled( Text )`
+export const LabelText = styled(Text)`
 	&&& {
-		color: ${ COLORS.ui.textDark };
+		color: ${COLORS.ui.textDark};
 		display: block;
 		font-size: 13px;
 		line-height: 1.4;

@@ -9,22 +9,22 @@ import {
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function ConvertToRegularBlocks( { clientId } ) {
-	const { getBlocks } = useSelect( blockEditorStore );
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+export default function ConvertToRegularBlocks({ clientId }) {
+	const { getBlocks } = useSelect(blockEditorStore);
+	const { replaceBlocks } = useDispatch(blockEditorStore);
 
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
+			{({ onClose }) => (
 				<MenuItem
-					onClick={ () => {
-						replaceBlocks( clientId, getBlocks( clientId ) );
+					onClick={() => {
+						replaceBlocks(clientId, getBlocks(clientId));
 						onClose();
-					} }
+					}}
 				>
-					{ __( 'Detach blocks from template part' ) }
+					{__('Detach blocks from template part')}
 				</MenuItem>
-			) }
+			)}
 		</BlockSettingsMenuControls>
 	);
 }

@@ -11,25 +11,25 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor paste tests', () => {
+describe('Gutenberg Editor paste tests', () => {
 	// skip iOS for now
-	if ( ! isAndroid() ) {
-		it( 'skips the tests on any platform other than Android', async () => {
-			expect( true ).toBe( true );
-		} );
+	if (!isAndroid()) {
+		it('skips the tests on any platform other than Android', async () => {
+			expect(true).toBe(true);
+		});
 		return;
 	}
 
-	beforeAll( async () => {
-		await editorPage.driver.setClipboard( '', 'plaintext' );
-	} );
+	beforeAll(async () => {
+		await editorPage.driver.setClipboard('', 'plaintext');
+	});
 
-	it( 'copies plain text from one paragraph block and pastes in another', async () => {
-		await editorPage.addNewBlock( blockNames.paragraph );
+	it('copies plain text from one paragraph block and pastes in another', async () => {
+		await editorPage.addNewBlock(blockNames.paragraph);
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
+		if (isAndroid()) {
 			await paragraphBlockElement.click();
 		}
 
@@ -42,13 +42,13 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// copy content to clipboard
-		await longPressMiddleOfElement( editorPage.driver, textViewElement );
-		await tapSelectAllAboveElement( editorPage.driver, textViewElement );
-		await tapCopyAboveElement( editorPage.driver, textViewElement );
+		await longPressMiddleOfElement(editorPage.driver, textViewElement);
+		await tapSelectAllAboveElement(editorPage.driver, textViewElement);
+		await tapCopyAboveElement(editorPage.driver, textViewElement);
 
 		// create another paragraph block
-		await editorPage.addNewBlock( blockNames.paragraph );
-		if ( isAndroid() ) {
+		await editorPage.addNewBlock(blockNames.paragraph);
+		if (isAndroid()) {
 			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
 			await editorPage.dismissAndroidClipboardSmartSuggestion();
 		}
@@ -56,7 +56,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 			blockNames.paragraph,
 			2
 		);
-		if ( isAndroid() ) {
+		if (isAndroid()) {
 			await paragraphBlockElement2.click();
 		}
 
@@ -65,23 +65,23 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// paste into second paragraph block
-		await longPressMiddleOfElement( editorPage.driver, textViewElement2 );
-		await tapPasteAboveElement( editorPage.driver, textViewElement2 );
+		await longPressMiddleOfElement(editorPage.driver, textViewElement2);
+		await tapPasteAboveElement(editorPage.driver, textViewElement2);
 
-		const text = await editorPage.getTextForParagraphBlockAtPosition( 2 );
-		expect( text ).toBe( testData.pastePlainText );
+		const text = await editorPage.getTextForParagraphBlockAtPosition(2);
+		expect(text).toBe(testData.pastePlainText);
 
-		await editorPage.removeBlockAtPosition( blockNames.paragraph, 2 );
-		await editorPage.removeBlockAtPosition( blockNames.paragraph, 1 );
-	} );
+		await editorPage.removeBlockAtPosition(blockNames.paragraph, 2);
+		await editorPage.removeBlockAtPosition(blockNames.paragraph, 1);
+	});
 
-	it( 'copies styled text from one paragraph block and pastes in another', async () => {
+	it('copies styled text from one paragraph block and pastes in another', async () => {
 		// create paragraph block with styled text by editing html
-		await editorPage.setHtmlContent( testData.pasteHtmlText );
+		await editorPage.setHtmlContent(testData.pasteHtmlText);
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
+		if (isAndroid()) {
 			await paragraphBlockElement.click();
 		}
 
@@ -90,13 +90,13 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// copy content to clipboard
-		await longPressMiddleOfElement( editorPage.driver, textViewElement );
-		await tapSelectAllAboveElement( editorPage.driver, textViewElement );
-		await tapCopyAboveElement( editorPage.driver, textViewElement );
+		await longPressMiddleOfElement(editorPage.driver, textViewElement);
+		await tapSelectAllAboveElement(editorPage.driver, textViewElement);
+		await tapCopyAboveElement(editorPage.driver, textViewElement);
 
 		// create another paragraph block
-		await editorPage.addNewBlock( blockNames.paragraph );
-		if ( isAndroid() ) {
+		await editorPage.addNewBlock(blockNames.paragraph);
+		if (isAndroid()) {
 			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
 			await editorPage.dismissAndroidClipboardSmartSuggestion();
 		}
@@ -104,7 +104,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 			blockNames.paragraph,
 			2
 		);
-		if ( isAndroid() ) {
+		if (isAndroid()) {
 			await paragraphBlockElement2.click();
 		}
 
@@ -113,14 +113,14 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// paste into second paragraph block
-		await longPressMiddleOfElement( editorPage.driver, textViewElement2 );
-		await tapPasteAboveElement( editorPage.driver, textViewElement2 );
+		await longPressMiddleOfElement(editorPage.driver, textViewElement2);
+		await tapPasteAboveElement(editorPage.driver, textViewElement2);
 
 		// check styled text by verifying html contents
 		const html = await editorPage.getHtmlContent();
 
-		expect( html.toLowerCase() ).toBe(
+		expect(html.toLowerCase()).toBe(
 			testData.pasteHtmlTextResult.toLowerCase()
 		);
-	} );
-} );
+	});
+});

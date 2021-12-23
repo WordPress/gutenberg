@@ -23,12 +23,12 @@ import { useCx, rtl } from '../../utils';
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
  * @return {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
  */
-function useDeprecatedProps( { isReversed, ...otherProps } ) {
-	if ( typeof isReversed !== 'undefined' ) {
-		deprecated( 'Flex isReversed', {
+function useDeprecatedProps({ isReversed, ...otherProps }) {
+	if (typeof isReversed !== 'undefined') {
+		deprecated('Flex isReversed', {
 			alternative: 'Flex direction="row-reverse" or "column-reverse"',
 			since: '5.9',
-		} );
+		});
 		return {
 			...otherProps,
 			direction: isReversed ? 'row-reverse' : 'row',
@@ -41,7 +41,7 @@ function useDeprecatedProps( { isReversed, ...otherProps } ) {
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
  */
-export function useFlex( props ) {
+export function useFlex(props) {
 	const {
 		align = 'center',
 		className,
@@ -51,32 +51,32 @@ export function useFlex( props ) {
 		justify = 'space-between',
 		wrap = false,
 		...otherProps
-	} = useContextSystem( useDeprecatedProps( props ), 'Flex' );
+	} = useContextSystem(useDeprecatedProps(props), 'Flex');
 
-	const directionAsArray = Array.isArray( directionProp )
+	const directionAsArray = Array.isArray(directionProp)
 		? directionProp
-		: [ directionProp ];
-	const direction = useResponsiveValue( directionAsArray );
+		: [directionProp];
+	const direction = useResponsiveValue(directionAsArray);
 
 	const isColumn =
-		typeof direction === 'string' && !! direction.includes( 'column' );
+		typeof direction === 'string' && !!direction.includes('column');
 	const isReverse =
-		typeof direction === 'string' && direction.includes( 'reverse' );
+		typeof direction === 'string' && direction.includes('reverse');
 
 	const cx = useCx();
 
-	const classes = useMemo( () => {
+	const classes = useMemo(() => {
 		const sx = {};
 
-		sx.Base = css( {
+		sx.Base = css({
 			alignItems: isColumn ? 'normal' : align,
 			flexDirection: direction,
 			flexWrap: wrap ? 'wrap' : undefined,
 			justifyContent: justify,
 			height: isColumn && expanded ? '100%' : undefined,
-			width: ! isColumn && expanded ? '100%' : undefined,
-			marginBottom: wrap ? `calc(${ space( gap ) } * -1)` : undefined,
-		} );
+			width: !isColumn && expanded ? '100%' : undefined,
+			marginBottom: wrap ? `calc(${space(gap)} * -1)` : undefined,
+		});
 
 		/**
 		 * Workaround to optimize DOM rendering.
@@ -86,33 +86,32 @@ export function useFlex( props ) {
 		 * Far less DOM less. However, UI rendering is not as reliable.
 		 */
 		sx.Items = css`
-			> * + *:not( marquee ) {
-				margin-top: ${ isColumn ? space( gap ) : undefined };
-				${ rtl( {
+			> * + *:not(marquee) {
+				margin-top: ${isColumn ? space(gap) : undefined};
+				${rtl({
 					marginLeft:
-						! isColumn && ! isReverse ? space( gap ) : undefined,
+						!isColumn && !isReverse ? space(gap) : undefined,
 					marginRight:
-						! isColumn && isReverse ? space( gap ) : undefined,
-				} )() }
+						!isColumn && isReverse ? space(gap) : undefined,
+				})()}
 			}
 		`;
 
 		sx.WrapItems = css`
-			> *:not( marquee ) {
-				margin-bottom: ${ space( gap ) };
-				${ rtl( {
-					marginLeft:
-						! isColumn && isReverse ? space( gap ) : undefined,
+			> *:not(marquee) {
+				margin-bottom: ${space(gap)};
+				${rtl({
+					marginLeft: !isColumn && isReverse ? space(gap) : undefined,
 					marginRight:
-						! isColumn && ! isReverse ? space( gap ) : undefined,
-				} )() }
+						!isColumn && !isReverse ? space(gap) : undefined,
+				})()}
 			}
 
-			> *:last-child:not( marquee ) {
-				${ rtl( {
-					marginLeft: ! isColumn && isReverse ? 0 : undefined,
-					marginRight: ! isColumn && ! isReverse ? 0 : undefined,
-				} )() }
+			> *:last-child:not(marquee) {
+				${rtl({
+					marginLeft: !isColumn && isReverse ? 0 : undefined,
+					marginRight: !isColumn && !isReverse ? 0 : undefined,
+				})()}
 			}
 		`;
 
@@ -134,7 +133,7 @@ export function useFlex( props ) {
 		justify,
 		wrap,
 		rtl.watch(),
-	] );
+	]);
 
 	return { ...otherProps, className: classes, isColumn };
 }

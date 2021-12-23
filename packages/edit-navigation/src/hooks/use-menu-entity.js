@@ -8,26 +8,23 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { MENU_KIND, MENU_POST_TYPE } from '../constants';
 
-export default function useMenuEntity( menuId ) {
-	const { editEntityRecord } = useDispatch( coreStore );
+export default function useMenuEntity(menuId) {
+	const { editEntityRecord } = useDispatch(coreStore);
 
-	const menuEntityData = [ MENU_KIND, MENU_POST_TYPE, menuId ];
+	const menuEntityData = [MENU_KIND, MENU_POST_TYPE, menuId];
 	const { editedMenu, hasLoadedEditedMenu } = useSelect(
-		( select ) => {
+		(select) => {
 			return {
 				editedMenu:
 					menuId &&
-					select( coreStore ).getEditedEntityRecord(
-						...menuEntityData
-					),
-				hasLoadedEditedMenu: select(
-					coreStore
-				).hasFinishedResolution( 'getEditedEntityRecord', [
-					...menuEntityData,
-				] ),
+					select(coreStore).getEditedEntityRecord(...menuEntityData),
+				hasLoadedEditedMenu: select(coreStore).hasFinishedResolution(
+					'getEditedEntityRecord',
+					[...menuEntityData]
+				),
 			};
 		},
-		[ menuId ]
+		[menuId]
 	);
 
 	return {

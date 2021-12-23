@@ -13,10 +13,10 @@ import inputFieldHasUncollapsedSelection from './input-field-has-uncollapsed-sel
  *
  * @return {boolean} Whether there is any sort of "selection" in the document.
  */
-export default function documentHasUncollapsedSelection( doc ) {
+export default function documentHasUncollapsedSelection(doc) {
 	return (
-		documentHasTextSelection( doc ) ||
-		( !! doc.activeElement &&
-			inputFieldHasUncollapsedSelection( doc.activeElement ) )
+		documentHasTextSelection(doc) ||
+		(!!doc.activeElement &&
+			inputFieldHasUncollapsedSelection(doc.activeElement))
 	);
 }

@@ -22,8 +22,8 @@ const ANIMATION_FRAME_PERIOD = 16;
  *
  * @return {Function} Higher-order component factory.
  */
-export default function withFilters( hookName ) {
-	return createHigherOrderComponent( ( OriginalComponent ) => {
+export default function withFilters(hookName) {
+	return createHigherOrderComponent((OriginalComponent) => {
 		const namespace = 'core/with-filters/' + hookName;
 
 		/**
@@ -40,26 +40,26 @@ export default function withFilters( hookName ) {
 		 * assigned. Subsequent calls are effectively a noop.
 		 */
 		function ensureFilteredComponent() {
-			if ( FilteredComponent === undefined ) {
-				FilteredComponent = applyFilters( hookName, OriginalComponent );
+			if (FilteredComponent === undefined) {
+				FilteredComponent = applyFilters(hookName, OriginalComponent);
 			}
 		}
 
 		class FilteredComponentRenderer extends Component {
 			constructor() {
-				super( ...arguments );
+				super(...arguments);
 
 				ensureFilteredComponent();
 			}
 
 			componentDidMount() {
-				FilteredComponentRenderer.instances.push( this );
+				FilteredComponentRenderer.instances.push(this);
 
 				// If there were previously no mounted instances for components
 				// filtered on this hook, add the hook handler.
-				if ( FilteredComponentRenderer.instances.length === 1 ) {
-					addAction( 'hookRemoved', namespace, onHooksUpdated );
-					addAction( 'hookAdded', namespace, onHooksUpdated );
+				if (FilteredComponentRenderer.instances.length === 1) {
+					addAction('hookRemoved', namespace, onHooksUpdated);
+					addAction('hookAdded', namespace, onHooksUpdated);
 				}
 			}
 
@@ -71,14 +71,14 @@ export default function withFilters( hookName ) {
 
 				// If this was the last of the mounted components filtered on
 				// this hook, remove the hook handler.
-				if ( FilteredComponentRenderer.instances.length === 0 ) {
-					removeAction( 'hookRemoved', namespace );
-					removeAction( 'hookAdded', namespace );
+				if (FilteredComponentRenderer.instances.length === 0) {
+					removeAction('hookRemoved', namespace);
+					removeAction('hookAdded', namespace);
 				}
 			}
 
 			render() {
-				return <FilteredComponent { ...this.props } />;
+				return <FilteredComponent {...this.props} />;
 			}
 		}
 
@@ -88,16 +88,16 @@ export default function withFilters( hookName ) {
 		 * Updates the FilteredComponent definition, forcing a render for each
 		 * mounted instance. This occurs a maximum of once per animation frame.
 		 */
-		const throttledForceUpdate = debounce( () => {
+		const throttledForceUpdate = debounce(() => {
 			// Recreate the filtered component, only after delay so that it's
 			// computed once, even if many filters added.
-			FilteredComponent = applyFilters( hookName, OriginalComponent );
+			FilteredComponent = applyFilters(hookName, OriginalComponent);
 
 			// Force each instance to render.
-			FilteredComponentRenderer.instances.forEach( ( instance ) => {
+			FilteredComponentRenderer.instances.forEach((instance) => {
 				instance.forceUpdate();
-			} );
-		}, ANIMATION_FRAME_PERIOD );
+			});
+		}, ANIMATION_FRAME_PERIOD);
 
 		/**
 		 * When a filter is added or removed for the matching hook name, each
@@ -106,12 +106,12 @@ export default function withFilters( hookName ) {
 		 *
 		 * @param {string} updatedHookName Name of the hook that was updated.
 		 */
-		function onHooksUpdated( updatedHookName ) {
-			if ( updatedHookName === hookName ) {
+		function onHooksUpdated(updatedHookName) {
+			if (updatedHookName === hookName) {
 				throttledForceUpdate();
 			}
 		}
 
 		return FilteredComponentRenderer;
-	}, 'withFilters' );
+	}, 'withFilters');
 }

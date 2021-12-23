@@ -20,52 +20,52 @@ import { fractionToPercentage } from './utils';
 const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
 
-export default function FocalPointPickerControls( {
+export default function FocalPointPickerControls({
 	onChange = noop,
 	percentages = {
 		x: 0.5,
 		y: 0.5,
 	},
-} ) {
-	const valueX = fractionToPercentage( percentages.x );
-	const valueY = fractionToPercentage( percentages.y );
+}) {
+	const valueX = fractionToPercentage(percentages.x);
+	const valueY = fractionToPercentage(percentages.y);
 
-	const handleChange = ( value, axis ) => {
-		const num = parseInt( value, 10 );
+	const handleChange = (value, axis) => {
+		const num = parseInt(value, 10);
 
-		if ( ! isNaN( num ) ) {
-			onChange( { ...percentages, [ axis ]: num / 100 } );
+		if (!isNaN(num)) {
+			onChange({ ...percentages, [axis]: num / 100 });
 		}
 	};
 
 	return (
 		<ControlWrapper className="focal-point-picker__controls">
 			<UnitControl
-				label={ __( 'Left' ) }
-				value={ valueX }
-				onChange={ ( next ) => handleChange( next, 'x' ) }
+				label={__('Left')}
+				value={valueX}
+				onChange={(next) => handleChange(next, 'x')}
 				dragDirection="e"
 			/>
 			<UnitControl
-				label={ __( 'Top' ) }
-				value={ valueY }
-				onChange={ ( next ) => handleChange( next, 'y' ) }
+				label={__('Top')}
+				value={valueY}
+				onChange={(next) => handleChange(next, 'y')}
 				dragDirection="s"
 			/>
 		</ControlWrapper>
 	);
 }
 
-function UnitControl( props ) {
+function UnitControl(props) {
 	return (
 		<BaseUnitControl
 			className="focal-point-picker__controls-position-unit-control"
 			labelPosition="top"
-			max={ TEXTCONTROL_MAX }
-			min={ TEXTCONTROL_MIN }
+			max={TEXTCONTROL_MAX}
+			min={TEXTCONTROL_MIN}
 			unit="%"
-			units={ [ { value: '%', label: '%' } ] }
-			{ ...props }
+			units={[{ value: '%', label: '%' }]}
+			{...props}
 		/>
 	);
 }

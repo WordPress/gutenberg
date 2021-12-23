@@ -29,42 +29,32 @@ const REGEXP_NEWLINES = /[\r\n]+/g;
 
 export default function PostTitle() {
 	const ref = useRef();
-	const [ isSelected, setIsSelected ] = useState( false );
-	const { editPost } = useDispatch( editorStore );
-	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
-		insertBlocks,
-	} = useDispatch( blockEditorStore );
-	const {
-		isCleanNewPost,
-		title,
-		placeholder,
-		isFocusMode,
-		hasFixedToolbar,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			isCleanNewPost: _isCleanNewPost,
-		} = select( editorStore );
-		const { getSettings } = select( blockEditorStore );
-		const {
-			titlePlaceholder,
-			focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		} = getSettings();
+	const [isSelected, setIsSelected] = useState(false);
+	const { editPost } = useDispatch(editorStore);
+	const { insertDefaultBlock, clearSelectedBlock, insertBlocks } =
+		useDispatch(blockEditorStore);
+	const { isCleanNewPost, title, placeholder, isFocusMode, hasFixedToolbar } =
+		useSelect((select) => {
+			const { getEditedPostAttribute, isCleanNewPost: _isCleanNewPost } =
+				select(editorStore);
+			const { getSettings } = select(blockEditorStore);
+			const {
+				titlePlaceholder,
+				focusMode,
+				hasFixedToolbar: _hasFixedToolbar,
+			} = getSettings();
 
-		return {
-			isCleanNewPost: _isCleanNewPost(),
-			title: getEditedPostAttribute( 'title' ),
-			placeholder: titlePlaceholder,
-			isFocusMode: focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		};
-	}, [] );
+			return {
+				isCleanNewPost: _isCleanNewPost(),
+				title: getEditedPostAttribute('title'),
+				placeholder: titlePlaceholder,
+				isFocusMode: focusMode,
+				hasFixedToolbar: _hasFixedToolbar,
+			};
+		}, []);
 
-	useEffect( () => {
-		if ( ! ref.current ) {
+	useEffect(() => {
+		if (!ref.current) {
 			return;
 		}
 
@@ -75,47 +65,47 @@ export default function PostTitle() {
 		// only happen for a new post, which means we focus the title on new
 		// post so the author can start typing right away, without needing to
 		// click anything.
-		if ( isCleanNewPost && ( ! activeElement || body === activeElement ) ) {
+		if (isCleanNewPost && (!activeElement || body === activeElement)) {
 			ref.current.focus();
 		}
-	}, [ isCleanNewPost ] );
+	}, [isCleanNewPost]);
 
 	function onEnterPress() {
-		insertDefaultBlock( undefined, undefined, 0 );
+		insertDefaultBlock(undefined, undefined, 0);
 	}
 
-	function onInsertBlockAfter( blocks ) {
-		insertBlocks( blocks, 0 );
+	function onInsertBlockAfter(blocks) {
+		insertBlocks(blocks, 0);
 	}
 
-	function onUpdate( newTitle ) {
-		editPost( { title: newTitle } );
+	function onUpdate(newTitle) {
+		editPost({ title: newTitle });
 	}
 
-	const [ selection, setSelection ] = useState( {} );
+	const [selection, setSelection] = useState({});
 
 	function onSelect() {
-		setIsSelected( true );
+		setIsSelected(true);
 		clearSelectedBlock();
 	}
 
 	function onUnselect() {
-		setIsSelected( false );
-		setSelection( {} );
+		setIsSelected(false);
+		setSelection({});
 	}
 
-	function onChange( value ) {
-		onUpdate( value.replace( REGEXP_NEWLINES, ' ' ) );
+	function onChange(value) {
+		onUpdate(value.replace(REGEXP_NEWLINES, ' '));
 	}
 
-	function onKeyDown( event ) {
-		if ( event.keyCode === ENTER ) {
+	function onKeyDown(event) {
+		if (event.keyCode === ENTER) {
 			event.preventDefault();
 			onEnterPress();
 		}
 	}
 
-	function onPaste( event ) {
+	function onPaste(event) {
 		const clipboardData = event.clipboardData;
 
 		let plainText = '';
@@ -125,12 +115,12 @@ export default function PostTitle() {
 		// otherwise throw an invalid argument error, so we try the standard
 		// arguments first, then fallback to `Text` if they fail.
 		try {
-			plainText = clipboardData.getData( 'text/plain' );
-			html = clipboardData.getData( 'text/html' );
-		} catch ( error1 ) {
+			plainText = clipboardData.getData('text/plain');
+			html = clipboardData.getData('text/html');
+		} catch (error1) {
 			try {
-				html = clipboardData.getData( 'Text' );
-			} catch ( error2 ) {
+				html = clipboardData.getData('Text');
+			} catch (error2) {
 				// Some browsers like UC Browser paste plain text by default and
 				// don't support clipboardData at all, so allow default
 				// behaviour.
@@ -139,28 +129,28 @@ export default function PostTitle() {
 		}
 
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
+		window.console.log('Received HTML:\n\n', html);
+		window.console.log('Received plain text:\n\n', plainText);
 
-		const content = pasteHandler( {
+		const content = pasteHandler({
 			HTML: html,
 			plainText,
-		} );
+		});
 
-		if ( typeof content !== 'string' && content.length ) {
+		if (typeof content !== 'string' && content.length) {
 			event.preventDefault();
 
-			const [ firstBlock ] = content;
+			const [firstBlock] = content;
 
 			if (
-				! title &&
-				( firstBlock.name === 'core/heading' ||
-					firstBlock.name === 'core/paragraph' )
+				!title &&
+				(firstBlock.name === 'core/heading' ||
+					firstBlock.name === 'core/paragraph')
 			) {
-				onUpdate( firstBlock.attributes.content );
-				onInsertBlockAfter( content.slice( 1 ) );
+				onUpdate(firstBlock.attributes.content);
+				onInsertBlockAfter(content.slice(1));
 			} else {
-				onInsertBlockAfter( content );
+				onInsertBlockAfter(content);
 			}
 		}
 	}
@@ -175,45 +165,44 @@ export default function PostTitle() {
 			'has-fixed-toolbar': hasFixedToolbar,
 		}
 	);
-	const decodedPlaceholder =
-		decodeEntities( placeholder ) || __( 'Add title' );
-	const { ref: richTextRef } = useRichText( {
+	const decodedPlaceholder = decodeEntities(placeholder) || __('Add title');
+	const { ref: richTextRef } = useRichText({
 		value: title,
 		onChange,
 		placeholder: decodedPlaceholder,
 		selectionStart: selection.start,
 		selectionEnd: selection.end,
-		onSelectionChange( newStart, newEnd ) {
-			setSelection( ( sel ) => {
+		onSelectionChange(newStart, newEnd) {
+			setSelection((sel) => {
 				const { start, end } = sel;
-				if ( start === newStart && end === newEnd ) {
+				if (start === newStart && end === newEnd) {
 					return sel;
 				}
 				return {
 					start: newStart,
 					end: newEnd,
 				};
-			} );
+			});
 		},
 		__unstableDisableFormats: true,
 		preserveWhiteSpace: true,
-	} );
+	});
 
 	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 	return (
 		<PostTypeSupportCheck supportKeys="title">
 			<h1
-				ref={ useMergeRefs( [ richTextRef, ref ] ) }
+				ref={useMergeRefs([richTextRef, ref])}
 				contentEditable
-				className={ className }
-				aria-label={ decodedPlaceholder }
+				className={className}
+				aria-label={decodedPlaceholder}
 				role="textbox"
 				aria-multiline="true"
-				onFocus={ onSelect }
-				onBlur={ onUnselect }
-				onKeyDown={ onKeyDown }
-				onKeyPress={ onUnselect }
-				onPaste={ onPaste }
+				onFocus={onSelect}
+				onBlur={onUnselect}
+				onKeyDown={onKeyDown}
+				onKeyPress={onUnselect}
+				onPaste={onPaste}
 			/>
 		</PostTypeSupportCheck>
 	);

@@ -27,4 +27,4 @@ export const settings = {
 
 // Importing this file includes side effects and is whitelisted
 // in block-library/package.json under `sideEffects`.
-addFilter( 'editor.BlockEdit', 'core/query', queryInspectorControls );
+addFilter('editor.BlockEdit', 'core/query', queryInspectorControls);

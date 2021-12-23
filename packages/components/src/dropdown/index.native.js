@@ -5,10 +5,10 @@ import { Component } from '@wordpress/element';
 
 class Dropdown extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
-		this.toggle = this.toggle.bind( this );
-		this.close = this.close.bind( this );
+		this.toggle = this.toggle.bind(this);
+		this.close = this.close.bind(this);
 
 		this.state = {
 			isOpen: false,
@@ -18,27 +18,27 @@ class Dropdown extends Component {
 	componentWillUnmount() {
 		const { isOpen } = this.state;
 		const { onToggle } = this.props;
-		if ( isOpen && onToggle ) {
-			onToggle( false );
+		if (isOpen && onToggle) {
+			onToggle(false);
 		}
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
+	componentDidUpdate(prevProps, prevState) {
 		const { isOpen } = this.state;
 		const { onToggle } = this.props;
-		if ( prevState.isOpen !== isOpen && onToggle ) {
-			onToggle( isOpen );
+		if (prevState.isOpen !== isOpen && onToggle) {
+			onToggle(isOpen);
 		}
 	}
 
 	toggle() {
-		this.setState( ( state ) => ( {
-			isOpen: ! state.isOpen,
-		} ) );
+		this.setState((state) => ({
+			isOpen: !state.isOpen,
+		}));
 	}
 
 	close() {
-		this.setState( { isOpen: false } );
+		this.setState({ isOpen: false });
 	}
 
 	render() {
@@ -49,8 +49,8 @@ class Dropdown extends Component {
 
 		return (
 			<>
-				{ renderToggle( args ) }
-				{ isOpen && renderContent( args ) }
+				{renderToggle(args)}
+				{isOpen && renderContent(args)}
 			</>
 		);
 	}

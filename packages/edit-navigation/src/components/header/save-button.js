@@ -11,30 +11,30 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editNavigationStore } from '../../store';
 
-export default function SaveButton( { navigationPost } ) {
-	const { isDirty } = useSelect( ( select ) => {
-		const { __experimentalGetDirtyEntityRecords } = select( coreStore );
+export default function SaveButton({ navigationPost }) {
+	const { isDirty } = useSelect((select) => {
+		const { __experimentalGetDirtyEntityRecords } = select(coreStore);
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 
 		return {
 			isDirty: dirtyEntityRecords.length > 0,
 		};
-	}, [] );
+	}, []);
 
-	const { saveNavigationPost } = useDispatch( editNavigationStore );
+	const { saveNavigationPost } = useDispatch(editNavigationStore);
 
-	const disabled = ! isDirty || ! navigationPost;
+	const disabled = !isDirty || !navigationPost;
 
 	return (
 		<Button
 			className="edit-navigation-toolbar__save-button"
 			variant="primary"
-			onClick={ () => {
-				saveNavigationPost( navigationPost );
-			} }
-			disabled={ disabled }
+			onClick={() => {
+				saveNavigationPost(navigationPost);
+			}}
+			disabled={disabled}
 		>
-			{ __( 'Save' ) }
+			{__('Save')}
 		</Button>
 	);
 }

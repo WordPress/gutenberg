@@ -8,4 +8,4 @@ import { isBlobURL } from '@wordpress/blob';
  */
 import _ from 'lodash';
 
-_.isEmpty( isBlobURL( '' ) );
+_.isEmpty(isBlobURL(''));

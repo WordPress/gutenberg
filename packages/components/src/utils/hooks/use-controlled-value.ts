@@ -3,10 +3,10 @@
  */
 import { useState } from '@wordpress/element';
 
-type Props< T > = {
+type Props<T> = {
 	defaultValue?: T;
 	value?: T;
-	onChange?: ( value: T ) => void;
+	onChange?: (value: T) => void;
 };
 
 /**
@@ -18,27 +18,27 @@ type Props< T > = {
  * @param  props.onChange
  * @return The controlled value and the value setter.
  */
-export function useControlledValue< T >( {
+export function useControlledValue<T>({
 	defaultValue,
 	onChange,
 	value: valueProp,
-}: Props< T > ): [ T | undefined, ( value: T ) => void ] {
+}: Props<T>): [T | undefined, (value: T) => void] {
 	const hasValue = typeof valueProp !== 'undefined';
 	const initialValue = hasValue ? valueProp : defaultValue;
-	const [ state, setState ] = useState( initialValue );
+	const [state, setState] = useState(initialValue);
 	const value = hasValue ? valueProp : state;
 
-	let setValue: ( nextValue: T ) => void;
-	if ( hasValue && typeof onChange === 'function' ) {
+	let setValue: (nextValue: T) => void;
+	if (hasValue && typeof onChange === 'function') {
 		setValue = onChange;
-	} else if ( ! hasValue && typeof onChange === 'function' ) {
-		setValue = ( nextValue ) => {
-			onChange( nextValue );
-			setState( nextValue );
+	} else if (!hasValue && typeof onChange === 'function') {
+		setValue = (nextValue) => {
+			onChange(nextValue);
+			setState(nextValue);
 		};
 	} else {
 		setValue = setState;
 	}
 
-	return [ value, setValue ];
+	return [value, setValue];
 }

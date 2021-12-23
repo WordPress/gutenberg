@@ -10,9 +10,9 @@ import moment from 'moment';
  * @param {?string} date Date representing the currently selected date or null to signify no selection.
  * @return {?moment.Moment} Moment object for selected date or null.
  */
-export const getMomentDate = ( date ) => {
-	if ( null === date ) {
+export const getMomentDate = (date) => {
+	if (null === date) {
 		return null;
 	}
-	return date ? moment( date ) : moment();
+	return date ? moment(date) : moment();
 };

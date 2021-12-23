@@ -17,48 +17,48 @@ const encodedNewLine = '%0A';
 const lineAndColumnInStackTrace = /^.*?:([0-9]+):([0-9]+).*$/;
 
 class GithubActionsReporter {
-	async onRunComplete( _contexts, _aggregatedResults ) {
-		if ( ! process.env.GITHUB_ACTIONS ) {
+	async onRunComplete(_contexts, _aggregatedResults) {
+		if (!process.env.GITHUB_ACTIONS) {
 			return;
 		}
 
-		if ( ! _aggregatedResults ) {
+		if (!_aggregatedResults) {
 			return;
 		}
-		const messages = getMessages( _aggregatedResults.testResults );
+		const messages = getMessages(_aggregatedResults.testResults);
 
-		for ( const message of messages ) {
+		for (const message of messages) {
 			// eslint-disable-next-line no-console
-			console.log( message );
+			console.log(message);
 		}
 	}
 }
 
-function getMessages( results ) {
-	if ( ! results ) return [];
+function getMessages(results) {
+	if (!results) return [];
 
 	return results.reduce(
-		flatMap( ( { testFilePath, testResults } ) =>
+		flatMap(({ testFilePath, testResults }) =>
 			testResults
-				.filter( ( r ) => r.status === 'failed' )
+				.filter((r) => r.status === 'failed')
 				.reduce(
-					flatMap( ( r ) => r.failureMessages ),
+					flatMap((r) => r.failureMessages),
 					[]
 				)
-				.map( ( m ) => m.replace( newLine, encodedNewLine ) )
-				.map( ( m ) => lineAndColumnInStackTrace.exec( m ) )
-				.filter( ( m ) => m !== null )
+				.map((m) => m.replace(newLine, encodedNewLine))
+				.map((m) => lineAndColumnInStackTrace.exec(m))
+				.filter((m) => m !== null)
 				.map(
-					( [ message, line, col ] ) =>
-						`::error file=${ testFilePath },line=${ line },col=${ col }::${ message }`
+					([message, line, col]) =>
+						`::error file=${testFilePath},line=${line},col=${col}::${message}`
 				)
 		),
 		[]
 	);
 }
 
-function flatMap( fn ) {
-	return ( out, entry ) => out.concat( ...fn( entry ) );
+function flatMap(fn) {
+	return (out, entry) => out.concat(...fn(entry));
 }
 
 module.exports = GithubActionsReporter;

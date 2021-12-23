@@ -13,13 +13,13 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const BackgroundView = ( { children } ) => {
+const BackgroundView = ({ children }) => {
 	const backgroundStyles = usePreferredColorSchemeStyle(
-		styles[ 'components-autocomplete__background' ],
-		styles[ 'components-autocomplete__background-dark' ]
+		styles['components-autocomplete__background'],
+		styles['components-autocomplete__background-dark']
 	);
 
-	return <View style={ backgroundStyles }>{ children }</View>;
+	return <View style={backgroundStyles}>{children}</View>;
 };
 
 export default BackgroundView;

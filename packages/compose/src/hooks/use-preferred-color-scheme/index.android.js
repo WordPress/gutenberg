@@ -13,17 +13,17 @@ import {
  * @return {string} return current color scheme.
  */
 function usePreferredColorScheme() {
-	const [ currentColorScheme, setCurrentColorScheme ] = useState(
+	const [currentColorScheme, setCurrentColorScheme] = useState(
 		isInitialColorSchemeDark ? 'dark' : 'light'
 	);
-	useEffect( () => {
-		subscribePreferredColorScheme( ( { isPreferredColorSchemeDark } ) => {
+	useEffect(() => {
+		subscribePreferredColorScheme(({ isPreferredColorSchemeDark }) => {
 			const colorScheme = isPreferredColorSchemeDark ? 'dark' : 'light';
-			if ( colorScheme !== currentColorScheme ) {
-				setCurrentColorScheme( colorScheme );
+			if (colorScheme !== currentColorScheme) {
+				setCurrentColorScheme(colorScheme);
 			}
-		} );
-	} );
+		});
+	});
 	return currentColorScheme;
 }
 

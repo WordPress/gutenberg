@@ -11,9 +11,9 @@
  *
  * @return {string|void} The protocol part of the URL.
  */
-export function getProtocol( url ) {
-	const matches = /^([^\s:]+:)/.exec( url );
-	if ( matches ) {
-		return matches[ 1 ];
+export function getProtocol(url) {
+	const matches = /^([^\s:]+:)/.exec(url);
+	if (matches) {
+		return matches[1];
 	}
 }

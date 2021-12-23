@@ -20,28 +20,28 @@ import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
-	[ 'core/post-title' ],
-	[ 'core/post-date' ],
-	[ 'core/post-excerpt' ],
+	['core/post-title'],
+	['core/post-date'],
+	['core/post-excerpt'],
 ];
 
 function PostTemplateInnerBlocks() {
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
-	return <li { ...innerBlocksProps } />;
+	const innerBlocksProps = useInnerBlocksProps({}, { template: TEMPLATE });
+	return <li {...innerBlocksProps} />;
 }
 
-function PostTemplateBlockPreview( {
+function PostTemplateBlockPreview({
 	blocks,
 	blockContextId,
 	isHidden,
 	setActiveBlockContextId,
-} ) {
-	const blockPreviewProps = useBlockPreview( {
+}) {
+	const blockPreviewProps = useBlockPreview({
 		blocks,
-	} );
+	});
 
 	const handleOnClick = () => {
-		setActiveBlockContextId( blockContextId );
+		setActiveBlockContextId(blockContextId);
 	};
 
 	const style = {
@@ -50,20 +50,20 @@ function PostTemplateBlockPreview( {
 
 	return (
 		<li
-			{ ...blockPreviewProps }
-			tabIndex={ 0 }
+			{...blockPreviewProps}
+			tabIndex={0}
 			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 			role="button"
-			onClick={ handleOnClick }
-			onKeyPress={ handleOnClick }
-			style={ style }
+			onClick={handleOnClick}
+			onKeyPress={handleOnClick}
+			style={style}
 		/>
 	);
 }
 
-const MemoizedPostTemplateBlockPreview = memo( PostTemplateBlockPreview );
+const MemoizedPostTemplateBlockPreview = memo(PostTemplateBlockPreview);
 
-export default function PostTemplateEdit( {
+export default function PostTemplateEdit({
 	clientId,
 	context: {
 		query: {
@@ -80,54 +80,54 @@ export default function PostTemplateEdit( {
 			sticky,
 			inherit,
 		} = {},
-		queryContext = [ { page: 1 } ],
+		queryContext = [{ page: 1 }],
 		templateSlug,
 		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
-} ) {
-	const [ { page } ] = queryContext;
-	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
+}) {
+	const [{ page }] = queryContext;
+	const [activeBlockContextId, setActiveBlockContextId] = useState();
 
 	const { posts, blocks } = useSelect(
-		( select ) => {
-			const { getEntityRecords } = select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
+		(select) => {
+			const { getEntityRecords } = select(coreStore);
+			const { getBlocks } = select(blockEditorStore);
 			const query = {
-				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
+				offset: perPage ? perPage * (page - 1) + offset : 0,
 				categories: categoryIds,
 				tags: tagIds,
 				order,
 				orderby: orderBy,
 			};
-			if ( perPage ) {
+			if (perPage) {
 				query.per_page = perPage;
 			}
-			if ( author ) {
+			if (author) {
 				query.author = author;
 			}
-			if ( search ) {
+			if (search) {
 				query.search = search;
 			}
-			if ( exclude?.length ) {
+			if (exclude?.length) {
 				query.exclude = exclude;
 			}
 			// If sticky is not set, it will return all posts in the results.
 			// If sticky is set to `only`, it will limit the results to sticky posts only.
 			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
-			if ( sticky ) {
+			if (sticky) {
 				query.sticky = sticky === 'only';
 			}
 			// If `inherit` is truthy, adjust conditionally the query to create a better preview.
-			if ( inherit ) {
+			if (inherit) {
 				// Change the post-type if needed.
-				if ( templateSlug?.startsWith( 'archive-' ) ) {
-					query.postType = templateSlug.replace( 'archive-', '' );
+				if (templateSlug?.startsWith('archive-')) {
+					query.postType = templateSlug.replace('archive-', '');
 					postType = query.postType;
 				}
 			}
 			return {
-				posts: getEntityRecords( 'postType', postType, query ),
-				blocks: getBlocks( clientId ),
+				posts: getEntityRecords('postType', postType, query),
+				blocks: getBlocks(clientId),
 			};
 		},
 		[
@@ -150,30 +150,30 @@ export default function PostTemplateEdit( {
 	);
 	const blockContexts = useMemo(
 		() =>
-			posts?.map( ( post ) => ( {
+			posts?.map((post) => ({
 				postType: post.type,
 				postId: post.id,
-			} ) ),
-		[ posts ]
+			})),
+		[posts]
 	);
 	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
-	const blockProps = useBlockProps( {
-		className: classnames( {
+	const blockProps = useBlockProps({
+		className: classnames({
 			'is-flex-container': hasLayoutFlex,
-			[ `columns-${ columns }` ]: hasLayoutFlex,
-		} ),
-	} );
+			[`columns-${columns}`]: hasLayoutFlex,
+		}),
+	});
 
-	if ( ! posts ) {
+	if (!posts) {
 		return (
-			<p { ...blockProps }>
+			<p {...blockProps}>
 				<Spinner />
 			</p>
 		);
 	}
 
-	if ( ! posts.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
+	if (!posts.length) {
+		return <p {...blockProps}> {__('No results found.')}</p>;
 	}
 
 	// To avoid flicker when switching active block contexts, a preview is rendered
@@ -181,30 +181,29 @@ export default function PostTemplateEdit( {
 	// This ensures that when it is displayed again, the cached rendering of the
 	// block preview is used, instead of having to re-render the preview from scratch.
 	return (
-		<ul { ...blockProps }>
-			{ blockContexts &&
-				blockContexts.map( ( blockContext ) => (
+		<ul {...blockProps}>
+			{blockContexts &&
+				blockContexts.map((blockContext) => (
 					<BlockContextProvider
-						key={ blockContext.postId }
-						value={ blockContext }
+						key={blockContext.postId}
+						value={blockContext}
 					>
-						{ blockContext.postId ===
-						( activeBlockContextId ||
-							blockContexts[ 0 ]?.postId ) ? (
+						{blockContext.postId ===
+						(activeBlockContextId || blockContexts[0]?.postId) ? (
 							<PostTemplateInnerBlocks />
-						) : null }
+						) : null}
 						<MemoizedPostTemplateBlockPreview
-							blocks={ blocks }
-							blockContextId={ blockContext.postId }
-							setActiveBlockContextId={ setActiveBlockContextId }
+							blocks={blocks}
+							blockContextId={blockContext.postId}
+							setActiveBlockContextId={setActiveBlockContextId}
 							isHidden={
 								blockContext.postId ===
-								( activeBlockContextId ||
-									blockContexts[ 0 ]?.postId )
+								(activeBlockContextId ||
+									blockContexts[0]?.postId)
 							}
 						/>
 					</BlockContextProvider>
-				) ) }
+				))}
 		</ul>
 	);
 }

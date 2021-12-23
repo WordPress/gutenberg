@@ -35,102 +35,100 @@ import { cleanEmptyObject } from './utils';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 
-export function BorderPanel( props ) {
+export function BorderPanel(props) {
 	const { clientId } = props;
-	const isDisabled = useIsBorderDisabled( props );
-	const isSupported = hasBorderSupport( props.name );
+	const isDisabled = useIsBorderDisabled(props);
+	const isSupported = hasBorderSupport(props.name);
 
 	const isColorSupported =
-		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
+		useSetting('border.color') && hasBorderSupport(props.name, 'color');
 
 	const isRadiusSupported =
-		useSetting( 'border.radius' ) &&
-		hasBorderSupport( props.name, 'radius' );
+		useSetting('border.radius') && hasBorderSupport(props.name, 'radius');
 
 	const isStyleSupported =
-		useSetting( 'border.style' ) && hasBorderSupport( props.name, 'style' );
+		useSetting('border.style') && hasBorderSupport(props.name, 'style');
 
 	const isWidthSupported =
-		useSetting( 'border.width' ) && hasBorderSupport( props.name, 'width' );
+		useSetting('border.width') && hasBorderSupport(props.name, 'width');
 
-	if ( isDisabled || ! isSupported ) {
+	if (isDisabled || !isSupported) {
 		return null;
 	}
 
-	const defaultBorderControls = getBlockSupport( props.name, [
+	const defaultBorderControls = getBlockSupport(props.name, [
 		BORDER_SUPPORT_KEY,
 		'__experimentalDefaultControls',
-	] );
+	]);
 
-	const createResetAllFilter = (
-		borderAttribute,
-		topLevelAttributes = {}
-	) => ( newAttributes ) => ( {
-		...newAttributes,
-		...topLevelAttributes,
-		style: {
-			...newAttributes.style,
-			border: {
-				...newAttributes.style?.border,
-				[ borderAttribute ]: undefined,
+	const createResetAllFilter =
+		(borderAttribute, topLevelAttributes = {}) =>
+		(newAttributes) => ({
+			...newAttributes,
+			...topLevelAttributes,
+			style: {
+				...newAttributes.style,
+				border: {
+					...newAttributes.style?.border,
+					[borderAttribute]: undefined,
+				},
 			},
-		},
-	} );
+		});
 
 	return (
 		<InspectorControls __experimentalGroup="border">
-			{ isWidthSupported && (
+			{isWidthSupported && (
 				<ToolsPanelItem
 					className="single-column"
-					hasValue={ () => hasBorderWidthValue( props ) }
-					label={ __( 'Width' ) }
-					onDeselect={ () => resetBorderWidth( props ) }
-					isShownByDefault={ defaultBorderControls?.width }
-					resetAllFilter={ createResetAllFilter( 'width' ) }
-					panelId={ clientId }
+					hasValue={() => hasBorderWidthValue(props)}
+					label={__('Width')}
+					onDeselect={() => resetBorderWidth(props)}
+					isShownByDefault={defaultBorderControls?.width}
+					resetAllFilter={createResetAllFilter('width')}
+					panelId={clientId}
 				>
-					<BorderWidthEdit { ...props } />
+					<BorderWidthEdit {...props} />
 				</ToolsPanelItem>
-			) }
-			{ isStyleSupported && (
+			)}
+			{isStyleSupported && (
 				<ToolsPanelItem
 					className="single-column"
-					hasValue={ () => hasBorderStyleValue( props ) }
-					label={ __( 'Style' ) }
-					onDeselect={ () => resetBorderStyle( props ) }
-					isShownByDefault={ defaultBorderControls?.style }
-					resetAllFilter={ createResetAllFilter( 'style' ) }
-					panelId={ clientId }
+					hasValue={() => hasBorderStyleValue(props)}
+					label={__('Style')}
+					onDeselect={() => resetBorderStyle(props)}
+					isShownByDefault={defaultBorderControls?.style}
+					resetAllFilter={createResetAllFilter('style')}
+					panelId={clientId}
 				>
-					<BorderStyleEdit { ...props } />
+					<BorderStyleEdit {...props} />
 				</ToolsPanelItem>
-			) }
-			{ isColorSupported && (
+			)}
+			{isColorSupported && (
 				<ToolsPanelItem
-					hasValue={ () => hasBorderColorValue( props ) }
-					label={ __( 'Color' ) }
-					onDeselect={ () => resetBorderColor( props ) }
-					isShownByDefault={ defaultBorderControls?.color }
-					resetAllFilter={ createResetAllFilter( 'color', {
+					hasValue={() => hasBorderColorValue(props)}
+					label={__('Color')}
+					onDeselect={() => resetBorderColor(props)}
+					isShownByDefault={defaultBorderControls?.color}
+					resetAllFilter={createResetAllFilter('color', {
 						borderColor: undefined,
-					} ) }
-					panelId={ clientId }
+					})}
+					panelId={clientId}
 				>
-					<BorderColorEdit { ...props } />
+					<BorderColorEdit {...props} />
 				</ToolsPanelItem>
-			) }
-			{ isRadiusSupported && (
+			)}
+			{isRadiusSupported && (
 				<ToolsPanelItem
-					hasValue={ () => hasBorderRadiusValue( props ) }
-					label={ __( 'Radius' ) }
-					onDeselect={ () => resetBorderRadius( props ) }
-					isShownByDefault={ defaultBorderControls?.radius }
-					resetAllFilter={ createResetAllFilter( 'radius' ) }
-					panelId={ clientId }
+					hasValue={() => hasBorderRadiusValue(props)}
+					label={__('Radius')}
+					onDeselect={() => resetBorderRadius(props)}
+					isShownByDefault={defaultBorderControls?.radius}
+					resetAllFilter={createResetAllFilter('radius')}
+					panelId={clientId}
 				>
-					<BorderRadiusEdit { ...props } />
+					<BorderRadiusEdit {...props} />
 				</ToolsPanelItem>
-			) }
+			)}
 		</InspectorControls>
 	);
 }
@@ -143,19 +141,19 @@ export function BorderPanel( props ) {
  *
  * @return {boolean} Whether there is support.
  */
-export function hasBorderSupport( blockName, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
+export function hasBorderSupport(blockName, feature = 'any') {
+	if (Platform.OS !== 'web') {
 		return false;
 	}
 
-	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY );
+	const support = getBlockSupport(blockName, BORDER_SUPPORT_KEY);
 
-	if ( support === true ) {
+	if (support === true) {
 		return true;
 	}
 
-	if ( feature === 'any' ) {
-		return !! (
+	if (feature === 'any') {
+		return !!(
 			support?.color ||
 			support?.radius ||
 			support?.width ||
@@ -163,7 +161,7 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
 		);
 	}
 
-	return !! support?.[ feature ];
+	return !!support?.[feature];
 }
 
 /**
@@ -173,8 +171,8 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
  *
  * @return {boolean} Whether serialization of border properties should occur.
  */
-export function shouldSkipSerialization( blockType ) {
-	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
+export function shouldSkipSerialization(blockType) {
+	const support = getBlockSupport(blockType, BORDER_SUPPORT_KEY);
 
 	return support?.__experimentalSkipSerialization;
 }
@@ -186,13 +184,13 @@ export function shouldSkipSerialization( blockType ) {
  */
 const useIsBorderDisabled = () => {
 	const configs = [
-		! useSetting( 'border.color' ),
-		! useSetting( 'border.radius' ),
-		! useSetting( 'border.style' ),
-		! useSetting( 'border.width' ),
+		!useSetting('border.color'),
+		!useSetting('border.radius'),
+		!useSetting('border.style'),
+		!useSetting('border.width'),
 	];
 
-	return configs.every( Boolean );
+	return configs.every(Boolean);
 };
 
 /**
@@ -204,12 +202,12 @@ const useIsBorderDisabled = () => {
  *
  * @return {Object} Style object with the specified attribute removed.
  */
-export function removeBorderAttribute( style, attribute ) {
-	return cleanEmptyObject( {
+export function removeBorderAttribute(style, attribute) {
+	return cleanEmptyObject({
 		...style,
 		border: {
 			...style?.border,
-			[ attribute ]: undefined,
+			[attribute]: undefined,
 		},
-	} );
+	});
 }

@@ -10,30 +10,30 @@ import deepFreeze from 'deep-freeze';
 import { normaliseFormats } from '../normalise-formats';
 import { getSparseArrayLength } from './helpers';
 
-describe( 'normaliseFormats', () => {
+describe('normaliseFormats', () => {
 	const strong = { type: 'strong' };
 	const em = { type: 'em' };
 
-	it( 'should normalise formats', () => {
+	it('should normalise formats', () => {
 		const record = {
 			formats: [
 				,
-				[ em ],
-				[ { ...em }, { ...strong } ],
-				[ em, strong ],
+				[em],
+				[{ ...em }, { ...strong }],
+				[em, strong],
 				,
-				[ { ...em } ],
+				[{ ...em }],
 			],
 			text: 'one two three',
 		};
-		const result = normaliseFormats( deepFreeze( record ) );
+		const result = normaliseFormats(deepFreeze(record));
 
-		expect( result ).toEqual( record );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 2 ][ 0 ] );
-		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 3 ][ 0 ] );
-		expect( result.formats[ 1 ][ 0 ] ).not.toBe( result.formats[ 5 ][ 0 ] );
-		expect( result.formats[ 2 ][ 1 ] ).toBe( result.formats[ 3 ][ 1 ] );
-	} );
-} );
+		expect(result).toEqual(record);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+		expect(result.formats[1][0]).toBe(result.formats[2][0]);
+		expect(result.formats[1][0]).toBe(result.formats[3][0]);
+		expect(result.formats[1][0]).not.toBe(result.formats[5][0]);
+		expect(result.formats[2][1]).toBe(result.formats[3][1]);
+	});
+});

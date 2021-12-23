@@ -11,9 +11,9 @@ import {
 	getPatternTransformedBlocks,
 } from '../use-transformed-patterns';
 
-describe( 'use-transformed-patterns', () => {
-	beforeAll( () => {
-		registerBlockType( 'core/test-block-1', {
+describe('use-transformed-patterns', () => {
+	beforeAll(() => {
+		registerBlockType('core/test-block-1', {
 			attributes: {
 				align: {
 					type: 'string',
@@ -34,8 +34,8 @@ describe( 'use-transformed-patterns', () => {
 			save() {},
 			category: 'text',
 			title: 'test block 1',
-		} );
-		registerBlockType( 'core/test-block-2', {
+		});
+		registerBlockType('core/test-block-2', {
 			attributes: {
 				align: { type: 'string' },
 				content: { type: 'boolean' },
@@ -44,15 +44,13 @@ describe( 'use-transformed-patterns', () => {
 			save() {},
 			category: 'text',
 			title: 'test block 2',
-		} );
-	} );
-	afterAll( () => {
-		[ 'core/test-block-1', 'core/test-block-2' ].forEach(
-			unregisterBlockType
-		);
-	} );
-	describe( 'transformMatchingBlock', () => {
-		it( 'should properly update the matching block - No retained block attributes', () => {
+		});
+	});
+	afterAll(() => {
+		['core/test-block-1', 'core/test-block-2'].forEach(unregisterBlockType);
+	});
+	describe('transformMatchingBlock', () => {
+		it('should properly update the matching block - No retained block attributes', () => {
 			const match = {
 				clientId: 'block-2',
 				name: 'core/test-block-2',
@@ -63,19 +61,19 @@ describe( 'use-transformed-patterns', () => {
 				name: 'core/test-block-2',
 				attributes: { align: 'right', content: 'hi' },
 			};
-			transformMatchingBlock( match, selectedBlock );
-			expect( match ).toEqual(
-				expect.objectContaining( {
+			transformMatchingBlock(match, selectedBlock);
+			expect(match).toEqual(
+				expect.objectContaining({
 					clientId: 'block-2',
 					name: 'core/test-block-2',
-					attributes: expect.objectContaining( {
+					attributes: expect.objectContaining({
 						align: 'right',
 						content: 'hi',
-					} ),
-				} )
+					}),
+				})
 			);
-		} );
-		it( 'should properly update the matching block - WITH retained block attributes', () => {
+		});
+		it('should properly update the matching block - WITH retained block attributes', () => {
 			const match = {
 				clientId: 'block-1',
 				name: 'core/test-block-1',
@@ -96,22 +94,22 @@ describe( 'use-transformed-patterns', () => {
 					color: 'green',
 				},
 			};
-			transformMatchingBlock( match, selectedBlock );
-			expect( match ).toEqual(
-				expect.objectContaining( {
+			transformMatchingBlock(match, selectedBlock);
+			expect(match).toEqual(
+				expect.objectContaining({
 					clientId: 'block-1',
 					name: 'core/test-block-1',
-					attributes: expect.objectContaining( {
+					attributes: expect.objectContaining({
 						align: 'center',
 						content: 'from selected block',
 						level: 1,
 						color: 'red',
-					} ),
-				} )
+					}),
+				})
 			);
-		} );
-	} );
-	describe( 'getPatternTransformedBlocks', () => {
+		});
+	});
+	describe('getPatternTransformedBlocks', () => {
 		const patternBlocks = [
 			{
 				clientId: 'client-1',
@@ -175,8 +173,8 @@ describe( 'use-transformed-patterns', () => {
 				innerBlocks: [],
 			},
 		];
-		describe( 'return nothing', () => {
-			it( 'when no match is found', () => {
+		describe('return nothing', () => {
+			it('when no match is found', () => {
 				const selectedBlocks = [
 					{
 						clientId: 'selected-1',
@@ -188,9 +186,9 @@ describe( 'use-transformed-patterns', () => {
 					selectedBlocks,
 					patternBlocks
 				);
-				expect( res ).toBeUndefined();
-			} );
-			it( 'when not ALL blocks are matched', () => {
+				expect(res).toBeUndefined();
+			});
+			it('when not ALL blocks are matched', () => {
 				const selectedBlocks = [
 					{
 						clientId: 'selected-1',
@@ -211,11 +209,11 @@ describe( 'use-transformed-patterns', () => {
 					selectedBlocks,
 					patternBlocks
 				);
-				expect( res ).toBeUndefined();
-			} );
-		} );
-		describe( 'return properly transformed pattern blocks', () => {
-			it( 'when single block is selected', () => {
+				expect(res).toBeUndefined();
+			});
+		});
+		describe('return properly transformed pattern blocks', () => {
+			it('when single block is selected', () => {
 				const selectedBlocks = [
 					{
 						clientId: 'selected-1',
@@ -231,30 +229,30 @@ describe( 'use-transformed-patterns', () => {
 					selectedBlocks,
 					patternBlocks
 				);
-				expect( res ).toHaveLength( 3 );
-				expect( res ).toEqual(
-					expect.arrayContaining( [
-						expect.objectContaining( {
+				expect(res).toHaveLength(3);
+				expect(res).toEqual(
+					expect.arrayContaining([
+						expect.objectContaining({
 							name: 'core/test-block-1',
-							attributes: expect.objectContaining( {
+							attributes: expect.objectContaining({
 								content: 'from selected',
 								color: 'red',
-							} ),
-						} ),
-						expect.objectContaining( {
+							}),
+						}),
+						expect.objectContaining({
 							name: 'core/test-block-2',
-						} ),
-						expect.objectContaining( {
+						}),
+						expect.objectContaining({
 							name: 'core/test-block-1',
 							attributes: {
 								content: 'top level block 3',
 								color: 'purple',
 							},
-						} ),
-					] )
+						}),
+					])
 				);
-			} );
-			it( 'when multiple selected blocks', () => {
+			});
+			it('when multiple selected blocks', () => {
 				/**
 				 * The matching is performed recursively searching depth first,
 				 * so top level blocks' InnerBlocks are search before trying
@@ -293,44 +291,44 @@ describe( 'use-transformed-patterns', () => {
 					selectedBlocks,
 					patternBlocks
 				);
-				expect( res ).toHaveLength( 3 );
-				expect( res ).toEqual(
-					expect.arrayContaining( [
-						expect.objectContaining( {
+				expect(res).toHaveLength(3);
+				expect(res).toEqual(
+					expect.arrayContaining([
+						expect.objectContaining({
 							name: 'core/test-block-1',
-							attributes: expect.objectContaining( {
+							attributes: expect.objectContaining({
 								content: 'from selected 1',
 								color: 'red',
-							} ),
-						} ),
-						expect.objectContaining( {
+							}),
+						}),
+						expect.objectContaining({
 							name: 'core/test-block-2',
-							innerBlocks: expect.arrayContaining( [
-								expect.objectContaining( {
+							innerBlocks: expect.arrayContaining([
+								expect.objectContaining({
 									name: 'nested block',
 									innerBlocks: [
-										expect.objectContaining( {
+										expect.objectContaining({
 											name: 'core/test-block-1',
 											attributes: {
 												content: 'from selected 2',
 												level: 1,
 												color: 'yellow',
 											},
-										} ),
+										}),
 									],
-								} ),
-							] ),
-						} ),
-						expect.objectContaining( {
+								}),
+							]),
+						}),
+						expect.objectContaining({
 							name: 'core/test-block-1',
 							attributes: {
 								content: 'from selected 3',
 								color: 'purple',
 							},
-						} ),
-					] )
+						}),
+					])
 				);
-			} );
-		} );
-	} );
-} );
+			});
+		});
+	});
+});

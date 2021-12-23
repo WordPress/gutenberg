@@ -54,25 +54,23 @@ import {
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
-	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
-	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
-	{ value: LINK_DESTINATION_NONE, label: __( 'None' ) },
+	{ value: LINK_DESTINATION_ATTACHMENT, label: __('Attachment Page') },
+	{ value: LINK_DESTINATION_MEDIA, label: __('Media File') },
+	{ value: LINK_DESTINATION_NONE, label: __('None') },
 ];
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const ALLOWED_MEDIA_TYPES = ['image'];
 
-const PLACEHOLDER_TEXT = Platform.select( {
-	web: __(
-		'Drag images, upload new ones or select files from your library.'
-	),
-	native: __( 'ADD MEDIA' ),
-} );
+const PLACEHOLDER_TEXT = Platform.select({
+	web: __('Drag images, upload new ones or select files from your library.'),
+	native: __('ADD MEDIA'),
+});
 
-const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
+const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select({
 	web: {},
 	native: { type: 'stepper' },
-} );
+});
 
-function GalleryEdit( props ) {
+function GalleryEdit(props) {
 	const {
 		attributes,
 		clientId,
@@ -82,103 +80,98 @@ function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 	const {
-		columns = defaultColumnsNumberV1( attributes ),
+		columns = defaultColumnsNumberV1(attributes),
 		imageCrop,
 		images,
 		linkTo,
 		sizeSlug,
 	} = attributes;
-	const [ selectedImage, setSelectedImage ] = useState();
-	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const [selectedImage, setSelectedImage] = useState();
+	const [attachmentCaptions, setAttachmentCaptions] = useState();
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch(blockEditorStore);
 
-	const {
-		imageSizes,
-		mediaUpload,
-		getMedia,
-		wasBlockJustInserted,
-	} = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+	const { imageSizes, mediaUpload, getMedia, wasBlockJustInserted } =
+		useSelect((select) => {
+			const settings = select(blockEditorStore).getSettings();
 
-		return {
-			imageSizes: settings.imageSizes,
-			mediaUpload: settings.mediaUpload,
-			getMedia: select( coreStore ).getMedia,
-			wasBlockJustInserted: select(
-				blockEditorStore
-			).wasBlockJustInserted( clientId, 'inserter_menu' ),
-		};
-	} );
+			return {
+				imageSizes: settings.imageSizes,
+				mediaUpload: settings.mediaUpload,
+				getMedia: select(coreStore).getMedia,
+				wasBlockJustInserted: select(
+					blockEditorStore
+				).wasBlockJustInserted(clientId, 'inserter_menu'),
+			};
+		});
 
-	const resizedImages = useMemo( () => {
-		if ( isSelected ) {
+	const resizedImages = useMemo(() => {
+		if (isSelected) {
 			return reduce(
 				attributes.ids,
-				( currentResizedImages, id ) => {
-					if ( ! id ) {
+				(currentResizedImages, id) => {
+					if (!id) {
 						return currentResizedImages;
 					}
-					const image = getMedia( id );
+					const image = getMedia(id);
 					const sizes = reduce(
 						imageSizes,
-						( currentSizes, size ) => {
-							const defaultUrl = get( image, [
+						(currentSizes, size) => {
+							const defaultUrl = get(image, [
 								'sizes',
 								size.slug,
 								'url',
-							] );
-							const mediaDetailsUrl = get( image, [
+							]);
+							const mediaDetailsUrl = get(image, [
 								'media_details',
 								'sizes',
 								size.slug,
 								'source_url',
-							] );
+							]);
 							return {
 								...currentSizes,
-								[ size.slug ]: defaultUrl || mediaDetailsUrl,
+								[size.slug]: defaultUrl || mediaDetailsUrl,
 							};
 						},
 						{}
 					);
 					return {
 						...currentResizedImages,
-						[ parseInt( id, 10 ) ]: sizes,
+						[parseInt(id, 10)]: sizes,
 					};
 				},
 				{}
 			);
 		}
 		return {};
-	}, [ isSelected, attributes.ids, imageSizes ] );
+	}, [isSelected, attributes.ids, imageSizes]);
 
 	function onFocusGalleryCaption() {
 		setSelectedImage();
 	}
 
-	function setAttributes( newAttrs ) {
-		if ( newAttrs.ids ) {
+	function setAttributes(newAttrs) {
+		if (newAttrs.ids) {
 			throw new Error(
 				'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes'
 			);
 		}
 
-		if ( newAttrs.images ) {
+		if (newAttrs.images) {
 			newAttrs = {
 				...newAttrs,
 				// Unlike images[ n ].id which is a string, always ensure the
 				// ids array contains numbers as per its attribute type.
-				ids: map( newAttrs.images, ( { id } ) => parseInt( id, 10 ) ),
+				ids: map(newAttrs.images, ({ id }) => parseInt(id, 10)),
 			};
 		}
 
-		props.setAttributes( newAttrs );
+		props.setAttributes(newAttrs);
 	}
 
-	function onSelectImage( index ) {
+	function onSelectImage(index) {
 		return () => {
-			setSelectedImage( index );
+			setSelectedImage(index);
 		};
 	}
 
@@ -188,295 +181,295 @@ function GalleryEdit( props ) {
 		};
 	}
 
-	function onMove( oldIndex, newIndex ) {
-		const newImages = [ ...images ];
-		newImages.splice( newIndex, 1, images[ oldIndex ] );
-		newImages.splice( oldIndex, 1, images[ newIndex ] );
-		setSelectedImage( newIndex );
-		setAttributes( { images: newImages } );
+	function onMove(oldIndex, newIndex) {
+		const newImages = [...images];
+		newImages.splice(newIndex, 1, images[oldIndex]);
+		newImages.splice(oldIndex, 1, images[newIndex]);
+		setSelectedImage(newIndex);
+		setAttributes({ images: newImages });
 	}
 
-	function onMoveForward( oldIndex ) {
+	function onMoveForward(oldIndex) {
 		return () => {
-			if ( oldIndex === images.length - 1 ) {
+			if (oldIndex === images.length - 1) {
 				return;
 			}
-			onMove( oldIndex, oldIndex + 1 );
+			onMove(oldIndex, oldIndex + 1);
 		};
 	}
 
-	function onMoveBackward( oldIndex ) {
+	function onMoveBackward(oldIndex) {
 		return () => {
-			if ( oldIndex === 0 ) {
+			if (oldIndex === 0) {
 				return;
 			}
-			onMove( oldIndex, oldIndex - 1 );
+			onMove(oldIndex, oldIndex - 1);
 		};
 	}
 
-	function onRemoveImage( index ) {
+	function onRemoveImage(index) {
 		return () => {
-			const newImages = filter( images, ( img, i ) => index !== i );
+			const newImages = filter(images, (img, i) => index !== i);
 			setSelectedImage();
-			setAttributes( {
+			setAttributes({
 				images: newImages,
 				columns: attributes.columns
-					? Math.min( newImages.length, attributes.columns )
+					? Math.min(newImages.length, attributes.columns)
 					: attributes.columns,
-			} );
+			});
 		};
 	}
 
-	function selectCaption( newImage ) {
+	function selectCaption(newImage) {
 		// The image id in both the images and attachmentCaptions arrays is a
 		// string, so ensure comparison works correctly by converting the
 		// newImage.id to a string.
-		const newImageId = toString( newImage.id );
-		const currentImage = find( images, { id: newImageId } );
+		const newImageId = toString(newImage.id);
+		const currentImage = find(images, { id: newImageId });
 		const currentImageCaption = currentImage
 			? currentImage.caption
 			: newImage.caption;
 
-		if ( ! attachmentCaptions ) {
+		if (!attachmentCaptions) {
 			return currentImageCaption;
 		}
 
-		const attachment = find( attachmentCaptions, {
+		const attachment = find(attachmentCaptions, {
 			id: newImageId,
-		} );
+		});
 
 		// if the attachment caption is updated
-		if ( attachment && attachment.caption !== newImage.caption ) {
+		if (attachment && attachment.caption !== newImage.caption) {
 			return newImage.caption;
 		}
 
 		return currentImageCaption;
 	}
 
-	function onSelectImages( newImages ) {
+	function onSelectImages(newImages) {
 		setAttachmentCaptions(
-			newImages.map( ( newImage ) => ( {
+			newImages.map((newImage) => ({
 				// Store the attachmentCaption id as a string for consistency
 				// with the type of the id in the images attribute.
-				id: toString( newImage.id ),
+				id: toString(newImage.id),
 				caption: newImage.caption,
-			} ) )
+			}))
 		);
-		setAttributes( {
-			images: newImages.map( ( newImage ) => ( {
-				...pickRelevantMediaFiles( newImage, sizeSlug ),
-				caption: selectCaption( newImage, images, attachmentCaptions ),
+		setAttributes({
+			images: newImages.map((newImage) => ({
+				...pickRelevantMediaFiles(newImage, sizeSlug),
+				caption: selectCaption(newImage, images, attachmentCaptions),
 				// The id value is stored in a data attribute, so when the
 				// block is parsed it's converted to a string. Converting
 				// to a string here ensures it's type is consistent.
-				id: toString( newImage.id ),
-			} ) ),
+				id: toString(newImage.id),
+			})),
 			columns: attributes.columns
-				? Math.min( newImages.length, attributes.columns )
+				? Math.min(newImages.length, attributes.columns)
 				: attributes.columns,
-		} );
+		});
 	}
 
-	function onUploadError( message ) {
+	function onUploadError(message) {
 		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		noticeOperations.createErrorNotice(message);
 	}
 
-	function setLinkTo( value ) {
-		setAttributes( { linkTo: value } );
+	function setLinkTo(value) {
+		setAttributes({ linkTo: value });
 	}
 
-	function setColumnsNumber( value ) {
-		setAttributes( { columns: value } );
+	function setColumnsNumber(value) {
+		setAttributes({ columns: value });
 	}
 
 	function toggleImageCrop() {
-		setAttributes( { imageCrop: ! imageCrop } );
+		setAttributes({ imageCrop: !imageCrop });
 	}
 
-	function getImageCropHelp( checked ) {
+	function getImageCropHelp(checked) {
 		return checked
-			? __( 'Thumbnails are cropped to align.' )
-			: __( 'Thumbnails are not cropped.' );
+			? __('Thumbnails are cropped to align.')
+			: __('Thumbnails are not cropped.');
 	}
 
-	function setImageAttributes( index, newAttributes ) {
-		if ( ! images[ index ] ) {
+	function setImageAttributes(index, newAttributes) {
+		if (!images[index]) {
 			return;
 		}
 
-		setAttributes( {
+		setAttributes({
 			images: [
-				...images.slice( 0, index ),
+				...images.slice(0, index),
 				{
-					...images[ index ],
+					...images[index],
 					...newAttributes,
 				},
-				...images.slice( index + 1 ),
+				...images.slice(index + 1),
 			],
-		} );
+		});
 	}
 
 	function getImagesSizeOptions() {
 		return map(
-			filter( imageSizes, ( { slug } ) =>
-				some( resizedImages, ( sizes ) => sizes[ slug ] )
+			filter(imageSizes, ({ slug }) =>
+				some(resizedImages, (sizes) => sizes[slug])
 			),
-			( { name, slug } ) => ( { value: slug, label: name } )
+			({ name, slug }) => ({ value: slug, label: name })
 		);
 	}
 
-	function updateImagesSize( newSizeSlug ) {
-		const updatedImages = map( images, ( image ) => {
-			if ( ! image.id ) {
+	function updateImagesSize(newSizeSlug) {
+		const updatedImages = map(images, (image) => {
+			if (!image.id) {
 				return image;
 			}
-			const url = get( resizedImages, [
-				parseInt( image.id, 10 ),
+			const url = get(resizedImages, [
+				parseInt(image.id, 10),
 				newSizeSlug,
-			] );
+			]);
 			return {
 				...image,
-				...( url && { url } ),
+				...(url && { url }),
 			};
-		} );
+		});
 
-		setAttributes( { images: updatedImages, sizeSlug: newSizeSlug } );
+		setAttributes({ images: updatedImages, sizeSlug: newSizeSlug });
 	}
 
-	useEffect( () => {
+	useEffect(() => {
 		if (
 			Platform.OS === 'web' &&
 			images &&
 			images.length > 0 &&
-			every( images, ( { url } ) => isBlobURL( url ) )
+			every(images, ({ url }) => isBlobURL(url))
 		) {
-			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
-			forEach( images, ( { url } ) => revokeBlobURL( url ) );
-			mediaUpload( {
+			const filesList = map(images, ({ url }) => getBlobByURL(url));
+			forEach(images, ({ url }) => revokeBlobURL(url));
+			mediaUpload({
 				filesList,
 				onFileChange: onSelectImages,
-				allowedTypes: [ 'image' ],
-			} );
+				allowedTypes: ['image'],
+			});
 		}
-	}, [] );
+	}, []);
 
-	useEffect( () => {
+	useEffect(() => {
 		// Deselect images when deselecting the block
-		if ( ! isSelected ) {
+		if (!isSelected) {
 			setSelectedImage();
 		}
-	}, [ isSelected ] );
+	}, [isSelected]);
 
-	useEffect( () => {
+	useEffect(() => {
 		// linkTo attribute must be saved so blocks don't break when changing
 		// image_default_link_type in options.php
-		if ( ! linkTo ) {
+		if (!linkTo) {
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
+			setAttributes({
 				linkTo:
 					window?.wp?.media?.view?.settings?.defaultProps?.link ||
 					LINK_DESTINATION_NONE,
-			} );
+			});
 		}
-	}, [ linkTo ] );
+	}, [linkTo]);
 
-	const hasImages = !! images.length;
-	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
+	const hasImages = !!images.length;
+	const hasImageIds = hasImages && images.some((image) => !!image.id);
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImageIds }
-			isAppender={ hasImages }
-			disableMediaButtons={ hasImages && ! isSelected }
-			icon={ ! hasImages && sharedIcon }
-			labels={ {
-				title: ! hasImages && __( 'Gallery' ),
-				instructions: ! hasImages && PLACEHOLDER_TEXT,
-			} }
-			onSelect={ onSelectImages }
+			addToGallery={hasImageIds}
+			isAppender={hasImages}
+			disableMediaButtons={hasImages && !isSelected}
+			icon={!hasImages && sharedIcon}
+			labels={{
+				title: !hasImages && __('Gallery'),
+				instructions: !hasImages && PLACEHOLDER_TEXT,
+			}}
+			onSelect={onSelectImages}
 			accept="image/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			allowedTypes={ALLOWED_MEDIA_TYPES}
 			multiple
-			value={ hasImageIds ? images : {} }
-			onError={ onUploadError }
-			notices={ hasImages ? undefined : noticeUI }
-			onFocus={ onFocus }
+			value={hasImageIds ? images : {}}
+			onError={onUploadError}
+			notices={hasImages ? undefined : noticeUI}
+			onFocus={onFocus}
 			autoOpenMediaUpload={
-				! hasImages && isSelected && wasBlockJustInserted
+				!hasImages && isSelected && wasBlockJustInserted
 			}
 		/>
 	);
 
 	const blockProps = useBlockProps();
 
-	if ( ! hasImages ) {
-		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
+	if (!hasImages) {
+		return <View {...blockProps}>{mediaPlaceholder}</View>;
 	}
 
 	const imageSizeOptions = getImagesSizeOptions();
-	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const shouldShowSizeOptions = hasImages && !isEmpty(imageSizeOptions);
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Gallery settings' ) }>
-					{ images.length > 1 && (
+				<PanelBody title={__('Gallery settings')}>
+					{images.length > 1 && (
 						<RangeControl
-							label={ __( 'Columns' ) }
-							value={ columns }
-							onChange={ setColumnsNumber }
-							min={ 1 }
-							max={ Math.min( MAX_COLUMNS, images.length ) }
-							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
+							label={__('Columns')}
+							value={columns}
+							onChange={setColumnsNumber}
+							min={1}
+							max={Math.min(MAX_COLUMNS, images.length)}
+							{...MOBILE_CONTROL_PROPS_RANGE_CONTROL}
 							required
 						/>
-					) }
+					)}
 					<ToggleControl
-						label={ __( 'Crop images' ) }
-						checked={ !! imageCrop }
-						onChange={ toggleImageCrop }
-						help={ getImageCropHelp }
+						label={__('Crop images')}
+						checked={!!imageCrop}
+						onChange={toggleImageCrop}
+						help={getImageCropHelp}
 					/>
 					<SelectControl
-						label={ __( 'Link to' ) }
-						value={ linkTo }
-						onChange={ setLinkTo }
-						options={ linkOptions }
-						hideCancelButton={ true }
+						label={__('Link to')}
+						value={linkTo}
+						onChange={setLinkTo}
+						options={linkOptions}
+						hideCancelButton={true}
 					/>
-					{ shouldShowSizeOptions && (
+					{shouldShowSizeOptions && (
 						<SelectControl
-							label={ __( 'Image size' ) }
-							value={ sizeSlug }
-							options={ imageSizeOptions }
-							onChange={ updateImagesSize }
-							hideCancelButton={ true }
+							label={__('Image size')}
+							value={sizeSlug}
+							options={imageSizeOptions}
+							onChange={updateImagesSize}
+							hideCancelButton={true}
 						/>
-					) }
+					)}
 				</PanelBody>
 			</InspectorControls>
 
-			{ noticeUI }
+			{noticeUI}
 			<Gallery
-				{ ...props }
-				selectedImage={ selectedImage }
-				mediaPlaceholder={ mediaPlaceholder }
-				onMoveBackward={ onMoveBackward }
-				onMoveForward={ onMoveForward }
-				onRemoveImage={ onRemoveImage }
-				onSelectImage={ onSelectImage }
-				onDeselectImage={ onDeselectImage }
-				onSetImageAttributes={ setImageAttributes }
-				blockProps={ blockProps }
+				{...props}
+				selectedImage={selectedImage}
+				mediaPlaceholder={mediaPlaceholder}
+				onMoveBackward={onMoveBackward}
+				onMoveForward={onMoveForward}
+				onRemoveImage={onRemoveImage}
+				onSelectImage={onSelectImage}
+				onDeselectImage={onDeselectImage}
+				onSetImageAttributes={setImageAttributes}
+				blockProps={blockProps}
 				// This prop is used by gallery.native.js.
-				onFocusGalleryCaption={ onFocusGalleryCaption }
+				onFocusGalleryCaption={onFocusGalleryCaption}
 			/>
 		</>
 	);
 }
 
-export default compose( [
+export default compose([
 	withNotices,
-	withViewportMatch( { isNarrow: '< small' } ),
-] )( GalleryEdit );
+	withViewportMatch({ isNarrow: '< small' }),
+])(GalleryEdit);

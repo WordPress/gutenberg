@@ -14,10 +14,10 @@ import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
  *
  * @return {RichTextFormat|void} Active object, or undefined.
  */
-export function getActiveObject( { start, end, replacements, text } ) {
-	if ( start + 1 !== end || text[ start ] !== OBJECT_REPLACEMENT_CHARACTER ) {
+export function getActiveObject({ start, end, replacements, text }) {
+	if (start + 1 !== end || text[start] !== OBJECT_REPLACEMENT_CHARACTER) {
 		return;
 	}
 
-	return replacements[ start ];
+	return replacements[start];
 }

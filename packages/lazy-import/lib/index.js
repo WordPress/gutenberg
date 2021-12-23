@@ -1,11 +1,11 @@
 /**
  * External dependencies
  */
-const npmPackageArg = require( 'npm-package-arg' );
-const semver = require( 'semver' );
-const execa = require( 'execa' );
-const { join } = require( 'path' );
-const { createHash } = require( 'crypto' );
+const npmPackageArg = require('npm-package-arg');
+const semver = require('semver');
+const execa = require('execa');
+const { join } = require('path');
+const { createHash } = require('crypto');
 
 /**
  * @typedef WPLazyImportOptions
@@ -21,8 +21,8 @@ const { createHash } = require( 'crypto' );
  *
  * @return {string} md5 hash of string.
  */
-function md5( text ) {
-	return createHash( 'md5' ).update( text ).digest( 'hex' );
+function md5(text) {
+	return createHash('md5').update(text).digest('hex');
 }
 
 /**
@@ -33,8 +33,8 @@ function md5( text ) {
  *
  * @return {string} Module to use as local package alias.
  */
-function getLocalModuleName( arg ) {
-	return '@wordpress/lazy-import.' + md5( arg );
+function getLocalModuleName(arg) {
+	return '@wordpress/lazy-import.' + md5(arg);
 }
 
 /**
@@ -46,8 +46,8 @@ function getLocalModuleName( arg ) {
  *
  * @return {Promise<void>} Promise resolving once package is installed.
  */
-async function install( arg, alias ) {
-	await execa( 'npm', [ 'install', '--no-save', alias + '@npm:' + arg ] );
+async function install(arg, alias) {
+	await execa('npm', ['install', '--no-save', alias + '@npm:' + arg]);
 }
 
 /**
@@ -63,59 +63,57 @@ async function install( arg, alias ) {
  *
  * @return {Promise<NodeRequire>} Promise resolving to required module.
  */
-async function lazyImport( arg, options = {} ) {
+async function lazyImport(arg, options = {}) {
 	const { localPath = '' } = options;
-	const { rawSpec, name } = npmPackageArg( arg );
+	const { rawSpec, name } = npmPackageArg(arg);
 
-	if ( ! name ) {
-		throw new TypeError(
-			`Unable to parse package name from \`${ arg }\`.`
-		);
+	if (!name) {
+		throw new TypeError(`Unable to parse package name from \`${arg}\`.`);
 	}
 
-	const localModule = getLocalModuleName( arg );
+	const localModule = getLocalModuleName(arg);
 
 	// Try first from the temporary install path, since the second attempt will
 	// need to verify both availability and version. Version isn't necessary to
 	// account for in this first attempt.
 	try {
-		if ( require.resolve( localModule ) ) {
-			return require( join( localModule, localPath ) );
+		if (require.resolve(localModule)) {
+			return require(join(localModule, localPath));
 		}
-	} catch ( error ) {
-		if ( error.code !== 'MODULE_NOT_FOUND' ) {
+	} catch (error) {
+		if (error.code !== 'MODULE_NOT_FOUND') {
 			throw error;
 		}
 	}
 
 	try {
-		const { version } = require( join( name, 'package.json' ) );
-		if ( semver.satisfies( version, rawSpec ) ) {
+		const { version } = require(join(name, 'package.json'));
+		if (semver.satisfies(version, rawSpec)) {
 			// Only return with the resolved module if the version is valid per
 			// the parsed arg. Otherwise, fall through to install stage.
-			return require( join( name, localPath ) );
+			return require(join(name, localPath));
 		}
-	} catch ( error ) {
-		if ( error.code !== 'MODULE_NOT_FOUND' ) {
+	} catch (error) {
+		if (error.code !== 'MODULE_NOT_FOUND') {
 			throw error;
 		}
 	}
 
 	// If this point is reached, the module cannot be found and must be
 	// installed.
-	if ( options.onInstall ) {
+	if (options.onInstall) {
 		options.onInstall();
 	}
 
 	try {
-		await install( arg, localModule );
-	} catch ( error ) {
+		await install(arg, localModule);
+	} catch (error) {
 		// Format connectivity error to one which can be easily evaluated.
 		if (
 			error.stderr &&
-			error.stderr.startsWith( 'npm ERR! code ENOTFOUND' )
+			error.stderr.startsWith('npm ERR! code ENOTFOUND')
 		) {
-			error = new Error( 'Unable to connect to NPM registry' );
+			error = new Error('Unable to connect to NPM registry');
 			error.code = 'ENOTFOUND';
 		}
 
@@ -135,7 +133,7 @@ async function lazyImport( arg, options = {} ) {
 	//
 	// See: https://github.com/WordPress/gutenberg/pull/22684#discussion_r434583858
 
-	return require( join( localModule, localPath ) );
+	return require(join(localModule, localPath));
 }
 
 module.exports = lazyImport;

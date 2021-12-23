@@ -15,36 +15,36 @@ interface SelectProps {
 	selectSize?: Size;
 }
 
-const disabledStyles = ( { disabled }: SelectProps ) => {
-	if ( ! disabled ) return '';
+const disabledStyles = ({ disabled }: SelectProps) => {
+	if (!disabled) return '';
 
-	return css( {
+	return css({
 		color: COLORS.ui.textDisabled,
-	} );
+	});
 };
 
-const fontSizeStyles = ( { selectSize }: SelectProps ) => {
+const fontSizeStyles = ({ selectSize }: SelectProps) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
 		'__unstable-large': '13px',
 	};
 
-	const fontSize = sizes[ selectSize as Size ];
+	const fontSize = sizes[selectSize as Size];
 	const fontSizeMobile = '16px';
 
-	if ( ! fontSize ) return '';
+	if (!fontSize) return '';
 
 	return css`
-		font-size: ${ fontSizeMobile };
+		font-size: ${fontSizeMobile};
 
-		@media ( min-width: 600px ) {
-			font-size: ${ fontSize };
+		@media (min-width: 600px) {
+			font-size: ${fontSize};
 		}
 	`;
 };
 
-const sizeStyles = ( { selectSize }: SelectProps ) => {
+const sizeStyles = ({ selectSize }: SelectProps) => {
 	const sizes = {
 		default: {
 			height: 30,
@@ -63,12 +63,12 @@ const sizeStyles = ( { selectSize }: SelectProps ) => {
 		},
 	};
 
-	const style = sizes[ selectSize as Size ] || sizes.default;
+	const style = sizes[selectSize as Size] || sizes.default;
 
-	return css( style );
+	return css(style);
 };
 
-const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
+const sizePaddings = ({ selectSize = 'default' }: SelectProps) => {
 	const sizes = {
 		default: {
 			paddingLeft: 8,
@@ -83,28 +83,28 @@ const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
 			paddingRight: 32,
 		},
 	};
-	return rtl( sizes[ selectSize ] );
+	return rtl(sizes[selectSize]);
 };
 
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
-export const Select = styled.select< SelectProps >`
+export const Select = styled.select<SelectProps>`
 	&&& {
 		appearance: none;
 		background: transparent;
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.black };
+		color: ${COLORS.black};
 		display: block;
 		margin: 0;
 		width: 100%;
 
-		${ disabledStyles };
-		${ fontSizeStyles };
-		${ sizeStyles };
-		${ sizePaddings };
+		${disabledStyles};
+		${fontSizeStyles};
+		${sizeStyles};
+		${sizePaddings};
 	}
 `;
 
@@ -118,7 +118,7 @@ export const DownArrowWrapper = styled.div`
 	position: absolute;
 	top: 0;
 
-	${ rtl( { right: 0 } ) }
+	${rtl({ right: 0 })}
 
 	svg {
 		display: block;

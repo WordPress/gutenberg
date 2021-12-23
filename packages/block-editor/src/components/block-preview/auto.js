@@ -16,42 +16,38 @@ import { store } from '../../store';
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
-function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
-	const [
-		containerResizeListener,
-		{ width: containerWidth },
-	] = useResizeObserver();
-	const [
-		contentResizeListener,
-		{ height: contentHeight },
-	] = useResizeObserver();
-	const { styles, assets } = useSelect( ( select ) => {
-		const settings = select( store ).getSettings();
+function AutoBlockPreview({ viewportWidth, __experimentalPadding }) {
+	const [containerResizeListener, { width: containerWidth }] =
+		useResizeObserver();
+	const [contentResizeListener, { height: contentHeight }] =
+		useResizeObserver();
+	const { styles, assets } = useSelect((select) => {
+		const settings = select(store).getSettings();
 		return {
 			styles: settings.styles,
 			assets: settings.__unstableResolvedAssets,
 		};
-	}, [] );
+	}, []);
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
-	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
+	MemoizedBlockList = MemoizedBlockList || pure(BlockList);
 
 	const scale = containerWidth / viewportWidth;
 
 	return (
 		<div className="block-editor-block-preview__container">
-			{ containerResizeListener }
+			{containerResizeListener}
 			<Disabled
 				className="block-editor-block-preview__content"
-				style={ {
-					transform: `scale(${ scale })`,
+				style={{
+					transform: `scale(${scale})`,
 					height: contentHeight * scale,
-				} }
+				}}
 			>
 				<Iframe
-					head={ <EditorStyles styles={ styles } /> }
-					assets={ assets }
-					contentRef={ useRefEffect( ( bodyElement ) => {
+					head={<EditorStyles styles={styles} />}
+					assets={assets}
+					contentRef={useRefEffect((bodyElement) => {
 						const {
 							ownerDocument: { documentElement },
 						} = bodyElement;
@@ -62,18 +58,18 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						documentElement.style.width = '100%';
 						bodyElement.style.padding =
 							__experimentalPadding + 'px';
-					}, [] ) }
+					}, [])}
 					aria-hidden
-					tabIndex={ -1 }
-					style={ {
+					tabIndex={-1}
+					style={{
 						position: 'absolute',
 						width: viewportWidth,
 						height: contentHeight,
 						pointerEvents: 'none',
-					} }
+					}}
 				>
-					{ contentResizeListener }
-					<MemoizedBlockList renderAppender={ false } />
+					{contentResizeListener}
+					<MemoizedBlockList renderAppender={false} />
 				</Iframe>
 			</Disabled>
 		</div>

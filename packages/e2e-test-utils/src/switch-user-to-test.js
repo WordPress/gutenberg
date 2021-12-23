@@ -10,7 +10,7 @@ import { WP_USERNAME } from './shared/config';
  * running the tests as (if we're not already that user).
  */
 export async function switchUserToTest() {
-	if ( ( await getCurrentUser() ) === WP_USERNAME ) {
+	if ((await getCurrentUser()) === WP_USERNAME) {
 		return;
 	}
 	await loginUser();

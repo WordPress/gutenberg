@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { createContext } from '@wordpress/element';
 
-export const untitledMenu = __( '(untitled menu)' );
+export const untitledMenu = __('(untitled menu)');
 export const IsMenuNameControlFocusedContext = createContext();
 
 export { default as useMenuEntity } from './use-menu-entity';

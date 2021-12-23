@@ -7,7 +7,7 @@ let previousMessage = '';
  *
  * @return {string} The filtered message.
  */
-export default function filterMessage( message ) {
+export default function filterMessage(message) {
 	/*
 	 * Strip HTML tags (if any) from the message string. Ideally, messages should
 	 * be simple strings, carefully crafted for specific use with A11ySpeak.
@@ -15,13 +15,13 @@ export default function filterMessage( message ) {
 	 * stripped out and replaced with a space. Browsers will collapse multiple
 	 * spaces natively.
 	 */
-	message = message.replace( /<[^<>]+>/g, ' ' );
+	message = message.replace(/<[^<>]+>/g, ' ');
 
 	/*
 	 * Safari + VoiceOver don't announce repeated, identical strings. We use
 	 * a `no-break space` to force them to think identical strings are different.
 	 */
-	if ( previousMessage === message ) {
+	if (previousMessage === message) {
 		message += '\u00A0';
 	}
 

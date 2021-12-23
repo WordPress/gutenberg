@@ -8,15 +8,15 @@ import { TextInput } from 'react-native';
  */
 import BaseControl from '../base-control';
 
-function TextareaControl( { label, value, help, onChange, rows = 4 } ) {
+function TextareaControl({ label, value, help, onChange, rows = 4 }) {
 	return (
-		<BaseControl label={ label } help={ help }>
+		<BaseControl label={label} help={help}>
 			<TextInput
-				style={ { height: 80, borderColor: 'gray', borderWidth: 1 } }
-				value={ value }
-				onChangeText={ onChange }
-				numberOfLines={ rows }
-				multiline={ rows > 1 }
+				style={{ height: 80, borderColor: 'gray', borderWidth: 1 }}
+				value={value}
+				onChangeText={onChange}
+				numberOfLines={rows}
+				multiline={rows > 1}
 				textAlignVertical="top"
 			/>
 		</BaseControl>

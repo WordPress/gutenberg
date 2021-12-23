@@ -9,18 +9,18 @@ import { View } from 'react-native';
  */
 import useResizeObserver from '../';
 
-const TestComponent = ( { onLayout } ) => {
-	const [ resizeObserver, sizes ] = useResizeObserver();
+const TestComponent = ({ onLayout }) => {
+	const [resizeObserver, sizes] = useResizeObserver();
 
 	return (
-		<View sizes={ sizes } onLayout={ onLayout }>
-			{ resizeObserver }
+		<View sizes={sizes} onLayout={onLayout}>
+			{resizeObserver}
 		</View>
 	);
 };
 
-const renderWithOnLayout = ( component ) => {
-	const testComponent = create( component );
+const renderWithOnLayout = (component) => {
+	const testComponent = create(component);
 
 	const mockNativeEvent = {
 		nativeEvent: {
@@ -31,20 +31,20 @@ const renderWithOnLayout = ( component ) => {
 		},
 	};
 
-	act( () => {
-		testComponent.toJSON().children[ 0 ].props.onLayout( mockNativeEvent );
-	} );
+	act(() => {
+		testComponent.toJSON().children[0].props.onLayout(mockNativeEvent);
+	});
 
 	return testComponent.toJSON();
 };
 
-describe( 'useResizeObserver()', () => {
-	it( 'should return "{ width: 300, height: 500 }"', () => {
-		const component = renderWithOnLayout( <TestComponent /> );
+describe('useResizeObserver()', () => {
+	it('should return "{ width: 300, height: 500 }"', () => {
+		const component = renderWithOnLayout(<TestComponent />);
 
-		expect( component.props.sizes ).toMatchObject( {
+		expect(component.props.sizes).toMatchObject({
 			width: 300,
 			height: 500,
-		} );
-	} );
-} );
+		});
+	});
+});

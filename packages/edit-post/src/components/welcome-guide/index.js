@@ -11,20 +11,20 @@ import WelcomeGuideTemplate from './template';
 import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuide() {
-	const { isActive, isTemplateMode } = useSelect( ( select ) => {
-		const { isFeatureActive, isEditingTemplate } = select( editPostStore );
+	const { isActive, isTemplateMode } = useSelect((select) => {
+		const { isFeatureActive, isEditingTemplate } = select(editPostStore);
 		const _isTemplateMode = isEditingTemplate();
 		const feature = _isTemplateMode
 			? 'welcomeGuideTemplate'
 			: 'welcomeGuide';
 
 		return {
-			isActive: isFeatureActive( feature ),
+			isActive: isFeatureActive(feature),
 			isTemplateMode: _isTemplateMode,
 		};
-	}, [] );
+	}, []);
 
-	if ( ! isActive ) {
+	if (!isActive) {
 		return null;
 	}
 

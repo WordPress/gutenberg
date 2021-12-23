@@ -6,7 +6,7 @@ import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 export default function NavigationMenuNameControl() {
-	const [ title, updateTitle ] = useEntityProp(
+	const [title, updateTitle] = useEntityProp(
 		'postType',
 		'wp_navigation',
 		'title'
@@ -14,9 +14,9 @@ export default function NavigationMenuNameControl() {
 
 	return (
 		<TextControl
-			label={ __( 'Menu name' ) }
-			value={ title }
-			onChange={ updateTitle }
+			label={__('Menu name')}
+			value={title}
+			onChange={updateTitle}
 		/>
 	);
 }

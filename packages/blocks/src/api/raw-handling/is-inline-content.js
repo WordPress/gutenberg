@@ -17,35 +17,35 @@ import { isTextContent } from '@wordpress/dom';
  *
  * @return {boolean} True if the node is inline content, false if nohe.
  */
-function isInline( node, contextTag ) {
-	if ( isTextContent( node ) ) {
+function isInline(node, contextTag) {
+	if (isTextContent(node)) {
 		return true;
 	}
 
-	if ( ! contextTag ) {
+	if (!contextTag) {
 		return false;
 	}
 
 	const tag = node.nodeName.toLowerCase();
 	const inlineAllowedTagGroups = [
-		[ 'ul', 'li', 'ol' ],
-		[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+		['ul', 'li', 'ol'],
+		['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 	];
 
 	return inlineAllowedTagGroups.some(
-		( tagGroup ) => difference( [ tag, contextTag ], tagGroup ).length === 0
+		(tagGroup) => difference([tag, contextTag], tagGroup).length === 0
 	);
 }
 
-function deepCheck( nodes, contextTag ) {
+function deepCheck(nodes, contextTag) {
 	return nodes.every(
-		( node ) =>
-			isInline( node, contextTag ) &&
-			deepCheck( Array.from( node.children ), contextTag )
+		(node) =>
+			isInline(node, contextTag) &&
+			deepCheck(Array.from(node.children), contextTag)
 	);
 }
 
-function isDoubleBR( node ) {
+function isDoubleBR(node) {
 	return (
 		node.nodeName === 'BR' &&
 		node.previousSibling &&
@@ -53,12 +53,12 @@ function isDoubleBR( node ) {
 	);
 }
 
-export default function isInlineContent( HTML, contextTag ) {
-	const doc = document.implementation.createHTMLDocument( '' );
+export default function isInlineContent(HTML, contextTag) {
+	const doc = document.implementation.createHTMLDocument('');
 
 	doc.body.innerHTML = HTML;
 
-	const nodes = Array.from( doc.body.children );
+	const nodes = Array.from(doc.body.children);
 
-	return ! nodes.some( isDoubleBR ) && deepCheck( nodes, contextTag );
+	return !nodes.some(isDoubleBR) && deepCheck(nodes, contextTag);
 }

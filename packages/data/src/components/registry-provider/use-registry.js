@@ -48,5 +48,5 @@ import { Context } from './context';
  * @return {Function}  A custom react hook exposing the registry context value.
  */
 export default function useRegistry() {
-	return useContext( Context );
+	return useContext(Context);
 }

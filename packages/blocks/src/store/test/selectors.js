@@ -19,40 +19,40 @@ import {
 	getActiveBlockVariation,
 } from '../selectors';
 
-describe( 'selectors', () => {
-	describe( 'getBlockSupport', () => {
+describe('selectors', () => {
+	describe('getBlockSupport', () => {
 		const blockName = 'block/name';
-		const getState = ( blocks ) => {
-			return deepFreeze( {
-				blockTypes: keyBy( blocks, 'name' ),
-			} );
+		const getState = (blocks) => {
+			return deepFreeze({
+				blockTypes: keyBy(blocks, 'name'),
+			});
 		};
 
-		it( 'returns default value when config entry not found', () => {
-			const state = getState( [] );
+		it('returns default value when config entry not found', () => {
+			const state = getState([]);
 
 			expect(
-				getBlockSupport( state, blockName, 'unknown', 'default' )
-			).toBe( 'default' );
-		} );
+				getBlockSupport(state, blockName, 'unknown', 'default')
+			).toBe('default');
+		});
 
-		it( 'returns value when config found but falsy', () => {
-			const state = getState( [
+		it('returns value when config found but falsy', () => {
+			const state = getState([
 				{
 					name: blockName,
 					supports: {
 						falsy: '',
 					},
 				},
-			] );
+			]);
 
-			expect(
-				getBlockSupport( state, blockName, 'falsy', 'default' )
-			).toBe( '' );
-		} );
+			expect(getBlockSupport(state, blockName, 'falsy', 'default')).toBe(
+				''
+			);
+		});
 
-		it( 'works with configs stored as nested objects', () => {
-			const state = getState( [
+		it('works with configs stored as nested objects', () => {
+			const state = getState([
 				{
 					name: blockName,
 					supports: {
@@ -63,40 +63,40 @@ describe( 'selectors', () => {
 						},
 					},
 				},
-			] );
+			]);
 
-			expect(
-				getBlockSupport( state, blockName, 'features.foo.bar' )
-			).toBe( 'value' );
-		} );
-	} );
+			expect(getBlockSupport(state, blockName, 'features.foo.bar')).toBe(
+				'value'
+			);
+		});
+	});
 
-	describe( 'getCategories', () => {
-		it( 'returns categories state', () => {
-			const categories = [ { slug: 'text', text: 'Text' } ];
-			const state = deepFreeze( { categories } );
+	describe('getCategories', () => {
+		it('returns categories state', () => {
+			const categories = [{ slug: 'text', text: 'Text' }];
+			const state = deepFreeze({ categories });
 
-			expect( getCategories( state ) ).toEqual( categories );
-		} );
-	} );
+			expect(getCategories(state)).toEqual(categories);
+		});
+	});
 
-	describe( 'getChildBlockNames', () => {
-		it( 'should return an empty array if state is empty', () => {
+	describe('getChildBlockNames', () => {
+		it('should return an empty array if state is empty', () => {
 			const state = {};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toHaveLength( 0 );
-		} );
+			expect(getChildBlockNames(state, 'parent1')).toHaveLength(0);
+		});
 
-		it( 'should return an empty array if no children exist', () => {
+		it('should return an empty array if no children exist', () => {
 			const state = {
 				blockTypes: [
 					{
 						name: 'child1',
-						parent: [ 'parent1' ],
+						parent: ['parent1'],
 					},
 					{
 						name: 'child2',
-						parent: [ 'parent2' ],
+						parent: ['parent2'],
 					},
 					{
 						name: 'parent3',
@@ -104,15 +104,15 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent3' ) ).toHaveLength( 0 );
-		} );
+			expect(getChildBlockNames(state, 'parent3')).toHaveLength(0);
+		});
 
-		it( 'should return an empty array if the parent block is not found', () => {
+		it('should return an empty array if the parent block is not found', () => {
 			const state = {
 				blockTypes: [
 					{
 						name: 'child1',
-						parent: [ 'parent1' ],
+						parent: ['parent1'],
 					},
 					{
 						name: 'parent1',
@@ -120,23 +120,23 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent3' ) ).toHaveLength( 0 );
-		} );
+			expect(getChildBlockNames(state, 'parent3')).toHaveLength(0);
+		});
 
-		it( 'should return an array with the child block names', () => {
+		it('should return an array with the child block names', () => {
 			const state = {
 				blockTypes: [
 					{
 						name: 'child1',
-						parent: [ 'parent1' ],
+						parent: ['parent1'],
 					},
 					{
 						name: 'child2',
-						parent: [ 'parent2' ],
+						parent: ['parent2'],
 					},
 					{
 						name: 'child3',
-						parent: [ 'parent1' ],
+						parent: ['parent1'],
 					},
 					{
 						name: 'child4',
@@ -150,22 +150,22 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
+			expect(getChildBlockNames(state, 'parent1')).toEqual([
 				'child1',
 				'child3',
-			] );
-		} );
+			]);
+		});
 
-		it( 'should return an array with the child block names even if only one child exists', () => {
+		it('should return an array with the child block names even if only one child exists', () => {
 			const state = {
 				blockTypes: [
 					{
 						name: 'child1',
-						parent: [ 'parent1' ],
+						parent: ['parent1'],
 					},
 					{
 						name: 'child2',
-						parent: [ 'parent2' ],
+						parent: ['parent2'],
 					},
 					{
 						name: 'child4',
@@ -179,25 +179,23 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
-				'child1',
-			] );
-		} );
+			expect(getChildBlockNames(state, 'parent1')).toEqual(['child1']);
+		});
 
-		it( 'should return an array with the child block names even if children have multiple parents', () => {
+		it('should return an array with the child block names even if children have multiple parents', () => {
 			const state = {
 				blockTypes: [
 					{
 						name: 'child1',
-						parent: [ 'parent1' ],
+						parent: ['parent1'],
 					},
 					{
 						name: 'child2',
-						parent: [ 'parent1', 'parent2' ],
+						parent: ['parent1', 'parent2'],
 					},
 					{
 						name: 'child3',
-						parent: [ 'parent1' ],
+						parent: ['parent1'],
 					},
 					{
 						name: 'child4',
@@ -211,25 +209,23 @@ describe( 'selectors', () => {
 				],
 			};
 
-			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
+			expect(getChildBlockNames(state, 'parent1')).toEqual([
 				'child1',
 				'child2',
 				'child3',
-			] );
-			expect( getChildBlockNames( state, 'parent2' ) ).toEqual( [
-				'child2',
-			] );
-		} );
-	} );
+			]);
+			expect(getChildBlockNames(state, 'parent2')).toEqual(['child2']);
+		});
+	});
 
-	describe( 'Testing block variations selectors', () => {
+	describe('Testing block variations selectors', () => {
 		const blockName = 'block/name';
-		const createBlockVariationsState = ( variations ) => {
-			return deepFreeze( {
+		const createBlockVariationsState = (variations) => {
+			return deepFreeze({
 				blockVariations: {
-					[ blockName ]: variations,
+					[blockName]: variations,
 				},
-			} );
+			});
 		};
 		const firstBlockVariation = {
 			name: 'first-block-variation',
@@ -240,45 +236,42 @@ describe( 'selectors', () => {
 		const thirdBlockVariation = {
 			name: 'third-block-variation',
 		};
-		describe( 'getBlockVariations', () => {
-			it( 'should return undefined if no variations exists', () => {
+		describe('getBlockVariations', () => {
+			it('should return undefined if no variations exists', () => {
 				expect(
-					getBlockVariations( { blockVariations: {} }, blockName )
+					getBlockVariations({ blockVariations: {} }, blockName)
 				).toBeUndefined();
-			} );
-			it( 'should return all variations if scope is not provided', () => {
-				const variations = [
-					firstBlockVariation,
-					secondBlockVariation,
-				];
-				const state = createBlockVariationsState( variations );
-				expect( getBlockVariations( state, blockName ) ).toEqual(
+			});
+			it('should return all variations if scope is not provided', () => {
+				const variations = [firstBlockVariation, secondBlockVariation];
+				const state = createBlockVariationsState(variations);
+				expect(getBlockVariations(state, blockName)).toEqual(
 					variations
 				);
-			} );
-			it( 'should return variations with scope not set at all or explicitly set', () => {
+			});
+			it('should return variations with scope not set at all or explicitly set', () => {
 				const variations = [
-					{ ...firstBlockVariation, scope: [ 'inserter' ] },
-					{ name: 'only-block', scope: [ 'block' ] },
+					{ ...firstBlockVariation, scope: ['inserter'] },
+					{ name: 'only-block', scope: ['block'] },
 					{
 						name: 'multiple-scopes-with-block',
-						scope: [ 'transform', 'block' ],
+						scope: ['transform', 'block'],
 					},
 					{ name: 'no-scope' },
 				];
-				const state = createBlockVariationsState( variations );
-				const result = getBlockVariations( state, blockName, 'block' );
-				expect( result ).toHaveLength( 3 );
-				expect( result.map( ( { name } ) => name ) ).toEqual(
-					expect.arrayContaining( [
+				const state = createBlockVariationsState(variations);
+				const result = getBlockVariations(state, blockName, 'block');
+				expect(result).toHaveLength(3);
+				expect(result.map(({ name }) => name)).toEqual(
+					expect.arrayContaining([
 						'only-block',
 						'multiple-scopes-with-block',
 						'no-scope',
-					] )
+					])
 				);
-			} );
-		} );
-		describe( 'getActiveBlockVariation', () => {
+			});
+		});
+		describe('getActiveBlockVariation', () => {
 			const blockTypeWithTestAttributes = {
 				name: 'block/name',
 				attributes: {
@@ -295,7 +288,7 @@ describe( 'selectors', () => {
 				attributes: {
 					testAttribute: FIRST_VARIATION_TEST_ATTRIBUTE_VALUE,
 				},
-				isActive: ( blockAttributes, variationAttributes ) => {
+				isActive: (blockAttributes, variationAttributes) => {
 					return (
 						blockAttributes.testAttribute ===
 						variationAttributes.testAttribute
@@ -307,7 +300,7 @@ describe( 'selectors', () => {
 				attributes: {
 					testAttribute: SECOND_VARIATION_TEST_ATTRIBUTE_VALUE,
 				},
-				isActive: ( blockAttributes, variationAttributes ) => {
+				isActive: (blockAttributes, variationAttributes) => {
 					return (
 						blockAttributes.testAttribute ===
 						variationAttributes.testAttribute
@@ -319,35 +312,34 @@ describe( 'selectors', () => {
 				attributes: {
 					testAttribute: FIRST_VARIATION_TEST_ATTRIBUTE_VALUE,
 				},
-				isActive: [ 'testAttribute' ],
+				isActive: ['testAttribute'],
 			};
 			const secondActiveBlockVariationArray = {
 				...secondBlockVariation,
 				attributes: {
 					testAttribute: SECOND_VARIATION_TEST_ATTRIBUTE_VALUE,
 				},
-				isActive: [ 'testAttribute' ],
+				isActive: ['testAttribute'],
 			};
-			const createBlockVariationsStateWithTestBlockType = (
-				variations
-			) =>
-				deepFreeze( {
-					...createBlockVariationsState( variations ),
+			const createBlockVariationsStateWithTestBlockType = (variations) =>
+				deepFreeze({
+					...createBlockVariationsState(variations),
 					blockTypes: {
-						[ blockTypeWithTestAttributes.name ]: blockTypeWithTestAttributes,
+						[blockTypeWithTestAttributes.name]:
+							blockTypeWithTestAttributes,
 					},
-				} );
-			const stateFunction = createBlockVariationsStateWithTestBlockType( [
+				});
+			const stateFunction = createBlockVariationsStateWithTestBlockType([
 				firstActiveBlockVariationFunction,
 				secondActiveBlockVariationFunction,
 				thirdBlockVariation,
-			] );
-			const stateArray = createBlockVariationsStateWithTestBlockType( [
+			]);
+			const stateArray = createBlockVariationsStateWithTestBlockType([
 				firstActiveBlockVariationArray,
 				secondActiveBlockVariationArray,
 				thirdBlockVariation,
-			] );
-			test.each( [
+			]);
+			test.each([
 				[
 					firstActiveBlockVariationFunction.name,
 					firstActiveBlockVariationFunction,
@@ -356,9 +348,9 @@ describe( 'selectors', () => {
 					secondActiveBlockVariationFunction.name,
 					secondActiveBlockVariationFunction,
 				],
-			] )(
+			])(
 				'should return the active variation based on the given isActive function (%s)',
-				( _variationName, variation ) => {
+				(_variationName, variation) => {
 					const blockAttributes = {
 						testAttribute: variation.attributes.testAttribute,
 					};
@@ -369,10 +361,10 @@ describe( 'selectors', () => {
 						blockAttributes
 					);
 
-					expect( result ).toEqual( variation );
+					expect(result).toEqual(variation);
 				}
 			);
-			it( 'should return undefined if no active variation is found', () => {
+			it('should return undefined if no active variation is found', () => {
 				const blockAttributes = {
 					testAttribute: UNUSED_TEST_ATTRIBUTE_VALUE,
 				};
@@ -383,13 +375,13 @@ describe( 'selectors', () => {
 					blockAttributes
 				);
 
-				expect( result ).toBeUndefined();
-			} );
-			it( 'should return the active variation based on the given isActive array', () => {
+				expect(result).toBeUndefined();
+			});
+			it('should return the active variation based on the given isActive array', () => {
 				[
 					firstActiveBlockVariationArray,
 					secondActiveBlockVariationArray,
-				].forEach( ( variation ) => {
+				].forEach((variation) => {
 					const blockAttributes = {
 						testAttribute: variation.attributes.testAttribute,
 					};
@@ -400,10 +392,10 @@ describe( 'selectors', () => {
 						blockAttributes
 					);
 
-					expect( result ).toEqual( variation );
-				} );
-			} );
-			it( 'should return the active variation based on the given isActive array (multiple values)', () => {
+					expect(result).toEqual(variation);
+				});
+			});
+			it('should return the active variation based on the given isActive array (multiple values)', () => {
 				const variations = [
 					{
 						name: 'variation-1',
@@ -411,10 +403,7 @@ describe( 'selectors', () => {
 							firstTestAttribute: 1,
 							secondTestAttribute: 10,
 						},
-						isActive: [
-							'firstTestAttribute',
-							'secondTestAttribute',
-						],
+						isActive: ['firstTestAttribute', 'secondTestAttribute'],
 					},
 					{
 						name: 'variation-2',
@@ -422,10 +411,7 @@ describe( 'selectors', () => {
 							firstTestAttribute: 2,
 							secondTestAttribute: 20,
 						},
-						isActive: [
-							'firstTestAttribute',
-							'secondTestAttribute',
-						],
+						isActive: ['firstTestAttribute', 'secondTestAttribute'],
 					},
 					{
 						name: 'variation-3',
@@ -433,37 +419,33 @@ describe( 'selectors', () => {
 							firstTestAttribute: 1,
 							secondTestAttribute: 20,
 						},
-						isActive: [
-							'firstTestAttribute',
-							'secondTestAttribute',
-						],
+						isActive: ['firstTestAttribute', 'secondTestAttribute'],
 					},
 				];
 
-				const state = createBlockVariationsStateWithTestBlockType(
-					variations
-				);
+				const state =
+					createBlockVariationsStateWithTestBlockType(variations);
 
 				expect(
-					getActiveBlockVariation( state, blockName, {
+					getActiveBlockVariation(state, blockName, {
 						firstTestAttribute: 1,
 						secondTestAttribute: 10,
-					} )
-				).toEqual( variations[ 0 ] );
+					})
+				).toEqual(variations[0]);
 				expect(
-					getActiveBlockVariation( state, blockName, {
+					getActiveBlockVariation(state, blockName, {
 						firstTestAttribute: 2,
 						secondTestAttribute: 20,
-					} )
-				).toEqual( variations[ 1 ] );
+					})
+				).toEqual(variations[1]);
 				expect(
-					getActiveBlockVariation( state, blockName, {
+					getActiveBlockVariation(state, blockName, {
 						firstTestAttribute: 1,
 						secondTestAttribute: 20,
-					} )
-				).toEqual( variations[ 2 ] );
-			} );
-			it( 'should ignore attributes that are not defined in the block type', () => {
+					})
+				).toEqual(variations[2]);
+			});
+			it('should ignore attributes that are not defined in the block type', () => {
 				const variations = [
 					{
 						name: 'variation-1',
@@ -493,63 +475,62 @@ describe( 'selectors', () => {
 					},
 				];
 
-				const state = createBlockVariationsStateWithTestBlockType(
-					variations
-				);
+				const state =
+					createBlockVariationsStateWithTestBlockType(variations);
 
 				expect(
-					getActiveBlockVariation( state, blockName, {
+					getActiveBlockVariation(state, blockName, {
 						firstTestAttribute: 1,
 						secondTestAttribute: 10,
 						undefinedTestAttribute: 100,
-					} )
-				).toEqual( variations[ 0 ] );
+					})
+				).toEqual(variations[0]);
 				expect(
-					getActiveBlockVariation( state, blockName, {
+					getActiveBlockVariation(state, blockName, {
 						firstTestAttribute: 1,
 						secondTestAttribute: 10,
 						undefinedTestAttribute: 1234,
-					} )
-				).toEqual( variations[ 0 ] );
+					})
+				).toEqual(variations[0]);
 				expect(
-					getActiveBlockVariation( state, blockName, {
+					getActiveBlockVariation(state, blockName, {
 						firstTestAttribute: 2,
 						secondTestAttribute: 20,
 						undefinedTestAttribute: 200,
-					} )
-				).toEqual( variations[ 1 ] );
+					})
+				).toEqual(variations[1]);
 				expect(
-					getActiveBlockVariation( state, blockName, {
+					getActiveBlockVariation(state, blockName, {
 						firstTestAttribute: 2,
 						secondTestAttribute: 20,
 						undefinedTestAttribute: 2345,
-					} )
-				).toEqual( variations[ 1 ] );
-			} );
-		} );
-		describe( 'getDefaultBlockVariation', () => {
-			it( 'should return the default variation when set', () => {
+					})
+				).toEqual(variations[1]);
+			});
+		});
+		describe('getDefaultBlockVariation', () => {
+			it('should return the default variation when set', () => {
 				const defaultBlockVariation = {
 					...secondBlockVariation,
 					isDefault: true,
 				};
-				const state = createBlockVariationsState( [
+				const state = createBlockVariationsState([
 					firstBlockVariation,
 					defaultBlockVariation,
 					thirdBlockVariation,
-				] );
+				]);
 
-				const result = getDefaultBlockVariation( state, blockName );
+				const result = getDefaultBlockVariation(state, blockName);
 
-				expect( result ).toEqual( defaultBlockVariation );
-			} );
+				expect(result).toEqual(defaultBlockVariation);
+			});
 
-			it( 'should return the last variation when multiple default variations added', () => {
+			it('should return the last variation when multiple default variations added', () => {
 				const defaultBlockVariation = {
 					...thirdBlockVariation,
 					isDefault: true,
 				};
-				const state = createBlockVariationsState( [
+				const state = createBlockVariationsState([
 					{
 						...firstBlockVariation,
 						isDefault: true,
@@ -559,127 +540,119 @@ describe( 'selectors', () => {
 						isDefault: true,
 					},
 					defaultBlockVariation,
-				] );
+				]);
 
-				const result = getDefaultBlockVariation( state, blockName );
+				const result = getDefaultBlockVariation(state, blockName);
 
-				expect( result ).toEqual( defaultBlockVariation );
-			} );
+				expect(result).toEqual(defaultBlockVariation);
+			});
 
-			it( 'should return the first variation when no default variation set', () => {
-				const state = createBlockVariationsState( [
+			it('should return the first variation when no default variation set', () => {
+				const state = createBlockVariationsState([
 					firstBlockVariation,
 					secondBlockVariation,
 					thirdBlockVariation,
-				] );
+				]);
 
-				const result = getDefaultBlockVariation( state, blockName );
+				const result = getDefaultBlockVariation(state, blockName);
 
-				expect( result ).toEqual( firstBlockVariation );
-			} );
-		} );
-	} );
+				expect(result).toEqual(firstBlockVariation);
+			});
+		});
+	});
 
-	describe( 'isMatchingSearchTerm', () => {
+	describe('isMatchingSearchTerm', () => {
 		const name = 'core/paragraph';
 		const blockType = {
 			title: 'Paragraph',
 			category: 'text',
-			keywords: [ 'body' ],
+			keywords: ['body'],
 		};
 
 		const state = {
 			blockTypes: {
-				[ name ]: blockType,
+				[name]: blockType,
 			},
 		};
 
-		describe.each( [
-			[ 'name', name ],
-			[ 'block type', blockType ],
-			[ 'block type without category', omit( blockType, 'category' ) ],
-		] )( 'by %s', ( label, nameOrType ) => {
-			it( 'should return false if not match', () => {
-				const result = isMatchingSearchTerm(
-					state,
-					nameOrType,
-					'Quote'
-				);
+		describe.each([
+			['name', name],
+			['block type', blockType],
+			['block type without category', omit(blockType, 'category')],
+		])('by %s', (label, nameOrType) => {
+			it('should return false if not match', () => {
+				const result = isMatchingSearchTerm(state, nameOrType, 'Quote');
 
-				expect( result ).toBe( false );
-			} );
+				expect(result).toBe(false);
+			});
 
-			it( 'should return true if match by title', () => {
+			it('should return true if match by title', () => {
 				const result = isMatchingSearchTerm(
 					state,
 					nameOrType,
 					'Paragraph'
 				);
 
-				expect( result ).toBe( true );
-			} );
+				expect(result).toBe(true);
+			});
 
-			it( 'should return true if match ignoring case', () => {
+			it('should return true if match ignoring case', () => {
 				const result = isMatchingSearchTerm(
 					state,
 					nameOrType,
 					'PARAGRAPH'
 				);
 
-				expect( result ).toBe( true );
-			} );
+				expect(result).toBe(true);
+			});
 
-			it( 'should return true if match ignoring diacritics', () => {
+			it('should return true if match ignoring diacritics', () => {
 				const result = isMatchingSearchTerm(
 					state,
 					nameOrType,
 					'PÁRAGRAPH'
 				);
 
-				expect( result ).toBe( true );
-			} );
+				expect(result).toBe(true);
+			});
 
-			it( 'should return true if match ignoring whitespace', () => {
+			it('should return true if match ignoring whitespace', () => {
 				const result = isMatchingSearchTerm(
 					state,
 					nameOrType,
 					'  PARAGRAPH  '
 				);
 
-				expect( result ).toBe( true );
-			} );
+				expect(result).toBe(true);
+			});
 
-			it( 'should return true if match using the keywords', () => {
-				const result = isMatchingSearchTerm(
-					state,
-					nameOrType,
-					'BODY'
-				);
+			it('should return true if match using the keywords', () => {
+				const result = isMatchingSearchTerm(state, nameOrType, 'BODY');
 
-				expect( result ).toBe( true );
-			} );
+				expect(result).toBe(true);
+			});
 
-			if ( nameOrType.category ) {
-				it( 'should return true if match using the categories', () => {
+			if (nameOrType.category) {
+				it('should return true if match using the categories', () => {
 					const result = isMatchingSearchTerm(
 						state,
 						nameOrType,
 						'TEXT'
 					);
 
-					expect( result ).toBe( true );
-				} );
+					expect(result).toBe(true);
+				});
 			}
-		} );
-	} );
+		});
+	});
 
-	describe( 'getGroupingBlockName', () => {
-		it( 'returns the grouping block name from state', () => {
+	describe('getGroupingBlockName', () => {
+		it('returns the grouping block name from state', () => {
 			const state = {
 				groupingBlockName: 'core/group',
 			};
 
-			expect( getGroupingBlockName( state ) ).toEqual( 'core/group' );
-		} );
-	} );
-} );
+			expect(getGroupingBlockName(state)).toEqual('core/group');
+		});
+	});
+});

@@ -7,7 +7,7 @@
  */
 import { createSlotFill, PanelRow } from '@wordpress/components';
 
-export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
+export const { Fill, Slot } = createSlotFill('PluginPostStatusInfo');
 
 /**
  * Renders a row in the Status & visibility panel of the Document sidebar.
@@ -52,9 +52,9 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  *
  * @return {WPComponent} The component to be rendered.
  */
-const PluginPostStatusInfo = ( { children, className } ) => (
+const PluginPostStatusInfo = ({ children, className }) => (
 	<Fill>
-		<PanelRow className={ className }>{ children }</PanelRow>
+		<PanelRow className={className}>{children}</PanelRow>
 	</Fill>
 );
 

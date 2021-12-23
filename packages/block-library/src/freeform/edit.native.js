@@ -3,10 +3,10 @@
  */
 import MissingEdit from '../missing/edit';
 
-const ClassicEdit = ( props ) => (
+const ClassicEdit = (props) => (
 	<MissingEdit
-		{ ...props }
-		attributes={ { ...props.attributes, originalName: props.name } }
+		{...props}
+		attributes={{ ...props.attributes, originalName: props.name }}
 	/>
 );
 

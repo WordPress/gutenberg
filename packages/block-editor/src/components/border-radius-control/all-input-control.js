@@ -9,21 +9,21 @@ import { __ } from '@wordpress/i18n';
  */
 import { getAllValue, hasMixedValues, hasDefinedValues } from './utils';
 
-export default function AllInputControl( { onChange, values, ...props } ) {
-	const allValue = getAllValue( values );
-	const hasValues = hasDefinedValues( values );
-	const isMixed = hasValues && hasMixedValues( values );
-	const allPlaceholder = isMixed ? __( 'Mixed' ) : null;
+export default function AllInputControl({ onChange, values, ...props }) {
+	const allValue = getAllValue(values);
+	const hasValues = hasDefinedValues(values);
+	const isMixed = hasValues && hasMixedValues(values);
+	const allPlaceholder = isMixed ? __('Mixed') : null;
 
 	return (
 		<UnitControl
-			{ ...props }
-			aria-label={ __( 'Border radius' ) }
-			disableUnits={ isMixed }
+			{...props}
+			aria-label={__('Border radius')}
+			disableUnits={isMixed}
 			isOnly
-			value={ allValue }
-			onChange={ onChange }
-			placeholder={ allPlaceholder }
+			value={allValue}
+			onChange={onChange}
+			placeholder={allPlaceholder}
 		/>
 	);
 }

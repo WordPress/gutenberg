@@ -19,10 +19,10 @@ const STORE_NAME = 'core/rich-text';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore(STORE_NAME, {
 	reducer,
 	selectors,
 	actions,
-} );
+});
 
-register( store );
+register(store);

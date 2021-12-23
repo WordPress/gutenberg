@@ -19,16 +19,16 @@
  * @return {HasHook} Function that returns whether any handlers are
  *                   attached to a particular hook and optional namespace.
  */
-function createHasHook( hooks, storeKey ) {
-	return function hasHook( hookName, namespace ) {
-		const hooksStore = hooks[ storeKey ];
+function createHasHook(hooks, storeKey) {
+	return function hasHook(hookName, namespace) {
+		const hooksStore = hooks[storeKey];
 
 		// Use the namespace if provided.
-		if ( 'undefined' !== typeof namespace ) {
+		if ('undefined' !== typeof namespace) {
 			return (
 				hookName in hooksStore &&
-				hooksStore[ hookName ].handlers.some(
-					( hook ) => hook.namespace === namespace
+				hooksStore[hookName].handlers.some(
+					(hook) => hook.namespace === namespace
 				)
 			);
 		}

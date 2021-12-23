@@ -14,22 +14,22 @@ import { useContext, forwardRef } from '@wordpress/element';
 import Button from '../button';
 import RadioContext from '../radio-context';
 
-function Radio( { children, value, ...props }, ref ) {
-	const radioContext = useContext( RadioContext );
+function Radio({ children, value, ...props }, ref) {
+	const radioContext = useContext(RadioContext);
 	const checked = radioContext.state === value;
 
 	return (
 		<ReakitRadio
-			ref={ ref }
-			as={ Button }
-			variant={ checked ? 'primary' : 'secondary' }
-			value={ value }
-			{ ...radioContext }
-			{ ...props }
+			ref={ref}
+			as={Button}
+			variant={checked ? 'primary' : 'secondary'}
+			value={value}
+			{...radioContext}
+			{...props}
 		>
-			{ children || value }
+			{children || value}
 		</ReakitRadio>
 	);
 }
 
-export default forwardRef( Radio );
+export default forwardRef(Radio);

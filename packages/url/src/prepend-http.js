@@ -17,13 +17,13 @@ const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
  *
  * @return {string} The updated URL.
  */
-export function prependHTTP( url ) {
-	if ( ! url ) {
+export function prependHTTP(url) {
+	if (!url) {
 		return url;
 	}
 
 	url = url.trim();
-	if ( ! USABLE_HREF_REGEXP.test( url ) && ! isEmail( url ) ) {
+	if (!USABLE_HREF_REGEXP.test(url) && !isEmail(url)) {
 		return 'http://' + url;
 	}
 

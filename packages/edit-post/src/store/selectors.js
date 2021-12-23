@@ -18,8 +18,8 @@ import { store as editorStore } from '@wordpress/editor';
  *
  * @return {string} Editing mode.
  */
-export function getEditorMode( state ) {
-	return getPreference( state, 'editorMode', 'visual' );
+export function getEditorMode(state) {
+	return getPreference(state, 'editorMode', 'visual');
 }
 
 /**
@@ -29,17 +29,14 @@ export function getEditorMode( state ) {
  *
  * @return {boolean} Whether the editor sidebar is opened.
  */
-export const isEditorSidebarOpened = createRegistrySelector(
-	( select ) => () => {
-		const activeGeneralSidebar = select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-post' );
-		return includes(
-			[ 'edit-post/document', 'edit-post/block' ],
-			activeGeneralSidebar
-		);
-	}
-);
+export const isEditorSidebarOpened = createRegistrySelector((select) => () => {
+	const activeGeneralSidebar =
+		select(interfaceStore).getActiveComplementaryArea('core/edit-post');
+	return includes(
+		['edit-post/document', 'edit-post/block'],
+		activeGeneralSidebar
+	);
+});
 
 /**
  * Returns true if the plugin sidebar is opened.
@@ -48,20 +45,17 @@ export const isEditorSidebarOpened = createRegistrySelector(
  *
  * @return {boolean} Whether the plugin sidebar is opened.
  */
-export const isPluginSidebarOpened = createRegistrySelector(
-	( select ) => () => {
-		const activeGeneralSidebar = select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-post' );
-		return (
-			!! activeGeneralSidebar &&
-			! includes(
-				[ 'edit-post/document', 'edit-post/block' ],
-				activeGeneralSidebar
-			)
-		);
-	}
-);
+export const isPluginSidebarOpened = createRegistrySelector((select) => () => {
+	const activeGeneralSidebar =
+		select(interfaceStore).getActiveComplementaryArea('core/edit-post');
+	return (
+		!!activeGeneralSidebar &&
+		!includes(
+			['edit-post/document', 'edit-post/block'],
+			activeGeneralSidebar
+		)
+	);
+});
 
 /**
  * Returns the current active general sidebar name, or null if there is no
@@ -78,8 +72,8 @@ export const isPluginSidebarOpened = createRegistrySelector(
  * @return {?string} Active general sidebar name.
  */
 export const getActiveGeneralSidebarName = createRegistrySelector(
-	( select ) => () => {
-		return select( interfaceStore ).getActiveComplementaryArea(
+	(select) => () => {
+		return select(interfaceStore).getActiveComplementaryArea(
 			'core/edit-post'
 		);
 	}
@@ -92,7 +86,7 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
  *
  * @return {Object} Preferences Object.
  */
-export function getPreferences( state ) {
+export function getPreferences(state) {
 	return state.preferences;
 }
 
@@ -104,9 +98,9 @@ export function getPreferences( state ) {
  *
  * @return {*} Preference Value.
  */
-export function getPreference( state, preferenceKey, defaultValue ) {
-	const preferences = getPreferences( state );
-	const value = preferences[ preferenceKey ];
+export function getPreference(state, preferenceKey, defaultValue) {
+	const preferences = getPreferences(state);
+	const value = preferences[preferenceKey];
 	return value === undefined ? defaultValue : value;
 }
 
@@ -117,7 +111,7 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  *
  * @return {boolean} Whether the publish sidebar is open.
  */
-export function isPublishSidebarOpened( state ) {
+export function isPublishSidebarOpened(state) {
 	return state.publishSidebarActive;
 }
 
@@ -130,8 +124,8 @@ export function isPublishSidebarOpened( state ) {
  *
  * @return {boolean} Whether or not the panel is removed.
  */
-export function isEditorPanelRemoved( state, panelName ) {
-	return includes( state.removedPanels, panelName );
+export function isEditorPanelRemoved(state, panelName) {
+	return includes(state.removedPanels, panelName);
 }
 
 /**
@@ -143,12 +137,12 @@ export function isEditorPanelRemoved( state, panelName ) {
  *
  * @return {boolean} Whether or not the panel is enabled.
  */
-export function isEditorPanelEnabled( state, panelName ) {
-	const panels = getPreference( state, 'panels' );
+export function isEditorPanelEnabled(state, panelName) {
+	const panels = getPreference(state, 'panels');
 
 	return (
-		! isEditorPanelRemoved( state, panelName ) &&
-		get( panels, [ panelName, 'enabled' ], true )
+		!isEditorPanelRemoved(state, panelName) &&
+		get(panels, [panelName, 'enabled'], true)
 	);
 }
 
@@ -161,11 +155,11 @@ export function isEditorPanelEnabled( state, panelName ) {
  *
  * @return {boolean} Whether or not the panel is open.
  */
-export function isEditorPanelOpened( state, panelName ) {
-	const panels = getPreference( state, 'panels' );
+export function isEditorPanelOpened(state, panelName) {
+	const panels = getPreference(state, 'panels');
 	return (
-		get( panels, [ panelName ] ) === true ||
-		get( panels, [ panelName, 'opened' ] ) === true
+		get(panels, [panelName]) === true ||
+		get(panels, [panelName, 'opened']) === true
 	);
 }
 
@@ -177,7 +171,7 @@ export function isEditorPanelOpened( state, panelName ) {
  *
  * @return {boolean} Whether the modal is active.
  */
-export function isModalActive( state, modalName ) {
+export function isModalActive(state, modalName) {
 	return state.activeModal === modalName;
 }
 
@@ -190,8 +184,8 @@ export function isModalActive( state, modalName ) {
  * @return {boolean} Is active.
  */
 export const isFeatureActive = createRegistrySelector(
-	( select ) => ( state, feature ) => {
-		return select( interfaceStore ).isFeatureActive(
+	(select) => (state, feature) => {
+		return select(interfaceStore).isFeatureActive(
 			'core/edit-post',
 			feature
 		);
@@ -208,8 +202,8 @@ export const isFeatureActive = createRegistrySelector(
  * @return {boolean} Whether the plugin item is pinned.
  */
 export const isPluginItemPinned = createRegistrySelector(
-	( select ) => ( state, pluginName ) => {
-		return select( interfaceStore ).isItemPinned(
+	(select) => (state, pluginName) => {
+		return select(interfaceStore).isItemPinned(
 			'core/edit-post',
 			pluginName
 		);
@@ -224,12 +218,12 @@ export const isPluginItemPinned = createRegistrySelector(
  * @return {string[]} Active meta box locations.
  */
 export const getActiveMetaBoxLocations = createSelector(
-	( state ) => {
-		return Object.keys( state.metaBoxes.locations ).filter( ( location ) =>
-			isMetaBoxLocationActive( state, location )
+	(state) => {
+		return Object.keys(state.metaBoxes.locations).filter((location) =>
+			isMetaBoxLocationActive(state, location)
 		);
 	},
-	( state ) => [ state.metaBoxes.locations ]
+	(state) => [state.metaBoxes.locations]
 );
 
 /**
@@ -240,12 +234,12 @@ export const getActiveMetaBoxLocations = createSelector(
  *
  * @return {boolean} Whether the meta box location is active and visible.
  */
-export function isMetaBoxLocationVisible( state, location ) {
+export function isMetaBoxLocationVisible(state, location) {
 	return (
-		isMetaBoxLocationActive( state, location ) &&
-		some( getMetaBoxesPerLocation( state, location ), ( { id } ) => {
-			return isEditorPanelEnabled( state, `meta-box-${ id }` );
-		} )
+		isMetaBoxLocationActive(state, location) &&
+		some(getMetaBoxesPerLocation(state, location), ({ id }) => {
+			return isEditorPanelEnabled(state, `meta-box-${id}`);
+		})
 	);
 }
 
@@ -258,9 +252,9 @@ export function isMetaBoxLocationVisible( state, location ) {
  *
  * @return {boolean} Whether the meta box location is active.
  */
-export function isMetaBoxLocationActive( state, location ) {
-	const metaBoxes = getMetaBoxesPerLocation( state, location );
-	return !! metaBoxes && metaBoxes.length !== 0;
+export function isMetaBoxLocationActive(state, location) {
+	const metaBoxes = getMetaBoxesPerLocation(state, location);
+	return !!metaBoxes && metaBoxes.length !== 0;
 }
 
 /**
@@ -271,8 +265,8 @@ export function isMetaBoxLocationActive( state, location ) {
  *
  * @return {?Array} List of meta boxes.
  */
-export function getMetaBoxesPerLocation( state, location ) {
-	return state.metaBoxes.locations[ location ];
+export function getMetaBoxesPerLocation(state, location) {
+	return state.metaBoxes.locations[location];
 }
 
 /**
@@ -283,10 +277,10 @@ export function getMetaBoxesPerLocation( state, location ) {
  * @return {Array} List of meta boxes.
  */
 export const getAllMetaBoxes = createSelector(
-	( state ) => {
-		return flatten( values( state.metaBoxes.locations ) );
+	(state) => {
+		return flatten(values(state.metaBoxes.locations));
 	},
-	( state ) => [ state.metaBoxes.locations ]
+	(state) => [state.metaBoxes.locations]
 );
 
 /**
@@ -296,8 +290,8 @@ export const getAllMetaBoxes = createSelector(
  *
  * @return {boolean} Whether there are metaboxes or not.
  */
-export function hasMetaBoxes( state ) {
-	return getActiveMetaBoxLocations( state ).length > 0;
+export function hasMetaBoxes(state) {
+	return getActiveMetaBoxLocations(state).length > 0;
 }
 
 /**
@@ -307,7 +301,7 @@ export function hasMetaBoxes( state ) {
  *
  * @return {boolean} Whether the metaboxes are being saved.
  */
-export function isSavingMetaBoxes( state ) {
+export function isSavingMetaBoxes(state) {
 	return state.metaBoxes.isSaving;
 }
 
@@ -318,7 +312,7 @@ export function isSavingMetaBoxes( state ) {
  *
  * @return {string} Device type.
  */
-export function __experimentalGetPreviewDeviceType( state ) {
+export function __experimentalGetPreviewDeviceType(state) {
 	return state.deviceType;
 }
 
@@ -329,8 +323,8 @@ export function __experimentalGetPreviewDeviceType( state ) {
  *
  * @return {boolean} Whether the inserter is opened.
  */
-export function isInserterOpened( state ) {
-	return !! state.blockInserterPanel;
+export function isInserterOpened(state) {
+	return !!state.blockInserterPanel;
 }
 
 /**
@@ -340,12 +334,9 @@ export function isInserterOpened( state ) {
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export function __experimentalGetInsertionPoint( state ) {
-	const {
-		rootClientId,
-		insertionIndex,
-		filterValue,
-	} = state.blockInserterPanel;
+export function __experimentalGetInsertionPoint(state) {
+	const { rootClientId, insertionIndex, filterValue } =
+		state.blockInserterPanel;
 	return { rootClientId, insertionIndex, filterValue };
 }
 
@@ -356,7 +347,7 @@ export function __experimentalGetInsertionPoint( state ) {
  *
  * @return {boolean} Whether the list view is opened.
  */
-export function isListViewOpened( state ) {
+export function isListViewOpened(state) {
 	return state.listViewPanel;
 }
 
@@ -367,7 +358,7 @@ export function isListViewOpened( state ) {
  *
  * @return {boolean} Whether we're editing the template.
  */
-export function isEditingTemplate( state ) {
+export function isEditingTemplate(state) {
 	return state.isEditingTemplate;
 }
 
@@ -378,7 +369,7 @@ export function isEditingTemplate( state ) {
  *
  * @return {boolean} Whether meta boxes are initialized.
  */
-export function areMetaBoxesInitialized( state ) {
+export function areMetaBoxesInitialized(state) {
 	return state.metaBoxes.initialized;
 }
 
@@ -387,32 +378,27 @@ export function areMetaBoxesInitialized( state ) {
  *
  * @return {Object?} Post Template.
  */
-export const getEditedPostTemplate = createRegistrySelector(
-	( select ) => () => {
-		const currentTemplate = select( editorStore ).getEditedPostAttribute(
-			'template'
+export const getEditedPostTemplate = createRegistrySelector((select) => () => {
+	const currentTemplate =
+		select(editorStore).getEditedPostAttribute('template');
+	if (currentTemplate) {
+		const templateWithSameSlug = select(coreStore)
+			.getEntityRecords('postType', 'wp_template')
+			?.find((template) => template.slug === currentTemplate);
+		if (!templateWithSameSlug) {
+			return templateWithSameSlug;
+		}
+		return select(coreStore).getEditedEntityRecord(
+			'postType',
+			'wp_template',
+			templateWithSameSlug.id
 		);
-		if ( currentTemplate ) {
-			const templateWithSameSlug = select( coreStore )
-				.getEntityRecords( 'postType', 'wp_template' )
-				?.find( ( template ) => template.slug === currentTemplate );
-			if ( ! templateWithSameSlug ) {
-				return templateWithSameSlug;
-			}
-			return select( coreStore ).getEditedEntityRecord(
-				'postType',
-				'wp_template',
-				templateWithSameSlug.id
-			);
-		}
-
-		const post = select( editorStore ).getCurrentPost();
-		if ( post.link ) {
-			return select( coreStore ).__experimentalGetTemplateForLink(
-				post.link
-			);
-		}
-
-		return null;
 	}
-);
+
+	const post = select(editorStore).getCurrentPost();
+	if (post.link) {
+		return select(coreStore).__experimentalGetTemplateForLink(post.link);
+	}
+
+	return null;
+});

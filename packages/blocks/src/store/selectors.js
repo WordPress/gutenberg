@@ -27,9 +27,9 @@ import {
  *
  * @return {Object} Block type object.
  */
-const getNormalizedBlockType = ( state, nameOrType ) =>
+const getNormalizedBlockType = (state, nameOrType) =>
 	'string' === typeof nameOrType
-		? getBlockType( state, nameOrType )
+		? getBlockType(state, nameOrType)
 		: nameOrType;
 
 /**
@@ -39,7 +39,7 @@ const getNormalizedBlockType = ( state, nameOrType ) =>
  *
  * @return {Array} Unprocessed block types.
  */
-export function __experimentalGetUnprocessedBlockTypes( state ) {
+export function __experimentalGetUnprocessedBlockTypes(state) {
 	return state.unprocessedBlockTypes;
 }
 
@@ -51,8 +51,8 @@ export function __experimentalGetUnprocessedBlockTypes( state ) {
  * @return {Array} Block Types.
  */
 export const getBlockTypes = createSelector(
-	( state ) => Object.values( state.blockTypes ),
-	( state ) => [ state.blockTypes ]
+	(state) => Object.values(state.blockTypes),
+	(state) => [state.blockTypes]
 );
 
 /**
@@ -63,8 +63,8 @@ export const getBlockTypes = createSelector(
  *
  * @return {Object?} Block Type.
  */
-export function getBlockType( state, name ) {
-	return state.blockTypes[ name ];
+export function getBlockType(state, name) {
+	return state.blockTypes[name];
 }
 
 /**
@@ -75,8 +75,8 @@ export function getBlockType( state, name ) {
  *
  * @return {Array?} Block Styles.
  */
-export function getBlockStyles( state, name ) {
-	return state.blockStyles[ name ];
+export function getBlockStyles(state, name) {
+	return state.blockStyles[name];
 }
 
 /**
@@ -89,20 +89,18 @@ export function getBlockStyles( state, name ) {
  * @return {(WPBlockVariation[]|void)} Block variations.
  */
 export const getBlockVariations = createSelector(
-	( state, blockName, scope ) => {
-		const variations = state.blockVariations[ blockName ];
-		if ( ! variations || ! scope ) {
+	(state, blockName, scope) => {
+		const variations = state.blockVariations[blockName];
+		if (!variations || !scope) {
 			return variations;
 		}
-		return variations.filter( ( variation ) => {
+		return variations.filter((variation) => {
 			// For backward compatibility reasons, variation's scope defaults to
 			// `block` and `inserter` when not set.
-			return ( variation.scope || [ 'block', 'inserter' ] ).includes(
-				scope
-			);
-		} );
+			return (variation.scope || ['block', 'inserter']).includes(scope);
+		});
 	},
-	( state, blockName ) => [ state.blockVariations[ blockName ] ]
+	(state, blockName) => [state.blockVariations[blockName]]
 );
 
 /**
@@ -124,28 +122,27 @@ export const getBlockVariations = createSelector(
  *
  * @return {(WPBlockVariation|undefined)} Active block variation.
  */
-export function getActiveBlockVariation( state, blockName, attributes, scope ) {
-	const variations = getBlockVariations( state, blockName, scope );
+export function getActiveBlockVariation(state, blockName, attributes, scope) {
+	const variations = getBlockVariations(state, blockName, scope);
 
-	const match = variations?.find( ( variation ) => {
-		if ( Array.isArray( variation.isActive ) ) {
-			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType?.attributes || {} );
-			const definedAttributes = variation.isActive.filter(
-				( attribute ) => attributeKeys.includes( attribute )
+	const match = variations?.find((variation) => {
+		if (Array.isArray(variation.isActive)) {
+			const blockType = getBlockType(state, blockName);
+			const attributeKeys = Object.keys(blockType?.attributes || {});
+			const definedAttributes = variation.isActive.filter((attribute) =>
+				attributeKeys.includes(attribute)
 			);
-			if ( definedAttributes.length === 0 ) {
+			if (definedAttributes.length === 0) {
 				return false;
 			}
 			return definedAttributes.every(
-				( attribute ) =>
-					attributes[ attribute ] ===
-					variation.attributes[ attribute ]
+				(attribute) =>
+					attributes[attribute] === variation.attributes[attribute]
 			);
 		}
 
-		return variation.isActive?.( attributes, variation.attributes );
-	} );
+		return variation.isActive?.(attributes, variation.attributes);
+	});
 
 	return match;
 }
@@ -162,10 +159,10 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
  *
  * @return {?WPBlockVariation} The default block variation.
  */
-export function getDefaultBlockVariation( state, blockName, scope ) {
-	const variations = getBlockVariations( state, blockName, scope );
+export function getDefaultBlockVariation(state, blockName, scope) {
+	const variations = getBlockVariations(state, blockName, scope);
 
-	return findLast( variations, 'isDefault' ) || first( variations );
+	return findLast(variations, 'isDefault') || first(variations);
 }
 
 /**
@@ -175,7 +172,7 @@ export function getDefaultBlockVariation( state, blockName, scope ) {
  *
  * @return {WPBlockCategory[]} Categories list.
  */
-export function getCategories( state ) {
+export function getCategories(state) {
 	return state.categories;
 }
 
@@ -186,7 +183,7 @@ export function getCategories( state ) {
  *
  * @return {Object} Collections list.
  */
-export function getCollections( state ) {
+export function getCollections(state) {
 	return state.collections;
 }
 
@@ -197,7 +194,7 @@ export function getCollections( state ) {
  *
  * @return {string?} Default block name.
  */
-export function getDefaultBlockName( state ) {
+export function getDefaultBlockName(state) {
 	return state.defaultBlockName;
 }
 
@@ -208,7 +205,7 @@ export function getDefaultBlockName( state ) {
  *
  * @return {string?} Name of the block for handling non-block content.
  */
-export function getFreeformFallbackBlockName( state ) {
+export function getFreeformFallbackBlockName(state) {
 	return state.freeformFallbackBlockName;
 }
 
@@ -219,7 +216,7 @@ export function getFreeformFallbackBlockName( state ) {
  *
  * @return {string?} Name of the block for handling unregistered blocks.
  */
-export function getUnregisteredFallbackBlockName( state ) {
+export function getUnregisteredFallbackBlockName(state) {
 	return state.unregisteredFallbackBlockName;
 }
 
@@ -230,7 +227,7 @@ export function getUnregisteredFallbackBlockName( state ) {
  *
  * @return {string?} Name of the block for handling unregistered blocks.
  */
-export function getGroupingBlockName( state ) {
+export function getGroupingBlockName(state) {
 	return state.groupingBlockName;
 }
 
@@ -243,15 +240,15 @@ export function getGroupingBlockName( state ) {
  * @return {Array} Array of child block names.
  */
 export const getChildBlockNames = createSelector(
-	( state, blockName ) => {
+	(state, blockName) => {
 		return map(
-			filter( state.blockTypes, ( blockType ) => {
-				return includes( blockType.parent, blockName );
-			} ),
-			( { name } ) => name
+			filter(state.blockTypes, (blockType) => {
+				return includes(blockType.parent, blockName);
+			}),
+			({ name }) => name
 		);
 	},
-	( state ) => [ state.blockTypes ]
+	(state) => [state.blockTypes]
 );
 
 /**
@@ -271,12 +268,12 @@ export const getBlockSupport = (
 	feature,
 	defaultSupports
 ) => {
-	const blockType = getNormalizedBlockType( state, nameOrType );
-	if ( ! blockType?.supports ) {
+	const blockType = getNormalizedBlockType(state, nameOrType);
+	if (!blockType?.supports) {
 		return defaultSupports;
 	}
 
-	return get( blockType.supports, feature, defaultSupports );
+	return get(blockType.supports, feature, defaultSupports);
 };
 
 /**
@@ -290,8 +287,8 @@ export const getBlockSupport = (
  *
  * @return {boolean} Whether block supports feature.
  */
-export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
-	return !! getBlockSupport( state, nameOrType, feature, defaultSupports );
+export function hasBlockSupport(state, nameOrType, feature, defaultSupports) {
+	return !!getBlockSupport(state, nameOrType, feature, defaultSupports);
 }
 
 /**
@@ -304,35 +301,35 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  *
  * @return {Object[]} Whether block type matches search term.
  */
-export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
-	const blockType = getNormalizedBlockType( state, nameOrType );
+export function isMatchingSearchTerm(state, nameOrType, searchTerm) {
+	const blockType = getNormalizedBlockType(state, nameOrType);
 
-	const getNormalizedSearchTerm = flow( [
+	const getNormalizedSearchTerm = flow([
 		// Disregard diacritics.
 		//  Input: "média"
 		deburr,
 
 		// Lowercase.
 		//  Input: "MEDIA"
-		( term ) => term.toLowerCase(),
+		(term) => term.toLowerCase(),
 
 		// Strip leading and trailing whitespace.
 		//  Input: " media "
-		( term ) => term.trim(),
-	] );
+		(term) => term.trim(),
+	]);
 
-	const normalizedSearchTerm = getNormalizedSearchTerm( searchTerm );
+	const normalizedSearchTerm = getNormalizedSearchTerm(searchTerm);
 
-	const isSearchMatch = flow( [
+	const isSearchMatch = flow([
 		getNormalizedSearchTerm,
-		( normalizedCandidate ) =>
-			includes( normalizedCandidate, normalizedSearchTerm ),
-	] );
+		(normalizedCandidate) =>
+			includes(normalizedCandidate, normalizedSearchTerm),
+	]);
 
 	return (
-		isSearchMatch( blockType.title ) ||
-		some( blockType.keywords, isSearchMatch ) ||
-		isSearchMatch( blockType.category )
+		isSearchMatch(blockType.title) ||
+		some(blockType.keywords, isSearchMatch) ||
+		isSearchMatch(blockType.category)
 	);
 }
 
@@ -344,8 +341,8 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
  *
  * @return {boolean} True if a block contains child blocks and false otherwise.
  */
-export const hasChildBlocks = ( state, blockName ) => {
-	return getChildBlockNames( state, blockName ).length > 0;
+export const hasChildBlocks = (state, blockName) => {
+	return getChildBlockNames(state, blockName).length > 0;
 };
 
 /**
@@ -357,8 +354,8 @@ export const hasChildBlocks = ( state, blockName ) => {
  * @return {boolean} True if a block contains at least one child blocks with inserter support
  *                   and false otherwise.
  */
-export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
-	return some( getChildBlockNames( state, blockName ), ( childBlockName ) => {
-		return hasBlockSupport( state, childBlockName, 'inserter', true );
-	} );
+export const hasChildBlocksWithInserterSupport = (state, blockName) => {
+	return some(getChildBlockNames(state, blockName), (childBlockName) => {
+		return hasBlockSupport(state, childBlockName, 'inserter', true);
+	});
 };

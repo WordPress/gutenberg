@@ -3,24 +3,24 @@
  */
 import { convertToTree } from '../util';
 
-describe( 'Convert to tree', () => {
-	it( 'Empty comments', () => {
-		const comments = convertToTree( [] );
+describe('Convert to tree', () => {
+	it('Empty comments', () => {
+		const comments = convertToTree([]);
 
-		expect( comments ).toEqual( [] );
-	} );
+		expect(comments).toEqual([]);
+	});
 
-	it( 'Handle comments', () => {
-		const comments = convertToTree( [
+	it('Handle comments', () => {
+		const comments = convertToTree([
 			{ id: 1, parent: 0 },
 			{ id: 2, parent: 0 },
 			{ id: 3, parent: 2 },
 			{ id: 4, parent: 2 },
 			{ id: 5, parent: 4 },
 			{ id: 6, parent: 1 },
-		] );
+		]);
 
-		expect( comments ).toEqual( [
+		expect(comments).toEqual([
 			{
 				commentId: 1,
 				children: [
@@ -36,10 +36,10 @@ describe( 'Convert to tree', () => {
 					{ commentId: 3, children: [] },
 					{
 						commentId: 4,
-						children: [ { commentId: 5, children: [] } ],
+						children: [{ commentId: 5, children: [] }],
 					},
 				],
 			},
-		] );
-	} );
-} );
+		]);
+	});
+});

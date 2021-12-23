@@ -8,20 +8,20 @@ const transforms = {
 		{
 			type: 'enter',
 			regExp: /^```$/,
-			transform: () => createBlock( 'core/code' ),
+			transform: () => createBlock('core/code'),
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/html' ],
-			transform: ( { content } ) => {
-				return createBlock( 'core/code', {
+			blocks: ['core/html'],
+			transform: ({ content }) => {
+				return createBlock('core/code', {
 					content,
-				} );
+				});
 			},
 		},
 		{
 			type: 'raw',
-			isMatch: ( node ) =>
+			isMatch: (node) =>
 				node.nodeName === 'PRE' &&
 				node.children.length === 1 &&
 				node.firstChild.nodeName === 'CODE',

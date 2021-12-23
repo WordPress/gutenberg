@@ -20,43 +20,40 @@ import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
 
 export class PostPublishButton extends Component {
-	constructor( props ) {
-		super( props );
+	constructor(props) {
+		super(props);
 		this.buttonNode = createRef();
 
-		this.createOnClick = this.createOnClick.bind( this );
-		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind(
-			this
-		);
+		this.createOnClick = this.createOnClick.bind(this);
+		this.closeEntitiesSavedStates =
+			this.closeEntitiesSavedStates.bind(this);
 
 		this.state = {
 			entitiesSavedStatesCallback: false,
 		};
 	}
 	componentDidMount() {
-		if ( this.props.focusOnMount ) {
+		if (this.props.focusOnMount) {
 			this.buttonNode.current.focus();
 		}
 	}
 
-	createOnClick( callback ) {
-		return ( ...args ) => {
-			const {
-				hasNonPostEntityChanges,
-				setEntitiesSavedStatesCallback,
-			} = this.props;
+	createOnClick(callback) {
+		return (...args) => {
+			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
+				this.props;
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
 			// We also need to check that the `setEntitiesSavedStatesCallback`
 			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
-			if ( hasNonPostEntityChanges && setEntitiesSavedStatesCallback ) {
+			if (hasNonPostEntityChanges && setEntitiesSavedStatesCallback) {
 				// The modal for multiple entity saving will open,
 				// hold the callback for saving/publishing the post
 				// so that we can call it if the post entity is checked.
-				this.setState( {
-					entitiesSavedStatesCallback: () => callback( ...args ),
-				} );
+				this.setState({
+					entitiesSavedStatesCallback: () => callback(...args),
+				});
 
 				// Open the save panel by setting its callback.
 				// To set a function on the useState hook, we must set it
@@ -68,19 +65,19 @@ export class PostPublishButton extends Component {
 				return noop;
 			}
 
-			return callback( ...args );
+			return callback(...args);
 		};
 	}
 
-	closeEntitiesSavedStates( savedEntities ) {
+	closeEntitiesSavedStates(savedEntities) {
 		const { postType, postId } = this.props;
 		const { entitiesSavedStatesCallback } = this.state;
-		this.setState( { entitiesSavedStatesCallback: false }, () => {
+		this.setState({ entitiesSavedStatesCallback: false }, () => {
 			if (
 				savedEntities &&
 				some(
 					savedEntities,
-					( elt ) =>
+					(elt) =>
 						elt.kind === 'postType' &&
 						elt.name === postType &&
 						elt.key === postId
@@ -89,7 +86,7 @@ export class PostPublishButton extends Component {
 				// The post entity was checked, call the held callback from `createOnClick`.
 				entitiesSavedStatesCallback();
 			}
-		} );
+		});
 	}
 
 	render() {
@@ -116,43 +113,43 @@ export class PostPublishButton extends Component {
 		} = this.props;
 
 		const isButtonDisabled =
-			( isSaving ||
+			(isSaving ||
 				forceIsSaving ||
-				! isSaveable ||
+				!isSaveable ||
 				isPostSavingLocked ||
-				( ! isPublishable && ! forceIsDirty ) ) &&
-			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
+				(!isPublishable && !forceIsDirty)) &&
+			(!hasNonPostEntityChanges || isSavingNonPostEntityChanges);
 
 		const isToggleDisabled =
-			( isPublished ||
+			(isPublished ||
 				isSaving ||
 				forceIsSaving ||
-				! isSaveable ||
-				( ! isPublishable && ! forceIsDirty ) ) &&
-			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
+				!isSaveable ||
+				(!isPublishable && !forceIsDirty)) &&
+			(!hasNonPostEntityChanges || isSavingNonPostEntityChanges);
 
 		let publishStatus;
-		if ( ! hasPublishAction ) {
+		if (!hasPublishAction) {
 			publishStatus = 'pending';
-		} else if ( visibility === 'private' ) {
+		} else if (visibility === 'private') {
 			publishStatus = 'private';
-		} else if ( isBeingScheduled ) {
+		} else if (isBeingScheduled) {
 			publishStatus = 'future';
 		} else {
 			publishStatus = 'publish';
 		}
 
 		const onClickButton = () => {
-			if ( isButtonDisabled ) {
+			if (isButtonDisabled) {
 				return;
 			}
 			onSubmit();
-			onStatusChange( publishStatus );
+			onStatusChange(publishStatus);
 			onSave();
 		};
 
 		const onClickToggle = () => {
-			if ( isToggleDisabled ) {
+			if (isToggleDisabled) {
 				return;
 			}
 			onToggle();
@@ -161,9 +158,9 @@ export class PostPublishButton extends Component {
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
-			isBusy: ! isAutoSaving && isSaving && isPublished,
+			isBusy: !isAutoSaving && isSaving && isPublished,
 			variant: 'primary',
-			onClick: this.createOnClick( onClickButton ),
+			onClick: this.createOnClick(onClickButton),
 		};
 
 		const toggleProps = {
@@ -172,16 +169,16 @@ export class PostPublishButton extends Component {
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
 			variant: 'primary',
-			onClick: this.createOnClick( onClickToggle ),
+			onClick: this.createOnClick(onClickToggle),
 		};
 
 		const toggleChildren = isBeingScheduled
-			? __( 'Schedule…' )
-			: __( 'Publish' );
+			? __('Schedule…')
+			: __('Publish');
 		const buttonChildren = (
 			<PublishButtonLabel
-				forceIsSaving={ forceIsSaving }
-				hasNonPostEntityChanges={ hasNonPostEntityChanges }
+				forceIsSaving={forceIsSaving}
+				hasNonPostEntityChanges={hasNonPostEntityChanges}
 			/>
 		);
 
@@ -190,25 +187,25 @@ export class PostPublishButton extends Component {
 		return (
 			<>
 				<Button
-					ref={ this.buttonNode }
-					{ ...componentProps }
-					className={ classnames(
+					ref={this.buttonNode}
+					{...componentProps}
+					className={classnames(
 						componentProps.className,
 						'editor-post-publish-button__button',
 						{
 							'has-changes-dot': hasNonPostEntityChanges,
 						}
-					) }
+					)}
 				>
-					{ componentChildren }
+					{componentChildren}
 				</Button>
 			</>
 		);
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		const {
 			isSavingPost,
 			isAutosavingPost,
@@ -223,7 +220,7 @@ export default compose( [
 			getCurrentPostId,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
-		} = select( editorStore );
+		} = select(editorStore);
 		const _isAutoSaving = isAutosavingPost();
 		return {
 			isSaving: isSavingPost() || _isAutoSaving,
@@ -236,7 +233,7 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			hasPublishAction: get(
 				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
+				['_links', 'wp:action-publish'],
 				false
 			),
 			postType: getCurrentPostType(),
@@ -244,13 +241,13 @@ export default compose( [
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( editorStore );
+	}),
+	withDispatch((dispatch) => {
+		const { editPost, savePost } = dispatch(editorStore);
 		return {
-			onStatusChange: ( status ) =>
-				editPost( { status }, { undoIgnore: true } ),
+			onStatusChange: (status) =>
+				editPost({ status }, { undoIgnore: true }),
 			onSave: savePost,
 		};
-	} ),
-] )( PostPublishButton );
+	}),
+])(PostPublishButton);

@@ -8,7 +8,7 @@ export async function ensureSidebarOpened() {
 		'.edit-post-header__settings [aria-label="Settings"][aria-expanded="false"]'
 	);
 
-	if ( toggleSidebarButton ) {
+	if (toggleSidebarButton) {
 		await toggleSidebarButton.click();
 	}
 }

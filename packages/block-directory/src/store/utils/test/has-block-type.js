@@ -8,18 +8,18 @@ import {
 } from '../../test/fixtures';
 import hasBlockType from '../has-block-type';
 
-describe( 'hasBlockType', () => {
-	it( 'should find the block', () => {
-		const found = hasBlockType( blockTypeInstalled, blockList );
-		expect( found ).toBe( true );
-	} );
+describe('hasBlockType', () => {
+	it('should find the block', () => {
+		const found = hasBlockType(blockTypeInstalled, blockList);
+		expect(found).toBe(true);
+	});
 
-	it( 'should not find the unused block', () => {
-		const found = hasBlockType( blockTypeUnused, blockList );
-		expect( found ).toBe( false );
-	} );
+	it('should not find the unused block', () => {
+		const found = hasBlockType(blockTypeUnused, blockList);
+		expect(found).toBe(false);
+	});
 
-	it( 'should find the block in innerBlocks', () => {
+	it('should find the block in innerBlocks', () => {
 		const innerBlockList = [
 			...blockList,
 			{
@@ -36,7 +36,7 @@ describe( 'hasBlockType', () => {
 				],
 			},
 		];
-		const found = hasBlockType( blockTypeUnused, innerBlockList );
-		expect( found ).toBe( true );
-	} );
-} );
+		const found = hasBlockType(blockTypeUnused, innerBlockList);
+		expect(found).toBe(true);
+	});
+});

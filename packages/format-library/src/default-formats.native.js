@@ -7,4 +7,4 @@ import { link } from './link';
 import { strikethrough } from './strikethrough';
 import { textColor } from './text-color';
 
-export default [ bold, italic, link, strikethrough, textColor ];
+export default [bold, italic, link, strikethrough, textColor];

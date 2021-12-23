@@ -23,7 +23,7 @@ import usePreferredColorScheme from '../use-preferred-color-scheme';
  * @param {Object} darkStyle
  * @return {Object} the combined styles depending on the current color scheme
  */
-const usePreferredColorSchemeStyle = ( lightStyle, darkStyle ) => {
+const usePreferredColorSchemeStyle = (lightStyle, darkStyle) => {
 	const colorScheme = usePreferredColorScheme();
 	const isDarkMode = colorScheme === 'dark';
 

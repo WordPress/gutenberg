@@ -15,49 +15,39 @@ import { useState } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
 
-const BlockTransformationsMenu = ( {
+const BlockTransformationsMenu = ({
 	className,
 	possibleBlockTransformations,
 	onSelect,
 	blocks,
-} ) => {
-	const [
-		hoveredTransformItemName,
-		setHoveredTransformItemName,
-	] = useState();
+}) => {
+	const [hoveredTransformItemName, setHoveredTransformItemName] = useState();
 	return (
-		<MenuGroup label={ __( 'Transform to' ) } className={ className }>
-			{ hoveredTransformItemName && (
+		<MenuGroup label={__('Transform to')} className={className}>
+			{hoveredTransformItemName && (
 				<PreviewBlockPopover
-					blocks={ switchToBlockType(
-						blocks,
-						hoveredTransformItemName
-					) }
+					blocks={switchToBlockType(blocks, hoveredTransformItemName)}
 				/>
-			) }
-			{ possibleBlockTransformations.map( ( item ) => {
+			)}
+			{possibleBlockTransformations.map((item) => {
 				const { name, icon, title, isDisabled } = item;
 				return (
 					<MenuItem
-						key={ name }
-						className={ getBlockMenuDefaultClassName( name ) }
-						onClick={ ( event ) => {
+						key={name}
+						className={getBlockMenuDefaultClassName(name)}
+						onClick={(event) => {
 							event.preventDefault();
-							onSelect( name );
-						} }
-						disabled={ isDisabled }
-						onMouseLeave={ () =>
-							setHoveredTransformItemName( null )
-						}
-						onMouseEnter={ () =>
-							setHoveredTransformItemName( name )
-						}
+							onSelect(name);
+						}}
+						disabled={isDisabled}
+						onMouseLeave={() => setHoveredTransformItemName(null)}
+						onMouseEnter={() => setHoveredTransformItemName(name)}
 					>
-						<BlockIcon icon={ icon } showColors />
-						{ title }
+						<BlockIcon icon={icon} showColors />
+						{title}
 					</MenuItem>
 				);
-			} ) }
+			})}
 		</MenuGroup>
 	);
 };

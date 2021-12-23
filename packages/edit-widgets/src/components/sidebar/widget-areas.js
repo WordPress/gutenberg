@@ -15,9 +15,9 @@ import { safeHTML } from '@wordpress/dom';
  */
 import { store as editWidgetsStore } from '../../store';
 
-export default function WidgetAreas( { selectedWidgetAreaId } ) {
+export default function WidgetAreas({ selectedWidgetAreaId }) {
 	const widgetAreas = useSelect(
-		( select ) => select( editWidgetsStore ).getWidgetAreas(),
+		(select) => select(editWidgetsStore).getWidgetAreas(),
 		[]
 	);
 
@@ -25,17 +25,17 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 		() =>
 			selectedWidgetAreaId &&
 			widgetAreas?.find(
-				( widgetArea ) => widgetArea.id === selectedWidgetAreaId
+				(widgetArea) => widgetArea.id === selectedWidgetAreaId
 			),
-		[ selectedWidgetAreaId, widgetAreas ]
+		[selectedWidgetAreaId, widgetAreas]
 	);
 
 	let description;
-	if ( ! selectedWidgetArea ) {
+	if (!selectedWidgetArea) {
 		description = __(
 			'Widget Areas are global parts in your site’s layout that can accept blocks. These vary by theme, but are typically parts like your Sidebar or Footer.'
 		);
-	} else if ( selectedWidgetAreaId === 'wp_inactive_widgets' ) {
+	} else if (selectedWidgetAreaId === 'wp_inactive_widgets') {
 		description = __(
 			'Blocks in this Widget Area will not be displayed in your site.'
 		);
@@ -46,35 +46,35 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 	return (
 		<div className="edit-widgets-widget-areas">
 			<div className="edit-widgets-widget-areas__top-container">
-				<BlockIcon icon={ blockDefault } />
+				<BlockIcon icon={blockDefault} />
 				<div>
 					<p
 						// Use `dangerouslySetInnerHTML` to keep backwards
 						// compatibility. Basic markup in the description is an
 						// established feature of WordPress.
 						// @see https://github.com/WordPress/gutenberg/issues/33106
-						dangerouslySetInnerHTML={ {
-							__html: safeHTML( description ),
-						} }
+						dangerouslySetInnerHTML={{
+							__html: safeHTML(description),
+						}}
 					/>
-					{ widgetAreas?.length === 0 && (
+					{widgetAreas?.length === 0 && (
 						<p>
-							{ __(
+							{__(
 								'Your theme does not contain any Widget Areas.'
-							) }
+							)}
 						</p>
-					) }
-					{ ! selectedWidgetArea && (
+					)}
+					{!selectedWidgetArea && (
 						<Button
-							href={ addQueryArgs( 'customize.php', {
+							href={addQueryArgs('customize.php', {
 								'autofocus[panel]': 'widgets',
 								return: window.location.pathname,
-							} ) }
+							})}
 							variant="tertiary"
 						>
-							{ __( 'Manage with live preview' ) }
+							{__('Manage with live preview')}
 						</Button>
-					) }
+					)}
 				</div>
 			</div>
 		</div>

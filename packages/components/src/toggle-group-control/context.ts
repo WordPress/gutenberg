@@ -12,5 +12,5 @@ const ToggleGroupControlContext = createContext(
 	{} as ToggleGroupControlContextProps
 );
 export const useToggleGroupControlContext = () =>
-	useContext( ToggleGroupControlContext );
+	useContext(ToggleGroupControlContext);
 export default ToggleGroupControlContext;

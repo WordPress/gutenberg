@@ -10,9 +10,9 @@ import { Component } from '@wordpress/element';
 
 class TokenInput extends Component {
 	constructor() {
-		super( ...arguments );
-		this.onChange = this.onChange.bind( this );
-		this.bindInput = this.bindInput.bind( this );
+		super(...arguments);
+		this.onChange = this.onChange.bind(this);
+		this.bindInput = this.bindInput.bind(this);
 	}
 
 	focus() {
@@ -23,14 +23,14 @@ class TokenInput extends Component {
 		return this.input === this.input.ownerDocument.activeElement;
 	}
 
-	bindInput( ref ) {
+	bindInput(ref) {
 		this.input = ref;
 	}
 
-	onChange( event ) {
-		this.props.onChange( {
+	onChange(event) {
+		this.props.onChange({
 			value: event.target.value,
-		} );
+		});
 	}
 
 	render() {
@@ -47,32 +47,32 @@ class TokenInput extends Component {
 
 		return (
 			<input
-				ref={ this.bindInput }
-				id={ `components-form-token-input-${ instanceId }` }
+				ref={this.bindInput}
+				id={`components-form-token-input-${instanceId}`}
 				type="text"
-				{ ...props }
-				value={ value || '' }
-				onChange={ onChange ? this.onChange : undefined }
-				size={ size }
-				className={ classnames(
+				{...props}
+				value={value || ''}
+				onChange={onChange ? this.onChange : undefined}
+				size={size}
+				className={classnames(
 					className,
 					'components-form-token-field__input'
-				) }
+				)}
 				autoComplete="off"
 				role="combobox"
-				aria-expanded={ isExpanded }
+				aria-expanded={isExpanded}
 				aria-autocomplete="list"
 				aria-owns={
 					isExpanded
-						? `components-form-token-suggestions-${ instanceId }`
+						? `components-form-token-suggestions-${instanceId}`
 						: undefined
 				}
 				aria-activedescendant={
 					selectedSuggestionIndex !== -1
-						? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+						? `components-form-token-suggestions-${instanceId}-${selectedSuggestionIndex}`
 						: undefined
 				}
-				aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
+				aria-describedby={`components-form-token-suggestions-howto-${instanceId}`}
 			/>
 		);
 	}

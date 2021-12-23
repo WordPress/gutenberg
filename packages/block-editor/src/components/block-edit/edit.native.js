@@ -25,26 +25,26 @@ import BlockContext from '../block-context';
  */
 const DEFAULT_BLOCK_CONTEXT = {};
 
-export const Edit = ( props ) => {
+export const Edit = (props) => {
 	const { name } = props;
-	const blockType = getBlockType( name );
+	const blockType = getBlockType(name);
 
-	const blockContext = useContext( BlockContext );
+	const blockContext = useContext(BlockContext);
 
 	// Assign context values using the block type's declared context needs.
-	const context = useMemo( () => {
+	const context = useMemo(() => {
 		return blockType && blockType.usesContext
-			? pick( blockContext, blockType.usesContext )
+			? pick(blockContext, blockType.usesContext)
 			: DEFAULT_BLOCK_CONTEXT;
-	}, [ blockType, blockContext ] );
+	}, [blockType, blockContext]);
 
-	if ( ! blockType ) {
+	if (!blockType) {
 		return null;
 	}
 
 	const Component = blockType.edit;
 
-	return <Component { ...props } context={ context } />;
+	return <Component {...props} context={context} />;
 };
 
-export default withFilters( 'editor.BlockEdit' )( Edit );
+export default withFilters('editor.BlockEdit')(Edit);

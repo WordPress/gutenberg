@@ -5,13 +5,13 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
-function DownloadableBlocksInserterPanel( {
+function DownloadableBlocksInserterPanel({
 	children,
 	downloadableItems,
 	hasLocalBlocks,
-} ) {
+}) {
 	const count = downloadableItems.length;
-	useEffect( () => {
+	useEffect(() => {
 		speak(
 			sprintf(
 				/* translators: %d: number of available blocks. */
@@ -23,30 +23,30 @@ function DownloadableBlocksInserterPanel( {
 				count
 			)
 		);
-	}, [ count ] );
+	}, [count]);
 
 	return (
 		<>
-			{ ! hasLocalBlocks && (
+			{!hasLocalBlocks && (
 				<p className="block-directory-downloadable-blocks-panel__no-local">
-					{ __( 'No results available from your installed blocks.' ) }
+					{__('No results available from your installed blocks.')}
 				</p>
-			) }
+			)}
 
 			<div className="block-editor-inserter__quick-inserter-separator" />
 
 			<div className="block-directory-downloadable-blocks-panel">
 				<div className="block-directory-downloadable-blocks-panel__header">
 					<h2 className="block-directory-downloadable-blocks-panel__title">
-						{ __( 'Available to install' ) }
+						{__('Available to install')}
 					</h2>
 					<p className="block-directory-downloadable-blocks-panel__description">
-						{ __(
+						{__(
 							'Select a block to install and add it to your post.'
-						) }
+						)}
 					</p>
 				</div>
-				{ children }
+				{children}
 			</div>
 		</>
 	);

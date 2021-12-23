@@ -4,7 +4,7 @@
 import { createBlobURL } from '@wordpress/blob';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 
-export function getPasteEventData( { clipboardData } ) {
+export function getPasteEventData({ clipboardData }) {
 	let plainText = '';
 	let html = '';
 
@@ -12,12 +12,12 @@ export function getPasteEventData( { clipboardData } ) {
 	// otherwise throw an invalid argument error, so we try the standard
 	// arguments first, then fallback to `Text` if they fail.
 	try {
-		plainText = clipboardData.getData( 'text/plain' );
-		html = clipboardData.getData( 'text/html' );
-	} catch ( error1 ) {
+		plainText = clipboardData.getData('text/plain');
+		html = clipboardData.getData('text/html');
+	} catch (error1) {
 		try {
-			html = clipboardData.getData( 'Text' );
-		} catch ( error2 ) {
+			html = clipboardData.getData('Text');
+		} catch (error2) {
 			// Some browsers like UC Browser paste plain text by default and
 			// don't support clipboardData at all, so allow default
 			// behaviour.
@@ -25,16 +25,16 @@ export function getPasteEventData( { clipboardData } ) {
 		}
 	}
 
-	const files = getFilesFromDataTransfer(
-		clipboardData
-	).filter( ( { type } ) => /^image\/(?:jpe?g|png|gif|webp)$/.test( type ) );
+	const files = getFilesFromDataTransfer(clipboardData).filter(({ type }) =>
+		/^image\/(?:jpe?g|png|gif|webp)$/.test(type)
+	);
 
 	// Only process files if no HTML is present.
 	// A pasted file may have the URL as plain text.
-	if ( files.length && ! html ) {
+	if (files.length && !html) {
 		html = files
-			.map( ( file ) => `<img src="${ createBlobURL( file ) }">` )
-			.join( '' );
+			.map((file) => `<img src="${createBlobURL(file)}">`)
+			.join('');
 		plainText = '';
 	}
 

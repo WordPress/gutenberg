@@ -33,7 +33,7 @@ let contentWidth = 0;
 let scrollPosition = 0;
 let customIndicatorWidth = 0;
 
-function ColorPalette( {
+function ColorPalette({
 	setColor,
 	activeColor,
 	isGradientColor,
@@ -46,7 +46,7 @@ function ColorPalette( {
 	shouldShowCustomVerticalSeparator = true,
 	customColorIndicatorStyles,
 	customIndicatorWrapperStyles,
-} ) {
+}) {
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8) 0%, rgba(255,255,255,1) 70.71%)',
 		'linear-gradient(240deg, rgba(0,255,0,.8) 0%, rgba(0,255,0,0) 70.71%)',
@@ -56,14 +56,14 @@ function ColorPalette( {
 	const scrollViewRef = useRef();
 	const isIOS = Platform.OS === 'ios';
 
-	const isGradientSegment = currentSegment === colorsUtils.segments[ 1 ];
+	const isGradientSegment = currentSegment === colorsUtils.segments[1];
 
-	const scale = useRef( new Animated.Value( 1 ) ).current;
-	const opacity = useRef( new Animated.Value( 1 ) ).current;
+	const scale = useRef(new Animated.Value(1)).current;
+	const opacity = useRef(new Animated.Value(1)).current;
 
-	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
+	const defaultColors = uniq(map(defaultSettings.colors, 'color'));
 	const defaultGradientColors = uniq(
-		map( defaultSettings.gradients, 'gradient' )
+		map(defaultSettings.gradients, 'gradient')
 	);
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
@@ -73,74 +73,74 @@ function ColorPalette( {
 	const isCustomGradientColor = isGradientColor && isSelectedCustom();
 	const shouldShowCustomIndicator =
 		shouldShowCustomIndicatorOption &&
-		( ! isGradientSegment || isCustomGradientColor );
+		(!isGradientSegment || isCustomGradientColor);
 
 	const accessibilityHint = isGradientSegment
-		? __( 'Navigates to customize the gradient' )
-		: __( 'Navigates to custom color picker' );
-	const customText = __( 'Custom' );
+		? __('Navigates to customize the gradient')
+		: __('Navigates to custom color picker');
+	const customText = __('Custom');
 
-	useEffect( () => {
-		if ( scrollViewRef.current ) {
-			if ( isSelectedCustom() ) {
+	useEffect(() => {
+		if (scrollViewRef.current) {
+			if (isSelectedCustom()) {
 				scrollToEndWithDelay();
 			} else {
-				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
+				scrollViewRef.current.scrollTo({ x: 0, y: 0 });
 			}
 		}
-	}, [ currentSegment ] );
+	}, [currentSegment]);
 
 	function isSelectedCustom() {
 		const isWithinColors =
-			activeColor && colors && colors.includes( activeColor );
-		if ( activeColor ) {
-			if ( isGradientSegment ) {
-				return isGradientColor && ! isWithinColors;
+			activeColor && colors && colors.includes(activeColor);
+		if (activeColor) {
+			if (isGradientSegment) {
+				return isGradientColor && !isWithinColors;
 			}
-			return ! isGradientColor && ! isWithinColors;
+			return !isGradientColor && !isWithinColors;
 		}
 		return false;
 	}
 
-	function isSelected( color ) {
-		return ! isSelectedCustom() && activeColor === color;
+	function isSelected(color) {
+		return !isSelectedCustom() && activeColor === color;
 	}
 
-	function timingAnimation( property, toValue ) {
-		return Animated.timing( property, {
+	function timingAnimation(property, toValue) {
+		return Animated.timing(property, {
 			toValue,
 			duration: ANIMATION_DURATION,
 			easing: Easing.ease,
 			useNativeDriver: true,
-		} );
+		});
 	}
 
-	function performAnimation( color ) {
-		if ( ! isSelected( color ) ) {
-			opacity.setValue( 0 );
+	function performAnimation(color) {
+		if (!isSelected(color)) {
+			opacity.setValue(0);
 		}
 
-		Animated.parallel( [
-			timingAnimation( scale, 2 ),
-			timingAnimation( opacity, 1 ),
-		] ).start( () => {
-			opacity.setValue( 1 );
-			scale.setValue( 1 );
-		} );
+		Animated.parallel([
+			timingAnimation(scale, 2),
+			timingAnimation(opacity, 1),
+		]).start(() => {
+			opacity.setValue(1);
+			scale.setValue(1);
+		});
 	}
 
-	const scaleInterpolation = scale.interpolate( {
-		inputRange: [ 1, 1.5, 2 ],
-		outputRange: [ 1, 0.7, 1 ],
-	} );
+	const scaleInterpolation = scale.interpolate({
+		inputRange: [1, 1.5, 2],
+		outputRange: [1, 0.7, 1],
+	});
 
 	function deselectCustomGradient() {
-		const { width } = Dimensions.get( 'window' );
+		const { width } = Dimensions.get('window');
 		const isVisible =
 			contentWidth - scrollPosition - customIndicatorWidth < width;
 
-		if ( isCustomGradientColor ) {
-			if ( ! isIOS ) {
+		if (isCustomGradientColor) {
+			if (!isIOS) {
 				// Scroll position on Android doesn't adjust automatically when removing the last item from the horizontal list.
 				// https://github.com/facebook/react-native/issues/27504
 				// Workaround: Force the scroll when deselecting custom gradient color and when custom indicator is visible on layout.
@@ -149,44 +149,44 @@ function ColorPalette( {
 					isVisible &&
 					scrollViewRef.current
 				) {
-					scrollViewRef.current.scrollTo( {
+					scrollViewRef.current.scrollTo({
 						x: scrollPosition - customIndicatorWidth,
-					} );
+					});
 				}
 			}
 		}
 	}
 
-	function onColorPress( color ) {
+	function onColorPress(color) {
 		deselectCustomGradient();
-		performAnimation( color );
-		setColor( color );
+		performAnimation(color);
+		setColor(color);
 	}
 
-	function onContentSizeChange( width ) {
+	function onContentSizeChange(width) {
 		contentWidth = width;
-		if ( isSelectedCustom() && scrollViewRef.current ) {
+		if (isSelectedCustom() && scrollViewRef.current) {
 			scrollToEndWithDelay();
 		}
 	}
 
 	function scrollToEndWithDelay() {
-		const delayedScroll = setTimeout( () => {
+		const delayedScroll = setTimeout(() => {
 			scrollViewRef.current.scrollToEnd();
-		}, ANIMATION_DURATION );
+		}, ANIMATION_DURATION);
 		return () => {
-			clearTimeout( delayedScroll );
+			clearTimeout(delayedScroll);
 		};
 	}
 
-	function onCustomIndicatorLayout( { nativeEvent } ) {
+	function onCustomIndicatorLayout({ nativeEvent }) {
 		const { width } = nativeEvent.layout;
-		if ( width !== customIndicatorWidth ) {
+		if (width !== customIndicatorWidth) {
 			customIndicatorWidth = width;
 		}
 	}
 
-	function onScroll( { nativeEvent } ) {
+	function onScroll({ nativeEvent }) {
 		scrollPosition = nativeEvent.contentOffset.x;
 	}
 
@@ -196,7 +196,7 @@ function ColorPalette( {
 	);
 
 	const customTextStyle = usePreferredColorSchemeStyle(
-		[ styles.customText, ! isIOS && styles.customTextAndroid ],
+		[styles.customText, !isIOS && styles.customTextAndroid],
 		styles.customTextDark
 	);
 
@@ -207,91 +207,91 @@ function ColorPalette( {
 
 	return (
 		<ScrollView
-			contentContainerStyle={ styles.contentContainer }
-			style={ styles.container }
+			contentContainerStyle={styles.contentContainer}
+			style={styles.container}
 			horizontal
-			showsHorizontalScrollIndicator={ false }
+			showsHorizontalScrollIndicator={false}
 			keyboardShouldPersistTaps="always"
 			disableScrollViewPanResponder
-			scrollEventThrottle={ 16 }
-			onScroll={ onScroll }
-			onContentSizeChange={ onContentSizeChange }
-			onScrollBeginDrag={ () => shouldEnableBottomSheetScroll( false ) }
-			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
-			ref={ scrollViewRef }
+			scrollEventThrottle={16}
+			onScroll={onScroll}
+			onContentSizeChange={onContentSizeChange}
+			onScrollBeginDrag={() => shouldEnableBottomSheetScroll(false)}
+			onScrollEndDrag={() => shouldEnableBottomSheetScroll(true)}
+			ref={scrollViewRef}
 			testID="color-palette"
 		>
-			{ shouldShowCustomIndicator && (
+			{shouldShowCustomIndicator && (
 				<View
-					style={ customIndicatorWrapperStyle }
-					onLayout={ onCustomIndicatorLayout }
+					style={customIndicatorWrapperStyle}
+					onLayout={onCustomIndicatorLayout}
 				>
-					{ shouldShowCustomVerticalSeparator && (
-						<View style={ verticalSeparatorStyle } />
-					) }
+					{shouldShowCustomVerticalSeparator && (
+						<View style={verticalSeparatorStyle} />
+					)}
 					<TouchableWithoutFeedback
-						onPress={ onCustomPress }
-						accessibilityRole={ 'button' }
-						accessibilityState={ { selected: isSelectedCustom() } }
-						accessibilityHint={ accessibilityHint }
+						onPress={onCustomPress}
+						accessibilityRole={'button'}
+						accessibilityState={{ selected: isSelectedCustom() }}
+						accessibilityHint={accessibilityHint}
 					>
-						<View style={ customIndicatorWrapperStyle }>
+						<View style={customIndicatorWrapperStyle}>
 							<ColorIndicator
-								withCustomPicker={ ! isGradientSegment }
-								color={ customIndicatorColor }
-								isSelected={ isSelectedCustom() }
-								style={ [
+								withCustomPicker={!isGradientSegment}
+								color={customIndicatorColor}
+								isSelected={isSelectedCustom()}
+								style={[
 									styles.colorIndicator,
 									customColorIndicatorStyles,
-								] }
+								]}
 							/>
-							{ shouldShowCustomLabel && (
-								<Text style={ customTextStyle }>
-									{ isIOS
+							{shouldShowCustomLabel && (
+								<Text style={customTextStyle}>
+									{isIOS
 										? customText
-										: customText.toUpperCase() }
+										: customText.toUpperCase()}
 								</Text>
-							) }
+							)}
 						</View>
 					</TouchableWithoutFeedback>
 				</View>
-			) }
-			{ colors.map( ( color ) => {
-				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
+			)}
+			{colors.map((color) => {
+				const scaleValue = isSelected(color) ? scaleInterpolation : 1;
 				return (
-					<View key={ `${ color }-${ isSelected( color ) }` }>
+					<View key={`${color}-${isSelected(color)}`}>
 						<TouchableWithoutFeedback
-							onPress={ () => onColorPress( color ) }
-							accessibilityRole={ 'button' }
-							accessibilityState={ {
-								selected: isSelected( color ),
-							} }
-							accessibilityHint={ color }
-							testID={ color }
+							onPress={() => onColorPress(color)}
+							accessibilityRole={'button'}
+							accessibilityState={{
+								selected: isSelected(color),
+							}}
+							accessibilityHint={color}
+							testID={color}
 						>
 							<Animated.View
-								style={ {
+								style={{
 									transform: [
 										{
 											scale: scaleValue,
 										},
 									],
-								} }
+								}}
 							>
 								<ColorIndicator
-									color={ color }
-									isSelected={ isSelected( color ) }
-									opacity={ opacity }
-									style={ [
+									color={color}
+									isSelected={isSelected(color)}
+									opacity={opacity}
+									style={[
 										styles.colorIndicator,
 										customColorIndicatorStyles,
-									] }
+									]}
 								/>
 							</Animated.View>
 						</TouchableWithoutFeedback>
 					</View>
 				);
-			} ) }
+			})}
 		</ScrollView>
 	);
 }

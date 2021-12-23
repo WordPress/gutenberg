@@ -7,7 +7,7 @@
  *
  * @return {Object} Action object.
  */
-export function setIsMatching( values ) {
+export function setIsMatching(values) {
 	return {
 		type: 'SET_IS_MATCHING',
 		values,

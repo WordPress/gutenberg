@@ -7,7 +7,7 @@ const variations = [
 	{
 		isDefault: true,
 		name: 'archive-title',
-		title: __( 'Archive Title' ),
+		title: __('Archive Title'),
 		description: __(
 			'Display the archive title based on the queried object.'
 		),
@@ -15,7 +15,7 @@ const variations = [
 		attributes: {
 			type: 'archive',
 		},
-		scope: [ 'inserter' ],
+		scope: ['inserter'],
 	},
 ];
 
@@ -24,10 +24,10 @@ const variations = [
  * `isActive` function is used to find a variation match from a created
  *  Block by providing its attributes.
  */
-variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
-	variation.isActive = ( blockAttributes, variationAttributes ) =>
+variations.forEach((variation) => {
+	if (variation.isActive) return;
+	variation.isActive = (blockAttributes, variationAttributes) =>
 		blockAttributes.type === variationAttributes.type;
-} );
+});
 
 export default variations;

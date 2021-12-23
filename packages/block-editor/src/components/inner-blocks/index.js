@@ -38,7 +38,7 @@ import useBlockDropZone from '../use-block-drop-zone';
  *
  * @param {Object} props The component props.
  */
-function UncontrolledInnerBlocks( props ) {
+function UncontrolledInnerBlocks(props) {
 	const {
 		clientId,
 		allowedBlocks,
@@ -75,30 +75,30 @@ function UncontrolledInnerBlocks( props ) {
 	);
 
 	const context = useSelect(
-		( select ) => {
-			const block = select( blockEditorStore ).getBlock( clientId );
-			const blockType = getBlockType( block.name );
+		(select) => {
+			const block = select(blockEditorStore).getBlock(clientId);
+			const blockType = getBlockType(block.name);
 
-			if ( ! blockType || ! blockType.providesContext ) {
+			if (!blockType || !blockType.providesContext) {
 				return;
 			}
 
-			return getBlockContext( block.attributes, blockType );
+			return getBlockContext(block.attributes, blockType);
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
 	return (
-		<BlockContextProvider value={ context }>
+		<BlockContextProvider value={context}>
 			<BlockListItems
-				rootClientId={ clientId }
-				renderAppender={ renderAppender }
-				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ __experimentalLayout }
-				wrapperRef={ wrapperRef }
-				placeholder={ placeholder }
+				rootClientId={clientId}
+				renderAppender={renderAppender}
+				__experimentalAppenderTagName={__experimentalAppenderTagName}
+				__experimentalLayout={__experimentalLayout}
+				wrapperRef={wrapperRef}
+				placeholder={placeholder}
 			/>
 		</BlockContextProvider>
 	);
@@ -113,19 +113,19 @@ function UncontrolledInnerBlocks( props ) {
  *
  * @param {Object} props The component props.
  */
-function ControlledInnerBlocks( props ) {
-	useBlockSync( props );
-	return <UncontrolledInnerBlocks { ...props } />;
+function ControlledInnerBlocks(props) {
+	useBlockSync(props);
+	return <UncontrolledInnerBlocks {...props} />;
 }
 
-const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
-	const innerBlocksProps = useInnerBlocksProps( { ref }, props );
+const ForwardedInnerBlocks = forwardRef((props, ref) => {
+	const innerBlocksProps = useInnerBlocksProps({ ref }, props);
 	return (
 		<div className="block-editor-inner-blocks">
-			<div { ...innerBlocksProps } />
+			<div {...innerBlocksProps} />
 		</div>
 	);
-} );
+});
 
 /**
  * This hook is used to lightly mark an element as an inner blocks wrapper
@@ -142,12 +142,12 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
-export function useInnerBlocksProps( props = {}, options = {} ) {
+export function useInnerBlocksProps(props = {}, options = {}) {
 	const { clientId } = useBlockEditContext();
-	const isSmallScreen = useViewportMatch( 'medium', '<' );
+	const isSmallScreen = useViewportMatch('medium', '<');
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
-		( select ) => {
-			if ( ! clientId ) {
+		(select) => {
+			if (!clientId) {
 				return {};
 			}
 
@@ -156,8 +156,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				isNavigationMode,
-			} = select( blockEditorStore );
-			const blockName = getBlockName( clientId );
+			} = select(blockEditorStore);
+			const blockName = getBlockName(clientId);
 			const enableClickThrough = isNavigationMode() || isSmallScreen;
 			return {
 				__experimentalCaptureToolbars: select(
@@ -169,20 +169,20 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				),
 				hasOverlay:
 					blockName !== 'core/template' &&
-					! isBlockSelected( clientId ) &&
-					! hasSelectedInnerBlock( clientId, true ) &&
+					!isBlockSelected(clientId) &&
+					!hasSelectedInnerBlock(clientId, true) &&
 					enableClickThrough,
 			};
 		},
-		[ clientId, isSmallScreen ]
+		[clientId, isSmallScreen]
 	);
 
-	const ref = useMergeRefs( [
+	const ref = useMergeRefs([
 		props.ref,
-		useBlockDropZone( {
+		useBlockDropZone({
 			rootClientId: clientId,
-		} ),
-	] );
+		}),
+	]);
 
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
@@ -203,9 +203,9 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			}
 		),
 		children: clientId ? (
-			<InnerBlocks { ...innerBlocksProps } clientId={ clientId } />
+			<InnerBlocks {...innerBlocksProps} clientId={clientId} />
 		) : (
-			<BlockListItems { ...options } />
+			<BlockListItems {...options} />
 		),
 	};
 }

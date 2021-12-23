@@ -66,13 +66,13 @@ import { store as blockEditorStore } from '../../store';
  *                                        for the given clientId. When this is called,
  *                                        controlling sources do not become dirty.
  */
-export default function useBlockSync( {
+export default function useBlockSync({
 	clientId = null,
 	value: controlledBlocks,
 	selection: controlledSelection,
 	onChange = noop,
 	onInput = noop,
-} ) {
+}) {
 	const registry = useRegistry();
 
 	const {
@@ -81,23 +81,23 @@ export default function useBlockSync( {
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
-	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
+	} = registry.dispatch(blockEditorStore);
+	const { getBlockName, getBlocks } = registry.select(blockEditorStore);
 	const isControlled = useSelect(
-		( select ) => {
+		(select) => {
 			return (
-				! clientId ||
-				select( blockEditorStore ).areInnerBlocksControlled( clientId )
+				!clientId ||
+				select(blockEditorStore).areInnerBlocksControlled(clientId)
 			);
 		},
-		[ clientId ]
+		[clientId]
 	);
 
-	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
-	const subscribed = useRef( false );
+	const pendingChanges = useRef({ incoming: null, outgoing: [] });
+	const subscribed = useRef(false);
 
 	const setControlledBlocks = () => {
-		if ( ! controlledBlocks ) {
+		if (!controlledBlocks) {
 			return;
 		}
 
@@ -105,27 +105,27 @@ export default function useBlockSync( {
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
 		__unstableMarkNextChangeAsNotPersistent();
-		if ( clientId ) {
+		if (clientId) {
 			// It is important to batch here because otherwise,
 			// as soon as `setHasControlledInnerBlocks` is called
 			// the effect to restore might be triggered
 			// before the actual blocks get set properly in state.
-			registry.batch( () => {
-				setHasControlledInnerBlocks( clientId, true );
-				const storeBlocks = controlledBlocks.map( ( block ) =>
-					cloneBlock( block )
+			registry.batch(() => {
+				setHasControlledInnerBlocks(clientId, true);
+				const storeBlocks = controlledBlocks.map((block) =>
+					cloneBlock(block)
 				);
-				if ( subscribed.current ) {
+				if (subscribed.current) {
 					pendingChanges.current.incoming = storeBlocks;
 				}
 				__unstableMarkNextChangeAsNotPersistent();
-				replaceInnerBlocks( clientId, storeBlocks );
-			} );
+				replaceInnerBlocks(clientId, storeBlocks);
+			});
 		} else {
-			if ( subscribed.current ) {
+			if (subscribed.current) {
 				pendingChanges.current.incoming = controlledBlocks;
 			}
-			resetBlocks( controlledBlocks );
+			resetBlocks(controlledBlocks);
 		}
 	};
 
@@ -133,28 +133,26 @@ export default function useBlockSync( {
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
 	// waiting for React renders for changes.
-	const onInputRef = useRef( onInput );
-	const onChangeRef = useRef( onChange );
-	useEffect( () => {
+	const onInputRef = useRef(onInput);
+	const onChangeRef = useRef(onChange);
+	useEffect(() => {
 		onInputRef.current = onInput;
 		onChangeRef.current = onChange;
-	}, [ onInput, onChange ] );
+	}, [onInput, onChange]);
 
 	// Determine if blocks need to be reset when they change.
-	useEffect( () => {
-		if ( pendingChanges.current.outgoing.includes( controlledBlocks ) ) {
+	useEffect(() => {
+		if (pendingChanges.current.outgoing.includes(controlledBlocks)) {
 			// Skip block reset if the value matches expected outbound sync
 			// triggered by this component by a preceding change detection.
 			// Only skip if the value matches expectation, since a reset should
 			// still occur if the value is modified (not equal by reference),
 			// to allow that the consumer may apply modifications to reflect
 			// back on the editor.
-			if (
-				last( pendingChanges.current.outgoing ) === controlledBlocks
-			) {
+			if (last(pendingChanges.current.outgoing) === controlledBlocks) {
 				pendingChanges.current.outgoing = [];
 			}
-		} else if ( getBlocks( clientId ) !== controlledBlocks ) {
+		} else if (getBlocks(clientId) !== controlledBlocks) {
 			// Reset changing value in all other cases than the sync described
 			// above. Since this can be reached in an update following an out-
 			// bound sync, unset the outbound value to avoid considering it in
@@ -162,7 +160,7 @@ export default function useBlockSync( {
 			pendingChanges.current.outgoing = [];
 			setControlledBlocks();
 
-			if ( controlledSelection ) {
+			if (controlledSelection) {
 				resetSelection(
 					controlledSelection.selectionStart,
 					controlledSelection.selectionEnd,
@@ -170,18 +168,18 @@ export default function useBlockSync( {
 				);
 			}
 		}
-	}, [ controlledBlocks, clientId ] );
+	}, [controlledBlocks, clientId]);
 
-	useEffect( () => {
+	useEffect(() => {
 		// When the block becomes uncontrolled, it means its inner state has been reset
 		// we need to take the blocks again from the external value property.
-		if ( ! isControlled ) {
+		if (!isControlled) {
 			pendingChanges.current.outgoing = [];
 			setControlledBlocks();
 		}
-	}, [ isControlled ] );
+	}, [isControlled]);
 
-	useEffect( () => {
+	useEffect(() => {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -189,14 +187,14 @@ export default function useBlockSync( {
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
 			areInnerBlocksControlled,
-		} = registry.select( blockEditorStore );
+		} = registry.select(blockEditorStore);
 
-		let blocks = getBlocks( clientId );
+		let blocks = getBlocks(clientId);
 		let isPersistent = isLastBlockChangePersistent();
 		let previousAreBlocksDifferent = false;
 
 		subscribed.current = true;
-		const unsubscribe = registry.subscribe( () => {
+		const unsubscribe = registry.subscribe(() => {
 			// Sometimes, when changing block lists, lingering subscriptions
 			// might trigger before they are cleaned up. If the block for which
 			// the subscription runs is no longer in the store, this would clear
@@ -204,28 +202,27 @@ export default function useBlockSync( {
 			// the subscription is triggering for a block (`clientId !== null`)
 			// and its block name can't be found because it's not on the list.
 			// (`getBlockName( clientId ) === null`).
-			if ( clientId !== null && getBlockName( clientId ) === null )
-				return;
+			if (clientId !== null && getBlockName(clientId) === null) return;
 
 			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
 			// can reset to uncontrolled, in these situations, it means we need to populate
 			// the blocks again from the external blocks (the value property here)
 			// and we should stop triggering onChange
 			const isStillControlled =
-				! clientId || areInnerBlocksControlled( clientId );
-			if ( ! isStillControlled ) {
+				!clientId || areInnerBlocksControlled(clientId);
+			if (!isStillControlled) {
 				return;
 			}
 
 			const newIsPersistent = isLastBlockChangePersistent();
-			const newBlocks = getBlocks( clientId );
+			const newBlocks = getBlocks(clientId);
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
 
 			if (
 				areBlocksDifferent &&
-				( pendingChanges.current.incoming ||
-					__unstableIsLastBlockChangeIgnored() )
+				(pendingChanges.current.incoming ||
+					__unstableIsLastBlockChangeIgnored())
 			) {
 				pendingChanges.current.incoming = null;
 				isPersistent = newIsPersistent;
@@ -237,34 +234,35 @@ export default function useBlockSync( {
 			// previous action before committing the change.
 			const didPersistenceChange =
 				previousAreBlocksDifferent &&
-				! areBlocksDifferent &&
+				!areBlocksDifferent &&
 				newIsPersistent &&
-				! isPersistent;
+				!isPersistent;
 
-			if ( areBlocksDifferent || didPersistenceChange ) {
+			if (areBlocksDifferent || didPersistenceChange) {
 				isPersistent = newIsPersistent;
 				// We know that onChange/onInput will update controlledBlocks.
 				// We need to be aware that it was caused by an outgoing change
 				// so that we do not treat it as an incoming change later on,
 				// which would cause a block reset.
-				pendingChanges.current.outgoing.push( blocks );
+				pendingChanges.current.outgoing.push(blocks);
 
 				// Inform the controlling entity that changes have been made to
 				// the block-editor store they should be aware about.
 				const updateParent = isPersistent
 					? onChangeRef.current
 					: onInputRef.current;
-				updateParent( blocks, {
+				updateParent(blocks, {
 					selection: {
 						selectionStart: getSelectionStart(),
 						selectionEnd: getSelectionEnd(),
-						initialPosition: getSelectedBlocksInitialCaretPosition(),
+						initialPosition:
+							getSelectedBlocksInitialCaretPosition(),
 					},
-				} );
+				});
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
-		} );
+		});
 
 		return () => unsubscribe();
-	}, [ registry, clientId ] );
+	}, [registry, clientId]);
 }

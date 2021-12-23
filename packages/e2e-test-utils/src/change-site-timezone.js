@@ -12,19 +12,19 @@ import { switchUserToTest } from './switch-user-to-test';
  *
  * @return {string} Value of the previous timezone.
  */
-export async function changeSiteTimezone( timezone ) {
+export async function changeSiteTimezone(timezone) {
 	await switchUserToAdmin();
-	await visitAdminPage( 'options-general.php' );
+	await visitAdminPage('options-general.php');
 
 	const oldTimezone = await page.$eval(
 		'#timezone_string',
-		( element ) => element.options[ element.selectedIndex ].text
+		(element) => element.options[element.selectedIndex].text
 	);
-	await page.select( '#timezone_string', timezone );
-	await Promise.all( [
-		page.click( '#submit' ),
-		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-	] );
+	await page.select('#timezone_string', timezone);
+	await Promise.all([
+		page.click('#submit'),
+		page.waitForNavigation({ waitUntil: 'networkidle0' }),
+	]);
 
 	await switchUserToTest();
 

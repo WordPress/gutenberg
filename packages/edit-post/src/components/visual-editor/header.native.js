@@ -15,12 +15,12 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import styles from './style.scss';
 
 const Header = memo(
-	function EditorHeader( {
+	function EditorHeader({
 		editTitle,
 		setTitleRef,
 		title,
 		getStylesFromColorScheme,
-	} ) {
+	}) {
 		const blockHolderFocusedStyle = getStylesFromColorScheme(
 			styles.blockHolderFocused,
 			styles.blockHolderFocusedDark
@@ -28,39 +28,39 @@ const Header = memo(
 		return (
 			<ReadableContentView>
 				<PostTitle
-					innerRef={ setTitleRef }
-					title={ title }
-					onUpdate={ editTitle }
-					placeholder={ __( 'Add title' ) }
-					borderStyle={ styles.blockHolderFullBordered }
-					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
+					innerRef={setTitleRef}
+					title={title}
+					onUpdate={editTitle}
+					placeholder={__('Add title')}
+					borderStyle={styles.blockHolderFullBordered}
+					focusedBorderColor={blockHolderFocusedStyle.borderColor}
 					accessibilityLabel="post-title"
 				/>
 			</ReadableContentView>
 		);
 	},
-	( prevProps, nextProps ) => prevProps.title === nextProps.title
+	(prevProps, nextProps) => prevProps.title === nextProps.title
 );
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( 'core/editor' );
+export default compose([
+	withSelect((select) => {
+		const { getEditedPostAttribute } = select('core/editor');
 
 		return {
-			title: getEditedPostAttribute( 'title' ),
+			title: getEditedPostAttribute('title'),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost } = dispatch( 'core/editor' );
+	}),
+	withDispatch((dispatch) => {
+		const { editPost } = dispatch('core/editor');
 
-		const { clearSelectedBlock } = dispatch( blockEditorStore );
+		const { clearSelectedBlock } = dispatch(blockEditorStore);
 
 		return {
 			clearSelectedBlock,
-			editTitle( title ) {
-				editPost( { title } );
+			editTitle(title) {
+				editPost({ title });
 			},
 		};
-	} ),
+	}),
 	withPreferredColorScheme,
-] )( Header );
+])(Header);

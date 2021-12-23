@@ -12,25 +12,25 @@ import { Button } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { Icon, plus } from '@wordpress/icons';
 
-export const LinkControlSearchCreate = ( {
+export const LinkControlSearchCreate = ({
 	searchTerm,
 	onClick,
 	itemProps,
 	isSelected,
 	buttonText,
-} ) => {
-	if ( ! searchTerm ) {
+}) => {
+	if (!searchTerm) {
 		return null;
 	}
 
 	let text;
-	if ( buttonText ) {
-		text = isFunction( buttonText ) ? buttonText( searchTerm ) : buttonText;
+	if (buttonText) {
+		text = isFunction(buttonText) ? buttonText(searchTerm) : buttonText;
 	} else {
 		text = createInterpolateElement(
 			sprintf(
 				/* translators: %s: search term. */
-				__( 'Create: <mark>%s</mark>' ),
+				__('Create: <mark>%s</mark>'),
 				searchTerm
 			),
 			{ mark: <mark /> }
@@ -39,23 +39,23 @@ export const LinkControlSearchCreate = ( {
 
 	return (
 		<Button
-			{ ...itemProps }
-			className={ classnames(
+			{...itemProps}
+			className={classnames(
 				'block-editor-link-control__search-create block-editor-link-control__search-item',
 				{
 					'is-selected': isSelected,
 				}
-			) }
-			onClick={ onClick }
+			)}
+			onClick={onClick}
 		>
 			<Icon
 				className="block-editor-link-control__search-item-icon"
-				icon={ plus }
+				icon={plus}
 			/>
 
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
-					{ text }
+					{text}
 				</span>
 			</span>
 		</Button>

@@ -40,8 +40,8 @@ const V_ALIGNMENTS = {
  * @return {import('./types').AlignmentProps} Alignment props.
  */
 /* eslint-enable jsdoc/valid-types */
-export function getAlignmentProps( alignment, direction = 'row' ) {
-	if ( isNil( alignment ) ) {
+export function getAlignmentProps(alignment, direction = 'row') {
+	if (isNil(alignment)) {
 		return {};
 	}
 	const isVertical = direction === 'column';
@@ -49,7 +49,7 @@ export function getAlignmentProps( alignment, direction = 'row' ) {
 
 	const alignmentProps =
 		alignment in props
-			? props[ /** @type {keyof typeof ALIGNMENTS} */ ( alignment ) ]
+			? props[/** @type {keyof typeof ALIGNMENTS} */ (alignment)]
 			: { align: alignment };
 
 	return alignmentProps;

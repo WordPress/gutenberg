@@ -1,4 +1,4 @@
-export default function headRemover( node ) {
+export default function headRemover(node) {
 	if (
 		node.nodeName !== 'SCRIPT' &&
 		node.nodeName !== 'NOSCRIPT' &&
@@ -8,5 +8,5 @@ export default function headRemover( node ) {
 		return;
 	}
 
-	node.parentNode.removeChild( node );
+	node.parentNode.removeChild(node);
 }

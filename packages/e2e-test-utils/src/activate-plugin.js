@@ -10,17 +10,15 @@ import { visitAdminPage } from './visit-admin-page';
  *
  * @param {string} slug Plugin slug.
  */
-export async function activatePlugin( slug ) {
+export async function activatePlugin(slug) {
 	await switchUserToAdmin();
-	await visitAdminPage( 'plugins.php' );
-	const disableLink = await page.$(
-		`tr[data-slug="${ slug }"] .deactivate a`
-	);
-	if ( disableLink ) {
+	await visitAdminPage('plugins.php');
+	const disableLink = await page.$(`tr[data-slug="${slug}"] .deactivate a`);
+	if (disableLink) {
 		await switchUserToTest();
 		return;
 	}
-	await page.click( `tr[data-slug="${ slug }"] .activate a` );
-	await page.waitForSelector( `tr[data-slug="${ slug }"] .deactivate a` );
+	await page.click(`tr[data-slug="${slug}"] .activate a`);
+	await page.waitForSelector(`tr[data-slug="${slug}"] .deactivate a`);
 	await switchUserToTest();
 }

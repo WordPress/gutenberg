@@ -19,18 +19,18 @@ const STORE_NAME = 'core/nux';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore(STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
-	persist: [ 'preferences' ],
-} );
+	persist: ['preferences'],
+});
 
 // Once we build a more generic persistence plugin that works across types of stores
 // we'd be able to replace this with a register call.
-registerStore( STORE_NAME, {
+registerStore(STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
-	persist: [ 'preferences' ],
-} );
+	persist: ['preferences'],
+});

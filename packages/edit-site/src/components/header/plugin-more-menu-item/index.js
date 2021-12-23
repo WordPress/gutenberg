@@ -62,10 +62,10 @@ import { withPluginContext } from '@wordpress/plugins';
  * @return {WPComponent} The component to be rendered.
  */
 export default compose(
-	withPluginContext( ( context, ownProps ) => {
+	withPluginContext((context, ownProps) => {
 		return {
 			icon: ownProps.icon || context.icon,
 			name: 'core/edit-site/plugin-more-menu',
 		};
-	} )
-)( ActionItem );
+	})
+)(ActionItem);

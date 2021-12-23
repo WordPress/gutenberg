@@ -8,16 +8,16 @@
  * @return {?Object } The first encountered parent node where the predicate
  *                    returns a truthy value.
  */
-function findParent( sourceNode, predicate ) {
-	if ( ! sourceNode.parent ) {
+function findParent(sourceNode, predicate) {
+	if (!sourceNode.parent) {
 		return;
 	}
 
-	if ( predicate( sourceNode.parent ) ) {
+	if (predicate(sourceNode.parent)) {
 		return sourceNode.parent;
 	}
 
-	return findParent( sourceNode.parent, predicate );
+	return findParent(sourceNode.parent, predicate);
 }
 
 /**
@@ -36,13 +36,13 @@ function findParent( sourceNode, predicate ) {
  * @param {Object} node    The GUTENBERG_PHASE identifier node.
  * @param {Object} context The eslint context object.
  */
-function testIsAccessedViaProcessEnv( node, context ) {
+function testIsAccessedViaProcessEnv(node, context) {
 	const parent = node.parent;
 
 	if (
 		parent &&
 		parent.type === 'MemberExpression' &&
-		context.getSource( parent ) === 'process.env.GUTENBERG_PHASE'
+		context.getSource(parent) === 'process.env.GUTENBERG_PHASE'
 	) {
 		return;
 	}
@@ -70,25 +70,25 @@ function testIsAccessedViaProcessEnv( node, context ) {
  * @param {Object} node    The GUTENBERG_PHASE identifier node.
  * @param {Object} context The eslint context object.
  */
-function testIsUsedInStrictBinaryExpression( node, context ) {
+function testIsUsedInStrictBinaryExpression(node, context) {
 	const parent = findParent(
 		node,
-		( candidate ) => candidate.type === 'BinaryExpression'
+		(candidate) => candidate.type === 'BinaryExpression'
 	);
 
-	if ( parent ) {
+	if (parent) {
 		const comparisonNode =
 			node.parent.type === 'MemberExpression' ? node.parent : node;
 
 		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE
-		const hasCorrectOperator = [ '===', '!==' ].includes( parent.operator );
+		const hasCorrectOperator = ['===', '!=='].includes(parent.operator);
 		const hasCorrectOperands =
-			( parent.left === comparisonNode &&
-				typeof parent.right.value === 'number' ) ||
-			( parent.right === comparisonNode &&
-				typeof parent.left.value === 'number' );
+			(parent.left === comparisonNode &&
+				typeof parent.right.value === 'number') ||
+			(parent.right === comparisonNode &&
+				typeof parent.left.value === 'number');
 
-		if ( hasCorrectOperator && hasCorrectOperands ) {
+		if (hasCorrectOperator && hasCorrectOperands) {
 			return;
 		}
 	}
@@ -115,21 +115,21 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
  * @param {Object} node    The GUTENBERG_PHASE identifier node.
  * @param {Object} context The eslint context object.
  */
-function testIsUsedInIfOrTernary( node, context ) {
-	const conditionalParent = findParent( node, ( candidate ) =>
-		[ 'IfStatement', 'ConditionalExpression' ].includes( candidate.type )
+function testIsUsedInIfOrTernary(node, context) {
+	const conditionalParent = findParent(node, (candidate) =>
+		['IfStatement', 'ConditionalExpression'].includes(candidate.type)
 	);
 	const binaryParent = findParent(
 		node,
-		( candidate ) => candidate.type === 'BinaryExpression'
+		(candidate) => candidate.type === 'BinaryExpression'
 	);
 
 	if (
 		conditionalParent &&
 		binaryParent &&
 		conditionalParent.test &&
-		conditionalParent.test.range[ 0 ] === binaryParent.range[ 0 ] &&
-		conditionalParent.test.range[ 1 ] === binaryParent.range[ 1 ]
+		conditionalParent.test.range[0] === binaryParent.range[0] &&
+		conditionalParent.test.range[1] === binaryParent.range[1]
 	) {
 		return;
 	}
@@ -145,26 +145,26 @@ module.exports = {
 		type: 'problem',
 		schema: [],
 	},
-	create( context ) {
+	create(context) {
 		return {
-			Identifier( node ) {
+			Identifier(node) {
 				// Bypass any identifiers with a node name different to `GUTENBERG_PHASE`.
-				if ( node.name !== 'GUTENBERG_PHASE' ) {
+				if (node.name !== 'GUTENBERG_PHASE') {
 					return;
 				}
 
-				testIsAccessedViaProcessEnv( node, context );
-				testIsUsedInStrictBinaryExpression( node, context );
-				testIsUsedInIfOrTernary( node, context );
+				testIsAccessedViaProcessEnv(node, context);
+				testIsUsedInStrictBinaryExpression(node, context);
+				testIsUsedInIfOrTernary(node, context);
 			},
-			Literal( node ) {
+			Literal(node) {
 				// Bypass any identifiers with a node value different to `GUTENBERG_PHASE`.
-				if ( node.value !== 'GUTENBERG_PHASE' ) {
+				if (node.value !== 'GUTENBERG_PHASE') {
 					return;
 				}
 
-				if ( node.parent && node.parent.type === 'MemberExpression' ) {
-					testIsAccessedViaProcessEnv( node, context );
+				if (node.parent && node.parent.type === 'MemberExpression') {
+					testIsAccessedViaProcessEnv(node, context);
 				}
 			},
 		};

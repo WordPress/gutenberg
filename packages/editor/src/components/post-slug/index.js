@@ -15,30 +15,30 @@ import { cleanForSlug } from '../../utils/url';
 import { store as editorStore } from '../../store';
 
 export class PostSlug extends Component {
-	constructor( { postSlug, postTitle, postID } ) {
-		super( ...arguments );
+	constructor({ postSlug, postTitle, postID }) {
+		super(...arguments);
 
 		this.state = {
 			editedSlug:
-				safeDecodeURIComponent( postSlug ) ||
-				cleanForSlug( postTitle ) ||
+				safeDecodeURIComponent(postSlug) ||
+				cleanForSlug(postTitle) ||
 				postID,
 		};
 
-		this.setSlug = this.setSlug.bind( this );
+		this.setSlug = this.setSlug.bind(this);
 	}
 
-	setSlug( event ) {
+	setSlug(event) {
 		const { postSlug, onUpdateSlug } = this.props;
 		const { value } = event.target;
 
-		const editedSlug = cleanForSlug( value );
+		const editedSlug = cleanForSlug(value);
 
-		if ( editedSlug === postSlug ) {
+		if (editedSlug === postSlug) {
 			return;
 		}
 
-		onUpdateSlug( editedSlug );
+		onUpdateSlug(editedSlug);
 	}
 
 	render() {
@@ -49,17 +49,17 @@ export class PostSlug extends Component {
 
 		return (
 			<PostSlugCheck>
-				<label htmlFor={ inputId }>{ __( 'Slug' ) }</label>
+				<label htmlFor={inputId}>{__('Slug')}</label>
 				<input
 					autoComplete="off"
 					spellCheck="false"
 					type="text"
-					id={ inputId }
-					value={ editedSlug }
-					onChange={ ( event ) =>
-						this.setState( { editedSlug: event.target.value } )
+					id={inputId}
+					value={editedSlug}
+					onChange={(event) =>
+						this.setState({ editedSlug: event.target.value })
 					}
-					onBlur={ this.setSlug }
+					onBlur={this.setSlug}
 					className="editor-post-slug__input"
 				/>
 			</PostSlugCheck>
@@ -67,26 +67,24 @@ export class PostSlug extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getCurrentPost, getEditedPostAttribute } = select(
-			editorStore
-		);
+export default compose([
+	withSelect((select) => {
+		const { getCurrentPost, getEditedPostAttribute } = select(editorStore);
 
 		const { id } = getCurrentPost();
 		return {
-			postSlug: getEditedPostAttribute( 'slug' ),
-			postTitle: getEditedPostAttribute( 'title' ),
+			postSlug: getEditedPostAttribute('slug'),
+			postTitle: getEditedPostAttribute('title'),
 			postID: id,
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost } = dispatch( editorStore );
+	}),
+	withDispatch((dispatch) => {
+		const { editPost } = dispatch(editorStore);
 		return {
-			onUpdateSlug( slug ) {
-				editPost( { slug } );
+			onUpdateSlug(slug) {
+				editPost({ slug });
 			},
 		};
-	} ),
+	}),
 	withInstanceId,
-] )( PostSlug );
+])(PostSlug);

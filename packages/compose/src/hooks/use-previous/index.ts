@@ -11,13 +11,13 @@ import { useEffect, useRef } from '@wordpress/element';
  *
  * @return The value from the previous render.
  */
-export default function usePrevious< T >( value: T ): T | undefined {
-	const ref = useRef< T >();
+export default function usePrevious<T>(value: T): T | undefined {
+	const ref = useRef<T>();
 
 	// Store current value in ref.
-	useEffect( () => {
+	useEffect(() => {
 		ref.current = value;
-	}, [ value ] ); // Re-run when value changes.
+	}, [value]); // Re-run when value changes.
 
 	// Return previous value (happens before update in useEffect above).
 	return ref.current;

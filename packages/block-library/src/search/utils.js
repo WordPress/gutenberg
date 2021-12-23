@@ -13,6 +13,6 @@ export const MIN_WIDTH_UNIT = 'px';
  *
  * @return {boolean} 	Whether unit is '%'.
  */
-export function isPercentageUnit( unit ) {
+export function isPercentageUnit(unit) {
 	return unit === '%';
 }

@@ -22,68 +22,68 @@ export default {
 	},
 };
 
-const IconSizeLabel = ( { size } ) => (
-	<div style={ { fontSize: 12 } }>{ size }px</div>
+const IconSizeLabel = ({ size }) => (
+	<div style={{ fontSize: 12 }}>{size}px</div>
 );
 
 export const _default = () => {
-	const size = number( 'Size', '24' );
+	const size = number('Size', '24');
 
 	return (
 		<div>
-			<Icon icon={ wordpress } size={ size } />
-			<IconSizeLabel size={ size } />
+			<Icon icon={wordpress} size={size} />
+			<IconSizeLabel size={size} />
 		</div>
 	);
 };
 
 export const sizes = () => {
-	const iconSizes = [ 14, 16, 20, 24, 28, 32, 40, 48, 56 ];
+	const iconSizes = [14, 16, 20, 24, 28, 32, 40, 48, 56];
 
 	return (
 		<>
-			{ iconSizes.map( ( size ) => (
+			{iconSizes.map((size) => (
 				<div
-					key={ size }
-					style={ { padding: 20, display: 'inline-block' } }
+					key={size}
+					style={{ padding: 20, display: 'inline-block' }}
 				>
-					<Icon icon={ wordpress } size={ size } />
-					<IconSizeLabel size={ size } />
+					<Icon icon={wordpress} size={size} />
+					<IconSizeLabel size={size} />
 				</div>
-			) ) }
+			))}
 		</>
 	);
 };
 
 export const colors = () => {
-	const iconColors = [ 'blue', 'purple', 'green' ];
+	const iconColors = ['blue', 'purple', 'green'];
 
 	return (
 		<>
-			{ iconColors.map( ( color ) => (
+			{iconColors.map((color) => (
 				<div
-					key={ color }
-					style={ {
+					key={color}
+					style={{
 						padding: 20,
 						display: 'inline-block',
 						fill: color,
-					} }
+					}}
 				>
-					<Icon icon={ wordpress } />
-					<IconSizeLabel size={ 24 } />
+					<Icon icon={wordpress} />
+					<IconSizeLabel size={24} />
 				</div>
-			) ) }
+			))}
 		</>
 	);
 };
 
 export const withAFunction = () => (
 	<Icon
-		icon={ () => (
+		icon={() => (
 			<SVG>
 				<Path d="M5 4v3h5.5v12h3V7H19V4z" />
 			</SVG>
-		) }
+		)}
 	/>
 );
 
@@ -94,7 +94,7 @@ export const withAComponent = () => {
 		</SVG>
 	);
 
-	return <Icon icon={ MyIconComponent } />;
+	return <Icon icon={MyIconComponent} />;
 };
 
 export const withAnSVG = () => {

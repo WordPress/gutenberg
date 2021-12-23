@@ -12,43 +12,43 @@ import { useState, useEffect } from '@wordpress/element';
  *
  * @return {boolean} Is dragging within the target element.
  */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
+const useIsDraggingWithin = (elementRef) => {
+	const [isDraggingWithin, setIsDraggingWithin] = useState(false);
 
-	useEffect( () => {
+	useEffect(() => {
 		const { ownerDocument } = elementRef.current;
 
-		function handleDragStart( event ) {
+		function handleDragStart(event) {
 			// Check the first time when the dragging starts.
-			handleDragEnter( event );
+			handleDragEnter(event);
 		}
 
 		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
 		function handleDragEnd() {
-			setIsDraggingWithin( false );
+			setIsDraggingWithin(false);
 		}
 
-		function handleDragEnter( event ) {
+		function handleDragEnter(event) {
 			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
+			if (elementRef.current.contains(event.target)) {
+				setIsDraggingWithin(true);
 			} else {
-				setIsDraggingWithin( false );
+				setIsDraggingWithin(false);
 			}
 		}
 
 		// Bind these events to the document to catch all drag events.
 		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
+		ownerDocument.addEventListener('dragstart', handleDragStart);
+		ownerDocument.addEventListener('dragend', handleDragEnd);
+		ownerDocument.addEventListener('dragenter', handleDragEnter);
 
 		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
+			ownerDocument.removeEventListener('dragstart', handleDragStart);
+			ownerDocument.removeEventListener('dragend', handleDragEnd);
+			ownerDocument.removeEventListener('dragenter', handleDragEnter);
 		};
-	}, [] );
+	}, []);
 
 	return isDraggingWithin;
 };

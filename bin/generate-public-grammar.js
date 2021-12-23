@@ -3,97 +3,94 @@
 /**
  * Internal dependencies
  */
-const parser = require( '../node_modules/pegjs/lib/parser.js' );
+const parser = require('../node_modules/pegjs/lib/parser.js');
 
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const path = require( 'path' );
+const fs = require('fs');
+const path = require('path');
 const grammarSource = fs.readFileSync(
 	'./packages/block-serialization-spec-parser/grammar.pegjs',
 	'utf8'
 );
-const grammar = parser.parse( grammarSource );
+const grammar = parser.parse(grammarSource);
 
-function escape( text ) {
+function escape(text) {
 	return text
-		.replace( /\t/g, '\\t' )
-		.replace( /\r/g, '\\r' )
-		.replace( /\n/g, '\\n' )
-		.replace( /\&/g, '&amp;' )
-		.replace( /</g, '&lt;' );
+		.replace(/\t/g, '\\t')
+		.replace(/\r/g, '\\r')
+		.replace(/\n/g, '\\n')
+		.replace(/\&/g, '&amp;')
+		.replace(/</g, '&lt;');
 }
 
-function isGroup( expression ) {
+function isGroup(expression) {
 	return (
-		[ 'choice', 'action', 'labeled', 'sequence' ].indexOf(
-			expression.type
-		) >= 0
+		['choice', 'action', 'labeled', 'sequence'].indexOf(expression.type) >=
+		0
 	);
 }
 
-function flattenUnary( expression ) {
-	const shouldWrap = isGroup( expression );
-	const inner = flatten( expression );
+function flattenUnary(expression) {
+	const shouldWrap = isGroup(expression);
+	const inner = flatten(expression);
 	return shouldWrap ? '(' + inner + ')' : inner;
 }
 
-function flatten( expression ) {
-	switch ( expression.type ) {
+function flatten(expression) {
+	switch (expression.type) {
 		// Terminal
 		case 'any':
 			return '.';
 		case 'rule_ref':
 			return expression.name;
 		case 'literal':
-			return '"' + escape( expression.value ) + '"';
+			return '"' + escape(expression.value) + '"';
 		case 'class':
 			return (
 				'[' +
-				( expression.inverted ? '^' : '' ) +
+				(expression.inverted ? '^' : '') +
 				expression.parts
-					.map( ( part ) =>
-						escape(
-							Array.isArray( part ) ? part.join( '-' ) : part
-						)
+					.map((part) =>
+						escape(Array.isArray(part) ? part.join('-') : part)
 					)
-					.join( '' ) +
+					.join('') +
 				']' +
-				( expression.ignoreCase ? 'i' : '' )
+				(expression.ignoreCase ? 'i' : '')
 			);
 
 		// Unary
 		case 'zero_or_more':
-			return flattenUnary( expression.expression ) + '*';
+			return flattenUnary(expression.expression) + '*';
 		case 'one_or_more':
-			return flattenUnary( expression.expression ) + '+';
+			return flattenUnary(expression.expression) + '+';
 		case 'optional':
-			return flattenUnary( expression.expression ) + '?';
+			return flattenUnary(expression.expression) + '?';
 		case 'simple_not':
-			return '!' + flattenUnary( expression.expression );
+			return '!' + flattenUnary(expression.expression);
 
 		// Other groups
 		case 'sequence':
-			return expression.elements.map( flatten ).join( ' ' );
+			return expression.elements.map(flatten).join(' ');
 		case 'choice':
 			const sep = expression.isRuleTop ? '\n  / ' : ' / ';
-			return expression.alternatives.map( flatten ).join( sep );
+			return expression.alternatives.map(flatten).join(sep);
 		case 'group':
-			return '(' + flatten( expression.expression ) + ')';
+			return '(' + flatten(expression.expression) + ')';
 		case 'text':
 			// Avoid double parentheses
-			const inner = flatten( expression.expression );
-			const shouldWrap = inner.indexOf( '(' ) !== 0;
+			const inner = flatten(expression.expression);
+			const shouldWrap = inner.indexOf('(') !== 0;
 			return shouldWrap ? '$(' + inner + ')' : '$' + inner;
 		case 'action':
 		case 'labeled':
 		case 'named':
-			return flatten( expression.expression );
+			return flatten(expression.expression);
 
 		// Top-level formatting
 		case 'grammar':
-			return `<dl>${ expression.rules.map( flatten ).join( '' ) }</dl>`;
+			return `<dl>${expression.rules.map(flatten).join('')}</dl>`;
 		case 'rule':
 			expression.expression.isRuleTop = true;
 			const displayName =
@@ -101,21 +98,21 @@ function flatten( expression ) {
 					? expression.expression.name
 					: '';
 			return (
-				`<dt>${ displayName }</dt>` +
-				`<dd><pre><header>${ expression.name }</header>  = ` +
-				`${ flatten( expression.expression ) }</pre></dd>`
+				`<dt>${displayName}</dt>` +
+				`<dd><pre><header>${expression.name}</header>  = ` +
+				`${flatten(expression.expression)}</pre></dd>`
 			);
 
 		default:
-			throw new Error( JSON.stringify( expression ) );
+			throw new Error(JSON.stringify(expression));
 	}
 }
 
 fs.writeFileSync(
-	path.join( __dirname, '..', 'docs', 'contributors', 'grammar.md' ),
+	path.join(__dirname, '..', 'docs', 'contributors', 'grammar.md'),
 	`
 # Block Grammar
 
-${ flatten( grammar ) }
+${flatten(grammar)}
 `
 );

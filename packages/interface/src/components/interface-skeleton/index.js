@@ -14,18 +14,18 @@ import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/c
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 
-function useHTMLClass( className ) {
-	useEffect( () => {
+function useHTMLClass(className) {
+	useEffect(() => {
 		const element =
-			document && document.querySelector( `html:not(.${ className })` );
-		if ( ! element ) {
+			document && document.querySelector(`html:not(.${className})`);
+		if (!element) {
 			return;
 		}
-		element.classList.toggle( className );
+		element.classList.toggle(className);
 		return () => {
-			element.classList.toggle( className );
+			element.classList.toggle(className);
 		};
-	}, [ className ] );
+	}, [className]);
 }
 
 function InterfaceSkeleton(
@@ -44,119 +44,119 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
-	const navigateRegionsProps = useNavigateRegions( shortcuts );
+	const navigateRegionsProps = useNavigateRegions(shortcuts);
 
-	useHTMLClass( 'interface-interface-skeleton__html-container' );
+	useHTMLClass('interface-interface-skeleton__html-container');
 
 	const defaultLabels = {
 		/* translators: accessibility text for the nav bar landmark region. */
-		drawer: __( 'Drawer' ),
+		drawer: __('Drawer'),
 		/* translators: accessibility text for the top bar landmark region. */
-		header: __( 'Header' ),
+		header: __('Header'),
 		/* translators: accessibility text for the content landmark region. */
-		body: __( 'Content' ),
+		body: __('Content'),
 		/* translators: accessibility text for the secondary sidebar landmark region. */
-		secondarySidebar: __( 'Block Library' ),
+		secondarySidebar: __('Block Library'),
 		/* translators: accessibility text for the settings landmark region. */
-		sidebar: __( 'Settings' ),
+		sidebar: __('Settings'),
 		/* translators: accessibility text for the publish landmark region. */
-		actions: __( 'Publish' ),
+		actions: __('Publish'),
 		/* translators: accessibility text for the footer landmark region. */
-		footer: __( 'Footer' ),
+		footer: __('Footer'),
 	};
 
 	const mergedLabels = { ...defaultLabels, ...labels };
 
 	return (
 		<div
-			{ ...navigateRegionsProps }
-			ref={ useMergeRefs( [ ref, navigateRegionsProps.ref ] ) }
-			className={ classnames(
+			{...navigateRegionsProps}
+			ref={useMergeRefs([ref, navigateRegionsProps.ref])}
+			className={classnames(
 				className,
 				'interface-interface-skeleton',
 				navigateRegionsProps.className,
-				!! footer && 'has-footer'
-			) }
+				!!footer && 'has-footer'
+			)}
 		>
-			{ !! drawer && (
+			{!!drawer && (
 				<div
 					className="interface-interface-skeleton__drawer"
 					role="region"
-					aria-label={ mergedLabels.drawer }
+					aria-label={mergedLabels.drawer}
 					tabIndex="-1"
 				>
-					{ drawer }
+					{drawer}
 				</div>
-			) }
+			)}
 			<div className="interface-interface-skeleton__editor">
-				{ !! header && (
+				{!!header && (
 					<div
 						className="interface-interface-skeleton__header"
 						role="region"
-						aria-label={ mergedLabels.header }
+						aria-label={mergedLabels.header}
 						tabIndex="-1"
 					>
-						{ header }
+						{header}
 					</div>
-				) }
+				)}
 				<div className="interface-interface-skeleton__body">
-					{ !! secondarySidebar && (
+					{!!secondarySidebar && (
 						<div
 							className="interface-interface-skeleton__secondary-sidebar"
 							role="region"
-							aria-label={ mergedLabels.secondarySidebar }
+							aria-label={mergedLabels.secondarySidebar}
 							tabIndex="-1"
 						>
-							{ secondarySidebar }
+							{secondarySidebar}
 						</div>
-					) }
-					{ !! notices && (
+					)}
+					{!!notices && (
 						<div className="interface-interface-skeleton__notices">
-							{ notices }
+							{notices}
 						</div>
-					) }
+					)}
 					<div
 						className="interface-interface-skeleton__content"
 						role="region"
-						aria-label={ mergedLabels.body }
+						aria-label={mergedLabels.body}
 						tabIndex="-1"
 					>
-						{ content }
+						{content}
 					</div>
-					{ !! sidebar && (
+					{!!sidebar && (
 						<div
 							className="interface-interface-skeleton__sidebar"
 							role="region"
-							aria-label={ mergedLabels.sidebar }
+							aria-label={mergedLabels.sidebar}
 							tabIndex="-1"
 						>
-							{ sidebar }
+							{sidebar}
 						</div>
-					) }
-					{ !! actions && (
+					)}
+					{!!actions && (
 						<div
 							className="interface-interface-skeleton__actions"
 							role="region"
-							aria-label={ mergedLabels.actions }
+							aria-label={mergedLabels.actions}
 							tabIndex="-1"
 						>
-							{ actions }
+							{actions}
 						</div>
-					) }
+					)}
 				</div>
 			</div>
-			{ !! footer && (
+			{!!footer && (
 				<div
 					className="interface-interface-skeleton__footer"
 					role="region"
-					aria-label={ mergedLabels.footer }
+					aria-label={mergedLabels.footer}
 					tabIndex="-1"
 				>
-					{ footer }
+					{footer}
 				</div>
-			) }
+			)}
 		</div>
 	);
 }
 
-export default forwardRef( InterfaceSkeleton );
+export default forwardRef(InterfaceSkeleton);

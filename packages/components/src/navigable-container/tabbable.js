@@ -10,10 +10,10 @@ import { TAB } from '@wordpress/keycodes';
  */
 import NavigableContainer from './container';
 
-export function TabbableContainer( { eventToOffset, ...props }, ref ) {
-	const innerEventToOffset = ( evt ) => {
+export function TabbableContainer({ eventToOffset, ...props }, ref) {
+	const innerEventToOffset = (evt) => {
 		const { keyCode, shiftKey } = evt;
-		if ( TAB === keyCode ) {
+		if (TAB === keyCode) {
 			return shiftKey ? -1 : 1;
 		}
 
@@ -28,20 +28,20 @@ export function TabbableContainer( { eventToOffset, ...props }, ref ) {
 		// - -1: move focus backward
 		// -  0: don't move focus, but acknowledge event and thus stop it
 		// - undefined: do nothing, let the event propagate
-		if ( eventToOffset ) {
-			return eventToOffset( evt );
+		if (eventToOffset) {
+			return eventToOffset(evt);
 		}
 	};
 
 	return (
 		<NavigableContainer
-			ref={ ref }
+			ref={ref}
 			stopNavigationEvents
 			onlyBrowserTabstops
-			eventToOffset={ innerEventToOffset }
-			{ ...props }
+			eventToOffset={innerEventToOffset}
+			{...props}
 		/>
 	);
 }
 
-export default forwardRef( TabbableContainer );
+export default forwardRef(TabbableContainer);

@@ -4,8 +4,8 @@
  * @param {Object} template The template entity to check.
  * @return {boolean} Whether the template is revertable.
  */
-export default function isTemplateRevertable( template ) {
-	if ( ! template ) {
+export default function isTemplateRevertable(template) {
+	if (!template) {
 		return false;
 	}
 	/* eslint-disable camelcase */

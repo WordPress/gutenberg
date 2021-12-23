@@ -7,20 +7,20 @@
  *
  * @return {boolean} Whether the hook name is valid.
  */
-function validateHookName( hookName ) {
-	if ( 'string' !== typeof hookName || '' === hookName ) {
+function validateHookName(hookName) {
+	if ('string' !== typeof hookName || '' === hookName) {
 		// eslint-disable-next-line no-console
-		console.error( 'The hook name must be a non-empty string.' );
+		console.error('The hook name must be a non-empty string.');
 		return false;
 	}
 
-	if ( /^__/.test( hookName ) ) {
+	if (/^__/.test(hookName)) {
 		// eslint-disable-next-line no-console
-		console.error( 'The hook name cannot begin with `__`.' );
+		console.error('The hook name cannot begin with `__`.');
 		return false;
 	}
 
-	if ( ! /^[a-zA-Z][a-zA-Z0-9_.-]*$/.test( hookName ) ) {
+	if (!/^[a-zA-Z][a-zA-Z0-9_.-]*$/.test(hookName)) {
 		// eslint-disable-next-line no-console
 		console.error(
 			'The hook name can only contain numbers, letters, dashes, periods and underscores.'

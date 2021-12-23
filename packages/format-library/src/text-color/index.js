@@ -20,68 +20,70 @@ import { default as InlineColorUI, getActiveColors } from './inline';
 export const transparentValue = 'rgba(0, 0, 0, 0)';
 
 const name = 'core/text-color';
-const title = __( 'Highlight' );
+const title = __('Highlight');
 
 const EMPTY_ARRAY = [];
 
-function getComputedStyleProperty( element, property ) {
+function getComputedStyleProperty(element, property) {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
-	const style = defaultView.getComputedStyle( element );
-	const value = style.getPropertyValue( property );
+	const style = defaultView.getComputedStyle(element);
+	const value = style.getPropertyValue(property);
 
 	if (
 		property === 'background-color' &&
 		value === transparentValue &&
 		element.parentElement
 	) {
-		return getComputedStyleProperty( element.parentElement, property );
+		return getComputedStyleProperty(element.parentElement, property);
 	}
 
 	return value;
 }
 
-function fillComputedColors( element, { color, backgroundColor } ) {
-	if ( ! color && ! backgroundColor ) {
+function fillComputedColors(element, { color, backgroundColor }) {
+	if (!color && !backgroundColor) {
 		return;
 	}
 
 	return {
-		color: color || getComputedStyleProperty( element, 'color' ),
+		color: color || getComputedStyleProperty(element, 'color'),
 		backgroundColor:
 			backgroundColor === transparentValue
-				? getComputedStyleProperty( element, 'background-color' )
+				? getComputedStyleProperty(element, 'background-color')
 				: backgroundColor,
 	};
 }
 
-function TextColorEdit( {
+function TextColorEdit({
 	value,
 	onChange,
 	isActive,
 	activeAttributes,
 	contentRef,
-} ) {
-	const allowCustomControl = useSetting( 'color.custom' );
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
-		setIsAddingColor,
-	] );
-	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
-		setIsAddingColor,
-	] );
+}) {
+	const allowCustomControl = useSetting('color.custom');
+	const colors = useSetting('color.palette') || EMPTY_ARRAY;
+	const [isAddingColor, setIsAddingColor] = useState(false);
+	const enableIsAddingColor = useCallback(
+		() => setIsAddingColor(true),
+		[setIsAddingColor]
+	);
+	const disableIsAddingColor = useCallback(
+		() => setIsAddingColor(false),
+		[setIsAddingColor]
+	);
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
 				contentRef.current,
-				getActiveColors( value, name, colors )
+				getActiveColors(value, name, colors)
 			),
-		[ value, colors ]
+		[value, colors]
 	);
 
-	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
-	if ( ! hasColorsToChoose && ! isActive ) {
+	const hasColorsToChoose = !isEmpty(colors) || !allowCustomControl;
+	if (!hasColorsToChoose && !isActive) {
 		return null;
 	}
 
@@ -89,32 +91,27 @@ function TextColorEdit( {
 		<>
 			<RichTextToolbarButton
 				className="format-library-text-color-button"
-				isActive={ isActive }
-				icon={
-					<Icon
-						icon={ textColorIcon }
-						style={ colorIndicatorStyle }
-					/>
-				}
-				title={ title }
+				isActive={isActive}
+				icon={<Icon icon={textColorIcon} style={colorIndicatorStyle} />}
+				title={title}
 				// If has no colors to choose but a color is active remove the color onClick
 				onClick={
 					hasColorsToChoose
 						? enableIsAddingColor
-						: () => onChange( removeFormat( value, name ) )
+						: () => onChange(removeFormat(value, name))
 				}
 				role="menuitemcheckbox"
 			/>
-			{ isAddingColor && (
+			{isAddingColor && (
 				<InlineColorUI
-					name={ name }
-					onClose={ disableIsAddingColor }
-					activeAttributes={ activeAttributes }
-					value={ value }
-					onChange={ onChange }
-					contentRef={ contentRef }
+					name={name}
+					onClose={disableIsAddingColor}
+					activeAttributes={activeAttributes}
+					value={value}
+					onChange={onChange}
+					contentRef={contentRef}
 				/>
-			) }
+			)}
 		</>
 	);
 }
@@ -137,14 +134,14 @@ export const textColor = {
 	 *
 	 * @see https://github.com/WordPress/gutenberg/pull/35516
 	 */
-	__unstableFilterAttributeValue( key, value ) {
-		if ( key !== 'style' ) return value;
+	__unstableFilterAttributeValue(key, value) {
+		if (key !== 'style') return value;
 		// We should not add a background-color if it's already set
-		if ( value && value.includes( 'background-color' ) ) return value;
-		const addedCSS = [ 'background-color', transparentValue ].join( ':' );
+		if (value && value.includes('background-color')) return value;
+		const addedCSS = ['background-color', transparentValue].join(':');
 		// Prepend `addedCSS` to avoid a double `;;` as any the existing CSS
 		// rules will already include a `;`.
-		return value ? [ addedCSS, value ].join( ';' ) : addedCSS;
+		return value ? [addedCSS, value].join(';') : addedCSS;
 	},
 	edit: TextColorEdit,
 };

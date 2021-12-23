@@ -15,50 +15,48 @@ import items from './fixtures';
 import ReusableBlocksTab from '../reusable-blocks-tab';
 import BlockTypesList from '../../block-types-list';
 
-jest.mock( '../../block-types-list' );
-jest.mock( '@wordpress/data/src/components/use-select' );
+jest.mock('../../block-types-list');
+jest.mock('@wordpress/data/src/components/use-select');
 
 const fetchReusableBlocks = jest.fn();
 const selectMock = {
-	getInserterItems: jest.fn().mockReturnValue( [] ),
-	getSettings: jest.fn().mockReturnValue( {
+	getInserterItems: jest.fn().mockReturnValue([]),
+	getSettings: jest.fn().mockReturnValue({
 		__experimentalFetchReusableBlocks: fetchReusableBlocks,
-	} ),
+	}),
 };
 
-describe( 'ReusableBlocksTab component', () => {
-	beforeEach( () => {
-		useSelect.mockImplementation( ( callback ) =>
-			callback( () => selectMock )
-		);
-	} );
+describe('ReusableBlocksTab component', () => {
+	beforeEach(() => {
+		useSelect.mockImplementation((callback) => callback(() => selectMock));
+	});
 
-	it( 'renders without crashing', () => {
+	it('renders without crashing', () => {
 		const component = shallow(
 			<ReusableBlocksTab
-				rootClientId={ 0 }
-				onSelect={ jest.fn() }
-				listProps={ {} }
+				rootClientId={0}
+				onSelect={jest.fn()}
+				listProps={{}}
 			/>
 		);
-		expect( component ).toBeTruthy();
-	} );
+		expect(component).toBeTruthy();
+	});
 
-	it( 'shows reusable block items', () => {
-		selectMock.getInserterItems.mockReturnValue( items );
+	it('shows reusable block items', () => {
+		selectMock.getInserterItems.mockReturnValue(items);
 
 		const reusableBlockItems = items.filter(
-			( { category } ) => category === 'reusable'
+			({ category }) => category === 'reusable'
 		);
 		const component = shallow(
 			<ReusableBlocksTab
-				rootClientId={ 0 }
-				onSelect={ jest.fn() }
-				listProps={ {} }
+				rootClientId={0}
+				onSelect={jest.fn()}
+				listProps={{}}
 			/>
 		);
-		expect( component.find( BlockTypesList ).prop( 'items' ) ).toEqual(
+		expect(component.find(BlockTypesList).prop('items')).toEqual(
 			reusableBlockItems
 		);
-	} );
-} );
+	});
+});

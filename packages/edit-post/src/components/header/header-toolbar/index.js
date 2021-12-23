@@ -25,15 +25,14 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { store as editPostStore } from '../../../store';
 
-const preventDefault = ( event ) => {
+const preventDefault = (event) => {
 	event.preventDefault();
 };
 
 function HeaderToolbar() {
 	const inserterButton = useRef();
-	const { setIsInserterOpened, setIsListViewOpened } = useDispatch(
-		editPostStore
-	);
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch(editPostStore);
 	const {
 		isInserterEnabled,
 		isInserterOpened,
@@ -41,128 +40,122 @@ function HeaderToolbar() {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
-	} = useSelect( ( select ) => {
-		const {
-			hasInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-		} = select( blockEditorStore );
-		const { getEditorSettings } = select( editorStore );
-		const { getEditorMode, isFeatureActive, isListViewOpened } = select(
-			editPostStore
-		);
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+	} = useSelect((select) => {
+		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
+			select(blockEditorStore);
+		const { getEditorSettings } = select(editorStore);
+		const { getEditorMode, isFeatureActive, isListViewOpened } =
+			select(editPostStore);
+		const { getShortcutRepresentation } = select(keyboardShortcutsStore);
 
 		return {
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				getEditorMode() === 'visual' &&
 				getEditorSettings().richEditingEnabled &&
-				hasInserterItems(
-					getBlockRootClientId( getBlockSelectionEnd() )
-				),
-			isInserterOpened: select( editPostStore ).isInserterOpened(),
+				hasInserterItems(getBlockRootClientId(getBlockSelectionEnd())),
+			isInserterOpened: select(editPostStore).isInserterOpened(),
 			isTextModeEnabled: getEditorMode() === 'text',
-			showIconLabels: isFeatureActive( 'showIconLabels' ),
+			showIconLabels: isFeatureActive('showIconLabels'),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-post/toggle-list-view'
 			),
 		};
-	}, [] );
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideViewport = useViewportMatch( 'wide' );
+	}, []);
+	const isLargeViewport = useViewportMatch('medium');
+	const isWideViewport = useViewportMatch('wide');
 
 	/* translators: accessibility text for the editor toolbar */
-	const toolbarAriaLabel = __( 'Document tools' );
+	const toolbarAriaLabel = __('Document tools');
 
 	const toggleListView = useCallback(
-		() => setIsListViewOpened( ! isListViewOpen ),
-		[ setIsListViewOpened, isListViewOpen ]
+		() => setIsListViewOpened(!isListViewOpen),
+		[setIsListViewOpened, isListViewOpen]
 	);
 	const overflowItems = (
 		<>
 			<ToolbarItem
-				as={ TableOfContents }
-				hasOutlineItemsDisabled={ isTextModeEnabled }
-				repositionDropdown={ showIconLabels && ! isWideViewport }
-				showTooltip={ ! showIconLabels }
-				variant={ showIconLabels ? 'tertiary' : undefined }
+				as={TableOfContents}
+				hasOutlineItemsDisabled={isTextModeEnabled}
+				repositionDropdown={showIconLabels && !isWideViewport}
+				showTooltip={!showIconLabels}
+				variant={showIconLabels ? 'tertiary' : undefined}
 			/>
 			<ToolbarItem
-				as={ Button }
+				as={Button}
 				className="edit-post-header-toolbar__list-view-toggle"
-				icon={ listView }
-				disabled={ isTextModeEnabled }
-				isPressed={ isListViewOpen }
+				icon={listView}
+				disabled={isTextModeEnabled}
+				isPressed={isListViewOpen}
 				/* translators: button label text should, if possible, be under 16 characters. */
-				label={ __( 'List View' ) }
-				onClick={ toggleListView }
-				shortcut={ listViewShortcut }
-				showTooltip={ ! showIconLabels }
+				label={__('List View')}
+				onClick={toggleListView}
+				shortcut={listViewShortcut}
+				showTooltip={!showIconLabels}
 			/>
 		</>
 	);
-	const openInserter = useCallback( () => {
-		if ( isInserterOpened ) {
+	const openInserter = useCallback(() => {
+		if (isInserterOpened) {
 			// Focusing the inserter button closes the inserter popover
 			inserterButton.current.focus();
 		} else {
-			setIsInserterOpened( true );
+			setIsInserterOpened(true);
 		}
-	}, [ isInserterOpened, setIsInserterOpened ] );
+	}, [isInserterOpened, setIsInserterOpened]);
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
-			aria-label={ toolbarAriaLabel }
+			aria-label={toolbarAriaLabel}
 		>
 			<div className="edit-post-header-toolbar__left">
 				<ToolbarItem
-					ref={ inserterButton }
-					as={ Button }
+					ref={inserterButton}
+					as={Button}
 					className="edit-post-header-toolbar__inserter-toggle"
 					variant="primary"
-					isPressed={ isInserterOpened }
-					onMouseDown={ preventDefault }
-					onClick={ openInserter }
-					disabled={ ! isInserterEnabled }
-					icon={ plus }
+					isPressed={isInserterOpened}
+					onMouseDown={preventDefault}
+					onClick={openInserter}
+					disabled={!isInserterEnabled}
+					icon={plus}
 					/* translators: button label text should, if possible, be under 16
 			characters. */
-					label={ _x(
+					label={_x(
 						'Toggle block inserter',
 						'Generic label for block inserter button'
-					) }
-					showTooltip={ ! showIconLabels }
+					)}
+					showTooltip={!showIconLabels}
 				>
-					{ showIconLabels &&
-						( ! isInserterOpened ? __( 'Add' ) : __( 'Close' ) ) }
+					{showIconLabels &&
+						(!isInserterOpened ? __('Add') : __('Close'))}
 				</ToolbarItem>
-				{ ( isWideViewport || ! showIconLabels ) && (
+				{(isWideViewport || !showIconLabels) && (
 					<>
-						{ isLargeViewport && (
+						{isLargeViewport && (
 							<ToolbarItem
-								as={ ToolSelector }
-								showTooltip={ ! showIconLabels }
+								as={ToolSelector}
+								showTooltip={!showIconLabels}
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
-								disabled={ isTextModeEnabled }
+								disabled={isTextModeEnabled}
 							/>
-						) }
+						)}
 						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
+							as={EditorHistoryUndo}
+							showTooltip={!showIconLabels}
+							variant={showIconLabels ? 'tertiary' : undefined}
 						/>
 						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
+							as={EditorHistoryRedo}
+							showTooltip={!showIconLabels}
+							variant={showIconLabels ? 'tertiary' : undefined}
 						/>
-						{ overflowItems }
+						{overflowItems}
 					</>
-				) }
+				)}
 			</div>
 		</NavigableToolbar>
 	);

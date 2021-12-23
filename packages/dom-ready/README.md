@@ -25,9 +25,9 @@ _Usage_
 ```js
 import domReady from '@wordpress/dom-ready';
 
-domReady( function () {
+domReady(function () {
 	//do something after DOM loads.
-} );
+});
 ```
 
 _Parameters_

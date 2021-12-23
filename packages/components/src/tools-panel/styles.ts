@@ -18,8 +18,8 @@ import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
 	spacing: css`
-		column-gap: ${ space( 4 ) };
-		row-gap: ${ space( 6 ) };
+		column-gap: ${space(4)};
+		row-gap: ${space(6)};
 	`,
 	item: {
 		fullWidth: css`
@@ -29,11 +29,11 @@ const toolsPanelGrid = {
 };
 
 export const ToolsPanel = css`
-	${ toolsPanelGrid.spacing };
+	${toolsPanelGrid.spacing};
 
-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+	border-top: ${CONFIG.borderWidth} solid ${COLORS.gray[200]};
 	margin-top: -1px;
-	padding: ${ space( 4 ) };
+	padding: ${space(4)};
 `;
 
 /**
@@ -42,26 +42,26 @@ export const ToolsPanel = css`
  * CSS grid display to be re-established.
  */
 
-export const ToolsPanelWithInnerWrapper = ( columns: number ) => {
+export const ToolsPanelWithInnerWrapper = (columns: number) => {
 	return css`
-		> div:not( :first-of-type ) {
+		> div:not(:first-of-type) {
 			display: grid;
-			grid-template-columns: ${ `repeat( ${ columns }, 1fr )` };
-			${ toolsPanelGrid.spacing }
-			${ toolsPanelGrid.item.fullWidth }
+			grid-template-columns: ${`repeat( ${columns}, 1fr )`};
+			${toolsPanelGrid.spacing}
+			${toolsPanelGrid.item.fullWidth}
 		}
 	`;
 };
 
 export const ToolsPanelHiddenInnerWrapper = css`
-	> div:not( :first-of-type ) {
+	> div:not(:first-of-type) {
 		display: none;
 	}
 `;
 
 export const ToolsPanelHeader = css`
-	${ toolsPanelGrid.item.fullWidth }
-	gap: ${ space( 2 ) };
+	${toolsPanelGrid.item.fullWidth}
+	gap: ${space(2)};
 
 	/**
 	 * The targeting of dropdown menu component classes here is a temporary
@@ -71,12 +71,12 @@ export const ToolsPanelHeader = css`
 	 * refactored and can be targeted via component interpolation.
 	 */
 	.components-dropdown-menu {
-		margin: ${ space( -1 ) } 0;
+		margin: ${space(-1)} 0;
 		line-height: 0;
 	}
 	&&&& .components-dropdown-menu__toggle {
 		padding: 0;
-		min-width: ${ space( 6 ) };
+		min-width: ${space(6)};
 	}
 `;
 
@@ -92,7 +92,7 @@ export const ToolsPanelHeading = css`
 `;
 
 export const ToolsPanelItem = css`
-	${ toolsPanelGrid.item.fullWidth }
+	${toolsPanelGrid.item.fullWidth}
 
 	/* Clear spacing in and around controls added as panel items. */
 	/* Remove when they can be addressed via context system. */
@@ -104,7 +104,7 @@ export const ToolsPanelItem = css`
 	}
 
 	/* Remove BaseControl components margins and leave spacing to grid layout */
-	&& ${ BaseControlWrapper } {
+	&& ${BaseControlWrapper} {
 		margin-bottom: 0;
 
 		/**
@@ -112,12 +112,12 @@ export const ToolsPanelItem = css`
 		 * margin should only be removed when there is no help text included and
 		 * it is therefore the last-child.
 		 */
-		${ BaseControlField }:last-child {
+		${BaseControlField}:last-child {
 			margin-bottom: 0;
 		}
 	}
 
-	${ BaseControlHelp } {
+	${BaseControlHelp} {
 		margin-bottom: 0;
 	}
 
@@ -128,9 +128,9 @@ export const ToolsPanelItem = css`
 	 * This is a temporary fix until the different control components have their
 	 * labels normalized.
 	 */
-	&& ${ LabelWrapper } {
+	&& ${LabelWrapper} {
 		label {
-			margin-bottom: ${ space( 2 ) };
+			margin-bottom: ${space(2)};
 			padding-bottom: 0;
 			line-height: 1.4em;
 		}
@@ -144,7 +144,7 @@ export const ToolsPanelItem = css`
 	 * refactored and can be targeted via component interpolation.
 	 */
 	.components-custom-select-control__label,
-	${ BaseControlLabel } {
+	${BaseControlLabel} {
 		line-height: 1.4em;
 	}
 `;

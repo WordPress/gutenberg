@@ -27,26 +27,26 @@ import { store as editorStore } from '../../store';
  *
  * @return {WPComponent} The component to be rendered.
  */
-export function PostTypeSupportCheck( { postType, children, supportKeys } ) {
+export function PostTypeSupportCheck({ postType, children, supportKeys }) {
 	let isSupported = true;
-	if ( postType ) {
+	if (postType) {
 		isSupported = some(
-			castArray( supportKeys ),
-			( key ) => !! postType.supports[ key ]
+			castArray(supportKeys),
+			(key) => !!postType.supports[key]
 		);
 	}
 
-	if ( ! isSupported ) {
+	if (!isSupported) {
 		return null;
 	}
 
 	return children;
 }
 
-export default withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( editorStore );
-	const { getPostType } = select( coreStore );
+export default withSelect((select) => {
+	const { getEditedPostAttribute } = select(editorStore);
+	const { getPostType } = select(coreStore);
 	return {
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		postType: getPostType(getEditedPostAttribute('type')),
 	};
-} )( PostTypeSupportCheck );
+})(PostTypeSupportCheck);

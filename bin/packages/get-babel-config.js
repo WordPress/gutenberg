@@ -1,4 +1,4 @@
-module.exports = ( environment = '', file ) => {
+module.exports = (environment = '', file) => {
 	/*
 	 * Specific options to be passed using the caller config option:
 	 * https://babeljs.io/docs/en/options#caller
@@ -8,10 +8,10 @@ module.exports = ( environment = '', file ) => {
 	 */
 	const callerOpts = {
 		caller: {
-			name: `WP_BUILD_${ environment.toUpperCase() }`,
+			name: `WP_BUILD_${environment.toUpperCase()}`,
 		},
 	};
-	switch ( environment ) {
+	switch (environment) {
 		case 'main':
 			// to be merged as a presetEnv option
 			callerOpts.caller.modules = 'commonjs';

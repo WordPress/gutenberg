@@ -25,51 +25,51 @@ let maxItems = null;
  *                   either `output` (if that request was succesful) or `error`
  *                   (if not ).
  */
-export default async function defaultProcessor( requests ) {
-	if ( maxItems === null ) {
-		const preflightResponse = await apiFetch( {
+export default async function defaultProcessor(requests) {
+	if (maxItems === null) {
+		const preflightResponse = await apiFetch({
 			path: '/batch/v1',
 			method: 'OPTIONS',
-		} );
-		maxItems = preflightResponse.endpoints[ 0 ].args.requests.maxItems;
+		});
+		maxItems = preflightResponse.endpoints[0].args.requests.maxItems;
 	}
 
 	const results = [];
 
-	for ( const batchRequests of chunk( requests, maxItems ) ) {
-		const batchResponse = await apiFetch( {
+	for (const batchRequests of chunk(requests, maxItems)) {
+		const batchResponse = await apiFetch({
 			path: '/batch/v1',
 			method: 'POST',
 			data: {
 				validation: 'require-all-validate',
-				requests: batchRequests.map( ( request ) => ( {
+				requests: batchRequests.map((request) => ({
 					path: request.path,
 					body: request.data, // Rename 'data' to 'body'.
 					method: request.method,
 					headers: request.headers,
-				} ) ),
+				})),
 			},
-		} );
+		});
 
 		let batchResults;
 
-		if ( batchResponse.failed ) {
-			batchResults = batchResponse.responses.map( ( response ) => ( {
+		if (batchResponse.failed) {
+			batchResults = batchResponse.responses.map((response) => ({
 				error: response?.body,
-			} ) );
+			}));
 		} else {
-			batchResults = batchResponse.responses.map( ( response ) => {
+			batchResults = batchResponse.responses.map((response) => {
 				const result = {};
-				if ( response.status >= 200 && response.status < 300 ) {
+				if (response.status >= 200 && response.status < 300) {
 					result.output = response.body;
 				} else {
 					result.error = response.body;
 				}
 				return result;
-			} );
+			});
 		}
 
-		results.push( ...batchResults );
+		results.push(...batchResults);
 	}
 
 	return results;

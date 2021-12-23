@@ -6,10 +6,10 @@ import {
 	SETTINGS_DEFAULTS as SETTINGS,
 } from './defaults.js';
 
-const fontSizes = SETTINGS.fontSizes.map( ( fontSize ) => {
+const fontSizes = SETTINGS.fontSizes.map((fontSize) => {
 	fontSize.sizePx = fontSize.size + 'px';
 	return fontSize;
-} );
+});
 
 const SETTINGS_DEFAULTS = {
 	...SETTINGS,

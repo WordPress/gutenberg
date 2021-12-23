@@ -14,7 +14,7 @@ import { useRef, useLayoutEffect } from '@wordpress/element';
 import { MediaPlaceholder } from './styles/focal-point-picker-style';
 import { isVideoType } from './utils';
 
-export default function Media( {
+export default function Media({
 	alt,
 	autoPlay,
 	src,
@@ -24,55 +24,55 @@ export default function Media( {
 	// https://github.com/testing-library/react-testing-library/issues/470
 	muted = true,
 	...props
-} ) {
-	if ( ! src ) {
+}) {
+	if (!src) {
 		return (
 			<MediaPlaceholderElement
 				className="components-focal-point-picker__media components-focal-point-picker__media--placeholder"
-				onLoad={ onLoad }
-				mediaRef={ mediaRef }
+				onLoad={onLoad}
+				mediaRef={mediaRef}
 			/>
 		);
 	}
 
-	const isVideo = isVideoType( src );
+	const isVideo = isVideoType(src);
 
 	return isVideo ? (
 		<video
-			{ ...props }
-			autoPlay={ autoPlay }
+			{...props}
+			autoPlay={autoPlay}
 			className="components-focal-point-picker__media components-focal-point-picker__media--video"
 			loop
-			muted={ muted }
-			onLoadedData={ onLoad }
-			ref={ mediaRef }
-			src={ src }
+			muted={muted}
+			onLoadedData={onLoad}
+			ref={mediaRef}
+			src={src}
 		/>
 	) : (
 		<img
-			{ ...props }
-			alt={ alt }
+			{...props}
+			alt={alt}
 			className="components-focal-point-picker__media components-focal-point-picker__media--image"
-			onLoad={ onLoad }
-			ref={ mediaRef }
-			src={ src }
+			onLoad={onLoad}
+			ref={mediaRef}
+			src={src}
 		/>
 	);
 }
 
-function MediaPlaceholderElement( { mediaRef, onLoad = noop, ...props } ) {
-	const onLoadRef = useRef( onLoad );
+function MediaPlaceholderElement({ mediaRef, onLoad = noop, ...props }) {
+	const onLoadRef = useRef(onLoad);
 
 	/**
 	 * This async callback mimics the onLoad (img) / onLoadedData (video) callback
 	 * for media elements. It is used in the main <FocalPointPicker /> component
 	 * to calculate the dimensions + boundaries for positioning.
 	 */
-	useLayoutEffect( () => {
-		window.requestAnimationFrame( () => {
+	useLayoutEffect(() => {
+		window.requestAnimationFrame(() => {
 			onLoadRef.current();
-		} );
-	}, [] );
+		});
+	}, []);
 
-	return <MediaPlaceholder ref={ mediaRef } { ...props } />;
+	return <MediaPlaceholder ref={mediaRef} {...props} />;
 }

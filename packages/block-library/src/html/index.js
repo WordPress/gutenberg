@@ -22,7 +22,7 @@ export const settings = {
 		attributes: {
 			content:
 				'<marquee>' +
-				__( 'Welcome to the wonderful world of blocks…' ) +
+				__('Welcome to the wonderful world of blocks…') +
 				'</marquee>',
 		},
 	},

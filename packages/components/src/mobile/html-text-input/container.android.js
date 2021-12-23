@@ -9,12 +9,12 @@ import { ScrollView } from 'react-native';
 import KeyboardAvoidingView from '../keyboard-avoiding-view';
 import styles from './style.android.scss';
 
-const HTMLInputContainer = ( { children, parentHeight } ) => (
+const HTMLInputContainer = ({ children, parentHeight }) => (
 	<KeyboardAvoidingView
-		style={ styles.keyboardAvoidingView }
-		parentHeight={ parentHeight }
+		style={styles.keyboardAvoidingView}
+		parentHeight={parentHeight}
 	>
-		<ScrollView style={ styles.scrollView }>{ children }</ScrollView>
+		<ScrollView style={styles.scrollView}>{children}</ScrollView>
 	</KeyboardAvoidingView>
 );
 

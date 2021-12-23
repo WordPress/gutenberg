@@ -9,16 +9,16 @@
  *
  * @return {Function} Listener creator.
  */
-export const onChangeListener = ( selector, listener, initial = false ) => {
+export const onChangeListener = (selector, listener, initial = false) => {
 	let previousValue = selector();
-	if ( initial ) {
-		listener( selector() );
+	if (initial) {
+		listener(selector());
 	}
 	return () => {
 		const selectedValue = selector();
-		if ( selectedValue !== previousValue ) {
+		if (selectedValue !== previousValue) {
 			previousValue = selectedValue;
-			listener( selectedValue );
+			listener(selectedValue);
 		}
 	};
 };

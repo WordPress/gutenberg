@@ -14,8 +14,8 @@ export default {
 };
 
 const AnglePickerWithState = () => {
-	const [ angle, setAngle ] = useState();
-	return <AnglePickerControl value={ angle } onChange={ setAngle } />;
+	const [angle, setAngle] = useState();
+	return <AnglePickerControl value={angle} onChange={setAngle} />;
 };
 
 export const _default = () => {

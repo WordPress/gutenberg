@@ -52,44 +52,44 @@ const initialState = {
 
 class FormTokenField extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 		this.state = initialState;
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onKeyPress = this.onKeyPress.bind( this );
-		this.onFocus = this.onFocus.bind( this );
-		this.onBlur = this.onBlur.bind( this );
-		this.deleteTokenBeforeInput = this.deleteTokenBeforeInput.bind( this );
-		this.deleteTokenAfterInput = this.deleteTokenAfterInput.bind( this );
-		this.addCurrentToken = this.addCurrentToken.bind( this );
-		this.onContainerTouched = this.onContainerTouched.bind( this );
-		this.renderToken = this.renderToken.bind( this );
-		this.onTokenClickRemove = this.onTokenClickRemove.bind( this );
-		this.onSuggestionHovered = this.onSuggestionHovered.bind( this );
-		this.onSuggestionSelected = this.onSuggestionSelected.bind( this );
-		this.onInputChange = this.onInputChange.bind( this );
-		this.bindInput = this.bindInput.bind( this );
-		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
-		this.updateSuggestions = this.updateSuggestions.bind( this );
+		this.onKeyDown = this.onKeyDown.bind(this);
+		this.onKeyPress = this.onKeyPress.bind(this);
+		this.onFocus = this.onFocus.bind(this);
+		this.onBlur = this.onBlur.bind(this);
+		this.deleteTokenBeforeInput = this.deleteTokenBeforeInput.bind(this);
+		this.deleteTokenAfterInput = this.deleteTokenAfterInput.bind(this);
+		this.addCurrentToken = this.addCurrentToken.bind(this);
+		this.onContainerTouched = this.onContainerTouched.bind(this);
+		this.renderToken = this.renderToken.bind(this);
+		this.onTokenClickRemove = this.onTokenClickRemove.bind(this);
+		this.onSuggestionHovered = this.onSuggestionHovered.bind(this);
+		this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
+		this.onInputChange = this.onInputChange.bind(this);
+		this.bindInput = this.bindInput.bind(this);
+		this.bindTokensAndInput = this.bindTokensAndInput.bind(this);
+		this.updateSuggestions = this.updateSuggestions.bind(this);
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate(prevProps) {
 		// Make sure to focus the input when the isActive state is true.
-		if ( this.state.isActive && ! this.input.hasFocus() ) {
+		if (this.state.isActive && !this.input.hasFocus()) {
 			this.input.focus();
 		}
 
 		const { suggestions, value } = this.props;
-		const suggestionsDidUpdate = ! isShallowEqual(
+		const suggestionsDidUpdate = !isShallowEqual(
 			suggestions,
 			prevProps.suggestions
 		);
-		if ( suggestionsDidUpdate || value !== prevProps.value ) {
-			this.updateSuggestions( suggestionsDidUpdate );
+		if (suggestionsDidUpdate || value !== prevProps.value) {
+			this.updateSuggestions(suggestionsDidUpdate);
 		}
 	}
 
-	static getDerivedStateFromProps( props, state ) {
-		if ( ! props.disabled || ! state.isActive ) {
+	static getDerivedStateFromProps(props, state) {
+		if (!props.disabled || !state.isActive) {
 			return null;
 		}
 
@@ -99,53 +99,53 @@ class FormTokenField extends Component {
 		};
 	}
 
-	bindInput( ref ) {
+	bindInput(ref) {
 		this.input = ref;
 	}
 
-	bindTokensAndInput( ref ) {
+	bindTokensAndInput(ref) {
 		this.tokensAndInput = ref;
 	}
 
-	onFocus( event ) {
+	onFocus(event) {
 		const { __experimentalExpandOnFocus } = this.props;
 		// If focus is on the input or on the container, set the isActive state to true.
-		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
-			this.setState( {
+		if (this.input.hasFocus() || event.target === this.tokensAndInput) {
+			this.setState({
 				isActive: true,
 				isExpanded:
-					!! __experimentalExpandOnFocus || this.state.isExpanded,
-			} );
+					!!__experimentalExpandOnFocus || this.state.isExpanded,
+			});
 		} else {
 			/*
 			 * Otherwise, focus is on one of the token "remove" buttons and we
 			 * set the isActive state to false to prevent the input to be
 			 * re-focused, see componentDidUpdate().
 			 */
-			this.setState( { isActive: false } );
+			this.setState({ isActive: false });
 		}
 
-		if ( 'function' === typeof this.props.onFocus ) {
-			this.props.onFocus( event );
+		if ('function' === typeof this.props.onFocus) {
+			this.props.onFocus(event);
 		}
 	}
 
 	onBlur() {
-		if ( this.inputHasValidValue() ) {
-			this.setState( { isActive: false } );
+		if (this.inputHasValidValue()) {
+			this.setState({ isActive: false });
 		} else {
-			this.setState( initialState );
+			this.setState(initialState);
 		}
 	}
 
-	onKeyDown( event ) {
+	onKeyDown(event) {
 		let preventDefault = false;
 
-		if ( event.defaultPrevented ) {
+		if (event.defaultPrevented) {
 			return;
 		}
 
-		switch ( event.keyCode ) {
+		switch (event.keyCode) {
 			case BACKSPACE:
 				preventDefault = this.handleDeleteKey(
 					this.deleteTokenBeforeInput
@@ -172,25 +172,25 @@ class FormTokenField extends Component {
 				);
 				break;
 			case SPACE:
-				if ( this.props.tokenizeOnSpace ) {
+				if (this.props.tokenizeOnSpace) {
 					preventDefault = this.addCurrentToken();
 				}
 				break;
 			case ESCAPE:
-				preventDefault = this.handleEscapeKey( event );
+				preventDefault = this.handleEscapeKey(event);
 				break;
 			default:
 				break;
 		}
 
-		if ( preventDefault ) {
+		if (preventDefault) {
 			event.preventDefault();
 		}
 	}
 
-	onKeyPress( event ) {
+	onKeyPress(event) {
 		let preventDefault = false;
-		switch ( event.charCode ) {
+		switch (event.charCode) {
 			case 44: // comma
 				preventDefault = this.handleCommaKey();
 				break;
@@ -198,47 +198,47 @@ class FormTokenField extends Component {
 				break;
 		}
 
-		if ( preventDefault ) {
+		if (preventDefault) {
 			event.preventDefault();
 		}
 	}
 
-	onContainerTouched( event ) {
+	onContainerTouched(event) {
 		// Prevent clicking/touching the tokensAndInput container from blurring
 		// the input and adding the current token.
-		if ( event.target === this.tokensAndInput && this.state.isActive ) {
+		if (event.target === this.tokensAndInput && this.state.isActive) {
 			event.preventDefault();
 		}
 	}
 
-	onTokenClickRemove( event ) {
-		this.deleteToken( event.value );
+	onTokenClickRemove(event) {
+		this.deleteToken(event.value);
 		this.input.focus();
 	}
 
-	onSuggestionHovered( suggestion ) {
-		const index = this.getMatchingSuggestions().indexOf( suggestion );
+	onSuggestionHovered(suggestion) {
+		const index = this.getMatchingSuggestions().indexOf(suggestion);
 
-		if ( index >= 0 ) {
-			this.setState( {
+		if (index >= 0) {
+			this.setState({
 				selectedSuggestionIndex: index,
 				selectedSuggestionScroll: false,
-			} );
+			});
 		}
 	}
 
-	onSuggestionSelected( suggestion ) {
-		this.addNewToken( suggestion );
+	onSuggestionSelected(suggestion) {
+		this.addNewToken(suggestion);
 	}
 
-	onInputChange( event ) {
+	onInputChange(event) {
 		const text = event.value;
 		const separator = this.props.tokenizeOnSpace ? /[ ,\t]+/ : /[,\t]+/;
-		const items = text.split( separator );
-		const tokenValue = last( items ) || '';
+		const items = text.split(separator);
+		const tokenValue = last(items) || '';
 
-		if ( items.length > 1 ) {
-			this.addNewTokens( items.slice( 0, -1 ) );
+		if (items.length > 1) {
+			this.addNewTokens(items.slice(0, -1));
 		}
 
 		this.setState(
@@ -246,12 +246,12 @@ class FormTokenField extends Component {
 			this.updateSuggestions
 		);
 
-		this.props.onInputChange( tokenValue );
+		this.props.onInputChange(tokenValue);
 	}
 
-	handleDeleteKey( deleteToken ) {
+	handleDeleteKey(deleteToken) {
 		let preventDefault = false;
-		if ( this.input.hasFocus() && this.isInputEmpty() ) {
+		if (this.input.hasFocus() && this.isInputEmpty()) {
 			deleteToken();
 			preventDefault = true;
 		}
@@ -261,7 +261,7 @@ class FormTokenField extends Component {
 
 	handleLeftArrowKey() {
 		let preventDefault = false;
-		if ( this.isInputEmpty() ) {
+		if (this.isInputEmpty()) {
 			this.moveInputBeforePreviousToken();
 			preventDefault = true;
 		}
@@ -271,7 +271,7 @@ class FormTokenField extends Component {
 
 	handleRightArrowKey() {
 		let preventDefault = false;
-		if ( this.isInputEmpty() ) {
+		if (this.isInputEmpty()) {
 			this.moveInputAfterNextToken();
 			preventDefault = true;
 		}
@@ -280,9 +280,9 @@ class FormTokenField extends Component {
 	}
 
 	handleUpArrowKey() {
-		this.setState( ( state, props ) => ( {
+		this.setState((state, props) => ({
 			selectedSuggestionIndex:
-				( state.selectedSuggestionIndex === 0
+				(state.selectedSuggestionIndex === 0
 					? this.getMatchingSuggestions(
 							state.incompleteTokenValue,
 							props.suggestions,
@@ -290,17 +290,17 @@ class FormTokenField extends Component {
 							props.maxSuggestions,
 							props.saveTransform
 					  ).length
-					: state.selectedSuggestionIndex ) - 1,
+					: state.selectedSuggestionIndex) - 1,
 			selectedSuggestionScroll: true,
-		} ) );
+		}));
 
 		return true; // preventDefault
 	}
 
 	handleDownArrowKey() {
-		this.setState( ( state, props ) => ( {
+		this.setState((state, props) => ({
 			selectedSuggestionIndex:
-				( state.selectedSuggestionIndex + 1 ) %
+				(state.selectedSuggestionIndex + 1) %
 				this.getMatchingSuggestions(
 					state.incompleteTokenValue,
 					props.suggestions,
@@ -309,65 +309,65 @@ class FormTokenField extends Component {
 					props.saveTransform
 				).length,
 			selectedSuggestionScroll: true,
-		} ) );
+		}));
 
 		return true; // preventDefault
 	}
 
-	handleEscapeKey( event ) {
-		this.setState( {
+	handleEscapeKey(event) {
+		this.setState({
 			incompleteTokenValue: event.target.value,
 			isExpanded: false,
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
-		} );
+		});
 		return true; // preventDefault
 	}
 
 	handleCommaKey() {
-		if ( this.inputHasValidValue() ) {
-			this.addNewToken( this.state.incompleteTokenValue );
+		if (this.inputHasValidValue()) {
+			this.addNewToken(this.state.incompleteTokenValue);
 		}
 
 		return true; // preventDefault
 	}
 
-	moveInputToIndex( index ) {
-		this.setState( ( state, props ) => ( {
-			inputOffsetFromEnd: props.value.length - Math.max( index, -1 ) - 1,
-		} ) );
+	moveInputToIndex(index) {
+		this.setState((state, props) => ({
+			inputOffsetFromEnd: props.value.length - Math.max(index, -1) - 1,
+		}));
 	}
 
 	moveInputBeforePreviousToken() {
-		this.setState( ( state, props ) => ( {
+		this.setState((state, props) => ({
 			inputOffsetFromEnd: Math.min(
 				state.inputOffsetFromEnd + 1,
 				props.value.length
 			),
-		} ) );
+		}));
 	}
 
 	moveInputAfterNextToken() {
-		this.setState( ( state ) => ( {
-			inputOffsetFromEnd: Math.max( state.inputOffsetFromEnd - 1, 0 ),
-		} ) );
+		this.setState((state) => ({
+			inputOffsetFromEnd: Math.max(state.inputOffsetFromEnd - 1, 0),
+		}));
 	}
 
 	deleteTokenBeforeInput() {
 		const index = this.getIndexOfInput() - 1;
 
-		if ( index > -1 ) {
-			this.deleteToken( this.props.value[ index ] );
+		if (index > -1) {
+			this.deleteToken(this.props.value[index]);
 		}
 	}
 
 	deleteTokenAfterInput() {
 		const index = this.getIndexOfInput();
 
-		if ( index < this.props.value.length ) {
-			this.deleteToken( this.props.value[ index ] );
+		if (index < this.props.value.length) {
+			this.deleteToken(this.props.value[index]);
 			// update input offset since it's the offset from the last token
-			this.moveInputToIndex( index );
+			this.moveInputToIndex(index);
 		}
 	}
 
@@ -375,72 +375,70 @@ class FormTokenField extends Component {
 		let preventDefault = false;
 		const selectedSuggestion = this.getSelectedSuggestion();
 
-		if ( selectedSuggestion ) {
-			this.addNewToken( selectedSuggestion );
+		if (selectedSuggestion) {
+			this.addNewToken(selectedSuggestion);
 			preventDefault = true;
-		} else if ( this.inputHasValidValue() ) {
-			this.addNewToken( this.state.incompleteTokenValue );
+		} else if (this.inputHasValidValue()) {
+			this.addNewToken(this.state.incompleteTokenValue);
 			preventDefault = true;
 		}
 
 		return preventDefault;
 	}
 
-	addNewTokens( tokens ) {
+	addNewTokens(tokens) {
 		const tokensToAdd = uniq(
 			tokens
-				.map( this.props.saveTransform )
-				.filter( Boolean )
-				.filter( ( token ) => ! this.valueContainsToken( token ) )
+				.map(this.props.saveTransform)
+				.filter(Boolean)
+				.filter((token) => !this.valueContainsToken(token))
 		);
 
-		if ( tokensToAdd.length > 0 ) {
-			const newValue = clone( this.props.value );
+		if (tokensToAdd.length > 0) {
+			const newValue = clone(this.props.value);
 			newValue.splice.apply(
 				newValue,
-				[ this.getIndexOfInput(), 0 ].concat( tokensToAdd )
+				[this.getIndexOfInput(), 0].concat(tokensToAdd)
 			);
-			this.props.onChange( newValue );
+			this.props.onChange(newValue);
 		}
 	}
 
-	addNewToken( token ) {
-		const {
-			__experimentalExpandOnFocus,
-			__experimentalValidateInput,
-		} = this.props;
-		if ( ! __experimentalValidateInput( token ) ) {
+	addNewToken(token) {
+		const { __experimentalExpandOnFocus, __experimentalValidateInput } =
+			this.props;
+		if (!__experimentalValidateInput(token)) {
 			this.props.speak(
 				this.props.messages.__experimentalInvalid,
 				'assertive'
 			);
 			return;
 		}
-		this.addNewTokens( [ token ] );
-		this.props.speak( this.props.messages.added, 'assertive' );
+		this.addNewTokens([token]);
+		this.props.speak(this.props.messages.added, 'assertive');
 
-		this.setState( {
+		this.setState({
 			incompleteTokenValue: '',
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
-			isExpanded: ! __experimentalExpandOnFocus,
-		} );
+			isExpanded: !__experimentalExpandOnFocus,
+		});
 
-		if ( this.state.isActive ) {
+		if (this.state.isActive) {
 			this.input.focus();
 		}
 	}
 
-	deleteToken( token ) {
-		const newTokens = this.props.value.filter( ( item ) => {
-			return this.getTokenValue( item ) !== this.getTokenValue( token );
-		} );
-		this.props.onChange( newTokens );
-		this.props.speak( this.props.messages.removed, 'assertive' );
+	deleteToken(token) {
+		const newTokens = this.props.value.filter((item) => {
+			return this.getTokenValue(item) !== this.getTokenValue(token);
+		});
+		this.props.onChange(newTokens);
+		this.props.speak(this.props.messages.removed, 'assertive');
 	}
 
-	getTokenValue( token ) {
-		if ( 'object' === typeof token ) {
+	getTokenValue(token) {
+		if ('object' === typeof token) {
 			return token.value;
 		}
 
@@ -454,44 +452,44 @@ class FormTokenField extends Component {
 		maxSuggestions = this.props.maxSuggestions,
 		saveTransform = this.props.saveTransform
 	) {
-		let match = saveTransform( searchValue );
+		let match = saveTransform(searchValue);
 		const startsWithMatch = [];
 		const containsMatch = [];
 
-		if ( match.length === 0 ) {
-			suggestions = difference( suggestions, value );
+		if (match.length === 0) {
+			suggestions = difference(suggestions, value);
 		} else {
 			match = match.toLocaleLowerCase();
 
-			each( suggestions, ( suggestion ) => {
-				const index = suggestion.toLocaleLowerCase().indexOf( match );
-				if ( value.indexOf( suggestion ) === -1 ) {
-					if ( index === 0 ) {
-						startsWithMatch.push( suggestion );
-					} else if ( index > 0 ) {
-						containsMatch.push( suggestion );
+			each(suggestions, (suggestion) => {
+				const index = suggestion.toLocaleLowerCase().indexOf(match);
+				if (value.indexOf(suggestion) === -1) {
+					if (index === 0) {
+						startsWithMatch.push(suggestion);
+					} else if (index > 0) {
+						containsMatch.push(suggestion);
 					}
 				}
-			} );
+			});
 
-			suggestions = startsWithMatch.concat( containsMatch );
+			suggestions = startsWithMatch.concat(containsMatch);
 		}
 
-		return take( suggestions, maxSuggestions );
+		return take(suggestions, maxSuggestions);
 	}
 
 	getSelectedSuggestion() {
-		if ( this.state.selectedSuggestionIndex !== -1 ) {
+		if (this.state.selectedSuggestionIndex !== -1) {
 			return this.getMatchingSuggestions()[
 				this.state.selectedSuggestionIndex
 			];
 		}
 	}
 
-	valueContainsToken( token ) {
-		return some( this.props.value, ( item ) => {
-			return this.getTokenValue( token ) === this.getTokenValue( item );
-		} );
+	valueContainsToken(token) {
+		return some(this.props.value, (item) => {
+			return this.getTokenValue(token) === this.getTokenValue(item);
+		});
 	}
 
 	getIndexOfInput() {
@@ -504,34 +502,32 @@ class FormTokenField extends Component {
 
 	inputHasValidValue() {
 		return (
-			this.props.saveTransform( this.state.incompleteTokenValue ).length >
-			0
+			this.props.saveTransform(this.state.incompleteTokenValue).length > 0
 		);
 	}
 
-	updateSuggestions( resetSelectedSuggestion = true ) {
+	updateSuggestions(resetSelectedSuggestion = true) {
 		const { __experimentalExpandOnFocus } = this.props;
 		const { incompleteTokenValue } = this.state;
 
 		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
-		const matchingSuggestions = this.getMatchingSuggestions(
-			incompleteTokenValue
-		);
+		const matchingSuggestions =
+			this.getMatchingSuggestions(incompleteTokenValue);
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
 		const newState = {
 			isExpanded:
 				__experimentalExpandOnFocus ||
-				( inputHasMinimumChars && hasMatchingSuggestions ),
+				(inputHasMinimumChars && hasMatchingSuggestions),
 		};
-		if ( resetSelectedSuggestion ) {
+		if (resetSelectedSuggestion) {
 			newState.selectedSuggestionIndex = -1;
 			newState.selectedSuggestionScroll = false;
 		}
 
-		this.setState( newState );
+		this.setState(newState);
 
-		if ( inputHasMinimumChars ) {
+		if (inputHasMinimumChars) {
 			const { debouncedSpeak } = this.props;
 
 			const message = hasMatchingSuggestions
@@ -544,40 +540,40 @@ class FormTokenField extends Component {
 						),
 						matchingSuggestions.length
 				  )
-				: __( 'No results.' );
+				: __('No results.');
 
-			debouncedSpeak( message, 'assertive' );
+			debouncedSpeak(message, 'assertive');
 		}
 	}
 
 	renderTokensAndInput() {
-		const components = map( this.props.value, this.renderToken );
-		components.splice( this.getIndexOfInput(), 0, this.renderInput() );
+		const components = map(this.props.value, this.renderToken);
+		components.splice(this.getIndexOfInput(), 0, this.renderInput());
 
 		return components;
 	}
 
-	renderToken( token, index, tokens ) {
-		const value = this.getTokenValue( token );
+	renderToken(token, index, tokens) {
+		const value = this.getTokenValue(token);
 		const status = token.status ? token.status : undefined;
 		const termPosition = index + 1;
 		const termsCount = tokens.length;
 
 		return (
 			<Token
-				key={ 'token-' + value }
-				value={ value }
-				status={ status }
-				title={ token.title }
-				displayTransform={ this.props.displayTransform }
-				onClickRemove={ this.onTokenClickRemove }
-				isBorderless={ token.isBorderless || this.props.isBorderless }
-				onMouseEnter={ token.onMouseEnter }
-				onMouseLeave={ token.onMouseLeave }
-				disabled={ 'error' !== status && this.props.disabled }
-				messages={ this.props.messages }
-				termsCount={ termsCount }
-				termPosition={ termPosition }
+				key={'token-' + value}
+				value={value}
+				status={status}
+				title={token.title}
+				displayTransform={this.props.displayTransform}
+				onClickRemove={this.onTokenClickRemove}
+				isBorderless={token.isBorderless || this.props.isBorderless}
+				onMouseEnter={token.onMouseEnter}
+				onMouseLeave={token.onMouseLeave}
+				disabled={'error' !== status && this.props.disabled}
+				messages={this.props.messages}
+				termsCount={termsCount}
+				termPosition={termPosition}
 			/>
 		);
 	}
@@ -606,17 +602,17 @@ class FormTokenField extends Component {
 			selectedSuggestionIndex: this.state.selectedSuggestionIndex,
 		};
 
-		if ( ! ( maxLength && value.length >= maxLength ) ) {
+		if (!(maxLength && value.length >= maxLength)) {
 			props = { ...props, onChange: this.onInputChange };
 		}
 
-		return <TokenInput { ...props } />;
+		return <TokenInput {...props} />;
 	}
 
 	render() {
 		const {
 			disabled,
-			label = __( 'Add item' ),
+			label = __('Add item'),
 			instanceId,
 			className,
 			__experimentalShowHowTo,
@@ -637,12 +633,12 @@ class FormTokenField extends Component {
 		};
 		const matchingSuggestions = this.getMatchingSuggestions();
 
-		if ( ! disabled ) {
-			tokenFieldProps = Object.assign( {}, tokenFieldProps, {
+		if (!disabled) {
+			tokenFieldProps = Object.assign({}, tokenFieldProps, {
 				onKeyDown: this.onKeyDown,
 				onKeyPress: this.onKeyPress,
 				onFocus: this.onFocus,
-			} );
+			});
 		}
 
 		// Disable reason: There is no appropriate role which describes the
@@ -650,50 +646,48 @@ class FormTokenField extends Component {
 		// TODO: Refactor click detection to use blur to stop propagation.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div { ...tokenFieldProps }>
+			<div {...tokenFieldProps}>
 				<label
-					htmlFor={ `components-form-token-input-${ instanceId }` }
+					htmlFor={`components-form-token-input-${instanceId}`}
 					className="components-form-token-field__label"
 				>
-					{ label }
+					{label}
 				</label>
 				<div
-					ref={ this.bindTokensAndInput }
-					className={ classes }
+					ref={this.bindTokensAndInput}
+					className={classes}
 					tabIndex="-1"
-					onMouseDown={ this.onContainerTouched }
-					onTouchStart={ this.onContainerTouched }
+					onMouseDown={this.onContainerTouched}
+					onTouchStart={this.onContainerTouched}
 				>
-					{ this.renderTokensAndInput() }
-					{ isExpanded && (
+					{this.renderTokensAndInput()}
+					{isExpanded && (
 						<SuggestionsList
-							instanceId={ instanceId }
-							match={ this.props.saveTransform(
+							instanceId={instanceId}
+							match={this.props.saveTransform(
 								this.state.incompleteTokenValue
-							) }
-							displayTransform={ this.props.displayTransform }
-							suggestions={ matchingSuggestions }
-							selectedIndex={ this.state.selectedSuggestionIndex }
-							scrollIntoView={
-								this.state.selectedSuggestionScroll
-							}
-							onHover={ this.onSuggestionHovered }
-							onSelect={ this.onSuggestionSelected }
+							)}
+							displayTransform={this.props.displayTransform}
+							suggestions={matchingSuggestions}
+							selectedIndex={this.state.selectedSuggestionIndex}
+							scrollIntoView={this.state.selectedSuggestionScroll}
+							onHover={this.onSuggestionHovered}
+							onSelect={this.onSuggestionSelected}
 						/>
-					) }
+					)}
 				</div>
-				{ __experimentalShowHowTo && (
+				{__experimentalShowHowTo && (
 					<p
-						id={ `components-form-token-suggestions-howto-${ instanceId }` }
+						id={`components-form-token-suggestions-howto-${instanceId}`}
 						className="components-form-token-field__help"
 					>
-						{ this.props.tokenizeOnSpace
+						{this.props.tokenizeOnSpace
 							? __(
 									'Separate with commas, spaces, or the Enter key.'
 							  )
-							: __( 'Separate with commas or the Enter key.' ) }
+							: __('Separate with commas or the Enter key.')}
 					</p>
-				) }
+				)}
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
@@ -701,25 +695,25 @@ class FormTokenField extends Component {
 }
 
 FormTokenField.defaultProps = {
-	suggestions: Object.freeze( [] ),
+	suggestions: Object.freeze([]),
 	maxSuggestions: 100,
-	value: Object.freeze( [] ),
+	value: Object.freeze([]),
 	displayTransform: identity,
-	saveTransform: ( token ) => token.trim(),
+	saveTransform: (token) => token.trim(),
 	onChange: () => {},
 	onInputChange: () => {},
 	isBorderless: false,
 	disabled: false,
 	tokenizeOnSpace: false,
 	messages: {
-		added: __( 'Item added.' ),
-		removed: __( 'Item removed.' ),
-		remove: __( 'Remove item' ),
-		__experimentalInvalid: __( 'Invalid item' ),
+		added: __('Item added.'),
+		removed: __('Item removed.'),
+		remove: __('Remove item'),
+		__experimentalInvalid: __('Invalid item'),
 	},
 	__experimentalExpandOnFocus: false,
 	__experimentalValidateInput: () => true,
 	__experimentalShowHowTo: true,
 };
 
-export default withSpokenMessages( withInstanceId( FormTokenField ) );
+export default withSpokenMessages(withInstanceId(FormTokenField));

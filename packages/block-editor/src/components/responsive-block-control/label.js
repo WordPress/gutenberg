@@ -6,12 +6,12 @@ import { VisuallyHidden } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 
-export default function ResponsiveBlockControlLabel( {
+export default function ResponsiveBlockControlLabel({
 	property,
 	viewport,
 	desc,
-} ) {
-	const instanceId = useInstanceId( ResponsiveBlockControlLabel );
+}) {
+	const instanceId = useInstanceId(ResponsiveBlockControlLabel);
 	const accessibleLabel =
 		desc ||
 		sprintf(
@@ -25,11 +25,11 @@ export default function ResponsiveBlockControlLabel( {
 		);
 	return (
 		<Fragment>
-			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
-				{ viewport.label }
+			<span aria-describedby={`rbc-desc-${instanceId}`}>
+				{viewport.label}
 			</span>
-			<VisuallyHidden as="span" id={ `rbc-desc-${ instanceId }` }>
-				{ accessibleLabel }
+			<VisuallyHidden as="span" id={`rbc-desc-${instanceId}`}>
+				{accessibleLabel}
 			</VisuallyHidden>
 		</Fragment>
 	);

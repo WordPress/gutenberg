@@ -36,18 +36,16 @@ function ScreenRoot() {
 			<CardBody>
 				<ItemGroup>
 					<Item>
-						{ __(
+						{__(
 							'Customize the appearance of specific blocks for the whole site.'
-						) }
+						)}
 					</Item>
 					<NavigationButton path="/blocks">
 						<HStack justify="space-between">
-							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
+							<FlexItem>{__('Blocks')}</FlexItem>
 							<FlexItem>
 								<Icon
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
+									icon={isRTL() ? chevronLeft : chevronRight}
 								/>
 							</FlexItem>
 						</HStack>

@@ -9,17 +9,16 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 
 const useNavigationEditorRootBlock = () => {
-	return useSelect( ( select ) => {
-		const { getBlockOrder } = select( blockEditorStore );
+	return useSelect((select) => {
+		const { getBlockOrder } = select(blockEditorStore);
 
-		const lockedNavigationBlock = getBlockOrder()[ 0 ];
+		const lockedNavigationBlock = getBlockOrder()[0];
 
 		return {
 			navBlockClientId: lockedNavigationBlock,
-			lastNavBlockItemIndex: getBlockOrder( lockedNavigationBlock )
-				.length,
+			lastNavBlockItemIndex: getBlockOrder(lockedNavigationBlock).length,
 		};
-	}, [] );
+	}, []);
 };
 
 export default useNavigationEditorRootBlock;

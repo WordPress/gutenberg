@@ -25,124 +25,119 @@ import styles from './style.scss';
 
 const TAB_ANIMATION_DURATION = 250;
 
-function InserterTabs( {
+function InserterTabs({
 	listProps,
 	onSelect,
 	rootClientId,
 	showReusableBlocks,
 	tabIndex,
-} ) {
-	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
-	const lastScrollEvents = useRef( [] ).current;
-	const [ wrapperWidth, setWrapperWidth ] = useState( 0 );
+}) {
+	const tabAnimation = useRef(new Animated.Value(0)).current;
+	const lastScrollEvents = useRef([]).current;
+	const [wrapperWidth, setWrapperWidth] = useState(0);
 
-	function onScroll( event ) {
-		lastScrollEvents[ tabIndex ] = event.nativeEvent;
-		listProps.onScroll( event );
+	function onScroll(event) {
+		lastScrollEvents[tabIndex] = event.nativeEvent;
+		listProps.onScroll(event);
 	}
 
 	const onWrapperLayout = useCallback(
-		( { nativeEvent } ) => {
-			setWrapperWidth( nativeEvent.layout.width );
+		({ nativeEvent }) => {
+			setWrapperWidth(nativeEvent.layout.width);
 		},
-		[ setWrapperWidth ]
+		[setWrapperWidth]
 	);
 
-	useEffect( () => {
-		Animated.timing( tabAnimation, {
+	useEffect(() => {
+		Animated.timing(tabAnimation, {
 			duration: TAB_ANIMATION_DURATION,
 			toValue: tabIndex,
 			useNativeDriver: true,
-		} ).start();
+		}).start();
 
 		// Notify upstream with the last scroll event of the current tab.
-		const lastScrollEvent = lastScrollEvents[ tabIndex ];
-		if ( lastScrollEvent ) {
-			listProps.onScroll( { nativeEvent: lastScrollEvent } );
+		const lastScrollEvent = lastScrollEvents[tabIndex];
+		if (lastScrollEvent) {
+			listProps.onScroll({ nativeEvent: lastScrollEvent });
 		}
-	}, [ tabIndex ] );
+	}, [tabIndex]);
 
-	const { tabs, tabKeys } = useMemo( () => {
+	const { tabs, tabKeys } = useMemo(() => {
 		const filteredTabs = InserterTabs.getTabs().filter(
-			( { name } ) => showReusableBlocks || name !== 'reusable'
+			({ name }) => showReusableBlocks || name !== 'reusable'
 		);
 		return {
 			tabs: filteredTabs,
-			tabKeys: [ ...filteredTabs.keys() ],
+			tabKeys: [...filteredTabs.keys()],
 		};
-	}, [ showReusableBlocks ] );
+	}, [showReusableBlocks]);
 
 	const translateX = useMemo(
 		() =>
 			tabKeys.length > 1
-				? tabAnimation.interpolate( {
+				? tabAnimation.interpolate({
 						inputRange: tabKeys,
-						outputRange: tabKeys.map(
-							( key ) => key * -wrapperWidth
-						),
-				  } )
+						outputRange: tabKeys.map((key) => key * -wrapperWidth),
+				  })
 				: tabAnimation,
-		[ tabAnimation, tabKeys, wrapperWidth ]
+		[tabAnimation, tabKeys, wrapperWidth]
 	);
 
 	const containerStyle = [
-		styles[ 'inserter-tabs__container' ],
+		styles['inserter-tabs__container'],
 		{
 			width: wrapperWidth * tabKeys.length,
-			transform: [ { translateX } ],
+			transform: [{ translateX }],
 		},
 	];
 
 	return (
 		<View
-			style={ styles[ 'inserter-tabs__wrapper' ] }
-			onLayout={ onWrapperLayout }
+			style={styles['inserter-tabs__wrapper']}
+			onLayout={onWrapperLayout}
 		>
-			<Animated.View style={ containerStyle }>
-				{ tabs.map( ( { component: TabComponent }, index ) => (
-					<View key={ `tab-${ index }` }>
+			<Animated.View style={containerStyle}>
+				{tabs.map(({ component: TabComponent }, index) => (
+					<View key={`tab-${index}`}>
 						<TabComponent
-							rootClientId={ rootClientId }
-							onSelect={ onSelect }
-							listProps={ { ...listProps, onScroll } }
+							rootClientId={rootClientId}
+							onSelect={onSelect}
+							listProps={{ ...listProps, onScroll }}
 						/>
 					</View>
-				) ) }
+				))}
 			</Animated.View>
 		</View>
 	);
 }
 
-function TabsControl( { onChangeTab, showReusableBlocks } ) {
+function TabsControl({ onChangeTab, showReusableBlocks }) {
 	const tabs = InserterTabs.getTabs();
-	const segments = useMemo( () => {
+	const segments = useMemo(() => {
 		const filteredTabs = tabs.filter(
-			( { name } ) => showReusableBlocks || name !== 'reusable'
+			({ name }) => showReusableBlocks || name !== 'reusable'
 		);
-		return filteredTabs.map( ( { title } ) => title );
-	}, [ showReusableBlocks ] );
+		return filteredTabs.map(({ title }) => title);
+	}, [showReusableBlocks]);
 
 	const segmentHandler = useCallback(
-		( selectedTab ) => {
-			const tabTitles = tabs.map( ( { title } ) => title );
-			onChangeTab( tabTitles.indexOf( selectedTab ) );
+		(selectedTab) => {
+			const tabTitles = tabs.map(({ title }) => title);
+			onChangeTab(tabTitles.indexOf(selectedTab));
 		},
-		[ onChangeTab ]
+		[onChangeTab]
 	);
 
 	return segments.length > 1 ? (
-		<SegmentedControl
-			segments={ segments }
-			segmentHandler={ segmentHandler }
-		/>
+		<SegmentedControl segments={segments} segmentHandler={segmentHandler} />
 	) : null;
 }
 
 InserterTabs.Control = TabsControl;
 
 InserterTabs.getTabs = () => [
-	{ name: 'blocks', title: __( 'Blocks' ), component: BlockTypesTab },
-	{ name: 'reusable', title: __( 'Reusable' ), component: ReusableBlocksTab },
+	{ name: 'blocks', title: __('Blocks'), component: BlockTypesTab },
+	{ name: 'reusable', title: __('Reusable'), component: ReusableBlocksTab },
 ];
 
 export default InserterTabs;

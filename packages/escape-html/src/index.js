@@ -30,8 +30,8 @@ const REGEXP_INVALID_ATTRIBUTE_NAME = /[\u007F-\u009F "'>/="\uFDD0-\uFDEF]/;
  *
  * @return {string} Escaped string.
  */
-export function escapeAmpersand( value ) {
-	return value.replace( /&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi, '&amp;' );
+export function escapeAmpersand(value) {
+	return value.replace(/&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi, '&amp;');
 }
 
 /**
@@ -41,8 +41,8 @@ export function escapeAmpersand( value ) {
  *
  * @return {string} Escaped string.
  */
-export function escapeQuotationMark( value ) {
-	return value.replace( /"/g, '&quot;' );
+export function escapeQuotationMark(value) {
+	return value.replace(/"/g, '&quot;');
 }
 
 /**
@@ -52,8 +52,8 @@ export function escapeQuotationMark( value ) {
  *
  * @return {string} Escaped string.
  */
-export function escapeLessThan( value ) {
-	return value.replace( /</g, '&lt;' );
+export function escapeLessThan(value) {
+	return value.replace(/</g, '&lt;');
 }
 
 /**
@@ -76,9 +76,9 @@ export function escapeLessThan( value ) {
  *
  * @return {string} Escaped attribute value.
  */
-export function escapeAttribute( value ) {
+export function escapeAttribute(value) {
 	return __unstableEscapeGreaterThan(
-		escapeQuotationMark( escapeAmpersand( value ) )
+		escapeQuotationMark(escapeAmpersand(value))
 	);
 }
 
@@ -94,8 +94,8 @@ export function escapeAttribute( value ) {
  *
  * @return {string} Escaped HTML element value.
  */
-export function escapeHTML( value ) {
-	return escapeLessThan( escapeAmpersand( value ) );
+export function escapeHTML(value) {
+	return escapeLessThan(escapeAmpersand(value));
 }
 
 /**
@@ -107,8 +107,8 @@ export function escapeHTML( value ) {
  *
  * @return {string} Escaped HTML element value.
  */
-export function escapeEditableHTML( value ) {
-	return escapeLessThan( value.replace( /&/g, '&amp;' ) );
+export function escapeEditableHTML(value) {
+	return escapeLessThan(value.replace(/&/g, '&amp;'));
 }
 
 /**
@@ -118,6 +118,6 @@ export function escapeEditableHTML( value ) {
  *
  * @return {boolean} Whether attribute is valid.
  */
-export function isValidAttributeName( name ) {
-	return ! REGEXP_INVALID_ATTRIBUTE_NAME.test( name );
+export function isValidAttributeName(name) {
+	return !REGEXP_INVALID_ATTRIBUTE_NAME.test(name);
 }

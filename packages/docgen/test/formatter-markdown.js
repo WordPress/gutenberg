@@ -1,10 +1,10 @@
 /**
  * Internal dependencies
  */
-const formatter = require( '../lib/markdown/formatter' );
+const formatter = require('../lib/markdown/formatter');
 
-describe( 'Formatter', () => {
-	it( 'returns markdown', () => {
+describe('Formatter', () => {
+	it('returns markdown', () => {
 		const rootDir = '/home/my-path';
 		const docPath = '/home/my-path/docs';
 		const docs = formatter(
@@ -35,8 +35,8 @@ describe( 'Formatter', () => {
 			],
 			'API docs'
 		);
-		expect( docs ).toBe(
+		expect(docs).toBe(
 			'# API docs\n\n## myDeclaration\n\nMy declaration example.\n\n*Parameters*\n\n- *firstParam* `number`: First declaration parameter.\n\n*Returns*\n\n- `number`: The result of the declaration.\n'
 		);
-	} );
-} );
+	});
+});

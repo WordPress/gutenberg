@@ -17,25 +17,25 @@ export default {
 	},
 };
 
-const Item = ( props ) => (
+const Item = (props) => (
 	<View
-		style={ {
+		style={{
 			borderRadius: 8,
 			background: '#eee',
 			padding: 8,
 			textAlign: 'center',
-		} }
-		{ ...props }
+		}}
+		{...props}
 	/>
 );
 
 export const _default = () => {
 	const props = {
-		columns: number( 'columns', 4 ),
-		gap: number( 'gap', 2 ),
+		columns: number('columns', 4),
+		gap: number('gap', 2),
 	};
 	return (
-		<Grid alignment="bottom" { ...props }>
+		<Grid alignment="bottom" {...props}>
 			<Item>One</Item>
 			<Item>Two</Item>
 			<Item>Three</Item>

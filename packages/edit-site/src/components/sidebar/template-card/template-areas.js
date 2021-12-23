@@ -15,71 +15,68 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as editSiteStore } from '../../../store';
 
-function TemplateAreaItem( { area, clientId } ) {
-	const { selectBlock, toggleBlockHighlight } = useDispatch(
-		blockEditorStore
-	);
+function TemplateAreaItem({ area, clientId }) {
+	const { selectBlock, toggleBlockHighlight } = useDispatch(blockEditorStore);
 	const templatePartArea = useSelect(
-		( select ) => {
-			const defaultAreas = select(
-				editorStore
-			).__experimentalGetDefaultTemplatePartAreas();
+		(select) => {
+			const defaultAreas =
+				select(editorStore).__experimentalGetDefaultTemplatePartAreas();
 
 			return defaultAreas.find(
-				( defaultArea ) => defaultArea.area === area
+				(defaultArea) => defaultArea.area === area
 			);
 		},
-		[ area ]
+		[area]
 	);
 
-	const highlightBlock = () => toggleBlockHighlight( clientId, true );
-	const cancelHighlightBlock = () => toggleBlockHighlight( clientId, false );
+	const highlightBlock = () => toggleBlockHighlight(clientId, true);
+	const cancelHighlightBlock = () => toggleBlockHighlight(clientId, false);
 
 	return (
 		<Button
 			className="edit-site-template-card__template-areas-item"
-			icon={ templatePartArea?.icon }
-			onMouseOver={ highlightBlock }
-			onMouseLeave={ cancelHighlightBlock }
-			onFocus={ highlightBlock }
-			onBlur={ cancelHighlightBlock }
-			onClick={ () => {
-				selectBlock( clientId );
-			} }
+			icon={templatePartArea?.icon}
+			onMouseOver={highlightBlock}
+			onMouseLeave={cancelHighlightBlock}
+			onFocus={highlightBlock}
+			onBlur={cancelHighlightBlock}
+			onClick={() => {
+				selectBlock(clientId);
+			}}
 		>
-			{ templatePartArea?.label }
+			{templatePartArea?.label}
 		</Button>
 	);
 }
 
 export default function TemplateAreas() {
 	const templateParts = useSelect(
-		( select ) => select( editSiteStore ).getCurrentTemplateTemplateParts(),
+		(select) => select(editSiteStore).getCurrentTemplateTemplateParts(),
 		[]
 	);
 
-	if ( ! templateParts.length ) {
+	if (!templateParts.length) {
 		return null;
 	}
 
 	return (
 		<section className="edit-site-template-card__template-areas">
 			<Heading
-				level={ 3 }
+				level={3}
 				className="edit-site-template-card__template-areas-title"
 			>
-				{ __( 'Areas' ) }
+				{__('Areas')}
 			</Heading>
 
 			<ul className="edit-site-template-card__template-areas-list">
-				{ templateParts.map( ( { templatePart, block } ) => (
-					<li key={ templatePart.slug }>
+				{templateParts.map(({ templatePart, block }) => (
+					<li key={templatePart.slug}>
 						<TemplateAreaItem
-							area={ templatePart.area }
-							clientId={ block.clientId }
+							area={templatePart.area}
+							clientId={block.clientId}
 						/>
 					</li>
-				) ) }
+				))}
 			</ul>
 		</section>
 	);

@@ -13,9 +13,9 @@ import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';
 
-const allowedBlocks = [ 'core/image' ];
+const allowedBlocks = ['core/image'];
 
-export const Gallery = ( props ) => {
+export const Gallery = (props) => {
 	const {
 		attributes,
 		isSelected,
@@ -27,75 +27,71 @@ export const Gallery = ( props ) => {
 
 	const { align, columns, caption, imageCrop } = attributes;
 
-	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
+	const { children, ...innerBlocksProps } = useInnerBlocksProps(blockProps, {
 		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 		__experimentalLayout: { type: 'default', alignments: [] },
-	} );
+	});
 
-	const [ captionFocused, setCaptionFocused ] = useState( false );
+	const [captionFocused, setCaptionFocused] = useState(false);
 
 	function onFocusCaption() {
-		if ( ! captionFocused ) {
-			setCaptionFocused( true );
+		if (!captionFocused) {
+			setCaptionFocused(true);
 		}
 	}
 
 	function removeCaptionFocus() {
-		if ( captionFocused ) {
-			setCaptionFocused( false );
+		if (captionFocused) {
+			setCaptionFocused(false);
 		}
 	}
 
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setCaptionFocused( false );
+	useEffect(() => {
+		if (!isSelected) {
+			setCaptionFocused(false);
 		}
-	}, [ isSelected ] );
+	}, [isSelected]);
 
 	return (
 		<figure
-			{ ...innerBlocksProps }
-			className={ classnames(
-				blockProps.className,
-				'blocks-gallery-grid',
-				{
-					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]: columns !== undefined,
-					[ `columns-default` ]: columns === undefined,
-					'is-cropped': imageCrop,
-				}
-			) }
+			{...innerBlocksProps}
+			className={classnames(blockProps.className, 'blocks-gallery-grid', {
+				[`align${align}`]: align,
+				[`columns-${columns}`]: columns !== undefined,
+				[`columns-default`]: columns === undefined,
+				'is-cropped': imageCrop,
+			})}
 		>
-			{ children }
+			{children}
 
 			<View
 				className="blocks-gallery-media-placeholder-wrapper"
-				onClick={ removeCaptionFocus }
+				onClick={removeCaptionFocus}
 			>
-				{ mediaPlaceholder }
+				{mediaPlaceholder}
 			</View>
 			<RichTextVisibilityHelper
-				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				captionFocused={ captionFocused }
-				onFocusCaption={ onFocusCaption }
+				isHidden={!isSelected && RichText.isEmpty(caption)}
+				captionFocused={captionFocused}
+				onFocusCaption={onFocusCaption}
 				tagName="figcaption"
 				className="blocks-gallery-caption"
-				aria-label={ __( 'Gallery caption text' ) }
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
+				aria-label={__('Gallery caption text')}
+				placeholder={__('Write gallery caption…')}
+				value={caption}
+				onChange={(value) => setAttributes({ caption: value })}
 				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+				__unstableOnSplitAtEnd={() =>
+					insertBlocksAfter(createBlock('core/paragraph'))
 				}
 			/>
 		</figure>
 	);
 };
 
-function RichTextVisibilityHelper( {
+function RichTextVisibilityHelper({
 	isHidden,
 	captionFocused,
 	onFocusCaption,
@@ -105,21 +101,21 @@ function RichTextVisibilityHelper( {
 	tagName,
 	captionRef,
 	...richTextProps
-} ) {
-	if ( isHidden ) {
-		return <VisuallyHidden as={ RichText } { ...richTextProps } />;
+}) {
+	if (isHidden) {
+		return <VisuallyHidden as={RichText} {...richTextProps} />;
 	}
 
 	return (
 		<RichText
-			ref={ captionRef }
-			value={ value }
-			placeholder={ placeholder }
-			className={ className }
-			tagName={ tagName }
-			isSelected={ captionFocused }
-			onClick={ onFocusCaption }
-			{ ...richTextProps }
+			ref={captionRef}
+			value={value}
+			placeholder={placeholder}
+			className={className}
+			tagName={tagName}
+			isSelected={captionFocused}
+			onClick={onFocusCaption}
+			{...richTextProps}
 		/>
 	);
 }

@@ -20,11 +20,11 @@ import {
  * @param {string} destination Gallery's selected link destination.
  * @return {Object}            New attributes to assign to image block.
  */
-export function getHrefAndDestination( image, destination ) {
+export function getHrefAndDestination(image, destination) {
 	// Need to determine the URL that the selected destination maps to.
 	// Gutenberg and WordPress use different constants so the new link
 	// destination also needs to be tweaked.
-	switch ( destination ) {
+	switch (destination) {
 		case LINK_DESTINATION_MEDIA:
 			return {
 				href: image?.source_url || image?.url, // eslint-disable-line camelcase

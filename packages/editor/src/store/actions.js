@@ -36,42 +36,42 @@ import {
  * @param {Object} edits    Initial edited attributes object.
  * @param {Array?} template Block Template.
  */
-export function* setupEditor( post, edits, template ) {
-	yield resetPost( post );
+export function* setupEditor(post, edits, template) {
+	yield resetPost(post);
 	yield {
 		type: 'SETUP_EDITOR',
 		post,
 		edits,
 		template,
 	};
-	yield setupEditorState( post );
+	yield setupEditorState(post);
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
-	if ( isNewPost && template ) {
+	if (isNewPost && template) {
 		// In order to ensure maximum of a single parse during setup, edits are
 		// included as part of editor setup action. Assume edited content as
 		// canonical if provided, falling back to post.
 		let content;
-		if ( has( edits, [ 'content' ] ) ) {
+		if (has(edits, ['content'])) {
 			content = edits.content;
 		} else {
 			content = post.content.raw;
 		}
-		let blocks = parse( content );
-		blocks = synchronizeBlocksWithTemplate( blocks, template );
-		yield resetEditorBlocks( blocks, {
+		let blocks = parse(content);
+		blocks = synchronizeBlocksWithTemplate(blocks, template);
+		yield resetEditorBlocks(blocks, {
 			__unstableShouldCreateUndoLevel: false,
-		} );
+		});
 	}
 	if (
 		edits &&
-		Object.keys( edits ).some(
-			( key ) =>
-				edits[ key ] !==
-				( has( post, [ key, 'raw' ] ) ? post[ key ].raw : post[ key ] )
+		Object.keys(edits).some(
+			(key) =>
+				edits[key] !==
+				(has(post, [key, 'raw']) ? post[key].raw : post[key])
 		)
 	) {
-		yield editPost( edits );
+		yield editPost(edits);
 	}
 }
 
@@ -93,7 +93,7 @@ export function __experimentalTearDownEditor() {
  *
  * @return {Object} Action object.
  */
-export function resetPost( post ) {
+export function resetPost(post) {
 	return {
 		type: 'RESET_POST',
 		post,
@@ -107,7 +107,7 @@ export function resetPost( post ) {
  *
  * @return {Object} An action object
  */
-export function __experimentalRequestPostUpdateStart( options = {} ) {
+export function __experimentalRequestPostUpdateStart(options = {}) {
 	return {
 		type: 'REQUEST_POST_UPDATE_START',
 		options,
@@ -121,7 +121,7 @@ export function __experimentalRequestPostUpdateStart( options = {} ) {
  *
  * @return {Object} An action object
  */
-export function __experimentalRequestPostUpdateFinish( options = {} ) {
+export function __experimentalRequestPostUpdateFinish(options = {}) {
 	return {
 		type: 'REQUEST_POST_UPDATE_FINISH',
 		options,
@@ -136,10 +136,10 @@ export function __experimentalRequestPostUpdateFinish( options = {} ) {
  * @deprecated since Gutenberg 9.7.0.
  */
 export function updatePost() {
-	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {
+	deprecated("wp.data.dispatch( 'core/editor' ).updatePost", {
 		since: '5.7',
 		alternative: 'Use the core entities store instead',
-	} );
+	});
 	return {
 		type: 'DO_NOTHING',
 	};
@@ -153,7 +153,7 @@ export function updatePost() {
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post ) {
+export function setupEditorState(post) {
 	return {
 		type: 'SETUP_EDITOR_STATE',
 		post,
@@ -169,8 +169,8 @@ export function setupEditorState( post ) {
  *
  * @yield {Object} Action object or control.
  */
-export function* editPost( edits, options ) {
-	const { id, type } = yield controls.select( STORE_NAME, 'getCurrentPost' );
+export function* editPost(edits, options) {
+	const { id, type } = yield controls.select(STORE_NAME, 'getCurrentPost');
 	yield controls.dispatch(
 		coreStore,
 		'editEntityRecord',
@@ -187,33 +187,30 @@ export function* editPost( edits, options ) {
  *
  * @param {Object} options
  */
-export function* savePost( options = {} ) {
-	if ( ! ( yield controls.select( STORE_NAME, 'isEditedPostSaveable' ) ) ) {
+export function* savePost(options = {}) {
+	if (!(yield controls.select(STORE_NAME, 'isEditedPostSaveable'))) {
 		return;
 	}
 	let edits = {
-		content: yield controls.select( STORE_NAME, 'getEditedPostContent' ),
+		content: yield controls.select(STORE_NAME, 'getEditedPostContent'),
 	};
-	if ( ! options.isAutosave ) {
-		yield controls.dispatch( STORE_NAME, 'editPost', edits, {
+	if (!options.isAutosave) {
+		yield controls.dispatch(STORE_NAME, 'editPost', edits, {
 			undoIgnore: true,
-		} );
+		});
 	}
 
-	yield __experimentalRequestPostUpdateStart( options );
-	const previousRecord = yield controls.select(
-		STORE_NAME,
-		'getCurrentPost'
-	);
+	yield __experimentalRequestPostUpdateStart(options);
+	const previousRecord = yield controls.select(STORE_NAME, 'getCurrentPost');
 	edits = {
 		id: previousRecord.id,
-		...( yield controls.select(
+		...(yield controls.select(
 			coreStore,
 			'getEntityRecordNonTransientEdits',
 			'postType',
 			previousRecord.type,
 			previousRecord.id
-		) ),
+		)),
 		...edits,
 	};
 	yield controls.dispatch(
@@ -224,7 +221,7 @@ export function* savePost( options = {} ) {
 		edits,
 		options
 	);
-	yield __experimentalRequestPostUpdateFinish( options );
+	yield __experimentalRequestPostUpdateFinish(options);
 
 	const error = yield controls.select(
 		coreStore,
@@ -233,25 +230,21 @@ export function* savePost( options = {} ) {
 		previousRecord.type,
 		previousRecord.id
 	);
-	if ( error ) {
-		const args = getNotificationArgumentsForSaveFail( {
+	if (error) {
+		const args = getNotificationArgumentsForSaveFail({
 			post: previousRecord,
 			edits,
 			error,
-		} );
-		if ( args.length ) {
-			yield controls.dispatch(
-				noticesStore,
-				'createErrorNotice',
-				...args
-			);
+		});
+		if (args.length) {
+			yield controls.dispatch(noticesStore, 'createErrorNotice', ...args);
 		}
 	} else {
 		const updatedRecord = yield controls.select(
 			STORE_NAME,
 			'getCurrentPost'
 		);
-		const args = getNotificationArgumentsForSaveSuccess( {
+		const args = getNotificationArgumentsForSaveSuccess({
 			previousPost: previousRecord,
 			post: updatedRecord,
 			postType: yield controls.resolveSelect(
@@ -260,8 +253,8 @@ export function* savePost( options = {} ) {
 				updatedRecord.type
 			),
 			options,
-		} );
-		if ( args.length ) {
+		});
+		if (args.length) {
 			yield controls.dispatch(
 				noticesStore,
 				'createSuccessNotice',
@@ -270,7 +263,7 @@ export function* savePost( options = {} ) {
 		}
 		// Make sure that any edits after saving create an undo level and are
 		// considered for change detection.
-		if ( ! options.isAutosave ) {
+		if (!options.isAutosave) {
 			yield controls.dispatch(
 				blockEditorStore,
 				'__unstableMarkLastChangeAsPersistent'
@@ -283,7 +276,7 @@ export function* savePost( options = {} ) {
  * Action generator for handling refreshing the current post.
  */
 export function* refreshPost() {
-	const post = yield controls.select( STORE_NAME, 'getCurrentPost' );
+	const post = yield controls.select(STORE_NAME, 'getCurrentPost');
 	const postTypeSlug = yield controls.select(
 		STORE_NAME,
 		'getCurrentPostType'
@@ -293,14 +286,14 @@ export function* refreshPost() {
 		'getPostType',
 		postTypeSlug
 	);
-	const newPost = yield apiFetch( {
+	const newPost = yield apiFetch({
 		// Timestamp arg allows caller to bypass browser caching, which is
 		// expected for this specific function.
 		path:
-			`/wp/v2/${ postType.rest_base }/${ post.id }` +
-			`?context=edit&_timestamp=${ Date.now() }`,
-	} );
-	yield controls.dispatch( STORE_NAME, 'resetPost', newPost );
+			`/wp/v2/${postType.rest_base}/${post.id}` +
+			`?context=edit&_timestamp=${Date.now()}`,
+	});
+	yield controls.dispatch(STORE_NAME, 'resetPost', newPost);
 }
 
 /**
@@ -316,24 +309,20 @@ export function* trashPost() {
 		'getPostType',
 		postTypeSlug
 	);
-	yield controls.dispatch(
-		noticesStore,
-		'removeNotice',
-		TRASH_POST_NOTICE_ID
-	);
+	yield controls.dispatch(noticesStore, 'removeNotice', TRASH_POST_NOTICE_ID);
 	try {
-		const post = yield controls.select( STORE_NAME, 'getCurrentPost' );
-		yield apiFetch( {
-			path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
+		const post = yield controls.select(STORE_NAME, 'getCurrentPost');
+		yield apiFetch({
+			path: `/wp/v2/${postType.rest_base}/${post.id}`,
 			method: 'DELETE',
-		} );
+		});
 
-		yield controls.dispatch( STORE_NAME, 'savePost' );
-	} catch ( error ) {
+		yield controls.dispatch(STORE_NAME, 'savePost');
+	} catch (error) {
 		yield controls.dispatch(
 			noticesStore,
 			'createErrorNotice',
-			...getNotificationArgumentsForTrashFail( { error } )
+			...getNotificationArgumentsForTrashFail({ error })
 		);
 	}
 }
@@ -346,13 +335,10 @@ export function* trashPost() {
  *
  * @param {Object?} options Extra flags to identify the autosave.
  */
-export function* autosave( { local = false, ...options } = {} ) {
-	if ( local ) {
-		const post = yield controls.select( STORE_NAME, 'getCurrentPost' );
-		const isPostNew = yield controls.select(
-			STORE_NAME,
-			'isEditedPostNew'
-		);
+export function* autosave({ local = false, ...options } = {}) {
+	if (local) {
+		const post = yield controls.select(STORE_NAME, 'getCurrentPost');
+		const isPostNew = yield controls.select(STORE_NAME, 'isEditedPostNew');
 		const title = yield controls.select(
 			STORE_NAME,
 			'getEditedPostAttribute',
@@ -377,10 +363,10 @@ export function* autosave( { local = false, ...options } = {} ) {
 			excerpt,
 		};
 	} else {
-		yield controls.dispatch( STORE_NAME, 'savePost', {
+		yield controls.dispatch(STORE_NAME, 'savePost', {
 			isAutosave: true,
 			...options,
-		} );
+		});
 	}
 }
 
@@ -391,7 +377,7 @@ export function* autosave( { local = false, ...options } = {} ) {
  * @yield {Object} Action object.
  */
 export function* redo() {
-	yield controls.dispatch( coreStore, 'redo' );
+	yield controls.dispatch(coreStore, 'redo');
 }
 
 /**
@@ -400,7 +386,7 @@ export function* redo() {
  * @yield {Object} Action object.
  */
 export function* undo() {
-	yield controls.dispatch( coreStore, 'undo' );
+	yield controls.dispatch(coreStore, 'undo');
 }
 
 /**
@@ -420,7 +406,7 @@ export function createUndoLevel() {
  *
  * @return {Object} Action object.
  */
-export function updatePostLock( lock ) {
+export function updatePostLock(lock) {
 	return {
 		type: 'UPDATE_POST_LOCK',
 		lock,
@@ -494,7 +480,7 @@ export function disablePublishSidebar() {
  *
  * @return {Object} Action object
  */
-export function lockPostSaving( lockName ) {
+export function lockPostSaving(lockName) {
 	return {
 		type: 'LOCK_POST_SAVING',
 		lockName,
@@ -514,7 +500,7 @@ export function lockPostSaving( lockName ) {
  *
  * @return {Object} Action object
  */
-export function unlockPostSaving( lockName ) {
+export function unlockPostSaving(lockName) {
 	return {
 		type: 'UNLOCK_POST_SAVING',
 		lockName,
@@ -534,7 +520,7 @@ export function unlockPostSaving( lockName ) {
  *
  * @return {Object} Action object
  */
-export function lockPostAutosaving( lockName ) {
+export function lockPostAutosaving(lockName) {
 	return {
 		type: 'LOCK_POST_AUTOSAVING',
 		lockName,
@@ -554,7 +540,7 @@ export function lockPostAutosaving( lockName ) {
  *
  * @return {Object} Action object
  */
-export function unlockPostAutosaving( lockName ) {
+export function unlockPostAutosaving(lockName) {
 	return {
 		type: 'UNLOCK_POST_AUTOSAVING',
 		lockName,
@@ -569,24 +555,24 @@ export function unlockPostAutosaving( lockName ) {
  *
  * @yield {Object} Action object
  */
-export function* resetEditorBlocks( blocks, options = {} ) {
+export function* resetEditorBlocks(blocks, options = {}) {
 	const { __unstableShouldCreateUndoLevel, selection } = options;
 	const edits = { blocks, selection };
 
-	if ( __unstableShouldCreateUndoLevel !== false ) {
+	if (__unstableShouldCreateUndoLevel !== false) {
 		const { id, type } = yield controls.select(
 			STORE_NAME,
 			'getCurrentPost'
 		);
 		const noChange =
-			( yield controls.select(
+			(yield controls.select(
 				coreStore,
 				'getEditedEntityRecord',
 				'postType',
 				type,
 				id
-			) ).blocks === edits.blocks;
-		if ( noChange ) {
+			)).blocks === edits.blocks;
+		if (noChange) {
 			return yield controls.dispatch(
 				coreStore,
 				'__unstableCreateUndoLevel',
@@ -599,10 +585,10 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		// We create a new function here on every persistent edit
 		// to make sure the edit makes the post dirty and creates
 		// a new undo level.
-		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-			__unstableSerializeAndClean( blocksForSerialization );
+		edits.content = ({ blocks: blocksForSerialization = [] }) =>
+			__unstableSerializeAndClean(blocksForSerialization);
 	}
-	yield* editPost( edits );
+	yield* editPost(edits);
 }
 
 /*
@@ -612,7 +598,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
  *
  * @return {Object} Action object
  */
-export function updateEditorSettings( settings ) {
+export function updateEditorSettings(settings) {
 	return {
 		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,
@@ -623,30 +609,30 @@ export function updateEditorSettings( settings ) {
  * Backward compatibility
  */
 
-const getBlockEditorAction = ( name ) =>
-	function* ( ...args ) {
-		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
+const getBlockEditorAction = (name) =>
+	function* (...args) {
+		deprecated("`wp.data.dispatch( 'core/editor' )." + name + '`', {
 			since: '5.3',
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
-		} );
-		yield controls.dispatch( blockEditorStore, name, ...args );
+		});
+		yield controls.dispatch(blockEditorStore, name, ...args);
 	};
 
 /**
  * @see resetBlocks in core/block-editor store.
  */
-export const resetBlocks = getBlockEditorAction( 'resetBlocks' );
+export const resetBlocks = getBlockEditorAction('resetBlocks');
 
 /**
  * @see receiveBlocks in core/block-editor store.
  */
-export const receiveBlocks = getBlockEditorAction( 'receiveBlocks' );
+export const receiveBlocks = getBlockEditorAction('receiveBlocks');
 
 /**
  * @see updateBlock in core/block-editor store.
  */
-export const updateBlock = getBlockEditorAction( 'updateBlock' );
+export const updateBlock = getBlockEditorAction('updateBlock');
 
 /**
  * @see updateBlockAttributes in core/block-editor store.
@@ -658,138 +644,132 @@ export const updateBlockAttributes = getBlockEditorAction(
 /**
  * @see selectBlock in core/block-editor store.
  */
-export const selectBlock = getBlockEditorAction( 'selectBlock' );
+export const selectBlock = getBlockEditorAction('selectBlock');
 
 /**
  * @see startMultiSelect in core/block-editor store.
  */
-export const startMultiSelect = getBlockEditorAction( 'startMultiSelect' );
+export const startMultiSelect = getBlockEditorAction('startMultiSelect');
 
 /**
  * @see stopMultiSelect in core/block-editor store.
  */
-export const stopMultiSelect = getBlockEditorAction( 'stopMultiSelect' );
+export const stopMultiSelect = getBlockEditorAction('stopMultiSelect');
 
 /**
  * @see multiSelect in core/block-editor store.
  */
-export const multiSelect = getBlockEditorAction( 'multiSelect' );
+export const multiSelect = getBlockEditorAction('multiSelect');
 
 /**
  * @see clearSelectedBlock in core/block-editor store.
  */
-export const clearSelectedBlock = getBlockEditorAction( 'clearSelectedBlock' );
+export const clearSelectedBlock = getBlockEditorAction('clearSelectedBlock');
 
 /**
  * @see toggleSelection in core/block-editor store.
  */
-export const toggleSelection = getBlockEditorAction( 'toggleSelection' );
+export const toggleSelection = getBlockEditorAction('toggleSelection');
 
 /**
  * @see replaceBlocks in core/block-editor store.
  */
-export const replaceBlocks = getBlockEditorAction( 'replaceBlocks' );
+export const replaceBlocks = getBlockEditorAction('replaceBlocks');
 
 /**
  * @see replaceBlock in core/block-editor store.
  */
-export const replaceBlock = getBlockEditorAction( 'replaceBlock' );
+export const replaceBlock = getBlockEditorAction('replaceBlock');
 
 /**
  * @see moveBlocksDown in core/block-editor store.
  */
-export const moveBlocksDown = getBlockEditorAction( 'moveBlocksDown' );
+export const moveBlocksDown = getBlockEditorAction('moveBlocksDown');
 
 /**
  * @see moveBlocksUp in core/block-editor store.
  */
-export const moveBlocksUp = getBlockEditorAction( 'moveBlocksUp' );
+export const moveBlocksUp = getBlockEditorAction('moveBlocksUp');
 
 /**
  * @see moveBlockToPosition in core/block-editor store.
  */
-export const moveBlockToPosition = getBlockEditorAction(
-	'moveBlockToPosition'
-);
+export const moveBlockToPosition = getBlockEditorAction('moveBlockToPosition');
 
 /**
  * @see insertBlock in core/block-editor store.
  */
-export const insertBlock = getBlockEditorAction( 'insertBlock' );
+export const insertBlock = getBlockEditorAction('insertBlock');
 
 /**
  * @see insertBlocks in core/block-editor store.
  */
-export const insertBlocks = getBlockEditorAction( 'insertBlocks' );
+export const insertBlocks = getBlockEditorAction('insertBlocks');
 
 /**
  * @see showInsertionPoint in core/block-editor store.
  */
-export const showInsertionPoint = getBlockEditorAction( 'showInsertionPoint' );
+export const showInsertionPoint = getBlockEditorAction('showInsertionPoint');
 
 /**
  * @see hideInsertionPoint in core/block-editor store.
  */
-export const hideInsertionPoint = getBlockEditorAction( 'hideInsertionPoint' );
+export const hideInsertionPoint = getBlockEditorAction('hideInsertionPoint');
 
 /**
  * @see setTemplateValidity in core/block-editor store.
  */
-export const setTemplateValidity = getBlockEditorAction(
-	'setTemplateValidity'
-);
+export const setTemplateValidity = getBlockEditorAction('setTemplateValidity');
 
 /**
  * @see synchronizeTemplate in core/block-editor store.
  */
-export const synchronizeTemplate = getBlockEditorAction(
-	'synchronizeTemplate'
-);
+export const synchronizeTemplate = getBlockEditorAction('synchronizeTemplate');
 
 /**
  * @see mergeBlocks in core/block-editor store.
  */
-export const mergeBlocks = getBlockEditorAction( 'mergeBlocks' );
+export const mergeBlocks = getBlockEditorAction('mergeBlocks');
 
 /**
  * @see removeBlocks in core/block-editor store.
  */
-export const removeBlocks = getBlockEditorAction( 'removeBlocks' );
+export const removeBlocks = getBlockEditorAction('removeBlocks');
 
 /**
  * @see removeBlock in core/block-editor store.
  */
-export const removeBlock = getBlockEditorAction( 'removeBlock' );
+export const removeBlock = getBlockEditorAction('removeBlock');
 
 /**
  * @see toggleBlockMode in core/block-editor store.
  */
-export const toggleBlockMode = getBlockEditorAction( 'toggleBlockMode' );
+export const toggleBlockMode = getBlockEditorAction('toggleBlockMode');
 
 /**
  * @see startTyping in core/block-editor store.
  */
-export const startTyping = getBlockEditorAction( 'startTyping' );
+export const startTyping = getBlockEditorAction('startTyping');
 
 /**
  * @see stopTyping in core/block-editor store.
  */
-export const stopTyping = getBlockEditorAction( 'stopTyping' );
+export const stopTyping = getBlockEditorAction('stopTyping');
 
 /**
  * @see enterFormattedText in core/block-editor store.
  */
-export const enterFormattedText = getBlockEditorAction( 'enterFormattedText' );
+export const enterFormattedText = getBlockEditorAction('enterFormattedText');
 
 /**
  * @see exitFormattedText in core/block-editor store.
  */
-export const exitFormattedText = getBlockEditorAction( 'exitFormattedText' );
+export const exitFormattedText = getBlockEditorAction('exitFormattedText');
 
 /**
  * @see insertDefaultBlock in core/block-editor store.
  */
-export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
+export const insertDefaultBlock = getBlockEditorAction('insertDefaultBlock');
 
 /**
  * @see updateBlockListSettings in core/block-editor store.

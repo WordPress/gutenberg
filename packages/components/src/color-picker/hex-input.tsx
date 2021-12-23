@@ -19,14 +19,14 @@ import { COLORS } from '../utils/colors-values';
 
 interface HexInputProps {
 	color: Colord;
-	onChange: ( nextColor: Colord ) => void;
+	onChange: (nextColor: Colord) => void;
 	enableAlpha: boolean;
 }
 
-export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
-	const handleValidate = ( value: string ) => {
-		if ( ! colord( '#' + value ).isValid() ) {
-			throw new Error( 'Invalid hex color input' );
+export const HexInput = ({ color, onChange, enableAlpha }: HexInputProps) => {
+	const handleValidate = (value: string) => {
+		if (!colord('#' + value).isValid()) {
+			throw new Error('Invalid hex color input');
 		}
 	};
 
@@ -34,21 +34,21 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 		<ColorHexInputControl
 			prefix={
 				<Spacer
-					as={ Text }
-					marginLeft={ space( 3.5 ) }
-					color={ COLORS.ui.theme }
-					lineHeight={ 1 }
+					as={Text}
+					marginLeft={space(3.5)}
+					color={COLORS.ui.theme}
+					lineHeight={1}
 				>
 					#
 				</Spacer>
 			}
-			value={ color.toHex().slice( 1 ).toUpperCase() }
-			onChange={ ( nextValue ) => {
-				onChange( colord( '#' + nextValue ) );
-			} }
-			onValidate={ handleValidate }
-			maxLength={ enableAlpha ? 8 : 6 }
-			label={ __( 'Hex color' ) }
+			value={color.toHex().slice(1).toUpperCase()}
+			onChange={(nextValue) => {
+				onChange(colord('#' + nextValue));
+			}}
+			onValidate={handleValidate}
+			maxLength={enableAlpha ? 8 : 6}
+			label={__('Hex color')}
 			hideLabelFromVision
 		/>
 	);

@@ -12,7 +12,7 @@ import { speak } from '@wordpress/a11y';
  */
 import { store as interfaceStore } from '../../store';
 
-export default function MoreMenuFeatureToggle( {
+export default function MoreMenuFeatureToggle({
 	scope,
 	label,
 	info,
@@ -20,34 +20,33 @@ export default function MoreMenuFeatureToggle( {
 	messageDeactivated,
 	shortcut,
 	feature,
-} ) {
+}) {
 	const isActive = useSelect(
-		( select ) =>
-			select( interfaceStore ).isFeatureActive( scope, feature ),
-		[ feature ]
+		(select) => select(interfaceStore).isFeatureActive(scope, feature),
+		[feature]
 	);
-	const { toggleFeature } = useDispatch( interfaceStore );
+	const { toggleFeature } = useDispatch(interfaceStore);
 	const speakMessage = () => {
-		if ( isActive ) {
-			speak( messageDeactivated || __( 'Feature deactivated' ) );
+		if (isActive) {
+			speak(messageDeactivated || __('Feature deactivated'));
 		} else {
-			speak( messageActivated || __( 'Feature activated' ) );
+			speak(messageActivated || __('Feature activated'));
 		}
 	};
 
 	return (
 		<MenuItem
-			icon={ isActive && check }
-			isSelected={ isActive }
-			onClick={ () => {
-				toggleFeature( scope, feature );
+			icon={isActive && check}
+			isSelected={isActive}
+			onClick={() => {
+				toggleFeature(scope, feature);
 				speakMessage();
-			} }
+			}}
 			role="menuitemcheckbox"
-			info={ info }
-			shortcut={ shortcut }
+			info={info}
+			shortcut={shortcut}
 		>
-			{ label }
+			{label}
 		</MenuItem>
 	);
 }

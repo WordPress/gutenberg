@@ -1,4 +1,4 @@
 module.exports = {
-	configs: require( './configs' ),
-	rules: require( './rules' ),
+	configs: require('./configs'),
+	rules: require('./rules'),
 };

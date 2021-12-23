@@ -1,4 +1,4 @@
-const ToolbarButtonContainer = ( props ) => (
-	<div className={ props.className }>{ props.children }</div>
+const ToolbarButtonContainer = (props) => (
+	<div className={props.className}>{props.children}</div>
 );
 export default ToolbarButtonContainer;

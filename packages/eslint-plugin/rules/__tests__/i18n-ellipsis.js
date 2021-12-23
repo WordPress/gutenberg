@@ -8,13 +8,13 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../i18n-ellipsis';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 	},
-} );
+});
 
-ruleTester.run( 'i18n-ellipsis', rule, {
+ruleTester.run('i18n-ellipsis', rule, {
 	valid: [
 		{
 			code: `__( 'Hello World…' )`,
@@ -36,17 +36,17 @@ ruleTester.run( 'i18n-ellipsis', rule, {
 		{
 			code: `__( 'Hello World...' )`,
 			output: `__( 'Hello World…' )`,
-			errors: [ { messageId: 'foundThreeDots' } ],
+			errors: [{ messageId: 'foundThreeDots' }],
 		},
 		{
 			code: `__( 'Hello' + 'World...' )`,
 			output: `__( 'Hello' + 'World…' )`,
-			errors: [ { messageId: 'foundThreeDots' } ],
+			errors: [{ messageId: 'foundThreeDots' }],
 		},
 		{
 			code: `_x( 'Hello World...', 'context' )`,
 			output: `_x( 'Hello World…', 'context' )`,
-			errors: [ { messageId: 'foundThreeDots' } ],
+			errors: [{ messageId: 'foundThreeDots' }],
 		},
 		{
 			code: `_n( 'Singular...', 'Plural...', number)`,
@@ -59,7 +59,7 @@ ruleTester.run( 'i18n-ellipsis', rule, {
 		{
 			code: `i18n.__( 'Hello World...' )`,
 			output: `i18n.__( 'Hello World…' )`,
-			errors: [ { messageId: 'foundThreeDots' } ],
+			errors: [{ messageId: 'foundThreeDots' }],
 		},
 	],
-} );
+});

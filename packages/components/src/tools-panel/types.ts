@@ -5,7 +5,7 @@
 import type { ReactNode } from 'react';
 
 type ResetAllFilter = () => void;
-type ResetAll = ( filters?: ResetAllFilter[] ) => void;
+type ResetAll = (filters?: ResetAllFilter[]) => void;
 
 export type ToolsPanelProps = {
 	/**
@@ -57,7 +57,7 @@ export type ToolsPanelHeaderProps = {
 	 * will update the panel's menu item state and call the panel item's
 	 * `onSelect` or `onDeselect` callbacks as appropriate.
 	 */
-	toggleItem: ( label: string ) => void;
+	toggleItem: (label: string) => void;
 };
 
 export type ToolsPanelItem = {
@@ -115,15 +115,15 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 export type ToolsPanelMenuItemKey = 'default' | 'optional';
 
 export type ToolsPanelMenuItems = {
-	[ menuItemKey in ToolsPanelMenuItemKey ]: { [ key: string ]: boolean };
+	[menuItemKey in ToolsPanelMenuItemKey]: { [key: string]: boolean };
 };
 
 export type ToolsPanelContext = {
 	panelId?: string;
 	menuItems: ToolsPanelMenuItems;
 	hasMenuItems: boolean;
-	registerPanelItem: ( item: ToolsPanelItem ) => void;
-	deregisterPanelItem: ( label: string ) => void;
+	registerPanelItem: (item: ToolsPanelItem) => void;
+	deregisterPanelItem: (label: string) => void;
 	flagItemCustomization: (
 		label: string,
 		group?: ToolsPanelMenuItemKey
@@ -134,9 +134,9 @@ export type ToolsPanelContext = {
 };
 
 export type ToolsPanelControlsGroupProps = {
-	items: [ string, boolean ][];
+	items: [string, boolean][];
 	onClose: () => void;
-	toggleItem: ( label: string ) => void;
+	toggleItem: (label: string) => void;
 };
 
 export type ToolsPanelMenuItemsConfig = {

@@ -12,53 +12,53 @@ import { chevronDown } from '@wordpress/icons';
 import LinkViewer from './link-viewer';
 import LinkEditor from './link-editor';
 
-function URLPopover( {
+function URLPopover({
 	additionalControls,
 	children,
 	renderSettings,
 	position = 'bottom center',
 	focusOnMount = 'firstElement',
 	...popoverProps
-} ) {
-	const [ isSettingsExpanded, setIsSettingsExpanded ] = useState( false );
+}) {
+	const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 
-	const showSettings = !! renderSettings && isSettingsExpanded;
+	const showSettings = !!renderSettings && isSettingsExpanded;
 
 	const toggleSettingsVisibility = () => {
-		setIsSettingsExpanded( ! isSettingsExpanded );
+		setIsSettingsExpanded(!isSettingsExpanded);
 	};
 
 	return (
 		<Popover
 			className="block-editor-url-popover"
-			focusOnMount={ focusOnMount }
-			position={ position }
-			{ ...popoverProps }
+			focusOnMount={focusOnMount}
+			position={position}
+			{...popoverProps}
 		>
 			<div className="block-editor-url-popover__input-container">
 				<div className="block-editor-url-popover__row">
-					{ children }
-					{ !! renderSettings && (
+					{children}
+					{!!renderSettings && (
 						<Button
 							className="block-editor-url-popover__settings-toggle"
-							icon={ chevronDown }
-							label={ __( 'Link settings' ) }
-							onClick={ toggleSettingsVisibility }
-							aria-expanded={ isSettingsExpanded }
+							icon={chevronDown}
+							label={__('Link settings')}
+							onClick={toggleSettingsVisibility}
+							aria-expanded={isSettingsExpanded}
 						/>
-					) }
+					)}
 				</div>
-				{ showSettings && (
+				{showSettings && (
 					<div className="block-editor-url-popover__row block-editor-url-popover__settings">
-						{ renderSettings() }
+						{renderSettings()}
 					</div>
-				) }
+				)}
 			</div>
-			{ additionalControls && ! showSettings && (
+			{additionalControls && !showSettings && (
 				<div className="block-editor-url-popover__additional-controls">
-					{ additionalControls }
+					{additionalControls}
 				</div>
-			) }
+			)}
 		</Popover>
 	);
 }

@@ -3,50 +3,50 @@
  */
 import { compact, get } from 'lodash';
 
-export function serializeGradientColor( { type, value } ) {
-	if ( type === 'literal' ) {
+export function serializeGradientColor({ type, value }) {
+	if (type === 'literal') {
 		return value;
 	}
-	if ( type === 'hex' ) {
-		return `#${ value }`;
+	if (type === 'hex') {
+		return `#${value}`;
 	}
-	return `${ type }(${ value.join( ',' ) })`;
+	return `${type}(${value.join(',')})`;
 }
 
-export function serializeGradientPosition( position ) {
-	if ( ! position ) {
+export function serializeGradientPosition(position) {
+	if (!position) {
 		return '';
 	}
 	const { value, type } = position;
-	return `${ value }${ type }`;
+	return `${value}${type}`;
 }
 
-export function serializeGradientColorStop( { type, value, length } ) {
-	return `${ serializeGradientColor( {
+export function serializeGradientColorStop({ type, value, length }) {
+	return `${serializeGradientColor({
 		type,
 		value,
-	} ) } ${ serializeGradientPosition( length ) }`;
+	})} ${serializeGradientPosition(length)}`;
 }
 
-export function serializeGradientOrientation( orientation ) {
-	if ( ! orientation || orientation.type !== 'angular' ) {
+export function serializeGradientOrientation(orientation) {
+	if (!orientation || orientation.type !== 'angular') {
 		return;
 	}
-	return `${ orientation.value }deg`;
+	return `${orientation.value}deg`;
 }
 
-export function serializeGradient( { type, orientation, colorStops } ) {
-	const serializedOrientation = serializeGradientOrientation( orientation );
+export function serializeGradient({ type, orientation, colorStops }) {
+	const serializedOrientation = serializeGradientOrientation(orientation);
 	const serializedColorStops = colorStops
-		.sort( ( colorStop1, colorStop2 ) => {
+		.sort((colorStop1, colorStop2) => {
 			return (
-				get( colorStop1, [ 'length', 'value' ], 0 ) -
-				get( colorStop2, [ 'length', 'value' ], 0 )
+				get(colorStop1, ['length', 'value'], 0) -
+				get(colorStop2, ['length', 'value'], 0)
 			);
-		} )
-		.map( serializeGradientColorStop );
-	return `${ type }(${ compact( [
+		})
+		.map(serializeGradientColorStop);
+	return `${type}(${compact([
 		serializedOrientation,
 		...serializedColorStops,
-	] ).join( ',' ) })`;
+	]).join(',')})`;
 }

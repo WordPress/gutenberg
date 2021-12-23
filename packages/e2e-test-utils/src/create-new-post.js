@@ -18,47 +18,45 @@ import { visitAdminPage } from './visit-admin-page';
  * @param {string}  [object.excerpt]          Excerpt of the new post.
  * @param {boolean} [object.showWelcomeGuide] Whether to show the welcome guide.
  */
-export async function createNewPost( {
+export async function createNewPost({
 	postType,
 	title,
 	content,
 	excerpt,
 	showWelcomeGuide = false,
-} = {} ) {
-	const query = addQueryArgs( '', {
+} = {}) {
+	const query = addQueryArgs('', {
 		post_type: postType,
 		post_title: title,
 		content,
 		excerpt,
-	} ).slice( 1 );
+	}).slice(1);
 
-	await visitAdminPage( 'post-new.php', query );
+	await visitAdminPage('post-new.php', query);
 
-	await page.waitForSelector( '.edit-post-layout' );
+	await page.waitForSelector('.edit-post-layout');
 
-	const isWelcomeGuideActive = await page.evaluate( () =>
-		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' )
+	const isWelcomeGuideActive = await page.evaluate(() =>
+		wp.data.select('core/edit-post').isFeatureActive('welcomeGuide')
 	);
-	const isFullscreenMode = await page.evaluate( () =>
-		wp.data.select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' )
+	const isFullscreenMode = await page.evaluate(() =>
+		wp.data.select('core/edit-post').isFeatureActive('fullscreenMode')
 	);
 
-	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
-		await page.evaluate( () =>
-			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' )
+	if (showWelcomeGuide !== isWelcomeGuideActive) {
+		await page.evaluate(() =>
+			wp.data.dispatch('core/edit-post').toggleFeature('welcomeGuide')
 		);
 
 		await page.reload();
-		await page.waitForSelector( '.edit-post-layout' );
+		await page.waitForSelector('.edit-post-layout');
 	}
 
-	if ( isFullscreenMode ) {
-		await page.evaluate( () =>
-			wp.data
-				.dispatch( 'core/edit-post' )
-				.toggleFeature( 'fullscreenMode' )
+	if (isFullscreenMode) {
+		await page.evaluate(() =>
+			wp.data.dispatch('core/edit-post').toggleFeature('fullscreenMode')
 		);
 
-		await page.waitForSelector( 'body:not(.is-fullscreen-mode)' );
+		await page.waitForSelector('body:not(.is-fullscreen-mode)');
 	}
 }

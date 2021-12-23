@@ -8,17 +8,17 @@ import {
 	openGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Register block type hooks', () => {
-	beforeEach( async () => {
-		await activatePlugin( 'gutenberg-test-register-block-type-hooks' );
+describe('Register block type hooks', () => {
+	beforeEach(async () => {
+		await activatePlugin('gutenberg-test-register-block-type-hooks');
 		await createNewPost();
-	} );
+	});
 
-	afterEach( async () => {
-		await deactivatePlugin( 'gutenberg-test-register-block-type-hooks' );
-	} );
+	afterEach(async () => {
+		await deactivatePlugin('gutenberg-test-register-block-type-hooks');
+	});
 
-	it( 'has a custom category for Paragraph block', async () => {
+	it('has a custom category for Paragraph block', async () => {
 		await openGlobalBlockInserter();
 
 		const widgetsCategory = await page.waitForSelector(
@@ -26,7 +26,7 @@ describe( 'Register block type hooks', () => {
 		);
 
 		expect(
-			await widgetsCategory.$( '.editor-block-list-item-paragraph' )
+			await widgetsCategory.$('.editor-block-list-item-paragraph')
 		).toBeDefined();
-	} );
-} );
+	});
+});

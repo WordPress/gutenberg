@@ -17,10 +17,10 @@ import * as selectors from './selectors';
  *
  * @type {Object}
  */
-export const store = createReduxStore( 'core/notices', {
+export const store = createReduxStore('core/notices', {
 	reducer,
 	actions,
 	selectors,
-} );
+});
 
-register( store );
+register(store);

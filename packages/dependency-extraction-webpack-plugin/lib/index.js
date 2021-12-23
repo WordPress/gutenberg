@@ -1,26 +1,23 @@
 /**
  * External dependencies
  */
-const { createHash } = require( 'crypto' );
-const path = require( 'path' );
-const webpack = require( 'webpack' );
+const { createHash } = require('crypto');
+const path = require('path');
+const webpack = require('webpack');
 // In webpack 5 there is a `webpack.sources` field but for webpack 4 we have to fallback to the `webpack-sources` package.
-const { RawSource } = webpack.sources || require( 'webpack-sources' );
-const json2php = require( 'json2php' );
-const isWebpack4 = webpack.version.startsWith( '4.' );
+const { RawSource } = webpack.sources || require('webpack-sources');
+const json2php = require('json2php');
+const isWebpack4 = webpack.version.startsWith('4.');
 
 /**
  * Internal dependencies
  */
-const {
-	defaultRequestToExternal,
-	defaultRequestToHandle,
-} = require( './util' );
+const { defaultRequestToExternal, defaultRequestToHandle } = require('./util');
 
 const defaultExternalizedReportFileName = 'externalized-dependencies.json';
 
 class DependencyExtractionWebpackPlugin {
-	constructor( options ) {
+	constructor(options) {
 		this.options = Object.assign(
 			{
 				combineAssets: false,
@@ -47,17 +44,17 @@ class DependencyExtractionWebpackPlugin {
 		this.externalsPlugin = new webpack.ExternalsPlugin(
 			'window',
 			isWebpack4
-				? this.externalizeWpDeps.bind( this )
-				: this.externalizeWpDepsV5.bind( this )
+				? this.externalizeWpDeps.bind(this)
+				: this.externalizeWpDepsV5.bind(this)
 		);
 	}
 
-	externalizeWpDeps( _context, request, callback ) {
+	externalizeWpDeps(_context, request, callback) {
 		let externalRequest;
 
 		// Handle via options.requestToExternal first
-		if ( typeof this.options.requestToExternal === 'function' ) {
-			externalRequest = this.options.requestToExternal( request );
+		if (typeof this.options.requestToExternal === 'function') {
+			externalRequest = this.options.requestToExternal(request);
 		}
 
 		// Cascade to default if unhandled and enabled
@@ -65,35 +62,35 @@ class DependencyExtractionWebpackPlugin {
 			typeof externalRequest === 'undefined' &&
 			this.options.useDefaults
 		) {
-			externalRequest = defaultRequestToExternal( request );
+			externalRequest = defaultRequestToExternal(request);
 		}
 
-		if ( externalRequest ) {
-			this.externalizedDeps.add( request );
+		if (externalRequest) {
+			this.externalizedDeps.add(request);
 
-			return callback( null, externalRequest );
+			return callback(null, externalRequest);
 		}
 
 		return callback();
 	}
 
-	externalizeWpDepsV5( { context, request }, callback ) {
-		return this.externalizeWpDeps( context, request, callback );
+	externalizeWpDepsV5({ context, request }, callback) {
+		return this.externalizeWpDeps(context, request, callback);
 	}
 
-	mapRequestToDependency( request ) {
+	mapRequestToDependency(request) {
 		// Handle via options.requestToHandle first
-		if ( typeof this.options.requestToHandle === 'function' ) {
-			const scriptDependency = this.options.requestToHandle( request );
-			if ( scriptDependency ) {
+		if (typeof this.options.requestToHandle === 'function') {
+			const scriptDependency = this.options.requestToHandle(request);
+			if (scriptDependency) {
 				return scriptDependency;
 			}
 		}
 
 		// Cascade to default if enabled
-		if ( this.options.useDefaults ) {
-			const scriptDependency = defaultRequestToHandle( request );
-			if ( scriptDependency ) {
+		if (this.options.useDefaults) {
+			const scriptDependency = defaultRequestToHandle(request);
+			if (scriptDependency) {
 				return scriptDependency;
 			}
 		}
@@ -102,42 +99,41 @@ class DependencyExtractionWebpackPlugin {
 		return request;
 	}
 
-	stringify( asset ) {
-		if ( this.options.outputFormat === 'php' ) {
-			return `<?php return ${ json2php(
-				JSON.parse( JSON.stringify( asset ) )
-			) };`;
+	stringify(asset) {
+		if (this.options.outputFormat === 'php') {
+			return `<?php return ${json2php(
+				JSON.parse(JSON.stringify(asset))
+			)};`;
 		}
 
-		return JSON.stringify( asset );
+		return JSON.stringify(asset);
 	}
 
-	apply( compiler ) {
-		this.externalsPlugin.apply( compiler );
+	apply(compiler) {
+		this.externalsPlugin.apply(compiler);
 
-		if ( isWebpack4 ) {
-			compiler.hooks.emit.tap( this.constructor.name, ( compilation ) =>
-				this.addAssets( compilation, compiler )
+		if (isWebpack4) {
+			compiler.hooks.emit.tap(this.constructor.name, (compilation) =>
+				this.addAssets(compilation, compiler)
 			);
 		} else {
 			compiler.hooks.thisCompilation.tap(
 				this.constructor.name,
-				( compilation ) => {
+				(compilation) => {
 					compilation.hooks.processAssets.tap(
 						{
 							name: this.constructor.name,
-							stage:
-								compiler.webpack.Compilation
-									.PROCESS_ASSETS_STAGE_ADDITIONAL,
+							stage: compiler.webpack.Compilation
+								.PROCESS_ASSETS_STAGE_ADDITIONAL,
 						},
-						() => this.addAssets( compilation, compiler )
+						() => this.addAssets(compilation, compiler)
 					);
 				}
 			);
 		}
 	}
 
-	addAssets( compilation, compiler ) {
+	addAssets(compilation, compiler) {
 		const {
 			combineAssets,
 			combinedOutputFile,
@@ -148,7 +144,7 @@ class DependencyExtractionWebpackPlugin {
 		} = this.options;
 
 		// Dump actually externalized dependencies to a report file.
-		if ( externalizedReport ) {
+		if (externalizedReport) {
 			const externalizedReportFile =
 				typeof externalizedReport === 'string'
 					? externalizedReport
@@ -156,7 +152,7 @@ class DependencyExtractionWebpackPlugin {
 			compilation.emitAsset(
 				externalizedReportFile,
 				new RawSource(
-					JSON.stringify( Array.from( this.externalizedDeps ).sort() )
+					JSON.stringify(Array.from(this.externalizedDeps).sort())
 				)
 			);
 		}
@@ -164,129 +160,124 @@ class DependencyExtractionWebpackPlugin {
 		const combinedAssetsData = {};
 
 		// Process each entry point independently.
-		for ( const [
+		for (const [
 			entrypointName,
 			entrypoint,
-		] of compilation.entrypoints.entries() ) {
+		] of compilation.entrypoints.entries()) {
 			const entrypointExternalizedWpDeps = new Set();
-			if ( injectPolyfill ) {
-				entrypointExternalizedWpDeps.add( 'wp-polyfill' );
+			if (injectPolyfill) {
+				entrypointExternalizedWpDeps.add('wp-polyfill');
 			}
 
-			const processModule = ( { userRequest } ) => {
-				if ( this.externalizedDeps.has( userRequest ) ) {
-					const scriptDependency = this.mapRequestToDependency(
-						userRequest
-					);
-					entrypointExternalizedWpDeps.add( scriptDependency );
+			const processModule = ({ userRequest }) => {
+				if (this.externalizedDeps.has(userRequest)) {
+					const scriptDependency =
+						this.mapRequestToDependency(userRequest);
+					entrypointExternalizedWpDeps.add(scriptDependency);
 				}
 			};
 
 			// Search for externalized modules in all chunks.
-			for ( const chunk of entrypoint.chunks ) {
+			for (const chunk of entrypoint.chunks) {
 				const modulesIterable = isWebpack4
 					? chunk.modulesIterable
-					: compilation.chunkGraph.getChunkModules( chunk );
-				for ( const chunkModule of modulesIterable ) {
-					processModule( chunkModule );
+					: compilation.chunkGraph.getChunkModules(chunk);
+				for (const chunkModule of modulesIterable) {
+					processModule(chunkModule);
 					// loop through submodules of ConcatenatedModule
-					if ( chunkModule.modules ) {
-						for ( const concatModule of chunkModule.modules ) {
-							processModule( concatModule );
+					if (chunkModule.modules) {
+						for (const concatModule of chunkModule.modules) {
+							processModule(concatModule);
 						}
 					}
 				}
 			}
 
 			const entrypointChunk = isWebpack4
-				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
+				? entrypoint.chunks.find((c) => c.name === entrypointName)
 				: entrypoint.getEntrypointChunk();
 
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
-				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
+				dependencies: Array.from(entrypointExternalizedWpDeps).sort(),
 				version: entrypointChunk.hash,
 			};
 
-			const assetString = this.stringify( assetData );
+			const assetString = this.stringify(assetData);
 
 			// Determine a filename for the asset file.
-			const [ filename, query ] = entrypointName.split( '?', 2 );
+			const [filename, query] = entrypointName.split('?', 2);
 			const buildFilename = compilation.getPath(
 				compiler.options.output.filename,
 				{
 					chunk: entrypointChunk,
 					filename,
 					query,
-					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
-						.update( assetString )
-						.digest( 'hex' ),
+					basename: basename(filename),
+					contentHash: createHash('md4')
+						.update(assetString)
+						.digest('hex'),
 				}
 			);
 
-			if ( combineAssets ) {
-				combinedAssetsData[ buildFilename ] = assetData;
+			if (combineAssets) {
+				combinedAssetsData[buildFilename] = assetData;
 				continue;
 			}
 
 			let assetFilename;
 
-			if ( outputFilename ) {
-				assetFilename = compilation.getPath( outputFilename, {
+			if (outputFilename) {
+				assetFilename = compilation.getPath(outputFilename, {
 					chunk: entrypointChunk,
 					filename,
 					query,
-					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
-						.update( assetString )
-						.digest( 'hex' ),
-				} );
+					basename: basename(filename),
+					contentHash: createHash('md4')
+						.update(assetString)
+						.digest('hex'),
+				});
 			} else {
 				assetFilename = buildFilename.replace(
 					/\.js$/i,
-					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
+					'.asset.' + (outputFormat === 'php' ? 'php' : 'json')
 				);
 			}
 
 			// Add source and file into compilation for webpack to output.
-			compilation.assets[ assetFilename ] = new RawSource( assetString );
-			entrypointChunk.files[ isWebpack4 ? 'push' : 'add' ](
-				assetFilename
-			);
+			compilation.assets[assetFilename] = new RawSource(assetString);
+			entrypointChunk.files[isWebpack4 ? 'push' : 'add'](assetFilename);
 		}
 
-		if ( combineAssets ) {
+		if (combineAssets) {
 			// Assert the `string` type for output path.
 			// The type indicates the option may be `undefined`.
 			// However, at this point in compilation, webpack has filled the options in if
 			// they were not provided.
-			const outputFolder = /** @type {{path:string}} */ ( compiler.options
-				.output ).path;
+			const outputFolder = /** @type {{path:string}} */ (
+				compiler.options.output
+			).path;
 
 			const assetsFilePath = path.resolve(
 				outputFolder,
 				combinedOutputFile ||
-					'assets.' + ( outputFormat === 'php' ? 'php' : 'json' )
+					'assets.' + (outputFormat === 'php' ? 'php' : 'json')
 			);
-			const assetsFilename = path.relative(
-				outputFolder,
-				assetsFilePath
-			);
+			const assetsFilename = path.relative(outputFolder, assetsFilePath);
 
 			// Add source into compilation for webpack to output.
-			compilation.assets[ assetsFilename ] = new RawSource(
-				this.stringify( combinedAssetsData )
+			compilation.assets[assetsFilename] = new RawSource(
+				this.stringify(combinedAssetsData)
 			);
 		}
 	}
 }
 
-function basename( name ) {
-	if ( ! name.includes( '/' ) ) {
+function basename(name) {
+	if (!name.includes('/')) {
 		return name;
 	}
-	return name.substr( name.lastIndexOf( '/' ) + 1 );
+	return name.substr(name.lastIndexOf('/') + 1);
 }
 
 module.exports = DependencyExtractionWebpackPlugin;

@@ -15,29 +15,27 @@ import filterMessage from './filter-message';
  * Create the live regions.
  */
 export function setup() {
-	const introText = document.getElementById( 'a11y-speak-intro-text' );
-	const containerAssertive = document.getElementById(
-		'a11y-speak-assertive'
-	);
-	const containerPolite = document.getElementById( 'a11y-speak-polite' );
+	const introText = document.getElementById('a11y-speak-intro-text');
+	const containerAssertive = document.getElementById('a11y-speak-assertive');
+	const containerPolite = document.getElementById('a11y-speak-polite');
 
-	if ( introText === null ) {
+	if (introText === null) {
 		addIntroText();
 	}
 
-	if ( containerAssertive === null ) {
-		addContainer( 'assertive' );
+	if (containerAssertive === null) {
+		addContainer('assertive');
 	}
 
-	if ( containerPolite === null ) {
-		addContainer( 'polite' );
+	if (containerPolite === null) {
+		addContainer('polite');
 	}
 }
 
 /**
  * Run setup on domReady.
  */
-domReady( setup );
+domReady(setup);
 
 /**
  * Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.
@@ -57,24 +55,22 @@ domReady( setup );
  * speak( 'The message you want to send to the ARIA live region', 'assertive' );
  * ```
  */
-export function speak( message, ariaLive ) {
+export function speak(message, ariaLive) {
 	/*
 	 * Clear previous messages to allow repeated strings being read out and hide
 	 * the explanatory text from assistive technologies.
 	 */
 	clear();
 
-	message = filterMessage( message );
+	message = filterMessage(message);
 
-	const introText = document.getElementById( 'a11y-speak-intro-text' );
-	const containerAssertive = document.getElementById(
-		'a11y-speak-assertive'
-	);
-	const containerPolite = document.getElementById( 'a11y-speak-polite' );
+	const introText = document.getElementById('a11y-speak-intro-text');
+	const containerAssertive = document.getElementById('a11y-speak-assertive');
+	const containerPolite = document.getElementById('a11y-speak-polite');
 
-	if ( containerAssertive && ariaLive === 'assertive' ) {
+	if (containerAssertive && ariaLive === 'assertive') {
 		containerAssertive.textContent = message;
-	} else if ( containerPolite ) {
+	} else if (containerPolite) {
 		containerPolite.textContent = message;
 	}
 
@@ -82,7 +78,7 @@ export function speak( message, ariaLive ) {
 	 * Make the explanatory text available to assistive technologies by removing
 	 * the 'hidden' HTML attribute.
 	 */
-	if ( introText ) {
-		introText.removeAttribute( 'hidden' );
+	if (introText) {
+		introText.removeAttribute('hidden');
 	}
 }

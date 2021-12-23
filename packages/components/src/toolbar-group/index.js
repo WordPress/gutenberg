@@ -47,19 +47,19 @@ import ToolbarContext from '../toolbar-context';
  * @param {boolean}   [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
  * @param {string}    [props.title]       ARIA label for dropdown menu if is collapsed.
  */
-function ToolbarGroup( {
+function ToolbarGroup({
 	controls = [],
 	children,
 	className,
 	isCollapsed,
 	title,
 	...props
-} ) {
+}) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar label="label" />`
-	const accessibleToolbarState = useContext( ToolbarContext );
+	const accessibleToolbarState = useContext(ToolbarContext);
 
-	if ( ( ! controls || ! controls.length ) && ! children ) {
+	if ((!controls || !controls.length) && !children) {
 		return null;
 	}
 
@@ -74,38 +74,38 @@ function ToolbarGroup( {
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets = controls;
-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-		controlSets = [ controlSets ];
+	if (!Array.isArray(controlSets[0])) {
+		controlSets = [controlSets];
 	}
 
-	if ( isCollapsed ) {
+	if (isCollapsed) {
 		return (
 			<ToolbarGroupCollapsed
-				label={ title }
-				controls={ controlSets }
-				className={ finalClassName }
-				children={ children }
-				{ ...props }
+				label={title}
+				controls={controlSets}
+				className={finalClassName}
+				children={children}
+				{...props}
 			/>
 		);
 	}
 
 	return (
-		<ToolbarGroupContainer className={ finalClassName } { ...props }>
-			{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
-				controlSet.map( ( control, indexOfControl ) => (
+		<ToolbarGroupContainer className={finalClassName} {...props}>
+			{flatMap(controlSets, (controlSet, indexOfSet) =>
+				controlSet.map((control, indexOfControl) => (
 					<ToolbarButton
-						key={ [ indexOfSet, indexOfControl ].join() }
+						key={[indexOfSet, indexOfControl].join()}
 						containerClassName={
 							indexOfSet > 0 && indexOfControl === 0
 								? 'has-left-divider'
 								: null
 						}
-						{ ...control }
+						{...control}
 					/>
-				) )
-			) }
-			{ children }
+				))
+			)}
+			{children}
 		</ToolbarGroupContainer>
 	);
 }

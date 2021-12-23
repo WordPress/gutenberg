@@ -52,7 +52,7 @@ import { createEmitter } from './utils/emitter';
  *
  * @return {WPDataRegistry} Data registry.
  */
-export function createRegistry( storeConfigs = {}, parent = null ) {
+export function createRegistry(storeConfigs = {}, parent = null) {
 	const stores = {};
 	const emitter = createEmitter();
 	const __experimentalListeningStores = new Set();
@@ -71,8 +71,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {Function} Unsubscribe function.
 	 */
-	const subscribe = ( listener ) => {
-		return emitter.subscribe( listener );
+	const subscribe = (listener) => {
+		return emitter.subscribe(listener);
 	};
 
 	/**
@@ -83,23 +83,23 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {*} The selector's returned value.
 	 */
-	function select( storeNameOrDescriptor ) {
-		const storeName = isObject( storeNameOrDescriptor )
+	function select(storeNameOrDescriptor) {
+		const storeName = isObject(storeNameOrDescriptor)
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor;
-		__experimentalListeningStores.add( storeName );
-		const store = stores[ storeName ];
-		if ( store ) {
+		__experimentalListeningStores.add(storeName);
+		const store = stores[storeName];
+		if (store) {
 			return store.getSelectors();
 		}
 
-		return parent && parent.select( storeName );
+		return parent && parent.select(storeName);
 	}
 
-	function __experimentalMarkListeningStores( callback, ref ) {
+	function __experimentalMarkListeningStores(callback, ref) {
 		__experimentalListeningStores.clear();
-		const result = callback.call( this );
-		ref.current = Array.from( __experimentalListeningStores );
+		const result = callback.call(this);
+		ref.current = Array.from(__experimentalListeningStores);
 		return result;
 	}
 
@@ -114,17 +114,17 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function resolveSelect( storeNameOrDescriptor ) {
-		const storeName = isObject( storeNameOrDescriptor )
+	function resolveSelect(storeNameOrDescriptor) {
+		const storeName = isObject(storeNameOrDescriptor)
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor;
-		__experimentalListeningStores.add( storeName );
-		const store = stores[ storeName ];
-		if ( store ) {
+		__experimentalListeningStores.add(storeName);
+		const store = stores[storeName];
+		if (store) {
 			return store.getResolveSelectors();
 		}
 
-		return parent && parent.resolveSelect( storeName );
+		return parent && parent.resolveSelect(storeName);
 	}
 
 	/**
@@ -135,71 +135,71 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {*} The action's returned value.
 	 */
-	function dispatch( storeNameOrDescriptor ) {
-		const storeName = isObject( storeNameOrDescriptor )
+	function dispatch(storeNameOrDescriptor) {
+		const storeName = isObject(storeNameOrDescriptor)
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor;
-		const store = stores[ storeName ];
-		if ( store ) {
+		const store = stores[storeName];
+		if (store) {
 			return store.getActions();
 		}
 
-		return parent && parent.dispatch( storeName );
+		return parent && parent.dispatch(storeName);
 	}
 
 	//
 	// Deprecated
 	// TODO: Remove this after `use()` is removed.
 	//
-	function withPlugins( attributes ) {
-		return mapValues( attributes, ( attribute, key ) => {
-			if ( typeof attribute !== 'function' ) {
+	function withPlugins(attributes) {
+		return mapValues(attributes, (attribute, key) => {
+			if (typeof attribute !== 'function') {
 				return attribute;
 			}
 			return function () {
-				return registry[ key ].apply( null, arguments );
+				return registry[key].apply(null, arguments);
 			};
-		} );
+		});
 	}
 
 	/**
 	 * Registers a store instance.
 	 *
-	 * @param {string} name Store registry name.
+	 * @param {string} name  Store registry name.
 	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
 	 */
-	function registerStoreInstance( name, store ) {
-		if ( typeof store.getSelectors !== 'function' ) {
-			throw new TypeError( 'store.getSelectors must be a function' );
+	function registerStoreInstance(name, store) {
+		if (typeof store.getSelectors !== 'function') {
+			throw new TypeError('store.getSelectors must be a function');
 		}
-		if ( typeof store.getActions !== 'function' ) {
-			throw new TypeError( 'store.getActions must be a function' );
+		if (typeof store.getActions !== 'function') {
+			throw new TypeError('store.getActions must be a function');
 		}
-		if ( typeof store.subscribe !== 'function' ) {
-			throw new TypeError( 'store.subscribe must be a function' );
+		if (typeof store.subscribe !== 'function') {
+			throw new TypeError('store.subscribe must be a function');
 		}
 		// The emitter is used to keep track of active listeners when the registry
 		// get paused, that way, when resumed we should be able to call all these
 		// pending listeners.
 		store.emitter = createEmitter();
 		const currentSubscribe = store.subscribe;
-		store.subscribe = ( listener ) => {
-			const unsubscribeFromEmitter = store.emitter.subscribe( listener );
-			const unsubscribeFromStore = currentSubscribe( () => {
-				if ( store.emitter.isPaused ) {
+		store.subscribe = (listener) => {
+			const unsubscribeFromEmitter = store.emitter.subscribe(listener);
+			const unsubscribeFromStore = currentSubscribe(() => {
+				if (store.emitter.isPaused) {
 					store.emitter.emit();
 					return;
 				}
 				listener();
-			} );
+			});
 
 			return () => {
 				unsubscribeFromStore?.();
 				unsubscribeFromEmitter?.();
 			};
 		};
-		stores[ name ] = store;
-		store.subscribe( globalListener );
+		stores[name] = store;
+		store.subscribe(globalListener);
 	}
 
 	/**
@@ -207,16 +207,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @param {StoreDescriptor} store Store descriptor.
 	 */
-	function register( store ) {
-		registerStoreInstance( store.name, store.instantiate( registry ) );
+	function register(store) {
+		registerStoreInstance(store.name, store.instantiate(registry));
 	}
 
-	function registerGenericStore( name, store ) {
-		deprecated( 'wp.data.registerGenericStore', {
+	function registerGenericStore(name, store) {
+		deprecated('wp.data.registerGenericStore', {
 			since: '5.9',
 			alternative: 'wp.data.register( storeDescriptor )',
-		} );
-		registerStoreInstance( name, store );
+		});
+		registerStoreInstance(name, store);
 	}
 
 	/**
@@ -227,15 +227,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {Object} Registered store object.
 	 */
-	function registerStore( storeName, options ) {
-		if ( ! options.reducer ) {
-			throw new TypeError( 'Must specify store reducer' );
+	function registerStore(storeName, options) {
+		if (!options.reducer) {
+			throw new TypeError('Must specify store reducer');
 		}
 
-		const store = createReduxStore( storeName, options ).instantiate(
+		const store = createReduxStore(storeName, options).instantiate(
 			registry
 		);
-		registerStoreInstance( storeName, store );
+		registerStoreInstance(storeName, store);
 		return store.store;
 	}
 
@@ -246,28 +246,28 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {Function} handler   The function subscribed to the store.
 	 * @return {Function} A function to unsubscribe the handler.
 	 */
-	function __experimentalSubscribeStore( storeName, handler ) {
-		if ( storeName in stores ) {
-			return stores[ storeName ].subscribe( handler );
+	function __experimentalSubscribeStore(storeName, handler) {
+		if (storeName in stores) {
+			return stores[storeName].subscribe(handler);
 		}
 
 		// Trying to access a store that hasn't been registered,
 		// this is a pattern rarely used but seen in some places.
 		// We fallback to regular `subscribe` here for backward-compatibility for now.
 		// See https://github.com/WordPress/gutenberg/pull/27466 for more info.
-		if ( ! parent ) {
-			return subscribe( handler );
+		if (!parent) {
+			return subscribe(handler);
 		}
 
-		return parent.__experimentalSubscribeStore( storeName, handler );
+		return parent.__experimentalSubscribeStore(storeName, handler);
 	}
 
-	function batch( callback ) {
+	function batch(callback) {
 		emitter.pause();
-		forEach( stores, ( store ) => store.emitter.pause() );
+		forEach(stores, (store) => store.emitter.pause());
 		callback();
 		emitter.resume();
-		forEach( stores, ( store ) => store.emitter.resume() );
+		forEach(stores, (store) => store.emitter.resume());
 	}
 
 	let registry = {
@@ -290,24 +290,24 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	// TODO:
 	// This function will be deprecated as soon as it is no longer internally referenced.
 	//
-	function use( plugin, options ) {
+	function use(plugin, options) {
 		registry = {
 			...registry,
-			...plugin( registry, options ),
+			...plugin(registry, options),
 		};
 
 		return registry;
 	}
 
-	registry.register( coreDataStore );
+	registry.register(coreDataStore);
 
-	for ( const [ name, config ] of Object.entries( storeConfigs ) ) {
-		registry.register( createReduxStore( name, config ) );
+	for (const [name, config] of Object.entries(storeConfigs)) {
+		registry.register(createReduxStore(name, config));
 	}
 
-	if ( parent ) {
-		parent.subscribe( globalListener );
+	if (parent) {
+		parent.subscribe(globalListener);
 	}
 
-	return withPlugins( registry );
+	return withPlugins(registry);
 }

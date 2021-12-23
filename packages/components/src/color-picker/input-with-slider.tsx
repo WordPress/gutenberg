@@ -14,46 +14,46 @@ interface InputWithSliderProps {
 	value: number;
 	label: string;
 	abbreviation: string;
-	onChange: ( value: number ) => void;
+	onChange: (value: number) => void;
 }
 
-export const InputWithSlider = ( {
+export const InputWithSlider = ({
 	min,
 	max,
 	label,
 	abbreviation,
 	onChange,
 	value,
-}: InputWithSliderProps ) => {
+}: InputWithSliderProps) => {
 	return (
-		<Spacer as={ HStack } spacing={ 4 }>
+		<Spacer as={HStack} spacing={4}>
 			<NumberControlWrapper
-				min={ min }
-				max={ max }
-				label={ label }
+				min={min}
+				max={max}
+				label={label}
 				hideLabelFromVision
-				value={ value }
-				onChange={ onChange }
+				value={value}
+				onChange={onChange}
 				prefix={
 					<Spacer
-						as={ Text }
-						paddingLeft={ space( 3.5 ) }
-						color={ COLORS.ui.theme }
-						lineHeight={ 1 }
+						as={Text}
+						paddingLeft={space(3.5)}
+						color={COLORS.ui.theme}
+						lineHeight={1}
 					>
-						{ abbreviation }
+						{abbreviation}
 					</Spacer>
 				}
 				hideHTMLArrows
 			/>
 			<RangeControl
-				label={ label }
+				label={label}
 				hideLabelFromVision
-				min={ min }
-				max={ max }
-				value={ value }
-				onChange={ onChange }
-				withInputField={ false }
+				min={min}
+				max={max}
+				value={value}
+				onChange={onChange}
+				withInputField={false}
 			/>
 		</Spacer>
 	);

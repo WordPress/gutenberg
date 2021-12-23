@@ -9,6 +9,6 @@ import placeCaretAtEdge from './place-caret-at-edge';
  * @param {HTMLElement} container Focusable element.
  * @param {boolean}     isReverse True for end, false for start.
  */
-export default function placeCaretAtHorizontalEdge( container, isReverse ) {
-	return placeCaretAtEdge( container, isReverse, undefined );
+export default function placeCaretAtHorizontalEdge(container, isReverse) {
+	return placeCaretAtEdge(container, isReverse, undefined);
 }

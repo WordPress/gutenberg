@@ -13,7 +13,7 @@ import {
  */
 import { useBlockEditContext } from '../block-edit/context';
 
-const RenderedRefsContext = createContext( {} );
+const RenderedRefsContext = createContext({});
 
 /**
  * Immutably adds an unique identifier to a set scoped for a given block type.
@@ -24,14 +24,14 @@ const RenderedRefsContext = createContext( {} );
  *
  * @return {Object} The list of rendered blocks grouped by block name.
  */
-function addToBlockType( renderedBlocks, blockName, uniqueId ) {
+function addToBlockType(renderedBlocks, blockName, uniqueId) {
 	const result = {
 		...renderedBlocks,
-		[ blockName ]: renderedBlocks[ blockName ]
-			? new Set( renderedBlocks[ blockName ] )
+		[blockName]: renderedBlocks[blockName]
+			? new Set(renderedBlocks[blockName])
 			: new Set(),
 	};
-	result[ blockName ].add( uniqueId );
+	result[blockName].add(uniqueId);
 
 	return result;
 }
@@ -50,24 +50,24 @@ function addToBlockType( renderedBlocks, blockName, uniqueId ) {
  *                               - a React context provider to be used to wrap
  *                                 other elements.
  */
-export default function useNoRecursiveRenders( uniqueId, blockName = '' ) {
-	const previouslyRenderedBlocks = useContext( RenderedRefsContext );
+export default function useNoRecursiveRenders(uniqueId, blockName = '') {
+	const previouslyRenderedBlocks = useContext(RenderedRefsContext);
 	const { name } = useBlockEditContext();
 	blockName = blockName || name;
 	const hasAlreadyRendered = Boolean(
-		previouslyRenderedBlocks[ blockName ]?.has( uniqueId )
+		previouslyRenderedBlocks[blockName]?.has(uniqueId)
 	);
 	const newRenderedBlocks = useMemo(
-		() => addToBlockType( previouslyRenderedBlocks, blockName, uniqueId ),
-		[ previouslyRenderedBlocks, blockName, uniqueId ]
+		() => addToBlockType(previouslyRenderedBlocks, blockName, uniqueId),
+		[previouslyRenderedBlocks, blockName, uniqueId]
 	);
 	const Provider = useCallback(
-		( { children } ) => (
-			<RenderedRefsContext.Provider value={ newRenderedBlocks }>
-				{ children }
+		({ children }) => (
+			<RenderedRefsContext.Provider value={newRenderedBlocks}>
+				{children}
 			</RenderedRefsContext.Provider>
 		),
-		[ newRenderedBlocks ]
+		[newRenderedBlocks]
 	);
-	return [ hasAlreadyRendered, Provider ];
+	return [hasAlreadyRendered, Provider];
 }

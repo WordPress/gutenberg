@@ -24,7 +24,7 @@ import deprecated from '@wordpress/deprecated';
  *
  * @return {Object} The control descriptor.
  */
-export function apiFetch( request ) {
+export function apiFetch(request) {
 	return {
 		type: 'API_FETCH',
 		request,
@@ -37,13 +37,13 @@ export function apiFetch( request ) {
  *
  * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
-export function select( ...args ) {
-	deprecated( '`select` control in `@wordpress/data-controls`', {
+export function select(...args) {
+	deprecated('`select` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `resolveSelect` control in `@wordpress/data`',
-	} );
+	});
 
-	return dataControls.resolveSelect( ...args );
+	return dataControls.resolveSelect(...args);
 }
 
 /**
@@ -52,13 +52,13 @@ export function select( ...args ) {
  *
  * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
-export function syncSelect( ...args ) {
-	deprecated( '`syncSelect` control in `@wordpress/data-controls`', {
+export function syncSelect(...args) {
+	deprecated('`syncSelect` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `select` control in `@wordpress/data`',
-	} );
+	});
 
-	return dataControls.select( ...args );
+	return dataControls.select(...args);
 }
 
 /**
@@ -67,13 +67,13 @@ export function syncSelect( ...args ) {
  *
  * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
-export function dispatch( ...args ) {
-	deprecated( '`dispatch` control in `@wordpress/data-controls`', {
+export function dispatch(...args) {
+	deprecated('`dispatch` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `dispatch` control in `@wordpress/data`',
-	} );
+	});
 
-	return dataControls.dispatch( ...args );
+	return dataControls.dispatch(...args);
 }
 
 /**
@@ -95,7 +95,7 @@ export function dispatch( ...args ) {
  *
  * @return {Object} The control descriptor.
  */
-export const __unstableAwaitPromise = function ( promise ) {
+export const __unstableAwaitPromise = function (promise) {
 	return {
 		type: 'AWAIT_PROMISE',
 		promise,
@@ -130,8 +130,8 @@ export const __unstableAwaitPromise = function ( promise ) {
  * store.
  */
 export const controls = {
-	AWAIT_PROMISE: ( { promise } ) => promise,
-	API_FETCH( { request } ) {
-		return triggerFetch( request );
+	AWAIT_PROMISE: ({ promise }) => promise,
+	API_FETCH({ request }) {
+		return triggerFetch(request);
 	},
 };

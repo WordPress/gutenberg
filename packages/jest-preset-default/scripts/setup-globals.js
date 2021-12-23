@@ -6,48 +6,46 @@ global.window.tinyMCEPreInit = {
 	baseURL: 'about:blank',
 };
 
-global.window.requestAnimationFrame = function requestAnimationFrame(
-	callback
-) {
+global.window.requestAnimationFrame = function requestAnimationFrame(callback) {
 	// eslint-disable-next-line no-restricted-syntax
-	const randomDelay = Math.round( ( Math.random() * 1_000 ) / 60 );
+	const randomDelay = Math.round((Math.random() * 1_000) / 60);
 
-	return setTimeout( () => callback( Date.now() ), randomDelay );
+	return setTimeout(() => callback(Date.now()), randomDelay);
 };
 
-global.window.cancelAnimationFrame = function cancelAnimationFrame( handle ) {
-	return clearTimeout( handle );
+global.window.cancelAnimationFrame = function cancelAnimationFrame(handle) {
+	return clearTimeout(handle);
 };
 
 // Ignoring `options` argument since we unconditionally schedule this ASAP
-global.window.requestIdleCallback = function requestIdleCallback( callback ) {
+global.window.requestIdleCallback = function requestIdleCallback(callback) {
 	const start = Date.now();
 
 	return setTimeout(
 		() =>
-			callback( {
+			callback({
 				didTimeout: false,
-				timeRemaining: () => Math.max( 0, 50 - ( Date.now() - start ) ),
-			} ),
+				timeRemaining: () => Math.max(0, 50 - (Date.now() - start)),
+			}),
 		0
 	);
 };
 
-global.window.cancelIdleCallback = function cancelIdleCallback( handle ) {
-	return clearTimeout( handle );
+global.window.cancelIdleCallback = function cancelIdleCallback(handle) {
+	return clearTimeout(handle);
 };
 
-global.window.matchMedia = () => ( {
+global.window.matchMedia = () => ({
 	matches: false,
 	addListener: () => {},
 	removeListener: () => {},
-} );
+});
 
 // Setup fake localStorage
 const storage = {};
 global.window.localStorage = {
-	getItem: ( key ) => ( key in storage ? storage[ key ] : null ),
-	setItem: ( key, value ) => ( storage[ key ] = value ),
+	getItem: (key) => (key in storage ? storage[key] : null),
+	setItem: (key, value) => (storage[key] = value),
 };
 
 // UserSettings global

@@ -11,12 +11,12 @@ import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '../../store';
 
 export function useUndoAutomaticChange() {
-	const { didAutomaticChange, getSettings } = useSelect( blockEditorStore );
-	return useRefEffect( ( element ) => {
-		function onKeyDown( event ) {
+	const { didAutomaticChange, getSettings } = useSelect(blockEditorStore);
+	return useRefEffect((element) => {
+		function onKeyDown(event) {
 			const { keyCode } = event;
 
-			if ( event.defaultPrevented ) {
+			if (event.defaultPrevented) {
 				return;
 			}
 
@@ -28,7 +28,7 @@ export function useUndoAutomaticChange() {
 				return;
 			}
 
-			if ( ! didAutomaticChange() ) {
+			if (!didAutomaticChange()) {
 				return;
 			}
 
@@ -36,9 +36,9 @@ export function useUndoAutomaticChange() {
 			getSettings().__experimentalUndo();
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
+		element.addEventListener('keydown', onKeyDown);
 		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
+			element.removeEventListener('keydown', onKeyDown);
 		};
-	}, [] );
+	}, []);
 }

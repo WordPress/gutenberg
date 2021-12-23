@@ -44,7 +44,7 @@ const postTypeEntities = [
 	{ name: 'page', baseURL: '/wp/v2/pages' },
 	{ name: 'attachment', baseURL: '/wp/v2/media' },
 	{ name: 'wp_block', baseURL: '/wp/v2/blocks' },
-].map( ( postTypeEntity ) => ( {
+].map((postTypeEntity) => ({
 	kind: 'postType',
 	...postTypeEntity,
 	transientEdits: {
@@ -54,8 +54,8 @@ const postTypeEntities = [
 	mergedEdits: {
 		meta: true,
 	},
-	rawAttributes: [ 'title', 'excerpt', 'content' ],
-} ) );
+	rawAttributes: ['title', 'excerpt', 'content'],
+}));
 import { EditorHelpTopics } from '@wordpress/editor';
 
 /**
@@ -65,22 +65,18 @@ import EditorProvider from './index.js';
 
 class NativeEditorProvider extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
 		// Keep a local reference to `post` to detect changes
 		this.post = this.props.post;
-		this.props.addEntities( postTypeEntities );
-		this.props.receiveEntityRecords(
-			'postType',
-			this.post.type,
-			this.post
-		);
+		this.props.addEntities(postTypeEntities);
+		this.props.receiveEntityRecords('postType', this.post.type, this.post);
 
 		this.getEditorSettings = memize(
-			( settings, capabilities ) => ( {
+			(settings, capabilities) => ({
 				...settings,
 				capabilities,
-			} ),
+			}),
 			{
 				maxSize: 1,
 			}
@@ -93,15 +89,15 @@ class NativeEditorProvider extends Component {
 	componentDidMount() {
 		const { capabilities, locale, updateSettings } = this.props;
 
-		updateSettings( {
+		updateSettings({
 			...capabilities,
-			...this.getThemeColors( this.props ),
+			...this.getThemeColors(this.props),
 			locale,
-		} );
+		});
 
-		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
+		this.subscriptionParentGetHtml = subscribeParentGetHtml(() => {
 			this.serializeToNativeAction();
-		} );
+		});
 
 		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode(
 			() => {
@@ -109,148 +105,140 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
-		this.subscriptionParentSetTitle = subscribeSetTitle( ( payload ) => {
-			this.props.editTitle( payload.title );
-		} );
+		this.subscriptionParentSetTitle = subscribeSetTitle((payload) => {
+			this.props.editTitle(payload.title);
+		});
 
-		this.subscriptionParentUpdateHtml = subscribeUpdateHtml(
-			( payload ) => {
-				this.updateHtmlAction( payload.html );
-			}
-		);
+		this.subscriptionParentUpdateHtml = subscribeUpdateHtml((payload) => {
+			this.updateHtmlAction(payload.html);
+		});
 
 		this.subscriptionParentReplaceBlock = subscribeReplaceBlock(
-			( payload ) => {
-				this.replaceBlockAction( payload.html, payload.clientId );
+			(payload) => {
+				this.replaceBlockAction(payload.html, payload.clientId);
 			}
 		);
 
-		this.subscriptionParentMediaAppend = subscribeMediaAppend(
-			( payload ) => {
-				const blockName = 'core/' + payload.mediaType;
-				const newBlock = createBlock( blockName, {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image'
-						? 'url'
-						: 'src' ]: payload.mediaUrl,
-				} );
+		this.subscriptionParentMediaAppend = subscribeMediaAppend((payload) => {
+			const blockName = 'core/' + payload.mediaType;
+			const newBlock = createBlock(blockName, {
+				id: payload.mediaId,
+				[payload.mediaType === 'image' ? 'url' : 'src']:
+					payload.mediaUrl,
+			});
 
-				const indexAfterSelected = this.props.selectedBlockIndex + 1;
-				const insertionIndex =
-					indexAfterSelected || this.props.blockCount;
+			const indexAfterSelected = this.props.selectedBlockIndex + 1;
+			const insertionIndex = indexAfterSelected || this.props.blockCount;
 
-				this.props.insertBlock( newBlock, insertionIndex );
-			}
-		);
+			this.props.insertBlock(newBlock, insertionIndex);
+		});
 
-		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
-			( { galleryWithImageBlocks, ...editorSettings } ) => {
-				if ( typeof galleryWithImageBlocks === 'boolean' ) {
-					window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+		this.subscriptionParentUpdateEditorSettings =
+			subscribeUpdateEditorSettings(
+				({ galleryWithImageBlocks, ...editorSettings }) => {
+					if (typeof galleryWithImageBlocks === 'boolean') {
+						window.wp.galleryBlockV2Enabled =
+							galleryWithImageBlocks;
+					}
+					updateSettings(this.getThemeColors(editorSettings));
 				}
-				updateSettings( this.getThemeColors( editorSettings ) );
-			}
-		);
+			);
 
 		this.subscriptionParentUpdateCapabilities = subscribeUpdateCapabilities(
-			( payload ) => {
-				this.updateCapabilitiesAction( payload );
+			(payload) => {
+				this.updateCapabilitiesAction(payload);
 			}
 		);
 
-		this.subscriptionParentShowNotice = subscribeShowNotice(
-			( payload ) => {
-				this.props.createSuccessNotice( payload.message );
-			}
-		);
+		this.subscriptionParentShowNotice = subscribeShowNotice((payload) => {
+			this.props.createSuccessNotice(payload.message);
+		});
 
-		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
-			this.setState( { isHelpVisible: true } );
-		} );
+		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp(() => {
+			this.setState({ isHelpVisible: true });
+		});
 
 		// Request current block impressions from native app
-		requestBlockTypeImpressions( ( storedImpressions ) => {
+		requestBlockTypeImpressions((storedImpressions) => {
 			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
 
 			// Persist impressions to JavaScript store
-			updateSettings( { impressions } );
+			updateSettings({ impressions });
 
 			// Persist impressions to native store if they do not include latest
 			// `NEW_BLOCK_TYPES` configuration
-			const storedImpressionKeys = Object.keys( storedImpressions );
-			const storedImpressionsCurrent = Object.keys(
-				NEW_BLOCK_TYPES
-			).every( ( newKey ) => storedImpressionKeys.includes( newKey ) );
-			if ( ! storedImpressionsCurrent ) {
-				setBlockTypeImpressions( impressions );
+			const storedImpressionKeys = Object.keys(storedImpressions);
+			const storedImpressionsCurrent = Object.keys(NEW_BLOCK_TYPES).every(
+				(newKey) => storedImpressionKeys.includes(newKey)
+			);
+			if (!storedImpressionsCurrent) {
+				setBlockTypeImpressions(impressions);
 			}
-		} );
+		});
 	}
 
 	componentWillUnmount() {
-		if ( this.subscriptionParentGetHtml ) {
+		if (this.subscriptionParentGetHtml) {
 			this.subscriptionParentGetHtml.remove();
 		}
 
-		if ( this.subscriptionParentToggleHTMLMode ) {
+		if (this.subscriptionParentToggleHTMLMode) {
 			this.subscriptionParentToggleHTMLMode.remove();
 		}
 
-		if ( this.subscriptionParentSetTitle ) {
+		if (this.subscriptionParentSetTitle) {
 			this.subscriptionParentSetTitle.remove();
 		}
 
-		if ( this.subscriptionParentUpdateHtml ) {
+		if (this.subscriptionParentUpdateHtml) {
 			this.subscriptionParentUpdateHtml.remove();
 		}
 
-		if ( this.subscriptionParentReplaceBlock ) {
+		if (this.subscriptionParentReplaceBlock) {
 			this.subscriptionParentReplaceBlock.remove();
 		}
 
-		if ( this.subscriptionParentMediaAppend ) {
+		if (this.subscriptionParentMediaAppend) {
 			this.subscriptionParentMediaAppend.remove();
 		}
 
-		if ( this.subscriptionParentUpdateEditorSettings ) {
+		if (this.subscriptionParentUpdateEditorSettings) {
 			this.subscriptionParentUpdateEditorSettings.remove();
 		}
 
-		if ( this.subscriptionParentUpdateCapabilities ) {
+		if (this.subscriptionParentUpdateCapabilities) {
 			this.subscriptionParentUpdateCapabilities.remove();
 		}
 
-		if ( this.subscriptionParentShowNotice ) {
+		if (this.subscriptionParentShowNotice) {
 			this.subscriptionParentShowNotice.remove();
 		}
 
-		if ( this.subscriptionParentShowEditorHelp ) {
+		if (this.subscriptionParentShowEditorHelp) {
 			this.subscriptionParentShowEditorHelp.remove();
 		}
 	}
 
-	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
+	getThemeColors({ colors, gradients, rawStyles, rawFeatures }) {
 		return {
-			...( rawStyles && rawFeatures
-				? getGlobalStyles( rawStyles, rawFeatures )
+			...(rawStyles && rawFeatures
+				? getGlobalStyles(rawStyles, rawFeatures)
 				: {
-						colors: validateThemeColors( colors ),
-						gradients: validateThemeGradients( gradients ),
-				  } ),
+						colors: validateThemeColors(colors),
+						gradients: validateThemeGradients(gradients),
+				  }),
 		};
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( ! prevProps.isReady && this.props.isReady ) {
+	componentDidUpdate(prevProps) {
+		if (!prevProps.isReady && this.props.isReady) {
 			const blocks = this.props.blocks;
-			const isUnsupportedBlock = ( { name } ) =>
+			const isUnsupportedBlock = ({ name }) =>
 				name === getUnregisteredTypeHandlerName();
 			const unsupportedBlockNames = blocks
-				.filter( isUnsupportedBlock )
-				.map( ( block ) => block.attributes.originalName );
-			RNReactNativeGutenbergBridge.editorDidMount(
-				unsupportedBlockNames
-			);
+				.filter(isUnsupportedBlock)
+				.map((block) => block.attributes.originalName);
+			RNReactNativeGutenbergBridge.editorDidMount(unsupportedBlockNames);
 		}
 	}
 
@@ -258,12 +246,12 @@ class NativeEditorProvider extends Component {
 		const title = this.props.title;
 		let html;
 
-		if ( this.props.mode === 'text' ) {
+		if (this.props.mode === 'text') {
 			// The HTMLTextInput component does not update the store when user is doing changes
 			// Let's request the HTML from the component's state directly
-			html = applyFilters( 'native.persist-html' );
+			html = applyFilters('native.persist-html');
 		} else {
-			html = serialize( this.props.blocks );
+			html = serialize(this.props.blocks);
 		}
 
 		const hasChanges =
@@ -275,7 +263,7 @@ class NativeEditorProvider extends Component {
 			html,
 			'characters_including_spaces'
 		);
-		contentInfo.wordCount = wordCount( html, 'words' );
+		contentInfo.wordCount = wordCount(html, 'words');
 		contentInfo.paragraphCount = this.props.paragraphCount;
 		contentInfo.blockCount = this.props.blockCount;
 		RNReactNativeGutenbergBridge.provideToNative_Html(
@@ -285,20 +273,20 @@ class NativeEditorProvider extends Component {
 			contentInfo
 		);
 
-		if ( hasChanges ) {
+		if (hasChanges) {
 			this.post.title.raw = title;
 			this.post.content.raw = html;
 		}
 	}
 
-	updateHtmlAction( html ) {
-		const parsed = parse( html );
-		this.props.resetEditorBlocksWithoutUndoLevel( parsed );
+	updateHtmlAction(html) {
+		const parsed = parse(html);
+		this.props.resetEditorBlocksWithoutUndoLevel(parsed);
 	}
 
-	replaceBlockAction( html, blockClientId ) {
-		const parsed = parse( html );
-		this.props.replaceBlock( blockClientId, parsed );
+	replaceBlockAction(html, blockClientId) {
+		const parsed = parse(html);
+		this.props.replaceBlock(blockClientId, parsed);
 	}
 
 	toggleMode() {
@@ -307,11 +295,11 @@ class NativeEditorProvider extends Component {
 		this.serializeToNativeAction();
 		// make sure to blur the selected block and dismiss the keyboard
 		this.props.clearSelectedBlock();
-		switchMode( mode === 'visual' ? 'text' : 'visual' );
+		switchMode(mode === 'visual' ? 'text' : 'visual');
 	}
 
-	updateCapabilitiesAction( capabilities ) {
-		this.props.updateSettings( capabilities );
+	updateCapabilitiesAction(capabilities) {
+		this.props.updateSettings(capabilities);
 	}
 
 	render() {
@@ -322,68 +310,68 @@ class NativeEditorProvider extends Component {
 			settings,
 			...props
 		} = this.props;
-		const editorSettings = this.getEditorSettings( settings, capabilities );
+		const editorSettings = this.getEditorSettings(settings, capabilities);
 
 		return (
 			<>
 				<EditorProvider
-					post={ this.post }
-					settings={ editorSettings }
-					{ ...props }
+					post={this.post}
+					settings={editorSettings}
+					{...props}
 				>
-					{ children }
+					{children}
 				</EditorProvider>
 				<EditorHelpTopics
-					isVisible={ this.state.isHelpVisible }
-					onClose={ () => this.setState( { isHelpVisible: false } ) }
-					close={ () => this.setState( { isHelpVisible: false } ) }
+					isVisible={this.state.isHelpVisible}
+					onClose={() => this.setState({ isHelpVisible: false })}
+					close={() => this.setState({ isHelpVisible: false })}
 				/>
 			</>
 		);
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
 			getEditedPostAttribute,
 			getEditedPostContent,
-		} = select( 'core/editor' );
-		const { getEditorMode } = select( 'core/edit-post' );
+		} = select('core/editor');
+		const { getEditorMode } = select('core/edit-post');
 
 		const {
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
 			getSettings: getBlockEditorSettings,
-		} = select( blockEditorStore );
+		} = select(blockEditorStore);
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			mode: getEditorMode(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
-			title: getEditedPostAttribute( 'title' ),
+			title: getEditedPostAttribute('title'),
 			getEditedPostContent,
 			getBlockEditorSettings,
-			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
+			selectedBlockIndex: getBlockIndex(selectedBlockClientId),
 			blockCount: getGlobalBlockCount(),
-			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
+			paragraphCount: getGlobalBlockCount('core/paragraph'),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+	}),
+	withDispatch((dispatch) => {
+		const { editPost, resetEditorBlocks } = dispatch('core/editor');
 		const {
 			updateSettings,
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-		} = dispatch( blockEditorStore );
-		const { switchEditorMode } = dispatch( 'core/edit-post' );
-		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
-		const { createSuccessNotice } = dispatch( 'core/notices' );
+		} = dispatch(blockEditorStore);
+		const { switchEditorMode } = dispatch('core/edit-post');
+		const { addEntities, receiveEntityRecords } = dispatch('core');
+		const { createSuccessNotice } = dispatch('core/notices');
 
 		return {
 			updateSettings,
@@ -391,19 +379,19 @@ export default compose( [
 			clearSelectedBlock,
 			insertBlock,
 			createSuccessNotice,
-			editTitle( title ) {
-				editPost( { title } );
+			editTitle(title) {
+				editPost({ title });
 			},
 			receiveEntityRecords,
-			resetEditorBlocksWithoutUndoLevel( blocks ) {
-				resetEditorBlocks( blocks, {
+			resetEditorBlocksWithoutUndoLevel(blocks) {
+				resetEditorBlocks(blocks, {
 					__unstableShouldCreateUndoLevel: false,
-				} );
+				});
 			},
-			switchMode( mode ) {
-				switchEditorMode( mode );
+			switchMode(mode) {
+				switchEditorMode(mode);
 			},
 			replaceBlock,
 		};
-	} ),
-] )( NativeEditorProvider );
+	}),
+])(NativeEditorProvider);

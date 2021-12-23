@@ -16,8 +16,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import EntityRecordItem from './entity-record-item';
 
-function getEntityDescription( entity, length ) {
-	switch ( entity ) {
+function getEntityDescription(entity, length) {
+	switch (entity) {
 		case 'site':
 			return _n(
 				'This change will affect your whole site.',
@@ -32,55 +32,55 @@ function getEntityDescription( entity, length ) {
 			);
 		case 'page':
 		case 'post':
-			return __( 'The following content has been modified.' );
+			return __('The following content has been modified.');
 	}
 }
 
-export default function EntityTypeList( {
+export default function EntityTypeList({
 	list,
 	unselectedEntities,
 	setUnselectedEntities,
 	closePanel,
-} ) {
-	const firstRecord = list[ 0 ];
+}) {
+	const firstRecord = list[0];
 	const entity = useSelect(
-		( select ) =>
-			select( coreStore ).getEntity( firstRecord.kind, firstRecord.name ),
-		[ firstRecord.kind, firstRecord.name ]
+		(select) =>
+			select(coreStore).getEntity(firstRecord.kind, firstRecord.name),
+		[firstRecord.kind, firstRecord.name]
 	);
 	const { name } = firstRecord;
 	const entityLabel =
 		name === 'wp_template_part'
-			? _n( 'Template Part', 'Template Parts', list.length )
+			? _n('Template Part', 'Template Parts', list.length)
 			: entity.label;
 	// Set description based on type of entity.
-	const description = getEntityDescription( name, list.length );
+	const description = getEntityDescription(name, list.length);
 
 	return (
-		<PanelBody title={ entityLabel } initialOpen={ true }>
-			{ description && <PanelRow>{ description }</PanelRow> }
-			{ list.map( ( record ) => {
+		<PanelBody title={entityLabel} initialOpen={true}>
+			{description && <PanelRow>{description}</PanelRow>}
+			{list.map((record) => {
 				return (
 					<EntityRecordItem
-						key={ record.key || record.property }
-						record={ record }
+						key={record.key || record.property}
+						record={record}
 						checked={
-							! some(
+							!some(
 								unselectedEntities,
-								( elt ) =>
+								(elt) =>
 									elt.kind === record.kind &&
 									elt.name === record.name &&
 									elt.key === record.key &&
 									elt.property === record.property
 							)
 						}
-						onChange={ ( value ) =>
-							setUnselectedEntities( record, value )
+						onChange={(value) =>
+							setUnselectedEntities(record, value)
 						}
-						closePanel={ closePanel }
+						closePanel={closePanel}
 					/>
 				);
-			} ) }
+			})}
 		</PanelBody>
 	);
 }

@@ -16,15 +16,12 @@ import { help, lock } from '@wordpress/icons';
  */
 import styles from './editor.scss';
 
-function EditTitle( { getStylesFromColorScheme, title } ) {
+function EditTitle({ getStylesFromColorScheme, title }) {
 	const lockIconStyle = getStylesFromColorScheme(
 		styles.lockIcon,
 		styles.lockIconDark
 	);
-	const titleStyle = getStylesFromColorScheme(
-		styles.title,
-		styles.titleDark
-	);
+	const titleStyle = getStylesFromColorScheme(styles.title, styles.titleDark);
 	const infoIconStyle = getStylesFromColorScheme(
 		styles.infoIcon,
 		styles.infoIconDark
@@ -35,29 +32,29 @@ function EditTitle( { getStylesFromColorScheme, title } ) {
 	);
 
 	return (
-		<View style={ styles.titleContainer }>
-			<View style={ styles.lockIconContainer }>
+		<View style={styles.titleContainer}>
+			<View style={styles.lockIconContainer}>
 				<Icon
-					label={ __( 'Lock icon' ) }
-					icon={ lock }
-					size={ 16 }
-					style={ lockIconStyle }
+					label={__('Lock icon')}
+					icon={lock}
+					size={16}
+					style={lockIconStyle}
 				/>
 			</View>
-			<Text numberOfLines={ 1 } style={ titleStyle }>
-				{ title }
+			<Text numberOfLines={1} style={titleStyle}>
+				{title}
 			</Text>
-			<View style={ styles.helpIconContainer }>
+			<View style={styles.helpIconContainer}>
 				<Icon
-					label={ __( 'Help icon' ) }
-					icon={ help }
-					size={ 20 }
-					style={ infoIconStyle }
+					label={__('Help icon')}
+					icon={help}
+					size={20}
+					style={infoIconStyle}
 				/>
 			</View>
-			<View style={ separatorStyle } />
+			<View style={separatorStyle} />
 		</View>
 	);
 }
 
-export default withPreferredColorScheme( EditTitle );
+export default withPreferredColorScheme(EditTitle);

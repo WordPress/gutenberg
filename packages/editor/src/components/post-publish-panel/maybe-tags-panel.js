@@ -21,27 +21,27 @@ import { store as editorStore } from '../../store';
 
 const TagsPanel = () => {
 	const panelBodyTitle = [
-		__( 'Suggestion:' ),
+		__('Suggestion:'),
 		<span className="editor-post-publish-panel__link" key="label">
-			{ __( 'Add tags' ) }
+			{__('Add tags')}
 		</span>,
 	];
 
 	return (
-		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
+		<PanelBody initialOpen={false} title={panelBodyTitle}>
 			<p>
-				{ __(
+				{__(
 					'Tags help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
-				) }
+				)}
 			</p>
-			<FlatTermSelector slug={ 'post_tag' } />
+			<FlatTermSelector slug={'post_tag'} />
 		</PanelBody>
 	);
 };
 
 class MaybeTagsPanel extends Component {
-	constructor( props ) {
-		super( props );
+	constructor(props) {
+		super(props);
 		this.state = {
 			hadTagsWhenOpeningThePanel: props.hasTags,
 		};
@@ -58,7 +58,7 @@ class MaybeTagsPanel extends Component {
 	 * more than one tag.
 	 */
 	render() {
-		if ( ! this.state.hadTagsWhenOpeningThePanel ) {
+		if (!this.state.hadTagsWhenOpeningThePanel) {
 			return <TagsPanel />;
 		}
 
@@ -67,24 +67,22 @@ class MaybeTagsPanel extends Component {
 }
 
 export default compose(
-	withSelect( ( select ) => {
-		const postType = select( editorStore ).getCurrentPostType();
-		const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
+	withSelect((select) => {
+		const postType = select(editorStore).getCurrentPostType();
+		const tagsTaxonomy = select(coreStore).getTaxonomy('post_tag');
 		const tags =
 			tagsTaxonomy &&
-			select( editorStore ).getEditedPostAttribute(
-				tagsTaxonomy.rest_base
-			);
+			select(editorStore).getEditedPostAttribute(tagsTaxonomy.rest_base);
 		return {
 			areTagsFetched: tagsTaxonomy !== undefined,
 			isPostTypeSupported:
 				tagsTaxonomy &&
-				some( tagsTaxonomy.types, ( type ) => type === postType ),
+				some(tagsTaxonomy.types, (type) => type === postType),
 			hasTags: tags && tags.length,
 		};
-	} ),
+	}),
 	ifCondition(
-		( { areTagsFetched, isPostTypeSupported } ) =>
+		({ areTagsFetched, isPostTypeSupported }) =>
 			isPostTypeSupported && areTagsFetched
 	)
-)( MaybeTagsPanel );
+)(MaybeTagsPanel);

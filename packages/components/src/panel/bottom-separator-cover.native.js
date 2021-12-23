@@ -13,15 +13,15 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './bottom-separator-cover.scss';
 
-function BottomSeparatorCover( { getStylesFromColorScheme } ) {
+function BottomSeparatorCover({ getStylesFromColorScheme }) {
 	return (
 		<View
-			style={ getStylesFromColorScheme(
+			style={getStylesFromColorScheme(
 				styles.coverSeparator,
 				styles.coverSeparatorDark
-			) }
+			)}
 		/>
 	);
 }
 
-export default withPreferredColorScheme( BottomSeparatorCover );
+export default withPreferredColorScheme(BottomSeparatorCover);

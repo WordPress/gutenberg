@@ -9,11 +9,11 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
 import useSaveImage from './use-save-image';
 import useTransformImage from './use-transform-image';
 
-const ImageEditingContext = createContext( {} );
+const ImageEditingContext = createContext({});
 
-export const useImageEditingContext = () => useContext( ImageEditingContext );
+export const useImageEditingContext = () => useContext(ImageEditingContext);
 
-export default function ImageEditingProvider( {
+export default function ImageEditingProvider({
 	id,
 	url,
 	naturalWidth,
@@ -22,7 +22,7 @@ export default function ImageEditingProvider( {
 	onFinishEditing,
 	onSaveImage,
 	children,
-} ) {
+}) {
 	const transformImage = useTransformImage(
 		{
 			url,
@@ -32,25 +32,25 @@ export default function ImageEditingProvider( {
 		isEditing
 	);
 
-	const saveImage = useSaveImage( {
+	const saveImage = useSaveImage({
 		id,
 		url,
 		onSaveImage,
 		onFinishEditing,
 		...transformImage,
-	} );
+	});
 
 	const providerValue = useMemo(
-		() => ( {
+		() => ({
 			...transformImage,
 			...saveImage,
-		} ),
-		[ transformImage, saveImage ]
+		}),
+		[transformImage, saveImage]
 	);
 
 	return (
-		<ImageEditingContext.Provider value={ providerValue }>
-			{ children }
+		<ImageEditingContext.Provider value={providerValue}>
+			{children}
 		</ImageEditingContext.Provider>
 	);
 }

@@ -20,36 +20,36 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @return {string} The class names.
  */
-export function useBlockMovingModeClassNames( clientId ) {
+export function useBlockMovingModeClassNames(clientId) {
 	return useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				hasBlockMovingClientId,
 				canInsertBlockType,
 				getBlockName,
 				getBlockRootClientId,
 				isBlockSelected,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 
 			// The classes are only relevant for the selected block. Avoid
 			// re-rendering all blocks!
-			if ( ! isBlockSelected( clientId ) ) {
+			if (!isBlockSelected(clientId)) {
 				return;
 			}
 
 			const movingClientId = hasBlockMovingClientId();
 
-			if ( ! movingClientId ) {
+			if (!movingClientId) {
 				return;
 			}
 
-			return classnames( 'is-block-moving-mode', {
+			return classnames('is-block-moving-mode', {
 				'can-insert-moving-block': canInsertBlockType(
-					getBlockName( movingClientId ),
-					getBlockRootClientId( clientId )
+					getBlockName(movingClientId),
+					getBlockRootClientId(clientId)
 				),
-			} );
+			});
 		},
-		[ clientId ]
+		[clientId]
 	);
 }

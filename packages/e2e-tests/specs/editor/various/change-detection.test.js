@@ -13,22 +13,22 @@ import {
 	openTypographyToolsPanelMenu,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Change detection', () => {
+describe('Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
 
-	beforeEach( async () => {
+	beforeEach(async () => {
 		hadInterceptedSave = false;
 
 		await createNewPost();
-	} );
+	});
 
-	afterEach( async () => {
-		if ( handleInterceptedRequest ) {
+	afterEach(async () => {
+		if (handleInterceptedRequest) {
 			await releaseSaveIntercept();
 		}
-	} );
+	});
 
-	async function assertIsDirty( isDirty ) {
+	async function assertIsDirty(isDirty) {
 		let hadDialog = false;
 
 		function handleOnDialog() {
@@ -36,218 +36,202 @@ describe( 'Change detection', () => {
 		}
 
 		try {
-			page.on( 'dialog', handleOnDialog );
+			page.on('dialog', handleOnDialog);
 			await page.reload();
 
 			// Ensure whether it was expected that dialog was encountered.
-			expect( hadDialog ).toBe( isDirty );
-		} catch ( error ) {
+			expect(hadDialog).toBe(isDirty);
+		} catch (error) {
 			throw error;
 		} finally {
-			page.removeListener( 'dialog', handleOnDialog );
+			page.removeListener('dialog', handleOnDialog);
 		}
 	}
 
 	async function interceptSave() {
-		await page.setRequestInterception( true );
+		await page.setRequestInterception(true);
 
-		handleInterceptedRequest = ( interceptedRequest ) => {
-			if ( interceptedRequest.url().includes( '/wp/v2/posts' ) ) {
+		handleInterceptedRequest = (interceptedRequest) => {
+			if (interceptedRequest.url().includes('/wp/v2/posts')) {
 				hadInterceptedSave = true;
 			} else {
 				interceptedRequest.continue();
 			}
 		};
-		page.on( 'request', handleInterceptedRequest );
+		page.on('request', handleInterceptedRequest);
 	}
 
 	async function releaseSaveIntercept() {
-		page.removeListener( 'request', handleInterceptedRequest );
-		await page.setRequestInterception( false );
+		page.removeListener('request', handleInterceptedRequest);
+		await page.setRequestInterception(false);
 		hadInterceptedSave = false;
 		handleInterceptedRequest = null;
 	}
 
-	it( 'Should not save on new unsaved post', async () => {
+	it('Should not save on new unsaved post', async () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressKeyWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier('primary', 'S');
 
-		expect( hadInterceptedSave ).toBe( false );
-	} );
+		expect(hadInterceptedSave).toBe(false);
+	});
 
-	it( 'Should autosave post', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should autosave post', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		// Force autosave to occur immediately.
-		await Promise.all( [
-			page.evaluate( () =>
-				window.wp.data.dispatch( 'core/editor' ).autosave()
+		await Promise.all([
+			page.evaluate(() =>
+				window.wp.data.dispatch('core/editor').autosave()
 			),
-			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-		] );
+			page.waitForSelector('.editor-post-saved-state.is-autosaving'),
+			page.waitForSelector('.editor-post-saved-state.is-saved'),
+		]);
 
 		// Autosave draft as same user should do full save, i.e. not dirty.
-		await assertIsDirty( false );
-	} );
+		await assertIsDirty(false);
+	});
 
-	it( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		// Toggle post as needing review (not persisted for autosave).
 		await ensureSidebarOpened();
 
 		const postPendingReviewButton = (
-			await page.$x( "//label[contains(text(), 'Pending review')]" )
-		 )[ 0 ];
-		await postPendingReviewButton.click( 'button' );
+			await page.$x("//label[contains(text(), 'Pending review')]")
+		)[0];
+		await postPendingReviewButton.click('button');
 
 		// Force autosave to occur immediately.
-		await Promise.all( [
-			page.evaluate( () =>
-				window.wp.data.dispatch( 'core/editor' ).autosave()
+		await Promise.all([
+			page.evaluate(() =>
+				window.wp.data.dispatch('core/editor').autosave()
 			),
-			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-		] );
+			page.waitForSelector('.editor-post-saved-state.is-autosaving'),
+			page.waitForSelector('.editor-post-saved-state.is-saved'),
+		]);
 
-		await assertIsDirty( true );
-	} );
+		await assertIsDirty(true);
+	});
 
-	it( 'Should prompt to confirm unsaved changes for autosaved published post', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should prompt to confirm unsaved changes for autosaved published post', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		await publishPost();
 
 		// Close publish panel.
-		await Promise.all( [
+		await Promise.all([
 			page.waitForFunction(
-				() => ! document.querySelector( '.editor-post-publish-panel' )
+				() => !document.querySelector('.editor-post-publish-panel')
 			),
-			page.click( '.editor-post-publish-panel__header button' ),
-		] );
+			page.click('.editor-post-publish-panel__header button'),
+		]);
 
 		// Should be dirty after autosave change of published post.
-		await page.type( '.editor-post-title__input', '!' );
+		await page.type('.editor-post-title__input', '!');
 
-		await Promise.all( [
+		await Promise.all([
 			page.waitForSelector(
 				'.editor-post-publish-button[aria-disabled="true"]'
 			),
 			page.waitForSelector(
 				'.editor-post-publish-button[aria-disabled="false"]'
 			),
-			page.evaluate( () =>
-				window.wp.data.dispatch( 'core/editor' ).autosave()
+			page.evaluate(() =>
+				window.wp.data.dispatch('core/editor').autosave()
 			),
-		] );
+		]);
 
-		await assertIsDirty( true );
-	} );
+		await assertIsDirty(true);
+	});
 
-	it( 'Should not prompt to confirm unsaved changes for new post', async () => {
-		await assertIsDirty( false );
-	} );
+	it('Should not prompt to confirm unsaved changes for new post', async () => {
+		await assertIsDirty(false);
+	});
 
-	it( 'Should prompt to confirm unsaved changes for new post with initial edits', async () => {
-		await createNewPost( {
+	it('Should prompt to confirm unsaved changes for new post with initial edits', async () => {
+		await createNewPost({
 			title: 'My New Post',
 			content: 'My content',
 			excerpt: 'My excerpt',
-		} );
+		});
 
-		await assertIsDirty( true );
-	} );
+		await assertIsDirty(true);
+	});
 
-	it( 'Should prompt if property changed without save', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should prompt if property changed without save', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
-		await assertIsDirty( true );
-	} );
+		await assertIsDirty(true);
+	});
 
-	it( 'Should prompt if content added without save', async () => {
+	it('Should prompt if content added without save', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( 'Paragraph' );
+		await page.keyboard.type('Paragraph');
 
-		await assertIsDirty( true );
-	} );
+		await assertIsDirty(true);
+	});
 
-	it( 'Should not prompt if changes saved', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should not prompt if changes saved', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		await saveDraft();
 
-		await assertIsDirty( false );
-	} );
+		await assertIsDirty(false);
+	});
 
-	it( 'Should not prompt if changes saved right after typing', async () => {
+	it('Should not prompt if changes saved right after typing', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( 'Hello World' );
+		await page.keyboard.type('Hello World');
 
 		await saveDraft();
 
-		await assertIsDirty( false );
-	} );
+		await assertIsDirty(false);
+	});
 
-	it( 'Should not save if all changes saved', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should not save if all changes saved', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		await saveDraft();
 
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressKeyWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier('primary', 'S');
 
-		expect( hadInterceptedSave ).toBe( false );
-	} );
+		expect(hadInterceptedSave).toBe(false);
+	});
 
-	it( 'Should prompt if save failed', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should prompt if save failed', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
-		await page.setOfflineMode( true );
+		await page.setOfflineMode(true);
 
-		await Promise.all( [
+		await Promise.all([
 			// Keyboard shortcut Ctrl+S save.
-			pressKeyWithModifier( 'primary', 'S' ),
+			pressKeyWithModifier('primary', 'S'),
 
 			// Ensure save update fails and presents button.
 			page.waitForXPath(
 				'//*[contains(@class, "components-notice") and contains(@class, "is-error")]/*[text()="Updating failed. You are probably offline."]'
 			),
-			page.waitForSelector( '.editor-post-save-draft' ),
-		] );
+			page.waitForSelector('.editor-post-save-draft'),
+		]);
 
 		// Need to disable offline to allow reload.
-		await page.setOfflineMode( false );
+		await page.setOfflineMode(false);
 
-		await assertIsDirty( true );
+		await assertIsDirty(true);
 
-		expect( console ).toHaveErroredWith(
+		expect(console).toHaveErroredWith(
 			'Failed to load resource: net::ERR_INTERNET_DISCONNECTED'
 		);
-	} );
+	});
 
-	it( 'Should prompt if changes and save is in-flight', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
-
-		// Hold the posts request so we don't deal with race conditions of the
-		// save completing early. Other requests should be allowed to continue,
-		// for example the page reload test.
-		await interceptSave();
-
-		// Keyboard shortcut Ctrl+S save.
-		await pressKeyWithModifier( 'primary', 'S' );
-
-		await assertIsDirty( true );
-
-		await releaseSaveIntercept();
-	} );
-
-	it( 'Should prompt if changes made while save is in-flight', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should prompt if changes and save is in-flight', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		// Hold the posts request so we don't deal with race conditions of the
 		// save completing early. Other requests should be allowed to continue,
@@ -255,25 +239,41 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressKeyWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier('primary', 'S');
 
-		await page.type( '.editor-post-title__input', '!' );
-		await page.waitForSelector( '.editor-post-save-draft' );
+		await assertIsDirty(true);
+
+		await releaseSaveIntercept();
+	});
+
+	it('Should prompt if changes made while save is in-flight', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
+
+		// Hold the posts request so we don't deal with race conditions of the
+		// save completing early. Other requests should be allowed to continue,
+		// for example the page reload test.
+		await interceptSave();
+
+		// Keyboard shortcut Ctrl+S save.
+		await pressKeyWithModifier('primary', 'S');
+
+		await page.type('.editor-post-title__input', '!');
+		await page.waitForSelector('.editor-post-save-draft');
 
 		await releaseSaveIntercept();
 
-		await assertIsDirty( true );
-	} );
+		await assertIsDirty(true);
+	});
 
-	it( 'Should prompt if property changes made while save is in-flight, and save completes', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should prompt if property changes made while save is in-flight, and save completes', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		// Hold the posts request so we don't deal with race conditions of the
 		// save completing early.
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressKeyWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier('primary', 'S');
 
 		// Start this check immediately after save since dirtying the post will
 		// remove the "Saved" with the Save button.
@@ -282,23 +282,23 @@ describe( 'Change detection', () => {
 		);
 
 		// Dirty post while save is in-flight.
-		await page.type( '.editor-post-title__input', '!' );
+		await page.type('.editor-post-title__input', '!');
 
 		// Allow save to complete. Disabling interception flushes pending.
-		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
+		await Promise.all([savedPromise, releaseSaveIntercept()]);
 
-		await assertIsDirty( true );
-	} );
+		await assertIsDirty(true);
+	});
 
-	it( 'Should prompt if block revision is made while save is in-flight, and save completes', async () => {
-		await page.type( '.editor-post-title__input', 'Hello World' );
+	it('Should prompt if block revision is made while save is in-flight, and save completes', async () => {
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		// Hold the posts request so we don't deal with race conditions of the
 		// save completing early.
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressKeyWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier('primary', 'S');
 
 		// Start this check immediately after save since dirtying the post will
 		// remove the "Saved" with the Save button.
@@ -307,18 +307,18 @@ describe( 'Change detection', () => {
 		);
 
 		await clickBlockAppender();
-		await page.keyboard.type( 'Paragraph' );
+		await page.keyboard.type('Paragraph');
 
 		// Allow save to complete. Disabling interception flushes pending.
-		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
+		await Promise.all([savedPromise, releaseSaveIntercept()]);
 
-		await assertIsDirty( true );
-	} );
+		await assertIsDirty(true);
+	});
 
-	it( 'should save posts without titles and persist and overwrite the auto draft title', async () => {
+	it('should save posts without titles and persist and overwrite the auto draft title', async () => {
 		// Enter content.
 		await clickBlockAppender();
-		await page.keyboard.type( 'Paragraph' );
+		await page.keyboard.type('Paragraph');
 
 		// Save
 		await saveDraft();
@@ -327,85 +327,82 @@ describe( 'Change detection', () => {
 		const title = await page.$eval(
 			'.editor-post-title__input',
 			// Trim padding non-breaking space
-			( element ) => element.textContent.trim()
+			(element) => element.textContent.trim()
 		);
-		expect( title ).toBe( '' );
+		expect(title).toBe('');
 
 		// Verify that the post is not dirty.
-		await assertIsDirty( false );
-	} );
+		await assertIsDirty(false);
+	});
 
-	it( 'should not prompt to confirm unsaved changes when trashing an existing post', async () => {
+	it('should not prompt to confirm unsaved changes when trashing an existing post', async () => {
 		// Enter title.
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await page.type('.editor-post-title__input', 'Hello World');
 
 		// Save
 		await saveDraft();
-		const postId = await page.evaluate( () =>
-			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		const postId = await page.evaluate(() =>
+			window.wp.data.select('core/editor').getCurrentPostId()
 		);
 
 		// Trash post.
 		await openDocumentSettingsSidebar();
-		await page.click( '.editor-post-trash.components-button' );
+		await page.click('.editor-post-trash.components-button');
 
-		await Promise.all( [
+		await Promise.all([
 			// Wait for "Saved" to confirm save complete.
-			await page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+			await page.waitForSelector('.editor-post-saved-state.is-saved'),
 
 			// Make sure redirection happens.
 			await page.waitForNavigation(),
-		] );
+		]);
 
 		expect(
-			isCurrentURL(
-				'/wp-admin/edit.php',
-				`post_type=post&ids=${ postId }`
-			)
-		).toBe( true );
-	} );
+			isCurrentURL('/wp-admin/edit.php', `post_type=post&ids=${postId}`)
+		).toBe(true);
+	});
 
-	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
+	it('consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
 		// Open the sidebar block settings.
 		await openDocumentSettingsSidebar();
-		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
+		await page.click('.edit-post-sidebar__panel-tab[data-label="Block"]');
 
 		// Insert a paragraph.
 		await clickBlockAppender();
-		await page.keyboard.type( 'Hello, World!' );
+		await page.keyboard.type('Hello, World!');
 
 		// Save and wait till the post is clean.
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			pressKeyWithModifier( 'primary', 'S' ),
-		] );
+		await Promise.all([
+			page.waitForSelector('.editor-post-saved-state.is-saved'),
+			pressKeyWithModifier('primary', 'S'),
+		]);
 
 		// Change the paragraph's `drop cap`.
-		await page.click( '[data-type="core/paragraph"]' );
+		await page.click('[data-type="core/paragraph"]');
 
 		await openTypographyToolsPanelMenu();
-		await page.click( 'button[aria-label="Show Drop cap"]' );
+		await page.click('button[aria-label="Show Drop cap"]');
 
-		const [ dropCapToggle ] = await page.$x(
+		const [dropCapToggle] = await page.$x(
 			"//label[contains(text(), 'Drop cap')]"
 		);
 		await dropCapToggle.click();
-		await page.click( '[data-type="core/paragraph"]' );
+		await page.click('[data-type="core/paragraph"]');
 
 		// Check that the post is dirty.
-		await page.waitForSelector( '.editor-post-save-draft' );
+		await page.waitForSelector('.editor-post-save-draft');
 
 		// Save and wait till the post is clean.
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			pressKeyWithModifier( 'primary', 'S' ),
-		] );
+		await Promise.all([
+			page.waitForSelector('.editor-post-saved-state.is-saved'),
+			pressKeyWithModifier('primary', 'S'),
+		]);
 
 		// Change the paragraph's `drop cap` again.
-		await page.click( '[data-type="core/paragraph"]' );
+		await page.click('[data-type="core/paragraph"]');
 		await dropCapToggle.click();
 
 		// Check that the post is dirty.
-		await page.waitForSelector( '.editor-post-save-draft' );
-	} );
-} );
+		await page.waitForSelector('.editor-post-save-draft');
+	});
+});

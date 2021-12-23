@@ -22,29 +22,27 @@ import { chevronDown } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function getBlockDisplayText( block ) {
-	if ( block ) {
-		const blockType = getBlockType( block.name );
-		return blockType ? getBlockLabel( blockType, block.attributes ) : null;
+function getBlockDisplayText(block) {
+	if (block) {
+		const blockType = getBlockType(block.name);
+		return blockType ? getBlockLabel(blockType, block.attributes) : null;
 	}
 	return null;
 }
 
 function useSecondaryText() {
-	const { getBlock } = useSelect( blockEditorStore );
+	const { getBlock } = useSelect(blockEditorStore);
 	const activeEntityBlockId = useSelect(
-		( select ) =>
-			select(
-				blockEditorStore
-			).__experimentalGetActiveBlockIdByBlockNames( [
-				'core/template-part',
-			] ),
+		(select) =>
+			select(blockEditorStore).__experimentalGetActiveBlockIdByBlockNames(
+				['core/template-part']
+			),
 		[]
 	);
 
-	if ( activeEntityBlockId ) {
+	if (activeEntityBlockId) {
 		return {
-			label: getBlockDisplayText( getBlock( activeEntityBlockId ) ),
+			label: getBlockDisplayText(getBlock(activeEntityBlockId)),
 			isActive: true,
 		};
 	}
@@ -63,12 +61,12 @@ function useSecondaryText() {
  *                                     information dropdown area. Should be a
  *                                     function which accepts dropdown props.
  */
-export default function DocumentActions( {
+export default function DocumentActions({
 	entityTitle,
 	entityLabel,
 	isLoaded,
 	children: dropdownContent,
-} ) {
+}) {
 	const { label } = useSecondaryText();
 
 	// The title ref is passed to the popover as the anchorRef so that the
@@ -77,31 +75,29 @@ export default function DocumentActions( {
 	const titleRef = useRef();
 
 	// Return a simple loading indicator until we have information to show.
-	if ( ! isLoaded ) {
+	if (!isLoaded) {
 		return (
-			<div className="edit-site-document-actions">
-				{ __( 'Loading…' ) }
-			</div>
+			<div className="edit-site-document-actions">{__('Loading…')}</div>
 		);
 	}
 
 	// Return feedback that the template does not seem to exist.
-	if ( ! entityTitle ) {
+	if (!entityTitle) {
 		return (
 			<div className="edit-site-document-actions">
-				{ __( 'Template not found' ) }
+				{__('Template not found')}
 			</div>
 		);
 	}
 
 	return (
 		<div
-			className={ classnames( 'edit-site-document-actions', {
-				'has-secondary-label': !! label,
-			} ) }
+			className={classnames('edit-site-document-actions', {
+				'has-secondary-label': !!label,
+			})}
 		>
 			<div
-				ref={ titleRef }
+				ref={titleRef}
 				className="edit-site-document-actions__title-wrapper"
 			>
 				<Text
@@ -110,46 +106,46 @@ export default function DocumentActions( {
 					as="h1"
 				>
 					<VisuallyHidden as="span">
-						{ sprintf(
+						{sprintf(
 							/* translators: %s: the entity being edited, like "template"*/
-							__( 'Editing %s: ' ),
+							__('Editing %s: '),
 							entityLabel
-						) }
+						)}
 					</VisuallyHidden>
-					{ entityTitle }
+					{entityTitle}
 				</Text>
 
 				<Text
 					size="body"
 					className="edit-site-document-actions__secondary-item"
 				>
-					{ label ?? '' }
+					{label ?? ''}
 				</Text>
 
-				{ dropdownContent && (
+				{dropdownContent && (
 					<Dropdown
-						popoverProps={ {
+						popoverProps={{
 							anchorRef: titleRef.current,
-						} }
+						}}
 						position="bottom center"
-						renderToggle={ ( { isOpen, onToggle } ) => (
+						renderToggle={({ isOpen, onToggle }) => (
 							<Button
 								className="edit-site-document-actions__get-info"
-								icon={ chevronDown }
-								aria-expanded={ isOpen }
+								icon={chevronDown}
+								aria-expanded={isOpen}
 								aria-haspopup="true"
-								onClick={ onToggle }
-								label={ sprintf(
+								onClick={onToggle}
+								label={sprintf(
 									/* translators: %s: the entity to see details about, like "template"*/
-									__( 'Show %s details' ),
+									__('Show %s details'),
 									entityLabel
-								) }
+								)}
 							/>
-						) }
+						)}
 						contentClassName="edit-site-document-actions__info-dropdown"
-						renderContent={ dropdownContent }
+						renderContent={dropdownContent}
 					/>
-				) }
+				)}
 			</div>
 		</div>
 	);

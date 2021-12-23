@@ -19,44 +19,44 @@ import linkSettingsScreens from './screens';
 const LinkPickerScreen = () => {
 	const navigation = useNavigation();
 	const route = useRoute();
-	const onLinkPicked = ( { url, title } ) => {
-		if ( Platform.OS === 'android' ) {
+	const onLinkPicked = ({ url, title }) => {
+		if (Platform.OS === 'android') {
 			Keyboard.dismiss();
-			delay( () => {
-				navigation.navigate( linkSettingsScreens.settings, {
+			delay(() => {
+				navigation.navigate(linkSettingsScreens.settings, {
 					inputValue: url,
 					text: title,
-				} );
-			}, 100 );
+				});
+			}, 100);
 			return;
 		}
-		navigation.navigate( linkSettingsScreens.settings, {
+		navigation.navigate(linkSettingsScreens.settings, {
 			inputValue: url,
 			text: title,
-		} );
+		});
 	};
 
 	const onCancel = () => {
-		if ( Platform.OS === 'android' ) {
+		if (Platform.OS === 'android') {
 			Keyboard.dismiss();
-			delay( () => {
+			delay(() => {
 				navigation.goBack();
-			}, 100 );
+			}, 100);
 			return;
 		}
 		navigation.goBack();
 	};
 
 	const { inputValue } = route.params;
-	return useMemo( () => {
+	return useMemo(() => {
 		return (
 			<LinkPicker
-				value={ inputValue }
-				onLinkPicked={ onLinkPicked }
-				onCancel={ onCancel }
+				value={inputValue}
+				onLinkPicked={onLinkPicked}
+				onCancel={onCancel}
 			/>
 		);
-	}, [ inputValue ] );
+	}, [inputValue]);
 };
 
 export default LinkPickerScreen;

@@ -26,55 +26,53 @@ export const SidebarInspectorFill = InspectorFill;
 
 export function SidebarComplementaryAreaFills() {
 	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
-		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( STORE_NAME );
+		(select) => {
+			const _sidebar =
+				select(interfaceStore).getActiveComplementaryArea(STORE_NAME);
 			const _isEditorSidebarOpened = [
 				SIDEBAR_BLOCK,
 				SIDEBAR_TEMPLATE,
-			].includes( _sidebar );
+			].includes(_sidebar);
 			return {
 				sidebar: _sidebar,
 				isEditorSidebarOpened: _isEditorSidebarOpened,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
+				hasBlockSelection:
+					!!select(blockEditorStore).getBlockSelectionStart(),
 			};
 		},
 		[]
 	);
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	useEffect( () => {
-		if ( ! isEditorSidebarOpened ) return;
-		if ( hasBlockSelection ) {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+	const { enableComplementaryArea } = useDispatch(interfaceStore);
+	useEffect(() => {
+		if (!isEditorSidebarOpened) return;
+		if (hasBlockSelection) {
+			enableComplementaryArea(STORE_NAME, SIDEBAR_BLOCK);
 		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
+			enableComplementaryArea(STORE_NAME, SIDEBAR_TEMPLATE);
 		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+	}, [hasBlockSelection, isEditorSidebarOpened]);
 	let sidebarName = sidebar;
-	if ( ! isEditorSidebarOpened ) {
+	if (!isEditorSidebarOpened) {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
 	}
 	return (
 		<>
 			<DefaultSidebar
-				identifier={ sidebarName }
-				title={ __( 'Settings' ) }
-				icon={ cog }
-				closeLabel={ __( 'Close settings sidebar' ) }
-				header={ <SettingsHeader sidebarName={ sidebarName } /> }
+				identifier={sidebarName}
+				title={__('Settings')}
+				icon={cog}
+				closeLabel={__('Close settings sidebar')}
+				header={<SettingsHeader sidebarName={sidebarName} />}
 				headerClassName="edit-site-sidebar__panel-tabs"
 			>
-				{ sidebarName === SIDEBAR_TEMPLATE && (
+				{sidebarName === SIDEBAR_TEMPLATE && (
 					<PanelBody>
 						<TemplateCard />
 					</PanelBody>
-				) }
-				{ sidebarName === SIDEBAR_BLOCK && (
+				)}
+				{sidebarName === SIDEBAR_BLOCK && (
 					<InspectorSlot bubblesVirtually />
-				) }
+				)}
 			</DefaultSidebar>
 			<GlobalStylesSidebar />
 		</>

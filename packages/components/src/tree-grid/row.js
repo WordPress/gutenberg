@@ -15,17 +15,17 @@ function TreeGridRow(
 		//
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<tr
-			{ ...props }
-			ref={ ref }
+			{...props}
+			ref={ref}
 			role="row"
-			aria-level={ level }
-			aria-posinset={ positionInSet }
-			aria-setsize={ setSize }
-			aria-expanded={ isExpanded }
+			aria-level={level}
+			aria-posinset={positionInSet}
+			aria-setsize={setSize}
+			aria-expanded={isExpanded}
 		>
-			{ children }
+			{children}
 		</tr>
 	);
 }
 
-export default forwardRef( TreeGridRow );
+export default forwardRef(TreeGridRow);

@@ -13,28 +13,28 @@ import {
 import { store as editPostStore } from '../../../store';
 
 export default function TemplateDescription() {
-	const { description, title } = useSelect( ( select ) => {
-		const { getEditedPostTemplate } = select( editPostStore );
+	const { description, title } = useSelect((select) => {
+		const { getEditedPostTemplate } = select(editPostStore);
 		return {
 			title: getEditedPostTemplate().title,
 			description: getEditedPostTemplate().description,
 		};
-	}, [] );
-	if ( ! description ) {
+	}, []);
+	if (!description) {
 		return null;
 	}
 	return (
 		<>
-			<Heading level={ 4 } weight={ 600 }>
-				{ title }
+			<Heading level={4} weight={600}>
+				{title}
 			</Heading>
 			<Text
 				className="edit-post-template-details__description"
 				size="body"
 				as="p"
-				style={ { marginTop: '12px' } }
+				style={{ marginTop: '12px' }}
 			>
-				{ description }
+				{description}
 			</Text>
 		</>
 	);

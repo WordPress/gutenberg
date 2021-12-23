@@ -1,28 +1,28 @@
 /**
  * External dependencies
  */
-const { includes } = require( 'lodash' );
-const { ConcatSource } = require( 'webpack-sources' );
+const { includes } = require('lodash');
+const { ConcatSource } = require('webpack-sources');
 
 module.exports = class LibraryExportDefaultPlugin {
-	constructor( entryPointNames ) {
+	constructor(entryPointNames) {
 		this.entryPointNames = entryPointNames;
 	}
 
-	apply( compiler ) {
+	apply(compiler) {
 		compiler.hooks.compilation.tap(
 			'LibraryExportDefaultPlugin',
-			( compilation ) => {
+			(compilation) => {
 				const { mainTemplate, chunkTemplate } = compilation;
 
-				const onRenderWithEntry = ( source, chunk ) => {
-					if ( ! includes( this.entryPointNames, chunk.name ) ) {
+				const onRenderWithEntry = (source, chunk) => {
+					if (!includes(this.entryPointNames, chunk.name)) {
 						return source;
 					}
-					return new ConcatSource( source, '["default"]' );
+					return new ConcatSource(source, '["default"]');
 				};
 
-				for ( const template of [ mainTemplate, chunkTemplate ] ) {
+				for (const template of [mainTemplate, chunkTemplate]) {
 					template.hooks.renderWithEntry.tap(
 						'LibraryExportDefaultPlugin',
 						onRenderWithEntry
@@ -31,9 +31,9 @@ module.exports = class LibraryExportDefaultPlugin {
 
 				mainTemplate.hooks.hash.tap(
 					'LibraryExportDefaultPlugin',
-					( hash ) => {
-						hash.update( 'export property' );
-						hash.update( 'default' );
+					(hash) => {
+						hash.update('export property');
+						hash.update('default');
 					}
 				);
 			}

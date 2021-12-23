@@ -12,15 +12,15 @@ import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuideMenuItem() {
 	const isTemplateMode = useSelect(
-		( select ) => select( editPostStore ).isEditingTemplate(),
+		(select) => select(editPostStore).isEditingTemplate(),
 		[]
 	);
 
 	return (
 		<MoreMenuFeatureToggle
 			scope="core/edit-post"
-			feature={ isTemplateMode ? 'welcomeGuideTemplate' : 'welcomeGuide' }
-			label={ __( 'Welcome Guide' ) }
+			feature={isTemplateMode ? 'welcomeGuideTemplate' : 'welcomeGuide'}
+			label={__('Welcome Guide')}
 		/>
 	);
 }

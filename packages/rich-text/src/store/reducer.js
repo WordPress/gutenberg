@@ -16,18 +16,18 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export function formatTypes( state = {}, action ) {
-	switch ( action.type ) {
+export function formatTypes(state = {}, action) {
+	switch (action.type) {
 		case 'ADD_FORMAT_TYPES':
 			return {
 				...state,
-				...keyBy( action.formatTypes, 'name' ),
+				...keyBy(action.formatTypes, 'name'),
 			};
 		case 'REMOVE_FORMAT_TYPES':
-			return omit( state, action.names );
+			return omit(state, action.names);
 	}
 
 	return state;
 }
 
-export default combineReducers( { formatTypes } );
+export default combineReducers({ formatTypes });

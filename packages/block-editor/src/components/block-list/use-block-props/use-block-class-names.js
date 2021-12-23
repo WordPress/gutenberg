@@ -21,9 +21,9 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @return {string} The class names.
  */
-export function useBlockClassNames( clientId ) {
+export function useBlockClassNames(clientId) {
 	return useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				isBlockBeingDragged,
 				isBlockHighlighted,
@@ -33,15 +33,16 @@ export function useBlockClassNames( clientId ) {
 				getSettings,
 				hasSelectedInnerBlock,
 				isTyping,
-				__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
-			} = select( blockEditorStore );
+				__experimentalGetActiveBlockIdByBlockNames:
+					getActiveBlockIdByBlockNames,
+			} = select(blockEditorStore);
 			const {
 				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
 				outlineMode,
 			} = getSettings();
-			const isDragging = isBlockBeingDragged( clientId );
-			const isSelected = isBlockSelected( clientId );
-			const name = getBlockName( clientId );
+			const isDragging = isBlockBeingDragged(clientId);
+			const isSelected = isBlockSelected(clientId);
+			const name = getBlockName(clientId);
 			const checkDeep = true;
 			// "ancestor" is the more appropriate label due to "deep" check
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
@@ -51,19 +52,19 @@ export function useBlockClassNames( clientId ) {
 			const activeEntityBlockId = getActiveBlockIdByBlockNames(
 				spotlightEntityBlocks
 			);
-			return classnames( {
+			return classnames({
 				'is-selected': isSelected,
-				'is-highlighted': isBlockHighlighted( clientId ),
-				'is-multi-selected': isBlockMultiSelected( clientId ),
-				'is-reusable': isReusableBlock( getBlockType( name ) ),
+				'is-highlighted': isBlockHighlighted(clientId),
+				'is-multi-selected': isBlockMultiSelected(clientId),
+				'is-reusable': isReusableBlock(getBlockType(name)),
 				'is-dragging': isDragging,
 				'has-child-selected': isAncestorOfSelectedBlock,
 				'has-active-entity': activeEntityBlockId,
 				// Determine if there is an active entity area to spotlight.
 				'is-active-entity': activeEntityBlockId === clientId,
 				'remove-outline': isSelected && outlineMode && isTyping(),
-			} );
+			});
 		},
-		[ clientId ]
+		[clientId]
 	);
 }

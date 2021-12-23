@@ -1,3 +1,3 @@
-export default function StyleProvider( { children } ) {
+export default function StyleProvider({ children }) {
 	return children;
 }

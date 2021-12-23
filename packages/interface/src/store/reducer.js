@@ -20,19 +20,16 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export function singleEnableItems(
-	state = {},
-	{ type, itemType, scope, item }
-) {
-	if ( type !== 'SET_SINGLE_ENABLE_ITEM' || ! itemType || ! scope ) {
+export function singleEnableItems(state = {}, { type, itemType, scope, item }) {
+	if (type !== 'SET_SINGLE_ENABLE_ITEM' || !itemType || !scope) {
 		return state;
 	}
 
 	return {
 		...state,
-		[ itemType ]: {
-			...state[ itemType ],
-			[ scope ]: item || null,
+		[itemType]: {
+			...state[itemType],
+			[scope]: item || null,
 		},
 	};
 }
@@ -56,23 +53,23 @@ export function multipleEnableItems(
 ) {
 	if (
 		type !== 'SET_MULTIPLE_ENABLE_ITEM' ||
-		! itemType ||
-		! scope ||
-		! item ||
-		get( state, [ itemType, scope, item ] ) === isEnable
+		!itemType ||
+		!scope ||
+		!item ||
+		get(state, [itemType, scope, item]) === isEnable
 	) {
 		return state;
 	}
-	const currentTypeState = state[ itemType ] || {};
-	const currentScopeState = currentTypeState[ scope ] || {};
+	const currentTypeState = state[itemType] || {};
+	const currentScopeState = currentTypeState[scope] || {};
 
 	return {
 		...state,
-		[ itemType ]: {
+		[itemType]: {
 			...currentTypeState,
-			[ scope ]: {
+			[scope]: {
 				...currentScopeState,
-				[ item ]: isEnable || false,
+				[item]: isEnable || false,
 			},
 		},
 	};
@@ -89,14 +86,14 @@ export function multipleEnableItems(
  *
  * @return {Object} Updated state.
  */
-export const preferenceDefaults = combineReducers( {
-	features( state = {}, action ) {
-		if ( action.type === 'SET_FEATURE_DEFAULTS' ) {
+export const preferenceDefaults = combineReducers({
+	features(state = {}, action) {
+		if (action.type === 'SET_FEATURE_DEFAULTS') {
 			const { scope, defaults } = action;
 			return {
 				...state,
-				[ scope ]: {
-					...state[ scope ],
+				[scope]: {
+					...state[scope],
 					...defaults,
 				},
 			};
@@ -104,7 +101,7 @@ export const preferenceDefaults = combineReducers( {
 
 		return state;
 	},
-} );
+});
 
 /**
  * Reducer returning the user preferences.
@@ -114,30 +111,30 @@ export const preferenceDefaults = combineReducers( {
  *
  * @return {Object} Updated state.
  */
-export const preferences = combineReducers( {
-	features( state = {}, action ) {
-		if ( action.type === 'SET_FEATURE_VALUE' ) {
+export const preferences = combineReducers({
+	features(state = {}, action) {
+		if (action.type === 'SET_FEATURE_VALUE') {
 			const { scope, featureName, value } = action;
 			return {
 				...state,
-				[ scope ]: {
-					...state[ scope ],
-					[ featureName ]: value,
+				[scope]: {
+					...state[scope],
+					[featureName]: value,
 				},
 			};
 		}
 
 		return state;
 	},
-} );
+});
 
-const enableItems = combineReducers( {
+const enableItems = combineReducers({
 	singleEnableItems,
 	multipleEnableItems,
-} );
+});
 
-export default combineReducers( {
+export default combineReducers({
 	enableItems,
 	preferenceDefaults,
 	preferences,
-} );
+});

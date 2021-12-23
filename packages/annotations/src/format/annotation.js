@@ -19,15 +19,15 @@ import { STORE_NAME } from '../store/constants';
  * @param {Array}  annotations The annotation to apply.
  * @return {Object} A record with the annotations applied.
  */
-export function applyAnnotations( record, annotations = [] ) {
-	annotations.forEach( ( annotation ) => {
+export function applyAnnotations(record, annotations = []) {
+	annotations.forEach((annotation) => {
 		let { start, end } = annotation;
 
-		if ( start > record.text.length ) {
+		if (start > record.text.length) {
 			start = record.text.length;
 		}
 
-		if ( end > record.text.length ) {
+		if (end > record.text.length) {
 			end = record.text.length;
 		}
 
@@ -46,7 +46,7 @@ export function applyAnnotations( record, annotations = [] ) {
 			start,
 			end
 		);
-	} );
+	});
 
 	return record;
 }
@@ -57,8 +57,8 @@ export function applyAnnotations( record, annotations = [] ) {
  * @param {Object} record Record to remove annotations from.
  * @return {Object} The cleaned record.
  */
-export function removeAnnotations( record ) {
-	return removeFormat( record, 'core/annotation', 0, record.text.length );
+export function removeAnnotations(record) {
+	return removeFormat(record, 'core/annotation', 0, record.text.length);
 }
 
 /**
@@ -67,20 +67,20 @@ export function removeAnnotations( record ) {
  * @param {Array} formats Formats with annotations in there.
  * @return {Object} ID keyed positions of annotations.
  */
-function retrieveAnnotationPositions( formats ) {
+function retrieveAnnotationPositions(formats) {
 	const positions = {};
 
-	formats.forEach( ( characterFormats, i ) => {
+	formats.forEach((characterFormats, i) => {
 		characterFormats = characterFormats || [];
 		characterFormats = characterFormats.filter(
-			( format ) => format.type === FORMAT_NAME
+			(format) => format.type === FORMAT_NAME
 		);
-		characterFormats.forEach( ( format ) => {
+		characterFormats.forEach((format) => {
 			let { id } = format.attributes;
-			id = id.replace( ANNOTATION_ATTRIBUTE_PREFIX, '' );
+			id = id.replace(ANNOTATION_ATTRIBUTE_PREFIX, '');
 
-			if ( ! positions.hasOwnProperty( id ) ) {
-				positions[ id ] = {
+			if (!positions.hasOwnProperty(id)) {
+				positions[id] = {
 					start: i,
 				};
 			}
@@ -88,9 +88,9 @@ function retrieveAnnotationPositions( formats ) {
 			// Annotations refer to positions between characters.
 			// Formats refer to the character themselves.
 			// So we need to adjust for that here.
-			positions[ id ].end = i + 1;
-		} );
-	} );
+			positions[id].end = i + 1;
+		});
+	});
 
 	return positions;
 }
@@ -109,30 +109,30 @@ function updateAnnotationsWithPositions(
 	positions,
 	{ removeAnnotation, updateAnnotationRange }
 ) {
-	annotations.forEach( ( currentAnnotation ) => {
-		const position = positions[ currentAnnotation.id ];
+	annotations.forEach((currentAnnotation) => {
+		const position = positions[currentAnnotation.id];
 		// If we cannot find an annotation, delete it.
-		if ( ! position ) {
+		if (!position) {
 			// Apparently the annotation has been removed, so remove it from the state:
 			// Remove...
-			removeAnnotation( currentAnnotation.id );
+			removeAnnotation(currentAnnotation.id);
 			return;
 		}
 
 		const { start, end } = currentAnnotation;
-		if ( start !== position.start || end !== position.end ) {
+		if (start !== position.start || end !== position.end) {
 			updateAnnotationRange(
 				currentAnnotation.id,
 				position.start,
 				position.end
 			);
 		}
-	} );
+	});
 }
 
 export const annotation = {
 	name: FORMAT_NAME,
-	title: __( 'Annotation' ),
+	title: __('Annotation'),
 	tagName: 'mark',
 	className: 'annotation-text',
 	attributes: {
@@ -155,38 +155,35 @@ export const annotation = {
 			),
 		};
 	},
-	__experimentalCreatePrepareEditableTree( { annotations } ) {
-		return ( formats, text ) => {
-			if ( annotations.length === 0 ) {
+	__experimentalCreatePrepareEditableTree({ annotations }) {
+		return (formats, text) => {
+			if (annotations.length === 0) {
 				return formats;
 			}
 
 			let record = { formats, text };
-			record = applyAnnotations( record, annotations );
+			record = applyAnnotations(record, annotations);
 			return record.formats;
 		};
 	},
-	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
+	__experimentalGetPropsForEditableTreeChangeHandler(dispatch) {
 		return {
-			removeAnnotation: dispatch( STORE_NAME )
-				.__experimentalRemoveAnnotation,
-			updateAnnotationRange: dispatch( STORE_NAME )
-				.__experimentalUpdateAnnotationRange,
+			removeAnnotation:
+				dispatch(STORE_NAME).__experimentalRemoveAnnotation,
+			updateAnnotationRange:
+				dispatch(STORE_NAME).__experimentalUpdateAnnotationRange,
 		};
 	},
-	__experimentalCreateOnChangeEditableValue( props ) {
-		return ( formats ) => {
-			const positions = retrieveAnnotationPositions( formats );
-			const {
-				removeAnnotation,
-				updateAnnotationRange,
-				annotations,
-			} = props;
+	__experimentalCreateOnChangeEditableValue(props) {
+		return (formats) => {
+			const positions = retrieveAnnotationPositions(formats);
+			const { removeAnnotation, updateAnnotationRange, annotations } =
+				props;
 
-			updateAnnotationsWithPositions( annotations, positions, {
+			updateAnnotationsWithPositions(annotations, positions, {
 				removeAnnotation,
 				updateAnnotationRange,
-			} );
+			});
 		};
 	},
 };

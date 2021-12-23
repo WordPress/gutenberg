@@ -10,7 +10,7 @@ import SidebarAdapter from '../components/sidebar-block-editor/sidebar-adapter';
 import getInserterOuterSection from './inserter-outer-section';
 import { store as customizeWidgetsStore } from '../store';
 
-const getInserterId = ( controlId ) => `widgets-inserter-${ controlId }`;
+const getInserterId = (controlId) => `widgets-inserter-${controlId}`;
 
 export default function getSidebarControl() {
 	const {
@@ -18,8 +18,8 @@ export default function getSidebarControl() {
 	} = window;
 
 	return class SidebarControl extends customize.Control {
-		constructor( ...args ) {
-			super( ...args );
+		constructor(...args) {
+			super(...args);
 
 			this.subscribers = new Set();
 		}
@@ -27,37 +27,35 @@ export default function getSidebarControl() {
 		ready() {
 			const InserterOuterSection = getInserterOuterSection();
 			this.inserter = new InserterOuterSection(
-				getInserterId( this.id ),
+				getInserterId(this.id),
 				{}
 			);
-			customize.section.add( this.inserter );
+			customize.section.add(this.inserter);
 
-			this.sectionInstance = customize.section( this.section() );
+			this.sectionInstance = customize.section(this.section());
 
 			this.inspector = this.sectionInstance.inspector;
 
-			this.sidebarAdapter = new SidebarAdapter( this.setting, customize );
+			this.sidebarAdapter = new SidebarAdapter(this.setting, customize);
 		}
 
-		subscribe( callback ) {
-			this.subscribers.add( callback );
+		subscribe(callback) {
+			this.subscribers.add(callback);
 
 			return () => {
-				this.subscribers.delete( callback );
+				this.subscribers.delete(callback);
 			};
 		}
 
-		onChangeSectionExpanded( expanded, args ) {
-			if ( ! args.unchanged ) {
+		onChangeSectionExpanded(expanded, args) {
+			if (!args.unchanged) {
 				// Close the inserter when the section collapses.
-				if ( ! expanded ) {
-					dispatch( customizeWidgetsStore ).setIsInserterOpened(
-						false
-					);
+				if (!expanded) {
+					dispatch(customizeWidgetsStore).setIsInserterOpened(false);
 				}
 
-				this.subscribers.forEach( ( subscriber ) =>
-					subscriber( expanded, args )
+				this.subscribers.forEach((subscriber) =>
+					subscriber(expanded, args)
 				);
 			}
 		}

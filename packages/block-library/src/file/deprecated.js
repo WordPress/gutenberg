@@ -52,7 +52,7 @@ const deprecated = [
 			anchor: true,
 			align: true,
 		},
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				href,
 				fileName,
@@ -64,55 +64,53 @@ const deprecated = [
 				previewHeight,
 			} = attributes;
 
-			const pdfEmbedLabel = RichText.isEmpty( fileName )
-				? __( 'PDF embed' )
+			const pdfEmbedLabel = RichText.isEmpty(fileName)
+				? __('PDF embed')
 				: sprintf(
 						/* translators: %s: filename. */
-						__( 'Embed of %s.' ),
+						__('Embed of %s.'),
 						fileName
 				  );
 
 			return (
 				href && (
-					<div { ...useBlockProps.save() }>
-						{ displayPreview && (
+					<div {...useBlockProps.save()}>
+						{displayPreview && (
 							<>
 								<object
 									className="wp-block-file__embed"
-									data={ href }
+									data={href}
 									type="application/pdf"
-									style={ {
+									style={{
 										width: '100%',
-										height: `${ previewHeight }px`,
-									} }
-									aria-label={ pdfEmbedLabel }
+										height: `${previewHeight}px`,
+									}}
+									aria-label={pdfEmbedLabel}
 								/>
 							</>
-						) }
-						{ ! RichText.isEmpty( fileName ) && (
+						)}
+						{!RichText.isEmpty(fileName) && (
 							<a
-								href={ textLinkHref }
-								target={ textLinkTarget }
+								href={textLinkHref}
+								target={textLinkTarget}
 								rel={
 									textLinkTarget
 										? 'noreferrer noopener'
 										: undefined
 								}
 							>
-								<RichText.Content value={ fileName } />
+								<RichText.Content value={fileName} />
 							</a>
-						) }
-						{ showDownloadButton && (
+						)}
+						{showDownloadButton && (
 							<a
-								href={ href }
+								href={href}
 								className="wp-block-file__button"
-								download={ true }
+								download={true}
 							>
-								<RichText.Content
-									value={ downloadButtonText }
-								/>
+								<RichText.Content value={downloadButtonText} />
 							</a>
-						) }
+						)}
 					</div>
 				)
 			);

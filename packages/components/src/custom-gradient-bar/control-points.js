@@ -36,70 +36,70 @@ import {
 	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
 
-function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
-	const instanceId = useInstanceId( ControlPointButton );
-	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
+function ControlPointButton({ isOpen, position, color, ...additionalProps }) {
+	const instanceId = useInstanceId(ControlPointButton);
+	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${instanceId}`;
 	return (
 		<>
 			<Button
-				aria-label={ sprintf(
+				aria-label={sprintf(
 					// translators: %1$s: gradient position e.g: 70, %2$s: gradient color code e.g: rgb(52,121,151).
 					__(
 						'Gradient control point at position %1$s%% with color code %2$s.'
 					),
 					position,
 					color
-				) }
-				aria-describedby={ descriptionId }
+				)}
+				aria-describedby={descriptionId}
 				aria-haspopup="true"
-				aria-expanded={ isOpen }
-				className={ classnames(
+				aria-expanded={isOpen}
+				className={classnames(
 					'components-custom-gradient-picker__control-point-button',
 					{
 						'is-active': isOpen,
 					}
-				) }
-				style={ {
-					left: `${ position }%`,
-				} }
-				{ ...additionalProps }
+				)}
+				style={{
+					left: `${position}%`,
+				}}
+				{...additionalProps}
 			/>
-			<VisuallyHidden id={ descriptionId }>
-				{ __(
+			<VisuallyHidden id={descriptionId}>
+				{__(
 					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
-				) }
+				)}
 			</VisuallyHidden>
 		</>
 	);
 }
 
-function GradientColorPickerDropdown( {
+function GradientColorPickerDropdown({
 	isRenderedInSidebar,
 	gradientPickerDomRef,
 	...props
-} ) {
-	const popoverProps = useMemo( () => {
+}) {
+	const popoverProps = useMemo(() => {
 		const result = {
 			className:
 				'components-custom-gradient-picker__color-picker-popover',
 			position: 'top',
 		};
-		if ( isRenderedInSidebar ) {
+		if (isRenderedInSidebar) {
 			result.anchorRef = gradientPickerDomRef.current;
 			result.position = isRTL() ? 'bottom right' : 'bottom left';
 		}
 		return result;
-	}, [ gradientPickerDomRef.current, isRenderedInSidebar ] );
+	}, [gradientPickerDomRef.current, isRenderedInSidebar]);
 	return (
 		<CustomColorPickerDropdown
-			isRenderedInSidebar={ isRenderedInSidebar }
-			popoverProps={ popoverProps }
-			{ ...props }
+			isRenderedInSidebar={isRenderedInSidebar}
+			popoverProps={popoverProps}
+			{...props}
 		/>
 	);
 }
 
-function ControlPoints( {
+function ControlPoints({
 	disableRemove,
 	disableAlpha,
 	gradientPickerDomRef,
@@ -109,30 +109,27 @@ function ControlPoints( {
 	onStartControlPointChange,
 	onStopControlPointChange,
 	__experimentalIsRenderedInSidebar,
-} ) {
+}) {
 	const controlPointMoveState = useRef();
 
-	const onMouseMove = ( event ) => {
+	const onMouseMove = (event) => {
 		const relativePosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientPickerDomRef.current,
 			GRADIENT_MARKERS_WIDTH
 		);
-		const {
-			initialPosition,
-			index,
-			significantMoveHappened,
-		} = controlPointMoveState.current;
+		const { initialPosition, index, significantMoveHappened } =
+			controlPointMoveState.current;
 		if (
-			! significantMoveHappened &&
-			Math.abs( initialPosition - relativePosition ) >=
+			!significantMoveHappened &&
+			Math.abs(initialPosition - relativePosition) >=
 				MINIMUM_SIGNIFICANT_MOVE
 		) {
 			controlPointMoveState.current.significantMoveHappened = true;
 		}
 
 		onChange(
-			updateControlPointPosition( controlPoints, index, relativePosition )
+			updateControlPointPosition(controlPoints, index, relativePosition)
 		);
 	};
 
@@ -143,32 +140,32 @@ function ControlPoints( {
 			controlPointMoveState.current &&
 			controlPointMoveState.current.listenersActivated
 		) {
-			window.removeEventListener( 'mousemove', onMouseMove );
-			window.removeEventListener( 'mouseup', cleanEventListeners );
+			window.removeEventListener('mousemove', onMouseMove);
+			window.removeEventListener('mouseup', cleanEventListeners);
 			onStopControlPointChange();
 			controlPointMoveState.current.listenersActivated = false;
 		}
 	};
 
-	useEffect( () => {
+	useEffect(() => {
 		return () => {
 			cleanEventListeners();
 		};
-	}, [] );
+	}, []);
 
-	return controlPoints.map( ( point, index ) => {
+	return controlPoints.map((point, index) => {
 		const initialPosition = point?.position;
 		return (
 			ignoreMarkerPosition !== initialPosition && (
 				<GradientColorPickerDropdown
-					gradientPickerDomRef={ gradientPickerDomRef }
-					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
-					key={ index }
-					onClose={ onStopControlPointChange }
-					renderToggle={ ( { isOpen, onToggle } ) => (
+					gradientPickerDomRef={gradientPickerDomRef}
+					isRenderedInSidebar={__experimentalIsRenderedInSidebar}
+					key={index}
+					onClose={onStopControlPointChange}
+					renderToggle={({ isOpen, onToggle }) => (
 						<ControlPointButton
-							key={ index }
-							onClick={ () => {
+							key={index}
+							onClick={() => {
 								if (
 									controlPointMoveState.current &&
 									controlPointMoveState.current
@@ -176,15 +173,15 @@ function ControlPoints( {
 								) {
 									return;
 								}
-								if ( isOpen ) {
+								if (isOpen) {
 									onStopControlPointChange();
 								} else {
 									onStartControlPointChange();
 								}
 								onToggle();
-							} }
-							onMouseDown={ () => {
-								if ( window && window.addEventListener ) {
+							}}
+							onMouseDown={() => {
+								if (window && window.addEventListener) {
 									controlPointMoveState.current = {
 										initialPosition,
 										index,
@@ -201,9 +198,9 @@ function ControlPoints( {
 										cleanEventListeners
 									);
 								}
-							} }
-							onKeyDown={ ( event ) => {
-								if ( event.keyCode === LEFT ) {
+							}}
+							onKeyDown={(event) => {
+								if (event.keyCode === LEFT) {
 									// Stop propagation of the key press event to avoid focus moving
 									// to another editor area.
 									event.stopPropagation();
@@ -217,7 +214,7 @@ function ControlPoints( {
 											)
 										)
 									);
-								} else if ( event.keyCode === RIGHT ) {
+								} else if (event.keyCode === RIGHT) {
 									// Stop propagation of the key press event to avoid focus moving
 									// to another editor area.
 									event.stopPropagation();
@@ -232,31 +229,31 @@ function ControlPoints( {
 										)
 									);
 								}
-							} }
-							isOpen={ isOpen }
-							position={ point.position }
-							color={ point.color }
+							}}
+							isOpen={isOpen}
+							position={point.position}
+							color={point.color}
 						/>
-					) }
-					renderContent={ ( { onClose } ) => (
+					)}
+					renderContent={({ onClose }) => (
 						<>
 							<ColorPicker
-								enableAlpha={ ! disableAlpha }
-								color={ point.color }
-								onChange={ ( color ) => {
+								enableAlpha={!disableAlpha}
+								color={point.color}
+								onChange={(color) => {
 									onChange(
 										updateControlPointColor(
 											controlPoints,
 											index,
-											colord( color ).toRgbString()
+											colord(color).toRgbString()
 										)
 									);
-								} }
+								}}
 							/>
-							{ ! disableRemove && controlPoints.length > 2 && (
+							{!disableRemove && controlPoints.length > 2 && (
 								<Button
 									className="components-custom-gradient-picker__remove-control-point"
-									onClick={ () => {
+									onClick={() => {
 										onChange(
 											removeControlPoint(
 												controlPoints,
@@ -264,21 +261,21 @@ function ControlPoints( {
 											)
 										);
 										onClose();
-									} }
+									}}
 									variant="link"
 								>
-									{ __( 'Remove Control Point' ) }
+									{__('Remove Control Point')}
 								</Button>
-							) }
+							)}
 						</>
-					) }
+					)}
 				/>
 			)
 		);
-	} );
+	});
 }
 
-function InsertPoint( {
+function InsertPoint({
 	value: controlPoints,
 	onChange,
 	onOpenInserter,
@@ -287,64 +284,64 @@ function InsertPoint( {
 	disableAlpha,
 	__experimentalIsRenderedInSidebar,
 	gradientPickerDomRef,
-} ) {
-	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
+}) {
+	const [alreadyInsertedPoint, setAlreadyInsertedPoint] = useState(false);
 	return (
 		<GradientColorPickerDropdown
-			gradientPickerDomRef={ gradientPickerDomRef }
-			isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
+			gradientPickerDomRef={gradientPickerDomRef}
+			isRenderedInSidebar={__experimentalIsRenderedInSidebar}
 			className="components-custom-gradient-picker__inserter"
-			onClose={ () => {
+			onClose={() => {
 				onCloseInserter();
-			} }
-			renderToggle={ ( { isOpen, onToggle } ) => (
+			}}
+			renderToggle={({ isOpen, onToggle }) => (
 				<Button
-					aria-expanded={ isOpen }
+					aria-expanded={isOpen}
 					aria-haspopup="true"
-					onClick={ () => {
-						if ( isOpen ) {
+					onClick={() => {
+						if (isOpen) {
 							onCloseInserter();
 						} else {
-							setAlreadyInsertedPoint( false );
+							setAlreadyInsertedPoint(false);
 							onOpenInserter();
 						}
 						onToggle();
-					} }
+					}}
 					className="components-custom-gradient-picker__insert-point"
-					icon={ plus }
-					style={ {
+					icon={plus}
+					style={{
 						left:
 							insertPosition !== null
-								? `${ insertPosition }%`
+								? `${insertPosition}%`
 								: undefined,
-					} }
+					}}
 				/>
-			) }
-			renderContent={ () => (
+			)}
+			renderContent={() => (
 				<ColorPicker
-					enableAlpha={ ! disableAlpha }
-					onChange={ ( color ) => {
-						if ( ! alreadyInsertedPoint ) {
+					enableAlpha={!disableAlpha}
+					onChange={(color) => {
+						if (!alreadyInsertedPoint) {
 							onChange(
 								addControlPoint(
 									controlPoints,
 									insertPosition,
-									colord( color ).toRgbString()
+									colord(color).toRgbString()
 								)
 							);
-							setAlreadyInsertedPoint( true );
+							setAlreadyInsertedPoint(true);
 						} else {
 							onChange(
 								updateControlPointColorByPosition(
 									controlPoints,
 									insertPosition,
-									colord( color ).toRgbString()
+									colord(color).toRgbString()
 								)
 							);
 						}
-					} }
+					}}
 				/>
-			) }
+			)}
 		/>
 	);
 }

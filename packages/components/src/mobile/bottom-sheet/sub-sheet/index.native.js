@@ -9,30 +9,30 @@ import { SafeAreaView } from 'react-native';
 import { Children, useEffect, useContext } from '@wordpress/element';
 import { createSlotFill, BottomSheetContext } from '@wordpress/components';
 
-const { Fill, Slot } = createSlotFill( 'BottomSheetSubSheet' );
+const { Fill, Slot } = createSlotFill('BottomSheetSubSheet');
 
-const BottomSheetSubSheet = ( {
+const BottomSheetSubSheet = ({
 	children,
 	navigationButton,
 	showSheet,
 	isFullScreen,
-} ) => {
-	const { setIsFullScreen } = useContext( BottomSheetContext );
+}) => {
+	const { setIsFullScreen } = useContext(BottomSheetContext);
 
-	useEffect( () => {
-		if ( showSheet ) {
-			setIsFullScreen( isFullScreen );
+	useEffect(() => {
+		if (showSheet) {
+			setIsFullScreen(isFullScreen);
 		}
-	}, [ showSheet, isFullScreen ] );
+	}, [showSheet, isFullScreen]);
 
 	return (
 		<>
-			{ showSheet && (
+			{showSheet && (
 				<Fill>
-					<SafeAreaView>{ children }</SafeAreaView>
+					<SafeAreaView>{children}</SafeAreaView>
 				</Fill>
-			) }
-			{ Children.count( children ) > 0 && navigationButton }
+			)}
+			{Children.count(children) > 0 && navigationButton}
 		</>
 	);
 };

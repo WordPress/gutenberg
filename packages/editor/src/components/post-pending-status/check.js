@@ -14,12 +14,12 @@ import { withSelect } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
-export function PostPendingStatusCheck( {
+export function PostPendingStatusCheck({
 	hasPublishAction,
 	isPublished,
 	children,
-} ) {
-	if ( isPublished || ! hasPublishAction ) {
+}) {
+	if (isPublished || !hasPublishAction) {
 		return null;
 	}
 
@@ -27,20 +27,17 @@ export function PostPendingStatusCheck( {
 }
 
 export default compose(
-	withSelect( ( select ) => {
-		const {
-			isCurrentPostPublished,
-			getCurrentPostType,
-			getCurrentPost,
-		} = select( editorStore );
+	withSelect((select) => {
+		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } =
+			select(editorStore);
 		return {
 			hasPublishAction: get(
 				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
+				['_links', 'wp:action-publish'],
 				false
 			),
 			isPublished: isCurrentPostPublished(),
 			postType: getCurrentPostType(),
 		};
-	} )
-)( PostPendingStatusCheck );
+	})
+)(PostPendingStatusCheck);

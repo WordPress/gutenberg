@@ -9,5 +9,5 @@ import { useContext } from '@wordpress/element';
 import { Context } from './context';
 
 export default function useAsyncMode() {
-	return useContext( Context );
+	return useContext(Context);
 }

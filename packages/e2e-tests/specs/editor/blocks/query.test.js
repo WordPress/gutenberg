@@ -11,28 +11,28 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const createDemoPosts = async () => {
-	await createNewPost( { postType: 'post', title: `Post 1` } );
+	await createNewPost({ postType: 'post', title: `Post 1` });
 	await publishPost();
 };
 
-describe( 'Query block', () => {
-	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-query-block' );
+describe('Query block', () => {
+	beforeAll(async () => {
+		await activatePlugin('gutenberg-test-query-block');
 		await createDemoPosts();
-	} );
-	afterAll( async () => {
+	});
+	afterAll(async () => {
 		await trashAllPosts();
-		await deactivatePlugin( 'gutenberg-test-query-block' );
-	} );
-	beforeEach( async () => {
-		await createNewPost( { postType: 'page', title: `Query Page` } );
-	} );
-	afterEach( async () => {
-		await trashAllPosts( 'page' );
-	} );
-	describe( 'Query block insertion', () => {
-		it( 'Carousel', async () => {
-			await insertBlock( 'Query' );
+		await deactivatePlugin('gutenberg-test-query-block');
+	});
+	beforeEach(async () => {
+		await createNewPost({ postType: 'page', title: `Query Page` });
+	});
+	afterEach(async () => {
+		await trashAllPosts('page');
+	});
+	describe('Query block insertion', () => {
+		it('Carousel', async () => {
+			await insertBlock('Query');
 			// Wait for pattern blocks to be loaded.
 			await page.waitForSelector(
 				'.block-editor-block-pattern-setup__container .wp-block-post-title'
@@ -57,19 +57,19 @@ describe( 'Query block', () => {
 			);
 			chooseButton.click();
 			// Wait for pattern setup to go away.
-			await page.waitForSelector( '.block-editor-block-pattern-setup', {
+			await page.waitForSelector('.block-editor-block-pattern-setup', {
 				hidden: true,
-			} );
+			});
 			/**
 			 * We can't use `getEditedPostContent` easily for now because
 			 * `query` makes used of `instanceId` so it's not very reliable.
 			 * This should be revisited.
 			 */
-			await page.waitForSelector( '.wp-block-post-date' );
-			await page.waitForSelector( '.wp-block-post-title' );
-		} );
-		it( 'Grid view', async () => {
-			await insertBlock( 'Query' );
+			await page.waitForSelector('.wp-block-post-date');
+			await page.waitForSelector('.wp-block-post-title');
+		});
+		it('Grid view', async () => {
+			await insertBlock('Query');
 			// Wait for patterns setup to be loaded.
 			await page.waitForSelector(
 				'.block-editor-block-pattern-setup__display-controls'
@@ -85,16 +85,16 @@ describe( 'Query block', () => {
 			);
 			await gridPattern.click();
 			// Wait for pattern setup to go away.
-			await page.waitForSelector( '.block-editor-block-pattern-setup', {
+			await page.waitForSelector('.block-editor-block-pattern-setup', {
 				hidden: true,
-			} );
+			});
 			/**
 			 * We can't use `getEditedPostContent` easily for now because
 			 * `query` makes used of `instanceId` so it's not very reliable.
 			 * This should be revisited.
 			 */
-			await page.waitForSelector( '.wp-block-post-date' );
-			await page.waitForSelector( '.wp-block-post-title' );
-		} );
-	} );
-} );
+			await page.waitForSelector('.wp-block-post-date');
+			await page.waitForSelector('.wp-block-post-title');
+		});
+	});
+});

@@ -14,9 +14,9 @@ import {
 } from '../use-global-styles-output';
 import { ROOT_BLOCK_SELECTOR } from '../utils';
 
-describe( 'global styles renderer', () => {
-	describe( 'getNodesWithStyles', () => {
-		it( 'should return the nodes with styles', () => {
+describe('global styles renderer', () => {
+	describe('getNodesWithStyles', () => {
+		it('should return the nodes with styles', () => {
 			const tree = {
 				styles: {
 					color: {
@@ -58,7 +58,7 @@ describe( 'global styles renderer', () => {
 					selector: '.my-heading1, .my-heading2',
 				},
 			};
-			expect( getNodesWithStyles( tree, blockSelectors ) ).toEqual( [
+			expect(getNodesWithStyles(tree, blockSelectors)).toEqual([
 				{
 					styles: {
 						color: {
@@ -102,11 +102,11 @@ describe( 'global styles renderer', () => {
 					},
 					selector: '.my-heading1 h2, .my-heading2 h2',
 				},
-			] );
-		} );
-	} );
-	describe( 'getNodesWithSettings', () => {
-		it( 'should return nodes with settings', () => {
+			]);
+		});
+	});
+	describe('getNodesWithSettings', () => {
+		it('should return nodes with settings', () => {
 			const tree = {
 				styles: {
 					color: {
@@ -157,7 +157,7 @@ describe( 'global styles renderer', () => {
 				},
 			};
 
-			expect( getNodesWithSettings( tree, blockSelectors ) ).toEqual( [
+			expect(getNodesWithSettings(tree, blockSelectors)).toEqual([
 				{
 					presets: {
 						color: {
@@ -196,12 +196,12 @@ describe( 'global styles renderer', () => {
 					},
 					selector: 'p',
 				},
-			] );
-		} );
-	} );
+			]);
+		});
+	});
 
-	describe( 'toCustomProperties', () => {
-		it( 'should return a ruleset', () => {
+	describe('toCustomProperties', () => {
+		it('should return a ruleset', () => {
 			const tree = {
 				settings: {
 					color: {
@@ -262,14 +262,14 @@ describe( 'global styles renderer', () => {
 				},
 			};
 
-			expect( toCustomProperties( tree, blockSelectors ) ).toEqual(
+			expect(toCustomProperties(tree, blockSelectors)).toEqual(
 				'body{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
 			);
-		} );
-	} );
+		});
+	});
 
-	describe( 'toStyles', () => {
-		it( 'should return a ruleset', () => {
+	describe('toStyles', () => {
+		it('should return a ruleset', () => {
 			const tree = {
 				settings: {
 					color: {
@@ -376,9 +376,9 @@ describe( 'global styles renderer', () => {
 				},
 			};
 
-			expect( toStyles( tree, blockSelectors ) ).toEqual(
+			expect(toStyles(tree, blockSelectors)).toEqual(
 				'.wp-site-blocks > * { margin-top: 0; margin-bottom: 0; }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }body{background-color: red;margin: 10px;padding: 10px;}h1{font-size: 42px;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
-		} );
-	} );
-} );
+		});
+	});
+});

@@ -15,25 +15,25 @@ export function PostSchedule() {
 
 	return (
 		<PostScheduleCheck>
-			<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>
-				<span>{ __( 'Publish' ) }</span>
+			<PanelRow className="edit-post-post-schedule" ref={anchorRef}>
+				<span>{__('Publish')}</span>
 				<Dropdown
-					popoverProps={ { anchorRef: anchorRef.current } }
+					popoverProps={{ anchorRef: anchorRef.current }}
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
-					renderToggle={ ( { onToggle, isOpen } ) => (
+					renderToggle={({ onToggle, isOpen }) => (
 						<>
 							<Button
 								className="edit-post-post-schedule__toggle"
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
+								onClick={onToggle}
+								aria-expanded={isOpen}
 								variant="tertiary"
 							>
 								<PostScheduleLabel />
 							</Button>
 						</>
-					) }
-					renderContent={ () => <PostScheduleForm /> }
+					)}
+					renderContent={() => <PostScheduleForm />}
 				/>
 			</PanelRow>
 		</PostScheduleCheck>

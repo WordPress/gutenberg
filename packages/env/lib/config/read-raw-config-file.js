@@ -2,12 +2,12 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' ).promises;
+const fs = require('fs').promises;
 
 /**
  * Internal dependencies
  */
-const { ValidationError } = require( './validate-config' );
+const { ValidationError } = require('./validate-config');
 
 /**
  * Reads the config JSON from the filesystem and returns it as a JS object
@@ -18,21 +18,19 @@ const { ValidationError } = require( './validate-config' );
  *
  * @return {Object} the raw config data.
  */
-module.exports = async function readRawConfigFile( name, configPath ) {
+module.exports = async function readRawConfigFile(name, configPath) {
 	try {
 		return withBackCompat(
-			JSON.parse( await fs.readFile( configPath, 'utf8' ) )
+			JSON.parse(await fs.readFile(configPath, 'utf8'))
 		);
-	} catch ( error ) {
-		if ( error.code === 'ENOENT' ) {
+	} catch (error) {
+		if (error.code === 'ENOENT') {
 			return null;
-		} else if ( error instanceof SyntaxError ) {
-			throw new ValidationError(
-				`Invalid ${ name }: ${ error.message }`
-			);
+		} else if (error instanceof SyntaxError) {
+			throw new ValidationError(`Invalid ${name}: ${error.message}`);
 		} else {
 			throw new ValidationError(
-				`Could not read ${ name }: ${ error.message }`
+				`Could not read ${name}: ${error.message}`
 			);
 		}
 	}
@@ -47,16 +45,16 @@ module.exports = async function readRawConfigFile( name, configPath ) {
  * @return {Object} Same config with any old-format values converted into the
  *                  shape of the currently expected format.
  */
-function withBackCompat( rawConfig ) {
+function withBackCompat(rawConfig) {
 	// Convert testsPort into new env.tests format.
-	if ( rawConfig.testsPort !== undefined ) {
+	if (rawConfig.testsPort !== undefined) {
 		rawConfig.env = {
-			...( rawConfig.env || {} ),
+			...(rawConfig.env || {}),
 			tests: {
 				port: rawConfig.testsPort,
-				...( rawConfig.env && rawConfig.env.tests
+				...(rawConfig.env && rawConfig.env.tests
 					? rawConfig.env.tests
-					: {} ),
+					: {}),
 			},
 		};
 	}

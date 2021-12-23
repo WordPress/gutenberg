@@ -16,6 +16,6 @@ import { store as richTextStore } from './store';
  *
  * @return {RichTextFormatType|undefined} Format type.
  */
-export function getFormatType( name ) {
-	return select( richTextStore ).getFormatType( name );
+export function getFormatType(name) {
+	return select(richTextStore).getFormatType(name);
 }

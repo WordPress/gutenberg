@@ -15,18 +15,18 @@ import isRTL from './is-rtl';
  *
  * @return {Range|null} The range to place.
  */
-function getRange( container, isReverse, x ) {
+function getRange(container, isReverse, x) {
 	const { ownerDocument } = container;
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
-	const isReverseDir = isRTL( container ) ? ! isReverse : isReverse;
+	const isReverseDir = isRTL(container) ? !isReverse : isReverse;
 	const containerRect = container.getBoundingClientRect();
 	// When placing at the end (isReverse), find the closest range to the bottom
 	// right corner. When placing at the start, to the top left corner.
-	if ( x === undefined ) {
+	if (x === undefined) {
 		x = isReverse ? containerRect.right - 1 : containerRect.left + 1;
 	}
 	const y = isReverseDir ? containerRect.bottom - 1 : containerRect.top + 1;
-	return hiddenCaretRangeFromPoint( ownerDocument, x, y, container );
+	return hiddenCaretRangeFromPoint(ownerDocument, x, y, container);
 }
 
 /**
@@ -36,20 +36,20 @@ function getRange( container, isReverse, x ) {
  * @param {boolean}          isReverse True for end, false for start.
  * @param {number|undefined} x         X coordinate to vertically position.
  */
-export default function placeCaretAtEdge( container, isReverse, x ) {
-	if ( ! container ) {
+export default function placeCaretAtEdge(container, isReverse, x) {
+	if (!container) {
 		return;
 	}
 
 	container.focus();
 
-	if ( isInputOrTextArea( container ) ) {
+	if (isInputOrTextArea(container)) {
 		// The element may not support selection setting.
-		if ( typeof container.selectionStart !== 'number' ) {
+		if (typeof container.selectionStart !== 'number') {
 			return;
 		}
 
-		if ( isReverse ) {
+		if (isReverse) {
 			container.selectionStart = container.value.length;
 			container.selectionEnd = container.value.length;
 		} else {
@@ -60,26 +60,26 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	if ( ! container.isContentEditable ) {
+	if (!container.isContentEditable) {
 		return;
 	}
 
-	let range = getRange( container, isReverse, x );
+	let range = getRange(container, isReverse, x);
 
 	// If no range range can be created or it is outside the container, the
 	// element may be out of view.
 	if (
-		! range ||
-		! range.startContainer ||
-		! container.contains( range.startContainer )
+		!range ||
+		!range.startContainer ||
+		!container.contains(range.startContainer)
 	) {
-		container.scrollIntoView( isReverse );
-		range = range = getRange( container, isReverse, x );
+		container.scrollIntoView(isReverse);
+		range = range = getRange(container, isReverse, x);
 
 		if (
-			! range ||
-			! range.startContainer ||
-			! container.contains( range.startContainer )
+			!range ||
+			!range.startContainer ||
+			!container.contains(range.startContainer)
 		) {
 			return;
 		}
@@ -87,9 +87,9 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
-	assertIsDefined( defaultView, 'defaultView' );
+	assertIsDefined(defaultView, 'defaultView');
 	const selection = defaultView.getSelection();
-	assertIsDefined( selection, 'selection' );
+	assertIsDefined(selection, 'selection');
 	selection.removeAllRanges();
-	selection.addRange( range );
+	selection.addRange(range);
 }

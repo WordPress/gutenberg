@@ -7,23 +7,23 @@ import { rest, batch } from './rest-api';
  * Delete all the widgets in the widgets screen.
  */
 export async function deleteAllWidgets() {
-	const [ widgets, sidebars ] = await Promise.all( [
-		rest( { path: '/wp/v2/widgets' } ),
-		rest( { path: '/wp/v2/sidebars' } ),
-	] );
+	const [widgets, sidebars] = await Promise.all([
+		rest({ path: '/wp/v2/widgets' }),
+		rest({ path: '/wp/v2/sidebars' }),
+	]);
 
 	await batch(
-		widgets.map( ( widget ) => ( {
+		widgets.map((widget) => ({
 			method: 'DELETE',
-			path: `/wp/v2/widgets/${ widget.id }?force=true`,
-		} ) )
+			path: `/wp/v2/widgets/${widget.id}?force=true`,
+		}))
 	);
 
 	await batch(
-		sidebars.map( ( sidebar ) => ( {
+		sidebars.map((sidebar) => ({
 			method: 'POST',
-			path: `/wp/v2/sidebars/${ sidebar.id }`,
+			path: `/wp/v2/sidebars/${sidebar.id}`,
 			body: { id: sidebar.id, widgets: [] },
-		} ) )
+		}))
 	);
 }

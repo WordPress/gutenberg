@@ -28,75 +28,75 @@ const KNOBS_GROUPS = {
 	ToggleGroupControlOption: 'ToggleGroupControlOption',
 };
 
-const _default = ( { options } ) => {
-	const [ value, setValue ] = useState( options[ 0 ].value );
+const _default = ({ options }) => {
+	const [value, setValue] = useState(options[0].value);
 	const label = text(
-		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
+		`${KNOBS_GROUPS.ToggleGroupControl}: label`,
 		'Toggle Group Control',
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 
 	const hideLabelFromVision = boolean(
-		`${ KNOBS_GROUPS.ToggleGroupControl }: hideLabelFromVision`,
+		`${KNOBS_GROUPS.ToggleGroupControl}: hideLabelFromVision`,
 		false,
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 	const isBlock = boolean(
-		`${ KNOBS_GROUPS.ToggleGroupControl }: isBlock (render as a css block element)`,
+		`${KNOBS_GROUPS.ToggleGroupControl}: isBlock (render as a css block element)`,
 		false,
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 	const help = text(
-		`${ KNOBS_GROUPS.ToggleGroupControl }: help`,
+		`${KNOBS_GROUPS.ToggleGroupControl}: help`,
 		undefined,
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 	const isAdaptiveWidth = boolean(
-		`${ KNOBS_GROUPS.ToggleGroupControl }: isAdaptiveWidth`,
+		`${KNOBS_GROUPS.ToggleGroupControl}: isAdaptiveWidth`,
 		false,
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 
-	const controlOptions = options.map( ( opt, index ) => (
+	const controlOptions = options.map((opt, index) => (
 		<ToggleGroupControlOption
-			key={ opt.value }
-			value={ opt.value }
-			label={ text(
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
+			key={opt.value}
+			value={opt.value}
+			label={text(
+				`${KNOBS_GROUPS.ToggleGroupControlOption}: label`,
 				opt.label,
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
-			) }
-			aria-label={ text(
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: aria-label`,
-				opt[ 'aria-label' ],
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
-			) }
-			showTooltip={ boolean(
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: showTooltip`,
+				`${KNOBS_GROUPS.ToggleGroupControlOption}-${index + 1}`
+			)}
+			aria-label={text(
+				`${KNOBS_GROUPS.ToggleGroupControlOption}: aria-label`,
+				opt['aria-label'],
+				`${KNOBS_GROUPS.ToggleGroupControlOption}-${index + 1}`
+			)}
+			showTooltip={boolean(
+				`${KNOBS_GROUPS.ToggleGroupControlOption}: showTooltip`,
 				opt.showTooltip,
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
-			) }
+				`${KNOBS_GROUPS.ToggleGroupControlOption}-${index + 1}`
+			)}
 		/>
-	) );
+	));
 
 	return (
 		<View>
 			<ToggleGroupControl
-				onChange={ setValue }
-				value={ value }
-				label={ label }
-				hideLabelFromVision={ hideLabelFromVision }
-				help={ help }
-				isBlock={ isBlock }
-				isAdaptiveWidth={ isAdaptiveWidth }
+				onChange={setValue}
+				value={value}
+				label={label}
+				hideLabelFromVision={hideLabelFromVision}
+				help={help}
+				isBlock={isBlock}
+				isAdaptiveWidth={isAdaptiveWidth}
 			>
-				{ controlOptions }
+				{controlOptions}
 			</ToggleGroupControl>
 		</View>
 	);
 };
 
-export const Default = _default.bind( {} );
+export const Default = _default.bind({});
 Default.args = {
 	options: [
 		{ value: 'left', label: 'Left' },
@@ -106,7 +106,7 @@ Default.args = {
 	],
 };
 
-export const WithTooltip = _default.bind( {} );
+export const WithTooltip = _default.bind({});
 WithTooltip.args = {
 	...Default.args,
 	options: [
@@ -116,7 +116,7 @@ WithTooltip.args = {
 	],
 };
 
-export const WithAriaLabel = _default.bind( {} );
+export const WithAriaLabel = _default.bind({});
 WithAriaLabel.args = {
 	...Default.args,
 	options: [
@@ -126,30 +126,30 @@ WithAriaLabel.args = {
 };
 
 export const WithReset = () => {
-	const [ alignState, setAlignState ] = useState();
-	const aligns = [ 'Left', 'Center', 'Right' ];
-	const alignOptions = aligns.map( ( key, index ) => (
+	const [alignState, setAlignState] = useState();
+	const aligns = ['Left', 'Center', 'Right'];
+	const alignOptions = aligns.map((key, index) => (
 		<ToggleGroupControlOption
-			key={ key }
-			value={ key }
-			label={ text(
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
+			key={key}
+			value={key}
+			label={text(
+				`${KNOBS_GROUPS.ToggleGroupControlOption}: label`,
 				key,
-				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
-			) }
+				`${KNOBS_GROUPS.ToggleGroupControlOption}-${index + 1}`
+			)}
 		/>
-	) );
+	));
 	return (
 		<View>
 			<ToggleGroupControl
-				onChange={ setAlignState }
-				value={ alignState }
-				label={ 'Toggle Group Control' }
+				onChange={setAlignState}
+				value={alignState}
+				label={'Toggle Group Control'}
 				hideLabelFromVision
 			>
-				{ alignOptions }
+				{alignOptions}
 			</ToggleGroupControl>
-			<Button onClick={ () => setAlignState( undefined ) } isTertiary>
+			<Button onClick={() => setAlignState(undefined)} isTertiary>
 				Reset
 			</Button>
 		</View>

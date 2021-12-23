@@ -12,7 +12,7 @@ import { store as editorStore } from '../../store';
 
 export default function WordCount() {
 	const content = useSelect(
-		( select ) => select( editorStore ).getEditedPostAttribute( 'content' ),
+		(select) => select(editorStore).getEditedPostAttribute('content'),
 		[]
 	);
 
@@ -21,11 +21,9 @@ export default function WordCount() {
 	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
 	 * Do not translate into your own language.
 	 */
-	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+	const wordCountType = _x('words', 'Word count type. Do not translate!');
 
 	return (
-		<span className="word-count">
-			{ wordCount( content, wordCountType ) }
-		</span>
+		<span className="word-count">{wordCount(content, wordCountType)}</span>
 	);
 }

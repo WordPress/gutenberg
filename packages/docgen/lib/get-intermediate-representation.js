@@ -1,55 +1,52 @@
 /**
  * External dependencies
  */
-const { get } = require( 'lodash' );
+const { get } = require('lodash');
 
 /**
  * Internal dependencies
  */
-const getExportEntries = require( './get-export-entries' );
-const getJSDocFromToken = require( './get-jsdoc-from-token' );
-const getDependencyPath = require( './get-dependency-path' );
+const getExportEntries = require('./get-export-entries');
+const getJSDocFromToken = require('./get-jsdoc-from-token');
+const getDependencyPath = require('./get-dependency-path');
 
 const UNDOCUMENTED = 'Undocumented declaration.';
 const NAMESPACE_EXPORT = '*';
 const DEFAULT_EXPORT = 'default';
 
-const hasClassWithName = ( node, name ) =>
+const hasClassWithName = (node, name) =>
 	node.type === 'ClassDeclaration' && node.id.name === name;
 
-const hasFunctionWithName = ( node, name ) =>
+const hasFunctionWithName = (node, name) =>
 	node.type === 'FunctionDeclaration' && node.id.name === name;
 
-const hasVariableWithName = ( node, name ) =>
+const hasVariableWithName = (node, name) =>
 	node.type === 'VariableDeclaration' &&
-	node.declarations.some( ( declaration ) => {
-		if ( declaration.id.type === 'ObjectPattern' ) {
+	node.declarations.some((declaration) => {
+		if (declaration.id.type === 'ObjectPattern') {
 			return declaration.id.properties.some(
-				( property ) => property.key.name === name
+				(property) => property.key.name === name
 			);
 		}
 		return declaration.id.name === name;
-	} );
+	});
 
-const hasNamedExportWithName = ( node, name ) =>
+const hasNamedExportWithName = (node, name) =>
 	node.type === 'ExportNamedDeclaration' &&
-	( ( node.declaration && hasClassWithName( node.declaration, name ) ) ||
-		( node.declaration && hasFunctionWithName( node.declaration, name ) ) ||
-		( node.declaration && hasVariableWithName( node.declaration, name ) ) );
+	((node.declaration && hasClassWithName(node.declaration, name)) ||
+		(node.declaration && hasFunctionWithName(node.declaration, name)) ||
+		(node.declaration && hasVariableWithName(node.declaration, name)));
 
-const hasImportWithName = ( node, name ) =>
+const hasImportWithName = (node, name) =>
 	node.type === 'ImportDeclaration' &&
-	node.specifiers.some( ( specifier ) => specifier.local.name === name );
+	node.specifiers.some((specifier) => specifier.local.name === name);
 
-const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
+const isImportDeclaration = (node) => node.type === 'ImportDeclaration';
 
-const someImportMatchesName = ( name, token ) => {
+const someImportMatchesName = (name, token) => {
 	let matches = false;
-	token.specifiers.forEach( ( specifier ) => {
-		if (
-			specifier.type === 'ImportDefaultSpecifier' &&
-			name === 'default'
-		) {
+	token.specifiers.forEach((specifier) => {
+		if (specifier.type === 'ImportDefaultSpecifier' && name === 'default') {
 			matches = true;
 		}
 		if (
@@ -58,60 +55,57 @@ const someImportMatchesName = ( name, token ) => {
 		) {
 			matches = true;
 		}
-	} );
+	});
 	return matches;
 };
 
-const someEntryMatchesName = ( name, entry, token ) =>
-	( token.type === 'ExportNamedDeclaration' && entry.localName === name ) ||
-	( token.type === 'ImportDeclaration' &&
-		someImportMatchesName( name, token ) );
+const someEntryMatchesName = (name, entry, token) =>
+	(token.type === 'ExportNamedDeclaration' && entry.localName === name) ||
+	(token.type === 'ImportDeclaration' && someImportMatchesName(name, token));
 
-const getJSDocFromDependency = ( token, entry, parseDependency ) => {
+const getJSDocFromDependency = (token, entry, parseDependency) => {
 	let doc;
-	const ir = parseDependency( getDependencyPath( token ) );
-	if ( entry.localName === NAMESPACE_EXPORT ) {
-		doc = ir.filter( ( { name } ) => name !== DEFAULT_EXPORT );
+	const ir = parseDependency(getDependencyPath(token));
+	if (entry.localName === NAMESPACE_EXPORT) {
+		doc = ir.filter(({ name }) => name !== DEFAULT_EXPORT);
 	} else {
-		doc = ir.find( ( { name } ) =>
-			someEntryMatchesName( name, entry, token )
-		);
+		doc = ir.find(({ name }) => someEntryMatchesName(name, entry, token));
 	}
 	return doc;
 };
 
-const getJSDoc = ( token, entry, ast, parseDependency ) => {
+const getJSDoc = (token, entry, ast, parseDependency) => {
 	let doc;
-	if ( entry.localName !== NAMESPACE_EXPORT ) {
-		doc = getJSDocFromToken( token );
-		if ( doc !== undefined ) {
+	if (entry.localName !== NAMESPACE_EXPORT) {
+		doc = getJSDocFromToken(token);
+		if (doc !== undefined) {
 			return doc;
 		}
 	}
 
-	if ( entry && entry.module === null ) {
-		const candidates = ast.body.filter( ( node ) => {
+	if (entry && entry.module === null) {
+		const candidates = ast.body.filter((node) => {
 			return (
-				hasClassWithName( node, entry.localName ) ||
-				hasFunctionWithName( node, entry.localName ) ||
-				hasVariableWithName( node, entry.localName ) ||
-				hasNamedExportWithName( node, entry.localName ) ||
-				hasImportWithName( node, entry.localName )
+				hasClassWithName(node, entry.localName) ||
+				hasFunctionWithName(node, entry.localName) ||
+				hasVariableWithName(node, entry.localName) ||
+				hasNamedExportWithName(node, entry.localName) ||
+				hasImportWithName(node, entry.localName)
 			);
-		} );
-		if ( candidates.length !== 1 ) {
+		});
+		if (candidates.length !== 1) {
 			return doc;
 		}
-		const node = candidates[ 0 ];
-		if ( isImportDeclaration( node ) ) {
-			doc = getJSDocFromDependency( node, entry, parseDependency );
+		const node = candidates[0];
+		if (isImportDeclaration(node)) {
+			doc = getJSDocFromDependency(node, entry, parseDependency);
 		} else {
-			doc = getJSDocFromToken( node );
+			doc = getJSDocFromToken(node);
 		}
 		return doc;
 	}
 
-	return getJSDocFromDependency( token, entry, parseDependency );
+	return getJSDocFromDependency(token, entry, parseDependency);
 };
 
 /**
@@ -135,31 +129,31 @@ module.exports = (
 	ast = { body: [] },
 	parseDependency = () => {}
 ) => {
-	const exportEntries = getExportEntries( token );
+	const exportEntries = getExportEntries(token);
 	const ir = [];
-	exportEntries.forEach( ( entry ) => {
-		const doc = getJSDoc( token, entry, ast, parseDependency );
-		if ( entry.localName === NAMESPACE_EXPORT ) {
-			doc.forEach( ( namedExport ) => {
-				ir.push( {
+	exportEntries.forEach((entry) => {
+		const doc = getJSDoc(token, entry, ast, parseDependency);
+		if (entry.localName === NAMESPACE_EXPORT) {
+			doc.forEach((namedExport) => {
+				ir.push({
 					path,
 					name: namedExport.name,
 					description: namedExport.description,
 					tags: namedExport.tags,
 					lineStart: entry.lineStart,
 					lineEnd: entry.lineEnd,
-				} );
-			} );
+				});
+			});
 		} else {
-			ir.push( {
+			ir.push({
 				path,
 				name: entry.exportName,
-				description: get( doc, [ 'description' ], UNDOCUMENTED ),
-				tags: get( doc, [ 'tags' ], [] ),
+				description: get(doc, ['description'], UNDOCUMENTED),
+				tags: get(doc, ['tags'], []),
 				lineStart: entry.lineStart,
 				lineEnd: entry.lineEnd,
-			} );
+			});
 		}
-	} );
+	});
 	return ir;
 };

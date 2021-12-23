@@ -8,20 +8,18 @@ import { shallow } from 'enzyme';
  */
 import { PostScheduleCheck } from '../check';
 
-describe( 'PostScheduleCheck', () => {
-	it( "should not render anything if the user doesn't have the right capabilities", () => {
+describe('PostScheduleCheck', () => {
+	it("should not render anything if the user doesn't have the right capabilities", () => {
 		const wrapper = shallow(
-			<PostScheduleCheck hasPublishAction={ false }>
-				yes
-			</PostScheduleCheck>
+			<PostScheduleCheck hasPublishAction={false}>yes</PostScheduleCheck>
 		);
-		expect( wrapper.type() ).toBe( null );
-	} );
+		expect(wrapper.type()).toBe(null);
+	});
 
-	it( 'should render if the user has the correct capability', () => {
+	it('should render if the user has the correct capability', () => {
 		const wrapper = shallow(
-			<PostScheduleCheck hasPublishAction={ true }>yes</PostScheduleCheck>
+			<PostScheduleCheck hasPublishAction={true}>yes</PostScheduleCheck>
 		);
-		expect( wrapper.type() ).not.toBe( null );
-	} );
-} );
+		expect(wrapper.type()).not.toBe(null);
+	});
+});

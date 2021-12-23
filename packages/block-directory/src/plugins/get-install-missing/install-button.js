@@ -12,24 +12,24 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as blockDirectoryStore } from '../../store';
 
-export default function InstallButton( { attributes, block, clientId } ) {
+export default function InstallButton({ attributes, block, clientId }) {
 	const isInstallingBlock = useSelect(
-		( select ) => select( blockDirectoryStore ).isInstalling( block.id ),
-		[ block.id ]
+		(select) => select(blockDirectoryStore).isInstalling(block.id),
+		[block.id]
 	);
-	const { installBlockType } = useDispatch( blockDirectoryStore );
-	const { replaceBlock } = useDispatch( blockEditorStore );
+	const { installBlockType } = useDispatch(blockDirectoryStore);
+	const { replaceBlock } = useDispatch(blockEditorStore);
 
 	return (
 		<Button
-			onClick={ () =>
-				installBlockType( block ).then( ( success ) => {
-					if ( success ) {
-						const blockType = getBlockType( block.name );
-						const [ originalBlock ] = parse(
+			onClick={() =>
+				installBlockType(block).then((success) => {
+					if (success) {
+						const blockType = getBlockType(block.name);
+						const [originalBlock] = parse(
 							attributes.originalContent
 						);
-						if ( originalBlock && blockType ) {
+						if (originalBlock && blockType) {
 							replaceBlock(
 								clientId,
 								createBlock(
@@ -40,17 +40,17 @@ export default function InstallButton( { attributes, block, clientId } ) {
 							);
 						}
 					}
-				} )
+				})
 			}
-			disabled={ isInstallingBlock }
-			isBusy={ isInstallingBlock }
+			disabled={isInstallingBlock}
+			isBusy={isInstallingBlock}
 			variant="primary"
 		>
-			{ sprintf(
+			{sprintf(
 				/* translators: %s: block name */
-				__( 'Install %s' ),
+				__('Install %s'),
 				block.title
-			) }
+			)}
 		</Button>
 	);
 }

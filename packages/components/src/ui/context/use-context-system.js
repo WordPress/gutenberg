@@ -25,50 +25,47 @@ import { useCx } from '../../utils/hooks/use-cx';
  * @param {string} namespace The namespace to register and to derive context props from.
  * @return {ConnectedProps<P>} The connected props.
  */
-export function useContextSystem( props, namespace ) {
+export function useContextSystem(props, namespace) {
 	const contextSystemProps = useComponentsContext();
-	if ( typeof namespace === 'undefined' ) {
-		warn( 'useContextSystem: Please provide a namespace' );
+	if (typeof namespace === 'undefined') {
+		warn('useContextSystem: Please provide a namespace');
 	}
 
-	const contextProps = contextSystemProps?.[ namespace ] || {};
+	const contextProps = contextSystemProps?.[namespace] || {};
 
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {ConnectedProps<P>} */
 	// @ts-ignore We fill in the missing properties below
 	const finalComponentProps = {
 		...getConnectedNamespace(),
-		...getNamespace( namespace ),
+		...getNamespace(namespace),
 	};
 	/* eslint-enable jsdoc/no-undefined-types */
 
 	const { _overrides: overrideProps, ...otherContextProps } = contextProps;
 
-	const initialMergedProps = Object.entries( otherContextProps ).length
-		? Object.assign( {}, otherContextProps, props )
+	const initialMergedProps = Object.entries(otherContextProps).length
+		? Object.assign({}, otherContextProps, props)
 		: props;
 
 	const cx = useCx();
 
-	const classes = cx(
-		getStyledClassNameFromKey( namespace ),
-		props.className
-	);
+	const classes = cx(getStyledClassNameFromKey(namespace), props.className);
 
 	// Provides the ability to customize the render of the component.
 	const rendered =
 		typeof initialMergedProps.renderChildren === 'function'
-			? initialMergedProps.renderChildren( initialMergedProps )
+			? initialMergedProps.renderChildren(initialMergedProps)
 			: initialMergedProps.children;
 
-	for ( const key in initialMergedProps ) {
+	for (const key in initialMergedProps) {
 		// @ts-ignore filling in missing props
-		finalComponentProps[ key ] = initialMergedProps[ key ];
+		finalComponentProps[key] = initialMergedProps[key];
 	}
 
-	for ( const key in overrideProps ) {
+	for (const key in overrideProps) {
 		// @ts-ignore filling in missing props
-		finalComponentProps[ key ] = overrideProps[ key ];
+		finalComponentProps[key] = overrideProps[key];
 	}
 
 	// @ts-ignore

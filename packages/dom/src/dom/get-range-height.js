@@ -5,15 +5,15 @@
  * @param {Range} range The range to check.
  * @return {number | undefined} Height of the range or undefined if the range has no client rectangles.
  */
-export default function getRangeHeight( range ) {
-	const rects = Array.from( range.getClientRects() );
+export default function getRangeHeight(range) {
+	const rects = Array.from(range.getClientRects());
 
-	if ( ! rects.length ) {
+	if (!rects.length) {
 		return;
 	}
 
-	const highestTop = Math.min( ...rects.map( ( { top } ) => top ) );
-	const lowestBottom = Math.max( ...rects.map( ( { bottom } ) => bottom ) );
+	const highestTop = Math.min(...rects.map(({ top }) => top));
+	const lowestBottom = Math.max(...rects.map(({ bottom }) => bottom));
 
 	return lowestBottom - highestTop;
 }

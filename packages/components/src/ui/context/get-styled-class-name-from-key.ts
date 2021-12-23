@@ -10,9 +10,9 @@ import memoize from 'memize';
  * @param  namespace The name of the connected component.
  * @return The generated CSS className.
  */
-function getStyledClassName( namespace: string ): string {
-	const kebab = kebabCase( namespace );
-	return `components-${ kebab }`;
+function getStyledClassName(namespace: string): string {
+	const kebab = kebabCase(namespace);
+	return `components-${kebab}`;
 }
 
-export const getStyledClassNameFromKey = memoize( getStyledClassName );
+export const getStyledClassNameFromKey = memoize(getStyledClassName);

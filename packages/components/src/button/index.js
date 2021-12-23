@@ -19,9 +19,9 @@ import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 
-const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+const disabledEventsOnDisabledButton = ['onMouseDown', 'onClick'];
 
-function useDeprecatedProps( {
+function useDeprecatedProps({
 	isDefault,
 	isPrimary,
 	isSecondary,
@@ -29,31 +29,31 @@ function useDeprecatedProps( {
 	isLink,
 	variant,
 	...otherProps
-} ) {
+}) {
 	let computedVariant = variant;
 
-	if ( isPrimary ) {
+	if (isPrimary) {
 		computedVariant ??= 'primary';
 	}
 
-	if ( isTertiary ) {
+	if (isTertiary) {
 		computedVariant ??= 'tertiary';
 	}
 
-	if ( isSecondary ) {
+	if (isSecondary) {
 		computedVariant ??= 'secondary';
 	}
 
-	if ( isDefault ) {
-		deprecated( 'Button isDefault prop', {
+	if (isDefault) {
+		deprecated('Button isDefault prop', {
 			since: '5.4',
 			alternative: 'variant="secondary"',
-		} );
+		});
 
 		computedVariant ??= 'secondary';
 	}
 
-	if ( isLink ) {
+	if (isLink) {
 		computedVariant ??= 'link';
 	}
 
@@ -63,7 +63,7 @@ function useDeprecatedProps( {
 	};
 }
 
-export function Button( props, ref ) {
+export function Button(props, ref) {
 	const {
 		href,
 		target,
@@ -86,13 +86,10 @@ export function Button( props, ref ) {
 		__experimentalIsFocusable: isFocusable,
 		describedBy,
 		...additionalProps
-	} = useDeprecatedProps( props );
-	const instanceId = useInstanceId(
-		Button,
-		'components-button__description'
-	);
+	} = useDeprecatedProps(props);
+	const instanceId = useInstanceId(Button, 'components-button__description');
 
-	const classes = classnames( 'components-button', className, {
+	const classes = classnames('components-button', className, {
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
 		'is-small': isSmall,
@@ -101,12 +98,12 @@ export function Button( props, ref ) {
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
-		'has-text': !! icon && !! children,
-		'has-icon': !! icon,
-	} );
+		'has-text': !!icon && !!children,
+		'has-icon': !!icon,
+	});
 
-	const trulyDisabled = disabled && ! isFocusable;
-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+	const trulyDisabled = disabled && !isFocusable;
+	const Tag = href !== undefined && !trulyDisabled ? 'a' : 'button';
 	const tagProps =
 		Tag === 'a'
 			? { href, target }
@@ -116,13 +113,13 @@ export function Button( props, ref ) {
 					'aria-pressed': isPressed,
 			  };
 
-	if ( disabled && isFocusable ) {
+	if (disabled && isFocusable) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
-		tagProps[ 'aria-disabled' ] = true;
+		tagProps['aria-disabled'] = true;
 
-		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
-			additionalProps[ disabledEvent ] = ( event ) => {
+		for (const disabledEvent of disabledEventsOnDisabledButton) {
+			additionalProps[disabledEvent] = (event) => {
 				event.stopPropagation();
 				event.preventDefault();
 			};
@@ -131,53 +128,51 @@ export function Button( props, ref ) {
 
 	// Should show the tooltip if...
 	const shouldShowTooltip =
-		! trulyDisabled &&
+		!trulyDisabled &&
 		// an explicit tooltip is passed or...
-		( ( showTooltip && label ) ||
+		((showTooltip && label) ||
 			// there's a shortcut or...
 			shortcut ||
 			// there's a label and...
-			( !! label &&
+			(!!label &&
 				// the children are empty and...
-				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
+				(!children || (isArray(children) && !children.length)) &&
 				// the tooltip is not explicitly disabled.
-				false !== showTooltip ) );
+				false !== showTooltip));
 
 	const descriptionId = describedBy ? instanceId : null;
 
-	const describedById =
-		additionalProps[ 'aria-describedby' ] || descriptionId;
+	const describedById = additionalProps['aria-describedby'] || descriptionId;
 
 	const element = (
 		<Tag
-			{ ...tagProps }
-			{ ...additionalProps }
-			className={ classes }
-			aria-label={ additionalProps[ 'aria-label' ] || label }
-			aria-describedby={ describedById }
-			ref={ ref }
+			{...tagProps}
+			{...additionalProps}
+			className={classes}
+			aria-label={additionalProps['aria-label'] || label}
+			aria-describedby={describedById}
+			ref={ref}
 		>
-			{ icon && iconPosition === 'left' && (
-				<Icon icon={ icon } size={ iconSize } />
-			) }
-			{ text && <>{ text }</> }
-			{ icon && iconPosition === 'right' && (
-				<Icon icon={ icon } size={ iconSize } />
-			) }
-			{ children }
+			{icon && iconPosition === 'left' && (
+				<Icon icon={icon} size={iconSize} />
+			)}
+			{text && <>{text}</>}
+			{icon && iconPosition === 'right' && (
+				<Icon icon={icon} size={iconSize} />
+			)}
+			{children}
 		</Tag>
 	);
 
-	if ( ! shouldShowTooltip ) {
+	if (!shouldShowTooltip) {
 		return (
 			<>
-				{ element }
-				{ describedBy && (
+				{element}
+				{describedBy && (
 					<VisuallyHidden>
-						<span id={ descriptionId }>{ describedBy }</span>
+						<span id={descriptionId}>{describedBy}</span>
 					</VisuallyHidden>
-				) }
+				)}
 			</>
 		);
 	}
@@ -185,19 +180,19 @@ export function Button( props, ref ) {
 	return (
 		<>
 			<Tooltip
-				text={ describedBy ? describedBy : label }
-				shortcut={ shortcut }
-				position={ tooltipPosition }
+				text={describedBy ? describedBy : label}
+				shortcut={shortcut}
+				position={tooltipPosition}
 			>
-				{ element }
+				{element}
 			</Tooltip>
-			{ describedBy && (
+			{describedBy && (
 				<VisuallyHidden>
-					<span id={ descriptionId }>{ describedBy }</span>
+					<span id={descriptionId}>{describedBy}</span>
 				</VisuallyHidden>
-			) }
+			)}
 		</>
 	);
 }
 
-export default forwardRef( Button );
+export default forwardRef(Button);

@@ -16,26 +16,26 @@ const GRID_BASE = '4px';
  *
  * @param  value A number, numeric string, or a unit value.
  */
-export function space( value?: SpaceInput ): string | undefined {
-	if ( typeof value === 'undefined' ) {
+export function space(value?: SpaceInput): string | undefined {
+	if (typeof value === 'undefined') {
 		return undefined;
 	}
 
 	// handle empty strings, if it's the number 0 this still works
-	if ( ! value ) {
+	if (!value) {
 		return '0';
 	}
 
-	const asInt = typeof value === 'number' ? value : Number( value );
+	const asInt = typeof value === 'number' ? value : Number(value);
 
 	// test if the input has a unit, was NaN, or was one of the named CSS values (like `auto`), in which case just use that value
 	if (
-		( typeof window !== 'undefined' &&
-			window.CSS?.supports?.( 'margin', value.toString() ) ) ||
-		Number.isNaN( asInt )
+		(typeof window !== 'undefined' &&
+			window.CSS?.supports?.('margin', value.toString())) ||
+		Number.isNaN(asInt)
 	) {
 		return value.toString();
 	}
 
-	return `calc(${ GRID_BASE } * ${ value })`;
+	return `calc(${GRID_BASE} * ${value})`;
 }

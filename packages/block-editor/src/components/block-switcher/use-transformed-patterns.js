@@ -18,7 +18,7 @@ import { getMatchingBlockByName, getRetainedBlockAttributes } from './utils';
  * @param {WPBlock} selectedBlock The selected block.
  * @return {void}
  */
-export const transformMatchingBlock = ( match, selectedBlock ) => {
+export const transformMatchingBlock = (match, selectedBlock) => {
 	// Get the block attributes to retain through the transformation.
 	const retainedBlockAttributes = getRetainedBlockAttributes(
 		selectedBlock.name,
@@ -39,14 +39,9 @@ export const transformMatchingBlock = ( match, selectedBlock ) => {
  * @param {WPBlock[]} patternBlocks  The pattern's blocks.
  * @return {WPBlock[]|void} The transformed pattern's blocks or undefined if not all selected blocks have been matched.
  */
-export const getPatternTransformedBlocks = (
-	selectedBlocks,
-	patternBlocks
-) => {
+export const getPatternTransformedBlocks = (selectedBlocks, patternBlocks) => {
 	// Clone Pattern's blocks to produce new clientIds and be able to mutate the matches.
-	const _patternBlocks = patternBlocks.map( ( block ) =>
-		cloneBlock( block )
-	);
+	const _patternBlocks = patternBlocks.map((block) => cloneBlock(block));
 	/**
 	 * Keep track of the consumed pattern blocks.
 	 * This is needed because we loop the selected blocks
@@ -54,24 +49,24 @@ export const getPatternTransformedBlocks = (
 	 * the pattern's blocks could have more `paragraphs`.
 	 */
 	const consumedBlocks = new Set();
-	for ( const selectedBlock of selectedBlocks ) {
+	for (const selectedBlock of selectedBlocks) {
 		let isMatch = false;
-		for ( const patternBlock of _patternBlocks ) {
+		for (const patternBlock of _patternBlocks) {
 			const match = getMatchingBlockByName(
 				patternBlock,
 				selectedBlock.name,
 				consumedBlocks
 			);
-			if ( ! match ) continue;
+			if (!match) continue;
 			isMatch = true;
-			consumedBlocks.add( match.clientId );
+			consumedBlocks.add(match.clientId);
 			// We update (mutate) the matching pattern block.
-			transformMatchingBlock( match, selectedBlock );
+			transformMatchingBlock(match, selectedBlock);
 			// No need to loop through other pattern's blocks.
 			break;
 		}
 		// Bail eary if a selected block has not been matched.
-		if ( ! isMatch ) return;
+		if (!isMatch) return;
 	}
 	return _patternBlocks;
 };
@@ -93,23 +88,23 @@ export const getPatternTransformedBlocks = (
  * @return {TransformedBlockPattern[]} Returns the eligible matched patterns with all the selected blocks.
  */
 // TODO tests
-const useTransformedPatterns = ( patterns, selectedBlocks ) => {
+const useTransformedPatterns = (patterns, selectedBlocks) => {
 	return useMemo(
 		() =>
-			patterns.reduce( ( accumulator, _pattern ) => {
+			patterns.reduce((accumulator, _pattern) => {
 				const transformedBlocks = getPatternTransformedBlocks(
 					selectedBlocks,
 					_pattern.blocks
 				);
-				if ( transformedBlocks ) {
-					accumulator.push( {
+				if (transformedBlocks) {
+					accumulator.push({
 						..._pattern,
 						transformedBlocks,
-					} );
+					});
 				}
 				return accumulator;
-			}, [] ),
-		[ patterns, selectedBlocks ]
+			}, []),
+		[patterns, selectedBlocks]
 	);
 };
 

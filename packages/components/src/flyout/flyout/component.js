@@ -24,7 +24,7 @@ import { useFlyout } from './hook';
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
  * @param {import('react').Ref<any>}                                                                   forwardedRef
  */
-function Flyout( props, forwardedRef ) {
+function Flyout(props, forwardedRef) {
 	const {
 		children,
 		elevation,
@@ -34,54 +34,54 @@ function Flyout( props, forwardedRef ) {
 		trigger,
 		flyoutState,
 		...otherProps
-	} = useFlyout( props );
+	} = useFlyout(props);
 
-	const resizeListener = useFlyoutResizeUpdater( {
+	const resizeListener = useFlyoutResizeUpdater({
 		onResize: flyoutState.unstable_update,
-	} );
+	});
 
-	const uniqueId = `flyout-${ flyoutState.baseId }`;
+	const uniqueId = `flyout-${flyoutState.baseId}`;
 	const labelId = label || uniqueId;
 
 	const contextProps = useMemo(
-		() => ( {
+		() => ({
 			label: labelId,
 			flyoutState,
-		} ),
-		[ labelId, flyoutState ]
+		}),
+		[labelId, flyoutState]
 	);
 
 	const triggerContent = useCallback(
-		( triggerProps ) => {
-			return cloneElement( trigger, triggerProps );
+		(triggerProps) => {
+			return cloneElement(trigger, triggerProps);
 		},
-		[ trigger ]
+		[trigger]
 	);
 
-	useUpdateEffect( () => {
-		onVisibleChange?.( flyoutState.visible );
-	}, [ flyoutState.visible ] );
+	useUpdateEffect(() => {
+		onVisibleChange?.(flyoutState.visible);
+	}, [flyoutState.visible]);
 
 	return (
-		<FlyoutContext.Provider value={ contextProps }>
-			{ trigger && (
+		<FlyoutContext.Provider value={contextProps}>
+			{trigger && (
 				<PopoverDisclosure
-					{ ...flyoutState }
-					ref={ trigger.ref }
-					{ ...trigger.props }
+					{...flyoutState}
+					ref={trigger.ref}
+					{...trigger.props}
 				>
-					{ triggerContent }
+					{triggerContent}
 				</PopoverDisclosure>
-			) }
+			)}
 			<Portal>
 				<FlyoutContent
-					ref={ forwardedRef }
-					{ ...otherProps }
-					elevation={ elevation }
-					maxWidth={ maxWidth }
+					ref={forwardedRef}
+					{...otherProps}
+					elevation={elevation}
+					maxWidth={maxWidth}
 				>
-					{ resizeListener }
-					{ children }
+					{resizeListener}
+					{children}
 				</FlyoutContent>
 			</Portal>
 		</FlyoutContext.Provider>
@@ -106,6 +106,6 @@ function Flyout( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedFlyout = contextConnect( Flyout, 'Flyout' );
+const ConnectedFlyout = contextConnect(Flyout, 'Flyout');
 
 export default ConnectedFlyout;

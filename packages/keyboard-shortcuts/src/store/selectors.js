@@ -47,13 +47,13 @@ const FORMATTING_METHODS = {
  *
  * @return {string?} Shortcut representation.
  */
-function getKeyCombinationRepresentation( shortcut, representation ) {
-	if ( ! shortcut ) {
+function getKeyCombinationRepresentation(shortcut, representation) {
+	if (!shortcut) {
 		return null;
 	}
 
 	return shortcut.modifier
-		? FORMATTING_METHODS[ representation ][ shortcut.modifier ](
+		? FORMATTING_METHODS[representation][shortcut.modifier](
 				shortcut.character
 		  )
 		: shortcut.character;
@@ -67,8 +67,8 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
  *
  * @return {WPShortcutKeyCombination?} Key combination.
  */
-export function getShortcutKeyCombination( state, name ) {
-	return state[ name ] ? state[ name ].keyCombination : null;
+export function getShortcutKeyCombination(state, name) {
+	return state[name] ? state[name].keyCombination : null;
 }
 
 /**
@@ -86,8 +86,8 @@ export function getShortcutRepresentation(
 	name,
 	representation = 'display'
 ) {
-	const shortcut = getShortcutKeyCombination( state, name );
-	return getKeyCombinationRepresentation( shortcut, representation );
+	const shortcut = getShortcutKeyCombination(state, name);
+	return getKeyCombinationRepresentation(shortcut, representation);
 }
 
 /**
@@ -98,8 +98,8 @@ export function getShortcutRepresentation(
  *
  * @return {string?} Shortcut description.
  */
-export function getShortcutDescription( state, name ) {
-	return state[ name ] ? state[ name ].description : null;
+export function getShortcutDescription(state, name) {
+	return state[name] ? state[name].description : null;
 }
 
 /**
@@ -110,20 +110,20 @@ export function getShortcutDescription( state, name ) {
  *
  * @return {WPShortcutKeyCombination[]} Key combinations.
  */
-export function getShortcutAliases( state, name ) {
-	return state[ name ] && state[ name ].aliases
-		? state[ name ].aliases
+export function getShortcutAliases(state, name) {
+	return state[name] && state[name].aliases
+		? state[name].aliases
 		: EMPTY_ARRAY;
 }
 
 export const getAllShortcutKeyCombinations = createSelector(
-	( state, name ) => {
-		return compact( [
-			getShortcutKeyCombination( state, name ),
-			...getShortcutAliases( state, name ),
-		] );
+	(state, name) => {
+		return compact([
+			getShortcutKeyCombination(state, name),
+			...getShortcutAliases(state, name),
+		]);
 	},
-	( state, name ) => [ state[ name ] ]
+	(state, name) => [state[name]]
 );
 
 /**
@@ -135,15 +135,12 @@ export const getAllShortcutKeyCombinations = createSelector(
  * @return {string[]} Shortcuts.
  */
 export const getAllShortcutRawKeyCombinations = createSelector(
-	( state, name ) => {
-		return getAllShortcutKeyCombinations(
-			state,
-			name
-		).map( ( combination ) =>
-			getKeyCombinationRepresentation( combination, 'raw' )
+	(state, name) => {
+		return getAllShortcutKeyCombinations(state, name).map((combination) =>
+			getKeyCombinationRepresentation(combination, 'raw')
 		);
 	},
-	( state, name ) => [ state[ name ] ]
+	(state, name) => [state[name]]
 );
 
 /**
@@ -155,10 +152,10 @@ export const getAllShortcutRawKeyCombinations = createSelector(
  * @return {string[]} Shortcut names.
  */
 export const getCategoryShortcuts = createSelector(
-	( state, categoryName ) => {
-		return Object.entries( state )
-			.filter( ( [ , shortcut ] ) => shortcut.category === categoryName )
-			.map( ( [ name ] ) => name );
+	(state, categoryName) => {
+		return Object.entries(state)
+			.filter(([, shortcut]) => shortcut.category === categoryName)
+			.map(([name]) => name);
 	},
-	( state ) => [ state ]
+	(state) => [state]
 );

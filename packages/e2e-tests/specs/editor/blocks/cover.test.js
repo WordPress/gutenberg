@@ -16,9 +16,9 @@ import {
 	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
 
-async function upload( selector ) {
+async function upload(selector) {
 	const inputElement = await page.waitForSelector(
-		`${ selector } input[type="file"]`
+		`${selector} input[type="file"]`
 	);
 	const testImagePath = path.join(
 		__dirname,
@@ -29,27 +29,27 @@ async function upload( selector ) {
 		'10x10_e2e_test_image_z9T8jK.png'
 	);
 	const filename = uuid();
-	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
-	fs.copyFileSync( testImagePath, tmpFileName );
-	await inputElement.uploadFile( tmpFileName );
-	await page.waitForSelector( `${ selector } img[src$="${ filename }.png"]` );
+	const tmpFileName = path.join(os.tmpdir(), filename + '.png');
+	fs.copyFileSync(testImagePath, tmpFileName);
+	await inputElement.uploadFile(tmpFileName);
+	await page.waitForSelector(`${selector} img[src$="${filename}.png"]`);
 	return filename;
 }
 
-describe( 'Cover', () => {
-	beforeEach( async () => {
+describe('Cover', () => {
+	beforeEach(async () => {
 		await createNewPost();
-	} );
+	});
 
-	it( 'can set overlay color using color picker on block placeholder', async () => {
-		await insertBlock( 'Cover' );
+	it('can set overlay color using color picker on block placeholder', async () => {
+		await insertBlock('Cover');
 		// Get the first color option from the block placeholder's color picker
 		const colorPickerButton = await page.waitForSelector(
 			'.wp-block-cover__placeholder-background-options .components-circular-option-picker__option-wrapper:first-child button'
 		);
 		// Get the RGB value of the picked color
 		const pickedColor = await colorPickerButton.evaluate(
-			( node ) => node.style.backgroundColor
+			(node) => node.style.backgroundColor
 		);
 		// Create the block by clicking selected color button
 		await colorPickerButton.click();
@@ -59,45 +59,45 @@ describe( 'Cover', () => {
 		);
 		// Get the RGB value of the background dim
 		const dimColor = await backgroundDim.evaluate(
-			( node ) => node.style.backgroundColor
+			(node) => node.style.backgroundColor
 		);
 
-		expect( pickedColor ).toEqual( dimColor );
-	} );
+		expect(pickedColor).toEqual(dimColor);
+	});
 
-	it( 'can set background image using image upload on block placeholder', async () => {
-		await insertBlock( 'Cover' );
+	it('can set background image using image upload on block placeholder', async () => {
+		await insertBlock('Cover');
 		// Create the block using uploaded image
-		const sourceImageFilename = await upload( '.wp-block-cover' );
+		const sourceImageFilename = await upload('.wp-block-cover');
 		// Get the block's background image URL
-		const blockImage = await page.waitForSelector( '.wp-block-cover img' );
-		const blockImageUrl = await blockImage.evaluate( ( el ) => el.src );
+		const blockImage = await page.waitForSelector('.wp-block-cover img');
+		const blockImageUrl = await blockImage.evaluate((el) => el.src);
 
-		expect( blockImageUrl ).toContain( sourceImageFilename );
-	} );
+		expect(blockImageUrl).toContain(sourceImageFilename);
+	});
 
-	it( 'dims background image down by 50% by default', async () => {
-		await insertBlock( 'Cover' );
+	it('dims background image down by 50% by default', async () => {
+		await insertBlock('Cover');
 		// Create the block using uploaded image
-		await upload( '.wp-block-cover' );
+		await upload('.wp-block-cover');
 		// Get the block's background dim color and its opacity
 		const backgroundDim = await page.waitForSelector(
 			'.wp-block-cover .has-background-dim'
 		);
-		const [
-			backgroundDimColor,
-			backgroundDimOpacity,
-		] = await page.evaluate( ( el ) => {
-			const computedStyle = window.getComputedStyle( el );
-			return [ computedStyle.backgroundColor, computedStyle.opacity ];
-		}, backgroundDim );
+		const [backgroundDimColor, backgroundDimOpacity] = await page.evaluate(
+			(el) => {
+				const computedStyle = window.getComputedStyle(el);
+				return [computedStyle.backgroundColor, computedStyle.opacity];
+			},
+			backgroundDim
+		);
 
-		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
-		expect( backgroundDimOpacity ).toBe( '0.5' );
-	} );
+		expect(backgroundDimColor).toBe('rgb(0, 0, 0)');
+		expect(backgroundDimOpacity).toBe('0.5');
+	});
 
-	it( 'can have the title edited', async () => {
-		await insertBlock( 'Cover' );
+	it('can have the title edited', async () => {
+		await insertBlock('Cover');
 		// Click first color option from the block placeholder's color picker
 		const colorPickerButton = await page.waitForSelector(
 			'.wp-block-cover__placeholder-background-options .components-circular-option-picker__option-wrapper:first-child button'
@@ -109,18 +109,16 @@ describe( 'Cover', () => {
 		);
 		await coverTitle.click();
 		// Type the title
-		await page.keyboard.type( 'foo' );
-		const coverTitleText = await coverTitle.evaluate(
-			( el ) => el.innerText
-		);
+		await page.keyboard.type('foo');
+		const coverTitleText = await coverTitle.evaluate((el) => el.innerText);
 
-		expect( coverTitleText ).toEqual( 'foo' );
-	} );
+		expect(coverTitleText).toEqual('foo');
+	});
 
-	it( 'can be resized using drag & drop', async () => {
-		await insertBlock( 'Cover' );
+	it('can be resized using drag & drop', async () => {
+		await insertBlock('Cover');
 		// Close the inserter
-		await page.click( '.edit-post-header-toolbar__inserter-toggle' );
+		await page.click('.edit-post-header-toolbar__inserter-toggle');
 		// Open the sidebar
 		await openDocumentSettingsSidebar();
 		// Choose the first solid color as the background of the cover.
@@ -129,20 +127,18 @@ describe( 'Cover', () => {
 		);
 
 		// Select the cover block.By default the child paragraph gets selected.
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		await page.click(
-			'.block-editor-list-view-block__contents-container a'
-		);
+		await page.click('.edit-post-header-toolbar__list-view-toggle');
+		await page.click('.block-editor-list-view-block__contents-container a');
 
 		const heightInput = (
 			await page.$x(
 				'//div[./label[contains(text(),"Minimum height of cover")]]//input'
 			)
-		 )[ 0 ];
+		)[0];
 
 		// Verify the height of the cover is not defined
 		expect(
-			await page.evaluate( ( { value } ) => value, heightInput )
+			await page.evaluate(({ value }) => value, heightInput)
 		).toBeFalsy();
 
 		const resizeButton = await page.$(
@@ -163,16 +159,16 @@ describe( 'Cover', () => {
 		// Trigger a mousedown event against the resize button.
 		// Using page.mouse.down does not works because it triggers a global event,
 		// not an event for that element.
-		page.evaluate( ( { x, y } ) => {
+		page.evaluate(({ x, y }) => {
 			const element = document.querySelector(
 				'.components-resizable-box__handle-bottom'
 			);
-			event = document.createEvent( 'CustomEvent' );
-			event.initCustomEvent( 'mousedown', true, true, null );
+			event = document.createEvent('CustomEvent');
+			event.initCustomEvent('mousedown', true, true, null);
 			event.clientX = x;
 			event.clientY = y;
-			element.dispatchEvent( event );
-		}, coordinatesResizeButton );
+			element.dispatchEvent(event);
+		}, coordinatesResizeButton);
 
 		// Move the mouse to resize the cover.
 		await page.mouse.move(
@@ -187,34 +183,34 @@ describe( 'Cover', () => {
 		// Verify the height of the cover has changed.
 		expect(
 			await page.evaluate(
-				( { value } ) => Number.parseInt( value ),
+				({ value }) => Number.parseInt(value),
 				heightInput
 			)
-		).toBeGreaterThan( 100 );
-	} );
+		).toBeGreaterThan(100);
+	});
 
-	it( 'dims the background image down by 50% when transformed from the Image block', async () => {
-		await insertBlock( 'Image' );
+	it('dims the background image down by 50% when transformed from the Image block', async () => {
+		await insertBlock('Image');
 		// Upload image and transform to the Cover block
-		await upload( '.wp-block-image' );
+		await upload('.wp-block-image');
 		// Click the block wrapper before trying to convert to make sure figcaption toolbar is not obscuring
 		// the block toolbar.
-		await page.click( '.wp-block-image' );
-		await transformBlockTo( 'Cover' );
+		await page.click('.wp-block-image');
+		await transformBlockTo('Cover');
 
 		// Get the block's background dim color and its opacity
 		const backgroundDim = await page.waitForSelector(
 			'.wp-block-cover .has-background-dim'
 		);
-		const [
-			backgroundDimColor,
-			backgroundDimOpacity,
-		] = await page.evaluate( ( el ) => {
-			const computedStyle = window.getComputedStyle( el );
-			return [ computedStyle.backgroundColor, computedStyle.opacity ];
-		}, backgroundDim );
+		const [backgroundDimColor, backgroundDimOpacity] = await page.evaluate(
+			(el) => {
+				const computedStyle = window.getComputedStyle(el);
+				return [computedStyle.backgroundColor, computedStyle.opacity];
+			},
+			backgroundDim
+		);
 
-		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
-		expect( backgroundDimOpacity ).toBe( '0.5' );
-	} );
-} );
+		expect(backgroundDimColor).toBe('rgb(0, 0, 0)');
+		expect(backgroundDimOpacity).toBe('0.5');
+	});
+});

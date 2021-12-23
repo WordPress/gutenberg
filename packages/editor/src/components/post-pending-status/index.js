@@ -12,30 +12,30 @@ import { compose } from '@wordpress/compose';
 import PostPendingStatusCheck from './check';
 import { store as editorStore } from '../../store';
 
-export function PostPendingStatus( { status, onUpdateStatus } ) {
+export function PostPendingStatus({ status, onUpdateStatus }) {
 	const togglePendingStatus = () => {
 		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
-		onUpdateStatus( updatedStatus );
+		onUpdateStatus(updatedStatus);
 	};
 
 	return (
 		<PostPendingStatusCheck>
 			<CheckboxControl
-				label={ __( 'Pending review' ) }
-				checked={ status === 'pending' }
-				onChange={ togglePendingStatus }
+				label={__('Pending review')}
+				checked={status === 'pending'}
+				onChange={togglePendingStatus}
 			/>
 		</PostPendingStatusCheck>
 	);
 }
 
 export default compose(
-	withSelect( ( select ) => ( {
-		status: select( editorStore ).getEditedPostAttribute( 'status' ),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateStatus( status ) {
-			dispatch( editorStore ).editPost( { status } );
+	withSelect((select) => ({
+		status: select(editorStore).getEditedPostAttribute('status'),
+	})),
+	withDispatch((dispatch) => ({
+		onUpdateStatus(status) {
+			dispatch(editorStore).editPost({ status });
 		},
-	} ) )
-)( PostPendingStatus );
+	}))
+)(PostPendingStatus);

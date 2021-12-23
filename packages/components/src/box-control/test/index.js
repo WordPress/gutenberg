@@ -14,269 +14,269 @@ import { ENTER } from '@wordpress/keycodes';
  */
 import BoxControl from '../';
 
-describe( 'BoxControl', () => {
-	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
-			const { container } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
+describe('BoxControl', () => {
+	describe('Basic rendering', () => {
+		it('should render', () => {
+			const { container } = render(<BoxControl />);
+			const input = container.querySelector('input');
 
-			expect( input ).toBeTruthy();
-		} );
+			expect(input).toBeTruthy();
+		});
 
-		it( 'should update values when interacting with input', () => {
-			const { container } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-
-			input.focus();
-			fireEvent.change( input, { target: { value: '100%' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
-
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( '%' );
-		} );
-	} );
-
-	describe( 'Reset', () => {
-		it( 'should reset values when clicking Reset', () => {
-			const { container, getByText } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+		it('should update values when interacting with input', () => {
+			const { container } = render(<BoxControl />);
+			const input = container.querySelector('input');
+			const unitSelect = container.querySelector('select');
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			fireEvent.change(input, { target: { value: '100%' } });
+			fireEvent.keyDown(input, { keyCode: ENTER });
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect(input.value).toBe('100');
+			expect(unitSelect.value).toBe('%');
+		});
+	});
+
+	describe('Reset', () => {
+		it('should reset values when clicking Reset', () => {
+			const { container, getByText } = render(<BoxControl />);
+			const input = container.querySelector('input');
+			const unitSelect = container.querySelector('select');
+			const reset = getByText(/Reset/);
+
+			input.focus();
+			fireEvent.change(input, { target: { value: '100px' } });
+			fireEvent.keyDown(input, { keyCode: ENTER });
+
+			expect(input.value).toBe('100');
+			expect(unitSelect.value).toBe('px');
 
 			reset.focus();
-			fireEvent.click( reset );
+			fireEvent.click(reset);
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
-		} );
+			expect(input.value).toBe('');
+			expect(unitSelect.value).toBe('px');
+		});
 
-		it( 'should reset values when clicking Reset, if controlled', () => {
+		it('should reset values when clicking Reset, if controlled', () => {
 			const Example = () => {
-				const [ state, setState ] = useState();
+				const [state, setState] = useState();
 
 				return (
 					<BoxControl
-						values={ state }
-						onChange={ ( next ) => setState( next ) }
+						values={state}
+						onChange={(next) => setState(next)}
 					/>
 				);
 			};
-			const { container, getByText } = render( <Example /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+			const { container, getByText } = render(<Example />);
+			const input = container.querySelector('input');
+			const unitSelect = container.querySelector('select');
+			const reset = getByText(/Reset/);
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			fireEvent.change(input, { target: { value: '100px' } });
+			fireEvent.keyDown(input, { keyCode: ENTER });
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect(input.value).toBe('100');
+			expect(unitSelect.value).toBe('px');
 
 			reset.focus();
-			fireEvent.click( reset );
+			fireEvent.click(reset);
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
-		} );
+			expect(input.value).toBe('');
+			expect(unitSelect.value).toBe('px');
+		});
 
-		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', () => {
+		it('should reset values when clicking Reset, if controlled <-> uncontrolled state changes', () => {
 			const Example = () => {
-				const [ state, setState ] = useState();
+				const [state, setState] = useState();
 
 				return (
 					<BoxControl
-						values={ state }
-						onChange={ ( next ) => {
-							if ( next.top ) {
-								setState( next );
+						values={state}
+						onChange={(next) => {
+							if (next.top) {
+								setState(next);
 							} else {
 								// This reverts it to being uncontrolled
-								setState( undefined );
+								setState(undefined);
 							}
-						} }
+						}}
 					/>
 				);
 			};
-			const { container, getByText } = render( <Example /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+			const { container, getByText } = render(<Example />);
+			const input = container.querySelector('input');
+			const unitSelect = container.querySelector('select');
+			const reset = getByText(/Reset/);
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			fireEvent.change(input, { target: { value: '100px' } });
+			fireEvent.keyDown(input, { keyCode: ENTER });
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect(input.value).toBe('100');
+			expect(unitSelect.value).toBe('px');
 
 			reset.focus();
-			fireEvent.click( reset );
+			fireEvent.click(reset);
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
-		} );
-	} );
+			expect(input.value).toBe('');
+			expect(unitSelect.value).toBe('px');
+		});
+	});
 
-	describe( 'Unlinked Sides', () => {
-		it( 'should update a single side value when unlinked', () => {
+	describe('Unlinked Sides', () => {
+		it('should update a single side value when unlinked', () => {
 			let state = {};
-			const setState = ( newState ) => ( state = newState );
+			const setState = (newState) => (state = newState);
 
 			const { container, getByLabelText } = render(
 				<BoxControl
-					values={ state }
-					onChange={ ( next ) => setState( next ) }
+					values={state}
+					onChange={(next) => setState(next)}
 				/>
 			);
 
-			const unlink = getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			const unlink = getByLabelText(/Unlink Sides/);
+			fireEvent.click(unlink);
 
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+			const input = container.querySelector('input');
+			const unitSelect = container.querySelector('select');
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			fireEvent.change(input, { target: { value: '100px' } });
+			fireEvent.keyDown(input, { keyCode: ENTER });
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect(input.value).toBe('100');
+			expect(unitSelect.value).toBe('px');
 
-			expect( state ).toEqual( {
+			expect(state).toEqual({
 				top: '100px',
 				right: undefined,
 				bottom: undefined,
 				left: undefined,
-			} );
-		} );
+			});
+		});
 
-		it( 'should update a whole axis when value is changed when unlinked', () => {
+		it('should update a whole axis when value is changed when unlinked', () => {
 			let state = {};
-			const setState = ( newState ) => ( state = newState );
+			const setState = (newState) => (state = newState);
 
 			const { container, getByLabelText } = render(
 				<BoxControl
-					values={ state }
-					onChange={ ( next ) => setState( next ) }
-					splitOnAxis={ true }
+					values={state}
+					onChange={(next) => setState(next)}
+					splitOnAxis={true}
 				/>
 			);
 
-			const unlink = getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			const unlink = getByLabelText(/Unlink Sides/);
+			fireEvent.click(unlink);
 
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+			const input = container.querySelector('input');
+			const unitSelect = container.querySelector('select');
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			fireEvent.change(input, { target: { value: '100px' } });
+			fireEvent.keyDown(input, { keyCode: ENTER });
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect(input.value).toBe('100');
+			expect(unitSelect.value).toBe('px');
 
-			expect( state ).toEqual( {
+			expect(state).toEqual({
 				top: '100px',
 				right: undefined,
 				bottom: '100px',
 				left: undefined,
-			} );
-		} );
-	} );
+			});
+		});
+	});
 
-	describe( 'Unit selections', () => {
-		it( 'should update unlinked controls unit selection based on all input control', () => {
+	describe('Unit selections', () => {
+		it('should update unlinked controls unit selection based on all input control', () => {
 			// Render control
-			render( <BoxControl /> );
+			render(<BoxControl />);
 
 			// Make unit selection on all input control
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
+			const allUnitSelect = screen.getByLabelText('Select unit');
 			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'em' } } );
+			fireEvent.change(allUnitSelect, { target: { value: 'em' } });
 
 			// Unlink the controls
-			const unlink = screen.getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			const unlink = screen.getByLabelText(/Unlink Sides/);
+			fireEvent.click(unlink);
 
 			// Confirm that each individual control has the selected unit
-			const unlinkedSelects = screen.getAllByDisplayValue( 'em' );
-			expect( unlinkedSelects.length ).toEqual( 4 );
-		} );
+			const unlinkedSelects = screen.getAllByDisplayValue('em');
+			expect(unlinkedSelects.length).toEqual(4);
+		});
 
-		it( 'should use individual side attribute unit when available', () => {
+		it('should use individual side attribute unit when available', () => {
 			// Render control
-			const { rerender } = render( <BoxControl /> );
+			const { rerender } = render(<BoxControl />);
 
 			// Make unit selection on all input control
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
+			const allUnitSelect = screen.getByLabelText('Select unit');
 			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'vw' } } );
+			fireEvent.change(allUnitSelect, { target: { value: 'vw' } });
 
 			// Unlink the controls
-			const unlink = screen.getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			const unlink = screen.getByLabelText(/Unlink Sides/);
+			fireEvent.click(unlink);
 
 			// Confirm that each individual control has the selected unit
-			const unlinkedSelects = screen.getAllByDisplayValue( 'vw' );
-			expect( unlinkedSelects.length ).toEqual( 4 );
+			const unlinkedSelects = screen.getAllByDisplayValue('vw');
+			expect(unlinkedSelects.length).toEqual(4);
 
 			// Rerender with individual side value & confirm unit is selected.
-			rerender( <BoxControl values={ { top: '2.5em' } } /> );
+			rerender(<BoxControl values={{ top: '2.5em' }} />);
 
-			const topSelect = screen.getByDisplayValue( 'em' );
-			const otherSelects = screen.getAllByDisplayValue( 'vw' );
+			const topSelect = screen.getByDisplayValue('em');
+			const otherSelects = screen.getAllByDisplayValue('vw');
 
-			expect( topSelect ).toBeInTheDocument();
-			expect( otherSelects.length ).toEqual( 3 );
-		} );
-	} );
+			expect(topSelect).toBeInTheDocument();
+			expect(otherSelects.length).toEqual(3);
+		});
+	});
 
-	describe( 'onChange updates', () => {
-		it( 'should call onChange when values contain more than just CSS units', () => {
+	describe('onChange updates', () => {
+		it('should call onChange when values contain more than just CSS units', () => {
 			const setState = jest.fn();
 
-			render( <BoxControl onChange={ setState } /> );
+			render(<BoxControl onChange={setState} />);
 
-			const input = screen.getByLabelText( 'Box Control', {
+			const input = screen.getByLabelText('Box Control', {
 				selector: 'input',
-			} );
+			});
 
 			input.focus();
-			fireEvent.change( input, { target: { value: '7.5rem' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			fireEvent.change(input, { target: { value: '7.5rem' } });
+			fireEvent.keyDown(input, { keyCode: ENTER });
 
-			expect( setState ).toHaveBeenCalledWith( {
+			expect(setState).toHaveBeenCalledWith({
 				top: '7.5rem',
 				right: '7.5rem',
 				bottom: '7.5rem',
 				left: '7.5rem',
-			} );
-		} );
+			});
+		});
 
-		it( 'should not pass invalid CSS unit only values to onChange', () => {
+		it('should not pass invalid CSS unit only values to onChange', () => {
 			const setState = jest.fn();
 
-			render( <BoxControl onChange={ setState } /> );
+			render(<BoxControl onChange={setState} />);
 
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
+			const allUnitSelect = screen.getByLabelText('Select unit');
 			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'rem' } } );
+			fireEvent.change(allUnitSelect, { target: { value: 'rem' } });
 
-			expect( setState ).toHaveBeenCalledWith( {
+			expect(setState).toHaveBeenCalledWith({
 				top: undefined,
 				right: undefined,
 				bottom: undefined,
 				left: undefined,
-			} );
-		} );
-	} );
-} );
+			});
+		});
+	});
+});

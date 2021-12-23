@@ -100,7 +100,7 @@ let settings = {
 			'Friday',
 			'Saturday',
 		],
-		weekdaysShort: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
+		weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 		meridiem: { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' },
 		relative: {
 			future: '%s from now',
@@ -133,20 +133,20 @@ let settings = {
  *
  * @param {DateSettings} dateSettings Settings, including locale data.
  */
-export function setSettings( dateSettings ) {
+export function setSettings(dateSettings) {
 	settings = dateSettings;
 
 	// Backup and restore current locale.
 	const currentLocale = momentLib.locale();
-	momentLib.updateLocale( dateSettings.l10n.locale, {
+	momentLib.updateLocale(dateSettings.l10n.locale, {
 		// Inherit anything missing from the default locale.
 		parentLocale: currentLocale,
 		months: dateSettings.l10n.months,
 		monthsShort: dateSettings.l10n.monthsShort,
 		weekdays: dateSettings.l10n.weekdays,
 		weekdaysShort: dateSettings.l10n.weekdaysShort,
-		meridiem( hour, minute, isLowercase ) {
-			if ( hour < 12 ) {
+		meridiem(hour, minute, isLowercase) {
+			if (hour < 12) {
 				return isLowercase
 					? dateSettings.l10n.meridiem.am
 					: dateSettings.l10n.meridiem.AM;
@@ -169,8 +169,8 @@ export function setSettings( dateSettings ) {
 		// From human_time_diff?
 		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
 		relativeTime: dateSettings.l10n.relative,
-	} );
-	momentLib.locale( currentLocale );
+	});
+	momentLib.locale(currentLocale);
 
 	setupWPTimezone();
 }
@@ -187,12 +187,12 @@ export function __experimentalGetSettings() {
 function setupWPTimezone() {
 	// Create WP timezone based off dateSettings.
 	momentLib.tz.add(
-		momentLib.tz.pack( {
+		momentLib.tz.pack({
 			name: WP_ZONE,
-			abbrs: [ WP_ZONE ],
-			untils: [ null ],
-			offsets: [ -settings.timezone.offset * 60 || 0 ],
-		} )
+			abbrs: [WP_ZONE],
+			untils: [null],
+			offsets: [-settings.timezone.offset * 60 || 0],
+		})
 	);
 }
 
@@ -241,11 +241,11 @@ const formatMap = {
 	 *
 	 * @return {string} Formatted date.
 	 */
-	S( momentDate ) {
+	S(momentDate) {
 		// Do - D
-		const num = momentDate.format( 'D' );
-		const withOrdinal = momentDate.format( 'Do' );
-		return withOrdinal.replace( num, '' );
+		const num = momentDate.format('D');
+		const withOrdinal = momentDate.format('Do');
+		return withOrdinal.replace(num, '');
 	},
 
 	w: 'd',
@@ -256,9 +256,9 @@ const formatMap = {
 	 *
 	 * @return {string} Formatted date.
 	 */
-	z( momentDate ) {
+	z(momentDate) {
 		// DDD - 1
-		return ( parseInt( momentDate.format( 'DDD' ), 10 ) - 1 ).toString();
+		return (parseInt(momentDate.format('DDD'), 10) - 1).toString();
 	},
 
 	// Week
@@ -276,7 +276,7 @@ const formatMap = {
 	 *
 	 * @return {number} Formatted date.
 	 */
-	t( momentDate ) {
+	t(momentDate) {
 		return momentDate.daysInMonth();
 	},
 
@@ -288,7 +288,7 @@ const formatMap = {
 	 *
 	 * @return {string} Formatted date.
 	 */
-	L( momentDate ) {
+	L(momentDate) {
 		return momentDate.isLeapYear() ? '1' : '0';
 	},
 	o: 'GGGG',
@@ -305,16 +305,16 @@ const formatMap = {
 	 *
 	 * @return {number} Formatted date.
 	 */
-	B( momentDate ) {
-		const timezoned = momentLib( momentDate ).utcOffset( 60 );
-		const seconds = parseInt( timezoned.format( 's' ), 10 ),
-			minutes = parseInt( timezoned.format( 'm' ), 10 ),
-			hours = parseInt( timezoned.format( 'H' ), 10 );
+	B(momentDate) {
+		const timezoned = momentLib(momentDate).utcOffset(60);
+		const seconds = parseInt(timezoned.format('s'), 10),
+			minutes = parseInt(timezoned.format('m'), 10),
+			hours = parseInt(timezoned.format('H'), 10);
 		return parseInt(
 			(
-				( seconds +
+				(seconds +
 					minutes * MINUTE_IN_SECONDS +
-					hours * HOUR_IN_SECONDS ) /
+					hours * HOUR_IN_SECONDS) /
 				86.4
 			).toString(),
 			10
@@ -337,7 +337,7 @@ const formatMap = {
 	 *
 	 * @return {string} Formatted date.
 	 */
-	I( momentDate ) {
+	I(momentDate) {
 		return momentDate.isDST() ? '1' : '0';
 	},
 	O: 'ZZ',
@@ -350,18 +350,16 @@ const formatMap = {
 	 *
 	 * @return {number} Formatted date.
 	 */
-	Z( momentDate ) {
+	Z(momentDate) {
 		// Timezone offset in seconds.
-		const offset = momentDate.format( 'Z' );
-		const sign = offset[ 0 ] === '-' ? -1 : 1;
+		const offset = momentDate.format('Z');
+		const sign = offset[0] === '-' ? -1 : 1;
 		const parts = offset
-			.substring( 1 )
-			.split( ':' )
-			.map( ( n ) => parseInt( n, 10 ) );
+			.substring(1)
+			.split(':')
+			.map((n) => parseInt(n, 10));
 		return (
-			sign *
-			( parts[ 0 ] * HOUR_IN_MINUTES + parts[ 1 ] ) *
-			MINUTE_IN_SECONDS
+			sign * (parts[0] * HOUR_IN_MINUTES + parts[1]) * MINUTE_IN_SECONDS
 		);
 	},
 	// Full date/time
@@ -380,36 +378,35 @@ const formatMap = {
  *
  * @return {string} Formatted date.
  */
-export function format( dateFormat, dateValue = new Date() ) {
+export function format(dateFormat, dateValue = new Date()) {
 	let i, char;
 	const newFormat = [];
-	const momentDate = momentLib( dateValue );
-	for ( i = 0; i < dateFormat.length; i++ ) {
-		char = dateFormat[ i ];
+	const momentDate = momentLib(dateValue);
+	for (i = 0; i < dateFormat.length; i++) {
+		char = dateFormat[i];
 		// Is this an escape?
-		if ( '\\' === char ) {
+		if ('\\' === char) {
 			// Add next character, then move on.
 			i++;
-			newFormat.push( '[' + dateFormat[ i ] + ']' );
+			newFormat.push('[' + dateFormat[i] + ']');
 			continue;
 		}
-		if ( char in formatMap ) {
-			const formatter =
-				formatMap[ /** @type {keyof formatMap} */ ( char ) ];
-			if ( typeof formatter !== 'string' ) {
+		if (char in formatMap) {
+			const formatter = formatMap[/** @type {keyof formatMap} */ (char)];
+			if (typeof formatter !== 'string') {
 				// If the format is a function, call it.
-				newFormat.push( '[' + formatter( momentDate ) + ']' );
+				newFormat.push('[' + formatter(momentDate) + ']');
 			} else {
 				// Otherwise, add as a formatting string.
-				newFormat.push( formatter );
+				newFormat.push(formatter);
 			}
 		} else {
-			newFormat.push( '[' + char + ']' );
+			newFormat.push('[' + char + ']');
 		}
 	}
 	// Join with [] between to separate characters, and replace
 	// unneeded separators with static text.
-	return momentDate.format( newFormat.join( '[]' ) );
+	return momentDate.format(newFormat.join('[]'));
 }
 
 /**
@@ -428,9 +425,9 @@ export function format( dateFormat, dateValue = new Date() ) {
  *
  * @return {string} Formatted date in English.
  */
-export function date( dateFormat, dateValue = new Date(), timezone ) {
-	const dateMoment = buildMoment( dateValue, timezone );
-	return format( dateFormat, dateMoment );
+export function date(dateFormat, dateValue = new Date(), timezone) {
+	const dateMoment = buildMoment(dateValue, timezone);
+	return format(dateFormat, dateMoment);
 }
 
 /**
@@ -443,9 +440,9 @@ export function date( dateFormat, dateValue = new Date(), timezone ) {
  *
  * @return {string} Formatted date in English.
  */
-export function gmdate( dateFormat, dateValue = new Date() ) {
-	const dateMoment = momentLib( dateValue ).utc();
-	return format( dateFormat, dateMoment );
+export function gmdate(dateFormat, dateValue = new Date()) {
+	const dateMoment = momentLib(dateValue).utc();
+	return format(dateFormat, dateMoment);
 }
 
 /**
@@ -469,18 +466,18 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
  *
  * @return {string} Formatted date.
  */
-export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
-	if ( true === timezone ) {
-		return gmdateI18n( dateFormat, dateValue );
+export function dateI18n(dateFormat, dateValue = new Date(), timezone) {
+	if (true === timezone) {
+		return gmdateI18n(dateFormat, dateValue);
 	}
 
-	if ( false === timezone ) {
+	if (false === timezone) {
 		timezone = undefined;
 	}
 
-	const dateMoment = buildMoment( dateValue, timezone );
-	dateMoment.locale( settings.l10n.locale );
-	return format( dateFormat, dateMoment );
+	const dateMoment = buildMoment(dateValue, timezone);
+	dateMoment.locale(settings.l10n.locale);
+	return format(dateFormat, dateMoment);
 }
 
 /**
@@ -494,10 +491,10 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
  *
  * @return {string} Formatted date.
  */
-export function gmdateI18n( dateFormat, dateValue = new Date() ) {
-	const dateMoment = momentLib( dateValue ).utc();
-	dateMoment.locale( settings.l10n.locale );
-	return format( dateFormat, dateMoment );
+export function gmdateI18n(dateFormat, dateValue = new Date()) {
+	const dateMoment = momentLib(dateValue).utc();
+	dateMoment.locale(settings.l10n.locale);
+	return format(dateFormat, dateMoment);
 }
 
 /**
@@ -507,11 +504,11 @@ export function gmdateI18n( dateFormat, dateValue = new Date() ) {
  *
  * @return {boolean} Is in the future.
  */
-export function isInTheFuture( dateValue ) {
-	const now = momentLib.tz( WP_ZONE );
-	const momentObject = momentLib.tz( dateValue, WP_ZONE );
+export function isInTheFuture(dateValue) {
+	const now = momentLib.tz(WP_ZONE);
+	const momentObject = momentLib.tz(dateValue, WP_ZONE);
 
-	return momentObject.isAfter( now );
+	return momentObject.isAfter(now);
 }
 
 /**
@@ -521,12 +518,12 @@ export function isInTheFuture( dateValue ) {
  *
  * @return {Date} Date
  */
-export function getDate( dateString ) {
-	if ( ! dateString ) {
-		return momentLib.tz( WP_ZONE ).toDate();
+export function getDate(dateString) {
+	if (!dateString) {
+		return momentLib.tz(WP_ZONE).toDate();
 	}
 
-	return momentLib.tz( dateString, WP_ZONE ).toDate();
+	return momentLib.tz(dateString, WP_ZONE).toDate();
 }
 
 /**
@@ -543,22 +540,22 @@ export function getDate( dateString ) {
  *
  * @return {Moment} a moment instance.
  */
-function buildMoment( dateValue, timezone = '' ) {
-	const dateMoment = momentLib( dateValue );
+function buildMoment(dateValue, timezone = '') {
+	const dateMoment = momentLib(dateValue);
 
-	if ( timezone && ! isUTCOffset( timezone ) ) {
-		return dateMoment.tz( timezone );
+	if (timezone && !isUTCOffset(timezone)) {
+		return dateMoment.tz(timezone);
 	}
 
-	if ( timezone && isUTCOffset( timezone ) ) {
-		return dateMoment.utcOffset( timezone );
+	if (timezone && isUTCOffset(timezone)) {
+		return dateMoment.utcOffset(timezone);
 	}
 
-	if ( settings.timezone.string ) {
-		return dateMoment.tz( settings.timezone.string );
+	if (settings.timezone.string) {
+		return dateMoment.tz(settings.timezone.string);
 	}
 
-	return dateMoment.utcOffset( settings.timezone.offset );
+	return dateMoment.utcOffset(settings.timezone.offset);
 }
 
 /**
@@ -568,12 +565,12 @@ function buildMoment( dateValue, timezone = '' ) {
  *
  * @return {boolean} whether a certain UTC offset is valid or not.
  */
-function isUTCOffset( offset ) {
-	if ( 'number' === typeof offset ) {
+function isUTCOffset(offset) {
+	if ('number' === typeof offset) {
 		return true;
 	}
 
-	return VALID_UTC_OFFSET.test( offset );
+	return VALID_UTC_OFFSET.test(offset);
 }
 
 setupWPTimezone();

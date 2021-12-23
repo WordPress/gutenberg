@@ -6,9 +6,9 @@ import { __ } from '@wordpress/i18n';
 import { lineDashed, lineDotted, lineSolid } from '@wordpress/icons';
 
 const BORDER_STYLES = [
-	{ label: __( 'Solid' ), icon: lineSolid, value: 'solid' },
-	{ label: __( 'Dashed' ), icon: lineDashed, value: 'dashed' },
-	{ label: __( 'Dotted' ), icon: lineDotted, value: 'dotted' },
+	{ label: __('Solid'), icon: lineSolid, value: 'solid' },
+	{ label: __('Dashed'), icon: lineDashed, value: 'dashed' },
+	{ label: __('Dotted'), icon: lineDotted, value: 'dotted' },
 ];
 
 /**
@@ -20,27 +20,27 @@ const BORDER_STYLES = [
  *
  * @return {WPElement} Custom border style segmented control.
  */
-export default function BorderStyleControl( { onChange, value } ) {
+export default function BorderStyleControl({ onChange, value }) {
 	return (
 		<fieldset className="components-border-style-control">
-			<legend>{ __( 'Style' ) }</legend>
+			<legend>{__('Style')}</legend>
 			<div className="components-border-style-control__buttons">
-				{ BORDER_STYLES.map( ( borderStyle ) => (
+				{BORDER_STYLES.map((borderStyle) => (
 					<Button
-						key={ borderStyle.value }
-						icon={ borderStyle.icon }
+						key={borderStyle.value}
+						icon={borderStyle.icon}
 						isSmall
-						isPressed={ borderStyle.value === value }
-						onClick={ () =>
+						isPressed={borderStyle.value === value}
+						onClick={() =>
 							onChange(
 								borderStyle.value === value
 									? undefined
 									: borderStyle.value
 							)
 						}
-						aria-label={ borderStyle.label }
+						aria-label={borderStyle.label}
 					/>
-				) ) }
+				))}
 			</div>
 		</fieldset>
 	);

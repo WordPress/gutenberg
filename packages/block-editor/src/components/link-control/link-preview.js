@@ -23,145 +23,143 @@ import { ViewerSlot } from './viewer-slot';
 
 import useRichUrlData from './use-rich-url-data';
 
-export default function LinkPreview( {
+export default function LinkPreview({
 	value,
 	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
-} ) {
+}) {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
-	const { richData, isFetching } = useRichUrlData( showRichPreviews );
+	const { richData, isFetching } = useRichUrlData(showRichPreviews);
 
 	// Rich data may be an empty object so test for that.
-	const hasRichData = richData && Object.keys( richData ).length;
+	const hasRichData = richData && Object.keys(richData).length;
 
 	const displayURL =
-		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
-		'';
+		(value && filterURLForDisplay(safeDecodeURI(value.url), 16)) || '';
 
 	const displayTitle = richData?.title || value?.title || displayURL;
 
-	const isEmptyURL = ! value.url.length;
+	const isEmptyURL = !value.url.length;
 
 	let icon;
 
-	if ( richData?.icon ) {
-		icon = <img src={ richData?.icon } alt="" />;
-	} else if ( isEmptyURL ) {
-		icon = <Icon icon={ info } size={ 32 } />;
+	if (richData?.icon) {
+		icon = <img src={richData?.icon} alt="" />;
+	} else if (isEmptyURL) {
+		icon = <Icon icon={info} size={32} />;
 	} else {
-		icon = <Icon icon={ globe } />;
+		icon = <Icon icon={globe} />;
 	}
 
 	return (
 		<div
-			aria-label={ __( 'Currently selected' ) }
+			aria-label={__('Currently selected')}
 			aria-selected="true"
-			className={ classnames( 'block-editor-link-control__search-item', {
+			className={classnames('block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
-				'is-fetching': !! isFetching,
+				'is-fetching': !!isFetching,
 				'is-preview': true,
 				'is-error': isEmptyURL,
-			} ) }
+			})}
 		>
 			<div className="block-editor-link-control__search-item-top">
 				<span className="block-editor-link-control__search-item-header">
 					<span
-						className={ classnames(
+						className={classnames(
 							'block-editor-link-control__search-item-icon',
 							{
 								'is-image': richData?.icon,
 							}
-						) }
+						)}
 					>
-						{ icon }
+						{icon}
 					</span>
 					<span className="block-editor-link-control__search-item-details">
-						{ ! isEmptyURL ? (
+						{!isEmptyURL ? (
 							<>
 								<ExternalLink
 									className="block-editor-link-control__search-item-title"
-									href={ value.url }
+									href={value.url}
 								>
-									{ stripHTML( displayTitle ) }
+									{stripHTML(displayTitle)}
 								</ExternalLink>
 
-								{ value?.url && (
+								{value?.url && (
 									<span className="block-editor-link-control__search-item-info">
-										{ displayURL }
+										{displayURL}
 									</span>
-								) }
+								)}
 							</>
 						) : (
 							<span className="block-editor-link-control__search-item-error-notice">
 								Link is empty
 							</span>
-						) }
+						)}
 					</span>
 				</span>
 
 				<Button
-					icon={ edit }
-					label={ __( 'Edit' ) }
+					icon={edit}
+					label={__('Edit')}
 					className="block-editor-link-control__search-item-action"
-					onClick={ onEditClick }
-					iconSize={ 24 }
+					onClick={onEditClick}
+					iconSize={24}
 				/>
-				{ hasUnlinkControl && (
+				{hasUnlinkControl && (
 					<Button
-						icon={ linkOff }
-						label={ __( 'Unlink' ) }
+						icon={linkOff}
+						label={__('Unlink')}
 						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
-						onClick={ onRemove }
-						iconSize={ 24 }
+						onClick={onRemove}
+						iconSize={24}
 					/>
-				) }
-				<ViewerSlot fillProps={ value } />
+				)}
+				<ViewerSlot fillProps={value} />
 			</div>
 
-			{ ( ( hasRichData &&
-				( richData?.image || richData?.description ) ) ||
-				isFetching ) && (
+			{((hasRichData && (richData?.image || richData?.description)) ||
+				isFetching) && (
 				<div className="block-editor-link-control__search-item-bottom">
-					{ ( richData?.image || isFetching ) && (
+					{(richData?.image || isFetching) && (
 						<div
-							aria-hidden={ ! richData?.image }
-							className={ classnames(
+							aria-hidden={!richData?.image}
+							className={classnames(
 								'block-editor-link-control__search-item-image',
 								{
-									'is-placeholder': ! richData?.image,
+									'is-placeholder': !richData?.image,
 								}
-							) }
+							)}
 						>
-							{ richData?.image && (
-								<img src={ richData?.image } alt="" />
-							) }
+							{richData?.image && (
+								<img src={richData?.image} alt="" />
+							)}
 						</div>
-					) }
+					)}
 
-					{ ( richData?.description || isFetching ) && (
+					{(richData?.description || isFetching) && (
 						<div
-							aria-hidden={ ! richData?.description }
-							className={ classnames(
+							aria-hidden={!richData?.description}
+							className={classnames(
 								'block-editor-link-control__search-item-description',
 								{
-									'is-placeholder': ! richData?.description,
+									'is-placeholder': !richData?.description,
 								}
-							) }
+							)}
 						>
-							{ richData?.description && (
+							{richData?.description && (
 								<Text truncate numberOfLines="2">
-									{ richData.description }
+									{richData.description}
 								</Text>
-							) }
+							)}
 						</div>
-					) }
+					)}
 				</div>
-			) }
+			)}
 		</div>
 	);
 }

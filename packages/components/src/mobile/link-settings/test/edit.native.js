@@ -21,14 +21,14 @@ import { __ } from '@wordpress/i18n';
 const unregisterBlocks = () => {
 	const blocks = getBlockTypes();
 
-	blocks.forEach( ( { name } ) => unregisterBlockType( name ) );
+	blocks.forEach(({ name }) => unregisterBlockType(name));
 };
 
 /**
  * ### TODO
  * + Try to figure out why I can't `console.log(JSON.stringify(subject.toJSON()))` anymore.
  */
-describe.each( [
+describe.each([
 	[
 		{
 			type: 'core/button',
@@ -55,14 +55,14 @@ describe.each( [
 			toJSON: () => 'core/image',
 		},
 	],
-] )( '<LinkSettings/> from %j', ( { type, initialHtml } ) => {
-	beforeAll( () => {
+])('<LinkSettings/> from %j', ({ type, initialHtml }) => {
+	beforeAll(() => {
 		registerCoreBlocks();
-	} );
+	});
 
-	afterAll( () => {
+	afterAll(() => {
 		unregisterBlocks();
-	} );
+	});
 
 	/**
 	 * GIVEN an EDITOR is displayed with an EDIT IMAGE BLOCK or EDIT BUTTON BLOCK;
@@ -70,33 +70,33 @@ describe.each( [
 	 * WHEN the USER selects the SETTINGS BUTTON on the EDIT IMAGE BLOCK or EDIT BUTTON BLOCK;
 	 */
 	// eslint-disable-next-line jest/no-done-callback
-	it( 'should display the LINK SETTINGS with an EMPTY LINK TO field.', async ( done ) => {
+	it('should display the LINK SETTINGS with an EMPTY LINK TO field.', async (done) => {
 		// Arrange
 		const expectation =
 			'The LINK SETTINGS > LINK TO field SHOULD be displayed WITHOUT a URL from the CLIPBOARD.';
 		const url = 'https://tonytahmouchtest.files.wordpress.com';
-		const subject = await initializeEditor( { initialHtml } );
-		Clipboard.getString.mockReturnValue( url );
+		const subject = await initializeEditor({ initialHtml });
+		Clipboard.getString.mockReturnValue(url);
 
 		// Act
 		try {
-			const block = await waitFor( () =>
+			const block = await waitFor(() =>
 				subject.getByA11yLabel(
 					type === 'core/image' ? /Image Block/ : /Button Block/
 				)
 			);
-			fireEvent.press( block );
-			fireEvent.press( block );
+			fireEvent.press(block);
+			fireEvent.press(block);
 			fireEvent.press(
-				await waitFor( () => subject.getByA11yLabel( 'Open Settings' ) )
+				await waitFor(() => subject.getByA11yLabel('Open Settings'))
 			);
-		} catch ( error ) {
-			done.fail( error );
+		} catch (error) {
+			done.fail(error);
 		}
 
 		// Assert
 		try {
-			await waitFor( () =>
+			await waitFor(() =>
 				subject.getByA11yLabel(
 					`Link to, ${
 						type === 'core/image' ? 'None' : 'Search or type URL'
@@ -104,13 +104,13 @@ describe.each( [
 				)
 			);
 			done();
-		} catch ( error ) {
-			done.fail( expectation );
+		} catch (error) {
+			done.fail(expectation);
 		}
-	} );
+	});
 
-	describe( '<LinkPicker/>', () => {
-		describe( 'Hide Clipboard Link Suggestion - Invalid URL in Clipboard', () => {
+	describe('<LinkPicker/>', () => {
+		describe('Hide Clipboard Link Suggestion - Invalid URL in Clipboard', () => {
 			/**
 			 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
 			 * GIVEN the CLIPBOARD has a NON-URL copied;
@@ -118,32 +118,32 @@ describe.each( [
 			 * WHEN the USER selects the LINK TO cell;
 			 */
 			// eslint-disable-next-line jest/no-done-callback
-			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async ( done ) => {
+			it('should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async (done) => {
 				// Arrange
 				const expectation =
 					'The LINK PICKER > LINK SUGGESTION SHOULD NOT suggest the URL from the CLIPBOARD.';
 				const url = 'tonytahmouchtest.files.wordpress.com';
-				const subject = await initializeEditor( { initialHtml } );
-				Clipboard.getString.mockReturnValue( url );
+				const subject = await initializeEditor({ initialHtml });
+				Clipboard.getString.mockReturnValue(url);
 
 				// Act
 				try {
-					const block = await waitFor( () =>
+					const block = await waitFor(() =>
 						subject.getByA11yLabel(
 							type === 'core/image'
 								? /Image Block/
 								: /Button Block/
 						)
 					);
-					fireEvent.press( block );
-					fireEvent.press( block );
+					fireEvent.press(block);
+					fireEvent.press(block);
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByA11yLabel( 'Open Settings' )
+						await waitFor(() =>
+							subject.getByA11yLabel('Open Settings')
 						)
 					);
 					fireEvent.press(
-						await waitFor( () =>
+						await waitFor(() =>
 							subject.getByA11yLabel(
 								`Link to, ${
 									type === 'core/image'
@@ -153,16 +153,16 @@ describe.each( [
 							)
 						)
 					);
-					if ( type === 'core/image' ) {
+					if (type === 'core/image') {
 						fireEvent.press(
-							await waitFor( () =>
-								subject.getByA11yLabel( /Custom URL/ )
+							await waitFor(() =>
+								subject.getByA11yLabel(/Custom URL/)
 							)
 						);
 					}
-					await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
-				} catch ( error ) {
-					done.fail( error );
+					await waitFor(() => subject.getByA11yLabel('Apply'));
+				} catch (error) {
+					done.fail(error);
 				}
 
 				// Assert
@@ -173,12 +173,12 @@ describe.each( [
 						),
 					{ timeout: 50, interval: 10 }
 				)
-					.then( () => done.fail( expectation ) )
-					.catch( () => done() );
-			} );
-		} );
+					.then(() => done.fail(expectation))
+					.catch(() => done());
+			});
+		});
 
-		describe( 'Hide Clipboard Link Suggestion - Valid and Same URL in Clipboard', () => {
+		describe('Hide Clipboard Link Suggestion - Valid and Same URL in Clipboard', () => {
 			/**
 			 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
 			 * GIVEN the CLIPBOARD has a URL copied;
@@ -186,32 +186,32 @@ describe.each( [
 			 * WHEN the USER selects the LINK TO cell;
 			 */
 			// eslint-disable-next-line jest/no-done-callback
-			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async ( done ) => {
+			it('should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async (done) => {
 				// Arrange
 				const expectation =
 					'The LINK PICKER > LINK SUGGESTION SHOULD NOT suggest the URL from the CLIPBOARD.';
 				const url = 'https://tonytahmouchtest.files.wordpress.com';
-				const subject = await initializeEditor( { initialHtml } );
-				Clipboard.getString.mockReturnValue( url );
+				const subject = await initializeEditor({ initialHtml });
+				Clipboard.getString.mockReturnValue(url);
 
 				// Act
 				try {
-					const block = await waitFor( () =>
+					const block = await waitFor(() =>
 						subject.getByA11yLabel(
 							type === 'core/image'
 								? /Image Block/
 								: /Button Block/
 						)
 					);
-					fireEvent.press( block );
-					fireEvent.press( block );
+					fireEvent.press(block);
+					fireEvent.press(block);
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByA11yLabel( 'Open Settings' )
+						await waitFor(() =>
+							subject.getByA11yLabel('Open Settings')
 						)
 					);
 					fireEvent.press(
-						await waitFor( () =>
+						await waitFor(() =>
 							subject.getByA11yLabel(
 								`Link to, ${
 									type === 'core/image'
@@ -221,22 +221,22 @@ describe.each( [
 							)
 						)
 					);
-					if ( type === 'core/image' ) {
+					if (type === 'core/image') {
 						fireEvent.press(
-							await waitFor( () =>
-								subject.getByA11yLabel( 'Custom URL. Empty' )
+							await waitFor(() =>
+								subject.getByA11yLabel('Custom URL. Empty')
 							)
 						);
 					}
 					fireEvent.press(
-						await waitFor( () =>
+						await waitFor(() =>
 							subject.getByA11yLabel(
-								`Copy URL from the clipboard, ${ url }`
+								`Copy URL from the clipboard, ${url}`
 							)
 						)
 					);
 					fireEvent.press(
-						await waitFor( () =>
+						await waitFor(() =>
 							subject.getByA11yLabel(
 								`Link to, ${
 									type === 'core/image' ? 'Custom URL' : url
@@ -244,16 +244,16 @@ describe.each( [
 							)
 						)
 					);
-					if ( type === 'core/image' ) {
+					if (type === 'core/image') {
 						fireEvent.press(
-							await waitFor( () =>
-								subject.getByA11yLabel( `Custom URL, ${ url }` )
+							await waitFor(() =>
+								subject.getByA11yLabel(`Custom URL, ${url}`)
 							)
 						);
 					}
-					await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
-				} catch ( error ) {
-					done.fail( error );
+					await waitFor(() => subject.getByA11yLabel('Apply'));
+				} catch (error) {
+					done.fail(error);
 				}
 
 				// Assert
@@ -264,12 +264,12 @@ describe.each( [
 						),
 					{ timeout: 50, interval: 10 }
 				)
-					.then( () => done.fail( expectation ) )
-					.catch( () => done() );
-			} );
-		} );
+					.then(() => done.fail(expectation))
+					.catch(() => done());
+			});
+		});
 
-		describe( 'Show Clipboard Link Suggestion - Valid and Different URL in Clipboard', () => {
+		describe('Show Clipboard Link Suggestion - Valid and Different URL in Clipboard', () => {
 			/**
 			 * GIVEN a SETTINGS BOTTOM SHEET is displayed;
 			 * GIVEN the CLIPBOARD has a URL copied;
@@ -280,36 +280,36 @@ describe.each( [
 				'should display the LINK PICKER with the FROM CLIPBOARD CELL populated' +
 					' with the URL from the CLIPBOARD.',
 				// eslint-disable-next-line jest/no-done-callback
-				async ( done ) => {
+				async (done) => {
 					// Arrange
 					const url = 'https://tonytahmouchtest.files.wordpress.com';
 					const expectation =
 						'The LINK PICKER > LINK SUGGESTION SHOULD suggest the URL from the CLIPBOARD, e.g.,' +
 						`
-					${ url }
-					${ __( 'From clipboard' ) }
+					${url}
+					${__('From clipboard')}
 				`;
-					const subject = await initializeEditor( { initialHtml } );
-					Clipboard.getString.mockReturnValue( url );
+					const subject = await initializeEditor({ initialHtml });
+					Clipboard.getString.mockReturnValue(url);
 
 					// Act
 					try {
-						const block = await waitFor( () =>
+						const block = await waitFor(() =>
 							subject.getByA11yLabel(
 								type === 'core/image'
 									? /Image Block/
 									: /Button Block/
 							)
 						);
-						fireEvent.press( block );
-						fireEvent.press( block );
+						fireEvent.press(block);
+						fireEvent.press(block);
 						fireEvent.press(
-							await waitFor( () =>
-								subject.getByA11yLabel( 'Open Settings' )
+							await waitFor(() =>
+								subject.getByA11yLabel('Open Settings')
 							)
 						);
 						fireEvent.press(
-							await waitFor( () =>
+							await waitFor(() =>
 								subject.getByA11yLabel(
 									`Link to, ${
 										type === 'core/image'
@@ -319,37 +319,37 @@ describe.each( [
 								)
 							)
 						);
-						if ( type === 'core/image' ) {
+						if (type === 'core/image') {
 							fireEvent.press(
-								await waitFor( () =>
-									subject.getByA11yLabel( /Custom URL/ )
+								await waitFor(() =>
+									subject.getByA11yLabel(/Custom URL/)
 								)
 							);
 						}
-						await waitFor( () =>
+						await waitFor(() =>
 							subject.getByA11yLabel(
-								`Copy URL from the clipboard, ${ url }`
+								`Copy URL from the clipboard, ${url}`
 							)
 						);
-					} catch ( error ) {
-						done.fail( error );
+					} catch (error) {
+						done.fail(error);
 					}
 
 					// Assert
 					try {
-						await waitFor( () => subject.getByText( url ) );
-						await waitFor( () =>
-							subject.getByText( __( 'From clipboard' ) )
+						await waitFor(() => subject.getByText(url));
+						await waitFor(() =>
+							subject.getByText(__('From clipboard'))
 						);
 						done();
-					} catch ( error ) {
-						done.fail( expectation );
+					} catch (error) {
+						done.fail(expectation);
 					}
 				}
 			);
-		} );
+		});
 
-		describe( 'Press Clipboard Link Suggestion', () => {
+		describe('Press Clipboard Link Suggestion', () => {
 			/**
 			 * GIVEN a LINK PICKER SHEET is displayed;
 			 * GIVEN the FROM CLIPBOARD CELL is displayed;
@@ -359,32 +359,32 @@ describe.each( [
 				'should display the LINK SETTINGS with the URL from the CLIPBOARD' +
 					' populated in the LINK TO field.',
 				// eslint-disable-next-line jest/no-done-callback
-				async ( done ) => {
+				async (done) => {
 					// Arrange
 					const expectation =
 						'The LINK SETTINGS > LINK TO field SHOULD be displayed WITH a URL from the CLIPBOARD.';
 					const url = 'https://tonytahmouchtest.files.wordpress.com';
-					const subject = await initializeEditor( { initialHtml } );
-					Clipboard.getString.mockReturnValue( url );
+					const subject = await initializeEditor({ initialHtml });
+					Clipboard.getString.mockReturnValue(url);
 
 					// Act
 					try {
-						const block = await waitFor( () =>
+						const block = await waitFor(() =>
 							subject.getByA11yLabel(
 								type === 'core/image'
 									? /Image Block/
 									: /Button Block/
 							)
 						);
-						fireEvent.press( block );
-						fireEvent.press( block );
+						fireEvent.press(block);
+						fireEvent.press(block);
 						fireEvent.press(
-							await waitFor( () =>
-								subject.getByA11yLabel( 'Open Settings' )
+							await waitFor(() =>
+								subject.getByA11yLabel('Open Settings')
 							)
 						);
 						fireEvent.press(
-							await waitFor( () =>
+							await waitFor(() =>
 								subject.getByA11yLabel(
 									`Link to, ${
 										type === 'core/image'
@@ -394,27 +394,27 @@ describe.each( [
 								)
 							)
 						);
-						if ( type === 'core/image' ) {
+						if (type === 'core/image') {
 							fireEvent.press(
-								await waitFor( () =>
-									subject.getByA11yLabel( /Custom URL/ )
+								await waitFor(() =>
+									subject.getByA11yLabel(/Custom URL/)
 								)
 							);
 						}
 						fireEvent.press(
-							await waitFor( () =>
+							await waitFor(() =>
 								subject.getByA11yLabel(
-									`Copy URL from the clipboard, ${ url }`
+									`Copy URL from the clipboard, ${url}`
 								)
 							)
 						);
-					} catch ( error ) {
-						done.fail( error );
+					} catch (error) {
+						done.fail(error);
 					}
 
 					// Assert
 					try {
-						await waitFor( () =>
+						await waitFor(() =>
 							subject.getByA11yLabel(
 								`Link to, ${
 									type === 'core/image' ? 'Custom URL' : url
@@ -422,11 +422,11 @@ describe.each( [
 							)
 						);
 						done();
-					} catch ( error ) {
-						done.fail( expectation );
+					} catch (error) {
+						done.fail(expectation);
 					}
 				}
 			);
-		} );
-	} );
-} );
+		});
+	});
+});

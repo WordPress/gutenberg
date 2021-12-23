@@ -16,24 +16,24 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
-const { writeFile, mkdir } = require( 'fs' ).promises;
-const filenamify = require( 'filenamify' );
-const NodeEnvironment = require( 'jest-environment-node' );
-const chalk = require( 'chalk' );
+const path = require('path');
+const { writeFile, mkdir } = require('fs').promises;
+const filenamify = require('filenamify');
+const NodeEnvironment = require('jest-environment-node');
+const chalk = require('chalk');
 
 /**
  * Internal dependencies
  */
-const { readConfig, getPuppeteer } = require( './config' );
+const { readConfig, getPuppeteer } = require('./config');
 
-const handleError = ( error ) => {
+const handleError = (error) => {
 	// To match the same behavior in jest-jasmine2:
 	// https://github.com/facebook/jest/blob/1be8d737abd0e2f30e3314184a0efc372ad6d88f/packages/jest-jasmine2/src/jasmine/Env.ts#L250-L251
 	// Emitting an uncaughtException event to the process will throw an
 	// empty error which is very hard to debug in puppeteer context.
 	// eslint-disable-next-line no-console
-	console.error( error );
+	console.error(error);
 };
 
 const KEYS = {
@@ -51,120 +51,120 @@ const ARTIFACTS_PATH = path.resolve(
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
 	// the setTimeout function, see https://github.com/facebook/jest/blob/v23.1.0/packages/jest-runtime/src/index.js#L823
-	setTimeout( timeout ) {
-		if ( this.global.jasmine ) {
+	setTimeout(timeout) {
+		if (this.global.jasmine) {
 			this.global.jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
 		} else {
-			this.global[ Symbol.for( 'TEST_TIMEOUT_SYMBOL' ) ] = timeout;
+			this.global[Symbol.for('TEST_TIMEOUT_SYMBOL')] = timeout;
 		}
 	}
 
 	async setup() {
 		const config = await readConfig();
-		const puppeteer = getPuppeteer( config );
+		const puppeteer = getPuppeteer(config);
 		this.global.puppeteerConfig = config;
 
 		const wsEndpoint = process.env.PUPPETEER_WS_ENDPOINT;
-		if ( ! wsEndpoint ) {
-			throw new Error( 'wsEndpoint not found' );
+		if (!wsEndpoint) {
+			throw new Error('wsEndpoint not found');
 		}
 
 		this.global.jestPuppeteer = {
 			debug: async () => {
 				// Set timeout to 4 days
-				this.setTimeout( 345600000 );
+				this.setTimeout(345600000);
 				// Run a debugger (in case Puppeteer has been launched with `{ devtools: true }`)
-				await this.global.page.evaluate( () => {
+				await this.global.page.evaluate(() => {
 					// eslint-disable-next-line no-debugger
 					debugger;
-				} );
+				});
 				// eslint-disable-next-line no-console
 				console.log(
-					chalk.blue(
-						'\n\n🕵️‍  Code is paused, press enter to resume'
-					)
+					chalk.blue('\n\n🕵️‍  Code is paused, press enter to resume')
 				);
 				// Run an infinite promise
-				return new Promise( ( resolve ) => {
+				return new Promise((resolve) => {
 					const { stdin } = process;
-					const onKeyPress = ( key ) => {
+					const onKeyPress = (key) => {
 						if (
 							key === KEYS.CONTROL_C ||
 							key === KEYS.CONTROL_D ||
 							key === KEYS.ENTER
 						) {
-							stdin.removeListener( 'data', onKeyPress );
-							if ( ! listening ) {
-								if ( stdin.isTTY ) {
-									stdin.setRawMode( false );
+							stdin.removeListener('data', onKeyPress);
+							if (!listening) {
+								if (stdin.isTTY) {
+									stdin.setRawMode(false);
 								}
 								stdin.pause();
 							}
 							resolve();
 						}
 					};
-					const listening = stdin.listenerCount( 'data' ) > 0;
-					if ( ! listening ) {
-						if ( stdin.isTTY ) {
-							stdin.setRawMode( true );
+					const listening = stdin.listenerCount('data') > 0;
+					if (!listening) {
+						if (stdin.isTTY) {
+							stdin.setRawMode(true);
 						}
 						stdin.resume();
-						stdin.setEncoding( 'utf8' );
+						stdin.setEncoding('utf8');
 					}
-					stdin.on( 'data', onKeyPress );
-				} );
+					stdin.on('data', onKeyPress);
+				});
 			},
 			resetPage: async () => {
-				if ( this.global.page ) {
-					this.global.page.removeListener( 'pageerror', handleError );
+				if (this.global.page) {
+					this.global.page.removeListener('pageerror', handleError);
 					await this.global.page.close();
 				}
 
 				this.global.page = await this.global.context.newPage();
-				if ( config && config.exitOnPageError ) {
-					this.global.page.addListener( 'pageerror', handleError );
+				if (config && config.exitOnPageError) {
+					this.global.page.addListener('pageerror', handleError);
 				}
 			},
 			resetBrowser: async () => {
-				if ( this.global.page ) {
-					this.global.page.removeListener( 'pageerror', handleError );
+				if (this.global.page) {
+					this.global.page.removeListener('pageerror', handleError);
 				}
 				if (
 					config.browserContext === 'incognito' &&
 					this.global.context
 				) {
 					await this.global.context.close();
-				} else if ( this.global.page ) {
+				} else if (this.global.page) {
 					await this.global.page.close();
 				}
 				this.global.page = null;
 
-				if ( this.global.browser ) {
+				if (this.global.browser) {
 					await this.global.browser.disconnect();
 				}
 
-				this.global.browser = await puppeteer.connect( {
+				this.global.browser = await puppeteer.connect({
 					...config.connect,
 					...config.launch,
 					browserURL: undefined,
 					browserWSEndpoint: wsEndpoint,
-				} );
+				});
 
-				if ( config.browserContext === 'incognito' ) {
+				if (config.browserContext === 'incognito') {
 					// Using this, pages will be created in a pristine context.
-					this.global.context = await this.global.browser.createIncognitoBrowserContext();
+					this.global.context =
+						await this.global.browser.createIncognitoBrowserContext();
 				} else if (
 					config.browserContext === 'default' ||
-					! config.browserContext
+					!config.browserContext
 				) {
 					/**
 					 * Since this is a new browser, browserContexts() will return only one instance
 					 * https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#browserbrowsercontexts
 					 */
-					this.global.context = await this.global.browser.browserContexts()[ 0 ];
+					this.global.context =
+						await this.global.browser.browserContexts()[0];
 				} else {
 					throw new Error(
-						`browserContext should be either 'incognito' or 'default'. Received '${ config.browserContext }'`
+						`browserContext should be either 'incognito' or 'default'. Received '${config.browserContext}'`
 					);
 				}
 				await this.global.jestPuppeteer.resetPage();
@@ -174,9 +174,9 @@ class PuppeteerEnvironment extends NodeEnvironment {
 		await this.global.jestPuppeteer.resetBrowser();
 
 		try {
-			await mkdir( ARTIFACTS_PATH, { recursive: true } );
-		} catch ( err ) {
-			if ( err.code !== 'EEXIST' ) {
+			await mkdir(ARTIFACTS_PATH, { recursive: true });
+		} catch (err) {
+			if (err.code !== 'EEXIST') {
 				throw err;
 			}
 		}
@@ -185,41 +185,41 @@ class PuppeteerEnvironment extends NodeEnvironment {
 	async teardown() {
 		const { page, context, browser, puppeteerConfig } = this.global;
 
-		if ( page ) {
-			page.removeListener( 'pageerror', handleError );
+		if (page) {
+			page.removeListener('pageerror', handleError);
 		}
 
-		if ( puppeteerConfig.browserContext === 'incognito' ) {
-			if ( context ) {
+		if (puppeteerConfig.browserContext === 'incognito') {
+			if (context) {
 				await context.close();
 			}
-		} else if ( page ) {
+		} else if (page) {
 			await page.close();
 		}
 
-		if ( browser ) {
+		if (browser) {
 			await browser.disconnect();
 		}
 	}
 
-	async storeArtifacts( testName ) {
-		const datetime = new Date().toISOString().split( '.' )[ 0 ];
-		const fileName = filenamify( `${ testName } ${ datetime }`, {
+	async storeArtifacts(testName) {
+		const datetime = new Date().toISOString().split('.')[0];
+		const fileName = filenamify(`${testName} ${datetime}`, {
 			replacement: '-',
-		} );
+		});
 		await writeFile(
-			path.join( ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
+			path.join(ARTIFACTS_PATH, `${fileName}-snapshot.html`),
 			await this.global.page.content()
 		);
-		await this.global.page.screenshot( {
-			path: path.join( ARTIFACTS_PATH, `${ fileName }.jpg` ),
-		} );
+		await this.global.page.screenshot({
+			path: path.join(ARTIFACTS_PATH, `${fileName}.jpg`),
+		});
 	}
 
-	async handleTestEvent( event, state ) {
-		if ( event.name === 'test_fn_failure' ) {
+	async handleTestEvent(event, state) {
+		if (event.name === 'test_fn_failure') {
 			const testName = state.currentlyRunningTest.name;
-			await this.storeArtifacts( testName );
+			await this.storeArtifacts(testName);
 		}
 	}
 }

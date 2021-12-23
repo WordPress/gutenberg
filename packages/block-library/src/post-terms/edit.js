@@ -22,88 +22,84 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import usePostTerms from './use-post-terms';
 
-export default function PostTermsEdit( {
-	attributes,
-	context,
-	setAttributes,
-} ) {
+export default function PostTermsEdit({ attributes, context, setAttributes }) {
 	const { term, textAlign, separator } = attributes;
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
-		( select ) => {
-			if ( ! term ) return {};
-			const { getTaxonomy } = select( coreStore );
-			const taxonomy = getTaxonomy( term );
+		(select) => {
+			if (!term) return {};
+			const { getTaxonomy } = select(coreStore);
+			const taxonomy = getTaxonomy(term);
 			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
 		},
-		[ term ]
+		[term]
 	);
-	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
+	const { postTerms, hasPostTerms, isLoading } = usePostTerms({
 		postId,
 		postType,
 		term: selectedTerm,
-	} );
+	});
 	const hasPost = postId && postType;
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			[ `taxonomy-${ term }` ]: term,
-		} ),
-	} );
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+			[`taxonomy-${term}`]: term,
+		}),
+	});
 
-	if ( ! hasPost || ! term ) {
-		return <div { ...blockProps }>{ __( 'Post Terms' ) }</div>;
+	if (!hasPost || !term) {
+		return <div {...blockProps}>{__('Post Terms')}</div>;
 	}
 
 	return (
 		<>
 			<BlockControls>
 				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
+					value={textAlign}
+					onChange={(nextAlign) => {
+						setAttributes({ textAlign: nextAlign });
+					}}
 				/>
 			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					autoComplete="off"
-					label={ __( 'Separator' ) }
-					value={ separator || '' }
-					onChange={ ( nextValue ) => {
-						setAttributes( { separator: nextValue } );
-					} }
-					help={ __( 'Enter character(s) used to separate terms.' ) }
+					label={__('Separator')}
+					value={separator || ''}
+					onChange={(nextValue) => {
+						setAttributes({ separator: nextValue });
+					}}
+					help={__('Enter character(s) used to separate terms.')}
 				/>
 			</InspectorControls>
-			<div { ...blockProps }>
-				{ isLoading && <Spinner /> }
-				{ ! isLoading &&
+			<div {...blockProps}>
+				{isLoading && <Spinner />}
+				{!isLoading &&
 					hasPostTerms &&
 					postTerms
-						.map( ( postTerm ) => (
+						.map((postTerm) => (
 							<a
-								key={ postTerm.id }
-								href={ postTerm.link }
-								onClick={ ( event ) => event.preventDefault() }
+								key={postTerm.id}
+								href={postTerm.link}
+								onClick={(event) => event.preventDefault()}
 							>
-								{ postTerm.name }
+								{postTerm.name}
 							</a>
-						) )
-						.reduce( ( prev, curr ) => (
+						))
+						.reduce((prev, curr) => (
 							<>
-								{ prev }
+								{prev}
 								<span className="wp-block-post-terms__separator">
-									{ separator || ' ' }
+									{separator || ' '}
 								</span>
-								{ curr }
+								{curr}
 							</>
-						) ) }
-				{ ! isLoading &&
-					! hasPostTerms &&
-					( selectedTerm?.labels?.no_terms ||
-						__( 'Term items not found.' ) ) }
+						))}
+				{!isLoading &&
+					!hasPostTerms &&
+					(selectedTerm?.labels?.no_terms ||
+						__('Term items not found.'))}
 			</div>
 		</>
 	);

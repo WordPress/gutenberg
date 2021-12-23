@@ -7,13 +7,13 @@ import { store as coreStore } from '@wordpress/core-data';
 
 /** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
 
-export function getUserLabel( user ) {
+export function getUserLabel(user) {
 	const avatar =
-		user.avatar_urls && user.avatar_urls[ 24 ] ? (
+		user.avatar_urls && user.avatar_urls[24] ? (
 			<img
 				className="editor-autocompleters__user-avatar"
 				alt=""
-				src={ user.avatar_urls[ 24 ] }
+				src={user.avatar_urls[24]}
 			/>
 		) : (
 			<span className="editor-autocompleters__no-avatar"></span>
@@ -21,12 +21,12 @@ export function getUserLabel( user ) {
 
 	return (
 		<>
-			{ avatar }
+			{avatar}
 			<span className="editor-autocompleters__user-name">
-				{ user.name }
+				{user.name}
 			</span>
 			<span className="editor-autocompleters__user-slug">
-				{ user.slug }
+				{user.slug}
 			</span>
 		</>
 	);
@@ -42,34 +42,34 @@ export default {
 	className: 'editor-autocompleters__user',
 	triggerPrefix: '@',
 
-	useItems( filterValue ) {
+	useItems(filterValue) {
 		const users = useSelect(
-			( select ) => {
-				const { getUsers } = select( coreStore );
-				return getUsers( {
+			(select) => {
+				const { getUsers } = select(coreStore);
+				return getUsers({
 					context: 'view',
-					search: encodeURIComponent( filterValue ),
-				} );
+					search: encodeURIComponent(filterValue),
+				});
 			},
-			[ filterValue ]
+			[filterValue]
 		);
 
 		const options = useMemo(
 			() =>
 				users
-					? users.map( ( user ) => ( {
-							key: `user-${ user.slug }`,
+					? users.map((user) => ({
+							key: `user-${user.slug}`,
 							value: user,
-							label: getUserLabel( user ),
-					  } ) )
+							label: getUserLabel(user),
+					  }))
 					: [],
-			[ users ]
+			[users]
 		);
 
-		return [ options ];
+		return [options];
 	},
 
-	getOptionCompletion( user ) {
-		return `@${ user.slug }`;
+	getOptionCompletion(user) {
+		return `@${user.slug}`;
 	},
 };

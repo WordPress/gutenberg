@@ -15,34 +15,34 @@ import { edit } from '@wordpress/icons';
  */
 import LinkViewerURL from './link-viewer-url';
 
-export default function LinkViewer( {
+export default function LinkViewer({
 	className,
 	linkClassName,
 	onEditLinkClick,
 	url,
 	urlLabel,
 	...props
-} ) {
+}) {
 	return (
 		<div
-			className={ classnames(
+			className={classnames(
 				'block-editor-url-popover__link-viewer',
 				className
-			) }
-			{ ...props }
+			)}
+			{...props}
 		>
 			<LinkViewerURL
-				url={ url }
-				urlLabel={ urlLabel }
-				className={ linkClassName }
+				url={url}
+				urlLabel={urlLabel}
+				className={linkClassName}
 			/>
-			{ onEditLinkClick && (
+			{onEditLinkClick && (
 				<Button
-					icon={ edit }
-					label={ __( 'Edit' ) }
-					onClick={ onEditLinkClick }
+					icon={edit}
+					label={__('Edit')}
+					onClick={onEditLinkClick}
 				/>
-			) }
+			)}
 		</div>
 	);
 }

@@ -8,24 +8,24 @@ import TreeSelect from '../tree-select';
  */
 import { useMemo } from '@wordpress/element';
 
-export default function CategorySelect( {
+export default function CategorySelect({
 	label,
 	noOptionLabel,
 	categoriesList,
 	selectedCategoryId,
 	onChange,
 	...props
-} ) {
-	const termsTree = useMemo( () => {
-		return buildTermsTree( categoriesList );
-	}, [ categoriesList ] );
+}) {
+	const termsTree = useMemo(() => {
+		return buildTermsTree(categoriesList);
+	}, [categoriesList]);
 
 	return (
 		<TreeSelect
-			{ ...{ label, noOptionLabel, onChange } }
-			tree={ termsTree }
-			selectedId={ selectedCategoryId }
-			{ ...props }
+			{...{ label, noOptionLabel, onChange }}
+			tree={termsTree}
+			selectedId={selectedCategoryId}
+			{...props}
 		/>
 	);
 }

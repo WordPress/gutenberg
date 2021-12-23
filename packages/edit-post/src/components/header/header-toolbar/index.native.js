@@ -30,7 +30,7 @@ import { store as editorStore } from '@wordpress/editor';
 import styles from './style.scss';
 import { store as editPostStore } from '../../../store';
 
-function HeaderToolbar( {
+function HeaderToolbar({
 	hasRedo,
 	hasUndo,
 	redo,
@@ -40,15 +40,15 @@ function HeaderToolbar( {
 	getStylesFromColorScheme,
 	onHideKeyboard,
 	isRTL,
-} ) {
-	const scrollViewRef = useRef( null );
+}) {
+	const scrollViewRef = useRef(null);
 	const scrollToStart = () => {
 		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
 		const isAndroid = Platform.OS === 'android';
-		if ( isAndroid && isRTL ) {
+		if (isAndroid && isRTL) {
 			scrollViewRef.current.scrollToEnd();
 		} else {
-			scrollViewRef.current.scrollTo( { x: 0 } );
+			scrollViewRef.current.scrollTo({ x: 0 });
 		}
 	};
 	const renderHistoryButtons = () => {
@@ -56,23 +56,23 @@ function HeaderToolbar( {
 			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */
 			<ToolbarButton
 				key="undoButton"
-				title={ __( 'Undo' ) }
-				icon={ ! isRTL ? undoIcon : redoIcon }
-				isDisabled={ ! hasUndo }
-				onClick={ undo }
-				extraProps={ {
-					hint: __( 'Double tap to undo last change' ),
-				} }
+				title={__('Undo')}
+				icon={!isRTL ? undoIcon : redoIcon}
+				isDisabled={!hasUndo}
+				onClick={undo}
+				extraProps={{
+					hint: __('Double tap to undo last change'),
+				}}
 			/>,
 			<ToolbarButton
 				key="redoButton"
-				title={ __( 'Redo' ) }
-				icon={ ! isRTL ? redoIcon : undoIcon }
-				isDisabled={ ! hasRedo }
-				onClick={ redo }
-				extraProps={ {
-					hint: __( 'Double tap to redo last change' ),
-				} }
+				title={__('Redo')}
+				icon={!isRTL ? redoIcon : undoIcon}
+				isDisabled={!hasRedo}
+				onClick={redo}
+				extraProps={{
+					hint: __('Double tap to redo last change'),
+				}}
 			/>,
 		];
 
@@ -81,76 +81,70 @@ function HeaderToolbar( {
 
 	return (
 		<View
-			style={ getStylesFromColorScheme(
+			style={getStylesFromColorScheme(
 				styles.container,
 				styles.containerDark
-			) }
+			)}
 		>
 			<ScrollView
-				ref={ scrollViewRef }
-				onContentSizeChange={ scrollToStart }
-				horizontal={ true }
-				showsHorizontalScrollIndicator={ false }
+				ref={scrollViewRef}
+				onContentSizeChange={scrollToStart}
+				horizontal={true}
+				showsHorizontalScrollIndicator={false}
 				keyboardShouldPersistTaps="always"
-				alwaysBounceHorizontal={ false }
-				contentContainerStyle={ styles.scrollableContent }
+				alwaysBounceHorizontal={false}
+				contentContainerStyle={styles.scrollableContent}
 			>
-				<Inserter disabled={ ! showInserter } />
-				{ renderHistoryButtons() }
+				<Inserter disabled={!showInserter} />
+				{renderHistoryButtons()}
 				<BlockToolbar />
 			</ScrollView>
-			{ showKeyboardHideButton && (
-				<ToolbarGroup passedStyle={ styles.keyboardHideContainer }>
+			{showKeyboardHideButton && (
+				<ToolbarGroup passedStyle={styles.keyboardHideContainer}>
 					<ToolbarButton
-						title={ __( 'Hide keyboard' ) }
-						icon={ keyboardClose }
-						onClick={ onHideKeyboard }
-						extraProps={ {
-							hint: __( 'Tap to hide the keyboard' ),
-						} }
+						title={__('Hide keyboard')}
+						icon={keyboardClose}
+						onClick={onHideKeyboard}
+						extraProps={{
+							hint: __('Tap to hide the keyboard'),
+						}}
 					/>
 				</ToolbarGroup>
-			) }
+			)}
 		</View>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const {
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			hasInserterItems,
-		} = select( blockEditorStore );
-		const { getEditorSettings } = select( editorStore );
+export default compose([
+	withSelect((select) => {
+		const { getBlockRootClientId, getBlockSelectionEnd, hasInserterItems } =
+			select(blockEditorStore);
+		const { getEditorSettings } = select(editorStore);
 		return {
-			hasRedo: select( editorStore ).hasEditorRedo(),
-			hasUndo: select( editorStore ).hasEditorUndo(),
+			hasRedo: select(editorStore).hasEditorRedo(),
+			hasUndo: select(editorStore).hasEditorUndo(),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			showInserter:
-				select( editPostStore ).getEditorMode() === 'visual' &&
+				select(editPostStore).getEditorMode() === 'visual' &&
 				getEditorSettings().richEditingEnabled &&
-				hasInserterItems(
-					getBlockRootClientId( getBlockSelectionEnd() )
-				),
-			isTextModeEnabled:
-				select( editPostStore ).getEditorMode() === 'text',
-			isRTL: select( blockEditorStore ).getSettings().isRTL,
+				hasInserterItems(getBlockRootClientId(getBlockSelectionEnd())),
+			isTextModeEnabled: select(editPostStore).getEditorMode() === 'text',
+			isRTL: select(blockEditorStore).getSettings().isRTL,
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( blockEditorStore );
-		const { togglePostTitleSelection } = dispatch( editorStore );
+	}),
+	withDispatch((dispatch) => {
+		const { clearSelectedBlock } = dispatch(blockEditorStore);
+		const { togglePostTitleSelection } = dispatch(editorStore);
 
 		return {
-			redo: dispatch( editorStore ).redo,
-			undo: dispatch( editorStore ).undo,
+			redo: dispatch(editorStore).redo,
+			undo: dispatch(editorStore).undo,
 			onHideKeyboard() {
 				clearSelectedBlock();
-				togglePostTitleSelection( false );
+				togglePostTitleSelection(false);
 			},
 		};
-	} ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
+	}),
+	withViewportMatch({ isLargeViewport: 'medium' }),
 	withPreferredColorScheme,
-] )( HeaderToolbar );
+])(HeaderToolbar);

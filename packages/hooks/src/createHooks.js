@@ -19,29 +19,29 @@ import createDidHook from './createDidHook';
 export class _Hooks {
 	constructor() {
 		/** @type {import('.').Store} actions */
-		this.actions = Object.create( null );
+		this.actions = Object.create(null);
 		this.actions.__current = [];
 
 		/** @type {import('.').Store} filters */
-		this.filters = Object.create( null );
+		this.filters = Object.create(null);
 		this.filters.__current = [];
 
-		this.addAction = createAddHook( this, 'actions' );
-		this.addFilter = createAddHook( this, 'filters' );
-		this.removeAction = createRemoveHook( this, 'actions' );
-		this.removeFilter = createRemoveHook( this, 'filters' );
-		this.hasAction = createHasHook( this, 'actions' );
-		this.hasFilter = createHasHook( this, 'filters' );
-		this.removeAllActions = createRemoveHook( this, 'actions', true );
-		this.removeAllFilters = createRemoveHook( this, 'filters', true );
-		this.doAction = createRunHook( this, 'actions' );
-		this.applyFilters = createRunHook( this, 'filters', true );
-		this.currentAction = createCurrentHook( this, 'actions' );
-		this.currentFilter = createCurrentHook( this, 'filters' );
-		this.doingAction = createDoingHook( this, 'actions' );
-		this.doingFilter = createDoingHook( this, 'filters' );
-		this.didAction = createDidHook( this, 'actions' );
-		this.didFilter = createDidHook( this, 'filters' );
+		this.addAction = createAddHook(this, 'actions');
+		this.addFilter = createAddHook(this, 'filters');
+		this.removeAction = createRemoveHook(this, 'actions');
+		this.removeFilter = createRemoveHook(this, 'filters');
+		this.hasAction = createHasHook(this, 'actions');
+		this.hasFilter = createHasHook(this, 'filters');
+		this.removeAllActions = createRemoveHook(this, 'actions', true);
+		this.removeAllFilters = createRemoveHook(this, 'filters', true);
+		this.doAction = createRunHook(this, 'actions');
+		this.applyFilters = createRunHook(this, 'filters', true);
+		this.currentAction = createCurrentHook(this, 'actions');
+		this.currentFilter = createCurrentHook(this, 'filters');
+		this.doingAction = createDoingHook(this, 'actions');
+		this.doingFilter = createDoingHook(this, 'filters');
+		this.didAction = createDidHook(this, 'actions');
+		this.didFilter = createDidHook(this, 'filters');
 	}
 }
 

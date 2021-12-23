@@ -52,7 +52,7 @@ var el = wp.element.createElement;
 var PluginArea = wp.plugins.PluginArea;
 
 function Layout() {
-	return el( 'div', { scope: 'my-page' }, 'Content of the page', PluginArea );
+	return el('div', { scope: 'my-page' }, 'Content of the page', PluginArea);
 }
 ```
 
@@ -85,7 +85,7 @@ var Fragment = wp.element.Fragment;
 var PluginSidebar = wp.editPost.PluginSidebar;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
 var registerPlugin = wp.plugins.registerPlugin;
-var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+var moreIcon = wp.element.createElement('svg'); //... svg element.
 
 function Component() {
 	return el(
@@ -108,11 +108,11 @@ function Component() {
 		)
 	);
 }
-registerPlugin( 'plugin-name', {
+registerPlugin('plugin-name', {
 	icon: moreIcon,
 	render: Component,
 	scope: 'my-page',
-} );
+});
 ```
 
 ```js
@@ -132,11 +132,11 @@ const Component = () => (
 	</>
 );
 
-registerPlugin( 'plugin-name', {
+registerPlugin('plugin-name', {
 	icon: more,
 	render: Component,
 	scope: 'my-page',
-} );
+});
 ```
 
 _Parameters_
@@ -158,14 +158,14 @@ _Usage_
 // Using ES5 syntax
 var unregisterPlugin = wp.plugins.unregisterPlugin;
 
-unregisterPlugin( 'plugin-name' );
+unregisterPlugin('plugin-name');
 ```
 
 ```js
 // Using ESNext syntax
 import { unregisterPlugin } from '@wordpress/plugins';
 
-unregisterPlugin( 'plugin-name' );
+unregisterPlugin('plugin-name');
 ```
 
 _Parameters_

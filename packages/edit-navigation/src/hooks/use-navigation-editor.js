@@ -14,76 +14,72 @@ import { store as editNavigationStore } from '../store';
 import { useSelectedMenuId } from './index';
 import useMenuEntity from './use-menu-entity';
 
-const getMenusData = ( select ) => {
-	const selectors = select( 'core' );
+const getMenusData = (select) => {
+	const selectors = select('core');
 	const params = { per_page: -1 };
 	return {
-		menus: selectors.getMenus( params ),
-		hasLoadedMenus: selectors.hasFinishedResolution( 'getMenus', [
-			params,
-		] ),
+		menus: selectors.getMenus(params),
+		hasLoadedMenus: selectors.hasFinishedResolution('getMenus', [params]),
 	};
 };
 export default function useNavigationEditor() {
-	const { deleteMenu: _deleteMenu } = useDispatch( coreStore );
-	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
-	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
-		false
-	);
-	const { editedMenu, hasLoadedEditedMenu } = useMenuEntity( selectedMenuId );
-	const { menus, hasLoadedMenus } = useSelect( getMenusData, [] );
+	const { deleteMenu: _deleteMenu } = useDispatch(coreStore);
+	const [selectedMenuId, setSelectedMenuId] = useSelectedMenuId();
+	const [hasFinishedInitialLoad, setHasFinishedInitialLoad] = useState(false);
+	const { editedMenu, hasLoadedEditedMenu } = useMenuEntity(selectedMenuId);
+	const { menus, hasLoadedMenus } = useSelect(getMenusData, []);
 
 	/**
 	 * If the Menu being edited has been requested from API and it has
 	 * no values then it has been deleted so reset the selected menu ID.
 	 */
-	useEffect( () => {
-		if ( hasLoadedEditedMenu && ! Object.keys( editedMenu )?.length ) {
-			setSelectedMenuId( null );
+	useEffect(() => {
+		if (hasLoadedEditedMenu && !Object.keys(editedMenu)?.length) {
+			setSelectedMenuId(null);
 		}
-	}, [ hasLoadedEditedMenu, editedMenu ] );
+	}, [hasLoadedEditedMenu, editedMenu]);
 
-	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createInfoNotice } = useDispatch(noticesStore);
 	const isMenuBeingDeleted = useSelect(
-		( select ) =>
-			select( coreStore ).isDeletingEntityRecord(
+		(select) =>
+			select(coreStore).isDeletingEntityRecord(
 				'root',
 				'menu',
 				selectedMenuId
 			),
-		[ selectedMenuId ]
+		[selectedMenuId]
 	);
 	const selectedMenuName =
-		menus?.find( ( { id } ) => id === selectedMenuId )?.name || '';
+		menus?.find(({ id }) => id === selectedMenuId)?.name || '';
 
-	useEffect( () => {
-		if ( hasLoadedMenus ) {
-			setHasFinishedInitialLoad( true );
+	useEffect(() => {
+		if (hasLoadedMenus) {
+			setHasFinishedInitialLoad(true);
 		}
-	}, [ hasLoadedMenus ] );
+	}, [hasLoadedMenus]);
 
 	const navigationPost = useSelect(
-		( select ) => {
-			if ( ! selectedMenuId ) {
+		(select) => {
+			if (!selectedMenuId) {
 				return;
 			}
-			return select( editNavigationStore ).getNavigationPostForMenu(
+			return select(editNavigationStore).getNavigationPostForMenu(
 				selectedMenuId
 			);
 		},
-		[ selectedMenuId ]
+		[selectedMenuId]
 	);
 
 	const deleteMenu = async () => {
-		const didDeleteMenu = await _deleteMenu( selectedMenuId, {
+		const didDeleteMenu = await _deleteMenu(selectedMenuId, {
 			force: true,
-		} );
-		if ( didDeleteMenu ) {
-			setSelectedMenuId( null );
+		});
+		if (didDeleteMenu) {
+			setSelectedMenuId(null);
 			createInfoNotice(
 				sprintf(
 					// translators: %s: the name of a menu.
-					__( '"%s" menu has been deleted' ),
+					__('"%s" menu has been deleted'),
 					selectedMenuName
 				),
 				{
@@ -92,7 +88,7 @@ export default function useNavigationEditor() {
 				}
 			);
 		} else {
-			createErrorNotice( __( 'Menu deletion unsuccessful' ) );
+			createErrorNotice(__('Menu deletion unsuccessful'));
 		}
 	};
 
@@ -105,6 +101,6 @@ export default function useNavigationEditor() {
 		isMenuBeingDeleted,
 		selectMenu: setSelectedMenuId,
 		deleteMenu,
-		isMenuSelected: !! selectedMenuId,
+		isMenuSelected: !!selectedMenuId,
 	};
 }

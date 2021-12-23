@@ -93,7 +93,7 @@ type ResizableBoxProps = ResizableProps & {
 	children: ReactNode;
 	showHandle: boolean;
 	__experimentalShowTooltip: boolean;
-	__experimentalTooltipProps: Parameters< typeof ResizeTooltip >[ 0 ];
+	__experimentalTooltipProps: Parameters<typeof ResizeTooltip>[0];
 };
 
 function ResizableBox(
@@ -105,24 +105,24 @@ function ResizableBox(
 		__experimentalTooltipProps: tooltipProps = {},
 		...props
 	}: ResizableBoxProps,
-	ref: Ref< Resizable >
+	ref: Ref<Resizable>
 ): JSX.Element {
 	return (
 		<Resizable
-			className={ classnames(
+			className={classnames(
 				'components-resizable-box__container',
 				showHandle && 'has-show-handle',
 				className
-			) }
-			handleClasses={ HANDLE_CLASSES }
-			handleStyles={ HANDLE_STYLES }
-			ref={ ref }
-			{ ...props }
+			)}
+			handleClasses={HANDLE_CLASSES}
+			handleStyles={HANDLE_STYLES}
+			ref={ref}
+			{...props}
 		>
-			{ children }
-			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
+			{children}
+			{showTooltip && <ResizeTooltip {...tooltipProps} />}
 		</Resizable>
 	);
 }
 
-export default forwardRef( ResizableBox );
+export default forwardRef(ResizableBox);

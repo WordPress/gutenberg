@@ -6,7 +6,7 @@ module.exports = {
 		// See https://github.com/facebook/jest/issues/11100#issuecomment-967161978
 		'@eslint/eslintrc': '@eslint/eslintrc/dist/eslintrc-universal.cjs',
 	},
-	modulePaths: [ '<rootDir>' ],
+	modulePaths: ['<rootDir>'],
 	setupFiles: [
 		require.resolve(
 			'@wordpress/jest-preset-default/scripts/setup-globals.js'
@@ -17,15 +17,15 @@ module.exports = {
 			'@wordpress/jest-preset-default/scripts/setup-test-framework.js'
 		),
 	],
-	snapshotSerializers: [ require.resolve( 'enzyme-to-json/serializer.js' ) ],
+	snapshotSerializers: [require.resolve('enzyme-to-json/serializer.js')],
 	testMatch: [
 		'**/__tests__/**/*.[jt]s?(x)',
 		'**/test/*.[jt]s?(x)',
 		'**/?(*.)test.[jt]s?(x)',
 	],
-	testPathIgnorePatterns: [ '/node_modules/', '<rootDir>/vendor/' ],
+	testPathIgnorePatterns: ['/node_modules/', '<rootDir>/vendor/'],
 	timers: 'fake',
 	transform: {
-		'\\.[jt]sx?$': require.resolve( 'babel-jest' ),
+		'\\.[jt]sx?$': require.resolve('babel-jest'),
 	},
 };

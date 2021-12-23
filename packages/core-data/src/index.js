@@ -19,23 +19,23 @@ import { STORE_NAME } from './name';
 // Instead of getEntityRecord, the consumer could use more user-frieldly named selector: getPostType, getTaxonomy...
 // The "kind" and the "name" of the entity are combined to generate these shortcuts.
 
-const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
+const entitySelectors = defaultEntities.reduce((result, entity) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
-		selectors.getEntityRecord( state, kind, name, key, query );
-	result[ getMethodName( kind, name, 'get', true ) ] = ( state, ...args ) =>
-		selectors.getEntityRecords( state, kind, name, ...args );
+	result[getMethodName(kind, name)] = (state, key, query) =>
+		selectors.getEntityRecord(state, kind, name, key, query);
+	result[getMethodName(kind, name, 'get', true)] = (state, ...args) =>
+		selectors.getEntityRecords(state, kind, name, ...args);
 	return result;
-}, {} );
+}, {});
 
-const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
+const entityResolvers = defaultEntities.reduce((result, entity) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( key, query ) =>
-		resolvers.getEntityRecord( kind, name, key, query );
-	const pluralMethodName = getMethodName( kind, name, 'get', true );
-	result[ pluralMethodName ] = ( ...args ) =>
-		resolvers.getEntityRecords( kind, name, ...args );
-	result[ pluralMethodName ].shouldInvalidate = ( action, ...args ) =>
+	result[getMethodName(kind, name)] = (key, query) =>
+		resolvers.getEntityRecord(kind, name, key, query);
+	const pluralMethodName = getMethodName(kind, name, 'get', true);
+	result[pluralMethodName] = (...args) =>
+		resolvers.getEntityRecords(kind, name, ...args);
+	result[pluralMethodName].shouldInvalidate = (action, ...args) =>
 		resolvers.getEntityRecords.shouldInvalidate(
 			action,
 			kind,
@@ -43,24 +43,24 @@ const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
 			...args
 		);
 	return result;
-}, {} );
+}, {});
 
-const entityActions = defaultEntities.reduce( ( result, entity ) => {
+const entityActions = defaultEntities.reduce((result, entity) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name, 'save' ) ] = ( key ) =>
-		actions.saveEntityRecord( kind, name, key );
-	result[ getMethodName( kind, name, 'delete' ) ] = ( key, query ) =>
-		actions.deleteEntityRecord( kind, name, key, query );
+	result[getMethodName(kind, name, 'save')] = (key) =>
+		actions.saveEntityRecord(kind, name, key);
+	result[getMethodName(kind, name, 'delete')] = (key, query) =>
+		actions.deleteEntityRecord(kind, name, key, query);
 	return result;
-}, {} );
+}, {});
 
-const storeConfig = () => ( {
+const storeConfig = () => ({
 	reducer,
 	actions: { ...actions, ...entityActions, ...createLocksActions() },
 	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
 	__experimentalUseThunks: true,
-} );
+});
 
 /**
  * Store definition for the code data namespace.
@@ -69,9 +69,9 @@ const storeConfig = () => ( {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig() );
+export const store = createReduxStore(STORE_NAME, storeConfig());
 
-register( store );
+register(store);
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

@@ -10,14 +10,14 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 
-export default function BlockSupportToolsPanel( { children, group, label } ) {
-	const { attributes, clientIds, panelId } = useSelect( ( select ) => {
+export default function BlockSupportToolsPanel({ children, group, label }) {
+	const { attributes, clientIds, panelId } = useSelect((select) => {
 		const {
 			getBlockAttributes,
 			getMultiSelectedBlockClientIds,
 			getSelectedBlockClientId,
 			hasMultiSelection,
-		} = select( blockEditorStore );
+		} = select(blockEditorStore);
 
 		// When we currently have a multi-selection, the value returned from
 		// `getSelectedBlockClientId()` is `null`. When a `null` value is used
@@ -25,11 +25,11 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 		// register themselves despite their panelIds not matching.
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		if ( hasMultiSelection() ) {
+		if (hasMultiSelection()) {
 			const selectedBlockClientIds = getMultiSelectedBlockClientIds();
 			const selectedBlockAttributes = selectedBlockClientIds.reduce(
-				( blockAttributes, blockId ) => {
-					blockAttributes[ blockId ] = getBlockAttributes( blockId );
+				(blockAttributes, blockId) => {
+					blockAttributes[blockId] = getBlockAttributes(blockId);
 					return blockAttributes;
 				},
 				{}
@@ -44,53 +44,53 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 
 		return {
 			panelId: selectedBlockClientId,
-			clientIds: [ selectedBlockClientId ],
+			clientIds: [selectedBlockClientId],
 			attributes: {
-				[ selectedBlockClientId ]: getBlockAttributes(
+				[selectedBlockClientId]: getBlockAttributes(
 					selectedBlockClientId
 				),
 			},
 		};
-	}, [] );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	}, []);
+	const { updateBlockAttributes } = useDispatch(blockEditorStore);
 
-	const resetAll = ( resetFilters = [] ) => {
+	const resetAll = (resetFilters = []) => {
 		const newAttributes = {};
 
-		clientIds.forEach( ( clientId ) => {
-			const { style } = attributes[ clientId ];
+		clientIds.forEach((clientId) => {
+			const { style } = attributes[clientId];
 			let newBlockAttributes = { style };
 
-			resetFilters.forEach( ( resetFilter ) => {
+			resetFilters.forEach((resetFilter) => {
 				newBlockAttributes = {
 					...newBlockAttributes,
-					...resetFilter( newBlockAttributes ),
+					...resetFilter(newBlockAttributes),
 				};
-			} );
+			});
 
 			// Enforce a cleaned style object.
 			newBlockAttributes = {
 				...newBlockAttributes,
-				style: cleanEmptyObject( newBlockAttributes.style ),
+				style: cleanEmptyObject(newBlockAttributes.style),
 			};
 
-			newAttributes[ clientId ] = newBlockAttributes;
-		} );
+			newAttributes[clientId] = newBlockAttributes;
+		});
 
-		updateBlockAttributes( clientIds, newAttributes, true );
+		updateBlockAttributes(clientIds, newAttributes, true);
 	};
 
 	return (
 		<ToolsPanel
-			className={ `${ group }-block-support-panel` }
-			label={ label }
-			resetAll={ resetAll }
-			key={ panelId }
-			panelId={ panelId }
-			hasInnerWrapper={ true }
-			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
+			className={`${group}-block-support-panel`}
+			label={label}
+			resetAll={resetAll}
+			key={panelId}
+			panelId={panelId}
+			hasInnerWrapper={true}
+			shouldRenderPlaceholderItems={true} // Required to maintain fills ordering.
 		>
-			{ children }
+			{children}
 		</ToolsPanel>
 	);
 }

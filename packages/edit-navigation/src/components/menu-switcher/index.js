@@ -21,56 +21,56 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import AddMenu from '../add-menu';
 
-export default function MenuSwitcher( {
+export default function MenuSwitcher({
 	menus,
 	selectedMenuId,
 	onSelectMenu = noop,
-} ) {
-	const [ isModalVisible, setIsModalVisible ] = useState( false );
-	const openModal = () => setIsModalVisible( true );
-	const closeModal = () => setIsModalVisible( false );
+}) {
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const openModal = () => setIsModalVisible(true);
+	const closeModal = () => setIsModalVisible(false);
 
 	return (
 		<>
 			<MenuGroup>
 				<MenuItemsChoice
-					value={ selectedMenuId }
-					onSelect={ onSelectMenu }
-					choices={ menus.map( ( { id, name } ) => ( {
+					value={selectedMenuId}
+					onSelect={onSelectMenu}
+					choices={menus.map(({ id, name }) => ({
 						value: id,
-						label: decodeEntities( name ),
+						label: decodeEntities(name),
 						'aria-label': sprintf(
 							/* translators: %s: The name of a menu. */
-							__( "Switch to '%s'" ),
+							__("Switch to '%s'"),
 							name
 						),
-					} ) ) }
+					}))}
 				/>
 			</MenuGroup>
 			<MenuGroup hideSeparator>
 				<MenuItem
 					className="edit-navigation-menu-switcher__new-button"
-					onClick={ openModal }
+					onClick={openModal}
 				>
-					{ __( 'Create a new menu' ) }
+					{__('Create a new menu')}
 				</MenuItem>
-				{ isModalVisible && (
+				{isModalVisible && (
 					<Modal
-						title={ __( 'Create a new menu' ) }
+						title={__('Create a new menu')}
 						className="edit-navigation-menu-switcher__modal"
-						onRequestClose={ closeModal }
+						onRequestClose={closeModal}
 					>
 						<AddMenu
-							onCreate={ ( menuId ) => {
+							onCreate={(menuId) => {
 								closeModal();
-								onSelectMenu( menuId );
-							} }
-							helpText={ __(
+								onSelectMenu(menuId);
+							}}
+							helpText={__(
 								'A short descriptive name for your menu.'
-							) }
+							)}
 						/>
 					</Modal>
-				) }
+				)}
 			</MenuGroup>
 		</>
 	);

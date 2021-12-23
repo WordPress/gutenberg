@@ -4,11 +4,11 @@
 import { hasBlockSupport } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 
-function migrateLightBlockWrapper( settings ) {
+function migrateLightBlockWrapper(settings) {
 	const { apiVersion = 1 } = settings;
 	if (
 		apiVersion < 2 &&
-		hasBlockSupport( settings, 'lightBlockWrapper', false )
+		hasBlockSupport(settings, 'lightBlockWrapper', false)
 	) {
 		settings.apiVersion = 2;
 	}

@@ -15,8 +15,8 @@ import { CONNECTED_NAMESPACE, COMPONENT_NAMESPACE } from './constants';
  * @param {string} componentName The name for the component.
  * @return {Record<string, any>} A props object with the namespaced HTML attribute.
  */
-export function getNamespace( componentName ) {
-	return { [ COMPONENT_NAMESPACE ]: componentName };
+export function getNamespace(componentName) {
+	return { [COMPONENT_NAMESPACE]: componentName };
 }
 
 /**
@@ -31,5 +31,5 @@ export function getNamespace( componentName ) {
  * @return {Record<string, any>} A props object with the namespaced HTML attribute.
  */
 export function getConnectedNamespace() {
-	return { [ CONNECTED_NAMESPACE ]: true };
+	return { [CONNECTED_NAMESPACE]: true };
 }

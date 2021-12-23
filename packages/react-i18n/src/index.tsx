@@ -23,12 +23,12 @@ import {
 import { defaultI18n } from '@wordpress/i18n';
 import type { I18n } from '@wordpress/i18n';
 interface I18nContextProps {
-	__: I18n[ '__' ];
-	_x: I18n[ '_x' ];
-	_n: I18n[ '_n' ];
-	_nx: I18n[ '_nx' ];
-	isRTL: I18n[ 'isRTL' ];
-	hasTranslation: I18n[ 'hasTranslation' ];
+	__: I18n['__'];
+	_x: I18n['_x'];
+	_n: I18n['_n'];
+	_nx: I18n['_nx'];
+	isRTL: I18n['isRTL'];
+	hasTranslation: I18n['hasTranslation'];
 }
 
 /**
@@ -36,20 +36,20 @@ interface I18nContextProps {
  *
  * @param  i18n
  */
-function makeContextValue( i18n: I18n ): I18nContextProps {
+function makeContextValue(i18n: I18n): I18nContextProps {
 	return {
-		__: i18n.__.bind( i18n ),
-		_x: i18n._x.bind( i18n ),
-		_n: i18n._n.bind( i18n ),
-		_nx: i18n._nx.bind( i18n ),
-		isRTL: i18n.isRTL.bind( i18n ),
-		hasTranslation: i18n.hasTranslation.bind( i18n ),
+		__: i18n.__.bind(i18n),
+		_x: i18n._x.bind(i18n),
+		_n: i18n._n.bind(i18n),
+		_nx: i18n._nx.bind(i18n),
+		isRTL: i18n.isRTL.bind(i18n),
+		hasTranslation: i18n.hasTranslation.bind(i18n),
 	};
 }
 
-const I18nContext = createContext( makeContextValue( defaultI18n ) );
+const I18nContext = createContext(makeContextValue(defaultI18n));
 
-type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
+type I18nProviderProps = PropsWithChildren<{ i18n: I18n }>;
 
 /**
  * The `I18nProvider` should be mounted above any localized components:
@@ -74,19 +74,17 @@ type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
  * @param  props i18n provider props.
  * @return Children wrapped in the I18nProvider.
  */
-export function I18nProvider( props: I18nProviderProps ): JSX.Element {
+export function I18nProvider(props: I18nProviderProps): JSX.Element {
 	const { children, i18n = defaultI18n } = props;
-	const [ update, forceUpdate ] = useReducer( () => [], [] );
+	const [update, forceUpdate] = useReducer(() => [], []);
 
 	// rerender translations whenever the i18n instance fires a change event
-	useEffect( () => i18n.subscribe( forceUpdate ), [ i18n ] );
+	useEffect(() => i18n.subscribe(forceUpdate), [i18n]);
 
-	const value = useMemo( () => makeContextValue( i18n ), [ i18n, update ] );
+	const value = useMemo(() => makeContextValue(i18n), [i18n, update]);
 
 	return (
-		<I18nContext.Provider value={ value }>
-			{ children }
-		</I18nContext.Provider>
+		<I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 	);
 }
 
@@ -105,11 +103,11 @@ export function I18nProvider( props: I18nProviderProps ): JSX.Element {
  * }
  * ```
  */
-export const useI18n = () => useContext( I18nContext );
+export const useI18n = () => useContext(I18nContext);
 
-type PropsAndI18n< P > = Pick<
+type PropsAndI18n<P> = Pick<
 	P,
-	Exclude< keyof P, '__' | '_x' | '_n' | '_nx' | 'isRTL' | 'hasTranslation' >
+	Exclude<keyof P, '__' | '_x' | '_n' | '_nx' | 'isRTL' | 'hasTranslation'>
 >;
 
 /**
@@ -130,17 +128,17 @@ type PropsAndI18n< P > = Pick<
  * @param  InnerComponent React component to be wrapped and receive the i18n functions like `__`
  * @return The wrapped component
  */
-export function withI18n< P extends I18nContextProps >(
-	InnerComponent: ComponentType< P >
-): FunctionComponent< PropsAndI18n< P > > {
-	const EnhancedComponent: ComponentType<
-		Subtract< P, I18nContextProps >
-	> = ( props ) => {
+export function withI18n<P extends I18nContextProps>(
+	InnerComponent: ComponentType<P>
+): FunctionComponent<PropsAndI18n<P>> {
+	const EnhancedComponent: ComponentType<Subtract<P, I18nContextProps>> = (
+		props
+	) => {
 		const i18nProps = useI18n();
-		return <InnerComponent { ...( props as P ) } { ...i18nProps } />;
+		return <InnerComponent {...(props as P)} {...i18nProps} />;
 	};
 	const innerComponentName =
 		InnerComponent.displayName || InnerComponent.name || 'Component';
-	EnhancedComponent.displayName = `WithI18n(${ innerComponentName })`;
+	EnhancedComponent.displayName = `WithI18n(${innerComponentName})`;
 	return EnhancedComponent;
 }

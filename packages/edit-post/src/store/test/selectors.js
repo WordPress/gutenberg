@@ -21,111 +21,107 @@ import {
 	isListViewOpened,
 } from '../selectors';
 
-describe( 'selectors', () => {
-	describe( 'getEditorMode', () => {
-		it( 'should return the selected editor mode', () => {
+describe('selectors', () => {
+	describe('getEditorMode', () => {
+		it('should return the selected editor mode', () => {
 			const state = {
 				preferences: { editorMode: 'text' },
 			};
 
-			expect( getEditorMode( state ) ).toEqual( 'text' );
-		} );
+			expect(getEditorMode(state)).toEqual('text');
+		});
 
-		it( 'should fallback to visual if not set', () => {
+		it('should fallback to visual if not set', () => {
 			const state = {
 				preferences: {},
 			};
 
-			expect( getEditorMode( state ) ).toEqual( 'visual' );
-		} );
-	} );
+			expect(getEditorMode(state)).toEqual('visual');
+		});
+	});
 
-	describe( 'getPreference', () => {
-		it( 'should return the preference value if set', () => {
+	describe('getPreference', () => {
+		it('should return the preference value if set', () => {
 			const state = {
 				preferences: { chicken: true },
 			};
 
-			expect( getPreference( state, 'chicken' ) ).toBe( true );
-		} );
+			expect(getPreference(state, 'chicken')).toBe(true);
+		});
 
-		it( 'should return undefined if the preference is unset', () => {
+		it('should return undefined if the preference is unset', () => {
 			const state = {
 				preferences: { chicken: true },
 			};
 
-			expect( getPreference( state, 'ribs' ) ).toBeUndefined();
-		} );
+			expect(getPreference(state, 'ribs')).toBeUndefined();
+		});
 
-		it( 'should return the default value if provided', () => {
+		it('should return the default value if provided', () => {
 			const state = {
 				preferences: {},
 			};
 
-			expect( getPreference( state, 'ribs', 'chicken' ) ).toEqual(
-				'chicken'
-			);
-		} );
-	} );
+			expect(getPreference(state, 'ribs', 'chicken')).toEqual('chicken');
+		});
+	});
 
-	describe( 'isModalActive', () => {
-		it( 'returns true if the provided name matches the value in the preferences activeModal property', () => {
+	describe('isModalActive', () => {
+		it('returns true if the provided name matches the value in the preferences activeModal property', () => {
 			const state = {
 				activeModal: 'test-modal',
 			};
 
-			expect( isModalActive( state, 'test-modal' ) ).toBe( true );
-		} );
+			expect(isModalActive(state, 'test-modal')).toBe(true);
+		});
 
-		it( 'returns false if the provided name does not match the preferences activeModal property', () => {
+		it('returns false if the provided name does not match the preferences activeModal property', () => {
 			const state = {
 				activeModal: 'something-else',
 			};
 
-			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
-		} );
+			expect(isModalActive(state, 'test-modal')).toBe(false);
+		});
 
-		it( 'returns false if the preferences activeModal property is null', () => {
+		it('returns false if the preferences activeModal property is null', () => {
 			const state = {
 				activeModal: null,
 			};
 
-			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
-		} );
-	} );
+			expect(isModalActive(state, 'test-modal')).toBe(false);
+		});
+	});
 
-	describe( 'isEditorPanelRemoved', () => {
-		it( 'should return false by default', () => {
-			const state = deepFreeze( {
+	describe('isEditorPanelRemoved', () => {
+		it('should return false by default', () => {
+			const state = deepFreeze({
 				removedPanels: [],
-			} );
+			});
 
-			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe(
-				false
-			);
-		} );
+			expect(isEditorPanelRemoved(state, 'post-status')).toBe(false);
+		});
 
-		it( 'should return true when panel was removed', () => {
-			const state = deepFreeze( {
-				removedPanels: [ 'post-status' ],
-			} );
+		it('should return true when panel was removed', () => {
+			const state = deepFreeze({
+				removedPanels: ['post-status'],
+			});
 
-			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
-		} );
-	} );
+			expect(isEditorPanelRemoved(state, 'post-status')).toBe(true);
+		});
+	});
 
-	describe( 'isEditorPanelEnabled', () => {
-		it( 'should return true by default', () => {
+	describe('isEditorPanelEnabled', () => {
+		it('should return true by default', () => {
 			const state = {
 				preferences: {
 					panels: {},
 				},
 			};
 
-			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( true );
-		} );
+			expect(isEditorPanelEnabled(state, 'post-status')).toBe(true);
+		});
 
-		it( 'should return true when a panel has been enabled', () => {
+		it('should return true when a panel has been enabled', () => {
 			const state = {
 				preferences: {
 					panels: {
@@ -134,10 +130,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( true );
-		} );
+			expect(isEditorPanelEnabled(state, 'post-status')).toBe(true);
+		});
 
-		it( 'should return false when a panel has been disabled', () => {
+		it('should return false when a panel has been disabled', () => {
 			const state = {
 				preferences: {
 					panels: {
@@ -146,13 +142,11 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe(
-				false
-			);
-		} );
+			expect(isEditorPanelEnabled(state, 'post-status')).toBe(false);
+		});
 
-		it( 'should return false when a panel is enabled but removed', () => {
-			const state = deepFreeze( {
+		it('should return false when a panel is enabled but removed', () => {
+			const state = deepFreeze({
 				preferences: {
 					panels: {
 						'post-status': {
@@ -160,36 +154,34 @@ describe( 'selectors', () => {
 						},
 					},
 				},
-				removedPanels: [ 'post-status' ],
-			} );
+				removedPanels: ['post-status'],
+			});
 
-			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe(
-				false
-			);
-		} );
-	} );
+			expect(isEditorPanelEnabled(state, 'post-status')).toBe(false);
+		});
+	});
 
-	describe( 'isEditorPanelOpened', () => {
-		it( 'is tolerant to an undefined panels preference', () => {
+	describe('isEditorPanelOpened', () => {
+		it('is tolerant to an undefined panels preference', () => {
 			// See: https://github.com/WordPress/gutenberg/issues/14580
 			const state = {
 				preferences: {},
 			};
 
-			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
-		} );
+			expect(isEditorPanelOpened(state, 'post-status')).toBe(false);
+		});
 
-		it( 'should return false by default', () => {
+		it('should return false by default', () => {
 			const state = {
 				preferences: {
 					panels: {},
 				},
 			};
 
-			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
-		} );
+			expect(isEditorPanelOpened(state, 'post-status')).toBe(false);
+		});
 
-		it( 'should return true when a panel has been opened', () => {
+		it('should return true when a panel has been opened', () => {
 			const state = {
 				preferences: {
 					panels: {
@@ -198,10 +190,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( true );
-		} );
+			expect(isEditorPanelOpened(state, 'post-status')).toBe(true);
+		});
 
-		it( 'should return false when a panel has been closed', () => {
+		it('should return false when a panel has been closed', () => {
 			const state = {
 				preferences: {
 					panels: {
@@ -210,10 +202,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
-		} );
+			expect(isEditorPanelOpened(state, 'post-status')).toBe(false);
+		});
 
-		it( 'should return true when a panel has been legacy opened', () => {
+		it('should return true when a panel has been legacy opened', () => {
 			const state = {
 				preferences: {
 					panels: {
@@ -222,10 +214,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( true );
-		} );
+			expect(isEditorPanelOpened(state, 'post-status')).toBe(true);
+		});
 
-		it( 'should return false when a panel has been legacy closed', () => {
+		it('should return false when a panel has been legacy closed', () => {
 			const state = {
 				preferences: {
 					panels: {
@@ -234,24 +226,24 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
-		} );
-	} );
+			expect(isEditorPanelOpened(state, 'post-status')).toBe(false);
+		});
+	});
 
-	describe( 'hasMetaBoxes', () => {
-		it( 'should return true if there are active meta boxes', () => {
+	describe('hasMetaBoxes', () => {
+		it('should return true if there are active meta boxes', () => {
 			const state = {
 				metaBoxes: {
 					locations: {
-						side: [ 'postcustom' ],
+						side: ['postcustom'],
 					},
 				},
 			};
 
-			expect( hasMetaBoxes( state ) ).toBe( true );
-		} );
+			expect(hasMetaBoxes(state)).toBe(true);
+		});
 
-		it( 'should return false if there are no active meta boxes', () => {
+		it('should return false if there are no active meta boxes', () => {
 			const state = {
 				metaBoxes: {
 					locations: {
@@ -260,12 +252,12 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( hasMetaBoxes( state ) ).toBe( false );
-		} );
-	} );
+			expect(hasMetaBoxes(state)).toBe(false);
+		});
+	});
 
-	describe( 'isSavingMetaBoxes', () => {
-		it( 'should return true if some meta boxes are saving', () => {
+	describe('isSavingMetaBoxes', () => {
+		it('should return true if some meta boxes are saving', () => {
 			const state = {
 				metaBoxes: {
 					isSaving: true,
@@ -273,10 +265,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isSavingMetaBoxes( state ) ).toBe( true );
-		} );
+			expect(isSavingMetaBoxes(state)).toBe(true);
+		});
 
-		it( 'should return false if no meta boxes are saving', () => {
+		it('should return false if no meta boxes are saving', () => {
 			const state = {
 				metaBoxes: {
 					isSaving: false,
@@ -284,29 +276,29 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isSavingMetaBoxes( state ) ).toBe( false );
-		} );
-	} );
+			expect(isSavingMetaBoxes(state)).toBe(false);
+		});
+	});
 
-	describe( 'getActiveMetaBoxLocations', () => {
-		it( 'should return the active meta boxes', () => {
+	describe('getActiveMetaBoxLocations', () => {
+		it('should return the active meta boxes', () => {
 			const state = {
 				metaBoxes: {
 					locations: {
-						side: [ 'postcustom' ],
+						side: ['postcustom'],
 						normal: [],
 					},
 				},
 			};
 
-			const result = getActiveMetaBoxLocations( state, 'side' );
+			const result = getActiveMetaBoxLocations(state, 'side');
 
-			expect( result ).toEqual( [ 'side' ] );
-		} );
-	} );
+			expect(result).toEqual(['side']);
+		});
+	});
 
-	describe( 'isMetaBoxLocationActive', () => {
-		it( 'should return false if not active', () => {
+	describe('isMetaBoxLocationActive', () => {
+		it('should return false if not active', () => {
 			const state = {
 				metaBoxes: {
 					locations: {
@@ -315,45 +307,45 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const result = isMetaBoxLocationActive( state, 'side' );
+			const result = isMetaBoxLocationActive(state, 'side');
 
-			expect( result ).toBe( false );
-		} );
+			expect(result).toBe(false);
+		});
 
-		it( 'should return true if active', () => {
+		it('should return true if active', () => {
 			const state = {
 				metaBoxes: {
 					locations: {
-						side: [ 'postcustom' ],
+						side: ['postcustom'],
 					},
 				},
 			};
 
-			const result = isMetaBoxLocationActive( state, 'side' );
+			const result = isMetaBoxLocationActive(state, 'side');
 
-			expect( result ).toBe( true );
-		} );
-	} );
+			expect(result).toBe(true);
+		});
+	});
 
-	describe( 'isInserterOpened', () => {
-		it( 'returns the block inserter panel isOpened state', () => {
+	describe('isInserterOpened', () => {
+		it('returns the block inserter panel isOpened state', () => {
 			const state = {
 				blockInserterPanel: true,
 			};
-			expect( isInserterOpened( state ) ).toBe( true );
+			expect(isInserterOpened(state)).toBe(true);
 			state.blockInserterPanel = false;
-			expect( isInserterOpened( state ) ).toBe( false );
-		} );
-	} );
+			expect(isInserterOpened(state)).toBe(false);
+		});
+	});
 
-	describe( 'isListViewOpened', () => {
-		it( 'returns the list view panel isOpened state', () => {
+	describe('isListViewOpened', () => {
+		it('returns the list view panel isOpened state', () => {
 			const state = {
 				listViewPanel: true,
 			};
-			expect( isListViewOpened( state ) ).toBe( true );
+			expect(isListViewOpened(state)).toBe(true);
 			state.listViewPanel = false;
-			expect( isListViewOpened( state ) ).toBe( false );
-		} );
-	} );
-} );
+			expect(isListViewOpened(state)).toBe(false);
+		});
+	});
+});

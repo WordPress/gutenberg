@@ -11,11 +11,11 @@ import { MenuItem } from '@wordpress/components';
 import { store as editSiteStore } from '../store';
 
 export default function WelcomeGuideMenuItem() {
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggleFeature } = useDispatch(editSiteStore);
 
 	return (
-		<MenuItem onClick={ () => toggleFeature( 'welcomeGuide' ) }>
-			{ __( 'Welcome Guide' ) }
+		<MenuItem onClick={() => toggleFeature('welcomeGuide')}>
+			{__('Welcome Guide')}
 		</MenuItem>
 	);
 }

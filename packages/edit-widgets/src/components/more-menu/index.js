@@ -16,123 +16,119 @@ import { useViewportMatch } from '@wordpress/compose';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 
 export default function MoreMenu() {
-	const [
-		isKeyboardShortcutsModalActive,
-		setIsKeyboardShortcutsModalVisible,
-	] = useState( false );
+	const [isKeyboardShortcutsModalActive, setIsKeyboardShortcutsModalVisible] =
+		useState(false);
 	const toggleKeyboardShortcutsModal = () =>
-		setIsKeyboardShortcutsModalVisible( ! isKeyboardShortcutsModalActive );
+		setIsKeyboardShortcutsModalVisible(!isKeyboardShortcutsModalActive);
 
 	useShortcut(
 		'core/edit-widgets/keyboard-shortcuts',
 		toggleKeyboardShortcutsModal
 	);
 
-	const isLargeViewport = useViewportMatch( 'medium' );
+	const isLargeViewport = useViewportMatch('medium');
 
 	return (
 		<>
 			<MoreMenuDropdown>
-				{ () => (
+				{() => (
 					<>
-						{ isLargeViewport && (
-							<MenuGroup label={ _x( 'View', 'noun' ) }>
+						{isLargeViewport && (
+							<MenuGroup label={_x('View', 'noun')}>
 								<MoreMenuFeatureToggle
 									scope="core/edit-widgets"
 									feature="fixedToolbar"
-									label={ __( 'Top toolbar' ) }
-									info={ __(
+									label={__('Top toolbar')}
+									info={__(
 										'Access all block and document tools in a single place'
-									) }
-									messageActivated={ __(
+									)}
+									messageActivated={__(
 										'Top toolbar activated'
-									) }
-									messageDeactivated={ __(
+									)}
+									messageDeactivated={__(
 										'Top toolbar deactivated'
-									) }
+									)}
 								/>
 							</MenuGroup>
-						) }
-						<MenuGroup label={ __( 'Tools' ) }>
+						)}
+						<MenuGroup label={__('Tools')}>
 							<MenuItem
-								onClick={ () => {
-									setIsKeyboardShortcutsModalVisible( true );
-								} }
-								shortcut={ displayShortcut.access( 'h' ) }
+								onClick={() => {
+									setIsKeyboardShortcutsModalVisible(true);
+								}}
+								shortcut={displayShortcut.access('h')}
 							>
-								{ __( 'Keyboard shortcuts' ) }
+								{__('Keyboard shortcuts')}
 							</MenuItem>
 							<MoreMenuFeatureToggle
 								scope="core/edit-widgets"
 								feature="welcomeGuide"
-								label={ __( 'Welcome Guide' ) }
+								label={__('Welcome Guide')}
 							/>
 							<MenuItem
 								role="menuitem"
-								icon={ external }
-								href={ __(
+								icon={external}
+								href={__(
 									'https://wordpress.org/support/article/block-based-widgets-editor/'
-								) }
+								)}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{ __( 'Help' ) }
+								{__('Help')}
 								<VisuallyHidden as="span">
 									{
 										/* translators: accessibility text */
-										__( '(opens in a new tab)' )
+										__('(opens in a new tab)')
 									}
 								</VisuallyHidden>
 							</MenuItem>
 						</MenuGroup>
-						<MenuGroup label={ __( 'Preferences' ) }>
+						<MenuGroup label={__('Preferences')}>
 							<MoreMenuFeatureToggle
 								scope="core/edit-widgets"
 								feature="keepCaretInsideBlock"
-								label={ __(
-									'Contain text cursor inside block'
-								) }
-								info={ __(
+								label={__('Contain text cursor inside block')}
+								info={__(
 									'Aids screen readers by stopping text caret from leaving blocks.'
-								) }
-								messageActivated={ __(
+								)}
+								messageActivated={__(
 									'Contain text cursor inside block activated'
-								) }
-								messageDeactivated={ __(
+								)}
+								messageDeactivated={__(
 									'Contain text cursor inside block deactivated'
-								) }
+								)}
 							/>
 							<MoreMenuFeatureToggle
 								scope="core/edit-widgets"
 								feature="themeStyles"
-								info={ __(
+								info={__(
 									'Make the editor look like your theme.'
-								) }
-								label={ __( 'Use theme styles' ) }
+								)}
+								label={__('Use theme styles')}
 							/>
-							{ isLargeViewport && (
+							{isLargeViewport && (
 								<MoreMenuFeatureToggle
 									scope="core/edit-widgets"
 									feature="showBlockBreadcrumbs"
-									label={ __( 'Display block breadcrumbs' ) }
-									info={ __(
+									label={__('Display block breadcrumbs')}
+									info={__(
 										'Shows block breadcrumbs at the bottom of the editor.'
-									) }
-									messageActivated={ __(
+									)}
+									messageActivated={__(
 										'Display block breadcrumbs activated'
-									) }
-									messageDeactivated={ __(
+									)}
+									messageDeactivated={__(
 										'Display block breadcrumbs deactivated'
-									) }
+									)}
 								/>
-							) }
+							)}
 						</MenuGroup>
 					</>
-				) }
+				)}
 			</MoreMenuDropdown>
 			<KeyboardShortcutHelpModal
-				isModalActive={ isKeyboardShortcutsModalActive }
-				toggleModal={ toggleKeyboardShortcutsModal }
+				isModalActive={isKeyboardShortcutsModalActive}
+				toggleModal={toggleKeyboardShortcutsModal}
 			/>
 		</>
 	);

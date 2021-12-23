@@ -5,15 +5,15 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor tests for List block (end)', () => {
-	it( 'should be able to end a List block', async () => {
-		await editorPage.addNewBlock( blockNames.list );
+describe('Gutenberg Editor tests for List block (end)', () => {
+	it('should be able to end a List block', async () => {
+		await editorPage.addNewBlock(blockNames.list);
 		const listBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.list
 		);
 
 		// Click List block on Android to force EditText focus
-		if ( isAndroid() ) {
+		if (isAndroid()) {
 			await listBlockElement.click();
 		}
 
@@ -24,15 +24,13 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 		);
 
 		// send an Enter
-		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
+		await editorPage.sendTextToListBlock(listBlockElement, '\n');
 
 		// send an Enter
-		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
+		await editorPage.sendTextToListBlock(listBlockElement, '\n');
 
 		const html = await editorPage.getHtmlContent();
 
-		expect( html.toLowerCase() ).toBe(
-			testData.listEndedHtml.toLowerCase()
-		);
-	} );
-} );
+		expect(html.toLowerCase()).toBe(testData.listEndedHtml.toLowerCase());
+	});
+});

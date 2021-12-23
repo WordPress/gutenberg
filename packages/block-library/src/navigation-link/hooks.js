@@ -14,8 +14,8 @@ import {
  */
 import fallbackVariations from './fallback-variations';
 
-function getIcon( variationName ) {
-	switch ( variationName ) {
+function getIcon(variationName) {
+	switch (variationName) {
 		case 'post':
 			return postTitle;
 		case 'page':
@@ -29,14 +29,14 @@ function getIcon( variationName ) {
 	}
 }
 
-export function enhanceNavigationLinkVariations( settings, name ) {
-	if ( name !== 'core/navigation-link' ) {
+export function enhanceNavigationLinkVariations(settings, name) {
+	if (name !== 'core/navigation-link') {
 		return settings;
 	}
 
 	// Fallback handling may be deleted after supported WP ranges understand the `variations`
 	// property when passed to register_block_type in index.php
-	if ( ! settings.variations ) {
+	if (!settings.variations) {
 		return {
 			...settings,
 			variations: fallbackVariations,
@@ -44,21 +44,21 @@ export function enhanceNavigationLinkVariations( settings, name ) {
 	}
 
 	// Otherwise decorate server passed variations with an icon and isActive function
-	if ( settings.variations ) {
-		const isActive = ( blockAttributes, variationAttributes ) => {
+	if (settings.variations) {
+		const isActive = (blockAttributes, variationAttributes) => {
 			return blockAttributes.type === variationAttributes.type;
 		};
-		const variations = settings.variations.map( ( variation ) => {
+		const variations = settings.variations.map((variation) => {
 			return {
 				...variation,
-				...( ! variation.icon && {
-					icon: getIcon( variation.name ),
-				} ),
-				...( ! variation.isActive && {
+				...(!variation.icon && {
+					icon: getIcon(variation.name),
+				}),
+				...(!variation.isActive && {
 					isActive,
-				} ),
+				}),
 			};
-		} );
+		});
 		return {
 			...settings,
 			variations,

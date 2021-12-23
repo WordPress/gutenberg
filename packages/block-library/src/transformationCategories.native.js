@@ -20,7 +20,7 @@ const transformationCategories = {
 		'core/media-text',
 		'core/embed',
 	],
-	grouped: [ 'core/columns', 'core/group', 'core/text-columns' ],
+	grouped: ['core/columns', 'core/group', 'core/text-columns'],
 	other: [
 		'core/more',
 		'core/nextpage',
@@ -31,16 +31,16 @@ const transformationCategories = {
 	],
 };
 
-export const transformationCategory = ( blockName ) => {
-	const found = Object.entries(
-		transformationCategories
-	).find( ( [ , value ] ) => value.includes( blockName ) );
-	if ( ! found ) {
+export const transformationCategory = (blockName) => {
+	const found = Object.entries(transformationCategories).find(([, value]) =>
+		value.includes(blockName)
+	);
+	if (!found) {
 		return [];
 	}
 
-	const group = found[ 0 ];
-	return transformationCategories[ group ];
+	const group = found[0];
+	return transformationCategories[group];
 };
 
 export default transformationCategories;

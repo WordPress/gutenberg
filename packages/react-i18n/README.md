@@ -28,7 +28,7 @@ import { I18nProvider } from '@wordpress/react-i18n';
 const i18n = createI18n();
 
 ReactDom.render(
-	<I18nProvider i18n={ i18n }>
+	<I18nProvider i18n={i18n}>
 		<App />
 	</I18nProvider>,
 	el
@@ -59,7 +59,7 @@ import { useI18n } from '@wordpress/react-i18n';
 
 function MyComponent() {
 	const { __ } = useI18n();
-	return __( 'Hello, world!' );
+	return __('Hello, world!');
 }
 ```
 
@@ -73,11 +73,11 @@ _Usage_
 ```js
 import { withI18n } from '@wordpress/react-i18n';
 
-function MyComponent( { __ } ) {
-	return __( 'Hello, world!' );
+function MyComponent({ __ }) {
+	return __('Hello, world!');
 }
 
-export default withI18n( MyComponent );
+export default withI18n(MyComponent);
 ```
 
 _Parameters_

@@ -1,4 +1,4 @@
-module.exports = ( { literalType, literalValue } ) => ( {
+module.exports = ({ literalType, literalValue }) => ({
 	type: 'FunctionDeclaration',
 	start: 22,
 	end: 65,
@@ -159,4 +159,4 @@ module.exports = ( { literalType, literalValue } ) => ( {
 		body: [],
 		directives: [],
 	},
-} );
+});

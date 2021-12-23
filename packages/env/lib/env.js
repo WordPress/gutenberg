@@ -2,8 +2,8 @@
 /**
  * Internal dependencies
  */
-const { ValidationError } = require( './config' );
-const commands = require( './commands' );
+const { ValidationError } = require('./config');
+const commands = require('./commands');
 
 module.exports = {
 	...commands,

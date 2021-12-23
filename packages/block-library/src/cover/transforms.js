@@ -12,8 +12,8 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
-			blocks: [ 'core/image' ],
-			transform: ( { caption, url, alt, align, id, anchor, style } ) =>
+			blocks: ['core/image'],
+			transform: ({ caption, url, alt, align, id, anchor, style }) =>
 				createBlock(
 					'core/cover',
 					{
@@ -30,17 +30,17 @@ const transforms = {
 						},
 					},
 					[
-						createBlock( 'core/paragraph', {
+						createBlock('core/paragraph', {
 							content: caption,
 							fontSize: 'large',
-						} ),
+						}),
 					]
 				),
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/video' ],
-			transform: ( { caption, src, align, id, anchor } ) =>
+			blocks: ['core/video'],
+			transform: ({ caption, src, align, id, anchor }) =>
 				createBlock(
 					'core/cover',
 					{
@@ -52,17 +52,17 @@ const transforms = {
 						anchor,
 					},
 					[
-						createBlock( 'core/paragraph', {
+						createBlock('core/paragraph', {
 							content: caption,
 							fontSize: 'large',
-						} ),
+						}),
 					]
 				),
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/group' ],
-			isMatch: ( { backgroundColor, gradient, style } ) => {
+			blocks: ['core/group'],
+			isMatch: ({ backgroundColor, gradient, style }) => {
 				/*
 				 * Make this transformation available only if the Group has background
 				 * or gradient set, because otherwise `Cover` block displays a Placeholder.
@@ -99,29 +99,29 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
-			blocks: [ 'core/image' ],
-			isMatch: ( {
+			blocks: ['core/image'],
+			isMatch: ({
 				backgroundType,
 				url,
 				overlayColor,
 				customOverlayColor,
 				gradient,
 				customGradient,
-			} ) => {
-				if ( url ) {
+			}) => {
+				if (url) {
 					// If a url exists the transform could happen if that URL represents an image background.
 					return backgroundType === IMAGE_BACKGROUND_TYPE;
 				}
 				// If a url is not set the transform could happen if the cover has no background color or gradient;
 				return (
-					! overlayColor &&
-					! customOverlayColor &&
-					! gradient &&
-					! customGradient
+					!overlayColor &&
+					!customOverlayColor &&
+					!gradient &&
+					!customGradient
 				);
 			},
-			transform: ( { title, url, alt, align, id, anchor, style } ) =>
-				createBlock( 'core/image', {
+			transform: ({ title, url, alt, align, id, anchor, style }) =>
+				createBlock('core/image', {
 					caption: title,
 					url,
 					alt,
@@ -133,39 +133,39 @@ const transforms = {
 							duotone: style?.color?.duotone,
 						},
 					},
-				} ),
+				}),
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/video' ],
-			isMatch: ( {
+			blocks: ['core/video'],
+			isMatch: ({
 				backgroundType,
 				url,
 				overlayColor,
 				customOverlayColor,
 				gradient,
 				customGradient,
-			} ) => {
-				if ( url ) {
+			}) => {
+				if (url) {
 					// If a url exists the transform could happen if that URL represents a video background.
 					return backgroundType === VIDEO_BACKGROUND_TYPE;
 				}
 				// If a url is not set the transform could happen if the cover has no background color or gradient;
 				return (
-					! overlayColor &&
-					! customOverlayColor &&
-					! gradient &&
-					! customGradient
+					!overlayColor &&
+					!customOverlayColor &&
+					!gradient &&
+					!customGradient
 				);
 			},
-			transform: ( { title, url, align, id, anchor } ) =>
-				createBlock( 'core/video', {
+			transform: ({ title, url, align, id, anchor }) =>
+				createBlock('core/video', {
 					caption: title,
 					src: url,
 					id,
 					align,
 					anchor,
-				} ),
+				}),
 		},
 	],
 };

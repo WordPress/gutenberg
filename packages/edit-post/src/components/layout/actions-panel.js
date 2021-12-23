@@ -17,64 +17,61 @@ import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import { store as editPostStore } from '../../store';
 
-const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
+const { Fill, Slot } = createSlotFill('ActionsPanel');
 
 export const ActionsPanelFill = Fill;
 
-export default function ActionsPanel( {
+export default function ActionsPanel({
 	setEntitiesSavedStatesCallback,
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
-} ) {
-	const { closePublishSidebar, togglePublishSidebar } = useDispatch(
-		editPostStore
-	);
+}) {
+	const { closePublishSidebar, togglePublishSidebar } =
+		useDispatch(editPostStore);
 	const {
 		publishSidebarOpened,
 		hasActiveMetaboxes,
 		isSavingMetaBoxes,
 		hasNonPostEntityChanges,
-	} = useSelect( ( select ) => {
+	} = useSelect((select) => {
 		return {
-			publishSidebarOpened: select(
-				editPostStore
-			).isPublishSidebarOpened(),
-			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isSavingMetaBoxes: select( editPostStore ).isSavingMetaBoxes(),
-			hasNonPostEntityChanges: select(
-				editorStore
-			).hasNonPostEntityChanges(),
+			publishSidebarOpened:
+				select(editPostStore).isPublishSidebarOpened(),
+			hasActiveMetaboxes: select(editPostStore).hasMetaBoxes(),
+			isSavingMetaBoxes: select(editPostStore).isSavingMetaBoxes(),
+			hasNonPostEntityChanges:
+				select(editorStore).hasNonPostEntityChanges(),
 		};
-	}, [] );
+	}, []);
 
 	const openEntitiesSavedStates = useCallback(
-		() => setEntitiesSavedStatesCallback( true ),
+		() => setEntitiesSavedStatesCallback(true),
 		[]
 	);
 
 	// It is ok for these components to be unmounted when not in visual use.
 	// We don't want more than one present at a time, decide which to render.
 	let unmountableContent;
-	if ( publishSidebarOpened ) {
+	if (publishSidebarOpened) {
 		unmountableContent = (
 			<PostPublishPanel
-				onClose={ closePublishSidebar }
-				forceIsDirty={ hasActiveMetaboxes }
-				forceIsSaving={ isSavingMetaBoxes }
-				PrePublishExtension={ PluginPrePublishPanel.Slot }
-				PostPublishExtension={ PluginPostPublishPanel.Slot }
+				onClose={closePublishSidebar}
+				forceIsDirty={hasActiveMetaboxes}
+				forceIsSaving={isSavingMetaBoxes}
+				PrePublishExtension={PluginPrePublishPanel.Slot}
+				PostPublishExtension={PluginPostPublishPanel.Slot}
 			/>
 		);
-	} else if ( hasNonPostEntityChanges ) {
+	} else if (hasNonPostEntityChanges) {
 		unmountableContent = (
 			<div className="edit-post-layout__toggle-entities-saved-states-panel">
 				<Button
 					variant="secondary"
 					className="edit-post-layout__toggle-entities-saved-states-panel-button"
-					onClick={ openEntitiesSavedStates }
-					aria-expanded={ false }
+					onClick={openEntitiesSavedStates}
+					aria-expanded={false}
 				>
-					{ __( 'Open save panel' ) }
+					{__('Open save panel')}
 				</Button>
 			</div>
 		);
@@ -84,10 +81,10 @@ export default function ActionsPanel( {
 				<Button
 					variant="secondary"
 					className="edit-post-layout__toggle-publish-panel-button"
-					onClick={ togglePublishSidebar }
-					aria-expanded={ false }
+					onClick={togglePublishSidebar}
+					aria-expanded={false}
 				>
-					{ __( 'Open publish panel' ) }
+					{__('Open publish panel')}
 				</Button>
 			</div>
 		);
@@ -97,11 +94,11 @@ export default function ActionsPanel( {
 	// always mounted to retain its own component state (such as checkboxes).
 	return (
 		<>
-			{ isEntitiesSavedStatesOpen && (
-				<EntitiesSavedStates close={ closeEntitiesSavedStates } />
-			) }
+			{isEntitiesSavedStatesOpen && (
+				<EntitiesSavedStates close={closeEntitiesSavedStates} />
+			)}
 			<Slot bubblesVirtually />
-			{ ! isEntitiesSavedStatesOpen && unmountableContent }
+			{!isEntitiesSavedStatesOpen && unmountableContent}
 		</>
 	);
 }

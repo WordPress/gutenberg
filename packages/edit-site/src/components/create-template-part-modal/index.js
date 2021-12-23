@@ -25,78 +25,78 @@ import { check } from '@wordpress/icons';
  */
 import { TEMPLATE_PART_AREA_GENERAL } from '../../store/constants';
 
-export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
-	const [ title, setTitle ] = useState( '' );
-	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_GENERAL );
-	const [ isSubmitting, setIsSubmitting ] = useState( false );
-	const instanceId = useInstanceId( CreateTemplatePartModal );
+export default function CreateTemplatePartModal({ closeModal, onCreate }) {
+	const [title, setTitle] = useState('');
+	const [area, setArea] = useState(TEMPLATE_PART_AREA_GENERAL);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const instanceId = useInstanceId(CreateTemplatePartModal);
 
 	const templatePartAreas = useSelect(
-		( select ) =>
-			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
+		(select) =>
+			select(editorStore).__experimentalGetDefaultTemplatePartAreas(),
 		[]
 	);
 
 	return (
 		<Modal
-			title={ __( 'Create a template part' ) }
-			closeLabel={ __( 'Close' ) }
-			onRequestClose={ closeModal }
+			title={__('Create a template part')}
+			closeLabel={__('Close')}
+			onRequestClose={closeModal}
 			overlayClassName="edit-site-create-template-part-modal"
 		>
 			<form
-				onSubmit={ async ( event ) => {
+				onSubmit={async (event) => {
 					event.preventDefault();
-					if ( ! title ) {
+					if (!title) {
 						return;
 					}
-					setIsSubmitting( true );
-					await onCreate( { title, area } );
-				} }
+					setIsSubmitting(true);
+					await onCreate({ title, area });
+				}}
 			>
 				<TextControl
-					label={ __( 'Name' ) }
-					value={ title }
-					onChange={ setTitle }
+					label={__('Name')}
+					value={title}
+					onChange={setTitle}
 					required
 				/>
 				<BaseControl
-					label={ __( 'Area' ) }
-					id={ `edit-site-create-template-part-modal__area-selection-${ instanceId }` }
+					label={__('Area')}
+					id={`edit-site-create-template-part-modal__area-selection-${instanceId}`}
 					className="edit-site-create-template-part-modal__area-base-control"
 				>
 					<RadioGroup
-						label={ __( 'Area' ) }
+						label={__('Area')}
 						className="edit-site-create-template-part-modal__area-radio-group"
-						id={ `edit-site-create-template-part-modal__area-selection-${ instanceId }` }
-						onChange={ setArea }
-						checked={ area }
+						id={`edit-site-create-template-part-modal__area-selection-${instanceId}`}
+						onChange={setArea}
+						checked={area}
 					>
-						{ templatePartAreas.map(
-							( { icon, label, area: value, description } ) => (
+						{templatePartAreas.map(
+							({ icon, label, area: value, description }) => (
 								<Radio
-									key={ label }
-									value={ value }
+									key={label}
+									value={value}
 									className="edit-site-create-template-part-modal__area-radio"
 								>
 									<Flex align="start" justify="start">
 										<FlexItem>
-											<Icon icon={ icon } />
+											<Icon icon={icon} />
 										</FlexItem>
 										<FlexBlock className="edit-site-create-template-part-modal__option-label">
-											{ label }
-											<div>{ description }</div>
+											{label}
+											<div>{description}</div>
 										</FlexBlock>
 
 										<FlexItem className="edit-site-create-template-part-modal__checkbox">
-											{ area === value && (
-												<Icon icon={ check } />
-											) }
+											{area === value && (
+												<Icon icon={check} />
+											)}
 										</FlexItem>
 									</Flex>
 								</Radio>
 							)
-						) }
+						)}
 					</RadioGroup>
 				</BaseControl>
 				<Flex
@@ -106,21 +106,21 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 					<FlexItem>
 						<Button
 							variant="secondary"
-							onClick={ () => {
+							onClick={() => {
 								closeModal();
-							} }
+							}}
 						>
-							{ __( 'Cancel' ) }
+							{__('Cancel')}
 						</Button>
 					</FlexItem>
 					<FlexItem>
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ ! title }
-							isBusy={ isSubmitting }
+							disabled={!title}
+							isBusy={isSubmitting}
 						>
-							{ __( 'Create' ) }
+							{__('Create')}
 						</Button>
 					</FlexItem>
 				</Flex>

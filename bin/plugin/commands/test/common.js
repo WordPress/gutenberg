@@ -3,48 +3,48 @@
  */
 import { calculateVersionBumpFromChangelog } from '../common';
 
-describe( 'calculateVersionBumpFromChangelog', () => {
-	it( 'should return null when no lines provided', () => {
-		expect( calculateVersionBumpFromChangelog( [] ) ).toBe( null );
-	} );
+describe('calculateVersionBumpFromChangelog', () => {
+	it('should return null when no lines provided', () => {
+		expect(calculateVersionBumpFromChangelog([])).toBe(null);
+	});
 
-	it( 'should return null when no unreleased header found', () => {
+	it('should return null when no unreleased header found', () => {
 		expect(
-			calculateVersionBumpFromChangelog( [
+			calculateVersionBumpFromChangelog([
 				'First line',
 				'Second line',
 				'Third line',
 				'Fourth line',
 				'Fifth line',
-			] )
-		).toBe( null );
-	} );
+			])
+		).toBe(null);
+	});
 
-	it( 'should return null when Unreleased header found but no entries', () => {
+	it('should return null when Unreleased header found but no entries', () => {
 		expect(
-			calculateVersionBumpFromChangelog( [
+			calculateVersionBumpFromChangelog([
 				'First line',
 				'## Unreleased',
 				'Third line',
 				'Fourth line',
 				'Fifth line',
-			] )
-		).toBe( null );
-	} );
+			])
+		).toBe(null);
+	});
 
-	it( 'should return patch version Unreleased header and new item detected', () => {
+	it('should return patch version Unreleased header and new item detected', () => {
 		expect(
-			calculateVersionBumpFromChangelog( [
+			calculateVersionBumpFromChangelog([
 				'First line',
 				'## Unreleased',
 				'Third line',
 				'  - new item added',
 				'Fifth line',
-			] )
-		).toBe( 'patch' );
-	} );
+			])
+		).toBe('patch');
+	});
 
-	it( 'should return enforce higher version bump when new item detected with lower level', () => {
+	it('should return enforce higher version bump when new item detected with lower level', () => {
 		expect(
 			calculateVersionBumpFromChangelog(
 				[
@@ -56,10 +56,10 @@ describe( 'calculateVersionBumpFromChangelog', () => {
 				],
 				'major'
 			)
-		).toBe( 'major' );
-	} );
+		).toBe('major');
+	});
 
-	it( 'should return major version bump when breaking changes detected', () => {
+	it('should return major version bump when breaking changes detected', () => {
 		expect(
 			calculateVersionBumpFromChangelog(
 				[
@@ -71,6 +71,6 @@ describe( 'calculateVersionBumpFromChangelog', () => {
 				],
 				'major'
 			)
-		).toBe( 'major' );
-	} );
-} );
+		).toBe('major');
+	});
+});

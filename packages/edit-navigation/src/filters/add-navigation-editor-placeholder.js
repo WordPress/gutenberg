@@ -10,13 +10,11 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import BlockPlaceholder from '../components/block-placeholder';
 
 const addNavigationEditorPlaceholder = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		if ( props.name !== 'core/navigation' ) {
-			return <BlockEdit { ...props } />;
+	(BlockEdit) => (props) => {
+		if (props.name !== 'core/navigation') {
+			return <BlockEdit {...props} />;
 		}
-		return (
-			<BlockEdit { ...props } customPlaceholder={ BlockPlaceholder } />
-		);
+		return <BlockEdit {...props} customPlaceholder={BlockPlaceholder} />;
 	},
 	'withNavigationEditorPlaceholder'
 );

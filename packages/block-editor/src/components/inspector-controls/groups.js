@@ -3,9 +3,9 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-const InspectorControlsDefault = createSlotFill( 'InspectorControls' );
-const InspectorControlsAdvanced = createSlotFill( 'InspectorAdvancedControls' );
-const InspectorControlsBorder = createSlotFill( 'InspectorControlsBorder' );
+const InspectorControlsDefault = createSlotFill('InspectorControls');
+const InspectorControlsAdvanced = createSlotFill('InspectorAdvancedControls');
+const InspectorControlsBorder = createSlotFill('InspectorControlsBorder');
 const InspectorControlsDimensions = createSlotFill(
 	'InspectorControlsDimensions'
 );

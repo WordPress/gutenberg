@@ -7,7 +7,7 @@ import { Draggable } from '@wordpress/components';
  */
 import BlockDraggableChip from '../block-draggable/draggable-chip';
 
-const InserterDraggableBlocks = ( { isEnabled, blocks, icon, children } ) => {
+const InserterDraggableBlocks = ({ isEnabled, blocks, icon, children }) => {
 	const transferData = {
 		type: 'inserter',
 		blocks,
@@ -16,18 +16,18 @@ const InserterDraggableBlocks = ( { isEnabled, blocks, icon, children } ) => {
 	return (
 		<Draggable
 			__experimentalTransferDataType="wp-blocks"
-			transferData={ transferData }
+			transferData={transferData}
 			__experimentalDragComponent={
-				<BlockDraggableChip count={ blocks.length } icon={ icon } />
+				<BlockDraggableChip count={blocks.length} icon={icon} />
 			}
 		>
-			{ ( { onDraggableStart, onDraggableEnd } ) => {
-				return children( {
+			{({ onDraggableStart, onDraggableEnd }) => {
+				return children({
 					draggable: isEnabled,
 					onDragStart: isEnabled ? onDraggableStart : undefined,
 					onDragEnd: isEnabled ? onDraggableEnd : undefined,
-				} );
-			} }
+				});
+			}}
 		</Draggable>
 	);
 };

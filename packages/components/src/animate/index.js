@@ -17,7 +17,7 @@ import classnames from 'classnames';
  * @param {GetAnimateOptions['type']} type The animation type
  * @return {'top' | 'left'} Default origin
  */
-function getDefaultOrigin( type ) {
+function getDefaultOrigin(type) {
 	return type === 'appear' ? 'top' : 'left';
 }
 /* eslint-enable jsdoc/valid-types */
@@ -27,32 +27,29 @@ function getDefaultOrigin( type ) {
  *
  * @return {string | void} ClassName that applies the animations
  */
-export function getAnimateClassName( options ) {
-	if ( options.type === 'loading' ) {
-		return classnames( 'components-animate__loading' );
+export function getAnimateClassName(options) {
+	if (options.type === 'loading') {
+		return classnames('components-animate__loading');
 	}
 
-	const { type, origin = getDefaultOrigin( type ) } = options;
+	const { type, origin = getDefaultOrigin(type) } = options;
 
-	if ( type === 'appear' ) {
-		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
-		return classnames( 'components-animate__appear', {
-			[ 'is-from-' + xAxis ]: xAxis !== 'center',
-			[ 'is-from-' + yAxis ]: yAxis !== 'middle',
-		} );
+	if (type === 'appear') {
+		const [yAxis, xAxis = 'center'] = origin.split(' ');
+		return classnames('components-animate__appear', {
+			['is-from-' + xAxis]: xAxis !== 'center',
+			['is-from-' + yAxis]: yAxis !== 'middle',
+		});
 	}
 
-	if ( type === 'slide-in' ) {
-		return classnames(
-			'components-animate__slide-in',
-			'is-from-' + origin
-		);
+	if (type === 'slide-in') {
+		return classnames('components-animate__slide-in', 'is-from-' + origin);
 	}
 }
 
 // @ts-ignore Reason: Planned for deprecation
-export default function Animate( { type, options = {}, children } ) {
-	return children( {
-		className: getAnimateClassName( { type, ...options } ),
-	} );
+export default function Animate({ type, options = {}, children }) {
+	return children({
+		className: getAnimateClassName({ type, ...options }),
+	});
 }

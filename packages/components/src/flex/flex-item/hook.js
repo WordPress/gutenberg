@@ -14,20 +14,20 @@ import { useCx } from '../../utils/hooks/use-cx';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
  */
-export function useFlexItem( props ) {
+export function useFlexItem(props) {
 	const {
 		className,
 		display: displayProp,
 		isBlock = false,
 		...otherProps
-	} = useContextSystem( props, 'FlexItem' );
+	} = useContextSystem(props, 'FlexItem');
 	const sx = {};
 
 	const contextDisplay = useFlexContext().flexItemDisplay;
 
-	sx.Base = css( {
+	sx.Base = css({
 		display: displayProp || contextDisplay,
-	} );
+	});
 
 	const cx = useCx();
 

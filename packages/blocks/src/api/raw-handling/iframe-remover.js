@@ -5,9 +5,9 @@
  *
  * @return {void}
  */
-export default function iframeRemover( node ) {
-	if ( node.nodeName === 'IFRAME' ) {
-		const text = node.ownerDocument.createTextNode( node.src );
-		node.parentNode.replaceChild( text, node );
+export default function iframeRemover(node) {
+	if (node.nodeName === 'IFRAME') {
+		const text = node.ownerDocument.createTextNode(node.src);
+		node.parentNode.replaceChild(text, node);
 	}
 }

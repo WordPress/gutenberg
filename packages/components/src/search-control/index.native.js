@@ -32,44 +32,40 @@ import platformStyles from './platform-style.scss';
 
 // Merge platform specific styles with the default styles.
 const baseStyles = { ...allStyles };
-for ( const selector in platformStyles ) {
-	baseStyles[ selector ] = {
-		...baseStyles[ selector ],
-		...platformStyles[ selector ],
+for (const selector in platformStyles) {
+	baseStyles[selector] = {
+		...baseStyles[selector],
+		...platformStyles[selector],
 	};
 }
 
-function selectModifiedStyles( styles, modifier ) {
-	const modifierMatcher = new RegExp( `--${ modifier }$` );
-	const modifierSelectors = Object.keys( styles ).filter( ( selector ) =>
-		selector.match( modifierMatcher )
+function selectModifiedStyles(styles, modifier) {
+	const modifierMatcher = new RegExp(`--${modifier}$`);
+	const modifierSelectors = Object.keys(styles).filter((selector) =>
+		selector.match(modifierMatcher)
 	);
 
-	return modifierSelectors.reduce( ( modifiedStyles, modifierSelector ) => {
-		const blockElementSelector = modifierSelector.split( '--' )[ 0 ];
-		modifiedStyles[ blockElementSelector ] = styles[ modifierSelector ];
+	return modifierSelectors.reduce((modifiedStyles, modifierSelector) => {
+		const blockElementSelector = modifierSelector.split('--')[0];
+		modifiedStyles[blockElementSelector] = styles[modifierSelector];
 		return modifiedStyles;
-	}, {} );
+	}, {});
 }
 
-function mergeStyles( styles, updateStyles, selectors ) {
-	selectors.forEach( ( selector ) => {
-		styles[ selector ] = {
-			...styles[ selector ],
-			...updateStyles[ selector ],
+function mergeStyles(styles, updateStyles, selectors) {
+	selectors.forEach((selector) => {
+		styles[selector] = {
+			...styles[selector],
+			...updateStyles[selector],
 		};
-	} );
+	});
 
 	return styles;
 }
 
-function SearchControl( {
-	value,
-	onChange,
-	placeholder = __( 'Search blocks' ),
-} ) {
-	const [ isActive, setIsActive ] = useState( false );
-	const [ currentStyles, setCurrentStyles ] = useState( baseStyles );
+function SearchControl({ value, onChange, placeholder = __('Search blocks') }) {
+	const [isActive, setIsActive] = useState(false);
+	const [currentStyles, setCurrentStyles] = useState(baseStyles);
 
 	const isDark = useColorScheme() === 'dark';
 	const inputRef = useRef();
@@ -77,60 +73,56 @@ function SearchControl( {
 
 	const isIOS = Platform.OS === 'ios';
 
-	const darkStyles = useMemo( () => {
-		return selectModifiedStyles( baseStyles, 'dark' );
-	}, [] );
+	const darkStyles = useMemo(() => {
+		return selectModifiedStyles(baseStyles, 'dark');
+	}, []);
 
-	const activeStyles = useMemo( () => {
-		return selectModifiedStyles( baseStyles, 'active' );
-	}, [] );
+	const activeStyles = useMemo(() => {
+		return selectModifiedStyles(baseStyles, 'active');
+	}, []);
 
-	const activeDarkStyles = useMemo( () => {
-		return selectModifiedStyles( baseStyles, 'active-dark' );
-	}, [] );
+	const activeDarkStyles = useMemo(() => {
+		return selectModifiedStyles(baseStyles, 'active-dark');
+	}, []);
 
-	useEffect( () => {
+	useEffect(() => {
 		let futureStyles = { ...baseStyles };
 
-		function mergeFutureStyles( modifiedStyles, shouldUseConditions ) {
+		function mergeFutureStyles(modifiedStyles, shouldUseConditions) {
 			const shouldUseModified = shouldUseConditions.every(
-				( should ) => should
+				(should) => should
 			);
 
 			const updatedStyles = shouldUseModified
 				? modifiedStyles
 				: futureStyles;
 
-			const selectors = Object.keys( modifiedStyles );
+			const selectors = Object.keys(modifiedStyles);
 
-			futureStyles = mergeStyles(
-				futureStyles,
-				updatedStyles,
-				selectors
-			);
+			futureStyles = mergeStyles(futureStyles, updatedStyles, selectors);
 		}
 
-		mergeFutureStyles( activeStyles, [ isActive ] );
-		mergeFutureStyles( darkStyles, [ isDark ] );
-		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ] );
+		mergeFutureStyles(activeStyles, [isActive]);
+		mergeFutureStyles(darkStyles, [isDark]);
+		mergeFutureStyles(activeDarkStyles, [isActive, isDark]);
 
-		setCurrentStyles( futureStyles );
-	}, [ isActive, isDark ] );
+		setCurrentStyles(futureStyles);
+	}, [isActive, isDark]);
 
-	useEffect( () => {
+	useEffect(() => {
 		const keyboardHideSubscription = Keyboard.addListener(
 			'keyboardDidHide',
 			() => {
-				if ( ! isIOS ) {
+				if (!isIOS) {
 					onCancel();
 				}
 			}
 		);
 		return () => {
-			clearTimeout( onCancelTimer.current );
+			clearTimeout(onCancelTimer.current);
 			keyboardHideSubscription.remove();
 		};
-	}, [] );
+	}, []);
 
 	const {
 		'search-control__container': containerStyle,
@@ -148,33 +140,33 @@ function SearchControl( {
 	} = currentStyles;
 
 	function clearInput() {
-		onChange( '' );
+		onChange('');
 	}
 
 	function onCancel() {
-		onCancelTimer.current = setTimeout( () => {
+		onCancelTimer.current = setTimeout(() => {
 			inputRef.current.blur();
 			clearInput();
-			setIsActive( false );
-		}, 0 );
+			setIsActive(false);
+		}, 0);
 	}
 
 	function renderLeftButton() {
 		const button =
-			! isIOS && isActive ? (
+			!isIOS && isActive ? (
 				<Button
-					label={ __( 'Cancel search' ) }
-					icon={ arrowLeftIcon }
-					onClick={ onCancel }
-					style={ iconStyle }
+					label={__('Cancel search')}
+					icon={arrowLeftIcon}
+					onClick={onCancel}
+					style={iconStyle}
 				/>
 			) : (
-				<Icon icon={ Gridicons.search } fill={ iconStyle?.color } />
+				<Icon icon={Gridicons.search} fill={iconStyle?.color} />
 			);
 
 		return (
-			<View style={ [ inputButtonStyle, inputButtonLeftStyle ] }>
-				{ button }
+			<View style={[inputButtonStyle, inputButtonLeftStyle]}>
+				{button}
 			</View>
 		);
 	}
@@ -183,43 +175,43 @@ function SearchControl( {
 		let button;
 
 		// Add a View element to properly center the input placeholder via flexbox.
-		if ( isIOS && ! isActive ) {
+		if (isIOS && !isActive) {
 			button = <View />;
 		}
 
-		if ( !! value ) {
+		if (!!value) {
 			button = (
 				<Button
-					label={ __( 'Clear search' ) }
-					icon={ isIOS ? cancelCircleFilledIcon : closeIcon }
-					onClick={ clearInput }
-					style={ [ iconStyle, rightIconStyle ] }
+					label={__('Clear search')}
+					icon={isIOS ? cancelCircleFilledIcon : closeIcon}
+					onClick={clearInput}
+					style={[iconStyle, rightIconStyle]}
 				/>
 			);
 		}
 
 		return (
-			<View style={ [ inputButtonStyle, inputButtonRightStyle ] }>
-				{ button }
+			<View style={[inputButtonStyle, inputButtonRightStyle]}>
+				{button}
 			</View>
 		);
 	}
 
 	function renderCancel() {
-		if ( ! isIOS ) {
+		if (!isIOS) {
 			return null;
 		}
 		return (
-			<View style={ cancelButtonStyle }>
+			<View style={cancelButtonStyle}>
 				<Text
-					onPress={ onCancel }
-					style={ cancelButtonTextStyle }
-					accessible={ true }
-					accessibilityRole={ 'button' }
-					accessibilityLabel={ __( 'Cancel search' ) }
-					accessibilityHint={ __( 'Cancel search' ) }
+					onPress={onCancel}
+					style={cancelButtonTextStyle}
+					accessible={true}
+					accessibilityRole={'button'}
+					accessibilityLabel={__('Cancel search')}
+					accessibilityHint={__('Cancel search')}
 				>
-					{ __( 'Cancel' ) }
+					{__('Cancel')}
 				</Text>
 			</View>
 		);
@@ -227,28 +219,28 @@ function SearchControl( {
 
 	return (
 		<TouchableOpacity
-			style={ containerStyle }
-			onPress={ () => {
-				setIsActive( true );
+			style={containerStyle}
+			onPress={() => {
+				setIsActive(true);
 				inputRef.current.focus();
-			} }
-			activeOpacity={ 1 }
+			}}
+			activeOpacity={1}
 		>
-			<View style={ innerContainerStyle }>
-				<View style={ inputContainerStyle }>
-					{ renderLeftButton() }
+			<View style={innerContainerStyle}>
+				<View style={inputContainerStyle}>
+					{renderLeftButton()}
 					<TextInput
-						ref={ inputRef }
-						style={ formInputStyle }
-						placeholderTextColor={ placeholderStyle?.color }
-						onChangeText={ onChange }
-						onFocus={ () => setIsActive( true ) }
-						value={ value }
-						placeholder={ placeholder }
+						ref={inputRef}
+						style={formInputStyle}
+						placeholderTextColor={placeholderStyle?.color}
+						onChangeText={onChange}
+						onFocus={() => setIsActive(true)}
+						value={value}
+						placeholder={placeholder}
 					/>
-					{ renderRightButton() }
+					{renderRightButton()}
 				</View>
-				{ isActive && renderCancel() }
+				{isActive && renderCancel()}
 			</View>
 		</TouchableOpacity>
 	);

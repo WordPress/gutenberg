@@ -8,35 +8,35 @@ import {
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'WP Editor Meta Boxes', () => {
-	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-plugin-wp-editor-meta-box' );
+describe('WP Editor Meta Boxes', () => {
+	beforeAll(async () => {
+		await activatePlugin('gutenberg-test-plugin-wp-editor-meta-box');
 		await createNewPost();
-	} );
+	});
 
-	afterAll( async () => {
-		await deactivatePlugin( 'gutenberg-test-plugin-wp-editor-meta-box' );
-	} );
+	afterAll(async () => {
+		await deactivatePlugin('gutenberg-test-plugin-wp-editor-meta-box');
+	});
 
-	it( 'Should save the changes', async () => {
+	it('Should save the changes', async () => {
 		// Add title to enable valid non-empty post save.
-		await page.type( '.editor-post-title__input', 'Hello Meta' );
+		await page.type('.editor-post-title__input', 'Hello Meta');
 
 		// Type something
-		await expect( page ).toClick( '#test_tinymce_id-html' );
-		await page.type( '#test_tinymce_id', 'Typing in a metabox' );
-		await page.click( '#test_tinymce_id-tmce' );
+		await expect(page).toClick('#test_tinymce_id-html');
+		await page.type('#test_tinymce_id', 'Typing in a metabox');
+		await page.click('#test_tinymce_id-tmce');
 
 		await publishPost();
 
 		await page.reload();
-		await page.waitForSelector( '.edit-post-layout' );
+		await page.waitForSelector('.edit-post-layout');
 
-		await expect( page ).toClick( '#test_tinymce_id-html' );
-		await page.waitForSelector( '#test_tinymce_id' );
+		await expect(page).toClick('#test_tinymce_id-html');
+		await page.waitForSelector('#test_tinymce_id');
 		const content = await page.$eval(
 			'#test_tinymce_id',
-			( textarea ) => textarea.value
+			(textarea) => textarea.value
 		);
 
 		/*
@@ -53,6 +53,6 @@ describe( 'WP Editor Meta Boxes', () => {
 		 *
 		 * For more context, see https://github.com/WordPress/gutenberg/pull/33228/files#r666897885
 		 */
-		expect( content ).toBe( 'Typing in a metabox' );
-	} );
-} );
+		expect(content).toBe('Typing in a metabox');
+	});
+});

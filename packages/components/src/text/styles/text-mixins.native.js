@@ -10,7 +10,7 @@ const fontWeightMedium = `font-weight: 500;`;
 const fontWeightSemibold = `font-weight: 600;`;
 
 const title = `
-  ${ fontWeightNormal }
+  ${fontWeightNormal}
 `;
 
 const titleLarge = `
@@ -29,7 +29,7 @@ const titleSmall = `
 `;
 
 const subtitle = `
-	${ fontWeightSemibold }
+	${fontWeightSemibold}
 	font-size: 14px;
 	line-height: 20px;
 `;
@@ -45,7 +45,7 @@ const subtitleSmall = `
 `;
 
 const body = `
-	${ fontWeightNormal }
+	${fontWeightNormal}
 `;
 
 const bodyLarge = `
@@ -59,29 +59,29 @@ const bodySmall = `
 `;
 
 const button = `
-  ${ fontWeightSemibold }
+  ${fontWeightSemibold}
   font-size: 14px;
   line-height: 20px;
 `;
 
 const caption = `
-	${ fontWeightNormal }
+	${fontWeightNormal}
 	font-size: 12px;
 	line-height: 16px;
 `;
 
 const label = `
-	${ fontWeightSemibold }
+	${fontWeightSemibold}
 	font-size: 12px;
 	line-height: 16px;
 `;
 
 const sectionHeading = `
-	${ fontWeightMedium }
+	${fontWeightMedium}
 	font-size: 11px;
 	line-height: 1.4;
 	text-transform: uppercase;
-	color: ${ G2.gray[ 700 ] }
+	color: ${G2.gray[700]}
 `;
 
 /**
@@ -91,48 +91,48 @@ const sectionHeading = `
 /**
  * @param {TextVariant} variantName
  */
-const variant = ( variantName = 'body' ) => {
-	switch ( variantName ) {
+const variant = (variantName = 'body') => {
+	switch (variantName) {
 		case 'title.large':
 			return css`
-				${ title }
-				${ titleLarge }
+				${title}
+				${titleLarge}
 			`;
 		case 'title.medium':
 			return css`
-				${ title }
-				${ titleMedium }
+				${title}
+				${titleMedium}
 			`;
 		case 'title.small':
 			return css`
-				${ title }
-				${ titleSmall }
+				${title}
+				${titleSmall}
 			`;
 
 		case 'subtitle':
 			return css`
-				${ subtitle }
-				${ subtitleLarge }
+				${subtitle}
+				${subtitleLarge}
 			`;
 		case 'subtitle.small':
 			return css`
-				${ subtitle }
-				${ subtitleSmall }
+				${subtitle}
+				${subtitleSmall}
 			`;
 
 		case 'body':
 			return css`
-				${ body }
+				${body}
 			`;
 		case 'body.large':
 			return css`
-				${ body }
-				${ bodyLarge }
+				${body}
+				${bodyLarge}
 			`;
 		case 'body.small':
 			return css`
-				${ body }
-				${ bodySmall }
+				${body}
+				${bodySmall}
 			`;
 
 		case 'button':
@@ -157,7 +157,7 @@ const variant = ( variantName = 'body' ) => {
 /**
  * @param {TextProps} props
  */
-export const text = ( props ) => css`
-	${ fontFamily }
-	${ variant( props.variant ) }
+export const text = (props) => css`
+	${fontFamily}
+	${variant(props.variant)}
 `;

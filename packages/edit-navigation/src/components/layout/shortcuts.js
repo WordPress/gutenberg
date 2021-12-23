@@ -10,57 +10,57 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-function NavigationEditorShortcuts( { saveBlocks } ) {
-	useShortcut( 'core/edit-navigation/save-menu', ( event ) => {
+function NavigationEditorShortcuts({ saveBlocks }) {
+	useShortcut('core/edit-navigation/save-menu', (event) => {
 		event.preventDefault();
 		saveBlocks();
-	} );
+	});
 
-	const { redo, undo } = useDispatch( coreStore );
-	useShortcut( 'core/edit-navigation/undo', ( event ) => {
+	const { redo, undo } = useDispatch(coreStore);
+	useShortcut('core/edit-navigation/undo', (event) => {
 		undo();
 		event.preventDefault();
-	} );
+	});
 
-	useShortcut( 'core/edit-navigation/redo', ( event ) => {
+	useShortcut('core/edit-navigation/redo', (event) => {
 		redo();
 		event.preventDefault();
-	} );
+	});
 
 	return null;
 }
 
 function RegisterNavigationEditorShortcuts() {
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	useEffect( () => {
-		registerShortcut( {
+	const { registerShortcut } = useDispatch(keyboardShortcutsStore);
+	useEffect(() => {
+		registerShortcut({
 			name: 'core/edit-navigation/save-menu',
 			category: 'global',
-			description: __( 'Save the navigation currently being edited.' ),
+			description: __('Save the navigation currently being edited.'),
 			keyCombination: {
 				modifier: 'primary',
 				character: 's',
 			},
-		} );
-		registerShortcut( {
+		});
+		registerShortcut({
 			name: 'core/edit-navigation/undo',
 			category: 'global',
-			description: __( 'Undo your last changes.' ),
+			description: __('Undo your last changes.'),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'z',
 			},
-		} );
-		registerShortcut( {
+		});
+		registerShortcut({
 			name: 'core/edit-navigation/redo',
 			category: 'global',
-			description: __( 'Redo your last undo.' ),
+			description: __('Redo your last undo.'),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: 'z',
 			},
-		} );
-	}, [ registerShortcut ] );
+		});
+	}, [registerShortcut]);
 
 	return null;
 }

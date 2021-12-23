@@ -44,21 +44,20 @@ import {
 
 const interfaceLabels = {
 	/* translators: accessibility text for the navigation screen top bar landmark region. */
-	header: __( 'Navigation top bar' ),
+	header: __('Navigation top bar'),
 	/* translators: accessibility text for the navigation screen content landmark region. */
-	body: __( 'Navigation menu blocks' ),
+	body: __('Navigation menu blocks'),
 	/* translators: accessibility text for the navigation screen settings landmark region. */
-	sidebar: __( 'Navigation settings' ),
-	secondarySidebar: __( 'Block library' ),
+	sidebar: __('Navigation settings'),
+	secondarySidebar: __('Block library'),
 };
 
-export default function Layout( { blockEditorSettings } ) {
+export default function Layout({ blockEditorSettings }) {
 	const contentAreaRef = useBlockSelectionClearer();
-	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
-		false
-	);
-	const { saveNavigationPost } = useDispatch( editNavigationStore );
-	const savePost = () => saveNavigationPost( navigationPost );
+	const [isMenuNameControlFocused, setIsMenuNameControlFocused] =
+		useState(false);
+	const { saveNavigationPost } = useDispatch(editNavigationStore);
+	const savePost = () => saveNavigationPost(navigationPost);
 
 	const {
 		menus,
@@ -72,7 +71,7 @@ export default function Layout( { blockEditorSettings } ) {
 		isMenuSelected,
 	} = useNavigationEditor();
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const [blocks, onInput, onChange] = useEntityBlockEditor(
 		NAVIGATION_POST_KIND,
 		NAVIGATION_POST_POST_TYPE,
 		{
@@ -81,101 +80,95 @@ export default function Layout( { blockEditorSettings } ) {
 	);
 
 	const { hasSidebarEnabled, isInserterOpened } = useSelect(
-		( select ) => ( {
-			hasSidebarEnabled: !! select(
+		(select) => ({
+			hasSidebarEnabled: !!select(
 				interfaceStore
-			).getActiveComplementaryArea( 'core/edit-navigation' ),
-			isInserterOpened: select( editNavigationStore ).isInserterOpened(),
-		} ),
+			).getActiveComplementaryArea('core/edit-navigation'),
+			isInserterOpened: select(editNavigationStore).isInserterOpened(),
+		}),
 		[]
 	);
 
-	useEffect( () => {
-		if ( ! selectedMenuId && menus?.length ) {
-			selectMenu( menus[ 0 ].id );
+	useEffect(() => {
+		if (!selectedMenuId && menus?.length) {
+			selectMenu(menus[0].id);
 		}
-	}, [ selectedMenuId, menus ] );
+	}, [selectedMenuId, menus]);
 
-	useMenuNotifications( selectedMenuId );
+	useMenuNotifications(selectedMenuId);
 
-	const hasMenus = !! menus?.length;
+	const hasMenus = !!menus?.length;
 
-	const isBlockEditorReady = !! (
-		hasMenus &&
-		navigationPost &&
-		isMenuSelected
-	);
+	const isBlockEditorReady = !!(hasMenus && navigationPost && isMenuSelected);
 
 	return (
 		<ErrorBoundary>
 			<ShortcutProvider>
 				<div
-					hidden={ ! isMenuBeingDeleted }
-					className={ 'edit-navigation-layout__overlay' }
+					hidden={!isMenuBeingDeleted}
+					className={'edit-navigation-layout__overlay'}
 				/>
 				<SlotFillProvider>
 					<BlockEditorKeyboardShortcuts.Register />
 					<NavigationEditorShortcuts.Register />
-					<NavigationEditorShortcuts saveBlocks={ savePost } />
+					<NavigationEditorShortcuts saveBlocks={savePost} />
 					<BlockEditorProvider
-						value={ blocks }
-						onInput={ onInput }
-						onChange={ onChange }
-						settings={ {
+						value={blocks}
+						onInput={onInput}
+						onChange={onChange}
+						settings={{
 							...blockEditorSettings,
 							templateLock: 'all',
-						} }
-						useSubRegistry={ false }
+						}}
+						useSubRegistry={false}
 					>
 						<IsMenuNameControlFocusedContext.Provider
-							value={ useMemo(
+							value={useMemo(
 								() => [
 									isMenuNameControlFocused,
 									setIsMenuNameControlFocused,
 								],
-								[ isMenuNameControlFocused ]
-							) }
+								[isMenuNameControlFocused]
+							)}
 						>
 							<InterfaceSkeleton
 								className="edit-navigation-layout"
-								labels={ interfaceLabels }
+								labels={interfaceLabels}
 								header={
 									<Header
-										isMenuSelected={ isMenuSelected }
-										isPending={ ! hasLoadedMenus }
-										menus={ menus }
-										navigationPost={ navigationPost }
+										isMenuSelected={isMenuSelected}
+										isPending={!hasLoadedMenus}
+										menus={menus}
+										navigationPost={navigationPost}
 									/>
 								}
 								content={
 									<>
 										<Notices />
-										{ ! hasFinishedInitialLoad && (
-											<Spinner />
-										) }
+										{!hasFinishedInitialLoad && <Spinner />}
 
-										{ ! isMenuSelected &&
+										{!isMenuSelected &&
 											hasFinishedInitialLoad && (
 												<UnselectedMenuState
-													onSelectMenu={ selectMenu }
-													onCreate={ selectMenu }
-													menus={ menus }
+													onSelectMenu={selectMenu}
+													onCreate={selectMenu}
+													menus={menus}
 												/>
-											) }
-										{ isBlockEditorReady && (
+											)}
+										{isBlockEditorReady && (
 											<div
 												className="edit-navigation-layout__content-area"
-												ref={ contentAreaRef }
+												ref={contentAreaRef}
 											>
 												<BlockTools>
 													<Editor
 														isPending={
-															! hasLoadedMenus
+															!hasLoadedMenus
 														}
 													/>
 												</BlockTools>
 											</div>
-										) }
+										)}
 									</>
 								}
 								sidebar={
@@ -187,15 +180,15 @@ export default function Layout( { blockEditorSettings } ) {
 									isInserterOpened && <InserterSidebar />
 								}
 							/>
-							{ isMenuSelected && (
+							{isMenuSelected && (
 								<Sidebar
-									menus={ menus }
-									menuId={ selectedMenuId }
-									onSelectMenu={ selectMenu }
-									onDeleteMenu={ deleteMenu }
-									isMenuBeingDeleted={ isMenuBeingDeleted }
+									menus={menus}
+									menuId={selectedMenuId}
+									onSelectMenu={selectMenu}
+									onDeleteMenu={deleteMenu}
+									isMenuBeingDeleted={isMenuBeingDeleted}
 								/>
-							) }
+							)}
 						</IsMenuNameControlFocusedContext.Provider>
 						<UnsavedChangesWarning />
 					</BlockEditorProvider>

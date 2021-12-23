@@ -8,6 +8,6 @@ import styled from '@emotion/native';
  */
 import { text } from './styles/text-mixins';
 
-const Text = styled.Text( text );
+const Text = styled.Text(text);
 
 export default Text;

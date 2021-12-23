@@ -17,8 +17,8 @@ import { hasBlockSupport } from '@wordpress/blocks';
  *
  * @return {Object} Filtered block settings.
  */
-export function addAttribute( settings ) {
-	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
+export function addAttribute(settings) {
+	if (hasBlockSupport(settings, 'customClassName', true)) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -42,9 +42,9 @@ export function addAttribute( settings ) {
  *
  * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( extraProps, blockType, attributes ) {
+export function addSaveProps(extraProps, blockType, attributes) {
 	if (
-		hasBlockSupport( blockType, 'customClassName', true ) &&
+		hasBlockSupport(blockType, 'customClassName', true) &&
 		attributes.className
 	) {
 		extraProps.className = classnames(

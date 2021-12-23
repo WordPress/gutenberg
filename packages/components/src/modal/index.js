@@ -37,7 +37,7 @@ import StyleProvider from '../style-provider';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
-function Modal( props, forwardedRef ) {
+function Modal(props, forwardedRef) {
 	const {
 		bodyOpenClassName = 'modal-open',
 		role = 'dialog',
@@ -66,49 +66,49 @@ function Modal( props, forwardedRef ) {
 	} = props;
 
 	const ref = useRef();
-	const instanceId = useInstanceId( Modal );
+	const instanceId = useInstanceId(Modal);
 	const headingId = title
-		? `components-modal-header-${ instanceId }`
+		? `components-modal-header-${instanceId}`
 		: aria.labelledby;
-	const focusOnMountRef = useFocusOnMount( focusOnMount );
+	const focusOnMountRef = useFocusOnMount(focusOnMount);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
-	const focusOutsideProps = useFocusOutside( onRequestClose );
+	const focusOutsideProps = useFocusOutside(onRequestClose);
 
-	useEffect( () => {
+	useEffect(() => {
 		openModalCount++;
 
-		if ( openModalCount === 1 ) {
-			ariaHelper.hideApp( ref.current );
-			document.body.classList.add( bodyOpenClassName );
+		if (openModalCount === 1) {
+			ariaHelper.hideApp(ref.current);
+			document.body.classList.add(bodyOpenClassName);
 		}
 
 		return () => {
 			openModalCount--;
 
-			if ( openModalCount === 0 ) {
-				document.body.classList.remove( bodyOpenClassName );
+			if (openModalCount === 0) {
+				document.body.classList.remove(bodyOpenClassName);
 				ariaHelper.showApp();
 			}
 		};
-	}, [] );
+	}, []);
 
-	if ( isDismissable ) {
-		deprecated( 'isDismissable prop of the Modal component', {
+	if (isDismissable) {
+		deprecated('isDismissable prop of the Modal component', {
 			since: '5.4',
 			alternative: 'isDismissible prop (renamed) of the Modal component',
-		} );
+		});
 	}
 
-	function handleEscapeKeyDown( event ) {
+	function handleEscapeKeyDown(event) {
 		if (
 			shouldCloseOnEsc &&
 			event.keyCode === ESCAPE &&
-			! event.defaultPrevented
+			!event.defaultPrevented
 		) {
 			event.preventDefault();
-			if ( onRequestClose ) {
-				onRequestClose( event );
+			if (onRequestClose) {
+				onRequestClose(event);
 			}
 		}
 	}
@@ -116,77 +116,75 @@ function Modal( props, forwardedRef ) {
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
-			className={ classnames(
+			ref={useMergeRefs([ref, forwardedRef])}
+			className={classnames(
 				'components-modal__screen-overlay',
 				overlayClassName
-			) }
-			onKeyDown={ handleEscapeKeyDown }
+			)}
+			onKeyDown={handleEscapeKeyDown}
 		>
-			<StyleProvider document={ document }>
+			<StyleProvider document={document}>
 				<div
-					className={ classnames(
+					className={classnames(
 						'components-modal__frame',
 						className,
 						{
 							'is-full-screen': isFullScreen,
 						}
-					) }
-					style={ style }
-					ref={ useMergeRefs( [
+					)}
+					style={style}
+					ref={useMergeRefs([
 						constrainedTabbingRef,
 						focusReturnRef,
 						focusOnMountRef,
-					] ) }
-					role={ role }
-					aria-label={ contentLabel }
-					aria-labelledby={ contentLabel ? null : headingId }
-					aria-describedby={ aria.describedby }
+					])}
+					role={role}
+					aria-label={contentLabel}
+					aria-labelledby={contentLabel ? null : headingId}
+					aria-describedby={aria.describedby}
 					tabIndex="-1"
-					{ ...( shouldCloseOnClickOutside
-						? focusOutsideProps
-						: {} ) }
-					onKeyDown={ onKeyDown }
+					{...(shouldCloseOnClickOutside ? focusOutsideProps : {})}
+					onKeyDown={onKeyDown}
 				>
 					<div
-						className={ classnames( 'components-modal__content', {
+						className={classnames('components-modal__content', {
 							'hide-header': __experimentalHideHeader,
-						} ) }
+						})}
 						role="document"
 					>
-						{ ! __experimentalHideHeader && (
+						{!__experimentalHideHeader && (
 							<div className="components-modal__header">
 								<div className="components-modal__header-heading-container">
-									{ icon && (
+									{icon && (
 										<span
 											className="components-modal__icon-container"
 											aria-hidden
 										>
-											{ icon }
+											{icon}
 										</span>
-									) }
-									{ title && (
+									)}
+									{title && (
 										<h1
-											id={ headingId }
+											id={headingId}
 											className="components-modal__header-heading"
 										>
-											{ title }
+											{title}
 										</h1>
-									) }
+									)}
 								</div>
-								{ isDismissible && (
+								{isDismissible && (
 									<Button
-										onClick={ onRequestClose }
-										icon={ closeSmall }
+										onClick={onRequestClose}
+										icon={closeSmall}
 										label={
 											closeButtonLabel ||
-											__( 'Close dialog' )
+											__('Close dialog')
 										}
 									/>
-								) }
+								)}
 							</div>
-						) }
-						{ children }
+						)}
+						{children}
 					</div>
 				</div>
 			</StyleProvider>
@@ -195,4 +193,4 @@ function Modal( props, forwardedRef ) {
 	);
 }
 
-export default forwardRef( Modal );
+export default forwardRef(Modal);

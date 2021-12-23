@@ -20,28 +20,28 @@ import { useContext } from '@wordpress/element';
  */
 import styles from './style.scss';
 
-const HelpDetailNavigationScreen = ( { content, label } ) => {
+const HelpDetailNavigationScreen = ({ content, label }) => {
 	const navigation = useNavigation();
 
-	const { listProps } = useContext( BottomSheetContext );
+	const { listProps } = useContext(BottomSheetContext);
 	const contentContainerStyle = StyleSheet.flatten(
 		listProps.contentContainerStyle
 	);
 
 	return (
 		<BottomSheet.NavigationScreen isScrollable fullScreen>
-			<View style={ styles.container }>
+			<View style={styles.container}>
 				<BottomSheet.NavBar>
 					<BottomSheet.NavBar.BackButton
-						onPress={ navigation.goBack }
+						onPress={navigation.goBack}
 					/>
 					<BottomSheet.NavBar.Heading>
-						{ label }
+						{label}
 					</BottomSheet.NavBar.Heading>
 				</BottomSheet.NavBar>
 				<ScrollView
-					{ ...listProps }
-					contentContainerStyle={ {
+					{...listProps}
+					contentContainerStyle={{
 						...contentContainerStyle,
 						paddingBottom: Math.max(
 							listProps.safeAreaBottomInset,
@@ -53,10 +53,10 @@ const HelpDetailNavigationScreen = ( { content, label } ) => {
 						 * current `BottomSheet` implementation.
 						 */
 						marginTop: 0,
-					} }
+					}}
 				>
-					<TouchableWithoutFeedback accessible={ false }>
-						<View>{ content }</View>
+					<TouchableWithoutFeedback accessible={false}>
+						<View>{content}</View>
 					</TouchableWithoutFeedback>
 				</ScrollView>
 			</View>

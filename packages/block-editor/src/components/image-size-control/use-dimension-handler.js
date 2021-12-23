@@ -10,57 +10,57 @@ export default function useDimensionHandler(
 	defaultWidth,
 	onChange
 ) {
-	const [ currentWidth, setCurrentWidth ] = useState(
+	const [currentWidth, setCurrentWidth] = useState(
 		customWidth ?? defaultWidth ?? ''
 	);
-	const [ currentHeight, setCurrentHeight ] = useState(
+	const [currentHeight, setCurrentHeight] = useState(
 		customHeight ?? defaultHeight ?? ''
 	);
 
 	// When an image is first inserted, the default dimensions are initially
 	// undefined. This effect updates the dimensions when the default values
 	// come through.
-	useEffect( () => {
-		if ( customWidth === undefined && defaultWidth !== undefined ) {
-			setCurrentWidth( defaultWidth );
+	useEffect(() => {
+		if (customWidth === undefined && defaultWidth !== undefined) {
+			setCurrentWidth(defaultWidth);
 		}
-		if ( customHeight === undefined && defaultHeight !== undefined ) {
-			setCurrentHeight( defaultHeight );
+		if (customHeight === undefined && defaultHeight !== undefined) {
+			setCurrentHeight(defaultHeight);
 		}
-	}, [ defaultWidth, defaultHeight ] );
+	}, [defaultWidth, defaultHeight]);
 
 	// If custom values change, it means an outsider has resized the image using some other method (eg resize box)
 	// this keeps track of these values too. We need to parse before comparing; custom values can be strings.
-	useEffect( () => {
+	useEffect(() => {
 		if (
 			customWidth !== undefined &&
-			Number.parseInt( customWidth ) !== Number.parseInt( currentWidth )
+			Number.parseInt(customWidth) !== Number.parseInt(currentWidth)
 		) {
-			setCurrentWidth( customWidth );
+			setCurrentWidth(customWidth);
 		}
 		if (
 			customHeight !== undefined &&
-			Number.parseInt( customHeight ) !== Number.parseInt( currentHeight )
+			Number.parseInt(customHeight) !== Number.parseInt(currentHeight)
 		) {
-			setCurrentHeight( customHeight );
+			setCurrentHeight(customHeight);
 		}
-	}, [ customWidth, customHeight ] );
+	}, [customWidth, customHeight]);
 
-	const updateDimension = ( dimension, value ) => {
-		if ( dimension === 'width' ) {
-			setCurrentWidth( value );
+	const updateDimension = (dimension, value) => {
+		if (dimension === 'width') {
+			setCurrentWidth(value);
 		} else {
-			setCurrentHeight( value );
+			setCurrentHeight(value);
 		}
-		onChange( {
-			[ dimension ]: value === '' ? undefined : parseInt( value, 10 ),
-		} );
+		onChange({
+			[dimension]: value === '' ? undefined : parseInt(value, 10),
+		});
 	};
 
-	const updateDimensions = ( nextHeight, nextWidth ) => {
-		setCurrentHeight( nextHeight ?? defaultHeight );
-		setCurrentWidth( nextWidth ?? defaultWidth );
-		onChange( { height: nextHeight, width: nextWidth } );
+	const updateDimensions = (nextHeight, nextWidth) => {
+		setCurrentHeight(nextHeight ?? defaultHeight);
+		setCurrentWidth(nextWidth ?? defaultWidth);
+		onChange({ height: nextHeight, width: nextWidth });
 	};
 
 	return {

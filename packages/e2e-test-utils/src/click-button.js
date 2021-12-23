@@ -3,9 +3,9 @@
  *
  * @param {string} buttonText The text that appears on the button to click.
  */
-export async function clickButton( buttonText ) {
+export async function clickButton(buttonText) {
 	const button = await page.waitForXPath(
-		`//button[contains(text(), '${ buttonText }')]`
+		`//button[contains(text(), '${buttonText}')]`
 	);
 	await button.click();
 }

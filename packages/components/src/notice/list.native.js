@@ -18,58 +18,58 @@ import styles from './style.scss';
 
 class NoticeList extends Component {
 	constructor() {
-		super( ...arguments );
-		this.removeNotice = this.removeNotice.bind( this );
+		super(...arguments);
+		this.removeNotice = this.removeNotice.bind(this);
 	}
 
-	removeNotice( id ) {
+	removeNotice(id) {
 		const { removeNotice } = this.props;
-		removeNotice( id );
+		removeNotice(id);
 	}
 
 	render() {
 		const { notices, shouldStack } = this.props;
 
-		if ( ! notices.length ) {
+		if (!notices.length) {
 			return null;
 		}
 
 		return (
-			<View style={ styles.list } key={ notices.length }>
-				{ shouldStack ? (
+			<View style={styles.list} key={notices.length}>
+				{shouldStack ? (
 					notices
 						.reverse()
-						.map( ( notice ) => (
+						.map((notice) => (
 							<Notice
-								{ ...notice }
-								key={ notice.id }
-								onNoticeHidden={ this.removeNotice }
+								{...notice}
+								key={notice.id}
+								onNoticeHidden={this.removeNotice}
 							></Notice>
-						) )
+						))
 				) : (
 					<Notice
-						{ ...notices[ notices.length - 1 ] }
-						onNoticeHidden={ this.removeNotice }
+						{...notices[notices.length - 1]}
+						onNoticeHidden={this.removeNotice}
 					></Notice>
-				) }
+				)}
 			</View>
 		);
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getNotices } = select( 'core/notices' );
+export default compose([
+	withSelect((select) => {
+		const { getNotices } = select('core/notices');
 
 		return {
 			notices: getNotices(),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { removeNotice } = dispatch( 'core/notices' );
+	}),
+	withDispatch((dispatch) => {
+		const { removeNotice } = dispatch('core/notices');
 
 		return {
 			removeNotice,
 		};
-	} ),
-] )( NoticeList );
+	}),
+])(NoticeList);

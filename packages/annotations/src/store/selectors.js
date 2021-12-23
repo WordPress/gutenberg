@@ -24,19 +24,16 @@ const EMPTY_ARRAY = [];
  * @return {Array} The annotations applicable to this block.
  */
 export const __experimentalGetAnnotationsForBlock = createSelector(
-	( state, blockClientId ) => {
-		return ( state?.[ blockClientId ] ?? [] ).filter( ( annotation ) => {
+	(state, blockClientId) => {
+		return (state?.[blockClientId] ?? []).filter((annotation) => {
 			return annotation.selector === 'block';
-		} );
+		});
 	},
-	( state, blockClientId ) => [ state?.[ blockClientId ] ?? EMPTY_ARRAY ]
+	(state, blockClientId) => [state?.[blockClientId] ?? EMPTY_ARRAY]
 );
 
-export function __experimentalGetAllAnnotationsForBlock(
-	state,
-	blockClientId
-) {
-	return state?.[ blockClientId ] ?? EMPTY_ARRAY;
+export function __experimentalGetAllAnnotationsForBlock(state, blockClientId) {
+	return state?.[blockClientId] ?? EMPTY_ARRAY;
 }
 
 /**
@@ -52,24 +49,24 @@ export function __experimentalGetAllAnnotationsForBlock(
  * @return {Array} All the annotations relevant for the `RichText`.
  */
 export const __experimentalGetAnnotationsForRichText = createSelector(
-	( state, blockClientId, richTextIdentifier ) => {
-		return ( state?.[ blockClientId ] ?? [] )
-			.filter( ( annotation ) => {
+	(state, blockClientId, richTextIdentifier) => {
+		return (state?.[blockClientId] ?? [])
+			.filter((annotation) => {
 				return (
 					annotation.selector === 'range' &&
 					richTextIdentifier === annotation.richTextIdentifier
 				);
-			} )
-			.map( ( annotation ) => {
+			})
+			.map((annotation) => {
 				const { range, ...other } = annotation;
 
 				return {
 					...range,
 					...other,
 				};
-			} );
+			});
 	},
-	( state, blockClientId ) => [ state?.[ blockClientId ] ?? EMPTY_ARRAY ]
+	(state, blockClientId) => [state?.[blockClientId] ?? EMPTY_ARRAY]
 );
 
 /**
@@ -78,8 +75,8 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
  * @param {Object} state Editor state.
  * @return {Array} All annotations currently applied.
  */
-export function __experimentalGetAnnotations( state ) {
-	return flatMap( state, ( annotations ) => {
+export function __experimentalGetAnnotations(state) {
+	return flatMap(state, (annotations) => {
 		return annotations;
-	} );
+	});
 }

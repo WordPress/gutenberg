@@ -15,47 +15,47 @@ import {
 	useColorsPerOrigin,
 } from './hooks';
 
-function ScreenTextColor( { name } ) {
+function ScreenTextColor({ name }) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
-	const [ isTextEnabled ] = useSetting( 'color.text', name );
+	const supports = getSupportedGlobalStylesPanels(name);
+	const [solids] = useSetting('color.palette', name);
+	const [areCustomSolidsEnabled] = useSetting('color.custom', name);
+	const [isTextEnabled] = useSetting('color.text', name);
 
-	const colorsPerOrigin = useColorsPerOrigin( name );
+	const colorsPerOrigin = useColorsPerOrigin(name);
 
 	const hasTextColor =
-		supports.includes( 'color' ) &&
+		supports.includes('color') &&
 		isTextEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		(solids.length > 0 || areCustomSolidsEnabled);
 
-	const [ color, setColor ] = useStyle( 'color.text', name );
-	const [ userColor ] = useStyle( 'color.text', name, 'user' );
+	const [color, setColor] = useStyle('color.text', name);
+	const [userColor] = useStyle('color.text', name, 'user');
 
-	if ( ! hasTextColor ) {
+	if (!hasTextColor) {
 		return null;
 	}
 
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu + '/colors' }
-				title={ __( 'Text' ) }
-				description={ __(
+				back={parentMenu + '/colors'}
+				title={__('Text')}
+				description={__(
 					'Set the default color used for text across the site.'
-				) }
+				)}
 			/>
 			<ColorGradientControl
 				className="edit-site-screen-text-color__control"
-				colors={ colorsPerOrigin }
-				disableCustomColors={ ! areCustomSolidsEnabled }
+				colors={colorsPerOrigin}
+				disableCustomColors={!areCustomSolidsEnabled}
 				__experimentalHasMultipleOrigins
-				showTitle={ false }
+				showTitle={false}
 				enableAlpha
 				__experimentalIsRenderedInSidebar
-				colorValue={ color }
-				onColorChange={ setColor }
-				clearable={ color === userColor }
+				colorValue={color}
+				onColorChange={setColor}
+				clearable={color === userColor}
 			/>
 		</>
 	);

@@ -9,5 +9,5 @@ import { wpDataSelect } from './wp-data-select';
  * @return {Promise} Promise resolving with post content markup.
  */
 export async function getEditedPostContent() {
-	return wpDataSelect( 'core/editor', 'getEditedPostContent' );
+	return wpDataSelect('core/editor', 'getEditedPostContent');
 }

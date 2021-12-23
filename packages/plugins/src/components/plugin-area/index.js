@@ -52,26 +52,26 @@ import { getPlugins } from '../../api';
  */
 class PluginArea extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
-		this.setPlugins = this.setPlugins.bind( this );
-		this.memoizedContext = memoize( ( name, icon ) => {
+		this.setPlugins = this.setPlugins.bind(this);
+		this.memoizedContext = memoize((name, icon) => {
 			return {
 				name,
 				icon,
 			};
-		} );
+		});
 		this.state = this.getCurrentPluginsState();
 	}
 
 	getCurrentPluginsState() {
 		return {
 			plugins: map(
-				getPlugins( this.props.scope ),
-				( { icon, name, render } ) => {
+				getPlugins(this.props.scope),
+				({ icon, name, render }) => {
 					return {
 						Plugin: render,
-						context: this.memoizedContext( name, icon ),
+						context: this.memoizedContext(name, icon),
 					};
 				}
 			),
@@ -103,20 +103,17 @@ class PluginArea extends Component {
 	}
 
 	setPlugins() {
-		this.setState( this.getCurrentPluginsState );
+		this.setState(this.getCurrentPluginsState);
 	}
 
 	render() {
 		return (
-			<div style={ { display: 'none' } }>
-				{ map( this.state.plugins, ( { context, Plugin } ) => (
-					<PluginContextProvider
-						key={ context.name }
-						value={ context }
-					>
+			<div style={{ display: 'none' }}>
+				{map(this.state.plugins, ({ context, Plugin }) => (
+					<PluginContextProvider key={context.name} value={context}>
 						<Plugin />
 					</PluginContextProvider>
-				) ) }
+				))}
 			</div>
 		);
 	}

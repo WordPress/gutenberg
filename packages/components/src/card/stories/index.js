@@ -40,9 +40,9 @@ const PROP_UNSET = 'unset';
 
 export const _default = () => {
 	const cardProps = {
-		isBorderless: boolean( 'Card: isBorderless', false, KNOBS_GROUPS.Card ),
-		isRounded: boolean( 'Card: isRounded', true, KNOBS_GROUPS.Card ),
-		elevation: number( 'Card: elevation', 0, {}, KNOBS_GROUPS.Card ),
+		isBorderless: boolean('Card: isBorderless', false, KNOBS_GROUPS.Card),
+		isRounded: boolean('Card: isRounded', true, KNOBS_GROUPS.Card),
+		elevation: number('Card: elevation', 0, {}, KNOBS_GROUPS.Card),
 		size: select(
 			'Card: size',
 			{
@@ -74,22 +74,20 @@ export const _default = () => {
 		isBorderless: select(
 			'CardHeader: isBorderless',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				true: true,
 				false: false,
 			},
 			PROP_UNSET,
 			KNOBS_GROUPS.CardHeader
 		),
-		isShady: boolean(
-			'CardHeader: isShady',
-			false,
-			KNOBS_GROUPS.CardHeader
-		),
+		isShady: boolean('CardHeader: isShady', false, KNOBS_GROUPS.CardHeader),
 		size: select(
 			'CardHeader: size',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				large: 'large',
 				medium: 'medium',
 				small: 'small',
@@ -101,11 +99,12 @@ export const _default = () => {
 	};
 
 	const cardBodyProps = {
-		isShady: boolean( 'CardBody: isShady', false, KNOBS_GROUPS.CardBody ),
+		isShady: boolean('CardBody: isShady', false, KNOBS_GROUPS.CardBody),
 		size: select(
 			'CardBody: size',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				large: 'large',
 				medium: 'medium',
 				small: 'small',
@@ -120,18 +119,15 @@ export const _default = () => {
 		isBorderless: select(
 			'CardFooter: isBorderless',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				true: true,
 				false: false,
 			},
 			PROP_UNSET,
 			KNOBS_GROUPS.CardFooter
 		),
-		isShady: boolean(
-			'CardFooter: isShady',
-			false,
-			KNOBS_GROUPS.CardFooter
-		),
+		isShady: boolean('CardFooter: isShady', false, KNOBS_GROUPS.CardFooter),
 		justify: select(
 			'CardFooter: justify',
 			{
@@ -148,7 +144,8 @@ export const _default = () => {
 		size: select(
 			'CardFooter: size',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				large: 'large',
 				medium: 'medium',
 				small: 'small',
@@ -162,31 +159,31 @@ export const _default = () => {
 	// Do not pass the `size` and `isBorderless` props when their value is `undefined`.
 	// This allows the `CardHeader`, `CardBody` and `CardFooter` components to use
 	// the values that are set on the parent `Card` component by default.
-	for ( const componentProps of [
+	for (const componentProps of [
 		cardHeaderProps,
 		cardFooterProps,
 		cardBodyProps,
-	] ) {
-		for ( const prop of [ 'isBorderless', 'size' ] ) {
-			if ( componentProps[ prop ] === PROP_UNSET ) {
-				delete componentProps[ prop ];
+	]) {
+		for (const prop of ['isBorderless', 'size']) {
+			if (componentProps[prop] === PROP_UNSET) {
+				delete componentProps[prop];
 			}
 		}
 	}
 
 	return (
-		<Card { ...cardProps }>
-			<CardHeader { ...cardHeaderProps }>
+		<Card {...cardProps}>
+			<CardHeader {...cardHeaderProps}>
 				<Heading>CardHeader</Heading>
 			</CardHeader>
-			<CardBody { ...cardBodyProps }>
+			<CardBody {...cardBodyProps}>
 				<Text>CardBody</Text>
 			</CardBody>
-			<CardBody { ...cardBodyProps }>
+			<CardBody {...cardBodyProps}>
 				<Text>CardBody (before CardDivider)</Text>
 			</CardBody>
 			<CardDivider />
-			<CardBody { ...cardBodyProps }>
+			<CardBody {...cardBodyProps}>
 				<Text>CardBody (after CardDivider)</Text>
 			</CardBody>
 			<CardMedia>
@@ -195,7 +192,7 @@ export const _default = () => {
 					src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
 				/>
 			</CardMedia>
-			<CardFooter { ...cardFooterProps }>
+			<CardFooter {...cardFooterProps}>
 				<Text>CardFooter</Text>
 				<Button variant="secondary">Action Button</Button>
 			</CardFooter>

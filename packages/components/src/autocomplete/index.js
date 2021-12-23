@@ -118,40 +118,40 @@ import { getAutoCompleterUI } from './autocompleter-ui';
  * @property {FnGetOptionCompletion}            getOptionCompletion get the completion associated with a given option.
  */
 
-function useAutocomplete( {
+function useAutocomplete({
 	record,
 	onChange,
 	onReplace,
 	completers,
 	contentRef,
-} ) {
-	const debouncedSpeak = useDebounce( speak, 500 );
-	const instanceId = useInstanceId( useAutocomplete );
-	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
-	const [ filteredOptions, setFilteredOptions ] = useState( [] );
-	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ autocompleter, setAutocompleter ] = useState( null );
-	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
-	const [ backspacing, setBackspacing ] = useState( false );
+}) {
+	const debouncedSpeak = useDebounce(speak, 500);
+	const instanceId = useInstanceId(useAutocomplete);
+	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [filteredOptions, setFilteredOptions] = useState([]);
+	const [filterValue, setFilterValue] = useState('');
+	const [autocompleter, setAutocompleter] = useState(null);
+	const [AutocompleterUI, setAutocompleterUI] = useState(null);
+	const [backspacing, setBackspacing] = useState(false);
 
-	function insertCompletion( replacement ) {
+	function insertCompletion(replacement) {
 		const end = record.start;
 		const start =
 			end - autocompleter.triggerPrefix.length - filterValue.length;
-		const toInsert = create( { html: renderToString( replacement ) } );
+		const toInsert = create({ html: renderToString(replacement) });
 
-		onChange( insert( record, toInsert, start, end ) );
+		onChange(insert(record, toInsert, start, end));
 	}
 
-	function select( option ) {
+	function select(option) {
 		const { getOptionCompletion } = autocompleter || {};
 
-		if ( option.isDisabled ) {
+		if (option.isDisabled) {
 			return;
 		}
 
-		if ( getOptionCompletion ) {
-			const completion = getOptionCompletion( option.value, filterValue );
+		if (getOptionCompletion) {
+			const completion = getOptionCompletion(option.value, filterValue);
 
 			const { action, value } =
 				undefined === completion.action ||
@@ -159,13 +159,13 @@ function useAutocomplete( {
 					? { action: 'insert-at-caret', value: completion }
 					: completion;
 
-			if ( 'replace' === action ) {
-				onReplace( [ value ] );
+			if ('replace' === action) {
+				onReplace([value]);
 				// When replacing, the component will unmount, so don't reset
 				// state (below) on an unmounted component.
 				return;
-			} else if ( 'insert-at-caret' === action ) {
-				insertCompletion( value );
+			} else if ('insert-at-caret' === action) {
+				insertCompletion(value);
 			}
 		}
 
@@ -175,18 +175,18 @@ function useAutocomplete( {
 	}
 
 	function reset() {
-		setSelectedIndex( 0 );
-		setFilteredOptions( [] );
-		setFilterValue( '' );
-		setAutocompleter( null );
-		setAutocompleterUI( null );
+		setSelectedIndex(0);
+		setFilteredOptions([]);
+		setFilterValue('');
+		setAutocompleter(null);
+		setAutocompleterUI(null);
 	}
 
-	function announce( options ) {
-		if ( ! debouncedSpeak ) {
+	function announce(options) {
+		if (!debouncedSpeak) {
 			return;
 		}
-		if ( !! options.length ) {
+		if (!!options.length) {
 			debouncedSpeak(
 				sprintf(
 					/* translators: %d: number of results. */
@@ -200,7 +200,7 @@ function useAutocomplete( {
 				'assertive'
 			);
 		} else {
-			debouncedSpeak( __( 'No results.' ), 'assertive' );
+			debouncedSpeak(__('No results.'), 'assertive');
 		}
 	}
 
@@ -209,49 +209,47 @@ function useAutocomplete( {
 	 *
 	 * @param {Array} options
 	 */
-	function onChangeOptions( options ) {
+	function onChangeOptions(options) {
 		setSelectedIndex(
 			options.length === filteredOptions.length ? selectedIndex : 0
 		);
-		setFilteredOptions( options );
-		announce( options );
+		setFilteredOptions(options);
+		announce(options);
 	}
 
-	function handleKeyDown( event ) {
-		setBackspacing( event.keyCode === BACKSPACE );
+	function handleKeyDown(event) {
+		setBackspacing(event.keyCode === BACKSPACE);
 
-		if ( ! autocompleter ) {
+		if (!autocompleter) {
 			return;
 		}
-		if ( filteredOptions.length === 0 ) {
+		if (filteredOptions.length === 0) {
 			return;
 		}
-		if ( event.defaultPrevented ) {
+		if (event.defaultPrevented) {
 			return;
 		}
-		switch ( event.keyCode ) {
+		switch (event.keyCode) {
 			case UP:
 				setSelectedIndex(
-					( selectedIndex === 0
+					(selectedIndex === 0
 						? filteredOptions.length
-						: selectedIndex ) - 1
+						: selectedIndex) - 1
 				);
 				break;
 
 			case DOWN:
-				setSelectedIndex(
-					( selectedIndex + 1 ) % filteredOptions.length
-				);
+				setSelectedIndex((selectedIndex + 1) % filteredOptions.length);
 				break;
 
 			case ESCAPE:
-				setAutocompleter( null );
-				setAutocompleterUI( null );
+				setAutocompleter(null);
+				setAutocompleterUI(null);
 				event.preventDefault();
 				break;
 
 			case ENTER:
-				select( filteredOptions[ selectedIndex ] );
+				select(filteredOptions[selectedIndex]);
 				break;
 
 			case LEFT:
@@ -270,26 +268,26 @@ function useAutocomplete( {
 
 	let textContent;
 
-	if ( isCollapsed( record ) ) {
-		textContent = getTextContent( slice( record, 0 ) );
+	if (isCollapsed(record)) {
+		textContent = getTextContent(slice(record, 0));
 	}
 
-	useEffect( () => {
-		if ( ! textContent ) {
+	useEffect(() => {
+		if (!textContent) {
 			reset();
 			return;
 		}
 
-		const text = deburr( textContent );
+		const text = deburr(textContent);
 		const textAfterSelection = getTextContent(
-			slice( record, undefined, getTextContent( record ).length )
+			slice(record, undefined, getTextContent(record).length)
 		);
 		const completer = find(
 			completers,
-			( { triggerPrefix, allowContext } ) => {
-				const index = text.lastIndexOf( triggerPrefix );
+			({ triggerPrefix, allowContext }) => {
+				const index = text.lastIndexOf(triggerPrefix);
 
-				if ( index === -1 ) {
+				if (index === -1) {
 					return false;
 				}
 
@@ -303,10 +301,10 @@ function useAutocomplete( {
 				// significantly. This could happen, for example, if `matchingWhileBackspacing`
 				// is true and one of the "words" end up being too long. If that's the case,
 				// it will be caught by this guard.
-				if ( tooDistantFromTrigger ) return false;
+				if (tooDistantFromTrigger) return false;
 
 				const mismatch = filteredOptions.length === 0;
-				const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
+				const wordsFromTrigger = textWithoutTrigger.split(/\s/);
 				// We need to allow the effect to run when not backspacing and if there
 				// was a mismatch. i.e when typing a trigger + the match string or when
 				// clicking in an existing trigger word on the page. We do that if we
@@ -325,61 +323,61 @@ function useAutocomplete( {
 				// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
 				// if the user presses backspace here, it will show the completion popup again.
 				const matchingWhileBackspacing =
-					backspacing && textWithoutTrigger.split( /\s/ ).length <= 3;
+					backspacing && textWithoutTrigger.split(/\s/).length <= 3;
 
 				if (
 					mismatch &&
-					! ( matchingWhileBackspacing || hasOneTriggerWord )
+					!(matchingWhileBackspacing || hasOneTriggerWord)
 				) {
 					return false;
 				}
 
 				if (
 					allowContext &&
-					! allowContext( text.slice( 0, index ), textAfterSelection )
+					!allowContext(text.slice(0, index), textAfterSelection)
 				) {
 					return false;
 				}
 
 				if (
-					/^\s/.test( textWithoutTrigger ) ||
-					/\s\s+$/.test( textWithoutTrigger )
+					/^\s/.test(textWithoutTrigger) ||
+					/\s\s+$/.test(textWithoutTrigger)
 				) {
 					return false;
 				}
 
-				return /[\u0000-\uFFFF]*$/.test( textWithoutTrigger );
+				return /[\u0000-\uFFFF]*$/.test(textWithoutTrigger);
 			}
 		);
 
-		if ( ! completer ) {
+		if (!completer) {
 			reset();
 			return;
 		}
 
-		const safeTrigger = escapeRegExp( completer.triggerPrefix );
+		const safeTrigger = escapeRegExp(completer.triggerPrefix);
 		const match = text
-			.slice( text.lastIndexOf( completer.triggerPrefix ) )
-			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
-		const query = match && match[ 1 ];
+			.slice(text.lastIndexOf(completer.triggerPrefix))
+			.match(new RegExp(`${safeTrigger}([\u0000-\uFFFF]*)$`));
+		const query = match && match[1];
 
-		setAutocompleter( completer );
-		setAutocompleterUI( () =>
+		setAutocompleter(completer);
+		setAutocompleterUI(() =>
 			completer !== autocompleter
-				? getAutoCompleterUI( completer )
+				? getAutoCompleterUI(completer)
 				: AutocompleterUI
 		);
-		setFilterValue( query );
-	}, [ textContent ] );
+		setFilterValue(query);
+	}, [textContent]);
 
-	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+	const { key: selectedKey = '' } = filteredOptions[selectedIndex] || {};
 	const { className } = autocompleter || {};
-	const isExpanded = !! autocompleter && filteredOptions.length > 0;
+	const isExpanded = !!autocompleter && filteredOptions.length > 0;
 	const listBoxId = isExpanded
-		? `components-autocomplete-listbox-${ instanceId }`
+		? `components-autocomplete-listbox-${instanceId}`
 		: null;
 	const activeId = isExpanded
-		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+		? `components-autocomplete-item-${instanceId}-${selectedKey}`
 		: null;
 	const hasSelection = record.start !== undefined;
 
@@ -389,42 +387,42 @@ function useAutocomplete( {
 		onKeyDown: handleKeyDown,
 		popover: hasSelection && AutocompleterUI && (
 			<AutocompleterUI
-				className={ className }
-				filterValue={ filterValue }
-				instanceId={ instanceId }
-				listBoxId={ listBoxId }
-				selectedIndex={ selectedIndex }
-				onChangeOptions={ onChangeOptions }
-				onSelect={ select }
-				value={ record }
-				contentRef={ contentRef }
-				reset={ reset }
+				className={className}
+				filterValue={filterValue}
+				instanceId={instanceId}
+				listBoxId={listBoxId}
+				selectedIndex={selectedIndex}
+				onChangeOptions={onChangeOptions}
+				onSelect={select}
+				value={record}
+				contentRef={contentRef}
+				reset={reset}
 			/>
 		),
 	};
 }
 
-export function useAutocompleteProps( options ) {
+export function useAutocompleteProps(options) {
 	const ref = useRef();
 	const onKeyDownRef = useRef();
-	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
+	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete({
 		...options,
 		contentRef: ref,
-	} );
+	});
 	onKeyDownRef.current = onKeyDown;
 	return {
-		ref: useMergeRefs( [
+		ref: useMergeRefs([
 			ref,
-			useRefEffect( ( element ) => {
-				function _onKeyDown( event ) {
-					onKeyDownRef.current( event );
+			useRefEffect((element) => {
+				function _onKeyDown(event) {
+					onKeyDownRef.current(event);
 				}
-				element.addEventListener( 'keydown', _onKeyDown );
+				element.addEventListener('keydown', _onKeyDown);
 				return () => {
-					element.removeEventListener( 'keydown', _onKeyDown );
+					element.removeEventListener('keydown', _onKeyDown);
 				};
-			}, [] ),
-		] ),
+			}, []),
+		]),
 		children: popover,
 		'aria-autocomplete': listBoxId ? 'list' : undefined,
 		'aria-owns': listBoxId,
@@ -432,12 +430,12 @@ export function useAutocompleteProps( options ) {
 	};
 }
 
-export default function Autocomplete( { children, isSelected, ...options } ) {
-	const { popover, ...props } = useAutocomplete( options );
+export default function Autocomplete({ children, isSelected, ...options }) {
+	const { popover, ...props } = useAutocomplete(options);
 	return (
 		<>
-			{ children( props ) }
-			{ isSelected && popover }
+			{children(props)}
+			{isSelected && popover}
 		</>
 	);
 }

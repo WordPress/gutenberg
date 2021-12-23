@@ -13,38 +13,38 @@ import apiFetch from '@wordpress/api-fetch';
  *
  * @return {Promise} Promise which will resolve when the asset is loaded.
  */
-export const loadAsset = ( el ) => {
-	return new Promise( ( resolve, reject ) => {
+export const loadAsset = (el) => {
+	return new Promise((resolve, reject) => {
 		/*
 		 * Reconstruct the passed element, this is required as inserting the Node directly
 		 * won't always fire the required onload events, even if the asset wasn't already loaded.
 		 */
-		const newNode = document.createElement( el.nodeName );
+		const newNode = document.createElement(el.nodeName);
 
-		[ 'id', 'rel', 'src', 'href', 'type' ].forEach( ( attr ) => {
-			if ( el[ attr ] ) {
-				newNode[ attr ] = el[ attr ];
+		['id', 'rel', 'src', 'href', 'type'].forEach((attr) => {
+			if (el[attr]) {
+				newNode[attr] = el[attr];
 			}
-		} );
+		});
 
 		// Append inline <script> contents.
-		if ( el.innerHTML ) {
-			newNode.appendChild( document.createTextNode( el.innerHTML ) );
+		if (el.innerHTML) {
+			newNode.appendChild(document.createTextNode(el.innerHTML));
 		}
 
-		newNode.onload = () => resolve( true );
-		newNode.onerror = () => reject( new Error( 'Error loading asset.' ) );
+		newNode.onload = () => resolve(true);
+		newNode.onerror = () => reject(new Error('Error loading asset.'));
 
-		document.body.appendChild( newNode );
+		document.body.appendChild(newNode);
 
 		// Resolve Stylesheets and Inline JavaScript immediately.
 		if (
 			'link' === newNode.nodeName.toLowerCase() ||
-			( 'script' === newNode.nodeName.toLowerCase() && ! newNode.src )
+			('script' === newNode.nodeName.toLowerCase() && !newNode.src)
 		) {
 			resolve();
 		}
-	} );
+	});
 };
 
 /**
@@ -58,24 +58,24 @@ export async function loadAssets() {
 	 * In the future this can be improved by reliance upon block.json and/or a script-loader
 	 * dependency API.
 	 */
-	const response = await apiFetch( {
+	const response = await apiFetch({
 		url: document.location.href,
 		parse: false,
-	} );
+	});
 
 	const data = await response.text();
 
-	const doc = new window.DOMParser().parseFromString( data, 'text/html' );
+	const doc = new window.DOMParser().parseFromString(data, 'text/html');
 
 	const newAssets = Array.from(
-		doc.querySelectorAll( 'link[rel="stylesheet"],script' )
-	).filter( ( asset ) => asset.id && ! document.getElementById( asset.id ) );
+		doc.querySelectorAll('link[rel="stylesheet"],script')
+	).filter((asset) => asset.id && !document.getElementById(asset.id));
 
 	/*
 	 * Load each asset in order, as they may depend upon an earlier loaded script.
 	 * Stylesheets and Inline Scripts will resolve immediately upon insertion.
 	 */
-	for ( const newAsset of newAssets ) {
-		await loadAsset( newAsset );
+	for (const newAsset of newAssets) {
+		await loadAsset(newAsset);
 	}
 }

@@ -15,57 +15,57 @@ import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
 import SlotFillContext from './context';
 import useSlot from './use-slot';
 
-function FillComponent( { name, children, registerFill, unregisterFill } ) {
-	const slot = useSlot( name );
+function FillComponent({ name, children, registerFill, unregisterFill }) {
+	const slot = useSlot(name);
 
-	const ref = useRef( {
+	const ref = useRef({
 		name,
 		children,
-	} );
+	});
 
-	useLayoutEffect( () => {
-		registerFill( name, ref.current );
-		return () => unregisterFill( name, ref.current );
-	}, [] );
+	useLayoutEffect(() => {
+		registerFill(name, ref.current);
+		return () => unregisterFill(name, ref.current);
+	}, []);
 
-	useLayoutEffect( () => {
+	useLayoutEffect(() => {
 		ref.current.children = children;
-		if ( slot ) {
+		if (slot) {
 			slot.forceUpdate();
 		}
-	}, [ children ] );
+	}, [children]);
 
-	useLayoutEffect( () => {
-		if ( name === ref.current.name ) {
+	useLayoutEffect(() => {
+		if (name === ref.current.name) {
 			// ignore initial effect
 			return;
 		}
-		unregisterFill( ref.current.name, ref.current );
+		unregisterFill(ref.current.name, ref.current);
 		ref.current.name = name;
-		registerFill( name, ref.current );
-	}, [ name ] );
+		registerFill(name, ref.current);
+	}, [name]);
 
-	if ( ! slot || ! slot.node ) {
+	if (!slot || !slot.node) {
 		return null;
 	}
 
 	// If a function is passed as a child, provide it with the fillProps.
-	if ( isFunction( children ) ) {
-		children = children( slot.props.fillProps );
+	if (isFunction(children)) {
+		children = children(slot.props.fillProps);
 	}
 
-	return createPortal( children, slot.node );
+	return createPortal(children, slot.node);
 }
 
-const Fill = ( props ) => (
+const Fill = (props) => (
 	<SlotFillContext.Consumer>
-		{ ( { registerFill, unregisterFill } ) => (
+		{({ registerFill, unregisterFill }) => (
 			<FillComponent
-				{ ...props }
-				registerFill={ registerFill }
-				unregisterFill={ unregisterFill }
+				{...props}
+				registerFill={registerFill}
+				unregisterFill={unregisterFill}
 			/>
-		) }
+		)}
 	</SlotFillContext.Consumer>
 );
 

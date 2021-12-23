@@ -1,19 +1,19 @@
 /**
  * External dependencies
  */
-const { join } = require( 'path' );
+const { join } = require('path');
 
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin');
 
 const sharedConfig = {
 	mode: 'development',
 	target: 'browserslist',
 	output: {
 		filename: '[name]/index.min.js',
-		path: join( __dirname, '..', '..', 'build' ),
+		path: join(__dirname, '..', '..', 'build'),
 	},
 };
 
@@ -26,7 +26,7 @@ module.exports = [
 			'react-refresh-entry':
 				'@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js',
 		},
-		plugins: [ new DependencyExtractionWebpackPlugin() ],
+		plugins: [new DependencyExtractionWebpackPlugin()],
 	},
 	{
 		...sharedConfig,
@@ -41,9 +41,9 @@ module.exports = [
 			},
 		},
 		plugins: [
-			new DependencyExtractionWebpackPlugin( {
+			new DependencyExtractionWebpackPlugin({
 				useDefaults: false,
-			} ),
+			}),
 		],
 	},
 ];

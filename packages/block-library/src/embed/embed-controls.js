@@ -11,7 +11,7 @@ import {
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { edit } from '@wordpress/icons';
 
-function getResponsiveHelp( checked ) {
+function getResponsiveHelp(checked) {
 	return checked
 		? __(
 				'This embed will preserve its aspect ratio when the browser is resized.'
@@ -21,42 +21,42 @@ function getResponsiveHelp( checked ) {
 		  );
 }
 
-const EmbedControls = ( {
+const EmbedControls = ({
 	blockSupportsResponsive,
 	showEditButton,
 	themeSupportsResponsive,
 	allowResponsive,
 	toggleResponsive,
 	switchBackToURLInput,
-} ) => (
+}) => (
 	<>
 		<BlockControls>
 			<ToolbarGroup>
-				{ showEditButton && (
+				{showEditButton && (
 					<ToolbarButton
 						className="components-toolbar__control"
-						label={ __( 'Edit URL' ) }
-						icon={ edit }
-						onClick={ switchBackToURLInput }
+						label={__('Edit URL')}
+						icon={edit}
+						onClick={switchBackToURLInput}
 					/>
-				) }
+				)}
 			</ToolbarGroup>
 		</BlockControls>
-		{ themeSupportsResponsive && blockSupportsResponsive && (
+		{themeSupportsResponsive && blockSupportsResponsive && (
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Media settings' ) }
+					title={__('Media settings')}
 					className="blocks-responsive"
 				>
 					<ToggleControl
-						label={ __( 'Resize for smaller devices' ) }
-						checked={ allowResponsive }
-						help={ getResponsiveHelp }
-						onChange={ toggleResponsive }
+						label={__('Resize for smaller devices')}
+						checked={allowResponsive}
+						help={getResponsiveHelp}
+						onChange={toggleResponsive}
 					/>
 				</PanelBody>
 			</InspectorControls>
-		) }
+		)}
 	</>
 );
 

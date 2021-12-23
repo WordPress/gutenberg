@@ -17,7 +17,7 @@ import LinkControlSearchCreate from './search-create-button';
 import LinkControlSearchItem from './search-item';
 import { CREATE_TYPE } from './constants';
 
-export default function LinkControlSearchResults( {
+export default function LinkControlSearchResults({
 	instanceId,
 	withCreateSuggestion,
 	currentInputValue,
@@ -30,7 +30,7 @@ export default function LinkControlSearchResults( {
 	isInitialSuggestions,
 	createSuggestionButtonText,
 	suggestionsQuery,
-} ) {
+}) {
 	const resultsListClasses = classnames(
 		'block-editor-link-control__search-results',
 		{
@@ -38,26 +38,26 @@ export default function LinkControlSearchResults( {
 		}
 	);
 
-	const directLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
+	const directLinkEntryTypes = ['url', 'mailto', 'tel', 'internal'];
 	const isSingleDirectEntryResult =
 		suggestions.length === 1 &&
-		directLinkEntryTypes.includes( suggestions[ 0 ].type.toLowerCase() );
+		directLinkEntryTypes.includes(suggestions[0].type.toLowerCase());
 	const shouldShowCreateSuggestion =
 		withCreateSuggestion &&
-		! isSingleDirectEntryResult &&
-		! isInitialSuggestions;
+		!isSingleDirectEntryResult &&
+		!isInitialSuggestions;
 	// If the query has a specified type, then we can skip showing them in the result. See #24839.
-	const shouldShowSuggestionsTypes = ! suggestionsQuery?.type;
+	const shouldShowSuggestionsTypes = !suggestionsQuery?.type;
 
 	// According to guidelines aria-label should be added if the label
 	// itself is not visible.
 	// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
-	const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
+	const searchResultsLabelId = `block-editor-link-control-search-results-label-${instanceId}`;
 	const labelText = isInitialSuggestions
-		? __( 'Recently updated' )
+		? __('Recently updated')
 		: sprintf(
 				/* translators: %s: search term. */
-				__( 'Search results for "%s"' ),
+				__('Search results for "%s"'),
 				currentInputValue
 		  );
 
@@ -69,72 +69,72 @@ export default function LinkControlSearchResults( {
 		{}, // empty props
 		<span
 			className="block-editor-link-control__search-results-label"
-			id={ searchResultsLabelId }
+			id={searchResultsLabelId}
 		>
-			{ labelText }
+			{labelText}
 		</span>
 	);
 
 	return (
 		<div className="block-editor-link-control__search-results-wrapper">
-			{ searchResultsLabel }
+			{searchResultsLabel}
 			<div
-				{ ...suggestionsListProps }
-				className={ resultsListClasses }
-				aria-labelledby={ searchResultsLabelId }
+				{...suggestionsListProps}
+				className={resultsListClasses}
+				aria-labelledby={searchResultsLabelId}
 			>
-				{ suggestions.map( ( suggestion, index ) => {
+				{suggestions.map((suggestion, index) => {
 					if (
 						shouldShowCreateSuggestion &&
 						CREATE_TYPE === suggestion.type
 					) {
 						return (
 							<LinkControlSearchCreate
-								searchTerm={ currentInputValue }
-								buttonText={ createSuggestionButtonText }
-								onClick={ () =>
-									handleSuggestionClick( suggestion )
+								searchTerm={currentInputValue}
+								buttonText={createSuggestionButtonText}
+								onClick={() =>
+									handleSuggestionClick(suggestion)
 								}
 								// Intentionally only using `type` here as
 								// the constant is enough to uniquely
 								// identify the single "CREATE" suggestion.
-								key={ suggestion.type }
-								itemProps={ buildSuggestionItemProps(
+								key={suggestion.type}
+								itemProps={buildSuggestionItemProps(
 									suggestion,
 									index
-								) }
-								isSelected={ index === selectedSuggestion }
+								)}
+								isSelected={index === selectedSuggestion}
 							/>
 						);
 					}
 
 					// If we're not handling "Create" suggestions above then
 					// we don't want them in the main results so exit early
-					if ( CREATE_TYPE === suggestion.type ) {
+					if (CREATE_TYPE === suggestion.type) {
 						return null;
 					}
 
 					return (
 						<LinkControlSearchItem
-							key={ `${ suggestion.id }-${ suggestion.type }` }
-							itemProps={ buildSuggestionItemProps(
+							key={`${suggestion.id}-${suggestion.type}`}
+							itemProps={buildSuggestionItemProps(
 								suggestion,
 								index
-							) }
-							suggestion={ suggestion }
-							index={ index }
-							onClick={ () => {
-								handleSuggestionClick( suggestion );
-							} }
-							isSelected={ index === selectedSuggestion }
-							isURL={ directLinkEntryTypes.includes(
+							)}
+							suggestion={suggestion}
+							index={index}
+							onClick={() => {
+								handleSuggestionClick(suggestion);
+							}}
+							isSelected={index === selectedSuggestion}
+							isURL={directLinkEntryTypes.includes(
 								suggestion.type.toLowerCase()
-							) }
-							searchTerm={ currentInputValue }
-							shouldShowType={ shouldShowSuggestionsTypes }
+							)}
+							searchTerm={currentInputValue}
+							shouldShowType={shouldShowSuggestionsTypes}
 						/>
 					);
-				} ) }
+				})}
 			</div>
 		</div>
 	);

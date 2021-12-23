@@ -25,7 +25,7 @@ import { getMomentDate } from './utils';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
 
-function DatePickerDay( { day, events = [] } ) {
+function DatePickerDay({ day, events = [] }) {
 	const ref = useRef();
 
 	/*
@@ -34,18 +34,18 @@ function DatePickerDay( { day, events = [] } ) {
 	 * re-defining the aria-label attribute.
 	 * This attribute is handled by the react-dates component.
 	 */
-	useEffect( () => {
+	useEffect(() => {
 		// Bail when no parent node.
-		if ( ! ref?.current?.parentNode ) {
+		if (!ref?.current?.parentNode) {
 			return;
 		}
 
 		const { parentNode } = ref.current;
-		const dayAriaLabel = moment( day ).format( ARIAL_LABEL_TIME_FORMAT );
+		const dayAriaLabel = moment(day).format(ARIAL_LABEL_TIME_FORMAT);
 
-		if ( ! events.length ) {
+		if (!events.length) {
 			// Set aria-label without event description.
-			parentNode.setAttribute( 'aria-label', dayAriaLabel );
+			parentNode.setAttribute('aria-label', dayAriaLabel);
 			return;
 		}
 
@@ -60,31 +60,31 @@ function DatePickerDay( { day, events = [] } ) {
 			events.length
 		);
 
-		parentNode.setAttribute( 'aria-label', dayWithEventsDescription );
-	}, [ events.length ] );
+		parentNode.setAttribute('aria-label', dayWithEventsDescription);
+	}, [events.length]);
 
 	return (
 		<div
-			ref={ ref }
-			className={ classnames( 'components-datetime__date__day', {
+			ref={ref}
+			className={classnames('components-datetime__date__day', {
 				'has-events': events?.length,
-			} ) }
+			})}
 		>
-			{ day.format( 'D' ) }
+			{day.format('D')}
 		</div>
 	);
 }
 
-function DatePicker( {
+function DatePicker({
 	currentDate,
 	onChange,
 	events,
 	isInvalidDate,
 	onMonthPreviewed,
-} ) {
+}) {
 	const nodeRef = useRef();
-	const onMonthPreviewedHandler = ( newMonthDate ) => {
-		onMonthPreviewed?.( newMonthDate.toISOString() );
+	const onMonthPreviewedHandler = (newMonthDate) => {
+		onMonthPreviewed?.(newMonthDate.toISOString());
 		keepFocusInside();
 	};
 
@@ -95,7 +95,7 @@ function DatePicker( {
 	 * Ideally we should add an upstream commit on react-dates to fix this issue.
 	 */
 	const keepFocusInside = () => {
-		if ( ! nodeRef.current ) {
+		if (!nodeRef.current) {
 			return;
 		}
 
@@ -104,14 +104,14 @@ function DatePicker( {
 
 		// If focus was lost.
 		if (
-			! activeElement ||
-			! nodeRef.current.contains( ownerDocument.activeElement )
+			!activeElement ||
+			!nodeRef.current.contains(ownerDocument.activeElement)
 		) {
 			// Retrieve the focus region div.
 			const focusRegion = nodeRef.current.querySelector(
 				'.DayPicker_focusRegion'
 			);
-			if ( ! focusRegion ) {
+			if (!focusRegion) {
 				return;
 			}
 			// Keep the focus on focus region.
@@ -119,63 +119,58 @@ function DatePicker( {
 		}
 	};
 
-	const onChangeMoment = ( newDate ) => {
+	const onChangeMoment = (newDate) => {
 		// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
-		const momentDate = currentDate ? moment( currentDate ) : moment();
+		const momentDate = currentDate ? moment(currentDate) : moment();
 		const momentTime = {
 			hours: momentDate.hours(),
 			minutes: momentDate.minutes(),
 			seconds: 0,
 		};
 
-		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
+		onChange(newDate.set(momentTime).format(TIMEZONELESS_FORMAT));
 
 		// Keep focus on the date picker.
 		keepFocusInside();
 	};
 
-	const getEventsPerDay = ( day ) => {
-		if ( ! events?.length ) {
+	const getEventsPerDay = (day) => {
+		if (!events?.length) {
 			return [];
 		}
 
-		return events.filter( ( eventDay ) =>
-			day.isSame( eventDay.date, 'day' )
-		);
+		return events.filter((eventDay) => day.isSame(eventDay.date, 'day'));
 	};
 
-	const momentDate = getMomentDate( currentDate );
+	const momentDate = getMomentDate(currentDate);
 
 	return (
-		<div className="components-datetime__date" ref={ nodeRef }>
+		<div className="components-datetime__date" ref={nodeRef}>
 			<DayPickerSingleDateController
-				date={ momentDate }
-				daySize={ 30 }
+				date={momentDate}
+				daySize={30}
 				focused
 				hideKeyboardShortcutsPanel
 				// This is a hack to force the calendar to update on month or year change
 				// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
-				key={ `datepicker-controller-${
-					momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
-				}` }
+				key={`datepicker-controller-${
+					momentDate ? momentDate.format('MM-YYYY') : 'null'
+				}`}
 				noBorder
-				numberOfMonths={ 1 }
-				onDateChange={ onChangeMoment }
-				transitionDuration={ 0 }
+				numberOfMonths={1}
+				onDateChange={onChangeMoment}
+				transitionDuration={0}
 				weekDayFormat="ddd"
-				dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
-				isRTL={ isRTL() }
-				isOutsideRange={ ( date ) => {
-					return isInvalidDate && isInvalidDate( date.toDate() );
-				} }
-				onPrevMonthClick={ onMonthPreviewedHandler }
-				onNextMonthClick={ onMonthPreviewedHandler }
-				renderDayContents={ ( day ) => (
-					<DatePickerDay
-						day={ day }
-						events={ getEventsPerDay( day ) }
-					/>
-				) }
+				dayAriaLabelFormat={ARIAL_LABEL_TIME_FORMAT}
+				isRTL={isRTL()}
+				isOutsideRange={(date) => {
+					return isInvalidDate && isInvalidDate(date.toDate());
+				}}
+				onPrevMonthClick={onMonthPreviewedHandler}
+				onNextMonthClick={onMonthPreviewedHandler}
+				renderDayContents={(day) => (
+					<DatePickerDay day={day} events={getEventsPerDay(day)} />
+				)}
 			/>
 		</div>
 	);

@@ -30,14 +30,14 @@ import { v4 as uuid } from 'uuid';
  *
  * @return {Object} Action object.
  */
-export function __experimentalAddAnnotation( {
+export function __experimentalAddAnnotation({
 	blockClientId,
 	richTextIdentifier = null,
 	range = null,
 	selector = 'range',
 	source = 'default',
 	id = uuid(),
-} ) {
+}) {
 	const action = {
 		type: 'ANNOTATION_ADD',
 		id,
@@ -47,7 +47,7 @@ export function __experimentalAddAnnotation( {
 		selector,
 	};
 
-	if ( selector === 'range' ) {
+	if (selector === 'range') {
 		action.range = range;
 	}
 
@@ -61,7 +61,7 @@ export function __experimentalAddAnnotation( {
  *
  * @return {Object} Action object.
  */
-export function __experimentalRemoveAnnotation( annotationId ) {
+export function __experimentalRemoveAnnotation(annotationId) {
 	return {
 		type: 'ANNOTATION_REMOVE',
 		annotationId,
@@ -77,11 +77,7 @@ export function __experimentalRemoveAnnotation( annotationId ) {
  *
  * @return {Object} Action object.
  */
-export function __experimentalUpdateAnnotationRange(
-	annotationId,
-	start,
-	end
-) {
+export function __experimentalUpdateAnnotationRange(annotationId, start, end) {
 	return {
 		type: 'ANNOTATION_UPDATE_RANGE',
 		annotationId,
@@ -97,7 +93,7 @@ export function __experimentalUpdateAnnotationRange(
  *
  * @return {Object} Action object.
  */
-export function __experimentalRemoveAnnotationsBySource( source ) {
+export function __experimentalRemoveAnnotationsBySource(source) {
 	return {
 		type: 'ANNOTATION_REMOVE_SOURCE',
 		source,

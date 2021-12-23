@@ -36,7 +36,7 @@ import {
 	isPercentageUnit,
 } from '../columns/utils';
 
-function ColumnEdit( {
+function ColumnEdit({
 	attributes,
 	setAttributes,
 	hasChildren,
@@ -49,143 +49,138 @@ function ColumnEdit( {
 	parentAlignment,
 	clientId,
 	blockWidth,
-} ) {
-	if ( ! contentStyle ) {
-		contentStyle = { [ clientId ]: {} };
+}) {
+	if (!contentStyle) {
+		contentStyle = { [clientId]: {} };
 	}
 
 	const { verticalAlignment, width } = attributes;
-	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
+	const { valueUnit = '%' } = getValueAndUnit(width) || {};
 
-	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+	const screenWidth = Math.floor(Dimensions.get('window').width);
 
-	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
+	const [widthUnit, setWidthUnit] = useState(valueUnit || '%');
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || [
 			'%',
 			'px',
 			'em',
 			'rem',
 			'vw',
 		],
-	} );
+	});
 
-	const updateAlignment = ( alignment ) => {
-		setAttributes( { verticalAlignment: alignment } );
+	const updateAlignment = (alignment) => {
+		setAttributes({ verticalAlignment: alignment });
 	};
 
-	useEffect( () => {
-		setWidthUnit( valueUnit );
-	}, [ valueUnit ] );
+	useEffect(() => {
+		setWidthUnit(valueUnit);
+	}, [valueUnit]);
 
-	useEffect( () => {
-		if ( ! verticalAlignment && parentAlignment ) {
-			updateAlignment( parentAlignment );
+	useEffect(() => {
+		if (!verticalAlignment && parentAlignment) {
+			updateAlignment(parentAlignment);
 		}
-	}, [] );
+	}, []);
 
-	const onChangeWidth = ( nextWidth ) => {
-		const widthWithUnit = getWidthWithUnit( nextWidth, widthUnit );
+	const onChangeWidth = (nextWidth) => {
+		const widthWithUnit = getWidthWithUnit(nextWidth, widthUnit);
 
-		setAttributes( {
+		setAttributes({
 			width: widthWithUnit,
-		} );
+		});
 	};
 
-	const onChangeUnit = ( nextUnit ) => {
-		setWidthUnit( nextUnit );
+	const onChangeUnit = (nextUnit) => {
+		setWidthUnit(nextUnit);
 		const widthWithoutUnit = parseFloat(
-			width || getWidths( columns )[ selectedColumnIndex ]
+			width || getWidths(columns)[selectedColumnIndex]
 		);
 
-		setAttributes( {
-			width: getWidthWithUnit( widthWithoutUnit, nextUnit ),
-		} );
+		setAttributes({
+			width: getWidthWithUnit(widthWithoutUnit, nextUnit),
+		});
 	};
 
-	const onChange = ( nextWidth ) => {
-		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
+	const onChange = (nextWidth) => {
+		if (isPercentageUnit(widthUnit) || !widthUnit) {
 			return;
 		}
-		onChangeWidth( nextWidth );
+		onChangeWidth(nextWidth);
 	};
 
-	const renderAppender = useCallback( () => {
-		const { width: columnWidth } = contentStyle[ clientId ];
+	const renderAppender = useCallback(() => {
+		const { width: columnWidth } = contentStyle[clientId];
 		const isFullWidth = columnWidth === screenWidth;
 
-		if ( isSelected ) {
+		if (isSelected) {
 			return (
 				<View
-					style={ [
+					style={[
 						styles.columnAppender,
 						isFullWidth && styles.fullwidthColumnAppender,
 						isFullWidth &&
 							hasChildren &&
 							styles.fullwidthHasInnerColumnAppender,
-						! isFullWidth &&
+						!isFullWidth &&
 							hasChildren &&
 							styles.hasInnerColumnAppender,
-					] }
+					]}
 				>
 					<InnerBlocks.ButtonBlockAppender />
 				</View>
 			);
 		}
 		return null;
-	}, [ contentStyle[ clientId ], screenWidth, isSelected, hasChildren ] );
+	}, [contentStyle[clientId], screenWidth, isSelected, hasChildren]);
 
-	if ( ! isSelected && ! hasChildren ) {
+	if (!isSelected && !hasChildren) {
 		return (
 			<View
-				style={ [
-					! isParentSelected &&
+				style={[
+					!isParentSelected &&
 						getStylesFromColorScheme(
 							styles.columnPlaceholder,
 							styles.columnPlaceholderDark
 						),
 					styles.columnPlaceholderNotSelected,
-					contentStyle[ clientId ],
-				] }
+					contentStyle[clientId],
+				]}
 			/>
 		);
 	}
 
 	return (
 		<>
-			{ isSelected && (
+			{isSelected && (
 				<>
 					<BlockControls>
 						<BlockVerticalAlignmentToolbar
-							onChange={ updateAlignment }
-							value={ verticalAlignment }
+							onChange={updateAlignment}
+							value={verticalAlignment}
 						/>
 					</BlockControls>
 					<InspectorControls>
-						<PanelBody title={ __( 'Column settings' ) }>
+						<PanelBody title={__('Column settings')}>
 							<UnitControl
-								label={ __( 'Width' ) }
-								min={ 1 }
+								label={__('Width')}
+								min={1}
 								max={
-									isPercentageUnit( widthUnit )
+									isPercentageUnit(widthUnit)
 										? 100
 										: undefined
 								}
-								onChange={ onChange }
-								onComplete={ onChangeWidth }
-								onUnitChange={ onChangeUnit }
-								value={
-									getWidths( columns )[ selectedColumnIndex ]
-								}
-								unit={ widthUnit }
-								units={ units }
+								onChange={onChange}
+								onComplete={onChangeWidth}
+								onUnitChange={onChangeUnit}
+								value={getWidths(columns)[selectedColumnIndex]}
+								unit={widthUnit}
+								units={units}
 								preview={
 									<ColumnsPreview
-										columnWidths={ getWidths(
-											columns,
-											false
-										) }
+										columnWidths={getWidths(columns, false)}
 										selectedColumnIndex={
 											selectedColumnIndex
 										}
@@ -195,50 +190,50 @@ function ColumnEdit( {
 						</PanelBody>
 						<PanelBody>
 							<FooterMessageControl
-								label={ __(
+								label={__(
 									'Note: Column layout may vary between themes and screen sizes'
-								) }
+								)}
 							/>
 						</PanelBody>
 					</InspectorControls>
 				</>
-			) }
+			)}
 			<View
-				style={ [
+				style={[
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
-					contentStyle[ clientId ],
-				] }
+					contentStyle[clientId],
+				]}
 			>
 				<InnerBlocks
-					renderAppender={ renderAppender }
-					parentWidth={ contentStyle[ clientId ].width }
-					blockWidth={ blockWidth }
+					renderAppender={renderAppender}
+					parentWidth={contentStyle[clientId].width}
+					blockWidth={blockWidth}
 				/>
 			</View>
 		</>
 	);
 }
 
-function ColumnEditWrapper( props ) {
+function ColumnEditWrapper(props) {
 	const { verticalAlignment } = props.attributes;
 
-	const getVerticalAlignmentRemap = ( alignment ) => {
-		if ( ! alignment ) return styles.flexBase;
+	const getVerticalAlignmentRemap = (alignment) => {
+		if (!alignment) return styles.flexBase;
 		return {
 			...styles.flexBase,
-			...styles[ `is-vertically-aligned-${ alignment }` ],
+			...styles[`is-vertically-aligned-${alignment}`],
 		};
 	};
 
 	return (
-		<View style={ getVerticalAlignmentRemap( verticalAlignment ) }>
-			<ColumnEdit { ...props } />
+		<View style={getVerticalAlignmentRemap(verticalAlignment)}>
+			<ColumnEdit {...props} />
 		</View>
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
+export default compose([
+	withSelect((select, { clientId }) => {
 		const {
 			getBlockCount,
 			getBlockRootClientId,
@@ -246,23 +241,22 @@ export default compose( [
 			getBlocks,
 			getBlockOrder,
 			getBlockAttributes,
-		} = select( blockEditorStore );
+		} = select(blockEditorStore);
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isSelected = selectedBlockClientId === clientId;
 
-		const parentId = getBlockRootClientId( clientId );
-		const hasChildren = !! getBlockCount( clientId );
+		const parentId = getBlockRootClientId(clientId);
+		const hasChildren = !!getBlockCount(clientId);
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
 
-		const blockOrder = getBlockOrder( parentId );
+		const blockOrder = getBlockOrder(parentId);
 
-		const selectedColumnIndex = blockOrder.indexOf( clientId );
-		const columns = getBlocks( parentId );
+		const selectedColumnIndex = blockOrder.indexOf(clientId);
+		const columns = getBlocks(parentId);
 
-		const parentAlignment = getBlockAttributes( parentId )
-			?.verticalAlignment;
+		const parentAlignment = getBlockAttributes(parentId)?.verticalAlignment;
 
 		return {
 			hasChildren,
@@ -272,6 +266,6 @@ export default compose( [
 			columns,
 			parentAlignment,
 		};
-	} ),
+	}),
 	withPreferredColorScheme,
-] )( ColumnEditWrapper );
+])(ColumnEditWrapper);

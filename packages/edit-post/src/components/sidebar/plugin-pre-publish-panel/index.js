@@ -4,23 +4,23 @@
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
-const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
+const { Fill, Slot } = createSlotFill('PluginPrePublishPanel');
 
-const PluginPrePublishPanelFill = ( {
+const PluginPrePublishPanelFill = ({
 	children,
 	className,
 	title,
 	initialOpen = false,
 	icon,
-} ) => (
+}) => (
 	<Fill>
 		<PanelBody
-			className={ className }
-			initialOpen={ initialOpen || ! title }
-			title={ title }
-			icon={ icon }
+			className={className}
+			initialOpen={initialOpen || !title}
+			title={title}
+			icon={icon}
 		>
-			{ children }
+			{children}
 		</PanelBody>
 	</Fill>
 );
@@ -77,12 +77,12 @@ const PluginPrePublishPanelFill = ( {
  * @return {WPComponent} The component to be rendered.
  */
 const PluginPrePublishPanel = compose(
-	withPluginContext( ( context, ownProps ) => {
+	withPluginContext((context, ownProps) => {
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} )
-)( PluginPrePublishPanelFill );
+	})
+)(PluginPrePublishPanelFill);
 
 PluginPrePublishPanel.Slot = Slot;
 

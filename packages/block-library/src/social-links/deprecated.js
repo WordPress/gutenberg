@@ -15,17 +15,17 @@ import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
  *
  * @param {Object} attributes Block's attributes.
  */
-const migrateWithLayout = ( attributes ) => {
-	if ( !! attributes.layout ) {
+const migrateWithLayout = (attributes) => {
+	if (!!attributes.layout) {
 		return attributes;
 	}
 	const { className } = attributes;
 	// Matches classes with `items-justified-` prefix.
 	const prefix = `items-justified-`;
-	const justifiedItemsRegex = new RegExp( `\\b${ prefix }[^ ]*[ ]?\\b`, 'g' );
+	const justifiedItemsRegex = new RegExp(`\\b${prefix}[^ ]*[ ]?\\b`, 'g');
 	const newAttributes = {
 		...attributes,
-		className: className?.replace( justifiedItemsRegex, '' ).trim(),
+		className: className?.replace(justifiedItemsRegex, '').trim(),
 	};
 	/**
 	 * Add `layout` prop only if `justifyContent` is defined, for backwards
@@ -33,16 +33,14 @@ const migrateWithLayout = ( attributes ) => {
 	 * Also noting that due to the missing attribute, it's possible for a block
 	 * to have more than one of `justified` classes.
 	 */
-	const justifyContent = className
-		?.match( justifiedItemsRegex )?.[ 0 ]
-		?.trim();
-	if ( justifyContent ) {
-		Object.assign( newAttributes, {
+	const justifyContent = className?.match(justifiedItemsRegex)?.[0]?.trim();
+	if (justifyContent) {
+		Object.assign(newAttributes, {
 			layout: {
 				type: 'flex',
-				justifyContent: justifyContent.slice( prefix.length ),
+				justifyContent: justifyContent.slice(prefix.length),
 			},
-		} );
+		});
 	}
 	return newAttributes;
 };
@@ -79,13 +77,13 @@ const deprecated = [
 			},
 		},
 		supports: {
-			align: [ 'left', 'center', 'right' ],
+			align: ['left', 'center', 'right'],
 			anchor: true,
 			__experimentalExposeControlsToChildren: true,
 		},
-		isEligible: ( { layout } ) => ! layout,
+		isEligible: ({ layout }) => !layout,
 		migrate: migrateWithLayout,
-		save( props ) {
+		save(props) {
 			const {
 				attributes: {
 					iconBackgroundColorValue,
@@ -95,14 +93,14 @@ const deprecated = [
 				},
 			} = props;
 
-			const className = classNames( size, {
+			const className = classNames(size, {
 				'has-icon-color': iconColorValue,
 				'has-icon-background-color': iconBackgroundColorValue,
-				[ `items-justified-${ itemsJustification }` ]: itemsJustification,
-			} );
+				[`items-justified-${itemsJustification}`]: itemsJustification,
+			});
 
 			return (
-				<ul { ...useBlockProps.save( { className } ) }>
+				<ul {...useBlockProps.save({ className })}>
 					<InnerBlocks.Content />
 				</ul>
 			);
@@ -141,11 +139,11 @@ const deprecated = [
 			openInNewTab: 'openInNewTab',
 		},
 		supports: {
-			align: [ 'left', 'center', 'right' ],
+			align: ['left', 'center', 'right'],
 			anchor: true,
 		},
 		migrate: migrateWithLayout,
-		save: ( props ) => {
+		save: (props) => {
 			const {
 				attributes: {
 					iconBackgroundColorValue,
@@ -155,19 +153,20 @@ const deprecated = [
 				},
 			} = props;
 
-			const className = classNames( size, {
+			const className = classNames(size, {
 				'has-icon-color': iconColorValue,
 				'has-icon-background-color': iconBackgroundColorValue,
-				[ `items-justified-${ itemsJustification }` ]: itemsJustification,
-			} );
+				[`items-justified-${itemsJustification}`]: itemsJustification,
+			});
 
 			const style = {
 				'--wp--social-links--icon-color': iconColorValue,
-				'--wp--social-links--icon-background-color': iconBackgroundColorValue,
+				'--wp--social-links--icon-background-color':
+					iconBackgroundColorValue,
 			};
 
 			return (
-				<ul { ...useBlockProps.save( { className, style } ) }>
+				<ul {...useBlockProps.save({ className, style })}>
 					<InnerBlocks.Content />
 				</ul>
 			);

@@ -69,129 +69,129 @@ const fontSizes = [
 	},
 ];
 
-const LetterCaseControl = ( props ) => {
+const LetterCaseControl = (props) => {
 	return (
-		<ToggleGroupControl label="Letter Case" isBlock={ true } { ...props }>
-			{ [
+		<ToggleGroupControl label="Letter Case" isBlock={true} {...props}>
+			{[
 				{ value: 'uppercase', ariaLabel: 'Uppercase', label: 'AB' },
 				{ value: 'lowercase', ariaLabel: 'Lowercase', label: 'ab' },
 				{ value: 'capitalize', ariaLabel: 'Capitalize', label: 'Ab' },
-			].map( ( { value, ariaLabel, label } ) => (
+			].map(({ value, ariaLabel, label }) => (
 				<ToggleGroupControlOption
-					key={ value }
-					label={ label }
-					aria-label={ ariaLabel }
-					value={ value }
+					key={value}
+					label={label}
+					aria-label={ariaLabel}
+					value={value}
 				/>
-			) ) }
+			))}
 		</ToggleGroupControl>
 	);
 };
 
 export const TypographyPanel = () => {
-	const [ fontFamily, setFontFamily ] = useState();
-	const [ fontSize, setFontSize ] = useState();
-	const [ fontWeight, setFontWeight ] = useState();
-	const [ fontStyle, setFontStyle ] = useState();
-	const [ lineHeight, setLineHeight ] = useState();
-	const [ letterSpacing, setLetterSpacing ] = useState();
-	const [ textTransform, setTextTransform ] = useState();
+	const [fontFamily, setFontFamily] = useState();
+	const [fontSize, setFontSize] = useState();
+	const [fontWeight, setFontWeight] = useState();
+	const [fontStyle, setFontStyle] = useState();
+	const [lineHeight, setLineHeight] = useState();
+	const [letterSpacing, setLetterSpacing] = useState();
+	const [textTransform, setTextTransform] = useState();
 
 	return (
 		<>
-			<div style={ { maxWidth: '280px' } }>
+			<div style={{ maxWidth: '280px' }}>
 				<Panel>
 					<ToolsPanel label="Typography">
 						<ToolsPanelItem
-							hasValue={ () => !! fontFamily }
+							hasValue={() => !!fontFamily}
 							label="Font"
-							onDeselect={ () => setFontFamily( undefined ) }
-							isShownByDefault={ true }
+							onDeselect={() => setFontFamily(undefined)}
+							isShownByDefault={true}
 						>
 							<FontFamilyControl
-								value={ fontFamily }
-								onChange={ setFontFamily }
-								fontFamilies={ fontFamilies }
+								value={fontFamily}
+								onChange={setFontFamily}
+								fontFamilies={fontFamilies}
 							/>
 						</ToolsPanelItem>
 
 						<ToolsPanelItem
-							hasValue={ () => !! fontSize }
+							hasValue={() => !!fontSize}
 							label="Size"
-							onDeselect={ () => setFontSize( undefined ) }
-							isShownByDefault={ true }
+							onDeselect={() => setFontSize(undefined)}
+							isShownByDefault={true}
 						>
 							<FontSizePicker
-								value={ fontSize }
-								onChange={ setFontSize }
-								fontSizes={ fontSizes }
+								value={fontSize}
+								onChange={setFontSize}
+								fontSizes={fontSizes}
 							/>
 						</ToolsPanelItem>
 
 						<ToolsPanelItem
-							hasValue={ () => !! fontStyle || !! fontWeight }
+							hasValue={() => !!fontStyle || !!fontWeight}
 							label="Appearance"
-							onDeselect={ () => {
-								setFontStyle( undefined );
-								setFontWeight( undefined );
-							} }
-							isShownByDefault={ true }
+							onDeselect={() => {
+								setFontStyle(undefined);
+								setFontWeight(undefined);
+							}}
+							isShownByDefault={true}
 						>
 							<FontAppearanceControl
-								value={ {
+								value={{
 									fontStyle,
 									fontWeight,
-								} }
-								onChange={ ( {
+								}}
+								onChange={({
 									fontStyle: style,
 									fontWeight: weight,
-								} ) => {
-									setFontStyle( style );
-									setFontWeight( weight );
-								} }
+								}) => {
+									setFontStyle(style);
+									setFontWeight(weight);
+								}}
 							/>
 						</ToolsPanelItem>
 
 						<ToolsPanelItem
-							hasValue={ () => !! lineHeight }
+							hasValue={() => !!lineHeight}
 							label="Line Height"
-							onDeselect={ () => setLineHeight( undefined ) }
-							isShownByDefault={ true }
+							onDeselect={() => setLineHeight(undefined)}
+							isShownByDefault={true}
 						>
 							<LineHeightControl
-								value={ lineHeight }
-								onChange={ setLineHeight }
+								value={lineHeight}
+								onChange={setLineHeight}
 							/>
 						</ToolsPanelItem>
 
 						<ToolsPanelItem
-							hasValue={ () => !! letterSpacing }
+							hasValue={() => !!letterSpacing}
 							label="Letter Spacing"
-							onDeselect={ () => setLetterSpacing( undefined ) }
-							isShownByDefault={ true }
+							onDeselect={() => setLetterSpacing(undefined)}
+							isShownByDefault={true}
 						>
 							<LetterSpacingControl
-								value={ letterSpacing }
-								onChange={ setLetterSpacing }
+								value={letterSpacing}
+								onChange={setLetterSpacing}
 							/>
 						</ToolsPanelItem>
 
 						<ToolsPanelItem
-							hasValue={ () => !! textTransform }
+							hasValue={() => !!textTransform}
 							label="Letter Case"
-							onDeselect={ () => setTextTransform( undefined ) }
-							isShownByDefault={ true }
+							onDeselect={() => setTextTransform(undefined)}
+							isShownByDefault={true}
 						>
 							<LetterCaseControl
-								onChange={ setTextTransform }
-								value={ textTransform }
+								onChange={setTextTransform}
+								value={textTransform}
 							/>
 						</ToolsPanelItem>
 					</ToolsPanel>
 				</Panel>
 			</div>
 			<div
-				style={ {
+				style={{
 					marginTop: '1rem',
 					fontFamily,
 					fontSize,
@@ -200,7 +200,7 @@ export const TypographyPanel = () => {
 					lineHeight,
 					letterSpacing,
 					textTransform,
-				} }
+				}}
 			>
 				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
 				eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut

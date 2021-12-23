@@ -12,14 +12,11 @@ export type NavigatorPath = NavigatorPathOptions & {
 	path?: string;
 };
 
-export type NavigatorContext = [
-	NavigatorPath,
-	( path: NavigatorPath ) => void
-];
+export type NavigatorContext = [NavigatorPath, (path: NavigatorPath) => void];
 
 // Returned by the `useNavigator` hook
 export type Navigator = {
-	push: ( path: string, options: NavigatorPathOptions ) => void;
+	push: (path: string, options: NavigatorPathOptions) => void;
 };
 
 export type NavigatorProviderProps = {

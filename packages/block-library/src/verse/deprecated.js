@@ -25,14 +25,14 @@ const v1 = {
 			type: 'string',
 		},
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const { textAlign, content } = attributes;
 
 		return (
 			<RichText.Content
 				tagName="pre"
-				style={ { textAlign } }
-				value={ content }
+				style={{ textAlign }}
+				value={content}
 			/>
 		);
 	},
@@ -66,21 +66,21 @@ const v2 = {
 			padding: true,
 		},
 	},
-	save( { attributes } ) {
+	save({ attributes }) {
 		const { textAlign, content } = attributes;
 
-		const className = classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} );
+		const className = classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+		});
 
 		return (
-			<pre { ...useBlockProps.save( { className } ) }>
-				<RichText.Content value={ content } />
+			<pre {...useBlockProps.save({ className })}>
+				<RichText.Content value={content} />
 			</pre>
 		);
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style } ) {
+	isEligible({ style }) {
 		return style?.typography?.fontFamily;
 	},
 };
@@ -93,4 +93,4 @@ const v2 = {
  *
  * See block-deprecation.md
  */
-export default [ v2, v1 ];
+export default [v2, v1];

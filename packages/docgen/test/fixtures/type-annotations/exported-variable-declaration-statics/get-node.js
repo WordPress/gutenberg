@@ -1,4 +1,4 @@
-module.exports = () => ( {
+module.exports = () => ({
 	type: 'ExportNamedDeclaration',
 	start: 49,
 	end: 94,
@@ -191,4 +191,4 @@ module.exports = () => ( {
 		],
 		kind: 'const',
 	},
-} );
+});

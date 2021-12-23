@@ -40,7 +40,7 @@ export const TEMPLATES_TOP_LEVEL = [
 	...TEMPLATES_SECONDARY,
 ];
 
-export const TEMPLATES_GENERAL = [ 'page-home' ];
+export const TEMPLATES_GENERAL = ['page-home'];
 
 export const TEMPLATES_POSTS_PREFIXES = [
 	'post-',
@@ -49,12 +49,12 @@ export const TEMPLATES_POSTS_PREFIXES = [
 	'tag-',
 ];
 
-export const TEMPLATES_PAGES_PREFIXES = [ 'page-' ];
+export const TEMPLATES_PAGES_PREFIXES = ['page-'];
 
 export const TEMPLATE_OVERRIDES = {
-	singular: [ 'single', 'page' ],
-	index: [ 'archive', '404', 'search', 'singular', 'home' ],
-	home: [ 'front-page' ],
+	singular: ['single', 'page'],
+	index: ['archive', '404', 'search', 'singular', 'home'],
+	home: ['front-page'],
 };
 
 export const MENU_ROOT = 'root';
@@ -74,21 +74,21 @@ export const TEMPLATE_PARTS_SUB_MENUS = [
 	{
 		area: TEMPLATE_PART_AREA_HEADER,
 		menu: MENU_TEMPLATE_PARTS_HEADERS,
-		title: __( 'headers' ),
+		title: __('headers'),
 	},
 	{
 		area: TEMPLATE_PART_AREA_FOOTER,
 		menu: MENU_TEMPLATE_PARTS_FOOTERS,
-		title: __( 'footers' ),
+		title: __('footers'),
 	},
 	{
 		area: TEMPLATE_PART_AREA_SIDEBAR,
 		menu: MENU_TEMPLATE_PARTS_SIDEBARS,
-		title: __( 'sidebars' ),
+		title: __('sidebars'),
 	},
 	{
 		area: TEMPLATE_PART_AREA_GENERAL,
 		menu: MENU_TEMPLATE_PARTS_GENERAL,
-		title: __( 'general' ),
+		title: __('general'),
 	},
 ];

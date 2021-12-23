@@ -41,97 +41,93 @@ const LAYOUT = {
 	alignments: [],
 };
 
-export default function BlockEditor( { setIsInserterOpen } ) {
+export default function BlockEditor({ setIsInserterOpen }) {
 	const { settings, templateType, templateId, page } = useSelect(
-		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getEditedPostId,
-				getPage,
-			} = select( editSiteStore );
+		(select) => {
+			const { getSettings, getEditedPostType, getEditedPostId, getPage } =
+				select(editSiteStore);
 
 			return {
-				settings: getSettings( setIsInserterOpen ),
+				settings: getSettings(setIsInserterOpen),
 				templateType: getEditedPostType(),
 				templateId: getEditedPostId(),
 				page: getPage(),
 			};
 		},
-		[ setIsInserterOpen ]
+		[setIsInserterOpen]
 	);
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const [blocks, onInput, onChange] = useEntityBlockEditor(
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( editSiteStore );
+	const { setPage } = useDispatch(editSiteStore);
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
-	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const mergedRefs = useMergeRefs([contentRef, useTypingObserver()]);
+	const isMobileViewport = useViewportMatch('small', '<');
+	const { clearSelectedBlock } = useDispatch(blockEditorStore);
 
 	const isTemplatePart = templateType === 'wp_template_part';
 
 	return (
 		<BlockEditorProvider
-			settings={ settings }
-			value={ blocks }
-			onInput={ onInput }
-			onChange={ onChange }
-			useSubRegistry={ false }
+			settings={settings}
+			value={blocks}
+			onInput={onInput}
+			onChange={onChange}
+			useSubRegistry={false}
 		>
 			<EditTemplatePartMenuButton />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
-				{ useCallback(
-					( fillProps ) => (
+				{useCallback(
+					(fillProps) => (
 						<NavigateToLink
-							{ ...fillProps }
-							activePage={ page }
-							onActivePageChange={ setPage }
+							{...fillProps}
+							activePage={page}
+							onActivePageChange={setPage}
 						/>
 					),
-					[ page ]
-				) }
+					[page]
+				)}
 			</__experimentalLinkControl.ViewerFill>
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
 			<BlockTools
-				className={ classnames( 'edit-site-visual-editor', {
+				className={classnames('edit-site-visual-editor', {
 					'is-focus-mode': isTemplatePart,
-				} ) }
-				__unstableContentRef={ contentRef }
-				onClick={ ( event ) => {
+				})}
+				__unstableContentRef={contentRef}
+				onClick={(event) => {
 					// Clear selected block when clicking on the gray background.
-					if ( event.target === event.currentTarget ) {
+					if (event.target === event.currentTarget) {
 						clearSelectedBlock();
 					}
-				} }
+				}}
 			>
 				<BlockEditorKeyboardShortcuts.Register />
 				<BackButton />
 				<ResizableEditor
 					// Reinitialize the editor and reset the states when the template changes.
-					key={ templateId }
+					key={templateId}
 					enableResizing={
 						isTemplatePart &&
 						// Disable resizing in mobile viewport.
-						! isMobileViewport
+						!isMobileViewport
 					}
-					settings={ settings }
-					contentRef={ mergedRefs }
+					settings={settings}
+					contentRef={mergedRefs}
 				>
 					<BlockList
 						className="edit-site-block-editor__block-list wp-site-blocks"
-						__experimentalLayout={ LAYOUT }
-						renderAppender={ isTemplatePart ? false : undefined }
+						__experimentalLayout={LAYOUT}
+						renderAppender={isTemplatePart ? false : undefined}
 					/>
 				</ResizableEditor>
 				<__unstableBlockSettingsMenuFirstItem>
-					{ ( { onClose } ) => (
-						<BlockInspectorButton onClick={ onClose } />
-					) }
+					{({ onClose }) => (
+						<BlockInspectorButton onClick={onClose} />
+					)}
 				</__unstableBlockSettingsMenuFirstItem>
 			</BlockTools>
 			<ReusableBlocksMenuItems />

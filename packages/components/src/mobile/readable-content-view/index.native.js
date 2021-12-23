@@ -15,23 +15,23 @@ import styles from './style.scss';
 
 const PIXEL_RATIO = 2;
 
-const ReadableContentView = ( { align, reversed, children, style } ) => {
-	const { width, height } = Dimensions.get( 'window' );
-	const [ windowWidth, setWindowWidth ] = useState( width );
-	const [ windowRatio, setWindowRatio ] = useState( width / height );
+const ReadableContentView = ({ align, reversed, children, style }) => {
+	const { width, height } = Dimensions.get('window');
+	const [windowWidth, setWindowWidth] = useState(width);
+	const [windowRatio, setWindowRatio] = useState(width / height);
 
-	function onDimensionsChange( { window } ) {
-		setWindowWidth( window.width );
-		setWindowRatio( window.width / window.height );
+	function onDimensionsChange({ window }) {
+		setWindowWidth(window.width);
+		setWindowRatio(window.width / window.height);
 	}
 
-	useEffect( () => {
-		Dimensions.addEventListener( 'change', onDimensionsChange );
+	useEffect(() => {
+		Dimensions.addEventListener('change', onDimensionsChange);
 
 		return () => {
-			Dimensions.removeEventListener( 'change', onDimensionsChange );
+			Dimensions.removeEventListener('change', onDimensionsChange);
 		};
-	}, [] );
+	}, []);
 
 	function getWideStyles() {
 		if (
@@ -41,7 +41,7 @@ const ReadableContentView = ( { align, reversed, children, style } ) => {
 			return styles.wideLandscape;
 		}
 
-		if ( windowWidth <= ALIGNMENT_BREAKPOINTS.small ) {
+		if (windowWidth <= ALIGNMENT_BREAKPOINTS.small) {
 			return { maxWidth: windowWidth };
 		}
 
@@ -54,26 +54,26 @@ const ReadableContentView = ( { align, reversed, children, style } ) => {
 	}
 
 	return (
-		<View style={ styles.container }>
+		<View style={styles.container}>
 			<View
-				style={ [
+				style={[
 					reversed
 						? styles.reversedCenteredContent
 						: styles.centeredContent,
 					style,
-					styles[ align ],
+					styles[align],
 					align === WIDE_ALIGNMENTS.alignments.wide &&
 						getWideStyles(),
-				] }
+				]}
 			>
-				{ children }
+				{children}
 			</View>
 		</View>
 	);
 };
 
 const isContentMaxWidth = () => {
-	const { width } = Dimensions.get( 'window' );
+	const { width } = Dimensions.get('window');
 	return width > styles.centeredContent.maxWidth;
 };
 

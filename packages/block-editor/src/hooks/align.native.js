@@ -10,7 +10,7 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
-const ALIGNMENTS = [ 'left', 'center', 'right' ];
+const ALIGNMENTS = ['left', 'center', 'right'];
 
 export * from './align.js';
 
@@ -18,19 +18,19 @@ export * from './align.js';
 addFilter(
 	'blocks.registerBlockType',
 	'core/react-native-editor/align',
-	( settings, name ) => {
+	(settings, name) => {
 		if (
-			WIDE_ALIGNMENTS.excludeBlocks.includes( name ) &&
-			hasBlockSupport( settings, 'align' )
+			WIDE_ALIGNMENTS.excludeBlocks.includes(name) &&
+			hasBlockSupport(settings, 'align')
 		) {
 			const blockAlign = settings.supports.align;
 
 			settings.supports = {
 				...settings.supports,
-				align: Array.isArray( blockAlign )
+				align: Array.isArray(blockAlign)
 					? without(
 							blockAlign,
-							...Object.values( WIDE_ALIGNMENTS.alignments )
+							...Object.values(WIDE_ALIGNMENTS.alignments)
 					  )
 					: blockAlign,
 				alignWide: false,
@@ -41,7 +41,7 @@ addFilter(
 					type: 'string',
 					// Allow for '' since it is used by updateAlignment function
 					// in withToolbarControls for special cases with defined default values.
-					enum: [ ...ALIGNMENTS, '' ],
+					enum: [...ALIGNMENTS, ''],
 				},
 			};
 		}

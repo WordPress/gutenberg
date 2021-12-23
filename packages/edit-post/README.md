@@ -55,12 +55,12 @@ function doOnClick() {
 }
 
 function MyPluginBlockSettingsMenuItem() {
-	return wp.element.createElement( PluginBlockSettingsMenuItem, {
-		allowedBlocks: [ 'core/paragraph' ],
+	return wp.element.createElement(PluginBlockSettingsMenuItem, {
+		allowedBlocks: ['core/paragraph'],
 		icon: 'dashicon-name',
-		label: __( 'Menu item text' ),
+		label: __('Menu item text'),
 		onClick: doOnClick,
-	} );
+	});
 }
 ```
 
@@ -75,10 +75,10 @@ const doOnClick = () => {
 
 const MyPluginBlockSettingsMenuItem = () => (
 	<PluginBlockSettingsMenuItem
-		allowedBlocks={ [ 'core/paragraph' ] }
+		allowedBlocks={['core/paragraph']}
 		icon="dashicon-name"
-		label={ __( 'Menu item text' ) }
-		onClick={ doOnClick }
+		label={__('Menu item text')}
+		onClick={doOnClick}
 	/>
 );
 ```
@@ -117,13 +117,13 @@ function MyDocumentSettingPlugin() {
 			className: 'my-document-setting-plugin',
 			title: 'My Panel',
 		},
-		__( 'My Document Setting Panel' )
+		__('My Document Setting Panel')
 	);
 }
 
-registerPlugin( 'my-document-setting-plugin', {
+registerPlugin('my-document-setting-plugin', {
 	render: MyDocumentSettingPlugin,
-} );
+});
 ```
 
 ```jsx
@@ -140,7 +140,7 @@ const MyDocumentSettingTest = () => (
 	</PluginDocumentSettingPanel>
 );
 
-registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
+registerPlugin('document-setting-test', { render: MyDocumentSettingTest });
 ```
 
 _Parameters_
@@ -166,10 +166,10 @@ _Usage_
 // Using ES5 syntax
 var __ = wp.i18n.__;
 var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
-var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+var moreIcon = wp.element.createElement('svg'); //... svg element.
 
 function onButtonClick() {
-	alert( 'Button clicked.' );
+	alert('Button clicked.');
 }
 
 function MyButtonMoreMenuItem() {
@@ -179,7 +179,7 @@ function MyButtonMoreMenuItem() {
 			icon: moreIcon,
 			onClick: onButtonClick,
 		},
-		__( 'My button title' )
+		__('My button title')
 	);
 }
 ```
@@ -191,12 +191,12 @@ import { PluginMoreMenuItem } from '@wordpress/edit-post';
 import { more } from '@wordpress/icons';
 
 function onButtonClick() {
-	alert( 'Button clicked.' );
+	alert('Button clicked.');
 }
 
 const MyButtonMoreMenuItem = () => (
-	<PluginMoreMenuItem icon={ more } onClick={ onButtonClick }>
-		{ __( 'My button title' ) }
+	<PluginMoreMenuItem icon={more} onClick={onButtonClick}>
+		{__('My button title')}
 	</PluginMoreMenuItem>
 );
 ```
@@ -230,10 +230,10 @@ function MyPluginPostPublishPanel() {
 		PluginPostPublishPanel,
 		{
 			className: 'my-plugin-post-publish-panel',
-			title: __( 'My panel title' ),
+			title: __('My panel title'),
 			initialOpen: true,
 		},
-		__( 'My panel content' )
+		__('My panel content')
 	);
 }
 ```
@@ -246,10 +246,10 @@ import { PluginPostPublishPanel } from '@wordpress/edit-post';
 const MyPluginPostPublishPanel = () => (
 	<PluginPostPublishPanel
 		className="my-plugin-post-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
+		title={__('My panel title')}
+		initialOpen={true}
 	>
-		{ __( 'My panel content' ) }
+		{__('My panel content')}
 	</PluginPostPublishPanel>
 );
 ```
@@ -285,7 +285,7 @@ function MyPluginPostStatusInfo() {
 		{
 			className: 'my-plugin-post-status-info',
 		},
-		__( 'My post status info' )
+		__('My post status info')
 	);
 }
 ```
@@ -297,7 +297,7 @@ import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
 const MyPluginPostStatusInfo = () => (
 	<PluginPostStatusInfo className="my-plugin-post-status-info">
-		{ __( 'My post status info' ) }
+		{__('My post status info')}
 	</PluginPostStatusInfo>
 );
 ```
@@ -329,10 +329,10 @@ function MyPluginPrePublishPanel() {
 		PluginPrePublishPanel,
 		{
 			className: 'my-plugin-pre-publish-panel',
-			title: __( 'My panel title' ),
+			title: __('My panel title'),
 			initialOpen: true,
 		},
-		__( 'My panel content' )
+		__('My panel content')
 	);
 }
 ```
@@ -345,10 +345,10 @@ import { PluginPrePublishPanel } from '@wordpress/edit-post';
 const MyPluginPrePublishPanel = () => (
 	<PluginPrePublishPanel
 		className="my-plugin-pre-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
+		title={__('My panel title')}
+		initialOpen={true}
 	>
-		{ __( 'My panel content' ) }
+		{__('My panel content')}
 	</PluginPrePublishPanel>
 );
 ```
@@ -373,8 +373,8 @@ If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuI
 
 ```js
 wp.data
-	.dispatch( 'core/edit-post' )
-	.openGeneralSidebar( 'plugin-name/sidebar-name' );
+	.dispatch('core/edit-post')
+	.openGeneralSidebar('plugin-name/sidebar-name');
 ```
 
 _Related_
@@ -389,7 +389,7 @@ var __ = wp.i18n.__;
 var el = wp.element.createElement;
 var PanelBody = wp.components.PanelBody;
 var PluginSidebar = wp.editPost.PluginSidebar;
-var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+var moreIcon = wp.element.createElement('svg'); //... svg element.
 
 function MyPluginSidebar() {
 	return el(
@@ -399,7 +399,7 @@ function MyPluginSidebar() {
 			title: 'My sidebar title',
 			icon: moreIcon,
 		},
-		el( PanelBody, {}, __( 'My sidebar content' ) )
+		el(PanelBody, {}, __('My sidebar content'))
 	);
 }
 ```
@@ -412,8 +412,8 @@ import { PluginSidebar } from '@wordpress/edit-post';
 import { more } from '@wordpress/icons';
 
 const MyPluginSidebar = () => (
-	<PluginSidebar name="my-sidebar" title="My sidebar title" icon={ more }>
-		<PanelBody>{ __( 'My sidebar content' ) }</PanelBody>
+	<PluginSidebar name="my-sidebar" title="My sidebar title" icon={more}>
+		<PanelBody>{__('My sidebar content')}</PanelBody>
 	</PluginSidebar>
 );
 ```
@@ -439,7 +439,7 @@ _Usage_
 // Using ES5 syntax
 var __ = wp.i18n.__;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
-var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+var moreIcon = wp.element.createElement('svg'); //... svg element.
 
 function MySidebarMoreMenuItem() {
 	return wp.element.createElement(
@@ -448,7 +448,7 @@ function MySidebarMoreMenuItem() {
 			target: 'my-sidebar',
 			icon: moreIcon,
 		},
-		__( 'My sidebar title' )
+		__('My sidebar title')
 	);
 }
 ```
@@ -460,8 +460,8 @@ import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
 import { more } from '@wordpress/icons';
 
 const MySidebarMoreMenuItem = () => (
-	<PluginSidebarMoreMenuItem target="my-sidebar" icon={ more }>
-		{ __( 'My sidebar title' ) }
+	<PluginSidebarMoreMenuItem target="my-sidebar" icon={more}>
+		{__('My sidebar title')}
 	</PluginSidebarMoreMenuItem>
 );
 ```

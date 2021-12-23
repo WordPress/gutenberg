@@ -25,6 +25,6 @@ import { getActiveFormats } from './get-active-formats';
  * @return {RichTextFormat|undefined} Active format object of the specified
  *                                    type, or undefined.
  */
-export function getActiveFormat( value, formatType ) {
-	return find( getActiveFormats( value ), { type: formatType } );
+export function getActiveFormat(value, formatType) {
+	return find(getActiveFormats(value), { type: formatType });
 }

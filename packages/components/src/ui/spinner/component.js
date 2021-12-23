@@ -19,27 +19,27 @@ import { COLORS } from '../../utils/colors-values';
  * @param {import('../context').WordPressComponentProps<Props, 'div'>} props
  * @param {import('react').Ref<any>}                                   forwardedRef
  */
-function Spinner( props, forwardedRef ) {
+function Spinner(props, forwardedRef) {
 	const {
 		color = COLORS.black,
 		size = BASE_SIZE,
 		...otherProps
-	} = useContextSystem( props, 'Spinner' );
+	} = useContextSystem(props, 'Spinner');
 	const ratio = size / BASE_SIZE;
-	const scale = ( ratio * BASE_SIZE ) / WRAPPER_SIZE;
-	const transform = `scale(${ scale })`;
+	const scale = (ratio * BASE_SIZE) / WRAPPER_SIZE;
+	const transform = `scale(${scale})`;
 
 	const styles = { transform };
 
 	return (
 		<ContainerView
-			{ ...otherProps }
-			aria-busy={ true }
-			ref={ forwardedRef }
-			style={ { height: size, width: size } }
+			{...otherProps}
+			aria-busy={true}
+			ref={forwardedRef}
+			style={{ height: size, width: size }}
 		>
-			<BarsWrapperView aria-hidden={ true } style={ styles }>
-				<BarsView style={ { color } }>
+			<BarsWrapperView aria-hidden={true} style={styles}>
+				<BarsView style={{ color }}>
 					<div className="InnerBar1" />
 					<div className="InnerBar2" />
 					<div className="InnerBar3" />
@@ -72,4 +72,4 @@ function Spinner( props, forwardedRef ) {
  * }
  * ```
  */
-export default contextConnect( Spinner, 'Spinner' );
+export default contextConnect(Spinner, 'Spinner');

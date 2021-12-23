@@ -16,20 +16,20 @@ import { _x } from '@wordpress/i18n';
  *
  * @return {Object?} The active style.
  */
-export function getActiveStyle( styles, className ) {
-	for ( const style of new TokenList( className ).values() ) {
-		if ( style.indexOf( 'is-style-' ) === -1 ) {
+export function getActiveStyle(styles, className) {
+	for (const style of new TokenList(className).values()) {
+		if (style.indexOf('is-style-') === -1) {
 			continue;
 		}
 
-		const potentialStyleName = style.substring( 9 );
-		const activeStyle = find( styles, { name: potentialStyleName } );
-		if ( activeStyle ) {
+		const potentialStyleName = style.substring(9);
+		const activeStyle = find(styles, { name: potentialStyleName });
+		if (activeStyle) {
 			return activeStyle;
 		}
 	}
 
-	return find( styles, 'isDefault' );
+	return find(styles, 'isDefault');
 }
 
 /**
@@ -41,14 +41,14 @@ export function getActiveStyle( styles, className ) {
  *
  * @return {string} The updated className.
  */
-export function replaceActiveStyle( className, activeStyle, newStyle ) {
-	const list = new TokenList( className );
+export function replaceActiveStyle(className, activeStyle, newStyle) {
+	const list = new TokenList(className);
 
-	if ( activeStyle ) {
-		list.remove( 'is-style-' + activeStyle.name );
+	if (activeStyle) {
+		list.remove('is-style-' + activeStyle.name);
 	}
 
-	list.add( 'is-style-' + newStyle.name );
+	list.add('is-style-' + newStyle.name);
 
 	return list.value;
 }
@@ -59,21 +59,21 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
  * act as a fallback for when there is no active style applied to a block. The default item also serves
  * as a switch on the frontend to deactivate non-default styles.
  *
- * @param {Array}           styles Block style variations.
+ * @param {Array} styles Block style variations.
  *
- * @return {Array<Object?>}        The style collection.
+ * @return {Array<Object?>} The style collection.
  */
-export function getRenderedStyles( styles ) {
-	if ( ! styles || styles.length === 0 ) {
+export function getRenderedStyles(styles) {
+	if (!styles || styles.length === 0) {
 		return [];
 	}
 
-	return getDefaultStyle( styles )
+	return getDefaultStyle(styles)
 		? styles
 		: [
 				{
 					name: 'default',
-					label: _x( 'Default', 'block style' ),
+					label: _x('Default', 'block style'),
 					isDefault: true,
 				},
 				...styles,
@@ -83,10 +83,10 @@ export function getRenderedStyles( styles ) {
 /**
  * Returns a style object from a collection of styles where that style object is the default block style.
  *
- * @param {Array}    styles Block style variations.
+ * @param {Array} styles Block style variations.
  *
- * @return {Object?}        The default style object, if found.
+ * @return {Object?} The default style object, if found.
  */
-export function getDefaultStyle( styles ) {
-	return find( styles, 'isDefault' );
+export function getDefaultStyle(styles) {
+	return find(styles, 'isDefault');
 }

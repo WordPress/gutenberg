@@ -5,21 +5,21 @@
 import type { MouseEvent, KeyboardEvent, ReactNode } from 'react';
 
 export type DialogInputEvent =
-	| KeyboardEvent< HTMLDivElement >
-	| MouseEvent< HTMLButtonElement >;
+	| KeyboardEvent<HTMLDivElement>
+	| MouseEvent<HTMLButtonElement>;
 
 type BaseProps = {
 	children: ReactNode;
-	onConfirm: ( event: DialogInputEvent ) => void;
+	onConfirm: (event: DialogInputEvent) => void;
 };
 
 type ControlledProps = BaseProps & {
-	onCancel: ( event: DialogInputEvent ) => void;
+	onCancel: (event: DialogInputEvent) => void;
 	isOpen: boolean;
 };
 
 type UncontrolledProps = BaseProps & {
-	onCancel?: ( event: DialogInputEvent ) => void;
+	onCancel?: (event: DialogInputEvent) => void;
 	isOpen?: never;
 };
 

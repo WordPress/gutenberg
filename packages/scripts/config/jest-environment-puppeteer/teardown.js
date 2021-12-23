@@ -1,1 +1,1 @@
-module.exports = require( './global' ).teardown;
+module.exports = require('./global').teardown;

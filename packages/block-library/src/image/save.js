@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash';
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const {
 		url,
 		alt,
@@ -26,56 +26,56 @@ export default function save( { attributes } ) {
 		title,
 	} = attributes;
 
-	const newRel = isEmpty( rel ) ? undefined : rel;
+	const newRel = isEmpty(rel) ? undefined : rel;
 
-	const classes = classnames( {
-		[ `align${ align }` ]: align,
-		[ `size-${ sizeSlug }` ]: sizeSlug,
+	const classes = classnames({
+		[`align${align}`]: align,
+		[`size-${sizeSlug}`]: sizeSlug,
 		'is-resized': width || height,
-	} );
+	});
 
 	const image = (
 		<img
-			src={ url }
-			alt={ alt }
-			className={ id ? `wp-image-${ id }` : null }
-			width={ width }
-			height={ height }
-			title={ title }
+			src={url}
+			alt={alt}
+			className={id ? `wp-image-${id}` : null}
+			width={width}
+			height={height}
+			title={title}
 		/>
 	);
 
 	const figure = (
 		<>
-			{ href ? (
+			{href ? (
 				<a
-					className={ linkClass }
-					href={ href }
-					target={ linkTarget }
-					rel={ newRel }
+					className={linkClass}
+					href={href}
+					target={linkTarget}
+					rel={newRel}
 				>
-					{ image }
+					{image}
 				</a>
 			) : (
 				image
-			) }
-			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content tagName="figcaption" value={ caption } />
-			) }
+			)}
+			{!RichText.isEmpty(caption) && (
+				<RichText.Content tagName="figcaption" value={caption} />
+			)}
 		</>
 	);
 
-	if ( 'left' === align || 'right' === align || 'center' === align ) {
+	if ('left' === align || 'right' === align || 'center' === align) {
 		return (
-			<div { ...useBlockProps.save() }>
-				<figure className={ classes }>{ figure }</figure>
+			<div {...useBlockProps.save()}>
+				<figure className={classes}>{figure}</figure>
 			</div>
 		);
 	}
 
 	return (
-		<figure { ...useBlockProps.save( { className: classes } ) }>
-			{ figure }
+		<figure {...useBlockProps.save({ className: classes })}>
+			{figure}
 		</figure>
 	);
 }

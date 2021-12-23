@@ -15,12 +15,13 @@ import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
  * @param {import('react').Ref<T>} ref
  * @param {T}                      value
  */
-function assignRef( ref, value ) {
-	if ( typeof ref === 'function' ) {
-		ref( value );
-	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
+function assignRef(ref, value) {
+	if (typeof ref === 'function') {
+		ref(value);
+	} else if (ref && ref.hasOwnProperty('current')) {
 		/* eslint-disable jsdoc/no-undefined-types */
-		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current = value;
+		/** @type {import('react').MutableRefObject<T>} */ (ref).current =
+			value;
 		/* eslint-enable jsdoc/no-undefined-types */
 	}
 }
@@ -68,14 +69,14 @@ function assignRef( ref, value ) {
  *
  * @return {import('react').RefCallback<TypeFromRef<TRef>>} The merged ref callback.
  */
-export default function useMergeRefs( refs ) {
+export default function useMergeRefs(refs) {
 	const element = useRef();
-	const didElementChange = useRef( false );
+	const didElementChange = useRef(false);
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {import('react').MutableRefObject<TRef[]>} */
 	/* eslint-enable jsdoc/no-undefined-types */
-	const previousRefs = useRef( [] );
-	const currentRefs = useRef( refs );
+	const previousRefs = useRef([]);
+	const currentRefs = useRef(refs);
 
 	// Update on render before the ref callback is called, so the ref callback
 	// always has access to the current refs.
@@ -84,32 +85,32 @@ export default function useMergeRefs( refs ) {
 	// If any of the refs change, call the previous ref with `null` and the new
 	// ref with the node, except when the element changes in the same cycle, in
 	// which case the ref callbacks will already have been called.
-	useLayoutEffect( () => {
-		if ( didElementChange.current === false ) {
-			refs.forEach( ( ref, index ) => {
-				const previousRef = previousRefs.current[ index ];
-				if ( ref !== previousRef ) {
-					assignRef( previousRef, null );
-					assignRef( ref, element.current );
+	useLayoutEffect(() => {
+		if (didElementChange.current === false) {
+			refs.forEach((ref, index) => {
+				const previousRef = previousRefs.current[index];
+				if (ref !== previousRef) {
+					assignRef(previousRef, null);
+					assignRef(ref, element.current);
 				}
-			} );
+			});
 		}
 
 		previousRefs.current = refs;
-	}, refs );
+	}, refs);
 
 	// No dependencies, must be reset after every render so ref callbacks are
 	// correctly called after a ref change.
-	useLayoutEffect( () => {
+	useLayoutEffect(() => {
 		didElementChange.current = false;
-	} );
+	});
 
 	// There should be no dependencies so that `callback` is only called when
 	// the node changes.
-	return useCallback( ( value ) => {
+	return useCallback((value) => {
 		// Update the element so it can be used when calling ref callbacks on a
 		// dependency change.
-		assignRef( element, value );
+		assignRef(element, value);
 
 		didElementChange.current = true;
 
@@ -118,8 +119,8 @@ export default function useMergeRefs( refs ) {
 		const refsToAssign = value ? currentRefs.current : previousRefs.current;
 
 		// Update the latest refs.
-		for ( const ref of refsToAssign ) {
-			assignRef( ref, value );
+		for (const ref of refsToAssign) {
+			assignRef(ref, value);
 		}
-	}, [] );
+	}, []);
 }

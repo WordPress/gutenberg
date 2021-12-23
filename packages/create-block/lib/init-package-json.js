@@ -1,18 +1,18 @@
 /**
  * External dependencies
  */
-const { command } = require( 'execa' );
-const { isEmpty, omitBy, size } = require( 'lodash' );
-const npmPackageArg = require( 'npm-package-arg' );
-const { join } = require( 'path' );
-const writePkg = require( 'write-pkg' );
+const { command } = require('execa');
+const { isEmpty, omitBy, size } = require('lodash');
+const npmPackageArg = require('npm-package-arg');
+const { join } = require('path');
+const writePkg = require('write-pkg');
 
 /**
  * Internal dependencies
  */
-const { info, error } = require( './log' );
+const { info, error } = require('./log');
 
-module.exports = async ( {
+module.exports = async ({
 	author,
 	description,
 	license,
@@ -20,11 +20,11 @@ module.exports = async ( {
 	version,
 	wpScripts,
 	npmDependencies,
-} ) => {
-	const cwd = join( process.cwd(), slug );
+}) => {
+	const cwd = join(process.cwd(), slug);
 
-	info( '' );
-	info( 'Creating a "package.json" file.' );
+	info('');
+	info('Creating a "package.json" file.');
 	await writePkg(
 		cwd,
 		omitBy(
@@ -48,30 +48,28 @@ module.exports = async ( {
 		)
 	);
 
-	if ( size( npmDependencies ) ) {
-		info( '' );
+	if (size(npmDependencies)) {
+		info('');
 		info(
 			'Installing npm dependencies. It might take a couple of minutes...'
 		);
-		for ( const packageArg of npmDependencies ) {
+		for (const packageArg of npmDependencies) {
 			try {
-				const { type } = npmPackageArg( packageArg );
+				const { type } = npmPackageArg(packageArg);
 				if (
-					! [ 'git', 'tag', 'version', 'range', 'remote' ].includes(
-						type
-					)
+					!['git', 'tag', 'version', 'range', 'remote'].includes(type)
 				) {
 					throw new Error(
-						`Provided package type "${ type }" is not supported.`
+						`Provided package type "${type}" is not supported.`
 					);
 				}
-				await command( `npm install ${ packageArg }`, {
+				await command(`npm install ${packageArg}`, {
 					cwd,
-				} );
-			} catch ( { message } ) {
-				info( '' );
-				info( `Skipping "${ packageArg }" npm dependency. Reason:` );
-				error( message );
+				});
+			} catch ({ message }) {
+				info('');
+				info(`Skipping "${packageArg}" npm dependency. Reason:`);
+				error(message);
 			}
 		}
 	}

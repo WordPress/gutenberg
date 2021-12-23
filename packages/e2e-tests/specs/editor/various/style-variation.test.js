@@ -8,17 +8,17 @@ import {
 	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'adding blocks', () => {
-	beforeAll( async () => {
+describe('adding blocks', () => {
+	beforeAll(async () => {
 		await createNewPost();
-	} );
+	});
 
-	it( 'Should switch to the large style of the quote block', async () => {
+	it('Should switch to the large style of the quote block', async () => {
 		// Inserting a quote block
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'Quote content' );
+		await insertBlock('Quote');
+		await page.keyboard.type('Quote content');
 
-		await clickBlockToolbarButton( 'Quote' );
+		await clickBlockToolbarButton('Quote');
 
 		const largeStyleButton = await page.waitForXPath(
 			'//*[@role="menuitem"][contains(., "Large")]'
@@ -27,6 +27,6 @@ describe( 'adding blocks', () => {
 
 		// Check the content
 		const content = await getEditedPostContent();
-		expect( content ).toMatchSnapshot();
-	} );
-} );
+		expect(content).toMatchSnapshot();
+	});
+});

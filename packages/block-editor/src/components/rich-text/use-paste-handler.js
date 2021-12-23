@@ -32,19 +32,19 @@ import { splitValue } from './split-value';
  *
  * @return {RichTextValue} Adjusted value.
  */
-function adjustLines( value, isMultiline ) {
-	if ( isMultiline ) {
-		return replace( value, /\n+/g, LINE_SEPARATOR );
+function adjustLines(value, isMultiline) {
+	if (isMultiline) {
+		return replace(value, /\n+/g, LINE_SEPARATOR);
 	}
 
-	return replace( value, new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
+	return replace(value, new RegExp(LINE_SEPARATOR, 'g'), '\n');
 }
 
-export function usePasteHandler( props ) {
-	const propsRef = useRef( props );
+export function usePasteHandler(props) {
+	const propsRef = useRef(props);
 	propsRef.current = props;
-	return useRefEffect( ( element ) => {
-		function _onPaste( event ) {
+	return useRefEffect((element) => {
+		function _onPaste(event) {
 			const {
 				isSelected,
 				disableFormats,
@@ -61,7 +61,7 @@ export function usePasteHandler( props ) {
 				pastePlainText,
 			} = propsRef.current;
 
-			if ( ! isSelected ) {
+			if (!isSelected) {
 				event.preventDefault();
 				return;
 			}
@@ -75,12 +75,12 @@ export function usePasteHandler( props ) {
 			// otherwise throw an invalid argument error, so we try the standard
 			// arguments first, then fallback to `Text` if they fail.
 			try {
-				plainText = clipboardData.getData( 'text/plain' );
-				html = clipboardData.getData( 'text/html' );
-			} catch ( error1 ) {
+				plainText = clipboardData.getData('text/plain');
+				html = clipboardData.getData('text/html');
+			} catch (error1) {
 				try {
-					html = clipboardData.getData( 'Text' );
-				} catch ( error2 ) {
+					html = clipboardData.getData('Text');
+				} catch (error2) {
 					// Some browsers like UC Browser paste plain text by default and
 					// don't support clipboardData at all, so allow default
 					// behaviour.
@@ -89,30 +89,30 @@ export function usePasteHandler( props ) {
 			}
 
 			// Remove Windows-specific metadata appended within copied HTML text.
-			html = removeWindowsFragments( html );
+			html = removeWindowsFragments(html);
 
 			// Strip meta tag.
-			html = removeCharsetMetaTag( html );
+			html = removeCharsetMetaTag(html);
 
 			event.preventDefault();
 
 			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received HTML:\n\n', html );
-			window.console.log( 'Received plain text:\n\n', plainText );
+			window.console.log('Received HTML:\n\n', html);
+			window.console.log('Received plain text:\n\n', plainText);
 
-			if ( disableFormats ) {
-				onChange( insert( value, plainText ) );
+			if (disableFormats) {
+				onChange(insert(value, plainText));
 				return;
 			}
 
 			const transformed = formatTypes.reduce(
-				( accumlator, { __unstablePasteRule } ) => {
+				(accumlator, { __unstablePasteRule }) => {
 					// Only allow one transform.
-					if ( __unstablePasteRule && accumlator === value ) {
-						accumlator = __unstablePasteRule( value, {
+					if (__unstablePasteRule && accumlator === value) {
+						accumlator = __unstablePasteRule(value, {
 							html,
 							plainText,
-						} );
+						});
 					}
 
 					return accumlator;
@@ -120,66 +120,64 @@ export function usePasteHandler( props ) {
 				value
 			);
 
-			if ( transformed !== value ) {
-				onChange( transformed );
+			if (transformed !== value) {
+				onChange(transformed);
 				return;
 			}
 
-			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
-			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
+			const files = [...getFilesFromDataTransfer(clipboardData)];
+			const isInternal = clipboardData.getData('rich-text') === 'true';
 
 			// If the data comes from a rich text instance, we can directly use it
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
-			if ( isInternal ) {
+			if (isInternal) {
 				const pastedMultilineTag =
-					clipboardData.getData( 'rich-text-multi-line-tag' ) ||
+					clipboardData.getData('rich-text-multi-line-tag') ||
 					undefined;
-				let pastedValue = create( {
+				let pastedValue = create({
 					html,
 					multilineTag: pastedMultilineTag,
 					multilineWrapperTags:
-						pastedMultilineTag === 'li'
-							? [ 'ul', 'ol' ]
-							: undefined,
+						pastedMultilineTag === 'li' ? ['ul', 'ol'] : undefined,
 					preserveWhiteSpace,
-				} );
-				pastedValue = adjustLines( pastedValue, !! multilineTag );
-				addActiveFormats( pastedValue, value.activeFormats );
-				onChange( insert( value, pastedValue ) );
+				});
+				pastedValue = adjustLines(pastedValue, !!multilineTag);
+				addActiveFormats(pastedValue, value.activeFormats);
+				onChange(insert(value, pastedValue));
 				return;
 			}
 
-			if ( pastePlainText ) {
-				onChange( insert( value, create( { text: plainText } ) ) );
+			if (pastePlainText) {
+				onChange(insert(value, create({ text: plainText })));
 				return;
 			}
 
 			// Only process file if no HTML is present.
 			// Note: a pasted file may have the URL as plain text.
-			if ( files && files.length && ! html ) {
-				const content = pasteHandler( {
-					HTML: filePasteHandler( files ),
+			if (files && files.length && !html) {
+				const content = pasteHandler({
+					HTML: filePasteHandler(files),
 					mode: 'BLOCKS',
 					tagName,
 					preserveWhiteSpace,
-				} );
+				});
 
 				// Allows us to ask for this information when we get a report.
 				// eslint-disable-next-line no-console
-				window.console.log( 'Received items:\n\n', files );
+				window.console.log('Received items:\n\n', files);
 
-				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content );
+				if (onReplace && isEmpty(value)) {
+					onReplace(content);
 				} else {
-					splitValue( {
+					splitValue({
 						value,
 						pastedBlocks: content,
 						onReplace,
 						onSplit,
 						onSplitMiddle,
 						multilineTag,
-					} );
+					});
 				}
 
 				return;
@@ -191,60 +189,56 @@ export function usePasteHandler( props ) {
 			// on a new line & the content resembles a shortcode.
 			// Otherwise it's going to be detected as inline
 			// and the shortcode won't be replaced.
-			if (
-				mode === 'AUTO' &&
-				isEmpty( value ) &&
-				isShortcode( plainText )
-			) {
+			if (mode === 'AUTO' && isEmpty(value) && isShortcode(plainText)) {
 				mode = 'BLOCKS';
 			}
 
 			if (
 				__unstableEmbedURLOnPaste &&
-				isEmpty( value ) &&
-				isURL( plainText.trim() )
+				isEmpty(value) &&
+				isURL(plainText.trim())
 			) {
 				mode = 'BLOCKS';
 			}
 
-			const content = pasteHandler( {
+			const content = pasteHandler({
 				HTML: html,
 				plainText,
 				mode,
 				tagName,
 				preserveWhiteSpace,
-			} );
+			});
 
-			if ( typeof content === 'string' ) {
-				let valueToInsert = create( { html: content } );
+			if (typeof content === 'string') {
+				let valueToInsert = create({ html: content });
 
 				// If the content should be multiline, we should process text
 				// separated by a line break as separate lines.
-				valueToInsert = adjustLines( valueToInsert, !! multilineTag );
+				valueToInsert = adjustLines(valueToInsert, !!multilineTag);
 
-				addActiveFormats( valueToInsert, value.activeFormats );
-				onChange( insert( value, valueToInsert ) );
-			} else if ( content.length > 0 ) {
-				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content, content.length - 1, -1 );
+				addActiveFormats(valueToInsert, value.activeFormats);
+				onChange(insert(value, valueToInsert));
+			} else if (content.length > 0) {
+				if (onReplace && isEmpty(value)) {
+					onReplace(content, content.length - 1, -1);
 				} else {
-					splitValue( {
+					splitValue({
 						value,
 						pastedBlocks: content,
 						onReplace,
 						onSplit,
 						onSplitMiddle,
 						multilineTag,
-					} );
+					});
 				}
 			}
 		}
 
-		element.addEventListener( 'paste', _onPaste );
+		element.addEventListener('paste', _onPaste);
 		return () => {
-			element.removeEventListener( 'paste', _onPaste );
+			element.removeEventListener('paste', _onPaste);
 		};
-	}, [] );
+	}, []);
 }
 
 /**
@@ -254,11 +248,11 @@ export function usePasteHandler( props ) {
  * @param {string} html the html to be normalized
  * @return {string} the normalized html
  */
-function removeWindowsFragments( html ) {
+function removeWindowsFragments(html) {
 	const startReg = /.*<!--StartFragment-->/s;
 	const endReg = /<!--EndFragment-->.*/s;
 
-	return html.replace( startReg, '' ).replace( endReg, '' );
+	return html.replace(startReg, '').replace(endReg, '');
 }
 
 /**
@@ -270,11 +264,11 @@ function removeWindowsFragments( html ) {
  * @param {string} html the html to be stripped of the meta tag.
  * @return {string} the cleaned html
  */
-function removeCharsetMetaTag( html ) {
+function removeCharsetMetaTag(html) {
 	const metaTag = `<meta charset='utf-8'>`;
 
-	if ( html.startsWith( metaTag ) ) {
-		return html.slice( metaTag.length );
+	if (html.startsWith(metaTag)) {
+		return html.slice(metaTag.length);
 	}
 
 	return html;

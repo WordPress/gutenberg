@@ -25,13 +25,12 @@ import { useEffect } from '@wordpress/element';
  * @param {import('lodash').DebounceSettings} [options] The options object.
  * @return {import('lodash').DebouncedFunc<TFunc>} Debounced function.
  */
-export default function useDebounce( fn, wait, options ) {
+export default function useDebounce(fn, wait, options) {
 	/* eslint-enable jsdoc/valid-types */
-	const debounced = useMemoOne( () => debounce( fn, wait, options ), [
-		fn,
-		wait,
-		options,
-	] );
-	useEffect( () => () => debounced.cancel(), [ debounced ] );
+	const debounced = useMemoOne(
+		() => debounce(fn, wait, options),
+		[fn, wait, options]
+	);
+	useEffect(() => () => debounced.cancel(), [debounced]);
 	return debounced;
 }

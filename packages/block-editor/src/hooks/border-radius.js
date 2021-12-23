@@ -12,13 +12,13 @@ import { removeBorderAttribute } from './border';
  *
  * @return {WPElement} Border radius edit element.
  */
-export function BorderRadiusEdit( props ) {
+export function BorderRadiusEdit(props) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const onChange = ( newRadius ) => {
+	const onChange = (newRadius) => {
 		let newStyle = {
 			...style,
 			border: {
@@ -27,17 +27,17 @@ export function BorderRadiusEdit( props ) {
 			},
 		};
 
-		if ( newRadius === undefined || newRadius === '' ) {
-			newStyle = cleanEmptyObject( newStyle );
+		if (newRadius === undefined || newRadius === '') {
+			newStyle = cleanEmptyObject(newStyle);
 		}
 
-		setAttributes( { style: newStyle } );
+		setAttributes({ style: newStyle });
 	};
 
 	return (
 		<BorderRadiusControl
-			values={ style?.border?.radius }
-			onChange={ onChange }
+			values={style?.border?.radius}
+			onChange={onChange}
 		/>
 	);
 }
@@ -49,14 +49,14 @@ export function BorderRadiusEdit( props ) {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a border radius value set.
  */
-export function hasBorderRadiusValue( props ) {
+export function hasBorderRadiusValue(props) {
 	const borderRadius = props.attributes.style?.border?.radius;
 
-	if ( typeof borderRadius === 'object' ) {
-		return Object.entries( borderRadius ).some( Boolean );
+	if (typeof borderRadius === 'object') {
+		return Object.entries(borderRadius).some(Boolean);
 	}
 
-	return !! borderRadius;
+	return !!borderRadius;
 }
 
 /**
@@ -68,7 +68,7 @@ export function hasBorderRadiusValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetBorderRadius( { attributes = {}, setAttributes } ) {
+export function resetBorderRadius({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
-	setAttributes( { style: removeBorderAttribute( style, 'radius' ) } );
+	setAttributes({ style: removeBorderAttribute(style, 'radius') });
 }

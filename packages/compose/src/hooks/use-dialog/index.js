@@ -30,55 +30,56 @@ import useMergeRefs from '../use-merge-refs';
  *
  * @param {DialogOptions} options Dialog Options.
  */
-function useDialog( options ) {
+function useDialog(options) {
 	/**
 	 * @type {import('react').MutableRefObject<DialogOptions | undefined>}
 	 */
 	const currentOptions = useRef();
-	useEffect( () => {
+	useEffect(() => {
 		currentOptions.current = options;
-	}, Object.values( options ) );
+	}, Object.values(options));
 	const constrainedTabbingRef = useConstrainedTabbing();
-	const focusOnMountRef = useFocusOnMount( options.focusOnMount );
+	const focusOnMountRef = useFocusOnMount(options.focusOnMount);
 	const focusReturnRef = useFocusReturn();
-	const focusOutsideProps = useFocusOutside( ( event ) => {
+	const focusOutsideProps = useFocusOutside((event) => {
 		// This unstable prop  is here only to manage backward compatibility
 		// for the Popover component otherwise, the onClose should be enough.
 		// @ts-ignore unstable property
-		if ( currentOptions.current?.__unstableOnClose ) {
+		if (currentOptions.current?.__unstableOnClose) {
 			// @ts-ignore unstable property
-			currentOptions.current.__unstableOnClose( 'focus-outside', event );
-		} else if ( currentOptions.current?.onClose ) {
+			currentOptions.current.__unstableOnClose('focus-outside', event);
+		} else if (currentOptions.current?.onClose) {
 			currentOptions.current.onClose();
 		}
-	} );
-	const closeOnEscapeRef = useCallback( ( node ) => {
-		if ( ! node ) {
+	});
+	const closeOnEscapeRef = useCallback((node) => {
+		if (!node) {
 			return;
 		}
 
-		node.addEventListener( 'keydown', (
-			/** @type {KeyboardEvent} */ event
-		) => {
-			// Close on escape
-			if (
-				event.keyCode === ESCAPE &&
-				! event.defaultPrevented &&
-				currentOptions.current?.onClose
-			) {
-				event.preventDefault();
-				currentOptions.current.onClose();
+		node.addEventListener(
+			'keydown',
+			(/** @type {KeyboardEvent} */ event) => {
+				// Close on escape
+				if (
+					event.keyCode === ESCAPE &&
+					!event.defaultPrevented &&
+					currentOptions.current?.onClose
+				) {
+					event.preventDefault();
+					currentOptions.current.onClose();
+				}
 			}
-		} );
-	}, [] );
+		);
+	}, []);
 
 	return [
-		useMergeRefs( [
+		useMergeRefs([
 			options.focusOnMount !== false ? constrainedTabbingRef : null,
 			options.focusOnMount !== false ? focusReturnRef : null,
 			options.focusOnMount !== false ? focusOnMountRef : null,
 			closeOnEscapeRef,
-		] ),
+		]),
 		{
 			...focusOutsideProps,
 			tabIndex: '-1',

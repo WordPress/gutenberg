@@ -20,68 +20,68 @@ import { store as editorStore } from '../../store';
 import { AUTHORS_QUERY } from './constants';
 
 function PostAuthorCombobox() {
-	const [ fieldValue, setFieldValue ] = useState();
+	const [fieldValue, setFieldValue] = useState();
 
 	const { authorId, isLoading, authors, postAuthor } = useSelect(
-		( select ) => {
-			const { getUser, getUsers, isResolving } = select( coreStore );
-			const { getEditedPostAttribute } = select( editorStore );
-			const author = getUser( getEditedPostAttribute( 'author' ), {
+		(select) => {
+			const { getUser, getUsers, isResolving } = select(coreStore);
+			const { getEditedPostAttribute } = select(editorStore);
+			const author = getUser(getEditedPostAttribute('author'), {
 				context: 'view',
-			} );
+			});
 			const query = { ...AUTHORS_QUERY };
 
-			if ( fieldValue ) {
+			if (fieldValue) {
 				query.search = fieldValue;
 			}
 
 			return {
-				authorId: getEditedPostAttribute( 'author' ),
+				authorId: getEditedPostAttribute('author'),
 				postAuthor: author,
-				authors: getUsers( query ),
-				isLoading: isResolving( 'core', 'getUsers', [ query ] ),
+				authors: getUsers(query),
+				isLoading: isResolving('core', 'getUsers', [query]),
 			};
 		},
-		[ fieldValue ]
+		[fieldValue]
 	);
-	const { editPost } = useDispatch( editorStore );
+	const { editPost } = useDispatch(editorStore);
 
-	const authorOptions = useMemo( () => {
-		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
+	const authorOptions = useMemo(() => {
+		const fetchedAuthors = (authors ?? []).map((author) => {
 			return {
 				value: author.id,
-				label: decodeEntities( author.name ),
+				label: decodeEntities(author.name),
 			};
-		} );
+		});
 
 		// Ensure the current author is included in the dropdown list.
 		const foundAuthor = fetchedAuthors.findIndex(
-			( { value } ) => postAuthor?.id === value
+			({ value }) => postAuthor?.id === value
 		);
 
-		if ( foundAuthor < 0 && postAuthor ) {
+		if (foundAuthor < 0 && postAuthor) {
 			return [
 				{
 					value: postAuthor.id,
-					label: decodeEntities( postAuthor.name ),
+					label: decodeEntities(postAuthor.name),
 				},
 				...fetchedAuthors,
 			];
 		}
 
 		return fetchedAuthors;
-	}, [ authors, postAuthor ] );
+	}, [authors, postAuthor]);
 
 	/**
 	 * Handle author selection.
 	 *
 	 * @param {number} postAuthorId The selected Author.
 	 */
-	const handleSelect = ( postAuthorId ) => {
-		if ( ! postAuthorId ) {
+	const handleSelect = (postAuthorId) => {
+		if (!postAuthorId) {
 			return;
 		}
-		editPost( { author: postAuthorId } );
+		editPost({ author: postAuthorId });
 	};
 
 	/**
@@ -89,23 +89,23 @@ function PostAuthorCombobox() {
 	 *
 	 * @param {string} inputValue The current value of the input field.
 	 */
-	const handleKeydown = ( inputValue ) => {
-		setFieldValue( inputValue );
+	const handleKeydown = (inputValue) => {
+		setFieldValue(inputValue);
 	};
 
-	if ( ! postAuthor ) {
+	if (!postAuthor) {
 		return null;
 	}
 
 	return (
 		<ComboboxControl
-			label={ __( 'Author' ) }
-			options={ authorOptions }
-			value={ authorId }
-			onFilterValueChange={ debounce( handleKeydown, 300 ) }
-			onChange={ handleSelect }
-			isLoading={ isLoading }
-			allowReset={ false }
+			label={__('Author')}
+			options={authorOptions}
+			value={authorId}
+			onFilterValueChange={debounce(handleKeydown, 300)}
+			onChange={handleSelect}
+			isLoading={isLoading}
+			allowReset={false}
 		/>
 	);
 }

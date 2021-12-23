@@ -14,75 +14,75 @@ import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
 
-function ParagraphBlock( {
+function ParagraphBlock({
 	attributes,
 	mergeBlocks,
 	onReplace,
 	setAttributes,
 	style,
 	clientId,
-} ) {
-	const isRTL = useSelect( ( select ) => {
-		return !! select( blockEditorStore ).getSettings().isRTL;
-	}, [] );
+}) {
+	const isRTL = useSelect((select) => {
+		return !!select(blockEditorStore).getSettings().isRTL;
+	}, []);
 
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
-		...( style?.baseColors && {
+		...(style?.baseColors && {
 			color: style.baseColors?.color?.text,
 			placeholderColor: style.color || style.baseColors?.color?.text,
 			linkColor: style.baseColors?.elements?.link?.color?.text,
-		} ),
+		}),
 		...style,
 	};
 
-	const onAlignmentChange = useCallback( ( nextAlign ) => {
-		setAttributes( { align: nextAlign } );
-	}, [] );
+	const onAlignmentChange = useCallback((nextAlign) => {
+		setAttributes({ align: nextAlign });
+	}, []);
 	return (
 		<>
 			<BlockControls group="block">
 				<AlignmentControl
-					value={ align }
-					isRTL={ isRTL }
-					onChange={ onAlignmentChange }
+					value={align}
+					isRTL={isRTL}
+					onChange={onAlignmentChange}
 				/>
 			</BlockControls>
 			<RichText
 				identifier="content"
 				tagName="p"
-				value={ content }
-				deleteEnter={ true }
-				style={ styles }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
+				value={content}
+				deleteEnter={true}
+				style={styles}
+				onChange={(nextContent) => {
+					setAttributes({
 						content: nextContent,
-					} );
-				} }
-				onSplit={ ( value, isOriginal ) => {
+					});
+				}}
+				onSplit={(value, isOriginal) => {
 					let newAttributes;
 
-					if ( isOriginal || value ) {
+					if (isOriginal || value) {
 						newAttributes = {
 							...attributes,
 							content: value,
 						};
 					}
 
-					const block = createBlock( name, newAttributes );
+					const block = createBlock(name, newAttributes);
 
-					if ( isOriginal ) {
+					if (isOriginal) {
 						block.clientId = clientId;
 					}
 
 					return block;
-				} }
-				onMerge={ mergeBlocks }
-				onReplace={ onReplace }
-				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-				placeholder={ placeholder || __( 'Start writing…' ) }
-				textAlign={ align }
+				}}
+				onMerge={mergeBlocks}
+				onReplace={onReplace}
+				onRemove={onReplace ? () => onReplace([]) : undefined}
+				placeholder={placeholder || __('Start writing…')}
+				textAlign={align}
 				__unstableEmbedURLOnPaste
 			/>
 		</>

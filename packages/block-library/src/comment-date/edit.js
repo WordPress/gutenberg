@@ -24,83 +24,83 @@ import { __, _x } from '@wordpress/i18n';
  *
  * @return {JSX.Element} React element.
  */
-export default function Edit( {
+export default function Edit({
 	attributes: { format, isLink },
 	context: { commentId },
 	setAttributes,
-} ) {
+}) {
 	const blockProps = useBlockProps();
-	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
-	const [ siteDateFormat ] = useEntityProp( 'root', 'site', 'date_format' );
+	const [date] = useEntityProp('root', 'comment', 'date', commentId);
+	const [siteDateFormat] = useEntityProp('root', 'site', 'date_format');
 
 	const settings = __experimentalGetSettings();
-	const formatOptions = Object.values( settings.formats ).map(
-		( formatOption ) => ( {
+	const formatOptions = Object.values(settings.formats).map(
+		(formatOption) => ({
 			key: formatOption,
-			name: dateI18n( formatOption, date || new Date() ),
-		} )
+			name: dateI18n(formatOption, date || new Date()),
+		})
 	);
 	const resolvedFormat = format || siteDateFormat || settings.formats.date;
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Format settings' ) }>
+			<PanelBody title={__('Format settings')}>
 				<CustomSelectControl
 					hideLabelFromVision
-					label={ __( 'Date Format' ) }
-					options={ formatOptions }
-					onChange={ ( { selectedItem } ) =>
-						setAttributes( {
+					label={__('Date Format')}
+					options={formatOptions}
+					onChange={({ selectedItem }) =>
+						setAttributes({
 							format: selectedItem.key,
-						} )
+						})
 					}
-					value={ formatOptions.find(
-						( option ) => option.key === resolvedFormat
-					) }
+					value={formatOptions.find(
+						(option) => option.key === resolvedFormat
+					)}
 				/>
 			</PanelBody>
-			<PanelBody title={ __( 'Link settings' ) }>
+			<PanelBody title={__('Link settings')}>
 				<ToggleControl
-					label={ __( 'Link to comment' ) }
-					onChange={ () => setAttributes( { isLink: ! isLink } ) }
-					checked={ isLink }
+					label={__('Link to comment')}
+					onChange={() => setAttributes({ isLink: !isLink })}
+					checked={isLink}
 				/>
 			</PanelBody>
 		</InspectorControls>
 	);
 
-	if ( ! commentId || ! date ) {
+	if (!commentId || !date) {
 		return (
 			<>
-				{ inspectorControls }
-				<div { ...blockProps }>
-					<p>{ _x( 'Comment Date', 'block title' ) }</p>
+				{inspectorControls}
+				<div {...blockProps}>
+					<p>{_x('Comment Date', 'block title')}</p>
 				</div>
 			</>
 		);
 	}
 
 	let commentDate = (
-		<time dateTime={ dateI18n( 'c', date ) }>
-			{ dateI18n( resolvedFormat, date ) }
+		<time dateTime={dateI18n('c', date)}>
+			{dateI18n(resolvedFormat, date)}
 		</time>
 	);
 
-	if ( isLink ) {
+	if (isLink) {
 		commentDate = (
 			<a
 				href="#comment-date-pseudo-link"
-				onClick={ ( event ) => event.preventDefault() }
+				onClick={(event) => event.preventDefault()}
 			>
-				{ commentDate }
+				{commentDate}
 			</a>
 		);
 	}
 
 	return (
 		<>
-			{ inspectorControls }
-			<div { ...blockProps }>{ commentDate }</div>
+			{inspectorControls}
+			<div {...blockProps}>{commentDate}</div>
 		</>
 	);
 }

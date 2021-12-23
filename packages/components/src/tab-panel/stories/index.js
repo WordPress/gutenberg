@@ -20,20 +20,20 @@ export const _default = () => {
 	return (
 		<TabPanel
 			className="my-tab-panel"
-			tabs={ [
+			tabs={[
 				{
 					name: 'tab1',
-					title: text( 'Tab 1 title', 'Tab 1' ),
+					title: text('Tab 1 title', 'Tab 1'),
 					className: 'tab-one',
 				},
 				{
 					name: 'tab2',
-					title: text( 'Tab 2 title', 'Tab 2' ),
+					title: text('Tab 2 title', 'Tab 2'),
 					className: 'tab-two',
 				},
-			] }
+			]}
 		>
-			{ ( tab ) => <p>Selected tab: { tab.title }</p> }
+			{(tab) => <p>Selected tab: {tab.title}</p>}
 		</TabPanel>
 	);
 };

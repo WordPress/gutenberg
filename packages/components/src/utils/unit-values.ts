@@ -1,4 +1,5 @@
-const UNITED_VALUE_REGEX = /^([\d.\-+]*)\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax|%|cap|ic|rlh|vi|vb|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?$/;
+const UNITED_VALUE_REGEX =
+	/^([\d.\-+]*)\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax|%|cap|ic|rlh|vi|vb|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?$/;
 
 /**
  * Parses a number and unit from a value.
@@ -9,18 +10,18 @@ const UNITED_VALUE_REGEX = /^([\d.\-+]*)\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|
  */
 export function parseCSSUnitValue(
 	toParse: string
-): [ number | undefined, string | undefined ] {
+): [number | undefined, string | undefined] {
 	const value = toParse.trim();
 
-	const matched = value.match( UNITED_VALUE_REGEX );
-	if ( ! matched ) {
-		return [ undefined, undefined ];
+	const matched = value.match(UNITED_VALUE_REGEX);
+	if (!matched) {
+		return [undefined, undefined];
 	}
-	const [ , num, unit ] = matched;
-	let numParsed: number | undefined = parseFloat( num );
-	numParsed = Number.isNaN( numParsed ) ? undefined : numParsed;
+	const [, num, unit] = matched;
+	let numParsed: number | undefined = parseFloat(num);
+	numParsed = Number.isNaN(numParsed) ? undefined : numParsed;
 
-	return [ numParsed, unit ];
+	return [numParsed, unit];
 }
 
 /**
@@ -35,5 +36,5 @@ export function createCSSUnitValue(
 	value: string | number,
 	unit: string
 ): string {
-	return `${ value }${ unit }`;
+	return `${value}${unit}`;
 }

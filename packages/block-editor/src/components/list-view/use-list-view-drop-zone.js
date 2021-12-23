@@ -56,7 +56,7 @@ import { store as blockEditorStore } from '../../store';
  *
  * @return {boolean} True if the point is contained by the rectangle, false otherwise.
  */
-function isPointContainedByRect( point, rect ) {
+function isPointContainedByRect(point, rect) {
 	return (
 		rect.left <= point.x &&
 		rect.right >= point.x &&
@@ -75,14 +75,14 @@ function isPointContainedByRect( point, rect ) {
  * @param {WPPoint} point The point representing the cursor position when dragging.
  * @param {DOMRect} rect  The rectangle.
  */
-function isNestingGesture( point, rect ) {
+function isNestingGesture(point, rect) {
 	const blockCenterX = rect.left + rect.width / 2;
 	return point.x > blockCenterX;
 }
 
 // Block navigation is always a vertical list, so only allow dropping
 // to the above or below a block.
-const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
+const ALLOWED_DROP_EDGES = ['top', 'bottom'];
 
 /**
  * Given blocks data and the cursor position, compute the drop target.
@@ -92,25 +92,25 @@ const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
  *
  * @return {WPListViewDropZoneTarget} An object containing data about the drop target.
  */
-function getListViewDropTarget( blocksData, position ) {
+function getListViewDropTarget(blocksData, position) {
 	let candidateEdge;
 	let candidateBlockData;
 	let candidateDistance;
 	let candidateRect;
 
-	for ( const blockData of blocksData ) {
-		if ( blockData.isDraggedBlock ) {
+	for (const blockData of blocksData) {
+		if (blockData.isDraggedBlock) {
 			continue;
 		}
 
 		const rect = blockData.element.getBoundingClientRect();
-		const [ distance, edge ] = getDistanceToNearestEdge(
+		const [distance, edge] = getDistanceToNearestEdge(
 			position,
 			rect,
 			ALLOWED_DROP_EDGES
 		);
 
-		const isCursorWithinBlock = isPointContainedByRect( position, rect );
+		const isCursorWithinBlock = isPointContainedByRect(position, rect);
 		if (
 			candidateDistance === undefined ||
 			distance < candidateDistance ||
@@ -118,8 +118,8 @@ function getListViewDropTarget( blocksData, position ) {
 		) {
 			candidateDistance = distance;
 
-			const index = blocksData.indexOf( blockData );
-			const previousBlockData = blocksData[ index - 1 ];
+			const index = blocksData.indexOf(blockData);
+			const previousBlockData = blocksData[index - 1];
 
 			// If dragging near the top of a block and the preceding block
 			// is at the same level, use the preceding block as the candidate
@@ -128,11 +128,12 @@ function getListViewDropTarget( blocksData, position ) {
 				edge === 'top' &&
 				previousBlockData &&
 				previousBlockData.rootClientId === blockData.rootClientId &&
-				! previousBlockData.isDraggedBlock
+				!previousBlockData.isDraggedBlock
 			) {
 				candidateBlockData = previousBlockData;
 				candidateEdge = 'bottom';
-				candidateRect = previousBlockData.element.getBoundingClientRect();
+				candidateRect =
+					previousBlockData.element.getBoundingClientRect();
 			} else {
 				candidateBlockData = blockData;
 				candidateEdge = edge;
@@ -145,13 +146,13 @@ function getListViewDropTarget( blocksData, position ) {
 			//
 			// This solves an issue where some rows in the list view
 			// tree overlap slightly due to sub-pixel rendering.
-			if ( isCursorWithinBlock ) {
+			if (isCursorWithinBlock) {
 				break;
 			}
 		}
 	}
 
-	if ( ! candidateBlockData ) {
+	if (!candidateBlockData) {
 		return;
 	}
 
@@ -164,8 +165,8 @@ function getListViewDropTarget( blocksData, position ) {
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		( candidateBlockData.innerBlockCount > 0 ||
-			isNestingGesture( position, candidateRect ) )
+		(candidateBlockData.innerBlockCount > 0 ||
+			isNestingGesture(position, candidateRect))
 	) {
 		return {
 			rootClientId: candidateBlockData.clientId,
@@ -176,7 +177,7 @@ function getListViewDropTarget( blocksData, position ) {
 
 	// If dropping as a sibling, but block cannot be inserted in
 	// this context, return early.
-	if ( ! candidateBlockData.canInsertDraggedBlocksAsSibling ) {
+	if (!candidateBlockData.canInsertDraggedBlocksAsSibling) {
 		return;
 	}
 
@@ -201,37 +202,37 @@ export default function useListViewDropZone() {
 		getBlockCount,
 		getDraggedBlockClientIds,
 		canInsertBlocks,
-	} = useSelect( blockEditorStore );
-	const [ target, setTarget ] = useState();
+	} = useSelect(blockEditorStore);
+	const [target, setTarget] = useState();
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};
 
-	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+	const onBlockDrop = useOnBlockDrop(targetRootClientId, targetBlockIndex);
 
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
 		useCallback(
-			( event, currentTarget ) => {
+			(event, currentTarget) => {
 				const position = { x: event.clientX, y: event.clientY };
-				const isBlockDrag = !! draggedBlockClientIds?.length;
+				const isBlockDrag = !!draggedBlockClientIds?.length;
 
 				const blockElements = Array.from(
-					currentTarget.querySelectorAll( '[data-block]' )
+					currentTarget.querySelectorAll('[data-block]')
 				);
 
-				const blocksData = blockElements.map( ( blockElement ) => {
+				const blocksData = blockElements.map((blockElement) => {
 					const clientId = blockElement.dataset.block;
-					const rootClientId = getBlockRootClientId( clientId );
+					const rootClientId = getBlockRootClientId(clientId);
 
 					return {
 						clientId,
 						rootClientId,
-						blockIndex: getBlockIndex( clientId ),
+						blockIndex: getBlockIndex(clientId),
 						element: blockElement,
 						isDraggedBlock: isBlockDrag
-							? draggedBlockClientIds.includes( clientId )
+							? draggedBlockClientIds.includes(clientId)
 							: false,
-						innerBlockCount: getBlockCount( clientId ),
+						innerBlockCount: getBlockCount(clientId),
 						canInsertDraggedBlocksAsSibling: isBlockDrag
 							? canInsertBlocks(
 									draggedBlockClientIds,
@@ -239,35 +240,35 @@ export default function useListViewDropZone() {
 							  )
 							: true,
 						canInsertDraggedBlocksAsChild: isBlockDrag
-							? canInsertBlocks( draggedBlockClientIds, clientId )
+							? canInsertBlocks(draggedBlockClientIds, clientId)
 							: true,
 					};
-				} );
+				});
 
-				const newTarget = getListViewDropTarget( blocksData, position );
+				const newTarget = getListViewDropTarget(blocksData, position);
 
-				if ( newTarget ) {
-					setTarget( newTarget );
+				if (newTarget) {
+					setTarget(newTarget);
 				}
 			},
-			[ draggedBlockClientIds ]
+			[draggedBlockClientIds]
 		),
 		200
 	);
 
-	const ref = useDropZone( {
+	const ref = useDropZone({
 		onDrop: onBlockDrop,
-		onDragOver( event ) {
+		onDragOver(event) {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-			throttled( event, event.currentTarget );
+			throttled(event, event.currentTarget);
 		},
 		onDragEnd() {
 			throttled.cancel();
-			setTarget( null );
+			setTarget(null);
 		},
-	} );
+	});
 
 	return { ref, target };
 }

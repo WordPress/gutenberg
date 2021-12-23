@@ -6,29 +6,29 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
 
-const { Fill, Slot } = createSlotFill( 'SettingsToolbarButton' );
+const { Fill, Slot } = createSlotFill('SettingsToolbarButton');
 
-const SettingsButton = ( { openGeneralSidebar } ) => (
+const SettingsButton = ({ openGeneralSidebar }) => (
 	<ToolbarButton
-		title={ __( 'Open Settings' ) }
-		icon={ cog }
-		onClick={ openGeneralSidebar }
+		title={__('Open Settings')}
+		icon={cog}
+		onClick={openGeneralSidebar}
 	/>
 );
 
-const SettingsButtonFill = ( props ) => (
+const SettingsButtonFill = (props) => (
 	<Fill>
-		<SettingsButton { ...props } />
+		<SettingsButton {...props} />
 	</Fill>
 );
 
-const SettingsToolbarButton = withDispatch( ( dispatch ) => {
-	const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+const SettingsToolbarButton = withDispatch((dispatch) => {
+	const { openGeneralSidebar } = dispatch('core/edit-post');
 
 	return {
-		openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
+		openGeneralSidebar: () => openGeneralSidebar('edit-post/block'),
 	};
-} )( SettingsButtonFill );
+})(SettingsButtonFill);
 
 SettingsToolbarButton.Slot = Slot;
 

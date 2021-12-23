@@ -1,30 +1,29 @@
 /**
  * External dependencies
  */
-const snapshotDiff = require( 'snapshot-diff' );
+const snapshotDiff = require('snapshot-diff');
 
-const getStyleSheets = () =>
-	Array.from( document.getElementsByTagName( 'style' ) );
+const getStyleSheets = () => Array.from(document.getElementsByTagName('style'));
 
 /**
  *
  * @param {Element}            element
  * @param {HTMLStyleElement[]} styleSheets
  */
-const getStyleRulesForElement = ( element, styleSheets ) => {
-	return styleSheets.reduce( ( matchingRules, styleSheet ) => {
+const getStyleRulesForElement = (element, styleSheets) => {
+	return styleSheets.reduce((matchingRules, styleSheet) => {
 		const found = [];
 
 		try {
-			Array.from( styleSheet.sheet.cssRules ).forEach( ( rule ) => {
-				if ( element.matches( rule.selectorText ) ) {
-					found.push( rule.style );
+			Array.from(styleSheet.sheet.cssRules).forEach((rule) => {
+				if (element.matches(rule.selectorText)) {
+					found.push(rule.style);
 				}
-			} );
-		} catch ( e ) {}
+			});
+		} catch (e) {}
 
-		return [ ...matchingRules, ...found ];
-	}, [] );
+		return [...matchingRules, ...found];
+	}, []);
 };
 
 /*
@@ -46,13 +45,13 @@ const getStyleRulesForElement = ( element, styleSheets ) => {
  * With that information, we can figure out the necessary key/value pairs
  * we need for the cleaned up style rule.
  */
-const cleanStyleRule = ( rule ) => {
-	const size = Array.from( Array( rule.length ).keys() );
-	const rules = size.reduce( ( acc, i ) => {
-		const key = rule[ i ];
-		const value = rule[ key ];
-		return { ...acc, [ key ]: value };
-	}, {} );
+const cleanStyleRule = (rule) => {
+	const size = Array.from(Array(rule.length).keys());
+	const rules = size.reduce((acc, i) => {
+		const key = rule[i];
+		const value = rule[key];
+		return { ...acc, [key]: value };
+	}, {});
 
 	return rules;
 };
@@ -62,12 +61,12 @@ const cleanStyleRule = ( rule ) => {
  * @param {Element} expected
  * @param {string}  testName
  */
-function toMatchStyleDiffSnapshot( received, expected, testName ) {
+function toMatchStyleDiffSnapshot(received, expected, testName) {
 	const styleSheets = getStyleSheets();
-	const receivedStyles = getStyleRulesForElement( received, styleSheets ).map(
+	const receivedStyles = getStyleRulesForElement(received, styleSheets).map(
 		cleanStyleRule
 	);
-	const expectedStyles = getStyleRulesForElement( expected, styleSheets ).map(
+	const expectedStyles = getStyleRulesForElement(expected, styleSheets).map(
 		cleanStyleRule
 	);
 	return snapshotDiff.toMatchDiffSnapshot.call(
@@ -82,4 +81,4 @@ function toMatchStyleDiffSnapshot( received, expected, testName ) {
 	);
 }
 
-expect.extend( { toMatchStyleDiffSnapshot } );
+expect.extend({ toMatchStyleDiffSnapshot });

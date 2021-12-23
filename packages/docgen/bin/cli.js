@@ -3,9 +3,9 @@
 /**
  * Internal dependencies
  */
-const docgen = require( '../lib' );
+const docgen = require('../lib');
 
-const optionator = require( 'optionator' )( {
+const optionator = require('optionator')({
 	prepend: 'Usage: node <path-to-docgen> <relative-path-to-entry-point>',
 	options: [
 		{
@@ -54,7 +54,7 @@ const optionator = require( 'optionator' )( {
 				'Run in debug mode, which outputs some intermediate files useful for debugging.',
 		},
 	],
-} );
+});
 
-const options = optionator.parseArgv( process.argv );
-process.exit( docgen( options._[ 0 ], options ) );
+const options = optionator.parseArgv(process.argv);
+process.exit(docgen(options._[0], options));

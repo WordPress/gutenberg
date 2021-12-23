@@ -10,14 +10,14 @@ import { TouchableOpacity, Text, Linking } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { external, Icon } from '@wordpress/icons';
 
-export function ExternalLink( { href, children } ) {
+export function ExternalLink({ href, children }) {
 	return (
 		<TouchableOpacity
-			onPress={ () => Linking.openURL( href ) }
-			accessibilityLabel={ __( 'Open link in a browser' ) }
+			onPress={() => Linking.openURL(href)}
+			accessibilityLabel={__('Open link in a browser')}
 		>
-			<Text>{ children }</Text>
-			<Icon icon={ external } />
+			<Text>{children}</Text>
+			<Icon icon={external} />
 		</TouchableOpacity>
 	);
 }

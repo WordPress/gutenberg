@@ -1,22 +1,22 @@
 /**
  * External dependencies
  */
-const glob = require( 'glob' ).sync;
+const glob = require('glob').sync;
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
-if ( process.env.TEST_RN_PLATFORM ) {
+if (process.env.TEST_RN_PLATFORM) {
 	// eslint-disable-next-line no-console
-	console.log( 'Setting RN platform to: ' + process.env.TEST_RN_PLATFORM );
+	console.log('Setting RN platform to: ' + process.env.TEST_RN_PLATFORM);
 } else {
 	// eslint-disable-next-line no-console
-	console.log( 'Setting RN platform to: default (' + defaultPlatform + ')' );
+	console.log('Setting RN platform to: default (' + defaultPlatform + ')');
 }
 
 const configPath = 'test/native';
 
-const transpiledPackageNames = glob( '../../packages/*/src/index.js' ).map(
-	( fileName ) => fileName.split( '/' )[ 3 ]
+const transpiledPackageNames = glob('../../packages/*/src/index.js').map(
+	(fileName) => fileName.split('/')[3]
 );
 
 module.exports = {
@@ -52,9 +52,8 @@ module.exports = {
 		'\\.(scss)$': '<rootDir>/' + configPath + '/__mocks__/styleMock.js',
 		'\\.(eot|otf|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
 			'<rootDir>/' + configPath + '/__mocks__/fileMock.js',
-		[ `@wordpress\\/(${ transpiledPackageNames.join(
-			'|'
-		) })$` ]: '<rootDir>/packages/$1/src',
+		[`@wordpress\\/(${transpiledPackageNames.join('|')})$`]:
+			'<rootDir>/packages/$1/src',
 		'test/helpers$': '<rootDir>/test/native/helpers.js',
 	},
 	modulePathIgnorePatterns: [
@@ -62,7 +61,7 @@ module.exports = {
 	],
 	haste: {
 		defaultPlatform: rnPlatform,
-		platforms: [ 'android', 'ios', 'native' ],
+		platforms: ['android', 'ios', 'native'],
 	},
 	transformIgnorePatterns: [
 		// This is required for now to have jest transform some of our modules
@@ -75,5 +74,5 @@ module.exports = {
 		'enzyme-to-json/serializer',
 		'@emotion/jest/serializer',
 	],
-	reporters: [ 'default', 'jest-junit' ],
+	reporters: ['default', 'jest-junit'],
 };

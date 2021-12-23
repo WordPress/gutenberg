@@ -17,9 +17,9 @@ import {
 import warn from '@wordpress/warning';
 
 export const ComponentsContext = createContext(
-	/** @type {Record<string, any>} */ ( {} )
+	/** @type {Record<string, any>} */ ({})
 );
-export const useComponentsContext = () => useContext( ComponentsContext );
+export const useComponentsContext = () => useContext(ComponentsContext);
 
 /**
  * Runs an effect only on update (i.e., ignores the first render)
@@ -27,15 +27,15 @@ export const useComponentsContext = () => useContext( ComponentsContext );
  * @param {import('react').EffectCallback} effect
  * @param {import('react').DependencyList} deps
  */
-function useUpdateEffect( effect, deps ) {
-	const mounted = useRef( false );
-	useEffect( () => {
-		if ( mounted.current ) {
+function useUpdateEffect(effect, deps) {
+	const mounted = useRef(false);
+	useEffect(() => {
+		if (mounted.current) {
 			return effect();
 		}
 		mounted.current = true;
 		return undefined;
-	}, deps );
+	}, deps);
 }
 
 /**
@@ -47,21 +47,21 @@ function useUpdateEffect( effect, deps ) {
  * @param {Record<string, any>} props.value
  * @return {Record<string, any>} The consolidated value.
  */
-function useContextSystemBridge( { value } ) {
+function useContextSystemBridge({ value }) {
 	const parentContext = useComponentsContext();
 
-	const valueRef = useRef( value );
+	const valueRef = useRef(value);
 
-	useUpdateEffect( () => {
+	useUpdateEffect(() => {
 		if (
 			// objects are equivalent
-			isEqual( valueRef.current, value ) &&
+			isEqual(valueRef.current, value) &&
 			// but not the same reference
 			valueRef.current !== value
 		) {
-			warn( `Please memoize your context: ${ JSON.stringify( value ) }` );
+			warn(`Please memoize your context: ${JSON.stringify(value)}`);
 		}
-	}, [ value ] );
+	}, [value]);
 
 	// `parentContext` will always be memoized (i.e., the result of this hook itself)
 	// or the default value from when the `ComponentsContext` was originally
@@ -75,9 +75,9 @@ function useContextSystemBridge( { value } ) {
 	// correctly warning when the `value` isn't being properly memoized. All of that to say
 	// that this should be super safe to assume that `useMemo` will only run on actual
 	// changes to the two dependencies, therefore saving us calls to `merge` and `cloneDeep`!
-	const config = useMemo( () => {
-		return merge( cloneDeep( parentContext ), value );
-	}, [ parentContext, value ] );
+	const config = useMemo(() => {
+		return merge(cloneDeep(parentContext), value);
+	}, [parentContext, value]);
 
 	return config;
 }
@@ -99,14 +99,14 @@ function useContextSystemBridge( { value } ) {
  * @param {T}                         options.value    Props to render into connected components.
  * @return {JSX.Element} A Provider wrapped component.
  */
-const BaseContextSystemProvider = ( { children, value } ) => {
-	const contextValue = useContextSystemBridge( { value } );
+const BaseContextSystemProvider = ({ children, value }) => {
+	const contextValue = useContextSystemBridge({ value });
 
 	return (
-		<ComponentsContext.Provider value={ contextValue }>
-			{ children }
+		<ComponentsContext.Provider value={contextValue}>
+			{children}
 		</ComponentsContext.Provider>
 	);
 };
 
-export const ContextSystemProvider = memo( BaseContextSystemProvider );
+export const ContextSystemProvider = memo(BaseContextSystemProvider);

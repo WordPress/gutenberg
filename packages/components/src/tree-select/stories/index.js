@@ -21,27 +21,20 @@ export default {
 	},
 };
 
-const TreeSelectWithState = ( props ) => {
-	const [ selection, setSelection ] = useState();
+const TreeSelectWithState = (props) => {
+	const [selection, setSelection] = useState();
 
 	return (
-		<TreeSelect
-			{ ...props }
-			onChange={ setSelection }
-			selectedId={ selection }
-		/>
+		<TreeSelect {...props} onChange={setSelection} selectedId={selection} />
 	);
 };
 
 export const _default = () => {
-	const label = text( 'Label', 'Label Text' );
-	const noOptionLabel = text( 'No Option Label', 'No parent page' );
-	const hideLabelFromVision = boolean( 'Hide Label From Vision', false );
-	const help = text(
-		'Help Text',
-		'Help text to explain the select control.'
-	);
-	const tree = object( 'Tree', [
+	const label = text('Label', 'Label Text');
+	const noOptionLabel = text('No Option Label', 'No parent page');
+	const hideLabelFromVision = boolean('Hide Label From Vision', false);
+	const help = text('Help Text', 'Help text to explain the select control.');
+	const tree = object('Tree', [
 		{
 			name: 'Page 1',
 			id: 'p1',
@@ -66,15 +59,15 @@ export const _default = () => {
 				},
 			],
 		},
-	] );
+	]);
 
 	return (
 		<TreeSelectWithState
-			label={ label }
-			noOptionLabel={ noOptionLabel }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			tree={ tree }
+			label={label}
+			noOptionLabel={noOptionLabel}
+			hideLabelFromVision={hideLabelFromVision}
+			help={help}
+			tree={tree}
 		/>
 	);
 };

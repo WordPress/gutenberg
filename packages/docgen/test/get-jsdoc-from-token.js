@@ -1,20 +1,19 @@
 /**
  * Internal dependencies
  */
-const getJSDocFromToken = require( '../lib/get-jsdoc-from-token' );
+const getJSDocFromToken = require('../lib/get-jsdoc-from-token');
 
-describe( 'JSDoc', () => {
-	it( 'extracts description and tags', () => {
+describe('JSDoc', () => {
+	it('extracts description and tags', () => {
 		expect(
-			getJSDocFromToken( {
+			getJSDocFromToken({
 				leadingComments: [
 					{
-						value:
-							'*\n * A function that adds two parameters.\n *\n * @deprecated Use native addition instead.\n * @since v2\n *\n * @see addition\n * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators\n *\n * @param {number} firstParam The first param to add.\n * @param {number} secondParam The second param to add.\n *\n *  @example\n *\n * ```js\n * const addResult = sum( 1, 3 );\n * console.log( addResult ); // will yield 4\n * ```\n *\n * @return {number} The result of adding the two params.\n ',
+						value: '*\n * A function that adds two parameters.\n *\n * @deprecated Use native addition instead.\n * @since v2\n *\n * @see addition\n * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators\n *\n * @param {number} firstParam The first param to add.\n * @param {number} secondParam The second param to add.\n *\n *  @example\n *\n * ```js\n * const addResult = sum( 1, 3 );\n * console.log( addResult ); // will yield 4\n * ```\n *\n * @return {number} The result of adding the two params.\n ',
 					},
 				],
-			} )
-		).toMatchObject( {
+			})
+		).toMatchObject({
 			description: 'A function that adds two parameters.\n',
 			tags: [
 				{
@@ -32,8 +31,7 @@ describe( 'JSDoc', () => {
 				},
 				{
 					tag: 'link',
-					name:
-						'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators',
+					name: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators',
 				},
 				{
 					tag: 'param',
@@ -60,18 +58,17 @@ describe( 'JSDoc', () => {
 					type: 'number',
 				},
 			],
-		} );
+		});
 
 		expect(
-			getJSDocFromToken( {
+			getJSDocFromToken({
 				leadingComments: [
 					{
-						value:
-							'*\n * Constant to document the meaning of life,\n * the universe and everything else.\n *\n * @type {number}\n ',
+						value: '*\n * Constant to document the meaning of life,\n * the universe and everything else.\n *\n * @type {number}\n ',
 					},
 				],
-			} )
-		).toMatchObject( {
+			})
+		).toMatchObject({
 			description:
 				'Constant to document the meaning of life,\nthe universe and everything else.\n',
 			tags: [
@@ -82,18 +79,17 @@ describe( 'JSDoc', () => {
 					type: 'number',
 				},
 			],
-		} );
+		});
 
 		expect(
-			getJSDocFromToken( {
+			getJSDocFromToken({
 				leadingComments: [
 					{
-						value:
-							'*\n * Function invoking callback after delay with current timestamp in milliseconds since epoch.\n * @param {(timestamp:number)=>void} callback Callback function.\n ',
+						value: '*\n * Function invoking callback after delay with current timestamp in milliseconds since epoch.\n * @param {(timestamp:number)=>void} callback Callback function.\n ',
 					},
 				],
-			} )
-		).toMatchObject( {
+			})
+		).toMatchObject({
 			description:
 				'Function invoking callback after delay with current timestamp in milliseconds since epoch.',
 			tags: [
@@ -104,10 +100,10 @@ describe( 'JSDoc', () => {
 					type: '(timestamp:number)=>void',
 				},
 			],
-		} );
+		});
 
 		expect(
-			getJSDocFromToken( { leadingComments: [ { value: '' } ] } )
+			getJSDocFromToken({ leadingComments: [{ value: '' }] })
 		).toBeUndefined();
-	} );
-} );
+	});
+});

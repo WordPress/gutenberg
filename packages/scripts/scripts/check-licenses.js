@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-const spawn = require( 'cross-spawn' );
-const { existsSync, readFileSync } = require( 'fs' );
-const chalk = require( 'chalk' );
+const spawn = require('cross-spawn');
+const { existsSync, readFileSync } = require('fs');
+const chalk = require('chalk');
 
 /**
  * Internal dependencies
  */
-const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
+const { getArgFromCLI, hasArgInCLI } = require('../utils');
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that
@@ -19,18 +19,18 @@ const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
  * reviewed and approved.
  */
 
-const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
-const WARNING = chalk.reset.inverse.bold.yellow( ' WARNING ' );
+const ERROR = chalk.reset.inverse.bold.red(' ERROR ');
+const WARNING = chalk.reset.inverse.bold.yellow(' WARNING ');
 
-const prod = hasArgInCLI( '--prod' ) || hasArgInCLI( '--production' );
-const dev = hasArgInCLI( '--dev' ) || hasArgInCLI( '--development' );
-const gpl2 = hasArgInCLI( '--gpl2' );
-const ignored = hasArgInCLI( '--ignore' )
-	? getArgFromCLI( '--ignore' )
+const prod = hasArgInCLI('--prod') || hasArgInCLI('--production');
+const dev = hasArgInCLI('--dev') || hasArgInCLI('--development');
+const gpl2 = hasArgInCLI('--gpl2');
+const ignored = hasArgInCLI('--ignore')
+	? getArgFromCLI('--ignore')
 			// "--ignore=a, b" -> "[ 'a', ' b' ]"
-			.split( ',' )
+			.split(',')
 			// "[ 'a', ' b' ]" -> "[ 'a', 'b' ]"
-			.map( ( moduleName ) => moduleName.trim() )
+			.map((moduleName) => moduleName.trim())
 	: [];
 
 /*
@@ -79,10 +79,7 @@ const otherOssLicenses = [
 	'Python-2.0',
 ];
 
-const licenses = [
-	...gpl2CompatibleLicenses,
-	...( gpl2 ? [] : otherOssLicenses ),
-];
+const licenses = [...gpl2CompatibleLicenses, ...(gpl2 ? [] : otherOssLicenses)];
 
 /*
  * Some packages don't included a license string in their package.json file, but they
@@ -105,11 +102,11 @@ const licenseFiles = [
  * and their matching license.
  */
 const licenseFileStrings = {
-	'Apache-2.0': [ 'Licensed under the Apache License, Version 2.0' ],
+	'Apache-2.0': ['Licensed under the Apache License, Version 2.0'],
 	BSD: [
 		'Redistributions in binary form must reproduce the above copyright notice,',
 	],
-	'BSD-3-Clause-W3C': [ 'W3C 3-clause BSD License' ],
+	'BSD-3-Clause-W3C': ['W3C 3-clause BSD License'],
 	MIT: [
 		'Permission is hereby granted, free of charge,',
 		'## License\n\nMIT',
@@ -128,8 +125,8 @@ const licenseFileStrings = {
  *
  * @return {boolean} true if the licenseType matches the allowedLicense, false if it doesn't.
  */
-const checkLicense = ( allowedLicense, licenseType ) => {
-	if ( ! licenseType ) {
+const checkLicense = (allowedLicense, licenseType) => {
+	if (!licenseType) {
 		return false;
 	}
 
@@ -137,12 +134,12 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	const formattedAllowedLicense = allowedLicense.toLowerCase();
 	const formattedlicenseType = licenseType.toLowerCase();
 
-	if ( formattedAllowedLicense === formattedlicenseType ) {
+	if (formattedAllowedLicense === formattedlicenseType) {
 		return true;
 	}
 
 	// We can skip the parsing below if there isn't an 'OR' in the license.
-	if ( ! formattedlicenseType.includes( ' or ' ) ) {
+	if (!formattedlicenseType.includes(' or ')) {
 		return false;
 	}
 
@@ -153,16 +150,16 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	 * - Trim any remaining whitespace from each element
 	 */
 	const subLicenseTypes = formattedlicenseType
-		.replace( /^\(*/g, '' )
-		.replace( /\)*$/, '' )
-		.split( ' or ' )
-		.map( ( e ) => e.trim() );
+		.replace(/^\(*/g, '')
+		.replace(/\)*$/, '')
+		.split(' or ')
+		.map((e) => e.trim());
 
 	// We can then check our array of licenses against the allowedLicense.
 	return (
 		undefined !==
-		subLicenseTypes.find( ( subLicenseType ) =>
-			checkLicense( allowedLicense, subLicenseType )
+		subLicenseTypes.find((subLicenseType) =>
+			checkLicense(allowedLicense, subLicenseType)
 		)
 	);
 };
@@ -175,8 +172,8 @@ const child = spawn.sync(
 		'--json',
 		'--long',
 		'--all',
-		...( prod ? [ '--prod' ] : [] ),
-		...( dev ? [ '--dev' ] : [] ),
+		...(prod ? ['--prod'] : []),
+		...(dev ? ['--dev'] : []),
 	],
 	/*
 	 * Set the max buffer to ~157MB, since the output size for
@@ -185,65 +182,65 @@ const child = spawn.sync(
 	{ maxBuffer: 1024 * 1024 * 150 }
 );
 
-const result = JSON.parse( child.stdout.toString() );
+const result = JSON.parse(child.stdout.toString());
 
 const topLevelDeps = result.dependencies;
 
-function traverseDepTree( deps ) {
-	for ( const key in deps ) {
-		const dep = deps[ key ];
+function traverseDepTree(deps) {
+	for (const key in deps) {
+		const dep = deps[key];
 
-		if ( ignored.includes( dep.name ) ) {
+		if (ignored.includes(dep.name)) {
 			return;
 		}
 
-		if ( ! dep.hasOwnProperty( 'path' ) ) {
-			if ( dep.hasOwnProperty( 'peerMissing' ) ) {
+		if (!dep.hasOwnProperty('path')) {
+			if (dep.hasOwnProperty('peerMissing')) {
 				process.stdout.write(
-					`${ WARNING } Unable to locate path for missing peer dep ${ dep.name }@${ dep.version }. `
+					`${WARNING} Unable to locate path for missing peer dep ${dep.name}@${dep.version}. `
 				);
 			} else {
 				process.exitCode = 1;
 				process.stdout.write(
-					`${ ERROR } Unable to locate path for ${ dep.name }@${ dep.version }. `
+					`${ERROR} Unable to locate path for ${dep.name}@${dep.version}. `
 				);
 			}
-		} else if ( dep.missing ) {
+		} else if (dep.missing) {
 			process.stdout.write(
-				`${ WARNING } missing dep ${ dep.name }@${ dep.version }. `
+				`${WARNING} missing dep ${dep.name}@${dep.version}. `
 			);
 		} else {
-			checkDepLicense( dep.path );
+			checkDepLicense(dep.path);
 		}
 
-		if ( dep.hasOwnProperty( 'dependencies' ) ) {
-			traverseDepTree( dep.dependencies );
+		if (dep.hasOwnProperty('dependencies')) {
+			traverseDepTree(dep.dependencies);
 		} else {
 			return;
 		}
 	}
 }
 
-function detectTypeFromLicenseFiles( path ) {
-	return licenseFiles.reduce( ( detectedType, licenseFile ) => {
-		if ( detectedType ) {
+function detectTypeFromLicenseFiles(path) {
+	return licenseFiles.reduce((detectedType, licenseFile) => {
+		if (detectedType) {
 			return detectedType;
 		}
 
 		const licensePath = path + '/' + licenseFile;
 
-		if ( existsSync( licensePath ) ) {
-			const licenseText = readFileSync( licensePath ).toString();
+		if (existsSync(licensePath)) {
+			const licenseText = readFileSync(licensePath).toString();
 
 			// Check if the file contains any of the strings in licenseFileStrings
-			return Object.keys( licenseFileStrings ).reduce(
-				( stringDetectedType, licenseStringType ) => {
+			return Object.keys(licenseFileStrings).reduce(
+				(stringDetectedType, licenseStringType) => {
 					const licenseFileString =
-						licenseFileStrings[ licenseStringType ];
+						licenseFileStrings[licenseStringType];
 
 					return licenseFileString.reduce(
-						( currentDetectedType, fileString ) => {
-							if ( licenseText.includes( fileString ) ) {
+						(currentDetectedType, fileString) => {
+							if (licenseText.includes(fileString)) {
 								return licenseStringType;
 							}
 							return currentDetectedType;
@@ -255,18 +252,18 @@ function detectTypeFromLicenseFiles( path ) {
 			);
 		}
 		return detectedType;
-	}, false );
+	}, false);
 }
 
-function checkDepLicense( path ) {
-	if ( ! path ) {
+function checkDepLicense(path) {
+	if (!path) {
 		return;
 	}
 
 	const filename = path + '/package.json';
-	if ( ! existsSync( filename ) ) {
-		process.stdout.write( `Unable to locate package.json in ${ path }.` );
-		process.exit( 1 );
+	if (!existsSync(filename)) {
+		process.stdout.write(`Unable to locate package.json in ${path}.`);
+		process.exit(1);
 	}
 
 	/*
@@ -276,28 +273,26 @@ function checkDepLicense( path ) {
 	 * - { licenses: [ 'MIT', 'Zlib' ] }
 	 * - { licenses: [ { type: 'MIT' }, { type: 'Zlib' } ] }
 	 */
-	const packageInfo = require( filename );
+	const packageInfo = require(filename);
 	const license =
 		packageInfo.license ||
-		( packageInfo.licenses &&
-			packageInfo.licenses.map( ( l ) => l.type || l ).join( ' OR ' ) );
+		(packageInfo.licenses &&
+			packageInfo.licenses.map((l) => l.type || l).join(' OR '));
 	let licenseType = typeof license === 'object' ? license.type : license;
 
 	// Check if the license we've detected is telling us to look in the license file, instead.
 	if (
 		licenseType &&
-		licenseFiles.find( ( licenseFile ) =>
-			licenseType.includes( licenseFile )
-		)
+		licenseFiles.find((licenseFile) => licenseType.includes(licenseFile))
 	) {
 		licenseType = undefined;
 	}
 
-	if ( licenseType ) {
-		const allowed = licenses.find( ( allowedLicense ) =>
-			checkLicense( allowedLicense, licenseType )
+	if (licenseType) {
+		const allowed = licenses.find((allowedLicense) =>
+			checkLicense(allowedLicense, licenseType)
 		);
-		if ( allowed ) {
+		if (allowed) {
 			return;
 		}
 	}
@@ -307,22 +302,22 @@ function checkDepLicense( path ) {
 	 * or the type was invalid, try reading it from the files defined in
 	 * license files, instead.
 	 */
-	const detectedLicenseType = detectTypeFromLicenseFiles( path );
-	if ( ! licenseType && ! detectedLicenseType ) {
+	const detectedLicenseType = detectTypeFromLicenseFiles(path);
+	if (!licenseType && !detectedLicenseType) {
 		return;
 	}
 
 	// Now that we have a license to check, see if any of the allowed licenses match.
-	const allowed = licenses.find( ( allowedLicense ) =>
-		checkLicense( allowedLicense, detectedLicenseType )
+	const allowed = licenses.find((allowedLicense) =>
+		checkLicense(allowedLicense, detectedLicenseType)
 	);
 
-	if ( ! allowed ) {
+	if (!allowed) {
 		process.exitCode = 1;
 		process.stdout.write(
-			`${ ERROR } Module ${ packageInfo.name } has an incompatible license '${ licenseType }'.\n`
+			`${ERROR} Module ${packageInfo.name} has an incompatible license '${licenseType}'.\n`
 		);
 	}
 }
 
-traverseDepTree( topLevelDeps );
+traverseDepTree(topLevelDeps);

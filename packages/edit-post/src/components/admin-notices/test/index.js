@@ -8,8 +8,8 @@ import renderer from 'react-test-renderer';
  */
 import { AdminNotices } from '../';
 
-describe( 'AdminNotices', () => {
-	beforeEach( () => {
+describe('AdminNotices', () => {
+	beforeEach(() => {
 		// The superfluous whitespace is intentional in verifying expected
 		// outputs of (a) non-element first child of the element (whitespace
 		// text node) and (b) untrimmed content.
@@ -28,15 +28,15 @@ describe( 'AdminNotices', () => {
 				</aside>
 			</div>
 		`;
-	} );
+	});
 
-	it( 'should upgrade notices', () => {
+	it('should upgrade notices', () => {
 		const createNotice = jest.fn();
 
-		renderer.create( <AdminNotices createNotice={ createNotice } /> );
+		renderer.create(<AdminNotices createNotice={createNotice} />);
 
-		expect( createNotice ).toHaveBeenCalledTimes( 2 );
-		expect( createNotice.mock.calls[ 0 ] ).toEqual( [
+		expect(createNotice).toHaveBeenCalledTimes(2);
+		expect(createNotice.mock.calls[0]).toEqual([
 			'warning',
 			'Warning',
 			{
@@ -44,8 +44,8 @@ describe( 'AdminNotices', () => {
 				__unstableHTML: true,
 				isDismissible: false,
 			},
-		] );
-		expect( createNotice.mock.calls[ 1 ] ).toEqual( [
+		]);
+		expect(createNotice.mock.calls[1]).toEqual([
 			'success',
 			'<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
 			{
@@ -53,11 +53,11 @@ describe( 'AdminNotices', () => {
 				__unstableHTML: true,
 				isDismissible: true,
 			},
-		] );
+		]);
 
 		// Verify all but `<aside>` are removed.
 		expect(
-			document.getElementById( 'wpbody-content' ).childElementCount
-		).toBe( 1 );
-	} );
-} );
+			document.getElementById('wpbody-content').childElementCount
+		).toBe(1);
+	});
+});

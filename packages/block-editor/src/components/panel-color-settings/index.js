@@ -3,20 +3,20 @@
  */
 import PanelColorGradientSettings from '../colors-gradients/panel-color-gradient-settings';
 
-const PanelColorSettings = ( { colorSettings, ...props } ) => {
+const PanelColorSettings = ({ colorSettings, ...props }) => {
 	const settings = colorSettings.map(
-		( { value, onChange, ...otherSettings } ) => ( {
+		({ value, onChange, ...otherSettings }) => ({
 			...otherSettings,
 			colorValue: value,
 			onColorChange: onChange,
-		} )
+		})
 	);
 	return (
 		<PanelColorGradientSettings
-			settings={ settings }
-			gradients={ [] }
-			disableCustomGradients={ true }
-			{ ...props }
+			settings={settings}
+			gradients={[]}
+			disableCustomGradients={true}
+			{...props}
 		/>
 	);
 };

@@ -16,19 +16,19 @@ export async function togglePreferencesOption(
 	optionLabel,
 	shouldBeChecked
 ) {
-	await clickOnMoreMenuItem( 'Preferences' );
-	const [ tabHandle ] = await page.$x(
-		`//button[contains(text(), "${ tabLabel }")]`
+	await clickOnMoreMenuItem('Preferences');
+	const [tabHandle] = await page.$x(
+		`//button[contains(text(), "${tabLabel}")]`
 	);
 	await tabHandle.click();
-	const [ optionHandle ] = await page.$x(
-		`//label[contains(text(), "${ optionLabel }")]`
+	const [optionHandle] = await page.$x(
+		`//label[contains(text(), "${optionLabel}")]`
 	);
 	const isChecked = await page.evaluate(
-		( element ) => element.control.checked,
+		(element) => element.control.checked,
 		optionHandle
 	);
-	if ( isChecked !== shouldBeChecked ) {
+	if (isChecked !== shouldBeChecked) {
 		await optionHandle.click();
 	}
 

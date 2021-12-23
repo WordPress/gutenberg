@@ -31,90 +31,87 @@ import { MIN_EXCERPT_LENGTH, MAX_EXCERPT_LENGTH } from './constants';
 
 class LatestPostsEdit extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 		this.state = {
 			categoriesList: [],
 		};
-		this.onSetDisplayPostContent = this.onSetDisplayPostContent.bind(
-			this
-		);
-		this.onSetDisplayPostContentRadio = this.onSetDisplayPostContentRadio.bind(
-			this
-		);
-		this.onSetExcerptLength = this.onSetExcerptLength.bind( this );
-		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind( this );
-		this.onSetOrder = this.onSetOrder.bind( this );
-		this.onSetOrderBy = this.onSetOrderBy.bind( this );
-		this.onSetPostsToShow = this.onSetPostsToShow.bind( this );
-		this.onSetCategories = this.onSetCategories.bind( this );
-		this.getInspectorControls = this.getInspectorControls.bind( this );
+		this.onSetDisplayPostContent = this.onSetDisplayPostContent.bind(this);
+		this.onSetDisplayPostContentRadio =
+			this.onSetDisplayPostContentRadio.bind(this);
+		this.onSetExcerptLength = this.onSetExcerptLength.bind(this);
+		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind(this);
+		this.onSetOrder = this.onSetOrder.bind(this);
+		this.onSetOrderBy = this.onSetOrderBy.bind(this);
+		this.onSetPostsToShow = this.onSetPostsToShow.bind(this);
+		this.onSetCategories = this.onSetCategories.bind(this);
+		this.getInspectorControls = this.getInspectorControls.bind(this);
 	}
 
 	componentDidMount() {
 		this.isStillMounted = true;
-		this.fetchRequest = apiFetch( { path: '/wp/v2/categories' } )
-			.then( ( categoriesList ) => {
-				if ( this.isStillMounted ) {
-					this.setState( {
-						categoriesList: isEmpty( categoriesList )
+		this.fetchRequest = apiFetch({ path: '/wp/v2/categories' })
+			.then((categoriesList) => {
+				if (this.isStillMounted) {
+					this.setState({
+						categoriesList: isEmpty(categoriesList)
 							? []
 							: categoriesList,
-					} );
+					});
 				}
-			} )
-			.catch( () => {
-				if ( this.isStillMounted ) {
-					this.setState( { categoriesList: [] } );
+			})
+			.catch(() => {
+				if (this.isStillMounted) {
+					this.setState({ categoriesList: [] });
 				}
-			} );
+			});
 	}
 
 	componentWillUnmount() {
 		this.isStillMounted = false;
 	}
 
-	onSetDisplayPostContent( value ) {
+	onSetDisplayPostContent(value) {
 		const { setAttributes } = this.props;
-		setAttributes( { displayPostContent: value } );
+		setAttributes({ displayPostContent: value });
 	}
 
-	onSetDisplayPostContentRadio( value ) {
+	onSetDisplayPostContentRadio(value) {
 		const { setAttributes } = this.props;
-		setAttributes( {
+		setAttributes({
 			displayPostContentRadio: value ? 'excerpt' : 'full_post',
-		} );
+		});
 	}
 
-	onSetExcerptLength( value ) {
+	onSetExcerptLength(value) {
 		const { setAttributes } = this.props;
-		setAttributes( { excerptLength: value } );
+		setAttributes({ excerptLength: value });
 	}
 
-	onSetDisplayPostDate( value ) {
+	onSetDisplayPostDate(value) {
 		const { setAttributes } = this.props;
-		setAttributes( { displayPostDate: value } );
+		setAttributes({ displayPostDate: value });
 	}
 
-	onSetOrder( value ) {
+	onSetOrder(value) {
 		const { setAttributes } = this.props;
-		setAttributes( { order: value } );
+		setAttributes({ order: value });
 	}
 
-	onSetOrderBy( value ) {
+	onSetOrderBy(value) {
 		const { setAttributes } = this.props;
-		setAttributes( { orderBy: value } );
+		setAttributes({ orderBy: value });
 	}
 
-	onSetPostsToShow( value ) {
+	onSetPostsToShow(value) {
 		const { setAttributes } = this.props;
-		setAttributes( { postsToShow: value } );
+		setAttributes({ postsToShow: value });
 	}
 
-	onSetCategories( value ) {
+	onSetCategories(value) {
 		const { setAttributes } = this.props;
-		setAttributes( {
+		setAttributes({
 			categories: '' !== value ? value.toString() : undefined,
-		} );
+		});
 	}
 
 	getInspectorControls() {
@@ -135,52 +132,52 @@ class LatestPostsEdit extends Component {
 
 		return (
 			<InspectorControls>
-				<PanelBody title={ __( 'Post content settings' ) }>
+				<PanelBody title={__('Post content settings')}>
 					<ToggleControl
-						label={ __( 'Show post content' ) }
-						checked={ displayPostContent }
-						onChange={ this.onSetDisplayPostContent }
+						label={__('Show post content')}
+						checked={displayPostContent}
+						onChange={this.onSetDisplayPostContent}
 					/>
-					{ displayPostContent && (
+					{displayPostContent && (
 						<ToggleControl
-							label={ __( 'Only show excerpt' ) }
-							checked={ displayExcerptPostContent }
-							onChange={ this.onSetDisplayPostContentRadio }
+							label={__('Only show excerpt')}
+							checked={displayExcerptPostContent}
+							onChange={this.onSetDisplayPostContentRadio}
 						/>
-					) }
-					{ displayPostContent && displayExcerptPostContent && (
+					)}
+					{displayPostContent && displayExcerptPostContent && (
 						<RangeControl
-							label={ __( 'Excerpt length (words)' ) }
-							value={ excerptLength }
-							onChange={ this.onSetExcerptLength }
-							min={ MIN_EXCERPT_LENGTH }
-							max={ MAX_EXCERPT_LENGTH }
+							label={__('Excerpt length (words)')}
+							value={excerptLength}
+							onChange={this.onSetExcerptLength}
+							min={MIN_EXCERPT_LENGTH}
+							max={MAX_EXCERPT_LENGTH}
 						/>
-					) }
+					)}
 				</PanelBody>
 
-				<PanelBody title={ __( 'Post meta settings' ) }>
+				<PanelBody title={__('Post meta settings')}>
 					<ToggleControl
-						label={ __( 'Display post date' ) }
-						checked={ displayPostDate }
-						onChange={ this.onSetDisplayPostDate }
+						label={__('Display post date')}
+						checked={displayPostDate}
+						onChange={this.onSetDisplayPostDate}
 					/>
 				</PanelBody>
-				<PanelBody title={ __( 'Sorting and filtering' ) }>
+				<PanelBody title={__('Sorting and filtering')}>
 					<QueryControls
-						{ ...{ order, orderBy } }
-						numberOfItems={ postsToShow }
-						categoriesList={ categoriesList }
+						{...{ order, orderBy }}
+						numberOfItems={postsToShow}
+						categoriesList={categoriesList}
 						selectedCategoryId={
-							undefined !== categories ? Number( categories ) : ''
+							undefined !== categories ? Number(categories) : ''
 						}
-						onOrderChange={ this.onSetOrder }
-						onOrderByChange={ this.onSetOrderBy }
+						onOrderChange={this.onSetOrder}
+						onOrderByChange={this.onSetOrderBy}
 						onCategoryChange={
 							// eslint-disable-next-line no-undef
 							__DEV__ ? this.onSetCategories : undefined
 						}
-						onNumberOfItemsChange={ this.onSetPostsToShow }
+						onNumberOfItemsChange={this.onSetPostsToShow}
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -212,16 +209,16 @@ class LatestPostsEdit extends Component {
 
 		return (
 			<TouchableWithoutFeedback
-				accessible={ ! isSelected }
-				disabled={ ! isSelected }
-				onPress={ openGeneralSidebar }
+				accessible={!isSelected}
+				disabled={!isSelected}
+				onPress={openGeneralSidebar}
 			>
-				<View style={ blockStyle }>
-					{ isSelected && this.getInspectorControls() }
-					<Icon icon={ icon } { ...iconStyle } />
-					<Text style={ titleStyle }>{ blockTitle }</Text>
-					<Text style={ styles.latestPostBlockSubtitle }>
-						{ __( 'CUSTOMIZE' ) }
+				<View style={blockStyle}>
+					{isSelected && this.getInspectorControls()}
+					<Icon icon={icon} {...iconStyle} />
+					<Text style={titleStyle}>{blockTitle}</Text>
+					<Text style={styles.latestPostBlockSubtitle}>
+						{__('CUSTOMIZE')}
 					</Text>
 				</View>
 			</TouchableWithoutFeedback>
@@ -229,19 +226,19 @@ class LatestPostsEdit extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select, { name } ) => {
-		const blockType = select( blocksStore ).getBlockType( name );
+export default compose([
+	withSelect((select, { name }) => {
+		const blockType = select(blocksStore).getBlockType(name);
 		return {
 			blockTitle: blockType?.title || name,
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+	}),
+	withDispatch((dispatch) => {
+		const { openGeneralSidebar } = dispatch('core/edit-post');
 
 		return {
-			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
+			openGeneralSidebar: () => openGeneralSidebar('edit-post/block'),
 		};
-	} ),
+	}),
 	withPreferredColorScheme,
-] )( LatestPostsEdit );
+])(LatestPostsEdit);

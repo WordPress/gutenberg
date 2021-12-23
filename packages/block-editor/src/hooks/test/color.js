@@ -15,15 +15,15 @@ import BlockEditorProvider from '../../components/provider';
 import { cleanEmptyObject } from '../utils';
 import { withColorPaletteStyles } from '../color';
 
-describe( 'cleanEmptyObject', () => {
-	it( 'should remove nested keys', () => {
-		expect( cleanEmptyObject( { color: { text: undefined } } ) ).toEqual(
+describe('cleanEmptyObject', () => {
+	it('should remove nested keys', () => {
+		expect(cleanEmptyObject({ color: { text: undefined } })).toEqual(
 			undefined
 		);
-	} );
-} );
+	});
+});
 
-describe( 'withColorPaletteStyles', () => {
+describe('withColorPaletteStyles', () => {
 	const settings = {
 		__experimentalFeatures: {
 			color: {
@@ -46,13 +46,13 @@ describe( 'withColorPaletteStyles', () => {
 	};
 
 	const EnhancedComponent = withColorPaletteStyles(
-		( { getStyleObj, wrapperProps } ) => (
-			<div>{ getStyleObj( wrapperProps.style ) }</div>
+		({ getStyleObj, wrapperProps }) => (
+			<div>{getStyleObj(wrapperProps.style)}</div>
 		)
 	);
 
-	beforeAll( () => {
-		registerBlockType( 'core/test-block', {
+	beforeAll(() => {
+		registerBlockType('core/test-block', {
 			save: () => undefined,
 			edit: () => undefined,
 			category: 'text',
@@ -63,36 +63,36 @@ describe( 'withColorPaletteStyles', () => {
 					background: true,
 				},
 			},
-		} );
-	} );
+		});
+	});
 
-	afterAll( () => {
-		unregisterBlockType( 'core/test-block' );
-	} );
+	afterAll(() => {
+		unregisterBlockType('core/test-block');
+	});
 
-	it( 'should add color styles from attributes', () => {
+	it('should add color styles from attributes', () => {
 		const getStyleObj = jest.fn();
 
 		render(
-			<BlockEditorProvider settings={ settings } value={ [] }>
+			<BlockEditorProvider settings={settings} value={[]}>
 				<EnhancedComponent
-					attributes={ {
+					attributes={{
 						backgroundColor: 'vivid-green-cyan',
 						textColor: 'pale-pink',
-					} }
+					}}
 					name="core/test-block"
-					getStyleObj={ getStyleObj }
+					getStyleObj={getStyleObj}
 				/>
 			</BlockEditorProvider>
 		);
 
-		expect( getStyleObj ).toHaveBeenLastCalledWith( {
+		expect(getStyleObj).toHaveBeenLastCalledWith({
 			color: '#f78da7',
 			backgroundColor: '#00d084',
-		} );
-	} );
+		});
+	});
 
-	it( 'should not add undefined style values', () => {
+	it('should not add undefined style values', () => {
 		// This test ensures that undefined `color` and `backgroundColor` styles
 		// are not added to the styles object. An undefined `backgroundColor`
 		// style causes a React warning when gradients are used, as the gradient
@@ -101,21 +101,21 @@ describe( 'withColorPaletteStyles', () => {
 		const getStyleObj = jest.fn();
 
 		render(
-			<BlockEditorProvider settings={ settings } value={ [] }>
+			<BlockEditorProvider settings={settings} value={[]}>
 				<EnhancedComponent
-					attributes={ {
+					attributes={{
 						backgroundColor: undefined,
 						textColor: undefined,
-					} }
+					}}
 					name="core/test-block"
-					getStyleObj={ getStyleObj }
+					getStyleObj={getStyleObj}
 				/>
 			</BlockEditorProvider>
 		);
 		// Check explictly for the object used in the call, because
 		// `toHaveBeenCalledWith` does not check for empty keys.
 		expect(
-			getStyleObj.mock.calls[ getStyleObj.mock.calls.length - 1 ][ 0 ]
-		).toStrictEqual( {} );
-	} );
-} );
+			getStyleObj.mock.calls[getStyleObj.mock.calls.length - 1][0]
+		).toStrictEqual({});
+	});
+});

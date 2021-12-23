@@ -3,4 +3,4 @@
  */
 import _ from 'lodash';
 
-import( './util' ).then( _.noop );
+import('./util').then(_.noop);

@@ -11,33 +11,33 @@
 /**
  * External dependencies
  */
-const { red, yellow } = require( 'chalk' );
+const { red, yellow } = require('chalk');
 
 /**
  * Internal dependencies
  */
 // Ignore reason: `package-lock.json` exists outside `bin` `rootDir`.
 // @ts-ignore
-const packageLock = require( '../package-lock' );
+const packageLock = require('../package-lock');
 
-const dependencies = Object.entries( packageLock.dependencies );
-for ( const [ name, dependency ] of dependencies ) {
-	if ( dependency.resolved === false ) {
+const dependencies = Object.entries(packageLock.dependencies);
+for (const [name, dependency] of dependencies) {
+	if (dependency.resolved === false) {
 		console.log(
 			`Invalid resolved dependency in package-lock.json.
 
-${ red( JSON.stringify( { [ name ]: dependency }, null, '\t' ) ) }
+${red(JSON.stringify({ [name]: dependency }, null, '\t'))}
 
-To fix, try removing the node_modules directory and reverting package-lock.json, then run ${ yellow(
+To fix, try removing the node_modules directory and reverting package-lock.json, then run ${yellow(
 				'npm install'
-			) }.
+			)}.
 `
 		);
 
-		process.exit( 1 );
+		process.exit(1);
 	}
 
-	if ( dependency.dependencies ) {
-		dependencies.push( ...Object.entries( dependency.dependencies ) );
+	if (dependency.dependencies) {
+		dependencies.push(...Object.entries(dependency.dependencies));
 	}
 }

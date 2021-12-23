@@ -23,8 +23,8 @@ Decodes the HTML entities from a given string.
 _Usage_
 
 ```js
-const result = decodeEntities( '&aacute;' );
-console.log( result ); // result will be "á"
+const result = decodeEntities('&aacute;');
+console.log(result); // result will be "á"
 ```
 
 _Parameters_

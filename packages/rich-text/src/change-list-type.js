@@ -21,40 +21,38 @@ import { getParentLineIndex } from './get-parent-line-index';
  *
  * @return {RichTextValue} The changed value.
  */
-export function changeListType( value, newFormat ) {
+export function changeListType(value, newFormat) {
 	const { text, replacements, start, end } = value;
-	const startingLineIndex = getLineIndex( value, start );
-	const startLineFormats = replacements[ startingLineIndex ] || [];
-	const endLineFormats = replacements[ getLineIndex( value, end ) ] || [];
-	const startIndex = getParentLineIndex( value, startingLineIndex );
+	const startingLineIndex = getLineIndex(value, start);
+	const startLineFormats = replacements[startingLineIndex] || [];
+	const endLineFormats = replacements[getLineIndex(value, end)] || [];
+	const startIndex = getParentLineIndex(value, startingLineIndex);
 	const newReplacements = replacements.slice();
 	const startCount = startLineFormats.length - 1;
 	const endCount = endLineFormats.length - 1;
 
 	let changed;
 
-	for ( let index = startIndex + 1 || 0; index < text.length; index++ ) {
-		if ( text[ index ] !== LINE_SEPARATOR ) {
+	for (let index = startIndex + 1 || 0; index < text.length; index++) {
+		if (text[index] !== LINE_SEPARATOR) {
 			continue;
 		}
 
-		if ( ( newReplacements[ index ] || [] ).length <= startCount ) {
+		if ((newReplacements[index] || []).length <= startCount) {
 			break;
 		}
 
-		if ( ! newReplacements[ index ] ) {
+		if (!newReplacements[index]) {
 			continue;
 		}
 
 		changed = true;
-		newReplacements[ index ] = newReplacements[ index ].map(
-			( format, i ) => {
-				return i < startCount || i > endCount ? format : newFormat;
-			}
-		);
+		newReplacements[index] = newReplacements[index].map((format, i) => {
+			return i < startCount || i > endCount ? format : newFormat;
+		});
 	}
 
-	if ( ! changed ) {
+	if (!changed) {
 		return value;
 	}
 

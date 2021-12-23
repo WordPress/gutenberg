@@ -10,48 +10,34 @@ import deepFreeze from 'deep-freeze';
 import { toggleFormat } from '../toggle-format';
 import { getSparseArrayLength } from './helpers';
 
-describe( 'toggleFormat', () => {
+describe('toggleFormat', () => {
 	const strong = { type: 'strong' };
 	const em = { type: 'em' };
 
-	it( 'should remove format if it exists at start of selection', () => {
+	it('should remove format if it exists at start of selection', () => {
 		const record = {
-			formats: [
-				,
-				,
-				,
-				[ strong ],
-				[ em, strong ],
-				[ em ],
-				[ em ],
-				,
-				,
-				,
-				,
-				,
-				,
-			],
+			formats: [, , , [strong], [em, strong], [em], [em], , , , , , ,],
 			text: 'one two three',
 			start: 3,
 			end: 6,
 		};
 		const expected = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			formats: [, , , , [em], [em], [em], , , , , , ,],
 			activeFormats: [],
 			text: 'one two three',
 			start: 3,
 			end: 6,
 		};
-		const result = toggleFormat( deepFreeze( record ), strong );
+		const result = toggleFormat(deepFreeze(record), strong);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-	} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(3);
+	});
 
-	it( "should apply format if it doesn't exist at start of selection", () => {
+	it("should apply format if it doesn't exist at start of selection", () => {
 		const record = {
-			formats: [ , , , , [ em, strong ], [ em ], [ em ], , , , , , , ],
+			formats: [, , , , [em, strong], [em], [em], , , , , , ,],
 			text: 'one two three',
 			start: 3,
 			end: 6,
@@ -61,10 +47,10 @@ describe( 'toggleFormat', () => {
 				,
 				,
 				,
-				[ strong ],
-				[ strong, em ],
-				[ strong, em ],
-				[ em ],
+				[strong],
+				[strong, em],
+				[strong, em],
+				[em],
 				,
 				,
 				,
@@ -72,15 +58,15 @@ describe( 'toggleFormat', () => {
 				,
 				,
 			],
-			activeFormats: [ strong ],
+			activeFormats: [strong],
 			text: 'one two three',
 			start: 3,
 			end: 6,
 		};
-		const result = toggleFormat( deepFreeze( record ), strong );
+		const result = toggleFormat(deepFreeze(record), strong);
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
-	} );
-} );
+		expect(result).toEqual(expected);
+		expect(result).not.toBe(record);
+		expect(getSparseArrayLength(result.formats)).toBe(4);
+	});
+});

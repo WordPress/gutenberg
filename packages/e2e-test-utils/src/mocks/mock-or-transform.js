@@ -20,23 +20,23 @@ import { getJSONResponse } from '../shared/get-json-response';
 export function mockOrTransform(
 	mockCheck,
 	mock,
-	responseObjectTransform = ( obj ) => obj
+	responseObjectTransform = (obj) => obj
 ) {
-	return async ( request ) => {
+	return async (request) => {
 		// Because we can't get the responses to requests and modify them on the fly,
 		// we have to make our own request and get the response, then apply the
 		// optional transform to the json encoded object.
-		const response = await fetch( request.url(), {
+		const response = await fetch(request.url(), {
 			headers: request.headers(),
 			method: request.method(),
 			body: request.postData(),
-		} );
+		});
 		const responseObject = await response.json();
-		if ( mockCheck( responseObject ) ) {
-			request.respond( getJSONResponse( mock ) );
+		if (mockCheck(responseObject)) {
+			request.respond(getJSONResponse(mock));
 		} else {
 			request.respond(
-				getJSONResponse( responseObjectTransform( responseObject ) )
+				getJSONResponse(responseObjectTransform(responseObject))
 			);
 		}
 	};

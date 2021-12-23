@@ -18,37 +18,33 @@ import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 
-function Item( { name, parentMenu, element, label } ) {
-	const hasSupport = ! name;
-	const prefix =
-		element === 'text' || ! element ? '' : `elements.${ element }.`;
+function Item({ name, parentMenu, element, label }) {
+	const hasSupport = !name;
+	const prefix = element === 'text' || !element ? '' : `elements.${element}.`;
 	const extraStyles =
 		element === 'link'
 			? {
 					textDecoration: 'underline',
 			  }
 			: {};
-	const [ fontFamily ] = useStyle( prefix + 'typography.fontFamily', name );
-	const [ fontStyle ] = useStyle( prefix + 'typography.fontStyle', name );
-	const [ fontWeight ] = useStyle( prefix + 'typography.fontWeight', name );
-	const [ letterSpacing ] = useStyle(
-		prefix + 'typography.letterSpacing',
-		name
-	);
-	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
-	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
-	const [ color ] = useStyle( prefix + 'color.text', name );
+	const [fontFamily] = useStyle(prefix + 'typography.fontFamily', name);
+	const [fontStyle] = useStyle(prefix + 'typography.fontStyle', name);
+	const [fontWeight] = useStyle(prefix + 'typography.fontWeight', name);
+	const [letterSpacing] = useStyle(prefix + 'typography.letterSpacing', name);
+	const [backgroundColor] = useStyle(prefix + 'color.background', name);
+	const [gradientValue] = useStyle(prefix + 'color.gradient', name);
+	const [color] = useStyle(prefix + 'color.text', name);
 
-	if ( ! hasSupport ) {
+	if (!hasSupport) {
 		return null;
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/typography/' + element }>
+		<NavigationButton path={parentMenu + '/typography/' + element}>
 			<HStack justify="flex-start">
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
-					style={ {
+					style={{
 						fontFamily: fontFamily ?? 'serif',
 						background: gradientValue ?? backgroundColor,
 						color,
@@ -56,53 +52,53 @@ function Item( { name, parentMenu, element, label } ) {
 						fontWeight,
 						letterSpacing,
 						...extraStyles,
-					} }
+					}}
 				>
-					{ __( 'Aa' ) }
+					{__('Aa')}
 				</FlexItem>
-				<FlexItem>{ label }</FlexItem>
+				<FlexItem>{label}</FlexItem>
 			</HStack>
 		</NavigationButton>
 	);
 }
 
-function ScreenTypography( { name } ) {
+function ScreenTypography({ name }) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu ? parentMenu : '/' }
-				title={ __( 'Typography' ) }
-				description={ __(
+				back={parentMenu ? parentMenu : '/'}
+				title={__('Typography')}
+				description={__(
 					'Manage the typography settings for different elements.'
-				) }
+				)}
 			/>
 
-			{ ! name && (
+			{!name && (
 				<div className="edit-site-global-styles-screen-typography">
-					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Elements' ) }</Subtitle>
+					<VStack spacing={3}>
+						<Subtitle>{__('Elements')}</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							<Item
-								name={ name }
-								parentMenu={ parentMenu }
+								name={name}
+								parentMenu={parentMenu}
 								element="text"
-								label={ __( 'Text' ) }
+								label={__('Text')}
 							/>
 							<Item
-								name={ name }
-								parentMenu={ parentMenu }
+								name={name}
+								parentMenu={parentMenu}
 								element="link"
-								label={ __( 'Links' ) }
+								label={__('Links')}
 							/>
 						</ItemGroup>
 					</VStack>
 				</div>
-			) }
+			)}
 
-			{ /* no typogrpahy elements support yet for blocks */ }
-			{ !! name && <TypographyPanel name={ name } element="text" /> }
+			{/* no typogrpahy elements support yet for blocks */}
+			{!!name && <TypographyPanel name={name} element="text" />}
 		</>
 	);
 }

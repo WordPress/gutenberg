@@ -28,7 +28,7 @@ import { store as editPostStore } from '.';
  *
  * @yield {Object} Action object.
  */
-export function* openGeneralSidebar( name ) {
+export function* openGeneralSidebar(name) {
 	yield controls.dispatch(
 		interfaceStore,
 		'enableComplementaryArea',
@@ -57,7 +57,7 @@ export function* closeGeneralSidebar() {
  *
  * @return {Object} Action object.
  */
-export function openModal( name ) {
+export function openModal(name) {
 	return {
 		type: 'OPEN_MODAL',
 		name,
@@ -117,7 +117,7 @@ export function togglePublishSidebar() {
  *
  * @return {Object} Action object.
  */
-export function toggleEditorPanelEnabled( panelName ) {
+export function toggleEditorPanelEnabled(panelName) {
 	return {
 		type: 'TOGGLE_PANEL_ENABLED',
 		panelName,
@@ -131,7 +131,7 @@ export function toggleEditorPanelEnabled( panelName ) {
  *
  * @return {Object} Action object.
  */
-export function toggleEditorPanelOpened( panelName ) {
+export function toggleEditorPanelOpened(panelName) {
 	return {
 		type: 'TOGGLE_PANEL_OPENED',
 		panelName,
@@ -145,7 +145,7 @@ export function toggleEditorPanelOpened( panelName ) {
  *
  * @return {Object} Action object.
  */
-export function removeEditorPanel( panelName ) {
+export function removeEditorPanel(panelName) {
 	return {
 		type: 'REMOVE_PANEL',
 		panelName,
@@ -157,7 +157,7 @@ export function removeEditorPanel( panelName ) {
  *
  * @param {string} feature Feature name.
  */
-export function* toggleFeature( feature ) {
+export function* toggleFeature(feature) {
 	yield controls.dispatch(
 		interfaceStore.name,
 		'toggleFeature',
@@ -166,22 +166,22 @@ export function* toggleFeature( feature ) {
 	);
 }
 
-export function* switchEditorMode( mode ) {
+export function* switchEditorMode(mode) {
 	yield {
 		type: 'SWITCH_MODE',
 		mode,
 	};
 
 	// Unselect blocks when we switch to the code editor.
-	if ( mode !== 'visual' ) {
-		yield controls.dispatch( blockEditorStore, 'clearSelectedBlock' );
+	if (mode !== 'visual') {
+		yield controls.dispatch(blockEditorStore, 'clearSelectedBlock');
 	}
 
 	const message =
 		mode === 'visual'
-			? __( 'Visual editor selected' )
-			: __( 'Code editor selected' );
-	speak( message, 'assertive' );
+			? __('Visual editor selected')
+			: __('Code editor selected');
+	speak(message, 'assertive');
 }
 
 /**
@@ -189,7 +189,7 @@ export function* switchEditorMode( mode ) {
  *
  * @param {string} pluginName Plugin name.
  */
-export function* togglePinnedPluginItem( pluginName ) {
+export function* togglePinnedPluginItem(pluginName) {
 	const isPinned = yield controls.select(
 		interfaceStore,
 		'isItemPinned',
@@ -213,10 +213,10 @@ export function* togglePinnedPluginItem( pluginName ) {
  *
  * @return {Object} Action object.
  */
-export function hideBlockTypes( blockNames ) {
+export function hideBlockTypes(blockNames) {
 	return {
 		type: 'HIDE_BLOCK_TYPES',
-		blockNames: castArray( blockNames ),
+		blockNames: castArray(blockNames),
 	};
 }
 
@@ -228,7 +228,7 @@ export function hideBlockTypes( blockNames ) {
  *
  * @return {Object} Action object.
  */
-export function updatePreferredStyleVariations( blockName, blockStyle ) {
+export function updatePreferredStyleVariations(blockName, blockStyle) {
 	return {
 		type: 'UPDATE_PREFERRED_STYLE_VARIATIONS',
 		blockName,
@@ -243,7 +243,7 @@ export function updatePreferredStyleVariations( blockName, blockStyle ) {
  * @param {number} interval The new interval, in seconds.
  * @return {Object} Action object.
  */
-export function __experimentalUpdateLocalAutosaveInterval( interval ) {
+export function __experimentalUpdateLocalAutosaveInterval(interval) {
 	return {
 		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
 		interval,
@@ -258,10 +258,10 @@ export function __experimentalUpdateLocalAutosaveInterval( interval ) {
  *
  * @return {Object} Action object.
  */
-export function showBlockTypes( blockNames ) {
+export function showBlockTypes(blockNames) {
 	return {
 		type: 'SHOW_BLOCK_TYPES',
-		blockNames: castArray( blockNames ),
+		blockNames: castArray(blockNames),
 	};
 }
 
@@ -273,7 +273,7 @@ export function showBlockTypes( blockNames ) {
  *
  * @yield {Object} Action object.
  */
-export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+export function* setAvailableMetaBoxesPerLocation(metaBoxesPerLocation) {
 	yield {
 		type: 'SET_META_BOXES_PER_LOCATIONS',
 		metaBoxesPerLocation,
@@ -291,23 +291,23 @@ export function* requestMetaBoxUpdates() {
 	};
 
 	// Saves the wp_editor fields
-	if ( window.tinyMCE ) {
+	if (window.tinyMCE) {
 		window.tinyMCE.triggerSave();
 	}
 
 	// Additional data needed for backward compatibility.
 	// If we do not provide this data, the post will be overridden with the default values.
-	const post = yield controls.select( editorStore, 'getCurrentPost' );
+	const post = yield controls.select(editorStore, 'getCurrentPost');
 	const additionalData = [
-		post.comment_status ? [ 'comment_status', post.comment_status ] : false,
-		post.ping_status ? [ 'ping_status', post.ping_status ] : false,
-		post.sticky ? [ 'sticky', post.sticky ] : false,
-		post.author ? [ 'post_author', post.author ] : false,
-	].filter( Boolean );
+		post.comment_status ? ['comment_status', post.comment_status] : false,
+		post.ping_status ? ['ping_status', post.ping_status] : false,
+		post.sticky ? ['sticky', post.sticky] : false,
+		post.author ? ['post_author', post.author] : false,
+	].filter(Boolean);
 
 	// We gather all the metaboxes locations data and the base form data
 	const baseFormData = new window.FormData(
-		document.querySelector( '.metabox-base-form' )
+		document.querySelector('.metabox-base-form')
 	);
 	const activeMetaBoxLocations = yield controls.select(
 		editPostStore,
@@ -316,37 +316,34 @@ export function* requestMetaBoxUpdates() {
 	const formDataToMerge = [
 		baseFormData,
 		...activeMetaBoxLocations.map(
-			( location ) =>
-				new window.FormData( getMetaBoxContainer( location ) )
+			(location) => new window.FormData(getMetaBoxContainer(location))
 		),
 	];
 
 	// Merge all form data objects into a single one.
 	const formData = reduce(
 		formDataToMerge,
-		( memo, currentFormData ) => {
-			for ( const [ key, value ] of currentFormData ) {
-				memo.append( key, value );
+		(memo, currentFormData) => {
+			for (const [key, value] of currentFormData) {
+				memo.append(key, value);
 			}
 			return memo;
 		},
 		new window.FormData()
 	);
-	additionalData.forEach( ( [ key, value ] ) =>
-		formData.append( key, value )
-	);
+	additionalData.forEach(([key, value]) => formData.append(key, value));
 
 	try {
 		// Save the metaboxes
-		yield apiFetch( {
+		yield apiFetch({
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
 			body: formData,
 			parse: false,
-		} );
-		yield controls.dispatch( editPostStore, 'metaBoxUpdatesSuccess' );
+		});
+		yield controls.dispatch(editPostStore, 'metaBoxUpdatesSuccess');
 	} catch {
-		yield controls.dispatch( editPostStore, 'metaBoxUpdatesFailure' );
+		yield controls.dispatch(editPostStore, 'metaBoxUpdatesFailure');
 	}
 }
 
@@ -379,7 +376,7 @@ export function metaBoxUpdatesFailure() {
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
+export function __experimentalSetPreviewDeviceType(deviceType) {
 	return {
 		type: 'SET_PREVIEW_DEVICE_TYPE',
 		deviceType,
@@ -398,7 +395,7 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
  *
  * @return {Object} Action object.
  */
-export function setIsInserterOpened( value ) {
+export function setIsInserterOpened(value) {
 	return {
 		type: 'SET_IS_INSERTER_OPENED',
 		value,
@@ -411,7 +408,7 @@ export function setIsInserterOpened( value ) {
  * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
  * @return {Object} Action object.
  */
-export function setIsListViewOpened( isOpen ) {
+export function setIsListViewOpened(isOpen) {
 	return {
 		type: 'SET_IS_LIST_VIEW_OPENED',
 		isOpen,
@@ -424,7 +421,7 @@ export function setIsListViewOpened( isOpen ) {
  * @param {boolean} value Is editing template.
  * @return {Object} Action object.
  */
-export function setIsEditingTemplate( value ) {
+export function setIsEditingTemplate(value) {
 	return {
 		type: 'SET_IS_EDITING_TEMPLATE',
 		value,
@@ -436,8 +433,8 @@ export function setIsEditingTemplate( value ) {
  *
  * @param {boolean} newTemplate Is new template.
  */
-export function* __unstableSwitchToTemplateMode( newTemplate = false ) {
-	yield setIsEditingTemplate( true );
+export function* __unstableSwitchToTemplateMode(newTemplate = false) {
+	yield setIsEditingTemplate(true);
 
 	const isWelcomeGuideActive = yield controls.select(
 		editPostStore,
@@ -445,15 +442,15 @@ export function* __unstableSwitchToTemplateMode( newTemplate = false ) {
 		'welcomeGuideTemplate'
 	);
 
-	if ( ! isWelcomeGuideActive ) {
+	if (!isWelcomeGuideActive) {
 		const message = newTemplate
-			? __( "Custom template created. You're in template mode now." )
+			? __("Custom template created. You're in template mode now.")
 			: __(
 					'Editing template. Changes made here affect all posts and pages that use the template.'
 			  );
-		yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
+		yield controls.dispatch(noticesStore, 'createSuccessNotice', message, {
 			type: 'snackbar',
-		} );
+		});
 	}
 }
 
@@ -462,7 +459,7 @@ export function* __unstableSwitchToTemplateMode( newTemplate = false ) {
  *
  * @param {Object?} template Template to create and assign.
  */
-export function* __unstableCreateTemplate( template ) {
+export function* __unstableCreateTemplate(template) {
 	const savedTemplate = yield controls.dispatch(
 		coreStore,
 		'saveEntityRecord',
@@ -470,7 +467,7 @@ export function* __unstableCreateTemplate( template ) {
 		'wp_template',
 		template
 	);
-	const post = yield controls.select( editorStore, 'getCurrentPost' );
+	const post = yield controls.select(editorStore, 'getCurrentPost');
 
 	yield controls.dispatch(
 		coreStore,
@@ -495,34 +492,34 @@ export function* initializeMetaBoxes() {
 		'__unstableIsEditorReady'
 	);
 
-	if ( ! isEditorReady ) {
+	if (!isEditorReady) {
 		return;
 	}
 
-	const postType = yield controls.select( editorStore, 'getCurrentPostType' );
+	const postType = yield controls.select(editorStore, 'getCurrentPostType');
 
 	// Only initialize once.
-	if ( metaBoxesInitialized ) {
+	if (metaBoxesInitialized) {
 		return;
 	}
 
-	if ( window.postboxes.page !== postType ) {
-		window.postboxes.add_postbox_toggles( postType );
+	if (window.postboxes.page !== postType) {
+		window.postboxes.add_postbox_toggles(postType);
 	}
 
 	metaBoxesInitialized = true;
 
-	let wasSavingPost = yield controls.select( editorStore, 'isSavingPost' );
+	let wasSavingPost = yield controls.select(editorStore, 'isSavingPost');
 	let wasAutosavingPost = yield controls.select(
 		editorStore,
 		'isAutosavingPost'
 	);
-	const hasMetaBoxes = yield controls.select( editPostStore, 'hasMetaBoxes' );
+	const hasMetaBoxes = yield controls.select(editPostStore, 'hasMetaBoxes');
 
 	// Save metaboxes when performing a full save on the post.
-	subscribe( () => {
-		const isSavingPost = select( editorStore ).isSavingPost();
-		const isAutosavingPost = select( editorStore ).isAutosavingPost();
+	subscribe(() => {
+		const isSavingPost = select(editorStore).isSavingPost();
+		const isAutosavingPost = select(editorStore).isAutosavingPost();
 
 		// Save metaboxes on save completion, except for autosaves that are not a post preview.
 		//
@@ -533,17 +530,17 @@ export function* initializeMetaBoxes() {
 		const shouldTriggerMetaboxesSave =
 			hasMetaBoxes &&
 			wasSavingPost &&
-			! isSavingPost &&
-			! wasAutosavingPost;
+			!isSavingPost &&
+			!wasAutosavingPost;
 
 		// Save current state for next inspection.
 		wasSavingPost = isSavingPost;
 		wasAutosavingPost = isAutosavingPost;
 
-		if ( shouldTriggerMetaboxesSave ) {
-			dispatch( editPostStore ).requestMetaBoxUpdates();
+		if (shouldTriggerMetaboxesSave) {
+			dispatch(editPostStore).requestMetaBoxUpdates();
 		}
-	} );
+	});
 
 	return {
 		type: 'META_BOXES_INITIALIZED',

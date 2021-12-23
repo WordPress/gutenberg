@@ -13,15 +13,15 @@ import { useMemo } from '@wordpress/element';
  */
 import { LinkPicker } from './';
 
-const LinkPickerScreen = ( { returnScreenName } ) => {
+const LinkPickerScreen = ({ returnScreenName }) => {
 	const navigation = useNavigation();
 	const route = useRoute();
 
-	const onLinkPicked = ( { url, title } ) => {
-		navigation.navigate( returnScreenName, {
+	const onLinkPicked = ({ url, title }) => {
+		navigation.navigate(returnScreenName, {
 			inputValue: url,
 			text: title,
-		} );
+		});
 	};
 
 	const onCancel = () => {
@@ -29,15 +29,15 @@ const LinkPickerScreen = ( { returnScreenName } ) => {
 	};
 
 	const { inputValue } = route.params;
-	return useMemo( () => {
+	return useMemo(() => {
 		return (
 			<LinkPicker
-				value={ inputValue }
-				onLinkPicked={ onLinkPicked }
-				onCancel={ onCancel }
+				value={inputValue}
+				onLinkPicked={onLinkPicked}
+				onCancel={onCancel}
 			/>
 		);
-	}, [ inputValue ] );
+	}, [inputValue]);
 };
 
 export default LinkPickerScreen;

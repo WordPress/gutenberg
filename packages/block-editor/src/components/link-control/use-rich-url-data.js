@@ -9,8 +9,8 @@ import { store as blockEditorStore } from '../../store';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useReducer } from '@wordpress/element';
 
-function reducer( state, action ) {
-	switch ( action.type ) {
+function reducer(state, action) {
+	switch (action.type) {
 		case 'RESOLVED':
 			return {
 				...state,
@@ -29,24 +29,24 @@ function reducer( state, action ) {
 				isFetching: true,
 			};
 		default:
-			throw new Error( `Unexpected action type ${ action.type }` );
+			throw new Error(`Unexpected action type ${action.type}`);
 	}
 }
 
-function useRemoteUrlData( url ) {
-	const [ state, dispatch ] = useReducer( reducer, {
+function useRemoteUrlData(url) {
+	const [state, dispatch] = useReducer(reducer, {
 		richData: null,
 		isFetching: false,
-	} );
+	});
 
-	const { fetchRichUrlData } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+	const { fetchRichUrlData } = useSelect((select) => {
+		const { getSettings } = select(blockEditorStore);
 		return {
 			fetchRichUrlData: getSettings().__experimentalFetchRichUrlData,
 		};
-	}, [] );
+	}, []);
 
-	useEffect( () => {
+	useEffect(() => {
 		// Only make the request if we have an actual URL
 		// and the fetching util is available. In some editors
 		// there may not be such a util.
@@ -55,37 +55,37 @@ function useRemoteUrlData( url ) {
 			fetchRichUrlData &&
 			typeof AbortController !== 'undefined'
 		) {
-			dispatch( {
+			dispatch({
 				type: 'LOADING',
-			} );
+			});
 
 			const controller = new window.AbortController();
 
 			const signal = controller.signal;
 
-			fetchRichUrlData( url, {
+			fetchRichUrlData(url, {
 				signal,
-			} )
-				.then( ( urlData ) => {
-					dispatch( {
+			})
+				.then((urlData) => {
+					dispatch({
 						type: 'RESOLVED',
 						richData: urlData,
-					} );
-				} )
-				.catch( () => {
+					});
+				})
+				.catch(() => {
 					// Avoid setting state on unmounted component
-					if ( ! signal.aborted ) {
-						dispatch( {
+					if (!signal.aborted) {
+						dispatch({
 							type: 'ERROR',
-						} );
+						});
 					}
-				} );
+				});
 			// Cleanup: when the URL changes the abort the current request
 			return () => {
 				controller.abort();
 			};
 		}
-	}, [ url ] );
+	}, [url]);
 
 	return state;
 }

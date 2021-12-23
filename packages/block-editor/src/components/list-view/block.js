@@ -33,7 +33,7 @@ import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdow
 import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
 
-function ListViewBlock( {
+function ListViewBlock({
 	block,
 	isDragged,
 	isSelected,
@@ -46,16 +46,17 @@ function ListViewBlock( {
 	showBlockMovers,
 	path,
 	isExpanded,
-} ) {
-	const cellRef = useRef( null );
-	const [ isHovered, setIsHovered ] = useState( false );
+}) {
+	const cellRef = useRef(null);
+	const [isHovered, setIsHovered] = useState(false);
 	const { clientId } = block;
 
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+	const { toggleBlockHighlight } = useDispatch(blockEditorStore);
 
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
-		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
+		__experimentalPersistentListViewFeatures:
+			withExperimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions: hideContainerBlockActions,
 		isTreeGridMounted,
 		expand,
@@ -77,161 +78,161 @@ function ListViewBlock( {
 	// If ListView has experimental features related to the Persistent List View,
 	// only focus the selected list item on mount; otherwise the list would always
 	// try to steal the focus from the editor canvas.
-	useEffect( () => {
+	useEffect(() => {
 		if (
 			withExperimentalPersistentListViewFeatures &&
-			! isTreeGridMounted &&
+			!isTreeGridMounted &&
 			isSelected
 		) {
 			cellRef.current.focus();
 		}
-	}, [] );
+	}, []);
 
 	const highlightBlock = withExperimentalPersistentListViewFeatures
 		? toggleBlockHighlight
 		: () => {};
 
-	const onMouseEnter = useCallback( () => {
-		setIsHovered( true );
-		highlightBlock( clientId, true );
-	}, [ clientId, setIsHovered, highlightBlock ] );
-	const onMouseLeave = useCallback( () => {
-		setIsHovered( false );
-		highlightBlock( clientId, false );
-	}, [ clientId, setIsHovered, highlightBlock ] );
+	const onMouseEnter = useCallback(() => {
+		setIsHovered(true);
+		highlightBlock(clientId, true);
+	}, [clientId, setIsHovered, highlightBlock]);
+	const onMouseLeave = useCallback(() => {
+		setIsHovered(false);
+		highlightBlock(clientId, false);
+	}, [clientId, setIsHovered, highlightBlock]);
 
 	const selectEditorBlock = useCallback(
-		( event ) => {
+		(event) => {
 			event.stopPropagation();
-			selectBlock( clientId );
+			selectBlock(clientId);
 		},
-		[ clientId, selectBlock ]
+		[clientId, selectBlock]
 	);
 
 	const toggleExpanded = useCallback(
-		( event ) => {
+		(event) => {
 			event.stopPropagation();
-			if ( isExpanded === true ) {
-				collapse( clientId );
-			} else if ( isExpanded === false ) {
-				expand( clientId );
+			if (isExpanded === true) {
+				collapse(clientId);
+			} else if (isExpanded === false) {
+				expand(clientId);
 			}
 		},
-		[ clientId, expand, collapse, isExpanded ]
+		[clientId, expand, collapse, isExpanded]
 	);
 
 	const showBlockActions =
 		withExperimentalFeatures &&
 		//hide actions for blocks like core/widget-areas
-		( ! hideContainerBlockActions ||
-			( hideContainerBlockActions && level > 1 ) );
+		(!hideContainerBlockActions ||
+			(hideContainerBlockActions && level > 1));
 
-	const hideBlockActions = withExperimentalFeatures && ! showBlockActions;
+	const hideBlockActions = withExperimentalFeatures && !showBlockActions;
 
 	let colSpan;
-	if ( hasRenderedMovers ) {
+	if (hasRenderedMovers) {
 		colSpan = 2;
-	} else if ( hideBlockActions ) {
+	} else if (hideBlockActions) {
 		colSpan = 3;
 	}
 
-	const classes = classnames( {
+	const classes = classnames({
 		'is-selected': isSelected,
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
 		'is-dragging': isDragged,
 		'has-single-cell': hideBlockActions,
-	} );
+	});
 
 	return (
 		<ListViewLeaf
-			className={ classes }
-			onMouseEnter={ onMouseEnter }
-			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
-			level={ level }
-			position={ position }
-			rowCount={ rowCount }
-			path={ path }
-			id={ `list-view-block-${ clientId }` }
-			data-block={ clientId }
-			isExpanded={ isExpanded }
+			className={classes}
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
+			onFocus={onMouseEnter}
+			onBlur={onMouseLeave}
+			level={level}
+			position={position}
+			rowCount={rowCount}
+			path={path}
+			id={`list-view-block-${clientId}`}
+			data-block={clientId}
+			isExpanded={isExpanded}
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
-				colSpan={ colSpan }
-				ref={ cellRef }
+				colSpan={colSpan}
+				ref={cellRef}
 			>
-				{ ( { ref, tabIndex, onFocus } ) => (
+				{({ ref, tabIndex, onFocus }) => (
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
-							block={ block }
-							onClick={ selectEditorBlock }
-							onToggleExpanded={ toggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							ref={ ref }
-							tabIndex={ tabIndex }
-							onFocus={ onFocus }
+							block={block}
+							onClick={selectEditorBlock}
+							onToggleExpanded={toggleExpanded}
+							isSelected={isSelected}
+							position={position}
+							siblingBlockCount={siblingBlockCount}
+							level={level}
+							ref={ref}
+							tabIndex={tabIndex}
+							onFocus={onFocus}
 						/>
 					</div>
-				) }
+				)}
 			</TreeGridCell>
-			{ hasRenderedMovers && (
+			{hasRenderedMovers && (
 				<>
 					<TreeGridCell
-						className={ moverCellClassName }
+						className={moverCellClassName}
 						withoutGridItem
 					>
 						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
+							{({ ref, tabIndex, onFocus }) => (
 								<BlockMoverUpButton
 									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
+									clientIds={[clientId]}
+									ref={ref}
+									tabIndex={tabIndex}
+									onFocus={onFocus}
 								/>
-							) }
+							)}
 						</TreeGridItem>
 						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
+							{({ ref, tabIndex, onFocus }) => (
 								<BlockMoverDownButton
 									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
+									clientIds={[clientId]}
+									ref={ref}
+									tabIndex={tabIndex}
+									onFocus={onFocus}
 								/>
-							) }
+							)}
 						</TreeGridItem>
 					</TreeGridCell>
 				</>
-			) }
+			)}
 
-			{ showBlockActions && (
-				<TreeGridCell className={ listViewBlockSettingsClassName }>
-					{ ( { ref, tabIndex, onFocus } ) => (
+			{showBlockActions && (
+				<TreeGridCell className={listViewBlockSettingsClassName}>
+					{({ ref, tabIndex, onFocus }) => (
 						<BlockSettingsDropdown
-							clientIds={ [ clientId ] }
-							icon={ moreVertical }
-							toggleProps={ {
+							clientIds={[clientId]}
+							icon={moreVertical}
+							toggleProps={{
 								ref,
 								className: 'block-editor-list-view-block__menu',
 								tabIndex,
 								onFocus,
-							} }
+							}}
 							disableOpenOnArrowDown
-							__experimentalSelectBlock={ selectEditorBlock }
+							__experimentalSelectBlock={selectEditorBlock}
 						/>
-					) }
+					)}
 				</TreeGridCell>
-			) }
+			)}
 		</ListViewLeaf>
 	);
 }
 
-export default memo( ListViewBlock );
+export default memo(ListViewBlock);

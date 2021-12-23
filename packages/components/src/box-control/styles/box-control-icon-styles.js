@@ -21,11 +21,11 @@ export const Viewbox = styled.span`
 	height: 100%;
 `;
 
-const strokeFocus = ( { isFocused } ) => {
-	return css( {
+const strokeFocus = ({ isFocused }) => {
+	return css({
 		backgroundColor: 'currentColor',
 		opacity: isFocused ? 1 : 0.3,
-	} );
+	});
 };
 
 const Stroke = styled.span`
@@ -33,33 +33,33 @@ const Stroke = styled.span`
 	display: block;
 	pointer-events: none;
 	position: absolute;
-	${ strokeFocus };
+	${strokeFocus};
 `;
 
-const VerticalStroke = styled( Stroke )`
+const VerticalStroke = styled(Stroke)`
 	bottom: 3px;
 	top: 3px;
 	width: 2px;
 `;
 
-const HorizontalStroke = styled( Stroke )`
+const HorizontalStroke = styled(Stroke)`
 	height: 2px;
 	left: 3px;
 	right: 3px;
 `;
 
-export const TopStroke = styled( HorizontalStroke )`
+export const TopStroke = styled(HorizontalStroke)`
 	top: 0;
 `;
 
-export const RightStroke = styled( VerticalStroke )`
+export const RightStroke = styled(VerticalStroke)`
 	right: 0;
 `;
 
-export const BottomStroke = styled( HorizontalStroke )`
+export const BottomStroke = styled(HorizontalStroke)`
 	bottom: 0;
 `;
 
-export const LeftStroke = styled( VerticalStroke )`
+export const LeftStroke = styled(VerticalStroke)`
 	left: 0;
 `;

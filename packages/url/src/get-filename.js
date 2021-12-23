@@ -11,15 +11,13 @@
  *
  * @return {string|void} The filename part of the URL.
  */
-export function getFilename( url ) {
+export function getFilename(url) {
 	let filename;
 	try {
-		filename = new URL( url, 'http://example.com' ).pathname
-			.split( '/' )
-			.pop();
-	} catch ( error ) {}
+		filename = new URL(url, 'http://example.com').pathname.split('/').pop();
+	} catch (error) {}
 
-	if ( filename ) {
+	if (filename) {
 		return filename;
 	}
 }

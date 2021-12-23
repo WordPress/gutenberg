@@ -3,13 +3,13 @@
  */
 import { useBlockProps } from '@wordpress/block-editor';
 
-const PaginationItem = ( { content, tag: Tag = 'a', extraClass = '' } ) => (
-	<Tag className={ `page-numbers ${ extraClass }` }>{ content }</Tag>
+const PaginationItem = ({ content, tag: Tag = 'a', extraClass = '' }) => (
+	<Tag className={`page-numbers ${extraClass}`}>{content}</Tag>
 );
 
 export default function CommentsPaginationNumbersEdit() {
 	return (
-		<div { ...useBlockProps() }>
+		<div {...useBlockProps()}>
 			<PaginationItem content="1" />
 			<PaginationItem content="2" />
 			<PaginationItem content="3" tag="span" extraClass="current" />

@@ -26,7 +26,7 @@ import styles from './editor.scss';
 
 const { isFullWidth } = alignmentHelpers;
 
-function GroupEdit( {
+function GroupEdit({
 	attributes,
 	hasInnerBlocks,
 	isSelected,
@@ -34,50 +34,50 @@ function GroupEdit( {
 	getStylesFromColorScheme,
 	style,
 	blockWidth,
-} ) {
+}) {
 	const { align } = attributes;
-	const [ resizeObserver, sizes ] = useResizeObserver();
+	const [resizeObserver, sizes] = useResizeObserver();
 	const { width } = sizes || { width: 0 };
 
 	const renderAppender = useCallback(
 		() => (
 			<View
-				style={ [
-					! hasInnerBlocks && styles.groupAppender,
-					isFullWidth( align ) &&
-						! hasInnerBlocks &&
+				style={[
+					!hasInnerBlocks && styles.groupAppender,
+					isFullWidth(align) &&
+						!hasInnerBlocks &&
 						styles.fullwidthGroupAppender,
-					isFullWidth( align ) &&
+					isFullWidth(align) &&
 						hasInnerBlocks &&
 						styles.fullwidthHasInnerGroupAppender,
-				] }
+				]}
 			>
 				<InnerBlocks.ButtonBlockAppender />
 			</View>
 		),
-		[ align, hasInnerBlocks ]
+		[align, hasInnerBlocks]
 	);
 
-	if ( ! isSelected && ! hasInnerBlocks ) {
+	if (!isSelected && !hasInnerBlocks) {
 		return (
 			<View
-				style={ [
+				style={[
 					getStylesFromColorScheme(
 						styles.groupPlaceholder,
 						styles.groupPlaceholderDark
 					),
-					! hasInnerBlocks && {
+					!hasInnerBlocks && {
 						...styles.marginVerticalDense,
 						...styles.marginHorizontalNone,
 					},
-				] }
+				]}
 			/>
 		);
 	}
 
 	return (
 		<View
-			style={ [
+			style={[
 				isSelected && hasInnerBlocks && styles.innerBlocks,
 				style,
 				isSelected &&
@@ -87,20 +87,20 @@ function GroupEdit( {
 				isLastInnerBlockSelected &&
 					style?.backgroundColor &&
 					styles.isLastInnerBlockSelected,
-			] }
+			]}
 		>
-			{ resizeObserver }
+			{resizeObserver}
 			<InnerBlocks
-				renderAppender={ isSelected && renderAppender }
-				parentWidth={ width }
-				blockWidth={ blockWidth }
+				renderAppender={isSelected && renderAppender}
+				parentWidth={width}
+				blockWidth={blockWidth}
 			/>
 		</View>
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
+export default compose([
+	withSelect((select, { clientId }) => {
 		const {
 			getBlock,
 			getBlockIndex,
@@ -108,30 +108,30 @@ export default compose( [
 			getBlockRootClientId,
 			getSelectedBlockClientId,
 			getBlockAttributes,
-		} = select( blockEditorStore );
+		} = select(blockEditorStore);
 
-		const block = getBlock( clientId );
-		const hasInnerBlocks = !! ( block && block.innerBlocks.length );
+		const block = getBlock(clientId);
+		const hasInnerBlocks = !!(block && block.innerBlocks.length);
 		const isInnerBlockSelected =
-			hasInnerBlocks && hasSelectedInnerBlock( clientId, true );
+			hasInnerBlocks && hasSelectedInnerBlock(clientId, true);
 		let isLastInnerBlockSelected = false;
 
-		if ( isInnerBlockSelected ) {
+		if (isInnerBlockSelected) {
 			const { innerBlocks } = block;
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const totalInnerBlocks = innerBlocks.length - 1;
-			const blockIndex = getBlockIndex( selectedBlockClientId );
+			const blockIndex = getBlockIndex(selectedBlockClientId);
 			isLastInnerBlockSelected = totalInnerBlocks === blockIndex;
 		}
 
-		const parentId = getBlockRootClientId( clientId );
-		const parentBlockAlignment = getBlockAttributes( parentId )?.align;
+		const parentId = getBlockRootClientId(clientId);
+		const parentBlockAlignment = getBlockAttributes(parentId)?.align;
 
 		return {
 			hasInnerBlocks,
 			isLastInnerBlockSelected,
 			parentBlockAlignment,
 		};
-	} ),
+	}),
 	withPreferredColorScheme,
-] )( GroupEdit );
+])(GroupEdit);

@@ -15,55 +15,51 @@ import {
 	useColorsPerOrigin,
 } from './hooks';
 
-function ScreenLinkColor( { name } ) {
+function ScreenLinkColor({ name }) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+	const supports = getSupportedGlobalStylesPanels(name);
+	const [solids] = useSetting('color.palette', name);
+	const [areCustomSolidsEnabled] = useSetting('color.custom', name);
 
-	const colorsPerOrigin = useColorsPerOrigin( name );
+	const colorsPerOrigin = useColorsPerOrigin(name);
 
-	const [ isLinkEnabled ] = useSetting( 'color.link', name );
+	const [isLinkEnabled] = useSetting('color.link', name);
 
 	const hasLinkColor =
-		supports.includes( 'linkColor' ) &&
+		supports.includes('linkColor') &&
 		isLinkEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		(solids.length > 0 || areCustomSolidsEnabled);
 
-	const [ linkColor, setLinkColor ] = useStyle(
+	const [linkColor, setLinkColor] = useStyle(
 		'elements.link.color.text',
 		name
 	);
-	const [ userLinkColor ] = useStyle(
-		'elements.link.color.text',
-		name,
-		'user'
-	);
+	const [userLinkColor] = useStyle('elements.link.color.text', name, 'user');
 
-	if ( ! hasLinkColor ) {
+	if (!hasLinkColor) {
 		return null;
 	}
 
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu + '/colors' }
-				title={ __( 'Links' ) }
-				description={ __(
+				back={parentMenu + '/colors'}
+				title={__('Links')}
+				description={__(
 					'Set the default color used for links across the site.'
-				) }
+				)}
 			/>
 			<ColorGradientControl
 				className="edit-site-screen-link-color__control"
-				colors={ colorsPerOrigin }
-				disableCustomColors={ ! areCustomSolidsEnabled }
+				colors={colorsPerOrigin}
+				disableCustomColors={!areCustomSolidsEnabled}
 				__experimentalHasMultipleOrigins
-				showTitle={ false }
+				showTitle={false}
 				enableAlpha
 				__experimentalIsRenderedInSidebar
-				colorValue={ linkColor }
-				onColorChange={ setLinkColor }
-				clearable={ linkColor === userLinkColor }
+				colorValue={linkColor}
+				onColorChange={setLinkColor}
+				clearable={linkColor === userLinkColor}
 			/>
 		</>
 	);

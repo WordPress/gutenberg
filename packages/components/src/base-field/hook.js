@@ -25,7 +25,7 @@ import { useCx } from '../utils/hooks/use-cx';
 /**
  * @param {import('../ui/context').WordPressComponentProps<Props, 'div'>} props
  */
-export function useBaseField( props ) {
+export function useBaseField(props) {
 	const {
 		className,
 		hasError = false,
@@ -35,7 +35,7 @@ export function useBaseField( props ) {
 		defaultValue,
 		disabled,
 		...flexProps
-	} = useContextSystem( props, 'BaseField' );
+	} = useContextSystem(props, 'BaseField');
 
 	const { styles: controlGroupStyles } = useControlGroupContext();
 	const cx = useCx();
@@ -50,11 +50,11 @@ export function useBaseField( props ) {
 				isInline && styles.inline,
 				className
 			),
-		[ className, controlGroupStyles, hasError, isInline, isSubtle ]
+		[className, controlGroupStyles, hasError, isInline, isSubtle]
 	);
 
 	return {
-		...useFlex( { ...flexProps, className: classes } ),
+		...useFlex({ ...flexProps, className: classes }),
 		disabled,
 		defaultValue,
 	};

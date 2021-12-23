@@ -24,75 +24,71 @@ import { useEntityProp } from '@wordpress/core-data';
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 import { useCanEditEntity } from '../utils/hooks';
 
-export default function PostTitleEdit( {
+export default function PostTitleEdit({
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
 	context: { postType, postId, queryId },
-} ) {
+}) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isDescendentOfQueryLoop = !! queryId;
-	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
-	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
+	const isDescendentOfQueryLoop = !!queryId;
+	const userCanEdit = useCanEditEntity('postType', postType, postId);
+	const [rawTitle = '', setTitle, fullTitle] = useEntityProp(
 		'postType',
 		postType,
 		'title',
 		postId
 	);
-	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const [link] = useEntityProp('postType', postType, 'link', postId);
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+		}),
+	});
 
-	let titleElement = (
-		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>
-	);
+	let titleElement = <TagName {...blockProps}>{__('Post Title')}</TagName>;
 
-	if ( postType && postId ) {
+	if (postType && postId) {
 		titleElement =
-			userCanEdit && ! isDescendentOfQueryLoop ? (
+			userCanEdit && !isDescendentOfQueryLoop ? (
 				<PlainText
-					tagName={ TagName }
-					placeholder={ __( 'No Title' ) }
-					value={ rawTitle }
-					onChange={ setTitle }
-					__experimentalVersion={ 2 }
-					{ ...blockProps }
+					tagName={TagName}
+					placeholder={__('No Title')}
+					value={rawTitle}
+					onChange={setTitle}
+					__experimentalVersion={2}
+					{...blockProps}
 				/>
 			) : (
-				<TagName { ...blockProps }>
-					<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
+				<TagName {...blockProps}>
+					<RawHTML key="html">{fullTitle?.rendered}</RawHTML>
 				</TagName>
 			);
 	}
 
-	if ( isLink && postType && postId ) {
+	if (isLink && postType && postId) {
 		titleElement =
-			userCanEdit && ! isDescendentOfQueryLoop ? (
-				<TagName { ...blockProps }>
+			userCanEdit && !isDescendentOfQueryLoop ? (
+				<TagName {...blockProps}>
 					<PlainText
 						tagName="a"
-						href={ link }
-						target={ linkTarget }
-						rel={ rel }
-						placeholder={
-							! rawTitle.length ? __( 'No Title' ) : null
-						}
-						value={ rawTitle }
-						onChange={ setTitle }
-						__experimentalVersion={ 2 }
+						href={link}
+						target={linkTarget}
+						rel={rel}
+						placeholder={!rawTitle.length ? __('No Title') : null}
+						value={rawTitle}
+						onChange={setTitle}
+						__experimentalVersion={2}
 					/>
 				</TagName>
 			) : (
-				<TagName { ...blockProps }>
+				<TagName {...blockProps}>
 					<a
-						href={ link }
-						target={ linkTarget }
-						rel={ rel }
-						onClick={ ( event ) => event.preventDefault() }
+						href={link}
+						target={linkTarget}
+						rel={rel}
+						onClick={(event) => event.preventDefault()}
 					>
-						<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
+						<RawHTML key="html">{fullTitle?.rendered}</RawHTML>
 					</a>
 				</TagName>
 			);
@@ -102,48 +98,46 @@ export default function PostTitleEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
+					selectedLevel={level}
+					onChange={(newLevel) => setAttributes({ level: newLevel })}
 				/>
 				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
+					value={textAlign}
+					onChange={(nextAlign) => {
+						setAttributes({ textAlign: nextAlign });
+					}}
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={__('Link settings')}>
 					<ToggleControl
-						label={ __( 'Make title a link' ) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
+						label={__('Make title a link')}
+						onChange={() => setAttributes({ isLink: !isLink })}
+						checked={isLink}
 					/>
-					{ isLink && (
+					{isLink && (
 						<>
 							<ToggleControl
-								label={ __( 'Open in new tab' ) }
-								onChange={ ( value ) =>
-									setAttributes( {
+								label={__('Open in new tab')}
+								onChange={(value) =>
+									setAttributes({
 										linkTarget: value ? '_blank' : '_self',
-									} )
+									})
 								}
-								checked={ linkTarget === '_blank' }
+								checked={linkTarget === '_blank'}
 							/>
 							<TextControl
-								label={ __( 'Link rel' ) }
-								value={ rel }
-								onChange={ ( newRel ) =>
-									setAttributes( { rel: newRel } )
+								label={__('Link rel')}
+								value={rel}
+								onChange={(newRel) =>
+									setAttributes({ rel: newRel })
 								}
 							/>
 						</>
-					) }
+					)}
 				</PanelBody>
 			</InspectorControls>
-			{ titleElement }
+			{titleElement}
 		</>
 	);
 }

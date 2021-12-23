@@ -20,13 +20,13 @@ import { menuItemToBlockAttributes } from '../../store/transform';
  *
  * @return {WPBlock[]} An array of blocks.
  */
-export default function menuItemsToBlocks( menuItems ) {
-	if ( ! menuItems ) {
+export default function menuItemsToBlocks(menuItems) {
+	if (!menuItems) {
 		return null;
 	}
 
-	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
+	const menuTree = createDataTree(menuItems);
+	return mapMenuItemsToBlocks(menuTree);
 }
 
 /** @typedef {import('../..store/utils').WPNavMenuItem} WPNavMenuItem */
@@ -37,21 +37,21 @@ export default function menuItemsToBlocks( menuItems ) {
  * @param {WPNavMenuItem[]} menuItems An array of WPNavMenuItem items.
  * @return {Object} Object containing innerBlocks and mapping.
  */
-function mapMenuItemsToBlocks( menuItems ) {
+function mapMenuItemsToBlocks(menuItems) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = sortBy( menuItems, 'menu_order' );
+	const sortedItems = sortBy(menuItems, 'menu_order');
 
-	const innerBlocks = sortedItems.map( ( menuItem ) => {
-		const attributes = menuItemToBlockAttributes( menuItem );
+	const innerBlocks = sortedItems.map((menuItem) => {
+		const attributes = menuItemToBlockAttributes(menuItem);
 
 		// If there are children recurse to build those nested blocks.
 		const {
 			innerBlocks: nestedBlocks = [], // alias to avoid shadowing
 			mapping: nestedMapping = {}, // alias to avoid shadowing
 		} = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
+			? mapMenuItemsToBlocks(menuItem.children)
 			: {};
 
 		// Update parent mapping with nested mapping.
@@ -68,10 +68,10 @@ function mapMenuItemsToBlocks( menuItems ) {
 		);
 
 		// Create mapping for menuItem -> block
-		mapping[ menuItem.id ] = block.clientId;
+		mapping[menuItem.id] = block.clientId;
 
 		return block;
-	} );
+	});
 
 	return {
 		innerBlocks,
@@ -94,24 +94,22 @@ function mapMenuItemsToBlocks( menuItems ) {
  * @param {*}      relation the property which identifies how the current item is related to other items in the data (if at all).
  * @return {Array} a nested array of parent/child relationships
  */
-function createDataTree( dataset, id = 'id', relation = 'parent' ) {
-	const hashTable = Object.create( null );
+function createDataTree(dataset, id = 'id', relation = 'parent') {
+	const hashTable = Object.create(null);
 	const dataTree = [];
 
-	for ( const data of dataset ) {
-		hashTable[ data[ id ] ] = {
+	for (const data of dataset) {
+		hashTable[data[id]] = {
 			...data,
 			children: [],
 		};
-		if ( data[ relation ] ) {
-			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
-			hashTable[ data[ relation ] ].children =
-				hashTable[ data[ relation ] ].children || [];
-			hashTable[ data[ relation ] ].children.push(
-				hashTable[ data[ id ] ]
-			);
+		if (data[relation]) {
+			hashTable[data[relation]] = hashTable[data[relation]] || {};
+			hashTable[data[relation]].children =
+				hashTable[data[relation]].children || [];
+			hashTable[data[relation]].children.push(hashTable[data[id]]);
 		} else {
-			dataTree.push( hashTable[ data[ id ] ] );
+			dataTree.push(hashTable[data[id]]);
 		}
 	}
 

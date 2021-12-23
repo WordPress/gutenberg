@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-const TerserPlugin = require( 'terser-webpack-plugin' );
+const TerserPlugin = require('terser-webpack-plugin');
 
 /**
  * Internal dependencies
  */
-const ReadableJsAssetsWebpackPlugin = require( '../..' );
+const ReadableJsAssetsWebpackPlugin = require('../..');
 
 module.exports = {
 	mode: 'production',
@@ -16,7 +16,7 @@ module.exports = {
 		moduleIds: 'named',
 		concatenateModules: true,
 		minimizer: [
-			new TerserPlugin( {
+			new TerserPlugin({
 				parallel: true,
 				terserOptions: {
 					output: {
@@ -26,11 +26,11 @@ module.exports = {
 						passes: 2,
 					},
 					mangle: {
-						reserved: [ '__', '_n', '_nx', '_x' ],
+						reserved: ['__', '_n', '_nx', '_x'],
 					},
 				},
 				extractComments: false,
-			} ),
+			}),
 		],
 	},
 	entry: {
@@ -40,5 +40,5 @@ module.exports = {
 	output: {
 		filename: '[name].min.js',
 	},
-	plugins: [ new ReadableJsAssetsWebpackPlugin() ],
+	plugins: [new ReadableJsAssetsWebpackPlugin()],
 };

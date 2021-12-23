@@ -24,28 +24,28 @@ export const TEXT_DECORATION_SUPPORT_KEY =
  *
  * @return {WPElement} Text decoration edit element.
  */
-export function TextDecorationEdit( props ) {
+export function TextDecorationEdit(props) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	function onChange( newDecoration ) {
-		setAttributes( {
-			style: cleanEmptyObject( {
+	function onChange(newDecoration) {
+		setAttributes({
+			style: cleanEmptyObject({
 				...style,
 				typography: {
 					...style?.typography,
 					textDecoration: newDecoration,
 				},
-			} ),
-		} );
+			}),
+		});
 	}
 
 	return (
 		<TextDecorationControl
-			value={ style?.typography?.textDecoration }
-			onChange={ onChange }
+			value={style?.typography?.textDecoration}
+			onChange={onChange}
 		/>
 	);
 }
@@ -57,14 +57,14 @@ export function TextDecorationEdit( props ) {
  *
  * @return {boolean} Whether or not the setting is disabled.
  */
-export function useIsTextDecorationDisabled( { name: blockName } = {} ) {
-	const notSupported = ! hasBlockSupport(
+export function useIsTextDecorationDisabled({ name: blockName } = {}) {
+	const notSupported = !hasBlockSupport(
 		blockName,
 		TEXT_DECORATION_SUPPORT_KEY
 	);
-	const hasTextDecoration = useSetting( 'typography.textDecoration' );
+	const hasTextDecoration = useSetting('typography.textDecoration');
 
-	return notSupported || ! hasTextDecoration;
+	return notSupported || !hasTextDecoration;
 }
 
 /**
@@ -73,8 +73,8 @@ export function useIsTextDecorationDisabled( { name: blockName } = {} ) {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a text decoration set.
  */
-export function hasTextDecorationValue( props ) {
-	return !! props.attributes.style?.typography?.textDecoration;
+export function hasTextDecorationValue(props) {
+	return !!props.attributes.style?.typography?.textDecoration;
 }
 
 /**
@@ -86,16 +86,16 @@ export function hasTextDecorationValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetTextDecoration( { attributes = {}, setAttributes } ) {
+export function resetTextDecoration({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
-		style: cleanEmptyObject( {
+	setAttributes({
+		style: cleanEmptyObject({
 			...style,
 			typography: {
 				...style?.typography,
 				textDecoration: undefined,
 			},
-		} ),
-	} );
+		}),
+	});
 }

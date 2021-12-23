@@ -10,9 +10,9 @@ import { join } from 'path';
  * @param {string} value         The value to check for.
  * @return {Function} Function that determines if a request's query parameter is the specified value.
  */
-function parameterEquals( parameterName, value ) {
-	return ( request ) =>
-		new URL( request.url() ).searchParams.get( parameterName ) === value;
+function parameterEquals(parameterName, value) {
+	return (request) =>
+		new URL(request.url()).searchParams.get(parameterName) === value;
 }
 
 /**
@@ -25,10 +25,10 @@ function parameterEquals( parameterName, value ) {
  *                    a given path, accounting for variance in site permalink
  *                    configuration.
  */
-function isRESTRoute( path ) {
-	return ( request ) =>
-		parameterEquals( 'rest_route', path )( request ) ||
-		new URL( request.url() ).pathname.endsWith( join( '/wp-json', path ) );
+function isRESTRoute(path) {
+	return (request) =>
+		parameterEquals('rest_route', path)(request) ||
+		new URL(request.url()).pathname.endsWith(join('/wp-json', path));
 }
 
 /**
@@ -37,8 +37,8 @@ function isRESTRoute( path ) {
  * @param {string} url The URL to check against a request.
  * @return {Function} Function that determines if a request is for the embed API, embedding a specific URL.
  */
-export function createEmbeddingMatcher( url ) {
-	return ( request ) =>
-		isRESTRoute( '/oembed/1.0/proxy' )( request ) &&
-		parameterEquals( 'url', url )( request );
+export function createEmbeddingMatcher(url) {
+	return (request) =>
+		isRESTRoute('/oembed/1.0/proxy')(request) &&
+		parameterEquals('url', url)(request);
 }

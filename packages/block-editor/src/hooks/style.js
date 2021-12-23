@@ -49,19 +49,19 @@ const styleSupportKeys = [
 	SPACING_SUPPORT_KEY,
 ];
 
-const hasStyleSupport = ( blockType ) =>
-	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
+const hasStyleSupport = (blockType) =>
+	styleSupportKeys.some((key) => hasBlockSupport(blockType, key));
 
 const VARIABLE_REFERENCE_PREFIX = 'var:';
 const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
 const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-function compileStyleValue( uncompiledValue ) {
-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+function compileStyleValue(uncompiledValue) {
+	if (startsWith(uncompiledValue, VARIABLE_REFERENCE_PREFIX)) {
 		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
+			.slice(VARIABLE_REFERENCE_PREFIX.length)
+			.split(VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE)
+			.join(VARIABLE_PATH_SEPARATOR_TOKEN_STYLE);
+		return `var(--wp--${variable})`;
 	}
 	return uncompiledValue;
 }
@@ -73,51 +73,50 @@ function compileStyleValue( uncompiledValue ) {
  *
  * @return {Object} Flattened CSS variables declaration.
  */
-export function getInlineStyles( styles = {} ) {
+export function getInlineStyles(styles = {}) {
 	const output = {};
-	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
-		const path = STYLE_PROPERTY[ propKey ].value;
-		const subPaths = STYLE_PROPERTY[ propKey ].properties;
+	Object.keys(STYLE_PROPERTY).forEach((propKey) => {
+		const path = STYLE_PROPERTY[propKey].value;
+		const subPaths = STYLE_PROPERTY[propKey].properties;
 		// Ignore styles on elements because they are handled on the server.
-		if ( has( styles, path ) && 'elements' !== first( path ) ) {
+		if (has(styles, path) && 'elements' !== first(path)) {
 			// Checking if style value is a string allows for shorthand css
 			// option and backwards compatibility for border radius support.
-			const styleValue = get( styles, path );
+			const styleValue = get(styles, path);
 
-			if ( !! subPaths && ! isString( styleValue ) ) {
-				Object.entries( subPaths ).forEach( ( entry ) => {
-					const [ name, subPath ] = entry;
-					const value = get( styleValue, [ subPath ] );
+			if (!!subPaths && !isString(styleValue)) {
+				Object.entries(subPaths).forEach((entry) => {
+					const [name, subPath] = entry;
+					const value = get(styleValue, [subPath]);
 
-					if ( value ) {
-						output[ name ] = compileStyleValue( value );
+					if (value) {
+						output[name] = compileStyleValue(value);
 					}
-				} );
+				});
 			} else {
-				output[ propKey ] = compileStyleValue( get( styles, path ) );
+				output[propKey] = compileStyleValue(get(styles, path));
 			}
 		}
-	} );
+	});
 
 	return output;
 }
 
-function compileElementsStyles( selector, elements = {} ) {
-	return map( elements, ( styles, element ) => {
-		const elementStyles = getInlineStyles( styles );
-		if ( ! isEmpty( elementStyles ) ) {
+function compileElementsStyles(selector, elements = {}) {
+	return map(elements, (styles, element) => {
+		const elementStyles = getInlineStyles(styles);
+		if (!isEmpty(elementStyles)) {
 			return [
-				`.${ selector } ${ ELEMENTS[ element ] }{`,
+				`.${selector} ${ELEMENTS[element]}{`,
 				...map(
 					elementStyles,
-					( value, property ) =>
-						`\t${ kebabCase( property ) }: ${ value };`
+					(value, property) => `\t${kebabCase(property)}: ${value};`
 				),
 				'}',
-			].join( '\n' );
+			].join('\n');
 		}
 		return '';
-	} ).join( '\n' );
+	}).join('\n');
 }
 
 /**
@@ -127,18 +126,18 @@ function compileElementsStyles( selector, elements = {} ) {
  *
  * @return {Object} Filtered block settings.
  */
-function addAttribute( settings ) {
-	if ( ! hasStyleSupport( settings ) ) {
+function addAttribute(settings) {
+	if (!hasStyleSupport(settings)) {
 		return settings;
 	}
 
 	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( ! settings.attributes.style ) {
-		Object.assign( settings.attributes, {
+	if (!settings.attributes.style) {
+		Object.assign(settings.attributes, {
 			style: {
 				type: 'object',
 			},
-		} );
+		});
 	}
 
 	return settings;
@@ -152,16 +151,14 @@ function addAttribute( settings ) {
  * @type {Record<string, string[]>}
  */
 const skipSerializationPathsEdit = {
-	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
-	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+	[`${BORDER_SUPPORT_KEY}.__experimentalSkipSerialization`]: ['border'],
+	[`${COLOR_SUPPORT_KEY}.__experimentalSkipSerialization`]: [
 		COLOR_SUPPORT_KEY,
 	],
-	[ `${ TYPOGRAPHY_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+	[`${TYPOGRAPHY_SUPPORT_KEY}.__experimentalSkipSerialization`]: [
 		TYPOGRAPHY_SUPPORT_KEY,
 	],
-	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
-		'spacing',
-	],
+	[`${SPACING_SUPPORT_KEY}.__experimentalSkipSerialization`]: ['spacing'],
 };
 
 /**
@@ -178,7 +175,7 @@ const skipSerializationPathsEdit = {
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
-	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing.blockGap' ],
+	[`${SPACING_SUPPORT_KEY}`]: ['spacing.blockGap'],
 };
 
 /**
@@ -197,20 +194,20 @@ export function addSaveProps(
 	attributes,
 	skipPaths = skipSerializationPathsSave
 ) {
-	if ( ! hasStyleSupport( blockType ) ) {
+	if (!hasStyleSupport(blockType)) {
 		return props;
 	}
 
 	let { style } = attributes;
 
-	forEach( skipPaths, ( path, indicator ) => {
-		if ( getBlockSupport( blockType, indicator ) ) {
-			style = omit( style, path );
+	forEach(skipPaths, (path, indicator) => {
+		if (getBlockSupport(blockType, indicator)) {
+			style = omit(style, path);
 		}
-	} );
+	});
 
 	props.style = {
-		...getInlineStyles( style ),
+		...getInlineStyles(style),
 		...props.style,
 	};
 
@@ -225,16 +222,16 @@ export function addSaveProps(
  *
  * @return {Object}.Filtered block settings.
  */
-export function addEditProps( settings ) {
-	if ( ! hasStyleSupport( settings ) ) {
+export function addEditProps(settings) {
+	if (!hasStyleSupport(settings)) {
 		return settings;
 	}
 
 	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
+	settings.getEditWrapperProps = (attributes) => {
 		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
+		if (existingGetEditWrapperProps) {
+			props = existingGetEditWrapperProps(attributes);
 		}
 
 		return addSaveProps(
@@ -257,20 +254,20 @@ export function addEditProps( settings ) {
  * @return {Function} Wrapped component.
  */
 export const withBlockControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
+	(BlockEdit) => (props) => {
 		const shouldDisplayControls = useDisplayBlockControls();
 
 		return (
 			<>
-				{ shouldDisplayControls && (
+				{shouldDisplayControls && (
 					<>
-						<ColorEdit { ...props } />
-						<TypographyPanel { ...props } />
-						<BorderPanel { ...props } />
-						<DimensionsPanel { ...props } />
+						<ColorEdit {...props} />
+						<TypographyPanel {...props} />
+						<BorderPanel {...props} />
+						<DimensionsPanel {...props} />
 					</>
-				) }
-				<BlockEdit { ...props } />
+				)}
+				<BlockEdit {...props} />
 			</>
 		);
 	},
@@ -284,33 +281,33 @@ export const withBlockControls = createHigherOrderComponent(
  * @return {Function}                Wrapped component
  */
 const withElementsStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
+	(BlockListBlock) => (props) => {
 		const elements = props.attributes.style?.elements;
 
-		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
+		const blockElementsContainerIdentifier = `wp-elements-${useInstanceId(
 			BlockListBlock
-		) }`;
+		)}`;
 		const styles = compileElementsStyles(
 			blockElementsContainerIdentifier,
 			props.attributes.style?.elements
 		);
-		const element = useContext( BlockList.__unstableElementContext );
+		const element = useContext(BlockList.__unstableElementContext);
 
 		return (
 			<>
-				{ elements &&
+				{elements &&
 					element &&
 					createPortal(
 						<style
-							dangerouslySetInnerHTML={ {
+							dangerouslySetInnerHTML={{
 								__html: styles,
-							} }
+							}}
 						/>,
 						element
-					) }
+					)}
 
 				<BlockListBlock
-					{ ...props }
+					{...props}
 					className={
 						elements
 							? classnames(
@@ -325,11 +322,7 @@ const withElementsStyles = createHigherOrderComponent(
 	}
 );
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/style/addAttribute',
-	addAttribute
-);
+addFilter('blocks.registerBlockType', 'core/style/addAttribute', addAttribute);
 
 addFilter(
 	'blocks.getSaveContent.extraProps',
@@ -337,11 +330,7 @@ addFilter(
 	addSaveProps
 );
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/style/addEditProps',
-	addEditProps
-);
+addFilter('blocks.registerBlockType', 'core/style/addEditProps', addEditProps);
 
 addFilter(
 	'editor.BlockEdit',

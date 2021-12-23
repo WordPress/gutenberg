@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const path = require( 'path' );
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Internal dependencies
  */
-const getIntermediateRepresentation = require( '../lib/get-intermediate-representation' );
+const getIntermediateRepresentation = require('../lib/get-intermediate-representation');
 
-describe( 'Intermediate Representation', () => {
-	describe( 'undocumented code', () => {
-		it( 'default export on multiple lines', () => {
+describe('Intermediate Representation', () => {
+	describe('undocumented code', () => {
+		it('default export on multiple lines', () => {
 			const token = fs.readFileSync(
 				path.join(
 					__dirname,
@@ -19,11 +19,8 @@ describe( 'Intermediate Representation', () => {
 				),
 				'utf-8'
 			);
-			const ir = getIntermediateRepresentation(
-				null,
-				JSON.parse( token )
-			);
-			expect( ir ).toMatchInlineSnapshot( `
+			const ir = getIntermediateRepresentation(null, JSON.parse(token));
+			expect(ir).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Undocumented declaration.",
@@ -34,9 +31,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-		} );
-		it( 'default export on one line', () => {
+		`);
+		});
+		it('default export on one line', () => {
 			const tokenOneliner = fs.readFileSync(
 				path.join(
 					__dirname,
@@ -46,9 +43,9 @@ describe( 'Intermediate Representation', () => {
 			);
 			const irOneliner = getIntermediateRepresentation(
 				null,
-				JSON.parse( tokenOneliner )
+				JSON.parse(tokenOneliner)
 			);
-			expect( irOneliner ).toMatchInlineSnapshot( `
+			expect(irOneliner).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Undocumented declaration.",
@@ -59,13 +56,13 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-		} );
-	} );
+		`);
+		});
+	});
 
-	describe( 'JSDoc in export statement', () => {
-		describe( 'default export', () => {
-			it( 'anonymous class', () => {
+	describe('JSDoc in export statement', () => {
+		describe('default export', () => {
+			it('anonymous class', () => {
 				const tokenClassAnonymous = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -75,9 +72,9 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irClassAnonymous = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenClassAnonymous )
+					JSON.parse(tokenClassAnonymous)
 				);
-				expect( irClassAnonymous ).toMatchInlineSnapshot( `
+				expect(irClassAnonymous).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Class declaration example.",
@@ -88,9 +85,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'named class', () => {
+		`);
+			});
+			it('named class', () => {
 				const tokenClassNamed = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -100,9 +97,9 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irClassNamed = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenClassNamed )
+					JSON.parse(tokenClassNamed)
 				);
-				expect( irClassNamed ).toMatchInlineSnapshot( `
+				expect(irClassNamed).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Class declaration example.",
@@ -113,9 +110,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'anonymous function', () => {
+		`);
+			});
+			it('anonymous function', () => {
 				const tokenFnAnonymous = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -125,9 +122,9 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irFnAnonymous = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenFnAnonymous )
+					JSON.parse(tokenFnAnonymous)
 				);
-				expect( irFnAnonymous ).toMatchInlineSnapshot( `
+				expect(irFnAnonymous).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration example.",
@@ -138,9 +135,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'named function', () => {
+		`);
+			});
+			it('named function', () => {
 				const tokenFnNamed = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -150,9 +147,9 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irFnNamed = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenFnNamed )
+					JSON.parse(tokenFnNamed)
 				);
-				expect( irFnNamed ).toMatchInlineSnapshot( `
+				expect(irFnNamed).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration example.",
@@ -163,9 +160,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'variable', () => {
+		`);
+			});
+			it('variable', () => {
 				const tokenVariable = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -175,9 +172,9 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irVar = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenVariable )
+					JSON.parse(tokenVariable)
 				);
-				expect( irVar ).toMatchInlineSnapshot( `
+				expect(irVar).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Variable declaration example.",
@@ -188,23 +185,20 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
-		describe( 'named export', () => {
-			it( 'named class', () => {
+		`);
+			});
+		});
+		describe('named export', () => {
+			it('named class', () => {
 				const tokenClass = fs.readFileSync(
-					path.join(
-						__dirname,
-						'./fixtures/named-class/exports.json'
-					),
+					path.join(__dirname, './fixtures/named-class/exports.json'),
 					'utf-8'
 				);
 				const irNamedClass = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenClass )
+					JSON.parse(tokenClass)
 				);
-				expect( irNamedClass ).toMatchInlineSnapshot( `
+				expect(irNamedClass).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "My declaration example.",
@@ -222,9 +216,9 @@ describe( 'Intermediate Representation', () => {
 			    ],
 			  },
 			]
-		` );
-			} );
-			it( 'named function', () => {
+		`);
+			});
+			it('named function', () => {
 				const tokenFn = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -234,9 +228,9 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irNamedFn = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenFn )
+					JSON.parse(tokenFn)
 				);
-				expect( irNamedFn ).toMatchInlineSnapshot( `
+				expect(irNamedFn).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "My declaration example.",
@@ -247,9 +241,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'named variable', () => {
+		`);
+			});
+			it('named variable', () => {
 				const tokenVariable = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -259,9 +253,9 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irNamedVar = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenVariable )
+					JSON.parse(tokenVariable)
 				);
-				expect( irNamedVar ).toMatchInlineSnapshot( `
+				expect(irNamedVar).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "My declaration example.",
@@ -272,9 +266,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'named variables', () => {
+		`);
+			});
+			it('named variables', () => {
 				const tokenVariables = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -284,9 +278,9 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irNamedVars = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenVariables )
+					JSON.parse(tokenVariables)
 				);
-				expect( irNamedVars ).toMatchInlineSnapshot( `
+				expect(irNamedVars).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "My declaration example.",
@@ -305,14 +299,14 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
-	} );
+		`);
+			});
+		});
+	});
 
-	describe( 'JSDoc in same file', () => {
-		describe( 'default export', () => {
-			it( 'named class', () => {
+	describe('JSDoc in same file', () => {
+		describe('default export', () => {
+			it('named class', () => {
 				const token = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -329,10 +323,10 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irDefaultId = getIntermediateRepresentation(
 					null,
-					JSON.parse( token ),
-					JSON.parse( ast )
+					JSON.parse(token),
+					JSON.parse(ast)
 				);
-				expect( irDefaultId ).toMatchInlineSnapshot( `
+				expect(irDefaultId).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Class declaration example.",
@@ -350,9 +344,9 @@ describe( 'Intermediate Representation', () => {
 			    ],
 			  },
 			]
-		` );
-			} );
-			it( 'named function', () => {
+		`);
+			});
+			it('named function', () => {
 				const namedExport = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -369,10 +363,10 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irDefaultNamed0 = getIntermediateRepresentation(
 					null,
-					JSON.parse( namedExport )[ 0 ],
-					JSON.parse( namedExportAST )
+					JSON.parse(namedExport)[0],
+					JSON.parse(namedExportAST)
 				);
-				expect( irDefaultNamed0 ).toMatchInlineSnapshot( `
+				expect(irDefaultNamed0).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration example.",
@@ -383,13 +377,13 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
+		`);
 				const irDefaultNamed1 = getIntermediateRepresentation(
 					null,
-					JSON.parse( namedExport )[ 1 ],
-					JSON.parse( namedExportAST )
+					JSON.parse(namedExport)[1],
+					JSON.parse(namedExportAST)
 				);
-				expect( irDefaultNamed1 ).toMatchInlineSnapshot( `
+				expect(irDefaultNamed1).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration example.",
@@ -400,12 +394,12 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
+		`);
+			});
+		});
 
-		describe( 'named export', () => {
-			it( 'named identifier', () => {
+		describe('named export', () => {
+			it('named identifier', () => {
 				const token = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -422,10 +416,10 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irNamedId = getIntermediateRepresentation(
 					null,
-					JSON.parse( token ),
-					JSON.parse( ast )
+					JSON.parse(token),
+					JSON.parse(ast)
 				);
-				expect( irNamedId ).toMatchInlineSnapshot( `
+				expect(irNamedId).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "My declaration example.",
@@ -436,9 +430,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'named identifier with destructuring', () => {
+		`);
+			});
+			it('named identifier with destructuring', () => {
 				const tokenObject = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -455,10 +449,10 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irNamedIdDestructuring = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenObject ),
-					JSON.parse( astObject )
+					JSON.parse(tokenObject),
+					JSON.parse(astObject)
 				);
-				expect( irNamedIdDestructuring ).toMatchInlineSnapshot( `
+				expect(irNamedIdDestructuring).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "My declaration example.",
@@ -469,9 +463,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'named identifiers', () => {
+		`);
+			});
+			it('named identifiers', () => {
 				const tokens = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -488,10 +482,10 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irIds = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokens ),
-					JSON.parse( asts )
+					JSON.parse(tokens),
+					JSON.parse(asts)
 				);
-				expect( irIds ).toMatchInlineSnapshot( `
+				expect(irIds).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration example.",
@@ -525,9 +519,9 @@ describe( 'Intermediate Representation', () => {
 			    ],
 			  },
 			]
-		` );
-			} );
-			it( 'named identifiers and inline', () => {
+		`);
+			});
+			it('named identifiers and inline', () => {
 				const foo = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -544,10 +538,10 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irIdInline0 = getIntermediateRepresentation(
 					null,
-					JSON.parse( foo )[ 0 ],
-					JSON.parse( bar )
+					JSON.parse(foo)[0],
+					JSON.parse(bar)
 				);
-				expect( irIdInline0 ).toMatchInlineSnapshot( `
+				expect(irIdInline0).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration example.",
@@ -573,13 +567,13 @@ describe( 'Intermediate Representation', () => {
 			    ],
 			  },
 			]
-		` );
+		`);
 				const irIdInline1 = getIntermediateRepresentation(
 					null,
-					JSON.parse( foo )[ 1 ],
-					JSON.parse( bar )
+					JSON.parse(foo)[1],
+					JSON.parse(bar)
 				);
-				expect( irIdInline1 ).toMatchInlineSnapshot( `
+				expect(irIdInline1).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Variable declaration example.",
@@ -590,14 +584,14 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
-	} );
+		`);
+			});
+		});
+	});
 
-	describe( 'JSDoc in module dependency', () => {
-		describe( 'named export', () => {
-			it( 'named import', () => {
+	describe('JSDoc in module dependency', () => {
+		describe('named export', () => {
+			it('named import', () => {
 				const tokenImportNamed = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -617,11 +611,11 @@ describe( 'Intermediate Representation', () => {
 					);
 				const ir = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenImportNamed ),
+					JSON.parse(tokenImportNamed),
 					{ body: [] },
 					getModuleImportNamed
 				);
-				expect( ir ).toMatchInlineSnapshot( `
+				expect(ir).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration example.",
@@ -648,11 +642,11 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
+		`);
+			});
+		});
 
-		describe( 'named default export', () => {
+		describe('named default export', () => {
 			const getModule = () =>
 				JSON.parse(
 					fs.readFileSync(
@@ -663,7 +657,7 @@ describe( 'Intermediate Representation', () => {
 						'utf-8'
 					)
 				);
-			it( 'default', () => {
+			it('default', () => {
 				const tokenDefault = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -673,11 +667,11 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irNamedDefault = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenDefault ),
+					JSON.parse(tokenDefault),
 					{ body: [] },
 					getModule
 				);
-				expect( irNamedDefault ).toMatchInlineSnapshot( `
+				expect(irNamedDefault).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Module declaration.",
@@ -688,9 +682,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'renamed', () => {
+		`);
+			});
+			it('renamed', () => {
 				const tokenDefaultExported = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -700,11 +694,11 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irNamedDefaultExported = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenDefaultExported ),
+					JSON.parse(tokenDefaultExported),
 					{ body: [] },
 					getModule
 				);
-				expect( irNamedDefaultExported ).toMatchInlineSnapshot( `
+				expect(irNamedDefaultExported).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Module declaration.",
@@ -715,11 +709,11 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
+		`);
+			});
+		});
 
-		describe( 'namespace export', () => {
+		describe('namespace export', () => {
 			const getModule = () =>
 				JSON.parse(
 					fs.readFileSync(
@@ -730,18 +724,18 @@ describe( 'Intermediate Representation', () => {
 						'utf-8'
 					)
 				);
-			it( 'exports', () => {
+			it('exports', () => {
 				const token = fs.readFileSync(
-					path.join( __dirname, './fixtures/namespace/exports.json' ),
+					path.join(__dirname, './fixtures/namespace/exports.json'),
 					'utf-8'
 				);
 				const irNamespace = getIntermediateRepresentation(
 					null,
-					JSON.parse( token ),
+					JSON.parse(token),
 					{ body: [] },
 					getModule
 				);
-				expect( irNamespace ).toMatchInlineSnapshot( `
+				expect(irNamespace).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Named class.",
@@ -768,9 +762,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'exports with comment', () => {
+		`);
+			});
+			it('exports with comment', () => {
 				const tokenCommented = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -780,11 +774,11 @@ describe( 'Intermediate Representation', () => {
 				);
 				const irNamespaceCommented = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenCommented ),
+					JSON.parse(tokenCommented),
 					{ body: [] },
 					getModule
 				);
-				expect( irNamespaceCommented ).toMatchInlineSnapshot( `
+				expect(irNamespaceCommented).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Named class.",
@@ -811,14 +805,14 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
-	} );
+		`);
+			});
+		});
+	});
 
-	describe( 'JSDoc in module dependency through import', () => {
-		describe( 'default export', () => {
-			it( 'default import', () => {
+	describe('JSDoc in module dependency through import', () => {
+		describe('default export', () => {
+			it('default import', () => {
 				const tokenDefault = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -845,11 +839,11 @@ describe( 'Intermediate Representation', () => {
 					);
 				const irDefault = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenDefault ),
-					JSON.parse( astDefault ),
+					JSON.parse(tokenDefault),
+					JSON.parse(astDefault),
 					getModuleDefault
 				);
-				expect( irDefault ).toMatchInlineSnapshot( `
+				expect(irDefault).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration.",
@@ -860,9 +854,9 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-			it( 'named import', () => {
+		`);
+			});
+			it('named import', () => {
 				const tokenNamed = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -889,11 +883,11 @@ describe( 'Intermediate Representation', () => {
 					);
 				const irNamed = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenNamed ),
-					JSON.parse( astNamed ),
+					JSON.parse(tokenNamed),
+					JSON.parse(astNamed),
 					getModuleNamed
 				);
-				expect( irNamed ).toMatchInlineSnapshot( `
+				expect(irNamed).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Function declaration.",
@@ -904,12 +898,12 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
+		`);
+			});
+		});
 
-		describe( 'named export', () => {
-			it( 'namespace import', () => {
+		describe('named export', () => {
+			it('namespace import', () => {
 				const tokenImportNamespace = fs.readFileSync(
 					path.join(
 						__dirname,
@@ -924,8 +918,8 @@ describe( 'Intermediate Representation', () => {
 					),
 					'utf-8'
 				);
-				const getModuleImportNamespace = ( filePath ) => {
-					if ( filePath === './named-import-namespace-module' ) {
+				const getModuleImportNamespace = (filePath) => {
+					if (filePath === './named-import-namespace-module') {
 						return JSON.parse(
 							fs.readFileSync(
 								path.join(
@@ -948,11 +942,11 @@ describe( 'Intermediate Representation', () => {
 				};
 				const ir = getIntermediateRepresentation(
 					null,
-					JSON.parse( tokenImportNamespace ),
-					JSON.parse( astImportNamespace ),
+					JSON.parse(tokenImportNamespace),
+					JSON.parse(astImportNamespace),
 					getModuleImportNamespace
 				);
-				expect( ir ).toMatchInlineSnapshot( `
+				expect(ir).toMatchInlineSnapshot(`
 			Array [
 			  Object {
 			    "description": "Undocumented declaration.",
@@ -963,8 +957,8 @@ describe( 'Intermediate Representation', () => {
 			    "tags": Array [],
 			  },
 			]
-		` );
-			} );
-		} );
-	} );
-} );
+		`);
+			});
+		});
+	});
+});

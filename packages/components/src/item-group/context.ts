@@ -8,8 +8,8 @@ import { createContext, useContext } from '@wordpress/element';
  */
 import type { ItemGroupContext as Context } from './types';
 
-export const ItemGroupContext = createContext( {
+export const ItemGroupContext = createContext({
 	size: 'medium',
-} as Context );
+} as Context);
 
-export const useItemGroupContext = () => useContext( ItemGroupContext );
+export const useItemGroupContext = () => useContext(ItemGroupContext);

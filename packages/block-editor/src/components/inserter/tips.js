@@ -24,18 +24,18 @@ const globalTips = [
 		),
 		{ kbd: <kbd /> }
 	),
-	__( 'Drag files into the editor to automatically insert media blocks.' ),
-	__( "Change a block's type by pressing the block icon on the toolbar." ),
+	__('Drag files into the editor to automatically insert media blocks.'),
+	__("Change a block's type by pressing the block icon on the toolbar."),
 ];
 
 function Tips() {
-	const [ randomIndex ] = useState(
+	const [randomIndex] = useState(
 		// Disable Reason: I'm not generating an HTML id.
 		// eslint-disable-next-line no-restricted-syntax
-		Math.floor( Math.random() * globalTips.length )
+		Math.floor(Math.random() * globalTips.length)
 	);
 
-	return <Tip>{ globalTips[ randomIndex ] }</Tip>;
+	return <Tip>{globalTips[randomIndex]}</Tip>;
 }
 
 export default Tips;

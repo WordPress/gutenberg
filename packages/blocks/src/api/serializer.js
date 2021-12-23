@@ -39,11 +39,11 @@ import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
  *
  * @return {string} The block's default class.
  */
-export function getBlockDefaultClassName( blockName ) {
+export function getBlockDefaultClassName(blockName) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
-		'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+		'wp-block-' + blockName.replace(/\//, '-').replace(/^core-/, '');
 
 	return applyFilters(
 		'blocks.getBlockDefaultClassName',
@@ -59,12 +59,12 @@ export function getBlockDefaultClassName( blockName ) {
  *
  * @return {string} The block's default menu item class.
  */
-export function getBlockMenuDefaultClassName( blockName ) {
+export function getBlockMenuDefaultClassName(blockName) {
 	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
 		'editor-block-list-item-' +
-		blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+		blockName.replace(/\//, '-').replace(/^core-/, '');
 
 	return applyFilters(
 		'blocks.getBlockMenuDefaultClassName',
@@ -81,7 +81,7 @@ const innerBlocksPropsProvider = {};
  *
  * @param {Object} props Optional. Props to pass to the element.
  */
-export function getBlockProps( props = {} ) {
+export function getBlockProps(props = {}) {
 	const { blockType, attributes } = blockPropsProvider;
 	return applyFilters(
 		'blocks.getSaveContent.extraProps',
@@ -96,12 +96,12 @@ export function getBlockProps( props = {} ) {
  *
  * @param {Object} props Optional. Props to pass to the element.
  */
-export function getInnerBlocksProps( props = {} ) {
+export function getInnerBlocksProps(props = {}) {
 	const { innerBlocks } = innerBlocksPropsProvider;
 	// Value is an array of blocks, so defer to block serializer
-	const html = serialize( innerBlocks, { isInnerBlocks: true } );
+	const html = serialize(innerBlocks, { isInnerBlocks: true });
 	// Use special-cased raw HTML tag to avoid default escaping.
-	const children = <RawHTML>{ html }</RawHTML>;
+	const children = <RawHTML>{html}</RawHTML>;
 
 	return { ...props, children };
 }
@@ -116,32 +116,28 @@ export function getInnerBlocksProps( props = {} ) {
  *
  * @return {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement(
-	blockTypeOrName,
-	attributes,
-	innerBlocks = []
-) {
-	const blockType = normalizeBlockType( blockTypeOrName );
+export function getSaveElement(blockTypeOrName, attributes, innerBlocks = []) {
+	const blockType = normalizeBlockType(blockTypeOrName);
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must
 	// occur synchronously. For improved interoperability with higher-order
 	// components which often return component class, emulate basic support.
-	if ( save.prototype instanceof Component ) {
-		const instance = new save( { attributes } );
-		save = instance.render.bind( instance );
+	if (save.prototype instanceof Component) {
+		const instance = new save({ attributes });
+		save = instance.render.bind(instance);
 	}
 
 	blockPropsProvider.blockType = blockType;
 	blockPropsProvider.attributes = attributes;
 	innerBlocksPropsProvider.innerBlocks = innerBlocks;
 
-	let element = save( { attributes, innerBlocks } );
+	let element = save({ attributes, innerBlocks });
 
 	if (
-		isObject( element ) &&
-		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
-		! ( blockType.apiVersion > 1 )
+		isObject(element) &&
+		hasFilter('blocks.getSaveContent.extraProps') &&
+		!(blockType.apiVersion > 1)
 	) {
 		/**
 		 * Filters the props applied to the block save result element.
@@ -157,8 +153,8 @@ export function getSaveElement(
 			attributes
 		);
 
-		if ( ! isShallowEqual( props, element.props ) ) {
-			element = cloneElement( element, props );
+		if (!isShallowEqual(props, element.props)) {
+			element = cloneElement(element, props);
 		}
 	}
 
@@ -187,12 +183,10 @@ export function getSaveElement(
  *
  * @return {string} Save content.
  */
-export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
-	const blockType = normalizeBlockType( blockTypeOrName );
+export function getSaveContent(blockTypeOrName, attributes, innerBlocks) {
+	const blockType = normalizeBlockType(blockTypeOrName);
 
-	return renderToString(
-		getSaveElement( blockType, attributes, innerBlocks )
-	);
+	return renderToString(getSaveElement(blockType, attributes, innerBlocks));
 }
 
 /**
@@ -211,19 +205,19 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  *
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
-export function getCommentAttributes( blockType, attributes ) {
+export function getCommentAttributes(blockType, attributes) {
 	return reduce(
 		blockType.attributes,
-		( accumulator, attributeSchema, key ) => {
-			const value = attributes[ key ];
+		(accumulator, attributeSchema, key) => {
+			const value = attributes[key];
 			// Ignore undefined values.
-			if ( undefined === value ) {
+			if (undefined === value) {
 				return accumulator;
 			}
 
 			// Ignore all attributes but the ones with an "undefined" source
 			// "undefined" source refers to attributes saved in the block comment.
-			if ( attributeSchema.source !== undefined ) {
+			if (attributeSchema.source !== undefined) {
 				return accumulator;
 			}
 
@@ -236,7 +230,7 @@ export function getCommentAttributes( blockType, attributes ) {
 			}
 
 			// Otherwise, include in comment set.
-			accumulator[ key ] = value;
+			accumulator[key] = value;
 			return accumulator;
 		},
 		{}
@@ -251,22 +245,22 @@ export function getCommentAttributes( blockType, attributes ) {
  *
  * @return {string} Serialized attributes.
  */
-export function serializeAttributes( attributes ) {
+export function serializeAttributes(attributes) {
 	return (
-		JSON.stringify( attributes )
+		JSON.stringify(attributes)
 			// Don't break HTML comments.
-			.replace( /--/g, '\\u002d\\u002d' )
+			.replace(/--/g, '\\u002d\\u002d')
 
 			// Don't break non-standard-compliant tools.
-			.replace( /</g, '\\u003c' )
-			.replace( />/g, '\\u003e' )
-			.replace( /&/g, '\\u0026' )
+			.replace(/</g, '\\u003c')
+			.replace(/>/g, '\\u003e')
+			.replace(/&/g, '\\u0026')
 
 			// Bypass server stripslashes behavior which would unescape stringify's
 			// escaping of quotation mark.
 			//
 			// See: https://developer.wordpress.org/reference/functions/wp_kses_stripslashes/
-			.replace( /\\"/g, '\\u0022' )
+			.replace(/\\"/g, '\\u0022')
 	);
 }
 
@@ -277,21 +271,21 @@ export function serializeAttributes( attributes ) {
  *
  * @return {string} HTML.
  */
-export function getBlockInnerHTML( block ) {
+export function getBlockInnerHTML(block) {
 	// If block was parsed as invalid or encounters an error while generating
 	// save content, use original content instead to avoid content loss. If a
 	// block contains nested content, exempt it from this condition because we
 	// otherwise have no access to its original content and content loss would
 	// still occur.
 	let saveContent = block.originalContent;
-	if ( block.isValid || block.innerBlocks.length ) {
+	if (block.isValid || block.innerBlocks.length) {
 		try {
 			saveContent = getSaveContent(
 				block.name,
 				block.attributes,
 				block.innerBlocks
 			);
-		} catch ( error ) {}
+		} catch (error) {}
 	}
 
 	return saveContent;
@@ -306,30 +300,26 @@ export function getBlockInnerHTML( block ) {
  *
  * @return {string} Comment-delimited block content.
  */
-export function getCommentDelimitedContent(
-	rawBlockName,
-	attributes,
-	content
-) {
-	const serializedAttributes = ! isEmpty( attributes )
-		? serializeAttributes( attributes ) + ' '
+export function getCommentDelimitedContent(rawBlockName, attributes, content) {
+	const serializedAttributes = !isEmpty(attributes)
+		? serializeAttributes(attributes) + ' '
 		: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = startsWith( rawBlockName, 'core/' )
-		? rawBlockName.slice( 5 )
+	const blockName = startsWith(rawBlockName, 'core/')
+		? rawBlockName.slice(5)
 		: rawBlockName;
 
 	// @todo make the `wp:` prefix potentially configurable.
 
-	if ( ! content ) {
-		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
+	if (!content) {
+		return `<!-- wp:${blockName} ${serializedAttributes}/-->`;
 	}
 
 	return (
-		`<!-- wp:${ blockName } ${ serializedAttributes }-->\n` +
+		`<!-- wp:${blockName} ${serializedAttributes}-->\n` +
 		content +
-		`\n<!-- /wp:${ blockName } -->`
+		`\n<!-- /wp:${blockName} -->`
 	);
 }
 
@@ -342,39 +332,39 @@ export function getCommentDelimitedContent(
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
+export function serializeBlock(block, { isInnerBlocks = false } = {}) {
 	const blockName = block.name;
-	const saveContent = getBlockInnerHTML( block );
+	const saveContent = getBlockInnerHTML(block);
 
 	if (
 		blockName === getUnregisteredTypeHandlerName() ||
-		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
+		(!isInnerBlocks && blockName === getFreeformContentHandlerName())
 	) {
 		return saveContent;
 	}
 
-	const blockType = getBlockType( blockName );
-	const saveAttributes = getCommentAttributes( blockType, block.attributes );
-	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+	const blockType = getBlockType(blockName);
+	const saveAttributes = getCommentAttributes(blockType, block.attributes);
+	return getCommentDelimitedContent(blockName, saveAttributes, saveContent);
 }
 
-export function __unstableSerializeAndClean( blocks ) {
+export function __unstableSerializeAndClean(blocks) {
 	// A single unmodified default block is assumed to
 	// be equivalent to an empty post.
-	if ( blocks.length === 1 && isUnmodifiedDefaultBlock( blocks[ 0 ] ) ) {
+	if (blocks.length === 1 && isUnmodifiedDefaultBlock(blocks[0])) {
 		blocks = [];
 	}
 
-	let content = serialize( blocks );
+	let content = serialize(blocks);
 
 	// For compatibility, treat a post consisting of a
 	// single freeform block as legacy content and apply
 	// pre-block-editor removep'd content formatting.
 	if (
 		blocks.length === 1 &&
-		blocks[ 0 ].name === getFreeformContentHandlerName()
+		blocks[0].name === getFreeformContentHandlerName()
 	) {
-		content = removep( content );
+		content = removep(content);
 	}
 
 	return content;
@@ -388,8 +378,8 @@ export function __unstableSerializeAndClean( blocks ) {
  *
  * @return {string} The post content.
  */
-export default function serialize( blocks, options ) {
-	return castArray( blocks )
-		.map( ( block ) => serializeBlock( block, options ) )
-		.join( '\n\n' );
+export default function serialize(blocks, options) {
+	return castArray(blocks)
+		.map((block) => serializeBlock(block, options))
+		.join('\n\n');
 }

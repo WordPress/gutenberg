@@ -28,8 +28,8 @@ import { Text } from '../text';
 import { VStack } from '../v-stack';
 
 function ConfirmDialog(
-	props: WordPressComponentProps< OwnProps, 'div', false >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<OwnProps, 'div', false>,
+	forwardedRef: Ref<any>
 ) {
 	const {
 		isOpen: isOpenProp,
@@ -37,78 +37,77 @@ function ConfirmDialog(
 		onCancel,
 		children,
 		...otherProps
-	} = useContextSystem( props, 'ConfirmDialog' );
+	} = useContextSystem(props, 'ConfirmDialog');
 
-	const [ isOpen, setIsOpen ] = useState< boolean >();
-	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
+	const [isOpen, setIsOpen] = useState<boolean>();
+	const [shouldSelfClose, setShouldSelfClose] = useState<boolean>();
 
-	useEffect( () => {
+	useEffect(() => {
 		// We only allow the dialog to close itself if `isOpenProp` is *not* set.
 		// If `isOpenProp` is set, then it (probably) means it's controlled by a
 		// parent component. In that case, `shouldSelfClose` might do more harm than
 		// good, so we disable it.
 		const isIsOpenSet = typeof isOpenProp !== 'undefined';
-		setIsOpen( isIsOpenSet ? isOpenProp : true );
-		setShouldSelfClose( ! isIsOpenSet );
-	}, [ isOpenProp ] );
+		setIsOpen(isIsOpenSet ? isOpenProp : true);
+		setShouldSelfClose(!isIsOpenSet);
+	}, [isOpenProp]);
 
 	const handleEvent = useCallback(
-		( callback?: ( event: DialogInputEvent ) => void ) => (
-			event: DialogInputEvent
-		) => {
-			callback?.( event );
-			if ( shouldSelfClose ) {
-				setIsOpen( false );
-			}
-		},
-		[ shouldSelfClose, setIsOpen ]
+		(callback?: (event: DialogInputEvent) => void) =>
+			(event: DialogInputEvent) => {
+				callback?.(event);
+				if (shouldSelfClose) {
+					setIsOpen(false);
+				}
+			},
+		[shouldSelfClose, setIsOpen]
 	);
 
 	const handleEnter = useCallback(
-		( event: KeyboardEvent< HTMLDivElement > ) => {
-			if ( event.key === 'Enter' ) {
-				handleEvent( onConfirm )( event );
+		(event: KeyboardEvent<HTMLDivElement>) => {
+			if (event.key === 'Enter') {
+				handleEvent(onConfirm)(event);
 			}
 		},
-		[ handleEvent, onConfirm ]
+		[handleEvent, onConfirm]
 	);
 
-	const cancelLabel = __( 'Cancel' );
-	const confirmLabel = __( 'OK' );
+	const cancelLabel = __('Cancel');
+	const confirmLabel = __('OK');
 
 	return (
 		<>
-			{ isOpen && (
+			{isOpen && (
 				<Modal
-					onRequestClose={ handleEvent( onCancel ) }
-					onKeyDown={ handleEnter }
-					closeButtonLabel={ cancelLabel }
-					isDismissible={ true }
-					ref={ forwardedRef }
+					onRequestClose={handleEvent(onCancel)}
+					onKeyDown={handleEnter}
+					closeButtonLabel={cancelLabel}
+					isDismissible={true}
+					ref={forwardedRef}
 					__experimentalHideHeader
-					{ ...otherProps }
+					{...otherProps}
 				>
-					<VStack spacing={ 8 }>
-						<Text>{ children }</Text>
+					<VStack spacing={8}>
+						<Text>{children}</Text>
 						<Flex direction="row" justify="flex-end">
 							<Button
 								variant="tertiary"
-								onClick={ handleEvent( onCancel ) }
+								onClick={handleEvent(onCancel)}
 							>
-								{ cancelLabel }
+								{cancelLabel}
 							</Button>
 							<Button
 								variant="primary"
-								onClick={ handleEvent( onConfirm ) }
+								onClick={handleEvent(onConfirm)}
 							>
-								{ confirmLabel }
+								{confirmLabel}
 							</Button>
 						</Flex>
 					</VStack>
 				</Modal>
-			) }
+			)}
 		</>
 	);
 }
 
-export default contextConnect( ConfirmDialog, 'ConfirmDialog' );
+export default contextConnect(ConfirmDialog, 'ConfirmDialog');

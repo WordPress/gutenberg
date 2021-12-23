@@ -26,7 +26,7 @@ export const Root = styled.div`
 	position: relative;
 `;
 
-const paddingStyles = ( { disableUnits, size }: InputProps ) => {
+const paddingStyles = ({ disableUnits, size }: InputProps) => {
 	const paddings = {
 		default: {
 			paddingRight: 8,
@@ -40,12 +40,12 @@ const paddingStyles = ( { disableUnits, size }: InputProps ) => {
 	};
 
 	return css`
-		${ rtl( paddings[ size ] )() };
+		${rtl(paddings[size])()};
 	`;
 };
 
-const arrowStyles = ( { disableUnits }: InputProps ) => {
-	if ( disableUnits ) return '';
+const arrowStyles = ({ disableUnits }: InputProps) => {
+	if (disableUnits) return '';
 
 	return css`
 		&::-webkit-outer-spin-button,
@@ -59,7 +59,7 @@ const arrowStyles = ( { disableUnits }: InputProps ) => {
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
-export const ValueInput = styled( NumberControl )`
+export const ValueInput = styled(NumberControl)`
 	&&& {
 		input {
 			appearance: none;
@@ -67,8 +67,8 @@ export const ValueInput = styled( NumberControl )`
 			display: block;
 			width: 100%;
 
-			${ arrowStyles };
-			${ paddingStyles };
+			${arrowStyles};
+			${paddingStyles};
 		}
 	}
 `;
@@ -79,7 +79,7 @@ const baseUnitLabelStyles = css`
 	border-radius: 2px;
 	border: none;
 	box-sizing: border-box;
-	color: ${ COLORS.darkGray[ 500 ] };
+	color: ${COLORS.darkGray[500]};
 	display: block;
 	font-size: 8px;
 	letter-spacing: -0.5px;
@@ -89,30 +89,30 @@ const baseUnitLabelStyles = css`
 	text-transform: uppercase;
 	width: 20px;
 
-	${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+	${rtl({ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 })()}
 `;
 
-export const UnitLabel = styled.div< SelectProps >`
+export const UnitLabel = styled.div<SelectProps>`
 	&&& {
 		pointer-events: none;
 
-		${ baseUnitLabelStyles };
+		${baseUnitLabelStyles};
 	}
 `;
 
-export const UnitSelect = styled.select< SelectProps >`
+export const UnitSelect = styled.select<SelectProps>`
 	&&& {
-		${ baseUnitLabelStyles };
+		${baseUnitLabelStyles};
 		cursor: pointer;
 		border: 1px solid transparent;
 		height: 100%;
 
 		&:hover {
-			background-color: ${ COLORS.lightGray[ 300 ] };
+			background-color: ${COLORS.lightGray[300]};
 		}
 
 		&:focus {
-			border-color: ${ COLORS.ui.borderFocus };
+			border-color: ${COLORS.ui.borderFocus};
 			outline: 2px solid transparent;
 			outline-offset: 0;
 		}

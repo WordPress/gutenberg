@@ -15,53 +15,53 @@ import {
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
-export default function PostCommentsFormEdit( {
+export default function PostCommentsFormEdit({
 	attributes,
 	context,
 	setAttributes,
-} ) {
+}) {
 	const { textAlign } = attributes;
 	const { postId, postType } = context;
-	const [ commentStatus ] = useEntityProp(
+	const [commentStatus] = useEntityProp(
 		'postType',
 		postType,
 		'comment_status',
 		postId
 	);
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+		}),
+	});
 
 	return (
 		<>
 			<BlockControls group="block">
 				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
+					value={textAlign}
+					onChange={(nextAlign) => {
+						setAttributes({ textAlign: nextAlign });
+					}}
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
-				{ ! commentStatus && (
+			<div {...blockProps}>
+				{!commentStatus && (
 					<Warning>
-						{ __(
+						{__(
 							'Post Comments Form block: comments are not enabled for this post type.'
-						) }
+						)}
 					</Warning>
-				) }
+				)}
 
-				{ 'open' !== commentStatus && (
+				{'open' !== commentStatus && (
 					<Warning>
-						{ __(
+						{__(
 							'Post Comments Form block: comments to this post are not allowed.'
-						) }
+						)}
 					</Warning>
-				) }
+				)}
 
-				{ 'open' === commentStatus && __( 'Post Comments Form' ) }
+				{'open' === commentStatus && __('Post Comments Form')}
 			</div>
 		</>
 	);

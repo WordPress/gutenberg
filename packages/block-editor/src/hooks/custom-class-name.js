@@ -25,8 +25,8 @@ import { InspectorControls } from '../components';
  *
  * @return {Object} Filtered block settings.
  */
-export function addAttribute( settings ) {
-	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
+export function addAttribute(settings) {
+	if (hasBlockSupport(settings, 'customClassName', true)) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -47,45 +47,40 @@ export function addAttribute( settings ) {
  *
  * @return {WPComponent} Wrapped component.
  */
-export const withInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const hasCustomClassName = hasBlockSupport(
-				props.name,
-				'customClassName',
-				true
+export const withInspectorControl = createHigherOrderComponent((BlockEdit) => {
+	return (props) => {
+		const hasCustomClassName = hasBlockSupport(
+			props.name,
+			'customClassName',
+			true
+		);
+		if (hasCustomClassName && props.isSelected) {
+			return (
+				<>
+					<BlockEdit {...props} />
+					<InspectorControls __experimentalGroup="advanced">
+						<TextControl
+							autoComplete="off"
+							label={__('Additional CSS class(es)')}
+							value={props.attributes.className || ''}
+							onChange={(nextValue) => {
+								props.setAttributes({
+									className:
+										nextValue !== ''
+											? nextValue
+											: undefined,
+								});
+							}}
+							help={__('Separate multiple classes with spaces.')}
+						/>
+					</InspectorControls>
+				</>
 			);
-			if ( hasCustomClassName && props.isSelected ) {
-				return (
-					<>
-						<BlockEdit { ...props } />
-						<InspectorControls __experimentalGroup="advanced">
-							<TextControl
-								autoComplete="off"
-								label={ __( 'Additional CSS class(es)' ) }
-								value={ props.attributes.className || '' }
-								onChange={ ( nextValue ) => {
-									props.setAttributes( {
-										className:
-											nextValue !== ''
-												? nextValue
-												: undefined,
-									} );
-								} }
-								help={ __(
-									'Separate multiple classes with spaces.'
-								) }
-							/>
-						</InspectorControls>
-					</>
-				);
-			}
+		}
 
-			return <BlockEdit { ...props } />;
-		};
-	},
-	'withInspectorControl'
-);
+		return <BlockEdit {...props} />;
+	};
+}, 'withInspectorControl');
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -98,9 +93,9 @@ export const withInspectorControl = createHigherOrderComponent(
  *
  * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( extraProps, blockType, attributes ) {
+export function addSaveProps(extraProps, blockType, attributes) {
 	if (
-		hasBlockSupport( blockType, 'customClassName', true ) &&
+		hasBlockSupport(blockType, 'customClassName', true) &&
 		attributes.className
 	) {
 		extraProps.className = classnames(

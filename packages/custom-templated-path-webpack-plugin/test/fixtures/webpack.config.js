@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-const { basename } = require( 'path' );
+const { basename } = require('path');
 
 /**
  * Internal dependencies
  */
-const CustomTemplatedPathPlugin = require( '../../' );
+const CustomTemplatedPathPlugin = require('../../');
 
 module.exports = {
 	mode: 'development',
@@ -17,15 +17,15 @@ module.exports = {
 		path: __dirname,
 	},
 	plugins: [
-		new CustomTemplatedPathPlugin( {
-			basename( path, data ) {
+		new CustomTemplatedPathPlugin({
+			basename(path, data) {
 				let rawRequest;
-				if ( data && data.chunk && data.chunk.entryModule ) {
+				if (data && data.chunk && data.chunk.entryModule) {
 					rawRequest = data.chunk.entryModule.rawRequest;
 				}
 
-				if ( rawRequest ) {
-					return basename( rawRequest );
+				if (rawRequest) {
+					return basename(rawRequest);
 				}
 
 				return path;
@@ -33,6 +33,6 @@ module.exports = {
 			theanswertolife() {
 				return 42;
 			},
-		} ),
+		}),
 	],
 };

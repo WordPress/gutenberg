@@ -9,14 +9,14 @@ import { noop } from 'lodash';
  */
 import PanelColorSettings from '../';
 
-describe( 'PanelColorSettings', () => {
-	it( 'should not render anything if there are no colors to choose', async () => {
+describe('PanelColorSettings', () => {
+	it('should not render anything if there are no colors to choose', async () => {
 		const { container } = render(
 			<PanelColorSettings
 				title="Test Title"
-				colors={ [] }
-				disableCustomColors={ true }
-				colorSettings={ [
+				colors={[]}
+				disableCustomColors={true}
+				colorSettings={[
 					{
 						value: '#000',
 						onChange: noop,
@@ -27,19 +27,19 @@ describe( 'PanelColorSettings', () => {
 						onChange: noop,
 						label: 'background color',
 					},
-				] }
+				]}
 			/>
 		);
-		expect( container.innerHTML ).toBe( '' );
-	} );
+		expect(container.innerHTML).toBe('');
+	});
 
-	it( 'should render a color panel if at least one setting supports custom colors', async () => {
+	it('should render a color panel if at least one setting supports custom colors', async () => {
 		const { container } = render(
 			<PanelColorSettings
 				title="Test Title"
-				colors={ [] }
-				disableCustomColors={ true }
-				colorSettings={ [
+				colors={[]}
+				disableCustomColors={true}
+				colorSettings={[
 					{
 						value: '#000',
 						onChange: noop,
@@ -51,19 +51,19 @@ describe( 'PanelColorSettings', () => {
 						label: 'background color',
 						disableCustomColors: false,
 					},
-				] }
+				]}
 			/>
 		);
-		expect( container.innerHTML ).not.toBe( '' );
-	} );
+		expect(container.innerHTML).not.toBe('');
+	});
 
-	it( 'should render a color panel if at least one setting specifies some colors to choose', async () => {
+	it('should render a color panel if at least one setting specifies some colors to choose', async () => {
 		const { container } = render(
 			<PanelColorSettings
 				title="Test Title"
-				colors={ [] }
-				disableCustomColors={ true }
-				colorSettings={ [
+				colors={[]}
+				disableCustomColors={true}
+				colorSettings={[
 					{
 						value: '#000',
 						onChange: noop,
@@ -81,19 +81,19 @@ describe( 'PanelColorSettings', () => {
 						onChange: noop,
 						label: 'background color',
 					},
-				] }
+				]}
 			/>
 		);
-		expect( container.innerHTML ).not.toBe( '' );
-	} );
+		expect(container.innerHTML).not.toBe('');
+	});
 
-	it( 'should not render anything if none of the setting panels has colors to choose', async () => {
+	it('should not render anything if none of the setting panels has colors to choose', async () => {
 		const { container } = render(
 			<PanelColorSettings
 				title="Test Title"
-				colors={ [] }
-				disableCustomColors={ false }
-				colorSettings={ [
+				colors={[]}
+				disableCustomColors={false}
+				colorSettings={[
 					{
 						value: '#000',
 						onChange: noop,
@@ -108,9 +108,9 @@ describe( 'PanelColorSettings', () => {
 						colors: [],
 						disableCustomColors: true,
 					},
-				] }
+				]}
 			/>
 		);
-		expect( container.innerHTML ).not.toBe( '' );
-	} );
-} );
+		expect(container.innerHTML).not.toBe('');
+	});
+});

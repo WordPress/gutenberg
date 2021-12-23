@@ -107,14 +107,14 @@ function createFrame(
  * @throws {TypeError}
  * @return {WPElement}  A wp element.
  */
-const createInterpolateElement = ( interpolatedString, conversionMap ) => {
+const createInterpolateElement = (interpolatedString, conversionMap) => {
 	indoc = interpolatedString;
 	offset = 0;
 	output = [];
 	stack = [];
 	tokenizer.lastIndex = 0;
 
-	if ( ! isValidConversionMap( conversionMap ) ) {
+	if (!isValidConversionMap(conversionMap)) {
 		throw new TypeError(
 			'The conversionMap provided is not valid. It must be an object with values that are WPElements'
 		);
@@ -122,8 +122,8 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 
 	do {
 		// twiddle our thumbs
-	} while ( proceed( conversionMap ) );
-	return createElement( Fragment, null, ...output );
+	} while (proceed(conversionMap));
+	return createElement(Fragment, null, ...output);
 };
 
 /**
@@ -138,13 +138,13 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
  *
  * @return {boolean}  True means the map is valid.
  */
-const isValidConversionMap = ( conversionMap ) => {
+const isValidConversionMap = (conversionMap) => {
 	const isObject = typeof conversionMap === 'object';
-	const values = isObject && Object.values( conversionMap );
+	const values = isObject && Object.values(conversionMap);
 	return (
 		isObject &&
 		values.length &&
-		values.every( ( element ) => isValidElement( element ) )
+		values.every((element) => isValidElement(element))
 	);
 };
 
@@ -157,30 +157,28 @@ const isValidConversionMap = ( conversionMap ) => {
  *
  * @return {boolean} true for continuing to iterate, false for finished.
  */
-function proceed( conversionMap ) {
+function proceed(conversionMap) {
 	const next = nextToken();
-	const [ tokenType, name, startOffset, tokenLength ] = next;
+	const [tokenType, name, startOffset, tokenLength] = next;
 	const stackDepth = stack.length;
 	const leadingTextStart = startOffset > offset ? offset : null;
-	if ( ! conversionMap[ name ] ) {
+	if (!conversionMap[name]) {
 		addText();
 		return false;
 	}
-	switch ( tokenType ) {
+	switch (tokenType) {
 		case 'no-more-tokens':
-			if ( stackDepth !== 0 ) {
-				const {
-					leadingTextStart: stackLeadingText,
-					tokenStart,
-				} = stack.pop();
-				output.push( indoc.substr( stackLeadingText, tokenStart ) );
+			if (stackDepth !== 0) {
+				const { leadingTextStart: stackLeadingText, tokenStart } =
+					stack.pop();
+				output.push(indoc.substr(stackLeadingText, tokenStart));
 			}
 			addText();
 			return false;
 
 		case 'self-closed':
-			if ( 0 === stackDepth ) {
-				if ( null !== leadingTextStart ) {
+			if (0 === stackDepth) {
+				if (null !== leadingTextStart) {
 					output.push(
 						indoc.substr(
 							leadingTextStart,
@@ -188,14 +186,14 @@ function proceed( conversionMap ) {
 						)
 					);
 				}
-				output.push( conversionMap[ name ] );
+				output.push(conversionMap[name]);
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner element
 			addChild(
-				createFrame( conversionMap[ name ], startOffset, tokenLength )
+				createFrame(conversionMap[name], startOffset, tokenLength)
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -203,7 +201,7 @@ function proceed( conversionMap ) {
 		case 'opener':
 			stack.push(
 				createFrame(
-					conversionMap[ name ],
+					conversionMap[name],
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -215,8 +213,8 @@ function proceed( conversionMap ) {
 
 		case 'closer':
 			// if we're not nesting then this is easy - close the block
-			if ( 1 === stackDepth ) {
-				closeOuterElement( startOffset );
+			if (1 === stackDepth) {
+				closeOuterElement(startOffset);
 				offset = startOffset + tokenLength;
 				return true;
 			}
@@ -228,7 +226,7 @@ function proceed( conversionMap ) {
 				stackTop.prevOffset,
 				startOffset - stackTop.prevOffset
 			);
-			stackTop.children.push( text );
+			stackTop.children.push(text);
 			stackTop.prevOffset = startOffset + tokenLength;
 			const frame = createFrame(
 				stackTop.element,
@@ -237,7 +235,7 @@ function proceed( conversionMap ) {
 				startOffset + tokenLength
 			);
 			frame.children = stackTop.children;
-			addChild( frame );
+			addChild(frame);
 			offset = startOffset + tokenLength;
 			return true;
 
@@ -255,21 +253,21 @@ function proceed( conversionMap ) {
  * @return {Array}  An array of details for the token matched.
  */
 function nextToken() {
-	const matches = tokenizer.exec( indoc );
+	const matches = tokenizer.exec(indoc);
 	// we have no more tokens
-	if ( null === matches ) {
-		return [ 'no-more-tokens' ];
+	if (null === matches) {
+		return ['no-more-tokens'];
 	}
 	const startedAt = matches.index;
-	const [ match, isClosing, name, isSelfClosed ] = matches;
+	const [match, isClosing, name, isSelfClosed] = matches;
 	const length = match.length;
-	if ( isSelfClosed ) {
-		return [ 'self-closed', name, startedAt, length ];
+	if (isSelfClosed) {
+		return ['self-closed', name, startedAt, length];
 	}
-	if ( isClosing ) {
-		return [ 'closer', name, startedAt, length ];
+	if (isClosing) {
+		return ['closer', name, startedAt, length];
 	}
-	return [ 'opener', name, startedAt, length ];
+	return ['opener', name, startedAt, length];
 }
 
 /**
@@ -281,10 +279,10 @@ function nextToken() {
  */
 function addText() {
 	const length = indoc.length - offset;
-	if ( 0 === length ) {
+	if (0 === length) {
 		return;
 	}
-	output.push( indoc.substr( offset, length ) );
+	output.push(indoc.substr(offset, length));
 }
 
 /**
@@ -296,19 +294,19 @@ function addText() {
  * @param {Frame} frame The Frame containing the child element and it's
  *                      token information.
  */
-function addChild( frame ) {
+function addChild(frame) {
 	const { element, tokenStart, tokenLength, prevOffset, children } = frame;
-	const parent = stack[ stack.length - 1 ];
+	const parent = stack[stack.length - 1];
 	const text = indoc.substr(
 		parent.prevOffset,
 		tokenStart - parent.prevOffset
 	);
 
-	if ( text ) {
-		parent.children.push( text );
+	if (text) {
+		parent.children.push(text);
 	}
 
-	parent.children.push( cloneElement( element, null, ...children ) );
+	parent.children.push(cloneElement(element, null, ...children));
 	parent.prevOffset = prevOffset ? prevOffset : tokenStart + tokenLength;
 }
 
@@ -324,30 +322,25 @@ function addChild( frame ) {
  *                           helps capture any remaining nested text nodes in
  *                           the element.
  */
-function closeOuterElement( endOffset ) {
-	const {
-		element,
-		leadingTextStart,
-		prevOffset,
-		tokenStart,
-		children,
-	} = stack.pop();
+function closeOuterElement(endOffset) {
+	const { element, leadingTextStart, prevOffset, tokenStart, children } =
+		stack.pop();
 
 	const text = endOffset
-		? indoc.substr( prevOffset, endOffset - prevOffset )
-		: indoc.substr( prevOffset );
+		? indoc.substr(prevOffset, endOffset - prevOffset)
+		: indoc.substr(prevOffset);
 
-	if ( text ) {
-		children.push( text );
+	if (text) {
+		children.push(text);
 	}
 
-	if ( null !== leadingTextStart ) {
+	if (null !== leadingTextStart) {
 		output.push(
-			indoc.substr( leadingTextStart, tokenStart - leadingTextStart )
+			indoc.substr(leadingTextStart, tokenStart - leadingTextStart)
 		);
 	}
 
-	output.push( cloneElement( element, null, ...children ) );
+	output.push(cloneElement(element, null, ...children));
 }
 
 export default createInterpolateElement;

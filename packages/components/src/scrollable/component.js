@@ -9,10 +9,10 @@ import { useScrollable } from './hook';
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                        forwardedRef
  */
-function Scrollable( props, forwardedRef ) {
-	const scrollableProps = useScrollable( props );
+function Scrollable(props, forwardedRef) {
+	const scrollableProps = useScrollable(props);
 
-	return <View { ...scrollableProps } ref={ forwardedRef } />;
+	return <View {...scrollableProps} ref={forwardedRef} />;
 }
 
 /**
@@ -32,6 +32,6 @@ function Scrollable( props, forwardedRef ) {
  * ```
  */
 
-const ConnectedScrollable = contextConnect( Scrollable, 'Scrollable' );
+const ConnectedScrollable = contextConnect(Scrollable, 'Scrollable');
 
 export default ConnectedScrollable;

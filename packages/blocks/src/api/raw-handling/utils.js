@@ -14,38 +14,38 @@ import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
 import { hasBlockSupport } from '..';
 import { getRawTransforms } from './get-raw-transforms';
 
-export function getBlockContentSchemaFromTransforms( transforms, context ) {
-	const phrasingContentSchema = getPhrasingContentSchema( context );
+export function getBlockContentSchemaFromTransforms(transforms, context) {
+	const phrasingContentSchema = getPhrasingContentSchema(context);
 	const schemaArgs = { phrasingContentSchema, isPaste: context === 'paste' };
-	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
-		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+	const schemas = transforms.map(({ isMatch, blockName, schema }) => {
+		const hasAnchorSupport = hasBlockSupport(blockName, 'anchor');
 
-		schema = isFunction( schema ) ? schema( schemaArgs ) : schema;
+		schema = isFunction(schema) ? schema(schemaArgs) : schema;
 
 		// If the block does not has anchor support and the transform does not
 		// provides an isMatch we can return the schema right away.
-		if ( ! hasAnchorSupport && ! isMatch ) {
+		if (!hasAnchorSupport && !isMatch) {
 			return schema;
 		}
 
-		return mapValues( schema, ( value ) => {
+		return mapValues(schema, (value) => {
 			let attributes = value.attributes || [];
 			// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
-			if ( hasAnchorSupport ) {
-				attributes = [ ...attributes, 'id' ];
+			if (hasAnchorSupport) {
+				attributes = [...attributes, 'id'];
 			}
 			return {
 				...value,
 				attributes,
 				isMatch: isMatch ? isMatch : undefined,
 			};
-		} );
-	} );
+		});
+	});
 
-	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
-		switch ( key ) {
+	return mergeWith({}, ...schemas, (objValue, srcValue, key) => {
+		switch (key) {
 			case 'children': {
-				if ( objValue === '*' || srcValue === '*' ) {
+				if (objValue === '*' || srcValue === '*') {
 					return '*';
 				}
 
@@ -53,22 +53,22 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 			}
 			case 'attributes':
 			case 'require': {
-				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
+				return [...(objValue || []), ...(srcValue || [])];
 			}
 			case 'isMatch': {
 				// If one of the values being merge is undefined (matches everything),
 				// the result of the merge will be undefined.
-				if ( ! objValue || ! srcValue ) {
+				if (!objValue || !srcValue) {
 					return undefined;
 				}
 				// When merging two isMatch functions, the result is a new function
 				// that returns if one of the source functions returns true.
-				return ( ...args ) => {
-					return objValue( ...args ) || srcValue( ...args );
+				return (...args) => {
+					return objValue(...args) || srcValue(...args);
 				};
 			}
 		}
-	} );
+	});
 }
 
 /**
@@ -80,8 +80,8 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
  *
  * @return {Object} A complete block content schema.
  */
-export function getBlockContentSchema( context ) {
-	return getBlockContentSchemaFromTransforms( getRawTransforms(), context );
+export function getBlockContentSchema(context) {
+	return getBlockContentSchemaFromTransforms(getRawTransforms(), context);
 }
 
 /**
@@ -92,8 +92,8 @@ export function getBlockContentSchema( context ) {
  *
  * @return {boolean} Whether the HTML can be considered plain text.
  */
-export function isPlain( HTML ) {
-	return ! /<(?!br[ />])/i.test( HTML );
+export function isPlain(HTML) {
+	return !/<(?!br[ />])/i.test(HTML);
 }
 
 /**
@@ -104,19 +104,19 @@ export function isPlain( HTML ) {
  * @param {Document} doc      The document of the nodeList.
  * @param {Object}   schema   The schema to use.
  */
-export function deepFilterNodeList( nodeList, filters, doc, schema ) {
-	Array.from( nodeList ).forEach( ( node ) => {
-		deepFilterNodeList( node.childNodes, filters, doc, schema );
+export function deepFilterNodeList(nodeList, filters, doc, schema) {
+	Array.from(nodeList).forEach((node) => {
+		deepFilterNodeList(node.childNodes, filters, doc, schema);
 
-		filters.forEach( ( item ) => {
+		filters.forEach((item) => {
 			// Make sure the node is still attached to the document.
-			if ( ! doc.contains( node ) ) {
+			if (!doc.contains(node)) {
 				return;
 			}
 
-			item( node, doc, schema );
-		} );
-	} );
+			item(node, doc, schema);
+		});
+	});
 }
 
 /**
@@ -129,12 +129,12 @@ export function deepFilterNodeList( nodeList, filters, doc, schema ) {
  *
  * @return {string} The filtered HTML.
  */
-export function deepFilterHTML( HTML, filters = [], schema ) {
-	const doc = document.implementation.createHTMLDocument( '' );
+export function deepFilterHTML(HTML, filters = [], schema) {
+	const doc = document.implementation.createHTMLDocument('');
 
 	doc.body.innerHTML = HTML;
 
-	deepFilterNodeList( doc.body.childNodes, filters, doc, schema );
+	deepFilterNodeList(doc.body.childNodes, filters, doc, schema);
 
 	return doc.body.innerHTML;
 }
@@ -145,18 +145,18 @@ export function deepFilterHTML( HTML, filters = [], schema ) {
  * @param {Element} node  The subject node.
  * @param {string}  which "next" or "previous".
  */
-export function getSibling( node, which ) {
-	const sibling = node[ `${ which }Sibling` ];
+export function getSibling(node, which) {
+	const sibling = node[`${which}Sibling`];
 
-	if ( sibling && isPhrasingContent( sibling ) ) {
+	if (sibling && isPhrasingContent(sibling)) {
 		return sibling;
 	}
 
 	const { parentNode } = node;
 
-	if ( ! parentNode || ! isPhrasingContent( parentNode ) ) {
+	if (!parentNode || !isPhrasingContent(parentNode)) {
 		return;
 	}
 
-	return getSibling( parentNode, which );
+	return getSibling(parentNode, which);
 }

@@ -18,22 +18,22 @@ import { compose } from '@wordpress/compose';
  */
 import { store as editPostStore } from '../../store';
 
-function TextEditor( { onExit, isRichEditingEnabled } ) {
+function TextEditor({ onExit, isRichEditingEnabled }) {
 	return (
 		<div className="edit-post-text-editor">
-			{ isRichEditingEnabled && (
+			{isRichEditingEnabled && (
 				<div className="edit-post-text-editor__toolbar">
-					<h2>{ __( 'Editing code' ) }</h2>
+					<h2>{__('Editing code')}</h2>
 					<Button
 						variant="tertiary"
-						onClick={ onExit }
-						shortcut={ displayShortcut.secondary( 'm' ) }
+						onClick={onExit}
+						shortcut={displayShortcut.secondary('m')}
 					>
-						{ __( 'Exit code editor' ) }
+						{__('Exit code editor')}
 					</Button>
 					<TextEditorGlobalKeyboardShortcuts />
 				</div>
-			) }
+			)}
 			<div className="edit-post-text-editor__body">
 				<PostTitle />
 				<PostTextEditor />
@@ -43,15 +43,15 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 }
 
 export default compose(
-	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( editorStore ).getEditorSettings()
-			.richEditingEnabled,
-	} ) ),
-	withDispatch( ( dispatch ) => {
+	withSelect((select) => ({
+		isRichEditingEnabled:
+			select(editorStore).getEditorSettings().richEditingEnabled,
+	})),
+	withDispatch((dispatch) => {
 		return {
 			onExit() {
-				dispatch( editPostStore ).switchEditorMode( 'visual' );
+				dispatch(editPostStore).switchEditorMode('visual');
 			},
 		};
-	} )
-)( TextEditor );
+	})
+)(TextEditor);

@@ -11,40 +11,38 @@ import {
 import { __ } from '@wordpress/i18n';
 import { moveTo } from '@wordpress/icons';
 
-export default function MoveToWidgetArea( {
+export default function MoveToWidgetArea({
 	currentWidgetAreaId,
 	widgetAreas,
 	onSelect,
-} ) {
+}) {
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>
-				{ ( toggleProps ) => (
+				{(toggleProps) => (
 					<DropdownMenu
-						icon={ moveTo }
-						label={ __( 'Move to widget area' ) }
-						toggleProps={ toggleProps }
+						icon={moveTo}
+						label={__('Move to widget area')}
+						toggleProps={toggleProps}
 					>
-						{ ( { onClose } ) => (
-							<MenuGroup label={ __( 'Move to' ) }>
+						{({ onClose }) => (
+							<MenuGroup label={__('Move to')}>
 								<MenuItemsChoice
-									choices={ widgetAreas.map(
-										( widgetArea ) => ( {
-											value: widgetArea.id,
-											label: widgetArea.name,
-											info: widgetArea.description,
-										} )
-									) }
-									value={ currentWidgetAreaId }
-									onSelect={ ( value ) => {
-										onSelect( value );
+									choices={widgetAreas.map((widgetArea) => ({
+										value: widgetArea.id,
+										label: widgetArea.name,
+										info: widgetArea.description,
+									}))}
+									value={currentWidgetAreaId}
+									onSelect={(value) => {
+										onSelect(value);
 										onClose();
-									} }
+									}}
 								/>
 							</MenuGroup>
-						) }
+						)}
 					</DropdownMenu>
-				) }
+				)}
 			</ToolbarItem>
 		</ToolbarGroup>
 	);

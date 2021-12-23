@@ -74,12 +74,12 @@ const INNER_BLOCKS_TEMPLATE = [
 		'core/paragraph',
 		{
 			align: 'center',
-			placeholder: __( 'Write title…' ),
+			placeholder: __('Write title…'),
 		},
 	],
 ];
 
-const Cover = ( {
+const Cover = ({
 	attributes,
 	getStylesFromColorScheme,
 	isParentSelected,
@@ -91,7 +91,7 @@ const Cover = ( {
 	selectBlock,
 	blockWidth,
 	hasInnerBlocks,
-} ) => {
+}) => {
 	const {
 		backgroundType,
 		dimRatio,
@@ -108,11 +108,9 @@ const Cover = ( {
 		gradient,
 		overlayColor,
 	} = attributes;
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
-		false
-	);
+	const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
-	useEffect( () => {
+	useEffect(() => {
 		let isCurrent = true;
 
 		// sync with local media store
@@ -122,11 +120,11 @@ const Cover = ( {
 			setIsScreenReaderEnabled
 		);
 
-		AccessibilityInfo.isScreenReaderEnabled().then( () => {
-			if ( isCurrent ) {
+		AccessibilityInfo.isScreenReaderEnabled().then(() => {
+			if (isCurrent) {
 				setIsScreenReaderEnabled();
 			}
-		} );
+		});
 
 		return () => {
 			isCurrent = false;
@@ -135,7 +133,7 @@ const Cover = ( {
 				setIsScreenReaderEnabled
 			);
 		};
-	}, [] );
+	}, []);
 
 	const convertedMinHeight = useConvertUnitToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
@@ -145,33 +143,31 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
-	const colorsDefault = useSetting( 'color.palette' ) || [];
+	const colorsDefault = useSetting('color.palette') || [];
 	const coverDefaultPalette = {
-		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
+		colors: colorsDefault.slice(0, THEME_COLORS_COUNT),
 	};
-	const gradients = useSetting( 'color.gradients' ) || [];
+	const gradients = useSetting('color.gradients') || [];
 	const gradientValue =
-		customGradient || getGradientValueBySlug( gradients, gradient );
+		customGradient || getGradientValueBySlug(gradients, gradient);
 	const overlayColorValue = getColorObjectByAttributeValues(
 		colorsDefault,
 		overlayColor
 	);
 
-	const hasBackground = !! (
+	const hasBackground = !!(
 		url ||
-		( style && style.color && style.color.background ) ||
+		(style && style.color && style.color.background) ||
 		attributes.overlayColor ||
 		overlayColorValue.color ||
 		customOverlayColor ||
 		gradientValue
 	);
 
-	const hasOnlyColorBackground = ! url && ( hasBackground || hasInnerBlocks );
+	const hasOnlyColorBackground = !url && (hasBackground || hasInnerBlocks);
 
-	const [
-		isCustomColorPickerShowing,
-		setCustomColorPickerShowing,
-	] = useState( false );
+	const [isCustomColorPickerShowing, setCustomColorPickerShowing] =
+		useState(false);
 
 	const openMediaOptionsRef = useRef();
 
@@ -180,75 +176,75 @@ const Cover = ( {
 	// the RichText component will check if there are
 	// parent styles for the current block. If there are,
 	// it will use that color instead.
-	useEffect( () => {
+	useEffect(() => {
 		// While we don't support theme colors
-		if ( ! attributes.overlayColor || ( ! attributes.overlay && url ) ) {
-			setAttributes( { childrenStyles: styles.defaultColor } );
+		if (!attributes.overlayColor || (!attributes.overlay && url)) {
+			setAttributes({ childrenStyles: styles.defaultColor });
 		}
-	}, [ setAttributes ] );
+	}, [setAttributes]);
 
 	// initialize uploading flag to false, awaiting sync
-	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
+	const [isUploadInProgress, setIsUploadInProgress] = useState(false);
 
 	// initialize upload failure flag to true if url is local
-	const [ didUploadFail, setDidUploadFail ] = useState(
-		id && getProtocol( url ) === 'file:'
+	const [didUploadFail, setDidUploadFail] = useState(
+		id && getProtocol(url) === 'file:'
 	);
 
 	// don't show failure if upload is in progress
-	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
+	const shouldShowFailure = didUploadFail && !isUploadInProgress;
 
-	const onSelectMedia = ( media ) => {
-		setDidUploadFail( false );
-		const onSelect = attributesFromMedia( setAttributes, dimRatio );
-		onSelect( media );
+	const onSelectMedia = (media) => {
+		setDidUploadFail(false);
+		const onSelect = attributesFromMedia(setAttributes, dimRatio);
+		onSelect(media);
 	};
 
 	const onMediaPressed = () => {
-		if ( isUploadInProgress ) {
-			requestImageUploadCancelDialog( id );
-		} else if ( shouldShowFailure ) {
-			requestImageFailedRetryDialog( id );
-		} else if ( isImage && url ) {
-			requestImageFullscreenPreview( url );
+		if (isUploadInProgress) {
+			requestImageUploadCancelDialog(id);
+		} else if (shouldShowFailure) {
+			requestImageFailedRetryDialog(id);
+		} else if (isImage && url) {
+			requestImageFullscreenPreview(url);
 		}
 	};
 
-	const [ isVideoLoading, setIsVideoLoading ] = useState( true );
+	const [isVideoLoading, setIsVideoLoading] = useState(true);
 
 	const onVideoLoadStart = () => {
-		setIsVideoLoading( true );
+		setIsVideoLoading(true);
 	};
 
 	const onVideoLoad = () => {
-		setIsVideoLoading( false );
+		setIsVideoLoading(false);
 	};
 
-	const onClearMedia = useCallback( () => {
-		setAttributes( {
+	const onClearMedia = useCallback(() => {
+		setAttributes({
 			focalPoint: undefined,
 			hasParallax: undefined,
 			id: undefined,
 			url: undefined,
-		} );
+		});
 		closeSettingsBottomSheet();
-	}, [ closeSettingsBottomSheet ] );
+	}, [closeSettingsBottomSheet]);
 
-	function setColor( color ) {
-		const colorValue = getColorObjectByColorValue( colorsDefault, color );
+	function setColor(color) {
+		const colorValue = getColorObjectByColorValue(colorsDefault, color);
 
-		setAttributes( {
+		setAttributes({
 			// clear all related attributes (only one should be set)
 			overlayColor: colorValue?.slug ?? undefined,
-			customOverlayColor: ( ! colorValue?.slug && color ) ?? undefined,
+			customOverlayColor: (!colorValue?.slug && color) ?? undefined,
 			gradient: undefined,
 			customGradient: undefined,
-		} );
+		});
 	}
 
 	function openColorPicker() {
 		selectBlock();
-		setCustomColorPickerShowing( true );
+		setCustomColorPickerShowing(true);
 		openGeneralSidebar();
 	}
 
@@ -260,7 +256,7 @@ const Cover = ( {
 	const overlayStyles = [
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
-		! gradientValue && {
+		!gradientValue && {
 			backgroundColor:
 				customOverlayColor ||
 				overlayColorValue?.color ||
@@ -268,11 +264,11 @@ const Cover = ( {
 				styles.overlay?.color,
 		},
 		// While we don't support theme colors we add a default bg color
-		! overlayColorValue.color && ! url ? backgroundColor : {},
+		!overlayColorValue.color && !url ? backgroundColor : {},
 		isImage &&
 			isParentSelected &&
-			! isUploadInProgress &&
-			! didUploadFail &&
+			!isUploadInProgress &&
+			!didUploadFail &&
 			styles.overlaySelected,
 	];
 
@@ -281,58 +277,54 @@ const Cover = ( {
 		styles.iconDark
 	);
 
-	const placeholderIcon = <Icon icon={ icon } { ...placeholderIconStyle } />;
+	const placeholderIcon = <Icon icon={icon} {...placeholderIconStyle} />;
 
-	const toolbarControls = ( open ) => (
+	const toolbarControls = (open) => (
 		<BlockControls group="other">
 			<ToolbarButton
-				title={ __( 'Edit cover media' ) }
-				icon={ replace }
-				onClick={ open }
+				title={__('Edit cover media')}
+				icon={replace}
+				onClick={open}
 			/>
 		</BlockControls>
 	);
 
 	const accessibilityHint =
 		Platform.OS === 'ios'
-			? __( 'Double tap to open Action Sheet to add image or video' )
-			: __( 'Double tap to open Bottom Sheet to add image or video' );
+			? __('Double tap to open Action Sheet to add image or video')
+			: __('Double tap to open Bottom Sheet to add image or video');
 
 	const addMediaButton = () => (
 		<TouchableWithoutFeedback
-			accessibilityHint={ accessibilityHint }
-			accessibilityLabel={ __( 'Add image or video' ) }
+			accessibilityHint={accessibilityHint}
+			accessibilityLabel={__('Add image or video')}
 			accessibilityRole="button"
-			onPress={ openMediaOptionsRef.current }
+			onPress={openMediaOptionsRef.current}
 		>
-			<View style={ styles.selectImageContainer }>
-				<View style={ styles.selectImage }>
-					<Icon
-						size={ 16 }
-						icon={ image }
-						{ ...styles.selectImageIcon }
-					/>
+			<View style={styles.selectImageContainer}>
+				<View style={styles.selectImage}>
+					<Icon size={16} icon={image} {...styles.selectImageIcon} />
 				</View>
 			</View>
 		</TouchableWithoutFeedback>
 	);
 
-	const onBottomSheetClosed = useCallback( () => {
-		InteractionManager.runAfterInteractions( () => {
-			setCustomColorPickerShowing( false );
-		} );
-	}, [] );
+	const onBottomSheetClosed = useCallback(() => {
+		InteractionManager.runAfterInteractions(() => {
+			setCustomColorPickerShowing(false);
+		});
+	}, []);
 
 	const colorPickerControls = (
 		<InspectorControls>
 			<BottomSheetConsumer>
-				{ ( {
+				{({
 					shouldEnableBottomSheetScroll,
 					shouldEnableBottomSheetMaxHeight,
 					onHandleClosingBottomSheet,
 					onHandleHardwareButtonPress,
 					isBottomSheetContentScrolling,
-				} ) => (
+				}) => (
 					<ColorPicker
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
@@ -340,142 +332,131 @@ const Cover = ( {
 						shouldEnableBottomSheetMaxHeight={
 							shouldEnableBottomSheetMaxHeight
 						}
-						setColor={ setColor }
-						onNavigationBack={ closeSettingsBottomSheet }
-						onHandleClosingBottomSheet={
-							onHandleClosingBottomSheet
-						}
+						setColor={setColor}
+						onNavigationBack={closeSettingsBottomSheet}
+						onHandleClosingBottomSheet={onHandleClosingBottomSheet}
 						onHandleHardwareButtonPress={
 							onHandleHardwareButtonPress
 						}
-						onBottomSheetClosed={ onBottomSheetClosed }
+						onBottomSheetClosed={onBottomSheetClosed}
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
-						bottomLabelText={ __( 'Select a color' ) }
+						bottomLabelText={__('Select a color')}
 					/>
-				) }
+				)}
 			</BottomSheetConsumer>
 		</InspectorControls>
 	);
 
-	const renderContent = ( getMediaOptions ) => (
+	const renderContent = (getMediaOptions) => (
 		<>
-			{ renderBackground( getMediaOptions ) }
-			{ isParentSelected && hasOnlyColorBackground && addMediaButton() }
+			{renderBackground(getMediaOptions)}
+			{isParentSelected && hasOnlyColorBackground && addMediaButton()}
 		</>
 	);
 
-	const renderBackground = ( getMediaOptions ) => (
+	const renderBackground = (getMediaOptions) => (
 		<TouchableWithoutFeedback
-			accessible={ ! isParentSelected }
-			onPress={ onMediaPressed }
-			onLongPress={ openMediaOptionsRef.current }
-			disabled={ ! isParentSelected }
+			accessible={!isParentSelected}
+			onPress={onMediaPressed}
+			onLongPress={openMediaOptionsRef.current}
+			disabled={!isParentSelected}
 		>
-			<View style={ [ styles.background, backgroundColor ] }>
-				{ getMediaOptions() }
-				{ isParentSelected &&
+			<View style={[styles.background, backgroundColor]}>
+				{getMediaOptions()}
+				{isParentSelected &&
 					backgroundType === VIDEO_BACKGROUND_TYPE &&
-					toolbarControls( openMediaOptionsRef.current ) }
+					toolbarControls(openMediaOptionsRef.current)}
 				<MediaUploadProgress
-					mediaId={ id }
-					onUpdateMediaProgress={ () => {
-						setIsUploadInProgress( true );
-					} }
-					onFinishMediaUploadWithSuccess={ ( {
+					mediaId={id}
+					onUpdateMediaProgress={() => {
+						setIsUploadInProgress(true);
+					}}
+					onFinishMediaUploadWithSuccess={({
 						mediaServerId,
 						mediaUrl,
-					} ) => {
-						setIsUploadInProgress( false );
-						setDidUploadFail( false );
-						setAttributes( {
+					}) => {
+						setIsUploadInProgress(false);
+						setDidUploadFail(false);
+						setAttributes({
 							id: mediaServerId,
 							url: mediaUrl,
 							backgroundType,
-						} );
-					} }
-					onFinishMediaUploadWithFailure={ () => {
-						setIsUploadInProgress( false );
-						setDidUploadFail( true );
-					} }
-					onMediaUploadStateReset={ () => {
-						setIsUploadInProgress( false );
-						setDidUploadFail( false );
-						setAttributes( { id: undefined, url: undefined } );
-					} }
+						});
+					}}
+					onFinishMediaUploadWithFailure={() => {
+						setIsUploadInProgress(false);
+						setDidUploadFail(true);
+					}}
+					onMediaUploadStateReset={() => {
+						setIsUploadInProgress(false);
+						setDidUploadFail(false);
+						setAttributes({ id: undefined, url: undefined });
+					}}
 				/>
 
-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-					<View style={ styles.imageContainer }>
+				{IMAGE_BACKGROUND_TYPE === backgroundType && (
+					<View style={styles.imageContainer}>
 						<Image
-							editButton={ false }
-							focalPoint={
-								focalPoint || IMAGE_DEFAULT_FOCAL_POINT
-							}
-							isSelected={ isParentSelected }
-							isUploadFailed={ didUploadFail }
-							isUploadInProgress={ isUploadInProgress }
-							onSelectMediaUploadOption={ onSelectMedia }
-							openMediaOptions={ openMediaOptionsRef.current }
-							url={ url }
-							width={ styles.image?.width }
+							editButton={false}
+							focalPoint={focalPoint || IMAGE_DEFAULT_FOCAL_POINT}
+							isSelected={isParentSelected}
+							isUploadFailed={didUploadFail}
+							isUploadInProgress={isUploadInProgress}
+							onSelectMediaUploadOption={onSelectMedia}
+							openMediaOptions={openMediaOptionsRef.current}
+							url={url}
+							width={styles.image?.width}
 						/>
 					</View>
-				) }
+				)}
 
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+				{VIDEO_BACKGROUND_TYPE === backgroundType && (
 					<Video
 						muted
 						disableFocus
 						repeat
-						resizeMode={ 'cover' }
-						source={ { uri: url } }
-						onLoad={ onVideoLoad }
-						onLoadStart={ onVideoLoadStart }
-						style={ [
+						resizeMode={'cover'}
+						source={{ uri: url }}
+						onLoad={onVideoLoad}
+						onLoadStart={onVideoLoadStart}
+						style={[
 							styles.background,
 							// Hide Video component since it has black background while loading the source
 							{ opacity: isVideoLoading ? 0 : 1 },
-						] }
+						]}
 					/>
-				) }
+				)}
 			</View>
 		</TouchableWithoutFeedback>
 	);
 
-	if (
-		( ! hasBackground && ! hasInnerBlocks ) ||
-		isCustomColorPickerShowing
-	) {
+	if ((!hasBackground && !hasInnerBlocks) || isCustomColorPickerShowing) {
 		return (
 			<View>
-				{ isCustomColorPickerShowing && colorPickerControls }
+				{isCustomColorPickerShowing && colorPickerControls}
 				<MediaPlaceholder
-					height={
-						styles.mediaPlaceholderEmptyStateContainer?.height
-					}
-					backgroundColor={ customOverlayColor }
+					height={styles.mediaPlaceholderEmptyStateContainer?.height}
+					backgroundColor={customOverlayColor}
 					hideContent={
 						customOverlayColor !== '' &&
 						customOverlayColor !== undefined
 					}
-					icon={ placeholderIcon }
-					labels={ {
-						title: __( 'Cover' ),
-					} }
-					onSelect={ onSelectMedia }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onFocus={ onFocus }
+					icon={placeholderIcon}
+					labels={{
+						title: __('Cover'),
+					}}
+					onSelect={onSelectMedia}
+					allowedTypes={ALLOWED_MEDIA_TYPES}
+					onFocus={onFocus}
 				>
 					<View
-						style={ styles.colorPaletteWrapper }
-						pointerEvents={
-							isScreenReaderEnabled ? 'none' : 'auto'
-						}
+						style={styles.colorPaletteWrapper}
+						pointerEvents={isScreenReaderEnabled ? 'none' : 'auto'}
 					>
 						<BottomSheetConsumer>
-							{ ( { shouldEnableBottomSheetScroll } ) => (
+							{({ shouldEnableBottomSheetScroll }) => (
 								<ColorPalette
 									customColorIndicatorStyles={
 										styles.paletteColorIndicator
@@ -483,16 +464,16 @@ const Cover = ( {
 									customIndicatorWrapperStyles={
 										styles.paletteCustomIndicatorWrapper
 									}
-									setColor={ setColor }
-									onCustomPress={ openColorPicker }
-									defaultSettings={ coverDefaultPalette }
-									shouldShowCustomLabel={ false }
-									shouldShowCustomVerticalSeparator={ false }
+									setColor={setColor}
+									onCustomPress={openColorPicker}
+									defaultSettings={coverDefaultPalette}
+									shouldShowCustomLabel={false}
+									shouldShowCustomVerticalSeparator={false}
 									shouldEnableBottomSheetScroll={
 										shouldEnableBottomSheetScroll
 									}
 								/>
-							) }
+							)}
 						</BottomSheetConsumer>
 					</View>
 				</MediaPlaceholder>
@@ -501,123 +482,118 @@ const Cover = ( {
 	}
 
 	return (
-		<View style={ styles.backgroundContainer }>
-			{ isSelected && (
+		<View style={styles.backgroundContainer}>
+			{isSelected && (
 				<InspectorControls>
 					<Controls
-						attributes={ attributes }
-						didUploadFail={ didUploadFail }
-						hasOnlyColorBackground={ hasOnlyColorBackground }
-						isUploadInProgress={ isUploadInProgress }
-						onClearMedia={ onClearMedia }
-						onSelectMedia={ onSelectMedia }
-						setAttributes={ setAttributes }
+						attributes={attributes}
+						didUploadFail={didUploadFail}
+						hasOnlyColorBackground={hasOnlyColorBackground}
+						isUploadInProgress={isUploadInProgress}
+						onClearMedia={onClearMedia}
+						onSelectMedia={onSelectMedia}
+						setAttributes={setAttributes}
 					/>
 				</InspectorControls>
-			) }
+			)}
 
 			<View
 				pointerEvents="box-none"
-				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
+				style={[styles.content, { minHeight: convertedMinHeight }]}
 			>
 				<InnerBlocks
-					allowedBlocks={ allowedBlocks }
-					template={ INNER_BLOCKS_TEMPLATE }
-					templateLock={ templateLock }
+					allowedBlocks={allowedBlocks}
+					template={INNER_BLOCKS_TEMPLATE}
+					templateLock={templateLock}
 					templateInsertUpdatesSelection
-					blockWidth={ blockWidth }
+					blockWidth={blockWidth}
 				/>
 			</View>
 
-			<View pointerEvents="none" style={ styles.overlayContainer }>
-				<View style={ overlayStyles }>
-					{ gradientValue && (
+			<View pointerEvents="none" style={styles.overlayContainer}>
+				<View style={overlayStyles}>
+					{gradientValue && (
 						<Gradient
-							gradientValue={ gradientValue }
-							style={ styles.background }
+							gradientValue={gradientValue}
+							style={styles.background}
 						/>
-					) }
+					)}
 				</View>
 			</View>
 
 			<MediaUpload
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				isReplacingMedia={ ! hasOnlyColorBackground }
-				onSelect={ onSelectMedia }
-				render={ ( { open, getMediaOptions } ) => {
+				allowedTypes={ALLOWED_MEDIA_TYPES}
+				isReplacingMedia={!hasOnlyColorBackground}
+				onSelect={onSelectMedia}
+				render={({ open, getMediaOptions }) => {
 					openMediaOptionsRef.current = open;
-					return renderContent( getMediaOptions );
-				} }
+					return renderContent(getMediaOptions);
+				}}
 			/>
 
-			{ isImage &&
+			{isImage &&
 				url &&
 				openMediaOptionsRef.current &&
 				isParentSelected &&
-				! isUploadInProgress &&
-				! didUploadFail && (
-					<View style={ styles.imageEditButton }>
+				!isUploadInProgress &&
+				!didUploadFail && (
+					<View style={styles.imageEditButton}>
 						<ImageEditingButton
-							onSelectMediaUploadOption={ onSelectMedia }
-							openMediaOptions={ openMediaOptionsRef.current }
-							pickerOptions={ [
+							onSelectMediaUploadOption={onSelectMedia}
+							openMediaOptions={openMediaOptionsRef.current}
+							pickerOptions={[
 								{
 									destructiveButton: true,
 									id: 'clearMedia',
-									label: __( 'Clear Media' ),
+									label: __('Clear Media'),
 									onPress: onClearMedia,
 									separated: true,
 									value: 'clearMedia',
 								},
-							] }
-							url={ url }
+							]}
+							url={url}
 						/>
 					</View>
-				) }
+				)}
 
-			{ shouldShowFailure && (
-				<View
-					pointerEvents="none"
-					style={ styles.uploadFailedContainer }
-				>
-					<View style={ styles.uploadFailed }>
-						<Icon icon={ warning } { ...styles.uploadFailedIcon } />
+			{shouldShowFailure && (
+				<View pointerEvents="none" style={styles.uploadFailedContainer}>
+					<View style={styles.uploadFailed}>
+						<Icon icon={warning} {...styles.uploadFailedIcon} />
 					</View>
 				</View>
-			) }
+			)}
 		</View>
 	);
 };
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getSelectedBlockClientId, getBlock } = select(
-			blockEditorStore
-		);
+export default compose([
+	withSelect((select, { clientId }) => {
+		const { getSelectedBlockClientId, getBlock } = select(blockEditorStore);
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		const { getSettings } = select( blockEditorStore );
+		const { getSettings } = select(blockEditorStore);
 
-		const hasInnerBlocks = getBlock( clientId )?.innerBlocks.length > 0;
+		const hasInnerBlocks = getBlock(clientId)?.innerBlocks.length > 0;
 
 		return {
 			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
 			hasInnerBlocks,
 		};
-	} ),
-	withDispatch( ( dispatch, { clientId } ) => {
-		const { openGeneralSidebar } = dispatch( editPostStore );
-		const { selectBlock } = dispatch( blockEditorStore );
+	}),
+	withDispatch((dispatch, { clientId }) => {
+		const { openGeneralSidebar } = dispatch(editPostStore);
+		const { selectBlock } = dispatch(blockEditorStore);
 
 		return {
-			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
+			openGeneralSidebar: () => openGeneralSidebar('edit-post/block'),
 			closeSettingsBottomSheet() {
-				dispatch( editPostStore ).closeGeneralSidebar();
+				dispatch(editPostStore).closeGeneralSidebar();
 			},
-			selectBlock: () => selectBlock( clientId ),
+			selectBlock: () => selectBlock(clientId),
 		};
-	} ),
+	}),
 	withPreferredColorScheme,
-] )( Cover );
+])(Cover);

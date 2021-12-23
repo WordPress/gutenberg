@@ -35,31 +35,31 @@ import { pullLeft, pullRight, replace } from '@wordpress/icons';
 import MediaContainer from './media-container';
 import styles from './style.scss';
 
-const TEMPLATE = [ [ 'core/paragraph' ] ];
+const TEMPLATE = [['core/paragraph']];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const BREAKPOINTS = {
 	mobile: 480,
 };
-const applyWidthConstraints = ( width ) =>
+const applyWidthConstraints = (width) =>
 	Math.max(
 		WIDTH_CONSTRAINT_PERCENTAGE,
-		Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE )
+		Math.min(width, 100 - WIDTH_CONSTRAINT_PERCENTAGE)
 	);
 
 class MediaTextEdit extends Component {
 	constructor() {
-		super( ...arguments );
+		super(...arguments);
 
-		this.onSelectMedia = this.onSelectMedia.bind( this );
-		this.onMediaUpdate = this.onMediaUpdate.bind( this );
-		this.onWidthChange = this.onWidthChange.bind( this );
-		this.commitWidthChange = this.commitWidthChange.bind( this );
-		this.onLayoutChange = this.onLayoutChange.bind( this );
-		this.onMediaSelected = this.onMediaSelected.bind( this );
-		this.onReplaceMedia = this.onReplaceMedia.bind( this );
-		this.onSetOpenPickerRef = this.onSetOpenPickerRef.bind( this );
-		this.onSetImageFill = this.onSetImageFill.bind( this );
+		this.onSelectMedia = this.onSelectMedia.bind(this);
+		this.onMediaUpdate = this.onMediaUpdate.bind(this);
+		this.onWidthChange = this.onWidthChange.bind(this);
+		this.commitWidthChange = this.commitWidthChange.bind(this);
+		this.onLayoutChange = this.onLayoutChange.bind(this);
+		this.onMediaSelected = this.onMediaSelected.bind(this);
+		this.onReplaceMedia = this.onReplaceMedia.bind(this);
+		this.onSetOpenPickerRef = this.onSetOpenPickerRef.bind(this);
+		this.onSetImageFill = this.onSetImageFill.bind(this);
 
 		this.state = {
 			mediaWidth: null,
@@ -68,23 +68,23 @@ class MediaTextEdit extends Component {
 		};
 	}
 
-	static getDerivedStateFromProps( props, state ) {
+	static getDerivedStateFromProps(props, state) {
 		return {
 			isMediaSelected:
 				state.isMediaSelected &&
 				props.isSelected &&
-				! props.isAncestorSelected,
+				!props.isAncestorSelected,
 		};
 	}
 
-	onSelectMedia( media ) {
+	onSelectMedia(media) {
 		const { setAttributes } = this.props;
 
 		let mediaType;
 		let src;
 		// for media selections originated from a file upload.
-		if ( media.media_type ) {
-			if ( media.media_type === 'image' ) {
+		if (media.media_type) {
+			if (media.media_type === 'image') {
 				mediaType = 'image';
 			} else {
 				// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
@@ -96,78 +96,73 @@ class MediaTextEdit extends Component {
 			mediaType = media.type;
 		}
 
-		if ( mediaType === 'image' && media.sizes ) {
+		if (mediaType === 'image' && media.sizes) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
-				get( media, [ 'sizes', 'large', 'url' ] ) ||
-				get( media, [
-					'media_details',
-					'sizes',
-					'large',
-					'source_url',
-				] );
+				get(media, ['sizes', 'large', 'url']) ||
+				get(media, ['media_details', 'sizes', 'large', 'source_url']);
 		}
 
-		setAttributes( {
+		setAttributes({
 			mediaAlt: media.alt,
 			mediaId: media.id,
 			mediaType,
 			mediaUrl: src || media.url,
 			imageFill: undefined,
 			focalPoint: undefined,
-		} );
+		});
 	}
 
-	onMediaUpdate( media ) {
+	onMediaUpdate(media) {
 		const { setAttributes } = this.props;
 
-		setAttributes( {
+		setAttributes({
 			mediaId: media.id,
 			mediaUrl: media.url,
-		} );
+		});
 	}
 
-	onWidthChange( width ) {
-		this.setState( {
-			mediaWidth: applyWidthConstraints( width ),
-		} );
+	onWidthChange(width) {
+		this.setState({
+			mediaWidth: applyWidthConstraints(width),
+		});
 	}
 
-	commitWidthChange( width ) {
+	commitWidthChange(width) {
 		const { setAttributes } = this.props;
 
-		setAttributes( {
-			mediaWidth: applyWidthConstraints( width ),
-		} );
-		this.setState( {
+		setAttributes({
+			mediaWidth: applyWidthConstraints(width),
+		});
+		this.setState({
 			mediaWidth: null,
-		} );
+		});
 	}
 
-	onLayoutChange( { nativeEvent } ) {
+	onLayoutChange({ nativeEvent }) {
 		const { width } = nativeEvent.layout;
 		const { containerWidth } = this.state;
 
-		if ( containerWidth === width ) {
+		if (containerWidth === width) {
 			return null;
 		}
 
-		this.setState( {
+		this.setState({
 			containerWidth: width,
-		} );
+		});
 	}
 
 	onMediaSelected() {
-		this.setState( { isMediaSelected: true } );
+		this.setState({ isMediaSelected: true });
 	}
 
 	onReplaceMedia() {
-		if ( this.openPickerRef ) {
+		if (this.openPickerRef) {
 			this.openPickerRef();
 		}
 	}
 
-	onSetOpenPickerRef( openPicker ) {
+	onSetOpenPickerRef(openPicker) {
 		this.openPickerRef = openPicker;
 	}
 
@@ -175,9 +170,9 @@ class MediaTextEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { imageFill } = attributes;
 
-		setAttributes( {
-			imageFill: ! imageFill,
-		} );
+		setAttributes({
+			imageFill: !imageFill,
+		});
 	}
 
 	getControls() {
@@ -186,17 +181,17 @@ class MediaTextEdit extends Component {
 
 		return (
 			<InspectorControls>
-				<PanelBody title={ __( 'Media & Text settings' ) }>
+				<PanelBody title={__('Media & Text settings')}>
 					<ToggleControl
-						label={ __( 'Crop image to fill entire column' ) }
-						checked={ imageFill }
-						onChange={ this.onSetImageFill }
+						label={__('Crop image to fill entire column')}
+						checked={imageFill}
+						onChange={this.onSetImageFill}
 					/>
 				</PanelBody>
 			</InspectorControls>
 		);
 	}
-	renderMediaArea( shouldStack ) {
+	renderMediaArea(shouldStack) {
 		const { isMediaSelected, containerWidth } = this.state;
 		const { attributes, isSelected } = this.props;
 		const {
@@ -211,27 +206,25 @@ class MediaTextEdit extends Component {
 			verticalAlignment,
 		} = attributes;
 		const mediaAreaWidth =
-			mediaWidth && ! shouldStack
-				? ( containerWidth * mediaWidth ) / 100 -
+			mediaWidth && !shouldStack
+				? (containerWidth * mediaWidth) / 100 -
 				  styles.mediaAreaPadding.width
 				: containerWidth;
 		const aligmentStyles =
-			styles[
-				`is-vertically-aligned-${ verticalAlignment || 'center' }`
-			];
+			styles[`is-vertically-aligned-${verticalAlignment || 'center'}`];
 
 		return (
 			<MediaContainer
-				commitWidthChange={ this.commitWidthChange }
-				isMediaSelected={ isMediaSelected }
-				onFocus={ this.props.onFocus }
-				onMediaSelected={ this.onMediaSelected }
-				onMediaUpdate={ this.onMediaUpdate }
-				onSelectMedia={ this.onSelectMedia }
-				onSetOpenPickerRef={ this.onSetOpenPickerRef }
-				onWidthChange={ this.onWidthChange }
-				mediaWidth={ mediaAreaWidth }
-				{ ...{
+				commitWidthChange={this.commitWidthChange}
+				isMediaSelected={isMediaSelected}
+				onFocus={this.props.onFocus}
+				onMediaSelected={this.onMediaSelected}
+				onMediaUpdate={this.onMediaUpdate}
+				onSelectMedia={this.onSelectMedia}
+				onSetOpenPickerRef={this.onSetOpenPickerRef}
+				onWidthChange={this.onWidthChange}
+				mediaWidth={mediaAreaWidth}
+				{...{
 					mediaAlt,
 					mediaId,
 					mediaType,
@@ -242,7 +235,7 @@ class MediaTextEdit extends Component {
 					isSelected,
 					aligmentStyles,
 					shouldStack,
-				} }
+				}}
 			/>
 		);
 	}
@@ -272,36 +265,34 @@ class MediaTextEdit extends Component {
 		const temporaryMediaWidth = shouldStack
 			? 100
 			: this.state.mediaWidth || mediaWidth;
-		const widthString = `${ temporaryMediaWidth }%`;
+		const widthString = `${temporaryMediaWidth}%`;
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
-		const innerBlockWidthString = `${ innerBlockWidth }%`;
+		const innerBlockWidthString = `${innerBlockWidth}%`;
 
 		const innerBlockContainerStyle = [
 			{ width: innerBlockWidthString },
-			! shouldStack
+			!shouldStack
 				? styles.innerBlock
 				: {
-						...( mediaPosition === 'left'
+						...(mediaPosition === 'left'
 							? styles.innerBlockStackMediaLeft
-							: styles.innerBlockStackMediaRight ),
+							: styles.innerBlockStackMediaRight),
 				  },
-			( style?.backgroundColor || backgroundColor.color ) &&
+			(style?.backgroundColor || backgroundColor.color) &&
 				styles.innerBlockPaddings,
 		];
 
 		const containerStyles = {
-			...styles[ 'wp-block-media-text' ],
-			...styles[
-				`is-vertically-aligned-${ verticalAlignment || 'center' }`
-			],
-			...( mediaPosition === 'right'
-				? styles[ 'has-media-on-the-right' ]
-				: {} ),
-			...( shouldStack && styles[ 'is-stacked-on-mobile' ] ),
-			...( shouldStack && mediaPosition === 'right'
-				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
-				: {} ),
-			...( isSelected && styles[ 'is-selected' ] ),
+			...styles['wp-block-media-text'],
+			...styles[`is-vertically-aligned-${verticalAlignment || 'center'}`],
+			...(mediaPosition === 'right'
+				? styles['has-media-on-the-right']
+				: {}),
+			...(shouldStack && styles['is-stacked-on-mobile']),
+			...(shouldStack && mediaPosition === 'right'
+				? styles['is-stacked-on-mobile.has-media-on-the-right']
+				: {}),
+			...(isSelected && styles['is-selected']),
 			backgroundColor: style?.backgroundColor || backgroundColor.color,
 			paddingBottom: 0,
 		};
@@ -310,78 +301,73 @@ class MediaTextEdit extends Component {
 			{ flex: 1 },
 			shouldStack
 				? {
-						...( mediaPosition === 'left' &&
-							styles.mediaStackLeft ),
-						...( mediaPosition === 'right' &&
-							styles.mediaStackRight ),
+						...(mediaPosition === 'left' && styles.mediaStackLeft),
+						...(mediaPosition === 'right' &&
+							styles.mediaStackRight),
 				  }
 				: {
-						...( mediaPosition === 'left' && styles.mediaLeft ),
-						...( mediaPosition === 'right' && styles.mediaRight ),
+						...(mediaPosition === 'left' && styles.mediaLeft),
+						...(mediaPosition === 'right' && styles.mediaRight),
 				  },
 		];
 
 		const toolbarControls = [
 			{
 				icon: isRTL ? pullRight : pullLeft,
-				title: __( 'Show media on left' ),
+				title: __('Show media on left'),
 				isActive: mediaPosition === 'left',
-				onClick: () => setAttributes( { mediaPosition: 'left' } ),
+				onClick: () => setAttributes({ mediaPosition: 'left' }),
 			},
 			{
 				icon: isRTL ? pullLeft : pullRight,
-				title: __( 'Show media on right' ),
+				title: __('Show media on right'),
 				isActive: mediaPosition === 'right',
-				onClick: () => setAttributes( { mediaPosition: 'right' } ),
+				onClick: () => setAttributes({ mediaPosition: 'right' }),
 			},
 		];
 
-		const onVerticalAlignmentChange = ( alignment ) => {
-			setAttributes( { verticalAlignment: alignment } );
+		const onVerticalAlignmentChange = (alignment) => {
+			setAttributes({ verticalAlignment: alignment });
 		};
 
 		return (
 			<>
-				{ mediaType === MEDIA_TYPE_IMAGE && this.getControls() }
+				{mediaType === MEDIA_TYPE_IMAGE && this.getControls()}
 				<BlockControls>
-					{ ( isMediaSelected || mediaType === MEDIA_TYPE_VIDEO ) && (
+					{(isMediaSelected || mediaType === MEDIA_TYPE_VIDEO) && (
 						<ToolbarGroup>
 							<Button
-								label={ __( 'Edit media' ) }
-								icon={ replace }
-								onClick={ this.onReplaceMedia }
+								label={__('Edit media')}
+								icon={replace}
+								onClick={this.onReplaceMedia}
 							/>
 						</ToolbarGroup>
-					) }
-					{ ( ! isMediaSelected ||
-						mediaType === MEDIA_TYPE_VIDEO ) && (
+					)}
+					{(!isMediaSelected || mediaType === MEDIA_TYPE_VIDEO) && (
 						<>
-							<ToolbarGroup controls={ toolbarControls } />
+							<ToolbarGroup controls={toolbarControls} />
 							<BlockVerticalAlignmentToolbar
-								onChange={ onVerticalAlignmentChange }
-								value={ verticalAlignment }
+								onChange={onVerticalAlignmentChange}
+								value={verticalAlignment}
 							/>
 						</>
-					) }
+					)}
 				</BlockControls>
-				<View
-					style={ containerStyles }
-					onLayout={ this.onLayoutChange }
-				>
+				<View style={containerStyles} onLayout={this.onLayoutChange}>
 					<View
-						style={ [
-							( shouldStack || ! imageFill ) && {
+						style={[
+							(shouldStack || !imageFill) && {
 								width: widthString,
 							},
 							mediaContainerStyle,
-						] }
+						]}
 					>
-						{ this.renderMediaArea( shouldStack ) }
+						{this.renderMediaArea(shouldStack)}
 					</View>
-					<View style={ innerBlockContainerStyle }>
+					<View style={innerBlockContainerStyle}>
 						<InnerBlocks
-							template={ TEMPLATE }
-							blockWidth={ blockWidth }
+							template={TEMPLATE}
+							blockWidth={blockWidth}
 						/>
 					</View>
 				</View>
@@ -391,24 +377,21 @@ class MediaTextEdit extends Component {
 }
 
 export default compose(
-	withColors( 'backgroundColor' ),
-	withSelect( ( select, { clientId } ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlockParents,
-			getSettings,
-		} = select( blockEditorStore );
+	withColors('backgroundColor'),
+	withSelect((select, { clientId }) => {
+		const { getSelectedBlockClientId, getBlockParents, getSettings } =
+			select(blockEditorStore);
 
-		const parents = getBlockParents( clientId, true );
+		const parents = getBlockParents(clientId, true);
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isAncestorSelected =
-			selectedBlockClientId && parents.includes( selectedBlockClientId );
+			selectedBlockClientId && parents.includes(selectedBlockClientId);
 
 		return {
 			isSelected: selectedBlockClientId === clientId,
 			isAncestorSelected,
 			isRTL: getSettings().isRTL,
 		};
-	} )
-)( MediaTextEdit );
+	})
+)(MediaTextEdit);

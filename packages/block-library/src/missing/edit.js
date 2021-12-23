@@ -13,14 +13,14 @@ import {
 } from '@wordpress/block-editor';
 import { safeHTML } from '@wordpress/dom';
 
-function MissingBlockWarning( { attributes, convertToHTML } ) {
+function MissingBlockWarning({ attributes, convertToHTML }) {
 	const { originalName, originalUndelimitedContent } = attributes;
-	const hasContent = !! originalUndelimitedContent;
-	const hasHTMLBlock = getBlockType( 'core/html' );
+	const hasContent = !!originalUndelimitedContent;
+	const hasHTMLBlock = getBlockType('core/html');
 
 	const actions = [];
 	let messageHTML;
-	if ( hasContent && hasHTMLBlock ) {
+	if (hasContent && hasHTMLBlock) {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
 			__(
@@ -29,8 +29,8 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 			originalName
 		);
 		actions.push(
-			<Button key="convert" onClick={ convertToHTML } variant="primary">
-				{ __( 'Keep as HTML' ) }
+			<Button key="convert" onClick={convertToHTML} variant="primary">
+				{__('Keep as HTML')}
 			</Button>
 		);
 	} else {
@@ -44,25 +44,25 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	}
 
 	return (
-		<div { ...useBlockProps( { className: 'has-warning' } ) }>
-			<Warning actions={ actions }>{ messageHTML }</Warning>
-			<RawHTML>{ safeHTML( originalUndelimitedContent ) }</RawHTML>
+		<div {...useBlockProps({ className: 'has-warning' })}>
+			<Warning actions={actions}>{messageHTML}</Warning>
+			<RawHTML>{safeHTML(originalUndelimitedContent)}</RawHTML>
 		</div>
 	);
 }
 
-const MissingEdit = withDispatch( ( dispatch, { clientId, attributes } ) => {
-	const { replaceBlock } = dispatch( blockEditorStore );
+const MissingEdit = withDispatch((dispatch, { clientId, attributes }) => {
+	const { replaceBlock } = dispatch(blockEditorStore);
 	return {
 		convertToHTML() {
 			replaceBlock(
 				clientId,
-				createBlock( 'core/html', {
+				createBlock('core/html', {
 					content: attributes.originalUndelimitedContent,
-				} )
+				})
 			);
 		},
 	};
-} )( MissingBlockWarning );
+})(MissingBlockWarning);
 
 export default MissingEdit;

@@ -8,12 +8,12 @@ import { css } from '@emotion/react';
  * @param {TemplateStringsArray}                                      strings
  * @param {import('@emotion/css/create-instance').CSSInterpolation[]} interpolations
  */
-export function firefoxOnly( strings, ...interpolations ) {
-	const interpolatedStyles = css( strings, ...interpolations );
+export function firefoxOnly(strings, ...interpolations) {
+	const interpolatedStyles = css(strings, ...interpolations);
 
 	return css`
 		@-moz-document url-prefix() {
-			${ interpolatedStyles };
+			${interpolatedStyles};
 		}
 	`;
 }
@@ -22,13 +22,13 @@ export function firefoxOnly( strings, ...interpolations ) {
  * @param {TemplateStringsArray}                                      strings
  * @param {import('@emotion/css/create-instance').CSSInterpolation[]} interpolations
  */
-export function safariOnly( strings, ...interpolations ) {
-	const interpolatedStyles = css( strings, ...interpolations );
+export function safariOnly(strings, ...interpolations) {
+	const interpolatedStyles = css(strings, ...interpolations);
 
 	return css`
-		@media not all and ( min-resolution: 0.001dpcm ) {
-			@supports ( -webkit-appearance: none ) {
-				${ interpolatedStyles }
+		@media not all and (min-resolution: 0.001dpcm) {
+			@supports (-webkit-appearance: none) {
+				${interpolatedStyles}
 			}
 		}
 	`;

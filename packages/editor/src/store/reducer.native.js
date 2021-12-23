@@ -32,16 +32,16 @@ export * from './reducer.js';
  *
  * @return {Object} Updated state.
  */
-export const postTitle = combineReducers( {
-	isSelected( state = false, action ) {
-		switch ( action.type ) {
+export const postTitle = combineReducers({
+	isSelected(state = false, action) {
+		switch (action.type) {
 			case 'TOGGLE_POST_TITLE_SELECTION':
 				return action.isSelected;
 		}
 
 		return state;
 	},
-} );
+});
 
 /**
  * Reducer returning the clipboard state.
@@ -51,8 +51,8 @@ export const postTitle = combineReducers( {
  *
  * @return {Object} Updated state.
  */
-export function clipboard( state = null, action ) {
-	switch ( action.type ) {
+export function clipboard(state = null, action) {
+	switch (action.type) {
 		case 'UPDATE_CLIPBOARD':
 			return action.clipboard;
 	}
@@ -68,19 +68,19 @@ export function clipboard( state = null, action ) {
  *
  * @return {Object} Updated state.
  */
-export function notices( state = [], action ) {
-	switch ( action.type ) {
+export function notices(state = [], action) {
+	switch (action.type) {
 		case 'CREATE_NOTICE':
-			return [ ...state, action.notice ];
+			return [...state, action.notice];
 		case 'REMOVE_ALL_NOTICES':
 			return [];
 		case 'REMOVE_NOTICE':
-			return state.filter( ( notice ) => notice.id !== action.id );
+			return state.filter((notice) => notice.id !== action.id);
 	}
 	return state;
 }
 
-export default combineReducers( {
+export default combineReducers({
 	postId,
 	postType,
 	postTitle,
@@ -93,4 +93,4 @@ export default combineReducers( {
 	editorSettings,
 	clipboard,
 	notices,
-} );
+});

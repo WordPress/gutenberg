@@ -7,11 +7,11 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
-			blocks: [ 'core/code' ],
-			transform: ( { content } ) => {
-				return createBlock( 'core/html', {
+			blocks: ['core/code'],
+			transform: ({ content }) => {
+				return createBlock('core/html', {
 					content,
-				} );
+				});
 			},
 		},
 	],

@@ -4,10 +4,10 @@
 import { BlockList, ObserveTyping, WritingFlow } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 
-export default function Editor( { isPending } ) {
+export default function Editor({ isPending }) {
 	return (
 		<div className="edit-navigation-editor">
-			{ isPending ? (
+			{isPending ? (
 				<Spinner />
 			) : (
 				<div className="editor-styles-wrapper">
@@ -17,7 +17,7 @@ export default function Editor( { isPending } ) {
 						</ObserveTyping>
 					</WritingFlow>
 				</div>
-			) }
+			)}
 		</div>
 	);
 }

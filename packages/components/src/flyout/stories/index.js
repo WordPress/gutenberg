@@ -13,7 +13,7 @@ export default {
 export const _default = () => {
 	return (
 		<Flyout
-			trigger={ <Button>Click</Button> }
+			trigger={<Button>Click</Button>}
 			visible
 			placement="bottom-start"
 		>

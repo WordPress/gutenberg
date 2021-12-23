@@ -27,34 +27,34 @@ function ToolbarButton(
 	},
 	ref
 ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
+	const accessibleToolbarState = useContext(ToolbarContext);
 
-	if ( ! accessibleToolbarState ) {
+	if (!accessibleToolbarState) {
 		return (
-			<ToolbarButtonContainer className={ containerClassName }>
+			<ToolbarButtonContainer className={containerClassName}>
 				<Button
-					ref={ ref }
-					icon={ props.icon }
-					label={ title }
-					shortcut={ props.shortcut }
-					data-subscript={ props.subscript }
-					onClick={ ( event ) => {
+					ref={ref}
+					icon={props.icon}
+					label={title}
+					shortcut={props.shortcut}
+					data-subscript={props.subscript}
+					onClick={(event) => {
 						event.stopPropagation();
-						if ( props.onClick ) {
-							props.onClick( event );
+						if (props.onClick) {
+							props.onClick(event);
 						}
-					} }
-					className={ classnames(
+					}}
+					className={classnames(
 						'components-toolbar__control',
 						className
-					) }
-					isPressed={ isActive }
-					disabled={ isDisabled }
+					)}
+					isPressed={isActive}
+					disabled={isDisabled}
 					data-toolbar-item
-					{ ...extraProps }
-					{ ...props }
+					{...extraProps}
+					{...props}
 				>
-					{ children }
+					{children}
 				</Button>
 			</ToolbarButtonContainer>
 		);
@@ -65,23 +65,23 @@ function ToolbarButton(
 	// Button.
 	return (
 		<ToolbarItem
-			className={ classnames( 'components-toolbar-button', className ) }
-			{ ...extraProps }
-			{ ...props }
-			ref={ ref }
+			className={classnames('components-toolbar-button', className)}
+			{...extraProps}
+			{...props}
+			ref={ref}
 		>
-			{ ( toolbarItemProps ) => (
+			{(toolbarItemProps) => (
 				<Button
-					label={ title }
-					isPressed={ isActive }
-					disabled={ isDisabled }
-					{ ...toolbarItemProps }
+					label={title}
+					isPressed={isActive}
+					disabled={isDisabled}
+					{...toolbarItemProps}
 				>
-					{ children }
+					{children}
 				</Button>
-			) }
+			)}
 		</ToolbarItem>
 	);
 }
 
-export default forwardRef( ToolbarButton );
+export default forwardRef(ToolbarButton);

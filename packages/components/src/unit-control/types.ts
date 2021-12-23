@@ -40,10 +40,10 @@ export type WPUnitControlUnit = {
 	step?: number;
 };
 
-export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;
+export type WPUnitControlUnitList = Array<WPUnitControlUnit> | false;
 
 export type UnitControlOnChangeCallback = InputChangeCallback<
-	SyntheticEvent< HTMLSelectElement | HTMLInputElement >,
+	SyntheticEvent<HTMLSelectElement | HTMLInputElement>,
 	{ data?: WPUnitControlUnit }
 >;
 

@@ -7,50 +7,50 @@ import { __, sprintf } from '@wordpress/i18n';
 
 const FONT_STYLES = [
 	{
-		name: __( 'Regular' ),
+		name: __('Regular'),
 		value: 'normal',
 	},
 	{
-		name: __( 'Italic' ),
+		name: __('Italic'),
 		value: 'italic',
 	},
 ];
 
 const FONT_WEIGHTS = [
 	{
-		name: __( 'Thin' ),
+		name: __('Thin'),
 		value: '100',
 	},
 	{
-		name: __( 'Extra Light' ),
+		name: __('Extra Light'),
 		value: '200',
 	},
 	{
-		name: __( 'Light' ),
+		name: __('Light'),
 		value: '300',
 	},
 	{
-		name: __( 'Regular' ),
+		name: __('Regular'),
 		value: '400',
 	},
 	{
-		name: __( 'Medium' ),
+		name: __('Medium'),
 		value: '500',
 	},
 	{
-		name: __( 'Semi Bold' ),
+		name: __('Semi Bold'),
 		value: '600',
 	},
 	{
-		name: __( 'Bold' ),
+		name: __('Bold'),
 		value: '700',
 	},
 	{
-		name: __( 'Extra Bold' ),
+		name: __('Extra Bold'),
 		value: '800',
 	},
 	{
-		name: __( 'Black' ),
+		name: __('Black'),
 		value: '900',
 	},
 ];
@@ -63,16 +63,16 @@ const FONT_WEIGHTS = [
  * @param {boolean} hasFontWeights Whether font weights are enabled and present.
  * @return {string} A label representing what font appearance is being edited.
  */
-export const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
-	if ( ! hasFontStyles ) {
-		return __( 'Font weight' );
+export const getFontAppearanceLabel = (hasFontStyles, hasFontWeights) => {
+	if (!hasFontStyles) {
+		return __('Font weight');
 	}
 
-	if ( ! hasFontWeights ) {
-		return __( 'Font style' );
+	if (!hasFontWeights) {
+		return __('Font style');
 	}
 
-	return __( 'Appearance' );
+	return __('Appearance');
 };
 
 /**
@@ -82,7 +82,7 @@ export const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
  *
  * @return {WPElement} Font appearance control.
  */
-export default function FontAppearanceControl( props ) {
+export default function FontAppearanceControl(props) {
 	const {
 		onChange,
 		hasFontStyles = true,
@@ -90,114 +90,112 @@ export default function FontAppearanceControl( props ) {
 		value: { fontStyle, fontWeight },
 	} = props;
 	const hasStylesOrWeights = hasFontStyles || hasFontWeights;
-	const label = getFontAppearanceLabel( hasFontStyles, hasFontWeights );
+	const label = getFontAppearanceLabel(hasFontStyles, hasFontWeights);
 	const defaultOption = {
 		key: 'default',
-		name: __( 'Default' ),
+		name: __('Default'),
 		style: { fontStyle: undefined, fontWeight: undefined },
 	};
 
 	// Combines both font style and weight options into a single dropdown.
 	const combineOptions = () => {
-		const combinedOptions = [ defaultOption ];
+		const combinedOptions = [defaultOption];
 
-		FONT_STYLES.forEach( ( { name: styleName, value: styleValue } ) => {
-			FONT_WEIGHTS.forEach(
-				( { name: weightName, value: weightValue } ) => {
-					const optionName =
-						styleValue === 'normal'
-							? weightName
-							: sprintf(
-									/* translators: 1: Font weight name. 2: Font style name. */
-									__( '%1$s %2$s' ),
-									weightName,
-									styleName
-							  );
+		FONT_STYLES.forEach(({ name: styleName, value: styleValue }) => {
+			FONT_WEIGHTS.forEach(({ name: weightName, value: weightValue }) => {
+				const optionName =
+					styleValue === 'normal'
+						? weightName
+						: sprintf(
+								/* translators: 1: Font weight name. 2: Font style name. */
+								__('%1$s %2$s'),
+								weightName,
+								styleName
+						  );
 
-					combinedOptions.push( {
-						key: `${ styleValue }-${ weightValue }`,
-						name: optionName,
-						style: {
-							fontStyle: styleValue,
-							fontWeight: weightValue,
-						},
-					} );
-				}
-			);
-		} );
+				combinedOptions.push({
+					key: `${styleValue}-${weightValue}`,
+					name: optionName,
+					style: {
+						fontStyle: styleValue,
+						fontWeight: weightValue,
+					},
+				});
+			});
+		});
 
 		return combinedOptions;
 	};
 
 	// Generates select options for font styles only.
 	const styleOptions = () => {
-		const combinedOptions = [ defaultOption ];
-		FONT_STYLES.forEach( ( { name, value } ) => {
-			combinedOptions.push( {
+		const combinedOptions = [defaultOption];
+		FONT_STYLES.forEach(({ name, value }) => {
+			combinedOptions.push({
 				key: value,
 				name,
 				style: { fontStyle: value, fontWeight: undefined },
-			} );
-		} );
+			});
+		});
 		return combinedOptions;
 	};
 
 	// Generates select options for font weights only.
 	const weightOptions = () => {
-		const combinedOptions = [ defaultOption ];
-		FONT_WEIGHTS.forEach( ( { name, value } ) => {
-			combinedOptions.push( {
+		const combinedOptions = [defaultOption];
+		FONT_WEIGHTS.forEach(({ name, value }) => {
+			combinedOptions.push({
 				key: value,
 				name,
 				style: { fontStyle: undefined, fontWeight: value },
-			} );
-		} );
+			});
+		});
 		return combinedOptions;
 	};
 
 	// Map font styles and weights to select options.
-	const selectOptions = useMemo( () => {
-		if ( hasFontStyles && hasFontWeights ) {
+	const selectOptions = useMemo(() => {
+		if (hasFontStyles && hasFontWeights) {
 			return combineOptions();
 		}
 
 		return hasFontStyles ? styleOptions() : weightOptions();
-	}, [ props.options ] );
+	}, [props.options]);
 
 	// Find current selection by comparing font style & weight against options,
 	// and fall back to the Default option if there is no matching option.
 	const currentSelection =
 		selectOptions.find(
-			( option ) =>
+			(option) =>
 				option.style.fontStyle === fontStyle &&
 				option.style.fontWeight === fontWeight
-		) || selectOptions[ 0 ];
+		) || selectOptions[0];
 
 	// Adjusts screen reader description based on styles or weights.
 	const getDescribedBy = () => {
-		if ( ! currentSelection ) {
-			return __( 'No selected font appearance' );
+		if (!currentSelection) {
+			return __('No selected font appearance');
 		}
 
-		if ( ! hasFontStyles ) {
+		if (!hasFontStyles) {
 			return sprintf(
 				// translators: %s: Currently selected font weight.
-				__( 'Currently selected font weight: %s' ),
+				__('Currently selected font weight: %s'),
 				currentSelection.name
 			);
 		}
 
-		if ( ! hasFontWeights ) {
+		if (!hasFontWeights) {
 			return sprintf(
 				// translators: %s: Currently selected font style.
-				__( 'Currently selected font style: %s' ),
+				__('Currently selected font style: %s'),
 				currentSelection.name
 			);
 		}
 
 		return sprintf(
 			// translators: %s: Currently selected font appearance.
-			__( 'Currently selected font appearance: %s' ),
+			__('Currently selected font appearance: %s'),
 			currentSelection.name
 		);
 	};
@@ -206,13 +204,11 @@ export default function FontAppearanceControl( props ) {
 		hasStylesOrWeights && (
 			<CustomSelectControl
 				className="components-font-appearance-control"
-				label={ label }
-				describedBy={ getDescribedBy() }
-				options={ selectOptions }
-				value={ currentSelection }
-				onChange={ ( { selectedItem } ) =>
-					onChange( selectedItem.style )
-				}
+				label={label}
+				describedBy={getDescribedBy()}
+				options={selectOptions}
+				value={currentSelection}
+				onChange={({ selectedItem }) => onChange(selectedItem.style)}
 			/>
 		)
 	);

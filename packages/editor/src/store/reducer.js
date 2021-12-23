@@ -21,8 +21,8 @@ import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
  *
  * @return {*} Raw value.
  */
-export function getPostRawValue( value ) {
-	if ( value && 'object' === typeof value && 'raw' in value ) {
+export function getPostRawValue(value) {
+	if (value && 'object' === typeof value && 'raw' in value) {
 		return value.raw;
 	}
 
@@ -38,8 +38,8 @@ export function getPostRawValue( value ) {
  *
  * @return {boolean} Whether the two objects have the same keys.
  */
-export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
+export function hasSameKeys(a, b) {
+	return isEqual(keys(a), keys(b));
 }
 
 /**
@@ -52,10 +52,10 @@ export function hasSameKeys( a, b ) {
  *
  * @return {boolean} Whether actions are updating the same post property.
  */
-export function isUpdatingSamePostProperty( action, previousAction ) {
+export function isUpdatingSamePostProperty(action, previousAction) {
 	return (
 		action.type === 'EDIT_POST' &&
-		hasSameKeys( action.edits, previousAction.edits )
+		hasSameKeys(action.edits, previousAction.edits)
 	);
 }
 
@@ -69,20 +69,20 @@ export function isUpdatingSamePostProperty( action, previousAction ) {
  *
  * @return {boolean} Whether to overwrite present state.
  */
-export function shouldOverwriteState( action, previousAction ) {
-	if ( action.type === 'RESET_EDITOR_BLOCKS' ) {
-		return ! action.shouldCreateUndoLevel;
+export function shouldOverwriteState(action, previousAction) {
+	if (action.type === 'RESET_EDITOR_BLOCKS') {
+		return !action.shouldCreateUndoLevel;
 	}
 
-	if ( ! previousAction || action.type !== previousAction.type ) {
+	if (!previousAction || action.type !== previousAction.type) {
 		return false;
 	}
 
-	return isUpdatingSamePostProperty( action, previousAction );
+	return isUpdatingSamePostProperty(action, previousAction);
 }
 
-export function postId( state = null, action ) {
-	switch ( action.type ) {
+export function postId(state = null, action) {
+	switch (action.type) {
 		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 			return action.post.id;
@@ -91,8 +91,8 @@ export function postId( state = null, action ) {
 	return state;
 }
 
-export function postType( state = null, action ) {
-	switch ( action.type ) {
+export function postType(state = null, action) {
+	switch (action.type) {
 		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 			return action.post.type;
@@ -109,8 +109,8 @@ export function postType( state = null, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function template( state = { isValid: true }, action ) {
-	switch ( action.type ) {
+export function template(state = { isValid: true }, action) {
+	switch (action.type) {
 		case 'SET_TEMPLATE_VALIDITY':
 			return {
 				...state,
@@ -129,8 +129,8 @@ export function template( state = { isValid: true }, action ) {
  *
  * @return {string} Updated state.
  */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
+export function preferences(state = PREFERENCES_DEFAULTS, action) {
+	switch (action.type) {
 		case 'ENABLE_PUBLISH_SIDEBAR':
 			return {
 				...state,
@@ -156,8 +156,8 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  *
  * @return {Object} Updated state.
  */
-export function saving( state = {}, action ) {
-	switch ( action.type ) {
+export function saving(state = {}, action) {
+	switch (action.type) {
 		case 'REQUEST_POST_UPDATE_START':
 		case 'REQUEST_POST_UPDATE_FINISH':
 			return {
@@ -188,8 +188,8 @@ export function saving( state = {}, action ) {
  *
  * @return {PostLockState} Updated state.
  */
-export function postLock( state = { isLocked: false }, action ) {
-	switch ( action.type ) {
+export function postLock(state = { isLocked: false }, action) {
+	switch (action.type) {
 		case 'UPDATE_POST_LOCK':
 			return action.lock;
 	}
@@ -207,13 +207,13 @@ export function postLock( state = { isLocked: false }, action ) {
  *
  * @return {PostLockState} Updated state.
  */
-export function postSavingLock( state = {}, action ) {
-	switch ( action.type ) {
+export function postSavingLock(state = {}, action) {
+	switch (action.type) {
 		case 'LOCK_POST_SAVING':
-			return { ...state, [ action.lockName ]: true };
+			return { ...state, [action.lockName]: true };
 
 		case 'UNLOCK_POST_SAVING':
-			return omit( state, action.lockName );
+			return omit(state, action.lockName);
 	}
 	return state;
 }
@@ -228,13 +228,13 @@ export function postSavingLock( state = {}, action ) {
  *
  * @return {PostLockState} Updated state.
  */
-export function postAutosavingLock( state = {}, action ) {
-	switch ( action.type ) {
+export function postAutosavingLock(state = {}, action) {
+	switch (action.type) {
 		case 'LOCK_POST_AUTOSAVING':
-			return { ...state, [ action.lockName ]: true };
+			return { ...state, [action.lockName]: true };
 
 		case 'UNLOCK_POST_AUTOSAVING':
-			return omit( state, action.lockName );
+			return omit(state, action.lockName);
 	}
 	return state;
 }
@@ -249,8 +249,8 @@ export function postAutosavingLock( state = {}, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function isReady( state = false, action ) {
-	switch ( action.type ) {
+export function isReady(state = false, action) {
+	switch (action.type) {
 		case 'SETUP_EDITOR_STATE':
 			return true;
 
@@ -269,8 +269,8 @@ export function isReady( state = false, action ) {
  *
  * @return {Object} Updated state.
  */
-export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
-	switch ( action.type ) {
+export function editorSettings(state = EDITOR_SETTINGS_DEFAULTS, action) {
+	switch (action.type) {
 		case 'UPDATE_EDITOR_SETTINGS':
 			return {
 				...state,
@@ -281,7 +281,7 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export default combineReducers( {
+export default combineReducers({
 	postId,
 	postType,
 	preferences,
@@ -292,4 +292,4 @@ export default combineReducers( {
 	isReady,
 	editorSettings,
 	postAutosavingLock,
-} );
+});

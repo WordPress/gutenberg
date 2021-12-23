@@ -30,22 +30,21 @@ import TouchableRipple from './ripple';
 
 const isIOS = Platform.OS === 'ios';
 class BottomSheetCell extends Component {
-	constructor( props ) {
-		super( ...arguments );
+	constructor(props) {
+		super(...arguments);
 		this.state = {
 			isEditingValue: props.autoFocus || false,
 			isScreenReaderEnabled: false,
 		};
 
-		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
-			this
-		);
+		this.handleScreenReaderToggled =
+			this.handleScreenReaderToggled.bind(this);
 
 		this.isCurrent = false;
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
-		if ( ! prevState.isEditingValue && this.state.isEditingValue ) {
+	componentDidUpdate(prevProps, prevState) {
+		if (!prevState.isEditingValue && this.state.isEditingValue) {
 			this._valueTextInput.focus();
 		}
 	}
@@ -58,9 +57,9 @@ class BottomSheetCell extends Component {
 		);
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
-			( isScreenReaderEnabled ) => {
-				if ( this.isCurrent ) {
-					this.setState( { isScreenReaderEnabled } );
+			(isScreenReaderEnabled) => {
+				if (this.isCurrent) {
+					this.setState({ isScreenReaderEnabled });
 				}
 			}
 		);
@@ -74,14 +73,14 @@ class BottomSheetCell extends Component {
 		);
 	}
 
-	handleScreenReaderToggled( isScreenReaderEnabled ) {
-		this.setState( { isScreenReaderEnabled } );
+	handleScreenReaderToggled(isScreenReaderEnabled) {
+		this.setState({ isScreenReaderEnabled });
 	}
 
-	typeToKeyboardType( type, step ) {
+	typeToKeyboardType(type, step) {
 		let keyboardType = `default`;
-		if ( type === `number` ) {
-			if ( step && Math.abs( step ) < 1 ) {
+		if (type === `number`) {
+			if (step && Math.abs(step) < 1) {
 				keyboardType = `decimal-pad`;
 			} else {
 				keyboardType = `number-pad`;
@@ -155,15 +154,12 @@ class BottomSheetCell extends Component {
 		);
 
 		const drawSeparator =
-			( separatorType && separatorType !== 'none' ) ||
+			(separatorType && separatorType !== 'none') ||
 			separatorStyle === undefined;
 		const drawTopSeparator =
 			drawSeparator && separatorType === 'topFullWidth';
 
-		const cellContainerStyles = [
-			styles.cellContainer,
-			cellContainerStyle,
-		];
+		const cellContainerStyles = [styles.cellContainer, cellContainerStyle];
 		const rowContainerStyles = [
 			styles.cellRowContainer,
 			cellRowContainerStyle,
@@ -175,20 +171,20 @@ class BottomSheetCell extends Component {
 			onLongPress !== undefined;
 
 		const onCellPress = () => {
-			if ( isValueEditable ) {
+			if (isValueEditable) {
 				startEditing();
-			} else if ( onPress !== undefined ) {
+			} else if (onPress !== undefined) {
 				onPress();
 			}
 		};
 
 		const finishEditing = () => {
-			this.setState( { isEditingValue: false } );
+			this.setState({ isEditingValue: false });
 		};
 
 		const startEditing = () => {
-			if ( this.state.isEditingValue === false ) {
-				this.setState( { isEditingValue: true } );
+			if (this.state.isEditingValue === false) {
+				this.setState({ isEditingValue: true });
 			}
 		};
 
@@ -206,7 +202,7 @@ class BottomSheetCell extends Component {
 				...cellSeparatorStyle,
 				...platformStyles.separatorMarginLeft,
 			};
-			switch ( separatorType ) {
+			switch (separatorType) {
 				case 'leftMargin':
 					return leftMarginStyle;
 				case 'fullWidth':
@@ -215,7 +211,7 @@ class BottomSheetCell extends Component {
 				case 'none':
 					return undefined;
 				case undefined:
-					if ( showValue && icon ) {
+					if (showValue && icon) {
 						return leftMarginStyle;
 					}
 					return defaultSeparatorStyle;
@@ -241,67 +237,65 @@ class BottomSheetCell extends Component {
 			const shouldShowPlaceholder = isValueEditable && value === '';
 			return this.state.isEditingValue || shouldShowPlaceholder ? (
 				<TextInput
-					ref={ ( c ) => ( this._valueTextInput = c ) }
-					numberOfLines={ 1 }
-					style={ finalStyle }
-					value={ value }
-					placeholder={ valuePlaceholder }
-					placeholderTextColor={ '#87a6bc' }
-					onChangeText={ onChangeValue }
-					editable={ isValueEditable }
-					pointerEvents={
-						this.state.isEditingValue ? 'auto' : 'none'
-					}
-					onFocus={ startEditing }
-					onBlur={ finishEditing }
-					onSubmitEditing={ onSubmit }
-					keyboardType={ this.typeToKeyboardType( type, step ) }
-					{ ...valueProps }
+					ref={(c) => (this._valueTextInput = c)}
+					numberOfLines={1}
+					style={finalStyle}
+					value={value}
+					placeholder={valuePlaceholder}
+					placeholderTextColor={'#87a6bc'}
+					onChangeText={onChangeValue}
+					editable={isValueEditable}
+					pointerEvents={this.state.isEditingValue ? 'auto' : 'none'}
+					onFocus={startEditing}
+					onBlur={finishEditing}
+					onSubmitEditing={onSubmit}
+					keyboardType={this.typeToKeyboardType(type, step)}
+					{...valueProps}
 				/>
 			) : (
 				<Text
-					style={ { ...cellValueStyle, ...valueStyle } }
-					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					style={{ ...cellValueStyle, ...valueStyle }}
+					numberOfLines={1}
+					ellipsizeMode={'middle'}
 				>
-					{ value }
+					{value}
 				</Text>
 			);
 		};
 
 		const getAccessibilityLabel = () => {
-			if ( accessible === false ) {
+			if (accessible === false) {
 				return;
 			}
-			if ( accessibilityLabel || ! showValue ) {
+			if (accessibilityLabel || !showValue) {
 				return accessibilityLabel || label;
 			}
 
-			if ( isEmpty( value ) ) {
-				return isEmpty( help )
+			if (isEmpty(value)) {
+				return isEmpty(help)
 					? sprintf(
 							/* translators: accessibility text. Empty state of a inline textinput cell. %s: The cell's title */
-							_x( '%s. Empty', 'inline textinput cell' ),
+							_x('%s. Empty', 'inline textinput cell'),
 							label
 					  )
 					: // Separating by ',' is necessary to make a pause on urls (non-capitalized text)
 					  sprintf(
 							/* translators: accessibility text. Empty state of a inline textinput cell. %1: Cell title, %2: cell help. */
-							_x( '%1$s, %2$s. Empty', 'inline textinput cell' ),
+							_x('%1$s, %2$s. Empty', 'inline textinput cell'),
 							label,
 							help
 					  );
 			}
-			return isEmpty( help )
+			return isEmpty(help)
 				? sprintf(
 						/* translators: accessibility text. Inline textinput title and value.%1: Cell title, %2: cell value. */
-						_x( '%1$s, %2$s', 'inline textinput cell' ),
+						_x('%1$s, %2$s', 'inline textinput cell'),
 						label,
 						value
 				  ) // Separating by ',' is necessary to make a pause on urls (non-capitalized text)
 				: sprintf(
 						/* translators: accessibility text. Inline textinput title, value and help text.%1: Cell title, %2: cell value, , %3: cell help. */
-						_x( '%1$s, %2$s, %3$s', 'inline textinput cell' ),
+						_x('%1$s, %2$s, %3$s', 'inline textinput cell'),
 						label,
 						value,
 						help
@@ -327,48 +321,48 @@ class BottomSheetCell extends Component {
 		const opacity =
 			activeOpacity !== undefined
 				? activeOpacity
-				: get( platformStyles, 'activeOpacity.opacity' );
+				: get(platformStyles, 'activeOpacity.opacity');
 
 		return (
 			<TouchableRipple
 				accessible={
 					accessible !== undefined
 						? accessible
-						: ! this.state.isEditingValue
+						: !this.state.isEditingValue
 				}
-				accessibilityLabel={ getAccessibilityLabel() }
-				accessibilityRole={ accessibilityRole || 'button' }
+				accessibilityLabel={getAccessibilityLabel()}
+				accessibilityRole={accessibilityRole || 'button'}
 				accessibilityHint={
 					isValueEditable
 						? /* translators: accessibility text */
-						  __( 'Double tap to edit this value' )
+						  __('Double tap to edit this value')
 						: accessibilityHint
 				}
-				disabled={ disabled || ! isInteractive }
-				activeOpacity={ opacity }
-				onPress={ onCellPress }
-				onLongPress={ onLongPress }
-				style={ [ styles.clipToBounds, style ] }
-				borderless={ borderless }
+				disabled={disabled || !isInteractive}
+				activeOpacity={opacity}
+				onPress={onCellPress}
+				onLongPress={onLongPress}
+				style={[styles.clipToBounds, style]}
+				borderless={borderless}
 			>
-				{ drawTopSeparator && <View style={ separatorStyle() } /> }
+				{drawTopSeparator && <View style={separatorStyle()} />}
 				<View
-					style={ cellContainerStyles }
-					pointerEvents={ containerPointerEvents }
+					style={cellContainerStyles}
+					pointerEvents={containerPointerEvents}
 				>
-					<View style={ rowContainerStyles }>
-						<View style={ styles.cellRowContainer }>
-							{ icon && (
-								<View style={ styles.cellRowContainer }>
+					<View style={rowContainerStyles}>
+						<View style={styles.cellRowContainer}>
+							{icon && (
+								<View style={styles.cellRowContainer}>
 									<Icon
-										icon={ icon }
-										size={ 24 }
+										icon={icon}
+										size={24}
 										fill={
 											iconStyle.color ||
 											iconStyleBase.color
 										}
-										style={ iconStyle }
-										isPressed={ false }
+										style={iconStyle}
+										isPressed={false}
 									/>
 									<View
 										style={
@@ -376,59 +370,52 @@ class BottomSheetCell extends Component {
 										}
 									/>
 								</View>
-							) }
-							{ subLabel && label && (
+							)}
+							{subLabel && label && (
 								<View>
 									<Text
-										style={ [
-											defaultLabelStyle,
-											labelStyle,
-										] }
+										style={[defaultLabelStyle, labelStyle]}
 									>
-										{ label }
+										{label}
 									</Text>
-									<Text style={ defaultSubLabelStyleText }>
-										{ subLabel }
+									<Text style={defaultSubLabelStyleText}>
+										{subLabel}
 									</Text>
 								</View>
-							) }
-							{ ! subLabel && label && (
-								<Text
-									style={ [ defaultLabelStyle, labelStyle ] }
-								>
-									{ label }
+							)}
+							{!subLabel && label && (
+								<Text style={[defaultLabelStyle, labelStyle]}>
+									{label}
 								</Text>
-							) }
+							)}
 						</View>
-						{ customActionButton && (
+						{customActionButton && (
 							<TouchableOpacity
-								onPress={ handler }
-								accessibilityRole={ 'button' }
+								onPress={handler}
+								accessibilityRole={'button'}
 							>
-								<Text style={ resetButtonStyle }>
-									{ title }
-								</Text>
+								<Text style={resetButtonStyle}>{title}</Text>
 							</TouchableOpacity>
-						) }
+						)}
 					</View>
-					{ isSelected && (
+					{isSelected && (
 						<Icon
-							icon={ check }
-							fill={ platformStyles.isSelected.color }
+							icon={check}
+							fill={platformStyles.isSelected.color}
 						/>
-					) }
-					{ showValue && getValueComponent() }
-					{ children }
+					)}
+					{showValue && getValueComponent()}
+					{children}
 				</View>
-				{ help && (
-					<Text style={ [ cellHelpStyle, styles.placeholderColor ] }>
-						{ help }
+				{help && (
+					<Text style={[cellHelpStyle, styles.placeholderColor]}>
+						{help}
 					</Text>
-				) }
-				{ ! drawTopSeparator && <View style={ separatorStyle() } /> }
+				)}
+				{!drawTopSeparator && <View style={separatorStyle()} />}
 			</TouchableRipple>
 		);
 	}
 }
 
-export default withPreferredColorScheme( BottomSheetCell );
+export default withPreferredColorScheme(BottomSheetCell);

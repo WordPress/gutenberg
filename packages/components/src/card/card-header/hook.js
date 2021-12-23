@@ -13,14 +13,14 @@ import { useCx } from '../../utils/hooks/use-cx';
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
  */
-export function useCardHeader( props ) {
+export function useCardHeader(props) {
 	const {
 		className,
 		isBorderless = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps
-	} = useContextSystem( props, 'CardHeader' );
+	} = useContextSystem(props, 'CardHeader');
 
 	const cx = useCx();
 
@@ -30,14 +30,14 @@ export function useCardHeader( props ) {
 				styles.Header,
 				styles.borderRadius,
 				styles.borderColor,
-				styles.cardPaddings[ size ],
+				styles.cardPaddings[size],
 				isBorderless && styles.borderless,
 				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
 				'components-card__header',
 				className
 			),
-		[ className, isBorderless, isShady, size ]
+		[className, isBorderless, isShady, size]
 	);
 
 	return {

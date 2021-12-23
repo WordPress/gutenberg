@@ -34,24 +34,24 @@ let requestMocks = [];
  *
  * @param {Array} mocks Array of mock settings.
  */
-export async function setUpResponseMocking( mocks ) {
-	if ( ! interceptionInitialized ) {
+export async function setUpResponseMocking(mocks) {
+	if (!interceptionInitialized) {
 		// We only want to set up the request interception once, or else we get a crash
 		// when we try to process the same request twice.
 		interceptionInitialized = true;
-		await page.setRequestInterception( true );
-		page.on( 'request', async ( request ) => {
-			for ( let i = 0; i < requestMocks.length; i++ ) {
-				const mock = requestMocks[ i ];
-				if ( mock.match( request ) ) {
-					await mock.onRequestMatch( request );
+		await page.setRequestInterception(true);
+		page.on('request', async (request) => {
+			for (let i = 0; i < requestMocks.length; i++) {
+				const mock = requestMocks[i];
+				if (mock.match(request)) {
+					await mock.onRequestMatch(request);
 					return;
 				}
 			}
 			request.continue();
-		} );
+		});
 	}
 	// Overwrite with the passed in mocks, so we can change the mocks mid-test to test
 	// recovery from scenarios where a request had failed, but is working again.
-	requestMocks = [ ...mocks ];
+	requestMocks = [...mocks];
 }

@@ -34,47 +34,45 @@ import { store as blockEditorStore } from '../../store';
  *
  * @return {?string} Block title.
  */
-export default function BlockTitle( { clientId } ) {
+export default function BlockTitle({ clientId }) {
 	const { attributes, name, reusableBlockTitle } = useSelect(
-		( select ) => {
-			if ( ! clientId ) {
+		(select) => {
+			if (!clientId) {
 				return {};
 			}
 			const {
 				getBlockName,
 				getBlockAttributes,
 				__experimentalGetReusableBlockTitle,
-			} = select( blockEditorStore );
-			const blockName = getBlockName( clientId );
-			if ( ! blockName ) {
+			} = select(blockEditorStore);
+			const blockName = getBlockName(clientId);
+			if (!blockName) {
 				return {};
 			}
-			const isReusable = isReusableBlock( getBlockType( blockName ) );
+			const isReusable = isReusableBlock(getBlockType(blockName));
 			return {
-				attributes: getBlockAttributes( clientId ),
+				attributes: getBlockAttributes(clientId),
 				name: blockName,
 				reusableBlockTitle:
 					isReusable &&
 					__experimentalGetReusableBlockTitle(
-						getBlockAttributes( clientId ).ref
+						getBlockAttributes(clientId).ref
 					),
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-	if ( ! name || ! blockInformation ) return null;
-	const blockType = getBlockType( name );
-	const blockLabel = blockType
-		? getBlockLabel( blockType, attributes )
-		: null;
+	const blockInformation = useBlockDisplayInformation(clientId);
+	if (!name || !blockInformation) return null;
+	const blockType = getBlockType(name);
+	const blockLabel = blockType ? getBlockLabel(blockType, attributes) : null;
 	const label = reusableBlockTitle || blockLabel;
 	// Label will fallback to the title if no label is defined for the current
 	// label context. If the label is defined we prioritize it over possible
 	// possible block variation title match.
-	if ( label && label !== blockType.title ) {
-		return truncate( label, { length: 35 } );
+	if (label && label !== blockType.title) {
+		return truncate(label, { length: 35 });
 	}
 	return blockInformation.title;
 }

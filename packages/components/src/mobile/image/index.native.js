@@ -28,7 +28,7 @@ const ICON_TYPE = {
 
 export const IMAGE_DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
-const ImageComponent = ( {
+const ImageComponent = ({
 	align,
 	alt,
 	editButton = true,
@@ -49,15 +49,15 @@ const ImageComponent = ( {
 	shapeStyle,
 	style,
 	width: imageWidth,
-} ) => {
-	const [ imageData, setImageData ] = useState( null );
-	const [ containerSize, setContainerSize ] = useState( null );
+}) => {
+	const [imageData, setImageData] = useState(null);
+	const [containerSize, setContainerSize] = useState(null);
 
-	useEffect( () => {
+	useEffect(() => {
 		let isCurrent = true;
-		if ( url ) {
-			Image.getSize( url, ( imgWidth, imgHeight ) => {
-				if ( ! isCurrent ) {
+		if (url) {
+			Image.getSize(url, (imgWidth, imgHeight) => {
+				if (!isCurrent) {
 					return;
 				}
 				const metaData = {
@@ -65,36 +65,35 @@ const ImageComponent = ( {
 					width: imgWidth,
 					height: imgHeight,
 				};
-				setImageData( metaData );
-				if ( onImageDataLoad ) {
-					onImageDataLoad( metaData );
+				setImageData(metaData);
+				if (onImageDataLoad) {
+					onImageDataLoad(metaData);
 				}
-			} );
+			});
 		}
-		return () => ( isCurrent = false );
-	}, [ url ] );
+		return () => (isCurrent = false);
+	}, [url]);
 
-	const onContainerLayout = ( event ) => {
+	const onContainerLayout = (event) => {
 		const { height, width } = event.nativeEvent.layout;
 
 		if (
 			width !== 0 &&
 			height !== 0 &&
-			( containerSize?.width !== width ||
-				containerSize?.height !== height )
+			(containerSize?.width !== width || containerSize?.height !== height)
 		) {
-			setContainerSize( { width, height } );
+			setContainerSize({ width, height });
 		}
 	};
 
-	const getIcon = ( iconType ) => {
+	const getIcon = (iconType) => {
 		let iconStyle;
-		switch ( iconType ) {
+		switch (iconType) {
 			case ICON_TYPE.RETRY:
 				return (
 					<Icon
-						icon={ retryIcon || SvgIconRetry }
-						{ ...styles.iconRetry }
+						icon={retryIcon || SvgIconRetry}
+						{...styles.iconRetry}
 					/>
 				);
 			case ICON_TYPE.PLACEHOLDER:
@@ -104,7 +103,7 @@ const ImageComponent = ( {
 				iconStyle = iconUploadStyles;
 				break;
 		}
-		return <Icon icon={ icon } { ...iconStyle } />;
+		return <Icon icon={icon} {...iconStyle} />;
 	};
 
 	const iconPlaceholderStyles = usePreferredColorSchemeStyle(
@@ -136,9 +135,9 @@ const ImageComponent = ( {
 		{
 			width:
 				imageWidth === styles.wide?.width ||
-				( imageData &&
+				(imageData &&
 					imageWidth > 0 &&
-					imageWidth < containerSize?.width )
+					imageWidth < containerSize?.width)
 					? imageWidth
 					: customWidth,
 		},
@@ -153,12 +152,8 @@ const ImageComponent = ( {
 		},
 		focalPoint && styles.focalPoint,
 		focalPoint &&
-			getImageWithFocalPointStyles(
-				focalPoint,
-				containerSize,
-				imageData
-			),
-		! focalPoint &&
+			getImageWithFocalPointStyles(focalPoint, containerSize, imageData),
+		!focalPoint &&
 			imageData &&
 			containerSize && {
 				height:
@@ -172,88 +167,85 @@ const ImageComponent = ( {
 
 	return (
 		<View
-			style={ [
+			style={[
 				styles.container,
 				// only set alignItems if an image exists because alignItems causes the placeholder
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
 				imageData && align && { alignItems: align },
 				style,
-			] }
-			onLayout={ onContainerLayout }
+			]}
+			onLayout={onContainerLayout}
 		>
 			<View
 				accessible
-				disabled={ ! isSelected }
-				accessibilityLabel={ alt }
-				accessibilityHint={ __( 'Double tap and hold to edit' ) }
-				accessibilityRole={ 'imagebutton' }
-				key={ url }
-				style={ imageContainerStyles }
+				disabled={!isSelected}
+				accessibilityLabel={alt}
+				accessibilityHint={__('Double tap and hold to edit')}
+				accessibilityRole={'imagebutton'}
+				key={url}
+				style={imageContainerStyles}
 			>
-				{ isSelected &&
+				{isSelected &&
 					highlightSelected &&
-					! ( isUploadInProgress || isUploadFailed ) && (
+					!(isUploadInProgress || isUploadFailed) && (
 						<View
-							style={ [
+							style={[
 								styles.imageBorder,
 								{ height: containerSize?.height },
-							] }
+							]}
 						/>
-					) }
+					)}
 
-				{ ! imageData ? (
-					<View style={ placeholderStyles }>
-						<View style={ styles.imageUploadingIconContainer }>
-							{ getIcon( ICON_TYPE.UPLOAD ) }
+				{!imageData ? (
+					<View style={placeholderStyles}>
+						<View style={styles.imageUploadingIconContainer}>
+							{getIcon(ICON_TYPE.UPLOAD)}
 						</View>
 					</View>
 				) : (
-					<View style={ focalPoint && styles.focalPointContent }>
+					<View style={focalPoint && styles.focalPointContent}>
 						<Image
-							{ ...( ! resizeMode && {
+							{...(!resizeMode && {
 								aspectRatio: imageData?.aspectRatio,
-							} ) }
-							style={ imageStyles }
-							source={ { uri: url } }
-							{ ...( ! focalPoint && {
+							})}
+							style={imageStyles}
+							source={{ uri: url }}
+							{...(!focalPoint && {
 								resizeMethod: 'scale',
-							} ) }
-							resizeMode={ resizeMode }
+							})}
+							resizeMode={resizeMode}
 						/>
 					</View>
-				) }
+				)}
 
-				{ isUploadFailed && retryMessage && (
+				{isUploadFailed && retryMessage && (
 					<View
-						style={ [
-							styles.imageContainer,
-							styles.retryContainer,
-						] }
+						style={[styles.imageContainer, styles.retryContainer]}
 					>
 						<View
-							style={ [
+							style={[
 								styles.retryIcon,
 								retryIcon && styles.customRetryIcon,
-							] }
+							]}
 						>
-							{ getIcon( ICON_TYPE.RETRY ) }
+							{getIcon(ICON_TYPE.RETRY)}
 						</View>
-						<Text style={ styles.uploadFailedText }>
-							{ retryMessage }
+						<Text style={styles.uploadFailedText}>
+							{retryMessage}
 						</Text>
 					</View>
-				) }
+				)}
 			</View>
 
-			{ editButton && isSelected && ! isUploadInProgress && (
+			{editButton && isSelected && !isUploadInProgress && (
 				<ImageEditingButton
-					onSelectMediaUploadOption={ onSelectMediaUploadOption }
-					openMediaOptions={ openMediaOptions }
-					url={ ! isUploadFailed && imageData && url }
-					pickerOptions={ mediaPickerOptions }
+					onSelectMediaUploadOption={onSelectMediaUploadOption}
+					openMediaOptions={openMediaOptions}
+					url={!isUploadFailed && imageData && url}
+					pickerOptions={mediaPickerOptions}
 				/>
-			) }
+			)}
 		</View>
 	);
 };

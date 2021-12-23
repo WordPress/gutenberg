@@ -11,20 +11,20 @@ import {
 import { formatItalic } from '@wordpress/icons';
 
 const name = 'core/italic';
-const title = __( 'Italic' );
+const title = __('Italic');
 
 export const italic = {
 	name,
 	title,
 	tagName: 'em',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit({ isActive, value, onChange, onFocus }) {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name, title } ) );
+			onChange(toggleFormat(value, { type: name, title }));
 		}
 
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange(toggleFormat(value, { type: name }));
 			onFocus();
 		}
 
@@ -33,20 +33,20 @@ export const italic = {
 				<RichTextShortcut
 					type="primary"
 					character="i"
-					onUse={ onToggle }
+					onUse={onToggle}
 				/>
 				<RichTextToolbarButton
 					name="italic"
-					icon={ formatItalic }
-					title={ title }
-					onClick={ onClick }
-					isActive={ isActive }
+					icon={formatItalic}
+					title={title}
+					onClick={onClick}
+					isActive={isActive}
 					shortcutType="primary"
 					shortcutCharacter="i"
 				/>
 				<__unstableRichTextInputEvent
 					inputType="formatItalic"
-					onInput={ onToggle }
+					onInput={onToggle}
 				/>
 			</>
 		);

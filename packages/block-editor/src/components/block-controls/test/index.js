@@ -14,7 +14,7 @@ import { alignCenter, alignLeft, alignRight } from '@wordpress/icons';
 import BlockControls from '../';
 import BlockEdit from '../../block-edit';
 
-describe( 'BlockControls', () => {
+describe('BlockControls', () => {
 	const controls = [
 		{
 			icon: alignLeft,
@@ -33,15 +33,15 @@ describe( 'BlockControls', () => {
 		},
 	];
 
-	it( 'should render a dynamic toolbar of controls', () => {
+	it('should render a dynamic toolbar of controls', () => {
 		const wrapper = shallow(
 			<BlockEdit isSelected>
-				<BlockControls controls={ controls }>
+				<BlockControls controls={controls}>
 					<p>Child</p>
 				</BlockControls>
 			</BlockEdit>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
+		expect(wrapper).toMatchSnapshot();
+	});
+});

@@ -21,35 +21,32 @@ function NavigationBackButton(
 ) {
 	const { setActiveMenu, navigationTree } = useNavigationContext();
 
-	const classes = classnames(
-		'components-navigation__back-button',
-		className
-	);
+	const classes = classnames('components-navigation__back-button', className);
 
-	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
+	const parentMenuTitle = navigationTree.getMenu(parentMenu)?.title;
 
-	const handleOnClick = ( event ) => {
-		if ( typeof onClick === 'function' ) {
-			onClick( event );
+	const handleOnClick = (event) => {
+		if (typeof onClick === 'function') {
+			onClick(event);
 		}
 
 		const animationDirection = isRTL() ? 'left' : 'right';
-		if ( parentMenu && ! event.defaultPrevented ) {
-			setActiveMenu( parentMenu, animationDirection );
+		if (parentMenu && !event.defaultPrevented) {
+			setActiveMenu(parentMenu, animationDirection);
 		}
 	};
 	const icon = isRTL() ? chevronRight : chevronLeft;
 	return (
 		<MenuBackButtonUI
-			className={ classes }
-			href={ href }
+			className={classes}
+			href={href}
 			variant="tertiary"
-			ref={ ref }
-			onClick={ handleOnClick }
+			ref={ref}
+			onClick={handleOnClick}
 		>
-			<Icon icon={ icon } />
-			{ backButtonLabel || parentMenuTitle || __( 'Back' ) }
+			<Icon icon={icon} />
+			{backButtonLabel || parentMenuTitle || __('Back')}
 		</MenuBackButtonUI>
 	);
 }
-export default forwardRef( NavigationBackButton );
+export default forwardRef(NavigationBackButton);

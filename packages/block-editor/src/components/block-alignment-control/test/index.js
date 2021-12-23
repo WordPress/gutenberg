@@ -13,50 +13,50 @@ import { useSelect } from '@wordpress/data';
  */
 import BlockAlignmentUI from '../ui';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
+jest.mock('@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
 	const mock = jest.fn();
 	return mock;
-} );
-useSelect.mockImplementation( () => ( { wideControlsEnabled: false } ) );
+});
+useSelect.mockImplementation(() => ({ wideControlsEnabled: false }));
 
-describe( 'BlockAlignmentUI', () => {
+describe('BlockAlignmentUI', () => {
 	const alignment = 'left';
 	const onChange = jest.fn();
 
 	const wrapper = shallow(
-		<BlockAlignmentUI value={ alignment } onChange={ onChange } isToolbar />
+		<BlockAlignmentUI value={alignment} onChange={onChange} isToolbar />
 	);
 
 	const controls = wrapper.props().controls;
 
-	afterEach( () => {
+	afterEach(() => {
 		onChange.mockClear();
-	} );
+	});
 
-	test( 'should match snapshot', () => {
-		expect( wrapper ).toMatchSnapshot();
-	} );
+	test('should match snapshot', () => {
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	test( 'should call onChange with undefined, when the control is already active', () => {
+	test('should call onChange with undefined, when the control is already active', () => {
 		const activeControl = controls.find(
-			( { title } ) => title === 'Align left'
+			({ title }) => title === 'Align left'
 		);
 		activeControl.onClick();
 
-		expect( activeControl.isActive ).toBe( true );
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		expect( onChange ).toHaveBeenCalledWith( undefined );
-	} );
+		expect(activeControl.isActive).toBe(true);
+		expect(onChange).toHaveBeenCalledTimes(1);
+		expect(onChange).toHaveBeenCalledWith(undefined);
+	});
 
-	test( 'should call onChange with alignment value when the control is inactive', () => {
+	test('should call onChange with alignment value when the control is inactive', () => {
 		const inactiveCenterControl = controls.find(
-			( { title } ) => title === 'Align center'
+			({ title }) => title === 'Align center'
 		);
 		inactiveCenterControl.onClick();
 
-		expect( inactiveCenterControl.isActive ).toBe( false );
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		expect( onChange ).toHaveBeenCalledWith( 'center' );
-	} );
-} );
+		expect(inactiveCenterControl.isActive).toBe(false);
+		expect(onChange).toHaveBeenCalledTimes(1);
+		expect(onChange).toHaveBeenCalledWith('center');
+	});
+});

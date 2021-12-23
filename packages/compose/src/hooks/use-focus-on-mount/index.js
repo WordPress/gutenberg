@@ -25,31 +25,31 @@ import { focus } from '@wordpress/dom';
  * }
  * ```
  */
-export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
-	const focusOnMountRef = useRef( focusOnMount );
-	useEffect( () => {
+export default function useFocusOnMount(focusOnMount = 'firstElement') {
+	const focusOnMountRef = useRef(focusOnMount);
+	useEffect(() => {
 		focusOnMountRef.current = focusOnMount;
-	}, [ focusOnMount ] );
+	}, [focusOnMount]);
 
-	return useCallback( ( node ) => {
-		if ( ! node || focusOnMountRef.current === false ) {
+	return useCallback((node) => {
+		if (!node || focusOnMountRef.current === false) {
 			return;
 		}
 
-		if ( node.contains( node.ownerDocument?.activeElement ?? null ) ) {
+		if (node.contains(node.ownerDocument?.activeElement ?? null)) {
 			return;
 		}
 
 		let target = node;
 
-		if ( focusOnMountRef.current === 'firstElement' ) {
-			const firstTabbable = focus.tabbable.find( node )[ 0 ];
+		if (focusOnMountRef.current === 'firstElement') {
+			const firstTabbable = focus.tabbable.find(node)[0];
 
-			if ( firstTabbable ) {
-				target = /** @type {HTMLElement} */ ( firstTabbable );
+			if (firstTabbable) {
+				target = /** @type {HTMLElement} */ (firstTabbable);
 			}
 		}
 
 		target.focus();
-	}, [] );
+	}, []);
 }

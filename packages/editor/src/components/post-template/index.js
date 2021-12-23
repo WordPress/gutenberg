@@ -16,48 +16,45 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export function PostTemplate( {} ) {
+export function PostTemplate({}) {
 	const { availableTemplates, selectedTemplate, isViewable } = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getEditedPostAttribute,
 				getEditorSettings,
 				getCurrentPostType,
-			} = select( editorStore );
-			const { getPostType } = select( coreStore );
+			} = select(editorStore);
+			const { getPostType } = select(coreStore);
 
 			return {
-				selectedTemplate: getEditedPostAttribute( 'template' ),
+				selectedTemplate: getEditedPostAttribute('template'),
 				availableTemplates: getEditorSettings().availableTemplates,
 				isViewable:
-					getPostType( getCurrentPostType() )?.viewable ?? false,
+					getPostType(getCurrentPostType())?.viewable ?? false,
 			};
 		},
 		[]
 	);
 
-	const { editPost } = useDispatch( editorStore );
+	const { editPost } = useDispatch(editorStore);
 
-	if ( ! isViewable || isEmpty( availableTemplates ) ) {
+	if (!isViewable || isEmpty(availableTemplates)) {
 		return null;
 	}
 
 	return (
 		<SelectControl
-			label={ __( 'Template:' ) }
-			value={ selectedTemplate }
-			onChange={ ( templateSlug ) => {
-				editPost( {
+			label={__('Template:')}
+			value={selectedTemplate}
+			onChange={(templateSlug) => {
+				editPost({
 					template: templateSlug || '',
-				} );
-			} }
-			options={ map(
-				availableTemplates,
-				( templateName, templateSlug ) => ( {
-					value: templateSlug,
-					label: templateName,
-				} )
-			) }
+				});
+			}}
+			options={map(availableTemplates, (templateName, templateSlug) => ({
+				value: templateSlug,
+				label: templateName,
+			}))}
 		/>
 	);
 }

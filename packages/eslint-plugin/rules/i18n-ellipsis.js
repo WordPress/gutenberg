@@ -6,47 +6,47 @@ const {
 	getTextContentFromNode,
 	getTranslateFunctionName,
 	getTranslateFunctionArgs,
-} = require( '../utils' );
+} = require('../utils');
 
 const THREE_DOTS = '...';
 const ELLIPSIS = '…';
 
-function replaceThreeDotsWithEllipsis( string ) {
-	return string.replace( /\.\.\./g, ELLIPSIS );
+function replaceThreeDotsWithEllipsis(string) {
+	return string.replace(/\.\.\./g, ELLIPSIS);
 }
 
 // see eslint-plugin-wpcalypso.
-function makeFixerFunction( arg ) {
-	return ( fixer ) => {
-		switch ( arg.type ) {
+function makeFixerFunction(arg) {
+	return (fixer) => {
+		switch (arg.type) {
 			case 'TemplateLiteral':
-				return arg.quasis.reduce( ( fixes, quasi ) => {
+				return arg.quasis.reduce((fixes, quasi) => {
 					if (
 						'TemplateElement' === quasi.type &&
-						quasi.value.raw.includes( THREE_DOTS )
+						quasi.value.raw.includes(THREE_DOTS)
 					) {
 						fixes.push(
 							fixer.replaceTextRange(
-								[ quasi.start, quasi.end ],
-								replaceThreeDotsWithEllipsis( quasi.value.raw )
+								[quasi.start, quasi.end],
+								replaceThreeDotsWithEllipsis(quasi.value.raw)
 							)
 						);
 					}
 					return fixes;
-				}, [] );
+				}, []);
 
 			case 'Literal':
 				return [
 					fixer.replaceText(
 						arg,
-						replaceThreeDotsWithEllipsis( arg.raw )
+						replaceThreeDotsWithEllipsis(arg.raw)
 					),
 				];
 
 			case 'BinaryExpression':
 				return [
-					...makeFixerFunction( arg.left )( fixer ),
-					...makeFixerFunction( arg.right )( fixer ),
+					...makeFixerFunction(arg.left)(fixer),
+					...makeFixerFunction(arg.right)(fixer),
 				];
 		}
 	};
@@ -61,36 +61,33 @@ module.exports = {
 		},
 		fixable: 'code',
 	},
-	create( context ) {
+	create(context) {
 		return {
-			CallExpression( node ) {
+			CallExpression(node) {
 				const { callee, arguments: args } = node;
 
-				const functionName = getTranslateFunctionName( callee );
+				const functionName = getTranslateFunctionName(callee);
 
-				if ( ! TRANSLATION_FUNCTIONS.has( functionName ) ) {
+				if (!TRANSLATION_FUNCTIONS.has(functionName)) {
 					return;
 				}
 
-				const candidates = getTranslateFunctionArgs(
-					functionName,
-					args
-				);
+				const candidates = getTranslateFunctionArgs(functionName, args);
 
-				for ( const arg of candidates ) {
-					const argumentString = getTextContentFromNode( arg );
+				for (const arg of candidates) {
+					const argumentString = getTextContentFromNode(arg);
 					if (
-						! argumentString ||
-						! argumentString.includes( THREE_DOTS )
+						!argumentString ||
+						!argumentString.includes(THREE_DOTS)
 					) {
 						continue;
 					}
 
-					context.report( {
+					context.report({
 						node,
 						messageId: 'foundThreeDots',
-						fix: makeFixerFunction( arg ),
-					} );
+						fix: makeFixerFunction(arg),
+					});
 				}
 			},
 		};

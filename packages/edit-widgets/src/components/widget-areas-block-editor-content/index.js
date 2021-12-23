@@ -19,28 +19,26 @@ import { store as interfaceStore } from '@wordpress/interface';
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
-export default function WidgetAreasBlockEditorContent( {
-	blockEditorSettings,
-} ) {
+export default function WidgetAreasBlockEditorContent({ blockEditorSettings }) {
 	const hasThemeStyles = useSelect(
-		( select ) =>
-			select( interfaceStore ).isFeatureActive(
+		(select) =>
+			select(interfaceStore).isFeatureActive(
 				'core/edit-widgets',
 				'themeStyles'
 			),
 		[]
 	);
 
-	const styles = useMemo( () => {
+	const styles = useMemo(() => {
 		return hasThemeStyles ? blockEditorSettings.styles : [];
-	}, [ blockEditorSettings, hasThemeStyles ] );
+	}, [blockEditorSettings, hasThemeStyles]);
 
 	return (
 		<div className="edit-widgets-block-editor">
 			<Notices />
 			<BlockTools>
 				<KeyboardShortcuts />
-				<EditorStyles styles={ styles } />
+				<EditorStyles styles={styles} />
 				<BlockSelectionClearer>
 					<WritingFlow>
 						<ObserveTyping>

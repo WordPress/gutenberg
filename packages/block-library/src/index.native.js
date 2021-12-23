@@ -65,7 +65,7 @@ import * as socialLinks from './social-links';
 
 import { transformationCategory } from './transformationCategories';
 
-const ALLOWED_BLOCKS_GRADIENT_SUPPORT = [ 'core/button' ];
+const ALLOWED_BLOCKS_GRADIENT_SUPPORT = ['core/button'];
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -113,10 +113,10 @@ export const coreBlocks = [
 	buttons,
 	socialLink,
 	socialLinks,
-].reduce( ( accumulator, block ) => {
-	accumulator[ block.name ] = block;
+].reduce((accumulator, block) => {
+	accumulator[block.name] = block;
 	return accumulator;
-}, {} );
+}, {});
 
 /**
  * Function to register an individual block.
@@ -124,8 +124,8 @@ export const coreBlocks = [
  * @param {Object} block The block to be registered.
  *
  */
-export const registerBlock = ( block ) => {
-	if ( ! block ) {
+export const registerBlock = (block) => {
+	if (!block) {
 		return;
 	}
 	const { metadata, settings, name } = block;
@@ -136,7 +136,7 @@ export const registerBlock = ( block ) => {
 			name,
 			...metadata,
 			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT
-			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
+			...(!ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes(name) &&
 			supports?.color?.gradients
 				? {
 						supports: {
@@ -144,7 +144,7 @@ export const registerBlock = ( block ) => {
 							color: { ...supports.color, gradients: false },
 						},
 				  }
-				: {} ),
+				: {}),
 		},
 		settings
 	);
@@ -156,38 +156,37 @@ export const registerBlock = ( block ) => {
  * @param {Object} block The block which variations will be registered.
  *
  */
-const registerBlockVariations = ( block ) => {
+const registerBlockVariations = (block) => {
 	const { metadata, settings, name } = block;
 
-	sortBy( settings.variations, 'title' ).forEach( ( v ) => {
-		registerBlockType( `${ name }-${ v.name }`, {
+	sortBy(settings.variations, 'title').forEach((v) => {
+		registerBlockType(`${name}-${v.name}`, {
 			...metadata,
-			name: `${ name }-${ v.name }`,
+			name: `${name}-${v.name}`,
 			...settings,
 			icon: v.icon(),
 			title: v.title,
 			variations: [],
-		} );
-	} );
+		});
+	});
 };
 
 // only enable code block for development
 // eslint-disable-next-line no-undef
-const devOnly = ( block ) => ( !! __DEV__ ? block : null );
+const devOnly = (block) => (!!__DEV__ ? block : null);
 
 // eslint-disable-next-line no-unused-vars
-const iOSOnly = ( block ) =>
-	Platform.OS === 'ios' ? block : devOnly( block );
+const iOSOnly = (block) => (Platform.OS === 'ios' ? block : devOnly(block));
 
 // Hide the Classic block and SocialLink block
 addFilter(
 	'blocks.registerBlockType',
 	'core/react-native-editor',
-	( settings, name ) => {
-		const hiddenBlocks = [ 'core/freeform', 'core/social-link' ];
+	(settings, name) => {
+		const hiddenBlocks = ['core/freeform', 'core/social-link'];
 		if (
-			hiddenBlocks.includes( name ) &&
-			hasBlockSupport( settings, 'inserter', true )
+			hiddenBlocks.includes(name) &&
+			hasBlockSupport(settings, 'inserter', true)
 		) {
 			settings.supports = {
 				...settings.supports,
@@ -202,17 +201,17 @@ addFilter(
 addFilter(
 	'blocks.registerBlockType',
 	'core/react-native-editor',
-	( settings, name ) => {
-		if ( ! settings.transforms ) {
+	(settings, name) => {
+		if (!settings.transforms) {
 			return settings;
 		}
 
-		if ( ! settings.transforms.supportedMobileTransforms ) {
+		if (!settings.transforms.supportedMobileTransforms) {
 			return {
 				...settings,
 				transforms: {
 					...settings.transforms,
-					supportedMobileTransforms: transformationCategory( name ),
+					supportedMobileTransforms: transformationCategory(name),
 				},
 			};
 		}
@@ -236,7 +235,7 @@ export const registerCoreBlocks = () => {
 	[
 		paragraph,
 		heading,
-		devOnly( code ),
+		devOnly(code),
 		missing,
 		more,
 		image,
@@ -267,14 +266,14 @@ export const registerCoreBlocks = () => {
 		reusableBlock,
 		search,
 		embed,
-	].forEach( registerBlock );
+	].forEach(registerBlock);
 
-	registerBlockVariations( socialLink );
-	setDefaultBlockName( paragraph.name );
-	setFreeformContentHandlerName( classic.name );
-	setUnregisteredTypeHandlerName( missing.name );
-	if ( group ) {
-		setGroupingBlockName( group.name );
+	registerBlockVariations(socialLink);
+	setDefaultBlockName(paragraph.name);
+	setFreeformContentHandlerName(classic.name);
+	setUnregisteredTypeHandlerName(missing.name);
+	if (group) {
+		setGroupingBlockName(group.name);
 	}
 };
 
@@ -288,7 +287,7 @@ export const registerCoreBlocks = () => {
  * @constant {{ string, number }}
  */
 export const NEW_BLOCK_TYPES = {
-	[ embed.name ]: 40,
-	[ search.name ]: 40,
-	[ audio.name ]: 40,
+	[embed.name]: 40,
+	[search.name]: 40,
+	[audio.name]: 40,
 };

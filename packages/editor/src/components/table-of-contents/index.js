@@ -18,36 +18,36 @@ function TableOfContents(
 	ref
 ) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( blockEditorStore ).getBlockCount(),
+		(select) => !!select(blockEditorStore).getBlockCount(),
 		[]
 	);
 	return (
 		<Dropdown
-			position={ repositionDropdown ? 'middle right right' : 'bottom' }
+			position={repositionDropdown ? 'middle right right' : 'bottom'}
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
-			renderToggle={ ( { isOpen, onToggle } ) => (
+			renderToggle={({ isOpen, onToggle }) => (
 				<Button
-					{ ...props }
-					ref={ ref }
-					onClick={ hasBlocks ? onToggle : undefined }
-					icon={ info }
-					aria-expanded={ isOpen }
+					{...props}
+					ref={ref}
+					onClick={hasBlocks ? onToggle : undefined}
+					icon={info}
+					aria-expanded={isOpen}
 					aria-haspopup="true"
 					/* translators: button label text should, if possible, be under 16 characters. */
-					label={ __( 'Details' ) }
+					label={__('Details')}
 					tooltipPosition="bottom"
-					aria-disabled={ ! hasBlocks }
+					aria-disabled={!hasBlocks}
 				/>
-			) }
-			renderContent={ ( { onClose } ) => (
+			)}
+			renderContent={({ onClose }) => (
 				<TableOfContentsPanel
-					onRequestClose={ onClose }
-					hasOutlineItemsDisabled={ hasOutlineItemsDisabled }
+					onRequestClose={onClose}
+					hasOutlineItemsDisabled={hasOutlineItemsDisabled}
 				/>
-			) }
+			)}
 		/>
 	);
 }
 
-export default forwardRef( TableOfContents );
+export default forwardRef(TableOfContents);

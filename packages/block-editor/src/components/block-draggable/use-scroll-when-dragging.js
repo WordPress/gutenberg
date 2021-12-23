@@ -8,7 +8,7 @@ const SCROLL_INACTIVE_DISTANCE_PX = 50;
 const SCROLL_INTERVAL_MS = 25;
 const PIXELS_PER_SECOND_PER_PERCENTAGE = 1000;
 const VELOCITY_MULTIPLIER =
-	PIXELS_PER_SECOND_PER_PERCENTAGE * ( SCROLL_INTERVAL_MS / 1000 );
+	PIXELS_PER_SECOND_PER_PERCENTAGE * (SCROLL_INTERVAL_MS / 1000);
 
 /**
  * React hook that scrolls the scroll container when a block is being dragged.
@@ -18,44 +18,44 @@ const VELOCITY_MULTIPLIER =
  *                      and `onDragEnd` events respectively.
  */
 export default function useScrollWhenDragging() {
-	const dragStartY = useRef( null );
-	const velocityY = useRef( null );
-	const scrollParentY = useRef( null );
-	const scrollEditorInterval = useRef( null );
+	const dragStartY = useRef(null);
+	const velocityY = useRef(null);
+	const scrollParentY = useRef(null);
+	const scrollEditorInterval = useRef(null);
 
 	// Clear interval when unmounting.
 	useEffect(
 		() => () => {
-			if ( scrollEditorInterval.current ) {
-				clearInterval( scrollEditorInterval.current );
+			if (scrollEditorInterval.current) {
+				clearInterval(scrollEditorInterval.current);
 				scrollEditorInterval.current = null;
 			}
 		},
 		[]
 	);
 
-	const startScrolling = useCallback( ( event ) => {
+	const startScrolling = useCallback((event) => {
 		dragStartY.current = event.clientY;
 
 		// Find nearest parent(s) to scroll.
-		scrollParentY.current = getScrollContainer( event.target );
+		scrollParentY.current = getScrollContainer(event.target);
 
-		scrollEditorInterval.current = setInterval( () => {
-			if ( scrollParentY.current && velocityY.current ) {
+		scrollEditorInterval.current = setInterval(() => {
+			if (scrollParentY.current && velocityY.current) {
 				const newTop =
 					scrollParentY.current.scrollTop + velocityY.current;
 
 				// Setting `behavior: 'smooth'` as a scroll property seems to hurt performance.
 				// Better to use a small scroll interval.
-				scrollParentY.current.scroll( {
+				scrollParentY.current.scroll({
 					top: newTop,
-				} );
+				});
 			}
-		}, SCROLL_INTERVAL_MS );
-	}, [] );
+		}, SCROLL_INTERVAL_MS);
+	}, []);
 
-	const scrollOnDragOver = useCallback( ( event ) => {
-		if ( ! scrollParentY.current ) {
+	const scrollOnDragOver = useCallback((event) => {
+		if (!scrollParentY.current) {
 			return;
 		}
 		const scrollParentHeight = scrollParentY.current.offsetHeight;
@@ -64,7 +64,7 @@ export default function useScrollWhenDragging() {
 		const offsetDragPosition =
 			event.clientY - scrollParentY.current.offsetTop;
 
-		if ( event.clientY > offsetDragStartPosition ) {
+		if (event.clientY > offsetDragStartPosition) {
 			// User is dragging downwards.
 			const moveableDistance = Math.max(
 				scrollParentHeight -
@@ -80,7 +80,7 @@ export default function useScrollWhenDragging() {
 			);
 			const distancePercentage = dragDistance / moveableDistance;
 			velocityY.current = VELOCITY_MULTIPLIER * distancePercentage;
-		} else if ( event.clientY < offsetDragStartPosition ) {
+		} else if (event.clientY < offsetDragStartPosition) {
 			// User is dragging upwards.
 			const moveableDistance = Math.max(
 				offsetDragStartPosition - SCROLL_INACTIVE_DISTANCE_PX,
@@ -97,17 +97,17 @@ export default function useScrollWhenDragging() {
 		} else {
 			velocityY.current = 0;
 		}
-	}, [] );
+	}, []);
 
 	const stopScrolling = () => {
 		dragStartY.current = null;
 		scrollParentY.current = null;
 
-		if ( scrollEditorInterval.current ) {
-			clearInterval( scrollEditorInterval.current );
+		if (scrollEditorInterval.current) {
+			clearInterval(scrollEditorInterval.current);
 			scrollEditorInterval.current = null;
 		}
 	};
 
-	return [ startScrolling, scrollOnDragOver, stopScrolling ];
+	return [startScrolling, scrollOnDragOver, stopScrolling];
 }

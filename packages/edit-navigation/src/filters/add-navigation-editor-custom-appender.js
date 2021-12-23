@@ -13,7 +13,7 @@ function CustomAppender() {
 	return <InnerBlocks.ButtonBlockAppender isToggle />;
 }
 
-function EnhancedNavigationBlock( { blockEdit: BlockEdit, ...props } ) {
+function EnhancedNavigationBlock({ blockEdit: BlockEdit, ...props }) {
 	const clientId = props.clientId;
 	const {
 		noBlockSelected,
@@ -21,49 +21,50 @@ function EnhancedNavigationBlock( { blockEdit: BlockEdit, ...props } ) {
 		isImmediateParentOfSelectedBlock,
 		selectedBlockHasDescendants,
 	} = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			} = select(blockEditorStore);
 			const _isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 				clientId,
 				false
 			);
 			const selectedBlockId = getSelectedBlockClientId();
-			const _selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
+			const _selectedBlockHasDescendants = !!getClientIdsOfDescendants([
 				selectedBlockId,
-			] )?.length;
+			])?.length;
 
 			return {
 				isSelected: selectedBlockId === clientId,
-				noBlockSelected: ! selectedBlockId,
-				isImmediateParentOfSelectedBlock: _isImmediateParentOfSelectedBlock,
+				noBlockSelected: !selectedBlockId,
+				isImmediateParentOfSelectedBlock:
+					_isImmediateParentOfSelectedBlock,
 				selectedBlockHasDescendants: _selectedBlockHasDescendants,
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
 	const customAppender =
 		noBlockSelected ||
 		isSelected ||
-		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants )
+		(isImmediateParentOfSelectedBlock && !selectedBlockHasDescendants)
 			? CustomAppender
 			: false;
 
-	return <BlockEdit { ...props } customAppender={ customAppender } />;
+	return <BlockEdit {...props} customAppender={customAppender} />;
 }
 
 const addNavigationEditorCustomAppender = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		if ( props.name !== 'core/navigation' ) {
-			return <BlockEdit { ...props } />;
+	(BlockEdit) => (props) => {
+		if (props.name !== 'core/navigation') {
+			return <BlockEdit {...props} />;
 		}
 
 		// Use a separate component so that `useSelect` only run on the navigation block.
-		return <EnhancedNavigationBlock blockEdit={ BlockEdit } { ...props } />;
+		return <EnhancedNavigationBlock blockEdit={BlockEdit} {...props} />;
 	},
 	'withNavigationEditorCustomAppender'
 );

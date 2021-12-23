@@ -17,12 +17,12 @@ import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
 
-export function getAutoCompleterUI( autocompleter ) {
+export function getAutoCompleterUI(autocompleter) {
 	const useItems = autocompleter.useItems
 		? autocompleter.useItems
-		: getDefaultUseItems( autocompleter );
+		: getDefaultUseItems(autocompleter);
 
-	function AutocompleterUI( {
+	function AutocompleterUI({
 		filterValue,
 		instanceId,
 		listBoxId,
@@ -33,50 +33,50 @@ export function getAutoCompleterUI( autocompleter ) {
 		onReset,
 		value,
 		contentRef,
-	} ) {
-		const [ items ] = useItems( filterValue );
-		const anchorRef = useAnchorRef( { ref: contentRef, value } );
+	}) {
+		const [items] = useItems(filterValue);
+		const anchorRef = useAnchorRef({ ref: contentRef, value });
 
-		useLayoutEffect( () => {
-			onChangeOptions( items );
-		}, [ items ] );
+		useLayoutEffect(() => {
+			onChangeOptions(items);
+		}, [items]);
 
-		if ( ! items.length > 0 ) {
+		if (!items.length > 0) {
 			return null;
 		}
 
 		return (
 			<Popover
-				focusOnMount={ false }
-				onClose={ onReset }
+				focusOnMount={false}
+				onClose={onReset}
 				position="top right"
 				className="components-autocomplete__popover"
-				anchorRef={ anchorRef }
+				anchorRef={anchorRef}
 			>
 				<div
-					id={ listBoxId }
+					id={listBoxId}
 					role="listbox"
 					className="components-autocomplete__results"
 				>
-					{ map( items, ( option, index ) => (
+					{map(items, (option, index) => (
 						<Button
-							key={ option.key }
-							id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+							key={option.key}
+							id={`components-autocomplete-item-${instanceId}-${option.key}`}
 							role="option"
-							aria-selected={ index === selectedIndex }
-							disabled={ option.isDisabled }
-							className={ classnames(
+							aria-selected={index === selectedIndex}
+							disabled={option.isDisabled}
+							className={classnames(
 								'components-autocomplete__result',
 								className,
 								{
 									'is-selected': index === selectedIndex,
 								}
-							) }
-							onClick={ () => onSelect( option ) }
+							)}
+							onClick={() => onSelect(option)}
 						>
-							{ option.label }
+							{option.label}
 						</Button>
-					) ) }
+					))}
 				</div>
 			</Popover>
 		);

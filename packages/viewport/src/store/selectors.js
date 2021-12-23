@@ -14,11 +14,11 @@
  *
  * @return {boolean} Whether viewport matches query.
  */
-export function isViewportMatch( state, query ) {
+export function isViewportMatch(state, query) {
 	// Default to `>=` if no operator is present.
-	if ( query.indexOf( ' ' ) === -1 ) {
+	if (query.indexOf(' ') === -1) {
 		query = '>= ' + query;
 	}
 
-	return !! state[ query ];
+	return !!state[query];
 }

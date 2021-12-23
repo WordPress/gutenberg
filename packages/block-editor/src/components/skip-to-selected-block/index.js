@@ -11,8 +11,8 @@ import { Button } from '@wordpress/components';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
-const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
-	const ref = useBlockRef( selectedBlockClientId );
+const SkipToSelectedBlock = ({ selectedBlockClientId }) => {
+	const ref = useBlockRef(selectedBlockClientId);
 	const onClick = () => {
 		ref.current.focus();
 	};
@@ -21,17 +21,16 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 		<Button
 			variant="secondary"
 			className="block-editor-skip-to-selected-block"
-			onClick={ onClick }
+			onClick={onClick}
 		>
-			{ __( 'Skip to the selected block' ) }
+			{__('Skip to the selected block')}
 		</Button>
 	) : null;
 };
 
-export default withSelect( ( select ) => {
+export default withSelect((select) => {
 	return {
-		selectedBlockClientId: select(
-			blockEditorStore
-		).getBlockSelectionStart(),
+		selectedBlockClientId:
+			select(blockEditorStore).getBlockSelectionStart(),
 	};
-} )( SkipToSelectedBlock );
+})(SkipToSelectedBlock);

@@ -26,23 +26,23 @@ const BREAKPOINTS = {
 	wrapSettings: 65,
 	wrapMover: 150,
 };
-const BlockMobileToolbar = ( {
+const BlockMobileToolbar = ({
 	clientId,
 	onDelete,
 	isStackedHorizontally,
 	blockWidth,
 	anchorNodeRef,
 	isFullWidth,
-} ) => {
-	const [ fillsLength, setFillsLength ] = useState( null );
-	const [ appenderWidth, setAppenderWidth ] = useState( 0 );
+}) => {
+	const [fillsLength, setFillsLength] = useState(null);
+	const [appenderWidth, setAppenderWidth] = useState(0);
 	const spacingValue = styles.toolbar.marginLeft * 2;
 
-	function onLayout( { nativeEvent } ) {
+	function onLayout({ nativeEvent }) {
 		const { layout } = nativeEvent;
-		const layoutWidth = Math.floor( layout.width );
-		if ( layoutWidth !== appenderWidth ) {
-			setAppenderWidth( nativeEvent.layout.width );
+		const layoutWidth = Math.floor(layout.width);
+		if (layoutWidth !== appenderWidth) {
+			setAppenderWidth(nativeEvent.layout.width);
 		}
 	}
 
@@ -53,67 +53,66 @@ const BlockMobileToolbar = ( {
 		blockWidth <= BREAKPOINTS.wrapMover ||
 		appenderWidth - spacingValue <= BREAKPOINTS.wrapMover;
 
-	const BlockSettingsButtonFill = ( fillProps ) => {
+	const BlockSettingsButtonFill = (fillProps) => {
 		useEffect(
-			() => fillProps.onChangeFillsLength( fillProps.fillsLength ),
-			[ fillProps.fillsLength ]
+			() => fillProps.onChangeFillsLength(fillProps.fillsLength),
+			[fillProps.fillsLength]
 		);
 		return fillProps.children ?? null;
 	};
 
 	return (
 		<View
-			style={ [ styles.toolbar, isFullWidth && styles.toolbarFullWidth ] }
-			onLayout={ onLayout }
+			style={[styles.toolbar, isFullWidth && styles.toolbarFullWidth]}
+			onLayout={onLayout}
 		>
-			{ ! wrapBlockMover && (
+			{!wrapBlockMover && (
 				<BlockMover
-					clientIds={ [ clientId ] }
-					isStackedHorizontally={ isStackedHorizontally }
+					clientIds={[clientId]}
+					isStackedHorizontally={isStackedHorizontally}
 				/>
-			) }
+			)}
 
-			<View style={ styles.spacer } />
+			<View style={styles.spacer} />
 
 			<BlockSettingsButton.Slot>
-				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
-				{ ( fills = [ null ] ) => (
+				{/* Render only one settings icon even if we have more than one fill - need for hooks with controls */}
+				{(fills = [null]) => (
 					// The purpose of BlockSettingsButtonFill component is only to provide a way
 					// to pass data upstream from the slot rendering
 					<BlockSettingsButtonFill
-						fillsLength={ fills.length }
-						onChangeFillsLength={ setFillsLength }
+						fillsLength={fills.length}
+						onChangeFillsLength={setFillsLength}
 					>
-						{ wrapBlockSettings ? null : fills[ 0 ] }
+						{wrapBlockSettings ? null : fills[0]}
 					</BlockSettingsButtonFill>
-				) }
+				)}
 			</BlockSettingsButton.Slot>
 
 			<BlockActionsMenu
-				clientIds={ [ clientId ] }
-				wrapBlockMover={ wrapBlockMover }
-				wrapBlockSettings={ wrapBlockSettings && fillsLength }
-				isStackedHorizontally={ isStackedHorizontally }
-				onDelete={ onDelete }
-				anchorNodeRef={ anchorNodeRef }
+				clientIds={[clientId]}
+				wrapBlockMover={wrapBlockMover}
+				wrapBlockSettings={wrapBlockSettings && fillsLength}
+				isStackedHorizontally={isStackedHorizontally}
+				onDelete={onDelete}
+				anchorNodeRef={anchorNodeRef}
 			/>
 		</View>
 	);
 };
 
 export default compose(
-	withSelect( ( select, { clientId } ) => {
-		const { getBlockIndex } = select( blockEditorStore );
+	withSelect((select, { clientId }) => {
+		const { getBlockIndex } = select(blockEditorStore);
 
 		return {
-			order: getBlockIndex( clientId ),
+			order: getBlockIndex(clientId),
 		};
-	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
-		const { removeBlock } = dispatch( blockEditorStore );
+	}),
+	withDispatch((dispatch, { clientId, rootClientId, onDelete }) => {
+		const { removeBlock } = dispatch(blockEditorStore);
 		return {
-			onDelete:
-				onDelete || ( () => removeBlock( clientId, rootClientId ) ),
+			onDelete: onDelete || (() => removeBlock(clientId, rootClientId)),
 		};
-	} )
-)( BlockMobileToolbar );
+	})
+)(BlockMobileToolbar);

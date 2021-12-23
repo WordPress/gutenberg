@@ -43,16 +43,16 @@ export const _default = () => {
 		// id is required for server side rendering
 		<Toolbar label="Options" id="options-toolbar">
 			<ToolbarGroup>
-				<ToolbarButton icon={ paragraph } label="Paragraph" />
+				<ToolbarButton icon={paragraph} label="Paragraph" />
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
-					{ ( toggleProps ) => (
+					{(toggleProps) => (
 						<DropdownMenu
 							hasArrowIndicator
-							icon={ alignLeft }
+							icon={alignLeft}
 							label="Align"
-							controls={ [
+							controls={[
 								{
 									icon: alignLeft,
 									title: 'Align left',
@@ -66,36 +66,36 @@ export const _default = () => {
 									icon: alignRight,
 									title: 'Align right',
 								},
-							] }
-							toggleProps={ toggleProps }
+							]}
+							toggleProps={toggleProps}
 						/>
-					) }
+					)}
 				</ToolbarItem>
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarButton>Text</ToolbarButton>
-				<ToolbarButton icon={ formatBold } label="Bold" isPressed />
-				<ToolbarButton icon={ formatItalic } label="Italic" />
-				<ToolbarButton icon={ link } label="Link" />
+				<ToolbarButton icon={formatBold} label="Bold" isPressed />
+				<ToolbarButton icon={formatItalic} label="Italic" />
+				<ToolbarButton icon={link} label="Link" />
 				<ToolbarGroup
 					isCollapsed
-					icon={ false }
+					icon={false}
 					label="More rich text controls"
-					controls={ [
+					controls={[
 						{ icon: code, title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
 						{
 							icon: formatStrikethrough,
 							title: 'Strikethrough',
 						},
-					] }
+					]}
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
-				icon={ more }
+				icon={more}
 				label="Align"
 				isCollapsed
-				controls={ [
+				controls={[
 					{
 						icon: alignLeft,
 						title: 'Align left',
@@ -103,7 +103,7 @@ export const _default = () => {
 					},
 					{ icon: alignCenter, title: 'Align center' },
 					{ icon: alignRight, title: 'Align right' },
-				] }
+				]}
 			/>
 		</Toolbar>
 	);
@@ -113,9 +113,9 @@ export const withoutGroup = () => {
 	return (
 		// id is required for server side rendering
 		<Toolbar label="Options" id="options-toolbar-without-group">
-			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
-			<ToolbarButton icon={ formatItalic } label="Italic" />
-			<ToolbarButton icon={ link } label="Link" />
+			<ToolbarButton icon={formatBold} label="Bold" isPressed />
+			<ToolbarButton icon={formatItalic} label="Italic" />
+			<ToolbarButton icon={link} label="Link" />
 		</Toolbar>
 	);
 };
@@ -124,20 +124,20 @@ export const withoutGroup = () => {
 export const toolbars = () => {
 	return (
 		<div>
-			<div style={ { padding: '20px' } }>
+			<div style={{ padding: '20px' }}>
 				<h2>Icon-only Toolbar</h2>
 				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
+					<ToolbarButton icon={formatBold} title="Bold" />
 					<ToolbarButton
-						icon={ formatItalic }
+						icon={formatItalic}
 						title="Italic"
 						isActive
 					/>
-					<ToolbarButton icon={ link } title="Link" />
+					<ToolbarButton icon={link} title="Link" />
 				</Toolbar>
 			</div>
 
-			<div style={ { padding: '20px' } }>
+			<div style={{ padding: '20px' }}>
 				<h2>Text-only Toolbar</h2>
 				<Toolbar>
 					<ToolbarButton>Bold Format</ToolbarButton>
@@ -146,26 +146,26 @@ export const toolbars = () => {
 				</Toolbar>
 			</div>
 
-			<div style={ { padding: '20px' } }>
+			<div style={{ padding: '20px' }}>
 				<h2>Text and Icon Toolbar</h2>
 				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
+					<ToolbarButton icon={formatBold} title="Bold" />
 					<ToolbarButton isActive>Bold Format</ToolbarButton>
-					<ToolbarButton icon={ formatItalic } title="Italic" />
+					<ToolbarButton icon={formatItalic} title="Italic" />
 					<ToolbarButton>Italic Format</ToolbarButton>
-					<ToolbarButton icon={ link } title="Link" />
+					<ToolbarButton icon={link} title="Link" />
 					<ToolbarButton>Link Format</ToolbarButton>
 				</Toolbar>
 			</div>
 
-			<div style={ { padding: '20px' } }>
+			<div style={{ padding: '20px' }}>
 				<h2>Single Icon Button Toolbar</h2>
 				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
+					<ToolbarButton icon={formatBold} title="Bold" />
 				</Toolbar>
 			</div>
 
-			<div style={ { padding: '20px' } }>
+			<div style={{ padding: '20px' }}>
 				<h2>Single Text Button toolbar</h2>
 				<Toolbar>
 					<ToolbarButton>Bold Toolbar</ToolbarButton>

@@ -29,78 +29,76 @@ import icon from './media-container-icon';
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+const ALLOWED_MEDIA_TYPES = ['image', 'video'];
 
-export function imageFillStyles( url, focalPoint ) {
+export function imageFillStyles(url, focalPoint) {
 	return url
 		? {
-				backgroundImage: `url(${ url })`,
+				backgroundImage: `url(${url})`,
 				backgroundPosition: focalPoint
-					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+					? `${focalPoint.x * 100}% ${focalPoint.y * 100}%`
 					: `50% 50%`,
 		  }
 		: {};
 }
 
 const ResizableBoxContainer = forwardRef(
-	( { isSelected, isStackedOnMobile, ...props }, ref ) => {
-		const isMobile = useViewportMatch( 'small', '<' );
+	({ isSelected, isStackedOnMobile, ...props }, ref) => {
+		const isMobile = useViewportMatch('small', '<');
 		return (
 			<ResizableBox
-				ref={ ref }
-				showHandle={
-					isSelected && ( ! isMobile || ! isStackedOnMobile )
-				}
-				{ ...props }
+				ref={ref}
+				showHandle={isSelected && (!isMobile || !isStackedOnMobile)}
+				{...props}
 			/>
 		);
 	}
 );
 
-function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
+function ToolbarEditButton({ mediaId, mediaUrl, onSelectMedia }) {
 	return (
 		<BlockControls group="other">
 			<MediaReplaceFlow
-				mediaId={ mediaId }
-				mediaURL={ mediaUrl }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				mediaId={mediaId}
+				mediaURL={mediaUrl}
+				allowedTypes={ALLOWED_MEDIA_TYPES}
 				accept="image/*,video/*"
-				onSelect={ onSelectMedia }
+				onSelect={onSelectMedia}
 			/>
 		</BlockControls>
 	);
 }
 
-function PlaceholderContainer( {
+function PlaceholderContainer({
 	className,
 	noticeOperations,
 	noticeUI,
 	mediaUrl,
 	onSelectMedia,
-} ) {
-	const onUploadError = ( message ) => {
+}) {
+	const onUploadError = (message) => {
 		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		noticeOperations.createErrorNotice(message);
 	};
 
 	return (
 		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } /> }
-			labels={ {
-				title: __( 'Media area' ),
-			} }
-			className={ className }
-			onSelect={ onSelectMedia }
+			icon={<BlockIcon icon={icon} />}
+			labels={{
+				title: __('Media area'),
+			}}
+			className={className}
+			onSelect={onSelectMedia}
 			accept="image/*,video/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			notices={ noticeUI }
-			onError={ onUploadError }
-			disableMediaButtons={ mediaUrl }
+			allowedTypes={ALLOWED_MEDIA_TYPES}
+			notices={noticeUI}
+			onError={onUploadError}
+			disableMediaButtons={mediaUrl}
 		/>
 	);
 }
 
-function MediaContainer( props, ref ) {
+function MediaContainer(props, ref) {
 	const {
 		className,
 		commitWidthChange,
@@ -118,20 +116,20 @@ function MediaContainer( props, ref ) {
 		onWidthChange,
 	} = props;
 
-	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
+	const isTemporaryMedia = !mediaId && isBlobURL(mediaUrl);
 
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const { toggleSelection } = useDispatch(blockEditorStore);
 
-	if ( mediaUrl ) {
+	if (mediaUrl) {
 		const onResizeStart = () => {
-			toggleSelection( false );
+			toggleSelection(false);
 		};
-		const onResize = ( event, direction, elt ) => {
-			onWidthChange( parseInt( elt.style.width ) );
+		const onResize = (event, direction, elt) => {
+			onWidthChange(parseInt(elt.style.width));
 		};
-		const onResizeStop = ( event, direction, elt ) => {
-			toggleSelection( true );
-			commitWidthChange( parseInt( elt.style.width ) );
+		const onResizeStop = (event, direction, elt) => {
+			toggleSelection(true);
+			commitWidthChange(parseInt(elt.style.width));
 		};
 		const enablePositions = {
 			right: mediaPosition === 'left',
@@ -140,48 +138,48 @@ function MediaContainer( props, ref ) {
 
 		const backgroundStyles =
 			mediaType === 'image' && imageFill
-				? imageFillStyles( mediaUrl, focalPoint )
+				? imageFillStyles(mediaUrl, focalPoint)
 				: {};
 
 		const mediaTypeRenderers = {
-			image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
-			video: () => <video controls src={ mediaUrl } />,
+			image: () => <img src={mediaUrl} alt={mediaAlt} />,
+			video: () => <video controls src={mediaUrl} />,
 		};
 
 		return (
 			<ResizableBoxContainer
 				as="figure"
-				className={ classnames(
+				className={classnames(
 					className,
 					'editor-media-container__resizer',
 					{ 'is-transient': isTemporaryMedia }
-				) }
-				style={ backgroundStyles }
-				size={ { width: mediaWidth + '%' } }
+				)}
+				style={backgroundStyles}
+				size={{ width: mediaWidth + '%' }}
 				minWidth="10%"
 				maxWidth="100%"
-				enable={ enablePositions }
-				onResizeStart={ onResizeStart }
-				onResize={ onResize }
-				onResizeStop={ onResizeStop }
+				enable={enablePositions}
+				onResizeStart={onResizeStart}
+				onResize={onResize}
+				onResizeStop={onResizeStop}
 				axis="x"
-				isSelected={ isSelected }
-				isStackedOnMobile={ isStackedOnMobile }
-				ref={ ref }
+				isSelected={isSelected}
+				isStackedOnMobile={isStackedOnMobile}
+				ref={ref}
 			>
 				<ToolbarEditButton
-					onSelectMedia={ onSelectMedia }
-					mediaUrl={ mediaUrl }
-					mediaId={ mediaId }
+					onSelectMedia={onSelectMedia}
+					mediaUrl={mediaUrl}
+					mediaId={mediaId}
 				/>
-				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
-				{ isTemporaryMedia && <Spinner /> }
-				<PlaceholderContainer { ...props } />
+				{(mediaTypeRenderers[mediaType] || noop)()}
+				{isTemporaryMedia && <Spinner />}
+				<PlaceholderContainer {...props} />
 			</ResizableBoxContainer>
 		);
 	}
 
-	return <PlaceholderContainer { ...props } />;
+	return <PlaceholderContainer {...props} />;
 }
 
-export default withNotices( forwardRef( MediaContainer ) );
+export default withNotices(forwardRef(MediaContainer));

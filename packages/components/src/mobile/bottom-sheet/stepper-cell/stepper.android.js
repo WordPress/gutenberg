@@ -14,7 +14,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-function Stepper( {
+function Stepper({
 	getStylesFromColorScheme,
 	isMaxValue,
 	isMinValue,
@@ -24,7 +24,7 @@ function Stepper( {
 	value,
 	shouldDisplayTextInput,
 	children,
-} ) {
+}) {
 	const valueStyle = getStylesFromColorScheme(
 		styles.value,
 		styles.valueTextDark
@@ -35,44 +35,44 @@ function Stepper( {
 	);
 
 	return (
-		<View style={ styles.container }>
+		<View style={styles.container}>
 			<TouchableOpacity
-				disabled={ isMinValue }
-				onPressIn={ onPressInDecrement }
-				onPressOut={ onPressOut }
-				style={ [
+				disabled={isMinValue}
+				onPressIn={onPressInDecrement}
+				onPressOut={onPressOut}
+				style={[
 					styles.buttonNoBg,
 					isMinValue ? { opacity: 0.4 } : null,
-				] }
+				]}
 			>
 				<Icon
-					icon={ chevronDown }
-					size={ 24 }
-					color={ buttonIconStyle.color }
+					icon={chevronDown}
+					size={24}
+					color={buttonIconStyle.color}
 				/>
 			</TouchableOpacity>
-			{ ! shouldDisplayTextInput && (
-				<Text style={ [ valueStyle, styles.spacings ] }>{ value }</Text>
-			) }
-			{ children }
+			{!shouldDisplayTextInput && (
+				<Text style={[valueStyle, styles.spacings]}>{value}</Text>
+			)}
+			{children}
 			<TouchableOpacity
-				testID={ 'Increment' }
-				disabled={ isMaxValue }
-				onPressIn={ onPressInIncrement }
-				onPressOut={ onPressOut }
-				style={ [
+				testID={'Increment'}
+				disabled={isMaxValue}
+				onPressIn={onPressInIncrement}
+				onPressOut={onPressOut}
+				style={[
 					styles.buttonNoBg,
 					isMaxValue ? { opacity: 0.4 } : null,
-				] }
+				]}
 			>
 				<Icon
-					icon={ chevronUp }
-					size={ 24 }
-					color={ buttonIconStyle.color }
+					icon={chevronUp}
+					size={24}
+					color={buttonIconStyle.color}
 				/>
 			</TouchableOpacity>
 		</View>
 	);
 }
 
-export default withPreferredColorScheme( Stepper );
+export default withPreferredColorScheme(Stepper);

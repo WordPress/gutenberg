@@ -19,14 +19,14 @@ import { store as editWidgetsStore } from '../../store';
  * @return {WPComponent} The component.
  */
 export default function UnsavedChangesWarning() {
-	const isDirty = useSelect( ( select ) => {
-		const { getEditedWidgetAreas } = select( editWidgetsStore );
+	const isDirty = useSelect((select) => {
+		const { getEditedWidgetAreas } = select(editWidgetsStore);
 		const editedWidgetAreas = getEditedWidgetAreas();
 
 		return editedWidgetAreas?.length > 0;
-	}, [] );
+	}, []);
 
-	useEffect( () => {
+	useEffect(() => {
 		/**
 		 * Warns the user if there are unsaved changes before leaving the editor.
 		 *
@@ -34,8 +34,8 @@ export default function UnsavedChangesWarning() {
 		 *
 		 * @return {?string} Warning prompt message, if unsaved changes exist.
 		 */
-		const warnIfUnsavedChanges = ( event ) => {
-			if ( isDirty ) {
+		const warnIfUnsavedChanges = (event) => {
+			if (isDirty) {
 				event.returnValue = __(
 					'You have unsaved changes. If you proceed, they will be lost.'
 				);
@@ -43,12 +43,12 @@ export default function UnsavedChangesWarning() {
 			}
 		};
 
-		window.addEventListener( 'beforeunload', warnIfUnsavedChanges );
+		window.addEventListener('beforeunload', warnIfUnsavedChanges);
 
 		return () => {
-			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
+			window.removeEventListener('beforeunload', warnIfUnsavedChanges);
 		};
-	}, [ isDirty ] );
+	}, [isDirty]);
 
 	return null;
 }

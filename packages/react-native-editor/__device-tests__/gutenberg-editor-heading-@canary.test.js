@@ -5,13 +5,13 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor tests', () => {
-	it( 'should be able to create a post with heading and paragraph blocks', async () => {
-		await editorPage.addNewBlock( blockNames.heading );
+describe('Gutenberg Editor tests', () => {
+	it('should be able to create a post with heading and paragraph blocks', async () => {
+		await editorPage.addNewBlock(blockNames.heading);
 		let headingBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.heading
 		);
-		if ( isAndroid() ) {
+		if (isAndroid()) {
 			await headingBlockElement.click();
 		}
 		await editorPage.sendTextToHeadingBlock(
@@ -20,7 +20,7 @@ describe( 'Gutenberg Editor tests', () => {
 			false
 		);
 
-		await editorPage.addNewBlock( blockNames.paragraph );
+		await editorPage.addNewBlock(blockNames.paragraph);
 		let paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			2
@@ -30,7 +30,7 @@ describe( 'Gutenberg Editor tests', () => {
 			testData.mediumText
 		);
 
-		await editorPage.addNewBlock( blockNames.paragraph );
+		await editorPage.addNewBlock(blockNames.paragraph);
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			3
@@ -40,7 +40,7 @@ describe( 'Gutenberg Editor tests', () => {
 			testData.mediumText
 		);
 
-		await editorPage.addNewBlock( blockNames.heading );
+		await editorPage.addNewBlock(blockNames.heading);
 		headingBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.heading,
 			4
@@ -50,7 +50,7 @@ describe( 'Gutenberg Editor tests', () => {
 			testData.heading
 		);
 
-		await editorPage.addNewBlock( blockNames.paragraph );
+		await editorPage.addNewBlock(blockNames.paragraph);
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
 			5
@@ -59,5 +59,5 @@ describe( 'Gutenberg Editor tests', () => {
 			paragraphBlockElement,
 			testData.mediumText
 		);
-	} );
-} );
+	});
+});

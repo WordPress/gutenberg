@@ -18,7 +18,7 @@ import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemProps } from '../types';
 
-export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+export function useItem(props: WordPressComponentProps<ItemProps, 'div'>) {
 	const {
 		as: asProp,
 		className,
@@ -26,7 +26,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 		role = 'listitem',
 		size: sizeProp,
 		...otherProps
-	} = useContextSystem( props, 'Item' );
+	} = useContextSystem(props, 'Item');
 
 	const { spacedAround, size: contextSize } = useItemGroupContext();
 
@@ -34,9 +34,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 
 	const as =
 		asProp ||
-		( ( typeof onClick !== 'undefined'
-			? 'button'
-			: 'div' ) as ElementType );
+		((typeof onClick !== 'undefined' ? 'button' : 'div') as ElementType);
 
 	const cx = useCx();
 
@@ -44,15 +42,15 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 		() =>
 			cx(
 				as === 'button' && styles.unstyledButton,
-				styles.itemSizes[ size ] || styles.itemSizes.medium,
+				styles.itemSizes[size] || styles.itemSizes.medium,
 				styles.item,
 				spacedAround && styles.spacedAround,
 				className
 			),
-		[ as, className, size, spacedAround ]
+		[as, className, size, spacedAround]
 	);
 
-	const wrapperClassName = cx( styles.itemWrapper );
+	const wrapperClassName = cx(styles.itemWrapper);
 
 	return {
 		as,

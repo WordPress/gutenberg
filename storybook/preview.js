@@ -19,7 +19,7 @@ export const globalTypes = {
 	},
 };
 
-export const decorators = [ WithRTL ];
+export const decorators = [WithRTL];
 
 export const parameters = {
 	knobs: {

@@ -1,12 +1,12 @@
 export default {
 	specialTokens: {
-		textEscaped: [ 'a   b', 'i &lt;3 tags', '1&amp;2&amp;3&amp;4' ],
+		textEscaped: ['a   b', 'i &lt;3 tags', '1&amp;2&amp;3&amp;4'],
 		htmlEscaped: [
 			'a&nbsp;&nbsp;&nbsp;b',
 			'i&nbsp;&lt;3&nbsp;tags',
 			'1&amp;2&amp;3&amp;4',
 		],
-		textUnescaped: [ 'a   b', 'i <3 tags', '1&2&3&4' ],
+		textUnescaped: ['a   b', 'i <3 tags', '1&2&3&4'],
 		htmlUnescaped: [
 			'a&nbsp;&nbsp;&nbsp;b',
 			'i&nbsp;&lt;3&nbsp;tags',
@@ -64,26 +64,26 @@ export default {
 			'Tags & Stuff 2',
 		],
 		matchAmpersandUnescaped: [
-			[ 'Tags ', '& S', 'tuff' ],
-			[ 'Tags ', '& S', 'tuff 2' ],
+			['Tags ', '& S', 'tuff'],
+			['Tags ', '& S', 'tuff 2'],
 		],
 		matchAmpersandSequence: [
-			[ 'Tag', 's &', ' Stuff' ],
-			[ 'Tag', 's &', ' Stuff 2' ],
+			['Tag', 's &', ' Stuff'],
+			['Tag', 's &', ' Stuff 2'],
 		],
 		matchAmpersandEscaped: [],
 	},
 	matchingSuggestions: {
 		th: [
-			[ 'th', 'e' ],
-			[ 'th', 'at' ],
-			[ 'th', 'is' ],
-			[ 'wi', 'th' ],
+			['th', 'e'],
+			['th', 'at'],
+			['th', 'is'],
+			['wi', 'th'],
 		],
 		so: [
-			[ 'so', 'und' ],
-			[ 'as', 'so', 'ciate' ],
+			['so', 'und'],
+			['as', 'so', 'ciate'],
 		],
-		at: [ [ 'at' ], [ 'th', 'at' ], [ 'associ', 'at', 'e' ] ],
+		at: [['at'], ['th', 'at'], ['associ', 'at', 'e']],
 	},
 };

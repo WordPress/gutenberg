@@ -23,23 +23,23 @@ export { metadata, name };
 
 export const settings = {
 	icon: symbolFilled,
-	__experimentalLabel: ( { slug, theme } ) => {
+	__experimentalLabel: ({ slug, theme }) => {
 		// Attempt to find entity title if block is a template part.
 		// Require slug to request, otherwise entity is uncreated and will throw 404.
-		if ( ! slug ) {
+		if (!slug) {
 			return;
 		}
 
-		const entity = select( coreDataStore ).getEntityRecord(
+		const entity = select(coreDataStore).getEntityRecord(
 			'postType',
 			'wp_template_part',
 			theme + '//' + slug
 		);
-		if ( ! entity ) {
+		if (!entity) {
 			return;
 		}
 
-		return startCase( entity.title?.rendered || entity.slug );
+		return startCase(entity.title?.rendered || entity.slug);
 	},
 	edit,
 };
@@ -52,7 +52,7 @@ addFilter(
 );
 
 // Prevent adding template parts inside post templates.
-const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
+const DISALLOWED_PARENTS = ['core/post-template', 'core/post-content'];
 addFilter(
 	'blockEditor.__unstableCanInsertBlockType',
 	'removeTemplatePartsFromPostTemplates',
@@ -62,16 +62,16 @@ addFilter(
 		rootClientId,
 		{ getBlock, getBlockParentsByBlockName }
 	) => {
-		if ( blockType.name !== 'core/template-part' ) {
+		if (blockType.name !== 'core/template-part') {
 			return can;
 		}
 
-		for ( const disallowedParentType of DISALLOWED_PARENTS ) {
+		for (const disallowedParentType of DISALLOWED_PARENTS) {
 			const hasDisallowedParent =
-				getBlock( rootClientId )?.name === disallowedParentType ||
-				getBlockParentsByBlockName( rootClientId, disallowedParentType )
+				getBlock(rootClientId)?.name === disallowedParentType ||
+				getBlockParentsByBlockName(rootClientId, disallowedParentType)
 					.length;
-			if ( hasDisallowedParent ) {
+			if (hasDisallowedParent) {
 				return false;
 			}
 		}

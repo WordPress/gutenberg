@@ -21,22 +21,22 @@ export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
 
 export type DragDirection = 'n' | 's' | 'e' | 'w';
 
-export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
+export type DragProps = Parameters<Parameters<typeof useDrag>[0]>[0];
 
 export type Size = 'default' | 'small' | '__unstable-large';
 
 interface BaseProps {
-	__unstableInputWidth?: CSSProperties[ 'width' ];
+	__unstableInputWidth?: CSSProperties['width'];
 	hideLabelFromVision?: boolean;
 	isFocused: boolean;
 	labelPosition?: LabelPosition;
 	size?: Size;
 }
 
-export type InputChangeCallback<
-	E = ChangeEvent< HTMLInputElement >,
-	P = {}
-> = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
+export type InputChangeCallback<E = ChangeEvent<HTMLInputElement>, P = {}> = (
+	nextValue: string | undefined,
+	extra: { event: E } & P
+) => void;
 
 export interface InputFieldProps extends BaseProps {
 	dragDirection?: DragDirection;
@@ -46,14 +46,14 @@ export interface InputFieldProps extends BaseProps {
 	onChange?: InputChangeCallback;
 	onValidate?: (
 		nextValue: string,
-		event?: SyntheticEvent< HTMLInputElement >
+		event?: SyntheticEvent<HTMLInputElement>
 	) => void;
-	setIsFocused: ( isFocused: boolean ) => void;
+	setIsFocused: (isFocused: boolean) => void;
 	stateReducer?: StateReducer;
 	value?: string;
-	onDragEnd?: ( dragProps: DragProps ) => void;
-	onDragStart?: ( dragProps: DragProps ) => void;
-	onDrag?: ( dragProps: DragProps ) => void;
+	onDragEnd?: (dragProps: DragProps) => void;
+	onDragStart?: (dragProps: DragProps) => void;
+	onDrag?: (dragProps: DragProps) => void;
 }
 
 export interface InputBaseProps extends BaseProps, FlexProps {
@@ -67,7 +67,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 }
 
 export interface InputControlProps
-	extends Omit< InputBaseProps, 'children' | 'isFocused' >,
+	extends Omit<InputBaseProps, 'children' | 'isFocused'>,
 		/**
 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from
@@ -79,15 +79,15 @@ export interface InputControlProps
 		 * for InputField are passed through.
 		 */
 		Omit<
-			WordPressComponentProps< InputFieldProps, 'input', false >,
+			WordPressComponentProps<InputFieldProps, 'input', false>,
 			'stateReducer' | 'prefix' | 'isFocused' | 'setIsFocused'
 		> {
-	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
+	__unstableStateReducer?: InputFieldProps['stateReducer'];
 }
 
 export interface InputControlLabelProps {
 	children: ReactNode;
-	hideLabelFromVision?: BaseProps[ 'hideLabelFromVision' ];
-	labelPosition?: BaseProps[ 'labelPosition' ];
-	size?: BaseProps[ 'size' ];
+	hideLabelFromVision?: BaseProps['hideLabelFromVision'];
+	labelPosition?: BaseProps['labelPosition'];
+	size?: BaseProps['size'];
 }

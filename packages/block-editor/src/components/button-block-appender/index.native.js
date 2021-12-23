@@ -16,19 +16,16 @@ import { Icon, plusCircleFilled } from '@wordpress/icons';
 import Inserter from '../inserter';
 import styles from './styles.scss';
 
-function ButtonBlockAppender( {
+function ButtonBlockAppender({
 	rootClientId,
 	getStylesFromColorScheme,
 	showSeparator,
 	isFloating = false,
 	onAddBlock,
-} ) {
+}) {
 	const appenderStyle = {
 		...styles.appender,
-		...getStylesFromColorScheme(
-			styles.appenderLight,
-			styles.appenderDark
-		),
+		...getStylesFromColorScheme(styles.appenderLight, styles.appenderDark),
 	};
 	const addBlockButtonStyle = getStylesFromColorScheme(
 		styles.addBlockButton,
@@ -40,31 +37,31 @@ function ButtonBlockAppender( {
 	return (
 		<>
 			<Inserter
-				rootClientId={ rootClientId }
-				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
+				rootClientId={rootClientId}
+				renderToggle={({ onToggle, disabled, isOpen }) => (
 					<Button
-						onClick={ onAddBlock || onToggle }
-						aria-expanded={ isOpen }
-						disabled={ disabled }
-						fixedRatio={ false }
+						onClick={onAddBlock || onToggle}
+						aria-expanded={isOpen}
+						disabled={disabled}
+						fixedRatio={false}
 					>
 						<View
-							style={ [
+							style={[
 								appenderStyle,
 								isFloating && styles.floatingAppender,
-							] }
+							]}
 						>
 							<Icon
-								icon={ plusCircleFilled }
-								style={ addBlockButtonStyle }
-								color={ addBlockButtonStyle.color }
-								size={ addBlockButtonStyle.size }
+								icon={plusCircleFilled}
+								style={addBlockButtonStyle}
+								color={addBlockButtonStyle.color}
+								size={addBlockButtonStyle.size}
 							/>
 						</View>
 					</Button>
-				) }
+				)}
 				isAppender
-				showSeparator={ showSeparator }
+				showSeparator={showSeparator}
 			/>
 		</>
 	);
@@ -73,4 +70,4 @@ function ButtonBlockAppender( {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md
  */
-export default withPreferredColorScheme( ButtonBlockAppender );
+export default withPreferredColorScheme(ButtonBlockAppender);

@@ -22,13 +22,13 @@ import SearchControl from '../../search-control';
 export const NavigationUI = styled.div`
 	width: 100%;
 	box-sizing: border-box;
-	padding: 0 ${ space( 4 ) };
+	padding: 0 ${space(4)};
 	overflow: hidden;
 `;
 
 export const MenuUI = styled.div`
-	margin-top: ${ space( 6 ) };
-	margin-bottom: ${ space( 6 ) };
+	margin-top: ${space(6)};
+	margin-bottom: ${space(6)};
 	display: flex;
 	flex-direction: column;
 	ul {
@@ -37,26 +37,26 @@ export const MenuUI = styled.div`
 		list-style: none;
 	}
 	.components-navigation__back-button {
-		margin-bottom: ${ space( 6 ) };
+		margin-bottom: ${space(6)};
 	}
 
 	.components-navigation__group + .components-navigation__group {
-		margin-top: ${ space( 6 ) };
+		margin-top: ${space(6)};
 	}
 `;
 
-export const MenuBackButtonUI = styled( Button )`
+export const MenuBackButtonUI = styled(Button)`
 	&.is-tertiary {
 		color: inherit;
 		opacity: 0.7;
 
-		&:hover:not( :disabled ) {
+		&:hover:not(:disabled) {
 			opacity: 1;
 			box-shadow: none;
 			color: inherit;
 		}
 
-		&:active:not( :disabled ) {
+		&:active:not(:disabled) {
 			background: transparent;
 			opacity: 1;
 			color: inherit;
@@ -70,20 +70,20 @@ export const MenuTitleUI = styled.div`
 `;
 
 export const MenuTitleActionsUI = styled.span`
-	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
+	height: ${space(6)}; // 24px, same height as the buttons inside
 
 	.components-button.is-small {
 		color: inherit;
 		opacity: 0.7;
-		margin-right: ${ space( 1 ) }; // Avoid hiding the focus outline
+		margin-right: ${space(1)}; // Avoid hiding the focus outline
 		padding: 0;
 
-		&:active:not( :disabled ) {
+		&:active:not(:disabled) {
 			background: none;
 			opacity: 1;
 			color: inherit;
 		}
-		&:hover:not( :disabled ) {
+		&:hover:not(:disabled) {
 			box-shadow: none;
 			opacity: 1;
 			color: inherit;
@@ -91,7 +91,7 @@ export const MenuTitleActionsUI = styled.span`
 	}
 `;
 
-export const MenuTitleSearchUI = styled( SearchControl )`
+export const MenuTitleSearchUI = styled(SearchControl)`
 	input[type='search'].components-search-control__input {
 		margin: 0;
 		background: #303030;
@@ -103,7 +103,7 @@ export const MenuTitleSearchUI = styled( SearchControl )`
 		}
 
 		&::placeholder {
-			color: rgba( 255, 255, 255, 0.6 );
+			color: rgba(255, 255, 255, 0.6);
 		}
 	}
 
@@ -117,19 +117,17 @@ export const MenuTitleSearchUI = styled( SearchControl )`
 	}
 `;
 
-export const GroupTitleUI = styled( Heading )`
-	min-height: ${ space( 12 ) };
+export const GroupTitleUI = styled(Heading)`
+	min-height: ${space(12)};
 	align-items: center;
 	color: inherit;
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: ${ space( 2 ) };
-	padding: ${ () =>
+	margin-bottom: ${space(2)};
+	padding: ${() =>
 		isRTL()
-			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } ${ space( 2 ) }`
-			: `${ space( 1 ) } ${ space( 2 ) } ${ space( 1 ) } ${ space(
-					4
-			  ) }` };
+			? `${space(1)} ${space(4)} ${space(1)} ${space(2)}`
+			: `${space(1)} ${space(2)} ${space(1)} ${space(4)}`};
 `;
 
 export const ItemBaseUI = styled.li`
@@ -143,8 +141,8 @@ export const ItemBaseUI = styled.li`
 		width: 100%;
 		color: inherit;
 		opacity: 0.7;
-		padding: ${ space( 2 ) } ${ space( 4 ) }; /* 8px 16px */
-		${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
+		padding: ${space(2)} ${space(4)}; /* 8px 16px */
+		${rtl({ textAlign: 'left' }, { textAlign: 'right' })}
 
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
@@ -155,18 +153,18 @@ export const ItemBaseUI = styled.li`
 	}
 
 	&.is-active {
-		background-color: ${ UI.theme };
-		color: ${ BASE.white };
+		background-color: ${UI.theme};
+		color: ${BASE.white};
 
 		> button,
 		> a {
-			color: ${ BASE.white };
+			color: ${BASE.white};
 			opacity: 1;
 		}
 	}
 
 	> svg path {
-		color: ${ G2.lightGray.ui };
+		color: ${G2.lightGray.ui};
 	}
 `;
 
@@ -176,7 +174,7 @@ export const ItemUI = styled.div`
 	height: auto;
 	min-height: 40px;
 	margin: 0;
-	padding: ${ space( 1.5 ) } ${ space( 4 ) };
+	padding: ${space(1.5)} ${space(4)};
 	font-weight: 400;
 	line-height: 20px;
 	width: 100%;
@@ -186,14 +184,14 @@ export const ItemUI = styled.div`
 
 export const ItemIconUI = styled.span`
 	display: flex;
-	margin-right: ${ space( 2 ) };
+	margin-right: ${space(2)};
 `;
 
 export const ItemBadgeUI = styled.span`
-	margin-left: ${ () => ( isRTL() ? '0' : space( 2 ) ) };
-	margin-right: ${ () => ( isRTL() ? space( 2 ) : '0' ) };
+	margin-left: ${() => (isRTL() ? '0' : space(2))};
+	margin-right: ${() => (isRTL() ? space(2) : '0')};
 	display: inline-flex;
-	padding: ${ space( 1 ) } ${ space( 3 ) };
+	padding: ${space(1)} ${space(3)};
 	border-radius: 2px;
 	animation: fade-in 250ms ease-out;
 
@@ -206,11 +204,11 @@ export const ItemBadgeUI = styled.span`
 		}
 	}
 
-	${ reduceMotion( 'animation' ) };
+	${reduceMotion('animation')};
 `;
 
-export const ItemTitleUI = styled( Text )`
-	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
+export const ItemTitleUI = styled(Text)`
+	${() => (isRTL() ? 'margin-left: auto;' : 'margin-right: auto;')}
 	font-size: 14px;
 	line-height: 20px;
 	color: inherit;

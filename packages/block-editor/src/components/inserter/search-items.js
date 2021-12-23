@@ -4,11 +4,11 @@
 import { deburr, differenceWith, find, words } from 'lodash';
 
 // Default search helpers
-const defaultGetName = ( item ) => item.name || '';
-const defaultGetTitle = ( item ) => item.title;
-const defaultGetDescription = ( item ) => item.description || '';
-const defaultGetKeywords = ( item ) => item.keywords || [];
-const defaultGetCategory = ( item ) => item.category;
+const defaultGetName = (item) => item.name || '';
+const defaultGetTitle = (item) => item.title;
+const defaultGetDescription = (item) => item.description || '';
+const defaultGetKeywords = (item) => item.keywords || [];
+const defaultGetCategory = (item) => item.category;
 const defaultGetCollection = () => null;
 
 /**
@@ -18,14 +18,14 @@ const defaultGetCollection = () => null;
  *
  * @return {string} The normalized search input.
  */
-function normalizeSearchInput( input = '' ) {
+function normalizeSearchInput(input = '') {
 	// Disregard diacritics.
 	//  Input: "média"
-	input = deburr( input );
+	input = deburr(input);
 
 	// Accommodate leading slash, matching autocomplete expectations.
 	//  Input: "/media"
-	input = input.replace( /^\//, '' );
+	input = input.replace(/^\//, '');
 
 	// Lowercase.
 	//  Input: "MEDIA"
@@ -41,17 +41,17 @@ function normalizeSearchInput( input = '' ) {
  *
  * @return {string[]} The normalized list of search terms.
  */
-export const getNormalizedSearchTerms = ( input = '' ) => {
+export const getNormalizedSearchTerms = (input = '') => {
 	// Extract words.
-	return words( normalizeSearchInput( input ) );
+	return words(normalizeSearchInput(input));
 };
 
-const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
+const removeMatchingTerms = (unmatchedTerms, unprocessedTerms) => {
 	return differenceWith(
 		unmatchedTerms,
-		getNormalizedSearchTerms( unprocessedTerms ),
-		( unmatchedTerm, unprocessedTerm ) =>
-			unprocessedTerm.includes( unmatchedTerm )
+		getNormalizedSearchTerms(unprocessedTerms),
+		(unmatchedTerm, unprocessedTerm) =>
+			unprocessedTerm.includes(unmatchedTerm)
 	);
 };
 
@@ -61,19 +61,17 @@ export const searchBlockItems = (
 	collections,
 	searchInput
 ) => {
-	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
-	if ( normalizedSearchTerms.length === 0 ) {
+	const normalizedSearchTerms = getNormalizedSearchTerms(searchInput);
+	if (normalizedSearchTerms.length === 0) {
 		return items;
 	}
 
 	const config = {
-		getCategory: ( item ) =>
-			find( categories, { slug: item.category } )?.title,
-		getCollection: ( item ) =>
-			collections[ item.name.split( '/' )[ 0 ] ]?.title,
+		getCategory: (item) => find(categories, { slug: item.category })?.title,
+		getCollection: (item) => collections[item.name.split('/')[0]]?.title,
 	};
 
-	return searchItems( items, searchInput, config );
+	return searchItems(items, searchInput, config);
 };
 
 /**
@@ -85,20 +83,20 @@ export const searchBlockItems = (
  *
  * @return {Array} Filtered item list.
  */
-export const searchItems = ( items = [], searchInput = '', config = {} ) => {
-	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
-	if ( normalizedSearchTerms.length === 0 ) {
+export const searchItems = (items = [], searchInput = '', config = {}) => {
+	const normalizedSearchTerms = getNormalizedSearchTerms(searchInput);
+	if (normalizedSearchTerms.length === 0) {
 		return items;
 	}
 
 	const rankedItems = items
-		.map( ( item ) => {
-			return [ item, getItemSearchRank( item, searchInput, config ) ];
-		} )
-		.filter( ( [ , rank ] ) => rank > 0 );
+		.map((item) => {
+			return [item, getItemSearchRank(item, searchInput, config)];
+		})
+		.filter(([, rank]) => rank > 0);
 
-	rankedItems.sort( ( [ , rank1 ], [ , rank2 ] ) => rank2 - rank1 );
-	return rankedItems.map( ( [ item ] ) => item );
+	rankedItems.sort(([, rank1], [, rank2]) => rank2 - rank1);
+	return rankedItems.map(([item]) => item);
 };
 
 /**
@@ -112,7 +110,7 @@ export const searchItems = ( items = [], searchInput = '', config = {} ) => {
  *
  * @return {number} Search Rank.
  */
-export function getItemSearchRank( item, searchTerm, config = {} ) {
+export function getItemSearchRank(item, searchTerm, config = {}) {
 	const {
 		getName = defaultGetName,
 		getTitle = defaultGetTitle,
@@ -122,24 +120,24 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 		getCollection = defaultGetCollection,
 	} = config;
 
-	const name = getName( item );
-	const title = getTitle( item );
-	const description = getDescription( item );
-	const keywords = getKeywords( item );
-	const category = getCategory( item );
-	const collection = getCollection( item );
+	const name = getName(item);
+	const title = getTitle(item);
+	const description = getDescription(item);
+	const keywords = getKeywords(item);
+	const category = getCategory(item);
+	const collection = getCollection(item);
 
-	const normalizedSearchInput = normalizeSearchInput( searchTerm );
-	const normalizedTitle = normalizeSearchInput( title );
+	const normalizedSearchInput = normalizeSearchInput(searchTerm);
+	const normalizedTitle = normalizeSearchInput(title);
 
 	let rank = 0;
 
 	// Prefers exact matches
 	// Then prefers if the beginning of the title matches the search term
 	// name, keywords, categories, collection, variations match come later.
-	if ( normalizedSearchInput === normalizedTitle ) {
+	if (normalizedSearchInput === normalizedTitle) {
 		rank += 30;
-	} else if ( normalizedTitle.startsWith( normalizedSearchInput ) ) {
+	} else if (normalizedTitle.startsWith(normalizedSearchInput)) {
 		rank += 20;
 	} else {
 		const terms = [
@@ -149,20 +147,20 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 			...keywords,
 			category,
 			collection,
-		].join( ' ' );
-		const normalizedSearchTerms = words( normalizedSearchInput );
+		].join(' ');
+		const normalizedSearchTerms = words(normalizedSearchInput);
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
 			terms
 		);
 
-		if ( unmatchedTerms.length === 0 ) {
+		if (unmatchedTerms.length === 0) {
 			rank += 10;
 		}
 	}
 
 	// Give a better rank to "core" namespaced items.
-	if ( rank !== 0 && name.startsWith( 'core/' ) ) {
+	if (rank !== 0 && name.startsWith('core/')) {
 		rank++;
 	}
 

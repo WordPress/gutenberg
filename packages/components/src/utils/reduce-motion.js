@@ -4,10 +4,10 @@
  * @param {'transition' | 'animation' | string} [prop='transition'] CSS Property name
  * @return {string} Generated CSS code for the reduced style
  */
-export function reduceMotion( prop = 'transition' ) {
+export function reduceMotion(prop = 'transition') {
 	let style;
 
-	switch ( prop ) {
+	switch (prop) {
 		case 'transition':
 			style = 'transition-duration: 0ms;';
 			break;
@@ -25,7 +25,7 @@ export function reduceMotion( prop = 'transition' ) {
 
 	return `
 		@media ( prefers-reduced-motion: reduce ) {
-			${ style };
+			${style};
 		}
 	`;
 }

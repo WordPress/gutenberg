@@ -1,22 +1,22 @@
 let objectStorage;
 
 const storage = {
-	getItem( key ) {
-		if ( ! objectStorage || ! objectStorage[ key ] ) {
+	getItem(key) {
+		if (!objectStorage || !objectStorage[key]) {
 			return null;
 		}
 
-		return objectStorage[ key ];
+		return objectStorage[key];
 	},
-	setItem( key, value ) {
-		if ( ! objectStorage ) {
+	setItem(key, value) {
+		if (!objectStorage) {
 			storage.clear();
 		}
 
-		objectStorage[ key ] = String( value );
+		objectStorage[key] = String(value);
 	},
 	clear() {
-		objectStorage = Object.create( null );
+		objectStorage = Object.create(null);
 	},
 };
 

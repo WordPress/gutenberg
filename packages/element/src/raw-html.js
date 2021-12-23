@@ -18,20 +18,20 @@ import { Children, createElement } from './react';
  *
  * @return {JSX.Element} Dangerously-rendering component.
  */
-export default function RawHTML( { children, ...props } ) {
+export default function RawHTML({ children, ...props }) {
 	let rawHtml = '';
 
 	// Cast children as an array, and concatenate each element if it is a string.
-	Children.toArray( children ).forEach( ( child ) => {
-		if ( typeof child === 'string' && child.trim() !== '' ) {
+	Children.toArray(children).forEach((child) => {
+		if (typeof child === 'string' && child.trim() !== '') {
 			rawHtml += child;
 		}
-	} );
+	});
 
 	// The `div` wrapper will be stripped by the `renderElement` serializer in
 	// `./serialize.js` unless there are non-children props present.
-	return createElement( 'div', {
+	return createElement('div', {
 		dangerouslySetInnerHTML: { __html: rawHtml },
 		...props,
-	} );
+	});
 }

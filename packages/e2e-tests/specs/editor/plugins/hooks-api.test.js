@@ -9,36 +9,36 @@ import {
 	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Using Hooks API', () => {
-	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-hooks-api' );
-	} );
+describe('Using Hooks API', () => {
+	beforeAll(async () => {
+		await activatePlugin('gutenberg-test-hooks-api');
+	});
 
-	afterAll( async () => {
-		await deactivatePlugin( 'gutenberg-test-hooks-api' );
-	} );
+	afterAll(async () => {
+		await deactivatePlugin('gutenberg-test-hooks-api');
+	});
 
-	beforeEach( async () => {
+	beforeEach(async () => {
 		await createNewPost();
-	} );
+	});
 
-	it( 'Should contain a reset block button on the sidebar', async () => {
+	it('Should contain a reset block button on the sidebar', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( 'First paragraph' );
+		await page.keyboard.type('First paragraph');
 		expect(
-			await page.$( '.edit-post-sidebar .e2e-reset-block-button' )
+			await page.$('.edit-post-sidebar .e2e-reset-block-button')
 		).not.toBeNull();
-	} );
+	});
 
-	it( 'Pressing reset block button resets the block', async () => {
+	it('Pressing reset block button resets the block', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( 'First paragraph' );
+		await page.keyboard.type('First paragraph');
 		const paragraphContent = await page.$eval(
 			'p[data-type="core/paragraph"]',
-			( element ) => element.textContent
+			(element) => element.textContent
 		);
-		expect( paragraphContent ).toEqual( 'First paragraph' );
-		await page.click( '.edit-post-sidebar .e2e-reset-block-button' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-} );
+		expect(paragraphContent).toEqual('First paragraph');
+		await page.click('.edit-post-sidebar .e2e-reset-block-button');
+		expect(await getEditedPostContent()).toMatchSnapshot();
+	});
+});

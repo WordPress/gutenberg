@@ -10,9 +10,9 @@ import { isURL } from '@wordpress/url';
 import { range } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 
-range( 1, 200 )
+range(1, 200)
 	.pipe(
-		filter( isBlobURL ),
-		map( ( x ) => x + x )
+		filter(isBlobURL),
+		map((x) => x + x)
 	)
-	.subscribe( ( x ) => isURL( x ) );
+	.subscribe((x) => isURL(x));

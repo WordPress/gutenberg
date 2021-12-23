@@ -10,11 +10,11 @@ import Navigation from '..';
 import NavigationItem from '../item';
 import NavigationMenu from '../menu';
 
-const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
-	<Navigation activeItem={ activeItem }>
-		<NavigationMenu title={ rootTitle }>
+const testNavigation = ({ activeItem, rootTitle, showBadge } = {}) => (
+	<Navigation activeItem={activeItem}>
+		<NavigationMenu title={rootTitle}>
 			<NavigationItem
-				badge={ showBadge && 21 }
+				badge={showBadge && 21}
 				item="item-1"
 				title="Item 1"
 			/>
@@ -45,92 +45,90 @@ const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 	</Navigation>
 );
 
-describe( 'Navigation', () => {
-	it( 'should render the panes and active item', async () => {
-		render( testNavigation( { activeItem: 'item-2' } ) );
+describe('Navigation', () => {
+	it('should render the panes and active item', async () => {
+		render(testNavigation({ activeItem: 'item-2' }));
 
-		const menuItems = screen.getAllByRole( 'listitem' );
+		const menuItems = screen.getAllByRole('listitem');
 
-		expect( menuItems.length ).toBe( 4 );
-		expect( menuItems[ 0 ].textContent ).toBe( 'Item 1' );
-		expect( menuItems[ 1 ].textContent ).toBe( 'Item 2' );
-		expect( menuItems[ 2 ].textContent ).toBe( 'Category' );
-		expect( menuItems[ 3 ].textContent ).toBe( 'customize me' );
-		expect( menuItems[ 0 ].classList.contains( 'is-active' ) ).toBe(
-			false
-		);
-		expect( menuItems[ 1 ].classList.contains( 'is-active' ) ).toBe( true );
-	} );
+		expect(menuItems.length).toBe(4);
+		expect(menuItems[0].textContent).toBe('Item 1');
+		expect(menuItems[1].textContent).toBe('Item 2');
+		expect(menuItems[2].textContent).toBe('Category');
+		expect(menuItems[3].textContent).toBe('customize me');
+		expect(menuItems[0].classList.contains('is-active')).toBe(false);
+		expect(menuItems[1].classList.contains('is-active')).toBe(true);
+	});
 
-	it( 'should render anchor links when menu item supplies an href', async () => {
-		render( testNavigation() );
+	it('should render anchor links when menu item supplies an href', async () => {
+		render(testNavigation());
 
-		const linkItem = screen.getByRole( 'link', { name: 'Item 2' } );
+		const linkItem = screen.getByRole('link', { name: 'Item 2' });
 
-		expect( linkItem ).toBeDefined();
-		expect( linkItem.target ).toBe( '_blank' );
-	} );
+		expect(linkItem).toBeDefined();
+		expect(linkItem.target).toBe('_blank');
+	});
 
-	it( 'should render a custom component when menu item supplies one', async () => {
-		render( testNavigation() );
+	it('should render a custom component when menu item supplies one', async () => {
+		render(testNavigation());
 
-		const customItem = screen.getByText( 'customize me' );
+		const customItem = screen.getByText('customize me');
 
-		expect( customItem ).toBeDefined();
-	} );
+		expect(customItem).toBeDefined();
+	});
 
-	it( 'should set an active category on click', async () => {
-		render( testNavigation() );
+	it('should set an active category on click', async () => {
+		render(testNavigation());
 
-		fireEvent.click( screen.getByRole( 'button', { name: 'Category' } ) );
-		const categoryTitle = screen.getByRole( 'heading' );
-		const menuItems = screen.getAllByRole( 'listitem' );
+		fireEvent.click(screen.getByRole('button', { name: 'Category' }));
+		const categoryTitle = screen.getByRole('heading');
+		const menuItems = screen.getAllByRole('listitem');
 
-		expect( categoryTitle.textContent ).toBe( 'Category' );
-		expect( menuItems.length ).toBe( 2 );
-		expect( menuItems[ 0 ].textContent ).toBe( 'Child 1' );
-		expect( menuItems[ 1 ].textContent ).toBe( 'Child 2' );
-	} );
+		expect(categoryTitle.textContent).toBe('Category');
+		expect(menuItems.length).toBe(2);
+		expect(menuItems[0].textContent).toBe('Child 1');
+		expect(menuItems[1].textContent).toBe('Child 2');
+	});
 
-	it( 'should render the root title', async () => {
-		const { rerender } = render( testNavigation() );
+	it('should render the root title', async () => {
+		const { rerender } = render(testNavigation());
 
-		const emptyTitle = screen.queryByRole( 'heading' );
-		expect( emptyTitle ).toBeNull();
+		const emptyTitle = screen.queryByRole('heading');
+		expect(emptyTitle).toBeNull();
 
-		rerender( testNavigation( { rootTitle: 'Home' } ) );
+		rerender(testNavigation({ rootTitle: 'Home' }));
 
-		const rootTitle = screen.getByRole( 'heading' );
-		expect( rootTitle.textContent ).toBe( 'Home' );
-	} );
+		const rootTitle = screen.getByRole('heading');
+		expect(rootTitle.textContent).toBe('Home');
+	});
 
-	it( 'should render badges', async () => {
-		render( testNavigation( { showBadge: true } ) );
+	it('should render badges', async () => {
+		render(testNavigation({ showBadge: true }));
 
-		const menuItem = screen.getAllByRole( 'listitem' );
-		expect( menuItem[ 0 ].textContent ).toBe( 'Item 1' + '21' );
-	} );
+		const menuItem = screen.getAllByRole('listitem');
+		expect(menuItem[0].textContent).toBe('Item 1' + '21');
+	});
 
-	it( 'should render menu titles when items exist', async () => {
-		const { rerender } = render( <Navigation></Navigation> );
+	it('should render menu titles when items exist', async () => {
+		const { rerender } = render(<Navigation></Navigation>);
 
-		const emptyMenu = screen.queryByText( 'Menu title' );
-		expect( emptyMenu ).toBeNull();
+		const emptyMenu = screen.queryByText('Menu title');
+		expect(emptyMenu).toBeNull();
 
-		rerender( testNavigation( { rootTitle: 'Menu title' } ) );
+		rerender(testNavigation({ rootTitle: 'Menu title' }));
 
-		const menuTitle = screen.queryByText( 'Menu title' );
-		expect( menuTitle ).not.toBeNull();
-	} );
+		const menuTitle = screen.queryByText('Menu title');
+		expect(menuTitle).not.toBeNull();
+	});
 
-	it( 'should navigate up a level when clicking the back button', async () => {
-		render( testNavigation( { rootTitle: 'Home' } ) );
+	it('should navigate up a level when clicking the back button', async () => {
+		render(testNavigation({ rootTitle: 'Home' }));
 
-		fireEvent.click( screen.getByRole( 'button', { name: 'Category' } ) );
-		let menuTitle = screen.getByRole( 'heading' );
-		expect( menuTitle.textContent ).toBe( 'Category' );
-		fireEvent.click( screen.getByRole( 'button', { name: 'Home' } ) );
-		menuTitle = screen.getByRole( 'heading' );
-		expect( menuTitle.textContent ).toBe( 'Home' );
-	} );
-} );
+		fireEvent.click(screen.getByRole('button', { name: 'Category' }));
+		let menuTitle = screen.getByRole('heading');
+		expect(menuTitle.textContent).toBe('Category');
+		fireEvent.click(screen.getByRole('button', { name: 'Home' }));
+		menuTitle = screen.getByRole('heading');
+		expect(menuTitle.textContent).toBe('Home');
+	});
+});

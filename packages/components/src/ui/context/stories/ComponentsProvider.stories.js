@@ -12,7 +12,7 @@ import { Text } from '../../../text';
 import { ContextSystemProvider } from '../index';
 
 const SomeContext = createContext();
-const useSomeContext = () => useContext( SomeContext );
+const useSomeContext = () => useContext(SomeContext);
 
 export default {
 	component: ContextSystemProvider,
@@ -44,44 +44,44 @@ const innerContext = {
 	},
 };
 
-const InnerContent = memo( () => {
+const InnerContent = memo(() => {
 	const state = useSomeContext();
 	const isEven = state % 2 === 0;
 	return (
-		<View style={ { background: isEven ? 'red' : 'initial' } }>
+		<View style={{ background: isEven ? 'red' : 'initial' }}>
 			<Text>Card (inside innerContext)</Text>
 			<br />
-			<Text>Counter:{ state }</Text>
+			<Text>Counter:{state}</Text>
 		</View>
 	);
-} );
+});
 
-const InnerCard = memo( () => {
+const InnerCard = memo(() => {
 	return (
-		<View style={ { padding: 40 } }>
+		<View style={{ padding: 40 }}>
 			<Card>
-				<CardBody style={ { border: '3px solid green' } }>
+				<CardBody style={{ border: '3px solid green' }}>
 					<InnerContent />
 				</CardBody>
 			</Card>
 		</View>
 	);
-} );
+});
 
 export const Default = () => {
-	const [ state, update ] = useState( 0 );
-	const forceUpdate = () => update( ( prev ) => prev + 1 );
+	const [state, update] = useState(0);
+	const forceUpdate = () => update((prev) => prev + 1);
 
 	return (
-		<SomeContext.Provider value={ state }>
-			<button onClick={ forceUpdate }>
+		<SomeContext.Provider value={state}>
+			<button onClick={forceUpdate}>
 				Force Update (increment counter)
 			</button>
-			<ContextSystemProvider value={ outerContext }>
+			<ContextSystemProvider value={outerContext}>
 				<Card>
 					<CardBody>
 						<Text>Card (inside outerContext)</Text>
-						<ContextSystemProvider value={ innerContext }>
+						<ContextSystemProvider value={innerContext}>
 							<InnerCard />
 						</ContextSystemProvider>
 					</CardBody>

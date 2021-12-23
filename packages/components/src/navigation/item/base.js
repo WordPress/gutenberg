@@ -16,23 +16,23 @@ import { useNavigationContext } from '../context';
 import { useNavigationTreeItem } from './use-navigation-tree-item';
 import { ItemBaseUI } from '../styles/navigation-styles';
 
-export default function NavigationItemBase( props ) {
+export default function NavigationItemBase(props) {
 	const { children, className, ...restProps } = props;
 
-	const [ itemId ] = useState( uniqueId( 'item-' ) );
+	const [itemId] = useState(uniqueId('item-'));
 
-	useNavigationTreeItem( itemId, props );
+	useNavigationTreeItem(itemId, props);
 	const { navigationTree } = useNavigationContext();
 
-	if ( ! navigationTree.getItem( itemId )?._isVisible ) {
+	if (!navigationTree.getItem(itemId)?._isVisible) {
 		return null;
 	}
 
-	const classes = classnames( 'components-navigation__item', className );
+	const classes = classnames('components-navigation__item', className);
 
 	return (
-		<ItemBaseUI className={ classes } { ...restProps }>
-			{ children }
+		<ItemBaseUI className={classes} {...restProps}>
+			{children}
 		</ItemBaseUI>
 	);
 }

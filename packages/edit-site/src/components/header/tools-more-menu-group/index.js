@@ -13,11 +13,11 @@ const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
 	'EditSiteToolsMoreMenuGroup'
 );
 
-ToolsMoreMenuGroup.Slot = ( { fillProps } ) => (
-	<Slot fillProps={ fillProps }>
-		{ ( fills ) =>
-			! isEmpty( fills ) && (
-				<MenuGroup label={ __( 'Tools' ) }>{ fills }</MenuGroup>
+ToolsMoreMenuGroup.Slot = ({ fillProps }) => (
+	<Slot fillProps={fillProps}>
+		{(fills) =>
+			!isEmpty(fills) && (
+				<MenuGroup label={__('Tools')}>{fills}</MenuGroup>
 			)
 		}
 	</Slot>

@@ -25,15 +25,15 @@ export const settings = {
 				{
 					cells: [
 						{
-							content: __( 'Version' ),
+							content: __('Version'),
 							tag: 'th',
 						},
 						{
-							content: __( 'Jazz Musician' ),
+							content: __('Jazz Musician'),
 							tag: 'th',
 						},
 						{
-							content: __( 'Release Date' ),
+							content: __('Release Date'),
 							tag: 'th',
 						},
 					],
@@ -51,7 +51,7 @@ export const settings = {
 							tag: 'td',
 						},
 						{
-							content: __( 'May 7, 2019' ),
+							content: __('May 7, 2019'),
 							tag: 'td',
 						},
 					],
@@ -67,7 +67,7 @@ export const settings = {
 							tag: 'td',
 						},
 						{
-							content: __( 'February 21, 2019' ),
+							content: __('February 21, 2019'),
 							tag: 'td',
 						},
 					],
@@ -83,7 +83,7 @@ export const settings = {
 							tag: 'td',
 						},
 						{
-							content: __( 'December 6, 2018' ),
+							content: __('December 6, 2018'),
 							tag: 'td',
 						},
 					],

@@ -9,10 +9,10 @@ import { useCardFooter } from './hook';
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                                  forwardedRef
  */
-function CardFooter( props, forwardedRef ) {
-	const footerProps = useCardFooter( props );
+function CardFooter(props, forwardedRef) {
+	const footerProps = useCardFooter(props);
 
-	return <Flex { ...footerProps } ref={ forwardedRef } />;
+	return <Flex {...footerProps} ref={forwardedRef} />;
 }
 
 /**
@@ -28,6 +28,6 @@ function CardFooter( props, forwardedRef ) {
  * </Card>
  * ```
  */
-const ConnectedCardFooter = contextConnect( CardFooter, 'CardFooter' );
+const ConnectedCardFooter = contextConnect(CardFooter, 'CardFooter');
 
 export default ConnectedCardFooter;

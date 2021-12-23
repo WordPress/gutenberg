@@ -14,7 +14,7 @@ import useRefEffect from '../use-ref-effect';
  * @param {T} value
  * @return {import('react').MutableRefObject<T>} A ref with the value.
  */
-function useFreshRef( value ) {
+function useFreshRef(value) {
 	/* eslint-enable jsdoc/valid-types */
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {import('react').MutableRefObject<T>} */
@@ -44,7 +44,7 @@ function useFreshRef( value ) {
  *
  * @return {import('react').RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
  */
-export default function useDropZone( {
+export default function useDropZone({
 	isDisabled,
 	onDrop: _onDrop,
 	onDragStart: _onDragStart,
@@ -52,17 +52,17 @@ export default function useDropZone( {
 	onDragLeave: _onDragLeave,
 	onDragEnd: _onDragEnd,
 	onDragOver: _onDragOver,
-} ) {
-	const onDropRef = useFreshRef( _onDrop );
-	const onDragStartRef = useFreshRef( _onDragStart );
-	const onDragEnterRef = useFreshRef( _onDragEnter );
-	const onDragLeaveRef = useFreshRef( _onDragLeave );
-	const onDragEndRef = useFreshRef( _onDragEnd );
-	const onDragOverRef = useFreshRef( _onDragOver );
+}) {
+	const onDropRef = useFreshRef(_onDrop);
+	const onDragStartRef = useFreshRef(_onDragStart);
+	const onDragEnterRef = useFreshRef(_onDragEnter);
+	const onDragLeaveRef = useFreshRef(_onDragLeave);
+	const onDragEndRef = useFreshRef(_onDragEnd);
+	const onDragOverRef = useFreshRef(_onDragOver);
 
 	return useRefEffect(
-		( element ) => {
-			if ( isDisabled ) {
+		(element) => {
+			if (isDisabled) {
 				return;
 			}
 
@@ -77,13 +77,13 @@ export default function useDropZone( {
 			 *
 			 * @return {boolean} True if in drop zone, false if not.
 			 */
-			function isElementInZone( targetToCheck ) {
+			function isElementInZone(targetToCheck) {
 				const { defaultView } = ownerDocument;
 				if (
-					! targetToCheck ||
-					! defaultView ||
-					! ( targetToCheck instanceof defaultView.HTMLElement ) ||
-					! element.contains( targetToCheck )
+					!targetToCheck ||
+					!defaultView ||
+					!(targetToCheck instanceof defaultView.HTMLElement) ||
+					!element.contains(targetToCheck)
 				) {
 					return false;
 				}
@@ -92,39 +92,36 @@ export default function useDropZone( {
 				let elementToCheck = targetToCheck;
 
 				do {
-					if ( elementToCheck.dataset.isDropZone ) {
+					if (elementToCheck.dataset.isDropZone) {
 						return elementToCheck === element;
 					}
-				} while ( ( elementToCheck = elementToCheck.parentElement ) );
+				} while ((elementToCheck = elementToCheck.parentElement));
 
 				return false;
 			}
 
-			function maybeDragStart( /** @type {DragEvent} */ event ) {
-				if ( isDragging ) {
+			function maybeDragStart(/** @type {DragEvent} */ event) {
+				if (isDragging) {
 					return;
 				}
 
 				isDragging = true;
 
-				ownerDocument.removeEventListener(
-					'dragenter',
-					maybeDragStart
-				);
+				ownerDocument.removeEventListener('dragenter', maybeDragStart);
 
 				// Note that `dragend` doesn't fire consistently for file and
 				// HTML drag events where the drag origin is outside the browser
 				// window. In Firefox it may also not fire if the originating
 				// node is removed.
-				ownerDocument.addEventListener( 'dragend', maybeDragEnd );
-				ownerDocument.addEventListener( 'mousemove', maybeDragEnd );
+				ownerDocument.addEventListener('dragend', maybeDragEnd);
+				ownerDocument.addEventListener('mousemove', maybeDragEnd);
 
-				if ( onDragStartRef.current ) {
-					onDragStartRef.current( event );
+				if (onDragStartRef.current) {
+					onDragStartRef.current(event);
 				}
 			}
 
-			function onDragEnter( /** @type {DragEvent} */ event ) {
+			function onDragEnter(/** @type {DragEvent} */ event) {
 				event.preventDefault();
 
 				// The `dragenter` event will also fire when entering child
@@ -132,22 +129,20 @@ export default function useDropZone( {
 				// entering the drop zone, which means the `relatedTarget`
 				// (element that has been left) should be outside the drop zone.
 				if (
-					element.contains(
-						/** @type {Node} */ ( event.relatedTarget )
-					)
+					element.contains(/** @type {Node} */ (event.relatedTarget))
 				) {
 					return;
 				}
 
-				if ( onDragEnterRef.current ) {
-					onDragEnterRef.current( event );
+				if (onDragEnterRef.current) {
+					onDragEnterRef.current(event);
 				}
 			}
 
-			function onDragOver( /** @type {DragEvent} */ event ) {
+			function onDragOver(/** @type {DragEvent} */ event) {
 				// Only call onDragOver for the innermost hovered drop zones.
-				if ( ! event.defaultPrevented && onDragOverRef.current ) {
-					onDragOverRef.current( event );
+				if (!event.defaultPrevented && onDragOverRef.current) {
+					onDragOverRef.current(event);
 				}
 
 				// Prevent the browser default while also signalling to parent
@@ -155,24 +150,24 @@ export default function useDropZone( {
 				event.preventDefault();
 			}
 
-			function onDragLeave( /** @type {DragEvent} */ event ) {
+			function onDragLeave(/** @type {DragEvent} */ event) {
 				// The `dragleave` event will also fire when leaving child
 				// elements, but we only want to call `onDragLeave` when
 				// leaving the drop zone, which means the `relatedTarget`
 				// (element that has been entered) should be outside the drop
 				// zone.
-				if ( isElementInZone( event.relatedTarget ) ) {
+				if (isElementInZone(event.relatedTarget)) {
 					return;
 				}
 
-				if ( onDragLeaveRef.current ) {
-					onDragLeaveRef.current( event );
+				if (onDragLeaveRef.current) {
+					onDragLeaveRef.current(event);
 				}
 			}
 
-			function onDrop( /** @type {DragEvent} */ event ) {
+			function onDrop(/** @type {DragEvent} */ event) {
 				// Don't handle drop if an inner drop zone already handled it.
-				if ( event.defaultPrevented ) {
+				if (event.defaultPrevented) {
 					return;
 				}
 
@@ -186,49 +181,49 @@ export default function useDropZone( {
 				// eslint-disable-next-line no-unused-expressions
 				event.dataTransfer && event.dataTransfer.files.length;
 
-				if ( onDropRef.current ) {
-					onDropRef.current( event );
+				if (onDropRef.current) {
+					onDropRef.current(event);
 				}
 
-				maybeDragEnd( event );
+				maybeDragEnd(event);
 			}
 
-			function maybeDragEnd( /** @type {MouseEvent} */ event ) {
-				if ( ! isDragging ) {
+			function maybeDragEnd(/** @type {MouseEvent} */ event) {
+				if (!isDragging) {
 					return;
 				}
 
 				isDragging = false;
 
-				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
-				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
-				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
+				ownerDocument.addEventListener('dragenter', maybeDragStart);
+				ownerDocument.removeEventListener('dragend', maybeDragEnd);
+				ownerDocument.removeEventListener('mousemove', maybeDragEnd);
 
-				if ( onDragEndRef.current ) {
-					onDragEndRef.current( event );
+				if (onDragEndRef.current) {
+					onDragEndRef.current(event);
 				}
 			}
 
 			element.dataset.isDropZone = 'true';
-			element.addEventListener( 'drop', onDrop );
-			element.addEventListener( 'dragenter', onDragEnter );
-			element.addEventListener( 'dragover', onDragOver );
-			element.addEventListener( 'dragleave', onDragLeave );
+			element.addEventListener('drop', onDrop);
+			element.addEventListener('dragenter', onDragEnter);
+			element.addEventListener('dragover', onDragOver);
+			element.addEventListener('dragleave', onDragLeave);
 			// The `dragstart` event doesn't fire if the drag started outside
 			// the document.
-			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
+			ownerDocument.addEventListener('dragenter', maybeDragStart);
 
 			return () => {
 				delete element.dataset.isDropZone;
-				element.removeEventListener( 'drop', onDrop );
-				element.removeEventListener( 'dragenter', onDragEnter );
-				element.removeEventListener( 'dragover', onDragOver );
-				element.removeEventListener( 'dragleave', onDragLeave );
-				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
-				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
-				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
+				element.removeEventListener('drop', onDrop);
+				element.removeEventListener('dragenter', onDragEnter);
+				element.removeEventListener('dragover', onDragOver);
+				element.removeEventListener('dragleave', onDragLeave);
+				ownerDocument.removeEventListener('dragend', maybeDragEnd);
+				ownerDocument.removeEventListener('mousemove', maybeDragEnd);
+				ownerDocument.addEventListener('dragenter', maybeDragStart);
 			};
 		},
-		[ isDisabled ]
+		[isDisabled]
 	);
 }

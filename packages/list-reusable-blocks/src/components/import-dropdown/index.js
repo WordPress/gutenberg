@@ -14,23 +14,23 @@ import { Dropdown, Button } from '@wordpress/components';
  */
 import ImportForm from '../import-form';
 
-function ImportDropdown( { onUpload } ) {
+function ImportDropdown({ onUpload }) {
 	return (
 		<Dropdown
 			position="bottom right"
 			contentClassName="list-reusable-blocks-import-dropdown__content"
-			renderToggle={ ( { isOpen, onToggle } ) => (
+			renderToggle={({ isOpen, onToggle }) => (
 				<Button
-					aria-expanded={ isOpen }
-					onClick={ onToggle }
+					aria-expanded={isOpen}
+					onClick={onToggle}
 					variant="primary"
 				>
-					{ __( 'Import from JSON' ) }
+					{__('Import from JSON')}
 				</Button>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<ImportForm onUpload={ flow( onClose, onUpload ) } />
-			) }
+			)}
+			renderContent={({ onClose }) => (
+				<ImportForm onUpload={flow(onClose, onUpload)} />
+			)}
 		/>
 	);
 }

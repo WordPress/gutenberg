@@ -14,37 +14,37 @@ import { contextConnect } from '../context';
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                     forwardedRef
  */
-function ControlGroup( props, forwardedRef ) {
+function ControlGroup(props, forwardedRef) {
 	const {
 		children,
 		direction = 'row',
 		templateColumns,
 		...otherProps
-	} = useControlGroup( props );
+	} = useControlGroup(props);
 
-	const isGrid = !! templateColumns;
+	const isGrid = !!templateColumns;
 
-	if ( isGrid ) {
+	if (isGrid) {
 		return (
 			<Grid
-				gap={ 0 }
-				templateColumns={ templateColumns }
-				{ ...otherProps }
-				ref={ forwardedRef }
+				gap={0}
+				templateColumns={templateColumns}
+				{...otherProps}
+				ref={forwardedRef}
 			>
-				{ children }
+				{children}
 			</Grid>
 		);
 	}
 
 	return (
 		<Flex
-			direction={ direction }
-			gap={ `-1px` }
-			{ ...otherProps }
-			ref={ forwardedRef }
+			direction={direction}
+			gap={`-1px`}
+			{...otherProps}
+			ref={forwardedRef}
 		>
-			{ children }
+			{children}
 		</Flex>
 	);
 }
@@ -70,6 +70,6 @@ function ControlGroup( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedControlGroup = contextConnect( ControlGroup, 'ControlGroup' );
+const ConnectedControlGroup = contextConnect(ControlGroup, 'ControlGroup');
 
 export default ConnectedControlGroup;

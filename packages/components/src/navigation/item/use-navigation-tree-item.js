@@ -11,7 +11,7 @@ import { useNavigationGroupContext } from '../group/context';
 import { useNavigationMenuContext } from '../menu/context';
 import { normalizedSearch } from '../utils';
 
-export const useNavigationTreeItem = ( itemId, props ) => {
+export const useNavigationTreeItem = (itemId, props) => {
 	const {
 		activeMenu,
 		navigationTree: { addItem, removeItem },
@@ -19,20 +19,19 @@ export const useNavigationTreeItem = ( itemId, props ) => {
 	const { group } = useNavigationGroupContext();
 	const { menu, search } = useNavigationMenuContext();
 
-	useEffect( () => {
+	useEffect(() => {
 		const isMenuActive = activeMenu === menu;
-		const isItemVisible =
-			! search || normalizedSearch( props.title, search );
+		const isItemVisible = !search || normalizedSearch(props.title, search);
 
-		addItem( itemId, {
+		addItem(itemId, {
 			...props,
 			group,
 			menu,
 			_isVisible: isMenuActive && isItemVisible,
-		} );
+		});
 
 		return () => {
-			removeItem( itemId );
+			removeItem(itemId);
 		};
-	}, [ activeMenu, search ] );
+	}, [activeMenu, search]);
 };

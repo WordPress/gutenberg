@@ -21,66 +21,67 @@ import { menuItemsToBlocks } from './transform';
  * @param {number} menuId The id of menu to create a post from
  * @return {void}
  */
-export const getNavigationPostForMenu = ( menuId ) => async ( {
-	registry,
-	dispatch,
-} ) => {
-	if ( ! menuId ) {
-		return;
-	}
+export const getNavigationPostForMenu =
+	(menuId) =>
+	async ({ registry, dispatch }) => {
+		if (!menuId) {
+			return;
+		}
 
-	const stubPost = createStubPost( menuId );
-	// Persist an empty post to warm up the state
-	dispatch( persistPost( stubPost ) );
+		const stubPost = createStubPost(menuId);
+		// Persist an empty post to warm up the state
+		dispatch(persistPost(stubPost));
 
-	// Dispatch startResolution to skip the execution of the real getEntityRecord resolver - it would
-	// issue an http request and fail.
-	const args = [
-		NAVIGATION_POST_KIND,
-		NAVIGATION_POST_POST_TYPE,
-		stubPost.id,
-	];
-	registry.dispatch( coreStore ).startResolution( 'getEntityRecord', args );
+		// Dispatch startResolution to skip the execution of the real getEntityRecord resolver - it would
+		// issue an http request and fail.
+		const args = [
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
+			stubPost.id,
+		];
+		registry.dispatch(coreStore).startResolution('getEntityRecord', args);
 
-	// Now let's create a proper one hydrated using actual menu items
-	const menuItems = await registry
-		.resolveSelect( coreStore )
-		.getMenuItems( menuItemsQuery( menuId ) );
+		// Now let's create a proper one hydrated using actual menu items
+		const menuItems = await registry
+			.resolveSelect(coreStore)
+			.getMenuItems(menuItemsQuery(menuId));
 
-	const navigationBlock = createNavigationBlock( menuItems );
-	// Persist the actual post containing the navigation block
-	const builtPost = createStubPost( menuId, navigationBlock );
-	dispatch( persistPost( builtPost ) );
+		const navigationBlock = createNavigationBlock(menuItems);
+		// Persist the actual post containing the navigation block
+		const builtPost = createStubPost(menuId, navigationBlock);
+		dispatch(persistPost(builtPost));
 
-	// Dispatch finishResolution to conclude startResolution dispatched earlier
-	registry.dispatch( coreStore ).finishResolution( 'getEntityRecord', args );
-};
+		// Dispatch finishResolution to conclude startResolution dispatched earlier
+		registry.dispatch(coreStore).finishResolution('getEntityRecord', args);
+	};
 
-const createStubPost = ( menuId, navigationBlock = null ) => {
-	const id = buildNavigationPostId( menuId );
+const createStubPost = (menuId, navigationBlock = null) => {
+	const id = buildNavigationPostId(menuId);
 	return {
 		id,
 		slug: id,
 		status: 'draft',
 		type: 'page',
-		blocks: navigationBlock ? [ navigationBlock ] : [],
+		blocks: navigationBlock ? [navigationBlock] : [],
 		meta: {
 			menuId,
 		},
 	};
 };
 
-const persistPost = ( post ) => ( { registry } ) => {
-	registry
-		.dispatch( coreStore )
-		.receiveEntityRecords(
-			NAVIGATION_POST_KIND,
-			NAVIGATION_POST_POST_TYPE,
-			post,
-			{ id: post.id },
-			false
-		);
-};
+const persistPost =
+	(post) =>
+	({ registry }) => {
+		registry
+			.dispatch(coreStore)
+			.receiveEntityRecords(
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
+				post,
+				{ id: post.id },
+				false
+			);
+	};
 
 /**
  * Converts an adjacency list of menuItems into a navigation block.
@@ -88,8 +89,8 @@ const persistPost = ( post ) => ( { registry } ) => {
  * @param {Array} menuItems a list of menu items
  * @return {Object} Navigation block
  */
-function createNavigationBlock( menuItems ) {
-	const innerBlocks = menuItemsToBlocks( menuItems );
+function createNavigationBlock(menuItems) {
+	const innerBlocks = menuItemsToBlocks(menuItems);
 
 	return createBlock(
 		'core/navigation',

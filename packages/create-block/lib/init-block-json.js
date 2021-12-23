@@ -1,16 +1,16 @@
 /**
  * External dependencies
  */
-const { omitBy } = require( 'lodash' );
-const { join } = require( 'path' );
-const { writeFile } = require( 'fs' ).promises;
+const { omitBy } = require('lodash');
+const { join } = require('path');
+const { writeFile } = require('fs').promises;
 
 /**
  * Internal dependencies
  */
-const { info } = require( './log' );
+const { info } = require('./log');
 
-module.exports = async ( {
+module.exports = async ({
 	$schema,
 	apiVersion,
 	slug,
@@ -26,10 +26,10 @@ module.exports = async ( {
 	editorScript,
 	editorStyle,
 	style,
-} ) => {
-	const outputFile = join( process.cwd(), slug, 'block.json' );
-	info( '' );
-	info( 'Creating a "block.json" file.' );
+}) => {
+	const outputFile = join(process.cwd(), slug, 'block.json');
+	info('');
+	info('Creating a "block.json" file.');
 	await writeFile(
 		outputFile,
 		JSON.stringify(
@@ -50,7 +50,7 @@ module.exports = async ( {
 					editorStyle,
 					style,
 				},
-				( value ) => ! value
+				(value) => !value
 			),
 			null,
 			'\t'

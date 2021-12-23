@@ -8,15 +8,15 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import BlockMover from '../block-mover';
 
-function BlockMobileToolbar( { clientId } ) {
-	const isMobile = useViewportMatch( 'small', '<' );
-	if ( ! isMobile ) {
+function BlockMobileToolbar({ clientId }) {
+	const isMobile = useViewportMatch('small', '<');
+	if (!isMobile) {
 		return null;
 	}
 
 	return (
 		<div className="block-editor-block-mobile-toolbar">
-			<BlockMover clientIds={ [ clientId ] } />
+			<BlockMover clientIds={[clientId]} />
 		</div>
 	);
 }

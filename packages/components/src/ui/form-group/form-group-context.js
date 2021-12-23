@@ -18,14 +18,14 @@ const initialContext = {
 /**
  * @type {import('react').Context<FormGroupContext>}
  */
-export const FormGroupContext = createContext( initialContext );
-export const useFormGroupContext = () => useContext( FormGroupContext );
+export const FormGroupContext = createContext(initialContext);
+export const useFormGroupContext = () => useContext(FormGroupContext);
 
 /**
  * @param {string | undefined} id The preferred id for the form group element.
  * @return {import('react').ReactText | undefined} The form group context id.
  */
-export const useFormGroupContextId = ( id ) => {
+export const useFormGroupContextId = (id) => {
 	const contextId = useFormGroupContext().id;
 	return id || contextId;
 };

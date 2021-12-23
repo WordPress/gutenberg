@@ -19,6 +19,6 @@ export const RESET_VALUE = '';
  *
  * @return {boolean} Whether the lineHeight attribute is valid.
  */
-export function isLineHeightDefined( lineHeight ) {
+export function isLineHeightDefined(lineHeight) {
 	return lineHeight !== undefined && lineHeight !== RESET_VALUE;
 }

@@ -1,4 +1,4 @@
-export type ResponsiveCSSValue< T > = Array< T | undefined > | T;
+export type ResponsiveCSSValue<T> = Array<T | undefined> | T;
 
 export type PopperPlacement =
 	| 'auto'

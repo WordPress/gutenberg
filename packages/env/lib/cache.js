@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
-const fs = require( 'fs' ).promises;
+const path = require('path');
+const fs = require('fs').promises;
 
 /**
  * Options for cache parsing.
@@ -24,8 +24,8 @@ const CACHE_FILE_NAME = 'wp-env-cache.json';
  *
  * @return {boolean} If true, the value is different from the cache which exists.
  */
-async function didCacheChange( key, value, options ) {
-	const existingValue = await getCache( key, options );
+async function didCacheChange(key, value, options) {
+	const existingValue = await getCache(key, options);
 	return value !== existingValue;
 }
 
@@ -38,13 +38,13 @@ async function didCacheChange( key, value, options ) {
  * @param {any}               value   The value to persist.
  * @param {WPEnvCacheOptions} options Parsing options
  */
-async function setCache( key, value, options ) {
-	const existingCache = await getCacheFile( options );
-	existingCache[ key ] = value;
+async function setCache(key, value, options) {
+	const existingCache = await getCacheFile(options);
+	existingCache[key] = value;
 
 	await fs.writeFile(
-		getPathToCacheFile( options.workDirectoryPath ),
-		JSON.stringify( existingCache )
+		getPathToCacheFile(options.workDirectoryPath),
+		JSON.stringify(existingCache)
 	);
 }
 
@@ -59,9 +59,9 @@ async function setCache( key, value, options ) {
  * @return {any?} The cache value. Undefined if it has not been set or if the cache
  *                file has not been created.
  */
-async function getCache( key, options ) {
-	const cache = await getCacheFile( options );
-	return cache[ key ];
+async function getCache(key, options) {
+	const cache = await getCacheFile(options);
+	return cache[key];
 }
 
 /**
@@ -72,18 +72,18 @@ async function getCache( key, options ) {
  *
  * @return {Object} The data from the cache file. Empty if the file does not exist.
  */
-async function getCacheFile( { workDirectoryPath } ) {
-	const filename = getPathToCacheFile( workDirectoryPath );
+async function getCacheFile({ workDirectoryPath }) {
+	const filename = getPathToCacheFile(workDirectoryPath);
 	try {
-		const rawCache = await fs.readFile( filename );
-		return JSON.parse( rawCache );
+		const rawCache = await fs.readFile(filename);
+		return JSON.parse(rawCache);
 	} catch {
 		return {};
 	}
 }
 
-function getPathToCacheFile( workDirectoryPath ) {
-	return path.resolve( workDirectoryPath, CACHE_FILE_NAME );
+function getPathToCacheFile(workDirectoryPath) {
+	return path.resolve(workDirectoryPath, CACHE_FILE_NAME);
 }
 
 module.exports = { didCacheChange, setCache, getCache, getCacheFile };

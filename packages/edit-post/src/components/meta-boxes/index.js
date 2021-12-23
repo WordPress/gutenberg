@@ -17,43 +17,43 @@ import MetaBoxesArea from './meta-boxes-area';
 import MetaBoxVisibility from './meta-box-visibility';
 import { store as editPostStore } from '../../store';
 
-export default function MetaBoxes( { location } ) {
+export default function MetaBoxes({ location }) {
 	const registry = useRegistry();
 	const { metaBoxes, areMetaBoxesInitialized, isEditorReady } = useSelect(
-		( select ) => {
-			const { __unstableIsEditorReady } = select( editorStore );
+		(select) => {
+			const { __unstableIsEditorReady } = select(editorStore);
 			const {
 				getMetaBoxesPerLocation,
 				areMetaBoxesInitialized: _areMetaBoxesInitialized,
-			} = select( editPostStore );
+			} = select(editPostStore);
 			return {
-				metaBoxes: getMetaBoxesPerLocation( location ),
+				metaBoxes: getMetaBoxesPerLocation(location),
 				areMetaBoxesInitialized: _areMetaBoxesInitialized(),
 				isEditorReady: __unstableIsEditorReady(),
 			};
 		},
-		[ location ]
+		[location]
 	);
 
 	// When editor is ready, initialize postboxes (wp core script) and metabox
 	// saving. This initializes all meta box locations, not just this specific
 	// one.
-	useEffect( () => {
-		if ( isEditorReady && ! areMetaBoxesInitialized ) {
-			registry.dispatch( editPostStore ).initializeMetaBoxes();
+	useEffect(() => {
+		if (isEditorReady && !areMetaBoxesInitialized) {
+			registry.dispatch(editPostStore).initializeMetaBoxes();
 		}
-	}, [ isEditorReady, areMetaBoxesInitialized ] );
+	}, [isEditorReady, areMetaBoxesInitialized]);
 
-	if ( ! areMetaBoxesInitialized ) {
+	if (!areMetaBoxesInitialized) {
 		return null;
 	}
 
 	return (
 		<>
-			{ map( metaBoxes, ( { id } ) => (
-				<MetaBoxVisibility key={ id } id={ id } />
-			) ) }
-			<MetaBoxesArea location={ location } />
+			{map(metaBoxes, ({ id }) => (
+				<MetaBoxVisibility key={id} id={id} />
+			))}
+			<MetaBoxesArea location={location} />
 		</>
 	);
 }

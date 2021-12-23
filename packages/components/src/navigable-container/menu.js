@@ -19,27 +19,27 @@ export function NavigableMenu(
 	{ role = 'menu', orientation = 'vertical', ...rest },
 	ref
 ) {
-	const eventToOffset = ( evt ) => {
+	const eventToOffset = (evt) => {
 		const { keyCode } = evt;
 
-		let next = [ DOWN ];
-		let previous = [ UP ];
+		let next = [DOWN];
+		let previous = [UP];
 
-		if ( orientation === 'horizontal' ) {
-			next = [ RIGHT ];
-			previous = [ LEFT ];
+		if (orientation === 'horizontal') {
+			next = [RIGHT];
+			previous = [LEFT];
 		}
 
-		if ( orientation === 'both' ) {
-			next = [ RIGHT, DOWN ];
-			previous = [ LEFT, UP ];
+		if (orientation === 'both') {
+			next = [RIGHT, DOWN];
+			previous = [LEFT, UP];
 		}
 
-		if ( includes( next, keyCode ) ) {
+		if (includes(next, keyCode)) {
 			return 1;
-		} else if ( includes( previous, keyCode ) ) {
+		} else if (includes(previous, keyCode)) {
 			return -1;
-		} else if ( includes( [ DOWN, UP, LEFT, RIGHT ], keyCode ) ) {
+		} else if (includes([DOWN, UP, LEFT, RIGHT], keyCode)) {
 			// Key press should be handled, e.g. have event propagation and
 			// default behavior handled by NavigableContainer but not result
 			// in an offset.
@@ -49,15 +49,15 @@ export function NavigableMenu(
 
 	return (
 		<NavigableContainer
-			ref={ ref }
+			ref={ref}
 			stopNavigationEvents
-			onlyBrowserTabstops={ false }
-			role={ role }
-			aria-orientation={ role === 'presentation' ? null : orientation }
-			eventToOffset={ eventToOffset }
-			{ ...rest }
+			onlyBrowserTabstops={false}
+			role={role}
+			aria-orientation={role === 'presentation' ? null : orientation}
+			eventToOffset={eventToOffset}
+			{...rest}
 		/>
 	);
 }
 
-export default forwardRef( NavigableMenu );
+export default forwardRef(NavigableMenu);

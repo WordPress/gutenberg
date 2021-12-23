@@ -21,12 +21,12 @@ let editorInitialized = false;
  * @param {Object} postType Post type of the post to edit.
  * @param {Object} postId   ID of the post to edit (unused right now)
  */
-export function initializeEditor( id, postType, postId ) {
-	if ( editorInitialized ) {
+export function initializeEditor(id, postType, postId) {
+	if (editorInitialized) {
 		return;
 	}
 
 	editorInitialized = true;
 
-	render( <Editor postId={ postId } postType={ postType } />, id );
+	render(<Editor postId={postId} postType={postType} />, id);
 }

@@ -39,34 +39,34 @@ import { browserSupportsPdfs } from './utils';
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
 
-function ClipboardToolbarButton( { text, disabled } ) {
-	const { createNotice } = useDispatch( noticesStore );
-	const ref = useCopyToClipboard( text, () => {
-		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+function ClipboardToolbarButton({ text, disabled }) {
+	const { createNotice } = useDispatch(noticesStore);
+	const ref = useCopyToClipboard(text, () => {
+		createNotice('info', __('Copied URL to clipboard.'), {
 			isDismissible: true,
 			type: 'snackbar',
-		} );
-	} );
+		});
+	});
 
 	return (
 		<ToolbarButton
 			className="components-clipboard-toolbar-button"
-			ref={ ref }
-			disabled={ disabled }
+			ref={ref}
+			disabled={disabled}
 		>
-			{ __( 'Copy URL' ) }
+			{__('Copy URL')}
 		</ToolbarButton>
 	);
 }
 
-function FileEdit( {
+function FileEdit({
 	attributes,
 	isSelected,
 	setAttributes,
 	noticeUI,
 	noticeOperations,
 	clientId,
-} ) {
+}) {
 	const {
 		id,
 		fileName,
@@ -78,136 +78,131 @@ function FileEdit( {
 		displayPreview,
 		previewHeight,
 	} = attributes;
-	const [ hasError, setHasError ] = useState( false );
+	const [hasError, setHasError] = useState(false);
 	const { media, mediaUpload } = useSelect(
-		( select ) => ( {
+		(select) => ({
 			media:
-				id === undefined
-					? undefined
-					: select( coreStore ).getMedia( id ),
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
-		} ),
-		[ id ]
+				id === undefined ? undefined : select(coreStore).getMedia(id),
+			mediaUpload: select(blockEditorStore).getSettings().mediaUpload,
+		}),
+		[id]
 	);
 
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const { toggleSelection } = useDispatch(blockEditorStore);
 
-	useEffect( () => {
+	useEffect(() => {
 		// Upload a file drag-and-dropped into the editor
-		if ( isBlobURL( href ) ) {
-			const file = getBlobByURL( href );
+		if (isBlobURL(href)) {
+			const file = getBlobByURL(href);
 
-			mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
-				onError: ( message ) => {
-					setHasError( true );
-					noticeOperations.createErrorNotice( message );
+			mediaUpload({
+				filesList: [file],
+				onFileChange: ([newMedia]) => onSelectFile(newMedia),
+				onError: (message) => {
+					setHasError(true);
+					noticeOperations.createErrorNotice(message);
 				},
-			} );
+			});
 
-			revokeBlobURL( href );
+			revokeBlobURL(href);
 		}
 
-		if ( downloadButtonText === undefined ) {
-			changeDownloadButtonText( _x( 'Download', 'button label' ) );
+		if (downloadButtonText === undefined) {
+			changeDownloadButtonText(_x('Download', 'button label'));
 		}
-	}, [] );
+	}, []);
 
-	useEffect( () => {
+	useEffect(() => {
 		// Add a unique fileId to each file block
-		setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
-	}, [ clientId ] );
+		setAttributes({ fileId: `wp-block-file--media-${clientId}` });
+	}, [clientId]);
 
-	function onSelectFile( newMedia ) {
-		if ( newMedia && newMedia.url ) {
-			setHasError( false );
-			const isPdf = newMedia.url.endsWith( '.pdf' );
-			setAttributes( {
+	function onSelectFile(newMedia) {
+		if (newMedia && newMedia.url) {
+			setHasError(false);
+			const isPdf = newMedia.url.endsWith('.pdf');
+			setAttributes({
 				href: newMedia.url,
 				fileName: newMedia.title,
 				textLinkHref: newMedia.url,
 				id: newMedia.id,
 				displayPreview: isPdf ? true : undefined,
 				previewHeight: isPdf ? 600 : undefined,
-			} );
+			});
 		}
 	}
 
-	function onUploadError( message ) {
-		setHasError( true );
+	function onUploadError(message) {
+		setHasError(true);
 		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		noticeOperations.createErrorNotice(message);
 	}
 
-	function changeLinkDestinationOption( newHref ) {
+	function changeLinkDestinationOption(newHref) {
 		// Choose Media File or Attachment Page (when file is in Media Library)
-		setAttributes( { textLinkHref: newHref } );
+		setAttributes({ textLinkHref: newHref });
 	}
 
-	function changeOpenInNewWindow( newValue ) {
-		setAttributes( {
+	function changeOpenInNewWindow(newValue) {
+		setAttributes({
 			textLinkTarget: newValue ? '_blank' : false,
-		} );
+		});
 	}
 
-	function changeShowDownloadButton( newValue ) {
-		setAttributes( { showDownloadButton: newValue } );
+	function changeShowDownloadButton(newValue) {
+		setAttributes({ showDownloadButton: newValue });
 	}
 
-	function changeDownloadButtonText( newValue ) {
+	function changeDownloadButtonText(newValue) {
 		// Remove anchor tags from button text content.
-		setAttributes( {
-			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
-		} );
+		setAttributes({
+			downloadButtonText: newValue.replace(/<\/?a[^>]*>/g, ''),
+		});
 	}
 
-	function changeDisplayPreview( newValue ) {
-		setAttributes( { displayPreview: newValue } );
+	function changeDisplayPreview(newValue) {
+		setAttributes({ displayPreview: newValue });
 	}
 
-	function handleOnResizeStop( event, direction, elt, delta ) {
-		toggleSelection( true );
+	function handleOnResizeStop(event, direction, elt, delta) {
+		toggleSelection(true);
 
-		const newHeight = parseInt( previewHeight + delta.height, 10 );
-		setAttributes( { previewHeight: newHeight } );
+		const newHeight = parseInt(previewHeight + delta.height, 10);
+		setAttributes({ previewHeight: newHeight });
 	}
 
-	function changePreviewHeight( newValue ) {
-		const newHeight = Math.max(
-			parseInt( newValue, 10 ),
-			MIN_PREVIEW_HEIGHT
-		);
-		setAttributes( { previewHeight: newHeight } );
+	function changePreviewHeight(newValue) {
+		const newHeight = Math.max(parseInt(newValue, 10), MIN_PREVIEW_HEIGHT);
+		setAttributes({ previewHeight: newHeight });
 	}
 
 	const attachmentPage = media && media.link;
 
-	const blockProps = useBlockProps( {
+	const blockProps = useBlockProps({
 		className: classnames(
-			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
+			isBlobURL(href) && getAnimateClassName({ type: 'loading' }),
 			{
-				'is-transient': isBlobURL( href ),
+				'is-transient': isBlobURL(href),
 			}
 		),
-	} );
+	});
 
 	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
-	if ( ! href || hasError ) {
+	if (!href || hasError) {
 		return (
-			<div { ...blockProps }>
+			<div {...blockProps}>
 				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					labels={ {
-						title: __( 'File' ),
+					icon={<BlockIcon icon={icon} />}
+					labels={{
+						title: __('File'),
 						instructions: __(
 							'Upload a file or pick one from your media library.'
 						),
-					} }
-					onSelect={ onSelectFile }
-					notices={ noticeUI }
-					onError={ onUploadError }
+					}}
+					onSelect={onSelectFile}
+					notices={noticeUI}
+					onError={onUploadError}
 					accept="*"
 				/>
 			</div>
@@ -217,9 +212,9 @@ function FileEdit( {
 	return (
 		<>
 			<FileBlockInspector
-				hrefs={ { href, textLinkHref, attachmentPage } }
-				{ ...{
-					openInNewWindow: !! textLinkTarget,
+				hrefs={{ href, textLinkHref, attachmentPage }}
+				{...{
+					openInNewWindow: !!textLinkTarget,
 					showDownloadButton,
 					changeLinkDestinationOption,
 					changeOpenInNewWindow,
@@ -228,30 +223,30 @@ function FileEdit( {
 					changeDisplayPreview,
 					previewHeight,
 					changePreviewHeight,
-				} }
+				}}
 			/>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ href }
+					mediaId={id}
+					mediaURL={href}
 					accept="*"
-					onSelect={ onSelectFile }
-					onError={ onUploadError }
+					onSelect={onSelectFile}
+					onError={onUploadError}
 				/>
 				<ClipboardToolbarButton
-					text={ href }
-					disabled={ isBlobURL( href ) }
+					text={href}
+					disabled={isBlobURL(href)}
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
-				{ displayPreviewInEditor && (
+			<div {...blockProps}>
+				{displayPreviewInEditor && (
 					<ResizableBox
-						size={ { height: previewHeight } }
-						minHeight={ MIN_PREVIEW_HEIGHT }
-						maxHeight={ MAX_PREVIEW_HEIGHT }
+						size={{ height: previewHeight }}
+						minHeight={MIN_PREVIEW_HEIGHT}
+						maxHeight={MAX_PREVIEW_HEIGHT}
 						minWidth="100%"
-						grid={ [ 10, 10 ] }
-						enable={ {
+						grid={[10, 10]}
+						enable={{
 							top: false,
 							right: false,
 							bottom: true,
@@ -260,59 +255,53 @@ function FileEdit( {
 							bottomRight: false,
 							bottomLeft: false,
 							topLeft: false,
-						} }
-						onResizeStart={ () => toggleSelection( false ) }
-						onResizeStop={ handleOnResizeStop }
-						showHandle={ isSelected }
+						}}
+						onResizeStart={() => toggleSelection(false)}
+						onResizeStop={handleOnResizeStop}
+						showHandle={isSelected}
 					>
 						<object
 							className="wp-block-file__preview"
-							data={ href }
+							data={href}
 							type="application/pdf"
-							aria-label={ __(
-								'Embed of the selected PDF file.'
-							) }
+							aria-label={__('Embed of the selected PDF file.')}
 						/>
-						{ ! isSelected && (
+						{!isSelected && (
 							<div className="wp-block-file__preview-overlay" />
-						) }
+						)}
 					</ResizableBox>
-				) }
-				<div className={ 'wp-block-file__content-wrapper' }>
+				)}
+				<div className={'wp-block-file__content-wrapper'}>
 					<RichText
 						tagName="a"
-						value={ fileName }
-						placeholder={ __( 'Write file name…' ) }
+						value={fileName}
+						placeholder={__('Write file name…')}
 						withoutInteractiveFormatting
-						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
-						}
-						href={ textLinkHref }
+						onChange={(text) => setAttributes({ fileName: text })}
+						href={textLinkHref}
 					/>
-					{ showDownloadButton && (
+					{showDownloadButton && (
 						<div
-							className={
-								'wp-block-file__button-richtext-wrapper'
-							}
+							className={'wp-block-file__button-richtext-wrapper'}
 						>
-							{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
+							{/* Using RichText here instead of PlainText so that it can be styled like a button */}
 							<RichText
 								tagName="div" // must be block-level or else cursor disappears
-								aria-label={ __( 'Download button text' ) }
-								className={ 'wp-block-file__button' }
-								value={ downloadButtonText }
+								aria-label={__('Download button text')}
+								className={'wp-block-file__button'}
+								value={downloadButtonText}
 								withoutInteractiveFormatting
-								placeholder={ __( 'Add text…' ) }
-								onChange={ ( text ) =>
-									changeDownloadButtonText( text )
+								placeholder={__('Add text…')}
+								onChange={(text) =>
+									changeDownloadButtonText(text)
 								}
 							/>
 						</div>
-					) }
+					)}
 				</div>
 			</div>
 		</>
 	);
 }
 
-export default withNotices( FileEdit );
+export default withNotices(FileEdit);

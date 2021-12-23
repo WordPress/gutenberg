@@ -9,21 +9,18 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 
 export default function UndoButton() {
-	const hasUndo = useSelect(
-		( select ) => select( coreStore ).hasUndo(),
-		[]
-	);
-	const { undo } = useDispatch( coreStore );
+	const hasUndo = useSelect((select) => select(coreStore).hasUndo(), []);
+	const { undo } = useDispatch(coreStore);
 	return (
 		<Button
-			icon={ ! isRTL() ? undoIcon : redoIcon }
-			label={ __( 'Undo' ) }
-			shortcut={ displayShortcut.primary( 'z' ) }
+			icon={!isRTL() ? undoIcon : redoIcon}
+			label={__('Undo')}
+			shortcut={displayShortcut.primary('z')}
 			// If there are no undo levels we don't want to actually disable this
 			// button, because it will remove focus for keyboard users.
 			// See: https://github.com/WordPress/gutenberg/issues/3486
-			aria-disabled={ ! hasUndo }
-			onClick={ hasUndo ? undo : undefined }
+			aria-disabled={!hasUndo}
+			onClick={hasUndo ? undo : undefined}
 		/>
 	);
 }

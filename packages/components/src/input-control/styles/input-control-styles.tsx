@@ -18,7 +18,7 @@ import type { LabelPosition, Size } from '../types';
 type ContainerProps = {
 	disabled?: boolean;
 	hideLabel?: boolean;
-	__unstableInputWidth?: CSSProperties[ 'width' ];
+	__unstableInputWidth?: CSSProperties['width'];
 	labelPosition?: LabelPosition;
 };
 
@@ -27,14 +27,14 @@ type RootProps = {
 	labelPosition?: LabelPosition;
 };
 
-const rootFocusedStyles = ( { isFocused }: RootProps ) => {
-	if ( ! isFocused ) return '';
+const rootFocusedStyles = ({ isFocused }: RootProps) => {
+	if (!isFocused) return '';
 
-	return css( { zIndex: 1 } );
+	return css({ zIndex: 1 });
 };
 
-const rootLabelPositionStyles = ( { labelPosition }: RootProps ) => {
-	switch ( labelPosition ) {
+const rootLabelPositionStyles = ({ labelPosition }: RootProps) => {
+	switch (labelPosition) {
 		case 'top':
 			return css`
 				align-items: flex-start;
@@ -54,45 +54,45 @@ const rootLabelPositionStyles = ( { labelPosition }: RootProps ) => {
 	}
 };
 
-export const Root = styled( Flex )< RootProps >`
+export const Root = styled(Flex)<RootProps>`
 	position: relative;
 	border-radius: 2px;
 	padding-top: 0;
-	${ rootFocusedStyles }
-	${ rootLabelPositionStyles }
+	${rootFocusedStyles}
+	${rootLabelPositionStyles}
 `;
 
-const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
+const containerDisabledStyles = ({ disabled }: ContainerProps) => {
 	const backgroundColor = disabled
 		? COLORS.ui.backgroundDisabled
 		: COLORS.ui.background;
 
-	return css( { backgroundColor } );
+	return css({ backgroundColor });
 };
 
 // Normalizes the margins from the <Flex /> (components/ui/flex/) container.
-const containerMarginStyles = ( { hideLabel }: ContainerProps ) => {
-	return hideLabel ? css( { margin: '0 !important' } ) : null;
+const containerMarginStyles = ({ hideLabel }: ContainerProps) => {
+	return hideLabel ? css({ margin: '0 !important' }) : null;
 };
 
-const containerWidthStyles = ( {
+const containerWidthStyles = ({
 	__unstableInputWidth,
 	labelPosition,
-}: ContainerProps ) => {
-	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
+}: ContainerProps) => {
+	if (!__unstableInputWidth) return css({ width: '100%' });
 
-	if ( labelPosition === 'side' ) return '';
+	if (labelPosition === 'side') return '';
 
-	if ( labelPosition === 'edge' ) {
-		return css( {
-			flex: `0 0 ${ __unstableInputWidth }`,
-		} );
+	if (labelPosition === 'edge') {
+		return css({
+			flex: `0 0 ${__unstableInputWidth}`,
+		});
 	}
 
-	return css( { width: __unstableInputWidth } );
+	return css({ width: __unstableInputWidth });
 };
 
-export const Container = styled.div< ContainerProps >`
+export const Container = styled.div<ContainerProps>`
 	align-items: center;
 	box-sizing: border-box;
 	border-radius: inherit;
@@ -100,48 +100,48 @@ export const Container = styled.div< ContainerProps >`
 	flex: 1;
 	position: relative;
 
-	${ containerDisabledStyles }
-	${ containerMarginStyles }
-	${ containerWidthStyles }
+	${containerDisabledStyles}
+	${containerMarginStyles}
+	${containerWidthStyles}
 `;
 
 type InputProps = {
 	disabled?: boolean;
 	inputSize?: Size;
 	isDragging?: boolean;
-	dragCursor?: CSSProperties[ 'cursor' ];
+	dragCursor?: CSSProperties['cursor'];
 };
 
-const disabledStyles = ( { disabled }: InputProps ) => {
-	if ( ! disabled ) return '';
+const disabledStyles = ({ disabled }: InputProps) => {
+	if (!disabled) return '';
 
-	return css( {
+	return css({
 		color: COLORS.ui.textDisabled,
-	} );
+	});
 };
 
-const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+const fontSizeStyles = ({ inputSize: size }: InputProps) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
 		'__unstable-large': '13px',
 	};
 
-	const fontSize = sizes[ size as Size ] || sizes.default;
+	const fontSize = sizes[size as Size] || sizes.default;
 	const fontSizeMobile = '16px';
 
-	if ( ! fontSize ) return '';
+	if (!fontSize) return '';
 
 	return css`
-		font-size: ${ fontSizeMobile };
+		font-size: ${fontSizeMobile};
 
-		@media ( min-width: 600px ) {
-			font-size: ${ fontSize };
+		@media (min-width: 600px) {
+			font-size: ${fontSize};
 		}
 	`;
 };
 
-const sizeStyles = ( { inputSize: size }: InputProps ) => {
+const sizeStyles = ({ inputSize: size }: InputProps) => {
 	const sizes = {
 		default: {
 			height: 30,
@@ -166,18 +166,18 @@ const sizeStyles = ( { inputSize: size }: InputProps ) => {
 		},
 	};
 
-	const style = sizes[ size as Size ] || sizes.default;
+	const style = sizes[size as Size] || sizes.default;
 
-	return css( style );
+	return css(style);
 };
 
-const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
+const dragStyles = ({ isDragging, dragCursor }: InputProps) => {
 	let defaultArrowStyles: SerializedStyles | undefined;
 	let activeDragCursorStyles: SerializedStyles | undefined;
 
-	if ( isDragging ) {
+	if (isDragging) {
 		defaultArrowStyles = css`
-			cursor: ${ dragCursor };
+			cursor: ${dragCursor};
 			user-select: none;
 
 			&::-webkit-outer-spin-button,
@@ -188,39 +188,39 @@ const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
 		`;
 	}
 
-	if ( isDragging && dragCursor ) {
+	if (isDragging && dragCursor) {
 		activeDragCursorStyles = css`
 			&:active {
-				cursor: ${ dragCursor };
+				cursor: ${dragCursor};
 			}
 		`;
 	}
 
 	return css`
-		${ defaultArrowStyles }
-		${ activeDragCursorStyles }
+		${defaultArrowStyles}
+		${activeDragCursorStyles}
 	`;
 };
 
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
-export const Input = styled.input< InputProps >`
+export const Input = styled.input<InputProps>`
 	&&& {
 		background-color: transparent;
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.black };
+		color: ${COLORS.black};
 		display: block;
 		margin: 0;
 		outline: none;
 		width: 100%;
 
-		${ dragStyles }
-		${ disabledStyles }
-		${ fontSizeStyles }
-		${ sizeStyles }
+		${dragStyles}
+		${disabledStyles}
+		${fontSizeStyles}
+		${sizeStyles}
 
 		&::-webkit-input-placeholder {
 			line-height: normal;
@@ -228,21 +228,17 @@ export const Input = styled.input< InputProps >`
 	}
 `;
 
-const labelPadding = ( {
-	labelPosition,
-}: {
-	labelPosition?: LabelPosition;
-} ) => {
+const labelPadding = ({ labelPosition }: { labelPosition?: LabelPosition }) => {
 	let paddingBottom = 4;
 
-	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
+	if (labelPosition === 'edge' || labelPosition === 'side') {
 		paddingBottom = 0;
 	}
 
-	return css( { paddingTop: 0, paddingBottom } );
+	return css({ paddingTop: 0, paddingBottom });
 };
 
-const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+const BaseLabel = styled(Text)<{ labelPosition?: LabelPosition }>`
 	&&& {
 		box-sizing: border-box;
 		color: currentColor;
@@ -251,7 +247,7 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 		max-width: 100%;
 		z-index: 1;
 
-		${ labelPadding }
+		${labelPadding}
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -264,10 +260,10 @@ export const Label = (
 		'label',
 		false
 	>
-) => <BaseLabel { ...props } as="label" />;
+) => <BaseLabel {...props} as="label" />;
 
-export const LabelWrapper = styled( FlexItem )`
-	max-width: calc( 100% - 10px );
+export const LabelWrapper = styled(FlexItem)`
+	max-width: calc(100% - 10px);
 `;
 
 type BackdropProps = {
@@ -275,31 +271,31 @@ type BackdropProps = {
 	isFocused?: boolean;
 };
 
-const backdropFocusedStyles = ( {
+const backdropFocusedStyles = ({
 	disabled,
 	isFocused,
-}: BackdropProps ): SerializedStyles => {
+}: BackdropProps): SerializedStyles => {
 	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
 
 	let boxShadow;
 
-	if ( isFocused ) {
-		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
+	if (isFocused) {
+		boxShadow = `0 0 0 1px ${COLORS.ui.borderFocus} inset`;
 	}
 
-	if ( disabled ) {
+	if (disabled) {
 		borderColor = COLORS.ui.borderDisabled;
 	}
 
-	return css( {
+	return css({
 		boxShadow,
 		borderColor,
 		borderStyle: 'solid',
 		borderWidth: 1,
-	} );
+	});
 };
 
-export const BackdropUI = styled.div< BackdropProps >`
+export const BackdropUI = styled.div<BackdropProps>`
 	&&& {
 		box-sizing: border-box;
 		border-radius: inherit;
@@ -312,8 +308,8 @@ export const BackdropUI = styled.div< BackdropProps >`
 		right: 0;
 		top: 0;
 
-		${ backdropFocusedStyles }
-		${ rtl( { paddingLeft: 2 } ) }
+		${backdropFocusedStyles}
+		${rtl({ paddingLeft: 2 })}
 	}
 `;
 

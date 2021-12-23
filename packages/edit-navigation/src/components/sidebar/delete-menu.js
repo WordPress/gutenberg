@@ -4,15 +4,15 @@
 import { __ } from '@wordpress/i18n';
 import { Button, PanelBody } from '@wordpress/components';
 
-export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
+export default function DeleteMenu({ onDeleteMenu, isMenuBeingDeleted }) {
 	return (
 		<PanelBody>
 			<Button
 				className="edit-navigation-inspector-additions__delete-menu-button"
 				variant="secondary"
 				isDestructive
-				isBusy={ isMenuBeingDeleted }
-				onClick={ () => {
+				isBusy={isMenuBeingDeleted}
+				onClick={() => {
 					if (
 						// eslint-disable-next-line no-alert
 						window.confirm(
@@ -23,9 +23,9 @@ export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 					) {
 						onDeleteMenu();
 					}
-				} }
+				}}
 			>
-				{ __( 'Delete menu' ) }
+				{__('Delete menu')}
 			</Button>
 		</PanelBody>
 	);

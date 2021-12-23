@@ -31,7 +31,7 @@ export const settings = {
 	transforms,
 	edit,
 	save,
-	merge( attributes, attributesToMerge ) {
+	merge(attributes, attributesToMerge) {
 		return {
 			content: attributes.content + attributesToMerge.content,
 		};

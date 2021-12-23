@@ -20,20 +20,20 @@ const BLOCK_CONTEXT_CACHE = new WeakMap();
  *
  * @return {Record<string,*>} Context value.
  */
-export default function getBlockContext( attributes, blockType ) {
-	if ( ! BLOCK_CONTEXT_CACHE.has( blockType ) ) {
-		BLOCK_CONTEXT_CACHE.set( blockType, new WeakMap() );
+export default function getBlockContext(attributes, blockType) {
+	if (!BLOCK_CONTEXT_CACHE.has(blockType)) {
+		BLOCK_CONTEXT_CACHE.set(blockType, new WeakMap());
 	}
 
-	const blockTypeCache = BLOCK_CONTEXT_CACHE.get( blockType );
-	if ( ! blockTypeCache.has( attributes ) ) {
+	const blockTypeCache = BLOCK_CONTEXT_CACHE.get(blockType);
+	if (!blockTypeCache.has(attributes)) {
 		const context = mapValues(
 			blockType.providesContext,
-			( attributeName ) => attributes[ attributeName ]
+			(attributeName) => attributes[attributeName]
 		);
 
-		blockTypeCache.set( attributes, context );
+		blockTypeCache.set(attributes, context);
 	}
 
-	return blockTypeCache.get( attributes );
+	return blockTypeCache.get(attributes);
 }

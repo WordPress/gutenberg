@@ -27,10 +27,10 @@ export const _default = () => {
 		},
 		'info'
 	);
-	const isDismissible = boolean( 'Is Dismissible', true );
+	const isDismissible = boolean('Is Dismissible', true);
 
 	return (
-		<Notice status={ status } isDismissible={ isDismissible }>
+		<Notice status={status} isDismissible={isDismissible}>
 			<p>This is a notice.</p>
 		</Notice>
 	);
@@ -47,7 +47,7 @@ export const withCustomSpokenMessage = () => {
 		},
 		'info'
 	);
-	const isDismissible = boolean( 'Is Dismissible', true );
+	const isDismissible = boolean('Is Dismissible', true);
 	const politeness = select(
 		'Politeness',
 		{
@@ -63,10 +63,10 @@ export const withCustomSpokenMessage = () => {
 
 	return (
 		<Notice
-			status={ status }
-			isDismissible={ isDismissible }
-			politeness={ politeness }
-			spokenMessage={ spokenMessage }
+			status={status}
+			isDismissible={isDismissible}
+			politeness={politeness}
+			spokenMessage={spokenMessage}
 		>
 			<p>This is a notice.</p>
 		</Notice>

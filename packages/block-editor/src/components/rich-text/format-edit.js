@@ -11,23 +11,23 @@ import {
  */
 import { find } from 'lodash';
 
-export default function FormatEdit( {
+export default function FormatEdit({
 	formatTypes,
 	onChange,
 	onFocus,
 	value,
 	forwardedRef,
-} ) {
-	return formatTypes.map( ( settings ) => {
+}) {
+	return formatTypes.map((settings) => {
 		const { name, edit: Edit } = settings;
 
-		if ( ! Edit ) {
+		if (!Edit) {
 			return null;
 		}
 
-		const activeFormat = getActiveFormat( value, name );
+		const activeFormat = getActiveFormat(value, name);
 		let isActive = activeFormat !== undefined;
-		const activeObject = getActiveObject( value );
+		const activeObject = getActiveObject(value);
 		const isObjectActive =
 			activeObject !== undefined && activeObject.type === name;
 
@@ -37,20 +37,20 @@ export default function FormatEdit( {
 		// the bounds of the link format.
 		// Also if the format objects don't match then we're dealing with two separate
 		// links so we should not allow the link to be modified over the top.
-		if ( name === 'core/link' && ! isCollapsed( value ) ) {
+		if (name === 'core/link' && !isCollapsed(value)) {
 			const formats = value.formats;
 
-			const linkFormatAtStart = find( formats[ value.start ], {
+			const linkFormatAtStart = find(formats[value.start], {
 				type: 'core/link',
-			} );
+			});
 
-			const linkFormatAtEnd = find( formats[ value.end - 1 ], {
+			const linkFormatAtEnd = find(formats[value.end - 1], {
 				type: 'core/link',
-			} );
+			});
 
 			if (
-				! linkFormatAtStart ||
-				! linkFormatAtEnd ||
+				!linkFormatAtStart ||
+				!linkFormatAtEnd ||
 				linkFormatAtStart !== linkFormatAtEnd
 			) {
 				isActive = false;
@@ -59,20 +59,18 @@ export default function FormatEdit( {
 
 		return (
 			<Edit
-				key={ name }
-				isActive={ isActive }
-				activeAttributes={
-					isActive ? activeFormat.attributes || {} : {}
-				}
-				isObjectActive={ isObjectActive }
+				key={name}
+				isActive={isActive}
+				activeAttributes={isActive ? activeFormat.attributes || {} : {}}
+				isObjectActive={isObjectActive}
 				activeObjectAttributes={
 					isObjectActive ? activeObject.attributes || {} : {}
 				}
-				value={ value }
-				onChange={ onChange }
-				onFocus={ onFocus }
-				contentRef={ forwardedRef }
+				value={value}
+				onChange={onChange}
+				onFocus={onFocus}
+				contentRef={forwardedRef}
 			/>
 		);
-	} );
+	});
 }

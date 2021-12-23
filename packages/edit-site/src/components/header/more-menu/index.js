@@ -23,42 +23,40 @@ const TOGGLE_PROPS = {
 const MoreMenu = () => (
 	<DropdownMenu
 		className="edit-site-more-menu"
-		icon={ moreVertical }
-		label={ __( 'More tools & options' ) }
-		popoverProps={ POPOVER_PROPS }
-		toggleProps={ TOGGLE_PROPS }
+		icon={moreVertical}
+		label={__('More tools & options')}
+		popoverProps={POPOVER_PROPS}
+		toggleProps={TOGGLE_PROPS}
 	>
-		{ ( { onClose } ) => (
+		{({ onClose }) => (
 			<>
-				<MenuGroup label={ _x( 'View', 'noun' ) }>
+				<MenuGroup label={_x('View', 'noun')}>
 					<FeatureToggle
 						feature="fixedToolbar"
-						label={ __( 'Top toolbar' ) }
-						info={ __(
+						label={__('Top toolbar')}
+						info={__(
 							'Access all block and document tools in a single place'
-						) }
-						messageActivated={ __( 'Top toolbar activated' ) }
-						messageDeactivated={ __( 'Top toolbar deactivated' ) }
+						)}
+						messageActivated={__('Top toolbar activated')}
+						messageDeactivated={__('Top toolbar deactivated')}
 					/>
 					<FeatureToggle
 						feature="focusMode"
-						label={ __( 'Spotlight mode' ) }
-						info={ __( 'Focus on one block at a time' ) }
-						messageActivated={ __( 'Spotlight mode activated' ) }
-						messageDeactivated={ __(
-							'Spotlight mode deactivated'
-						) }
+						label={__('Spotlight mode')}
+						info={__('Focus on one block at a time')}
+						messageActivated={__('Spotlight mode activated')}
+						messageDeactivated={__('Spotlight mode deactivated')}
 					/>
 					<ActionItem.Slot
 						name="core/edit-site/plugin-more-menu"
-						label={ __( 'Plugins' ) }
-						as={ MenuGroup }
-						fillProps={ { onClick: onClose } }
+						label={__('Plugins')}
+						as={MenuGroup}
+						fillProps={{ onClick: onClose }}
 					/>
 				</MenuGroup>
-				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
+				<ToolsMoreMenuGroup.Slot fillProps={{ onClose }} />
 			</>
-		) }
+		)}
 	</DropdownMenu>
 );
 

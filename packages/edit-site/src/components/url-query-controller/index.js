@@ -11,30 +11,28 @@ import { useLocation, useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
 export default function URLQueryController() {
-	const { setTemplate, setTemplatePart, showHomepage, setPage } = useDispatch(
-		editSiteStore
-	);
+	const { setTemplate, setTemplatePart, showHomepage, setPage } =
+		useDispatch(editSiteStore);
 	const history = useHistory();
 	const {
 		params: { postId, postType },
 	} = useLocation();
-	const { getPage, getEditedPostId, getEditedPostType } = useSelect(
-		editSiteStore
-	);
+	const { getPage, getEditedPostId, getEditedPostType } =
+		useSelect(editSiteStore);
 
 	// Set correct entity on page navigation.
-	useEffect( () => {
+	useEffect(() => {
 		let isMounted = true;
 
-		if ( 'page' === postType || 'post' === postType ) {
-			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
-		} else if ( 'wp_template' === postType ) {
-			setTemplate( postId );
-		} else if ( 'wp_template_part' === postType ) {
-			setTemplatePart( postId );
+		if ('page' === postType || 'post' === postType) {
+			setPage({ context: { postType, postId } }); // Resolves correct template based on ID.
+		} else if ('wp_template' === postType) {
+			setTemplate(postId);
+		} else if ('wp_template_part' === postType) {
+			setTemplatePart(postId);
 		} else {
-			showHomepage().then( () => {
-				if ( ! isMounted ) {
+			showHomepage().then(() => {
+				if (!isMounted) {
 					return;
 				}
 
@@ -42,24 +40,24 @@ export default function URLQueryController() {
 				const editedPostId = getEditedPostId();
 				const editedPostType = getEditedPostType();
 
-				if ( page?.context?.postId && page?.context?.postType ) {
-					history.replace( {
+				if (page?.context?.postId && page?.context?.postType) {
+					history.replace({
 						postId: page.context.postId,
 						postType: page.context.postType,
-					} );
-				} else if ( editedPostId && editedPostType ) {
-					history.replace( {
+					});
+				} else if (editedPostId && editedPostType) {
+					history.replace({
 						postId: editedPostId,
 						postType: editedPostType,
-					} );
+					});
 				}
-			} );
+			});
 		}
 
 		return () => {
 			isMounted = false;
 		};
-	}, [ postId, postType ] );
+	}, [postId, postType]);
 
 	return null;
 }

@@ -8,28 +8,28 @@ import { debounce, deburr, escapeRegExp } from 'lodash';
  */
 import { useLayoutEffect, useState } from '@wordpress/element';
 
-function filterOptions( search, options = [], maxResults = 10 ) {
+function filterOptions(search, options = [], maxResults = 10) {
 	const filtered = [];
-	for ( let i = 0; i < options.length; i++ ) {
-		const option = options[ i ];
+	for (let i = 0; i < options.length; i++) {
+		const option = options[i];
 
 		// Merge label into keywords
 		let { keywords = [] } = option;
-		if ( 'string' === typeof option.label ) {
-			keywords = [ ...keywords, option.label ];
+		if ('string' === typeof option.label) {
+			keywords = [...keywords, option.label];
 		}
 
-		const isMatch = keywords.some( ( keyword ) =>
-			search.test( deburr( keyword ) )
+		const isMatch = keywords.some((keyword) =>
+			search.test(deburr(keyword))
 		);
-		if ( ! isMatch ) {
+		if (!isMatch) {
 			continue;
 		}
 
-		filtered.push( option );
+		filtered.push(option);
 
 		// Abort early if max reached
-		if ( filtered.length === maxResults ) {
+		if (filtered.length === maxResults) {
 			break;
 		}
 	}
@@ -37,9 +37,9 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	return filtered;
 }
 
-export default function getDefaultUseItems( autocompleter ) {
-	return ( filterValue ) => {
-		const [ items, setItems ] = useState( [] );
+export default function getDefaultUseItems(autocompleter) {
+	return (filterValue) => {
+		const [items, setItems] = useState([]);
 		/*
 		 * We support both synchronous and asynchronous retrieval of completer options
 		 * but internally treat all as async so we maintain a single, consistent code path.
@@ -51,45 +51,41 @@ export default function getDefaultUseItems( autocompleter ) {
 		 * `activePromise` in the state would result in it actually being in `this.state`
 		 * before the promise resolves and we check to see if this is the active promise or not.
 		 */
-		useLayoutEffect( () => {
+		useLayoutEffect(() => {
 			const { options, isDebounced } = autocompleter;
 			const loadOptions = debounce(
 				() => {
 					const promise = Promise.resolve(
 						typeof options === 'function'
-							? options( filterValue )
+							? options(filterValue)
 							: options
-					).then( ( optionsData ) => {
-						if ( promise.canceled ) {
+					).then((optionsData) => {
+						if (promise.canceled) {
 							return;
 						}
 						const keyedOptions = optionsData.map(
-							( optionData, optionIndex ) => ( {
-								key: `${ autocompleter.name }-${ optionIndex }`,
+							(optionData, optionIndex) => ({
+								key: `${autocompleter.name}-${optionIndex}`,
 								value: optionData,
-								label: autocompleter.getOptionLabel(
-									optionData
-								),
+								label: autocompleter.getOptionLabel(optionData),
 								keywords: autocompleter.getOptionKeywords
 									? autocompleter.getOptionKeywords(
 											optionData
 									  )
 									: [],
 								isDisabled: autocompleter.isOptionDisabled
-									? autocompleter.isOptionDisabled(
-											optionData
-									  )
+									? autocompleter.isOptionDisabled(optionData)
 									: false,
-							} )
+							})
 						);
 
 						// create a regular expression to filter the options
 						const search = new RegExp(
-							'(?:\\b|\\s|^)' + escapeRegExp( filterValue ),
+							'(?:\\b|\\s|^)' + escapeRegExp(filterValue),
 							'i'
 						);
-						setItems( filterOptions( search, keyedOptions ) );
-					} );
+						setItems(filterOptions(search, keyedOptions));
+					});
 
 					return promise;
 				},
@@ -100,12 +96,12 @@ export default function getDefaultUseItems( autocompleter ) {
 
 			return () => {
 				loadOptions.cancel();
-				if ( promise ) {
+				if (promise) {
 					promise.canceled = true;
 				}
 			};
-		}, [ filterValue ] );
+		}, [filterValue]);
 
-		return [ items ];
+		return [items];
 	};
 }

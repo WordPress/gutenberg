@@ -11,14 +11,14 @@ import { MenuItem } from '@wordpress/components';
 import { store as editPostStore } from '../../../store';
 
 export default function PreferencesMenuItem() {
-	const { openModal } = useDispatch( editPostStore );
+	const { openModal } = useDispatch(editPostStore);
 	return (
 		<MenuItem
-			onClick={ () => {
-				openModal( 'edit-post/preferences' );
-			} }
+			onClick={() => {
+				openModal('edit-post/preferences');
+			}}
 		>
-			{ __( 'Preferences' ) }
+			{__('Preferences')}
 		</MenuItem>
 	);
 }

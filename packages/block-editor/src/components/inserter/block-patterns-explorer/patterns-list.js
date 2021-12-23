@@ -19,17 +19,17 @@ import { searchItems } from '../search-items';
 
 const INITIAL_INSERTER_RESULTS = 2;
 
-function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
-	if ( ! filterValue ) {
+function PatternsListHeader({ filterValue, filteredBlockPatternsLength }) {
+	if (!filterValue) {
 		return null;
 	}
 	return (
 		<Heading
-			level={ 2 }
-			lineHeight={ '48px' }
+			level={2}
+			lineHeight={'48px'}
 			className="block-editor-block-patterns-explorer__search-results-count"
 		>
-			{ sprintf(
+			{sprintf(
 				/* translators: %d: number of patterns. %s: block pattern search query */
 				_n(
 					'%1$d pattern found for "%2$s"',
@@ -38,82 +38,77 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 				),
 				filteredBlockPatternsLength,
 				filterValue
-			) }
+			)}
 		</Heading>
 	);
 }
 
-function PatternList( { filterValue, selectedCategory, patternCategories } ) {
-	const debouncedSpeak = useDebounce( speak, 500 );
-	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
+function PatternList({ filterValue, selectedCategory, patternCategories }) {
+	const debouncedSpeak = useDebounce(speak, 500);
+	const [destinationRootClientId, onInsertBlocks] = useInsertionPoint({
 		shouldFocusBlock: true,
-	} );
-	const [ allPatterns, , onSelectBlockPattern ] = usePatternsState(
+	});
+	const [allPatterns, , onSelectBlockPattern] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
 	const registeredPatternCategories = useMemo(
-		() =>
-			patternCategories.map(
-				( patternCategory ) => patternCategory.name
-			),
-		[ patternCategories ]
+		() => patternCategories.map((patternCategory) => patternCategory.name),
+		[patternCategories]
 	);
 
-	const filteredBlockPatterns = useMemo( () => {
-		if ( ! filterValue ) {
-			return allPatterns.filter( ( pattern ) =>
+	const filteredBlockPatterns = useMemo(() => {
+		if (!filterValue) {
+			return allPatterns.filter((pattern) =>
 				selectedCategory === 'uncategorized'
-					? ! pattern.categories?.length ||
+					? !pattern.categories?.length ||
 					  pattern.categories.every(
-							( category ) =>
-								! registeredPatternCategories.includes(
-									category
-								)
+							(category) =>
+								!registeredPatternCategories.includes(category)
 					  )
-					: pattern.categories?.includes( selectedCategory )
+					: pattern.categories?.includes(selectedCategory)
 			);
 		}
-		return searchItems( allPatterns, filterValue );
-	}, [ filterValue, selectedCategory, allPatterns ] );
+		return searchItems(allPatterns, filterValue);
+	}, [filterValue, selectedCategory, allPatterns]);
 
 	// Announce search results on change.
-	useEffect( () => {
-		if ( ! filterValue ) {
+	useEffect(() => {
+		if (!filterValue) {
 			return;
 		}
 		const count = filteredBlockPatterns.length;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
-			_n( '%d result found.', '%d results found.', count ),
+			_n('%d result found.', '%d results found.', count),
 			count
 		);
-		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak ] );
+		debouncedSpeak(resultsFoundMessage);
+	}, [filterValue, debouncedSpeak]);
 
-	const currentShownPatterns = useAsyncList( filteredBlockPatterns, {
+	const currentShownPatterns = useAsyncList(filteredBlockPatterns, {
 		step: INITIAL_INSERTER_RESULTS,
-	} );
+	});
 
-	const hasItems = !! filteredBlockPatterns?.length;
+	const hasItems = !!filteredBlockPatterns?.length;
 	return (
 		<div className="block-editor-block-patterns-explorer__list">
-			{ hasItems && (
+			{hasItems && (
 				<PatternsListHeader
-					filterValue={ filterValue }
-					filteredBlockPatternsLength={ filteredBlockPatterns.length }
+					filterValue={filterValue}
+					filteredBlockPatternsLength={filteredBlockPatterns.length}
 				/>
-			) }
+			)}
 			<InserterListbox>
-				{ ! hasItems && <InserterNoResults /> }
-				{ hasItems && (
+				{!hasItems && <InserterNoResults />}
+				{hasItems && (
 					<BlockPatternsList
-						shownPatterns={ currentShownPatterns }
-						blockPatterns={ filteredBlockPatterns }
-						onClickPattern={ onSelectBlockPattern }
-						isDraggable={ false }
+						shownPatterns={currentShownPatterns}
+						blockPatterns={filteredBlockPatterns}
+						onClickPattern={onSelectBlockPattern}
+						isDraggable={false}
 					/>
-				) }
+				)}
 			</InserterListbox>
 		</div>
 	);

@@ -6,9 +6,6 @@
  *
  * @return {string} The manipulated text.
  */
-export default function transposeHTMLEntitiesToCountableChars(
-	settings,
-	text
-) {
-	return text.replace( settings.HTMLEntityRegExp, 'a' );
+export default function transposeHTMLEntitiesToCountableChars(settings, text) {
+	return text.replace(settings.HTMLEntityRegExp, 'a');
 }

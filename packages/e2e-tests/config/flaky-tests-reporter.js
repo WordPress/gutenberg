@@ -9,13 +9,13 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' ).promises;
-const path = require( 'path' );
-const { formatResultsErrors } = require( 'jest-message-util' );
-const filenamify = require( 'filenamify' );
+const fs = require('fs').promises;
+const path = require('path');
+const { formatResultsErrors } = require('jest-message-util');
+const filenamify = require('filenamify');
 
 class FlakyTestsReporter {
-	constructor( globalConfig, options ) {
+	constructor(globalConfig, options) {
 		this._globalConfig = globalConfig;
 		this._options = options;
 
@@ -24,49 +24,46 @@ class FlakyTestsReporter {
 
 	async onRunStart() {
 		try {
-			fs.mkdir( 'flaky-tests' );
-		} catch ( err ) {
+			fs.mkdir('flaky-tests');
+		} catch (err) {
 			// Ignore the error if the directory already exists.
-			if ( err.code !== 'EEXIST' ) {
+			if (err.code !== 'EEXIST') {
 				throw err;
 			}
 		}
 	}
 
-	async onTestCaseResult( test, testCaseResult ) {
-		const testPath = path.relative( this._globalConfig.rootDir, test.path );
+	async onTestCaseResult(test, testCaseResult) {
+		const testPath = path.relative(this._globalConfig.rootDir, test.path);
 		const testTitle = testCaseResult.title;
 
-		switch ( testCaseResult.status ) {
+		switch (testCaseResult.status) {
 			case 'failed': {
-				if ( ! this.failingTestCaseResults.has( testTitle ) ) {
-					this.failingTestCaseResults.set( testTitle, [] );
+				if (!this.failingTestCaseResults.has(testTitle)) {
+					this.failingTestCaseResults.set(testTitle, []);
 				}
-				this.failingTestCaseResults
-					.get( testTitle )
-					.push( testCaseResult );
+				this.failingTestCaseResults.get(testTitle).push(testCaseResult);
 				break;
 			}
 			case 'passed': {
-				if ( this.failingTestCaseResults.has( testTitle ) ) {
-					const failingResults = this.failingTestCaseResults.get(
-						testTitle
-					);
+				if (this.failingTestCaseResults.has(testTitle)) {
+					const failingResults =
+						this.failingTestCaseResults.get(testTitle);
 
 					await fs.writeFile(
-						`flaky-tests/${ filenamify( testTitle ) }.json`,
-						JSON.stringify( {
+						`flaky-tests/${filenamify(testTitle)}.json`,
+						JSON.stringify({
 							title: testTitle,
 							path: testPath,
 							results: failingResults,
-						} ),
+						}),
 						'utf-8'
 					);
 
 					// Don't silence flaky error messages for debugging reason.
 					// eslint-disable-next-line no-console
 					console.error(
-						`Test passed after ${ failingResults.length } failed ${
+						`Test passed after ${failingResults.length} failed ${
 							failingResults.length === 1 ? 'attempt' : 'attempts'
 						}:`
 					);

@@ -6,8 +6,8 @@ module.exports = {
 		'at-rule-empty-line-before': [
 			'always',
 			{
-				except: [ 'blockless-after-blockless' ],
-				ignore: [ 'after-comment' ],
+				except: ['blockless-after-blockless'],
+				ignore: ['after-comment'],
 			},
 		],
 		'at-rule-name-case': 'lower',
@@ -24,7 +24,7 @@ module.exports = {
 		'comment-empty-line-before': [
 			'always',
 			{
-				ignore: [ 'stylelint-commands' ],
+				ignore: ['stylelint-commands'],
 			},
 		],
 		'declaration-bang-space-after': 'never',
@@ -32,7 +32,7 @@ module.exports = {
 		'declaration-block-no-duplicate-properties': [
 			true,
 			{
-				ignore: [ 'consecutive-duplicates' ],
+				ignore: ['consecutive-duplicates'],
 			},
 		],
 		'declaration-block-semicolon-newline-after': 'always',
@@ -42,13 +42,13 @@ module.exports = {
 		'declaration-colon-space-after': 'always-single-line',
 		'declaration-colon-space-before': 'never',
 		'declaration-property-unit-allowed-list': {
-			'line-height': [ 'px' ],
+			'line-height': ['px'],
 		},
 		'font-family-name-quotes': 'always-where-recommended',
 		'font-weight-notation': [
 			'numeric',
 			{
-				ignore: [ 'relative' ],
+				ignore: ['relative'],
 			},
 		],
 		'function-comma-space-after': 'always',
@@ -57,7 +57,7 @@ module.exports = {
 		'function-name-case': [
 			'lower',
 			{
-				ignoreFunctions: [ '/^DXImageTransform.Microsoft.*$/' ],
+				ignoreFunctions: ['/^DXImageTransform.Microsoft.*$/'],
 			},
 		],
 		'function-parentheses-space-inside': 'never',
@@ -90,7 +90,7 @@ module.exports = {
 		'rule-empty-line-before': [
 			'always',
 			{
-				ignore: [ 'after-comment' ],
+				ignore: ['after-comment'],
 			},
 		],
 		'selector-attribute-brackets-space-inside': 'never',

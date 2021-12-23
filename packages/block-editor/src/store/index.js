@@ -32,13 +32,13 @@ export const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore(STORE_NAME, {
 	...storeConfig,
-	persist: [ 'preferences' ],
-} );
+	persist: ['preferences'],
+});
 
 // Ideally we'd use register instead of register stores.
-registerStore( STORE_NAME, {
+registerStore(STORE_NAME, {
 	...storeConfig,
-	persist: [ 'preferences' ],
-} );
+	persist: ['preferences'],
+});

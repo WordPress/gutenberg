@@ -24,22 +24,25 @@ const MIN_BORDER_WIDTH = 0;
  *
  * @return {WPElement} Border width edit element.
  */
-export const BorderWidthEdit = ( props ) => {
+export const BorderWidthEdit = (props) => {
 	const {
 		attributes: { borderColor, style },
 		setAttributes,
 	} = props;
 
-	const { width, color: customBorderColor, style: borderStyle } =
-		style?.border || {};
+	const {
+		width,
+		color: customBorderColor,
+		style: borderStyle,
+	} = style?.border || {};
 
 	// Used to temporarily track previous border color & style selections to be
 	// able to restore them when border width changes from zero value.
-	const [ styleSelection, setStyleSelection ] = useState();
-	const [ colorSelection, setColorSelection ] = useState();
-	const [ customColorSelection, setCustomColorSelection ] = useState();
+	const [styleSelection, setStyleSelection] = useState();
+	const [colorSelection, setColorSelection] = useState();
+	const [customColorSelection, setCustomColorSelection] = useState();
 
-	const onChange = ( newWidth ) => {
+	const onChange = (newWidth) => {
 		let newStyle = {
 			...style,
 			border: {
@@ -51,18 +54,18 @@ export const BorderWidthEdit = ( props ) => {
 		// Used to clear named border color attribute.
 		let borderPaletteColor = borderColor;
 
-		const hasZeroWidth = parseFloat( newWidth ) === 0;
-		const hadPreviousZeroWidth = parseFloat( width ) === 0;
+		const hasZeroWidth = parseFloat(newWidth) === 0;
+		const hadPreviousZeroWidth = parseFloat(width) === 0;
 
 		// Setting the border width explicitly to zero will also set the
 		// border style to `none` and clear border color attributes.
-		if ( hasZeroWidth && ! hadPreviousZeroWidth ) {
+		if (hasZeroWidth && !hadPreviousZeroWidth) {
 			// Before clearing color and style selections, keep track of
 			// the current selections so they can be restored when the width
 			// changes to a non-zero value.
-			setColorSelection( borderColor );
-			setCustomColorSelection( customBorderColor );
-			setStyleSelection( borderStyle );
+			setColorSelection(borderColor);
+			setCustomColorSelection(customBorderColor);
+			setStyleSelection(borderStyle);
 
 			// Clear style and color attributes.
 			borderPaletteColor = undefined;
@@ -70,45 +73,45 @@ export const BorderWidthEdit = ( props ) => {
 			newStyle.border.style = 'none';
 		}
 
-		if ( ! hasZeroWidth && hadPreviousZeroWidth ) {
+		if (!hasZeroWidth && hadPreviousZeroWidth) {
 			// Restore previous border style selection if width is now not zero and
 			// border style was 'none'. This is to support changes to the UI which
 			// change the border style UI to a segmented control without a "none"
 			// option.
-			if ( borderStyle === 'none' ) {
+			if (borderStyle === 'none') {
 				newStyle.border.style = styleSelection;
 			}
 
 			// Restore previous border color selection if width is no longer zero
 			// and current border color is undefined.
-			if ( borderColor === undefined ) {
+			if (borderColor === undefined) {
 				borderPaletteColor = colorSelection;
 				newStyle.border.color = customColorSelection;
 			}
 		}
 
 		// If width was reset, clean out undefined styles.
-		if ( newWidth === undefined || newWidth === '' ) {
-			newStyle = cleanEmptyObject( newStyle );
+		if (newWidth === undefined || newWidth === '') {
+			newStyle = cleanEmptyObject(newStyle);
 		}
 
-		setAttributes( {
+		setAttributes({
 			borderColor: borderPaletteColor,
 			style: newStyle,
-		} );
+		});
 	};
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
-	} );
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || ['px', 'em', 'rem'],
+	});
 
 	return (
 		<UnitControl
-			value={ width }
-			label={ __( 'Width' ) }
-			min={ MIN_BORDER_WIDTH }
-			onChange={ onChange }
-			units={ units }
+			value={width}
+			label={__('Width')}
+			min={MIN_BORDER_WIDTH}
+			onChange={onChange}
+			units={units}
 		/>
 	);
 };
@@ -120,8 +123,8 @@ export const BorderWidthEdit = ( props ) => {
  * @param {Object} props Block props.
  * @return {boolean}     Whether or not the block has a border width value set.
  */
-export function hasBorderWidthValue( props ) {
-	return !! props.attributes.style?.border?.width;
+export function hasBorderWidthValue(props) {
+	return !!props.attributes.style?.border?.width;
 }
 
 /**
@@ -133,7 +136,7 @@ export function hasBorderWidthValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetBorderWidth( { attributes = {}, setAttributes } ) {
+export function resetBorderWidth({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
-	setAttributes( { style: removeBorderAttribute( style, 'width' ) } );
+	setAttributes({ style: removeBorderAttribute(style, 'width') });
 }

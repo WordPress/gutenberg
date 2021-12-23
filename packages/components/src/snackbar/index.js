@@ -28,15 +28,15 @@ const NOTICE_TIMEOUT = 10000;
  * @param {string|WPElement}     [message]  Message to announce.
  * @param {'polite'|'assertive'} politeness Politeness to announce.
  */
-function useSpokenMessage( message, politeness ) {
+function useSpokenMessage(message, politeness) {
 	const spokenMessage =
-		typeof message === 'string' ? message : renderToString( message );
+		typeof message === 'string' ? message : renderToString(message);
 
-	useEffect( () => {
-		if ( spokenMessage ) {
-			speak( spokenMessage, politeness );
+	useEffect(() => {
+		if (spokenMessage) {
+			speak(spokenMessage, politeness);
 		}
-	}, [ spokenMessage, politeness ] );
+	}, [spokenMessage, politeness]);
 }
 
 function Snackbar(
@@ -59,8 +59,8 @@ function Snackbar(
 ) {
 	onDismiss = onDismiss || noop;
 
-	function dismissMe( event ) {
-		if ( event && event.preventDefault ) {
+	function dismissMe(event) {
+		if (event && event.preventDefault) {
 			event.preventDefault();
 		}
 
@@ -71,94 +71,92 @@ function Snackbar(
 		onRemove();
 	}
 
-	function onActionClick( event, onClick ) {
+	function onActionClick(event, onClick) {
 		event.stopPropagation();
 
 		onRemove();
 
-		if ( onClick ) {
-			onClick( event );
+		if (onClick) {
+			onClick(event);
 		}
 	}
 
-	useSpokenMessage( spokenMessage, politeness );
+	useSpokenMessage(spokenMessage, politeness);
 
 	// Only set up the timeout dismiss if we're not explicitly dismissing.
-	useEffect( () => {
-		const timeoutHandle = setTimeout( () => {
-			if ( ! explicitDismiss ) {
+	useEffect(() => {
+		const timeoutHandle = setTimeout(() => {
+			if (!explicitDismiss) {
 				onDismiss();
 				onRemove();
 			}
-		}, NOTICE_TIMEOUT );
+		}, NOTICE_TIMEOUT);
 
-		return () => clearTimeout( timeoutHandle );
-	}, [ onDismiss, onRemove ] );
+		return () => clearTimeout(timeoutHandle);
+	}, [onDismiss, onRemove]);
 
-	const classes = classnames( className, 'components-snackbar', {
-		'components-snackbar-explicit-dismiss': !! explicitDismiss,
-	} );
-	if ( actions && actions.length > 1 ) {
+	const classes = classnames(className, 'components-snackbar', {
+		'components-snackbar-explicit-dismiss': !!explicitDismiss,
+	});
+	if (actions && actions.length > 1) {
 		// we need to inform developers that snackbar only accepts 1 action
 		warning(
 			'Snackbar can only have 1 action, use Notice if your message require many messages'
 		);
 		// return first element only while keeping it inside an array
-		actions = [ actions[ 0 ] ];
+		actions = [actions[0]];
 	}
 
 	const snackbarContentClassnames = classnames(
 		'components-snackbar__content',
 		{
-			'components-snackbar__content-with-icon': !! icon,
+			'components-snackbar__content-with-icon': !!icon,
 		}
 	);
 
 	return (
 		<div
-			ref={ ref }
-			className={ classes }
-			onClick={ ! explicitDismiss ? dismissMe : noop }
+			ref={ref}
+			className={classes}
+			onClick={!explicitDismiss ? dismissMe : noop}
 			tabIndex="0"
-			role={ ! explicitDismiss ? 'button' : '' }
-			onKeyPress={ ! explicitDismiss ? dismissMe : noop }
-			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
+			role={!explicitDismiss ? 'button' : ''}
+			onKeyPress={!explicitDismiss ? dismissMe : noop}
+			aria-label={!explicitDismiss ? __('Dismiss this notice') : ''}
 		>
-			<div className={ snackbarContentClassnames }>
-				{ icon && (
-					<div className="components-snackbar__icon">{ icon }</div>
-				) }
-				{ children }
-				{ actions.map( ( { label, onClick, url }, index ) => {
+			<div className={snackbarContentClassnames}>
+				{icon && (
+					<div className="components-snackbar__icon">{icon}</div>
+				)}
+				{children}
+				{actions.map(({ label, onClick, url }, index) => {
 					return (
 						<Button
-							key={ index }
-							href={ url }
+							key={index}
+							href={url}
 							variant="tertiary"
-							onClick={ ( event ) =>
-								onActionClick( event, onClick )
-							}
+							onClick={(event) => onActionClick(event, onClick)}
 							className="components-snackbar__action"
 						>
-							{ label }
+							{label}
 						</Button>
 					);
-				} ) }
-				{ explicitDismiss && (
+				})}
+				{explicitDismiss && (
 					<span
 						role="button"
 						aria-label="Dismiss this notice"
 						tabIndex="0"
 						className="components-snackbar__dismiss-button"
-						onClick={ dismissMe }
-						onKeyPress={ dismissMe }
+						onClick={dismissMe}
+						onKeyPress={dismissMe}
 					>
 						&#x2715;
 					</span>
-				) }
+				)}
 			</div>
 		</div>
 	);
 }
 
-export default forwardRef( Snackbar );
+export default forwardRef(Snackbar);

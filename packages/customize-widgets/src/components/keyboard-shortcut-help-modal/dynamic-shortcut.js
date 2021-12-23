@@ -9,33 +9,33 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import Shortcut from './shortcut';
 
-function DynamicShortcut( { name } ) {
+function DynamicShortcut({ name }) {
 	const { keyCombination, description, aliases } = useSelect(
-		( select ) => {
+		(select) => {
 			const {
 				getShortcutKeyCombination,
 				getShortcutDescription,
 				getShortcutAliases,
-			} = select( keyboardShortcutsStore );
+			} = select(keyboardShortcutsStore);
 
 			return {
-				keyCombination: getShortcutKeyCombination( name ),
-				aliases: getShortcutAliases( name ),
-				description: getShortcutDescription( name ),
+				keyCombination: getShortcutKeyCombination(name),
+				aliases: getShortcutAliases(name),
+				description: getShortcutDescription(name),
 			};
 		},
-		[ name ]
+		[name]
 	);
 
-	if ( ! keyCombination ) {
+	if (!keyCombination) {
 		return null;
 	}
 
 	return (
 		<Shortcut
-			keyCombination={ keyCombination }
-			description={ description }
-			aliases={ aliases }
+			keyCombination={keyCombination}
+			description={description}
+			aliases={aliases}
 		/>
 	);
 }

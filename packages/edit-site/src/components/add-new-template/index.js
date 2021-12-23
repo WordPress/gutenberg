@@ -10,20 +10,20 @@ import { store as coreStore } from '@wordpress/core-data';
 import NewTemplate from './new-template';
 import NewTemplatePart from './new-template-part';
 
-export default function AddNewTemplate( { templateType = 'wp_template' } ) {
+export default function AddNewTemplate({ templateType = 'wp_template' }) {
 	const postType = useSelect(
-		( select ) => select( coreStore ).getPostType( templateType ),
-		[ templateType ]
+		(select) => select(coreStore).getPostType(templateType),
+		[templateType]
 	);
 
-	if ( ! postType ) {
+	if (!postType) {
 		return null;
 	}
 
-	if ( templateType === 'wp_template' ) {
-		return <NewTemplate postType={ postType } />;
-	} else if ( templateType === 'wp_template_part' ) {
-		return <NewTemplatePart postType={ postType } />;
+	if (templateType === 'wp_template') {
+		return <NewTemplate postType={postType} />;
+	} else if (templateType === 'wp_template_part') {
+		return <NewTemplatePart postType={postType} />;
 	}
 
 	return null;

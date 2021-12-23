@@ -9,13 +9,13 @@ import { Keyboard, Dimensions } from 'react-native';
 import { useEffect, useState } from '@wordpress/element';
 
 export default function useIsFloatingKeyboard() {
-	const windowWidth = Dimensions.get( 'window' ).width;
+	const windowWidth = Dimensions.get('window').width;
 
-	const [ floating, setFloating ] = useState( false );
+	const [floating, setFloating] = useState(false);
 
-	useEffect( () => {
-		const onKeyboardWillChangeFrame = ( event ) => {
-			setFloating( event.endCoordinates.width !== windowWidth );
+	useEffect(() => {
+		const onKeyboardWillChangeFrame = (event) => {
+			setFloating(event.endCoordinates.width !== windowWidth);
 		};
 
 		Keyboard.addListener(
@@ -28,7 +28,7 @@ export default function useIsFloatingKeyboard() {
 				onKeyboardWillChangeFrame
 			);
 		};
-	}, [ windowWidth ] );
+	}, [windowWidth]);
 
 	return floating;
 }

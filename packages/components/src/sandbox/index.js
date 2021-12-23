@@ -91,28 +91,28 @@ const style = `
 	}
 `;
 
-export default function Sandbox( {
+export default function Sandbox({
 	html = '',
 	title = '',
 	type,
 	styles = [],
 	scripts = [],
 	onFocus,
-} ) {
+}) {
 	const ref = useRef();
-	const [ width, setWidth ] = useState( 0 );
-	const [ height, setHeight ] = useState( 0 );
+	const [width, setWidth] = useState(0);
+	const [height, setHeight] = useState(0);
 
 	function isFrameAccessible() {
 		try {
-			return !! ref.current.contentDocument.body;
-		} catch ( e ) {
+			return !!ref.current.contentDocument.body;
+		} catch (e) {
 			return false;
 		}
 	}
 
-	function trySandbox( forceRerender = false ) {
-		if ( ! isFrameAccessible() ) {
+	function trySandbox(forceRerender = false) {
+		if (!isFrameAccessible()) {
 			return;
 		}
 
@@ -120,8 +120,8 @@ export default function Sandbox( {
 		const { body } = contentDocument;
 
 		if (
-			! forceRerender &&
-			null !== body.getAttribute( 'data-resizable-iframe-connected' )
+			!forceRerender &&
+			null !== body.getAttribute('data-resizable-iframe-connected')
 		) {
 			return;
 		}
@@ -131,34 +131,31 @@ export default function Sandbox( {
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
 		// that expect the scripts to be part of the body.
 		const htmlDoc = (
-			<html
-				lang={ ownerDocument.documentElement.lang }
-				className={ type }
-			>
+			<html lang={ownerDocument.documentElement.lang} className={type}>
 				<head>
-					<title>{ title }</title>
-					<style dangerouslySetInnerHTML={ { __html: style } } />
-					{ styles.map( ( rules, i ) => (
+					<title>{title}</title>
+					<style dangerouslySetInnerHTML={{ __html: style }} />
+					{styles.map((rules, i) => (
 						<style
-							key={ i }
-							dangerouslySetInnerHTML={ { __html: rules } }
+							key={i}
+							dangerouslySetInnerHTML={{ __html: rules }}
 						/>
-					) ) }
+					))}
 				</head>
 				<body
 					data-resizable-iframe-connected="data-resizable-iframe-connected"
-					className={ type }
+					className={type}
 				>
-					<div dangerouslySetInnerHTML={ { __html: html } } />
+					<div dangerouslySetInnerHTML={{ __html: html }} />
 					<script
 						type="text/javascript"
-						dangerouslySetInnerHTML={ {
+						dangerouslySetInnerHTML={{
 							__html: observeAndResizeJS,
-						} }
+						}}
 					/>
-					{ scripts.map( ( src ) => (
-						<script key={ src } src={ src } />
-					) ) }
+					{scripts.map((src) => (
+						<script key={src} src={src} />
+					))}
 				</body>
 			</html>
 		);
@@ -167,42 +164,42 @@ export default function Sandbox( {
 		// loaded over the network, so DOM creation and mutation, script execution, etc.
 		// all work as expected
 		contentDocument.open();
-		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
+		contentDocument.write('<!DOCTYPE html>' + renderToString(htmlDoc));
 		contentDocument.close();
 	}
 
-	useEffect( () => {
+	useEffect(() => {
 		trySandbox();
 
 		function tryNoForceSandbox() {
-			trySandbox( false );
+			trySandbox(false);
 		}
 
-		function checkMessageForResize( event ) {
+		function checkMessageForResize(event) {
 			const iframe = ref.current;
 
 			// Verify that the mounted element is the source of the message
-			if ( ! iframe || iframe.contentWindow !== event.source ) {
+			if (!iframe || iframe.contentWindow !== event.source) {
 				return;
 			}
 
 			// Attempt to parse the message data as JSON if passed as string
 			let data = event.data || {};
 
-			if ( 'string' === typeof data ) {
+			if ('string' === typeof data) {
 				try {
-					data = JSON.parse( data );
-				} catch ( e ) {}
+					data = JSON.parse(data);
+				} catch (e) {}
 			}
 
 			// Update the state only if the message is formatted as we expect,
 			// i.e. as an object with a 'resize' action.
-			if ( 'resize' !== data.action ) {
+			if ('resize' !== data.action) {
 				return;
 			}
 
-			setWidth( data.width );
-			setHeight( data.height );
+			setWidth(data.width);
+			setHeight(data.height);
 		}
 
 		const { ownerDocument } = ref.current;
@@ -212,36 +209,32 @@ export default function Sandbox( {
 		// after reordering the containing block. See these two issues for more details:
 		// https://github.com/WordPress/gutenberg/issues/6146
 		// https://github.com/facebook/react/issues/18752
-		ref.current.addEventListener( 'load', tryNoForceSandbox, false );
-		defaultView.addEventListener( 'message', checkMessageForResize );
+		ref.current.addEventListener('load', tryNoForceSandbox, false);
+		defaultView.addEventListener('message', checkMessageForResize);
 
 		return () => {
-			ref.current?.removeEventListener(
-				'load',
-				tryNoForceSandbox,
-				false
-			);
-			defaultView.addEventListener( 'message', checkMessageForResize );
+			ref.current?.removeEventListener('load', tryNoForceSandbox, false);
+			defaultView.addEventListener('message', checkMessageForResize);
 		};
-	}, [] );
+	}, []);
 
-	useEffect( () => {
+	useEffect(() => {
 		trySandbox();
-	}, [ title, type, styles, scripts ] );
+	}, [title, type, styles, scripts]);
 
-	useEffect( () => {
-		trySandbox( true );
-	}, [ html ] );
+	useEffect(() => {
+		trySandbox(true);
+	}, [html]);
 
 	return (
 		<iframe
-			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
-			title={ title }
+			ref={useMergeRefs([ref, useFocusableIframe()])}
+			title={title}
 			className="components-sandbox"
 			sandbox="allow-scripts allow-same-origin allow-presentation"
-			onFocus={ onFocus }
-			width={ Math.ceil( width ) }
-			height={ Math.ceil( height ) }
+			onFocus={onFocus}
+			width={Math.ceil(width)}
+			height={Math.ceil(height)}
 		/>
 	);
 }

@@ -21,9 +21,9 @@ export default {
 	},
 };
 
-const ColorPaletteWithState = ( props ) => {
-	const [ color, setColor ] = useState( '#F00' );
-	return <ColorPalette { ...props } value={ color } onChange={ setColor } />;
+const ColorPaletteWithState = (props) => {
+	const [color, setColor] = useState('#F00');
+	return <ColorPalette {...props} value={color} onChange={setColor} />;
 };
 
 export const _default = () => {
@@ -33,15 +33,15 @@ export const _default = () => {
 		{ name: 'blue', color: '#00f' },
 	];
 
-	return <ColorPaletteWithState colors={ colors } />;
+	return <ColorPaletteWithState colors={colors} />;
 };
 
 export const withKnobs = () => {
 	const colors = [
-		object( 'Red', { name: 'red', color: '#f00' } ),
-		object( 'White', { name: 'white', color: '#fff' } ),
-		object( 'Blue', { name: 'blue', color: '#00f' } ),
+		object('Red', { name: 'red', color: '#f00' }),
+		object('White', { name: 'white', color: '#fff' }),
+		object('Blue', { name: 'blue', color: '#00f' }),
 	];
 
-	return <ColorPaletteWithState colors={ colors } />;
+	return <ColorPaletteWithState colors={colors} />;
 };

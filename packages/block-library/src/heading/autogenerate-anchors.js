@@ -17,8 +17,8 @@ const anchors = {};
  *
  * @return {string} The text without markup.
  */
-const getTextWithoutMarkup = ( text ) => {
-	const dummyElement = document.createElement( 'div' );
+const getTextWithoutMarkup = (text) => {
+	const dummyElement = document.createElement('div');
 	dummyElement.innerHTML = text;
 	return dummyElement.innerText;
 };
@@ -30,11 +30,11 @@ const getTextWithoutMarkup = ( text ) => {
  *
  * @return {string} Returns the slug.
  */
-const getSlug = ( content ) => {
+const getSlug = (content) => {
 	// Get the slug.
 	return trim(
-		deburr( getTextWithoutMarkup( content ) )
-			.replace( /[^\p{L}\p{N}]+/gu, '-' )
+		deburr(getTextWithoutMarkup(content))
+			.replace(/[^\p{L}\p{N}]+/gu, '-')
 			.toLowerCase(),
 		'-'
 	);
@@ -48,21 +48,21 @@ const getSlug = ( content ) => {
  *
  * @return {string|null} Return the heading anchor.
  */
-export const generateAnchor = ( clientId, content ) => {
-	const slug = getSlug( content );
+export const generateAnchor = (clientId, content) => {
+	const slug = getSlug(content);
 	// If slug is empty, then return null.
 	// Returning null instead of an empty string allows us to check again when the content changes.
-	if ( '' === slug ) {
+	if ('' === slug) {
 		return null;
 	}
 
-	delete anchors[ clientId ];
+	delete anchors[clientId];
 
 	let anchor = slug;
 	let i = 0;
 
 	// If the anchor already exists in another heading, append -i.
-	while ( Object.values( anchors ).includes( anchor ) ) {
+	while (Object.values(anchors).includes(anchor)) {
 		i += 1;
 		anchor = slug + '-' + i;
 	}
@@ -76,6 +76,6 @@ export const generateAnchor = ( clientId, content ) => {
  * @param {string}      clientId The block ID.
  * @param {string|null} anchor   The block anchor.
  */
-export const setAnchor = ( clientId, anchor ) => {
-	anchors[ clientId ] = anchor;
+export const setAnchor = (clientId, anchor) => {
+	anchors[clientId] = anchor;
 };

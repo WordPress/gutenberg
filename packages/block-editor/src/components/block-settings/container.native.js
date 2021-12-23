@@ -25,83 +25,81 @@ export const blockSettingsScreens = {
 	imageLinkDestinations: 'imageLinkDestinations',
 };
 
-function BottomSheetSettings( {
+function BottomSheetSettings({
 	editorSidebarOpened,
 	closeGeneralSidebar,
 	settings,
 	...props
-} ) {
+}) {
 	const colorSettings = {
-		colors: useSetting( 'color.palette' ) || settings.colors,
-		gradients: useSetting( 'color.gradients' ) || settings.gradients,
+		colors: useSetting('color.palette') || settings.colors,
+		gradients: useSetting('color.gradients') || settings.gradients,
 	};
 
 	return (
 		<BottomSheet
-			isVisible={ editorSidebarOpened }
-			onClose={ closeGeneralSidebar }
+			isVisible={editorSidebarOpened}
+			onClose={closeGeneralSidebar}
 			hideHeader
-			contentStyle={ styles.content }
+			contentStyle={styles.content}
 			hasNavigation
 			testID="block-settings-modal"
-			{ ...props }
+			{...props}
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
-					name={ blockSettingsScreens.settings }
+					name={blockSettingsScreens.settings}
 				>
 					<InspectorControls.Slot />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
-					name={ BottomSheet.SubSheet.screenName }
+					name={BottomSheet.SubSheet.screenName}
 				>
 					<BottomSheet.SubSheet.Slot />
 				</BottomSheet.NavigationScreen>
 
-				<BottomSheet.NavigationScreen
-					name={ blockSettingsScreens.color }
-				>
-					<ColorSettings defaultSettings={ colorSettings } />
+				<BottomSheet.NavigationScreen name={blockSettingsScreens.color}>
+					<ColorSettings defaultSettings={colorSettings} />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
-					name={ blockSettingsScreens.focalPoint }
+					name={blockSettingsScreens.focalPoint}
 					fullScreen
 				>
 					<FocalPointSettingsPanel />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
-					name={ blockSettingsScreens.linkPicker }
+					name={blockSettingsScreens.linkPicker}
 					fullScreen
 					isScrollable
 				>
 					<LinkPickerScreen
-						returnScreenName={ blockSettingsScreens.settings }
+						returnScreenName={blockSettingsScreens.settings}
 					/>
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
-					name={ blockSettingsScreens.imageLinkDestinations }
+					name={blockSettingsScreens.imageLinkDestinations}
 				>
-					<ImageLinkDestinationsScreen { ...props } />
+					<ImageLinkDestinationsScreen {...props} />
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getSettings } = select( blockEditorStore );
+export default compose([
+	withSelect((select) => {
+		const { isEditorSidebarOpened } = select('core/edit-post');
+		const { getSettings } = select(blockEditorStore);
 		return {
 			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { closeGeneralSidebar } = dispatch( 'core/edit-post' );
+	}),
+	withDispatch((dispatch) => {
+		const { closeGeneralSidebar } = dispatch('core/edit-post');
 
 		return {
 			closeGeneralSidebar,
 		};
-	} ),
-] )( BottomSheetSettings );
+	}),
+])(BottomSheetSettings);

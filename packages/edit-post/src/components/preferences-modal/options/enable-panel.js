@@ -11,18 +11,17 @@ import BaseOption from './base';
 import { store as editPostStore } from '../../../store';
 
 export default compose(
-	withSelect( ( select, { panelName } ) => {
-		const { isEditorPanelEnabled, isEditorPanelRemoved } = select(
-			editPostStore
-		);
+	withSelect((select, { panelName }) => {
+		const { isEditorPanelEnabled, isEditorPanelRemoved } =
+			select(editPostStore);
 		return {
-			isRemoved: isEditorPanelRemoved( panelName ),
-			isChecked: isEditorPanelEnabled( panelName ),
+			isRemoved: isEditorPanelRemoved(panelName),
+			isChecked: isEditorPanelEnabled(panelName),
 		};
-	} ),
-	ifCondition( ( { isRemoved } ) => ! isRemoved ),
-	withDispatch( ( dispatch, { panelName } ) => ( {
+	}),
+	ifCondition(({ isRemoved }) => !isRemoved),
+	withDispatch((dispatch, { panelName }) => ({
 		onChange: () =>
-			dispatch( editPostStore ).toggleEditorPanelEnabled( panelName ),
-	} ) )
-)( BaseOption );
+			dispatch(editPostStore).toggleEditorPanelEnabled(panelName),
+	}))
+)(BaseOption);

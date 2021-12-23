@@ -19,7 +19,7 @@ import PaletteScreen from './palette.screen';
 import { colorsUtils } from './utils';
 
 const ColorSettingsMemo = memo(
-	( {
+	({
 		defaultSettings,
 		onHandleClosingBottomSheet,
 		shouldEnableBottomSheetMaxHeight,
@@ -30,16 +30,16 @@ const ColorSettingsMemo = memo(
 		onColorCleared,
 		label,
 		hideNavigation,
-	} ) => {
-		useEffect( () => {
-			shouldEnableBottomSheetMaxHeight( true );
-			onHandleClosingBottomSheet( null );
-		}, [] );
+	}) => {
+		useEffect(() => {
+			shouldEnableBottomSheetMaxHeight(true);
+			onHandleClosingBottomSheet(null);
+		}, []);
 		return (
 			<BottomSheet.NavigationContainer>
 				<BottomSheet.NavigationScreen
-					name={ colorsUtils.screens.palette }
-					initialParams={ {
+					name={colorsUtils.screens.palette}
+					initialParams={{
 						defaultSettings,
 						onColorChange,
 						colorValue,
@@ -48,17 +48,15 @@ const ColorSettingsMemo = memo(
 						onColorCleared,
 						label,
 						hideNavigation,
-					} }
+					}}
 				>
 					<PaletteScreen />
 				</BottomSheet.NavigationScreen>
-				<BottomSheet.NavigationScreen
-					name={ colorsUtils.screens.picker }
-				>
+				<BottomSheet.NavigationScreen name={colorsUtils.screens.picker}>
 					<PickerScreen />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
-					name={ colorsUtils.screens.gradientPicker }
+					name={colorsUtils.screens.gradientPicker}
 				>
 					<GradientPickerScreen />
 				</BottomSheet.NavigationScreen>
@@ -66,21 +64,17 @@ const ColorSettingsMemo = memo(
 		);
 	}
 );
-function ColorSettings( props ) {
+function ColorSettings(props) {
 	const route = useRoute();
-	const {
-		onHandleClosingBottomSheet,
-		shouldEnableBottomSheetMaxHeight,
-	} = useContext( BottomSheetContext );
+	const { onHandleClosingBottomSheet, shouldEnableBottomSheetMaxHeight } =
+		useContext(BottomSheetContext);
 
 	return (
 		<ColorSettingsMemo
-			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
-			shouldEnableBottomSheetMaxHeight={
-				shouldEnableBottomSheetMaxHeight
-			}
-			{ ...props }
-			{ ...route.params }
+			onHandleClosingBottomSheet={onHandleClosingBottomSheet}
+			shouldEnableBottomSheetMaxHeight={shouldEnableBottomSheetMaxHeight}
+			{...props}
+			{...route.params}
 		/>
 	);
 }

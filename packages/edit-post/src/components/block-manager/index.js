@@ -18,31 +18,31 @@ import { useState } from '@wordpress/element';
 import BlockManagerCategory from './category';
 import { store as editPostStore } from '../../store';
 
-function BlockManager( {
+function BlockManager({
 	blockTypes,
 	categories,
 	hasBlockSupport,
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
-} ) {
-	const [ search, setSearch ] = useState( '' );
+}) {
+	const [search, setSearch] = useState('');
 
 	// Filtering occurs here (as opposed to `withSelect`) to avoid
 	// wasted renders by consequence of `Array#filter` producing
 	// a new value reference on each call.
 	blockTypes = blockTypes.filter(
-		( blockType ) =>
-			hasBlockSupport( blockType, 'inserter', true ) &&
-			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
-			( ! blockType.parent ||
-				includes( blockType.parent, 'core/post-content' ) )
+		(blockType) =>
+			hasBlockSupport(blockType, 'inserter', true) &&
+			(!search || isMatchingSearchTerm(blockType, search)) &&
+			(!blockType.parent ||
+				includes(blockType.parent, 'core/post-content'))
 	);
 
 	return (
 		<div className="edit-post-block-manager__content">
-			{ !! numberOfHiddenBlocks && (
+			{!!numberOfHiddenBlocks && (
 				<div className="edit-post-block-manager__disabled-blocks-count">
-					{ sprintf(
+					{sprintf(
 						/* translators: %d: number of blocks. */
 						_n(
 							'%d block is hidden.',
@@ -50,59 +50,56 @@ function BlockManager( {
 							numberOfHiddenBlocks
 						),
 						numberOfHiddenBlocks
-					) }
+					)}
 				</div>
-			) }
+			)}
 			<SearchControl
-				label={ __( 'Search for a block' ) }
-				placeholder={ __( 'Search for a block' ) }
-				value={ search }
-				onChange={ ( nextSearch ) => setSearch( nextSearch ) }
+				label={__('Search for a block')}
+				placeholder={__('Search for a block')}
+				value={search}
+				onChange={(nextSearch) => setSearch(nextSearch)}
 				className="edit-post-block-manager__search"
 			/>
 			<div
 				tabIndex="0"
 				role="region"
-				aria-label={ __( 'Available block types' ) }
+				aria-label={__('Available block types')}
 				className="edit-post-block-manager__results"
 			>
-				{ blockTypes.length === 0 && (
+				{blockTypes.length === 0 && (
 					<p className="edit-post-block-manager__no-results">
-						{ __( 'No blocks found.' ) }
+						{__('No blocks found.')}
 					</p>
-				) }
-				{ categories.map( ( category ) => (
+				)}
+				{categories.map((category) => (
 					<BlockManagerCategory
-						key={ category.slug }
-						title={ category.title }
-						blockTypes={ filter( blockTypes, {
+						key={category.slug}
+						title={category.title}
+						blockTypes={filter(blockTypes, {
 							category: category.slug,
-						} ) }
+						})}
 					/>
-				) ) }
+				))}
 				<BlockManagerCategory
-					title={ __( 'Uncategorized' ) }
-					blockTypes={ filter(
-						blockTypes,
-						( { category } ) => ! category
-					) }
+					title={__('Uncategorized')}
+					blockTypes={filter(blockTypes, ({ category }) => !category)}
 				/>
 			</div>
 		</div>
 	);
 }
 
-export default withSelect( ( select ) => {
+export default withSelect((select) => {
 	const {
 		getBlockTypes,
 		getCategories,
 		hasBlockSupport,
 		isMatchingSearchTerm,
-	} = select( blocksStore );
-	const { getPreference } = select( editPostStore );
-	const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
+	} = select(blocksStore);
+	const { getPreference } = select(editPostStore);
+	const hiddenBlockTypes = getPreference('hiddenBlockTypes');
 	const numberOfHiddenBlocks =
-		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+		isArray(hiddenBlockTypes) && hiddenBlockTypes.length;
 
 	return {
 		blockTypes: getBlockTypes(),
@@ -111,4 +108,4 @@ export default withSelect( ( select ) => {
 		isMatchingSearchTerm,
 		numberOfHiddenBlocks,
 	};
-} )( BlockManager );
+})(BlockManager);

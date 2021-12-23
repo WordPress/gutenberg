@@ -17,10 +17,10 @@ import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
-function PostCommentsDisplay( { postId } ) {
+function PostCommentsDisplay({ postId }) {
 	return useSelect(
-		( select ) => {
-			const comments = select( coreStore ).getEntityRecords(
+		(select) => {
+			const comments = select(coreStore).getEntityRecords(
 				'root',
 				'comment',
 				{
@@ -29,39 +29,37 @@ function PostCommentsDisplay( { postId } ) {
 			);
 			// TODO: "No Comments" placeholder should be editable.
 			return comments && comments.length
-				? comments.map( ( comment ) => (
+				? comments.map((comment) => (
 						<RawHTML
 							className="wp-block-post-comments__comment"
-							key={ comment.id }
+							key={comment.id}
 						>
-							{ comment.content.rendered }
+							{comment.content.rendered}
 						</RawHTML>
-				  ) )
-				: __( 'No comments.' );
+				  ))
+				: __('No comments.');
 		},
-		[ postId ]
+		[postId]
 	);
 }
 
-export default function PostCommentsEdit( {
+export default function PostCommentsEdit({
 	attributes,
 	setAttributes,
 	context,
-} ) {
+}) {
 	const { postType, postId } = context;
 	const { textAlign } = attributes;
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+		}),
+	});
 
-	if ( ! postType || ! postId ) {
+	if (!postType || !postId) {
 		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Post comments block: no post found.' ) }
-				</Warning>
+			<div {...blockProps}>
+				<Warning>{__('Post comments block: no post found.')}</Warning>
 			</div>
 		);
 	}
@@ -70,15 +68,15 @@ export default function PostCommentsEdit( {
 		<>
 			<BlockControls group="block">
 				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
+					value={textAlign}
+					onChange={(nextAlign) => {
+						setAttributes({ textAlign: nextAlign });
+					}}
 				/>
 			</BlockControls>
 
-			<div { ...blockProps }>
-				<PostCommentsDisplay postId={ postId } />
+			<div {...blockProps}>
+				<PostCommentsDisplay postId={postId} />
 			</div>
 		</>
 	);

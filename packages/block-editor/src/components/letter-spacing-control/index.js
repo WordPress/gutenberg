@@ -22,22 +22,22 @@ import useSetting from '../../components/use-setting';
  *
  * @return {WPElement} Letter-spacing control.
  */
-export default function LetterSpacingControl( {
+export default function LetterSpacingControl({
 	value,
 	onChange,
 	__unstableInputWidth = '60px',
-} ) {
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+}) {
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || ['px', 'em', 'rem'],
 		defaultValues: { px: '2', em: '.2', rem: '.2' },
-	} );
+	});
 	return (
 		<UnitControl
-			label={ __( 'Letter spacing' ) }
-			value={ value }
-			__unstableInputWidth={ __unstableInputWidth }
-			units={ units }
-			onChange={ onChange }
+			label={__('Letter spacing')}
+			value={value}
+			__unstableInputWidth={__unstableInputWidth}
+			units={units}
+			onChange={onChange}
 		/>
 	);
 }

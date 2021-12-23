@@ -21,38 +21,37 @@ import EditTemplateTitle from './edit-template-title';
 import TemplateDescription from './template-description';
 
 function TemplateTitle() {
-	const { template, isEditing, title } = useSelect( ( select ) => {
-		const { isEditingTemplate, getEditedPostTemplate } = select(
-			editPostStore
-		);
-		const { getEditedPostAttribute } = select( editorStore );
+	const { template, isEditing, title } = useSelect((select) => {
+		const { isEditingTemplate, getEditedPostTemplate } =
+			select(editPostStore);
+		const { getEditedPostAttribute } = select(editorStore);
 
 		const _isEditing = isEditingTemplate();
 
 		return {
 			template: _isEditing ? getEditedPostTemplate() : null,
 			isEditing: _isEditing,
-			title: getEditedPostAttribute( 'title' )
-				? getEditedPostAttribute( 'title' )
-				: __( 'Untitled' ),
+			title: getEditedPostAttribute('title')
+				? getEditedPostAttribute('title')
+				: __('Untitled'),
 		};
-	}, [] );
+	}, []);
 
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const { setIsEditingTemplate } = useDispatch( editPostStore );
+	const { clearSelectedBlock } = useDispatch(blockEditorStore);
+	const { setIsEditingTemplate } = useDispatch(editPostStore);
 
-	if ( ! isEditing || ! template ) {
+	if (!isEditing || !template) {
 		return null;
 	}
 
-	let templateTitle = __( 'Default' );
-	if ( template?.title ) {
+	let templateTitle = __('Default');
+	if (template?.title) {
 		templateTitle = template.title;
-	} else if ( !! template ) {
+	} else if (!!template) {
 		templateTitle = template.slug;
 	}
 
-	const hasOptions = !! (
+	const hasOptions = !!(
 		template.custom ||
 		template.wp_id ||
 		template.description
@@ -64,51 +63,51 @@ function TemplateTitle() {
 				className="edit-post-template-post-title"
 				isLink
 				showTooltip
-				label={ sprintf(
+				label={sprintf(
 					/* translators: %s: Title of the referring post, e.g: "Hello World!" */
-					__( 'Edit %s' ),
+					__('Edit %s'),
 					title
-				) }
-				onClick={ () => {
+				)}
+				onClick={() => {
 					clearSelectedBlock();
-					setIsEditingTemplate( false );
-				} }
+					setIsEditingTemplate(false);
+				}}
 			>
-				{ title }
+				{title}
 			</Button>
-			{ hasOptions ? (
+			{hasOptions ? (
 				<Dropdown
 					position="bottom center"
 					contentClassName="edit-post-template-top-area__popover"
-					renderToggle={ ( { onToggle } ) => (
+					renderToggle={({ onToggle }) => (
 						<Button
 							className="edit-post-template-title"
 							isLink
-							icon={ chevronDown }
+							icon={chevronDown}
 							showTooltip
-							onClick={ onToggle }
-							label={ __( 'Template Options' ) }
+							onClick={onToggle}
+							label={__('Template Options')}
 						>
-							{ templateTitle }
+							{templateTitle}
 						</Button>
-					) }
-					renderContent={ () => (
+					)}
+					renderContent={() => (
 						<>
 							<EditTemplateTitle />
 							<TemplateDescription />
 							<DeleteTemplate />
 						</>
-					) }
+					)}
 				/>
 			) : (
 				<Text
 					className="edit-post-template-title"
 					size="body"
-					style={ { lineHeight: '24px' } }
+					style={{ lineHeight: '24px' }}
 				>
-					{ templateTitle }
+					{templateTitle}
 				</Text>
-			) }
+			)}
 		</div>
 	);
 }

@@ -16,13 +16,13 @@ export const unstyledButton = css`
 	text-align: left;
 
 	&:hover {
-		color: ${ COLORS.admin.theme };
+		color: ${COLORS.admin.theme};
 	}
 
 	&:focus {
 		background-color: transparent;
-		color: ${ COLORS.admin.theme };
-		border-color: ${ COLORS.admin.theme };
+		color: ${COLORS.admin.theme};
+		border-color: ${COLORS.admin.theme};
 		outline: 3px solid transparent;
 	}
 `;
@@ -39,15 +39,15 @@ export const item = css`
 `;
 
 export const bordered = css`
-	border: 1px solid ${ CONFIG.surfaceBorderColor };
+	border: 1px solid ${CONFIG.surfaceBorderColor};
 `;
 
 export const separated = css`
-	> *:not( marquee ) > * {
-		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
+	> *:not(marquee) > * {
+		border-bottom: 1px solid ${CONFIG.surfaceBorderColor};
 	}
 
-	> *:last-of-type > *:not( :focus ) {
+	> *:last-of-type > *:not(:focus) {
 		border-bottom-color: transparent;
 	}
 `;
@@ -55,24 +55,24 @@ export const separated = css`
 const borderRadius = CONFIG.controlBorderRadius;
 
 export const spacedAround = css`
-	border-radius: ${ borderRadius };
+	border-radius: ${borderRadius};
 `;
 
 export const rounded = css`
-	border-radius: ${ borderRadius };
+	border-radius: ${borderRadius};
 
 	> *:first-of-type > * {
-		border-top-left-radius: ${ borderRadius };
-		border-top-right-radius: ${ borderRadius };
+		border-top-left-radius: ${borderRadius};
+		border-top-right-radius: ${borderRadius};
 	}
 
 	> *:last-of-type > * {
-		border-bottom-left-radius: ${ borderRadius };
-		border-bottom-right-radius: ${ borderRadius };
+		border-bottom-left-radius: ${borderRadius};
+		border-bottom-right-radius: ${borderRadius};
 	}
 `;
 
-const baseFontHeight = `calc(${ CONFIG.fontSize } * ${ CONFIG.fontLineHeightBase })`;
+const baseFontHeight = `calc(${CONFIG.fontSize} * ${CONFIG.fontLineHeightBase})`;
 
 /*
  * Math:
@@ -81,18 +81,18 @@ const baseFontHeight = `calc(${ CONFIG.fontSize } * ${ CONFIG.fontLineHeightBase
  * - Subtract the effects of border
  * - Divide the calculated number by 2, in order to get an individual top/bottom padding
  */
-const paddingY = `calc((${ CONFIG.controlHeight } - ${ baseFontHeight } - 2px) / 2)`;
-const paddingYSmall = `calc((${ CONFIG.controlHeightSmall } - ${ baseFontHeight } - 2px) / 2)`;
-const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight } - 2px) / 2)`;
+const paddingY = `calc((${CONFIG.controlHeight} - ${baseFontHeight} - 2px) / 2)`;
+const paddingYSmall = `calc((${CONFIG.controlHeightSmall} - ${baseFontHeight} - 2px) / 2)`;
+const paddingYLarge = `calc((${CONFIG.controlHeightLarge} - ${baseFontHeight} - 2px) / 2)`;
 
 export const itemSizes = {
 	small: css`
-		padding: ${ paddingYSmall } ${ CONFIG.controlPaddingXSmall };
+		padding: ${paddingYSmall} ${CONFIG.controlPaddingXSmall};
 	`,
 	medium: css`
-		padding: ${ paddingY } ${ CONFIG.controlPaddingX };
+		padding: ${paddingY} ${CONFIG.controlPaddingX};
 	`,
 	large: css`
-		padding: ${ paddingYLarge } ${ CONFIG.controlPaddingXLarge };
+		padding: ${paddingYLarge} ${CONFIG.controlPaddingXLarge};
 	`,
 };

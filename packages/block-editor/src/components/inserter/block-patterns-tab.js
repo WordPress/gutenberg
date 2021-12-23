@@ -13,70 +13,67 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 
-function BlockPatternsCategory( {
+function BlockPatternsCategory({
 	rootClientId,
 	onInsert,
 	selectedCategory,
 	populatedCategories,
-} ) {
-	const [ allPatterns, , onClick ] = usePatternsState(
-		onInsert,
-		rootClientId
-	);
+}) {
+	const [allPatterns, , onClick] = usePatternsState(onInsert, rootClientId);
 
 	const getPatternIndex = useCallback(
-		( pattern ) => {
-			if ( ! pattern.categories?.length ) {
+		(pattern) => {
+			if (!pattern.categories?.length) {
 				return Infinity;
 			}
 			const indexedCategories = populatedCategories.reduce(
-				( accumulator, { name }, index ) => {
-					accumulator[ name ] = index;
+				(accumulator, { name }, index) => {
+					accumulator[name] = index;
 					return accumulator;
 				},
 				{}
 			);
 			return Math.min(
-				...pattern.categories.map( ( cat ) =>
-					indexedCategories[ cat ] !== undefined
-						? indexedCategories[ cat ]
+				...pattern.categories.map((cat) =>
+					indexedCategories[cat] !== undefined
+						? indexedCategories[cat]
 						: Infinity
 				)
 			);
 		},
-		[ populatedCategories ]
+		[populatedCategories]
 	);
 
 	const currentCategoryPatterns = useMemo(
 		() =>
-			allPatterns.filter( ( pattern ) =>
+			allPatterns.filter((pattern) =>
 				selectedCategory.name === 'uncategorized'
-					? getPatternIndex( pattern ) === Infinity
-					: pattern.categories?.includes( selectedCategory.name )
+					? getPatternIndex(pattern) === Infinity
+					: pattern.categories?.includes(selectedCategory.name)
 			),
-		[ allPatterns, selectedCategory ]
+		[allPatterns, selectedCategory]
 	);
 
 	// Ordering the patterns is important for the async rendering.
-	const orderedPatterns = useMemo( () => {
-		return currentCategoryPatterns.sort( ( a, b ) => {
-			return getPatternIndex( a ) - getPatternIndex( b );
-		} );
-	}, [ currentCategoryPatterns, getPatternIndex ] );
+	const orderedPatterns = useMemo(() => {
+		return currentCategoryPatterns.sort((a, b) => {
+			return getPatternIndex(a) - getPatternIndex(b);
+		});
+	}, [currentCategoryPatterns, getPatternIndex]);
 
-	const currentShownPatterns = useAsyncList( orderedPatterns );
+	const currentShownPatterns = useAsyncList(orderedPatterns);
 
-	if ( ! currentCategoryPatterns.length ) {
+	if (!currentCategoryPatterns.length) {
 		return null;
 	}
 
 	return (
 		<div className="block-editor-inserter__panel-content">
 			<BlockPatternList
-				shownPatterns={ currentShownPatterns }
-				blockPatterns={ currentCategoryPatterns }
-				onClickPattern={ onClick }
-				label={ selectedCategory.label }
+				shownPatterns={currentShownPatterns}
+				blockPatterns={currentCategoryPatterns}
+				onClickPattern={onClick}
+				label={selectedCategory.label}
 				orientation="vertical"
 				isDraggable
 			/>
@@ -84,91 +81,87 @@ function BlockPatternsCategory( {
 	);
 }
 
-function BlockPatternsTabs( {
+function BlockPatternsTabs({
 	rootClientId,
 	onInsert,
 	onClickCategory,
 	selectedCategory,
-} ) {
-	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const [ allPatterns, allCategories ] = usePatternsState();
+}) {
+	const [showPatternsExplorer, setShowPatternsExplorer] = useState(false);
+	const [allPatterns, allCategories] = usePatternsState();
 
 	const hasRegisteredCategory = useCallback(
-		( pattern ) => {
-			if ( ! pattern.categories || ! pattern.categories.length ) {
+		(pattern) => {
+			if (!pattern.categories || !pattern.categories.length) {
 				return false;
 			}
 
-			return pattern.categories.some( ( cat ) =>
-				allCategories.some( ( category ) => category.name === cat )
+			return pattern.categories.some((cat) =>
+				allCategories.some((category) => category.name === cat)
 			);
 		},
-		[ allCategories ]
+		[allCategories]
 	);
 
 	// Remove any empty categories
-	const populatedCategories = useMemo( () => {
+	const populatedCategories = useMemo(() => {
 		const categories = allCategories
-			.filter( ( category ) =>
-				allPatterns.some( ( pattern ) =>
-					pattern.categories?.includes( category.name )
+			.filter((category) =>
+				allPatterns.some((pattern) =>
+					pattern.categories?.includes(category.name)
 				)
 			)
-			.sort( ( { name: currentName }, { name: nextName } ) => {
-				if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
+			.sort(({ name: currentName }, { name: nextName }) => {
+				if (![currentName, nextName].includes('featured')) {
 					return 0;
 				}
 				return currentName === 'featured' ? -1 : 1;
-			} );
+			});
 
 		if (
-			allPatterns.some(
-				( pattern ) => ! hasRegisteredCategory( pattern )
-			) &&
-			! categories.find(
-				( category ) => category.name === 'uncategorized'
-			)
+			allPatterns.some((pattern) => !hasRegisteredCategory(pattern)) &&
+			!categories.find((category) => category.name === 'uncategorized')
 		) {
-			categories.push( {
+			categories.push({
 				name: 'uncategorized',
-				label: _x( 'Uncategorized' ),
-			} );
+				label: _x('Uncategorized'),
+			});
 		}
 
 		return categories;
-	}, [ allPatterns, allCategories ] );
+	}, [allPatterns, allCategories]);
 
 	const patternCategory = selectedCategory
 		? selectedCategory
-		: populatedCategories[ 0 ];
+		: populatedCategories[0];
 
 	return (
 		<>
-			{ ! showPatternsExplorer && (
+			{!showPatternsExplorer && (
 				<>
 					<PatternInserterPanel
-						selectedCategory={ patternCategory }
-						patternCategories={ populatedCategories }
-						onClickCategory={ onClickCategory }
-						openPatternExplorer={ () =>
-							setShowPatternsExplorer( true )
+						selectedCategory={patternCategory}
+						patternCategories={populatedCategories}
+						onClickCategory={onClickCategory}
+						openPatternExplorer={() =>
+							setShowPatternsExplorer(true)
 						}
 					/>
 					<BlockPatternsCategory
-						rootClientId={ rootClientId }
-						onInsert={ onInsert }
-						selectedCategory={ patternCategory }
-						populatedCategories={ populatedCategories }
+						rootClientId={rootClientId}
+						onInsert={onInsert}
+						selectedCategory={patternCategory}
+						populatedCategories={populatedCategories}
 					/>
 				</>
-			) }
-			{ showPatternsExplorer && (
+			)}
+			{showPatternsExplorer && (
 				<PatternsExplorerModal
-					initialCategory={ patternCategory }
-					patternCategories={ populatedCategories }
-					onModalClose={ () => setShowPatternsExplorer( false ) }
+					initialCategory={patternCategory}
+					patternCategories={populatedCategories}
+					onModalClose={() => setShowPatternsExplorer(false)}
 				/>
-			) }
+			)}
 		</>
 	);
 }

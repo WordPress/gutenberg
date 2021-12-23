@@ -10,8 +10,8 @@ import ApplyButton from './apply-button';
 import Button from './back-button';
 import Heading from './heading';
 import styles from './styles.scss';
-function NavBar( { children } ) {
-	return <View style={ styles[ 'nav-bar' ] }>{ children }</View>;
+function NavBar({ children }) {
+	return <View style={styles['nav-bar']}>{children}</View>;
 }
 
 NavBar.ApplyButton = ApplyButton;

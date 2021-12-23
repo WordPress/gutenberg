@@ -20,8 +20,8 @@ import Editor from '@wordpress/edit-post/src/editor';
 // Set up the mocks for getting the HTML output of the editor
 let triggerHtmlSerialization;
 let serializedHtml;
-subscribeParentGetHtml.mockImplementation( ( callback ) => {
-	if ( ! triggerHtmlSerialization ) {
+subscribeParentGetHtml.mockImplementation((callback) => {
+	if (!triggerHtmlSerialization) {
 		triggerHtmlSerialization = callback;
 		return {
 			remove: () => {
@@ -29,18 +29,18 @@ subscribeParentGetHtml.mockImplementation( ( callback ) => {
 			},
 		};
 	}
-} );
-provideToNativeHtml.mockImplementation( ( html ) => {
+});
+provideToNativeHtml.mockImplementation((html) => {
 	serializedHtml = html;
-} );
+});
 
-export function initializeEditor( props ) {
+export function initializeEditor(props) {
 	const renderResult = render(
 		<Editor
-			postId={ `post-id-${ uuid() }` }
+			postId={`post-id-${uuid()}`}
 			postType="post"
 			initialTitle="test"
-			{ ...props }
+			{...props}
 		/>
 	);
 	const { getByTestId } = renderResult;
@@ -49,22 +49,22 @@ export function initializeEditor( props ) {
 	// the React Native testing library from warning of potential undesired React state updates
 	// that can be covered in the integration tests.
 	// Reference: https://git.io/JPHn6
-	return new Promise( ( resolve ) => {
-		waitFor( () => getByTestId( 'block-list-wrapper' ) ).then(
-			( blockListWrapper ) => {
+	return new Promise((resolve) => {
+		waitFor(() => getByTestId('block-list-wrapper')).then(
+			(blockListWrapper) => {
 				// onLayout event has to be explicitly dispatched in BlockList component,
 				// otherwise the inner blocks are not rendered.
-				fireEvent( blockListWrapper, 'layout', {
+				fireEvent(blockListWrapper, 'layout', {
 					nativeEvent: {
 						layout: {
 							width: 100,
 						},
 					},
-				} );
-				resolve( renderResult );
+				});
+				resolve(renderResult);
 			}
 		);
-	} );
+	});
 }
 
 export * from '@testing-library/react-native';
@@ -75,40 +75,37 @@ export function waitFor(
 	{ timeout, interval } = { timeout: 1000, interval: 50 }
 ) {
 	let result;
-	const check = ( resolve, reject, time = 0 ) => {
+	const check = (resolve, reject, time = 0) => {
 		try {
 			result = cb();
-		} catch ( e ) {
+		} catch (e) {
 			//NOOP
 		}
-		if ( ! result && time < timeout ) {
-			setTimeout(
-				() => check( resolve, reject, time + interval ),
-				interval
-			);
+		if (!result && time < timeout) {
+			setTimeout(() => check(resolve, reject, time + interval), interval);
 			return;
 		}
-		resolve( result );
+		resolve(result);
 	};
-	return new Promise( ( resolve, reject ) =>
+	return new Promise((resolve, reject) =>
 		act(
-			() => new Promise( ( internalResolve ) => check( internalResolve ) )
-		).then( () => {
-			if ( ! result ) {
+			() => new Promise((internalResolve) => check(internalResolve))
+		).then(() => {
+			if (!result) {
 				reject(
-					`waitFor timed out after ${ timeout }ms for callback:\n${ cb }`
+					`waitFor timed out after ${timeout}ms for callback:\n${cb}`
 				);
 				return;
 			}
-			resolve( result );
-		} )
+			resolve(result);
+		})
 	);
 }
 
 // Helper for getting the current HTML output of the editor
 export function getEditorHtml() {
-	if ( ! triggerHtmlSerialization ) {
-		throw new Error( 'HTML serialization trigger is not defined.' );
+	if (!triggerHtmlSerialization) {
+		throw new Error('HTML serialization trigger is not defined.');
 	}
 	triggerHtmlSerialization();
 	return serializedHtml;

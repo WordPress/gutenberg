@@ -23,7 +23,7 @@ import * as children from './children';
  *
  * @return {boolean} Whether node is of intended type.
  */
-function isNodeOfType( node, type ) {
+function isNodeOfType(node, type) {
 	return node && node.type === type;
 }
 
@@ -37,11 +37,11 @@ function isNodeOfType( node, type ) {
  *
  * @return {Object} Object equivalent value of NamedNodeMap.
  */
-export function getNamedNodeMapAsObject( nodeMap ) {
+export function getNamedNodeMapAsObject(nodeMap) {
 	const result = {};
-	for ( let i = 0; i < nodeMap.length; i++ ) {
-		const { name, value } = nodeMap[ i ];
-		result[ name ] = value;
+	for (let i = 0; i < nodeMap.length; i++) {
+		const { name, value } = nodeMap[i];
+		result[name] = value;
 	}
 
 	return result;
@@ -57,12 +57,12 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  *
  * @return {WPBlockNode} Block node equivalent to DOM node.
  */
-export function fromDOM( domNode ) {
-	if ( domNode.nodeType === domNode.TEXT_NODE ) {
+export function fromDOM(domNode) {
+	if (domNode.nodeType === domNode.TEXT_NODE) {
 		return domNode.nodeValue;
 	}
 
-	if ( domNode.nodeType !== domNode.ELEMENT_NODE ) {
+	if (domNode.nodeType !== domNode.ELEMENT_NODE) {
 		throw new TypeError(
 			'A block node can only be created from a node of type text or ' +
 				'element.'
@@ -72,8 +72,8 @@ export function fromDOM( domNode ) {
 	return {
 		type: domNode.nodeName.toLowerCase(),
 		props: {
-			...getNamedNodeMapAsObject( domNode.attributes ),
-			children: children.fromDOM( domNode.childNodes ),
+			...getNamedNodeMapAsObject(domNode.attributes),
+			children: children.fromDOM(domNode.childNodes),
 		},
 	};
 }
@@ -85,8 +85,8 @@ export function fromDOM( domNode ) {
  *
  * @return {string} String HTML representation of block node.
  */
-export function toHTML( node ) {
-	return children.toHTML( [ node ] );
+export function toHTML(node) {
+	return children.toHTML([node]);
 }
 
 /**
@@ -97,17 +97,17 @@ export function toHTML( node ) {
  *
  * @return {Function} hpq matcher.
  */
-export function matcher( selector ) {
-	return ( domNode ) => {
+export function matcher(selector) {
+	return (domNode) => {
 		let match = domNode;
 
-		if ( selector ) {
-			match = domNode.querySelector( selector );
+		if (selector) {
+			match = domNode.querySelector(selector);
 		}
 
 		try {
-			return fromDOM( match );
-		} catch ( error ) {
+			return fromDOM(match);
+		} catch (error) {
 			return null;
 		}
 	};

@@ -8,39 +8,39 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { MoreMenuFeatureToggle } from '@wordpress/interface';
 
 function WritingMenu() {
-	const isLargeViewport = useViewportMatch( 'medium' );
-	if ( ! isLargeViewport ) {
+	const isLargeViewport = useViewportMatch('medium');
+	if (!isLargeViewport) {
 		return null;
 	}
 
 	return (
-		<MenuGroup label={ _x( 'View', 'noun' ) }>
+		<MenuGroup label={_x('View', 'noun')}>
 			<MoreMenuFeatureToggle
 				scope="core/edit-post"
 				feature="fixedToolbar"
-				label={ __( 'Top toolbar' ) }
-				info={ __(
+				label={__('Top toolbar')}
+				info={__(
 					'Access all block and document tools in a single place'
-				) }
-				messageActivated={ __( 'Top toolbar activated' ) }
-				messageDeactivated={ __( 'Top toolbar deactivated' ) }
+				)}
+				messageActivated={__('Top toolbar activated')}
+				messageDeactivated={__('Top toolbar deactivated')}
 			/>
 			<MoreMenuFeatureToggle
 				scope="core/edit-post"
 				feature="focusMode"
-				label={ __( 'Spotlight mode' ) }
-				info={ __( 'Focus on one block at a time' ) }
-				messageActivated={ __( 'Spotlight mode activated' ) }
-				messageDeactivated={ __( 'Spotlight mode deactivated' ) }
+				label={__('Spotlight mode')}
+				info={__('Focus on one block at a time')}
+				messageActivated={__('Spotlight mode activated')}
+				messageDeactivated={__('Spotlight mode deactivated')}
 			/>
 			<MoreMenuFeatureToggle
 				scope="core/edit-post"
 				feature="fullscreenMode"
-				label={ __( 'Fullscreen mode' ) }
-				info={ __( 'Work without distraction' ) }
-				messageActivated={ __( 'Fullscreen mode activated' ) }
-				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
-				shortcut={ displayShortcut.secondary( 'f' ) }
+				label={__('Fullscreen mode')}
+				info={__('Work without distraction')}
+				messageActivated={__('Fullscreen mode activated')}
+				messageDeactivated={__('Fullscreen mode deactivated')}
+				shortcut={displayShortcut.secondary('f')}
 			/>
 		</MenuGroup>
 	);

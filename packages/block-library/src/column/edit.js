@@ -24,7 +24,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
-function ColumnEdit( {
+function ColumnEdit({
 	attributes: {
 		verticalAlignment,
 		width,
@@ -33,62 +33,61 @@ function ColumnEdit( {
 	},
 	setAttributes,
 	clientId,
-} ) {
-	const classes = classnames( 'block-core-columns', {
-		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-	} );
+}) {
+	const classes = classnames('block-core-columns', {
+		[`is-vertically-aligned-${verticalAlignment}`]: verticalAlignment,
+	});
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || [
 			'%',
 			'px',
 			'em',
 			'rem',
 			'vw',
 		],
-	} );
+	});
 
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
-		( select ) => {
-			const { getBlockOrder, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+		(select) => {
+			const { getBlockOrder, getBlockRootClientId } =
+				select(blockEditorStore);
 
-			const rootId = getBlockRootClientId( clientId );
+			const rootId = getBlockRootClientId(clientId);
 
 			return {
-				hasChildBlocks: getBlockOrder( clientId ).length > 0,
+				hasChildBlocks: getBlockOrder(clientId).length > 0,
 				rootClientId: rootId,
-				columnsIds: getBlockOrder( rootId ),
+				columnsIds: getBlockOrder(rootId),
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch(blockEditorStore);
 
-	const updateAlignment = ( value ) => {
+	const updateAlignment = (value) => {
 		// Update own alignment.
-		setAttributes( { verticalAlignment: value } );
+		setAttributes({ verticalAlignment: value });
 		// Reset parent Columns block.
-		updateBlockAttributes( rootClientId, {
+		updateBlockAttributes(rootClientId, {
 			verticalAlignment: null,
-		} );
+		});
 	};
 
-	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
-	const blockProps = useBlockProps( {
+	const widthWithUnit = Number.isFinite(width) ? width + '%' : width;
+	const blockProps = useBlockProps({
 		className: classes,
 		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
-	} );
+	});
 
 	const columnsCount = columnsIds.length;
-	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
+	const currentColumnPosition = columnsIds.indexOf(clientId) + 1;
 
 	const label = sprintf(
 		/* translators: 1: Block label (i.e. "Block: Column"), 2: Position of the selected block, 3: Total number of sibling blocks of the same type */
-		__( '%1$s (%2$d of %3$d)' ),
-		blockProps[ 'aria-label' ],
+		__('%1$s (%2$d of %3$d)'),
+		blockProps['aria-label'],
 		currentColumnPosition,
 		columnsCount
 	);
@@ -108,27 +107,27 @@ function ColumnEdit( {
 		<>
 			<BlockControls>
 				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
+					onChange={updateAlignment}
+					value={verticalAlignment}
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Column settings' ) }>
+				<PanelBody title={__('Column settings')}>
 					<UnitControl
-						label={ __( 'Width' ) }
+						label={__('Width')}
 						labelPosition="edge"
 						__unstableInputWidth="80px"
-						value={ width || '' }
-						onChange={ ( nextWidth ) => {
+						value={width || ''}
+						onChange={(nextWidth) => {
 							nextWidth =
-								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-							setAttributes( { width: nextWidth } );
-						} }
-						units={ units }
+								0 > parseFloat(nextWidth) ? '0' : nextWidth;
+							setAttributes({ width: nextWidth });
+						}}
+						units={units}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...innerBlocksProps } />
+			<div {...innerBlocksProps} />
 		</>
 	);
 }

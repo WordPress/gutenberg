@@ -13,11 +13,11 @@ import { Keyboard } from 'react-native';
 import Header from './header';
 
 export default class VisualEditor extends Component {
-	constructor( props ) {
-		super( props );
-		this.renderHeader = this.renderHeader.bind( this );
-		this.keyboardDidShow = this.keyboardDidShow.bind( this );
-		this.keyboardDidHide = this.keyboardDidHide.bind( this );
+	constructor(props) {
+		super(props);
+		this.renderHeader = this.renderHeader.bind(this);
+		this.keyboardDidShow = this.keyboardDidShow.bind(this);
+		this.keyboardDidHide = this.keyboardDidHide.bind(this);
 
 		this.state = {
 			isAutoScrollEnabled: true,
@@ -41,16 +41,16 @@ export default class VisualEditor extends Component {
 	}
 
 	keyboardDidShow() {
-		this.setState( { isAutoScrollEnabled: false } );
+		this.setState({ isAutoScrollEnabled: false });
 	}
 
 	keyboardDidHide() {
-		this.setState( { isAutoScrollEnabled: true } );
+		this.setState({ isAutoScrollEnabled: true });
 	}
 
 	renderHeader() {
 		const { setTitleRef } = this.props;
-		return <Header setTitleRef={ setTitleRef } />;
+		return <Header setTitleRef={setTitleRef} />;
 	}
 
 	render() {
@@ -59,9 +59,9 @@ export default class VisualEditor extends Component {
 
 		return (
 			<BlockList
-				header={ this.renderHeader }
-				safeAreaBottomInset={ safeAreaBottomInset }
-				autoScroll={ isAutoScrollEnabled }
+				header={this.renderHeader}
+				safeAreaBottomInset={safeAreaBottomInset}
+				autoScroll={isAutoScrollEnabled}
 			/>
 		);
 	}

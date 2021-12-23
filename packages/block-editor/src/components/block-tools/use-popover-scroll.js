@@ -10,25 +10,25 @@ import { useRefEffect } from '@wordpress/compose';
  *
  * @param {Object} scrollableRef
  */
-export function usePopoverScroll( scrollableRef ) {
+export function usePopoverScroll(scrollableRef) {
 	return useRefEffect(
-		( node ) => {
-			if ( ! scrollableRef ) {
+		(node) => {
+			if (!scrollableRef) {
 				return;
 			}
 
-			function onWheel( event ) {
+			function onWheel(event) {
 				const { deltaX, deltaY } = event;
-				scrollableRef.current.scrollBy( deltaX, deltaY );
+				scrollableRef.current.scrollBy(deltaX, deltaY);
 			}
 			// Tell the browser that we do not call event.preventDefault
 			// See https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#improving_scrolling_performance_with_passive_listeners
 			const options = { passive: true };
-			node.addEventListener( 'wheel', onWheel, options );
+			node.addEventListener('wheel', onWheel, options);
 			return () => {
-				node.removeEventListener( 'wheel', onWheel, options );
+				node.removeEventListener('wheel', onWheel, options);
 			};
 		},
-		[ scrollableRef ]
+		[scrollableRef]
 	);
 }

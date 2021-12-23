@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { get } = require( 'lodash' );
+const { get } = require('lodash');
 
 /**
  * Returns the export entry records of the given export statement.
@@ -19,11 +19,11 @@ const { get } = require( 'lodash' );
  *    lineEnd: 3,
  * } ]
  */
-module.exports = ( token ) => {
-	if ( token.type === 'ExportDefaultDeclaration' ) {
-		const getLocalName = ( t ) => {
+module.exports = (token) => {
+	if (token.type === 'ExportDefaultDeclaration') {
+		const getLocalName = (t) => {
 			let name;
-			switch ( t.declaration.type ) {
+			switch (t.declaration.type) {
 				case 'Identifier':
 					name = t.declaration.name;
 					break;
@@ -33,13 +33,13 @@ module.exports = ( token ) => {
 				//case 'FunctionDeclaration'
 				//case 'ClassDeclaration'
 				default:
-					name = get( t.declaration, [ 'id', 'name' ], '*default*' );
+					name = get(t.declaration, ['id', 'name'], '*default*');
 			}
 			return name;
 		};
 		return [
 			{
-				localName: getLocalName( token ),
+				localName: getLocalName(token),
 				exportName: 'default',
 				module: null,
 				lineStart: token.loc.start.line,
@@ -48,7 +48,7 @@ module.exports = ( token ) => {
 		];
 	}
 
-	if ( token.type === 'ExportAllDeclaration' ) {
+	if (token.type === 'ExportAllDeclaration') {
 		return [
 			{
 				localName: '*',
@@ -61,41 +61,41 @@ module.exports = ( token ) => {
 	}
 
 	const name = [];
-	if ( token.declaration === null ) {
-		token.specifiers.forEach( ( specifier ) =>
-			name.push( {
+	if (token.declaration === null) {
+		token.specifiers.forEach((specifier) =>
+			name.push({
 				localName: specifier.local.name,
 				exportName: specifier.exported.name,
-				module: get( token.source, [ 'value' ], null ),
+				module: get(token.source, ['value'], null),
 				lineStart: specifier.loc.start.line,
 				lineEnd: specifier.loc.end.line,
-			} )
+			})
 		);
 		return name;
 	}
 
-	switch ( token.declaration.type ) {
+	switch (token.declaration.type) {
 		case 'ClassDeclaration':
 		case 'FunctionDeclaration':
-			name.push( {
+			name.push({
 				localName: token.declaration.id.name,
 				exportName: token.declaration.id.name,
 				module: null,
 				lineStart: token.declaration.loc.start.line,
 				lineEnd: token.declaration.loc.end.line,
-			} );
+			});
 			break;
 
 		case 'VariableDeclaration':
-			token.declaration.declarations.forEach( ( declaration ) => {
-				name.push( {
+			token.declaration.declarations.forEach((declaration) => {
+				name.push({
 					localName: declaration.id.name,
 					exportName: declaration.id.name,
 					module: null,
 					lineStart: token.declaration.loc.start.line,
 					lineEnd: token.declaration.loc.end.line,
-				} );
-			} );
+				});
+			});
 			break;
 	}
 

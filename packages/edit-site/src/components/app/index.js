@@ -13,34 +13,34 @@ import List from '../list';
 import NavigationSidebar from '../navigation-sidebar';
 import getIsListPage from '../../utils/get-is-list-page';
 
-export default function EditSiteApp( { reboot } ) {
+export default function EditSiteApp({ reboot }) {
 	return (
 		<SlotFillProvider>
 			<UnsavedChangesWarning />
 
 			<Routes>
-				{ ( { params } ) => {
-					const isListPage = getIsListPage( params );
+				{({ params }) => {
+					const isListPage = getIsListPage(params);
 
 					return (
 						<>
-							{ isListPage ? (
+							{isListPage ? (
 								<List />
 							) : (
-								<Editor onError={ reboot } />
-							) }
-							{ /* Keep the instance of the sidebar to ensure focus will not be lost
-							 * when navigating to other pages. */ }
+								<Editor onError={reboot} />
+							)}
+							{/* Keep the instance of the sidebar to ensure focus will not be lost
+							 * when navigating to other pages. */}
 							<NavigationSidebar
 								// Open the navigation sidebar by default when in the list page.
-								isDefaultOpen={ !! isListPage }
+								isDefaultOpen={!!isListPage}
 								activeTemplateType={
 									isListPage ? params.postType : undefined
 								}
 							/>
 						</>
 					);
-				} }
+				}}
 			</Routes>
 		</SlotFillProvider>
 	);

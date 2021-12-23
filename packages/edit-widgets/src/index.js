@@ -39,7 +39,7 @@ const disabledBlocks = [
 	'core/more',
 	'core/freeform',
 	'core/template-part',
-	...( ALLOW_REUSABLE_BLOCKS ? [] : [ 'core/block' ] ),
+	...(ALLOW_REUSABLE_BLOCKS ? [] : ['core/block']),
 ];
 
 /**
@@ -50,13 +50,10 @@ const disabledBlocks = [
  * @param {Element} target   DOM node in which editor is rendered.
  * @param {?Object} settings Editor settings object.
  */
-export function reinitializeEditor( target, settings ) {
-	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, target, settings );
-	render(
-		<Layout blockEditorSettings={ settings } onError={ reboot } />,
-		target
-	);
+export function reinitializeEditor(target, settings) {
+	unmountComponentAtNode(target);
+	const reboot = reinitializeEditor.bind(null, target, settings);
+	render(<Layout blockEditorSettings={settings} onError={reboot} />, target);
 }
 
 /**
@@ -65,50 +62,47 @@ export function reinitializeEditor( target, settings ) {
  * @param {string} id       ID of the root element to render the screen in.
  * @param {Object} settings Block editor settings.
  */
-export function initialize( id, settings ) {
-	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, target, settings );
-	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
-		return ! (
-			disabledBlocks.includes( block.name ) ||
-			block.name.startsWith( 'core/post' ) ||
-			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' ) ||
-			block.name.startsWith( 'core/navigation' )
+export function initialize(id, settings) {
+	const target = document.getElementById(id);
+	const reboot = reinitializeEditor.bind(null, target, settings);
+	const coreBlocks = __experimentalGetCoreBlocks().filter((block) => {
+		return !(
+			disabledBlocks.includes(block.name) ||
+			block.name.startsWith('core/post') ||
+			block.name.startsWith('core/query') ||
+			block.name.startsWith('core/site') ||
+			block.name.startsWith('core/navigation')
 		);
-	} );
+	});
 
-	dispatch( interfaceStore ).setFeatureDefaults( 'core/edit-widgets', {
+	dispatch(interfaceStore).setFeatureDefaults('core/edit-widgets', {
 		fixedToolbar: false,
 		welcomeGuide: true,
 		showBlockBreadcrumbs: true,
 		themeStyles: true,
-	} );
+	});
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
-	registerCoreBlocks( coreBlocks );
+	dispatch(blocksStore).__experimentalReapplyBlockTypeFilters();
+	registerCoreBlocks(coreBlocks);
 	registerLegacyWidgetBlock();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
+	if (process.env.GUTENBERG_PHASE === 2) {
+		__experimentalRegisterExperimentalCoreBlocks({
 			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
-		} );
+		});
 	}
-	registerLegacyWidgetVariations( settings );
-	registerBlock( widgetArea );
+	registerLegacyWidgetVariations(settings);
+	registerBlock(widgetArea);
 	registerWidgetGroupBlock();
 
-	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
-		fetchLinkSuggestions( search, searchOptions, settings );
+	settings.__experimentalFetchLinkSuggestions = (search, searchOptions) =>
+		fetchLinkSuggestions(search, searchOptions, settings);
 
 	// As we are unregistering `core/freeform` to avoid the Classic block, we must
 	// replace it with something as the default freeform content handler. Failure to
 	// do this will result in errors in the default block parser.
 	// see: https://github.com/WordPress/gutenberg/issues/33097
-	setFreeformContentHandlerName( 'core/html' );
-	render(
-		<Layout blockEditorSettings={ settings } onError={ reboot } />,
-		target
-	);
+	setFreeformContentHandlerName('core/html');
+	render(<Layout blockEditorSettings={settings} onError={reboot} />, target);
 }
 
 /**
@@ -117,13 +111,13 @@ export function initialize( id, settings ) {
  * @param {Object} block The block to be registered.
  *
  */
-const registerBlock = ( block ) => {
-	if ( ! block ) {
+const registerBlock = (block) => {
+	if (!block) {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	if ( metadata ) {
-		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } );
+	if (metadata) {
+		unstable__bootstrapServerSideBlockDefinitions({ [name]: metadata });
 	}
-	registerBlockType( name, settings );
+	registerBlockType(name, settings);
 };

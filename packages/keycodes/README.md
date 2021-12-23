@@ -66,7 +66,7 @@ _Usage_
 
 ```js
 // Assuming macOS:
-displayShortcut.primary( 'm' );
+displayShortcut.primary('m');
 // "⌘M"
 ```
 
@@ -82,7 +82,7 @@ _Usage_
 
 ```js
 // Assuming macOS:
-displayShortcutList.primary( 'm' );
+displayShortcutList.primary('m');
 // [ "⌘", "M" ]
 ```
 
@@ -123,7 +123,7 @@ _Usage_
 
 ```js
 // Assuming an event for ⌘M key press:
-isKeyboardEvent.primary( event, 'm' );
+isKeyboardEvent.primary(event, 'm');
 // true
 ```
 
@@ -162,7 +162,7 @@ _Usage_
 
 ```js
 // Assuming macOS:
-rawShortcut.primary( 'm' );
+rawShortcut.primary('m');
 // "meta+m""
 ```
 
@@ -187,7 +187,7 @@ _Usage_
 
 ```js
 // Assuming macOS:
-shortcutAriaLabel.primary( '.' );
+shortcutAriaLabel.primary('.');
 // "Command + Period"
 ```
 

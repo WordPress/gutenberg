@@ -23,12 +23,12 @@ import { useControlledState } from '../utils/hooks';
  *
  * @return {number} A (float) number
  */
-export function floatClamp( value, min, max ) {
-	if ( typeof value !== 'number' ) {
+export function floatClamp(value, min, max) {
+	if (typeof value !== 'number') {
 		return null;
 	}
 
-	return parseFloat( clamp( value, min, max ) );
+	return parseFloat(clamp(value, min, max));
 }
 
 /**
@@ -42,29 +42,29 @@ export function floatClamp( value, min, max ) {
  *
  * @return {[*, Function]} The controlled value and the value setter.
  */
-export function useControlledRangeValue( {
+export function useControlledRangeValue({
 	min,
 	max,
 	value: valueProp,
 	initial,
-} ) {
-	const [ state, setInternalState ] = useControlledState(
-		floatClamp( valueProp, min, max ),
+}) {
+	const [state, setInternalState] = useControlledState(
+		floatClamp(valueProp, min, max),
 		{ initial, fallback: null }
 	);
 
 	const setState = useCallback(
-		( nextValue ) => {
-			if ( nextValue === null ) {
-				setInternalState( null );
+		(nextValue) => {
+			if (nextValue === null) {
+				setInternalState(null);
 			} else {
-				setInternalState( floatClamp( nextValue, min, max ) );
+				setInternalState(floatClamp(nextValue, min, max));
 			}
 		},
-		[ min, max ]
+		[min, max]
 	);
 
-	return [ state, setState ];
+	return [state, setState];
 }
 
 /**
@@ -80,50 +80,50 @@ export function useControlledRangeValue( {
  *
  * @return {Object} Bound properties for use on a React.Node.
  */
-export function useDebouncedHoverInteraction( {
+export function useDebouncedHoverInteraction({
 	onHide = noop,
 	onMouseLeave = noop,
 	onMouseMove = noop,
 	onShow = noop,
 	timeout = 300,
-} ) {
-	const [ show, setShow ] = useState( false );
+}) {
+	const [show, setShow] = useState(false);
 	const timeoutRef = useRef();
 
 	const setDebouncedTimeout = useCallback(
-		( callback ) => {
-			window.clearTimeout( timeoutRef.current );
+		(callback) => {
+			window.clearTimeout(timeoutRef.current);
 
-			timeoutRef.current = setTimeout( callback, timeout );
+			timeoutRef.current = setTimeout(callback, timeout);
 		},
-		[ timeout ]
+		[timeout]
 	);
 
-	const handleOnMouseMove = useCallback( ( event ) => {
-		onMouseMove( event );
+	const handleOnMouseMove = useCallback((event) => {
+		onMouseMove(event);
 
-		setDebouncedTimeout( () => {
-			if ( ! show ) {
-				setShow( true );
+		setDebouncedTimeout(() => {
+			if (!show) {
+				setShow(true);
 				onShow();
 			}
-		} );
-	}, [] );
+		});
+	}, []);
 
-	const handleOnMouseLeave = useCallback( ( event ) => {
-		onMouseLeave( event );
+	const handleOnMouseLeave = useCallback((event) => {
+		onMouseLeave(event);
 
-		setDebouncedTimeout( () => {
-			setShow( false );
+		setDebouncedTimeout(() => {
+			setShow(false);
 			onHide();
-		} );
-	}, [] );
+		});
+	}, []);
 
-	useEffect( () => {
+	useEffect(() => {
 		return () => {
-			window.clearTimeout( timeoutRef.current );
+			window.clearTimeout(timeoutRef.current);
 		};
-	} );
+	});
 
 	return {
 		onMouseMove: handleOnMouseMove,

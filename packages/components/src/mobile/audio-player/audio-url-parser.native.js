@@ -3,18 +3,18 @@
  */
 import { safeDecodeURI } from '@wordpress/url';
 
-export const parseAudioUrl = ( src ) => {
-	const decodedURI = safeDecodeURI( src );
+export const parseAudioUrl = (src) => {
+	const decodedURI = safeDecodeURI(src);
 	const fileName = decodedURI
-		.split( '#' )
+		.split('#')
 		.shift()
-		.split( '?' )
+		.split('?')
 		.shift()
-		.split( '/' )
+		.split('/')
 		.pop();
 
-	const parts = fileName.split( '.' );
+	const parts = fileName.split('.');
 	const extension = parts.length === 2 ? parts.pop().toUpperCase() + ' ' : '';
-	const title = parts.join( '.' );
+	const title = parts.join('.');
 	return { title, extension };
 };

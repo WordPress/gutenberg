@@ -33,8 +33,8 @@ import {
 } from './padding';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
-export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
-export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
+export const ALL_SIDES = ['top', 'right', 'bottom', 'left'];
+export const AXIAL_SIDES = ['vertical', 'horizontal'];
 
 /**
  * Inspector controls for dimensions support.
@@ -43,71 +43,71 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
  *
  * @return {WPElement} Inspector controls for spacing support features.
  */
-export function DimensionsPanel( props ) {
-	const isGapDisabled = useIsGapDisabled( props );
-	const isPaddingDisabled = useIsPaddingDisabled( props );
-	const isMarginDisabled = useIsMarginDisabled( props );
-	const isDisabled = useIsDimensionsDisabled( props );
-	const isSupported = hasDimensionsSupport( props.name );
+export function DimensionsPanel(props) {
+	const isGapDisabled = useIsGapDisabled(props);
+	const isPaddingDisabled = useIsPaddingDisabled(props);
+	const isMarginDisabled = useIsMarginDisabled(props);
+	const isDisabled = useIsDimensionsDisabled(props);
+	const isSupported = hasDimensionsSupport(props.name);
 
-	if ( isDisabled || ! isSupported ) {
+	if (isDisabled || !isSupported) {
 		return null;
 	}
 
-	const defaultSpacingControls = getBlockSupport( props.name, [
+	const defaultSpacingControls = getBlockSupport(props.name, [
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
-	] );
+	]);
 
-	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
+	const createResetAllFilter = (attribute) => (newAttributes) => ({
 		...newAttributes,
 		style: {
 			...newAttributes.style,
 			spacing: {
 				...newAttributes.style?.spacing,
-				[ attribute ]: undefined,
+				[attribute]: undefined,
 			},
 		},
-	} );
+	});
 
 	return (
 		<InspectorControls __experimentalGroup="dimensions">
-			{ ! isPaddingDisabled && (
+			{!isPaddingDisabled && (
 				<ToolsPanelItem
-					hasValue={ () => hasPaddingValue( props ) }
-					label={ __( 'Padding' ) }
-					onDeselect={ () => resetPadding( props ) }
-					resetAllFilter={ createResetAllFilter( 'padding' ) }
-					isShownByDefault={ defaultSpacingControls?.padding }
-					panelId={ props.clientId }
+					hasValue={() => hasPaddingValue(props)}
+					label={__('Padding')}
+					onDeselect={() => resetPadding(props)}
+					resetAllFilter={createResetAllFilter('padding')}
+					isShownByDefault={defaultSpacingControls?.padding}
+					panelId={props.clientId}
 				>
-					<PaddingEdit { ...props } />
+					<PaddingEdit {...props} />
 				</ToolsPanelItem>
-			) }
-			{ ! isMarginDisabled && (
+			)}
+			{!isMarginDisabled && (
 				<ToolsPanelItem
-					hasValue={ () => hasMarginValue( props ) }
-					label={ __( 'Margin' ) }
-					onDeselect={ () => resetMargin( props ) }
-					resetAllFilter={ createResetAllFilter( 'margin' ) }
-					isShownByDefault={ defaultSpacingControls?.margin }
-					panelId={ props.clientId }
+					hasValue={() => hasMarginValue(props)}
+					label={__('Margin')}
+					onDeselect={() => resetMargin(props)}
+					resetAllFilter={createResetAllFilter('margin')}
+					isShownByDefault={defaultSpacingControls?.margin}
+					panelId={props.clientId}
 				>
-					<MarginEdit { ...props } />
+					<MarginEdit {...props} />
 				</ToolsPanelItem>
-			) }
-			{ ! isGapDisabled && (
+			)}
+			{!isGapDisabled && (
 				<ToolsPanelItem
-					hasValue={ () => hasGapValue( props ) }
-					label={ __( 'Block spacing' ) }
-					onDeselect={ () => resetGap( props ) }
-					resetAllFilter={ createResetAllFilter( 'blockGap' ) }
-					isShownByDefault={ defaultSpacingControls?.blockGap }
-					panelId={ props.clientId }
+					hasValue={() => hasGapValue(props)}
+					label={__('Block spacing')}
+					onDeselect={() => resetGap(props)}
+					resetAllFilter={createResetAllFilter('blockGap')}
+					isShownByDefault={defaultSpacingControls?.blockGap}
+					panelId={props.clientId}
 				>
-					<GapEdit { ...props } />
+					<GapEdit {...props} />
 				</ToolsPanelItem>
-			) }
+			)}
 		</InspectorControls>
 	);
 }
@@ -119,15 +119,15 @@ export function DimensionsPanel( props ) {
  *
  * @return {boolean} Whether there is support.
  */
-export function hasDimensionsSupport( blockName ) {
-	if ( Platform.OS !== 'web' ) {
+export function hasDimensionsSupport(blockName) {
+	if (Platform.OS !== 'web') {
 		return false;
 	}
 
 	return (
-		hasGapSupport( blockName ) ||
-		hasPaddingSupport( blockName ) ||
-		hasMarginSupport( blockName )
+		hasGapSupport(blockName) ||
+		hasPaddingSupport(blockName) ||
+		hasMarginSupport(blockName)
 	);
 }
 
@@ -138,10 +138,10 @@ export function hasDimensionsSupport( blockName ) {
  *
  * @return {boolean} If spacing support is completely disabled.
  */
-const useIsDimensionsDisabled = ( props = {} ) => {
-	const gapDisabled = useIsGapDisabled( props );
-	const paddingDisabled = useIsPaddingDisabled( props );
-	const marginDisabled = useIsMarginDisabled( props );
+const useIsDimensionsDisabled = (props = {}) => {
+	const gapDisabled = useIsGapDisabled(props);
+	const paddingDisabled = useIsPaddingDisabled(props);
+	const marginDisabled = useIsMarginDisabled(props);
 
 	return gapDisabled && paddingDisabled && marginDisabled;
 };
@@ -158,15 +158,15 @@ const useIsDimensionsDisabled = ( props = {} ) => {
  *
  * @return {Object} Sides supporting custom margin.
  */
-export function useCustomSides( blockName, feature ) {
-	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
+export function useCustomSides(blockName, feature) {
+	const support = getBlockSupport(blockName, SPACING_SUPPORT_KEY);
 
 	// Skip when setting is boolean as theme isn't setting arbitrary sides.
-	if ( ! support || typeof support[ feature ] === 'boolean' ) {
+	if (!support || typeof support[feature] === 'boolean') {
 		return;
 	}
 
-	return support[ feature ];
+	return support[feature];
 }
 
 /**
@@ -179,17 +179,17 @@ export function useCustomSides( blockName, feature ) {
  *
  * @return {boolean} If the feature has a valid configuration of sides.
  */
-export function useIsDimensionsSupportValid( blockName, feature ) {
-	const sides = useCustomSides( blockName, feature );
+export function useIsDimensionsSupportValid(blockName, feature) {
+	const sides = useCustomSides(blockName, feature);
 
 	if (
 		sides &&
-		sides.some( ( side ) => ALL_SIDES.includes( side ) ) &&
-		sides.some( ( side ) => AXIAL_SIDES.includes( side ) )
+		sides.some((side) => ALL_SIDES.includes(side)) &&
+		sides.some((side) => AXIAL_SIDES.includes(side))
 	) {
 		// eslint-disable-next-line no-console
 		console.warn(
-			`The ${ feature } support for the "${ blockName }" block can not be configured to support both axial and arbitrary sides.`
+			`The ${feature} support for the "${blockName}" block can not be configured to support both axial and arbitrary sides.`
 		);
 		return false;
 	}

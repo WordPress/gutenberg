@@ -5,11 +5,11 @@ async function toggleListView() {
 }
 
 async function isListViewOpen() {
-	return await page.evaluate( () => {
-		return !! document.querySelector(
+	return await page.evaluate(() => {
+		return !!document.querySelector(
 			'.edit-post-header-toolbar__list-view-toggle.is-pressed, .edit-site-header-toolbar__list-view-toggle.is-pressed, .edit-widgets-header-toolbar__list-view-toggle.is-pressed'
 		);
-	} );
+	});
 }
 
 /**
@@ -17,7 +17,7 @@ async function isListViewOpen() {
  */
 export async function openListView() {
 	const isOpen = await isListViewOpen();
-	if ( ! isOpen ) {
+	if (!isOpen) {
 		await toggleListView();
 	}
 }
@@ -27,7 +27,7 @@ export async function openListView() {
  */
 export async function closeListView() {
 	const isOpen = await isListViewOpen();
-	if ( isOpen ) {
+	if (isOpen) {
 		await toggleListView();
 	}
 }

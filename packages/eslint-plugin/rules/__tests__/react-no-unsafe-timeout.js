@@ -8,13 +8,13 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../react-no-unsafe-timeout';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 	},
-} );
+});
 
-ruleTester.run( 'react-no-unsafe-timeout', rule, {
+ruleTester.run('react-no-unsafe-timeout', rule, {
 	valid: [
 		{
 			code: `function getNotComponent() { setTimeout(); }`,
@@ -82,4 +82,4 @@ function MyComponent() {
 			],
 		},
 	],
-} );
+});

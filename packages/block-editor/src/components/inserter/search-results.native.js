@@ -13,47 +13,45 @@ import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 import { filterInserterItems } from './utils';
 
-function InserterSearchResults( {
+function InserterSearchResults({
 	filterValue,
 	onSelect,
 	listProps,
 	rootClientId,
 	isFullScreen,
-} ) {
+}) {
 	const { blockTypes } = useSelect(
-		( select ) => {
-			const allItems = select( blockEditorStore ).getInserterItems(
-				rootClientId
-			);
+		(select) => {
+			const allItems =
+				select(blockEditorStore).getInserterItems(rootClientId);
 
-			const availableItems = filterInserterItems( allItems, {
+			const availableItems = filterInserterItems(allItems, {
 				allowReusable: true,
-			} );
-			const filteredItems = searchItems( availableItems, filterValue );
+			});
+			const filteredItems = searchItems(availableItems, filterValue);
 
 			return { blockTypes: filteredItems };
 		},
-		[ rootClientId, filterValue ]
+		[rootClientId, filterValue]
 	);
 
-	const { items, trackBlockTypeSelected } = useBlockTypeImpressions(
-		blockTypes
-	);
+	const { items, trackBlockTypeSelected } =
+		useBlockTypeImpressions(blockTypes);
 
-	if ( ! items || items?.length === 0 ) {
+	if (!items || items?.length === 0) {
 		return <InserterNoResults />;
 	}
 
-	const handleSelect = ( ...args ) => {
-		trackBlockTypeSelected( ...args );
-		onSelect( ...args );
+	const handleSelect = (...args) => {
+		trackBlockTypeSelected(...args);
+		onSelect(...args);
 	};
 
 	return (
 		<BlockTypesList
 			name="Blocks"
-			initialNumToRender={ isFullScreen ? 10 : 3 }
-			{ ...{ items, onSelect: handleSelect, listProps } }
+			initialNumToRender={isFullScreen ? 10 : 3}
+			{...{ items, onSelect: handleSelect, listProps }}
 		/>
 	);
 }

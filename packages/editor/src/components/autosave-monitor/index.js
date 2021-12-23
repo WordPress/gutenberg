@@ -23,62 +23,62 @@ import { store as editorStore } from '../../store';
  * * The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
  */
 export class AutosaveMonitor extends Component {
-	constructor( props ) {
-		super( props );
-		this.needsAutosave = !! ( props.isDirty && props.isAutosaveable );
+	constructor(props) {
+		super(props);
+		this.needsAutosave = !!(props.isDirty && props.isAutosaveable);
 	}
 
 	componentDidMount() {
-		if ( ! this.props.disableIntervalChecks ) {
+		if (!this.props.disableIntervalChecks) {
 			this.setAutosaveTimer();
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.disableIntervalChecks ) {
-			if ( this.props.editsReference !== prevProps.editsReference ) {
+	componentDidUpdate(prevProps) {
+		if (this.props.disableIntervalChecks) {
+			if (this.props.editsReference !== prevProps.editsReference) {
 				this.props.autosave();
 			}
 			return;
 		}
 
-		if ( this.props.interval !== prevProps.interval ) {
-			clearTimeout( this.timerId );
+		if (this.props.interval !== prevProps.interval) {
+			clearTimeout(this.timerId);
 			this.setAutosaveTimer();
 		}
 
-		if ( ! this.props.isDirty ) {
+		if (!this.props.isDirty) {
 			this.needsAutosave = false;
 			return;
 		}
 
-		if ( this.props.isAutosaving && ! prevProps.isAutosaving ) {
+		if (this.props.isAutosaving && !prevProps.isAutosaving) {
 			this.needsAutosave = false;
 			return;
 		}
 
-		if ( this.props.editsReference !== prevProps.editsReference ) {
+		if (this.props.editsReference !== prevProps.editsReference) {
 			this.needsAutosave = true;
 		}
 	}
 
 	componentWillUnmount() {
-		clearTimeout( this.timerId );
+		clearTimeout(this.timerId);
 	}
 
-	setAutosaveTimer( timeout = this.props.interval * 1000 ) {
-		this.timerId = setTimeout( () => {
+	setAutosaveTimer(timeout = this.props.interval * 1000) {
+		this.timerId = setTimeout(() => {
 			this.autosaveTimerHandler();
-		}, timeout );
+		}, timeout);
 	}
 
 	autosaveTimerHandler() {
-		if ( ! this.props.isAutosaveable ) {
-			this.setAutosaveTimer( 1000 );
+		if (!this.props.isAutosaveable) {
+			this.setAutosaveTimer(1000);
 			return;
 		}
 
-		if ( this.needsAutosave ) {
+		if (this.needsAutosave) {
 			this.needsAutosave = false;
 			this.props.autosave();
 		}
@@ -91,16 +91,16 @@ export class AutosaveMonitor extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const { getReferenceByDistinctEdits } = select( coreStore );
+export default compose([
+	withSelect((select, ownProps) => {
+		const { getReferenceByDistinctEdits } = select(coreStore);
 
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
 			isAutosavingPost,
 			getEditorSettings,
-		} = select( editorStore );
+		} = select(editorStore);
 
 		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
@@ -111,11 +111,11 @@ export default compose( [
 			isAutosaving: isAutosavingPost(),
 			interval,
 		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => ( {
+	}),
+	withDispatch((dispatch, ownProps) => ({
 		autosave() {
-			const { autosave = dispatch( editorStore ).autosave } = ownProps;
+			const { autosave = dispatch(editorStore).autosave } = ownProps;
 			autosave();
 		},
-	} ) ),
-] )( AutosaveMonitor );
+	})),
+])(AutosaveMonitor);

@@ -36,8 +36,8 @@ import { store as blockEditorStore } from '../../store';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
-function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+function BlockVariationPicker({ isVisible, onClose, clientId, variations }) {
+	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
 	const isIOS = Platform.OS === 'ios';
 
 	const cancelButtonStyle = usePreferredColorSchemeStyle(
@@ -47,32 +47,28 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 
 	const leftButton = useMemo(
 		() => (
-			<TouchableWithoutFeedback onPress={ onClose } hitSlop={ hitSlop }>
+			<TouchableWithoutFeedback onPress={onClose} hitSlop={hitSlop}>
 				<View>
-					{ isIOS ? (
+					{isIOS ? (
 						<Text
-							style={ cancelButtonStyle }
-							maxFontSizeMultiplier={ 2 }
+							style={cancelButtonStyle}
+							maxFontSizeMultiplier={2}
 						>
-							{ __( 'Cancel' ) }
+							{__('Cancel')}
 						</Text>
 					) : (
-						<Icon
-							icon={ close }
-							size={ 24 }
-							style={ styles.closeIcon }
-						/>
-					) }
+						<Icon icon={close} size={24} style={styles.closeIcon} />
+					)}
 				</View>
 			</TouchableWithoutFeedback>
 		),
-		[ onClose, cancelButtonStyle ]
+		[onClose, cancelButtonStyle]
 	);
 
-	const onVariationSelect = ( variation ) => {
+	const onVariationSelect = (variation) => {
 		replaceInnerBlocks(
 			clientId,
-			createBlocksFromInnerBlocksTemplate( variation.innerBlocks )
+			createBlocksFromInnerBlocksTemplate(variation.innerBlocks)
 		);
 		onClose();
 	};
@@ -80,47 +76,47 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 	return useMemo(
 		() => (
 			<BottomSheet
-				isVisible={ isVisible }
-				onClose={ onClose }
-				title={ __( 'Select a layout' ) }
-				contentStyle={ styles.contentStyle }
-				leftButton={ leftButton }
+				isVisible={isVisible}
+				onClose={onClose}
+				title={__('Select a layout')}
+				contentStyle={styles.contentStyle}
+				leftButton={leftButton}
 			>
 				<ScrollView
 					horizontal
-					showsHorizontalScrollIndicator={ false }
-					contentContainerStyle={ styles.contentContainerStyle }
-					style={ styles.containerStyle }
+					showsHorizontalScrollIndicator={false}
+					contentContainerStyle={styles.contentContainerStyle}
+					style={styles.containerStyle}
 				>
-					{ variations.map( ( v ) => {
+					{variations.map((v) => {
 						return (
 							<InserterButton
-								item={ v }
-								key={ v.name }
-								onSelect={ () => onVariationSelect( v ) }
+								item={v}
+								key={v.name}
+								onSelect={() => onVariationSelect(v)}
 							/>
 						);
-					} ) }
+					})}
 				</ScrollView>
 				<PanelBody>
 					<FooterMessageControl
-						label={ __(
+						label={__(
 							'Note: Column layout may vary between themes and screen sizes'
-						) }
+						)}
 					/>
 				</PanelBody>
 			</BottomSheet>
 		),
-		[ variations, isVisible, onClose ]
+		[variations, isVisible, onClose]
 	);
 }
 
 export default compose(
-	withSelect( ( select, {} ) => {
-		const { getBlockVariations } = select( blocksStore );
+	withSelect((select, {}) => {
+		const { getBlockVariations } = select(blocksStore);
 
 		return {
-			date: getBlockVariations( 'core/columns', 'block' ),
+			date: getBlockVariations('core/columns', 'block'),
 		};
-	} )
-)( BlockVariationPicker );
+	})
+)(BlockVariationPicker);

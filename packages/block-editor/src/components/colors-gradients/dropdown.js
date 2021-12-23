@@ -21,7 +21,7 @@ import { isRTL } from '@wordpress/i18n';
  */
 import ColorGradientControl from './control';
 
-export default function ColorGradientSettingsDropdown( {
+export default function ColorGradientSettingsDropdown({
 	colors,
 	gradients,
 	disableCustomColors,
@@ -30,9 +30,9 @@ export default function ColorGradientSettingsDropdown( {
 	__experimentalIsRenderedInSidebar,
 	enableAlpha,
 	settings,
-} ) {
+}) {
 	let dropdownPosition;
-	if ( __experimentalIsRenderedInSidebar ) {
+	if (__experimentalIsRenderedInSidebar) {
 		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
 	}
 
@@ -42,20 +42,20 @@ export default function ColorGradientSettingsDropdown( {
 			isSeparated
 			className="block-editor-panel-color-gradient-settings__item-group"
 		>
-			{ settings.map( ( setting, index ) => (
+			{settings.map((setting, index) => (
 				<Dropdown
-					key={ index }
-					position={ dropdownPosition }
+					key={index}
+					position={dropdownPosition}
 					className="block-editor-panel-color-gradient-settings__dropdown"
 					contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
-					renderToggle={ ( { isOpen, onToggle } ) => {
+					renderToggle={({ isOpen, onToggle }) => {
 						return (
 							<Item
-								onClick={ onToggle }
-								className={ classnames(
+								onClick={onToggle}
+								className={classnames(
 									'block-editor-panel-color-gradient-settings__item',
 									{ 'is-open': isOpen }
-								) }
+								)}
 							>
 								<HStack justify="flex-start">
 									<ColorIndicator
@@ -65,15 +65,15 @@ export default function ColorGradientSettingsDropdown( {
 											setting.colorValue
 										}
 									/>
-									<FlexItem>{ setting.label }</FlexItem>
+									<FlexItem>{setting.label}</FlexItem>
 								</HStack>
 							</Item>
 						);
-					} }
-					renderContent={ () => (
+					}}
+					renderContent={() => (
 						<ColorGradientControl
-							showTitle={ false }
-							{ ...{
+							showTitle={false}
+							{...{
 								colors,
 								gradients,
 								disableCustomColors,
@@ -82,11 +82,11 @@ export default function ColorGradientSettingsDropdown( {
 								__experimentalIsRenderedInSidebar,
 								enableAlpha,
 								...setting,
-							} }
+							}}
 						/>
-					) }
+					)}
 				/>
-			) ) }
+			))}
 		</ItemGroup>
 	);
 }

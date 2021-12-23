@@ -11,24 +11,24 @@ import { useFormGroup } from './use-form-group';
  * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                              forwardedRef
  */
-function FormGroup( props, forwardedRef ) {
-	const { contentProps, horizontal, ...otherProps } = useFormGroup( props );
+function FormGroup(props, forwardedRef) {
+	const { contentProps, horizontal, ...otherProps } = useFormGroup(props);
 
-	if ( horizontal ) {
+	if (horizontal) {
 		return (
 			<Grid
 				templateColumns="minmax(0, 1fr) 2fr"
-				{ ...otherProps }
-				ref={ forwardedRef }
+				{...otherProps}
+				ref={forwardedRef}
 			>
-				<FormGroupContent { ...contentProps } />
+				<FormGroupContent {...contentProps} />
 			</Grid>
 		);
 	}
 
 	return (
-		<View { ...otherProps } ref={ forwardedRef }>
-			<FormGroupContent { ...contentProps } />
+		<View {...otherProps} ref={forwardedRef}>
+			<FormGroupContent {...contentProps} />
 		</View>
 	);
 }
@@ -49,6 +49,6 @@ function FormGroup( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedFormGroup = contextConnect( FormGroup, 'FormGroup' );
+const ConnectedFormGroup = contextConnect(FormGroup, 'FormGroup');
 
 export default ConnectedFormGroup;

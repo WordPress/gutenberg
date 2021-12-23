@@ -49,30 +49,27 @@ const DEFAULT_LAYOUT_ANIMATION = LayoutAnimation.Presets.easeInEaseOut;
 
 class BottomSheet extends Component {
 	constructor() {
-		super( ...arguments );
-		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
-		this.onScroll = this.onScroll.bind( this );
-		this.isScrolling = this.isScrolling.bind( this );
-		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
-		this.onDismiss = this.onDismiss.bind( this );
-		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
-			this
-		);
+		super(...arguments);
+		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind(this);
+		this.onScroll = this.onScroll.bind(this);
+		this.isScrolling = this.isScrolling.bind(this);
+		this.onShouldEnableScroll = this.onShouldEnableScroll.bind(this);
+		this.onDismiss = this.onDismiss.bind(this);
+		this.onShouldSetBottomSheetMaxHeight =
+			this.onShouldSetBottomSheetMaxHeight.bind(this);
 
-		this.setIsFullScreen = this.setIsFullScreen.bind( this );
+		this.setIsFullScreen = this.setIsFullScreen.bind(this);
 
-		this.onDimensionsChange = this.onDimensionsChange.bind( this );
-		this.onHeaderLayout = this.onHeaderLayout.bind( this );
-		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
-		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
-			this
-		);
-		this.onHardwareButtonPress = this.onHardwareButtonPress.bind( this );
-		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
-			this
-		);
-		this.keyboardShow = this.keyboardShow.bind( this );
-		this.keyboardHide = this.keyboardHide.bind( this );
+		this.onDimensionsChange = this.onDimensionsChange.bind(this);
+		this.onHeaderLayout = this.onHeaderLayout.bind(this);
+		this.onCloseBottomSheet = this.onCloseBottomSheet.bind(this);
+		this.onHandleClosingBottomSheet =
+			this.onHandleClosingBottomSheet.bind(this);
+		this.onHardwareButtonPress = this.onHardwareButtonPress.bind(this);
+		this.onHandleHardwareButtonPress =
+			this.onHandleHardwareButtonPress.bind(this);
+		this.keyboardShow = this.keyboardShow.bind(this);
+		this.keyboardHide = this.keyboardHide.bind(this);
 
 		this.headerHeight = 0;
 		this.keyboardHeight = 0;
@@ -93,39 +90,39 @@ class BottomSheet extends Component {
 		};
 	}
 
-	keyboardShow( e ) {
-		if ( ! this.props.isVisible ) {
+	keyboardShow(e) {
+		if (!this.props.isVisible) {
 			return;
 		}
 
 		const { height } = e.endCoordinates;
 		this.keyboardHeight = height;
-		this.performKeyboardLayoutAnimation( e );
+		this.performKeyboardLayoutAnimation(e);
 		this.onSetMaxHeight();
 		this.props.onKeyboardShow?.();
 	}
 
-	keyboardHide( e ) {
-		if ( ! this.props.isVisible ) {
+	keyboardHide(e) {
+		if (!this.props.isVisible) {
 			return;
 		}
 
 		this.keyboardHeight = 0;
-		this.performKeyboardLayoutAnimation( e );
+		this.performKeyboardLayoutAnimation(e);
 		this.onSetMaxHeight();
 		this.props.onKeyboardHide?.();
 	}
 
-	performKeyboardLayoutAnimation( event ) {
+	performKeyboardLayoutAnimation(event) {
 		const { duration, easing } = event;
 
-		if ( duration && easing ) {
+		if (duration && easing) {
 			// This layout animation is the same as the React Native's KeyboardAvoidingView component.
 			// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
 			const animationConfig = {
 				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
 				duration: duration > 10 ? duration : 10,
-				type: LayoutAnimation.Types[ easing ] || 'keyboard',
+				type: LayoutAnimation.Types[easing] || 'keyboard',
 			};
 			const layoutAnimation = {
 				duration: animationConfig.duration,
@@ -140,23 +137,23 @@ class BottomSheet extends Component {
 				},
 			};
 			this.lastLayoutAnimationFinished = false;
-			LayoutAnimation.configureNext( layoutAnimation, () => {
+			LayoutAnimation.configureNext(layoutAnimation, () => {
 				this.lastLayoutAnimationFinished = true;
-			} );
+			});
 			this.lastLayoutAnimation = layoutAnimation;
 		} else {
-			this.performRegularLayoutAnimation( {
+			this.performRegularLayoutAnimation({
 				useLastLayoutAnimation: false,
-			} );
+			});
 		}
 	}
 
-	performRegularLayoutAnimation( { useLastLayoutAnimation } ) {
+	performRegularLayoutAnimation({ useLastLayoutAnimation }) {
 		// On Android, we should prevent triggering multiple layout animations at the same time because it can produce visual glitches.
 		if (
 			Platform.OS === 'android' &&
 			this.lastLayoutAnimation &&
-			! this.lastLayoutAnimationFinished
+			!this.lastLayoutAnimationFinished
 		) {
 			return;
 		}
@@ -166,9 +163,9 @@ class BottomSheet extends Component {
 			: DEFAULT_LAYOUT_ANIMATION;
 
 		this.lastLayoutAnimationFinished = false;
-		LayoutAnimation.configureNext( layoutAnimation, () => {
+		LayoutAnimation.configureNext(layoutAnimation, () => {
 			this.lastLayoutAnimationFinished = true;
-		} );
+		});
 		this.lastLayoutAnimation = layoutAnimation;
 	}
 
@@ -177,7 +174,7 @@ class BottomSheet extends Component {
 			this.onSafeAreaInsetsUpdate
 		);
 
-		if ( Platform.OS === 'android' ) {
+		if (Platform.OS === 'android') {
 			this.androidModalClosedSubscription = subscribeAndroidModalClosed(
 				() => {
 					this.props.onClose();
@@ -185,7 +182,7 @@ class BottomSheet extends Component {
 			);
 		}
 
-		Dimensions.addEventListener( 'change', this.onDimensionsChange );
+		Dimensions.addEventListener('change', this.onDimensionsChange);
 
 		// 'Will' keyboard events are not available on Android.
 		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
@@ -206,13 +203,13 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		Dimensions.removeEventListener( 'change', this.onDimensionsChange );
+		Dimensions.removeEventListener('change', this.onDimensionsChange);
 		this.keyboardShowListener.remove();
 		this.keyboardHideListener.remove();
-		if ( this.androidModalClosedSubscription ) {
+		if (this.androidModalClosedSubscription) {
 			this.androidModalClosedSubscription.remove();
 		}
-		if ( this.safeAreaEventSubscription === null ) {
+		if (this.safeAreaEventSubscription === null) {
 			return;
 		}
 		this.safeAreaEventSubscription.remove();
@@ -223,9 +220,9 @@ class BottomSheet extends Component {
 		);
 	}
 
-	onSafeAreaInsetsUpdate( result ) {
+	onSafeAreaInsetsUpdate(result) {
 		const { safeAreaBottomInset, safeAreaTopInset } = this.state;
-		if ( this.safeAreaEventSubscription === null ) {
+		if (this.safeAreaEventSubscription === null) {
 			return;
 		}
 		const { safeAreaInsets } = result;
@@ -233,15 +230,15 @@ class BottomSheet extends Component {
 			safeAreaBottomInset !== safeAreaInsets.bottom ||
 			safeAreaTopInset !== safeAreaInsets.top
 		) {
-			this.setState( {
+			this.setState({
 				safeAreaBottomInset: safeAreaInsets.bottom,
 				safeAreaTopInset: safeAreaInsets.top,
-			} );
+			});
 		}
 	}
 
 	onSetMaxHeight() {
-		const { height, width } = Dimensions.get( 'window' );
+		const { height, width } = Dimensions.get('window');
 		const { safeAreaBottomInset } = this.state;
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
@@ -249,113 +246,113 @@ class BottomSheet extends Component {
 		// `maxHeight` when modal is opened along with a keyboard
 		const maxHeightWithOpenKeyboard =
 			0.95 *
-			( Dimensions.get( 'window' ).height -
+			(Dimensions.get('window').height -
 				this.keyboardHeight -
 				statusBarHeight -
-				this.headerHeight );
+				this.headerHeight);
 
 		// On horizontal mode `maxHeight` has to be set on 90% of width
-		if ( width > height ) {
-			this.setState( {
-				maxHeight: Math.min( 0.9 * height, maxHeightWithOpenKeyboard ),
-			} );
+		if (width > height) {
+			this.setState({
+				maxHeight: Math.min(0.9 * height, maxHeightWithOpenKeyboard),
+			});
 			//	On vertical mode `maxHeight` has to be set on 50% of width
 		} else {
-			this.setState( {
+			this.setState({
 				maxHeight: Math.min(
 					height / 2 - safeAreaBottomInset,
 					maxHeightWithOpenKeyboard
 				),
-			} );
+			});
 		}
 	}
 
 	onDimensionsChange() {
 		this.onSetMaxHeight();
-		this.setState( { bounces: false } );
+		this.setState({ bounces: false });
 	}
 
-	onHeaderLayout( { nativeEvent } ) {
+	onHeaderLayout({ nativeEvent }) {
 		const { height } = nativeEvent.layout;
 		// The layout animation should only be triggered if the header
 		// height has changed after being mounted.
-		if ( this.headerHeight !== 0 && height !== this.headerHeight ) {
-			this.performRegularLayoutAnimation( {
+		if (this.headerHeight !== 0 && height !== this.headerHeight) {
+			this.performRegularLayoutAnimation({
 				useLastLayoutAnimation: true,
-			} );
+			});
 		}
 		this.headerHeight = height;
 		this.onSetMaxHeight();
 	}
 
-	isCloseToBottom( { layoutMeasurement, contentOffset, contentSize } ) {
+	isCloseToBottom({ layoutMeasurement, contentOffset, contentSize }) {
 		return (
 			layoutMeasurement.height + contentOffset.y >=
 			contentSize.height - contentOffset.y
 		);
 	}
 
-	isCloseToTop( { contentOffset } ) {
+	isCloseToTop({ contentOffset }) {
 		return contentOffset.y < 10;
 	}
 
-	onScroll( { nativeEvent } ) {
-		if ( this.isCloseToTop( nativeEvent ) ) {
-			this.setState( { bounces: false } );
+	onScroll({ nativeEvent }) {
+		if (this.isCloseToTop(nativeEvent)) {
+			this.setState({ bounces: false });
 		} else {
-			this.setState( { bounces: true } );
+			this.setState({ bounces: true });
 		}
 	}
 
 	onDismiss() {
 		const { onDismiss } = this.props;
 
-		if ( onDismiss ) {
+		if (onDismiss) {
 			onDismiss();
 		}
 
 		this.onCloseBottomSheet();
 	}
 
-	onShouldEnableScroll( value ) {
-		this.setState( { scrollEnabled: value } );
+	onShouldEnableScroll(value) {
+		this.setState({ scrollEnabled: value });
 	}
 
-	onShouldSetBottomSheetMaxHeight( value ) {
-		this.setState( { isMaxHeightSet: value } );
+	onShouldSetBottomSheetMaxHeight(value) {
+		this.setState({ isMaxHeightSet: value });
 	}
 
-	isScrolling( value ) {
-		this.setState( { isScrolling: value } );
+	isScrolling(value) {
+		this.setState({ isScrolling: value });
 	}
 
-	onHandleClosingBottomSheet( action ) {
-		this.setState( { handleClosingBottomSheet: action } );
+	onHandleClosingBottomSheet(action) {
+		this.setState({ handleClosingBottomSheet: action });
 	}
 
-	onHandleHardwareButtonPress( action ) {
-		this.setState( { handleHardwareButtonPress: action } );
+	onHandleHardwareButtonPress(action) {
+		this.setState({ handleHardwareButtonPress: action });
 	}
 
 	onCloseBottomSheet() {
 		const { onClose } = this.props;
 		const { handleClosingBottomSheet } = this.state;
-		if ( handleClosingBottomSheet ) {
+		if (handleClosingBottomSheet) {
 			handleClosingBottomSheet();
-			this.onHandleClosingBottomSheet( null );
+			this.onHandleClosingBottomSheet(null);
 		}
-		if ( onClose ) {
+		if (onClose) {
 			onClose();
 		}
-		this.onShouldSetBottomSheetMaxHeight( true );
+		this.onShouldSetBottomSheetMaxHeight(true);
 	}
 
-	setIsFullScreen( isFullScreen ) {
-		if ( isFullScreen !== this.state.isFullScreen ) {
-			if ( isFullScreen ) {
-				this.setState( { isFullScreen, isMaxHeightSet: false } );
+	setIsFullScreen(isFullScreen) {
+		if (isFullScreen !== this.state.isFullScreen) {
+			if (isFullScreen) {
+				this.setState({ isFullScreen, isMaxHeightSet: false });
 			} else {
-				this.setState( { isFullScreen, isMaxHeightSet: true } );
+				this.setState({ isFullScreen, isMaxHeightSet: true });
 			}
 		}
 	}
@@ -363,10 +360,10 @@ class BottomSheet extends Component {
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { handleHardwareButtonPress } = this.state;
-		if ( handleHardwareButtonPress && handleHardwareButtonPress() ) {
+		if (handleHardwareButtonPress && handleHardwareButtonPress()) {
 			return;
 		}
-		if ( onClose ) {
+		if (onClose) {
 			return onClose();
 		}
 	}
@@ -375,7 +372,7 @@ class BottomSheet extends Component {
 		const { safeAreaBottomInset } = this.state;
 		return {
 			paddingBottom:
-				( safeAreaBottomInset || 0 ) +
+				(safeAreaBottomInset || 0) +
 				styles.scrollableContent.paddingBottom,
 		};
 	}
@@ -407,21 +404,21 @@ class BottomSheet extends Component {
 			isFullScreen,
 		} = this.state;
 
-		const panResponder = PanResponder.create( {
-			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
+		const panResponder = PanResponder.create({
+			onMoveShouldSetPanResponder: (evt, gestureState) => {
 				// 'swiping-to-close' option is temporarily and partially disabled
 				//	on Android ( swipe / drag is still available in the top most area - near drag indicator)
-				if ( Platform.OS === 'ios' ) {
+				if (Platform.OS === 'ios') {
 					// Activates swipe down over child Touchables if the swipe is long enough.
 					// With this we can adjust sensibility on the swipe vs tap gestures.
-					if ( gestureState.dy > 3 && ! bounces ) {
+					if (gestureState.dy > 3 && !bounces) {
 						gestureState.dy = 0;
 						return true;
 					}
 				}
 				return false;
 			},
-		} );
+		});
 
 		const backgroundStyle = getStylesFromColorScheme(
 			styles.background,
@@ -434,14 +431,14 @@ class BottomSheet extends Component {
 		);
 
 		let listStyle = {};
-		if ( isFullScreen ) {
+		if (isFullScreen) {
 			listStyle = { flexGrow: 1, flexShrink: 1 };
-		} else if ( isMaxHeightSet ) {
+		} else if (isMaxHeightSet) {
 			listStyle = { maxHeight };
 
 			// Allow setting a "static" height of the bottom sheet
 			// by settting the min height to the max height.
-			if ( this.props.setMinHeightToMaxHeight ) {
+			if (this.props.setMinHeightToMaxHeight) {
 				listStyle.minHeight = maxHeight;
 			}
 		}
@@ -469,25 +466,25 @@ class BottomSheet extends Component {
 
 		const getHeader = () => (
 			<>
-				{ header || (
-					<View style={ styles.bottomSheetHeader }>
-						<View style={ styles.flex }>{ leftButton }</View>
+				{header || (
+					<View style={styles.bottomSheetHeader}>
+						<View style={styles.flex}>{leftButton}</View>
 						<Text
-							style={ bottomSheetHeaderTitleStyle }
-							maxFontSizeMultiplier={ 3 }
+							style={bottomSheetHeaderTitleStyle}
+							maxFontSizeMultiplier={3}
 						>
-							{ title }
+							{title}
 						</Text>
-						<View style={ styles.flex }>{ rightButton }</View>
+						<View style={styles.flex}>{rightButton}</View>
 					</View>
-				) }
-				{ withHeaderSeparator && <View style={ styles.separator } /> }
+				)}
+				{withHeaderSeparator && <View style={styles.separator} />}
 			</>
 		);
 
 		const showDragIndicator = () => {
 			// if iOS or not fullscreen show the drag indicator
-			if ( Platform.OS === 'ios' || ! this.state.isFullScreen ) {
+			if (Platform.OS === 'ios' || !this.state.isFullScreen) {
 				return true;
 			}
 
@@ -497,17 +494,17 @@ class BottomSheet extends Component {
 
 		return (
 			<Modal
-				isVisible={ isVisible }
-				style={ styles.bottomModal }
-				animationInTiming={ 400 }
-				animationOutTiming={ 300 }
-				backdropTransitionInTiming={ 50 }
-				backdropTransitionOutTiming={ 50 }
-				backdropOpacity={ 0.2 }
-				onBackdropPress={ this.onCloseBottomSheet }
-				onBackButtonPress={ this.onHardwareButtonPress }
-				onSwipeComplete={ this.onCloseBottomSheet }
-				onDismiss={ Platform.OS === 'ios' ? this.onDismiss : undefined }
+				isVisible={isVisible}
+				style={styles.bottomModal}
+				animationInTiming={400}
+				animationOutTiming={300}
+				backdropTransitionInTiming={50}
+				backdropTransitionOutTiming={50}
+				backdropOpacity={0.2}
+				onBackdropPress={this.onCloseBottomSheet}
+				onBackButtonPress={this.onHardwareButtonPress}
+				onSwipeComplete={this.onCloseBottomSheet}
+				onDismiss={Platform.OS === 'ios' ? this.onDismiss : undefined}
 				onModalHide={
 					Platform.OS === 'android' ? this.onDismiss : undefined
 				}
@@ -520,14 +517,14 @@ class BottomSheet extends Component {
 					scrollEnabled &&
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
-				onAccessibilityEscape={ this.onCloseBottomSheet }
+				onAccessibilityEscape={this.onCloseBottomSheet}
 				// We need to prevent overwriting the onDismiss prop,
 				// for this reason it is excluded from the rest object.
-				{ ...omit( rest, 'onDismiss' ) }
+				{...omit(rest, 'onDismiss')}
 			>
 				<KeyboardAvoidingView
-					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ {
+					behavior={Platform.OS === 'ios' && 'padding'}
+					style={{
 						...backgroundStyle,
 						borderColor: 'rgba(0, 0, 0, 0.1)',
 						marginTop:
@@ -535,60 +532,57 @@ class BottomSheet extends Component {
 								? safeAreaTopInset
 								: 0,
 						flex: isFullScreen ? 1 : undefined,
-						...( Platform.OS === 'android' && isFullScreen
+						...(Platform.OS === 'android' && isFullScreen
 							? styles.backgroundFullScreen
-							: {} ),
+							: {}),
 						...style,
-					} }
-					keyboardVerticalOffset={ -safeAreaBottomInset }
+					}}
+					keyboardVerticalOffset={-safeAreaBottomInset}
 				>
-					<View
-						style={ styles.header }
-						onLayout={ this.onHeaderLayout }
-					>
-						{ showDragIndicator() && (
-							<View style={ styles.dragIndicator } />
-						) }
-						{ ! hideHeader && getHeader() }
+					<View style={styles.header} onLayout={this.onHeaderLayout}>
+						{showDragIndicator() && (
+							<View style={styles.dragIndicator} />
+						)}
+						{!hideHeader && getHeader()}
 					</View>
 					<WrapperView
-						{ ...( hasNavigation
+						{...(hasNavigation
 							? { style: listProps.style }
-							: listProps ) }
+							: listProps)}
 					>
 						<BottomSheetProvider
-							value={ {
-								shouldEnableBottomSheetScroll: this
-									.onShouldEnableScroll,
-								shouldEnableBottomSheetMaxHeight: this
-									.onShouldSetBottomSheetMaxHeight,
+							value={{
+								shouldEnableBottomSheetScroll:
+									this.onShouldEnableScroll,
+								shouldEnableBottomSheetMaxHeight:
+									this.onShouldSetBottomSheetMaxHeight,
 								isBottomSheetContentScrolling: isScrolling,
-								onHandleClosingBottomSheet: this
-									.onHandleClosingBottomSheet,
-								onHandleHardwareButtonPress: this
-									.onHandleHardwareButtonPress,
+								onHandleClosingBottomSheet:
+									this.onHandleClosingBottomSheet,
+								onHandleHardwareButtonPress:
+									this.onHandleHardwareButtonPress,
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
 								safeAreaBottomInset,
-							} }
+							}}
 						>
-							{ hasNavigation ? (
-								<>{ children }</>
+							{hasNavigation ? (
+								<>{children}</>
 							) : (
-								<TouchableHighlight accessible={ false }>
-									<>{ children }</>
+								<TouchableHighlight accessible={false}>
+									<>{children}</>
 								</TouchableHighlight>
-							) }
+							)}
 						</BottomSheetProvider>
-						{ ! hasNavigation && (
+						{!hasNavigation && (
 							<View
-								style={ {
+								style={{
 									height:
 										safeAreaBottomInset ||
 										styles.scrollableContent.paddingBottom,
-								} }
+								}}
 							/>
-						) }
+						)}
 					</WrapperView>
 				</KeyboardAvoidingView>
 			</Modal>
@@ -597,13 +591,10 @@ class BottomSheet extends Component {
 }
 
 function getWidth() {
-	return Math.min(
-		Dimensions.get( 'window' ).width,
-		styles.background.maxWidth
-	);
+	return Math.min(Dimensions.get('window').width, styles.background.maxWidth);
 }
 
-const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
+const ThemedBottomSheet = withPreferredColorScheme(BottomSheet);
 
 ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;

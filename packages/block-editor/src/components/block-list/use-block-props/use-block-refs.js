@@ -25,27 +25,27 @@ import { BlockRefs } from '../../provider/block-refs-provider';
  *
  * @return {RefCallback} Ref callback.
  */
-export function useBlockRefProvider( clientId ) {
-	const { refs, callbacks } = useContext( BlockRefs );
+export function useBlockRefProvider(clientId) {
+	const { refs, callbacks } = useContext(BlockRefs);
 	const ref = useRef();
-	useLayoutEffect( () => {
-		refs.set( ref, clientId );
+	useLayoutEffect(() => {
+		refs.set(ref, clientId);
 		return () => {
-			refs.delete( ref );
+			refs.delete(ref);
 		};
-	}, [ clientId ] );
+	}, [clientId]);
 	return useRefEffect(
-		( element ) => {
+		(element) => {
 			// Update the ref in the provider.
 			ref.current = element;
 			// Call any update functions.
-			callbacks.forEach( ( id, setElement ) => {
-				if ( clientId === id ) {
-					setElement( element );
+			callbacks.forEach((id, setElement) => {
+				if (clientId === id) {
+					setElement(element);
 				}
-			} );
+			});
 		},
-		[ clientId ]
+		[clientId]
 	);
 }
 
@@ -57,28 +57,28 @@ export function useBlockRefProvider( clientId ) {
  *
  * @return {RefObject} A ref containing the element.
  */
-function useBlockRef( clientId ) {
-	const { refs } = useContext( BlockRefs );
+function useBlockRef(clientId) {
+	const { refs } = useContext(BlockRefs);
 	const freshClientId = useRef();
 	freshClientId.current = clientId;
 	// Always return an object, even if no ref exists for a given client ID, so
 	// that `current` works at a later point.
 	return useMemo(
-		() => ( {
+		() => ({
 			get current() {
 				let element = null;
 
 				// Multiple refs may be created for a single block. Find the
 				// first that has an element set.
-				for ( const [ ref, id ] of refs.entries() ) {
-					if ( id === freshClientId.current && ref.current ) {
+				for (const [ref, id] of refs.entries()) {
+					if (id === freshClientId.current && ref.current) {
 						element = ref.current;
 					}
 				}
 
 				return element;
 			},
-		} ),
+		}),
 		[]
 	);
 }
@@ -91,21 +91,21 @@ function useBlockRef( clientId ) {
  *
  * @return {Element|null} The block's wrapper element.
  */
-function useBlockElement( clientId ) {
-	const { callbacks } = useContext( BlockRefs );
-	const ref = useBlockRef( clientId );
-	const [ element, setElement ] = useState( null );
+function useBlockElement(clientId) {
+	const { callbacks } = useContext(BlockRefs);
+	const ref = useBlockRef(clientId);
+	const [element, setElement] = useState(null);
 
-	useLayoutEffect( () => {
-		if ( ! clientId ) {
+	useLayoutEffect(() => {
+		if (!clientId) {
 			return;
 		}
 
-		callbacks.set( setElement, clientId );
+		callbacks.set(setElement, clientId);
 		return () => {
-			callbacks.delete( setElement );
+			callbacks.delete(setElement);
 		};
-	}, [ clientId ] );
+	}, [clientId]);
 
 	return ref.current || element;
 }

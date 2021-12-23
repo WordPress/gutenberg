@@ -6,18 +6,18 @@
  */
 export const browserSupportsPdfs = () => {
 	// Most mobile devices include "Mobi" in their UA.
-	if ( window.navigator.userAgent.indexOf( 'Mobi' ) > -1 ) {
+	if (window.navigator.userAgent.indexOf('Mobi') > -1) {
 		return false;
 	}
 
 	// Android tablets are the noteable exception.
-	if ( window.navigator.userAgent.indexOf( 'Android' ) > -1 ) {
+	if (window.navigator.userAgent.indexOf('Android') > -1) {
 		return false;
 	}
 
 	// iPad pretends to be a Mac.
 	if (
-		window.navigator.userAgent.indexOf( 'Macintosh' ) > -1 &&
+		window.navigator.userAgent.indexOf('Macintosh') > -1 &&
 		window.navigator.maxTouchPoints &&
 		window.navigator.maxTouchPoints > 2
 	) {
@@ -26,10 +26,10 @@ export const browserSupportsPdfs = () => {
 
 	// IE only supports PDFs when there's an ActiveX object available for it.
 	if (
-		!! ( window.ActiveXObject || 'ActiveXObject' in window ) &&
-		! (
-			createActiveXObject( 'AcroPDF.PDF' ) ||
-			createActiveXObject( 'PDF.PdfCtrl' )
+		!!(window.ActiveXObject || 'ActiveXObject' in window) &&
+		!(
+			createActiveXObject('AcroPDF.PDF') ||
+			createActiveXObject('PDF.PdfCtrl')
 		)
 	) {
 		return false;
@@ -45,11 +45,11 @@ export const browserSupportsPdfs = () => {
  * @param {string} type The name of the ActiveX object to create.
  * @return {window.ActiveXObject|undefined} The generated ActiveXObject, or null if it failed.
  */
-const createActiveXObject = ( type ) => {
+const createActiveXObject = (type) => {
 	let ax;
 	try {
-		ax = new window.ActiveXObject( type );
-	} catch ( e ) {
+		ax = new window.ActiveXObject(type);
+	} catch (e) {
 		ax = undefined;
 	}
 	return ax;
@@ -60,12 +60,10 @@ const createActiveXObject = ( type ) => {
  * to be run on the front-end, it may have weird side effects running in the block editor.
  */
 export const hidePdfEmbedsOnUnsupportedBrowsers = () => {
-	if ( ! browserSupportsPdfs() ) {
-		const embeds = document.getElementsByClassName(
-			'wp-block-file__embed'
-		);
-		Array.from( embeds ).forEach( ( embed ) => {
+	if (!browserSupportsPdfs()) {
+		const embeds = document.getElementsByClassName('wp-block-file__embed');
+		Array.from(embeds).forEach((embed) => {
 			embed.style.display = 'none';
-		} );
+		});
 	}
 };

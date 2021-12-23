@@ -31,7 +31,7 @@ const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 const PaletteScreen = () => {
 	const route = useRoute();
 	const navigation = useNavigation();
-	const { shouldEnableBottomSheetScroll } = useContext( BottomSheetContext );
+	const { shouldEnableBottomSheetScroll } = useContext(BottomSheetContext);
 	const {
 		label,
 		onColorChange,
@@ -42,12 +42,12 @@ const PaletteScreen = () => {
 		hideNavigation = false,
 	} = route.params || {};
 	const { segments, isGradient } = colorsUtils;
-	const [ currentValue, setCurrentValue ] = useState( colorValue );
-	const isGradientColor = isGradient( currentValue );
+	const [currentValue, setCurrentValue] = useState(colorValue);
+	const isGradientColor = isGradient(currentValue);
 	const selectedSegmentIndex = isGradientColor ? 1 : 0;
 
-	const [ currentSegment, setCurrentSegment ] = useState(
-		segments[ selectedSegmentIndex ]
+	const [currentSegment, setCurrentSegment] = useState(
+		segments[selectedSegmentIndex]
 	);
 
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
@@ -63,142 +63,142 @@ const PaletteScreen = () => {
 		styles.colorTextDark
 	);
 
-	const isSolidSegment = currentSegment === segments[ 0 ];
-	const isCustomGadientShown = ! isSolidSegment && isGradientColor;
+	const isSolidSegment = currentSegment === segments[0];
+	const isCustomGadientShown = !isSolidSegment && isGradientColor;
 
-	const setColor = ( color ) => {
-		setCurrentValue( color );
-		if ( isSolidSegment && onColorChange && onGradientChange ) {
-			onColorChange( color );
-			onGradientChange( '' );
-		} else if ( isSolidSegment && onColorChange ) {
-			onColorChange( color );
-		} else if ( ! isSolidSegment && onGradientChange ) {
-			onGradientChange( color );
-			onColorChange( '' );
+	const setColor = (color) => {
+		setCurrentValue(color);
+		if (isSolidSegment && onColorChange && onGradientChange) {
+			onColorChange(color);
+			onGradientChange('');
+		} else if (isSolidSegment && onColorChange) {
+			onColorChange(color);
+		} else if (!isSolidSegment && onGradientChange) {
+			onGradientChange(color);
+			onColorChange('');
 		}
 	};
 
 	function onClear() {
-		setCurrentValue( undefined );
-		if ( isSolidSegment ) {
-			onColorChange( '' );
+		setCurrentValue(undefined);
+		if (isSolidSegment) {
+			onColorChange('');
 		} else {
-			onGradientChange( '' );
+			onGradientChange('');
 		}
 
-		if ( onColorCleared ) {
+		if (onColorCleared) {
 			onColorCleared();
 		}
 	}
 
 	function onCustomPress() {
-		if ( isSolidSegment ) {
-			navigation.navigate( colorsUtils.screens.picker, {
+		if (isSolidSegment) {
+			navigation.navigate(colorsUtils.screens.picker, {
 				currentValue,
 				setColor,
-			} );
+			});
 		} else {
-			navigation.navigate( colorsUtils.screens.gradientPicker, {
+			navigation.navigate(colorsUtils.screens.gradientPicker, {
 				setColor,
 				isGradientColor,
 				currentValue,
-			} );
+			});
 		}
 	}
 
 	function getClearButton() {
 		return (
-			<TouchableWithoutFeedback onPress={ onClear } hitSlop={ HIT_SLOP }>
-				<View style={ styles.clearButtonContainer }>
-					<Text style={ clearButtonStyle }>{ __( 'Reset' ) }</Text>
+			<TouchableWithoutFeedback onPress={onClear} hitSlop={HIT_SLOP}>
+				<View style={styles.clearButtonContainer}>
+					<Text style={clearButtonStyle}>{__('Reset')}</Text>
 				</View>
 			</TouchableWithoutFeedback>
 		);
 	}
 
 	function getFooter() {
-		if ( onGradientChange ) {
+		if (onGradientChange) {
 			return (
 				<SegmentedControls
-					segments={ segments }
-					segmentHandler={ setCurrentSegment }
-					selectedIndex={ segments.indexOf( currentSegment ) }
+					segments={segments}
+					segmentHandler={setCurrentSegment}
+					selectedIndex={segments.indexOf(currentSegment)}
 					addonLeft={
 						currentValue && (
 							<ColorIndicator
-								color={ currentValue }
-								style={ styles.colorIndicator }
+								color={currentValue}
+								style={styles.colorIndicator}
 							/>
 						)
 					}
-					addonRight={ currentValue && getClearButton() }
+					addonRight={currentValue && getClearButton()}
 				/>
 			);
 		}
 		return (
-			<View style={ styles.footer }>
-				<View style={ styles.flex }>
-					{ currentValue && (
+			<View style={styles.footer}>
+				<View style={styles.flex}>
+					{currentValue && (
 						<ColorIndicator
-							color={ currentValue }
-							style={ styles.colorIndicator }
+							color={currentValue}
+							style={styles.colorIndicator}
 						/>
-					) }
+					)}
 				</View>
-				{ currentValue ? (
+				{currentValue ? (
 					<Text
-						style={ selectedColorTextStyle }
-						maxFontSizeMultiplier={ 2 }
+						style={selectedColorTextStyle}
+						maxFontSizeMultiplier={2}
 						selectable
 					>
-						{ currentValue.toUpperCase() }
+						{currentValue.toUpperCase()}
 					</Text>
 				) : (
 					<Text
-						style={ styles.selectColorText }
-						maxFontSizeMultiplier={ 2 }
+						style={styles.selectColorText}
+						maxFontSizeMultiplier={2}
 					>
-						{ __( 'Select a color above' ) }
+						{__('Select a color above')}
 					</Text>
-				) }
-				<View style={ styles.flex }>
-					{ currentValue && getClearButton() }
+				)}
+				<View style={styles.flex}>
+					{currentValue && getClearButton()}
 				</View>
 			</View>
 		);
 	}
 	return (
 		<View>
-			{ ! hideNavigation && (
+			{!hideNavigation && (
 				<NavBar>
-					<NavBar.BackButton onPress={ navigation.goBack } />
-					<NavBar.Heading>{ label } </NavBar.Heading>
+					<NavBar.BackButton onPress={navigation.goBack} />
+					<NavBar.Heading>{label} </NavBar.Heading>
 				</NavBar>
-			) }
+			)}
 			<ColorPalette
-				setColor={ setColor }
-				activeColor={ currentValue }
-				isGradientColor={ isGradientColor }
-				currentSegment={ currentSegment }
-				onCustomPress={ onCustomPress }
-				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
-				defaultSettings={ defaultSettings }
+				setColor={setColor}
+				activeColor={currentValue}
+				isGradientColor={isGradientColor}
+				currentSegment={currentSegment}
+				onCustomPress={onCustomPress}
+				shouldEnableBottomSheetScroll={shouldEnableBottomSheetScroll}
+				defaultSettings={defaultSettings}
 			/>
-			{ isCustomGadientShown && (
+			{isCustomGadientShown && (
 				<>
-					<View style={ horizontalSeparatorStyle } />
+					<View style={horizontalSeparatorStyle} />
 					<PanelBody>
 						<ColorControl
-							label={ __( 'Customize Gradient' ) }
-							onPress={ onCustomPress }
-							withColorIndicator={ false }
+							label={__('Customize Gradient')}
+							onPress={onCustomPress}
+							withColorIndicator={false}
 						/>
 					</PanelBody>
 				</>
-			) }
-			<View style={ horizontalSeparatorStyle } />
-			{ getFooter() }
+			)}
+			<View style={horizontalSeparatorStyle} />
+			{getFooter()}
 		</View>
 	);
 };

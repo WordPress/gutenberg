@@ -28,8 +28,8 @@
  *
  * @return {void}
  */
-export default function domReady( callback ) {
-	if ( typeof document === 'undefined' ) {
+export default function domReady(callback) {
+	if (typeof document === 'undefined') {
 		return;
 	}
 
@@ -41,5 +41,5 @@ export default function domReady( callback ) {
 	}
 
 	// DOMContentLoaded has not fired yet, delay callback until then.
-	document.addEventListener( 'DOMContentLoaded', callback );
+	document.addEventListener('DOMContentLoaded', callback);
 }

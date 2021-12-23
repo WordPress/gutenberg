@@ -34,98 +34,97 @@ const alignItemsMap = {
 	center: 'center',
 };
 
-const flexWrapOptions = [ 'wrap', 'nowrap' ];
+const flexWrapOptions = ['wrap', 'nowrap'];
 
 export default {
 	name: 'flex',
-	label: __( 'Flex' ),
-	inspectorControls: function FlexLayoutInspectorControls( {
+	label: __('Flex'),
+	inspectorControls: function FlexLayoutInspectorControls({
 		layout = {},
 		onChange,
-	} ) {
+	}) {
 		const { allowOrientation = true } = layout;
 		return (
 			<>
 				<Flex>
 					<FlexItem>
 						<FlexLayoutJustifyContentControl
-							layout={ layout }
-							onChange={ onChange }
+							layout={layout}
+							onChange={onChange}
 						/>
 					</FlexItem>
 					<FlexItem>
-						{ allowOrientation && (
+						{allowOrientation && (
 							<OrientationControl
-								layout={ layout }
-								onChange={ onChange }
+								layout={layout}
+								onChange={onChange}
 							/>
-						) }
+						)}
 					</FlexItem>
 				</Flex>
-				<FlexWrapControl layout={ layout } onChange={ onChange } />
+				<FlexWrapControl layout={layout} onChange={onChange} />
 			</>
 		);
 	},
-	toolBarControls: function FlexLayoutToolbarControls( {
+	toolBarControls: function FlexLayoutToolbarControls({
 		layout = {},
 		onChange,
 		layoutBlockSupport,
-	} ) {
-		if ( layoutBlockSupport?.allowSwitching ) {
+	}) {
+		if (layoutBlockSupport?.allowSwitching) {
 			return null;
 		}
 		return (
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<FlexLayoutJustifyContentControl
-					layout={ layout }
-					onChange={ onChange }
+					layout={layout}
+					onChange={onChange}
 					isToolbar
 				/>
 			</BlockControls>
 		);
 	},
-	save: function FlexLayoutStyle( { selector, layout } ) {
+	save: function FlexLayoutStyle({ selector, layout }) {
 		const { orientation = 'horizontal' } = layout;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
+		const blockGapSupport = useSetting('spacing.blockGap');
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const justifyContent =
-			justifyContentMap[ layout.justifyContent ] ||
-			justifyContentMap.left;
-		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
+			justifyContentMap[layout.justifyContent] || justifyContentMap.left;
+		const flexWrap = flexWrapOptions.includes(layout.flexWrap)
 			? layout.flexWrap
 			: 'wrap';
 		const rowOrientation = `
 		flex-direction: row;
 		align-items: center;
-		justify-content: ${ justifyContent };
+		justify-content: ${justifyContent};
 		`;
 		const alignItems =
-			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
+			alignItemsMap[layout.justifyContent] || alignItemsMap.left;
 		const columnOrientation = `
 		flex-direction: column;
-		align-items: ${ alignItems };
+		align-items: ${alignItems};
 		`;
 
 		return (
-			<style>{ `
-				${ appendSelectors( selector ) } {
+			<style>{`
+				${appendSelectors(selector)} {
 					display: flex;
 					gap: ${
 						hasBlockGapStylesSupport
 							? 'var( --wp--style--block-gap, 0.5em )'
 							: '0.5em'
 					};
-					flex-wrap: ${ flexWrap };
-					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
+					flex-wrap: ${flexWrap};
+					${orientation === 'horizontal' ? rowOrientation : columnOrientation}
 				}
 
-				${ appendSelectors( selector, '> *' ) } {
+				${appendSelectors(selector, '> *')} {
 					margin: 0;
 				}
-			` }</style>
+			`}</style>
 		);
 	},
-	getOrientation( layout ) {
+	getOrientation(layout) {
 		const { orientation = 'horizontal' } = layout;
 		return orientation;
 	},
@@ -134,32 +133,32 @@ export default {
 	},
 };
 
-function FlexLayoutJustifyContentControl( {
+function FlexLayoutJustifyContentControl({
 	layout,
 	onChange,
 	isToolbar = false,
-} ) {
+}) {
 	const { justifyContent = 'left', orientation = 'horizontal' } = layout;
-	const onJustificationChange = ( value ) => {
-		onChange( {
+	const onJustificationChange = (value) => {
+		onChange({
 			...layout,
 			justifyContent: value,
-		} );
+		});
 	};
-	const allowedControls = [ 'left', 'center', 'right' ];
-	if ( orientation === 'horizontal' ) {
-		allowedControls.push( 'space-between' );
+	const allowedControls = ['left', 'center', 'right'];
+	if (orientation === 'horizontal') {
+		allowedControls.push('space-between');
 	}
-	if ( isToolbar ) {
+	if (isToolbar) {
 		return (
 			<JustifyContentControl
-				allowedControls={ allowedControls }
-				value={ justifyContent }
-				onChange={ onJustificationChange }
-				popoverProps={ {
+				allowedControls={allowedControls}
+				value={justifyContent}
+				onChange={onJustificationChange}
+				popoverProps={{
 					position: 'bottom right',
 					isAlternate: true,
-				} }
+				}}
 			/>
 		);
 	}
@@ -168,88 +167,88 @@ function FlexLayoutJustifyContentControl( {
 		{
 			value: 'left',
 			icon: justifyLeft,
-			label: __( 'Justify items left' ),
+			label: __('Justify items left'),
 		},
 		{
 			value: 'center',
 			icon: justifyCenter,
-			label: __( 'Justify items center' ),
+			label: __('Justify items center'),
 		},
 		{
 			value: 'right',
 			icon: justifyRight,
-			label: __( 'Justify items right' ),
+			label: __('Justify items right'),
 		},
 	];
-	if ( orientation === 'horizontal' ) {
-		justificationOptions.push( {
+	if (orientation === 'horizontal') {
+		justificationOptions.push({
 			value: 'space-between',
 			icon: justifySpaceBetween,
-			label: __( 'Space between items' ),
-		} );
+			label: __('Space between items'),
+		});
 	}
 
 	return (
 		<fieldset className="block-editor-hooks__flex-layout-justification-controls">
-			<legend>{ __( 'Justification' ) }</legend>
+			<legend>{__('Justification')}</legend>
 			<div>
-				{ justificationOptions.map( ( { value, icon, label } ) => {
+				{justificationOptions.map(({ value, icon, label }) => {
 					return (
 						<Button
-							key={ value }
-							label={ label }
-							icon={ icon }
-							isPressed={ justifyContent === value }
-							onClick={ () => onJustificationChange( value ) }
+							key={value}
+							label={label}
+							icon={icon}
+							isPressed={justifyContent === value}
+							onClick={() => onJustificationChange(value)}
 						/>
 					);
-				} ) }
+				})}
 			</div>
 		</fieldset>
 	);
 }
 
-function FlexWrapControl( { layout, onChange } ) {
+function FlexWrapControl({ layout, onChange }) {
 	const { flexWrap = 'wrap' } = layout;
 	return (
 		<ToggleControl
-			label={ __( 'Allow to wrap to multiple lines' ) }
-			onChange={ ( value ) => {
-				onChange( {
+			label={__('Allow to wrap to multiple lines')}
+			onChange={(value) => {
+				onChange({
 					...layout,
 					flexWrap: value ? 'wrap' : 'nowrap',
-				} );
-			} }
-			checked={ flexWrap === 'wrap' }
+				});
+			}}
+			checked={flexWrap === 'wrap'}
 		/>
 	);
 }
 
-function OrientationControl( { layout, onChange } ) {
+function OrientationControl({ layout, onChange }) {
 	const { orientation = 'horizontal' } = layout;
 	return (
 		<fieldset className="block-editor-hooks__flex-layout-orientation-controls">
-			<legend>{ __( 'Orientation' ) }</legend>
+			<legend>{__('Orientation')}</legend>
 			<Button
-				label={ 'horizontal' }
-				icon={ arrowRight }
-				isPressed={ orientation === 'horizontal' }
-				onClick={ () =>
-					onChange( {
+				label={'horizontal'}
+				icon={arrowRight}
+				isPressed={orientation === 'horizontal'}
+				onClick={() =>
+					onChange({
 						...layout,
 						orientation: 'horizontal',
-					} )
+					})
 				}
 			/>
 			<Button
-				label={ 'vertical' }
-				icon={ arrowDown }
-				isPressed={ orientation === 'vertical' }
-				onClick={ () =>
-					onChange( {
+				label={'vertical'}
+				icon={arrowDown}
+				isPressed={orientation === 'vertical'}
+				onClick={() =>
+					onChange({
 						...layout,
 						orientation: 'vertical',
-					} )
+					})
 				}
 			/>
 		</fieldset>

@@ -23,33 +23,33 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import CreateTemplatePartModal from '../create-template-part-modal';
 
-export default function ConvertToTemplatePart( { clientIds, blocks } ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice } = useDispatch( noticesStore );
+export default function ConvertToTemplatePart({ clientIds, blocks }) {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const { replaceBlocks } = useDispatch(blockEditorStore);
+	const { saveEntityRecord } = useDispatch(coreStore);
+	const { createSuccessNotice } = useDispatch(noticesStore);
 
-	const onConvert = async ( { title, area } ) => {
+	const onConvert = async ({ title, area }) => {
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
 			{
-				slug: kebabCase( title ),
+				slug: kebabCase(title),
 				title,
-				content: serialize( blocks ),
+				content: serialize(blocks),
 				area,
 			}
 		);
 		replaceBlocks(
 			clientIds,
-			createBlock( 'core/template-part', {
+			createBlock('core/template-part', {
 				slug: templatePart.slug,
 				theme: templatePart.theme,
-			} )
+			})
 		);
-		createSuccessNotice( __( 'Template part created.' ), {
+		createSuccessNotice(__('Template part created.'), {
 			type: 'snackbar',
-		} );
+		});
 
 		// The modal and this component will be unmounted because of `replaceBlocks` above,
 		// so no need to call `closeModal` or `onClose`.
@@ -58,24 +58,24 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	return (
 		<>
 			<BlockSettingsMenuControls>
-				{ () => (
+				{() => (
 					<MenuItem
-						onClick={ () => {
-							setIsModalOpen( true );
-						} }
+						onClick={() => {
+							setIsModalOpen(true);
+						}}
 					>
-						{ __( 'Make template part' ) }
+						{__('Make template part')}
 					</MenuItem>
-				) }
+				)}
 			</BlockSettingsMenuControls>
-			{ isModalOpen && (
+			{isModalOpen && (
 				<CreateTemplatePartModal
-					closeModal={ () => {
-						setIsModalOpen( false );
-					} }
-					onCreate={ onConvert }
+					closeModal={() => {
+						setIsModalOpen(false);
+					}}
+					onCreate={onConvert}
 				/>
-			) }
+			)}
 		</>
 	);
 }

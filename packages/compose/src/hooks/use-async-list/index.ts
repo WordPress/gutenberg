@@ -15,16 +15,16 @@ type AsyncListConfig = {
  * @param  state Current state.
  * @return First items present iin state.
  */
-function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
+function getFirstItemsPresentInState<T>(list: T[], state: T[]): T[] {
 	const firstItems = [];
 
-	for ( let i = 0; i < list.length; i++ ) {
-		const item = list[ i ];
-		if ( ! state.includes( item ) ) {
+	for (let i = 0; i < list.length; i++) {
+		const item = list[i];
+		if (!state.includes(item)) {
 			break;
 		}
 
-		firstItems.push( item );
+		firstItems.push(item);
 	}
 
 	return firstItems;
@@ -39,40 +39,38 @@ function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
  *
  * @return Async array.
  */
-function useAsyncList< T >(
+function useAsyncList<T>(
 	list: T[],
 	config: AsyncListConfig = { step: 1 }
 ): T[] {
 	const { step = 1 } = config;
-	const [ current, setCurrent ] = useState( [] as T[] );
+	const [current, setCurrent] = useState([] as T[]);
 
-	useEffect( () => {
+	useEffect(() => {
 		// On reset, we keep the first items that were previously rendered.
-		let firstItems = getFirstItemsPresentInState( list, current );
-		if ( firstItems.length < step ) {
-			firstItems = firstItems.concat(
-				list.slice( firstItems.length, step )
-			);
+		let firstItems = getFirstItemsPresentInState(list, current);
+		if (firstItems.length < step) {
+			firstItems = firstItems.concat(list.slice(firstItems.length, step));
 		}
-		setCurrent( firstItems );
+		setCurrent(firstItems);
 		let nextIndex = firstItems.length;
 
 		const asyncQueue = createQueue();
 		const append = () => {
-			if ( list.length <= nextIndex ) {
+			if (list.length <= nextIndex) {
 				return;
 			}
-			setCurrent( ( state ) => [
+			setCurrent((state) => [
 				...state,
-				...list.slice( nextIndex, nextIndex + step ),
-			] );
+				...list.slice(nextIndex, nextIndex + step),
+			]);
 			nextIndex += step;
-			asyncQueue.add( {}, append );
+			asyncQueue.add({}, append);
 		};
-		asyncQueue.add( {}, append );
+		asyncQueue.add({}, append);
 
 		return () => asyncQueue.reset();
-	}, [ list ] );
+	}, [list]);
 
 	return current;
 }

@@ -9,9 +9,9 @@ import { render } from '@testing-library/react';
 import Toolbar from '../';
 import ToolbarButton from '../../toolbar-button';
 
-describe( 'Toolbar', () => {
-	describe( 'basic rendering', () => {
-		it( 'should render a toolbar with toolbar buttons', () => {
+describe('Toolbar', () => {
+	describe('basic rendering', () => {
+		it('should render a toolbar with toolbar buttons', () => {
 			const { getByLabelText } = render(
 				<Toolbar label="blocks">
 					<ToolbarButton label="control1" />
@@ -20,11 +20,11 @@ describe( 'Toolbar', () => {
 			);
 
 			expect(
-				getByLabelText( 'control1', { selector: 'button' } )
+				getByLabelText('control1', { selector: 'button' })
 			).toBeTruthy();
 			expect(
-				getByLabelText( 'control2', { selector: 'button' } )
+				getByLabelText('control2', { selector: 'button' })
 			).toBeTruthy();
-		} );
-	} );
-} );
+		});
+	});
+});

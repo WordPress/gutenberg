@@ -10,8 +10,8 @@ import { View } from '../../view';
 import { Grid } from '..';
 import CONFIG from '../../utils/config-values';
 
-describe( 'props', () => {
-	test( 'should render correctly', () => {
+describe('props', () => {
+	test('should render correctly', () => {
 		const { container } = render(
 			<Grid>
 				<View />
@@ -19,30 +19,30 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'grid',
 			gridTemplateColumns: 'repeat( 2, 1fr )',
-			gap: `calc( ${ CONFIG.gridBase } * 3 )`,
-		} );
-	} );
+			gap: `calc( ${CONFIG.gridBase} * 3 )`,
+		});
+	});
 
-	test( 'should render gap', () => {
+	test('should render gap', () => {
 		const { container } = render(
-			<Grid columns="3" gap={ 4 }>
+			<Grid columns="3" gap={4}>
 				<View />
 				<View />
 				<View />
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'grid',
 			gridTemplateColumns: 'repeat( 3, 1fr )',
-			gap: `calc( ${ CONFIG.gridBase } * 4 )`,
-		} );
-	} );
+			gap: `calc( ${CONFIG.gridBase} * 4 )`,
+		});
+	});
 
-	test( 'should render custom columns', () => {
+	test('should render custom columns', () => {
 		const { container } = render(
 			<Grid columns="7">
 				<View />
@@ -51,13 +51,13 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'grid',
 			gridTemplateColumns: 'repeat( 7, 1fr )',
-		} );
-	} );
+		});
+	});
 
-	test( 'should render custom rows', () => {
+	test('should render custom rows', () => {
 		const { container } = render(
 			<Grid rows="7">
 				<View />
@@ -66,13 +66,13 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'grid',
 			gridTemplateRows: 'repeat( 7, 1fr )',
-		} );
-	} );
+		});
+	});
 
-	test( 'should render align', () => {
+	test('should render align', () => {
 		const { container } = render(
 			<Grid align="flex-start">
 				<View />
@@ -81,13 +81,13 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			alignItems: 'flex-start',
 			display: 'grid',
-		} );
-	} );
+		});
+	});
 
-	test( 'should render alignment spaced', () => {
+	test('should render alignment spaced', () => {
 		const { container } = render(
 			<Grid alignment="spaced">
 				<View />
@@ -96,14 +96,14 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'grid',
 			alignItems: 'center',
 			justifyContent: 'space-between',
-		} );
-	} );
+		});
+	});
 
-	test( 'should render justify', () => {
+	test('should render justify', () => {
 		const { container } = render(
 			<Grid justify="flex-start">
 				<View />
@@ -112,13 +112,13 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'grid',
 			justifyContent: 'flex-start',
-		} );
-	} );
+		});
+	});
 
-	test( 'should render isInline', () => {
+	test('should render isInline', () => {
 		const { container } = render(
 			<Grid columns="3" isInline>
 				<View />
@@ -127,13 +127,13 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'inline-grid',
 			gridTemplateColumns: 'repeat( 3, 1fr )',
-		} );
-	} );
+		});
+	});
 
-	test( 'should render custom templateColumns', () => {
+	test('should render custom templateColumns', () => {
 		const { container } = render(
 			<Grid templateColumns="1fr auto 1fr">
 				<View />
@@ -142,13 +142,13 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'grid',
 			gridTemplateColumns: '1fr auto 1fr',
-		} );
-	} );
+		});
+	});
 
-	test( 'should render custom templateRows', () => {
+	test('should render custom templateRows', () => {
 		const { container } = render(
 			<Grid templateRows="1fr auto 1fr">
 				<View />
@@ -157,9 +157,9 @@ describe( 'props', () => {
 			</Grid>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
+		expect(container.firstChild).toHaveStyle({
 			display: 'grid',
 			gridTemplateRows: '1fr auto 1fr',
-		} );
-	} );
-} );
+		});
+	});
+});

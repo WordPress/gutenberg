@@ -9,26 +9,26 @@ import { shallow } from 'enzyme';
  */
 import { KeyboardShortcutHelpModal } from '../index';
 
-describe( 'KeyboardShortcutHelpModal', () => {
-	it( 'should match snapshot when the modal is active', () => {
+describe('KeyboardShortcutHelpModal', () => {
+	it('should match snapshot when the modal is active', () => {
 		const wrapper = shallow(
 			<KeyboardShortcutHelpModal
-				isModalActive={ true }
-				toggleModal={ noop }
+				isModalActive={true}
+				toggleModal={noop}
 			/>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
+		expect(wrapper).toMatchSnapshot();
+	});
 
-	it( 'should match snapshot when the modal is not active', () => {
+	it('should match snapshot when the modal is not active', () => {
 		const wrapper = shallow(
 			<KeyboardShortcutHelpModal
-				isModalActive={ false }
-				toggleModal={ noop }
+				isModalActive={false}
+				toggleModal={noop}
 			/>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
+		expect(wrapper).toMatchSnapshot();
+	});
+});

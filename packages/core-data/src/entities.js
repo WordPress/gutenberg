@@ -16,26 +16,26 @@ import { addEntities } from './actions';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
-const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+const POST_RAW_ATTRIBUTES = ['title', 'excerpt', 'content'];
 
 export const defaultEntities = [
 	{
-		label: __( 'Base' ),
+		label: __('Base'),
 		name: '__unstableBase',
 		kind: 'root',
 		baseURL: '/',
 	},
 	{
-		label: __( 'Site' ),
+		label: __('Site'),
 		name: 'site',
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
-		getTitle: ( record ) => {
-			return get( record, [ 'title' ], __( 'Site Title' ) );
+		getTitle: (record) => {
+			return get(record, ['title'], __('Site Title'));
 		},
 	},
 	{
-		label: __( 'Post Type' ),
+		label: __('Post Type'),
 		name: 'postType',
 		kind: 'root',
 		key: 'slug',
@@ -49,7 +49,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/media',
 		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
-		label: __( 'Media' ),
+		label: __('Media'),
 	},
 	{
 		name: 'taxonomy',
@@ -58,7 +58,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/taxonomies',
 		baseURLParams: { context: 'edit' },
 		plural: 'taxonomies',
-		label: __( 'Taxonomy' ),
+		label: __('Taxonomy'),
 	},
 	{
 		name: 'sidebar',
@@ -66,7 +66,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/sidebars',
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
-		label: __( 'Widget areas' ),
+		label: __('Widget areas'),
 	},
 	{
 		name: 'widget',
@@ -75,7 +75,7 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		plural: 'widgets',
 		transientEdits: { blocks: true },
-		label: __( 'Widgets' ),
+		label: __('Widgets'),
 	},
 	{
 		name: 'widgetType',
@@ -83,10 +83,10 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/widget-types',
 		baseURLParams: { context: 'edit' },
 		plural: 'widgetTypes',
-		label: __( 'Widget types' ),
+		label: __('Widget types'),
 	},
 	{
-		label: __( 'User' ),
+		label: __('User'),
 		name: 'user',
 		kind: 'root',
 		baseURL: '/wp/v2/users',
@@ -99,7 +99,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/comments',
 		baseURLParams: { context: 'edit' },
 		plural: 'comments',
-		label: __( 'Comment' ),
+		label: __('Comment'),
 	},
 	{
 		name: 'menu',
@@ -107,7 +107,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/menus',
 		baseURLParams: { context: 'edit' },
 		plural: 'menus',
-		label: __( 'Menu' ),
+		label: __('Menu'),
 	},
 	{
 		name: 'menuItem',
@@ -115,8 +115,8 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/menu-items',
 		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
-		label: __( 'Menu Item' ),
-		rawAttributes: [ 'title', 'content' ],
+		label: __('Menu Item'),
+		rawAttributes: ['title', 'content'],
 	},
 	{
 		name: 'menuLocation',
@@ -124,7 +124,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/menu-locations',
 		baseURLParams: { context: 'edit' },
 		plural: 'menuLocations',
-		label: __( 'Menu Location' ),
+		label: __('Menu Location'),
 		key: 'name',
 	},
 	{
@@ -133,21 +133,21 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/block-navigation-areas',
 		baseURLParams: { context: 'edit' },
 		plural: 'navigationAreas',
-		label: __( 'Navigation Area' ),
+		label: __('Navigation Area'),
 		key: 'name',
-		getTitle: ( record ) => record?.description,
+		getTitle: (record) => record?.description,
 	},
 	{
-		label: __( 'Global Styles' ),
+		label: __('Global Styles'),
 		name: 'globalStyles',
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
 		plural: 'globalStylesVariations', // should be different than name
-		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getTitle: (record) => record?.title?.rendered || record?.title,
 	},
 	{
-		label: __( 'Themes' ),
+		label: __('Themes'),
 		name: 'theme',
 		kind: 'root',
 		baseURL: '/wp/v2/themes',
@@ -155,7 +155,7 @@ export const defaultEntities = [
 		key: 'stylesheet',
 	},
 	{
-		label: __( 'Plugins' ),
+		label: __('Plugins'),
 		name: 'plugin',
 		kind: 'root',
 		baseURL: '/wp/v2/plugins',
@@ -176,21 +176,20 @@ export const kinds = [
  * @param {Object} edits           Edits.
  * @return {Object} Updated edits.
  */
-export const prePersistPostType = ( persistedRecord, edits ) => {
+export const prePersistPostType = (persistedRecord, edits) => {
 	const newEdits = {};
 
-	if ( persistedRecord?.status === 'auto-draft' ) {
+	if (persistedRecord?.status === 'auto-draft') {
 		// Saving an auto-draft should create a draft by default.
-		if ( ! edits.status && ! newEdits.status ) {
+		if (!edits.status && !newEdits.status) {
 			newEdits.status = 'draft';
 		}
 
 		// Fix the auto-draft default title.
 		if (
-			( ! edits.title || edits.title === 'Auto Draft' ) &&
-			! newEdits.title &&
-			( ! persistedRecord?.title ||
-				persistedRecord?.title === 'Auto Draft' )
+			(!edits.title || edits.title === 'Auto Draft') &&
+			!newEdits.title &&
+			(!persistedRecord?.title || persistedRecord?.title === 'Auto Draft')
 		) {
 			newEdits.title = '';
 		}
@@ -205,15 +204,13 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( { path: '/wp/v2/types?context=edit' } );
-	return map( postTypes, ( postType, name ) => {
-		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-			name
-		);
+	const postTypes = await apiFetch({ path: '/wp/v2/types?context=edit' });
+	return map(postTypes, (postType, name) => {
+		const isTemplate = ['wp_template', 'wp_template_part'].includes(name);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'postType',
-			baseURL: `/${ namespace }/${ postType.rest_base }`,
+			baseURL: `/${namespace}/${postType.rest_base}`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: postType.labels.singular_name,
@@ -223,14 +220,14 @@ async function loadPostTypeEntities() {
 			},
 			mergedEdits: { meta: true },
 			rawAttributes: POST_RAW_ATTRIBUTES,
-			getTitle: ( record ) =>
+			getTitle: (record) =>
 				record?.title?.rendered ||
 				record?.title ||
-				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
+				(isTemplate ? startCase(record.slug) : String(record.id)),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
 		};
-	} );
+	});
 }
 
 /**
@@ -239,19 +236,19 @@ async function loadPostTypeEntities() {
  * @return {Promise} Entities promise
  */
 async function loadTaxonomyEntities() {
-	const taxonomies = await apiFetch( {
+	const taxonomies = await apiFetch({
 		path: '/wp/v2/taxonomies?context=edit',
-	} );
-	return map( taxonomies, ( taxonomy, name ) => {
+	});
+	return map(taxonomies, (taxonomy, name) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'taxonomy',
-			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
+			baseURL: `/${namespace}/${taxonomy.rest_base}`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: taxonomy.labels.singular_name,
 		};
-	} );
+	});
 }
 
 /**
@@ -270,15 +267,14 @@ export const getMethodName = (
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entity = find( defaultEntities, { kind, name } );
-	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
-	const nameSuffix =
-		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
+	const entity = find(defaultEntities, { kind, name });
+	const kindPrefix = kind === 'root' ? '' : upperFirst(camelCase(kind));
+	const nameSuffix = upperFirst(camelCase(name)) + (usePlural ? 's' : '');
 	const suffix =
 		usePlural && entity.plural
-			? upperFirst( camelCase( entity.plural ) )
+			? upperFirst(camelCase(entity.plural))
 			: nameSuffix;
-	return `${ prefix }${ kindPrefix }${ suffix }`;
+	return `${prefix}${kindPrefix}${suffix}`;
 };
 
 /**
@@ -288,19 +284,21 @@ export const getMethodName = (
  *
  * @return {Array} Entities
  */
-export const getKindEntities = ( kind ) => async ( { select, dispatch } ) => {
-	let entities = select.getEntitiesByKind( kind );
-	if ( entities && entities.length !== 0 ) {
+export const getKindEntities =
+	(kind) =>
+	async ({ select, dispatch }) => {
+		let entities = select.getEntitiesByKind(kind);
+		if (entities && entities.length !== 0) {
+			return entities;
+		}
+
+		const kindConfig = find(kinds, { name: kind });
+		if (!kindConfig) {
+			return [];
+		}
+
+		entities = await kindConfig.loadEntities();
+		dispatch(addEntities(entities));
+
 		return entities;
-	}
-
-	const kindConfig = find( kinds, { name: kind } );
-	if ( ! kindConfig ) {
-		return [];
-	}
-
-	entities = await kindConfig.loadEntities();
-	dispatch( addEntities( entities ) );
-
-	return entities;
-};
+	};

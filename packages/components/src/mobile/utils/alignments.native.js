@@ -8,12 +8,8 @@ export const WIDE_ALIGNMENTS = {
 		wide: 'wide',
 		full: 'full',
 	},
-	excludeBlocks: [ 'core/heading' ],
-	notInnerContainers: [
-		'core/separator',
-		'core/media-text',
-		'core/pullquote',
-	],
+	excludeBlocks: ['core/heading'],
+	notInnerContainers: ['core/separator', 'core/media-text', 'core/pullquote'],
 };
 
 export const ALIGNMENT_BREAKPOINTS = {
@@ -24,23 +20,23 @@ export const ALIGNMENT_BREAKPOINTS = {
 	mobile: 480,
 };
 
-const isFullWidth = ( align ) => align === WIDE_ALIGNMENTS.alignments.full;
+const isFullWidth = (align) => align === WIDE_ALIGNMENTS.alignments.full;
 
-const isWideWidth = ( align ) => align === WIDE_ALIGNMENTS.alignments.wide;
+const isWideWidth = (align) => align === WIDE_ALIGNMENTS.alignments.wide;
 
-const isWider = ( width, breakpoint ) =>
-	width > ALIGNMENT_BREAKPOINTS[ breakpoint ];
+const isWider = (width, breakpoint) =>
+	width > ALIGNMENT_BREAKPOINTS[breakpoint];
 
-const isContainerRelated = ( blockName ) => {
-	if ( WIDE_ALIGNMENTS.notInnerContainers.includes( blockName ) ) {
+const isContainerRelated = (blockName) => {
+	if (WIDE_ALIGNMENTS.notInnerContainers.includes(blockName)) {
 		return false;
 	}
 
-	if ( hasFullWidthSupport( blockName ) ) {
+	if (hasFullWidthSupport(blockName)) {
 		return true;
 	}
 
-	return hasParentFullWidthSupport( blockName );
+	return hasParentFullWidthSupport(blockName);
 };
 
 /**
@@ -49,12 +45,12 @@ const isContainerRelated = ( blockName ) => {
  * @param {string} blockName
  * @return {boolean} Return whether the block supports full width alignment.
  */
-function hasFullWidthSupport( blockName ) {
-	const blockType = getBlockType( blockName );
+function hasFullWidthSupport(blockName) {
+	const blockType = getBlockType(blockName);
 	const blockAlign = blockType?.supports?.align;
 	return (
-		!! Array.isArray( blockAlign ) &&
-		blockAlign.includes( WIDE_ALIGNMENTS.alignments.full )
+		!!Array.isArray(blockAlign) &&
+		blockAlign.includes(WIDE_ALIGNMENTS.alignments.full)
 	);
 }
 /**
@@ -63,9 +59,9 @@ function hasFullWidthSupport( blockName ) {
  * @param {string} blockName
  * @return {boolean} Return whether the block's parent supports full width alignment.
  */
-function hasParentFullWidthSupport( blockName ) {
-	const blockType = getBlockType( blockName );
-	return !! blockType?.parent?.some( hasFullWidthSupport );
+function hasParentFullWidthSupport(blockName) {
+	const blockType = getBlockType(blockName);
+	return !!blockType?.parent?.some(hasFullWidthSupport);
 }
 
 export const alignmentHelpers = {

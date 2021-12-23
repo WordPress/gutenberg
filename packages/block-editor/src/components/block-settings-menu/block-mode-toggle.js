@@ -17,44 +17,39 @@ import { compose } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 
-export function BlockModeToggle( {
+export function BlockModeToggle({
 	blockType,
 	mode,
 	onToggleMode,
 	small = false,
 	isCodeEditingEnabled = true,
-} ) {
-	if (
-		! hasBlockSupport( blockType, 'html', true ) ||
-		! isCodeEditingEnabled
-	) {
+}) {
+	if (!hasBlockSupport(blockType, 'html', true) || !isCodeEditingEnabled) {
 		return null;
 	}
 
-	const label =
-		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
+	const label = mode === 'visual' ? __('Edit as HTML') : __('Edit visually');
 
-	return <MenuItem onClick={ onToggleMode }>{ ! small && label }</MenuItem>;
+	return <MenuItem onClick={onToggleMode}>{!small && label}</MenuItem>;
 }
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getBlockMode, getSettings } = select(
-			blockEditorStore
-		);
-		const block = getBlock( clientId );
+export default compose([
+	withSelect((select, { clientId }) => {
+		const { getBlock, getBlockMode, getSettings } =
+			select(blockEditorStore);
+		const block = getBlock(clientId);
 		const isCodeEditingEnabled = getSettings().codeEditingEnabled;
 
 		return {
-			mode: getBlockMode( clientId ),
-			blockType: block ? getBlockType( block.name ) : null,
+			mode: getBlockMode(clientId),
+			blockType: block ? getBlockType(block.name) : null,
 			isCodeEditingEnabled,
 		};
-	} ),
-	withDispatch( ( dispatch, { onToggle = noop, clientId } ) => ( {
+	}),
+	withDispatch((dispatch, { onToggle = noop, clientId }) => ({
 		onToggleMode() {
-			dispatch( blockEditorStore ).toggleBlockMode( clientId );
+			dispatch(blockEditorStore).toggleBlockMode(clientId);
 			onToggle();
 		},
-	} ) ),
-] )( BlockModeToggle );
+	})),
+])(BlockModeToggle);

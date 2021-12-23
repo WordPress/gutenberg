@@ -24,7 +24,7 @@ const CORNER_OFFSET = 4;
 const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
 
 type LabelProps = React.DetailedHTMLProps<
-	React.HTMLAttributes< HTMLDivElement >,
+	React.HTMLAttributes<HTMLDivElement>,
 	HTMLDivElement
 > & {
 	label?: string;
@@ -34,14 +34,14 @@ type LabelProps = React.DetailedHTMLProps<
 
 function Label(
 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
-	ref: Ref< HTMLDivElement >
+	ref: Ref<HTMLDivElement>
 ): JSX.Element | null {
-	const showLabel = !! label;
+	const showLabel = !!label;
 
 	const isBottom = position === POSITIONS.bottom;
 	const isCorner = position === POSITIONS.corner;
 
-	if ( ! showLabel ) return null;
+	if (!showLabel) return null;
 
 	let style: React.CSSProperties = {
 		opacity: showLabel ? 1 : undefined,
@@ -50,7 +50,7 @@ function Label(
 
 	let labelStyle = {};
 
-	if ( isBottom ) {
+	if (isBottom) {
 		style = {
 			...style,
 			position: 'absolute',
@@ -64,7 +64,7 @@ function Label(
 		};
 	}
 
-	if ( isCorner ) {
+	if (isCorner) {
 		style = {
 			...style,
 			position: 'absolute',
@@ -78,20 +78,20 @@ function Label(
 		<TooltipWrapper
 			aria-hidden="true"
 			className="components-resizable-tooltip__tooltip-wrapper"
-			ref={ ref }
-			style={ style }
-			{ ...props }
+			ref={ref}
+			style={style}
+			{...props}
 		>
 			<Tooltip
 				className="components-resizable-tooltip__tooltip"
-				style={ labelStyle }
+				style={labelStyle}
 			>
-				<LabelText as="span">{ label }</LabelText>
+				<LabelText as="span">{label}</LabelText>
 			</Tooltip>
 		</TooltipWrapper>
 	);
 }
 
-const ForwardedComponent = forwardRef( Label );
+const ForwardedComponent = forwardRef(Label);
 
 export default ForwardedComponent;

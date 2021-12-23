@@ -8,40 +8,40 @@ import { act, render } from '@testing-library/react';
  */
 import Popover from '../';
 
-describe( 'Popover', () => {
-	afterEach( () => {
-		if ( document.activeElement ) {
+describe('Popover', () => {
+	afterEach(() => {
+		if (document.activeElement) {
 			document.activeElement.blur();
 		}
-	} );
+	});
 
-	it( 'should allow focus-on-open behavior to be disabled', () => {
-		expect( document.activeElement ).toBe( document.body );
+	it('should allow focus-on-open behavior to be disabled', () => {
+		expect(document.activeElement).toBe(document.body);
 
-		act( () => {
-			render( <Popover focusOnMount={ false } /> );
+		act(() => {
+			render(<Popover focusOnMount={false} />);
 
-			jest.advanceTimersByTime( 1 );
-		} );
+			jest.advanceTimersByTime(1);
+		});
 
-		expect( document.activeElement ).toBe( document.body );
-	} );
+		expect(document.activeElement).toBe(document.body);
+	});
 
-	it( 'should render content', () => {
+	it('should render content', () => {
 		let result;
-		act( () => {
-			result = render( <Popover>Hello</Popover> );
-		} );
+		act(() => {
+			result = render(<Popover>Hello</Popover>);
+		});
 
-		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
-	} );
+		expect(result.container.querySelector('span')).toMatchSnapshot();
+	});
 
-	it( 'should pass additional props to portaled element', () => {
+	it('should pass additional props to portaled element', () => {
 		let result;
-		act( () => {
-			result = render( <Popover role="tooltip">Hello</Popover> );
-		} );
+		act(() => {
+			result = render(<Popover role="tooltip">Hello</Popover>);
+		});
 
-		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
-	} );
-} );
+		expect(result.container.querySelector('span')).toMatchSnapshot();
+	});
+});

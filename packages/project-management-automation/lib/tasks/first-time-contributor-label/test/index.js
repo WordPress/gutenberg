@@ -3,7 +3,7 @@
  */
 import firstTimeContributorLabel from '../';
 
-describe( 'firstTimeContributorLabel', () => {
+describe('firstTimeContributorLabel', () => {
 	const payload = {
 		repository: {
 			owner: {
@@ -19,19 +19,18 @@ describe( 'firstTimeContributorLabel', () => {
 		},
 	};
 
-	it( 'does nothing if the user has at least one commit', async () => {
+	it('does nothing if the user has at least one commit', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( {
+					listCommits: jest.fn(() =>
+						Promise.resolve({
 							data: [
 								{
-									sha:
-										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 								},
 							],
-						} )
+						})
 					),
 				},
 				issues: {
@@ -41,25 +40,25 @@ describe( 'firstTimeContributorLabel', () => {
 			},
 		};
 
-		await firstTimeContributorLabel( payload, octokit );
+		await firstTimeContributorLabel(payload, octokit);
 
-		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
+		expect(octokit.rest.repos.listCommits).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
-	} );
+		});
+		expect(octokit.rest.issues.addLabels).not.toHaveBeenCalled();
+		expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
+	});
 
-	it( 'adds the First Time Contributor label if the user has no commits', async () => {
+	it('adds the First Time Contributor label if the user has no commits', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( {
+					listCommits: jest.fn(() =>
+						Promise.resolve({
 							data: [],
-						} )
+						})
 					),
 				},
 				issues: {
@@ -75,24 +74,24 @@ describe( 'firstTimeContributorLabel', () => {
 			' where we hold [regularly weekly meetings](https://make.wordpress.org/core/tag/core-editor-summary/) open to anyone to coordinate with each other.\n\n' +
 			'If you want to learn more about WordPress development in general, check out the [Core Handbook](https://make.wordpress.org/core/handbook/) full of helpful information.';
 
-		await firstTimeContributorLabel( payload, octokit );
+		await firstTimeContributorLabel(payload, octokit);
 
-		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
+		expect(octokit.rest.repos.listCommits).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.rest.issues.addLabels ).toHaveBeenCalledWith( {
+		});
+		expect(octokit.rest.issues.addLabels).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
-			labels: [ 'First-time Contributor' ],
-		} );
-		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
+			labels: ['First-time Contributor'],
+		});
+		expect(octokit.rest.issues.createComment).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
 			body: expectedComment,
-		} );
-	} );
-} );
+		});
+	});
+});

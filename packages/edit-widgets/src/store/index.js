@@ -35,19 +35,19 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const store = createReduxStore(STORE_NAME, storeConfig);
 
 // Once we build a more generic persistence plugin that works across types of stores
 // we'd be able to replace this with a register call.
-registerStore( STORE_NAME, storeConfig );
+registerStore(STORE_NAME, storeConfig);
 
 // This package uses a few in-memory post types as wrappers for convenience.
 // This middleware prevents any network requests related to these types as they are
 // bound to fail anyway.
-apiFetch.use( function ( options, next ) {
-	if ( options.path?.indexOf( '/wp/v2/types/widget-area' ) === 0 ) {
-		return Promise.resolve( {} );
+apiFetch.use(function (options, next) {
+	if (options.path?.indexOf('/wp/v2/types/widget-area') === 0) {
+		return Promise.resolve({});
 	}
 
-	return next( options );
-} );
+	return next(options);
+});

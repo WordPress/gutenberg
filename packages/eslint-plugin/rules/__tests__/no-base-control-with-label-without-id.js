@@ -8,16 +8,16 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../no-base-control-with-label-without-id';
 
-const ruleTester = new RuleTester( {
+const ruleTester = new RuleTester({
 	parserOptions: {
 		ecmaVersion: 6,
 		ecmaFeatures: {
 			jsx: true,
 		},
 	},
-} );
+});
 
-ruleTester.run( 'no-base-control-with-label-without-id', rule, {
+ruleTester.run('no-base-control-with-label-without-id', rule, {
 	valid: [
 		{
 			code: `
@@ -81,4 +81,4 @@ ruleTester.run( 'no-base-control-with-label-without-id', rule, {
 			],
 		},
 	],
-} );
+});

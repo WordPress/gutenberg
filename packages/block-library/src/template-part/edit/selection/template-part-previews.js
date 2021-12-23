@@ -27,10 +27,10 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { createTemplatePartId } from '../utils/create-template-part-id';
 
-function getAreaGroupTitle( areaLabel ) {
+function getAreaGroupTitle(areaLabel) {
 	return sprintf(
 		// Translators: %s for the area the template part is assigned to (Header, Footer, General, etc.)
-		__( 'Area: %s' ),
+		__('Area: %s'),
 		areaLabel
 	);
 }
@@ -38,17 +38,12 @@ function PreviewPlaceholder() {
 	return (
 		<div
 			className="wp-block-template-part__selection-preview-item is-placeholder"
-			tabIndex={ 0 }
+			tabIndex={0}
 		/>
 	);
 }
 
-function TemplatePartItem( {
-	templatePart,
-	setAttributes,
-	onClose,
-	composite,
-} ) {
+function TemplatePartItem({ templatePart, setAttributes, onClose, composite }) {
 	const {
 		slug,
 		theme,
@@ -57,15 +52,15 @@ function TemplatePartItem( {
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
-	const blocks = useMemo( () => parse( content ), [ content ] );
-	const { createSuccessNotice } = useDispatch( noticesStore );
+	const blocks = useMemo(() => parse(content), [content]);
+	const { createSuccessNotice } = useDispatch(noticesStore);
 
-	const onClick = useCallback( () => {
-		setAttributes( { slug, theme, area: undefined } );
+	const onClick = useCallback(() => {
+		setAttributes({ slug, theme, area: undefined });
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
-				__( 'Template Part "%s" inserted.' ),
+				__('Template Part "%s" inserted.'),
 				title || slug
 			),
 			{
@@ -73,281 +68,272 @@ function TemplatePartItem( {
 			}
 		);
 		onClose();
-	}, [ slug, theme ] );
+	}, [slug, theme]);
 
 	return (
 		<CompositeItem
 			as="div"
 			className="wp-block-template-part__selection-preview-item"
 			role="option"
-			onClick={ onClick }
-			onKeyDown={ ( event ) => {
-				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+			onClick={onClick}
+			onKeyDown={(event) => {
+				if (ENTER === event.keyCode || SPACE === event.keyCode) {
 					onClick();
 				}
-			} }
-			tabIndex={ 0 }
-			aria-label={ title || slug }
-			{ ...composite }
+			}}
+			tabIndex={0}
+			aria-label={title || slug}
+			{...composite}
 		>
-			<BlockPreview blocks={ blocks } />
+			<BlockPreview blocks={blocks} />
 			<div className="wp-block-template-part__selection-preview-item-title">
-				{ title || slug }
+				{title || slug}
 			</div>
 		</CompositeItem>
 	);
 }
 
-function PanelGroup( { title, icon, children } ) {
+function PanelGroup({ title, icon, children }) {
 	return (
 		<>
 			<div className="wp-block-template-part__selection-panel-group-header">
 				<span className="wp-block-template-part__selection-panel-group-title">
-					{ title }
+					{title}
 				</span>
-				<Icon icon={ icon } />
+				<Icon icon={icon} />
 			</div>
 			<div className="wp-block-template-part__selection-panel-group-content">
-				{ children }
+				{children}
 			</div>
 		</>
 	);
 }
 
-function TemplatePartsByArea( {
+function TemplatePartsByArea({
 	templateParts,
 	setAttributes,
 	onClose,
 	composite,
 	area = 'uncategorized',
 	labelsByArea,
-} ) {
-	const { templatePartsByArea, templatePartsToShow } = useMemo( () => {
+}) {
+	const { templatePartsByArea, templatePartsToShow } = useMemo(() => {
 		const _templatePartsToShow =
 			templateParts.filter(
-				( templatePart ) =>
+				(templatePart) =>
 					'uncategorized' === area || templatePart.area === area
 			) || [];
 		const _templatePartsByArea = Object.values(
-			groupBy( _templatePartsToShow, 'area' )
+			groupBy(_templatePartsToShow, 'area')
 		);
-		const orderedTemplatePartsToShow = flatten( _templatePartsToShow );
+		const orderedTemplatePartsToShow = flatten(_templatePartsToShow);
 		return {
 			templatePartsByArea: _templatePartsByArea,
 			templatePartsToShow: orderedTemplatePartsToShow,
 		};
-	}, [ templateParts, area ] );
+	}, [templateParts, area]);
 
-	const currentShownTPs = useAsyncList( templatePartsToShow );
+	const currentShownTPs = useAsyncList(templatePartsToShow);
 
-	if ( ! templatePartsToShow.length ) {
+	if (!templatePartsToShow.length) {
 		return (
 			<PanelGroup
-				title={ getAreaGroupTitle(
-					labelsByArea[ area ] || labelsByArea.uncategorized
-				) }
+				title={getAreaGroupTitle(
+					labelsByArea[area] || labelsByArea.uncategorized
+				)}
 			>
-				{ sprintf(
+				{sprintf(
 					// Translators: %s for the template part variation ("Header", "Footer", "Template Part").
 					__(
 						'There is no other %s available. If you are looking for another type of template part, try searching for it using the input above.'
 					),
 					area && area !== 'uncategorized'
-						? labelsByArea[ area ] || area
-						: __( 'Template Part' )
-				) }
+						? labelsByArea[area] || area
+						: __('Template Part')
+				)}
 			</PanelGroup>
 		);
 	}
 
-	return templatePartsByArea.map( ( templatePartList ) => {
+	return templatePartsByArea.map((templatePartList) => {
 		return (
 			<PanelGroup
-				key={ templatePartList[ 0 ].area }
-				title={ getAreaGroupTitle(
-					labelsByArea[ templatePartList[ 0 ].area ] ||
+				key={templatePartList[0].area}
+				title={getAreaGroupTitle(
+					labelsByArea[templatePartList[0].area] ||
 						labelsByArea.uncategorized
-				) }
+				)}
 			>
-				{ templatePartList.map( ( templatePart ) => {
-					return currentShownTPs.includes( templatePart ) ? (
+				{templatePartList.map((templatePart) => {
+					return currentShownTPs.includes(templatePart) ? (
 						<TemplatePartItem
-							key={ templatePart.id }
-							templatePart={ templatePart }
-							setAttributes={ setAttributes }
-							onClose={ onClose }
-							composite={ composite }
+							key={templatePart.id}
+							templatePart={templatePart}
+							setAttributes={setAttributes}
+							onClose={onClose}
+							composite={composite}
 						/>
 					) : (
-						<PreviewPlaceholder key={ templatePart.id } />
+						<PreviewPlaceholder key={templatePart.id} />
 					);
-				} ) }
+				})}
 			</PanelGroup>
 		);
-	} );
+	});
 }
 
-function TemplatePartSearchResults( {
+function TemplatePartSearchResults({
 	templateParts,
 	setAttributes,
 	filterValue,
 	onClose,
 	composite,
 	labelsByArea,
-} ) {
-	const { filteredTPs, groupedResults } = useMemo( () => {
+}) {
+	const { filteredTPs, groupedResults } = useMemo(() => {
 		// Filter based on value.
 		// Remove diacritics and convert to lowercase to normalize.
-		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
+		const normalizedFilterValue = deburr(filterValue).toLowerCase();
 		const searchResults = templateParts.filter(
-			( { title: { rendered: title }, area } ) =>
-				deburr( title )
-					.toLowerCase()
-					.includes( normalizedFilterValue ) ||
+			({ title: { rendered: title }, area }) =>
+				deburr(title).toLowerCase().includes(normalizedFilterValue) ||
 				// Since diacritics can be used in theme names, remove them for the comparison.
-				deburr( labelsByArea[ area ] )
+				deburr(labelsByArea[area])
 					.toLowerCase()
-					.includes( normalizedFilterValue )
+					.includes(normalizedFilterValue)
 		);
 		// Order based on value location.
-		searchResults.sort( ( a, b ) => {
+		searchResults.sort((a, b) => {
 			// First prioritize index found in title.
 			// Deburr for diacritics.
-			const indexInTitleA = deburr( a.title.rendered )
+			const indexInTitleA = deburr(a.title.rendered)
 				.toLowerCase()
-				.indexOf( normalizedFilterValue );
-			const indexInTitleB = deburr( b.title.rendered )
+				.indexOf(normalizedFilterValue);
+			const indexInTitleB = deburr(b.title.rendered)
 				.toLowerCase()
-				.indexOf( normalizedFilterValue );
-			if ( indexInTitleA !== -1 && indexInTitleB !== -1 ) {
+				.indexOf(normalizedFilterValue);
+			if (indexInTitleA !== -1 && indexInTitleB !== -1) {
 				return indexInTitleA - indexInTitleB;
-			} else if ( indexInTitleA !== -1 ) {
+			} else if (indexInTitleA !== -1) {
 				return -1;
-			} else if ( indexInTitleB !== -1 ) {
+			} else if (indexInTitleB !== -1) {
 				return 1;
 			}
 			// Second prioritize index found in area.
 			return (
-				deburr( labelsByArea[ a.area ] )
+				deburr(labelsByArea[a.area])
 					.toLowerCase()
-					.indexOf( normalizedFilterValue ) -
-				deburr( labelsByArea[ b.area ] )
+					.indexOf(normalizedFilterValue) -
+				deburr(labelsByArea[b.area])
 					.toLowerCase()
-					.indexOf( normalizedFilterValue )
+					.indexOf(normalizedFilterValue)
 			);
-		} );
+		});
 		// Group filtered results together if their neighbors share the same area.
 		// This helps not show redundant panel groups side by side in the results.
 		const _groupedResults = [];
-		for ( let i = 0; i < searchResults.length; i++ ) {
+		for (let i = 0; i < searchResults.length; i++) {
 			if (
 				i !== 0 &&
-				searchResults[ i ].area === searchResults[ i - 1 ].area
+				searchResults[i].area === searchResults[i - 1].area
 			) {
-				_groupedResults[ _groupedResults.length - 1 ].push(
-					searchResults[ i ]
+				_groupedResults[_groupedResults.length - 1].push(
+					searchResults[i]
 				);
 			} else {
-				_groupedResults.push( [ searchResults[ i ] ] );
+				_groupedResults.push([searchResults[i]]);
 			}
 		}
 		return {
 			filteredTPs: searchResults,
 			groupedResults: _groupedResults,
 		};
-	}, [ filterValue, templateParts ] );
+	}, [filterValue, templateParts]);
 
-	const currentShownTPs = useAsyncList( filteredTPs );
+	const currentShownTPs = useAsyncList(filteredTPs);
 
-	return groupedResults.map( ( group ) => (
+	return groupedResults.map((group) => (
 		<PanelGroup
-			key={ group[ 0 ].id }
-			title={ getAreaGroupTitle(
-				labelsByArea[ group[ 0 ].area ] || labelsByArea.uncategorized
-			) }
+			key={group[0].id}
+			title={getAreaGroupTitle(
+				labelsByArea[group[0].area] || labelsByArea.uncategorized
+			)}
 		>
-			{ group.map( ( templatePart ) =>
-				currentShownTPs.includes( templatePart ) ? (
+			{group.map((templatePart) =>
+				currentShownTPs.includes(templatePart) ? (
 					<TemplatePartItem
-						key={ templatePart.id }
-						templatePart={ templatePart }
-						setAttributes={ setAttributes }
-						onClose={ onClose }
-						composite={ composite }
+						key={templatePart.id}
+						templatePart={templatePart}
+						setAttributes={setAttributes}
+						onClose={onClose}
+						composite={composite}
 					/>
 				) : (
-					<PreviewPlaceholder key={ templatePart.id } />
+					<PreviewPlaceholder key={templatePart.id} />
 				)
-			) }
+			)}
 		</PanelGroup>
-	) );
+	));
 }
 
-export default function TemplatePartPreviews( {
+export default function TemplatePartPreviews({
 	setAttributes,
 	filterValue,
 	onClose,
 	area,
 	templatePartId,
-} ) {
+}) {
 	const composite = useCompositeState();
 
-	const { templateParts, labelsByArea } = useSelect( ( select ) => {
+	const { templateParts, labelsByArea } = useSelect((select) => {
 		const _templateParts = (
-			select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_template_part',
-				{
-					per_page: -1,
-				}
-			) || []
+			select(coreStore).getEntityRecords('postType', 'wp_template_part', {
+				per_page: -1,
+			}) || []
 		).filter(
-			( templatePart ) =>
-				createTemplatePartId(
-					templatePart.theme,
-					templatePart.slug
-				) !== templatePartId
+			(templatePart) =>
+				createTemplatePartId(templatePart.theme, templatePart.slug) !==
+				templatePartId
 		);
 
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const definedAreas = select(
-			'core/editor'
-		).__experimentalGetDefaultTemplatePartAreas();
+		const definedAreas =
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			select('core/editor').__experimentalGetDefaultTemplatePartAreas();
 		const _labelsByArea = {};
-		definedAreas.forEach( ( item ) => {
-			_labelsByArea[ item.area ] = item.label;
-		} );
+		definedAreas.forEach((item) => {
+			_labelsByArea[item.area] = item.label;
+		});
 
 		return {
 			templateParts: _templateParts,
 			labelsByArea: _labelsByArea,
 		};
-	}, [] );
+	}, []);
 
-	if ( ! templateParts || ! templateParts.length ) {
+	if (!templateParts || !templateParts.length) {
 		return (
 			<PanelGroup>
-				{ __( 'There are no existing template parts to select.' ) }
+				{__('There are no existing template parts to select.')}
 			</PanelGroup>
 		);
 	}
 
-	if ( filterValue ) {
+	if (filterValue) {
 		return (
 			<Composite
-				{ ...composite }
+				{...composite}
 				role="listbox"
-				aria-label={ __( 'List of template parts' ) }
+				aria-label={__('List of template parts')}
 			>
 				<TemplatePartSearchResults
-					templateParts={ templateParts }
-					setAttributes={ setAttributes }
-					filterValue={ filterValue }
-					onClose={ onClose }
-					composite={ composite }
-					labelsByArea={ labelsByArea }
+					templateParts={templateParts}
+					setAttributes={setAttributes}
+					filterValue={filterValue}
+					onClose={onClose}
+					composite={composite}
+					labelsByArea={labelsByArea}
 				/>
 			</Composite>
 		);
@@ -355,17 +341,17 @@ export default function TemplatePartPreviews( {
 
 	return (
 		<Composite
-			{ ...composite }
+			{...composite}
 			role="listbox"
-			aria-label={ __( 'List of template parts' ) }
+			aria-label={__('List of template parts')}
 		>
 			<TemplatePartsByArea
-				templateParts={ templateParts }
-				setAttributes={ setAttributes }
-				onClose={ onClose }
-				composite={ composite }
-				area={ area }
-				labelsByArea={ labelsByArea }
+				templateParts={templateParts}
+				setAttributes={setAttributes}
+				onClose={onClose}
+				composite={composite}
+				area={area}
+				labelsByArea={labelsByArea}
 			/>
 		</Composite>
 	);

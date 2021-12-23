@@ -3,8 +3,8 @@
  */
 import addMilestone from '../';
 
-describe( 'addMilestone', () => {
-	it( 'does nothing if base is not trunk', async () => {
+describe('addMilestone', () => {
+	it('does nothing if base is not trunk', async () => {
 		const payload = {
 			ref: 'refs/heads/not-trunk',
 		};
@@ -29,21 +29,21 @@ describe( 'addMilestone', () => {
 			},
 		};
 
-		await addMilestone( payload, octokit );
+		await addMilestone(payload, octokit);
 
-		expect( octokit.rest.issues.get ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.createMilestone ).not.toHaveBeenCalled();
+		expect(octokit.rest.issues.get).not.toHaveBeenCalled();
+		expect(octokit.rest.issues.createMilestone).not.toHaveBeenCalled();
 		expect(
 			octokit.rest.issues.listMilestones.endpoint.merge
 		).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.update ).not.toHaveBeenCalled();
-		expect( octokit.rest.repos.getContent ).not.toHaveBeenCalled();
-	} );
+		expect(octokit.rest.issues.update).not.toHaveBeenCalled();
+		expect(octokit.rest.repos.getContent).not.toHaveBeenCalled();
+	});
 
-	it( 'does nothing if PR already has a milestone', async () => {
+	it('does nothing if PR already has a milestone', async () => {
 		const payload = {
 			ref: 'refs/heads/trunk',
-			commits: [ { message: '(#123)' } ],
+			commits: [{ message: '(#123)' }],
 			repository: {
 				owner: {
 					login: 'WordPress',
@@ -57,12 +57,12 @@ describe( 'addMilestone', () => {
 			},
 			rest: {
 				issues: {
-					get: jest.fn( () =>
-						Promise.resolve( {
+					get: jest.fn(() =>
+						Promise.resolve({
 							data: {
 								milestone: 'Gutenberg 6.4',
 							},
-						} )
+						})
 					),
 					createMilestone: jest.fn(),
 					listMilestones: jest.fn(),
@@ -74,23 +74,23 @@ describe( 'addMilestone', () => {
 			},
 		};
 
-		await addMilestone( payload, octokit );
+		await addMilestone(payload, octokit);
 
-		expect( octokit.rest.issues.get ).toHaveBeenCalledWith( {
+		expect(octokit.rest.issues.get).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
-		} );
-		expect( octokit.rest.issues.createMilestone ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.listMilestones ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.update ).not.toHaveBeenCalled();
-		expect( octokit.rest.repos.getContent ).not.toHaveBeenCalled();
-	} );
+		});
+		expect(octokit.rest.issues.createMilestone).not.toHaveBeenCalled();
+		expect(octokit.rest.issues.listMilestones).not.toHaveBeenCalled();
+		expect(octokit.rest.issues.update).not.toHaveBeenCalled();
+		expect(octokit.rest.repos.getContent).not.toHaveBeenCalled();
+	});
 
-	it( 'correctly milestones PRs when `package.json` has a `*.[1-8]` version', async () => {
+	it('correctly milestones PRs when `package.json` has a `*.[1-8]` version', async () => {
 		const payload = {
 			ref: 'refs/heads/trunk',
-			commits: [ { message: '(#123)' } ],
+			commits: [{ message: '(#123)' }],
 			repository: {
 				owner: {
 					login: 'WordPress',
@@ -100,8 +100,8 @@ describe( 'addMilestone', () => {
 		};
 		const octokit = {
 			paginate: {
-				iterator: jest.fn().mockReturnValue( [
-					Promise.resolve( {
+				iterator: jest.fn().mockReturnValue([
+					Promise.resolve({
 						data: [
 							{
 								title: 'Gutenberg 6.2',
@@ -119,17 +119,17 @@ describe( 'addMilestone', () => {
 								due_on: '2019-08-26T00:00:00.000Z',
 							},
 						],
-					} ),
-				] ),
+					}),
+				]),
 			},
 			rest: {
 				issues: {
-					get: jest.fn( () =>
-						Promise.resolve( {
+					get: jest.fn(() =>
+						Promise.resolve({
 							data: {
 								milestone: null,
 							},
-						} )
+						})
 					),
 					createMilestone: jest.fn(),
 					listMilestones: {
@@ -140,52 +140,52 @@ describe( 'addMilestone', () => {
 					update: jest.fn(),
 				},
 				repos: {
-					getContent: jest.fn( () =>
-						Promise.resolve( {
+					getContent: jest.fn(() =>
+						Promise.resolve({
 							data: {
 								content: Buffer.from(
-									JSON.stringify( {
+									JSON.stringify({
 										version: '6.3.0',
-									} )
-								).toString( 'base64' ),
+									})
+								).toString('base64'),
 								encoding: 'base64',
 							},
-						} )
+						})
 					),
 				},
 			},
 		};
 
-		await addMilestone( payload, octokit );
+		await addMilestone(payload, octokit);
 
-		expect( octokit.rest.issues.get ).toHaveBeenCalledWith( {
+		expect(octokit.rest.issues.get).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
-		} );
-		expect( octokit.rest.repos.getContent ).toHaveBeenCalledWith( {
+		});
+		expect(octokit.rest.repos.getContent).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			path: 'package.json',
-		} );
-		expect( octokit.rest.issues.createMilestone ).toHaveBeenCalledWith( {
+		});
+		expect(octokit.rest.issues.createMilestone).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			title: 'Gutenberg 6.4',
 			due_on: '2019-08-26T00:00:00.000Z',
-		} );
-		expect( octokit.rest.issues.update ).toHaveBeenCalledWith( {
+		});
+		expect(octokit.rest.issues.update).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
 			milestone: 12,
-		} );
-	} );
+		});
+	});
 
-	it( 'correctly milestones PRs when `package.json` has a `*.9` version', async () => {
+	it('correctly milestones PRs when `package.json` has a `*.9` version', async () => {
 		const payload = {
 			ref: 'refs/heads/trunk',
-			commits: [ { message: '(#123)' } ],
+			commits: [{ message: '(#123)' }],
 			repository: {
 				owner: {
 					login: 'WordPress',
@@ -195,8 +195,8 @@ describe( 'addMilestone', () => {
 		};
 		const octokit = {
 			paginate: {
-				iterator: jest.fn().mockReturnValue( [
-					Promise.resolve( {
+				iterator: jest.fn().mockReturnValue([
+					Promise.resolve({
 						data: [
 							{
 								title: 'Gutenberg 6.8',
@@ -214,17 +214,17 @@ describe( 'addMilestone', () => {
 								due_on: '2019-11-18T00:00:00.000Z',
 							},
 						],
-					} ),
-				] ),
+					}),
+				]),
 			},
 			rest: {
 				issues: {
-					get: jest.fn( () =>
-						Promise.resolve( {
+					get: jest.fn(() =>
+						Promise.resolve({
 							data: {
 								milestone: null,
 							},
-						} )
+						})
 					),
 					createMilestone: jest.fn(),
 					listMilestones: {
@@ -235,45 +235,45 @@ describe( 'addMilestone', () => {
 					update: jest.fn(),
 				},
 				repos: {
-					getContent: jest.fn( () =>
-						Promise.resolve( {
+					getContent: jest.fn(() =>
+						Promise.resolve({
 							data: {
 								content: Buffer.from(
-									JSON.stringify( {
+									JSON.stringify({
 										version: '6.9.0',
-									} )
-								).toString( 'base64' ),
+									})
+								).toString('base64'),
 								encoding: 'base64',
 							},
-						} )
+						})
 					),
 				},
 			},
 		};
 
-		await addMilestone( payload, octokit );
+		await addMilestone(payload, octokit);
 
-		expect( octokit.rest.issues.get ).toHaveBeenCalledWith( {
+		expect(octokit.rest.issues.get).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
-		} );
-		expect( octokit.rest.repos.getContent ).toHaveBeenCalledWith( {
+		});
+		expect(octokit.rest.repos.getContent).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			path: 'package.json',
-		} );
-		expect( octokit.rest.issues.createMilestone ).toHaveBeenCalledWith( {
+		});
+		expect(octokit.rest.issues.createMilestone).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			title: 'Gutenberg 7.0',
 			due_on: '2019-11-18T00:00:00.000Z',
-		} );
-		expect( octokit.rest.issues.update ).toHaveBeenCalledWith( {
+		});
+		expect(octokit.rest.issues.update).toHaveBeenCalledWith({
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,
 			milestone: 12,
-		} );
-	} );
-} );
+		});
+	});
+});

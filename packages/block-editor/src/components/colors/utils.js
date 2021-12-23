@@ -6,7 +6,7 @@ import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 
-extend( [ namesPlugin, a11yPlugin ] );
+extend([namesPlugin, a11yPlugin]);
 
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults,
@@ -25,10 +25,10 @@ export const getColorObjectByAttributeValues = (
 	definedColor,
 	customColor
 ) => {
-	if ( definedColor ) {
-		const colorObj = find( colors, { slug: definedColor } );
+	if (definedColor) {
+		const colorObj = find(colors, { slug: definedColor });
 
-		if ( colorObj ) {
+		if (colorObj) {
 			return colorObj;
 		}
 	}
@@ -46,8 +46,8 @@ export const getColorObjectByAttributeValues = (
  * @return {?Object} Color object included in the colors array whose color property equals colorValue.
  *                   Returns undefined if no color object matches this requirement.
  */
-export const getColorObjectByColorValue = ( colors, colorValue ) => {
-	return find( colors, { color: colorValue } );
+export const getColorObjectByColorValue = (colors, colorValue) => {
+	return find(colors, { color: colorValue });
 };
 
 /**
@@ -59,12 +59,12 @@ export const getColorObjectByColorValue = ( colors, colorValue ) => {
  * @return {?string} String with the class corresponding to the color in the provided context.
  *                   Returns undefined if either colorContextName or colorSlug are not provided.
  */
-export function getColorClassName( colorContextName, colorSlug ) {
-	if ( ! colorContextName || ! colorSlug ) {
+export function getColorClassName(colorContextName, colorSlug) {
+	if (!colorContextName || !colorSlug) {
 		return undefined;
 	}
 
-	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;
+	return `has-${kebabCase(colorSlug)}-${colorContextName}`;
 }
 
 /**
@@ -75,8 +75,7 @@ export function getColorClassName( colorContextName, colorSlug ) {
  *
  * @return {string} String with the color value of the most readable color.
  */
-export function getMostReadableColor( colors, colorValue ) {
-	const colordColor = colord( colorValue );
-	return maxBy( colors, ( { color } ) => colordColor.contrast( color ) )
-		.color;
+export function getMostReadableColor(colors, colorValue) {
+	const colordColor = colord(colorValue);
+	return maxBy(colors, ({ color }) => colordColor.contrast(color)).color;
 }

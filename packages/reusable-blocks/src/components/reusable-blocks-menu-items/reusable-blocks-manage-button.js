@@ -17,44 +17,39 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as reusableBlocksStore } from '../../store';
 
-function ReusableBlocksManageButton( { clientId } ) {
+function ReusableBlocksManageButton({ clientId }) {
 	const { isVisible } = useSelect(
-		( select ) => {
-			const { getBlock } = select( blockEditorStore );
-			const { canUser } = select( coreStore );
-			const reusableBlock = getBlock( clientId );
+		(select) => {
+			const { getBlock } = select(blockEditorStore);
+			const { canUser } = select(coreStore);
+			const reusableBlock = getBlock(clientId);
 
 			return {
 				isVisible:
-					!! reusableBlock &&
-					isReusableBlock( reusableBlock ) &&
-					!! canUser(
-						'update',
-						'blocks',
-						reusableBlock.attributes.ref
-					),
+					!!reusableBlock &&
+					isReusableBlock(reusableBlock) &&
+					!!canUser('update', 'blocks', reusableBlock.attributes.ref),
 			};
 		},
-		[ clientId ]
+		[clientId]
 	);
 
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch(reusableBlocksStore);
 
-	if ( ! isVisible ) {
+	if (!isVisible) {
 		return null;
 	}
 
 	return (
 		<BlockSettingsMenuControls>
 			<MenuItem
-				href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
+				href={addQueryArgs('edit.php', { post_type: 'wp_block' })}
 			>
-				{ __( 'Manage Reusable blocks' ) }
+				{__('Manage Reusable blocks')}
 			</MenuItem>
-			<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
-				{ __( 'Convert to regular blocks' ) }
+			<MenuItem onClick={() => convertBlockToStatic(clientId)}>
+				{__('Convert to regular blocks')}
 			</MenuItem>
 		</BlockSettingsMenuControls>
 	);

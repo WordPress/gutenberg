@@ -22,20 +22,20 @@ import '@wordpress/format-library';
 import './style.scss';
 
 function App() {
-	const [ blocks, updateBlocks ] = useState( [] );
+	const [blocks, updateBlocks] = useState([]);
 
-	useEffect( () => {
+	useEffect(() => {
 		registerCoreBlocks();
-	}, [] );
+	}, []);
 
 	return (
 		<div className="playground">
 			<ShortcutProvider>
 				<SlotFillProvider>
 					<BlockEditorProvider
-						value={ blocks }
-						onInput={ updateBlocks }
-						onChange={ updateBlocks }
+						value={blocks}
+						onInput={updateBlocks}
+						onChange={updateBlocks}
 					>
 						<div className="playground__sidebar">
 							<BlockInspector />

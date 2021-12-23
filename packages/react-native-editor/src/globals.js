@@ -37,26 +37,26 @@ global.wp = {
 	},
 };
 
-const doc = jsdom.html( '', null, null );
+const doc = jsdom.html('', null, null);
 
 // inject a simple version of the missing createHTMLDocument method that `hpq` depends on
-doc.implementation.createHTMLDocument = function ( html ) {
-	return jsdom.html( html, null, null );
+doc.implementation.createHTMLDocument = function (html) {
+	return jsdom.html(html, null, null);
 };
 
 // `hpq` depends on `document` be available globally
 global.document = doc;
 
-if ( ! global.window.Node ) {
+if (!global.window.Node) {
 	global.window.Node = jsdomLevel1Core.dom.level1.core.Node;
 }
 
-if ( ! global.window.matchMedia ) {
-	global.window.matchMedia = () => ( {
+if (!global.window.matchMedia) {
+	global.window.matchMedia = () => ({
 		matches: false,
 		addListener: () => {},
 		removeListener: () => {},
-	} );
+	});
 }
 
 global.window.navigator.userAgent = global.window.navigator.userAgent ?? '';

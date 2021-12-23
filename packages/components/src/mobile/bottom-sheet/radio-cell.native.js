@@ -10,7 +10,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import Cell from './cell';
 import styles from './styles.scss';
 
-export default function BottomSheetColorCell( props ) {
+export default function BottomSheetColorCell(props) {
 	const { selected, ...cellProps } = props;
 
 	const selectedIconStyle = usePreferredColorSchemeStyle(
@@ -20,19 +20,17 @@ export default function BottomSheetColorCell( props ) {
 
 	return (
 		<Cell
-			{ ...cellProps }
-			accessibilityRole={ 'radio' }
-			accessibilityState={ { selected } }
+			{...cellProps}
+			accessibilityRole={'radio'}
+			accessibilityState={{ selected }}
 			accessibilityHint={
 				/* translators: accessibility text (hint for selecting option) */
-				__( 'Double tap to select the option' )
+				__('Double tap to select the option')
 			}
-			editable={ false }
-			value={ '' }
+			editable={false}
+			value={''}
 		>
-			{ selected && (
-				<Icon icon={ check } style={ selectedIconStyle }></Icon>
-			) }
+			{selected && <Icon icon={check} style={selectedIconStyle}></Icon>}
 		</Cell>
 	);
 }

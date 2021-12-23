@@ -28,8 +28,8 @@ import { toTree } from './to-tree';
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( { value, multilineTag, preserveWhiteSpace } ) {
-	const tree = toTree( {
+export function toHTMLString({ value, multilineTag, preserveWhiteSpace }) {
+	const tree = toTree({
 		value,
 		multilineTag,
 		preserveWhiteSpace,
@@ -41,88 +41,86 @@ export function toHTMLString( { value, multilineTag, preserveWhiteSpace } ) {
 		getText,
 		remove,
 		appendText,
-	} );
+	});
 
-	return createChildrenHTML( tree.children );
+	return createChildrenHTML(tree.children);
 }
 
 function createEmpty() {
 	return {};
 }
 
-function getLastChild( { children } ) {
-	return children && children[ children.length - 1 ];
+function getLastChild({ children }) {
+	return children && children[children.length - 1];
 }
 
-function append( parent, object ) {
-	if ( typeof object === 'string' ) {
+function append(parent, object) {
+	if (typeof object === 'string') {
 		object = { text: object };
 	}
 
 	object.parent = parent;
 	parent.children = parent.children || [];
-	parent.children.push( object );
+	parent.children.push(object);
 	return object;
 }
 
-function appendText( object, text ) {
+function appendText(object, text) {
 	object.text += text;
 }
 
-function getParent( { parent } ) {
+function getParent({ parent }) {
 	return parent;
 }
 
-function isText( { text } ) {
+function isText({ text }) {
 	return typeof text === 'string';
 }
 
-function getText( { text } ) {
+function getText({ text }) {
 	return text;
 }
 
-function remove( object ) {
-	const index = object.parent.children.indexOf( object );
+function remove(object) {
+	const index = object.parent.children.indexOf(object);
 
-	if ( index !== -1 ) {
-		object.parent.children.splice( index, 1 );
+	if (index !== -1) {
+		object.parent.children.splice(index, 1);
 	}
 
 	return object;
 }
 
-function createElementHTML( { type, attributes, object, children } ) {
+function createElementHTML({ type, attributes, object, children }) {
 	let attributeString = '';
 
-	for ( const key in attributes ) {
-		if ( ! isValidAttributeName( key ) ) {
+	for (const key in attributes) {
+		if (!isValidAttributeName(key)) {
 			continue;
 		}
 
-		attributeString += ` ${ key }="${ escapeAttribute(
-			attributes[ key ]
-		) }"`;
+		attributeString += ` ${key}="${escapeAttribute(attributes[key])}"`;
 	}
 
-	if ( object ) {
-		return `<${ type }${ attributeString }>`;
+	if (object) {
+		return `<${type}${attributeString}>`;
 	}
 
-	return `<${ type }${ attributeString }>${ createChildrenHTML(
+	return `<${type}${attributeString}>${createChildrenHTML(
 		children
-	) }</${ type }>`;
+	)}</${type}>`;
 }
 
-function createChildrenHTML( children = [] ) {
+function createChildrenHTML(children = []) {
 	return children
-		.map( ( child ) => {
-			if ( child.html !== undefined ) {
+		.map((child) => {
+			if (child.html !== undefined) {
 				return child.html;
 			}
 
 			return child.text === undefined
-				? createElementHTML( child )
-				: escapeEditableHTML( child.text );
-		} )
-		.join( '' );
+				? createElementHTML(child)
+				: escapeEditableHTML(child.text);
+		})
+		.join('');
 }

@@ -9,8 +9,8 @@ const APPENDER_SELECTOR = '.block-list-appender';
  *
  * @return {boolean} Whether elements are in the same block.
  */
-export function isInSameBlock( a, b ) {
-	return a.closest( BLOCK_SELECTOR ) === b.closest( BLOCK_SELECTOR );
+export function isInSameBlock(a, b) {
+	return a.closest(BLOCK_SELECTOR) === b.closest(BLOCK_SELECTOR);
 }
 
 /**
@@ -23,9 +23,9 @@ export function isInSameBlock( a, b ) {
  * @return {boolean} Whether an element is considered part of the block and not
  *                   its inner blocks or appender.
  */
-export function isInsideRootBlock( blockElement, element ) {
+export function isInsideRootBlock(blockElement, element) {
 	const parentBlock = element.closest(
-		[ BLOCK_SELECTOR, APPENDER_SELECTOR ].join( ',' )
+		[BLOCK_SELECTOR, APPENDER_SELECTOR].join(',')
 	);
 	return parentBlock === blockElement;
 }
@@ -38,21 +38,21 @@ export function isInsideRootBlock( blockElement, element ) {
  * @return {string|undefined} Client ID or undefined if the node is not part of
  *                            a block.
  */
-export function getBlockClientId( node ) {
-	while ( node && node.nodeType !== node.ELEMENT_NODE ) {
+export function getBlockClientId(node) {
+	while (node && node.nodeType !== node.ELEMENT_NODE) {
 		node = node.parentNode;
 	}
 
-	if ( ! node ) {
+	if (!node) {
 		return;
 	}
 
-	const elementNode = /** @type {Element} */ ( node );
-	const blockNode = elementNode.closest( BLOCK_SELECTOR );
+	const elementNode = /** @type {Element} */ (node);
+	const blockNode = elementNode.closest(BLOCK_SELECTOR);
 
-	if ( ! blockNode ) {
+	if (!blockNode) {
 		return;
 	}
 
-	return blockNode.id.slice( 'block-'.length );
+	return blockNode.id.slice('block-'.length);
 }

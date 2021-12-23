@@ -17,13 +17,13 @@ import { get } from 'lodash';
  *
  * @return {boolean | undefined} isResolving value.
  */
-export function getIsResolving( state, selectorName, args ) {
-	const map = get( state, [ selectorName ] );
-	if ( ! map ) {
+export function getIsResolving(state, selectorName, args) {
+	const map = get(state, [selectorName]);
+	if (!map) {
 		return undefined;
 	}
 
-	return map.get( args );
+	return map.get(args);
 }
 
 /**
@@ -36,8 +36,8 @@ export function getIsResolving( state, selectorName, args ) {
  *
  * @return {boolean} Whether resolution has been triggered.
  */
-export function hasStartedResolution( state, selectorName, args = [] ) {
-	return getIsResolving( state, selectorName, args ) !== undefined;
+export function hasStartedResolution(state, selectorName, args = []) {
+	return getIsResolving(state, selectorName, args) !== undefined;
 }
 
 /**
@@ -50,8 +50,8 @@ export function hasStartedResolution( state, selectorName, args = [] ) {
  *
  * @return {boolean} Whether resolution has completed.
  */
-export function hasFinishedResolution( state, selectorName, args = [] ) {
-	return getIsResolving( state, selectorName, args ) === false;
+export function hasFinishedResolution(state, selectorName, args = []) {
+	return getIsResolving(state, selectorName, args) === false;
 }
 
 /**
@@ -64,8 +64,8 @@ export function hasFinishedResolution( state, selectorName, args = [] ) {
  *
  * @return {boolean} Whether resolution is in progress.
  */
-export function isResolving( state, selectorName, args = [] ) {
-	return getIsResolving( state, selectorName, args ) === true;
+export function isResolving(state, selectorName, args = []) {
+	return getIsResolving(state, selectorName, args) === true;
 }
 
 /**
@@ -75,6 +75,6 @@ export function isResolving( state, selectorName, args = [] ) {
  *
  * @return {State} Resolvers mapped by args and selectorName.
  */
-export function getCachedResolvers( state ) {
+export function getCachedResolvers(state) {
 	return state;
 }

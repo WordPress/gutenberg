@@ -12,19 +12,19 @@ import { store as noticesStore } from '@wordpress/notices';
 
 export default function EditorSnackbars() {
 	const notices = useSelect(
-		( select ) => select( noticesStore ).getNotices(),
+		(select) => select(noticesStore).getNotices(),
 		[]
 	);
-	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = filter( notices, {
+	const { removeNotice } = useDispatch(noticesStore);
+	const snackbarNotices = filter(notices, {
 		type: 'snackbar',
-	} );
+	});
 
 	return (
 		<SnackbarList
-			notices={ snackbarNotices }
+			notices={snackbarNotices}
 			className="components-editor-notices__snackbar"
-			onRemove={ removeNotice }
+			onRemove={removeNotice}
 		/>
 	);
 }

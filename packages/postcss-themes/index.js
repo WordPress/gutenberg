@@ -1,43 +1,41 @@
 /**
  * External dependencies
  */
-const postcss = require( 'postcss' );
+const postcss = require('postcss');
 
-module.exports = ( options ) => {
+module.exports = (options) => {
 	return {
 		postcssPlugin: 'postcss-themes',
-		Once( root ) {
-			root.walkRules( ( rule ) => {
+		Once(root) {
+			root.walkRules((rule) => {
 				const themeDecls = {};
 				let hasThemeDecls = false;
-				rule.walkDecls( ( decl ) => {
+				rule.walkDecls((decl) => {
 					const themeMatch = /(theme\(([^\)]*)\))/g;
-					if ( ! decl.value ) {
+					if (!decl.value) {
 						return;
 					}
-					const matched = decl.value.match( themeMatch );
-					if ( ! matched ) {
+					const matched = decl.value.match(themeMatch);
+					if (!matched) {
 						return;
 					}
 					let value = decl.value;
 					let parsed;
 					const themeValues = {};
-					while (
-						( parsed = themeMatch.exec( decl.value ) ) !== null
-					) {
-						const [ , whole, color ] = parsed;
+					while ((parsed = themeMatch.exec(decl.value)) !== null) {
+						const [, whole, color] = parsed;
 						const colorKey = color.trim();
-						const defaultColor = options.defaults[ colorKey ];
-						value = value.replace( whole, defaultColor );
+						const defaultColor = options.defaults[colorKey];
+						value = value.replace(whole, defaultColor);
 
-						Object.entries( options.themes ).forEach(
-							( [ key, colors ] ) => {
-								const previousValue = themeValues[ key ]
-									? themeValues[ key ]
+						Object.entries(options.themes).forEach(
+							([key, colors]) => {
+								const previousValue = themeValues[key]
+									? themeValues[key]
 									: decl.value;
-								themeValues[ key ] = previousValue.replace(
+								themeValues[key] = previousValue.replace(
 									whole,
-									colors[ colorKey ]
+									colors[colorKey]
 								);
 							}
 						);
@@ -45,34 +43,32 @@ module.exports = ( options ) => {
 
 					hasThemeDecls = true;
 					decl.value = value;
-					Object.keys( options.themes ).forEach( ( key ) => {
+					Object.keys(options.themes).forEach((key) => {
 						const themeDecl = decl.clone();
-						themeDecl.value = themeValues[ key ];
-						if ( ! themeDecls[ key ] ) {
-							themeDecls[ key ] = [];
+						themeDecl.value = themeValues[key];
+						if (!themeDecls[key]) {
+							themeDecls[key] = [];
 						}
-						themeDecls[ key ].push( themeDecl );
-					} );
-				} );
+						themeDecls[key].push(themeDecl);
+					});
+				});
 
-				if ( hasThemeDecls ) {
-					Object.keys( options.themes ).forEach( ( key ) => {
-						const newRule = postcss.rule( {
+				if (hasThemeDecls) {
+					Object.keys(options.themes).forEach((key) => {
+						const newRule = postcss.rule({
 							selector: rule.selector
-								.split( ',' )
+								.split(',')
 								.map(
-									( subselector ) =>
+									(subselector) =>
 										'body.' + key + ' ' + subselector.trim()
 								)
-								.join( ', ' ),
-						} );
-						themeDecls[ key ].forEach( ( decl ) =>
-							newRule.append( decl )
-						);
-						rule.parent.insertAfter( rule, newRule );
-					} );
+								.join(', '),
+						});
+						themeDecls[key].forEach((decl) => newRule.append(decl));
+						rule.parent.insertAfter(rule, newRule);
+					});
 				}
-			} );
+			});
 		},
 	};
 };

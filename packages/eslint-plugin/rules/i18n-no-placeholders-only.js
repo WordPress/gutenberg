@@ -7,7 +7,7 @@ const {
 	getTextContentFromNode,
 	getTranslateFunctionName,
 	getTranslateFunctionArgs,
-} = require( '../utils' );
+} = require('../utils');
 
 module.exports = {
 	meta: {
@@ -18,40 +18,37 @@ module.exports = {
 				'Translatable strings should not contain nothing but placeholders',
 		},
 	},
-	create( context ) {
+	create(context) {
 		return {
-			CallExpression( node ) {
+			CallExpression(node) {
 				const { callee, arguments: args } = node;
 
-				const functionName = getTranslateFunctionName( callee );
+				const functionName = getTranslateFunctionName(callee);
 
-				if ( ! TRANSLATION_FUNCTIONS.has( functionName ) ) {
+				if (!TRANSLATION_FUNCTIONS.has(functionName)) {
 					return;
 				}
 
-				const candidates = getTranslateFunctionArgs(
-					functionName,
-					args
-				);
+				const candidates = getTranslateFunctionArgs(functionName, args);
 
-				for ( const arg of candidates ) {
-					const argumentString = getTextContentFromNode( arg );
-					if ( ! argumentString ) {
+				for (const arg of candidates) {
+					const argumentString = getTextContentFromNode(arg);
+					if (!argumentString) {
 						continue;
 					}
 
 					const modifiedString = argumentString
-						.replace( /%%/g, 'VALID_ESCAPED_PERCENTAGE_SIGN' )
-						.replace( REGEXP_SPRINTF_PLACEHOLDER, '' );
+						.replace(/%%/g, 'VALID_ESCAPED_PERCENTAGE_SIGN')
+						.replace(REGEXP_SPRINTF_PLACEHOLDER, '');
 
-					if ( modifiedString.length > 0 ) {
+					if (modifiedString.length > 0) {
 						continue;
 					}
 
-					context.report( {
+					context.report({
 						node,
 						messageId: 'noPlaceholdersOnly',
-					} );
+					});
 				}
 			},
 		};

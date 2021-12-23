@@ -21,21 +21,21 @@ import NoticeList from '../../notice/list';
  *
  * @return {WPComponent} Wrapped component.
  */
-export default createHigherOrderComponent( ( OriginalComponent ) => {
-	function Component( props, ref ) {
-		const [ noticeList, setNoticeList ] = useState( [] );
+export default createHigherOrderComponent((OriginalComponent) => {
+	function Component(props, ref) {
+		const [noticeList, setNoticeList] = useState([]);
 
-		const noticeOperations = useMemo( () => {
+		const noticeOperations = useMemo(() => {
 			/**
 			 * Function passed down as a prop that adds a new notice.
 			 *
 			 * @param {Object} notice Notice to add.
 			 */
-			const createNotice = ( notice ) => {
+			const createNotice = (notice) => {
 				const noticeToAdd = notice.id
 					? notice
 					: { ...notice, id: uuid() };
-				setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
+				setNoticeList((current) => [...current, noticeToAdd]);
 			};
 
 			return {
@@ -46,11 +46,11 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 				 *
 				 * @param {string} msg Error message of the notice.
 				 */
-				createErrorNotice: ( msg ) => {
-					createNotice( {
+				createErrorNotice: (msg) => {
+					createNotice({
 						status: 'error',
 						content: msg,
-					} );
+					});
 				},
 
 				/**
@@ -58,9 +58,9 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 				 *
 				 * @param {string} id Id of the notice to remove.
 				 */
-				removeNotice: ( id ) => {
-					setNoticeList( ( current ) =>
-						current.filter( ( notice ) => notice.id !== id )
+				removeNotice: (id) => {
+					setNoticeList((current) =>
+						current.filter((notice) => notice.id !== id)
 					);
 				},
 
@@ -68,10 +68,10 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 				 * Removes all notices
 				 */
 				removeAllNotices: () => {
-					setNoticeList( [] );
+					setNoticeList([]);
 				},
 			};
-		}, [] );
+		}, []);
 
 		const propsOut = {
 			...props,
@@ -80,25 +80,25 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 			noticeUI: noticeList.length > 0 && (
 				<NoticeList
 					className="components-with-notices-ui"
-					notices={ noticeList }
-					onRemove={ noticeOperations.removeNotice }
+					notices={noticeList}
+					onRemove={noticeOperations.removeNotice}
 				/>
 			),
 		};
 
 		return isForwardRef ? (
-			<OriginalComponent { ...propsOut } ref={ ref } />
+			<OriginalComponent {...propsOut} ref={ref} />
 		) : (
-			<OriginalComponent { ...propsOut } />
+			<OriginalComponent {...propsOut} />
 		);
 	}
 
 	let isForwardRef;
 	const { render } = OriginalComponent;
 	// Returns a forwardRef if OriginalComponent appears to be a forwardRef
-	if ( typeof render === 'function' ) {
+	if (typeof render === 'function') {
 		isForwardRef = true;
-		return forwardRef( Component );
+		return forwardRef(Component);
 	}
 	return Component;
-} );
+});

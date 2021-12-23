@@ -19,10 +19,10 @@ const STORE_NAME = 'core/viewport';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore(STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
-} );
+});
 
-register( store );
+register(store);

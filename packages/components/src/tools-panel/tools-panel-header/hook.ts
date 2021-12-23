@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelHeaderProps } from '../types';
 
 export function useToolsPanelHeader(
-	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >
+	props: WordPressComponentProps<ToolsPanelHeaderProps, 'h2'>
 ) {
 	const { className, ...otherProps } = useContextSystem(
 		props,
@@ -21,23 +21,20 @@ export function useToolsPanelHeader(
 	);
 
 	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.ToolsPanelHeader, className );
-	}, [ className ] );
+	const classes = useMemo(() => {
+		return cx(styles.ToolsPanelHeader, className);
+	}, [className]);
 
-	const dropdownMenuClassName = useMemo( () => {
-		return cx( styles.DropdownMenu );
-	}, [] );
+	const dropdownMenuClassName = useMemo(() => {
+		return cx(styles.DropdownMenu);
+	}, []);
 
-	const headingClassName = useMemo( () => {
-		return cx( styles.ToolsPanelHeading );
-	}, [] );
+	const headingClassName = useMemo(() => {
+		return cx(styles.ToolsPanelHeading);
+	}, []);
 
-	const {
-		menuItems,
-		hasMenuItems,
-		areAllOptionalControlsHidden,
-	} = useToolsPanelContext();
+	const { menuItems, hasMenuItems, areAllOptionalControlsHidden } =
+		useToolsPanelContext();
 
 	return {
 		...otherProps,

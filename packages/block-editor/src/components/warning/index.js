@@ -11,52 +11,50 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreHorizontal } from '@wordpress/icons';
 
-function Warning( { className, actions, children, secondaryActions } ) {
+function Warning({ className, actions, children, secondaryActions }) {
 	return (
-		<div className={ classnames( className, 'block-editor-warning' ) }>
+		<div className={classnames(className, 'block-editor-warning')}>
 			<div className="block-editor-warning__contents">
-				<p className="block-editor-warning__message">{ children }</p>
+				<p className="block-editor-warning__message">{children}</p>
 
-				{ ( Children.count( actions ) > 0 || secondaryActions ) && (
+				{(Children.count(actions) > 0 || secondaryActions) && (
 					<div className="block-editor-warning__actions">
-						{ Children.count( actions ) > 0 &&
-							Children.map( actions, ( action, i ) => (
+						{Children.count(actions) > 0 &&
+							Children.map(actions, (action, i) => (
 								<span
-									key={ i }
+									key={i}
 									className="block-editor-warning__action"
 								>
-									{ action }
+									{action}
 								</span>
-							) ) }
-						{ secondaryActions && (
+							))}
+						{secondaryActions && (
 							<DropdownMenu
 								className="block-editor-warning__secondary"
-								icon={ moreHorizontal }
-								label={ __( 'More options' ) }
-								popoverProps={ {
+								icon={moreHorizontal}
+								label={__('More options')}
+								popoverProps={{
 									position: 'bottom left',
 									className: 'block-editor-warning__dropdown',
-								} }
+								}}
 								noIcons
 							>
-								{ () => (
+								{() => (
 									<MenuGroup>
-										{ secondaryActions.map(
-											( item, pos ) => (
-												<MenuItem
-													onClick={ item.onClick }
-													key={ pos }
-												>
-													{ item.title }
-												</MenuItem>
-											)
-										) }
+										{secondaryActions.map((item, pos) => (
+											<MenuItem
+												onClick={item.onClick}
+												key={pos}
+											>
+												{item.title}
+											</MenuItem>
+										))}
 									</MenuGroup>
-								) }
+								)}
 							</DropdownMenu>
-						) }
+						)}
 					</div>
-				) }
+				)}
 			</div>
 		</div>
 	);

@@ -16,16 +16,16 @@ import { isTextContent } from '@wordpress/dom';
  *
  * @return {boolean} True if figure content, false if not.
  */
-function isFigureContent( node, schema ) {
+function isFigureContent(node, schema) {
 	const tag = node.nodeName.toLowerCase();
 
 	// We are looking for tags that can be a child of the figure tag, excluding
 	// `figcaption` and any phrasing content.
-	if ( tag === 'figcaption' || isTextContent( node ) ) {
+	if (tag === 'figcaption' || isTextContent(node)) {
 		return false;
 	}
 
-	return has( schema, [ 'figure', 'children', tag ] );
+	return has(schema, ['figure', 'children', tag]);
 }
 
 /**
@@ -36,10 +36,10 @@ function isFigureContent( node, schema ) {
  *
  * @return {boolean} True if it can, false if not.
  */
-function canHaveAnchor( node, schema ) {
+function canHaveAnchor(node, schema) {
 	const tag = node.nodeName.toLowerCase();
 
-	return has( schema, [ 'figure', 'children', 'a', 'children', tag ] );
+	return has(schema, ['figure', 'children', 'a', 'children', tag]);
 }
 
 /**
@@ -48,10 +48,10 @@ function canHaveAnchor( node, schema ) {
  * @param {Element} element       The element to wrap.
  * @param {Element} beforeElement The element before which to place the figure.
  */
-function wrapFigureContent( element, beforeElement = element ) {
-	const figure = element.ownerDocument.createElement( 'figure' );
-	beforeElement.parentNode.insertBefore( figure, beforeElement );
-	figure.appendChild( element );
+function wrapFigureContent(element, beforeElement = element) {
+	const figure = element.ownerDocument.createElement('figure');
+	beforeElement.parentNode.insertBefore(figure, beforeElement);
+	figure.appendChild(element);
 }
 
 /**
@@ -64,8 +64,8 @@ function wrapFigureContent( element, beforeElement = element ) {
  *
  * @return {void}
  */
-export default function figureContentReducer( node, doc, schema ) {
-	if ( ! isFigureContent( node, schema ) ) {
+export default function figureContentReducer(node, doc, schema) {
+	if (!isFigureContent(node, schema)) {
 		return;
 	}
 
@@ -75,32 +75,32 @@ export default function figureContentReducer( node, doc, schema ) {
 	// If the figure content can have an anchor and its parent is an anchor with
 	// only the figure content, take the anchor out instead of just the content.
 	if (
-		canHaveAnchor( node, schema ) &&
+		canHaveAnchor(node, schema) &&
 		parentNode.nodeName === 'A' &&
 		parentNode.childNodes.length === 1
 	) {
 		nodeToInsert = node.parentNode;
 	}
 
-	const wrapper = nodeToInsert.closest( 'p,div' );
+	const wrapper = nodeToInsert.closest('p,div');
 
 	// If wrapped in a paragraph or div, only extract if it's aligned or if
 	// there is no text content.
 	// Otherwise, if directly at the root, wrap in a figure element.
-	if ( wrapper ) {
+	if (wrapper) {
 		// In jsdom-jscore, 'node.classList' can be undefined.
 		// In this case, default to extract as it offers a better UI experience on mobile.
-		if ( ! node.classList ) {
-			wrapFigureContent( nodeToInsert, wrapper );
+		if (!node.classList) {
+			wrapFigureContent(nodeToInsert, wrapper);
 		} else if (
-			node.classList.contains( 'alignright' ) ||
-			node.classList.contains( 'alignleft' ) ||
-			node.classList.contains( 'aligncenter' ) ||
-			! wrapper.textContent.trim()
+			node.classList.contains('alignright') ||
+			node.classList.contains('alignleft') ||
+			node.classList.contains('aligncenter') ||
+			!wrapper.textContent.trim()
 		) {
-			wrapFigureContent( nodeToInsert, wrapper );
+			wrapFigureContent(nodeToInsert, wrapper);
 		}
-	} else if ( nodeToInsert.parentNode.nodeName === 'BODY' ) {
-		wrapFigureContent( nodeToInsert );
+	} else if (nodeToInsert.parentNode.nodeName === 'BODY') {
+		wrapFigureContent(nodeToInsert);
 	}
 }

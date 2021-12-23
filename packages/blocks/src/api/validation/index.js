@@ -134,10 +134,7 @@ const ENUMERATED_ATTRIBUTES = [
  *
  * @type {Array}
  */
-const MEANINGFUL_ATTRIBUTES = [
-	...BOOLEAN_ATTRIBUTES,
-	...ENUMERATED_ATTRIBUTES,
-];
+const MEANINGFUL_ATTRIBUTES = [...BOOLEAN_ATTRIBUTES, ...ENUMERATED_ATTRIBUTES];
 
 /**
  * Array of functions which receive a text string on which to apply normalizing
@@ -146,7 +143,7 @@ const MEANINGFUL_ATTRIBUTES = [
  *
  * @type {Array}
  */
-const TEXT_NORMALIZATIONS = [ identity, getTextWithCollapsedWhitespace ];
+const TEXT_NORMALIZATIONS = [identity, getTextWithCollapsedWhitespace];
 
 /**
  * Regular expression matching a named character reference. In lieu of bundling
@@ -206,11 +203,11 @@ const REGEXP_HEXADECIMAL_CHARACTER_REFERENCE = /^#x[\da-f]+$/i;
  *
  * @return {boolean} Whether text is valid character reference.
  */
-export function isValidCharacterReference( text ) {
+export function isValidCharacterReference(text) {
 	return (
-		REGEXP_NAMED_CHARACTER_REFERENCE.test( text ) ||
-		REGEXP_DECIMAL_CHARACTER_REFERENCE.test( text ) ||
-		REGEXP_HEXADECIMAL_CHARACTER_REFERENCE.test( text )
+		REGEXP_NAMED_CHARACTER_REFERENCE.test(text) ||
+		REGEXP_DECIMAL_CHARACTER_REFERENCE.test(text) ||
+		REGEXP_HEXADECIMAL_CHARACTER_REFERENCE.test(text)
 	);
 }
 
@@ -230,9 +227,9 @@ export class DecodeEntityParser {
 	 *
 	 * @return {?string} Entity substitute value.
 	 */
-	parse( entity ) {
-		if ( isValidCharacterReference( entity ) ) {
-			return decodeEntities( '&' + entity + ';' );
+	parse(entity) {
+		if (isValidCharacterReference(entity)) {
+			return decodeEntities('&' + entity + ';');
 		}
 	}
 }
@@ -245,8 +242,8 @@ export class DecodeEntityParser {
  *
  * @return {string[]} Text pieces split on whitespace.
  */
-export function getTextPiecesSplitOnWhitespace( text ) {
-	return text.trim().split( REGEXP_WHITESPACE );
+export function getTextPiecesSplitOnWhitespace(text) {
+	return text.trim().split(REGEXP_WHITESPACE);
 }
 
 /**
@@ -257,12 +254,12 @@ export function getTextPiecesSplitOnWhitespace( text ) {
  *
  * @return {string} Trimmed text with consecutive whitespace collapsed.
  */
-export function getTextWithCollapsedWhitespace( text ) {
+export function getTextWithCollapsedWhitespace(text) {
 	// This is an overly simplified whitespace comparison. The specification is
 	// more prescriptive of whitespace behavior in inline and block contexts.
 	//
 	// See: https://medium.com/@patrickbrosset/when-does-white-space-matter-in-html-b90e8a7cdd33
-	return getTextPiecesSplitOnWhitespace( text ).join( ' ' );
+	return getTextPiecesSplitOnWhitespace(text).join(' ');
 }
 
 /**
@@ -276,15 +273,15 @@ export function getTextWithCollapsedWhitespace( text ) {
  *
  * @return {Array[]} Attribute pairs.
  */
-export function getMeaningfulAttributePairs( token ) {
-	return token.attributes.filter( ( pair ) => {
-		const [ key, value ] = pair;
+export function getMeaningfulAttributePairs(token) {
+	return token.attributes.filter((pair) => {
+		const [key, value] = pair;
 		return (
 			value ||
-			key.indexOf( 'data-' ) === 0 ||
-			includes( MEANINGFUL_ATTRIBUTES, key )
+			key.indexOf('data-') === 0 ||
+			includes(MEANINGFUL_ATTRIBUTES, key)
 		);
-	} );
+	});
 }
 
 /**
@@ -309,13 +306,13 @@ export function isEquivalentTextTokens(
 	let actualChars = actual.chars;
 	let expectedChars = expected.chars;
 
-	for ( let i = 0; i < TEXT_NORMALIZATIONS.length; i++ ) {
-		const normalize = TEXT_NORMALIZATIONS[ i ];
+	for (let i = 0; i < TEXT_NORMALIZATIONS.length; i++) {
+		const normalize = TEXT_NORMALIZATIONS[i];
 
-		actualChars = normalize( actualChars );
-		expectedChars = normalize( expectedChars );
+		actualChars = normalize(actualChars);
+		expectedChars = normalize(expectedChars);
 
-		if ( actualChars === expectedChars ) {
+		if (actualChars === expectedChars) {
 			return true;
 		}
 	}
@@ -337,12 +334,12 @@ export function isEquivalentTextTokens(
  *
  * @return {string} Normalized CSS length value.
  */
-export function getNormalizedLength( value ) {
-	if ( 0 === parseFloat( value ) ) {
+export function getNormalizedLength(value) {
+	if (0 === parseFloat(value)) {
 		return '0';
 	}
 	// Normalize strings with floats to always include a leading zero.
-	if ( value.indexOf( '.' ) === 0 ) {
+	if (value.indexOf('.') === 0) {
 		return '0' + value;
 	}
 
@@ -357,15 +354,15 @@ export function getNormalizedLength( value ) {
  *
  * @return {string} Normalized style value.
  */
-export function getNormalizedStyleValue( value ) {
-	const textPieces = getTextPiecesSplitOnWhitespace( value );
-	const normalizedPieces = textPieces.map( getNormalizedLength );
-	const result = normalizedPieces.join( ' ' );
+export function getNormalizedStyleValue(value) {
+	const textPieces = getTextPiecesSplitOnWhitespace(value);
+	const normalizedPieces = textPieces.map(getNormalizedLength);
+	const result = normalizedPieces.join(' ');
 
 	return (
 		result
 			// Normalize URL type to omit whitespace or quotes
-			.replace( REGEXP_STYLE_URL_TYPE, 'url($1)' )
+			.replace(REGEXP_STYLE_URL_TYPE, 'url($1)')
 	);
 }
 
@@ -376,22 +373,22 @@ export function getNormalizedStyleValue( value ) {
  *
  * @return {Object} Style properties.
  */
-export function getStyleProperties( text ) {
+export function getStyleProperties(text) {
 	const pairs = text
 		// Trim ending semicolon (avoid including in split)
-		.replace( /;?\s*$/, '' )
+		.replace(/;?\s*$/, '')
 		// Split on property assignment
-		.split( ';' )
+		.split(';')
 		// For each property assignment...
-		.map( ( style ) => {
+		.map((style) => {
 			// ...split further into key-value pairs
-			const [ key, ...valueParts ] = style.split( ':' );
-			const value = valueParts.join( ':' );
+			const [key, ...valueParts] = style.split(':');
+			const value = valueParts.join(':');
 
-			return [ key.trim(), getNormalizedStyleValue( value.trim() ) ];
-		} );
+			return [key.trim(), getNormalizedStyleValue(value.trim())];
+		});
 
-	return fromPairs( pairs );
+	return fromPairs(pairs);
 }
 
 /**
@@ -400,21 +397,18 @@ export function getStyleProperties( text ) {
  * @type {Object}
  */
 export const isEqualAttributesOfName = {
-	class: ( actual, expected ) => {
+	class: (actual, expected) => {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
-		return ! xor(
-			...[ actual, expected ].map( getTextPiecesSplitOnWhitespace )
-		).length;
+		return !xor(...[actual, expected].map(getTextPiecesSplitOnWhitespace))
+			.length;
 	},
-	style: ( actual, expected ) => {
-		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
+	style: (actual, expected) => {
+		return isEqual(...[actual, expected].map(getStyleProperties));
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
-	...fromPairs(
-		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] )
-	),
+	...fromPairs(BOOLEAN_ATTRIBUTES.map((attribute) => [attribute, stubTrue])),
 };
 
 /**
@@ -435,7 +429,7 @@ export function isEqualTagAttributePairs(
 	// Attributes is tokenized as tuples. Their lengths should match. This also
 	// avoids us needing to check both attributes sets, since if A has any keys
 	// which do not exist in B, we know the sets to be different.
-	if ( actual.length !== expected.length ) {
+	if (actual.length !== expected.length) {
 		logger.warning(
 			'Expected attributes %o, instead saw %o.',
 			expected,
@@ -448,27 +442,26 @@ export function isEqualTagAttributePairs(
 	// actual attributes, first convert the set of expected attribute values to
 	// an object, for lookup by key.
 	const expectedAttributes = {};
-	for ( let i = 0; i < expected.length; i++ ) {
-		expectedAttributes[ expected[ i ][ 0 ].toLowerCase() ] =
-			expected[ i ][ 1 ];
+	for (let i = 0; i < expected.length; i++) {
+		expectedAttributes[expected[i][0].toLowerCase()] = expected[i][1];
 	}
 
-	for ( let i = 0; i < actual.length; i++ ) {
-		const [ name, actualValue ] = actual[ i ];
+	for (let i = 0; i < actual.length; i++) {
+		const [name, actualValue] = actual[i];
 		const nameLower = name.toLowerCase();
 
 		// As noted above, if missing member in B, assume different
-		if ( ! expectedAttributes.hasOwnProperty( nameLower ) ) {
-			logger.warning( 'Encountered unexpected attribute `%s`.', name );
+		if (!expectedAttributes.hasOwnProperty(nameLower)) {
+			logger.warning('Encountered unexpected attribute `%s`.', name);
 			return false;
 		}
 
-		const expectedValue = expectedAttributes[ nameLower ];
-		const isEqualAttributes = isEqualAttributesOfName[ nameLower ];
+		const expectedValue = expectedAttributes[nameLower];
+		const isEqualAttributes = isEqualAttributesOfName[nameLower];
 
-		if ( isEqualAttributes ) {
+		if (isEqualAttributes) {
 			// Defer custom attribute equality handling
-			if ( ! isEqualAttributes( actualValue, expectedValue ) ) {
+			if (!isEqualAttributes(actualValue, expectedValue)) {
 				logger.warning(
 					'Expected attribute `%s` of value `%s`, saw `%s`.',
 					name,
@@ -477,7 +470,7 @@ export function isEqualTagAttributePairs(
 				);
 				return false;
 			}
-		} else if ( actualValue !== expectedValue ) {
+		} else if (actualValue !== expectedValue) {
 			// Otherwise strict inequality should bail
 			logger.warning(
 				'Expected attribute `%s` of value `%s`, saw `%s`.',
@@ -498,7 +491,7 @@ export function isEqualTagAttributePairs(
  * @type {Object}
  */
 export const isEqualTokensOfType = {
-	StartTag: ( actual, expected, logger = createLogger() ) => {
+	StartTag: (actual, expected, logger = createLogger()) => {
 		if (
 			actual.tagName !== expected.tagName &&
 			// Optimization: Use short-circuit evaluation to defer case-
@@ -515,7 +508,7 @@ export const isEqualTokensOfType = {
 		}
 
 		return isEqualTagAttributePairs(
-			...[ actual, expected ].map( getMeaningfulAttributePairs ),
+			...[actual, expected].map(getMeaningfulAttributePairs),
 			logger
 		);
 	},
@@ -533,14 +526,14 @@ export const isEqualTokensOfType = {
  *
  * @return {Object} Next non-whitespace token.
  */
-export function getNextNonWhitespaceToken( tokens ) {
+export function getNextNonWhitespaceToken(tokens) {
 	let token;
-	while ( ( token = tokens.shift() ) ) {
-		if ( token.type !== 'Chars' ) {
+	while ((token = tokens.shift())) {
+		if (token.type !== 'Chars') {
 			return token;
 		}
 
-		if ( ! REGEXP_ONLY_WHITESPACE.test( token.chars ) ) {
+		if (!REGEXP_ONLY_WHITESPACE.test(token.chars)) {
 			return token;
 		}
 	}
@@ -555,11 +548,11 @@ export function getNextNonWhitespaceToken( tokens ) {
  *
  * @return {Object[]|null} Array of valid tokenized HTML elements, or null on error
  */
-function getHTMLTokens( html, logger = createLogger() ) {
+function getHTMLTokens(html, logger = createLogger()) {
 	try {
-		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
-	} catch ( e ) {
-		logger.warning( 'Malformed HTML detected: %s', html );
+		return new Tokenizer(new DecodeEntityParser()).tokenize(html);
+	} catch (e) {
+		logger.warning('Malformed HTML detected: %s', html);
 	}
 
 	return null;
@@ -573,9 +566,9 @@ function getHTMLTokens( html, logger = createLogger() ) {
  *
  * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
  */
-export function isClosedByToken( currentToken, nextToken ) {
+export function isClosedByToken(currentToken, nextToken) {
 	// Ensure this is a self closed token
-	if ( ! currentToken.selfClosing ) {
+	if (!currentToken.selfClosing) {
 		return false;
 	}
 
@@ -602,29 +595,28 @@ export function isClosedByToken( currentToken, nextToken ) {
  *
  * @return {boolean} Whether HTML strings are equivalent.
  */
-export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
+export function isEquivalentHTML(actual, expected, logger = createLogger()) {
 	// Short-circuit if markup is identical.
-	if ( actual === expected ) {
+	if (actual === expected) {
 		return true;
 	}
 
 	// Tokenize input content and reserialized save content
-	const [ actualTokens, expectedTokens ] = [
-		actual,
-		expected,
-	].map( ( html ) => getHTMLTokens( html, logger ) );
+	const [actualTokens, expectedTokens] = [actual, expected].map((html) =>
+		getHTMLTokens(html, logger)
+	);
 
 	// If either is malformed then stop comparing - the strings are not equivalent
-	if ( ! actualTokens || ! expectedTokens ) {
+	if (!actualTokens || !expectedTokens) {
 		return false;
 	}
 
 	let actualToken, expectedToken;
-	while ( ( actualToken = getNextNonWhitespaceToken( actualTokens ) ) ) {
-		expectedToken = getNextNonWhitespaceToken( expectedTokens );
+	while ((actualToken = getNextNonWhitespaceToken(actualTokens))) {
+		expectedToken = getNextNonWhitespaceToken(expectedTokens);
 
 		// Inequal if exhausted all expected tokens
-		if ( ! expectedToken ) {
+		if (!expectedToken) {
 			logger.warning(
 				'Expected end of content, instead saw %o.',
 				actualToken
@@ -633,7 +625,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 		}
 
 		// Inequal if next non-whitespace token of each set are not same type
-		if ( actualToken.type !== expectedToken.type ) {
+		if (actualToken.type !== expectedToken.type) {
 			logger.warning(
 				'Expected token of type `%s` (%o), instead saw `%s` (%o).',
 				expectedToken.type,
@@ -646,28 +638,28 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 
 		// Defer custom token type equality handling, otherwise continue and
 		// assume as equal
-		const isEqualTokens = isEqualTokensOfType[ actualToken.type ];
+		const isEqualTokens = isEqualTokensOfType[actualToken.type];
 		if (
 			isEqualTokens &&
-			! isEqualTokens( actualToken, expectedToken, logger )
+			!isEqualTokens(actualToken, expectedToken, logger)
 		) {
 			return false;
 		}
 
 		// Peek at the next tokens (actual and expected) to see if they close
 		// a self-closing tag
-		if ( isClosedByToken( actualToken, expectedTokens[ 0 ] ) ) {
+		if (isClosedByToken(actualToken, expectedTokens[0])) {
 			// Consume the next expected token that closes the current actual
 			// self-closing token
-			getNextNonWhitespaceToken( expectedTokens );
-		} else if ( isClosedByToken( expectedToken, actualTokens[ 0 ] ) ) {
+			getNextNonWhitespaceToken(expectedTokens);
+		} else if (isClosedByToken(expectedToken, actualTokens[0])) {
 			// Consume the next actual token that closes the current expected
 			// self-closing token
-			getNextNonWhitespaceToken( actualTokens );
+			getNextNonWhitespaceToken(actualTokens);
 		}
 	}
 
-	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
+	if ((expectedToken = getNextNonWhitespaceToken(expectedTokens))) {
 		// If any non-whitespace tokens remain in expected token set, this
 		// indicates inequality
 		logger.warning(
@@ -705,28 +697,28 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  *
  * @return {[boolean,Object]} validation results.
  */
-export function validateBlock( block, blockTypeOrName ) {
+export function validateBlock(block, blockTypeOrName) {
 	const isFallbackBlock =
 		block.name === getFreeformContentHandlerName() ||
 		block.name === getUnregisteredTypeHandlerName();
 
 	// Shortcut to avoid costly validation.
-	if ( isFallbackBlock ) {
-		return [ true ];
+	if (isFallbackBlock) {
+		return [true];
 	}
 
 	const logger = createQueuedLogger();
-	const blockType = normalizeBlockType( blockTypeOrName );
+	const blockType = normalizeBlockType(blockTypeOrName);
 	let generatedBlockContent;
 	try {
-		generatedBlockContent = getSaveContent( blockType, block.attributes );
-	} catch ( error ) {
+		generatedBlockContent = getSaveContent(blockType, block.attributes);
+	} catch (error) {
 		logger.error(
 			'Block validation failed because an error occurred while generating block content:\n\n%s',
 			error.toString()
 		);
 
-		return [ false, logger.getItems() ];
+		return [false, logger.getItems()];
 	}
 
 	const isValid = isEquivalentHTML(
@@ -735,7 +727,7 @@ export function validateBlock( block, blockTypeOrName ) {
 		logger
 	);
 
-	if ( ! isValid ) {
+	if (!isValid) {
 		logger.error(
 			'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
 			blockType.name,
@@ -745,7 +737,7 @@ export function validateBlock( block, blockTypeOrName ) {
 		);
 	}
 
-	return [ isValid, logger.getItems() ];
+	return [isValid, logger.getItems()];
 }
 
 /**
@@ -766,14 +758,14 @@ export function isValidBlockContent(
 	attributes,
 	originalBlockContent
 ) {
-	const blockType = normalizeBlockType( blockTypeOrName );
+	const blockType = normalizeBlockType(blockTypeOrName);
 	const block = {
 		name: blockType.name,
 		attributes,
 		innerBlocks: [],
 		originalContent: originalBlockContent,
 	};
-	const [ isValid ] = validateBlock( block, blockType );
+	const [isValid] = validateBlock(block, blockType);
 
 	return isValid;
 }

@@ -15,18 +15,18 @@ import useInstanceId from '../../hooks/use-instance-id';
  * A Higher Order Component used to be provide a unique instance ID by
  * component.
  */
-const withInstanceId: PropInjectingHigherOrderComponent< {
+const withInstanceId: PropInjectingHigherOrderComponent<{
 	instanceId: string | number;
-} > = createHigherOrderComponent(
-	< TProps extends { instanceId: string | number } >(
-		WrappedComponent: ComponentType< TProps >
+}> = createHigherOrderComponent(
+	<TProps extends { instanceId: string | number }>(
+		WrappedComponent: ComponentType<TProps>
 	) => {
-		return ( props: Omit< TProps, 'instanceId' > ) => {
-			const instanceId = useInstanceId( WrappedComponent );
+		return (props: Omit<TProps, 'instanceId'>) => {
+			const instanceId = useInstanceId(WrappedComponent);
 			return (
 				<WrappedComponent
-					{ ...( props as TProps ) }
-					instanceId={ instanceId }
+					{...(props as TProps)}
+					instanceId={instanceId}
 				/>
 			);
 		};

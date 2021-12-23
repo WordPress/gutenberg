@@ -8,7 +8,7 @@ import { createContext } from '@wordpress/element';
  */
 import defaultRegistry from '../../default-registry';
 
-export const Context = createContext( defaultRegistry );
+export const Context = createContext(defaultRegistry);
 
 const { Consumer, Provider } = Context;
 

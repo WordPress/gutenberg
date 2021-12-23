@@ -11,23 +11,23 @@ import {
 	toHTMLString,
 } from '@wordpress/rich-text';
 
-function getListContentSchema( { phrasingContentSchema } ) {
+function getListContentSchema({ phrasingContentSchema }) {
 	const listContentSchema = {
 		...phrasingContentSchema,
 		ul: {},
-		ol: { attributes: [ 'type', 'start', 'reversed' ] },
+		ol: { attributes: ['type', 'start', 'reversed'] },
 	};
 
 	// Recursion is needed.
 	// Possible: ul > li > ul.
 	// Impossible: ul > ul.
-	[ 'ul', 'ol' ].forEach( ( tag ) => {
-		listContentSchema[ tag ].children = {
+	['ul', 'ol'].forEach((tag) => {
+		listContentSchema[tag].children = {
 			li: {
 				children: listContentSchema,
 			},
 		};
-	} );
+	});
 
 	return listContentSchema;
 }
@@ -37,15 +37,15 @@ const transforms = {
 		{
 			type: 'block',
 			isMultiBlock: true,
-			blocks: [ 'core/paragraph', 'core/heading' ],
-			transform: ( blockAttributes ) => {
-				return createBlock( 'core/list', {
-					values: toHTMLString( {
+			blocks: ['core/paragraph', 'core/heading'],
+			transform: (blockAttributes) => {
+				return createBlock('core/list', {
+					values: toHTMLString({
 						value: join(
-							blockAttributes.map( ( { content } ) => {
-								const value = create( { html: content } );
+							blockAttributes.map(({ content }) => {
+								const value = create({ html: content });
 
-								if ( blockAttributes.length > 1 ) {
+								if (blockAttributes.length > 1) {
 									return value;
 								}
 
@@ -56,156 +56,156 @@ const transforms = {
 									/\n/g,
 									__UNSTABLE_LINE_SEPARATOR
 								);
-							} ),
+							}),
 							__UNSTABLE_LINE_SEPARATOR
 						),
 						multilineTag: 'li',
-					} ),
+					}),
 					anchor: blockAttributes.anchor,
-				} );
+				});
 			},
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/quote', 'core/pullquote' ],
-			transform: ( { value, anchor } ) => {
-				return createBlock( 'core/list', {
-					values: toHTMLString( {
-						value: create( { html: value, multilineTag: 'p' } ),
+			blocks: ['core/quote', 'core/pullquote'],
+			transform: ({ value, anchor }) => {
+				return createBlock('core/list', {
+					values: toHTMLString({
+						value: create({ html: value, multilineTag: 'p' }),
 						multilineTag: 'li',
-					} ),
+					}),
 					anchor,
-				} );
+				});
 			},
 		},
 		{
 			type: 'raw',
 			selector: 'ol,ul',
-			schema: ( args ) => ( {
-				ol: getListContentSchema( args ).ol,
-				ul: getListContentSchema( args ).ul,
-			} ),
-			transform( node ) {
+			schema: (args) => ({
+				ol: getListContentSchema(args).ol,
+				ul: getListContentSchema(args).ul,
+			}),
+			transform(node) {
 				const attributes = {
 					ordered: node.nodeName === 'OL',
 					anchor: node.id === '' ? undefined : node.id,
 				};
 
-				if ( attributes.ordered ) {
-					const type = node.getAttribute( 'type' );
+				if (attributes.ordered) {
+					const type = node.getAttribute('type');
 
-					if ( type ) {
+					if (type) {
 						attributes.type = type;
 					}
 
-					if ( node.getAttribute( 'reversed' ) !== null ) {
+					if (node.getAttribute('reversed') !== null) {
 						attributes.reversed = true;
 					}
 
-					const start = parseInt( node.getAttribute( 'start' ), 10 );
+					const start = parseInt(node.getAttribute('start'), 10);
 
 					if (
-						! isNaN( start ) &&
+						!isNaN(start) &&
 						// start=1 only makes sense if the list is reversed.
-						( start !== 1 || attributes.reversed )
+						(start !== 1 || attributes.reversed)
 					) {
 						attributes.start = start;
 					}
 				}
 
-				return createBlock( 'core/list', {
-					...getBlockAttributes( 'core/list', node.outerHTML ),
+				return createBlock('core/list', {
+					...getBlockAttributes('core/list', node.outerHTML),
 					...attributes,
-				} );
+				});
 			},
 		},
-		...[ '*', '-' ].map( ( prefix ) => ( {
+		...['*', '-'].map((prefix) => ({
 			type: 'prefix',
 			prefix,
-			transform( content ) {
-				return createBlock( 'core/list', {
-					values: `<li>${ content }</li>`,
-				} );
+			transform(content) {
+				return createBlock('core/list', {
+					values: `<li>${content}</li>`,
+				});
 			},
-		} ) ),
-		...[ '1.', '1)' ].map( ( prefix ) => ( {
+		})),
+		...['1.', '1)'].map((prefix) => ({
 			type: 'prefix',
 			prefix,
-			transform( content ) {
-				return createBlock( 'core/list', {
+			transform(content) {
+				return createBlock('core/list', {
 					ordered: true,
-					values: `<li>${ content }</li>`,
-				} );
+					values: `<li>${content}</li>`,
+				});
 			},
-		} ) ),
+		})),
 	],
 	to: [
 		{
 			type: 'block',
-			blocks: [ 'core/paragraph' ],
-			transform: ( { values } ) =>
+			blocks: ['core/paragraph'],
+			transform: ({ values }) =>
 				split(
-					create( {
+					create({
 						html: values,
 						multilineTag: 'li',
-						multilineWrapperTags: [ 'ul', 'ol' ],
-					} ),
+						multilineWrapperTags: ['ul', 'ol'],
+					}),
 					__UNSTABLE_LINE_SEPARATOR
-				).map( ( piece ) =>
-					createBlock( 'core/paragraph', {
-						content: toHTMLString( { value: piece } ),
-					} )
+				).map((piece) =>
+					createBlock('core/paragraph', {
+						content: toHTMLString({ value: piece }),
+					})
 				),
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/heading' ],
-			transform: ( { values } ) =>
+			blocks: ['core/heading'],
+			transform: ({ values }) =>
 				split(
-					create( {
+					create({
 						html: values,
 						multilineTag: 'li',
-						multilineWrapperTags: [ 'ul', 'ol' ],
-					} ),
+						multilineWrapperTags: ['ul', 'ol'],
+					}),
 					__UNSTABLE_LINE_SEPARATOR
-				).map( ( piece ) =>
-					createBlock( 'core/heading', {
-						content: toHTMLString( { value: piece } ),
-					} )
+				).map((piece) =>
+					createBlock('core/heading', {
+						content: toHTMLString({ value: piece }),
+					})
 				),
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/quote' ],
-			transform: ( { values, anchor } ) => {
-				return createBlock( 'core/quote', {
-					value: toHTMLString( {
-						value: create( {
+			blocks: ['core/quote'],
+			transform: ({ values, anchor }) => {
+				return createBlock('core/quote', {
+					value: toHTMLString({
+						value: create({
 							html: values,
 							multilineTag: 'li',
-							multilineWrapperTags: [ 'ul', 'ol' ],
-						} ),
+							multilineWrapperTags: ['ul', 'ol'],
+						}),
 						multilineTag: 'p',
-					} ),
+					}),
 					anchor,
-				} );
+				});
 			},
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/pullquote' ],
-			transform: ( { values, anchor } ) => {
-				return createBlock( 'core/pullquote', {
-					value: toHTMLString( {
-						value: create( {
+			blocks: ['core/pullquote'],
+			transform: ({ values, anchor }) => {
+				return createBlock('core/pullquote', {
+					value: toHTMLString({
+						value: create({
 							html: values,
 							multilineTag: 'li',
-							multilineWrapperTags: [ 'ul', 'ol' ],
-						} ),
+							multilineWrapperTags: ['ul', 'ol'],
+						}),
 						multilineTag: 'p',
-					} ),
+					}),
 					anchor,
-				} );
+				});
 			},
 		},
 	],

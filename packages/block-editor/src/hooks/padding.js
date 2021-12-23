@@ -28,9 +28,9 @@ import { cleanEmptyObject } from './utils';
  *
  * @return {boolean} Whether there is support.
  */
-export function hasPaddingSupport( blockType ) {
-	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
-	return !! ( true === support || support?.padding );
+export function hasPaddingSupport(blockType) {
+	const support = getBlockSupport(blockType, SPACING_SUPPORT_KEY);
+	return !!(true === support || support?.padding);
 }
 
 /**
@@ -39,7 +39,7 @@ export function hasPaddingSupport( blockType ) {
  * @param {Object} props Block props.
  * @return {boolean}      Whether or not the block has a padding value set.
  */
-export function hasPaddingValue( props ) {
+export function hasPaddingValue(props) {
 	return props.attributes.style?.spacing?.padding !== undefined;
 }
 
@@ -51,18 +51,18 @@ export function hasPaddingValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetPadding( { attributes = {}, setAttributes } ) {
+export function resetPadding({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
-		style: cleanEmptyObject( {
+	setAttributes({
+		style: cleanEmptyObject({
 			...style,
 			spacing: {
 				...style?.spacing,
 				padding: undefined,
 			},
-		} ),
-	} );
+		}),
+	});
 }
 
 /**
@@ -72,11 +72,11 @@ export function resetPadding( { attributes = {}, setAttributes } ) {
  *
  * @return {boolean} Whether padding setting is disabled.
  */
-export function useIsPaddingDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'spacing.padding' );
-	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'padding' );
+export function useIsPaddingDisabled({ name: blockName } = {}) {
+	const isDisabled = !useSetting('spacing.padding');
+	const isInvalid = !useIsDimensionsSupportValid(blockName, 'padding');
 
-	return ! hasPaddingSupport( blockName ) || isDisabled || isInvalid;
+	return !hasPaddingSupport(blockName) || isDisabled || isInvalid;
 }
 
 /**
@@ -86,31 +86,31 @@ export function useIsPaddingDisabled( { name: blockName } = {} ) {
  *
  * @return {WPElement} Padding edit element.
  */
-export function PaddingEdit( props ) {
+export function PaddingEdit(props) {
 	const {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || [
 			'%',
 			'px',
 			'em',
 			'rem',
 			'vw',
 		],
-	} );
-	const sides = useCustomSides( blockName, 'padding' );
+	});
+	const sides = useCustomSides(blockName, 'padding');
 	const splitOnAxis =
-		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+		sides && sides.some((side) => AXIAL_SIDES.includes(side));
 
-	if ( useIsPaddingDisabled( props ) ) {
+	if (useIsPaddingDisabled(props)) {
 		return null;
 	}
 
-	const onChange = ( next ) => {
+	const onChange = (next) => {
 		const newStyle = {
 			...style,
 			spacing: {
@@ -119,12 +119,12 @@ export function PaddingEdit( props ) {
 			},
 		};
 
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
+		setAttributes({
+			style: cleanEmptyObject(newStyle),
+		});
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
+	const onChangeShowVisualizer = (next) => {
 		const newStyle = {
 			...style,
 			visualizers: {
@@ -132,26 +132,26 @@ export function PaddingEdit( props ) {
 			},
 		};
 
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
+		setAttributes({
+			style: cleanEmptyObject(newStyle),
+		});
 	};
 
-	return Platform.select( {
+	return Platform.select({
 		web: (
 			<>
 				<BoxControl
-					values={ style?.spacing?.padding }
-					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
-					label={ __( 'Padding' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
+					values={style?.spacing?.padding}
+					onChange={onChange}
+					onChangeShowVisualizer={onChangeShowVisualizer}
+					label={__('Padding')}
+					sides={sides}
+					units={units}
+					allowReset={false}
+					splitOnAxis={splitOnAxis}
 				/>
 			</>
 		),
 		native: null,
-	} );
+	});
 }

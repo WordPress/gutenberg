@@ -3,9 +3,9 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const path = require( 'path' );
-const fetch = require( 'node-fetch' );
+const fs = require('fs');
+const path = require('path');
+const fetch = require('node-fetch');
 
 const supportedLocales = [
 	'ar', // Arabic
@@ -59,57 +59,56 @@ const supportedLocales = [
 	'zh-tw', // Chinese (Taiwan)
 ];
 
-const getLanguageUrl = ( locale ) =>
-	`https://translate.wordpress.org/projects/wp-plugins/gutenberg/dev/${ locale }/default/export-translations\?format\=json`;
-const getTranslationFilePath = ( locale ) => `./data/${ locale }.json`;
+const getLanguageUrl = (locale) =>
+	`https://translate.wordpress.org/projects/wp-plugins/gutenberg/dev/${locale}/default/export-translations\?format\=json`;
+const getTranslationFilePath = (locale) => `./data/${locale}.json`;
 
-const getTranslation = ( locale ) =>
-	require( getTranslationFilePath( locale ) );
+const getTranslation = (locale) => require(getTranslationFilePath(locale));
 
-const fetchTranslation = ( locale ) => {
-	if ( ! process.env.REFRESH_I18N_CACHE ) {
+const fetchTranslation = (locale) => {
+	if (!process.env.REFRESH_I18N_CACHE) {
 		try {
-			const localData = getTranslation( locale );
-			console.log( `Using cached locale data for ${ locale }` );
-			return Promise.resolve( {
+			const localData = getTranslation(locale);
+			console.log(`Using cached locale data for ${locale}`);
+			return Promise.resolve({
 				response: localData,
 				locale,
 				inCache: true,
-			} );
-		} catch ( error ) {
+			});
+		} catch (error) {
 			// translation not found, let's fetch it
 		}
 	}
 
-	console.log( 'fetching', getLanguageUrl( locale ) );
-	const localeUrl = getLanguageUrl( locale );
-	return fetch( localeUrl )
-		.then( ( response ) => response.json() )
-		.then( ( body ) => {
+	console.log('fetching', getLanguageUrl(locale));
+	const localeUrl = getLanguageUrl(locale);
+	return fetch(localeUrl)
+		.then((response) => response.json())
+		.then((body) => {
 			return { response: body, locale };
-		} )
-		.catch( () => {
-			console.error( `Could not find translation file ${ localeUrl }` );
-		} );
+		})
+		.catch(() => {
+			console.error(`Could not find translation file ${localeUrl}`);
+		});
 };
 
 const fetchTranslations = () => {
-	const fetchPromises = supportedLocales.map( ( locale ) =>
-		fetchTranslation( locale )
+	const fetchPromises = supportedLocales.map((locale) =>
+		fetchTranslation(locale)
 	);
 
-	return Promise.all( fetchPromises ).then( ( results ) => {
-		const fetchedTranslations = results.filter( Boolean );
+	return Promise.all(fetchPromises).then((results) => {
+		const fetchedTranslations = results.filter(Boolean);
 		const translationFilePromises = fetchedTranslations.map(
-			( languageResult ) => {
-				return new Promise( ( resolve, reject ) => {
+			(languageResult) => {
+				return new Promise((resolve, reject) => {
 					const translationRelativePath = getTranslationFilePath(
 						languageResult.locale
 					);
 
-					if ( languageResult.inCache ) {
+					if (languageResult.inCache) {
 						languageResult.path = translationRelativePath;
-						resolve( translationRelativePath );
+						resolve(translationRelativePath);
 						return;
 					}
 
@@ -120,24 +119,24 @@ const fetchTranslations = () => {
 
 					fs.writeFile(
 						translationAbsolutePath,
-						JSON.stringify( languageResult.response ),
+						JSON.stringify(languageResult.response),
 						'utf8',
-						( err ) => {
-							if ( err ) {
-								reject( err );
+						(err) => {
+							if (err) {
+								reject(err);
 							} else {
 								languageResult.path = translationRelativePath;
-								resolve( translationRelativePath );
+								resolve(translationRelativePath);
 							}
 						}
 					);
-				} );
+				});
 			}
 		);
-		return Promise.all( translationFilePromises ).then(
+		return Promise.all(translationFilePromises).then(
 			() => fetchedTranslations
 		);
-	} );
+	});
 };
 
 module.exports = {
@@ -145,19 +144,19 @@ module.exports = {
 };
 
 // if run as a script
-if ( require.main === module ) {
-	fetchTranslations().then( ( translations ) => {
+if (require.main === module) {
+	fetchTranslations().then((translations) => {
 		const indexNative = `/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */
 /* eslint-disable prettier/prettier */
 
 const translations = {
-${ translations
-	.filter( Boolean )
+${translations
+	.filter(Boolean)
 	.map(
-		( translation ) =>
-			`\t"${ translation.locale }": require( "${ translation.path }" ),`
+		(translation) =>
+			`\t"${translation.locale}": require( "${translation.path}" ),`
 	)
-	.join( '\n' ) }
+	.join('\n')}
 };
 
 export const getTranslation = ( locale ) => translations[ locale ];
@@ -166,18 +165,18 @@ export const getTranslation = ( locale ) => translations[ locale ];
 `;
 
 		fs.writeFile(
-			path.join( __dirname, 'index.native.js' ),
+			path.join(__dirname, 'index.native.js'),
 			indexNative,
 			'utf8',
-			( error ) => {
-				if ( error ) {
-					console.error( error );
+			(error) => {
+				if (error) {
+					console.error(error);
 					return;
 				}
-				console.log( 'Done.' );
+				console.log('Done.');
 			}
 		);
-	} );
+	});
 }
 
 /* eslint-enable no-console */

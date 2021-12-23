@@ -13,36 +13,36 @@ class Listener {
 		/** @type {any} */
 		this.listeners = {};
 
-		this.handleEvent = this.handleEvent.bind( this );
+		this.handleEvent = this.handleEvent.bind(this);
 	}
 
-	add( /** @type {any} */ eventType, /** @type {any} */ instance ) {
-		if ( ! this.listeners[ eventType ] ) {
+	add(/** @type {any} */ eventType, /** @type {any} */ instance) {
+		if (!this.listeners[eventType]) {
 			// Adding first listener for this type, so bind event.
-			window.addEventListener( eventType, this.handleEvent );
-			this.listeners[ eventType ] = [];
+			window.addEventListener(eventType, this.handleEvent);
+			this.listeners[eventType] = [];
 		}
 
-		this.listeners[ eventType ].push( instance );
+		this.listeners[eventType].push(instance);
 	}
 
-	remove( /** @type {any} */ eventType, /** @type {any} */ instance ) {
-		this.listeners[ eventType ] = without(
-			this.listeners[ eventType ],
+	remove(/** @type {any} */ eventType, /** @type {any} */ instance) {
+		this.listeners[eventType] = without(
+			this.listeners[eventType],
 			instance
 		);
 
-		if ( ! this.listeners[ eventType ].length ) {
+		if (!this.listeners[eventType].length) {
 			// Removing last listener for this type, so unbind event.
-			window.removeEventListener( eventType, this.handleEvent );
-			delete this.listeners[ eventType ];
+			window.removeEventListener(eventType, this.handleEvent);
+			delete this.listeners[eventType];
 		}
 	}
 
-	handleEvent( /** @type {any} */ event ) {
-		forEach( this.listeners[ event.type ], ( instance ) => {
-			instance.handleEvent( event );
-		} );
+	handleEvent(/** @type {any} */ event) {
+		forEach(this.listeners[event.type], (instance) => {
+			instance.handleEvent(event);
+		});
 	}
 }
 

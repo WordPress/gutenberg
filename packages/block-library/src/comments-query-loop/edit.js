@@ -15,36 +15,34 @@ import { __ } from '@wordpress/i18n';
  */
 import QueryToolbar from './toolbar';
 
-const TEMPLATE = [ [ 'core/comment-template' ] ];
+const TEMPLATE = [['core/comment-template']];
 
-export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
+export default function CommentsQueryLoopEdit({ attributes, setAttributes }) {
 	const { perPage, tagName: TagName } = attributes;
 
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		template: TEMPLATE,
-	} );
+	});
 
 	return (
 		<>
 			<BlockControls>
-				<QueryToolbar perPage={ perPage } setQuery={ setAttributes } />
+				<QueryToolbar perPage={perPage} setQuery={setAttributes} />
 			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
-					label={ __( 'HTML element' ) }
-					options={ [
-						{ label: __( 'Default (<div>)' ), value: 'div' },
+					label={__('HTML element')}
+					options={[
+						{ label: __('Default (<div>)'), value: 'div' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<aside>', value: 'aside' },
-					] }
-					value={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
+					]}
+					value={TagName}
+					onChange={(value) => setAttributes({ tagName: value })}
 				/>
 			</InspectorControls>
-			<TagName { ...innerBlocksProps } />
+			<TagName {...innerBlocksProps} />
 		</>
 	);
 }

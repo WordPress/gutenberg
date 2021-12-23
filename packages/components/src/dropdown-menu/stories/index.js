@@ -22,9 +22,9 @@ export default {
 };
 
 export const _default = () => {
-	const label = text( 'Label', 'Select a direction.' );
-	const firstMenuItemLabel = text( 'First Menu Item Label', 'Up' );
-	const secondMenuItemLabel = text( 'First Menu Item Label', 'Down' );
+	const label = text('Label', 'Select a direction.');
+	const firstMenuItemLabel = text('First Menu Item Label', 'Up');
+	const secondMenuItemLabel = text('First Menu Item Label', 'Down');
 
 	const controls = [
 		{
@@ -37,5 +37,5 @@ export const _default = () => {
 		},
 	];
 
-	return <DropdownMenu icon={ menu } label={ label } controls={ controls } />;
+	return <DropdownMenu icon={menu} label={label} controls={controls} />;
 };

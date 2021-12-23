@@ -10,7 +10,7 @@ import { useHover } from 'react-use-gesture';
 import BaseTooltip from '../tooltip';
 import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
 
-export default function BoxUnitControl( {
+export default function BoxUnitControl({
 	isFirst,
 	isLast,
 	isOnly,
@@ -19,37 +19,37 @@ export default function BoxUnitControl( {
 	label,
 	value,
 	...props
-} ) {
-	const bindHoverGesture = useHover( ( { event, ...state } ) => {
-		if ( state.hovering ) {
-			onHoverOn( event, state );
+}) {
+	const bindHoverGesture = useHover(({ event, ...state }) => {
+		if (state.hovering) {
+			onHoverOn(event, state);
 		} else {
-			onHoverOff( event, state );
+			onHoverOff(event, state);
 		}
-	} );
+	});
 
 	return (
-		<UnitControlWrapper { ...bindHoverGesture() }>
-			<Tooltip text={ label }>
+		<UnitControlWrapper {...bindHoverGesture()}>
+			<Tooltip text={label}>
 				<UnitControl
-					aria-label={ label }
+					aria-label={label}
 					className="component-box-control__unit-control"
 					hideHTMLArrows
-					isFirst={ isFirst }
-					isLast={ isLast }
-					isOnly={ isOnly }
+					isFirst={isFirst}
+					isLast={isLast}
+					isOnly={isOnly}
 					isPressEnterToChange
-					isResetValueOnUnitChange={ false }
-					value={ value }
-					{ ...props }
+					isResetValueOnUnitChange={false}
+					value={value}
+					{...props}
 				/>
 			</Tooltip>
 		</UnitControlWrapper>
 	);
 }
 
-function Tooltip( { children, text } ) {
-	if ( ! text ) return children;
+function Tooltip({ children, text }) {
+	if (!text) return children;
 
 	/**
 	 * Wrapping the children in a `<div />` as Tooltip as it attempts
@@ -60,8 +60,8 @@ function Tooltip( { children, text } ) {
 	 * https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
 	 */
 	return (
-		<BaseTooltip text={ text } position="top">
-			<div>{ children }</div>
+		<BaseTooltip text={text} position="top">
+			<div>{children}</div>
 		</BaseTooltip>
 	);
 }

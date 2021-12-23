@@ -16,11 +16,11 @@ export type FormGroupLabelProps = ControlLabelProps & {
 };
 
 export type FormGroupContentProps = FormGroupLabelProps & {
-	alignLabel?: CSSProperties[ 'textAlign' ];
+	alignLabel?: CSSProperties['textAlign'];
 	help?: ReactNode;
 	horizontal?: boolean;
 	label?: ReactNode;
-	spacing?: CSSProperties[ 'width' ];
+	spacing?: CSSProperties['width'];
 	truncate?: boolean;
 };
 
@@ -30,4 +30,4 @@ type Horizontal = GridProps & {
 
 type Vertical = { horizontal: false };
 
-export type FormGroupProps = FormGroupContentProps & ( Horizontal | Vertical );
+export type FormGroupProps = FormGroupContentProps & (Horizontal | Vertical);

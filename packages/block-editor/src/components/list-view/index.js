@@ -28,12 +28,12 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
-const expanded = ( state, action ) => {
-	switch ( action.type ) {
+const expanded = (state, action) => {
+	switch (action.type) {
 		case 'expand':
-			return { ...state, ...{ [ action.clientId ]: true } };
+			return { ...state, ...{ [action.clientId]: true } };
 		case 'collapse':
-			return { ...state, ...{ [ action.clientId ]: false } };
+			return { ...state, ...{ [action.clientId]: false } };
 		default:
 			return state;
 	}
@@ -67,49 +67,45 @@ function ListView(
 	},
 	ref
 ) {
-	const {
-		clientIdsTree,
-		draggedClientIds,
-		selectedClientIds,
-	} = useListViewClientIds( blocks );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { clientIdsTree, draggedClientIds, selectedClientIds } =
+		useListViewClientIds(blocks);
+	const { selectBlock } = useDispatch(blockEditorStore);
 	const { visibleBlockCount } = useSelect(
-		( select ) => {
-			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
-				blockEditorStore
-			);
+		(select) => {
+			const { getGlobalBlockCount, getClientIdsOfDescendants } =
+				select(blockEditorStore);
 			const draggedBlockCount =
 				draggedClientIds?.length > 0
-					? getClientIdsOfDescendants( draggedClientIds ).length + 1
+					? getClientIdsOfDescendants(draggedClientIds).length + 1
 					: 0;
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
 			};
 		},
-		[ draggedClientIds ]
+		[draggedClientIds]
 	);
 	const selectEditorBlock = useCallback(
-		( clientId ) => {
-			selectBlock( clientId );
-			onSelect( clientId );
+		(clientId) => {
+			selectBlock(clientId);
+			onSelect(clientId);
 		},
-		[ selectBlock, onSelect ]
+		[selectBlock, onSelect]
 	);
-	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
+	const [expandedState, setExpandedState] = useReducer(expanded, {});
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
 	const elementRef = useRef();
-	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
+	const treeGridRef = useMergeRefs([elementRef, dropZoneRef, ref]);
 
-	const isMounted = useRef( false );
-	useEffect( () => {
+	const isMounted = useRef(false);
+	useEffect(() => {
 		isMounted.current = true;
-	}, [] );
+	}, []);
 
 	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
 	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
-	const [ fixedListWindow ] = useFixedWindowList(
+	const [fixedListWindow] = useFixedWindowList(
 		elementRef,
 		36,
 		visibleBlockCount,
@@ -120,38 +116,38 @@ function ListView(
 	);
 
 	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		(clientId) => {
+			if (!clientId) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientId } );
+			setExpandedState({ type: 'expand', clientId });
 		},
-		[ setExpandedState ]
+		[setExpandedState]
 	);
 	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		(clientId) => {
+			if (!clientId) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientId } );
+			setExpandedState({ type: 'collapse', clientId });
 		},
-		[ setExpandedState ]
+		[setExpandedState]
 	);
 	const expandRow = useCallback(
-		( row ) => {
-			expand( row?.dataset?.block );
+		(row) => {
+			expand(row?.dataset?.block);
 		},
-		[ expand ]
+		[expand]
 	);
 	const collapseRow = useCallback(
-		( row ) => {
-			collapse( row?.dataset?.block );
+		(row) => {
+			collapse(row?.dataset?.block);
 		},
-		[ collapse ]
+		[collapse]
 	);
 
 	const contextValue = useMemo(
-		() => ( {
+		() => ({
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			__experimentalHideContainerBlockActions,
@@ -160,7 +156,7 @@ function ListView(
 			expandedState,
 			expand,
 			collapse,
-		} ),
+		}),
 		[
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
@@ -174,31 +170,31 @@ function ListView(
 	);
 
 	return (
-		<AsyncModeProvider value={ true }>
+		<AsyncModeProvider value={true}>
 			<ListViewDropIndicator
-				listViewRef={ elementRef }
-				blockDropTarget={ blockDropTarget }
+				listViewRef={elementRef}
+				blockDropTarget={blockDropTarget}
 			/>
 			<TreeGrid
 				className="block-editor-list-view-tree"
-				aria-label={ __( 'Block navigation structure' ) }
-				ref={ treeGridRef }
-				onCollapseRow={ collapseRow }
-				onExpandRow={ expandRow }
+				aria-label={__('Block navigation structure')}
+				ref={treeGridRef}
+				onCollapseRow={collapseRow}
+				onExpandRow={expandRow}
 			>
-				<ListViewContext.Provider value={ contextValue }>
+				<ListViewContext.Provider value={contextValue}>
 					<ListViewBranch
-						blocks={ clientIdsTree }
-						selectBlock={ selectEditorBlock }
-						showNestedBlocks={ showNestedBlocks }
-						showBlockMovers={ showBlockMovers }
-						fixedListWindow={ fixedListWindow }
-						selectedClientIds={ selectedClientIds }
-						{ ...props }
+						blocks={clientIdsTree}
+						selectBlock={selectEditorBlock}
+						showNestedBlocks={showNestedBlocks}
+						showBlockMovers={showBlockMovers}
+						fixedListWindow={fixedListWindow}
+						selectedClientIds={selectedClientIds}
+						{...props}
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>
 		</AsyncModeProvider>
 	);
 }
-export default forwardRef( ListView );
+export default forwardRef(ListView);

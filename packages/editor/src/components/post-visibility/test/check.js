@@ -8,20 +8,20 @@ import { shallow } from 'enzyme';
  */
 import { PostVisibilityCheck } from '../check';
 
-describe( 'PostVisibilityCheck', () => {
-	const render = ( { canEdit } ) => ( canEdit ? 'yes' : 'no' );
+describe('PostVisibilityCheck', () => {
+	const render = ({ canEdit }) => (canEdit ? 'yes' : 'no');
 
-	it( "should not render the edit link if the user doesn't have the right capability", () => {
+	it("should not render the edit link if the user doesn't have the right capability", () => {
 		const wrapper = shallow(
-			<PostVisibilityCheck hasPublishAction={ false } render={ render } />
+			<PostVisibilityCheck hasPublishAction={false} render={render} />
 		);
-		expect( wrapper.text() ).toBe( 'no' );
-	} );
+		expect(wrapper.text()).toBe('no');
+	});
 
-	it( 'should render if the user has the correct capability', () => {
+	it('should render if the user has the correct capability', () => {
 		const wrapper = shallow(
-			<PostVisibilityCheck hasPublishAction={ true } render={ render } />
+			<PostVisibilityCheck hasPublishAction={true} render={render} />
 		);
-		expect( wrapper.text() ).toBe( 'yes' );
-	} );
-} );
+		expect(wrapper.text()).toBe('yes');
+	});
+});

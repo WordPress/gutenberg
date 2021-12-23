@@ -19,7 +19,7 @@ import { useCx } from '../utils/hooks/use-cx';
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
-export default function useTruncate( props ) {
+export default function useTruncate(props) {
 	const {
 		className,
 		children,
@@ -28,12 +28,12 @@ export default function useTruncate( props ) {
 		limit = 0,
 		numberOfLines = 0,
 		...otherProps
-	} = useContextSystem( props, 'Truncate' );
+	} = useContextSystem(props, 'Truncate');
 
 	const cx = useCx();
 
 	const truncatedContent = truncateContent(
-		typeof children === 'string' ? /** @type {string} */ ( children ) : '',
+		typeof children === 'string' ? /** @type {string} */ (children) : '',
 		{
 			ellipsis,
 			ellipsizeMode,
@@ -44,22 +44,22 @@ export default function useTruncate( props ) {
 
 	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
 
-	const classes = useMemo( () => {
+	const classes = useMemo(() => {
 		const sx = {};
 
 		sx.numberOfLines = css`
 			-webkit-box-orient: vertical;
-			-webkit-line-clamp: ${ numberOfLines };
+			-webkit-line-clamp: ${numberOfLines};
 			display: -webkit-box;
 			overflow: hidden;
 		`;
 
 		return cx(
-			shouldTruncate && ! numberOfLines && styles.Truncate,
-			shouldTruncate && !! numberOfLines && sx.numberOfLines,
+			shouldTruncate && !numberOfLines && styles.Truncate,
+			shouldTruncate && !!numberOfLines && sx.numberOfLines,
 			className
 		);
-	}, [ className, numberOfLines, shouldTruncate ] );
+	}, [className, numberOfLines, shouldTruncate]);
 
 	return { ...otherProps, className: classes, children: truncatedContent };
 }

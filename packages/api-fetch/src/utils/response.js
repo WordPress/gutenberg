@@ -11,13 +11,13 @@ import { __ } from '@wordpress/i18n';
  *
  * @return {Promise<any> | null | Response} Parsed response.
  */
-const parseResponse = ( response, shouldParseResponse = true ) => {
-	if ( shouldParseResponse ) {
-		if ( response.status === 204 ) {
+const parseResponse = (response, shouldParseResponse = true) => {
+	if (shouldParseResponse) {
+		if (response.status === 204) {
 			return null;
 		}
 
-		return response.json ? response.json() : Promise.reject( response );
+		return response.json ? response.json() : Promise.reject(response);
 	}
 
 	return response;
@@ -30,19 +30,19 @@ const parseResponse = ( response, shouldParseResponse = true ) => {
  * @param {Response} response
  * @return {Promise<any>} Parsed response.
  */
-const parseJsonAndNormalizeError = ( response ) => {
+const parseJsonAndNormalizeError = (response) => {
 	const invalidJsonError = {
 		code: 'invalid_json',
-		message: __( 'The response is not a valid JSON response.' ),
+		message: __('The response is not a valid JSON response.'),
 	};
 
-	if ( ! response || ! response.json ) {
+	if (!response || !response.json) {
 		throw invalidJsonError;
 	}
 
-	return response.json().catch( () => {
+	return response.json().catch(() => {
 		throw invalidJsonError;
-	} );
+	});
 };
 
 /**
@@ -57,9 +57,9 @@ export const parseResponseAndNormalizeError = (
 	response,
 	shouldParseResponse = true
 ) => {
-	return Promise.resolve(
-		parseResponse( response, shouldParseResponse )
-	).catch( ( res ) => parseAndThrowError( res, shouldParseResponse ) );
+	return Promise.resolve(parseResponse(response, shouldParseResponse)).catch(
+		(res) => parseAndThrowError(res, shouldParseResponse)
+	);
 };
 
 /**
@@ -69,17 +69,17 @@ export const parseResponseAndNormalizeError = (
  * @param {boolean}  shouldParseResponse
  * @return {Promise<any>} Parsed response.
  */
-export function parseAndThrowError( response, shouldParseResponse = true ) {
-	if ( ! shouldParseResponse ) {
+export function parseAndThrowError(response, shouldParseResponse = true) {
+	if (!shouldParseResponse) {
 		throw response;
 	}
 
-	return parseJsonAndNormalizeError( response ).then( ( error ) => {
+	return parseJsonAndNormalizeError(response).then((error) => {
 		const unknownError = {
 			code: 'unknown_error',
-			message: __( 'An unknown error occurred.' ),
+			message: __('An unknown error occurred.'),
 		};
 
 		throw error || unknownError;
-	} );
+	});
 }

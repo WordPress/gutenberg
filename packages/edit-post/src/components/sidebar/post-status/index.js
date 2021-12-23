@@ -25,16 +25,16 @@ import { store as editPostStore } from '../../../store';
  */
 const PANEL_NAME = 'post-status';
 
-function PostStatus( { isOpened, onTogglePanel } ) {
+function PostStatus({ isOpened, onTogglePanel }) {
 	return (
 		<PanelBody
 			className="edit-post-post-status"
-			title={ __( 'Status & visibility' ) }
-			opened={ isOpened }
-			onToggle={ onTogglePanel }
+			title={__('Status & visibility')}
+			opened={isOpened}
+			onToggle={onTogglePanel}
 		>
 			<PluginPostStatusInfo.Slot>
-				{ ( fills ) => (
+				{(fills) => (
 					<>
 						<PostVisibility />
 						<PostSchedule />
@@ -43,33 +43,30 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostPendingStatus />
 						<PostSlug />
 						<PostAuthor />
-						{ fills }
+						{fills}
 						<PostTrash />
 					</>
-				) }
+				)}
 			</PluginPostStatusInfo.Slot>
 		</PanelBody>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
+export default compose([
+	withSelect((select) => {
 		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved, isEditorPanelOpened } = select(
-			editPostStore
-		);
+		const { isEditorPanelRemoved, isEditorPanelOpened } =
+			select(editPostStore);
 		return {
-			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
-			isOpened: isEditorPanelOpened( PANEL_NAME ),
+			isRemoved: isEditorPanelRemoved(PANEL_NAME),
+			isOpened: isEditorPanelOpened(PANEL_NAME),
 		};
-	} ),
-	ifCondition( ( { isRemoved } ) => ! isRemoved ),
-	withDispatch( ( dispatch ) => ( {
+	}),
+	ifCondition(({ isRemoved }) => !isRemoved),
+	withDispatch((dispatch) => ({
 		onTogglePanel() {
-			return dispatch( editPostStore ).toggleEditorPanelOpened(
-				PANEL_NAME
-			);
+			return dispatch(editPostStore).toggleEditorPanelOpened(PANEL_NAME);
 		},
-	} ) ),
-] )( PostStatus );
+	})),
+])(PostStatus);

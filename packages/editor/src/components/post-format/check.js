@@ -9,17 +9,17 @@ import { withSelect } from '@wordpress/data';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 
-function PostFormatCheck( { disablePostFormats, ...props } ) {
+function PostFormatCheck({ disablePostFormats, ...props }) {
 	return (
-		! disablePostFormats && (
-			<PostTypeSupportCheck { ...props } supportKeys="post-formats" />
+		!disablePostFormats && (
+			<PostTypeSupportCheck {...props} supportKeys="post-formats" />
 		)
 	);
 }
 
-export default withSelect( ( select ) => {
-	const editorSettings = select( editorStore ).getEditorSettings();
+export default withSelect((select) => {
+	const editorSettings = select(editorStore).getEditorSettings();
 	return {
 		disablePostFormats: editorSettings.disablePostFormats,
 	};
-} )( PostFormatCheck );
+})(PostFormatCheck);

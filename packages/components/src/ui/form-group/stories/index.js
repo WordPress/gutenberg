@@ -5,11 +5,11 @@ import { FormGroup, useFormGroupContextId } from '../index';
 import { Text } from '../../../text';
 
 // @todo: Refactor this after adding next TextInput component.
-const TextInput = ( { id: idProp, ...props } ) => {
-	const id = useFormGroupContextId( idProp );
+const TextInput = ({ id: idProp, ...props }) => {
+	const id = useFormGroupContextId(idProp);
 	return (
 		<div>
-			<input type="text" id={ id } { ...props } />
+			<input type="text" id={id} {...props} />
 		</div>
 	);
 };
@@ -37,7 +37,7 @@ export const _labelHidden = () => {
 
 export const _help = () => {
 	return (
-		<FormGroup help={ <Text>Help Text</Text> } label="Form Group">
+		<FormGroup help={<Text>Help Text</Text>} label="Form Group">
 			<TextInput />
 		</FormGroup>
 	);

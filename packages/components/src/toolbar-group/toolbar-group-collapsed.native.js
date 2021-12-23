@@ -12,25 +12,25 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import DropdownMenu from '../dropdown-menu';
 import styles from './style.scss';
 
-function ToolbarGroupCollapsed( {
+function ToolbarGroupCollapsed({
 	controls = [],
 	getStylesFromColorScheme,
 	passedStyle,
 	...props
-} ) {
+}) {
 	return (
 		<View
-			style={ [
+			style={[
 				getStylesFromColorScheme(
 					styles.container,
 					styles.containerDark
 				),
 				passedStyle,
-			] }
+			]}
 		>
-			<DropdownMenu controls={ controls } { ...props } />
+			<DropdownMenu controls={controls} {...props} />
 		</View>
 	);
 }
 
-export default withPreferredColorScheme( ToolbarGroupCollapsed );
+export default withPreferredColorScheme(ToolbarGroupCollapsed);

@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import { Icon } from '@wordpress/icons';
 
-export const StyledIcon = styled( Icon )`
+export const StyledIcon = styled(Icon)`
 	width: 1.4em;
 	height: 1.4em;
 	margin: -0.2em 0.1em 0;

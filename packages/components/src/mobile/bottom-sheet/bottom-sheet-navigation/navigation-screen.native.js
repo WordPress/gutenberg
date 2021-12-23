@@ -22,14 +22,14 @@ import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
 import styles from './styles.scss';
 
-const BottomSheetNavigationScreen = ( {
+const BottomSheetNavigationScreen = ({
 	children,
 	fullScreen,
 	isScrollable,
 	isNested,
-} ) => {
+}) => {
 	const navigation = useNavigation();
-	const heightRef = useRef( { maxHeight: 0 } );
+	const heightRef = useRef({ maxHeight: 0 });
 	const isFocused = useIsFocused();
 	const {
 		onHandleHardwareButtonPress,
@@ -37,68 +37,66 @@ const BottomSheetNavigationScreen = ( {
 		setIsFullScreen,
 		listProps,
 		safeAreaBottomInset,
-	} = useContext( BottomSheetContext );
+	} = useContext(BottomSheetContext);
 
-	const { setHeight } = useContext( BottomSheetNavigationContext );
+	const { setHeight } = useContext(BottomSheetNavigationContext);
 
-	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [
-		setHeight,
-	] );
+	const setHeightDebounce = useCallback(debounce(setHeight, 10), [setHeight]);
 
 	useFocusEffect(
-		useCallback( () => {
-			onHandleHardwareButtonPress( () => {
-				if ( navigation.canGoBack() ) {
-					shouldEnableBottomSheetMaxHeight( true );
+		useCallback(() => {
+			onHandleHardwareButtonPress(() => {
+				if (navigation.canGoBack()) {
+					shouldEnableBottomSheetMaxHeight(true);
 					navigation.goBack();
 					return true;
 				}
-				onHandleHardwareButtonPress( null );
+				onHandleHardwareButtonPress(null);
 				return false;
-			} );
-			if ( fullScreen ) {
-				setHeight( '100%' );
-				setIsFullScreen( true );
-			} else if ( heightRef.current.maxHeight !== 0 ) {
-				setIsFullScreen( false );
-				setHeight( heightRef.current.maxHeight );
+			});
+			if (fullScreen) {
+				setHeight('100%');
+				setIsFullScreen(true);
+			} else if (heightRef.current.maxHeight !== 0) {
+				setIsFullScreen(false);
+				setHeight(heightRef.current.maxHeight);
 			}
 			return () => {};
-		}, [] )
+		}, [])
 	);
-	const onLayout = ( { nativeEvent } ) => {
-		if ( fullScreen ) {
+	const onLayout = ({ nativeEvent }) => {
+		if (fullScreen) {
 			return;
 		}
 		const { height } = nativeEvent.layout;
 
-		if ( heightRef.current.maxHeight !== height && isFocused ) {
+		if (heightRef.current.maxHeight !== height && isFocused) {
 			heightRef.current.maxHeight = height;
-			setHeightDebounce( height );
+			setHeightDebounce(height);
 		}
 	};
-	return useMemo( () => {
+	return useMemo(() => {
 		return isScrollable || isNested ? (
-			<View onLayout={ onLayout }>{ children }</View>
+			<View onLayout={onLayout}>{children}</View>
 		) : (
-			<ScrollView { ...listProps }>
-				<TouchableHighlight accessible={ false }>
-					<View onLayout={ onLayout }>
-						{ children }
-						{ ! isNested && (
+			<ScrollView {...listProps}>
+				<TouchableHighlight accessible={false}>
+					<View onLayout={onLayout}>
+						{children}
+						{!isNested && (
 							<View
-								style={ {
+								style={{
 									height:
 										safeAreaBottomInset ||
 										styles.scrollableContent.paddingBottom,
-								} }
+								}}
 							/>
-						) }
+						)}
 					</View>
 				</TouchableHighlight>
 			</ScrollView>
 		);
-	}, [ children, isFocused, safeAreaBottomInset, listProps ] );
+	}, [children, isFocused, safeAreaBottomInset, listProps]);
 };
 
 export default BottomSheetNavigationScreen;

@@ -13,30 +13,30 @@ import { isThemeInstalled } from './theme-installed';
  * @param {Object?} settings            Optional settings object.
  * @param {string?} settings.searchTerm Search term to use if the theme is not findable by its slug.
  */
-export async function installTheme( slug, { searchTerm } = {} ) {
+export async function installTheme(slug, { searchTerm } = {}) {
 	await switchUserToAdmin();
 
-	const installed = await isThemeInstalled( slug );
-	if ( installed ) {
+	const installed = await isThemeInstalled(slug);
+	if (installed) {
 		return;
 	}
 
 	await visitAdminPage(
 		'theme-install.php',
-		`search=${ encodeURIComponent( searchTerm || slug ) }`
+		`search=${encodeURIComponent(searchTerm || slug)}`
 	);
-	await page.waitForSelector( `div[data-slug="${ slug }"]` );
+	await page.waitForSelector(`div[data-slug="${slug}"]`);
 
 	const activateLink = await page.$(
-		`div[data-slug="${ slug }"] .button.activate`
+		`div[data-slug="${slug}"] .button.activate`
 	);
-	if ( activateLink ) {
+	if (activateLink) {
 		await switchUserToTest();
 		return;
 	}
 
-	await page.waitForSelector( `.theme-install[data-slug="${ slug }"]` );
-	await page.click( `.theme-install[data-slug="${ slug }"]` );
-	await page.waitForSelector( `.theme[data-slug="${ slug }"] .activate` );
+	await page.waitForSelector(`.theme-install[data-slug="${slug}"]`);
+	await page.click(`.theme-install[data-slug="${slug}"]`);
+	await page.waitForSelector(`.theme[data-slug="${slug}"] .activate`);
 	await switchUserToTest();
 }

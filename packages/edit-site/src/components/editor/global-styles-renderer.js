@@ -15,25 +15,25 @@ import { store as editSiteStore } from '../../store';
 import { useGlobalStylesOutput } from '../global-styles/use-global-styles-output';
 
 function useGlobalStylesRenderer() {
-	const [ styles, settings ] = useGlobalStylesOutput();
-	const { getSettings } = useSelect( editSiteStore );
-	const { updateSettings } = useDispatch( editSiteStore );
+	const [styles, settings] = useGlobalStylesOutput();
+	const { getSettings } = useSelect(editSiteStore);
+	const { updateSettings } = useDispatch(editSiteStore);
 
-	useEffect( () => {
-		if ( ! styles || ! settings ) {
+	useEffect(() => {
+		if (!styles || !settings) {
 			return;
 		}
 
 		const currentStoreSettings = getSettings();
 		const nonGlobalStyles = currentStoreSettings?.styles?.filter(
-			( style ) => ! style.isGlobalStyles
+			(style) => !style.isGlobalStyles
 		);
-		updateSettings( {
+		updateSettings({
 			...currentStoreSettings,
-			styles: [ ...nonGlobalStyles, ...styles ],
+			styles: [...nonGlobalStyles, ...styles],
 			__experimentalFeatures: settings,
-		} );
-	}, [ styles, settings ] );
+		});
+	}, [styles, settings]);
 }
 
 export function GlobalStylesRenderer() {

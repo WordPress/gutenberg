@@ -8,12 +8,12 @@ const transforms = {
 		{
 			type: 'raw',
 			schema: {
-				'wp-block': { attributes: [ 'data-block' ] },
+				'wp-block': { attributes: ['data-block'] },
 			},
-			isMatch: ( node ) =>
+			isMatch: (node) =>
 				node.dataset && node.dataset.block === 'core/nextpage',
 			transform() {
-				return createBlock( 'core/nextpage', {} );
+				return createBlock('core/nextpage', {});
 			},
 		},
 	],

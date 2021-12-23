@@ -46,40 +46,40 @@ const blockAttributes = {
 	},
 	direction: {
 		type: 'string',
-		enum: [ 'ltr', 'rtl' ],
+		enum: ['ltr', 'rtl'],
 	},
 	style: {
 		type: 'object',
 	},
 };
 
-const migrateCustomColorsAndFontSizes = ( attributes ) => {
+const migrateCustomColorsAndFontSizes = (attributes) => {
 	if (
-		! attributes.customTextColor &&
-		! attributes.customBackgroundColor &&
-		! attributes.customFontSize
+		!attributes.customTextColor &&
+		!attributes.customBackgroundColor &&
+		!attributes.customFontSize
 	) {
 		return attributes;
 	}
 	const style = {};
-	if ( attributes.customTextColor || attributes.customBackgroundColor ) {
+	if (attributes.customTextColor || attributes.customBackgroundColor) {
 		style.color = {};
 	}
-	if ( attributes.customTextColor ) {
+	if (attributes.customTextColor) {
 		style.color.text = attributes.customTextColor;
 	}
-	if ( attributes.customBackgroundColor ) {
+	if (attributes.customBackgroundColor) {
 		style.color.background = attributes.customBackgroundColor;
 	}
-	if ( attributes.customFontSize ) {
+	if (attributes.customFontSize) {
 		style.typography = { fontSize: attributes.customFontSize };
 	}
 	return {
-		...omit( attributes, [
+		...omit(attributes, [
 			'customTextColor',
 			'customBackgroundColor',
 			'customFontSize',
-		] ),
+		]),
 		style,
 	};
 };
@@ -88,7 +88,7 @@ const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...omit(blockAttributes, ['style']),
 			customTextColor: {
 				type: 'string',
 			},
@@ -100,7 +100,7 @@ const deprecated = [
 			},
 		},
 		migrate: migrateCustomColorsAndFontSizes,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				align,
 				content,
@@ -114,22 +114,22 @@ const deprecated = [
 				direction,
 			} = attributes;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
-			const fontSizeClass = getFontSizeClass( fontSize );
+			const fontSizeClass = getFontSizeClass(fontSize);
 
-			const className = classnames( {
+			const className = classnames({
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
-				[ `has-text-align-${ align }` ]: align,
-				[ fontSizeClass ]: fontSizeClass,
-				[ textClass ]: textClass,
-				[ backgroundClass ]: backgroundClass,
-			} );
+				[`has-text-align-${align}`]: align,
+				[fontSizeClass]: fontSizeClass,
+				[textClass]: textClass,
+				[backgroundClass]: backgroundClass,
+			});
 
 			const styles = {
 				backgroundColor: backgroundClass
@@ -142,10 +142,10 @@ const deprecated = [
 			return (
 				<RichText.Content
 					tagName="p"
-					style={ styles }
-					className={ className ? className : undefined }
-					value={ content }
-					dir={ direction }
+					style={styles}
+					className={className ? className : undefined}
+					value={content}
+					dir={direction}
 				/>
 			);
 		},
@@ -153,7 +153,7 @@ const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...omit(blockAttributes, ['style']),
 			customTextColor: {
 				type: 'string',
 			},
@@ -165,7 +165,7 @@ const deprecated = [
 			},
 		},
 		migrate: migrateCustomColorsAndFontSizes,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				align,
 				content,
@@ -179,21 +179,21 @@ const deprecated = [
 				direction,
 			} = attributes;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
-			const fontSizeClass = getFontSizeClass( fontSize );
+			const fontSizeClass = getFontSizeClass(fontSize);
 
-			const className = classnames( {
+			const className = classnames({
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
-				[ fontSizeClass ]: fontSizeClass,
-				[ textClass ]: textClass,
-				[ backgroundClass ]: backgroundClass,
-			} );
+				[fontSizeClass]: fontSizeClass,
+				[textClass]: textClass,
+				[backgroundClass]: backgroundClass,
+			});
 
 			const styles = {
 				backgroundColor: backgroundClass
@@ -207,10 +207,10 @@ const deprecated = [
 			return (
 				<RichText.Content
 					tagName="p"
-					style={ styles }
-					className={ className ? className : undefined }
-					value={ content }
-					dir={ direction }
+					style={styles}
+					className={className ? className : undefined}
+					value={content}
+					dir={direction}
 				/>
 			);
 		},
@@ -218,7 +218,7 @@ const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...omit(blockAttributes, ['style']),
 			customTextColor: {
 				type: 'string',
 			},
@@ -233,7 +233,7 @@ const deprecated = [
 			},
 		},
 		migrate: migrateCustomColorsAndFontSizes,
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				width,
 				align,
@@ -247,21 +247,21 @@ const deprecated = [
 				customFontSize,
 			} = attributes;
 
-			const textClass = getColorClassName( 'color', textColor );
+			const textClass = getColorClassName('color', textColor);
 			const backgroundClass = getColorClassName(
 				'background-color',
 				backgroundColor
 			);
-			const fontSizeClass = fontSize && `is-${ fontSize }-text`;
+			const fontSizeClass = fontSize && `is-${fontSize}-text`;
 
-			const className = classnames( {
-				[ `align${ width }` ]: width,
+			const className = classnames({
+				[`align${width}`]: width,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
-				[ fontSizeClass ]: fontSizeClass,
-				[ textClass ]: textClass,
-				[ backgroundClass ]: backgroundClass,
-			} );
+				[fontSizeClass]: fontSizeClass,
+				[textClass]: textClass,
+				[backgroundClass]: backgroundClass,
+			});
 
 			const styles = {
 				backgroundColor: backgroundClass
@@ -275,9 +275,9 @@ const deprecated = [
 			return (
 				<RichText.Content
 					tagName="p"
-					style={ styles }
-					className={ className ? className : undefined }
-					value={ content }
+					style={styles}
+					className={className ? className : undefined}
+					value={content}
 				/>
 			);
 		},
@@ -291,9 +291,9 @@ const deprecated = [
 					type: 'number',
 				},
 			},
-			[ 'style' ]
+			['style']
 		),
-		save( { attributes } ) {
+		save({ attributes }) {
 			const {
 				width,
 				align,
@@ -303,11 +303,11 @@ const deprecated = [
 				textColor,
 				fontSize,
 			} = attributes;
-			const className = classnames( {
-				[ `align${ width }` ]: width,
+			const className = classnames({
+				[`align${width}`]: width,
 				'has-background': backgroundColor,
 				'has-drop-cap': dropCap,
-			} );
+			});
 			const styles = {
 				backgroundColor,
 				color: textColor,
@@ -316,33 +316,29 @@ const deprecated = [
 			};
 
 			return (
-				<p
-					style={ styles }
-					className={ className ? className : undefined }
-				>
-					{ content }
+				<p style={styles} className={className ? className : undefined}>
+					{content}
 				</p>
 			);
 		},
-		migrate( attributes ) {
+		migrate(attributes) {
 			return migrateCustomColorsAndFontSizes(
-				omit( {
+				omit({
 					...attributes,
-					customFontSize: isFinite( attributes.fontSize )
+					customFontSize: isFinite(attributes.fontSize)
 						? attributes.fontSize
 						: undefined,
 					customTextColor:
-						attributes.textColor &&
-						'#' === attributes.textColor[ 0 ]
+						attributes.textColor && '#' === attributes.textColor[0]
 							? attributes.textColor
 							: undefined,
 					customBackgroundColor:
 						attributes.backgroundColor &&
-						'#' === attributes.backgroundColor[ 0 ]
+						'#' === attributes.backgroundColor[0]
 							? attributes.backgroundColor
 							: undefined,
-				} ),
-				[ 'fontSize', 'textColor', 'backgroundColor', 'style' ]
+				}),
+				['fontSize', 'textColor', 'backgroundColor', 'style']
 			);
 		},
 	},
@@ -356,10 +352,10 @@ const deprecated = [
 				default: '',
 			},
 		},
-		save( { attributes } ) {
-			return <RawHTML>{ attributes.content }</RawHTML>;
+		save({ attributes }) {
+			return <RawHTML>{attributes.content}</RawHTML>;
 		},
-		migrate( attributes ) {
+		migrate(attributes) {
 			return attributes;
 		},
 	},

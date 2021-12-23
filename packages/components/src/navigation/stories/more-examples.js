@@ -13,19 +13,17 @@ import NavigationItem from '../item';
 import NavigationMenu from '../menu';
 
 export function MoreExamplesStory() {
-	const [ activeItem, setActiveItem ] = useState( 'child-1' );
-	const [ delayedBadge, setDelayedBadge ] = useState();
-	useEffect( () => {
-		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
-		return () => clearTimeout( timeout );
-	} );
-	const [ backButtonBadge, setBackButtonBadge ] = useState( 1 );
-	const [ backButtonPreventedBadge, setBackButtonPreventedBadge ] = useState(
-		1
-	);
+	const [activeItem, setActiveItem] = useState('child-1');
+	const [delayedBadge, setDelayedBadge] = useState();
+	useEffect(() => {
+		const timeout = setTimeout(() => setDelayedBadge(2), 1500);
+		return () => clearTimeout(timeout);
+	});
+	const [backButtonBadge, setBackButtonBadge] = useState(1);
+	const [backButtonPreventedBadge, setBackButtonPreventedBadge] = useState(1);
 
 	return (
-		<Navigation activeItem={ activeItem } className="navigation-story">
+		<Navigation activeItem={activeItem} className="navigation-story">
 			<NavigationMenu title="Home">
 				<NavigationGroup title="Items without Active State">
 					<NavigationItem item="item-1" title="Item 1" />
@@ -33,7 +31,7 @@ export function MoreExamplesStory() {
 				</NavigationGroup>
 				<NavigationGroup title="Items with Unusual Features">
 					<NavigationItem
-						icon={ home }
+						icon={home}
 						item="item-sub-menu"
 						navigateToMenu="sub-menu"
 						title="Sub-Menu with Custom Back Label"
@@ -42,7 +40,7 @@ export function MoreExamplesStory() {
 						item="item-custom-back-click-handler"
 						navigateToMenu="custom-back-click-handler-menu"
 						title="Custom Back Click Handler"
-						badge={ backButtonBadge }
+						badge={backButtonBadge}
 					/>
 					<NavigationItem
 						item="item-custom-back-click-handler-prevented"
@@ -55,9 +53,9 @@ export function MoreExamplesStory() {
 						title="Navigate to Nonexistent Menu"
 					/>
 					<NavigationItem
-						badge={ delayedBadge }
+						badge={delayedBadge}
 						item="item-delayed-badge"
-						onClick={ () => setActiveItem( 'item-delayed-badge' ) }
+						onClick={() => setActiveItem('item-delayed-badge')}
 						title="Item with a Delayed Badge"
 					/>
 				</NavigationGroup>
@@ -75,7 +73,7 @@ export function MoreExamplesStory() {
 							target="_blank"
 							rel="noreferrer"
 						>
-							<Icon icon={ wordpress } />
+							<Icon icon={wordpress} />
 							<em>Custom Content</em>
 						</a>
 					</NavigationItem>
@@ -103,12 +101,12 @@ export function MoreExamplesStory() {
 			>
 				<NavigationItem
 					item="child-1"
-					onClick={ () => setActiveItem( 'child-1' ) }
+					onClick={() => setActiveItem('child-1')}
 					title="Child 1"
 				/>
 				<NavigationItem
 					item="child-2"
-					onClick={ () => setActiveItem( 'child-2' ) }
+					onClick={() => setActiveItem('child-2')}
 					title="Child 2"
 				/>
 			</NavigationMenu>
@@ -117,8 +115,8 @@ export function MoreExamplesStory() {
 				menu="custom-back-click-handler-menu"
 				title="Custom back button click handler"
 				parentMenu="root"
-				onBackButtonClick={ () =>
-					setBackButtonBadge( backButtonBadge + 1 )
+				onBackButtonClick={() =>
+					setBackButtonBadge(backButtonBadge + 1)
 				}
 				backButtonLabel="Increment badge and go back"
 			/>
@@ -127,16 +125,16 @@ export function MoreExamplesStory() {
 				menu="custom-back-click-handler-prevented-menu"
 				title="Custom back button click handler prevented"
 				parentMenu="root"
-				onBackButtonClick={ ( event ) => {
+				onBackButtonClick={(event) => {
 					event.preventDefault();
-					setBackButtonPreventedBadge( backButtonPreventedBadge + 1 );
-				} }
+					setBackButtonPreventedBadge(backButtonPreventedBadge + 1);
+				}}
 				backButtonLabel="Increment badge"
 			>
 				<NavigationItem
 					item="custom-back-click-prevented-child-1"
 					title="You can't go back from here"
-					badge={ backButtonPreventedBadge }
+					badge={backButtonPreventedBadge}
 				/>
 			</NavigationMenu>
 		</Navigation>

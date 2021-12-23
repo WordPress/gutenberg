@@ -28,9 +28,9 @@ import { cleanEmptyObject } from './utils';
  *
  * @return {boolean} Whether there is support.
  */
-export function hasMarginSupport( blockType ) {
-	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
-	return !! ( true === support || support?.margin );
+export function hasMarginSupport(blockType) {
+	const support = getBlockSupport(blockType, SPACING_SUPPORT_KEY);
+	return !!(true === support || support?.margin);
 }
 
 /**
@@ -39,7 +39,7 @@ export function hasMarginSupport( blockType ) {
  * @param {Object} props Block props.
  * @return {boolean}      Whether or not the block has a margin value set.
  */
-export function hasMarginValue( props ) {
+export function hasMarginValue(props) {
 	return props.attributes.style?.spacing?.margin !== undefined;
 }
 
@@ -51,18 +51,18 @@ export function hasMarginValue( props ) {
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
-export function resetMargin( { attributes = {}, setAttributes } ) {
+export function resetMargin({ attributes = {}, setAttributes }) {
 	const { style } = attributes;
 
-	setAttributes( {
-		style: cleanEmptyObject( {
+	setAttributes({
+		style: cleanEmptyObject({
 			...style,
 			spacing: {
 				...style?.spacing,
 				margin: undefined,
 			},
-		} ),
-	} );
+		}),
+	});
 }
 
 /**
@@ -72,11 +72,11 @@ export function resetMargin( { attributes = {}, setAttributes } ) {
  *
  * @return {boolean} Whether margin setting is disabled.
  */
-export function useIsMarginDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'spacing.margin' );
-	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'margin' );
+export function useIsMarginDisabled({ name: blockName } = {}) {
+	const isDisabled = !useSetting('spacing.margin');
+	const isInvalid = !useIsDimensionsSupportValid(blockName, 'margin');
 
-	return ! hasMarginSupport( blockName ) || isDisabled || isInvalid;
+	return !hasMarginSupport(blockName) || isDisabled || isInvalid;
 }
 
 /**
@@ -86,31 +86,31 @@ export function useIsMarginDisabled( { name: blockName } = {} ) {
  *
  * @return {WPElement} Margin edit element.
  */
-export function MarginEdit( props ) {
+export function MarginEdit(props) {
 	const {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
+	const units = useCustomUnits({
+		availableUnits: useSetting('spacing.units') || [
 			'%',
 			'px',
 			'em',
 			'rem',
 			'vw',
 		],
-	} );
-	const sides = useCustomSides( blockName, 'margin' );
+	});
+	const sides = useCustomSides(blockName, 'margin');
 	const splitOnAxis =
-		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+		sides && sides.some((side) => AXIAL_SIDES.includes(side));
 
-	if ( useIsMarginDisabled( props ) ) {
+	if (useIsMarginDisabled(props)) {
 		return null;
 	}
 
-	const onChange = ( next ) => {
+	const onChange = (next) => {
 		const newStyle = {
 			...style,
 			spacing: {
@@ -119,12 +119,12 @@ export function MarginEdit( props ) {
 			},
 		};
 
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
+		setAttributes({
+			style: cleanEmptyObject(newStyle),
+		});
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
+	const onChangeShowVisualizer = (next) => {
 		const newStyle = {
 			...style,
 			visualizers: {
@@ -132,26 +132,26 @@ export function MarginEdit( props ) {
 			},
 		};
 
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
+		setAttributes({
+			style: cleanEmptyObject(newStyle),
+		});
 	};
 
-	return Platform.select( {
+	return Platform.select({
 		web: (
 			<>
 				<BoxControl
-					values={ style?.spacing?.margin }
-					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
-					label={ __( 'Margin' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
+					values={style?.spacing?.margin}
+					onChange={onChange}
+					onChangeShowVisualizer={onChangeShowVisualizer}
+					label={__('Margin')}
+					sides={sides}
+					units={units}
+					allowReset={false}
+					splitOnAxis={splitOnAxis}
 				/>
 			</>
 		),
 		native: null,
-	} );
+	});
 }

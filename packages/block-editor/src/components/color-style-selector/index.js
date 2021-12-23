@@ -26,12 +26,12 @@ const ColorSelectorSVGIcon = () => (
  *
  * @return {*} React Icon component.
  */
-const ColorSelectorIcon = ( { style, className } ) => {
+const ColorSelectorIcon = ({ style, className }) => {
 	return (
 		<div className="block-library-colors-selector__icon-container">
 			<div
-				className={ `${ className } block-library-colors-selector__state-selection` }
-				style={ style }
+				className={`${className} block-library-colors-selector__state-selection`}
+				style={style}
 			>
 				<ColorSelectorSVGIcon />
 			</div>
@@ -48,43 +48,42 @@ const ColorSelectorIcon = ( { style, className } ) => {
  *
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {
-	onToggle,
-	isOpen,
-} ) => {
-	const openOnArrowDown = ( event ) => {
-		if ( ! isOpen && event.keyCode === DOWN ) {
-			event.preventDefault();
-			onToggle();
-		}
+const renderToggleComponent =
+	({ TextColor, BackgroundColor }) =>
+	({ onToggle, isOpen }) => {
+		const openOnArrowDown = (event) => {
+			if (!isOpen && event.keyCode === DOWN) {
+				event.preventDefault();
+				onToggle();
+			}
+		};
+
+		return (
+			<ToolbarGroup>
+				<ToolbarButton
+					className="components-toolbar__control block-library-colors-selector__toggle"
+					label={__('Open Colors Selector')}
+					onClick={onToggle}
+					onKeyDown={openOnArrowDown}
+					icon={
+						<BackgroundColor>
+							<TextColor>
+								<ColorSelectorIcon />
+							</TextColor>
+						</BackgroundColor>
+					}
+				/>
+			</ToolbarGroup>
+		);
 	};
 
-	return (
-		<ToolbarGroup>
-			<ToolbarButton
-				className="components-toolbar__control block-library-colors-selector__toggle"
-				label={ __( 'Open Colors Selector' ) }
-				onClick={ onToggle }
-				onKeyDown={ openOnArrowDown }
-				icon={
-					<BackgroundColor>
-						<TextColor>
-							<ColorSelectorIcon />
-						</TextColor>
-					</BackgroundColor>
-				}
-			/>
-		</ToolbarGroup>
-	);
-};
-
-const BlockColorsStyleSelector = ( { children, ...other } ) => (
+const BlockColorsStyleSelector = ({ children, ...other }) => (
 	<Dropdown
 		position="bottom right"
 		className="block-library-colors-selector"
 		contentClassName="block-library-colors-selector__popover"
-		renderToggle={ renderToggleComponent( other ) }
-		renderContent={ () => children }
+		renderToggle={renderToggleComponent(other)}
+		renderContent={() => children}
 	/>
 );
 

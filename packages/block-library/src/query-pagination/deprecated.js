@@ -8,7 +8,7 @@ const deprecated = [
 	{
 		save() {
 			return (
-				<div { ...useBlockProps.save() }>
+				<div {...useBlockProps.save()}>
 					<InnerBlocks.Content />
 				</div>
 			);

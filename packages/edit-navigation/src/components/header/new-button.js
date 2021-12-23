@@ -12,31 +12,29 @@ import AddMenu from '../add-menu';
 import { useSelectedMenuId } from '../../hooks';
 
 export default function NewButton() {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const [ , setSelectedMenuId ] = useSelectedMenuId();
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [, setSelectedMenuId] = useSelectedMenuId();
 
 	return (
 		<>
-			<Button variant="tertiary" onClick={ () => setIsModalOpen( true ) }>
-				{ __( 'New menu' ) }
+			<Button variant="tertiary" onClick={() => setIsModalOpen(true)}>
+				{__('New menu')}
 			</Button>
-			{ isModalOpen && (
+			{isModalOpen && (
 				<Modal
-					title={ __( 'Create a new menu' ) }
+					title={__('Create a new menu')}
 					className="edit-navigation-menu-switcher__modal"
-					onRequestClose={ () => setIsModalOpen( false ) }
+					onRequestClose={() => setIsModalOpen(false)}
 				>
 					<AddMenu
-						helpText={ __(
-							'A short descriptive name for your menu.'
-						) }
-						onCreate={ ( menuId ) => {
-							setIsModalOpen( false );
-							setSelectedMenuId( menuId );
-						} }
+						helpText={__('A short descriptive name for your menu.')}
+						onCreate={(menuId) => {
+							setIsModalOpen(false);
+							setSelectedMenuId(menuId);
+						}}
 					/>
 				</Modal>
-			) }
+			)}
 		</>
 	);
 }

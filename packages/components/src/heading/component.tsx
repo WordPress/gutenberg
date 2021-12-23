@@ -12,12 +12,12 @@ import { View } from '../view';
 import { useHeading, HeadingProps } from './hook';
 
 function Heading(
-	props: WordPressComponentProps< HeadingProps, 'h1' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps<HeadingProps, 'h1'>,
+	forwardedRef: Ref<any>
 ) {
-	const headerProps = useHeading( props );
+	const headerProps = useHeading(props);
 
-	return <View { ...headerProps } ref={ forwardedRef } />;
+	return <View {...headerProps} ref={forwardedRef} />;
 }
 
 /**
@@ -32,6 +32,6 @@ function Heading(
  * }
  * ```
  */
-const ConnectedHeading = contextConnect( Heading, 'Heading' );
+const ConnectedHeading = contextConnect(Heading, 'Heading');
 
 export default ConnectedHeading;

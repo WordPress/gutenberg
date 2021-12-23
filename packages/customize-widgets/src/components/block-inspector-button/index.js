@@ -7,30 +7,30 @@ import { MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function BlockInspectorButton( { inspector, closeMenu, ...props } ) {
+function BlockInspectorButton({ inspector, closeMenu, ...props }) {
 	const selectedBlockClientId = useSelect(
-		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
+		(select) => select(blockEditorStore).getSelectedBlockClientId(),
 		[]
 	);
 
 	const selectedBlock = useMemo(
-		() => document.getElementById( `block-${ selectedBlockClientId }` ),
-		[ selectedBlockClientId ]
+		() => document.getElementById(`block-${selectedBlockClientId}`),
+		[selectedBlockClientId]
 	);
 
 	return (
 		<MenuItem
-			onClick={ () => {
+			onClick={() => {
 				// Open the inspector.
-				inspector.open( {
+				inspector.open({
 					returnFocusWhenClose: selectedBlock,
-				} );
+				});
 				// Then close the dropdown menu.
 				closeMenu();
-			} }
-			{ ...props }
+			}}
+			{...props}
 		>
-			{ __( 'Show more settings' ) }
+			{__('Show more settings')}
 		</MenuItem>
 	);
 }

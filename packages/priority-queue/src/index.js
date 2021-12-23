@@ -80,30 +80,32 @@ export const createQueue = () => {
 	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
 	 *                                       animation frame timestamp.
 	 */
-	const runWaitingList = ( deadline ) => {
+	const runWaitingList = (deadline) => {
 		const hasTimeRemaining =
 			typeof deadline === 'number'
 				? () => false
 				: () => deadline.timeRemaining() > 0;
 
 		do {
-			if ( waitingList.length === 0 ) {
+			if (waitingList.length === 0) {
 				isRunning = false;
 				return;
 			}
 
-			const nextElement = /** @type {WPPriorityQueueContext} */ ( waitingList.shift() );
-			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
-				nextElement
-			) );
+			const nextElement = /** @type {WPPriorityQueueContext} */ (
+				waitingList.shift()
+			);
+			const callback = /** @type {WPPriorityQueueCallback} */ (
+				elementsMap.get(nextElement)
+			);
 			// If errors with undefined callbacks are encountered double check that all of your useSelect calls
 			// have all dependecies set correctly in second parameter. Missing dependencies can cause unexpected
 			// loops and race conditions in the queue.
 			callback();
-			elementsMap.delete( nextElement );
-		} while ( hasTimeRemaining() );
+			elementsMap.delete(nextElement);
+		} while (hasTimeRemaining());
 
-		requestIdleCallback( runWaitingList );
+		requestIdleCallback(runWaitingList);
 	};
 
 	/**
@@ -114,14 +116,14 @@ export const createQueue = () => {
 	 * @param {WPPriorityQueueContext}  element Context object.
 	 * @param {WPPriorityQueueCallback} item    Callback function.
 	 */
-	const add = ( element, item ) => {
-		if ( ! elementsMap.has( element ) ) {
-			waitingList.push( element );
+	const add = (element, item) => {
+		if (!elementsMap.has(element)) {
+			waitingList.push(element);
 		}
-		elementsMap.set( element, item );
-		if ( ! isRunning ) {
+		elementsMap.set(element, item);
+		if (!isRunning) {
 			isRunning = true;
-			requestIdleCallback( runWaitingList );
+			requestIdleCallback(runWaitingList);
 		}
 	};
 
@@ -135,17 +137,17 @@ export const createQueue = () => {
 	 *
 	 * @return {boolean} Whether flush was performed.
 	 */
-	const flush = ( element ) => {
-		if ( ! elementsMap.has( element ) ) {
+	const flush = (element) => {
+		if (!elementsMap.has(element)) {
 			return false;
 		}
 
-		const index = waitingList.indexOf( element );
-		waitingList.splice( index, 1 );
-		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
-			element
-		) );
-		elementsMap.delete( element );
+		const index = waitingList.indexOf(element);
+		waitingList.splice(index, 1);
+		const callback = /** @type {WPPriorityQueueCallback} */ (
+			elementsMap.get(element)
+		);
+		elementsMap.delete(element);
 		callback();
 
 		return true;

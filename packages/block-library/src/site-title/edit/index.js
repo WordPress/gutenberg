@@ -25,96 +25,93 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import LevelControl from './level-toolbar';
 
-export default function SiteTitleEdit( {
+export default function SiteTitleEdit({
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
-} ) {
+}) {
 	const { level, textAlign, isLink, linkTarget } = attributes;
-	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
-	const { canUserEdit, readOnlyTitle } = useSelect( ( select ) => {
-		const { canUser, getEntityRecord } = select( coreStore );
-		const siteData = getEntityRecord( 'root', '__unstableBase' );
+	const [title, setTitle] = useEntityProp('root', 'site', 'title');
+	const { canUserEdit, readOnlyTitle } = useSelect((select) => {
+		const { canUser, getEntityRecord } = select(coreStore);
+		const siteData = getEntityRecord('root', '__unstableBase');
 		return {
-			canUserEdit: canUser( 'update', 'settings' ),
-			readOnlyTitle: decodeEntities( siteData?.name ),
+			canUserEdit: canUser('update', 'settings'),
+			readOnlyTitle: decodeEntities(siteData?.name),
 		};
-	}, [] );
-	const TagName = level === 0 ? 'p' : `h${ level }`;
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-site-title__placeholder':
-				! canUserEdit && ! readOnlyTitle,
-		} ),
-	} );
+	}, []);
+	const TagName = level === 0 ? 'p' : `h${level}`;
+	const blockProps = useBlockProps({
+		className: classnames({
+			[`has-text-align-${textAlign}`]: textAlign,
+			'wp-block-site-title__placeholder': !canUserEdit && !readOnlyTitle,
+		}),
+	});
 	const siteTitleContent = canUserEdit ? (
-		<TagName { ...blockProps }>
+		<TagName {...blockProps}>
 			<RichText
-				tagName={ isLink ? 'a' : 'span' }
-				href={ isLink ? '#site-title-pseudo-link' : undefined }
-				aria-label={ __( 'Site title text' ) }
-				placeholder={ __( 'Write site title…' ) }
-				value={ title }
-				onChange={ setTitle }
-				allowedFormats={ [] }
+				tagName={isLink ? 'a' : 'span'}
+				href={isLink ? '#site-title-pseudo-link' : undefined}
+				aria-label={__('Site title text')}
+				placeholder={__('Write site title…')}
+				value={title}
+				onChange={setTitle}
+				allowedFormats={[]}
 				disableLineBreaks
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				__unstableOnSplitAtEnd={() =>
+					insertBlocksAfter(createBlock(getDefaultBlockName()))
 				}
 			/>
 		</TagName>
 	) : (
-		<TagName { ...blockProps }>
-			{ isLink ? (
+		<TagName {...blockProps}>
+			{isLink ? (
 				<a
 					href="#site-title-pseudo-link"
-					onClick={ ( event ) => event.preventDefault() }
+					onClick={(event) => event.preventDefault()}
 				>
-					{ readOnlyTitle || __( 'Site Title placeholder' ) }
+					{readOnlyTitle || __('Site Title placeholder')}
 				</a>
 			) : (
-				<span>{ title || readOnlyTitle }</span>
-			) }
+				<span>{title || readOnlyTitle}</span>
+			)}
 		</TagName>
 	);
 	return (
 		<>
 			<BlockControls group="block">
 				<LevelControl
-					level={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
+					level={level}
+					onChange={(newLevel) => setAttributes({ level: newLevel })}
 				/>
 				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
+					value={textAlign}
+					onChange={(nextAlign) => {
+						setAttributes({ textAlign: nextAlign });
+					}}
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={__('Link settings')}>
 					<ToggleControl
-						label={ __( 'Make title link to home' ) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
+						label={__('Make title link to home')}
+						onChange={() => setAttributes({ isLink: !isLink })}
+						checked={isLink}
 					/>
-					{ isLink && (
+					{isLink && (
 						<ToggleControl
-							label={ __( 'Open in new tab' ) }
-							onChange={ ( value ) =>
-								setAttributes( {
+							label={__('Open in new tab')}
+							onChange={(value) =>
+								setAttributes({
 									linkTarget: value ? '_blank' : '_self',
-								} )
+								})
 							}
-							checked={ linkTarget === '_blank' }
+							checked={linkTarget === '_blank'}
 						/>
-					) }
+					)}
 				</PanelBody>
 			</InspectorControls>
-			{ siteTitleContent }
+			{siteTitleContent}
 		</>
 	);
 }

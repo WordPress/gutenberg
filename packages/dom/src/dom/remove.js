@@ -9,7 +9,7 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  * @param {Node} node Node to be removed.
  * @return {void}
  */
-export default function remove( node ) {
-	assertIsDefined( node.parentNode, 'node.parentNode' );
-	node.parentNode.removeChild( node );
+export default function remove(node) {
+	assertIsDefined(node.parentNode, 'node.parentNode');
+	node.parentNode.removeChild(node);
 }

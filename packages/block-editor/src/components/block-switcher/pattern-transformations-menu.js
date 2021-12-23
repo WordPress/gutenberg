@@ -22,37 +22,37 @@ import {
 import BlockPreview from '../block-preview';
 import useTransformedPatterns from './use-transformed-patterns';
 
-function PatternTransformationsMenu( {
+function PatternTransformationsMenu({
 	blocks,
 	patterns: statePatterns,
 	onSelect,
-} ) {
-	const [ showTransforms, setShowTransforms ] = useState( false );
-	const patterns = useTransformedPatterns( statePatterns, blocks );
-	if ( ! patterns.length ) return null;
+}) {
+	const [showTransforms, setShowTransforms] = useState(false);
+	const patterns = useTransformedPatterns(statePatterns, blocks);
+	if (!patterns.length) return null;
 
 	return (
 		<MenuGroup className="block-editor-block-switcher__pattern__transforms__menugroup">
-			{ showTransforms && (
+			{showTransforms && (
 				<PreviewPatternsPopover
-					patterns={ patterns }
-					onSelect={ onSelect }
+					patterns={patterns}
+					onSelect={onSelect}
 				/>
-			) }
+			)}
 			<MenuItem
-				onClick={ ( event ) => {
+				onClick={(event) => {
 					event.preventDefault();
-					setShowTransforms( ! showTransforms );
-				} }
-				icon={ chevronRight }
+					setShowTransforms(!showTransforms);
+				}}
+				icon={chevronRight}
 			>
-				{ __( 'Patterns' ) }
+				{__('Patterns')}
 			</MenuItem>
 		</MenuGroup>
 	);
 }
 
-function PreviewPatternsPopover( { patterns, onSelect } ) {
+function PreviewPatternsPopover({ patterns, onSelect }) {
 	return (
 		<div className="block-editor-block-switcher__popover__preview__parent">
 			<div className="block-editor-block-switcher__popover__preview__container">
@@ -62,11 +62,11 @@ function PreviewPatternsPopover( { patterns, onSelect } ) {
 				>
 					<div className="block-editor-block-switcher__preview">
 						<div className="block-editor-block-switcher__preview-title">
-							{ __( 'Preview' ) }
+							{__('Preview')}
 						</div>
 						<BlockPatternsList
-							patterns={ patterns }
-							onSelect={ onSelect }
+							patterns={patterns}
+							onSelect={onSelect}
 						/>
 					</div>
 				</Popover>
@@ -75,61 +75,61 @@ function PreviewPatternsPopover( { patterns, onSelect } ) {
 	);
 }
 
-function BlockPatternsList( { patterns, onSelect } ) {
+function BlockPatternsList({ patterns, onSelect }) {
 	const composite = useCompositeState();
 	return (
 		<Composite
-			{ ...composite }
+			{...composite}
 			role="listbox"
 			className="block-editor-block-switcher__preview-patterns-container"
-			aria-label={ __( 'Patterns list' ) }
+			aria-label={__('Patterns list')}
 		>
-			{ patterns.map( ( pattern ) => (
+			{patterns.map((pattern) => (
 				<BlockPattern
-					key={ pattern.name }
-					pattern={ pattern }
-					onSelect={ onSelect }
-					composite={ composite }
+					key={pattern.name}
+					pattern={pattern}
+					onSelect={onSelect}
+					composite={composite}
 				/>
-			) ) }
+			))}
 		</Composite>
 	);
 }
 
-function BlockPattern( { pattern, onSelect, composite } ) {
+function BlockPattern({ pattern, onSelect, composite }) {
 	// TODO check pattern/preview width...
 	const baseClassName =
 		'block-editor-block-switcher__preview-patterns-container';
 	const descriptionId = useInstanceId(
 		BlockPattern,
-		`${ baseClassName }-list__item-description`
+		`${baseClassName}-list__item-description`
 	);
 	return (
 		<div
-			className={ `${ baseClassName }-list__list-item` }
-			aria-label={ pattern.title }
-			aria-describedby={ pattern.description ? descriptionId : undefined }
+			className={`${baseClassName}-list__list-item`}
+			aria-label={pattern.title}
+			aria-describedby={pattern.description ? descriptionId : undefined}
 		>
 			<CompositeItem
 				role="option"
 				as="div"
-				{ ...composite }
-				className={ `${ baseClassName }-list__item` }
-				onClick={ () => onSelect( pattern.transformedBlocks ) }
+				{...composite}
+				className={`${baseClassName}-list__item`}
+				onClick={() => onSelect(pattern.transformedBlocks)}
 			>
 				<BlockPreview
-					blocks={ pattern.transformedBlocks }
-					viewportWidth={ pattern.viewportWidth || 500 }
+					blocks={pattern.transformedBlocks}
+					viewportWidth={pattern.viewportWidth || 500}
 				/>
-				<div className={ `${ baseClassName }-list__item-title` }>
-					{ pattern.title }
+				<div className={`${baseClassName}-list__item-title`}>
+					{pattern.title}
 				</div>
 			</CompositeItem>
-			{ !! pattern.description && (
-				<VisuallyHidden id={ descriptionId }>
-					{ pattern.description }
+			{!!pattern.description && (
+				<VisuallyHidden id={descriptionId}>
+					{pattern.description}
 				</VisuallyHidden>
-			) }
+			)}
 		</div>
 	);
 }

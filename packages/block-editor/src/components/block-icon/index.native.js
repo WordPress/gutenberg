@@ -15,8 +15,8 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-export function BlockIcon( { icon, fill, size, showColors = false } ) {
-	if ( icon?.src === 'block-default' ) {
+export function BlockIcon({ icon, fill, size, showColors = false }) {
+	if (icon?.src === 'block-default') {
 		icon = {
 			src: blockDefault,
 		};
@@ -30,9 +30,9 @@ export function BlockIcon( { icon, fill, size, showColors = false } ) {
 
 	const renderedIcon = (
 		<Icon
-			icon={ icon && icon.src ? icon.src : icon }
-			fill={ fill || iconForeground || defaultFill }
-			{ ...( size && { size } ) }
+			icon={icon && icon.src ? icon.src : icon}
+			fill={fill || iconForeground || defaultFill}
+			{...(size && { size })}
 		/>
 	);
 	const style = showColors
@@ -41,7 +41,7 @@ export function BlockIcon( { icon, fill, size, showColors = false } ) {
 		  }
 		: {};
 
-	return <View style={ style }>{ renderedIcon }</View>;
+	return <View style={style}>{renderedIcon}</View>;
 }
 
 export default BlockIcon;

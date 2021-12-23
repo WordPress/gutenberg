@@ -29,7 +29,7 @@ const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
 const marginLeft = -3;
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 3,
@@ -73,9 +73,9 @@ const styles = StyleSheet.create( {
 		marginLeft,
 		marginBottom,
 	},
-} );
+});
 
-export function Button( props ) {
+export function Button(props) {
 	const {
 		children,
 		onClick,
@@ -107,24 +107,24 @@ export function Button( props ) {
 
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.3 : 1,
-		...( fixedRatio && styles.fixedRatio ),
-		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
-		...( isPressed &&
+		...(fixedRatio && styles.fixedRatio),
+		...(isPressed ? styles.buttonActive : styles.buttonInactive),
+		...(isPressed &&
 			isActiveStyle?.borderRadius && {
 				borderRadius: isActiveStyle.borderRadius,
-			} ),
-		...( isActiveStyle?.backgroundColor && {
+			}),
+		...(isActiveStyle?.backgroundColor && {
 			backgroundColor: isActiveStyle.backgroundColor,
-		} ),
+		}),
 	};
 
 	const states = [];
-	if ( isPressed ) {
-		states.push( 'selected' );
+	if (isPressed) {
+		states.push('selected');
 	}
 
-	if ( isDisabled ) {
-		states.push( 'disabled' );
+	if (isDisabled) {
+		states.push('disabled');
 	}
 
 	const subscriptInactive = usePreferredColorSchemeStyle(
@@ -132,56 +132,55 @@ export function Button( props ) {
 		styles.subscriptInactiveDark
 	);
 
-	const newChildren = Children.map( children, ( child ) => {
+	const newChildren = Children.map(children, (child) => {
 		return child
-			? cloneElement( child, {
+			? cloneElement(child, {
 					colorScheme: preferredColorScheme,
 					isPressed,
-			  } )
+			  })
 			: child;
-	} );
+	});
 
 	// Should show the tooltip if...
 	const shouldShowTooltip =
-		! isDisabled &&
+		!isDisabled &&
 		// an explicit tooltip is passed or...
-		( ( showTooltip && label ) ||
+		((showTooltip && label) ||
 			// there's a shortcut or...
 			shortcut ||
 			// there's a label and...
-			( !! label &&
+			(!!label &&
 				// the children are empty and...
-				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
+				(!children || (isArray(children) && !children.length)) &&
 				// the tooltip is not explicitly disabled.
-				false !== showTooltip ) );
+				false !== showTooltip));
 
 	const newIcon = icon
-		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
+		? cloneElement(<Icon icon={icon} size={iconSize} />, {
 				colorScheme: preferredColorScheme,
 				isPressed,
-		  } )
+		  })
 		: null;
 
 	const element = (
 		<TouchableOpacity
-			activeOpacity={ 0.7 }
-			accessible={ true }
-			accessibilityLabel={ label }
-			accessibilityStates={ states }
-			accessibilityRole={ 'button' }
-			accessibilityHint={ hint }
-			onPress={ onClick }
-			onLongPress={ onLongPress }
-			style={ containerStyle }
-			disabled={ isDisabled }
-			testID={ testID }
+			activeOpacity={0.7}
+			accessible={true}
+			accessibilityLabel={label}
+			accessibilityStates={states}
+			accessibilityRole={'button'}
+			accessibilityHint={hint}
+			onPress={onClick}
+			onLongPress={onLongPress}
+			style={containerStyle}
+			disabled={isDisabled}
+			testID={testID}
 		>
-			<View style={ buttonViewStyle }>
-				<View style={ { flexDirection: 'row' } }>
-					{ newIcon }
-					{ newChildren }
-					{ subscript && (
+			<View style={buttonViewStyle}>
+				<View style={{ flexDirection: 'row' }}>
+					{newIcon}
+					{newChildren}
+					{subscript && (
 						<Text
 							style={
 								isPressed
@@ -189,26 +188,26 @@ export function Button( props ) {
 									: subscriptInactive
 							}
 						>
-							{ subscript }
+							{subscript}
 						</Text>
-					) }
+					)}
 				</View>
 			</View>
 		</TouchableOpacity>
 	);
 
-	if ( ! shouldShowTooltip ) {
+	if (!shouldShowTooltip) {
 		return element;
 	}
 
 	return (
 		<Tooltip
-			text={ label }
-			shortcut={ shortcut }
-			position={ tooltipPosition }
-			visible={ showTooltip === true }
+			text={label}
+			shortcut={shortcut}
+			position={tooltipPosition}
+			visible={showTooltip === true}
 		>
-			{ element }
+			{element}
 		</Tooltip>
 	);
 }

@@ -28,7 +28,7 @@ import Icon from '../icon';
  *
  * @return {Object} The rendered placeholder.
  */
-function Placeholder( {
+function Placeholder({
 	icon,
 	children,
 	label,
@@ -38,13 +38,13 @@ function Placeholder( {
 	preview,
 	isColumnLayout,
 	...additionalProps
-} ) {
-	const [ resizeListener, { width } ] = useResizeObserver();
+}) {
+	const [resizeListener, { width }] = useResizeObserver();
 
 	// Since `useResizeObserver` will report a width of `null` until after the
 	// first render, avoid applying any modifier classes until width is known.
 	let modifierClassNames;
-	if ( typeof width === 'number' ) {
+	if (typeof width === 'number') {
 		modifierClassNames = {
 			'is-large': width >= 480,
 			'is-medium': width >= 160 && width < 480,
@@ -57,28 +57,26 @@ function Placeholder( {
 		className,
 		modifierClassNames
 	);
-	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
+	const fieldsetClasses = classnames('components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
-	} );
+	});
 	return (
-		<div { ...additionalProps } className={ classes }>
-			{ resizeListener }
-			{ notices }
-			{ preview && (
-				<div className="components-placeholder__preview">
-					{ preview }
-				</div>
-			) }
+		<div {...additionalProps} className={classes}>
+			{resizeListener}
+			{notices}
+			{preview && (
+				<div className="components-placeholder__preview">{preview}</div>
+			)}
 			<div className="components-placeholder__label">
-				<Icon icon={ icon } />
-				{ label }
+				<Icon icon={icon} />
+				{label}
 			</div>
-			{ !! instructions && (
+			{!!instructions && (
 				<div className="components-placeholder__instructions">
-					{ instructions }
+					{instructions}
 				</div>
-			) }
-			<div className={ fieldsetClasses }>{ children }</div>
+			)}
+			<div className={fieldsetClasses}>{children}</div>
 		</div>
 	);
 }

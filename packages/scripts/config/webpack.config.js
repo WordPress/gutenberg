@@ -1,20 +1,20 @@
 /**
  * External dependencies
  */
-const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
-const browserslist = require( 'browserslist' );
-const { sync: glob } = require( 'fast-glob' );
-const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const path = require( 'path' );
-const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
-const TerserPlugin = require( 'terser-webpack-plugin' );
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const browserslist = require('browserslist');
+const { sync: glob } = require('fast-glob');
+const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
+const DependencyExtractionWebpackPlugin = require('@wordpress/dependency-extraction-webpack-plugin');
+const postcssPlugins = require('@wordpress/postcss-plugins-preset');
 
 /**
  * Internal dependencies
@@ -24,27 +24,27 @@ const {
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
-} = require( '../utils' );
+} = require('../utils');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 let target = 'browserslist';
-if ( ! browserslist.findConfig( '.' ) ) {
-	target += ':' + fromConfigRoot( '.browserslistrc' );
+if (!browserslist.findConfig('.')) {
+	target += ':' + fromConfigRoot('.browserslistrc');
 }
 let entry = {};
-if ( process.env.WP_ENTRY ) {
-	entry = JSON.parse( process.env.WP_ENTRY );
+if (process.env.WP_ENTRY) {
+	entry = JSON.parse(process.env.WP_ENTRY);
 } else {
 	// The script checks whether standard file names can be detected in the `src` folder,
 	// and converts all found files to entry points.
-	const entryFiles = glob( 'src/index.[jt]s?(x)', {
+	const entryFiles = glob('src/index.[jt]s?(x)', {
 		absolute: true,
-	} );
-	entryFiles.forEach( ( filepath ) => {
-		const [ entryName ] = path.basename( filepath ).split( '.' );
-		entry[ entryName ] = filepath;
-	} );
+	});
+	entryFiles.forEach((filepath) => {
+		const [entryName] = path.basename(filepath).split('.');
+		entry[entryName] = filepath;
+	});
 }
 
 const cssLoaders = [
@@ -52,30 +52,30 @@ const cssLoaders = [
 		loader: MiniCSSExtractPlugin.loader,
 	},
 	{
-		loader: require.resolve( 'css-loader' ),
+		loader: require.resolve('css-loader'),
 		options: {
-			sourceMap: ! isProduction,
+			sourceMap: !isProduction,
 			modules: {
 				auto: true,
 			},
 		},
 	},
 	{
-		loader: require.resolve( 'postcss-loader' ),
+		loader: require.resolve('postcss-loader'),
 		options: {
 			// Provide a fallback configuration if there's not
 			// one explicitly available in the project.
-			...( ! hasPostCSSConfig() && {
+			...(!hasPostCSSConfig() && {
 				postcssOptions: {
 					ident: 'postcss',
-					sourceMap: ! isProduction,
+					sourceMap: !isProduction,
 					plugins: isProduction
 						? [
 								...postcssPlugins,
-								require( 'cssnano' )( {
+								require('cssnano')({
 									// Provide a fallback configuration if there's not
 									// one explicitly available in the project.
-									...( ! hasCssnanoConfig() && {
+									...(!hasCssnanoConfig() && {
 										preset: [
 											'default',
 											{
@@ -84,12 +84,12 @@ const cssLoaders = [
 												},
 											},
 										],
-									} ),
-								} ),
+									}),
+								}),
 						  ]
 						: postcssPlugins,
 				},
-			} ),
+			}),
 		},
 	},
 ];
@@ -100,17 +100,17 @@ const config = {
 	entry,
 	output: {
 		filename: '[name].js',
-		path: path.resolve( process.cwd(), 'build' ),
+		path: path.resolve(process.cwd(), 'build'),
 	},
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.ts', '.tsx', '...' ],
+		extensions: ['.ts', '.tsx', '...'],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
-		concatenateModules: isProduction && ! process.env.WP_BUNDLE_ANALYZER,
+		concatenateModules: isProduction && !process.env.WP_BUNDLE_ANALYZER,
 		splitChunks: {
 			cacheGroups: {
 				style: {
@@ -118,15 +118,15 @@ const config = {
 					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
-					name( module, chunks, cacheGroupKey ) {
-						return `${ cacheGroupKey }-${ chunks[ 0 ].name }`;
+					name(module, chunks, cacheGroupKey) {
+						return `${cacheGroupKey}-${chunks[0].name}`;
 					},
 				},
 				default: false,
 			},
 		},
 		minimizer: [
-			new TerserPlugin( {
+			new TerserPlugin({
 				parallel: true,
 				terserOptions: {
 					output: {
@@ -136,11 +136,11 @@ const config = {
 						passes: 2,
 					},
 					mangle: {
-						reserved: [ '__', '_n', '_nx', '_x' ],
+						reserved: ['__', '_n', '_nx', '_x'],
 					},
 				},
 				extractComments: false,
-			} ),
+			}),
 		],
 	},
 	module: {
@@ -150,7 +150,7 @@ const config = {
 				exclude: /node_modules/,
 				use: [
 					{
-						loader: require.resolve( 'babel-loader' ),
+						loader: require.resolve('babel-loader'),
 						options: {
 							// Babel uses a directory within local node_modules
 							// by default. Use the environment variable option
@@ -160,7 +160,7 @@ const config = {
 
 							// Provide a fallback configuration if there's not
 							// one explicitly available in the project.
-							...( ! hasBabelConfig() && {
+							...(!hasBabelConfig() && {
 								babelrc: false,
 								configFile: false,
 								presets: [
@@ -169,12 +169,10 @@ const config = {
 									),
 								],
 								plugins: [
-									! isProduction &&
-										require.resolve(
-											'react-refresh/babel'
-										),
-								].filter( Boolean ),
-							} ),
+									!isProduction &&
+										require.resolve('react-refresh/babel'),
+								].filter(Boolean),
+							}),
 						},
 					},
 				],
@@ -188,9 +186,9 @@ const config = {
 				use: [
 					...cssLoaders,
 					{
-						loader: require.resolve( 'sass-loader' ),
+						loader: require.resolve('sass-loader'),
 						options: {
-							sourceMap: ! isProduction,
+							sourceMap: !isProduction,
 						},
 					},
 				],
@@ -198,7 +196,7 @@ const config = {
 			{
 				test: /\.svg$/,
 				issuer: /\.(j|t)sx?$/,
-				use: [ '@svgr/webpack', 'url-loader' ],
+				use: ['@svgr/webpack', 'url-loader'],
 				type: 'javascript/auto',
 			},
 			{
@@ -227,39 +225,38 @@ const config = {
 		// removed automatically. There is an exception added in watch mode for
 		// fonts and images. It is a known limitations:
 		// https://github.com/johnagan/clean-webpack-plugin/issues/159
-		new CleanWebpackPlugin( {
-			cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
+		new CleanWebpackPlugin({
+			cleanAfterEveryBuildPatterns: ['!fonts/**', '!images/**'],
 			// Prevent it from deleting webpack assets during builds that have
 			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
-		} ),
+		}),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		new MiniCSSExtractPlugin({ filename: '[name].css' }),
 		// React Fast Refresh.
-		! isProduction && new ReactRefreshWebpackPlugin(),
+		!isProduction && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
-		! process.env.WP_NO_EXTERNALS &&
-			new DependencyExtractionWebpackPlugin(),
-	].filter( Boolean ),
+		!process.env.WP_NO_EXTERNALS && new DependencyExtractionWebpackPlugin(),
+	].filter(Boolean),
 	stats: {
 		children: false,
 	},
 };
 
-if ( ! isProduction ) {
+if (!isProduction) {
 	// WP_DEVTOOL global variable controls how source maps are generated.
 	// See: https://webpack.js.org/configuration/devtool/#devtool.
 	config.devtool = process.env.WP_DEVTOOL || 'source-map';
-	config.module.rules.unshift( {
+	config.module.rules.unshift({
 		test: /\.(j|t)sx?$/,
-		exclude: [ /node_modules/ ],
-		use: require.resolve( 'source-map-loader' ),
+		exclude: [/node_modules/],
+		use: require.resolve('source-map-loader'),
 		enforce: 'pre',
-	} );
+	});
 	config.devServer = {
 		devMiddleware: {
 			writeToDisk: true,
