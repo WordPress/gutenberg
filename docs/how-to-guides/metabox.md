@@ -34,6 +34,13 @@ For background around the thinking of blocks as the interface, please see the
 Before starting this tutorial, you will need a plugin to hold your code. Please take a look at the first two steps
 of [the JavaScript tutorial](/docs/how-to-guides/javascript/README.md) for information setting up a plugin.
 
+## Table of Contents
+
+1. [Register Meta Field](#step-1-register-meta-field)
+2. [Add Meta Block](#step-2-add-meta-block)
+3. [Use Post Meta Data](#step-3-use-post-meta-data)
+4. [Finishing Touches](#step-4-finishing-touches)
+
 ### Step 1: Register Meta Field
 
 A post meta field is a WordPress object used to store extra data about a post. You need to first register a new meta
