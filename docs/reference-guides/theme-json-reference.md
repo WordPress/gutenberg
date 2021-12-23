@@ -8,7 +8,12 @@ This reference guide lists the settings and style properties defined in the them
 
 ### appearanceTools
 
-Setting that enables ui tools.
+Setting that enables the following UI tools:
+
+- border: color, radius, style, width
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
 
 
 ---
