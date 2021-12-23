@@ -9,7 +9,7 @@
  * If _add_plugin_file_editor_to_tools is defined, it means the plugin
  * is running on WordPress 5.9, so no need to change menu location.
  */
-if ( function_exists( '_add_plugin_file_editor_to_tools' ) ) {
+if ( ! function_exists( '_add_plugin_file_editor_to_tools' ) ) {
 	/**
 	 * Moves the "theme editor" under "tools" in block themes.
 	 */
