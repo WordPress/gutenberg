@@ -189,6 +189,7 @@
 		"mkdirp": "0.5.1",
 		"nock": "12.0.3",
 		"node-watch": "0.7.0",
+		"npm-run-all": "4.1.5",
 		"patch-package": "6.2.2",
 		"postcss": "8.2.15",
 		"postcss-loader": "6.1.1",
@@ -223,6 +224,8 @@
 	},
 	"scripts": {
 		"analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
+		"api-docs:ref": "node ./bin/api-docs/update-api-docs.js",
+		"api-docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
 		"clean:package-types": "tsc --build --clean",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
@@ -237,7 +240,8 @@
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
 		"distclean": "rimraf node_modules packages/*/node_modules",
-		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js && node ./bin/api-docs/gen-block-lib-list.js",
+		"docs:gen": "node ./docs/tool/index.js",
+		"docs:build": "npm-run-all docs:gen api-docs:*",
 		"fixtures:clean": "rimraf \"test/integration/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
@@ -305,8 +309,8 @@
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
 			"node ./docs/tool/index.js"
 		],
-		"packages/**/*.{js,ts,tsx}": [
-			"node ./bin/api-docs/update-api-docs.js",
+		"packages/**/*.{js,ts,tsx,json}": [
+			"npm-run-all api-docs:*",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
 		]
