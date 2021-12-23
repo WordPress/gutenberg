@@ -67,12 +67,11 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 
 	if ( siteIconUrl ) {
 		buttonIcon = (
-			<motion.div
+			<motion.img
 				variants={ ! disableMotion && effect }
+				alt={ __( 'Site Icon' ) }
 				className="edit-post-fullscreen-mode-close_site-icon"
-				style={ {
-					backgroundImage: `url(${ siteIconUrl })`,
-				} }
+				src={ siteIconUrl }
 			/>
 		);
 	}
