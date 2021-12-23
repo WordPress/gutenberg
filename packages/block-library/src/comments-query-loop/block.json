@@ -7,6 +7,14 @@
 	"description": "An advanced block that allows displaying post comments based on different query parameters and visual configurations.",
 	"textdomain": "default",
 	"attributes": {
+		"inherit": {
+			"type": "boolean",
+			"default": true
+		},
+		"order": {
+			"type": "string",
+			"default": null
+		},
 		"perPage": {
 			"type": "number",
 			"default": null
@@ -14,10 +22,6 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
-		},
-		"order": {
-			"type": "string",
-			"default": null
 		}
 	},
 	"providesContext": {

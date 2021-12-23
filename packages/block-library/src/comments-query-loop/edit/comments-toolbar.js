@@ -16,7 +16,7 @@ export default function CommentsQueryLoopToolbar( {
 	attributes,
 	setAttributes,
 } ) {
-	const { perPage, order } = attributes;
+	const { perPage, order, inherit } = attributes;
 	return (
 		<ToolbarGroup>
 			<Dropdown
@@ -32,39 +32,56 @@ export default function CommentsQueryLoopToolbar( {
 					<>
 						<BaseControl>
 							<ToggleControl
-								label={ __( 'Newer comments first' ) }
-								checked={ order === 'desc' }
+								label={ __(
+									'Inherit from Discussion Settings'
+								) }
+								checked={ inherit }
 								onChange={ () => {
 									setAttributes( {
-										order:
-											order === 'desc' ? 'asc' : 'desc',
+										inherit: ! inherit,
 									} );
 								} }
 							/>
-							<NumberControl
-								__unstableInputWidth="60px"
-								label={ __( 'Items per Page' ) }
-								labelPosition="edge"
-								min={ 1 }
-								max={ 100 }
-								onChange={ ( value ) => {
-									const num = parseInt( value, 10 );
-									if (
-										isNaN( num ) ||
-										num < 1 ||
-										num > 100
-									) {
-										return;
-									}
-									setAttributes( {
-										...attributes,
-										perPage: num,
-									} );
-								} }
-								step="1"
-								value={ perPage }
-								isDragEnabled={ false }
-							/>
+							{ ! inherit && (
+								<>
+									<ToggleControl
+										label={ __( 'Newer comments first' ) }
+										checked={ order === 'desc' }
+										onChange={ () => {
+											setAttributes( {
+												order:
+													order === 'desc'
+														? 'asc'
+														: 'desc',
+											} );
+										} }
+									/>
+									<NumberControl
+										__unstableInputWidth="60px"
+										label={ __( 'Items per Page' ) }
+										labelPosition="edge"
+										min={ 1 }
+										max={ 100 }
+										onChange={ ( value ) => {
+											const num = parseInt( value, 10 );
+											if (
+												isNaN( num ) ||
+												num < 1 ||
+												num > 100
+											) {
+												return;
+											}
+											setAttributes( {
+												...attributes,
+												perPage: num,
+											} );
+										} }
+										step="1"
+										value={ perPage }
+										isDragEnabled={ false }
+									/>
+								</>
+							) }
 						</BaseControl>
 					</>
 				) }

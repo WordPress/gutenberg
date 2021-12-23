@@ -15,7 +15,6 @@ import { useEffect } from '@wordpress/element';
 import CommentsToolbar from './edit/comments-toolbar';
 import CommentsInspectorControls from './edit/comments-inspector-controls';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
 	[ 'core/comment-template' ],
@@ -23,7 +22,7 @@ const TEMPLATE = [
 ];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
-	const { tagName: TagName, order } = attributes;
+	const { tagName: TagName, inherit } = attributes;
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -34,28 +33,23 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 		blockEditorStore
 	);
 
-	const settingsOrder = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
-
-		const { comment_order: commentOrder } =
-			getEntityRecord( 'root', 'site' ) || {};
-
-		// We cannot get the order of the discussion settings page if we are not an admin user.
-		// Without the order defined, the default on the API is DESC
-		// with means show the newest comments first.
-		// By default, in discussion settings, the order is ASC.
-		// So the frontend is showing older comments first, while the editor is showing newer ones.
-		if ( commentOrder ) return commentOrder;
+	const {
+		__experimentalDiscussionSettings: { commentOrder, commentsPerPage },
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings();
 	} );
 
-	// If we are an admin user and have access to discussion settings,
-	// we initialize the default position from the settings discusion.
 	useEffect( () => {
-		if ( settingsOrder && order === null ) {
+		if ( inherit ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { order: settingsOrder } );
+			setAttributes( { order: null, perPage: null } );
+		} else {
+			// We initialize the attributes from the settings.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { order: commentOrder, perPage: commentsPerPage } );
 		}
-	}, [ settingsOrder ] );
+	}, [ inherit ] );
 
 	return (
 		<>

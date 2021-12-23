@@ -11,40 +11,53 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 
 export default function CommentsInspectorControls( {
-	attributes: { TagName, perPage, order },
+	attributes: { TagName, perPage, order, inherit },
 	setAttributes,
 } ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
-					label={ __( 'Newer comments first' ) }
-					checked={ order === 'desc' }
+					label={ __( 'Inherit from Discussion Settings' ) }
+					checked={ inherit }
 					onChange={ () => {
 						setAttributes( {
-							order: order === 'desc' ? 'asc' : 'desc',
+							inherit: ! inherit,
 						} );
 					} }
 				/>
-				<NumberControl
-					__unstableInputWidth="60px"
-					label={ __( 'Items per Page' ) }
-					labelPosition="edge"
-					min={ 1 }
-					max={ 100 }
-					onChange={ ( value ) => {
-						const num = parseInt( value, 10 );
-						if ( isNaN( num ) || num < 1 || num > 100 ) {
-							return;
-						}
-						setAttributes( {
-							perPage: num,
-						} );
-					} }
-					step="1"
-					value={ perPage }
-					isDragEnabled={ false }
-				/>
+				{ ! inherit && (
+					<>
+						<ToggleControl
+							label={ __( 'Newer comments first' ) }
+							checked={ order === 'desc' }
+							onChange={ () => {
+								setAttributes( {
+									order: order === 'desc' ? 'asc' : 'desc',
+								} );
+							} }
+						/>
+						<NumberControl
+							__unstableInputWidth="60px"
+							label={ __( 'Items per Page' ) }
+							labelPosition="edge"
+							min={ 1 }
+							max={ 100 }
+							onChange={ ( value ) => {
+								const num = parseInt( value, 10 );
+								if ( isNaN( num ) || num < 1 || num > 100 ) {
+									return;
+								}
+								setAttributes( {
+									perPage: num,
+								} );
+							} }
+							step="1"
+							value={ perPage }
+							isDragEnabled={ false }
+						/>
+					</>
+				) }
 			</PanelBody>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl

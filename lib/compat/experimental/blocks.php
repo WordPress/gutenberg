@@ -100,3 +100,24 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 		return null;
 	}
 }
+
+if ( ! function_exists( 'extend_block_editor_settings_with_discussion_settings' ) ) {
+	/**
+	 * Workaround for getting discussion settings as block editor settings
+	 * so any user can access to them without needing to be an admin.
+	 *
+	 * @param array $settings Default editor settings.
+	 *
+	 * @return array Filtered editor settings.
+	 */
+	function extend_block_editor_settings_with_discussion_settings( $settings ) {
+		$settings['__experimentalDiscussionSettings'] = array(
+			'pageComments'        => get_option( 'page_comments' ),
+			'commentsPerPage'     => get_option( 'comments_per_page' ),
+			'defaultCommentsPage' => get_option( 'default_comments_page' ),
+			'commentOrder'        => get_option( 'comment_order' ),
+		);
+		return $settings;
+	}
+}
+add_filter( 'block_editor_settings_all', 'extend_block_editor_settings_with_discussion_settings' );
