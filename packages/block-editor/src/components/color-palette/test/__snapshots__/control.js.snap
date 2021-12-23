@@ -31,7 +31,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   justify-content: space-between;
 }
 
-.emotion-4>*+*:not( marquee ) {
+.emotion-4>*+*:not(marquee) {
   margin-top: calc(4px * 1);
 }
 
@@ -56,7 +56,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   justify-content: space-between;
 }
 
-.emotion-6>*+*:not( marquee ) {
+.emotion-6>*+*:not(marquee) {
   margin-top: calc(4px * 3);
 }
 

@@ -111,7 +111,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   justify-content: space-between;
 }
 
-.emotion-2>*+*:not( marquee ) {
+.emotion-2>*+*:not(marquee) {
   margin-top: calc(4px * 3);
 }
 
@@ -136,7 +136,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   justify-content: space-between;
 }
 
-.emotion-4>*+*:not( marquee ) {
+.emotion-4>*+*:not(marquee) {
   margin-top: calc(4px * 3);
 }
 

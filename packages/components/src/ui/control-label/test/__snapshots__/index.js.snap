@@ -30,7 +30,7 @@ exports[`props should render correctly 1`] = `
   user-select: none;
 }
 
-@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+@media (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) {
   .emotion-0>* {
     position: relative;
     top: 0.5px;
@@ -72,7 +72,7 @@ exports[`props should render no truncate 1`] = `
   user-select: none;
 }
 
-@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+@media (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) {
   .emotion-0>* {
     position: relative;
     top: 0.5px;
@@ -118,7 +118,7 @@ exports[`props should render size 1`] = `
   user-select: none;
 }
 
-@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+@media (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) {
   .emotion-0>* {
     position: relative;
     top: 0.5px;
