@@ -46,7 +46,7 @@
 	max-height: 400px;
 	overflow: auto;
 	padding: 0;
-	margin: 0 -$border-width; // Allow width value to include the Popover border width.
+	margin: 0 (-$border-width); // Allow width value to include the Popover border width.
 	z-index: z-index(".components-popover");
 }
 
@@ -76,5 +76,15 @@
 
 	&:last-child {
 		margin-bottom: 0;
+	}
+}
+
+.components-custom-select-control__popover {
+	&.components-popover {
+		.components-popover__content {
+			// Prevent the Popover scrollbars so that
+			// the scrollbars are only handled by the Menu.
+			overflow: hidden;
+		}
 	}
 }
