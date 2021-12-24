@@ -313,6 +313,7 @@
 		"packages/**/*.{js,ts,tsx,json}": [
 			"npm run api-docs:ref",
 			"npm run api-docs:blocks",
+			"npm run api-docs:theme-ref",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
 		]
