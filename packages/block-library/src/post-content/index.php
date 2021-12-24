@@ -40,7 +40,10 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		the_post();
 	}
 
-	$content = get_the_content( null, false, $post_id );
+	// When inside the main loop, we want to use queried object
+	// so that `the_preview` for the current post can apply.
+	// We force this behavior by passing `null` instead of the post ID.
+	$content = get_the_content( null, false, in_the_loop() ? null : $post_id );
 	/** This filter is documented in wp-includes/post-template.php */
 	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
 	unset( $seen_ids[ $post_id ] );
