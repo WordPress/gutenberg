@@ -134,15 +134,11 @@ const getSectionMarkup = ( title, data, type ) => {
 		type === 'settings'
 			? getSettingsPropertiesMarkup
 			: getStylePropertiesMarkup;
-	const description =
-		'markdownDescription' in data
-			? data.markdownDescription
-			: data.description;
 
 	return `
 ### ${ title }
 
-${ description }
+${ data.description }
 
 ${ markupFn( data ) }
 ---
