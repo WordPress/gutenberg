@@ -534,7 +534,6 @@ _Parameters_
 -   _name_ `string`: Name of the deleted entity.
 -   _recordId_ `string`: Record ID of the deleted entity.
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
--   _options_ `[Object]`: Delete options.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 
 ### editEntityRecord
