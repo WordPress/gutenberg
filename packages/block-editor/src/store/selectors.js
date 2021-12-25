@@ -1224,6 +1224,17 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
+		const hasBlockInserted = some(
+			getBlocksByClientId( state, getClientIdsWithDescendants( state ) ),
+			{ name: blockType.name }
+		);
+
+		if ( hasBlockInserted ) {
+			return false;
+		}
+	}
+
 	const { allowedBlockTypes } = getSettings( state );
 
 	const isBlockAllowedInEditor = checkAllowList(
@@ -1313,7 +1324,7 @@ export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId[ rootClientId ],
+		state.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 	]
