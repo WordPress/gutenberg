@@ -195,7 +195,6 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {string}   recordId                  Record ID of the deleted entity.
  * @param {?Object}  query                     Special query parameters for the
  *                                             DELETE API call.
- * @param {Object}   [options]                 Delete options.
  * @param {Function} [options.__unstableFetch] Internal use only. Function to
  *                                             call instead of `apiFetch()`.
  *                                             Must return a promise.
