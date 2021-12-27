@@ -1,10 +1,4 @@
 /**
- * Internal dependencies
- */
-import initialHtml from './initial-html';
-import setupApiFetch from './api-fetch-setup';
-
-/**
  * External dependencies
  */
 import { I18nManager } from 'react-native';
@@ -21,6 +15,12 @@ import { addAction, addFilter } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
 import { initializeEditor } from '@wordpress/edit-post';
 import { registerCoreBlocks } from '@wordpress/block-library';
+
+/**
+ * Internal dependencies
+ */
+import initialHtml from './initial-html';
+import setupApiFetch from './api-fetch-setup';
 
 let editorComponent;
 let blocksRegistered = false;
