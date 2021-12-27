@@ -48,9 +48,6 @@
 				"docs/how-to-guides/backward-compatibility/README.md": [
 					{
 						"docs/how-to-guides/backward-compatibility/deprecations.md": []
-					},
-					{
-						"docs/how-to-guides/backward-compatibility/meta-box.md": []
 					}
 				]
 			},
@@ -122,19 +119,7 @@
 			},
 			{ "docs/how-to-guides/internationalization.md": [] },
 			{
-				"docs/how-to-guides/metabox/README.md": [
-					{ "docs/how-to-guides/metabox/meta-block-1-intro.md": [] },
-					{
-						"docs/how-to-guides/metabox/meta-block-2-register-meta.md": []
-					},
-					{ "docs/how-to-guides/metabox/meta-block-3-add.md": [] },
-					{
-						"docs/how-to-guides/metabox/meta-block-4-use-data.md": []
-					},
-					{
-						"docs/how-to-guides/metabox/meta-block-5-finishing.md": []
-					}
-				]
+				"docs/how-to-guides/metabox.md": []
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
 			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
