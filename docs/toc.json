@@ -48,9 +48,6 @@
 				"docs/how-to-guides/backward-compatibility/README.md": [
 					{
 						"docs/how-to-guides/backward-compatibility/deprecations.md": []
-					},
-					{
-						"docs/how-to-guides/backward-compatibility/meta-box.md": []
 					}
 				]
 			},

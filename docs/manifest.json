@@ -108,12 +108,6 @@
 		"parent": "backward-compatibility"
 	},
 	{
-		"title": "Meta Boxes",
-		"slug": "meta-box",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/meta-box.md",
-		"parent": "backward-compatibility"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
