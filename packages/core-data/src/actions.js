@@ -705,6 +705,7 @@ export const __experimentalSaveSpecifiedEntityEdits = (
 export function receiveUploadPermissions( hasUploadPermissions ) {
 	deprecated( "wp.data.dispatch( 'core' ).receiveUploadPermissions", {
 		since: '5.9',
+		alternative: 'receiveUserPermission',
 	} );
 
 	return receiveUserPermission( 'create/media', hasUploadPermissions );
