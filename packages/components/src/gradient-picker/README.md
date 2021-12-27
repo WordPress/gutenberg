@@ -1,6 +1,8 @@
 # GradientPicker
 
-GradientPicker is a React component that renders a color gradient picker to define a multi step gradient. There's either a *linear* or a *radial* type available.
+GradientPicker is a React component that renders a color gradient picker to define a multi step gradient. There's either a _linear_ or a _radial_ type available.
+
+![gradient-picker](https://user-images.githubusercontent.com/881729/147505438-3818c4c7-65b5-4394-b97b-af903c62adce.png)
 
 ## Usage
 
@@ -16,30 +18,30 @@ const myGradientPicker = () => {
 	return (
 		<GradientPicker
 			value={ gradient }
-			onChange={(currentGradient) => setGradient(currentGradient)}
-			gradients={[
+			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
+			gradients={ [
 				{
-					name: "JShine",
+					name: 'JShine',
 					gradient:
-						"linear-gradient(135deg,#12c2e9 0%,#c471ed 50%,#f64f59 100%)",
-					slug: "jshine",
+						'linear-gradient(135deg,#12c2e9 0%,#c471ed 50%,#f64f59 100%)',
+					slug: 'jshine',
 				},
 				{
-					name: "Moonlit Asteroid",
+					name: 'Moonlit Asteroid',
 					gradient:
-						"linear-gradient(135deg,#0F2027 0%, #203A43 0%, #2c5364 100%)",
-					slug: "moonlit-asteroid",
+						'linear-gradient(135deg,#0F2027 0%, #203A43 0%, #2c5364 100%)',
+					slug: 'moonlit-asteroid',
 				},
 				{
-					name: "Rastafarie",
+					name: 'Rastafarie',
 					gradient:
-						"linear-gradient(135deg,#1E9600 0%, #FFF200 0%, #FF0000 100%)",
-					slug: "rastafari",
+						'linear-gradient(135deg,#1E9600 0%, #FFF200 0%, #FF0000 100%)',
+					slug: 'rastafari',
 				},
-			]}
+			] }
 		/>
 	);
-}
+};
 ```
 
 ## Props
@@ -82,7 +84,6 @@ Called when a new gradient has been defined. It is passed the `currentGradient` 
 
 -   Type: `Function`
 -   Required: No
-
 
 ### disableCustomGradients
 
