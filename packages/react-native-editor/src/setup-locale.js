@@ -49,7 +49,7 @@ export default (
 		}
 	};
 
-	// Set up default local and plugin translations
+	// Set up default domain and plugin translations
 	[
 		{ getTranslation: getDefaultTranslation },
 		...pluginTranslations,
