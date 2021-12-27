@@ -3,6 +3,7 @@
  */
 import 'react-native-gesture-handler';
 import { AppRegistry } from 'react-native';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +15,6 @@ import { Component, cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import './globals';
-import { omit } from 'lodash';
 import initialHtml from './initial-html';
 import setupLocale from './setup-locale';
 import { getTranslation as getGutenbergTranslation } from '../i18n-cache';
