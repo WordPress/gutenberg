@@ -22,9 +22,6 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
 
-let editorComponent;
-let blocksRegistered = false;
-
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
 	// eslint-disable-next-line no-console
@@ -117,6 +114,7 @@ const setupInitHooks = () => {
 	);
 };
 
+let blocksRegistered = false;
 const registerBlocks = () => {
 	if ( blocksRegistered ) {
 		return;
@@ -127,6 +125,7 @@ const registerBlocks = () => {
 	blocksRegistered = true;
 };
 
+let editorComponent;
 export default () => {
 	if ( editorComponent ) {
 		return editorComponent;
