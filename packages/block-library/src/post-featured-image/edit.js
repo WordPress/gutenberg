@@ -52,7 +52,7 @@ function PostFeaturedImageDisplay( {
 	setAttributes,
 	context: { postId, postType, queryId },
 } ) {
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { isLink, height, width, scale } = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
