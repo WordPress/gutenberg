@@ -3,7 +3,6 @@
  */
 import 'react-native-gesture-handler';
 import { AppRegistry } from 'react-native';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,7 +37,8 @@ const registerGutenberg = ( {
 		constructor( props ) {
 			super( props );
 
-			const parentProps = omit( this.props || {}, [ 'rootTag' ] );
+			// eslint-disable-next-line no-unused-vars
+			const { rootTag, ...parentProps } = this.props;
 
 			// Setup locale
 			setupLocale(

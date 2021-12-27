@@ -53,7 +53,6 @@
 		"fast-average-color": "^4.3.0",
 		"jed": "^1.1.1",
 		"jsdom-jscore-rn": "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800",
-		"lodash": "^4.17.21",
 		"node-fetch": "^2.6.0",
 		"react-native": "0.64.0",
 		"react-native-gesture-handler": "https://raw.githubusercontent.com/wordpress-mobile/react-native-gesture-handler/e20fb879b029dc2da92ff06e059cc8b1bd1cee26/react-native-gesture-handler-1.10.1-wp-3.tgz",
