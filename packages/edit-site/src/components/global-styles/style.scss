@@ -47,7 +47,8 @@
 	// Need to override the too specific styles for complementary areas.
 	margin-bottom: 0 !important;
 	text-transform: uppercase;
-	font-weight: 500;
+	font-weight: 500 !important;
+	font-size: 11px !important;
 }
 
 .edit-site-screen-color-palette-toggle.edit-site-screen-color-palette-toggle {
