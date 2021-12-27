@@ -870,6 +870,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "GradientPicker",
+		"slug": "gradient-picker",
+		"markdown_source": "../packages/components/src/gradient-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Grid",
 		"slug": "grid",
 		"markdown_source": "../packages/components/src/grid/README.md",
