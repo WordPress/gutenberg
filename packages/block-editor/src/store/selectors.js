@@ -890,8 +890,8 @@ export function getBlockOrder( state, rootClientId ) {
  * Returns the index at which the block corresponding to the specified client
  * ID occurs within the block order, or `-1` if the block does not exist.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     Block client ID.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
  * @return {number} Index at which block exists in order.
  */
