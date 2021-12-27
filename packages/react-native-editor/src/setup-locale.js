@@ -19,7 +19,7 @@ export default (
 	locale,
 	extraTranslations,
 	getDefaultTranslation,
-	pluginTranslations
+	pluginTranslations = []
 ) => {
 	const setDomainLocaleData = ( { getTranslation, domain = 'default' } ) => {
 		let translations = getTranslation( locale );
