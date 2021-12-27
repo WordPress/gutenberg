@@ -45,9 +45,6 @@ const gutenbergSetup = () => {
 	setupInitHooks();
 };
 
-const initializeGutenbergEditor = () =>
-	initializeEditor( 'gutenberg', 'post', 1 );
-
 const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
 		registerBlocks();
@@ -133,7 +130,7 @@ export default () => {
 
 	reactNativeSetup();
 	gutenbergSetup();
-	editorComponent = initializeGutenbergEditor();
+	editorComponent = initializeEditor( 'gutenberg', 'post', 1 );
 
 	return editorComponent;
 };
