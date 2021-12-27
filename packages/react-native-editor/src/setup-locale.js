@@ -21,35 +21,37 @@ export default (
 	getDefaultTranslation,
 	pluginTranslations
 ) => {
-	const setDomainLocaleData = ( getTranslation, domain ) => {
+	const setDomainLocaleData = ( { getTranslation, domain = 'default' } ) => {
 		let translations = getTranslation( locale );
 		if ( locale && ! translations ) {
 			// Try stripping out the regional
 			locale = locale.replace( /[-_][A-Za-z]+$/, '' );
 			translations = getTranslation( locale );
 		}
-		const allTranslations = Object.assign(
-			{},
-			translations,
-			extraTranslations
-		);
-		// eslint-disable-next-line no-console
-		console.log(
-			domain ? `${ domain } - locale` : 'locale',
-			locale,
-			allTranslations
-		);
+		const allTranslations = {
+			...translations,
+			...extraTranslations,
+		};
+
+		if ( domain === 'default' ) {
+			// eslint-disable-next-line no-console
+			console.log( 'locale', locale, allTranslations );
+		} else {
+			// Extra translations are already logged along with the default domain, so
+			// for other domains we can limit the output to their translations.
+			// eslint-disable-next-line no-console
+			console.log( `${ domain } - locale`, locale, translations );
+		}
+
 		// Only change the locale if it's supported by gutenberg
 		if ( translations || extraTranslations ) {
 			setLocaleData( allTranslations, domain );
 		}
 	};
 
-	// Set up default locale data (Gutenberg)
-	setDomainLocaleData( getDefaultTranslation );
-
-	// Set up plugin translations
-	pluginTranslations.forEach( ( { domain, getTranslation } ) =>
-		setDomainLocaleData( getTranslation, domain )
-	);
+	// Set up default local and plugin translations
+	[
+		{ getTranslation: getDefaultTranslation },
+		...pluginTranslations,
+	].forEach( setDomainLocaleData );
 };
