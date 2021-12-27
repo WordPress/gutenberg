@@ -3,11 +3,14 @@
  */
 import { useBlockProps } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes: { height, width } } ) {
 	return (
 		<div
 			{ ...useBlockProps.save( {
-				style: { height: attributes.height, width: attributes.width },
+				style: {
+					height,
+					width,
+				},
 				'aria-hidden': true,
 			} ) }
 		/>

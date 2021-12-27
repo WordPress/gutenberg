@@ -14,7 +14,7 @@
 		}
 	},
 	"providesContext": {
-		"paginationArrow": "paginationArrow"
+		"comments/paginationArrow": "paginationArrow"
 	},
 	"supports": {
 		"align": true,

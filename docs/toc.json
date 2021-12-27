@@ -137,7 +137,7 @@
 				]
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
-			{ "docs/how-to-guides/plugin-sidebar.md": [] },
+			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
@@ -194,6 +194,7 @@
 					}
 				]
 			},
+			{ "docs/reference-guides/core-blocks.md": [] },
 			{
 				"docs/reference-guides/filters/README.md": [
 					{ "docs/reference-guides/filters/block-filters.md": [] },

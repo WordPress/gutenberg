@@ -7,12 +7,16 @@
 .block-editor-panel-color-gradient-settings {
 	.block-editor-panel-color-gradient-settings__panel-title {
 		display: flex;
-		gap: $grid-unit-15;
+		gap: $grid-unit-10;
 
 		.component-color-indicator {
 			width: $grid-unit-15;
 			height: $grid-unit-15;
 			align-self: center;
+
+			&:first-child {
+				margin-left: $grid-unit-15;
+			}
 		}
 	}
 

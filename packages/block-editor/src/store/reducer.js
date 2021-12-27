@@ -737,6 +737,27 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 
 	return reducer( state, action );
 };
+/**
+ * Higher-order reducer which removes blocks from state when switching parent block controlled state.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
+		// when switching a block from controlled to uncontrolled or inverse,
+		// we need to remove its content first.
+		const tempState = reducer( state, {
+			type: 'REPLACE_INNER_BLOCKS',
+			rootClientId: action.clientId,
+			blocks: [],
+		} );
+		return reducer( tempState, action );
+	}
+
+	return reducer( state, action );
+};
 
 /**
  * Reducer returning the blocks state.
@@ -754,7 +775,8 @@ export const blocks = flow(
 	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,
 	withPersistentBlockChange,
-	withIgnoredBlockChange
+	withIgnoredBlockChange,
+	withResetControlledBlocks
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {
