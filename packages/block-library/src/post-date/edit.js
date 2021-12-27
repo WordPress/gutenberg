@@ -33,7 +33,7 @@ export default function PostDateEdit( {
 	context: { postId, postType, queryId },
 	setAttributes,
 } ) {
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',
