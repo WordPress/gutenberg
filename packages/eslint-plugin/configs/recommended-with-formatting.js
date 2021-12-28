@@ -20,6 +20,10 @@ const config = {
 		document: true,
 		wp: 'readonly',
 	},
+	settings: {
+		'import/internal-regex': '^@wordpress/',
+		'import/extensions': [ '.js', '.jsx' ],
+	},
 	rules: {
 		'import/no-extraneous-dependencies': [
 			'error',
@@ -27,7 +31,12 @@ const config = {
 				peerDependencies: true,
 			},
 		],
-		'import/no-unresolved': 'error',
+		'import/no-unresolved': [
+			'error',
+			{
+				ignore: [ '^@wordpress/' ],
+			},
+		],
 		'import/default': 'warn',
 		'import/named': 'warn',
 	},
