@@ -3,6 +3,7 @@
  */
 const { isPackageInstalled } = require( '../utils' );
 
+// Exclude bundled WordPress packages from the list.
 const wpPackagesRegExp = '^@wordpress/(?!(icons|interface))';
 
 const config = {
