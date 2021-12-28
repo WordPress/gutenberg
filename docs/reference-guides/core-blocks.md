@@ -95,7 +95,7 @@ Display content in multiple columns, with blocks added to each column.
 
 -	**Name:** core/columns
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (margin, padding), ~~html~~
 -	**Attributes:** isStackedOnMobile, verticalAlignment
 
 ## Comment Author Avatar
@@ -365,7 +365,7 @@ A collection of blocks that allow visitors to get around your site.
 
 -	**Name:** core/navigation
 -	**Category:** theme
--	**Supports:** align (full, wide), anchor, inserter, spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, inserter, spacing (units), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
 
 ## Navigation Area
