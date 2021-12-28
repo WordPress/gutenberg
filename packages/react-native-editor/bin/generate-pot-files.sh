@@ -24,7 +24,7 @@
 #
 
 # Exit if any command fails
-set -e
+set -euo pipefail
 
 # Get arguments
 while test $# -gt 0; do
@@ -75,7 +75,7 @@ function setup_wp_cli() {
   fi
 
   # Upgrade WP-CLI command
-  if [[ -z $SKIP_UPGRADE_WP_CLI ]]; then
+  if [[ -z "${SKIP_UPGRADE_WP_CLI:-}" ]]; then
     echo -e "\n\033[1mUpgrading WP-CLI\033[0m"
     $WP_CLI cli update --nightly --yes
     $WP_CLI --info
@@ -172,7 +172,7 @@ for (( index=0; index<${#PLUGINS[@]}; index+=2 )); do
     echo -e "\033[0;31mPlugin folder \"$PLUGIN_FOLDER\" doesn't exist.\033[0m"
   fi
 done
-if [[ -n $NOT_FOUND_PLUGIN_FOLDERS ]]; then
+if [[ -n "${NOT_FOUND_PLUGIN_FOLDERS:-}" ]]; then
   exit 1
 fi
 
