@@ -2,11 +2,11 @@
 
 ColorIndicator is a React component that renders a specific color in a squared box. It's often used to summarize a collection of used colors in a child component.
 
-### single component
+### Single component
 
 ![simple color indicator](https://user-images.githubusercontent.com/881729/147558034-cba09db5-2f06-458b-a7b1-fd2f2ffb982a.png)
 
-### used in side panel
+### Used in sidebar
 
 ![multiple color indicator](https://user-images.githubusercontent.com/881729/147559177-69ce52e1-30dc-4f24-8483-ca2a580f434f.png)
 
