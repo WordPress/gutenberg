@@ -150,7 +150,7 @@ export default function ColorPalette( {
 
 	let dropdownPosition;
 	if ( __experimentalIsRenderedInSidebar ) {
-		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
+		dropdownPosition = 'bottom left';
 	}
 
 	const colordColor = colord( value );

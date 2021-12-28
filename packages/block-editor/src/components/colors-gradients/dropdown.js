@@ -33,7 +33,7 @@ export default function ColorGradientSettingsDropdown( {
 } ) {
 	let dropdownPosition;
 	if ( __experimentalIsRenderedInSidebar ) {
-		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
+		dropdownPosition = 'bottom left';
 	}
 
 	return (
