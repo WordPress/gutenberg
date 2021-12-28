@@ -187,8 +187,25 @@ $color-control-label-height: 20px;
 	}
 }
 
+// Override inner padding on default appender.
+// This should be a temporary fix, to be replaced by improvements to
+// the sibling inserter.
+// See https://github.com/WordPress/gutenberg/issues/37572.
 .wp-block-navigation .block-editor-button-block-appender {
-	justify-content: flex-start;
+	background-color: $gray-900;
+	color: $white;
+
+	// This needs specificity to override an inherited padding.
+	// That source padding in turn has high specificity to protect
+	// from theme CSS bleed.
+	&.block-editor-button-block-appender.block-editor-button-block-appender {
+		padding: 0;
+	}
+}
+
+.wp-block-navigation .wp-block .wp-block .block-editor-button-block-appender {
+	background-color: transparent;
+	color: $gray-900;
 }
 
 
