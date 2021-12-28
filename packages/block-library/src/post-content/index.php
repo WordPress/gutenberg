@@ -36,14 +36,16 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	$seen_ids[ $post_id ] = true;
 
+	// Check is needed for backward compatibility with third-party plugins
+	// that might rely on the `in_the_loop` check; calling `the_post` sets it to true.
 	if ( ! in_the_loop() && have_posts() ) {
 		the_post();
 	}
 
 	// When inside the main loop, we want to use queried object
 	// so that `the_preview` for the current post can apply.
-	// We force this behavior by passing `null` instead of the post ID.
-	$content = get_the_content( null, false, in_the_loop() ? null : $post_id );
+	// We force this behavior by omitting the third argument (post ID) from the `get_the_content`.
+	$content = get_the_content( null, false );
 	/** This filter is documented in wp-includes/post-template.php */
 	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
 	unset( $seen_ids[ $post_id ] );
