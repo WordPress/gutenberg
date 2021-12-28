@@ -3,6 +3,8 @@
  */
 const { isPackageInstalled } = require( '../utils' );
 
+const wpPackagesRegExp = '^@wordpress/(?!(icons|interface))';
+
 const config = {
 	extends: [
 		require.resolve( './jsx-a11y.js' ),
@@ -21,7 +23,7 @@ const config = {
 		wp: 'readonly',
 	},
 	settings: {
-		'import/internal-regex': '^@wordpress/',
+		'import/internal-regex': wpPackagesRegExp,
 		'import/extensions': [ '.js', '.jsx' ],
 	},
 	rules: {
@@ -34,7 +36,7 @@ const config = {
 		'import/no-unresolved': [
 			'error',
 			{
-				ignore: [ '^@wordpress/' ],
+				ignore: [ wpPackagesRegExp ],
 			},
 		],
 		'import/default': 'warn',
