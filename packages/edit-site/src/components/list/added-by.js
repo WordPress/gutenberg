@@ -14,7 +14,11 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { layout as themeIcon, plugins as pluginIcon } from '@wordpress/icons';
+import {
+	commentAuthorAvatar as authorIcon,
+	layout as themeIcon,
+	plugins as pluginIcon,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
@@ -62,7 +66,11 @@ function AddedByPlugin( { slug, isCustomized } ) {
 	return (
 		<HStack alignment="left">
 			<CustomizedTooltip isCustomized={ isCustomized }>
-				<div className="edit-site-list-added-by__icon">
+				<div
+					className={ classnames( 'edit-site-list-added-by__icon', {
+						'is-customized': isCustomized,
+					} ) }
+				>
 					<Icon icon={ pluginIcon } />
 				</div>
 			</CustomizedTooltip>
@@ -77,18 +85,30 @@ function AddedByAuthor( { id } ) {
 	] );
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 
+	const avatarURL = user?.avatar_urls?.[ 48 ];
+	const hasAvatar = !! avatarURL;
+
 	return (
 		<HStack alignment="left">
 			<div
-				className={ classnames( 'edit-site-list-added-by__avatar', {
-					'is-loaded': isImageLoaded,
-				} ) }
+				className={ classnames(
+					hasAvatar
+						? 'edit-site-list-added-by__avatar'
+						: 'edit-site-list-added-by__icon',
+					{
+						'is-loaded': isImageLoaded,
+					}
+				) }
 			>
-				<img
-					onLoad={ () => setIsImageLoaded( true ) }
-					alt=""
-					src={ user?.avatar_urls[ 48 ] }
-				/>
+				{ hasAvatar ? (
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ avatarURL }
+					/>
+				) : (
+					<Icon icon={ authorIcon } />
+				) }
 			</div>
 			<span>{ user?.nickname }</span>
 		</HStack>

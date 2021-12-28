@@ -40,6 +40,10 @@ const convertUnitToMobile = ( containerSize, globalStyles, value, unit ) => {
 	const { valueToConvert, valueUnit } = getValueAndUnit( value, unit ) || {};
 	const { fontSize = 16 } = globalStyles || {};
 
+	if ( valueToConvert === undefined ) {
+		return undefined;
+	}
+
 	switch ( valueUnit ) {
 		case 'rem':
 		case 'em':
@@ -78,7 +82,8 @@ const useConvertUnitToMobile = ( value, unit ) => {
 	}, [] );
 
 	return useMemo( () => {
-		const { valueToConvert, valueUnit } = getValueAndUnit( value, unit );
+		const { valueToConvert, valueUnit } =
+			getValueAndUnit( value, unit ) || {};
 
 		return convertUnitToMobile(
 			windowSizes,

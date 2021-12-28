@@ -106,6 +106,45 @@ $navigation-icon-size: 24px;
 			height: inherit;
 		}
 	}
+
+	// Custom properties for layout style cascade: default values.
+	--navigation-layout-justification-setting: flex-start;
+	--navigation-layout-direction: row;
+	--navigation-layout-wrap: wrap;
+	--navigation-layout-justify: flex-start;
+	--navigation-layout-align: center;
+
+	&.is-vertical {
+		--navigation-layout-direction: column;
+		--navigation-layout-justify: initial;
+	}
+
+	&.no-wrap {
+		--navigation-layout-wrap: nowrap;
+	}
+
+	&.items-justified-center {
+		--navigation-layout-justification-setting: center;
+		--navigation-layout-justify: center;
+
+		&.is-vertical {
+			--navigation-layout-align: center;
+		}
+	}
+
+	&.items-justified-right {
+		--navigation-layout-justification-setting: flex-end;
+		--navigation-layout-justify: flex-end;
+
+		&.is-vertical {
+			--navigation-layout-align: flex-end;
+		}
+	}
+
+	&.items-justified-space-between {
+		--navigation-layout-justification-setting: space-between;
+		--navigation-layout-justify: space-between;
+	}
 }
 
 // Styles for submenu flyout.
@@ -351,10 +390,10 @@ button.wp-block-navigation-item__content {
 // Navigation block inner container.
 .wp-block-navigation__container {
 	display: flex;
-	flex-wrap: var(--layout-wrap, wrap);
-	flex-direction: var(--layout-direction, initial);
-	justify-content: var(--layout-justify, initial);
-	align-items: var(--layout-align, initial);
+	flex-wrap: var(--navigation-layout-wrap, wrap);
+	flex-direction: var(--navigation-layout-direction, initial);
+	justify-content: var(--navigation-layout-justify, initial);
+	align-items: var(--navigation-layout-align, initial);
 
 	// Reset the default list styles
 	list-style: none;
@@ -388,10 +427,10 @@ button.wp-block-navigation-item__content {
 
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
-		flex-wrap: var(--layout-wrap, wrap);
-		flex-direction: var(--layout-direction, initial);
-		justify-content: var(--layout-justify, initial);
-		align-items: var(--layout-align, initial);
+		flex-wrap: var(--navigation-layout-wrap, wrap);
+		flex-direction: var(--navigation-layout-direction, initial);
+		justify-content: var(--navigation-layout-justify, initial);
+		align-items: var(--navigation-layout-align, initial);
 	}
 
 	// If the responsive wrapper is present but overlay is not open,
@@ -435,7 +474,7 @@ button.wp-block-navigation-item__content {
 			flex-wrap: nowrap;
 
 			// Inherit alignment settings from container.
-			align-items: var(--layout-justification-setting, inherit);
+			align-items: var(--navigation-layout-justification-setting, inherit);
 
 			// Always align the contents of the menu to the top.
 			&,
@@ -489,7 +528,7 @@ button.wp-block-navigation-item__content {
 				display: flex;
 				flex-direction: column;
 				// Inherit alignment settings from container.
-				align-items: var(--layout-justification-setting, initial);
+				align-items: var(--navigation-layout-justification-setting, initial);
 			}
 		}
 

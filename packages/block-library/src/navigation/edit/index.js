@@ -28,7 +28,7 @@ import {
 } from '@wordpress/block-editor';
 import { EntityProvider, useEntityProp } from '@wordpress/core-data';
 
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -111,7 +111,11 @@ function Navigation( {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
-		layout: { justifyContent, orientation = 'horizontal' } = {},
+		layout: {
+			justifyContent,
+			orientation = 'horizontal',
+			flexWrap = 'wrap',
+		} = {},
 	} = attributes;
 
 	let areaMenu,
@@ -132,6 +136,7 @@ function Navigation( {
 
 	const ref = navigationArea ? navigationAreaMenu : attributes.ref;
 
+	const registry = useRegistry();
 	const setRef = useCallback(
 		( postId ) => {
 			setAttributes( { ref: postId } );
@@ -149,7 +154,6 @@ function Navigation( {
 	const {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
-		controlledInnerBlocks,
 		isInnerBlockSelected,
 		hasSubmenus,
 	} = useSelect(
@@ -178,7 +182,6 @@ function Navigation( {
 				),
 				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
 				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
-				controlledInnerBlocks: _controlledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
 		},
@@ -235,6 +238,10 @@ function Navigation( {
 		className: classnames( className, {
 			'items-justified-right': justifyContent === 'right',
 			'items-justified-space-between': justifyContent === 'space-between',
+			'items-justified-left': justifyContent === 'left',
+			'items-justified-center': justifyContent === 'center',
+			'is-vertical': orientation === 'vertical',
+			'no-wrap': flexWrap === 'nowrap',
 			'is-responsive': 'never' !== overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
@@ -322,18 +329,6 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
-	// If the ref no longer exists the reset the inner blocks to provide a
-	// clean slate.
-	useEffect( () => {
-		if (
-			! hasUncontrolledInnerBlocks &&
-			controlledInnerBlocks?.length > 0 &&
-			ref === undefined
-		) {
-			replaceInnerBlocks( clientId, [] );
-		}
-	}, [ clientId, ref, hasUncontrolledInnerBlocks, controlledInnerBlocks ] );
-
 	const [ showCantEditNotice, hideCantEditNotice ] = useNavigationNotice( {
 		name: 'block-library/core/navigation/permissions/update',
 		message: __(
@@ -383,15 +378,19 @@ function Navigation( {
 	] );
 
 	const startWithEmptyMenu = useCallback( () => {
-		if ( navigationArea ) {
-			setAreaMenu( 0 );
-		}
-		setAttributes( {
-			ref: undefined,
+		registry.batch( () => {
+			if ( navigationArea ) {
+				setAreaMenu( 0 );
+			}
+			setAttributes( {
+				ref: undefined,
+			} );
+			if ( ! ref ) {
+				replaceInnerBlocks( clientId, [] );
+			}
+			setIsPlaceholderShown( true );
 		} );
-
-		setIsPlaceholderShown( true );
-	}, [ clientId ] );
+	}, [ clientId, ref ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
@@ -423,11 +422,6 @@ function Navigation( {
 						onSave={ ( post ) => {
 							// Set some state used as a guard to prevent the creation of multiple posts.
 							setHasSavedUnsavedInnerBlocks( true );
-							// replaceInnerBlocks is required to ensure the block editor store is sync'd
-							// to be aware that there are now no inner blocks (as blocks moved to entity).
-							// This should probably happen automatically with useBlockSync
-							// but there appears to be a bug.
-							replaceInnerBlocks( clientId, [] );
 							// Switch to using the wp_navigation entity.
 							setRef( post.id );
 						} }
@@ -613,15 +607,7 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationEntity &&
 							canUserDeleteNavigationEntity && (
 								<NavigationMenuDeleteControl
-									onDelete={ () => {
-										if ( navigationArea ) {
-											setAreaMenu( 0 );
-										}
-										setAttributes( {
-											ref: undefined,
-										} );
-										setIsPlaceholderShown( true );
-									} }
+									onDelete={ startWithEmptyMenu }
 								/>
 							) }
 					</InspectorControls>

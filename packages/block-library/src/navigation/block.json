@@ -92,18 +92,13 @@
 			}
 		},
 		"spacing": {
-			"blockGap": true,
-			"units": [ "px", "em", "rem", "vh", "vw" ],
-			"__experimentalDefaultControls": {
-				"blockGap": true
-			}
+			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"__experimentalLayout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
-				"type": "flex",
-				"setCascadingProperties": true
+				"type": "flex"
 			}
 		}
 	},
