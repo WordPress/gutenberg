@@ -65,13 +65,13 @@ function error() {
 }
 
 function setup_wp_cli() {
-  local CLI_PATH="$SCRIPT_DIR/wp-cli.phar"
+  local cli_path="$SCRIPT_DIR/wp-cli.phar"
 
   # Install WP-CLI command
-  if [[ ! -f "$CLI_PATH" ]]; then
+  if [[ ! -f "$cli_path" ]]; then
     echo -e "\n\033[1mInstalling WP-CLI\033[0m"
-    curl -Ls https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o $CLI_PATH
-    chmod +x $CLI_PATH
+    curl -Ls https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o $cli_path
+    chmod +x $cli_path
   fi
 
   # Upgrade WP-CLI command
@@ -83,77 +83,77 @@ function setup_wp_cli() {
 }
 
 function generate_bundles() {
-  local ENTRY_FILE=$1
-  local ANDROID_BUNDLE_OUTPUT=$2
-  local ANDROID_SOURCEMAP_OUTPUT=$3
-  local IOS_BUNDLE_OUTPUT=$4
-  local IOS_SOURCEMAP_OUTPUT=$5
+  local entry_file=$1
+  local android_bundle_output=$2
+  local android_sourcemap_output=$3
+  local ios_bundle_output=$4
+  local ios_sourcemap_output=$5
 
   echo -e "\n\033[1mGenerate Android JS bundle\033[0m"
-  $BUNDLE_CLI --platform android --dev false --entry-file "$ENTRY_FILE" --bundle-output "$ANDROID_BUNDLE_OUTPUT" --sourcemap-output "$ANDROID_SOURCEMAP_OUTPUT"
+  $BUNDLE_CLI --platform android --dev false --entry-file "$entry_file" --bundle-output "$android_bundle_output" --sourcemap-output "$android_sourcemap_output"
   
   echo -e "\n\033[1mGenerate iOS JS bundle\033[0m"
-  $BUNDLE_CLI --platform ios --dev false --entry-file "$ENTRY_FILE" --bundle-output "$IOS_BUNDLE_OUTPUT" --sourcemap-output "$IOS_SOURCEMAP_OUTPUT"
+  $BUNDLE_CLI --platform ios --dev false --entry-file "$entry_file" --bundle-output "$ios_bundle_output" --sourcemap-output "$ios_sourcemap_output"
 }
 
 function extract_source_from_sourcemap_file() {
-  local MAP_FILE=$1
-  local TARGET_PATH=$2
+  local map_file=$1
+  local target_path=$2
 
-  mkdir -p $TARGET_PATH
+  mkdir -p $target_path
 
-  echo -e "\n\033[1mExtracting source files from \"$MAP_FILE\" source map file\033[0m"
-  node $SCRIPT_DIR/extract-files-from-sourcemap.js $MAP_FILE $TARGET_PATH
+  echo -e "\n\033[1mExtracting source files from \"$map_file\" source map file\033[0m"
+  node $SCRIPT_DIR/extract-files-from-sourcemap.js $map_file $target_path
 }
 
 function generate_pot_files() {
-  local OUTPUT_PATH=$1
-  local PLUGIN_NAME=$2
-  local SOURCE_DIR=$3
+  local output_path=$1
+  local plugin_name=$2
+  local source_dir=$3
   shift 3
-  local PLUGINS_TO_SUBTRACT=( $@ )
+  local plugins_to_subtract=( $@ )
 
   # Define subtract pot files
-  local SUBTRACT_POT_FILES=()
+  local subtract_pot_files=()
   for PLUGIN in "$@"; do
-    SUBTRACT_POT_FILES+=( "$OUTPUT_PATH/$PLUGIN-used-android.pot" )
-    SUBTRACT_POT_FILES+=( "$OUTPUT_PATH/$PLUGIN-used-ios.pot" )
+    subtract_pot_files+=( "$output_path/$PLUGIN-used-android.pot" )
+    subtract_pot_files+=( "$output_path/$PLUGIN-used-ios.pot" )
   done
-  local SUBTRACT_POT_FILES=$(join_by , ${SUBTRACT_POT_FILES[@]})
+  local subtract_pot_files=$(join_by , ${subtract_pot_files[@]})
 
   # Define output paths
-  local OUTPUT_POT_USED_ANDROID_FILE="$OUTPUT_PATH/$PLUGIN_NAME-used-android.pot"
-  local OUTPUT_POT_USED_IOS_FILE="$OUTPUT_PATH/$PLUGIN_NAME-used-ios.pot"
-  local OUTPUT_POT_BLOCKS_FILE="$OUTPUT_PATH/$PLUGIN_NAME-blocks.pot"
-  local OUTPUT_POT_SOURCE_FILE="$OUTPUT_PATH/$PLUGIN_NAME-source.pot"
+  local output_pot_used_android_file="$output_path/$plugin_name-used-android.pot"
+  local output_pot_used_ios_file="$output_path/$plugin_name-used-ios.pot"
+  local output_pot_blocks_file="$output_path/$plugin_name-blocks.pot"
+  local output_pot_source_file="$output_path/$plugin_name-source.pot"
 
-  local EXCLUDE_FILES="test/*,e2e-tests/*,bundle/*,build-module/*"
+  local exclude_files="test/*,e2e-tests/*,bundle/*,build-module/*"
 
-  local DEBUG_PARAM=$([ -z $DEBUG ] && echo "" || echo "--debug")
-  local SUBTRACT_PARAM=$([ -z $SUBTRACT_POT_FILES ] && echo "" || echo "--subtract=$SUBTRACT_POT_FILES")
-  local DOMAIN_PARAM=$([ "$PLUGIN_NAME" == "gutenberg" ] && echo "--ignore-domain" || echo "--domain=$PLUGIN_NAME")
+  local debug_param=$([ -z $DEBUG ] && echo "" || echo "--debug")
+  local subtract_param=$([ -z $subtract_pot_files ] && echo "" || echo "--subtract=$subtract_pot_files")
+  local domain_param=$([ "$plugin_name" == "gutenberg" ] && echo "--ignore-domain" || echo "--domain=$plugin_name")
 
-  local MAKEPOT_COMMAND="$WP_CLI i18n make-pot"
+  local makepot_command="$WP_CLI i18n make-pot"
 
-  echo -e "\n\033[1mExtract strings and generate POT files for \"$PLUGIN_NAME\" plugin from \"$SOURCE_DIR\"\033[0m"
+  echo -e "\n\033[1mExtract strings and generate POT files for \"$plugin_name\" plugin from \"$source_dir\"\033[0m"
 
-  mkdir -p $OUTPUT_PATH
+  mkdir -p $output_path
 
-  if [ -n "$SUBTRACT_POT_FILES" ]; then
-    echo "--- Strings from ${PLUGINS_TO_SUBTRACT[@]} plugins will be subtracted ---"
+  if [ -n "$subtract_pot_files" ]; then
+    echo "--- Strings from ${plugins_to_subtract[@]} plugins will be subtracted ---"
   fi
   
   echo -e "\nExtract used strings from Android source-map:"
-  $MAKEPOT_COMMAND $ANDROID_EXTRACT_SOURCE_FILES_PATH $DEBUG_PARAM $SUBTRACT_PARAM $DOMAIN_PARAM $OUTPUT_POT_USED_ANDROID_FILE
+  $makepot_command $ANDROID_EXTRACT_SOURCE_FILES_PATH $debug_param $subtract_param $domain_param $output_pot_used_android_file
 
   echo -e "\nExtract used strings from iOS source-map:"
-  $MAKEPOT_COMMAND $IOS_EXTRACT_SOURCE_FILES_PATH $DEBUG_PARAM $SUBTRACT_PARAM $DOMAIN_PARAM $OUTPUT_POT_USED_IOS_FILE
+  $makepot_command $IOS_EXTRACT_SOURCE_FILES_PATH $debug_param $subtract_param $domain_param $output_pot_used_ios_file
 
   echo -e "\nExtract strings from block JSON files:"
-  $MAKEPOT_COMMAND $SOURCE_DIR $DEBUG_PARAM --exclude="$EXCLUDE_FILES" --skip-js --skip-php --ignore-domain $OUTPUT_POT_BLOCKS_FILE
+  $makepot_command $source_dir $debug_param --exclude="$exclude_files" --skip-js --skip-php --ignore-domain $output_pot_blocks_file
 
   echo -e "\nExtract strings from non-native JS code:"
-  $MAKEPOT_COMMAND $SOURCE_DIR $DEBUG_PARAM --exclude="$EXCLUDE_FILES" --merge="$OUTPUT_POT_BLOCKS_FILE" $DOMAIN_PARAM $OUTPUT_POT_SOURCE_FILE
+  $makepot_command $source_dir $debug_param --exclude="$exclude_files" --merge="$output_pot_blocks_file" $domain_param $output_pot_source_file
 }
 
 # Get parameters
