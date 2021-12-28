@@ -26,6 +26,8 @@ You will need:
 -   A minimal plugin activated and ready to edit
 -   JavaScript setup for building and enqueuing
 
+A [complete meta-block example](https://github.com/WordPress/gutenberg-examples/tree/trunk/meta-block) is available that you can use as a reference for your setup.
+
 ## Step-by-step guide
 
 1. [Register Meta Field](#step-1-register-meta-field)
