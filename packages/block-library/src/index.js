@@ -70,6 +70,7 @@ import * as postContent from './post-content';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
+import * as postLink from './post-link';
 import * as postNavigationLink from './post-navigation-link';
 import * as postTemplate from './post-template';
 import * as postTerms from './post-terms';
@@ -194,6 +195,7 @@ export const __experimentalGetCoreBlocks = () => [
 	postAuthor,
 	postDate,
 	postTerms,
+	postLink,
 	postNavigationLink,
 	postTemplate,
 	queryPagination,
