@@ -45,6 +45,15 @@ import {
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
+	// If a Block is undefined, use the core/missing block as a placeholder
+	// for a better user experience.
+	if ( undefined === getBlockType( name ) ) {
+		attributes.originalName = name;
+		attributes.originalContent = '';
+		attributes.originalUndelimitedContent = '';
+		name = 'core/missing';
+	}
+
 	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
 		name,
 		attributes

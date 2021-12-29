@@ -28,3 +28,6 @@ test/native/junit.xml
 phpcs.xml
 phpunit.xml
 phpunit-watcher.yml
+
+# IDE
+.idea/
