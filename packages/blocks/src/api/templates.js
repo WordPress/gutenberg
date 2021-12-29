@@ -73,6 +73,18 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			// before creating the blocks.
 
 			const blockType = getBlockType( name );
+
+			// If a Block is undefined, use the core/missing block as a placeholder
+			// for a better user experience.
+			if ( undefined === blockType ) {
+				attributes = {
+					originalName: name,
+					originalContent: '',
+					originalUndelimitedContent: '',
+				};
+				name = 'core/missing';
+			}
+
 			const isHTMLAttribute = ( attributeDefinition ) =>
 				get( attributeDefinition, [ 'source' ] ) === 'html';
 			const isQueryAttribute = ( attributeDefinition ) =>
