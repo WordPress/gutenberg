@@ -119,7 +119,7 @@ function generate_pot_files() {
     subtract_pot_files+=( "$output_path/$PLUGIN-used-android.pot" )
     subtract_pot_files+=( "$output_path/$PLUGIN-used-ios.pot" )
   done
-  local subtract_pot_files=$(join_by , ${subtract_pot_files[@]})
+  local subtract_pot_files=$(join_by , ${subtract_pot_files[@]+"${subtract_pot_files[@]}"})
 
   # Define output paths
   local output_pot_used_android_file="$output_path/$plugin_name-used-android.pot"
@@ -129,7 +129,7 @@ function generate_pot_files() {
 
   local exclude_files="test/*,e2e-tests/*,bundle/*,build-module/*"
 
-  local debug_param=$([ -z $DEBUG ] && echo "" || echo "--debug")
+  local debug_param=$([ -z ${DEBUG:-} ] && echo "" || echo "--debug")
   local subtract_param=$([ -z $subtract_pot_files ] && echo "" || echo "--subtract=$subtract_pot_files")
   local domain_param=$([ "$plugin_name" == "gutenberg" ] && echo "--ignore-domain" || echo "--domain=$plugin_name")
 
@@ -183,7 +183,7 @@ WP_CLI="php -d memory_limit=4G $SCRIPT_DIR/wp-cli.phar"
 BUNDLE_CLI="$GUTENBERG_SOURCE_CODE_DIR/node_modules/.bin/react-native bundle --config $METRO_CONFIG"
 
 # Set target path
-if [[ -n $LOCAL_PATH ]]; then
+if [[ -n ${LOCAL_PATH:-} ]]; then
   TARGET_PATH=$LOCAL_PATH
 else
   TARGET_PATH=$(mktemp -d)
@@ -240,4 +240,4 @@ for (( index=0; index<${#PLUGINS[@]}; index+=2 )); do
 done
 
 # Generate POT files for Gutenberg
-generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR/packages" "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"
+generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR/packages" "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"}"
