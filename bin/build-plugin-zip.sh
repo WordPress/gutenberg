@@ -99,7 +99,6 @@ done
 
 # Run the build.
 status "Installing dependencies... 📦"
-npm cache verify
 pnpm install
 status "Generating build... 👷‍♀️"
 npm run build
