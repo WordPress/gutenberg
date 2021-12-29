@@ -32,7 +32,7 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 
 When adding new components or new props to existing components, it's recommended to prefix them with `__unstable` or `__experimental` until they're stable enough to be exposed as part of the public API.
 
-Learn more on [How to preserve backward compatibility for a React Component](/docs/how-to-guides/backward-compatibility/README.md#how-to-preserve-backward-compatibility-for-a-react-component) and [Experimental and Unstable APIs](/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis).
+Learn more on [How to preserve backward compatibility for a React Component](/docs/contributors/code/backward-compatibility.md#how-to-preserve-backward-compatibility-for-a-react-component) and [Experimental and Unstable APIs](/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis).
 
 <!-- ## Polymorphic Components (i.e. the `as` prop)
 
