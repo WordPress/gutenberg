@@ -15,6 +15,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { textFormattingShortcuts } from './config';
 import Shortcut from './shortcut';
 import DynamicShortcut from './dynamic-shortcut';
 
@@ -124,6 +125,10 @@ export default function KeyboardShortcutHelpModal( {
 						ariaLabel: __( 'Forward-slash' ),
 					},
 				] }
+			/>
+			<ShortcutSection
+				title={ __( 'Text formatting' ) }
+				shortcuts={ textFormattingShortcuts }
 			/>
 		</Modal>
 	);
