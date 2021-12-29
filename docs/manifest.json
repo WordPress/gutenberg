@@ -96,18 +96,6 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Backward Compatibility",
-		"slug": "backward-compatibility",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Deprecations",
-		"slug": "deprecations",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/deprecations.md",
-		"parent": "backward-compatibility"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
@@ -2032,6 +2020,18 @@
 		"slug": "internationalization-guide",
 		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
 		"parent": "react-native"
+	},
+	{
+		"title": "Backward Compatibility",
+		"slug": "backward-compatibility",
+		"markdown_source": "../docs/contributors/code/backward-compatibility.md",
+		"parent": "code"
+	},
+	{
+		"title": "Deprecations",
+		"slug": "deprecations",
+		"markdown_source": "../docs/contributors/code/deprecations.md",
+		"parent": "code"
 	},
 	{
 		"title": "Design Contributions",

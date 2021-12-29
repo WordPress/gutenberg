@@ -43,14 +43,6 @@
 	{
 		"docs/how-to-guides/README.md": [
 			{ "docs/how-to-guides/accessibility.md": [] },
-
-			{
-				"docs/how-to-guides/backward-compatibility/README.md": [
-					{
-						"docs/how-to-guides/backward-compatibility/deprecations.md": []
-					}
-				]
-			},
 			{
 				"docs/how-to-guides/block-tutorial/README.md": [
 					{
@@ -312,7 +304,9 @@
 								"docs/contributors/code/react-native/internationalization-guide.md": []
 							}
 						]
-					}
+					},
+					{ "docs/contributors/code/backward-compatibility.md": [] },
+					{ "docs/contributors/code/deprecations.md": [] }
 				]
 			},
 			{
