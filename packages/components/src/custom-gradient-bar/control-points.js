@@ -9,7 +9,7 @@ import { colord } from 'colord';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 

@@ -14,7 +14,6 @@ import {
 	ColorIndicator,
 	Dropdown,
 } from '@wordpress/components';
-import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
