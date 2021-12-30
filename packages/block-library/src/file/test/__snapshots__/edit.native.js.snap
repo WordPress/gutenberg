@@ -95,6 +95,7 @@ exports[`File block renders file error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>File name</p>",
             }
           }
@@ -191,6 +192,7 @@ exports[`File block renders file error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>Download</p>",
             }
           }
@@ -298,6 +300,7 @@ exports[`File block renders file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>File name</p>",
             }
           }
@@ -373,6 +376,7 @@ exports[`File block renders file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>Download</p>",
             }
           }
