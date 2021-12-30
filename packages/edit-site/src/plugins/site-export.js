@@ -6,7 +6,7 @@ import downloadjs from 'downloadjs';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { download } from '@wordpress/icons';
@@ -46,7 +46,7 @@ export default function SiteExport() {
 			onClick={ handleExport }
 			info={ __( 'Download your templates and template parts.' ) }
 		>
-			{ __( 'Export' ) }
+			{ _x( 'Export', 'site exporter menu item' ) }
 		</MenuItem>
 	);
 }
