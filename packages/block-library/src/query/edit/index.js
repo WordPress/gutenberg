@@ -13,8 +13,9 @@ import {
 	store as blockEditorStore,
 	useInnerBlocksProps,
 	__experimentalBlockPatternSetup as BlockPatternSetup,
+	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,7 +28,34 @@ import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 import { getFirstQueryClientIdFromBlocks } from '../utils';
 
 const TEMPLATE = [ [ 'core/post-template' ] ];
-export function QueryContent( { attributes, setAttributes } ) {
+
+function ResetQueryLoopMenuItem( { clientId } ) {
+	const selectedBlockClientId = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
+		[]
+	);
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	if ( selectedBlockClientId !== clientId ) {
+		return null;
+	}
+	return (
+		<BlockSettingsMenuControls>
+			{ ( { onClose } ) => (
+				<MenuItem
+					onClick={ () => {
+						replaceInnerBlocks( clientId, [] );
+						onClose();
+					} }
+					info={ __( 'Remove all innerblocks and start fresh' ) }
+				>
+					{ __( 'Reset Query Loop' ) }
+				</MenuItem>
+			) }
+		</BlockSettingsMenuControls>
+	);
+}
+
+export function QueryContent( { attributes, setAttributes, clientId } ) {
 	const {
 		queryId,
 		query,
@@ -104,6 +132,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 					setDisplayLayout={ updateDisplayLayout }
 				/>
 			</BlockControls>
+			<ResetQueryLoopMenuItem clientId={ clientId } />
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
