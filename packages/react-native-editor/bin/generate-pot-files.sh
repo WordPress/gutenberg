@@ -163,7 +163,7 @@ function generate_pot_files() {
   echo -e "\nExtract strings from block JSON files:"
   make_pot "$source_dir" "--exclude="$exclude_files" --skip-js --skip-php --ignore-domain $output_pot_blocks_file"
 
-  echo -e "\nExtract strings from non-native JS code:"
+  echo -e "\nExtract strings from source:"
   make_pot "$source_dir" "--exclude="$exclude_files" --merge="$output_pot_blocks_file" $domain_param $output_pot_source_file"
 }
 
