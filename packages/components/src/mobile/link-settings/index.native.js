@@ -220,6 +220,10 @@ function LinkSettings( {
 		setLabelInputValue( '' );
 	};
 
+	const clearLinkRelInput = () => {
+		setLinkRelInputValue( '' );
+	};
+
 	const onChangeLinkRel = useCallback( ( value ) => {
 		setLinkRelInputValue( value );
 	}, [] );
@@ -290,10 +294,12 @@ function LinkSettings( {
 						) }
 						{ options.linkRel && (
 							<TextControl
+								displayClearButton={ true }
 								icon={ showIcon && LinkRelIcon }
 								label={ options.linkRel.label }
 								value={ linkRelInputValue }
 								valuePlaceholder={ options.linkRel.placeholder }
+								onClear={ () => clearLinkRelInput() }
 								onChange={ onChangeLinkRel }
 								onSubmit={ onCloseSettingsSheet }
 								autoCapitalize="none"
