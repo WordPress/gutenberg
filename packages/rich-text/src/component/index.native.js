@@ -963,7 +963,7 @@ export class RichText extends Component {
 
 		const { baseGlobalStyles, tagName } = this.props;
 		const isBlockBasedTheme =
-			Object.entries( baseGlobalStyles ).length !== 0;
+			baseGlobalStyles && Object.entries( baseGlobalStyles ).length !== 0;
 		const tagsToMatch = /pre|h([1-6])$/gm;
 
 		return isBlockBasedTheme && tagsToMatch.test( tagName );
