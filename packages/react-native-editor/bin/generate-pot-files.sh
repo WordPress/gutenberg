@@ -106,6 +106,21 @@ function extract_source_from_sourcemap_file() {
   node $SCRIPT_DIR/extract-files-from-sourcemap.js $map_file $target_path
 }
 
+function make_pot () {
+  local source=$1
+  local arguments=$2
+  local makepot_command="$WP_CLI i18n make-pot"
+
+  # In order to detect parse errors, we need to use the "--debug" option, otherwise "make-pot" command doesn't output errors.
+  local full_command="$makepot_command $source --debug $arguments"
+  if [[ -z ${DEBUG:-} ]]; then
+    # When DEBUG flag is not enabled, we only print the parse errors.
+    $full_command 2> >(grep 'Could not parse file' | sed 's/Debug[[:space:]][(]make-pot[)]/Warning/g' >&2)
+  else
+    $full_command
+  fi
+}
+
 function generate_pot_files() {
   local output_path=$1
   local plugin_name=$2
@@ -127,13 +142,9 @@ function generate_pot_files() {
   local output_pot_blocks_file="$output_path/$plugin_name-blocks.pot"
   local output_pot_source_file="$output_path/$plugin_name-source.pot"
 
-  local exclude_files="test/*,e2e-tests/*,bundle/*,build-module/*"
-
-  local debug_param=$([ -z ${DEBUG:-} ] && echo "" || echo "--debug")
+  local exclude_files="test/*,e2e-tests/*,bundle/*,build-module/*,gutenberg/build/*,*.map,bin/*"
   local subtract_param=$([ -z $subtract_pot_files ] && echo "" || echo "--subtract=$subtract_pot_files")
   local domain_param=$([ "$plugin_name" == "gutenberg" ] && echo "--ignore-domain" || echo "--domain=$plugin_name")
-
-  local makepot_command="$WP_CLI i18n make-pot"
 
   echo -e "\n\033[1mExtract strings and generate POT files for \"$plugin_name\" plugin from \"$source_dir\"\033[0m"
 
@@ -144,16 +155,16 @@ function generate_pot_files() {
   fi
   
   echo -e "\nExtract used strings from Android source-map:"
-  $makepot_command $ANDROID_EXTRACT_SOURCE_FILES_PATH $debug_param $subtract_param $domain_param $output_pot_used_android_file
+  make_pot "$ANDROID_EXTRACT_SOURCE_FILES_PATH" "$subtract_param $domain_param $output_pot_used_android_file"
 
   echo -e "\nExtract used strings from iOS source-map:"
-  $makepot_command $IOS_EXTRACT_SOURCE_FILES_PATH $debug_param $subtract_param $domain_param $output_pot_used_ios_file
+  make_pot "$IOS_EXTRACT_SOURCE_FILES_PATH" "$subtract_param $domain_param $output_pot_used_ios_file"
 
   echo -e "\nExtract strings from block JSON files:"
-  $makepot_command $source_dir $debug_param --exclude="$exclude_files" --skip-js --skip-php --ignore-domain $output_pot_blocks_file
+  make_pot "$source_dir" "--exclude="$exclude_files" --skip-js --skip-php --ignore-domain $output_pot_blocks_file"
 
   echo -e "\nExtract strings from non-native JS code:"
-  $makepot_command $source_dir $debug_param --exclude="$exclude_files" --merge="$output_pot_blocks_file" $domain_param $output_pot_source_file
+  make_pot "$source_dir" "--exclude="$exclude_files" --merge="$output_pot_blocks_file" $domain_param $output_pot_source_file"
 }
 
 # Get parameters

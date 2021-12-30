@@ -134,7 +134,6 @@ const generatePotFiles = ( plugins, potFilesDir ) => {
 		.map( ( { name, sourcePath } ) => `${ name } ${ sourcePath }` )
 		.join( ' ' );
 	try {
-		// TODO: Detect potential parse failures
 		childProcess.execSync(
 			`${ potFilesCommand } --path ${ potFilesDir } ${ potFilesArgs } `,
 			{
