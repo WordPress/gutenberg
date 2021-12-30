@@ -721,7 +721,7 @@ export class RichText extends Component {
 		}
 	}
 
-	shouldComponentUpdate( nextProps ) {
+	shouldComponentUpdate( nextProps, nextState ) {
 		if (
 			nextProps.tagName !== this.props.tagName ||
 			nextProps.reversed !== this.props.reversed ||
@@ -779,7 +779,10 @@ export class RichText extends Component {
 			}
 
 			if (
-				nextProps?.style?.fontSize !== this.props?.style?.fontSize ||
+				( nextProps?.style?.fontSize !== this.props?.style?.fontSize &&
+					nextState.currentFontSize !==
+						this.state.currentFontSize ) ||
+				nextState.currentFontSize !== this.state.currentFontSize ||
 				nextProps?.style?.lineHeight !== this.props?.style?.lineHeight
 			) {
 				this.needsSelectionUpdate = true;
@@ -814,7 +817,7 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { style } = this.props;
+		const { style, tagName } = this.props;
 		const { currentFontSize } = this.state;
 
 		if ( this.props.value !== this.value ) {
@@ -838,10 +841,12 @@ export class RichText extends Component {
 
 		const currentFontSizeStyle = parseFloat( style?.fontSize );
 		const prevFontSizeStyle = parseFloat( prevProps?.style?.fontSize );
+		const isDifferentTag = prevProps.tagName !== tagName;
 		if (
-			currentFontSize &&
-			( currentFontSizeStyle || prevFontSizeStyle ) &&
-			currentFontSizeStyle !== currentFontSize
+			( currentFontSize &&
+				( currentFontSizeStyle || prevFontSizeStyle ) &&
+				currentFontSizeStyle !== currentFontSize ) ||
+			isDifferentTag
 		) {
 			this.setState( {
 				currentFontSize: this.getFontSize( this.props ),
@@ -948,6 +953,22 @@ export class RichText extends Component {
 		return lineHeight;
 	}
 
+	getBlockUseDefaultFont() {
+		// For block-based themes it enables using the defaultFont
+		// in Aztec for iOS so it allows customizing the font size
+		// for the Preformatted/Code and Heading blocks.
+		if ( ! this.isIOS ) {
+			return;
+		}
+
+		const { baseGlobalStyles, tagName } = this.props;
+		const isBlockBasedTheme =
+			Object.entries( baseGlobalStyles ).length !== 0;
+		const tagsToMatch = /pre|h([1-6])$/gm;
+
+		return isBlockBasedTheme && tagsToMatch.test( tagName );
+	}
+
 	render() {
 		const {
 			tagName,
@@ -968,6 +989,7 @@ export class RichText extends Component {
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
 		const editableProps = this.getEditableProps();
+		const blockUseDefaultFont = this.getBlockUseDefaultFont();
 
 		const placeholderStyle = getStylesFromColorScheme(
 			styles.richTextPlaceholder,
@@ -1073,12 +1095,14 @@ export class RichText extends Component {
 							: { maxWidth } ),
 						minHeight: this.state.height,
 					} }
+					blockUseDefaultFont={ blockUseDefaultFont }
 					text={ {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
 						linkTextColor:
 							style?.linkColor || defaultTextDecorationColor,
+						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
