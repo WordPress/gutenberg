@@ -106,7 +106,7 @@ if ( require.main === module ) {
 
 			// eslint-disable-next-line no-console
 			console.log(
-				`Using compiled file "${ compiledFile }" for Typescript file ${ file }`
+				`Using compiled file "${ compiledFile }" for Typescript file "${ file }"`
 			);
 			return compiledFile;
 		}
