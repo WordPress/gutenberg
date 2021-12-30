@@ -142,7 +142,7 @@ function generate_pot_files() {
   local output_pot_blocks_file="$output_path/$plugin_name-blocks.pot"
   local output_pot_source_file="$output_path/$plugin_name-source.pot"
 
-  local exclude_files="test/*,e2e-tests/*,bundle/*,build-module/*,gutenberg/build/*,*.map,bin/*"
+  local exclude_files="test/*,e2e-tests/*,bundle/*,build-module/*,*.map,bin/*,local-test/*"
   local subtract_param=$([ -z $subtract_pot_files ] && echo "" || echo "--subtract=$subtract_pot_files")
   local domain_param=$([ "$plugin_name" == "gutenberg" ] && echo "--ignore-domain" || echo "--domain=$plugin_name")
 
@@ -251,4 +251,4 @@ for (( index=0; index<${#PLUGINS[@]}; index+=2 )); do
 done
 
 # Generate POT files for Gutenberg
-generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR/packages" "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"}"
+generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR" "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"}"
