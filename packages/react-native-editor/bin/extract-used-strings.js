@@ -59,7 +59,7 @@ const getStringsFromPotFile = ( potFileName ) => {
 						: stringPlural,
 				context: msgctxt,
 				comments: comments?.extracted || '',
-				reference: comments?.reference.split( '\n' ) || [],
+				reference: comments?.reference?.split( '\n' ) || [],
 			} )
 		);
 
