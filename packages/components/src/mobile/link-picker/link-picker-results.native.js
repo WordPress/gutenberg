@@ -1,37 +1,78 @@
 /**
  * External dependencies
  */
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import {
+	ActivityIndicator,
+	AppState,
+	Clipboard,
+	FlatList,
+	View,
+} from 'react-native';
 import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { isURL } from '@wordpress/url';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
+export const useAppState = () => {
+	const [ state, setState ] = useState( AppState.currentState );
+
+	useEffect( () => {
+		const onChange = ( nextAppState ) => setState( nextAppState );
+		const subscription = AppState.addEventListener( 'change', onChange );
+		return () => subscription.remove();
+	}, [] );
+
+	return state;
+};
+
 const PER_PAGE = 20;
 const REQUEST_DEBOUNCE_DELAY = 400;
 const MINIMUM_QUERY_SIZE = 2;
 const meetsThreshold = ( query ) => MINIMUM_QUERY_SIZE <= query.length;
+const getURLFromClipboard = async () => {
+	const text = await Clipboard.getString();
+	return !! text && isURL( text ) ? text : '';
+};
 
 export default function LinkPickerResults( {
 	query,
 	onLinkPicked,
 	directEntry,
 } ) {
-	const [ links, setLinks ] = useState( [ directEntry ] );
+	const appState = useAppState();
+	const [ clipboardLink, setClipboardLink ] = useState( {} );
+	const { url: clipboardUrl } = clipboardLink;
+	const initialSuggestions = !! query ? [ directEntry ] : [];
+	const [ links, setLinks ] = useState( initialSuggestions );
 	const [ hasAllSuggestions, setHasAllSuggestions ] = useState( false );
 	const nextPage = useRef( 1 );
 	const pendingRequest = useRef();
 	const clearRequest = () => {
 		pendingRequest.current = null;
+	};
+	const setClipboardUrl = ( url ) => {
+		setClipboardLink( {
+			type: 'clipboard',
+			url,
+			isDirectEntry: true,
+			accessible: true,
+			accessibilityLabel: sprintf(
+				/* translators: Copy URL from the clipboard, https://sample.url */
+				__( 'Copy URL from the clipboard, %s' ),
+				url
+			),
+		} );
 	};
 
 	// a stable debounced function to fetch suggestions and append
@@ -84,9 +125,17 @@ export default function LinkPickerResults( {
 		clearRequest();
 		nextPage.current = 1;
 		setHasAllSuggestions( false );
-		setLinks( [ directEntry ] );
-		fetchMoreSuggestions( { query, links: [ directEntry ] } );
+		setLinks( initialSuggestions );
+		fetchMoreSuggestions( { query, links: initialSuggestions } );
 	}, [ query ] );
+
+	useEffect( () => {
+		if ( appState === 'active' ) {
+			getURLFromClipboard()
+				.then( ( url ) => setClipboardUrl( url ) )
+				.catch( () => setClipboardUrl( '' ) );
+		}
+	}, [ appState ] );
 
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
 
@@ -100,7 +149,11 @@ export default function LinkPickerResults( {
 		<BottomSheetConsumer>
 			{ ( { listProps } ) => (
 				<FlatList
-					data={ links }
+					data={
+						!! clipboardUrl && clipboardUrl !== query
+							? [ clipboardLink, ...links ]
+							: links
+					}
 					keyboardShouldPersistTaps="always"
 					renderItem={ ( { item } ) => (
 						<BottomSheet.LinkSuggestionItemCell
@@ -112,6 +165,15 @@ export default function LinkPickerResults( {
 					onEndReached={ onEndReached }
 					onEndReachedThreshold={ 0.1 }
 					initialNumToRender={ PER_PAGE }
+					ListEmptyComponent={
+						<View
+							accessible={ true }
+							accessibilityLabel={
+								/* translators: No items. */
+								__( 'No items.' )
+							}
+						/>
+					}
 					ListFooterComponent={ spinner }
 					{ ...listProps }
 					contentContainerStyle={ [

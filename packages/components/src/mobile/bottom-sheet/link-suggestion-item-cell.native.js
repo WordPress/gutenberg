@@ -39,8 +39,15 @@ const getSummaryForType = ( type ) => {
 };
 
 // we use some Cell styles here with a column flex-direction
-function LinkSuggestionItemCell( { suggestion, onLinkPicked, ...props } ) {
-	const { title: contentTitle, url, type, isDirectEntry } = suggestion;
+function LinkSuggestionItemCell( { suggestion, onLinkPicked } ) {
+	const {
+		title: contentTitle,
+		url,
+		type,
+		isDirectEntry,
+		accessible,
+		accessibilityLabel,
+	} = suggestion;
 	const title = isDirectEntry ? url : contentTitle;
 	const summary = isDirectEntry ? getSummaryForType( type ) : url;
 
@@ -61,7 +68,8 @@ function LinkSuggestionItemCell( { suggestion, onLinkPicked, ...props } ) {
 
 	return (
 		<Cell
-			{ ...props }
+			accessible={ accessible }
+			accessibilityLabel={ accessibilityLabel }
 			icon={ icons[ type ] || empty }
 			onPress={ pickLink }
 			separatorType={ 'none' }
