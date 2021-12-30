@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
+import { MenuItem, VisuallyHidden } from '@wordpress/components';
+import { external } from '@wordpress/icons';
 import { registerPlugin } from '@wordpress/plugins';
 
 /**
@@ -20,6 +21,7 @@ registerPlugin( 'edit-site', {
 					<SiteExport />
 					<WelcomeGuideMenuItem />
 					<MenuItem
+						icon={ external }
 						href={ __(
 							'https://wordpress.org/support/article/site-editor/'
 						) }
@@ -27,6 +29,12 @@ registerPlugin( 'edit-site', {
 						rel="noopener noreferrer"
 					>
 						{ __( 'Help' ) }
+						<VisuallyHidden as="span">
+							{
+								/* translators: accessibility text */
+								__( '(opens in a new tab)' )
+							}
+						</VisuallyHidden>
 					</MenuItem>
 				</ToolsMoreMenuGroup>
 			</>
