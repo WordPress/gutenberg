@@ -22,6 +22,7 @@ registerPlugin( 'edit-site', {
 					<WelcomeGuideMenuItem />
 					<MenuItem
 						icon={ external }
+						role="menuitem"
 						href={ __(
 							'https://wordpress.org/support/article/site-editor/'
 						) }
