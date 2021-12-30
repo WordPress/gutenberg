@@ -328,6 +328,7 @@ function CoverEdit( {
 		alt,
 		allowedBlocks,
 		templateLock,
+		layout = {},
 	} = attributes;
 	const {
 		gradientClass,
@@ -618,6 +619,12 @@ function CoverEdit( {
 		fontSize: hasFontSizes ? 'large' : undefined,
 	} );
 
+	const themeSupportsLayout = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings()?.supportsLayout;
+	}, [] );
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
@@ -627,6 +634,7 @@ function CoverEdit( {
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
+			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 		}
 	);
 
