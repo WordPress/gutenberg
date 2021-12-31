@@ -68,17 +68,13 @@ Create a basic `block.json` file there:
 
 With the `block.json` in place, the registration for the block is a single function call in PHP, this will setup the block and JavaScript file specified in the `editorScript` property to load in the editor.
 
-```php
-	register_block_type( __DIR__ );
-```
-
-Create a full plugin file, `index.php` like the following:
+Create a full plugin file, `index.php` like the following, the same PHP code works for both JSX and Plain code.
 
 ```php
 <?php
-/*
-Plugin Name: Gutenberg examples 01
-*/
+/**
+ * Plugin Name: Gutenberg examples 01
+ */
 function gutenberg_examples_01_register_block() {
 	register_block_type( __DIR__ );
 }
