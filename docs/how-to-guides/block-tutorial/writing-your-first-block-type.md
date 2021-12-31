@@ -4,7 +4,7 @@ This guide takes you through creating a basic block to display a message in a po
 
 ## Overview
 
-There are two main types of blocks: static and dynamic, this guide focusing on static blocks. A static block is used to insert HTML content into the post and saved with the post. A dynamic block builds the content on the fly when rendered on the front end, see the [dynamic blocks guide](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md).
+There are two main types of blocks: static and dynamic, this guide focuses on static blocks. A static block is used to insert HTML content into the post and save it with the post. A dynamic block builds the content on the fly when rendered on the front end, see the [dynamic blocks guide](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md).
 
 This guide focuses on just the block, see the [Create a Block tutorial](/docs/getting-started/create-block/README.md) for a complete setup.
 
@@ -27,13 +27,13 @@ Here are the basic settings:
 
 -   `title`: Block title shown in inserter
 -   `name`: Unique name defines your block
--   `category`: Category in inserter (text, media, design, widgets, theme embed)
+-   `category`: Category in inserter (text, media, design, widgets, theme, embed)
 -   `icon`: Dashicon icon displayed for block
 -   `editorScript`: JavaScript file to load for block
 
-The block.json file should be added to your plugin. To start a new plugin, create a directory in `/wp-content/plugins/` in your WordPress.
+The `block.json` file should be added to your plugin. To start a new plugin, create a directory in `/wp-content/plugins/` in your WordPress.
 
-Create a basic block.json file there:
+Create a basic `block.json` file there:
 
 {% codetabs %}
 {% JSX %}
@@ -67,7 +67,7 @@ Create a basic block.json file there:
 
 ### Step 2: Register block in plugin
 
-With the block.json in place, the registration for the block is a single function call in PHP, this will setup the block and JavaScript file specified in the `editorScript` property to load in the editor.
+With the `block.json` in place, the registration for the block is a single function call in PHP, this will setup the block and JavaScript file specified in the `editorScript` property to load in the editor.
 
 ```php
 	register_block_type( __DIR__ );
@@ -88,7 +88,7 @@ add_action( 'init', 'gutenberg_examples_01_register_block' );
 
 ### Step 3: Block edit and save functions
 
-The `editorScript` that loads in the editor calls a register function with a matching `name` specified in block.json and defines two important functions for the block, the `edit` and `save` functions.
+The `editorScript` that loads in the editor calls a register function with a matching `name` specified in `block.json` and defines two important functions for the block, the `edit` and `save` functions.
 
 The `edit` function is a component that is shown in the editor when the block is inserted.
 
@@ -129,7 +129,6 @@ Add the following to `block.js`
 			return el( 'p', {}, 'Hello World (from the editor).' );
 		},
 		save: function () {
-			var blockProps = useBlockProps.save( { style: blockStyle } );
 			return el( 'p', {}, 'Hola mundo (from the frontend).' );
 		},
 	} );
@@ -145,7 +144,7 @@ NOTE: If using the JSX version, you need to run `npm run build` and it will crea
 Open your editor and try adding your new block. It will show in the inserter using the `title`.
 When inserted you will see the `Hello World (from the editor)` message.
 
-When you save the post and view it published, you will see the `Hello World (from the frontend)` message.
+When you save the post and view it published, you will see the `Hola mundo (from the frontend)` message.
 
 **Troubleshooting** - If you run into any issues, here are a few things to try:
 
