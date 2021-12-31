@@ -114,7 +114,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Writing Your First Block Type",
+		"title": "Create a basic block",
 		"slug": "writing-your-first-block-type",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
 		"parent": "block-tutorial"
