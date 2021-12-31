@@ -146,6 +146,8 @@ class RCTAztecView: Aztec.TextView {
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         storage.htmlConverter.shouldCollapseSpaces = false
         shouldNotifyOfNonUserChanges = false
+        // Typing attributes are controlled by RichText component so we have to prevent Aztec to recalculate them when deleting backward.
+        shouldRecalculateTypingAttributesOnDeleteBackward = false
         disableLinkTapRecognizer()
         preBackgroundColor = .clear
     }
