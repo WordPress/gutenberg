@@ -45,7 +45,6 @@ Create a basic `block.json` file there:
 	"title": "Example: Basic (ESNext)",
 	"icon": "universal-access-alt",
 	"category": "layout",
-	"example": {},
 	"editorScript": "file:./build/index.js"
 }
 ```
