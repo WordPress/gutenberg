@@ -25,6 +25,7 @@ The functions of a static block is defined in JavaScript, however the settings a
 
 Here are the basic settings:
 
+-   `apiVersion`: Block API version
 -   `title`: Block title shown in inserter
 -   `name`: Unique name defines your block
 -   `category`: Category in inserter (text, media, design, widgets, theme, embed)
@@ -83,7 +84,7 @@ add_action( 'init', 'gutenberg_examples_01_register_block' );
 
 ### Step 3: Block edit and save functions
 
-The `editorScript` that loads in the editor calls a register function with a matching `name` specified in `block.json` and defines two important functions for the block, the `edit` and `save` functions.
+The `editorScript` entry is enqueued automatically in the block editor. This file contains the JavaScript portion of the block registration and defines two important functions for the block, the `edit` and `save` functions.
 
 The `edit` function is a component that is shown in the editor when the block is inserted.
 
