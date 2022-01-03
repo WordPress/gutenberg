@@ -51,9 +51,13 @@
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1), inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
-}
 
-.edit-post-fullscreen-mode-close_site-icon {
-	width: $button-size;
-	border-radius: $radius-block-ui;
+	.edit-post-fullscreen-mode-close_site-icon {
+		width: $button-size;
+		height: $button-size;
+		border-radius: $radius-block-ui;
+		object-fit: cover;
+		// Compensate for the top-bar border.
+		margin-top: -($border-width);
+	}
 }

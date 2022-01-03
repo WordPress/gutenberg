@@ -175,6 +175,13 @@ Theme authors can opt-out of this feature by removing the `block-templates` them
 remove_theme_support( 'block-templates' );
 ```
 
+## Accessibility
+
+A [skip to content link](https://make.wordpress.org/accessibility/handbook/markup/skip-links/) is automatically added on the front of the website when a webpage includes a `<main>` HTML element.
+The skip link points to the `<main>`.
+
+The group, template part, and query blocks can be changed to use `<main>`. You can find the setting to change the HTML element in the block settings sidebar under Advanced.
+
 ## Resources
 
 -   [Full Site Editing](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Full%20Site%20Editing) label.

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	store as blockEditorStore,
 	BlockSettingsMenuControls,
@@ -14,7 +14,8 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
+import { useLocation } from '../routes';
+import { useLink } from '../routes/link';
 
 export default function EditTemplatePartMenuButton() {
 	return (
@@ -30,6 +31,7 @@ export default function EditTemplatePartMenuButton() {
 }
 
 function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
+	const { params } = useLocation();
 	const selectedTemplatePart = useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock(
@@ -50,7 +52,15 @@ function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
 		[ selectedClientId ]
 	);
 
-	const { pushTemplatePart } = useDispatch( editSiteStore );
+	const linkProps = useLink(
+		{
+			postId: selectedTemplatePart?.id,
+			postType: selectedTemplatePart?.type,
+		},
+		{
+			fromTemplateId: params.postId,
+		}
+	);
 
 	if ( ! selectedTemplatePart ) {
 		return null;
@@ -58,8 +68,9 @@ function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
 
 	return (
 		<MenuItem
-			onClick={ () => {
-				pushTemplatePart( selectedTemplatePart.id );
+			{ ...linkProps }
+			onClick={ ( event ) => {
+				linkProps.onClick( event );
 				onClose();
 			} }
 		>

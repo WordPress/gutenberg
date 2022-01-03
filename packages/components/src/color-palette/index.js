@@ -35,6 +35,7 @@ function SinglePalette( {
 	const colorOptions = useMemo( () => {
 		return map( colors, ( { color, name } ) => {
 			const colordColor = colord( color );
+
 			return (
 				<CircularOptionPicker.Option
 					key={ color }
@@ -109,6 +110,20 @@ function MultiplePalettes( {
 	);
 }
 
+export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+	return (
+		<Dropdown
+			contentClassName={ classnames(
+				'components-color-palette__custom-color-dropdown-content',
+				{
+					'is-rendered-in-sidebar': isRenderedInSidebar,
+				}
+			) }
+			{ ...props }
+		/>
+	);
+}
+
 export default function ColorPalette( {
 	clearable = true,
 	className,
@@ -133,16 +148,19 @@ export default function ColorPalette( {
 		/>
 	);
 
+	let dropdownPosition;
+	if ( __experimentalIsRenderedInSidebar ) {
+		dropdownPosition = 'bottom left';
+	}
+
+	const colordColor = colord( value );
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
-				<Dropdown
-					contentClassName={ classnames(
-						'components-color-palette__custom-color-dropdown-content',
-						{
-							'is-rendered-in-sidebar': __experimentalIsRenderedInSidebar,
-						}
-					) }
+				<CustomColorPickerDropdown
+					position={ dropdownPosition }
+					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<button
@@ -151,7 +169,14 @@ export default function ColorPalette( {
 							aria-haspopup="true"
 							onClick={ onToggle }
 							aria-label={ __( 'Custom color picker' ) }
-							style={ { background: value } }
+							style={ {
+								background: value,
+								color:
+									colordColor.contrast() >
+									colordColor.contrast( '#000' )
+										? '#fff'
+										: '#000',
+							} }
 						>
 							{ value }
 						</button>

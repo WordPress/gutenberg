@@ -21,6 +21,7 @@ export default function PanelColorGradientSettings( { settings, title } ) {
 		return settings.map(
 			( {
 				onColorChange,
+				onColorCleared,
 				colorValue,
 				onGradientChange,
 				gradientValue,
@@ -33,6 +34,7 @@ export default function PanelColorGradientSettings( { settings, title } ) {
 							colorValue: gradientValue || colorValue,
 							gradientValue,
 							onGradientChange,
+							onColorCleared,
 							label,
 						} );
 					} }

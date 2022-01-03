@@ -36,6 +36,12 @@ The handbook is organized into four sections based on the functional types of do
 -   **Reference guides** - API documentation, purely functional descriptions,
 -   **Explanations** - longer documentation focused on learning, not a specific task.
 
+### Templates
+
+A [how to guide template](https://raw.githubusercontent.com/WordPress/gutenberg/trunk/docs/contributors/documentation/how-to-guide-template.md) is available to provide a common structure to guides. If starting a new how to guide, copy the markdown from the template to get started.
+
+The template is based on examples from The Good Docs Project, see their [template repository for additional examples](https://github.com/thegooddocsproject/templates) to help you create quality documentation.
+
 ### Update a document
 
 To update an existing page:
@@ -82,26 +88,26 @@ An example, the link to this page is: `/docs/contributors/documentation/README.m
 
 The code example in markdown should be wrapped in three tick marks \`\`\` and should additionally include a language specifier. See this [GitHub documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).
 
-A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `ESNext` and `ES5` code samples. For example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
+A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `JSX` and `Plain` code samples. For example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
 
 Here is an example `codetabs` section:
 
 ````md
-    {% codetabs %}
-    {% ESNext %}
+    \{\% codetabs \%\}
+    \{\% JSX \%\}
     ```js
-    	// ESNext code here
+    // JSX code here
     ```
-    {% ES5 %}
+    \{\% Plain \%\}
     ```js
-    	// ES5 code here
+    // Plain code here
     ```
-    {% end %}
+    \{\% end \%\}
 ````
 
-The preferred format for code examples is ESNext, this should be the default view. The example placed first in source will be shown as the default.
+The preferred format for code examples is JSX, this should be the default view. The example placed first in source will be shown as the default.
 
-**Note:** it is not required to include ES5 code examples. The guidance is to include `ES5` code for beginner tutorials, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem is in ESNext.
+**Note:** It is not required to include plain JavaScript code examples for every guide. The recommendation is to include plain code for beginner tutorials or short examples, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem are in JSX that requires a build process.
 
 ### Callout notices
 
@@ -150,6 +156,6 @@ An example config for using Visual Studio Code and the Prettier extensions:
 
 ## Resources
 
--   [Copy Guidelines](/docs/contributors/copy-guide.md) for writing instructions, documentations, or other contributions to Gutenberg project.
+-   [Copy Guidelines](/docs/contributors/documentation/copy-guide.md) for writing instructions, documentations, or other contributions to Gutenberg project.
 
 -   [Tone and Voice Guide](https://make.wordpress.org/docs/handbook/documentation-team-handbook/tone-and-voice-guide/) from WordPress Documentation.

@@ -208,7 +208,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block client ID.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 

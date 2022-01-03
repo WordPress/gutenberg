@@ -38,7 +38,10 @@
 		"enzyme-to-json": "^3.4.4"
 	},
 	"peerDependencies": {
-		"jest": ">=26"
+		"@babel/core": ">=7",
+		"jest": ">=26",
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

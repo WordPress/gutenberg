@@ -18,30 +18,31 @@ export const {
 	Slot: NavigationPanelPreviewSlot,
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
-export default function NavigationSidebar( {
-	isDefaultOpen = false,
-	activeTemplateType,
-} ) {
+const {
+	Fill: NavigationSidebarFill,
+	Slot: NavigationSidebarSlot,
+} = createSlotFill( 'EditSiteNavigationSidebar' );
+
+function NavigationSidebar( { isDefaultOpen = false, activeTemplateType } ) {
 	const isDesktopViewport = useViewportMatch( 'medium' );
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
-	useEffect( () => {
-		// When transitioning to desktop open the navigation if `isDefaultOpen` is true.
-		if ( isDefaultOpen && isDesktopViewport ) {
-			setIsNavigationPanelOpened( true );
-		}
-
-		// When transitioning to mobile/tablet, close the navigation.
-		if ( ! isDesktopViewport ) {
-			setIsNavigationPanelOpened( false );
-		}
-	}, [ isDefaultOpen, isDesktopViewport, setIsNavigationPanelOpened ] );
+	useEffect(
+		function autoOpenNavigationPanelOnViewportChange() {
+			setIsNavigationPanelOpened( isDefaultOpen && isDesktopViewport );
+		},
+		[ isDefaultOpen, isDesktopViewport, setIsNavigationPanelOpened ]
+	);
 
 	return (
-		<>
+		<NavigationSidebarFill>
 			<NavigationToggle />
 			<NavigationPanel activeItem={ activeTemplateType } />
 			<NavigationPanelPreviewSlot />
-		</>
+		</NavigationSidebarFill>
 	);
 }
+
+NavigationSidebar.Slot = NavigationSidebarSlot;
+
+export default NavigationSidebar;

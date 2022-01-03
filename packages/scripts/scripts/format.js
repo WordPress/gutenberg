@@ -30,7 +30,7 @@ function checkPrettier() {
 	try {
 		const prettierResolvePath = require.resolve( 'prettier' );
 		const prettierPackageJson = readPkgUp( { cwd: prettierResolvePath } );
-		const prettierPackageName = prettierPackageJson.pkg.name;
+		const prettierPackageName = prettierPackageJson.packageJson.name;
 
 		if (
 			! [ 'wp-prettier', '@wordpress/prettier' ].includes(

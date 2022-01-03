@@ -29,7 +29,6 @@
 
 	.comment-author {
 		line-height: 1.5;
-		margin-left: -3.25em;
 
 		.avatar {
 			border-radius: 1.5em;
@@ -64,9 +63,13 @@
 		}
 	}
 
-	.comment-form-comment textarea {
-		box-sizing: border-box;
-		width: 100%;
+	.comment-form {
+		textarea,
+		input:not([type="submit"]):not([type="checkbox"]) {
+			display: block;
+			box-sizing: border-box;
+			width: 100%;
+		}
 	}
 
 	.comment-form-cookies-consent {

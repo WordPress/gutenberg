@@ -33,6 +33,7 @@ function ModeSwitcher() {
 		shortcut,
 		isRichEditingEnabled,
 		isCodeEditingEnabled,
+		isEditingTemplate,
 		mode,
 	} = useSelect(
 		( select ) => ( {
@@ -43,11 +44,16 @@ function ModeSwitcher() {
 				.richEditingEnabled,
 			isCodeEditingEnabled: select( editorStore ).getEditorSettings()
 				.codeEditingEnabled,
+			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
 			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]
 	);
 	const { switchEditorMode } = useDispatch( editPostStore );
+
+	if ( isEditingTemplate ) {
+		return null;
+	}
 
 	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
 		return null;
