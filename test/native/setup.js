@@ -4,6 +4,11 @@
 import 'react-native-gesture-handler/jestSetup';
 import { Image, NativeModules as RNNativeModules } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
+import apiFetch from '@wordpress/api-fetch';
+
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
 RNNativeModules.RNGestureHandlerModule = RNNativeModules.RNGestureHandlerModule || {
@@ -35,6 +40,7 @@ jest.mock( '@wordpress/element', () => {
 } );
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+apiFetch.setFetchHandler = jest.fn();
 
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
