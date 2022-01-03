@@ -165,6 +165,11 @@ describe( 'Multi-entity save flow', () => {
 				'//*[@id="a11y-speak-polite"][contains(text(), "Post published")]'
 			);
 
+			// Unselect the blocks to avoid clicking the block toolbar.
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+			} );
+
 			// Update the post.
 			await page.click( '.editor-post-title' );
 			await page.keyboard.type( '...more title!' );
