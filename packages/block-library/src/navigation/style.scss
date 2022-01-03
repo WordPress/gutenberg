@@ -112,11 +112,11 @@ $navigation-icon-size: 24px;
 	--navigation-layout-direction: row;
 	--navigation-layout-wrap: wrap;
 	--navigation-layout-justify: flex-start;
-	--navigation-layout-align: left;
+	--navigation-layout-align: center;
 
 	&.is-vertical {
 		--navigation-layout-direction: column;
-		--navigation-layout-justify: initial;
+		--navigation-layout-align: flex-start;
 	}
 
 	&.no-wrap {
