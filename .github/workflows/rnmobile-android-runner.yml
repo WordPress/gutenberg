@@ -19,6 +19,7 @@ jobs:
         strategy:
             matrix:
                 api-level: ['29']
+                emulator-build: 7425822 # https://git.io/JE3jX
                 native-test-name: [gutenberg-editor-initial-html]
                 node: ['14']
 
