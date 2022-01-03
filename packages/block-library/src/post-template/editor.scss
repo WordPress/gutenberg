@@ -4,4 +4,11 @@
 		margin-left: 0;
 		list-style: none;
 	}
+
+	.wp-block-post-template {
+		.is-root-container {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
 }
