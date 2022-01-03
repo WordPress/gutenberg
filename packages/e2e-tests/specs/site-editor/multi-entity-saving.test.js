@@ -308,26 +308,18 @@ describe( 'Multi-entity save flow', () => {
 			// Open the block settings.
 			await page.click( 'button[aria-label="Settings"]' );
 
-			// Click on font size selector.
-			await page.click( 'button[aria-label="Font size"]' );
-
-			// Click on a different font size.
-			const extraSmallFontSize = await page.waitForXPath(
-				'//li[contains(text(), "Extra small")]'
+			// Change the font size
+			await page.click(
+				'.components-font-size-picker__controls button[aria-label="Small"]'
 			);
-			await extraSmallFontSize.click();
 
 			// Save all changes.
 			await saveAllChanges();
 
-			// Click on font size selector again.
-			await page.click( 'button[aria-label="Font size"]' );
-
-			// Select another font size.
-			const normalFontSize = await page.waitForXPath(
-				'//li[contains(text(), "Normal")]'
+			// Change the font size
+			await page.click(
+				'.components-font-size-picker__controls button[aria-label="Medium"]'
 			);
-			await normalFontSize.click();
 
 			// Assert that the save button has been re-enabled.
 			const saveButton = await page.waitForSelector(
