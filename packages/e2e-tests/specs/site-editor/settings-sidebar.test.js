@@ -70,7 +70,7 @@ describe( 'Settings sidebar', () => {
 
 			const templateCardBeforeNavigation = await getTemplateCard();
 			await siteEditor.visit( {
-				postId: 'emptytheme//404',
+				postId: 'emptytheme//singular',
 				postType: 'wp_template',
 			} );
 			const templateCardAfterNavigation = await getTemplateCard();
@@ -80,8 +80,8 @@ describe( 'Settings sidebar', () => {
 				description: 'Displays posts.',
 			} );
 			expect( templateCardAfterNavigation ).toMatchObject( {
-				title: '404',
-				description: 'Displays when no content is found.',
+				title: 'Singular',
+				description: 'Displays a single post or page.',
 			} );
 		} );
 	} );
