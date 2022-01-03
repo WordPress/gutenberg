@@ -176,13 +176,13 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 			...DEFAULT_LOCALE_DATA,
 			...tannin.data[ domain ],
 			...data,
-		};
-
-		// Populate default domain configuration (supported locale date which omits
-		// a plural forms expression).
-		tannin.data[ domain ][ '' ] = {
-			...DEFAULT_LOCALE_DATA[ '' ],
-			...tannin.data[ domain ][ '' ],
+			// Populate default domain configuration (supported locale date which omits
+			// a plural forms expression).
+			'': {
+				...DEFAULT_LOCALE_DATA[ '' ],
+				...( tannin.data[ domain ] || {} )[ '' ],
+				...( data || {} )[ '' ],
+			},
 		};
 	};
 
