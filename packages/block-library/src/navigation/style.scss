@@ -112,7 +112,7 @@ $navigation-icon-size: 24px;
 	--navigation-layout-direction: row;
 	--navigation-layout-wrap: wrap;
 	--navigation-layout-justify: flex-start;
-	--navigation-layout-align: center;
+	--navigation-layout-align: left;
 
 	&.is-vertical {
 		--navigation-layout-direction: column;
