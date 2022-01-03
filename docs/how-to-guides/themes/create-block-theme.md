@@ -4,7 +4,7 @@ The purpose of this tutorial is to show how to create a block theme and help the
 
 You will learn about the required files, how to combine templates and template parts, how to add presets for global styles, and how to add blocks and export the templates in the site editor.
 
-Block themes are releasing in WordPress 5.9 as part of the full site editing project.
+Block themes are releasing in WordPress 5.9 as part of the full site editing project, previously required Gutenberg plugin 11.0+ or newer.
 
 ## Table of Contents
 
@@ -388,11 +388,11 @@ Start by adding two curly brackets to the file:
 {}
 ```
 
-Add the version number for the theme.json format. For Gutenberg 10.6, the version number is 1:
+Add the version number for the theme.json format. For WordPress 5.9, the version number is 2:
 
 ```json
 {
-	"version": 1
+	"version": 2
 }
 ```
 
@@ -404,7 +404,7 @@ Next, add three main sections:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {},
 	"styles": {},
 	"templateParts": []
@@ -434,7 +434,7 @@ To enable border styles, add a `border` object under `settings` with the followi
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"border": {
 			"color": true,
@@ -450,7 +450,7 @@ To enable link colors, add a `color` setting and set `link` to true:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"border": {
 			"color": true,
@@ -469,7 +469,7 @@ To enable padding, margin and custom spacing units, include a setting for spacin
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"border": {
 			"color": true,
@@ -495,7 +495,7 @@ If you want to disable gradients, which are enabled by default, set `gradient` t
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"border": {
 			"color": true,
@@ -530,7 +530,7 @@ The example uses pixels, but you can use any valid CSS value and unit.
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		...
 		"layout": {
@@ -557,7 +557,7 @@ Add a default color palette inside `settings`, under `color`:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		...
 		"color": {
@@ -779,7 +779,7 @@ Since the theme has custom padding enabled, you can add `padding` within the `sp
 ### Template parts
 
 In the templeParts section, assign the two template parts that you created to their template areas.
-Add two keys: -`name`, the file name of the template part file without the file extension, -`area`, the name of the template area.
+Add three keys: -`name`, the file name of the template part file without the file extension, -`area`, the name of the template area, and `title` the visible name in the editor.
 
 There are three template areas to choose from: Header, footer, and general.
 
@@ -787,11 +787,13 @@ There are three template areas to choose from: Header, footer, and general.
 "templateParts": [
 	{
 		"name": "header",
-		"area": "header"
+		"area": "header",
+		"title": "Header"
 	},
 	{
 		"name": "footer",
-		"area": "footer"
+		"area": "footer",
+		"title": "Footer"
 	}
 ]
 ```
