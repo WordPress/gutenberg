@@ -145,6 +145,33 @@ Specifies the button's style. The accepted values are `'primary'` (the primary b
 -   Required: No
 -   Default: `undefined`
 
+#### isSecondary
+
+Deprecated: Renders a default button style.
+Use `variant` prop with `secondary` value instead.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isPrimary
+
+Deprecated: Renders a primary button style.
+Use `variant` prop with `primary` value instead.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isTertiary
+
+Deprecated: Renders a text-based button style.
+Use `variant` prop with `tertiary` value instead.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 #### isDestructive
 
 Renders a red text-based button style to indicate destructive behavior.
@@ -172,6 +199,15 @@ Renders a pressed button style.
 #### isBusy
 
 Indicates activity while a action is being performed.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### isLink
+
+Deprecated: Renders a button with an anchor style.
+Use `variant` prop with `link` value instead.
 
 -   Type: `Boolean`
 -   Required: No
