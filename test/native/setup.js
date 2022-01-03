@@ -34,7 +34,10 @@ jest.mock( '@wordpress/element', () => {
 	};
 } );
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+jest.mock( '@wordpress/api-fetch', () => ( {
+	defaut: jest.fn(),
+	setFetchHandler: jest.fn(),
+} ) );
 
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {

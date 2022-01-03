@@ -3,7 +3,7 @@
  */
 import { AppRegistry } from 'react-native';
 // eslint-disable-next-line import/no-unresolved
-import { render } from 'test/helpers';
+import { render, waitFor } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -21,13 +21,14 @@ jest.mock( '../setup-locale' );
 
 const initGutenberg = ( registerParams ) => {
 	let EditorComponent;
-	jest.spyOn( AppRegistry, 'registerComponent' ).mockImplementation(
+	AppRegistry.registerComponent.mockImplementation(
 		( name, componentProvider ) => {
 			EditorComponent = componentProvider();
 		}
 	);
 	registerGutenberg( registerParams );
-	render( <EditorComponent /> );
+
+	return render( <EditorComponent /> );
 };
 
 describe( 'Register Gutenberg', () => {
@@ -37,12 +38,8 @@ describe( 'Register Gutenberg', () => {
 	} );
 
 	it( 'registers Gutenberg editor component', () => {
-		const registerComponent = jest.spyOn(
-			AppRegistry,
-			'registerComponent'
-		);
 		registerGutenberg();
-		expect( registerComponent ).toHaveBeenCalled();
+		expect( AppRegistry.registerComponent ).toHaveBeenCalled();
 	} );
 
 	it( 'sets up locale before editor is initialized', () => {
@@ -178,5 +175,11 @@ describe( 'Register Gutenberg', () => {
 
 		expect( hookName ).toBe( 'native.render' );
 		expect( hookCallOrder ).toBeGreaterThan( onRenderEditorCallOrder );
+	} );
+
+	it( 'initializes the editor', () => {
+		const { getByTestId } = initGutenberg();
+		const blockList = waitFor( () => getByTestId( 'block-list-wrapper' ) );
+		expect( blockList ).toBeDefined();
 	} );
 } );
