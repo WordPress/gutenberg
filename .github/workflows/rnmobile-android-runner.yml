@@ -19,7 +19,6 @@ jobs:
         strategy:
             matrix:
                 api-level: ['29']
-                emulator-build: 7425822 # https://git.io/JE3jX
                 native-test-name: [gutenberg-editor-initial-html]
                 node: ['14']
 
@@ -45,6 +44,7 @@ jobs:
               uses: reactivecircus/android-emulator-runner@2b2ebf2e518e38a17180117fc2b677006db27330 # v2.21.0
               with:
                   api-level: ${{ matrix.api-level }}
+                  emulator-build: 7425822 # https://git.io/JE3jX
                   profile: pixel_xl
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
