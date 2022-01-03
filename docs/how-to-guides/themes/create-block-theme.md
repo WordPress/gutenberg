@@ -146,7 +146,6 @@ There are several ways to create templates and template parts:
 -   Using the site editor.
 -   Using the template editing mode in the block editor.
 
-The fourth way is temporary and involves going to the Appearance menu > Templates, and is not recommended because of its limitations.
 
 ### Manual template creation
 
