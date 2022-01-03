@@ -1,0 +1,33 @@
+diff --git a/node_modules/react-native-modal/dist/modal.js b/node_modules/react-native-modal/dist/modal.js
+index 165cd55..85f820c 100644
+--- a/node_modules/react-native-modal/dist/modal.js
++++ b/node_modules/react-native-modal/dist/modal.js
+@@ -403,7 +403,13 @@ export class ReactNativeModal extends React.Component {
+         if (this.props.onSwipe) {
+             console.warn('`<Modal onSwipe="..." />` is deprecated and will be removed starting from 13.0.0. Use `<Modal onSwipeComplete="..." />` instead.');
+         }
+-        DeviceEventEmitter.addListener('didUpdateDimensions', this.handleDimensionsUpdate);
++		// The following `didUpdateDimensionsEmitter` changes were added via
++		// patch-package. The patch can be removed once we upgrade to
++		// react-native-modal@^13.0.0. https://git.io/JPQgq
++        this.didUpdateDimensionsEmitter = DeviceEventEmitter.addListener(
++            'didUpdateDimensions',
++            this.handleDimensionsUpdate
++        );
+         if (this.state.isVisible) {
+             this.open();
+         }
+@@ -411,7 +417,12 @@ export class ReactNativeModal extends React.Component {
+     }
+     componentWillUnmount() {
+         BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPress);
+-        DeviceEventEmitter.removeListener('didUpdateDimensions', this.handleDimensionsUpdate);
++		// The following `didUpdateDimensionsEmitter` changes were added via
++		// patch-package. The patch can be removed once we upgrade to
++		// react-native-modal@^13.0.0. https://git.io/JPQgq
++        if ( this.didUpdateDimensionsEmitter ) {
++            this.didUpdateDimensionsEmitter.remove();
++        }
+     }
+     componentDidUpdate(prevProps) {
+         // If the animations have been changed then rebuild them to make sure we're
