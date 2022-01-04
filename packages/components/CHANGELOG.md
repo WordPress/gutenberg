@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.2.0 (2022-01-04)
+
 ### Experimental
 
 -   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([36588](https://github.com/WordPress/gutenberg/pull/36588)).
