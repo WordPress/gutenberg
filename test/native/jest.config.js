@@ -30,7 +30,6 @@ module.exports = {
 		'<rootDir>/' + configPath + '/setup.js',
 		'<rootDir>/' + configPath + '/enzyme.config.js',
 	],
-	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
 		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
