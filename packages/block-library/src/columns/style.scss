@@ -6,7 +6,7 @@
 	// Responsiveness: Allow wrapping on mobile.
 	flex-wrap: wrap !important;
 
-	@include break-medium() {
+	@include break-small() {
 		flex-wrap: nowrap !important;
 	}
 
@@ -57,7 +57,7 @@
 	}
 
 	&.is-not-stacked-on-mobile {
-		flex-wrap: nowrap;
+		flex-wrap: nowrap !important;
 
 		> .wp-block-column {
 			// Available space should be divided equally amongst columns.
