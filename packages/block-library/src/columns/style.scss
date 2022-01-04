@@ -6,7 +6,7 @@
 	// Responsiveness: Allow wrapping on mobile.
 	flex-wrap: wrap !important;
 
-	@include break-small() {
+	@include break-medium() {
 		flex-wrap: nowrap !important;
 	}
 
