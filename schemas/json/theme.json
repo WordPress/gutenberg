@@ -10,7 +10,7 @@
 		"settingsProperties": {
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables ui tools.",
+					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				},
@@ -1041,7 +1041,7 @@
 				}
 			},
 			"patternProperties": {
-				"^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				}
 			},

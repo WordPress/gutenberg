@@ -215,6 +215,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 						<LayoutStyle
 							selector={ `.wp-container-${ id }` }
 							layout={ usedLayout }
+							style={ attributes?.style }
 						/>,
 						element
 					) }

@@ -24,11 +24,10 @@
 			"link": true
 		},
 		"spacing": {
-			"blockGap": true,
 			"margin": [ "top", "bottom" ],
 			"padding": true,
 			"__experimentalDefaultControls": {
-				"blockGap": true
+				"padding": true
 			}
 		}
 	},

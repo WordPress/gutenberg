@@ -105,12 +105,14 @@ export default {
 	toolBarControls: function DefaultLayoutToolbarControls() {
 		return null;
 	},
-	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
+	save: function DefaultLayoutStyle( { selector, layout = {}, style } ) {
 		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		const blockGapValue =
+			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap )';
 
-		let style =
+		let output =
 			!! contentSize || !! wideSize
 				? `
 					${ appendSelectors( selector, '> *' ) } {
@@ -129,7 +131,7 @@ export default {
 				`
 				: '';
 
-		style += `
+		output += `
 			${ appendSelectors( selector, '> [data-align="left"]' ) } {
 				float: left;
 				margin-right: 2em;
@@ -143,18 +145,18 @@ export default {
 		`;
 
 		if ( hasBlockGapStylesSupport ) {
-			style += `
+			output += `
 				${ appendSelectors( selector, '> *' ) } {
 					margin-top: 0;
 					margin-bottom: 0;
 				}
 				${ appendSelectors( selector, '> * + *' ) } {
-					margin-top: var( --wp--style--block-gap );
+					margin-top: ${ blockGapValue };
 				}
 			`;
 		}
 
-		return <style>{ style }</style>;
+		return <style>{ output }</style>;
 	},
 	getOrientation() {
 		return 'vertical';
