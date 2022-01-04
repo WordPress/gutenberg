@@ -195,6 +195,7 @@ function Iframe(
 				Array.from( ownerDocument.body.classList ).filter(
 					( name ) =>
 						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
 						name === 'wp-embed-responsive'
 				)
 			);

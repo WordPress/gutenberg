@@ -714,11 +714,8 @@ export class RichText extends Component {
 
 		if ( typeof this.lastEventCount !== 'undefined' ) {
 			this.lastEventCount += 100; // bump by a hundred, hopefully native hasn't bombarded the JS side in the meantime.
-		} else {
-			window.console.warn(
-				"Tried to bump the RichText native event counter but was 'undefined'. Aborting bump."
-			);
-		}
+		} // no need to bump when 'undefined' as native side won't receive the key when the value is undefined, and that will cause force updating anyway,
+		//   see https://github.com/WordPress/gutenberg/blob/82e578dcc75e67891c750a41a04c1e31994192fc/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java#L213-L215
 	}
 
 	shouldComponentUpdate( nextProps ) {

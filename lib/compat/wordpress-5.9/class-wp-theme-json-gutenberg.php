@@ -285,7 +285,7 @@ class WP_Theme_JSON_Gutenberg {
 		'spacing'    => array(
 			'margin'   => null,
 			'padding'  => null,
-			'blockGap' => null,
+			'blockGap' => 'top',
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -428,17 +428,28 @@ class WP_Theme_JSON_Gutenberg {
 
 		$output = array_intersect_key( $input, array_flip( self::VALID_TOP_LEVEL_KEYS ) );
 
+		// Some styles are only meant to be available at the top-level (e.g.: blockGap),
+		// hence, the schema for blocks & elements should not have them.
+		$styles_non_top_level = self::VALID_STYLES;
+		foreach ( array_keys( $styles_non_top_level ) as $section ) {
+			foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
+				if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
+					unset( $styles_non_top_level[ $section ][ $prop ] );
+				}
+			}
+		}
+
 		// Build the schema based on valid block & element names.
 		$schema                 = array();
 		$schema_styles_elements = array();
 		foreach ( $valid_element_names as $element ) {
-			$schema_styles_elements[ $element ] = self::VALID_STYLES;
+			$schema_styles_elements[ $element ] = $styles_non_top_level;
 		}
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ]           = self::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]             = self::VALID_STYLES;
+			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
 		$schema['styles']             = self::VALID_STYLES;

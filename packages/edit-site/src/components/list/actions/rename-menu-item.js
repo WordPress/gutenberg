@@ -61,14 +61,14 @@ export default function RenameMenuItem( { template, onClose } ) {
 				throw lastError;
 			}
 
-			createSuccessNotice( __( 'Template has been renamed.' ), {
+			createSuccessNotice( __( 'Entity renamed.' ), {
 				type: 'snackbar',
 			} );
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while renaming the template.' );
+					: __( 'An error occurred while renaming the entity.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
@@ -86,7 +86,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			</MenuItem>
 			{ isModalOpen && (
 				<Modal
-					title={ __( 'Rename template' ) }
+					title={ __( 'Rename' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );

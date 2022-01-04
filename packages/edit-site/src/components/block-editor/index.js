@@ -17,6 +17,7 @@ import {
 	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
 	__unstableUseTypingObserver as useTypingObserver,
+	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
@@ -108,8 +109,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					}
 				} }
 			>
+				<BlockEditorKeyboardShortcuts.Register />
 				<BackButton />
-
 				<ResizableEditor
 					// Reinitialize the editor and reset the states when the template changes.
 					key={ templateId }
@@ -127,7 +128,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						renderAppender={ isTemplatePart ? false : undefined }
 					/>
 				</ResizableEditor>
-
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />

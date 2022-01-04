@@ -145,9 +145,13 @@ class BottomSheet extends Component {
 			} );
 			this.lastLayoutAnimation = layoutAnimation;
 		} else {
-			this.performRegularLayoutAnimation( {
-				useLastLayoutAnimation: false,
-			} );
+			// TODO: Reinstate animations, possibly replacing `LayoutAnimation` with
+			// more nuanced `Animated` usage or replacing our custom `BottomSheet`
+			// with `@gorhom/bottom-sheet`. This animation was disabled to avoid a
+			// preexisting bug: https://git.io/JMPCV
+			// this.performRegularLayoutAnimation( {
+			// 	useLastLayoutAnimation: false,
+			// } );
 		}
 	}
 
@@ -185,7 +189,10 @@ class BottomSheet extends Component {
 			);
 		}
 
-		Dimensions.addEventListener( 'change', this.onDimensionsChange );
+		this.dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			this.onDimensionsChange
+		);
 
 		// 'Will' keyboard events are not available on Android.
 		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
@@ -206,7 +213,7 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		Dimensions.removeEventListener( 'change', this.onDimensionsChange );
+		this.dimensionsChangeSubscription.remove();
 		this.keyboardShowListener.remove();
 		this.keyboardHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
@@ -217,10 +224,6 @@ class BottomSheet extends Component {
 		}
 		this.safeAreaEventSubscription.remove();
 		this.safeAreaEventSubscription = null;
-		SafeArea.removeEventListener(
-			'safeAreaInsetsForRootViewDidChange',
-			this.onSafeAreaInsetsUpdate
-		);
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -254,16 +257,19 @@ class BottomSheet extends Component {
 				statusBarHeight -
 				this.headerHeight );
 
-		// On horizontal mode `maxHeight` has to be set on 90% of width
+		// In landscape orientation, set `maxHeight` to ~96% of the height
 		if ( width > height ) {
 			this.setState( {
-				maxHeight: Math.min( 0.9 * height, maxHeightWithOpenKeyboard ),
+				maxHeight: Math.min(
+					0.96 * height - this.headerHeight,
+					maxHeightWithOpenKeyboard
+				),
 			} );
-			//	On vertical mode `maxHeight` has to be set on 50% of width
+			// In portrait orientation, set `maxHeight` to ~59% of the height
 		} else {
 			this.setState( {
 				maxHeight: Math.min(
-					height / 2 - safeAreaBottomInset,
+					height * 0.59 - safeAreaBottomInset - this.headerHeight,
 					maxHeightWithOpenKeyboard
 				),
 			} );

@@ -66,7 +66,11 @@ function AddedByPlugin( { slug, isCustomized } ) {
 	return (
 		<HStack alignment="left">
 			<CustomizedTooltip isCustomized={ isCustomized }>
-				<div className="edit-site-list-added-by__icon">
+				<div
+					className={ classnames( 'edit-site-list-added-by__icon', {
+						'is-customized': isCustomized,
+					} ) }
+				>
 					<Icon icon={ pluginIcon } />
 				</div>
 			</CustomizedTooltip>
