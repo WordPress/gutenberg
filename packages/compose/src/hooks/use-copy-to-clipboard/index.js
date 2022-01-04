@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import Clipboard from 'clipboard';
-
-/**
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
@@ -39,32 +34,30 @@ export default function useCopyToClipboard( text, onSuccess ) {
 	// fresh when the callback is called.
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );
-	return useRefEffect( ( node ) => {
-		// Clipboard listens to click events.
-		const clipboard = new Clipboard( node, {
-			text() {
-				return typeof textRef.current === 'function'
+	return useRefEffect( ( trigger ) => {
+		if ( ! trigger ) {
+			return;
+		}
+
+		const copyTextToClipboard = () => {
+			const currentWindow = trigger.ownerDocument.defaultView || window;
+			const textToCopy =
+				typeof textRef.current === 'function'
 					? textRef.current()
 					: textRef.current || '';
-			},
-		} );
 
-		clipboard.on( 'success', ( { clearSelection } ) => {
-			// Clearing selection will move focus back to the triggering
-			// button, ensuring that it is not reset to the body, and
-			// further that it is kept within the rendered node.
-			clearSelection();
-			// Handle ClipboardJS focus bug, see
-			// https://github.com/zenorocha/clipboard.js/issues/680
-			node.focus();
+			currentWindow?.navigator?.clipboard
+				?.writeText( textToCopy )
+				.then( () => {
+					// Invoke callback
+					onSuccessRef?.current?.();
+				} );
+		};
 
-			if ( onSuccessRef.current ) {
-				onSuccessRef.current();
-			}
-		} );
+		trigger.addEventListener( 'click', copyTextToClipboard );
 
 		return () => {
-			clipboard.destroy();
+			trigger.removeEventListener( 'click', copyTextToClipboard );
 		};
 	}, [] );
 }
