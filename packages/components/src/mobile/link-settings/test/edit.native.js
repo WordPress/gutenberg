@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { Clipboard } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { fireEvent, initializeEditor, waitFor } from 'test/helpers';
 /**
  * WordPress dependencies

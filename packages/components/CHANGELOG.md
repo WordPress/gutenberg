@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.2.0 (2022-01-04)
+
 ### Experimental
 
 -   Reinstated the ability to pass additional props to the `ToolsPanel` ([#36428](https://github.com/WordPress/gutenberg/pull/36428)).

@@ -1,39 +1,57 @@
 project 'GutenbergDemo.xcodeproj'
 
-# Uncomment the next line to define a global platform for your project
-platform :ios, '13.0'
 require_relative '../../../node_modules/react-native/scripts/react_native_pods'
 require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+# Uncomment the next line to define a global platform for your project
+app_ios_deployment_target = Gem::Version.new('13.0')
+platform :ios, app_ios_deployment_target.version
 
 target 'GutenbergDemo' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
   config = use_native_modules!
-  use_react_native!(:path => "../../../node_modules/react-native")
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # to enable hermes on iOS, change `false` to `true` and then install pods
+    :hermes_enabled => false
+  )
 
   target 'GutenbergDemoTests' do
-    inherit! :search_paths
+    inherit! :complete
     # Pods for testing
   end
 
-  ### Begin workaround for https://github.com/facebook/react-native/issues/31034
-  # Can be removed when this issue is resolved.
   post_install do |installer|
-    
     react_native_post_install(installer)
-    
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
+
+    # Let Pods targets inherit deployment target from the app
+    # This solution is suggested here: https://github.com/CocoaPods/CocoaPods/issues/4859
+    installer.pods_project.targets.each do |target|
+        # Exclude RCT-Folly as it requires explicit deployment target https://git.io/JPb73
+        if (target.name != 'RCT-Folly')
+          target.build_configurations.each do |configuration|
+            pod_ios_deployment_target = Gem::Version.new(configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+            configuration.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET' if pod_ios_deployment_target <= app_ios_deployment_target
+          end
+        end
+    end
+
+    ### Begin workaround for https://github.com/facebook/react-native/issues/31034
+    # Can be removed when this issue is resolved.
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
       end
-      
+
       if (target.name&.eql?('FBReactNativeSpec'))
         target.build_phases.each do |build_phase|
           if (build_phase.respond_to?(:name) && build_phase.name.eql?('[CP-User] Generate Specs'))
             ## Begin workaround for https://stackoverflow.com/questions/66627590/phasescriptexecution-error-in-react-native-app
             # Can be removed when this issue is resolved.
-            build_phase.shell_script.prepend("unset npm_config_prefix \n") 
+            build_phase.shell_script.prepend("unset npm_config_prefix \n")
             ## End workaround for https://stackoverflow.com/questions/66627590/phasescriptexecution-error-in-react-native-app
             target.build_phases.move(build_phase, 0)
           end

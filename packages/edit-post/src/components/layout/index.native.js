@@ -53,17 +53,14 @@ class Layout extends Component {
 
 	componentDidMount() {
 		this._isMounted = true;
-		SafeArea.addEventListener(
+		this.safeAreaSubscription = SafeArea.addEventListener(
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
 	}
 
 	componentWillUnmount() {
-		SafeArea.removeEventListener(
-			'safeAreaInsetsForRootViewDidChange',
-			this.onSafeAreaInsetsUpdate
-		);
+		this.safeAreaSubscription?.remove();
 		this._isMounted = false;
 	}
 
