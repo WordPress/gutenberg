@@ -26,6 +26,7 @@
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/base-field/**/*",
+		"src/border-control/**/*",
 		"src/button/**/*",
 		"src/card/**/*",
 		"src/circular-option-picker/**/*",
