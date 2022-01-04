@@ -47,28 +47,23 @@ function FontSizePicker(
 		availableUnits: [ 'px', 'em', 'rem' ],
 	} );
 
-	/**
-	 * The main font size UI displays a toggle group when the presets are less
-	 * than six and a select control when they are more.
-	 */
-	const fontSizesContainComplexValues = fontSizes.some(
-		( { size } ) => ! isSimpleCssValue( size )
-	);
-	const shouldUseSelectControl = fontSizes.length > 5;
+	// The main font size UI displays a toggle group when the presets are less
+	// than six and a select control when they are more.
+	//
+	// A select control is also used when the value of a preset cannot be
+	// immediately computed (eg. 'calc', 'var').
+	const shouldUseSelectControl =
+		fontSizes.length > 5 ||
+		fontSizes.some( ( { size } ) => ! isSimpleCssValue( size ) );
+
 	const options = useMemo(
 		() =>
 			getFontSizeOptions(
 				shouldUseSelectControl,
 				fontSizes,
-				disableCustomFontSizes,
-				fontSizesContainComplexValues
+				disableCustomFontSizes
 			),
-		[
-			shouldUseSelectControl,
-			fontSizes,
-			disableCustomFontSizes,
-			fontSizesContainComplexValues,
-		]
+		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
 	);
 	const selectedOption = getSelectedOption( fontSizes, value );
 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
@@ -93,21 +88,12 @@ function FontSizePicker(
 		}
 		// Calculate the `hint` for toggle group control.
 		let hint = selectedOption.name;
-		if (
-			! fontSizesContainComplexValues &&
-			typeof selectedOption.size === 'string'
-		) {
+		if ( typeof selectedOption.size === 'string' ) {
 			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
 			hint += `(${ unit })`;
 		}
 		return hint;
-	}, [
-		showCustomValueControl,
-		selectedOption?.slug,
-		value,
-		isCustomValue,
-		fontSizesContainComplexValues,
-	] );
+	}, [ showCustomValueControl, selectedOption?.slug, value, isCustomValue ] );
 
 	if ( ! options ) {
 		return null;
