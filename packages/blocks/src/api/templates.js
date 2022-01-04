@@ -73,7 +73,6 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			// before creating the blocks.
 
 			const blockType = getBlockType( name );
-
 			const isHTMLAttribute = ( attributeDefinition ) =>
 				get( attributeDefinition, [ 'source' ] ) === 'html';
 			const isQueryAttribute = ( attributeDefinition ) =>
