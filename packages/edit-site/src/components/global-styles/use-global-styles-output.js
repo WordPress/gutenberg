@@ -56,16 +56,27 @@ function compileStyleValue( uncompiledValue ) {
 function getPresetsDeclarations( blockPresets = {} ) {
 	return reduce(
 		PRESET_METADATA,
-		( declarations, { path, valueKey, cssVarInfix } ) => {
+		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
 			const presetByOrigin = get( blockPresets, path, [] );
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
-						declarations.push(
-							`--wp--preset--${ cssVarInfix }--${ kebabCase(
-								value.slug
-							) }: ${ value[ valueKey ] }`
-						);
+						if ( valueKey ) {
+							declarations.push(
+								`--wp--preset--${ cssVarInfix }--${ kebabCase(
+									value.slug
+								) }: ${ value[ valueKey ] }`
+							);
+						} else if (
+							valueFunc &&
+							typeof valueFunc === 'function'
+						) {
+							declarations.push(
+								`--wp--preset--${ cssVarInfix }--${ kebabCase(
+									value.slug
+								) }: ${ valueFunc( value ) }`
+							);
+						}
 					} );
 				}
 			} );
