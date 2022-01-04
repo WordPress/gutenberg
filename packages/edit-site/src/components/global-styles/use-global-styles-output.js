@@ -212,7 +212,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 	const pickStyleKeys = ( treeToPickFrom ) =>
 		pickBy( treeToPickFrom, ( value, key ) =>
-			[ 'border', 'color', 'spacing', 'typography' ].includes( key )
+			[ 'border', 'color', 'spacing', 'typography', 'filter' ].includes(
+				key
+			)
 		);
 
 	// Top-level.
