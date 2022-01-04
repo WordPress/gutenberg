@@ -31,7 +31,6 @@ module.exports = {
 		'<rootDir>/' + configPath + '/enzyme.config.js',
 	],
 	testEnvironment: 'jsdom',
-	testRunner: 'jest-jasmine2',
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
 		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
