@@ -38,7 +38,6 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/priority-queue": "file:../priority-queue",
-		"clipboard": "^2.0.8",
 		"lodash": "^4.17.21",
 		"mousetrap": "^1.6.5",
 		"react-resize-aware": "^3.1.0",
