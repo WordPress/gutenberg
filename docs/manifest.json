@@ -558,6 +558,12 @@
 		"parent": "reference-guides"
 	},
 	{
+		"title": "Theme.json Reference",
+		"slug": "theme-json-reference",
+		"markdown_source": "../docs/reference-guides/theme-json-reference.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
