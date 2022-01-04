@@ -42,10 +42,10 @@ describe( 'Register Gutenberg', () => {
 	} );
 
 	it( 'sets up locale before editor is initialized', () => {
-		const onModuleImported = jest.fn();
-		jest.doMock( '../setup', () => {
+		const mockOnModuleImported = jest.fn();
+		jest.mock( '../setup', () => {
 			// To determine if the setup module is imported, we create a mock function that is called when the module is mocked.
-			onModuleImported();
+			mockOnModuleImported();
 
 			return {
 				__esModule: true,
@@ -59,17 +59,17 @@ describe( 'Register Gutenberg', () => {
 		// Reference: https://git.io/JyBk0
 		const setupLocaleCallOrder = setupLocale.mock.invocationCallOrder[ 0 ];
 		const onSetupImportedCallOrder =
-			onModuleImported.mock.invocationCallOrder[ 0 ];
+			mockOnModuleImported.mock.invocationCallOrder[ 0 ];
 
 		expect( setupLocaleCallOrder ).toBeLessThan( onSetupImportedCallOrder );
 	} );
 
 	it( 'beforeInit callback is invoked before the editor is initialized', () => {
 		const beforeInitCallback = jest.fn();
-		const onModuleImported = jest.fn();
-		jest.doMock( '../setup', () => {
+		const mockOnModuleImported = jest.fn();
+		jest.mock( '../setup', () => {
 			// To determine if the setup module is imported, we create a mock function that is called when the module is mocked.
-			onModuleImported();
+			mockOnModuleImported();
 
 			return {
 				__esModule: true,
@@ -84,7 +84,7 @@ describe( 'Register Gutenberg', () => {
 		const beforeInitCallOrder =
 			beforeInitCallback.mock.invocationCallOrder[ 0 ];
 		const onSetupImportedCallOrder =
-			onModuleImported.mock.invocationCallOrder[ 0 ];
+			mockOnModuleImported.mock.invocationCallOrder[ 0 ];
 
 		expect( beforeInitCallOrder ).toBeLessThan( onSetupImportedCallOrder );
 	} );
