@@ -24,9 +24,13 @@ const LinkEditSlot = ( props ) => (
 	</SlotFillProvider>
 );
 
-beforeAll( () => {
+beforeEach( () => {
 	jest.useFakeTimers();
 	jest.spyOn( Keyboard, 'dismiss' );
+} );
+
+afterEach( () => {
+	jest.useRealTimers();
 } );
 
 describe( 'Android', () => {
