@@ -44,11 +44,6 @@ const additionalLocaleData = {
 };
 
 const createTestLocale = () => createI18n( localeData, 'test_domain' );
-const createTestLocaleWithAdditionalData = () => {
-	const locale = createI18n( localeData, 'test_domain' );
-	locale.setLocaleData( additionalLocaleData, 'test_domain' );
-	return locale;
-};
 
 describe( 'createI18n', () => {
 	test( 'instantiated with locale data', () => {
@@ -139,6 +134,12 @@ describe( 'createI18n', () => {
 	} );
 
 	describe( 'setLocaleData', () => {
+		const createTestLocaleWithAdditionalData = () => {
+			const locale = createI18n( localeData, 'test_domain' );
+			locale.setLocaleData( additionalLocaleData, 'test_domain' );
+			return locale;
+		};
+
 		it( 'supports omitted plural forms expression', () => {
 			const locale = createTestLocaleWithAdditionalData();
 			locale.setLocaleData(
@@ -155,6 +156,113 @@ describe( 'createI18n', () => {
 			expect(
 				locale._n( '%d banana', '%d bananes', 2, 'test_domain2' )
 			).toBe( '%d bananes' );
+		} );
+
+		it( 'overwrites domain configuration', () => {
+			const locale = createTestLocaleWithAdditionalData();
+			const domain = 'test_domain';
+			const domainConfiguration = {
+				additionalData: 'This is setLocaleData',
+			};
+			locale.setLocaleData(
+				{
+					'': domainConfiguration,
+				},
+				domain
+			);
+
+			expect(
+				locale.getLocaleData( domain )[ '' ].domain
+			).toBeUndefined();
+			expect( locale.getLocaleData( domain )[ '' ].lang ).toBeUndefined();
+			expect( locale.getLocaleData( domain )[ '' ].additionalData ).toBe(
+				domainConfiguration.additionalData
+			);
+		} );
+
+		describe( '__', () => {
+			it( 'existing translation still available', () => {
+				const locale = createTestLocaleWithAdditionalData();
+				expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
+			} );
+
+			it( 'new translation available.', () => {
+				const locale = createTestLocaleWithAdditionalData();
+				expect( locale.__( 'cheeseburger', 'test_domain' ) ).toBe(
+					'hamburger au fromage'
+				);
+			} );
+		} );
+
+		describe( '_n', () => {
+			it( 'existing plural form still works', () => {
+				const locale = createTestLocaleWithAdditionalData();
+				expect(
+					locale._n( '%d banana', '%d bananas', 3, 'test_domain' )
+				).toBe( '%d bananes' );
+			} );
+
+			it( 'new singular form was added', () => {
+				const locale = createTestLocaleWithAdditionalData();
+				expect(
+					locale._n( '%d cat', '%d cats', 1, 'test_domain' )
+				).toBe( '%d chat' );
+			} );
+
+			it( 'new plural form was added', () => {
+				const locale = createTestLocaleWithAdditionalData();
+				expect(
+					locale._n( '%d cat', '%d cats', 3, 'test_domain' )
+				).toBe( '%d chats' );
+			} );
+		} );
+	} );
+
+	describe( 'addLocaleData', () => {
+		const createTestLocaleWithAdditionalData = () => {
+			const locale = createI18n( localeData, 'test_domain' );
+			locale.addLocaleData( additionalLocaleData, 'test_domain' );
+			return locale;
+		};
+
+		it( 'supports omitted plural forms expression', () => {
+			const locale = createTestLocaleWithAdditionalData();
+			locale.addLocaleData(
+				{
+					'': {
+						domain: 'test_domain2',
+						lang: 'fr',
+					},
+
+					'%d banana': [ '%d banane', '%d bananes' ],
+				},
+				'test_domain2'
+			);
+			expect(
+				locale._n( '%d banana', '%d bananes', 2, 'test_domain2' )
+			).toBe( '%d bananes' );
+		} );
+
+		it( 'merges domain configuration', () => {
+			const locale = createTestLocaleWithAdditionalData();
+			const domain = 'test_domain';
+			const domainConfiguration = {
+				additionalData: 'This is addLocaleData',
+			};
+			locale.addLocaleData(
+				{
+					'': domainConfiguration,
+				},
+				domain
+			);
+
+			expect( locale.getLocaleData( domain )[ '' ].domain ).toBe(
+				domain
+			);
+			expect( locale.getLocaleData( domain )[ '' ].lang ).toBe( 'fr' );
+			expect( locale.getLocaleData( domain )[ '' ].additionalData ).toBe(
+				domainConfiguration.additionalData
+			);
 		} );
 
 		describe( '__', () => {
