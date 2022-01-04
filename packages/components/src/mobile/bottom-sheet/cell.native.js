@@ -196,6 +196,7 @@ class BottomSheetCell extends Component {
 				<TouchableOpacity
 					onPress={ onClear }
 					style={ styles.clearIconContainer }
+					testID="clear-button"
 				>
 					<Icon
 						icon={ isIOS ? cancelCircleFilled : close }
@@ -260,6 +261,7 @@ class BottomSheetCell extends Component {
 						numberOfLines={ 1 }
 						style={ finalStyle }
 						value={ value }
+						testID="text-input"
 						placeholder={ valuePlaceholder }
 						placeholderTextColor={ '#87a6bc' }
 						onChangeText={ onChangeValue }
@@ -366,6 +368,7 @@ class BottomSheetCell extends Component {
 				onPress={ onCellPress }
 				onLongPress={ onLongPress }
 				style={ [ styles.clipToBounds, style ] }
+				testID={ 'cell-touchable' }
 				borderless={ borderless }
 			>
 				{ drawTopSeparator && <View style={ separatorStyle() } /> }
