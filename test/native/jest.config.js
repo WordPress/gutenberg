@@ -24,7 +24,8 @@ module.exports = {
 	rootDir: '../../',
 	// Automatically clear mock calls and instances between every test
 	clearMocks: true,
-	preset: 'react-native',
+	// TL/RN preset fixes usage of "modern" timers alongside of `waitFor` https://git.io/JSDZI
+	preset: '@testing-library/react-native',
 	setupFiles: [
 		'<rootDir>/' + configPath + '/setup.js',
 		'<rootDir>/' + configPath + '/enzyme.config.js',
