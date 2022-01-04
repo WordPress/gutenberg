@@ -127,12 +127,6 @@ if ( ! global.window.matchMedia ) {
 	} );
 }
 
-if ( ! global.window.setImmediate ) {
-	global.window.setImmediate = function ( callback ) {
-		return setTimeout( callback, 0 );
-	};
-}
-
 jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
 } );
