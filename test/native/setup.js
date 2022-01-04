@@ -26,8 +26,6 @@ const mockComponent = ( element ) => ( ...args ) => {
 	return React.createElement( element, props, props.children );
 };
 
-jest.useFakeTimers();
-
 jest.mock( '@wordpress/element', () => {
 	return {
 		__esModule: true,
