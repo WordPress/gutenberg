@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { AppRegistry } from 'react-native';
-// eslint-disable-next-line import/no-unresolved
 import { render, waitFor } from 'test/helpers';
 
 /**
