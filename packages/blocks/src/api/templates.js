@@ -74,17 +74,6 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 
 			const blockType = getBlockType( name );
 
-			// If a Block is undefined, use the core/missing block as a placeholder
-			// for a better user experience.
-			if ( undefined === blockType ) {
-				attributes = {
-					originalName: name,
-					originalContent: '',
-					originalUndelimitedContent: '',
-				};
-				name = 'core/missing';
-			}
-
 			const isHTMLAttribute = ( attributeDefinition ) =>
 				get( attributeDefinition, [ 'source' ] ) === 'html';
 			const isQueryAttribute = ( attributeDefinition ) =>
@@ -120,13 +109,24 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 				attributes
 			);
 
-			const [
+			let [
 				blockName,
 				blockAttributes,
 			] = convertLegacyBlockNameAndAttributes(
 				name,
 				normalizedAttributes
 			);
+
+			// If a Block is undefined at this point, use the core/missing block as
+			// a placeholder for a better user experience.
+			if ( undefined === getBlockType( blockName ) ) {
+				blockAttributes = {
+					originalName: name,
+					originalContent: '',
+					originalUndelimitedContent: '',
+				};
+				blockName = 'core/missing';
+			}
 
 			return createBlock(
 				blockName,
