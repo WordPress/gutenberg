@@ -40,15 +40,11 @@ export function useToolsPanelItem(
 
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
-	const previousPanelId = usePrevious( currentPanelId );
-
-	const hasMatchingPanel =
-		currentPanelId === panelId || currentPanelId === null;
 
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
 	useEffect( () => {
-		if ( hasMatchingPanel && previousPanelId !== null ) {
+		if ( currentPanelId === panelId ) {
 			registerPanelItem( {
 				hasValue: hasValueCallback,
 				isShownByDefault,
@@ -58,22 +54,13 @@ export function useToolsPanelItem(
 			} );
 		}
 
-		return () => {
-			if (
-				( previousPanelId === null && !! currentPanelId ) ||
-				currentPanelId === panelId
-			) {
-				deregisterPanelItem( label );
-			}
-		};
+		return () => deregisterPanelItem( label );
 	}, [
 		currentPanelId,
-		hasMatchingPanel,
+		panelId,
 		isShownByDefault,
 		label,
 		hasValueCallback,
-		panelId,
-		previousPanelId,
 		resetAllFilterCallback,
 	] );
 
@@ -97,7 +84,7 @@ export function useToolsPanelItem(
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
-		if ( isResetting || ! hasMatchingPanel ) {
+		if ( isResetting || currentPanelId !== panelId ) {
 			return;
 		}
 
@@ -109,10 +96,11 @@ export function useToolsPanelItem(
 			onDeselect?.();
 		}
 	}, [
-		hasMatchingPanel,
+		currentPanelId,
 		isMenuItemChecked,
 		isResetting,
 		isValueSet,
+		panelId,
 		wasMenuItemChecked,
 	] );
 
