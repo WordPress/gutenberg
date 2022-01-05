@@ -166,7 +166,8 @@ const SiteLogo = ( {
 	const currentWidth = width || defaultWidth;
 	const ratio = naturalWidth / naturalHeight;
 	const currentHeight = currentWidth / ratio;
-	const minWidth = naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
+	const minWidth =
+		naturalWidth < naturalHeight ? MIN_SIZE : Math.ceil( MIN_SIZE * ratio );
 	const minHeight =
 		naturalHeight < naturalWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
