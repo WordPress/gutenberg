@@ -100,7 +100,7 @@ class RCTAztecView: Aztec.TextView {
 
     /// Flag to enable using the defaultFont in Aztec for specific blocks
     /// Like the Preformatted and Heading blocks.
-    private var blockUseDefaultFont: Bool? = false
+    private var blockUseDefaultFont: Bool = false
 
     /// Font family for all contents  Once this is set, it will always override the font family for all of its
     /// contents, regardless of what HTML is provided to Aztec.
@@ -709,7 +709,7 @@ class RCTAztecView: Aztec.TextView {
     private func checkDefaultFontFamily(tag: String) {
         // Since we are using the defaultFont to customize
         // the font size, we need to set the monospace font.
-        if (blockUseDefaultFont! && tag == "pre") {
+        if (blockUseDefaultFont && tag == "pre") {
             setFontFamily(FontProvider.shared.monospaceFont.fontName)
         }
     }
