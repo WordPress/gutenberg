@@ -3,10 +3,6 @@ project 'GutenbergDemo.xcodeproj'
 require_relative '../../../node_modules/react-native/scripts/react_native_pods'
 require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-# Changes Aztec reference to last commit from https://github.com/wordpress-mobile/AztecEditor-iOS/pull/1346 PR.
-# ONLY FOR TESTING, IT SHOULD BE DELETED ONCE THE AZTEC PR IS MERGED!
-pod 'WordPress-Aztec-iOS', :git => 'https://github.com/wordpress-mobile/AztecEditor-iOS.git', :commit => 'd68c76ec8f01490c741077dccefc17b17ce19f2d'
-
 # Uncomment the next line to define a global platform for your project
 app_ios_deployment_target = Gem::Version.new('13.0')
 platform :ios, app_ios_deployment_target.version
