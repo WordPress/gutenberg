@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
-import { map, noop } from 'lodash';
+import { map } from 'lodash';
 import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
-import { withSafeTimeout } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
+import { withSafeTimeout, useRefEffect } from '@wordpress/compose';
 
 const emptyList = Object.freeze( [] );
 
@@ -22,38 +22,35 @@ function SuggestionsList( {
 	selectedIndex,
 	scrollIntoView,
 	match = '',
-	onHover = noop,
-	onSelect = noop,
+	onHover = () => {},
+	onSelect = () => {},
 	suggestions = emptyList,
 	displayTransform,
 	instanceId,
 	setTimeout,
 } ) {
-	const [ scrollingIntoView, setScrollingIntoView ] = useState( true );
-	const [ list, setList ] = useState();
+	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
 
-	useEffect( () => {
-		// only have to worry about scrolling selected suggestion into view
-		// when already expanded
-		if (
-			selectedIndex > -1 &&
-			scrollIntoView &&
-			list.children[ selectedIndex ]
-		) {
-			setScrollingIntoView( true );
-			scrollView( list.children[ selectedIndex ], list, {
-				onlyScrollIfNeeded: true,
-			} );
-
-			setTimeout( () => {
-				setScrollingIntoView( false );
-			}, 100 );
-		}
-	}, [ selectedIndex, scrollIntoView, list ] );
-
-	const bindList = ( ref ) => {
-		setList( ref );
-	};
+	const listRef = useRefEffect(
+		( listNode ) => {
+			// only have to worry about scrolling selected suggestion into view
+			// when already expanded
+			if (
+				selectedIndex > -1 &&
+				scrollIntoView &&
+				listNode.children[ selectedIndex ]
+			) {
+				setScrollingIntoView( true );
+				scrollView( listNode.children[ selectedIndex ], listNode, {
+					onlyScrollIfNeeded: true,
+				} );
+				setTimeout( () => {
+					setScrollingIntoView( false );
+				}, 100 );
+			}
+		},
+		[ selectedIndex, scrollIntoView ]
+	);
 
 	const handleHover = ( suggestion ) => {
 		return () => {
@@ -98,14 +95,14 @@ function SuggestionsList( {
 	// TODO does this still apply now that it's a <ul> and not a <div>?
 	return (
 		<ul
-			ref={ bindList }
+			ref={ listRef }
 			className="components-form-token-field__suggestions-list"
 			id={ `components-form-token-suggestions-${ instanceId }` }
 			role="listbox"
 		>
 			{ map( suggestions, ( suggestion, index ) => {
 				const matchText = computeSuggestionMatch( suggestion );
-				const classeName = classnames(
+				const className = classnames(
 					'components-form-token-field__suggestion',
 					{
 						'is-selected': index === selectedIndex,
@@ -117,7 +114,7 @@ function SuggestionsList( {
 					<li
 						id={ `components-form-token-suggestions-${ instanceId }-${ index }` }
 						role="option"
-						className={ classeName }
+						className={ className }
 						key={
 							suggestion?.value
 								? suggestion.value
