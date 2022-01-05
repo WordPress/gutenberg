@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Integrated a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).
+
 ### Enhancement
 
 -   Speed up scaffolding process by omitting WordPress dependencies in the template ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).

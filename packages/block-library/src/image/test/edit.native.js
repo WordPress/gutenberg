@@ -23,6 +23,16 @@ jest.mock( '@wordpress/data-controls', () => {
 	};
 } );
 
+/**
+ * Immediately invoke delayed functions. A better alternative would be using
+ * fake timers and test the delay itself. However, fake timers does not work
+ * with our custom waitFor implementation.
+ */
+jest.mock( 'lodash', () => {
+	const actual = jest.requireActual( 'lodash' );
+	return { ...actual, delay: ( cb ) => cb() };
+} );
+
 const apiFetchPromise = Promise.resolve( {} );
 apiFetch.mockImplementation( () => apiFetchPromise );
 
