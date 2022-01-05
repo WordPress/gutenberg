@@ -57,6 +57,7 @@ exports[`Search Block renders block with button inside option 1`] = `
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
@@ -165,6 +166,7 @@ exports[`Search Block renders block with button inside option 1`] = `
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
@@ -235,6 +237,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
@@ -403,6 +406,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
@@ -473,6 +477,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
@@ -581,6 +586,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
@@ -651,6 +657,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
