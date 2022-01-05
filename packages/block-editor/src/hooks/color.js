@@ -378,6 +378,7 @@ export function ColorEdit( props ) {
 				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
 			}
 			clientId={ props.clientId }
+			enableAlpha={ true }
 			settings={ [
 				...( hasTextColor
 					? [

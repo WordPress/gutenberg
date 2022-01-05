@@ -17,6 +17,7 @@ function getComputedStyle( node ) {
 }
 
 export default function ColorPanel( {
+	enableAlpha,
 	settings,
 	clientId,
 	enableContrastChecking = true,
@@ -60,6 +61,7 @@ export default function ColorPanel( {
 				initialOpen={ false }
 				settings={ settings }
 				showTitle={ showTitle }
+				enableAlpha={ enableAlpha }
 				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
 			>
