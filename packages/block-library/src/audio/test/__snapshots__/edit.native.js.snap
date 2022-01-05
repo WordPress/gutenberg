@@ -2,6 +2,11 @@
 
 exports[`Audio block renders audio block error state without crashing 1`] = `
 <View
+  accessibilityState={
+    Object {
+      "disabled": true,
+    }
+  }
   accessible={true}
   focusable={true}
   onClick={[Function]}
@@ -31,6 +36,11 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
       }
     />
     <View
+      accessibilityState={
+        Object {
+          "disabled": true,
+        }
+      }
       accessible={true}
       focusable={true}
       onClick={[Function]}
@@ -149,6 +159,11 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
 
 exports[`Audio block renders audio file without crashing 1`] = `
 <View
+  accessibilityState={
+    Object {
+      "disabled": true,
+    }
+  }
   accessible={true}
   focusable={true}
   onClick={[Function]}
@@ -178,6 +193,11 @@ exports[`Audio block renders audio file without crashing 1`] = `
       }
     />
     <View
+      accessibilityState={
+        Object {
+          "disabled": true,
+        }
+      }
       accessible={true}
       focusable={true}
       onClick={[Function]}

@@ -7,7 +7,7 @@ exports[`Spacer can be created by typing "/spacer" 1`] = `
 `;
 
 exports[`Spacer can be resized using the drag handle and remains selected after being dragged 1`] = `
-"<!-- wp:spacer {\\"height\\":150} -->
+"<!-- wp:spacer {\\"height\\":\\"150px\\"} -->
 <div style=\\"height:150px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
 <!-- /wp:spacer -->"
 `;

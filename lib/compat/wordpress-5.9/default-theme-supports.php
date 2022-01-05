@@ -14,6 +14,8 @@ if ( wp_is_block_theme() ) {
 		array(
 			'style',
 			'script',
+			'comment-form',
+			'comment-list',
 		)
 	);
 	add_theme_support( 'automatic-feed-links' );

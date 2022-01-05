@@ -15,7 +15,10 @@ import { __ } from '@wordpress/i18n';
  */
 import QueryToolbar from './toolbar';
 
-const TEMPLATE = [ [ 'core/comment-template' ] ];
+const TEMPLATE = [
+	[ 'core/comment-template' ],
+	[ 'core/comments-pagination' ],
+];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 	const { perPage, tagName: TagName } = attributes;

@@ -21,6 +21,9 @@ module.exports = {
 		getTransformOptions: async () => ( {
 			transform: {
 				experimentalImportSupport: false,
+				// `inlineRequires` is disabled as it is incompatible with some of the
+				// import side effects utilize in the Gutenberg source.
+				// E.g. `import './hooks'`
 				inlineRequires: false,
 			},
 		} ),

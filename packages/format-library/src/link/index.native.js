@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { find } from 'lodash';
-import { Clipboard } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies

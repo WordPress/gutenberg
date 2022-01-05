@@ -32,6 +32,8 @@ export const BottomSheetContext = createContext( {
 	// Android only: Function called to control android hardware back button functionality
 	// Return true if the bottom-sheet default close action shouldn't be called
 	onHandleHardwareButtonPress: () => {},
+	// Toggle full-screen styles and dimensions
+	setIsFullScreen: () => {},
 } );
 
 export const {

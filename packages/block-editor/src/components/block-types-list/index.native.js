@@ -34,10 +34,13 @@ export default function BlockTypesList( {
 	const [ maxWidth, setMaxWidth ] = useState();
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onLayout );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onLayout
+		);
 		onLayout();
 		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 
