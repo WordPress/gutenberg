@@ -19,7 +19,6 @@ import { getQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import './plugins';
 import './hooks';
 import { store as editSiteStore } from './store';
 import EditSiteApp from './components/app';

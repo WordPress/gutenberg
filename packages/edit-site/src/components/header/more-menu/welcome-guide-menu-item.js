@@ -8,7 +8,7 @@ import { MenuItem } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../store';
+import { store as editSiteStore } from '../../../store';
 
 export default function WelcomeGuideMenuItem() {
 	const { toggleFeature } = useDispatch( editSiteStore );
