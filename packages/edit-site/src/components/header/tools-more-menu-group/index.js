@@ -14,7 +14,7 @@ const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
 
 ToolsMoreMenuGroup.Slot = ( { fillProps } ) => (
 	<Slot fillProps={ fillProps }>
-		{ ( fills ) => ! isEmpty( fills ) && <>{ fills }</> }
+		{ ( fills ) => ! isEmpty( fills ) && fills }
 	</Slot>
 );
 
