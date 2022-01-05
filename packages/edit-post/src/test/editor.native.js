@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+import { act } from 'test/helpers';
 
 /**
  * WordPress dependencies
