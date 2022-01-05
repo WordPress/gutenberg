@@ -82,7 +82,7 @@ describe( 'Text color', () => {
 		fireEvent.press( textColorButton );
 
 		// Wait for Inline color modal to be visible
-		const inlineTextColorModal = getByTestId( 'inline-text-color' );
+		const inlineTextColorModal = getByTestId( 'inline-text-color-modal' );
 		await waitFor( () => inlineTextColorModal.props.isVisible );
 
 		// Look for the pink color button
@@ -91,9 +91,6 @@ describe( 'Text color', () => {
 		);
 		expect( pinkColorButton ).toBeDefined();
 		fireEvent.press( pinkColorButton );
-
-		// Dismiss the inline color modal
-		fireEvent( inlineTextColorModal, 'backdropPress' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -138,7 +135,7 @@ describe( 'Text color', () => {
 		fireEvent.press( textColorButton );
 
 		// Wait for Inline color modal to be visible
-		const inlineTextColorModal = getByTestId( 'inline-text-color' );
+		const inlineTextColorModal = getByTestId( 'inline-text-color-modal' );
 		await waitFor( () => inlineTextColorModal.props.isVisible );
 
 		// Look for the pink color button
@@ -147,9 +144,6 @@ describe( 'Text color', () => {
 		);
 		expect( pinkColorButton ).toBeDefined();
 		fireEvent.press( pinkColorButton );
-
-		// Dismiss the inline color modal
-		fireEvent( inlineTextColorModal, 'backdropPress' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
