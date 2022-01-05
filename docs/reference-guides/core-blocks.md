@@ -544,7 +544,7 @@ Displays the next or previous post link that is adjacent to the current post.
 Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more.
 
 -	**Name:** core/post-template
--	**Category:** design
+-	**Category:** theme
 -	**Supports:** align, ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
@@ -598,7 +598,7 @@ An advanced block that allows displaying post types based on different query par
 Displays a paginated navigation to next/previous set of posts, when applicable.
 
 -	**Name:** core/query-pagination
--	**Category:** design
+-	**Category:** theme
 -	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
@@ -607,7 +607,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable.
 Displays the next posts page link.
 
 -	**Name:** core/query-pagination-next
--	**Category:** design
+-	**Category:** theme
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
@@ -616,7 +616,7 @@ Displays the next posts page link.
 Displays a list of page numbers for pagination
 
 -	**Name:** core/query-pagination-numbers
--	**Category:** design
+-	**Category:** theme
 -	**Supports:** ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
@@ -625,7 +625,7 @@ Displays a list of page numbers for pagination
 Displays the previous posts page link.
 
 -	**Name:** core/query-pagination-previous
--	**Category:** design
+-	**Category:** theme
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
