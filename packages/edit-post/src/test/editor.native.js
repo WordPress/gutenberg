@@ -29,8 +29,15 @@ const unsupportedBlock = `
 describe( 'Editor', () => {
 	beforeAll( registerCoreBlocks );
 
-	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
+	beforeEach( () => {
 		jest.useFakeTimers();
+	} );
+
+	afterEach( () => {
+		jest.useRealTimers();
+	} );
+
+	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
 
 		const appContainer = renderEditorWith( unsupportedBlock );
