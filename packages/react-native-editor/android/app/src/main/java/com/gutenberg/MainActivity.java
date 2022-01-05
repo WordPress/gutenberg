@@ -9,6 +9,8 @@ import com.facebook.react.ReactActivityDelegate;
 
 import org.wordpress.mobile.WPAndroidGlue.GutenbergProps;
 
+import java.util.Locale;
+
 public class MainActivity extends ReactActivity {
 
     /**
@@ -27,6 +29,13 @@ public class MainActivity extends ReactActivity {
             @Override
             protected Bundle getLaunchOptions() {
                 Bundle bundle = new Bundle();
+
+                // Add locale
+                String languageString = Locale.getDefault().toString();
+                String localeSlug = languageString.replace("_", "-").toLowerCase(Locale.ENGLISH);
+                bundle.putString(GutenbergProps.PROP_LOCALE, localeSlug);
+
+                // Add capabilities
                 Bundle capabilities = new Bundle();
                 capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_MENTIONS, true);
                 capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_XPOSTS, true);

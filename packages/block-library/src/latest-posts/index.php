@@ -60,6 +60,11 @@ function render_block_core_latest_posts( $attributes ) {
 
 	foreach ( $recent_posts as $post ) {
 		$post_link = esc_url( get_permalink( $post ) );
+		$title     = get_the_title( $post );
+
+		if ( ! $title ) {
+			$title = __( '(no title)' );
+		}
 
 		$list_items_markup .= '<li>';
 
@@ -86,8 +91,9 @@ function render_block_core_latest_posts( $attributes ) {
 			);
 			if ( $attributes['addLinkToFeaturedImage'] ) {
 				$featured_image = sprintf(
-					'<a href="%1$s">%2$s</a>',
+					'<a href="%1$s" aria-label="%2$s">%3$s</a>',
 					$post_link,
+					$title,
 					$featured_image
 				);
 			}
@@ -98,10 +104,6 @@ function render_block_core_latest_posts( $attributes ) {
 			);
 		}
 
-		$title = get_the_title( $post );
-		if ( ! $title ) {
-			$title = __( '(no title)' );
-		}
 		$list_items_markup .= sprintf(
 			'<a href="%1$s">%2$s</a>',
 			$post_link,

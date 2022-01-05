@@ -37,6 +37,7 @@ _Example:_
 		"lint:md:js": "wp-scripts lint-md-js",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js"
@@ -282,7 +283,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](<(https://www.npmjs.com/package/@wordpress/stylelint-config)>) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](https://www.npmjs.com/package/@wordpress/stylelint-config) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `packages-update`
 
@@ -303,6 +304,34 @@ _Example:_
 
 The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the package.json file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
 
+### `packages-update`
+
+Creates a zip file for a WordPress plugin.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"plugin-zip": "wp-scripts plugin-zip"
+	}
+}
+```
+
+By default, it uses [Plugin Handbook best practices](https://developer.wordpress.org/plugins/plugin-basics/best-practices/#file-organization) to discover files.
+
+#### Advanced information
+
+In the case where the plugin author wants to customize the files included in the zip file, they can provide the `files` field in the `package.json` file as documented in the [`npm-packlist`](https://www.npmjs.com/package/npm-packlist) package, example:
+
+```json
+{
+	"files": [ "dir" ]
+}
+```
+
+It reuses the same logic as `npm pack` command to create an npm package tarball.
+
 ### `start`
 
 Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project’s code should be located in `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`). The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
@@ -313,6 +342,7 @@ _Example:_
 {
 	"scripts": {
 		"start": "wp-scripts start",
+		"start:hot": "wp-scripts start --hot",
 		"start:custom": "wp-scripts start entry-one.js entry-two.js --output-path=custom"
 	}
 }
@@ -321,10 +351,12 @@ _Example:_
 This is how you execute the script with presented setup:
 
 -   `npm start` - starts the build for development.
+-   `npm start:hot` - starts the build for development with "Fast Refresh". The page will automatically reload if you make changes to the code.
 -   `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
+-   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
 -   `--webpack--devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.

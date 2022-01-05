@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "5.0.11",
+	"version": "5.0.20",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

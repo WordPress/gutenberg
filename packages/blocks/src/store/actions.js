@@ -6,13 +6,11 @@ import { castArray, isFunction, isPlainObject, omit, pick, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from './constants';
 import { isValidIcon, normalizeIconObject } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
@@ -36,11 +34,13 @@ const LEGACY_CATEGORY_MAPPING = {
  * Takes the unprocessed block type data and applies all the existing filters for the registered block type.
  * Next, it validates all the settings and performs additional processing to the block type definition.
  *
- * @param {WPBlockType} blockType Unprocessed block type settings.
+ * @param {WPBlockType} blockType        Unprocessed block type settings.
+ * @param {Object}      thunkArgs        Argument object for the thunk middleware.
+ * @param {Function}    thunkArgs.select Function to select from the store.
  *
  * @return {?WPBlockType} The block, if it has been successfully registered; otherwise `undefined`.
  */
-function processBlockType( blockType ) {
+const processBlockType = ( blockType, { select } ) => {
 	const { name } = blockType;
 
 	const settings = applyFilters(
@@ -92,7 +92,7 @@ function processBlockType( blockType ) {
 
 	if (
 		'category' in settings &&
-		! some( select( STORE_NAME ).getCategories(), {
+		! some( select.getCategories(), {
 			slug: settings.category,
 		} )
 	) {
@@ -125,7 +125,7 @@ function processBlockType( blockType ) {
 	}
 
 	return settings;
-}
+};
 
 /**
  * Returns an action object used in signalling that block types have been added.
@@ -142,27 +142,28 @@ export function addBlockTypes( blockTypes ) {
 }
 
 /**
- * Yields action objects signaling that the passed block type's settings should be stored in the state.
+ * Signals that the passed block type's settings should be stored in the state.
  *
  * @param {WPBlockType} blockType Unprocessed block type settings.
- *
- * @yield {Object} Action object.
  */
-export function* __experimentalRegisterBlockType( blockType ) {
-	yield {
+export const __experimentalRegisterBlockType = ( blockType ) => ( {
+	dispatch,
+	select,
+} ) => {
+	dispatch( {
 		type: 'ADD_UNPROCESSED_BLOCK_TYPE',
 		blockType,
-	};
+	} );
 
-	const processedBlockType = processBlockType( blockType );
+	const processedBlockType = processBlockType( blockType, { select } );
 	if ( ! processedBlockType ) {
 		return;
 	}
-	yield addBlockTypes( processedBlockType );
-}
+	dispatch.addBlockTypes( processedBlockType );
+};
 
 /**
- * Yields an action object signaling that all block types should be computed again.
+ * Signals that all block types should be computed again.
  * It uses stored unprocessed block types and all the most recent list of registered filters.
  *
  * It addresses the issue where third party block filters get registered after third party blocks. A sample sequence:
@@ -174,18 +175,18 @@ export function* __experimentalRegisterBlockType( blockType ) {
  *   6. Block F.
  *   7. Filter G.
  * In this scenario some filters would not get applied for all blocks because they are registered too late.
- *
- * @yield {Object} Action object.
  */
-export function* __experimentalReapplyBlockTypeFilters() {
-	const unprocessedBlockTypes = select(
-		STORE_NAME
-	).__experimentalGetUnprocessedBlockTypes();
+export const __experimentalReapplyBlockTypeFilters = () => ( {
+	dispatch,
+	select,
+} ) => {
+	const unprocessedBlockTypes = select.__experimentalGetUnprocessedBlockTypes();
 
 	const processedBlockTypes = Object.keys( unprocessedBlockTypes ).reduce(
 		( accumulator, blockName ) => {
 			const result = processBlockType(
-				unprocessedBlockTypes[ blockName ]
+				unprocessedBlockTypes[ blockName ],
+				{ select }
 			);
 			if ( result ) {
 				accumulator.push( result );
@@ -199,8 +200,8 @@ export function* __experimentalReapplyBlockTypeFilters() {
 		return;
 	}
 
-	yield addBlockTypes( processedBlockTypes );
-}
+	dispatch.addBlockTypes( processedBlockTypes );
+};
 
 /**
  * Returns an action object used to remove a registered block type.

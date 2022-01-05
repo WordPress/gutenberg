@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform, Keyboard } from 'react-native';
+import { Keyboard } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { delay } from 'lodash';
 /**
@@ -20,31 +20,20 @@ const LinkPickerScreen = () => {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const onLinkPicked = ( { url, title } ) => {
-		if ( Platform.OS === 'android' ) {
-			Keyboard.dismiss();
-			delay( () => {
-				navigation.navigate( linkSettingsScreens.settings, {
-					inputValue: url,
-					text: title,
-				} );
-			}, 100 );
-			return;
-		}
-		navigation.navigate( linkSettingsScreens.settings, {
-			inputValue: url,
-			text: title,
-		} );
+		Keyboard.dismiss();
+		delay( () => {
+			navigation.navigate( linkSettingsScreens.settings, {
+				inputValue: url,
+				text: title,
+			} );
+		}, 100 );
 	};
 
 	const onCancel = () => {
-		if ( Platform.OS === 'android' ) {
-			Keyboard.dismiss();
-			delay( () => {
-				navigation.goBack();
-			}, 100 );
-			return;
-		}
-		navigation.goBack();
+		Keyboard.dismiss();
+		delay( () => {
+			navigation.goBack();
+		}, 100 );
 	};
 
 	const { inputValue } = route.params;

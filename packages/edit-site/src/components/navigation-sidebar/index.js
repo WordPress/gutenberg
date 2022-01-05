@@ -1,13 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as editSiteStore } from '../../store';
 import NavigationPanel from './navigation-panel';
 import NavigationToggle from './navigation-toggle';
 
@@ -16,39 +18,31 @@ export const {
 	Slot: NavigationPanelPreviewSlot,
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
-export default function NavigationSidebar( {
-	isDefaultOpen = false,
-	activeTemplateType,
-} ) {
+const {
+	Fill: NavigationSidebarFill,
+	Slot: NavigationSidebarSlot,
+} = createSlotFill( 'EditSiteNavigationSidebar' );
+
+function NavigationSidebar( { isDefaultOpen = false, activeTemplateType } ) {
 	const isDesktopViewport = useViewportMatch( 'medium' );
-	const [ isNavigationOpen, setIsNavigationOpen ] = useState(
-		isDefaultOpen && isDesktopViewport
+	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+
+	useEffect(
+		function autoOpenNavigationPanelOnViewportChange() {
+			setIsNavigationPanelOpened( isDefaultOpen && isDesktopViewport );
+		},
+		[ isDefaultOpen, isDesktopViewport, setIsNavigationPanelOpened ]
 	);
-
-	useEffect( () => {
-		// When transitioning to desktop open the navigation if `isDefaultOpen` is true.
-		if ( isDefaultOpen && isDesktopViewport ) {
-			setIsNavigationOpen( true );
-		}
-
-		// When transitioning to mobile/tablet, close the navigation.
-		if ( ! isDesktopViewport ) {
-			setIsNavigationOpen( false );
-		}
-	}, [ isDefaultOpen, isDesktopViewport ] );
 
 	return (
-		<>
-			<NavigationToggle
-				isOpen={ isNavigationOpen }
-				setIsOpen={ setIsNavigationOpen }
-			/>
-			<NavigationPanel
-				isOpen={ isNavigationOpen }
-				setIsOpen={ setIsNavigationOpen }
-				activeItem={ activeTemplateType }
-			/>
+		<NavigationSidebarFill>
+			<NavigationToggle />
+			<NavigationPanel activeItem={ activeTemplateType } />
 			<NavigationPanelPreviewSlot />
-		</>
+		</NavigationSidebarFill>
 	);
 }
+
+NavigationSidebar.Slot = NavigationSidebarSlot;
+
+export default NavigationSidebar;

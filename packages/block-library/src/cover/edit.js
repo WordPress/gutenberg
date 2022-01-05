@@ -310,6 +310,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
+	markNextChangeAsNotPersistent,
 } ) {
 	const {
 		contentPosition,
@@ -391,6 +392,8 @@ function CoverEdit( {
 	);
 
 	useEffect( () => {
+		// This side-effect should not create an undo level.
+		markNextChangeAsNotPersistent();
 		setAttributes( { isDark: isCoverDark } );
 	}, [ isCoverDark ] );
 
@@ -544,6 +547,7 @@ function CoverEdit( {
 				) }
 				<PanelColorGradientSettings
 					__experimentalHasMultipleOrigins
+					__experimentalIsRenderedInSidebar
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
 					settings={ [
@@ -770,10 +774,14 @@ function CoverEdit( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( blockEditorStore );
+		const {
+			toggleSelection,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = dispatch( blockEditorStore );
 
 		return {
 			toggleSelection,
+			markNextChangeAsNotPersistent: __unstableMarkNextChangeAsNotPersistent,
 		};
 	} ),
 	withColors( { overlayColor: 'background-color' } ),

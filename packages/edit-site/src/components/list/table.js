@@ -1,76 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import isTemplateRemovable from '../../utils/is-template-removable';
-import isTemplateRevertable from '../../utils/is-template-revertable';
-
-function Actions( { template } ) {
-	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
-
-	const isRemovable = isTemplateRemovable( template );
-	const isRevertable = isTemplateRevertable( template );
-
-	if ( ! isRemovable && ! isRevertable ) {
-		return null;
-	}
-
-	async function revertAndSaveTemplate() {
-		await revertTemplate( template, { allowUndo: false } );
-		await saveEditedEntityRecord( 'postType', template.type, template.id );
-	}
-
-	return (
-		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Actions' ) }
-			className="edit-site-list-table__actions"
-		>
-			{ ( { onClose } ) => (
-				<MenuGroup>
-					{ isRemovable && (
-						<MenuItem
-							isDestructive
-							onClick={ () => {
-								removeTemplate( template );
-								onClose();
-							} }
-						>
-							{ __( 'Delete template' ) }
-						</MenuItem>
-					) }
-					{ isRevertable && (
-						<MenuItem
-							info={ __( 'Restore template to theme default' ) }
-							onClick={ () => {
-								revertAndSaveTemplate();
-								onClose();
-							} }
-						>
-							{ __( 'Clear customizations' ) }
-						</MenuItem>
-					) }
-				</MenuGroup>
-			) }
-		</DropdownMenu>
-	);
-}
+import Link from '../routes/link';
+import Actions from './actions';
+import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
 	const { templates, isLoading, postType } = useSelect(
@@ -147,19 +91,25 @@ export default function Table( { templateType } ) {
 						role="row"
 					>
 						<td className="edit-site-list-table-column" role="cell">
-							<a
-								href={ addQueryArgs( window.location.href, {
-									postId: template.id,
-									postType: template.type,
-								} ) }
-							>
-								{ template.title.rendered }
-							</a>
+							<Heading level={ 4 }>
+								<Link
+									params={ {
+										postId: template.id,
+										postType: template.type,
+									} }
+								>
+									{ template.title?.rendered ||
+										template.slug }
+								</Link>
+							</Heading>
 							{ template.description }
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
-							{ template.theme }
+							<AddedBy
+								templateType={ templateType }
+								template={ template }
+							/>
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
 							<Actions template={ template } />

@@ -105,6 +105,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               style={
                 Object {
                   "background": "#f00",
+                  "color": "#000",
                 }
               }
             >

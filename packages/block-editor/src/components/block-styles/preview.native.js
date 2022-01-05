@@ -39,10 +39,13 @@ function StylePreview( { onPress, isActive, style, url } ) {
 
 	useEffect( () => {
 		onLayout();
-		Dimensions.addEventListener( 'change', onLayout );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onLayout
+		);
 
 		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 

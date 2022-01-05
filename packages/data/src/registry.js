@@ -165,7 +165,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a store instance.
 	 *
-	 * @param {string} name Store registry name.
+	 * @param {string} name  Store registry name.
 	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
 	 */
 	function registerStoreInstance( name, store ) {

@@ -33,7 +33,6 @@ function render_block_core_search( $attributes ) {
 	$use_icon_button  = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
 	$show_input       = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'] ) ? false : true;
 	$show_button      = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
-	$label_markup     = '';
 	$input_markup     = '';
 	$button_markup    = '';
 	$inline_styles    = styles_for_block_core_search( $attributes );
@@ -178,9 +177,11 @@ function classnames_for_block_core_search( $attributes ) {
  * @return array Style HTML attribute.
  */
 function styles_for_block_core_search( $attributes ) {
-	$wrapper_styles = array();
-	$button_styles  = array();
-	$input_styles   = array();
+	$wrapper_styles   = array();
+	$button_styles    = array();
+	$input_styles     = array();
+	$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
+		'button-inside' === $attributes['buttonPosition'];
 
 	// Add width styles.
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
@@ -194,15 +195,26 @@ function styles_for_block_core_search( $attributes ) {
 		);
 	}
 
+	// Add border width styles.
+	$has_border_width = ! empty( $attributes['style']['border']['width'] );
+
+	if ( $has_border_width ) {
+		$border_width = $attributes['style']['border']['width'];
+
+		if ( $is_button_inside ) {
+			$wrapper_styles[] = sprintf( 'border-width: %s;', esc_attr( $border_width ) );
+		} else {
+			$button_styles[] = sprintf( 'border-width: %s;', esc_attr( $border_width ) );
+			$input_styles[]  = sprintf( 'border-width: %s;', esc_attr( $border_width ) );
+		}
+	}
+
 	// Add border radius styles.
 	$has_border_radius = ! empty( $attributes['style']['border']['radius'] );
 
 	if ( $has_border_radius ) {
 		$default_padding = '4px';
 		$border_radius   = $attributes['style']['border']['radius'];
-		// Apply wrapper border radius if button placed inside.
-		$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
-			'button-inside' === $attributes['buttonPosition'];
 
 		if ( is_array( $border_radius ) ) {
 			// Apply styles for individual corner border radii.
@@ -255,9 +267,7 @@ function styles_for_block_core_search( $attributes ) {
 	$has_border_color = ! empty( $attributes['style']['border']['color'] );
 
 	if ( $has_border_color ) {
-		$border_color     = $attributes['style']['border']['color'];
-		$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
-			'button-inside' === $attributes['buttonPosition'];
+		$border_color = $attributes['style']['border']['color'];
 
 		// Apply wrapper border color if button placed inside.
 		if ( $is_button_inside ) {

@@ -27,7 +27,6 @@ class GutenbergViewController: UIViewController {
         super.viewDidLoad()
         configureNavigationBar()
         gutenberg.delegate = self
-        navigationController?.navigationBar.isTranslucent = false
         registerLongPressGestureRecognizer()
 
         _ = try! FallbackJavascriptInjection(blockHTML: "Hello", userId: "1")

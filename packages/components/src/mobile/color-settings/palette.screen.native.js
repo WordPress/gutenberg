@@ -26,7 +26,7 @@ import { colorsUtils } from './utils';
 
 import styles from './style.scss';
 
-const HIT_SLOP = { top: 22, bottom: 22, left: 22, right: 22 };
+const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 
 const PaletteScreen = () => {
 	const route = useRoute();
@@ -36,8 +36,10 @@ const PaletteScreen = () => {
 		label,
 		onColorChange,
 		onGradientChange,
+		onColorCleared,
 		colorValue,
 		defaultSettings,
+		hideNavigation = false,
 	} = route.params || {};
 	const { segments, isGradient } = colorsUtils;
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
@@ -83,6 +85,10 @@ const PaletteScreen = () => {
 			onColorChange( '' );
 		} else {
 			onGradientChange( '' );
+		}
+
+		if ( onColorCleared ) {
+			onColorCleared();
 		}
 	}
 
@@ -164,10 +170,12 @@ const PaletteScreen = () => {
 	}
 	return (
 		<View>
-			<NavBar>
-				<NavBar.BackButton onPress={ navigation.goBack } />
-				<NavBar.Heading>{ label } </NavBar.Heading>
-			</NavBar>
+			{ ! hideNavigation && (
+				<NavBar>
+					<NavBar.BackButton onPress={ navigation.goBack } />
+					<NavBar.Heading>{ label } </NavBar.Heading>
+				</NavBar>
+			) }
 			<ColorPalette
 				setColor={ setColor }
 				activeColor={ currentValue }

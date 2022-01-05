@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/customize-widgets",
-	"version": "2.0.11",
+	"version": "2.0.20",
 	"description": "Widgets blocks in Customizer Module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

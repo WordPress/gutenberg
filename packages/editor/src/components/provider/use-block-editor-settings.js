@@ -127,6 +127,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'titlePlaceholder',
 				'supportsLayout',
 				'widgetTypesToHideFromLegacyWidgetBlock',
+				'__unstableResolvedAssets',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,

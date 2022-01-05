@@ -15,10 +15,13 @@ import { __ } from '@wordpress/i18n';
  */
 import QueryToolbar from './toolbar';
 
-const TEMPLATE = [ [ 'core/comment-template' ] ];
+const TEMPLATE = [
+	[ 'core/comment-template' ],
+	[ 'core/comments-pagination' ],
+];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
-	const { queryPerPage, tagName: TagName } = attributes;
+	const { perPage, tagName: TagName } = attributes;
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -28,10 +31,7 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<BlockControls>
-				<QueryToolbar
-					queryPerPage={ queryPerPage }
-					setQuery={ setAttributes }
-				/>
+				<QueryToolbar perPage={ perPage } setQuery={ setAttributes } />
 			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl

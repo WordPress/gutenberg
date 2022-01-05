@@ -29,7 +29,11 @@ import * as commentDate from './comment-date';
 import * as commentEditLink from './comment-edit-link';
 import * as commentReplyLink from './comment-reply-link';
 import * as commentTemplate from './comment-template';
+import * as commentsPaginationPrevious from './comments-pagination-previous';
 import * as commentsQueryLoop from './comments-query-loop';
+import * as commentsPagination from './comments-pagination';
+import * as commentsPaginationNext from './comments-pagination-next';
+import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -55,6 +59,7 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
+import * as postAuthorName from './post-author-name';
 import * as postComment from './post-comment';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
@@ -149,53 +154,56 @@ export const __experimentalGetCoreBlocks = () => [
 	html,
 	latestComments,
 	latestPosts,
-	logInOut,
 	mediaText,
 	missing,
 	more,
-	navigation,
-	navigationLink,
-	navigationSubmenu,
 	nextpage,
 	pageList,
 	pattern,
-	postAuthor,
-	postComments,
-	postContent,
-	postDate,
-	postExcerpt,
-	postFeaturedImage,
-	postNavigationLink,
-	postTemplate,
-	postTerms,
-	postTitle,
 	preformatted,
 	pullquote,
-	query,
-	queryPagination,
-	queryPaginationNext,
-	queryPaginationNumbers,
-	queryPaginationPrevious,
-	queryTitle,
 	reusableBlock,
 	rss,
 	search,
 	separator,
 	shortcode,
-	siteLogo,
-	siteTagline,
-	siteTitle,
 	socialLink,
 	socialLinks,
 	spacer,
 	table,
 	// tableOfContents,
 	tagCloud,
-	templatePart,
-	termDescription,
 	textColumns,
 	verse,
 	video,
+
+	// theme blocks
+	navigation,
+	navigationLink,
+	navigationSubmenu,
+	siteLogo,
+	siteTitle,
+	siteTagline,
+	query,
+	templatePart,
+	postTitle,
+	postExcerpt,
+	postFeaturedImage,
+	postContent,
+	postAuthor,
+	postDate,
+	postTerms,
+	postNavigationLink,
+	postTemplate,
+	queryPagination,
+	queryPaginationNext,
+	queryPaginationNumbers,
+	queryPaginationPrevious,
+	postComments,
+	logInOut,
+	termDescription,
+	queryTitle,
+	postAuthorName,
 ];
 
 /**
@@ -252,6 +260,10 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								commentReplyLink,
 								commentTemplate,
 								commentsQueryLoop,
+								commentsPagination,
+								commentsPaginationNext,
+								commentsPaginationNumbers,
+								commentsPaginationPrevious,
 								navigationArea,
 								postComment,
 								postCommentsCount,

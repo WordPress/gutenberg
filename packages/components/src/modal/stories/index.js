@@ -20,7 +20,7 @@ export default {
 	title: 'Components/Modal',
 	component: Modal,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

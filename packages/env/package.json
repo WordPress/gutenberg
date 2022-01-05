@@ -43,7 +43,7 @@
 		"rimraf": "^3.0.2",
 		"simple-git": "^2.35.0",
 		"terminal-link": "^2.0.0",
-		"yargs": "^14.0.0"
+		"yargs": "^17.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

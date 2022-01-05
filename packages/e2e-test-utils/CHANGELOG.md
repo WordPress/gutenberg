@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+-   Added `createReusableBlock` function to make it easier to create a simple reusable block ([#37333](https://github.com/WordPress/gutenberg/pull/37333)).
+
+### New Features
+
+-   Added `getOption` and `setOption` functions to make it easier to set and reset options such as the site title and site tagline ([#37139](https://github.com/WordPress/gutenberg/pull/37139)).
+
 ### Breaking Changes
 
 -   The peer `puppeteer` dependency has been replaced with `puppeteer-core` requiring version `>=11` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
