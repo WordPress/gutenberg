@@ -435,7 +435,7 @@ describe( 'Navigation', () => {
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+	it.skip( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		// The URL Details endpoint 404s for the created page, since it will
 		// be a draft that is inaccessible publicly. To avoid this we mock
 		// out the endpoint response to be empty which will be handled gracefully
