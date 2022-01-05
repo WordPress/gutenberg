@@ -60,13 +60,6 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 			currentWindow?.navigator?.clipboard
 				?.writeText( textToCopy )
 				.then( () => {
-					// Clear selection and ensure focus stays on the trigger element.
-					if ( trigger ) {
-						currentWindow?.getSelection()?.removeAllRanges();
-
-						trigger.focus();
-					}
-
 					if ( timeout ) {
 						setHasCopied( true );
 						clearTimeout( timeoutId );

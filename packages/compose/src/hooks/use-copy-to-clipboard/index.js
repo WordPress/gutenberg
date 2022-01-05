@@ -49,11 +49,6 @@ export default function useCopyToClipboard( text, onSuccess ) {
 			currentWindow?.navigator?.clipboard
 				?.writeText( textToCopy )
 				.then( () => {
-					// Clear selection and ensure focus stays on the trigger element.
-					currentWindow?.getSelection()?.removeAllRanges();
-					trigger.focus();
-
-					// Invoke callback
 					onSuccessRef?.current?.();
 				} );
 		};
