@@ -10,6 +10,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+/**
+ * Registers the REST API routes for Post locking.
+ */
+function gutenberg_register_post_locking_details_routes() {
+	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+		$controller = $post_type->get_rest_controller();
+
+		if ( ! $controller ) {
+			continue;
+		}
+
+		$controller->register_routes();
+
+		$lock_controller = new WP_REST_Post_Lock_Controller( $post_type->name );
+		$lock_controller->register_routes();
+	}
+}
+
+add_action( 'rest_api_init', 'gutenberg_register_post_locking_details_routes' );
 
 /**
  * Registers the REST API routes for URL Details.
