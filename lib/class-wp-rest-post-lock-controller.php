@@ -183,11 +183,10 @@ class WP_REST_Post_Lock_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $item, $request ) {
 		$fields = $this->get_fields_for_response( $request );
 
-		// Base fields for every post.
 		$data = array();
 
 		if ( rest_is_field_included( 'id', $fields ) ) {
-			$data['id'] = $item['post_id'];
+			$data['id'] = (int) $item['post_id'];
 		}
 
 		if ( rest_is_field_included( 'date', $fields ) ) {
@@ -209,13 +208,15 @@ class WP_REST_Post_Lock_Controller extends WP_REST_Controller {
 		$response->add_links( $links );
 
 		/**
-		 * Post locking filter.
+		 * Filters a post lock before it is inserted via the REST API.
+		 *
+		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
 		 *
 		 * @param WP_REST_Response $response The response object.
-		 * @param Array $item Lock object.
-		 * @param WP_REST_Request $request Request object.
+		 * @param Array            $item     Lock object.
+		 * @param WP_REST_Request  $request  Request object.
 		 */
-		return apply_filters( "rest_prepare_lock_{$this->post_type}", $response, $item, $request );
+		return apply_filters( "rest_prepare_{$this->post_type}_lock", $response, $item, $request );
 	}
 
 	/**
@@ -226,24 +227,12 @@ class WP_REST_Post_Lock_Controller extends WP_REST_Controller {
 	 * @return bool|WP_Error
 	 */
 	protected function permissions_check( $request ) {
-		if ( is_callable( array( $this->parent_controller, 'update_item_permissions_check' ) ) ) {
-			return $this->parent_controller->update_item_permissions_check( $request );
-		}
-
 		$post = $this->get_post( $request['id'] );
 		if ( is_wp_error( $post ) ) {
 			return $post;
 		}
 
-		if ( current_user_can( 'edit_post', $post->ID ) ) {
-			return new WP_Error(
-				'rest_cannot_edit',
-				__( 'Sorry, you are not allowed to edit this post.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
-		}
-
-		return true;
+		return $this->parent_controller->update_item_permissions_check( $request );
 	}
 
 	/**
@@ -351,7 +340,6 @@ class WP_REST_Post_Lock_Controller extends WP_REST_Controller {
 		}
 
 		$lock = explode( ':', $lock );
-		$time = (int) $lock[0];
 		$user = isset( $lock[1] ) ? $lock[1] : get_post_meta( $post->ID, '_edit_last', true );
 
 		if ( ! get_userdata( $user ) ) {
@@ -361,6 +349,8 @@ class WP_REST_Post_Lock_Controller extends WP_REST_Controller {
 				array( 'status' => 404 )
 			);
 		}
+
+		$time = (int) $lock[0];
 
 		/** This filter is documented in wp-admin/includes/ajax-actions.php */
 		$time_window = apply_filters( 'wp_check_post_lock_window', 150 );
