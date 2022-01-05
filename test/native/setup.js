@@ -4,6 +4,22 @@
 import 'react-native-gesture-handler/jestSetup';
 import { Image, NativeModules as RNNativeModules } from 'react-native';
 
+// React Native sets up a global navigator, but that is not executed in the
+// testing environment: https://git.io/JSSBg
+global.navigator = global.navigator ?? {};
+
+// Set up the app runtime globals for the test environment, which includes
+// modifying the above `global.navigator`
+require( '../../packages/react-native-editor/src/globals' );
+
+if ( ! global.window.matchMedia ) {
+	global.window.matchMedia = () => ( {
+		matches: false,
+		addListener: () => {},
+		removeListener: () => {},
+	} );
+}
+
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
 RNNativeModules.RNGestureHandlerModule = RNNativeModules.RNGestureHandlerModule || {
@@ -118,14 +134,6 @@ jest.mock(
 	},
 	{ virtual: true }
 );
-
-if ( ! global.window.matchMedia ) {
-	global.window.matchMedia = () => ( {
-		matches: false,
-		addListener: () => {},
-		removeListener: () => {},
-	} );
-}
 
 jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
