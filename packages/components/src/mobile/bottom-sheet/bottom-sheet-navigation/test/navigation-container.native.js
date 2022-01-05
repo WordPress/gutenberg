@@ -27,11 +27,11 @@ const TestScreen = ( { fullScreen, name, navigateTo } ) => {
 	);
 };
 
-beforeEach( () => {
-	jest.useFakeTimers();
+beforeAll( () => {
+	jest.useFakeTimers( 'legacy' );
 } );
 
-afterEach( () => {
+afterAll( () => {
 	jest.useRealTimers();
 } );
 

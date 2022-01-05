@@ -29,11 +29,11 @@ const unsupportedBlock = `
 describe( 'Editor', () => {
 	beforeAll( registerCoreBlocks );
 
-	beforeEach( () => {
-		jest.useFakeTimers();
+	beforeAll( () => {
+		jest.useFakeTimers( 'legacy' );
 	} );
 
-	afterEach( () => {
+	afterAll( () => {
 		jest.useRealTimers();
 	} );
 
