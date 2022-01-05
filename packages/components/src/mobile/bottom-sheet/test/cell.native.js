@@ -75,7 +75,7 @@ describe( '<BottomSheetCell />', () => {
 
 		const clearButton = await screen.queryByTestId( 'clear-button' );
 		expect( clearButton ).toBeNull();
-	});
+	} );
 
 	it( 'clears text input value when the clear button is pressed', async () => {
 		const clearMock = jest.fn();

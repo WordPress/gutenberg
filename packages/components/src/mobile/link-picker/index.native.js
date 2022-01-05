@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { SafeAreaView, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { lowerCase, startsWith } from 'lodash';
 
