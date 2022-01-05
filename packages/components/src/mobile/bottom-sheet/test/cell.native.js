@@ -19,7 +19,6 @@ describe( '<BottomSheetCell />', () => {
 	it( 'displays a clear button when the text has value', async () => {
 		const onChangeValueMock = jest.fn();
 		const testValueString = 'test value string';
-		const newTestValueString = 'new test value string';
 
 		const screen = render(
 			<BottomSheetCell
@@ -33,13 +32,7 @@ describe( '<BottomSheetCell />', () => {
 		const cellTouchable = await screen.getByTestId( 'cell-touchable' );
 		fireEvent.press( cellTouchable );
 
-		// Simulate onChangeValue events (without rerender)
-		const textInput = await screen.getByTestId( 'text-input' );
-		fireEvent( textInput, 'focus' );
-		fireEvent.changeText( textInput, newTestValueString );
-		expect( onChangeValueMock ).toHaveBeenCalledWith( newTestValueString );
-
-		const clearButton = await screen.getByTestId( 'clear-button' );
+		const clearButton = await screen.getByA11yLabel( 'Clear Button' );
 		expect( clearButton ).toBeTruthy();
 	} );
 
@@ -58,7 +51,7 @@ describe( '<BottomSheetCell />', () => {
 		const cellTouchable = await screen.getByTestId( 'cell-touchable' );
 		fireEvent.press( cellTouchable );
 
-		const clearButton = await screen.queryByTestId( 'clear-button' );
+		const clearButton = await screen.queryByA11yLabel( 'Clear Button' );
 		expect( clearButton ).toBeNull();
 	} );
 
@@ -73,11 +66,11 @@ describe( '<BottomSheetCell />', () => {
 			/>
 		);
 
-		const clearButton = await screen.queryByTestId( 'clear-button' );
+		const clearButton = await screen.queryByA11yLabel( 'Clear Button' );
 		expect( clearButton ).toBeNull();
 	} );
 
-	it( 'clears text input value when the clear button is pressed', async () => {
+	it( 'calls `onClear` when the clear button is pressed', async () => {
 		const clearMock = jest.fn();
 		const testValueString = 'test value string';
 
@@ -94,8 +87,8 @@ describe( '<BottomSheetCell />', () => {
 		const cellTouchable = await screen.getByTestId( 'cell-touchable' );
 		fireEvent.press( cellTouchable );
 
-		// Press clear button to invoke clear handler function
-		const clearButton = await screen.getByTestId( 'clear-button' );
+		// Press clear button to invoke the `onClear` handler function
+		const clearButton = await screen.getByA11yLabel( 'Clear Button' );
 		fireEvent.press( clearButton );
 		expect( clearMock ).toHaveBeenCalled();
 	} );
