@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { mapValues } = require( 'lodash' );
+const { mapValues, kebabCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -245,7 +245,7 @@ async function runPerformanceTests( branches, options ) {
 	for ( const branch of branches ) {
 		log( '    >> Branch: ' + branch );
 		const environmentDirectory =
-			performanceTestDirectory + '/perf-envs/' + branch;
+			performanceTestDirectory + '/perf-envs/' + kebabCase( branch );
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
 		await runShellScript( 'mkdir ' + environmentDirectory );
@@ -330,7 +330,7 @@ async function runPerformanceTests( branches, options ) {
 				log( '    >> Branch: ' + branch + ', Suite: ' + testSuite );
 				log( '        >> Starting the environment.' );
 				await runShellScript(
-					'npm run wp-env start',
+					'../../node_modules/.bin/wp-env start',
 					environmentDirectory
 				);
 				log( '        >> Running the test.' );
@@ -340,7 +340,7 @@ async function runPerformanceTests( branches, options ) {
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
-					'npm run wp-env stop',
+					'../../node_modules/.bin/wp-env stop',
 					environmentDirectory
 				);
 			}
