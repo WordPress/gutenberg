@@ -1,0 +1,12 @@
+{
+	"core": "WordPress/WordPress",
+	"plugins": [ "./plugin" ],
+	"themes": [ "../../tests/emptytheme" ],
+	"env": {
+		"tests": {
+			"mappings": {
+				"wp-content/mu-plugins": "../../packages/e2e-tests/mu-plugins"
+			}
+		}
+	}
+}
