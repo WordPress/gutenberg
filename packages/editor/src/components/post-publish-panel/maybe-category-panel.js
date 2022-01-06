@@ -32,17 +32,22 @@ function MaybeCategoryPanel() {
 				slug: defaultCategorySlug,
 			}
 		)?.[ 0 ];
-
+		const postTypeSupportsCategories =
+			categoriesTaxonomy &&
+			some( categoriesTaxonomy.types, ( type ) => type === postType );
 		const categories =
 			categoriesTaxonomy &&
 			select( editorStore ).getEditedPostAttribute(
 				categoriesTaxonomy.rest_base
 			);
 
+		// This boolean should return true if everything is loaded
+		// ( categoriesTaxonomy, defaultCategory )
+		// and the post has not been assigned a category different than "uncategorized".
 		return (
-			categoriesTaxonomy !== undefined &&
-			defaultCategory &&
-			some( categoriesTaxonomy.types, ( type ) => type === postType ) &&
+			!! categoriesTaxonomy &&
+			!! defaultCategory &&
+			postTypeSupportsCategories &&
 			( categories?.length === 0 ||
 				( categories?.length === 1 &&
 					defaultCategory.id === categories[ 0 ] ) )
@@ -70,6 +75,11 @@ function MaybeCategoryPanel() {
 
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
+			<p>
+				{ __(
+					'Categories provide a helpful way to group related posts together and to quickly tell readers what a post is about.'
+				) }
+			</p>
 			<HierarchicalTermSelector slug="category" />
 		</PanelBody>
 	);
