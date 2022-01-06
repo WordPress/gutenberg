@@ -1,0 +1,69 @@
+name: Publish npm packages
+
+on:
+    workflow_dispatch:
+        inputs:
+            release_type:
+                description: 'latest, next, or bugfix?'
+                required: true
+            version:
+                description: 'patch, minor, or major?'
+                required: true
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    sync-wordpress-branch:
+        name: Sync the WordPress release branch
+        runs-on: ubuntu-latest
+        env:
+            WORDPRESS_RELEASE_BRANCH: ${{ github.event.inputs.release_type == 'next' && 'wp/next' || 'wp/trunk' ) }}
+        outputs:
+            plugin_version: ${{ steps.get_version.outputs.plugin_version }}
+            plugin_release_branch: ${{ steps.get_version.outputs.plugin_release_branch }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+
+            - name: Compute plugin release branch
+              id: get_version
+              run: |
+                  PLUGIN_VERSION=$(jq --raw-output '.version' package.json)
+                  echo "::set-output name=plugin_version::$(echo $PLUGIN_VERSION)"
+                  IFS='.' read -r -a PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
+                  PLUGIN_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
+                  echo "::set-output name=plugin_release_branch::$(echo $PLUGIN_RELEASE_BRANCH)"
+
+            - name: Configure git user name and email
+              run: |
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
+            - name: Switch to WordPress release branch
+              run: |
+                  git fetch --depth=1 origin "$WORDPRESS_RELEASE_BRANCH"
+                  git checkout "$WORDPRESS_RELEASE_BRANCH"
+
+            - name: Sync the WordPress release branch with the changes from the latest plugin release
+              if: |
+                  github.event.inputs.release_type == 'latest' ||
+                  github.event.inputs.release_type == 'next'
+              run: |
+                  git rm -r .
+                  git checkout origin/"${{ steps.get_version.outputs.plugin_release_branch }}" -- .
+
+            - name: Commit the changes to the WordPress release branch
+              if: |
+                  github.event.inputs.release_type == 'latest' ||
+                  github.event.inputs.release_type == 'next'
+              run: |
+                  git commit -m "Merge changes published in the Gutenberg plugin ${{ steps.get_version.outputs.plugin_release_branch }} branch"
+                  git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
