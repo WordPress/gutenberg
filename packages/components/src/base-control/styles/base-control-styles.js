@@ -32,3 +32,8 @@ export const StyledHelp = styled.p`
 	font-style: normal;
 	color: ${ COLORS.mediumGray.text };
 `;
+
+export const StyledVisualLabel = styled.span`
+	display: inline-block;
+	margin-bottom: ${ space( 2 ) };
+`;

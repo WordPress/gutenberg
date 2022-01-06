@@ -12,6 +12,7 @@ import {
 	StyledField,
 	StyledLabel,
 	StyledHelp,
+	StyledVisualLabel,
 } from './styles/base-control-styles';
 
 /**
@@ -95,8 +96,16 @@ function BaseControl( {
  * @return {JSX.Element} Element
  */
 BaseControl.VisualLabel = ( { className, children } ) => {
-	className = classnames( 'components-base-control__label', className );
-	return <span className={ className }>{ children }</span>;
+	return (
+		<StyledVisualLabel
+			className={ classnames(
+				'components-base-control__label',
+				className
+			) }
+		>
+			{ children }
+		</StyledVisualLabel>
+	);
 };
 
 export default BaseControl;
