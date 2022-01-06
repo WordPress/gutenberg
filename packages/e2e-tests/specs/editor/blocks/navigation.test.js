@@ -435,7 +435,7 @@ describe( 'Navigation', () => {
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	it.skip( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		// The URL Details endpoint 404s for the created page, since it will
 		// be a draft that is inaccessible publicly. To avoid this we mock
 		// out the endpoint response to be empty which will be handled gracefully
@@ -471,11 +471,6 @@ describe( 'Navigation', () => {
 			'.block-editor-link-control__search-create'
 		);
 		await createPageButton.click();
-
-		const draftLink = await page.waitForSelector(
-			'.wp-block-navigation-item__content'
-		);
-		await draftLink.click();
 
 		// Creating a draft is async, so wait for a sign of completion. In this
 		// case the link that shows in the URL popover once a link is added.
