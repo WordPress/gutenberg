@@ -96,10 +96,10 @@ describe( 'actions', () => {
 				selectorName: '__experimentalGetTemplateForLink',
 				args: [ page.path ],
 			} );
-			expect( it.next( { id: 'tt1-blocks//single' } ).value ).toEqual( {
+			expect( it.next( { id: 'emptytheme//single' } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
-				templateId: 'tt1-blocks//single',
+				templateId: 'emptytheme//single',
 			} );
 			expect( it.next().done ).toBe( true );
 		} );
