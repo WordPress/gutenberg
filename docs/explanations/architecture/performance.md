@@ -40,7 +40,7 @@ To achieve that the command first prepares the following folder structure:
     ├── packages/e2e-tests/specs/performance/*
     |   The actual performance tests to run
     │
-    ├── tests/emptytheme
+    ├── test/emptytheme
     |   The theme used for the tests environment. (site editor)
     │
     │── perf-envs/branch1/.wp-env.json
