@@ -6,6 +6,7 @@ import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalBoxControl as BoxControl,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 
@@ -14,7 +15,7 @@ import {
  */
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY } from './dimensions';
+import { AXIAL_SIDES, SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -82,6 +83,7 @@ export function GapEdit( props ) {
 	const {
 		clientId,
 		attributes: { style },
+		name: blockName,
 		setAttributes,
 	} = props;
 
@@ -95,6 +97,10 @@ export function GapEdit( props ) {
 		],
 	} );
 
+	const sides = useCustomSides( blockName, 'blockGap' );
+	const splitOnAxis =
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+
 	const ref = useBlockRef( clientId );
 
 	if ( useIsGapDisabled( props ) ) {
@@ -102,11 +108,15 @@ export function GapEdit( props ) {
 	}
 
 	const onChange = ( next ) => {
+		const row = next?.top ?? next;
+		const column = next?.left ?? next;
+		const newValue = row === column ? row : `${ row } ${ column }`;
+
 		const newStyle = {
 			...style,
 			spacing: {
 				...style?.spacing,
-				blockGap: next,
+				blockGap: newValue,
 			},
 		};
 
@@ -128,17 +138,53 @@ export function GapEdit( props ) {
 		}
 	};
 
+	const blockGapValue = style?.spacing?.blockGap;
+	const boxValuesArray = blockGapValue
+		? blockGapValue.split( ' ' )
+		: [ undefined ];
+	const boxValues = {
+		left: undefined,
+		top: undefined,
+	};
+
+	if ( boxValuesArray.length === 1 ) {
+		boxValues.left = boxValuesArray[ 0 ];
+		boxValues.top = boxValuesArray[ 0 ];
+	}
+
+	if ( boxValuesArray.length === 2 ) {
+		boxValues.left = boxValuesArray[ 1 ];
+		boxValues.top = boxValuesArray[ 0 ];
+	}
+
+	// The default combined value we'll take from row.
+	const defaultValue = boxValues.top;
+
 	return Platform.select( {
 		web: (
 			<>
-				<UnitControl
-					label={ __( 'Block spacing' ) }
-					__unstableInputWidth="80px"
-					min={ 0 }
-					onChange={ onChange }
-					units={ units }
-					value={ style?.spacing?.blockGap }
-				/>
+				{ splitOnAxis ? (
+					<BoxControl
+						label={ __( 'Block spacing' ) }
+						min={ 0 }
+						onChange={ onChange }
+						units={ units }
+						sides={ sides }
+						values={ boxValues }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) : (
+					<UnitControl
+						label={ __( 'Block spacing' ) }
+						__unstableInputWidth="80px"
+						min={ 0 }
+						onChange={ onChange }
+						units={ units }
+						// Default to `row` for combined values.
+						value={ defaultValue }
+					/>
+				) }
 			</>
 		),
 		native: null,
