@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { Button, TextHighlight } from '@wordpress/components';
-import { Icon, globe, home } from '@wordpress/icons';
+import { Icon, globe } from '@wordpress/icons';
 
 export const LinkControlSearchItem = ( {
 	itemProps,
@@ -19,7 +19,6 @@ export const LinkControlSearchItem = ( {
 	isURL = false,
 	searchTerm = '',
 	shouldShowType = false,
-	isFrontPage = false,
 } ) => {
 	return (
 		<Button
@@ -38,12 +37,6 @@ export const LinkControlSearchItem = ( {
 				/>
 			) }
 
-			{ ! isURL && isFrontPage && (
-				<Icon
-					className="block-editor-link-control__search-item-icon"
-					icon={ home }
-				/>
-			) }
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight
