@@ -5,7 +5,7 @@ import ModalLinkUI from '../modal';
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow } from 'test/helpers';
 
 describe( 'LinksUI', () => {
 	it( 'LinksUI renders', () => {
