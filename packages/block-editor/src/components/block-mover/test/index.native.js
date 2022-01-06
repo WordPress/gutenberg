@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow } from 'test/helpers';
 
 /**
  * Internal dependencies
@@ -43,7 +43,7 @@ describe( 'Block Mover Picker', () => {
 			rootClientId: '',
 			isStackedHorizontally: true,
 		};
-		const wrapper = shallow( <BlockMover { ...props } /> );
-		expect( wrapper ).toMatchSnapshot();
+		const { output } = shallow( <BlockMover { ...props } /> );
+		expect( output ).toMatchSnapshot();
 	} );
 } );
