@@ -66,10 +66,8 @@ const spinAnimationPseudo = keyframes`
 	}
 `;
 
-export const StyledSpinner = styled.progress`
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
+export const StyledSpinner = styled.span`
+	display: block;
 	box-sizing: border-box;
 	border: none;
 	border-radius: 50%;
@@ -79,17 +77,13 @@ export const StyledSpinner = styled.progress`
 	color: var( --wp-admin-theme-color );
 	background-color: transparent;
 	overflow: hidden;
-
-	&:indeterminate {
 		-webkit-mask-image: linear-gradient( transparent 50%, black 50% ),
 			linear-gradient( to right, transparent 50%, black 50% );
 		mask-image: linear-gradient( transparent 50%, black 50% ),
 			linear-gradient( to right, transparent 50%, black 50% );
 		animation: ${ spinAnimation } 6s infinite cubic-bezier( 0.3, 0.6, 1, 1 );
-	}
 
-	&::before,
-	&:indeterminate::-webkit-progress-value {
+	&::before {
 		content: '';
 		display: block;
 		box-sizing: border-box;
@@ -103,7 +97,7 @@ export const StyledSpinner = styled.progress`
 		animation: ${ spinAnimationPseudo } 0.75s infinite linear alternate;
 	}
 
-	&:indeterminate::-moz-progress-bar {
+	&::-moz-progress-bar {
 		box-sizing: border-box;
 		border: solid 2px transparent;
 		border-top-color: currentColor;
