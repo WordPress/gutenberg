@@ -3,10 +3,12 @@
  */
 import { act, render, fireEvent } from '@testing-library/react-native';
 import { v4 as uuid } from 'uuid';
+import ShallowRenderer from 'react-test-renderer/shallow';
 
 /**
  * WordPress dependencies
  */
+import * as React from '@wordpress/element';
 import {
 	subscribeParentGetHtml,
 	provideToNative_Html as provideToNativeHtml,
@@ -112,4 +114,17 @@ export function getEditorHtml() {
 	}
 	triggerHtmlSerialization();
 	return serializedHtml;
+}
+
+/**
+ * @deprecated Shallow rendering React component is usually not a good idea, please use `render` instead.
+ *
+ * @param {React.Element} instance The node to render.
+ * @return {Object} The wrapper instance around the rendered output.
+ */
+export function shallow( instance ) {
+	const renderer = new ShallowRenderer();
+	renderer.render( React.createElement( instance.type, instance.props ) );
+
+	return { output: renderer.getRenderOutput() };
 }

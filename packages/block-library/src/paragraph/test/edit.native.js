@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow } from 'test/helpers';
 
 /**
  * Internal dependencies
@@ -31,6 +31,6 @@ const getTestComponentWithContent = ( content ) => {
 describe( 'Paragraph block', () => {
 	it( 'renders without crashing', () => {
 		const component = getTestComponentWithContent( '' );
-		expect( component.exists() ).toBe( true );
+		expect( component ).toBeTruthy();
 	} );
 } );
