@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { filter, map } from 'lodash';
-import TestUtils from 'react-dom/test-utils';
+import TestUtils, { act } from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 
 /**
@@ -262,7 +262,9 @@ describe( 'FormTokenField', () => {
 
 			// before sending a hover event, we need to wait for
 			// SuggestionList#_scrollingIntoView to become false
-			jest.advanceTimersByTime( 100 );
+			act( () => {
+				jest.advanceTimersByTime( 100 );
+			} );
 
 			TestUtils.Simulate.mouseEnter( hoverSuggestion );
 			expect( getSelectedSuggestion() ).toEqual( [ 'wi', 'th' ] );
