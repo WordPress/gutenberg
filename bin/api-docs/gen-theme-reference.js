@@ -148,7 +148,15 @@ ${ markupFn( data ) }
 let autogen = '';
 
 // Settings
-const settings = themejson.definitions.settingsProperties.properties;
+const settings = Object.entries( themejson.definitions )
+	.filter( ( [ settingsKey ] ) =>
+		/^settingsProperties(?!Complete)\w+$/.test( settingsKey )
+	)
+	.reduce(
+		( settingsObj, [ , { properties } ] ) =>
+			Object.assign( settingsObj, properties ),
+		{}
+	);
 const settingSections = keys( settings );
 autogen += '## Settings' + '\n\n';
 settingSections.forEach( ( section ) => {
