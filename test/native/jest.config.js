@@ -26,10 +26,6 @@ module.exports = {
 	clearMocks: true,
 	preset: 'react-native',
 	setupFiles: [ '<rootDir>/' + configPath + '/setup.js' ],
-	// TODO: Refactor tests away from `done` callback and switch to `jest-circus`,
-	// as it is the clear predecssor to `jest-jasmine2`: https://git.io/JSHWU,
-	// https://git.io/JSHWk
-	testRunner: 'jest-jasmine2',
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
 		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
