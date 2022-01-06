@@ -29,7 +29,7 @@ import { ItemSubmenuIcon } from '../navigation-link/icons';
 const MAX_PAGE_COUNT = 100;
 
 export default function PageListEdit( { context, clientId } ) {
-	const { pagesByParentId, totalPages } = usePagesByParentId();
+	const { pagesByParentId, totalPages } = usePageData();
 
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const allowConvertToLinks =
@@ -94,7 +94,14 @@ export default function PageListEdit( { context, clientId } ) {
 	);
 }
 
-function usePagesByParentId() {
+function useFrontPageId() {
+	return useSelect( ( select ) => {
+		const site = select( coreStore ).getEntityRecord( 'root', 'site' );
+		return site?.show_on_front === 'page' && site?.page_on_front;
+	}, [] );
+}
+
+function usePageData() {
 	const { pages } = useSelect( ( select ) => {
 		const { getEntityRecords } = select( coreStore );
 
@@ -137,6 +144,7 @@ const PageItems = memo( function PageItems( {
 	depth = 0,
 } ) {
 	const pages = pagesByParentId.get( parentId );
+	const frontPageId = useFrontPageId();
 
 	if ( ! pages?.length ) {
 		return [];
@@ -155,6 +163,7 @@ const PageItems = memo( function PageItems( {
 					'open-on-hover-click':
 						! context.openSubmenusOnClick &&
 						context.showSubmenuIcon,
+					'menu-item-home': page.id === frontPageId,
 				} ) }
 			>
 				{ hasChildren && context.openSubmenusOnClick ? (
