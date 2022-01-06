@@ -428,5 +428,147 @@ describe.each( [
 				}
 			);
 		} );
+
+		describe( 'Clear Button Behavior - Clear Button Presence', () => {
+			/**
+			 * GIVEN a LINK PICKER SHEET is displayed;
+			 * GIVEN the LINK PICKER field is FOCUSED but has NO text value;
+			 */
+			// eslint-disable-next-line jest/no-done-callback
+			it( 'should not display a CLEAR BUTTON within the LINK SETTINGS field', async ( done ) => {
+				// Arrange
+				const expectation =
+					'The LINK SETTINGS > LINK TO field value should not have a CLEAR BUTTON within it.';
+				const subject = await initializeEditor( { initialHtml } );
+
+				// Act
+				try {
+					const block = await waitFor( () =>
+						subject.getByA11yLabel(
+							type === 'core/image'
+								? /Image Block/
+								: /Button Block/
+						)
+					);
+					fireEvent.press( block );
+					fireEvent.press( block );
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel( 'Open Settings' )
+						)
+					);
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel(
+								`Link to, ${
+									type === 'core/image'
+										? 'None'
+										: 'Search or type URL'
+								}`
+							)
+						)
+					);
+					if ( type === 'core/image' ) {
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel( /Custom URL/ )
+							)
+						);
+					}
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByPlaceholderText(
+								__( 'Search or type URL' )
+							)
+						)
+					);
+				} catch ( error ) {
+					done.fail( error );
+				}
+
+				// Assert
+				waitFor( () => subject.getByA11yLabel( 'Clear Button' ), {
+					timeout: 50,
+					interval: 10,
+				} )
+					.then( () => done.fail( expectation ) )
+					.catch( () => done() );
+			} );
+		} );
+
+		describe( 'Clear Button Behavior - Press Clear Button', () => {
+			/**
+			 * GIVEN a LINK PICKER SHEET is displayed;
+			 * GIVEN the LINK PICKER field has text value;
+			 * WHEN the CLEAR BUTTON is PRESSED
+			 */
+			// eslint-disable-next-line jest/no-done-callback
+			it( 'should clear the value of LINK SETTINGS field using the CLEAR BUTTON', async ( done ) => {
+				// Arrange
+				const expectation =
+					'The LINK SETTINGS > LINK TO field value should be EMPTY when the CLEAR BUTTON is pressed.';
+				const url = 'https://tonytahmouchtest.files.wordpress.com';
+				const subject = await initializeEditor( { initialHtml } );
+
+				// Act
+				try {
+					const block = await waitFor( () =>
+						subject.getByA11yLabel(
+							type === 'core/image'
+								? /Image Block/
+								: /Button Block/
+						)
+					);
+					fireEvent.press( block );
+					fireEvent.press( block );
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel( 'Open Settings' )
+						)
+					);
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel(
+								`Link to, ${
+									type === 'core/image'
+										? 'None'
+										: 'Search or type URL'
+								}`
+							)
+						)
+					);
+					if ( type === 'core/image' ) {
+						fireEvent.press(
+							await waitFor( () =>
+								subject.getByA11yLabel( /Custom URL/ )
+							)
+						);
+					}
+					fireEvent.changeText(
+						await waitFor( () =>
+							subject.getByPlaceholderText(
+								__( 'Search or type URL' )
+							)
+						),
+						url
+					);
+					fireEvent.press(
+						await waitFor( () =>
+							subject.getByA11yLabel( 'Clear Button' )
+						)
+					);
+				} catch ( error ) {
+					done.fail( error );
+				}
+
+				// Assert
+				waitFor( () => subject.getByDisplayValue( url ), {
+					timeout: 50,
+					interval: 10,
+				} )
+					.then( () => done.fail( expectation ) )
+					.catch( () => done() );
+			} );
+		} );
 	} );
 } );
