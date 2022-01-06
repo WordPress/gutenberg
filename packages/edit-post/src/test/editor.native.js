@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
-import { act } from 'test/helpers';
+import { act, render } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -58,7 +57,7 @@ describe( 'Editor', () => {
 
 // Utilities
 const renderEditorWith = ( content ) => {
-	return mount(
+	return render(
 		<Editor
 			initialHtml={ content }
 			initialHtmlModeEnabled={ false }
