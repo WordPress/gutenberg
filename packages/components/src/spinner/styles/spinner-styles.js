@@ -77,11 +77,11 @@ export const StyledSpinner = styled.span`
 	color: var( --wp-admin-theme-color );
 	background-color: transparent;
 	overflow: hidden;
-		-webkit-mask-image: linear-gradient( transparent 50%, black 50% ),
-			linear-gradient( to right, transparent 50%, black 50% );
-		mask-image: linear-gradient( transparent 50%, black 50% ),
-			linear-gradient( to right, transparent 50%, black 50% );
-		animation: ${ spinAnimation } 6s infinite cubic-bezier( 0.3, 0.6, 1, 1 );
+	-webkit-mask-image: linear-gradient( transparent 50%, black 50% ),
+		linear-gradient( to right, transparent 50%, black 50% );
+	mask-image: linear-gradient( transparent 50%, black 50% ),
+		linear-gradient( to right, transparent 50%, black 50% );
+	animation: ${ spinAnimation } 6s infinite cubic-bezier( 0.3, 0.6, 1, 1 );
 
 	&::before {
 		content: '';
