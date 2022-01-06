@@ -166,9 +166,10 @@ const SiteLogo = ( {
 	const currentWidth = width || defaultWidth;
 	const ratio = naturalWidth / naturalHeight;
 	const currentHeight = currentWidth / ratio;
-	const minWidth = naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
+	const minWidth =
+		naturalWidth < naturalHeight ? MIN_SIZE : Math.ceil( MIN_SIZE * ratio );
 	const minHeight =
-		naturalHeight < naturalWidth ? MIN_SIZE : MIN_SIZE / ratio;
+		naturalHeight < naturalWidth ? MIN_SIZE : Math.ceil( MIN_SIZE / ratio );
 
 	// With the current implementation of ResizableBox, an image needs an
 	// explicit pixel value for the max-width. In absence of being able to
