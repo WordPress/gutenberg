@@ -10,8 +10,10 @@ import BottomSheetCell from '../cell.native.js';
 
 describe( '<BottomSheetCell />', () => {
 	it( 'renders the component', async () => {
-		const screen = render( <BottomSheetCell /> );
-		const cellTouchable = screen.getByTestId( 'cell-touchable' );
+		const screen = render(
+			<BottomSheetCell accessibilityLabel={ 'Text Input' } />
+		);
+		const cellTouchable = screen.getByA11yLabel( 'Text Input' );
 
 		expect( cellTouchable ).toBeTruthy();
 	} );
@@ -22,6 +24,7 @@ describe( '<BottomSheetCell />', () => {
 
 		const screen = render(
 			<BottomSheetCell
+				accessibilityLabel={ 'Text Input' }
 				displayClearButton={ true }
 				value={ testValueString }
 				onChangeValue={ onChangeValueMock }
@@ -29,7 +32,7 @@ describe( '<BottomSheetCell />', () => {
 		);
 
 		// Invoke editing behavior by pressing the Cell
-		const cellTouchable = await screen.getByTestId( 'cell-touchable' );
+		const cellTouchable = await screen.getByA11yLabel( 'Text Input' );
 		fireEvent.press( cellTouchable );
 
 		const clearButton = await screen.getByA11yLabel( 'Clear Button' );
@@ -41,6 +44,7 @@ describe( '<BottomSheetCell />', () => {
 
 		const screen = render(
 			<BottomSheetCell
+				accessibilityLabel={ 'Text Input' }
 				displayClearButton={ true }
 				value={ '' }
 				onChangeValue={ onChangeValueMock }
@@ -48,7 +52,7 @@ describe( '<BottomSheetCell />', () => {
 		);
 
 		// Invoke editing behavior by pressing the Cell
-		const cellTouchable = await screen.getByTestId( 'cell-touchable' );
+		const cellTouchable = await screen.getByA11yLabel( 'Text Input' );
 		fireEvent.press( cellTouchable );
 
 		const clearButton = await screen.queryByA11yLabel( 'Clear Button' );
@@ -76,6 +80,7 @@ describe( '<BottomSheetCell />', () => {
 
 		const screen = render(
 			<BottomSheetCell
+				accessibilityLabel={ 'Text Input' }
 				displayClearButton={ true }
 				value={ testValueString }
 				onClear={ clearMock }
@@ -84,7 +89,7 @@ describe( '<BottomSheetCell />', () => {
 		);
 
 		// Invoke editing behavior by pressing the Cell
-		const cellTouchable = await screen.getByTestId( 'cell-touchable' );
+		const cellTouchable = await screen.getByA11yLabel( 'Text Input' );
 		fireEvent.press( cellTouchable );
 
 		// Press clear button to invoke the `onClear` handler function

@@ -198,7 +198,7 @@ class BottomSheetCell extends Component {
 					style={ styles.clearIconContainer }
 					accessibilityLabel={ __( 'Clear Button' ) }
 					accessibilityHint={ __(
-						'Will clear the value of the text input when pressed'
+						'Tap here to clear the value of the text input'
 					) }
 				>
 					<Icon
@@ -370,7 +370,6 @@ class BottomSheetCell extends Component {
 				onPress={ onCellPress }
 				onLongPress={ onLongPress }
 				style={ [ styles.clipToBounds, style ] }
-				testID={ 'cell-touchable' }
 				borderless={ borderless }
 			>
 				{ drawTopSeparator && <View style={ separatorStyle() } /> }
