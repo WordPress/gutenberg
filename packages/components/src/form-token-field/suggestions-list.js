@@ -22,8 +22,8 @@ function SuggestionsList( {
 	selectedIndex,
 	scrollIntoView,
 	match = '',
-	onHover = () => {},
-	onSelect = () => {},
+	onHover,
+	onSelect,
 	suggestions = emptyList,
 	displayTransform,
 	instanceId,
@@ -55,14 +55,14 @@ function SuggestionsList( {
 	const handleHover = ( suggestion ) => {
 		return () => {
 			if ( ! scrollingIntoView ) {
-				onHover( suggestion );
+				onHover?.( suggestion );
 			}
 		};
 	};
 
 	const handleClick = ( suggestion ) => {
 		return () => {
-			onSelect( suggestion );
+			onSelect?.( suggestion );
 		};
 	};
 
