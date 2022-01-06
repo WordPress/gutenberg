@@ -7,12 +7,16 @@
 .block-editor-panel-color-gradient-settings {
 	.block-editor-panel-color-gradient-settings__panel-title {
 		display: flex;
-		gap: $grid-unit-15;
+		gap: $grid-unit-10;
 
 		.component-color-indicator {
 			width: $grid-unit-15;
 			height: $grid-unit-15;
 			align-self: center;
+
+			&:first-child {
+				margin-left: $grid-unit-15;
+			}
 		}
 	}
 
@@ -44,6 +48,10 @@
 	}
 }
 
+.block-editor-panel-color-gradient-settings__dropdown {
+	width: 100%;
+}
+
 .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
 	& > div {
 		width: $sidebar-width;
@@ -51,9 +59,18 @@
 }
 
 @include break-medium() {
-	.block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
-		margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 } !important;
-		margin-top: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+	.block-editor-panel-color-gradient-settings__dropdown-content {
+		.components-popover__content {
+			margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 } !important;
+		}
+
+		&.is-from-top .components-popover__content {
+			margin-top: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+		}
+
+		&.is-from-bottom .components-popover__content {
+			margin-bottom: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+		}
 	}
 }
 

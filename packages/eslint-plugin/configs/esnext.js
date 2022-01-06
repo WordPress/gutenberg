@@ -1,11 +1,17 @@
-module.exports = {
+/**
+ * External dependencies
+ */
+const { cosmiconfigSync } = require( 'cosmiconfig' );
+
+const config = {
+	parser: '@babel/eslint-parser',
+	parserOptions: {
+		sourceType: 'module',
+	},
 	env: {
 		es6: true,
 	},
 	extends: [ require.resolve( './es5.js' ) ],
-	parserOptions: {
-		sourceType: 'module',
-	},
 	rules: {
 		// Disable ES5-specific (extended from ES5)
 		'vars-on-top': 'off',
@@ -45,3 +51,18 @@ module.exports = {
 		'template-curly-spacing': [ 'error', 'always' ],
 	},
 };
+
+// It won't recognize the `babel.config.json` file used in the project until the upstream bug in `cosmiconfig` is fixed:
+// https://github.com/davidtheclark/cosmiconfig/issues/246.
+const result = cosmiconfigSync( 'babel' ).search();
+if ( ! result || ! result.filepath ) {
+	config.parserOptions = {
+		...config.parserOptions,
+		requireConfigFile: false,
+		babelOptions: {
+			presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+		},
+	};
+}
+
+module.exports = config;

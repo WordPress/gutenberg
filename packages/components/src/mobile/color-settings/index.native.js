@@ -27,6 +27,7 @@ const ColorSettingsMemo = memo(
 		colorValue,
 		gradientValue,
 		onGradientChange,
+		onColorCleared,
 		label,
 		hideNavigation,
 	} ) => {
@@ -44,6 +45,7 @@ const ColorSettingsMemo = memo(
 						colorValue,
 						gradientValue,
 						onGradientChange,
+						onColorCleared,
 						label,
 						hideNavigation,
 					} }

@@ -93,8 +93,9 @@ panel's dropdown menu.
 ### `panelId`: `string`
 
 If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
-to restrict panel items. Only items with a matching `panelId` will be able
-to register themselves with this panel.
+to restrict panel items. When a `panelId` is set, items can only register
+themselves if the `panelId` is explicitly `null` or the item's `panelId` matches
+exactly.
 
 - Required: No
 
