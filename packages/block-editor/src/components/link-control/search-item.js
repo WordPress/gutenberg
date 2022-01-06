@@ -67,7 +67,7 @@ export const LinkControlSearchItem = ( {
 
 function getVisualTypeName( suggestion ) {
 	if ( suggestion.isFrontPage ) {
-		return 'Front Page';
+		return 'front page';
 	}
 
 	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
