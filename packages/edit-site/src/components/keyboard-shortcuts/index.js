@@ -23,6 +23,7 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		__experimentalGetDirtyEntityRecords,
 		isSavingEntityRecord,
 	} = useSelect( coreStore );
+	const { getEditorMode } = useSelect( editSiteStore );
 	const isListViewOpen = useSelect(
 		( select ) => select( editSiteStore ).isListViewOpened(),
 		[]
@@ -35,7 +36,9 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		[]
 	);
 	const { redo, undo } = useDispatch( coreStore );
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
+	const { setIsListViewOpened, switchEditorMode } = useDispatch(
+		editSiteStore
+	);
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
 		interfaceStore
 	);
@@ -78,6 +81,10 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		} else {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 		}
+	} );
+
+	useShortcut( 'core/edit-site/toggle-mode', () => {
+		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
 	} );
 
 	return null;
@@ -177,6 +184,15 @@ function KeyboardShortcutsRegister() {
 					character: 'p',
 				},
 			],
+		} );
+		registerShortcut( {
+			name: 'core/edit-site/toggle-mode',
+			category: 'global',
+			description: __( 'Switch between visual editor and code editor.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'm',
+			},
 		} );
 	}, [ registerShortcut ] );
 

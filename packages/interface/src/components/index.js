@@ -6,3 +6,5 @@ export { default as PinnedItems } from './pinned-items';
 export { default as MoreMenuDropdown } from './more-menu-dropdown';
 export { default as MoreMenuFeatureToggle } from './more-menu-feature-toggle';
 export { default as ActionItem } from './action-item';
+export { default as CodeEditorScreen } from './code-editor-screen';
+export { default as CodeEditor } from './code-editor';

@@ -9,6 +9,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -485,4 +487,23 @@ export function* closeGeneralSidebar() {
 		'disableComplementaryArea',
 		editSiteStoreName
 	);
+}
+
+export function* switchEditorMode( mode ) {
+	yield {
+		type: 'SWITCH_MODE',
+		mode,
+	};
+
+	// Unselect blocks when we switch to a non visual mode.
+	if ( mode !== 'visual' ) {
+		yield controls.dispatch( blockEditorStore.name, 'clearSelectedBlock' );
+	}
+	const messages = {
+		visual: __( 'Visual editor selected' ),
+		mosaic: __( 'Mosaic view selected' ),
+	};
+	if ( messages[ mode ] ) {
+		speak( messages[ mode ], 'assertive' );
+	}
 }
