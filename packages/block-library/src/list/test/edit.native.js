@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow } from 'test/helpers';
 
 /**
  * Internal dependencies
