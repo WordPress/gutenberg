@@ -361,7 +361,7 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"description": "As of WordPress 5.9, this block does not support any block-level settings.",
+					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
 					"additionalProperties": false
 				},
 				"core/audio": {
