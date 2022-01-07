@@ -114,8 +114,9 @@ function make_pot () {
   # In order to detect parse errors, we need to use the "--debug" option, otherwise "make-pot" command doesn't output errors.
   local full_command="$makepot_command $source --debug $arguments"
   if [[ -z ${DEBUG:-} ]]; then
-    # When DEBUG flag is not enabled, we only print the parse errors.
-    $full_command 2> >(grep 'Could not parse file' | sed 's/Debug[[:space:]][(]make-pot[)]/Warning/g' >&2)
+    # When DEBUG flag is not enabled, we ignore extra debug information except important warnings.
+    local ignore_pattern="Parsing file\|Debug (commands)\|Debug (bootstrap)\|Debug (hooks)"
+    $full_command 2> >(grep -v "$ignore_pattern" | sed 's/Debug[[:space:]][(]make-pot[)]/Warning/g' >&2)
   else
     $full_command
   fi
