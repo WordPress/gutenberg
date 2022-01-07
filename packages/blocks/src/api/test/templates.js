@@ -43,6 +43,13 @@ describe( 'templates', () => {
 			category: 'text',
 			title: 'test block',
 		} );
+
+		registerBlockType( 'core/missing', {
+			attributes: {},
+			save: noop,
+			category: 'text',
+			title: 'missing block',
+		} );
 	} );
 
 	describe( 'doBlocksMatchTemplate', () => {
@@ -200,6 +207,18 @@ describe( 'templates', () => {
 			expect(
 				synchronizeBlocksWithTemplate( blockList, template )
 			).toEqual( [ block1 ] );
+		} );
+
+		it( 'should replace unregistered blocks from template with core/missing block', () => {
+			const template = [
+				[ 'core/test-block' ],
+				[ 'core/test-block-2' ],
+				[ 'core/test-faker' ],
+			];
+
+			expect(
+				synchronizeBlocksWithTemplate( [], template )[ 2 ].name
+			).toEqual( 'core/missing' );
 		} );
 	} );
 } );

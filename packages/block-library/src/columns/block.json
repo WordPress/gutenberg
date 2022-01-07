@@ -24,10 +24,20 @@
 			"link": true
 		},
 		"spacing": {
+			"blockGap": true,
 			"margin": [ "top", "bottom" ],
 			"padding": true,
 			"__experimentalDefaultControls": {
 				"padding": true
+			}
+		},
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"allowEditing": false,
+			"default": {
+				"type": "flex",
+				"flexWrap": "nowrap"
 			}
 		}
 	},

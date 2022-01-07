@@ -221,6 +221,7 @@
 				]
 			},
 			{ "docs/reference-guides/richtext.md": [] },
+			{ "docs/reference-guides/theme-json-reference.md": [] },
 			{ "packages/components/README.md": "{{components}}" },
 			{ "docs/reference-guides/packages.md": "{{packages}}" },
 			{

@@ -120,7 +120,7 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Applying Styles From a Stylesheet",
+		"title": "Use styles and stylesheets",
 		"slug": "applying-styles-with-stylesheets",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md",
 		"parent": "block-tutorial"
@@ -555,6 +555,12 @@
 		"title": "RichText Reference",
 		"slug": "richtext",
 		"markdown_source": "../docs/reference-guides/richtext.md",
+		"parent": "reference-guides"
+	},
+	{
+		"title": "Theme.json Reference",
+		"slug": "theme-json-reference",
+		"markdown_source": "../docs/reference-guides/theme-json-reference.md",
 		"parent": "reference-guides"
 	},
 	{

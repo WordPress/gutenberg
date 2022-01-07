@@ -148,6 +148,7 @@ export default function InlineColorUI( { name, value, onChange, onClose } ) {
 			contentStyle={ { paddingLeft: 0, paddingRight: 0 } }
 			hasNavigation
 			leftButton={ null }
+			testID="inline-text-color-modal"
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen name="text-color">

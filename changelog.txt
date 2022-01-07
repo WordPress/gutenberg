@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 12.3.0-rc.1 =
+= 12.3.0 =
 
 ### Features
 
@@ -205,6 +205,8 @@
 - Add npm-run-all package to simplify running scripts. ([37558](https://github.com/WordPress/gutenberg/pull/37558))
 - Update caniuse to latest. ([37588](https://github.com/WordPress/gutenberg/pull/37588))
 - Fix pre commit hook to build block documentation. ([37613](https://github.com/WordPress/gutenberg/pull/37613))
+
+
 
 
 = 12.2.0 =
