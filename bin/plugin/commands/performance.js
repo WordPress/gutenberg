@@ -216,7 +216,9 @@ async function runPerformanceTests( branches, options ) {
 	log( '\n>> Preparing the tests directories' );
 	log( '    >> Cloning the repository' );
 	const baseDirectory = await git.clone( config.gitRepositoryURL );
-	const performanceTestDirectory = getRandomTemporaryPath();
+	const rootDirectory = getRandomTemporaryPath();
+	const performanceTestDirectory = rootDirectory + '/tests';
+	await runShellScript( 'mkdir -p ' + rootDirectory );
 	await runShellScript(
 		'cp -R ' + baseDirectory + ' ' + performanceTestDirectory
 	);
@@ -237,7 +239,7 @@ async function runPerformanceTests( branches, options ) {
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
-	await runShellScript( 'mkdir perf-envs', performanceTestDirectory );
+	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
 
 	// 2- Preparing the environment directories per branch.
 	log( '\n>> Preparing an environment directory per branch' );
@@ -245,7 +247,7 @@ async function runPerformanceTests( branches, options ) {
 	for ( const branch of branches ) {
 		log( '    >> Branch: ' + branch );
 		const environmentDirectory =
-			performanceTestDirectory + '/perf-envs/' + kebabCase( branch );
+			rootDirectory + '/envs/' + kebabCase( branch );
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
 		await runShellScript( 'mkdir ' + environmentDirectory );
@@ -330,7 +332,7 @@ async function runPerformanceTests( branches, options ) {
 				log( '    >> Branch: ' + branch + ', Suite: ' + testSuite );
 				log( '        >> Starting the environment.' );
 				await runShellScript(
-					'../../node_modules/.bin/wp-env start',
+					'../../tests/node_modules/.bin/wp-env start',
 					environmentDirectory
 				);
 				log( '        >> Running the test.' );
@@ -340,7 +342,7 @@ async function runPerformanceTests( branches, options ) {
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
-					'../../node_modules/.bin/wp-env stop',
+					'../../tests/node_modules/.bin/wp-env stop',
 					environmentDirectory
 				);
 			}

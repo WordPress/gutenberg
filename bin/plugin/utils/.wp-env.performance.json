@@ -1,12 +1,12 @@
 {
 	"core": "WordPress/WordPress",
 	"plugins": [ "./plugin" ],
-	"themes": [ "../../test/emptytheme" ],
+	"themes": [ "../../tests/test/emptytheme" ],
 	"env": {
 		"tests": {
 			"mappings": {
-				"wp-content/mu-plugins": "../../packages/e2e-tests/mu-plugins",
-				"wp-content/plugins/gutenberg-test-plugins": "../../packages/e2e-tests/plugins"
+				"wp-content/mu-plugins": "../../tests/packages/e2e-tests/mu-plugins",
+				"wp-content/plugins/gutenberg-test-plugins": "../../tests/packages/e2e-tests/plugins"
 			}
 		}
 	}
