@@ -361,7 +361,8 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"description": "As of WordPress 5.9, this block does not support any block-level settings.",
+					"additionalProperties": false
 				},
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
