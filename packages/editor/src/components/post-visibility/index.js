@@ -16,17 +16,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { visibilityOptions } from './utils';
 import { store as editorStore } from '../../store';
 
-function PublishPrivateConfirm( props ) {
-	return props.showPrivateConfirmDialog ? (
-		<ConfirmDialog
-			onConfirm={ props.confirmPrivateHandler }
-			onCancel={ props.cancelPrivateHandler }
-		>
-			{ __( 'Would you like to privately publish this post now?' ) }
-		</ConfirmDialog>
-	) : null;
-}
-
 export class PostVisibility extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -38,6 +27,7 @@ export class PostVisibility extends Component {
 
 		this.state = {
 			hasPassword: !! props.password,
+			showPrivateConfirmDialog: false,
 		};
 	}
 
@@ -52,16 +42,15 @@ export class PostVisibility extends Component {
 		this.setState( { showPrivateConfirmDialog: true } );
 	}
 
-	confirmPrivateHandler = () => {
+	confirmPrivate = () => {
 		const { onUpdateVisibility, onSave } = this.props;
 
 		onUpdateVisibility( 'private' );
-		this.setState( { hasPassword: false } );
+		this.setState( {
+			hasPassword: false,
+			showPrivateConfirmDialog: false,
+		} );
 		onSave();
-	};
-
-	cancelPrivateHandler = () => {
-		this.setState( { showPrivateConfirmDialog: false } );
 	};
 
 	setPasswordProtected() {
@@ -158,14 +147,16 @@ export class PostVisibility extends Component {
 					/>
 				</div>
 			),
-			<PublishPrivateConfirm
+			<ConfirmDialog
 				key={ 'private-publish-confirmation' }
-				showPrivateConfirmDialog={ this.state.showPrivateConfirmDialog }
-				confirmPrivateHandler={ this.confirmPrivateHandler }
-				cancelPrivateHandler={ this.cancelPrivateHandler }
+				isOpen={ this.state.showPrivateConfirmDialog }
+				onConfirm={ this.confirmPrivate }
+				onCancel={ () => {
+					this.setState( { showPrivateConfirmDialog: false } );
+				} }
 			>
 				{ __( 'Would you like to privately publish this post now?' ) }
-			</PublishPrivateConfirm>,
+			</ConfirmDialog>,
 		];
 	}
 }
