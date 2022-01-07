@@ -23,23 +23,6 @@ import { useState } from '@wordpress/element';
  */
 import { store as editPostStore } from '../../../store';
 
-function DeleteTemplateConfirm( props ) {
-	return props.showConfirmDialog ? (
-		<ConfirmDialog
-			onConfirm={ props.onConfirm }
-			onCancel={ props.confirmStateResetHandler }
-		>
-			{ sprintf(
-				/* translators: %s: template name */
-				__(
-					'Are you sure you want to delete the %s template? It may be used by other pages or posts.'
-				),
-				props.templateTitle
-			) }
-		</ConfirmDialog>
-	) : null;
-}
-
 export default function DeleteTemplate() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
@@ -64,10 +47,6 @@ export default function DeleteTemplate() {
 	if ( template?.title ) {
 		templateTitle = template.title;
 	}
-
-	const confirmStateResetHandler = () => {
-		setShowConfirmDialog( false );
-	};
 
 	const onDelete = () => {
 		clearSelectedBlock();
@@ -104,12 +83,21 @@ export default function DeleteTemplate() {
 				>
 					{ __( 'Delete template' ) }
 				</MenuItem>
-				<DeleteTemplateConfirm
-					showConfirmDialog={ showConfirmDialog }
-					confirmStateResetHandler={ confirmStateResetHandler }
-					templateTitle={ templateTitle }
+				<ConfirmDialog
+					isOpen={ showConfirmDialog }
 					onConfirm={ onDelete }
-				/>
+					onCancel={ () => {
+						setShowConfirmDialog( false );
+					} }
+				>
+					{ sprintf(
+						/* translators: %s: template name */
+						__(
+							'Are you sure you want to delete the %s template? It may be used by other pages or posts.'
+						),
+						templateTitle
+					) }
+				</ConfirmDialog>
 			</>
 		</MenuGroup>
 	);
