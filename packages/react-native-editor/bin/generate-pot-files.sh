@@ -116,7 +116,7 @@ function make_pot () {
   if [[ -z ${DEBUG:-} ]]; then
     # When DEBUG flag is not enabled, we ignore extra debug information except important warnings.
     local ignore_pattern="Parsing file\|Debug (commands)\|Debug (bootstrap)\|Debug (hooks)"
-    $full_command 2> >(grep -v "$ignore_pattern" | sed 's/Debug[[:space:]][(]make-pot[)]/Warning/g' >&2)
+    $full_command 2> >(grep -v "$ignore_pattern" >&2)
   else
     $full_command
   fi
