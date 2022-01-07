@@ -79,12 +79,12 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `HigherOrderComponent< TInnerProps, TOuterProps >`: Function mapping component to enhanced component.
+-   _mapComponent_ `HigherOrderComponent< HOCProps >`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `HigherOrderComponent< TInnerProps, TOuterProps >`: Component class with generated display name assigned.
+-   ``: Component class with generated display name assigned.
 
 ### ifCondition
 
@@ -109,16 +109,12 @@ _Parameters_
 
 _Returns_
 
--   `HigherOrderComponent< TProps, TProps >`: Higher-order component.
+-   `( ( Wrapped: ComponentType< TProps > ) => ComponentType< TProps > )`: Higher-order component.
 
 ### pure
 
 Given a component returns the enhanced component augmented with a component
 only rerendering when its props/state change
-
-_Type_
-
--   `SimpleHigherOrderComponent`
 
 ### useAsyncList
 
@@ -528,18 +524,10 @@ _Returns_
 A Higher Order Component used to be provide a unique instance ID by
 component.
 
-_Type_
-
--   `PropInjectingHigherOrderComponent< { instanceId: string | number; } >`
-
 ### withSafeTimeout
 
 A higher-order component used to provide and manage delayed function calls
 that ought to be bound to a component's lifecycle.
-
-_Type_
-
--   `PropInjectingHigherOrderComponent< TimeoutProps >`
 
 ### withState
 

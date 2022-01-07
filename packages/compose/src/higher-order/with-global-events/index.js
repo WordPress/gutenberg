@@ -46,6 +46,7 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 		alternative: 'useEffect',
 	} );
 
+	// @ts-ignore-next-line
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		class Wrapper extends Component {
 			constructor( /** @type {any} */ props ) {
