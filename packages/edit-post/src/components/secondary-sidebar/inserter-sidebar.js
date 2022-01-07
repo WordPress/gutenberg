@@ -10,7 +10,6 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -36,13 +35,6 @@ export default function InserterSidebar() {
 		focusOnMount: null,
 	} );
 
-	const inserterContentRef = useRef();
-	useEffect( () => {
-		inserterContentRef.current
-			.querySelector( '.block-editor-inserter__search input' )
-			.focus();
-	}, [] );
-
 	return (
 		<div
 			ref={ inserterDialogRef }
@@ -56,10 +48,7 @@ export default function InserterSidebar() {
 					onClick={ () => setIsInserterOpened( false ) }
 				/>
 			</TagName>
-			<div
-				className="edit-post-editor__inserter-panel-content"
-				ref={ inserterContentRef }
-			>
+			<div className="edit-post-editor__inserter-panel-content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel

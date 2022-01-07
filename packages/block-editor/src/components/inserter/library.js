@@ -7,6 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,6 +25,7 @@ function InserterLibrary( {
 	__experimentalFilterValue,
 	onSelect = noop,
 	shouldFocusBlock = false,
+	shouldFocusSearch = false,
 } ) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
@@ -36,6 +38,14 @@ function InserterLibrary( {
 		[ clientId, rootClientId ]
 	);
 
+	const inserterRef = useRef();
+	useEffect( () => {
+		if ( ! shouldFocusSearch ) {
+			return;
+		}
+		inserterRef.current.searchFocus();
+	}, [ shouldFocusSearch ] );
+
 	return (
 		<InserterMenu
 			onSelect={ onSelect }
@@ -47,6 +57,7 @@ function InserterLibrary( {
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
 			shouldFocusBlock={ shouldFocusBlock }
+			ref={ inserterRef }
 		/>
 	);
 }
