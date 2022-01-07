@@ -16,19 +16,18 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
-import ListViewBranch, { countBlocks } from './branch';
+import ListViewBranch from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
+import useListViewOpenSelectedItem from './use-list-view-open-selected-item';
 import { store as blockEditorStore } from '../../store';
-import { hasFocusWithin } from './utils';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -46,7 +45,7 @@ const expanded = ( state, action ) => {
 	return state;
 };
 
-const BLOCK_LIST_ITEM_HEIGHT = 36;
+export const BLOCK_LIST_ITEM_HEIGHT = 36;
 
 /**
  * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
@@ -78,7 +77,6 @@ function ListView(
 		clientIdsTree,
 		draggedClientIds,
 		selectedClientIds,
-		selectedBlockParentClientIds,
 	} = useListViewClientIds( blocks );
 
 	const { visibleBlockCount } = useSelect(
@@ -100,12 +98,23 @@ function ListView(
 	const { updateBlockSelection } = useBlockSelection();
 
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
+
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
 	const elementRef = useRef();
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
-	const isMounted = useRef( false );
-	const hasFocus = hasFocusWithin( elementRef?.current );
 
+	const isMounted = useRef( false );
+	const { setSelectedTreeId } = useListViewOpenSelectedItem( {
+		firstSelectedBlockClientId: selectedClientIds[ 0 ],
+		setExpandedState,
+	} );
+	const selectEditorBlock = useCallback(
+		( clientId ) => {
+			updateBlockSelection( clientId );
+			setSelectedTreeId( clientId );
+		},
+		[ setSelectedTreeId, updateBlockSelection ]
+	);
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
@@ -189,65 +198,6 @@ function ListView(
 		]
 	);
 
-	// If a selection is made outside the block list,
-	// for example, in the Block Editor,
-	// try to expand the block list tree.
-	useEffect( () => {
-		if (
-			! hasFocus &&
-			Array.isArray( selectedBlockParentClientIds ) &&
-			selectedBlockParentClientIds.length
-		) {
-			setExpandedState( {
-				type: 'expand',
-				clientIds: selectedBlockParentClientIds,
-			} );
-		}
-	}, [ hasFocus, selectedBlockParentClientIds ] );
-
-	useEffect( () => {
-		if (
-			! hasFocus &&
-			Array.isArray( selectedClientIds ) &&
-			selectedClientIds.length
-		) {
-			const scrollContainer = getScrollContainer( elementRef.current );
-
-			// Grab the selected id. This is the point at which we can
-			// stop counting blocks in the tree.
-			let selectedId = selectedClientIds[ 0 ];
-
-			// If the selected block has parents, get the top-level parent.
-			if (
-				Array.isArray( selectedBlockParentClientIds ) &&
-				selectedBlockParentClientIds.length
-			) {
-				selectedId = selectedBlockParentClientIds[ 0 ];
-			}
-
-			// Count expanded blocks in the tree.
-			let heightFactor = 0;
-			clientIdsTree.every( ( item ) => {
-				if ( item?.clientId === selectedId ) {
-					return false;
-				}
-				heightFactor += countBlocks( item, expandedState, [] );
-				return true;
-			} );
-
-			scrollContainer?.scrollTo( {
-				top: heightFactor * BLOCK_LIST_ITEM_HEIGHT,
-			} );
-		}
-	}, [
-		hasFocus,
-		expandedState,
-		elementRef,
-		clientIdsTree,
-		selectedBlockParentClientIds,
-		selectedClientIds,
-	] );
-
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
@@ -265,7 +215,7 @@ function ListView(
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
 						blocks={ clientIdsTree }
-						selectBlock={ updateBlockSelection }
+						selectBlock={ selectEditorBlock }
 						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
