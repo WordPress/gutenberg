@@ -22,12 +22,12 @@ Setting that enables the following UI tools:
 
 Settings related to borders.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| color | boolean | false |  |
-| radius | boolean | false |  |
-| style | boolean | false |  |
-| width | boolean | false |  |
+| Property  | Type   | Default | Props  | Since |
+| ---       | ---    | ---    |---   | --- |
+| color | boolean | true |  | v2 |
+| radius | boolean | false |  | v1 |
+| style | boolean | false |  | v2 |
+| width | boolean | false |  | v2 |
 
 ---
 
@@ -35,19 +35,19 @@ Settings related to borders.
 
 Settings related to colors.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| background | boolean | true |  |
-| custom | boolean | true |  |
-| customDuotone | boolean | true |  |
-| customGradient | boolean | true |  |
-| defaultGradients | boolean | true |  |
-| defaultPalette | boolean | true |  |
-| duotone | array |  | colors, name, slug |
-| gradients | array |  | gradient, name, slug |
-| link | boolean | false |  |
-| palette | array |  | color, name, slug |
-| text | boolean | true |  |
+| Property  | Type   | Default | Props  | Since |
+| ---       | ---    | ---    |---   | --- |
+| background | boolean | true |  | v1 |
+| custom | boolean | true |  | v1 |
+| customDuotone | boolean | true |  | v1 |
+| customGradient | boolean | true |  | v1 |
+| defaultGradients | boolean | true |  | v1 |
+| defaultPalette | boolean | true |  | v1 |
+| duotone | array |  | colors, name, slug | v1 |
+| gradients | array |  | gradient, name, slug | v1 |
+| link | boolean | false |  | v1 |
+| palette | array |  | color, name, slug | v1 |
+| text | boolean | true |  | v1 |
 
 ---
 
@@ -55,10 +55,10 @@ Settings related to colors.
 
 Settings related to layout.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| contentSize | string |  |  |
-| wideSize | string |  |  |
+| Property  | Type   | Default | Props  | Since |
+| ---       | ---    | ---    |---   | --- |
+| contentSize | string |  |  | v1 |
+| wideSize | string |  |  | v1 |
 
 ---
 
@@ -66,12 +66,12 @@ Settings related to layout.
 
 Settings related to spacing.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| blockGap | undefined | null |  |
-| margin | boolean | false |  |
-| padding | boolean | false |  |
-| units | array | px,em,rem,vh,vw,% |  |
+| Property  | Type   | Default | Props  | Since |
+| ---       | ---    | ---    |---   | --- |
+| blockGap | undefined | null |  | v2 |
+| margin | boolean | false |  | v2 (was customMargin in v1) |
+| padding | boolean | false |  | v2 (was customPadding in v1) |
+| units | array | px,em,rem,vh,vw,% |  | v1 |
 
 ---
 
@@ -79,18 +79,18 @@ Settings related to spacing.
 
 Settings related to typography.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| customFontSize | boolean | true |  |
-| fontStyle | boolean | true |  |
-| fontWeight | boolean | true |  |
-| letterSpacing | boolean | true |  |
-| lineHeight | boolean | false |  |
-| textDecoration | boolean | true |  |
-| textTransform | boolean | true |  |
-| dropCap | boolean | true |  |
-| fontSizes | array |  | name, size, slug |
-| fontFamilies | array |  | fontFamily, name, slug |
+| Property  | Type   | Default | Props  | Since |
+| ---       | ---    | ---    |---   | --- |
+| customFontSize | boolean | true |  | v1 |
+| fontStyle | boolean | true |  | v2 |
+| fontWeight | boolean | true |  | v2 |
+| letterSpacing | boolean | true |  | v2 |
+| lineHeight | boolean | false |  | v1 |
+| textDecoration | boolean | true |  | v2 |
+| textTransform | boolean | true |  | v2 |
+| dropCap | boolean | true |  | v1 |
+| fontSizes | array |  | name, size, slug | v1 |
+| fontFamilies | array |  | fontFamily, name, slug | v2 |
 
 ---
 
