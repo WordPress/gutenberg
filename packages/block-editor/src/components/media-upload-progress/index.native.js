@@ -144,6 +144,7 @@ export class MediaUploadProgress extends Component {
 						<Spinner
 							progress={ progress }
 							style={ this.props.spinnerStyle }
+							testID="spinner"
 						/>
 					) }
 				</View>
