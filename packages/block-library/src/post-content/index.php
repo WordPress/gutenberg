@@ -47,9 +47,8 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	// We force this behavior by omitting the third argument (post ID) from the `get_the_content`.
 	$content = get_the_content( null, false );
 	// Check for nextpage to display page links for paginated posts.
-	$nextpage = has_block( 'nextpage' ) ? wp_link_pages( array( 'echo' => 0 ) ) : false;
-	if ( false !== $nextpage ) {
-		$content = get_the_content() . $nextpage;
+	if ( has_block( 'core/nextpage' ) ) {
+		$content .= wp_link_pages( array( 'echo' => 0 ) );
 	}
 	/** This filter is documented in wp-includes/post-template.php */
 	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
