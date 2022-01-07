@@ -141,4 +141,91 @@ describe( 'FontSizePicker', () => {
 			expect( fontSize ).toBe( '16px' );
 		} );
 	} );
+	describe( 'renders different control', () => {
+		const options = [
+			{
+				name: 'Small',
+				slug: 'small',
+				size: '0.65rem',
+			},
+			{
+				name: 'Medium',
+				slug: 'medium',
+				size: '1.125rem',
+			},
+			{
+				name: 'Large',
+				slug: 'large',
+				size: '1.7rem',
+			},
+		];
+		it( 'should render select control when we have more than five font sizes', () => {
+			const extraOptions = [
+				{
+					name: 'Extra Large',
+					slug: 'extra-large',
+					size: '1.95rem',
+				},
+				{
+					name: 'Extra Extra Large',
+					slug: 'extra-extra-large',
+					size: '2.5rem',
+				},
+				{
+					name: 'Huge',
+					slug: 'huge',
+					size: '2.8rem',
+				},
+			];
+			const fontSizes = [ ...options, ...extraOptions ];
+			render(
+				<FontSizePicker
+					fontSizes={ fontSizes }
+					value={ fontSizes[ 0 ].size }
+				/>
+			);
+			// Trigger click to open the select menu and take into account
+			// the two extra options (default, custom);
+			fireEvent.click(
+				screen.getByLabelText( 'Font size', { selector: 'button' } )
+			);
+			const element = screen.getAllByRole( 'option' );
+			expect( element ).toHaveLength( fontSizes.length + 2 );
+		} );
+		describe( 'segmented control', () => {
+			it( 'should use numeric labels for simple css values', () => {
+				const fontSizes = [ ...options ];
+				render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value={ fontSizes[ 0 ].size }
+					/>
+				);
+				const element = screen.getByLabelText( 'Large' );
+				expect( element ).toBeInTheDocument();
+				expect( element.children ).toHaveLength( 2 );
+				expect( element.children[ 0 ].textContent ).toBe( '1.7' );
+			} );
+			it( 'should use incremental sequence of numbers as labels if we have complex css', () => {
+				const fontSizes = [
+					...options,
+					{
+						name: 'Extra Large',
+						slug: 'extra-large',
+						size: 'clamp(1.75rem, 3vw, 2.25rem)',
+					},
+				];
+				render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value={ fontSizes[ 0 ].size }
+					/>
+				);
+				const element = screen.getByLabelText( 'Large' );
+				expect( element ).toBeInTheDocument();
+				expect( element.children ).toHaveLength( 2 );
+				expect( element.children[ 0 ].textContent ).toBe( '3' );
+			} );
+		} );
+	} );
 } );

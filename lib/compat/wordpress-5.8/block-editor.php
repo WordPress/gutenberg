@@ -208,7 +208,7 @@ function gutenberg_get_default_block_editor_settings() {
 	}
 
 	$editor_settings = array(
-		'__unstableEnableFullSiteEditingBlocks' => gutenberg_supports_block_templates(),
+		'__unstableEnableFullSiteEditingBlocks' => current_theme_supports( 'block-templates' ),
 		'alignWide'                             => get_theme_support( 'align-wide' ),
 		'allowedBlockTypes'                     => true,
 		'allowedMimeTypes'                      => get_allowed_mime_types(),
@@ -322,7 +322,8 @@ function gutenberg_block_editor_rest_api_preload( array $preload_paths, $block_e
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param string[] $preload_paths Array of paths to preload.
+	 * @param string[]                $preload_paths        Array of paths to preload.
+	 * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
 	 */
 	$preload_paths = apply_filters( 'block_editor_rest_api_preload_paths', $preload_paths, $block_editor_context );
 	if ( ! empty( $block_editor_context->post ) ) {

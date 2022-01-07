@@ -44,11 +44,6 @@ const predefinedBlockTemplates = {
 			supports: {
 				html: false,
 			},
-			npmDependencies: [
-				'@wordpress/block-editor',
-				'@wordpress/blocks',
-				'@wordpress/i18n',
-			],
 		},
 		templatesPath: join( __dirname, 'templates', 'esnext' ),
 	},
@@ -185,7 +180,7 @@ const getBlockTemplate = async ( templateName ) => {
 
 const getDefaultValues = ( blockTemplate ) => {
 	return {
-		$schema: 'https://json.schemastore.org/block.json',
+		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 2,
 		namespace: 'create-block',
 		category: 'widgets',

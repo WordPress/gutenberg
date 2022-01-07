@@ -5,15 +5,7 @@ import { SVG, Path } from '@wordpress/primitives';
 
 const tag = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path
-			stroke="#1E1E1E"
-			strokeWidth="1.5"
-			d="M9 19.25h6M4 19.25h4M12 15.25h8M4 15.25h7"
-		/>
-		<Path
-			d="M8.994 10.103H6.08L5.417 12H4l2.846-8h1.383l2.845 8H9.657l-.663-1.897zm-.457-1.28l-.994-2.857-1.006 2.857h2z"
-			fill="#1E1E1E"
-		/>
+		<Path d="M6.08 10.103h2.914L9.657 12h1.417L8.23 4H6.846L4 12h1.417l.663-1.897Zm1.463-4.137.994 2.857h-2l1.006-2.857ZM11 16H4v-1.5h7V16Zm1 0h8v-1.5h-8V16Zm-4 4H4v-1.5h4V20Zm7-1.5V20H9v-1.5h6Z" />
 	</SVG>
 );
 

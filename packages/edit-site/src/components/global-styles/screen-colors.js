@@ -96,7 +96,7 @@ function ScreenColors( { name } ) {
 				back={ parentMenu ? parentMenu : '/' }
 				title={ __( 'Colors' ) }
 				description={ __(
-					'Manage palettes and the default color of different global elements on the website.'
+					'Manage palettes and the default color of different global elements on the site.'
 				) }
 			/>
 

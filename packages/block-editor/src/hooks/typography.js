@@ -218,7 +218,7 @@ export function TypographyPanel( props ) {
 				<ToolsPanelItem
 					className="single-column"
 					hasValue={ () => hasLetterSpacingValue( props ) }
-					label={ __( 'Letter-spacing' ) }
+					label={ __( 'Letter spacing' ) }
 					onDeselect={ () => resetLetterSpacing( props ) }
 					isShownByDefault={ defaultControls?.letterSpacing }
 					resetAllFilter={ createResetAllFilter( 'letterSpacing' ) }
@@ -231,7 +231,7 @@ export function TypographyPanel( props ) {
 	);
 }
 
-const hasTypographySupport = ( blockName ) => {
+export const hasTypographySupport = ( blockName ) => {
 	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
 		hasBlockSupport( blockName, key )
 	);

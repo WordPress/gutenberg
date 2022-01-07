@@ -555,8 +555,7 @@ export const insertBlocks = (
 		meta = initialPosition;
 		initialPosition = 0;
 		deprecated( "meta argument in wp.data.dispatch('core/block-editor')", {
-			since: '10.1',
-			plugin: 'Gutenberg',
+			since: '5.8',
 			hint: 'The meta argument is now the 6th argument of the function',
 		} );
 	}
@@ -1170,8 +1169,7 @@ export const duplicateBlocks = ( clientIds, updateSelection = true ) => ( {
 
 	const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 	const lastSelectedIndex = select.getBlockIndex(
-		last( castArray( clientIds ) ),
-		rootClientId
+		last( castArray( clientIds ) )
 	);
 	const clonedBlocks = blocks.map( ( block ) =>
 		__experimentalCloneSanitizedBlock( block )
@@ -1206,7 +1204,7 @@ export const insertBeforeBlock = ( clientId ) => ( { select, dispatch } ) => {
 		return;
 	}
 
-	const firstSelectedIndex = select.getBlockIndex( clientId, rootClientId );
+	const firstSelectedIndex = select.getBlockIndex( clientId );
 	return dispatch.insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
 };
 
@@ -1225,7 +1223,7 @@ export const insertAfterBlock = ( clientId ) => ( { select, dispatch } ) => {
 		return;
 	}
 
-	const firstSelectedIndex = select.getBlockIndex( clientId, rootClientId );
+	const firstSelectedIndex = select.getBlockIndex( clientId );
 	return dispatch.insertDefaultBlock(
 		{},
 		rootClientId,

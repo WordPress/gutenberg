@@ -38,7 +38,7 @@ add_action( 'init', 'gutenberg_examples_01_register_block' );
 
 Note the above example, shows using the [wp-scripts build step](/docs/how-to-guides/javascript/js-build-setup/) that automatically sets dependencies and versions the file.
 
-If you were using the ES5 code, you would specify `array( 'wp-blocks', 'wp-element' )` as the dependency array. See the [example 01](https://github.com/WordPress/gutenberg-examples/blob/HEAD/01-basic/index.php) in Gutenberg Examples repository for full syntax.
+If you were using the plain code, you would specify `array( 'wp-blocks', 'wp-element' )` as the dependency array. See the [example 01](https://github.com/WordPress/gutenberg-examples/blob/HEAD/01-basic/index.php) in Gutenberg Examples repository for full syntax.
 
 -   **`wp-blocks`** includes block type registration and related functions
 -   **`wp-element`** includes the [WordPress Element abstraction](/packages/element/README.md) for describing the structure of your blocks
@@ -48,7 +48,7 @@ If you were using the ES5 code, you would specify `array( 'wp-blocks', 'wp-eleme
 With the script enqueued, let's look at the implementation of the block itself:
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -85,7 +85,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, blockEditor ) {

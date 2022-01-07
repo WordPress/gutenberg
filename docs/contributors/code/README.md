@@ -23,5 +23,5 @@ Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find 
 -   [Accessibility Testing](/docs/contributors/accessibility-testing.md) documents the process of testing accessibility in Gutenberg.
 -   [Managing Packages](/docs/contributors/code/managing-packages.md) documents the process for managing the npm packages.
 -   [Gutenberg Release Process](/docs/contributors/code/release.md) - a checklist for the different types of releases for the Gutenberg project.
--   [React Native mobile Gutenberg](/docs/contributors/code/native-mobile.md) - a guide on the React Native based mobile Gutenberg editor.
--   [React Native Integration Test Guide](/docs/contributors/code/native-mobile-integration-test-guide.md) - a guide on creating integration tests for the Gutenberg Mobile editor.
+-   [React Native mobile editor](/docs/contributors/code/react-native/README.md) - a guide on contributing to the React Native mobile editor.
+-   [React Native Integration Test Guide](/docs/contributors/code/react-native/integration-test-guide.md) - a guide on creating integration tests for the mobile editor.

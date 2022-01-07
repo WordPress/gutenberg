@@ -15,6 +15,7 @@ import android.widget.FrameLayout.LayoutParams;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
 import com.brentvatne.react.ReactVideoPackage;
@@ -38,6 +39,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.horcrux.svg.SvgPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
@@ -49,6 +51,7 @@ import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import org.wordpress.android.util.AppLog;
+import org.wordpress.android.util.AppLog.T;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.BuildConfig;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
@@ -570,6 +573,7 @@ public class WPAndroidGlueCode {
                 new ReanimatedPackage(),
                 new RNPromptPackage(),
                 new RNCWebViewPackage(),
+                new ClipboardPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
@@ -667,7 +671,7 @@ public class WPAndroidGlueCode {
         viewGroup.addView(mReactRootView, 0,
                 new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        if (mReactContext != null) {
+        if (hasReactContext()) {
             setPreferredColorScheme(isDarkMode);
         }
 
@@ -844,7 +848,7 @@ public class WPAndroidGlueCode {
         if (title != null) {
             mTitle = title;
         }
-        if (mReactContext != null) {
+        if (hasReactContext()) {
             if (content != null) {
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setHtmlInJS(content);
             }
@@ -854,72 +858,96 @@ public class WPAndroidGlueCode {
         }
     }
 
-    public interface OnGetContentTimeout {
-        void onGetContentTimeout(InterruptedException ie);
+    public interface OnGetContentInterrupted {
+        void onGetContentInterrupted(InterruptedException ie);
     }
 
-    public CharSequence getContent(CharSequence originalContent, OnGetContentTimeout onGetContentTimeout) {
-        if (mReactContext != null) {
+    public synchronized CharSequence getContent(CharSequence originalContent,
+                                                OnGetContentInterrupted onGetContentInterrupted) {
+        if (hasReactContext()) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
 
             try {
-                mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                if (!success) {
+                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
+                }
             } catch (InterruptedException ie) {
-                onGetContentTimeout.onGetContentTimeout(ie);
+                onGetContentInterrupted.onGetContentInterrupted(ie);
             }
 
             return mContentChanged ? (mContentHtml == null ? "" : mContentHtml) : originalContent;
         } else {
-            // TODO: Add app logging here
+            AppLog.e(T.EDITOR, "getContent was called when there was no React context.");
         }
 
         return originalContent;
     }
 
-    public CharSequence getTitle(OnGetContentTimeout onGetContentTimeout) {
-        if (mReactContext != null) {
+    /** This method retrieves both the title and the content from the Gutenberg editor by the emission of a single
+     * event. This is useful to avoid redundant events, since {@link #getContent} already retrieves the title as well,
+     * using same event, and also shares the same mechanism to suspend execution until a response is received (or a
+     * timeout is reached).
+     * @param originalContent fallback content to return in case the timeout is reached, or the thread is interrupted
+     * @param onGetContentInterrupted callback to invoke if thread is interrupted before the timeout
+     * @return A Pair of CharSequence with the first being the title and the second being the content
+     */
+    public synchronized Pair<CharSequence, CharSequence> getTitleAndContent(CharSequence originalContent,
+                                                               OnGetContentInterrupted onGetContentInterrupted) {
+        if (hasReactContext()) {
             mGetContentCountDownLatch = new CountDownLatch(1);
 
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
 
             try {
-                mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                boolean success = mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+                if (!success) {
+                    AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
+                }
             } catch (InterruptedException ie) {
-                onGetContentTimeout.onGetContentTimeout(ie);
+                onGetContentInterrupted.onGetContentInterrupted(ie);
             }
 
-            return mTitle == null ? "" : mTitle;
+            return new Pair<>(
+                    mTitle == null ? "" : mTitle,
+                    mContentChanged ? (mContentHtml == null ? "" : mContentHtml) : originalContent
+            );
         } else {
-            // TODO: Add app logging here
+            AppLog.e(T.EDITOR, "getTitleAndContent was called when there was no React context.");
         }
 
-        return "";
+        return new Pair<>("", originalContent);
     }
 
     public boolean triggerGetContentInfo(OnContentInfoReceivedListener onContentInfoReceivedListener) {
-        if (mReactContext != null && (mGetContentCountDownLatch == null || mGetContentCountDownLatch.getCount() == 0)) {
+        if (hasReactContext() && (mGetContentCountDownLatch == null || mGetContentCountDownLatch.getCount() == 0)) {
             if (!mIsEditorMounted) {
                 onContentInfoReceivedListener.onEditorNotReady();
                 return false;
             }
-
-            mGetContentCountDownLatch = new CountDownLatch(1);
-
-            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
-
             new Thread(new Runnable() {
                 @Override public void run() {
-                    try {
-                        mGetContentCountDownLatch.await(5, TimeUnit.SECONDS);
-                        if (mContentInfo == null) {
+                    // We need to synchronize access to (and overwriting of) the latch to avoid race conditions
+                    synchronized (WPAndroidGlueCode.this) {
+                        mGetContentCountDownLatch = new CountDownLatch(1);
+
+                        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
+
+                        try {
+                            boolean success = mGetContentCountDownLatch.await(5, TimeUnit.SECONDS);
+                            if (!success) {
+                                AppLog.e(T.EDITOR, "Timeout reached before response from requestGetHtml.");
+                            }
+                            if (mContentInfo == null) {
+                                onContentInfoReceivedListener.onContentInfoFailed();
+                            } else {
+                                onContentInfoReceivedListener.onContentInfoReceived(mContentInfo.toHashMap());
+                            }
+                        } catch (InterruptedException ie) {
                             onContentInfoReceivedListener.onContentInfoFailed();
-                        } else {
-                            onContentInfoReceivedListener.onContentInfoReceived(mContentInfo.toHashMap());
                         }
-                    } catch (InterruptedException ie) {
-                        onContentInfoReceivedListener.onContentInfoFailed();
                     }
                 }
             }).start();
