@@ -15,24 +15,6 @@ import { useState } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
-function SwitchToDraftConfirm( props ) {
-	let alertMessage;
-	if ( props.isPublished ) {
-		alertMessage = __( 'Are you sure you want to unpublish this post?' );
-	} else if ( props.isScheduled ) {
-		alertMessage = __( 'Are you sure you want to unschedule this post?' );
-	}
-
-	return props.showConfirmDialog ? (
-		<ConfirmDialog
-			onConfirm={ props.onClick }
-			onCancel={ props.confirmStateResetHandler }
-		>
-			{ alertMessage }
-		</ConfirmDialog>
-	) : null;
-}
-
 function PostSwitchToDraftButton( {
 	isSaving,
 	isPublished,
@@ -42,12 +24,15 @@ function PostSwitchToDraftButton( {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
-	const confirmStateResetHandler = () => {
-		setShowConfirmDialog( false );
-	};
-
 	if ( ! isPublished && ! isScheduled ) {
 		return null;
+	}
+
+	let alertMessage;
+	if ( isPublished ) {
+		alertMessage = __( 'Are you sure you want to unpublish this post?' );
+	} else if ( isScheduled ) {
+		alertMessage = __( 'Are you sure you want to unschedule this post?' );
 	}
 
 	return (
@@ -62,13 +47,13 @@ function PostSwitchToDraftButton( {
 			>
 				{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
 			</Button>
-			<SwitchToDraftConfirm
-				isPublished={ isPublished }
-				isScheduled={ isScheduled }
-				onClick={ onClick }
-				showConfirmDialog={ showConfirmDialog }
-				confirmStateResetHandler={ confirmStateResetHandler }
-			/>
+			<ConfirmDialog
+				isOpen={ showConfirmDialog }
+				onConfirm={ onClick }
+				onCancel={ () => setShowConfirmDialog( false ) }
+			>
+				{ alertMessage }
+			</ConfirmDialog>
 		</>
 	);
 }
