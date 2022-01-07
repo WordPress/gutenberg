@@ -16,11 +16,12 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
-import ListViewBranch from './branch';
+import ListViewBranch, { countBlocks } from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
 import useBlockSelection from './use-block-selection';
@@ -44,6 +45,8 @@ const expanded = ( state, action ) => {
 	}
 	return state;
 };
+
+const BLOCK_LIST_ITEM_HEIGHT = 36;
 
 /**
  * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
@@ -112,7 +115,7 @@ function ListView(
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	const [ fixedListWindow ] = useFixedWindowList(
 		elementRef,
-		36,
+		BLOCK_LIST_ITEM_HEIGHT,
 		visibleBlockCount,
 		{
 			useWindowing: __experimentalPersistentListViewFeatures,
@@ -201,6 +204,49 @@ function ListView(
 			} );
 		}
 	}, [ hasFocus, selectedBlockParentClientIds ] );
+
+	useEffect( () => {
+		if (
+			! hasFocus &&
+			Array.isArray( selectedClientIds ) &&
+			selectedClientIds.length
+		) {
+			const scrollContainer = getScrollContainer( elementRef.current );
+
+			// Grab the selected id. This is the point at which we can
+			// stop counting blocks in the tree.
+			let selectedId = selectedClientIds[ 0 ];
+
+			// If the selected block has parents, get the top-level parent.
+			if (
+				Array.isArray( selectedBlockParentClientIds ) &&
+				selectedBlockParentClientIds.length
+			) {
+				selectedId = selectedBlockParentClientIds[ 0 ];
+			}
+
+			// Count expanded blocks in the tree.
+			let heightFactor = 0;
+			clientIdsTree.every( ( item ) => {
+				if ( item?.clientId === selectedId ) {
+					return false;
+				}
+				heightFactor += countBlocks( item, expandedState, [] );
+				return true;
+			} );
+
+			scrollContainer?.scrollTo( {
+				top: heightFactor * BLOCK_LIST_ITEM_HEIGHT,
+			} );
+		}
+	}, [
+		hasFocus,
+		expandedState,
+		elementRef,
+		clientIdsTree,
+		selectedBlockParentClientIds,
+		selectedClientIds,
+	] );
 
 	return (
 		<AsyncModeProvider value={ true }>
