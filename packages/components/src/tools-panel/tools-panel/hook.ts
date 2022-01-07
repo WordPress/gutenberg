@@ -255,23 +255,21 @@ export function useToolsPanel(
 
 	// Assist ItemGroup styling when there are potentially hidden placeholder
 	// items by identifying first & last items that are toggled on for display.
-	const getFirstItem = () => {
+	const getFirstVisibleItemLabel = ( items: ToolsPanelItem[] ) => {
 		const optionalItems = menuItems.optional || {};
-		const firstItem = panelItems.find(
+		const firstItem = items.find(
 			( item ) => item.isShownByDefault || !! optionalItems[ item.label ]
 		);
 
 		return firstItem?.label;
 	};
 
-	const getLastItem = () => {
-		const reversedPanelItems = [ ...panelItems ].reverse();
-		const optionalItems = menuItems.optional || {};
-		const lastItem = reversedPanelItems.find(
-			( item ) => item.isShownByDefault || !! optionalItems[ item.label ]
-		);
+	const getFirstItem = () => {
+		return getFirstVisibleItemLabel( panelItems );
+	};
 
-		return lastItem?.label;
+	const getLastItem = () => {
+		return getFirstVisibleItemLabel( [ ...panelItems ].reverse() );
 	};
 
 	const firstDisplayedItem = getFirstItem();
