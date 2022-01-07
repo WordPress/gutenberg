@@ -9,24 +9,8 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-function DeleteMenuConfirm( props ) {
-	return props.showConfirmDialog ? (
-		<ConfirmDialog
-			onConfirm={ props.onDeleteMenu }
-			onCancel={ props.confirmStateResetHandler }
-		>
-			Are you sure you want to delete this navigation? This action cannot
-			be undone.
-		</ConfirmDialog>
-	) : null;
-}
-
 export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-
-	const confirmStateResetHandler = () => {
-		setShowConfirmDialog( false );
-	};
 
 	return (
 		<PanelBody>
@@ -42,11 +26,15 @@ export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 				>
 					{ __( 'Delete menu' ) }
 				</Button>
-				<DeleteMenuConfirm
-					onDeleteMenu={ onDeleteMenu }
-					showConfirmDialog={ showConfirmDialog }
-					confirmStateResetHandler={ confirmStateResetHandler }
-				/>
+				<ConfirmDialog
+					isOpen={ showConfirmDialog }
+					onConfirm={ onDeleteMenu }
+					onCancel={ () => setShowConfirmDialog( false ) }
+				>
+					{ __(
+						'Are you sure you want to delete this navigation? This action cannot be undone.'
+					) }
+				</ConfirmDialog>
 			</>
 		</PanelBody>
 	);
