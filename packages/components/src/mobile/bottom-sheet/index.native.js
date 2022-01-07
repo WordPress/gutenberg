@@ -554,7 +554,7 @@ class BottomSheet extends Component {
 					<View
 						style={ styles.header }
 						onLayout={ this.onHeaderLayout }
-						testID="bottom-sheet-header"
+   					testID={ `${ rest.testID || 'bottom-sheet' }-header` }
 					>
 						{ showDragIndicator() && (
 							<View style={ styles.dragIndicator } />
