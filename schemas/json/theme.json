@@ -28,7 +28,7 @@
 							"description": "Allow users to set custom border radius.",
 							"type": "boolean",
 							"default": false,
-							"since": "v1"
+							"since": "v2 (was customRadius in v1)"
 						},
 						"style": {
 							"description": "Allow users to set custom border styles.",
@@ -57,7 +57,7 @@
 							"description": "Allow users to set background colors.",
 							"type": "boolean",
 							"default": true,
-							"since": "v1"
+							"since": "v2"
 						},
 						"custom": {
 							"description": "Allow users to select custom colors.",
@@ -81,13 +81,13 @@
 							"description": "Allow users to choose colors from the default gradients.",
 							"type": "boolean",
 							"default": true,
-							"since": "v1"
+							"since": "v2"
 						},
 						"defaultPalette": {
 							"description": "Allow users to choose colors from the default palette.",
 							"type": "boolean",
 							"default": true,
-							"since": "v1"
+							"since": "v2"
 						},
 						"duotone": {
 							"description": "Duotone presets for the duotone picker.\nDoesn't generate classes or properties.",
@@ -175,7 +175,7 @@
 							"description": "Allow users to set text colors.",
 							"type": "boolean",
 							"default": true,
-							"since": "v1"
+							"since": "v2"
 						}
 					},
 					"additionalProperties": false
@@ -192,12 +192,12 @@
 						"contentSize": {
 							"description": "Sets the max-width of the content.",
 							"type": "string",
-							"since": "v1"
+							"since": "v2"
 						},
 						"wideSize": {
 							"description": "Sets the max-width of wide (`.alignwide`) content.",
 							"type": "string",
-							"since": "v1"
+							"since": "v2"
 						}
 					},
 					"additionalProperties": false
@@ -280,7 +280,7 @@
 							"description": "Allow users to set custom line height.",
 							"type": "boolean",
 							"default": false,
-							"since": "v1"
+							"since": "v2 (was customLineHeight in v1)"
 						},
 						"textDecoration": {
 							"description": "Allow users to set custom text decorations.",
@@ -699,7 +699,7 @@
 						"radius": {
 							"description": "Sets the `border-radius` CSS property.",
 							"type": "string",
-							"since": "v2"
+							"since": "v1"
 						},
 						"style": {
 							"description": "Sets the `border-style` CSS property.",

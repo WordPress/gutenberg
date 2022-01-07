@@ -25,7 +25,7 @@ Settings related to borders.
 | Property  | Type   | Default | Props  | Since |
 | ---       | ---    | ---    |---   | --- |
 | color | boolean | true |  | v2 |
-| radius | boolean | false |  | v1 |
+| radius | boolean | false |  | v2 (was customRadius in v1) |
 | style | boolean | false |  | v2 |
 | width | boolean | false |  | v2 |
 
@@ -37,17 +37,17 @@ Settings related to colors.
 
 | Property  | Type   | Default | Props  | Since |
 | ---       | ---    | ---    |---   | --- |
-| background | boolean | true |  | v1 |
+| background | boolean | true |  | v2 |
 | custom | boolean | true |  | v1 |
 | customDuotone | boolean | true |  | v1 |
 | customGradient | boolean | true |  | v1 |
-| defaultGradients | boolean | true |  | v1 |
-| defaultPalette | boolean | true |  | v1 |
+| defaultGradients | boolean | true |  | v2 |
+| defaultPalette | boolean | true |  | v2 |
 | duotone | array |  | colors, name, slug | v1 |
 | gradients | array |  | gradient, name, slug | v1 |
 | link | boolean | false |  | v1 |
 | palette | array |  | color, name, slug | v1 |
-| text | boolean | true |  | v1 |
+| text | boolean | true |  | v2 |
 
 ---
 
@@ -57,8 +57,8 @@ Settings related to layout.
 
 | Property  | Type   | Default | Props  | Since |
 | ---       | ---    | ---    |---   | --- |
-| contentSize | string |  |  | v1 |
-| wideSize | string |  |  | v1 |
+| contentSize | string |  |  | v2 |
+| wideSize | string |  |  | v2 |
 
 ---
 
@@ -85,7 +85,7 @@ Settings related to typography.
 | fontStyle | boolean | true |  | v2 |
 | fontWeight | boolean | true |  | v2 |
 | letterSpacing | boolean | true |  | v2 |
-| lineHeight | boolean | false |  | v1 |
+| lineHeight | boolean | false |  | v2 (was customLineHeight in v1) |
 | textDecoration | boolean | true |  | v2 |
 | textTransform | boolean | true |  | v2 |
 | dropCap | boolean | true |  | v1 |
@@ -110,7 +110,7 @@ Border styles.
 | Property  | Type   |  Props  | Since |
 | ---       | ---    |---   | --- |
 | color | string |  | v2 |
-| radius | string |  | v2 |
+| radius | string |  | v1 |
 | style | string |  | v2 |
 | width | string |  | v2 |
 
