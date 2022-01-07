@@ -16,6 +16,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix empty line apperaing when splitting heading blocks on Android 12 [#37279]
 -   [**] Fix missing translations by refactoring the editor initialization code [#37073]
 -   [**] Fix text formatting mode lost after backspace is used [#37676]
+-   [*] Fix app freeze when closing link picker while virtual keyboard is hidden [#37782]
 
 ## 1.68.0
 -   [**] Fix undo/redo functionality in links when applying text format [#36861]
