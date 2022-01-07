@@ -61,6 +61,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 			callback( {} );
 		} ),
 		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
+		sendMediaUpload: jest.fn(),
+		sendMediaSave: jest.fn(),
 		setBlockTypeImpressions: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),

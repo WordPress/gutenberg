@@ -281,7 +281,7 @@ export class BlockMediaUpdateProgress extends Component {
 			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">
 				{ showSpinner && (
 					<View style={ styles.progressBar }>
-						<Spinner progress={ progress } />
+						<Spinner progress={ progress } testID="spinner" />
 					</View>
 				) }
 				{ renderContent( {
