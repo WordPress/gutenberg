@@ -242,7 +242,6 @@ are saved to the database as custom post types. To export them as theme files, f
 -   Select the **Export** option to download a zip file containing the files. Unpack the files.
 -   Copy the updated `index.html` file from `theme/templates/` to your theme's `templates` folder.
 -   Copy template part one and two from `theme/parts/` to your theme's `parts` folder.
--   Open `index.html` and update the template part slugs in the block markup.
 
 Saved templates have precedence over theme files. To use the updated theme files, go to **Appearance > Templates** and
 **Appearance > Template parts** and delete the saved templates.
