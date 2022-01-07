@@ -986,7 +986,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'first and last panel items', () => {
 		it( 'should apply first/last classes to appropriate items', () => {
-			render(
+			const { container } = render(
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps }>
@@ -1028,11 +1028,7 @@ describe( 'ToolsPanel', () => {
 			expect( item3 ).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 4' ) ).not.toBeInTheDocument();
 
-			expect( item2.parentNode ).toHaveClass( 'first' );
-			expect( item2.parentNode ).not.toHaveClass( 'last' );
-
-			expect( item3.parentNode ).not.toHaveClass( 'first' );
-			expect( item3.parentNode ).toHaveClass( 'last' );
+			expect( container ).toMatchSnapshot();
 		} );
 	} );
 } );

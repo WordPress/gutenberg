@@ -1,0 +1,224 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ToolsPanel first and last panel items should apply first/last classes to appropriate items 1`] = `
+.emotion-0 {
+  display: grid;
+  gap: calc( 4px * 3 );
+  grid-template-columns: repeat( 2, 1fr );
+  -webkit-column-gap: calc(4px * 4);
+  column-gap: calc(4px * 4);
+  row-gap: calc(4px * 6);
+  border-top: 1px solid #ddd;
+  margin-top: -1px;
+  padding: calc(4px * 4);
+}
+
+.emotion-0>div:not( :first-of-type ) {
+  display: grid;
+  grid-template-columns: repeat( 2, 1fr );
+  -webkit-column-gap: calc(4px * 4);
+  column-gap: calc(4px * 4);
+  row-gap: calc(4px * 6);
+  grid-column: 1/-1;
+}
+
+.emotion-2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+  grid-column: 1/-1;
+  gap: calc(4px * 2);
+}
+
+.emotion-2>*+*:not( marquee ) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-2>* {
+  min-width: 0;
+}
+
+.emotion-2 .components-dropdown-menu {
+  margin: calc(4px * -1) 0;
+  line-height: 0;
+}
+
+.emotion-2.emotion-2.emotion-2.emotion-2 .components-dropdown-menu__toggle {
+  padding: 0;
+  min-width: calc(4px * 6);
+}
+
+.emotion-4 {
+  color: #1e1e1e;
+  line-height: 1.2;
+  margin: 0;
+  color: #050505;
+  font-size: calc(1.95 * 13px);
+  font-weight: 600;
+  display: block;
+  font-size: inherit;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.emotion-4.emotion-4 {
+  margin: 0;
+}
+
+.emotion-6 {
+  grid-column: 1/-1;
+  display: none;
+}
+
+.emotion-6>div,
+.emotion-6>fieldset {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  max-width: 100%;
+}
+
+.emotion-6.emotion-6 .e1puf3u3 {
+  margin-bottom: 0;
+}
+
+.emotion-6.emotion-6 .e1puf3u3 .e1puf3u2:last-child {
+  margin-bottom: 0;
+}
+
+.emotion-6 .e1puf3u0 {
+  margin-bottom: 0;
+}
+
+.emotion-6.emotion-6 .em5sgkm3 label {
+  margin-bottom: calc(4px * 2);
+  padding-bottom: 0;
+  line-height: 1.4em;
+}
+
+.emotion-6 .components-custom-select-control__label,
+.emotion-6 .e1puf3u1 {
+  line-height: 1.4em;
+}
+
+.emotion-8 {
+  grid-column: 1/-1;
+}
+
+.emotion-8>div,
+.emotion-8>fieldset {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  max-width: 100%;
+}
+
+.emotion-8.emotion-8 .e1puf3u3 {
+  margin-bottom: 0;
+}
+
+.emotion-8.emotion-8 .e1puf3u3 .e1puf3u2:last-child {
+  margin-bottom: 0;
+}
+
+.emotion-8 .e1puf3u0 {
+  margin-bottom: 0;
+}
+
+.emotion-8.emotion-8 .em5sgkm3 label {
+  margin-bottom: calc(4px * 2);
+  padding-bottom: 0;
+  line-height: 1.4em;
+}
+
+.emotion-8 .components-custom-select-control__label,
+.emotion-8 .e1puf3u1 {
+  line-height: 1.4em;
+}
+
+<div>
+  <div
+    class="components-grid components-tools-panel emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="ToolsPanel"
+  >
+    <div
+      class="components-flex components-h-stack components-tools-panel-header emotion-2 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ToolsPanelHeader"
+    >
+      <h2
+        class="components-truncate components-text components-heading emotion-4 emotion-1"
+        data-wp-c16t="true"
+        data-wp-component="Heading"
+      >
+        Panel header
+      </h2>
+      <div
+        class="components-dropdown components-dropdown-menu"
+        tabindex="-1"
+      >
+        <button
+          aria-expanded="false"
+          aria-haspopup="true"
+          aria-label="View options"
+          class="components-button components-dropdown-menu__toggle is-small has-icon"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height="24"
+            role="img"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      class="components-tools-panel-item emotion-6 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ToolsPanelItem"
+    />
+    <div
+      class="components-tools-panel-item first emotion-8 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ToolsPanelItem"
+    >
+      <div>
+        Item 2
+      </div>
+    </div>
+    <div
+      class="components-tools-panel-item last emotion-8 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ToolsPanelItem"
+    >
+      <div>
+        Item 3
+      </div>
+    </div>
+    <div
+      class="components-tools-panel-item emotion-6 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ToolsPanelItem"
+    />
+  </div>
+</div>
+`;
