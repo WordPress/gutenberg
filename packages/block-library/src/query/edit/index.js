@@ -29,13 +29,14 @@ import { getFirstQueryClientIdFromBlocks } from '../utils';
 
 const TEMPLATE = [ [ 'core/post-template' ] ];
 
-function ResetQueryLoopMenuItem( { clientId } ) {
-	const selectedBlockClientId = useSelect(
-		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
-		[]
+function ResetQueryLoopMenuItem( { clientId, isSelected } ) {
+	const rootClientId = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockRootClientId( clientId ),
+		[ clientId ]
 	);
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	if ( selectedBlockClientId !== clientId ) {
+	if ( ! isSelected || rootClientId ) {
 		return null;
 	}
 	return (
@@ -55,7 +56,12 @@ function ResetQueryLoopMenuItem( { clientId } ) {
 	);
 }
 
-export function QueryContent( { attributes, setAttributes, clientId } ) {
+export function QueryContent( {
+	attributes,
+	setAttributes,
+	clientId,
+	isSelected,
+} ) {
 	const {
 		queryId,
 		query,
@@ -132,7 +138,10 @@ export function QueryContent( { attributes, setAttributes, clientId } ) {
 					setDisplayLayout={ updateDisplayLayout }
 				/>
 			</BlockControls>
-			<ResetQueryLoopMenuItem clientId={ clientId } />
+			<ResetQueryLoopMenuItem
+				clientId={ clientId }
+				isSelected={ isSelected }
+			/>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
