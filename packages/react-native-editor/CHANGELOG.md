@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.69.0
 -   [*] Give multi-line block names central alignment in inserter [#37185]
 -   [**] Fix empty line apperaing when splitting heading blocks on Android 12 [#37279]
 -   [**] Fix missing translations by refactoring the editor initialization code [#37073]
