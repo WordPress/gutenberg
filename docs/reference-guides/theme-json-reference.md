@@ -15,6 +15,8 @@ Setting that enables the following UI tools:
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 
+Since v2.
+
 
 ---
 
@@ -96,7 +98,11 @@ Settings related to typography.
 
 ### custom
 
-Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.
+Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. 
+
+`camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema and keys at different depth levels are separated by `--` (so keys should not include `--` in the name).
+
+Since v1.
 
 
 ---

@@ -10,7 +10,7 @@
 		"settingsPropertiesBorder": {
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight\n\nSince v2.",
 					"type": "boolean",
 					"default": false
 				},
@@ -354,7 +354,7 @@
 		"settingsPropertiesCustom": {
 			"properties": {
 				"custom": {
-					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
+					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. \n\n`camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema and keys at different depth levels are separated by `--` (so keys should not include `--` in the name).\n\nSince v1.",
 					"$ref": "#/definitions/settingsCustomAdditionalProperties"
 				}
 			}
