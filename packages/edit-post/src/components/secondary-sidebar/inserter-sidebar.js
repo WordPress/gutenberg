@@ -58,6 +58,7 @@ export default function InserterSidebar() {
 						insertionPoint.insertionIndex
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
+					shouldFocusSearch="true"
 				/>
 			</div>
 		</div>
