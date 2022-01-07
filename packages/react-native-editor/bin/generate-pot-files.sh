@@ -152,7 +152,7 @@ function generate_pot_files() {
   mkdir -p $output_path
 
   if [ -n "$subtract_pot_files" ]; then
-    echo "--- Strings from ${plugins_to_subtract[@]} plugins will be subtracted ---"
+    echo "-- Strings from ${plugins_to_subtract[@]} plugins will be subtracted --"
   fi
   
   echo -e "\nExtract used strings from Android source-map:"
