@@ -18,11 +18,12 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    env:
+        WORDPRESS_RELEASE_BRANCH: ${{ github.event.inputs.release_type == 'next' && 'wp/next' || 'wp/trunk' ) }}
+
     sync-wordpress-branch:
         name: Sync the WordPress release branch
         runs-on: ubuntu-latest
-        env:
-            WORDPRESS_RELEASE_BRANCH: ${{ github.event.inputs.release_type == 'next' && 'wp/next' || 'wp/trunk' ) }}
         outputs:
             plugin_version: ${{ steps.get_version.outputs.plugin_version }}
             plugin_release_branch: ${{ steps.get_version.outputs.plugin_release_branch }}
@@ -67,3 +68,58 @@ jobs:
               run: |
                   git commit -m "Merge changes published in the Gutenberg plugin ${{ steps.get_version.outputs.plugin_release_branch }} branch"
                   git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
+
+    update-packages:
+        name: Update Packages
+        runs-on: ubuntu-latest
+        needs: sync-wordpress-branch
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  ref: ${{ env.WORDPRESS_RELEASE_BRANCH }}
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              with:
+                  node-version: 14
+                  cache: npm
+
+            - name: Update package versions
+              run: |
+                  PUBLIC_PACKAGES=$(ls -d packages/*/ | xargs -I{} sh -c "jq -e '.private != true' '{}'/package.json >/dev/null && test -f '{}'CHANGELOG.md && echo '{}'")
+                  PUBLIC_PACKAGE_NAMES=$(jq '.dependencies' package.json )
+                  minimum_version_jump='patch'
+                  while IFS= read -r package; do
+                    changes_detected=false
+                    while IFS= read -r line; do
+                      if [[ "$line" = '## Unreleased' ]]; then
+                        changes_detected=true
+                        continue
+                      fi
+                      if [[ "$changes_detected" = false ]]; then
+                        continue;
+                      fi
+                      case $line in
+                        '## '*)
+                          break
+                          ;;
+                        '### Breaking Change'*)
+                          version_jump=major
+                          break
+                          ;;
+                        '### Deprecation'*|'### Enhancement'*|'### New API'*|'### New Feature'*)
+                          version_jump=minor
+                          continue
+                          ;;
+                        '### '*|*-*)
+                          if [[ "$version_jump" != 'minor' ]]; then
+                            version_jump="$minimum_version_jump"
+                          fi
+                      esac
+                    done < "$package"CHANGELOG.md
+                    package_name=${my_package#'packages/'}
+                    package_name="@wordpress/${package_name%'/'}"
+                    package_version=$(jq --raw-output '.version' "$package"package.json)
+                  done <<< $PUBLIC_PACKAGES
