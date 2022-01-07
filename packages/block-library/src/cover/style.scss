@@ -12,6 +12,12 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 
+	> span,
+	> img,
+	> video {
+		border-radius: inherit;
+	}
+
 	&.has-parallax {
 		background-attachment: fixed;
 
@@ -68,6 +74,7 @@
 		right: 0;
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
 		opacity: 0.5;
+		border-radius: inherit;
 	}
 
 	@for $i from 0 through 10 {

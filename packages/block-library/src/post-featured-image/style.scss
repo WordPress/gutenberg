@@ -11,6 +11,13 @@
 		vertical-align: bottom;
 	}
 
+	&:not(.is-style-rounded) {
+		> a,
+		img {
+			border-radius: inherit;
+		}
+	}
+
 	&.alignwide img,
 	&.alignfull img {
 		width: 100%;

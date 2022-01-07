@@ -15,6 +15,7 @@
 		align-items: center;
 		box-shadow: none;
 		padding: 0;
+		border-radius: inherit;
 
 		// Hide the upload button, as it's also available in the media library.
 		.components-form-file-upload {

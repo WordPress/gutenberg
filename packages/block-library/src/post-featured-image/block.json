@@ -34,6 +34,18 @@
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": false,
+				"radius": false,
+				"style": false,
+				"width": false
+			}
 		}
 	},
 	"editorStyle": "wp-block-post-featured-image-editor",
