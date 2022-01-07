@@ -42,12 +42,12 @@ describe( 'List view', () => {
 		await pressKeyWithModifier( 'access', 'o' );
 
 		const paragraphBlock = await page.waitForXPath(
-			'//button[contains(., "Paragraph")][@draggable="true"]'
+			'//a[contains(., "Paragraph")][@draggable="true"]'
 		);
 
 		// Drag above the heading block
 		const headingBlock = await page.waitForXPath(
-			'//button[contains(., "Heading")][@draggable="true"]'
+			'//a[contains(., "Heading")][@draggable="true"]'
 		);
 
 		await dragAndDrop( paragraphBlock, headingBlock, -5 );

@@ -15,6 +15,8 @@ import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 
+const blockedPaths = [ 'color', 'border', 'typography', 'spacing' ];
+
 const deprecatedFlags = {
 	'color.palette': ( settings ) =>
 		settings.colors === undefined ? undefined : settings.colors,
@@ -34,8 +36,7 @@ const deprecatedFlags = {
 		settings.disableCustomFontSizes === undefined
 			? undefined
 			: ! settings.disableCustomFontSizes,
-	'typography.customLineHeight': ( settings ) =>
-		settings.enableCustomLineHeight,
+	'typography.lineHeight': ( settings ) => settings.enableCustomLineHeight,
 	'spacing.units': ( settings ) => {
 		if ( settings.enableCustomUnits === undefined ) {
 			return;
@@ -47,10 +48,15 @@ const deprecatedFlags = {
 
 		return settings.enableCustomUnits;
 	},
-	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
+	'spacing.padding': ( settings ) => settings.enableCustomSpacing,
 };
 
 const prefixedFlags = {
+	/*
+	 * These were only available in the plugin
+	 * and can be removed when the minimum WordPress version
+	 * for the plugin is 5.9.
+	 */
 	'border.customColor': 'border.color',
 	'border.customStyle': 'border.style',
 	'border.customWidth': 'border.width',
@@ -59,6 +65,13 @@ const prefixedFlags = {
 	'typography.customLetterSpacing': 'typography.letterSpacing',
 	'typography.customTextDecorations': 'typography.textDecoration',
 	'typography.customTextTransforms': 'typography.textTransform',
+	/*
+	 * These were part of WordPress 5.8 and we need to keep them.
+	 */
+	'border.customRadius': 'border.radius',
+	'spacing.customMargin': 'spacing.margin',
+	'spacing.customPadding': 'spacing.padding',
+	'typography.customLineHeight': 'typography.lineHeight',
 };
 
 /**
@@ -93,6 +106,13 @@ export default function useSetting( path ) {
 
 	const setting = useSelect(
 		( select ) => {
+			if ( blockedPaths.includes( path ) ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'Top level useSetting paths are disabled. Please use a subpath to query the information needed.'
+				);
+				return undefined;
+			}
 			const settings = select( blockEditorStore ).getSettings();
 
 			// 1 - Use __experimental features, if available.
@@ -106,9 +126,9 @@ export default function useSetting( path ) {
 			if ( experimentalFeaturesResult !== undefined ) {
 				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
 					return (
-						experimentalFeaturesResult.user ??
+						experimentalFeaturesResult.custom ??
 						experimentalFeaturesResult.theme ??
-						experimentalFeaturesResult.core
+						experimentalFeaturesResult.default
 					);
 				}
 				return experimentalFeaturesResult;

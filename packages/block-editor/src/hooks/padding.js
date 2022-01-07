@@ -73,7 +73,7 @@ export function resetPadding( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether padding setting is disabled.
  */
 export function useIsPaddingDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'spacing.customPadding' );
+	const isDisabled = ! useSetting( 'spacing.padding' );
 	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'padding' );
 
 	return ! hasPaddingSupport( blockName ) || isDisabled || isInvalid;

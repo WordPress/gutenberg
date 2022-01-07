@@ -17,14 +17,18 @@ const {
 	defaultRequestToHandle,
 } = require( './util' );
 
+const defaultExternalizedReportFileName = 'externalized-dependencies.json';
+
 class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
 		this.options = Object.assign(
 			{
 				combineAssets: false,
 				combinedOutputFile: null,
+				externalizedReport: false,
 				injectPolyfill: false,
 				outputFormat: 'php',
+				outputFilename: null,
 				useDefaults: true,
 			},
 			options
@@ -137,9 +141,25 @@ class DependencyExtractionWebpackPlugin {
 		const {
 			combineAssets,
 			combinedOutputFile,
+			externalizedReport,
 			injectPolyfill,
 			outputFormat,
+			outputFilename,
 		} = this.options;
+
+		// Dump actually externalized dependencies to a report file.
+		if ( externalizedReport ) {
+			const externalizedReportFile =
+				typeof externalizedReport === 'string'
+					? externalizedReport
+					: defaultExternalizedReportFileName;
+			compilation.emitAsset(
+				externalizedReportFile,
+				new RawSource(
+					JSON.stringify( Array.from( this.externalizedDeps ).sort() )
+				)
+			);
+		}
 
 		const combinedAssetsData = {};
 
@@ -179,7 +199,7 @@ class DependencyExtractionWebpackPlugin {
 			}
 
 			// Go through the assets and hash the sources. We can't just use
-			// `runtimeChunk.contentHash` because that's not updated when
+			// `entrypointChunk.contentHash` because that's not updated when
 			// assets are minified. Sigh.
 			// @todo Use `asset.info.contenthash` if we can make sure it's reliably set.
 			const hash = createHash( 'md4' );
@@ -189,7 +209,9 @@ class DependencyExtractionWebpackPlugin {
 				asset.source.updateHash( hash );
 			}
 
-			const runtimeChunk = entrypoint.getRuntimeChunk();
+			const entrypointChunk = isWebpack4
+				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
+				: entrypoint.getEntrypointChunk();
 
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
@@ -204,7 +226,7 @@ class DependencyExtractionWebpackPlugin {
 			const buildFilename = compilation.getPath(
 				compiler.options.output.filename,
 				{
-					chunk: runtimeChunk,
+					chunk: entrypointChunk,
 					filename,
 					query,
 					basename: basename( filename ),
@@ -219,14 +241,30 @@ class DependencyExtractionWebpackPlugin {
 				continue;
 			}
 
-			const assetFilename = buildFilename.replace(
-				/\.js$/i,
-				'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
-			);
+			let assetFilename;
+
+			if ( outputFilename ) {
+				assetFilename = compilation.getPath( outputFilename, {
+					chunk: entrypointChunk,
+					filename,
+					query,
+					basename: basename( filename ),
+					contentHash: createHash( 'md4' )
+						.update( assetString )
+						.digest( 'hex' ),
+				} );
+			} else {
+				assetFilename = buildFilename.replace(
+					/\.js$/i,
+					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
+				);
+			}
 
 			// Add source and file into compilation for webpack to output.
 			compilation.assets[ assetFilename ] = new RawSource( assetString );
-			runtimeChunk.files[ isWebpack4 ? 'push' : 'add' ]( assetFilename );
+			entrypointChunk.files[ isWebpack4 ? 'push' : 'add' ](
+				assetFilename
+			);
 		}
 
 		if ( combineAssets ) {

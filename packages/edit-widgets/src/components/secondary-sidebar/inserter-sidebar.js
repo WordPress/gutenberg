@@ -1,15 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { close } from '@wordpress/icons';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,12 +25,21 @@ export default function InserterSidebar() {
 	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
 
 	const closeInserter = useCallback( () => {
-		return () => setIsInserterOpened( false );
+		return setIsInserterOpened( false );
 	}, [ setIsInserterOpened ] );
 
+	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: closeInserter,
+		focusOnMount: null,
 	} );
+
+	const inserterContentRef = useRef();
+	useEffect( () => {
+		inserterContentRef.current
+			.querySelector( '.block-editor-inserter__search input' )
+			.focus();
+	}, [] );
 
 	return (
 		<div
@@ -37,10 +47,17 @@ export default function InserterSidebar() {
 			{ ...inserterDialogProps }
 			className="edit-widgets-layout__inserter-panel"
 		>
-			<div className="edit-widgets-layout__inserter-panel-header">
-				<Button icon={ close } onClick={ closeInserter } />
-			</div>
-			<div className="edit-widgets-layout__inserter-panel-content">
+			<TagName className="edit-widgets-layout__inserter-panel-header">
+				<Button
+					icon={ close }
+					onClick={ closeInserter }
+					label={ __( 'Close block inserter' ) }
+				/>
+			</TagName>
+			<div
+				className="edit-widgets-layout__inserter-panel-content"
+				ref={ inserterContentRef }
+			>
 				<Library
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }

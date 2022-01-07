@@ -24,7 +24,7 @@ export default {
 	title: 'Components/Button',
 	component: Button,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

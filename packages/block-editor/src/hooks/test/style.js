@@ -30,7 +30,6 @@ describe( 'getInlineStyles', () => {
 				},
 			} )
 		).toEqual( {
-			'--wp--style--block-gap': '1em',
 			backgroundColor: 'black',
 			borderColor: '#21759b',
 			borderRadius: '10px',
@@ -104,7 +103,6 @@ describe( 'getInlineStyles', () => {
 				},
 			} )
 		).toEqual( {
-			'--wp--style--block-gap': '1em',
 			margin: '10px',
 			padding: '20px',
 		} );

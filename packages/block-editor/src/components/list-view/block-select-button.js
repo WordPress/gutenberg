@@ -19,6 +19,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
 import BlockTitle from '../block-title';
 import ListViewExpander from './expander';
+import { SPACE, ENTER } from '@wordpress/keycodes';
 
 function ListViewBlockSelectButton(
 	{
@@ -47,6 +48,22 @@ function ListViewBlockSelectButton(
 		level
 	);
 
+	// The `href` attribute triggers the browser's native HTML drag operations.
+	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
+	// We need to clear any HTML drag data to prevent `pasteHandler` from firing
+	// inside the `useOnBlockDrop` hook.
+	const onDragStartHandler = ( event ) => {
+		event.dataTransfer.clearData();
+		onDragStart( event );
+	};
+
+	function onKeyDownHandler( event ) {
+		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+			event.preventDefault();
+			onClick( event );
+		}
+	}
+
 	return (
 		<>
 			<Button
@@ -55,13 +72,15 @@ function ListViewBlockSelectButton(
 					className
 				) }
 				onClick={ onClick }
+				onKeyDown={ onKeyDownHandler }
 				aria-describedby={ descriptionId }
 				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
-				onDragStart={ onDragStart }
+				onDragStart={ onDragStartHandler }
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
+				href={ `#block-${ clientId }` }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />

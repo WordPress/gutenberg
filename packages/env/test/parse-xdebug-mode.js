@@ -4,10 +4,16 @@
 const parseXdebugMode = require( '../lib/parse-xdebug-mode' );
 
 describe( 'parseXdebugMode', () => {
-	it( 'throws an error if the passed value is not a string', () => {
-		expect( () => parseXdebugMode() ).toThrow(
-			'is not a mode recognized by Xdebug'
-		);
+	it( 'throws an error if the passed value is neither a string nor undefined', () => {
+		const errorMessage = 'is not a mode recognized by Xdebug';
+		expect( () => parseXdebugMode( true ) ).toThrow( errorMessage );
+		expect( () => parseXdebugMode( false ) ).toThrow( errorMessage );
+		expect( () => parseXdebugMode( 1 ) ).toThrow( errorMessage );
+	} );
+
+	it( 'sets the Xdebug mode to "off" if no --xdebug flag is passed', () => {
+		const result = parseXdebugMode( undefined );
+		expect( result ).toEqual( 'off' );
 	} );
 
 	it( 'sets the Xdebug mode to "debug" if no mode is specified', () => {

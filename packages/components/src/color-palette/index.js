@@ -5,6 +5,7 @@ import { map } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -19,22 +20,22 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
+import { ColorHeading } from './styles';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
-export default function ColorPalette( {
-	clearable = true,
+function SinglePalette( {
 	className,
+	clearColor,
 	colors,
-	disableCustomColors = false,
-	enableAlpha,
 	onChange,
 	value,
+	actions,
 } ) {
-	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 	const colorOptions = useMemo( () => {
 		return map( colors, ( { color, name } ) => {
 			const colordColor = colord( color );
+
 			return (
 				<CircularOptionPicker.Option
 					key={ color }
@@ -70,6 +71,75 @@ export default function ColorPalette( {
 			);
 		} );
 	}, [ colors, value, onChange, clearColor ] );
+	return (
+		<CircularOptionPicker
+			className={ className }
+			options={ colorOptions }
+			actions={ actions }
+		/>
+	);
+}
+
+function MultiplePalettes( {
+	className,
+	clearColor,
+	colors,
+	onChange,
+	value,
+	actions,
+} ) {
+	return (
+		<VStack spacing={ 3 } className={ className }>
+			{ colors.map( ( { name, colors: colorPalette }, index ) => {
+				return (
+					<VStack spacing={ 2 } key={ index }>
+						<ColorHeading>{ name }</ColorHeading>
+						<SinglePalette
+							clearColor={ clearColor }
+							colors={ colorPalette }
+							onChange={ onChange }
+							value={ value }
+							actions={
+								colors.length === index + 1 ? actions : null
+							}
+						/>
+					</VStack>
+				);
+			} ) }
+		</VStack>
+	);
+}
+
+export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+	return (
+		<Dropdown
+			contentClassName={ classnames(
+				'components-color-palette__custom-color-dropdown-content',
+				{
+					'is-rendered-in-sidebar': isRenderedInSidebar,
+				}
+			) }
+			{ ...props }
+		/>
+	);
+}
+
+export default function ColorPalette( {
+	clearable = true,
+	className,
+	colors,
+	disableCustomColors = false,
+	enableAlpha,
+	onChange,
+	value,
+	__experimentalHasMultipleOrigins = false,
+	__experimentalIsRenderedInSidebar = false,
+} ) {
+	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+	const Component = __experimentalHasMultipleOrigins
+		? MultiplePalettes
+		: SinglePalette;
+
 	const renderCustomColorPicker = () => (
 		<ColorPicker
 			color={ value }
@@ -78,10 +148,19 @@ export default function ColorPalette( {
 		/>
 	);
 
+	let dropdownPosition;
+	if ( __experimentalIsRenderedInSidebar ) {
+		dropdownPosition = 'bottom left';
+	}
+
+	const colordColor = colord( value );
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
-				<Dropdown
+				<CustomColorPickerDropdown
+					position={ dropdownPosition }
+					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<button
@@ -90,15 +169,26 @@ export default function ColorPalette( {
 							aria-haspopup="true"
 							onClick={ onToggle }
 							aria-label={ __( 'Custom color picker' ) }
-							style={ { background: value } }
+							style={ {
+								background: value,
+								color:
+									colordColor.contrast() >
+									colordColor.contrast( '#000' )
+										? '#fff'
+										: '#000',
+							} }
 						>
 							{ value }
 						</button>
 					) }
 				/>
 			) }
-			<CircularOptionPicker
-				options={ colorOptions }
+			<Component
+				clearable={ clearable }
+				clearColor={ clearColor }
+				colors={ colors }
+				onChange={ onChange }
+				value={ value }
 				actions={
 					!! clearable && (
 						<CircularOptionPicker.ButtonAction

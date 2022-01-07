@@ -60,7 +60,7 @@ describe( 'createMiddleware', () => {
 			try {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
-				// eslint-disable-next-line jest/no-try-expect, jest/no-conditional-expect
+				// eslint-disable-next-line jest/no-conditional-expect
 				expect( error ).toBe( 'Message' );
 			}
 		}
@@ -81,7 +81,7 @@ describe( 'createMiddleware', () => {
 			try {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
-				// eslint-disable-next-line jest/no-try-expect, jest/no-conditional-expect
+				// eslint-disable-next-line jest/no-conditional-expect
 				expect( error.message ).toBe( 'Message' );
 			}
 		}
@@ -108,7 +108,7 @@ describe( 'createMiddleware', () => {
 			try {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
-				// eslint-disable-next-line jest/no-try-expect, jest/no-conditional-expect
+				// eslint-disable-next-line jest/no-conditional-expect
 				expect( error.message ).toBe( 'Message' );
 				return null;
 			}

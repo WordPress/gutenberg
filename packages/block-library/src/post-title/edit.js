@@ -30,7 +30,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId, queryId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
@@ -62,7 +62,7 @@ export default function PostTitleEdit( {
 				/>
 			) : (
 				<TagName { ...blockProps }>
-					<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
+					<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
 				</TagName>
 			);
 	}
@@ -92,7 +92,7 @@ export default function PostTitleEdit( {
 						rel={ rel }
 						onClick={ ( event ) => event.preventDefault() }
 					>
-						<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
+						<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
 					</a>
 				</TagName>
 			);

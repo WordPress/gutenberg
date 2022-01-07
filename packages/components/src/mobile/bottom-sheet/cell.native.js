@@ -52,7 +52,7 @@ class BottomSheetCell extends Component {
 
 	componentDidMount() {
 		this.isCurrent = true;
-		AccessibilityInfo.addEventListener(
+		this.a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
 		);
@@ -68,10 +68,7 @@ class BottomSheetCell extends Component {
 
 	componentWillUnmount() {
 		this.isCurrent = false;
-		AccessibilityInfo.removeEventListener(
-			'screenReaderChanged',
-			this.handleScreenReaderToggled
-		);
+		this.a11yInfoChangeSubscription.remove();
 	}
 
 	handleScreenReaderToggled( isScreenReaderEnabled ) {
@@ -106,6 +103,7 @@ class BottomSheetCell extends Component {
 			valuePlaceholder = '',
 			icon,
 			leftAlign,
+			iconStyle = {},
 			labelStyle = {},
 			valueStyle = {},
 			cellContainerStyle = {},
@@ -307,7 +305,7 @@ class BottomSheetCell extends Component {
 				  );
 		};
 
-		const iconStyle = getStylesFromColorScheme(
+		const iconStyleBase = getStylesFromColorScheme(
 			styles.icon,
 			styles.iconDark
 		);
@@ -362,7 +360,11 @@ class BottomSheetCell extends Component {
 									<Icon
 										icon={ icon }
 										size={ 24 }
-										fill={ iconStyle.color }
+										fill={
+											iconStyle.color ||
+											iconStyleBase.color
+										}
+										style={ iconStyle }
 										isPressed={ false }
 									/>
 									<View

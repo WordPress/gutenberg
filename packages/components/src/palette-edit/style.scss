@@ -1,0 +1,24 @@
+@include break-medium() {
+	.components-palette-edit__popover.components-popover .components-popover__content.components-popover__content.components-popover__content {
+		margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 };
+		margin-top: #{ -($grid-unit-60 + $border-width) };
+	}
+}
+
+.components-palette-edit__popover {
+	.components-custom-gradient-picker__gradient-bar {
+		margin-top: 0;
+	}
+	.components-custom-gradient-picker__ui-line {
+		margin-bottom: 0;
+	}
+	.components-custom-gradient-picker {
+		width: 280px;
+		padding: 8px;
+	}
+}
+.components-dropdown-menu__menu {
+	.components-palette-edit__menu-button {
+		width: 100%;
+	}
+}

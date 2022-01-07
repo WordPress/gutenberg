@@ -9,19 +9,24 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import ColorGradientControl from '../components/colors-gradients/control';
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
+import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import {
 	getColorClassName,
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
 import useSetting from '../components/use-setting';
-import { hasBorderSupport, shouldSkipSerialization } from './border';
+import {
+	hasBorderSupport,
+	removeBorderAttribute,
+	shouldSkipSerialization,
+} from './border';
 import { cleanEmptyObject } from './utils';
 
 // Defining empty array here instead of inline avoids unnecessary re-renders of
@@ -46,22 +51,42 @@ export function BorderColorEdit( props ) {
 		attributes: { borderColor, style },
 		setAttributes,
 	} = props;
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const disableCustomColors = ! useSetting( 'color.custom' );
-	const disableCustomGradients = ! useSetting( 'color.customGradient' );
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const availableColors = colorGradientSettings.colors.reduce(
+		( colors, origin ) => colors.concat( origin.colors ),
+		[]
+	);
+	const { color: customBorderColor } = style?.border || {};
 	const [ colorValue, setColorValue ] = useState(
 		() =>
 			getColorObjectByAttributeValues(
-				colors,
+				availableColors,
 				borderColor,
-				style?.border?.color
+				customBorderColor
 			)?.color
 	);
+
+	// Detect changes in the color attributes and update the colorValue to keep the
+	// UI in sync. This is necessary for situations when border controls interact with
+	// eachother: eg, setting the border width to zero causes the color and style
+	// selections to be cleared.
+	useEffect( () => {
+		setColorValue(
+			getColorObjectByAttributeValues(
+				availableColors,
+				borderColor,
+				customBorderColor
+			)?.color
+		);
+	}, [ borderColor, customBorderColor, availableColors ] );
 
 	const onChangeColor = ( value ) => {
 		setColorValue( value );
 
-		const colorObject = getColorObjectByColorValue( colors, value );
+		const colorObject = getColorObjectByColorValue(
+			availableColors,
+			value
+		);
 		const newStyle = {
 			...style,
 			border: {
@@ -79,17 +104,58 @@ export function BorderColorEdit( props ) {
 		} );
 	};
 
+	const settings = [
+		{
+			label: __( 'Color' ),
+			onColorChange: onChangeColor,
+			colorValue,
+			clearable: false,
+		},
+	];
 	return (
-		<ColorGradientControl
-			label={ __( 'Color' ) }
-			colorValue={ colorValue }
-			colors={ colors }
-			gradients={ undefined }
-			disableCustomColors={ disableCustomColors }
-			disableCustomGradients={ disableCustomGradients }
-			onColorChange={ onChangeColor }
+		<ColorGradientSettingsDropdown
+			settings={ settings }
+			disableCustomColors
+			disableCustomGradients
+			__experimentalHasMultipleOrigins
+			__experimentalIsRenderedInSidebar
+			enableAlpha
+			{ ...colorGradientSettings }
 		/>
 	);
+}
+
+/**
+ * Checks if there is a current value in the border color block support
+ * attributes.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a border color value set.
+ */
+export function hasBorderColorValue( props ) {
+	const {
+		attributes: { borderColor, style },
+	} = props;
+
+	return !! borderColor || !! style?.border?.color;
+}
+
+/**
+ * Resets the border color block support attributes. This can be used when
+ * disabling the border color support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetBorderColor( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		borderColor: undefined,
+		style: removeBorderAttribute( style, 'color' ),
+	} );
 }
 
 /**

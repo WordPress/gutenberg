@@ -11,6 +11,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
 import { isTemplatePart } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -65,6 +66,22 @@ export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
 );
 
 /**
+ * Returns any available Reusable blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The available reusable blocks.
+ */
+export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
+	const isWeb = Platform.OS === 'web';
+	return isWeb
+		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
+				per_page: -1,
+		  } )
+		: [];
+} );
+
+/**
  * Returns the settings, taking into account active features and permissions.
  *
  * @param {Object}   state             Global application state.
@@ -80,6 +97,7 @@ export const getSettings = createSelector(
 			focusMode: isFeatureActive( state, 'focusMode' ),
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
+			__experimentalReusableBlocks: getReusableBlocks( state ),
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -101,6 +119,7 @@ export const getSettings = createSelector(
 		state.settings,
 		isFeatureActive( state, 'focusMode' ),
 		isFeatureActive( state, 'fixedToolbar' ),
+		getReusableBlocks( state ),
 	]
 );
 
@@ -116,11 +135,7 @@ export function getHomeTemplateId( state ) {
 }
 
 function getCurrentEditedPost( state ) {
-	return state.editedPost[ state.editedPost.length - 1 ] || {};
-}
-
-function getPreviousEditedPost( state ) {
-	return state.editedPost[ state.editedPost.length - 2 ] || {};
+	return state.editedPost;
 }
 
 /**
@@ -143,28 +158,6 @@ export function getEditedPostType( state ) {
  */
 export function getEditedPostId( state ) {
 	return getCurrentEditedPost( state ).id;
-}
-
-/**
- * Returns the previous edited post type (wp_template or wp_template_part).
- *
- * @param {Object} state Global application state.
- *
- * @return {TemplateType?} Template type.
- */
-export function getPreviousEditedPostType( state ) {
-	return getPreviousEditedPost( state ).type;
-}
-
-/**
- * Returns the ID of the previous edited template or template part.
- *
- * @param {Object} state Global application state.
- *
- * @return {string?} Post ID.
- */
-export function getPreviousEditedPostId( state ) {
-	return getPreviousEditedPost( state ).id;
 }
 
 /**
@@ -309,10 +302,9 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			templateId
 		);
 
-		const templateParts = select( coreDataStore ).getEntityRecords(
-			'postType',
-			'wp_template_part'
-		);
+		const templateParts = select(
+			coreDataStore
+		).getEntityRecords( 'postType', 'wp_template_part', { per_page: -1 } );
 		const templatePartsById = keyBy(
 			templateParts,
 			( templatePart ) => templatePart.id

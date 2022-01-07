@@ -22,8 +22,18 @@ import * as classic from './freeform';
 import * as code from './code';
 import * as column from './column';
 import * as columns from './columns';
+import * as commentAuthorAvatar from './comment-author-avatar';
+import * as commentAuthorName from './comment-author-name';
+import * as commentContent from './comment-content';
+import * as commentDate from './comment-date';
+import * as commentEditLink from './comment-edit-link';
+import * as commentReplyLink from './comment-reply-link';
 import * as commentTemplate from './comment-template';
+import * as commentsPaginationPrevious from './comments-pagination-previous';
 import * as commentsQueryLoop from './comments-query-loop';
+import * as commentsPagination from './comments-pagination';
+import * as commentsPaginationNext from './comments-pagination-next';
+import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -41,6 +51,7 @@ import * as mediaText from './media-text';
 import * as missing from './missing';
 import * as more from './more';
 import * as navigation from './navigation';
+import * as navigationArea from './navigation-area';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
@@ -48,13 +59,8 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
+import * as postAuthorName from './post-author-name';
 import * as postComment from './post-comment';
-import * as postCommentAuthor from './post-comment-author';
-import * as postCommentAuthorAvatar from './post-comment-author-avatar';
-import * as postCommentContent from './post-comment-content';
-import * as postCommentDate from './post-comment-date';
-import * as postCommentEdit from './post-comment-edit';
-import * as postCommentReplyLink from './post-comment-reply-link';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
@@ -141,8 +147,6 @@ export const __experimentalGetCoreBlocks = () => [
 	code,
 	column,
 	columns,
-	commentTemplate,
-	commentsQueryLoop,
 	cover,
 	embed,
 	file,
@@ -150,50 +154,56 @@ export const __experimentalGetCoreBlocks = () => [
 	html,
 	latestComments,
 	latestPosts,
-	logInOut,
 	mediaText,
 	missing,
 	more,
-	navigation,
-	navigationLink,
-	navigationSubmenu,
 	nextpage,
 	pageList,
 	pattern,
-	postAuthor,
-	postContent,
-	postDate,
-	postExcerpt,
-	postFeaturedImage,
-	postTemplate,
-	postTerms,
-	postTitle,
 	preformatted,
 	pullquote,
-	query,
-	queryPagination,
-	queryPaginationNext,
-	queryPaginationNumbers,
-	queryPaginationPrevious,
-	queryTitle,
 	reusableBlock,
 	rss,
 	search,
 	separator,
 	shortcode,
-	siteLogo,
-	siteTagline,
-	siteTitle,
 	socialLink,
 	socialLinks,
 	spacer,
 	table,
 	// tableOfContents,
 	tagCloud,
-	templatePart,
 	textColumns,
 	verse,
 	video,
+
+	// theme blocks
+	navigation,
+	navigationLink,
+	navigationSubmenu,
+	siteLogo,
+	siteTitle,
+	siteTagline,
+	query,
+	templatePart,
+	postTitle,
+	postExcerpt,
+	postFeaturedImage,
+	postContent,
+	postAuthor,
+	postDate,
+	postTerms,
+	postNavigationLink,
+	postTemplate,
+	queryPagination,
+	queryPaginationNext,
+	queryPaginationNumbers,
+	queryPaginationPrevious,
+	postComments,
+	logInOut,
+	termDescription,
+	queryTitle,
+	postAuthorName,
 ];
 
 /**
@@ -242,19 +252,23 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					// Full Site Editing blocks.
 					...( enableFSEBlocks
 						? [
+								commentAuthorAvatar,
+								commentAuthorName,
+								commentContent,
+								commentDate,
+								commentEditLink,
+								commentReplyLink,
+								commentTemplate,
+								commentsQueryLoop,
+								commentsPagination,
+								commentsPaginationNext,
+								commentsPaginationNumbers,
+								commentsPaginationPrevious,
+								navigationArea,
 								postComment,
-								postCommentAuthor,
-								postCommentAuthorAvatar,
-								postCommentContent,
-								postCommentDate,
-								postCommentEdit,
-								postCommentReplyLink,
-								postComments,
 								postCommentsCount,
 								postCommentsForm,
 								postCommentsLink,
-								postNavigationLink,
-								termDescription,
 						  ]
 						: [] ),
 				].forEach( registerBlock );

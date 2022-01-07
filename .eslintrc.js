@@ -49,6 +49,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/internal-regex': null,
 		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
@@ -175,6 +176,7 @@ module.exports = {
 				...developmentFiles,
 			],
 			rules: {
+				'import/default': 'off',
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',

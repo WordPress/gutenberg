@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/cover",
 	"title": "Cover",
@@ -67,7 +68,7 @@
 			"type": "array"
 		},
 		"templateLock": {
-			"type": "string",
+			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", false ]
 		}
 	},

@@ -206,7 +206,7 @@ describe( 'global styles renderer', () => {
 				settings: {
 					color: {
 						palette: {
-							user: [
+							custom: [
 								{
 									name: 'White',
 									slug: 'white',
@@ -217,10 +217,16 @@ describe( 'global styles renderer', () => {
 									slug: 'black',
 									color: 'black',
 								},
+								{
+									name: 'White to Black',
+									slug: 'white2black',
+									color: 'value',
+								},
 							],
 						},
 					},
 					custom: {
+						white2black: 'value',
 						'font-primary': 'value',
 						'line-height': {
 							body: 1.7,
@@ -257,7 +263,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( toCustomProperties( tree, blockSelectors ) ).toEqual(
-				'body{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
+				'body{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
 			);
 		} );
 	} );
@@ -268,7 +274,7 @@ describe( 'global styles renderer', () => {
 				settings: {
 					color: {
 						palette: {
-							core: [
+							default: [
 								{
 									name: 'White',
 									slug: 'white',
@@ -286,7 +292,7 @@ describe( 'global styles renderer', () => {
 						'core/heading': {
 							color: {
 								palette: {
-									core: [
+									default: [
 										{
 											name: 'Blue',
 											slug: 'blue',

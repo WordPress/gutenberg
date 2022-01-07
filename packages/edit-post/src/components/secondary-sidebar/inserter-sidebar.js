@@ -2,13 +2,15 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { close } from '@wordpress/icons';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,9 +30,18 @@ export default function InserterSidebar() {
 	const { setIsInserterOpened } = useDispatch( editPostStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
+		focusOnMount: null,
 	} );
+
+	const inserterContentRef = useRef();
+	useEffect( () => {
+		inserterContentRef.current
+			.querySelector( '.block-editor-inserter__search input' )
+			.focus();
+	}, [] );
 
 	return (
 		<div
@@ -38,13 +49,17 @@ export default function InserterSidebar() {
 			{ ...inserterDialogProps }
 			className="edit-post-editor__inserter-panel"
 		>
-			<div className="edit-post-editor__inserter-panel-header">
+			<TagName className="edit-post-editor__inserter-panel-header">
 				<Button
 					icon={ close }
+					label={ __( 'Close block inserter' ) }
 					onClick={ () => setIsInserterOpened( false ) }
 				/>
-			</div>
-			<div className="edit-post-editor__inserter-panel-content">
+			</TagName>
+			<div
+				className="edit-post-editor__inserter-panel-content"
+				ref={ inserterContentRef }
+			>
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel

@@ -187,13 +187,21 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink ] );
 
-	/**
-	 * If the value's `text` property changes then sync this
-	 * back up with state.
-	 */
 	useEffect( () => {
+		/**
+		 * If the value's `text` property changes then sync this
+		 * back up with state.
+		 */
 		if ( value?.title && value.title !== internalTextValue ) {
 			setInternalTextValue( value.title );
+		}
+
+		/**
+		 * Update the state value internalInputValue if the url value changes
+		 * for example when clicking on another anchor
+		 */
+		if ( value?.url ) {
+			setInternalInputValue( value.url );
 		}
 	}, [ value ] );
 
@@ -253,7 +261,7 @@ function LinkControl( {
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
-	const showTextControl = value?.url?.trim()?.length && hasTextControl;
+	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
 	return (
 		<div
