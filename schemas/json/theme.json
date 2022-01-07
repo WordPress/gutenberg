@@ -693,19 +693,23 @@
 					"properties": {
 						"color": {
 							"description": "Sets the `border-color` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"radius": {
 							"description": "Sets the `border-radius` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"style": {
 							"description": "Sets the `border-style` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"width": {
 							"description": "Sets the `border-width` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						}
 					},
 					"additionalProperties": false
@@ -716,15 +720,18 @@
 					"properties": {
 						"background": {
 							"description": "Sets the `background-color` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v1"
 						},
 						"gradient": {
 							"description": "Sets the `background` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v1"
 						},
 						"text": {
 							"description": "Sets the `color` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v1"
 						}
 					},
 					"additionalProperties": false
@@ -735,7 +742,8 @@
 					"properties": {
 						"blockGap": {
 							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"margin": {
 							"description": "Margin styles.",
@@ -758,6 +766,7 @@
 									"type": "string"
 								}
 							},
+							"since": "v1",
 							"additionalProperties": false
 						},
 						"padding": {
@@ -781,6 +790,7 @@
 									"type": "string"
 								}
 							},
+							"since": "v1",
 							"additionalProperties": false
 						}
 					},
@@ -792,35 +802,43 @@
 					"properties": {
 						"fontFamily": {
 							"description": "Sets the `font-family` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"fontSize": {
 							"description": "Sets the `font-size` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v1"
 						},
 						"fontStyle": {
 							"description": "Sets the `font-style` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"fontWeight": {
 							"description": "Sets the `font-weight` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"letterSpacing": {
 							"description": "Sets the `letter-spacing` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"lineHeight": {
 							"description": "Sets the `line-height` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v1"
 						},
 						"textDecoration": {
 							"description": "Sets the `text-decoration` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
-							"type": "string"
+							"type": "string",
+							"since": "v2"
 						}
 					},
 					"additionalProperties": false

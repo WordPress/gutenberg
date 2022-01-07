@@ -81,7 +81,7 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 	markup += '| ---       | ---    | ---    |---   | --- |\n';
 	ks.forEach( ( key ) => {
 		const def = 'default' in props[ key ] ? props[ key ].default : '';
-		const since = props[key].since ? props[key].since : '';
+		const since = props[ key ].since ? props[ key ].since : '';
 		const ps =
 			props[ key ].type === 'array'
 				? keys( props[ key ].items.properties ).sort().join( ', ' )
@@ -108,14 +108,15 @@ const getStylePropertiesMarkup = ( struct ) => {
 		return '';
 	}
 
-	let markup = '| Property  | Type   |  Props  |\n';
-	markup += '| ---       | ---    |---   |\n';
+	let markup = '| Property  | Type   |  Props  | Since |\n';
+	markup += '| ---       | ---    |---   | --- |\n';
 	ks.forEach( ( key ) => {
+		const since = props[ key ].since ? props[ key ].since : '';
 		const ps =
 			props[ key ].type === 'object'
 				? keys( props[ key ].properties ).sort().join( ', ' )
 				: '';
-		markup += `| ${ key } | ${ props[ key ].type } | ${ ps } |\n`;
+		markup += `| ${ key } | ${ props[ key ].type } | ${ ps } | ${ since } |\n`;
 	} );
 
 	return markup;

@@ -107,12 +107,12 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 Border styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| color | string |  |
-| radius | string |  |
-| style | string |  |
-| width | string |  |
+| Property  | Type   |  Props  | Since |
+| ---       | ---    |---   | --- |
+| color | string |  | v2 |
+| radius | string |  | v2 |
+| style | string |  | v2 |
+| width | string |  | v2 |
 
 ---
 
@@ -120,11 +120,11 @@ Border styles.
 
 Color styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| background | string |  |
-| gradient | string |  |
-| text | string |  |
+| Property  | Type   |  Props  | Since |
+| ---       | ---    |---   | --- |
+| background | string |  | v1 |
+| gradient | string |  | v1 |
+| text | string |  | v1 |
 
 ---
 
@@ -132,11 +132,11 @@ Color styles.
 
 Spacing styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| blockGap | string |  |
-| margin | object | bottom, left, right, top |
-| padding | object | bottom, left, right, top |
+| Property  | Type   |  Props  | Since |
+| ---       | ---    |---   | --- |
+| blockGap | string |  | v2 |
+| margin | object | bottom, left, right, top | v1 |
+| padding | object | bottom, left, right, top | v1 |
 
 ---
 
@@ -144,16 +144,16 @@ Spacing styles.
 
 Typography styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| fontFamily | string |  |
-| fontSize | string |  |
-| fontStyle | string |  |
-| fontWeight | string |  |
-| letterSpacing | string |  |
-| lineHeight | string |  |
-| textDecoration | string |  |
-| textTransform | string |  |
+| Property  | Type   |  Props  | Since |
+| ---       | ---    |---   | --- |
+| fontFamily | string |  | v2 |
+| fontSize | string |  | v1 |
+| fontStyle | string |  | v2 |
+| fontWeight | string |  | v2 |
+| letterSpacing | string |  | v2 |
+| lineHeight | string |  | v1 |
+| textDecoration | string |  | v2 |
+| textTransform | string |  | v2 |
 
 ---
 
