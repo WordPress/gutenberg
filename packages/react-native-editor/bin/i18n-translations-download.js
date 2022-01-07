@@ -197,7 +197,7 @@ const getUsedStrings = ( usedStringsFile, domain ) => {
 
 const generateIndexFile = ( translations, pluginDir ) => {
 	const indexNative = `/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */
-	/* eslint-disable prettier/prettier */
+/* eslint-disable prettier/prettier */
 	
 	const translations = {
 	${ translations
@@ -211,8 +211,8 @@ const generateIndexFile = ( translations, pluginDir ) => {
 	
 	export const getTranslation = ( locale ) => translations[ locale ];
 	
-	/* eslint-enable prettier/prettier */
-	`;
+/* eslint-enable prettier/prettier */
+`;
 
 	fs.writeFile(
 		path.join( pluginDir, 'index.js' ),
