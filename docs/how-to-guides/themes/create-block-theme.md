@@ -4,7 +4,7 @@ The purpose of this tutorial is to show how to create a block theme and help the
 
 You will learn about the required files, how to combine templates and template parts, how to add presets for global styles, and how to add blocks and export the templates in the site editor.
 
-Block themes are releasing in WordPress 5.9 as part of the full site editing project, previously required Gutenberg plugin 11.0+ or newer.
+Block themes require WordPress 5.9. To use block themes in earlier versions of WordPress requires the Gutenberg plugin version 11.0 or newer.
 
 ## Table of Contents
 
