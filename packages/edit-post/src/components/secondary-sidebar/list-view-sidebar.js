@@ -51,10 +51,10 @@ export default function ListViewSidebar() {
 			onKeyDown={ closeOnEscape }
 		>
 			<div className="edit-post-editor__list-view-panel-header">
-				<strong id={ labelId }>{ __( 'List view' ) }</strong>
+				<strong id={ labelId }>{ __( 'List View' ) }</strong>
 				<Button
 					icon={ closeSmall }
-					label={ __( 'Close list view sidebar' ) }
+					label={ __( 'Close List View sidebar' ) }
 					onClick={ () => setIsListViewOpened( false ) }
 				/>
 			</div>
