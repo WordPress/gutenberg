@@ -6,12 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import {
-	useFocusOnMount,
-	useFocusReturn,
-	useInstanceId,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useFocusOnMount, useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
@@ -32,7 +27,7 @@ export default function ListViewSidebar() {
 	}
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const focusReturnRef = useFocusReturn();
+
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -60,7 +55,7 @@ export default function ListViewSidebar() {
 			</div>
 			<div
 				className="edit-post-editor__list-view-panel-content"
-				ref={ useMergeRefs( [ focusReturnRef, focusOnMountRef ] ) }
+				ref={ focusOnMountRef }
 			>
 				<ListView
 					onSelect={ selectEditorBlock }

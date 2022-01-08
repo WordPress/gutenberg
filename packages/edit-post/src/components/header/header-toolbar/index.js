@@ -17,7 +17,7 @@ import {
 } from '@wordpress/editor';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
-import { useRef, useCallback } from '@wordpress/element';
+import { useRef, useCallback, useEffect } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
@@ -76,10 +76,13 @@ function HeaderToolbar() {
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
-	const toggleListView = useCallback(
-		() => setIsListViewOpened( ! isListViewOpen ),
-		[ setIsListViewOpened, isListViewOpen ]
-	);
+	const listViewRef = useRef();
+	useEffect( () => {
+		if ( ! isListViewOpen ) {
+			listViewRef.current.focus();
+		}
+	}, [ isListViewOpen ] );
+
 	const overflowItems = (
 		<>
 			<ToolbarItem
@@ -97,9 +100,10 @@ function HeaderToolbar() {
 				isPressed={ isListViewOpen }
 				/* translators: button label text should, if possible, be under 16 characters. */
 				label={ __( 'List View' ) }
-				onClick={ toggleListView }
+				onClick={ () => setIsListViewOpened( ! isListViewOpen ) }
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
+				ref={ listViewRef }
 			/>
 		</>
 	);
