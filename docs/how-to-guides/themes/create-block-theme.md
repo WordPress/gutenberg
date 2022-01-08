@@ -243,8 +243,9 @@ are saved to the database as custom post types. To export them as theme files, f
 -   Copy the updated `index.html` file from `theme/templates/` to your theme's `templates` folder.
 -   Copy template parts from `theme/parts/` to your theme's `parts` folder.
 
-Saved templates have precedence over theme files. To use the updated theme files, go to **Appearance > Templates** and
-**Appearance > Template parts** and delete the saved templates.
+Saved templates have precedence over theme files.
+
+To learn more about the Site Editor, see the [support article](https://wordpress.org/support/article/site-editor/)
 
 ### Additional templates
 
