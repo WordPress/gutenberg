@@ -8,9 +8,8 @@ import { render, fireEvent } from '@testing-library/react';
 import { CustomSelectControl } from '@wordpress/components';
 
 describe( 'CustomSelectControl', () => {
-	const onKeyDown = jest.fn();
-
 	it( 'Captures the keypress event and does not let it propagate', () => {
+		const onKeyDown = jest.fn();
 		const wrapper = (
 			<div
 				// This role="none" is required to prevent an eslint warning about accessibility.
