@@ -121,9 +121,9 @@ jobs:
                     done < "$package"CHANGELOG.md
                     package_name=${package#'packages/'}
                     package_name="@wordpress/${package_name%'/'}"
-                    if [ -n "$version_bump" ] && \\
-                       [ ${{ github.event.inputs.release_type }} != 'next' ] && \\
-                       [ "$minimum_version_bump" !== 'patch' ]
+                    if [ -n "$version_bump" ] && \
+                       [ '${{ github.event.inputs.release_type }}' != 'next' ] && \
+                       [ "$minimum_version_bump" != 'patch' ]
                     then
                         case "$production_package_names" in
                           *"'$package_name'"*)
