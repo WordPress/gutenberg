@@ -89,7 +89,7 @@ jobs:
             - name: Update package versions
               run: |
                   PUBLIC_PACKAGES=$(ls -d packages/*/ | xargs -I{} sh -c "jq -e '.private != true' '{}'/package.json >/dev/null && test -f '{}'CHANGELOG.md && echo '{}'")
-                  PRODUCTION_PACKAGE_NAMES=$(jq '.dependencies' package.json )
+                  production_package_names=$(jq '.dependencies | keys | @sh' package.json)
                   minimum_version_bump='patch'
                   while IFS= read -r package; do
                     changes_detected=false
@@ -121,5 +121,14 @@ jobs:
                     done < "$package"CHANGELOG.md
                     package_name=${package#'packages/'}
                     package_name="@wordpress/${package_name%'/'}"
+                    if [ -n "$version_bump" ] && \\
+                       [ ${{ github.event.inputs.release_type }} != 'next' ] && \\
+                       [ "$minimum_version_bump" !== 'patch' ]
+                    then
+                        case "$production_package_names" in
+                          *"'$package_name'"*)
+                            version_bump="$minimum_version_bump"
+                        esac
+                    fi
                     package_version=$(jq --raw-output '.version' "$package"package.json)
                   done <<< $PUBLIC_PACKAGES
