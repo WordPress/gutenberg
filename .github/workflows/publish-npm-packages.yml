@@ -106,16 +106,16 @@ jobs:
                           break
                           ;;
                         '### Breaking Change'*)
-                          version_jump=major
+                          version_bump=major
                           break
                           ;;
                         '### Deprecation'*|'### Enhancement'*|'### New API'*|'### New Feature'*)
-                          version_jump=minor
+                          version_bump=minor
                           continue
                           ;;
                         '### '*|*-*)
-                          if [[ "$version_jump" != 'minor' ]]; then
-                            version_jump="$minimum_version_jump"
+                          if [[ "$version_bump" != 'minor' ]]; then
+                            version_bump="$minimum_version_jump"
                           fi
                       esac
                     done < "$package"CHANGELOG.md
