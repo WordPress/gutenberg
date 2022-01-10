@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map, some } from 'lodash';
+import { map, some, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -97,11 +97,8 @@ function runV2Migration( attributes ) {
 
 	return [
 		{
-			caption: attributes.caption,
-			columns: attributes.columns,
-			imageCrop: attributes.imageCrop,
+			...omit( attributes, [ 'images', 'ids' ] ),
 			linkTo,
-			sizeSlug: attributes.sizeSlug,
 			allowResize: false,
 		},
 		imageBlocks,
