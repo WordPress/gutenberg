@@ -10,13 +10,27 @@ import { CustomSelectControl } from '@wordpress/components';
 describe( 'CustomSelectControl', () => {
 	it( 'Captures the keypress event and does not let it propagate', () => {
 		const onKeyDown = jest.fn();
+		const options = [
+			{
+				key: 'one',
+				name: 'Option one',
+			},
+			{
+				key: 'two',
+				name: 'Option two',
+			},
+			{
+				key: 'three',
+				name: 'Option three',
+			},
+		];
 		const wrapper = (
 			<div
 				// This role="none" is required to prevent an eslint warning about accessibility.
 				role="none"
 				onKeyDown={ onKeyDown }
 			>
-				<CustomSelectControl options={ [ 'a', 'b', 'c' ] } />
+				<CustomSelectControl options={ options } />
 			</div>
 		);
 		const { container } = render( wrapper );
