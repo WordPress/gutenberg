@@ -93,6 +93,8 @@ jobs:
                   minimum_version_bump='patch'
                   while IFS= read -r package; do
                     changes_detected=false
+                    version_bump=
+                    next_version=
                     while IFS= read -r line; do
                       if [[ "$line" = '## Unreleased' ]]; then
                         changes_detected=true
