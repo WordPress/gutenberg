@@ -109,7 +109,7 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	 *
 	 * See: https://core.trac.wordpress.org/ticket/46089
 	 */
-	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks', 'wp-dev-runtime' ), true ) ) {
+	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks', 'wp-dev-runtime', 'wp-dev-hot' ), true ) ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
 

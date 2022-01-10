@@ -135,17 +135,17 @@ function getEntries() {
 	return entry;
 }
 
-const workerOptions = {
-	// Only set the timeout to infinity in development mode to prevent it from hanging.
-	poolTimeout: mode !== 'production' ? Infinity : undefined,
-};
+// const workerOptions = {
+// 	// Only set the timeout to infinity in development mode to prevent it from hanging.
+// 	poolTimeout: mode !== 'production' ? Infinity : undefined,
+// };
 
-if ( mode !== 'production' ) {
-	threadLoader.warmup( workerOptions, [
-		require.resolve( 'babel-loader' ),
-		'@wordpress/babel-preset-default',
-	] );
-}
+// if ( mode !== 'production' ) {
+// 	threadLoader.warmup( workerOptions, [
+// 		require.resolve( 'babel-loader' ),
+// 		'@wordpress/babel-preset-default',
+// 	] );
+// }
 
 module.exports = {
 	mode,
@@ -192,20 +192,41 @@ module.exports = {
 						name: 'dev-runtime/index',
 				  }
 				: undefined,
-		// Bundle common dev runtime into `dev-runtime/index.min.js`.
-		// splitChunks:
-		// 	mode === 'development'
-		// 		? {
-		// 				cacheGroups: {
-		// 					devRuntime: {
-		// 						chunks: 'all',
-		// 						// Ensure the runtime of `@pmmmwh/react-refresh-webpack-plugin` is hoisted.
-		// 						minChunks: 10,
-		// 						name: 'dev-runtime/index',
-		// 					},
-		// 				},
-		// 		  }
-		// 		: undefined,
+		// Bundle HMR runtime into `dev-hot/index.min.js`.
+		splitChunks:
+			mode === 'development'
+				? {
+						cacheGroups: {
+							devRuntime: {
+								chunks: 'all',
+								enforce: true,
+								test: ( module, { moduleGraph } ) => {
+									let issuer = module;
+									do {
+										const issuerId = issuer.identifier();
+										if (
+											[
+												'react-refresh',
+												'webpack-dev-server',
+												'webpack/hot',
+											].some( ( hotModule ) =>
+												issuerId.includes( hotModule )
+											)
+										) {
+											return true;
+										}
+									} while (
+										( issuer = moduleGraph.getIssuer(
+											issuer
+										) )
+									);
+									return false;
+								},
+								name: 'dev-hot/index',
+							},
+						},
+				  }
+				: undefined,
 	},
 	module: {
 		rules: [
@@ -213,10 +234,10 @@ module.exports = {
 				test: /\.[tj]sx?$/,
 				exclude: /node_modules/,
 				use: [
-					{
-						loader: require.resolve( 'thread-loader' ),
-						options: workerOptions,
-					},
+					// {
+					// 	loader: require.resolve( 'thread-loader' ),
+					// 	options: workerOptions,
+					// },
 					{
 						loader: require.resolve( 'babel-loader' ),
 						options: {
@@ -317,12 +338,13 @@ module.exports = {
 				entryPoint,
 				entrypointExternalizedWpDeps
 			) {
-				// Add `wp-dev-runtime` to deps for every entry in development mode.
+				// Add `wp-dev-runtime` and `wp-dev-hot` to deps for every entry in development mode.
 				if ( mode === 'development' ) {
 					entrypointExternalizedWpDeps.add( 'wp-dev-runtime' );
+					entrypointExternalizedWpDeps.add( 'wp-dev-hot' );
 				}
 
-				// Add `pw-polyfill` to deps for every "package" entry.
+				// Add `wp-polyfill` to deps for every "package" entry.
 				if ( entryPoint.name.endsWith( '/index' ) ) {
 					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
 				}
