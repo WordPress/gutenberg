@@ -119,7 +119,7 @@ jobs:
                           fi
                       esac
                     done < "$package"CHANGELOG.md
-                    package_name=${my_package#'packages/'}
+                    package_name=${package#'packages/'}
                     package_name="@wordpress/${package_name%'/'}"
                     package_version=$(jq --raw-output '.version' "$package"package.json)
                   done <<< $PUBLIC_PACKAGES
