@@ -1,0 +1,44 @@
+.components-spinner--svg {
+	animation: 2s linear infinite both rotatesvg;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+@keyframes rotatesvg {
+	0% {
+		transform: rotateZ(0deg);
+	}
+	100% {
+		transform: rotateZ(360deg);
+	}
+}
+
+.components-spinner--circle {
+	animation: 1.4s ease-in-out infinite both rotatecircle;
+	fill: transparent;
+	stroke: currentColor;
+	stroke-dasharray: 185;
+	stroke-linecap: round;
+	stroke-width: 1.5px;
+	transform-origin: 50% 50%;
+}
+
+@keyframes rotatecircle {
+	0%,
+	25% {
+		stroke-dashoffset: 180;
+		transform: rotate(0);
+	}
+
+	50%,
+	75% {
+		stroke-dashoffset: 165;
+		transform: rotate(45deg);
+	}
+
+	100% {
+		stroke-dashoffset: 180;
+		transform: rotate(360deg);
+	}
+}
