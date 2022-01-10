@@ -89,7 +89,7 @@ jobs:
             - name: Update package versions
               run: |
                   PUBLIC_PACKAGES=$(ls -d packages/*/ | xargs -I{} sh -c "jq -e '.private != true' '{}'/package.json >/dev/null && test -f '{}'CHANGELOG.md && echo '{}'")
-                  PUBLIC_PACKAGE_NAMES=$(jq '.dependencies' package.json )
+                  PRODUCTION_PACKAGE_NAMES=$(jq '.dependencies' package.json )
                   minimum_version_bump='patch'
                   while IFS= read -r package; do
                     changes_detected=false
