@@ -144,3 +144,4 @@ jobs:
                       sed -i '' "s/## Unreleased/\n\n## ${next_version} ($(date +%F))/g" "$package"CHANGELOG.md
                     fi
                   done <<< $PUBLIC_PACKAGES
+                  git commit -am "Update changelog files"
