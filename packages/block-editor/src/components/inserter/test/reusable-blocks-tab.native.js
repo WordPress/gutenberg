@@ -56,7 +56,7 @@ describe( 'ReusableBlocksTab component', () => {
 			/>
 		);
 		reusableBlockItems.forEach( ( { title } ) => {
-			component.getByText( title );
+			expect( component.getByText( title ) ).toBeTruthy();
 		} );
 	} );
 } );

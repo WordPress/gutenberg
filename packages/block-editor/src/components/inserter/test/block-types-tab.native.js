@@ -59,7 +59,7 @@ describe( 'BlockTypesTab component', () => {
 		);
 
 		blockItems.forEach( ( item ) => {
-			component.getByText( item.title );
+			expect( component.getByText( item.title ) ).toBeTruthy();
 		} );
 	} );
 } );
