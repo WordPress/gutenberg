@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 12.3.2 =
+
+### Bug Fixes
+
+#### Block Library
+- Spacer: Fix unit settings filter. ([37774](https://github.com/WordPress/gutenberg/pull/37774))
+
+
+
+
+
 = 12.3.1 =
 
 
