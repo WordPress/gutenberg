@@ -82,7 +82,16 @@ export function getHrefAndDestination( image, destination ) {
 	return {};
 }
 
-function runV2Migration( attributes ) {
+function runV2Migration( attributes, versionAttributes ) {
+	// First see if the block has any custom attributes that
+	// need to be passed through.
+	const customAttributes = {};
+	for ( const key in attributes ) {
+		if ( ! versionAttributes.hasOwnProperty( key ) ) {
+			customAttributes[ key ] = attributes[ key ];
+		}
+	}
+
 	let linkTo = attributes.linkTo ? attributes.linkTo : 'none';
 
 	if ( linkTo === 'post' ) {
@@ -103,6 +112,7 @@ function runV2Migration( attributes ) {
 			linkTo,
 			sizeSlug: attributes.sizeSlug,
 			allowResize: false,
+			...customAttributes,
 		},
 		imageBlocks,
 	];
@@ -282,7 +292,7 @@ const v6 = {
 	},
 	migrate( attributes ) {
 		if ( isGalleryV2Enabled() ) {
-			return runV2Migration( attributes );
+			return runV2Migration( attributes, v6.attributes );
 		}
 
 		return attributes;
@@ -372,7 +382,7 @@ const v5 = {
 	},
 	migrate( attributes ) {
 		if ( isGalleryV2Enabled() ) {
-			return runV2Migration( attributes );
+			return runV2Migration( attributes, v5.attributes );
 		}
 
 		let linkTo = attributes.linkTo;
@@ -535,7 +545,7 @@ const v4 = {
 	},
 	migrate( attributes ) {
 		if ( isGalleryV2Enabled() ) {
-			return runV2Migration( attributes );
+			return runV2Migration( attributes, v4.attributes );
 		}
 
 		return {
@@ -741,7 +751,7 @@ const v3 = {
 	},
 	migrate( attributes ) {
 		if ( isGalleryV2Enabled() ) {
-			return runV2Migration( attributes );
+			return runV2Migration( attributes, v3.attributes );
 		}
 		return attributes;
 	},
@@ -810,7 +820,7 @@ const v2 = {
 	},
 	migrate( attributes ) {
 		if ( isGalleryV2Enabled() ) {
-			return runV2Migration( attributes );
+			return runV2Migration( attributes, v2.attributes );
 		}
 		return {
 			...attributes,
@@ -974,7 +984,7 @@ const v1 = {
 	},
 	migrate( attributes ) {
 		if ( isGalleryV2Enabled() ) {
-			return runV2Migration( attributes );
+			return runV2Migration( attributes, v1.attributes );
 		}
 
 		return attributes;
