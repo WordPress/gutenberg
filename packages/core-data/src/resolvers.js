@@ -455,3 +455,17 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles = () => async ( {
 		themeGlobalStyles
 	);
 };
+
+export const __experimentalGetCurrentThemeGlobalStylesVariations = () => async ( {
+	resolveSelect,
+	dispatch,
+} ) => {
+	const currentTheme = await resolveSelect.getCurrentTheme();
+	const variations = await apiFetch( {
+		path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
+	} );
+	await dispatch.__experimentalReceiveThemeGlobalStyleVariations(
+		currentTheme.stylesheet,
+		variations
+	);
+};

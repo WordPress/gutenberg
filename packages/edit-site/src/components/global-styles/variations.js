@@ -10,31 +10,30 @@ import { __experimentalVStack as VStack } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import {
-	mergeBaseAndUserConfigs,
-	parseUserGlobalStyles,
-} from './global-styles-provider';
+import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { GlobalStylesContext } from './context';
 import StylesPreview from './preview';
 
 function Variation( { variation } ) {
 	const { base, setUserConfig } = useContext( GlobalStylesContext );
-	const config = useMemo( () => {
-		return parseUserGlobalStyles( variation.content.raw );
-	}, [ variation.content.raw ] );
 	const context = useMemo( () => {
 		return {
-			user: config,
+			user: {
+				settings: variation.settings ?? {},
+				styles: variation.styles ?? {},
+			},
 			base,
-			merged: mergeBaseAndUserConfigs( base, config ),
+			merged: mergeBaseAndUserConfigs( base, variation ),
 			setUserConfig: () => {},
 		};
-	}, [ config, base ] );
+	}, [ variation, base ] );
 
 	const selectVariation = () => {
 		setUserConfig( () => {
-			return config;
+			return {
+				settings: variation.settings,
+				styles: variation.styles,
+			};
 		} );
 	};
 
@@ -47,25 +46,24 @@ function Variation( { variation } ) {
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>
-			<StylesPreview
-				role="button"
-				onClick={ selectVariation }
-				onKeyDown={ selectOnEnter }
-			/>
+			<VStack spacing={ 2 }>
+				<StylesPreview
+					role="button"
+					onClick={ selectVariation }
+					onKeyDown={ selectOnEnter }
+				/>
+				<h3>{ variation.name }</h3>
+			</VStack>
 		</GlobalStylesContext.Provider>
 	);
 }
 
 function Variations() {
-	const { variations, globalStylesId } = useSelect( ( select ) => {
-		const _globalStylesId = select( editSiteStore ).getSettings()
-			.__experimentalGlobalStylesUserEntityId;
+	const { variations } = useSelect( ( select ) => {
 		return {
-			variations: select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_global_styles'
-			),
-			globalStylesId: _globalStylesId,
+			variations: select(
+				coreStore
+			).__experimentalGetCurrentThemeGlobalStylesVariations(),
 		};
 	}, [] );
 
@@ -75,11 +73,9 @@ function Variations() {
 
 	return (
 		<VStack spacing={ 3 }>
-			{ variations
-				.filter( ( variation ) => variation.id !== globalStylesId )
-				.map( ( variation ) => (
-					<Variation key={ variation.id } variation={ variation } />
-				) ) }
+			{ variations.map( ( variation ) => (
+				<Variation key={ variation.id } variation={ variation } />
+			) ) }
 		</VStack>
 	);
 }
