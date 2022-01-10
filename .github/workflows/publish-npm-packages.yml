@@ -138,5 +138,9 @@ jobs:
                     fi
                     if [ -n "$next_version" ]; then
                       cat <<< $(jq --tab --arg version "${next_version}-prerelease" '.version = $version' "$package"package.json) > "$package"package.json
+                      if [ '${{ github.event.inputs.release_type }}' = 'next' ]; then
+                        next_version="${next_version}-next.0"
+                      fi
+                      sed -i '' "s/## Unreleased/\n\n## ${next_version} ($(date +%F))/g" "$package"CHANGELOG.md
                     fi
                   done <<< $PUBLIC_PACKAGES
