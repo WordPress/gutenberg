@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
+
 /**
  * WordPress dependencies
  */
@@ -24,7 +25,8 @@ describe( 'CustomSelectControl', () => {
 				name: 'Option three',
 			},
 		];
-		const wrapper = (
+
+		render(
 			<div
 				// This role="none" is required to prevent an eslint warning about accessibility.
 				role="none"
@@ -33,12 +35,12 @@ describe( 'CustomSelectControl', () => {
 				<CustomSelectControl options={ options } />
 			</div>
 		);
-		const { container } = render( wrapper );
-		fireEvent.keyDown(
-			container.getElementsByClassName(
-				'components-custom-select-control__menu'
-			)[ 0 ]
-		);
-		expect( onKeyDown.mock.calls.length ).toBe( 0 );
+		const toggleButton = screen.getByRole( 'button' );
+		fireEvent.click( toggleButton );
+
+		const customSelect = screen.getByRole( 'listbox' );
+		fireEvent.keyDown( customSelect );
+
+		expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
 	} );
 } );
