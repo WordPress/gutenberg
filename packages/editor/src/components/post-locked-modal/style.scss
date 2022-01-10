@@ -1,29 +1,16 @@
 .editor-post-locked-modal {
-	height: auto;
-	padding-right: 10px;
-	padding-left: 10px;
-	padding-top: 10px;
-	max-width: 480px;
-
-	.components-modal__header {
-		height: 36px;
-	}
-
-	.components-modal__content {
-		height: auto;
-	}
+	max-width: 400px;
 }
 
 .editor-post-locked-modal__buttons {
-	margin-top: 10px;
-
-	.components-button {
-		margin-right: 5px;
-	}
+	margin-top: $grid-unit-30;
+	display: flex;
+	justify-content: flex-end;
+	gap: $grid-unit-10;
 }
 
 .editor-post-locked-modal__avatar {
 	float: left;
-	margin: 5px;
-	margin-right: 15px;
+	margin: $grid-unit-10;
+	margin-right: $grid-unit-15;
 }

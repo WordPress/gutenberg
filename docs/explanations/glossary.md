@@ -38,7 +38,7 @@
 <dd>A type of block where the content of which may change and cannot be determined at the time of saving a post, instead calculated any time the post is shown on the front of a site. These blocks may save fallback content or no content at all in their JavaScript implementation, instead deferring to a PHP block implementation for runtime rendering.</dd>
 
 <dt>Full Site Editing </dt>
-<dd>This refers to a collection of features that ultimately allows users to edit their entire website using blocks as the starting point. This feature set includes everything from block patterns to global styles to templates to design tools for blocks (and more). Currently, it's still in an experimental phase.</dd>
+<dd>This refers to a collection of features that ultimately allows users to edit their entire website using blocks as the starting point. This feature set includes everything from block patterns to global styles to templates to design tools for blocks (and more). First released in WordPress 5.9.</dd>
 
 <dt>Inspector</dt>
 <dd>Deprecated term. See <a href="#settings-sidebar">Settings Sidebar.</a></dd>
