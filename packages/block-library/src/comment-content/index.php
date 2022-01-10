@@ -33,7 +33,7 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => esc_attr( $classes ) ) );
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
