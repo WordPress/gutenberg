@@ -90,7 +90,7 @@ jobs:
               run: |
                   PUBLIC_PACKAGES=$(ls -d packages/*/ | xargs -I{} sh -c "jq -e '.private != true' '{}'/package.json >/dev/null && test -f '{}'CHANGELOG.md && echo '{}'")
                   PUBLIC_PACKAGE_NAMES=$(jq '.dependencies' package.json )
-                  minimum_version_jump='patch'
+                  minimum_version_bump='patch'
                   while IFS= read -r package; do
                     changes_detected=false
                     while IFS= read -r line; do
@@ -115,7 +115,7 @@ jobs:
                           ;;
                         '### '*|*-*)
                           if [[ "$version_bump" != 'minor' ]]; then
-                            version_bump="$minimum_version_jump"
+                            version_bump="$minimum_version_bump"
                           fi
                       esac
                     done < "$package"CHANGELOG.md
