@@ -13,8 +13,8 @@ describe( 'CustomSelectControl', () => {
 	it( 'Captures the keypress event and does not let it propagate', () => {
 		const wrapper = (
 			<div
+				// This role="none" is required to prevent an eslint warning about accessibility.
 				role="none"
-				className="test-class-name"
 				onKeyDown={ onKeyDown }
 			>
 				<CustomSelectControl options={ [ 'a', 'b', 'c' ] } />
