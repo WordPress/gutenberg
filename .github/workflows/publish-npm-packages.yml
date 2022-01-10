@@ -136,4 +136,7 @@ jobs:
                     if [ -n "$version_bump" ]; then
                       next_version=$(npx semver "$version" -i "$version_bump")
                     fi
+                    if [ -n "$next_version" ]; then
+                      cat <<< $(jq --tab --arg version "${next_version}-prerelease" '.version = $version' "$package"package.json) > "$package"package.json
+                    fi
                   done <<< $PUBLIC_PACKAGES
