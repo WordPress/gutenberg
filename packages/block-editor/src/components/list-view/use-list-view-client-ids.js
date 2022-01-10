@@ -16,18 +16,12 @@ export default function useListViewClientIds( blocks ) {
 				getDraggedBlockClientIds,
 				getSelectedBlockClientIds,
 				__unstableGetClientIdsTree,
-				getBlockParents,
 			} = select( blockEditorStore );
-			const selectedBlockClientIds = getSelectedBlockClientIds();
 
 			return {
 				selectedClientIds: getSelectedBlockClientIds(),
 				draggedClientIds: getDraggedBlockClientIds(),
 				clientIdsTree: blocks ? blocks : __unstableGetClientIdsTree(),
-				selectedBlockParentClientIds: getBlockParents(
-					selectedBlockClientIds[ 0 ],
-					false
-				),
 			};
 		},
 		[ blocks ]
