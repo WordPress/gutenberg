@@ -145,3 +145,4 @@ jobs:
                     fi
                   done <<< $PUBLIC_PACKAGES
                   git commit -am "Update changelog files"
+                  git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
