@@ -130,5 +130,8 @@ jobs:
                             version_bump="$minimum_version_bump"
                         esac
                     fi
-                    package_version=$(jq --raw-output '.version' "$package"package.json)
+                    version=$(jq --raw-output '.version' "$package"package.json)
+                    if [ -n "$version_bump" ]; then
+                      next_version=$(npx semver "$version" -i "$version_bump")
+                    fi
                   done <<< $PUBLIC_PACKAGES
