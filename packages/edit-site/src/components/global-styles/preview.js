@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -22,13 +27,20 @@ const StylesPreview = ( props ) => {
 
 	return (
 		<Card
-			className="edit-site-global-styles-preview"
+			{ ...props }
 			style={ {
 				background: gradientValue ?? backgroundColor,
+				...props.style,
 			} }
-			{ ...props }
+			className={ classnames(
+				'edit-site-global-styles-preview',
+				props.className
+			) }
 		>
-			<HStack spacing={ 5 }>
+			<HStack
+				spacing={ 5 }
+				className="edit-site-global-styles-preview__content"
+			>
 				<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
 				<VStack spacing={ 2 }>
 					<ColorIndicator colorValue={ textColor } />

@@ -10,10 +10,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	// The VStack component is reset the min-height, so we need important here.
-	min-height: 152px !important;
 	line-height: 1;
 	cursor: pointer;
+}
+
+.edit-site-global-styles-preview__content {
+	min-height: 152px;
 }
 
 .edit-site-typography-panel__preview {
@@ -74,4 +76,8 @@
 .edit-site-screen-link-color__control,
 .edit-site-screen-background-color__control {
 	padding: $grid-unit-20;
+}
+
+.edit-site-global-styles-variations_item.edit-site-global-styles-preview {
+	zoom: 0.6;
 }

@@ -5,7 +5,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useContext } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	__experimentalGrid as Grid,
+	Card,
+	CardBody,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -13,6 +18,7 @@ import { __experimentalVStack as VStack } from '@wordpress/components';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { GlobalStylesContext } from './context';
 import StylesPreview from './preview';
+import ScreenHeader from './header';
 
 function Variation( { variation } ) {
 	const { base, setUserConfig } = useContext( GlobalStylesContext );
@@ -46,19 +52,17 @@ function Variation( { variation } ) {
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>
-			<VStack spacing={ 2 }>
-				<StylesPreview
-					role="button"
-					onClick={ selectVariation }
-					onKeyDown={ selectOnEnter }
-				/>
-				<h3>{ variation.name }</h3>
-			</VStack>
+			<StylesPreview
+				className="edit-site-global-styles-variations_item"
+				role="button"
+				onClick={ selectVariation }
+				onKeyDown={ selectOnEnter }
+			/>
 		</GlobalStylesContext.Provider>
 	);
 }
 
-function Variations() {
+function ScreenStyleVariations() {
 	const { variations } = useSelect( ( select ) => {
 		return {
 			variations: select(
@@ -67,17 +71,27 @@ function Variations() {
 		};
 	}, [] );
 
-	if ( ! variations?.length ) {
-		return 'loading...';
-	}
-
 	return (
-		<VStack spacing={ 3 }>
-			{ variations.map( ( variation ) => (
-				<Variation key={ variation.id } variation={ variation } />
-			) ) }
-		</VStack>
+		<>
+			<ScreenHeader
+				back="/"
+				title={ __( 'Other styles' ) }
+				description={ __(
+					'Choose a different style combination for the theme styles'
+				) }
+			/>
+
+			<Card size="small" isBorderless>
+				<CardBody>
+					<Grid columns={ 2 }>
+						{ variations?.map( ( variation, index ) => (
+							<Variation key={ index } variation={ variation } />
+						) ) }
+					</Grid>
+				</CardBody>
+			</Card>
+		</>
 	);
 }
 
-export default Variations;
+export default ScreenStyleVariations;
