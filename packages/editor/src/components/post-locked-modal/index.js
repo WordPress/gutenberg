@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Modal, Button } from '@wordpress/components';
+import { Modal, Button, Flex, FlexItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import { useEffect } from '@wordpress/element';
@@ -218,15 +218,25 @@ export default function PostLockedModal() {
 							  ) }
 					</p>
 
-					<div className="editor-post-locked-modal__buttons">
-						<PostPreviewButton />
-						<Button variant="tertiary" href={ unlockUrl }>
-							{ __( 'Take over' ) }
-						</Button>
-						<Button variant="primary" href={ allPostsUrl }>
-							{ allPostsLabel }
-						</Button>
-					</div>
+					<Flex
+						className="editor-post-locked-modal__buttons"
+						justify="flex-end"
+						expanded={ false }
+					>
+						<FlexItem>
+							<PostPreviewButton />
+						</FlexItem>
+						<FlexItem>
+							<Button variant="tertiary" href={ unlockUrl }>
+								{ __( 'Take over' ) }
+							</Button>
+						</FlexItem>
+						<FlexItem>
+							<Button variant="primary" href={ allPostsUrl }>
+								{ allPostsLabel }
+							</Button>
+						</FlexItem>
+					</Flex>
 				</div>
 			) }
 		</Modal>
