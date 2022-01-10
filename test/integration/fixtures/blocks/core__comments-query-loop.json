@@ -4,9 +4,10 @@
 		"name": "core/comments-query-loop",
 		"isValid": true,
 		"attributes": {
+			"inherit": true,
+			"order": "desc",
 			"perPage": 2,
-			"tagName": "div",
-			"order": "desc"
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

@@ -41,14 +41,11 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 	} );
 
 	useEffect( () => {
-		if ( inherit ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { order: null, perPage: null } );
-		} else {
-			// We initialize the attributes from the settings.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { order: commentOrder, perPage: commentsPerPage } );
-		}
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			order: commentOrder,
+			perPage: commentsPerPage,
+		} );
 	}, [ inherit ] );
 
 	return (
