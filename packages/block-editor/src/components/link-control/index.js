@@ -132,6 +132,7 @@ function LinkControl( {
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
+	const isEndingEditWithFocus = useRef( false );
 
 	const [ internalInputValue, setInternalInputValue ] = useState(
 		value?.url || ''
@@ -139,15 +140,12 @@ function LinkControl( {
 	const [ internalTextValue, setInternalTextValue ] = useState(
 		value?.title || ''
 	);
-	const currentInputValue = propInputValue || internalInputValue;
+
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
 			: ! value || ! value.url
 	);
-	const isEndingEditWithFocus = useRef( false );
-
-	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
 	const { createPage, isCreatingPage, errorMessage } =
 		useCreatePage( createSuggestion );
@@ -253,6 +251,10 @@ function LinkControl( {
 			handleSubmit();
 		}
 	};
+
+	const currentInputValue = propInputValue || internalInputValue;
+
+	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
