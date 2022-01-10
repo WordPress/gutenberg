@@ -32,13 +32,13 @@ function render_block_core_comment_edit_link( $attributes, $content, $block ) {
 		$classes .= 'has-text-align-' . esc_attr( $attributes['textAlign'] );
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => esc_attr( $classes ) ) );
 
 	return sprintf(
 		'<div %1$s><a href="%2$s" %3$s>%4$s</a></div>',
 		$wrapper_attributes,
 		esc_url( $edit_comment_link ),
-		$link_atts,
+		esc_attr( $link_atts ),
 		esc_html__( 'Edit' )
 	);
 }
