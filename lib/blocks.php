@@ -605,10 +605,9 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 		 * @param string $content When the callback is used for the render_block filter,
 		 *                        the content needs to be returned so the function parameter
 		 *                        is to ensure the content exists.
-		 *
-		 * @return string
+		 * @return string Block content.
 		 */
-		$callback = function( $content ) use ( $args ) {
+		$callback = static function( $content ) use ( $args ) {
 			// Register the stylesheet.
 			if ( ! empty( $args['src'] ) ) {
 				wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
