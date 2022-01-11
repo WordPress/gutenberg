@@ -1,5 +1,7 @@
 .editor-post-locked-modal {
-	max-width: 400px;
+	@include break-small() {
+		max-width: $break-mobile;
+	}
 }
 
 .editor-post-locked-modal__buttons {
