@@ -13,7 +13,7 @@ import {
 	JustifyContentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
@@ -35,11 +35,17 @@ export default function ButtonsEdit( {
 	isSelected,
 	setAttributes,
 	blockWidth,
+	name,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const { marginLeft: spacing } = styles.spacing;
-	const { justifyContent } = layout || {};
+
+	// Extract attributes from block layout
+	const layoutBlockSupport = getBlockSupport( name, '__experimentalLayout' );
+	const defaultBlockLayout = layoutBlockSupport?.default;
+	const usedLayout = layout || defaultBlockLayout || {};
+	const { justifyContent } = usedLayout;
 
 	const { isInnerButtonSelected, shouldDelete } = useSelect(
 		( select ) => {
@@ -130,7 +136,10 @@ export default function ButtonsEdit( {
 						value={ justifyContent }
 						onChange={ ( value ) =>
 							setAttributes( {
-								layout: { ...layout, justifyContent: value },
+								layout: {
+									...usedLayout,
+									justifyContent: value,
+								},
 							} )
 						}
 						popoverProps={ {
