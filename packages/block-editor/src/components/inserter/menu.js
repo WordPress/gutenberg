@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import {
+	forwardRef,
+	useState,
+	useCallback,
+	useMemo,
+	useImperativeHandle,
+	useRef,
+} from '@wordpress/element';
 import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -19,17 +26,20 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
 
-function InserterMenu( {
-	rootClientId,
-	clientId,
-	isAppender,
-	__experimentalInsertionIndex,
-	onSelect,
-	showInserterHelpPanel,
-	showMostUsedBlocks,
-	__experimentalFilterValue = '',
-	shouldFocusBlock = true,
-} ) {
+function InserterMenu(
+	{
+		rootClientId,
+		clientId,
+		isAppender,
+		__experimentalInsertionIndex,
+		onSelect,
+		showInserterHelpPanel,
+		showMostUsedBlocks,
+		__experimentalFilterValue = '',
+		shouldFocusBlock = true,
+	},
+	ref
+) {
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
 	);
@@ -168,6 +178,13 @@ function InserterMenu( {
 		[ blocksTab, patternsTab, reusableBlocksTab ]
 	);
 
+	const searchRef = useRef();
+	useImperativeHandle( ref, () => ( {
+		focusSearch: () => {
+			searchRef.current.focus();
+		},
+	} ) );
+
 	return (
 		<div className="block-editor-inserter__menu">
 			<div className="block-editor-inserter__main-area">
@@ -182,6 +199,7 @@ function InserterMenu( {
 						value={ filterValue }
 						label={ __( 'Search for blocks and patterns' ) }
 						placeholder={ __( 'Search' ) }
+						ref={ searchRef }
 					/>
 					{ !! filterValue && (
 						<InserterSearchResults
@@ -219,4 +237,4 @@ function InserterMenu( {
 	);
 }
 
-export default InserterMenu;
+export default forwardRef( InserterMenu );

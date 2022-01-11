@@ -36,11 +36,9 @@ export default function InserterSidebar() {
 		focusOnMount: null,
 	} );
 
-	const inserterContentRef = useRef();
+	const libraryRef = useRef();
 	useEffect( () => {
-		inserterContentRef.current
-			.querySelector( '.block-editor-inserter__search input' )
-			.focus();
+		libraryRef.current.focusSearch();
 	}, [] );
 
 	return (
@@ -56,10 +54,7 @@ export default function InserterSidebar() {
 					onClick={ () => setIsInserterOpened( false ) }
 				/>
 			</TagName>
-			<div
-				className="edit-post-editor__inserter-panel-content"
-				ref={ inserterContentRef }
-			>
+			<div className="edit-post-editor__inserter-panel-content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel
@@ -69,6 +64,7 @@ export default function InserterSidebar() {
 						insertionPoint.insertionIndex
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
+					ref={ libraryRef }
 				/>
 			</div>
 		</div>
