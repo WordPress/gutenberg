@@ -30,7 +30,7 @@ const ALLOWED_BLOCKS = [ buttonBlockName ];
 const layoutProp = { type: 'default', alignments: [] };
 
 export default function ButtonsEdit( {
-	attributes: { contentJustification, align },
+	attributes: { layout, align },
 	clientId,
 	isSelected,
 	setAttributes,
@@ -39,6 +39,7 @@ export default function ButtonsEdit( {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const { marginLeft: spacing } = styles.spacing;
+	const { justifyContent } = layout || {};
 
 	const { isInnerButtonSelected, shouldDelete } = useSelect(
 		( select ) => {
@@ -126,9 +127,11 @@ export default function ButtonsEdit( {
 				<BlockControls group="block">
 					<JustifyContentControl
 						allowedControls={ justifyControls }
-						value={ contentJustification }
+						value={ justifyContent }
 						onChange={ ( value ) =>
-							setAttributes( { contentJustification: value } )
+							setAttributes( {
+								layout: { ...layout, justifyContent: value },
+							} )
 						}
 						popoverProps={ {
 							position: 'bottom right',
@@ -154,7 +157,7 @@ export default function ButtonsEdit( {
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}
 				orientation="horizontal"
-				horizontalAlignment={ contentJustification }
+				horizontalAlignment={ justifyContent }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
 				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
