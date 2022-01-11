@@ -28,7 +28,7 @@
 function wp_latest_comments_draft_or_post_title( $post = 0 ) {
 	$title = get_the_title( $post );
 	if ( empty( $title ) ) {
-		$title = __( '(no title)' );
+		$title = esc_html__( '(no title)' );
 	}
 	return esc_html( $title );
 }
@@ -61,7 +61,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 		_prime_post_caches( $post_ids, strpos( get_option( 'permalink_structure' ), '%category%' ), false );
 
 		foreach ( $comments as $comment ) {
-			$list_items_markup .= '<li class="wp-block-latest-comments__comment">';
+			$list_items_markup .= '<li class="' . esc_attr( 'wp-block-latest-comments__comment' ) . '">';
 			if ( $attributes['displayAvatar'] ) {
 				$avatar = get_avatar(
 					$comment,
@@ -69,7 +69,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 					'',
 					'',
 					array(
-						'class' => 'wp-block-latest-comments__comment-avatar',
+						'class' => esc_attr( 'wp-block-latest-comments__comment-avatar' ),
 					)
 				);
 				if ( $avatar ) {
@@ -106,7 +106,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 				$list_items_markup .= sprintf(
 					'<time datetime="%1$s" class="wp-block-latest-comments__comment-date">%2$s</time>',
 					esc_attr( get_comment_date( 'c', $comment ) ),
-					date_i18n( get_option( 'date_format' ), get_comment_date( 'U', $comment ) )
+					esc_html( date_i18n( get_option( 'date_format' ), get_comment_date( 'U', $comment ) ) )
 				);
 			}
 			$list_items_markup .= '</footer>';
@@ -130,7 +130,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	if ( empty( $comments ) ) {
 		$classnames[] = 'no-comments';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => esc_attr( implode( ' ', $classnames ) ) ) );
 
 	return ! empty( $comments ) ? sprintf(
 		'<ol %1$s>%2$s</ol>',
@@ -139,7 +139,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	) : sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		__( 'No comments to show.' )
+		esc_html__( 'No comments to show.' )
 	);
 }
 
