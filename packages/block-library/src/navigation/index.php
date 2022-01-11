@@ -478,7 +478,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
 		$is_responsive_menu ? array( 'is-responsive' ) : array(),
-		$layout_class ? array( $layout_class ) : array(),
+		$layout_class ? array( esc_attr( $layout_class ) ) : array(),
 		$is_fallback ? array( 'is-fallback' ) : array()
 	);
 
@@ -508,8 +508,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => implode( ' ', $classes ),
-			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'class' => esc_attr( implode( ' ', $classes ) ),
+			'style' => esc_attr( $block_styles ) . esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ),
 		)
 	);
 
@@ -549,14 +549,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 					</div>
 				</div>
 			</div>',
-		$modal_unique_id,
+		esc_attr( $modal_unique_id ),
 		$inner_blocks_html,
-		__( 'Open menu' ), // Open button label.
-		__( 'Close menu' ), // Close button label.
-		implode( ' ', $responsive_container_classes ),
-		implode( ' ', $open_button_classes ),
-		$colors['overlay_inline_styles'],
-		__( 'Menu' )
+		esc_html__( 'Open menu' ), // Open button label.
+		esc_html__( 'Close menu' ), // Close button label.
+		esc_attr( implode( ' ', $responsive_container_classes ) ),
+		esc_attr( implode( ' ', $open_button_classes ) ),
+		esc_attr( $colors['overlay_inline_styles'] ),
+		esc_html__( 'Menu' )
 	);
 
 	return sprintf(
