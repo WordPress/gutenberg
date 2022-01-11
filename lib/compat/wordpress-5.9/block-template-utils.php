@@ -114,7 +114,7 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'home'           => array(
 				'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays as the site\'s home page, or as the Posts page when a static home page it set.', 'gutenberg' ),
+				'description' => __( 'Displays as the site\'s home page, or as the Posts page when a static home page isn\'t set.', 'gutenberg' ),
 			),
 			'front-page'     => array(
 				'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
