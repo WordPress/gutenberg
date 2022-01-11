@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Refine `ExternalLink` to be same size as the text, to appear more as a glyph than an icon.
+-   Refine `ExternalLink` to be same size as the text, to appear more as a glyph than an icon. ([#37859](https://github.com/WordPress/gutenberg/pull/37859))
 
 ### Bug Fix
 
