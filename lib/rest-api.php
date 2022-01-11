@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function slug_add_post_data() {
 	register_rest_field( 'type',
-		'default_content',
+		'default_context',
 		array(
 			'get_callback'    => function ( $request ) {
 				$obj = get_post_type_object( $request['slug'] );
@@ -33,7 +33,7 @@ function slug_add_post_data() {
 	);
 
 	register_rest_field( 'taxonomy',
-		'default_content',
+		'default_context',
 		array(
 			'get_callback'    => function ( $request ) {
 				$obj = get_taxonomy( $request['slug'] );

@@ -211,7 +211,7 @@ async function loadPostTypeEntities() {
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
-		const context = postType?.default_content ?? 'edit';
+		const context = postType?.default_context ?? 'edit';
 		return {
 			kind: 'postType',
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
@@ -245,7 +245,7 @@ async function loadTaxonomyEntities() {
 	} );
 	return map( taxonomies, ( taxonomy, name ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
-		const context = taxonomy?.default_content ?? 'edit';
+		const context = taxonomy?.default_context ?? 'edit';
 		return {
 			kind: 'taxonomy',
 			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
