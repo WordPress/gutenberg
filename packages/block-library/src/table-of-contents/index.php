@@ -279,7 +279,7 @@ function block_core_table_of_contents_render_list(
 				$child_node['children']
 					? block_core_table_of_contents_render_list(
 						$child_node['children'],
-						$page_url
+						esc_url( $page_url )
 					)
 					: null
 			);
