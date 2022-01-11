@@ -12,7 +12,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import WebPreformattedEdit from './edit.js';
 import styles from './styles.scss';
 
-export function PreformattedEdit( props ) {
+export default function PreformattedEdit( props ) {
 	const { style } = props;
 
 	const textBaseStyle = usePreferredColorSchemeStyle(
@@ -48,5 +48,3 @@ export function PreformattedEdit( props ) {
 		</View>
 	);
 }
-
-export default PreformattedEdit;

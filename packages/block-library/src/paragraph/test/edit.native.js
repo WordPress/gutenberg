@@ -1,24 +1,15 @@
 /**
  * External dependencies
  */
-import { shallow } from 'test/helpers';
+import { render } from 'test/helpers';
 
 /**
  * Internal dependencies
  */
 import Paragraph from '../edit';
 
-/**
- * WordPress dependencies
- */
-jest.mock( '@wordpress/blocks' );
-jest.mock( '../../../../data/src/components/use-select', () => () => ( {
-	attributes: () => {},
-	settingsColors: [],
-} ) );
-
 const getTestComponentWithContent = ( content ) => {
-	return shallow(
+	return render(
 		<Paragraph
 			attributes={ { content } }
 			setAttributes={ jest.fn() }
@@ -30,7 +21,7 @@ const getTestComponentWithContent = ( content ) => {
 
 describe( 'Paragraph block', () => {
 	it( 'renders without crashing', () => {
-		const component = getTestComponentWithContent( '' );
-		expect( component ).toBeTruthy();
+		const screen = getTestComponentWithContent( '' );
+		expect( screen.container ).toBeTruthy();
 	} );
 } );
