@@ -10,6 +10,7 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,6 +36,11 @@ export default function InserterSidebar() {
 		focusOnMount: null,
 	} );
 
+	const libraryRef = useRef();
+	useEffect( () => {
+		libraryRef.current.focusSearch();
+	} );
+
 	return (
 		<div
 			ref={ inserterDialogRef }
@@ -58,7 +64,7 @@ export default function InserterSidebar() {
 						insertionPoint.insertionIndex
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
-					shouldFocusSearch="true"
+					ref={ libraryRef }
 				/>
 			</div>
 		</div>

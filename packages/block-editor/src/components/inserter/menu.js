@@ -179,15 +179,11 @@ function InserterMenu(
 	);
 
 	const searchRef = useRef();
-	useImperativeHandle(
-		ref,
-		() => ( {
-			searchFocus: () => {
-				searchRef.current.focus();
-			},
-		} ),
-		[]
-	);
+	useImperativeHandle( ref, () => ( {
+		focusSearch: () => {
+			searchRef.current.focus();
+		},
+	} ) );
 
 	return (
 		<div className="block-editor-inserter__menu">

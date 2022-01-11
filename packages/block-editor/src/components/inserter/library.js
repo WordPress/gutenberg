@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,18 +15,20 @@ import { useEffect, useRef } from '@wordpress/element';
 import InserterMenu from './menu';
 import { store as blockEditorStore } from '../../store';
 
-function InserterLibrary( {
-	rootClientId,
-	clientId,
-	isAppender,
-	showInserterHelpPanel,
-	showMostUsedBlocks = false,
-	__experimentalInsertionIndex,
-	__experimentalFilterValue,
-	onSelect = noop,
-	shouldFocusBlock = false,
-	shouldFocusSearch = false,
-} ) {
+function InserterLibrary(
+	{
+		rootClientId,
+		clientId,
+		isAppender,
+		showInserterHelpPanel,
+		showMostUsedBlocks = false,
+		__experimentalInsertionIndex,
+		__experimentalFilterValue,
+		onSelect = noop,
+		shouldFocusBlock = false,
+	},
+	ref
+) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
 			const { getBlockRootClientId } = select( blockEditorStore );
@@ -37,14 +39,6 @@ function InserterLibrary( {
 		},
 		[ clientId, rootClientId ]
 	);
-
-	const inserterRef = useRef();
-	useEffect( () => {
-		if ( ! shouldFocusSearch ) {
-			return;
-		}
-		inserterRef.current.searchFocus();
-	}, [ shouldFocusSearch ] );
 
 	return (
 		<InserterMenu
@@ -57,9 +51,9 @@ function InserterLibrary( {
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
 			shouldFocusBlock={ shouldFocusBlock }
-			ref={ inserterRef }
+			ref={ ref }
 		/>
 	);
 }
 
-export default InserterLibrary;
+export default forwardRef( InserterLibrary );
