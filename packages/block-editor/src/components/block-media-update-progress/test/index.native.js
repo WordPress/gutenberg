@@ -327,7 +327,6 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		sendMediaSave( payloadSuccess );
 
 		expect( wrapper.queryByTestId( 'spinner' ) ).toBeNull();
-
 		expect( onFinishMediaSaveWithSuccess ).toHaveBeenCalledTimes( 1 );
 		expect( onFinishMediaSaveWithSuccess ).toHaveBeenCalledWith(
 			payloadSuccess
@@ -487,6 +486,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		sendMediaSave( payloadSuccess );
 
+		expect( wrapper.queryByTestId( 'spinner' ) ).toBeNull();
 		expect( renderContentMock ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				isSaveFailed: false,
@@ -528,6 +528,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		sendMediaSave( payloadMediaIdChange );
 
+		expect( wrapper.queryByTestId( 'spinner' ) ).toBeNull();
 		expect( renderContentMock ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				isSaveFailed: false,
