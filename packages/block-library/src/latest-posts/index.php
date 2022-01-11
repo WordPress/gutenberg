@@ -92,22 +92,22 @@ function render_block_core_latest_posts( $attributes ) {
 			if ( $attributes['addLinkToFeaturedImage'] ) {
 				$featured_image = sprintf(
 					'<a href="%1$s" aria-label="%2$s">%3$s</a>',
-					$post_link,
-					$title,
-					$featured_image
+					esc_url( $post_link ),
+					esc_attr( $title ),
+					esc_html( $featured_image )
 				);
 			}
 			$list_items_markup .= sprintf(
 				'<div class="%1$s">%2$s</div>',
-				$image_classes,
+				esc_attr( $image_classes ),
 				$featured_image
 			);
 		}
 
 		$list_items_markup .= sprintf(
 			'<a href="%1$s">%2$s</a>',
-			$post_link,
-			$title
+			esc_url( $post_link ),
+			esc_html( $title )
 		);
 
 		if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
@@ -143,7 +143,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-excerpt">%1$s</div>',
-				$trimmed_excerpt
+				esc_html( $trimmed_excerpt )
 			);
 		}
 
@@ -158,7 +158,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
-				$post_content
+				esc_html( $post_content )
 			);
 		}
 
@@ -185,7 +185,7 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' has-author';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => esc_attr( $class ) ) );
 
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
