@@ -7,7 +7,6 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import * as React from '@wordpress/element';
 import {
 	subscribeParentGetHtml,
 	provideToNative_Html as provideToNativeHtml,
