@@ -22,7 +22,7 @@ const TEMPLATE = [
 ];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
-	const { tagName: TagName, inherit } = attributes;
+	const { tagName: TagName, inherit, perPage, order } = attributes;
 
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -42,10 +42,12 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			order: commentOrder,
-			perPage: commentsPerPage,
-		} );
+		if ( order === null ) {
+			setAttributes( { order: commentOrder } );
+		}
+		if ( perPage === null ) {
+			setAttributes( { perPage: commentsPerPage } );
+		}
 	}, [ inherit ] );
 
 	return (
