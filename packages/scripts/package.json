@@ -51,6 +51,7 @@
 		"chalk": "^4.0.0",
 		"check-node-version": "^4.1.0",
 		"clean-webpack-plugin": "^3.0.0",
+		"copy-webpack-plugin": "^10.2.0",
 		"cross-spawn": "^5.1.0",
 		"css-loader": "^6.2.0",
 		"cssnano": "^5.0.7",
