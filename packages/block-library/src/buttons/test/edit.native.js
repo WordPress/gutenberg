@@ -79,4 +79,37 @@ describe( 'Buttons block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 	} );
+
+	describe( 'justify content', () => {
+		[
+			'Justify items left',
+			'Justify items center',
+			'Justify items right',
+		].forEach( ( justificationOption ) =>
+			it( `sets ${ justificationOption } option`, async () => {
+				const initialHtml = `<!-- wp:buttons -->
+				<div class="wp-block-buttons"><!-- wp:button /--></div>
+				<!-- /wp:buttons -->`;
+				const { getByA11yLabel, getByText } = await initializeEditor( {
+					initialHtml,
+				} );
+
+				const block = await waitFor( () =>
+					getByA11yLabel( /Buttons Block\. Row 1/ )
+				);
+				fireEvent.press( block );
+
+				fireEvent.press(
+					getByA11yLabel( 'Change items justification' )
+				);
+
+				// Select alignment option
+				fireEvent.press(
+					await waitFor( () => getByText( justificationOption ) )
+				);
+
+				expect( getEditorHtml() ).toMatchSnapshot();
+			} )
+		);
+	} );
 } );
