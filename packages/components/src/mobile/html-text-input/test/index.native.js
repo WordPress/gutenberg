@@ -8,19 +8,14 @@ import { shallow, render, fireEvent } from 'test/helpers';
  */
 import { HTMLTextInput } from '..';
 
-// Utility to find a TextInput in a ShallowWrapper
-const findTextInputInWrapper = ( wrapper, accessibilityLabel ) => {
-	return wrapper.getByA11yLabel( accessibilityLabel );
-};
-
 // Finds the Content TextInput in our HTMLInputView
 const findContentTextInput = ( wrapper ) => {
-	return findTextInputInWrapper( wrapper, 'html-view-content' );
+	return wrapper.getByA11yLabel( 'html-view-content' );
 };
 
 // Finds the Title TextInput in our HTMLInputView
 const findTitleTextInput = ( wrapper ) => {
-	return findTextInputInWrapper( wrapper, 'html-view-title' );
+	return wrapper.getByA11yLabel( 'html-view-title' );
 };
 
 const getStylesFromColorScheme = () => {
