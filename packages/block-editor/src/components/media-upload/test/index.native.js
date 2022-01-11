@@ -127,7 +127,11 @@ describe( 'MediaUpload component', () => {
 	} );
 
 	it( 'can select multiple media from device library', () => {
-		expectMediaPickerForOption( 'Take a Video', true, requestMediaPicker );
+		expectMediaPickerForOption(
+			'Choose from device',
+			true,
+			requestMediaPicker
+		);
 	} );
 
 	it( 'can select multiple media from WP media library', () => {
