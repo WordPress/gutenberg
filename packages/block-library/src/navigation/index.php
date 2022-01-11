@@ -474,7 +474,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$block_gap = '';
 	if ( wp_get_global_settings( array( 'spacing', 'blockGap' ) ) ) {
-		$block_gap = isset( $attributes['style']['spacing']['blockGap'] ) ? 'style="gap: ' . $attributes['style']['spacing']['blockGap'] . '"' : 'style="gap: var( --wp--style--block-gap )"';
+		$block_gap = isset( $attributes['style']['spacing']['blockGap'] ) ? 'style="gap: ' . $attributes['style']['spacing']['blockGap'] . '"' : 'style="gap: var( --wp--style--block-gap, 2em )"';
+	} else {
+		$block_gap = 'style="gap: var( --wp--style--block-gap, 2em )"';
 	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );

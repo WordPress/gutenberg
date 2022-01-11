@@ -102,7 +102,7 @@ export default function NavigationInnerBlocks( {
 		{
 			className: 'wp-block-navigation__container',
 			style: {
-				gap: blockGap ? blockGap : 'var( --wp--style--block-gap )',
+				gap: blockGap ? blockGap : 'var( --wp--style--block-gap, 2em )',
 			},
 		},
 		{
