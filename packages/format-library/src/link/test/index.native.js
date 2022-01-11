@@ -24,10 +24,8 @@ const LinkEditSlot = ( props ) => (
 	</SlotFillProvider>
 );
 
-beforeAll( () => {
-	jest.useFakeTimers();
-	jest.spyOn( Keyboard, 'dismiss' );
-} );
+jest.useFakeTimers( 'legacy' );
+jest.spyOn( Keyboard, 'dismiss' );
 
 describe( 'Android', () => {
 	it( 'improves back animation performance by dismissing keyboard beforehand', async () => {

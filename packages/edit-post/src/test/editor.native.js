@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+import { act, render } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -26,11 +25,12 @@ const unsupportedBlock = `
 <!-- /wp:notablock -->
 `;
 
+jest.useFakeTimers( 'legacy' );
+
 describe( 'Editor', () => {
 	beforeAll( registerCoreBlocks );
 
 	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
-		jest.useFakeTimers();
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
 
 		const appContainer = renderEditorWith( unsupportedBlock );
@@ -51,7 +51,7 @@ describe( 'Editor', () => {
 
 // Utilities
 const renderEditorWith = ( content ) => {
-	return mount(
+	return render(
 		<Editor
 			initialHtml={ content }
 			initialHtmlModeEnabled={ false }

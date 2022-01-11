@@ -22,10 +22,10 @@ exports[`File block renders file error state without crashing 1`] = `
   <View
     accessibilityState={
       Object {
-        "disabled": true,
+        "disabled": false,
       }
     }
-    accessible={true}
+    accessible={false}
     focusable={true}
     onClick={[Function]}
     onLayout={[Function]}
@@ -35,6 +35,7 @@ exports[`File block renders file error state without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
+    testID="file-edit-container"
   >
     <Text
       onTextLayout={[Function]}
@@ -229,10 +230,10 @@ exports[`File block renders file without crashing 1`] = `
   <View
     accessibilityState={
       Object {
-        "disabled": true,
+        "disabled": false,
       }
     }
-    accessible={true}
+    accessible={false}
     focusable={true}
     onClick={[Function]}
     onLayout={[Function]}
@@ -242,6 +243,7 @@ exports[`File block renders file without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
+    testID="file-edit-container"
   >
     <Text
       onTextLayout={[Function]}

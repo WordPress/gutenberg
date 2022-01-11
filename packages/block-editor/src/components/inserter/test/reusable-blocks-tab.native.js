@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -13,9 +13,7 @@ import { useSelect } from '@wordpress/data';
  */
 import items from './fixtures';
 import ReusableBlocksTab from '../reusable-blocks-tab';
-import BlockTypesList from '../../block-types-list';
 
-jest.mock( '../../block-types-list' );
 jest.mock( '@wordpress/data/src/components/use-select' );
 
 const fetchReusableBlocks = jest.fn();
@@ -34,11 +32,11 @@ describe( 'ReusableBlocksTab component', () => {
 	} );
 
 	it( 'renders without crashing', () => {
-		const component = shallow(
+		const component = render(
 			<ReusableBlocksTab
 				rootClientId={ 0 }
 				onSelect={ jest.fn() }
-				listProps={ {} }
+				listProps={ { contentContainerStyle: {} } }
 			/>
 		);
 		expect( component ).toBeTruthy();
@@ -50,15 +48,15 @@ describe( 'ReusableBlocksTab component', () => {
 		const reusableBlockItems = items.filter(
 			( { category } ) => category === 'reusable'
 		);
-		const component = shallow(
+		const component = render(
 			<ReusableBlocksTab
 				rootClientId={ 0 }
 				onSelect={ jest.fn() }
-				listProps={ {} }
+				listProps={ { contentContainerStyle: {} } }
 			/>
 		);
-		expect( component.find( BlockTypesList ).prop( 'items' ) ).toEqual(
-			reusableBlockItems
-		);
+		reusableBlockItems.forEach( ( { title } ) => {
+			expect( component.getByText( title ) ).toBeTruthy();
+		} );
 	} );
 } );

@@ -27,7 +27,7 @@ const TestScreen = ( { fullScreen, name, navigateTo } ) => {
 	);
 };
 
-jest.useFakeTimers();
+jest.useFakeTimers( 'legacy' );
 
 it( 'animates height transitioning from non-full-screen to full-screen', async () => {
 	const screen = render(

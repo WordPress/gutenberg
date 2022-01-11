@@ -1,16 +1,13 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-import { TouchableWithoutFeedback } from 'react-native';
+import { render, fireEvent } from 'test/helpers';
+import { Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import {
-	requestMediaPicker,
-	mediaSources,
-} from '@wordpress/react-native-bridge';
+import { requestMediaPicker } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -30,48 +27,32 @@ const MEDIA_ID = 123;
 
 describe( 'MediaUpload component', () => {
 	it( 'renders without crashing', () => {
-		const wrapper = shallow(
-			<MediaUpload allowedTypes={ [] } render={ () => {} } />
+		const wrapper = render(
+			<MediaUpload allowedTypes={ [] } render={ () => null } />
 		);
 		expect( wrapper ).toBeTruthy();
 	} );
 
-	it( 'opens media options picker', () => {
-		const wrapper = shallow(
-			<MediaUpload
-				allowedTypes={ [] }
-				render={ ( { open, getMediaOptions } ) => {
-					return (
-						<TouchableWithoutFeedback onPress={ open }>
-							{ getMediaOptions() }
-						</TouchableWithoutFeedback>
-					);
-				} }
-			/>
-		);
-		expect( wrapper.find( 'Picker' ) ).toHaveLength( 1 );
-	} );
-
 	it( 'shows right media capture option for media type', () => {
 		const expectOptionForMediaType = ( mediaType, expectedOption ) => {
-			const wrapper = shallow(
+			const wrapper = render(
 				<MediaUpload
 					allowedTypes={ [ mediaType ] }
 					render={ ( { open, getMediaOptions } ) => {
 						return (
-							<TouchableWithoutFeedback onPress={ open }>
+							<>
+								<TouchableWithoutFeedback onPress={ open }>
+									<Text>Open Picker</Text>
+								</TouchableWithoutFeedback>
 								{ getMediaOptions() }
-							</TouchableWithoutFeedback>
+							</>
 						);
 					} }
 				/>
 			);
-			expect(
-				wrapper
-					.find( 'Picker' )
-					.props()
-					.options.filter( ( item ) => item.label === expectedOption )
-			).toHaveLength( 1 );
+			fireEvent.press( wrapper.getByText( 'Open Picker' ) );
+
+			wrapper.getByText( expectedOption );
 		};
 		expectOptionForMediaType( MEDIA_TYPE_IMAGE, OPTION_TAKE_PHOTO );
 		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );
@@ -96,21 +77,25 @@ describe( 'MediaUpload component', () => {
 
 		const onSelect = jest.fn();
 
-		const wrapper = shallow(
+		const wrapper = render(
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 				onSelect={ onSelect }
 				multiple={ allowMultiple }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
-						<TouchableWithoutFeedback onPress={ open }>
+						<>
+							<TouchableWithoutFeedback onPress={ open }>
+								<Text>Open Picker</Text>
+							</TouchableWithoutFeedback>
 							{ getMediaOptions() }
-						</TouchableWithoutFeedback>
+						</>
 					);
 				} }
 			/>
 		);
-		wrapper.find( 'Picker' ).simulate( 'change', option );
+		fireEvent.press( wrapper.getByText( 'Open Picker' ) );
+		fireEvent.press( wrapper.getByText( option ) );
 		const media = { id: MEDIA_ID, url: MEDIA_URL };
 
 		expect( requestFunction ).toHaveBeenCalledTimes( 1 );
@@ -123,7 +108,7 @@ describe( 'MediaUpload component', () => {
 
 	it( 'can select media from device library', () => {
 		expectMediaPickerForOption(
-			mediaSources.deviceLibrary,
+			'Choose from device',
 			false,
 			requestMediaPicker
 		);
@@ -131,23 +116,19 @@ describe( 'MediaUpload component', () => {
 
 	it( 'can select media from WP media library', () => {
 		expectMediaPickerForOption(
-			mediaSources.siteMediaLibrary,
+			'WordPress Media Library',
 			false,
 			requestMediaPicker
 		);
 	} );
 
-	it( 'can select media by capturig', () => {
-		expectMediaPickerForOption(
-			mediaSources.deviceCamera,
-			false,
-			requestMediaPicker
-		);
+	it( 'can select media by capturing', () => {
+		expectMediaPickerForOption( 'Take a Video', false, requestMediaPicker );
 	} );
 
 	it( 'can select multiple media from device library', () => {
 		expectMediaPickerForOption(
-			mediaSources.deviceLibrary,
+			'Choose from device',
 			true,
 			requestMediaPicker
 		);
@@ -155,7 +136,7 @@ describe( 'MediaUpload component', () => {
 
 	it( 'can select multiple media from WP media library', () => {
 		expectMediaPickerForOption(
-			mediaSources.siteMediaLibrary,
+			'WordPress Media Library',
 			true,
 			requestMediaPicker
 		);

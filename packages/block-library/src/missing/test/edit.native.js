@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import { render } from 'test/helpers';
 import { Text } from 'react-native';
 
 /**
@@ -23,9 +23,7 @@ const defaultAttributes = {
 };
 
 const getTestComponentWithContent = ( attributes = defaultAttributes ) => {
-	return renderer.create(
-		<UnsupportedBlockEdit attributes={ attributes } />
-	);
+	return render( <UnsupportedBlockEdit attributes={ attributes } /> );
 };
 
 describe( 'Missing block', () => {
@@ -34,33 +32,30 @@ describe( 'Missing block', () => {
 	} );
 
 	it( 'renders without crashing', () => {
-		const component = getTestComponentWithContent();
-		const rendered = component.toJSON();
+		const testInstance = getTestComponentWithContent();
+		const rendered = testInstance.toJSON();
 		expect( rendered ).toMatchSnapshot();
 	} );
 
 	describe( 'help modal', () => {
 		it( 'renders help icon', () => {
-			const component = getTestComponentWithContent();
-			const testInstance = component.root;
-			const icons = testInstance.findAllByType( Icon );
+			const testInstance = getTestComponentWithContent();
+			const icons = testInstance.UNSAFE_getAllByType( Icon );
 			expect( icons.length ).toBe( 2 );
 			expect( icons[ 0 ].props.icon ).toBe( help );
 		} );
 
 		it( 'renders info icon on modal', () => {
-			const component = getTestComponentWithContent();
-			const testInstance = component.root;
-			const bottomSheet = testInstance.findByType( BottomSheet );
+			const testInstance = getTestComponentWithContent();
+			const bottomSheet = testInstance.UNSAFE_getByType( BottomSheet );
 			const children = bottomSheet.props.children[ 0 ].props.children;
 			expect( children.length ).toBe( 3 ); // 4 children in the bottom sheet: the icon, the "isn't yet supported" title and the "We are working hard..." message
 			expect( children[ 0 ].props.icon ).toBe( help );
 		} );
 
 		it( 'renders unsupported text on modal', () => {
-			const component = getTestComponentWithContent();
-			const testInstance = component.root;
-			const bottomSheet = testInstance.findByType( BottomSheet );
+			const testInstance = getTestComponentWithContent();
+			const bottomSheet = testInstance.UNSAFE_getByType( BottomSheet );
 			const children = bottomSheet.props.children[ 0 ].props.children;
 			expect( children[ 1 ].props.children ).toBe(
 				"'" +
@@ -78,9 +73,10 @@ describe( 'Missing block', () => {
 			} );
 
 			it( 'renders edit action if UBE is available', () => {
-				const component = getTestComponentWithContent();
-				const testInstance = component.root;
-				const bottomSheet = testInstance.findByType( BottomSheet );
+				const testInstance = getTestComponentWithContent();
+				const bottomSheet = testInstance.UNSAFE_getByType(
+					BottomSheet
+				);
 				const bottomSheetCells = bottomSheet.props.children[ 1 ];
 				expect( bottomSheetCells ).toBeTruthy();
 				expect( bottomSheetCells.props.children.length ).toBe( 2 );
@@ -94,35 +90,35 @@ describe( 'Missing block', () => {
 					unsupportedBlockEditor: false,
 				} );
 
-				const component = getTestComponentWithContent();
-				const testInstance = component.root;
-				const bottomSheet = testInstance.findByType( BottomSheet );
+				const testInstance = getTestComponentWithContent();
+				const bottomSheet = testInstance.UNSAFE_getByType(
+					BottomSheet
+				);
 				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
 			} );
 
 			it( 'does not render edit action if the block is incompatible with UBE', () => {
-				const component = getTestComponentWithContent( {
+				const testInstance = getTestComponentWithContent( {
 					originalName: 'core/block',
 				} );
-				const testInstance = component.root;
-				const bottomSheet = testInstance.findByType( BottomSheet );
+				const bottomSheet = testInstance.UNSAFE_getByType(
+					BottomSheet
+				);
 				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
 			} );
 		} );
 	} );
 
 	it( 'renders admin plugins icon', () => {
-		const component = getTestComponentWithContent();
-		const testInstance = component.root;
-		const icons = testInstance.findAllByType( Icon );
+		const testInstance = getTestComponentWithContent();
+		const icons = testInstance.UNSAFE_getAllByType( Icon );
 		expect( icons.length ).toBe( 2 );
 		expect( icons[ 1 ].props.icon ).toBe( plugins );
 	} );
 
 	it( 'renders title text without crashing', () => {
-		const component = getTestComponentWithContent();
-		const testInstance = component.root;
-		const texts = testInstance.findAllByType( Text );
+		const testInstance = getTestComponentWithContent();
+		const texts = testInstance.UNSAFE_getAllByType( Text );
 		expect( texts.length ).toBe( 2 );
 		expect( texts[ 0 ].props.children ).toBe( 'missing/block/title' );
 		expect( texts[ 1 ].props.children ).toBe( 'Unsupported' );
