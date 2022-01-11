@@ -600,10 +600,9 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 		 * @param string $content When the callback is used for the render_block filter,
 		 *                        the content needs to be returned so the function parameter
 		 *                        is to ensure the content exists.
-		 *
-		 * @return string
+		 * @return string Block content.
 		 */
-		$callback = function( $content ) use ( $args ) {
+		$callback = static function( $content ) use ( $args ) {
 			// Register the stylesheet.
 			if ( ! empty( $args['src'] ) ) {
 				wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
@@ -634,10 +633,42 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 
 		$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
 		if ( wp_should_load_separate_core_block_assets() ) {
-			$hook = "render_block_$block_name";
+			/**
+			 * Callback function to register and enqueue styles.
+			 *
+			 * @param string $content The block content.
+			 * @param array  $block   The full block, including name and attributes.
+			 * @return string Block content.
+			 */
+			$callback_separate = static function( $content, $block ) use ( $block_name, $callback ) {
+				if ( ! empty( $block['blockName'] ) && $block_name === $block['blockName'] ) {
+					return $callback( $content );
+				}
+				return $content;
+			};
+
+			/*
+			 * The filter's callback here is an anonymous function because
+			 * using a named function in this case is not possible.
+			 *
+			 * The function cannot be unhooked, however, users are still able
+			 * to dequeue the stylesheets registered/enqueued by the callback
+			 * which is why in this case, using an anonymous function
+			 * was deemed acceptable.
+			 */
+			add_filter( 'render_block', $callback_separate, 10, 2 );
+			return;
 		}
 
-		// Enqueue assets in the frontend.
+		/*
+		 * The filter's callback here is an anonymous function because
+		 * using a named function in this case is not possible.
+		 *
+		 * The function cannot be unhooked, however, users are still able
+		 * to dequeue the stylesheets registered/enqueued by the callback
+		 * which is why in this case, using an anonymous function
+		 * was deemed acceptable.
+		 */
 		add_filter( $hook, $callback );
 
 		// Enqueue assets in the editor.
