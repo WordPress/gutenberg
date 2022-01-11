@@ -31,7 +31,7 @@ function render_block_core_query_title( $attributes ) {
 		'<%1$s %2$s>%3$s</%1$s>',
 		$tag_name,
 		$wrapper_attributes,
-		esc_html( $title )
+		$title
 	);
 }
 
