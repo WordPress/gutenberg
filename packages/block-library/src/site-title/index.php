@@ -29,15 +29,15 @@ function render_block_core_site_title( $attributes ) {
 
 	if ( $attributes['isLink'] ) {
 		$link_attrs = array(
-			'href="' . get_bloginfo( 'url' ) . '"',
-			'rel="home"',
+			'href="' . esc_url( get_bloginfo( 'url' ) ) . '"',
+			esc_attr( 'rel="home"' ),
 			$aria_current,
 		);
 		if ( '_blank' === $attributes['linkTarget'] ) {
 			$link_attrs[] = 'target="_blank"';
 			$link_attrs[] = 'aria-label="' . esc_attr__( '(opens in a new tab)' ) . '"';
 		}
-		$site_title = sprintf( '<a %1$s>%2$s</a>', implode( ' ', $link_attrs ), $site_title );
+		$site_title = sprintf( '<a %1$s>%2$s</a>', implode( ' ', $link_attrs ), esc_html( $site_title ) );
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
