@@ -261,14 +261,14 @@ function block_core_table_of_contents_render_list(
 
 				$entry = sprintf(
 					'<a class="%1$s" href="%2$s">%3$s</a>',
-					$entry_class,
+					esc_attr( $entry_class ),
 					esc_url( $href ),
 					esc_html( $content )
 				);
 			} else {
 				$entry = sprintf(
 					'<span class="%1$s">%2$s</span>',
-					$entry_class,
+					esc_attr( $entry_class ),
 					esc_html( $content )
 				);
 			}
