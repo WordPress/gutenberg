@@ -32,10 +32,7 @@ export type HigherOrderComponent< HOCProps extends Record< string, any > > = <
  */
 function createHigherOrderComponent<
 	HOCProps extends Record< string, any > = {}
->(
-	mapComponent: HigherOrderComponent< HOCProps >,
-	modifierName: string
-): typeof mapComponent {
+>( mapComponent: HigherOrderComponent< HOCProps >, modifierName: string ) {
 	return < InnerProps extends HOCProps >(
 		Inner: ComponentType< InnerProps >
 	) => {
@@ -47,4 +44,5 @@ function createHigherOrderComponent<
 		return Outer;
 	};
 }
+
 export default createHigherOrderComponent;

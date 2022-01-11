@@ -19,7 +19,9 @@ import type { ComponentType, ComponentClass } from 'react';
  * only rerendering when its props/state change
  */
 const pure = createHigherOrderComponent(
-	< TProps, >( Wrapped: ComponentType< TProps > ) => {
+	< TProps extends Record< string, any > >(
+		Wrapped: ComponentType< TProps >
+	) => {
 		if ( Wrapped.prototype instanceof Component ) {
 			return class extends ( Wrapped as ComponentClass< TProps > ) {
 				shouldComponentUpdate( nextProps: TProps, nextState: any ) {

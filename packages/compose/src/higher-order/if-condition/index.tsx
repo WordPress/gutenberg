@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import type { ComponentType } from 'react';
-
-/**
  * Internal dependencies
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
@@ -28,7 +22,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  */
 const ifCondition = < TProps extends Record< string, any > >(
 	predicate: ( props: TProps ) => boolean
-): ( ( Wrapped: ComponentType< TProps > ) => ComponentType< TProps > ) =>
+) =>
 	createHigherOrderComponent< {} >(
 		( WrappedComponent ) => ( props ) => {
 			if ( ! predicate( props as TProps ) ) {
