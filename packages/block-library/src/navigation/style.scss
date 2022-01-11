@@ -51,6 +51,43 @@ $navigation-icon-size: 24px;
 		padding: 0;
 	}
 
+	// Force links to inherit text decoration applied to navigation block.
+	// The extra selector adds specificity to ensure it works when user-set.
+	&[style*="text-decoration: underline"],
+	&[style*="text-decoration:underline"] {
+		.wp-block-navigation-item__content {
+			text-decoration: underline;
+
+			&:focus,
+			&:active {
+				text-decoration: underline;
+			}
+		}
+	}
+
+	&[style*="text-decoration: line-through"],
+	&[style*="text-decoration:line-through"] {
+		.wp-block-navigation-item__content {
+			text-decoration: line-through;
+
+			&:focus,
+			&:active {
+				text-decoration: line-through;
+			}
+		}
+	}
+
+	&:not([style*="text-decoration"]) {
+		a {
+			text-decoration: none;
+
+			&:focus,
+			&:active {
+				text-decoration: none;
+			}
+		}
+	}
+
 	// Submenu indicator.
 	.wp-block-navigation__submenu-icon {
 		align-self: center; // This one affects nested submenu indicators.
