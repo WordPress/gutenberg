@@ -436,16 +436,26 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
+		const pageTitle = 'A really long page name that will not exist';
+
 		// The URL Details endpoint 404s for the created page, since it will
 		// be a draft that is inaccessible publicly. To avoid this we mock
-		// out the endpoint response to be empty which will be handled gracefully
-		// in the UI whilst avoiding any 404s.
+		// out the endpoint response to be valid and allow the UI to handle
+		// gracefully. This avoids indeterminism in this test caused by
+		// waiting on network 404 which was preivously making it unstable.
+		// Consider that the rich previews feature is not under test here
+		// and so it is valid to mock out this endpoint.
 		await setUpResponseMocking( [
 			{
 				match: ( request ) =>
 					request.url().includes( `rest_route` ) &&
 					request.url().includes( `url-details` ),
-				onRequestMatch: createJSONResponse( [] ),
+				onRequestMatch: createJSONResponse( {
+					description: '',
+					icon: '',
+					image: '',
+					title: pageTitle,
+				} ),
 			},
 		] );
 
@@ -460,7 +470,7 @@ describe( 'Navigation', () => {
 
 		// Wait for URL input to be focused
 		// Insert name for the new page.
-		const pageTitle = 'A really long page name that will not exist';
+
 		const input = await page.waitForSelector(
 			'input.block-editor-url-input__input:focus'
 		);
