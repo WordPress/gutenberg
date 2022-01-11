@@ -32,7 +32,7 @@ function render_block_core_loginout( $attributes ) {
 		$contents = wp_login_form( array( 'echo' => false ) );
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => esc_attr( $classes ) ) );
 
 	return '<div ' . $wrapper_attributes . '>' . $contents . '</div>';
 }
