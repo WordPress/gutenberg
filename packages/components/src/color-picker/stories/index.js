@@ -30,6 +30,7 @@ const Example = () => {
 	const [ color, setColor ] = useState( undefined );
 	const props = {
 		enableAlpha: boolean( 'enableAlpha', false ),
+		hideAuxiliaryControls: boolean( 'hideAuxiliaryControls', false ),
 		copyFormat: select(
 			'copyFormat',
 			[ PROP_UNSET, 'rgb', 'hsl', 'hex' ],
@@ -79,3 +80,29 @@ const LegacyExample = () => {
 };
 
 export const legacy = () => <LegacyExample />;
+
+const CustomAuxiliaryControls = () => {
+	const [ color, setColor ] = useState( undefined );
+	const props = {
+		enableAlpha: boolean( 'enableAlpha', false ),
+	};
+
+	if ( props.copyFormat === PROP_UNSET ) {
+		delete props.copyFormat;
+	}
+
+	return (
+		<ColorPicker
+			{ ...props }
+			hideAuxiliaryControls
+			color={ color }
+			onChange={ setColor }
+		>
+			<input type="text" value={ color } />
+		</ColorPicker>
+	);
+};
+
+export const customAuxiliaryControls = () => {
+	return <CustomAuxiliaryControls />;
+};
