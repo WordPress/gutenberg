@@ -88,13 +88,14 @@ describe.each( [
 		);
 
 		// Assert
-		await waitFor( () =>
+		const linkToField = await waitFor( () =>
 			subject.getByA11yLabel(
 				`Link to, ${
 					type === 'core/image' ? 'None' : 'Search or type URL'
 				}`
 			)
 		);
+		expect( linkToField ).toBeTruthy();
 	} );
 
 	describe( '<LinkPicker/>', () => {
@@ -283,10 +284,14 @@ describe.each( [
 					);
 
 					// Assert
-					await waitFor( () => subject.getByText( url ) );
-					await waitFor( () =>
+					const clipboardUrl = await waitFor( () =>
+						subject.getByText( url )
+					);
+					expect( clipboardUrl ).toBeTruthy();
+					const clipboardNote = await waitFor( () =>
 						subject.getByText( __( 'From clipboard' ) )
 					);
+					expect( clipboardNote ).toBeTruthy();
 				}
 			);
 		} );
@@ -348,13 +353,14 @@ describe.each( [
 					);
 
 					// Assert
-					await waitFor( () =>
+					const linkToField = await waitFor( () =>
 						subject.getByA11yLabel(
 							`Link to, ${
 								type === 'core/image' ? 'Custom URL' : url
 							}`
 						)
 					);
+					expect( linkToField ).toBeTruthy();
 				}
 			);
 		} );
