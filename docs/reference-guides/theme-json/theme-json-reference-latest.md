@@ -1,4 +1,4 @@
-# Theme.json Reference
+# Version 2 Reference
 
 This reference guide lists the settings and style properties defined in the theme.json schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guide on how to use the theme.json file in your theme.
 

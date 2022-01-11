@@ -221,7 +221,19 @@
 				]
 			},
 			{ "docs/reference-guides/richtext.md": [] },
-			{ "docs/reference-guides/theme-json-reference.md": [] },
+			{
+				"docs/reference-guides/theme-json/README.md": [
+					{
+						"docs/reference-guides/theme-json/theme-json-reference-latest.md": []
+					},
+					{
+						"docs/reference-guides/theme-json/theme-json-reference-v1.md": []
+					},
+					{
+						"docs/reference-guides/theme-json/theme-json-migrations.md": []
+					}
+				]
+			},
 			{ "packages/components/README.md": "{{components}}" },
 			{ "docs/reference-guides/packages.md": "{{packages}}" },
 			{

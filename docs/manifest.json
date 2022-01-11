@@ -559,9 +559,27 @@
 	},
 	{
 		"title": "Theme.json Reference",
-		"slug": "theme-json-reference",
-		"markdown_source": "../docs/reference-guides/theme-json-reference.md",
+		"slug": "theme-json",
+		"markdown_source": "../docs/reference-guides/theme-json/README.md",
 		"parent": "reference-guides"
+	},
+	{
+		"title": "Version 2 Reference",
+		"slug": "theme-json-reference-latest",
+		"markdown_source": "../docs/reference-guides/theme-json/theme-json-reference-latest.md",
+		"parent": "theme-json"
+	},
+	{
+		"title": "Version 1 Reference",
+		"slug": "theme-json-reference-v1",
+		"markdown_source": "../docs/reference-guides/theme-json/theme-json-reference-v1.md",
+		"parent": "theme-json"
+	},
+	{
+		"title": "Migrating to Newer Versions",
+		"slug": "theme-json-migrations",
+		"markdown_source": "../docs/reference-guides/theme-json/theme-json-migrations.md",
+		"parent": "theme-json"
 	},
 	{
 		"title": "Component Reference",
