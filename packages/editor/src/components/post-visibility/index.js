@@ -148,7 +148,7 @@ export class PostVisibility extends Component {
 				</div>
 			),
 			<ConfirmDialog
-				key={ 'private-publish-confirmation' }
+				key="private-publish-confirmation"
 				isOpen={ this.state.showPrivateConfirmDialog }
 				onConfirm={ this.confirmPrivate }
 				onCancel={ () => {
