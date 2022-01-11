@@ -24,7 +24,7 @@ function render_block_core_site_title( $attributes ) {
 	$aria_current = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) ) ? ' aria-current="page"' : '';
 
 	if ( isset( $attributes['level'] ) ) {
-		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
+		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . (int) $attributes['level'];
 	}
 
 	if ( $attributes['isLink'] ) {
