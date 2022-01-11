@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import { render } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -26,31 +26,31 @@ const defaultAttributes = {
 
 const getTestComponent = ( attributes = {} ) => {
 	const finalAttrs = { ...defaultAttributes, ...attributes };
-	return renderer.create(
+	return render(
 		<SearchEdit attributes={ finalAttrs } setAttributes={ jest.fn() } />
 	);
 };
 
 const getLabel = ( instance ) => {
-	return instance.findByProps( {
+	return instance.UNSAFE_getByProps( {
 		className: 'wp-block-search__label',
 	} );
 };
 
 const getButton = ( instance ) => {
-	return instance.findByProps( {
+	return instance.UNSAFE_getByProps( {
 		className: 'wp-block-search__button',
 	} );
 };
 
 const getSearchInput = ( instance ) => {
-	return instance.findByProps( {
+	return instance.UNSAFE_getByProps( {
 		className: 'wp-block-search__input',
 	} );
 };
 
 const hasComponent = ( instance, className ) => {
-	const components = instance.findAllByProps( {
+	const components = instance.UNSAFE_queryAllByProps( {
 		className,
 	} );
 	return components.length !== 0;
@@ -64,8 +64,10 @@ describe( 'Search Block', () => {
 	} );
 
 	describe( 'renders with default configuration', () => {
-		const component = getTestComponent();
-		const instance = component.root;
+		let instance;
+		beforeEach( () => {
+			instance = getTestComponent();
+		} );
 
 		it( 'label is visible and text is properly set', () => {
 			// Verify the label element of the search block exists and
@@ -94,16 +96,18 @@ describe( 'Search Block', () => {
 		} );
 
 		it( 'matches snapshot', () => {
-			const rendered = component.toJSON();
+			const rendered = instance.toJSON();
 			expect( rendered ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'renders with no-button option', () => {
-		const component = getTestComponent( {
-			buttonPosition: 'no-button',
+		let instance;
+		beforeEach( () => {
+			instance = getTestComponent( {
+				buttonPosition: 'no-button',
+			} );
 		} );
-		const instance = component.root;
 
 		it( 'verify button element has not been rendered', () => {
 			expect(
@@ -112,42 +116,46 @@ describe( 'Search Block', () => {
 		} );
 
 		it( 'matches snapshot', () => {
-			const rendered = component.toJSON();
+			const rendered = instance.toJSON();
 			expect( rendered ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'renders block with icon button option', () => {
-		const component = getTestComponent( {
-			buttonUseIcon: true,
+		let instance;
+		beforeEach( () => {
+			instance = getTestComponent( {
+				buttonUseIcon: true,
+			} );
 		} );
-		const instance = component.root;
 
 		it( 'search button uses icon', () => {
-			const button = instance.findByType( Icon );
+			const button = instance.UNSAFE_getByType( Icon );
 			expect( button ).toBeTruthy();
 		} );
 
 		it( 'matches snapshot', () => {
-			const rendered = component.toJSON();
+			const rendered = instance.toJSON();
 			expect( rendered ).toMatchSnapshot();
 		} );
 	} );
 
 	it( 'renders block with button inside option', () => {
-		const component = getTestComponent( {
+		const instance = getTestComponent( {
 			buttonPosition: 'button-inside',
 		} );
 
-		const rendered = component.toJSON();
+		const rendered = instance.toJSON();
 		expect( rendered ).toMatchSnapshot();
 	} );
 
 	describe( 'renders block with label hidden', () => {
-		const component = getTestComponent( {
-			showLabel: false,
+		let instance;
+		beforeEach( () => {
+			instance = getTestComponent( {
+				showLabel: false,
+			} );
 		} );
-		const instance = component.root;
 
 		it( 'verify label has not been rendered', () => {
 			expect(
@@ -156,7 +164,7 @@ describe( 'Search Block', () => {
 		} );
 
 		it( 'matches snapshot', () => {
-			const rendered = component.toJSON();
+			const rendered = instance.toJSON();
 			expect( rendered ).toMatchSnapshot();
 		} );
 	} );
