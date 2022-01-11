@@ -39,7 +39,7 @@ export default function InserterSidebar() {
 	const libraryRef = useRef();
 	useEffect( () => {
 		libraryRef.current.focusSearch();
-	} );
+	}, [] );
 
 	return (
 		<div
