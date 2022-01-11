@@ -2,6 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -22,13 +23,21 @@ export const StyledField = styled.div`
 	}
 `;
 
-export const StyledLabel = styled.label`
+const labelStyles = css`
 	display: inline-block;
 	margin-bottom: ${ space( 2 ) };
+`;
+
+export const StyledLabel = styled.label`
+	${ labelStyles }
 `;
 
 export const StyledHelp = styled.p`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
 	color: ${ COLORS.mediumGray.text };
+`;
+
+export const StyledVisualLabel = styled.span`
+	${ labelStyles }
 `;

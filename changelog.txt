@@ -1,5 +1,28 @@
 == Changelog ==
 
+= 12.3.2 =
+
+### Bug Fixes
+
+#### Block Library
+- Spacer: Fix unit settings filter. ([37774](https://github.com/WordPress/gutenberg/pull/37774))
+
+
+
+
+
+= 12.3.1 =
+
+
+### Bug Fixes
+
+- Restore canvas padding for classic themes (#37741).
+- Site logo: Fix range control on landscape logos (#37733).
+- RichText: Fix dead key input on Windows (#37777).
+- Update: Improve escaping on the search block (#37829).
+- Fix: Impossible to clear colors if color palettes are removed. (#37791).
+
+
 = 12.3.0 =
 
 ### Features
