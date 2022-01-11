@@ -116,6 +116,7 @@ function usePageEntities() {
 					order: 'asc',
 					orderby: 'id',
 					per_page: -1,
+					context: 'view',
 				},
 			];
 
