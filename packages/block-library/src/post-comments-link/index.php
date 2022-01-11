@@ -48,7 +48,7 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 		);
 	}
 
-	return "<div {$wrapper_attributes}><a href='{$comments_link}'>{$comment_text}</a></div>";
+	return '<div ' . $wrapper_attributes . '><a href=' . esc_url( $comments_link ) . '>' . esc_html( $comment_text ) . '</a></div>';
 }
 
 /**
