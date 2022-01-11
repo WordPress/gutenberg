@@ -187,8 +187,8 @@ export default function PostLockedModal() {
 					className="editor-post-locked-modal__avatar"
 				/>
 			) }
-			{ !! isTakeover && (
-				<div>
+			<div>
+				{ !! isTakeover && (
 					<p>
 						{ createInterpolateElement(
 							userDisplayName
@@ -212,16 +212,8 @@ export default function PostLockedModal() {
 							}
 						) }
 					</p>
-
-					<div className="editor-post-locked-modal__buttons">
-						<Button variant="primary" href={ allPostsUrl }>
-							{ allPostsLabel }
-						</Button>
-					</div>
-				</div>
-			) }
-			{ ! isTakeover && (
-				<div>
+				) }
+				{ ! isTakeover && (
 					<p>
 						{ createInterpolateElement(
 							userDisplayName
@@ -245,25 +237,27 @@ export default function PostLockedModal() {
 							}
 						) }
 					</p>
+				) }
 
-					<Flex
-						className="editor-post-locked-modal__buttons"
-						justify="flex-end"
-						expanded={ false }
-					>
+				<Flex
+					className="editor-post-locked-modal__buttons"
+					justify="flex-end"
+					expanded={ false }
+				>
+					{ ! isTakeover && (
 						<FlexItem>
 							<Button variant="tertiary" href={ unlockUrl }>
 								{ __( 'Take over' ) }
 							</Button>
 						</FlexItem>
-						<FlexItem>
-							<Button variant="primary" href={ allPostsUrl }>
-								{ allPostsLabel }
-							</Button>
-						</FlexItem>
-					</Flex>
-				</div>
-			) }
+					) }
+					<FlexItem>
+						<Button variant="primary" href={ allPostsUrl }>
+							{ allPostsLabel }
+						</Button>
+					</FlexItem>
+				</Flex>
+			</div>
 		</Modal>
 	);
 }
