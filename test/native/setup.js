@@ -12,14 +12,6 @@ global.navigator = global.navigator ?? {};
 // modifying the above `global.navigator`
 require( '../../packages/react-native-editor/src/globals' );
 
-if ( ! global.window.matchMedia ) {
-	global.window.matchMedia = () => ( {
-		matches: false,
-		addListener: () => {},
-		removeListener: () => {},
-	} );
-}
-
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
 RNNativeModules.RNGestureHandlerModule = RNNativeModules.RNGestureHandlerModule || {
