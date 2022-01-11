@@ -29,14 +29,28 @@ import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 const expanded = ( state, action ) => {
-	switch ( action.type ) {
-		case 'expand':
-			return { ...state, ...{ [ action.clientId ]: true } };
-		case 'collapse':
-			return { ...state, ...{ [ action.clientId ]: false } };
-		default:
-			return state;
+	if ( ! Array.isArray( action.clientIds ) ) {
+		return state;
 	}
+
+	const nextState = { ...state };
+
+	switch ( action.type ) {
+		case 'expand': {
+			for ( const clientId of action.clientIds ) {
+				delete nextState[ clientId ];
+			}
+			break;
+		}
+		case 'collapse': {
+			for ( const clientId of action.clientIds ) {
+				nextState[ clientId ] = false;
+			}
+			break;
+		}
+	}
+
+	return nextState;
 };
 
 /**
@@ -120,20 +134,20 @@ function ListView(
 	);
 
 	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( clientIds ) => {
+			if ( ! clientIds ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientId } );
+			setExpandedState( { type: 'expand', clientIds } );
 		},
 		[ setExpandedState ]
 	);
 	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( clientIds ) => {
+			if ( ! clientIds ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientId } );
+			setExpandedState( { type: 'collapse', clientIds } );
 		},
 		[ setExpandedState ]
 	);
