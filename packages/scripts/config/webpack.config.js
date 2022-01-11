@@ -5,9 +5,8 @@ const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const browserslist = require( 'browserslist' );
-const { sync: glob } = require( 'fast-glob' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const path = require( 'path' );
+const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 
@@ -25,6 +24,7 @@ const {
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
+	getWebpackEntryPoints,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -32,20 +32,6 @@ const mode = isProduction ? 'production' : 'development';
 let target = 'browserslist';
 if ( ! browserslist.findConfig( '.' ) ) {
 	target += ':' + fromConfigRoot( '.browserslistrc' );
-}
-let entry = {};
-if ( process.env.WP_ENTRY ) {
-	entry = JSON.parse( process.env.WP_ENTRY );
-} else {
-	// The script checks whether standard file names can be detected in the `src` folder,
-	// and converts all found files to entry points.
-	const entryFiles = glob( 'src/index.[jt]s?(x)', {
-		absolute: true,
-	} );
-	entryFiles.forEach( ( filepath ) => {
-		const [ entryName ] = path.basename( filepath ).split( '.' );
-		entry[ entryName ] = filepath;
-	} );
 }
 
 const cssLoaders = [
@@ -98,10 +84,10 @@ const cssLoaders = [
 const config = {
 	mode,
 	target,
-	entry,
+	entry: getWebpackEntryPoints(),
 	output: {
 		filename: '[name].js',
-		path: path.resolve( process.cwd(), 'build' ),
+		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {
 		alias: {
@@ -119,8 +105,11 @@ const config = {
 					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
-					name( module, chunks, cacheGroupKey ) {
-						return `${ cacheGroupKey }-${ chunks[ 0 ].name }`;
+					name( _, chunks, cacheGroupKey ) {
+						const chunkName = chunks[ 0 ].name;
+						return `${ dirname(
+							chunkName
+						) }/${ cacheGroupKey }-${ basename( chunkName ) }`;
 					},
 				},
 				default: false,
