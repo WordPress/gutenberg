@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { Ref } from 'react';
+import { ReactNode, Ref } from 'react';
 import { colord, extend, Colord } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
@@ -45,6 +45,8 @@ export interface ColorPickerProps {
 	onChange?: ( color: string ) => void;
 	defaultValue?: string;
 	copyFormat?: ColorType;
+	hideAuxiliaryControls?: boolean;
+	children?: ReactNode;
 }
 
 const options = [
@@ -63,6 +65,8 @@ const ColorPicker = (
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
+		hideAuxiliaryControls,
+		children,
 		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
@@ -98,47 +102,51 @@ const ColorPicker = (
 				color={ safeColordColor }
 				enableAlpha={ enableAlpha }
 			/>
-			<AuxiliaryColorArtefactWrapper>
-				<HStack justify="space-between">
-					{ showInputs ? (
-						<SelectControl
-							options={ options }
-							value={ colorType }
-							onChange={ ( nextColorType ) =>
-								setColorType( nextColorType as ColorType )
+			{ hideAuxiliaryControls ? null : (
+				<AuxiliaryColorArtefactWrapper>
+					<HStack justify="space-between">
+						{ showInputs ? (
+							<SelectControl
+								options={ options }
+								value={ colorType }
+								onChange={ ( nextColorType ) =>
+									setColorType( nextColorType as ColorType )
+								}
+								label={ __( 'Color format' ) }
+								hideLabelFromVision
+							/>
+						) : (
+							<ColorDisplay
+								color={ safeColordColor }
+								colorType={ copyFormat || colorType }
+								enableAlpha={ enableAlpha }
+							/>
+						) }
+						<DetailsControlButton
+							isSmall
+							onClick={ () => setShowInputs( ! showInputs ) }
+							icon={ settings }
+							isPressed={ showInputs }
+							label={
+								showInputs
+									? __( 'Hide detailed inputs' )
+									: __( 'Show detailed inputs' )
 							}
-							label={ __( 'Color format' ) }
-							hideLabelFromVision
 						/>
-					) : (
-						<ColorDisplay
+					</HStack>
+					<Spacer margin={ 4 } />
+					{ showInputs && (
+						<ColorInput
+							colorType={ colorType }
 							color={ safeColordColor }
-							colorType={ copyFormat || colorType }
+							onChange={ handleChange }
 							enableAlpha={ enableAlpha }
 						/>
 					) }
-					<DetailsControlButton
-						isSmall
-						onClick={ () => setShowInputs( ! showInputs ) }
-						icon={ settings }
-						isPressed={ showInputs }
-						label={
-							showInputs
-								? __( 'Hide detailed inputs' )
-								: __( 'Show detailed inputs' )
-						}
-					/>
-				</HStack>
-				<Spacer margin={ 4 } />
-				{ showInputs && (
-					<ColorInput
-						colorType={ colorType }
-						color={ safeColordColor }
-						onChange={ handleChange }
-						enableAlpha={ enableAlpha }
-					/>
-				) }
-			</AuxiliaryColorArtefactWrapper>
+				</AuxiliaryColorArtefactWrapper>
+			) }
+
+			{ children }
 		</ColorfulWrapper>
 	);
 };
