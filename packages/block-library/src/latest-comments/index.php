@@ -86,9 +86,9 @@ function render_block_core_latest_comments( $attributes = array() ) {
 
 			$author_markup = '';
 			if ( $author_url ) {
-				$author_markup .= '<a class="wp-block-latest-comments__comment-author" href="' . esc_url( $author_url ) . '">' . get_comment_author( $comment ) . '</a>';
+				$author_markup .= '<a class="wp-block-latest-comments__comment-author" href="' . esc_url( $author_url ) . '">' . esc_html( get_comment_author( $comment ) ) . '</a>';
 			} else {
-				$author_markup .= '<span class="wp-block-latest-comments__comment-author">' . get_comment_author( $comment ) . '</span>';
+				$author_markup .= '<span class="wp-block-latest-comments__comment-author">' . esc_html( get_comment_author( $comment ) ) . '</span>';
 			}
 
 			// `_draft_or_post_title` calls `esc_html()` so we don't need to wrap that call in
