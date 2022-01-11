@@ -53,6 +53,10 @@ export class PostVisibility extends Component {
 		onSave();
 	};
 
+	handleDialogCancel = () => {
+		this.setState( { showPrivateConfirmDialog: false } );
+	};
+
 	setPasswordProtected() {
 		const { visibility, onUpdateVisibility, status, password } = this.props;
 
@@ -151,9 +155,7 @@ export class PostVisibility extends Component {
 				key="private-publish-confirmation"
 				isOpen={ this.state.showPrivateConfirmDialog }
 				onConfirm={ this.confirmPrivate }
-				onCancel={ () => {
-					this.setState( { showPrivateConfirmDialog: false } );
-				} }
+				onCancel={ this.handleDialogCancel }
 			>
 				{ __( 'Would you like to privately publish this post now?' ) }
 			</ConfirmDialog>,
