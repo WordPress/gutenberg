@@ -1,44 +1,25 @@
-.components-spinner--svg {
-	animation: 2s linear infinite both rotatesvg;
-	position: absolute;
-	top: 0;
-	left: 0;
+.components-spinner {
+	&::after {
+		display: block;
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		border: 2px solid transparent;
+		border-top-color: var(--wp-admin-theme-color);
+		box-sizing: border-box;
+		border-radius: 50%;
+		animation: 1.4s linear infinite both components-spinner__spin-indicator;
+	}
 }
 
-@keyframes rotatesvg {
+@keyframes components-spinner__spin-indicator {
 	0% {
 		transform: rotateZ(0deg);
 	}
 	100% {
 		transform: rotateZ(360deg);
-	}
-}
-
-.components-spinner--circle {
-	animation: 1.4s ease-in-out infinite both rotatecircle;
-	fill: transparent;
-	stroke: currentColor;
-	stroke-dasharray: 185;
-	stroke-linecap: round;
-	stroke-width: 1.5px;
-	transform-origin: 50% 50%;
-}
-
-@keyframes rotatecircle {
-	0%,
-	25% {
-		stroke-dashoffset: 180;
-		transform: rotate(0);
-	}
-
-	50%,
-	75% {
-		stroke-dashoffset: 165;
-		transform: rotate(45deg);
-	}
-
-	100% {
-		stroke-dashoffset: 180;
-		transform: rotate(360deg);
 	}
 }
