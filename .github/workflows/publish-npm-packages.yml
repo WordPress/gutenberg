@@ -146,3 +146,40 @@ jobs:
                   done <<< $PUBLIC_PACKAGES
                   git commit -am "Update changelog files"
                   git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
+
+    publish-packages:
+        name: Update Packages
+        runs-on: ubuntu-latest
+        needs: update-packages
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  ref: ${{ env.WORDPRESS_RELEASE_BRANCH }}
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              with:
+                  node-version: 14
+                  cache: npm
+
+            - name: Npm install and build
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Publish packages
+              if: github.event.inputs.release_type == 'next'
+              run: |
+                  minimum_version_bump='patch'
+                  if [ '${{ github.event.inputs.release_type }}' = 'next' ]; then
+                    sha=$(git rev-parse --short HEAD)
+                    npx lerna version pre"$minimum_version_bump" --preid next."$sha" --no-private
+                    npx lerna publish from-package --dist-tag next
+                  elif [ '${{ github.event.inputs.release_type }}' = 'bugfix' ]; then
+                    npm run publish:latest
+                  else
+                    npx lerna version "$minimum_version_bump" --no-private
+                    npx lerna publish from-package
+                  fi
