@@ -611,6 +611,7 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 			}
 		}
 	}
+
 	return $parsed_block;
 }
 
