@@ -652,6 +652,7 @@ if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 				}
 				return $content;
 			};
+
 			/*
 			 * The filter's callback here is an anonymous function because
 			 * using a named function in this case is not possible.
