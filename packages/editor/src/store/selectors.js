@@ -1256,6 +1256,7 @@ function getBlockEditorSelector( name ) {
 		deprecated( "`wp.data.select( 'core/editor' )." + name + '`', {
 			since: '5.3',
 			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
+			version: '6.2',
 		} );
 
 		return select( blockEditorStore )[ name ]( ...args );
