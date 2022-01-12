@@ -109,7 +109,7 @@ _Parameters_
 
 _Returns_
 
--   `ComponentType`: Higher-order component.
+-   `Object`: Higher-order component.
 
 ### pure
 

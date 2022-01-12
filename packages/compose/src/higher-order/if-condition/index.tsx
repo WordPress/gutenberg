@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ComponentType } from 'react';
-
-/**
  * Internal dependencies
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
@@ -23,7 +18,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  *
  * @param  predicate Function to test condition.
  *
- * @return {ComponentType} Higher-order component.
+ * @return {Object} Higher-order component.
  */
 const ifCondition = < TProps extends Record< string, any > >(
 	predicate: ( props: TProps ) => boolean
