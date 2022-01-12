@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { AppRegistry } from 'react-native';
+import { AppRegistry, Text } from 'react-native';
 import { render, waitFor } from 'test/helpers';
 
 /**
@@ -176,9 +176,19 @@ describe( 'Register Gutenberg', () => {
 		expect( hookCallOrder ).toBeGreaterThan( onRenderEditorCallOrder );
 	} );
 
-	it( 'initializes the editor', () => {
-		const { getByTestId } = initGutenberg();
-		const blockList = waitFor( () => getByTestId( 'block-list-wrapper' ) );
+	it( 'initializes the editor', async () => {
+		const MockEditor = () => <Text>Mock Editor</Text>;
+		jest.mock( '../setup', () => {
+			return {
+				__esModule: true,
+				default: jest.fn( () => <MockEditor /> ),
+			};
+		} );
+
+		const screen = initGutenberg();
+		const blockList = await waitFor( () =>
+			screen.getByText( 'Mock Editor' )
+		);
 		expect( blockList ).toBeDefined();
 	} );
 } );
