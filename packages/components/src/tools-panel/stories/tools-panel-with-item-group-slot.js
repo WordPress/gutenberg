@@ -12,6 +12,7 @@ import { useContext, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import Button from '../../button';
 import ColorIndicator from '../../color-indicator';
 import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
@@ -135,25 +136,28 @@ export const ToolsPanelWithItemGroupSlot = () => {
 				onDeselect={ () => updateAttribute( attribute, undefined ) }
 				resetAllFilter={ () => ( { [ attribute ]: undefined } ) }
 				panelId={ panelId }
-				as={ Dropdown }
-				renderToggle={ ( { onToggle } ) => (
-					<Item onClick={ onToggle }>
-						<HStack justify="flex-start">
-							<ColorIndicator colorValue={ value } />
-							<FlexItem>{ label }</FlexItem>
-						</HStack>
-					</Item>
-				) }
-				renderContent={ () => (
-					<ColorPalette
-						value={ value }
-						colors={ colors }
-						onChange={ ( newColor ) =>
-							updateAttribute( attribute, newColor )
-						}
-					/>
-				) }
-			/>
+				as={ Item }
+			>
+				<Dropdown
+					renderToggle={ ( { onToggle } ) => (
+						<Button onClick={ onToggle }>
+							<HStack justify="flex-start">
+								<ColorIndicator colorValue={ value } />
+								<FlexItem>{ label }</FlexItem>
+							</HStack>
+						</Button>
+					) }
+					renderContent={ () => (
+						<ColorPalette
+							value={ value }
+							colors={ colors }
+							onChange={ ( newColor ) =>
+								updateAttribute( attribute, newColor )
+							}
+						/>
+					) }
+				/>
+			</ToolsPanelItem>
 		);
 	};
 
@@ -206,26 +210,32 @@ const SlotWrapper = css`
 	&&& {
 		row-gap: 0;
 	}
+
+	> div {
+		grid-column: span 2;
+	}
 `;
 
 const ToolsPanelItemClass = css`
+	padding: 0;
 	border-left: 1px solid rgba( 0, 0, 0, 0.1 );
 	border-right: 1px solid rgba( 0, 0, 0, 0.1 );
 	border-bottom: 1px solid rgba( 0, 0, 0, 0.1 );
 
-	&.first {
-		border-top-left-radius: 20px;
-		border-top-right-radius: 20px;
+	&&.first {
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
 		border-top: 1px solid rgba( 0, 0, 0, 0.1 );
 	}
 
 	&.last {
-		border-bottom-left-radius: 20px;
-		border-bottom-right-radius: 20px;
+		border-bottom-left-radius: 10px;
+		border-bottom-right-radius: 10px;
 	}
 
 	&& > div,
 	&& > div > button {
+		width: 100%;
 		border-radius: inherit;
 	}
 
