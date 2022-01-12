@@ -164,7 +164,10 @@ if ( require.main === module ) {
 		domains.push( pluginName );
 	}
 
-	const potFilesDir = path.resolve( path.dirname( outputFile ) );
+	const potFilesDir = path.join(
+		path.resolve( path.dirname( outputFile ) ),
+		'pot-files'
+	);
 
 	// Generate POT files
 	generatePotFiles( otherPlugins, potFilesDir );
@@ -175,4 +178,7 @@ if ( require.main === module ) {
 		JSON.stringify( usedStrings, null, 2 ),
 		'utf8'
 	);
+
+	// Clean up POT files directory
+	fs.rmSync( potFilesDir, { force: true, recursive: true } );
 }
