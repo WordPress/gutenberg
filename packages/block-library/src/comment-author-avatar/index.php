@@ -57,8 +57,8 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 		array(
 			'height'     => $height,
 			'width'      => $width,
-			'extra_attr' => sprintf( 'style="%1s"', esc_attr( $styles ) ),
-			'class'      => esc_attr( $classes ),
+			'extra_attr' => sprintf( 'style="%1s"', $styles ),
+			'class'      => $classes,
 		)
 	);
 	if ( isset( $spacing_attributes ) ) {
