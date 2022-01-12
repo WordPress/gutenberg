@@ -182,7 +182,7 @@ jobs:
                   NO_ZIP: 'true'
 
             - name: Upload artifact
-              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # v2.3.1
               with:
                   name: gutenberg
                   path: gutenberg/
@@ -205,7 +205,7 @@ jobs:
 
             - name: Upload release notes artifact
               if: ${{ needs.bump-version.outputs.new_version }}
-              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # v2.3.1
               with:
                   name: release-notes
                   path: ./release-notes.txt
@@ -268,7 +268,7 @@ jobs:
               run: echo ::set-output name=version::$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )
 
             - name: Download Plugin Artifact Files
-              uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
+              uses: actions/download-artifact@f023be2c48cc18debc3bacd34cb396e0295e2869 # v2.1.0
               with:
                   name: gutenberg
 
@@ -276,7 +276,7 @@ jobs:
               run: zip -r gutenberg.zip *
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
+              uses: actions/download-artifact@f023be2c48cc18debc3bacd34cb396e0295e2869 # v2.1.0
               with:
                   name: release-notes
 
