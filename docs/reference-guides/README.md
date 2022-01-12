@@ -37,9 +37,9 @@
 
 ## [Theme.json Reference](/docs/reference-guides/theme-json/README.md)
 
--   [Latest Reference](/docs/reference-guides/theme-json/theme-json-reference-latest.md)
--   [Version 1 Reference](/docs/reference-guides/theme-json/theme-json-reference-v1.md)
--   [Migrating to Newer Versions](/docs/reference-guides/theme-json/theme-json-migrations.md)
+-   [Latest Reference](/docs/reference-guides/theme-json/living.md)
+-   [Version 1 Reference](/docs/reference-guides/theme-json/v1.md)
+-   [Migrating to Newer Versions](/docs/reference-guides/theme-json/migrations.md)
 
 ## [RichText Reference](/docs/reference-guides/richtext.md)
 

@@ -34,7 +34,7 @@ const THEME_JSON_SCHEMA_FILE = path.resolve(
  */
 const THEME_JSON_REF_DOC = path.resolve(
 	ROOT_DIR,
-	'docs/reference-guides/theme-json/theme-json-reference-latest.md'
+	'docs/reference-guides/theme-json/living.md'
 );
 
 /**

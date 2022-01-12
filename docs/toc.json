@@ -224,13 +224,13 @@
 			{
 				"docs/reference-guides/theme-json/README.md": [
 					{
-						"docs/reference-guides/theme-json/theme-json-reference-latest.md": []
+						"docs/reference-guides/theme-json/living.md": []
 					},
 					{
-						"docs/reference-guides/theme-json/theme-json-reference-v1.md": []
+						"docs/reference-guides/theme-json/v1.md": []
 					},
 					{
-						"docs/reference-guides/theme-json/theme-json-migrations.md": []
+						"docs/reference-guides/theme-json/migrations.md": []
 					}
 				]
 			},
