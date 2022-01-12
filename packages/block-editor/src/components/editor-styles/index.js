@@ -78,20 +78,22 @@ function PrefixedStyle( { tagName, href, id, rel, media, textContent } ) {
 	const TagName = tagName.toLowerCase();
 
 	function onLoad( event ) {
-		const { sheet } = event.target;
+		const { sheet, ownerDocument } = event.target;
+		const { defaultView } = ownerDocument;
+		const { CSSStyleRule } = defaultView;
 		const { cssRules } = sheet;
 
 		let index = 0;
 
 		for ( const rule of cssRules ) {
-			const { type, STYLE_RULE, selectorText, cssText } = rule;
+			const { selectorText, cssText } = rule;
 
-			if ( type !== STYLE_RULE ) {
+			if ( ! ( rule instanceof CSSStyleRule ) ) {
 				continue;
 			}
 
 			if ( selectorText.includes( EDITOR_STYLES_SELECTOR ) ) {
-				return;
+				continue;
 			}
 
 			sheet.deleteRule( index );
