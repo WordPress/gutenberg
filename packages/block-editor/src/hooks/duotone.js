@@ -364,16 +364,16 @@ const withDuotoneStyles = createHigherOrderComponent(
 );
 
 const withDuotoneFilter = createHigherOrderComponent(
-	( PresetSvgFilter ) => ( props ) => {
-		if ( props.metadata.svgFilter !== 'duotone' ) {
+	( PresetSvgFilter ) => ( { metadata, preset } ) => {
+		if ( metadata.svgFilter !== 'duotone' ) {
 			return <PresetSvgFilter />;
 		}
 		return (
 			<>
 				<PresetSvgFilter />
 				<DuotoneFilter
-					id={ `wp-duotone-${ props.preset.slug }` }
-					values={ getValuesFromColors( props.preset.colors ) }
+					id={ `wp-duotone-${ preset.slug }` }
+					values={ getValuesFromColors( preset.colors ) }
 				/>
 			</>
 		);
