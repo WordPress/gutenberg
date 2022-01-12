@@ -60,9 +60,6 @@ const getHeading = ( index, text ) => {
 };
 
 const getTypeOutput = ( tag ) => {
-	if ( ! tag.type ) {
-		return '<abbr title="See the documentation for more complete types">*</abbr>';
-	}
 	if ( tag.optional ) {
 		return `\`[${ tag.type }]\``;
 	}
@@ -117,27 +114,27 @@ module.exports = (
 				'Type',
 				getSymbolTagsByName( symbol, 'type' ),
 				( tag ) =>
-					`\n- ${ getTypeOutput( tag ) }${ cleanSpaces(
-						` ${ tag.name } ${ tag.description }`
-					) }`,
+					`\n- ${
+						tag.type ? getTypeOutput( tag ) : ''
+					}${ cleanSpaces( ` ${ tag.name } ${ tag.description }` ) }`,
 				docs
 			);
 			formatTag(
 				'Parameters',
 				getSymbolTagsByName( symbol, 'param' ),
 				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput(
-						tag
-					) }: ${ cleanSpaces( tag.description ) }`,
+					`\n- *${ tag.name }* ${
+						tag.type ? `${ getTypeOutput( tag ) }: ` : ''
+					}${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Returns',
 				getSymbolTagsByName( symbol, 'return' ),
 				( tag ) => {
-					return `\n- ${ getTypeOutput( tag ) }: ${ cleanSpaces(
-						`${ tag.name } ${ tag.description }`
-					) }`;
+					return `\n- ${
+						tag.type ? `${ getTypeOutput( tag ) }: ` : ''
+					}${ cleanSpaces( `${ tag.name } ${ tag.description }` ) }`;
 				},
 				docs
 			);
@@ -151,9 +148,9 @@ module.exports = (
 				'Properties',
 				getSymbolTagsByName( symbol, 'property' ),
 				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput(
-						tag
-					) }: ${ cleanSpaces( tag.description ) }`,
+					`\n- *${ tag.name }* ${
+						tag.type ? `${ getTypeOutput( tag ) }: ` : ''
+					}${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			docs.push( '\n' );
