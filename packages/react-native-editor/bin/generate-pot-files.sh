@@ -204,10 +204,12 @@ fi
 # Set JS bundle directory
 BUNDLE_DIR="$TARGET_PATH/bundle"
 mkdir -p $BUNDLE_DIR
+trap '{ rm -rf -- "$BUNDLE_DIR"; }' EXIT
 
 # Set source files extraction directory
 EXTRACT_SOURCE_FILES_DIR="$TARGET_PATH/source-files"
 mkdir -p $EXTRACT_SOURCE_FILES_DIR
+trap '{ rm -rf -- "$EXTRACT_SOURCE_FILES_DIR"; }' EXIT
 
 # Set POT files directory
 POT_FILES_DIR="$TARGET_PATH"
@@ -253,7 +255,3 @@ done
 
 # Generate POT files for Gutenberg
 generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR" "${PLUGINS_TO_EXTRACT_FROM_GUTENBERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENBERG[@]}"}"
-
-# Clean up folders of intermediate files
-rm -rf $BUNDLE_DIR
-rm -rf $EXTRACT_SOURCE_FILES_DIR
