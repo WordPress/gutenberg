@@ -53,12 +53,7 @@ export const PRESET_METADATA = [
 		path: [ 'color', 'duotone' ],
 		cssVarInfix: 'duotone',
 		valueFunc: ( { slug } ) => `url( '#wp-duotone-${ slug }' )`,
-		classes: [
-			{
-				classSuffix: 'gradient-background',
-				propertyName: 'background',
-			},
-		],
+		classes: [],
 	},
 	{
 		path: [ 'typography', 'fontSizes' ],
