@@ -6,10 +6,15 @@ import { external } from '@wordpress/icons';
 import { MoreMenuDropdown } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import ToolsMoreMenuGroup from './tools-more-menu-group';
+
 export default function MoreMenu() {
 	return (
 		<MoreMenuDropdown>
-			{ () => (
+			{ ( onClose ) => (
 				<MenuGroup label={ __( 'Tools' ) }>
 					<MenuItem
 						role="menuitem"
@@ -26,6 +31,7 @@ export default function MoreMenu() {
 							}
 						</VisuallyHidden>
 					</MenuItem>
+					<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
 				</MenuGroup>
 			) }
 		</MoreMenuDropdown>
