@@ -16,8 +16,8 @@ import { SVG, Circle } from '@wordpress/primitives';
 export const StyledSpinner = styled.span`
 	width: ${ CONFIG.spinnerSize }px;
 	height: ${ CONFIG.spinnerSize }px;
-	box-shadow: inset 0 0 0 0.75px ${ COLORS.gray[ 400 ] },
-		0 0 0 0.75px ${ COLORS.gray[ 400 ] };
+	box-shadow: inset 0 0 0 0.75px ${ COLORS.gray[ 300 ] },
+		0 0 0 0.75px ${ COLORS.gray[ 300 ] };
 `;
 
 export default function Spinner() {
