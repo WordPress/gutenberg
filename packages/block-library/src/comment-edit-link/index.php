@@ -38,7 +38,7 @@ function render_block_core_comment_edit_link( $attributes, $content, $block ) {
 		'<div %1$s><a href="%2$s" %3$s>%4$s</a></div>',
 		$wrapper_attributes,
 		esc_url( $edit_comment_link ),
-		esc_attr( $link_atts ),
+		$link_atts,
 		esc_html__( 'Edit' )
 	);
 }
