@@ -31,7 +31,7 @@ function render_block_core_rss( $attributes ) {
 			$title = __( '(no title)' );
 		}
 		$link = $item->get_link();
-		$link = esc_url( $link );
+
 		if ( $link ) {
 			$title = '<a href="' . esc_url( $link ) . '">' . esc_html( $title ) . '</a>';
 		}
