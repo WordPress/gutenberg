@@ -16,6 +16,7 @@
  * 	  "<string>": {
  * 	    "string": String value.
  * 		"stringPlural": String value with its plural form. [optional]
+ * 		"context": Context associated with the string. [optional]
  * 		"comments": Comments for translators. [default value is an empty string]
  * 		"reference": Array containing the paths of the source files that reference the string.
  * 		"platforms": Array containing the platforms where the string is being used, values are "android" | "ios" | "web".
