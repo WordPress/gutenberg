@@ -1,9 +1,12 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import React, { useState } from 'react';
 import { text } from '@storybook/addon-knobs';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies

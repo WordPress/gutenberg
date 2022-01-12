@@ -3,13 +3,12 @@
  */
 import { noop } from 'lodash';
 import classnames from 'classnames';
+import type { Ref } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
 
 /**
  * Internal dependencies

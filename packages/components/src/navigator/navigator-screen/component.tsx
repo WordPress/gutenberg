@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';

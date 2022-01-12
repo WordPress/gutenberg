@@ -3,7 +3,6 @@
  */
 import { isEmpty, noop } from 'lodash';
 import classNames from 'classnames';
-// eslint-disable-next-line no-restricted-imports
 import type { ChangeEvent, FocusEvent, Ref } from 'react';
 
 /**
