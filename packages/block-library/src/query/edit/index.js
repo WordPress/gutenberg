@@ -30,13 +30,8 @@ import { getFirstQueryClientIdFromBlocks } from '../utils';
 const TEMPLATE = [ [ 'core/post-template' ] ];
 
 function ResetQueryLoopMenuItem( { clientId, isSelected } ) {
-	const rootClientId = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockRootClientId( clientId ),
-		[ clientId ]
-	);
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	if ( ! isSelected || rootClientId ) {
+	if ( ! isSelected ) {
 		return null;
 	}
 	return (
