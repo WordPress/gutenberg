@@ -13,23 +13,8 @@
 					"description": "Settings related to borders.",
 					"type": "object",
 					"properties": {
-						"customColor": {
-							"description": "Allow users to set custom border colors.",
-							"type": "boolean",
-							"default": false
-						},
 						"customRadius": {
 							"description": "Allow users to set custom border radius.",
-							"type": "boolean",
-							"default": false
-						},
-						"customStyle": {
-							"description": "Allow users to set custom border styles.",
-							"type": "boolean",
-							"default": false
-						},
-						"customWidth": {
-							"description": "Allow users to set custom border widths.",
 							"type": "boolean",
 							"default": false
 						}
@@ -40,11 +25,6 @@
 					"description": "Settings related to colors.",
 					"type": "object",
 					"properties": {
-						"background": {
-							"description": "Allow users to set background colors.",
-							"type": "boolean",
-							"default": true
-						},
 						"custom": {
 							"description": "Allow users to select custom colors.",
 							"type": "boolean",
@@ -190,30 +170,10 @@
 							"type": "boolean",
 							"default": true
 						},
-						"customFontStyle": {
-							"description": "Allow users to set custom font styles.",
-							"type": "boolean",
-							"default": true
-						},
-						"customFontWeight": {
-							"description": "Allow users to set custom font weights.",
-							"type": "boolean",
-							"default": true
-						},
 						"customLineHeight": {
 							"description": "Allow users to set custom line height.",
 							"type": "boolean",
 							"default": false
-						},
-						"customTextDecoration": {
-							"description": "Allow users to set custom text decorations.",
-							"type": "boolean",
-							"default": true
-						},
-						"customTextTransform": {
-							"description": "Allow users to set custom text transforms.",
-							"type": "boolean",
-							"default": true
 						},
 						"dropCap": {
 							"description": "Enable drop cap.",
@@ -236,28 +196,6 @@
 									},
 									"size": {
 										"description": "CSS font-size value, including units.",
-										"type": "string"
-									}
-								},
-								"additionalProperties": false
-							}
-						},
-						"fontFamilies": {
-							"description": "Font family presets for the font family selector.\nGenerates a single custom property (`--wp--preset--font-family--{slug}`) per preset value.",
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"name": {
-										"description": "Name of the font family preset, translatable.",
-										"type": "string"
-									},
-									"slug": {
-										"description": "Kebab-case unique identifier for the font family preset.",
-										"type": "string"
-									},
-									"fontFamily": {
-										"description": "CSS font-family value.",
 										"type": "string"
 									}
 								},
@@ -550,20 +488,8 @@
 					"description": "Border styles.",
 					"type": "object",
 					"properties": {
-						"color": {
-							"description": "Sets the `border-color` CSS property.",
-							"type": "string"
-						},
 						"radius": {
 							"description": "Sets the `border-radius` CSS property.",
-							"type": "string"
-						},
-						"style": {
-							"description": "Sets the `border-style` CSS property.",
-							"type": "string"
-						},
-						"width": {
-							"description": "Sets the `border-width` CSS property.",
 							"type": "string"
 						}
 					},
@@ -592,10 +518,6 @@
 					"description": "Spacing styles.",
 					"type": "object",
 					"properties": {
-						"blockGap": {
-							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true.",
-							"type": "string"
-						},
 						"margin": {
 							"description": "Margin styles.",
 							"type": "object",
@@ -649,32 +571,12 @@
 					"description": "Typography styles.",
 					"type": "object",
 					"properties": {
-						"fontFamily": {
-							"description": "Sets the `font-family` CSS property.",
-							"type": "string"
-						},
 						"fontSize": {
 							"description": "Sets the `font-size` CSS property.",
 							"type": "string"
 						},
-						"fontStyle": {
-							"description": "Sets the `font-style` CSS property.",
-							"type": "string"
-						},
-						"fontWeight": {
-							"description": "Sets the `font-weight` CSS property.",
-							"type": "string"
-						},
 						"lineHeight": {
 							"description": "Sets the `line-height` CSS property.",
-							"type": "string"
-						},
-						"textDecoration": {
-							"description": "Sets the `text-decoration` CSS property.",
-							"type": "string"
-						},
-						"textTransform": {
-							"description": "Sets the `text-transform` CSS property.",
 							"type": "string"
 						}
 					},
