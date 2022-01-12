@@ -268,11 +268,6 @@
 					"description": "When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to false.",
 					"default": true
 				},
-				"fontSize": {
-					"type": "boolean",
-					"description": "This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.\n\nThe values shown in this control are the ones declared by the theme via the editor-font-sizes theme support, or the default ones if none is provided.\n\nWhen the block declares support for fontSize, the attributes definition is extended to include two new attributes: fontSize and style",
-					"default": false
-				},
 				"html": {
 					"type": "boolean",
 					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
@@ -282,11 +277,6 @@
 					"type": "boolean",
 					"description": "By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set inserter to false.",
 					"default": true
-				},
-				"lineHeight": {
-					"type": "boolean",
-					"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, the attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
-					"default": false
 				},
 				"multiple": {
 					"type": "boolean",
@@ -353,6 +343,22 @@
 									}
 								}
 							]
+						}
+					}
+				},
+				"typography": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific typography property, the attributes definition is extended to include the style attribute.",
+					"properties": {
+						"fontSize": {
+							"type": "boolean",
+							"description": "This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.\n\nThe values shown in this control are the ones declared by the theme via the editor-font-sizes theme support, or the default ones if none is provided.\n\nWhen the block declares support for fontSize, the attributes definition is extended to include two new attributes: fontSize and style",
+							"default": false
+						},
+						"lineHeight": {
+							"type": "boolean",
+							"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, the attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
+							"default": false
 						}
 					}
 				}
