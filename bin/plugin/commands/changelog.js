@@ -31,6 +31,7 @@ const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
  *
  * @property {string=}  milestone  Optional Milestone title.
  * @property {string=}  token      Optional personal access token.
+ * @property {string=}  version    Optional "rc" or "stable" version. Defaults to "rc".
  * @property {boolean=} unreleased Optional flag to only include issues that haven't been part of a release yet.
  */
 
@@ -40,6 +41,7 @@ const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
  * @property {string}   owner      Repository owner.
  * @property {string}   repo       Repository name.
  * @property {string=}  token      Optional personal access token.
+ * @property {string}  version     Optional "rc" or "stable" version.
  * @property {string}   milestone  Milestone title.
  * @property {boolean=} unreleased Only include issues that have been closed since the milestone's latest release.
  */
@@ -645,6 +647,13 @@ async function getChangelog( settings ) {
 
 	const pullRequests = await fetchAllPullRequests( octokit, settings );
 	if ( ! pullRequests.length ) {
+		if ( settings.version === 'stable' ) {
+			// No need to return an error for this case.
+			return (
+				'There are no additional pull requests associated with this milestone. ' +
+				'You can delete this line.\n'
+			);
+		}
 		if ( settings.unreleased ) {
 			throw new Error(
 				'There are no unreleased pull requests associated with the milestone.'
@@ -791,6 +800,7 @@ async function getReleaseChangelog( options ) {
 		owner: config.githubRepositoryOwner,
 		repo: config.githubRepositoryName,
 		token: options.token,
+		version: options.version || 'rc',
 		milestone:
 			options.milestone === undefined
 				? // Disable reason: valid-sprintf applies to `@wordpress/i18n` where

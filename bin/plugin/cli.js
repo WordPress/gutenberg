@@ -57,6 +57,11 @@ program
 	.option( '-m, --milestone <milestone>', 'Milestone' )
 	.option( '-t, --token <token>', 'Github token' )
 	.option(
+		'--version <version>',
+		'The version to be released. Either "rc" or "stable"',
+		'rc'
+	)
+	.option(
 		'-u, --unreleased',
 		"Only include PRs that haven't been included in a release yet"
 	)
