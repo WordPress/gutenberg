@@ -40,7 +40,6 @@
 		"className": false,
 		"typography": {
 			"fontSize": true,
-			"__experimentalFontFamily": true,
 			"lineHeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
