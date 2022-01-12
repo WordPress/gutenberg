@@ -57,11 +57,7 @@ if ( require.main === module ) {
 	const mapFileData = fs.readFileSync( mapFile );
 	const { sources } = JSON.parse( mapFileData );
 
-	// Transform absolute paths into relative
-	const currentPath = process.cwd();
-	let sourceFiles = sources.map( ( file ) =>
-		file.replace( currentPath, '.' )
-	);
+	let sourceFiles = sources;
 
 	// Filter out files under "node_modules" folder
 	sourceFiles = sourceFiles.filter(
