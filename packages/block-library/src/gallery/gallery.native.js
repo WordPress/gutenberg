@@ -35,6 +35,7 @@ export const Gallery = ( props ) => {
 	const {
 		mediaPlaceholder,
 		attributes,
+		images,
 		isNarrow,
 		onBlur,
 		insertBlocksAfter,
@@ -49,7 +50,6 @@ export const Gallery = ( props ) => {
 	}, [ sizes ] );
 
 	const {
-		images,
 		align,
 		columns = defaultColumnsNumber( images.length ),
 	} = attributes;
