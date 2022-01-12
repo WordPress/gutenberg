@@ -64,7 +64,7 @@ describe( 'Document Settings', () => {
 				);
 				headerTemplatePartListViewButton.click();
 				await page.click(
-					'button[aria-label="Close list view sidebar"]'
+					'button[aria-label="Close List View Sidebar"]'
 				);
 
 				// Evaluate the document settings secondary title
