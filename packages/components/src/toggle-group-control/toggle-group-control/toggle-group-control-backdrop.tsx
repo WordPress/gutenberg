@@ -22,7 +22,7 @@ function ToggleGroupControlBackdrop( {
 	const [ targetNode, setTargetNode ] = useState< HTMLElement | null >();
 	// On the second transition, the component is in the intended starting position and ready to animate
 	const [ transitionCount, setTransitionCount ] = useState( 0 );
-	const [ canAnimate, setReady ] = useState( false );
+	const [ canAnimate, setCanAnimate ] = useState( false );
 
 	useEffect( () => {
 		const containerNode = containerRef?.current;
@@ -88,7 +88,7 @@ function ToggleGroupControlBackdrop( {
 
 	useEffect( () => {
 		if ( transitionCount >= 2 && ! canAnimate ) {
-			setReady( true );
+			setCanAnimate( true );
 		}
 	}, [ transitionCount ] );
 
