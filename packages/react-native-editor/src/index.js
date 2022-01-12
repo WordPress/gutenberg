@@ -2,13 +2,12 @@
  * External dependencies
  */
 import 'react-native-gesture-handler';
-import { AppRegistry } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { applyFilters, doAction } from '@wordpress/hooks';
-import { Component, cloneElement } from '@wordpress/element';
+import { Component, cloneElement, registerComponent } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -77,7 +76,7 @@ const registerGutenberg = ( {
 		}
 	}
 
-	AppRegistry.registerComponent( 'gutenberg', () => Gutenberg );
+	registerComponent( 'gutenberg', () => Gutenberg );
 };
 
 export { initialHtml as initialHtmlGutenberg, registerGutenberg, setupLocale };
