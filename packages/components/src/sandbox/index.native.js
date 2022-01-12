@@ -32,8 +32,8 @@ const observeAndResizeJS = `
 		function sendResize() {
 			var clientBoundingRect = document.body.getBoundingClientRect();
 
-			// The function postMessage is exposed by the react-native-webview library 
-			// to communicate between React Native and the WebView, in this case, 
+			// The function postMessage is exposed by the react-native-webview library
+			// to communicate between React Native and the WebView, in this case,
 			// we use it for notifying resize changes.
             window.ReactNativeWebView.postMessage(JSON.stringify( {
                 action: 'resize',
@@ -109,7 +109,7 @@ const style = `
 
 	/**
 	 * Add responsiveness to embeds with aspect ratios.
-	 * 
+	 *
 	 * These styles have been copied from the web version (https://git.io/JEFcX) and
 	 * adapted for the native version.
 	 */
@@ -270,9 +270,12 @@ function Sandbox( {
 	}
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onChangeDimensions );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onChangeDimensions
+		);
 		return () => {
-			Dimensions.removeEventListener( 'change', onChangeDimensions );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 

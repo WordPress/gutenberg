@@ -14,7 +14,7 @@ const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
 const {
-	getBlockTemplate,
+	getPluginTemplate,
 	getDefaultValues,
 	getPrompts,
 } = require( './templates' );
@@ -34,13 +34,16 @@ program
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'block template type name, allowed values: "es5", "esnext", or the name of an external npm package',
+		'plugin template type name, allowed values: "es5", "esnext", or the name of an external npm package',
 		'esnext'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
-	.option( '--title <value>', 'display title for the block' )
+	.option( '--title <value>', 'display title for the plugin/block' )
 	// The name "description" is used internally so it couldn't be used.
-	.option( '--short-description <value>', 'short description for the block' )
+	.option(
+		'--short-description <value>',
+		'short description for the plugin/block'
+	)
 	.option( '--category <name>', 'category name for the block' )
 	.option(
 		'--wp-scripts',
@@ -66,8 +69,8 @@ program
 		) => {
 			await checkSystemRequirements( engines );
 			try {
-				const blockTemplate = await getBlockTemplate( templateName );
-				const defaultValues = getDefaultValues( blockTemplate );
+				const pluginTemplate = await getPluginTemplate( templateName );
+				const defaultValues = getDefaultValues( pluginTemplate );
 				const optionsValues = pickBy(
 					{
 						category,
@@ -88,16 +91,16 @@ program
 						title: startCase( slug ),
 						...optionsValues,
 					};
-					await scaffold( blockTemplate, answers );
+					await scaffold( pluginTemplate, answers );
 				} else {
-					const prompts = getPrompts( blockTemplate ).filter(
+					const prompts = getPrompts( pluginTemplate ).filter(
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
 					log.info( '' );
-					log.info( "Let's customize your block:" );
+					log.info( "Let's customize your WordPress plugin:" );
 					const answers = await inquirer.prompt( prompts );
-					await scaffold( blockTemplate, {
+					await scaffold( pluginTemplate, {
 						...defaultValues,
 						...optionsValues,
 						...answers,

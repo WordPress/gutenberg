@@ -4,7 +4,7 @@
 	"name": "core/post-author",
 	"title": "Post Author",
 	"category": "theme",
-	"description": "Add the author of this post.",
+	"description": "Display post author details such as name, avatar, and bio.",
 	"textdomain": "default",
 	"attributes": {
 		"textAlign": {

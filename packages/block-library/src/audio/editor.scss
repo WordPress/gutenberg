@@ -2,4 +2,18 @@
 	// Remove the left and right margin the figure is born with.
 	margin-left: 0;
 	margin-right: 0;
+	position: relative;
+
+	&.is-transient audio {
+		opacity: 0.3;
+	}
+
+	// Shown while audio is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
 }

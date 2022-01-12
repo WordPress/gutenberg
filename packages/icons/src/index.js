@@ -229,6 +229,7 @@ export { default as trendingUp } from './library/trending-up';
 export { default as typography } from './library/typography';
 export { default as undo } from './library/undo';
 export { default as ungroup } from './library/ungroup';
+export { default as unlock } from './library/unlock';
 export { default as update } from './library/update';
 export { default as upload } from './library/upload';
 export { default as verse } from './library/verse';

@@ -12,7 +12,7 @@ Visit the [Gutenberg handbook](https://developer.wordpress.org/block-editor/deve
 
 ## Quick start
 
-You just need to provide the `slug` which is the target location for scaffolded files and the internal block name.
+You just need to provide the `slug` which is the target location for scaffolded plugin files and the internal block name.
 
 ```bash
 $ npx @wordpress/create-block todo-list
@@ -40,10 +40,10 @@ Options:
 
 ```bash
 -V, --version                output the version number
--t, --template <name>        block template type name, allowed values: "es5", "esnext", the name of an external npm package (default: "esnext"), or the path to a local directory.
+-t, --template <name>        plugin template type name, allowed values: "es5", "esnext", the name of an external npm package (default: "esnext"), or the path to a local directory.
 --namespace <value>          internal namespace for the block name
---title <value>              display title for the block
---short-description <value>  short description for the block
+--title <value>              display title for the plugin/block
+--short-description <value>  short description for the plugin/block
 --category <name>            category name for the block
 --wp-scripts                 enable integration with `@wordpress/scripts` package
 --no-wp-scripts              disable integration with `@wordpress/scripts` package
@@ -131,7 +131,7 @@ It is mandatory to provide the main file (`index.js` by default) for the package
 
 #### `templatesPath`
 
-A mandatory field with the path pointing to the location where template files live (nested folders are also supported). All files without the `.mustache` extension will be ignored.
+A mandatory field with the path pointing to the location where plugin template files live (nested folders are also supported). All files without the `.mustache` extension will be ignored.
 
 _Example:_
 
@@ -139,13 +139,27 @@ _Example:_
 const { join } = require( 'path' );
 
 module.exports = {
-	templatesPath: join( __dirname, 'templates' ),
+	templatesPath: join( __dirname, 'plugin-templates' ),
+};
+```
+
+#### `blockTemplatesPath`
+
+An optional field with the path pointing to the location where template files for the individual block live (nested folders are also supported). All files without the `.mustache` extension will be ignored.
+
+_Example:_
+
+```js
+const { join } = require( 'path' );
+
+module.exports = {
+	blockTemplatesPath: join( __dirname, 'block-templates' ),
 };
 ```
 
 #### `assetsPath`
 
-This setting is useful when your template scaffolds a block that uses static assets like images or fonts, which should not be processed. It provides the path pointing to the location where assets are located. They will be copied to the `assets` subfolder in the generated plugin.
+This setting is useful when your template scaffolds a plugin that uses static assets like images or fonts, which should not be processed. It provides the path pointing to the location where assets are located. They will be copied to the `assets` subfolder in the generated plugin.
 
 _Example:_
 
@@ -153,7 +167,7 @@ _Example:_
 const { join } = require( 'path' );
 
 module.exports = {
-	assetsPath: join( __dirname, 'assets' ),
+	assetsPath: join( __dirname, 'plugin-assets' ),
 };
 ```
 
@@ -193,7 +207,8 @@ The following configurable variables are used with the template files. Template 
 -   `version` (default: `'0.1.0'`)
 -   `wpScripts` (default: `true`)
 -   `wpEnv` (default: `false`)
--   `npmDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install`](https://docs.npmjs.com/cli/v6/commands/npm-install).
+-   `npmDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install`](https://docs.npmjs.com/cli/v8/commands/npm-install) when `wpScripts` is enabled.
+-   `folderName` (default: `.`) – the location for the `block.json` file and other optional block files generated from block templates included in the folder set with the `blockTemplatesPath` setting.
 -   `editorScript` (default: `'file:./build/index.js'`)
 -   `editorStyle` (default: `'file:./build/index.css'`)
 -   `style` (default: `'file:./build/style-index.css'`)

@@ -14,6 +14,7 @@ import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
@@ -299,6 +300,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new RNScreensPackage(),
                         new RNPromptPackage(),
                         new RNCWebViewPackage(),
+                        new ClipboardPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 

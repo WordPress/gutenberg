@@ -14,7 +14,6 @@ import {
 	ColorIndicator,
 	Dropdown,
 } from '@wordpress/components';
-import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,7 +32,7 @@ export default function ColorGradientSettingsDropdown( {
 } ) {
 	let dropdownPosition;
 	if ( __experimentalIsRenderedInSidebar ) {
-		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
+		dropdownPosition = 'bottom left';
 	}
 
 	return (

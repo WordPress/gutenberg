@@ -79,7 +79,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
-		if ( ! queryId ) {
+		if ( ! Number.isFinite( queryId ) ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { queryId: instanceId } );
 		}

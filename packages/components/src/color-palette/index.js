@@ -10,7 +10,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -136,9 +136,10 @@ export default function ColorPalette( {
 	__experimentalIsRenderedInSidebar = false,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
-	const Component = __experimentalHasMultipleOrigins
-		? MultiplePalettes
-		: SinglePalette;
+	const Component =
+		__experimentalHasMultipleOrigins && colors?.length
+			? MultiplePalettes
+			: SinglePalette;
 
 	const renderCustomColorPicker = () => (
 		<ColorPicker
@@ -150,7 +151,7 @@ export default function ColorPalette( {
 
 	let dropdownPosition;
 	if ( __experimentalIsRenderedInSidebar ) {
-		dropdownPosition = isRTL() ? 'bottom right' : 'bottom left';
+		dropdownPosition = 'bottom left';
 	}
 
 	const colordColor = colord( value );

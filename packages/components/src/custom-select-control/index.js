@@ -9,6 +9,8 @@ import classnames from 'classnames';
  */
 import { Icon, check, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -98,6 +100,15 @@ export default function CustomSelectControl( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
 	} );
+
+	const onKeyDownHandler = useCallback(
+		( e ) => {
+			e.stopPropagation();
+			menuProps?.onKeyDown?.( e );
+		},
+		[ menuProps ]
+	);
+
 	// We need this here, because the null active descendant is not fully ARIA compliant.
 	if (
 		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
@@ -141,7 +152,8 @@ export default function CustomSelectControl( {
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
-			<ul { ...menuProps }>
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
 				{ isOpen &&
 					items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key

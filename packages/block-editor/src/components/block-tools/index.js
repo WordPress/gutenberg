@@ -95,6 +95,17 @@ export default function BlockTools( {
 		} else if (
 			isMatch( 'core/block-editor/delete-multi-selection', event )
 		) {
+			/**
+			 * Check if the target element is a text area, input or
+			 * event.defaultPrevented and return early. In all these
+			 * cases backspace could be handled elsewhere.
+			 */
+			if (
+				[ 'INPUT', 'TEXTAREA' ].includes( event.target.nodeName ) ||
+				event.defaultPrevented
+			) {
+				return;
+			}
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length > 1 ) {
 				event.preventDefault();
