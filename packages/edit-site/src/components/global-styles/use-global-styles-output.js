@@ -135,22 +135,22 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 const PresetSvgFilter = withFilters( 'editor.PresetSvgFilter' )( () => null );
 
 function getPresetsSvgFilters( blockPresets = {} ) {
-	// For now, only duotone produces SVG filters.
-	const path = [ 'color', 'duotone' ];
-	const presetByOrigin = get( blockPresets, path, {} );
-	return [ 'default', 'theme' ]
-		.filter( ( origin ) => presetByOrigin[ origin ] )
-		.flatMap( ( origin ) => {
-			return presetByOrigin[ origin ].map( ( preset ) => {
-				return (
-					<PresetSvgFilter
-						path={ path }
-						preset={ preset }
-						key={ preset.slug }
-					/>
-				);
+	return PRESET_METADATA.flatMap( ( metadata ) => {
+		const presetByOrigin = get( blockPresets, metadata.path, {} );
+		return [ 'default', 'theme' ]
+			.filter( ( origin ) => presetByOrigin[ origin ] )
+			.flatMap( ( origin ) => {
+				return presetByOrigin[ origin ].map( ( preset ) => {
+					return (
+						<PresetSvgFilter
+							metadata={ metadata }
+							preset={ preset }
+							key={ preset.slug }
+						/>
+					);
+				} );
 			} );
-		} );
+	} );
 }
 
 function flattenTree( input = {}, prefix, token ) {
