@@ -510,7 +510,7 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 function getReturnTypeAnnotation( declarationToken ) {
 	const functionToken = getFunctionToken( declarationToken );
 	if ( ! functionToken.returnType ) {
-		return 'unknown (see the source)';
+		return null;
 	}
 
 	try {

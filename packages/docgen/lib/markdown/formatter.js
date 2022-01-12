@@ -60,6 +60,9 @@ const getHeading = ( index, text ) => {
 };
 
 const getTypeOutput = ( tag ) => {
+	if ( ! tag.type ) {
+		return '<abbr title="See the documentation for more complete types">*</abbr>';
+	}
 	if ( tag.optional ) {
 		return `\`[${ tag.type }]\``;
 	}
