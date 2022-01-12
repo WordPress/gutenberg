@@ -7,29 +7,30 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	Card,
-	ColorIndicator,
-} from '@wordpress/components';
+	__unstableIframe as Iframe,
+	__unstableEditorStyles as EditorStyles,
+} from '@wordpress/block-editor';
+import { Card } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { useStyle } from './hooks';
+import { useGlobalStylesOutput } from './use-global-styles-output';
 
-const StylesPreview = ( props ) => {
+const StylesPreview = ( { height = 150, ...props } ) => {
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
 	const [ textColor = 'black' ] = useStyle( 'color.text' );
 	const [ linkColor = 'blue' ] = useStyle( 'elements.link.color.text' );
 	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
 	const [ gradientValue ] = useStyle( 'color.gradient' );
+	const [ styles ] = useGlobalStylesOutput();
 
 	return (
 		<Card
 			{ ...props }
 			style={ {
-				background: gradientValue ?? backgroundColor,
+				height,
 				...props.style,
 			} }
 			className={ classnames(
@@ -37,16 +38,49 @@ const StylesPreview = ( props ) => {
 				props.className
 			) }
 		>
-			<HStack
-				spacing={ 5 }
-				className="edit-site-global-styles-preview__content"
+			<Iframe
+				className="edit-site-global-styles-preview__iframe editor-styles-wrapper"
+				head={ <EditorStyles styles={ styles } /> }
+				style={ { height } }
 			>
-				<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
-				<VStack spacing={ 2 }>
-					<ColorIndicator colorValue={ textColor } />
-					<ColorIndicator colorValue={ linkColor } />
-				</VStack>
-			</HStack>
+				<div
+					style={ {
+						display: 'flex',
+						gap: 20,
+						alignItems: 'center',
+						justifyContent: 'center',
+						height: '100%',
+						zoom: height / 150,
+						background: gradientValue ?? backgroundColor,
+					} }
+				>
+					<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
+					<div
+						style={ {
+							display: 'flex',
+							gap: 20,
+							flexDirection: 'column',
+						} }
+					>
+						<div
+							style={ {
+								height: 40,
+								width: 40,
+								background: textColor,
+								borderRadius: 20,
+							} }
+						/>{ ' ' }
+						<div
+							style={ {
+								height: 40,
+								width: 40,
+								background: linkColor,
+								borderRadius: 20,
+							} }
+						/>
+					</div>
+				</div>
+			</Iframe>
 		</Card>
 	);
 };

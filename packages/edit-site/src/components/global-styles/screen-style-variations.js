@@ -57,6 +57,7 @@ function Variation( { variation } ) {
 				role="button"
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
+				height={ 100 }
 			/>
 		</GlobalStylesContext.Provider>
 	);
