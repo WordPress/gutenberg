@@ -87,7 +87,7 @@ const renderQueue = createQueue();
  * }
  * ```
  *
- * @return A custom react hook.
+ * @return {Function} A custom react hook.
  */
 export default function useSelect(
 	mapSelect: SelectChooser,
