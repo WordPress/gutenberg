@@ -435,20 +435,7 @@ describe( 'Navigation', () => {
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 	} );
 
-	it.skip( 'allows pages to be created from the navigation block and their links added to menu', async () => {
-		// The URL Details endpoint 404s for the created page, since it will
-		// be a draft that is inaccessible publicly. To avoid this we mock
-		// out the endpoint response to be empty which will be handled gracefully
-		// in the UI whilst avoiding any 404s.
-		await setUpResponseMocking( [
-			{
-				match: ( request ) =>
-					request.url().includes( `rest_route` ) &&
-					request.url().includes( `url-details` ),
-				onRequestMatch: createJSONResponse( [] ),
-			},
-		] );
-
+	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
@@ -472,10 +459,23 @@ describe( 'Navigation', () => {
 		);
 		await createPageButton.click();
 
+		// When creating a draft, the URLControl makes a request to the
+		// url-details endpoint to fetch information about the page.
+		// Because the draft is inaccessible publicly, this request
+		// returns a 404 response. Wait for the response and expect
+		// the error to have occurred.
 		const draftLink = await page.waitForSelector(
 			'.wp-block-navigation-item__content'
 		);
 		await draftLink.click();
+		await page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'url-details' ) &&
+				response.status() === 404
+		);
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
 
 		// Creating a draft is async, so wait for a sign of completion. In this
 		// case the link that shows in the URL popover once a link is added.
