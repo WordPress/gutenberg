@@ -136,13 +136,18 @@ const PresetSvgFilter = withFilters( 'editor.PresetSvgFilter' )( () => null );
 
 function getPresetsSvgFilters( blockPresets = {} ) {
 	// For now, only duotone produces SVG filters.
-	const presetByOrigin = get( blockPresets, [ 'color', 'duotone' ], {} );
+	const path = [ 'color', 'duotone' ];
+	const presetByOrigin = get( blockPresets, path, {} );
 	return [ 'default', 'theme' ]
 		.filter( ( origin ) => presetByOrigin[ origin ] )
 		.flatMap( ( origin ) => {
 			return presetByOrigin[ origin ].map( ( preset ) => {
 				return (
-					<PresetSvgFilter preset={ preset } key={ preset.slug } />
+					<PresetSvgFilter
+						path={ path }
+						preset={ preset }
+						key={ preset.slug }
+					/>
 				);
 			} );
 		} );

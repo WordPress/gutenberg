@@ -4,6 +4,7 @@
 import classnames from 'classnames';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -364,6 +365,9 @@ const withDuotoneStyles = createHigherOrderComponent(
 
 const withDuotoneFilter = createHigherOrderComponent(
 	( PresetSvgFilter ) => ( props ) => {
+		if ( ! isEqual( props.path, [ 'color', 'duotone' ] ) ) {
+			return <PresetSvgFilter />;
+		}
 		return (
 			<>
 				<PresetSvgFilter />
