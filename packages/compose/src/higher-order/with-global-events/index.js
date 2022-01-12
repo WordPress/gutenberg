@@ -46,7 +46,7 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 		alternative: 'useEffect',
 	} );
 
-	// @ts-ignore We dont' need to fix the type-related issues because this is deprecated.
+	// @ts-ignore We don't need to fix the type-related issues because this is deprecated.
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		class Wrapper extends Component {
 			constructor( /** @type {any} */ props ) {
