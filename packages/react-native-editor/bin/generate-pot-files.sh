@@ -253,3 +253,7 @@ done
 
 # Generate POT files for Gutenberg
 generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR" "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"}"
+
+# Clean up folders of intermediate files
+rm -rf $BUNDLE_DIR
+rm -rf $EXTRACT_SOURCE_FILES_DIR
