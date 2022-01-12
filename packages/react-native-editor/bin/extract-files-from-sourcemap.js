@@ -79,14 +79,9 @@ if ( require.main === module ) {
 		}
 	} );
 
-	// Use compiled files for Typescript files (only Gutenberg)
+	// Use compiled files for Typescript files
 	sourceFiles = sourceFiles.map( ( file ) => {
-		if (
-			// For now, only check files under Gutenberg
-			file.startsWith( './gutenberg' ) !== -1 &&
-			file.indexOf( 'node_modules' ) === -1 &&
-			file.endsWith( '.ts' )
-		) {
+		if ( file.indexOf( 'node_modules' ) === -1 && file.endsWith( '.ts' ) ) {
 			const compiledFile = file
 				.replace( 'src', 'build' )
 				.replace( '.ts', '.js' );
