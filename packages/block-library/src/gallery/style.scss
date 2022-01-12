@@ -3,15 +3,17 @@
 
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
+	display: grid;
 	// Need bogus :not(#individual-image) to override long :not()
 	// specificity chain on default image block on front end.
 	figure.wp-block-image:not(#individual-image) {
-		width: calc(50% - (var(--gallery-block--gutter-size, #{$grid-unit-20}) / 2));
+		width: 100%;
+    	height: 100%;
+    	object-fit: cover
 	}
 
 	figure.wp-block-image {
 		display: flex;
-		flex-grow: 1;
 		justify-content: center;
 		position: relative;
 		margin-top: auto;
@@ -80,8 +82,10 @@
 
 	// Non cropped images.
 	&:not(.is-cropped) {
-
 		figure.wp-block-image:not(#individual-image) {
+			width: 100%;
+			height: initial;
+			object-fit: initial;
 			margin-top: 0;
 			margin-bottom: auto;
 			img {
@@ -111,33 +115,17 @@
 		}
 	}
 
-	&.columns-1 figure.wp-block-image:not(#individual-image) {
-		width: 100%;
-	}
-
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
-		@for $i from 3 through 8 {
-			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
-				width: calc(#{math.div(100%, $i)} - (var(--gallery-block--gutter-size, #{$grid-unit-20}) * #{math.div($i - 1, $i)}));
+		@for $i from 1 through 8 {
+			&.columns-#{ $i } {
+				grid-template-columns: repeat($i, 1fr);
 
 			}
 		}
 		// If number of columns not explicitly set default to 3 columns if 3 or more images.
 		&.columns-default {
-			figure.wp-block-image:not(#individual-image) {
-
-				width: calc(33.33% - (var(--gallery-block--gutter-size, 16px) * #{math.div(2, 3)}));
-			}
-			// If only 2 child images use 2 columns.
-			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2),
-			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2) ~ figure.wp-block-image:not(#individual-image) {
-				width: calc(50% - (var(--gallery-block--gutter-size, 16px) * 0.5));
-			}
-			// For a single image set to 100%.
-			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(1) {
-				width: 100%;
-			}
+			grid-template-columns: repeat(3, 1fr);
 		}
 	}
 

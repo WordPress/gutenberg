@@ -75,7 +75,6 @@ export const Gallery = ( props ) => {
 					'is-cropped': imageCrop,
 				}
 			) }
-			style={ { '--gallery-block--gutter-size': blockGap } }
 		>
 			{ children }
 

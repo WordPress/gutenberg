@@ -3,9 +3,9 @@ figure.wp-block-gallery {
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
 
-	display: block;
 	margin: 0;
 	&.has-nested-images {
+		display: grid;
 		.components-drop-zone {
 			display: none;
 			pointer-events: none;
@@ -13,11 +13,11 @@ figure.wp-block-gallery {
 	}
 
 	> .blocks-gallery-caption {
-		flex: 0 0 100%;
+		grid-column: 1 / -1;
 	}
 
 	> .blocks-gallery-media-placeholder-wrapper {
-		flex-basis: 100%;
+		grid-column: 1 / -1;
 	}
 
 	.wp-block-image {
