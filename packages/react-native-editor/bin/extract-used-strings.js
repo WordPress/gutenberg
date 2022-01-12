@@ -12,7 +12,7 @@
  *
  * The format of the JSON file is:
  * {
- * 	"gutengerg": {
+ * 	"gutenberg": {
  * 	  "<string>": {
  * 	    "string": String value.
  * 		"stringPlural": String value with its plural form. [optional]

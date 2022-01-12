@@ -246,13 +246,13 @@ for (( index=0; index<${#PLUGINS[@]}; index+=2 )); do
   PLUGIN_NAME=${PLUGINS[index]}
   PLUGIN_FOLDER=${PLUGINS[index+1]}
 
-  PLUGINS_TO_EXTRACT_FROM_GUTENGERG+=( $PLUGIN_NAME )
+  PLUGINS_TO_EXTRACT_FROM_GUTENBERG+=( $PLUGIN_NAME )
 
   generate_pot_files $POT_FILES_DIR $PLUGIN_NAME $PLUGIN_FOLDER
 done
 
 # Generate POT files for Gutenberg
-generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR" "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"}"
+generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR" "${PLUGINS_TO_EXTRACT_FROM_GUTENBERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENBERG[@]}"}"
 
 # Clean up folders of intermediate files
 rm -rf $BUNDLE_DIR
