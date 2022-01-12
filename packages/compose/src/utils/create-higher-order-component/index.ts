@@ -28,7 +28,7 @@ export type HigherOrderComponent< HOCProps extends Record< string, any > > = <
  * @param mapComponent Function mapping component to enhanced component.
  * @param modifierName Seed name from which to generated display name.
  *
- * @return Component class with generated display name assigned.
+ * @return {ComponentType} Component class with generated display name assigned.
  */
 function createHigherOrderComponent<
 	HOCProps extends Record< string, any > = {}

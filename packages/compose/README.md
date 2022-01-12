@@ -84,7 +84,7 @@ _Parameters_
 
 _Returns_
 
--   ``: Component class with generated display name assigned.
+-   `ComponentType`: Component class with generated display name assigned.
 
 ### ifCondition
 
@@ -109,7 +109,7 @@ _Parameters_
 
 _Returns_
 
--   `( ( Wrapped: ComponentType< TProps > ) => ComponentType< TProps > )`: Higher-order component.
+-   `ComponentType`: Higher-order component.
 
 ### pure
 
