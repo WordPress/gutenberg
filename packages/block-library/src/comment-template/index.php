@@ -35,7 +35,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
 		}
 
-		$content .= '<li>' . esc_html( $block_content ) . '</li>';
+		$content .= '<li>' . $block_content . '</li>';
 	}
 
 	return $content;
