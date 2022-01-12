@@ -15,14 +15,20 @@ function ToggleGroupControlBackdrop( {
 	isAdaptiveWidth,
 	state,
 }: ToggleGroupControlBackdropProps ) {
-	const [ left, setLeft ] = useState< number | undefined >( undefined );
+	// Start at -1 so there is a transition to monitor in case there's no padding
+	const [ left, setLeft ] = useState< number | undefined >( -1 );
 	const [ width, setWidth ] = useState( 0 );
-	const [ canAnimate, setCanAnimate ] = useState( false );
-	const [ targetNode, setTargetNode ] = useState< HTMLElement >();
+	const [ borderWidth, setBorderWidth ] = useState( 0 );
+	const [ targetNode, setTargetNode ] = useState< HTMLElement | null >();
+	// On the second transition, the component is in the intended starting position and ready to animate
+	const [ transitionCount, setTransitionCount ] = useState( 0 );
+	const [ canAnimate, setReady ] = useState( false );
 
 	useEffect( () => {
 		const containerNode = containerRef?.current;
 		if ( ! containerNode ) return;
+
+		// Using querySelector as a workaround for Reakit
 		const target = containerNode.querySelector(
 			`[data-value="${ state }"]`
 		) as HTMLElement;
@@ -30,54 +36,63 @@ function ToggleGroupControlBackdrop( {
 	}, [ containerRef, containerWidth, state, isAdaptiveWidth ] );
 
 	useEffect( () => {
-		if ( ! containerRef?.current || ! targetNode ) return;
-		// Set the width when the target node changes
-		setWidth( targetNode.offsetWidth );
-	}, [ targetNode ] );
-
-	useEffect( () => {
 		const containerNode = containerRef?.current;
 		if ( ! containerNode || ! targetNode ) return;
 
-		// If the component is being rendered in an animating parent (e.g. popover),
-		// the element's final x/y position may not be available until the parent
-		// finishes animating. We poll until then and wait for an available frame thereafter
-		let timer = 0;
-		const pollTime = 5;
-		const maxPollTime = 150;
-		let animationRequestId: number;
-		const waitForTransition = window.setInterval( () => {
-			timer += pollTime;
+		// Set the width of the backdrop to the target (e.g. button) width
+		setWidth( targetNode.offsetWidth );
 
-			// Check whether the element is in a subpixel position, likely in transition
-			const { x, y, width: targetW } = targetNode.getBoundingClientRect();
-			const inMotion = x % 1 !== 0 || y % 1 !== 0;
-			if ( ( targetW && ! inMotion ) || timer >= maxPollTime ) {
-				const { x: parentX } = containerNode.getBoundingClientRect();
-				const borderWidth = 1;
-				const offsetLeft = x - parentX - borderWidth;
-				animationRequestId = window.requestAnimationFrame( () => {
-					setLeft( offsetLeft );
-				} );
-				window.clearInterval( waitForTransition );
-			}
-		}, pollTime );
+		// Check if there is a border, which is required for positioning
+		if ( ! borderWidth ) {
+			const bWidth = parseInt(
+				window
+					?.getComputedStyle( containerNode )
+					?.getPropertyValue( 'border-width' ) ?? 0,
+				10
+			);
+			setBorderWidth( bWidth );
+		}
+
+		const requestAnimationIds: number[] = [];
+		const handle = () => {
+			// Find and set the offset position for the backdrop
+			const { x } = targetNode.getBoundingClientRect();
+			const { x: parentX } = containerNode.getBoundingClientRect();
+			const offsetLeft = x - parentX - borderWidth;
+			const id = window.requestAnimationFrame( () => {
+				setLeft( offsetLeft );
+				setTransitionCount( ( count ) => count + 1 );
+			} );
+			requestAnimationIds.push( id );
+		};
+		containerNode.addEventListener( 'transitionend', handle );
+
+		// Trigger an initial transition for the event listener to pick up on
+		if ( left === -1 ) {
+			const paddingLeft = parseInt(
+				window
+					?.getComputedStyle( containerNode )
+					?.getPropertyValue( 'padding-left' ) ?? 0,
+				10
+			);
+			setLeft( paddingLeft );
+		}
 
 		return () => {
-			window.cancelAnimationFrame( animationRequestId );
-			window.clearInterval( waitForTransition );
+			containerNode.removeEventListener( 'transitionend', handle );
+			requestAnimationIds.forEach( ( id ) =>
+				window.cancelAnimationFrame( id )
+			);
 		};
 	}, [ targetNode, width ] );
 
 	useEffect( () => {
-		// Don't animate until the position is set
-		if ( ! canAnimate && left !== undefined ) {
-			setCanAnimate( true );
+		if ( transitionCount >= 2 && ! canAnimate ) {
+			setReady( true );
 		}
-	}, [ left ] );
+	}, [ transitionCount ] );
 
-	// Do not render unless we have a target node and it's position is known
-	if ( ! targetNode || left === undefined ) {
+	if ( ! targetNode ) {
 		return null;
 	}
 
@@ -86,7 +101,7 @@ function ToggleGroupControlBackdrop( {
 			role="presentation"
 			style={ {
 				transform: `translateX(${ left }px)`,
-				transition: canAnimate ? undefined : 'none',
+				visibility: canAnimate ? undefined : 'hidden',
 				width,
 			} }
 		/>
