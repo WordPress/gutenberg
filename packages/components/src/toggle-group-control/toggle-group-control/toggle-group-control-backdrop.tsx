@@ -60,6 +60,10 @@ function ToggleGroupControlBackdrop( {
 			const { x: parentX } = containerNode.getBoundingClientRect();
 			const offsetLeft = x - parentX - borderWidth;
 			const id = window.requestAnimationFrame( () => {
+				// If there is no second transition
+				if ( offsetLeft === left && ! canAnimate ) {
+					setCanAnimate( true );
+				}
 				setLeft( offsetLeft );
 				setTransitionCount( ( count ) => count + 1 );
 			} );
