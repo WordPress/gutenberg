@@ -4,7 +4,6 @@
 import classnames from 'classnames';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
