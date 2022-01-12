@@ -140,17 +140,15 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 			const presetByOrigin = get( blockPresets, metadata.path, {} );
 			return [ 'default', 'theme' ]
 				.filter( ( origin ) => presetByOrigin[ origin ] )
-				.flatMap( ( origin ) => {
-					return presetByOrigin[ origin ].map( ( preset ) => {
-						return (
-							<PresetSvgFilter
-								metadata={ metadata }
-								preset={ preset }
-								key={ preset.slug }
-							/>
-						);
-					} );
-				} );
+				.flatMap( ( origin ) =>
+					presetByOrigin[ origin ].map( ( preset ) => (
+						<PresetSvgFilter
+							metadata={ metadata }
+							preset={ preset }
+							key={ preset.slug }
+						/>
+					) )
+				);
 		}
 	);
 }
@@ -421,9 +419,9 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 
 export function toSvgFilters( tree, blockSelectors ) {
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
-	return nodesWithSettings.flatMap( ( { presets } ) =>
-		getPresetsSvgFilters( presets )
-	);
+	return nodesWithSettings.flatMap( ( { presets } ) => {
+		return getPresetsSvgFilters( presets );
+	} );
 }
 
 const getBlockSelectors = ( blockTypes ) => {
