@@ -36,7 +36,7 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
-function ResizableEditor( { enableResizing, settings, ...props } ) {
+function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 	const deviceType = useSelect(
 		( select ) =>
 			select( editSiteStore ).__experimentalGetPreviewDeviceType(),
@@ -182,7 +182,10 @@ function ResizableEditor( { enableResizing, settings, ...props } ) {
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"
 				{ ...props }
-			/>
+			>
+				{ settings.svgFilters }
+				{ children }
+			</Iframe>
 		</ResizableBox>
 	);
 }

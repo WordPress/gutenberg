@@ -22,6 +22,7 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import { withFilters } from '@wordpress/components';
 import { useEffect, useState, useContext } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 
@@ -129,6 +130,22 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 		},
 		''
 	);
+}
+
+const PresetSvgFilter = withFilters( 'editor.PresetSvgFilter' )( () => null );
+
+function getPresetsSvgFilters( blockPresets = {} ) {
+	// For now, only duotone produces SVG filters.
+	const presetByOrigin = get( blockPresets, [ 'color', 'duotone' ], {} );
+	return [ 'default', 'theme' ]
+		.filter( ( origin ) => presetByOrigin[ origin ] )
+		.flatMap( ( origin ) => {
+			return presetByOrigin[ origin ].map( ( preset ) => {
+				return (
+					<PresetSvgFilter preset={ preset } key={ preset.slug } />
+				);
+			} );
+		} );
 }
 
 function flattenTree( input = {}, prefix, token ) {
@@ -395,6 +412,13 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 	return ruleset;
 };
 
+export function toSvgFilters( tree, blockSelectors ) {
+	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
+	return nodesWithSettings.flatMap( ( { presets } ) =>
+		getPresetsSvgFilters( presets )
+	);
+}
+
 const getBlockSelectors = ( blockTypes ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
@@ -414,6 +438,7 @@ const getBlockSelectors = ( blockTypes ) => {
 export function useGlobalStylesOutput() {
 	const [ stylesheets, setStylesheets ] = useState( [] );
 	const [ settings, setSettings ] = useState( {} );
+	const [ svgFilters, setSvgFilters ] = useState( {} );
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
@@ -433,6 +458,7 @@ export function useGlobalStylesOutput() {
 			blockSelectors,
 			hasBlockGapSupport
 		);
+		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [
 			{
 				css: customProperties,
@@ -444,7 +470,8 @@ export function useGlobalStylesOutput() {
 			},
 		] );
 		setSettings( mergedConfig.settings );
+		setSvgFilters( filters );
 	}, [ mergedConfig ] );
 
-	return [ stylesheets, settings, hasBlockGapSupport ];
+	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }

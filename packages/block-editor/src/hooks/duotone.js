@@ -362,6 +362,21 @@ const withDuotoneStyles = createHigherOrderComponent(
 	'withDuotoneStyles'
 );
 
+const withDuotoneFilter = createHigherOrderComponent(
+	( Filters ) => ( props ) => {
+		return (
+			<>
+				<Filters />
+				<DuotoneFilter
+					id={ `wp-duotone-${ props.preset.slug }` }
+					values={ getValuesFromColors( props.preset.colors ) }
+				/>
+			</>
+		);
+	},
+	'withDuotoneFilter'
+);
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/editor/duotone/add-attributes',
@@ -376,4 +391,9 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/duotone/with-styles',
 	withDuotoneStyles
+);
+addFilter(
+	'editor.PresetSvgFilter',
+	'core/editor/duotone/with-svg-filter',
+	withDuotoneFilter
 );
