@@ -146,6 +146,9 @@ $z-layers: (
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".edit-site-create-template-part-modal": 1000001,
 
+	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
+	// because it uses emotion and not sass. We need it to render on top its parent popover.
+
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
