@@ -12,10 +12,7 @@ Settings related to borders.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| customColor | boolean | false |  |
 | customRadius | boolean | false |  |
-| customStyle | boolean | false |  |
-| customWidth | boolean | false |  |
 
 ---
 
@@ -25,7 +22,6 @@ Settings related to colors.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| background | boolean | true |  |
 | custom | boolean | true |  |
 | customDuotone | boolean | true |  |
 | customGradient | boolean | true |  |
@@ -66,14 +62,9 @@ Settings related to typography.
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
 | customFontSize | boolean | true |  |
-| customFontStyle | boolean | true |  |
-| customFontWeight | boolean | true |  |
 | customLineHeight | boolean | false |  |
-| customTextDecoration | boolean | true |  |
-| customTextTransform | boolean | true |  |
 | dropCap | boolean | true |  |
 | fontSizes | array |  | name, size, slug |
-| fontFamilies | array |  | fontFamily, name, slug |
 
 ---
 
@@ -92,10 +83,7 @@ Border styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | string |  |
 | radius | string |  |
-| style | string |  |
-| width | string |  |
 
 ---
 
@@ -117,7 +105,6 @@ Spacing styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| blockGap | string |  |
 | margin | object | bottom, left, right, top |
 | padding | object | bottom, left, right, top |
 
@@ -129,13 +116,8 @@ Typography styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| fontFamily | string |  |
 | fontSize | string |  |
-| fontStyle | string |  |
-| fontWeight | string |  |
 | lineHeight | string |  |
-| textDecoration | string |  |
-| textTransform | string |  |
 
 ---
 
