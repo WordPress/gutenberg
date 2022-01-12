@@ -467,12 +467,13 @@ describe( 'Navigation', () => {
 		const draftLink = await page.waitForSelector(
 			'.wp-block-navigation-item__content'
 		);
-		await draftLink.click();
-		await page.waitForResponse(
+		const responsePromise = page.waitForResponse(
 			( response ) =>
 				response.url().includes( 'url-details' ) &&
 				response.status() === 404
 		);
+		const draftCreationPromise = draftLink.click();
+		await Promise.all( [ responsePromise, draftCreationPromise ] );
 		expect( console ).toHaveErroredWith(
 			'Failed to load resource: the server responded with a status of 404 (Not Found)'
 		);
