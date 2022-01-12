@@ -85,3 +85,4 @@ function gutenberg_enable_block_templates() {
 // Remove 5.8 filter if existant.
 remove_action( 'setup_theme', 'wp_enable_block_templates' );
 add_action( 'setup_theme', 'gutenberg_enable_block_templates' );
+add_action( 'switch_theme', 'gutenberg_enable_block_templates' );
