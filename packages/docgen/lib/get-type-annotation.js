@@ -397,7 +397,10 @@ function getFunctionToken( token ) {
 
 function getFunctionNameForError( declarationToken ) {
 	let namedFunctionToken = declarationToken;
-	if ( babelTypes.isExportNamedDeclaration( declarationToken ) ) {
+	if (
+		babelTypes.isExportNamedDeclaration( declarationToken ) ||
+		babelTypes.isExportDefaultDeclaration( declarationToken )
+	) {
 		namedFunctionToken = declarationToken.declaration;
 	}
 
@@ -502,16 +505,19 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 
 /**
  * @param {ASTNode} declarationToken A function token.
- * @return {null | string} The function's return type annoation.
+ * @return {null | string} The function's return type annotation.
  */
 function getReturnTypeAnnotation( declarationToken ) {
 	const functionToken = getFunctionToken( declarationToken );
+	if ( ! functionToken.returnType ) {
+		return 'unknown (see the source)';
+	}
 
 	try {
 		return getTypeAnnotation( functionToken.returnType.typeAnnotation );
 	} catch ( e ) {
 		throw new Error(
-			`Could not find return type for function '${ getFunctionNameForError(
+			`Could not understand return type for function '${ getFunctionNameForError(
 				declarationToken
 			) }'.`
 		);
