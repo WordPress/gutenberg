@@ -135,22 +135,24 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 const PresetSvgFilter = withFilters( 'editor.PresetSvgFilter' )( () => null );
 
 function getPresetsSvgFilters( blockPresets = {} ) {
-	return PRESET_METADATA.flatMap( ( metadata ) => {
-		const presetByOrigin = get( blockPresets, metadata.path, {} );
-		return [ 'default', 'theme' ]
-			.filter( ( origin ) => presetByOrigin[ origin ] )
-			.flatMap( ( origin ) => {
-				return presetByOrigin[ origin ].map( ( preset ) => {
-					return (
-						<PresetSvgFilter
-							metadata={ metadata }
-							preset={ preset }
-							key={ preset.slug }
-						/>
-					);
+	return PRESET_METADATA.filter( ( metadata ) => metadata.svgFilter ).flatMap(
+		( metadata ) => {
+			const presetByOrigin = get( blockPresets, metadata.path, {} );
+			return [ 'default', 'theme' ]
+				.filter( ( origin ) => presetByOrigin[ origin ] )
+				.flatMap( ( origin ) => {
+					return presetByOrigin[ origin ].map( ( preset ) => {
+						return (
+							<PresetSvgFilter
+								metadata={ metadata }
+								preset={ preset }
+								key={ preset.slug }
+							/>
+						);
+					} );
 				} );
-			} );
-	} );
+		}
+	);
 }
 
 function flattenTree( input = {}, prefix, token ) {
