@@ -27,8 +27,10 @@
 		},
 		"spacing": {
 			"padding": true,
+			"blockGap": true,
 			"__experimentalDefaultControls": {
-				"padding": true
+				"padding": true,
+				"blockGap": true
 			}
 		},
 		"__experimentalBorder": {

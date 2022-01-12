@@ -28,7 +28,7 @@ import {
 } from '@wordpress/block-editor';
 import { EntityProvider, useEntityProp } from '@wordpress/core-data';
 
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -39,7 +39,6 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -54,6 +53,7 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
+import useNavigationNotice from './use-navigation-notice';
 
 const EMPTY_ARRAY = [];
 
@@ -107,13 +107,15 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 	customAppender: CustomAppender = null,
 } ) {
-	const noticeRef = useRef();
-
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
-		layout: { justifyContent, orientation = 'horizontal' } = {},
+		layout: {
+			justifyContent,
+			orientation = 'horizontal',
+			flexWrap = 'wrap',
+		} = {},
 	} = attributes;
 
 	let areaMenu,
@@ -134,6 +136,7 @@ function Navigation( {
 
 	const ref = navigationArea ? navigationAreaMenu : attributes.ref;
 
+	const registry = useRegistry();
 	const setRef = useCallback(
 		( postId ) => {
 			setAttributes( { ref: postId } );
@@ -151,7 +154,6 @@ function Navigation( {
 	const {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
-		controlledInnerBlocks,
 		isInnerBlockSelected,
 		hasSubmenus,
 	} = useSelect(
@@ -180,7 +182,6 @@ function Navigation( {
 				),
 				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
 				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
-				controlledInnerBlocks: _controlledInnerBlocks,
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 			};
 		},
@@ -191,8 +192,6 @@ function Navigation( {
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
-
-	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
 
 	const [
 		hasSavedUnsavedInnerBlocks,
@@ -220,6 +219,8 @@ function Navigation( {
 		hasResolvedCanUserUpdateNavigationEntity,
 		canUserDeleteNavigationEntity,
 		hasResolvedCanUserDeleteNavigationEntity,
+		canUserCreateNavigation,
+		hasResolvedCanUserCreateNavigation,
 	} = useNavigationMenu( ref );
 
 	const navRef = useRef();
@@ -237,6 +238,10 @@ function Navigation( {
 		className: classnames( className, {
 			'items-justified-right': justifyContent === 'right',
 			'items-justified-space-between': justifyContent === 'space-between',
+			'items-justified-left': justifyContent === 'left',
+			'items-justified-center': justifyContent === 'center',
+			'is-vertical': orientation === 'vertical',
+			'no-wrap': flexWrap === 'nowrap',
 			'is-responsive': 'never' !== overlayMenu,
 			'has-text-color': !! textColor.color || !! textColor?.class,
 			[ getColorClassName(
@@ -307,7 +312,7 @@ function Navigation( {
 			setDetectedColor,
 			setDetectedBackgroundColor
 		);
-		const subMenuElement = navRef.current.querySelector(
+		const subMenuElement = navRef.current?.querySelector(
 			'[data-type="core/navigation-link"] [data-type="core/navigation-link"]'
 		);
 		if ( subMenuElement ) {
@@ -324,76 +329,68 @@ function Navigation( {
 		setIsPlaceholderShown( ! isEntityAvailable );
 	}, [ isEntityAvailable ] );
 
-	// If the ref no longer exists the reset the inner blocks to provide a
-	// clean slate.
-	useEffect( () => {
-		if (
-			! hasUncontrolledInnerBlocks &&
-			controlledInnerBlocks?.length > 0 &&
-			ref === undefined
-		) {
-			replaceInnerBlocks( clientId, [] );
+	const [ showCantEditNotice, hideCantEditNotice ] = useNavigationNotice( {
+		name: 'block-library/core/navigation/permissions/update',
+		message: __(
+			'You do not have permission to edit this Menu. Any changes made will not be saved.'
+		),
+	} );
+
+	const [ showCantCreateNotice, hideCantCreateNotice ] = useNavigationNotice(
+		{
+			name: 'block-library/core/navigation/permissions/create',
+			message: __(
+				'You do not have permission to create Navigation Menus.'
+			),
 		}
-	}, [ clientId, ref, hasUncontrolledInnerBlocks, controlledInnerBlocks ] );
+	);
 
 	useEffect( () => {
-		const setPermissionsNotice = () => {
-			if ( noticeRef.current ) {
-				return;
-			}
-
-			noticeRef.current =
-				'block-library/core/navigation/permissions/update';
-
-			createWarningNotice(
-				__(
-					'You do not have permission to edit this Menu. Any changes made will not be saved.'
-				),
-				{
-					id: noticeRef.current,
-					type: 'snackbar',
-				}
-			);
-		};
-
-		const removePermissionsNotice = () => {
-			if ( ! noticeRef.current ) {
-				return;
-			}
-			removeNotice( noticeRef.current );
-			noticeRef.current = null;
-		};
-
 		if ( ! isSelected && ! isInnerBlockSelected ) {
-			removePermissionsNotice();
+			hideCantEditNotice();
+			hideCantCreateNotice();
 		}
 
-		if (
-			( isSelected || isInnerBlockSelected ) &&
-			hasResolvedCanUserUpdateNavigationEntity &&
-			! canUserUpdateNavigationEntity
-		) {
-			setPermissionsNotice();
+		if ( isSelected || isInnerBlockSelected ) {
+			if (
+				hasResolvedCanUserUpdateNavigationEntity &&
+				! canUserUpdateNavigationEntity
+			) {
+				showCantEditNotice();
+			}
+
+			if (
+				! ref &&
+				hasResolvedCanUserCreateNavigation &&
+				! canUserCreateNavigation
+			) {
+				showCantCreateNotice();
+			}
 		}
 	}, [
-		ref,
-		isEntityAvailable,
-		hasResolvedCanUserUpdateNavigationEntity,
-		canUserUpdateNavigationEntity,
 		isSelected,
 		isInnerBlockSelected,
+		canUserUpdateNavigationEntity,
+		hasResolvedCanUserUpdateNavigationEntity,
+		canUserCreateNavigation,
+		hasResolvedCanUserCreateNavigation,
+		ref,
 	] );
 
 	const startWithEmptyMenu = useCallback( () => {
-		if ( navigationArea ) {
-			setAreaMenu( 0 );
-		}
-		setAttributes( {
-			ref: undefined,
+		registry.batch( () => {
+			if ( navigationArea ) {
+				setAreaMenu( 0 );
+			}
+			setAttributes( {
+				ref: undefined,
+			} );
+			if ( ! ref ) {
+				replaceInnerBlocks( clientId, [] );
+			}
+			setIsPlaceholderShown( true );
 		} );
-
-		setIsPlaceholderShown( true );
-	}, [ clientId ] );
+	}, [ clientId, ref ] );
 
 	// If the block has inner blocks, but no menu id, this was an older
 	// navigation block added before the block used a wp_navigation entity.
@@ -425,11 +422,6 @@ function Navigation( {
 						onSave={ ( post ) => {
 							// Set some state used as a guard to prevent the creation of multiple posts.
 							setHasSavedUnsavedInnerBlocks( true );
-							// replaceInnerBlocks is required to ensure the block editor store is sync'd
-							// to be aware that there are now no inner blocks (as blocks moved to entity).
-							// This should probably happen automatically with useBlockSync
-							// but there appears to be a bug.
-							replaceInnerBlocks( clientId, [] );
 							// Switch to using the wp_navigation entity.
 							setRef( post.id );
 						} }
@@ -488,6 +480,7 @@ function Navigation( {
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
+										showCreate={ canUserCreateNavigation }
 									/>
 								) }
 							</ToolbarDropdownMenu>
@@ -614,15 +607,7 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationEntity &&
 							canUserDeleteNavigationEntity && (
 								<NavigationMenuDeleteControl
-									onDelete={ () => {
-										if ( navigationArea ) {
-											setAreaMenu( 0 );
-										}
-										setAttributes( {
-											ref: undefined,
-										} );
-										setIsPlaceholderShown( true );
-									} }
+									onDelete={ startWithEmptyMenu }
 								/>
 							) }
 					</InspectorControls>
@@ -642,11 +627,13 @@ function Navigation( {
 								hasResolvedNavigationMenus
 							}
 							clientId={ clientId }
+							canUserCreateNavigation={ canUserCreateNavigation }
 						/>
 					) }
-					{ ! isEntityAvailable && ! isPlaceholderShown && (
-						<PlaceholderPreview isLoading />
-					) }
+					{ ! hasResolvedCanUserCreateNavigation ||
+						( ! isEntityAvailable && ! isPlaceholderShown && (
+							<PlaceholderPreview isLoading />
+						) ) }
 					{ ! isPlaceholderShown && (
 						<ResponsiveWrapper
 							id={ clientId }

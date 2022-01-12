@@ -117,7 +117,7 @@ const Cover = ( {
 
 		// sync with local media store
 		mediaUploadSync();
-		AccessibilityInfo.addEventListener(
+		const a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			setIsScreenReaderEnabled
 		);
@@ -130,10 +130,7 @@ const Cover = ( {
 
 		return () => {
 			isCurrent = false;
-			AccessibilityInfo.removeEventListener(
-				'screenReaderChanged',
-				setIsScreenReaderEnabled
-			);
+			a11yInfoChangeSubscription.remove();
 		};
 	}, [] );
 

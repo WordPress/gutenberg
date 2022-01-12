@@ -158,13 +158,13 @@ export default function PostLockedModal() {
 	const allPostsUrl = getWPAdminURL( 'edit.php', {
 		post_type: get( postType, [ 'slug' ] ),
 	} );
-	const allPostsLabel = __( 'Exit the Editor' );
+	const allPostsLabel = __( 'Exit editor' );
 	return (
 		<Modal
 			title={
 				isTakeover
-					? __( 'Someone else has taken over this post.' )
-					: __( 'This post is already being edited.' )
+					? __( 'Someone else has taken over this post' )
+					: __( 'This post is already being edited' )
 			}
 			focusOnMount={ true }
 			shouldCloseOnClickOutside={ false }
@@ -181,7 +181,7 @@ export default function PostLockedModal() {
 			) }
 			{ !! isTakeover && (
 				<div>
-					<div>
+					<p>
 						{ userDisplayName
 							? sprintf(
 									/* translators: %s: user's display name */
@@ -193,7 +193,7 @@ export default function PostLockedModal() {
 							: __(
 									'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
 							  ) }
-					</div>
+					</p>
 
 					<div className="editor-post-locked-modal__buttons">
 						<Button variant="primary" href={ allPostsUrl }>
@@ -204,7 +204,7 @@ export default function PostLockedModal() {
 			) }
 			{ ! isTakeover && (
 				<div>
-					<div>
+					<p>
 						{ userDisplayName
 							? sprintf(
 									/* translators: %s: user's display name */
@@ -216,15 +216,15 @@ export default function PostLockedModal() {
 							: __(
 									'Another user is currently working on this post, which means you cannot make changes, unless you take over.'
 							  ) }
-					</div>
+					</p>
 
 					<div className="editor-post-locked-modal__buttons">
-						<Button variant="secondary" href={ allPostsUrl }>
-							{ allPostsLabel }
-						</Button>
 						<PostPreviewButton />
-						<Button variant="primary" href={ unlockUrl }>
-							{ __( 'Take Over' ) }
+						<Button variant="tertiary" href={ unlockUrl }>
+							{ __( 'Take over' ) }
+						</Button>
+						<Button variant="primary" href={ allPostsUrl }>
+							{ allPostsLabel }
 						</Button>
 					</div>
 				</div>

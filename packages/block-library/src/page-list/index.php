@@ -173,11 +173,16 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 			}
 		}
 
+		$front_page_id = (int) get_option( 'page_on_front' );
+		if ( (int) $page['page_id'] === $front_page_id ) {
+			$css_class .= ' menu-item-home';
+		}
+
 		$title      = wp_kses( $page['title'], wp_kses_allowed_html( 'post' ) );
 		$aria_label = sprintf(
 			/* translators: Accessibility text. %s: Parent page title. */
 			__( '%s submenu' ),
-			$title
+			wp_strip_all_tags( $title )
 		);
 
 		$markup .= '<li class="wp-block-pages-list__item' . $css_class . '"' . $style_attribute . '>';
@@ -231,7 +236,7 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
  * Renders the `core/page-list` block on server.
  *
  * @param array    $attributes The block attributes.
- * @param array    $content    The saved content.
+ * @param string   $content    The saved content.
  * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the page list markup.
