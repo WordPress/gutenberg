@@ -35,7 +35,7 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 		isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array()
 	);
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => esc_attr( implode( ' ', $classes ) ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	return sprintf( '<div %1$s>', $wrapper_attributes ) .
 	( ! empty( $attributes['showAvatar'] ) ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
