@@ -195,6 +195,10 @@ const v6 = {
 			type: 'boolean',
 			default: true,
 		},
+		fixedHeight: {
+			type: 'boolean',
+			default: true,
+		},
 		linkTo: {
 			type: 'string',
 		},
