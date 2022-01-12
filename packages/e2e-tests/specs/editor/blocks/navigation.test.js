@@ -453,27 +453,21 @@ describe( 'Navigation', () => {
 		);
 		await input.type( pageTitle );
 
-		// Wait for the create button to appear and click it.
-		const createPageButton = await page.waitForSelector(
-			'.block-editor-link-control__search-create'
-		);
-		await createPageButton.click();
-
-		// When creating a draft, the URLControl makes a request to the
+		// When creating a page, the URLControl makes a request to the
 		// url-details endpoint to fetch information about the page.
 		// Because the draft is inaccessible publicly, this request
 		// returns a 404 response. Wait for the response and expect
 		// the error to have occurred.
-		const draftLink = await page.waitForSelector(
-			'.wp-block-navigation-item__content'
+		const createPageButton = await page.waitForSelector(
+			'.block-editor-link-control__search-create'
 		);
 		const responsePromise = page.waitForResponse(
 			( response ) =>
 				response.url().includes( 'url-details' ) &&
 				response.status() === 404
 		);
-		const draftCreationPromise = draftLink.click();
-		await Promise.all( [ responsePromise, draftCreationPromise ] );
+		const createPagePromise = createPageButton.click();
+		await Promise.all( [ responsePromise, createPagePromise ] );
 		expect( console ).toHaveErroredWith(
 			'Failed to load resource: the server responded with a status of 404 (Not Found)'
 		);
