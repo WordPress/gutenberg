@@ -9,7 +9,6 @@ import { forwardRef } from '@wordpress/element';
 import classnames from 'classnames';
 import { Resizable } from 're-resizable';
 import type { ResizableProps } from 're-resizable';
-// eslint-disable-next-line no-restricted-imports
 import type { ReactNode, Ref } from 'react';
 
 /**

@@ -2,8 +2,11 @@
  * External dependencies
  */
 import { boolean, select } from '@storybook/addon-knobs';
-/* eslint-disable-next-line no-restricted-imports */
-import React from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,7 +23,7 @@ export default {
 };
 
 export const _default = () => {
-	const targetRef = React.useRef( null );
+	const targetRef = useRef( null );
 
 	const onButtonClick = () => {
 		targetRef.current?.focus();

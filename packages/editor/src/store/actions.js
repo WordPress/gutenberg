@@ -629,6 +629,7 @@ const getBlockEditorAction = ( name ) =>
 			since: '5.3',
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
+			version: '6.2',
 		} );
 		yield controls.dispatch( blockEditorStore, name, ...args );
 	};

@@ -3,7 +3,6 @@
  */
 import { css, SerializedStyles } from '@emotion/react';
 import styled from '@emotion/styled';
-// eslint-disable-next-line no-restricted-imports
 import type { CSSProperties, ReactNode } from 'react';
 
 /**

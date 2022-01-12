@@ -3,7 +3,6 @@
  */
 import { noop } from 'lodash';
 import classnames from 'classnames';
-// eslint-disable-next-line no-restricted-imports
 import type { ChangeEvent } from 'react';
 
 /**
