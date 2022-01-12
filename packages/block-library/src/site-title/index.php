@@ -30,7 +30,7 @@ function render_block_core_site_title( $attributes ) {
 	if ( $attributes['isLink'] ) {
 		$link_attrs = array(
 			'href="' . esc_url( get_bloginfo( 'url' ) ) . '"',
-			esc_attr( 'rel="home"' ),
+			'rel="' . esc_attr( 'home') . '"',
 			$aria_current,
 		);
 		if ( '_blank' === $attributes['linkTarget'] ) {
