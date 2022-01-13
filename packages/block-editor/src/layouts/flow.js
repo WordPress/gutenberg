@@ -106,13 +106,17 @@ export default {
 		return null;
 	},
 	save: function DefaultLayoutStyle( { selector, layout = {}, style } ) {
-		const { contentSize, wideSize } = layout;
+		const { contentSize, wideSize, writingMode = 'horizontal' } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const blockGapValue =
 			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap )';
-
-		let output =
+		let output = `
+			${ appendSelectors( selector ) } {
+				writing-mode: ${ writingMode === 'vertical' ? 'vertical-rl' : 'horizontal-tb' };
+			}
+		`;
+		output +=
 			!! contentSize || !! wideSize
 				? `
 					${ appendSelectors( selector, '> *' ) } {
@@ -144,7 +148,7 @@ export default {
 
 		`;
 
-		if ( hasBlockGapStylesSupport ) {
+		if ( hasBlockGapStylesSupport && writingMode !== 'vertical' ) {
 			output += `
 				${ appendSelectors( selector, '> *' ) } {
 					margin-top: 0;
@@ -152,6 +156,19 @@ export default {
 				}
 				${ appendSelectors( selector, '> * + *' ) } {
 					margin-top: ${ blockGapValue };
+				}
+			`;
+		}
+
+		if ( hasBlockGapStylesSupport && writingMode === 'vertical' ) {
+			output += `
+				${ appendSelectors( selector, '> *' ) } {
+					margin-left: ${ blockGapValue };
+					margin-right: 0;
+					margin-top: 0;
+				}
+				${ appendSelectors( selector, '> *:last-child' ) } {
+					margin-left: 0;
 				}
 			`;
 		}

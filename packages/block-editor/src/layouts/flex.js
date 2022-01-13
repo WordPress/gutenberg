@@ -85,7 +85,10 @@ export default {
 		);
 	},
 	save: function FlexLayoutStyle( { selector, layout, style } ) {
-		const { orientation = 'horizontal' } = layout;
+		const {
+			orientation = 'horizontal',
+			writingMode = 'horizontal',
+		} = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const blockGapValue =
@@ -115,6 +118,7 @@ export default {
 					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
 					flex-wrap: ${ flexWrap };
 					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
+					writing-mode: ${ writingMode === 'vertical' ? 'vertical-rl' : 'horizontal-tb' };
 				}
 
 				${ appendSelectors( selector, '> *' ) } {

@@ -56,7 +56,9 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": true
+		"__experimentalLayout": {
+			"allowWritingMode": true
+		}
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"

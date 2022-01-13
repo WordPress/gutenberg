@@ -19,6 +19,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext, createPortal } from '@wordpress/element';
+import { arrowRight, arrowDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -49,6 +50,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		allowSwitching,
 		allowEditing = true,
 		allowInheriting = true,
+		allowWritingMode,
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;
 
@@ -103,6 +105,25 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 							layoutBlockSupport={ layoutBlockSupport }
 						/>
 					) }
+
+					{ ! inherit && allowWritingMode && (
+						<WritingModeControls
+							writingMode={ layout?.writingMode }
+							onChange={ ( newWritingMode ) => {
+								const newOrientation =
+									newWritingMode === 'vertical'
+										? 'vertical'
+										: layout.orientation;
+								setAttributes( {
+									layout: {
+										...layout,
+										orientation: newOrientation,
+										writingMode: newWritingMode,
+									},
+								} );
+							} }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			{ ! inherit && layoutType && (
@@ -118,7 +139,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
-		<ButtonGroup>
+		<ButtonGroup className="block-editor-hooks__layout-controls-buttons">
 			{ getLayoutTypes().map( ( { name, label } ) => {
 				return (
 					<Button
@@ -131,6 +152,26 @@ function LayoutTypeSwitcher( { type, onChange } ) {
 				);
 			} ) }
 		</ButtonGroup>
+	);
+}
+
+function WritingModeControls( { writingMode = 'horizontal', onChange } ) {
+	return (
+		<fieldset className="block-editor-hooks__writing-mode-controls">
+			<legend>{ __( 'Writing mode' ) }</legend>
+			<Button
+				label={ 'horizontal' }
+				icon={ arrowRight }
+				isPressed={ writingMode === 'horizontal' }
+				onClick={ () => onChange( 'horizontal' ) }
+			/>
+			<Button
+				label={ 'vertical' }
+				icon={ arrowDown }
+				isPressed={ writingMode === 'vertical' }
+				onClick={ () => onChange( 'vertical' ) }
+			/>
+		</fieldset>
 	);
 }
 
