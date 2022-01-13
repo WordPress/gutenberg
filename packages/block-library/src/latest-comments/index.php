@@ -111,7 +111,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 			}
 			$list_items_markup .= '</footer>';
 			if ( $attributes['displayExcerpt'] ) {
-				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . esc_html( wpautop( get_comment_excerpt( $comment ) ) ) . '</div>';
+				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_excerpt( $comment ) ) . '</div>';
 			}
 			$list_items_markup .= '</article></li>';
 		}
