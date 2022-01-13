@@ -1,67 +1,75 @@
-.block-editor-block-styles {
+.block-editor-block-styles + .default-style-picker__default-switcher {
+	margin-top: $grid-unit-20;
+}
+
+.block-editor-block-styles__preview-panel {
+	display: none;
+	position: absolute;
+	right: $grid-unit-20;
+	left: auto;
+	// Same layer as the sidebar from which it's triggered.
+	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+
+	// Only show in narrow widths.
+	@include break-medium() {
+		display: block;
+	}
+
+	// Overrides for InserterPreviewPanel.
+	.block-editor-inserter__preview-container {
+		left: auto;
+		right: auto;
+		top: auto;
+		position: static;
+	}
+
+	.block-editor-block-card__title.block-editor-block-card__title {
+		margin: 0;
+	}
+	.block-editor-block-icon {
+		display: none;
+	}
+}
+
+.block-editor-block-styles__variants {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
-}
+	gap: $grid-unit-10;
 
-.block-editor-block-styles__item {
-	width: calc(50% - #{ $grid-unit-05 });
-	margin: $grid-unit-05 0;
-	flex-shrink: 0;
-	cursor: pointer;
-	overflow: hidden;
-	border-radius: $radius-block-ui;
-	padding: $grid-unit-05 * 1.5;
-	display: flex;
-	flex-direction: column;
+	.block-editor-block-styles__item {
+		color: $gray-800;
+		box-shadow: inset 0 0 0 1px $gray-400;
+		display: inline-block;
+		width: calc(50% - #{$grid-unit-05});
 
-	&:focus {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
-	}
-
-	&:hover .block-editor-block-styles__item-preview {
-		border-color: var(--wp-admin-theme-color);
-	}
-
-	&.is-active {
-		.block-editor-block-styles__item-label {
-			font-weight: bold;
+		&:focus,
+		&:hover {
+			color: var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
 		}
 
-		.block-editor-block-styles__item-preview {
-			margin: 0;
-			border: 2px solid $gray-900;
+		&.is-active,
+		&.is-active:hover {
+			background-color: $gray-800;
+			box-shadow: none;
+		}
+
+		&.is-active .block-editor-block-styles__item-text,
+		&.is-active:hover .block-editor-block-styles__item-text {
+			color: $white;
+		}
+
+		&.is-active:focus {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 2px var(--wp-admin-theme-color);
 		}
 	}
-
-	.block-editor-block-preview__container {
-		cursor: inherit;
-	}
 }
 
-// Show a little preview thumbnail for style variations.
-.block-editor-block-styles__item-preview {
-	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
-	padding: 0;
-	margin: 2px;
-	border-radius: $radius-block-ui;
-	display: flex;
-	overflow: hidden;
-	background: $white;
-	align-items: center;
-	flex-grow: 1;
-	min-height: 80px;
-	max-height: 160px;
-}
-
-.block-editor-block-switcher__styles__menugroup {
-	position: relative;
-}
-
-.block-editor-block-styles__item-label {
-	text-align: center;
-	padding: 4px 0;
+// To prevent overflow in the preview container,
+// ensure that block contents' margin and padding
+// do not add to the block container's width.
+.block-editor-block-styles__block-preview-container,
+.block-editor-block-styles__block-preview-container * {
+	box-sizing: border-box !important;
 }

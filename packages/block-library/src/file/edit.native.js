@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { View, Clipboard, TouchableWithoutFeedback, Text } from 'react-native';
+import { View, TouchableWithoutFeedback, Text } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies

@@ -24,7 +24,7 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 	public function set_up() {
 		parent::set_up();
-		switch_theme( 'tt1-blocks' );
+		switch_theme( 'emptytheme' );
 	}
 
 	/**
@@ -33,7 +33,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		gutenberg_register_wp_theme_taxonomy();
 		self::$admin_id = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -46,9 +45,9 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 				'post_status'  => 'publish',
 				'post_title'   => __( 'Custom Styles', 'default' ),
 				'post_type'    => 'wp_global_styles',
-				'post_name'    => 'wp-global-styles-tt1-blocks',
+				'post_name'    => 'wp-global-styles-emptytheme',
 				'tax_input'    => array(
-					'wp_theme' => 'tt1-blocks',
+					'wp_theme' => 'emptytheme',
 				),
 			),
 			true
@@ -57,7 +56,16 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( '/wp/v2/global-styles/(?P<id>[\/\w-]+)', $routes );
+		$this->assertArrayHasKey(
+			'/wp/v2/global-styles/(?P<id>[\/\s%\w\.\(\)\[\]\@_\-]+)',
+			$routes,
+			'Single global style based on the given ID route does not exist'
+		);
+		$this->assertArrayHasKey(
+			'/wp/v2/global-styles/themes/(?P<stylesheet>[\/\s%\w\.\(\)\[\]\@_\-]+)',
+			$routes,
+			'Theme global styles route does not exist'
+		);
 	}
 
 	public function test_context_param() {

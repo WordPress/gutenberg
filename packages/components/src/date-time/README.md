@@ -64,3 +64,10 @@ A callback function which receives a Date object representing a day as an argume
 
 -   Type: `Function`
 -   Required: No
+
+### onMonthPreviewed
+
+A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
+
+- Type: `Function`
+- Required: No

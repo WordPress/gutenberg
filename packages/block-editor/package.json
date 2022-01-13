@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "8.0.0",
+	"version": "8.0.13",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,7 +31,7 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"@react-spring/web": "^9.2.4",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
@@ -71,6 +71,10 @@
 		"redux-multi": "^0.1.12",
 		"rememo": "^3.0.0",
 		"traverse": "^0.6.6"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

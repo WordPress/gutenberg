@@ -5,13 +5,18 @@
 }
 
 .block-editor-panel-color-gradient-settings {
-	.component-color-indicator {
-		vertical-align: text-bottom;
-	}
+	.block-editor-panel-color-gradient-settings__panel-title {
+		display: flex;
+		gap: $grid-unit-10;
 
-	&__panel-title {
 		.component-color-indicator {
-			display: inline-block;
+			width: $grid-unit-15;
+			height: $grid-unit-15;
+			align-self: center;
+
+			&:first-child {
+				margin-left: $grid-unit-15;
+			}
 		}
 	}
 
@@ -37,4 +42,53 @@
 	.block-editor-block-inspector & .components-base-control {
 		margin-bottom: inherit;
 	}
+
+	.block-editor-panel-color-gradient-settings__dropdown {
+		display: block;
+	}
 }
+
+.block-editor-panel-color-gradient-settings__dropdown {
+	width: 100%;
+}
+
+.block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
+	& > div {
+		width: $sidebar-width;
+	}
+}
+
+@include break-medium() {
+	.block-editor-panel-color-gradient-settings__dropdown-content {
+		.components-popover__content {
+			margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 } !important;
+		}
+
+		&.is-from-top .components-popover__content {
+			margin-top: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+		}
+
+		&.is-from-bottom .components-popover__content {
+			margin-bottom: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+		}
+	}
+}
+
+.block-editor-panel-color-gradient-settings__dropdown:last-child > div {
+	border-bottom-width: 0;
+}
+
+.block-editor-panel-color-gradient-settings__item {
+	padding-top: $grid-unit-15 !important;
+	padding-bottom: $grid-unit-15 !important;
+	.block-editor-panel-color-gradient-settings__color-indicator {
+		// Show a diagonal line (crossed out) for empty swatches.
+		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+	}
+
+	&.is-open {
+		background: $gray-100;
+		color: var(--wp-admin-theme-color);
+	}
+}
+

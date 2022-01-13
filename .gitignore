@@ -12,6 +12,7 @@ coverage
 *.log
 yarn.lock
 /artifacts
+/perf-envs
 
 .cache
 *.tsbuildinfo

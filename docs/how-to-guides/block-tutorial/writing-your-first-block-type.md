@@ -1,137 +1,175 @@
-# Writing Your First Block Type
+# Create a basic block
 
-To keep things simple for our first example, let's create a new block type which displays a styled message in a post. At this point, we won't allow the user to edit the message. We'll learn more about editable fields in later sections.
+This guide takes you through creating a basic block to display a message in a post. This message will be fixed, we won't allow the user to edit the message, the goal of the guide is to show how to register and load a block.
 
-Blocks containing static content are implemented entirely in JavaScript using the `registerBlockType` function. This function is responsible for specifying the blueprint of a block, describing the behaviors necessary for the editor to understand how it appears, changes when edited, and is ultimately saved in the post's content.
+## Overview
 
-## Enqueuing Block Scripts
+There are two main types of blocks: static and dynamic, this guide focuses on static blocks. A static block is used to insert HTML content into the post and save it with the post. A dynamic block builds the content on the fly when rendered on the front end, see the [dynamic blocks guide](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md).
 
-While the block's editor behaviors are implemented in JavaScript, you'll need to register your block server-side to ensure that the script is enqueued when the editor loads. Register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
+This guide focuses on just the block, see the [Create a Block tutorial](/docs/getting-started/create-block/README.md) for a complete setup.
 
-The `editor_script` and `editor_style` files will only be enqueued in the editor, while the `script` and `style` will be enqueued both in the editor and when viewing a post on the front of your site.
+## Before you start
 
-```php
-<?php
-/*
-Plugin Name: Gutenberg examples 01
-*/
-function gutenberg_examples_01_register_block() {
+Static blocks are implemented in JavaScript, so a basic level of JavaScript is helpful, see the [Getting Started with JavaScript](/docs/how-to-guides/javascript/README.md) for a refresher.
 
-	// automatically load dependencies and version
-	$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
+Blocks are added to WordPress using plugins, so you will need:
 
-	wp_register_script(
-		'gutenberg-examples-01-esnext',
-		plugins_url( 'build/index.js', __FILE__ ),
-		$asset_file['dependencies'],
-		$asset_file['version']
-	);
+-   WordPress development environment, see [setup guide](/docs/getting-started/devenv/README.md)
+-   JavaScript build tools (node/npm) if using JSX example
 
-	register_block_type( 'gutenberg-examples/example-01-basic-esnext', array(
-		'api_version' => 2,
-		'editor_script' => 'gutenberg-examples-01-esnext',
-	) );
+## Step-by-step guide
 
-}
-add_action( 'init', 'gutenberg_examples_01_register_block' );
-```
+### Step 1: Configure block.json
 
-Note the above example, shows using the [wp-scripts build step](/docs/how-to-guides/javascript/js-build-setup/) that automatically sets dependencies and versions the file.
+The functions of a static block is defined in JavaScript, however the settings and other metadata should be defined in a block.json file.
 
-If you were using the ES5 code, you would specify `array( 'wp-blocks', 'wp-element' )` as the dependency array. See the [example 01](https://github.com/WordPress/gutenberg-examples/blob/HEAD/01-basic/index.php) in Gutenberg Examples repository for full syntax.
+Here are the basic settings:
 
--   **`wp-blocks`** includes block type registration and related functions
--   **`wp-element`** includes the [WordPress Element abstraction](/packages/element/README.md) for describing the structure of your blocks
+-   `apiVersion`: Block API version
+-   `title`: Block title shown in inserter
+-   `name`: Unique name defines your block
+-   `category`: Category in inserter (text, media, design, widgets, theme, embed)
+-   `icon`: Dashicon icon displayed for block
+-   `editorScript`: JavaScript file to load for block
 
-## Registering the Block
+The `block.json` file should be added to your plugin. To start a new plugin, create a directory in `/wp-content/plugins/` in your WordPress.
 
-With the script enqueued, let's look at the implementation of the block itself:
+Create a basic `block.json` file there:
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
-```jsx
-import { registerBlockType } from '@wordpress/blocks';
-import { useBlockProps } from '@wordpress/block-editor';
-
-const blockStyle = {
-	backgroundColor: '#900',
-	color: '#fff',
-	padding: '20px',
-};
-
-registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
-	apiVersion: 2,
-	title: 'Example: Basic (esnext)',
-	icon: 'universal-access-alt',
-	category: 'design',
-	example: {},
-	edit() {
-		const blockProps = useBlockProps( { style: blockStyle } );
-
-		return (
-			<div { ...blockProps }>Hello World (from the editor).</div>
-		);
-	},
-	save() {
-		const blockProps = useBlockProps.save( { style: blockStyle } );
-
-		return (
-			<div { ...blockProps }>
-				Hello World (from the frontend).
-			</div>
-		);
-	},
-} );
+```json
+{
+	"apiVersion": 2,
+	"name": "gutenberg-examples/example-01-basic-esnext",
+	"title": "Example: Basic (ESNext)",
+	"icon": "universal-access-alt",
+	"category": "layout",
+	"editorScript": "file:./build/index.js"
+}
 ```
 
-{% ES5 %}
+{% Plain %}
 
-```js
-( function ( blocks, element, blockEditor ) {
-	var el = element.createElement;
-	var useBlockProps = blockEditor.useBlockProps;
-
-	var blockStyle = {
-		backgroundColor: '#900',
-		color: '#fff',
-		padding: '20px',
-	};
-
-	blocks.registerBlockType( 'gutenberg-examples/example-01-basic', {
-		apiVersion: 2,
-		title: 'Example: Basic',
-		icon: 'universal-access-alt',
-		category: 'design',
-		example: {},
-		edit: function () {
-			var blockProps = useBlockProps( { style: blockStyle } );
-			return el(
-				'p',
-				blockProps,
-				'Hello World (from the editor).'
-			);
-		},
-		save: function () {
-			var blockProps = useBlockProps.save( { style: blockStyle } );
-			return el(
-				'p',
-				blockProps,
-				'Hello World (from the frontend).'
-			);
-		},
-	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+```json
+{
+	"apiVersion": 2,
+	"title": "Example: Basic",
+	"name": "gutenberg-examples/example-01-basic",
+	"category": "layout",
+	"icon": "universal-access-alt",
+	"editorScript": "file:./block.js"
+}
 ```
 
 {% end %}
 
-_By now you should be able to see `Hello World (from the editor).` in the admin side and `Hello World (from the frontend).` on the frontend side._
+### Step 2: Register block in plugin
 
-Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/reference-guides/block-api/block-registration.md#icon-optional).
+With the `block.json` in place, the registration for the block is a single function call in PHP, this will setup the block and JavaScript file specified in the `editorScript` property to load in the editor.
 
-A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name. In this example, the namespace is `gutenberg-examples`.
+Create a full plugin file, `index.php` like the following, the same PHP code works for both JSX and Plain code.
 
-Block names _must_ include only lowercase alphanumeric characters or dashes and start with a letter. Example: `my-plugin/my-custom-block`.
+```php
+<?php
+/**
+ * Plugin Name: Gutenberg examples 01
+ */
+function gutenberg_examples_01_register_block() {
+	register_block_type( __DIR__ );
+}
+add_action( 'init', 'gutenberg_examples_01_register_block' );
+```
 
-The `edit` and `save` functions describe the structure of your block in the context of the editor and the saved content respectively. While the difference is not obvious in this simple example, in the following sections we'll explore how these are used to enable customization of the block in the editor preview.
+### Step 3: Block edit and save functions
+
+The `editorScript` entry is enqueued automatically in the block editor. This file contains the JavaScript portion of the block registration and defines two important functions for the block, the `edit` and `save` functions.
+
+The `edit` function is a component that is shown in the editor when the block is inserted.
+
+The `save` function is a component that defines the final markup returned by the block and saved in `post_content`.
+
+{% codetabs %}
+{% JSX %}
+
+Add the following in `src/index.js`
+
+```jsx
+/**
+ * WordPress dependencies
+ */
+import { registerBlockType } from '@wordpress/blocks';
+
+// Register the block
+registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
+	edit: function () {
+		return <p> Hello world (from the editor)</p>;
+	},
+	save: function () {
+		return <p> Hola mundo (from the frontend) </p>;
+	},
+} );
+```
+
+{% Plain %}
+
+Add the following to `block.js`
+
+```js
+( function ( blocks, element ) {
+	var el = element.createElement;
+
+	blocks.registerBlockType( 'gutenberg-examples/example-01-basic', {
+		edit: function () {
+			return el( 'p', {}, 'Hello World (from the editor).' );
+		},
+		save: function () {
+			return el( 'p', {}, 'Hola mundo (from the frontend).' );
+		},
+	} );
+} )( window.wp.blocks, window.wp.element );
+```
+
+{% end %}
+
+NOTE: If using the JSX version, you need to run `npm run build` and it will create the JavaScript file that is loaded in the editor at `build/index.js`
+
+### Step 4: Confirm
+
+Open your editor and try adding your new block. It will show in the inserter using the `title`.
+When inserted you will see the `Hello World (from the editor)` message.
+
+When you save the post and view it published, you will see the `Hola mundo (from the frontend)` message.
+
+**Troubleshooting** - If you run into any issues, here are a few things to try:
+
+-   Check the filenames are correct and loading properly,
+-   Check the developer console in your browser for errors,
+-   If using JSX remember to build after each change
+
+## Conclusion
+
+This shows the most basic static block. The [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository has complete examples for both.
+
+-   [Basic example with JSX build](https://github.com/WordPress/gutenberg-examples/tree/trunk/01-basic-esnext)
+
+-   [Basic example plain JavaScript](https://github.com/WordPress/gutenberg-examples/tree/trunk/01-basic),
+
+**NOTE:** The examples include a more complete block setup with translation features included, it is recommended to follow those examples for a production block. The internationalization features were left out of this guide for simplicity and focusing on the very basics of a block.
+
+### Additional
+
+A couple of things to note when creating your blocks:
+
+-   A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name. In this example, the namespace is `gutenberg-examples`.
+
+-   Block names _must_ include only lowercase alphanumeric characters or dashes and start with a letter. Example: `my-plugin/my-custom-block`.
+
+### Resources
+
+-   block.json [metadata reference](/docs/reference-guides/block-api/block-metadata.md) documentation
+
+-   Block [edit and save function reference](/docs/reference-guides/block-api/block-edit-save.md)
+
+-   [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/)

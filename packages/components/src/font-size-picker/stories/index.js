@@ -17,7 +17,7 @@ export default {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
@@ -154,5 +154,67 @@ export const differentControlBySize = () => {
 	);
 	return (
 		<FontSizePickerWithState fontSizes={ fontSizes } initialValue={ 8 } />
+	);
+};
+
+export const withComplexCSSValues = () => {
+	const options = [
+		{
+			name: 'Small',
+			slug: 'small',
+			size: '0.65rem',
+		},
+		{
+			name: 'Medium',
+			slug: 'medium',
+			size: '1.125rem',
+		},
+		{
+			name: 'Large',
+			slug: 'large',
+			size: '1.7rem',
+		},
+		{
+			name: 'Extra Large',
+			slug: 'extra-large',
+			size: '1.95rem',
+		},
+		{
+			name: 'Extra Extra Large',
+			slug: 'extra-extra-large',
+			size: '2.5rem',
+		},
+		{
+			name: 'Huge',
+			slug: 'huge',
+			size: '2.8rem',
+		},
+	];
+	const showMoreFontSizes = boolean( 'Add more font sizes', false );
+	const addComplexCssValues = boolean(
+		'Add some complex css values(calc, var, etc..)',
+		true
+	);
+
+	const _options = options.map( ( option, index ) => {
+		const _option = { ...option };
+		// Adding just one complex css value is enough (first element);
+		if ( addComplexCssValues && ! index ) {
+			_option.size = 'clamp(1.75rem, 3vw, 2.25rem)';
+		}
+		return _option;
+	} );
+
+	const fontSizes = _options.slice(
+		0,
+		showMoreFontSizes ? _options.length : 5
+	);
+	return (
+		<div style={ { maxWidth: '248px' } }>
+			<FontSizePickerWithState
+				fontSizes={ fontSizes }
+				initialValue={ '1.125rem' }
+			/>
+		</div>
 	);
 };

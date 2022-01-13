@@ -84,40 +84,35 @@ export default {
 			</BlockControls>
 		);
 	},
-	save: function FlexLayoutStyle( { selector, layout } ) {
+	save: function FlexLayoutStyle( { selector, layout, style } ) {
 		const { orientation = 'horizontal' } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		const blockGapValue =
+			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap, 0.5em )';
 		const justifyContent =
 			justifyContentMap[ layout.justifyContent ] ||
 			justifyContentMap.left;
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
 			? layout.flexWrap
 			: 'wrap';
-		// --justification-setting allows children to inherit the value
-		// regardless or row or column direction.
 		const rowOrientation = `
 		flex-direction: row;
 		align-items: center;
 		justify-content: ${ justifyContent };
-		--justification-setting: ${ justifyContent };
 		`;
 		const alignItems =
 			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
 		const columnOrientation = `
 		flex-direction: column;
 		align-items: ${ alignItems };
-		--justification-setting: ${ alignItems };
 		`;
+
 		return (
 			<style>{ `
 				${ appendSelectors( selector ) } {
 					display: flex;
-					gap: ${
-						hasBlockGapStylesSupport
-							? 'var( --wp--style--block-gap, 0.5em )'
-							: '0.5em'
-					};
+					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
 					flex-wrap: ${ flexWrap };
 					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
 				}

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
@@ -12,7 +11,7 @@ import useResizeAware from 'react-resize-aware';
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useMemo } from '@wordpress/element';
-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId, usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -59,10 +58,15 @@ function ToggleGroupControl(
 		baseId,
 		state: value,
 	} );
+	const previousValue = usePrevious( value );
 
 	// Propagate radio.state change
 	useUpdateEffect( () => {
-		onChange( radio.state );
+		// Avoid calling onChange if radio state changed
+		// from incoming value.
+		if ( previousValue !== radio.state ) {
+			onChange( radio.state );
+		}
 	}, [ radio.state ] );
 
 	// Sync incoming value with radio.state

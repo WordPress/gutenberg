@@ -143,6 +143,26 @@ describe( 'Card', () => {
 			expect( withoutBorder ).toMatchDiffSnapshot( withBorder );
 		} );
 
+		it( 'should support the legacy extraSmall value for the size prop as an alias for the xSmall value', () => {
+			const { container: containerXSmall } = render(
+				<Card size="xSmall">
+					<CardHeader>Header</CardHeader>
+					<CardBody>Body</CardBody>
+					<CardFooter>Footer</CardFooter>
+				</Card>
+			);
+			const { container: containerExtraSmall } = render(
+				<Card size="extraSmall">
+					<CardHeader>Header</CardHeader>
+					<CardBody>Body</CardBody>
+					<CardFooter>Footer</CardFooter>
+				</Card>
+			);
+			expect( containerXSmall ).toMatchDiffSnapshot(
+				containerExtraSmall
+			);
+		} );
+
 		describe( 'CardHeader', () => {
 			it( 'should render with a darker background color when isShady is true', () => {
 				const { container } = render( <CardHeader>Header</CardHeader> );

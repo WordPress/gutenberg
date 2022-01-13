@@ -1,7 +1,9 @@
 .wp-block-code {
-	font-family: $editor-html-font;
-	color: $gray-900;
-	padding: 0.8em 1em;
-	border: 1px solid $gray-300;
+	border: 1px solid #ccc;
 	border-radius: 4px;
+}
+
+.wp-block-code > code {
+	font-family: Menlo, Consolas, monaco, monospace;
+	padding: 0.8em 1em;
 }

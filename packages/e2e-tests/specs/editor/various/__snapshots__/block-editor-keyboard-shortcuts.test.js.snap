@@ -2,112 +2,126 @@
 
 exports[`block editor keyboard shortcuts move blocks multiple blocks selected should move the blocks down 1`] = `
 "<!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>1st</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p>2nd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p>3rd</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`block editor keyboard shortcuts move blocks multiple blocks selected should move the blocks down 2`] = `
 "<!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p>3rd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>1st</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p>2nd</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`block editor keyboard shortcuts move blocks multiple blocks selected should move the blocks up 1`] = `
 "<!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>1st</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p>2nd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p>3rd</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`block editor keyboard shortcuts move blocks multiple blocks selected should move the blocks up 2`] = `
 "<!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p>2nd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p>3rd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>1st</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`block editor keyboard shortcuts move blocks single block selected should move the block down 1`] = `
 "<!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>1st</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p>2nd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p>3rd</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`block editor keyboard shortcuts move blocks single block selected should move the block down 2`] = `
 "<!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>1st</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p>3rd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p>2nd</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`block editor keyboard shortcuts move blocks single block selected should move the block up 1`] = `
 "<!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>1st</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p>2nd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p>3rd</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`block editor keyboard shortcuts move blocks single block selected should move the block up 2`] = `
 "<!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p>3rd</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>1st</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p>2nd</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`block editor keyboard shortcuts test shortcuts handling through portals in the same tree should prevent deleting multiple selected blocks from inputs 1`] = `
+"<!-- wp:paragraph -->
+<p>1st</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2nd</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3rd</p>
 <!-- /wp:paragraph -->"
 `;

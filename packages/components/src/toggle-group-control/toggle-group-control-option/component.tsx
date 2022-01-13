@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Radio } from 'reakit';
@@ -9,7 +8,6 @@ import { Radio } from 'reakit';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -20,12 +18,24 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
-import type { ToggleGroupControlOptionProps } from '../types';
+import type { ToggleGroupControlOptionProps, WithToolTipProps } from '../types';
 import { useToggleGroupControlContext } from '../context';
 import * as styles from './styles';
 import { useCx } from '../../utils/hooks';
+import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
+
+const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
+	if ( showTooltip && text ) {
+		return (
+			<Tooltip text={ text } position="top center">
+				{ children }
+			</Tooltip>
+		);
+	}
+	return <>{ children }</>;
+};
 
 function ToggleGroupControlOption(
 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
@@ -41,7 +51,14 @@ function ToggleGroupControlOption(
 		'ToggleGroupControlOption'
 	);
 
-	const { className, isBlock = false, label, value, ...radioProps } = {
+	const {
+		className,
+		isBlock = false,
+		label,
+		value,
+		showTooltip = false,
+		...radioProps
+	} = {
 		...toggleGroupControlContext,
 		...buttonProps,
 	};
@@ -54,23 +71,28 @@ function ToggleGroupControlOption(
 		className,
 		isActive && styles.buttonActive
 	);
+	const optionLabel = !! radioProps[ 'aria-label' ]
+		? radioProps[ 'aria-label' ]
+		: label;
 
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
-			<Radio
-				{ ...radioProps }
-				as="button"
-				aria-label={ radioProps[ 'aria-label' ] ?? label }
-				className={ classes }
-				data-value={ value }
-				ref={ forwardedRef }
-				value={ value }
-			>
-				<ButtonContentView>{ label }</ButtonContentView>
-				<LabelPlaceholderView aria-hidden>
-					{ label }
-				</LabelPlaceholderView>
-			</Radio>
+			<WithToolTip showTooltip={ showTooltip } text={ optionLabel }>
+				<Radio
+					{ ...radioProps }
+					as="button"
+					aria-label={ optionLabel }
+					className={ classes }
+					data-value={ value }
+					ref={ forwardedRef }
+					value={ value }
+				>
+					<ButtonContentView>{ label }</ButtonContentView>
+					<LabelPlaceholderView aria-hidden>
+						{ label }
+					</LabelPlaceholderView>
+				</Radio>
+			</WithToolTip>
 		</LabelView>
 	);
 }

@@ -3,7 +3,6 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import { Separator } from 'reakit';
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 
 /**
@@ -38,17 +37,18 @@ function Divider(
  * @example
  * ```js
  * import {
- *     __experimentalDivider as Divider,
- *     __experimentalText as Text }
- * from `@wordpress/components`;
+ * 		__experimentalDivider as Divider,
+ * 		__experimentalText as Text,
+ * 		__experimentalVStack as VStack,
+ * } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (
- * 		<ListGroup>
- * 			<FormGroup>...</FormGroup>
+ * 		<VStack spacing={4}>
+ * 			<Text>Some text here</Text>
  * 			<Divider />
- * 			<FormGroup>...</FormGroup>
- * 		</ListGroup>
+ * 			<Text>Some more text here</Text>
+ * 		</VStack>
  * 	);
  * }
  * ```

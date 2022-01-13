@@ -45,14 +45,17 @@ describe( 'Classic', () => {
 		await page.keyboard.type( 'test' );
 
 		// Click the image button.
-		await page.waitForSelector( 'div[aria-label^="Add Media"]' );
-		await page.click( 'div[aria-label^="Add Media"]' );
+		const addMediaButton = await page.waitForSelector(
+			'div[aria-label^="Add Media"]'
+		);
+		await addMediaButton.click();
 
 		await page.click( '.media-menu-item#menu-item-gallery' );
 
 		// Wait for media modal to appear and upload image.
-		await page.waitForSelector( '.media-modal input[type=file]' );
-		const inputElement = await page.$( '.media-modal input[type=file]' );
+		const inputElement = await page.waitForSelector(
+			'.media-modal .moxie-shim input[type=file]'
+		);
 		const testImagePath = path.join(
 			__dirname,
 			'..',
@@ -91,6 +94,7 @@ describe( 'Classic', () => {
 
 		// Check that you can undo back to a Classic block gallery in one step.
 		await pressKeyWithModifier( 'primary', 'z' );
+		await page.waitForSelector( 'div[aria-label="Block: Classic"]' );
 		expect( await getEditedPostContent() ).toMatch(
 			/\[gallery ids=\"\d+\"\]/
 		);

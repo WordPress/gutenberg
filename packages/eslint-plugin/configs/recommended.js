@@ -21,7 +21,6 @@ const config = {
 	extends: [
 		require.resolve( './recommended-with-formatting.js' ),
 		'plugin:prettier/recommended',
-		'prettier/react',
 	],
 	rules: {
 		'prettier/prettier': [ 'error', prettierConfig ],
@@ -35,7 +34,6 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
 			},
 		},
-		'import/core-modules': [ 'react' ],
 	};
 	config.extends.push( 'plugin:@typescript-eslint/eslint-recommended' );
 	config.ignorePatterns = [ '**/*.d.ts' ];

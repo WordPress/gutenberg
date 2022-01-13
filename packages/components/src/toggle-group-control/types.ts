@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { MutableRefObject, ReactNode, ReactText } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { RadioStateReturn } from 'reakit';
@@ -18,6 +17,30 @@ export type ToggleGroupControlOptionProps = {
 	 * to specify a different label for assistive technologies.
 	 */
 	label: string;
+	/**
+	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
+	 * show the aria-label or the label prop text.
+	 *
+	 * @default false
+	 */
+	showTooltip?: boolean;
+};
+
+export type WithToolTipProps = {
+	/**
+	 * React children
+	 */
+	children: ReactNode;
+	/**
+	 * Label for the Tooltip component.
+	 */
+	text: string;
+	/**
+	 * Whether to wrap the control option in a Tooltip component.
+	 *
+	 * @default false
+	 */
+	showTooltip?: boolean;
 };
 
 export type ToggleGroupControlProps = Omit<

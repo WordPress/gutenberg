@@ -94,7 +94,7 @@ add_action( 'admin_menu', 'gutenberg_menu', 9 );
  * @since 9.4.0
  */
 function gutenberg_site_editor_menu() {
-	if ( gutenberg_experimental_is_site_editor_available() ) {
+	if ( wp_is_block_theme() ) {
 		add_theme_page(
 			__( 'Editor (beta)', 'gutenberg' ),
 			sprintf(
@@ -104,14 +104,6 @@ function gutenberg_site_editor_menu() {
 			),
 			'edit_theme_options',
 			'gutenberg-edit-site',
-			'gutenberg_edit_site_page'
-		);
-
-		add_theme_page(
-			__( 'Styles', 'gutenberg' ),
-			__( 'Styles', 'gutenberg' ),
-			'edit_theme_options',
-			'gutenberg-edit-site&styles=open',
 			'gutenberg_edit_site_page'
 		);
 	}
@@ -223,14 +215,3 @@ function register_site_logo_to_rest_index( $response ) {
 add_filter( 'rest_index', 'register_site_logo_to_rest_index' );
 
 add_theme_support( 'widgets-block-editor' );
-
-/**
- * Enable block templates (editor mode) for themes with theme.json.
- */
-function gutenberg_enable_block_templates() {
-	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
-		add_theme_support( 'block-templates' );
-	}
-}
-
-add_action( 'setup_theme', 'gutenberg_enable_block_templates' );
