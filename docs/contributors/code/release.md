@@ -164,7 +164,7 @@ For each Gutenberg plugin release, WordPress trunk should be synchronized.
 
 Note that the WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, feature freeze in WordPress Core happens about 2 weeks before Beta 1 and remains in effect until RC1 when the `trunk` gets branched. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
 
-A different person usually synchronizes the WordPress `trunk` branch and publishes the npm packages. So you shouldn't worry about it for the normal plugin release process. However, if you are still unsure whether you should do it or not, please ask in the #core-editor Slack channel.
+A different person usually synchronizes the WordPress `trunk` branch and publishes the npm packages. Therefore, you typically shouldn't need to worry about handling this for the normal plugin release process. However, if you are still unsure, ask in [the #core-editor Slack channel](https://wordpress.slack.com/archives/C02QB2JS7).
 
 The process has three steps: 1) update the `wp/trunk` branch within the Gutenberg repo 2) publish the new package versions to npm 3) update the WordPress `trunk` branch.
 
