@@ -10,6 +10,9 @@ on:
                 description: 'patch, minor, or major?'
                 required: true
 
+env:
+    WORDPRESS_RELEASE_BRANCH: ${{ github.event.inputs.release_type == 'next' && 'wp/next' || 'wp/trunk' ) }}
+
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
@@ -18,9 +21,6 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    env:
-        WORDPRESS_RELEASE_BRANCH: ${{ github.event.inputs.release_type == 'next' && 'wp/next' || 'wp/trunk' ) }}
-
     sync-wordpress-branch:
         name: Sync the WordPress release branch
         runs-on: ubuntu-latest
