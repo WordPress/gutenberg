@@ -11,7 +11,7 @@ on:
                 required: true
 
 env:
-    WORDPRESS_RELEASE_BRANCH: ${{ github.event.inputs.release_type == 'next' && 'wp/next' || 'wp/trunk' ) }}
+    WORDPRESS_RELEASE_BRANCH: ${{ github.event.inputs.release_type == 'next' && 'wp/next' || 'wp/trunk' }}
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
