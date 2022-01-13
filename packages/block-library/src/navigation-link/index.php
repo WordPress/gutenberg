@@ -154,11 +154,11 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => esc_attr(
+			'class' =>
 				$css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
 				( $is_active ? ' current-menu-item' : '' )
-			),
-			'style' => esc_attr( $style_attribute ),
+
+			'style' => $style_attribute,
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>' .
