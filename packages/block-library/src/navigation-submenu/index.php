@@ -157,12 +157,12 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => esc_attr(
+			'class' =>
 				$css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
 				( $open_on_click ? ' open-on-click' : '' ) . ( $open_on_hover_and_click ? ' open-on-hover-click' : '' ) .
-				( $is_active ? ' current-menu-item' : '' )
+				( $is_active ? ' current-menu-item' : ''
 			),
-			'style' => esc_attr( $style_attribute ),
+			'style' => $style_attribute,
 		)
 	);
 
