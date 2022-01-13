@@ -86,7 +86,7 @@ function render_block_core_latest_posts( $attributes ) {
 				$post,
 				$attributes['featuredImageSizeSlug'],
 				array(
-					'style' => $image_style,
+					'style' => esc_attr( $image_style ),
 				)
 			);
 			if ( $attributes['addLinkToFeaturedImage'] ) {
@@ -94,7 +94,7 @@ function render_block_core_latest_posts( $attributes ) {
 					'<a href="%1$s" aria-label="%2$s">%3$s</a>',
 					esc_url( $post_link ),
 					esc_attr( $title ),
-					esc_html( $featured_image )
+					$featured_image
 				);
 			}
 			$list_items_markup .= sprintf(
