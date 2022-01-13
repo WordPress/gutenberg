@@ -467,7 +467,10 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// 2. Filters display incorrectly when the SVG is defined after
 		// where the filter is used in the document, so the footer does
 		// not work.
-		'wp_body_open',
+		// Additionally, some non-fse themes call the render_block filter
+		// after the wp_body_open hook, so instead we use the wp_footer hook
+		// in that case even though it won't render 100% correctly in Safari.
+		did_action( 'wp_body_open' ) === 0 ? 'wp_body_open' : 'wp_footer',
 		function () use ( $filter_svg ) {
 			echo $filter_svg;
 		}
