@@ -282,13 +282,13 @@ describe( 'validation', () => {
 				expect( isEqual ).toBe( true );
 			} );
 
-			it( 'returns false if not same style', () => {
+			it( 'returns true even if the style is different', () => {
 				const isEqual = isEqualAttributesOfName.style(
 					'background-image: url( "https://wordpress.org/img.png" ); color: red;',
 					"color: red;  font-size: 13px; background-image: url('https://wordpress.org/img.png');"
 				);
 
-				expect( isEqual ).toBe( false );
+				expect( isEqual ).toBe( true );
 			} );
 		} );
 
