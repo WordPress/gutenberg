@@ -153,7 +153,7 @@ function render_block_core_latest_posts( $attributes ) {
 			$post_content = html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) );
 
 			if ( post_password_required( $post ) ) {
-				$post_content = esc_html__( 'This content is password protected.' );
+				$post_content = __( 'This content is password protected.' );
 			}
 
 			$list_items_markup .= sprintf(
