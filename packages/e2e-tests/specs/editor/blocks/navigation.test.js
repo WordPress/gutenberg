@@ -22,6 +22,7 @@ import {
 	deleteUser,
 	switchUserToAdmin,
 } from '@wordpress/e2e-test-utils';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ import menuItemsFixture from '../fixtures/menu-items-request-fixture.json';
 
 const POSTS_ENDPOINT = '/wp/v2/posts';
 const PAGES_ENDPOINT = '/wp/v2/pages';
+const DRAFT_PAGES_ENDPOINT = [ PAGES_ENDPOINT, { status: 'draft' } ];
 const NAVIGATION_MENUS_ENDPOINT = '/wp/v2/navigation';
 
 async function mockSearchResponse( items ) {
@@ -126,8 +128,17 @@ const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select
  * @param {*} endpoints The endpoints of the resources to delete.
  */
 async function deleteAll( endpoints ) {
-	for ( const path of endpoints ) {
-		const items = await rest( { path: `${ path }?per_page=-1` } );
+	for ( const endpoint of endpoints ) {
+		const defaultArgs = { per_page: -1 };
+		const isArrayEndpoint = Array.isArray( endpoint );
+		const path = isArrayEndpoint ? endpoint[ 0 ] : endpoint;
+		const args = isArrayEndpoint
+			? { ...defaultArgs, ...endpoint[ 1 ] }
+			: defaultArgs;
+
+		const items = await rest( {
+			path: addQueryArgs( path, args ),
+		} );
 
 		for ( const item of items ) {
 			await rest( {
@@ -204,6 +215,7 @@ describe( 'Navigation', () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
@@ -217,6 +229,7 @@ describe( 'Navigation', () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
