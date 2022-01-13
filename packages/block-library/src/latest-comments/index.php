@@ -139,7 +139,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	) : sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		esc_html__( 'No comments to show.' )
+		__( 'No comments to show.' )
 	);
 }
 
