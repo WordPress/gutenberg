@@ -127,7 +127,7 @@ const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select
  */
 async function deleteAll( endpoints ) {
 	for ( const path of endpoints ) {
-		const items = await rest( { path } );
+		const items = await rest( { path: `${ path }?per_page=-1` } );
 
 		for ( const item of items ) {
 			await rest( {
