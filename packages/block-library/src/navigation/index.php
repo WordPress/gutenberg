@@ -508,8 +508,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => esc_attr( implode( ' ', $classes ) ),
-			'style' => esc_attr( $block_styles ) . esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ),
+			'class' => implode( ' ', $classes ),
+			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
 		)
 	);
 
