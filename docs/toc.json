@@ -222,15 +222,15 @@
 			},
 			{ "docs/reference-guides/richtext.md": [] },
 			{
-				"docs/reference-guides/theme-json/README.md": [
+				"docs/reference-guides/theme-json-reference/README.md": [
 					{
-						"docs/reference-guides/theme-json/living.md": []
+						"docs/reference-guides/theme-json-reference/theme-json-unstable.md": []
 					},
 					{
-						"docs/reference-guides/theme-json/v1.md": []
+						"docs/reference-guides/theme-json-reference/theme-json-v1.md": []
 					},
 					{
-						"docs/reference-guides/theme-json/migrations.md": []
+						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []
 					}
 				]
 			},

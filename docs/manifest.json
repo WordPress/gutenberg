@@ -559,27 +559,27 @@
 	},
 	{
 		"title": "Theme.json Reference",
-		"slug": "theme-json",
-		"markdown_source": "../docs/reference-guides/theme-json/README.md",
+		"slug": "theme-json-reference",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/README.md",
 		"parent": "reference-guides"
 	},
 	{
 		"title": "Version 2 Reference",
-		"slug": "living",
-		"markdown_source": "../docs/reference-guides/theme-json/living.md",
-		"parent": "theme-json"
+		"slug": "theme-json-unstable",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-unstable.md",
+		"parent": "theme-json-reference"
 	},
 	{
 		"title": "Version 1 Reference",
-		"slug": "v1",
-		"markdown_source": "../docs/reference-guides/theme-json/v1.md",
-		"parent": "theme-json"
+		"slug": "theme-json-v1",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
+		"parent": "theme-json-reference"
 	},
 	{
 		"title": "Migrating to Newer Versions",
-		"slug": "migrations",
-		"markdown_source": "../docs/reference-guides/theme-json/migrations.md",
-		"parent": "theme-json"
+		"slug": "theme-json-migrations",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
+		"parent": "theme-json-reference"
 	},
 	{
 		"title": "Component Reference",
