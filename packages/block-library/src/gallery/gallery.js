@@ -25,15 +25,7 @@ export const Gallery = ( props ) => {
 		blockProps,
 	} = props;
 
-	const {
-		align,
-		columns,
-		caption,
-		imageCrop,
-		style: {
-			spacing: { blockGap },
-		},
-	} = attributes;
+	const { align, columns, caption, imageCrop } = attributes;
 
 	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
@@ -75,7 +67,6 @@ export const Gallery = ( props ) => {
 					'is-cropped': imageCrop,
 				}
 			) }
-			style={ { '--gallery-block--gutter-size': blockGap } }
 		>
 			{ children }
 

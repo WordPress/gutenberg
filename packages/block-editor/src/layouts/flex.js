@@ -113,6 +113,9 @@ export default {
 				${ appendSelectors( selector ) } {
 					display: flex;
 					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
+					--wp--style--scoped-block-gap: ${
+						hasBlockGapStylesSupport ? blockGapValue : '0.5em'
+					}; 
 					flex-wrap: ${ flexWrap };
 					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
 				}
