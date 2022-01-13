@@ -13,6 +13,8 @@ import { COLORS, CONFIG } from '../utils';
  */
 import { SVG, Circle } from '@wordpress/primitives';
 
+// A dedicated wrapper allows us to apply width and shadow color based on config values
+// The SVG can only have a centered stroke so a stacked box-shadow accomplishes a matching 1.5px border
 export const StyledSpinner = styled.span`
 	width: ${ CONFIG.spinnerSize }px;
 	height: ${ CONFIG.spinnerSize }px;
