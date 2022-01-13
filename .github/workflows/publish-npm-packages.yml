@@ -50,7 +50,7 @@ jobs:
 
             - name: Switch to WordPress release branch
               run: |
-                  git fetch --depth=1 origin "$WORDPRESS_RELEASE_BRANCH"
+                  git fetch --depth=100 origin "$WORDPRESS_RELEASE_BRANCH"
                   git checkout "$WORDPRESS_RELEASE_BRANCH"
 
             - name: Sync the WordPress release branch with the changes from the latest plugin release
