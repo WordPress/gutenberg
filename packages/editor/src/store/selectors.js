@@ -843,7 +843,6 @@ export function getEditedPostPreviewLink( state ) {
 	// If the post is draft, ignore the preview link from the autosave record,
 	// because the preview could be a stale autosave if the post was switched from
 	// published to draft.
-	// See: https://github.com/Automattic/gutenberg/pull/1
 	if ( ! previewLink || 'draft' === getCurrentPost( state ).status ) {
 		previewLink = getEditedPostAttribute( state, 'link' );
 		if ( previewLink ) {
