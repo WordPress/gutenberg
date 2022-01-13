@@ -11,7 +11,7 @@ How to migrate from v1 to v2:
 1. Update `version` to `2`.
 2. Rename the properties that were updated (see below) if you're using them.
 
-Refer to the [dev note for the release](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/) and the reference document for [v2](./theme-json-reference-latest.md) for more information.
+Refer to the [dev note for the release](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/) and the [reference documents](/docs/reference-guides/theme-json-reference/README.md) for the respective v1 and v2 versions.
 
 ### Renamed properties
 
