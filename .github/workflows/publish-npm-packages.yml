@@ -89,7 +89,7 @@ jobs:
 
             - name: Update package versions
               run: |
-                  PUBLIC_PACKAGES=$(ls -d packages/*/ | xargs -I{} sh -c "jq -e '.private != true' '{}'/package.json >/dev/null && test -f '{}'CHANGELOG.md && echo '{}'")
+                  PUBLIC_PACKAGES=$(find packages/*/ -type d -maxdepth 0 -exec sh -c 'jq -e ".private != true" "$1"/package.json > /dev/null && test -f "$1"/CHANGELOG.md && echo "$1"' shell {} \;)
                   production_package_names=$(jq '.dependencies | keys | @sh' package.json)
                   minimum_version_bump='patch'
                   while IFS= read -r package; do
@@ -142,7 +142,7 @@ jobs:
                       if [ '${{ github.event.inputs.release_type }}' = 'next' ]; then
                         next_version="${next_version}-next.0"
                       fi
-                      sed -i '' "s/## Unreleased/\n\n## ${next_version} ($(date +%F))/g" "$package"CHANGELOG.md
+                      sed -i "s/## Unreleased/\n\n## ${next_version} ($(date +%F))/g" "$package"CHANGELOG.md
                     fi
                   done <<< $PUBLIC_PACKAGES
                   git commit -am "Update changelog files"
