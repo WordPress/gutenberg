@@ -836,8 +836,10 @@ export class RichText extends Component {
 			this._editor.blur();
 		}
 
-		const currentFontSizeStyle = parseFloat( style?.fontSize );
-		const prevFontSizeStyle = parseFloat( prevProps?.style?.fontSize );
+		const currentFontSizeStyle = this.getParsedFontSize( style?.fontSize );
+		const prevFontSizeStyle = this.getParsedFontSize(
+			prevProps?.style?.fontSize
+		);
 		const isDifferentTag = prevProps.tagName !== tagName;
 		if (
 			( currentFontSize &&
@@ -891,6 +893,20 @@ export class RichText extends Component {
 		};
 	}
 
+	getParsedFontSize( fontSize ) {
+		const { height, width } = Dimensions.get( 'window' );
+		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+
+		if ( ! fontSize ) {
+			return fontSize;
+		}
+
+		const selectedPxValue =
+			getPxFromCssUnit( fontSize, cssUnitOptions ) ?? DEFAULT_FONT_SIZE;
+
+		return parseFloat( selectedPxValue );
+	}
+
 	getFontSize( props ) {
 		const { baseGlobalStyles, tagName, fontSize, style } = props;
 		const tagNameFontSize =
@@ -913,15 +929,12 @@ export class RichText extends Component {
 		if ( fontSize && ! tagNameFontSize ) {
 			newFontSize = fontSize;
 		}
-		const { height, width } = Dimensions.get( 'window' );
-		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+
 		// We need to always convert to px units because the selected value
 		// could be coming from the web where it could be stored as a different unit.
-		const selectedPxValue =
-			getPxFromCssUnit( newFontSize, cssUnitOptions ) ??
-			DEFAULT_FONT_SIZE;
+		const selectedPxValue = this.getParsedFontSize( newFontSize );
 
-		return parseFloat( selectedPxValue );
+		return selectedPxValue;
 	}
 
 	getLineHeight() {
