@@ -93,6 +93,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $has_block_gap_support ) {
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
 			$style    .= "gap: $gap_style;";
+			$style    .= "--gallery-block--gutter-size: $gap_style;";
 		} else {
 			$style .= 'gap: 0.5em;';
 		}
