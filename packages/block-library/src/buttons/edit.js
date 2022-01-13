@@ -25,7 +25,7 @@ const DEFAULT_BLOCK = [
 	},
 ];
 
-function ButtonsEdit( { attributes: { layout = {} }, clientId } ) {
+function ButtonsEdit( { attributes: { layout = {} } } ) {
 	const blockProps = useBlockProps();
 	const preferredStyle = useSelect( ( select ) => {
 		const preferredStyleVariations = select(
@@ -33,21 +33,6 @@ function ButtonsEdit( { attributes: { layout = {} }, clientId } ) {
 		).getSettings().__experimentalPreferredStyleVariations;
 		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
-
-	const innerBlocks = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
-		},
-		[ clientId ]
-	);
-
-	let defaultAttributes = {};
-
-	if ( innerBlocks?.length ) {
-		defaultAttributes = { ...innerBlocks[ 0 ].attributes };
-		defaultAttributes.text = undefined;
-		defaultAttributes.url = undefined;
-	}
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
