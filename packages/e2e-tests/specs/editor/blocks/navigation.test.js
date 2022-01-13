@@ -468,7 +468,6 @@ describe( 'Navigation', () => {
 		);
 		const createPagePromise = createPageButton.click();
 		await Promise.all( [ responsePromise, createPagePromise ] );
-		expect( console ).toHaveErrored();
 
 		// Creating a draft is async, so wait for a sign of completion. In this
 		// case the link that shows in the URL popover once a link is added.
@@ -480,6 +479,9 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
 	} );
 
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
