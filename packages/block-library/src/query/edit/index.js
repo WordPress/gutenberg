@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
-import QueryInspectorControls from './query-inspector-controls';
+import QueryInspectorControls from './inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 import { getFirstQueryClientIdFromBlocks } from '../utils';
