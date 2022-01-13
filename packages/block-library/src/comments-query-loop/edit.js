@@ -61,13 +61,11 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 			<CommentsInspectorControls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
-				defaultSettings={ ( commentOrder, commentsPerPage ) }
 			/>
 			<BlockControls>
 				<CommentsToolbar
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					defaultSettings={ ( commentOrder, commentsPerPage ) }
 				/>
 			</BlockControls>
 			<TagName { ...innerBlocksProps } />
