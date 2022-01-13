@@ -39,7 +39,7 @@ const StylesPreview = ( { height = 150, ...props } ) => {
 			) }
 		>
 			<Iframe
-				className="edit-site-global-styles-preview__iframe editor-styles-wrapper"
+				className="edit-site-global-styles-preview__iframe"
 				head={ <EditorStyles styles={ styles } /> }
 				style={ { height } }
 			>
@@ -50,8 +50,9 @@ const StylesPreview = ( { height = 150, ...props } ) => {
 						alignItems: 'center',
 						justifyContent: 'center',
 						height: '100%',
-						zoom: height / 150,
+						transform: `scale(${ height / 150 })`,
 						background: gradientValue ?? backgroundColor,
+						cursor: 'pointer',
 					} }
 				>
 					<div style={ { fontFamily, fontSize: '80px' } }>Aa</div>
