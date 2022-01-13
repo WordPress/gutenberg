@@ -79,8 +79,14 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 /**
  * Render the elements stylesheet.
  *
+ * In the case of nested blocks we want the parent element styles to be rendered before their descendants.
+ * This solves the issue of an element (e.g.: link color) being styled in both the parent and a descendant:
+ * we want the descendant style to take priority, and this is done by loading it after, in DOM order.
+ *
  * @param string|null   $pre_render   The pre-rendered content. Default null.
  * @param array         $parsed_block The block being rendered.
+ *
+ * @return null
  */
 function gutenberg_render_elements_support_footer( $pre_render, $block ) {
 	$link_color = null;
@@ -95,7 +101,7 @@ function gutenberg_render_elements_support_footer( $pre_render, $block ) {
 	* and work for any element and style.
 	*/
 	if ( null === $link_color ) {
-		return;
+		return null;
 	}
 
 	$class_name = gutenberg_get_elements_class_name( $block );
