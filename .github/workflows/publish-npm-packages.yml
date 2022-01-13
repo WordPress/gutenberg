@@ -59,6 +59,7 @@ jobs:
                   github.event.inputs.release_type == 'next'
               run: |
                   git rm -r .
+                  git fetch --depth=1 origin "${{ steps.get_version.outputs.plugin_release_branch }}"
                   git checkout origin/"${{ steps.get_version.outputs.plugin_release_branch }}" -- .
 
             - name: Commit the changes to the WordPress release branch
