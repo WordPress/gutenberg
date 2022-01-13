@@ -65,7 +65,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 
 	// Changes in query property (which is an object) need to be in the same callback,
 	// because updates are batched after the render and changes in different query properties
-	// would cause to overide previous wanted changes.
+	// would cause to override previous wanted changes.
 	useEffect( () => {
 		const newQuery = {};
 		if ( ! query.perPage && postsPerPage ) {
