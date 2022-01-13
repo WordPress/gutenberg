@@ -478,7 +478,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
 		$is_responsive_menu ? array( 'is-responsive' ) : array(),
-		$layout_class ? array( esc_attr( $layout_class ) ) : array(),
+		$layout_class ? array( $layout_class ) : array(),
 		$is_fallback ? array( 'is-fallback' ) : array()
 	);
 
