@@ -185,7 +185,7 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' has-author';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => esc_attr( $class ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
 
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
