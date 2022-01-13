@@ -35,7 +35,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 
 	if ( $has_width ) {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => esc_attr( "width:{$attributes['width']};" ) ) );
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => "width:{$attributes['width']};" ) );
 	}
 
 	if ( $has_height ) {
