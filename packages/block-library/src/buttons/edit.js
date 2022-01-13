@@ -15,6 +15,16 @@ import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 
+// The undefined attributes below ensure that text and url attributes are cleared
+// when a new button block is inserted adjacent to existing button blocks.
+const DEFAULT_BLOCK = [
+	buttonBlockName,
+	{
+		text: undefined,
+		url: undefined,
+	},
+];
+
 function ButtonsEdit( { attributes: { layout = {} }, clientId } ) {
 	const blockProps = useBlockProps();
 	const preferredStyle = useSelect( ( select ) => {
@@ -41,12 +51,7 @@ function ButtonsEdit( { attributes: { layout = {} }, clientId } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: [
-			buttonBlockName,
-			{
-				...defaultAttributes,
-			},
-		],
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
 		__experimentalDirectInsert: true,
 		template: [
 			[

@@ -255,6 +255,50 @@ export default compose( [
 					return;
 				}
 
+				function getAdjacentBlockAttributes() {
+					const { getBlock, getPreviousBlockClientId } = select(
+						blockEditorStore
+					);
+
+					if ( ! clientId && ! rootClientId ) {
+						return {};
+					}
+
+					// If there is no clientId, then attempt to get attributes
+					// from the last block within innerBlocks of the root block.
+					if ( ! clientId ) {
+						const parentBlock = getBlock( rootClientId );
+
+						if ( parentBlock?.innerBlocks?.length ) {
+							const lastInnerBlock =
+								parentBlock.innerBlocks[
+									parentBlock.innerBlocks.length - 1
+								];
+
+							if (
+								directInsertBlock &&
+								directInsertBlock?.[ 0 ] === lastInnerBlock.name
+							) {
+								return { ...lastInnerBlock.attributes };
+							}
+						}
+						return {};
+					}
+
+					// Attempt to get attributes from the previous block
+					// relative to the current clientId.
+					const currentBlock = getBlock( clientId );
+					const previousBlock = getBlock(
+						getPreviousBlockClientId( clientId )
+					);
+
+					if ( currentBlock?.name === previousBlock?.name ) {
+						return { ...( previousBlock?.attributes || {} ) };
+					}
+
+					return {};
+				}
+
 				function getInsertionIndex() {
 					const {
 						getBlockIndex,
@@ -284,8 +328,22 @@ export default compose( [
 
 				const { insertBlock } = dispatch( blockEditorStore );
 
-				const blockToInsert = directInsertBlock?.length
-					? createBlock( ...directInsertBlock )
+				// Attempt to augment the directInsertBlock with attributes from an adjacent block.
+				// This ensures that styling from existing nearby blocks are preserved in the
+				// newly inserted block. To support intentionally clearing out certain attributes,
+				// the attributes of the directInsertBlock override those of the adjacent block.
+				// See: https://github.com/WordPress/gutenberg/issues/37904
+				const directInsertBlockWithAttributes = directInsertBlock?.length
+					? [
+							directInsertBlock[ 0 ],
+							{
+								...getAdjacentBlockAttributes(),
+								...( directInsertBlock[ 1 ] || {} ),
+							},
+					  ]
+					: directInsertBlock;
+				const blockToInsert = directInsertBlockWithAttributes.length
+					? createBlock( ...directInsertBlockWithAttributes )
 					: createBlock( allowedBlockType.name );
 
 				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
