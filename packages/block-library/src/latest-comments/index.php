@@ -28,9 +28,9 @@
 function wp_latest_comments_draft_or_post_title( $post = 0 ) {
 	$title = get_the_title( $post );
 	if ( empty( $title ) ) {
-		$title = esc_html__( '(no title)' );
+		$title = __( '(no title)' );
 	}
-	return esc_html( $title );
+	return $title;
 }
 
 /**
