@@ -1,4 +1,4 @@
-# Version 2 Reference (living document)
+# Version 2 (living reference)
 
 > This is the living specification for the **version 2** of theme.json. This version works with the upcoming WordPress 5.9 and the latest Gutenberg plugin.
 >
