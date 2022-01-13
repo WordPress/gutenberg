@@ -103,8 +103,8 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => esc_attr( $css_classes ),
-			'style' => esc_attr( $style_attribute ),
+			'class' => $css_classes,
+			'style' => $style_attribute,
 		)
 	);
 
