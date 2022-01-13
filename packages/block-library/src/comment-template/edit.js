@@ -148,7 +148,6 @@ export default function CommentTemplateEdit( {
 
 	// TODO: Replicate the logic used on the server.
 	perPage = perPage || 50;
-
 	// We convert the flat list of comments to tree.
 	// Then, we show only a maximum of `perPage` number of comments.
 	// This is because passing `per_page` to `getEntityRecords()` does not

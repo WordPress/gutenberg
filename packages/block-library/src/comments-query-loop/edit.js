@@ -41,12 +41,18 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 	} );
 
 	useEffect( () => {
-		__unstableMarkNextChangeAsNotPersistent();
-		if ( order === null ) {
+		// We set the default value of order to the value of the discussion setting if it is not already defined.
+		if ( order === null && inherit ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { order: commentOrder } );
 		}
-		if ( perPage === null ) {
+		if ( perPage === null && inherit ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { perPage: commentsPerPage } );
+		}
+		// We set defaults when user switches to inherit int the block options.
+		if ( inherit ) {
+			setAttributes( { order: commentOrder, perPage: commentsPerPage } );
 		}
 	}, [ inherit ] );
 
@@ -55,11 +61,13 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 			<CommentsInspectorControls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
+				defaultSettings={ ( commentOrder, commentsPerPage ) }
 			/>
 			<BlockControls>
 				<CommentsToolbar
 					attributes={ attributes }
 					setAttributes={ setAttributes }
+					defaultSettings={ ( commentOrder, commentsPerPage ) }
 				/>
 			</BlockControls>
 			<TagName { ...innerBlocksProps } />
