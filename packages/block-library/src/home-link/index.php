@@ -139,7 +139,7 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 
 	if ( isset( $attributes['label'] ) ) {
 		$html .= wp_kses(
-			esc_html( $attributes['label'] ),
+			$attributes['label'],
 			array(
 				'code'   => array(),
 				'em'     => array(),
