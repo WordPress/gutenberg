@@ -148,7 +148,7 @@ jobs:
                   git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
 
     publish-packages:
-        name: Update Packages
+        name: Publish Packages
         runs-on: ubuntu-latest
         needs: update-packages
 
