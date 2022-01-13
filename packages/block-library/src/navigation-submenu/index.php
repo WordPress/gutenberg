@@ -241,7 +241,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		// Wrap title with span to isolate it from submenu icon.
 		$html .= '<span class="wp-block-navigation-item__label">';
 
-		$html .= esc_html( $label );
+		$html .= $label;
 
 		$html .= '</span>';
 
