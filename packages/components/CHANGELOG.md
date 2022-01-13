@@ -5,6 +5,7 @@
 ### Bug Fix
 
 -   Prevent keyDown events from propagating up in `CustomSelectControl` ([#30557](https://github.com/WordPress/gutenberg/pull/30557))
+-   Mark `children` prop as optional in `SelectControl` ([#37872](https://github.com/WordPress/gutenberg/pull/37872))
 
 ## 19.2.0 (2022-01-04)
 
