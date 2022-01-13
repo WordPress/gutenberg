@@ -468,9 +468,7 @@ describe( 'Navigation', () => {
 		);
 		const createPagePromise = createPageButton.click();
 		await Promise.all( [ responsePromise, createPagePromise ] );
-		expect( console ).toHaveErroredWith(
-			'Failed to load resource: the server responded with a status of 404 (Not Found)'
-		);
+		expect( console ).toHaveErrored();
 
 		// Creating a draft is async, so wait for a sign of completion. In this
 		// case the link that shows in the URL popover once a link is added.
