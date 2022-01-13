@@ -37,7 +37,7 @@
 
 ## [Theme.json Reference](/docs/reference-guides/theme-json-reference/README.md)
 
--   [Version 2 (living document)](/docs/reference-guides/theme-json-reference/theme-json-living.md)
+-   [Version 2 (living reference)](/docs/reference-guides/theme-json-reference/theme-json-living.md)
 -   [Version 1](/docs/reference-guides/theme-json-reference/theme-json-v1.md)
 -   [Migrating to Newer Versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md)
 
