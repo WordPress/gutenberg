@@ -61,7 +61,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 		_prime_post_caches( $post_ids, strpos( get_option( 'permalink_structure' ), '%category%' ), false );
 
 		foreach ( $comments as $comment ) {
-			$list_items_markup .= '<li class="' . esc_attr( 'wp-block-latest-comments__comment' ) . '">';
+			$list_items_markup .= '<li class="wp-block-latest-comments__comment">';
 			if ( $attributes['displayAvatar'] ) {
 				$avatar = get_avatar(
 					$comment,
@@ -69,7 +69,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 					'',
 					'',
 					array(
-						'class' => esc_attr( 'wp-block-latest-comments__comment-avatar' ),
+						'class' => 'wp-block-latest-comments__comment-avatar',
 					)
 				);
 				if ( $avatar ) {
