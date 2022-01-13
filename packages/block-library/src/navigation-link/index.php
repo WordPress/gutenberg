@@ -156,7 +156,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		array(
 			'class' =>
 				$css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
-				( $is_active ? ' current-menu-item' : '' )
+				( $is_active ? ' current-menu-item' : '' ),
 
 			'style' => $style_attribute,
 		)
