@@ -9,5 +9,6 @@ module.exports = {
 		'@wordpress/i18n-no-variables': 'error',
 		'@wordpress/i18n-ellipsis': 'error',
 		'@wordpress/i18n-no-leading-or-trailing-whitespace': 'error',
+		'@wordpress/i18n-hyphen': 'error',
 	},
 };
