@@ -555,7 +555,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		__( 'Close menu' ), // Close button label.
 		esc_attr( implode( ' ', $responsive_container_classes ) ),
 		esc_attr( implode( ' ', $open_button_classes ) ),
-		esc_attr( $colors['overlay_inline_styles'] ),
+		safecss_filter_attr( $colors['overlay_inline_styles'] ),
 		__( 'Menu' )
 	);
 
