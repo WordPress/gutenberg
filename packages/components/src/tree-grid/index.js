@@ -7,7 +7,7 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { forwardRef, useCallback } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
@@ -51,7 +51,7 @@ function TreeGrid(
 	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
 	ref
 ) {
-	const onKeyDown = useCallback( ( event ) => {
+	function onKeyDown( event ) {
 		const { keyCode, metaKey, ctrlKey, altKey, shiftKey } = event;
 
 		const hasModifierKeyPressed = metaKey || ctrlKey || altKey || shiftKey;
@@ -94,7 +94,9 @@ function TreeGrid(
 				if ( keyCode === LEFT ) {
 					// Left:
 					// If a row is focused, and it is expanded, collapses the current row.
-					if ( activeRow?.ariaExpanded === 'true' ) {
+					if (
+						activeRow.getAttribute( 'aria-expanded' ) === 'true'
+					) {
 						onCollapseRow( activeRow );
 						event.preventDefault();
 						return;
@@ -116,10 +118,13 @@ function TreeGrid(
 						}
 					}
 					getRowFocusables( parentRow )?.[ 0 ]?.focus();
-				} else {
+				}
+				if ( keyCode === RIGHT ) {
 					// Right:
 					// If a row is focused, and it is collapsed, expands the current row.
-					if ( activeRow?.ariaExpanded === 'false' ) {
+					if (
+						activeRow.getAttribute( 'aria-expanded' ) === 'false'
+					) {
 						onExpandRow( activeRow );
 						event.preventDefault();
 						return;
@@ -191,7 +196,7 @@ function TreeGrid(
 			// doesn't try to handle key navigation.
 			event.preventDefault();
 		}
-	}, [] );
+	}
 
 	/* Disable reason: A treegrid is implemented using a table element. */
 	/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
