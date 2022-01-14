@@ -8,7 +8,7 @@ A WordPress plugin is a set of files within the site's `wp-content/plugins` dire
 
 ### Switch to Working Directory
 
-(1A) If you do not plan to use `wp-env`, change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\wp-content\plugins`
+(1A) If you do not plan to use `wp-env`, change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\app\public\wp-content\plugins`
 
 -or-
 

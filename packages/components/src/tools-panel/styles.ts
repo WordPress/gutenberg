@@ -130,8 +130,6 @@ export const ToolsPanelItem = css`
 	 */
 	&& ${ LabelWrapper } {
 		label {
-			margin-bottom: ${ space( 2 ) };
-			padding-bottom: 0;
 			line-height: 1.4em;
 		}
 	}

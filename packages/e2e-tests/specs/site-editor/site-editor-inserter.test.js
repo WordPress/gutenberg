@@ -10,7 +10,7 @@ import { siteEditor } from './utils';
 
 describe( 'Site Editor Inserter', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
