@@ -88,7 +88,7 @@ function render_block_core_archives( $attributes ) {
 
 	$archives = wp_get_archives( $archives_args );
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => esc_attr( $class ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
 
 	if ( empty( $archives ) ) {
 		return sprintf(
