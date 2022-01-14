@@ -209,29 +209,22 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	};
 
 	/** @type {AddLocaleData} */
-	const addLocaleData = ( data, domain ) => {
-		/**
-		 * @param {LocaleData} [_data]
-		 * @param {string}     [_domain]
-		 */
-		const doAddLocaleData = ( _data, _domain = 'default' ) => {
-			tannin.data[ _domain ] = {
-				...tannin.data[ _domain ],
-				...data,
-				// Populate default domain configuration (supported locale date which omits
-				// a plural forms expression).
-				'': {
-					...DEFAULT_LOCALE_DATA[ '' ],
-					...tannin.data[ _domain ]?.[ '' ],
-					...data?.[ '' ],
-				},
-			};
-
-			// Clean up cached plural forms functions cache as it might be updated.
-			delete tannin.pluralForms[ _domain ];
+	const addLocaleData = ( data, domain = 'default' ) => {
+		tannin.data[ domain ] = {
+			...tannin.data[ domain ],
+			...data,
+			// Populate default domain configuration (supported locale date which omits
+			// a plural forms expression).
+			'': {
+				...DEFAULT_LOCALE_DATA[ '' ],
+				...tannin.data[ domain ]?.[ '' ],
+				...data?.[ '' ],
+			},
 		};
 
-		doAddLocaleData( data, domain );
+		// Clean up cached plural forms functions cache as it might be updated.
+		delete tannin.pluralForms[ domain ];
+
 		notifyListeners();
 	};
 
