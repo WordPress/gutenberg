@@ -113,7 +113,7 @@ function AddedByAuthor( { id } ) {
 	return (
 		<BaseAddedBy
 			icon={ authorIcon }
-			imageUrl={ user?.avatar_urls[ 48 ] }
+			imageUrl={ user?.avatar_urls?.[ 48 ] }
 			text={ user?.nickname }
 		/>
 	);
