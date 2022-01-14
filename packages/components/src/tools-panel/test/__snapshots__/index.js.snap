@@ -89,26 +89,24 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
   max-width: 100%;
 }
 
-.emotion-6.emotion-6 .e1puf3u3 {
+.emotion-6.emotion-6 .e1puf3u4 {
   margin-bottom: 0;
 }
 
-.emotion-6.emotion-6 .e1puf3u3 .e1puf3u2:last-child {
+.emotion-6.emotion-6 .e1puf3u4 .e1puf3u3:last-child {
   margin-bottom: 0;
 }
 
-.emotion-6 .e1puf3u0 {
+.emotion-6 .e1puf3u1 {
   margin-bottom: 0;
 }
 
 .emotion-6.emotion-6 .em5sgkm3 label {
-  margin-bottom: calc(4px * 2);
-  padding-bottom: 0;
   line-height: 1.4em;
 }
 
 .emotion-6 .components-custom-select-control__label,
-.emotion-6 .e1puf3u1 {
+.emotion-6 .e1puf3u2 {
   line-height: 1.4em;
 }
 
@@ -123,26 +121,24 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
   max-width: 100%;
 }
 
-.emotion-8.emotion-8 .e1puf3u3 {
+.emotion-8.emotion-8 .e1puf3u4 {
   margin-bottom: 0;
 }
 
-.emotion-8.emotion-8 .e1puf3u3 .e1puf3u2:last-child {
+.emotion-8.emotion-8 .e1puf3u4 .e1puf3u3:last-child {
   margin-bottom: 0;
 }
 
-.emotion-8 .e1puf3u0 {
+.emotion-8 .e1puf3u1 {
   margin-bottom: 0;
 }
 
 .emotion-8.emotion-8 .em5sgkm3 label {
-  margin-bottom: calc(4px * 2);
-  padding-bottom: 0;
   line-height: 1.4em;
 }
 
 .emotion-8 .components-custom-select-control__label,
-.emotion-8 .e1puf3u1 {
+.emotion-8 .e1puf3u2 {
   line-height: 1.4em;
 }
 
