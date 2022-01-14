@@ -38,6 +38,7 @@ const ExistingMenusDropdown = ( {
 		iconPosition: 'right',
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
+
 	return (
 		<DropdownMenu
 			text={ __( 'Select menu' ) }
@@ -47,27 +48,26 @@ const ExistingMenusDropdown = ( {
 		>
 			{ ( { onClose } ) => (
 				<>
-					{ canSwitchNavigationMenu &&
-						navigationMenus?.length(
-							<MenuGroup label={ __( 'Menus' ) }>
-								{ navigationMenus.map( ( menu ) => {
-									return (
-										<MenuItem
-											onClick={ () => {
-												setSelectedMenu( menu.id );
-												onFinish( menu );
-											} }
-											onClose={ onClose }
-											key={ menu.id }
-										>
-											{ decodeEntities(
-												menu.title.rendered
-											) }
-										</MenuItem>
-									);
-								} ) }
-							</MenuGroup>
-						) }
+					{ canSwitchNavigationMenu && navigationMenus?.length && (
+						<MenuGroup label={ __( 'Menus' ) }>
+							{ navigationMenus.map( ( menu ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											setSelectedMenu( menu.id );
+											onFinish( menu );
+										} }
+										onClose={ onClose }
+										key={ menu.id }
+									>
+										{ decodeEntities(
+											menu.title.rendered
+										) }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
 					{ showClassicMenus && menus?.length && (
 						<MenuGroup label={ __( 'Classic Menus' ) }>
 							{ menus.map( ( menu ) => {
