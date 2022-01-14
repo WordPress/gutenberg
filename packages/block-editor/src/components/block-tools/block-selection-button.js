@@ -196,12 +196,24 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				if ( navigateDown ) {
 					nextTabbable = focus.tabbable.findNext( blockElement );
 
-					if ( null === getNextBlockClientId( clientId ) ) {
-						const searchForButtonToFocus = document.querySelector(
-							'button[data-focus-at-end="true"]'
+					if (
+						null === getNextBlockClientId( clientId ) &&
+						nextTabbable
+					) {
+						const currentBlockByID = document.getElementById(
+							`block-${ clientId }`
 						);
-						if ( searchForButtonToFocus ) {
-							nextTabbable = searchForButtonToFocus;
+						let checkIfInsideBlock = true;
+						while ( checkIfInsideBlock ) {
+							nextTabbable = focus.tabbable.findNext(
+								nextTabbable
+							);
+							if (
+								false ===
+								currentBlockByID.contains( nextTabbable )
+							) {
+								checkIfInsideBlock = false;
+							}
 						}
 					}
 
