@@ -51,6 +51,7 @@ import navigationLinkMetadata from '../navigation-link/block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
+// Set default block to use default or undefined attribute values when inserted.
 const DEFAULT_BLOCK = [
 	'core/navigation-link',
 	{
