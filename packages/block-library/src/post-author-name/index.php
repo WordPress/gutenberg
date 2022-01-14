@@ -27,7 +27,7 @@ function render_block_core_post_author_name( $attributes, $content, $block ) {
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-		$author_name = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-author-name__link">%3$s</a>', get_author_posts_url( $author_id ), $attributes['linkTarget'], $author_name );
+		$author_name = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-author-name__link">%3$s</a>', get_author_posts_url( $author_id ), esc_attr( $attributes['linkTarget'] ), $author_name );
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );

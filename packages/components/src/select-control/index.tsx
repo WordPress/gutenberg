@@ -4,7 +4,7 @@
 import { isEmpty, noop } from 'lodash';
 import classNames from 'classnames';
 // eslint-disable-next-line no-restricted-imports
-import type { ChangeEvent, FocusEvent, Ref } from 'react';
+import type { ChangeEvent, FocusEvent, ReactNode, Ref } from 'react';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ function useUniqueId( idProp?: string ) {
 }
 
 export interface SelectControlProps
-	extends Omit< InputBaseProps, 'isFocused' > {
+	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
 	help?: string;
 	hideLabelFromVision?: boolean;
 	multiple?: boolean;
@@ -50,6 +50,7 @@ export interface SelectControlProps
 	size?: Size;
 	value?: string | string[];
 	labelPosition?: LabelPosition;
+	children?: ReactNode;
 }
 
 function SelectControl(

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { CSSProperties } from 'react';
 
 type ResponsiveCSSValue< T > = Array< T | undefined > | T;

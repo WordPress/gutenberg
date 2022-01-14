@@ -22,17 +22,15 @@ const {
 	disableWelcomeGuide,
 } = siteEditor;
 
-const assertSaveButtonIsDisabled = () =>
+const assertSaveButtonIsDisabled = async () =>
 	page.waitForSelector(
 		'.edit-site-save-button__button[aria-disabled="true"]'
 	);
 
-const assertSaveButtonIsEnabled = () =>
+const assertSaveButtonIsEnabled = async () =>
 	page.waitForSelector(
 		'.edit-site-save-button__button[aria-disabled="false"]'
 	);
-
-const waitForNotice = () => page.waitForSelector( '.components-snackbar' );
 
 const clickButtonInNotice = async () => {
 	const selector = '.components-snackbar button';
@@ -40,11 +38,15 @@ const clickButtonInNotice = async () => {
 	await page.click( selector );
 };
 
-const clickUndoInHeaderToolbar = () =>
+const clickUndoInHeaderToolbar = async () =>
 	page.click( '.edit-site-header__toolbar button[aria-label="Undo"]' );
 
-const clickRedoInHeaderToolbar = () =>
-	page.click( '.edit-site-header__toolbar button[aria-label="Redo"]' );
+const clickRedoInHeaderToolbar = async () => {
+	await page.waitForSelector(
+		'.edit-site-header__toolbar button[aria-label="Redo"][aria-disabled="false"]'
+	);
+	return page.click( '.edit-site-header__toolbar button[aria-label="Redo"]' );
+};
 
 const undoRevertInHeaderToolbar = async () => {
 	await clickUndoInHeaderToolbar();
@@ -72,7 +74,9 @@ const save = async () => {
 const revertTemplate = async () => {
 	await page.click( '.edit-site-document-actions__get-info' );
 	await page.click( '.edit-site-template-details__revert-button' );
-	await waitForNotice();
+	await page.waitForXPath(
+		'//*[contains(@class, "components-snackbar") and contains(text(), "Template reverted")]'
+	);
 	await assertSaveButtonIsEnabled();
 };
 
@@ -164,7 +168,7 @@ describe( 'Template Revert', () => {
 		expect( contentBefore ).toBe( contentAfter );
 	} );
 
-	it.skip( 'should show the original content after revert, clicking undo then redo in the header toolbar', async () => {
+	it( 'should show the original content after revert, clicking undo then redo in the header toolbar', async () => {
 		const contentBefore = await getEditedPostContent();
 
 		await addDummyText();
@@ -172,7 +176,6 @@ describe( 'Template Revert', () => {
 		await revertTemplate();
 		await save();
 		await undoRevertInHeaderToolbar();
-		// there's a bug which probably also exists where the redo button stays disabled.
 		await clickRedoInHeaderToolbar();
 
 		const contentAfter = await getEditedPostContent();

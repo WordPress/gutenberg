@@ -3,7 +3,6 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import { Separator } from 'reakit';
-// eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 
 /**

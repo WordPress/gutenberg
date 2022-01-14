@@ -138,7 +138,7 @@ export function* removeTemplate( template ) {
 			'createSuccessNotice',
 			sprintf(
 				/* translators: The template/part's name. */
-				__( '"%s" removed.' ),
+				__( '"%s" deleted.' ),
 				template.title.rendered
 			),
 			{ type: 'snackbar' }
