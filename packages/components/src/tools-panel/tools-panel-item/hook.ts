@@ -38,6 +38,8 @@ export function useToolsPanelItem(
 		shouldRenderPlaceholderItems: shouldRenderPlaceholder,
 		firstDisplayedItem,
 		lastDisplayedItem,
+		__experimentalFirstVisibleItemClass,
+		__experimentalLastVisibleItemClass,
 	} = useToolsPanelContext();
 
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
@@ -131,8 +133,10 @@ export function useToolsPanelItem(
 			shouldRenderPlaceholder &&
 			! isShown &&
 			styles.ToolsPanelItemPlaceholder;
-		const firstItemStyle = firstDisplayedItem === label && 'first';
-		const lastItemStyle = lastDisplayedItem === label && 'last';
+		const firstItemStyle =
+			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
+		const lastItemStyle =
+			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
 		return cx(
 			styles.ToolsPanelItem,
 			placeholderStyle,
@@ -146,6 +150,8 @@ export function useToolsPanelItem(
 		className,
 		firstDisplayedItem,
 		lastDisplayedItem,
+		__experimentalFirstVisibleItemClass,
+		__experimentalLastVisibleItemClass,
 	] );
 
 	return {

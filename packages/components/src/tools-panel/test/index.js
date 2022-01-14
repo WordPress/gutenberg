@@ -1014,6 +1014,8 @@ describe( 'ToolsPanel', () => {
 						{ ...defaultProps }
 						hasInnerWrapper={ true }
 						shouldRenderPlaceholderItems={ true }
+						__experimentalFirstVisibleItemClass="first"
+						__experimentalLastVisibleItemClass="last"
 					>
 						<Slot />
 					</ToolsPanel>

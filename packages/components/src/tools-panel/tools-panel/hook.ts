@@ -57,6 +57,8 @@ export function useToolsPanel(
 		panelId,
 		hasInnerWrapper,
 		shouldRenderPlaceholderItems,
+		__experimentalFirstVisibleItemClass,
+		__experimentalLastVisibleItemClass,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanel' );
 
@@ -288,6 +290,8 @@ export function useToolsPanel(
 			panelId,
 			registerPanelItem,
 			shouldRenderPlaceholderItems,
+			__experimentalFirstVisibleItemClass,
+			__experimentalLastVisibleItemClass,
 		} ),
 		[
 			areAllOptionalControlsHidden,
@@ -301,6 +305,8 @@ export function useToolsPanel(
 			panelItems,
 			registerPanelItem,
 			shouldRenderPlaceholderItems,
+			__experimentalFirstVisibleItemClass,
+			__experimentalLastVisibleItemClass,
 		]
 	);
 

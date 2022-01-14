@@ -95,6 +95,8 @@ ToolsPanelItems.Slot = ( { resetAll, ...props } ) => (
 		panelId={ panelId }
 		hasInnerWrapper={ true }
 		shouldRenderPlaceholderItems={ true }
+		__experimentalFirstVisibleItemClass="first"
+		__experimentalLastVisibleItemClass="last"
 	>
 		<SlotContainer { ...props } Slot={ Slot } />
 	</ToolsPanel>
