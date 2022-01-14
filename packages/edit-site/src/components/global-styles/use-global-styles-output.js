@@ -23,6 +23,7 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { useEffect, useState, useContext } from '@wordpress/element';
+import { getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -146,7 +147,7 @@ function flattenTree( input = {}, prefix, token ) {
  * @return {Array} An array of style declarations.
  */
 function getStylesDeclarations( blockStyles = {} ) {
-	return reduce(
+	const output = reduce(
 		STYLE_PROPERTY,
 		( declarations, { value, properties }, key ) => {
 			const pathToValue = value;
@@ -188,6 +189,18 @@ function getStylesDeclarations( blockStyles = {} ) {
 		},
 		[]
 	);
+
+	// The goal is to move everything to server side generated engine styles
+	// This is temporary as we absorb more and more styles into the engine.
+	const extraRules = getCSSRules( blockStyles, 'self' );
+	extraRules.forEach( ( rule ) => {
+		if ( rule.selector !== 'self' ) {
+			throw "This style can't be added as inline style";
+		}
+		return ( output[ rule.key ] = compileStyleValue( rule.value ) );
+	} );
+
+	return output;
 }
 
 export const getNodesWithStyles = ( tree, blockSelectors ) => {

@@ -51,6 +51,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
+		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.3.1",

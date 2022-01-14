@@ -76,6 +76,7 @@
 		"@wordpress/rich-text": "file:packages/rich-text",
 		"@wordpress/server-side-render": "file:packages/server-side-render",
 		"@wordpress/shortcode": "file:packages/shortcode",
+		"@wordpress/style-engine": "file:packages/style-engine",
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",

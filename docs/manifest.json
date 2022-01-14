@@ -1758,6 +1758,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/style-engine",
+		"slug": "packages-style-engine",
+		"markdown_source": "../packages/style-engine/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",
