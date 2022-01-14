@@ -1,4 +1,6 @@
 .wp-block-social-links {
+	// Required for when social icons are oriented vertically.
+	align-items: flex-start;
 	padding-left: 0;
 	padding-right: 0;
 	// Some themes set text-indent on all <ul>
