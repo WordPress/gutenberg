@@ -468,7 +468,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// Safari renders elements incorrectly on first paint when the SVG
 	// filter comes after the content that it is filtering, so we force
-	// a repaint by resetting the display style which solves the issue.
+	// a repaint with a WebKit hack which solves the issue.
 	global $is_safari;
 	if ( $is_safari ) {
 		wp_register_script( $filter_id, false, array(), null, true );
@@ -476,7 +476,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		wp_add_inline_script(
 			$filter_id,
 			sprintf(
-				'( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; setTimeout( function() { el.style.display = display; } ); } )();',
+				// Simply accessing el.offsetHeight flushes layout and style
+				// changes in WebKit without having to wait for setTimeout.
+				'( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();',
 				wp_json_encode( $selector )
 			),
 			'after'
