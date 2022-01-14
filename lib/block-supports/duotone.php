@@ -461,27 +461,27 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	add_action(
 		is_admin() ? 'admin_footer' : 'wp_footer',
-		function () use ( $filter_svg, $filter_id, $selector ) {
+		function () use ( $filter_svg ) {
 			echo $filter_svg;
-
-			// Safari renders elements incorrectly on first paint when the SVG
-			// filter comes after the content that it is filtering, so we force
-			// a repaint by resetting the display style which solves the issue.
-			global $is_safari;
-			if ( $is_safari ) {
-				wp_register_script( $filter_id, false, array(), null, true );
-				wp_enqueue_script( $filter_id );
-				wp_add_inline_script(
-					$filter_id,
-					sprintf(
-						'( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; setTimeout( function() { el.style.display = display; } ); } )();',
-						wp_json_encode( $selector )
-					),
-					'after'
-				);
-			}
 		}
 	);
+
+	// Safari renders elements incorrectly on first paint when the SVG
+	// filter comes after the content that it is filtering, so we force
+	// a repaint by resetting the display style which solves the issue.
+	global $is_safari;
+	if ( $is_safari ) {
+		wp_register_script( $filter_id, false, array(), null, true );
+		wp_enqueue_script( $filter_id );
+		wp_add_inline_script(
+			$filter_id,
+			sprintf(
+				'( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; setTimeout( function() { el.style.display = display; } ); } )();',
+				wp_json_encode( $selector )
+			),
+			'after'
+		);
+	}
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(
