@@ -11,7 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Hide help button from Unsupported Block Editor. [#37221]
 -   [*] Add contrast checker to text-based blocks [#34902]
+
 ## 1.69.0
 -   [*] Give multi-line block names central alignment in inserter [#37185]
 -   [**] Fix empty line apperaing when splitting heading blocks on Android 12 [#37279]

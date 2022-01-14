@@ -32,9 +32,9 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$attribute = '';
+	$rel_target_attributes = '';
 	if ( $open_in_new_tab ) {
-		$attribute = 'rel="noopener nofollow" target="_blank"';
+		$rel_target_attributes = 'rel="noopener nofollow" target="_blank"';
 	}
 
 	$icon               = block_core_social_link_get_icon( $service );
@@ -45,7 +45,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		)
 	);
 
-	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . ' class="wp-block-social-link-anchor"> ' . $icon . '</a></li>';
+	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $rel_target_attributes . ' class="wp-block-social-link-anchor">' . $icon . '</a></li>';
 }
 
 /**
