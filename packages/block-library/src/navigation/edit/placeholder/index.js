@@ -25,7 +25,7 @@ import useNavigationMenu from '../../use-navigation-menu';
 import useCreateNavigationMenu from '../use-create-navigation-menu';
 
 const ExistingMenusDropdown = ( {
-	canSwitchNavigationMenu,
+	showNavigationMenus,
 	navigationMenus,
 	setSelectedMenu,
 	onFinish,
@@ -51,7 +51,7 @@ const ExistingMenusDropdown = ( {
 		>
 			{ ( { onClose } ) => (
 				<>
-					{ canSwitchNavigationMenu && hasNavigationMenus && (
+					{ showNavigationMenus && hasNavigationMenus && (
 						<MenuGroup label={ __( 'Menus' ) }>
 							{ navigationMenus.map( ( menu ) => {
 								return (
@@ -201,7 +201,7 @@ export default function NavigationPlaceholder( {
 							{ showSelectMenus ? (
 								<>
 									<ExistingMenusDropdown
-										canSwitchNavigationMenu={
+										showNavigationMenus={
 											canSwitchNavigationMenu
 										}
 										navigationMenus={ navigationMenus }
