@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Highlight text: fix applying formatting for non-selected text [#37915]
 
 ## 1.69.0
 -   [*] Give multi-line block names central alignment in inserter [#37185]
