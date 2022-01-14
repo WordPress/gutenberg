@@ -187,7 +187,6 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	 */
 	const doSetLocaleData = ( data, domain = 'default' ) => {
 		tannin.data[ domain ] = {
-			...DEFAULT_LOCALE_DATA,
 			...tannin.data[ domain ],
 			...data,
 		};
@@ -206,7 +205,6 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	 */
 	const doAddLocaleData = ( data, domain = 'default' ) => {
 		tannin.data[ domain ] = {
-			...DEFAULT_LOCALE_DATA,
 			...tannin.data[ domain ],
 			...data,
 			// Populate default domain configuration (supported locale date which omits
