@@ -199,24 +199,6 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		};
 	};
 
-	/**
-	 * @param {LocaleData} [data]
-	 * @param {string}     [domain]
-	 */
-	const doAddLocaleData = ( data, domain = 'default' ) => {
-		tannin.data[ domain ] = {
-			...tannin.data[ domain ],
-			...data,
-			// Populate default domain configuration (supported locale date which omits
-			// a plural forms expression).
-			'': {
-				...DEFAULT_LOCALE_DATA[ '' ],
-				...tannin.data[ domain ]?.[ '' ],
-				...data?.[ '' ],
-			},
-		};
-	};
-
 	/** @type {SetLocaleData} */
 	const setLocaleData = ( data, domain ) => {
 		doSetLocaleData( data, domain );
@@ -225,6 +207,24 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 
 	/** @type {AddLocaleData} */
 	const addLocaleData = ( data, domain ) => {
+		/**
+		 * @param {LocaleData} [_data]
+		 * @param {string}     [_domain]
+		 */
+		const doAddLocaleData = ( _data, _domain = 'default' ) => {
+			tannin.data[ _domain ] = {
+				...tannin.data[ _domain ],
+				...data,
+				// Populate default domain configuration (supported locale date which omits
+				// a plural forms expression).
+				'': {
+					...DEFAULT_LOCALE_DATA[ '' ],
+					...tannin.data[ _domain ]?.[ '' ],
+					...data?.[ '' ],
+				},
+			};
+		};
+
 		doAddLocaleData( data, domain );
 		notifyListeners();
 	};
