@@ -460,7 +460,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	wp_enqueue_style( $filter_id );
 
 	add_action(
-		is_admin() ? 'admin_footer' : 'wp_footer',
+		'wp_footer',
 		function () use ( $filter_svg ) {
 			echo $filter_svg;
 		}
