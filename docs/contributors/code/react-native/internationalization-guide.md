@@ -43,7 +43,7 @@ Extract used strings:
 npm run native i18n:extract-used-strings -- "$PWD/used-strings.json"
 ```
 
-***NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path  for relative paths.*
+***NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path for relative paths.*
 
 Extract used strings including extra plugins: 
 ```sh
@@ -54,9 +54,9 @@ npm run native i18n:extract-used-strings -- "$PWD/used-strings.json" "domain-plu
 
 A translation file is basically a JSON object that contains key-value items with the translation for each individual string. This content is fetched from [translate.wordpress.org](https://translate.wordpress.org/) that holds translations for WordPress and a list of different plugins like Gutenberg.
 
-These files can be cached under a folder and can be optimized, additionally, an index file (`index.js`) is generated that acts as the entry point to import and get translations of the plugin.
+These files can be cached under a folder and optimized. Additionally, an index file is generated that acts as the entry point to import and fetches the plugin translations.
 
-Fetched translations contain all the strings of the plugin, including strings that are not used in the native version of the editor, however, and in order to reduce their file size, they can be optimized by filtering out the strings that aren't referenced in the used strings JSON file.
+Fetched translations contain all the translatable plugin strings, including those not used in the native version of the editor. The file sizes, however, can be reduced by filtering out the strings not referenced in the used strings JSON file.
 
 By default, when installing dependencies, un-optimized translations might be downloaded for Gutenberg and located in the `i18n-cache` folder if the cache is not present.
 
