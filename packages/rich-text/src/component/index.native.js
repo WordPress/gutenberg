@@ -836,6 +836,10 @@ export class RichText extends Component {
 			this._editor.blur();
 		}
 
+		// For font size values changes from the font size picker
+		// we compare previous values to refresh the selected font size,
+		// this is also used when the tag name changes
+		// e.g Heading block and a level change like h1->h2.
 		const currentFontSizeStyle = this.getParsedFontSize( style?.fontSize );
 		const prevFontSizeStyle = this.getParsedFontSize(
 			prevProps?.style?.fontSize
@@ -914,19 +918,26 @@ export class RichText extends Component {
 
 		let newFontSize = DEFAULT_FONT_SIZE;
 
+		// For block-based themes, get the default editor font size.
 		if ( baseGlobalStyles?.typography?.fontSize ) {
 			newFontSize = baseGlobalStyles?.typography?.fontSize;
 		}
 
+		// For block-based themes, get the default element font size
+		// e.g h1, h2.
 		if ( tagNameFontSize ) {
 			newFontSize = tagNameFontSize;
 		}
 
+		// For font size values provided from the styles,
+		// usually from values set from the font size picker.
 		if ( style?.fontSize ) {
 			newFontSize = style.fontSize;
 		}
 
-		if ( fontSize && ! tagNameFontSize ) {
+		// Fall-back to a font size provided from its props (if there's any)
+		// and there are no other default values to use.
+		if ( fontSize && ! tagNameFontSize && ! style?.fontSize ) {
 			newFontSize = fontSize;
 		}
 
