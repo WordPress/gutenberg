@@ -3,7 +3,6 @@
  */
 import { noop } from 'lodash';
 import { useDrag } from 'react-use-gesture';
-// eslint-disable-next-line no-restricted-imports
 import type {
 	SyntheticEvent,
 	ChangeEvent,

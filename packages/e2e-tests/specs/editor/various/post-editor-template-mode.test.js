@@ -102,7 +102,7 @@ describe( 'Post Editor Template mode', () => {
 	} );
 
 	it( 'Allow to switch to template mode, edit the template and check the result', async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await createNewPost();
 		// Create a random post.
 		await page.type( '.editor-post-title__input', 'Just an FSE Post' );

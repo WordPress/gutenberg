@@ -1,29 +1,19 @@
 .editor-post-locked-modal {
-	height: auto;
-	padding-right: 10px;
-	padding-left: 10px;
-	padding-top: 10px;
-	max-width: 480px;
-
-	.components-modal__header {
-		height: 36px;
+	@include break-small() {
+		max-width: $break-mobile;
 	}
 
 	.components-modal__content {
-		height: auto;
+		display: flex;
 	}
 }
 
 .editor-post-locked-modal__buttons {
-	margin-top: 10px;
-
-	.components-button {
-		margin-right: 5px;
-	}
+	margin-top: $grid-unit-30;
 }
 
 .editor-post-locked-modal__avatar {
-	float: left;
-	margin: 5px;
-	margin-right: 15px;
+	border-radius: $radius-block-ui;
+	margin-top: $grid-unit-20;
+	margin-right: $grid-unit-30;
 }

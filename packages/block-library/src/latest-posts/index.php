@@ -86,28 +86,28 @@ function render_block_core_latest_posts( $attributes ) {
 				$post,
 				$attributes['featuredImageSizeSlug'],
 				array(
-					'style' => $image_style,
+					'style' => esc_attr( $image_style ),
 				)
 			);
 			if ( $attributes['addLinkToFeaturedImage'] ) {
 				$featured_image = sprintf(
 					'<a href="%1$s" aria-label="%2$s">%3$s</a>',
-					$post_link,
-					$title,
+					esc_url( $post_link ),
+					esc_attr( $title ),
 					$featured_image
 				);
 			}
 			$list_items_markup .= sprintf(
 				'<div class="%1$s">%2$s</div>',
-				$image_classes,
+				esc_attr( $image_classes ),
 				$featured_image
 			);
 		}
 
 		$list_items_markup .= sprintf(
 			'<a href="%1$s">%2$s</a>',
-			$post_link,
-			$title
+			esc_url( $post_link ),
+			esc_html( $title )
 		);
 
 		if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
@@ -143,14 +143,14 @@ function render_block_core_latest_posts( $attributes ) {
 
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-excerpt">%1$s</div>',
-				$trimmed_excerpt
+				esc_html( $trimmed_excerpt )
 			);
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' === $attributes['displayPostContentRadio'] ) {
 
-			$post_content = wp_kses_post( html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) ) );
+			$post_content = html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) );
 
 			if ( post_password_required( $post ) ) {
 				$post_content = __( 'This content is password protected.' );
@@ -158,7 +158,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
-				$post_content
+				wp_kses_post( $post_content )
 			);
 		}
 

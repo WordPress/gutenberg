@@ -44,9 +44,9 @@ Pick one and follow the install instructions noted on their website.
 Then run:
 
 ```sh
-nvm install lts/*
-nvm alias default lts/* #sets this as the default when opening a new terminal
-nvm use #switches to the project settings
+nvm install 'lts/*'
+nvm alias default 'lts/*' # sets this as the default when opening a new terminal
+nvm use # switches to the project settings
 ```
 
 Or

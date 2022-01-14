@@ -191,7 +191,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$aria_label = sprintf(
 		/* translators: Accessibility text. %s: Parent page title. */
 		__( '%s submenu' ),
-		$label
+		wp_strip_all_tags( $label )
 	);
 
 	$html = '<li ' . $wrapper_attributes . '>';
@@ -199,9 +199,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	// If Submenus open on hover, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
 	if ( ! $open_on_click ) {
-		$item_url = isset( $attributes['url'] ) ? esc_url( $attributes['url'] ) : '';
+		$item_url = isset( $attributes['url'] ) ? $attributes['url'] : '';
 		// Start appending HTML attributes to anchor tag.
-		$html .= '<a class="wp-block-navigation-item__content" href="' . $item_url . '"';
+		$html .= '<a class="wp-block-navigation-item__content" href="' . esc_url( $item_url ) . '"';
 
 		if ( $is_active ) {
 			$html .= ' aria-current="page"';
@@ -231,12 +231,12 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 		if ( $show_submenu_indicators ) {
 			// The submenu icon is rendered in a button here
-			// so that there's a clickable elment to open the submenu.
-			$html .= '<button aria-label="' . $aria_label . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			// so that there's a clickable element to open the submenu.
+			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
 		}
 	} else {
 		// If menus open on click, we render the parent as a button.
-		$html .= '<button aria-label="' . $aria_label . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
+		$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
 
 		// Wrap title with span to isolate it from submenu icon.
 		$html .= '<span class="wp-block-navigation-item__label">';

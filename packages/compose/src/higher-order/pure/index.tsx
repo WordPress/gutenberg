@@ -13,7 +13,6 @@ import type { SimpleHigherOrderComponent } from '../../utils/create-higher-order
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { ComponentType, ComponentClass } from 'react';
 
 /**

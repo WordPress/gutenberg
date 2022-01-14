@@ -30,7 +30,7 @@ function wp_latest_comments_draft_or_post_title( $post = 0 ) {
 	if ( empty( $title ) ) {
 		$title = __( '(no title)' );
 	}
-	return esc_html( $title );
+	return $title;
 }
 
 /**
@@ -86,14 +86,14 @@ function render_block_core_latest_comments( $attributes = array() ) {
 
 			$author_markup = '';
 			if ( $author_url ) {
-				$author_markup .= '<a class="wp-block-latest-comments__comment-author" href="' . esc_url( $author_url ) . '">' . get_comment_author( $comment ) . '</a>';
+				$author_markup .= '<a class="wp-block-latest-comments__comment-author" href="' . esc_url( $author_url ) . '">' . esc_html( get_comment_author( $comment ) ) . '</a>';
 			} else {
-				$author_markup .= '<span class="wp-block-latest-comments__comment-author">' . get_comment_author( $comment ) . '</span>';
+				$author_markup .= '<span class="wp-block-latest-comments__comment-author">' . esc_html( get_comment_author( $comment ) ) . '</span>';
 			}
 
 			// `_draft_or_post_title` calls `esc_html()` so we don't need to wrap that call in
 			// `esc_html`.
-			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . wp_latest_comments_draft_or_post_title( $comment->comment_post_ID ) . '</a>';
+			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . esc_html( wp_latest_comments_draft_or_post_title( $comment->comment_post_ID ) ) . '</a>';
 
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
@@ -106,7 +106,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 				$list_items_markup .= sprintf(
 					'<time datetime="%1$s" class="wp-block-latest-comments__comment-date">%2$s</time>',
 					esc_attr( get_comment_date( 'c', $comment ) ),
-					date_i18n( get_option( 'date_format' ), get_comment_date( 'U', $comment ) )
+					esc_html( date_i18n( get_option( 'date_format' ), get_comment_date( 'U', $comment ) ) )
 				);
 			}
 			$list_items_markup .= '</footer>';

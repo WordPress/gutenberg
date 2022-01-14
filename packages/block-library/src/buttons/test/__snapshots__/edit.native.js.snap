@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Buttons block justify content sets Justify items center option 1`] = `
+"<!-- wp:buttons {\\"layout\\":{\\"type\\":\\"flex\\",\\"justifyContent\\":\\"center\\"}} -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button /--></div>
+<!-- /wp:buttons -->"
+`;
+
+exports[`Buttons block justify content sets Justify items left option 1`] = `
+"<!-- wp:buttons {\\"layout\\":{\\"type\\":\\"flex\\",\\"justifyContent\\":\\"left\\"}} -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button /--></div>
+<!-- /wp:buttons -->"
+`;
+
+exports[`Buttons block justify content sets Justify items right option 1`] = `
+"<!-- wp:buttons {\\"layout\\":{\\"type\\":\\"flex\\",\\"justifyContent\\":\\"right\\"}} -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button /--></div>
+<!-- /wp:buttons -->"
+`;
+
+exports[`Buttons block when a button is shown adjusts the border radius 1`] = `
+"<!-- wp:buttons -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button {\\"style\\":{\\"border\\":{\\"radius\\":\\"6px\\"}}} -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\" href=\\"\\" style=\\"border-radius:6px\\">Hello</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->"
+`;

@@ -144,6 +144,7 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "",
             }
           }
@@ -323,6 +324,7 @@ exports[`Audio block renders audio file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "",
             }
           }

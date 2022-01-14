@@ -22,6 +22,7 @@ import {
 	deleteUser,
 	switchUserToAdmin,
 } from '@wordpress/e2e-test-utils';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ import menuItemsFixture from '../fixtures/menu-items-request-fixture.json';
 
 const POSTS_ENDPOINT = '/wp/v2/posts';
 const PAGES_ENDPOINT = '/wp/v2/pages';
+const DRAFT_PAGES_ENDPOINT = [ PAGES_ENDPOINT, { status: 'draft' } ];
 const NAVIGATION_MENUS_ENDPOINT = '/wp/v2/navigation';
 
 async function mockSearchResponse( items ) {
@@ -126,8 +128,17 @@ const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select
  * @param {*} endpoints The endpoints of the resources to delete.
  */
 async function deleteAll( endpoints ) {
-	for ( const path of endpoints ) {
-		const items = await rest( { path } );
+	for ( const endpoint of endpoints ) {
+		const defaultArgs = { per_page: -1 };
+		const isArrayEndpoint = Array.isArray( endpoint );
+		const path = isArrayEndpoint ? endpoint[ 0 ] : endpoint;
+		const args = isArrayEndpoint
+			? { ...defaultArgs, ...endpoint[ 1 ] }
+			: defaultArgs;
+
+		const items = await rest( {
+			path: addQueryArgs( path, args ),
+		} );
 
 		for ( const item of items ) {
 			await rest( {
@@ -204,6 +215,7 @@ describe( 'Navigation', () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
@@ -217,6 +229,7 @@ describe( 'Navigation', () => {
 		await deleteAll( [
 			POSTS_ENDPOINT,
 			PAGES_ENDPOINT,
+			DRAFT_PAGES_ENDPOINT,
 			NAVIGATION_MENUS_ENDPOINT,
 		] );
 		await deleteAllClassicMenus();
@@ -436,19 +449,6 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
-		// The URL Details endpoint 404s for the created page, since it will
-		// be a draft that is inaccessible publicly. To avoid this we mock
-		// out the endpoint response to be empty which will be handled gracefully
-		// in the UI whilst avoiding any 404s.
-		await setUpResponseMocking( [
-			{
-				match: ( request ) =>
-					request.url().includes( `rest_route` ) &&
-					request.url().includes( `url-details` ),
-				onRequestMatch: createJSONResponse( [] ),
-			},
-		] );
-
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
@@ -466,16 +466,21 @@ describe( 'Navigation', () => {
 		);
 		await input.type( pageTitle );
 
-		// Wait for the create button to appear and click it.
+		// When creating a page, the URLControl makes a request to the
+		// url-details endpoint to fetch information about the page.
+		// Because the draft is inaccessible publicly, this request
+		// returns a 404 response. Wait for the response and expect
+		// the error to have occurred.
 		const createPageButton = await page.waitForSelector(
 			'.block-editor-link-control__search-create'
 		);
-		await createPageButton.click();
-
-		const draftLink = await page.waitForSelector(
-			'.wp-block-navigation-item__content'
+		const responsePromise = page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'url-details' ) &&
+				response.status() === 404
 		);
-		await draftLink.click();
+		const createPagePromise = createPageButton.click();
+		await Promise.all( [ responsePromise, createPagePromise ] );
 
 		// Creating a draft is async, so wait for a sign of completion. In this
 		// case the link that shows in the URL popover once a link is added.
@@ -487,6 +492,9 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
 	} );
 
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
