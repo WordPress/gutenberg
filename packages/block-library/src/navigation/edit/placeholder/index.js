@@ -175,6 +175,12 @@ export default function NavigationPlaceholder( {
 
 	const { navigationMenus } = useNavigationMenu();
 
+	const hasNavigationMenus = !! navigationMenus?.length;
+
+	const showSelectMenus =
+		( canSwitchNavigationMenu || canUserCreateNavigation ) &&
+		( hasNavigationMenus || hasMenus );
+
 	return (
 		<>
 			{ ( ! hasResolvedNavigationMenus || isStillLoading ) && (
@@ -192,7 +198,7 @@ export default function NavigationPlaceholder( {
 
 							<hr />
 
-							{ hasMenus || navigationMenus?.length ? (
+							{ showSelectMenus ? (
 								<>
 									<ExistingMenusDropdown
 										canSwitchNavigationMenu={
