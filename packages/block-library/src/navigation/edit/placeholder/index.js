@@ -47,28 +47,30 @@ const ExistingMenusDropdown = ( {
 		>
 			{ ( { onClose } ) => (
 				<>
-					<MenuGroup label={ __( 'Menus' ) }>
-						{ canSwitchNavigationMenu &&
-							navigationMenus?.map( ( menu ) => {
-								return (
-									<MenuItem
-										onClick={ () => {
-											setSelectedMenu( menu.id );
-											onFinish( menu );
-										} }
-										onClose={ onClose }
-										key={ menu.id }
-									>
-										{ decodeEntities(
-											menu.title.rendered
-										) }
-									</MenuItem>
-								);
-							} ) }
-					</MenuGroup>
-					{ showClassicMenus && (
+					{ canSwitchNavigationMenu &&
+						navigationMenus?.length(
+							<MenuGroup label={ __( 'Menus' ) }>
+								{ navigationMenus.map( ( menu ) => {
+									return (
+										<MenuItem
+											onClick={ () => {
+												setSelectedMenu( menu.id );
+												onFinish( menu );
+											} }
+											onClose={ onClose }
+											key={ menu.id }
+										>
+											{ decodeEntities(
+												menu.title.rendered
+											) }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+					{ showClassicMenus && menus?.length && (
 						<MenuGroup label={ __( 'Classic Menus' ) }>
-							{ menus?.map( ( menu ) => {
+							{ menus.map( ( menu ) => {
 								return (
 									<MenuItem
 										onClick={ () => {
