@@ -839,7 +839,12 @@ export function getEditedPostPreviewLink( state ) {
 	}
 
 	let previewLink = getAutosaveAttribute( state, 'preview_link' );
-	if ( ! previewLink ) {
+	// Fix for issue: https://github.com/WordPress/gutenberg/issues/33616
+	// If the post is draft, ignore the preview link from the autosave record,
+	// because the preview could be a stale autosave if the post was switched from
+	// published to draft.
+	// See: https://github.com/WordPress/gutenberg/pull/37952
+	if ( ! previewLink || 'draft' === getCurrentPost( state ).status ) {
 		previewLink = getEditedPostAttribute( state, 'link' );
 		if ( previewLink ) {
 			previewLink = addQueryArgs( previewLink, { preview: true } );
