@@ -511,7 +511,9 @@ _Related_
 
 ### MediaReplaceFlow
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md>
 
 ### MediaUpload
 
