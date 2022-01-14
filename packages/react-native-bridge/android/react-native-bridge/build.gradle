@@ -79,6 +79,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation "org.wordpress:utils:1.22"
 
+
+    testImplementation "junit:junit:4.13"
+
     if (willPublishReactNativeBridgeBinary) {
         def rnVersion = readReactNativeVersion('../../../../package.json', 'devDependencies')
         println "react-native version for react-native-bridge: $rnVersion"

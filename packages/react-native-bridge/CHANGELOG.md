@@ -2,4 +2,5 @@
 
 ## Unreleased
 
--   [***] Bump minimum deployment target to iOS 13.0 [#27577]
+- [**] Fix Android handling of Hebrew and Indonesian translations [#37565]
+- [***] Bump minimum deployment target to iOS 13.0 [#27577]
