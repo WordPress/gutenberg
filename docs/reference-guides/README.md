@@ -35,6 +35,12 @@
 -   [PluginSidebar](/docs/reference-guides/slotfills/plugin-sidebar.md)
 -   [PluginSidebarMoreMenuItem](/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md)
 
+## [Theme.json Reference](/docs/reference-guides/theme-json-reference/README.md)
+
+-   [Version 2 (living reference)](/docs/reference-guides/theme-json-reference/theme-json-living.md)
+-   [Version 1](/docs/reference-guides/theme-json-reference/theme-json-v1.md)
+-   [Migrating to Newer Versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md)
+
 ## [RichText Reference](/docs/reference-guides/richtext.md)
 
 ## [Component Reference](/packages/components/README.md)
