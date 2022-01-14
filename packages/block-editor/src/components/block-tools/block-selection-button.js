@@ -196,6 +196,15 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				if ( navigateDown ) {
 					nextTabbable = focus.tabbable.findNext( blockElement );
 
+					if ( null === getNextBlockClientId( clientId ) ) {
+						const searchForButtonToFocus = document.querySelector(
+							'button[data-focus-at-end="true"]'
+						);
+						if ( searchForButtonToFocus ) {
+							nextTabbable = searchForButtonToFocus;
+						}
+					}
+
 					if ( ! nextTabbable ) {
 						nextTabbable =
 							blockElement.ownerDocument.defaultView.frameElement;

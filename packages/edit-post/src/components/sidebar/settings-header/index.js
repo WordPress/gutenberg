@@ -55,6 +55,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 						className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
 						aria-label={ documentAriaLabel }
 						data-label={ documentLabel }
+						data-focus-at-end="true"
 					>
 						{ documentLabel }
 					</Button>
@@ -67,6 +68,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 						className={ `edit-post-sidebar__panel-tab ${ templateActiveClass }` }
 						aria-label={ templateAriaLabel }
 						data-label={ __( 'Template' ) }
+						data-focus-at-end
 					>
 						{ __( 'Template' ) }
 					</Button>
