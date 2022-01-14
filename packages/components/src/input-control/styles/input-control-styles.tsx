@@ -227,18 +227,18 @@ export const Input = styled.input< InputProps >`
 	}
 `;
 
-const labelPadding = ( {
+const labelMargin = ( {
 	labelPosition,
 }: {
 	labelPosition?: LabelPosition;
 } ) => {
-	let paddingBottom = 4;
+	let marginBottom = 8;
 
 	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
-		paddingBottom = 0;
+		marginBottom = 0;
 	}
 
-	return css( { paddingTop: 0, paddingBottom } );
+	return css( { marginTop: 0, marginRight: 0, marginBottom, marginLeft: 0 } );
 };
 
 const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
@@ -246,11 +246,12 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 		box-sizing: border-box;
 		color: currentColor;
 		display: block;
-		margin: 0;
+		padding-top: 0;
+		padding-bottom: 0;
 		max-width: 100%;
 		z-index: 1;
 
-		${ labelPadding }
+		${ labelMargin }
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;

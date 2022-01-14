@@ -306,11 +306,14 @@ button.wp-block-navigation-item__content {
  */
 
 // Menu items with no background.
+.wp-block-navigation__responsive-container,
+.wp-block-navigation__responsive-close,
+.wp-block-navigation__responsive-dialog,
 .wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container,
 .wp-block-navigation__responsive-container-content {
-	gap: var(--wp--style--block-gap, 2em);
+	gap: inherit;
 }
 
 // Menu items with background.
@@ -321,7 +324,7 @@ button.wp-block-navigation-item__content {
 	&,
 	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
-		gap: var(--wp--style--block-gap, 0.5em);
+		gap: inherit;
 	}
 }
 
@@ -509,7 +512,7 @@ button.wp-block-navigation-item__content {
 			// Space unfolded items using gap and padding for submenus.
 			.wp-block-navigation__submenu-container,
 			.wp-block-navigation__container {
-				gap: var(--wp--style--block-gap, 2em);
+				gap: inherit;
 			}
 
 			// Apply top padding to nested submenus.

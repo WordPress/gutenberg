@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<RichText/> Font Size renders component with style and font size 1`] = `
+"<!-- wp:paragraph {\\"style\\":{\\"color\\":{\\"text\\":\\"#fcb900\\"},\\"typography\\":{\\"fontSize\\":35.56}}} -->
+<p class=\\"has-text-color\\" style=\\"color:#fcb900;font-size:35.56px\\">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed imperdiet ut nibh vitae ornare. Sed auctor nec augue at blandit.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`<RichText/> Font Size should update the font size when style prop with font size property is provided 1`] = `
+<View>
+  <TextInput
+    accessibilityLabel="Text input. Empty"
+    activeFormats={Array []}
+    blockType={
+      Object {
+        "tag": "div",
+      }
+    }
+    disableEditingMenu={false}
+    fontFamily="serif"
+    fontSize={12}
+    isMultiline={false}
+    maxImagesWidth={200}
+    onBlur={[Function]}
+    onChange={[Function]}
+    onContentSizeChange={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onPaste={[Function]}
+    onSelectionChange={[Function]}
+    placeholderTextColor="gray"
+    triggerKeyCodes={Array []}
+    value=""
+  />
+</View>
+`;
+
+exports[`<RichText/> Font Size should update the font size with decimals when style prop with font size property is provided 1`] = `
+<View>
+  <TextInput
+    accessibilityLabel="Text input. Empty"
+    activeFormats={Array []}
+    blockType={
+      Object {
+        "tag": "div",
+      }
+    }
+    disableEditingMenu={false}
+    fontFamily="serif"
+    fontSize={13}
+    isMultiline={false}
+    maxImagesWidth={200}
+    onBlur={[Function]}
+    onChange={[Function]}
+    onContentSizeChange={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onPaste={[Function]}
+    onSelectionChange={[Function]}
+    placeholderTextColor="gray"
+    triggerKeyCodes={Array []}
+    value=""
+  />
+</View>
+`;

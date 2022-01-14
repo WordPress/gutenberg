@@ -57,11 +57,5 @@ describe( 'iframed inline styles', () => {
 		expect( await getComputedStyle( canvas(), 'border-width' ) ).toBe(
 			'2px'
 		);
-
-		expect( console ).toHaveWarned(
-			`Stylesheet iframed-inline-styles-compat-style-css was not properly added.
-For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
-For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles). <link rel="stylesheet" id="iframed-inline-styles-compat-style-css" href="http://localhost:8889/wp-content/plugins/gutenberg-test-plugins/iframed-inline-styles/compat-style.css?ver=1626189899" media="all">`
-		);
 	} );
 } );

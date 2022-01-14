@@ -524,7 +524,7 @@ export class ImageEdit extends Component {
 
 		const removeFeaturedButton = () => (
 			<BottomSheet.Cell
-				label={ __( 'Remove as Featured Image ' ) }
+				label={ __( 'Remove as Featured Image' ) }
 				labelStyle={ [
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
@@ -539,7 +539,7 @@ export class ImageEdit extends Component {
 
 		const setFeaturedButton = () => (
 			<BottomSheet.Cell
-				label={ __( 'Set as Featured Image ' ) }
+				label={ __( 'Set as Featured Image' ) }
 				labelStyle={ setFeaturedButtonStyle }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
 				separatorType={ 'none' }
