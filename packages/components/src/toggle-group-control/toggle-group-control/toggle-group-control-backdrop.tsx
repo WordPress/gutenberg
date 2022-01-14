@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, memo } from '@wordpress/element';
+import { useState, useEffect, useLayoutEffect, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { ToggleGroupControlBackdropProps } from '../types';
 import { BackdropView } from './styles';
+import { COLORS } from '../../utils';
 
 function ToggleGroupControlBackdrop( {
 	containerRef,
@@ -15,16 +16,16 @@ function ToggleGroupControlBackdrop( {
 	isAdaptiveWidth,
 	state,
 }: ToggleGroupControlBackdropProps ) {
-	// Start at -1 so there is a transition to monitor in case there's no padding
-	const [ left, setLeft ] = useState< number | undefined >( -1 );
+	const [ left, setLeft ] = useState< number | undefined >( 0 );
 	const [ width, setWidth ] = useState( 0 );
 	const [ borderWidth, setBorderWidth ] = useState( 0 );
 	const [ targetNode, setTargetNode ] = useState< HTMLElement | null >();
+
 	// On the second transition, the component is in the intended starting position and ready to animate
 	const [ transitionCount, setTransitionCount ] = useState( 0 );
 	const [ canAnimate, setCanAnimate ] = useState( false );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const containerNode = containerRef?.current;
 		if ( ! containerNode ) return;
 
@@ -32,7 +33,15 @@ function ToggleGroupControlBackdrop( {
 		const target = containerNode.querySelector(
 			`[data-value="${ state }"]`
 		) as HTMLElement;
+
+		// Temporarily set backgrop BG color to button
+		if ( ! canAnimate ) {
+			target.style.backgroundColor = COLORS.gray[ 900 ];
+		}
 		setTargetNode( target );
+		return () => {
+			target.style.backgroundColor = '';
+		};
 	}, [ containerRef, containerWidth, state, isAdaptiveWidth ] );
 
 	useEffect( () => {
@@ -44,13 +53,10 @@ function ToggleGroupControlBackdrop( {
 
 		// Check if there is a border, which is required for positioning
 		if ( ! borderWidth ) {
-			const bWidth = parseInt(
-				window
-					?.getComputedStyle( containerNode )
-					?.getPropertyValue( 'border-width' ) ?? 0,
-				10
-			);
-			setBorderWidth( bWidth );
+			const bWidth = window
+				?.getComputedStyle( containerNode )
+				?.getPropertyValue( 'border-width' );
+			setBorderWidth( parseInt( bWidth ?? 0, 10 ) );
 		}
 
 		const requestAnimationIds: number[] = [];
@@ -71,17 +77,6 @@ function ToggleGroupControlBackdrop( {
 		};
 		containerNode.addEventListener( 'transitionend', handle );
 
-		// Trigger an initial transition for the event listener to pick up on
-		if ( left === -1 ) {
-			const paddingLeft = parseInt(
-				window
-					?.getComputedStyle( containerNode )
-					?.getPropertyValue( 'padding-left' ) ?? 0,
-				10
-			);
-			setLeft( paddingLeft );
-		}
-
 		return () => {
 			containerNode.removeEventListener( 'transitionend', handle );
 			requestAnimationIds.forEach( ( id ) =>
@@ -91,7 +86,9 @@ function ToggleGroupControlBackdrop( {
 	}, [ targetNode, width ] );
 
 	useEffect( () => {
-		if ( transitionCount >= 2 && ! canAnimate ) {
+		if ( targetNode && transitionCount >= 2 && ! canAnimate ) {
+			// Remove temporary background color
+			targetNode.style.backgroundColor = '';
 			setCanAnimate( true );
 		}
 	}, [ transitionCount ] );
@@ -105,6 +102,7 @@ function ToggleGroupControlBackdrop( {
 			role="presentation"
 			style={ {
 				transform: `translateX(${ left }px)`,
+				background: COLORS.gray[ 900 ],
 				visibility: canAnimate ? undefined : 'hidden',
 				width,
 			} }
