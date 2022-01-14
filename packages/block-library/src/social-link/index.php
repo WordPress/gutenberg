@@ -34,7 +34,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 
 	$rel_target_attributes = '';
 	if ( $open_in_new_tab ) {
-		$rel_target_attributes = 'rel="' . esc_attr( 'noopener nofollow' ) . '" target="' . esc_attr( '_blank' ) . '"';
+		$rel_target_attributes = 'rel="noopener nofollow" target="_blank"';
 	}
 
 	$icon               = block_core_social_link_get_icon( $service );
