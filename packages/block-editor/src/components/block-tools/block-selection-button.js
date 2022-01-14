@@ -197,7 +197,6 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 					nextTabbable = focus.tabbable.findNext( blockElement );
 
 					if (
-						selectedBlockClientId &&
 						null === getNextBlockClientId( clientId ) &&
 						nextTabbable
 					) {
@@ -206,14 +205,15 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 						);
 						let checkIfInsideBlock = true;
 						while ( checkIfInsideBlock ) {
-							nextTabbable = focus.tabbable.findNext(
-								nextTabbable
-							);
 							if (
 								false ===
 								currentBlockByID.contains( nextTabbable )
 							) {
 								checkIfInsideBlock = false;
+							} else {
+								nextTabbable = focus.tabbable.findNext(
+									nextTabbable
+								);
 							}
 						}
 					}
