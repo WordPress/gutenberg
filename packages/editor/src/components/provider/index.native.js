@@ -56,7 +56,10 @@ const postTypeEntities = [
 	},
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
 } ) );
-import { EditorHelpTopics } from '@wordpress/editor';
+import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -350,8 +353,8 @@ export default compose( [
 			getEditorBlocks,
 			getEditedPostAttribute,
 			getEditedPostContent,
-		} = select( 'core/editor' );
-		const { getEditorMode } = select( 'core/edit-post' );
+		} = select( editorStore );
+		const { getEditorMode } = select( editPostStore );
 
 		const {
 			getBlockIndex,
@@ -374,16 +377,16 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks } = dispatch( editorStore );
 		const {
 			updateSettings,
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
 		} = dispatch( blockEditorStore );
-		const { switchEditorMode } = dispatch( 'core/edit-post' );
-		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
-		const { createSuccessNotice } = dispatch( 'core/notices' );
+		const { switchEditorMode } = dispatch( editPostStore );
+		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
+		const { createSuccessNotice } = dispatch( noticesStore );
 
 		return {
 			updateSettings,

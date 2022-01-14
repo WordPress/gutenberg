@@ -29,8 +29,8 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
 		$wrapper_attributes,
-		get_the_date( 'c', $post_ID ),
-		$formatted_date
+		esc_attr( get_the_date( 'c', $post_ID ) ),
+		esc_html( $formatted_date )
 	);
 }
 

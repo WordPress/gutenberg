@@ -120,7 +120,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'              => array( 'color', 'duotone' ),
 			'override'          => true,
 			'use_default_names' => false,
-			'value_func'        => 'gutenberg_render_duotone_filter_preset',
+			'value_func'        => 'gutenberg_get_duotone_filter_property',
 			'css_vars'          => '--wp--preset--duotone--$slug',
 			'classes'           => array(),
 			'properties'        => array( 'filter' ),
@@ -285,7 +285,7 @@ class WP_Theme_JSON_Gutenberg {
 		'spacing'    => array(
 			'margin'   => null,
 			'padding'  => null,
-			'blockGap' => null,
+			'blockGap' => 'top',
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -428,17 +428,28 @@ class WP_Theme_JSON_Gutenberg {
 
 		$output = array_intersect_key( $input, array_flip( self::VALID_TOP_LEVEL_KEYS ) );
 
+		// Some styles are only meant to be available at the top-level (e.g.: blockGap),
+		// hence, the schema for blocks & elements should not have them.
+		$styles_non_top_level = self::VALID_STYLES;
+		foreach ( array_keys( $styles_non_top_level ) as $section ) {
+			foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
+				if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
+					unset( $styles_non_top_level[ $section ][ $prop ] );
+				}
+			}
+		}
+
 		// Build the schema based on valid block & element names.
 		$schema                 = array();
 		$schema_styles_elements = array();
 		foreach ( $valid_element_names as $element ) {
-			$schema_styles_elements[ $element ] = self::VALID_STYLES;
+			$schema_styles_elements[ $element ] = $styles_non_top_level;
 		}
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ]           = self::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]             = self::VALID_STYLES;
+			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
 		$schema['styles']             = self::VALID_STYLES;
@@ -1481,6 +1492,39 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Converts all filter (duotone) presets into SVGs.
+	 *
+	 * @param array $origins List of origins to process.
+	 *
+	 * @return string SVG filters.
+	 */
+	public function get_svg_filters( $origins ) {
+		$blocks_metadata = self::get_blocks_metadata();
+		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		foreach ( $setting_nodes as $metadata ) {
+			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $node['color']['duotone'] ) ) {
+				continue;
+			}
+
+			$duotone_presets = $node['color']['duotone'];
+
+			$filters = '';
+			foreach ( $origins as $origin ) {
+				if ( ! isset( $duotone_presets[ $origin ] ) ) {
+					continue;
+				}
+				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
+					$filters .= gutenberg_get_duotone_filter_svg( $duotone_preset );
+				}
+			}
+		}
+
+		return $filters;
 	}
 
 	/**

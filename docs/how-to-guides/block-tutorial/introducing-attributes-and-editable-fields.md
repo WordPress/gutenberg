@@ -53,7 +53,7 @@ Because `RichText` allows for nested nodes, you'll most often use it in conjunct
 Here is the complete block definition for Example 03.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -108,7 +108,7 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, blockEditor, element ) {

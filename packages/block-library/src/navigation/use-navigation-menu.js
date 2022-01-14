@@ -79,6 +79,11 @@ export default function useNavigationMenu( ref ) {
 					'canUser',
 					[ 'delete', 'navigation', ref ]
 				),
+				canUserCreateNavigation: canUser( 'create', 'navigation' ),
+				hasResolvedCanUserCreateNavigation: hasFinishedResolution(
+					'canUser',
+					[ 'create', 'navigation' ]
+				),
 			};
 		},
 		[ ref ]

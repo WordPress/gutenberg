@@ -2,11 +2,13 @@
 
 ## Unreleased
 
+-   Updated `yargs` to fix [CVE-2021-3807](https://nvd.nist.gov/vuln/detail/CVE-2021-3807).
+
 ## 4.1.3 (2021-11-07)
 
 ### Bug Fix
 
-- Fix Xdebug installation code to ensure it would fail gracefully
+-   Fix Xdebug installation code to ensure it would fail gracefully
 
 ## 4.0.3 (2021-04-29)
 

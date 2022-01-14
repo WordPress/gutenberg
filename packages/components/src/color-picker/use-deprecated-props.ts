@@ -10,7 +10,6 @@ import {
 	RgbColor,
 	RgbaColor,
 } from 'colord';
-// eslint-disable-next-line no-restricted-imports
 import type { ComponentProps } from 'react';
 import memoize from 'memize';
 

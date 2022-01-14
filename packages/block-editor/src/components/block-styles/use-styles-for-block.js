@@ -48,7 +48,7 @@ function useGenericPreviewBlock( block, type ) {
 
 /**
  *
- * @param  {useStylesForBlocksArguments} useStylesForBlocks arguments.
+ * @param {useStylesForBlocksArguments} useStylesForBlocks arguments.
  * @return {Object}                                         Results of the select methods.
  */
 export default function useStylesForBlocks( { clientId, onSwitch } ) {

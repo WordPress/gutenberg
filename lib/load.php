@@ -105,6 +105,7 @@ require __DIR__ . '/compat/wordpress-5.9/register-global-styles-cpt.php';
 // and the global styles assets won't be loaded.
 require __DIR__ . '/compat/wordpress-5.9/script-loader.php';
 require __DIR__ . '/compat/wordpress-5.9/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-5.9/render-svg-filters.php';
 require __DIR__ . '/compat/wordpress-5.9/json-file-decode.php';
 require __DIR__ . '/compat/wordpress-5.9/translate-settings-using-i18n-schema.php';
 require __DIR__ . '/compat/wordpress-5.9/global-styles-css-custom-properties.php';
