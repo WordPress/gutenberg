@@ -333,8 +333,16 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 String injectWPBarsCssScript = getFileContentFromAssets("gutenberg-web-single-block/wp-bar-override.css");
                 injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
                 evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
+
+                String injectExternalCssScript = getOnGutenbergReadyExternalStyles();
+                injectExternalCssScript = removeWhiteSpace(removeNewLines(injectExternalCssScript));
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectExternalCssScript));
             }
         });
+    }
+
+    protected String getOnGutenbergReadyExternalStyles() {
+        return new String();
     }
 
     private void injectOnGutenbergReadyExternalSources() {
