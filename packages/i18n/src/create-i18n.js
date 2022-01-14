@@ -195,7 +195,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		// a plural forms expression).
 		tannin.data[ domain ][ '' ] = {
 			...DEFAULT_LOCALE_DATA[ '' ],
-			...tannin.data[ domain ][ '' ],
+			...tannin.data[ domain ]?.[ '' ],
 		};
 	};
 
@@ -211,8 +211,8 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 			// a plural forms expression).
 			'': {
 				...DEFAULT_LOCALE_DATA[ '' ],
-				...( tannin.data[ domain ] || {} )[ '' ],
-				...( data || {} )[ '' ],
+				...tannin.data[ domain ]?.[ '' ],
+				...data?.[ '' ],
 			},
 		};
 	};
