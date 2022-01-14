@@ -52,7 +52,6 @@ describe( 'Register Gutenberg', () => {
 
 		it( 'sets up locale before editor is initialized', () => {
 			const mockOnModuleImported = jest.fn();
-			// jest.resetModules();
 			jest.mock( '../setup', () => {
 				// To determine if the setup module is imported, we create a mock function that is called when the module is mocked.
 				mockOnModuleImported();
