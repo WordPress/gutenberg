@@ -47,10 +47,25 @@ import { speak } from '@wordpress/a11y';
  */
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
+import navigationLinkMetadata from '../navigation-link/block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
-const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+const DEFAULT_BLOCK = [
+	'core/navigation-link',
+	{
+		...Object.entries( navigationLinkMetadata.attributes ).reduce(
+			( acc, attribute ) => ( {
+				...acc,
+				[ attribute[ 0 ] ]:
+					attribute[ 1 ].default !== undefined
+						? attribute[ 1 ].default
+						: undefined,
+			} ),
+			{}
+		),
+	},
+];
 
 const MAX_NESTING = 5;
 
