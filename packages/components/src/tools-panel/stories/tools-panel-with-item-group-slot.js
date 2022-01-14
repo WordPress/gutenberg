@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
+import { ContrastChecker } from '@wordpress/block-editor';
 import { useContext, useState } from '@wordpress/element';
 
 /**
@@ -193,6 +194,14 @@ export const ToolsPanelWithItemGroupSlot = () => {
 					value={ link }
 				/>
 			</ToolsPanelItems>
+			<ToolsPanelItems>
+				{ !! text && !! background && (
+					<ContrastChecker
+						backgroundColor={ background }
+						textColor={ text }
+					/>
+				) }
+			</ToolsPanelItems>
 		</SlotFillProvider>
 	);
 };
@@ -213,6 +222,10 @@ const SlotWrapper = css`
 
 	> div {
 		grid-column: span 2;
+	}
+
+	.block-editor-contrast-checker {
+		margin-top: 16px;
 	}
 `;
 
@@ -237,10 +250,5 @@ const ToolsPanelItemClass = css`
 	&& > div > button {
 		width: 100%;
 		border-radius: inherit;
-	}
-
-	/* .components-dropdown class overrides ToolsPanelItemPlaceholder styles */
-	&[class*='ToolsPanelItemPlaceholder'] {
-		display: none;
 	}
 `;
