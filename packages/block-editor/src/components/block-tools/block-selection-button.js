@@ -197,6 +197,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 					nextTabbable = focus.tabbable.findNext( blockElement );
 
 					if (
+						selectedBlockClientId &&
 						null === getNextBlockClientId( clientId ) &&
 						nextTabbable
 					) {
