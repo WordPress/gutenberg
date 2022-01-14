@@ -45,7 +45,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		)
 	);
 
-	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $rel_target_attributes . ' class="wp-block-social-link-anchor"> ' . esc_html( $icon ) . '</a></li>';
+	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $rel_target_attributes . ' class="wp-block-social-link-anchor">' . $icon . '</a></li>';
 }
 
 /**
