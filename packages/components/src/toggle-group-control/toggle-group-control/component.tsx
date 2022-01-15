@@ -24,7 +24,6 @@ import {
 import { useUpdateEffect, useCx } from '../../utils/hooks';
 import { View } from '../../view';
 import BaseControl from '../../base-control';
-import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import type { ToggleGroupControlProps } from '../types';
 import ToggleGroupControlContext from '../context';
 import * as styles from './styles';
@@ -49,7 +48,7 @@ function ToggleGroupControl(
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
 	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeAware();
+	const [ resizeListener ] = useResizeAware();
 	const baseId = useInstanceId(
 		ToggleGroupControl,
 		'toggle-group-control'
@@ -107,12 +106,6 @@ function ToggleGroupControl(
 					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
 				>
 					{ resizeListener }
-					<ToggleGroupControlBackdrop
-						{ ...radio }
-						containerRef={ containerRef }
-						containerWidth={ sizes.width }
-						isAdaptiveWidth={ isAdaptiveWidth }
-					/>
 					{ children }
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>
