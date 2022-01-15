@@ -126,16 +126,14 @@ export function SocialLinksEdit( props ) {
 				setAttributes( { iconColorValue: colorValue } );
 			},
 			label: __( 'Icon color' ),
-		}
+		},
 	];
 
 	if ( ! logosOnly ) {
 		colorSettings.push( {
 			// Use custom attribute as fallback to prevent loss of named color selection when
 			// switching themes to a new theme that does not have a matching named color.
-			value:
-				iconBackgroundColor.color ||
-				iconBackgroundColorValue,
+			value: iconBackgroundColor.color || iconBackgroundColorValue,
 			onChange: ( colorValue ) => {
 				setIconBackgroundColor( colorValue );
 				setAttributes( {
