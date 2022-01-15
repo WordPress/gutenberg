@@ -452,6 +452,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	}
 
+	/**
+	 * Filter navigation block $inner_blocks.
+	 * Allows modification of a navigation block menu items.
+	 *
+	 * @param \WP_Block_List $inner_blocks
+	 */
+	$inner_blocks = apply_filters( 'render_block_core_navigation_inner_blocks', $inner_blocks );
+
 	$layout_justification = array(
 		'left'          => 'items-justified-left',
 		'right'         => 'items-justified-right',
