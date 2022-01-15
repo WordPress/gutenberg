@@ -86,11 +86,15 @@ function ToggleGroupControlBackdrop( {
 	}, [ targetNode, width ] );
 
 	useEffect( () => {
+		let animationId: number;
 		if ( targetNode && transitionCount >= 2 && ! canAnimate ) {
 			// Remove temporary background color
 			targetNode.style.backgroundColor = '';
-			setCanAnimate( true );
+			animationId = window.requestAnimationFrame( () => {
+				setCanAnimate( true );
+			} );
 		}
+		return () => window.cancelAnimationFrame( animationId );
 	}, [ transitionCount ] );
 
 	if ( ! targetNode ) {
