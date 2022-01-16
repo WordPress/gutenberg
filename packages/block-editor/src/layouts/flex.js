@@ -113,7 +113,7 @@ export default {
 				${ appendSelectors( selector ) } {
 					display: flex;
 					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
-					--wp--style--scoped-block-gap: ${
+					--wp--style--block-scoped-flex-gap: ${
 						hasBlockGapStylesSupport ? blockGapValue : '0.5em'
 					}; 
 					flex-wrap: ${ flexWrap };
