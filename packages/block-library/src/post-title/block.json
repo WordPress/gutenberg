@@ -6,7 +6,7 @@
 	"category": "theme",
 	"description": "Displays the title of a post, page, or any other content-type.",
 	"textdomain": "default",
-	"usesContext": [ "postId", "postType", "queryId" ],
+	"usesContext": [ "postId", "postType", "queryId", "isPostOneLink" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"

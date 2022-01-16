@@ -13,7 +13,7 @@ import {
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
-import { RawHTML } from '@wordpress/element';
+import { RawHTML, useEffect } from '@wordpress/element';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
@@ -27,7 +27,7 @@ import { useCanEditEntity } from '../utils/hooks';
 export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
-	context: { postType, postId, queryId },
+	context: { postType, postId, queryId, isPostOneLink },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -44,6 +44,11 @@ export default function PostTitleEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	// ensure that the post title is a link when the post template marks the entire post a link
+	useEffect( () => {
+		if ( isPostOneLink ) setAttributes( { isLink: true } );
+	}, [ isPostOneLink ] );
 
 	let titleElement = (
 		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>
@@ -120,6 +125,12 @@ export default function PostTitleEdit( {
 						label={ __( 'Make title a link' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
+						disabled={ isPostOneLink }
+						help={
+							isPostOneLink
+								? 'The Post Template block marks that the entire Post should be one link. Therefore the link in the title is needed.'
+								: null
+						}
 					/>
 					{ isLink && (
 						<>
