@@ -128,7 +128,7 @@ export default function PostTitleEdit( {
 						disabled={ isPostOneLink }
 						help={
 							isPostOneLink
-								? 'The Post Template block marks that the entire Post should be one link. Therefore the link in the title is needed.'
+								? 'The Post Template block marks that the entire post should be one link. Therefore the link in the title is needed.'
 								: null
 						}
 					/>
