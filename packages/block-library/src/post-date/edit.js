@@ -161,7 +161,7 @@ export default function PostDateEdit( {
 						help={
 							isPostOneLink
 								? __(
-										'The Post Template block marks that the entire Post should be one link.'
+										'The Post Template block marks that the entire post should be one link.'
 								  )
 								: null
 						}
