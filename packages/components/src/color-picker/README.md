@@ -5,7 +5,7 @@
 ## Usage
 
 ```jsx
-import { ColorPicker } from '@wordpress/components/ui';
+import { ColorPicker } from '@wordpress/components';
 
 function Example() {
 	const [color, setColor] = useState();
