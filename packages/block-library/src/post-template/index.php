@@ -67,6 +67,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 	wp_reset_postdata();
 
+	if ( $attributes['makeEntirePostClickable'] ) {
+		wp_enqueue_script( 'wp-block-post-template-view' );
+	}
+
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
 		$wrapper_attributes,

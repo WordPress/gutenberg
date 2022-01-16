@@ -18,6 +18,10 @@ import {
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+/**
+ * Internal dependencies
+ */
+import { BlockInspector } from './inspector';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -65,6 +69,8 @@ const MemoizedPostTemplateBlockPreview = memo( PostTemplateBlockPreview );
 
 export default function PostTemplateEdit( {
 	clientId,
+	attributes,
+	setAttributes,
 	context: {
 		query: {
 			perPage,
@@ -166,14 +172,28 @@ export default function PostTemplateEdit( {
 
 	if ( ! posts ) {
 		return (
-			<p { ...blockProps }>
-				<Spinner />
-			</p>
+			<>
+				<BlockInspector
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
+				<p { ...blockProps }>
+					<Spinner />
+				</p>
+			</>
 		);
 	}
 
 	if ( ! posts.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
+		return (
+			<>
+				<BlockInspector
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
+				<p { ...blockProps }> { __( 'No results found.' ) }</p>
+			</>
+		);
 	}
 
 	// To avoid flicker when switching active block contexts, a preview is rendered
@@ -181,30 +201,38 @@ export default function PostTemplateEdit( {
 	// This ensures that when it is displayed again, the cached rendering of the
 	// block preview is used, instead of having to re-render the preview from scratch.
 	return (
-		<ul { ...blockProps }>
-			{ blockContexts &&
-				blockContexts.map( ( blockContext ) => (
-					<BlockContextProvider
-						key={ blockContext.postId }
-						value={ blockContext }
-					>
-						{ blockContext.postId ===
-						( activeBlockContextId ||
-							blockContexts[ 0 ]?.postId ) ? (
-							<PostTemplateInnerBlocks />
-						) : null }
-						<MemoizedPostTemplateBlockPreview
-							blocks={ blocks }
-							blockContextId={ blockContext.postId }
-							setActiveBlockContextId={ setActiveBlockContextId }
-							isHidden={
-								blockContext.postId ===
-								( activeBlockContextId ||
-									blockContexts[ 0 ]?.postId )
-							}
-						/>
-					</BlockContextProvider>
-				) ) }
-		</ul>
+		<>
+			<BlockInspector
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+			<ul { ...blockProps }>
+				{ blockContexts &&
+					blockContexts.map( ( blockContext ) => (
+						<BlockContextProvider
+							key={ blockContext.postId }
+							value={ blockContext }
+						>
+							{ blockContext.postId ===
+							( activeBlockContextId ||
+								blockContexts[ 0 ]?.postId ) ? (
+								<PostTemplateInnerBlocks />
+							) : null }
+							<MemoizedPostTemplateBlockPreview
+								blocks={ blocks }
+								blockContextId={ blockContext.postId }
+								setActiveBlockContextId={
+									setActiveBlockContextId
+								}
+								isHidden={
+									blockContext.postId ===
+									( activeBlockContextId ||
+										blockContexts[ 0 ]?.postId )
+								}
+							/>
+						</BlockContextProvider>
+					) ) }
+			</ul>
+		</>
 	);
 }

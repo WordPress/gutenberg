@@ -30,4 +30,8 @@
 			}
 		}
 	}
+
+	& .wp-block-post.is-clickable {
+		cursor: pointer;
+	}
 }
