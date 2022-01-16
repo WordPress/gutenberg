@@ -5,13 +5,13 @@ window.addEventListener( 'load', () => {
 		'.wp-block-post-template .wp-block-post'
 	);
 
-	postBlocks.forEach( ( postCard ) => {
-		const link = postCard.querySelector( '.wp-block-post-title a' );
+	postBlocks.forEach( ( postBlockElement ) => {
+		const link = postBlockElement.querySelector( '.wp-block-post-title a' );
 		if ( link ) {
-			postCard.addEventListener( 'click', () => {
+			postBlockElement.addEventListener( 'click', () => {
 				link.click();
 			} );
-			postCard.classList.add( 'is-clickable' );
+			postBlockElement.classList.add( 'is-clickable' );
 		}
 	} );
 } );
