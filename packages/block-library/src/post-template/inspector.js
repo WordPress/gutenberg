@@ -18,7 +18,7 @@ export function BlockInspector( props ) {
 				<ToggleControl
 					checked={ makeEntirePostClickable }
 					onChange={ setMakeEntirePostClickable }
-					label={ __( 'Make entire Post Clickable' ) }
+					label={ __( 'Make entire Post clickable' ) }
 					help={ __(
 						'When enabled the entire post will be clickable and direct the user to the post page.'
 					) }
