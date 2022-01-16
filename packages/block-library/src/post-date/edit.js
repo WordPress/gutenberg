@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
 import {
 	AlignmentControl,
@@ -30,7 +30,7 @@ import { DOWN } from '@wordpress/keycodes';
 
 export default function PostDateEdit( {
 	attributes: { textAlign, format, isLink },
-	context: { postId, postType, queryId },
+	context: { postId, postType, queryId, isPostOneLink },
 	setAttributes,
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -64,6 +64,11 @@ export default function PostDateEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	// ensure that the post date is not a link when the post template marks the entire post a link
+	useEffect( () => {
+		if ( isPostOneLink ) setAttributes( { isLink: false } );
+	}, [ isPostOneLink ] );
 
 	const timeRef = useRef();
 
@@ -152,6 +157,14 @@ export default function PostDateEdit( {
 						) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
+						disabled={ isPostOneLink }
+						help={
+							isPostOneLink
+								? __(
+										'The Post Template block marks that the entire Post should be one link.'
+								  )
+								: null
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
