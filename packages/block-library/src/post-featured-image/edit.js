@@ -21,6 +21,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { SVG, Path } from '@wordpress/primitives';
 import { store as noticesStore } from '@wordpress/notices';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,7 +51,7 @@ function PostFeaturedImageDisplay( {
 	clientId,
 	attributes,
 	setAttributes,
-	context: { postId, postType, queryId },
+	context: { postId, postType, queryId, isPostOneLink },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { isLink, height, width, scale } = attributes;
@@ -60,6 +61,11 @@ function PostFeaturedImageDisplay( {
 		'featured_media',
 		postId
 	);
+
+	// ensure that the post featured image is not a link when the post template marks the entire post a link
+	useEffect( () => {
+		if ( isPostOneLink ) setAttributes( { isLink: false } );
+	}, [ isPostOneLink ] );
 
 	const media = useSelect(
 		( select ) =>
@@ -109,6 +115,14 @@ function PostFeaturedImageDisplay( {
 						) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
+						disabled={ isPostOneLink }
+						help={
+							isPostOneLink
+								? __(
+										'The Post Template block marks that the entire Post should be one link.'
+								  )
+								: null
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>

@@ -22,7 +22,7 @@
 			"default": "cover"
 		}
 	},
-	"usesContext": [ "postId", "postType", "queryId" ],
+	"usesContext": [ "postId", "postType", "queryId", "isPostOneLink" ],
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
 		"color": {
