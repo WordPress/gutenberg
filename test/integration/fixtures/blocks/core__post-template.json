@@ -3,7 +3,9 @@
 		"clientId": "_clientId_0",
 		"name": "core/post-template",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"makeEntirePostClickable": false
+		},
 		"innerBlocks": [],
 		"originalContent": ""
 	}
