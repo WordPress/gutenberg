@@ -16,6 +16,7 @@ import {
 	openGlobalBlockInserter,
 	searchForBlock,
 	closeGlobalBlockInserter,
+	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -841,6 +842,41 @@ describe( 'Widgets screen', () => {
 		);
 		expect( listItems.length >= widgetAreas.length ).toEqual( true );
 		await closeListView();
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/38002.
+	it( 'allows blocks to be added on mobile viewports', async () => {
+		await setBrowserViewport( 'small' );
+		const [ firstWidgetArea ] = await findAll( {
+			role: 'document',
+			name: 'Block: Widget Area',
+		} );
+
+		const addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
+
+		const addedParagraphBlockInFirstWidgetArea = await find(
+			{
+				name: /^Empty block/,
+				selector: '[data-block][data-type="core/paragraph"]',
+			},
+			{
+				root: firstWidgetArea,
+			}
+		);
+		await addedParagraphBlockInFirstWidgetArea.focus();
+		await page.keyboard.type( 'First Paragraph' );
+		const updatedParagraphBlockInFirstWidgetArea = await find(
+			{
+				name: 'Paragraph block',
+				value: 'First Paragraph',
+			},
+			{
+				root: firstWidgetArea,
+			}
+		);
+
+		expect( updatedParagraphBlockInFirstWidgetArea ).toBeTruthy();
 	} );
 } );
 
