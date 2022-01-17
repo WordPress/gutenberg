@@ -15,11 +15,11 @@ import { store as coreStore } from '@wordpress/core-data';
  * The object used in Query block that contains info and helper mappings
  * from an array of IHasNameAndId objects.
  *
- * @typedef {Object} QueryTermsInfo
- * @property {IHasNameAndId[]}               terms     The array of terms.
- * @property {Object<string, IHasNameAndId>} mapById   Object mapping with the term id as key and the term as value.
- * @property {Object<string, IHasNameAndId>} mapByName Object mapping with the term name as key and the term as value.
- * @property {string[]}                      names     Array with the terms' names.
+ * @typedef {Object} QueryEntitiesInfo
+ * @property {IHasNameAndId[]}               entities  The array of entities.
+ * @property {Object<string, IHasNameAndId>} mapById   Object mapping with the id as key and the entity as value.
+ * @property {Object<string, IHasNameAndId>} mapByName Object mapping with the name as key and the entity as value.
+ * @property {string[]}                      names     Array with the entities' names.
  */
 
 /**
@@ -28,7 +28,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * integration with `FormTokenField` component.
  *
  * @param {IHasNameAndId[]} entities The entities to extract of helper object.
- * @return {QueryTermsInfo} The object with the entities information.
+ * @return {QueryEntitiesInfo} The object with the entities information.
  */
 export const getEntitiesInfo = ( entities ) => {
 	const mapping = entities?.reduce(
