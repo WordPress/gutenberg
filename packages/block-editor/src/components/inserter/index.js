@@ -251,7 +251,7 @@ export default compose( [
 					onSelectOrClose,
 				} = ownProps;
 
-				if ( ! hasSingleBlockType && ! directInsertBlock?.length ) {
+				if ( ! hasSingleBlockType && ! directInsertBlock ) {
 					return;
 				}
 
@@ -277,7 +277,7 @@ export default compose( [
 
 							if (
 								directInsertBlock &&
-								directInsertBlock?.[ 0 ] === lastInnerBlock.name
+								directInsertBlock?.name === lastInnerBlock.name
 							) {
 								return { ...lastInnerBlock.attributes };
 							}
@@ -328,23 +328,37 @@ export default compose( [
 
 				const { insertBlock } = dispatch( blockEditorStore );
 
+				let blockToInsert;
+
 				// Attempt to augment the directInsertBlock with attributes from an adjacent block.
 				// This ensures that styling from existing nearby blocks are preserved in the
 				// newly inserted block. To support intentionally clearing out certain attributes,
 				// the attributes of the directInsertBlock override those of the adjacent block.
 				// See: https://github.com/WordPress/gutenberg/issues/37904
-				const directInsertBlockWithAttributes = directInsertBlock?.length
-					? [
-							directInsertBlock[ 0 ],
-							{
-								...getAdjacentBlockAttributes(),
-								...( directInsertBlock[ 1 ] || {} ),
-							},
-					  ]
-					: directInsertBlock;
-				const blockToInsert = directInsertBlockWithAttributes.length
-					? createBlock( ...directInsertBlockWithAttributes )
-					: createBlock( allowedBlockType.name );
+				if ( directInsertBlock ) {
+					const newAttributes = {};
+					const adjacentBlockAttributes = getAdjacentBlockAttributes();
+
+					Object.keys( adjacentBlockAttributes ).forEach(
+						( attributeName ) => {
+							if (
+								directInsertBlock.attributesToCopy?.[
+									attributeName
+								]
+							) {
+								newAttributes[ attributeName ] =
+									adjacentBlockAttributes[ attributeName ];
+							}
+						}
+					);
+					blockToInsert = createBlock(
+						directInsertBlock.name,
+						newAttributes,
+						directInsertBlock.innerBlocks
+					);
+				} else {
+					blockToInsert = createBlock( allowedBlockType.name );
+				}
 
 				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
 

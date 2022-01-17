@@ -15,15 +15,16 @@ import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 
-// The undefined attributes below ensure that text and url attributes are cleared
-// when a new button block is inserted adjacent to existing button blocks.
-const DEFAULT_BLOCK = [
-	buttonBlockName,
-	{
-		text: undefined,
-		url: undefined,
+const DEFAULT_BLOCK = {
+	name: buttonBlockName,
+	attributesToCopy: {
+		backgroundColor: true,
+		className: true,
+		gradient: true,
+		textColor: true,
+		width: true,
 	},
-];
+};
 
 function ButtonsEdit( { attributes: { layout = {} } } ) {
 	const blockProps = useBlockProps();

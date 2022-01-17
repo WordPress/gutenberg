@@ -14,7 +14,6 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import PlaceholderPreview from './placeholder/placeholder-preview';
-import navigationLinkMetadata from '../../navigation-link/block.json';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -28,22 +27,9 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
-// Set default block to use default or undefined attribute values when inserted.
-const DEFAULT_BLOCK = [
-	'core/navigation-link',
-	{
-		...Object.entries( navigationLinkMetadata.attributes ).reduce(
-			( acc, attribute ) => ( {
-				...acc,
-				[ attribute[ 0 ] ]:
-					attribute[ 1 ].default !== undefined
-						? attribute[ 1 ].default
-						: undefined,
-			} ),
-			{}
-		),
-	},
-];
+const DEFAULT_BLOCK = {
+	name: 'core/navigation-link',
+};
 
 const LAYOUT = {
 	type: 'default',

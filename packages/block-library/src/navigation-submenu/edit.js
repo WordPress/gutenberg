@@ -47,26 +47,12 @@ import { speak } from '@wordpress/a11y';
  */
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
-import navigationLinkMetadata from '../navigation-link/block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
-// Set default block to use default or undefined attribute values when inserted.
-const DEFAULT_BLOCK = [
-	'core/navigation-link',
-	{
-		...Object.entries( navigationLinkMetadata.attributes ).reduce(
-			( acc, attribute ) => ( {
-				...acc,
-				[ attribute[ 0 ] ]:
-					attribute[ 1 ].default !== undefined
-						? attribute[ 1 ].default
-						: undefined,
-			} ),
-			{}
-		),
-	},
-];
+const DEFAULT_BLOCK = {
+	name: 'core/navigation-link',
+};
 
 const MAX_NESTING = 5;
 
