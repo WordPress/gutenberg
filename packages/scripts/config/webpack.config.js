@@ -3,7 +3,11 @@
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
-const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
+// Temporary workaround to fix broken CommonJS import in version 2.5.0.
+// @see https://github.com/WordPress/gutenberg/issues/37992
+const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' ).default
+	? require( 'mini-css-extract-plugin' ).default
+	: require( 'mini-css-extract-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const browserslist = require( 'browserslist' );
