@@ -26,7 +26,7 @@
 
 ### Bug Fixes
 
--   Added temporary workaround to fix broken CommonJS import of m`ini-css-extract-plugin` [#38004](https://github.com/WordPress/gutenberg/pull/38004).
+-   Added temporary workaround to fix broken CommonJS import of `mini-css-extract-plugin` [#38004](https://github.com/WordPress/gutenberg/pull/38004).
 
 ## 19.2.0 (2021-11-15)
 
