@@ -39,7 +39,6 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
-import { COLORS } from '../utils';
 
 const DEFAULT_COLOR = '#000';
 
@@ -78,16 +77,16 @@ function Option( {
 
 	return (
 		<PaletteItem
+			className={ isEditing ? 'is-selected' : undefined }
 			as="div"
 			onClick={ onStartEditing }
 			{ ...( isEditing
-				? {
-						...focusOutsideProps,
+				? { ...focusOutsideProps }
+				: {
 						style: {
-							border: `1px solid ${ COLORS.blue.wordpress[ 700 ] }`,
+							cursor: 'pointer',
 						},
-				  }
-				: { style: { cursor: 'pointer' } } ) }
+				  } ) }
 		>
 			<HStack justify="flex-start">
 				<FlexItem>
@@ -200,7 +199,7 @@ function PaletteEditListView( {
 	}, [] );
 	return (
 		<VStack spacing={ 3 }>
-			<ItemGroup isBordered isSeparated>
+			<ItemGroup isRounded>
 				{ elements.map( ( element, index ) => (
 					<Option
 						isGradient={ isGradient }
