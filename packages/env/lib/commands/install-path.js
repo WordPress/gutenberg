@@ -1,32 +1,20 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-const fs = require( 'fs' );
-
-/**
  * Internal dependencies
  */
-const { readConfig } = require( '../config' );
+const initConfig = require( '../init-config' );
 
 /**
  * Logs the path to where wp-env files are installed.
+ *
+ * @param {Object}  options
+ * @param {Object}  options.spinner
+ * @param {boolean} options.debug
  */
-module.exports = async function installPath() {
-	const configPath = path.resolve( '.wp-env.json' );
-	if ( ! fs.existsSync( configPath ) ) {
-		console.error( 'Error: .wp-env.json file not found.' );
-		return;
-	}
-
-	const { workDirectoryPath } = await readConfig( configPath );
-
-	if ( ! fs.existsSync( workDirectoryPath ) ) {
-		console.error(
-			'Error: Environment has not yet been created. Try running `wp-env start`.'
-		);
-		return;
-	}
-
+module.exports = async function installPath( { spinner, debug } ) {
+	// Stop the spinner so that stdout is not polluted.
+	spinner.stop();
+	// initConfig will fail if wp-env start has not yet been called, so that
+	// edge case is handled.
+	const { workDirectoryPath } = await initConfig( { spinner, debug } );
 	console.log( workDirectoryPath );
 };

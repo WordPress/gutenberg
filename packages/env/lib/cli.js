@@ -201,7 +201,7 @@ module.exports = function cli() {
 		'install-path',
 		'Get the path where environment files are located.',
 		() => {},
-		env.installPath
+		withSpinner( env.installPath )
 	);
 
 	return yargs;
