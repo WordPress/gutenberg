@@ -123,6 +123,10 @@ export function ImageEdit( {
 		height,
 		sizeSlug,
 	} = attributes;
+
+	const parentGap = context?.style?.spacing?.blockGap;
+	const columns = context?.columns ? context?.columns : 3;
+
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const altRef = useRef();
@@ -349,8 +353,17 @@ export function ImageEdit( {
 		className: classes,
 	} );
 
+	const newWidth =
+		columns && parentGap
+			? `calc((100% / ${ columns }) - ${ parentGap })`
+			: 'initial';
 	return (
-		<figure { ...blockProps }>
+		<figure
+			{ ...blockProps }
+			style={ {
+				width: newWidth,
+			} }
+		>
 			{ ( temporaryURL || url ) && (
 				<Image
 					temporaryURL={ temporaryURL }

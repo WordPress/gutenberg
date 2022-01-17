@@ -102,7 +102,9 @@
 	"providesContext": {
 		"allowResize": "allowResize",
 		"imageCrop": "imageCrop",
-		"fixedHeight": "fixedHeight"
+		"fixedHeight": "fixedHeight",
+		"style": "style",
+		"columns": "columns"
 	},
 	"supports": {
 		"anchor": true,
