@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.2.2 (2022-01-18)
+
 ### Bug Fix
 
 -   Prevent keyDown events from propagating up in `CustomSelectControl` ([#30557](https://github.com/WordPress/gutenberg/pull/30557))
