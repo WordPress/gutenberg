@@ -7,7 +7,6 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { ContrastChecker } from '@wordpress/block-editor';
 import { useContext, useState } from '@wordpress/element';
 
 /**
@@ -172,6 +171,9 @@ export const ToolsPanelWithItemGroupSlot = () => {
 				<Panel>
 					<ToolsPanelItems.Slot
 						as={ ItemGroup }
+						isBordered
+						isSeparated
+						isRounded={ false }
 						className={ slotWrapperClassName }
 						resetAll={ resetAll }
 					/>
@@ -196,14 +198,6 @@ export const ToolsPanelWithItemGroupSlot = () => {
 					value={ link }
 				/>
 			</ToolsPanelItems>
-			<ToolsPanelItems>
-				{ !! text && !! background && (
-					<ContrastChecker
-						backgroundColor={ background }
-						textColor={ text }
-					/>
-				) }
-			</ToolsPanelItems>
 		</SlotFillProvider>
 	);
 };
@@ -220,34 +214,28 @@ const PanelWrapperView = styled.div`
 const SlotWrapper = css`
 	&&& {
 		row-gap: 0;
+		border-radius: 20px;
 	}
 
 	> div {
 		grid-column: span 2;
-	}
-
-	.block-editor-contrast-checker {
-		margin-top: 16px;
+		border-radius: inherit;
 	}
 `;
 
 const ToolsPanelItemClass = css`
 	padding: 0;
-	border-left: 1px solid rgba( 0, 0, 0, 0.1 );
-	border-right: 1px solid rgba( 0, 0, 0, 0.1 );
-	border-bottom: 1px solid rgba( 0, 0, 0, 0.1 );
 
 	&&.first {
-		border-top-left-radius: 10px;
-		border-top-right-radius: 10px;
-		border-top: 1px solid rgba( 0, 0, 0, 0.1 );
+		border-top-left-radius: inherit;
+		border-top-right-radius: inherit;
 	}
 
 	&.last {
-		border-bottom-left-radius: 10px;
-		border-bottom-right-radius: 10px;
+		border-bottom-left-radius: inherit;
+		border-bottom-right-radius: inherit;
+		border-bottom-color: transparent;
 	}
-
 	&& > div,
 	&& > div > button {
 		width: 100%;
