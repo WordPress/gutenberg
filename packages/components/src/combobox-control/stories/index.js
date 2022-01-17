@@ -8,6 +8,11 @@ import { useState } from '@wordpress/element';
  */
 import ComboboxControl from '../';
 
+/**
+ * External dependencies
+ */
+import { boolean } from '@storybook/addon-knobs';
+
 const countries = [
 	{ name: 'Afghanistan', code: 'AF' },
 	{ name: 'Åland Islands', code: 'AX' },
@@ -257,6 +262,9 @@ const countries = [
 export default {
 	title: 'Components/ComboboxControl',
 	component: ComboboxControl,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const mapCountryOption = ( country ) => ( {
@@ -276,6 +284,7 @@ function CountryCodeComboboxControl() {
 				onChange={ setValue }
 				label="Select a country"
 				options={ countryOptions }
+				allowReset={ boolean( 'allowReset', false ) }
 			/>
 			<p>Value: { value }</p>
 		</>
