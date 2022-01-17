@@ -82,7 +82,8 @@ const MediaReplaceFlow = ( {
 		}, 1000 );
 	};
 
-	const selectMedia = ( media ) => {
+	const selectMedia = ( media, closeMenu ) => {
+		closeMenu();
 		setMediaURLValue( media.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
@@ -94,7 +95,8 @@ const MediaReplaceFlow = ( {
 		onSelectURL( newURL );
 	};
 
-	const uploadFiles = ( event ) => {
+	const uploadFiles = ( event, closeMenu ) => {
+		closeMenu();
 		const files = event.target.files;
 		if ( ! handleUpload ) {
 			return onSelect( files );
@@ -156,7 +158,9 @@ const MediaReplaceFlow = ( {
 							addToGallery={ addToGallery }
 							multiple={ multiple }
 							value={ multiple ? mediaIds : mediaId }
-							onSelect={ ( media ) => selectMedia( media ) }
+							onSelect={ ( media ) =>
+								selectMedia( media, onClose )
+							}
 							allowedTypes={ allowedTypes }
 							onClose={ onCloseModal }
 							render={ ( { open } ) => (
