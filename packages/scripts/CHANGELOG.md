@@ -19,6 +19,7 @@
 ### Bug Fixes
 
 -   Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
+-   Remove temporary workaround fixing CommonJS import for `mini-css-extract-plugin` [#38027](https://github.com/WordPress/gutenberg/pull/38027).
 
 ### Internal
 
