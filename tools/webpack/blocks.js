@@ -24,7 +24,7 @@ const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/view))/g );
 
 /**
  * We need to automatically rename some functions when they are called inside block files,
- * but have been declard elsewhere. This way we can call gutenberg override functions, but
+ * but have been declared elsewhere. This way we can call Gutenberg override functions, but
  * the block will still call the core function when updates are back ported.
  */
 const prefixFunctions = [ 'build_query_vars_from_query_block' ];
@@ -121,8 +121,8 @@ module.exports = {
 
 							// Within content, search and prefix any function calls from
 							// `prefixFunctions` list. This is needed because some functions
-							// are called inside block files, but have been declard elsewhere.
-							// So with the rename we can call gutenberg override functions, but the
+							// are called inside block files, but have been declared elsewhere.
+							// So with the rename we can call Gutenberg override functions, but the
 							// block will still call the core function when updates are back ported.
 							content = content.replace(
 								new RegExp( prefixFunctions.join( '|' ), 'g' ),
