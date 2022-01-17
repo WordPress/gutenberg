@@ -83,11 +83,13 @@ function Interface( { blockEditorSettings } ) {
 		}
 	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
 
+	const hasSecondarySidebar = isListViewOpened || isInserterOpened;
+
 	return (
 		<InterfaceSkeleton
 			labels={ interfaceLabels }
 			header={ <Header /> }
-			secondarySidebar={ <SecondarySidebar /> }
+			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
 			sidebar={
 				hasSidebarEnabled && (
 					<ComplementaryArea.Slot scope="core/edit-widgets" />
