@@ -16,6 +16,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Add contrast checker to text-based blocks [#34902]
 
 -   [*] [Image block] Fix missing translations [#37956]
+-   [*] Fix cut-off setting labels by properly wrapping the text [#37993]
 
 ## 1.69.0
 
