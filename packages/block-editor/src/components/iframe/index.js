@@ -10,7 +10,6 @@ import {
 	useState,
 	createPortal,
 	forwardRef,
-	useEffect,
 	useMemo,
 	useReducer,
 } from '@wordpress/element';
@@ -28,68 +27,85 @@ const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
 
 /**
- * Clones stylesheets targetting the editor canvas to the given document. A
- * stylesheet is considered targetting the editor a canvas if it contains the
- * `editor-styles-wrapper`, `wp-block`, or `wp-block-*` class selectors.
+ * Hook that clones stylesheets targetting the editor canvas to the given
+ * document. A stylesheet is considered targetting the editor a canvas if it
+ * contains the `editor-styles-wrapper`, `wp-block`, or `wp-block-*` class
+ * selectors.
  *
  * Ideally, this hook should be removed in the future and styles should be added
  * explicitly as editor styles.
- *
- * @param {Document} doc The document to append cloned stylesheets to.
  */
-function styleSheetsCompat( doc ) {
-	// Search the document for stylesheets targetting the editor canvas.
-	Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
-		try {
-			// May fail for external styles.
-			// eslint-disable-next-line no-unused-expressions
-			styleSheet.cssRules;
-		} catch ( e ) {
-			return;
-		}
-
-		const { ownerNode, cssRules } = styleSheet;
-
-		if ( ! cssRules ) {
-			return;
-		}
-
-		// Generally, ignore inline styles. We add inline styles belonging to a
-		// stylesheet later, which may or may not match the selectors.
-		if ( ownerNode.tagName !== 'LINK' ) {
-			return;
-		}
-
-		// Don't try to add the reset styles, which were removed as a dependency
-		// from `edit-blocks` for the iframe since we don't need to reset admin
-		// styles.
-		if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
-			return;
-		}
-
-		const isMatch = Array.from( cssRules ).find(
-			( { selectorText } ) =>
-				selectorText &&
-				( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
-					selectorText.includes( `.${ BLOCK_PREFIX }` ) )
-		);
-
-		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
-			// Display warning once we have a way to add style dependencies to the editor.
-			// See: https://github.com/WordPress/gutenberg/pull/37466.
-
-			doc.head.appendChild( ownerNode.cloneNode( true ) );
-
-			// Add inline styles belonging to the stylesheet.
-			const inlineCssId = ownerNode.id.replace( '-css', '-inline-css' );
-			const inlineCssElement = document.getElementById( inlineCssId );
-
-			if ( inlineCssElement ) {
-				doc.head.appendChild( inlineCssElement.cloneNode( true ) );
+const useEditorStyles = () =>
+	useRefEffect( ( node ) => {
+		// Search the document for stylesheets targetting the editor canvas.
+		const clonedStyles = [];
+		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
+			try {
+				// May fail for external styles.
+				// eslint-disable-next-line no-unused-expressions
+				styleSheet.cssRules;
+			} catch ( e ) {
+				return;
 			}
-		}
+
+			const { ownerNode, cssRules } = styleSheet;
+
+			if ( ! cssRules ) {
+				return;
+			}
+
+			// Generally, ignore inline styles. We add inline styles belonging to a
+			// stylesheet later, which may or may not match the selectors.
+			if ( ownerNode.tagName !== 'LINK' ) {
+				return;
+			}
+
+			// Don't try to add the reset styles, which were removed as a dependency
+			// from `edit-blocks` for the iframe since we don't need to reset admin
+			// styles.
+			if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
+				return;
+			}
+
+			const isMatch = Array.from( cssRules ).find(
+				( { selectorText } ) =>
+					selectorText &&
+					( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
+						selectorText.includes( `.${ BLOCK_PREFIX }` ) )
+			);
+
+			if ( isMatch ) {
+				clonedStyles.push( ownerNode.cloneNode( true ) );
+
+				// Add inline styles belonging to the stylesheet.
+				const inlineCssId = ownerNode.id.replace(
+					'-css',
+					'-inline-css'
+				);
+				const inlineCssElement = document.getElementById( inlineCssId );
+				if ( inlineCssElement ) {
+					clonedStyles.push( inlineCssElement.cloneNode( true ) );
+				}
+			}
+		} );
+
+		const appendStyles = () => {
+			const doc = node.contentDocument;
+			clonedStyles.forEach( ( style ) => {
+				if (
+					doc?.head &&
+					! doc.contains( style ) &&
+					! doc.getElementById( style.id )
+				) {
+					// Display warning once we have a way to add style dependencies to the editor.
+					// See: https://github.com/WordPress/gutenberg/pull/37466.
+					doc.head.appendChild( style );
+				}
+			} );
+		};
+
+		node.addEventListener( 'load', appendStyles );
 	} );
-}
 
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
@@ -227,12 +243,6 @@ function Iframe(
 	}, [] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
 
-	useEffect( () => {
-		if ( iframeDocument ) {
-			styleSheetsCompat( iframeDocument );
-		}
-	}, [ iframeDocument ] );
-
 	head = (
 		<>
 			<style>{ 'body{margin:0}' }</style>
@@ -262,7 +272,7 @@ function Iframe(
 			{ tabIndex >= 0 && before }
 			<iframe
 				{ ...props }
-				ref={ useMergeRefs( [ ref, setRef ] ) }
+				ref={ useMergeRefs( [ ref, setRef, useEditorStyles() ] ) }
 				tabIndex={ tabIndex }
 				title={ __( 'Editor canvas' ) }
 			>
