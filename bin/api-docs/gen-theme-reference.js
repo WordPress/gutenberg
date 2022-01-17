@@ -34,7 +34,7 @@ const THEME_JSON_SCHEMA_FILE = path.resolve(
  */
 const THEME_JSON_REF_DOC = path.resolve(
 	ROOT_DIR,
-	'docs/reference-guides/theme-json-reference.md'
+	'docs/reference-guides/theme-json-reference/theme-json-living.md'
 );
 
 /**
@@ -126,7 +126,7 @@ const getStylePropertiesMarkup = ( struct ) => {
  *
  * @param {string} title
  * @param {Object} data
- * @param {string} type settings|style
+ * @param {string} type  settings|style
  * @return {string} markup
  */
 const getSectionMarkup = ( title, data, type ) => {

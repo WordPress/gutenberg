@@ -45,7 +45,7 @@ function render_block_core_search( $attributes ) {
 	$label_markup = sprintf(
 		'<label for="%1$s" class="wp-block-search__label screen-reader-text">%2$s</label>',
 		esc_attr( $input_id ),
-		empty( $attributes['label'] ) ? esc_html__( 'Search' ) : esc_html( $attributes['label'] )
+		empty( $attributes['label'] ) ? __( 'Search' ) : esc_html( $attributes['label'] )
 	);
 	if ( $show_label && ! empty( $attributes['label'] ) ) {
 		$label_markup = sprintf(

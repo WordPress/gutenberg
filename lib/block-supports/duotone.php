@@ -459,17 +459,23 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	wp_add_inline_style( $filter_id, $filter_style );
 	wp_enqueue_style( $filter_id );
 
-	// Render any custom filter the user may have added.
 	add_action(
-		// There are a couple of known rendering quirks in Safari.
-		// 1. Filters won't render at all when the SVG is in the head of
-		// the document.
-		// 2. Filters display incorrectly when the SVG is defined after
-		// where the filter is used in the document, so the footer does
-		// not work.
-		'wp_body_open',
-		function () use ( $filter_svg ) {
+		'wp_footer',
+		function () use ( $filter_svg, $selector ) {
 			echo $filter_svg;
+
+			// Safari renders elements incorrectly on first paint when the SVG
+			// filter comes after the content that it is filtering, so we force
+			// a repaint with a WebKit hack which solves the issue.
+			global $is_safari;
+			if ( $is_safari ) {
+				printf(
+					// Simply accessing el.offsetHeight flushes layout and style
+					// changes in WebKit without having to wait for setTimeout.
+					'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+					wp_json_encode( $selector )
+				);
+			}
 		}
 	);
 

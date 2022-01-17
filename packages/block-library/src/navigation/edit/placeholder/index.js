@@ -25,7 +25,7 @@ import useNavigationMenu from '../../use-navigation-menu';
 import useCreateNavigationMenu from '../use-create-navigation-menu';
 
 const ExistingMenusDropdown = ( {
-	canSwitchNavigationMenu,
+	showNavigationMenus,
 	navigationMenus,
 	setSelectedMenu,
 	onFinish,
@@ -38,6 +38,10 @@ const ExistingMenusDropdown = ( {
 		iconPosition: 'right',
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
+
+	const hasNavigationMenus = !! navigationMenus?.length;
+	const hasClassicMenus = !! menus?.length;
+
 	return (
 		<DropdownMenu
 			text={ __( 'Select menu' ) }
@@ -47,9 +51,9 @@ const ExistingMenusDropdown = ( {
 		>
 			{ ( { onClose } ) => (
 				<>
-					<MenuGroup label={ __( 'Menus' ) }>
-						{ canSwitchNavigationMenu &&
-							navigationMenus?.map( ( menu ) => {
+					{ showNavigationMenus && hasNavigationMenus && (
+						<MenuGroup label={ __( 'Menus' ) }>
+							{ navigationMenus.map( ( menu ) => {
 								return (
 									<MenuItem
 										onClick={ () => {
@@ -65,10 +69,11 @@ const ExistingMenusDropdown = ( {
 									</MenuItem>
 								);
 							} ) }
-					</MenuGroup>
-					{ showClassicMenus && (
+						</MenuGroup>
+					) }
+					{ showClassicMenus && hasClassicMenus && (
 						<MenuGroup label={ __( 'Classic Menus' ) }>
-							{ menus?.map( ( menu ) => {
+							{ menus.map( ( menu ) => {
 								return (
 									<MenuItem
 										onClick={ () => {
@@ -170,6 +175,12 @@ export default function NavigationPlaceholder( {
 
 	const { navigationMenus } = useNavigationMenu();
 
+	const hasNavigationMenus = !! navigationMenus?.length;
+
+	const showSelectMenus =
+		( canSwitchNavigationMenu || canUserCreateNavigation ) &&
+		( hasNavigationMenus || hasMenus );
+
 	return (
 		<>
 			{ ( ! hasResolvedNavigationMenus || isStillLoading ) && (
@@ -187,10 +198,10 @@ export default function NavigationPlaceholder( {
 
 							<hr />
 
-							{ hasMenus || navigationMenus?.length ? (
+							{ showSelectMenus ? (
 								<>
 									<ExistingMenusDropdown
-										canSwitchNavigationMenu={
+										showNavigationMenus={
 											canSwitchNavigationMenu
 										}
 										navigationMenus={ navigationMenus }

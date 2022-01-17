@@ -25,8 +25,9 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { getTermsInfo, usePostTypes } from '../utils';
-import { MAX_FETCHED_TERMS } from '../constants';
+import OrderControl from './order-control';
+import { getTermsInfo, usePostTypes } from '../../utils';
+import { MAX_FETCHED_TERMS } from '../../constants';
 
 const stickyOptions = [
 	{ label: __( 'Include' ), value: '' },
@@ -217,14 +218,9 @@ export default function QueryInspectorControls( {
 					</>
 				) }
 				{ ! inherit && (
-					<QueryControls
+					<OrderControl
 						{ ...{ order, orderBy } }
-						onOrderChange={ ( value ) =>
-							setQuery( { order: value } )
-						}
-						onOrderByChange={ ( value ) =>
-							setQuery( { orderBy: value } )
-						}
+						onChange={ setQuery }
 					/>
 				) }
 				{ showSticky && (
