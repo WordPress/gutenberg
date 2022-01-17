@@ -24,6 +24,10 @@
 
 -   The bundled `read-pkg-up` dependency has been updated from requiring `^1.0.1` to requiring `^7.0.1` ([#37395](https://github.com/WordPress/gutenberg/pull/37395)).
 
+### Bug Fixes
+
+-   Added temporary workaround to fix broken CommonJS import of `mini-css-extract-plugin` [#38004](https://github.com/WordPress/gutenberg/pull/38004).
+
 ## 19.2.0 (2021-11-15)
 
 ### New Features
