@@ -182,7 +182,7 @@ jobs:
                     npx lerna version pre"$minimum_version_bump" --preid next."$sha" --no-private
                     npx lerna publish from-package --dist-tag next
                   elif [ '${{ github.event.inputs.release_type }}' = 'bugfix' ]; then
-                    npm run publish:latest
+                    npx lerna publish
                   else
                     npx lerna version "$minimum_version_bump" --no-private
                     npx lerna publish from-package
