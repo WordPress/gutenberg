@@ -7,7 +7,7 @@ const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const browserslist = require( 'browserslist' );
 
 /*
- * temporary workaround to fix broken common js import in version 2.5.0
+ * Temporary workaround to fix broken CommonJS import in version 2.5.0.
  * @see https://github.com/WordPress/gutenberg/issues/37992
  */
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' ).default
