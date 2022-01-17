@@ -351,10 +351,10 @@ export default compose( [
 							}
 						}
 					);
-					blockToInsert = createBlock(
-						directInsertBlock.name,
-						newAttributes
-					);
+					blockToInsert = createBlock( directInsertBlock.name, {
+						...newAttributes,
+						...( directInsertBlock.attributes || {} ),
+					} );
 				} else {
 					blockToInsert = createBlock( allowedBlockType.name );
 				}
