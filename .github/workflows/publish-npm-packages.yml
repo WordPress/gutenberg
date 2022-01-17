@@ -87,6 +87,11 @@ jobs:
                   node-version: 14
                   cache: npm
 
+            - name: Configure git user name and email
+              run: |
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
             - name: Update package versions
               run: |
                   PUBLIC_PACKAGES=$(find packages/*/ -type d -maxdepth 0 -exec sh -c 'jq -e ".private != true" "$1"/package.json > /dev/null && test -f "$1"/CHANGELOG.md && echo "$1"' shell {} \;)
