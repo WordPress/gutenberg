@@ -31,43 +31,40 @@ function createPreloadingMiddleware( preloadedData ) {
 		const path = normalizePath( rawPath );
 
 		if ( 'GET' === method && cache[ path ] ) {
-			const cacheData = cache[ path ];
-
 			// Unsetting the cache key ensures that the data is only used a single time
 			delete cache[ path ];
 
-			return Promise.resolve(
-				parse
-					? cacheData.body
-					: new window.Response( JSON.stringify( cacheData.body ), {
-							status: 200,
-							statusText: 'OK',
-							headers: cacheData.headers,
-					  } )
-			);
+			return prepareResponse( cache[ path ], parse );
 		} else if (
 			'OPTIONS' === method &&
 			cache[ method ] &&
 			cache[ method ][ path ]
 		) {
-			const cacheData = cache[ method ][ path ];
-
 			// Unsetting the cache key ensures that the data is only used a single time
 			delete cache[ method ][ path ];
 
-			return Promise.resolve(
-				parse
-					? cacheData.body
-					: new window.Response( JSON.stringify( cacheData.body ), {
-							status: 200,
-							statusText: 'OK',
-							headers: cacheData.headers,
-					  } )
-			);
+			return prepareResponse( cache[ method ][ path ], parse );
 		}
 
 		return next( options );
 	};
+}
+
+/**
+ * @param {Record<string, any>} responseData
+ * @param {boolean}             parse
+ * @return {Promise<any>} Promise with the response.
+ */
+function prepareResponse( responseData, parse ) {
+	return Promise.resolve(
+		parse
+			? responseData.body
+			: new window.Response( JSON.stringify( responseData.body ), {
+					status: 200,
+					statusText: 'OK',
+					headers: responseData.headers,
+			  } )
+	);
 }
 
 export default createPreloadingMiddleware;
