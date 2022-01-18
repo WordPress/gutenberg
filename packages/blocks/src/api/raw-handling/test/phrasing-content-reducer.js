@@ -51,12 +51,6 @@ describe( 'phrasingContentReducer', () => {
 		);
 	} );
 
-	it( 'should transform divs to paragraphs', () => {
-		expect(
-			deepFilterHTML( '<div>test</div>', [ phrasingContentReducer ], {} )
-		).toEqual( '<p>test</p>' );
-	} );
-
 	it( 'should normalise the rel attribute', () => {
 		const input =
 			'<a href="https://wordpress.org" target="_blank">WordPress</a>';
