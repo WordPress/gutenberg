@@ -48,7 +48,7 @@ npm run native i18n:extract-used-strings -- "$PWD/used-strings.json" "domain-plu
 
 ## Providing own translations (for strings only used in native platform)
 
-Once you have the list of used strings in the native platform, the strings have to be translated, however, this process is out of the scope of the native version hence, you have to provide your own translations.
+Once you have the list of used strings in the native platform, the strings have to be translated, however, this process is out of the scope of the native version so you have to provide your own translations.
 
 The process for injecting the translations data into the editor is via the `translations` initial prop which is passed to the editor during its initialization:
 - [Android reference](https://github.com/WordPress/gutenberg/blob/72854b4d6b09bd7fb7f996a5c55dd3cc0613ddf8/packages/react-native-bridge/android/react-native-bridge/src/main/java/org/wordpress/mobile/WPAndroidGlue/GutenbergProps.kt#L34)
@@ -56,7 +56,7 @@ The process for injecting the translations data into the editor is via the `tran
 
 The mechanism for integrating the provided translations to the mobile client, via the mentioned `translations` initial prop, is not described here, as it's specific to the mobile client and could be achieved in different ways. Nevertheless, it's important that they're provided by the mentioned initial prop, as the editor is in charge of merging them with the translations already included in the editor.
 
-**NOTE:** Note that those strings that match with ones already included in the editor will be overridden.
+**NOTE:** Keep in mind that those strings that match with ones already included in the editor will be overridden.
 
 ## Fetch translations (for strings used in web and native platforms)
 
