@@ -2,14 +2,13 @@
  * External dependencies
  */
 import { AppRegistry } from 'react-native';
-import { render } from 'test/helpers';
+import { act, render } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import * as wpHooks from '@wordpress/hooks';
-import '@wordpress/jest-console';
 
 /**
  * Internal dependencies
@@ -200,24 +199,47 @@ describe( 'Register Gutenberg', () => {
 		} );
 
 		it( 'initializes the editor with empty HTML', async () => {
+			const consoleLog = jest
+				.spyOn( console, 'log' )
+				.mockImplementation( jest.fn() );
+
 			const { getByTestId } = initGutenberg( {}, { initialData: '' } );
-			const blockList = getByTestId( 'block-list-wrapper' );
-
-			expect( blockList ).toHaveProperty( 'type', 'View' );
-			expect( console ).toHaveLogged( 'Hermes is: true' );
-		} );
-
-		it( 'initializes the editor with initial HTML', async () => {
-			const { getByTestId } = initGutenberg(
-				{},
-				{ initialData: initialHtmlGutenberg }
+			// Some of the store updates that happen upon editor initialization are executed at the end of the current
+			// Javascript block execution and after the test is finished. In order to prevent "act" warnings due to
+			// this behavior, we wait for the execution block to be finished before acting on the test.
+			await act(
+				() => new Promise( ( resolve ) => setImmediate( resolve ) )
 			);
 			const blockList = getByTestId( 'block-list-wrapper' );
 
 			expect( blockList ).toHaveProperty( 'type', 'View' );
-			expect( console ).toHaveLogged( 'Hermes is: true' );
+			expect( consoleLog ).toHaveBeenCalledWith( 'Hermes is: true' );
+		} );
+
+		it( 'initializes the editor with initial HTML', async () => {
+			const consoleLog = jest
+				.spyOn( console, 'log' )
+				.mockImplementation( jest.fn() );
+			const consoleInfo = jest
+				.spyOn( console, 'info' )
+				.mockImplementation( jest.fn() );
+
+			const { getByTestId } = initGutenberg(
+				{},
+				{ initialData: initialHtmlGutenberg }
+			);
+			// Some of the store updates that happen upon editor initialization are executed at the end of the current
+			// Javascript block execution and after the test is finished. In order to prevent "act" warnings due to
+			// this behavior, we wait for the execution block to be finished before acting on the test.
+			await act(
+				() => new Promise( ( resolve ) => setImmediate( resolve ) )
+			);
+			const blockList = getByTestId( 'block-list-wrapper' );
+
+			expect( blockList ).toHaveProperty( 'type', 'View' );
+			expect( consoleLog ).toHaveBeenCalledWith( 'Hermes is: true' );
 			// It's expected that some blocks are upgraded and inform about it (example: "Updated Block: core/cover")
-			expect( console ).toHaveInformed();
+			expect( consoleInfo ).toHaveBeenCalled();
 		} );
 	} );
 } );
