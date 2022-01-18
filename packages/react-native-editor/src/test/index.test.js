@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { AppRegistry } from 'react-native';
-import { render, waitFor } from 'test/helpers';
+import { render } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -201,10 +201,7 @@ describe( 'Register Gutenberg', () => {
 
 		it( 'initializes the editor with empty HTML', async () => {
 			const { getByTestId } = initGutenberg( {}, { initialData: '' } );
-
-			const blockList = await waitFor( () =>
-				getByTestId( 'block-list-wrapper' )
-			);
+			const blockList = getByTestId( 'block-list-wrapper' );
 
 			expect( blockList ).toHaveProperty( 'type', 'View' );
 			expect( console ).toHaveLogged( 'Hermes is: true' );
@@ -215,10 +212,7 @@ describe( 'Register Gutenberg', () => {
 				{},
 				{ initialData: initialHtmlGutenberg }
 			);
-
-			const blockList = await waitFor( () =>
-				getByTestId( 'block-list-wrapper' )
-			);
+			const blockList = getByTestId( 'block-list-wrapper' );
 
 			expect( blockList ).toHaveProperty( 'type', 'View' );
 			expect( console ).toHaveLogged( 'Hermes is: true' );
