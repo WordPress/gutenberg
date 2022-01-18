@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-This doc assumes you are familiar with [Redux](https://redux.js.org/) concepts such as actions, reducers, and selectors, as well as certain Gutenberg concepts such as _Thunks_. You may still be able to get the gist of the ideas here without these pre-requisites, but you are highly encouraged to get familiar with them first.
+This doc assumes you are familiar with [Redux](https://redux.js.org/) concepts such as actions, reducers, and selectors, as well as certain Gutenberg concepts such as _[Thunks](https://gist.github.com/adamziel/2ee2a22b417825e9324f9dad26c17e73)_. You may still be able to get the gist of the ideas here without these pre-requisites, but you are highly encouraged to get familiar with them first.
 
 ## Big Ideas
 
@@ -23,7 +23,7 @@ function MyComponent({ widgetId }) {
 Moreover, you can be sure that it’s the most recent version, and that no unnecessary HTTP requests were performed. But how does it all work? There are a few big concepts to discuss:
 
 * Data package
-	* Selectors and resolvers 
+	* Selectors and resolvers
 	* React hooks
 * Core-data package
 	* Entities
@@ -42,11 +42,11 @@ Selectors are simple functions that return a piece of data from the redux store.
 const store = wp.data.createReduxStore( 'thermostat', {
 	// Essential functions
 	selectors: {
-		getTemperatureCelcius: ( state ) => state.temperature,
+		getTemperatureCelsius: ( state ) => state.temperature,
 		getTemperatureFarenheit: ( state ) => state.temperature * 1.8 + 32
 	},
 	resolvers: {
-		getTemperatureCelcius: () => ( { dispatch } ) => {
+		getTemperatureCelsius: () => ( { dispatch } ) => {
 			dispatch.receiveTemperature( 10 );
 		}
 	},
@@ -77,10 +77,10 @@ wp.data.register(store)
 The `@@INIT` action is dispatched when the store is instantiated, and so the initial state says `temperature: 0`
 
 ### Simple selectors
-The  `getTemperatureFarenheit` is a simple selector, it predictably returns `0` once the store was instantiated:
+The  `getTemperatureCelsius` is a simple selector, it predictably returns `0` once the store was instantiated:
 
 ```js
-> wp.data.select('my-store').getTemperatureFarenheit()
+> wp.data.select('my-store').getTemperatureCelsius()
 0
 ```
 
@@ -107,11 +107,11 @@ getTemperatureFarenheit: createSelector(
 Read more about memoized selectors in [rememo](https://github.com/aduth/rememo) package documentation.
 
 ### Resolved selectors
-`getTemperatureCelcius` is more special as there is a resolver registered under the same name. When `getTemperatureCelcius` is called for the first time, it will receive the current state and return `0`, but the data layer will also call the related resolver. Since our resolver populates the state with the temperature, the second call will return the actual data:
+`getTemperatureCelsius` is more special as there is a resolver registered under the same name. When `getTemperatureCelsius` is called for the first time, it will receive the current state and return `0`, but the data layer will also call the related resolver. Since our resolver populates the state with the temperature, the second call will return the actual data:
 ```js
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 0
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 10
 ```
 
@@ -123,7 +123,10 @@ Once the data is loaded, `getTemperatureFarenheit` can do something with it:
 
 As we’re about to learn, the resolvers may be asynchronous. How do you know when the data becomes available? The easiest way is to use the `resolveSelect` utility instead of `select`:
 ```js
-> wp.data .resolveSelect('thermostat') .getTemperatureCelcius() .then(( temperature ) => console.log( temperature ))
+> wp.data
+.resolveSelect('thermostat')
+.getTemperatureCelsius()
+.then(( temperature ) => console.log( temperature ))
 10
 ```
 `resolveSelect` returns a promise that waits until the resolver finishes, runs the selector, then yields the final value.
@@ -131,26 +134,26 @@ As we’re about to learn, the resolvers may be asynchronous. How do you know wh
 ### Resolvers
 Let’s zoom into our resolver:
 ```js
-getTemperatureCelcius: () => ( { dispatch } ) => {
+getTemperatureCelsius: () => ( { dispatch } ) => {
 	dispatch.receiveTemperature( 10 );
 }
 ```
 
-It is a [thunk](thunks%20link) that populates the state. Note  that it does not return anything, nor there are any assumptions on how the data is loaded. The sole goal of this function is to populate the state, and it does so by dispatching the `receiveTemperature` action when the data is ready.
+It is a [thunk](thunks%20link) that populates the state. Note  that it does not return anything, nor are there any assumptions on how the data is loaded. The sole goal of this function is to populate the state, and it does so by dispatching the `receiveTemperature` action when the data is ready.
 
 In real world, data is often stored in APIs and needs to be loaded asynchronously. Fortunately, resolvers can be async too. Here’s a different way of loading the temperature:
 ```js
-getTemperatureCelcius: () => async ( { dispatch } ) => {
+getTemperatureCelsius: () => async ( { dispatch } ) => {
     const response = await window.fetch( '/temperature' );
     const result = await response.json();
     dispatch.receiveCurrentTemperature( result.temperature );
 }
 ```
 
-An avid reader may ask at this point _Is this going to send a request every time I use the `getTemperatureCelcius()` selector?_ Great question! The answer is no, thanks to the resolvers cache. 
+An attentive reader may ask at this point _Is this going to send a request every time I use the `getTemperatureCelsius()` selector?_ Great question! The answer is no, thanks to the resolvers cache.
 
 ### Resolvers cache
-Resolvers are cached by the data layer. Subsequent calls to the same selectors will not trigger additional HTTP requests. 
+Resolvers are cached by the data layer. Subsequent calls to the same selectors will not trigger additional HTTP requests.
 
 Let’s take a closer look at the `thermostat ` store. Once it is registered with `wp.data.register(store)`, the actual state looks as follows:
 ```js
@@ -163,34 +166,34 @@ Let’s take a closer look at the `thermostat ` store. Once it is registered wi
 ```
 The state managed by the developer lives in `root`, and the state managed by the `@wordpress/data` package lives in `metadata`.  Let’s take a closer look at the latter.
 
-Firstly we call the `getTemperatureCelcius` **selector** for the first time:
+Firstly we call the `getTemperatureCelsius` **selector** for the first time:
 
 ```js
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 null
 ```
 
-First, `getTemperatureCelcius` does not refer to the same function as we originally registered with the store (`( state ) => state.temperature`). Instead, the `data` package replaced it with a „resolved” version using the [mapResolvers](https://github.com/WordPress/gutenberg/blob/5dbf7ca8a285f5cab65ebf7ab87dafeb6118b6aa/packages/data/src/redux-store/index.js#L366-L442) utility. The function we’re actually calling is [`selectorResolver`](https://github.com/WordPress/gutenberg/blob/5dbf7ca8a285f5cab65ebf7ab87dafeb6118b6aa/packages/data/src/redux-store/index.js#L388) . It does two things:
+First, `getTemperatureCelsius` does not refer to the same function as we originally registered with the store (`( state ) => state.temperature`). Instead, the `data` package replaced it with a „resolved” version using the [mapResolvers](https://github.com/WordPress/gutenberg/blob/5dbf7ca8a285f5cab65ebf7ab87dafeb6118b6aa/packages/data/src/redux-store/index.js#L366-L442) utility. The function we’re actually calling is [`selectorResolver`](https://github.com/WordPress/gutenberg/blob/5dbf7ca8a285f5cab65ebf7ab87dafeb6118b6aa/packages/data/src/redux-store/index.js#L388) . It does two things:
 
 1. It runs the underlying selector and returns the result.
-2. It runs the underlying resolver, but only if it isn’t already running and wasn’t already fulfilled. 
+2. It runs the underlying resolver, but only if it isn’t already running and wasn’t already fulfilled.
 
 Note that the selector runs first, which means the resolver can’t affect its return value.
 
 #### resolversCache
 
-When the resolver runs for the first time, `selectorResolver` acquires a lock through `resolversCache.markAsRunning()`, and when it finishes, it releases it through `resolversCache.clear()`. That’s how we’re sure the same resolver never runs multiple times in parallel. 
+When the resolver runs for the first time, `selectorResolver` acquires a lock through `resolversCache.markAsRunning()`, and when it finishes, it releases it through `resolversCache.clear()`. That’s how we’re sure the same resolver never runs multiple times in parallel.
 
 As a store developer, you never need to worry about the `resolversCache` API. It is internal, and resolves to resolve the unique timing challenges of the  `data` module. Outside of the data module you may lean on resolvers metadata.
 
 #### Metadata cache
 
-The resolver call is surrounded by two special actions: `START_RESOLUTION` and `FINISH_RESOLUTION`. If we peeked at the dispatch history after `getTemperatureCelcius()` is initially called, it would look like this:
+The resolver call is surrounded by two special actions: `START_RESOLUTION` and `FINISH_RESOLUTION`. If we peeked at the dispatch history after `getTemperatureCelsius()` is initially called, it would look like this:
 
 ```js
 {
   type: 'START_RESOLUTION',
-  selectorName: 'getTemperatureCelcius',
+  selectorName: 'getTemperatureCelsius',
   args: []
 }
 
@@ -201,7 +204,7 @@ The resolver call is surrounded by two special actions: `START_RESOLUTION` and `
 
 {
   type: 'FINISH_RESOLUTION',
-  selectorName: 'getTemperatureCelcius',
+  selectorName: 'getTemperatureCelsius',
   args: []
 }
 ```
@@ -212,7 +215,7 @@ This is how the Redux state looks like after the `FINISH_RESOLUTION`:
 ```js
 {
   metadata: {
-    getTemperatureCelcius: /*
+    getTemperatureCelsius: /*
 		A mapping with one entry:
 		[] => false
 	*/
@@ -222,18 +225,18 @@ This is how the Redux state looks like after the `FINISH_RESOLUTION`:
   }
 }
 ```
-It means that the resolution of `getTemperatureCelcius` with an empty arguments list (`[]`) is not running at the time (`false`).
+It means that the resolution of `getTemperatureCelsius` with an empty arguments list (`[]`) is not running at the time (`false`).
 
 As you may notice, the resolution is cached per arguments list. If we called the selector with a bogus argument:
 ```
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius(2)
 10
 ```
 It would run the resolver again and create a new metadata entry like this:
 ```js
 {
   metadata: {
-    getTemperatureCelcius: /*
+    getTemperatureCelsius: /*
 		A mapping with two entries:
 		[] => false
 		[2] => false
@@ -245,7 +248,7 @@ It would run the resolver again and create a new metadata entry like this:
 }
 ```
 
-How is this useful? It allows you to the resolution state of your data.
+How is this useful? It allows you to check the resolution state of your data via metadata selectors.
 
 #### Metadata selectors
 
@@ -258,19 +261,23 @@ The names say it all. Here’s an example:
 
 ```js
 > (register a new store)
-> wp.data.select('thermostat').hasStartedResolution('getTemperatureCelcius', [])
+> wp.data.select('thermostat').hasStartedResolution('getTemperatureCelsius', [])
 false
-> wp.data.select('thermostat').isResolving('getTemperatureCelcius’)
+> wp.data.select('thermostat').isResolving('getTemperatureCelsius’)
 false
 
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 0
 
-> wp.data.select('thermostat').hasStartedResolution('getTemperatureCelcius', [])
+> wp.data.select('thermostat').hasStartedResolution('getTemperatureCelsius', [])
 true
-> wp.data.select('thermostat').isResolving('getTemperatureCelcius’)
-false // Not resolving yet, the resolver called asynchronously after the selector runs  
-> setTimeout(() => { console.log(wp.data.select('thermostat').isResolving('getTemperatureCelcius’)) });
+> wp.data.select('thermostat').isResolving('getTemperatureCelsius’)
+false
+// Not resolving yet, the resolver called asynchronously after the selector runs
+
+> setTimeout(() => {
+console.log(wp.data.select('thermostat').isResolving('getTemperatureCelsius’))
+});
 true
 
 ```
@@ -283,7 +290,7 @@ There are also two low-level selectors used to reason about the low-level detail
 
 Let’s imagine the temperature reading changes every minute. We will simulate this behavior like:
 ```js
-getTemperatureCelcius: () => ( { dispatch } ) => {
+getTemperatureCelsius: () => ( { dispatch } ) => {
 	const temperature = (new Date()).getMinutes();
     dispatch.receiveCurrentTemperature( temperature );
 }
@@ -296,21 +303,21 @@ The data module adds a few special actions to every store with resolvers. We’v
 `invalidateResolution`  removes the specified entry from the metadata cache. Here’s how it works:
 
 ```
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 0   // Initial value
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 10  // Resolved reading value
 // ... a few minutes pass ...
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 10  // Redux state is still the same
 
-> wp.data.dispatch('thermostat').invalidateResolution('getTemperatureCelcius', [])
+> wp.data.dispatch('thermostat').invalidateResolution('getTemperatureCelsius', [])
 Promise {<fulfilled>: {…}}  // The resolution was invalidated
 
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 10  // Remember, selector returns the current value before resolving
     // The resolver runs again only now.
-> wp.data.select('thermostat').getTemperatureCelcius()
+> wp.data.select('thermostat').getTemperatureCelsius()
 15
 ```
 
@@ -320,7 +327,6 @@ Promise {<fulfilled>: {…}}  // The resolution was invalidated
 As the name `core-data` says, this package connects WordPress core and the `data`  package. To explain how it can be useful in everyday development, we need to discuss a few key concepts first.
 
 ## Entities
-
 Entities are like data types. A Post is an entity, so is a Taxonomy and a Widget. We will use the latter as our running example. Default entities are declared in `entities.js`, and a minimal definition looks like this:
 
 ```js
@@ -336,7 +342,7 @@ const defaultEntities = [
 }
 ```
 
-`name: widget` is the Entity name, no surprises there. 
+`name: widget` is the Entity name, no surprises there.
 
 `label: __( 'Widgets' )` is a human-readable name. It may be in any user interface elements that have to refer to this Entity.
 
@@ -437,7 +443,7 @@ To keep things simple, let’s omit query and focus on`getEntityRecords( 'root',
 }
 ```
 
-#### Redux state 
+#### Redux state
 `RECEIVE_ITEMS` reducer creates the new Redux state :
 ```js
 {
@@ -500,7 +506,7 @@ items: {
 }
 ```
 
-The distinction is useful, because the REST API may return different fields for different contexts. 
+The distinction is useful, because the REST API may return different fields for different contexts.
 
 #### itemIsComplete
 ```js
@@ -718,7 +724,7 @@ And updates the Redux state as follows:
 					"kind": 'root"
 					'name": "widget",
 					"recordId": "block-2",
-					"edits": { 
+					"edits": {
 						"sidebar": "header"
 					}
 				},
@@ -726,7 +732,7 @@ And updates the Redux state as follows:
 					"kind": 'root"
 					'name": "widget",
 					"recordId": "block-2",
-					"edits": { 
+					"edits": {
 						"sidebar": "footer"
 					}
 				}
@@ -752,7 +758,7 @@ export function getEntityRecordEdits( state, kind, name, recordId ) {
 Note that the `queriedData` didn’t change. What happens if we call `getEntityRecord` now?
 
 ```js
-> wp.data.select('core').getEntityRecord( 'root', 'widget', 
+> wp.data.select('core').getEntityRecord( 'root', 'widget',
 'block-2' )
 [
 	{ id: "block-2", sidebar: "header", ...},
@@ -762,7 +768,7 @@ Note that the `queriedData` didn’t change. What happens if we call `getEntityR
 The sidebar is still `header`. This is expected, as `getEntityRecord` tells us about the most recent API data. To access the edited data, that only lives in the browser, we must use `getEditedEntityRecord()` instead:
 
 ```js
-> wp.data.select('core').getEditedEntityRecord( 'root', 'widget', 
+> wp.data.select('core').getEditedEntityRecord( 'root', 'widget',
 'block-2' )
 [
 	{ id: "block-2", sidebar: "footer", ...},
@@ -788,7 +794,7 @@ undo: {
 		"kind": 'root"
 		'name": "widget",
 		"recordId": "block-2",
-		"edits": { 
+		"edits": {
 			"sidebar": "header"
 		}
 	},
@@ -796,14 +802,14 @@ undo: {
 		"kind": 'root"
 		'name": "widget",
 		"recordId": "block-2",
-		"edits": { 
+		"edits": {
 			"sidebar": "footer"
 		}
 	}
 }
 ```
 
-This enables you to easily add an undo and redo buttons to your app. The two core-data actions you would typically use are `undo` and `redo`. 
+This enables you to easily add an undo and redo buttons to your app. The two core-data actions you would typically use are `undo` and `redo`.
 
 Here’s a practical demonstration:
 
@@ -894,7 +900,7 @@ undo: {
 		"kind": 'root"
 		'name": "widget",
 		"recordId": "block-2",
-		"edits": { 
+		"edits": {
 			"sidebar": "header"
 		}
 	},
@@ -902,7 +908,7 @@ undo: {
 		"kind": 'root"
 		'name": "widget",
 		"recordId": "block-2",
-		"edits": { 
+		"edits": {
 			"sidebar": "But I insist!"
 		}
 	}
@@ -940,7 +946,7 @@ undo: {
 		"kind": 'root"
 		'name": "widget",
 		"recordId": "block-2",
-		"edits": { 
+		"edits": {
 			"sidebar": "header"
 		}
 	},
@@ -948,7 +954,7 @@ undo: {
 		"kind": 'root"
 		'name": "widget",
 		"recordId": "block-2",
-		"edits": { 
+		"edits": {
 			"sidebar": "footer"
 		}
 	}
@@ -993,7 +999,7 @@ Now that the user updated the widget, it is time to save changes. The easiest wa
 wp.data.dispatch('core').saveEditedEntityRecord( 'root', 'widget', 'block-2' )
 ```
 
-It collects all the edits for the specified Entity Record, applies them to the last queried state, and calls the API to perform the actual save operation. 
+It collects all the edits for the specified Entity Record, applies them to the last queried state, and calls the API to perform the actual save operation.
 
 ```js
 > wp.data.dispatch('core').editEntityRecord( 'root', 'widget', 'block-2', {
@@ -1088,7 +1094,7 @@ Once the record is saved and the API response with a new version is available, `
 ```
 
 ##### Lazy edits
- 
+
 If the `record` contains any functions, they will be evaluated. It is an optimization feature that spared expensive computations on every edit. For example, the following two records are equivalent as far as `saveEntityRecord` is concerned:
 
 ```js
@@ -1199,6 +1205,5 @@ The deletion logic is analogous to the saving logic, and there even are correspo
 `saveEntityRecord()` -\> `deleteEntityRecord()`
 `isSavingEntityRecord()` -\> `isDeletingEntityRecord()`
 `getLastEntitySaveError()` -\> `getLastEntityDeleteError()`
-
 
 
