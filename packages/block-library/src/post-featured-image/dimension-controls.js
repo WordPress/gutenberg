@@ -3,6 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import {
+	SelectControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -32,6 +33,7 @@ const SCALE_OPTIONS = (
 );
 
 const DEFAULT_SCALE = 'cover';
+const DEFAULT_SIZE = 'full';
 
 const scaleHelp = {
 	cover: __(
@@ -47,8 +49,9 @@ const scaleHelp = {
 
 const DimensionControls = ( {
 	clientId,
-	attributes: { width, height, scale },
+	attributes: { width, height, scale, sizeSlug },
 	setAttributes,
+	imageSizeOptions = [],
 } ) => {
 	const defaultUnits = [ 'px', '%', 'vw', 'em', 'rem' ];
 	const units = useCustomUnits( {
@@ -113,6 +116,29 @@ const DimensionControls = ( {
 					units={ units }
 				/>
 			</ToolsPanelItem>
+			{ !! imageSizeOptions.length && (
+				<ToolsPanelItem
+					hasValue={ () => !! sizeSlug && sizeSlug !== DEFAULT_SIZE }
+					label={ __( 'Size' ) }
+					onDeselect={ () =>
+						setAttributes( { sizeSlug: undefined } )
+					}
+					resetAllFilter={ () => ( {
+						sizeSlug: undefined,
+					} ) }
+					isShownByDefault={ true }
+					panelId={ clientId }
+				>
+					<SelectControl
+						label={ __( 'Size' ) }
+						value={ sizeSlug || DEFAULT_SIZE }
+						options={ imageSizeOptions }
+						onChange={ ( nextSizeSlug ) =>
+							setAttributes( { sizeSlug: nextSizeSlug } )
+						}
+					/>
+				</ToolsPanelItem>
+			) }
 			{ !! height && (
 				<ToolsPanelItem
 					hasValue={ () => !! scale && scale !== DEFAULT_SCALE }
