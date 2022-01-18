@@ -140,7 +140,7 @@ It is a [thunk](thunks%20link) that populates the state. Note  that it does not 
 
 In real world, data is often stored in APIs and needs to be loaded asynchronously. Fortunately, resolvers can be async too. Here’s a different way of loading the temperature:
 ```js
-getTemperatureCelcius: () => ( { dispatch } ) => {
+getTemperatureCelcius: () => async ( { dispatch } ) => {
     const response = await window.fetch( '/temperature' );
     const result = await response.json();
     dispatch.receiveCurrentTemperature( result.temperature );
