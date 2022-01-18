@@ -150,7 +150,9 @@ getTemperatureCelcius: () => async ( { dispatch } ) => {
 An avid reader may ask at this point _Is this going to send a request every time I use the `getTemperatureCelcius()` selector?_ Great question! The answer is no, thanks to the resolvers cache. 
 
 ### Resolvers cache
-Resolvers are cached by the data layer. Subsequent calls to the same selectors will not trigger additional HTTP requests. Let’s take a closer look at the `thermostat ` store. Once it is registered with `wp.data.register(store)`, the actual state looks as follows:
+Resolvers are cached by the data layer. Subsequent calls to the same selectors will not trigger additional HTTP requests. 
+
+Let’s take a closer look at the `thermostat ` store. Once it is registered with `wp.data.register(store)`, the actual state looks as follows:
 ```js
 {
   metadata: {},
