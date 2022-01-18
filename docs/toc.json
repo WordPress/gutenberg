@@ -300,6 +300,9 @@
 							},
 							{
 								"docs/contributors/code/react-native/integration-test-guide.md": []
+							},
+							{
+								"docs/contributors/code/react-native/internationalization-guide.md": []
 							}
 						]
 					}
