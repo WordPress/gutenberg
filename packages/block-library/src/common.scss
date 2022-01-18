@@ -120,12 +120,3 @@ html :where(.has-border-color) {
 html :where([style*="border-width"]) {
 	border-style: solid;
 }
-
-/**
- * Ensures that the default box-sizing: border-box in the editor
- * is reflected on the frontend.
- * See: https://github.com/WordPress/gutenberg/pull/37818
- */
-:where(*) {
-	box-sizing: border-box;
-}
