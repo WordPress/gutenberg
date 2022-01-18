@@ -35,7 +35,7 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 } );
 
 export function initializeEditor( props ) {
-	const renderResult = render(
+	const screen = render(
 		<Editor
 			postId={ `post-id-${ uuid() }` }
 			postType="post"
@@ -43,27 +43,31 @@ export function initializeEditor( props ) {
 			{ ...props }
 		/>
 	);
-	const { getByTestId } = renderResult;
+	const { getByTestId } = screen;
 
 	// A promise is used here, instead of making the function async, to prevent
 	// the React Native testing library from warning of potential undesired React state updates
 	// that can be covered in the integration tests.
 	// Reference: https://git.io/JPHn6
 	return new Promise( ( resolve ) => {
-		waitFor( () => getByTestId( 'block-list-wrapper' ) ).then(
-			( blockListWrapper ) => {
-				// onLayout event has to be explicitly dispatched in BlockList component,
-				// otherwise the inner blocks are not rendered.
-				fireEvent( blockListWrapper, 'layout', {
-					nativeEvent: {
-						layout: {
-							width: 100,
-						},
+		// Some of the store updates that happen upon editor initialization are executed at the end of the current
+		// Javascript block execution and after the test is finished. In order to prevent "act" warnings due to
+		// this behavior, we wait for the execution block to be finished before acting on the test.
+		act(
+			() => new Promise( ( actResolve ) => setImmediate( actResolve ) )
+		).then( () => {
+			// onLayout event has to be explicitly dispatched in BlockList component,
+			// otherwise the inner blocks are not rendered.
+			fireEvent( getByTestId( 'block-list-wrapper' ), 'layout', {
+				nativeEvent: {
+					layout: {
+						width: 100,
 					},
-				} );
-				resolve( renderResult );
-			}
-		);
+				},
+			} );
+
+			resolve( screen );
+		} );
 	} );
 }
 
