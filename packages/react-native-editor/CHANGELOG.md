@@ -10,13 +10,13 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
--   [**] Fix content justification attribute in Buttons block [#37887]
 
+-   [**] Fix content justification attribute in Buttons block [#37887]
 -   [*] Hide help button from Unsupported Block Editor. [#37221]
 -   [*] Add contrast checker to text-based blocks [#34902]
-
 -   [*] [Image block] Fix missing translations [#37956]
 -   [*] Fix cut-off setting labels by properly wrapping the text [#37993]
+-   [*] Highlight text: fix applying formatting for non-selected text [#37915]
 
 ## 1.69.0
 
