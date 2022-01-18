@@ -8,7 +8,7 @@ This doc assumes you are familiar with [Redux](https://redux.js.org/) concepts s
 
 Gutenberg is part of WordPress core and frequently acts on the same data. There are posts, pages, taxonomies, widgets, navigation items and so on. The obvious way of using the data, would be to just request it from API whenever a given React component needs it. This would have a serious drawback though. Any other component wanting to use the same data, would have to request it as well. So now there is more than one request. Then, what if the data changes? Would all components re-request it? Would they even know to do so?
 
-The data layer provides answers to all of these questions, and more. It handles data synchronization for you, so you can focus on your component. For example, when you need to do something with a post, you can access it with:
+The data layer provides answers to all of these questions and more. It handles data synchronization for you, so you can focus on your component. For example, when you need to do something with a post, you can access it with:
 
 ```js
 function MyComponent({ widgetId }) {
