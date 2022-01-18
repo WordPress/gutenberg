@@ -102,7 +102,8 @@ export default function PostLockedModal() {
 					isLocked: true,
 					isTakeover: true,
 					user: {
-						avatar: received.lock_error.avatar_src,
+						name: received.lock_error.name,
+						avatar: received.lock_error.avatar_src_2x,
 					},
 				} );
 			} else if ( received.new_lock ) {
