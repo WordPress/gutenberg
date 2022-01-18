@@ -533,7 +533,7 @@ describe( 'Writing Flow', () => {
 		const paragraph = await page.$( '[data-type="core/paragraph"]' );
 		const paragraphRect = await paragraph.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
-		const y = paragraphRect.y + paragraphRect.height + 1;
+		const y = paragraphRect.y + paragraphRect.height + 16;
 
 		await page.mouse.move( x, y );
 		await page.waitForSelector(
@@ -575,7 +575,7 @@ describe( 'Writing Flow', () => {
 		const paragraph = await page.$( '[data-type="core/paragraph"]' );
 		const paragraphRect = await paragraph.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
-		const y = paragraphRect.y + paragraphRect.height + 1;
+		const y = paragraphRect.y + paragraphRect.height + 16;
 
 		await page.mouse.move( x, y );
 		await page.waitForSelector(
