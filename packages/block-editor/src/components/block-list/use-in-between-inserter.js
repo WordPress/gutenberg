@@ -11,6 +11,7 @@ import { useContext } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
+import { getDistanceToNearestEdge } from '../../utils/math';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
@@ -74,26 +75,43 @@ export function useInBetweenInserter() {
 					return;
 				}
 
+				const position = { x: event.clientX, y: event.clientY };
 				const orientation =
 					getBlockListSettings( rootClientId )?.orientation ||
 					'vertical';
-				const rect = event.target.getBoundingClientRect();
-				const offsetTop = event.clientY - rect.top;
-				const offsetLeft = event.clientX - rect.left;
 
 				const children = Array.from( event.target.children );
-				let element = children.find( ( blockEl ) => {
-					return (
-						( blockEl.classList.contains( 'wp-block' ) &&
-							orientation === 'vertical' &&
-							blockEl.offsetTop > offsetTop ) ||
-						( blockEl.classList.contains( 'wp-block' ) &&
-							orientation === 'horizontal' &&
-							blockEl.offsetLeft > offsetLeft )
+				let element;
+				let elementDistance;
+				let indexOffset;
+
+				children.forEach( ( blockEl ) => {
+					const allowedEdges =
+						orientation === 'horizontal'
+							? [ 'left', 'right' ]
+							: [ 'top', 'bottom' ];
+					const elementRect = blockEl.getBoundingClientRect();
+					const [ distance, edge ] = getDistanceToNearestEdge(
+						position,
+						elementRect,
+						allowedEdges
 					);
+
+					if ( ! elementDistance || distance < elementDistance ) {
+						element = blockEl;
+						elementDistance = distance;
+						// Use the next index if the cursor is closest to the
+						// trailing end of the block.
+						indexOffset = [ 'right', 'bottom' ].includes( edge )
+							? 1
+							: 0;
+					}
 				} );
 
 				if ( ! element ) {
+					if ( isBlockInsertionPointVisible() ) {
+						hideInsertionPoint();
+					}
 					return;
 				}
 
@@ -128,23 +146,8 @@ export function useInBetweenInserter() {
 					return;
 				}
 
-				const elementRect = element.getBoundingClientRect();
-
-				if (
-					( orientation === 'horizontal' &&
-						( event.clientY > elementRect.bottom ||
-							event.clientY < elementRect.top ) ) ||
-					( orientation === 'vertical' &&
-						( event.clientX > elementRect.right ||
-							event.clientX < elementRect.left ) )
-				) {
-					if ( isBlockInsertionPointVisible() ) {
-						hideInsertionPoint();
-					}
-					return;
-				}
-
-				const index = getBlockIndex( clientId );
+				const index =
+					getBlockIndex( clientId, rootClientId ) + indexOffset;
 
 				// Don't show the in-between inserter before the first block in
 				// the list (preserves the original behaviour).
