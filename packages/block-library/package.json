@@ -67,7 +67,7 @@
 		"fast-average-color": "4.3.0",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
-		"micromodal": "^0.4.9",
+		"micromodal": "^0.4.10",
 		"moment": "^2.22.1"
 	},
 	"publishConfig": {
