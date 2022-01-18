@@ -59,7 +59,7 @@ function gutenberg_update_post_lock_details( $settings, $block_editor_context ) 
 
 	$user_id = wp_check_post_lock( $block_editor_context->post->ID );
 	if ( $user_id ) {
-		$settings['postLock']['user']['avatar'] = get_avatar_url( $user_id, array( 'size' => 64 ) );
+		$settings['postLock']['user']['avatar'] = get_avatar_url( $user_id, array( 'size' => 128 ) );
 	}
 
 	return $settings;
