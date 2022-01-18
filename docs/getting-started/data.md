@@ -400,34 +400,8 @@ null
 Only then the data is loaded by the [related resolver](https://github.com/WordPress/gutenberg/blob/d1c41d49fc040e44fa11730bee3dd7fe315b2b3f/packages/core-data/src/resolvers.js#L167).
 
 #### Resolution
-The [`getEntityRecords` resolver]([https://github.com/WordPress/gutenberg/blob/d1c41d49fc040e44fa11730bee3dd7fe315b2b3f/packages/core-data/src/resolvers.js#L167]) calls the Entity’s `baseURL` :
+The [`getEntityRecords` resolver]([https://github.com/WordPress/gutenberg/blob/d1c41d49fc040e44fa11730bee3dd7fe315b2b3f/packages/core-data/src/resolvers.js#L167]) requests the data from the API using the `baseURL` defined in the Entity config earlier on. For widgets, it’s `/wp/v2/widgets`. Once the request is finished, the resolver dispatches the [`receiveEntityRecords()`](https://developer.wordpress.org/block-editor/reference-guides/data/data-core/#receiveentityrecords) action to store the retrieved records:
 
-```js
-const entity = find( entities, { kind, name } );
-// ...additional checks...
-const path = addQueryArgs( entity.baseURL, {
-	...entity.baseURLParams,
-	...query,
-} );
-
-let records = Object.values( await apiFetch( { path } ) );
-// ...additional checks...
-dispatch.receiveEntityRecords( kind, name, records, query );
-```
-
-In case of widgets, the `baseURL` is `/wp/v2/widgets`. Calling the selector as follows:
-```js
-wp.data.select('core').getEntityRecords( 'root', 'widget' )
-```
-Will make the resolver request [http://localhost:8888/wp/v2/widgets](#).
-
-If we also used the `query` argument:
-```js
-wp.data.select('core').getEntityRecords( 'root', 'widget', { name: 'block-1' } )
-```
-The resolver would request [http://localhost:8888/wp/v2/widgets?name=block-1](http://localhost:8888/wp/v2/widgets).
-
-To keep things simple, let’s omit query and focus on`getEntityRecords( 'root', 'widget' )`. Once the `apiFetch` is finished, the resolver stores the retrieved records by calling `dispatch.receiveEntityRecords()` , which dispatches the following action:
 ```js
 {
   type: 'RECEIVE_ITEMS',
@@ -442,8 +416,9 @@ To keep things simple, let’s omit query and focus on`getEntityRecords( 'root',
 }
 ```
 
+
 #### Redux state
-`RECEIVE_ITEMS` reducer creates the new Redux state :
+The `RECEIVE_ITEMS` reducer creates the new Redux state :
 ```js
 {
 	entities: {
@@ -542,6 +517,25 @@ queries: {
 	}
 }
 ```
+
+The resolver also supports default query parameters. They may be configured via `baseURLParams` entity configuration key:
+```js
+const defaultEntities = [
+	// ...
+	{
+		kind: 'root',
+		name: 'widget',
+		label: __( 'Widgets' ),
+		baseURL: '/wp/v2/widgets',
+		baseURLParams: { per_page: 1 },
+	},
+	// ...
+}
+// ...
+wp.data.select('core').getEntityRecords( 'root', 'widget' )
+// Request sent to /wp/v2/widgets?per_page=1
+```
+
 
 #### How it all ties together
 Going back to  `getEntityRecords()` , we are now ready to move from the simplified definition to the actual one.
