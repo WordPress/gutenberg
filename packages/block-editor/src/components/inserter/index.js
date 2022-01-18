@@ -176,7 +176,7 @@ class Inserter extends Component {
 			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType || directInsertBlock?.length ) {
+		if ( hasSingleBlockType || directInsertBlock ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
@@ -351,6 +351,7 @@ export default compose( [
 							}
 						}
 					);
+
 					blockToInsert = createBlock( directInsertBlock.name, {
 						...newAttributes,
 						...( directInsertBlock.attributes || {} ),
