@@ -383,22 +383,21 @@ The Redux state used by `core-data` resembles this one structure:
 
 ### Reading Entity Records
 
-#### `getEntityRecords()`
+#### Selectors
+The `core-data` store provides a named selector for each of the default entities. There is `getTaxonomies()`, `getWidgets()`, and so on. These selectors are not actually implemented from scratch: `getWidgets()` is merely a shorthand for `getEntityRecords( 'root', 'widget' )`.
 
-The `core-data` store provides a named selector for each of the default entities. There is `getTaxonomies()`, `getWidgets()`, and so on. These selectors are not actually implemented from scratch: `getWidgets()` is merely a shorthand for `getEntityRecords( 'root', 'widget' )`
+[getEntityRecords( kind, name, query )]([https://github.com/WordPress/gutenberg/blob/d1c41d49fc040e44fa11730bee3dd7fe315b2b3f/packages/core-data/src/selectors.js#L294-L306]) returns the queried items if they exist in the store. The arguments are:
+* `kind` – points to the correct Entity
+* `name` – points to the correct Entity
+* `query` – an optional HTTP query that can help with things like filtering and pagination
 
-This is what a slightly simplified implementation of [getEntityRecords()]([https://github.com/WordPress/gutenberg/blob/d1c41d49fc040e44fa11730bee3dd7fe315b2b3f/packages/core-data/src/selectors.js#L294-L306]) looks like:
+As with any selector, the first call returns `null` because the store is still empty:
 ```js
-export function getEntityRecords( state, kind, name, query ) {
-	return getQueriedItems(
-		state.entities.data[kind][type].queriedData,
-		query
-	);
-}
+> wp.data.select('core').getEntityRecords( 'root', 'widget' )
+null
 ```
 
-* `kind` and `name` arguments point to the correct Entity
-* `query` is an optional HTTP query that can help with things like filtering and pagination
+Only then the data is loaded by the [related resolver](https://github.com/WordPress/gutenberg/blob/d1c41d49fc040e44fa11730bee3dd7fe315b2b3f/packages/core-data/src/resolvers.js#L167).
 
 #### Resolution
 The [`getEntityRecords` resolver]([https://github.com/WordPress/gutenberg/blob/d1c41d49fc040e44fa11730bee3dd7fe315b2b3f/packages/core-data/src/resolvers.js#L167]) calls the Entity’s `baseURL` :
