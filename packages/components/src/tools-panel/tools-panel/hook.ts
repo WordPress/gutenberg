@@ -76,40 +76,46 @@ export function useToolsPanel(
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
 
-	const registerPanelItem = useCallback( ( item: ToolsPanelItem ) => {
-		setPanelItems( ( items ) => {
-			const newItems = [ ...items ];
-			// If an item with this label has already been registered, remove it
-			// first. This can happen when an item is moved between the default
-			// and optional groups.
-			const existingIndex = newItems.findIndex(
-				( oldItem ) => oldItem.label === item.label
-			);
-			if ( existingIndex !== -1 ) {
-				newItems.splice( existingIndex, 1 );
-			}
-			return [ ...newItems, item ];
-		} );
-	}, [] );
+	const registerPanelItem = useCallback(
+		( item: ToolsPanelItem ) => {
+			setPanelItems( ( items ) => {
+				const newItems = [ ...items ];
+				// If an item with this label has already been registered, remove it
+				// first. This can happen when an item is moved between the default
+				// and optional groups.
+				const existingIndex = newItems.findIndex(
+					( oldItem ) => oldItem.label === item.label
+				);
+				if ( existingIndex !== -1 ) {
+					newItems.splice( existingIndex, 1 );
+				}
+				return [ ...newItems, item ];
+			} );
+		},
+		[ setPanelItems ]
+	);
 
 	// Panels need to deregister on unmount to avoid orphans in menu state.
 	// This is an issue when panel items are being injected via SlotFills.
-	const deregisterPanelItem = useCallback( ( label: string ) => {
-		// When switching selections between components injecting matching
-		// controls, e.g. both panels have a "padding" control, the
-		// deregistration of the first panel doesn't occur until after the
-		// registration of the next.
-		setPanelItems( ( items ) => {
-			const newItems = [ ...items ];
-			const index = newItems.findIndex(
-				( item ) => item.label === label
-			);
-			if ( index !== -1 ) {
-				newItems.splice( index, 1 );
-			}
-			return newItems;
-		} );
-	}, [] );
+	const deregisterPanelItem = useCallback(
+		( label: string ) => {
+			// When switching selections between components injecting matching
+			// controls, e.g. both panels have a "padding" control, the
+			// deregistration of the first panel doesn't occur until after the
+			// registration of the next.
+			setPanelItems( ( items ) => {
+				const newItems = [ ...items ];
+				const index = newItems.findIndex(
+					( item ) => item.label === label
+				);
+				if ( index !== -1 ) {
+					newItems.splice( index, 1 );
+				}
+				return newItems;
+			} );
+		},
+		[ setPanelItems ]
+	);
 
 	// Manage and share display state of menu items representing child controls.
 	const [ menuItems, setMenuItems ] = useState< ToolsPanelMenuItems >( {
@@ -127,7 +133,7 @@ export function useToolsPanel(
 			} );
 			return items;
 		} );
-	}, [ panelItems ] );
+	}, [ generateMenuItems, panelItems, setMenuItems ] );
 
 	// Force a menu item to be checked.
 	// This is intended for use with default panel items. They are displayed
@@ -146,7 +152,7 @@ export function useToolsPanel(
 				return newState;
 			} );
 		},
-		[]
+		[ setMenuItems ]
 	);
 
 	// Whether all optional menu items are hidden or not must be tracked
@@ -166,7 +172,7 @@ export function useToolsPanel(
 				! optionalItems.some( ( [ , isSelected ] ) => isSelected );
 			setAreAllOptionalControlsHidden( allControlsHidden );
 		}
-	}, [ menuItems.optional ] );
+	}, [ menuItems.optional, setAreAllOptionalControlsHidden ] );
 
 	const cx = useCx();
 	const classes = useMemo( () => {
@@ -182,10 +188,10 @@ export function useToolsPanel(
 
 		return cx( styles.ToolsPanel, wrapperStyle, emptyStyle, className );
 	}, [
+		areAllOptionalControlsHidden,
 		className,
 		hasInnerWrapper,
 		menuItems,
-		areAllOptionalControlsHidden,
 	] );
 
 	// Toggle the checked state of a menu item which is then used to determine
@@ -214,7 +220,7 @@ export function useToolsPanel(
 
 			setMenuItems( newMenuItems );
 		},
-		[ panelItems, menuItems ]
+		[ menuItems, panelItems, setMenuItems ]
 	);
 
 	// Resets display of children and executes resetAll callback if available.
@@ -239,29 +245,35 @@ export function useToolsPanel(
 			shouldReset: true,
 		} );
 		setMenuItems( resetMenuItems );
-	}, [ panelItems ] );
+	}, [
+		generateMenuItems,
+		isResetting.current,
+		panelItems,
+		resetAll,
+		setMenuItems,
+	] );
 
 	const panelContext = useMemo(
 		() => ( {
-			panelId,
-			menuItems,
-			registerPanelItem,
+			areAllOptionalControlsHidden,
 			deregisterPanelItem,
 			flagItemCustomization,
-			areAllOptionalControlsHidden,
 			hasMenuItems: !! panelItems.length,
 			isResetting: isResetting.current,
+			menuItems,
+			panelId,
+			registerPanelItem,
 			shouldRenderPlaceholderItems,
 		} ),
 		[
-			panelId,
-			panelItems,
-			menuItems,
-			registerPanelItem,
+			areAllOptionalControlsHidden,
 			deregisterPanelItem,
 			flagItemCustomization,
-			areAllOptionalControlsHidden,
 			isResetting.current,
+			menuItems,
+			panelId,
+			panelItems,
+			registerPanelItem,
 			shouldRenderPlaceholderItems,
 		]
 	);
