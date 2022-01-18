@@ -20,7 +20,7 @@ function MyComponent({ widgetId }) {
 }
 ```
 
-And be sure that it’s the most recent version, and that no unnecessary HTTP requests were performed. How does it all work? There are a few big concepts to discuss:
+Moreover, you can be sure that it’s the most recent version, and that no unnecessary HTTP requests were performed. But how does it all work? There are a few big concepts to discuss:
 
 * Data package
 	* Selectors and resolvers 
