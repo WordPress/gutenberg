@@ -23,40 +23,47 @@ function createPreloadingMiddleware( preloadedData ) {
 				rawPath = pathFromQuery;
 			}
 		}
-		if ( typeof rawPath === 'string' ) {
-			const method = options.method || 'GET';
-			const path = normalizePath( rawPath );
+		if ( typeof rawPath !== 'string' ) {
+			return next( options );
+		}
 
-			if ( 'GET' === method && cache[ path ] ) {
-				const cacheData = cache[ path ];
+		const method = options.method || 'GET';
+		const path = normalizePath( rawPath );
 
-				// Unsetting the cache key ensures that the data is only used a single time
-				delete cache[ path ];
+		if ( 'GET' === method && cache[ path ] ) {
+			const cacheData = cache[ path ];
 
-				return Promise.resolve(
-					parse
-						? cacheData.body
-						: new window.Response(
-								JSON.stringify( cacheData.body ),
-								{
-									status: 200,
-									statusText: 'OK',
-									headers: cacheData.headers,
-								}
-						  )
-				);
-			} else if (
-				'OPTIONS' === method &&
-				cache[ method ] &&
-				cache[ method ][ path ]
-			) {
-				const cacheData = cache[ method ][ path ];
+			// Unsetting the cache key ensures that the data is only used a single time
+			delete cache[ path ];
 
-				// Unsetting the cache key ensures that the data is only used a single time
-				delete cache[ method ][ path ];
+			return Promise.resolve(
+				parse
+					? cacheData.body
+					: new window.Response( JSON.stringify( cacheData.body ), {
+							status: 200,
+							statusText: 'OK',
+							headers: cacheData.headers,
+					  } )
+			);
+		} else if (
+			'OPTIONS' === method &&
+			cache[ method ] &&
+			cache[ method ][ path ]
+		) {
+			const cacheData = cache[ method ][ path ];
 
-				return Promise.resolve( parse ? cacheData.body : cacheData );
-			}
+			// Unsetting the cache key ensures that the data is only used a single time
+			delete cache[ method ][ path ];
+
+			return Promise.resolve(
+				parse
+					? cacheData.body
+					: new window.Response( JSON.stringify( cacheData.body ), {
+							status: 200,
+							statusText: 'OK',
+							headers: cacheData.headers,
+					  } )
+			);
 		}
 
 		return next( options );
