@@ -31,19 +31,23 @@ function createPreloadingMiddleware( preloadedData ) {
 		const path = normalizePath( rawPath );
 
 		if ( 'GET' === method && cache[ path ] ) {
+			const cacheData = cache[ path ];
+
 			// Unsetting the cache key ensures that the data is only used a single time
 			delete cache[ path ];
 
-			return prepareResponse( cache[ path ], !! parse );
+			return prepareResponse( cacheData, !! parse );
 		} else if (
 			'OPTIONS' === method &&
 			cache[ method ] &&
 			cache[ method ][ path ]
 		) {
+			const cacheData = cache[ method ][ path ];
+
 			// Unsetting the cache key ensures that the data is only used a single time
 			delete cache[ method ][ path ];
 
-			return prepareResponse( cache[ method ][ path ], !! parse );
+			return prepareResponse( cacheData, !! parse );
 		}
 
 		return next( options );
