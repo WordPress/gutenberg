@@ -52,10 +52,12 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			updateBlockAttributes( clientIds, newAttributes, true );
 		},
 		[
-			hasMultiSelection,
-			getMultiSelectedBlockClientIds,
-			panelId,
+			cleanEmptyObject,
 			getBlockAttributes,
+			getMultiSelectedBlockClientIds,
+			hasMultiSelection,
+			panelId,
+			updateBlockAttributes,
 		]
 	);
 
