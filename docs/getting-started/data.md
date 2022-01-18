@@ -8,7 +8,7 @@ This doc assumes you are familiar with [Redux](https://redux.js.org/) concepts s
 
 Gutenberg is part of WordPress core and frequently acts on the same data. There are posts, pages, taxonomies, widgets, navigation items and so on. The obvious way of using the data, would be to just request it from API whenever a given React component needs it. This would have a serious drawback though. Any other component wanting to use the same data, would have to request it as well. So now there is more than one request. Then, what if the data changes? Would all components re-request it? Would they even know to do so?
 
-The data layer provides answers to all of these questions and more. It handles data synchronization for you, so you can focus on your component. For example, when you need to do something with a post, you can access it with:
+The data layer provides answers to all of these questions and more. It handles data synchronization for you, so you can focus on your component. For example, when you need to do something with a widget, you can access it with:
 
 ```js
 function MyComponent({ widgetId }) {
@@ -22,10 +22,10 @@ function MyComponent({ widgetId }) {
 
 Moreover, you can be sure that it’s the most recent version, and that no unnecessary HTTP requests were performed. But how does it all work? There are a few big concepts to discuss:
 
-* Data package
+* Data package (`@wordpress/data`)
 	* Selectors and resolvers
 	* React hooks
-* Core-data package
+* Core-data package (`@wordpress/core-data`)
 	* Entities
 	* Entity Records
 	* Data flow
@@ -36,7 +36,7 @@ Moreover, you can be sure that it’s the most recent version, and that no unnec
 
 # Data package
 ## Selectors and resolvers
-Selectors are simple functions that return a piece of data from the redux store. Resolvers are used to load the data when there is none available yet. Let’s see how they work in tandem in this minimal store:
+Selectors are simple functions that return a piece of data from the store. Resolvers are used to load the data when there is none available yet. Let’s see how they work in tandem in this minimal store:
 
 ```js
 const store = wp.data.createReduxStore( 'thermostat', {
@@ -59,7 +59,7 @@ const store = wp.data.createReduxStore( 'thermostat', {
 			temperature
 		})
 	},
-	reducer(state={}, action) {
+	reducer( state={}, action ) {
 		const newState = {
 			...state
 		}
@@ -327,7 +327,7 @@ Promise {<fulfilled>: {…}}  // The resolution was invalidated
 As the name `core-data` says, this package connects WordPress core and the `data`  package. To explain how it can be useful in everyday development, we need to discuss a few key concepts first.
 
 ## Entities
-An entity is a basic unit of information in core-data. Entities can be thought of as data types, REST API resources, or database entries. A Post is an entity, so is a Taxonomy and a Widget. We will use the latter as our running example. Default entities are declared in `entities.js`, and a minimal definition looks like this:
+An entity is a basic unit of information in core-data. Entities are conceptually similar to REST API resources, database entries, and class objects. A Post is an entity, so is a Taxonomy and a Widget. We will use the latter as our running example. Default entities are declared in `entities.js`, and a minimal definition looks like this:
 
 ```js
 const defaultEntities = [
