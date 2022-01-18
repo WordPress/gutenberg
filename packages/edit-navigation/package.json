@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.9.22",
+	"version": "1.9.23",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
