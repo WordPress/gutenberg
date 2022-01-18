@@ -40,7 +40,7 @@ function useMenuEntities() {
 				coreStore
 			);
 
-			const menusParameters = [ { per_page: -1 } ];
+			const menusParameters = [ { per_page: -1, context: 'view' } ];
 
 			return {
 				menus: getMenus( ...menusParameters ),
@@ -73,6 +73,7 @@ function useMenuItemEntities( menuId ) {
 						{
 							menus: menuId,
 							per_page: -1,
+							context: 'view',
 						},
 				  ]
 				: undefined;
@@ -115,6 +116,7 @@ function usePageEntities() {
 					order: 'asc',
 					orderby: 'id',
 					per_page: -1,
+					context: 'view',
 				},
 			];
 
