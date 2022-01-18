@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-directory",
-	"version": "3.0.22",
+	"version": "3.0.23",
 	"description": "Extend editor with block directory features to search, download and install blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
