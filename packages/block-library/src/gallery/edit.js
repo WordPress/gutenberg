@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { concat, find } from 'lodash';
+import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
@@ -295,6 +296,22 @@ function GalleryEdit( props ) {
 					newOrderMap[ b.attributes.id ]
 			)
 		);
+
+		//If new blocks added scroll the first of these into view.
+		if ( newBlocks?.length ) {
+			const firstNewBlock = document.getElementById(
+				`block-${ newBlocks[ 0 ].clientId }`
+			);
+			const scrollContainer = document.querySelector(
+				'.interface-interface-skeleton__content'
+			);
+			if ( scrollContainer && firstNewBlock ) {
+				scrollIntoView( firstNewBlock, scrollContainer, {
+					onlyScrollIfNeeded: true,
+					alignWithTop: true,
+				} );
+			}
+		}
 	}
 
 	function onUploadError( message ) {
