@@ -34,7 +34,7 @@ function createPreloadingMiddleware( preloadedData ) {
 			// Unsetting the cache key ensures that the data is only used a single time
 			delete cache[ path ];
 
-			return prepareResponse( cache[ path ], parse );
+			return prepareResponse( cache[ path ], !! parse );
 		} else if (
 			'OPTIONS' === method &&
 			cache[ method ] &&
@@ -43,7 +43,7 @@ function createPreloadingMiddleware( preloadedData ) {
 			// Unsetting the cache key ensures that the data is only used a single time
 			delete cache[ method ][ path ];
 
-			return prepareResponse( cache[ method ][ path ], parse );
+			return prepareResponse( cache[ method ][ path ], !! parse );
 		}
 
 		return next( options );
