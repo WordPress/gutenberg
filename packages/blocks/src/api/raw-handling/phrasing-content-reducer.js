@@ -43,6 +43,8 @@ export default function phrasingContentReducer( node, doc ) {
 		} else if ( verticalAlign === 'sub' ) {
 			wrap( doc.createElement( 'sub' ), node );
 		}
+	} else if ( node.nodeName === 'DIV' ) {
+		node = replaceTag( node, 'p' );
 	} else if ( node.nodeName === 'B' ) {
 		node = replaceTag( node, 'strong' );
 	} else if ( node.nodeName === 'I' ) {
