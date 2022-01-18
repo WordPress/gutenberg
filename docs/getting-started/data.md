@@ -2,7 +2,7 @@
 
 ## Pre-requisites
 
-This doc assumes you are familiar with Redux concepts like action, reducer, and selector, as well as certain Gutenberg concepts like _Thunks_. You may still be able to get the gist of the ideas here without these pre-requisites, but you are highly encouraged to get familiar with them first.
+This doc assumes you are familiar with [Redux](https://redux.js.org/) concepts such as actions, reducers, and selectors, as well as certain Gutenberg concepts such as _Thunks_. You may still be able to get the gist of the ideas here without these pre-requisites, but you are highly encouraged to get familiar with them first.
 
 ## Big Ideas
 
