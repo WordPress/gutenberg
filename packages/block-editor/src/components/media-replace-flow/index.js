@@ -96,14 +96,14 @@ const MediaReplaceFlow = ( {
 	};
 
 	const uploadFiles = ( event, closeMenu ) => {
-		closeMenu();
 		const files = event.target.files;
 		if ( ! handleUpload ) {
+			closeMenu();
 			return onSelect( files );
 		}
 		onFilesUpload( files );
 		const setMedia = ( [ media ] ) => {
-			selectMedia( media );
+			selectMedia( media, closeMenu );
 		};
 		mediaUpload( {
 			allowedTypes,
