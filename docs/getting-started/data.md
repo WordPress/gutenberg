@@ -161,7 +161,7 @@ Let’s take a closer look at the `thermostat ` store. Once it is registered wi
   }
 }
 ```
-The state managed by the developer lives in `root`, and the state managed by the `data` package lives in `metadata`.  Let’s take a closer look at the latter.
+The state managed by the developer lives in `root`, and the state managed by the `@wordpress/data` package lives in `metadata`.  Let’s take a closer look at the latter.
 
 Once the `getTemperatureCelcius` **selector** is called for the first time:
 
