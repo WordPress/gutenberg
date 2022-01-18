@@ -74,7 +74,7 @@ const store = wp.data.createReduxStore( 'thermostat', {
 wp.data.register(store)
 ```
 
-The `@@INIT` action is dispatched when the store is instantiated, and so the initial state says `temperature: 0`
+The `@@INIT` action is dispatched when the store is instantiated, and so the initial state says `temperature: 0`.
 
 ### Simple selectors
 The  `getTemperatureCelsius` is a simple selector, it predictably returns `0` once the store was instantiated:
