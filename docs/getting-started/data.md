@@ -327,7 +327,8 @@ Promise {<fulfilled>: {…}}  // The resolution was invalidated
 As the name `core-data` says, this package connects WordPress core and the `data`  package. To explain how it can be useful in everyday development, we need to discuss a few key concepts first.
 
 ## Entities
-Entities are like data types. A Post is an entity, so is a Taxonomy and a Widget. We will use the latter as our running example. Default entities are declared in `entities.js`, and a minimal definition looks like this:
+
+Entities are like data types. A Post is an entity, so is a Taxonomy and a Widget. We will use the latter as our running example. Default entities are declared in `entities.js`, and a minimal definition looks like this:An entity is a basic unit of information in core-data. Entities can be thought of as data types, REST API resources, or database entries. A Post is an entity, so is a Taxonomy and a Widget. We will use the latter as our running example. Default entities are declared in `entities.js`, and a minimal definition looks like this:
 
 ```js
 const defaultEntities = [
