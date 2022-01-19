@@ -34,7 +34,7 @@ export const StyledSpinner = styled.span`
 	border-radius: 50%;
 	margin: auto;
 	position: relative;
-	color: var(--wp-admin-theme-color);
+	color: var( --wp-admin-theme-color );
 	animation: 1.4s linear infinite both ${ spinAnimation };
 
 	.components-spinner__track {
