@@ -35,6 +35,20 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 } );
 
 export function initializeEditor( props ) {
+	// Portions of the React Native Animation API rely upon these APIs. However,
+	// Jest's 'legacy' fake timer mutate these globals, which breaks the Animated
+	// API. We preserve the original implementations to restore them later.
+	const originalRAF = global.requestAnimationFrame;
+	const originalCAF = global.cancelAnimationFrame;
+
+	// During editor initialization, asynchronous store resolvers rely upon
+	// `setTimeout` to run at the end of the current JavaScript block execution.
+	// In order to prevent "act" warnings triggered by updates to the React tree,
+	// we leverage fake timers to manually tick and await the resolution of the
+	// current block execution before proceeding.
+	jest.useFakeTimers( 'legacy' );
+
+	// Arrange
 	const screen = render(
 		<Editor
 			postId={ `post-id-${ uuid() }` }
@@ -43,17 +57,28 @@ export function initializeEditor( props ) {
 			{ ...props }
 		/>
 	);
-	const { getByTestId } = screen;
 
-	// onLayout event has to be explicitly dispatched in BlockList component,
+	// Layout event must be explicitly dispatched in BlockList component,
 	// otherwise the inner blocks are not rendered.
-	fireEvent( getByTestId( 'block-list-wrapper' ), 'layout', {
+	fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
 		nativeEvent: {
 			layout: {
 				width: 100,
 			},
 		},
 	} );
+
+	// Advance all timers allowing store resolvers to resolve.
+	act( () => jest.runAllTimers() );
+
+	// Restore the default timer APIs for remainder of test arrangement, act, and
+	// assertion.
+	jest.useRealTimers();
+
+	// Restore the global animation frame APIs to their original state for the
+	// React Native Animated API.
+	global.requestAnimationFrame = originalRAF;
+	global.cancelAnimationFrame = originalCAF;
 
 	return screen;
 }
