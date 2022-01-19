@@ -8,7 +8,6 @@ import { debounce } from 'lodash';
  */
 import {
 	PanelBody,
-	QueryControls,
 	TextControl,
 	FormTokenField,
 	SelectControl,
@@ -26,7 +25,8 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import OrderControl from './order-control';
-import { getTermsInfo, usePostTypes } from '../../utils';
+import AuthorControl from './author-control';
+import { getEntitiesInfo, usePostTypes } from '../../utils';
 import { MAX_FETCHED_TERMS } from '../../constants';
 
 const stickyOptions = [
@@ -65,7 +65,7 @@ export default function QueryInspectorControls( {
 	const {
 		order,
 		orderBy,
-		author: selectedAuthorId,
+		author: authorIds,
 		postType,
 		sticky,
 		inherit,
@@ -74,7 +74,7 @@ export default function QueryInspectorControls( {
 	const [ showTags, setShowTags ] = useState( true );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
-	const { authorList, categories, tags } = useSelect( ( select ) => {
+	const { categories, tags } = useSelect( ( select ) => {
 		const { getEntityRecords } = select( coreStore );
 		const termsQuery = { per_page: MAX_FETCHED_TERMS };
 		const _categories = getEntityRecords(
@@ -84,11 +84,8 @@ export default function QueryInspectorControls( {
 		);
 		const _tags = getEntityRecords( 'taxonomy', 'post_tag', termsQuery );
 		return {
-			categories: getTermsInfo( _categories ),
-			tags: getTermsInfo( _tags ),
-			authorList: getEntityRecords( 'root', 'user', {
-				per_page: -1,
-			} ),
+			categories: getEntitiesInfo( _categories ),
+			tags: getEntitiesInfo( _tags ),
 		};
 	}, [] );
 	useEffect( () => {
@@ -237,7 +234,7 @@ export default function QueryInspectorControls( {
 			</PanelBody>
 			{ ! inherit && (
 				<PanelBody title={ __( 'Filters' ) }>
-					{ showCategories && categories?.terms?.length > 0 && (
+					{ showCategories && categories?.entities?.length > 0 && (
 						<FormTokenField
 							label={ __( 'Categories' ) }
 							value={ getExistingTermsFormTokenValue(
@@ -247,7 +244,7 @@ export default function QueryInspectorControls( {
 							onChange={ onCategoriesChange }
 						/>
 					) }
-					{ showTags && tags?.terms?.length > 0 && (
+					{ showTags && tags?.entities?.length > 0 && (
 						<FormTokenField
 							label={ __( 'Tags' ) }
 							value={ getExistingTermsFormTokenValue(
@@ -257,14 +254,7 @@ export default function QueryInspectorControls( {
 							onChange={ onTagsChange }
 						/>
 					) }
-					<QueryControls
-						{ ...{ selectedAuthorId, authorList } }
-						onAuthorChange={ ( value ) =>
-							setQuery( {
-								author: value !== '' ? +value : undefined,
-							} )
-						}
-					/>
+					<AuthorControl value={ authorIds } onChange={ setQuery } />
 					<TextControl
 						label={ __( 'Keyword' ) }
 						value={ querySearch }

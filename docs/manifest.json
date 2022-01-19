@@ -2010,6 +2010,12 @@
 		"parent": "react-native"
 	},
 	{
+		"title": "React Native Internationalization Guide",
+		"slug": "internationalization-guide",
+		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
+		"parent": "react-native"
+	},
+	{
 		"title": "Design Contributions",
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design/README.md",

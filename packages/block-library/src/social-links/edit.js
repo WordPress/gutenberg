@@ -116,6 +116,34 @@ export function SocialLinksEdit( props ) {
 		position: 'bottom right',
 	};
 
+	const colorSettings = [
+		{
+			// Use custom attribute as fallback to prevent loss of named color selection when
+			// switching themes to a new theme that does not have a matching named color.
+			value: iconColor.color || iconColorValue,
+			onChange: ( colorValue ) => {
+				setIconColor( colorValue );
+				setAttributes( { iconColorValue: colorValue } );
+			},
+			label: __( 'Icon color' ),
+		},
+	];
+
+	if ( ! logosOnly ) {
+		colorSettings.push( {
+			// Use custom attribute as fallback to prevent loss of named color selection when
+			// switching themes to a new theme that does not have a matching named color.
+			value: iconBackgroundColor.color || iconBackgroundColorValue,
+			onChange: ( colorValue ) => {
+				setIconBackgroundColor( colorValue );
+				setAttributes( {
+					iconBackgroundColorValue: colorValue,
+				} );
+			},
+			label: __( 'Icon background' ),
+		} );
+	}
+
 	return (
 		<Fragment>
 			<BlockControls group="other">
@@ -169,32 +197,7 @@ export function SocialLinksEdit( props ) {
 					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
 					title={ __( 'Color' ) }
-					colorSettings={ [
-						{
-							// Use custom attribute as fallback to prevent loss of named color selection when
-							// switching themes to a new theme that does not have a matching named color.
-							value: iconColor.color || iconColorValue,
-							onChange: ( colorValue ) => {
-								setIconColor( colorValue );
-								setAttributes( { iconColorValue: colorValue } );
-							},
-							label: __( 'Icon color' ),
-						},
-						! logosOnly && {
-							// Use custom attribute as fallback to prevent loss of named color selection when
-							// switching themes to a new theme that does not have a matching named color.
-							value:
-								iconBackgroundColor.color ||
-								iconBackgroundColorValue,
-							onChange: ( colorValue ) => {
-								setIconBackgroundColor( colorValue );
-								setAttributes( {
-									iconBackgroundColorValue: colorValue,
-								} );
-							},
-							label: __( 'Icon background' ),
-						},
-					] }
+					colorSettings={ colorSettings }
 				/>
 				{ ! logosOnly && (
 					<ContrastChecker

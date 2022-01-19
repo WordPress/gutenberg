@@ -39,6 +39,7 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
+import { COLORS } from '../utils';
 
 const DEFAULT_COLOR = '#000';
 
@@ -79,7 +80,14 @@ function Option( {
 		<PaletteItem
 			as="div"
 			onClick={ onStartEditing }
-			{ ...( isEditing ? focusOutsideProps : {} ) }
+			{ ...( isEditing
+				? {
+						...focusOutsideProps,
+						style: {
+							border: `1px solid ${ COLORS.blue.wordpress[ 700 ] }`,
+						},
+				  }
+				: { style: { cursor: 'pointer' } } ) }
 		>
 			<HStack justify="flex-start">
 				<FlexItem>

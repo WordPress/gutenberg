@@ -57,11 +57,7 @@ if ( require.main === module ) {
 	const mapFileData = fs.readFileSync( mapFile );
 	const { sources } = JSON.parse( mapFileData );
 
-	// Transform absolute paths into relative
-	const currentPath = process.cwd();
-	let sourceFiles = sources.map( ( file ) =>
-		file.replace( currentPath, '.' )
-	);
+	let sourceFiles = sources;
 
 	// Filter out files under "node_modules" folder
 	sourceFiles = sourceFiles.filter(
@@ -83,14 +79,9 @@ if ( require.main === module ) {
 		}
 	} );
 
-	// Use compiled files for Typescript files (only Gutenberg)
+	// Use compiled files for Typescript files
 	sourceFiles = sourceFiles.map( ( file ) => {
-		if (
-			// For now, only check files under Gutenberg
-			file.startsWith( './gutenberg' ) !== -1 &&
-			file.indexOf( 'node_modules' ) === -1 &&
-			file.endsWith( '.ts' )
-		) {
+		if ( file.indexOf( 'node_modules' ) === -1 && file.endsWith( '.ts' ) ) {
 			const compiledFile = file
 				.replace( 'src', 'build' )
 				.replace( '.ts', '.js' );

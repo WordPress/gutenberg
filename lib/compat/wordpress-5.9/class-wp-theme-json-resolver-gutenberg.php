@@ -132,7 +132,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Data from theme.json will be backfilled from existing
 	 * theme supports, if any. Note that if the same data
 	 * is present in theme.json and in theme supports,
-	 * the theme.json takes precendence.
+	 * the theme.json takes precedence.
 	 *
 	 * @param array $deprecated Deprecated argument.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.

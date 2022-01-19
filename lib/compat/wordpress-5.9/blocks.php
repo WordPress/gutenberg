@@ -16,7 +16,7 @@ if ( ! function_exists( 'get_query_pagination_arrow' ) ) {
 	 * It's used in QueryPaginationNext and QueryPaginationPrevious blocks.
 	 *
 	 * @param WP_Block $block   Block instance.
-	 * @param boolean  $is_next Flag for hanlding `next/previous` blocks.
+	 * @param boolean  $is_next Flag for handling `next/previous` blocks.
 	 *
 	 * @return string|null Returns the constructed WP_Query arguments.
 	 */
