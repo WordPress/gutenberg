@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Increased minimum peer dependency of `stylelint` to `14.2.0`. See [official migration guide to v14](https://github.com/stylelint/stylelint/blob/14.0.0/docs/migration-guide/to-14.md) for details.
+
 ## 19.0.0 (2021-01-21)
 
 ### Breaking Change
