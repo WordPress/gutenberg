@@ -14,7 +14,7 @@ The abstract term used to describe units of markup that, composed together, form
 
 ## Block Styles
 
-The CSS styles that are part of the block, either via its stylesheet to the block or via the block markup itself. For example, a class attached to the block markup is considered block styles.
+The CSS styles that are part of the block, either via its stylesheet or via the block markup itself. For example, a class attached to the block markup is considered block styles.
 
 Compare to <a href="global-styles">Global Styles</a>. In contraposition to "Global Styles", block styles are sometimes referred to as "Local Styles".
 
