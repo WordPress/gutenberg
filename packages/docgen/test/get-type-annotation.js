@@ -196,12 +196,12 @@ describe( 'Type annotations', () => {
 	describe( 'missing types', () => {
 		const node = getMissingTypesNode();
 
-		it( 'should return null if there is no return type', () => {
-			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBeNull();
+		it( 'should return empty value if there is no return type', () => {
+			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBeFalsy();
 		} );
 
-		it( 'should return null if there is no param type', () => {
-			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBeNull();
+		it( 'should return empty value if there is no param type', () => {
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBeFalsy();
 		} );
 	} );
 

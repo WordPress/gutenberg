@@ -454,7 +454,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
  * @param {CommentTag} tag              The documented parameter.
  * @param {ASTNode}    declarationToken The function the parameter is documented on.
  * @param {number}     paramIndex       The parameter index.
- * @return {null | string} The parameter's type annotation.
+ * @return {string?} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
@@ -480,59 +480,43 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 		! paramToken.typeAnnotation ||
 		! paramToken.typeAnnotation.typeAnnotation
 	) {
-		return null;
+		return;
 	}
 
 	const paramType = paramToken.typeAnnotation.typeAnnotation;
 	const isQualifiedName = tag.name.includes( '.' );
 
-	try {
-		if (
-			babelTypes.isIdentifier( paramToken ) ||
-			babelTypes.isRestElement( paramToken ) ||
-			( ( babelTypes.isArrayPattern( paramToken ) ||
-				babelTypes.isObjectPattern( paramToken ) ) &&
-				! isQualifiedName )
-		) {
-			return getTypeAnnotation( paramType );
-		} else if ( babelTypes.isArrayPattern( paramToken ) ) {
-			return getQualifiedArrayPatternTypeAnnotation( tag, paramType );
-		} else if ( babelTypes.isObjectPattern( paramToken ) ) {
-			return getQualifiedObjectPatternTypeAnnotation( tag, paramType );
-		}
-	} catch ( e ) {
-		throw new Error(
-			`Could not understand type for parameter '${
-				tag.name
-			}' in function '${ getFunctionNameForError( declarationToken ) }'.`
-		);
+	if (
+		babelTypes.isIdentifier( paramToken ) ||
+		babelTypes.isRestElement( paramToken ) ||
+		( ( babelTypes.isArrayPattern( paramToken ) ||
+			babelTypes.isObjectPattern( paramToken ) ) &&
+			! isQualifiedName )
+	) {
+		return getTypeAnnotation( paramType );
+	} else if ( babelTypes.isArrayPattern( paramToken ) ) {
+		return getQualifiedArrayPatternTypeAnnotation( tag, paramType );
+	} else if ( babelTypes.isObjectPattern( paramToken ) ) {
+		return getQualifiedObjectPatternTypeAnnotation( tag, paramType );
 	}
 }
 
 /**
  * @param {ASTNode} declarationToken A function token.
- * @return {null | string} The function's return type annotation.
+ * @return {string?} The function's return type annotation.
  */
 function getReturnTypeAnnotation( declarationToken ) {
 	const functionToken = getFunctionToken( declarationToken );
 	if ( ! functionToken.returnType ) {
-		return null;
+		return;
 	}
 
-	try {
-		return getTypeAnnotation( functionToken.returnType.typeAnnotation );
-	} catch ( e ) {
-		throw new Error(
-			`Could not understand return type for function '${ getFunctionNameForError(
-				declarationToken
-			) }'.`
-		);
-	}
+	return getTypeAnnotation( functionToken.returnType.typeAnnotation );
 }
 
 /**
  * @param {ASTNode} declarationToken
- * @return {string} The type annotation for the variable.
+ * @return {string?} The type annotation for the variable.
  */
 function getVariableTypeAnnotation( declarationToken ) {
 	let resolvedToken = declarationToken;
@@ -553,7 +537,6 @@ function getVariableTypeAnnotation( declarationToken ) {
 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
 	} catch ( e ) {
 		// assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
-		return '';
 	}
 }
 

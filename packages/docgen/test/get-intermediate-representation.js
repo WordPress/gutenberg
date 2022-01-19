@@ -85,7 +85,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "default",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -110,7 +117,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "default",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -135,7 +149,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "default",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -160,7 +181,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "default",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -185,7 +213,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "default",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -244,7 +279,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "myDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -269,7 +311,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "myDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -294,7 +343,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "firstDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			  Object {
 			    "description": "My declaration example.",
@@ -302,7 +358,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "secondDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -380,7 +443,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 4,
 			    "name": "functionDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -397,7 +467,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 6,
 			    "name": "default",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -433,7 +510,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 6,
 			    "name": "myDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -466,7 +550,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 6,
 			    "name": "myDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
@@ -499,7 +590,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 16,
 			    "name": "functionDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			  Object {
 			    "description": "Variable declaration example.",
@@ -507,7 +605,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 16,
 			    "name": "variableDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			  Object {
 			    "description": "Class declaration example.",
@@ -555,7 +660,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 11,
 			    "name": "functionDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			  Object {
 			    "description": "Class declaration example.",
@@ -587,7 +699,14 @@ describe( 'Intermediate Representation', () => {
 			    "lineStart": 16,
 			    "name": "variableDeclaration",
 			    "path": null,
-			    "tags": Array [],
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": undefined,
+			      },
+			    ],
 			  },
 			]
 		` );
