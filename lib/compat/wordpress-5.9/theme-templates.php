@@ -69,7 +69,7 @@ function gutenberg_filter_wp_template_unique_post_slug( $override_slug, $slug, $
 	return $override_slug;
 }
 
-// Remove 5.8 filter if existent.
+// Remove 5.8 filter if it exists.
 remove_filter( 'pre_wp_unique_post_slug', 'wp_filter_wp_template_unique_post_slug' );
 add_filter( 'pre_wp_unique_post_slug', 'gutenberg_filter_wp_template_unique_post_slug', 10, 5 );
 
@@ -82,6 +82,6 @@ function gutenberg_enable_block_templates() {
 	}
 }
 
-// Remove 5.8 filter if existent.
+// Remove 5.8 filter if it exists.
 remove_action( 'setup_theme', 'wp_enable_block_templates' );
 add_action( 'setup_theme', 'gutenberg_enable_block_templates' );
