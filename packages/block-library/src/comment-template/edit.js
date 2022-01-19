@@ -256,6 +256,11 @@ export default function CommentTemplateEdit( {
 
 	const { topLevelComments, blocks } = useSelect(
 		( select ) => {
+			if ( ! postId ) {
+				return {
+					rawComments: [ {} ],
+				};
+			}
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
