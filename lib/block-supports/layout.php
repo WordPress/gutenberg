@@ -111,6 +111,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= 'flex-direction: column;';
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
+			} else {
+				$style .= "align-items: flex-start;";
 			}
 		}
 		$style .= '}';
