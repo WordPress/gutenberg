@@ -61,7 +61,7 @@ $preview-image-height: 140px;
 	// Specificity overide of URLInput defaults.
 	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
 		@include input-control;
-		width: calc(100% - #{$grid-unit-20*2});
+		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
 		padding: 11px $grid-unit-20;
 		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
