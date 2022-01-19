@@ -226,6 +226,9 @@ export default function CommentTemplateEdit( {
 
 	const { rawComments, blocks } = useSelect(
 		( select ) => {
+			// Show empty comments if we don't have a postId context.
+			// The structure of the empty object as a rawComment allows
+			// to inner blocks to render the default placeholders.
 			if ( ! postId ) {
 				return {
 					rawComments: [ {} ],
