@@ -64,15 +64,41 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 			$query['offset']         = ( $per_page * ( $page - 1 ) ) + $offset;
 			$query['posts_per_page'] = $per_page;
 		}
-		if ( ! empty( $block->context['query']['categoryIds'] ) ) {
-			$term_ids              = array_map( 'intval', $block->context['query']['categoryIds'] );
-			$term_ids              = array_filter( $term_ids );
-			$query['category__in'] = $term_ids;
+
+		// We need to migrate `categoryIds` and `tagIds` to `tax_query` for backwards compatibility.
+		if ( ! empty( $block->context['query']['categoryIds'] ) || ! empty( $block->context['query']['tagIds'] ) ) {
+			$tax_query = array();
+			if ( ! empty( $block->context['query']['categoryIds'] ) ) {
+				$tax_query[] = array(
+					'taxonomy'         => 'category',
+					'terms'            => $block->context['query']['categoryIds'],
+					'include_children' => false,
+				);
+			}
+			if ( ! empty( $block->context['query']['tagIds'] ) ) {
+				$tax_query[] = array(
+					'taxonomy'         => 'post_tag',
+					'terms'            => $block->context['query']['tagIds'],
+					'include_children' => false,
+				);
+			}
+			$query['tax_query'] = $tax_query;
 		}
-		if ( ! empty( $block->context['query']['tagIds'] ) ) {
-			$term_ids         = array_map( 'intval', $block->context['query']['tagIds'] );
-			$term_ids         = array_filter( $term_ids );
-			$query['tag__in'] = $term_ids;
+		if ( ! empty( $block->context['query']['taxQuery'] ) ) {
+			$query['tax_query'] = array();
+			foreach ( $block->context['query']['taxQuery'] as $taxonomy => $terms ) {
+				if ( ! empty( $terms ) ) {
+					$term_ids = array_map( 'intval', $terms );
+					$term_ids = array_filter( $term_ids );
+
+					$query['tax_query'][] = array(
+						'taxonomy'         => $taxonomy,
+						'terms'            => $terms,
+						'include_children' => false,
+
+					);
+				}
+			}
 		}
 		if (
 			isset( $block->context['query']['order'] ) &&

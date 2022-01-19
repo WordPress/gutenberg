@@ -25,7 +25,8 @@
 				"search": "",
 				"exclude": [],
 				"sticky": "",
-				"inherit": true
+				"inherit": true,
+				"taxQuery": null
 			}
 		},
 		"tagName": {

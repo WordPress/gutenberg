@@ -79,6 +79,7 @@ export default function PostTemplateEdit( {
 			exclude,
 			sticky,
 			inherit,
+			taxQuery,
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
@@ -90,15 +91,37 @@ export default function PostTemplateEdit( {
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecords } = select( coreStore );
+			const { getEntityRecords, getTaxonomies } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
+			const taxonomies = getTaxonomies( {
+				type: postType,
+				per_page: -1,
+				context: 'view',
+			} );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
-				categories: categoryIds,
-				tags: tagIds,
 				order,
 				orderby: orderBy,
 			};
+			if ( taxQuery ) {
+				// We have to build the tax query for the REST API and use as
+				// keys the taxonomies `rest_base` with the `term ids` as values.
+				const builtTaxQuery = Object.entries( taxQuery ).reduce(
+					( accumulator, [ taxonomySlug, terms ] ) => {
+						const taxonomy = taxonomies?.find(
+							( { slug } ) => slug === taxonomySlug
+						);
+						if ( taxonomy?.rest_base ) {
+							accumulator[ taxonomy?.rest_base ] = terms;
+						}
+						return accumulator;
+					},
+					{}
+				);
+				if ( !! Object.keys( builtTaxQuery ).length ) {
+					Object.assign( query, builtTaxQuery );
+				}
+			}
 			if ( perPage ) {
 				query.per_page = perPage;
 			}
@@ -146,6 +169,7 @@ export default function PostTemplateEdit( {
 			sticky,
 			inherit,
 			templateSlug,
+			taxQuery,
 		]
 	);
 	const blockContexts = useMemo(
