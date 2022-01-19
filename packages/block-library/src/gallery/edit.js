@@ -298,7 +298,7 @@ function GalleryEdit( props ) {
 		);
 
 		//If new blocks added select the first of these so they scroll into view.
-		if ( newBlocks?.length ) {
+		if ( newBlocks?.length && existingImageBlocks?.length ) {
 			selectBlock( newBlocks[ 0 ].clientId );
 		}
 	}
