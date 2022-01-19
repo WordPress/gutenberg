@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "12.3.0",
+	"version": "12.4.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -159,7 +159,7 @@
 		"chalk": "4.1.1",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
-		"copy-webpack-plugin": "9.0.1",
+		"copy-webpack-plugin": "10.2.0",
 		"core-js-builder": "3.19.1",
 		"cross-env": "3.2.4",
 		"css-loader": "6.2.0",

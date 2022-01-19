@@ -24,7 +24,7 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 	public function set_up() {
 		parent::set_up();
-		switch_theme( 'tt1-blocks' );
+		switch_theme( 'emptytheme' );
 	}
 
 	/**
@@ -45,9 +45,9 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 				'post_status'  => 'publish',
 				'post_title'   => __( 'Custom Styles', 'default' ),
 				'post_type'    => 'wp_global_styles',
-				'post_name'    => 'wp-global-styles-tt1-blocks',
+				'post_name'    => 'wp-global-styles-emptytheme',
 				'tax_input'    => array(
-					'wp_theme' => 'tt1-blocks',
+					'wp_theme' => 'emptytheme',
 				),
 			),
 			true

@@ -5,7 +5,7 @@ import MicroModal from 'micromodal';
 
 // Responsive navigation toggle.
 function navigationToggleModal( modal ) {
-	const dialogContainer = document.querySelector(
+	const dialogContainer = modal.querySelector(
 		`.wp-block-navigation__responsive-dialog`
 	);
 

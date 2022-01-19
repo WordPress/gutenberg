@@ -22,6 +22,7 @@ import FeatureToggle from '../feature-toggle';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
+import CopyContentMenuItem from './copy-content-menu-item';
 
 const POPOVER_PROPS = {
 	className: 'edit-site-more-menu__content',
@@ -91,6 +92,7 @@ export default function MoreMenu() {
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
 							<WelcomeGuideMenuItem />
+							<CopyContentMenuItem />
 							<MenuItem
 								icon={ external }
 								role="menuitem"

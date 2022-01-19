@@ -114,8 +114,9 @@ function make_pot () {
   # In order to detect parse errors, we need to use the "--debug" option, otherwise "make-pot" command doesn't output errors.
   local full_command="$makepot_command $source --debug $arguments"
   if [[ -z ${DEBUG:-} ]]; then
-    # When DEBUG flag is not enabled, we only print the parse errors.
-    $full_command 2> >(grep 'Could not parse file' | sed 's/Debug[[:space:]][(]make-pot[)]/Warning/g' >&2)
+    # When DEBUG flag is not enabled, we ignore extra debug information except important warnings.
+    local ignore_pattern="Parsing file\|Debug (commands)\|Debug (bootstrap)\|Debug (hooks)"
+    $full_command 2> >(grep -v "$ignore_pattern" >&2)
   else
     $full_command
   fi
@@ -151,7 +152,7 @@ function generate_pot_files() {
   mkdir -p $output_path
 
   if [ -n "$subtract_pot_files" ]; then
-    echo "--- Strings from ${plugins_to_subtract[@]} plugins will be subtracted ---"
+    echo "-- Strings from ${plugins_to_subtract[@]} plugins will be subtracted --"
   fi
   
   echo -e "\nExtract used strings from Android source-map:"
@@ -191,7 +192,7 @@ fi
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 GUTENBERG_SOURCE_CODE_DIR="$SCRIPT_DIR/../../.."
 WP_CLI="php -d memory_limit=4G $SCRIPT_DIR/wp-cli.phar"
-BUNDLE_CLI="$GUTENBERG_SOURCE_CODE_DIR/node_modules/.bin/react-native bundle --config $METRO_CONFIG"
+BUNDLE_CLI="$GUTENBERG_SOURCE_CODE_DIR/node_modules/.bin/react-native bundle --config ${METRO_CONFIG:-metro.config.js}"
 
 # Set target path
 if [[ -n ${LOCAL_PATH:-} ]]; then
@@ -203,10 +204,12 @@ fi
 # Set JS bundle directory
 BUNDLE_DIR="$TARGET_PATH/bundle"
 mkdir -p $BUNDLE_DIR
+trap '{ rm -rf -- "$BUNDLE_DIR"; }' EXIT
 
 # Set source files extraction directory
 EXTRACT_SOURCE_FILES_DIR="$TARGET_PATH/source-files"
 mkdir -p $EXTRACT_SOURCE_FILES_DIR
+trap '{ rm -rf -- "$EXTRACT_SOURCE_FILES_DIR"; }' EXIT
 
 # Set POT files directory
 POT_FILES_DIR="$TARGET_PATH"
@@ -245,10 +248,10 @@ for (( index=0; index<${#PLUGINS[@]}; index+=2 )); do
   PLUGIN_NAME=${PLUGINS[index]}
   PLUGIN_FOLDER=${PLUGINS[index+1]}
 
-  PLUGINS_TO_EXTRACT_FROM_GUTENGERG+=( $PLUGIN_NAME )
+  PLUGINS_TO_EXTRACT_FROM_GUTENBERG+=( $PLUGIN_NAME )
 
   generate_pot_files $POT_FILES_DIR $PLUGIN_NAME $PLUGIN_FOLDER
 done
 
 # Generate POT files for Gutenberg
-generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR" "${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENGERG[@]}"}"
+generate_pot_files $POT_FILES_DIR "gutenberg" "$GUTENBERG_SOURCE_CODE_DIR" "${PLUGINS_TO_EXTRACT_FROM_GUTENBERG[@]+"${PLUGINS_TO_EXTRACT_FROM_GUTENBERG[@]}"}"

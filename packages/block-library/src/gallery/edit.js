@@ -53,11 +53,6 @@ import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
 
-/**
- * Internal dependencies
- */
-import useMobileWarning from './use-mobile-warning';
-
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
@@ -148,8 +143,6 @@ function GalleryEdit( props ) {
 	const imageData = useGetMedia( innerBlockImages );
 
 	const newImages = useGetNewImages( images, imageData );
-
-	useMobileWarning( newImages );
 
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {

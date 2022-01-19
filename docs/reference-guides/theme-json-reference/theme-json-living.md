@@ -1,4 +1,8 @@
-# Theme.json Reference
+# Version 2 (living reference)
+
+> This is the living specification for the **version 2** of theme.json. This version works with the upcoming WordPress 5.9 and the latest Gutenberg plugin.
+>
+> There're related documents you may be interested in: the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification and the [reference to migrate from theme.json v1 to v2](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
 
 This reference guide lists the settings and style properties defined in the theme.json schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guide on how to use the theme.json file in your theme.
 

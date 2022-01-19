@@ -45,8 +45,10 @@ describe( 'Classic', () => {
 		await page.keyboard.type( 'test' );
 
 		// Click the image button.
-		await page.waitForSelector( 'div[aria-label^="Add Media"]' );
-		await page.click( 'div[aria-label^="Add Media"]' );
+		const addMediaButton = await page.waitForSelector(
+			'div[aria-label^="Add Media"]'
+		);
+		await addMediaButton.click();
 
 		await page.click( '.media-menu-item#menu-item-gallery' );
 
@@ -92,6 +94,7 @@ describe( 'Classic', () => {
 
 		// Check that you can undo back to a Classic block gallery in one step.
 		await pressKeyWithModifier( 'primary', 'z' );
+		await page.waitForSelector( 'div[aria-label="Block: Classic"]' );
 		expect( await getEditedPostContent() ).toMatch(
 			/\[gallery ids=\"\d+\"\]/
 		);

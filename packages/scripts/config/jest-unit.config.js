@@ -13,7 +13,7 @@ const jestUnitConfig = {
 	preset: '@wordpress/jest-preset-default',
 	reporters: [
 		'default',
-		path.join( __dirname, 'jest-github-actions-reporter.js' ),
+		path.join( __dirname, 'jest-github-actions-reporter', 'index.js' ),
 	],
 };
 

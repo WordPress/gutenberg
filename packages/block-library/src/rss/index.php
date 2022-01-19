@@ -16,7 +16,7 @@ function render_block_core_rss( $attributes ) {
 	$rss = fetch_feed( $attributes['feedURL'] );
 
 	if ( is_wp_error( $rss ) ) {
-		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:' ) . '</strong> ' . esc_html( $rss->get_error_message() ) . '</div></div>';
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
@@ -31,11 +31,11 @@ function render_block_core_rss( $attributes ) {
 			$title = __( '(no title)' );
 		}
 		$link = $item->get_link();
-		$link = esc_url( $link );
+
 		if ( $link ) {
-			$title = "<a href='{$link}'>{$title}</a>";
+			$title = '<a href="' . esc_url( $link ) . '">' . esc_html( $title ) . '</a>';
 		}
-		$title = "<div class='wp-block-rss__item-title'>{$title}</div>";
+		$title = '<div class="wp-block-rss__item-title">' . esc_html( $title ) . '</div>';
 
 		$date = '';
 		if ( $attributes['displayDate'] ) {
@@ -44,8 +44,8 @@ function render_block_core_rss( $attributes ) {
 			if ( $date ) {
 				$date = sprintf(
 					'<time datetime="%1$s" class="wp-block-rss__item-publish-date">%2$s</time> ',
-					date_i18n( get_option( 'c' ), $date ),
-					date_i18n( get_option( 'date_format' ), $date )
+					esc_attr( date_i18n( get_option( 'c' ), $date ) ),
+					esc_html( date_i18n( get_option( 'date_format' ), $date ) )
 				);
 			}
 		}
@@ -66,7 +66,7 @@ function render_block_core_rss( $attributes ) {
 		$excerpt = '';
 		if ( $attributes['displayExcerpt'] ) {
 			$excerpt = html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
-			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
+			$excerpt = wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' );
 
 			// Change existing [...] to [&hellip;].
 			if ( '[...]' === substr( $excerpt, -5 ) ) {
@@ -76,7 +76,7 @@ function render_block_core_rss( $attributes ) {
 			$excerpt = '<div class="wp-block-rss__item-excerpt">' . esc_html( $excerpt ) . '</div>';
 		}
 
-		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
+		$list_items .= '<li class="wp-block-rss__item">' . esc_html( $title . $date . $author . $excerpt ) . '</li>';
 	}
 
 	$classnames = array();

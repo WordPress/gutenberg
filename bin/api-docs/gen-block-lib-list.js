@@ -123,6 +123,20 @@ function augmentSupports( supports ) {
 }
 
 /**
+ * Returns URL to the block directory source.
+ *
+ * @param {string} filename
+ *
+ * @return {string} URL
+ */
+function getSourceFromFile( filename ) {
+	const pkgdir =
+		'https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/';
+	const blockdir = path.basename( path.dirname( filename ) );
+	return pkgdir + blockdir;
+}
+
+/**
  * Reads block.json file and returns markdown formatted entry.
  *
  * @param {string} filename
@@ -132,6 +146,7 @@ function augmentSupports( supports ) {
 function readBlockJSON( filename ) {
 	const blockjson = require( filename );
 
+	const sourcefile = getSourceFromFile( filename );
 	const supportsAugmented = augmentSupports( blockjson.supports );
 	const supportsList = processObjWithInnerKeys( supportsAugmented );
 	const attributes = getTruthyKeys( blockjson.attributes );
@@ -139,7 +154,7 @@ function readBlockJSON( filename ) {
 	return `
 ## ${ blockjson.title }
 
-${ blockjson.description }
+${ blockjson.description } ([Source](${ sourcefile }))
 
 -	**Name:** ${ blockjson.name }
 -	**Category:** ${ blockjson.category }

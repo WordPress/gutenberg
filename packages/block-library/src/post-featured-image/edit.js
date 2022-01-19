@@ -92,9 +92,36 @@ function PostFeaturedImageDisplay( {
 		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
 	};
 
+	const controls = (
+		<>
+			<DimensionControls
+				clientId={ clientId }
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ sprintf(
+							// translators: %s: Name of the post type e.g: "post".
+							__( 'Link to %s' ),
+							postType
+						) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		</>
+	);
 	let image;
 	if ( ! featuredImage && isDescendentOfQueryLoop ) {
-		return <div { ...blockProps }>{ placeholderChip }</div>;
+		return (
+			<>
+				{ controls }
+				<div { ...blockProps }>{ placeholderChip }</div>
+			</>
+		);
 	}
 
 	const label = __( 'Add a featured image' );
@@ -138,24 +165,7 @@ function PostFeaturedImageDisplay( {
 
 	return (
 		<>
-			<DimensionControls
-				clientId={ clientId }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-			/>
-			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<ToggleControl
-						label={ sprintf(
-							// translators: %s: Name of the post type e.g: "post".
-							__( 'Link to %s' ),
-							postType
-						) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
-				</PanelBody>
-			</InspectorControls>
+			{ controls }
 			{ !! media && ! isDescendentOfQueryLoop && (
 				<BlockControls group="other">
 					<MediaReplaceFlow

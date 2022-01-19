@@ -25,9 +25,9 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	// In most contexts the spacer size cannot meaningfully be set to a
 	// percentage, since this is relative to the parent container. This
 	// unit is disabled from the UI.
-	const availableUnitSettings = useSetting( 'spacing.units' ).filter(
-		( availableUnit ) => availableUnit !== '%'
-	);
+	const availableUnitSettings = (
+		useSetting( 'spacing.units' ) || undefined
+	)?.filter( ( availableUnit ) => availableUnit !== '%' );
 
 	const units = useCustomUnits( {
 		availableUnits: availableUnitSettings || [

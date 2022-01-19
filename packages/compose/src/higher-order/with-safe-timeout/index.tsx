@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { without } from 'lodash';
-// eslint-disable-next-line no-restricted-imports
 import type { ComponentType } from 'react';
 
 /**

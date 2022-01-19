@@ -21,7 +21,7 @@ const templatePartNameInput =
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'emptytheme' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -40,7 +40,7 @@ describe( 'Template Part', () => {
 		async function navigateToHeader() {
 			// Switch to editing the header template part.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//header',
+				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
 		}
@@ -61,7 +61,7 @@ describe( 'Template Part', () => {
 
 			// Switch back to the Index template.
 			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
 		}
@@ -93,12 +93,9 @@ describe( 'Template Part', () => {
 			expect( paragraphInTemplatePart ).not.toBeNull();
 		}
 
-		async function awaitHeaderAndFooterLoad() {
+		async function awaitHeaderLoad() {
 			await canvas().waitForSelector(
-				'.wp-block-template-part.site-header.block-editor-block-list__layout'
-			);
-			await canvas().waitForSelector(
-				'.wp-block-template-part.site-footer.block-editor-block-list__layout'
+				'header.wp-block-template-part.block-editor-block-list__layout'
 			);
 		}
 
@@ -172,7 +169,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await awaitHeaderAndFooterLoad();
+			await awaitHeaderLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -210,7 +207,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await awaitHeaderAndFooterLoad();
+			await awaitHeaderLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -277,7 +274,7 @@ describe( 'Template Part', () => {
 
 			it( 'Should insert new template part on creation', async () => {
 				let siteEditorCanvas = canvas();
-				await awaitHeaderAndFooterLoad();
+				await awaitHeaderLoad();
 
 				// Create new template part.
 				await insertBlock( 'Template Part' );
@@ -319,7 +316,7 @@ describe( 'Template Part', () => {
 				// Reload the page so as the new template part is available in the existing template parts.
 				await siteEditor.visit();
 				siteEditorCanvas = canvas();
-				await awaitHeaderAndFooterLoad();
+				await awaitHeaderLoad();
 				// Try to insert the template part we created.
 				await insertBlock( 'Template Part' );
 				const chooseExistingButton = await siteEditorCanvas.waitForXPath(

@@ -30,7 +30,7 @@ export const IndicatorStyled = styled( CircularOptionPicker.Option )`
 export const NameInputControl = styled( InputControl )`
 	${ InputControlContainer } {
 		background: ${ COLORS.gray[ 100 ] };
-		border-radius: 2px;
+		border-radius: ${ CONFIG.controlBorderRadius }};
 		${ Input }${ Input }${ Input }${ Input } {
 			height: ${ space( 8 ) };
 		}
@@ -52,6 +52,9 @@ export const NameContainer = styled.div`
 	margin-right: ${ space( 2 ) };
 	white-space: nowrap;
 	overflow: hidden;
+	${ PaletteItem }:hover & {
+		color: var( --wp-admin-theme-color, ${ COLORS.blue.wordpress[ 700 ] } );
+	}
 `;
 
 export const PaletteHeading = styled( Heading )`

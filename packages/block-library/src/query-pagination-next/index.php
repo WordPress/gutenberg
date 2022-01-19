@@ -51,7 +51,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 				'<a href="%1$s" %2$s>%3$s</a>',
 				esc_url( add_query_arg( $page_key, $page + 1 ) ),
 				$wrapper_attributes,
-				$label
+				esc_html( $label )
 			);
 		}
 		wp_reset_postdata(); // Restore original Post Data.

@@ -356,7 +356,12 @@ class BottomSheetCell extends Component {
 					<View style={ rowContainerStyles }>
 						<View style={ styles.cellRowContainer }>
 							{ icon && (
-								<View style={ styles.cellRowContainer }>
+								<View
+									style={ [
+										styles.cellRowContainer,
+										styles.cellRowIcon,
+									] }
+								>
 									<Icon
 										icon={ icon }
 										size={ 24 }

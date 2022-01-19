@@ -15,6 +15,11 @@ exports[`ToggleGroupControl should render correctly 1`] = `
 }
 
 .emotion-4 {
+  display: inline-block;
+  margin-bottom: calc(4px * 2);
+}
+
+.emotion-6 {
   background: #fff;
   border: 1px solid;
   border-color: #757575;
@@ -32,23 +37,23 @@ exports[`ToggleGroupControl should render correctly 1`] = `
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-4 {
+  .emotion-6 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-4:hover {
+.emotion-6:hover {
   border-color: #757575;
 }
 
-.emotion-4:focus-within {
+.emotion-6:focus-within {
   border-color: var( --wp-admin-theme-color-darker-10, #007cba);
   box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
   outline: none;
   z-index: 1;
 }
 
-.emotion-6 {
+.emotion-8 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -61,7 +66,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   flex: 1;
 }
 
-.emotion-8 {
+.emotion-10 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -100,20 +105,20 @@ exports[`ToggleGroupControl should render correctly 1`] = `
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-8 {
+  .emotion-10 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-8::-moz-focus-inner {
+.emotion-10::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-8:active {
+.emotion-10:active {
   background: #fff;
 }
 
-.emotion-9 {
+.emotion-11 {
   font-size: 13px;
   line-height: 1;
   position: absolute;
@@ -125,7 +130,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   transform: translate( -50%, -50% );
 }
 
-.emotion-11 {
+.emotion-13 {
   font-size: 13px;
   font-weight: bold;
   height: 0;
@@ -141,14 +146,14 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   >
     <div>
       <span
-        class="components-base-control__label"
+        class="components-base-control__label emotion-4 emotion-5"
       >
         Test Toggle Group Control
       </span>
     </div>
     <div
       aria-label="Test Toggle Group Control"
-      class="medium components-toggle-group-control emotion-4 emotion-5"
+      class="medium components-toggle-group-control emotion-6 emotion-7"
       data-wp-c16t="true"
       data-wp-component="ToggleGroupControl"
       id="toggle-group-control-0"
@@ -162,13 +167,13 @@ exports[`ToggleGroupControl should render correctly 1`] = `
         tabindex="-1"
       />
       <div
-        class="emotion-6 emotion-7"
+        class="emotion-8 emotion-9"
         data-active="false"
       >
         <button
           aria-checked="false"
           aria-label="R"
-          class="emotion-8 components-toggle-group-control-option"
+          class="emotion-10 components-toggle-group-control-option"
           data-value="rigas"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOption"
@@ -177,26 +182,26 @@ exports[`ToggleGroupControl should render correctly 1`] = `
           tabindex="0"
         >
           <div
-            class="emotion-9 emotion-10"
+            class="emotion-11 emotion-12"
           >
             R
           </div>
           <div
             aria-hidden="true"
-            class="emotion-11 emotion-12"
+            class="emotion-13 emotion-14"
           >
             R
           </div>
         </button>
       </div>
       <div
-        class="emotion-6 emotion-7"
+        class="emotion-8 emotion-9"
         data-active="false"
       >
         <button
           aria-checked="false"
           aria-label="J"
-          class="emotion-8 components-toggle-group-control-option"
+          class="emotion-10 components-toggle-group-control-option"
           data-value="jack"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOption"
@@ -205,13 +210,13 @@ exports[`ToggleGroupControl should render correctly 1`] = `
           tabindex="-1"
         >
           <div
-            class="emotion-9 emotion-10"
+            class="emotion-11 emotion-12"
           >
             J
           </div>
           <div
             aria-hidden="true"
-            class="emotion-11 emotion-12"
+            class="emotion-13 emotion-14"
           >
             J
           </div>

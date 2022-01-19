@@ -138,7 +138,7 @@ export function* removeTemplate( template ) {
 			'createSuccessNotice',
 			sprintf(
 				/* translators: The template/part's name. */
-				__( '"%s" removed.' ),
+				__( '"%s" deleted.' ),
 				template.title.rendered
 			),
 			{ type: 'snackbar' }
@@ -228,40 +228,6 @@ export function* setPage( page ) {
 		templateId,
 	};
 	return templateId;
-}
-
-/**
- * Displays the site homepage for editing in the editor.
- */
-export function* showHomepage() {
-	const {
-		show_on_front: showOnFront,
-		page_on_front: frontpageId,
-	} = yield controls.resolveSelect(
-		coreStore,
-		'getEntityRecord',
-		'root',
-		'site'
-	);
-
-	const { siteUrl } = yield controls.select(
-		editSiteStoreName,
-		'getSettings'
-	);
-
-	const page = {
-		path: siteUrl,
-		context:
-			showOnFront === 'page'
-				? {
-						postType: 'page',
-						postId: frontpageId,
-				  }
-				: {},
-	};
-
-	const homeTemplate = yield* setPage( page );
-	yield setHomeTemplateId( homeTemplate );
 }
 
 /**

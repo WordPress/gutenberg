@@ -96,6 +96,8 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 } )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
 ```
 
+{% end %}
+
 ## Method 2: Block classname
 
 The inline style works well for a small amount of CSS to apply. If you have much more than the above you will likely find that it is easier to manage with them in a separate stylesheet file.

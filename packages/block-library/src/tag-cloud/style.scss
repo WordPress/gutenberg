@@ -18,4 +18,13 @@
 		margin-left: 5px;
 		text-decoration: none;
 	}
+
+	&.is-style-outline a {
+		border: 1px solid currentColor;
+		font-size: unset !important; // !important Needed to override the inline styles.
+		margin-bottom: 1ch;
+		margin-right: 1ch;
+		padding: 1ch 2ch;
+		text-decoration: none !important; // !important needed to override generic post content link decoration.
+	}
 }

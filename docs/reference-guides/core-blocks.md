@@ -10,7 +10,7 @@ Items marked with a strikeout (~~strikeout~~) are explicitly disabled.
 
 ## Archives
 
-Display a monthly archive of your posts.
+Display a monthly archive of your posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/archives))
 
 -	**Name:** core/archives
 -	**Category:** widgets
@@ -19,7 +19,7 @@ Display a monthly archive of your posts.
 
 ## Audio
 
-Embed a simple audio player.
+Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/audio))
 
 -	**Name:** core/audio
 -	**Category:** media
@@ -28,7 +28,7 @@ Embed a simple audio player.
 
 ## Reusable block
 
-Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used.
+Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
 
 -	**Name:** core/block
 -	**Category:** reusable
@@ -37,7 +37,7 @@ Create and save content to reuse across your site. Update the block, and the cha
 
 ## Button
 
-Prompt visitors to take action with a button-style link.
+Prompt visitors to take action with a button-style link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button))
 
 -	**Name:** core/button
 -	**Category:** design
@@ -46,7 +46,7 @@ Prompt visitors to take action with a button-style link.
 
 ## Buttons
 
-Prompt visitors to take action with a group of button-style links.
+Prompt visitors to take action with a group of button-style links. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/buttons))
 
 -	**Name:** core/buttons
 -	**Category:** design
@@ -55,7 +55,7 @@ Prompt visitors to take action with a group of button-style links.
 
 ## Calendar
 
-A calendar of your site’s posts.
+A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/calendar))
 
 -	**Name:** core/calendar
 -	**Category:** widgets
@@ -64,7 +64,7 @@ A calendar of your site’s posts.
 
 ## Categories
 
-Display a list of all categories.
+Display a list of all categories. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
 
 -	**Name:** core/categories
 -	**Category:** widgets
@@ -73,7 +73,7 @@ Display a list of all categories.
 
 ## Code
 
-Display code snippets that respect your spacing and tabs.
+Display code snippets that respect your spacing and tabs. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/code))
 
 -	**Name:** core/code
 -	**Category:** text
@@ -82,7 +82,7 @@ Display code snippets that respect your spacing and tabs.
 
 ## Column
 
-A single column within a columns block.
+A single column within a columns block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/column))
 
 -	**Name:** core/column
 -	**Category:** text
@@ -91,16 +91,16 @@ A single column within a columns block.
 
 ## Columns
 
-Display content in multiple columns, with blocks added to each column.
+Display content in multiple columns, with blocks added to each column. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/columns))
 
 -	**Name:** core/columns
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (margin, padding), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), ~~html~~
 -	**Attributes:** isStackedOnMobile, verticalAlignment
 
 ## Comment Author Avatar
 
-Add the avatar of this comment's author.
+Add the avatar of this comment's author. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar))
 
 -	**Name:** core/comment-author-avatar
 -	**Category:** theme
@@ -109,7 +109,7 @@ Add the avatar of this comment's author.
 
 ## Comment Author Name
 
-Add the author name of this comment.
+Add the author name of this comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-name))
 
 -	**Name:** core/comment-author-name
 -	**Category:** theme
@@ -118,7 +118,7 @@ Add the author name of this comment.
 
 ## Comment Content
 
-Displays the contents of a comment.
+Displays the contents of a comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-content))
 
 -	**Name:** core/comment-content
 -	**Category:** theme
@@ -127,7 +127,7 @@ Displays the contents of a comment.
 
 ## Comment Date
 
-Add the date of this comment.
+Add the date of this comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-date))
 
 -	**Name:** core/comment-date
 -	**Category:** theme
@@ -136,7 +136,7 @@ Add the date of this comment.
 
 ## Comment Edit Link
 
-Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to users with the edit comment capability.
+Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to users with the edit comment capability. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-edit-link))
 
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
@@ -145,7 +145,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 
 ## Comment Reply Link
 
-Displays a link to reply to a comment.
+Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-reply-link))
 
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
@@ -154,7 +154,7 @@ Displays a link to reply to a comment.
 
 ## Comment Template
 
-Contains the block elements used to render a comment, like the title, date, author, avatar and more.
+Contains the block elements used to render a comment, like the title, date, author, avatar and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-template))
 
 -	**Name:** core/comment-template
 -	**Category:** design
@@ -163,7 +163,7 @@ Contains the block elements used to render a comment, like the title, date, auth
 
 ## Comments Pagination
 
-Displays a paginated navigation to next/previous set of comments, when applicable.
+Displays a paginated navigation to next/previous set of comments, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination))
 
 -	**Name:** core/comments-pagination
 -	**Category:** theme
@@ -172,7 +172,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 
 ## Next Page
 
-Displays the next comments page link.
+Displays the next comments page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-next))
 
 -	**Name:** core/comments-pagination-next
 -	**Category:** theme
@@ -181,7 +181,7 @@ Displays the next comments page link.
 
 ## Page Numbers
 
-Displays a list of page numbers for comments pagination.
+Displays a list of page numbers for comments pagination. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-numbers))
 
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
@@ -190,7 +190,7 @@ Displays a list of page numbers for comments pagination.
 
 ## Previous Page
 
-Displays the previous comments page link.
+Displays the previous comments page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-previous))
 
 -	**Name:** core/comments-pagination-previous
 -	**Category:** theme
@@ -199,7 +199,7 @@ Displays the previous comments page link.
 
 ## Comments Query Loop
 
-An advanced block that allows displaying post comments based on different query parameters and visual configurations.
+An advanced block that allows displaying post comments based on different query parameters and visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-query-loop))
 
 -	**Name:** core/comments-query-loop
 -	**Category:** theme
@@ -208,7 +208,7 @@ An advanced block that allows displaying post comments based on different query 
 
 ## Cover
 
-Add an image or video with a text overlay — great for headers.
+Add an image or video with a text overlay — great for headers. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover))
 
 -	**Name:** core/cover
 -	**Category:** media
@@ -217,7 +217,7 @@ Add an image or video with a text overlay — great for headers.
 
 ## Embed
 
-Add a block that displays content pulled from other sites, like Twitter or YouTube.
+Add a block that displays content pulled from other sites, like Twitter or YouTube. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/embed))
 
 -	**Name:** core/embed
 -	**Category:** embed
@@ -226,7 +226,7 @@ Add a block that displays content pulled from other sites, like Twitter or YouTu
 
 ## File
 
-Add a link to a downloadable file.
+Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/file))
 
 -	**Name:** core/file
 -	**Category:** media
@@ -235,7 +235,7 @@ Add a link to a downloadable file.
 
 ## Classic
 
-Use the classic WordPress editor.
+Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/freeform))
 
 -	**Name:** core/freeform
 -	**Category:** text
@@ -244,7 +244,7 @@ Use the classic WordPress editor.
 
 ## Gallery
 
-Display multiple images in a rich gallery.
+Display multiple images in a rich gallery. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/gallery))
 
 -	**Name:** core/gallery
 -	**Category:** media
@@ -253,7 +253,7 @@ Display multiple images in a rich gallery.
 
 ## Group
 
-Combine blocks into a group.
+Combine blocks into a group. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/group))
 
 -	**Name:** core/group
 -	**Category:** design
@@ -262,7 +262,7 @@ Combine blocks into a group.
 
 ## Heading
 
-Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
+Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/heading))
 
 -	**Name:** core/heading
 -	**Category:** text
@@ -271,7 +271,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 ## Home Link
 
-Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header.
+Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/home-link))
 
 -	**Name:** core/home-link
 -	**Category:** design
@@ -280,7 +280,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 
 ## Custom HTML
 
-Add custom HTML code and preview it as you edit.
+Add custom HTML code and preview it as you edit. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/html))
 
 -	**Name:** core/html
 -	**Category:** widgets
@@ -289,7 +289,7 @@ Add custom HTML code and preview it as you edit.
 
 ## Image
 
-Insert an image to make a visual statement.
+Insert an image to make a visual statement. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/image))
 
 -	**Name:** core/image
 -	**Category:** media
@@ -298,7 +298,7 @@ Insert an image to make a visual statement.
 
 ## Latest Comments
 
-Display a list of your most recent comments.
+Display a list of your most recent comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/latest-comments))
 
 -	**Name:** core/latest-comments
 -	**Category:** widgets
@@ -307,7 +307,7 @@ Display a list of your most recent comments.
 
 ## Latest Posts
 
-Display a list of your most recent posts.
+Display a list of your most recent posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/latest-posts))
 
 -	**Name:** core/latest-posts
 -	**Category:** widgets
@@ -316,7 +316,7 @@ Display a list of your most recent posts.
 
 ## List
 
-Create a bulleted or numbered list.
+Create a bulleted or numbered list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list))
 
 -	**Name:** core/list
 -	**Category:** text
@@ -325,7 +325,7 @@ Create a bulleted or numbered list.
 
 ## Login/out
 
-Show login & logout links.
+Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/loginout))
 
 -	**Name:** core/loginout
 -	**Category:** theme
@@ -334,7 +334,7 @@ Show login & logout links.
 
 ## Media & Text
 
-Set media and words side-by-side for a richer layout.
+Set media and words side-by-side for a richer layout. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/media-text))
 
 -	**Name:** core/media-text
 -	**Category:** media
@@ -343,7 +343,7 @@ Set media and words side-by-side for a richer layout.
 
 ## Unsupported
 
-Your site doesn’t include support for this block.
+Your site doesn’t include support for this block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/missing))
 
 -	**Name:** core/missing
 -	**Category:** text
@@ -352,7 +352,7 @@ Your site doesn’t include support for this block.
 
 ## More
 
-Content before this block will be shown in the excerpt on your archives page.
+Content before this block will be shown in the excerpt on your archives page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/more))
 
 -	**Name:** core/more
 -	**Category:** design
@@ -361,16 +361,16 @@ Content before this block will be shown in the excerpt on your archives page.
 
 ## Navigation
 
-A collection of blocks that allow visitors to get around your site.
+A collection of blocks that allow visitors to get around your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation))
 
 -	**Name:** core/navigation
 -	**Category:** theme
--	**Supports:** align (full, wide), anchor, inserter, spacing (units), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
+-	**Supports:** align (full, wide), anchor, inserter, spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
 
 ## Navigation Area
 
-Define a navigation area for your theme. The navigation block associated with this area will be automatically displayed.
+Define a navigation area for your theme. The navigation block associated with this area will be automatically displayed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-area))
 
 -	**Name:** core/navigation-area
 -	**Category:** theme
@@ -379,7 +379,7 @@ Define a navigation area for your theme. The navigation block associated with th
 
 ## Custom Link
 
-Add a page, link, or another item to your navigation.
+Add a page, link, or another item to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-link))
 
 -	**Name:** core/navigation-link
 -	**Category:** design
@@ -388,7 +388,7 @@ Add a page, link, or another item to your navigation.
 
 ## Submenu
 
-Add a submenu to your navigation.
+Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-submenu))
 
 -	**Name:** core/navigation-submenu
 -	**Category:** design
@@ -397,7 +397,7 @@ Add a submenu to your navigation.
 
 ## Page Break
 
-Separate your content into a multi-page experience.
+Separate your content into a multi-page experience. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/nextpage))
 
 -	**Name:** core/nextpage
 -	**Category:** design
@@ -406,7 +406,7 @@ Separate your content into a multi-page experience.
 
 ## Page List
 
-Display a list of all pages.
+Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/page-list))
 
 -	**Name:** core/page-list
 -	**Category:** widgets
@@ -415,7 +415,7 @@ Display a list of all pages.
 
 ## Paragraph
 
-Start with the building block of all narrative.
+Start with the building block of all narrative. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/paragraph))
 
 -	**Name:** core/paragraph
 -	**Category:** text
@@ -424,7 +424,7 @@ Start with the building block of all narrative.
 
 ## Pattern
 
-Show a block pattern.
+Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern))
 
 -	**Name:** core/pattern
 -	**Category:** theme
@@ -433,7 +433,7 @@ Show a block pattern.
 
 ## Post Author
 
-Add the author of this post.
+Display post author details such as name, avatar, and bio. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))
 
 -	**Name:** core/post-author
 -	**Category:** theme
@@ -442,7 +442,7 @@ Add the author of this post.
 
 ## Post Author Name
 
-The author name.
+The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-name))
 
 -	**Name:** core/post-author-name
 -	**Category:** theme
@@ -451,7 +451,7 @@ The author name.
 
 ## Post Comment (deprecated)
 
-This block is deprecated. Please use the Comments Query Loop block instead.
+This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
 
 -	**Name:** core/post-comment
 -	**Category:** theme
@@ -460,7 +460,7 @@ This block is deprecated. Please use the Comments Query Loop block instead.
 
 ## Post Comments
 
-Display a post's comments.
+Display a post's comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
 
 -	**Name:** core/post-comments
 -	**Category:** theme
@@ -469,7 +469,7 @@ Display a post's comments.
 
 ## Post Comments Count
 
-Display a post's comments count.
+Display a post's comments count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count))
 
 -	**Name:** core/post-comments-count
 -	**Category:** theme
@@ -478,7 +478,7 @@ Display a post's comments count.
 
 ## Post Comments Form
 
-Display a post's comments form.
+Display a post's comments form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-form))
 
 -	**Name:** core/post-comments-form
 -	**Category:** theme
@@ -487,7 +487,7 @@ Display a post's comments form.
 
 ## Post Comments Link
 
-Displays the link to the current post comments.
+Displays the link to the current post comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-link))
 
 -	**Name:** core/post-comments-link
 -	**Category:** theme
@@ -496,7 +496,7 @@ Displays the link to the current post comments.
 
 ## Post Content
 
-Displays the contents of a post or page.
+Displays the contents of a post or page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-content))
 
 -	**Name:** core/post-content
 -	**Category:** theme
@@ -505,7 +505,7 @@ Displays the contents of a post or page.
 
 ## Post Date
 
-Add the date of this post.
+Add the date of this post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))
 
 -	**Name:** core/post-date
 -	**Category:** theme
@@ -514,7 +514,7 @@ Add the date of this post.
 
 ## Post Excerpt
 
-Display a post's excerpt.
+Display a post's excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
 
 -	**Name:** core/post-excerpt
 -	**Category:** theme
@@ -523,7 +523,7 @@ Display a post's excerpt.
 
 ## Post Featured Image
 
-Display a post's featured image.
+Display a post's featured image. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-featured-image))
 
 -	**Name:** core/post-featured-image
 -	**Category:** theme
@@ -532,7 +532,7 @@ Display a post's featured image.
 
 ## Post Navigation Link
 
-Displays the next or previous post link that is adjacent to the current post.
+Displays the next or previous post link that is adjacent to the current post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-navigation-link))
 
 -	**Name:** core/post-navigation-link
 -	**Category:** theme
@@ -541,7 +541,7 @@ Displays the next or previous post link that is adjacent to the current post.
 
 ## Post Template
 
-Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more.
+Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-template))
 
 -	**Name:** core/post-template
 -	**Category:** theme
@@ -550,7 +550,7 @@ Contains the block elements used to render a post, like the title, date, feature
 
 ## Post Terms
 
-Post terms.
+Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-terms))
 
 -	**Name:** core/post-terms
 -	**Category:** theme
@@ -559,7 +559,7 @@ Post terms.
 
 ## Post Title
 
-Displays the title of a post, page, or any other content-type.
+Displays the title of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title))
 
 -	**Name:** core/post-title
 -	**Category:** theme
@@ -568,7 +568,7 @@ Displays the title of a post, page, or any other content-type.
 
 ## Preformatted
 
-Add text that respects your spacing and tabs, and also allows styling.
+Add text that respects your spacing and tabs, and also allows styling. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted))
 
 -	**Name:** core/preformatted
 -	**Category:** text
@@ -577,7 +577,7 @@ Add text that respects your spacing and tabs, and also allows styling.
 
 ## Pullquote
 
-Give special visual emphasis to a quote from your text.
+Give special visual emphasis to a quote from your text. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote))
 
 -	**Name:** core/pullquote
 -	**Category:** text
@@ -586,7 +586,7 @@ Give special visual emphasis to a quote from your text.
 
 ## Query Loop
 
-An advanced block that allows displaying post types based on different query parameters and visual configurations.
+An advanced block that allows displaying post types based on different query parameters and visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query))
 
 -	**Name:** core/query
 -	**Category:** theme
@@ -595,7 +595,7 @@ An advanced block that allows displaying post types based on different query par
 
 ## Pagination
 
-Displays a paginated navigation to next/previous set of posts, when applicable.
+Displays a paginated navigation to next/previous set of posts, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination))
 
 -	**Name:** core/query-pagination
 -	**Category:** theme
@@ -604,7 +604,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable.
 
 ## Next Page
 
-Displays the next posts page link.
+Displays the next posts page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-next))
 
 -	**Name:** core/query-pagination-next
 -	**Category:** theme
@@ -613,7 +613,7 @@ Displays the next posts page link.
 
 ## Page Numbers
 
-Displays a list of page numbers for pagination
+Displays a list of page numbers for pagination ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-numbers))
 
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
@@ -622,7 +622,7 @@ Displays a list of page numbers for pagination
 
 ## Previous Page
 
-Displays the previous posts page link.
+Displays the previous posts page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-previous))
 
 -	**Name:** core/query-pagination-previous
 -	**Category:** theme
@@ -631,7 +631,7 @@ Displays the previous posts page link.
 
 ## Query Title
 
-Display the query title.
+Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-title))
 
 -	**Name:** core/query-title
 -	**Category:** theme
@@ -640,7 +640,7 @@ Display the query title.
 
 ## Quote
 
-Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar
+Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/quote))
 
 -	**Name:** core/quote
 -	**Category:** text
@@ -649,7 +649,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 ## RSS
 
-Display entries from any RSS or Atom feed.
+Display entries from any RSS or Atom feed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/rss))
 
 -	**Name:** core/rss
 -	**Category:** widgets
@@ -658,7 +658,7 @@ Display entries from any RSS or Atom feed.
 
 ## Search
 
-Help visitors find your content.
+Help visitors find your content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/search))
 
 -	**Name:** core/search
 -	**Category:** widgets
@@ -667,7 +667,7 @@ Help visitors find your content.
 
 ## Separator
 
-Create a break between ideas or sections with a horizontal separator.
+Create a break between ideas or sections with a horizontal separator. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/separator))
 
 -	**Name:** core/separator
 -	**Category:** design
@@ -676,7 +676,7 @@ Create a break between ideas or sections with a horizontal separator.
 
 ## Shortcode
 
-Insert additional custom elements with a WordPress shortcode.
+Insert additional custom elements with a WordPress shortcode. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/shortcode))
 
 -	**Name:** core/shortcode
 -	**Category:** widgets
@@ -685,7 +685,7 @@ Insert additional custom elements with a WordPress shortcode.
 
 ## Site Logo
 
-Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used. This is different than the site icon, which is the smaller image visible in your dashboard, browser tabs, etc used to help others recognize this site.
+Display a graphic to represent this site. Update the block, and the changes apply everywhere it’s used. This is different than the site icon, which is the smaller image visible in your dashboard, browser tabs, etc used to help others recognize this site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
 
 -	**Name:** core/site-logo
 -	**Category:** theme
@@ -694,7 +694,7 @@ Display a graphic to represent this site. Update the block, and the changes appl
 
 ## Site Tagline
 
-Describe in a few words what the site is about. The tagline can be used in search results or when sharing on social networks even if it's not displayed in the theme design.
+Describe in a few words what the site is about. The tagline can be used in search results or when sharing on social networks even if it's not displayed in the theme design. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-tagline))
 
 -	**Name:** core/site-tagline
 -	**Category:** theme
@@ -703,7 +703,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 
 ## Site Title
 
-Displays the name of this site. Update the block, and the changes apply everywhere it’s used. This will also appear in the browser title bar and in search results.
+Displays the name of this site. Update the block, and the changes apply everywhere it’s used. This will also appear in the browser title bar and in search results. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-title))
 
 -	**Name:** core/site-title
 -	**Category:** theme
@@ -712,7 +712,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 ## Social Icon
 
-Display an icon linking to a social media profile or site.
+Display an icon linking to a social media profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))
 
 -	**Name:** core/social-link
 -	**Category:** widgets
@@ -721,7 +721,7 @@ Display an icon linking to a social media profile or site.
 
 ## Social Icons
 
-Display icons linking to your social media profiles or sites.
+Display icons linking to your social media profiles or sites. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-links))
 
 -	**Name:** core/social-links
 -	**Category:** widgets
@@ -730,7 +730,7 @@ Display icons linking to your social media profiles or sites.
 
 ## Spacer
 
-Add white space between blocks and customize its height.
+Add white space between blocks and customize its height. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/spacer))
 
 -	**Name:** core/spacer
 -	**Category:** design
@@ -739,7 +739,7 @@ Add white space between blocks and customize its height.
 
 ## Table
 
-Create structured content in rows and columns to display information.
+Create structured content in rows and columns to display information. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table))
 
 -	**Name:** core/table
 -	**Category:** text
@@ -748,7 +748,7 @@ Create structured content in rows and columns to display information.
 
 ## Table of Contents
 
-Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
+Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table-of-contents))
 
 -	**Name:** core/table-of-contents
 -	**Category:** layout
@@ -757,7 +757,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 
 ## Tag Cloud
 
-A cloud of your most used tags.
+A cloud of your most used tags. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tag-cloud))
 
 -	**Name:** core/tag-cloud
 -	**Category:** widgets
@@ -766,7 +766,7 @@ A cloud of your most used tags.
 
 ## Template Part
 
-Edit the different global regions of your site, like the header, footer, sidebar, or create your own.
+Edit the different global regions of your site, like the header, footer, sidebar, or create your own. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/template-part))
 
 -	**Name:** core/template-part
 -	**Category:** theme
@@ -775,7 +775,7 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 ## Term Description
 
-Display the description of categories, tags and custom taxonomies when viewing an archive.
+Display the description of categories, tags and custom taxonomies when viewing an archive. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-description))
 
 -	**Name:** core/term-description
 -	**Category:** theme
@@ -784,7 +784,7 @@ Display the description of categories, tags and custom taxonomies when viewing a
 
 ## Text Columns (deprecated)
 
-This block is deprecated. Please use the Columns block instead.
+This block is deprecated. Please use the Columns block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/text-columns))
 
 -	**Name:** core/text-columns
 -	**Category:** design
@@ -793,7 +793,7 @@ This block is deprecated. Please use the Columns block instead.
 
 ## Verse
 
-Insert poetry. Use special spacing formats. Or quote song lyrics.
+Insert poetry. Use special spacing formats. Or quote song lyrics. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/verse))
 
 -	**Name:** core/verse
 -	**Category:** text
@@ -802,7 +802,7 @@ Insert poetry. Use special spacing formats. Or quote song lyrics.
 
 ## Video
 
-Embed a video from your media library or upload a new one.
+Embed a video from your media library or upload a new one. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/video))
 
 -	**Name:** core/video
 -	**Category:** media

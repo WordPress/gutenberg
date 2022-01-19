@@ -5,6 +5,7 @@
 ### Enhancement
 
 -   Speed up scaffolding process by omitting WordPress dependencies in the template ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
+-   Update link to block registration reference ([#37674](https://github.com/WordPress/gutenberg/pull/37674))
 
 ## 1.3.0 (2021-07-21)
 
