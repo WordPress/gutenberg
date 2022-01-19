@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import path from 'path';
 import { get } from 'lodash';
 import { toMatchInlineSnapshot, toMatchSnapshot } from 'jest-snapshot';
 
@@ -15,6 +16,7 @@ import {
 	isOfflineMode,
 	setBrowserViewport,
 	trashAllPosts,
+	__experimentalSetupRest as setupRest,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -37,6 +39,19 @@ const THROTTLE_CPU = process.env.THROTTLE_CPU;
  * @type {string|undefined}
  */
 const SLOW_NETWORK = process.env.SLOW_NETWORK;
+
+/**
+ * Admin storage state path.
+ *
+ * @type {string|undefined}
+ */
+let adminStorageStatePath = process.env.ADMIN_STORAGE_STATE_PATH;
+if ( adminStorageStatePath && ! path.isAbsolute( adminStorageStatePath ) ) {
+	adminStorageStatePath = path.resolve(
+		process.cwd(),
+		adminStorageStatePath
+	);
+}
 
 /**
  * Emulate no internet connection.
@@ -238,6 +253,8 @@ expect.extend( {
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
 beforeAll( async () => {
+	await setupRest( adminStorageStatePath );
+
 	capturePageEventsForTearDown();
 	enablePageDialogAccept();
 	observeConsoleLogging();

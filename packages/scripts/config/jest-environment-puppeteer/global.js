@@ -16,6 +16,7 @@
 /**
  * External dependencies
  */
+const path = require( 'path' );
 const {
 	setup: setupServer,
 	teardown: teardownServer,
@@ -28,6 +29,12 @@ const chalk = require( 'chalk' );
  * Internal dependencies
  */
 const { readConfig, getPuppeteer } = require( './config' );
+
+/**
+ * WordPress dependencies
+ */
+// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+import { __experimentalSetupRest as setupRest } from '@wordpress/e2e-test-utils';
 
 let browser;
 
@@ -77,6 +84,16 @@ async function setup( jestConfig = {} ) {
 			throw error;
 		}
 	}
+
+	let adminStorageStatePath = process.env.ADMIN_STORAGE_STATE_PATH;
+	if ( adminStorageStatePath && ! path.isAbsolute( adminStorageStatePath ) ) {
+		adminStorageStatePath = path.resolve(
+			process.cwd(),
+			adminStorageStatePath
+		);
+	}
+
+	await setupRest( adminStorageStatePath );
 }
 
 async function teardown( jestConfig = {} ) {

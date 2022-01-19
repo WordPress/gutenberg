@@ -8,16 +8,27 @@ import { kebabCase } from 'lodash';
  */
 import { rest } from './rest-api';
 
-const pluginsMapPromise = ( async function getPluginsMap() {
+/** @type {Record<string, string>} */
+let pluginsCache;
+
+/**
+ * Fetch the plugins from API and cache them in memory,
+ * since they are unlikely to change during testing.
+ */
+async function getPluginsMap() {
+	if ( pluginsCache ) {
+		return pluginsCache;
+	}
+
 	const plugins = await rest( { path: '/wp/v2/plugins' } );
-	const map = {};
+	pluginsCache = {};
 	for ( const plugin of plugins ) {
 		// Ideally, we should be using sanitize_title() in PHP rather than kebabCase(),
 		// but we don't have the exact port of it in JS.
-		map[ kebabCase( plugin.name ) ] = plugin.plugin;
+		pluginsCache[ kebabCase( plugin.name ) ] = plugin.plugin;
 	}
-	return map;
-} )();
+	return pluginsCache;
+}
 
 /**
  * Activates an installed plugin.
@@ -25,7 +36,7 @@ const pluginsMapPromise = ( async function getPluginsMap() {
  * @param {string} slug Plugin slug.
  */
 async function activatePlugin( slug ) {
-	const pluginsMap = await pluginsMapPromise;
+	const pluginsMap = await getPluginsMap();
 	const plugin = pluginsMap[ slug ];
 
 	await rest( {
@@ -41,7 +52,7 @@ async function activatePlugin( slug ) {
  * @param {string} slug Plugin slug.
  */
 async function deactivatePlugin( slug ) {
-	const pluginsMap = await pluginsMapPromise;
+	const pluginsMap = await getPluginsMap();
 	const plugin = pluginsMap[ slug ];
 
 	await rest( {

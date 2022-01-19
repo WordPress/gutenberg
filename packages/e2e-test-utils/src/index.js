@@ -94,6 +94,7 @@ export { openPreviewPage } from './preview';
 export { wpDataSelect } from './wp-data-select';
 export { deleteAllWidgets } from './widgets';
 export {
+	setupRest as __experimentalSetupRest,
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
