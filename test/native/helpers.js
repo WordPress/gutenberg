@@ -50,9 +50,10 @@ export function initializeEditor( props ) {
 	// that can be covered in the integration tests.
 	// Reference: https://git.io/JPHn6
 	return new Promise( ( resolve ) => {
-		// Some of the store updates that happen upon editor initialization are executed at the end of the current
-		// Javascript block execution and after the test is finished. In order to prevent "act" warnings due to
-		// this behavior, we wait for the execution block to be finished before acting on the test.
+		// During editor initialization, asynchronous store resolvers rely upon `setTimeout` to run at the end
+		// of the current JavaScript block execution. In order to prevent "act" warnings triggered by updates
+		// to the React tree, we leverage `setImmediate` to await the resolution of the current block execution
+		// before proceeding.
 		act(
 			() => new Promise( ( actResolve ) => setImmediate( actResolve ) )
 		).then( () => {
