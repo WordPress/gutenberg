@@ -46,8 +46,6 @@ const variations = [
 				pages: 1,
 				offset: 0,
 				postType: 'post',
-				categoryIds: [],
-				tagIds: [],
 				order: 'desc',
 				orderBy: 'date',
 				author: '',
