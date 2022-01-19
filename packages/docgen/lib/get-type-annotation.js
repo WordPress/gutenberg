@@ -472,15 +472,21 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 		);
 	}
 
+	if ( babelTypes.isAssignmentPattern( paramToken ) ) {
+		paramToken = paramToken.left;
+	}
+
+	if (
+		! paramToken.typeAnnotation ||
+		! paramToken.typeAnnotation.typeAnnotation
+	) {
+		return null;
+	}
+
+	const paramType = paramToken.typeAnnotation.typeAnnotation;
 	const isQualifiedName = tag.name.includes( '.' );
 
 	try {
-		if ( babelTypes.isAssignmentPattern( paramToken ) ) {
-			paramToken = paramToken.left;
-		}
-
-		const paramType = paramToken.typeAnnotation.typeAnnotation;
-
 		if (
 			babelTypes.isIdentifier( paramToken ) ||
 			babelTypes.isRestElement( paramToken ) ||
@@ -496,7 +502,7 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 		}
 	} catch ( e ) {
 		throw new Error(
-			`Could not find type for parameter '${
+			`Could not understand type for parameter '${
 				tag.name
 			}' in function '${ getFunctionNameForError( declarationToken ) }'.`
 		);
