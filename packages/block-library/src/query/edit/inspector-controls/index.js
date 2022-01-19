@@ -15,11 +15,7 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	InspectorControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
+import { InspectorControls } from '@wordpress/block-editor';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 
 /**
@@ -55,26 +51,6 @@ export default function QueryInspectorControls( {
 	useEffect( () => {
 		setShowSticky( postType === 'post' );
 	}, [ postType ] );
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
-	// We need to migrate `categoryIds` and `tagIds` to `tax_query`.
-	// TODO: We could probably use the `deprecations` API but it
-	// doesn't support dynamic blocks deprecations properly.
-	useEffect( () => {
-		if ( query.categoryIds?.length || query.tagIds?.length ) {
-			const updateObj = { categoryIds: [], tagIds: [] };
-			updateObj.taxQuery = {
-				category: !! query.categoryIds?.length
-					? query.categoryIds
-					: undefined,
-				post_tag: !! query.tagIds?.length ? query.tagIds : undefined,
-				...taxQuery,
-			};
-			__unstableMarkNextChangeAsNotPersistent();
-			setQuery( updateObj );
-		}
-	}, [ query.categoryIds, query.tagIds ] );
 	const onPostTypeChange = ( newValue ) => {
 		const updateQuery = { postType: newValue };
 		// We need to dynamically update the `taxQuery` property,
