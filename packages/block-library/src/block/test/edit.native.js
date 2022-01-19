@@ -74,11 +74,7 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByText,
-		} = await initializeEditor( {
+		const { getByA11yLabel, getByTestId, getByText } = initializeEditor( {
 			initialHtml: '',
 			capabilities: { reusableBlock: true },
 		} );
@@ -87,7 +83,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
 
 		// Navigate to reusable tab
-		const reusableSegment = getByText( 'Reusable' );
+		const reusableSegment = await waitFor( () => getByText( 'Reusable' ) );
 		// onLayout event is required by Segment component
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
@@ -127,7 +123,7 @@ describe( 'Reusable block', () => {
 		const id = 3;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByA11yLabel } = initializeEditor( {
 			initialHtml,
 		} );
 
@@ -162,7 +158,7 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByA11yLabel } = initializeEditor( {
 			initialHtml,
 		} );
 
