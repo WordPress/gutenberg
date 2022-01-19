@@ -3,6 +3,7 @@
  */
 import { act, fireEvent, initializeEditor, getEditorHtml } from 'test/helpers';
 import { Image } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
@@ -35,6 +36,9 @@ jest.mock( 'lodash', () => {
 
 const apiFetchPromise = Promise.resolve( {} );
 apiFetch.mockImplementation( () => apiFetchPromise );
+
+const clipboardPromise = Promise.resolve( '' );
+Clipboard.getString.mockImplementation( () => clipboardPromise );
 
 beforeAll( () => {
 	registerCoreBlocks();
@@ -127,6 +131,8 @@ describe( 'Image Block', () => {
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.changeText(
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
@@ -159,12 +165,16 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.changeText(
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		// Await asynchronous fetch of clipboard
+		await act( () => clipboardPromise );
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
