@@ -18,6 +18,12 @@ The CSS styles that are part of the block, either via its stylesheet to the bloc
 
 Compare to <a href="global-styles">Global Styles</a>. In contraposition to "Global Styles", block styles are sometimes referred to as "Local Styles".
 
+## Block Supports
+
+An API for blocks to declare what feautures they support. By declaring support for a feature, the API would add aditional <a href="#attributes">attributes</a> to the block and matching UI controls for most of the existing block supports.
+
+See <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/">Block Supports reference documentation</a> for a deep dive into the API.
+
 ## Block Theme
 
 A theme built in block forward way that allows Full Site Editing to work. The core of a block theme are its block templates and block template parts. To date, block theme templates have been HTML files of block markup that map to templates from the standard WordPress template hierarchy.
