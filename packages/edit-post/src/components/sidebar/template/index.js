@@ -55,6 +55,7 @@ export function TemplatePanel() {
 
 		const wpTemplates = getEntityRecords( 'postType', 'wp_template', {
 			post_type: currentPostType,
+			per_page: -1,
 		} );
 
 		const newAvailableTemplates = fromPairs(
