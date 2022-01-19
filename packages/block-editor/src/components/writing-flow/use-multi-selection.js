@@ -8,6 +8,7 @@ import { first, last } from 'lodash';
  */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -121,7 +122,16 @@ export default function useMultiSelection() {
 
 			const { length } = multiSelectedBlockClientIds;
 
-			if ( length < 2 ) {
+			//  This filter allows to override the paragraph selection count in Gutenberg.
+			//  This is so that we can select specifically the number of paragraphs that can
+			//  be selected letter by letter instead of the whole paragraph being selected.
+
+			const paragraphLength = applyFilters(
+				'editor.paragraph.selectionLength',
+				2
+			);
+
+			if ( length < paragraphLength ) {
 				return;
 			}
 
