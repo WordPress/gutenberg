@@ -353,8 +353,8 @@ export default compose( [
 					);
 
 					blockToInsert = createBlock( directInsertBlock.name, {
-						...newAttributes,
 						...( directInsertBlock.attributes || {} ),
+						...newAttributes,
 					} );
 				} else {
 					blockToInsert = createBlock( allowedBlockType.name );
