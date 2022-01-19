@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 12.4.0-rc.1 =
+= 12.4.0 =
 
 
 
@@ -8,9 +8,9 @@
 
 #### Accessibility
 - Accessibility improvements for Block Inserter. ([37357](https://github.com/WordPress/gutenberg/pull/37357))
+- Try possibly better method for Block Inserter Search focus. ([37793](https://github.com/WordPress/gutenberg/pull/37793))
 - Accessibility improvements for List View Part 1. ([37798](https://github.com/WordPress/gutenberg/pull/37798))
 - Improve successful draft save notification for screen readers. ([37683](https://github.com/WordPress/gutenberg/pull/37683))
-- Try possibly better method for Block Inserter Search focus. ([37793](https://github.com/WordPress/gutenberg/pull/37793))
 
 #### Block Library
 - Audio: Add uploading state. ([37739](https://github.com/WordPress/gutenberg/pull/37739))
@@ -112,7 +112,7 @@
   - Fix issue template typo. ([37825](https://github.com/WordPress/gutenberg/pull/37825))
 - Add automated theme.json reference documentation. ([37569](https://github.com/WordPress/gutenberg/pull/37569))
 - Add link to block source for reference. ([37750](https://github.com/WordPress/gutenberg/pull/37750))
-- Add mising end tag for codetabs in stylesheet guide. ([37827](https://github.com/WordPress/gutenberg/pull/37827))
+- Add missing end tag for codetabs in stylesheet guide. ([37827](https://github.com/WordPress/gutenberg/pull/37827))
 - Fix broken URL on block variation page. ([37702](https://github.com/WordPress/gutenberg/pull/37702))
 - Fix type of saved $content. ([37688](https://github.com/WordPress/gutenberg/pull/37688))
   - Fix type of saved content - part two. ([37740](https://github.com/WordPress/gutenberg/pull/37740))
@@ -126,6 +126,7 @@
 - Updated ColorIndicator readme. ([37638](https://github.com/WordPress/gutenberg/pull/37638))
 - Update the Post Author block description. ([37836](https://github.com/WordPress/gutenberg/pull/37836))
 - Fixing broken links and adding colon. ([37664](https://github.com/WordPress/gutenberg/pull/37664))
+- Improve Gutenberg release documentation. ([37898](https://github.com/WordPress/gutenberg/pull/37898))
 
 
 ### Code Quality
@@ -169,6 +170,8 @@
 #### Create Block
 - Allow custom folder name for a block. ([37612](https://github.com/WordPress/gutenberg/pull/37612))
 - Speed up scaffolding by omitting WordPress dependencies. ([37639](https://github.com/WordPress/gutenberg/pull/37639))
+
+
 
 
 
