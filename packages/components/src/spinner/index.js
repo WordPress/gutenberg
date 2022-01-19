@@ -25,10 +25,7 @@ export const StyledSpinner = styled.span`
 export default function Spinner() {
 	const viewBox = `0 0 ${ CONFIG.spinnerSize } ${ CONFIG.spinnerSize }`;
 	const radius = Number( CONFIG.spinnerSize ) / 2;
-	const strokeDasharray = [
-		Number( CONFIG.spinnerSize ),
-		Number( CONFIG.spinnerSize ) * 10,
-	];
+	const strokeDasharray = `${ CONFIG.spinnerSize }, calc(${ CONFIG.spinnerSize } * 10)`;
 
 	return (
 		<StyledSpinner className="components-spinner">
@@ -45,8 +42,8 @@ export default function Spinner() {
 					cx="50%"
 					cy="50%"
 					r={ radius }
-					stroke-dasharray={ strokeDasharray }
-					vector-effect="non-scaling-stroke"
+					strokeDasharray={ strokeDasharray }
+					vectorEffect="non-scaling-stroke"
 				/>
 			</SVG>
 		</StyledSpinner>
