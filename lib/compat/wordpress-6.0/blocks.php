@@ -95,7 +95,6 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 						'taxonomy'         => $taxonomy,
 						'terms'            => $terms,
 						'include_children' => false,
-
 					);
 				}
 			}
