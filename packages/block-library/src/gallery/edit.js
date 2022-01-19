@@ -297,7 +297,7 @@ function GalleryEdit( props ) {
 			)
 		);
 
-		//If new blocks added select the first of these so they scroll into view.
+		// If new blocks added select the first of these so they scroll into view.
 		if ( newBlocks?.length && existingImageBlocks?.length ) {
 			multiSelect(
 				newBlocks[ 0 ].clientId,

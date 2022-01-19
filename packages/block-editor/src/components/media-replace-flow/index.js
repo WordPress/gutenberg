@@ -131,6 +131,8 @@ const MediaReplaceFlow = ( {
 		);
 	};
 
+	const gallery = multiple && onlyAllowsImages();
+
 	const POPOVER_PROPS = {
 		isAlternate: true,
 	};
@@ -154,7 +156,7 @@ const MediaReplaceFlow = ( {
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
 						<MediaUpload
-							gallery={ multiple && onlyAllowsImages() }
+							gallery={ gallery }
 							addToGallery={ addToGallery }
 							multiple={ multiple }
 							value={ multiple ? mediaIds : mediaId }
