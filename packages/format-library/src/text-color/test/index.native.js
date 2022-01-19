@@ -32,7 +32,7 @@ afterAll( () => {
 
 describe( 'Text color', () => {
 	it( 'shows the text color formatting button in the toolbar', async () => {
-		const { getByA11yLabel } = await initializeEditor();
+		const { getByA11yLabel } = initializeEditor();
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>
@@ -59,7 +59,7 @@ describe( 'Text color', () => {
 			getByA11yLabel,
 			getByTestId,
 			getByA11yHint,
-		} = await initializeEditor();
+		} = initializeEditor();
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>
@@ -101,7 +101,7 @@ describe( 'Text color', () => {
 			getByTestId,
 			getByPlaceholderText,
 			getByA11yHint,
-		} = await initializeEditor();
+		} = initializeEditor();
 		const text = 'Hello this is a test';
 
 		// Wait for the editor placeholder
@@ -149,7 +149,7 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'creates a paragraph block with the text color format', async () => {
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByA11yLabel } = initializeEditor( {
 			initialHtml: TEXT_WITH_COLOR,
 		} );
 

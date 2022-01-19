@@ -63,7 +63,7 @@ describe( 'Image Block', () => {
 			</a>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -89,7 +89,7 @@ describe( 'Image Block', () => {
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -115,7 +115,7 @@ describe( 'Image Block', () => {
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -146,7 +146,7 @@ describe( 'Image Block', () => {
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -182,7 +182,7 @@ describe( 'Image Block', () => {
 			</a>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -206,7 +206,7 @@ describe( 'Image Block', () => {
 			</a>
 		<figcaption>Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
@@ -237,7 +237,7 @@ describe( 'Image Block', () => {
 			<figcaption>Mountain</figcaption>
 		</figure>
 		<!-- /wp:image -->`;
-		const screen = await initializeEditor( { initialHtml } );
+		const screen = initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
