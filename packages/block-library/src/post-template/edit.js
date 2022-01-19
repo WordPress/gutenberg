@@ -69,9 +69,7 @@ export default function PostTemplateEdit( {
 		query: {
 			perPage,
 			offset,
-			categoryIds = [],
 			postType,
-			tagIds = [],
 			order,
 			orderBy,
 			author,
@@ -157,8 +155,6 @@ export default function PostTemplateEdit( {
 			perPage,
 			page,
 			offset,
-			categoryIds,
-			tagIds,
 			order,
 			orderBy,
 			clientId,

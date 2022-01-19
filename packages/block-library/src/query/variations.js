@@ -20,8 +20,6 @@ const QUERY_DEFAULT_ATTRIBUTES = {
 		pages: 0,
 		offset: 0,
 		postType: 'post',
-		categoryIds: [],
-		tagIds: [],
 		order: 'desc',
 		orderBy: 'date',
 		author: '',
