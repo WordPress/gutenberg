@@ -1,6 +1,8 @@
 package org.wordpress.mobile.WPAndroidGlue
 
 import android.os.Bundle
+import androidx.annotation.VisibleForTesting
+import java.util.Locale
 
 data class GutenbergProps @JvmOverloads constructor(
     val enableContactInfoBlock: Boolean,
@@ -29,7 +31,7 @@ data class GutenbergProps @JvmOverloads constructor(
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
         putString(PROP_INITIAL_DATA, "")
         putString(PROP_INITIAL_TITLE, "")
-        putString(PROP_LOCALE, localeSlug)
+        putString(PROP_LOCALE, revertDeprecatedLanguageCode(localeSlug))
         putString(PROP_POST_TYPE, postType)
         putInt(PROP_INITIAL_FEATURED_IMAGE_ID, featuredImageId)
         putBundle(PROP_TRANSLATIONS, translations)
@@ -105,5 +107,16 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
+
+        /**
+         * Android converts some new language codes to older, deprecated ones, to preserve
+         * backward compatibility. Gutenberg, however, uses the new language codes, so this
+         * function uses Locale::toLanguageTag to convert back to the "new" codes that Gutenberg
+         * requires.
+         * See https://developer.android.com/reference/java/util/Locale#legacy-language-codes
+         */
+        @VisibleForTesting
+        fun revertDeprecatedLanguageCode(localeSlug: String): String =
+                Locale.forLanguageTag(localeSlug).toLanguageTag()
     }
 }

@@ -36,6 +36,7 @@ export const LinkControlSearchItem = ( {
 					icon={ globe }
 				/>
 			) }
+
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight
@@ -57,12 +58,20 @@ export const LinkControlSearchItem = ( {
 			</span>
 			{ shouldShowType && suggestion.type && (
 				<span className="block-editor-link-control__search-item-type">
-					{ /* Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label. */ }
-					{ suggestion.type === 'post_tag' ? 'tag' : suggestion.type }
+					{ getVisualTypeName( suggestion ) }
 				</span>
 			) }
 		</Button>
 	);
 };
+
+function getVisualTypeName( suggestion ) {
+	if ( suggestion.isFrontPage ) {
+		return 'front page';
+	}
+
+	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
+	return suggestion.type === 'post_tag' ? 'tag' : suggestion.type;
+}
 
 export default LinkControlSearchItem;
