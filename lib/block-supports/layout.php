@@ -29,7 +29,7 @@ function gutenberg_register_layout_support( $block_type ) {
  * Generates the CSS corresponding to the provided layout.
  *
  * @param string  $selector CSS selector.
- * @param array   $layout   Layout object. The one that is passed has already checked the existance of default block layout.
+ * @param array   $layout   Layout object. The one that is passed has already checked the existence of default block layout.
  * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
  * @param string  $gap_value The block gap value to apply.
  *
