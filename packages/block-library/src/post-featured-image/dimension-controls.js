@@ -166,7 +166,7 @@ const DimensionControls = ( {
 						onChange={ ( nextSizeSlug ) =>
 							setAttributes( { sizeSlug: nextSizeSlug } )
 						}
-						help={ __( 'Select the image source to use.' ) }
+						help={ __( 'Select the size of the source image.' ) }
 					/>
 				</ToolsPanelItem>
 			) }
