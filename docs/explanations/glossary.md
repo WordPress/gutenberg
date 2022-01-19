@@ -20,7 +20,7 @@ Compare to <a href="#global-styles">Global Styles</a>. In contraposition to "Glo
 
 ## Block Supports
 
-An API for blocks to declare what feautures they support. By declaring support for a feature, the API would add aditional <a href="#attributes">attributes</a> to the block and matching UI controls for most of the existing block supports.
+An API for blocks to declare what features they support. By declaring support for a feature, the API would add additional <a href="#attributes">attributes</a> to the block and matching UI controls for most of the existing block supports.
 
 See <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/">Block Supports reference documentation</a> for a deep dive into the API.
 
