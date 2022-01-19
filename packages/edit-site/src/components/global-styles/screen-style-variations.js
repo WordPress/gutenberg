@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { isEqual } from 'lodash';
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
@@ -20,8 +26,12 @@ import { GlobalStylesContext } from './context';
 import StylesPreview from './preview';
 import ScreenHeader from './header';
 
+function compareVariations( a, b ) {
+	return isEqual( a.styles, b.styles ) && isEqual( a.settings, b.settings );
+}
+
 function Variation( { variation } ) {
-	const { base, setUserConfig } = useContext( GlobalStylesContext );
+	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
 		return {
 			user: {
@@ -50,15 +60,26 @@ function Variation( { variation } ) {
 		}
 	};
 
+	const isActive = useMemo( () => {
+		return compareVariations( user, variation );
+	}, [ user, variation ] );
+
 	return (
 		<GlobalStylesContext.Provider value={ context }>
-			<StylesPreview
-				className="edit-site-global-styles-variations_item"
+			<div
+				className={ classnames(
+					'edit-site-global-styles-variations_item',
+					{
+						'is-active': isActive,
+					}
+				) }
 				role="button"
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
-				height={ 100 }
-			/>
+				tabIndex="0"
+			>
+				<StylesPreview height={ 100 } />
+			</div>
 		</GlobalStylesContext.Provider>
 	);
 }
@@ -71,6 +92,17 @@ function ScreenStyleVariations() {
 			).__experimentalGetCurrentThemeGlobalStylesVariations(),
 		};
 	}, [] );
+
+	const withEmptyVariation = useMemo( () => {
+		return [
+			{
+				name: __( 'Default' ),
+				settings: {},
+				styles: {},
+			},
+			...variations,
+		];
+	}, [ variations ] );
 
 	return (
 		<>
@@ -85,7 +117,7 @@ function ScreenStyleVariations() {
 			<Card size="small" isBorderless>
 				<CardBody>
 					<Grid columns={ 2 }>
-						{ variations?.map( ( variation, index ) => (
+						{ withEmptyVariation?.map( ( variation, index ) => (
 							<Variation key={ index } variation={ variation } />
 						) ) }
 					</Grid>

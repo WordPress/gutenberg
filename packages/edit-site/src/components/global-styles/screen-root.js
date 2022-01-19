@@ -36,7 +36,9 @@ function ScreenRoot() {
 		<Card size="small">
 			<CardBody>
 				<VStack spacing={ 2 }>
-					<StylesPreview />
+					<Card>
+						<StylesPreview />
+					</Card>
 					{ !! variations?.length && (
 						<NavigationButton path="/variations">
 							<HStack justify="space-between">

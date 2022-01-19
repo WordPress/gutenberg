@@ -8,6 +8,7 @@
 
 .edit-site-global-styles-preview__iframe {
 	max-width: 100%;
+	display: block;
 }
 
 .edit-site-typography-panel__preview {
@@ -68,4 +69,23 @@
 .edit-site-screen-link-color__control,
 .edit-site-screen-background-color__control {
 	padding: $grid-unit-20;
+}
+
+.edit-site-global-styles-variations_item {
+	box-sizing: border-box;
+	padding: 3px;
+	border-radius: $radius-block-ui;
+	border: $gray-200 1px solid;
+
+	&.is-active {
+		border: $gray-900 1px solid;
+	}
+
+	&:hover {
+		border: var(--wp-admin-theme-color) 1px solid;
+	}
+
+	&:focus {
+		border: var(--wp-admin-theme-color) 1px solid;
+	}
 }
