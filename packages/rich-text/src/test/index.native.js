@@ -225,16 +225,15 @@ describe( '<RichText/>', () => {
 			expect( screen.toJSON() ).toMatchSnapshot();
 		} );
 
-		it( 'renders component with style and font size', async () => {
+		it( 'renders component with style and font size', () => {
 			// Arrange
 			const initialHtml = `<!-- wp:paragraph {"style":{"color":{"text":"#fcb900"},"typography":{"fontSize":35.56}}} -->
 					<p class="has-text-color" style="color:#fcb900;font-size:35.56px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed imperdiet ut nibh vitae ornare. Sed auctor nec augue at blandit.</p>
 					<!-- /wp:paragraph -->`;
 			// Act
-			const { unmount } = await initializeEditor( { initialHtml } );
+			initializeEditor( { initialHtml } );
 			// Assert
 			expect( getEditorHtml() ).toMatchSnapshot();
-			unmount();
 		} );
 
 		it( 'should update the font size with decimals when style prop with font size property is provided', () => {
