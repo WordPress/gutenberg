@@ -17,6 +17,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] [Image block] Fix missing translations [#37956]
 -   [*] Fix cut-off setting labels by properly wrapping the text [#37993]
 -   [*] Highlight text: fix applying formatting for non-selected text [#37915]
+-   [*] Fix missing translations of color settings [#38026]
 
 ## 1.69.0
 
