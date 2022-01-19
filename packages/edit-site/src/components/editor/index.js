@@ -105,6 +105,7 @@ function Editor( { onError } ) {
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const [
 		isEntitiesSavedStatesOpen,
@@ -146,6 +147,19 @@ function Editor( { onError } ) {
 			document.body.classList.remove( 'is-navigation-sidebar-open' );
 		}
 	}, [ isNavigationOpen ] );
+
+	useEffect(
+		function openGlobalStylesOnLoad() {
+			const searchParams = new URLSearchParams( window.location.search );
+			if ( searchParams.get( 'styles' ) === 'open' ) {
+				enableComplementaryArea(
+					'core/edit-site',
+					'edit-site/global-styles'
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
 
 	// Don't render the Editor until the settings are set and loaded
 	const isReady =
