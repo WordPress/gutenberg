@@ -231,40 +231,6 @@ export function* setPage( page ) {
 }
 
 /**
- * Displays the site homepage for editing in the editor.
- */
-export function* showHomepage() {
-	const {
-		show_on_front: showOnFront,
-		page_on_front: frontpageId,
-	} = yield controls.resolveSelect(
-		coreStore,
-		'getEntityRecord',
-		'root',
-		'site'
-	);
-
-	const { siteUrl } = yield controls.select(
-		editSiteStoreName,
-		'getSettings'
-	);
-
-	const page = {
-		path: siteUrl,
-		context:
-			showOnFront === 'page'
-				? {
-						postType: 'page',
-						postId: frontpageId,
-				  }
-				: {},
-	};
-
-	const homeTemplate = yield* setPage( page );
-	yield setHomeTemplateId( homeTemplate );
-}
-
-/**
  * Returns an action object used to set the active navigation panel menu.
  *
  * @param {string} menu Menu prop of active menu.
