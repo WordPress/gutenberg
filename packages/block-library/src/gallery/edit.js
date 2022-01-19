@@ -99,7 +99,7 @@ function GalleryEdit( props ) {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
-		selectBlock,
+		multiSelect,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -299,7 +299,10 @@ function GalleryEdit( props ) {
 
 		//If new blocks added select the first of these so they scroll into view.
 		if ( newBlocks?.length && existingImageBlocks?.length ) {
-			selectBlock( newBlocks[ 0 ].clientId );
+			multiSelect(
+				newBlocks[ 0 ].clientId,
+				newBlocks[ newBlocks.length - 1 ].clientId
+			);
 		}
 	}
 
