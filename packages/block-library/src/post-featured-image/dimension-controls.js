@@ -116,29 +116,6 @@ const DimensionControls = ( {
 					units={ units }
 				/>
 			</ToolsPanelItem>
-			{ !! imageSizeOptions.length && (
-				<ToolsPanelItem
-					hasValue={ () => !! sizeSlug && sizeSlug !== DEFAULT_SIZE }
-					label={ __( 'Size' ) }
-					onDeselect={ () =>
-						setAttributes( { sizeSlug: undefined } )
-					}
-					resetAllFilter={ () => ( {
-						sizeSlug: undefined,
-					} ) }
-					isShownByDefault={ true }
-					panelId={ clientId }
-				>
-					<SelectControl
-						label={ __( 'Size' ) }
-						value={ sizeSlug || DEFAULT_SIZE }
-						options={ imageSizeOptions }
-						onChange={ ( nextSizeSlug ) =>
-							setAttributes( { sizeSlug: nextSizeSlug } )
-						}
-					/>
-				</ToolsPanelItem>
-			) }
 			{ !! height && (
 				<ToolsPanelItem
 					hasValue={ () => !! scale && scale !== DEFAULT_SCALE }
@@ -167,6 +144,29 @@ const DimensionControls = ( {
 					>
 						{ SCALE_OPTIONS }
 					</ToggleGroupControl>
+				</ToolsPanelItem>
+			) }
+			{ !! imageSizeOptions.length && (
+				<ToolsPanelItem
+					hasValue={ () => !! sizeSlug && sizeSlug !== DEFAULT_SIZE }
+					label={ __( 'Size' ) }
+					onDeselect={ () =>
+						setAttributes( { sizeSlug: undefined } )
+					}
+					resetAllFilter={ () => ( {
+						sizeSlug: undefined,
+					} ) }
+					isShownByDefault={ false }
+					panelId={ clientId }
+				>
+					<SelectControl
+						label={ __( 'Size' ) }
+						value={ sizeSlug || DEFAULT_SIZE }
+						options={ imageSizeOptions }
+						onChange={ ( nextSizeSlug ) =>
+							setAttributes( { sizeSlug: nextSizeSlug } )
+						}
+					/>
 				</ToolsPanelItem>
 			) }
 		</InspectorControls>
