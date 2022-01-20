@@ -42,14 +42,14 @@ export default function InserterSidebar() {
 			{ ...inserterDialogProps }
 			className="edit-site-editor__inserter-panel"
 		>
-			<TagName className="edit-post-editor__inserter-panel-header">
+			<TagName className="edit-site-editor__inserter-panel-header">
 				<Button
 					icon={ close }
 					label={ __( 'Close block inserter' ) }
 					onClick={ () => setIsInserterOpened( false ) }
 				/>
 			</TagName>
-			<div className="edit-post-editor__inserter-panel-content">
+			<div className="edit-site-editor__inserter-panel-content">
 				<Library
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobile }
