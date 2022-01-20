@@ -39,6 +39,5 @@ export const SpinnerIndicator = styled.circle`
 	stroke-linecap: round;
 	stroke-width: 1.5px;
 	transform-origin: 50% 50%;
-	stroke-dasharray: ${ CONFIG.spinnerSize },
-		calc( ${ CONFIG.spinnerSize } * 10 );
+	stroke-dasharray: ${ CONFIG.spinnerSize }, ${ CONFIG.spinnerSize * 10 };
 `;
