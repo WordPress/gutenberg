@@ -9,11 +9,6 @@ import { keyframes } from '@emotion/react';
  */
 import { COLORS, CONFIG } from '../utils';
 
-/**
- * WordPress dependencies
- */
-import { SVG, Circle } from '@wordpress/primitives';
-
 const spinAnimation = keyframes`
 	from {
 		transform: rotate(0deg);
@@ -23,9 +18,8 @@ const spinAnimation = keyframes`
 	}
 `;
 
-// A dedicated wrapper allows us to apply width and shadow color based on config values
-// The SVG can only have a centered stroke so a stacked box-shadow accomplishes a matching 1.5px border
-export const StyledSpinner = styled.span`
+// The Circle can only have a centered stroke so a stacked box-shadow on the svg accomplishes a matching 1.5px border
+export const StyledSpinner = styled.svg`
 	width: ${ CONFIG.spinnerSize }px;
 	height: ${ CONFIG.spinnerSize }px;
 	box-shadow: inset 0 0 0 0.75px ${ COLORS.gray[ 300 ] },
@@ -34,49 +28,37 @@ export const StyledSpinner = styled.span`
 	border-radius: 50%;
 	margin: auto;
 	position: relative;
-	color: var( --wp-admin-theme-color );
+	color: var(--wp-admin-theme-color);
+	overflow: visible;
 	animation: 1.4s linear infinite both ${ spinAnimation };
+`;
 
-	.components-spinner__track {
-		position: absolute;
-		top: 0;
-		left: 0;
-		overflow: visible;
-	}
-
-	.components-spinner__indicator {
-		fill: transparent;
-		stroke: currentColor;
-		stroke-linecap: round;
-		stroke-width: 1.5px;
-		transform-origin: 50% 50%;
-	}
+export const SpinnerIndicator = styled.circle`
+	fill: transparent;
+	stroke: currentColor;
+	stroke-linecap: round;
+	stroke-width: 1.5px;
+	transform-origin: 50% 50%;
+	stroke-dasharray: ${ CONFIG.spinnerSize }, calc(${ CONFIG.spinnerSize } * 10);
 `;
 
 export default function Spinner() {
-	const viewBox = `0 0 ${ CONFIG.spinnerSize } ${ CONFIG.spinnerSize }`;
-	const radius = Number( CONFIG.spinnerSize ) / 2;
-	const strokeDasharray = `${ CONFIG.spinnerSize }, calc(${ CONFIG.spinnerSize } * 10)`;
 
 	return (
-		<StyledSpinner className="components-spinner">
-			<SVG
-				viewBox={ viewBox }
-				xmlns="http://www.w3.org/2000/svg"
-				className="components-spinner__track"
-				role="img"
-				aria-hidden="true"
-				focusable="false"
-			>
-				<Circle
-					className="components-spinner__indicator"
+		<StyledSpinner 
+			className="components-spinner"
+			viewBox="0 0 100 100"
+			xmlns="http://www.w3.org/2000/svg"
+			role="img"
+			aria-hidden="true"
+			focusable="false"
+		>
+				<SpinnerIndicator
 					cx="50%"
 					cy="50%"
-					r={ radius }
-					strokeDasharray={ strokeDasharray }
+					r="50"
 					vectorEffect="non-scaling-stroke"
 				/>
-			</SVG>
 		</StyledSpinner>
 	);
 }
