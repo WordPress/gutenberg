@@ -760,7 +760,7 @@ describe( 'Navigation', () => {
 		expect( tagCount ).toBe( 1 );
 	} );
 
-	describe( 'Permission based restrictions', () => {
+	describe.skip( 'Permission based restrictions', () => {
 		const contributorUsername = 'contributoruser';
 		let contributorPassword;
 
