@@ -8,6 +8,7 @@
 
 ### Bug Fix
 
+-   Update `ToggleGroupControl` background active state to use a simple background color instead of animated backdrop ([38008](https://github.com/WordPress/gutenberg/pull/38008))
 -   Update label spacing for the `BoxControl`, `CustomGradientPicker`, `FormTokenField`, `InputControl`, and `ToolsPanel` components to use a bottom margin of `8px` for consistency. ([#37844](https://github.com/WordPress/gutenberg/pull/37844))
 -   Add missing styles to the `BaseControl.VisualLabel` component. ([#37747](https://github.com/WordPress/gutenberg/pull/37747))
 -   Prevent keyDown events from propagating up in `CustomSelectControl` ([#30557](https://github.com/WordPress/gutenberg/pull/30557))
