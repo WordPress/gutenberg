@@ -490,7 +490,7 @@ export class ImageEdit extends Component {
 				footerNote={
 					<>
 						{ __(
-							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
 						) }
 						<FooterMessageLink
 							href={
