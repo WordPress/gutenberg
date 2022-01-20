@@ -28,7 +28,7 @@ export const StyledSpinner = styled.svg`
 	border-radius: 50%;
 	margin: auto;
 	position: relative;
-	color: var(--wp-admin-theme-color);
+	color: var( --wp-admin-theme-color );
 	overflow: visible;
 	animation: 1.4s linear infinite both ${ spinAnimation };
 `;
@@ -39,13 +39,13 @@ export const SpinnerIndicator = styled.circle`
 	stroke-linecap: round;
 	stroke-width: 1.5px;
 	transform-origin: 50% 50%;
-	stroke-dasharray: ${ CONFIG.spinnerSize }, calc(${ CONFIG.spinnerSize } * 10);
+	stroke-dasharray: ${ CONFIG.spinnerSize },
+		calc( ${ CONFIG.spinnerSize } * 10 );
 `;
 
 export default function Spinner() {
-
 	return (
-		<StyledSpinner 
+		<StyledSpinner
 			className="components-spinner"
 			viewBox="0 0 100 100"
 			xmlns="http://www.w3.org/2000/svg"
@@ -53,12 +53,12 @@ export default function Spinner() {
 			aria-hidden="true"
 			focusable="false"
 		>
-				<SpinnerIndicator
-					cx="50%"
-					cy="50%"
-					r="50"
-					vectorEffect="non-scaling-stroke"
-				/>
+			<SpinnerIndicator
+				cx="50%"
+				cy="50%"
+				r="50"
+				vectorEffect="non-scaling-stroke"
+			/>
 		</StyledSpinner>
 	);
 }
