@@ -17,17 +17,17 @@ const ALLOWED_BLOCKS = [ buttonBlockName ];
 
 const DEFAULT_BLOCK = {
 	name: buttonBlockName,
-	attributesToCopy: {
-		backgroundColor: true,
-		border: true,
-		className: true,
-		fontSize: true,
-		fontFamily: true,
-		gradient: true,
-		style: true,
-		textColor: true,
-		width: true,
-	},
+	attributesToCopy: [
+		'backgroundColor',
+		'border',
+		'className',
+		'fontFamily',
+		'fontSize',
+		'gradient',
+		'style',
+		'textColor',
+		'width',
+	],
 };
 
 function ButtonsEdit( { attributes: { layout = {} } } ) {

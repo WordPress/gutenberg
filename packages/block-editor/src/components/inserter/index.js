@@ -303,15 +303,12 @@ export default compose( [
 					}
 
 					// Copy over only those attributes flagged to be copied.
-					for ( const attribute in attributesToCopy ) {
-						if (
-							attributesToCopy[ attribute ] &&
-							adjacentAttributes.hasOwnProperty( attribute )
-						) {
+					attributesToCopy.forEach( ( attribute ) => {
+						if ( adjacentAttributes.hasOwnProperty( attribute ) ) {
 							result[ attribute ] =
 								adjacentAttributes[ attribute ];
 						}
-					}
+					} );
 
 					return result;
 				}
