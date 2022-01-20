@@ -159,7 +159,7 @@ export const UI = {
 	borderHover: G2.gray[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: G2.gray[ 400 ],
-	borderLight: G2.gray[ 200 ],
+	borderLight: G2.gray[ 300 ],
 	label: DARK_GRAY[ 500 ],
 	textDisabled: DARK_GRAY[ 150 ],
 	textDark: BASE.white,
