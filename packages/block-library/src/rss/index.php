@@ -76,7 +76,7 @@ function render_block_core_rss( $attributes ) {
 			$excerpt = '<div class="wp-block-rss__item-excerpt">' . esc_html( $excerpt ) . '</div>';
 		}
 
-		$list_items .= '<li class="wp-block-rss__item">' . esc_html( $title . $date . $author . $excerpt ) . '</li>';
+		$list_items .= '<li class="wp-block-rss__item">' . $title . $date . $author . $excerpt . '</li>';
 	}
 
 	$classnames = array();
