@@ -252,7 +252,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			return $changes;
 		}
 
-		if ( 'custom' === $template->source ) {
+		$is_customized_template = 'custom' === $template->source;
+
+		if ( $is_customized_template ) {
 			$result = wp_update_post( wp_slash( (array) $changes ), true );
 		} else {
 			$result = wp_insert_post( wp_slash( (array) $changes ), true );
@@ -262,6 +264,16 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		$template      = gutenberg_get_block_template( $request['id'], $this->post_type );
+
+		/**
+		 * Fires after a single item is created or updated via the REST API.
+		 *
+		 * @param Gutenberg_Block_Template	$template	Inserted or updated block template object.
+		 * @param WP_REST_Request			$request	Request object.
+		 * @param boolean					$creating	True when creating item, false when updating.
+		 */
+		do_action( "rest_insert_{$this->post_type}", $template, $request, ! $is_customized_template );
+
 		$fields_update = $this->update_additional_fields_for_object( $template, $request );
 		if ( is_wp_error( $fields_update ) ) {
 			return $fields_update;
@@ -307,6 +319,16 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		}
 		$id            = $posts[0]->id;
 		$template      = gutenberg_get_block_template( $id, $this->post_type );
+
+		/**
+		 * Fires after a single item is created via the REST API.
+		 *
+		 * @param Gutenberg_Block_Template	$template	Newly created block template object.
+		 * @param WP_REST_Request			$request	Request object.
+		 * @param boolean					$creating	True when creating item, false when updating.
+		 */
+		do_action( "rest_insert_{$this->post_type}", $template, $request, true );
+
 		$fields_update = $this->update_additional_fields_for_object( $template, $request );
 		if ( is_wp_error( $fields_update ) ) {
 			return $fields_update;
