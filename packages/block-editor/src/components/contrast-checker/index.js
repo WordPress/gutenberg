@@ -24,9 +24,7 @@ function ContrastCheckerMessage( {
 } ) {
 	let msg = '';
 	if ( shouldShowTransparencyWarning ) {
-		msg = __(
-			'Transparent background and/or text colors may be hard for people to read.'
-		);
+		msg = __( 'Transparent text may be hard for people to read.' );
 	} else {
 		msg =
 			colordBackgroundColor.brightness() < colordTextColor.brightness()
@@ -44,7 +42,7 @@ function ContrastCheckerMessage( {
 	// new color combination is selected and the contrast is still insufficient.
 	useEffect( () => {
 		const speakMsg = shouldShowTransparencyWarning
-			? __( 'Transparent colors may be hard for people to read.' )
+			? __( 'Transparent text may be hard for people to read.' )
 			: __( 'This color combination may be hard for people to read.' );
 		speak( speakMsg );
 	}, [ backgroundColor, textColor ] );
@@ -81,8 +79,10 @@ function ContrastChecker( {
 		backgroundColor || fallbackBackgroundColor
 	);
 	const colordTextColor = colord( textColor || fallbackTextColor );
+	const textColorHasTransparency = colordTextColor.alpha() < 1;
+	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
 	const hasTransparency =
-		colordBackgroundColor.alpha() !== 1 || colordTextColor.alpha() !== 1;
+		textColorHasTransparency || backgroundColorHasTransparency;
 	const isReadable = colordTextColor.isReadable( colordBackgroundColor, {
 		level: 'AA',
 		size:
@@ -91,13 +91,21 @@ function ContrastChecker( {
 				: 'small',
 	} );
 
-	// Don't show the  message if the text is readable and there's no transparency,
-	// or if there is transparency and the alpha checker is disabled.
-	if (
-		( isReadable && ! hasTransparency ) ||
-		( hasTransparency && ! __experimentalEnableAlphaChecker )
-	) {
+	// Don't show the message if the text is readable AND there's no transparency.
+	// This is the default.
+	if ( isReadable && ! hasTransparency ) {
 		return null;
+	}
+
+	if ( hasTransparency ) {
+		if (
+			// If there's transparency, don't show the message if the alpha checker is disabled.
+			! __experimentalEnableAlphaChecker ||
+			// If the alpha checker is enabled, we only show the warning if the text has transparency.
+			( isReadable && ! textColorHasTransparency )
+		) {
+			return null;
+		}
 	}
 
 	return (
@@ -106,8 +114,11 @@ function ContrastChecker( {
 			textColor={ textColor }
 			colordBackgroundColor={ colordBackgroundColor }
 			colordTextColor={ colordTextColor }
-			// Flag to warn about transparency only if the text is otherwise readable according to colord.
-			shouldShowTransparencyWarning={ isReadable && hasTransparency }
+			// Flag to warn about transparency only if the text is otherwise readable according to colord
+			// to ensure the readability warnings take precedence.
+			shouldShowTransparencyWarning={
+				isReadable && textColorHasTransparency
+			}
 		/>
 	);
 }

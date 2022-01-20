@@ -274,25 +274,25 @@ describe( 'ContrastChecker', () => {
 	} );
 
 	// __experimentalEnableAlphaChecker tests
-	test( 'should render component when the colors meet AA WCAG guidelines but the text color has alpha transparency with alpha checker enabled.', () => {
+	test( 'should render component when the colors meet AA WCAG guidelines but the text color only has alpha transparency with alpha checker enabled.', () => {
 		const wrapper = mount(
 			<ContrastChecker
-				backgroundColor={ 'rgba(255,255,255,0.7)' }
-				textColor={ textColor }
+				backgroundColor={ backgroundColor }
+				textColor={ 'rgba(0,0,0,0.9)' }
 				isLargeText={ isLargeText }
 				__experimentalEnableAlphaChecker={ true }
 			/>
 		);
 
 		expect( speak ).toHaveBeenCalledWith(
-			'Transparent colors may be hard for people to read.'
+			'Transparent text may be hard for people to read.'
 		);
 		expect( wrapper.find( Notice ).children().text() ).toBe(
-			'Transparent background and/or text colors may be hard for people to read.'
+			'Transparent text may be hard for people to read.'
 		);
 	} );
 
-	test( 'should render component when the colors meet AA WCAG guidelines but the background color has alpha transparency with alpha checker enabled.', () => {
+	test( 'should render null when the colors meet AA WCAG guidelines but the background color only has alpha transparency with alpha checker enabled.', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ 'rgba(255,255,255,0.7)' }
@@ -302,12 +302,8 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
-		expect( speak ).toHaveBeenCalledWith(
-			'Transparent colors may be hard for people to read.'
-		);
-		expect( wrapper.find( Notice ).children().text() ).toBe(
-			'Transparent background and/or text colors may be hard for people to read.'
-		);
+		expect( speak ).not.toHaveBeenCalled();
+		expect( wrapper.html() ).toBeNull();
 	} );
 
 	test( 'should render component when the colors meet AA WCAG guidelines but all colors have alpha transparency with alpha checker enabled.', () => {
@@ -321,10 +317,10 @@ describe( 'ContrastChecker', () => {
 		);
 
 		expect( speak ).toHaveBeenCalledWith(
-			'Transparent colors may be hard for people to read.'
+			'Transparent text may be hard for people to read.'
 		);
 		expect( wrapper.find( Notice ).children().text() ).toBe(
-			'Transparent background and/or text colors may be hard for people to read.'
+			'Transparent text may be hard for people to read.'
 		);
 	} );
 } );

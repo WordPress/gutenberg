@@ -377,7 +377,6 @@ export function ColorEdit( props ) {
 	return (
 		<ColorPanel
 			enableContrastChecking={ enableContrastChecking }
-			enableAlphaChecking={ enableContrastChecking }
 			clientId={ props.clientId }
 			enableAlpha={ true }
 			settings={ [
