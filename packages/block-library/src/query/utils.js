@@ -55,16 +55,14 @@ export const getEntitiesInfo = ( entities ) => {
  * @return {Object} The helper object related to post types.
  */
 export const usePostTypes = () => {
-	const { postTypes } = useSelect( ( select ) => {
+	const postTypes = useSelect( ( select ) => {
 		const { getPostTypes } = select( coreStore );
 		const excludedPostTypes = [ 'attachment' ];
 		const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
 			( { viewable, slug } ) =>
 				viewable && ! excludedPostTypes.includes( slug )
 		);
-		return {
-			postTypes: filteredPostTypes,
-		};
+		return filteredPostTypes;
 	}, [] );
 	const postTypesTaxonomiesMap = useMemo( () => {
 		if ( ! postTypes?.length ) return;
@@ -82,6 +80,28 @@ export const usePostTypes = () => {
 		[ postTypes ]
 	);
 	return { postTypesTaxonomiesMap, postTypesSelectOptions };
+};
+
+/**
+ * Hook that returns the taxonomies associated with a specific post type.
+ *
+ * @param {string} postType The post type from which to retrieve the associated taxonomies.
+ * @return {Object[]} An array of the associated taxonomies.
+ */
+export const useTaxonomies = ( postType ) => {
+	const taxonomies = useSelect(
+		( select ) => {
+			const { getTaxonomies } = select( coreStore );
+			const filteredTaxonomies = getTaxonomies( {
+				type: postType,
+				per_page: -1,
+				context: 'view',
+			} );
+			return filteredTaxonomies;
+		},
+		[ postType ]
+	);
+	return taxonomies;
 };
 
 /**
