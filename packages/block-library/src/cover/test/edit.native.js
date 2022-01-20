@@ -295,7 +295,7 @@ describe( 'when an image is attached', () => {
 
 describe( 'color settings', () => {
 	it( 'sets a color for the overlay background when the placeholder is visible', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByA11yLabel } = initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
 
@@ -350,7 +350,7 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'sets a gradient overlay background when a solid background was already selected', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByA11yLabel } = initializeEditor( {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );
 
@@ -407,7 +407,7 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'toggles between solid colors and gradients', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByA11yLabel } = initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
 
@@ -493,11 +493,7 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'clears the selected overlay color and mantains the inner blocks', async () => {
-		const {
-			getByTestId,
-			getByA11yLabel,
-			getByText,
-		} = await initializeEditor( {
+		const { getByTestId, getByA11yLabel, getByText } = initializeEditor( {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );
 
