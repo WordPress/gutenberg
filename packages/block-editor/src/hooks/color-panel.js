@@ -69,7 +69,7 @@ export default function ColorPanel( {
 					<ContrastChecker
 						backgroundColor={ detectedBackgroundColor }
 						textColor={ detectedColor }
-						__experimentalEnableAlphaChecker={ enableAlpha }
+						enableAlphaChecker={ enableAlpha }
 					/>
 				) }
 			</PanelColorGradientSettings>

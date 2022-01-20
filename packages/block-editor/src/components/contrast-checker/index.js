@@ -67,7 +67,7 @@ function ContrastChecker( {
 	fontSize, // font size value in pixels
 	isLargeText,
 	textColor,
-	__experimentalEnableAlphaChecker = false,
+	enableAlphaChecker = false,
 } ) {
 	if (
 		! ( backgroundColor || fallbackBackgroundColor ) ||
@@ -100,7 +100,7 @@ function ContrastChecker( {
 	if ( hasTransparency ) {
 		if (
 			// If there's transparency, don't show the message if the alpha checker is disabled.
-			! __experimentalEnableAlphaChecker ||
+			! enableAlphaChecker ||
 			// If the alpha checker is enabled, we only show the warning if the text has transparency.
 			( isReadable && ! textColorHasTransparency )
 		) {

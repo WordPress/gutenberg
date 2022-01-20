@@ -56,7 +56,7 @@ describe( 'ContrastChecker', () => {
 				backgroundColor={ backgroundColor }
 				textColor={ textColor }
 				isLargeText={ isLargeText }
-				__experimentalEnableAlphaChecker={ true }
+				enableAlphaChecker={ true }
 			/>
 		);
 
@@ -273,14 +273,14 @@ describe( 'ContrastChecker', () => {
 		expect( speak ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	// __experimentalEnableAlphaChecker tests
+	// enableAlphaChecker tests
 	test( 'should render component when the colors meet AA WCAG guidelines but the text color only has alpha transparency with alpha checker enabled.', () => {
 		const wrapper = mount(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
 				textColor={ 'rgba(0,0,0,0.9)' }
 				isLargeText={ isLargeText }
-				__experimentalEnableAlphaChecker={ true }
+				enableAlphaChecker={ true }
 			/>
 		);
 
@@ -298,7 +298,7 @@ describe( 'ContrastChecker', () => {
 				backgroundColor={ 'rgba(255,255,255,0.7)' }
 				textColor={ textColor }
 				isLargeText={ isLargeText }
-				__experimentalEnableAlphaChecker={ true }
+				enableAlphaChecker={ true }
 			/>
 		);
 
@@ -312,7 +312,7 @@ describe( 'ContrastChecker', () => {
 				backgroundColor={ 'rgba(255,255,255,0.7)' }
 				textColor={ 'rgba(0,0,0,0.7)' }
 				isLargeText={ isLargeText }
-				__experimentalEnableAlphaChecker={ true }
+				enableAlphaChecker={ true }
 			/>
 		);
 
