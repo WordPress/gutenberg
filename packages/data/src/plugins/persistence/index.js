@@ -297,53 +297,6 @@ export function migrateFeaturePreferencesToPreferencesStore(
 }
 
 /**
- * Move the 'features' object in local storage from the sourceStoreName to the
- * interface store.
- *
- * @param {Object} persistence     The persistence interface.
- * @param {string} sourceStoreName The name of the store that has persisted
- *                                 preferences to migrate to the interface
- *                                 package.
- */
-export function migrateFeaturePreferencesToInterfaceStore(
-	persistence,
-	sourceStoreName
-) {
-	const interfaceStoreName = 'core/interface';
-	const state = persistence.get();
-	const sourcePreferences = state[ sourceStoreName ]?.preferences;
-	const sourceFeatures = sourcePreferences?.features;
-
-	if ( sourceFeatures ) {
-		const targetFeatures =
-			state[ interfaceStoreName ]?.preferences?.features;
-
-		// Avoid migrating features again if they've previously been migrated.
-		if ( ! targetFeatures?.[ sourceStoreName ] ) {
-			// Set the feature values in the interface store, the features
-			// object is keyed by 'scope', which matches the store name for
-			// the source.
-			persistence.set( interfaceStoreName, {
-				preferences: {
-					features: {
-						...targetFeatures,
-						[ sourceStoreName ]: sourceFeatures,
-					},
-				},
-			} );
-
-			// Remove feature preferences from the source.
-			persistence.set( sourceStoreName, {
-				preferences: {
-					...sourcePreferences,
-					features: undefined,
-				},
-			} );
-		}
-	}
-}
-
-/**
  * Deprecated: Remove this function and the code in WordPress Core that calls
  * it once WordPress 6.0 is released.
  */
@@ -359,7 +312,10 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 		persistence,
 		'core/customize-widgets'
 	);
-	migrateFeaturePreferencesToInterfaceStore( persistence, 'core/edit-post' );
+	migrateFeaturePreferencesToPreferencesStore(
+		persistence,
+		'core/edit-post'
+	);
 };
 
 export default persistencePlugin;

@@ -3,6 +3,7 @@
  */
 import { createRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -22,6 +23,7 @@ function createRegistryWithStores() {
 		blockEditorStore,
 		coreStore,
 		interfaceStore,
+		preferencesStore,
 		editorStore,
 	].forEach( registry.register );
 	return registry;
@@ -53,15 +55,15 @@ describe( 'actions', () => {
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(
 			registry
-				.select( interfaceStore )
-				.isFeatureActive( editPostStore.name, 'welcomeGuide' )
+				.select( preferencesStore )
+				.get( editPostStore.name, 'welcomeGuide' )
 		).toBe( true );
 
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(
 			registry
-				.select( interfaceStore )
-				.isFeatureActive( editPostStore.name, 'welcomeGuide' )
+				.select( preferencesStore )
+				.get( editPostStore.name, 'welcomeGuide' )
 		).toBe( false );
 	} );
 	describe( 'switchEditorMode', () => {

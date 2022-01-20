@@ -4,6 +4,13 @@
 import { get } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
  * Returns the item that is enabled in a given scope.
  *
  * @param {Object} state    Global application state.
@@ -72,12 +79,13 @@ export function isItemPinned( state, scope, item ) {
  *
  * @return {boolean} Is the feature enabled?
  */
-export function isFeatureActive( state, scope, featureName ) {
-	const featureValue = state.preferences.features[ scope ]?.[ featureName ];
-	const defaultedFeatureValue =
-		featureValue !== undefined
-			? featureValue
-			: state.preferenceDefaults.features[ scope ]?.[ featureName ];
+export const isFeatureActive = createRegistrySelector(
+	( select ) => ( state, scope, featureName ) => {
+		deprecated( `select( 'core/interface' ).isFeatureActive`, {
+			since: '6.0',
+			alternative: `select( 'core/preferences' ).get`,
+		} );
 
-	return !! defaultedFeatureValue;
-}
+		return !! select( preferencesStore ).get( scope, featureName );
+	}
+);

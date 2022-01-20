@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';
 import { MoreMenuDropdown } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies

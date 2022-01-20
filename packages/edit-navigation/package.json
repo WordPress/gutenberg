@@ -47,6 +47,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.3.1",
 		"lodash": "^4.17.21"

@@ -8,8 +8,9 @@ import { castArray, reduce } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { speak } from '@wordpress/a11y';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -147,10 +148,13 @@ export function removeEditorPanel( panelName ) {
  * @param {string} feature Feature name.
  */
 export const toggleFeature = ( feature ) => ( { registry } ) =>
-	registry
-		.dispatch( interfaceStore )
-		.toggleFeature( 'core/edit-post', feature );
+	registry.dispatch( preferencesStore ).toggle( 'core/edit-post', feature );
 
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @param {string} mode The editor mode.
+ */
 export const switchEditorMode = ( mode ) => ( { dispatch, registry } ) => {
 	dispatch( {
 		type: 'SWITCH_MODE',

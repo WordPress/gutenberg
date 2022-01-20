@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
  * Returns an action object used in signalling that an active area should be changed.
  *
  * @param {string} itemType Type of item.
@@ -90,9 +96,13 @@ export function unpinItem( scope, itemId ) {
  * @param {string} featureName The feature name.
  */
 export function toggleFeature( scope, featureName ) {
-	return function ( { select, dispatch } ) {
-		const currentValue = select.isFeatureActive( scope, featureName );
-		dispatch.setFeatureValue( scope, featureName, ! currentValue );
+	deprecated( `dispatch( 'core/interface' ).toggleFeature`, {
+		since: '6.0',
+		alternative: `dispatch( 'core/preferences' ).toggle`,
+	} );
+
+	return function ( { registry } ) {
+		registry.dispatch( preferencesStore ).toggle( scope, featureName );
 	};
 }
 
@@ -107,11 +117,15 @@ export function toggleFeature( scope, featureName ) {
  * @return {Object} Action object.
  */
 export function setFeatureValue( scope, featureName, value ) {
-	return {
-		type: 'SET_FEATURE_VALUE',
-		scope,
-		featureName,
-		value: !! value,
+	deprecated( `dispatch( 'core/interface' ).setFeatureValue`, {
+		since: '6.0',
+		alternative: `dispatch( 'core/preferences' ).set`,
+	} );
+
+	return function ( { registry } ) {
+		registry
+			.dispatch( preferencesStore )
+			.set( scope, featureName, !! value );
 	};
 }
 
@@ -123,10 +137,13 @@ export function setFeatureValue( scope, featureName, value ) {
  *
  * @return {Object} Action object.
  */
-export function setFeatureDefaults( scope, defaults ) {
-	return {
-		type: 'SET_FEATURE_DEFAULTS',
-		scope,
-		defaults,
+export function* setFeatureDefaults( scope, defaults ) {
+	deprecated( `dispatch( 'core/interface' ).setFeatureDefaults`, {
+		since: '6.0',
+		alternative: `dispatch( 'core/preferences' ).setDefaults`,
+	} );
+
+	return function ( { registry } ) {
+		registry.dispatch( preferencesStore ).setDefaults( scope, defaults );
 	};
 }

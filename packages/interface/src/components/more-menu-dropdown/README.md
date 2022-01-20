@@ -8,7 +8,7 @@
 
 This component implements a `DropdownMenu` component from the `@wordpress/components` package.
 
-See also the `MoreMenuFeatureToggle` component in the `@wordpress/interface` package, which provides an easy way to implement a feature toggle as a child of this component. Use with the `MenuGroup`, `MenuItem`, `MenuItemsChoice` components from the `@wordpress/components` package to implement more advanced behaviors.
+See also the `PreferenceToggleMenuItem` component in the `@wordpress/preference` package, which provides an easy way to implement a feature toggle as a child of this component. Use with the `MenuGroup`, `MenuItem`, `MenuItemsChoice` components from the `@wordpress/components` package to implement more advanced behaviors.
 
 Note that just like the `DropdownMenu` component, this component accepts a render callback, which child elements should be returned from.
 
@@ -20,9 +20,9 @@ function MyEditorMenu() {
 		<MoreMenuDropdown>
 			{ () => (
 				<MenuGroup label={ __( 'Features' ) }>
-					<MoreMenuFeatureToggle
+					<PreferenceToggleMenuItem
 						scope="namespace/editor-or-plugin-name"
-						feature="myFeatureName"
+						name="myFeatureName"
 						label={ __( 'My feature' ) }
 						info={ __( 'A really awesome feature' ) }
 						messageActivated={ __( 'My feature activated' )}
