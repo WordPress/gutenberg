@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -211,7 +216,7 @@ async function getNavigationMenuRawContent() {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
-	const contributorUsername = 'contributoruser';
+	const contributorUsername = uniqueId( 'contributoruser_' );
 	let contributorPassword;
 
 	beforeAll( async () => {
