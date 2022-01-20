@@ -20,6 +20,9 @@
 		"scale": {
 			"type": "string",
 			"default": "cover"
+		},
+		"sizeSlug": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

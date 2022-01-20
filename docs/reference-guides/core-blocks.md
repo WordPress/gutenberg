@@ -528,7 +528,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** height, isLink, scale, width
+-	**Attributes:** height, isLink, scale, sizeSlug, width
 
 ## Post Navigation Link
 
