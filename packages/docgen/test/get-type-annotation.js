@@ -36,7 +36,7 @@ describe( 'Type annotations', () => {
 		};
 		const node = {};
 		const result = getTypeAnnotation( tag, node, 0 );
-		expect( result ).toBe( '' );
+		expect( result ).toBeFalsy();
 	} );
 
 	const paramTag = {
