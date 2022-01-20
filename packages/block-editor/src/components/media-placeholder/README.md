@@ -140,6 +140,14 @@ Whether to allow multiple selection of files or not.
 -   Default: `false`
 -   Platform: Web
 
+### mediaPreview
+
+React Element to render as preview in placeholder
+
+-   Type: `Object`
+-   Required: No
+-   Platform: Web
+
 ### onError
 
 Callback called when an upload error happens.
