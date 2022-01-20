@@ -545,7 +545,7 @@ module.exports =
 	 * @param {CommentTag}    tag   A comment tag.
 	 * @param {ASTNode}       token A function token.
 	 * @param {number | null} index The index of the parameter or `null` if not a param tag.
-	 * @return {null | string} The type annotation for the given tag or null if the tag has no type annotation.
+	 * @return {[string]} The type annotation for the given tag or null if the tag has no type annotation.
 	 */
 	function ( tag, token, index ) {
 		// If the file is using JSDoc type annotations, use the JSDoc.
@@ -562,9 +562,6 @@ module.exports =
 			}
 			case 'type': {
 				return getVariableTypeAnnotation( token );
-			}
-			default: {
-				return '';
 			}
 		}
 	};
