@@ -34,11 +34,6 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			$comment_args['hierarchical'] = false;
 		}
 
-		// With the fallback option enabled. By default the render won't coincide with the editor.
-		if ( get_option( 'comment_order' ) ) {
-			$comment_args['order'] = get_option( 'comment_order' );
-		}
-
 		$per_page = ! empty( $block->context['comments/perPage'] ) ? (int) $block->context['comments/perPage'] : 0;
 		if ( 0 === $per_page && get_option( 'page_comments' ) ) {
 			$per_page = (int) get_query_var( 'comments_per_page' );
@@ -58,7 +53,9 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 		}
 
 		$order = ! empty( $block->context['comments/order'] ) ? $block->context['comments/order'] : null;
-		if ( $order ) {
+		if ( empty( $order ) && get_option( 'comment_order' ) ) {
+			$comment_args['order'] = get_option( 'comment_order' );
+		} else {
 			$comment_args['order'] = $order;
 		}
 
