@@ -6,6 +6,10 @@
 
 -   Components: Fix `Slot`/`Fill` Emotion `StyleProvider` ([#38237](https://github.com/WordPress/gutenberg/pull/38237))
 
+### Enhancements
+
+-   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
+
 ## 19.3.0 (2022-01-27)
 
 ### Enhancements
