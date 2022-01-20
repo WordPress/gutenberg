@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking changes
+
+   `OPTIONS` requests handled by the preloading middleware are now resolved as `window.Response` objects if you explicitly set `parse: false` for consistency with how GET requests are resolved. They used to be resolved as `Plain Old JavaScript Objects`.
+
 ## 5.2.5 (2021-11-07)
 
 ### Internal
