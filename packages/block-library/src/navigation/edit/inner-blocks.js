@@ -27,7 +27,9 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
-const DEFAULT_BLOCK = [ 'core/navigation-link' ];
+const DEFAULT_BLOCK = {
+	name: 'core/navigation-link',
+};
 
 const LAYOUT = {
 	type: 'default',
