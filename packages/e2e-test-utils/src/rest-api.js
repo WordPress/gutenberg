@@ -50,12 +50,23 @@ class AdminStorageState {
 					await fs.readFile( storageStatePath, 'utf-8' )
 				);
 			} catch ( error ) {
-				// Ignore errors if the state is not found or invalid.
+				if ( error instanceof Error && error.code === 'ENOENT' ) {
+					// Ignore errors if the state is not found.
+				} else {
+					throw error;
+				}
 			}
 		}
 
 		return new AdminStorageState( initialStorageState, storageStatePath );
 	}
+
+	/** @type {Partial<StorageState>} */
+	#storageState;
+	/** @type {string|undefined} */
+	#storageStatePath;
+	/** @type {boolean} */
+	#isDirty = false;
 
 	/**
 	 * The class to update and save the admin storage state.
@@ -64,30 +75,26 @@ class AdminStorageState {
 	 * @param {string}                [storageStatePath]  The optional storage state path.
 	 */
 	constructor( initialStorageState, storageStatePath ) {
-		/**
-		 * @private
-		 * @type {Partial<StorageState>}
-		 */
-		this._storageState = initialStorageState;
-		/**
-		 * @private
-		 * @type {string | undefined}
-		 */
-		this._storageStatePath = storageStatePath;
-		/**
-		 * @private
-		 * @type {boolean}
-		 */
-		this._hasUpdated = false;
+		this.#storageState = initialStorageState;
+		this.#storageStatePath = storageStatePath;
 	}
 
 	get value() {
-		return this._storageState;
+		return this.#storageState;
 	}
 
-	set value( storageState ) {
-		this._storageState = storageState;
-		this._hasUpdated = true;
+	/**
+	 * Update the storage state in memory.
+	 * (It's probably impossible now to correctly type-check this using JSDoc.)
+	 *
+	 * @typedef {keyof StorageState} KeyOfStorageState
+	 * @template {KeyOfStorageState} Key
+	 * @param {Key}              key   The key to update.
+	 * @param {StorageState.Key} value The value to update.
+	 */
+	update( key, value ) {
+		this.#storageState[ key ] = value;
+		this.#isDirty = true;
 	}
 
 	/**
@@ -96,18 +103,18 @@ class AdminStorageState {
 	 * @return {Promise<void>}
 	 */
 	async save() {
-		if ( this._storageStatePath && this._hasUpdated ) {
-			await fs.mkdir( path.dirname( this._storageStatePath ), {
+		if ( this.#storageStatePath && this.#isDirty ) {
+			await fs.mkdir( path.dirname( this.#storageStatePath ), {
 				recursive: true,
 			} );
 
 			await fs.writeFile(
-				this._storageStatePath,
-				JSON.stringify( this._storageState ),
+				this.#storageStatePath,
+				JSON.stringify( this.#storageState ),
 				'utf-8'
 			);
 
-			this._hasUpdated = false;
+			this.#isDirty = false;
 		}
 	}
 }
@@ -174,7 +181,14 @@ async function getNonce( cookie ) {
 	} );
 
 	if ( response.status !== 200 ) {
-		throw response;
+		try {
+			// If there's a json error from the API, throw it.
+			const errorBody = await response.json();
+			throw errorBody;
+		} catch ( error ) {
+			// Otherwise, fallback to throwing the response object.
+			throw response;
+		}
 	}
 
 	const nonce = await response.text();
@@ -192,17 +206,18 @@ async function setupRest( storageStatePath ) {
 	const adminStorageState = await AdminStorageState.init( storageStatePath );
 
 	if ( ! adminStorageState.value.cookie ) {
-		adminStorageState.value.cookie = await loginAsAdmin();
+		adminStorageState.update( 'cookie', await loginAsAdmin() );
 	}
 
 	if ( ! adminStorageState.value.nonce ) {
-		adminStorageState.value.nonce = await getNonce(
-			adminStorageState.value.cookie
+		adminStorageState.update(
+			'nonce',
+			await getNonce( adminStorageState.value.cookie )
 		);
 	}
 
 	if ( ! adminStorageState.value.rootURL ) {
-		adminStorageState.value.rootURL = await getAPIRootURL();
+		adminStorageState.update( 'rootURL', await getAPIRootURL() );
 	}
 
 	await adminStorageState.save();
@@ -210,7 +225,7 @@ async function setupRest( storageStatePath ) {
 	// Register nonce endpoint.
 	apiFetch.nonceEndpoint = REST_NONCE_ENDPOINT;
 
-	// Create the nonce middleware and set the initial nonce as an empty string.
+	// Create the nonce middleware and set the initial nonce.
 	apiFetch.nonceMiddleware = apiFetch.createNonceMiddleware(
 		adminStorageState.value.nonce
 	);
@@ -245,11 +260,11 @@ async function setupRest( storageStatePath ) {
 
 			// Renew the cookies.
 			const cookie = await loginAsAdmin();
-			adminStorageState.value.cookie = cookie;
+			adminStorageState.update( 'cookie', cookie );
 
 			// Renew the nonce.
 			const nonce = await getNonce( cookie );
-			adminStorageState.value.nonce = nonce;
+			adminStorageState.update( 'nonce', nonce );
 			apiFetch.nonceMiddleware.nonce = nonce;
 
 			await adminStorageState.save();

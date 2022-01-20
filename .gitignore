@@ -7,7 +7,7 @@ node_modules
 gutenberg.zip
 coverage
 *-performance-results.json
-/test/integration/storage-state
+/test/storage-state
 
 # Directories/files that may appear in your environment
 *.log

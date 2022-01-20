@@ -269,7 +269,7 @@
 		"publish:latest": "lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"test:create-block": "./bin/test-create-block.sh",
-		"test-e2e": "ADMIN_STORAGE_STATE_PATH=./test/integration/storage-state/admin.json wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
+		"test-e2e": "ADMIN_STORAGE_STATE_PATH=./test/storage-state/admin.json wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:debug": "wp-scripts --inspect-brk test-e2e --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
