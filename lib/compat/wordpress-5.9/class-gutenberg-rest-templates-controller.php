@@ -268,9 +268,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		/**
 		 * Fires after a single item is created or updated via the REST API.
 		 *
-		 * @param Gutenberg_Block_Template	$template	Inserted or updated block template object.
-		 * @param WP_REST_Request			$request	Request object.
-		 * @param boolean					$creating	True when creating item, false when updating.
+		 * @param Gutenberg_Block_Template $template Inserted or updated block template object.
+		 * @param WP_REST_Request $request Request object.
+		 * @param boolean $creating True when creating item, false when updating.
 		 */
 		do_action( "rest_insert_{$this->post_type}", $template, $request, ! $is_customized_template );
 
@@ -323,9 +323,9 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 		/**
 		 * Fires after a single item is created via the REST API.
 		 *
-		 * @param Gutenberg_Block_Template	$template	Newly created block template object.
-		 * @param WP_REST_Request			$request	Request object.
-		 * @param boolean					$creating	True when creating item, false when updating.
+		 * @param Gutenberg_Block_Template $template Newly created block template object.
+		 * @param WP_REST_Request $request Request object.
+		 * @param boolean $creating True when creating item, false when updating.
 		 */
 		do_action( "rest_insert_{$this->post_type}", $template, $request, true );
 
