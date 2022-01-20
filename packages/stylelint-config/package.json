@@ -31,12 +31,11 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"stylelint-config-recommended": "^3.0.0",
-		"stylelint-config-recommended-scss": "^4.2.0",
-		"stylelint-scss": "^3.17.2"
+		"stylelint-config-recommended": "^6.0.0",
+		"stylelint-config-recommended-scss": "^5.0.2"
 	},
 	"peerDependencies": {
-		"stylelint": "^13.7.0 || ^14"
+		"stylelint": "^14.2"
 	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",

@@ -15,6 +15,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── .jshintignore
     ├── .eslintignore
     ├── .prettierrc.js
+    ├── .stylelintignore
     ├── .stylelintrc.json
     ├── .markdownlintignore
     ├── .npmpackagejsonlintrc.json
