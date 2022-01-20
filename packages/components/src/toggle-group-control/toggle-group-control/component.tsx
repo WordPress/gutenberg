@@ -4,7 +4,6 @@
 import type { Ref } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
-import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
@@ -48,7 +47,6 @@ function ToggleGroupControl(
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
 	const containerRef = useRef();
-	const [ resizeListener ] = useResizeAware();
 	const baseId = useInstanceId(
 		ToggleGroupControl,
 		'toggle-group-control'
@@ -105,7 +103,6 @@ function ToggleGroupControl(
 					{ ...otherProps }
 					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
 				>
-					{ resizeListener }
 					{ children }
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>
