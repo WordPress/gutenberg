@@ -10,9 +10,21 @@ import {
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 
+const orderOptions = [
+	{
+		label: __( 'Newest to oldest' ),
+		value: 'desc',
+	},
+	{
+		label: __( 'Oldest to newest' ),
+		value: 'asc',
+	},
+];
+
 export default function CommentsInspectorControls( {
 	attributes: { TagName, perPage, order, inherit },
 	setAttributes,
+	defaultSettings: { defaultPerPage, defaultOrder },
 } ) {
 	return (
 		<InspectorControls>
@@ -23,17 +35,20 @@ export default function CommentsInspectorControls( {
 					onChange={ () => {
 						setAttributes( {
 							inherit: ! inherit,
+							order: inherit ? defaultOrder : null,
+							perPage: inherit ? defaultPerPage : null,
 						} );
 					} }
 				/>
 				{ ! inherit && (
 					<>
-						<ToggleControl
-							label={ __( 'Newer comments first' ) }
-							checked={ order === 'desc' }
-							onChange={ () => {
+						<SelectControl
+							label={ __( 'Order by' ) }
+							value={ order }
+							options={ orderOptions }
+							onChange={ ( value ) => {
 								setAttributes( {
-									order: order === 'desc' ? 'asc' : 'desc',
+									order: value,
 								} );
 							} }
 						/>

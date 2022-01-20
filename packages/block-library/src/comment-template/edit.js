@@ -119,7 +119,12 @@ export default function CommentTemplateEdit( {
 	const blockProps = useBlockProps();
 
 	const [ activeComment, setActiveComment ] = useState();
-
+	const {
+		__experimentalDiscussionSettings: { commentOrder, commentsPerPage },
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings();
+	} );
 	const { rawComments, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
@@ -129,6 +134,7 @@ export default function CommentTemplateEdit( {
 				post: postId,
 				status: 'approve',
 				context: 'embed',
+				order: order || commentOrder,
 			};
 
 			if ( order ) {
@@ -147,7 +153,7 @@ export default function CommentTemplateEdit( {
 	);
 
 	// TODO: Replicate the logic used on the server.
-	perPage = perPage || 50;
+	perPage = perPage || commentsPerPage;
 	// We convert the flat list of comments to tree.
 	// Then, we show only a maximum of `perPage` number of comments.
 	// This is because passing `per_page` to `getEntityRecords()` does not
