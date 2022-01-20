@@ -10,12 +10,20 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
--   [**] Fix content justification attribute in Buttons block [#37887]
 
+-   [**] Fix content justification attribute in Buttons block [#37887]
 -   [*] Hide help button from Unsupported Block Editor. [#37221]
 -   [*] Add contrast checker to text-based blocks [#34902]
-
 -   [*] [Image block] Fix missing translations [#37956]
+-   [*] Fix cut-off setting labels by properly wrapping the text [#37993]
+-   [*] Highlight text: fix applying formatting for non-selected text [#37915]
+-   [*] Fix missing translations of color settings [#38026]
+
+## 1.69.1
+
+-   [*] Fix app freeze when closing link picker while virtual keyboard is hidden [#37782]
+-   [*] Gallery block - Fix bug when migrating from old galleries format [#37889]
+-   [*] RichText - Use parsed font size values when comparing new changes [#37951]
 
 ## 1.69.0
 

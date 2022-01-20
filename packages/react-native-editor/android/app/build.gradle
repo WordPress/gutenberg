@@ -178,9 +178,6 @@ dependencies {
     implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
         exclude group: 'org.wordpress', module: 'utils'
     })
-    implementation("org.wordpress:utils:$wordpressUtilsVersion", {
-        exclude group: 'com.android.support'
-    })
     implementation 'androidx.appcompat:appcompat:1.2.0'
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules

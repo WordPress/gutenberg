@@ -6,7 +6,8 @@
 		"attributes": {
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
-			"overlayMenu": "mobile"
+			"overlayMenu": "mobile",
+			"hasIcon": true
 		},
 		"innerBlocks": [],
 		"originalContent": ""

@@ -54,6 +54,7 @@ import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
+import OverlayMenuIcon from './overlay-menu-icon';
 
 const EMPTY_ARRAY = [];
 
@@ -116,6 +117,7 @@ function Navigation( {
 			orientation = 'horizontal',
 			flexWrap = 'wrap',
 		} = {},
+		hasIcon,
 	} = attributes;
 
 	let areaMenu,
@@ -207,6 +209,8 @@ function Navigation( {
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
+
+	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
 	const {
 		isNavigationMenuResolved,
@@ -462,6 +466,13 @@ function Navigation( {
 		? CustomPlaceholder
 		: Placeholder;
 
+	const isResponsive = 'never' !== overlayMenu;
+
+	const overlayMenuPreviewClasses = classnames(
+		'wp-block-navigation__overlay-menu-preview',
+		{ open: overlayMenuPreview }
+	);
+
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider>
@@ -492,6 +503,33 @@ function Navigation( {
 				<InspectorControls>
 					{ hasSubmenuIndicatorSetting && (
 						<PanelBody title={ __( 'Display' ) }>
+							{ isResponsive && (
+								<Button
+									className={ overlayMenuPreviewClasses }
+									onClick={ () => {
+										setOverlayMenuPreview(
+											! overlayMenuPreview
+										);
+									} }
+								>
+									{ hasIcon && <OverlayMenuIcon /> }
+									{ ! hasIcon && (
+										<span>{ __( 'Menu' ) }</span>
+									) }
+								</Button>
+							) }
+							{ overlayMenuPreview && (
+								<ToggleControl
+									label={ __( 'Show icon button' ) }
+									help={ __(
+										'Configure the visual appearance of the button opening the overlay menu.'
+									) }
+									onChange={ ( value ) =>
+										setAttributes( { hasIcon: value } )
+									}
+									checked={ hasIcon }
+								/>
+							) }
 							<h3>{ __( 'Overlay Menu' ) }</h3>
 							<ToggleGroupControl
 								label={ __( 'Configure overlay menu' ) }
@@ -638,8 +676,10 @@ function Navigation( {
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }
+							label={ __( 'Menu' ) }
+							hasIcon={ hasIcon }
 							isOpen={ isResponsiveMenuOpen }
-							isResponsive={ 'never' !== overlayMenu }
+							isResponsive={ isResponsive }
 							isHiddenByDefault={ 'always' === overlayMenu }
 							classNames={ overlayClassnames }
 							styles={ overlayStyles }

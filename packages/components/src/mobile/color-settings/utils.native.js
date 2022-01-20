@@ -1,11 +1,16 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 const gradients = {
 	linear: 'linear-gradient',
 	radial: 'radial-gradient',
 };
 
 const gradientOptions = [
-	{ label: 'Linear', value: gradients.linear },
-	{ label: 'Radial', value: gradients.radial },
+	{ label: __( 'Linear' ), value: gradients.linear },
+	{ label: __( 'Radial' ), value: gradients.radial },
 ];
 
 const getGradientType = ( color ) => {
@@ -23,7 +28,7 @@ export const colorsUtils = {
 		picker: 'Picker',
 		palette: 'Palette',
 	},
-	segments: [ 'Solid', 'Gradient' ],
+	segments: [ __( 'Solid' ), __( 'Gradient' ) ],
 	gradients,
 	gradientOptions,
 	getGradientType,

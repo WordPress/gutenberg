@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.69.0",
+	"version": "1.69.1",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -92,6 +92,8 @@
 		"bundle:ios": "mkdir -p bundle/ios && npm run rn-bundle -- --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
 		"i18n-cache": "node i18n-cache/index.js",
 		"i18n-cache:force": "cross-env REFRESH_I18N_CACHE=1 node i18n-cache/index.js",
+		"i18n:extract-used-strings": "node bin/extract-used-strings",
+		"i18n:fetch-translations": "node bin/i18n-translations-download",
 		"postinstall": "npm run i18n-cache",
 		"android": "react-native run-android --no-packager --no-jetifier",
 		"prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
