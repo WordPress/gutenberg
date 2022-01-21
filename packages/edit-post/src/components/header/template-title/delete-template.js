@@ -51,6 +51,7 @@ export default function DeleteTemplate() {
 	const onDelete = () => {
 		clearSelectedBlock();
 		setIsEditingTemplate( false );
+		setShowConfirmDialog( false );
 
 		editPost( {
 			template: '',
