@@ -34,7 +34,7 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 	serializedHtml = html;
 } );
 
-export function initializeEditor( props, customEditorComponent ) {
+export function initializeEditor( props, { component = Editor } = {} ) {
 	// Portions of the React Native Animation API rely upon these APIs. However,
 	// Jest's 'legacy' fake timer mutate these globals, which breaks the Animated
 	// API. We preserve the original implementations to restore them later.
@@ -49,7 +49,7 @@ export function initializeEditor( props, customEditorComponent ) {
 	jest.useFakeTimers( 'legacy' );
 
 	// Arrange
-	const EditorComponent = customEditorComponent || Editor;
+	const EditorComponent = component;
 	const screen = render(
 		<EditorComponent
 			postId={ `post-id-${ uuid() }` }
