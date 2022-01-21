@@ -66,13 +66,13 @@ The `navigator` instance has a few properties:
 
 ### `push`: `( path: string, options: NavigateOptions ) => void`
 
-The `push` function allows you to navigate to a given path. The second argument can augment the navigation operations with different options.
+The `push` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
 
-The current aren't any available options.
+There currently aren't any available options.
 
 ### `pop`: `() => void`
 
-The `pop` function allows you to navigate to the previous path.
+The `pop` function allows navigating to the previous path.
 
 ### `location`: `NavigatorLocation`
 
