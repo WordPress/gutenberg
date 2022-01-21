@@ -80,9 +80,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		$this->markTestIncomplete();
 	}
 
-	/**
-	 * @group tsek
-	 */
 	public function test_get_theme_items() {
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/themes/emptytheme/variations' );
