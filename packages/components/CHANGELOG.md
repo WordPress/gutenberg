@@ -37,6 +37,7 @@
 ### Experimental
 
 -   Add basic history location support to `Navigator` ([#37416](https://github.com/WordPress/gutenberg/pull/37416)).
+-   Add focus restoration to `Navigator` ([#38149](https://github.com/WordPress/gutenberg/pull/38149)).
 
 ## 19.2.0 (2022-01-04)
 
