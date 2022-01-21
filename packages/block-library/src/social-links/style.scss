@@ -6,10 +6,8 @@
 	// Some themes give all <ul> default margin instead of padding.
 	margin-left: 0;
 
-	// Unset background colors that can be inherited from Global Styles with extra specificity.
-	&.wp-block-social-links {
-		background: none;
-	}
+	// Unset background colors that can be inherited from Global Styles.
+	background: none;
 
 	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
 	.wp-social-link a,
