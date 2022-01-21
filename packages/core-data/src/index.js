@@ -10,6 +10,8 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
+export { default as useEntityMutation } from './use-entity-mutation';
+
 import createLocksActions from './locks/actions';
 import { defaultEntities, getMethodName } from './entities';
 import { STORE_NAME } from './name';
