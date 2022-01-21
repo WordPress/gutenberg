@@ -85,19 +85,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/themes/emptytheme/variations' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEmpty( $data );
-
-		// We create a global style variation by creating a `styles` folder with
-		// a `theme.json` variation.
-		$styles_path  = gutenberg_dir_path() . 'test/emptytheme/styles';
-		$fixture_name = 'theme-json-variation.json';
-		$fixture      = gutenberg_dir_path() . "phpunit/fixtures/$fixture_name";
-		if ( ! file_exists( $styles_path ) ) {
-			mkdir( $styles_path, 0777, true );
-		}
-		copy( $fixture, "$styles_path/$fixture_name" );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
 		$expected = array(
 			array(
 				'version'  => 2,
@@ -126,10 +113,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 			),
 		);
 		$this->assertSameSetsWithIndex( $data, $expected );
-
-		// Delete copied files.
-		array_map( 'unlink', glob( "$styles_path/*.*" ) );
-		rmdir( $styles_path );
 	}
 
 	public function test_get_items() {
