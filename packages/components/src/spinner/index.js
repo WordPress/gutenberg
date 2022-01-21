@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { StyledSpinner, SpinnerIndicator } from './styles';
+import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
 
 export default function Spinner() {
 	return (
@@ -12,10 +12,17 @@ export default function Spinner() {
 			role="presentation"
 			focusable="false"
 		>
-			<SpinnerIndicator
-				cx="50%"
-				cy="50%"
+			{ /* Gray circular background */ }
+			<SpinnerTrack
+				cx="50"
+				cy="50"
 				r="50"
+				vectorEffect="non-scaling-stroke"
+			/>
+
+			{ /* Theme-colored arc */ }
+			<SpinnerIndicator
+				d="m 50 0 a 50 50 0 0 1 50 50"
 				vectorEffect="non-scaling-stroke"
 			/>
 		</StyledSpinner>

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import { keyframes } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -10,34 +10,39 @@ import { keyframes } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 
 const spinAnimation = keyframes`
-     from {
-         transform: rotate(0deg);
-     }
-     to {
-         transform: rotate(360deg);
-     }
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
  `;
 
 // The Circle can only have a centered stroke so a stacked box-shadow on the svg accomplishes a matching 1.5px border
 export const StyledSpinner = styled.svg`
 	width: ${ CONFIG.spinnerSize }px;
 	height: ${ CONFIG.spinnerSize }px;
-	box-shadow: inset 0 0 0 0.75px ${ COLORS.gray[ 300 ] },
-		0 0 0 0.75px ${ COLORS.gray[ 300 ] };
 	display: block;
-	border-radius: 50%;
 	margin: auto;
 	position: relative;
 	color: var( --wp-admin-theme-color );
 	overflow: visible;
-	animation: 1.4s linear infinite both ${ spinAnimation };
 `;
 
-export const SpinnerIndicator = styled.circle`
+const commonPathProps = css`
 	fill: transparent;
+	stroke-width: 1.5px;
+`;
+
+export const SpinnerTrack = styled.circle`
+	${ commonPathProps };
+	stroke: ${ COLORS.gray[ 300 ] };
+`;
+
+export const SpinnerIndicator = styled.path`
+	${ commonPathProps };
 	stroke: currentColor;
 	stroke-linecap: round;
-	stroke-width: 1.5px;
 	transform-origin: 50% 50%;
-	stroke-dasharray: ${ CONFIG.spinnerSize }, ${ CONFIG.spinnerSize * 10 };
+	animation: 1.4s linear infinite both ${ spinAnimation };
 `;
