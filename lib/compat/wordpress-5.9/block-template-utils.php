@@ -118,7 +118,7 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'front-page'     => array(
 				'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays as the site\'s homepage.', 'gutenberg' ),
+				'description' => __( 'Displays the site\'s homepage.', 'gutenberg' ),
 			),
 			'singular'       => array(
 				'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
