@@ -32,7 +32,7 @@ export default function useEntityMutation( kind, type, id ) {
 			edit: ( record ) => editEntityRecord( kind, type, id, record ),
 			save: ( record ) =>
 				saveEntityRecord( kind, type, id, record ),
-			saveEdited: () => saveEditedEntityRecord( kind, type, id ),
+			saveEdits: () => saveEditedEntityRecord( kind, type, id ),
 			delete: () => deleteEntityRecord( kind, type, id ),
 		} ),
 		[id],
