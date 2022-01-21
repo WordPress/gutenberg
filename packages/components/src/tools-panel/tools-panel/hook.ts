@@ -266,16 +266,10 @@ export function useToolsPanel(
 		return firstItem?.label;
 	};
 
-	const getFirstItem = () => {
-		return getFirstVisibleItemLabel( panelItems );
-	};
-
-	const getLastItem = () => {
-		return getFirstVisibleItemLabel( [ ...panelItems ].reverse() );
-	};
-
-	const firstDisplayedItem = getFirstItem();
-	const lastDisplayedItem = getLastItem();
+	const firstDisplayedItem = getFirstVisibleItemLabel( panelItems );
+	const lastDisplayedItem = getFirstVisibleItemLabel(
+		[ ...panelItems ].reverse()
+	);
 
 	const panelContext = useMemo(
 		() => ( {
