@@ -20,11 +20,23 @@ export default {
 
 function NavigatorButton( { path, ...props } ) {
 	const { push } = useNavigator();
+	const dataAttrName = 'data-navigator-focusable-id';
+	const dataAttrValue = path;
+
+	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+
+	const buttonProps = {
+		...props,
+		[ dataAttrName ]: dataAttrValue,
+	};
+
 	return (
 		<Button
 			variant="secondary"
-			onClick={ () => push( path ) }
-			{ ...props }
+			onClick={ () =>
+				push( path, { focusTargetSelector: dataAttrCssSelector } )
+			}
+			{ ...buttonProps }
 		/>
 	);
 }
