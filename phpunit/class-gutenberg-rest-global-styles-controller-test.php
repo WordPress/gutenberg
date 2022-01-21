@@ -54,23 +54,85 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		);
 	}
 
+
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
-			'/wp/v2/global-styles/(?P<id>[\/\s%\w\.\(\)\[\]\@_\-]+)',
+			// '/wp/v2/global-styles/(?P<id>[\/\s%\w\.\(\)\[\]\@_\-]+)',
+			'/wp/v2/global-styles/(?P<id>[\/\w-]+)',
 			$routes,
 			'Single global style based on the given ID route does not exist'
 		);
 		$this->assertArrayHasKey(
-			'/wp/v2/global-styles/themes/(?P<stylesheet>[\/\s%\w\.\(\)\[\]\@_\-]+)',
+			'/wp/v2/global-styles/themes/(?P<stylesheet>[^\/:<>\*\?"\|]+(?:\/[^\/:<>\*\?"\|]+)?)',
 			$routes,
 			'Theme global styles route does not exist'
+		);
+		$this->assertArrayHasKey(
+			'/wp/v2/global-styles/themes/(?P<stylesheet>[\/\s%\w\.\(\)\[\]\@_\-]+)/variations',
+			$routes,
+			'Theme global styles variations route does not exist'
 		);
 	}
 
 	public function test_context_param() {
 		// TODO: Implement test_context_param() method.
 		$this->markTestIncomplete();
+	}
+
+	/**
+	 * @group tsek
+	 */
+	public function test_get_theme_items() {
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/themes/emptytheme/variations' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEmpty( $data );
+
+		// We create a global style variation by creating a `styles` folder with
+		// a `theme.json` variation.
+		$styles_path  = gutenberg_dir_path() . 'test/emptytheme/styles';
+		$fixture_name = 'theme-json-variation.json';
+		$fixture      = gutenberg_dir_path() . "phpunit/fixtures/$fixture_name";
+		if ( ! file_exists( $styles_path ) ) {
+			mkdir( $styles_path, 0777, true );
+		}
+		copy( $fixture, "$styles_path/$fixture_name" );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$expected = array(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'foreground',
+									'color' => '#3F67C6',
+									'name'  => 'Foreground',
+								),
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/post-title' => array(
+							'typography' => array(
+								'fontWeight' => '700',
+							),
+						),
+					),
+				),
+			),
+		);
+		$this->assertSameSetsWithIndex( $data, $expected );
+
+		// Delete copied files.
+		array_map( 'unlink', glob( "$styles_path/*.*" ) );
+		rmdir( $styles_path );
 	}
 
 	public function test_get_items() {
