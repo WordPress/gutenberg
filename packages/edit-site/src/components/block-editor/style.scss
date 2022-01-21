@@ -31,6 +31,12 @@
 			overflow: visible;
 		}
 	}
+
+	> .components-resizable-box__container {
+		margin: 0 auto;
+		// Removing this will cancel the bottom margins in the iframe.
+		overflow: auto;
+	}
 }
 
 .edit-site-visual-editor__back-button {
@@ -44,12 +50,6 @@
 	&:hover {
 		color: $gray-100;
 	}
-}
-
-.components-resizable-box__container {
-	margin: 0 auto;
-	// Removing this will cancel the bottom margins in the iframe.
-	overflow: auto;
 }
 
 .resizable-editor__drag-handle {
