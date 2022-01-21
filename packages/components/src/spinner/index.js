@@ -1,16 +1,33 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * Internal dependencies
  */
 import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
 
-export default function Spinner() {
+/**
+ * @typedef OwnProps
+ *
+ * @property {string} [className] Class name
+ */
+/** @typedef {import('react').ComponentPropsWithoutRef<'svg'> & OwnProps} Props */
+
+/**
+ * @param {Props} props
+ * @return {JSX.Element} Element
+ */
+export default function Spinner( { className, ...props } ) {
 	return (
 		<StyledSpinner
-			className="components-spinner"
+			className={ classNames( 'components-spinner', className ) }
 			viewBox="0 0 100 100"
 			xmlns="http://www.w3.org/2000/svg"
 			role="presentation"
 			focusable="false"
+			{ ...props }
 		>
 			{ /* Gray circular background */ }
 			<SpinnerTrack
