@@ -57,7 +57,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 						'permission_callback' => array( $this, 'get_theme_item_permissions_check' ),
 						'args'                => array(
 							'stylesheet' => array(
-								'description'       => __( 'The theme identifier' ),
+								'description'       => __( 'The theme identifier', 'gutenberg' ),
 								'type'              => 'string',
 								'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
 							),
@@ -77,7 +77,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 						'permission_callback' => array( $this, 'get_item_permissions_check' ),
 						'args'                => array(
 							'id' => array(
-								'description'       => __( 'The id of a template' ),
+								'description'       => __( 'The id of a template', 'gutenberg' ),
 								'type'              => 'string',
 								'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
 							),
@@ -125,7 +125,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 			if ( 'edit' === $request['context'] && $post && ! $this->check_update_permission( $post ) ) {
 				return new WP_Error(
 					'rest_forbidden_context',
-					__( 'Sorry, you are not allowed to edit this global style.' ),
+					__( 'Sorry, you are not allowed to edit this global style.', 'gutenberg' ),
 					array( 'status' => rest_authorization_required_code() )
 				);
 			}
@@ -133,7 +133,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 			if ( ! $this->check_read_permission( $post ) ) {
 				return new WP_Error(
 					'rest_cannot_view',
-					__( 'Sorry, you are not allowed to view this global style.' ),
+					__( 'Sorry, you are not allowed to view this global style.', 'gutenberg' ),
 					array( 'status' => rest_authorization_required_code() )
 				);
 			}
@@ -188,7 +188,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 			if ( $post && ! $this->check_update_permission( $post ) ) {
 				return new WP_Error(
 					'rest_cannot_edit',
-					__( 'Sorry, you are not allowed to edit this global style.' ),
+					__( 'Sorry, you are not allowed to edit this global style.', 'gutenberg' ),
 					array( 'status' => rest_authorization_required_code() )
 				);
 			}
@@ -371,7 +371,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 		protected function get_post( $id ) {
 			$error = new WP_Error(
 				'rest_global_styles_not_found',
-				__( 'No global styles config exist with that id.' ),
+				__( 'No global styles config exist with that id.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
 
@@ -471,34 +471,34 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 				'type'       => 'object',
 				'properties' => array(
 					'id'       => array(
-						'description' => __( 'ID of global styles config.' ),
+						'description' => __( 'ID of global styles config.', 'gutenberg' ),
 						'type'        => 'string',
 						'context'     => array( 'embed', 'view', 'edit' ),
 						'readonly'    => true,
 					),
 					'styles'   => array(
-						'description' => __( 'Global styles.' ),
+						'description' => __( 'Global styles.', 'gutenberg' ),
 						'type'        => array( 'object' ),
 						'context'     => array( 'view', 'edit' ),
 					),
 					'settings' => array(
-						'description' => __( 'Global settings.' ),
+						'description' => __( 'Global settings.', 'gutenberg' ),
 						'type'        => array( 'object' ),
 						'context'     => array( 'view', 'edit' ),
 					),
 					'title'    => array(
-						'description' => __( 'Title of the global styles variation.' ),
+						'description' => __( 'Title of the global styles variation.', 'gutenberg' ),
 						'type'        => array( 'object', 'string' ),
 						'default'     => '',
 						'context'     => array( 'embed', 'view', 'edit' ),
 						'properties'  => array(
 							'raw'      => array(
-								'description' => __( 'Title for the global styles variation, as it exists in the database.' ),
+								'description' => __( 'Title for the global styles variation, as it exists in the database.', 'gutenberg' ),
 								'type'        => 'string',
 								'context'     => array( 'view', 'edit', 'embed' ),
 							),
 							'rendered' => array(
-								'description' => __( 'HTML title for the post, transformed for display.' ),
+								'description' => __( 'HTML title for the post, transformed for display.', 'gutenberg' ),
 								'type'        => 'string',
 								'context'     => array( 'view', 'edit', 'embed' ),
 								'readonly'    => true,
@@ -521,13 +521,13 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 		 * @param WP_REST_Request $request Full details about the request.
 		 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 		 */
-		public function get_theme_item_permissions_check( $request ) {
+		public function get_theme_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 			// Verify if the current user has edit_theme_options capability.
 			// This capability is required to edit/view/delete templates.
 			if ( ! current_user_can( 'edit_theme_options' ) ) {
 				return new WP_Error(
 					'rest_cannot_manage_global_styles',
-					__( 'Sorry, you are not allowed to access the global styles on this site.' ),
+					__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
 					array(
 						'status' => rest_authorization_required_code(),
 					)
@@ -550,7 +550,7 @@ if ( ! class_exists( 'WP_REST_Global_Styles_Controller' ) ) {
 				// This endpoint only supports the active theme for now.
 				return new WP_Error(
 					'rest_theme_not_found',
-					__( 'Theme not found.' ),
+					__( 'Theme not found.', 'gutenberg' ),
 					array( 'status' => 404 )
 				);
 			}
