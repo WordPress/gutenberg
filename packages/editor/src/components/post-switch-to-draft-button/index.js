@@ -35,6 +35,11 @@ function PostSwitchToDraftButton( {
 		alertMessage = __( 'Are you sure you want to unschedule this post?' );
 	}
 
+	const handleConfirm = () => {
+		setShowConfirmDialog( false );
+		onClick();
+	};
+
 	return (
 		<>
 			<Button
@@ -49,7 +54,7 @@ function PostSwitchToDraftButton( {
 			</Button>
 			<ConfirmDialog
 				isOpen={ showConfirmDialog }
-				onConfirm={ onClick }
+				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
 			>
 				{ alertMessage }
