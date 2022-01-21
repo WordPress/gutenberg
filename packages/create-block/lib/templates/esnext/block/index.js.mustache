@@ -17,7 +17,7 @@ import './style.scss';
 /**
  * Internal dependencies
  */
-import Edit from './edit';
+import edit from './edit';
 import save from './save';
 
 /**
@@ -26,10 +26,12 @@ import save from './save';
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
 registerBlockType( '{{namespace}}/{{slug}}', {
+
+	// The edit and save properties below are using object property shorthand. See https://alligator.io/js/object-property-shorthand-es6/
 	/**
 	 * @see ./edit.js
 	 */
-	edit: Edit,
+	edit: edit,
 
 	/**
 	 * @see ./save.js
