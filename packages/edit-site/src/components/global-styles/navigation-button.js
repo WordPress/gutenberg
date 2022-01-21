@@ -24,10 +24,27 @@ function GenericNavigationButton( { icon, children, ...props } ) {
 		</Item>
 	);
 }
+
 function NavigationButton( { path, ...props } ) {
 	const { push } = useNavigator();
+
+	const dataAttrName = 'data-navigator-focusable-id';
+	const dataAttrValue = path;
+
+	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+
+	const buttonProps = {
+		...props,
+		[ dataAttrName ]: dataAttrValue,
+	};
+
 	return (
-		<GenericNavigationButton onClick={ () => push( path ) } { ...props } />
+		<GenericNavigationButton
+			onClick={ () =>
+				push( path, { focusTargetSelector: dataAttrCssSelector } )
+			}
+			{ ...buttonProps }
+		/>
 	);
 }
 
