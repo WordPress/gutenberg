@@ -12,6 +12,11 @@ import { useState } from '@wordpress/element';
 export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
+	const handleConfirm = () => {
+		setShowConfirmDialog( false );
+		onDeleteMenu();
+	};
+
 	return (
 		<PanelBody>
 			<>
@@ -28,7 +33,7 @@ export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 				</Button>
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }
-					onConfirm={ onDeleteMenu }
+					onConfirm={ handleConfirm }
 					onCancel={ () => setShowConfirmDialog( false ) }
 				>
 					{ __(
