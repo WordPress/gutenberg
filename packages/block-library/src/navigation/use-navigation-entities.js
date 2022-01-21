@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useResolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -34,111 +34,55 @@ export default function useNavigationEntities( menuId ) {
 }
 
 function useMenuEntities() {
-	const { menus, isResolvingMenus, hasResolvedMenus } = useSelect(
-		( select ) => {
-			const { getMenus, isResolving, hasFinishedResolution } = select(
-				coreStore
-			);
-
-			const menusParameters = [ { per_page: -1, context: 'view' } ];
-
-			return {
-				menus: getMenus( ...menusParameters ),
-				isResolvingMenus: isResolving( 'getMenus', menusParameters ),
-				hasResolvedMenus: hasFinishedResolution(
-					'getMenus',
-					menusParameters
-				),
-			};
-		},
+	const { data, isResolving, hasFinished } = useResolveSelect(
+		( resolve ) =>
+			resolve( coreStore ).getMenus( { per_page: -1, context: 'view' } ),
 		[]
 	);
-
 	return {
-		menus,
-		isResolvingMenus,
-		hasResolvedMenus,
-		hasMenus: !! ( hasResolvedMenus && menus?.length ),
+		menus: data,
+		isResolvingMenus: isResolving,
+		hasResolvedMenus: hasFinished,
+		hasMenus: !! ( hasFinished && data?.length ),
 	};
 }
 
 function useMenuItemEntities( menuId ) {
-	const { menuItems, hasResolvedMenuItems } = useSelect(
-		( select ) => {
-			const { getMenuItems, hasFinishedResolution } = select( coreStore );
-
+	const { data, hasFinished } = useResolveSelect(
+		( resolve ) => {
 			const hasSelectedMenu = menuId !== undefined;
-			const menuItemsParameters = hasSelectedMenu
-				? [
-						{
-							menus: menuId,
-							per_page: -1,
-							context: 'view',
-						},
-				  ]
-				: undefined;
+			if ( ! hasSelectedMenu ) {
+				return { hasFinished: false };
+			}
 
-			return {
-				menuItems: hasSelectedMenu
-					? getMenuItems( ...menuItemsParameters )
-					: undefined,
-				hasResolvedMenuItems: hasSelectedMenu
-					? hasFinishedResolution(
-							'getMenuItems',
-							menuItemsParameters
-					  )
-					: false,
-			};
+			return resolve( coreStore ).getMenuItems( {
+				menus: menuId,
+				per_page: -1,
+				context: 'view',
+			} );
 		},
 		[ menuId ]
 	);
-
-	return {
-		menuItems,
-		hasResolvedMenuItems,
-	};
+	return { menuItems: data, hasResolvedMenuItems: hasFinished };
 }
 
 function usePageEntities() {
-	const { pages, isResolvingPages, hasResolvedPages } = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				isResolving,
-				hasFinishedResolution,
-			} = select( coreStore );
-
-			const pagesParameters = [
-				'postType',
-				'page',
-				{
-					parent: 0,
-					order: 'asc',
-					orderby: 'id',
-					per_page: -1,
-					context: 'view',
-				},
-			];
-
-			return {
-				pages: getEntityRecords( ...pagesParameters ) || null,
-				isResolvingPages: isResolving(
-					'getEntityRecords',
-					pagesParameters
-				),
-				hasResolvedPages: hasFinishedResolution(
-					'getEntityRecords',
-					pagesParameters
-				),
-			};
-		},
+	const { data, isResolving, hasFinished } = useResolveSelect(
+		( resolve ) =>
+			resolve( coreStore ).getEntityRecords( 'postType', 'page', {
+				parent: 0,
+				order: 'asc',
+				orderby: 'id',
+				per_page: -1,
+				context: 'view',
+			} ),
 		[]
 	);
 
 	return {
-		pages,
-		isResolvingPages,
-		hasResolvedPages,
-		hasPages: !! ( hasResolvedPages && pages?.length ),
+		pages: data,
+		isResolvingPages: isResolving,
+		hasResolvedPages: hasFinished,
+		hasPages: !! ( hasFinished && data?.length ),
 	};
 }
