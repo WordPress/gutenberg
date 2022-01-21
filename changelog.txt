@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 12.4.1 =
+
+### Bug Fixes
+
+#### Block Library
+- RSS: Reverts the late escape RSS block enhancement (#37878) to resolve an issue where raw HTML was shown to users of the RSS block (#38117)
+
+
 = 12.4.0 =
 
 
