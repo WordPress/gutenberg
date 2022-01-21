@@ -235,15 +235,6 @@ function gutenberg_rest_user_collection_params_has_published_posts( $query_param
 add_filter( 'rest_user_collection_params', 'gutenberg_rest_user_collection_params_has_published_posts' );
 
 /**
- * Registers the Global Styles REST API routes.
- */
-function gutenberg_register_global_styles_endpoints() {
-	$editor_settings = new Gutenberg_REST_Global_Styles_Controller();
-	$editor_settings->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
-
-/**
  * Registers the Edit Site's Export REST API routes.
  *
  * @return void

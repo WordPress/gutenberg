@@ -123,11 +123,13 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template.php';
 require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
-require __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-global-styles-controller.php';
+require __DIR__ . '/compat/wordpress-5.9/class-wp-rest-global-styles-controller.php';
 require __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
 require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
+require __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
+require __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 require __DIR__ . '/compat/experimental/blocks.php';
 
 require __DIR__ . '/blocks.php';
