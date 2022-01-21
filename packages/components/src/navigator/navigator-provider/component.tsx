@@ -49,18 +49,25 @@ function NavigatorProvider(
 
 	const push: NavigatorContextType[ 'push' ] = useCallback(
 		( path, options ) => {
-			// Force the `isBack` flag to `false` when navigating forward on both the
-			// previous and the new location.
-			// Also force the `isInitial` flag to `false` for the new location, to make
-			// sure it doesn't get overridden by mistake.
+			const { focusTargetSelector, ...restOptions } = options;
+
+			// Notes:
+			// - the `isBack` flag is set to `false` when navigating forwards on both
+			//   the previous and the new location.
+			// - the `isInitial` flag is set to `false` for the new location, to make
+			//   sure it doesn't get overridden by mistake.
+			// - the `focusTargetSelector` prop is set on the current (soon previous)
+			//   location, as it is used to restore focus in NavigatorScreen. The
+			//   remaining options are instead set on the new location being pushed.
 			setLocationHistory( [
 				...locationHistory.slice( 0, -1 ),
 				{
 					...locationHistory[ locationHistory.length - 1 ],
 					isBack: false,
+					focusTargetSelector,
 				},
 				{
-					...options,
+					...restOptions,
 					path,
 					isBack: false,
 					isInitial: false,

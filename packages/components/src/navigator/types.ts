@@ -3,7 +3,9 @@
  */
 import type { ReactNode } from 'react';
 
-type NavigateOptions = {};
+type NavigateOptions = {
+	focusTargetSelector?: string;
+};
 
 export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
