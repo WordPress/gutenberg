@@ -70,4 +70,10 @@ For context I’ll quote [this article on WordPress.org](https://make.wordpress.
 
 See <https://make.wordpress.org/design/handbook/design-guide/browser-support/>
 
+## Contributing to this package
+
+This package is part of the Gutenberg project. The repository is organized as a monorepo and contains many packages.
+
+To find out more about contributing, please read the [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
