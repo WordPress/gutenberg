@@ -763,6 +763,20 @@ _Returns_
 
 -   `Function`: A custom react hook exposing the registry context value.
 
+### useResolveSelect
+
+Like useSelect, but the selectors return objects containing
+both the original data AND the resolution info.
+
+_Parameters_
+
+-   _mapSelect_ `Function|StoreDescriptor|string`: see useSelect
+-   _deps_ `Array`: see useSelect
+
+_Returns_
+
+-   `Function`: A custom react hook.
+
 ### useSelect
 
 Custom react hook for retrieving props from registered selectors.
