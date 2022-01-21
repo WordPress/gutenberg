@@ -7,39 +7,18 @@ import { store as coreStore } from '../';
 
 export default function useEntityMutation( kind, type, id ) {
 	const mutationState = useSelect(
-		( select ) => ( {
-			editedRecord: select( coreStore ).getEditedEntityRecord(
-				kind,
-				type,
-				id
-			),
-			hasEdits: select( coreStore ).hasEditsForEntityRecord(
-				kind,
-				type,
-				id
-			),
-			isSaving: select( coreStore ).isSavingEntityRecord(
-				kind,
-				type,
-				id
-			),
-			saveError: select( coreStore ).getLastEntitySaveError(
-				kind,
-				type,
-				id
-			),
-			isDeleting: select( coreStore ).isDeletingEntityRecord(
-				kind,
-				type,
-				id
-			),
-			deleteError: select( coreStore ).getLastEntityDeleteError(
-				kind,
-				type,
-				id
-			),
-		} ),
-		[ id ]
+		( select ) => {
+			const args = [kind, type, id];
+			return {
+				editedRecord: select( coreStore ).getEditedEntityRecord( ...args ),
+				hasEdits: select( coreStore ).hasEditsForEntityRecord( ...args ),
+				isSaving: select( coreStore ).isSavingEntityRecord( ...args ),
+				saveError: select( coreStore ).getLastEntitySaveError( ...args ),
+				isDeleting: select( coreStore ).isDeletingEntityRecord( ...args ),
+				deleteError: select( coreStore ).getLastEntityDeleteError( ...args ),
+			};
+		},
+		[kind, type, id],
 	);
 
 	const {
@@ -52,11 +31,11 @@ export default function useEntityMutation( kind, type, id ) {
 		() => ( {
 			edit: ( record ) => editEntityRecord( kind, type, id, record ),
 			save: ( record ) =>
-				saveEditedEntityRecord( kind, type, id, record ),
+				saveEntityRecord( kind, type, id, record ),
 			saveEdited: () => saveEditedEntityRecord( kind, type, id ),
 			delete: () => deleteEntityRecord( kind, type, id ),
 		} ),
-		[ id ]
+		[id],
 	);
 
 	return {
