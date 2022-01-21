@@ -17,4 +17,8 @@
 	.components-base-control__label {
 		display: block;
 	}
+
+	.components-toolbar {
+		border-radius: $radius-block-ui;
+	}
 }
