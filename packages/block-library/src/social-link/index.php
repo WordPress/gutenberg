@@ -25,7 +25,9 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		block_core_social_link_get_name( $service ),
 		$url
 	);
-	$class_name = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
+	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
+	$shown_label = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
+	$class_name  = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
@@ -45,7 +47,17 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		)
 	);
 
-	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $rel_target_attributes . ' class="wp-block-social-link-anchor">' . $icon . '</a></li>';
+	$link  = '<li ' . $wrapper_attributes . '>';
+	$link .= '<a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" title="' . esc_attr( $label ) . '" ' . $rel_target_attributes . ' class="wp-block-social-link-anchor">';
+	$link .= $icon;
+
+	if ( $show_labels ) {
+		$link .= '<span class="wp-block-social-link-label">' . esc_attr( $shown_label ) . '</span>';
+	}
+
+	$link .= '</a></li>';
+
+	return $link;
 }
 
 /**

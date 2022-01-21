@@ -28,6 +28,12 @@
 			width: 1em;
 			height: 1em;
 		}
+
+		span {
+			margin-left: 0.5em;
+			margin-right: 0.5em;
+			font-size: 0.65em;
+		}
 	}
 
 	// Icon sizes.
@@ -74,7 +80,8 @@
 	height: auto;
 
 	a {
-		display: block;
+		align-items: center;
+		display: flex;
 		line-height: 0;
 		transition: transform 0.1s ease;
 	}
