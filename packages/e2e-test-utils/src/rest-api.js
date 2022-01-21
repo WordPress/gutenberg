@@ -183,7 +183,7 @@ async function getNonce( cookie ) {
 	if ( response.status !== 200 ) {
 		try {
 			// If there's a json error from the API, throw it.
-			const errorBody = await response.json();
+			const errorBody = await response.clone().json();
 			throw errorBody;
 		} catch ( error ) {
 			// Otherwise, fallback to throwing the response object.
