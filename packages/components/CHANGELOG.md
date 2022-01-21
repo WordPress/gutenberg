@@ -15,6 +15,10 @@
 -   Mark `children` prop as optional in `SelectControl` ([#37872](https://github.com/WordPress/gutenberg/pull/37872))
 -   Add memoization of callbacks and context to prevent unnecessary rerenders of the `ToolsPanel` ([#38037](https://github.com/WordPress/gutenberg/pull/38037))
 
+### Experimental
+
+-   Add basic history location support to `Navigator` ([#37416](https://github.com/WordPress/gutenberg/pull/37416)).
+
 ## 19.2.0 (2022-01-04)
 
 ### Experimental

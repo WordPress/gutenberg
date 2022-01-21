@@ -11,16 +11,12 @@ import DimensionsPanel, { useHasDimensionsPanel } from './dimensions-panel';
 import ScreenHeader from './header';
 
 function ScreenLayout( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 
 	return (
 		<>
-			<ScreenHeader
-				back={ parentMenu ? parentMenu : '/' }
-				title={ __( 'Layout' ) }
-			/>
+			<ScreenHeader title={ __( 'Layout' ) } />
 			{ hasDimensionsPanel && <DimensionsPanel name={ name } /> }
 			{ hasBorderPanel && <BorderPanel name={ name } /> }
 		</>
