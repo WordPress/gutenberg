@@ -114,11 +114,11 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'home'           => array(
 				'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays as the site\'s home page, or as the Posts page when a static home page isn\'t set.', 'gutenberg' ),
+				'description' => __( 'Displays posts on the site homepage, or on the Posts page if a static homepage is set.', 'gutenberg' ),
 			),
 			'front-page'     => array(
 				'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays as the site\'s home page.', 'gutenberg' ),
+				'description' => __( 'Displays as the site\'s homepage.', 'gutenberg' ),
 			),
 			'singular'       => array(
 				'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
@@ -162,7 +162,7 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'search'         => array(
 				'title'       => _x( 'Search', 'Template name', 'gutenberg' ),
-				'description' => __( 'Template used to display search results.', 'gutenberg' ),
+				'description' => __( 'Displays search results.', 'gutenberg' ),
 			),
 			'privacy-policy' => array(
 				'title'       => __( 'Privacy Policy', 'gutenberg' ),
