@@ -48,7 +48,7 @@ function NavigatorProvider(
 	] );
 
 	const push: NavigatorContextType[ 'push' ] = useCallback(
-		( path, options ) => {
+		( path, options = {} ) => {
 			const { focusTargetSelector, ...restOptions } = options;
 
 			// Notes:
