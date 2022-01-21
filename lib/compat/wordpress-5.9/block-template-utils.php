@@ -114,11 +114,11 @@ if ( ! function_exists( 'get_default_block_template_types' ) ) {
 			),
 			'home'           => array(
 				'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays posts on the site homepage, or on the Posts page if a static homepage is set.', 'gutenberg' ),
+				'description' => __( 'Displays posts on the homepage, or on the Posts page if a static homepage is set.', 'gutenberg' ),
 			),
 			'front-page'     => array(
 				'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-				'description' => __( 'Displays the site\'s homepage.', 'gutenberg' ),
+				'description' => __( 'Displays the homepage.', 'gutenberg' ),
 			),
 			'singular'       => array(
 				'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
