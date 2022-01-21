@@ -83,11 +83,14 @@ function NavigatorProvider(
 		}
 	}, [ locationHistory ] );
 
-	const navigatorContextValue: NavigatorContextType = {
-		location: locationHistory[ locationHistory.length - 1 ],
-		push,
-		pop,
-	};
+	const navigatorContextValue: NavigatorContextType = useMemo(
+		() => ( {
+			location: locationHistory[ locationHistory.length - 1 ],
+			push,
+			pop,
+		} ),
+		[ locationHistory, push, pop ]
+	);
 
 	const cx = useCx();
 	const classes = useMemo(
