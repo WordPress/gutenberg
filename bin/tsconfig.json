@@ -25,7 +25,6 @@
 		"./plugin/lib/version.js",
 		"./plugin/lib/logger.js",
 		"./plugin/lib/utils.js",
-		"./plugin/lib/git.js",
-		"./validate-package-lock.js"
+		"./plugin/lib/git.js"
 	]
 }

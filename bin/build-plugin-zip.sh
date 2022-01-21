@@ -101,7 +101,7 @@ done
 status "Installing dependencies... 📦"
 pnpm install
 status "Generating build... 👷‍♀️"
-npm run build
+pnpm build
 
 # Temporarily modify `gutenberg.php` with production constants defined. Use a
 # temp file because `bin/generate-gutenberg-php.php` reads from `gutenberg.php`

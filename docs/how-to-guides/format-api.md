@@ -22,7 +22,7 @@ The [complete format-api example](https://github.com/WordPress/gutenberg-example
 
 ## Step-by-step guide
 
-The guide will refer to `src/index.js` as the JavaScript file where the changes are made. After each step, running `npm run build` creates `build/index.js` that is then loaded on the post editor screen.
+The guide will refer to `src/index.js` as the JavaScript file where the changes are made. After each step, running `pnpm build` creates `build/index.js` that is then loaded on the post editor screen.
 
 ### Step 1: Register a new format
 
@@ -177,7 +177,7 @@ registerFormatType( 'my-custom-format/sample-output', {
 
 If you run into errors:
 
--   Double check that you run `npm run build` first.
+-   Double check that you run `pnpm build` first.
 -   Confirm no syntax errors or issues in build process.
 -   Confirm the JavaScript is loading in the editor.
 -   Check for any console error messages.

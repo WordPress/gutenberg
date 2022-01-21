@@ -40,11 +40,11 @@ jobs:
             - name: Npm install and build
               run: |
                   pnpm install
-                  npm run build
+                  pnpm build
 
             - name: Install WordPress
               run: |
-                  npm run wp-env start
+                  pnpm wp-env start
 
             - name: Running the tests
               run: |

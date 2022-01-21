@@ -22,13 +22,13 @@ module.exports = async ( { slug } ) => {
 
 	info( '' );
 	info( 'Formatting JavaScript files.' );
-	await command( 'npm run format', {
+	await command( 'pnpm format', {
 		cwd,
 	} );
 
 	info( '' );
 	info( 'Compiling block.' );
-	await command( 'npm run build', {
+	await command( 'pnpm build', {
 		cwd,
 	} );
 };

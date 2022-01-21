@@ -32,12 +32,12 @@
 	"scripts": {
 		"install-aztec-ios": "cd ./ios && carthage bootstrap --platform iOS --cache-builds --use-xcframeworks",
 		"update-aztec-ios": "cd ./ios && carthage update --platform iOS --cache-builds --use-xcframeworks",
-		"clean": "npm run clean-watchman; npm run clean-node; npm run clean-react; npm run clean-metro; npm run clean-jest;",
+		"clean": "pnpm clean-watchman; pnpm clean-node; pnpm clean-react; pnpm clean-metro; pnpm clean-jest;",
 		"clean-jest": "rm -rf $TMPDIR/jest_*;",
 		"clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",
 		"clean-node": "rm -rf node_modules/;",
 		"clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*;",
 		"clean-watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all;",
-		"clean:install": "npm run clean && npm install"
+		"clean:install": "pnpm clean && npm install"
 	}
 }

@@ -38,7 +38,7 @@ Lead-in sentence explaining the code snippet. For example:
 
 ```shell
 npm install
-npm run build
+pnpm build
 ```
 
 ## Troubleshooting

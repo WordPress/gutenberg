@@ -59,10 +59,10 @@ To add a new document requires a working JavaScript development environment to b
 1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/HEAD/docs) folder, use lower-case, no spaces, if needed a dash separator, and `.md` extension.
 2. Add content, all documents require one and only H1 tag, using markdown notation.
 3. Add document entry to the [toc.json](https://github.com/WordPress/gutenberg/blob/HEAD/docs/toc.json) hierarchy, see existing entries for format.
-4. Run `npm run docs:build` to update `manifest.json`.
+4. Run `pnpm docs:build` to update `manifest.json`.
 5. Commit `manifest.json` with other files updated.
 
-If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
+If you forget to run, `pnpm docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
 
 ### Using links
 

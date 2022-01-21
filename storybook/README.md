@@ -6,4 +6,4 @@ The Gutenberg project uses Storybook to view and work with the UI components dev
 
 View online at: https://wordpress.github.io/gutenberg/
 
-Run locally in your development environment running: `npm run storybook:dev` from the top-level Gutenberg directory.
+Run locally in your development environment running: `pnpm storybook:dev` from the top-level Gutenberg directory.

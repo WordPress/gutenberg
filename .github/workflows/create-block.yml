@@ -36,4 +36,4 @@ jobs:
             - name: pnpm install, build, format and lint
               run: |
                   pnpm install
-                  npm run test:create-block
+                  ppnpm test:create-block

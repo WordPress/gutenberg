@@ -133,7 +133,7 @@ Add the following to `block.js`
 
 {% end %}
 
-NOTE: If using the JSX version, you need to run `npm run build` and it will create the JavaScript file that is loaded in the editor at `build/index.js`
+NOTE: If using the JSX version, you need to run `pnpm build` and it will create the JavaScript file that is loaded in the editor at `build/index.js`
 
 ### Step 4: Confirm
 

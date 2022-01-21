@@ -27,7 +27,7 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: pnpm
 
-            - name: Install NPM dependencies
+            - name: Install pnpm dependencies
               run: pnpm install
 
             - uses: ./packages/project-management-automation

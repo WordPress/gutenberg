@@ -45,13 +45,13 @@ jobs:
               # build tasks, however. These must be run.
               run: |
                   pnpm install
-                  npx lerna run build
+                  pnpx lerna run build
 
             - name: Running the tests
-              run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: pnpm test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
             - name: Running the date tests
-              run: npm run test-unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: pnpm test-unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     unit-php:
         name: PHP
@@ -72,21 +72,21 @@ jobs:
             - name: Npm install and build
               run: |
                   pnpm install
-                  npm run build
+                  pnpm build
 
             - name: Install WordPress
               run: |
-                  npm run wp-env start
+                  pnpm wp-env start
 
             - name: Running lint check
-              run: npm run lint-php
+              run: pnpm lint-php
 
             - name: Running single site unit tests
-              run: npm run test-unit-php
+              run: pnpm test-unit-php
               if: ${{ success() || failure() }}
 
             - name: Running multisite unit tests
-              run: npm run test-unit-php-multisite
+              run: pnpm test-unit-php-multisite
               if: ${{ success() || failure() }}
 
     mobile-unit-js:
@@ -114,4 +114,4 @@ jobs:
                   npx lerna run build
 
             - name: Running the tests
-              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: pnpm native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

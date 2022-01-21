@@ -56,7 +56,7 @@ Next, to generate files (2) through (4) run the following command from the root 
 project:
 
 ```sh
-npm run fixtures:regenerate test/integration/full-content/full-content.test.js
+pnpm fixtures:regenerate test/integration/full-content/full-content.test.js
 ```
 
 When using this command, please be sure to manually verify that the
@@ -72,7 +72,7 @@ The process for updating fixtures for existing tests is similar to that for crea
 Run the command to regenerate the files:
 
 ```sh
-npm run fixtures:regenerate test/integration/full-content/full-content.test.js
+pnpm fixtures:regenerate test/integration/full-content/full-content.test.js
 ```
 
 After regenerating fixtures, check the diff (using git/github) to check that the changes were expected

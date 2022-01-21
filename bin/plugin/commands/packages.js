@@ -314,7 +314,7 @@ async function publishPackagesToNpm(
 		} );
 	} else if ( releaseType === 'bugfix' ) {
 		log( '>> Publishing modified packages to npm.' );
-		await command( `npm run publish:latest`, {
+		await command( `pnpm publish:latest`, {
 			cwd: gitWorkingDirectoryPath,
 			stdio: 'inherit',
 		} );

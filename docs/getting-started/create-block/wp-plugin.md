@@ -69,7 +69,7 @@ The `package.json` file defines the JavaScript properties for your project. This
 
 A `package.json` file was created with the create script, this defines the dependencies and scripts needed. You can install dependencies. The only initial dependency is the `@wordpress/scripts` package that bundles the tools and configurations needed to build blocks.
 
-In `package.json`, there is a `scripts` property that defines what command to run when using `npm run (cmd)`. In our generated `package.json` file, the two main scripts point to the commands in the `wp-scripts` package:
+In `package.json`, there is a `scripts` property that defines what command to run when using `pnpm (cmd)`. In our generated `package.json` file, the two main scripts point to the commands in the `wp-scripts` package:
 
 ```json
   "scripts": {
@@ -78,11 +78,11 @@ In `package.json`, there is a `scripts` property that defines what command to ru
   },
 ```
 
-These scripts are run by using: `npm run build` or `npm run start`
+These scripts are run by using: `pnpm build` or `pnpm start`
 
-Use `npm run build` for running once to create a "production" build. This compresses the code down so it downloads faster, but makes it harder to read using browser tools—good for final deployment but not while developing.
+Use `pnpm build` for running once to create a "production" build. This compresses the code down so it downloads faster, but makes it harder to read using browser tools—good for final deployment but not while developing.
 
-Use `npm run start` for creating a "development" build, this does not compress the code so it is easier to read using browser tools, plus [source maps](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map) that make debugging easier. Additionally, development build will start a watch process that waits and watches for changes to the file and will rebuild each time it is saved; so you don't have to run the command for each change.
+Use `pnpm start` for creating a "development" build, this does not compress the code so it is easier to read using browser tools, plus [source maps](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map) that make debugging easier. Additionally, development build will start a watch process that waits and watches for changes to the file and will rebuild each time it is saved; so you don't have to run the command for each change.
 
 By default, the build scripts looks for `src/index.js` for the JavaScript file to build and will save the built file to `build/index.js`. In the upcoming sections, we will look closer at that script, but first let's make sure it is loaded in WordPress.
 
@@ -131,7 +131,7 @@ It is a good skill to learn and get comfortable using the web console. This is w
 
 To open the developer tools in Firefox, use the menu selecting Web Developer : Toggle Tools, on Chrome, select More Tools -> Developers Tools. For both browsers, the keyboard shortcut on Windows is Ctrl+Shift+I, or on Mac Cmd+Shift+I. On Windows & Linux, the F12 key also works. You can then click Console to view logs.
 
-Try running `npm run start` that will start the watch process for automatic rebuilds. If you then make an update to `src/index.js` file, you will see the build run, and if you reload the WordPress editor you'll see the change.
+Try running `pnpm start` that will start the watch process for automatic rebuilds. If you then make an update to `src/index.js` file, you will see the build run, and if you reload the WordPress editor you'll see the change.
 
 For more info, see the build section of the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/js-build-setup.md) in the Block Editor Handbook.
 

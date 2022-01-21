@@ -31,7 +31,7 @@ jobs:
               run: pnpm install
 
             - name: Build Storybook
-              run: npm run storybook:build
+              run: pnpm storybook:build
 
             - name: Deploy
               uses: peaceiris/actions-gh-pages@bbdfb200618d235585ad98e965f4aafc39b4c501 # v3.7.3

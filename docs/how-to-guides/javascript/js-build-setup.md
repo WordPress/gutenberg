@@ -123,7 +123,7 @@ To configure npm to run a script, you use the scripts section in `package.json` 
   },
 ```
 
-You can then run the build using: `npm run build`.
+You can then run the build using: `pnpm build`.
 
 After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [loading JavaScript step in this tutorial](/docs/how-to-guides/javascript/loading-javascript.md), and the block will load in the editor.
 
@@ -179,4 +179,4 @@ With a setup in place, the standard workflow is:
 1. Install dependencies: `npm install`
 2. Start development builds: `npm start`
 3. Develop. Test. Repeat.
-4. Create production build: `npm run build`
+4. Create production build: `pnpm build`

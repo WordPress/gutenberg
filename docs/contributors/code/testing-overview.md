@@ -26,14 +26,14 @@ _It should be noted that in the past, React components were unit tested with [En
 Assuming you've followed the [instructions](/docs/contributors/code/getting-started-with-code-contribution.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
 ```
-npm test
+pnpm test
 ```
 
-Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint-js:fix`.
+Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `pnpm test` will execute both unit tests and code linting, code linting can be verified independently by running `pnpm lint`. Some JavaScript issues can be fixed automatically by running `pnpm lint-js:fix`.
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
-To run unit tests only, without the linter, use `npm run test-unit` instead.
+To run unit tests only, without the linter, use `pnpm test-unit` instead.
 
 ### Folder structure
 
@@ -224,7 +224,7 @@ However, if the change was intentional, follow these steps to update the snapsho
 
 ```sh
 # --testPathPattern is optional but will be much faster by only running matching tests
-npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
+pnpm test-unit -- --updateSnapshot --testPathPattern path/to/tests
 ```
 
 1. Review the diff and ensure the changes are expected and intentional.
@@ -300,12 +300,12 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
 
 ```sh
-npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
+pnpm test-unit -- --updateSnapshot --testPathPattern path/to/tests
 ```
 
 `--testPathPattern` is not required, but specifying a path will speed things up by running a subset of tests.
 
-It's a great idea to keep `npm run test-unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
+It's a great idea to keep `pnpm test-unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
 
 #### Pain points
 
@@ -377,7 +377,7 @@ In that case, you might see test failures and `TypeError` reported by Jest in th
 
 ### Debugging Jest unit tests
 
-Running `npm run test-unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+Running `pnpm test-unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
 
 ## Native mobile testing
 
@@ -388,7 +388,7 @@ Part of the unit-tests suite is a set of Jest tests run exercise native-mobile c
 To locally run the tests in debug mode, follow these steps:
 
 0. Make sure you have ran `npm ci` to install all the packages
-1. Run `npm run native test:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
+1. Run `pnpm native test:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
 2. Open `chrome://inspect` in Chrome
 3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file. Alternatively, if the targets are not visible, click on the `Open dedicated DevTools for Node` link in the same page.
 4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
@@ -412,31 +412,31 @@ End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a he
 If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the e2e tests locally using this command:
 
 ```bash
-npm run test-e2e
+pnpm test-e2e
 ```
 
 or interactively
 
 ```bash
-npm run test-e2e:watch
+pnpm test-e2e:watch
 ```
 
 Sometimes it's useful to observe the browser while running tests. Then, use this command:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-interactive
+pnpm test-e2e:watch -- --puppeteer-interactive
 ```
 
 You can control the speed of execution with `--puppeteer-slowmo`:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
+pnpm test-e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
 ```
 
 You can additionally have the devtools automatically open for interactive debugging in the browser:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-devtools
+pnpm test-e2e:watch -- --puppeteer-devtools
 ```
 
 ### Using alternate environment
@@ -450,7 +450,7 @@ ln -s gutenberg/packages/e2e-tests/plugins/* .
 Then to run the tests, specify the base URL, username, and passwords for your site. For example, if your test site is at `http://wp.test`, use:
 
 ```bash
-WP_BASE_URL=http://wp.test npm run test-e2e -- --wordpress-username=admin --wordpress-password=password
+WP_BASE_URL=http://wp.test pnpm test-e2e -- --wordpress-username=admin --wordpress-password=password
 ```
 
 ### Scenario Testing
@@ -458,7 +458,7 @@ WP_BASE_URL=http://wp.test npm run test-e2e -- --wordpress-username=admin --word
 If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
 ```
-THROTTLE_CPU=4 npm run test-e2e
+THROTTLE_CPU=4 pnpm test-e2e
 ```
 
 `THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
@@ -466,7 +466,7 @@ THROTTLE_CPU=4 npm run test-e2e
 See [Chrome docs: setCPUThrottlingRate](https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate)
 
 ```
-SLOW_NETWORK=true npm run test-e2e
+SLOW_NETWORK=true pnpm test-e2e
 ```
 
 `SLOW_NETWORK` emulates a network speed equivalent to "Fast 3G" in the Chrome devtools.
@@ -474,7 +474,7 @@ SLOW_NETWORK=true npm run test-e2e
 See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions) and [NetworkManager.js](https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274)
 
 ```
-OFFLINE=true npm run test-e2e
+OFFLINE=true pnpm test-e2e
 ```
 
 `OFFLINE` emulates network disconnection.
@@ -494,22 +494,22 @@ A test is considered to be **flaky** when it can pass and fail across multiple r
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the PHP tests locally using this command:
 
 ```bash
-npm run test-php
+pnpm test-php
 ```
 
 To re-run tests automatically when files change (similar to Jest), run:
 
 ```
-npm run test-php:watch
+pnpm test-php:watch
 ```
 
 _Note: The phpunit commands require `wp-env` to be running and composer dependencies to be installed. The package script will start wp-env for you if it is not already running._
 
 In other environments, run `composer run test` and `composer run test:watch`.
 
-Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
+Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `pnpm test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `pnpm lint-php`.
 
-To run unit tests only, without the linter, use `npm run test-unit-php` instead.
+To run unit tests only, without the linter, use `pnpm test-unit-php` instead.
 
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
@@ -525,7 +525,7 @@ To ensure that the editor stays performant as we add features, we monitor the im
 Performance tests are end-to-end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
 
 ```
-npm run test-performance
+pnpm test-performance
 ```
 
 This gives you the result for the current branch/code on the running environment.

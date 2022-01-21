@@ -58,22 +58,22 @@ jobs:
                   key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
 
             - name: Bundle iOS
-              run: npm run native test:e2e:bundle:ios
+              run: pnpm native test:e2e:bundle:ios
 
             - name: Switch Xcode version to ${{ matrix.xcode }}
               run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
 
             - name: Build (if needed)
-              run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
+              run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || pnpm native test:e2e:build-app:ios
 
             - name: Build Web Driver Agent (if needed)
-              run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
+              run: test -d packages/react-native-editor/ios/build/WDA || pnpm native test:e2e:build-wda
 
             - name: Force update Launch Database to prevent issues when opening the Simulator app
               run: /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer/Applications/Simulator.app
 
             - name: Run iOS Device Tests
-              run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
+              run: TEST_RN_PLATFORM=ios pnpm native device-tests:local  ${{ matrix.native-test-name }}
 
             - name: Prepare build cache
               run: |

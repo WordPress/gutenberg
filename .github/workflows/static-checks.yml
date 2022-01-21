@@ -36,13 +36,13 @@ jobs:
               run: pnpm install
 
             - name: Lint JavaScript and Styles
-              run: npm run lint
+              run: pnpm lint
 
             - name: Type checking
-              run: npm run build:package-types
+              run: pnpm build:package-types
 
             - name: Check local changes
-              run: npm run check-local-changes
+              run: pnpm check-local-changes
 
             - name: License compatibility
-              run: npm run check-licenses
+              run: pnpm check-licenses

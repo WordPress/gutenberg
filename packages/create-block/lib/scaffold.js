@@ -117,19 +117,19 @@ module.exports = async (
 		code( '  $ npm start' );
 		info( '    Starts the build for development.' );
 		info( '' );
-		code( '  $ npm run build' );
+		code( '  $ pnpm build' );
 		info( '    Builds the code for production.' );
 		info( '' );
-		code( '  $ npm run format' );
+		code( '  $ pnpm format' );
 		info( '    Formats files.' );
 		info( '' );
-		code( '  $ npm run lint:css' );
+		code( '  $ pnpm lint:css' );
 		info( '    Lints CSS files.' );
 		info( '' );
-		code( '  $ npm run lint:js' );
+		code( '  $ pnpm lint:js' );
 		info( '    Lints JavaScript files.' );
 		info( '' );
-		code( '  $ npm run packages-update' );
+		code( '  $ pnpm packages-update' );
 		info( '    Updates WordPress packages to the latest version.' );
 	}
 	info( '' );

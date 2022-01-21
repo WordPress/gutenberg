@@ -67,7 +67,7 @@ If you have an existing Gutenberg checkout be sure to fully clean `node_modules`
 This may help avoid errors in the future.
 
 ```sh
-npm run distclean
+pnpm distclean
 npm ci
 ```
 
@@ -76,7 +76,7 @@ npm ci
 Unit tests should work at this point.
 
 ```sh
-npm run native test
+pnpm native test
 ```
 
 ## iOS
@@ -96,13 +96,13 @@ See if `doctor` can fix both "common" and "iOS" issues. (Don't worry if "Android
 Once all common and iOS issues are resolved, try:
 
 ```
-npm run native start:reset #starts metro
+pnpm native start:reset #starts metro
 ```
 
 In another terminal type:
 
 ```
-npm run native ios
+pnpm native ios
 ```
 
 After waiting for everything to build we should see:
@@ -191,13 +191,13 @@ There are some advanced settings we can toggle, but these are optional. Click fi
 Start metro:
 
 ```
-npm run native start:reset
+pnpm native start:reset
 ```
 
 In another terminal run the following to launch the demo app in the Android emulator (if the emulator isn't already running, it'll also be launched as part of this command):
 
 ```
-npm run native android
+pnpm native android
 ```
 
 After a bit of a wait, we’ll see something like this:
@@ -219,18 +219,18 @@ Resolve any required dependencies.
 ### iOS Integration Tests
 
 If we know we can run the iOS local environment without issue, E2Es for iOS are straightforward. Stop any running metro processes.
-This was launched previously with `npm run native start:reset`.
+This was launched previously with `pnpm native start:reset`.
 
 Then in terminal type:
 
 ```sh
-npm run native test:e2e:ios:local
+pnpm native test:e2e:ios:local
 ```
 
 Passing a filename should also work to run a subset of tests:
 
 ```sh
-npm run native test:e2e:ios:local gutenberg-editor-gallery.test.js
+pnpm native test:e2e:ios:local gutenberg-editor-gallery.test.js
 ```
 
 If all things go well, it should look like:
@@ -245,18 +245,18 @@ Start the virtual device first. Go back to the AVD by clicking on the phone icon
 
 <img src="https://developer.wordpress.org/files/2021/10/adv-integration.png" alt="A screenshot of how to start the Android Simulator.">
 
-Make sure no metro processes are running. This was launched previously with `npm run native start:reset`.
+Make sure no metro processes are running. This was launched previously with `pnpm native start:reset`.
 
 Then in a terminal run:
 
 ```sh
-npm run native test:e2e:android:local
+pnpm native test:e2e:android:local
 ```
 
 Passing a filename should also work to run a subset of tests:
 
 ```
-npm run native test:e2e:android:local gutenberg-editor-gallery.test.js
+pnpm native test:e2e:android:local gutenberg-editor-gallery.test.js
 ```
 
 After a bit of a wait we should see:

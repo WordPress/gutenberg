@@ -11,7 +11,7 @@ locales=(en_US ja_JP)
 
 for timezone in "${timezones[@]}"; do
     for locale in "${locales[@]}"; do
-        TZ=$timezone LANG=$locale npm run test-unit -- packages/date "$@" &
+        TZ=$timezone LANG=$locale pnpm test-unit -- packages/date "$@" &
         pids+=($!)
         pidsTimezones+=($timezone)
         pidsLocales+=($locale)

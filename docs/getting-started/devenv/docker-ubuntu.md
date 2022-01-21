@@ -14,7 +14,7 @@ For earlier versions of Ubuntu, the docker binaries included in repositories did
 
 ## Troubleshooting
 
-If you run into this error, when running `npm run wp-env` from the Gutenberg directory:
+If you run into this error, when running `pnpm wp-env` from the Gutenberg directory:
 
 ```
 ERROR: Couldn't connect to Docker daemon at http+docker://localhost - is it running?
@@ -54,7 +54,7 @@ After restarting the services, set the environment variable DOCKER_HOST and try 
 
 ```
 export DOCKER_HOST=tcp://127.0.0.1:2376
-npm run wp-env start
+pnpm wp-env start
 ```
 
 Your environment should be setup at: http://localhost:8888/

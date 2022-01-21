@@ -35,12 +35,12 @@ Install the Gutenberg dependencies and build your code in development mode:
 ```bash
 npm install -g pnpm
 pnpm install
-npm run dev
+pnpm dev
 ```
 
 > Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system. This might be installed by default for your operating system, or require downloading and installing.
 
-There are two ways to build your code. While developing, you probably will want to use `npm run dev` to run continuous builds automatically as source files change. The dev build also includes additional warnings and errors to help troubleshoot while developing. Once you are happy with your changes, you can run `npm run build` to create optimized production build.
+There are two ways to build your code. While developing, you probably will want to use `pnpm dev` to run continuous builds automatically as source files change. The dev build also includes additional warnings and errors to help troubleshoot while developing. Once you are happy with your changes, you can run `pnpm build` to create optimized production build.
 
 Once built, Gutenberg is ready to be used as a WordPress plugin!
 
@@ -59,17 +59,17 @@ By default, `wp-env` can run in a plugin directory to create and run a WordPress
 Make sure Docker is running, and start `wp-env` from within the gutenberg directory:
 
 ```bash
-npm run wp-env start
+pnpm wp-env start
 ```
 
 This script will create a Docker instance behind the scenes with the latest WordPress Docker image, and then will map the Gutenberg plugin code from your local copy to the environment as a Docker volume. This way, any changes you make to the code locally are reflected immediately in the WordPress instance.
 
-> Note: `npm run` will use the `wp-env` / `WordPress`?? version specified within the Gutenberg project, making sure you are running the latest wp-env version.
+> Note: `pnpm` will use the `wp-env` / `WordPress`?? version specified within the Gutenberg project, making sure you are running the latest wp-env version.
 
 To stop the running environment:
 
 ```bash
-npm run wp-env stop
+pnpm wp-env stop
 ```
 
 If everyting went well, you should see the following message in your terminal:
@@ -89,7 +89,7 @@ And if you open Docker dashboard by rightclicking the icon in the menu bar(on Ma
 To destroy the install completely:
 
 ```bash
-npm run wp-env destroy
+pnpm wp-env destroy
 ```
 
 Explore the [package documentation](/packages/env/README.md) for additional commands.
@@ -105,7 +105,7 @@ You can access the Dashboard at: `http://localhost:8888/wp-admin/` using **Usern
 To access the MySQL database on the `wp-env` instance you will first need the connection details. To do this:
 
 1. In a terminal, navigate to your local Gutenberg repo.
-2. Run `npm run wp-env start` - various information about the `wp-env` environment should be logged into the terminal.
+2. Run `pnpm wp-env start` - various information about the `wp-env` environment should be logged into the terminal.
 3. In the output from step 2, look for information about the _MySQL_ port:
    For example:
 
@@ -144,7 +144,7 @@ ln -s gutenberg/packages/e2e-tests/plugins/* .
 You'll need to run this again if new plugins are added. To run e2e tests:
 
 ```bash
-WP_BASE_URL=http://localhost:8888/gutenberg npm run test-e2e
+WP_BASE_URL=http://localhost:8888/gutenberg pnpm test-e2e
 ```
 
 #### Caching of PHP files
@@ -184,11 +184,11 @@ Tools like MAMP tend to configure MySQL to use ports other than the default 3306
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 
-To build: open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm ci` to get the dependencies all set up. Once that finishes, you can type `npm run build`.
+To build: open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `pnpm i --frozen-lockfile` to get the dependencies all set up. Once that finishes, you can type `pnpm build`.
 
 After building the cloned gutenberg directory contains the complete plugin, you can upload the entire repository to your `wp-content/plugins` directory and activate the plugin from the WordPress admin.
 
-Another way to upload after building is to run `npm run build:plugin-zip` to create a plugin zip file — this requires `bash` and `php` to run. The script creates `gutenberg.zip` that you can use to install Gutenberg through the WordPress admin.
+Another way to upload after building is to run `pnpm build:plugin-zip` to create a plugin zip file — this requires `bash` and `php` to run. The script creates `gutenberg.zip` that you can use to install Gutenberg through the WordPress admin.
 
 ## Storybook
 
@@ -196,7 +196,7 @@ Another way to upload after building is to run `npm run build:plugin-zip` to cre
 
 The Gutenberg repository also includes [Storybook](https://storybook.js.org/) integration that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
 
-You can launch Storybook by running `npm run storybook:dev` locally. It will open in your browser automatically.
+You can launch Storybook by running `pnpm storybook:dev` locally. It will open in your browser automatically.
 
 You can also test Storybook for the current `trunk` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 

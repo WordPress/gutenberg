@@ -183,7 +183,7 @@ If you are publishing new versions of packages, note that there are versioning r
 
 ## Releasing Packages
 
-Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check` from the branch that keeps the code for a given `wp/X.Y` release type (example `wp/5.7`).
+Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `pnpm publish:check` from the branch that keeps the code for a given `wp/X.Y` release type (example `wp/5.7`).
 
 If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your [npm account][npm].
 
@@ -201,7 +201,7 @@ If you're publishing a new package, ensure that its `package.json` file contains
 }
 ```
 
-You can check your package configs by running `npm run lint-pkg-json`.
+You can check your package configs by running `pnpm lint-pkg-json`.
 
 ### Development Release
 
@@ -231,7 +231,7 @@ To release a patch for the older major or minor version of packages, run the fol
 
 ```bash
 npm install
-npm run publish:patch
+pnpm publish:patch
 ```
 
 This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress. This will publish only a patch version of the built packages. This is useful for backpublishing certain packages to WordPress.

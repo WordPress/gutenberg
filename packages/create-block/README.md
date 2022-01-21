@@ -90,31 +90,31 @@ $ npm start
 Starts the build for development. [Learn more](/packages/scripts#start).
 
 ```bash
-$ npm run build
+$ pnpm build
 ```
 
 Builds the code for production. [Learn more](/packages/scripts#build).
 
 ```bash
-$ npm run format
+$ pnpm format
 ```
 
 Formats files. [Learn more](/packages/scripts#format).
 
 ```bash
-$ npm run lint:css
+$ pnpm lint:css
 ```
 
 Lints CSS files. [Learn more](/packages/scripts#lint-style).
 
 ```bash
-$ npm run lint:js
+$ pnpm lint:js
 ```
 
 Lints JavaScript files. [Learn more](/packages/scripts#lint-js).
 
 ```bash
-$ npm run packages-update
+$ pnpm packages-update
 ```
 
 Updates WordPress packages to the latest version. [Learn more](/packages/scripts#packages-update).

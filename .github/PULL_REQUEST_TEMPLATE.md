@@ -20,7 +20,7 @@
 
 ## Checklist:
 - [ ] My code is tested.
-- [ ] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/ -->
+- [ ] My code follows the WordPress code style. <!-- Check code: `pnpm lint`, Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/ -->
 - [ ] My code follows the accessibility standards. <!-- Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/accessibility/ -->
 - [ ] I've tested my changes with keyboard and screen readers. <!-- Instructions: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/accessibility-testing.md -->
 - [ ] My code has proper inline documentation. <!-- Guidelines: https://developer.wordpress.org/coding-standards/inline-documentation-standards/javascript/ -->

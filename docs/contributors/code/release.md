@@ -179,7 +179,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
 7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number after every major WordPress release. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
 8. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 9. From the `wp/trunk` branch, install npm dependencies with `npm ci`.
-10. Run the script `npm run publish:latest`.
+10. Run the script `pnpm publish:latest`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
@@ -202,7 +202,7 @@ Now, the branch is ready to be used to publish the npm packages.
 
 1. Check out the WordPress branch used before (Example `wp/5.2`).
 2. `git pull`.
-3. Run the `npm run publish:patch` command (see more in [package release process]) but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
+3. Run the `pnpm publish:patch` command (see more in [package release process]) but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
 
 **Note:** For WordPress `5.0` and WordPress `5.1`, a different release process was used. This means that when choosing npm package versions targeting these two releases, you won't be able to use the next `patch` version number as it may have been already used. You should use the "metadata" modifier for these. For example, if the last published package version for this WordPress branch was `5.6.1`, choose `5.6.1+patch.1` as a version.
 
@@ -231,7 +231,7 @@ Open a terminal and perform the following steps:
 Before porting commits check that the `wp/trunk` branch does not have any outstanding packages waiting to be published:
 
 1. `git checkout wp/trunk`
-2. `npm run publish:check`
+2. `pnpm publish:check`
 
 Now _cherry-pick_ the commits from `trunk` to `wp/trunk`, use `-m 1 commithash` if the commit was a pull request merge commit:
 
@@ -241,11 +241,11 @@ Now _cherry-pick_ the commits from `trunk` to `wp/trunk`, use `-m 1 commithash` 
 Whilst waiting for the GitHub actions build for `wp/trunk`[branch to pass](https://github.com/WordPress/gutenberg/actions?query=branch%3Awp%2Ftrunk), identify and begin updating the `CHANGELOG.md` files:
 
 1. `git checkout wp/trunk`
-2. `npm run publish:check`
+2. `pnpm publish:check`
     > Example
     >
     > ```shell
-    > npm run publish:check
+    > pnpm publish:check
     > @wordpress/e2e-tests
     > @wordpress/jest-preset-default
     > @wordpress/scripts
@@ -274,21 +274,21 @@ Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://gi
 
 Now that the changes have been committed to the `wp/trunk` branch and the Travis CI builds for the `wp/trunk` [branch are passing](https://travis-ci.com/WordPress/gutenberg/branches) it's time to publish the packages to npm:
 
-1. Once again run `npm run publish:check` to confirm there are no unexpected packages ready to be published:
+1. Once again run `pnpm publish:check` to confirm there are no unexpected packages ready to be published:
     > Example
     >
     > ```shell
-    > npm run publish:check
+    > pnpm publish:check
     > @wordpress/e2e-tests
     > @wordpress/jest-preset-default
     > @wordpress/scripts
     > lerna success found 3 packages ready to publish
     > ```
-2. Run the `npm run publish:latest` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
+2. Run the `pnpm publish:latest` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
     > Truncated example of publishing process output
     >
     > ```
-    > npm run publish:latest
+    > pnpm publish:latest
     >
     > Build Progress: [==============================] 100%
     > lerna notice cli v3.18.2

@@ -89,7 +89,7 @@ You can run the benchmarks yourselves by cloning the repository, installing depe
 ```
 git clone https://github.com/WordPress/gutenberg.git
 npm install
-npm run build:packages
+pnpm build:packages
 node ./packages/is-shallow-equal/benchmark
 ```
 

@@ -161,10 +161,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
 	await git.checkoutRemoteBranch( environmentDirectory, branch );
 
 	log( '        >> Building the ' + formats.success( branch ) + ' branch' );
-	await runShellScript(
-		'pnpm install && npm run build',
-		environmentDirectory
-	);
+	await runShellScript( 'pnpm install && pnpm build', environmentDirectory );
 }
 
 /**
@@ -177,7 +174,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
  */
 async function runTestSuite( testSuite, performanceTestDirectory ) {
 	await runShellScript(
-		`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+		`pnpm test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 		performanceTestDirectory
 	);
 	const rawResults = await readJSONFile(
@@ -235,7 +232,7 @@ async function runPerformanceTests( branches, options ) {
 	}
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'pnpm install && npm run build:packages',
+		'pnpm install && pnpm build:packages',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );

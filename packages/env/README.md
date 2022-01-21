@@ -48,11 +48,11 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 }
 ```
 
-When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
+When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `pnpm`, for example:
 
 ```sh
 # You must add another dash to pass the "update" flag to wp-env
-$ npm run wp-env start -- --update
+$ pnpm wp-env start -- --update
 ```
 
 instead of:

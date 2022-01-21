@@ -36,14 +36,14 @@ It's important to note that the JSON object contains all used strings, so in ord
 
 Extract used strings:
 ```sh
-npm run native i18n:extract-used-strings -- "$PWD/used-strings.json"
+pnpm native i18n:extract-used-strings -- "$PWD/used-strings.json"
 ```
 
 ***NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path for relative paths.*
 
-Extract used strings including extra plugins: 
+Extract used strings including extra plugins:
 ```sh
-npm run native i18n:extract-used-strings -- "$PWD/used-strings.json" "domain-plugin-1" <PLUGIN-1_SOURCE_PATH> "domain-plugin-2" <PLUGIN-2_SOURCE_PATH> ...
+pnpm native i18n:extract-used-strings -- "$PWD/used-strings.json" "domain-plugin-1" <PLUGIN-1_SOURCE_PATH> "domain-plugin-2" <PLUGIN-2_SOURCE_PATH> ...
 ```
 
 ## Providing own translations (for strings only used in native platform)
@@ -74,12 +74,12 @@ The strings included in these translation files are imported in the editor upon 
 
 Fetch un-optimized translations:
 ```sh
-npm run native i18n:fetch-translations -- "gutenberg" <OUTPUT_PATH>
+pnpm native i18n:fetch-translations -- "gutenberg" <OUTPUT_PATH>
 ```
 
 ***NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path  for relative paths.*
 
 Fetch optimized translations:
 ```sh
-npm run native i18n:fetch-translations -- "gutenberg" <OUTPUT_PATH> <USED_STRINGS_FILE>
+pnpm native i18n:fetch-translations -- "gutenberg" <OUTPUT_PATH> <USED_STRINGS_FILE>
 ```

@@ -172,6 +172,7 @@ jobs:
             - uses: pnpm/action-setup@v2.0.1
               with:
                   version: 6.23.6
+
             - name: Use desired version of NodeJS
               uses: actions/setup-node@v2
               with:
@@ -196,7 +197,7 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  npm run changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
+                  pnpm changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
                   sed -ie '1,6d' release-notes.txt
                   if [[ ${{ needs.bump-version.outputs.new_version }} != *"rc"* ]]; then
                     # Include previous RCs' release notes, if any

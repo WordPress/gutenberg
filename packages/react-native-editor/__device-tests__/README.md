@@ -20,7 +20,7 @@ TBA
 
 ## Running the tests locally
 
-TLDR; to run the tests locally ensure metro isn't running and then run `npm run native test:e2e:ios:local` and `npm run native test:e2e:android:local` for the desired platform.
+TLDR; to run the tests locally ensure metro isn't running and then run `pnpm native test:e2e:ios:local` and `pnpm native test:e2e:android:local` for the desired platform.
 
 Those commands include the process to build a testable version of the app with these steps:
 
@@ -34,7 +34,7 @@ Once the JS bundle and native app code are created they can be re-used by the te
 -   If you only changed JS app code you can run only `test:e2e:bundle:(ios|android)` followed by `device-tests:local`
 -   If you didn't change native or JS app code but only have modified e2e tests under `__device-tests__` you only need to re-rerun `device-tests:local` which uses the pre-built native and JS app code
 -   If it's the case you don't want to run the
-    full suite and want to run a specific file or files you can run `TEST_RN_PLATFORM=android npm run native device-tests <pattern>` where the pattern can just be the file name.
+    full suite and want to run a specific file or files you can run `TEST_RN_PLATFORM=android pnpm native device-tests <pattern>` where the pattern can just be the file name.
 
 ### Debugging
 

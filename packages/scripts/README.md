@@ -74,8 +74,8 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run build` - builds the code for production.
--   `npm run build:custom` - builds the code for production with two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+-   `pnpm build` - builds the code for production.
+-   `pnpm build:custom` - builds the code for production with two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
@@ -102,7 +102,7 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run check-engines` - checks installed version of `node` and `npm`.
+-   `pnpm check-engines` - checks installed version of `node` and `npm`.
 
 #### Advanced information
 
@@ -146,10 +146,10 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run format` - formats files in the entire project’s directories.
--   `npm run format:src` - formats files in the project’s `src` subfolder’s directories.
+-   `pnpm format` - formats files in the entire project’s directories.
+-   `pnpm format:src` - formats files in the project’s `src` subfolder’s directories.
 
-When you run commands similar to the `npm run format:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
+When you run commands similar to the `pnpm format:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored. You can customize the list of ignored files and directories by adding them to a `.prettierignore` file in your project.
 
@@ -170,10 +170,10 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:js` - lints JavaScript and TypeScript files in the entire project’s directories.
--   `npm run lint:js:src` - lints JavaScript and TypeScript files in the project’s `src` subfolder’s directories.
+-   `pnpm lint:js` - lints JavaScript and TypeScript files in the entire project’s directories.
+-   `pnpm lint:js:src` - lints JavaScript and TypeScript files in the project’s `src` subfolder’s directories.
 
-When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
+When you run commands similar to the `pnpm lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
@@ -198,10 +198,10 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
--   `npm run lint:pkg-json` - lints `package.json` file in the entire project’s directories.
--   `npm run lint:pkg-json:src` - lints `package.json` file in the project’s `src` subfolder’s directories.
+-   `pnpm lint:pkg-json` - lints `package.json` file in the entire project’s directories.
+-   `pnpm lint:pkg-json:src` - lints `package.json` file in the project’s `src` subfolder’s directories.
 
-When you run commands similar to the `npm run lint:pkg-json:src` example above, you can provide one or multiple directories to scan as well. See [more examples](https://github.com/tclindner/npm-package-json-lint/blob/HEAD/README.md#examples).
+When you run commands similar to the `pnpm lint:pkg-json:src` example above, you can provide one or multiple directories to scan as well. See [more examples](https://github.com/tclindner/npm-package-json-lint/blob/HEAD/README.md#examples).
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
@@ -225,7 +225,7 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
+-   `pnpm lint:md:docs` - lints markdown files in the entire project’s directories.
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
@@ -249,7 +249,7 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:md:js` - lints markdown files in the entire project’s directories.
+-   `pnpm lint:md:js` - lints markdown files in the entire project’s directories.
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
@@ -274,10 +274,10 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:style` - lints CSS and SCSS files in the entire project’s directories.
--   `npm run lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
+-   `pnpm lint:style` - lints CSS and SCSS files in the entire project’s directories.
+-   `pnpm lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
 
-When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
+When you run commands similar to the `pnpm lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
@@ -295,7 +295,7 @@ _Example:_
 {
 	"scripts": {
 		"packages-update": "wp-scripts packages-update",
-		"postpackages-update": "npm run build"
+		"postpackages-update": "pnpm build"
 	}
 }
 ```
@@ -352,7 +352,7 @@ This is how you execute the script with presented setup:
 
 -   `npm start` - starts the build for development.
 -   `npm start:hot` - starts the build for development with "Fast Refresh". The page will automatically reload if you make changes to the code.
--   `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+-   `pnpm start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
@@ -387,12 +387,12 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
--   `npm run test:e2e` - runs all e2e tests.
--   `npm run test:e2e:help` - prints all available options to configure e2e test runner.
--   `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
--   `npm run test-e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
--   `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
--   `npm run test-e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
+-   `pnpm test:e2e` - runs all e2e tests.
+-   `pnpm test:e2e:help` - prints all available options to configure e2e test runner.
+-   `pnpm test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
+-   `pnpm test-e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
+-   `pnpm test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
+-   `pnpm test-e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
@@ -409,11 +409,11 @@ We enforce that all tests run serially in the current process using [--runInBand
 
 When tests fail, both a screenshot and an HTML snapshot will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
 
-The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project's root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:e2e`.
+The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project's root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts pnpm test:e2e`.
 
 #### Advanced information
 
-It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `pnpm test:e2e:help` (as mentioned above) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 Should there be any situation where you want to provide your own Jest config, you can do so.
 
@@ -442,10 +442,10 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
--   `npm run test:unit` - runs all unit tests.
--   `npm run test:unit:help` - prints all available options to configure unit tests runner.
--   `npm run test:unit:watch` - runs all unit tests in the watch mode.
--   `npm run test:unit:debug` - runs all unit tests in [debug mode](#debugging-tests).
+-   `pnpm test:unit` - runs all unit tests.
+-   `pnpm test:unit:help` - prints all available options to configure unit tests runner.
+-   `pnpm test:unit:watch` - runs all unit tests in the watch mode.
+-   `pnpm test:unit:debug` - runs all unit tests in [debug mode](#debugging-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
@@ -455,7 +455,7 @@ Jest will look for test files with any of the following popular naming conventio
 
 #### Advanced information
 
-It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `pnpm test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 Should there be any situation where you want to provide your own Jest config, you can do so.
 
@@ -483,7 +483,7 @@ Google Chrome and Visual Studio Code are used as examples below.
 
 #### Debugging in Google Chrome
 
-Place `debugger;` statements in any test and run `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` (or `npm run test:unit:debug` from above).
+Place `debugger;` statements in any test and run `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` (or `pnpm test:unit:debug` from above).
 
 Then open `about:inspect` in Google Chrome and select `inspect` on your process.
 
