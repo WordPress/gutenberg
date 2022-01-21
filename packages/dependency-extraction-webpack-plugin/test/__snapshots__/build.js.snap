@@ -88,7 +88,7 @@ Array [
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => '90ac5f67b465feaec264ee3047123919');"`;
+exports[`DependencyExtractionWebpackPlugin Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => '2ef2de70636b56c1605f623a0c5f297a');"`;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
@@ -184,9 +184,9 @@ Array [
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `"<?php return array('dependencies' => array('wp-blob'), 'version' => 'd189640bf0bd44c2f6f9fee71b00d756');"`;
+exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `"<?php return array('dependencies' => array('wp-blob'), 'version' => '377d736f1bf33b87df5cc5a1e0b6686b');"`;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'b.asset.php' should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'dd30d1b96694d89afddbfad01a09ee4d');"`;
+exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'b.asset.php' should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '06432ef14d33806938477c5b9eaec57a');"`;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
