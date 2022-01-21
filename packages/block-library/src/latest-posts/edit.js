@@ -299,7 +299,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								} )
 							}
 						/>
-						<BaseControl className="block-editor-image-alignment-control__row">
+						<BaseControl className="editor-latest-posts-image-alignment-control">
 							<BaseControl.VisualLabel>
 								{ __( 'Image alignment' ) }
 							</BaseControl.VisualLabel>

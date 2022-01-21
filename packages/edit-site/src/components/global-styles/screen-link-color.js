@@ -16,7 +16,6 @@ import {
 } from './hooks';
 
 function ScreenLinkColor( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
@@ -47,7 +46,6 @@ function ScreenLinkColor( { name } ) {
 	return (
 		<>
 			<ScreenHeader
-				back={ parentMenu + '/colors' }
 				title={ __( 'Links' ) }
 				description={ __(
 					'Set the default color used for links across the site.'
