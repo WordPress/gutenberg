@@ -11,7 +11,7 @@ import { css } from '@emotion/react';
  */
 import { focus } from '@wordpress/dom';
 import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
-import { useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -99,13 +99,19 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 		elementToFocus.focus();
 	}, [ isInitialLocation, isMatch ] );
 
+	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
+
 	if ( ! isMatch ) {
 		return null;
 	}
 
 	if ( prefersReducedMotion ) {
 		return (
-			<View ref={ forwardedRef } className={ classes } { ...otherProps }>
+			<View
+				ref={ mergedWrapperRef }
+				className={ classes }
+				{ ...otherProps }
+			>
 				{ children }
 			</View>
 		);
@@ -148,7 +154,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
 
 	return (
 		<motion.div
-			ref={ wrapperRef }
+			ref={ mergedWrapperRef }
 			className={ classes }
 			{ ...otherProps }
 			{ ...animatedProps }
