@@ -34,6 +34,15 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 	serializedHtml = html;
 } );
 
+/**
+ * Initialize an editor for test assertions.
+ *
+ * @param {Object}                    props               Properties passed to the editor component.
+ * @param {string}                    props.initialHtml   String of block editor HTML to parse and render.
+ * @param {Object}                    [options]           Configuration options for the editor.
+ * @param {import('react').ReactNode} [options.component] A specific editor component to render.
+ * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
+ */
 export function initializeEditor( props, { component = Editor } = {} ) {
 	// Portions of the React Native Animation API rely upon these APIs. However,
 	// Jest's 'legacy' fake timer mutate these globals, which breaks the Animated
