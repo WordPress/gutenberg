@@ -30,9 +30,11 @@ const mockClipboard = {
 	} ),
 };
 
-global.navigator.clipboard = mockClipboard;
-
 describe( 'useCopyToClipboard', () => {
+	beforeAll( () => {
+		global.navigator.clipboard = mockClipboard;
+	} );
+
 	beforeEach( () => {
 		clipboardValue = undefined;
 	} );
@@ -43,7 +45,8 @@ describe( 'useCopyToClipboard', () => {
 
 	it( 'should copy the text to the clipboard', async () => {
 		const successCallback = jest.fn();
-		const textToBeCopied = 'mango';
+		const textToBeCopied = 'papaya';
+
 		render(
 			<ExampleComponent
 				onSuccess={ successCallback }
@@ -54,7 +57,9 @@ describe( 'useCopyToClipboard', () => {
 		const triggerButton = screen.getByText( 'Click to copy' );
 		fireEvent.click( triggerButton );
 
-		await waitFor( () => expect( successCallback ).toHaveBeenCalled() );
-		expect( clipboardValue ).toEqual( textToBeCopied );
+		await waitFor( () =>
+			expect( clipboardValue ).toEqual( textToBeCopied )
+		);
+		expect( successCallback ).toHaveBeenCalled();
 	} );
 } );

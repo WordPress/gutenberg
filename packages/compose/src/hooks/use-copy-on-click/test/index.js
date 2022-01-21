@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+	act,
+	render,
+	screen,
+	fireEvent,
+	waitFor,
+} from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -37,9 +43,11 @@ const mockClipboard = {
 	} ),
 };
 
-global.navigator.clipboard = mockClipboard;
-
 describe( 'useCopyOnClick', () => {
+	beforeAll( () => {
+		global.navigator.clipboard = mockClipboard;
+	} );
+
 	beforeEach( () => {
 		clipboardValue = undefined;
 	} );
@@ -64,8 +72,11 @@ describe( 'useCopyOnClick', () => {
 		// Check that the displayed text changes as a way of testing
 		// the `hasCopied` logic
 		expect( screen.getByText( 'Copied' ) ).toBeInTheDocument();
-		await waitFor( () =>
-			expect( screen.getByText( 'Click to copy' ) ).toBeInTheDocument()
-		);
+
+		act( () => {
+			jest.runAllTimers();
+		} );
+
+		expect( screen.getByText( 'Click to copy' ) ).toBeInTheDocument();
 	} );
 } );
