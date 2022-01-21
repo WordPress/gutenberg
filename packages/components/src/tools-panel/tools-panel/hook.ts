@@ -57,6 +57,8 @@ export function useToolsPanel(
 		panelId,
 		hasInnerWrapper,
 		shouldRenderPlaceholderItems,
+		__experimentalFirstVisibleItemClass,
+		__experimentalLastVisibleItemClass,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanel' );
 
@@ -253,28 +255,52 @@ export function useToolsPanel(
 		setMenuItems,
 	] );
 
+	// Assist ItemGroup styling when there are potentially hidden placeholder
+	// items by identifying first & last items that are toggled on for display.
+	const getFirstVisibleItemLabel = ( items: ToolsPanelItem[] ) => {
+		const optionalItems = menuItems.optional || {};
+		const firstItem = items.find(
+			( item ) => item.isShownByDefault || !! optionalItems[ item.label ]
+		);
+
+		return firstItem?.label;
+	};
+
+	const firstDisplayedItem = getFirstVisibleItemLabel( panelItems );
+	const lastDisplayedItem = getFirstVisibleItemLabel(
+		[ ...panelItems ].reverse()
+	);
+
 	const panelContext = useMemo(
 		() => ( {
 			areAllOptionalControlsHidden,
 			deregisterPanelItem,
+			firstDisplayedItem,
 			flagItemCustomization,
 			hasMenuItems: !! panelItems.length,
 			isResetting: isResetting.current,
+			lastDisplayedItem,
 			menuItems,
 			panelId,
 			registerPanelItem,
 			shouldRenderPlaceholderItems,
+			__experimentalFirstVisibleItemClass,
+			__experimentalLastVisibleItemClass,
 		} ),
 		[
 			areAllOptionalControlsHidden,
 			deregisterPanelItem,
+			firstDisplayedItem,
 			flagItemCustomization,
 			isResetting.current,
+			lastDisplayedItem,
 			menuItems,
 			panelId,
 			panelItems,
 			registerPanelItem,
 			shouldRenderPlaceholderItems,
+			__experimentalFirstVisibleItemClass,
+			__experimentalLastVisibleItemClass,
 		]
 	);
 
