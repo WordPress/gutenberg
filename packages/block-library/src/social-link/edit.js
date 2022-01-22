@@ -79,7 +79,7 @@ const SocialLinkEdit = ( {
 	const ref = useRef();
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
-	const socialLinkLabel = label ? label : socialLinkName;
+	const socialLinkLabel = label ?? socialLinkName;
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
