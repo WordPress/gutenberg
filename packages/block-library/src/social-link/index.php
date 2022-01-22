@@ -52,7 +52,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$link .= $icon;
 
 	if ( $show_labels ) {
-		$link .= '<span class="wp-block-social-link-label">' . esc_attr( $shown_label ) . '</span>';
+		$link .= '<span class="wp-block-social-link-label">' . esc_html( $shown_label ) . '</span>';
 	}
 
 	$link .= '</a></li>';
