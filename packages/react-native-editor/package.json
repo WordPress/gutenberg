@@ -55,7 +55,7 @@
 		"gettext-parser": "^1.3.1",
 		"jed": "^1.1.1",
 		"jsdom-jscore-rn": "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800",
-		"node-fetch": "^2.6.0",
+		"node-fetch": "^3.1.1",
 		"react-native": "0.66.2",
 		"react-native-gesture-handler": "https://raw.githubusercontent.com/wordpress-mobile/react-native-gesture-handler/1.10.1-wp-4/react-native-gesture-handler-1.10.1-wp-4.tgz",
 		"react-native-get-random-values": "https://raw.githubusercontent.com/wordpress-mobile/react-native-get-random-values/v1.4.0-wp-2/react-native-get-random-values-1.4.0-wp-2.tgz",
