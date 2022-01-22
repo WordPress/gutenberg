@@ -15,7 +15,7 @@ export type NavigatorLocation = NavigateOptions & {
 
 export type NavigatorContext = {
 	location: NavigatorLocation;
-	push: ( path: string, options: NavigateOptions ) => void;
+	push: ( path: string, options?: NavigateOptions ) => void;
 	pop: () => void;
 };
 
