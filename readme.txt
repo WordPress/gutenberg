@@ -1,6 +1,6 @@
 === Gutenberg ===
 Contributors: matveb, joen, karmatosed
-Tested up to: 5.8
+Tested up to: 5.9
 Stable tag: V.V.V
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -9,7 +9,7 @@ The Gutenberg plugin provides editing, customization, and site building features
 
 == Description ==
 
-“Gutenberg” is a codename for a whole new paradigm for creating with WordPress, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. The project is following a four-phase process that will touch major pieces of WordPress — Editing, Customization, Collaboration, and Multilingual. 
+“Gutenberg” is a codename for a whole new paradigm for creating with WordPress, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. The project is following a four-phase process that will touch major pieces of WordPress — Editing, Customization, Collaboration, and Multilingual.
 
 The block editor introduces a modular approach to all parts of your site: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing WordPress users to create media-rich content in a visually intuitive way — and without work-arounds like shortcodes or custom HTML.
 
@@ -33,7 +33,7 @@ We'd love to hear your bug reports, feature suggestions and any other feedback! 
 
 = Do I have to use the Gutenberg plugin to get access to these features? =
 
-It depends on the feature you want to use! Keep in mind that each version of WordPress after 5.0 comes with bundled versions of the Gutenberg plugin, automatically containing new features and changes. If you want the cutting edge features, including more experimental items, you will need to use the plugin. You can <a href="https://wordpress.org/news/2021/04/become-an-early-adopter-with-the-gutenberg-plugin/">read more here</a> about whether using the plugin is right for you. 
+It depends on the feature you want to use! Keep in mind that each version of WordPress after 5.0 comes with bundled versions of the Gutenberg plugin, automatically containing new features and changes. If you want the cutting edge features, including more experimental items, you will need to use the plugin. You can <a href="https://wordpress.org/news/2021/04/become-an-early-adopter-with-the-gutenberg-plugin/">read more here</a> about whether using the plugin is right for you.
 
 = Where can I see which Gutenberg plugin versions are included in each WordPress release? =
 
@@ -41,7 +41,7 @@ View the <a href="https://developer.wordpress.org/block-editor/principles/versio
 
 = What's Next for the Project? =
 
-The four phases of the project are Editing, Customization, Collaboration, and Multilingual. You can hear more about the project and phases from Matt in his State of the Word talks for <a href="https://ma.tt/2020/12/sotw-2020/">2020</a>, <a href="https://ma.tt/2019/11/state-of-the-word-2019/">2019</a>, and <a href="https://ma.tt/2018/12/state-of-the-word-2018/">2018</a>. Additionally, you can follow the <a href="https://make.wordpress.org/core/tag/gutenberg-new/">biweekly release notes</a> and <a href="https://make.wordpress.org/core/tag/gutenberg-next/">monthly project plan updates</a> on the <a href="https://make.wordpress.org/core/?s=gutenberg">Make WordPress Core blog</a> for more up to date information about what’s happening now. 
+The four phases of the project are Editing, Customization, Collaboration, and Multilingual. You can hear more about the project and phases from Matt in his State of the Word talks for <a href="https://ma.tt/2020/12/sotw-2020/">2020</a>, <a href="https://ma.tt/2019/11/state-of-the-word-2019/">2019</a>, and <a href="https://ma.tt/2018/12/state-of-the-word-2018/">2018</a>. Additionally, you can follow the <a href="https://make.wordpress.org/core/tag/gutenberg-new/">biweekly release notes</a> and <a href="https://make.wordpress.org/core/tag/gutenberg-next/">monthly project plan updates</a> on the <a href="https://make.wordpress.org/core/?s=gutenberg">Make WordPress Core blog</a> for more up to date information about what’s happening now.
 
 
 = Where Can I Read More About Gutenberg? =
