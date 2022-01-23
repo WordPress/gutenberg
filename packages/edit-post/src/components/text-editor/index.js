@@ -4,43 +4,54 @@
 import {
 	PostTextEditor,
 	PostTitle,
-	store as editorStore,
 	TextEditorGlobalKeyboardShortcuts,
+	store as editorStore,
 } from '@wordpress/editor';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { CodeEditorScreen } from '@wordpress/interface';
-import { useCallback } from '@wordpress/element';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { Button } from '@wordpress/components';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { displayShortcut } from '@wordpress/keycodes';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
 
-export default function TextEditor() {
-	const { isRichEditingEnabled, shortcut } = useSelect( ( select ) => {
-		const { getEditorSettings } = select( editorStore );
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		return {
-			isRichEditingEnabled: getEditorSettings().richEditingEnabled,
-			shortcut: getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
-		};
-	}, [] );
-	const { switchEditorMode } = useDispatch( editPostStore );
-	const onExit = useCallback( () => switchEditorMode( 'visual' ), [
-		switchEditorMode,
-	] );
+function TextEditor( { onExit, isRichEditingEnabled } ) {
 	return (
-		<>
-			<TextEditorGlobalKeyboardShortcuts />
-			<CodeEditorScreen
-				className="edit-post-text-editor"
-				onExit={ isRichEditingEnabled ? onExit : undefined }
-				exitShortcut={ shortcut }
-			>
+		<div className="edit-post-text-editor">
+			{ isRichEditingEnabled && (
+				<div className="edit-post-text-editor__toolbar">
+					<h2>{ __( 'Editing code' ) }</h2>
+					<Button
+						variant="tertiary"
+						onClick={ onExit }
+						shortcut={ displayShortcut.secondary( 'm' ) }
+					>
+						{ __( 'Exit code editor' ) }
+					</Button>
+					<TextEditorGlobalKeyboardShortcuts />
+				</div>
+			) }
+			<div className="edit-post-text-editor__body">
 				<PostTitle />
 				<PostTextEditor />
-			</CodeEditorScreen>
-		</>
+			</div>
+		</div>
 	);
 }
+
+export default compose(
+	withSelect( ( select ) => ( {
+		isRichEditingEnabled: select( editorStore ).getEditorSettings()
+			.richEditingEnabled,
+	} ) ),
+	withDispatch( ( dispatch ) => {
+		return {
+			onExit() {
+				dispatch( editPostStore ).switchEditorMode( 'visual' );
+			},
+		};
+	} )
+)( TextEditor );

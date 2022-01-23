@@ -9,15 +9,18 @@ import Textarea from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
-export default function CodeEditor( { value, onChange, onInput } ) {
+export default function CodeEditorTextArea( { value, onChange, onInput } ) {
 	const [ stateValue, setStateValue ] = useState( value );
 	const [ isDirty, setIsDirty ] = useState( false );
-	const instanceId = useInstanceId( CodeEditor );
+	const instanceId = useInstanceId( CodeEditorTextArea );
 
 	if ( ! isDirty && stateValue !== value ) {
 		setStateValue( value );
@@ -57,7 +60,7 @@ export default function CodeEditor( { value, onChange, onInput } ) {
 		<>
 			<VisuallyHidden
 				as="label"
-				htmlFor={ `post-content-${ instanceId }` }
+				htmlFor={ `code-editor-text-area-${ instanceId }` }
 			>
 				{ __( 'Type text or HTML' ) }
 			</VisuallyHidden>
@@ -67,8 +70,8 @@ export default function CodeEditor( { value, onChange, onInput } ) {
 				value={ stateValue }
 				onChange={ onChangeHandler }
 				onBlur={ stopEditing }
-				className="interface-code-editor"
-				id={ `post-content-${ instanceId }` }
+				className="edit-site-code-editor-text-area"
+				id={ `code-editor-text-area-${ instanceId }` }
 				placeholder={ __( 'Start writing with text or HTML' ) }
 			/>
 		</>
