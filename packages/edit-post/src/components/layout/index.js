@@ -20,7 +20,7 @@ import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
 	FullscreenMode,
@@ -29,6 +29,7 @@ import {
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -70,6 +71,7 @@ function Layout( { styles } ) {
 		closeGeneralSidebar,
 		setIsInserterOpened,
 	} = useDispatch( editPostStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -178,6 +180,18 @@ function Layout( { styles } ) {
 		return null;
 	};
 
+	function handlePluginErrors( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -273,7 +287,7 @@ function Layout( { styles } ) {
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<Popover.Slot />
-			<PluginArea />
+			<PluginArea onError={ handlePluginErrors } />
 		</>
 	);
 }
