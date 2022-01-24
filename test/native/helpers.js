@@ -101,11 +101,12 @@ export function waitFor(
 	{ timeout, interval } = { timeout: 1000, interval: 50 }
 ) {
 	let result;
+	let lastError;
 	const check = ( resolve, reject, time = 0 ) => {
 		try {
 			result = cb();
-		} catch ( e ) {
-			//NOOP
+		} catch ( error ) {
+			lastError = error;
 		}
 		if ( ! result && time < timeout ) {
 			setTimeout(
@@ -122,7 +123,7 @@ export function waitFor(
 		).then( () => {
 			if ( ! result ) {
 				reject(
-					`waitFor timed out after ${ timeout }ms for callback:\n${ cb }`
+					`waitFor timed out after ${ timeout }ms for callback:\n${ cb }\n${ lastError.toString() }`
 				);
 				return;
 			}
