@@ -13,11 +13,6 @@ import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { useGetContrastCheckerColors } from './use-get-contrast-checker-colors';
-
 extend( [ namesPlugin, a11yPlugin ] );
 
 // @TODO move this to an external component.
@@ -84,32 +79,106 @@ function ContrastChecker( {
 	enableAlphaChecker = false,
 } ) {
 	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
+
+	// Must have a background color.
+	if ( ! currentBackgroundColor ) {
+		return null;
+	}
+
 	const currentTextColor = textColor || fallbackTextColor;
 	const currentLinkColor = linkColor || fallbackLinkColor;
-	const {
-		shouldShowTransparencyWarning,
-		shouldRenderMessage,
-		colordBackgroundColor,
-		colordTextColor,
-		colordLinkColor,
-	} = useGetContrastCheckerColors( {
-		backgroundColor: currentBackgroundColor,
-		textColor: currentTextColor,
-		linkColor: currentLinkColor,
-		isLargeText,
-		fontSize,
-		enableAlphaChecker,
-	} );
 
-	if ( ! shouldRenderMessage ) {
+	// Must have at least one text color.
+	if ( ! currentTextColor && ! currentLinkColor ) {
 		return null;
+	}
+
+	const colordBackgroundColor = colord( currentBackgroundColor );
+	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
+
+	const hasTextAndLinkColors = currentTextColor && currentLinkColor;
+	// If there's only one color passed, store in `singleTextColor`.
+	const singleTextColor = hasTextAndLinkColors
+		? null
+		: currentTextColor || currentLinkColor;
+
+	const colordTextColor = singleTextColor
+		? colord( singleTextColor )
+		: colord( currentTextColor );
+	const colordLinkColor = colord( currentLinkColor );
+
+	// Transparency.
+	const textColorHasTransparency =
+		currentTextColor && colordTextColor.alpha() < 1;
+	const linkColorHasTransparency =
+		currentLinkColor && colordLinkColor.alpha() < 1;
+
+	// Text size.
+	const textSize =
+		isLargeText || ( isLargeText !== false && fontSize >= 24 )
+			? 'large'
+			: 'small';
+
+	// Readability.
+	const isTextColorReadable =
+		currentTextColor &&
+		colordTextColor.isReadable( colordBackgroundColor, {
+			level: 'AA',
+			size: textSize,
+		} );
+
+	const isLinkColorReadable =
+		currentLinkColor &&
+		colordLinkColor.isReadable( colordBackgroundColor, {
+			level: 'AA',
+			size: textSize,
+		} );
+
+	// Flag to warn about transparency only if the text is otherwise readable according to colord
+	// to ensure the readability warnings take precedence.
+	let shouldShowTransparencyWarning = false;
+
+	// Don't show the message if the text is readable AND there's no transparency.
+	// This is the default.
+	if ( ! textColorHasTransparency && ! linkColorHasTransparency ) {
+		// If the background has transparency, don't show any contrast warnings.
+		if (
+			backgroundColorHasTransparency ||
+			( isTextColorReadable && isLinkColorReadable ) ||
+			( singleTextColor && isTextColorReadable )
+		) {
+			return null;
+		}
+	} else {
+		// If there's text transparency, don't show the message if the alpha checker is disabled.
+		if ( ! enableAlphaChecker ) {
+			return null;
+		}
+
+		// If the background has transparency, don't show any contrast warnings.
+		if ( backgroundColorHasTransparency ) {
+			shouldShowTransparencyWarning = true;
+		}
+
+		// If there is only one text color (text or link) and the color is readable with no transparency.
+		if ( singleTextColor && isTextColorReadable ) {
+			if ( ! textColorHasTransparency ) {
+				return null;
+			}
+			shouldShowTransparencyWarning = true;
+		}
+
+		// If both text colors are readable, but transparent show the warning.
+		if ( isTextColorReadable && isLinkColorReadable ) {
+			shouldShowTransparencyWarning = true;
+		}
 	}
 
 	return (
 		<ContrastCheckerMessage
-			backgroundColor={ currentBackgroundColor }
-			textColor={ currentTextColor }
-			linkColor={ currentLinkColor }
+			backgroundColor={ backgroundColor }
+			textColor={ textColor }
+			linkColor={ linkColor }
 			colordBackgroundColor={ colordBackgroundColor }
 			colordTextColor={ colordTextColor }
 			colordLinkColor={ colordLinkColor }
