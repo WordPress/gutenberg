@@ -21,6 +21,28 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    determine-feature-freeze:
+        name: Determine if Core is in Feature Freeze
+        runs-on: ubuntu-latest
+        outputs:
+            wordpress_release_branch: ${{ steps.get_wordpress_version.outputs.feature_freeze }}
+
+        steps:
+            - name: Get WordPress version from wordpress-develop trunk
+              id: get_wordpress_version
+              run: |
+                  wp_version_url='https://raw.githubusercontent.com/WordPress/wordpress-develop/trunk/src/wp-includes/version.php'
+                  curl -o version.php "$wp_version_url"
+                  wp_version=$(awk -F "'" '/^\$wp_version = /{print $2}' version.php)
+                  case "$wp_version" in
+                    *"-beta"*|*"-RC1")
+                      echo "::set-output name=feature_freeze::true"
+                    ;;
+                    *)
+                      echo "::set-output name=feature_freeze::false"
+                  esac
+                  rm version.php
+
     sync-wordpress-branch:
         name: Sync the WordPress release branch
         runs-on: ubuntu-latest
