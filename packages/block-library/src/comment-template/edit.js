@@ -230,8 +230,12 @@ export default function CommentTemplateEdit( {
 			// The structure of the empty object as a rawComment allows
 			// to inner blocks to render the default placeholders.
 			if ( ! postId ) {
+				// We set a limit in order not to overload the editor of empty comments.
+				const defaultCommentsToShow = perPage <= 3 ? perPage : 1;
 				return {
-					rawComments: [ {} ],
+					rawComments: Array( defaultCommentsToShow ).fill( {
+						id: null,
+					} ),
 				};
 			}
 			const { getEntityRecords } = select( coreStore );
@@ -256,7 +260,7 @@ export default function CommentTemplateEdit( {
 				blocks: getBlocks( clientId ),
 			};
 		},
-		[ postId, clientId, order ]
+		[ postId, clientId, order, perPage ]
 	);
 	// TODO: Replicate the logic used on the server.
 	perPage = perPage || commentsPerPage;
