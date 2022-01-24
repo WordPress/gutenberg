@@ -239,3 +239,47 @@ function gutenberg_rest_comment_set_children_as_embeddable() {
 	} );
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable');
+
+/**
+ * Register some comment-related settings to make them appear in the REST API.
+ *
+ * @return void
+ */
+function gutenberg_rest_settings_add_discussion_settings() {
+	register_setting(
+		'discussion',
+		'comments_per_page',
+		array(
+			'show_in_rest' => array(
+				'name' => 'comments_per_page',
+			),
+			'type'         => 'number',
+			'description'  => __( 'Number of comments per page.' ),
+		)
+	);
+
+	register_setting(
+		'discussion',
+		'comment_order',
+		array(
+			'show_in_rest' => array(
+				'name' => 'comment_order',
+			),
+			'type'         => 'string',
+			'description'  => __( 'Order in which comments should appear.' ),
+		)
+	);
+
+	register_setting(
+		'discussion',
+		'default_comments_page',
+		array(
+			'show_in_rest' => array(
+				'name' => 'default_comments_page',
+			),
+			'type'         => 'string',
+			'description'  => __( 'Page displayed by default.' ),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_rest_settings_add_discussion_settings' );
