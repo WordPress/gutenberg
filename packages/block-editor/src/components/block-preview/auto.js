@@ -17,7 +17,7 @@ import { store } from '../../store';
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
-const MAX_HEIGHT = 1800;
+const MAX_HEIGHT = 2000;
 
 function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const [
