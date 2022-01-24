@@ -55,6 +55,7 @@ module.exports = {
 	rules: {
 		'jest/expect-expect': 'off',
 		'@wordpress/dependency-group': 'error',
+		'@wordpress/comment-case': 'warn',
 		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
