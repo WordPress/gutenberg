@@ -38,13 +38,9 @@ export default function ColorPanel( {
 		}
 		setDetectedColor( getComputedStyle( ref.current ).color );
 
-		if ( ref.current?.children?.length ) {
-			const linkElement = Array.from( ref.current.children ).find(
-				( child ) => child.nodeName === 'A'
-			);
-			if ( linkElement && !! linkElement.textContent ) {
-				setDetectedLinkColor( getComputedStyle( linkElement ).color );
-			}
+		const firstLinkElement = ref.current?.querySelector( 'a' );
+		if ( firstLinkElement && !! firstLinkElement.innerText ) {
+			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
 		}
 
 		let backgroundColorNode = ref.current;
