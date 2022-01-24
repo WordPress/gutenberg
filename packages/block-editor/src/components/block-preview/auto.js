@@ -17,6 +17,8 @@ import { store } from '../../store';
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
+const MAX_HEIGHT = 1800;
+
 function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const [
 		containerResizeListener,
@@ -40,7 +42,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 			return [
 				...styles,
 				{
-					css: 'body{height:unset;overflow:hidden;}',
+					css: 'body{height:auto;overflow:hidden;}',
 					__unstableType: 'presets',
 				},
 			];
@@ -62,6 +64,10 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 				style={ {
 					transform: `scale(${ scale })`,
 					height: contentHeight * scale,
+					maxHeight:
+						contentHeight > MAX_HEIGHT
+							? MAX_HEIGHT * scale
+							: undefined,
 				} }
 			>
 				<Iframe
@@ -87,11 +93,8 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						height: contentHeight,
 						pointerEvents: 'none',
 						// This is a catch-all max-height for patterns.
-						// VH units are as tall as your current viewport, and when used inside a scaled iframe
-						// the math to convert an inherited VH unit appears to cause it to keep growing endlessly.
-						// By applying a max-height, at least it will stop growing.
-						// A longer term fix would be to disallow the thumbnail from growing after initial load.
-						maxHeight: '1800px',
+						// See: https://github.com/WordPress/gutenberg/pull/38175.
+						maxHeight: MAX_HEIGHT,
 					} }
 				>
 					{ contentResizeListener }
