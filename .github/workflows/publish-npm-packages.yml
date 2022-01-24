@@ -91,6 +91,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Update package versions
+              id: update_package_versions
               run: |
                   PUBLIC_PACKAGES=$(find packages/*/ -type d -maxdepth 0 -exec sh -c 'jq -e ".private != true" "$1"/package.json > /dev/null && test -f "$1"/CHANGELOG.md && echo "$1"' shell {} \;)
                   production_package_names=$(jq '.dependencies | keys | @sh' package.json)
@@ -150,6 +151,17 @@ jobs:
                   done <<< $PUBLIC_PACKAGES
                   git commit -am "Update changelog files"
                   git push --set-upstream origin "$WORDPRESS_RELEASE_BRANCH"
+                  echo "::set-output name=changelog_commit::$(git rev-parse --verify --short HEAD)"
+
+            - name: Fetch trunk
+              run: git fetch --depth=1 origin trunk
+
+            - name: Cherry-pick the changelog update commit to trunk
+              run: |
+                  git checkout trunk
+                  git pull
+                  git cherry-pick "${{ steps.update_package_versions.outputs.changelog_commit }}"
+                  git push
 
     publish-packages:
         name: Publish Packages
