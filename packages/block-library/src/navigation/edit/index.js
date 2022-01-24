@@ -45,6 +45,7 @@ import { __ } from '@wordpress/i18n';
  */
 import useListViewModal from './use-list-view-modal';
 import useNavigationMenu from '../use-navigation-menu';
+import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
@@ -150,6 +151,10 @@ function Navigation( {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ ref }`
 	);
+
+	// Preload classic menus, so that they don't suddenly pop-in when viewing
+	// the Select Menu dropdown.
+	useNavigationEntities();
 
 	const {
 		hasUncontrolledInnerBlocks,
@@ -474,12 +479,15 @@ function Navigation( {
 							>
 								{ ( { onClose } ) => (
 									<NavigationMenuSelector
+										clientId={ clientId }
 										onSelect={ ( { id } ) => {
 											setRef( id );
 											onClose();
 										} }
 										onCreateNew={ startWithEmptyMenu }
-										showCreate={ canUserCreateNavigation }
+										canUserCreateNavigation={
+											canUserCreateNavigation
+										}
 									/>
 								) }
 							</ToolbarDropdownMenu>
