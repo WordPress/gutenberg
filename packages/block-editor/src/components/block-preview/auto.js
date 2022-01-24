@@ -69,7 +69,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 						position: 'absolute',
 						width: viewportWidth,
 						height: contentHeight,
-						maxHeight: '99vh',
+						maxHeight: '100vh',
 						pointerEvents: 'none',
 					} }
 				>

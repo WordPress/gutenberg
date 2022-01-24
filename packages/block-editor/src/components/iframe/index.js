@@ -235,7 +235,7 @@ function Iframe(
 
 	head = (
 		<>
-			<style>{ 'body{margin:0}' }</style>
+			<style>{ 'body{margin:0;overflow: hidden}' }</style>
 			{ styles.map(
 				( { tagName, href, id, rel, media, textContent } ) => {
 					const TagName = tagName.toLowerCase();
