@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useLayoutEffect, useMemo } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
@@ -17,7 +17,7 @@ export const useCommentQueryArgs = ( { context } ) => {
 	let { postId, 'comments/perPage': perPage } = context;
 
 	// Initialize the query args that are not going to change.
-	const defaultQueryArgs = {
+	const queryArgs = {
 		status: 'approve',
 		order: 'asc',
 		context: 'embed',
@@ -41,58 +41,74 @@ export const useCommentQueryArgs = ( { context } ) => {
 	// appropriate query arg.
 	perPage = perPage || commentsPerPage;
 
-	// Create a variable for the default page's number. If the default page is
-	// the newest one, the only way to know the page's index is by using the
-	// `X-WP-TotalPages` header. In that case, that sadly forces to make an
-	// additional request.
-	const [ defaultPage, setDefaultPage ] = useState( 1 );
-	const [ isDefaultPageKnown, setIsDefaultPageKnown ] = useState(
-		defaultCommentsPage !== 'newest'
-	);
-	const isFirstPage = defaultCommentsPage !== 'newest';
-
-	useLayoutEffect( () => {
-		if ( defaultCommentsPage !== 'newest' ) {
-			return;
-		}
-		// Reset the page number as it is going to change.
-		setIsDefaultPageKnown( false );
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/comments', {
-				...defaultQueryArgs,
-				post: postId,
-				per_page: perPage,
-				_fields: 'id', // For performance purposes.
-			} ),
-			method: 'HEAD', // We only need headers, no body.
-			parse: false,
-		} ).then( ( res ) => {
-			setDefaultPage( parseInt( res.headers.get( 'X-WP-TotalPages' ) ) );
-			setIsDefaultPageKnown( true );
-		} );
-	}, [ defaultCommentsPage, postId, perPage ] );
+	// Get the number of the default page.
+	const page = useDefaultPage( {
+		defaultCommentsPage,
+		postId,
+		perPage,
+		queryArgs,
+	} );
 
 	// Merge, memoize and return all query arguments, unless the default page's
 	// number is not known yet.
 	return useMemo( () => {
-		if ( isFirstPage ) {
-			return {
-				...defaultQueryArgs,
-				post: postId,
-				per_page: perPage,
-				page: 1,
-			};
-		}
-
-		return isDefaultPageKnown
+		return page
 			? {
-					...defaultQueryArgs,
+					...queryArgs,
 					post: postId,
 					per_page: perPage,
-					page: defaultPage,
+					page,
 			  }
 			: null;
-	}, [ isDefaultPageKnown, postId, perPage, defaultPage ] );
+	}, [ postId, perPage, page ] );
+};
+
+/**
+ * Return the index of the default page, depending on whether
+ * `defaultCommentsPage` is `newest` or not. If the default page is the newest
+ * one, the only way to know the page's index is by using the `X-WP-TotalPages`
+ * header. That case sadly forces to make an additional request.
+ *
+ * @param {*} param0
+ * @return {number} Default comments page index.
+ */
+const useDefaultPage = ( {
+	defaultCommentsPage,
+	postId,
+	perPage,
+	queryArgs,
+} ) => {
+	// Store the default page indices.
+	const [ defaultPages, setDefaultPages ] = useState( {} );
+	const key = `${ postId }_${ perPage }`;
+	const page = defaultPages[ key ] || 0;
+
+	useEffect( () => {
+		// Do nothing if the page is already known or not the newest page.
+		if ( page || defaultCommentsPage !== 'newest' ) {
+			return;
+		}
+		// We need to fetch comments to know the index. Use HEAD and limit
+		// fields just to ID, to make this call as light as possible.
+		apiFetch( {
+			path: addQueryArgs( '/wp/v2/comments', {
+				...queryArgs,
+				post: postId,
+				per_page: perPage,
+				_fields: 'id',
+			} ),
+			method: 'HEAD',
+			parse: false,
+		} ).then( ( res ) => {
+			setDefaultPages( {
+				...defaultPages,
+				[ key ]: parseInt( res.headers.get( 'X-WP-TotalPages' ) ),
+			} );
+		} );
+	}, [ defaultCommentsPage, postId, perPage, setDefaultPages ] );
+
+	// The oldest one is always the first one.
+	return defaultCommentsPage === 'newest' ? page : 1;
 };
 
 /**
