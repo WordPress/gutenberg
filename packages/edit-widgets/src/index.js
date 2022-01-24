@@ -5,7 +5,9 @@ import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	setFreeformContentHandlerName,
+	store as blocksStore,
 } from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import {
 	registerCoreBlocks,
@@ -18,7 +20,6 @@ import {
 	registerLegacyWidgetVariations,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-import { dispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -37,6 +38,7 @@ import {
 const disabledBlocks = [
 	'core/more',
 	'core/freeform',
+	'core/template-part',
 	...( ALLOW_REUSABLE_BLOCKS ? [] : [ 'core/block' ] ),
 ];
 
@@ -71,7 +73,8 @@ export function initialize( id, settings ) {
 			disabledBlocks.includes( block.name ) ||
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' )
+			block.name.startsWith( 'core/site' ) ||
+			block.name.startsWith( 'core/navigation' )
 		);
 	} );
 
@@ -82,6 +85,7 @@ export function initialize( id, settings ) {
 		themeStyles: true,
 	} );
 
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {

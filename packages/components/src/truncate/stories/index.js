@@ -10,7 +10,10 @@ import { Truncate } from '..';
 
 export default {
 	component: Truncate,
-	title: 'G2 Components (Experimental)/Truncate',
+	title: 'Components (Experimental)/Truncate',
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 export const _default = () => {

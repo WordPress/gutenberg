@@ -7,11 +7,13 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
+import BlockSupportToolsPanel from './block-support-tools-panel';
+import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
 export default function InspectorControlsSlot( {
 	__experimentalGroup: group = 'default',
-	bubblesVirtually = true,
+	label,
 	...props
 } ) {
 	const Slot = groups[ group ]?.Slot;
@@ -26,5 +28,13 @@ export default function InspectorControlsSlot( {
 		return null;
 	}
 
-	return <Slot { ...props } bubblesVirtually={ bubblesVirtually } />;
+	if ( label ) {
+		return (
+			<BlockSupportToolsPanel group={ group } label={ label }>
+				<BlockSupportSlotContainer { ...props } Slot={ Slot } />
+			</BlockSupportToolsPanel>
+		);
+	}
+
+	return <Slot { ...props } bubblesVirtually />;
 }

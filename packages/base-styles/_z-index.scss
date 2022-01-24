@@ -11,6 +11,7 @@ $z-layers: (
 	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
 	".edit-post-text-editor__toolbar": 1,
+	".edit-site-code-editor__toolbar": 1,
 	".edit-post-sidebar__panel-tab.is-active": 1,
 
 	// These next three share a stacking context
@@ -37,10 +38,15 @@ $z-layers: (
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
+	".wp-block-cover.is-placeholder .components-placeholder.is-large": 1, // Cover block resizer component inside a large placeholder.
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
+	".block-library-cover__padding-visualizer": 2, // BoxControl visualizer needs to be +1 higher than .wp-block-cover.has-background-dim::before
 	".wp-block-cover__image-background": 0, // Image background inside cover block.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
+
+	// Fixed position appender:
+	".block-editor-block-list__block .block-list-appender": 2,
 
 	// Navigation menu dropdown.
 	".has-child .wp-block-navigation__submenu-container": 28,
@@ -114,6 +120,8 @@ $z-layers: (
 
 	// Show the navigation toggle above the skeleton header
 	".edit-site-navigation-toggle": 31,
+	// Show the navigation link above the skeleton header
+	".edit-site-navigation-link": 31,
 
 	// Show the FSE template previews above the editor and any open block toolbars
 	".edit-site-navigation-panel__preview": 32,
@@ -136,7 +144,7 @@ $z-layers: (
 
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
-	".edit-site-template-part-converter__modal": 1000001,
+	".edit-site-create-template-part-modal": 1000001,
 
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,
@@ -147,7 +155,7 @@ $z-layers: (
 	".components-popover.edit-widgets-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
-	".components-popover.edit-navigation-header__menu-switcher-dropdown": 99998,
+	".components-popover.edit-navigation-menu-actions__switcher-dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 

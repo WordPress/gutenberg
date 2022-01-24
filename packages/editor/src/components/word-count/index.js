@@ -11,8 +11,9 @@ import { count as wordCount } from '@wordpress/wordcount';
 import { store as editorStore } from '../../store';
 
 export default function WordCount() {
-	const content = useSelect( ( select ) =>
-		select( editorStore ).getEditedPostAttribute( 'content' )
+	const content = useSelect(
+		( select ) => select( editorStore ).getEditedPostAttribute( 'content' ),
+		[]
 	);
 
 	/*

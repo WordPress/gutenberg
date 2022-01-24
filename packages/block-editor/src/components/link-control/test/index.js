@@ -51,6 +51,8 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
+jest.useRealTimers();
+
 /**
  * Wait for next tick of event loop. This is required
  * because the `fetchSearchSuggestions` Promise will
@@ -202,9 +204,9 @@ describe( 'Basic rendering', () => {
 			} );
 
 			// Click the "Edit" button to trigger into the editing mode.
-			const editButton = Array.from(
-				container.querySelectorAll( 'button' )
-			).find( ( button ) => button.innerHTML.includes( 'Edit' ) );
+			const editButton = queryByRole( container, 'button', {
+				name: 'Edit',
+			} );
 
 			act( () => {
 				Simulate.click( editButton );
@@ -225,6 +227,40 @@ describe( 'Basic rendering', () => {
 			} );
 
 			expect( isEditing() ).toBe( false );
+		} );
+
+		it( 'should display human friendly error message if value URL prop is empty when component is forced into no-editing (preview) mode', async () => {
+			// Why do we need this test?
+			// Occasionally `forceIsEditingLink` is set explictly to `false` which causes the Link UI to render
+			// it's preview even if the `value` has no URL.
+			// for an example of this see the usage in the following file whereby forceIsEditingLink is used to start/stop editing mode:
+			// https://github.com/WordPress/gutenberg/blob/fa5728771df7cdc86369f7157d6aa763649937a7/packages/format-library/src/link/inline.js#L151.
+			// see also: https://github.com/WordPress/gutenberg/issues/17972.
+
+			const valueWithEmptyURL = {
+				url: '',
+				id: 123,
+				type: 'post',
+			};
+
+			act( () => {
+				render(
+					<LinkControl
+						value={ valueWithEmptyURL }
+						forceIsEditingLink={ false }
+					/>,
+					container
+				);
+			} );
+
+			const linkPreview = queryByRole( container, 'generic', {
+				name: 'Currently selected',
+			} );
+
+			const isPreviewError = linkPreview.classList.contains( 'is-error' );
+			expect( isPreviewError ).toBe( true );
+
+			expect( queryByText( linkPreview, 'Link is empty' ) ).toBeTruthy();
 		} );
 	} );
 
@@ -562,6 +598,104 @@ describe( 'Manual link entry', () => {
 			);
 		}
 	);
+
+	describe( 'Handling of empty values', () => {
+		const testTable = [
+			[ 'containing only spaces', '        ' ],
+			[ 'containing only tabs', '		' ],
+			[ 'from strings with no length', '' ],
+		];
+
+		it.each( testTable )(
+			'should not allow creation of links %s when using the keyboard',
+			async ( _desc, searchString ) => {
+				act( () => {
+					render( <LinkControl />, container );
+				} );
+
+				// Search Input UI
+				const searchInput = getURLInput();
+
+				let submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: searchString },
+					} );
+				} );
+
+				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				await eventLoopTick();
+
+				// Attempt to submit the empty search value in the input.
+				act( () => {
+					Simulate.keyDown( searchInput, { keyCode: ENTER } );
+				} );
+
+				submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				// Verify the UI hasn't allowed submission.
+				expect( searchInput ).toBeInTheDocument();
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+			}
+		);
+
+		it.each( testTable )(
+			'should not allow creation of links %s via the UI "submit" button',
+			async ( _desc, searchString ) => {
+				act( () => {
+					render( <LinkControl />, container );
+				} );
+
+				// Search Input UI
+				const searchInput = getURLInput();
+
+				let submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+
+				// Simulate searching for a term
+				act( () => {
+					Simulate.change( searchInput, {
+						target: { value: searchString },
+					} );
+				} );
+
+				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+				await eventLoopTick();
+
+				// Attempt to submit the empty search value in the input.
+				act( () => {
+					Simulate.click( submitButton );
+				} );
+
+				submitButton = queryByRole( container, 'button', {
+					name: 'Submit',
+				} );
+
+				// Verify the UI hasn't allowed submission.
+				expect( searchInput ).toBeInTheDocument();
+				expect( submitButton.disabled ).toBeTruthy();
+				expect( submitButton ).not.toBeNull();
+				expect( submitButton ).toBeInTheDocument();
+			}
+		);
+	} );
 
 	describe( 'Alternative link protocols and formats', () => {
 		it.each( [
@@ -1502,6 +1636,7 @@ describe( 'Selecting links', () => {
 					);
 
 					// We should have highlighted the first item using the keyboard
+					// eslint-disable-next-line jest/no-conditional-expect
 					expect( selectedSearchResultElement ).toEqual(
 						secondSearchSuggestion
 					);
@@ -1516,12 +1651,13 @@ describe( 'Selecting links', () => {
 					);
 
 					// We should be back to highlighting the first search result again
+					// eslint-disable-next-line jest/no-conditional-expect
 					expect( selectedSearchResultElement ).toEqual(
 						firstSearchSuggestion
 					);
 				}
 
-				// Commit the selected item as the current link
+				// Submit the selected item as the current link
 				act( () => {
 					Simulate.keyDown( searchInput, { keyCode: ENTER } );
 				} );
@@ -2140,5 +2276,180 @@ describe( 'Rich link previews', () => {
 	afterAll( () => {
 		// Remove the mock to avoid edge cases in other tests.
 		mockFetchRichUrlData = undefined;
+	} );
+} );
+
+describe( 'Controlling link title text', () => {
+	const selectedLink = first( fauxEntitySuggestions );
+
+	it( 'should not show a means to alter the link title text by default', async () => {
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } forceIsEditingLink />,
+				container
+			);
+		} );
+
+		expect(
+			queryByRole( container, 'textbox', { name: 'Text' } )
+		).toBeFalsy();
+	} );
+
+	it.each( [ null, undefined, '   ' ] )(
+		'should not show the link title text input when the URL is `%s`',
+		async ( urlValue ) => {
+			const selectedLinkWithoutURL = {
+				...first( fauxEntitySuggestions ),
+				url: urlValue,
+			};
+
+			act( () => {
+				render(
+					<LinkControl
+						value={ selectedLinkWithoutURL }
+						forceIsEditingLink
+						hasTextControl
+					/>,
+					container
+				);
+			} );
+
+			expect(
+				queryByRole( container, 'textbox', { name: 'Text' } )
+			).toBeFalsy();
+		}
+	);
+
+	it( 'should show a text input to alter the link title text when hasTextControl prop is truthy', async () => {
+		act( () => {
+			render(
+				<LinkControl
+					value={ selectedLink }
+					forceIsEditingLink
+					hasTextControl
+				/>,
+				container
+			);
+		} );
+
+		expect(
+			queryByRole( container, 'textbox', { name: 'Text' } )
+		).toBeTruthy();
+	} );
+
+	it.each( [
+		[ '', 'Testing' ],
+		[ '(with leading and traling whitespace)', '    Testing    ' ],
+		[
+			// Note: link control should always preserve the original value.
+			// The consumer is responsible for filtering or otherwise handling the value.
+			'(when containing HTML)',
+			'<strong>Yes this</strong> <em>is</em> expected behaviour',
+		],
+	] )(
+		"should ensure text input reflects the current link value's `title` property %s",
+		async ( _unused, titleValue ) => {
+			const linkWithTitle = { ...selectedLink, title: titleValue };
+			act( () => {
+				render(
+					<LinkControl
+						value={ linkWithTitle }
+						forceIsEditingLink
+						hasTextControl
+					/>,
+					container
+				);
+			} );
+
+			const textInput = queryByRole( container, 'textbox', {
+				name: 'Text',
+			} );
+
+			expect( textInput.value ).toEqual( titleValue );
+		}
+	);
+
+	it( "should ensure title value matching the text input's current value is included in onChange handler value on submit", async () => {
+		const mockOnChange = jest.fn();
+		const textValue = 'My new text value';
+
+		act( () => {
+			render(
+				<LinkControl
+					value={ selectedLink }
+					forceIsEditingLink
+					hasTextControl
+					onChange={ mockOnChange }
+				/>,
+				container
+			);
+		} );
+
+		let textInput = queryByRole( container, 'textbox', { name: 'Text' } );
+
+		act( () => {
+			Simulate.change( textInput, {
+				target: { value: textValue },
+			} );
+		} );
+
+		textInput = queryByRole( container, 'textbox', { name: 'Text' } );
+
+		expect( textInput.value ).toEqual( textValue );
+
+		const submitButton = queryByRole( container, 'button', {
+			name: 'Submit',
+		} );
+
+		act( () => {
+			Simulate.click( submitButton );
+		} );
+
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				title: textValue,
+			} )
+		);
+	} );
+
+	it( 'should allow `ENTER` keypress within the text field to trigger submission of value', async () => {
+		const textValue = 'My new text value';
+		const mockOnChange = jest.fn();
+		act( () => {
+			render(
+				<LinkControl
+					value={ selectedLink }
+					forceIsEditingLink
+					hasTextControl
+					onChange={ mockOnChange }
+				/>,
+				container
+			);
+		} );
+
+		const textInput = queryByRole( container, 'textbox', { name: 'Text' } );
+
+		expect( textInput ).toBeTruthy();
+
+		act( () => {
+			Simulate.change( textInput, {
+				target: { value: textValue },
+			} );
+		} );
+
+		// Attempt to submit the empty search value in the input.
+		act( () => {
+			Simulate.keyDown( textInput, { keyCode: ENTER } );
+		} );
+
+		expect( mockOnChange ).toHaveBeenCalledWith( {
+			title: textValue,
+			url: selectedLink.url,
+		} );
+
+		// The text input should not be showing as the form is submitted.
+		expect(
+			queryByRole( container, 'textbox', { name: 'Text' } )
+		).toBeFalsy();
 	} );
 } );

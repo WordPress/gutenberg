@@ -67,7 +67,6 @@ function BlockNavigationDropdown(
 
 					<ListView
 						showNestedBlocks
-						showOnlyCurrentHierarchy
 						__experimentalFeatures={ __experimentalFeatures }
 					/>
 				</div>

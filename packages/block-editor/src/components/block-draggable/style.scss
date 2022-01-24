@@ -45,8 +45,23 @@
 	}
 }
 
-// This hides the block being dragged.
-// The effect is that the block being dragged appears to be "lifted".
-.is-dragging {
-	display: none !important;
+// This creates a "slot" where the block you're dragging appeared.
+// We use !important as one of the rules are meant to be overriden.
+.block-editor-block-list__layout .is-dragging {
+	background-color: currentColor !important;
+	opacity: 0.05 !important;
+	border-radius: $radius-block-ui !important;
+
+	// Disabling pointer events during the drag event is necessary,
+	// lest the block might affect your drag operation.
+	pointer-events: none !important;
+
+	// Hide the multi selection indicator when dragging.
+	&::selection {
+		background: transparent !important;
+	}
+
+	&::after {
+		content: none !important;
+	}
 }

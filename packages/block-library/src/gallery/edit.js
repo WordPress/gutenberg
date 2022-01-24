@@ -22,6 +22,8 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	BlockControls,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -97,6 +99,7 @@ function GalleryEdit( props ) {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
+		multiSelect,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -114,6 +117,16 @@ function GalleryEdit( props ) {
 	const innerBlockImages = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
+		},
+		[ clientId ]
+	);
+
+	const wasBlockJustInserted = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			);
 		},
 		[ clientId ]
 	);
@@ -137,8 +150,9 @@ function GalleryEdit( props ) {
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			updateBlockAttributes( newImage.clientId, {
-				...buildImageAttributes( false, newImage.attributes ),
+				...buildImageAttributes( newImage.attributes ),
 				id: newImage.id,
+				align: undefined,
 			} );
 		} );
 	}, [ newImages ] );
@@ -168,26 +182,24 @@ function GalleryEdit( props ) {
 	 * it already existed in the gallery. If the image is in fact new, we need
 	 * to apply the gallery's current settings to the image.
 	 *
-	 * @param {Object} existingBlock Existing Image block that still exists after gallery update.
-	 * @param {Object} image         Media object for the actual image.
-	 * @return {Object}               Attributes to set on the new image block.
+	 * @param {Object} imageAttributes Media object for the actual image.
+	 * @return {Object}                Attributes to set on the new image block.
 	 */
-	function buildImageAttributes( existingBlock, image ) {
-		if ( existingBlock ) {
-			return existingBlock.attributes;
-		}
+	function buildImageAttributes( imageAttributes ) {
+		const image = imageAttributes.id
+			? find( imageData, { id: imageAttributes.id } )
+			: null;
 
 		let newClassName;
-		if ( image.className && image.className !== '' ) {
-			newClassName = image.className;
+		if ( imageAttributes.className && imageAttributes.className !== '' ) {
+			newClassName = imageAttributes.className;
 		} else {
 			newClassName = preferredStyle
 				? `is-style-${ preferredStyle }`
 				: undefined;
 		}
-
 		return {
-			...pickRelevantMediaFiles( image, sizeSlug ),
+			...pickRelevantMediaFiles( imageAttributes, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
 			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
 			className: newClassName,
@@ -284,6 +296,14 @@ function GalleryEdit( props ) {
 					newOrderMap[ b.attributes.id ]
 			)
 		);
+
+		// If new blocks added select the first of these so they scroll into view.
+		if ( newBlocks?.length && existingImageBlocks?.length ) {
+			multiSelect(
+				newBlocks[ 0 ].clientId,
+				newBlocks[ newBlocks.length - 1 ].clientId
+			);
+		}
 	}
 
 	function onUploadError( message ) {
@@ -411,24 +431,22 @@ function GalleryEdit( props ) {
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImageIds }
+			addToGallery={ false }
 			handleUpload={ false }
-			isAppender={ hasImages }
-			disableMediaButtons={
-				( hasImages && ! isSelected ) || imagesUploading
-			}
-			icon={ ! hasImages && sharedIcon }
+			disableMediaButtons={ imagesUploading }
+			icon={ sharedIcon }
 			labels={ {
-				title: ! hasImages && __( 'Gallery' ),
-				instructions: ! hasImages && PLACEHOLDER_TEXT,
+				title: __( 'Gallery' ),
+				instructions: PLACEHOLDER_TEXT,
 			} }
 			onSelect={ updateImages }
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
-			value={ hasImageIds ? images : {} }
+			value={ {} }
 			onError={ onUploadError }
-			notices={ hasImages ? undefined : noticeUI }
+			notices={ noticeUI }
+			autoOpenMediaUpload={ isSelected && wasBlockJustInserted }
 		/>
 	);
 
@@ -490,7 +508,7 @@ function GalleryEdit( props ) {
 							hideCancelButton={ true }
 						/>
 					) }
-					{ Platform.isWeb && ! imageSizeOptions && (
+					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
 								{ __( 'Image size' ) }
@@ -503,11 +521,23 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					handleUpload={ false }
+					onSelect={ updateImages }
+					name={ __( 'Add' ) }
+					multiple={ true }
+					mediaIds={ images.map( ( image ) => image.id ) }
+					addToGallery={ hasImageIds }
+				/>
+			</BlockControls>
 			{ noticeUI }
 			<Gallery
 				{ ...props }
 				images={ images }
-				mediaPlaceholder={ mediaPlaceholder }
+				mediaPlaceholder={ ! hasImages ? mediaPlaceholder : undefined }
 				blockProps={ blockProps }
 				insertBlocksAfter={ insertBlocksAfter }
 			/>

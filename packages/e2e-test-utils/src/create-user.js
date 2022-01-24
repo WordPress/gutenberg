@@ -27,14 +27,30 @@ export async function createUser(
 ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'user-new.php' );
-
-	await page.type( '#user_login', username );
-	await page.type( '#email', snakeCase( username ) + '@example.com' );
+	await page.waitForSelector( '#user_login', { visible: true } );
+	await page.$eval(
+		'#user_login',
+		( el, value ) => ( el.value = value ),
+		username
+	);
+	await page.$eval(
+		'#email',
+		( el, value ) => ( el.value = value ),
+		snakeCase( username ) + '@example.com'
+	);
 	if ( firstName ) {
-		await page.type( '#first_name', firstName );
+		await page.$eval(
+			'#first_name',
+			( el, value ) => ( el.value = value ),
+			firstName
+		);
 	}
 	if ( lastName ) {
-		await page.type( '#last_name', lastName );
+		await page.$eval(
+			'#last_name',
+			( el, value ) => ( el.value = value ),
+			lastName
+		);
 	}
 	if ( role ) {
 		await page.select( '#role', role );

@@ -54,7 +54,7 @@ description: __( 'Block showing a Book card.' );
 
 #### category
 
--   **Type:** `String` [ common | formatting | layout | widgets | embed ]
+-   **Type:** `String` [ text | media | design | widgets | theme | embed ]
 
 Blocks are grouped into categories to help users browse and discover them.
 

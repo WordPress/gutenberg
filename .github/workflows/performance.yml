@@ -54,7 +54,11 @@ jobs:
 
             - name: Compare performance with base branch
               if: github.event_name == 'push'
-              run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA wp/5.8 --tests-branch $GITHUB_SHA
+              run: |
+                  WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
+                  IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
+                  WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
+                  ./bin/plugin/cli.js perf --ci $GITHUB_SHA wp/5.8 --tests-branch $GITHUB_SHA  --wp-version "$WP_MAJOR"
 
             - uses: actions/github-script@0.3.0
               if: github.event_name == 'push'

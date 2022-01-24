@@ -1,183 +1,169 @@
 /**
  * Internal dependencies
  */
-import { getPxFromCssUnit } from '../parse-css-unit-to-px';
+import {
+	default as memoizedGetPxFromCssUnit,
+	getPxFromCssUnit,
+} from '../parse-css-unit-to-px';
+
+jest.useRealTimers();
 
 describe( 'getPxFromCssUnit', () => {
 	// Absolute units
-	it( 'test px return px unit', () => {
-		expect( getPxFromCssUnit( '25px' ) ).toBe( '25px' );
+	describe( 'absolute unites should return px values', () => {
+		const testData = [
+			[ '25px', '25px' ],
+			[ '25.5', '26px' ],
+			[ '1cm', '38px' ],
+			[ '10mm', '38px' ],
+			[ '1in', '96px' ],
+			[ '12pt', '16px' ],
+			[ '1pc', '16px' ],
+			[ '40Q', '38px' ], // 40 Q should be 1 cm
+		];
+
+		test.each( testData )(
+			'test getPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( getPxFromCssUnit( unit ) ).toBe( expected );
+			}
+		);
+		test.each( testData )(
+			'test memoizedGetPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( memoizedGetPxFromCssUnit( unit ) ).toBe( expected );
+			}
+		);
+		test.each( testData )(
+			'test cached memoizedGetPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( memoizedGetPxFromCssUnit( unit ) ).toBe( expected );
+			}
+		);
 	} );
 
-	it( 'test numeric float return px unit', () => {
-		expect( getPxFromCssUnit( '25.5' ) ).toBe( '26px' );
-	} );
+	describe( 'relative unites should return px values', () => {
+		const settings = {
+			fontSize: 10,
+			width: 100,
+			height: 200,
+			lineHeight: 2,
+			type: 'font',
+		};
 
-	it( 'test cm return px unit', () => {
-		expect( getPxFromCssUnit( '1cm' ) ).toBe( '38px' );
-	} );
+		const testData = [
+			[ '2em', '20px' ],
+			[ '2rem', '20px' ],
+			[ '1.125rem', '11px' ],
+			[ '20vw', '20px' ],
+			[ '20vh', '40px' ],
+			[ '20vmin', '20px' ],
+			[ '20vmax', '40px' ],
+			[ '20lh', '40px' ],
+			[ '120%', '12px' ],
+		];
 
-	it( 'test mm return px unit', () => {
-		expect( getPxFromCssUnit( '10mm' ) ).toBe( '38px' );
-	} );
-
-	it( 'test in return px unit', () => {
-		expect( getPxFromCssUnit( '1in' ) ).toBe( '96px' );
-	} );
-
-	it( 'test pt return px unit', () => {
-		expect( getPxFromCssUnit( '12pt' ) ).toBe( '16px' );
-	} );
-
-	it( 'test pc return px unit', () => {
-		expect( getPxFromCssUnit( '1pc' ) ).toBe( '16px' );
-	} );
-
-	it( 'test Q return px unit', () => {
-		expect( getPxFromCssUnit( '40Q' ) ).toBe( '38px' ); // 40 Q should be 1 cm
-	} );
-
-	// Relative units
-	it( 'test em return px unit', () => {
-		expect( getPxFromCssUnit( '2em', { fontSize: 10 } ) ).toBe( '20px' );
-	} );
-
-	it( 'test rem return px unit', () => {
-		expect( getPxFromCssUnit( '2rem', { fontSize: 10 } ) ).toBe( '20px' );
-	} );
-
-	it( 'test vw return px unit', () => {
-		expect( getPxFromCssUnit( '20vw', { width: 100 } ) ).toBe( '20px' );
-	} );
-
-	it( 'test vh return px unit', () => {
-		expect( getPxFromCssUnit( '20vh', { height: 200 } ) ).toBe( '40px' );
-	} );
-
-	it( 'test vmin return px unit', () => {
-		expect(
-			getPxFromCssUnit( '20vmin', { height: 200, width: 100 } )
-		).toBe( '20px' );
-	} );
-
-	it( 'test vmax return px unit', () => {
-		expect(
-			getPxFromCssUnit( '20vmax', { height: 200, width: 100 } )
-		).toBe( '40px' );
-	} );
-
-	it( 'test lh return px unit', () => {
-		expect( getPxFromCssUnit( '20lh', { lineHeight: 2 } ) ).toBe( '40px' );
-	} );
-
-	it( 'test % return px unit', () => {
-		expect(
-			getPxFromCssUnit( '120%', {
-				height: 200,
-				width: 100,
-				fontSize: 10,
-				type: 'font',
-			} )
-		).toBe( '12px' );
+		test.each( testData )(
+			'test getPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
+			}
+		);
+		test.each( testData )(
+			'test memoizedGetPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
+					expected
+				);
+			}
+		);
+		test.each( testData )(
+			'test cached memoizedGetPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
+					expected
+				);
+			}
+		);
 	} );
 
 	// Function units
-	it( 'test min() return px unit', () => {
-		expect( getPxFromCssUnit( 'min(20px, 25px)' ) ).toBe( '20px' );
-	} );
 
-	it( 'test min() function with many arguments return px unit', () => {
-		expect( getPxFromCssUnit( 'min(20px, 9px, 12pt, 25px)' ) ).toBe(
-			'9px'
+	describe( 'function unites should return px values', () => {
+		const settings = {
+			fontSize: 10,
+			width: 100,
+			height: 200,
+			lineHeight: 2,
+			type: 'font',
+		};
+
+		const testData = [
+			[ 'min(20px, 25px)', '20px' ],
+			[ 'min(20px, 9px, 12pt, 25px)', '9px' ],
+			[ 'max(20px, 25px)', '25px' ],
+			[ 'clamp(10px, 9px, 25px)', '10px' ],
+			[ 'clamp(10px, 35px, 25px)', '25px' ],
+			[ 'clamp(10px, 15px, 25px)', '15px' ],
+			[ 'min(max(20px,25px), 35px)', '25px' ],
+			[ 'max(min(20px,25px), 35px)', '35px' ],
+			[ '10px + 25px', '35px' ],
+			[ 'calc(10px + 25px)', '35px' ],
+			[ 'calc( 2 * 20px)', '40px' ],
+			[ 'calc(25px - 10px)', '15px' ],
+			[ 'min(10px + 25px, 55pt)', '35px' ],
+			[ 'calc(12vw * 10px)', '450px' ],
+			[ 'calc(45vw / 10px)', '17px' ],
+			[ '', null ],
+			[ undefined, null ],
+			[ 123, '123px' ],
+			[ 123.456, '123px' ],
+			[ 'abc', null ],
+			[ 'console.log("howdy"); + 10px', null ],
+			[ 'calc(12vw * 10px', null ], // missing closing bracket
+		];
+
+		test.each( testData )(
+			'test getPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
+			}
+		);
+		test.each( testData )(
+			'test memoizedGetPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
+					expected
+				);
+			}
+		);
+		test.each( testData )(
+			'test cached memoizedGetPxFromCssUnit( %s )',
+			( unit, expected ) => {
+				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
+					expected
+				);
+			}
 		);
 	} );
+	// Skip this test it might be useful in dev.
+	it.skip( 'test performance of memoizedGetPxFromCssUnit function', () => {
+		const start = Date.now();
+		let i = 0;
+		const intervals = 1000;
+		while ( i < intervals ) {
+			getPxFromCssUnit( 'max(25px, 35px)', { width: 200 } );
+			i++;
+		}
+		const rawDuration = Date.now() - start;
 
-	it( 'test max() return px unit', () => {
-		expect( getPxFromCssUnit( 'max(20px, 25px)' ) ).toBe( '25px' );
-	} );
-
-	it( 'test clamp() lower return px unit', () => {
-		expect( getPxFromCssUnit( 'clamp(10px, 9px, 25px)' ) ).toBe( '10px' );
-	} );
-
-	it( 'test clamp() upper return px unit', () => {
-		expect( getPxFromCssUnit( 'clamp(10px, 35px, 25px)' ) ).toBe( '25px' );
-	} );
-
-	it( 'test clamp() middle return px unit', () => {
-		expect( getPxFromCssUnit( 'clamp(10px, 15px, 25px)' ) ).toBe( '15px' );
-	} );
-
-	it( 'test nested max min function return px unit', () => {
-		expect( getPxFromCssUnit( 'min(max(20px,25px), 35px)' ) ).toBe(
-			'25px'
-		);
-	} );
-
-	it( 'test nested min max function return px unit', () => {
-		expect( getPxFromCssUnit( 'max(min(20px,25px), 35px)' ) ).toBe(
-			'35px'
-		);
-	} );
-
-	it( 'test calculate function return px unit', () => {
-		expect( getPxFromCssUnit( '10px + 25px' ) ).toBe( '35px' );
-	} );
-
-	it( 'test calc(10px + 25px) function return px unit', () => {
-		expect( getPxFromCssUnit( 'calc(10px + 25px)' ) ).toBe( '35px' );
-	} );
-
-	it( 'test calc( number * cssUnit ) return px unit', () => {
-		expect( getPxFromCssUnit( 'calc( 2 * 20px)' ) ).toBe( '40px' );
-	} );
-
-	it( 'test calc(25px - 10px) function return px unit', () => {
-		expect( getPxFromCssUnit( 'calc(25px - 10px)' ) ).toBe( '15px' );
-	} );
-
-	it( 'test min(10px + 25px, 55pt) function return px unit', () => {
-		expect( getPxFromCssUnit( 'min(10px + 25px, 55pt)' ) ).toBe( '35px' );
-	} );
-
-	it( 'test calc(12vw * 10px) function return px unit', () => {
-		expect( getPxFromCssUnit( 'calc(12vw * 10px)' ) ).toBe( '450px' );
-	} );
-
-	it( 'test calc(42vw / 10px) function return px unit', () => {
-		expect( getPxFromCssUnit( 'calc(45vw / 10px)' ) ).toBe( '17px' );
-	} );
-
-	it( 'test empty string', () => {
-		expect( getPxFromCssUnit( '' ) ).toBe( null );
-	} );
-
-	it( 'test undefined string', () => {
-		expect( getPxFromCssUnit( undefined ) ).toBe( null );
-	} );
-	it( 'test integer string', () => {
-		expect( getPxFromCssUnit( 123 ) ).toBe( '123px' );
-	} );
-
-	it( 'test float string', () => {
-		expect( getPxFromCssUnit( 123.456 ) ).toBe( '123px' );
-	} );
-
-	it( 'test text string', () => {
-		expect( getPxFromCssUnit( 'abc' ) ).toBe( null );
-	} );
-
-	it( 'test not non function return null', () => {
-		expect( getPxFromCssUnit( 'abc + num' ) ).toBe( null );
-	} );
-
-	it( 'test not a fishy function return null', () => {
-		expect( getPxFromCssUnit( 'console.log("howdy"); + 10px' ) ).toBe(
-			null
-		);
-	} );
-
-	it( 'test not a typo function return null', () => {
-		expect( getPxFromCssUnit( 'calc(12vw * 10px' ) ).toBe( null );
+		const startM = Date.now();
+		i = 0;
+		// the memoized Version should be at 10X better then the non default one.
+		while ( i < intervals * 10 ) {
+			memoizedGetPxFromCssUnit( 'max(25px, 35px)', { width: 201 } );
+			i++;
+		}
+		expect( rawDuration > Date.now() - startM ).toBe( true );
 	} );
 } );

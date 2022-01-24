@@ -32,8 +32,8 @@ const observeAndResizeJS = `
 		function sendResize() {
 			var clientBoundingRect = document.body.getBoundingClientRect();
 
-			// The function postMessage is exposed by the react-native-webview library 
-			// to communicate between React Native and the WebView, in this case, 
+			// The function postMessage is exposed by the react-native-webview library
+			// to communicate between React Native and the WebView, in this case,
 			// we use it for notifying resize changes.
             window.ReactNativeWebView.postMessage(JSON.stringify( {
                 action: 'resize',
@@ -109,7 +109,7 @@ const style = `
 
 	/**
 	 * Add responsiveness to embeds with aspect ratios.
-	 * 
+	 *
 	 * These styles have been copied from the web version (https://git.io/JEFcX) and
 	 * adapted for the native version.
 	 */
@@ -154,8 +154,9 @@ const EMPTY_ARRAY = [];
 
 function Sandbox( {
 	containerStyle,
-	html = '',
 	customJS,
+	html = '',
+	lang = 'en',
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
 	styles = EMPTY_ARRAY,
@@ -185,9 +186,6 @@ function Sandbox( {
 	} );
 
 	function getHtmlDoc() {
-		// TODO: Use the device's locale
-		const lang = 'en';
-
 		// Put the html snippet into a html document, and update the state to refresh the WebView,
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
@@ -272,9 +270,12 @@ function Sandbox( {
 	}
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onChangeDimensions );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onChangeDimensions
+		);
 		return () => {
-			Dimensions.removeEventListener( 'change', onChangeDimensions );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 

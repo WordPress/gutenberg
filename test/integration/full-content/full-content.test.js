@@ -58,8 +58,8 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
-	beforeAll( async () => {
-		const blockMetadataFiles = await glob(
+	beforeAll( () => {
+		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
 		const blockDefinitions = fromPairs(
@@ -266,7 +266,9 @@ describe( 'full post content fixture', () => {
 				if ( ! foundFixtures.length ) {
 					errors.push(
 						format(
-							"Expected a fixture file called '%s.html' or '%s__*.html'.",
+							"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
+								'\n\n' +
+								'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
 							nameToFilename,
 							nameToFilename
 						)

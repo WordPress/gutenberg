@@ -17,6 +17,7 @@ const transforms = {
 				createBlock(
 					'core/cover',
 					{
+						dimRatio: 50,
 						url,
 						alt,
 						align,
@@ -43,6 +44,7 @@ const transforms = {
 				createBlock(
 					'core/cover',
 					{
+						dimRatio: 50,
 						url: src,
 						align,
 						id,

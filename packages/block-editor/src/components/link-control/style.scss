@@ -30,23 +30,45 @@ $preview-image-height: 140px;
 	position: relative;
 }
 
-// LinkControl popover.
-.block-editor-link-control .block-editor-link-control__search-input {
-	// Specificity override.
-	&.block-editor-link-control__search-input input[type="text"] {
+// Provides positioning context for search actions
+.block-editor-link-control__search-input-container {
+	position: relative;
+}
+
+// If the input doesn't have a visible label then
+// we need to expand the input itself to occupy
+// the full available horizontal space.
+.block-editor-link-control__search-input.has-no-label .block-editor-url-input__input {
+	flex: 1;
+}
+
+.block-editor-link-control__field {
+	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
+
+	// Element wrapping the label and input.
+	> .components-base-control__field {
+		display: flex;
+		align-items: center;
+		margin: 0;
+	}
+
+	.components-base-control__label {
+		margin-right: $grid-unit-20;
+		margin-bottom: 0;
+	}
+
+	input[type="text"],
+	// Specificity overide of URLInput defaults.
+	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
 		@include input-control;
-		width: calc(100% - #{$grid-unit-20*2});
+		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
 		padding: 11px $grid-unit-20;
 		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
-		margin: $grid-unit-20;
+		margin: 0;
 		position: relative;
 		border: 1px solid $gray-300;
 		border-radius: $radius-block-ui;
-	}
-
-	.components-base-control__field {
-		margin-bottom: 0;
 	}
 }
 
@@ -61,14 +83,13 @@ $preview-image-height: 140px;
 	 * when suggestions are rendered.
 	 *
 	 * Compensate for:
-	 *  - Input margin ($grid-unit-20)
 	 *  - Border (1px)
 	 *  - Vertically, for the difference in height between the input (40px) and
 	 *    the icon buttons.
 	 *  - Horizontally, pad to the minimum of: default input padding, or the
 	 *    equivalent of the vertical padding.
 	 */
-	top: $grid-unit-20 + 1px + ( ( 40px - $button-size ) * 0.5 );
+	top: 1px + ( ( 40px - $button-size ) * 0.5 );
 	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) * 0.5);
 }
 
@@ -132,12 +153,16 @@ $preview-image-height: 140px;
 	border: none;
 	text-align: left;
 	padding: $grid-unit-15 $grid-unit-20;
-	border-radius: 5px;
+	border-radius: 2px;
 	height: auto;
 
 	&:hover,
 	&:focus {
-		background-color: $gray-300;
+		background-color: $gray-100;
+
+		.block-editor-link-control__search-item-type {
+			background: $white;
+		}
 	}
 
 	// The added specificity is needed to override.
@@ -167,22 +192,25 @@ $preview-image-height: 140px;
 		flex-direction: row;
 		align-items: flex-start;
 		margin-right: $grid-unit-10;
-		overflow: hidden;
 
 		// Force text to wrap to improve UX when encountering long lines
 		// of text, particular those with no spaces.
 		// See: https://github.com/WordPress/gutenberg/issues/33586#issuecomment-888921188
 		white-space: pre-wrap;
-		word-wrap: break-word;
+		overflow-wrap: break-word;
+
+		.block-editor-link-control__search-item-info {
+			word-break: break-all;
+		}
 	}
 
 	&.is-preview .block-editor-link-control__search-item-header {
 		display: flex;
-		flex: 1; // fill available space.
+		flex: 1; // Fill available space.
 	}
 
-	.block-editor-link-control__search-item-details {
-		overflow: hidden; // clip to force text ellipsis.
+	&.is-error .block-editor-link-control__search-item-header {
+		align-items: center;
 	}
 
 	.block-editor-link-control__search-item-icon {
@@ -198,6 +226,12 @@ $preview-image-height: 140px;
 		img {
 			width: 16px; // favicons often have a source of 32px
 		}
+	}
+
+	&.is-error .block-editor-link-control__search-item-icon {
+		top: 0;
+		width: 32px;
+		max-height: 32px;
 	}
 
 
@@ -221,7 +255,7 @@ $preview-image-height: 140px;
 
 		mark {
 			font-weight: 700;
-			color: $black;
+			color: inherit;
 			background-color: transparent;
 		}
 
@@ -241,13 +275,19 @@ $preview-image-height: 140px;
 		line-height: 1.3;
 	}
 
+	.block-editor-link-control__search-item-error-notice {
+		font-style: italic;
+		font-size: 1.1em;
+	}
+
 	.block-editor-link-control__search-item-type {
 		display: block;
-		padding: 3px 8px;
+		padding: 3px 6px;
 		margin-left: auto;
 		font-size: 0.9em;
 		background-color: $gray-100;
 		border-radius: 2px;
+		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
 	.block-editor-link-control__search-item-description {
@@ -380,7 +420,19 @@ $preview-image-height: 140px;
 	}
 }
 
-// Specificity overide
+.block-editor-link-control__search-create {
+	align-items: center; // align text with icon.
+
+	.block-editor-link-control__search-item-title {
+		margin-bottom: 0;
+	}
+
+	.block-editor-link-control__search-item-icon {
+		top: 0; // cancel compensatory spacing added to default suggestions.
+	}
+}
+
+// Specificity override
 .block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
 	padding: 10px;
 }

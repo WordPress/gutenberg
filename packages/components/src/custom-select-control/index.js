@@ -9,12 +9,14 @@ import classnames from 'classnames';
  */
 import { Icon, check, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
 import { Button, VisuallyHidden } from '../';
 
-const itemToString = ( item ) => item && item.name;
+const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
 // the menu does not necessarily open on
 // key up/down, you can still switch between
@@ -98,14 +100,18 @@ export default function CustomSelectControl( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
 	} );
-	// We need this here, because the null active descendant is not
-	// fully ARIA compliant.
+
+	const onKeyDownHandler = useCallback(
+		( e ) => {
+			e.stopPropagation();
+			menuProps?.onKeyDown?.( e );
+		},
+		[ menuProps ]
+	);
+
+	// We need this here, because the null active descendant is not fully ARIA compliant.
 	if (
-		menuProps[ 'aria-activedescendant' ] &&
-		menuProps[ 'aria-activedescendant' ].slice(
-			0,
-			'downshift-null'.length
-		) === 'downshift-null'
+		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
@@ -146,7 +152,8 @@ export default function CustomSelectControl( {
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
-			<ul { ...menuProps }>
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
 				{ isOpen &&
 					items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key
@@ -161,12 +168,18 @@ export default function CustomSelectControl( {
 									{
 										'is-highlighted':
 											index === highlightedIndex,
+										'has-hint': !! item.__experimentalHint,
 									}
 								),
 								style: item.style,
 							} ) }
 						>
 							{ item.name }
+							{ item.__experimentalHint && (
+								<span className="components-custom-select-control__item-hint">
+									{ item.__experimentalHint }
+								</span>
+							) }
 							{ item === selectedItem && (
 								<Icon
 									icon={ check }

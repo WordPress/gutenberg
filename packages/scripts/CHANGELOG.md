@@ -2,6 +2,67 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The bundled `eslint` dependency has been updated from requiring `^7.17.0` to requiring `^8.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The `puppeteer-core` dependency has been updated from requiring `^10.1.0` to requiring `^11.0.0` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
+-   Removed support for live reload in the `start` command ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+-   The bundled `webpack-cli` dependency has been updated to the next major version `^4.9.1` ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+-   The peer `jest` dependency has been updated from requiring `>=26` to requiring `>=27` (see [Breaking Changes](https://jestjs.io/blog/2021/05/25/jest-27), [#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+-   The bundled `jest-dev-server` dependency has been updated to the next major version `^6.0.0` ([#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+-   The bundled `stylelint` dependency has been updated from requiring `^13.8.0` to requiring `^14.2.0` ([#38091](https://github.com/WordPress/gutenberg/pull/38091)).
+
+### New Features
+
+-   Added a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).
+-   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)).
+-   Automatically copy `block.json` files located in the `src` folder and its subfolders to the output folder (`build` by default) ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
+-   Scan the `src` directory for `block.json` files to detect defined scripts to use them as entry points with the `start` and `build` commands. ([#37661](https://github.com/WordPress/gutenberg/pull/37661)).
+
+### Bug Fixes
+
+-   Prevent the `CleanWebpackPlugin` plugin from deleting webpack assets during multi-configuration builds [#35980](https://github.com/WordPress/gutenberg/issues/35980).
+-   Remove temporary workaround fixing CommonJS import for `mini-css-extract-plugin` [#38027](https://github.com/WordPress/gutenberg/pull/38027).
+
+### Internal
+
+-   The bundled `read-pkg-up` dependency has been updated from requiring `^1.0.1` to requiring `^7.0.1` ([#37395](https://github.com/WordPress/gutenberg/pull/37395)).
+
+## 19.2.3 (2022-01-17)
+
+### Bug Fixes
+
+-   Added temporary workaround to fix broken CommonJS import of `mini-css-extract-plugin` [#38004](https://github.com/WordPress/gutenberg/pull/38004).
+
+## 19.2.0 (2021-11-15)
+
+### New Features
+
+-   Add basic support for TypeScript in `build`, `start`, `test-e2e` and `test-unit-js` commands ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
+
+### Enhancements
+
+-   The bundled `browserslist` dependency has been updated from requiring `^4.16.6` to requiring `^4.17.6` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   Updated the default ESLint config to work correctly with the latest version of `@wordpress/eslint-plugin` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
+## 19.1.0 (2021-11-07)
+
+### Enhancements
+
+-   Increase the timeout for e2e tests to 30 seconds ([#35983](https://github.com/WordPress/gutenberg/pull/35983)).
+
+## 19.0.0 (2021-10-22)
+
+### Breaking Changes
+
+-   The webpack config was updated to no longer include the polyfill by default when creating the `assets.php` file. If your usage requires the `wp-polyfill`, you must explicitly set it as a dependency ([#34536](https://github.com/WordPress/gutenberg/pull/35436)].
+
+### Enhancements
+
+-   Allow customization of the `ARTIFACTS_PATH` in the `jest-environment-puppeteer` failed test reporter via the `WP_ARTIFACTS_PATH` environment variable ([#35371](https://github.com/WordPress/gutenberg/pull/35371)).
+
+## 18.1.0 (2021-10-12)
+
 ### Enhancements
 
 -   The bundled `jest-dev-server` dependency has been updated to the next major version `^5.0.3` ([#34560](https://github.com/WordPress/gutenberg/pull/34560)).

@@ -1,0 +1,11 @@
+[
+	{
+		"blockName": "core/navigation-area",
+		"attrs": {
+			"area": "secondary"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

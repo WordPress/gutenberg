@@ -9,7 +9,10 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 
 export default function UndoButton() {
-	const hasUndo = useSelect( ( select ) => select( coreStore ).hasUndo() );
+	const hasUndo = useSelect(
+		( select ) => select( coreStore ).hasUndo(),
+		[]
+	);
 	const { undo } = useDispatch( coreStore );
 	return (
 		<ToolbarButton

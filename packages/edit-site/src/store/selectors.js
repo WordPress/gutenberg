@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, map } from 'lodash';
+import { get, map, keyBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -10,6 +10,8 @@ import createSelector from 'rememo';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
+import { isTemplatePart } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,6 +26,10 @@ import {
 	getTemplateLocation,
 	isTemplateSuperseded,
 } from '../components/navigation-sidebar/navigation-panel/template-hierarchy';
+
+/**
+ * @typedef {'template'|'template_type'} TemplateType Template type.
+ */
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -60,6 +66,22 @@ export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
 );
 
 /**
+ * Returns any available Reusable blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The available reusable blocks.
+ */
+export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
+	const isWeb = Platform.OS === 'web';
+	return isWeb
+		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
+				per_page: -1,
+		  } )
+		: [];
+} );
+
+/**
  * Returns the settings, taking into account active features and permissions.
  *
  * @param {Object}   state             Global application state.
@@ -75,6 +97,7 @@ export const getSettings = createSelector(
 			focusMode: isFeatureActive( state, 'focusMode' ),
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
+			__experimentalReusableBlocks: getReusableBlocks( state ),
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -96,6 +119,7 @@ export const getSettings = createSelector(
 		state.settings,
 		isFeatureActive( state, 'focusMode' ),
 		isFeatureActive( state, 'fixedToolbar' ),
+		getReusableBlocks( state ),
 	]
 );
 
@@ -110,15 +134,19 @@ export function getHomeTemplateId( state ) {
 	return state.homeTemplateId;
 }
 
+function getCurrentEditedPost( state ) {
+	return state.editedPost;
+}
+
 /**
  * Returns the current edited post type (wp_template or wp_template_part).
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Template ID.
+ * @return {TemplateType?} Template type.
  */
 export function getEditedPostType( state ) {
-	return state.editedPost.type;
+	return getCurrentEditedPost( state ).type;
 }
 
 /**
@@ -126,10 +154,10 @@ export function getEditedPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Post ID.
+ * @return {string?} Post ID.
  */
 export function getEditedPostId( state ) {
-	return state.editedPost.id;
+	return getCurrentEditedPost( state ).id;
 }
 
 /**
@@ -140,7 +168,7 @@ export function getEditedPostId( state ) {
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return state.editedPost.page;
+	return getCurrentEditedPost( state ).page;
 }
 
 /**
@@ -188,10 +216,7 @@ export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
 
 		const templates = select( coreDataStore ).getEntityRecords(
 			'postType',
-			'wp_template',
-			{
-				per_page: -1,
-			}
+			'wp_template'
 		);
 		const showOnFront = select( coreDataStore ).getEditedEntityRecord(
 			'root',
@@ -239,11 +264,15 @@ export function isInserterOpened( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} The root client ID and index to insert at.
+ * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex } = state.blockInserterPanel;
-	return { rootClientId, insertionIndex };
+	const {
+		rootClientId,
+		insertionIndex,
+		filterValue,
+	} = state.blockInserterPanel;
+	return { rootClientId, insertionIndex, filterValue };
 }
 
 /**
@@ -255,4 +284,57 @@ export function __experimentalGetInsertionPoint( state ) {
  */
 export function isListViewOpened( state ) {
 	return state.listViewPanel;
+}
+
+/**
+ * Returns the template parts and their blocks for the current edited template.
+ *
+ * @param {Object} state Global application state.
+ * @return {Array} Template parts and their blocks in an array.
+ */
+export const getCurrentTemplateTemplateParts = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = select( coreDataStore ).getEditedEntityRecord(
+			'postType',
+			templateType,
+			templateId
+		);
+
+		const templateParts = select(
+			coreDataStore
+		).getEntityRecords( 'postType', 'wp_template_part', { per_page: -1 } );
+		const templatePartsById = keyBy(
+			templateParts,
+			( templatePart ) => templatePart.id
+		);
+
+		return ( template.blocks ?? [] )
+			.filter( ( block ) => isTemplatePart( block ) )
+			.map( ( block ) => {
+				const {
+					attributes: { theme, slug },
+				} = block;
+				const templatePartId = `${ theme }//${ slug }`;
+				const templatePart = templatePartsById[ templatePartId ];
+
+				return {
+					templatePart,
+					block,
+				};
+			} )
+			.filter( ( { templatePart } ) => !! templatePart );
+	}
+);
+
+/**
+ * Returns the current editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Editing mode.
+ */
+export function getEditorMode( state ) {
+	return state.preferences.editorMode || 'visual';
 }

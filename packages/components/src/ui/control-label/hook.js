@@ -8,7 +8,7 @@ import * as styles from './styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label'>} props
+ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
  */
 export function useControlLabel( props ) {
 	const {

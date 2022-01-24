@@ -33,12 +33,6 @@ export interface ItemGroupProps {
 
 export interface ItemProps {
 	/**
-	 * Renders the item as an interactive `button` element.
-	 *
-	 * @default false
-	 */
-	isAction?: boolean;
-	/**
 	 * Determines the amount of padding within the component.
 	 *
 	 * @default 'medium'

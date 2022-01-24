@@ -88,7 +88,7 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 				'showIconLabels'
 			),
 		};
-	} );
+	}, [] );
 	return (
 		<ComplementaryArea
 			panelClassName={ className }

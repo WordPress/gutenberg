@@ -40,15 +40,16 @@ module.exports = async ( {
 					format: 'wp-scripts format',
 					'lint:css': 'wp-scripts lint-style',
 					'lint:js': 'wp-scripts lint-js',
-					start: 'wp-scripts start',
 					'packages-update': 'wp-scripts packages-update',
+					'plugin-zip': 'wp-scripts plugin-zip',
+					start: 'wp-scripts start',
 				},
 			},
 			isEmpty
 		)
 	);
 
-	if ( size( npmDependencies ) ) {
+	if ( wpScripts && size( npmDependencies ) ) {
 		info( '' );
 		info(
 			'Installing npm dependencies. It might take a couple of minutes...'

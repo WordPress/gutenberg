@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/home-link` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -79,7 +79,7 @@ function block_core_home_link_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
 	}
 
 	return $font_sizes;
@@ -114,9 +114,9 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
 /**
  * Renders the `core/home-link` block.
  *
- * @param array $attributes The block attributes.
- * @param array $content    The saved content.
- * @param array $block      The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the post content with the home url added.
  */
@@ -127,7 +127,9 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = block_core_home_link_build_li_wrapper_attributes( $block->context );
 
-	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content wp-block-navigation-item__content"';
+	$aria_current = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) ) ? ' aria-current="page"' : '';
+
+	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content wp-block-navigation-item__content" rel="home"' . $aria_current;
 
 	// Start appending HTML attributes to anchor tag.
 	$html .= ' href="' . esc_url( home_url() ) . '"';

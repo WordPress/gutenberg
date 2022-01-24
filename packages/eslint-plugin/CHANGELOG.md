@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The peer dependency constraint for ESLint has been updated from `^6 || ^7` to `^8`.
+-   The bundled `@typescript-eslint/eslint-plugin` dependency has been updated from requiring `^4.31.0` to requiring `^5.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `@typescript-eslint/parser` dependency has been updated from requiring `^4.31.0` to requiring `^5.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `eslint-config-prettier` dependency has been updated from requiring `^7.1.0` to requiring `^8.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `eslint-plugin-jest` dependency has been updated from requiring `^24.1.3` to requiring `^25.2.3` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^36.0.8` to requiring `^37.0.3` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `globals` dependency has been updated from requiring `^12.0.0` to requiring `^13.12.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+
+### Enhancement
+
+-   Omit verification for WordPress dependencies in the import statements since they get externalized when used with WordPress ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
+
+### Bug Fix
+
+-   Fix Babel config resolution when a custom ESLint config present ([#37406](https://github.com/WordPress/gutenberg/pull/37406)). Warning: it won't recognize the `babel.config.json` file present in the project until the upstream bug in `cosmiconfig` is fixed.
+
+## 9.3.0 (2021-11-15)
+
+### Enhancements
+
+-   Replaced deprecated `babel-eslint` dependency with `@babel/eslint-parser` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `eslint-plugin-import` dependency has been updated from requiring `^2.23.4` to requiring `^2.25.2` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
+## 9.2.0 (2021-10-12)
+
 ### Enhancement
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^34.1.0` to requiring `^36.0.8` ([#34338](https://github.com/WordPress/gutenberg/pull/34338)).

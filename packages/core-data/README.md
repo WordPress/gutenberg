@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/core-data --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Example
 
@@ -160,17 +160,17 @@ _Returns_
 
 ### receiveThemeSupports
 
+> **Deprecated** since WP 5.9, this is not useful anymore, use the selector direclty.
+
 Returns an action object used in signalling that the index has been received.
-
-_Parameters_
-
--   _themeSupports_ `Object`: Theme support for the current theme.
 
 _Returns_
 
 -   `Object`: Action object.
 
 ### receiveUploadPermissions
+
+> **Deprecated** since WP 5.9, use receiveUserPermission instead.
 
 Returns an action object used in signalling that Upload permissions have been received.
 

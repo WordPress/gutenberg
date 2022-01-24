@@ -2,17 +2,11 @@
  * WordPress dependencies
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
-import {
-	SlotFillProvider,
-	Popover,
-	Button,
-	Notice,
-} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { Popover, Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
-	FullscreenMode,
 	InterfaceSkeleton,
 	ComplementaryArea,
 	store as interfaceStore,
@@ -21,33 +15,39 @@ import {
 	EditorNotices,
 	EditorSnackbars,
 	EntitiesSavedStates,
-	UnsavedChangesWarning,
-	store as editorStore,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import {
+	ShortcutProvider,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
-import BlockEditor from '../block-editor';
-import KeyboardShortcuts from '../keyboard-shortcuts';
-import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
+import BlockEditor from '../block-editor';
+import CodeEditor from '../code-editor';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import ErrorBoundary from '../error-boundary';
+import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
+import { GlobalStylesRenderer } from './global-styles-renderer';
+import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
 	drawer: __( 'Navigation Sidebar' ),
 };
 
-function Editor( { initialSettings, onError } ) {
+function Editor( { onError } ) {
 	const {
 		isInserterOpen,
 		isListViewOpen,
@@ -59,6 +59,9 @@ function Editor( { initialSettings, onError } ) {
 		template,
 		templateResolved,
 		isNavigationOpen,
+		previousShortcut,
+		nextShortcut,
+		editorMode,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -68,6 +71,7 @@ function Editor( { initialSettings, onError } ) {
 			getEditedPostId,
 			getPage,
 			isNavigationOpened,
+			getEditorMode,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const postType = getEditedPostType();
@@ -95,27 +99,17 @@ function Editor( { initialSettings, onError } ) {
 				: false,
 			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/previous-region' ),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
+			editorMode: getEditorMode(),
 		};
 	}, [] );
-	const { updateEditorSettings } = useDispatch( editorStore );
-	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
-		editSiteStore
-	);
-	useEffect( () => {
-		updateSettings( initialSettings );
-	}, [] );
-
-	// Keep the defaultTemplateTypes in the core/editor settings too,
-	// so that they can be selected with core/editor selectors in any editor.
-	// This is needed because edit-site doesn't initialize with EditorProvider,
-	// which internally uses updateEditorSettings as well.
-	const { defaultTemplateTypes, defaultTemplatePartAreas } = settings;
-	useEffect( () => {
-		updateEditorSettings( {
-			defaultTemplateTypes,
-			defaultTemplatePartAreas,
-		} );
-	}, [ defaultTemplateTypes, defaultTemplatePartAreas ] );
+	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const [
 		isEntitiesSavedStatesOpen,
@@ -158,61 +152,66 @@ function Editor( { initialSettings, onError } ) {
 		}
 	}, [ isNavigationOpen ] );
 
+	useEffect(
+		function openGlobalStylesOnLoad() {
+			const searchParams = new URLSearchParams( window.location.search );
+			if ( searchParams.get( 'styles' ) === 'open' ) {
+				enableComplementaryArea(
+					'core/edit-site',
+					'edit-site/global-styles'
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
+
 	// Don't render the Editor until the settings are set and loaded
-	if ( ! settings?.siteUrl ) {
-		return null;
-	}
+	const isReady =
+		settings?.siteUrl &&
+		templateType !== undefined &&
+		entityId !== undefined;
 
 	const secondarySidebar = () => {
 		if ( isInserterOpen ) {
 			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
-			return (
-				<AsyncModeProvider value="true">
-					<ListViewSidebar />
-				</AsyncModeProvider>
-			);
+			return <ListViewSidebar />;
 		}
 		return null;
 	};
 
+	// Only announce the title once the editor is ready to prevent "Replace"
+	// action in <URlQueryController> from double-announcing.
+	useTitle( isReady && __( 'Editor (beta)' ) );
+
 	return (
 		<>
 			<URLQueryController />
-			<SlotFillProvider>
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ templateType }
-						id={ entityId }
-					>
+			{ isReady && (
+				<ShortcutProvider>
+					<EntityProvider kind="root" type="site">
 						<EntityProvider
 							kind="postType"
-							type="wp_global_styles"
-							id={
-								settings.__experimentalGlobalStylesUserEntityId
-							}
+							type={ templateType }
+							id={ entityId }
 						>
-							<BlockContextProvider value={ blockContext }>
-								<GlobalStylesProvider
-									baseStyles={
-										settings.__experimentalGlobalStylesBaseStyles
-									}
-								>
+							<GlobalStylesProvider>
+								<BlockContextProvider value={ blockContext }>
+									<GlobalStylesRenderer />
 									<ErrorBoundary onError={ onError }>
-										<FullscreenMode isActive />
-										<UnsavedChangesWarning />
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
-											drawer={ <NavigationSidebar /> }
 											secondarySidebar={ secondarySidebar() }
 											sidebar={
 												sidebarIsOpened && (
 													<ComplementaryArea.Slot scope="core/edit-site" />
 												)
+											}
+											drawer={
+												<NavigationSidebar.Slot />
 											}
 											header={
 												<Header
@@ -225,13 +224,18 @@ function Editor( { initialSettings, onError } ) {
 											content={
 												<>
 													<EditorNotices />
-													{ template && (
-														<BlockEditor
-															setIsInserterOpen={
-																setIsInserterOpened
-															}
-														/>
-													) }
+													{ editorMode === 'visual' &&
+														template && (
+															<BlockEditor
+																setIsInserterOpen={
+																	setIsInserterOpened
+																}
+															/>
+														) }
+													{ editorMode === 'text' &&
+														template && (
+															<CodeEditor />
+														) }
 													{ templateResolved &&
 														! template &&
 														settings?.siteUrl &&
@@ -247,7 +251,11 @@ function Editor( { initialSettings, onError } ) {
 																) }
 															</Notice>
 														) }
-													<KeyboardShortcuts />
+													<KeyboardShortcuts
+														openEntitiesSavedStates={
+															openEntitiesSavedStates
+														}
+													/>
 												</>
 											}
 											actions={
@@ -279,16 +287,21 @@ function Editor( { initialSettings, onError } ) {
 												</>
 											}
 											footer={ <BlockBreadcrumb /> }
+											shortcuts={ {
+												previous: previousShortcut,
+												next: nextShortcut,
+											} }
 										/>
+										<WelcomeGuide />
 										<Popover.Slot />
 										<PluginArea />
 									</ErrorBoundary>
-								</GlobalStylesProvider>
-							</BlockContextProvider>
+								</BlockContextProvider>
+							</GlobalStylesProvider>
 						</EntityProvider>
 					</EntityProvider>
-				</EntityProvider>
-			</SlotFillProvider>
+				</ShortcutProvider>
+			) }
 		</>
 	);
 }

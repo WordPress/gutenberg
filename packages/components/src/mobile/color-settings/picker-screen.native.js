@@ -12,7 +12,7 @@ import { BottomSheetContext } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import ColorPicker from '../../color-picker';
+import { ColorPicker } from '../../color-picker';
 
 const PickerScreen = () => {
 	const route = useRoute();

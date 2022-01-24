@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-// Disable reason: Type-only import, this is fine. See https://github.com/typescript-eslint/typescript-eslint/issues/2661
-// eslint-disable-next-line no-restricted-imports
 import type {
 	ComponentType,
 	FunctionComponent,

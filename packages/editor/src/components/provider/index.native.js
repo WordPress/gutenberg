@@ -56,7 +56,10 @@ const postTypeEntities = [
 	},
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
 } ) );
-import { EditorHelpTopics } from '@wordpress/editor';
+import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -75,6 +78,7 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
+
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
 				...settings,
@@ -90,16 +94,12 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			capabilities,
-			updateSettings,
-			galleryWithImageBlocks,
-		} = this.props;
+		const { capabilities, locale, updateSettings } = this.props;
 
 		updateSettings( {
 			...capabilities,
-			...{ __unstableGalleryWithImageBlocks: galleryWithImageBlocks },
 			...this.getThemeColors( this.props ),
+			locale,
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -147,14 +147,11 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
-			( editorSettings ) => {
-				updateSettings( {
-					...{
-						__unstableGalleryWithImageBlocks:
-							editorSettings.galleryWithImageBlocks,
-					},
-					...this.getThemeColors( editorSettings ),
-				} );
+			( { galleryWithImageBlocks, ...editorSettings } ) => {
+				if ( typeof galleryWithImageBlocks === 'boolean' ) {
+					window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+				}
+				updateSettings( this.getThemeColors( editorSettings ) );
 			}
 		);
 
@@ -356,8 +353,8 @@ export default compose( [
 			getEditorBlocks,
 			getEditedPostAttribute,
 			getEditedPostContent,
-		} = select( 'core/editor' );
-		const { getEditorMode } = select( 'core/edit-post' );
+		} = select( editorStore );
+		const { getEditorMode } = select( editPostStore );
 
 		const {
 			getBlockIndex,
@@ -380,16 +377,16 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks } = dispatch( editorStore );
 		const {
 			updateSettings,
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
 		} = dispatch( blockEditorStore );
-		const { switchEditorMode } = dispatch( 'core/edit-post' );
-		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
-		const { createSuccessNotice } = dispatch( 'core/notices' );
+		const { switchEditorMode } = dispatch( editPostStore );
+		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
+		const { createSuccessNotice } = dispatch( noticesStore );
 
 		return {
 			updateSettings,

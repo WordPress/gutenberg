@@ -51,17 +51,6 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-navigation',
 		)
 	);
-	add_settings_field(
-		'gutenberg-gallery-refactor',
-		__( 'Gallery block experiment', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test a new gallery block that uses nested image blocks (Warning: The new gallery is not compatible with WordPress mobile apps prior to version 18.2. If you use the mobile app, please update to the latest version to avoid content loss.)', 'gutenberg' ),
-			'id'    => 'gutenberg-gallery-refactor',
-		)
-	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -108,9 +97,11 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
-	$experiments          = get_option( 'gutenberg-experiments' );
+	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
+	// This bypass needs to remain in place until this is resolved and a patch released.
+	// https://core.trac.wordpress.org/ticket/54130.
 	$experiments_settings = array(
-		'__unstableGalleryWithImageBlocks' => isset( $experiments['gutenberg-gallery-refactor'] ),
+		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1 || is_wp_version_compatible( '5.9' ),
 	);
 	return array_merge( $settings, $experiments_settings );
 }

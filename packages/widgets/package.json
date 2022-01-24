@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "2.0.2",
+	"version": "2.0.19",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",

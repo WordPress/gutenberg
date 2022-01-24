@@ -1,0 +1,22 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/comment-author-avatar",
+		"isValid": true,
+		"attributes": {
+			"width": 120,
+			"height": 120,
+			"borderColor": "recommended-color-02",
+			"backgroundColor": "text-color",
+			"style": {
+				"border": {
+					"width": "3px",
+					"style": "solid",
+					"radius": "100px"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

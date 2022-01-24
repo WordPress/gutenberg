@@ -71,6 +71,10 @@ describe( 'Taxonomies', () => {
 
 		await openSidebarPanelWithTitle( 'Categories' );
 
+		await page.waitForSelector(
+			'.editor-post-taxonomies__hierarchical-terms-list'
+		);
+
 		// If the user has no permission to add a new category finish the test.
 		if ( ! ( await canCreatTermInTaxonomy( 'categories' ) ) ) {
 			return;

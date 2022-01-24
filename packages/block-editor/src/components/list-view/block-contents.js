@@ -12,8 +12,6 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useListViewContext } from './context';
-import ListViewBlockSlot from './block-slot';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
@@ -32,8 +30,6 @@ const ListViewBlockContents = forwardRef(
 		},
 		ref
 	) => {
-		const { __experimentalFeatures } = useListViewContext();
-
 		const { clientId } = block;
 
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
@@ -61,40 +57,23 @@ const ListViewBlockContents = forwardRef(
 
 		return (
 			<BlockDraggable clientIds={ [ block.clientId ] }>
-				{ ( { draggable, onDragStart, onDragEnd } ) =>
-					__experimentalFeatures ? (
-						<ListViewBlockSlot
-							ref={ ref }
-							className={ className }
-							block={ block }
-							onToggleExpanded={ onToggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							draggable={ draggable && __experimentalFeatures }
-							onDragStart={ onDragStart }
-							onDragEnd={ onDragEnd }
-							{ ...props }
-						/>
-					) : (
-						<ListViewBlockSelectButton
-							ref={ ref }
-							className={ className }
-							block={ block }
-							onClick={ onClick }
-							onToggleExpanded={ onToggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							draggable={ draggable }
-							onDragStart={ onDragStart }
-							onDragEnd={ onDragEnd }
-							{ ...props }
-						/>
-					)
-				}
+				{ ( { draggable, onDragStart, onDragEnd } ) => (
+					<ListViewBlockSelectButton
+						ref={ ref }
+						className={ className }
+						block={ block }
+						onClick={ onClick }
+						onToggleExpanded={ onToggleExpanded }
+						isSelected={ isSelected }
+						position={ position }
+						siblingBlockCount={ siblingBlockCount }
+						level={ level }
+						draggable={ draggable }
+						onDragStart={ onDragStart }
+						onDragEnd={ onDragEnd }
+						{ ...props }
+					/>
+				) }
 			</BlockDraggable>
 		);
 	}

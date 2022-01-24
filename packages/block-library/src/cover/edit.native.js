@@ -40,8 +40,9 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
-	withColors,
-	__experimentalUseGradient,
+	getColorObjectByColorValue,
+	getColorObjectByAttributeValues,
+	getGradientValueBySlug,
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -83,13 +84,13 @@ const Cover = ( {
 	getStylesFromColorScheme,
 	isParentSelected,
 	onFocus,
-	overlayColor,
 	setAttributes,
 	openGeneralSidebar,
 	closeSettingsBottomSheet,
 	isSelected,
 	selectBlock,
 	blockWidth,
+	hasInnerBlocks,
 } ) => {
 	const {
 		backgroundType,
@@ -101,6 +102,11 @@ const Cover = ( {
 		style,
 		customOverlayColor,
 		minHeightUnit = 'px',
+		allowedBlocks,
+		templateLock,
+		customGradient,
+		gradient,
+		overlayColor,
 	} = attributes;
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
@@ -111,7 +117,7 @@ const Cover = ( {
 
 		// sync with local media store
 		mediaUploadSync();
-		AccessibilityInfo.addEventListener(
+		const a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			setIsScreenReaderEnabled
 		);
@@ -124,10 +130,7 @@ const Cover = ( {
 
 		return () => {
 			isCurrent = false;
-			AccessibilityInfo.removeEventListener(
-				'screenReaderChanged',
-				setIsScreenReaderEnabled
-			);
+			a11yInfoChangeSubscription.remove();
 		};
 	}, [] );
 
@@ -143,18 +146,24 @@ const Cover = ( {
 	const coverDefaultPalette = {
 		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};
-
-	const { gradientValue } = __experimentalUseGradient();
+	const gradients = useSetting( 'color.gradients' ) || [];
+	const gradientValue =
+		customGradient || getGradientValueBySlug( gradients, gradient );
+	const overlayColorValue = getColorObjectByAttributeValues(
+		colorsDefault,
+		overlayColor
+	);
 
 	const hasBackground = !! (
 		url ||
 		( style && style.color && style.color.background ) ||
 		attributes.overlayColor ||
-		overlayColor.color ||
+		overlayColorValue.color ||
+		customOverlayColor ||
 		gradientValue
 	);
 
-	const hasOnlyColorBackground = ! url && hasBackground;
+	const hasOnlyColorBackground = ! url && ( hasBackground || hasInnerBlocks );
 
 	const [
 		isCustomColorPickerShowing,
@@ -188,7 +197,7 @@ const Cover = ( {
 
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
-		const onSelect = attributesFromMedia( setAttributes );
+		const onSelect = attributesFromMedia( setAttributes, dimRatio );
 		onSelect( media );
 	};
 
@@ -223,10 +232,12 @@ const Cover = ( {
 	}, [ closeSettingsBottomSheet ] );
 
 	function setColor( color ) {
+		const colorValue = getColorObjectByColorValue( colorsDefault, color );
+
 		setAttributes( {
 			// clear all related attributes (only one should be set)
-			overlayColor: undefined,
-			customOverlayColor: color,
+			overlayColor: colorValue?.slug ?? undefined,
+			customOverlayColor: ( ! colorValue?.slug && color ) ?? undefined,
 			gradient: undefined,
 			customGradient: undefined,
 		} );
@@ -249,12 +260,12 @@ const Cover = ( {
 		! gradientValue && {
 			backgroundColor:
 				customOverlayColor ||
-				overlayColor?.color ||
+				overlayColorValue?.color ||
 				style?.color?.background ||
 				styles.overlay?.color,
 		},
 		// While we don't support theme colors we add a default bg color
-		! overlayColor.color && ! url ? backgroundColor : {},
+		! overlayColorValue.color && ! url ? backgroundColor : {},
 		isImage &&
 			isParentSelected &&
 			! isUploadInProgress &&
@@ -430,7 +441,10 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	if ( ! hasBackground || isCustomColorPickerShowing ) {
+	if (
+		( ! hasBackground && ! hasInnerBlocks ) ||
+		isCustomColorPickerShowing
+	) {
 		return (
 			<View>
 				{ isCustomColorPickerShowing && colorPickerControls }
@@ -504,7 +518,9 @@ const Cover = ( {
 				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
 			>
 				<InnerBlocks
+					allowedBlocks={ allowedBlocks }
 					template={ INNER_BLOCKS_TEMPLATE }
+					templateLock={ templateLock }
 					templateInsertUpdatesSelection
 					blockWidth={ blockWidth }
 				/>
@@ -571,17 +587,21 @@ const Cover = ( {
 };
 
 export default compose( [
-	withColors( { overlayColor: 'background-color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const { getSelectedBlockClientId } = select( blockEditorStore );
+		const { getSelectedBlockClientId, getBlock } = select(
+			blockEditorStore
+		);
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		const { getSettings } = select( blockEditorStore );
 
+		const hasInnerBlocks = getBlock( clientId )?.innerBlocks.length > 0;
+
 		return {
 			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
+			hasInnerBlocks,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

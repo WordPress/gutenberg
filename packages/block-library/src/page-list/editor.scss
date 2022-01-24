@@ -39,14 +39,31 @@
 
 // Modal that shows conversion option.
 .wp-block-page-list-modal {
-	max-width: 400px;
+	@include break-small() {
+		max-width: $break-mobile;
+	}
 }
 
 .wp-block-page-list-modal-buttons {
 	display: flex;
 	justify-content: flex-end;
+	gap: $grid-unit-15;
+}
 
-	.components-button {
-		margin-left: $grid-unit-15;
+// Simulate open on click behaviour in the editor by opening on focus instead.
+
+.wp-block-page-list {
+	.open-on-click:focus-within {
+		> .wp-block-navigation__submenu-container {
+			visibility: visible;
+			opacity: 1;
+			width: auto;
+			height: auto;
+			min-width: 200px;
+		}
 	}
+}
+
+.wp-block-page-list .components-notice {
+	margin-left: 0;
 }

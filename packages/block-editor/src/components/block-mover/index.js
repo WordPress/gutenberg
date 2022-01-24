@@ -26,7 +26,7 @@ function BlockMover( {
 	isFirst,
 	isLast,
 	clientIds,
-	isLocked,
+	canMove,
 	isHidden,
 	rootClientId,
 	orientation,
@@ -37,7 +37,7 @@ function BlockMover( {
 	const onFocus = () => setIsFocused( true );
 	const onBlur = () => setIsFocused( false );
 
-	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
+	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
 	}
 
@@ -100,7 +100,7 @@ export default withSelect( ( select, { clientIds } ) => {
 		getBlock,
 		getBlockIndex,
 		getBlockListSettings,
-		getTemplateLock,
+		canMoveBlocks,
 		getBlockOrder,
 		getBlockRootClientId,
 	} = select( blockEditorStore );
@@ -108,18 +108,15 @@ export default withSelect( ( select, { clientIds } ) => {
 	const firstClientId = first( normalizedClientIds );
 	const block = getBlock( firstClientId );
 	const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
-	const firstIndex = getBlockIndex( firstClientId, rootClientId );
-	const lastIndex = getBlockIndex(
-		last( normalizedClientIds ),
-		rootClientId
-	);
+	const firstIndex = getBlockIndex( firstClientId );
+	const lastIndex = getBlockIndex( last( normalizedClientIds ) );
 	const blockOrder = getBlockOrder( rootClientId );
 	const isFirst = firstIndex === 0;
 	const isLast = lastIndex === blockOrder.length - 1;
 
 	return {
 		blockType: block ? getBlockType( block.name ) : null,
-		isLocked: getTemplateLock( rootClientId ) === 'all',
+		canMove: canMoveBlocks( clientIds, rootClientId ),
 		rootClientId,
 		firstIndex,
 		isFirst,

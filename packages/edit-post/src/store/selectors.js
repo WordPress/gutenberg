@@ -338,11 +338,15 @@ export function isInserterOpened( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} The root client ID and index to insert at.
+ * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex } = state.blockInserterPanel;
-	return { rootClientId, insertionIndex };
+	const {
+		rootClientId,
+		insertionIndex,
+		filterValue,
+	} = state.blockInserterPanel;
+	return { rootClientId, insertionIndex, filterValue };
 }
 
 /**
@@ -390,7 +394,7 @@ export const getEditedPostTemplate = createRegistrySelector(
 		);
 		if ( currentTemplate ) {
 			const templateWithSameSlug = select( coreStore )
-				.getEntityRecords( 'postType', 'wp_template' )
+				.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )
 				?.find( ( template ) => template.slug === currentTemplate );
 			if ( ! templateWithSameSlug ) {
 				return templateWithSameSlug;

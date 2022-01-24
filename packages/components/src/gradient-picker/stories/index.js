@@ -16,6 +16,9 @@ import GradientPicker from '../';
 export default {
 	title: 'Components/GradientPicker',
 	component: GradientPicker,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const GradientPickerWithState = ( props ) => {
@@ -74,6 +77,29 @@ export const _default = () => {
 
 	return (
 		<GradientPickerWithState
+			disableCustomGradients={ disableCustomGradients }
+			gradients={ gradients }
+			clearable={ clearable }
+			className={ className }
+		/>
+	);
+};
+
+export const WithNoExistingGradients = () => {
+	const disableCustomGradients = boolean( 'Disable Custom Gradients', false );
+	const __experimentalHasMultipleOrigins = boolean(
+		'Experimental Has Multiple Origins',
+		true
+	);
+	const clearable = boolean( 'Clearable', true );
+	const className = text( 'Class Name', '' );
+	const gradients = object( 'Gradients', [] );
+
+	return (
+		<GradientPickerWithState
+			__experimentalHasMultipleOrigins={
+				__experimentalHasMultipleOrigins
+			}
 			disableCustomGradients={ disableCustomGradients }
 			gradients={ gradients }
 			clearable={ clearable }

@@ -19,8 +19,11 @@ import { isFormatEqual } from './is-format-equal';
  * @return {RichTextValue} Mutated value.
  */
 export function updateFormats( { value, start, end, formats } ) {
-	const formatsBefore = value.formats[ start - 1 ] || [];
-	const formatsAfter = value.formats[ end ] || [];
+	// Start and end may be switched in case of delete.
+	const min = Math.min( start, end );
+	const max = Math.max( start, end );
+	const formatsBefore = value.formats[ min - 1 ] || [];
+	const formatsAfter = value.formats[ max ] || [];
 
 	// First, fix the references. If any format right before or after are
 	// equal, the replacement format should use the same reference.

@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/block-editor --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -208,6 +208,10 @@ _Parameters_
 _Returns_
 
 -   `WPElement`: Element.
+
+### BlockStyles
+
+Undocumented declaration.
 
 ### BlockTitle
 
@@ -425,6 +429,19 @@ _Parameters_
 _Returns_
 
 -   `string`: Gradient value.
+
+### getPxFromCssUnit
+
+Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+
+_Parameters_
+
+-   _cssUnit_ `string`:
+-   _options_ `Object`:
+
+_Returns_
+
+-   `string`: returns the cssUnit value in a simple px format.
 
 ### InnerBlocks
 
@@ -645,7 +662,14 @@ _Returns_
 
 ### useBlockEditContext
 
-Undocumented declaration.
+The `useBlockEditContext` hook provides information about the block this hook is being used in.
+It returns an object with the `name`, `isSelected` state, and the `clientId` of the block.
+It is useful if you want to create custom hooks that need access to the current blocks clientId
+but don't want to rely on the data getting passed in as a parameter.
+
+_Returns_
+
+-   `Object`: Block edit context
 
 ### useBlockProps
 
@@ -666,6 +690,37 @@ _Parameters_
 _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
+
+### useCachedTruthy
+
+Keeps an up-to-date copy of the passed value and returns it. If value becomes falsy, it will return the last truthy copy.
+
+_Parameters_
+
+-   _value_ `any`:
+
+_Returns_
+
+-   `any`: value
+
+### useInnerBlocksProps
+
+This hook is used to lightly mark an element as an inner blocks wrapper
+element. Call this hook and pass the returned props to the element to mark as
+an inner blocks wrapper, automatically rendering inner blocks as children. If
+you define a ref for the element, it is important to pass the ref to this
+hook, which the hook in turn will pass to the component through the props it
+returns. Optionally, you can also pass any other props through this hook, and
+they will be merged and returned.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Optional. Inner blocks options.
 
 ### useSetting
 

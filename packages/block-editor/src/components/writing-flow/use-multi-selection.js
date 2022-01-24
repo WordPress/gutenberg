@@ -15,16 +15,19 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
-function toggleRichText( container, toggle ) {
-	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach(
-		( node ) => {
-			if ( toggle ) {
-				node.setAttribute( 'contenteditable', true );
-			} else {
-				node.removeAttribute( 'contenteditable' );
-			}
+export function toggleRichText( container, toggle ) {
+	Array.from(
+		container.querySelectorAll(
+			// Exclude the Post Title from multi-select disable.
+			'.rich-text:not( .editor-post-title__input )'
+		)
+	).forEach( ( node ) => {
+		if ( toggle ) {
+			node.setAttribute( 'contenteditable', true );
+		} else {
+			node.removeAttribute( 'contenteditable' );
 		}
-	);
+	} );
 }
 
 /**
@@ -119,6 +122,12 @@ export default function useMultiSelection() {
 			const { length } = multiSelectedBlockClientIds;
 
 			if ( length < 2 ) {
+				return;
+			}
+
+			// The block refs might not be immediately available
+			// when dragging blocks into another block.
+			if ( ! startRef.current || ! endRef.current ) {
 				return;
 			}
 

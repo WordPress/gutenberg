@@ -16,7 +16,7 @@ export default function WelcomeGuideTemplate() {
 
 	return (
 		<Guide
-			className="edit-post-welcome-guide"
+			className="edit-template-welcome-guide"
 			contentLabel={ __( 'Welcome to the template editor' ) }
 			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggleFeature( 'welcomeGuideTemplate' ) }

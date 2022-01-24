@@ -101,34 +101,6 @@ export function resetPost( post ) {
 }
 
 /**
- * Returns an action object used in signalling that the latest autosave of the
- * post has been received, by initialization or autosave.
- *
- * @deprecated since 5.6. Callers should use the `receiveAutosaves( postId, autosave )`
- * 			   selector from the '@wordpress/core-data' package.
- *
- * @param {Object} newAutosave Autosave post object.
- *
- * @return {Object} Action object.
- */
-export function* resetAutosave( newAutosave ) {
-	deprecated( 'resetAutosave action (`core/editor` store)', {
-		since: '5.3',
-		alternative: 'receiveAutosaves action (`core` store)',
-	} );
-
-	const postId = yield controls.select( STORE_NAME, 'getCurrentPostId' );
-	yield controls.dispatch(
-		coreStore,
-		'receiveAutosaves',
-		postId,
-		newAutosave
-	);
-
-	return { type: '__INERT__' };
-}
-
-/**
  * Action for dispatching that a post update request has started.
  *
  * @param {Object} options
@@ -657,6 +629,7 @@ const getBlockEditorAction = ( name ) =>
 			since: '5.3',
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
+			version: '6.2',
 		} );
 		yield controls.dispatch( blockEditorStore, name, ...args );
 	};

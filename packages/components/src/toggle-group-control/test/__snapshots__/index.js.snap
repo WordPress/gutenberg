@@ -15,6 +15,11 @@ exports[`ToggleGroupControl should render correctly 1`] = `
 }
 
 .emotion-4 {
+  display: inline-block;
+  margin-bottom: calc(4px * 2);
+}
+
+.emotion-6 {
   background: #fff;
   border: 1px solid;
   border-color: #757575;
@@ -32,39 +37,20 @@ exports[`ToggleGroupControl should render correctly 1`] = `
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-4 {
+  .emotion-6 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-4:hover {
+.emotion-6:hover {
   border-color: #757575;
 }
 
-.emotion-4:focus-within {
+.emotion-6:focus-within {
   border-color: var( --wp-admin-theme-color-darker-10, #007cba);
   box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
   outline: none;
   z-index: 1;
-}
-
-.emotion-6 {
-  background: #1e1e1e;
-  border-radius: 2px;
-  box-shadow: transparent;
-  left: 0;
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  -webkit-transition: -webkit-transform 160ms ease;
-  transition: transform 160ms ease;
-  z-index: 1;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-6 {
-    transition-duration: 0ms;
-  }
 }
 
 .emotion-8 {
@@ -152,24 +138,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   visibility: hidden;
 }
 
-.emotion-15 {
-  background: rgba(0, 0, 0, 0.1);
-  height: calc( 100% - 4px - 4px );
-  position: absolute;
-  right: 0;
-  top: 4px;
-  -webkit-transition: background 200ms linear;
-  transition: background 200ms linear;
-  width: 1px;
-  background: transparent;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-15 {
-    transition-duration: 0ms;
-  }
-}
-
 <div
   class="components-base-control emotion-0 emotion-1"
 >
@@ -178,31 +146,19 @@ exports[`ToggleGroupControl should render correctly 1`] = `
   >
     <div>
       <span
-        class="components-base-control__label"
+        class="components-base-control__label emotion-4 emotion-5"
       >
         Test Toggle Group Control
       </span>
     </div>
     <div
       aria-label="Test Toggle Group Control"
-      class="medium components-toggle-group-control emotion-4 emotion-5"
+      class="medium components-toggle-group-control emotion-6 emotion-7"
       data-wp-c16t="true"
       data-wp-component="ToggleGroupControl"
       id="toggle-group-control-0"
       role="radiogroup"
     >
-      <iframe
-        aria-hidden="true"
-        frameborder="0"
-        src="about:blank"
-        style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
-        tabindex="-1"
-      />
-      <div
-        class="emotion-6 emotion-7"
-        role="presentation"
-        style="transform: translateX(0px); transition: none; width: 0px;"
-      />
       <div
         class="emotion-8 emotion-9"
         data-active="false"
@@ -230,10 +186,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
             R
           </div>
         </button>
-        <div
-          aria-hidden="true"
-          class="emotion-15 emotion-16"
-        />
       </div>
       <div
         class="emotion-8 emotion-9"
@@ -262,10 +214,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
             J
           </div>
         </button>
-        <div
-          aria-hidden="true"
-          class="emotion-15 emotion-16"
-        />
       </div>
     </div>
   </div>

@@ -1,0 +1,25 @@
+.edit-widgets-editor__list-view-panel {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	// Same width as the Inserter.
+	// @see packages/block-editor/src/components/inserter/style.scss
+	min-width: 350px;
+}
+
+.edit-widgets-editor__list-view-panel-content {
+	// Leave space for the close button
+	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+	overflow-y: auto;
+	padding: $grid-unit-10;
+}
+
+.edit-widgets-editor__list-view-panel-header {
+	align-items: center;
+	border-bottom: $border-width solid $gray-300;
+	display: flex;
+	justify-content: space-between;
+	height: $grid-unit-60;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-05;
+}

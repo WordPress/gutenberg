@@ -1,0 +1,13 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/comments-query-loop",
+		"isValid": true,
+		"attributes": {
+			"perPage": null,
+			"tagName": "div"
+		},
+		"innerBlocks": [],
+		"originalContent": "<div class=\"wp-block-comments-query-loop\"></div>"
+	}
+]

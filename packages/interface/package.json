@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interface",
-	"version": "4.1.0",
+	"version": "4.1.15",
 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,7 +31,7 @@
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",

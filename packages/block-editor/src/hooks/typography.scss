@@ -1,0 +1,16 @@
+.typography-block-support-panel {
+	.components-font-appearance-control,
+	.components-font-size-picker__controls,
+	.block-editor-text-decoration-control__buttons,
+	.block-editor-text-transform-control__buttons {
+		margin-bottom: 0;
+	}
+
+	.block-editor-line-height-control input {
+		max-width: 100%;
+	}
+
+	.single-column {
+		grid-column: span 1;
+	}
+}

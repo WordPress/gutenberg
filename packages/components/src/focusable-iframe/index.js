@@ -1,37 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 export default function FocusableIframe( { iframeRef, ...props } ) {
-	const fallbackRef = useRef();
-	const ref = useMergeRefs( [ iframeRef, fallbackRef ] );
-
-	useEffect( () => {
-		const iframe = fallbackRef.current;
-		const { ownerDocument } = iframe;
-		const { defaultView } = ownerDocument;
-
-		/**
-		 * Checks whether the iframe is the activeElement, inferring that it has
-		 * then received focus, and calls the `onFocus` prop callback.
-		 */
-		function checkFocus() {
-			if ( ownerDocument.activeElement !== iframe ) {
-				return;
-			}
-
-			iframe.focus();
-		}
-
-		defaultView.addEventListener( 'blur', checkFocus );
-
-		return () => {
-			defaultView.removeEventListener( 'blur', checkFocus );
-		};
-	}, [] );
-
+	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
+	deprecated( 'wp.components.FocusableIframe', {
+		since: '5.9',
+		alternative: 'wp.compose.useFocusableIframe',
+	} );
 	// Disable reason: The rendered iframe is a pass-through component,
 	// assigning props inherited from the rendering parent. It's the
 	// responsibility of the parent to assign a title.

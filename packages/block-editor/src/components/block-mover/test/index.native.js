@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from 'test/helpers';
 
 /**
  * Internal dependencies
@@ -10,42 +10,40 @@ import { BlockMover } from '../index';
 
 describe( 'Block Mover Picker', () => {
 	it( 'renders without crashing', () => {
-		const wrapper = shallow( <BlockMover />, {
-			context: {
-				isFirst: false,
-				isLast: true,
-				isLocked: false,
-				numberOfBlocks: 2,
-				firstIndex: 1,
+		const props = {
+			isFirst: false,
+			isLast: true,
+			canMove: true,
+			numberOfBlocks: 2,
+			firstIndex: 1,
 
-				onMoveDown: jest.fn(),
-				onMoveUp: jest.fn(),
-				onLongPress: jest.fn(),
+			onMoveDown: jest.fn(),
+			onMoveUp: jest.fn(),
+			onLongPress: jest.fn(),
 
-				rootClientId: '',
-				isStackedHorizontally: true,
-			},
-		} );
-		expect( wrapper ).toBeTruthy();
+			rootClientId: '',
+			isStackedHorizontally: true,
+		};
+		const screen = render( <BlockMover { ...props } /> );
+		expect( screen.container ).toBeTruthy();
 	} );
 
 	it( 'should match snapshot', () => {
-		const wrapper = shallow( <BlockMover />, {
-			context: {
-				isFirst: false,
-				isLast: true,
-				isLocked: false,
-				numberOfBlocks: 2,
-				firstIndex: 1,
+		const props = {
+			isFirst: false,
+			isLast: true,
+			canMove: true,
+			numberOfBlocks: 2,
+			firstIndex: 1,
 
-				onMoveDown: jest.fn(),
-				onMoveUp: jest.fn(),
-				onLongPress: jest.fn(),
+			onMoveDown: jest.fn(),
+			onMoveUp: jest.fn(),
+			onLongPress: jest.fn(),
 
-				rootClientId: '',
-				isStackedHorizontally: true,
-			},
-		} );
-		expect( wrapper ).toMatchSnapshot();
+			rootClientId: '',
+			isStackedHorizontally: true,
+		};
+		const screen = render( <BlockMover { ...props } /> );
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 } );

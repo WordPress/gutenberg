@@ -3,7 +3,23 @@
  */
 const IS_ROOT_TAG = /^(body|html|:root).*$/;
 
+/**
+ * Creates a callback to modify selectors so they only apply within a certain
+ * namespace.
+ *
+ * @param {string}   namespace Namespace to prefix selectors with.
+ * @param {string[]} ignore    Selectors to not prefix.
+ *
+ * @return {(node: Object) => Object} Callback to wrap selectors.
+ */
 const wrap = ( namespace, ignore = [] ) => ( node ) => {
+	/**
+	 * Updates selector if necessary.
+	 *
+	 * @param {string} selector Selector to modify.
+	 *
+	 * @return {string} Updated selector.
+	 */
 	const updateSelector = ( selector ) => {
 		if ( ignore.includes( selector.trim() ) ) {
 			return selector;

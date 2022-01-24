@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Copy/cut/paste of whole blocks can copy group onto non textual element (image, spacer) 1`] = `""`;
+
+exports[`Copy/cut/paste of whole blocks can copy group onto non textual element (image, spacer) 2`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+<p>P</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
+`;
+
 exports[`Copy/cut/paste of whole blocks should copy and paste individual blocks 1`] = `
 "<!-- wp:paragraph -->
 <p>Here is a unique string so we can test copying.</p>
@@ -54,6 +68,20 @@ exports[`Copy/cut/paste of whole blocks should cut and paste individual blocks 2
 <!-- wp:paragraph -->
 <p>Yet another unique string.</p>
 <!-- /wp:paragraph -->"
+`;
+
+exports[`Copy/cut/paste of whole blocks should handle paste events once 1`] = `""`;
+
+exports[`Copy/cut/paste of whole blocks should handle paste events once 2`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+<p>P</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
 `;
 
 exports[`Copy/cut/paste of whole blocks should respect inline copy in places like input fields and textareas 1`] = `

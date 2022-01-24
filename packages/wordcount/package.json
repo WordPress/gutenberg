@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/wordcount",
-	"version": "3.2.1",
+	"version": "3.2.3",
 	"description": "WordPress word count utility.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,7 +26,7 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {

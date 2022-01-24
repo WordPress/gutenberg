@@ -3,9 +3,7 @@
 		"clientId": "_clientId_0",
 		"name": "core/buttons",
 		"isValid": true,
-		"attributes": {
-			"orientation": "horizontal"
-		},
+		"attributes": {},
 		"innerBlocks": [
 			{
 				"clientId": "_clientId_0",

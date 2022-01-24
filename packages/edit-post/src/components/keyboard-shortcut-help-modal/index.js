@@ -91,9 +91,7 @@ const ShortcutCategorySection = ( {
 };
 
 export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
-	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal, {
-		bindGlobal: true,
-	} );
+	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal );
 
 	if ( ! isModalActive ) {
 		return null;

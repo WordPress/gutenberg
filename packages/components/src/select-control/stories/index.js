@@ -11,11 +11,14 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import SelectControl from '../';
+import SelectControl from '..';
 
 export default {
 	title: 'Components/SelectControl',
 	component: SelectControl,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const SelectControlWithState = ( props ) => {
@@ -57,10 +60,45 @@ export const _default = () => {
 			{
 				default: 'default',
 				small: 'small',
+				'__unstable-large': '__unstable-large',
 			},
 			'default'
 		),
 	};
 
 	return <SelectControlWithState { ...props } />;
+};
+
+export const withCustomChildren = () => {
+	return (
+		<SelectControlWithState label="Value">
+			<option value="option-1">Option 1</option>
+			<option value="option-2" disabled>
+				Option 2 - Disabled
+			</option>
+			<option value="option-3">Option 3</option>
+			<optgroup label="Option Group 1">
+				<option value="option-group-1-option-1">
+					Option Group 1 - Option 1
+				</option>
+				<option value="option-group-1-option-2" disabled>
+					Option Group 1 - Option 2 - Disabled
+				</option>
+				<option value="option-group-1-option-3">
+					Option Group 1 - Option 3
+				</option>
+			</optgroup>
+			<optgroup label="Option Group 2">
+				<option value="option-group-2-option-1">
+					Option Group 2 - Option 1
+				</option>
+				<option value="option-group-2-option-2" disabled>
+					Option Group 2 - Option 2 - Disabled
+				</option>
+				<option value="option-group-2-option-3">
+					Option Group 2 - Option 3
+				</option>
+			</optgroup>
+		</SelectControlWithState>
+	);
 };

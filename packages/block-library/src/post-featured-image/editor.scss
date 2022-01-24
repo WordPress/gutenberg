@@ -1,34 +1,130 @@
+// Give the featured image placeholder the appearance of a literal image placeholder.
+// @todo: this CSS is similar to that of the Site Logo. That makes it an opportunity
+// to create a new component for placeholders meant to inherit some theme styles.
+.wp-block-post-featured-image.wp-block-post-featured-image {
+	// Inherit border radius from style variations.
+	.components-placeholder,
+	.components-resizable-box__container {
+		border-radius: inherit;
+	}
+
+	// Style the placeholder.
+	.wp-block-post-featured-image__placeholder,
+	.components-placeholder {
+		justify-content: center;
+		align-items: center;
+		box-shadow: none;
+		padding: 0;
+
+		// Hide the upload button, as it's also available in the media library.
+		.components-form-file-upload {
+			display: none;
+		}
+
+		// Position the spinner.
+		.components-placeholder__preview {
+			position: absolute;
+			top: $grid-unit-05;
+			right: $grid-unit-05;
+			bottom: $grid-unit-05;
+			left: $grid-unit-05;
+			background: rgba($white, 0.8);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		// Draw the dashed outline.
+		// By setting the dashed border to currentColor, we ensure it's visible
+		// against any background color.
+		color: currentColor;
+		background: transparent;
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			border: $border-width dashed currentColor;
+			opacity: 0.4;
+			pointer-events: none;
+
+			// Inherit border radius from style variations.
+			border-radius: inherit;
+		}
+
+		// Style the upload button.
+		.components-placeholder__fieldset {
+			width: auto;
+		}
+
+		.components-button.components-button {
+			color: inherit;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: $grid-unit-60;
+			height: $grid-unit-60;
+			border-radius: 50%;
+			position: relative;
+			visibility: hidden;
+
+			// Animation.
+			background: transparent;
+			transition: all 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
+		.components-button.components-button > svg {
+			color: $white;
+		}
+
+		// Style the placeholder illustration.
+		.components-placeholder__illustration {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			stroke: currentColor;
+			stroke-dasharray: 3;
+			opacity: 0.4;
+		}
+
+		// Show default placeholder height when not resized.
+		min-height: 200px;
+	}
+
+	// Provide a minimum size for the placeholder when resized.
+	// Note, this should be as small as we can afford it, and exists only
+	// to ensure there's room for the upload button.
+	&[style*="height"] .components-placeholder {
+		min-height: $grid-unit-60;
+		min-width: $grid-unit-60;
+		height: 100%;
+		width: 100%;
+	}
+
+	// Show upload button on block selection.
+	&.is-selected .components-button.components-button {
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+		border-style: solid;
+		color: $white;
+		opacity: 1;
+		visibility: visible;
+	}
+}
+
 div[data-type="core/post-featured-image"] {
 	img {
 		max-width: 100%;
 		height: auto;
 		display: block;
-	}
-}
-
-.editor-styles-wrapper {
-	.post-featured-image_placeholder {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		border-radius: $radius-block-ui;
-		background-color: $white;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
-		padding: $grid-unit-15;
-		svg {
-			margin-right: $grid-unit-15;
-		}
-		p {
-			font-family: $default-font;
-			font-size: $default-font-size;
-			margin: 0;
-		}
-	}
-}
-
-.block-library-post-featured-image-dimension-controls {
-	margin-bottom: $grid-unit-10;
-	&.scale-control-is-visible {
-		margin-bottom: $grid-unit-20;
 	}
 }

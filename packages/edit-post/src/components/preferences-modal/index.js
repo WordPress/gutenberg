@@ -7,13 +7,23 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import {
-	__experimentalNavigation as Navigation,
-	__experimentalNavigationMenu as NavigationMenu,
-	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalUseNavigator as useNavigator,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
+	__experimentalTruncate as Truncate,
+	FlexItem,
 	Modal,
 	TabPanel,
+	Button,
+	Card,
+	CardHeader,
+	CardBody,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
@@ -26,6 +36,7 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,6 +54,16 @@ import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
+
+function NavigationButton( { as: Tag = Button, path, ...props } ) {
+	const { push } = useNavigator();
+	return <Tag onClick={ () => push( path ) } { ...props } />;
+}
+
+function NavigationBackButton( { as: Tag = Button, ...props } ) {
+	const { pop } = useNavigator();
+	return <Tag onClick={ pop } { ...props } />;
+}
 
 export default function PreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -301,34 +322,71 @@ export default function PreferencesModal() {
 		);
 	} else {
 		modalContent = (
-			<Navigation
-				activeMenu={ activeMenu }
-				onActivateMenu={ setActiveMenu }
-			>
-				<NavigationMenu menu={ PREFERENCES_MENU }>
-					{ tabs.map( ( tab ) => {
-						return (
-							<NavigationItem
-								key={ tab.name }
-								title={ tab.title }
-								navigateToMenu={ tab.name }
-							/>
-						);
-					} ) }
-				</NavigationMenu>
+			<NavigatorProvider initialPath="/">
+				<NavigatorScreen path="/">
+					<Card isBorderless size="small">
+						<CardBody>
+							<ItemGroup>
+								{ tabs.map( ( tab ) => {
+									return (
+										<NavigationButton
+											key={ tab.name }
+											path={ tab.name }
+											as={ Item }
+											isAction
+										>
+											<HStack justify="space-between">
+												<FlexItem>
+													<Truncate>
+														{ tab.title }
+													</Truncate>
+												</FlexItem>
+												<FlexItem>
+													<Icon
+														icon={
+															isRTL()
+																? chevronLeft
+																: chevronRight
+														}
+													/>
+												</FlexItem>
+											</HStack>
+										</NavigationButton>
+									);
+								} ) }
+							</ItemGroup>
+						</CardBody>
+					</Card>
+				</NavigatorScreen>
 				{ sections.map( ( section ) => {
 					return (
-						<NavigationMenu
+						<NavigatorScreen
 							key={ `${ section.name }-menu` }
-							menu={ section.name }
-							title={ section.tabLabel }
-							parentMenu={ PREFERENCES_MENU }
+							path={ section.name }
 						>
-							<NavigationItem>{ section.content }</NavigationItem>
-						</NavigationMenu>
+							<Card isBorderless size="large">
+								<CardHeader
+									isBorderless={ false }
+									justify="left"
+									size="small"
+									gap="6"
+								>
+									<NavigationBackButton
+										icon={
+											isRTL() ? chevronRight : chevronLeft
+										}
+										aria-label={ __(
+											'Navigate to the previous view'
+										) }
+									/>
+									<Text size="16">{ section.tabLabel }</Text>
+								</CardHeader>
+								<CardBody>{ section.content }</CardBody>
+							</Card>
+						</NavigatorScreen>
 					);
 				} ) }
-			</Navigation>
+			</NavigatorProvider>
 		);
 	}
 	return (

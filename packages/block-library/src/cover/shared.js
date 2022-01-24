@@ -27,12 +27,12 @@ export function backgroundImageStyles( url ) {
 export const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
 export function dimRatioToClass( ratio ) {
-	return ratio === 0 || ratio === 50 || ! ratio
+	return ratio === 50 || ! ratio === undefined
 		? null
 		: 'has-background-dim-' + 10 * Math.round( ratio / 10 );
 }
 
-export function attributesFromMedia( setAttributes ) {
+export function attributesFromMedia( setAttributes, dimRatio ) {
 	return ( media ) => {
 		if ( ! media || ! media.url ) {
 			setAttributes( { url: undefined, id: undefined } );
@@ -65,6 +65,7 @@ export function attributesFromMedia( setAttributes ) {
 		}
 
 		setAttributes( {
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
 			url: media.url,
 			id: media.id,
 			alt: media?.alt,

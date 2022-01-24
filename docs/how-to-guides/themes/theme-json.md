@@ -169,6 +169,9 @@ The settings section has the following structure:
 {
 	"version": 1,
 	"settings": {
+		"border": {
+			"customRadius": false
+		},
 		"color": {
 			"custom": true,
 			"customDuotone": true,
@@ -215,17 +218,20 @@ The settings section has the following structure:
 {
 	"version": 1,
 	"settings": {
+		"appearanceTools": false,
 		"border": {
-			"customColor": false,
-			"customRadius": false,
-			"customStyle": false,
-			"customWidth": false
+			"color": false,
+			"radius": false,
+			"style": false,
+			"width": false
 		},
 		"color": {
 			"background": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
+			"defaultGradients": true,
+			"defaultPalette": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
@@ -238,20 +244,22 @@ The settings section has the following structure:
 			"wideSize": "1000px"
 		},
 		"spacing": {
-			"customMargin": false,
-			"customPadding": false,
+			"blockGap": null,
+			"margin": false,
+			"padding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
 			"customFontSize": true,
-			"customFontStyle": true,
-			"customFontWeight": true,
-			"customLineHeight": false,
-			"customTextDecorations": true,
-			"customTextTransforms": true,
 			"dropCap": true,
 			"fontFamilies": [],
-			"fontSizes": []
+			"fontSizes": [],
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"lineHeight": false,
+			"textDecoration": true,
+			"textTransform": true
 		},
 		"blocks": {
 			"core/paragraph": {
@@ -275,14 +283,23 @@ Each block can configure any of these settings separately, providing a more fine
 
 Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
 
+### Opt-in into UI controls
+
+There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
+
+- border: color, radius, style, width
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
+
 #### Backward compatibility with add_theme_support
 
 To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the complete list of equivalences:
 
 | add_theme_support           | theme.json setting                                        |
 | --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.customLineHeight` to `false`.             |
-| `custom-spacing`            | Set `spacing.customPadding` to `true`.                    |
+| `custom-line-height`        | Set `typography.lineHeight` to `true`.              |
+| `custom-spacing`            | Set `spacing.padding` to `true`.                    |
 | `custom-units`              | Provide the list of units via `spacing.units`.            |
 | `disable-custom-colors`     | Set `color.custom` to `false`.                            |
 | `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |
@@ -519,7 +536,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 }
 ```
 
-- Disable border radius for the button block (borders only work in the plugin so far):
+- Disable border radius for the button block:
 
 ```json
 {
@@ -611,6 +628,9 @@ Each block declares which style properties it exposes via the [block supports me
 {
 	"version": 1,
 	"styles": {
+		"border": {
+			"radius": "value"
+		},
 		"color": {
 			"background": "value",
 			"gradient": "value",
@@ -636,6 +656,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"elements": {
 			"link": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {}
@@ -649,6 +670,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"blocks": {
 			"core/group": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {},
@@ -685,6 +707,9 @@ Each block declares which style properties it exposes via the [block supports me
 			"gradient": "value",
 			"text": "value"
 		},
+		"filter": {
+			"duotone": "value"
+		},
 		"spacing": {
 			"blockGap": "value",
 			"margin": {
@@ -705,6 +730,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontSize": "value",
 			"fontStyle": "value",
 			"fontWeight": "value",
+			"letterSpacing": "value",
 			"lineHeight": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
@@ -779,7 +805,7 @@ body {
 
 Styles found within a block will be enqueued using the block selector.
 
-By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitely telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
+By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
 
 {% codetabs %}
 {% Input %}
@@ -915,7 +941,7 @@ h3 {
 This field is only allowed when the Gutenberg plugin is active. In WordPress 5.8 will be ignored.
 </div>
 
-Within this field themes can list the custom templates present in the `block-templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
+Within this field themes can list the custom templates present in the `templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
 
 - name: mandatory.
 - title: mandatory, translatable.
@@ -944,11 +970,12 @@ Within this field themes can list the custom templates present in the `block-tem
 This field is only allowed when the Gutenberg plugin is active. In WordPress 5.8 will be ignored.
 </div>
 
-Within this field themes can list the template parts present in the `block-template-parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
+Within this field themes can list the template parts present in the `parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
 
 Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block. Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
 - name: mandatory.
+- title: optional, translatable.
 - area: optional, will be set to `uncategorized` by default and trigger no block variation.
 
 ```json
@@ -957,11 +984,21 @@ Currently block variations exist for "header" and "footer" values of the area te
 	"templateParts": [
 		{
 			"name": "my-template-part",
+			"title": "Header",
 			"area": "header"
 		}
 	]
 }
 ```
+
+## Developing with theme.json
+
+It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
+
+Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
+
+![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
+
 
 ## Frequently Asked Questions
 
@@ -984,8 +1021,8 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 
 The `--` as a separator has two functions:
 
-- Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
-- Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
+- Readability, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
+- Parsability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
 
 ### Why using `--` as a separator?
 
@@ -1045,6 +1082,31 @@ A few notes about this process:
 			"line--height": { // DO NOT DO THIS
 				"body": 1.7
 			}
+		}
+	}
+}
+```
+
+### What is blockGap and how can I use it?
+
+blockGap adjusts the vertical margin, or gap, between blocks.
+It is also used for margins between inner blocks in columns, buttons, and social icons.
+In the editor, the control for the blockGap is called Block spacing, located in the Dimensions panel.
+
+The value you define for the blockGap style uses a CSS property, a preset, named `--wp--style--block-gap`.
+The default value is 2em.
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"spacing": {
+			"blockGap": true,
+		}
+	},
+	"styles": {
+		"spacing": {
+			"blockGap": "1.5rem"
 		}
 	}
 }

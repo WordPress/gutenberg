@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-i18n",
-	"version": "3.0.1",
+	"version": "3.0.4",
 	"description": "React bindings for @wordpress/i18n.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"utility-types": "^3.10.0"

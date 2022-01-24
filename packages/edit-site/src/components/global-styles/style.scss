@@ -1,0 +1,67 @@
+.edit-site-global-styles-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 152px;
+	line-height: 1;
+}
+
+.edit-site-typography-panel__preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100px;
+	margin-bottom: $grid-unit-20;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles-screen-typography {
+	margin: $grid-unit-20;
+}
+
+.edit-site-global-styles-screen-typography__indicator {
+	height: 24px;
+	width: 24px;
+	font-size: 14px;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles-screen-colors {
+	margin: $grid-unit-20;
+
+	.component-color-indicator {
+		// Show a diagonal line (crossed out) for empty swatches.
+		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+	}
+}
+
+.edit-site-global-styles-header__description {
+	padding: 0 $grid-unit-20;
+}
+
+.edit-site-global-styles-subtitle {
+	// Need to override the too specific styles for complementary areas.
+	margin-bottom: 0 !important;
+	text-transform: uppercase;
+	font-weight: 500 !important;
+	font-size: 11px !important;
+}
+
+.edit-site-screen-color-palette-toggle.edit-site-screen-color-palette-toggle {
+	margin-right: $grid-unit-20;
+	margin-left: $grid-unit-20;
+	width: unset;
+	.components-toggle-group-control {
+		min-height: $grid-unit-40;
+	}
+}
+
+.edit-site-screen-text-color__control,
+.edit-site-screen-link-color__control,
+.edit-site-screen-background-color__control {
+	padding: $grid-unit-20;
+}

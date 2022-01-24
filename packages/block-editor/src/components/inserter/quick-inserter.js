@@ -56,7 +56,7 @@ export default function QuickInserter( {
 			const { getSettings, getBlockIndex, getBlockCount } = select(
 				blockEditorStore
 			);
-			const index = getBlockIndex( clientId, rootClientId );
+			const index = getBlockIndex( clientId );
 			return {
 				setInserterIsOpened: getSettings()
 					.__experimentalSetIsInserterOpened,
@@ -75,7 +75,7 @@ export default function QuickInserter( {
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected
 	const onBrowseAll = () => {
-		setInserterIsOpened( { rootClientId, insertionIndex } );
+		setInserterIsOpened( { rootClientId, insertionIndex, filterValue } );
 	};
 
 	return (

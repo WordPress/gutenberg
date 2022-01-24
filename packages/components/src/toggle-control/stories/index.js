@@ -13,7 +13,13 @@ import { useState } from '@wordpress/element';
  */
 import ToggleControl from '../';
 
-export default { title: 'Components/ToggleControl', component: ToggleControl };
+export default {
+	title: 'Components/ToggleControl',
+	component: ToggleControl,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 const ToggleControlWithState = ( {
 	helpTextChecked,

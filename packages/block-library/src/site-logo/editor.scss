@@ -1,7 +1,7 @@
 .wp-block[data-align="center"] > .wp-block-site-logo {
+	display: table;
 	margin-left: auto;
 	margin-right: auto;
-	text-align: center;
 }
 
 .wp-block-site-logo {
@@ -9,20 +9,6 @@
 	a {
 		pointer-events: none;
 	}
-
-	&:not(.is-default-size) {
-		display: table;
-	}
-
-	// Provide a sane starting point for the size.
-	&.is-default-size {
-		width: 120px;
-
-		img {
-			width: 100%;
-		}
-	}
-
 
 	.custom-logo-link {
 		cursor: inherit;
@@ -38,26 +24,40 @@
 
 	img {
 		display: block;
+		height: auto;
 		max-width: 100%;
 	}
+}
 
-	// Placeholder improvements.
-	.components-placeholder {
-		justify-content: flex-start;
-		min-height: auto;
+// Provide special styling for the placeholder.
+.wp-block-site-logo.wp-block-site-logo {
+	// Inherit border radius from style variations.
+	.components-placeholder,
+	.components-resizable-box__container {
+		border-radius: inherit;
+	}
+
+	// Match the default logo size.
+	&.is-default-size .components-placeholder {
 		height: 120px;
-		padding: $grid-unit-15;
+		width: 120px;
+	}
 
-		// Massage the label.
-		.components-placeholder__label {
-			margin-top: $grid-unit-15;
-			white-space: nowrap;
-		}
+	// Style the placeholder.
+	.components-placeholder {
+		justify-content: center;
+		align-items: center;
+		box-shadow: none;
+		padding: 0;
 
-		.components-placeholder__label .block-editor-block-icon,
-		.components-placeholder__label > svg {
-			margin-right: $grid-unit-05;
-		}
+		// Provide a minimum size for the placeholder, for when the logo is resized.
+		// @todo: resizing is currently only possible by adding an image, resizing,
+		// and then removing the image again. We might want to enable resizing on the
+		// placeholder itself.
+		min-height: $grid-unit-60;
+		min-width: $grid-unit-60;
+		height: 100%;
+		width: 100%;
 
 		// Hide the upload button, as it's also available in the media library.
 		.components-form-file-upload {
@@ -77,9 +77,81 @@
 			justify-content: center;
 		}
 
-		// Hide drag and drop text.
+		// Hide items.
 		.components-drop-zone__content-text {
 			display: none;
 		}
+
+		// Draw the dashed outline.
+		// By setting the dashed border to currentColor, we ensure it's visible
+		// against any background color.
+		color: currentColor;
+		background: transparent;
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			border: $border-width dashed currentColor;
+			opacity: 0.4;
+			pointer-events: none;
+
+			// Inherit border radius from style variations.
+			border-radius: inherit;
+		}
+
+		// Style the upload button.
+		.components-placeholder__fieldset {
+			width: auto;
+		}
+
+		.components-button.components-button {
+			color: inherit;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: $grid-unit-60;
+			height: $grid-unit-60;
+			border-radius: 50%;
+			position: relative;
+			visibility: hidden;
+
+			// Animation.
+			background: transparent;
+			transition: all 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
+		.components-button.components-button > svg {
+			color: $white;
+		}
+
+		// Style the placeholder illustration.
+		.components-placeholder__illustration {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			stroke: currentColor;
+			stroke-dasharray: 3;
+			opacity: 0.4;
+		}
+	}
+
+	// Show upload button on block selection.
+	&.is-selected .components-button.components-button {
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+		border-style: solid;
+		color: $white;
+		opacity: 1;
+		visibility: visible;
 	}
 }

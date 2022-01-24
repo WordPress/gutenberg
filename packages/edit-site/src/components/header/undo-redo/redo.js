@@ -9,7 +9,10 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 
 export default function RedoButton() {
-	const hasRedo = useSelect( ( select ) => select( coreStore ).hasRedo() );
+	const hasRedo = useSelect(
+		( select ) => select( coreStore ).hasRedo(),
+		[]
+	);
 	const { redo } = useDispatch( coreStore );
 	return (
 		<Button

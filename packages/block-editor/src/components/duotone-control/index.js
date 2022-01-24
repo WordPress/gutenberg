@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, DuotoneSwatch } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import {
+	Dropdown,
+	DuotonePicker,
+	DuotoneSwatch,
+	MenuGroup,
+	ToolbarButton,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
-import DuotonePickerPopover from './duotone-picker-popover';
 
 function DuotoneControl( {
 	colorPalette,
@@ -19,42 +19,50 @@ function DuotoneControl( {
 	value,
 	onChange,
 } ) {
-	const [ isOpen, setIsOpen ] = useState( false );
-
-	const onToggle = () => {
-		setIsOpen( ( prev ) => ! prev );
-	};
-
-	const openOnArrowDown = ( event ) => {
-		if ( ! isOpen && event.keyCode === DOWN ) {
-			event.preventDefault();
-			onToggle();
-		}
-	};
-
 	return (
-		<>
-			<ToolbarButton
-				showTooltip
-				onClick={ onToggle }
-				aria-haspopup="true"
-				aria-expanded={ isOpen }
-				onKeyDown={ openOnArrowDown }
-				label={ __( 'Apply duotone filter' ) }
-				icon={ <DuotoneSwatch values={ value } /> }
-			/>
-			{ isOpen && (
-				<DuotonePickerPopover
-					value={ value }
-					onChange={ onChange }
-					onToggle={ onToggle }
-					duotonePalette={ duotonePalette }
-					colorPalette={ colorPalette }
-					disableCustomColors={ disableCustomColors }
-					disableCustomDuotone={ disableCustomDuotone }
-				/>
+		<Dropdown
+			popoverProps={ {
+				className: 'block-editor-duotone-control__popover',
+				headerTitle: __( 'Duotone' ),
+				isAlternate: true,
+			} }
+			renderToggle={ ( { isOpen, onToggle } ) => {
+				const openOnArrowDown = ( event ) => {
+					if ( ! isOpen && event.keyCode === DOWN ) {
+						event.preventDefault();
+						onToggle();
+					}
+				};
+				return (
+					<ToolbarButton
+						showTooltip
+						onClick={ onToggle }
+						aria-haspopup="true"
+						aria-expanded={ isOpen }
+						onKeyDown={ openOnArrowDown }
+						label={ __( 'Apply duotone filter' ) }
+						icon={ <DuotoneSwatch values={ value } /> }
+					/>
+				);
+			} }
+			renderContent={ () => (
+				<MenuGroup label={ __( 'Duotone' ) }>
+					<div className="block-editor-duotone-control__description">
+						{ __(
+							'Create a two-tone color effect without losing your original image.'
+						) }
+					</div>
+					<DuotonePicker
+						colorPalette={ colorPalette }
+						duotonePalette={ duotonePalette }
+						disableCustomColors={ disableCustomColors }
+						disableCustomDuotone={ disableCustomDuotone }
+						value={ value }
+						onChange={ onChange }
+					/>
+				</MenuGroup>
 			) }
-		</>
+		/>
 	);
 }
 

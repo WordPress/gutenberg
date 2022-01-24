@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 6.4.0 (2021-11-15)
+
+### Enhancements
+
+-   The bundled `@babel/core` dependency has been updated from requiring `^7.13.19` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/plugin-transform-react-jsx` dependency has been updated from requiring `^7.12.7` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/plugin-transform-runtime` dependency has been updated from requiring `^7.13.10` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/preset-env` dependency has been updated from requiring `^7.13.10` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/preset-typescript` dependency has been updated from requiring `^7.13.10` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/runtime` dependency has been updated from requiring `^7.13.10` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `browserslist` dependency has been updated from requiring `^4.16.6` to requiring `^4.17.6` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `core-js` dependency has been updated from requiring `^3.12.1` to requiring `^3.19.1` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
 ## 6.2.0 (2021-05-31)
 
 ### New Feature

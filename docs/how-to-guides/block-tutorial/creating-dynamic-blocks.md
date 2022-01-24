@@ -18,7 +18,7 @@ Block attributes can be used for any content or setting you want to save for tha
 The following code example shows how to create a dynamic block that shows only the last post as a link.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -52,7 +52,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, data, blockEditor ) {
@@ -155,7 +155,7 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/READ
 _Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation)._
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -182,7 +182,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, serverSideRender, blockEditor ) {
@@ -219,4 +219,4 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 
 {% end %}
 
-Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts and ESNext setup for auto dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/HEAD/01-basic-esnext) for PHP code setup).
+Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts to automatically build dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/HEAD/01-basic-esnext) for PHP code setup).

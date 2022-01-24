@@ -23,9 +23,11 @@ import { useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function getBlockDisplayText( block ) {
-	return block
-		? getBlockLabel( getBlockType( block.name ), block.attributes )
-		: null;
+	if ( block ) {
+		const blockType = getBlockType( block.name );
+		return blockType ? getBlockLabel( blockType, block.attributes ) : null;
+	}
+	return null;
 }
 
 function useSecondaryText() {
@@ -104,22 +106,16 @@ export default function DocumentActions( {
 			>
 				<Text
 					size="body"
-					className="edit-site-document-actions__title-prefix"
+					className="edit-site-document-actions__title"
+					as="h1"
 				>
 					<VisuallyHidden as="span">
 						{ sprintf(
 							/* translators: %s: the entity being edited, like "template"*/
-							__( 'Editing %s:' ),
+							__( 'Editing %s: ' ),
 							entityLabel
 						) }
 					</VisuallyHidden>
-				</Text>
-
-				<Text
-					size="body"
-					className="edit-site-document-actions__title"
-					as="h1"
-				>
 					{ entityTitle }
 				</Text>
 

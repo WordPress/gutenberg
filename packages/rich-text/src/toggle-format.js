@@ -1,4 +1,11 @@
 /**
+ * WordPress dependencies
+ */
+
+import { speak } from '@wordpress/a11y';
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 
@@ -19,8 +26,17 @@ import { applyFormat } from './apply-format';
  */
 export function toggleFormat( value, format ) {
 	if ( getActiveFormat( value, format.type ) ) {
+		// For screen readers, will announce if formatting control is disabled.
+		if ( format.title ) {
+			// translators: %s: title of the formatting control
+			speak( sprintf( __( '%s removed.' ), format.title ), 'assertive' );
+		}
 		return removeFormat( value, format.type );
 	}
-
+	// For screen readers, will announce if formatting control is enabled.
+	if ( format.title ) {
+		// translators: %s: title of the formatting control
+		speak( sprintf( __( '%s applied.' ), format.title ), 'assertive' );
+	}
 	return applyFormat( value, format );
 }

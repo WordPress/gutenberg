@@ -29,12 +29,6 @@ export function LetterSpacingEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const isDisabled = useIsLetterSpacingDisabled( props );
-
-	if ( isDisabled ) {
-		return null;
-	}
-
 	function onChange( newSpacing ) {
 		setAttributes( {
 			style: cleanEmptyObject( {
@@ -51,6 +45,7 @@ export function LetterSpacingEdit( props ) {
 		<LetterSpacingControl
 			value={ style?.typography?.letterSpacing }
 			onChange={ onChange }
+			__unstableInputWidth={ '100%' }
 		/>
 	);
 }
@@ -66,7 +61,40 @@ export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {
 		blockName,
 		LETTER_SPACING_SUPPORT_KEY
 	);
-	const hasLetterSpacing = useSetting( 'typography.customLetterSpacing' );
+	const hasLetterSpacing = useSetting( 'typography.letterSpacing' );
 
 	return notSupported || ! hasLetterSpacing;
+}
+
+/**
+ * Checks if there is a current value set for the letter spacing block support.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a letter spacing set.
+ */
+export function hasLetterSpacingValue( props ) {
+	return !! props.attributes.style?.typography?.letterSpacing;
+}
+
+/**
+ * Resets the letter spacing block support attribute. This can be used when
+ * disabling the letter spacing support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetLetterSpacing( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			typography: {
+				...style?.typography,
+				letterSpacing: undefined,
+			},
+		} ),
+	} );
 }

@@ -7,7 +7,7 @@ Note: A single block can only contain one `InnerBlock` component.
 Here is the basic InnerBlocks usage.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -38,7 +38,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, blockEditor ) {
@@ -79,20 +79,20 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 
 ## Orientation
 
-By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style InnerBlocks to appear horizontally. When blocks are styled in such a way, the `orientation` prop can be used to indicate a horizontal layout:
+By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style inner blocks to appear horizontally, for instance by adding CSS flex or grid properties to the inner blocks wrapper. When blocks are styled in such a way, the `orientation` prop can be set to indicate that a horizontal layout is being used:
 
 ```js
 <InnerBlocks orientation="horizontal" />
 ```
 
-Specifying this prop will result in the block movers being shown horizontally, and also ensure drag and drop works correctly.
+Specifying this prop does not affect the layout of the inner blocks, but results in the block mover icons in the child blocks being displayed horizontally, and also ensures that drag and drop works correctly.
 
 ## Template
 
 Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 const MY_TEMPLATE = [
@@ -113,7 +113,7 @@ const MY_TEMPLATE = [
 	},
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 const MY_TEMPLATE = [

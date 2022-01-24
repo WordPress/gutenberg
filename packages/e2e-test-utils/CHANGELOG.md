@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The peer `jest` dependency has been updated from requiring `>=26` to requiring `>=27` (see [Breaking Changes](https://jestjs.io/blog/2021/05/25/jest-27), [#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+-   The peer `puppeteer` dependency has been replaced with `puppeteer-core` requiring version `>=11` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
+
+### New Features
+
+-   Added `createReusableBlock` function to make it easier to create a simple reusable block ([#37333](https://github.com/WordPress/gutenberg/pull/37333)).
+-   Added `getOption` and `setOption` functions to make it easier to set and reset options such as the site title and site tagline ([#37139](https://github.com/WordPress/gutenberg/pull/37139)).
+
+## 5.4.6 (2021-11-07)
+
+### New Features
+
+-   Added `disablePageDialogAccept` - Disable auto-accepting dialogs enabled by `enablePageDialogAccept` [#35828](https://github.com/WordPress/gutenberg/pull/35828).
+
 ## 5.4.0 (2021-07-21)
 
 ### New Features

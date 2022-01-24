@@ -1,3 +1,7 @@
 export const PREFERENCES_DEFAULTS = {
-	features: {},
+	features: {
+		welcomeGuide: true,
+		welcomeGuideStyles: true,
+	},
+	editorMode: 'visual',
 };

@@ -68,6 +68,13 @@ const pageEvents = [];
 // The Jest timeout is increased because these tests are a bit slow
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
+// Retry failed tests at most 2 times in CI.
+// This enables `flaky-tests-reporter` and `report-flaky-tests` GitHub action
+// to mark test as flaky and automatically create a tracking issue about it.
+if ( process.env.CI ) {
+	jest.retryTimes( 2 );
+}
+
 async function setupBrowser() {
 	await clearLocalStorage();
 	await setBrowserViewport( 'large' );

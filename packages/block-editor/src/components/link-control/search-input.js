@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop, omit } from 'lodash';
-
+import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
@@ -45,6 +45,7 @@ const LinkControlSearchInput = forwardRef(
 			suggestionsQuery = {},
 			withURLSuggestion = true,
 			createSuggestionButtonText,
+			useLabel = false,
 		},
 		ref
 	) => {
@@ -117,10 +118,15 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
+		const inputClasses = classnames( className, {
+			'has-no-label': ! useLabel,
+		} );
+
 		return (
-			<div>
+			<div className="block-editor-link-control__search-input-container">
 				<URLInput
-					className={ className }
+					label={ useLabel ? 'URL' : undefined }
+					className={ inputClasses }
 					value={ value }
 					onChange={ onInputChange }
 					placeholder={ placeholder ?? __( 'Search or type url' ) }
@@ -132,10 +138,18 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
-					onSubmit={ ( suggestion ) => {
-						onSuggestionSelected(
-							suggestion || focusedSuggestion || { url: value }
-						);
+					onSubmit={ ( suggestion, event ) => {
+						const hasSuggestion = suggestion || focusedSuggestion;
+
+						// If there is no suggestion and the value (ie: any manually entered URL) is empty
+						// then don't allow submission otherwise we get empty links.
+						if ( ! hasSuggestion && ! value?.trim()?.length ) {
+							event.preventDefault();
+						} else {
+							onSuggestionSelected(
+								hasSuggestion || { url: value }
+							);
+						}
 					} }
 					ref={ ref }
 				/>

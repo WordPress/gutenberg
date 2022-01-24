@@ -1,0 +1,27 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/navigation-submenu",
+		"isValid": true,
+		"attributes": {
+			"label": "A fine submenu",
+			"opensInNewTab": false,
+			"isTopLevelItem": true
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/navigation-link",
+				"isValid": true,
+				"attributes": {
+					"label": "WordPress",
+					"opensInNewTab": false,
+					"url": "https://wordpress.org/"
+				},
+				"innerBlocks": [],
+				"originalContent": ""
+			}
+		],
+		"originalContent": ""
+	}
+]

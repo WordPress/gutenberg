@@ -19,61 +19,44 @@ import {
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { controls } from '@wordpress/data';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
 /**
- * Internal dependencies
- */
-import { __unstableMarkAutomaticChangeFinalControl } from '../store/controls';
-import { STORE_NAME as blockEditorStoreName } from './constants';
-
-/**
- * Generator which will yield a default block insert action if there
- * are no other blocks at the root of the editor. This generator should be used
+ * Action which will insert a default block insert action if there
+ * are no other blocks at the root of the editor. This action should be used
  * in actions which may result in no blocks remaining in the editor (removal,
  * replacement, etc).
  */
-function* ensureDefaultBlock() {
-	const count = yield controls.select(
-		blockEditorStoreName,
-		'getBlockCount'
-	);
-
+const ensureDefaultBlock = () => ( { select, dispatch } ) => {
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
-	if ( count === 0 ) {
-		const { __unstableHasCustomAppender } = yield controls.select(
-			blockEditorStoreName,
-			'getSettings'
-		);
-
-		// If there's an custom appender, don't insert default block.
-		// We have to remember to manually move the focus elsewhere to
-		// prevent it from being lost though.
-		if ( __unstableHasCustomAppender ) {
-			return;
-		}
-
-		return yield insertDefaultBlock();
+	const count = select.getBlockCount();
+	if ( count > 0 ) {
+		return;
 	}
-}
+
+	// If there's an custom appender, don't insert default block.
+	// We have to remember to manually move the focus elsewhere to
+	// prevent it from being lost though.
+	const { __unstableHasCustomAppender } = select.getSettings();
+	if ( __unstableHasCustomAppender ) {
+		return;
+	}
+
+	dispatch.insertDefaultBlock();
+};
 
 /**
- * Returns an action object used in signalling that blocks state should be
- * reset to the specified array of blocks, taking precedence over any other
- * content reflected as an edit in state.
+ * Action that resets blocks state to the specified array of blocks, taking precedence
+ * over any other content reflected as an edit in state.
  *
  * @param {Array} blocks Array of blocks.
  */
-export function* resetBlocks( blocks ) {
-	yield {
-		type: 'RESET_BLOCKS',
-		blocks,
-	};
-	return yield* validateBlocksToTemplate( blocks );
-}
+export const resetBlocks = ( blocks ) => ( { dispatch } ) => {
+	dispatch( { type: 'RESET_BLOCKS', blocks } );
+	dispatch( validateBlocksToTemplate( blocks ) );
+};
 
 /**
  * Block validity is a function of blocks state (at the point of a
@@ -83,15 +66,12 @@ export function* resetBlocks( blocks ) {
  *
  * @param {Array} blocks Array of blocks.
  */
-export function* validateBlocksToTemplate( blocks ) {
-	const template = yield controls.select(
-		blockEditorStoreName,
-		'getTemplate'
-	);
-	const templateLock = yield controls.select(
-		blockEditorStoreName,
-		'getTemplateLock'
-	);
+export const validateBlocksToTemplate = ( blocks ) => ( {
+	select,
+	dispatch,
+} ) => {
+	const template = select.getTemplate();
+	const templateLock = select.getTemplateLock();
 
 	// Unlocked templates are considered always valid because they act
 	// as default values only.
@@ -101,16 +81,13 @@ export function* validateBlocksToTemplate( blocks ) {
 		doBlocksMatchTemplate( blocks, template );
 
 	// Update if validity has changed.
-	const isValidTemplate = yield controls.select(
-		blockEditorStoreName,
-		'isValidTemplate'
-	);
+	const isValidTemplate = select.isValidTemplate();
 
 	if ( isBlocksValidToTemplate !== isValidTemplate ) {
-		yield setTemplateValidity( isBlocksValidToTemplate );
+		dispatch.setTemplateValidity( isBlocksValidToTemplate );
 		return isBlocksValidToTemplate;
 	}
-}
+};
 
 /**
  * A block selection object.
@@ -172,8 +149,7 @@ export function receiveBlocks( blocks ) {
 }
 
 /**
- * Returns an action object used in signalling that the multiple blocks'
- * attributes with the specified client IDs have been updated.
+ * Action that updates attributes of multiple blocks with the specified client IDs.
  *
  * @param {string|string[]} clientIds     Block client IDs.
  * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
@@ -195,8 +171,7 @@ export function updateBlockAttributes(
 }
 
 /**
- * Returns an action object used in signalling that the block with the
- * specified client ID has been updated.
+ * Action that updates the block with the specified client ID.
  *
  * @param {string} clientId Block client ID.
  * @param {Object} updates  Block attributes to be merged.
@@ -239,18 +214,12 @@ export function selectBlock( clientId, initialPosition = 0 ) {
  *
  * @param {string} clientId Block client ID.
  */
-export function* selectPreviousBlock( clientId ) {
-	const previousBlockClientId = yield controls.select(
-		blockEditorStoreName,
-		'getPreviousBlockClientId',
-		clientId
-	);
-
+export const selectPreviousBlock = ( clientId ) => ( { select, dispatch } ) => {
+	const previousBlockClientId = select.getPreviousBlockClientId( clientId );
 	if ( previousBlockClientId ) {
-		yield selectBlock( previousBlockClientId, -1 );
-		return [ previousBlockClientId ];
+		dispatch.selectBlock( previousBlockClientId, -1 );
 	}
-}
+};
 
 /**
  * Yields action objects used in signalling that the block following the given
@@ -258,21 +227,15 @@ export function* selectPreviousBlock( clientId ) {
  *
  * @param {string} clientId Block client ID.
  */
-export function* selectNextBlock( clientId ) {
-	const nextBlockClientId = yield controls.select(
-		blockEditorStoreName,
-		'getNextBlockClientId',
-		clientId
-	);
-
+export const selectNextBlock = ( clientId ) => ( { select, dispatch } ) => {
+	const nextBlockClientId = select.getNextBlockClientId( clientId );
 	if ( nextBlockClientId ) {
-		yield selectBlock( nextBlockClientId );
-		return [ nextBlockClientId ];
+		dispatch.selectBlock( nextBlockClientId );
 	}
-}
+};
 
 /**
- * Returns an action object used in signalling that a block multi-selection has started.
+ * Action that starts block multi-selection.
  *
  * @return {Object} Action object.
  */
@@ -283,7 +246,7 @@ export function startMultiSelect() {
 }
 
 /**
- * Returns an action object used in signalling that block multi-selection stopped.
+ * Action that stops block multi-selection.
  *
  * @return {Object} Action object.
  */
@@ -294,38 +257,23 @@ export function stopMultiSelect() {
 }
 
 /**
- * Returns an action object used in signalling that block multi-selection changed.
+ * Action that changes block multi-selection.
  *
  * @param {string} start First block of the multi selection.
  * @param {string} end   Last block of the multiselection.
  */
-export function* multiSelect( start, end ) {
-	const startBlockRootClientId = yield controls.select(
-		blockEditorStoreName,
-		'getBlockRootClientId',
-		start
-	);
-	const endBlockRootClientId = yield controls.select(
-		blockEditorStoreName,
-		'getBlockRootClientId',
-		end
-	);
+export const multiSelect = ( start, end ) => ( { select, dispatch } ) => {
+	const startBlockRootClientId = select.getBlockRootClientId( start );
+	const endBlockRootClientId = select.getBlockRootClientId( end );
 
 	// Only allow block multi-selections at the same level.
 	if ( startBlockRootClientId !== endBlockRootClientId ) {
 		return;
 	}
 
-	yield {
-		type: 'MULTI_SELECT',
-		start,
-		end,
-	};
+	dispatch( { type: 'MULTI_SELECT', start, end } );
 
-	const blockCount = yield controls.select(
-		blockEditorStoreName,
-		'getSelectedBlockCount'
-	);
+	const blockCount = select.getSelectedBlockCount();
 
 	speak(
 		sprintf(
@@ -335,10 +283,10 @@ export function* multiSelect( start, end ) {
 		),
 		'assertive'
 	);
-}
+};
 
 /**
- * Returns an action object used in signalling that the block selection is cleared.
+ * Action that clears the block selection.
  *
  * @return {Object} Action object.
  */
@@ -349,7 +297,7 @@ export function clearSelectedBlock() {
 }
 
 /**
- * Returns an action object that enables or disables block selection.
+ * Action that enables or disables block selection.
  *
  * @param {boolean} [isSelectionEnabled=true] Whether block selection should
  *                                            be enabled.
@@ -395,8 +343,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * Returns an action object signalling that a blocks should be replaced with
- * one or more replacement blocks.
+ * Action that replaces given blocks with one or more replacement blocks.
  *
  * @param {(string|string[])} clientIds       Block client ID(s) to replace.
  * @param {(Object|Object[])} blocks          Replacement block(s).
@@ -404,32 +351,26 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  * @param {0|-1|null}         initialPosition Index of caret after in the selected block after the operation.
  * @param {?Object}           meta            Optional Meta values to be passed to the action object.
  *
- * @yield {Object} Action object.
+ * @return {Object} Action object.
  */
-export function* replaceBlocks(
+export const replaceBlocks = (
 	clientIds,
 	blocks,
 	indexToSelect,
 	initialPosition = 0,
 	meta
-) {
+) => ( { select, dispatch } ) => {
 	/* eslint-enable jsdoc/valid-types */
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield controls.select( blockEditorStoreName, 'getSettings' )
+		select.getSettings()
 	);
-	const rootClientId = yield controls.select(
-		blockEditorStoreName,
-		'getBlockRootClientId',
-		first( clientIds )
-	);
+	const rootClientId = select.getBlockRootClientId( first( clientIds ) );
 	// Replace is valid if the new blocks can be inserted in the root block.
 	for ( let index = 0; index < blocks.length; index++ ) {
 		const block = blocks[ index ];
-		const canInsertBlock = yield controls.select(
-			blockEditorStoreName,
-			'canInsertBlockType',
+		const canInsertBlock = select.canInsertBlockType(
 			block.name,
 			rootClientId
 		);
@@ -437,7 +378,7 @@ export function* replaceBlocks(
 			return;
 		}
 	}
-	yield {
+	dispatch( {
 		type: 'REPLACE_BLOCKS',
 		clientIds,
 		blocks,
@@ -445,13 +386,12 @@ export function* replaceBlocks(
 		indexToSelect,
 		initialPosition,
 		meta,
-	};
-	yield* ensureDefaultBlock();
-}
+	} );
+	dispatch( ensureDefaultBlock() );
+};
 
 /**
- * Returns an action object signalling that a single block should be replaced
- * with one or more replacement blocks.
+ * Action that replaces a single block with one or more replacement blocks.
  *
  * @param {(string|string[])} clientId Block client ID to replace.
  * @param {(Object|Object[])} block    Replacement block(s).
@@ -470,100 +410,91 @@ export function replaceBlock( clientId, block ) {
  *
  * @return {Function} Action creator.
  */
-function createOnMove( type ) {
-	return ( clientIds, rootClientId ) => {
-		return {
-			clientIds: castArray( clientIds ),
-			type,
-			rootClientId,
-		};
-	};
-}
+const createOnMove = ( type ) => ( clientIds, rootClientId ) => ( {
+	select,
+	dispatch,
+} ) => {
+	// If one of the blocks is locked or the parent is locked, we cannot move any block.
+	const canMoveBlocks = select.canMoveBlocks( clientIds, rootClientId );
+	if ( ! canMoveBlocks ) {
+		return;
+	}
+
+	dispatch( { type, clientIds: castArray( clientIds ), rootClientId } );
+};
 
 export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
 export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 
 /**
- * Returns an action object signalling that the given blocks should be moved to
- * a new position.
+ * Action that moves given blocks to a new position.
  *
  * @param {?string} clientIds        The client IDs of the blocks.
  * @param {?string} fromRootClientId Root client ID source.
  * @param {?string} toRootClientId   Root client ID destination.
  * @param {number}  index            The index to move the blocks to.
- *
- * @yield {Object} Action object.
  */
-export function* moveBlocksToPosition(
+export const moveBlocksToPosition = (
 	clientIds,
 	fromRootClientId = '',
 	toRootClientId = '',
 	index
-) {
-	const templateLock = yield controls.select(
-		blockEditorStoreName,
-		'getTemplateLock',
-		fromRootClientId
-	);
+) => ( { select, dispatch } ) => {
+	const canMoveBlocks = select.canMoveBlocks( clientIds, fromRootClientId );
 
-	// If locking is equal to all on the original clientId (fromRootClientId),
-	// it is not possible to move the block to any other position.
-	if ( templateLock === 'all' ) {
+	// If one of the blocks is locked or the parent is locked, we cannot move any block.
+	if ( ! canMoveBlocks ) {
 		return;
 	}
 
-	const action = {
+	// If moving inside the same root block the move is always possible.
+	if ( fromRootClientId !== toRootClientId ) {
+		const canRemoveBlocks = select.canRemoveBlocks(
+			clientIds,
+			fromRootClientId
+		);
+
+		// If we're moving to another block, it means we're deleting blocks from
+		// the original block, so we need to check if removing is possible.
+		if ( ! canRemoveBlocks ) {
+			return;
+		}
+
+		const canInsertBlocks = select.canInsertBlocks(
+			clientIds,
+			toRootClientId
+		);
+
+		// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
+		if ( ! canInsertBlocks ) {
+			return;
+		}
+	}
+
+	dispatch( {
 		type: 'MOVE_BLOCKS_TO_POSITION',
 		fromRootClientId,
 		toRootClientId,
 		clientIds,
 		index,
-	};
-
-	// If moving inside the same root block the move is always possible.
-	if ( fromRootClientId === toRootClientId ) {
-		yield action;
-		return;
-	}
-
-	// If templateLock is insert we can not remove the block from the parent.
-	// Given that here we know that we are moving the block to a different
-	// parent, the move should not be possible if the condition is true.
-	if ( templateLock === 'insert' ) {
-		return;
-	}
-
-	const canInsertBlocks = yield controls.select(
-		blockEditorStoreName,
-		'canInsertBlocks',
-		clientIds,
-		toRootClientId
-	);
-
-	// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
-	if ( canInsertBlocks ) {
-		yield action;
-	}
-}
+	} );
+};
 
 /**
- * Returns an action object signalling that the given block should be moved to a
- * new position.
+ * Action that moves given block to a new position.
  *
  * @param {?string} clientId         The client ID of the block.
  * @param {?string} fromRootClientId Root client ID source.
  * @param {?string} toRootClientId   Root client ID destination.
  * @param {number}  index            The index to move the block to.
- *
- * @yield {Object} Action object.
  */
-export function* moveBlockToPosition(
+export function moveBlockToPosition(
 	clientId,
 	fromRootClientId = '',
 	toRootClientId = '',
 	index
 ) {
-	yield moveBlocksToPosition(
+	return moveBlocksToPosition(
 		[ clientId ],
 		fromRootClientId,
 		toRootClientId,
@@ -572,8 +503,7 @@ export function* moveBlockToPosition(
 }
 
 /**
- * Returns an action object used in signalling that a single block should be
- * inserted, optionally at a specific index respective a root block list.
+ * Action that inserts a single block, optionally at a specific index respective a root block list.
  *
  * @param {Object}   block           Block object to insert.
  * @param {?number}  index           Index at which block should be inserted.
@@ -587,7 +517,7 @@ export function insertBlock(
 	block,
 	index,
 	rootClientId,
-	updateSelection = true,
+	updateSelection,
 	meta
 ) {
 	return insertBlocks(
@@ -602,8 +532,7 @@ export function insertBlock(
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * Returns an action object used in signalling that an array of blocks should
- * be inserted, optionally at a specific index respective a root block list.
+ * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
  * @param {Object[]}  blocks          Block objects to insert.
  * @param {?number}   index           Index at which block should be inserted.
@@ -613,43 +542,37 @@ export function insertBlock(
  * @param {?Object}   meta            Optional Meta values to be passed to the action object.
  * @return {Object} Action object.
  */
-export function* insertBlocks(
+export const insertBlocks = (
 	blocks,
 	index,
 	rootClientId,
 	updateSelection = true,
 	initialPosition = 0,
 	meta
-) {
+) => ( { select, dispatch } ) => {
 	/* eslint-enable jsdoc/valid-types */
 	if ( isObject( initialPosition ) ) {
 		meta = initialPosition;
 		initialPosition = 0;
 		deprecated( "meta argument in wp.data.dispatch('core/block-editor')", {
-			since: '10.1',
-			plugin: 'Gutenberg',
+			since: '5.8',
 			hint: 'The meta argument is now the 6th argument of the function',
 		} );
 	}
 
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield controls.select( blockEditorStoreName, 'getSettings' )
+		select.getSettings()
 	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
-		const isValid = yield controls.select(
-			blockEditorStoreName,
-			'canInsertBlockType',
-			block.name,
-			rootClientId
-		);
+		const isValid = select.canInsertBlockType( block.name, rootClientId );
 		if ( isValid ) {
 			allowedBlocks.push( block );
 		}
 	}
 	if ( allowedBlocks.length ) {
-		return {
+		dispatch( {
 			type: 'INSERT_BLOCKS',
 			blocks: allowedBlocks,
 			index,
@@ -658,13 +581,12 @@ export function* insertBlocks(
 			updateSelection,
 			initialPosition: updateSelection ? initialPosition : null,
 			meta,
-		};
+		} );
 	}
-}
+};
 
 /**
- * Returns an action object used in signalling that the insertion point should
- * be shown.
+ * Action that shows the insertion point.
  *
  * @param {?string} rootClientId      Optional root client ID of block list on
  *                                    which to insert.
@@ -688,7 +610,7 @@ export function showInsertionPoint(
 }
 
 /**
- * Returns an action object hiding the insertion point.
+ * Action that hides the insertion point.
  *
  * @return {Object} Action object.
  */
@@ -699,7 +621,7 @@ export function hideInsertionPoint() {
 }
 
 /**
- * Returns an action object resetting the template validity.
+ * Action that resets the template validity.
  *
  * @param {boolean} isValid template validity flag.
  *
@@ -713,61 +635,45 @@ export function setTemplateValidity( isValid ) {
 }
 
 /**
- * Returns an action object synchronize the template with the list of blocks
+ * Action that synchronizes the template with the list of blocks.
  *
  * @return {Object} Action object.
  */
-export function* synchronizeTemplate() {
-	yield {
-		type: 'SYNCHRONIZE_TEMPLATE',
-	};
-	const blocks = yield controls.select( blockEditorStoreName, 'getBlocks' );
-	const template = yield controls.select(
-		blockEditorStoreName,
-		'getTemplate'
-	);
+export const synchronizeTemplate = () => ( { select, dispatch } ) => {
+	dispatch( { type: 'SYNCHRONIZE_TEMPLATE' } );
+	const blocks = select.getBlocks();
+	const template = select.getTemplate();
 	const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
-	return yield resetBlocks( updatedBlockList );
-}
+	dispatch.resetBlocks( updatedBlockList );
+};
 
 /**
- * Returns an action object used in signalling that two blocks should be merged
+ * Action that merges two blocks.
  *
  * @param {string} firstBlockClientId  Client ID of the first block to merge.
  * @param {string} secondBlockClientId Client ID of the second block to merge.
  */
-export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
+export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
+	select,
+	dispatch,
+} ) => {
 	const blocks = [ firstBlockClientId, secondBlockClientId ];
-	yield {
-		type: 'MERGE_BLOCKS',
-		blocks,
-	};
+	dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
 	const [ clientIdA, clientIdB ] = blocks;
-	const blockA = yield controls.select(
-		blockEditorStoreName,
-		'getBlock',
-		clientIdA
-	);
+	const blockA = select.getBlock( clientIdA );
 	const blockAType = getBlockType( blockA.name );
 
 	// Only focus the previous block if it's not mergeable
-	if ( ! blockAType.merge ) {
-		yield selectBlock( blockA.clientId );
+	if ( blockAType && ! blockAType.merge ) {
+		dispatch.selectBlock( blockA.clientId );
 		return;
 	}
 
-	const blockB = yield controls.select(
-		blockEditorStoreName,
-		'getBlock',
-		clientIdB
-	);
+	const blockB = select.getBlock( clientIdB );
 	const blockBType = getBlockType( blockB.name );
-	const { clientId, attributeKey, offset } = yield controls.select(
-		blockEditorStoreName,
-		'getSelectionStart'
-	);
+	const { clientId, attributeKey, offset } = select.getSelectionStart();
 	const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
 	const attributeDefinition = selectedBlockType.attributes[ attributeKey ];
 	const canRestoreTextSelection =
@@ -874,7 +780,7 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 
 		updatedAttributes[ newAttributeKey ] = newHtml;
 
-		yield selectionChange(
+		dispatch.selectionChange(
 			blockA.clientId,
 			newAttributeKey,
 			newOffset,
@@ -882,7 +788,7 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 		);
 	}
 
-	yield* replaceBlocks(
+	dispatch.replaceBlocks(
 		[ blockA.clientId, blockB.clientId ],
 		[
 			{
@@ -896,7 +802,7 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 		],
 		0 // If we don't pass the `indexToSelect` it will default to the last block.
 	);
-}
+};
 
 /**
  * Yields action objects used in signalling that the blocks corresponding to
@@ -906,47 +812,32 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
  * @param {boolean}         selectPrevious True if the previous block should be
  *                                         selected when a block is removed.
  */
-export function* removeBlocks( clientIds, selectPrevious = true ) {
+export const removeBlocks = ( clientIds, selectPrevious = true ) => ( {
+	select,
+	dispatch,
+} ) => {
 	if ( ! clientIds || ! clientIds.length ) {
 		return;
 	}
 
 	clientIds = castArray( clientIds );
-	const rootClientId = yield controls.select(
-		blockEditorStoreName,
-		'getBlockRootClientId',
-		clientIds[ 0 ]
-	);
-	const isLocked = yield controls.select(
-		blockEditorStoreName,
-		'getTemplateLock',
-		rootClientId
-	);
-	if ( isLocked ) {
+	const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+	const canRemoveBlocks = select.canRemoveBlocks( clientIds, rootClientId );
+
+	if ( ! canRemoveBlocks ) {
 		return;
 	}
 
-	let previousBlockId;
 	if ( selectPrevious ) {
-		previousBlockId = yield selectPreviousBlock( clientIds[ 0 ] );
-	} else {
-		previousBlockId = yield controls.select(
-			blockEditorStoreName,
-			'getPreviousBlockClientId',
-			clientIds[ 0 ]
-		);
+		dispatch.selectPreviousBlock( clientIds[ 0 ] );
 	}
 
-	yield {
-		type: 'REMOVE_BLOCKS',
-		clientIds,
-	};
+	dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
 
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
-	const defaultBlockId = yield* ensureDefaultBlock();
-	return [ previousBlockId || defaultBlockId ];
-}
+	dispatch( ensureDefaultBlock() );
+};
 
 /**
  * Returns an action object used in signalling that the block with the
@@ -1075,8 +966,7 @@ export function exitFormattedText() {
 }
 
 /**
- * Returns an action object used in signalling that the user caret has changed
- * position.
+ * Action that changes the position of the user caret.
  *
  * @param {string} clientId     The selected block client ID.
  * @param {string} attributeKey The selected block attribute key.
@@ -1101,8 +991,7 @@ export function selectionChange(
 }
 
 /**
- * Returns an action object used in signalling that a new block of the default
- * type should be added to the block list.
+ * Action that adds a new block of the default type to the block list.
  *
  * @param {?Object} attributes   Optional attributes of the block to assign.
  * @param {?string} rootClientId Optional root client ID of block list on which
@@ -1124,7 +1013,7 @@ export function insertDefaultBlock( attributes, rootClientId, index ) {
 }
 
 /**
- * Returns an action object that changes the nested settings of a given block.
+ * Action that changes the nested settings of a given block.
  *
  * @param {string} clientId Client ID of the block whose nested setting are
  *                          being received.
@@ -1141,7 +1030,7 @@ export function updateBlockListSettings( clientId, settings ) {
 }
 
 /**
- * Returns an action object used in signalling that the block editor settings have been updated.
+ * Action that updates the block editor settings.
  *
  * @param {Object} settings Updated settings
  *
@@ -1155,7 +1044,7 @@ export function updateSettings( settings ) {
 }
 
 /**
- * Returns an action object used in signalling that a temporary reusable blocks have been saved
+ * Action that signals that a temporary reusable block has been saved
  * in order to switch its temporary id with the real id.
  *
  * @param {string} id        Reusable block's id.
@@ -1172,7 +1061,7 @@ export function __unstableSaveReusableBlock( id, updatedId ) {
 }
 
 /**
- * Returns an action object used in signalling that the last block change should be marked explicitly as persistent.
+ * Action that marks the last block change explicitly as persistent.
  *
  * @return {Object} Action object.
  */
@@ -1181,7 +1070,7 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
- * Returns an action object used in signalling that the next block change should be marked explicitly as not persistent.
+ * Action that signals that the next block change should be marked explicitly as not persistent.
  *
  * @return {Object} Action object.
  */
@@ -1190,34 +1079,29 @@ export function __unstableMarkNextChangeAsNotPersistent() {
 }
 
 /**
- * Returns an action object used in signalling that the last block change is
- * an automatic change, meaning it was not performed by the user, and can be
- * undone using the `Escape` and `Backspace` keys. This action must be called
- * after the change was made, and any actions that are a consequence of it, so
- * it is recommended to be called at the next idle period to ensure all
+ * Action that marks the last block change as an automatic change, meaning it was not
+ * performed by the user, and can be undone using the `Escape` and `Backspace` keys.
+ * This action must be called after the change was made, and any actions that are a
+ * consequence of it, so it is recommended to be called at the next idle period to ensure all
  * selection changes have been recorded.
  */
-export function* __unstableMarkAutomaticChange() {
-	yield { type: 'MARK_AUTOMATIC_CHANGE' };
-	yield __unstableMarkAutomaticChangeFinalControl();
-}
-
-export function __unstableMarkAutomaticChangeFinal() {
-	return {
-		type: 'MARK_AUTOMATIC_CHANGE_FINAL',
-	};
-}
+export const __unstableMarkAutomaticChange = () => ( { dispatch } ) => {
+	dispatch( { type: 'MARK_AUTOMATIC_CHANGE' } );
+	const { requestIdleCallback = ( cb ) => setTimeout( cb, 100 ) } = window;
+	requestIdleCallback( () => {
+		dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
+	} );
+};
 
 /**
- * Generators that triggers an action used to enable or disable the navigation mode.
+ * Action that enables or disables the navigation mode.
  *
  * @param {string} isNavigationMode Enable/Disable navigation mode.
  */
-export function* setNavigationMode( isNavigationMode = true ) {
-	yield {
-		type: 'SET_NAVIGATION_MODE',
-		isNavigationMode,
-	};
+export const setNavigationMode = ( isNavigationMode = true ) => ( {
+	dispatch,
+} ) => {
+	dispatch( { type: 'SET_NAVIGATION_MODE', isNavigationMode } );
 
 	if ( isNavigationMode ) {
 		speak(
@@ -1232,18 +1116,17 @@ export function* setNavigationMode( isNavigationMode = true ) {
 			)
 		);
 	}
-}
+};
 
 /**
- * Generator that triggers an action used to enable or disable the block moving mode.
+ * Action that enables or disables the block moving mode.
  *
  * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
  */
-export function* setBlockMovingClientId( hasBlockMovingClientId = null ) {
-	yield {
-		type: 'SET_BLOCK_MOVING_MODE',
-		hasBlockMovingClientId,
-	};
+export const setBlockMovingClientId = ( hasBlockMovingClientId = null ) => ( {
+	dispatch,
+} ) => {
+	dispatch( { type: 'SET_BLOCK_MOVING_MODE', hasBlockMovingClientId } );
 
 	if ( hasBlockMovingClientId ) {
 		speak(
@@ -1252,133 +1135,104 @@ export function* setBlockMovingClientId( hasBlockMovingClientId = null ) {
 			)
 		);
 	}
-}
+};
 
 /**
- * Generator that triggers an action used to duplicate a list of blocks.
+ * Action that duplicates a list of blocks.
  *
  * @param {string[]} clientIds
  * @param {boolean}  updateSelection
  */
-export function* duplicateBlocks( clientIds, updateSelection = true ) {
-	if ( ! clientIds && ! clientIds.length ) {
+export const duplicateBlocks = ( clientIds, updateSelection = true ) => ( {
+	select,
+	dispatch,
+} ) => {
+	if ( ! clientIds || ! clientIds.length ) {
 		return;
 	}
-	const blocks = yield controls.select(
-		blockEditorStoreName,
-		'getBlocksByClientId',
-		clientIds
-	);
-	const rootClientId = yield controls.select(
-		blockEditorStoreName,
-		'getBlockRootClientId',
-		clientIds[ 0 ]
-	);
+
 	// Return early if blocks don't exist.
+	const blocks = select.getBlocksByClientId( clientIds );
 	if ( some( blocks, ( block ) => ! block ) ) {
 		return;
 	}
-	const blockNames = blocks.map( ( block ) => block.name );
+
 	// Return early if blocks don't support multiple usage.
+	const blockNames = blocks.map( ( block ) => block.name );
 	if (
-		some(
-			blockNames,
+		blockNames.some(
 			( blockName ) => ! hasBlockSupport( blockName, 'multiple', true )
 		)
 	) {
 		return;
 	}
 
-	const lastSelectedIndex = yield controls.select(
-		blockEditorStoreName,
-		'getBlockIndex',
-		last( castArray( clientIds ) ),
-		rootClientId
+	const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+	const lastSelectedIndex = select.getBlockIndex(
+		last( castArray( clientIds ) )
 	);
 	const clonedBlocks = blocks.map( ( block ) =>
 		__experimentalCloneSanitizedBlock( block )
 	);
-	yield insertBlocks(
+	dispatch.insertBlocks(
 		clonedBlocks,
 		lastSelectedIndex + 1,
 		rootClientId,
 		updateSelection
 	);
 	if ( clonedBlocks.length > 1 && updateSelection ) {
-		yield multiSelect(
+		dispatch.multiSelect(
 			first( clonedBlocks ).clientId,
 			last( clonedBlocks ).clientId
 		);
 	}
 	return clonedBlocks.map( ( block ) => block.clientId );
-}
+};
 
 /**
- * Generator used to insert an empty block after a given block.
+ * Action that inserts an empty block before a given block.
  *
  * @param {string} clientId
  */
-export function* insertBeforeBlock( clientId ) {
+export const insertBeforeBlock = ( clientId ) => ( { select, dispatch } ) => {
 	if ( ! clientId ) {
 		return;
 	}
-	const rootClientId = yield controls.select(
-		blockEditorStoreName,
-		'getBlockRootClientId',
-		clientId
-	);
-	const isLocked = yield controls.select(
-		blockEditorStoreName,
-		'getTemplateLock',
-		rootClientId
-	);
+	const rootClientId = select.getBlockRootClientId( clientId );
+	const isLocked = select.getTemplateLock( rootClientId );
 	if ( isLocked ) {
 		return;
 	}
 
-	const firstSelectedIndex = yield controls.select(
-		blockEditorStoreName,
-		'getBlockIndex',
-		clientId,
-		rootClientId
-	);
-	return yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
-}
+	const firstSelectedIndex = select.getBlockIndex( clientId );
+	return dispatch.insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+};
 
 /**
- * Generator used to insert an empty block before a given block.
+ * Action that inserts an empty block after a given block.
  *
  * @param {string} clientId
  */
-export function* insertAfterBlock( clientId ) {
+export const insertAfterBlock = ( clientId ) => ( { select, dispatch } ) => {
 	if ( ! clientId ) {
 		return;
 	}
-	const rootClientId = yield controls.select(
-		blockEditorStoreName,
-		'getBlockRootClientId',
-		clientId
-	);
-	const isLocked = yield controls.select(
-		blockEditorStoreName,
-		'getTemplateLock',
-		rootClientId
-	);
+	const rootClientId = select.getBlockRootClientId( clientId );
+	const isLocked = select.getTemplateLock( rootClientId );
 	if ( isLocked ) {
 		return;
 	}
 
-	const firstSelectedIndex = yield controls.select(
-		blockEditorStoreName,
-		'getBlockIndex',
-		clientId,
-		rootClientId
+	const firstSelectedIndex = select.getBlockIndex( clientId );
+	return dispatch.insertDefaultBlock(
+		{},
+		rootClientId,
+		firstSelectedIndex + 1
 	);
-	return yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
-}
+};
 
 /**
- * Returns an action object that toggles the highlighted block state.
+ * Action that toggles the highlighted block state.
  *
  * @param {string}  clientId      The block's clientId.
  * @param {boolean} isHighlighted The highlight state.
@@ -1392,22 +1246,18 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
 }
 
 /**
- * Yields action objects used in signalling that the block corresponding to the
- * given clientId should appear to "flash" by rhythmically highlighting it.
+ * Action that "flashes" the block with a given `clientId` by rhythmically highlighting it.
  *
  * @param {string} clientId Target block client ID.
  */
-export function* flashBlock( clientId ) {
-	yield toggleBlockHighlight( clientId, true );
-	yield {
-		type: 'SLEEP',
-		duration: 150,
-	};
-	yield toggleBlockHighlight( clientId, false );
-}
+export const flashBlock = ( clientId ) => async ( { dispatch } ) => {
+	dispatch( toggleBlockHighlight( clientId, true ) );
+	await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+	dispatch( toggleBlockHighlight( clientId, false ) );
+};
 
 /**
- * Returns an action object that sets whether the block has controlled innerblocks.
+ * Action that sets whether a block has controlled inner blocks.
  *
  * @param {string}  clientId                 The block's clientId.
  * @param {boolean} hasControlledInnerBlocks True if the block's inner blocks are controlled.

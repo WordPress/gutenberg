@@ -2,11 +2,16 @@
 	margin: 0 0 1em 0;
 
 	img {
+		height: auto;
 		max-width: 100%;
+		vertical-align: bottom;
 	}
 
-	&:not(.is-style-rounded) img {
-		border-radius: inherit;
+	&:not(.is-style-rounded) {
+		> a,
+		img {
+			border-radius: inherit;
+		}
 	}
 
 	&.aligncenter {
@@ -15,6 +20,7 @@
 
 	&.alignfull img,
 	&.alignwide img {
+		height: auto;
 		width: 100%;
 	}
 

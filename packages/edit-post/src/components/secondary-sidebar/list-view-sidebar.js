@@ -32,7 +32,8 @@ export default function ListViewSidebar() {
 	}
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const focusReturnRef = useFocusReturn();
+	const headerFocusReturnRef = useFocusReturn();
+	const contentFocusReturnRef = useFocusReturn();
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -50,21 +51,28 @@ export default function ListViewSidebar() {
 			className="edit-post-editor__list-view-panel"
 			onKeyDown={ closeOnEscape }
 		>
-			<div className="edit-post-editor__list-view-panel-header">
-				<strong id={ labelId }>{ __( 'List view' ) }</strong>
+			<div
+				className="edit-post-editor__list-view-panel-header"
+				ref={ headerFocusReturnRef }
+			>
+				<strong id={ labelId }>{ __( 'List View' ) }</strong>
 				<Button
 					icon={ closeSmall }
-					label={ __( 'Close list view sidebar' ) }
+					label={ __( 'Close List View Sidebar' ) }
 					onClick={ () => setIsListViewOpened( false ) }
 				/>
 			</div>
 			<div
 				className="edit-post-editor__list-view-panel-content"
-				ref={ useMergeRefs( [ focusReturnRef, focusOnMountRef ] ) }
+				ref={ useMergeRefs( [
+					contentFocusReturnRef,
+					focusOnMountRef,
+				] ) }
 			>
 				<ListView
 					onSelect={ selectEditorBlock }
 					showNestedBlocks
+					__experimentalFeatures
 					__experimentalPersistentListViewFeatures
 				/>
 			</div>

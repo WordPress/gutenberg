@@ -3,7 +3,8 @@
  */
 import classnames from 'classnames';
 import FastAverageColor from 'fast-average-color';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -24,6 +25,7 @@ import {
 	withNotices,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -36,7 +38,7 @@ import {
 	ColorPalette,
 	useBlockProps,
 	useSetting,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -64,22 +66,22 @@ import {
 	getPositionClassName,
 } from './shared';
 
-/**
- * Module Constants
- */
-
-const INNER_BLOCKS_TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			align: 'center',
-			fontSize: 'large',
-			placeholder: __( 'Write title…' ),
-		},
-	],
-];
+extend( [ namesPlugin ] );
 
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
+
+function getInnerBlocksTemplate( attributes ) {
+	return [
+		[
+			'core/paragraph',
+			{
+				align: 'center',
+				placeholder: __( 'Write title…' ),
+				...attributes,
+			},
+		],
+	];
+}
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -114,7 +116,7 @@ function CoverHeightInput( {
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
 			unprocessedValue !== ''
-				? parseInt( unprocessedValue, 10 )
+				? parseFloat( unprocessedValue )
 				: undefined;
 
 		if ( isNaN( inputValue ) && inputValue !== undefined ) {
@@ -146,7 +148,6 @@ function CoverHeightInput( {
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
-				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
 				units={ units }
@@ -196,7 +197,6 @@ function ResizableCover( {
 				onResizeStop( elt.clientHeight );
 				setIsResizing( false );
 			} }
-			minHeight={ COVER_MIN_HEIGHT }
 			{ ...props }
 		/>
 	);
@@ -239,7 +239,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 				setIsDark( true );
 				return;
 			}
-			setIsDark( tinycolor( overlayColor ).isDark() );
+			setIsDark( colord( overlayColor ).isDark() );
 		}
 	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
@@ -272,6 +272,7 @@ function CoverPlaceholder( {
 	noticeUI,
 	noticeOperations,
 	onSelectMedia,
+	style,
 } ) {
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
@@ -280,7 +281,7 @@ function CoverPlaceholder( {
 			labels={ {
 				title: __( 'Cover' ),
 				instructions: __(
-					'Upload an image or video file, or pick one from your media library.'
+					'Drag and drop onto this block, upload, or select existing media from your library.'
 				),
 			} }
 			onSelect={ onSelectMedia }
@@ -292,6 +293,7 @@ function CoverPlaceholder( {
 				removeAllNotices();
 				createErrorNotice( message );
 			} }
+			style={ style }
 		>
 			{ children }
 		</MediaPlaceholder>
@@ -308,6 +310,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
+	markNextChangeAsNotPersistent,
 } ) {
 	const {
 		contentPosition,
@@ -316,19 +319,22 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isDark,
 		isRepeated,
 		minHeight,
 		minHeightUnit,
 		style: styleAttribute,
 		url,
 		alt,
+		allowedBlocks,
+		templateLock,
 	} = attributes;
 	const {
 		gradientClass,
 		gradientValue,
 		setGradient,
 	} = __experimentalUseGradient();
-	const onSelectMedia = attributesFromMedia( setAttributes );
+	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
@@ -378,12 +384,18 @@ function CoverEdit( {
 	};
 
 	const isDarkElement = useRef();
-	const isDark = useCoverIsDark(
+	const isCoverDark = useCoverIsDark(
 		url,
 		dimRatio,
 		overlayColor.color,
 		isDarkElement
 	);
+
+	useEffect( () => {
+		// This side-effect should not create an undo level.
+		markNextChangeAsNotPersistent();
+		setAttributes( { isDark: isCoverDark } );
+	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -399,13 +411,11 @@ function CoverEdit( {
 	const style = {
 		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
-			: {
-					backgroundImage: gradientValue ? gradientValue : undefined,
-			  } ),
-		backgroundColor: overlayColor.color,
+			: undefined ),
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
+	const bgStyle = { backgroundColor: overlayColor.color };
 	const mediaStyle = {
 		objectPosition:
 			focalPoint && isImgElement
@@ -524,7 +534,6 @@ function CoverEdit( {
 										url: undefined,
 										id: undefined,
 										backgroundType: undefined,
-										dimRatio: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
 										isRepeated: undefined,
@@ -536,21 +545,9 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Dimensions' ) }>
-					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} )
-						}
-					/>
-				</PanelBody>
 				<PanelColorGradientSettings
+					__experimentalHasMultipleOrigins
+					__experimentalIsRenderedInSidebar
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
 					settings={ [
@@ -563,35 +560,73 @@ function CoverEdit( {
 						},
 					] }
 				>
-					{ !! url && (
-						<RangeControl
-							label={ __( 'Opacity' ) }
-							value={ dimRatio }
-							onChange={ ( newDimRation ) =>
-								setAttributes( {
-									dimRatio: newDimRation,
-								} )
-							}
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
-							required
-						/>
-					) }
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						value={ dimRatio }
+						onChange={ ( newDimRation ) =>
+							setAttributes( {
+								dimRatio: newDimRation,
+							} )
+						}
+						min={ 0 }
+						max={ 100 }
+						step={ 10 }
+						required
+					/>
 				</PanelColorGradientSettings>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="dimensions">
+				<ToolsPanelItem
+					hasValue={ () => !! minHeight }
+					label={ __( 'Minimum height' ) }
+					onDeselect={ () =>
+						setAttributes( {
+							minHeight: undefined,
+							minHeightUnit: undefined,
+						} )
+					}
+					resetAllFilter={ () => ( {
+						minHeight: undefined,
+						minHeightUnit: undefined,
+					} ) }
+					isShownByDefault={ true }
+					panelId={ clientId }
+				>
+					<CoverHeightInput
+						value={ temporaryMinHeight || minHeight }
+						unit={ minHeightUnit }
+						onChange={ ( newMinHeight ) =>
+							setAttributes( { minHeight: newMinHeight } )
+						}
+						onUnitChange={ ( nextUnit ) =>
+							setAttributes( {
+								minHeightUnit: nextUnit,
+							} )
+						}
+					/>
+				</ToolsPanelItem>
 			</InspectorControls>
 		</>
 	);
 
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
+
+	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
+	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
+	const innerBlocksTemplate = getInnerBlocksTemplate( {
+		fontSize: hasFontSizes ? 'large' : undefined,
+	} );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			template: INNER_BLOCKS_TEMPLATE,
+			template: innerBlocksTemplate,
 			templateInsertUpdatesSelection: true,
+			allowedBlocks,
+			templateLock,
 		}
 	);
 
@@ -610,6 +645,12 @@ function CoverEdit( {
 						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
 						noticeOperations={ noticeOperations }
+						style={ {
+							minHeight:
+								temporaryMinHeight ||
+								minHeightWithUnit ||
+								undefined,
+						} }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -620,22 +661,32 @@ function CoverEdit( {
 							/>
 						</div>
 					</CoverPlaceholder>
+					<ResizableCover
+						className="block-library-cover__resize-container"
+						onResizeStart={ () => {
+							setAttributes( { minHeightUnit: 'px' } );
+							toggleSelection( false );
+						} }
+						onResize={ setTemporaryMinHeight }
+						onResizeStop={ ( newMinHeight ) => {
+							toggleSelection( true );
+							setAttributes( { minHeight: newMinHeight } );
+							setTemporaryMinHeight( null );
+						} }
+						showHandle={ isSelected }
+					/>
 				</div>
 			</>
 		);
 	}
 
 	const classes = classnames(
-		dimRatioToClass( dimRatio ),
 		{
 			'is-dark-theme': isDark,
-			'has-background-dim': dimRatio !== 0,
+			'is-light': ! isDark,
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			[ overlayColor.class ]: overlayColor.class,
-			'has-background-gradient': gradientValue,
-			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
 				contentPosition
 			),
@@ -655,6 +706,7 @@ function CoverEdit( {
 				<BoxControlVisualizer
 					values={ styleAttribute?.spacing?.padding }
 					showValues={ styleAttribute?.visualizers?.padding }
+					className="block-library-cover__padding-visualizer"
 				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
@@ -670,16 +722,23 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ url && gradientValue && dimRatio !== 0 && (
-					<span
-						aria-hidden="true"
-						className={ classnames(
-							'wp-block-cover__gradient-background',
-							gradientClass
-						) }
-						style={ { backgroundImage: gradientValue } }
-					/>
-				) }
+
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						dimRatioToClass( dimRatio ),
+						{ [ overlayColor.class ]: overlayColor.class },
+						'wp-block-cover__gradient-background',
+						gradientClass,
+						{
+							'has-background-dim': dimRatio !== undefined,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: ! url && gradientClass,
+						}
+					) }
+					style={ { backgroundImage: gradientValue, ...bgStyle } }
+				/>
+
 				{ url && isImageBackground && isImgElement && (
 					<img
 						ref={ isDarkElement }
@@ -715,10 +774,14 @@ function CoverEdit( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( blockEditorStore );
+		const {
+			toggleSelection,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = dispatch( blockEditorStore );
 
 		return {
 			toggleSelection,
+			markNextChangeAsNotPersistent: __unstableMarkNextChangeAsNotPersistent,
 		};
 	} ),
 	withColors( { overlayColor: 'background-color' } ),

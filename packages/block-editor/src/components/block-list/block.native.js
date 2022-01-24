@@ -302,7 +302,7 @@ function getWrapperProps( value, getWrapperPropsFunction ) {
 }
 
 export default compose( [
-	withSelect( ( select, { clientId, rootClientId } ) => {
+	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlockIndex,
 			getSettings,
@@ -314,15 +314,15 @@ export default compose( [
 			hasSelectedInnerBlock,
 		} = select( blockEditorStore );
 
-		const order = getBlockIndex( clientId, rootClientId );
+		const order = getBlockIndex( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const isInnerBlockSelected = hasSelectedInnerBlock( clientId );
 		const block = getBlock( clientId );
 		const { name, attributes, isValid } = block || {};
 
 		const blockType = getBlockType( name || 'core/missing' );
-		const title = blockType.title;
-		const icon = blockType.icon;
+		const title = blockType?.title;
+		const icon = blockType?.icon;
 
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';

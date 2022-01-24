@@ -7,9 +7,10 @@
 			"alt": "",
 			"hasParallax": false,
 			"isRepeated": false,
-			"dimRatio": 50,
+			"dimRatio": 100,
 			"overlayColor": "primary",
-			"backgroundType": "image"
+			"backgroundType": "image",
+			"isDark": true
 		},
 		"innerBlocks": [
 			{
@@ -27,6 +28,6 @@
 				"originalContent": "<p class=\"has-text-align-center has-large-font-size\"></p>"
 			}
 		],
-		"originalContent": "<div class=\"wp-block-cover has-primary-background-color has-background-dim\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+		"originalContent": "<div class=\"wp-block-cover\">\n\t<span aria-hidden=\"true\" class=\"has-primary-background-color has-background-dim-100 wp-block-cover__gradient-background has-background-dim\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
 	}
 ]

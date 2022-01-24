@@ -107,6 +107,13 @@ module.exports = {
 
 The output format for the generated asset file. There are two options available: 'php' or 'json'.
 
+##### `outputFilename`
+
+- Type: string | function
+- Default: null
+
+The filename for the generated asset file. Accepts the same values as the Webpack `output.filename` option.
+
 ##### `combineAssets`
 
 -   Type: boolean
@@ -134,6 +141,14 @@ Pass `useDefaults: false` to disable the default request handling.
 -   Default: `false`
 
 Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as adding `import '@wordpress/polyfill';` to each entry point.
+
+##### `externalizedReport`
+
+-   Type: boolean | string
+-   Default: `false`
+
+Report all externalized dependencies as an array in JSON format. It could be used for further manual or automated inspection.
+You can provide a filename, or set it to `true` to report to a default `externalized-dependencies.json`.
 
 ##### `requestToExternal`
 

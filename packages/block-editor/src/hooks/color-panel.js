@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,9 +17,11 @@ function getComputedStyle( node ) {
 }
 
 export default function ColorPanel( {
+	enableAlpha = false,
 	settings,
 	clientId,
 	enableContrastChecking = true,
+	showTitle = true,
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
@@ -58,11 +60,16 @@ export default function ColorPanel( {
 				title={ __( 'Color' ) }
 				initialOpen={ false }
 				settings={ settings }
+				showTitle={ showTitle }
+				enableAlpha={ enableAlpha }
+				__experimentalHasMultipleOrigins
+				__experimentalIsRenderedInSidebar
 			>
 				{ enableContrastChecking && (
 					<ContrastChecker
 						backgroundColor={ detectedBackgroundColor }
 						textColor={ detectedColor }
+						enableAlphaChecker={ enableAlpha }
 					/>
 				) }
 			</PanelColorGradientSettings>

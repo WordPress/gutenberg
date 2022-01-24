@@ -15,8 +15,8 @@ import {
 	EditorSnackbars,
 	store as editorStore,
 } from '@wordpress/editor';
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -173,11 +173,7 @@ function Layout( { styles } ) {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return (
-				<AsyncModeProvider value="true">
-					<ListViewSidebar />
-				</AsyncModeProvider>
-			);
+			return <ListViewSidebar />;
 		}
 		return null;
 	};
@@ -243,6 +239,7 @@ function Layout( { styles } ) {
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
 						) }
+						<BlockStyles.Slot scope="core/block-inspector" />
 					</>
 				}
 				footer={

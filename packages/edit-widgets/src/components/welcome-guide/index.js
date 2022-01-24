@@ -24,8 +24,10 @@ export default function WelcomeGuide() {
 
 	const { toggleFeature } = useDispatch( interfaceStore );
 
-	const widgetAreas = useSelect( ( select ) =>
-		select( editWidgetsStore ).getWidgetAreas( { per_page: -1 } )
+	const widgetAreas = useSelect(
+		( select ) =>
+			select( editWidgetsStore ).getWidgetAreas( { per_page: -1 } ),
+		[]
 	);
 
 	if ( ! isActive ) {

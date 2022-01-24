@@ -22,7 +22,7 @@ function InserterPreviewPanel( { item } ) {
 	return (
 		<div className="block-editor-inserter__preview-container">
 			<div className="block-editor-inserter__preview">
-				{ isReusable || hoveredItemBlockType.example ? (
+				{ isReusable || hoveredItemBlockType?.example ? (
 					<div className="block-editor-inserter__preview-content">
 						<BlockPreview
 							__experimentalPadding={ 16 }

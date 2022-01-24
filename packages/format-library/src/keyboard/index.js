@@ -16,7 +16,7 @@ export const keyboard = {
 	className: null,
 	edit( { isActive, value, onChange, onFocus } ) {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 		}
 
 		function onClick() {
@@ -30,6 +30,7 @@ export const keyboard = {
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }
+				role="menuitemcheckbox"
 			/>
 		);
 	},

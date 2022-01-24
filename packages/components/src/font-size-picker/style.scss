@@ -1,13 +1,24 @@
+.components-font-size-picker__header {
+	&__hint {
+		margin-left: $grid-unit-05;
+		color: $gray-700;
+	}
+
+	// This button is inheriting padding and min-width.
+	// @todo: we should refactor it to not need to unset this.
+	.components-button.is-small.has-icon:not(.has-text) {
+		min-width: $icon-size;
+		padding: 0;
+	}
+}
+
 .components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
-	display: flex;
-	flex-wrap: wrap;
 	align-items: center;
+	margin-top: $grid-unit-10;
 	margin-bottom: $grid-unit-30;
 
 	.components-unit-control-wrapper {
-		margin-right: $grid-unit-10;
-
 		.components-input-control__label {
 			font-weight: 300;
 			padding-bottom: 0 !important;
@@ -16,7 +27,7 @@
 	}
 
 	.components-custom-select-control__button {
-		min-width: 120px;
+		width: 100%;
 	}
 
 	// Apply the same height as the isSmall Reset button.
@@ -44,14 +55,8 @@
 		}
 	}
 
-	// Allow the font-size picker dropdown to grow in width.
-	.components-font-size-picker__select {
-		margin-right: $grid-unit-10;
-	}
-
 	.components-color-palette__clear {
 		height: 30px;
-		margin-top: 26px;
 	}
 }
 

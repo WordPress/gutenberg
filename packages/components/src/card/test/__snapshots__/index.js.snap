@@ -141,7 +141,7 @@ Snapshot Diff:
         </div>
         <div
 -         class="components-flex components-card__footer components-card-footer css-c7cteg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
-+         class="components-flex components-card__footer components-card-footer css-1mzdgj0-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmall em57xhy0"
++         class="components-flex components-card__footer components-card-footer css-1t7s584-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding em57xhy0"
           data-wp-c16t="true"
           data-wp-component="CardFooter"
         >
@@ -157,8 +157,8 @@ Snapshot Diff:
 @@ -1,30 +1,30 @@
   <div>
     <div
--     class="components-surface components-card components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
-+     class="components-surface components-card components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
+-     class="components-surface components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
++     class="components-surface components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Card"
     >
@@ -269,10 +269,10 @@ Object {
 }
 
 .emotion-10 {
-  border-color: rgba(0, 0, 0, 0.1);
-  border-width: 0 0 1px 0;
-  height: 0;
+  border: 0;
   margin: 0;
+  border-bottom: 1px solid currentColor;
+  height: 0;
   width: auto;
   box-sizing: border-box;
   display: block;
@@ -375,7 +375,7 @@ Object {
 <body>
     <div>
       <div
-        class="components-surface components-card components-card emotion-0 emotion-1"
+        class="components-surface components-card emotion-0 emotion-1"
         data-wp-c16t="true"
         data-wp-component="Card"
       >
@@ -525,10 +525,10 @@ Object {
 }
 
 .emotion-10 {
-  border-color: rgba(0, 0, 0, 0.1);
-  border-width: 0 0 1px 0;
-  height: 0;
+  border: 0;
   margin: 0;
+  border-bottom: 1px solid currentColor;
+  height: 0;
   width: auto;
   box-sizing: border-box;
   display: block;
@@ -630,7 +630,7 @@ Object {
 
 <div>
     <div
-      class="components-surface components-card components-card emotion-0 emotion-1"
+      class="components-surface components-card emotion-0 emotion-1"
       data-wp-c16t="true"
       data-wp-component="Card"
     >
@@ -784,6 +784,11 @@ Snapshot Diff:
   </div>
 `;
 
+exports[`Card Card component should support the legacy extraSmall value for the size prop as an alias for the xSmall value 1`] = `
+Snapshot Diff:
+Compared values have no visual difference.
+`;
+
 exports[`Card Card component should warn when the isElevated prop is passed 1`] = `
 .emotion-0 {
   background-color: #fff;
@@ -850,7 +855,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
 
 <div>
   <div
-    class="components-surface components-card components-card emotion-0 emotion-1"
+    class="components-surface components-card emotion-0 emotion-1"
     data-wp-c16t="true"
     data-wp-component="Card"
   >

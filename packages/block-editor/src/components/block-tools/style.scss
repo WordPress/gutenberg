@@ -10,15 +10,8 @@
 	position: absolute;
 	background: var(--wp-admin-theme-color);
 
-	// Provide a muted animation that isn't too noisy.
-	animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.3s ease;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
-
 	.block-editor-block-list__insertion-point.is-vertical > & {
 		top: 50%;
-		right: 0;
-		left: 0;
 		height: $border-width;
 	}
 
@@ -26,7 +19,6 @@
 		top: 0;
 		right: 0;
 		left: 50%;
-		height: 100%;
 		width: $border-width;
 	}
 }
@@ -42,8 +34,8 @@
 
 	justify-content: center;
 
-	top: calc(50% - #{  $button-size-small * 0.5 });
-	left: calc(50% - #{  $button-size-small * 0.5 });
+	top: calc(50% - #{$button-size-small * 0.5});
+	left: calc(50% - #{$button-size-small * 0.5});
 }
 
 .block-editor-block-list__block-popover-inserter {
@@ -85,29 +77,6 @@
 		background: $gray-900;
 	}
 }
-
-.block-editor-block-list__insertion-point-inserter,
-.block-editor-block-list__block-popover-inserter {
-	.block-editor-inserter__toggle.components-button {
-		// Fade it in after a delay.
-		animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.3s ease;
-		animation-fill-mode: forwards;
-		@include reduce-motion("animation");
-	}
-}
-
-@keyframes block-editor-inserter__toggle__fade-in-animation-delayed {
-	0% {
-		opacity: 0;
-	}
-	60% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
 
 /**
  * Block Toolbar when contextual.
@@ -180,7 +149,6 @@
 		}
 	}
 }
-
 
 /**
  * Block Label for Navigation/Selection Mode
@@ -270,7 +238,8 @@
 		}
 	}
 
-	.components-popover__content.components-popover__content { // Needs specificity.
+	.components-popover__content.components-popover__content {
+		// Needs specificity.
 		background: none;
 		border: none;
 		box-shadow: none;

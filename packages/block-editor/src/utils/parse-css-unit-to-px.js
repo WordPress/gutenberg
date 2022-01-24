@@ -8,7 +8,7 @@ function parseUnit( cssUnit ) {
 	const match = cssUnit
 		?.trim()
 		.match(
-			/^(0?[-.]?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch|Q|lh)$/
+			/^(0?[-.]?\d*\.?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch|Q|lh)$/
 		);
 	if ( ! isNaN( cssUnit ) && ! isNaN( parseFloat( cssUnit ) ) ) {
 		return { value: parseFloat( cssUnit ), unit: 'px' };
@@ -131,6 +131,7 @@ function evalMathExpression( cssUnit ) {
 
 	return errorFound ? null : calculate( cssUnit ).toFixed( 0 ) + 'px';
 }
+
 /**
  * Convert a parsedUnit object to px value.
  *
@@ -202,11 +203,12 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 
 	return null;
 }
+
 /**
  * Returns the px value of a cssUnit.
  *
  * @param {string} cssUnit
- * @param {string} options
+ * @param {Object} options
  * @return {string} returns the cssUnit value in a simple px format.
  */
 export function getPxFromCssUnit( cssUnit, options = {} ) {
@@ -228,3 +230,43 @@ export function getPxFromCssUnit( cssUnit, options = {} ) {
 
 	return convertParsedUnitToPx( parsedUnit, options );
 }
+
+// Use simple cache.
+const cache = {};
+/**
+ * Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+ *
+ * @param {string} cssUnit
+ * @param {Object} options
+ * @return {string} returns the cssUnit value in a simple px format.
+ */
+function memoizedGetPxFromCssUnit( cssUnit, options = {} ) {
+	const hash = cssUnit + hashOptions( options );
+
+	if ( ! cache[ hash ] ) {
+		cache[ hash ] = getPxFromCssUnit( cssUnit, options );
+	}
+	return cache[ hash ];
+}
+
+function hashOptions( options ) {
+	let hash = '';
+	if ( options.hasOwnProperty( 'fontSize' ) ) {
+		hash = ':' + options.width;
+	}
+	if ( options.hasOwnProperty( 'lineHeight' ) ) {
+		hash = ':' + options.lineHeight;
+	}
+	if ( options.hasOwnProperty( 'width' ) ) {
+		hash = ':' + options.width;
+	}
+	if ( options.hasOwnProperty( 'height' ) ) {
+		hash = ':' + options.height;
+	}
+	if ( options.hasOwnProperty( 'type' ) ) {
+		hash = ':' + options.type;
+	}
+	return hash;
+}
+
+export default memoizedGetPxFromCssUnit;

@@ -2,7 +2,10 @@
 .wp-block-navigation {
 	.wp-block-page-list {
 		display: flex;
-		flex-wrap: wrap;
+		flex-direction: var(--navigation-layout-direction, initial);
+		justify-content: var(--navigation-layout-justify, initial);
+		align-items: var(--navigation-layout-align, initial);
+		flex-wrap: var(--navigation-layout-wrap, wrap);
 		background-color: inherit;
 	}
 
@@ -10,39 +13,5 @@
 	// and must therefore inherit from the parent.
 	.wp-block-navigation-item {
 		background-color: inherit;
-	}
-
-	// Submenu icon indicator.
-	// The specific styles for the submenu indicator are inherited from the navigation block style.
-	.wp-block-page-list__submenu-icon {
-		display: none;
-	}
-
-	.show-submenu-icons {
-		.wp-block-page-list__submenu-icon {
-			display: inline-block;
-		}
-	}
-}
-
-.is-vertical .wp-block-navigation__container,
-.is-open .wp-block-navigation__container {
-	.wp-block-page-list {
-		display: block;
-	}
-}
-
-.is-open .wp-block-navigation__container {
-	.wp-block-page-list {
-		@include break-mobile() {
-			display: flex;
-		}
-	}
-}
-
-// space-between justification.
-.wp-block-page-list {
-	.items-justified-space-between & {
-		display: contents;
 	}
 }

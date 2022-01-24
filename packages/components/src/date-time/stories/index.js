@@ -16,6 +16,9 @@ import DateTimePicker from '../';
 export default {
 	title: 'Components/DateTimePicker',
 	component: DateTimePicker,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const DateTimePickerWithState = ( { is12Hour } ) => {

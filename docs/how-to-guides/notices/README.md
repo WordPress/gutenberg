@@ -1,4 +1,4 @@
-# Displaying Notices from Your Plugin or Theme
+# Notices
 
 Notices are informational UI displayed near the top of admin pages. WordPress core, themes, and plugins all use notices to indicate the result of an action, or to draw the user's attention to necessary information.
 

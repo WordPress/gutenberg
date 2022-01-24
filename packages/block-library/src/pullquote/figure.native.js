@@ -5,19 +5,29 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import styles from './figure.scss';
 
-export const Figure = withPreferredColorScheme( ( props ) => {
-	const { children, getStylesFromColorScheme } = props;
-
-	const wpPullquoteFigure = getStylesFromColorScheme(
+export const Figure = ( { children, backgroundColor, borderColor } ) => {
+	const wpPullquoteFigure = usePreferredColorSchemeStyle(
 		styles.light,
 		styles.dark
 	);
 
-	return <View style={ wpPullquoteFigure }>{ children }</View>;
-} );
+	const customStyles = {};
+	if ( borderColor ) {
+		customStyles.borderTopColor = borderColor;
+		customStyles.borderBottomColor = borderColor;
+	}
+
+	if ( backgroundColor ) {
+		customStyles.backgroundColor = backgroundColor;
+	}
+
+	return (
+		<View style={ [ wpPullquoteFigure, customStyles ] }>{ children }</View>
+	);
+};

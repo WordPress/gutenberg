@@ -2,15 +2,16 @@
  * External dependencies
  */
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { lowerCase, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useEffect, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { BottomSheet, Icon } from '@wordpress/components';
-import { getProtocol, prependHTTP } from '@wordpress/url';
+import { getProtocol, isURL, prependHTTP } from '@wordpress/url';
 import { link, cancelCircleFilled } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -47,12 +48,20 @@ export const createDirectEntry = ( value ) => {
 	};
 };
 
+const getURLFromClipboard = async () => {
+	const text = await Clipboard.getString();
+	return !! text && isURL( text ) ? text : '';
+};
+
 export const LinkPicker = ( {
 	value: initialValue,
 	onLinkPicked,
 	onCancel: cancel,
 } ) => {
-	const [ value, setValue ] = useState( initialValue );
+	const [ { value, clipboardUrl }, setValue ] = useState( {
+		value: initialValue,
+		clipboardUrl: '',
+	} );
 	const directEntry = createDirectEntry( value );
 
 	// the title of a direct entry is displayed as the raw input value, but if we
@@ -66,7 +75,7 @@ export const LinkPicker = ( {
 	};
 
 	const clear = () => {
-		setValue( '' );
+		setValue( { value: '', clipboardUrl } );
 	};
 
 	const omniCellStyle = usePreferredColorSchemeStyle(
@@ -79,6 +88,14 @@ export const LinkPicker = ( {
 		styles.iconDark
 	);
 
+	useEffect( () => {
+		getURLFromClipboard()
+			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
+			.catch( () => setValue( { value, clipboardUrl: '' } ) );
+	}, [] );
+
+	// TODO: Localize the accessibility label.
+	// TODO: Decide on if `LinkSuggestionItemCell` with `isDirectEntry` makes sense.
 	return (
 		<SafeAreaView style={ styles.safeArea }>
 			<NavBar>
@@ -96,7 +113,9 @@ export const LinkPicker = ( {
 					autoCapitalize="none"
 					autoCorrect={ false }
 					keyboardType="url"
-					onChangeValue={ setValue }
+					onChangeValue={ ( newValue ) => {
+						setValue( { value: newValue, clipboardUrl } );
+					} }
 					onSubmit={ onSubmit }
 					/* eslint-disable-next-line jsx-a11y/no-autofocus */
 					autoFocus
@@ -115,6 +134,22 @@ export const LinkPicker = ( {
 						</TouchableOpacity>
 					) }
 				</BottomSheet.Cell>
+				{ !! clipboardUrl && clipboardUrl !== value && (
+					<BottomSheet.LinkSuggestionItemCell
+						accessible
+						accessibilityLabel={ sprintf(
+							/* translators: Copy URL from the clipboard, https://sample.url */
+							__( 'Copy URL from the clipboard, %s' ),
+							clipboardUrl
+						) }
+						suggestion={ {
+							type: 'clipboard',
+							url: clipboardUrl,
+							isDirectEntry: true,
+						} }
+						onLinkPicked={ pickLink }
+					/>
+				) }
 				{ !! value && (
 					<LinkPickerResults
 						query={ value }

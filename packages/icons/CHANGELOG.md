@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 6.1.0 (2021-11-07)
+
+### New Features
+
+-   Added new block icons: `commentAuthorAvatar`, `commentAuthorName`, `commentContent` and `commentReplyLink` ([#36171](https://github.com/WordPress/gutenberg/pull/36171)).
+
+## 6.0.0 (2021-10-12)
+
+### Breaking Change
+
+-   Removed the `minus` icon, which was only used once in the block editor, in favor of the new `reset` icon which offers a more refined vector.
+
 ## 5.0.0 (2021-07-29)
 
 ### Breaking Change

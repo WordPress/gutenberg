@@ -1,4 +1,9 @@
 .wp-block-post-comments {
+	// Remove extraneous top padding added to the first heading of the block.
+	> h3:first-of-type {
+		margin-top: 0;
+	}
+
 	.commentlist {
 		list-style: none;
 		margin: 0;
@@ -9,9 +14,9 @@
 			padding-left: 3.25em;
 
 			p {
-				font-size: 0.875em;
+				font-size: 1em;
 				line-height: 1.8;
-				margin: 0.36em 0 1.4em;
+				margin: 1em 0;
 			}
 		}
 
@@ -24,13 +29,13 @@
 
 	.comment-author {
 		line-height: 1.5;
-		margin-left: -3.25em;
 
 		.avatar {
 			border-radius: 1.5em;
 			display: block;
 			float: left;
 			height: 2.5em;
+			margin-top: 0.5em;
 			margin-right: 0.75em;
 			width: 2.5em;
 		}
@@ -41,12 +46,17 @@
 	}
 
 	.comment-meta {
+		font-size: 0.875em;
 		line-height: 1.5;
 		margin-left: -3.25em;
+
+		b {
+			font-weight: normal;
+		}
 	}
 
 	.comment-body .commentmetadata {
-		font-size: 0.75em;
+		font-size: 0.875em;
 	}
 
 	.comment-form-comment,
@@ -55,21 +65,46 @@
 	.comment-form-url {
 		label {
 			display: block;
+			margin-bottom: 0.25em;
 		}
 	}
 
-	.comment-form-comment textarea {
-		box-sizing: border-box;
-		width: 100%;
+	.comment-form {
+		textarea,
+		input:not([type="submit"]):not([type="checkbox"]) {
+			display: block;
+			box-sizing: border-box;
+			width: 100%;
+		}
+	}
+
+	.comment-form-cookies-consent {
+		display: flex;
+		gap: 0.25em;
+
+		#wp-comment-cookies-consent {
+			margin-top: 0.35em;
+		}
 	}
 
 	.reply {
-		font-size: 0.75em;
+		font-size: 0.875em;
 		margin-bottom: 1.4em;
 	}
 
 	textarea,
-	input {
+	input:not([type="submit"]) {
 		border: 1px solid $gray-600;
+		font-size: 1em;
+		font-family: inherit;
+	}
+
+	textarea,
+	input:not([type="submit"]):not([type="checkbox"]) {
+		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
+	}
+
+	input[type="submit"] {
+		border: none;
 	}
 }

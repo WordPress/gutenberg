@@ -98,24 +98,28 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
 
 		if ( $has_named_font_size ) {
-			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
+			$classes[] = sprintf( 'has-%s-font-size', _wp_to_kebab_case( $block_attributes['fontSize'] ) );
 		} elseif ( $has_custom_font_size ) {
 			$styles[] = sprintf( 'font-size: %s;', $block_attributes['style']['typography']['fontSize'] );
 		}
 	}
 
 	if ( $has_font_family_support ) {
-		$has_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
-		if ( $has_font_family ) {
-			$font_family = $block_attributes['style']['typography']['fontFamily'];
-			if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) {
-				// Get the name from the string and add proper styles.
-				$index_to_splice  = strrpos( $font_family, '|' ) + 1;
-				$font_family_name = substr( $font_family, $index_to_splice );
-				$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s);', $font_family_name );
-			} else {
-				$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['typography']['fontFamily'] );
+		$has_named_font_family  = array_key_exists( 'fontFamily', $block_attributes );
+		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
+
+		if ( $has_named_font_family ) {
+			$classes[] = sprintf( 'has-%s-font-family', _wp_to_kebab_case( $block_attributes['fontFamily'] ) );
+		} elseif ( $has_custom_font_family ) {
+			// Before using classes, the value was serialized as a CSS Custom Property.
+			// We don't need this code path when it lands in core.
+			$font_family_custom = $block_attributes['style']['typography']['fontFamily'];
+			if ( strpos( $font_family_custom, 'var:preset|font-family' ) !== false ) {
+				$index_to_splice    = strrpos( $font_family_custom, '|' ) + 1;
+				$font_family_slug   = _wp_to_kebab_case( substr( $font_family_custom, $index_to_splice ) );
+				$font_family_custom = sprintf( 'var(--wp--preset--font-family--%s)', $font_family_slug );
 			}
+			$styles[] = sprintf( 'font-family: %s;', $font_family_custom );
 		}
 	}
 

@@ -1,18 +1,24 @@
 @import "../../interface/src/style.scss";
 
 @import "./components/block-editor/style.scss";
+@import "./components/code-editor/style.scss";
+@import "./components/global-styles/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/document-actions/style.scss";
 @import "./components/header/more-menu/style.scss";
 @import "./components/navigation-sidebar/navigation-toggle/style.scss";
 @import "./components/navigation-sidebar/navigation-panel/style.scss";
+@import "./components/list/style.scss";
+@import "./components/add-new-template/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/settings-header/style.scss";
 @import "./components/sidebar/template-card/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/template-details/style.scss";
-@import "./components/template-part-converter/style.scss";
+@import "./components/create-template-part-modal/style.scss";
 @import "./components/secondary-sidebar/style.scss";
+@import "./components/welcome-guide/style.scss";
+@import "./components/keyboard-shortcut-help-modal/style.scss";
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color.
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations.
@@ -20,7 +26,8 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.toplevel_page_gutenberg-edit-site {
+body.appearance_page_gutenberg-edit-site,
+body.site-editor-php {
 	@include wp-admin-reset(".edit-site");
 }
 
@@ -36,15 +43,14 @@ body.toplevel_page_gutenberg-edit-site {
 	@include break-small {
 		bottom: 0;
 		left: 0;
-		min-height: calc(100vh - #{$admin-bar-height-big});
+		min-height: 100vh;
 		position: absolute;
 		right: 0;
 		top: 0;
 	}
 
-	// The WP header height changes at this breakpoint.
-	@include break-medium {
-		min-height: calc(100vh - #{$admin-bar-height});
+	.interface-interface-skeleton {
+		top: 0;
 	}
 
 	// Todo: Remove this rule when edit site gets support
@@ -54,7 +60,7 @@ body.toplevel_page_gutenberg-edit-site {
 	}
 
 	.interface-interface-skeleton__content {
-		background-color: $gray-400;
+		background-color: $gray-800;
 	}
 }
 

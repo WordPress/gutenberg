@@ -10,8 +10,9 @@ import { useSelect, useDispatch, select as selectStore } from '@wordpress/data';
 import { store as customizeWidgetsStore } from '../../store';
 
 export default function useInserter( inserter ) {
-	const isInserterOpened = useSelect( ( select ) =>
-		select( customizeWidgetsStore ).isInserterOpened()
+	const isInserterOpened = useSelect(
+		( select ) => select( customizeWidgetsStore ).isInserterOpened(),
+		[]
 	);
 	const { setIsInserterOpened } = useDispatch( customizeWidgetsStore );
 

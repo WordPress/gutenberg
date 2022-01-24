@@ -3,7 +3,10 @@
 		"blockName": "core/buttons",
 		"attrs": {
 			"align": "wide",
-			"contentJustification": "center"
+			"layout": {
+				"type": "flex",
+				"justifyContent": "center"
+			}
 		},
 		"innerBlocks": [
 			{
@@ -25,9 +28,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t\n\n\t\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-buttons alignwide\">\n\t\n\n\t\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t",
+			"\n<div class=\"wp-block-buttons alignwide\">\n\t",
 			null,
 			"\n\n\t",
 			null,

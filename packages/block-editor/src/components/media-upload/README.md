@@ -4,7 +4,7 @@ MediaUpload is a React component used to render a button that opens the WordPres
 
 ## Setup
 
-This is a placeholder component necessary to make it possible to provide an integration with the core blocks that handle media files. By default it renders nothing but it provides a way to have it overridden with the `components.MediaUpload` filter.
+This is a placeholder component necessary to make it possible to provide an integration with the core blocks that handle media files. By default it renders nothing but it provides a way to have it overridden with the `editor.MediaUpload` filter.
 
 ```jsx
 import { addFilter } from '@wordpress/hooks';

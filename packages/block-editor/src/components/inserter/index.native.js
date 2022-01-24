@@ -7,7 +7,7 @@ import { delay } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -32,19 +32,9 @@ import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
-const defaultRenderToggle = ( {
-	displayEditorOnboardingTooltip,
-	onToggle,
-	disabled,
-	style,
-	onLongPress,
-} ) => (
+const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
-		title={
-			displayEditorOnboardingTooltip
-				? __( 'Tap to add content' )
-				: __( 'Add block' )
-		}
+		title={ _x( 'Add block', 'Generic label for block inserter button' ) }
 		icon={
 			<Icon
 				icon={ plusCircleFilled }
@@ -52,8 +42,6 @@ const defaultRenderToggle = ( {
 				color={ style.color }
 			/>
 		}
-		showTooltip={ displayEditorOnboardingTooltip }
-		tooltipPosition="top right"
 		onClick={ onToggle }
 		extraProps={ {
 			hint: __( 'Double tap to add a block' ),
@@ -227,7 +215,6 @@ export class Inserter extends Component {
 	 */
 	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
-			displayEditorOnboardingTooltip,
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
@@ -274,7 +261,6 @@ export class Inserter extends Component {
 		return (
 			<>
 				{ renderToggle( {
-					displayEditorOnboardingTooltip,
 					onToggle: onPress,
 					isOpen,
 					disabled,
@@ -357,10 +343,7 @@ export default compose( [
 		const destinationRootClientId = isAnyBlockSelected
 			? getBlockRootClientId( end )
 			: rootClientId;
-		const selectedBlockIndex = getBlockIndex(
-			end,
-			destinationRootClientId
-		);
+		const selectedBlockIndex = getBlockIndex( end );
 		const endOfRootIndex = getBlockOrder( rootClientId ).length;
 		const isSelectedUnmodifiedDefaultBlock = isAnyBlockSelected
 			? isUnmodifiedDefaultBlock( getBlock( end ) )
@@ -378,7 +361,7 @@ export default compose( [
 
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
-				return getBlockIndex( clientId, rootClientId );
+				return getBlockIndex( clientId );
 			}
 
 			// If there is a selected block,
@@ -410,9 +393,6 @@ export default compose( [
 
 		return {
 			blockTypeImpressions: getBlockEditorSettings().impressions,
-			displayEditorOnboardingTooltip:
-				getBlockEditorSettings().editorOnboarding &&
-				getBlockEditorSettings().firstGutenbergEditorSession,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,

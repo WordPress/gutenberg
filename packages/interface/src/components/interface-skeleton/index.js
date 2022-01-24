@@ -83,6 +83,7 @@ function InterfaceSkeleton(
 					className="interface-interface-skeleton__drawer"
 					role="region"
 					aria-label={ mergedLabels.drawer }
+					tabIndex="-1"
 				>
 					{ drawer }
 				</div>

@@ -17,7 +17,7 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'menu-locations';
 	}
 
@@ -152,11 +152,21 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $location, $request ) {
 		$locations = get_nav_menu_locations();
 		$menu      = ( isset( $locations[ $location->name ] ) ) ? $locations[ $location->name ] : 0;
-		$data      = array(
-			'name'        => $location->name,
-			'description' => $location->description,
-			'menu'        => $menu,
-		);
+
+		$fields = $this->get_fields_for_response( $request );
+		$data   = array();
+
+		if ( rest_is_field_included( 'name', $fields ) ) {
+			$data['name'] = $location->name;
+		}
+
+		if ( rest_is_field_included( 'description', $fields ) ) {
+			$data['description'] = $location->description;
+		}
+
+		if ( rest_is_field_included( 'menu', $fields ) ) {
+			$data['menu'] = (int) $menu;
+		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
@@ -250,8 +260,10 @@ class WP_REST_Menu_Locations_Controller extends WP_REST_Controller {
 		if ( $menu ) {
 			$taxonomy_object = get_taxonomy( 'nav_menu' );
 			if ( $taxonomy_object->show_in_rest ) {
-				$rest_base                         = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
-				$url                               = rest_url( sprintf( '__experimental/%s/%d', $rest_base, $menu ) );
+				$rest_base = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
+				$namespace = ! empty( $taxonomy_object->rest_namespace ) ? $taxonomy_object->rest_namespace : '__experimental';
+				$url       = rest_url( sprintf( '%s/%s/%d', $namespace, $rest_base, $menu ) );
+
 				$links['https://api.w.org/menu'][] = array(
 					'href'       => $url,
 					'embeddable' => true,

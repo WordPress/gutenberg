@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -79,18 +79,36 @@ describe( 'ItemGroup', () => {
 	} );
 
 	describe( 'Item', () => {
-		it( 'should render a button with the isAction prop is true', () => {
-			// By default, `isAction` is `false`
-			const { container: normalItem } = render(
-				<Item>Code is poetry</Item>
-			);
-			const { container: actionItem } = render(
-				<Item isAction={ true }>Code is poetry</Item>
+		it( 'should render as a `button` if the `onClick` handler is specified', () => {
+			const spy = jest.fn();
+			render( <Item onClick={ spy }>Code is poetry</Item> );
+
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).toBeInTheDocument();
+
+			fireEvent.click( button );
+
+			expect( spy ).toHaveBeenCalled();
+		} );
+
+		it( 'should give priority to the `as` prop even if the `onClick` handler is specified', () => {
+			const spy = jest.fn();
+			const { rerender } = render(
+				<Item onClick={ spy }>Code is poetry</Item>
 			);
 
-			expect( normalItem.firstChild ).toMatchDiffSnapshot(
-				actionItem.firstChild
+			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
+			expect( screen.queryByRole( 'label' ) ).not.toBeInTheDocument();
+
+			rerender(
+				<Item as="a" href="#" onClick={ spy }>
+					Code is poetry
+				</Item>
 			);
+
+			expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
+			expect( screen.getByRole( 'link' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should use different amounts of padding depending on the value of the size prop', () => {

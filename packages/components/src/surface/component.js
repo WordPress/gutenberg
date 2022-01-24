@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import { useSurface } from './hook';
+
+/**
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                        forwardedRef
+ */
+function Surface( props, forwardedRef ) {
+	const surfaceProps = useSurface( props );
+
+	return <View { ...surfaceProps } ref={ forwardedRef } />;
+}
 
 /**
  * `Surface` is a core component that renders a primary background color.
@@ -24,8 +35,6 @@ import { useSurface } from './hook';
  * }
  * ```
  */
-export default createComponent( {
-	as: 'div',
-	useHook: useSurface,
-	name: 'Surface',
-} );
+const ConnectedSurface = contextConnect( Surface, 'Surface' );
+
+export default ConnectedSurface;

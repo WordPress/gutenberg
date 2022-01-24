@@ -4,7 +4,9 @@
 		"name": "core/site-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1
+			"level": 1,
+			"isLink": true,
+			"linkTarget": "_self"
 		},
 		"innerBlocks": [],
 		"originalContent": ""

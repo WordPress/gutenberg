@@ -7,16 +7,22 @@ import { every, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PanelBody, ColorIndicator } from '@wordpress/components';
+import {
+	__experimentalSpacer as Spacer,
+	ColorIndicator,
+	PanelBody,
+} from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import ColorGradientControl from './control';
+import ColorGradientSettingsDropdown from './dropdown';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
+import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
+import useMultipleOriginColorsAndGradients from './use-multiple-origin-colors-and-gradients';
 
 // translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(%s: color %s)' );
@@ -89,6 +95,10 @@ export const PanelColorGradientSettingsInner = ( {
 	children,
 	settings,
 	title,
+	showTitle = true,
+	__experimentalHasMultipleOrigins,
+	__experimentalIsRenderedInSidebar,
+	enableAlpha,
 	...props
 } ) => {
 	if (
@@ -120,40 +130,50 @@ export const PanelColorGradientSettingsInner = ( {
 			/>
 		</span>
 	);
+
 	return (
 		<PanelBody
 			className={ classnames(
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }
-			title={ titleElement }
+			title={ showTitle ? titleElement : undefined }
 			{ ...props }
 		>
-			{ settings.map( ( setting, index ) => (
-				<ColorGradientControl
-					key={ index }
-					{ ...{
-						colors,
-						gradients,
-						disableCustomColors,
-						disableCustomGradients,
-						...setting,
-					} }
-				/>
-			) ) }
-			{ children }
+			<ColorGradientSettingsDropdown
+				settings={ settings }
+				{ ...{
+					colors,
+					gradients,
+					disableCustomColors,
+					disableCustomGradients,
+					__experimentalHasMultipleOrigins,
+					__experimentalIsRenderedInSidebar,
+					enableAlpha,
+				} }
+			/>
+			{ !! children && (
+				<>
+					<Spacer marginY={ 4 } /> { children }
+				</>
+			) }
 		</PanelBody>
 	);
 };
 
-const PanelColorGradientSettingsSelect = ( props ) => {
-	const colorGradientSettings = {};
+const PanelColorGradientSettingsSingleSelect = ( props ) => {
+	const colorGradientSettings = useCommonSingleMultipleSelects();
 	colorGradientSettings.colors = useSetting( 'color.palette' );
 	colorGradientSettings.gradients = useSetting( 'color.gradients' );
-	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
-	colorGradientSettings.disableCustomGradients = ! useSetting(
-		'color.customGradient'
+	return (
+		<PanelColorGradientSettingsInner
+			{ ...{ ...colorGradientSettings, ...props } }
+		/>
 	);
+};
+
+const PanelColorGradientSettingsMultipleSelect = ( props ) => {
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }
@@ -167,7 +187,10 @@ const PanelColorGradientSettings = ( props ) => {
 	) {
 		return <PanelColorGradientSettingsInner { ...props } />;
 	}
-	return <PanelColorGradientSettingsSelect { ...props } />;
+	if ( props.__experimentalHasMultipleOrigins ) {
+		return <PanelColorGradientSettingsMultipleSelect { ...props } />;
+	}
+	return <PanelColorGradientSettingsSingleSelect { ...props } />;
 };
 
 export default PanelColorGradientSettings;

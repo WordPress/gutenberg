@@ -66,11 +66,14 @@ export default function BlockTitle( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	if ( ! name || ! blockInformation ) return null;
 	const blockType = getBlockType( name );
-	const label = reusableBlockTitle || getBlockLabel( blockType, attributes );
+	const blockLabel = blockType
+		? getBlockLabel( blockType, attributes )
+		: null;
+	const label = reusableBlockTitle || blockLabel;
 	// Label will fallback to the title if no label is defined for the current
 	// label context. If the label is defined we prioritize it over possible
 	// possible block variation title match.
-	if ( label !== blockType.title ) {
+	if ( label && label !== blockType.title ) {
 		return truncate( label, { length: 35 } );
 	}
 	return blockInformation.title;

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -15,7 +10,7 @@ import {
 	saveDraft,
 	openDocumentSettingsSidebar,
 	isCurrentURL,
-	pressKeyTimes,
+	openTypographyToolsPanelMenu,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -371,8 +366,6 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
-		const FONT_SIZE_LABEL_SELECTOR =
-			"//label[contains(text(), 'Font size')]";
 		// Open the sidebar block settings.
 		await openDocumentSettingsSidebar();
 		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
@@ -387,11 +380,16 @@ describe( 'Change detection', () => {
 			pressKeyWithModifier( 'primary', 'S' ),
 		] );
 
-		// Increase the paragraph's font size.
+		// Change the paragraph's `drop cap`.
 		await page.click( '[data-type="core/paragraph"]' );
-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await pressKeyTimes( 'ArrowDown', 2 );
-		await page.keyboard.press( 'Enter' );
+
+		await openTypographyToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Drop cap"]' );
+
+		const [ dropCapToggle ] = await page.$x(
+			"//label[contains(text(), 'Drop cap')]"
+		);
+		await dropCapToggle.click();
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
@@ -403,12 +401,9 @@ describe( 'Change detection', () => {
 			pressKeyWithModifier( 'primary', 'S' ),
 		] );
 
-		// Increase the paragraph's font size again.
+		// Change the paragraph's `drop cap` again.
 		await page.click( '[data-type="core/paragraph"]' );
-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await pressKeyTimes( 'ArrowDown', 3 );
-		await page.keyboard.press( 'Enter' );
-		await page.click( '[data-type="core/paragraph"]' );
+		await dropCapToggle.click();
 
 		// Check that the post is dirty.
 		await page.waitForSelector( '.editor-post-save-draft' );

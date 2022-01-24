@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "11.0.2",
+	"version": "12.0.16",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,7 +30,7 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -64,6 +64,10 @@
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
 		"rememo": "^3.0.0"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

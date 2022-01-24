@@ -22,7 +22,7 @@ A block instance (object) or a blocks array you would like to render a preview.
 ### `viewportWidth`
 
 -   **Type:** `Int`
--   **Default:** `700`
+-   **Default:** `1200`
 
 Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview.
 

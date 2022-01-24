@@ -6,19 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-} from '@wordpress/block-editor';
+import { RichText, useInnerBlocksProps } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
-import {
-	useState,
-	useEffect,
-	useRef,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { View } from '@wordpress/primitives';
 
 const allowedBlocks = [ 'core/image' ];
 
@@ -43,19 +36,15 @@ export const Gallery = ( props ) => {
 
 	const [ captionFocused, setCaptionFocused ] = useState( false );
 
-	const captionRef = useRef();
-
-	// Need to use a layout effect here as we can't focus the RichText element
-	// until the DOM render cycle is finished.
-	useLayoutEffect( () => {
-		if ( captionFocused && captionRef.current ) {
-			captionRef.current.focus();
-		}
-	}, [ captionFocused ] );
-
 	function onFocusCaption() {
 		if ( ! captionFocused ) {
 			setCaptionFocused( true );
+		}
+	}
+
+	function removeCaptionFocus() {
+		if ( captionFocused ) {
+			setCaptionFocused( false );
 		}
 	}
 
@@ -80,9 +69,14 @@ export const Gallery = ( props ) => {
 			) }
 		>
 			{ children }
-			{ mediaPlaceholder }
+
+			<View
+				className="blocks-gallery-media-placeholder-wrapper"
+				onClick={ removeCaptionFocus }
+			>
+				{ mediaPlaceholder }
+			</View>
 			<RichTextVisibilityHelper
-				captionRef={ captionRef }
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				captionFocused={ captionFocused }
 				onFocusCaption={ onFocusCaption }
@@ -116,28 +110,17 @@ function RichTextVisibilityHelper( {
 		return <VisuallyHidden as={ RichText } { ...richTextProps } />;
 	}
 
-	if ( captionFocused ) {
-		return (
-			<RichText
-				ref={ captionRef }
-				value={ value }
-				placeholder={ placeholder }
-				className={ className }
-				tagName={ tagName }
-				isSelected={ captionFocused }
-				{ ...richTextProps }
-			/>
-		);
-	}
-
 	return (
-		<figcaption
-			role="presentation"
-			onClick={ onFocusCaption }
+		<RichText
+			ref={ captionRef }
+			value={ value }
+			placeholder={ placeholder }
 			className={ className }
-		>
-			{ RichText.isEmpty( value ) ? placeholder : value }
-		</figcaption>
+			tagName={ tagName }
+			isSelected={ captionFocused }
+			onClick={ onFocusCaption }
+			{ ...richTextProps }
+		/>
 	);
 }
 

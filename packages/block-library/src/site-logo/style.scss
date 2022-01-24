@@ -11,12 +11,20 @@
 		height: auto;
 	}
 
-	.aligncenter {
-		display: table;
+	// Inherit border radius from style variations.
+	a,
+	img {
+		border-radius: inherit;
+	}
+
+	&.aligncenter {
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
 	}
 
 	// Style variations
-	&.is-style-rounded img {
+	&.is-style-rounded {
 		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 		// to rectangular images. A pill-shape is better than otherwise.
 		border-radius: 9999px;

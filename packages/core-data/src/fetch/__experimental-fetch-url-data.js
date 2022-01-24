@@ -45,7 +45,7 @@ const CACHE = new Map();
  * @return {Promise< WPRemoteUrlData[] >} Remote URL data.
  */
 const fetchUrlData = async ( url, options = {} ) => {
-	const endpoint = '/__experimental/url-details';
+	const endpoint = '/wp-block-editor/v1/url-details';
 
 	const args = {
 		url: prependHTTP( url ),

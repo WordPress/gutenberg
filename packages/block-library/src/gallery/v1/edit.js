@@ -456,6 +456,7 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+
 			{ noticeUI }
 			<Gallery
 				{ ...props }

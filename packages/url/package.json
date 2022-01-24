@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/url",
-	"version": "3.2.2",
+	"version": "3.3.1",
 	"description": "WordPress URL utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {

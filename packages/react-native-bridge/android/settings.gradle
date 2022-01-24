@@ -4,7 +4,7 @@ pluginManagement {
     plugins {
         id "com.android.library" version "4.2.2"
         id "org.jetbrains.kotlin.android" version gradle.ext.kotlinVersion
-        id "com.automattic.android.publish-to-s3" version "0.6.1"
+        id "com.automattic.android.publish-to-s3" version "0.7.0"
     }
     repositories {
         maven {
@@ -56,4 +56,6 @@ if (hasProperty("willPublishReactNativeBridgeBinary")) {
     project(':react-native-prompt-android').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-prompt-android/android')
     include ':react-native-webview'
     project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-webview/android')
+    include ':@react-native-clipboard_clipboard'
+    project(':@react-native-clipboard_clipboard').projectDir = new File(rootProject.projectDir, '../../../node_modules/@react-native-clipboard/clipboard/android')
 }

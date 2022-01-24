@@ -46,4 +46,15 @@ describe( 'Modal', () => {
 		const titleId = within( dialog ).getByText( 'Test Title' ).id;
 		expect( dialog ).toHaveAttribute( 'aria-labelledby', titleId );
 	} );
+
+	it( 'hides the header when the `__experimentalHideHeader` prop is used', () => {
+		render(
+			<Modal title="Test Title" __experimentalHideHeader>
+				<p>Modal content</p>
+			</Modal>
+		);
+		const dialog = screen.getByRole( 'dialog' );
+		const title = within( dialog ).queryByText( 'Test Title' );
+		expect( title ).not.toBeInTheDocument();
+	} );
 } );

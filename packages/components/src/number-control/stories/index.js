@@ -16,6 +16,9 @@ import NumberControl from '../';
 export default {
 	title: 'Components/NumberControl',
 	component: NumberControl,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 function Example() {
@@ -32,7 +35,7 @@ function Example() {
 		placeholder: text( 'placeholder', 0 ),
 		required: boolean( 'required', false ),
 		shiftStep: number( 'shiftStep', 10 ),
-		step: number( 'step', 1 ),
+		step: text( 'step', 1 ),
 	};
 
 	return (

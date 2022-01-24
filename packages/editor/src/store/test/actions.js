@@ -188,13 +188,15 @@ describe( 'Post generator actions', () => {
 				'yields an action for dispatching a success notice',
 				() => true,
 				() => {
-					if ( ! isAutosave && currentPostStatus === 'publish' ) {
+					if ( ! isAutosave ) {
 						const { value } = fulfillment.next( postType );
 						expect( value ).toEqual(
 							controls.dispatch(
 								noticesStore,
 								'createSuccessNotice',
-								'Updated Post',
+								currentPostStatus === 'publish'
+									? 'Updated Post'
+									: 'Draft saved',
 								{
 									actions: [],
 									id: 'SAVE_POST_NOTICE_ID',

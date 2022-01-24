@@ -15,7 +15,7 @@ import { isRTL } from '@wordpress/i18n';
  */
 import Button from '../../button';
 import { useNavigationContext } from '../context';
-import { ItemUI } from '../styles/navigation-styles';
+import { ItemUI, ItemIconUI } from '../styles/navigation-styles';
 import NavigationItemBaseContent from './base-content';
 import NavigationItemBase from './base';
 
@@ -29,6 +29,7 @@ export default function NavigationItem( props ) {
 		navigateToMenu,
 		onClick = noop,
 		title,
+		icon,
 		hideIfTargetMenuEmpty,
 		isText,
 		...restProps
@@ -51,8 +52,10 @@ export default function NavigationItem( props ) {
 		return null;
 	}
 
+	const isActive = item && activeItem === item;
+
 	const classes = classnames( className, {
-		'is-active': item && activeItem === item,
+		'is-active': isActive,
 	} );
 
 	const onItemClick = ( event ) => {
@@ -62,22 +65,34 @@ export default function NavigationItem( props ) {
 
 		onClick( event );
 	};
-	const icon = isRTL() ? chevronLeft : chevronRight;
+	const navigationIcon = isRTL() ? chevronLeft : chevronRight;
 	const baseProps = children ? props : { ...props, onClick: undefined };
 	const itemProps = isText
 		? restProps
-		: { as: Button, href, onClick: onItemClick, ...restProps };
+		: {
+				as: Button,
+				href,
+				onClick: onItemClick,
+				'aria-current': isActive ? 'page' : undefined,
+				...restProps,
+		  };
 
 	return (
 		<NavigationItemBase { ...baseProps } className={ classes }>
 			{ children || (
 				<ItemUI { ...itemProps }>
+					{ icon && (
+						<ItemIconUI>
+							<Icon icon={ icon } />
+						</ItemIconUI>
+					) }
+
 					<NavigationItemBaseContent
 						title={ title }
 						badge={ badge }
 					/>
 
-					{ navigateToMenu && <Icon icon={ icon } /> }
+					{ navigateToMenu && <Icon icon={ navigationIcon } /> }
 				</ItemUI>
 			) }
 		</NavigationItemBase>

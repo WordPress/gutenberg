@@ -19,7 +19,7 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
   <Icon
     icon={
       <SVG
-        className="components-menu-items__item-icon"
+        className="components-menu-items__item-icon has-icon-right"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -79,7 +79,7 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally 
   <Icon
     icon={
       <SVG
-        className="components-menu-items__item-icon"
+        className="components-menu-items__item-icon has-icon-right"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >

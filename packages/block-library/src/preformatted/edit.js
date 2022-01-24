@@ -9,9 +9,10 @@ export default function PreformattedEdit( {
 	mergeBlocks,
 	setAttributes,
 	onRemove,
+	style,
 } ) {
 	const { content } = attributes;
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { style } );
 
 	return (
 		<RichText

@@ -10,6 +10,7 @@ const { join } = require( 'path' );
 const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 /**
  * Internal dependencies
@@ -65,6 +66,7 @@ module.exports = {
 	},
 	plugins: [
 		...plugins,
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 		new CopyWebpackPlugin( {
 			patterns: gutenbergPackages.map( ( packageName ) => ( {
 				from: '*.css',

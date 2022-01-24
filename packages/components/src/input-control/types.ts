@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type {
 	CSSProperties,
 	ReactNode,
@@ -23,23 +22,27 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
 
 export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 
+export type Size = 'default' | 'small' | '__unstable-large';
+
 interface BaseProps {
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	hideLabelFromVision?: boolean;
 	isFocused: boolean;
 	labelPosition?: LabelPosition;
-	size?: 'default' | 'small';
+	size?: Size;
 }
+
+export type InputChangeCallback<
+	E = ChangeEvent< HTMLInputElement >,
+	P = {}
+> = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
 
 export interface InputFieldProps extends BaseProps {
 	dragDirection?: DragDirection;
 	dragThreshold?: number;
 	isDragEnabled?: boolean;
 	isPressEnterToChange?: boolean;
-	onChange?: (
-		nextValue: string | undefined,
-		extra: { event: ChangeEvent< HTMLInputElement > }
-	) => void;
+	onChange?: InputChangeCallback;
 	onValidate?: (
 		nextValue: string,
 		event?: SyntheticEvent< HTMLInputElement >

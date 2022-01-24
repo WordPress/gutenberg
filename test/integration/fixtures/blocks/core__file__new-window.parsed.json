@@ -6,9 +6,9 @@
 			"showDownloadButton": true
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\" rel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button\" download>Download</a></div>\n",
+		"innerHTML": "\n<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_0\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\" rel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button\" download aria-describedby=\"wp-block-file--media-_clientId_0\">Download</a></div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\" rel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button\" download>Download</a></div>\n"
+			"\n<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_0\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\" rel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button\" download aria-describedby=\"wp-block-file--media-_clientId_0\">Download</a></div>\n"
 		]
 	}
 ]

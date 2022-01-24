@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, useEffect } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -41,6 +42,7 @@ import {
 	BlockAlignmentToolbar,
 	BlockStyles,
 	store as blockEditorStore,
+	blockSettingsScreens,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
@@ -63,6 +65,7 @@ import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
 import {
+	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
@@ -75,6 +78,101 @@ const getUrlForSlug = ( image, sizeSlug ) => {
 	}
 	return image?.media_details?.sizes?.[ sizeSlug ]?.source_url;
 };
+
+function LinkSettings( {
+	attributes,
+	image,
+	isLinkSheetVisible,
+	setMappedAttributes,
+} ) {
+	const route = useRoute();
+	const { href: url, label, linkDestination, linkTarget, rel } = attributes;
+
+	// Persist attributes passed from child screen
+	useEffect( () => {
+		const { inputValue: newUrl } = route.params || {};
+
+		let newLinkDestination;
+		switch ( newUrl ) {
+			case attributes.url:
+				newLinkDestination = LINK_DESTINATION_MEDIA;
+				break;
+			case image?.link:
+				newLinkDestination = LINK_DESTINATION_ATTACHMENT;
+				break;
+			case '':
+				newLinkDestination = LINK_DESTINATION_NONE;
+				break;
+			default:
+				newLinkDestination = LINK_DESTINATION_CUSTOM;
+				break;
+		}
+
+		setMappedAttributes( {
+			url: newUrl,
+			linkDestination: newLinkDestination,
+		} );
+	}, [ route.params?.inputValue ] );
+
+	let valueMask;
+	switch ( linkDestination ) {
+		case LINK_DESTINATION_MEDIA:
+			valueMask = __( 'Media File' );
+			break;
+		case LINK_DESTINATION_ATTACHMENT:
+			valueMask = __( 'Attachment Page' );
+			break;
+		case LINK_DESTINATION_CUSTOM:
+			valueMask = __( 'Custom URL' );
+			break;
+		default:
+			valueMask = __( 'None' );
+			break;
+	}
+
+	const linkSettingsOptions = {
+		url: {
+			valueMask,
+			autoFocus: false,
+			autoFill: false,
+		},
+		openInNewTab: {
+			label: __( 'Open in new tab' ),
+		},
+		linkRel: {
+			label: __( 'Link Rel' ),
+			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
+		},
+	};
+
+	return (
+		<PanelBody title={ __( 'Link Settings' ) }>
+			<LinkSettingsNavigation
+				isVisible={ isLinkSheetVisible }
+				url={ url }
+				rel={ rel }
+				label={ label }
+				linkTarget={ linkTarget }
+				setAttributes={ setMappedAttributes }
+				withBottomSheet={ false }
+				hasPicker
+				options={ linkSettingsOptions }
+				showIcon={ false }
+				onLinkCellPressed={ ( { navigation } ) => {
+					navigation.navigate(
+						blockSettingsScreens.imageLinkDestinations,
+						{
+							inputValue: attributes.href,
+							linkDestination: attributes.linkDestination,
+							imageUrl: attributes.url,
+							attachmentPageUrl: image?.link,
+						}
+					);
+				} }
+			/>
+		</PanelBody>
+	);
+}
 
 export class ImageEdit extends Component {
 	constructor( props ) {
@@ -98,7 +196,6 @@ export class ImageEdit extends Component {
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
-		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
@@ -110,25 +207,6 @@ export class ImageEdit extends Component {
 		);
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
 		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
-
-		this.linkSettingsOptions = {
-			url: {
-				label: __( 'Image Link URL' ),
-				placeholder: __( 'Add URL' ),
-				autoFocus: false,
-				autoFill: true,
-			},
-			openInNewTab: {
-				label: __( 'Open in new tab' ),
-			},
-			linkRel: {
-				label: __( 'Link Rel' ),
-				placeholder: _x(
-					'None',
-					'Link rel attribute value placeholder'
-				),
-			},
-		};
 	}
 
 	componentDidMount() {
@@ -315,13 +393,6 @@ export class ImageEdit extends Component {
 		} );
 	}
 
-	onSetLinkDestination( href ) {
-		this.props.setAttributes( {
-			linkDestination: LINK_DESTINATION_CUSTOM,
-			href,
-		} );
-	}
-
 	onSetNewTab( value ) {
 		const updatedLinkTarget = getUpdatedLinkTargetSettings(
 			value,
@@ -416,43 +487,21 @@ export class ImageEdit extends Component {
 			: width;
 	}
 
-	setMappedAttributes( { url: href, ...restAttributes } ) {
+	setMappedAttributes( { url: href, linkDestination, ...restAttributes } ) {
 		const { setAttributes } = this.props;
+		if ( ! href && ! linkDestination ) {
+			linkDestination = LINK_DESTINATION_NONE;
+		} else if ( ! linkDestination ) {
+			linkDestination = LINK_DESTINATION_CUSTOM;
+		}
 
-		return href === undefined
-			? setAttributes( {
-					...restAttributes,
-					linkDestination: LINK_DESTINATION_CUSTOM,
-			  } )
+		return href === undefined || href === this.props.attributes.href
+			? setAttributes( restAttributes )
 			: setAttributes( {
 					...restAttributes,
+					linkDestination,
 					href,
-					linkDestination: LINK_DESTINATION_CUSTOM,
 			  } );
-	}
-
-	getLinkSettings() {
-		const { isLinkSheetVisible } = this.state;
-		const {
-			attributes: { href: url, ...unMappedAttributes },
-		} = this.props;
-		const mappedAttributes = { ...unMappedAttributes, url };
-
-		return (
-			<LinkSettingsNavigation
-				isVisible={ isLinkSheetVisible }
-				url={ mappedAttributes.url }
-				rel={ mappedAttributes.rel }
-				label={ mappedAttributes.label }
-				linkTarget={ mappedAttributes.linkTarget }
-				onClose={ this.dismissSheet }
-				setAttributes={ this.setMappedAttributes }
-				withBottomSheet={ false }
-				hasPicker
-				options={ this.linkSettingsOptions }
-				showIcon={ false }
-			/>
-		);
 	}
 
 	getAltTextSettings() {
@@ -474,7 +523,7 @@ export class ImageEdit extends Component {
 				footerNote={
 					<>
 						{ __(
-							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
 						) }
 						<FooterMessageLink
 							href={
@@ -508,7 +557,7 @@ export class ImageEdit extends Component {
 
 		const removeFeaturedButton = () => (
 			<BottomSheet.Cell
-				label={ __( 'Remove as Featured Image ' ) }
+				label={ __( 'Remove as Featured Image' ) }
 				labelStyle={ [
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
@@ -523,7 +572,7 @@ export class ImageEdit extends Component {
 
 		const setFeaturedButton = () => (
 			<BottomSheet.Cell
-				label={ __( 'Set as Featured Image ' ) }
+				label={ __( 'Set as Featured Image' ) }
 				labelStyle={ setFeaturedButtonStyle }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
 				separatorType={ 'none' }
@@ -551,11 +600,14 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
-			context: { imageCrop = false } = {},
+			context,
 			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
+		const hasImageContext = context
+			? Object.keys( context ).length > 0
+			: false;
 
 		const imageSizes = Array.isArray( this.props.imageSizes )
 			? this.props.imageSizes
@@ -616,9 +668,12 @@ export class ImageEdit extends Component {
 					) }
 					{ this.getAltTextSettings() }
 				</PanelBody>
-				<PanelBody title={ __( 'Link Settings' ) }>
-					{ this.getLinkSettings( true ) }
-				</PanelBody>
+				<LinkSettings
+					attributes={ this.props.attributes }
+					image={ this.props.image }
+					isLinkSheetVisible={ this.state.isLinkSheetVisible }
+					setMappedAttributes={ this.setMappedAttributes }
+				/>
 				<PanelBody
 					title={ __( 'Featured Image' ) }
 					titleStyle={ styles.featuredImagePanelTitle }
@@ -663,8 +718,12 @@ export class ImageEdit extends Component {
 
 		const additionalImageProps = {
 			height: '100%',
-			resizeMode: imageCrop ? 'cover' : 'contain',
+			resizeMode: context?.imageCrop ? 'cover' : 'contain',
 		};
+
+		const imageContainerStyles = [
+			context?.fixedHeight && styles.fixedHeight,
+		];
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
@@ -698,7 +757,7 @@ export class ImageEdit extends Component {
 								retryMessage,
 							} ) => {
 								return (
-									<View style={ styles.isGallery }>
+									<View style={ imageContainerStyles }>
 										<Image
 											align={
 												align && alignToFlex[ align ]
@@ -720,9 +779,13 @@ export class ImageEdit extends Component {
 											}
 											retryMessage={ retryMessage }
 											url={ url }
-											shapeStyle={ styles[ className ] }
+											shapeStyle={
+												styles[ className ] || className
+											}
 											width={ this.getWidth() }
-											{ ...additionalImageProps }
+											{ ...( hasImageContext
+												? additionalImageProps
+												: {} ) }
 										/>
 									</View>
 								);

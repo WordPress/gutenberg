@@ -18,10 +18,7 @@ export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
-export {
-	default as InnerBlocks,
-	useInnerBlocksProps as __experimentalUseInnerBlocksProps,
-} from './inner-blocks';
+export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
 	default as InspectorControls,
 	InspectorAdvancedControls,
@@ -57,6 +54,7 @@ export { default as __experimentalPanelColorGradientSettings } from './colors-gr
 export { default as useSetting } from './use-setting';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 export { default as Warning } from './warning';
+export { default as ContrastChecker } from './contrast-checker';
 
 export {
 	BottomSheetSettings,

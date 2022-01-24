@@ -220,7 +220,7 @@ You should only have to translate `port` and `pathMappings` to the format used b
 	"request": "launch",
 	"port": 9003,
 	"pathMappings": {
-		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceRoot}/"
+		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}/"
 	}
 }
 ```
@@ -350,6 +350,29 @@ wp> ^C
 ✔ Ran `wp shell` in 'tests-cli'. (in 16s 400ms)
 ```
 
+#### Installing a plugin or theme on the development instance
+
+```sh
+wp-env run cli plugin install custom-post-type-ui
+
+Creating 500cd328b649d63e882d5c4695871d04_cli_run ... done
+Installing Custom Post Type UI (1.9.2)
+Downloading installation package from https://downloads.wordpress.org/plugin/custom-post-type-ui.zip...
+The authenticity of custom-post-type-ui.zip could not be verified as no signature was found.
+Unpacking the package...
+Installing the plugin...
+Plugin installed successfully.
+Success: Installed 1 of 1 plugins.
+✔ Ran `plugin install custom-post-type-ui` in 'cli'. (in 6s 483ms)
+```
+
+**NOTE**: Depending on your host OS, you may experience errors when trying to install plugins or themes (e.g. `Warning: Could not create directory.`). This is typically because the user ID used within the container does not have write access to the mounted directories created by `wp-env`. To resolve this, run the `docker-compose` command directly from the directory created by `wp-env` and add `-u $(id -u)` and `-e HOME=/tmp` the `run` command as options:
+
+```sh
+$ cd ~/wp-env/500cd328b649d63e882d5c4695871d04
+$ docker-compose run --rm -u $(id -u) -e HOME=/tmp cli [plugin|theme] install <plugin|theme>
+```
+
 ### `wp-env destroy`
 
 ```sh
@@ -375,6 +398,18 @@ Options:
   --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
   --watch    Watch for logs as they happen.            [boolean] [default: true]
+```
+
+### `wp-env install-path`
+
+Outputs the absolute path to the WordPress environment files.
+
+Example:
+
+```sh
+$ wp-env install-path
+
+/home/user/.wp-env/63263e6506becb7b8613b02d42280a49
 ```
 
 ## .wp-env.json
@@ -486,9 +521,20 @@ This is useful for plugin development when upstream Core changes need to be test
 
 This is useful for working on plugins and WordPress Core at the same time.
 
+If you are running a _build_ of `wordpress-develop`, point `core` to the `build` directory.
+
 ```json
 {
 	"core": "../wordpress-develop/build",
+	"plugins": [ "." ]
+}
+```
+
+If you are running `wordpress-develop` in a dev mode (e.g. the watch command `dev` or the dev build `build:dev`), then point `core` to the `src` directory.
+
+```json
+{
+	"core": "../wordpress-develop/src",
 	"plugins": [ "." ]
 }
 ```

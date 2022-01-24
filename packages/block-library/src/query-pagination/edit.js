@@ -5,10 +5,11 @@ import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { getBlockSupport } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 
 /**
@@ -22,11 +23,21 @@ const TEMPLATE = [
 	[ 'core/query-pagination-next' ],
 ];
 
+const getDefaultBlockLayout = ( blockTypeOrName ) => {
+	const layoutBlockSupportConfig = getBlockSupport(
+		blockTypeOrName,
+		'__experimentalLayout'
+	);
+	return layoutBlockSupportConfig?.default;
+};
+
 export default function QueryPaginationEdit( {
-	attributes: { paginationArrow },
+	attributes: { paginationArrow, layout },
 	setAttributes,
 	clientId,
+	name,
 } ) {
+	const usedLayout = layout || getDefaultBlockLayout( name );
 	const hasNextPreviousBlocks = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
 		const innerBlocks = getBlocks( clientId );
@@ -49,7 +60,7 @@ export default function QueryPaginationEdit( {
 			'core/query-pagination-numbers',
 			'core/query-pagination-next',
 		],
-		orientation: 'horizontal',
+		__experimentalLayout: usedLayout,
 	} );
 	return (
 		<>

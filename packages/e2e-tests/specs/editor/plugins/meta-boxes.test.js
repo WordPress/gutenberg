@@ -39,7 +39,7 @@ describe( 'Meta boxes', () => {
 		await page.waitForSelector( '.editor-post-save-draft' );
 	} );
 
-	it.skip( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async () => {
+	it( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async () => {
 		// Publish a post so there's something for the latest posts dynamic block to render.
 		await page.type( '.editor-post-title__input', 'A published post' );
 		await insertBlock( 'Paragraph' );
@@ -60,7 +60,17 @@ describe( 'Meta boxes', () => {
 		await page.waitForNavigation();
 
 		// Check the the dynamic block appears.
-		await page.waitForSelector( '.wp-block-latest-posts' );
+		const latestPostsBlock = await page.waitForSelector(
+			'.wp-block-latest-posts'
+		);
+
+		expect(
+			await latestPostsBlock.evaluate( ( block ) => block.textContent )
+		).toContain( 'A published post' );
+
+		expect(
+			await latestPostsBlock.evaluate( ( block ) => block.textContent )
+		).toContain( 'Dynamic block test' );
 	} );
 
 	it( 'Should render the excerpt in meta based on post content if no explicit excerpt exists', async () => {

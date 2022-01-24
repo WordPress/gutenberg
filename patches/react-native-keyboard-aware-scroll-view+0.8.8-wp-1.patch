@@ -1,0 +1,76 @@
+diff --git a/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js b/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
+index 30f62c9..83a6920 100644
+--- a/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
++++ b/node_modules/react-native-keyboard-aware-scroll-view/lib/KeyboardAwareHOC.js
+@@ -264,9 +264,13 @@ function KeyboardAwareHOC(
+       })
+     }
+ 
+-    componentWillReceiveProps(nextProps: KeyboardAwareHOCProps) {
+-      if (nextProps.viewIsInsideTabBar !== this.props.viewIsInsideTabBar) {
+-        const keyboardSpace: number = nextProps.viewIsInsideTabBar
++    // This patch changed from the deprecated `componentWillReceiveProps` to
++    // `componentDidUpdate`. We can remove this patch when we upgrade to
++    // `react-native-keyboard-aware-scroll-view@^0.9.2`
++    // https://git.io/JPbOK
++    componentDidUpdate(prevProps: KeyboardAwareHOCProps) {
++      if (this.props.viewIsInsideTabBar !== prevProps.viewIsInsideTabBar) {
++        const keyboardSpace: number = this.props.viewIsInsideTabBar
+           ? _KAM_DEFAULT_TAB_BAR_HEIGHT
+           : 0
+         if (this.state.keyboardSpace !== keyboardSpace) {
+@@ -293,12 +297,33 @@ function KeyboardAwareHOC(
+ 
+     scrollToPosition = (x: number, y: number, animated: boolean = true) => {
+       const responder = this.getScrollResponder()
+-      responder && responder.scrollResponderScrollTo({ x, y, animated })
++      // Patch applied to avoid invoking the removed `scrollResponderScrollTo`
++      // method. This patch could be removed if we upgrade to
++      // `react-native-keyboard-aware-view@^0.9.5` https://git.io/JPb6a
++      if (!responder) return;
++      if (responder.scrollResponderScrollTo) {
++        // React Native < 0.65
++        responder.scrollResponderScrollTo({ x, y, animated })
++      } else if (responder.scrollTo) {
++        // React Native >= 0.65
++        responder.scrollTo({ x, y, animated })
++      }
+     }
+ 
+     scrollToEnd = (animated?: boolean = true) => {
+       const responder = this.getScrollResponder()
+-      responder && responder.scrollResponderScrollToEnd({ animated })
++      // Patch applied to avoid invoking the removed
++      // `scrollResponderScrollToEnd` method. This patch could be removed if we
++      // upgrade to `react-native-keyboard-aware-view@^0.9.5`
++      // https://git.io/JPb6a
++      if (!responder) return;
++      if (responder.scrollResponderScrollToEnd) {
++        // React Native < 0.65
++        responder.scrollResponderScrollToEnd({ animated })
++      } else if (responder.scrollToEnd) {
++        // React Native >= 0.65
++        responder.scrollToEnd({ animated })
++      }
+     }
+ 
+     scrollForExtraHeightOnAndroid = (extraHeight: number) => {
+@@ -553,7 +578,17 @@ function KeyboardAwareHOC(
+ 
+         scrollOffsetY = Math.max(0, scrollOffsetY); //prevent negative scroll offset
+         const responder = this.getScrollResponder();
+-        responder && responder.scrollResponderScrollTo( { x: 0, y: scrollOffsetY, animated: true } );
++        // Patch applied to avoid invoking the removed `scrollResponderScrollTo`
++        // method. This patch could be removed if we upgrade to
++        // `react-native-keyboard-aware-view@^0.9.5` https://git.io/JPb6a
++        if (!responder) return;
++        if (responder.scrollResponderScrollTo) {
++          // React Native < 0.65
++          responder.scrollResponderScrollTo( { x: 0, y: scrollOffsetY, animated: true } )
++        } else if (responder.scrollTo) {
++          // React Native >= 0.65
++          responder.scrollTo( { x: 0, y: scrollOffsetY, animated: true } )
++        }
+       }
+ 
+       const measureLayoutErrorHandler = ( e: Object ) => {

@@ -49,6 +49,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/internal-regex': null,
 		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
@@ -81,11 +82,6 @@ module.exports = {
 						message: 'Please use `memize` instead.',
 					},
 					{
-						name: 'react',
-						message:
-							'Please use React API through `@wordpress/element` instead.',
-					},
-					{
 						name: 'reakit',
 						message:
 							'Please use Reakit API through `@wordpress/components` instead.',
@@ -109,6 +105,19 @@ module.exports = {
 				],
 			},
 		],
+		'@typescript-eslint/no-restricted-imports': [
+			'error',
+			{
+				paths: [
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+						allowTypeImports: true,
+					},
+				],
+			},
+		],
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
@@ -119,12 +128,6 @@ module.exports = {
 					'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
 				message:
 					'Path access on WordPress dependencies is not allowed.',
-			},
-			{
-				selector:
-					'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb.cjs)/]',
-				message:
-					'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
 			},
 			{
 				selector:
@@ -181,6 +184,7 @@ module.exports = {
 				...developmentFiles,
 			],
 			rules: {
+				'import/default': 'off',
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',

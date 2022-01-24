@@ -1,0 +1,14 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/comment-author-name",
+		"isValid": true,
+		"attributes": {
+			"isLink": false,
+			"linkTarget": "_self",
+			"fontFamily": "cambria-georgia"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

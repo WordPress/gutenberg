@@ -1,22 +1,23 @@
-$components-custom-gradient-picker__padding: 6px; // 36px container, 24px handles inside, that leaves 12px padding, half of which is 6.
+$components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
 
 .components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
 	opacity: 0.4;
 }
 
 .components-custom-gradient-picker__gradient-bar {
+	border-radius: $radius-block-ui;
 	margin-top: $grid-unit-15;
 	width: 100%;
-	height: $button-size;
-	border-radius: $button-size;
-	margin-bottom: $grid-unit-15;
+	height: $grid-unit-60;
+	margin-bottom: $grid-unit-20+$grid-unit-05;
 	/*rtl:ignore*/
-	padding-left: $components-custom-gradient-picker__padding;
-	/*rtl:ignore*/
-	padding-right: $button-size - $components-custom-gradient-picker__padding;
+	padding-right: $components-custom-gradient-picker__padding;
 
 	.components-custom-gradient-picker__markers-container {
 		position: relative;
+		width: calc(100% - #{ $grid-unit-40 });
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.components-custom-gradient-picker__insert-point {
@@ -24,9 +25,9 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 		background: $white;
 		padding: 2px;
 		top: $components-custom-gradient-picker__padding;
-		min-width: $button-size-small;
-		width: $button-size-small;
-		height: $button-size-small;
+		min-width: $grid-unit-20;
+		width: $grid-unit-20;
+		height: $grid-unit-20;
 		position: relative;
 		color: $gray-900;
 
@@ -37,20 +38,25 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 	}
 
 	.components-custom-gradient-picker__control-point-button {
-		border: 2px solid transparent;
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
 		border-radius: 50%;
-		height: $button-size-small;
-		width: $button-size-small;
+		height: $grid-unit-20;
+		width: $grid-unit-20;
 		padding: 0;
 		position: absolute;
 		top: $components-custom-gradient-picker__padding;
 
+		// Shadow and stroke.
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 $border-width-focus 0 rgba($black, 0.25);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+
 		&:focus,
 		&.is-active {
-			box-shadow:
-				0 0 0 1px $white,
-				0 0 0 3px $gray-900;
+			box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus) * 2) $white, 0 0 $border-width-focus 0 rgba($black, 0.25);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: $border-width-tab solid transparent;
 		}
 	}
 }
@@ -59,7 +65,7 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 	margin-left: auto;
 	margin-right: auto;
 	display: block;
-	margin-bottom: 8px;
+	margin-bottom: $grid-unit-10;
 }
 
 .components-custom-gradient-picker__inserter {
@@ -100,5 +106,17 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 				border-radius: 2px;
 			}
 		}
+	}
+}
+
+// All these styles should be made generic and changed on the inputs for all components.
+.components-custom-gradient-picker {
+	.components-input-control__label {
+		line-height: 1;
+	}
+	label {
+		text-transform: uppercase;
+		font-size: 11px;
+		font-weight: 500;
 	}
 }

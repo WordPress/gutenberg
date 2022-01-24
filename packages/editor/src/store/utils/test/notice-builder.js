@@ -34,7 +34,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		[
 			'when previous post is not published and post will not be published',
 			[ 'draft', 'draft', false ],
-			[],
+			[ 'Draft saved', defaultExpectedAction ],
 		],
 		[
 			'when previous post is published and post will be unpublished',

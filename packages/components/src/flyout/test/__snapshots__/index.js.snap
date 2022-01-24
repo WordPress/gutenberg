@@ -86,7 +86,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
+  class="components-surface components-card emotion-0 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >

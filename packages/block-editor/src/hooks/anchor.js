@@ -81,9 +81,9 @@ export const withInspectorControl = createHigherOrderComponent(
 
 								{ isWeb && (
 									<ExternalLink
-										href={
+										href={ __(
 											'https://wordpress.org/support/article/page-jumps/'
-										}
+										) }
 									>
 										{ __( 'Learn more about anchors' ) }
 									</ExternalLink>

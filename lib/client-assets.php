@@ -208,7 +208,8 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		$scripts,
 		'react',
 		'https://unpkg.com/react@17.0.1/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' )
+		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
+		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' )
 	);
 	gutenberg_register_vendor_script(
 		$scripts,
@@ -370,7 +371,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-reset-editor-styles',
 		gutenberg_url( 'build/block-library/reset.css' ),
-		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Adminn styles.
+		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Admin styles.
 		$version
 	);
 	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
@@ -483,24 +484,6 @@ function gutenberg_register_packages_styles( $styles ) {
 	$styles->add_data( 'wp-widgets', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
-
-/**
- * Registers common scripts and styles to be used as dependencies of the editor
- * and plugins.
- *
- * @since 0.1.0
- */
-function gutenberg_enqueue_block_editor_assets() {
-	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
-		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
-
-		wp_enqueue_script(
-			'gutenberg-live-reload',
-			$live_reload_url
-		);
-	}
-}
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets' );
 
 /**
  * Retrieves a unique and reasonably short and human-friendly filename for a
@@ -693,7 +676,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
-	$settings['supportsTemplateMode'] = gutenberg_supports_block_templates();
+	$settings['supportsTemplateMode'] = current_theme_supports( 'block-templates' );
 
 	// Enable the new layout options for themes with a theme.json file.
 	$settings['supportsLayout'] = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
@@ -710,7 +693,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 /**
  * Sets the editor styles to be consumed by JS.
  */
-function gutenberg_extend_block_editor_styles_html() {
+function gutenberg_resolve_assets() {
 	global $pagenow;
 
 	$script_handles = array();
@@ -765,16 +748,17 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	$scripts = ob_get_clean();
 
-	$editor_assets = wp_json_encode(
-		array(
-			'styles'  => $styles,
-			'scripts' => $scripts,
-		)
+	return array(
+		'styles'  => $styles,
+		'scripts' => $scripts,
 	);
-
-	echo "<script>window.__editorAssets = $editor_assets</script>";
 }
-add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
-add_action( 'admin_footer-widgets.php', 'gutenberg_extend_block_editor_styles_html' );
+
+add_filter(
+	'block_editor_settings_all',
+	function( $settings ) {
+		// In the future we can allow WP Dependency handles to be passed.
+		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets();
+		return $settings;
+	}
+);

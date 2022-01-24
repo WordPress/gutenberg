@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -99,7 +104,7 @@ export default function TemplatePartEdit( {
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
-				isMissing: hasResolvedEntity && ! entityRecord,
+				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
 				defaultWrapper: defaultWrapperElement || 'div',
 				area: _area,
 				enableSelection: _enableSelection,
@@ -179,9 +184,6 @@ export default function TemplatePartEdit( {
 								<ToolbarButton
 									aria-expanded={ isOpen }
 									onClick={ onToggle }
-									// Disable when open to prevent odd FireFox bug causing reopening.
-									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
-									disabled={ isOpen }
 								>
 									{ __( 'Replace' ) }
 								</ToolbarButton>

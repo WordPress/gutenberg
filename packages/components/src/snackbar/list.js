@@ -8,6 +8,7 @@ import { omit, noop } from 'lodash';
  * WordPress dependencies
  */
 import { useReducedMotion } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -56,11 +57,12 @@ const SNACKBAR_REDUCE_MOTION_VARIANTS = {
  * @return {Object} The rendered notices list.
  */
 function SnackbarList( { notices, className, children, onRemove = noop } ) {
+	const listRef = useRef();
 	const isReducedMotion = useReducedMotion();
 	className = classnames( 'components-snackbar-list', className );
 	const removeNotice = ( notice ) => () => onRemove( notice.id );
 	return (
-		<div className={ className }>
+		<div className={ className } tabIndex={ -1 } ref={ listRef }>
 			{ children }
 			<AnimatePresence>
 				{ notices.map( ( notice ) => {
@@ -81,6 +83,7 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 								<Snackbar
 									{ ...omit( notice, [ 'content' ] ) }
 									onRemove={ removeNotice( notice ) }
+									listRef={ listRef }
 								>
 									{ notice.content }
 								</Snackbar>

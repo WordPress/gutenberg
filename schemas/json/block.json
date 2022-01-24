@@ -1,0 +1,451 @@
+{
+	"title": "JSON schema for WordPress blocks",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"definitions": {
+		"//": {
+			"reference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/",
+			"attributesReference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/",
+			"contextReference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/",
+			"supportsReference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/",
+			"registerReference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional"
+		}
+	},
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"apiVersion": {
+			"type": "integer",
+			"description": "The version of the Block API used by the block. The most recent version is 2 and it was introduced in WordPress 5.6.\n\n See the the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"default": 1,
+			"enum": [ 1, 2 ]
+		},
+		"name": {
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$",
+			"description": "The name for a block is a unique string that identifies a block. Names have to be structured as `namespace/block-name`, where namespace is the name of your plugin or theme."
+		},
+		"title": {
+			"type": "string",
+			"description": "This is the display title for your block, which can be translated with our translation functions. The block inserter will show this name."
+		},
+		"category": {
+			"description": "Blocks are grouped into categories to help users browse and discover them.\n Core provided categories are: text, media, design, widgets, theme, embed\n\nPlugins and Themes can also register custom block categories.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#managing-block-categories",
+			"anyOf": [
+				{
+					"type": "string"
+				},
+				{
+					"enum": [
+						"text",
+						"media",
+						"design",
+						"widgets",
+						"theme",
+						"embed"
+					]
+				}
+			]
+		},
+		"parent": {
+			"type": "array",
+			"description": "Setting parent lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an ‘Add to Cart’ block to only be available within a ‘Product’ block.",
+			"items": {
+				"type": "string"
+			}
+		},
+		"icon": {
+			"type": "string",
+			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts)."
+		},
+		"description": {
+			"type": "string",
+			"description": "This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector."
+		},
+		"keywords": {
+			"type": "array",
+			"description": "Sometimes a block could have aliases that help users discover it while searching. For example, an image block could also want to be discovered by photo. You can do so by providing an array of unlimited terms (which are translated).",
+			"items": {
+				"type": "string"
+			}
+		},
+		"version": {
+			"type": "string",
+			"description": "The current version number of the block, such as 1.0 or 1.0.3. It’s similar to how plugins are versioned. This field might be used with block assets to control cache invalidation, and when the block author omits it, then the installed version of WordPress is used instead."
+		},
+		"textdomain": {
+			"type": "string",
+			"description": "The gettext text domain of the plugin/block. More information can be found in the Text Domain section of the How to Internationalize your Plugin page.\n\nhttps://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/"
+		},
+		"attributes": {
+			"type": "object",
+			"description": "Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.\n\nSee the attributes documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/ for more details.",
+			"patternProperties": {
+				"[a-zA-Z]": {
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "The type indicates the type of data that is stored by the attribute. It does not indicate where the data is stored, which is defined by the source field.\n\nA type is required, unless an enum is provided. A type can be used with an enum.\n\nNote that the validity of an object is determined by your source. For an example, see the query details below.",
+							"oneOf": [
+								{
+									"type": "string",
+									"enum": [
+										"null",
+										"boolean",
+										"object",
+										"array",
+										"string",
+										"integer",
+										"number"
+									]
+								},
+								{
+									"type": "array",
+									"uniqueItems": true,
+									"items": {
+										"type": "string",
+										"enum": [
+											"null",
+											"boolean",
+											"object",
+											"array",
+											"string",
+											"integer",
+											"number"
+										]
+									}
+								}
+							]
+						},
+						"enum": {
+							"type": "array",
+							"description": "An attribute can be defined as one of a fixed set of values. This is specified by an enum, which contains an array of allowed values:",
+							"items": {
+								"oneOf": [
+									{
+										"type": "boolean"
+									},
+									{
+										"type": "number"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"source": {
+							"type": "string",
+							"description": "Attribute sources are used to define how the attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.",
+							"enum": [
+								"attribute",
+								"text",
+								"html",
+								"query",
+								"meta"
+							]
+						},
+						"selector": {
+							"type": "string",
+							"description": "The selector can be an HTML tag, or anything queryable with querySelector, such as a class or id attribute. Examples are given below.\n\nFor example, a selector of img will match an img element, and img.class will match an img element that has a class of class."
+						},
+						"attribute": {
+							"type": "string",
+							"description": "Use an attribute source to extract the value from an attribute in the markup. The attribute is specified by the attribute field, which must be supplied.\n\nExample: Extract the src attribute from an image found in the block’s markup."
+						},
+						"multiline": {
+							"type": "string",
+							"description": "Use the multiline property to extract the inner HTML of matching tag names for the use in RichText with the multiline prop."
+						},
+						"query": {
+							"type": "object",
+							"description": "Use query to extract an array of values from markup. Entries of the array are determined by the selector argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources."
+						},
+						"meta": {
+							"type": "string",
+							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/meta-block-3-add/"
+						},
+						"default": {
+							"description": "TA block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
+						}
+					},
+					"required": [ "type" ]
+				}
+			},
+			"additionalProperties": false
+		},
+		"providesContext": {
+			"type": "object",
+			"description": "Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block’s own attribute.\n\nSee the block context documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/ for more details.",
+			"patternProperties": {
+				"[a-zA-Z]": {
+					"type": "string"
+				}
+			}
+		},
+		"usesContext": {
+			"type": "array",
+			"description": "Array of the names of context values to inherit from an ancestor provider.\n\nSee the block context documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/ for more details.",
+			"items": {
+				"type": "string"
+			}
+		},
+		"supports": {
+			"type": "object",
+			"description": "It contains as set of options to control features used in the editor. See the the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
+			"properties": {
+				"anchor": {
+					"type": "boolean",
+					"description": "Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.",
+					"default": false
+				},
+				"align": {
+					"default": false,
+					"description": "This property adds block controls which allow to change block’s alignment.",
+					"oneOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"wide",
+									"full",
+									"left",
+									"center",
+									"right"
+								]
+							}
+						}
+					]
+				},
+				"alignWide": {
+					"type": "boolean",
+					"description": "This property allows to enable wide alignment for your theme. To disable this behavior for a single block, set this flag to false.",
+					"default": true
+				},
+				"className": {
+					"type": "boolean",
+					"description": "By default, the class .wp-block-your-block-name is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.",
+					"default": true
+				},
+				"color": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.\n\nNote that the background and text keys have a default value of true, so if the color property is present they’ll also be considered enabled",
+					"properties": {
+						"background": {
+							"type": "boolean",
+							"description": "This property adds UI controls which allow the user to apply a solid background color to a block.\n\nWhen color support is declared, this property is enabled by default (along with text), so simply setting color will enable background color.\n\nTo disable background support while keeping other color supports enabled, set to false.\n\nWhen the block declares support for color.background, the attributes definition is extended to include two new attributes: backgroundColor and style",
+							"default": true
+						},
+						"gradients": {
+							"type": "boolean",
+							"description": "This property adds UI controls which allow the user to apply a gradient background to a block.\n\nGradient presets are sourced from editor-gradient-presets theme support.\n\nWhen the block declares support for color.gradient, the attributes definition is extended to include two new attributes: gradient and style",
+							"default": false
+						},
+						"link": {
+							"type": "boolean",
+							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, the attributes definition is extended to include two new attributes: linkColor and style",
+							"default": false
+						},
+						"text": {
+							"type": "boolean",
+							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, the attributes definition is extended to include two new attributes: textColor and style",
+							"default": true
+						}
+					}
+				},
+				"customClassName": {
+					"type": "boolean",
+					"description": "This property adds a field to define a custom className for the block’s wrapper.",
+					"default": true
+				},
+				"defaultStylePicker": {
+					"type": "boolean",
+					"description": "When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to false.",
+					"default": true
+				},
+				"html": {
+					"type": "boolean",
+					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
+					"default": true
+				},
+				"inserter": {
+					"type": "boolean",
+					"description": "By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set inserter to false.",
+					"default": true
+				},
+				"multiple": {
+					"type": "boolean",
+					"description": "A non-multiple block can be inserted into each post, one time only. For example, the built-in ‘More’ block cannot be inserted again if it already exists in the post being edited. A non-multiple block’s icon is automatically dimmed (unclickable) to prevent multiple instances.",
+					"default": true
+				},
+				"reusable": {
+					"type": "boolean",
+					"description": "A block may want to disable the ability of being converted into a reusable block. By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.",
+					"default": true
+				},
+				"spacing": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific spacing property, the attributes definition is extended to include the style attribute.",
+					"properties": {
+						"margin": {
+							"oneOf": [
+								{
+									"type": "boolean"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [
+											"top",
+											"right",
+											"left",
+											"bottom"
+										]
+									}
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [ "vertical", "horizontal" ]
+									}
+								}
+							]
+						},
+						"padding": {
+							"oneOf": [
+								{
+									"type": "boolean"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [
+											"top",
+											"right",
+											"left",
+											"bottom"
+										]
+									}
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [ "vertical", "horizontal" ]
+									}
+								}
+							]
+						}
+					}
+				},
+				"typography": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific typography property, the attributes definition is extended to include the style attribute.",
+					"properties": {
+						"fontSize": {
+							"type": "boolean",
+							"description": "This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.\n\nThe values shown in this control are the ones declared by the theme via the editor-font-sizes theme support, or the default ones if none is provided.\n\nWhen the block declares support for fontSize, the attributes definition is extended to include two new attributes: fontSize and style",
+							"default": false
+						},
+						"lineHeight": {
+							"type": "boolean",
+							"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, the attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
+							"default": false
+						}
+					}
+				}
+			},
+			"additionalProperties": true
+		},
+		"styles": {
+			"type": "array",
+			"description": "Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.\n\nPlugins and Themes can also register custom block style for existing blocks.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#block-styles",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"label": {
+						"type": "string"
+					},
+					"isDefault": {
+						"type": "boolean",
+						"default": false
+					}
+				},
+				"required": [ "name", "label" ],
+				"additionalProperties": false
+			}
+		},
+		"example": {
+			"type": "object",
+			"description": "It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.\n\nSee the the example documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional for more details.",
+			"properties": {
+				"viewportWidth": {
+					"type": "number",
+					"description": "The viewportWidth controls the width of the iFrame container in which the block preview will get rendered",
+					"default": 1200
+				},
+				"attributes": {
+					"type": "object",
+					"description": "Set the attribues for the block example"
+				},
+				"innerBlocks": {
+					"type": "array",
+					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this: \n\n [ [ 'core/heading', { content: 'This is an Example' }, [] ] ]\n\n Where each block itself is an array that contains the block name, the block attributes, and the blocks inner blocks."
+				}
+			}
+		},
+		"editorScript": {
+			"type": "string",
+			"description": "Block type editor script definition. It will only be enqueued in the context of the editor."
+		},
+		"script": {
+			"type": "string",
+			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
+		},
+		"viewScript": {
+			"type": "string",
+			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site."
+		},
+		"editorStyle": {
+			"description": "Block type editor style definition. It will only be enqueued in the context of the editor.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"style": {
+			"description": "Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		}
+	},
+	"required": [ "name", "title" ],
+	"additionalProperties": false
+}

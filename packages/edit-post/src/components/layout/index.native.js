@@ -53,17 +53,14 @@ class Layout extends Component {
 
 	componentDidMount() {
 		this._isMounted = true;
-		SafeArea.addEventListener(
+		this.safeAreaSubscription = SafeArea.addEventListener(
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
 	}
 
 	componentWillUnmount() {
-		SafeArea.removeEventListener(
-			'safeAreaInsetsForRootViewDidChange',
-			this.onSafeAreaInsetsUpdate
-		);
+		this.safeAreaSubscription?.remove();
 		this._isMounted = false;
 	}
 
@@ -91,7 +88,13 @@ class Layout extends Component {
 	}
 
 	renderHTML() {
-		return <HTMLTextInput parentHeight={ this.state.rootViewHeight } />;
+		const { globalStyles } = this.props;
+		return (
+			<HTMLTextInput
+				parentHeight={ this.state.rootViewHeight }
+				style={ globalStyles }
+			/>
+		);
 	}
 
 	renderVisual() {

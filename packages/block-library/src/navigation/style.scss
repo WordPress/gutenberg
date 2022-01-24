@@ -6,21 +6,21 @@
 // - .wp-block-navigation-item targets the menu item itself.
 // - .wp-block-navigation-item__content targets the link inside a menu item.
 // - .wp-block-navigation__submenu-icon targets the chevron icon indicating submenus.
+
+// Size of burger and close icons.
+$navigation-icon-size: 24px;
+
 .wp-block-navigation {
 	position: relative;
 
-	// Horizontal layout
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-
-	// Vertical layout
-	&.is-vertical {
-		flex-direction: column;
-		align-items: flex-start;
+	// Normalize list styles.
+	ul {
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: 0;
+		padding-left: 0;
 	}
 
-	// Normalize list styles.
 	ul,
 	ul li {
 		list-style: none;
@@ -41,12 +41,14 @@
 	}
 
 	// Menu item link.
-	// By targetting the markup directly we enable greater global styles compatibility.
-	// The extra container specificity is due to global styles outputting link styles that need overriding.
-	&.wp-block-navigation a {
-		// Inherit colors set by the block color definition.
+	// By adding low specificity, we enable compatibility with link colors set in theme.json,
+	// but still allow them to be overridden by user-set colors.
+	.wp-block-navigation-item__content {
 		color: inherit;
 		display: block;
+
+		// Set the default menu item padding to zero, to allow text-only buttons.
+		padding: 0;
 	}
 
 	// Force links to inherit text decoration applied to navigation block.
@@ -80,18 +82,71 @@
 
 	// Submenu indicator.
 	.wp-block-navigation__submenu-icon {
-		align-self: center;
-		height: inherit;
+		align-self: center; // This one affects nested submenu indicators.
 		line-height: 0;
-		margin-left: 6px;
+		display: inline-block;
+		vertical-align: middle;
+		font-size: inherit;
+
+		// Affect the button as well.
+		padding: 0;
+		background-color: inherit;
+		color: currentColor;
+		border: none;
+
+		// Scale to font size.
+		margin-left: 0.25em;
+		width: 0.6em;
+		height: 0.6em;
 
 		svg {
 			display: inline-block;
 			stroke: currentColor;
+			width: inherit;
+			height: inherit;
 		}
 	}
-}
 
+	// Custom properties for layout style cascade: default values.
+	--navigation-layout-justification-setting: flex-start;
+	--navigation-layout-direction: row;
+	--navigation-layout-wrap: wrap;
+	--navigation-layout-justify: flex-start;
+	--navigation-layout-align: center;
+
+	&.is-vertical {
+		--navigation-layout-direction: column;
+		--navigation-layout-justify: initial;
+		--navigation-layout-align: flex-start;
+	}
+
+	&.no-wrap {
+		--navigation-layout-wrap: nowrap;
+	}
+
+	&.items-justified-center {
+		--navigation-layout-justification-setting: center;
+		--navigation-layout-justify: center;
+
+		&.is-vertical {
+			--navigation-layout-align: center;
+		}
+	}
+
+	&.items-justified-right {
+		--navigation-layout-justification-setting: flex-end;
+		--navigation-layout-justify: flex-end;
+
+		&.is-vertical {
+			--navigation-layout-align: flex-end;
+		}
+	}
+
+	&.items-justified-space-between {
+		--navigation-layout-justification-setting: space-between;
+		--navigation-layout-justify: space-between;
+	}
+}
 
 // Styles for submenu flyout.
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
@@ -116,10 +171,11 @@
 		// Don't take up space when the menu is collapsed.
 		width: 0;
 		height: 0;
+		overflow: hidden; // Overflow is necessary to set, otherwise submenu items will take up space.
 
 		// Submenu items.
 		> .wp-block-navigation-item {
-			> a {
+			> .wp-block-navigation-item__content {
 				display: flex;
 				flex-grow: 1;
 
@@ -132,12 +188,12 @@
 		}
 
 		// Spacing in all submenus.
-		a {
+		.wp-block-navigation-item__content {
 			margin: 0;
 		}
 
 		// Submenu indentation when there's no background.
-		left: -1em;
+		left: -1px; // Border width.
 		top: 100%;
 
 		// Indentation for all submenus.
@@ -167,14 +223,11 @@
 		}
 	}
 
-
-	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
-	// We will need to replace focus-within with a JS solution for IE keyboard support.
-
 	// Custom menu items.
-	// Show submenus on hover.
-	&:hover > .wp-block-navigation__submenu-container {
+	// Show submenus on hover unless they open on click.
+	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
 		visibility: visible;
+		overflow: visible;
 		opacity: 1;
 		width: auto;
 		height: auto;
@@ -182,8 +235,19 @@
 	}
 
 	// Keep submenus open when focus is within.
-	&:focus-within > .wp-block-navigation__submenu-container {
+	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
 		visibility: visible;
+		overflow: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+		min-width: 200px;
+	}
+
+	// Show submenus on click.
+	.wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-container {
+		visibility: visible;
+		overflow: visible;
 		opacity: 1;
 		width: auto;
 		height: auto;
@@ -192,7 +256,9 @@
 }
 
 // Submenu indentation when there's a background.
-.wp-block-navigation.has-background .has-child .wp-block-navigation__submenu-container {
+.wp-block-navigation.has-background
+.has-child
+.wp-block-navigation__submenu-container {
 	left: 0;
 	top: 100%;
 
@@ -205,15 +271,49 @@
 	}
 }
 
+// General submenu colors.
+// These styles are stored here as opposed to in the separate submenu block,
+// so that they can affect both submenus and page lists with submenu items both.
+.wp-block-navigation-submenu {
+	position: relative;
+	display: flex;
+
+	.wp-block-navigation__submenu-icon svg {
+		stroke: currentColor;
+	}
+}
+
+button.wp-block-navigation-item__content {
+	background-color: transparent;
+	border: none;
+	color: currentColor;
+	font-size: inherit;
+	font-family: inherit;
+	line-height: inherit;
+
+	// Buttons default to center alignment. This becomes visible
+	// when a menu item label is long enough to wrap.
+	text-align: left;
+}
+
+.wp-block-navigation-submenu__toggle {
+	cursor: pointer;
+}
+
 
 /**
  * Margins
  */
 
 // Menu items with no background.
+.wp-block-navigation__responsive-container,
+.wp-block-navigation__responsive-close,
+.wp-block-navigation__responsive-dialog,
+.wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
-.wp-block-navigation__container {
-	gap: 0.5em 2em;
+.wp-block-navigation__container,
+.wp-block-navigation__responsive-container-content {
+	gap: inherit;
 }
 
 // Menu items with background.
@@ -221,12 +321,12 @@
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
 .wp-block-navigation:where(.has-background) {
+	&,
 	.wp-block-navigation .wp-block-page-list,
 	.wp-block-navigation__container {
-		gap: 0 0.5em;
+		gap: inherit;
 	}
 }
-
 
 /**
  * Paddings
@@ -236,22 +336,16 @@
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
 
-// Set the default menu item padding to zero, to allow text-only buttons.
-.wp-block-navigation a {
-	padding: 0;
-}
-
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
-.wp-block-navigation:where(.has-background) a {
+.wp-block-navigation:where(.has-background) .wp-block-navigation-item__content {
 	padding: 0.5em 1em;
 }
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
-.wp-block-navigation :where(.wp-block-navigation__submenu-container) a {
+.wp-block-navigation :where(.wp-block-navigation__submenu-container) .wp-block-navigation-item__content {
 	padding: 0.5em 1em;
 }
-
 
 /**
  * Justifications.
@@ -263,17 +357,23 @@
 .wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
 .wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
 .wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
-.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
-
+.wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
 	// First submenu.
 	.wp-block-navigation__submenu-container {
 		left: auto;
 		right: 0;
 
 		// Nested submenus.
+		// On smaller breakpoints, nested menus open downwards.
 		.wp-block-navigation__submenu-container {
-			left: auto;
-			right: 100%;
+			left: -1px; // Border width.
+			right: -1px;
+		}
+		@include break-medium {
+			.wp-block-navigation__submenu-container {
+				left: auto;
+				right: 100%;
+			}
 		}
 	}
 }
@@ -293,8 +393,11 @@
 
 // Navigation block inner container.
 .wp-block-navigation__container {
-	// Vertically center child blocks, like Social Links or Search.
-	align-items: center;
+	display: flex;
+	flex-wrap: var(--navigation-layout-wrap, wrap);
+	flex-direction: var(--navigation-layout-direction, initial);
+	justify-content: var(--navigation-layout-justify, initial);
+	align-items: var(--navigation-layout-align, initial);
 
 	// Reset the default list styles
 	list-style: none;
@@ -305,47 +408,12 @@
 	.is-responsive {
 		display: none;
 	}
-
-	// Horizontal layout
-	display: flex;
-	flex-wrap: wrap;
-	flex: 1;
 }
 
-// Vertical layout
-.is-vertical .wp-block-page-list, // Page list.
-.is-vertical .wp-block-navigation__container {
-	display: block;
-	flex-direction: column;
-	align-items: flex-start;
-}
-
-// Justification.
-// These target the named container class to work even with the additional mobile menu containers.
-.items-justified-center .wp-block-navigation__container {
-	justify-content: center;
-}
-
-.items-justified-right .wp-block-navigation__container {
-	justify-content: flex-end;
-}
-
-.items-justified-space-between .wp-block-navigation__container {
-	justify-content: space-between;
-	flex: 1;
-}
-
-// Vertical justification.
-.is-vertical.items-justified-center > ul {
-	align-items: center;
-}
-
-.is-vertical.items-justified-right > ul {
-	align-items: flex-end;
-
-	.wp-block-navigation-item {
-		justify-content: flex-end;
-	}
+// Allow menu items to be spaced out by space-between when only navigation links are present.
+.wp-block-navigation__container:only-child,
+.wp-block-page-list:only-child {
+	flex-grow: 1;
 }
 
 
@@ -360,9 +428,21 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: 1;
-	align-items: flex-start;
-	justify-content: flex-start;
+
+	.wp-block-navigation__responsive-container-content {
+		display: flex;
+		flex-wrap: var(--navigation-layout-wrap, wrap);
+		flex-direction: var(--navigation-layout-direction, initial);
+		justify-content: var(--navigation-layout-justify, initial);
+		align-items: var(--navigation-layout-align, initial);
+	}
+
+	// If the responsive wrapper is present but overlay is not open,
+	// overlay styles shouldn't apply.
+	&:not(.is-menu-open.is-menu-open) {
+		color: inherit !important;
+		background-color: inherit !important;
+	}
 
 	// Overlay menu.
 	// Provide an opinionated default style for menu items inside.
@@ -370,8 +450,12 @@
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
 	&.is-menu-open {
-		display: flex;
+		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
+		background-color: inherit;
+
+		// Use em units to apply padding, so themes can more easily style this in various ways.
+		padding: 2rem;
 
 		// Allow modal to scroll.
 		overflow: auto;
@@ -379,43 +463,107 @@
 		// Give it a z-index just higher than the adminbar.
 		z-index: 100000;
 
-		padding: 24px;
-		background-color: inherit;
+		.wp-block-navigation__responsive-container-content {
+			// Add padding above to accommodate close button.
+			padding-top: calc(2rem + #{ $navigation-icon-size });
 
-		.wp-block-navigation__container {
+			// Don't crop the focus style.
+			overflow: visible;
+
+			// Override the container flex layout settings
+			// because we want overlay menu to always display
+			// as a column.
 			display: flex;
 			flex-direction: column;
-			margin-left: auto;
-			margin-right: auto;
-			align-items: flex-start;
-			line-height: 48px;
-			padding: 0;
+			flex-wrap: nowrap;
 
+			// Inherit alignment settings from container.
+			align-items: var(--navigation-layout-justification-setting, inherit);
+
+			// Always align the contents of the menu to the top.
+			&,
+			.wp-block-page-list,
+			.wp-block-navigation__container {
+				justify-content: flex-start;
+			}
+
+			.wp-block-navigation__submenu-icon {
+				display: none;
+			}
+
+			// Always expand/unfold submenus inside the modal.
+			.has-child .submenu-container,
+			.has-child .wp-block-navigation__submenu-container {
+				// Unset CSS that hides dropdown menus.
+				opacity: 1;
+				visibility: visible;
+				height: auto;
+				width: auto;
+				overflow: initial;
+				min-width: 200px;
+
+				// Position and style.
+				position: static;
+				border: none;
+				padding-left: 2rem;
+				padding-right: 2rem;
+			}
+
+			// Space unfolded items using gap and padding for submenus.
+			.wp-block-navigation__submenu-container,
+			.wp-block-navigation__container {
+				gap: inherit;
+			}
+
+			// Apply top padding to nested submenus.
+			.wp-block-navigation__submenu-container {
+				padding-top: var(--wp--style--block-gap, 2em);
+			}
+
+			// A default padding is added to submenu items. It's not appropriate inside the modal.
+			.wp-block-navigation-item__content {
+				padding: 0;
+			}
+
+			// Default column display for overlay menu contents.
+			.wp-block-navigation__container,
+			.wp-block-navigation-item,
 			.wp-block-page-list {
+				display: flex;
 				flex-direction: column;
+				// Inherit alignment settings from container.
+				align-items: var(--navigation-layout-justification-setting, initial);
 			}
 		}
 
 		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
-		// @todo: We should revisit this so that the overlay colors can be applied, instead of the background.
 		.wp-block-navigation-item .wp-block-navigation__submenu-container,
-		.wp-block-navigation-item {
+		.wp-block-navigation-item,
+		.wp-block-page-list {
 			color: inherit !important;
 			background: transparent !important;
+		}
+
+		// Override justification dropdown menu positioning rules.
+		.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
+			right: auto;
+			left: auto;
 		}
 	}
 
 	@include break-small() {
-		&:not(.is-menu-open) {
-			display: flex;
-			flex-direction: row;
-			position: relative;
-			z-index: 2;
-			background-color: inherit;
+		&:not(.hidden-by-default) {
+			&:not(.is-menu-open) {
+				display: block;
+				width: 100%;
+				position: relative;
+				z-index: auto;
+				background-color: inherit;
 
-			.wp-block-navigation__responsive-container-close {
-				display: none;
+				.wp-block-navigation__responsive-container-close {
+					display: none;
+				}
 			}
 		}
 
@@ -429,9 +577,16 @@
 }
 
 // Default menu background and font color.
-.wp-block-navigation:not(.has-background) .wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation:not(.has-background)
+.wp-block-navigation__responsive-container.is-menu-open {
 	background-color: #fff;
 	color: #000;
+}
+
+// Overlay menu toggle button label
+.wp-block-navigation__toggle_button_label {
+	font-size: 1rem;
+	font-weight: bold;
 }
 
 // Menu and close buttons.
@@ -449,8 +604,8 @@
 		fill: currentColor;
 		pointer-events: none;
 		display: block;
-		width: 24px;
-		height: 24px;
+		width: $navigation-icon-size;
+		height: $navigation-icon-size;
 	}
 }
 
@@ -458,72 +613,45 @@
 .wp-block-navigation__responsive-container-open {
 	display: flex;
 
-	@include break-small {
-		display: none;
-	}
-
-	// Justify the button.
-	.items-justified-left & {
-		margin-left: 0;
-		margin-right: auto;
-	}
-
-	.items-justified-center & {
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.items-justified-right & {
-		margin-left: auto;
-		margin-right: 0;
+	&:not(.always-shown) {
+		@include break-small {
+			display: none;
+		}
 	}
 }
 
 // Button to close the menus.
 .wp-block-navigation__responsive-container-close {
 	position: absolute;
-	top: 24px;
-	right: 24px;
+	top: 0;
+	right: 0;
 	z-index: 2; // Needs to be above the modal z index itself.
 }
 
 // The menu adds wrapping containers.
 .wp-block-navigation__responsive-close {
 	width: 100%;
+
+	// This element is not keyboard accessible, and is focusable only using the mouse.
+	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,
+	// where clicking that scrim closes the overlay just like the close button.
+	// It should not have a visible focus rectangle.
+	&:focus {
+		outline: none;
+	}
 }
 
 .is-menu-open .wp-block-navigation__responsive-close,
 .is-menu-open .wp-block-navigation__responsive-dialog,
 .is-menu-open .wp-block-navigation__responsive-container-content {
-	width: 100%;
-	height: 100%;
+	box-sizing: border-box;
 }
 
-// Always show submenus fully expanded inside the modal menu.
-.wp-block-navigation .wp-block-navigation__responsive-container.is-menu-open {
-	.wp-block-navigation__submenu-icon {
-		display: none;
-	}
-
-	.has-child .submenu-container,
-	.has-child .wp-block-navigation__submenu-container {
-		position: relative;
-		opacity: 1;
-		visibility: visible;
-		height: auto;
-		width: auto;
-
-		padding: 0 0 0 32px;
-		border: none;
-	}
-
-	.wp-block-navigation-item,
-	.wp-block-page-list {
-		flex-direction: column;
-		align-items: flex-start;
-	}
+.wp-block-navigation__responsive-dialog {
+	position: relative;
 }
 
+// Prevent scrolling of the parent content when the modal is open.
 html.has-modal-open {
 	overflow: hidden;
 }

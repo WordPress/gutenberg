@@ -22,8 +22,8 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 	);
 
 	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_picked_text_color = array_key_exists( 'customTextColor', $attributes );
+	$has_named_text_color  = array_key_exists( 'textColor', $context );
+	$has_picked_text_color = array_key_exists( 'customTextColor', $context );
 	$has_custom_text_color = isset( $context['style']['color']['text'] );
 
 	// If has text color.
@@ -34,17 +34,17 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $attributes['textColor'] ) );
+		$colors['css_classes'][] = sprintf( 'has-%s-color', _wp_to_kebab_case( $context['textColor'] ) );
 	} elseif ( $has_picked_text_color ) {
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['customTextColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['style']['color']['text'] );
 	}
 
 	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_picked_background_color = array_key_exists( 'customBackgroundColor', $attributes );
+	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
+	$has_picked_background_color = array_key_exists( 'customBackgroundColor', $context );
 	$has_custom_background_color = isset( $context['style']['color']['background'] );
 
 	// If has background color.
@@ -55,17 +55,17 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $attributes['backgroundColor'] ) );
+		$colors['css_classes'][] = sprintf( 'has-%s-background-color', _wp_to_kebab_case( $context['backgroundColor'] ) );
 	} elseif ( $has_picked_background_color ) {
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['customBackgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['style']['color']['background'] );
 	}
 
 	// Overlay text color.
-	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $attributes );
-	$has_picked_overlay_text_color = array_key_exists( 'customOverlayTextColor', $attributes );
+	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $context );
+	$has_picked_overlay_text_color = array_key_exists( 'customOverlayTextColor', $context );
 
 	// If it has a text color.
 	if ( $has_named_overlay_text_color || $has_picked_overlay_text_color ) {
@@ -74,14 +74,14 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	// Give overlay colors priority, fall back to Navigation block colors, then global styles.
 	if ( $has_named_overlay_text_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $attributes['overlayTextColor'] ) );
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', _wp_to_kebab_case( $context['overlayTextColor'] ) );
 	} elseif ( $has_picked_overlay_text_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
+		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $context['customOverlayTextColor'] );
 	}
 
 	// Overlay background colors.
-	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
-	$has_picked_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $attributes );
+	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $context );
+	$has_picked_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $context );
 
 	// If has background color.
 	if ( $has_named_overlay_background_color || $has_picked_overlay_background_color ) {
@@ -89,9 +89,9 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 	}
 
 	if ( $has_named_overlay_background_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $attributes['overlayBackgroundColor'] ) );
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', _wp_to_kebab_case( $context['overlayBackgroundColor'] ) );
 	} elseif ( $has_picked_overlay_background_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
+		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $context['customOverlayBackgroundColor'] );
 	}
 
 	return $colors;
@@ -119,7 +119,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
 	}
 
 	return $font_sizes;
@@ -128,6 +128,8 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
+ * @param boolean $open_submenus_on_click Whether to open submenus on click instead of hover.
+ * @param boolean $show_submenu_icons Whether to show submenu indicator icons.
  * @param boolean $is_navigation_child If block is a child of Navigation block.
  * @param array   $nested_pages The array of nested pages.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
@@ -136,13 +138,14 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  *
  * @return string List markup.
  */
-function block_core_page_list_render_nested_page_list( $is_navigation_child, $nested_pages, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
+function block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
 	$markup = '';
 	foreach ( (array) $nested_pages as $page ) {
 		$css_class       = $page['is_active'] ? ' current-menu-item' : '';
+		$aria_current    = $page['is_active'] ? ' aria-current="page"' : '';
 		$style_attribute = '';
 
 		$css_class .= in_array( $page['page_id'], $active_page_ancestor_ids, true ) ? ' current-menu-ancestor' : '';
@@ -152,6 +155,12 @@ function block_core_page_list_render_nested_page_list( $is_navigation_child, $ne
 
 		if ( $is_navigation_child ) {
 			$css_class .= ' wp-block-navigation-item';
+
+			if ( $open_submenus_on_click ) {
+				$css_class .= ' open-on-click';
+			} elseif ( $show_submenu_icons ) {
+				$css_class .= ' open-on-hover-click';
+			}
 		}
 
 		$navigation_child_content_class = $is_navigation_child ? ' wp-block-navigation-item__content' : '';
@@ -164,21 +173,39 @@ function block_core_page_list_render_nested_page_list( $is_navigation_child, $ne
 			}
 		}
 
-		$markup .= '<li class="wp-block-pages-list__item' . $css_class . '"' . $style_attribute . '>';
-		$markup .= '<a class="wp-block-pages-list__item__link' . $navigation_child_content_class . ' "href="' . esc_url( $page['link'] ) . '">' . wp_kses(
-			$page['title'],
-			wp_kses_allowed_html( 'post' )
-		) . '</a>';
+		$front_page_id = (int) get_option( 'page_on_front' );
+		if ( (int) $page['page_id'] === $front_page_id ) {
+			$css_class .= ' menu-item-home';
+		}
+
+		$title      = wp_kses( $page['title'], wp_kses_allowed_html( 'post' ) );
+		$aria_label = sprintf(
+			/* translators: Accessibility text. %s: Parent page title. */
+			__( '%s submenu' ),
+			wp_strip_all_tags( $title )
+		);
+
+		$markup .= '<li class="wp-block-pages-list__item' . esc_attr( $css_class ) . '"' . $style_attribute . '>';
+
+		if ( isset( $page['children'] ) && $is_navigation_child && $open_submenus_on_click ) {
+			$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="' . esc_attr( $navigation_child_content_class ) . ' wp-block-navigation-submenu__toggle" aria-expanded="false">' . esc_html( $title ) . '<span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>' .
+			'</button>';
+		} else {
+			$markup .= '<a class="wp-block-pages-list__item__link' . esc_attr( $navigation_child_content_class ) . '" href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . esc_html( $title ) . '</a>';
+		}
+
 		if ( isset( $page['children'] ) ) {
-			if ( $is_navigation_child ) {
+			if ( $is_navigation_child && $show_submenu_icons && ! $open_submenus_on_click ) {
+				$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
 				$markup .= '<span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
+				$markup .= '</button>';
 			}
 			$markup .= '<ul class="submenu-container';
 			// Extra classname is added when the block is a child of Navigation.
 			if ( $is_navigation_child ) {
 				$markup .= ' wp-block-navigation__submenu-container';
 			}
-			$markup .= '">' . block_core_page_list_render_nested_page_list( $is_navigation_child, $page['children'], $active_page_ancestor_ids, $colors, $depth + 1 ) . '</ul>';
+			$markup .= '">' . block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $page['children'], $active_page_ancestor_ids, $colors, $depth + 1 ) . '</ul>';
 		}
 		$markup .= '</li>';
 	}
@@ -208,9 +235,9 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
 /**
  * Renders the `core/page-list` block on server.
  *
- * @param array $attributes The block attributes.
- * @param array $content The saved content.
- * @param array $block The parsed block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The saved content.
+ * @param WP_Block $block      The parsed block.
  *
  * @return string Returns the page list markup.
  */
@@ -218,17 +245,17 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	$block_id++;
 
-	// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby values is resolved,
-	// update 'sort_column' to 'menu_order, post_title'. Sorting by both menu_order and post_title ensures a stable sort.
-	// Otherwise with pages that have the same menu_order value, we can see different ordering depending on how DB
-	// queries are constructed internally. For example we might see a different order when a limit is set to <499
-	// versus >= 500.
 	$all_pages = get_pages(
 		array(
-			'sort_column' => 'menu_order',
+			'sort_column' => 'menu_order,post_title',
 			'order'       => 'asc',
 		)
 	);
+
+	// If there are no pages, there is nothing to show.
+	if ( empty( $all_pages ) ) {
+		return;
+	}
 
 	$top_level_pages = array();
 
@@ -272,20 +299,25 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
-	$is_navigation_child = array_key_exists( 'isNavigationChild', $attributes ) ? $attributes['isNavigationChild'] : ! empty( $block->context );
+	// Limit the number of items to be visually displayed.
+	if ( ! empty( $attributes['__unstableMaxPages'] ) ) {
+		$nested_pages = array_slice( $nested_pages, 0, $attributes['__unstableMaxPages'] );
+	}
+
+	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
+
+	$open_submenus_on_click = array_key_exists( 'openSubmenusOnClick', $block->context ) ? $block->context['openSubmenusOnClick'] : false;
+
+	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 
-	$items_markup = block_core_page_list_render_nested_page_list( $is_navigation_child, $nested_pages, $active_page_ancestor_ids, $colors );
-
-	if ( $block->context && $block->context['showSubmenuIcon'] ) {
-		$css_classes .= ' show-submenu-icons';
-	}
+	$items_markup = block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $active_page_ancestor_ids, $colors );
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => $css_classes,
-			'style' => $style_attribute,
+			'class' => esc_attr( $css_classes ),
+			'style' => esc_attr( $style_attribute ),
 		)
 	);
 

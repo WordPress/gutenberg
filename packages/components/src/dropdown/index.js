@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -85,6 +86,10 @@ export default function Dropdown( {
 		<div
 			className={ classnames( 'components-dropdown', className ) }
 			ref={ containerRef }
+			// Some UAs focus the closest focusable parent when the toggle is
+			// clicked. Making this div focusable ensures such UAs will focus
+			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
+			tabIndex="-1"
 		>
 			{ renderToggle( args ) }
 			{ isOpen && (

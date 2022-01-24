@@ -36,7 +36,6 @@
 	align-items: center;
 	padding: 0 $grid-unit-20;
 	height: $grid-unit-60;
-	border-top: $border-width solid $gray-300;
 	border-bottom: $border-width solid $gray-300;
 
 	h2 {
@@ -50,7 +49,7 @@
 .components-panel__body + .components-panel__header,
 .components-panel__header + .components-panel__body,
 .components-panel__header + .components-panel__header {
-	margin-top: -1px;
+	margin-top: -$border-width;
 }
 
 .components-panel__body > .components-panel__body-title {

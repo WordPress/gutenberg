@@ -23,7 +23,14 @@ import { BlockIcon } from '@wordpress/block-editor';
  */
 import styles from './styles.scss';
 
-const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
+const EmbedNoPreview = ( {
+	label,
+	icon,
+	isSelected,
+	onPress,
+	previewable,
+	isDefaultEmbedInfo,
+} ) => {
 	const shouldRequestReview = useRef( false );
 	const [ isSheetVisible, setIsSheetVisible ] = useState( false );
 
@@ -114,7 +121,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		onPressContainer();
 	}
 
-	return (
+	const embedNoProviderPreview = (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
@@ -156,6 +163,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 				hideHeader
 				onDismiss={ onDismissSheet }
 				onClose={ onCloseSheet }
+				testID="embed-no-preview-modal"
 			>
 				<View style={ styles[ 'embed-no-preview__container' ] }>
 					<View style={ sheetIconStyle }>
@@ -166,11 +174,15 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 						/>
 					</View>
 					<Text style={ sheetTitleStyle }>
-						{ sprintf(
-							// translators: %s: embed block variant's label e.g: "Twitter".
-							__( '%s block previews are coming soon' ),
-							label
-						) }
+						{ isDefaultEmbedInfo
+							? __( 'Embed block previews are coming soon' )
+							: sprintf(
+									// translators: %s: embed block variant's label e.g: "Twitter".
+									__(
+										'%s embed block previews are coming soon'
+									),
+									label
+							  ) }
 					</Text>
 					<Text style={ sheetDescriptionStyle }>
 						{ comingSoonDescription }
@@ -192,6 +204,21 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					labelStyle={ sheetButtonStyle }
 				/>
 			</BottomSheet>
+		</>
+	);
+
+	return (
+		<>
+			{ previewable ? (
+				embedNoProviderPreview
+			) : (
+				<View style={ containerStyle }>
+					<BlockIcon icon={ icon } />
+					<Text style={ labelStyle }>
+						{ __( 'No preview available' ) }
+					</Text>
+				</View>
+			) }
 		</>
 	);
 };

@@ -12,7 +12,10 @@ import NumberControl from '../../number-control';
 import { COLORS, reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 
-const rangeHeight = () => css( { height: 30, minHeight: 30 } );
+const rangeHeightValue = 30;
+const railHeight = 4;
+const rangeHeight = () =>
+	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
 const thumbSize = 12;
 
 export const Root = styled.div`
@@ -38,7 +41,6 @@ export const Wrapper = styled.div`
 	color: ${ COLORS.blue.medium.focus };
 	display: block;
 	flex: 1;
-	padding-top: 18px;
 	position: relative;
 	width: 100%;
 
@@ -48,15 +50,15 @@ export const Wrapper = styled.div`
 `;
 
 export const BeforeIconWrapper = styled.span`
-	margin-top: 3px;
+	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginRight: 6 } ) }
 `;
 
 export const AfterIconWrapper = styled.span`
-	margin-top: 3px;
+	margin-top: ${ railHeight }px;
 
-	${ rtl( { marginLeft: 16 } ) }
+	${ rtl( { marginLeft: 6 } ) }
 `;
 
 const railBackgroundColor = ( { disabled, railColor } ) => {
@@ -78,11 +80,11 @@ export const Rail = styled.span`
 	pointer-events: none;
 	right: 0;
 	display: block;
-	height: 3px;
+	height: ${ railHeight }px;
 	position: absolute;
-	margin-top: 14px;
+	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
 	top: 0;
-	border-radius: 9999px;
+	border-radius: ${ railHeight }px;
 
 	${ railBackgroundColor };
 `;
@@ -101,13 +103,13 @@ const trackBackgroundColor = ( { disabled, trackColor } ) => {
 
 export const Track = styled.span`
 	background-color: currentColor;
-	border-radius: 9999px;
+	border-radius: ${ railHeight }px;
 	box-sizing: border-box;
-	height: 3px;
+	height: ${ railHeight }px;
 	pointer-events: none;
 	display: block;
 	position: absolute;
-	margin-top: 14px;
+	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
 	top: 0;
 
 	${ trackBackgroundColor };
@@ -136,7 +138,7 @@ const markFill = ( { disabled, isFilled } ) => {
 
 export const Mark = styled.span`
 	box-sizing: border-box;
-	height: 9px;
+	height: ${ thumbSize }px;
 	left: 0;
 	position: absolute;
 	top: -4px;
@@ -179,7 +181,7 @@ export const ThumbWrapper = styled.span`
 	display: flex;
 	height: ${ thumbSize }px;
 	justify-content: center;
-	margin-top: 9px;
+	margin-top: ${ ( rangeHeightValue - thumbSize ) / 2 }px;
 	outline: 0;
 	pointer-events: none;
 	position: absolute;
@@ -187,10 +189,13 @@ export const ThumbWrapper = styled.span`
 	user-select: none;
 	width: ${ thumbSize }px;
 	border-radius: 50%;
-	transform: translateX( 4.5px );
 
 	${ thumbColor };
 	${ rtl( { marginLeft: -10 } ) };
+	${ rtl(
+		{ transform: 'translateX( 4.5px )' },
+		{ transform: 'translateX( -4.5px )' }
+	) };
 `;
 
 const thumbFocus = ( { isFocused } ) => {
@@ -199,13 +204,13 @@ const thumbFocus = ( { isFocused } ) => {
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: transparent;
-					box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+					background-color: var( --wp-admin-theme-color );
+					opacity: 0.4;
 					border-radius: 50%;
-					height: ${ thumbSize + 4 }px;
-					width: ${ thumbSize + 4 }px;
-					top: -2px;
-					left: -2px;
+					height: ${ thumbSize + 8 }px;
+					width: ${ thumbSize + 8 }px;
+					top: -4px;
+					left: -4px;
 				}
 		  `
 		: '';
@@ -247,21 +252,21 @@ const tooltipShow = ( { show } ) => {
 };
 
 const tooltipPosition = ( { position } ) => {
-	const isTop = position === 'top';
+	const isBottom = position === 'bottom';
 
-	if ( isTop ) {
+	if ( isBottom ) {
 		return css`
-			top: -80%;
+			bottom: -80%;
 		`;
 	}
 
 	return css`
-		bottom: -80%;
+		top: -80%;
 	`;
 };
 
 export const Tooltip = styled.span`
-	background: ${ COLORS.ui.border };
+	background: rgba( 0, 0, 0, 0.8 );
 	border-radius: 2px;
 	box-sizing: border-box;
 	color: white;

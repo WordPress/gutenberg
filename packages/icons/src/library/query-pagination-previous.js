@@ -12,7 +12,6 @@ const queryPaginationPrevious = (
 			height="3"
 			rx="1.5"
 			transform="rotate(-180 18 13.5)"
-			fill="#000"
 		/>
 		<Rect
 			x="13"
@@ -21,9 +20,8 @@ const queryPaginationPrevious = (
 			height="3"
 			rx="1.5"
 			transform="rotate(-180 13 13.5)"
-			fill="#000"
 		/>
-		<Path d="M7.5 14.5L5 12l2.5-2.5" stroke="#1E1E1E" strokeWidth="1.5" />
+		<Path d="M7.5 14.5L5 12l2.5-2.5" strokeWidth="1.5" />
 	</SVG>
 );
 

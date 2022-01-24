@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../../ui/utils';
+import { contextConnect } from '../../ui/context';
+import { View } from '../../view';
 import { useFlexBlock } from './hook';
+
+/**
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                     forwardedRef
+ */
+function FlexBlock( props, forwardedRef ) {
+	const flexBlockProps = useFlexBlock( props );
+
+	return <View { ...flexBlockProps } ref={ forwardedRef } />;
+}
 
 /**
  * `FlexBlock` is a primitive layout component that adaptively resizes content within layout containers like `Flex`.
@@ -14,10 +25,6 @@ import { useFlexBlock } from './hook';
  * </Flex>
  * ```
  */
-const FlexBlock = createComponent( {
-	as: 'div',
-	useHook: useFlexBlock,
-	name: 'FlexBlock',
-} );
+const ConnectedFlexBlock = contextConnect( FlexBlock, 'FlexBlock' );
 
-export default FlexBlock;
+export default ConnectedFlexBlock;

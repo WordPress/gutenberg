@@ -10,6 +10,20 @@ exports[`BlockAlignmentUI should match snapshot 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <Path
+            d="M5 15h14V9H5v6zm0 4.8h14v-1.5H5v1.5zM5 4.2v1.5h14V4.2H5z"
+          />
+        </SVG>,
+        "isActive": false,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "None",
+      },
+      Object {
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
             d="M4 9v6h14V9H4zm8-4.8H4v1.5h8V4.2zM4 19.8h8v-1.5H4v1.5z"
           />
         </SVG>,
@@ -24,7 +38,7 @@ exports[`BlockAlignmentUI should match snapshot 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <Path
-            d="M5 15h14V9H5v6zm0 4.8h14v-1.5H5v1.5zM5 4.2v1.5h14V4.2H5z"
+            d="M7 9v6h10V9H7zM5 19.8h14v-1.5H5v1.5zM5 4.3v1.5h14V4.3H5z"
           />
         </SVG>,
         "isActive": false,

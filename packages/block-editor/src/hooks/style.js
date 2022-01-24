@@ -18,6 +18,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useContext, createPortal } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -30,6 +31,7 @@ import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import BlockList from '../components/block-list';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -72,6 +74,7 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
+	const ignoredStyles = [ 'spacing.blockGap' ];
 	const output = {};
 	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
 		const path = STYLE_PROPERTY[ propKey ].value;
@@ -91,7 +94,7 @@ export function getInlineStyles( styles = {} ) {
 						output[ name ] = compileStyleValue( value );
 					}
 				} );
-			} else {
+			} else if ( ! ignoredStyles.includes( path.join( '.' ) ) ) {
 				output[ propKey ] = compileStyleValue( get( styles, path ) );
 			}
 		}
@@ -109,9 +112,7 @@ function compileElementsStyles( selector, elements = {} ) {
 				...map(
 					elementStyles,
 					( value, property ) =>
-						`\t${ kebabCase( property ) }: ${ value }${
-							element === 'link' ? '!important' : ''
-						};`
+						`\t${ kebabCase( property ) }: ${ value };`
 				),
 				'}',
 			].join( '\n' );
@@ -264,9 +265,9 @@ export const withBlockControls = createHigherOrderComponent(
 			<>
 				{ shouldDisplayControls && (
 					<>
+						<ColorEdit { ...props } />
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />
-						<ColorEdit { ...props } />
 						<DimensionsPanel { ...props } />
 					</>
 				) }
@@ -294,16 +295,20 @@ const withElementsStyles = createHigherOrderComponent(
 			blockElementsContainerIdentifier,
 			props.attributes.style?.elements
 		);
+		const element = useContext( BlockList.__unstableElementContext );
 
 		return (
 			<>
-				{ elements && (
-					<style
-						dangerouslySetInnerHTML={ {
-							__html: styles,
-						} }
-					/>
-				) }
+				{ elements &&
+					element &&
+					createPortal(
+						<style
+							dangerouslySetInnerHTML={ {
+								__html: styles,
+							} }
+						/>,
+						element
+					) }
 
 				<BlockListBlock
 					{ ...props }

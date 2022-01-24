@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { MutableRefObject, Ref, ReactNode, ReactText } from 'react';
+import type { ReactNode, ReactText } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { RadioStateReturn } from 'reakit';
 
@@ -13,7 +12,35 @@ import type { FormElementProps } from '../utils/types';
 
 export type ToggleGroupControlOptionProps = {
 	value: ReactText;
+	/**
+	 * Label for the option. If needed, the `aria-label` prop can be used in addition
+	 * to specify a different label for assistive technologies.
+	 */
 	label: string;
+	/**
+	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
+	 * show the aria-label or the label prop text.
+	 *
+	 * @default false
+	 */
+	showTooltip?: boolean;
+};
+
+export type WithToolTipProps = {
+	/**
+	 * React children
+	 */
+	children: ReactNode;
+	/**
+	 * Label for the Tooltip component.
+	 */
+	text: string;
+	/**
+	 * Whether to wrap the control option in a Tooltip component.
+	 *
+	 * @default false
+	 */
+	showTooltip?: boolean;
 };
 
 export type ToggleGroupControlProps = Omit<
@@ -68,26 +95,4 @@ export type ToggleGroupControlContextProps = RadioStateReturn & {
 	 * @default false
 	 */
 	isBlock?: boolean;
-};
-
-export type ToggleGroupControlButtonProps = {
-	className?: string;
-	forwardedRef?: Ref< any >;
-	/**
-	 * Renders `ToggleGroupControl` is a (CSS) block element.
-	 *
-	 * @default false
-	 */
-	isBlock?: boolean;
-	label: string;
-	showSeparator?: boolean;
-	value?: ReactText;
-	state?: any;
-};
-
-export type ToggleGroupControlBackdropProps = {
-	containerRef: MutableRefObject< HTMLElement | undefined >;
-	containerWidth?: number | null;
-	isAdaptiveWidth?: boolean;
-	state?: any;
 };

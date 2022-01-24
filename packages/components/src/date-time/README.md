@@ -65,11 +65,9 @@ A callback function which receives a Date object representing a day as an argume
 -   Type: `Function`
 -   Required: No
 
-### isDayHighlighted
+### onMonthPreviewed
 
-A callback function which receives a moment object representing a day as an argument, and should return a Boolean to signify if the day is visually highlighted in the calendar.
+A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
 
-This function will be called on each day, every time user browses into a different month. If you want to force an update to highlights, pass a new reference to your function. Otherwise, make sure the reference does not change between renders to fully leverage the caching.
-
--   Type: `Function`
--   Required: No
+- Type: `Function`
+- Required: No

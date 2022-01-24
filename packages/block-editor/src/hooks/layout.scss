@@ -22,7 +22,9 @@
 	font-size: $helptext-font-size;
 }
 
-.block-editor-hooks__flex-layout-justification-controls {
+.block-editor-hooks__flex-layout-justification-controls,
+.block-editor-hooks__flex-layout-orientation-controls {
+	margin-bottom: $grid-unit-15;
 	legend {
 		margin-bottom: $grid-unit-10;
 	}

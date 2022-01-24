@@ -92,7 +92,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should default to returning the same state', () => {
-			const state = {};
+			const state = [];
 			expect( editedPost( state, {} ) ).toBe( state );
 		} );
 

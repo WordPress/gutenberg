@@ -8,7 +8,13 @@ import { text } from '@storybook/addon-knobs';
  */
 import Tip from '../';
 
-export default { title: 'Components/Tip', component: Tip };
+export default {
+	title: 'Components/Tip',
+	component: Tip,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const tipText = text( 'Text', 'An example tip' );

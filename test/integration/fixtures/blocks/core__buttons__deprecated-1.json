@@ -4,7 +4,10 @@
 		"name": "core/buttons",
 		"isValid": true,
 		"attributes": {
-			"contentJustification": "center"
+			"layout": {
+				"type": "flex",
+				"justifyContent": "center"
+			}
 		},
 		"innerBlocks": [
 			{

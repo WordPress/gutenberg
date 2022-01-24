@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { ScrollView, View } from 'react-native';
+import { Platform, ScrollView, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -43,7 +43,13 @@ function HeaderToolbar( {
 } ) {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
-		scrollViewRef.current.scrollTo( { x: 0 } );
+		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
+		const isAndroid = Platform.OS === 'android';
+		if ( isAndroid && isRTL ) {
+			scrollViewRef.current.scrollToEnd();
+		} else {
+			scrollViewRef.current.scrollTo( { x: 0 } );
+		}
 	};
 	const renderHistoryButtons = () => {
 		const buttons = [

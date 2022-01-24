@@ -1,59 +1,73 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, Icon } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
+import {
+	Button,
+	Icon,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
 
-function NavigationToggle( { icon, isOpen } ) {
-	const {
-		isRequestingSiteIcon,
-		navigationPanelMenu,
-		siteIconUrl,
-	} = useSelect( ( select ) => {
-		const { getCurrentTemplateNavigationPanelSubMenu } = select(
-			editSiteStore
-		);
-		const { getEntityRecord, isResolving } = select( coreDataStore );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+function NavigationToggle( { icon } ) {
+	const { isNavigationOpen, isRequestingSiteIcon, siteIconUrl } = useSelect(
+		( select ) => {
+			const { getEntityRecord, isResolving } = select( coreDataStore );
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-		return {
-			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
-			navigationPanelMenu: getCurrentTemplateNavigationPanelSubMenu(),
-			siteIconUrl: siteData.site_icon_url,
-		};
-	}, [] );
+			return {
+				isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
+				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+					'root',
+					'__unstableBase',
+					undefined,
+				] ),
+				siteIconUrl: siteData.site_icon_url,
+			};
+		},
+		[]
+	);
+	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
-	const {
-		openNavigationPanelToMenu,
-		setIsNavigationPanelOpened,
-	} = useDispatch( editSiteStore );
+	const disableMotion = useReducedMotion();
 
-	const toggleNavigationPanel = () => {
-		if ( isOpen ) {
-			setIsNavigationPanelOpened( false );
-			return;
+	const navigationToggleRef = useRef();
+
+	useEffect( () => {
+		// TODO: Remove this effect when alternative solution is merged.
+		// See: https://github.com/WordPress/gutenberg/pull/37314
+		if ( ! isNavigationOpen ) {
+			navigationToggleRef.current.focus();
 		}
-		openNavigationPanelToMenu( navigationPanelMenu );
-	};
+	}, [ isNavigationOpen ] );
+
+	const toggleNavigationPanel = () =>
+		setIsNavigationPanelOpened( ! isNavigationOpen );
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
+	const effect = {
+		expand: {
+			scale: 1.7,
+			borderRadius: 0,
+			transition: { type: 'tween', duration: '0.2' },
+		},
+	};
+
 	if ( siteIconUrl ) {
 		buttonIcon = (
-			<img
+			<motion.img
+				variants={ ! disableMotion && effect }
 				alt={ __( 'Site Icon' ) }
 				className="edit-site-navigation-toggle__site-icon"
 				src={ siteIconUrl }
@@ -66,20 +80,25 @@ function NavigationToggle( { icon, isOpen } ) {
 	}
 
 	return (
-		<div
+		<motion.div
 			className={
-				'edit-site-navigation-toggle' + ( isOpen ? ' is-open' : '' )
+				'edit-site-navigation-toggle' +
+				( isNavigationOpen ? ' is-open' : '' )
 			}
+			whileHover="expand"
 		>
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
+				ref={ navigationToggleRef }
+				// isPressed will add unwanted styles.
+				aria-pressed={ isNavigationOpen }
 				onClick={ toggleNavigationPanel }
 				showTooltip
 			>
 				{ buttonIcon }
 			</Button>
-		</div>
+		</motion.div>
 	);
 }
 

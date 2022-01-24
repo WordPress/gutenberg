@@ -12,6 +12,9 @@ import { Text } from '../../text';
 export default {
 	component: Surface,
 	title: 'Components (Experimental)/Surface',
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const variantOptions = {

@@ -30,7 +30,7 @@ export default function PostExcerptEditor( {
 	isSelected,
 	context: { postId, postType, queryId },
 } ) {
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 	const [
@@ -57,13 +57,7 @@ export default function PostExcerptEditor( {
 		return document.body.textContent || document.body.innerText || '';
 	}, [ renderedExcerpt ] );
 	if ( ! postType || ! postId ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Post excerpt block: no post found.' ) }
-				</Warning>
-			</div>
-		);
+		return <div { ...blockProps }>{ __( 'Post Excerpt' ) }</div>;
 	}
 	if ( isProtected && ! userCanEdit ) {
 		return (
@@ -102,6 +96,7 @@ export default function PostExcerptEditor( {
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
+			tagName="p"
 		/>
 	) : (
 		( renderedExcerpt && (

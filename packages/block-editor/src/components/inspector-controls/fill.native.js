@@ -14,7 +14,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import groups from './groups';
-import { useBlockEditContext } from '../block-edit/context';
+import useDisplayBlockControls from '../use-display-block-controls';
 import { BlockSettingsButton } from '../block-settings';
 
 export default function InspectorControlsFill( {
@@ -22,13 +22,14 @@ export default function InspectorControlsFill( {
 	__experimentalGroup: group = 'default',
 	...props
 } ) {
-	const { isSelected } = useBlockEditContext();
+	const isDisplayed = useDisplayBlockControls();
+
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
 		warning( `Unknown InspectorControl group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! isSelected ) {
+	if ( ! isDisplayed ) {
 		return null;
 	}
 

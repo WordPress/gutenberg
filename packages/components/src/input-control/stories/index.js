@@ -16,6 +16,9 @@ import InputControl from '../';
 export default {
 	title: 'Components/InputControl',
 	component: InputControl,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 function Example() {
@@ -41,6 +44,7 @@ function Example() {
 			{
 				default: 'default',
 				small: 'small',
+				'__unstable-large': '__unstable-large',
 			},
 			'default'
 		),

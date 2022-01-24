@@ -127,6 +127,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -272,6 +273,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 				save: expect.any( Function ),
 			} );
 		} );
@@ -307,6 +309,7 @@ describe( 'blocks', () => {
 					keywords: [],
 					supports: {},
 					styles: [],
+					variations: [],
 				}
 			);
 		} );
@@ -338,6 +341,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -371,6 +375,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -406,6 +411,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -473,6 +479,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -503,6 +510,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -547,6 +555,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -605,6 +614,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -630,6 +640,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -715,6 +726,7 @@ describe( 'blocks', () => {
 										keywords: [],
 										supports: {},
 										styles: [],
+										variations: [],
 										save: () => null,
 										...get(
 											serverSideBlockDefinitions,
@@ -969,6 +981,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -1047,6 +1060,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 
@@ -1071,6 +1085,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				supports: {},
 				styles: [],
+				variations: [],
 			} );
 		} );
 	} );

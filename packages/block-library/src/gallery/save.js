@@ -6,15 +6,20 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import saveWithoutInnerBlocks from './v1/save';
+import { isGalleryV2Enabled } from './shared';
 
 export default function saveWithInnerBlocks( { attributes } ) {
-	if ( attributes?.ids?.length > 0 || attributes?.images?.length > 0 ) {
+	if ( ! isGalleryV2Enabled() ) {
 		return saveWithoutInnerBlocks( { attributes } );
 	}
 
@@ -25,10 +30,12 @@ export default function saveWithInnerBlocks( { attributes } ) {
 		[ `columns-default` ]: columns === undefined,
 		'is-cropped': imageCrop,
 	} );
+	const blockProps = useBlockProps.save( { className } );
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
-			<InnerBlocks.Content />
+		<figure { ...innerBlocksProps }>
+			{ innerBlocksProps.children }
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"

@@ -35,5 +35,8 @@ RCT_EXTERN_METHOD(mediaFilesBlockReplaceSync:(NSArray<NSDictionary *> *)mediaFil
 RCT_EXTERN_METHOD(requestPreview)
 RCT_EXTERN_METHOD(requestBlockTypeImpressions:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(setBlockTypeImpressions:(NSDictionary *)impressions)
+RCT_EXTERN_METHOD(requestContactCustomerSupport)
+RCT_EXTERN_METHOD(requestGotoCustomerSupportOptions)
+RCT_EXTERN_METHOD(sendEventToHost:(NSString)eventName properties:(NSDictionary *)properties)
 
 @end

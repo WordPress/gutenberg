@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	find,
-	get,
-	has,
-	isString,
-	pick,
-	mapValues,
-	includes,
-	some,
-} from 'lodash';
+import { find, get, has, isString, includes, some } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -19,7 +10,6 @@ import createSelector from 'rememo';
 import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
-	isUnmodifiedDefaultBlock,
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
@@ -43,7 +33,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { cleanForSlug } from '../utils/url';
-import { getTemplatePartIcon } from './utils/get-template-part-icon';
+import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -679,63 +669,6 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 );
 
 /**
- * Returns the current autosave, or null if one is not set (i.e. if the post
- * has yet to be autosaved, or has been saved or published since the last
- * autosave).
- *
- * @deprecated since 5.6. Callers should use the `getAutosave( postType, postId, userId )`
- * 			   selector from the '@wordpress/core-data' package.
- *
- * @param {Object} state Editor state.
- *
- * @return {?Object} Current autosave, if exists.
- */
-export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
-	deprecated( "`wp.data.select( 'core/editor' ).getAutosave()`", {
-		since: '5.3',
-		alternative:
-			"`wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-	} );
-
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	const currentUserId = get( select( coreStore ).getCurrentUser(), [ 'id' ] );
-	const autosave = select( coreStore ).getAutosave(
-		postType,
-		postId,
-		currentUserId
-	);
-	return mapValues( pick( autosave, AUTOSAVE_PROPERTIES ), getPostRawValue );
-} );
-
-/**
- * Returns the true if there is an existing autosave, otherwise false.
- *
- * @deprecated since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector
- *             from the '@wordpress/core-data' package and check for a truthy value.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether there is an existing autosave.
- */
-export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
-	deprecated( "`wp.data.select( 'core/editor' ).hasAutosave()`", {
-		since: '5.3',
-		alternative:
-			"`!! wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-	} );
-
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	const currentUserId = get( select( coreStore ).getCurrentUser(), [ 'id' ] );
-	return !! select( coreStore ).getAutosave(
-		postType,
-		postId,
-		currentUserId
-	);
-} );
-
-/**
  * Return true if the post being edited is being scheduled. Preferring the
  * unsaved status values.
  *
@@ -906,7 +839,12 @@ export function getEditedPostPreviewLink( state ) {
 	}
 
 	let previewLink = getAutosaveAttribute( state, 'preview_link' );
-	if ( ! previewLink ) {
+	// Fix for issue: https://github.com/WordPress/gutenberg/issues/33616
+	// If the post is draft, ignore the preview link from the autosave record,
+	// because the preview could be a stale autosave if the post was switched from
+	// published to draft.
+	// See: https://github.com/WordPress/gutenberg/pull/37952
+	if ( ! previewLink || 'draft' === getCurrentPost( state ).status ) {
 		previewLink = getEditedPostAttribute( state, 'link' );
 		if ( previewLink ) {
 			previewLink = addQueryArgs( previewLink, { preview: true } );
@@ -973,42 +911,6 @@ export function getSuggestedPostFormat( state ) {
 		default:
 			return null;
 	}
-}
-
-/**
- * Returns a set of blocks which are to be used in consideration of the post's
- * generated save content.
- *
- * @deprecated since Gutenberg 6.2.0.
- *
- * @param {Object} state Editor state.
- *
- * @return {WPBlock[]} Filtered set of blocks for save.
- */
-export function getBlocksForSerialization( state ) {
-	deprecated( '`core/editor` getBlocksForSerialization selector', {
-		since: '5.3',
-		alternative: 'getEditorBlocks',
-		hint: 'Blocks serialization pre-processing occurs at save time',
-	} );
-
-	const blocks = state.editor.present.blocks.value;
-
-	// WARNING: Any changes to the logic of this function should be verified
-	// against the implementation of isEditedPostEmpty, which bypasses this
-	// function for performance' sake, in an assumption of this current logic
-	// being irrelevant to the optimized condition of emptiness.
-
-	// A single unmodified default block is assumed to be equivalent to an
-	// empty post.
-	const isSingleUnmodifiedDefaultBlock =
-		blocks.length === 1 && isUnmodifiedDefaultBlock( blocks[ 0 ] );
-
-	if ( isSingleUnmodifiedDefaultBlock ) {
-		return [];
-	}
-
-	return blocks;
 }
 
 /**
@@ -1269,8 +1171,7 @@ export function getEditorBlocks( state ) {
  */
 export function getEditorSelectionStart( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
-		since: '10.0',
-		plugin: 'Gutenberg',
+		since: '5.8',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionStart;
@@ -1286,8 +1187,7 @@ export function getEditorSelectionStart( state ) {
  */
 export function getEditorSelectionEnd( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
-		since: '10.0',
-		plugin: 'Gutenberg',
+		since: '5.8',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionEnd;
@@ -1361,6 +1261,7 @@ function getBlockEditorSelector( name ) {
 		deprecated( "`wp.data.select( 'core/editor' )." + name + '`', {
 			since: '5.3',
 			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
+			version: '6.2',
 		} );
 
 		return select( blockEditorStore )[ name ]( ...args );

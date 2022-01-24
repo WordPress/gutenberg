@@ -70,7 +70,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		// Ignore the deprecation if it produces a block which is not valid.
 		let [ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
 
-		// If the migrated block is not valid intiailly, try the built-in fixes.
+		// If the migrated block is not valid initially, try the built-in fixes.
 		if ( ! isValid ) {
 			migratedBlock = applyBuiltInValidationFixes(
 				migratedBlock,
@@ -80,7 +80,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		}
 
 		// An invalid block does not imply incorrect HTML but the fact block
-		// source information could be lost on reserialization.
+		// source information could be lost on re-serialization.
 		if ( ! isValid ) {
 			continue;
 		}

@@ -12,7 +12,6 @@ import { v4 as uuid } from 'uuid';
 import {
 	activatePlugin,
 	createNewPost,
-	clickButton,
 	deactivatePlugin,
 	insertBlock,
 	openDocumentSettingsSidebar,
@@ -30,11 +29,9 @@ describe( 'changing image size', () => {
 
 	it( 'should insert and change my image size', async () => {
 		await insertBlock( 'Image' );
-		await clickButton( 'Media Library' );
-
-		// Wait for media modal to appear and upload image.
-		await page.waitForSelector( '.media-modal input[type=file]' );
-		const inputElement = await page.$( '.media-modal input[type=file]' );
+		const inputElement = await page.waitForSelector(
+			'figure[aria-label="Block: Image"] input[type=file]'
+		);
 		const testImagePath = path.join(
 			__dirname,
 			'..',
@@ -49,12 +46,7 @@ describe( 'changing image size', () => {
 		await inputElement.uploadFile( tmpFileName );
 
 		// Wait for upload to finish.
-		await page.waitForSelector(
-			`.media-modal li[aria-label="${ filename }"]`
-		);
-
-		// Insert the uploaded image.
-		await page.click( '.media-modal button.media-button-select' );
+		await page.waitForXPath( `//img[contains(@src, "${ filename }")]` );
 
 		// Select the new size updated with the plugin.
 		await openDocumentSettingsSidebar();

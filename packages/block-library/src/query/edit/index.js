@@ -11,7 +11,7 @@ import {
 	useBlockProps,
 	useSetting,
 	store as blockEditorStore,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
-import QueryInspectorControls from './query-inspector-controls';
+import QueryInspectorControls from './inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 import { getFirstQueryClientIdFromBlocks } from '../utils';
@@ -65,7 +65,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 
 	// Changes in query property (which is an object) need to be in the same callback,
 	// because updates are batched after the render and changes in different query properties
-	// would cause to overide previous wanted changes.
+	// would cause to override previous wanted changes.
 	useEffect( () => {
 		const newQuery = {};
 		if ( ! query.perPage && postsPerPage ) {
@@ -79,7 +79,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
-		if ( ! queryId ) {
+		if ( ! Number.isFinite( queryId ) ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { queryId: instanceId } );
 		}

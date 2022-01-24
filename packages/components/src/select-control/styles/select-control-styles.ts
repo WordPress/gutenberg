@@ -27,6 +27,7 @@ const fontSizeStyles = ( { selectSize }: SelectProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ selectSize as Size ];
@@ -55,11 +56,34 @@ const sizeStyles = ( { selectSize }: SelectProps ) => {
 			lineHeight: 1,
 			minHeight: 24,
 		},
+		'__unstable-large': {
+			height: 40,
+			lineHeight: 1,
+			minHeight: 40,
+		},
 	};
 
 	const style = sizes[ selectSize as Size ] || sizes.default;
 
 	return css( style );
+};
+
+const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
+	const sizes = {
+		default: {
+			paddingLeft: 8,
+			paddingRight: 24,
+		},
+		small: {
+			paddingLeft: 8,
+			paddingRight: 24,
+		},
+		'__unstable-large': {
+			paddingLeft: 16,
+			paddingRight: 32,
+		},
+	};
+	return rtl( sizes[ selectSize ] );
 };
 
 // TODO: Resolve need to use &&& to increase specificity
@@ -80,8 +104,7 @@ export const Select = styled.select< SelectProps >`
 		${ disabledStyles };
 		${ fontSizeStyles };
 		${ sizeStyles };
-
-		${ rtl( { paddingLeft: 8, paddingRight: 24 } ) }
+		${ sizePaddings };
 	}
 `;
 

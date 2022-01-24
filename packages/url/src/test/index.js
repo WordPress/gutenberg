@@ -30,6 +30,7 @@ import {
 	cleanForSlug,
 	getQueryArgs,
 	getFilename,
+	normalizePath,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -983,5 +984,28 @@ describe( 'cleanForSlug', () => {
 
 	it( 'should return an empty string for falsy argument', () => {
 		expect( cleanForSlug( null ) ).toBe( '' );
+	} );
+} );
+
+describe( 'normalizePath', () => {
+	it( 'returns same value if no query parameters', () => {
+		const path = '/foo/bar';
+
+		expect( normalizePath( path ) ).toBe( path );
+	} );
+
+	it( 'returns a stable path', () => {
+		const abc = normalizePath( '/foo/bar?a=5&b=1&c=2' );
+		const bca = normalizePath( '/foo/bar?b=1&c=2&a=5' );
+		const bac = normalizePath( '/foo/bar?b=1&a=5&c=2' );
+		const acb = normalizePath( '/foo/bar?a=5&c=2&b=1' );
+		const cba = normalizePath( '/foo/bar?c=2&b=1&a=5' );
+		const cab = normalizePath( '/foo/bar?c=2&a=5&b=1' );
+
+		expect( abc ).toBe( bca );
+		expect( bca ).toBe( bac );
+		expect( bac ).toBe( acb );
+		expect( acb ).toBe( cba );
+		expect( cba ).toBe( cab );
 	} );
 } );

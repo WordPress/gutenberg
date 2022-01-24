@@ -24,11 +24,13 @@ import createSelector from 'rememo';
 import {
 	getBlockType,
 	getBlockTypes,
+	getBlockVariations,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 
 /**
@@ -825,6 +827,7 @@ export const isAncestorMultiSelected = createSelector(
 		state.selection.selectionEnd.clientId,
 	]
 );
+
 /**
  * Returns the client ID of the block which begins the multi-selection set, or
  * null if there is no multi-selection.
@@ -887,13 +890,13 @@ export function getBlockOrder( state, rootClientId ) {
  * Returns the index at which the block corresponding to the specified client
  * ID occurs within the block order, or `-1` if the block does not exist.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     Block client ID.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
  * @return {number} Index at which block exists in order.
  */
-export function getBlockIndex( state, clientId, rootClientId ) {
+export function getBlockIndex( state, clientId ) {
+	const rootClientId = getBlockRootClientId( state, clientId );
 	return getBlockOrder( state, rootClientId ).indexOf( clientId );
 }
 
@@ -1258,15 +1261,43 @@ const canInsertBlockTypeUnmemoized = (
 		parentName
 	);
 
-	if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
-		return hasParentAllowedBlock || hasBlockAllowedParent;
-	} else if ( hasParentAllowedBlock !== null ) {
-		return hasParentAllowedBlock;
-	} else if ( hasBlockAllowedParent !== null ) {
-		return hasBlockAllowedParent;
+	const canInsert =
+		( hasParentAllowedBlock === null && hasBlockAllowedParent === null ) ||
+		hasParentAllowedBlock === true ||
+		hasBlockAllowedParent === true;
+
+	if ( ! canInsert ) {
+		return canInsert;
 	}
 
-	return true;
+	/**
+	 * This filter is an ad-hoc solution to prevent adding template parts inside post content.
+	 * Conceptually, having a filter inside a selector is bad pattern so this code will be
+	 * replaced by a declarative API that doesn't the following drawbacks:
+	 *
+	 * Filters are not reactive: Upon switching between "template mode" and non "template mode",
+	 * the filter and selector won't necessarily be executed again. For now, it doesn't matter much
+	 * because you can't switch between the two modes while the inserter stays open.
+	 *
+	 * Filters are global: Once they're defined, they will affect all editor instances and all registries.
+	 * An ideal API would only affect specific editor instances.
+	 */
+	return applyFilters(
+		'blockEditor.__unstableCanInsertBlockType',
+		canInsert,
+		blockType,
+		rootClientId,
+		{
+			// Pass bound selectors of the current registry. If we're in a nested
+			// context, the data will differ from the one selected from the root
+			// registry.
+			getBlock: getBlock.bind( null, state ),
+			getBlockParentsByBlockName: getBlockParentsByBlockName.bind(
+				null,
+				state
+			),
+		}
+	);
 };
 
 /**
@@ -1301,6 +1332,90 @@ export const canInsertBlockType = createSelector(
 export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 	return clientIds.every( ( id ) =>
 		canInsertBlockType( state, getBlockName( state, id ), rootClientId )
+	);
+}
+
+/**
+ * Determines if the given block is allowed to be deleted.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientId     The block client Id.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given block is allowed to be removed.
+ */
+export function canRemoveBlock( state, clientId, rootClientId = null ) {
+	const attributes = getBlockAttributes( state, clientId );
+
+	// attributes can be null if the block is already deleted.
+	if ( attributes === null ) {
+		return true;
+	}
+
+	const { lock } = attributes;
+	const parentIsLocked = !! getTemplateLock( state, rootClientId );
+	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
+	if ( lock === undefined || lock?.remove === undefined ) {
+		return ! parentIsLocked;
+	}
+
+	// when remove is true, it means we cannot remove it.
+	return ! lock?.remove;
+}
+
+/**
+ * Determines if the given blocks are allowed to be removed.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientIds    The block client IDs to be removed.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given blocks are allowed to be removed.
+ */
+export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
+	return clientIds.every( ( clientId ) =>
+		canRemoveBlock( state, clientId, rootClientId )
+	);
+}
+
+/**
+ * Determines if the given block is allowed to be moved.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientId     The block client Id.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given block is allowed to be moved.
+ */
+export function canMoveBlock( state, clientId, rootClientId = null ) {
+	const attributes = getBlockAttributes( state, clientId );
+	if ( attributes === null ) {
+		return;
+	}
+
+	const { lock } = attributes;
+	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
+	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
+	if ( lock === undefined || lock?.move === undefined ) {
+		return ! parentIsLocked;
+	}
+
+	// when move is true, it means we cannot move it.
+	return ! lock?.move;
+}
+
+/**
+ * Determines if the given blocks are allowed to be moved.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientIds    The block client IDs to be moved.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given blocks are allowed to be moved.
+ */
+export function canMoveBlocks( state, clientIds, rootClientId = null ) {
+	return clientIds.every( ( clientId ) =>
+		canMoveBlock( state, clientId, rootClientId )
 	);
 }
 
@@ -1430,9 +1545,7 @@ const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 	};
 	if ( buildScope === 'transform' ) return blockItemBase;
 
-	const inserterVariations = blockType.variations.filter(
-		( { scope } ) => ! scope || scope.includes( 'inserter' )
-	);
+	const inserterVariations = getBlockVariations( blockType.name, 'inserter' );
 	return {
 		...blockItemBase,
 		initialAttributes: {},
@@ -1480,20 +1593,55 @@ export const getInserterItems = createSelector(
 			buildScope: 'inserter',
 		} );
 
-		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			const id = `core/block/${ reusableBlock.id }`;
+		/*
+		 * Matches block comment delimiters amid serialized content.
+		 *
+		 * @see `tokenizer` in `@wordpress/block-serialization-default-parser`
+		 * package
+		 *
+		 * blockParserTokenizer differs from the original tokenizer in the
+		 * following ways:
+		 *
+		 * - removed global flag (/g)
+		 * - prepended ^\s*
+		 *
+		 */
+		const blockParserTokenizer = /^\s*<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
 
-			const referencedBlocks = __experimentalGetParsedReusableBlock(
-				state,
-				reusableBlock.id
-			);
-			let referencedBlockType;
-			if ( referencedBlocks.length === 1 ) {
-				referencedBlockType = getBlockType(
-					referencedBlocks[ 0 ].name
-				);
+		const buildReusableBlockInserterItem = ( reusableBlock ) => {
+			let icon = symbol;
+
+			/*
+			 * Instead of always displaying a generic "symbol" icon for every
+			 * reusable block, try to use an icon that represents the first
+			 * outermost block contained in the reusable block. This requires
+			 * scanning the serialized form of the reusable block to find its
+			 * first block delimiter, then looking up the corresponding block
+			 * type, if available.
+			 */
+			if ( Platform.OS === 'web' ) {
+				const content =
+					typeof reusableBlock.content.raw === 'string'
+						? reusableBlock.content.raw
+						: reusableBlock.content;
+				const rawBlockMatch = content.match( blockParserTokenizer );
+				if ( rawBlockMatch ) {
+					const [
+						,
+						,
+						namespace = 'core/',
+						blockName,
+					] = rawBlockMatch;
+					const referencedBlockType = getBlockType(
+						namespace + blockName
+					);
+					if ( referencedBlockType ) {
+						icon = referencedBlockType.icon;
+					}
+				}
 			}
 
+			const id = `core/block/${ reusableBlock.id }`;
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const frecency = calculateFrecency( time, count );
 
@@ -1502,7 +1650,7 @@ export const getInserterItems = createSelector(
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
 				title: reusableBlock.title.raw,
-				icon: referencedBlockType ? referencedBlockType.icon : symbol,
+				icon,
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
@@ -1525,22 +1673,19 @@ export const getInserterItems = createSelector(
 			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
 
-		// Exclude any block type item that is to be replaced by a default
-		// variation.
-		const visibleBlockTypeInserterItems = blockTypeInserterItems.filter(
-			( { variations = [] } ) =>
-				! variations.some( ( { isDefault } ) => isDefault )
-		);
-
-		const blockVariations = [];
-		// Show all available blocks with variations
-		for ( const item of blockTypeInserterItems ) {
+		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
 			const { variations = [] } = item;
+			// Exclude any block type item that is to be replaced by a default variation
+			if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
+				accumulator.push( item );
+			}
 			if ( variations.length ) {
 				const variationMapper = getItemFromVariation( state, item );
-				blockVariations.push( ...variations.map( variationMapper ) );
+				accumulator.push( ...variations.map( variationMapper ) );
 			}
-		}
+			return accumulator;
+		}, [] );
+
 		// Ensure core blocks are prioritized in the returned results,
 		// because third party blocks can be registered earlier than
 		// the core blocks (usually by using the `init` action),
@@ -1553,20 +1698,11 @@ export const getInserterItems = createSelector(
 			type.push( block );
 			return blocks;
 		};
-		const items = visibleBlockTypeInserterItems.reduce( groupByType, {
-			core: [],
-			noncore: [],
-		} );
-		const variations = blockVariations.reduce( groupByType, {
-			core: [],
-			noncore: [],
-		} );
-		const sortedBlockTypes = [
-			...items.core,
-			...variations.core,
-			...items.noncore,
-			...variations.noncore,
-		];
+		const {
+			core: coreItems,
+			noncore: nonCoreItems,
+		} = items.reduce( groupByType, { core: [], noncore: [] } );
+		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
 		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
@@ -1705,6 +1841,44 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+/**
+ * Returns the block to be directly inserted by the block appender.
+ *
+ * @param    {Object}         state            Editor state.
+ * @param    {?string}        rootClientId     Optional root client ID of block list.
+ *
+ * @return {?WPDirectInsertBlock}              The block type to be directly inserted.
+ *
+ * @typedef {Object} WPDirectInsertBlock
+ * @property {string}         name             The type of block.
+ * @property {?Object}        attributes       Attributes to pass to the newly created block.
+ * @property {?Array<string>} attributesToCopy Attributes to be copied from adjecent blocks when inserted.
+ */
+export const __experimentalGetDirectInsertBlock = createSelector(
+	( state, rootClientId = null ) => {
+		if ( ! rootClientId ) {
+			return;
+		}
+		const defaultBlock =
+			state.blockListSettings[ rootClientId ]?.__experimentalDefaultBlock;
+		const directInsert =
+			state.blockListSettings[ rootClientId ]?.__experimentalDirectInsert;
+		if ( ! defaultBlock || ! directInsert ) {
+			return;
+		}
+		if ( typeof directInsert === 'function' ) {
+			return directInsert( getBlock( state, rootClientId ) )
+				? defaultBlock
+				: null;
+		}
+		return defaultBlock;
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.tree[ rootClientId ],
+	]
+);
+
 const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	if ( isBoolean( allowedBlockTypes ) ) {
 		return allowedBlockTypes;
@@ -1750,9 +1924,11 @@ const getAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
 		const { allowedBlockTypes } = getSettings( state );
-		const parsedPatterns = patterns.map( ( { name } ) =>
-			__experimentalGetParsedPattern( state, name )
-		);
+		const parsedPatterns = patterns
+			.filter( ( { inserter = true } ) => !! inserter )
+			.map( ( { name } ) =>
+				__experimentalGetParsedPattern( state, name )
+			);
 		const allowedPatterns = parsedPatterns.filter( ( { blocks } ) =>
 			checkAllowListRecursive( blocks, allowedBlockTypes )
 		);
@@ -1951,35 +2127,6 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
 		}, {} );
 	},
 	( state ) => [ state.blockListSettings ]
-);
-
-/**
- * Returns the parsed block saved as shared block with the given ID.
- *
- * @param {Object}        state Global application state.
- * @param {number|string} ref   The shared block's ID.
- *
- * @return {Object} The parsed block.
- */
-export const __experimentalGetParsedReusableBlock = createSelector(
-	( state, ref ) => {
-		const reusableBlock = find(
-			getReusableBlocks( state ),
-			( block ) => block.id === ref
-		);
-		if ( ! reusableBlock ) {
-			return null;
-		}
-
-		// Only reusableBlock.content.raw should be used here, `reusableBlock.content` is a
-		// workaround until #22127 is fixed.
-		return parse(
-			typeof reusableBlock.content.raw === 'string'
-				? reusableBlock.content.raw
-				: reusableBlock.content
-		);
-	},
-	( state ) => [ getReusableBlocks( state ) ]
 );
 
 /**

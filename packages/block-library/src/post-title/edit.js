@@ -30,7 +30,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId, queryId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
@@ -46,9 +46,7 @@ export default function PostTitleEdit( {
 	} );
 
 	let titleElement = (
-		<TagName { ...( isLink ? {} : blockProps ) }>
-			{ __( 'An example title' ) }
-		</TagName>
+		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>
 	);
 
 	if ( postType && postId ) {
@@ -60,16 +58,16 @@ export default function PostTitleEdit( {
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
-					{ ...( isLink ? {} : blockProps ) }
+					{ ...blockProps }
 				/>
 			) : (
-				<TagName { ...( isLink ? {} : blockProps ) }>
-					<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
+				<TagName { ...blockProps }>
+					<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
 				</TagName>
 			);
 	}
 
-	if ( isLink ) {
+	if ( isLink && postType && postId ) {
 		titleElement =
 			userCanEdit && ! isDescendentOfQueryLoop ? (
 				<TagName { ...blockProps }>
@@ -94,7 +92,7 @@ export default function PostTitleEdit( {
 						rel={ rel }
 						onClick={ ( event ) => event.preventDefault() }
 					>
-						<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
+						<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
 					</a>
 				</TagName>
 			);

@@ -1,14 +1,6 @@
 .edit-post-layout__metaboxes {
 	flex-shrink: 0;
-}
-.edit-post-layout__metaboxes:not(:empty) {
-	border-top: $border-width solid $gray-300;
-	padding: 10px 0 10px;
 	clear: both;
-
-	.edit-post-meta-boxes-area {
-		margin: auto 20px;
-	}
 }
 
 // Adjust the position of the notices

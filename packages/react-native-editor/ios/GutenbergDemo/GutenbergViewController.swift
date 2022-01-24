@@ -27,7 +27,6 @@ class GutenbergViewController: UIViewController {
         super.viewDidLoad()
         configureNavigationBar()
         gutenberg.delegate = self
-        navigationController?.navigationBar.isTranslucent = false
         registerLongPressGestureRecognizer()
 
         _ = try! FallbackJavascriptInjection(blockHTML: "Hello", userId: "1")
@@ -256,6 +255,18 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int]) -> Void {
         print("Gutenberg requested setting block type impressions to \(impressions).")
     }
+
+    func gutenbergDidRequestContactCustomerSupport() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestGotoCustomerSupportOptions() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) -> Void {
+        print("Gutenberg requested sending '\(eventName)' event to host with propreties: \(properties).")
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -306,10 +317,13 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
+            .tiledGalleryBlock: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
-            .editorOnboarding: false,
-            .firstGutenbergEditorSession: false,
+            .facebookEmbed: true,
+            .instagramEmbed: true,
+            .loomEmbed: true,
+            .smartframeEmbed: true,
         ]
     }
 
@@ -385,7 +399,7 @@ extension GutenbergViewController {
     
     var showEditorHelpAction: UIAlertAction {
         return UIAlertAction(
-            title: "Help",
+            title: "Help & Support",
             style: .default,
             handler: { [unowned self] action in
                 self.showEditorHelp()

@@ -9,12 +9,12 @@ import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '
 import { useState } from '@wordpress/element';
 
 const Example = () => {
-	const [alignment, setAlignment] = useState('center center');
+	const [ alignment, setAlignment ] = useState( 'center center' );
 
 	return (
 		<AlignmentMatrixControl
-			value={alignment}
-			onChange={(newAlignment) => setAlignment(newAlignment)}
+			value={ alignment }
+			onChange={ ( newAlignment ) => setAlignment( newAlignment ) }
 		/>
 	);
 };
@@ -23,43 +23,54 @@ const Example = () => {
 ## Props
 
 The component accepts the following props:
+
 ### className
 
-The class that will be added with "component-alignment-matrix-control" to the classes of the wrapper <Composite/> component.
-If no className is passed only "component-alignment-matrix-control" is used.
+The class that will be added to the classes of the wrapper <Composite/> component.
 
--   Type: `String`
+-   Type: `string`
 -   Required: No
 
 ### id
 
 Unique ID for the component.
--  Type: `String`
+
+-  Type: `string`
 -  Required: No
+
 ### label
 
-If provided, sets the aria-label attribute of the wrapper <Composite/> component.
+Accessible label. If provided, sets the `aria-label` attribute of the underlying <Composite/> component.
 
--   Type: `String`
+-   Type: `string`
 -   Required: No
 -   Default: `Alignment Matrix Control`
+
 ### defaultValue
 
 If provided, sets the default alignment value.
-- Type: `String`
+
+- Type: `string`
 - Required: No
 - Default: `center center`
+
+### value
+
+The current alignment value.
+- Type: `string`
+- Required: No
 
 ### onChange
 
 A function that receives the updated alignment value.
 
--   Type: `function`
+-   Type: `( nextValue: string ) => void`
 -   Required: No
--   Default: `noop`
+
 ### width
 
 If provided, sets the width of the wrapper <Composite/> component.
- - Type: `Number`
+
+ - Type: `number`
  - Required: No
  - Default: `92`

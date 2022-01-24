@@ -6,6 +6,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 
 ```json
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "my-plugin/notice",
 	"title": "Notice",
@@ -41,6 +42,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	},
 	"editorScript": "file:./build/index.js",
 	"script": "file:./build/script.js",
+	"viewScript": "file:./build/view.js",
 	"editorStyle": "file:./build/index.css",
 	"style": "file:./build/style.css"
 }
@@ -54,7 +56,13 @@ From a performance perspective, when themes support lazy loading assets, blocks 
 
 Furthermore, because the [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) can only list blocks registered on the server, registering blocks server-side is recommended; using the `block.json` file simplifies this registration.
 
-Last, but not least, the [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+
+Development is improved by using a defined schema definition file. Supported editors can provide help like tooltips, autocomplete, and schema validation. To use the schema, add the following to the top of the `block.json`.
+
+```json
+"$schema": "https://schemas.wp.org/trunk/block.json"
+```
 
 ## Block registration
 
@@ -169,7 +177,7 @@ This is the display title for your block, which can be translated with our trans
 ### Category
 
 -   Type: `string`
--   Required
+-   Optional
 -   Localized: No
 -   Property: `category`
 
@@ -255,7 +263,7 @@ Sometimes a block could have aliases that help users discover it while searching
 -   Optional
 -   Localized: No
 -   Property: `version`
--   Since: `5.8.0`
+-   Since: `WordPress 5.8.0`
 
 ```json
 { "version": "1.0.3" }
@@ -269,6 +277,7 @@ The current version number of the block, such as 1.0 or 1.0.3. It's similar to h
 -   Optional
 -   Localized: No
 -   Property: `textdomain`
+-   Since: `WordPress 5.7.0`
 
 ```json
 { "textdomain": "my-plugin" }
@@ -398,7 +407,7 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 
 ### Editor Script
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -411,7 +420,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 ### Script
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -420,11 +429,25 @@ Block type editor script definition. It will only be enqueued in the context of 
 { "script": "file:./build/script.js" }
 ```
 
-Block type frontend script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+
+### View Script
+
+-   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Optional
+-   Localized: No
+-   Property: `viewScript`
+-   Since: `WordPress 5.9.0`
+
+```json
+{ "viewScript": "file:./build/view.js" }
+```
+
+Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
 
 ### Editor Style
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `editorStyle`
@@ -435,9 +458,11 @@ Block type frontend script definition. It will be enqueued both in the editor an
 
 Block type editor style definition. It will only be enqueued in the context of the editor.
 
+_Note: An option to pass also an array of editor styles exists since WordPress `5.9.0`._
+
 ### Style
 
--   Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
 -   Optional
 -   Localized: No
 -   Property: `style`
@@ -446,7 +471,9 @@ Block type editor style definition. It will only be enqueued in the context of t
 { "style": "file:./build/style.css" }
 ```
 
-Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+
+_Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
 
 ## Assets
 
@@ -454,7 +481,7 @@ Block type frontend style definition. It will be enqueued both in the editor and
 
 The `WPDefinedAsset` type is a subtype of string, where the value represents a path to a JavaScript or CSS file relative to where `block.json` file is located. The path provided must be prefixed with `file:`. This approach is based on how npm handles [local paths](https://docs.npmjs.com/files/package.json#local-paths) for packages.
 
-An alternative would be a script or style handle name referencing a registered asset using WordPress helpers.
+An alternative would be a script or style handle name referencing an already registered asset using WordPress helpers.
 
 **Example:**
 
@@ -462,8 +489,11 @@ In `block.json`:
 
 ```json
 {
-	"editorScript": "file:./build/index.js",
-	"editorStyle": "my-editor-style-handle"
+	"editorScript": "file:./index.js",
+	"script": "my-script-handle",
+	"viewScript": "file:./view.js",
+	"editorStyle": "my-editor-style-handle",
+	"style": [ "file:./style.css", "my-style-handle" ]
 }
 ```
 
@@ -482,6 +512,7 @@ The definition is stored inside separate PHP file which ends with `.asset.php` a
 **Example:**
 
 ```
+block.json
 build/
 ├─ index.js
 └─ index.asset.php
@@ -506,6 +537,14 @@ return array(
 	'version'      => '3be55b05081a63d8f9d0ecb466c42cfd',
 );
 ```
+
+### Frontend Enqueueing
+
+Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
+
+-   `script`
+-   `viewScript` (when the block defines `render_callback` during registration in PHP, then the block author is responsible for enqueuing the script)
+-   `style`
 
 ## Internationalization
 

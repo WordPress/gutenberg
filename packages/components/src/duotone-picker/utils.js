@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+
+extend( [ namesPlugin ] );
 
 /**
  * Object representation for a color.
@@ -26,7 +29,7 @@ export function getDefaultColors( palette ) {
 	return palette
 		.map( ( { color } ) => ( {
 			color,
-			brightness: tinycolor( color ).getBrightness() / 255,
+			brightness: colord( color ).brightness(),
 		} ) )
 		.reduce(
 			( [ min, max ], current ) => {

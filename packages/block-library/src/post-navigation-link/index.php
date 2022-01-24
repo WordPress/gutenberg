@@ -18,7 +18,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		return '';
 	}
 
-	// Get the nagigation type to show the proper link. Available options are `next|previous`.
+	// Get the navigation type to show the proper link. Available options are `next|previous`.
 	$navigation_type = isset( $attributes['type'] ) ? $attributes['type'] : 'next';
 	// Allow only `next` and `previous` in `$navigation_type`.
 	if ( ! in_array( $navigation_type, array( 'next', 'previous' ), true ) ) {
@@ -33,6 +33,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
 	$label  = '';
+
 	// If a custom label is provided, make this a link.
 	// `$label` is used to prepend the provided label, if we want to show the page title as well.
 	if ( isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ) {
@@ -42,11 +43,34 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 
 	// If we want to also show the page title, make the page title a link and prepend the label.
 	if ( isset( $attributes['showTitle'] ) && $attributes['showTitle'] ) {
-		if ( $label ) {
-			$format = "$label %link";
+		/*
+		 * If the label link option is not enabled but there is a custom label,
+		 * display the custom label as text before the linked title.
+		 */
+		if ( ! $attributes['linkLabel'] ) {
+			if ( $label ) {
+				$format = '<span class="post-navigation-link__label">' . esc_html( $label ) . '</span> %link';
+			}
+			$link = '%title';
+		} elseif ( isset( $attributes['linkLabel'] ) && $attributes['linkLabel'] ) {
+			// If the label link option is enabled and there is a custom label, display it before the title.
+			if ( $label ) {
+				$link = '<span class="post-navigation-link__label">' . esc_html( $label ) . '</span> <span class="post-navigation-link__title">%title</title>';
+			} else {
+				/*
+				 * If the label link option is enabled and there is no custom label,
+				 * add a colon between the label and the post title.
+				 */
+				$label = 'next' === $navigation_type ? _x( 'Next:', 'label before the title of the next post' ) : _x( 'Previous:', 'label before the title of the previous post' );
+				$link  = sprintf(
+					'<span class="post-navigation-link__label">%1$s</span> <span class="post-navigation-link__title">%2$s</span>',
+					esc_html( $label ),
+					'%title'
+				);
+			}
 		}
-		$link = '%title';
 	}
+
 	// The dynamic portion of the function name, `$navigation_type`,
 	// refers to the type of adjacency, 'next' or 'previous'.
 	$get_link_function = "get_{$navigation_type}_post_link";

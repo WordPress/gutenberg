@@ -1,24 +1,12 @@
 /**
- * External dependencies
- */
-const fs = require( 'fs' );
-const path = require( 'path' );
-
-/**
  * Internal dependencies
  */
 const getExportEntries = require( '../lib/get-export-entries' );
 
 describe( 'Export entries', () => {
 	it( 'default class (anonymous)', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-class-anonymous/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/default-class-anonymous/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: '*default*',
@@ -30,14 +18,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'default class (named)', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-class-named/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/default-class-named/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'ClassDeclaration',
@@ -49,14 +31,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'default function (anonymous)', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-function-anonymous/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/default-function-anonymous/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: '*default*',
@@ -68,14 +44,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'default function (named)', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-function-named/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/default-function-named/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'myDeclaration',
@@ -87,14 +57,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'default identifier', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-identifier/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/default-identifier/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'ClassDeclaration',
@@ -106,14 +70,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'default import (named)', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-import-named/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/default-import-named/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'fnDeclaration',
@@ -125,14 +83,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'default import (default)', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-import-default/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/default-import-default/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'fnDeclaration',
@@ -144,14 +96,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'default named export', () => {
-		const tokens = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-named-export/exports.json'
-			),
-			'utf-8'
-		);
-		const namedExport = getExportEntries( JSON.parse( tokens )[ 0 ] );
+		const tokens = require( './fixtures/default-named-export/exports.json' );
+		const namedExport = getExportEntries( tokens[ 0 ] );
 		expect( namedExport ).toHaveLength( 1 );
 		expect( namedExport[ 0 ] ).toEqual( {
 			localName: 'functionDeclaration',
@@ -160,7 +106,7 @@ describe( 'Export entries', () => {
 			lineStart: 4,
 			lineEnd: 4,
 		} );
-		const defaultExport = getExportEntries( JSON.parse( tokens )[ 1 ] );
+		const defaultExport = getExportEntries( tokens[ 1 ] );
 		expect( defaultExport ).toHaveLength( 1 );
 		expect( defaultExport[ 0 ] ).toEqual( {
 			localName: 'functionDeclaration',
@@ -172,11 +118,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'default variable', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/default-variable/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/default-variable/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: '*default*',
@@ -188,11 +131,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named class', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-class/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-class/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'MyDeclaration',
@@ -204,11 +144,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named default', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-default/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-default/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'default',
@@ -220,14 +157,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named default (exported)', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/named-default-exported/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-default-exported/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'default',
@@ -239,11 +170,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named function', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-function/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-function/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'myDeclaration',
@@ -255,11 +183,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named identifier', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-identifier/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-identifier/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'myDeclaration',
@@ -268,14 +193,8 @@ describe( 'Export entries', () => {
 			lineStart: 6,
 			lineEnd: 6,
 		} );
-		const tokenObject = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/named-identifier-destructuring/exports.json'
-			),
-			'utf-8'
-		);
-		const nameObject = getExportEntries( JSON.parse( tokenObject ) );
+		const tokenObject = require( './fixtures/named-identifier-destructuring/exports.json' );
+		const nameObject = getExportEntries( tokenObject );
 		expect( nameObject ).toHaveLength( 1 );
 		expect( nameObject[ 0 ] ).toEqual( {
 			localName: 'someDeclaration',
@@ -287,11 +206,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named identifiers', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-identifiers/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-identifiers/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 3 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'functionDeclaration',
@@ -314,16 +230,8 @@ describe( 'Export entries', () => {
 			lineStart: 16,
 			lineEnd: 16,
 		} );
-		const tokenIdentifiersAndInline = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/named-identifiers-and-inline/exports.json'
-			),
-			'utf-8'
-		);
-		const nameInline0 = getExportEntries(
-			JSON.parse( tokenIdentifiersAndInline )[ 0 ]
-		);
+		const tokenIdentifiersAndInline = require( './fixtures/named-identifiers-and-inline/exports.json' );
+		const nameInline0 = getExportEntries( tokenIdentifiersAndInline[ 0 ] );
 		expect( nameInline0 ).toHaveLength( 2 );
 		expect( nameInline0[ 0 ] ).toEqual( {
 			localName: 'functionDeclaration',
@@ -339,9 +247,7 @@ describe( 'Export entries', () => {
 			lineStart: 11,
 			lineEnd: 11,
 		} );
-		const nameInline1 = getExportEntries(
-			JSON.parse( tokenIdentifiersAndInline )[ 1 ]
-		);
+		const nameInline1 = getExportEntries( tokenIdentifiersAndInline[ 1 ] );
 		expect( nameInline1 ).toHaveLength( 1 );
 		expect( nameInline1[ 0 ] ).toEqual( {
 			localName: 'variableDeclaration',
@@ -353,14 +259,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named import namespace', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/named-import-namespace/exports.json'
-			),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-import-namespace/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'variables',
@@ -372,11 +272,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named variable', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-variable/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-variable/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'myDeclaration',
@@ -388,11 +285,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'named variables', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/named-variables/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/named-variables/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 2 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'firstDeclaration',
@@ -411,11 +305,8 @@ describe( 'Export entries', () => {
 	} );
 
 	it( 'namespace (*)', () => {
-		const token = fs.readFileSync(
-			path.join( __dirname, './fixtures/namespace/exports.json' ),
-			'utf-8'
-		);
-		const name = getExportEntries( JSON.parse( token ) );
+		const token = require( './fixtures/namespace/exports.json' );
+		const name = getExportEntries( token );
 		expect( name ).toHaveLength( 1 );
 		expect( name[ 0 ] ).toEqual( {
 			localName: '*',

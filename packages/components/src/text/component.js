@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import useText from './hook';
+
+/**
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+ * @param {import('react').Ref<any>}                                                         forwardedRef
+ */
+function Text( props, forwardedRef ) {
+	const textProps = useText( props );
+
+	return <View as="span" { ...textProps } ref={ forwardedRef } />;
+}
 
 /**
  * `Text` is a core component that renders text in the library, using the
@@ -20,10 +31,6 @@ import useText from './hook';
  * }
  * ```
  */
-const Text = createComponent( {
-	as: 'span',
-	useHook: useText,
-	name: 'Text',
-} );
+const ConnectedText = contextConnect( Text, 'Text' );
 
-export default Text;
+export default ConnectedText;

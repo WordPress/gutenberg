@@ -6,7 +6,12 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, cloneElement, renderToString } from '@wordpress/element';
+import {
+	Component,
+	cloneElement,
+	renderToString,
+	RawHTML,
+} from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { removep } from '@wordpress/autop';
@@ -20,7 +25,6 @@ import {
 	getUnregisteredTypeHandlerName,
 } from './registration';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
-import BlockContentProvider from '../block-content-provider';
 
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
@@ -70,6 +74,7 @@ export function getBlockMenuDefaultClassName( blockName ) {
 }
 
 const blockPropsProvider = {};
+const innerBlocksPropsProvider = {};
 
 /**
  * Call within a save function to get the props for the block wrapper.
@@ -84,6 +89,21 @@ export function getBlockProps( props = {} ) {
 		blockType,
 		attributes
 	);
+}
+
+/**
+ * Call within a save function to get the props for the inner blocks wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getInnerBlocksProps( props = {} ) {
+	const { innerBlocks } = innerBlocksPropsProvider;
+	// Value is an array of blocks, so defer to block serializer
+	const html = serialize( innerBlocks, { isInnerBlocks: true } );
+	// Use special-cased raw HTML tag to avoid default escaping.
+	const children = <RawHTML>{ html }</RawHTML>;
+
+	return { ...props, children };
 }
 
 /**
@@ -114,6 +134,7 @@ export function getSaveElement(
 
 	blockPropsProvider.blockType = blockType;
 	blockPropsProvider.attributes = attributes;
+	innerBlocksPropsProvider.innerBlocks = innerBlocks;
 
 	let element = save( { attributes, innerBlocks } );
 
@@ -148,17 +169,11 @@ export function getSaveElement(
 	 * @param {WPBlock}   blockType  Block type definition.
 	 * @param {Object}    attributes Block attributes.
 	 */
-	element = applyFilters(
+	return applyFilters(
 		'blocks.getSaveElement',
 		element,
 		blockType,
 		attributes
-	);
-
-	return (
-		<BlockContentProvider innerBlocks={ innerBlocks }>
-			{ element }
-		</BlockContentProvider>
 	);
 }
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "7.0.2",
+	"version": "8.0.13",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,15 +31,16 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
+		"@babel/runtime": "^7.16.0",
+		"@react-spring/web": "^9.2.4",
 		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -58,6 +59,7 @@
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.3.1",
+		"colord": "^2.7.0",
 		"css-mediaquery": "^0.1.2",
 		"diff": "^4.0.2",
 		"dom-scroll-into-view": "^1.2.1",
@@ -65,11 +67,14 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"react-spring": "^8.0.19",
+		"react-easy-crop": "^3.0.0",
 		"redux-multi": "^0.1.12",
 		"rememo": "^3.0.0",
-		"tinycolor2": "^1.4.2",
 		"traverse": "^0.6.6"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -6,13 +6,13 @@ import { castArray, flow, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
-import { serialize } from '@wordpress/blocks';
+import { serialize, store as blocksStore } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useCopyToClipboard } from '@wordpress/compose';
 
@@ -46,9 +46,17 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
-	const onlyBlock = useSelect(
-		( select ) => 1 === select( blockEditorStore ).getBlockCount(),
-		[]
+	const { onlyBlock, title } = useSelect(
+		( select ) => {
+			const { getBlockCount, getBlockName } = select( blockEditorStore );
+			const { getBlockType } = select( blocksStore );
+			return {
+				onlyBlock: 1 === getBlockCount(),
+				title: getBlockType( getBlockName( firstBlockClientId ) )
+					?.title,
+			};
+		},
+		[ firstBlockClientId ]
 	);
 
 	const shortcuts = useSelect( ( select ) => {
@@ -79,8 +87,12 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
-	const removeBlockLabel =
-		count === 1 ? __( 'Remove block' ) : __( 'Remove blocks' );
+	const label = sprintf(
+		/* translators: %s: block name */
+		__( 'Remove %s' ),
+		title
+	);
+	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 
 	return (
 		<BlockActions
@@ -90,7 +102,8 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canDuplicate,
 				canInsertDefaultBlock,
-				isLocked,
+				canMove,
+				canRemove,
 				onDuplicate,
 				onInsertAfter,
 				onInsertBefore,
@@ -156,7 +169,7 @@ export function BlockSettingsDropdown( {
 										</MenuItem>
 									</>
 								) }
-								{ ! isLocked && ! onlyBlock && (
+								{ canMove && ! onlyBlock && (
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
 									>
@@ -179,8 +192,8 @@ export function BlockSettingsDropdown( {
 								: Children.map( ( child ) =>
 										cloneElement( child, { onClose } )
 								  ) }
-							<MenuGroup>
-								{ ! isLocked && (
+							{ canRemove && (
+								<MenuGroup>
 									<MenuItem
 										onClick={ flow(
 											onClose,
@@ -191,8 +204,8 @@ export function BlockSettingsDropdown( {
 									>
 										{ removeBlockLabel }
 									</MenuItem>
-								) }
-							</MenuGroup>
+								</MenuGroup>
+							) }
 						</>
 					) }
 				</DropdownMenu>

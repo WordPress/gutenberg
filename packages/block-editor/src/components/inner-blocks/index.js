@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	getBlockType,
 	store as blocksStore,
-	withBlockContentContext,
+	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
 
 /**
@@ -42,6 +42,8 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		template,
 		templateLock,
 		wrapperRef,
@@ -57,6 +59,8 @@ function UncontrolledInnerBlocks( props ) {
 	useNestedSettingsUpdate(
 		clientId,
 		allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		templateLock,
 		captureToolbars,
 		orientation,
@@ -206,13 +210,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	};
 }
 
+useInnerBlocksProps.save = getInnerBlocksProps;
+
 // Expose default appender placeholders as components.
 ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-ForwardedInnerBlocks.Content = withBlockContentContext(
-	( { BlockContent } ) => <BlockContent />
-);
+ForwardedInnerBlocks.Content = () => useInnerBlocksProps.save().children;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md

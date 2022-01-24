@@ -95,6 +95,17 @@ export default function BlockTools( {
 		} else if (
 			isMatch( 'core/block-editor/delete-multi-selection', event )
 		) {
+			/**
+			 * Check if the target element is a text area, input or
+			 * event.defaultPrevented and return early. In all these
+			 * cases backspace could be handled elsewhere.
+			 */
+			if (
+				[ 'INPUT', 'TEXTAREA' ].includes( event.target.nodeName ) ||
+				event.defaultPrevented
+			) {
+				return;
+			}
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length > 1 ) {
 				event.preventDefault();
@@ -128,8 +139,11 @@ export default function BlockTools( {
 					ref={ usePopoverScroll( __unstableContentRef ) }
 				/>
 				{ children }
-				{ /* Forward compatibility: a place to render block tools behind the
-                 content so it can be tabbed to properly. */ }
+				{ /* Used for inline rich text popovers. */ }
+				<Popover.Slot
+					name="__unstable-block-tools-after"
+					ref={ usePopoverScroll( __unstableContentRef ) }
+				/>
 			</InsertionPoint>
 		</div>
 	);

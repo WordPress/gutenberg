@@ -1,15 +1,14 @@
 # JavaScript Versions and Build Step
 
-The Block Editor Handbook shows JavaScript examples in two syntaxes: ES5 and ESNext. These are version names for the JavaScript language standard definitions. You may also see elsewhere the names ES6, or ECMAScript 2015 mentioned. See the [ECMAScript](https://en.wikipedia.org/wiki/ECMAScript) Wikipedia article for all the details.
+The Block Editor Handbook shows JavaScript examples in two syntaxes: JSX and Plain.
 
-ES5 code is compatible with WordPress's minimum [target for browser support](https://make.wordpress.org/core/handbook/best-practices/browser-support/).
+Plain refers to JavaScript code compatible with WordPress's minimum [target for browser support](https://make.wordpress.org/core/handbook/best-practices/browser-support/) without requiring a transpilation step. This step is commonly referred to as a build process.
 
-"ESNext" doesn't refer to a specific version of JavaScript, but is "dynamic" and refers to the next language definitions, whatever they might be. Because some browsers won't support these features yet (because they're new or proposed), an extra build step is required to transform the code to a syntax that works in all browsers. Webpack and babel are the tools that perform this transformation step.
+"JSX" doesn't refer to a specific version of JavaScript, but refers to the latest language definition plus
+[JSX syntax](https://reactjs.org/docs/introducing-jsx.html), a syntax that blends HTML and JavaScript. JSX makes it easier to read and write markup code, but does require a build step to transpile into code compatible with browers. Webpack and babel are the tools that perform this transpilation step.
 
-Additionally, the ESNext code examples in the handbook include [JSX syntax](https://reactjs.org/docs/introducing-jsx.html), a syntax that blends HTML and JavaScript. JSX makes it easier to read and write markup code, but does require a build step to transform into compatible code.
+For simplicity, the JavaScript tutorial uses the Plain definition, without JSX. This code can run straight in your browser and does not require an additional build step. In many cases, it is perfectly fine to follow the same approach for simple plugins or experimenting. As your codebase grows in complexity it might be a good idea to switch to JSX. You will find the majority of code and documentation across the block editor uses JSX.
 
-For simplicity, the JavaScript tutorial uses the ES5 definition, without JSX. This code can run straight in your browser and does not require an additional build step. In many cases, it is perfectly fine to follow the same approach for simple plugins or experimenting. As your codebase grows in complexity it might be a good idea to switch to ESNext. You will find the majority of code and documentation across the block editor uses ESNext.
+See the [JavaScript Build Setup documentation](/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment using JSX syntax.
 
-See the [JavaScript Build Setup documentation](/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment using ESNext syntax.
-
-See the [ESNext syntax documentation](/docs/how-to-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
+See the [ESNext syntax documentation](/docs/how-to-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and more modern approaches.

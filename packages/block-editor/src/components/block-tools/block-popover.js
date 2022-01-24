@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -107,13 +107,11 @@ function BlockPopover( {
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
-		useCallback( () => {
+		() => {
 			setIsToolbarForced( true );
 			stopTyping( true );
-		}, [] ),
+		},
 		{
-			bindGlobal: true,
-			eventName: 'keydown',
 			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);

@@ -75,13 +75,9 @@ function styleSheetsCompat( doc ) {
 		);
 
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Stylesheet ${ ownerNode.id } was not properly added.
-For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
-For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
-				ownerNode.outerHTML
-			);
+			// Display warning once we have a way to add style dependencies to the editor.
+			// See: https://github.com/WordPress/gutenberg/pull/37466.
+
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
 
 			// Add inline styles belonging to the stylesheet.
@@ -134,7 +130,7 @@ function bubbleEvents( doc ) {
 		}
 	}
 
-	const eventTypes = [ 'keydown', 'keypress', 'dragover' ];
+	const eventTypes = [ 'dragover' ];
 
 	for ( const name of eventTypes ) {
 		doc.addEventListener( name, bubbleEvent );
@@ -164,12 +160,15 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
+function Iframe(
+	{ contentRef, children, head, tabIndex = 0, assets, ...props },
+	ref
+) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const styles = useParsedAssets( window.__editorAssets.styles );
-	const scripts = useParsedAssets( window.__editorAssets.scripts );
+	const styles = useParsedAssets( assets?.styles );
+	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const setRef = useRefEffect( ( node ) => {
@@ -192,6 +191,7 @@ function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 				Array.from( ownerDocument.body.classList ).filter(
 					( name ) =>
 						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
 						name === 'wp-embed-responsive'
 				)
 			);

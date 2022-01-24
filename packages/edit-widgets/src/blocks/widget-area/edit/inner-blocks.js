@@ -7,10 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import {
-	InnerBlocks,
-	__experimentalUseInnerBlocksProps,
-} from '@wordpress/block-editor';
+import { InnerBlocks, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -27,7 +24,7 @@ export default function WidgetAreaInnerBlocks( { id } ) {
 	const isDraggingWithinInnerBlocks = useIsDraggingWithin( innerBlocksRef );
 	const shouldHighlightDropZone = isDraggingWithinInnerBlocks;
 	// Using the experimental hook so that we can control the className of the element.
-	const innerBlocksProps = __experimentalUseInnerBlocksProps(
+	const innerBlocksProps = useInnerBlocksProps(
 		{ ref: innerBlocksRef },
 		{
 			value: blocks,

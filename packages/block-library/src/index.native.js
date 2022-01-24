@@ -124,7 +124,7 @@ export const coreBlocks = [
  * @param {Object} block The block to be registered.
  *
  */
-const registerBlock = ( block ) => {
+export const registerBlock = ( block ) => {
 	if ( ! block ) {
 		return;
 	}

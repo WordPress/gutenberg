@@ -120,6 +120,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
+			canRemove: true,
 		} ) );
 		const wrapper = shallow(
 			<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
@@ -146,6 +147,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
+			canRemove: true,
 		} ) );
 		const wrapper = shallow(
 			<BlockSwitcherDropdownMenu
@@ -161,6 +163,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				possibleBlockTransformations: [
 					{ name: 'core/paragraph', frecency: 3 },
 				],
+				canRemove: true,
 			} ) );
 		} );
 		const getDropdown = () =>

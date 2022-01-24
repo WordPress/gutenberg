@@ -8,7 +8,7 @@
 /**
  * Register Gutenberg bundled patterns.
  */
-function register_gutenberg_patterns() {
+function gutenberg_register_gutenberg_patterns() {
 	// Register categories used for block patterns.
 	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
 		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
@@ -19,7 +19,7 @@ function register_gutenberg_patterns() {
 			'title'      => _x( 'Standard', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:post-title {"isLink":true} /-->
@@ -37,7 +37,7 @@ function register_gutenberg_patterns() {
 			'title'      => _x( 'Image at left', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:columns {"align":"wide"} -->
@@ -57,7 +57,7 @@ function register_gutenberg_patterns() {
 			'title'      => _x( 'Small image and title', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:columns {"verticalAlignment":"center"} -->
@@ -76,7 +76,7 @@ function register_gutenberg_patterns() {
 			'title'      => _x( 'Grid', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
@@ -93,7 +93,7 @@ function register_gutenberg_patterns() {
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"100px","right":"100px","bottom":"100px","left":"100px"}},"color":{"text":"#ffffff","background":"#000000"}}} -->
-							<div class="wp-block-group alignfull has-text-color has-background" style="background-color:#000000;color:#ffffff;padding-top:100px;padding-right:100px;padding-bottom:100px;padding-left:100px"><!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+							<div class="wp-block-group alignfull has-text-color has-background" style="background-color:#000000;color:#ffffff;padding-top:100px;padding-right:100px;padding-bottom:100px;padding-left:100px"><!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query"><!-- wp:post-template -->
 							<!-- wp:separator {"customColor":"#ffffff","align":"wide","className":"is-style-wide"} -->
 							<hr class="wp-block-separator alignwide has-text-color has-background is-style-wide" style="background-color:#ffffff;color:#ffffff"/>
@@ -119,7 +119,7 @@ function register_gutenberg_patterns() {
 			'content'    => '<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
 							<div class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->
 							<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
-							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->
+							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->
 							<div class="wp-block-query"><!-- wp:post-template -->
 							<!-- wp:post-featured-image /-->
 							<!-- wp:post-title /-->
@@ -131,7 +131,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query --></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"width":"50%"} -->
-							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":2,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->
+							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":2,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->
 							<div class="wp-block-query"><!-- wp:post-template -->
 							<!-- wp:spacer {"height":200} -->
 							<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>
@@ -170,7 +170,7 @@ function register_gutenberg_patterns() {
 /**
  * Deactivate the legacy patterns bundled with WordPress.
  */
-function remove_core_patterns() {
+function gutenberg_remove_core_patterns() {
 	$core_block_patterns = array(
 		'text-two-columns',
 		'two-buttons',
@@ -199,65 +199,13 @@ function remove_core_patterns() {
 	}
 }
 
-/**
- * Register Core's official patterns from wordpress.org/patterns.
- *
- * @since 5.8.0
- */
-function load_remote_patterns() {
-	// This is the core function that provides the same feature.
-	if ( function_exists( '_load_remote_block_patterns' ) ) {
-		return;
-	}
-
-	/**
-	 * Filter to disable remote block patterns.
-	 *
-	 * @since 5.8.0
-	 *
-	 * @param bool $should_load_remote
-	 */
-	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
-
-	if ( $should_load_remote ) {
-		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$core_keyword_id = 11; // 11 is the ID for "core".
-		$request->set_param( 'keyword', $core_keyword_id );
-		$response = rest_do_request( $request );
-		if ( $response->is_error() ) {
-			return;
-		}
-		$patterns = $response->get_data();
-
-		foreach ( $patterns as $settings ) {
-			$pattern_name = 'core/' . sanitize_title( $settings['title'] );
-			register_block_pattern( $pattern_name, (array) $settings );
-		}
-	}
-}
-
-
 add_action(
 	'init',
 	function() {
 		if ( ! get_theme_support( 'core-block-patterns' ) || ! function_exists( 'unregister_block_pattern' ) ) {
 			return;
 		}
-		remove_core_patterns();
-		register_gutenberg_patterns();
-	}
-);
-
-add_action(
-	'current_screen',
-	function( $current_screen ) {
-		if ( ! get_theme_support( 'core-block-patterns' ) ) {
-			return;
-		}
-
-		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
-		if ( $current_screen->is_block_editor || $is_site_editor ) {
-			load_remote_patterns();
-		}
+		gutenberg_remove_core_patterns();
+		gutenberg_register_gutenberg_patterns();
 	}
 );

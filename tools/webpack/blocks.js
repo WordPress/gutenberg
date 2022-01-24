@@ -7,6 +7,11 @@ const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 
 /**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
  * Internal dependencies
  */
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
@@ -16,6 +21,13 @@ const { baseConfig, plugins, stylesTransform } = require( './shared' );
  * build-module/<blockName>/view.js
  */
 const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/view))/g );
+
+/**
+ * We need to automatically rename some functions when they are called inside block files,
+ * but have been declared elsewhere. This way we can call Gutenberg override functions, but
+ * the block will still call the core function when updates are back ported.
+ */
+const prefixFunctions = [ 'build_query_vars_from_query_block' ];
 
 const createEntrypoints = () => {
 	/*
@@ -54,6 +66,7 @@ module.exports = {
 	},
 	plugins: [
 		...plugins,
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
 			patterns: [].concat(
 				[
@@ -103,23 +116,34 @@ module.exports = {
 							return join( to, `${ dirname }.php` );
 						},
 						transform: ( content ) => {
+							const prefix = 'gutenberg_';
 							content = content.toString();
+
+							// Within content, search and prefix any function calls from
+							// `prefixFunctions` list. This is needed because some functions
+							// are called inside block files, but have been declared elsewhere.
+							// So with the rename we can call Gutenberg override functions, but the
+							// block will still call the core function when updates are back ported.
+							content = content.replace(
+								new RegExp( prefixFunctions.join( '|' ), 'g' ),
+								( match ) => `${ prefix }${ match }`
+							);
 
 							// Within content, search for any function definitions. For
 							// each, replace every other reference to it in the file.
 							return (
-								content
-									.match( /^function [^\(]+/gm )
-									.reduce( ( result, functionName ) => {
-										// Trim leading "function " prefix from match.
-										functionName = functionName.slice( 9 );
-
+								Array.from(
+									content.matchAll(
+										/^\s*function ([^\(]+)/gm
+									)
+								)
+									.reduce( ( result, [ , functionName ] ) => {
 										// Prepend the Gutenberg prefix, substituting any
 										// other core prefix (e.g. "wp_").
 										return result.replace(
 											new RegExp( functionName, 'g' ),
 											( match ) =>
-												'gutenberg_' +
+												prefix +
 												match.replace( /^wp_/, '' )
 										);
 									}, content )

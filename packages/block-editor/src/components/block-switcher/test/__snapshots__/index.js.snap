@@ -6,7 +6,7 @@ exports[`BlockSwitcherDropdownMenu should render disabled block switcher with mu
     className="block-editor-block-switcher__no-switcher-icon"
     disabled={true}
     icon={
-      <BlockIcon
+      <Memo(BlockIcon)
         icon={
           <SVG
             viewBox="0 0 24 24"

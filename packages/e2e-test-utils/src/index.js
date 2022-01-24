@@ -15,6 +15,7 @@ export { clickMenuItem } from './click-menu-item';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { createNewPost } from './create-new-post';
+export { createReusableBlock } from './create-reusable-block';
 export { createUser } from './create-user';
 export { createURL } from './create-url';
 export { deactivatePlugin } from './deactivate-plugin';
@@ -22,7 +23,10 @@ export { deleteTheme } from './delete-theme';
 export { deleteUser } from './delete-user';
 export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { dragAndResize } from './drag-and-resize';
-export { enablePageDialogAccept } from './enable-page-dialog-accept';
+export {
+	enablePageDialogAccept,
+	disablePageDialogAccept,
+} from './auto-accept-page-dialogs';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
 export { findSidebarPanelToggleButtonWithTitle } from './find-sidebar-panel-toggle-button-with-title';
@@ -35,6 +39,7 @@ export { getEditedPostContent } from './get-edited-post-content';
 export { getCurrentPostContent } from './get-current-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
+export { getOption } from './get-option';
 export {
 	insertBlock,
 	insertPattern,
@@ -52,12 +57,14 @@ export { installTheme } from './install-theme';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
+export { createMenu, deleteAllMenus } from './menus';
 export {
 	enableFocusLossObservation,
 	disableFocusLossObservation,
 } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
+export { openTypographyToolsPanelMenu } from './open-typography-tools-panel-menu';
 export { trashAllPosts } from './posts';
 export { pressKeyTimes } from './press-key-times';
 export {
@@ -69,6 +76,7 @@ export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre
 export { saveDraft } from './save-draft';
 export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
+export { setOption } from './set-option';
 export { setPostContent } from './set-post-content';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';
@@ -89,5 +97,6 @@ export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
+export { openListView, closeListView } from './list-view';
 
 export * from './mocks';

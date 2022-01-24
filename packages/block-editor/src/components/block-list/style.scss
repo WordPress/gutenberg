@@ -326,6 +326,21 @@
 	z-index: z-index("{core/image aligned left or right} .wp-block");
 }
 
+.wp-site-blocks > [data-align="left"] {
+	float: left;
+	margin-right: 2em;
+}
+
+.wp-site-blocks > [data-align="right"] {
+	float: right;
+	margin-left: 2em;
+}
+
+.wp-site-blocks > [data-align="center"] {
+	justify-content: center;
+	margin-left: auto;
+	margin-right: auto;
+}
 
 /**
  * In-Canvas Inserter

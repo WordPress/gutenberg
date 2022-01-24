@@ -6,6 +6,9 @@
 	// Some themes give all <ul> default margin instead of padding.
 	margin-left: 0;
 
+	// Unset background colors that can be inherited from Global Styles.
+	background: none;
+
 	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
 	.wp-social-link a,
 	.wp-social-link a:hover {
@@ -104,8 +107,15 @@
 	.wp-social-link {
 		background: none;
 
+		a {
+			padding: 0;
+		}
+
 		// Make these bigger.
-		padding: 4px;
+		svg {
+			width: 1.25em;
+			height: 1.25em;
+		}
 	}
 
 	@import "../social-link/socials-without-bg.scss";

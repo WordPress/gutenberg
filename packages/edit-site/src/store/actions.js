@@ -5,10 +5,12 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { controls, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -106,23 +108,62 @@ export function* addTemplate( template ) {
 }
 
 /**
- * Removes a template, and updates the current page and template.
+ * Removes a template.
  *
- * @param {number} templateId The template ID.
+ * @param {Object} template The template object.
  */
-export function* removeTemplate( templateId ) {
-	yield apiFetch( {
-		path: `/wp/v2/templates/${ templateId }`,
-		method: 'DELETE',
-	} );
-	const page = yield controls.select( editSiteStoreName, 'getPage' );
-	yield controls.dispatch( editSiteStoreName, 'setPage', page );
+export function* removeTemplate( template ) {
+	try {
+		yield controls.dispatch(
+			coreStore,
+			'deleteEntityRecord',
+			'postType',
+			template.type,
+			template.id,
+			{ force: true }
+		);
+
+		const lastError = yield controls.select(
+			coreStore,
+			'getLastEntityDeleteError',
+			'postType',
+			template.type,
+			template.id
+		);
+
+		if ( lastError ) {
+			throw lastError;
+		}
+
+		yield controls.dispatch(
+			noticesStore,
+			'createSuccessNotice',
+			sprintf(
+				/* translators: The template/part's name. */
+				__( '"%s" deleted.' ),
+				template.title.rendered
+			),
+			{ type: 'snackbar' }
+		);
+	} catch ( error ) {
+		const errorMessage =
+			error.message && error.code !== 'unknown_error'
+				? error.message
+				: __( 'An error occurred while deleting the template.' );
+
+		yield controls.dispatch(
+			noticesStore,
+			'createErrorNotice',
+			errorMessage,
+			{ type: 'snackbar' }
+		);
+	}
 }
 
 /**
  * Returns an action object used to set a template part.
  *
- * @param {number} templatePartId The template part ID.
+ * @param {string} templatePartId The template part ID.
  *
  * @return {Object} Action object.
  */
@@ -189,40 +230,6 @@ export function* setPage( page ) {
 		templateId,
 	};
 	return templateId;
-}
-
-/**
- * Displays the site homepage for editing in the editor.
- */
-export function* showHomepage() {
-	const {
-		show_on_front: showOnFront,
-		page_on_front: frontpageId,
-	} = yield controls.resolveSelect(
-		coreStore,
-		'getEntityRecord',
-		'root',
-		'site'
-	);
-
-	const { siteUrl } = yield controls.select(
-		editSiteStoreName,
-		'getSettings'
-	);
-
-	const page = {
-		path: siteUrl,
-		context:
-			showOnFront === 'page'
-				? {
-						postType: 'page',
-						postId: frontpageId,
-				  }
-				: {},
-	};
-
-	const homeTemplate = yield* setPage( page );
-	yield setHomeTemplateId( homeTemplate );
 }
 
 /**
@@ -313,9 +320,12 @@ export function setIsListViewOpened( isOpen ) {
 /**
  * Reverts a template to its original theme-provided file.
  *
- * @param {Object} template The template to revert.
+ * @param {Object}  template            The template to revert.
+ * @param {Object}  [options]
+ * @param {boolean} [options.allowUndo] Whether to allow the user to undo
+ *                                      reverting the template. Default true.
  */
-export function* revertTemplate( template ) {
+export function* revertTemplate( template, { allowUndo = true } = {} ) {
 	if ( ! isTemplateRevertable( template ) ) {
 		yield controls.dispatch(
 			noticesStore,
@@ -368,7 +378,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'getEditedEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			template.id
 		);
 		// We are fixing up the undo level here to make sure we can undo
@@ -377,7 +387,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'editEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			template.id,
 			{
 				content: serializeBlocks, // required to make the `undo` behave correctly
@@ -394,7 +404,7 @@ export function* revertTemplate( template ) {
 			coreStore,
 			'editEntityRecord',
 			'postType',
-			'wp_template',
+			template.type,
 			fileTemplate.id,
 			{
 				content: serializeBlocks,
@@ -403,32 +413,40 @@ export function* revertTemplate( template ) {
 			}
 		);
 
-		const undoRevert = async () => {
-			await dispatch( coreStore ).editEntityRecord(
-				'postType',
-				'wp_template',
-				edited.id,
+		if ( allowUndo ) {
+			const undoRevert = async () => {
+				await dispatch( coreStore ).editEntityRecord(
+					'postType',
+					template.type,
+					edited.id,
+					{
+						content: serializeBlocks,
+						blocks: edited.blocks,
+						source: 'custom',
+					}
+				);
+			};
+			yield controls.dispatch(
+				noticesStore,
+				'createSuccessNotice',
+				__( 'Template reverted.' ),
 				{
-					content: serializeBlocks,
-					blocks: edited.blocks,
-					source: 'custom',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: undoRevert,
+						},
+					],
 				}
 			);
-		};
-		yield controls.dispatch(
-			noticesStore,
-			'createSuccessNotice',
-			__( 'Template reverted.' ),
-			{
-				type: 'snackbar',
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick: undoRevert,
-					},
-				],
-			}
-		);
+		} else {
+			yield controls.dispatch(
+				noticesStore,
+				'createSuccessNotice',
+				__( 'Template reverted.' )
+			);
+		}
 	} catch ( error ) {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'
@@ -469,4 +487,23 @@ export function* closeGeneralSidebar() {
 		'disableComplementaryArea',
 		editSiteStoreName
 	);
+}
+
+export function* switchEditorMode( mode ) {
+	yield {
+		type: 'SWITCH_MODE',
+		mode,
+	};
+
+	// Unselect blocks when we switch to a non visual mode.
+	if ( mode !== 'visual' ) {
+		yield controls.dispatch( blockEditorStore.name, 'clearSelectedBlock' );
+	}
+	const messages = {
+		visual: __( 'Visual editor selected' ),
+		mosaic: __( 'Mosaic view selected' ),
+	};
+	if ( messages[ mode ] ) {
+		speak( messages[ mode ], 'assertive' );
+	}
 }

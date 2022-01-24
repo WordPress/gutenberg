@@ -4,7 +4,7 @@
 import { isEmpty, noop } from 'lodash';
 import classNames from 'classnames';
 // eslint-disable-next-line no-restricted-imports
-import type { ChangeEvent, FocusEvent, Ref } from 'react';
+import type { ChangeEvent, FocusEvent, ReactNode, Ref } from 'react';
 
 /**
  * WordPress dependencies
@@ -50,6 +50,7 @@ export interface SelectControlProps
 	size?: Size;
 	value?: string | string[];
 	labelPosition?: LabelPosition;
+	children?: ReactNode;
 }
 
 function SelectControl(
@@ -68,6 +69,7 @@ function SelectControl(
 		size = 'default',
 		value: valueProp,
 		labelPosition = 'top',
+		children,
 		prefix,
 		suffix,
 		...props
@@ -79,7 +81,7 @@ function SelectControl(
 	const helpId = help ? `${ id }__help` : undefined;
 
 	// Disable reason: A select with an onchange throws a warning
-	if ( isEmpty( options ) ) return null;
+	if ( isEmpty( options ) && ! children ) return null;
 
 	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {
 		onBlur( event );
@@ -141,21 +143,22 @@ function SelectControl(
 					selectSize={ size }
 					value={ valueProp }
 				>
-					{ options.map( ( option, index ) => {
-						const key =
-							option.id ||
-							`${ option.label }-${ option.value }-${ index }`;
+					{ children ||
+						options.map( ( option, index ) => {
+							const key =
+								option.id ||
+								`${ option.label }-${ option.value }-${ index }`;
 
-						return (
-							<option
-								key={ key }
-								value={ option.value }
-								disabled={ option.disabled }
-							>
-								{ option.label }
-							</option>
-						);
-					} ) }
+							return (
+								<option
+									key={ key }
+									value={ option.value }
+									disabled={ option.disabled }
+								>
+									{ option.label }
+								</option>
+							);
+						} ) }
 				</Select>
 			</InputBase>
 		</BaseControl>

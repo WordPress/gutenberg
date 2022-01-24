@@ -2,21 +2,21 @@
 	.block-editor-color-gradient-control__color-indicator {
 		margin-bottom: $grid-unit-15;
 	}
-
-	.block-editor-color-gradient-control__button-tabs {
-		display: block;
-		margin-bottom: $grid-unit-15;
-	}
 }
 
 .block-editor-panel-color-gradient-settings {
-	.component-color-indicator {
-		vertical-align: text-bottom;
-	}
+	.block-editor-panel-color-gradient-settings__panel-title {
+		display: flex;
+		gap: $grid-unit-10;
 
-	&__panel-title {
 		.component-color-indicator {
-			display: inline-block;
+			width: $grid-unit-15;
+			height: $grid-unit-15;
+			align-self: center;
+
+			&:first-child {
+				margin-left: $grid-unit-15;
+			}
 		}
 	}
 
@@ -28,21 +28,67 @@
 	// @wordpress/components/src/circular-option-picker/style.scss
 	$swatch-size: 28px;
 
-	// Optimize fit of six swatches per line using calc() to create variable
-	// spacing that mimics a "justified/space-between" layout and works with
-	// or without scrollbars
 	@media screen and (min-width: $break-medium) {
-		// Overrides the default negative margin
 		.components-circular-option-picker__swatches {
-			margin-right: 0;
+			display: grid;
+			grid-template-columns: repeat(6, $swatch-size);
+			justify-content: space-between;
 		}
-		// Figures the spacing
-		.components-circular-option-picker__option-wrapper {
-			margin-right: calc((100% - (#{$swatch-size} * 6)) / 5);
+	}
+
+	// This shouldn't be needed but there's a rule in the inspector controls
+	// overriding this causing too much spacing.
+	// That generic rule should ideally be removed.
+	.block-editor-block-inspector & .components-base-control {
+		margin-bottom: inherit;
+	}
+
+	.block-editor-panel-color-gradient-settings__dropdown {
+		display: block;
+	}
+}
+
+.block-editor-panel-color-gradient-settings__dropdown {
+	width: 100%;
+}
+
+.block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
+	& > div {
+		width: $sidebar-width;
+	}
+}
+
+@include break-medium() {
+	.block-editor-panel-color-gradient-settings__dropdown-content {
+		.components-popover__content {
+			margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 } !important;
 		}
-		// Removes the right margin on every sixth swatch
-		.components-circular-option-picker__option-wrapper:nth-child(6n + 6) {
-			margin-right: 0;
+
+		&.is-from-top .components-popover__content {
+			margin-top: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+		}
+
+		&.is-from-bottom .components-popover__content {
+			margin-bottom: #{ -($grid-unit-60 + $grid-unit-15) } !important;
 		}
 	}
 }
+
+.block-editor-panel-color-gradient-settings__dropdown:last-child > div {
+	border-bottom-width: 0;
+}
+
+.block-editor-panel-color-gradient-settings__item {
+	padding-top: $grid-unit-15 !important;
+	padding-bottom: $grid-unit-15 !important;
+	.block-editor-panel-color-gradient-settings__color-indicator {
+		// Show a diagonal line (crossed out) for empty swatches.
+		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+	}
+
+	&.is-open {
+		background: $gray-100;
+		color: var(--wp-admin-theme-color);
+	}
+}
+

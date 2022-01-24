@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/group",
 	"title": "Group",
@@ -12,6 +13,7 @@
 			"default": "div"
 		},
 		"templateLock": {
+			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", false ]
 		}
 	},
@@ -25,15 +27,34 @@
 		},
 		"spacing": {
 			"padding": true,
+			"blockGap": true,
 			"__experimentalDefaultControls": {
-				"padding": true
+				"padding": true,
+				"blockGap": true
 			}
 		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
 			"style": true,
-			"width": true
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
 		"__experimentalLayout": true
 	},

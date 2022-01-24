@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/interface --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## API Usage
 
@@ -88,9 +88,12 @@ import { store as interfaceStore } from '@wordpress/interface';
 function initialize() {
 	// ...
 
-	dispatch( interfaceStore ).setFeatureDefaults( 'namespace/editor-or-plugin-name', {
-		myFeatureName: true
-	} );
+	dispatch( interfaceStore ).setFeatureDefaults(
+		'namespace/editor-or-plugin-name',
+		{
+			myFeatureName: true,
+		}
+	);
 
 	// ...
 }
@@ -99,9 +102,15 @@ function initialize() {
 Use the `toggleFeature` action and the `isFeatureActive` selector to toggle features within your app:
 
 ```js
-wp.data.select( 'core/interface' ).isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // true
-wp.data.dispatch( 'core/interface' ).toggleFeature( 'namespace/editor-or-plugin-name', 'myFeatureName' );
-wp.data.select( 'core/interface' ).isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // false
+wp.data
+	.select( 'core/interface' )
+	.isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // true
+wp.data
+	.dispatch( 'core/interface' )
+	.toggleFeature( 'namespace/editor-or-plugin-name', 'myFeatureName' );
+wp.data
+	.select( 'core/interface' )
+	.isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // false
 ```
 
 The `MoreMenuDropdown` and `MoreMenuFeatureToggle` components help to implement an editor menu for changing preferences and feature values.
@@ -117,8 +126,8 @@ function MyEditorMenu() {
 						feature="myFeatureName"
 						label={ __( 'My feature' ) }
 						info={ __( 'A really awesome feature' ) }
-						messageActivated={ __( 'My feature activated' )}
-						messageDeactivated={ __( 'My feature deactivated' )}
+						messageActivated={ __( 'My feature activated' ) }
+						messageDeactivated={ __( 'My feature deactivated' ) }
 					/>
 				</MenuGroup>
 			) }
@@ -126,4 +135,3 @@ function MyEditorMenu() {
 	);
 }
 ```
-

@@ -12,17 +12,19 @@
 		padding-left: 0;
 	}
 
-	// Revert any left/right margins.
+	// Revert any margins.
 	// This also makes it work with classic theme auto margins.
 	.wp-block-navigation-item.wp-block {
-		margin-left: revert;
-		margin-right: revert;
+		margin: revert;
 	}
 }
 
-// This element is inline on the frontend but needs to be editable, therefore inline-block, in the editor.
-.wp-block-navigation-link__label {
-	display: inline-block;
+// The following rule affects the positioning of the dropdown arrow indicator.
+// On the frontend, this element is inline, which makes it look correct. In the editor,
+// the label is block, which causes the dropdown indicator to wrap onto a new line.
+// Therefore we explicitly set it to inline even in the block editor.
+.wp-block-navigation-item__label {
+	display: inline;
 }
 
 
@@ -34,6 +36,7 @@
 .wp-block-navigation__container.is-parent-of-selected-block {
 	visibility: visible;
 	opacity: 1;
+	overflow: visible;
 }
 
 // Low specificity default to ensure background color applies to submenus.
@@ -43,7 +46,8 @@
 }
 
 // Only show the flyout on hover if the parent menu item is selected.
-.wp-block-navigation:not(.is-selected):not(.has-child-selected) .has-child:hover {
+.wp-block-navigation:not(.is-selected):not(.has-child-selected)
+.has-child:hover {
 	> .wp-block-navigation__submenu-container {
 		opacity: 0;
 		visibility: hidden;
@@ -79,7 +83,8 @@
 	flex-direction: column;
 }
 
-.is-dragging-components-draggable .wp-block-navigation-link > .wp-block-navigation__container {
+.is-dragging-components-draggable
+.wp-block-navigation-link > .wp-block-navigation__container {
 	// Set opacity to 1 to still be able to show the draggable chip.
 	opacity: 1;
 	visibility: hidden;
@@ -89,6 +94,19 @@
 		visibility: visible;
 	}
 }
+
+// Show even when a child is selected. This is an edgecase just for navigation submenus.
+.is-editing > .wp-block-navigation__submenu-container > .block-list-appender {
+	display: block;
+	position: static;
+	width: 100%;
+}
+
+// Hide when hovering.
+.wp-block-navigation__submenu-container .block-list-appender {
+	display: none;
+}
+
 
 /**
  * Colors Selector component
@@ -173,7 +191,6 @@ $color-control-label-height: 20px;
 	justify-content: flex-start;
 }
 
-
 /**
  * Setup state
  */
@@ -211,6 +228,18 @@ $color-control-label-height: 20px;
 	margin-right: 7px;
 }
 
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
@@ -219,6 +248,11 @@ $color-control-label-height: 20px;
 	flex-wrap: nowrap;
 	width: 100%;
 	overflow: hidden;
+
+	&.is-loading {
+		animation: loadingpulse 1s linear infinite;
+		animation-delay: 0.5s; // avoid animating for fast network responses
+	}
 
 	// Style skeleton elements to mostly match the metrics of actual menu items.
 	// Needs specificity.
@@ -243,41 +277,33 @@ $color-control-label-height: 20px;
 		}
 	}
 
-
 	.wp-block-navigation-item.wp-block-navigation-item,
 	.wp-block-navigation-placeholder__preview-search-icon {
 		opacity: 0.3;
 	}
 
-	// Don't show the preview boxes for an empty nav block,
-	// but be technically present to help size the empty state.
-	.wp-block-navigation.is-selected & {
-		display: flex;
-		opacity: 0;
-		width: 0;
-		overflow: hidden;
-		flex-wrap: nowrap;
-		flex: 0;
-	}
+	&:not(.is-loading) {
+		// Don't show the preview boxes for an empty nav block,
+		// but be technically present to help size the empty state.
+		.wp-block-navigation.is-selected & {
+			display: flex;
+			opacity: 0;
+			width: 0;
+			overflow: hidden;
+			flex-wrap: nowrap;
+			flex: 0;
+		}
 
-	// Hide entirely when vertical.
-	.is-vertical.is-selected & {
-		display: none;
-	}
-
-	// Hide entirely when the placeholder can still be toggled.
-	.wp-block-navigation.is-selected .is-small & {
-		display: none;
-	}
-
-	.wp-block-navigation.is-selected .is-medium & {
-		display: none;
+		// Hide entirely when vertical.
+		.wp-block-navigation.is-selected .is-small &,
+		.wp-block-navigation.is-selected .is-medium & {
+			display: none;
+		}
 	}
 }
 
 // Selected state.
 .wp-block-navigation-placeholder__controls {
-	padding: $grid-unit-10;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
@@ -286,11 +312,7 @@ $color-control-label-height: 20px;
 	display: none;
 	position: relative;
 	z-index: 1;
-
-	// Adjust padding for when shown horizontally.
-	.is-large & {
-		padding: $grid-unit-05 $grid-unit-10;
-	}
+	padding: $grid-unit-05 $grid-unit-10;
 
 	// If an ancestor has a text-decoration property applied, it is inherited regardless of
 	// the specificity of a child element. Only pulling the child out of the flow fixes it.
@@ -303,19 +325,27 @@ $color-control-label-height: 20px;
 		display: flex;
 	}
 
-	// Show stacked for the vertical navigation, or small placeholders.
-	.is-small &,
-	.is-medium &,
-	.is-vertical & {
-		.wp-block-navigation-placeholder__actions {
-			flex-direction: column;
+	// Hide a few elements in medium size placeholders.
+	// @todo: part of the code here will be irrelevant if https://github.com/WordPress/gutenberg/pull/36775 lands.
+	.is-medium & {
+		.wp-block-navigation-placeholder__actions__indicator,
+		.wp-block-navigation-placeholder__actions__indicator + hr,
+		.wp-block-navigation-placeholder__actions > :nth-last-child(3), // Add all pages.
+		.wp-block-navigation-placeholder__actions > :nth-last-child(2) { // hr separator after it.
+			display: none;
 		}
 	}
 
-	// Both selected and vertical.
-	.is-selected.is-vertical & {
-		display: inline-flex; // This makes the white box not take up all available space.
-		padding: $grid-unit-15;
+	// Show stacked for the vertical navigation, or small placeholders.
+	.is-small & {
+		.wp-block-navigation-placeholder__actions {
+			flex-direction: column;
+		}
+
+		// Hide the separators in the vertical version.
+		.wp-block-navigation-placeholder__actions hr {
+			display: none;
+		}
 	}
 
 	.wp-block-navigation-placeholder__icon {
@@ -325,60 +355,52 @@ $color-control-label-height: 20px;
 
 	// Block title
 	.wp-block-navigation-placeholder__actions__indicator {
-		margin-right: $grid-unit-15;
-		padding: 0;
+		display: flex;
+		padding: 0 ($grid-unit-15 * 0.5) 0 0;
 		align-items: center;
 		justify-content: flex-start;
 		line-height: 0;
+		min-height: $button-size;
 
 		// Line up with the icon in the toolbar.
-		margin-left: $grid-unit-05 + $border-width;
+		margin-left: $grid-unit-05;
 
 		svg {
 			margin-right: $grid-unit-05;
 		}
-
-		.is-vertical & {
-			margin-bottom: $grid-unit-05;
-			margin-left: 0;
-		}
-
-		// Show only in big placeholders.
-		display: none;
-		.is-large & {
-			display: inline-flex;
-		}
 	}
 }
 
-// When block is vertical.
-.is-vertical .wp-block-navigation-placeholder,
-.is-vertical .wp-block-navigation-placeholder__preview,
-.is-vertical .wp-block-navigation-placeholder__controls {
-	min-height: $icon-size + ($grid-unit-20 + $grid-unit-05 + $grid-unit-15 + $grid-unit-15) * 3;
-}
-
-.is-vertical .wp-block-navigation-placeholder__preview,
-.is-vertical .wp-block-navigation-placeholder__controls {
-	flex-direction: column;
-	align-items: flex-start;
+// Keep as row for medium.
+.wp-block-navigation .components-placeholder.is-medium .components-placeholder__fieldset {
+	flex-direction: row !important;
 }
 
 .wp-block-navigation-placeholder__actions {
 	display: flex;
 	font-size: $default-font-size;
 	font-family: $default-font;
-
-	.components-button.components-dropdown-menu__toggle.has-icon {
-		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) $grid-unit-15;
-		display: flex;
-		flex-direction: row-reverse; // This puts the chevron, which is hidden from screen readers, on the right.
-	}
+	gap: $grid-unit-15 * 0.5;
+	align-items: center;
 
 	// Margins.
 	.components-dropdown,
 	> .components-button {
-		margin-right: $grid-unit-15;
+		margin-right: 0;
+	}
+
+	// Separator.
+	height: 100%; // This allows the separator to scale vertically.
+
+	// Separator.
+	&.wp-block-navigation-placeholder__actions hr {
+		border: 0;
+		min-height: $border-width;
+		min-width: $border-width;
+		background-color: $gray-900;
+		margin: auto 0;
+		height: 100%;
+		max-height: $grid-unit-20;
 	}
 }
 
@@ -395,19 +417,15 @@ $color-control-label-height: 20px;
 		}
 	}
 }
-.components-button.wp-block-navigation__responsive-container-open {
-	@include break-small {
-		display: none;
-	}
-}
-
 // Emulate the fullscreen editing inside the editor.
 // Most of this can be removed when the iframe lands.
 
 // When not fullscreen.
 .wp-block-navigation__responsive-container.is-menu-open {
 	position: fixed;
-	top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
+	top:
+		$admin-bar-height-big + $header-height + $block-toolbar-height +
+		$border-width;
 
 	@include break-medium() {
 		top: $admin-bar-height + $header-height + $border-width;
@@ -424,13 +442,17 @@ $color-control-label-height: 20px;
 
 .has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
 	@include break-medium() {
-		top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
+		top:
+			$admin-bar-height + $header-height + $block-toolbar-height +
+			$border-width;
 	}
 }
 
 .is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
 .is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
-	top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
+	top:
+		$admin-bar-height + $header-height + $block-toolbar-height +
+		$border-width;
 }
 
 .is-sidebar-opened .wp-block-navigation__responsive-container.is-menu-open {
@@ -441,7 +463,9 @@ $color-control-label-height: 20px;
 .is-fullscreen-mode {
 	.wp-block-navigation__responsive-container.is-menu-open {
 		left: 0; // Unset the value from non fullscreen mode.
-		top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
+		top:
+			$admin-bar-height-big + $header-height + $block-toolbar-height +
+			$border-width;
 
 		@include break-medium() {
 			top: $header-height + $border-width;
@@ -461,7 +485,8 @@ $color-control-label-height: 20px;
 }
 
 // The iframe makes these rules a lot simpler.
-body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-open {
+body.editor-styles-wrapper
+.wp-block-navigation__responsive-container.is-menu-open {
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -502,5 +527,65 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .is-menu-open .wp-block-navigation__responsive-container-content * {
 	.block-list-appender {
 		margin-top: $grid-unit-20;
+	}
+}
+
+@keyframes fadein {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.wp-block-navigation__unsaved-changes {
+	position: relative;
+
+	.components-spinner {
+		position: absolute;
+		top: calc(50% - #{$spinner-size} / 2);
+		left: calc(50% - #{$spinner-size} / 2);
+
+		// Delay showing the saving spinner until after 2 seconds.
+		// This should ensure it only shows for slow connections.
+		opacity: 0;
+		animation: 0.5s linear 2s normal forwards fadein;
+	}
+}
+
+@keyframes fadeouthalf {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.5;
+	}
+}
+
+.wp-block-navigation__unsaved-changes-overlay.is-saving {
+	opacity: 1;
+	animation: 0.5s linear 2s normal forwards fadeouthalf;
+}
+
+.wp-block-navigation-delete-menu-button {
+	width: 100%;
+	justify-content: center;
+	margin-bottom: $grid-unit-20;
+}
+
+.wp-block-navigation__overlay-menu-preview {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	background-color: $gray-100;
+	padding: 0 $grid-unit-30;
+	height: $grid-unit-40 * 2;
+	margin-bottom: $grid-unit-15;
+
+	&.open {
+		box-shadow: inset 0 0 0 $border-width $gray-200;
+		outline: 1px solid transparent; // Box shadow is removed in high contrast mode, a transparent outline is made opaque.
+		background-color: $white;
 	}
 }

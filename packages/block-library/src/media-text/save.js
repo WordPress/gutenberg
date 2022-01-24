@@ -7,7 +7,7 @@ import { noop, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -95,9 +95,11 @@ export default function save( { attributes } ) {
 			>
 				{ ( mediaTypeRenders[ mediaType ] || noop )() }
 			</figure>
-			<div className="wp-block-media-text__content">
-				<InnerBlocks.Content />
-			</div>
+			<div
+				{ ...useInnerBlocksProps.save( {
+					className: 'wp-block-media-text__content',
+				} ) }
+			/>
 		</div>
 	);
 }

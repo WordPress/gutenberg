@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { isStackedOnMobile, verticalAlignment } = attributes;
@@ -16,9 +16,8 @@ export default function save( { attributes } ) {
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
 	} );
 
-	return (
-		<div { ...useBlockProps.save( { className } ) }>
-			<InnerBlocks.Content />
-		</div>
-	);
+	const blockProps = useBlockProps.save( { className } );
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+	return <div { ...innerBlocksProps } />;
 }

@@ -20,8 +20,6 @@ If critical bugs are discovered on stable versions of the plugin, patch versions
 
 ### Release Tool
 
-> Note that at the time of writing, the tool doesn't support releasing consecutive RC releases. However, it is possible to use the tool for patch releases following the first stable release.
-
 The plugin release process is entirely automated and happens solely on GitHub -- i.e. it doesn't require any steps to be run locally on your machine.
 
 For your convenience, here's an [11-minute video walkthrough](https://youtu.be/TnSgJd3zpJY) that demonstrates the release process. It's recommended to watch this if you're unfamiliar with it. The process is also documented in the following paragraphs.
@@ -36,7 +34,7 @@ This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version,
 
 As soon as the workflow has finished, you'll find the release draft under https://github.com/WordPress/gutenberg/releases. The draft is pre-populated with changelog entries based on previous release candidates for this version, and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, make sure to delete any RC version headers (that are only there for your information) and to move the more recent changes to the correct section (see below).
 
-The changelog draft will be at least partially pre-organized (based on Github label) into sections and within those into "features". Take some time to read the generated notes and then edit them to ensure legibility and accuracy.
+The changelog draft will be at least partially pre-organized (based on GitHub label) into sections and within those into "features". Take some time to read the generated notes and then edit them to ensure legibility and accuracy.
 
 Don't rush this part -- it's important to bring the release notes into a nice shape. You don't have to do it all in one go -- you can save the draft and come back to it later.
 
@@ -55,7 +53,7 @@ Only once you're happy with the shape of the release notes should you press the 
 The latter step needs approval by a member of the Gutenberg Core team. Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
 This will cause the new version to be available to users of WordPress all over the globe! 💃
-You should check that folks are able to install the new version from their Dashboard.
+You should check that folks can install the new version from their Dashboard.
 
 Once released, all that's left to do is writing a release post on [make.wordpress.org/core](https://make.wordpress.org/core/). You can find some tips on that below.
 
@@ -154,15 +152,19 @@ The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wor
 
 Release types and their schedule:
 
--   [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) (`latest` dist tag) – when there is no "feature-freeze" mode in WordPress Core, then publishing happens every two weeks based on the new stable version of the Gutenberg plugin. Otherwise, only bug fixes get manually included and published to npm before every next beta and RC version of the following WordPress release.
+-   [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) (`latest` dist tag) – when there is no "feature-freeze" mode in WordPress Core, publishing happens every two weeks based on the newly created RC1 version of the Gutenberg plugin. Otherwise, only bug fixes get manually included and published to npm before every next beta and RC version of the following WordPress release.
 -   [Minor WordPress Releases](#minor-wordpress-releases) (`patch` dist tag) – only when bug fixes or security releases need to be backported into WordPress Core.
--   [Development Releases](#development-releases) (`next` dist tag) – at least every two weeks when the RC version for the Gutenberg plugin is released.
+-   [Development Releases](#development-releases) (`next` dist tag) – when there is a "feature-freeze" mode in WordPress Core, publishing can still happen every two weeks based on the new RC1 version of the Gutenberg plugin. It is also possible to perform development releases at any time when there is a need to test the upcoming changes.
 
 There is also an option to perform [Standalone Bugfix Package Releases](#standalone-bugfix-package-releases) at will. It should be reserved only for critical bug fixes or security releases that must be published to _npm_ outside of a regular WordPress release cycle.
 
 ### Synchronizing WordPress Trunk
 
-For each Gutenberg plugin release, WordPress trunk should be synchronized. Note that the WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, this happens between the first `beta` and the first `RC` of the WordPress release cycle. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
+For each Gutenberg plugin release, WordPress trunk should be synchronized.
+
+Note that the WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, feature freeze in WordPress Core happens about 2 weeks before Beta 1 and remains in effect until RC1 when the `trunk` gets branched. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
+
+A different person usually synchronizes the WordPress `trunk` branch and publishes the npm packages. Therefore, you typically shouldn't need to worry about handling this for the normal plugin release process. However, if you are still unsure, ask in [the #core-editor Slack channel](https://wordpress.slack.com/archives/C02QB2JS7).
 
 The process has three steps: 1) update the `wp/trunk` branch within the Gutenberg repo 2) publish the new package versions to npm 3) update the WordPress `trunk` branch.
 
@@ -252,7 +254,7 @@ Whilst waiting for the GitHub actions build for `wp/trunk`[branch to pass](https
 
 Check the versions listed in the current `CHANGELOG.md` file, looking through the commit history of a package e.g [@wordpress/scripts](https://github.com/WordPress/gutenberg/commits/HEAD/packages/scripts) and look out for _"chore(release): publish"_ and _"Update changelogs"_ commits to determine recent version bumps, then looking at the commits since the most recent release should aid with discovering what changes have occurred since the last release.
 
-Note: You may discover the current version of each package is not up to date, if so updating the previous released versions would be appreciated.
+Note: You may discover the current version of each package is not up to date, if so updating the previously released versions would be appreciated.
 
 The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. The rest of the section covers all the necessary steps for publishing the packages if you prefer to do it manually.
 
@@ -323,7 +325,7 @@ Now that the packages have been published the _"chore(release): publish"_ and _"
 2. `git pull`
 3. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
 4. `git cherry-pick 278f524`
-5. Get the commit hash from the the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
+5. Get the commit hash from the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
 6. Cherry-pick the `fe6ae0d` "chore(release): publish"\_ commit made to `wp/trunk`
 7. `git cherry-pick fe6ae0d`
 8. `git push`

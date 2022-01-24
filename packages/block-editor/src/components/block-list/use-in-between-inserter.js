@@ -144,7 +144,7 @@ export function useInBetweenInserter() {
 					return;
 				}
 
-				const index = getBlockIndex( clientId, rootClientId );
+				const index = getBlockIndex( clientId );
 
 				// Don't show the in-between inserter before the first block in
 				// the list (preserves the original behaviour).

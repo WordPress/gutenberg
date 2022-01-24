@@ -1,9 +1,7 @@
 # Block Theme
 
 <div class="callout callout-alert">
-These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors and theme authors.
-
-Documentation is shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. You can provide feedback in the weekly #core-editor chats, or #fse-outreach-experiment channels, or async via Github issues.
+These features are part of the full site editing project releasing in WordPress 5.9. You can provide feedback in the weekly #core-editor chats, or #fse-outreach-experiment channels, or async using GitHub issues.
 </div>
 
 ## What is a block theme?
@@ -19,12 +17,12 @@ theme
 |__ style.css
 |__ theme.json
 |__ functions.php
-|__ block-templates
+|__ templates
     |__ index.html
     |__ single.html
     |__ archive.html
     |__ ...
-|__ block-template-parts
+|__ parts
     |__ header.html
     |__ footer.html
     |__ sidebar.html
@@ -78,7 +76,7 @@ Please note that the "Templates" admin menu under "Appearance" will _not_ list t
 
 ### Edit Templates within the Full-site Editor
 
-To begin, create a blank template file within your theme. For example: `mytheme/block-templates/index.html`. Afterwards, open the Full-site editor. Your new template should appear as the active template, and should be blank. Add blocks as you normally would using Gutenberg. You can add and create template parts directly using the "Template Parts" block.
+To begin, create a blank template file within your theme. For example: `mytheme/templates/index.html`. Afterwards, open the Full-site editor. Your new template should appear as the active template, and should be blank. Add blocks as you normally would using Gutenberg. You can add and create template parts directly using the "Template Parts" block.
 
 Repeat for any additional templates you'd like to bundle with your theme.
 
@@ -105,6 +103,7 @@ As we're still early in the process, the number of blocks specifically dedicated
 -   Query
 -   Query Loop
 -   Query Pagination
+-   Pattern
 -   Post Title
 -   Post Content
 -   Post Author
@@ -124,6 +123,46 @@ As we're still early in the process, the number of blocks specifically dedicated
 
 One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, the [Global Styles](/docs/how-to-guides/themes/theme-json.md) effort will provide a scaffolding for adding many theme styles in the future.
 
+## Internationalization (i18n)
+
+A pattern block can be used to insert translatable content inside a block template. Since those files are php-based, there is a mechanism to mark strings for translation or supply dynamic URLs.
+
+#### Example
+
+Register a pattern:
+
+```php
+<?php
+register_block_pattern(
+	'myblocktheme/wordpress-credit',
+	array(
+		'title'      => __( 'Wordpress credit', 'myblocktheme' ),
+		'content'    => '
+						<!-- wp:paragraph -->
+						<p>' .
+						sprintf(
+							/* Translators: WordPress link. */
+							esc_html__( 'Proudly Powered by %s', 'myblocktheme' ),
+							'<a href="' . esc_url( __( 'https://wordpress.org', 'myblocktheme' ) ) . '" rel="nofollow">WordPress</a>'
+						) . '</p>
+						<!-- /wp:paragraph -->',
+		'inserter'   => false
+	)
+);
+```
+
+Load the pattern in a template or template part:
+
+```html
+<!-- wp:group -->
+<div class="wp-block-group">
+	<!-- wp:pattern {"slug":"myblocktheme/wordpress-credit"} /-->
+</div>
+<!-- /wp:group -->
+```
+
+You can read more about [internationalization in WordPress here](https://developer.wordpress.org/apis/handbook/internationalization/).
+
 ## Classic Themes
 
 Users of classic themes can also build custom block templates and use them in their Pages and Custom Post Types that support Page Templates.
@@ -133,6 +172,13 @@ Theme authors can opt-out of this feature by removing the `block-templates` them
 ```php
 remove_theme_support( 'block-templates' );
 ```
+
+## Accessibility
+
+A [skip to content link](https://make.wordpress.org/accessibility/handbook/markup/skip-links/) is automatically added on the front of the website when a webpage includes a `<main>` HTML element.
+The skip link points to the `<main>`.
+
+The group, template part, and query blocks can be changed to use `<main>`. You can find the setting to change the HTML element in the block settings sidebar under Advanced.
 
 ## Resources
 

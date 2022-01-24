@@ -5,7 +5,7 @@ import { Heading } from '../';
 
 export default {
 	component: Heading,
-	title: 'G2 Components (Experimental)/Heading',
+	title: 'Components (Experimental)/Heading',
 };
 
 export const _default = () => {

@@ -2,16 +2,10 @@
 $blocks-block__margin: 0.5em;
 
 .wp-block-buttons {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	column-gap: $blocks-block__margin;
 
 	&.is-vertical {
 		flex-direction: column;
 		> .wp-block-button {
-			/*rtl:ignore*/
-			margin-right: 0;
 			&:last-child {
 				margin-bottom: 0;
 			}
@@ -21,16 +15,7 @@ $blocks-block__margin: 0.5em;
 	// Increased specificity to override blocks default margin.
 	> .wp-block-button {
 		display: inline-block;
-		/*rtl:ignore*/
-		margin-left: 0;
-		/*rtl:ignore*/
-		margin-right: $blocks-block__margin;
-		margin-bottom: $blocks-block__margin;
-
-		&:last-child {
-			/*rtl:ignore*/
-			margin-right: 0;
-		}
+		margin: 0;
 	}
 
 	&.is-content-justification-left {
@@ -50,18 +35,6 @@ $blocks-block__margin: 0.5em;
 	&.is-content-justification-right {
 		justify-content: flex-end;
 
-		> .wp-block-button {
-			/*rtl:ignore*/
-			margin-left: $blocks-block__margin;
-			/*rtl:ignore*/
-			margin-right: 0;
-
-			&:first-child {
-				/*rtl:ignore*/
-				margin-left: 0;
-			}
-		}
-
 		&.is-vertical {
 			align-items: flex-end;
 		}
@@ -74,28 +47,6 @@ $blocks-block__margin: 0.5em;
 	// Kept for backward compatibility.
 	&.aligncenter {
 		text-align: center;
-	}
-	&.alignleft .wp-block-button {
-		/*rtl:ignore*/
-		margin-left: 0;
-		/*rtl:ignore*/
-		margin-right: $blocks-block__margin;
-
-		&:last-child {
-			/*rtl:ignore*/
-			margin-right: 0;
-		}
-	}
-	&.alignright .wp-block-button {
-		/*rtl:ignore*/
-		margin-right: 0;
-		/*rtl:ignore*/
-		margin-left: $blocks-block__margin;
-
-		&:first-child {
-			/*rtl:ignore*/
-			margin-left: 0;
-		}
 	}
 
 	// Back compat: Inner button blocks previously had their own alignment
@@ -116,7 +67,6 @@ $blocks-block__margin: 0.5em;
 	/* stylelint-enable indentation */
 		margin-left: auto;
 		margin-right: auto;
-		margin-bottom: $blocks-block__margin;
 		width: 100%;
 	}
 }

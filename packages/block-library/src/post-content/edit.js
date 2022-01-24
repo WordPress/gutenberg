@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { RawHTML } from '@wordpress/element';
 import {
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	useSetting,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	store as blockEditorStore,
@@ -66,7 +66,7 @@ function EditableContent( { layout, context = {} } ) {
 
 function Content( props ) {
 	const { context: { queryId, postType, postId } = {} } = props;
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 
@@ -85,9 +85,7 @@ function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
-			<div className="wp-block-post-content__placeholder">
-				<span>{ __( 'This is a placeholder for post content.' ) }</span>
-			</div>
+			<p>{ __( 'Post Content' ) }</p>
 		</div>
 	);
 }

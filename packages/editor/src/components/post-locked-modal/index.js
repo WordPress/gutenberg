@@ -7,10 +7,16 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Modal, Button } from '@wordpress/components';
+import {
+	Modal,
+	Button,
+	ExternalLink,
+	Flex,
+	FlexItem,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { useEffect } from '@wordpress/element';
+import { useEffect, createInterpolateElement } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,7 +25,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { getWPAdminURL } from '../../utils/url';
-import PostPreviewButton from '../post-preview-button';
 import { store as editorStore } from '../../store';
 
 export default function PostLockedModal() {
@@ -34,6 +39,7 @@ export default function PostLockedModal() {
 		postLockUtils,
 		activePostLock,
 		postType,
+		previewLink,
 	} = useSelect( ( select ) => {
 		const {
 			isPostLocked,
@@ -42,6 +48,7 @@ export default function PostLockedModal() {
 			getCurrentPostId,
 			getActivePostLock,
 			getEditedPostAttribute,
+			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
 		const { getPostType } = select( coreStore );
@@ -53,8 +60,9 @@ export default function PostLockedModal() {
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
+			previewLink: getEditedPostPreviewLink(),
 		};
-	} );
+	}, [] );
 
 	useEffect( () => {
 		/**
@@ -94,7 +102,8 @@ export default function PostLockedModal() {
 					isLocked: true,
 					isTakeover: true,
 					user: {
-						avatar: received.lock_error.avatar_src,
+						name: received.lock_error.name,
+						avatar: received.lock_error.avatar_src_2x,
 					},
 				} );
 			} else if ( received.new_lock ) {
@@ -158,13 +167,13 @@ export default function PostLockedModal() {
 	const allPostsUrl = getWPAdminURL( 'edit.php', {
 		post_type: get( postType, [ 'slug' ] ),
 	} );
-	const allPostsLabel = __( 'Exit the Editor' );
+	const allPostsLabel = __( 'Exit editor' );
 	return (
 		<Modal
 			title={
 				isTakeover
-					? __( 'Someone else has taken over this post.' )
-					: __( 'This post is already being edited.' )
+					? __( 'Someone else has taken over this post' )
+					: __( 'This post is already being edited' )
 			}
 			focusOnMount={ true }
 			shouldCloseOnClickOutside={ false }
@@ -177,58 +186,88 @@ export default function PostLockedModal() {
 					src={ userAvatar }
 					alt={ __( 'Avatar' ) }
 					className="editor-post-locked-modal__avatar"
+					width={ 64 }
+					height={ 64 }
 				/>
 			) }
-			{ !! isTakeover && (
-				<div>
-					<div>
-						{ userDisplayName
-							? sprintf(
-									/* translators: %s: user's display name */
-									__(
-										'%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
+			<div>
+				{ !! isTakeover && (
+					<p>
+						{ createInterpolateElement(
+							userDisplayName
+								? sprintf(
+										/* translators: %s: user's display name */
+										__(
+											'<strong>%s</strong> now has editing control of this posts (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+										),
+										userDisplayName
+								  )
+								: __(
+										'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+								  ),
+							{
+								strong: <strong />,
+								PreviewLink: (
+									<ExternalLink href={ previewLink }>
+										{ __( 'preview' ) }
+									</ExternalLink>
+								),
+							}
+						) }
+					</p>
+				) }
+				{ ! isTakeover && (
+					<>
+						<p>
+							{ createInterpolateElement(
+								userDisplayName
+									? sprintf(
+											/* translators: %s: user's display name */
+											__(
+												'<strong>%s</strong> is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
+											),
+											userDisplayName
+									  )
+									: __(
+											'Another user is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
+									  ),
+								{
+									strong: <strong />,
+									PreviewLink: (
+										<ExternalLink href={ previewLink }>
+											{ __( 'preview' ) }
+										</ExternalLink>
 									),
-									userDisplayName
-							  )
-							: __(
-									'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
-							  ) }
-					</div>
+								}
+							) }
+						</p>
+						<p>
+							{ __(
+								'If you take over, the other user will lose editing control to the post, but their changes will be saved.'
+							) }
+						</p>
+					</>
+				) }
 
-					<div className="editor-post-locked-modal__buttons">
+				<Flex
+					className="editor-post-locked-modal__buttons"
+					justify="flex-end"
+					expanded={ false }
+				>
+					{ ! isTakeover && (
+						<FlexItem>
+							<Button variant="tertiary" href={ unlockUrl }>
+								{ __( 'Take over' ) }
+							</Button>
+						</FlexItem>
+					) }
+					<FlexItem>
 						<Button variant="primary" href={ allPostsUrl }>
 							{ allPostsLabel }
 						</Button>
-					</div>
-				</div>
-			) }
-			{ ! isTakeover && (
-				<div>
-					<div>
-						{ userDisplayName
-							? sprintf(
-									/* translators: %s: user's display name */
-									__(
-										'%s is currently working on this post, which means you cannot make changes, unless you take over.'
-									),
-									userDisplayName
-							  )
-							: __(
-									'Another user is currently working on this post, which means you cannot make changes, unless you take over.'
-							  ) }
-					</div>
-
-					<div className="editor-post-locked-modal__buttons">
-						<Button variant="secondary" href={ allPostsUrl }>
-							{ allPostsLabel }
-						</Button>
-						<PostPreviewButton />
-						<Button variant="primary" href={ unlockUrl }>
-							{ __( 'Take Over' ) }
-						</Button>
-					</div>
-				</div>
-			) }
+					</FlexItem>
+				</Flex>
+			</div>
 		</Modal>
 	);
 }

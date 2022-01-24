@@ -68,22 +68,6 @@ _Related_
 
 -   getAdjacentBlockClientId in core/block-editor store.
 
-### getAutosave
-
-> **Deprecated** since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector from the '@wordpress/core-data' package.
-
-Returns the current autosave, or null if one is not set (i.e. if the post
-has yet to be autosaved, or has been saved or published since the last
-autosave).
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `?Object`: Current autosave, if exists.
-
 ### getAutosaveAttribute
 
 > **Deprecated** since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector from the '@wordpress/core-data' package and access properties on the returned autosave object using getPostRawValue.
@@ -189,21 +173,6 @@ _Related_
 _Related_
 
 -   getBlockSelectionStart in core/block-editor store.
-
-### getBlocksForSerialization
-
-> **Deprecated** since Gutenberg 6.2.0.
-
-Returns a set of blocks which are to be used in consideration of the post's
-generated save content.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `WPBlock[]`: Filtered set of blocks for save.
 
 ### getClientIdsOfDescendants
 
@@ -626,20 +595,6 @@ _Related_
 _Related_
 
 -   getTemplateLock in core/block-editor store.
-
-### hasAutosave
-
-> **Deprecated** since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector from the '@wordpress/core-data' package and check for a truthy value.
-
-Returns the true if there is an existing autosave, otherwise false.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether there is an existing autosave.
 
 ### hasChangedContent
 
@@ -1314,21 +1269,6 @@ _Related_
 _Related_
 
 -   replaceBlocks in core/block-editor store.
-
-### resetAutosave
-
-> **Deprecated** since 5.6. Callers should use the `receiveAutosaves( postId, autosave )` selector from the '@wordpress/core-data' package.
-
-Returns an action object used in signalling that the latest autosave of the
-post has been received, by initialization or autosave.
-
-_Parameters_
-
--   _newAutosave_ `Object`: Autosave post object.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### resetBlocks
 

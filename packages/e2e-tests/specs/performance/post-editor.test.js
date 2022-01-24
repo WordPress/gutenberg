@@ -14,6 +14,8 @@ import {
 	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+	openListView,
+	closeListView,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -26,15 +28,22 @@ import {
 	getClickEventDurations,
 	getHoverEventDurations,
 	getSelectionEventDurations,
+	getLoadingDurations,
 } from './utils';
 
 jest.setTimeout( 1000000 );
 
 describe( 'Post Editor Performance', () => {
 	const results = {
-		load: [],
+		serverResponse: [],
+		firstPaint: [],
+		domContentLoaded: [],
+		loaded: [],
+		firstContentfulPaint: [],
+		firstBlock: [],
 		type: [],
 		focus: [],
+		listViewOpen: [],
 		inserterOpen: [],
 		inserterHover: [],
 		inserterSearch: [],
@@ -90,10 +99,23 @@ describe( 'Post Editor Performance', () => {
 		// Measuring loading time
 		let i = 5;
 		while ( i-- ) {
-			const startTime = new Date();
 			await page.reload();
 			await page.waitForSelector( '.wp-block' );
-			results.load.push( new Date() - startTime );
+			const {
+				serverResponse,
+				firstPaint,
+				domContentLoaded,
+				loaded,
+				firstContentfulPaint,
+				firstBlock,
+			} = await getLoadingDurations();
+
+			results.serverResponse.push( serverResponse );
+			results.firstPaint.push( firstPaint );
+			results.domContentLoaded.push( domContentLoaded );
+			results.loaded.push( loaded );
+			results.firstContentfulPaint.push( firstContentfulPaint );
+			results.firstBlock.push( firstBlock );
 		}
 	} );
 
@@ -163,6 +185,26 @@ describe( 'Post Editor Performance', () => {
 		traceResults = JSON.parse( readFile( traceFile ) );
 		const [ focusEvents ] = getSelectionEventDurations( traceResults );
 		results.focus = focusEvents;
+	} );
+
+	it( 'Opening persistent list view', async () => {
+		// Measure time to open inserter
+		await page.waitForSelector( '.edit-post-layout' );
+		for ( let j = 0; j < 10; j++ ) {
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
+			await openListView();
+			await page.tracing.stop();
+			traceResults = JSON.parse( readFile( traceFile ) );
+			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
+			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
+				results.listViewOpen.push( mouseClickEvents[ k ] );
+			}
+			await closeListView();
+		}
 	} );
 
 	it( 'Opening the inserter', async () => {

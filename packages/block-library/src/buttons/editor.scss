@@ -1,18 +1,17 @@
 // This variable is repeated across Button, Buttons, and Buttons editor styles.
 $blocks-block__margin: 0.5em;
 
-.wp-block > .wp-block-buttons {
-	display: flex;
-	flex-wrap: wrap;
-}
-
 .wp-block-buttons {
+	// Override editor auto block margins for button as well as the block appender.
 	> .wp-block {
-		// Override editor auto block margins.
-		margin-left: 0;
-		margin-top: $blocks-block__margin;
-		margin-right: $blocks-block__margin;
+		margin: 0;
 	}
+
+	// Specificity needed in some themes to override editor auto block margins for the button.
+	> .wp-block-button.wp-block-button.wp-block-button.wp-block-button.wp-block-button {
+		margin: 0;
+	}
+
 	> .block-list-appender {
 		display: inline-flex;
 		align-items: center;

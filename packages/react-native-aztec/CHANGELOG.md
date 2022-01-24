@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Bump Aztec-Android version to v1.5.1 [#36861]
 
+## 1.50.0
 -   [*] Block split/merge fix for a (never shipped) regression (Android only) [#29683]
 -   [***] Bump minimum deployment target to iOS 13.0 [#27577]

@@ -1,16 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import {
-	__experimentalUseDialog as useDialog,
-	useViewportMatch,
-} from '@wordpress/compose';
-import { close } from '@wordpress/icons';
-import {
-	__experimentalLibrary as Library,
-	BlockBreadcrumb,
-} from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
+import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -26,8 +18,8 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import Header from '../header';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
-import useWidgetLibraryInsertionPoint from '../../hooks/use-widget-library-insertion-point';
 import { store as editWidgetsStore } from '../../store';
+import SecondarySidebar from '../secondary-sidebar';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the widgets screen top bar landmark region. */
@@ -43,15 +35,16 @@ const interfaceLabels = {
 function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const { setIsInserterOpened, closeGeneralSidebar } = useDispatch(
-		editWidgetsStore
-	);
-	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
-
+	const {
+		setIsInserterOpened,
+		setIsListViewOpened,
+		closeGeneralSidebar,
+	} = useDispatch( editWidgetsStore );
 	const {
 		hasBlockBreadCrumbsEnabled,
 		hasSidebarEnabled,
 		isInserterOpened,
+		isListViewOpened,
 		previousShortcut,
 		nextShortcut,
 	} = useSelect(
@@ -60,6 +53,7 @@ function Interface( { blockEditorSettings } ) {
 				interfaceStore
 			).getActiveComplementaryArea( editWidgetsStore.name ),
 			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
+			isListViewOpened: !! select( editWidgetsStore ).isListViewOpened(),
 			hasBlockBreadCrumbsEnabled: select(
 				interfaceStore
 			).isFeatureActive( 'core/edit-widgets', 'showBlockBreadcrumbs' ),
@@ -79,56 +73,35 @@ function Interface( { blockEditorSettings } ) {
 	useEffect( () => {
 		if ( hasSidebarEnabled && ! isHugeViewport ) {
 			setIsInserterOpened( false );
+			setIsListViewOpened( false );
 		}
 	}, [ hasSidebarEnabled, isHugeViewport ] );
 
 	useEffect( () => {
-		if ( isInserterOpened && ! isHugeViewport ) {
+		if ( ( isInserterOpened || isListViewOpened ) && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpened, isHugeViewport ] );
+	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
 
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-	} );
+	const hasSecondarySidebar = isListViewOpened || isInserterOpened;
 
 	return (
 		<InterfaceSkeleton
 			labels={ interfaceLabels }
 			header={ <Header /> }
-			secondarySidebar={
-				isInserterOpened && (
-					<div
-						ref={ inserterDialogRef }
-						{ ...inserterDialogProps }
-						className="edit-widgets-layout__inserter-panel"
-					>
-						<div className="edit-widgets-layout__inserter-panel-header">
-							<Button
-								icon={ close }
-								onClick={ () => setIsInserterOpened( false ) }
-							/>
-						</div>
-						<div className="edit-widgets-layout__inserter-panel-content">
-							<Library
-								showInserterHelpPanel
-								shouldFocusBlock={ isMobileViewport }
-								rootClientId={ rootClientId }
-								__experimentalInsertionIndex={ insertionIndex }
-							/>
-						</div>
-					</div>
-				)
-			}
+			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
 			sidebar={
 				hasSidebarEnabled && (
 					<ComplementaryArea.Slot scope="core/edit-widgets" />
 				)
 			}
 			content={
-				<WidgetAreasBlockEditorContent
-					blockEditorSettings={ blockEditorSettings }
-				/>
+				<>
+					<WidgetAreasBlockEditorContent
+						blockEditorSettings={ blockEditorSettings }
+					/>
+					<BlockStyles.Slot scope="core/block-inspector" />
+				</>
 			}
 			footer={
 				hasBlockBreadCrumbsEnabled &&

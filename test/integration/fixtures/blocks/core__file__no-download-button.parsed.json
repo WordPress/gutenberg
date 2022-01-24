@@ -6,9 +6,9 @@
 			"showDownloadButton": false
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\">lkjfijwef</a></div>\n",
+		"innerHTML": "\n<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_0\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\">lkjfijwef</a></div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\">lkjfijwef</a></div>\n"
+			"\n<div class=\"wp-block-file\"><a id=\"wp-block-file--media-_clientId_0\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\">lkjfijwef</a></div>\n"
 		]
 	}
 ]

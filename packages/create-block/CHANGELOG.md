@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### New Features
+
+-   Integrated a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).
+-   Add support for handling block templates with the `blockTemplatesPath` field in the external template configuration ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
+-   Add a new field `folderName` for setting the location for the `block.json` file and other optional block files generated from block templates included in the folder set with the `blockTemplatesPath` setting ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
+
+### Enhancement
+
+-   Speed up scaffolding process by omitting WordPress dependencies in the template ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
+-   Update link to block registration reference ([#37674](https://github.com/WordPress/gutenberg/pull/37674))
+
+### Internal
+
+-   The bundled `npm-package-arg` dependency has been updated from requiring `^8.0.1` to requiring `^8.1.5` ([#37395](https://github.com/WordPress/gutenberg/pull/37395)).
+
+## 2.7.0 (2021-11-07)
+
+### New Features
+
+-   Add $schema definition to generated `block.json` file.
+
+## 2.6.0 (2021-10-22)
+
+### New Features
+
+-   Add passing local directories to --template. ([#35645](https://github.com/WordPress/gutenberg/pull/35645))
+-   Add `slugPascalCase` to the list of variables that can be used in templates ([#35462](https://github.com/WordPress/gutenberg/pull/35462))
+
 ## 2.5.0 (2021-07-21)
 
 ### Enhancements

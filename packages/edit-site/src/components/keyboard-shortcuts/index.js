@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
@@ -18,9 +18,15 @@ import { store as editSiteStore } from '../../store';
 import { SIDEBAR_BLOCK } from '../sidebar/constants';
 import { STORE_NAME } from '../../store/constants';
 
-function KeyboardShortcuts() {
-	const isListViewOpen = useSelect( ( select ) =>
-		select( editSiteStore ).isListViewOpened()
+function KeyboardShortcuts( { openEntitiesSavedStates } ) {
+	const {
+		__experimentalGetDirtyEntityRecords,
+		isSavingEntityRecord,
+	} = useSelect( coreStore );
+	const { getEditorMode } = useSelect( editSiteStore );
+	const isListViewOpen = useSelect(
+		( select ) => select( editSiteStore ).isListViewOpened(),
+		[]
 	);
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>
@@ -30,59 +36,74 @@ function KeyboardShortcuts() {
 		[]
 	);
 	const { redo, undo } = useDispatch( coreStore );
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
+	const { setIsListViewOpened, switchEditorMode } = useDispatch(
+		editSiteStore
+	);
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
 		interfaceStore
 	);
 
-	useShortcut(
-		'core/edit-site/undo',
-		( event ) => {
-			undo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/edit-site/save', ( event ) => {
+		event.preventDefault();
 
-	useShortcut(
-		'core/edit-site/redo',
-		( event ) => {
-			redo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		const isDirty = !! dirtyEntityRecords.length;
+		const isSaving = dirtyEntityRecords.some( ( record ) =>
+			isSavingEntityRecord( record.kind, record.name, record.key )
+		);
 
-	useShortcut(
-		'core/edit-site/toggle-list-view',
-		useCallback( () => {
-			setIsListViewOpened( ! isListViewOpen );
-		}, [ isListViewOpen, setIsListViewOpened ] ),
-		{ bindGlobal: true }
-	);
+		if ( ! isSaving && isDirty ) {
+			openEntitiesSavedStates();
+		}
+	} );
 
-	useShortcut(
-		'core/edit-site/toggle-block-settings-sidebar',
-		( event ) => {
-			// This shortcut has no known clashes, but use preventDefault to prevent any
-			// obscure shortcuts from triggering.
-			event.preventDefault();
+	useShortcut( 'core/edit-site/undo', ( event ) => {
+		undo();
+		event.preventDefault();
+	} );
 
-			if ( isBlockInspectorOpen ) {
-				disableComplementaryArea( STORE_NAME );
-			} else {
-				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
-			}
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/edit-site/redo', ( event ) => {
+		redo();
+		event.preventDefault();
+	} );
+
+	useShortcut( 'core/edit-site/toggle-list-view', () => {
+		setIsListViewOpened( ! isListViewOpen );
+	} );
+
+	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {
+		// This shortcut has no known clashes, but use preventDefault to prevent any
+		// obscure shortcuts from triggering.
+		event.preventDefault();
+
+		if ( isBlockInspectorOpen ) {
+			disableComplementaryArea( STORE_NAME );
+		} else {
+			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+		}
+	} );
+
+	useShortcut( 'core/edit-site/toggle-mode', () => {
+		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
+	} );
 
 	return null;
 }
+
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
+		registerShortcut( {
+			name: 'core/edit-site/save',
+			category: 'global',
+			description: __( 'Save your changes.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 's',
+			},
+		} );
+
 		registerShortcut( {
 			name: 'core/edit-site/undo',
 			category: 'global',
@@ -120,6 +141,57 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/next-region',
+			category: 'global',
+			description: __( 'Navigate to the next part of the editor.' ),
+			keyCombination: {
+				modifier: 'ctrl',
+				character: '`',
+			},
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'n',
+				},
+			],
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/previous-region',
+			category: 'global',
+			description: __( 'Navigate to the previous part of the editor.' ),
+			keyCombination: {
+				modifier: 'ctrlShift',
+				character: '`',
+			},
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'p',
+				},
+			],
+		} );
+		registerShortcut( {
+			name: 'core/edit-site/toggle-mode',
+			category: 'global',
+			description: __( 'Switch between visual editor and code editor.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'm',
 			},
 		} );
 	}, [ registerShortcut ] );

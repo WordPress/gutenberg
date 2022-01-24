@@ -50,7 +50,7 @@ function BackButton( { onPress } ) {
 	);
 	const arrowLeftStyle = usePreferredColorSchemeStyle(
 		styles[ 'arrow-left-icon' ],
-		styles[ 'arrow-right-icon-dark' ]
+		styles[ 'arrow-left-icon-dark' ]
 	);
 
 	let backIcon;
@@ -73,7 +73,7 @@ function BackButton( { onPress } ) {
 function DismissButton( { onPress, iosText } ) {
 	const arrowLeftStyle = usePreferredColorSchemeStyle(
 		styles[ 'arrow-left-icon' ],
-		styles[ 'arrow-right-icon-dark' ]
+		styles[ 'arrow-left-icon-dark' ]
 	);
 
 	let backIcon;

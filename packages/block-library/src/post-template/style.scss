@@ -5,36 +5,32 @@
 // See: https://github.com/WordPress/gutenberg/pull/32514.
 // TODO: Remove this class when WordPress 5.9 is released.
 .wp-block-query-loop {
+	margin-top: 0;
+	margin-bottom: 0;
 	max-width: 100%;
 	list-style: none;
 	padding: 0;
 
-	li {
-		clear: both;
+	// Unset background colors that can be inherited from Global Styles with extra specificity.
+	&.wp-block-post-template {
+		background: none;
 	}
 
 	&.is-flex-container {
 		flex-direction: row;
 		display: flex;
 		flex-wrap: wrap;
+		gap: 1.25em;
 
 		li {
-			margin: 0 0 1.25em 0;
+			margin: 0;
 			width: 100%;
 		}
 
 		@include break-small {
-			li {
-				margin-right: 1.25em;
-			}
-
 			@for $i from 2 through 6 {
 				&.is-flex-container.columns-#{ $i } > li {
 					width: calc((100% / #{ $i }) - 1.25em + (1.25em / #{ $i }));
-
-					&:nth-child( #{ $i }n ) {
-						margin-right: 0;
-					}
 				}
 			}
 		}

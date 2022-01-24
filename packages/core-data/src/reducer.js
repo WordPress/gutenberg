@@ -120,39 +120,36 @@ export function currentTheme( state = undefined, action ) {
 }
 
 /**
- * Reducer managing installed themes.
+ * Reducer managing the current global styles id.
  *
- * @param {Object} state  Current state.
+ * @param {string} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string} Updated state.
  */
-export function themes( state = {}, action ) {
+export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_CURRENT_THEME':
-			return {
-				...state,
-				[ action.currentTheme.stylesheet ]: action.currentTheme,
-			};
+		case 'RECEIVE_CURRENT_GLOBAL_STYLES_ID':
+			return action.id;
 	}
 
 	return state;
 }
 
 /**
- * Reducer managing theme supports data.
+ * Reducer managing the theme base global styles.
  *
- * @param {Object} state  Current state.
+ * @param {string} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string} Updated state.
  */
-export function themeSupports( state = {}, action ) {
+export function themeBaseGlobalStyles( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_THEME_SUPPORTS':
+		case 'RECEIVE_THEME_GLOBAL_STYLES':
 			return {
 				...state,
-				...action.themeSupports,
+				[ action.stylesheet ]: action.globalStyles,
 			};
 	}
 
@@ -434,7 +431,16 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 					// to continue as if we were creating an explicit undo level. This
 					// will result in an extra undo level being appended with the flattened
 					// undo values.
+					// We also have to take into account if the `lastEditAction` had opted out
+					// of being tracked in undo history, like the action that persists the latest
+					// content right before saving. In that case we have to update the `lastEditAction`
+					// to avoid returning early before applying the existing flattened undos.
 					isCreateUndoLevel = true;
+					if ( ! lastEditAction.meta.undo ) {
+						lastEditAction.meta.undo = {
+							edits: {},
+						};
+					}
 					action = lastEditAction;
 				} else {
 					return nextState;
@@ -570,10 +576,10 @@ export default combineReducers( {
 	terms,
 	users,
 	currentTheme,
+	currentGlobalStylesId,
 	currentUser,
+	themeBaseGlobalStyles,
 	taxonomies,
-	themes,
-	themeSupports,
 	entities,
 	undo,
 	embedPreviews,

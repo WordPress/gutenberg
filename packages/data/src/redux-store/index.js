@@ -22,9 +22,19 @@ import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
-/** @typedef {import('../types').WPDataRegistry} WPDataRegistry */
-/** @typedef {import('../types').WPDataStore} WPDataStore */
-/** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
+/** @typedef {import('../types').DataRegistry} DataRegistry */
+/** @typedef {import('../types').StoreDescriptor} StoreDescriptor */
+/** @typedef {import('../types').ReduxStoreConfig} ReduxStoreConfig */
+
+const trimUndefinedValues = ( array ) => {
+	const result = [ ...array ];
+	for ( let i = result.length - 1; i >= 0; i-- ) {
+		if ( result[ i ] === undefined ) {
+			result.splice( i, 1 );
+		}
+	}
+	return result;
+};
 
 /**
  * Create a cache to track whether resolvers started running or not.
@@ -35,12 +45,15 @@ function createResolversCache() {
 	const cache = {};
 	return {
 		isRunning( selectorName, args ) {
-			return cache[ selectorName ] && cache[ selectorName ].get( args );
+			return (
+				cache[ selectorName ] &&
+				cache[ selectorName ].get( trimUndefinedValues( args ) )
+			);
 		},
 
 		clear( selectorName, args ) {
 			if ( cache[ selectorName ] ) {
-				cache[ selectorName ].delete( args );
+				cache[ selectorName ].delete( trimUndefinedValues( args ) );
 			}
 		},
 
@@ -49,13 +62,13 @@ function createResolversCache() {
 				cache[ selectorName ] = new EquivalentKeyMap();
 			}
 
-			cache[ selectorName ].set( args, true );
+			cache[ selectorName ].set( trimUndefinedValues( args ), true );
 		},
 	};
 }
 
 /**
- * Creates a data store definition for the provided Redux store options containing
+ * Creates a data store descriptor for the provided Redux store configuration containing
  * properties describing reducer, actions, selectors, controls and resolvers.
  *
  * @example
@@ -70,12 +83,12 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}                 key     Unique namespace identifier.
- * @param {WPDataReduxStoreConfig} options Registered store options, with properties
- *                                         describing reducer, actions, selectors,
- *                                         and resolvers.
+ * @param {string}           key     Unique namespace identifier.
+ * @param {ReduxStoreConfig} options Registered store options, with properties
+ *                                   describing reducer, actions, selectors,
+ *                                   and resolvers.
  *
- * @return {WPDataStore} Store Object.
+ * @return {StoreDescriptor} Store Object.
  */
 export default function createReduxStore( key, options ) {
 	return {
@@ -197,12 +210,12 @@ export default function createReduxStore( key, options ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}         key       Unique namespace identifier.
- * @param {Object}         options   Registered store options, with properties
- *                                   describing reducer, actions, selectors,
- *                                   and resolvers.
- * @param {WPDataRegistry} registry  Registry reference.
- * @param {Object}         thunkArgs Argument object for the thunk middleware.
+ * @param {string}       key       Unique namespace identifier.
+ * @param {Object}       options   Registered store options, with properties
+ *                                 describing reducer, actions, selectors,
+ *                                 and resolvers.
+ * @param {DataRegistry} registry  Registry reference.
+ * @param {Object}       thunkArgs Argument object for the thunk middleware.
  * @return {Object} Newly created redux store.
  */
 function instantiateReduxStore( key, options, registry, thunkArgs ) {
@@ -324,7 +337,6 @@ function mapResolveSelectors( selectors, store ) {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
 				const getResult = () => selector.apply( null, args );
-
 				// trigger the selector (to trigger the resolver)
 				const result = getResult();
 				if ( hasFinished() ) {
@@ -376,6 +388,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
+
 				if (
 					resolversCache.isRunning( selectorName, args ) ||
 					( typeof resolver.isFulfilled === 'function' &&

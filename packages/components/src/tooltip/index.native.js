@@ -273,6 +273,7 @@ const TooltipSlot = ( { children, ...rest } ) => {
 				}
 				pointerEvents="box-none"
 				style={ StyleSheet.absoluteFill }
+				testID="tooltip-overlay"
 			>
 				{ children }
 				<Slot { ...rest } />

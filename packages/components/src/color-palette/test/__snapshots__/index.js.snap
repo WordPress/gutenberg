@@ -1,202 +1,149 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
-<div
-  className="components-color-picker is-alpha-disabled"
->
-  <div
-    className="components-color-picker__saturation"
-  >
-    <Pure(WithInstanceId(Saturation))
-      hsl={
-        Object {
-          "a": 1,
-          "h": 0,
-          "l": 50,
-          "s": 100,
-        }
-      }
-      hsv={
-        Object {
-          "a": 1,
-          "h": 0,
-          "s": 100,
-          "v": 100,
-        }
-      }
-      onChange={[Function]}
-    />
-  </div>
-  <div
-    className="components-color-picker__body"
-  >
-    <div
-      className="components-color-picker__controls"
-    >
-      <div
-        className="components-color-picker__swatch"
-      >
-        <div
-          className="components-color-picker__active"
-          style={
-            Object {
-              "backgroundColor": "rgb(255, 0, 0)",
-            }
-          }
-        />
-      </div>
-      <div
-        className="components-color-picker__toggles"
-      >
-        <Pure(WithInstanceId(Hue))
-          hsl={
-            Object {
-              "a": 1,
-              "h": 0,
-              "l": 50,
-              "s": 100,
-            }
-          }
-          onChange={[Function]}
-        />
-      </div>
-    </div>
-    <Inputs
-      disableAlpha={true}
-      hex="#ff0000"
-      hsl={
-        Object {
-          "a": 1,
-          "h": 0,
-          "l": 50,
-          "s": 100,
-        }
-      }
-      onChange={[Function]}
-      rgb={
-        Object {
-          "a": 1,
-          "b": 0,
-          "g": 0,
-          "r": 255,
-        }
-      }
-    />
-  </div>
-</div>
+<ColorPicker
+  color="#f00"
+  onChange={[Function]}
+/>
 `;
 
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
-<Fragment>
-  <button
-    aria-describedby={null}
-    aria-expanded={true}
-    aria-haspopup="true"
-    aria-label="Custom color picker"
-    className="components-button is-link"
-    onClick={[MockFunction]}
-    type="button"
-  >
-    Custom color
-  </button>
-</Fragment>
+<button
+  aria-expanded={true}
+  aria-haspopup="true"
+  aria-label="Custom color picker"
+  className="components-color-palette__custom-color"
+  onClick={[MockFunction]}
+  style={
+    Object {
+      "background": "#f00",
+      "color": "#000",
+    }
+  }
+>
+  #f00
+</button>
 `;
 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
 <Dropdown
-  className="components-circular-option-picker__dropdown-link-action"
-  contentClassName="components-color-palette__picker"
+  contentClassName="components-color-palette__custom-color-dropdown-content"
   renderContent={[Function]}
   renderToggle={[Function]}
 >
   <div
-    className="components-dropdown components-circular-option-picker__dropdown-link-action"
+    className="components-dropdown"
+    tabIndex="-1"
   >
-    <ForwardRef(Button)
+    <button
       aria-expanded={false}
       aria-haspopup="true"
       aria-label="Custom color picker"
+      className="components-color-palette__custom-color"
       onClick={[Function]}
-      variant="link"
+      style={
+        Object {
+          "background": "#f00",
+          "color": "#000",
+        }
+      }
     >
-      <button
-        aria-describedby={null}
-        aria-expanded={false}
-        aria-haspopup="true"
-        aria-label="Custom color picker"
-        className="components-button is-link"
-        onClick={[Function]}
-        type="button"
-      >
-        Custom color
-      </button>
-    </ForwardRef(Button)>
+      #f00
+    </button>
   </div>
 </Dropdown>
 `;
 
 exports[`ColorPalette should allow disabling custom color picker 1`] = `
-<CircularOptionPicker
-  actions={
-    <React.Fragment>
+<VStack
+  spacing={3}
+>
+  <SinglePalette
+    actions={
       <ButtonAction
         onClick={[Function]}
       >
         Clear
       </ButtonAction>
-    </React.Fragment>
-  }
-  options={
-    Array [
-      <Option
-        aria-label="Color: red"
-        isSelected={true}
-        onClick={[Function]}
-        selectedIconProps={
-          Object {
-            "fill": "#000000",
-          }
-        }
-        style={
-          Object {
-            "backgroundColor": "#f00",
-            "color": "#f00",
-          }
-        }
-        tooltipText="red"
-      />,
-      <Option
-        aria-label="Color: white"
-        isSelected={false}
-        onClick={[Function]}
-        selectedIconProps={Object {}}
-        style={
-          Object {
-            "backgroundColor": "#fff",
-            "color": "#fff",
-          }
-        }
-        tooltipText="white"
-      />,
-      <Option
-        aria-label="Color: blue"
-        isSelected={false}
-        onClick={[Function]}
-        selectedIconProps={Object {}}
-        style={
-          Object {
-            "backgroundColor": "#00f",
-            "color": "#00f",
-          }
-        }
-        tooltipText="blue"
-      />,
-    ]
-  }
-/>
+    }
+    clearColor={[Function]}
+    clearable={true}
+    colors={
+      Array [
+        Object {
+          "color": "#f00",
+          "name": "red",
+        },
+        Object {
+          "color": "#fff",
+          "name": "white",
+        },
+        Object {
+          "color": "#00f",
+          "name": "blue",
+        },
+      ]
+    }
+    onChange={[MockFunction]}
+    value="#f00"
+  />
+</VStack>
 `;
 
 exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-1 {
+  -webkit-align-items: normal;
+  -webkit-box-align: normal;
+  -ms-flex-align: normal;
+  align-items: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+}
+
+.emotion-2>*+*:not( marquee ) {
+  margin-top: calc(4px * 3);
+}
+
+.emotion-3>* {
+  min-height: 0;
+}
+
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: normal;
+  -webkit-box-align: normal;
+  -ms-flex-align: normal;
+  align-items: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+}
+
+.emotion-4>*+*:not( marquee ) {
+  margin-top: calc(4px * 3);
+}
+
+.emotion-4>* {
+  min-height: 0;
+}
+
 <ColorPalette
   colors={
     Array [
@@ -217,378 +164,399 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   onChange={[MockFunction]}
   value="#f00"
 >
-  <CircularOptionPicker
-    actions={
-      <React.Fragment>
-        <DropdownLinkAction
-          buttonProps={
-            Object {
-              "aria-label": "Custom color picker",
-            }
-          }
-          dropdownProps={
-            Object {
-              "contentClassName": "components-color-palette__picker",
-              "renderContent": [Function],
-            }
-          }
-          linkText="Custom color"
-        />
-        <ButtonAction
-          onClick={[Function]}
-        >
-          Clear
-        </ButtonAction>
-      </React.Fragment>
-    }
-    options={
-      Array [
-        <Option
-          aria-label="Color: red"
-          isSelected={true}
-          onClick={[Function]}
-          selectedIconProps={
-            Object {
-              "fill": "#000000",
-            }
-          }
-          style={
-            Object {
-              "backgroundColor": "#f00",
-              "color": "#f00",
-            }
-          }
-          tooltipText="red"
-        />,
-        <Option
-          aria-label="Color: white"
-          isSelected={false}
-          onClick={[Function]}
-          selectedIconProps={Object {}}
-          style={
-            Object {
-              "backgroundColor": "#fff",
-              "color": "#fff",
-            }
-          }
-          tooltipText="white"
-        />,
-        <Option
-          aria-label="Color: blue"
-          isSelected={false}
-          onClick={[Function]}
-          selectedIconProps={Object {}}
-          style={
-            Object {
-              "backgroundColor": "#00f",
-              "color": "#00f",
-            }
-          }
-          tooltipText="blue"
-        />,
-      ]
-    }
+  <VStack
+    spacing={3}
   >
-    <div
-      className="components-circular-option-picker"
+    <View
+      className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-h-stack components-v-stack"
+      data-wp-c16t={true}
+      data-wp-component="VStack"
+      isColumn={true}
     >
+      <Noop />
       <div
-        className="components-circular-option-picker__swatches"
+        className="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
+        data-wp-c16t={true}
+        data-wp-component="VStack"
       >
-        <Option
-          aria-label="Color: red"
-          isSelected={true}
-          key="#f00"
-          onClick={[Function]}
-          selectedIconProps={
-            Object {
-              "fill": "#000000",
-            }
-          }
-          style={
-            Object {
-              "backgroundColor": "#f00",
-              "color": "#f00",
-            }
-          }
-          tooltipText="red"
+        <CustomColorPickerDropdown
+          isRenderedInSidebar={false}
+          key=".0"
+          renderContent={[Function]}
+          renderToggle={[Function]}
         >
-          <div
-            className="components-circular-option-picker__option-wrapper"
+          <Dropdown
+            contentClassName="components-color-palette__custom-color-dropdown-content"
+            renderContent={[Function]}
+            renderToggle={[Function]}
           >
-            <Tooltip
-              text="red"
+            <div
+              className="components-dropdown"
+              tabIndex="-1"
             >
-              <ForwardRef(Button)
-                aria-label="Color: red"
-                className="components-circular-option-picker__option"
-                isPressed={true}
-                onBlur={[Function]}
+              <button
+                aria-expanded={false}
+                aria-haspopup="true"
+                aria-label="Custom color picker"
+                className="components-color-palette__custom-color"
                 onClick={[Function]}
-                onFocus={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
                 style={
                   Object {
-                    "backgroundColor": "#f00",
-                    "color": "#f00",
+                    "background": "#f00",
+                    "color": "#000",
                   }
                 }
               >
-                <button
-                  aria-describedby={null}
+                #f00
+              </button>
+            </div>
+          </Dropdown>
+        </CustomColorPickerDropdown>
+        <SinglePalette
+          actions={
+            <ButtonAction
+              onClick={[Function]}
+            >
+              Clear
+            </ButtonAction>
+          }
+          clearColor={[Function]}
+          clearable={true}
+          colors={
+            Array [
+              Object {
+                "color": "#f00",
+                "name": "red",
+              },
+              Object {
+                "color": "#fff",
+                "name": "white",
+              },
+              Object {
+                "color": "#00f",
+                "name": "blue",
+              },
+            ]
+          }
+          key=".1"
+          onChange={[MockFunction]}
+          value="#f00"
+        >
+          <CircularOptionPicker
+            actions={
+              <ButtonAction
+                onClick={[Function]}
+              >
+                Clear
+              </ButtonAction>
+            }
+            options={
+              Array [
+                <Option
                   aria-label="Color: red"
-                  aria-pressed={true}
-                  className="components-button components-circular-option-picker__option is-pressed"
-                  onBlur={[Function]}
+                  isSelected={true}
                   onClick={[Function]}
-                  onFocus={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
+                  selectedIconProps={
+                    Object {
+                      "fill": "#000",
+                    }
+                  }
                   style={
                     Object {
                       "backgroundColor": "#f00",
                       "color": "#f00",
                     }
                   }
-                  type="button"
-                />
-              </ForwardRef(Button)>
-            </Tooltip>
-            <Icon
-              fill="#000000"
-              icon={
-                <SVG
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <Path
-                    d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
-                  />
-                </SVG>
-              }
-            >
-              <SVG
-                fill="#000000"
-                height={24}
-                viewBox="0 0 24 24"
-                width={24}
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <svg
-                  aria-hidden={true}
-                  fill="#000000"
-                  focusable={false}
-                  height={24}
-                  role="img"
-                  viewBox="0 0 24 24"
-                  width={24}
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <Path
-                    d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
-                  >
-                    <path
-                      d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
-                    />
-                  </Path>
-                </svg>
-              </SVG>
-            </Icon>
-          </div>
-        </Option>
-        <Option
-          aria-label="Color: white"
-          isSelected={false}
-          key="#fff"
-          onClick={[Function]}
-          selectedIconProps={Object {}}
-          style={
-            Object {
-              "backgroundColor": "#fff",
-              "color": "#fff",
-            }
-          }
-          tooltipText="white"
-        >
-          <div
-            className="components-circular-option-picker__option-wrapper"
-          >
-            <Tooltip
-              text="white"
-            >
-              <ForwardRef(Button)
-                aria-label="Color: white"
-                className="components-circular-option-picker__option"
-                isPressed={false}
-                onBlur={[Function]}
-                onClick={[Function]}
-                onFocus={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                style={
-                  Object {
-                    "backgroundColor": "#fff",
-                    "color": "#fff",
-                  }
-                }
-              >
-                <button
-                  aria-describedby={null}
+                  tooltipText="red"
+                />,
+                <Option
                   aria-label="Color: white"
-                  aria-pressed={false}
-                  className="components-button components-circular-option-picker__option"
-                  onBlur={[Function]}
+                  isSelected={false}
                   onClick={[Function]}
-                  onFocus={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
+                  selectedIconProps={Object {}}
                   style={
                     Object {
                       "backgroundColor": "#fff",
                       "color": "#fff",
                     }
                   }
-                  type="button"
-                />
-              </ForwardRef(Button)>
-            </Tooltip>
-          </div>
-        </Option>
-        <Option
-          aria-label="Color: blue"
-          isSelected={false}
-          key="#00f"
-          onClick={[Function]}
-          selectedIconProps={Object {}}
-          style={
-            Object {
-              "backgroundColor": "#00f",
-              "color": "#00f",
-            }
-          }
-          tooltipText="blue"
-        >
-          <div
-            className="components-circular-option-picker__option-wrapper"
-          >
-            <Tooltip
-              text="blue"
-            >
-              <ForwardRef(Button)
-                aria-label="Color: blue"
-                className="components-circular-option-picker__option"
-                isPressed={false}
-                onBlur={[Function]}
-                onClick={[Function]}
-                onFocus={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                style={
-                  Object {
-                    "backgroundColor": "#00f",
-                    "color": "#00f",
-                  }
-                }
-              >
-                <button
-                  aria-describedby={null}
+                  tooltipText="white"
+                />,
+                <Option
                   aria-label="Color: blue"
-                  aria-pressed={false}
-                  className="components-button components-circular-option-picker__option"
-                  onBlur={[Function]}
+                  isSelected={false}
                   onClick={[Function]}
-                  onFocus={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
+                  selectedIconProps={Object {}}
                   style={
                     Object {
                       "backgroundColor": "#00f",
                       "color": "#00f",
                     }
                   }
-                  type="button"
-                />
-              </ForwardRef(Button)>
-            </Tooltip>
-          </div>
-        </Option>
-      </div>
-      <div
-        className="components-circular-option-picker__custom-clear-wrapper"
-      >
-        <DropdownLinkAction
-          buttonProps={
-            Object {
-              "aria-label": "Custom color picker",
+                  tooltipText="blue"
+                />,
+              ]
             }
-          }
-          dropdownProps={
-            Object {
-              "contentClassName": "components-color-palette__picker",
-              "renderContent": [Function],
-            }
-          }
-          linkText="Custom color"
-        >
-          <Dropdown
-            className="components-circular-option-picker__dropdown-link-action"
-            contentClassName="components-color-palette__picker"
-            renderContent={[Function]}
-            renderToggle={[Function]}
           >
             <div
-              className="components-dropdown components-circular-option-picker__dropdown-link-action"
+              className="components-circular-option-picker"
             >
-              <ForwardRef(Button)
-                aria-expanded={false}
-                aria-haspopup="true"
-                aria-label="Custom color picker"
-                onClick={[Function]}
-                variant="link"
+              <div
+                className="components-circular-option-picker__swatches"
               >
-                <button
-                  aria-describedby={null}
-                  aria-expanded={false}
-                  aria-haspopup="true"
-                  aria-label="Custom color picker"
-                  className="components-button is-link"
+                <Option
+                  aria-label="Color: red"
+                  isSelected={true}
+                  key="#f00"
                   onClick={[Function]}
-                  type="button"
+                  selectedIconProps={
+                    Object {
+                      "fill": "#000",
+                    }
+                  }
+                  style={
+                    Object {
+                      "backgroundColor": "#f00",
+                      "color": "#f00",
+                    }
+                  }
+                  tooltipText="red"
                 >
-                  Custom color
-                </button>
-              </ForwardRef(Button)>
+                  <div
+                    className="components-circular-option-picker__option-wrapper"
+                  >
+                    <Tooltip
+                      text="red"
+                    >
+                      <ForwardRef(Button)
+                        aria-label="Color: red"
+                        className="components-circular-option-picker__option"
+                        isPressed={true}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        style={
+                          Object {
+                            "backgroundColor": "#f00",
+                            "color": "#f00",
+                          }
+                        }
+                      >
+                        <button
+                          aria-describedby={null}
+                          aria-label="Color: red"
+                          aria-pressed={true}
+                          className="components-button components-circular-option-picker__option is-pressed"
+                          onBlur={[Function]}
+                          onClick={[Function]}
+                          onFocus={[Function]}
+                          onMouseDown={[Function]}
+                          onMouseEnter={[Function]}
+                          onMouseLeave={[Function]}
+                          style={
+                            Object {
+                              "backgroundColor": "#f00",
+                              "color": "#f00",
+                            }
+                          }
+                          type="button"
+                        />
+                      </ForwardRef(Button)>
+                    </Tooltip>
+                    <Icon
+                      fill="#000"
+                      icon={
+                        <SVG
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <Path
+                            d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                          />
+                        </SVG>
+                      }
+                    >
+                      <SVG
+                        fill="#000"
+                        height={24}
+                        viewBox="0 0 24 24"
+                        width={24}
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <svg
+                          aria-hidden={true}
+                          fill="#000"
+                          focusable={false}
+                          height={24}
+                          role="img"
+                          viewBox="0 0 24 24"
+                          width={24}
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <Path
+                            d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                          >
+                            <path
+                              d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                            />
+                          </Path>
+                        </svg>
+                      </SVG>
+                    </Icon>
+                  </div>
+                </Option>
+                <Option
+                  aria-label="Color: white"
+                  isSelected={false}
+                  key="#fff"
+                  onClick={[Function]}
+                  selectedIconProps={Object {}}
+                  style={
+                    Object {
+                      "backgroundColor": "#fff",
+                      "color": "#fff",
+                    }
+                  }
+                  tooltipText="white"
+                >
+                  <div
+                    className="components-circular-option-picker__option-wrapper"
+                  >
+                    <Tooltip
+                      text="white"
+                    >
+                      <ForwardRef(Button)
+                        aria-label="Color: white"
+                        className="components-circular-option-picker__option"
+                        isPressed={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        style={
+                          Object {
+                            "backgroundColor": "#fff",
+                            "color": "#fff",
+                          }
+                        }
+                      >
+                        <button
+                          aria-describedby={null}
+                          aria-label="Color: white"
+                          aria-pressed={false}
+                          className="components-button components-circular-option-picker__option"
+                          onBlur={[Function]}
+                          onClick={[Function]}
+                          onFocus={[Function]}
+                          onMouseDown={[Function]}
+                          onMouseEnter={[Function]}
+                          onMouseLeave={[Function]}
+                          style={
+                            Object {
+                              "backgroundColor": "#fff",
+                              "color": "#fff",
+                            }
+                          }
+                          type="button"
+                        />
+                      </ForwardRef(Button)>
+                    </Tooltip>
+                  </div>
+                </Option>
+                <Option
+                  aria-label="Color: blue"
+                  isSelected={false}
+                  key="#00f"
+                  onClick={[Function]}
+                  selectedIconProps={Object {}}
+                  style={
+                    Object {
+                      "backgroundColor": "#00f",
+                      "color": "#00f",
+                    }
+                  }
+                  tooltipText="blue"
+                >
+                  <div
+                    className="components-circular-option-picker__option-wrapper"
+                  >
+                    <Tooltip
+                      text="blue"
+                    >
+                      <ForwardRef(Button)
+                        aria-label="Color: blue"
+                        className="components-circular-option-picker__option"
+                        isPressed={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        style={
+                          Object {
+                            "backgroundColor": "#00f",
+                            "color": "#00f",
+                          }
+                        }
+                      >
+                        <button
+                          aria-describedby={null}
+                          aria-label="Color: blue"
+                          aria-pressed={false}
+                          className="components-button components-circular-option-picker__option"
+                          onBlur={[Function]}
+                          onClick={[Function]}
+                          onFocus={[Function]}
+                          onMouseDown={[Function]}
+                          onMouseEnter={[Function]}
+                          onMouseLeave={[Function]}
+                          style={
+                            Object {
+                              "backgroundColor": "#00f",
+                              "color": "#00f",
+                            }
+                          }
+                          type="button"
+                        />
+                      </ForwardRef(Button)>
+                    </Tooltip>
+                  </div>
+                </Option>
+              </div>
+              <div
+                className="components-circular-option-picker__custom-clear-wrapper"
+              >
+                <ButtonAction
+                  onClick={[Function]}
+                >
+                  <ForwardRef(Button)
+                    className="components-circular-option-picker__clear"
+                    isSmall={true}
+                    onClick={[Function]}
+                    variant="secondary"
+                  >
+                    <button
+                      aria-describedby={null}
+                      className="components-button components-circular-option-picker__clear is-secondary is-small"
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Clear
+                    </button>
+                  </ForwardRef(Button)>
+                </ButtonAction>
+              </div>
             </div>
-          </Dropdown>
-        </DropdownLinkAction>
-        <ButtonAction
-          onClick={[Function]}
-        >
-          <ForwardRef(Button)
-            className="components-circular-option-picker__clear"
-            isSmall={true}
-            onClick={[Function]}
-            variant="secondary"
-          >
-            <button
-              aria-describedby={null}
-              className="components-button components-circular-option-picker__clear is-secondary is-small"
-              onClick={[Function]}
-              type="button"
-            >
-              Clear
-            </button>
-          </ForwardRef(Button)>
-        </ButtonAction>
+          </CircularOptionPicker>
+        </SinglePalette>
       </div>
-    </div>
-  </CircularOptionPicker>
+    </View>
+  </VStack>
 </ColorPalette>
 `;

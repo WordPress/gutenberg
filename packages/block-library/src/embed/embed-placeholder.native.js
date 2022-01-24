@@ -2,14 +2,16 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { Icon } from '@wordpress/components';
+import { Icon, Picker } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +25,9 @@ const EmbedPlaceholder = ( {
 	label,
 	onPress,
 	cannotEmbed,
+	fallback,
+	tryAgain,
+	openEmbedLinkSettings,
 } ) => {
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
@@ -40,12 +45,59 @@ const EmbedPlaceholder = ( {
 	);
 	const embedIconErrorStyle = styles[ 'embed__icon--error' ];
 
+	const cannotEmbedMenuPickerRef = useRef();
+
+	const errorPickerOptions = {
+		retry: {
+			id: 'retryOption',
+			label: __( 'Retry' ),
+			value: 'retryOption',
+			onSelect: tryAgain,
+		},
+		convertToLink: {
+			id: 'convertToLinkOption',
+			label: __( 'Convert to link' ),
+			value: 'convertToLinkOption',
+			onSelect: fallback,
+		},
+		editLink: {
+			id: 'editLinkOption',
+			label: __( 'Edit link' ),
+			value: 'editLinkOption',
+			onSelect: openEmbedLinkSettings,
+		},
+	};
+
+	const options = compact( [
+		cannotEmbed && errorPickerOptions.retry,
+		cannotEmbed && errorPickerOptions.convertToLink,
+		cannotEmbed && errorPickerOptions.editLink,
+	] );
+
+	function onPickerSelect( value ) {
+		const selectedItem = options.find( ( item ) => item.value === value );
+		selectedItem.onSelect();
+	}
+
+	// When the content cannot be embedded the onPress should trigger the Picker instead of the onPress prop.
+	function resolveOnPressEvent() {
+		if ( cannotEmbed ) {
+			cannotEmbedMenuPickerRef.current?.presentPicker();
+		} else {
+			onPress();
+		}
+	}
+
 	return (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Double tap to add a link.' ) }
-				onPress={ onPress }
+				accessibilityHint={
+					cannotEmbed
+						? __( 'Double tap to view embed options.' )
+						: __( 'Double tap to add a link.' )
+				}
+				onPress={ resolveOnPressEvent }
 				disabled={ ! isSelected }
 			>
 				<View style={ containerStyle }>
@@ -65,8 +117,16 @@ const EmbedPlaceholder = ( {
 								{ __( 'Unable to embed media' ) }
 							</Text>
 							<Text style={ actionStyle }>
-								{ __( 'EDIT LINK' ) }
+								{ __( 'More options' ) }
 							</Text>
+							<Picker
+								title={ __( 'Embed options' ) }
+								ref={ cannotEmbedMenuPickerRef }
+								options={ options }
+								onChange={ onPickerSelect }
+								hideCancelButton
+								leftAlign
+							/>
 						</>
 					) : (
 						<>

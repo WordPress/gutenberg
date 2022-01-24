@@ -1,0 +1,17 @@
+name: 'Report flaky tests'
+description: 'Report flaky tests to GitHub issues'
+inputs:
+    repo-token:
+        description: 'GitHub token'
+        required: true
+    label:
+        description: 'The flaky-test label name'
+        required: true
+        default: 'flaky-test'
+    artifact-name:
+        description: 'The name of the uploaded artifact'
+        required: true
+        default: 'flaky-tests-report'
+runs:
+    using: 'node12'
+    main: 'index.js'

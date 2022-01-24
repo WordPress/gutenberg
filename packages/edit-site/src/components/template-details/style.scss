@@ -1,46 +1,73 @@
 .edit-site-template-details {
-	margin: $grid-unit-10 $grid-unit-20;
-
-	p {
-		padding: $grid-unit-10 0;
-	}
-}
-
-.edit-site-template-details__description {
-	color: $gray-700;
-}
-
-.edit-site-template-details__revert {
-	border-top: $border-width solid $gray-400;
-
-	.components-menu-item__button {
-		height: auto;
+	.edit-site-template-details__group {
+		margin: 0;
 		padding: $grid-unit-20;
+	}
+
+	.edit-site-template-details__group + .edit-site-template-details__group {
+		border-top: $border-width solid $gray-400;
+	}
+
+	.edit-site-template-details__title {
+		margin: 0;
+	}
+
+	.edit-site-template-details__description {
+		margin: $grid-unit-15 0 0;
+		color: $gray-700;
+	}
+
+	// The group already has a 8px padding inside, so overriding the parent padding.
+	.edit-site-template-details__group.edit-site-template-details__template-areas {
+		padding: $grid-unit-10;
+	}
+
+	.edit-site-template-details__template-areas-item {
+		position: relative;
+
+		.edit-site-template-details__template-areas-item-more {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			margin: auto 0;
+		}
+	}
+
+	.edit-site-template-details__revert {
+		// Make some spaces for the revert button to have some paddings.
+		padding: $grid-unit-15 $grid-unit;
+	}
+
+	.edit-site-template-details__revert-button {
+		height: auto;
+		padding: $grid-unit-05 $grid-unit;
 		text-align: left;
 
 		&:focus:not(:disabled) {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 3px $white;
 		}
 	}
-}
 
-.edit-site-template-details__show-all-button.components-button {
-	display: block;
-	background: $gray-900;
-	color: $white;
-	width: 100%;
-	height: ($button-size + $grid-unit-10);
-	border-radius: 0;
-
-	&:hover {
+	.edit-site-template-details__show-all-button.components-button {
+		display: flex;
+		justify-content: center;
+		background: $gray-900;
 		color: $white;
-	}
+		width: 100%;
+		height: ($button-size + $grid-unit-10);
+		border-radius: 0;
 
-	&:active {
-		color: $gray-400;
-	}
+		&:hover {
+			color: $white;
+		}
 
-	&:focus:not(:disabled) {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 3px $white;
+		&:active {
+			color: $gray-400;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 3px $white;
+		}
 	}
 }

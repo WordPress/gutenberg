@@ -2,6 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	padding: 0 $grid-unit;
 	height: 100%;
 	// Flex items will, by default, refuse to shrink below a minimum
 	// intrinsic width. In order to shrink this flexbox item, and
@@ -40,15 +41,6 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 120px;
-
-		@include break-medium() {
-			max-width: 75px;
-		}
-
-		@include break-xlarge() {
-			max-width: 180px;
-		}
 	}
 
 	.edit-site-document-actions__secondary-item {

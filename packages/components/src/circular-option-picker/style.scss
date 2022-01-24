@@ -9,12 +9,13 @@ $color-palette-circle-spacing: 12px;
 	.components-circular-option-picker__custom-clear-wrapper {
 		display: flex;
 		justify-content: flex-end;
+		margin-top: $grid-unit-15;
 	}
 
-	// Effectively negates the end swatch spacing to keep the swatches
-	// from wrapping before necessary.
 	.components-circular-option-picker__swatches {
-		margin-right: -$color-palette-circle-spacing;
+		display: flex;
+		flex-wrap: wrap;
+		gap: $color-palette-circle-spacing;
 	}
 }
 
@@ -22,8 +23,6 @@ $color-palette-circle-spacing: 12px;
 	display: inline-block;
 	height: $color-palette-circle-size;
 	width: $color-palette-circle-size;
-	margin-right: $color-palette-circle-spacing;
-	margin-bottom: $color-palette-circle-spacing;
 	vertical-align: top;
 	transform: scale(1);
 	transition: 100ms transform ease;

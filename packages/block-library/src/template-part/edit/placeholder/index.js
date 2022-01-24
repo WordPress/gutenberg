@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -65,7 +65,7 @@ export default function TemplatePartPlaceholder( {
 			// block attributes.
 			const record = {
 				title,
-				slug: 'template-part',
+				slug: kebabCase( title ),
 				content: serialize( startingBlocks ),
 				// `area` is filterable on the server and defaults to `UNCATEGORIZED`
 				// if provided value is not allowed.
@@ -95,12 +95,14 @@ export default function TemplatePartPlaceholder( {
 						enableSelection
 							? sprintf(
 									// Translators: %s as template part area title ("Header", "Footer", etc.).
-									'Choose an existing %s or create a new one.',
+									__(
+										'Choose an existing %s or create a new one.'
+									),
 									areaLabel.toLowerCase()
 							  )
 							: sprintf(
 									// Translators: %s as template part area title ("Header", "Footer", etc.).
-									'Create a new %s.',
+									__( 'Create a new %s.' ),
 									areaLabel.toLowerCase()
 							  )
 					}
@@ -136,7 +138,7 @@ export default function TemplatePartPlaceholder( {
 									>
 										{ sprintf(
 											// Translators: %s as template part area title ("Header", "Footer", etc.).
-											'New %s',
+											__( 'New %s' ),
 											areaLabel.toLowerCase()
 										) }
 									</Button>

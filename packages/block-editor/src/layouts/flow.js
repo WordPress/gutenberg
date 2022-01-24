@@ -6,7 +6,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
@@ -105,12 +105,14 @@ export default {
 	toolBarControls: function DefaultLayoutToolbarControls() {
 		return null;
 	},
-	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
+	save: function DefaultLayoutStyle( { selector, layout = {}, style } ) {
 		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		const blockGapValue =
+			style?.spacing?.blockGap ?? 'var( --wp--style--block-gap )';
 
-		let style =
+		let output =
 			!! contentSize || !! wideSize
 				? `
 					${ appendSelectors( selector, '> *' ) } {
@@ -129,7 +131,7 @@ export default {
 				`
 				: '';
 
-		style += `
+		output += `
 			${ appendSelectors( selector, '> [data-align="left"]' ) } {
 				float: left;
 				margin-right: 2em;
@@ -143,34 +145,80 @@ export default {
 		`;
 
 		if ( hasBlockGapStylesSupport ) {
-			style += `
-				${ appendSelectors( selector, '> * + *' ) } {
-					margin-top: var( --wp--style--block-gap );
+			output += `
+				${ appendSelectors( selector, '> *' ) } {
+					margin-top: 0;
 					margin-bottom: 0;
+				}
+				${ appendSelectors( selector, '> * + *' ) } {
+					margin-top: ${ blockGapValue };
 				}
 			`;
 		}
 
-		return <style>{ style }</style>;
+		return <style>{ output }</style>;
 	},
 	getOrientation() {
 		return 'vertical';
 	},
 	getAlignments( layout ) {
+		const alignmentInfo = getAlignmentsInfo( layout );
 		if ( layout.alignments !== undefined ) {
-			return layout.alignments;
+			if ( ! layout.alignments.includes( 'none' ) ) {
+				layout.alignments.unshift( 'none' );
+			}
+			return layout.alignments.map( ( alignment ) => ( {
+				name: alignment,
+				info: alignmentInfo[ alignment ],
+			} ) );
+		}
+		const { contentSize, wideSize } = layout;
+
+		const alignments = [
+			{ name: 'left' },
+			{ name: 'center' },
+			{ name: 'right' },
+		];
+
+		if ( contentSize ) {
+			alignments.unshift( { name: 'full' } );
 		}
 
-		const alignments = [ 'left', 'center', 'right' ];
-
-		if ( layout.contentSize ) {
-			alignments.unshift( 'full' );
+		if ( wideSize ) {
+			alignments.unshift( { name: 'wide', info: alignmentInfo.wide } );
 		}
 
-		if ( layout.wideSize ) {
-			alignments.unshift( 'wide' );
-		}
+		alignments.unshift( { name: 'none', info: alignmentInfo.none } );
 
 		return alignments;
 	},
 };
+
+/**
+ * Helper method to assign contextual info to clarify
+ * alignment settings.
+ *
+ * Besides checking if `contentSize` and `wideSize` have a
+ * value, we now show this information only if their values
+ * are not a `css var`. This needs to change when parsing
+ * css variables land.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/34710#issuecomment-918000752
+ *
+ * @param {Object} layout The layout object.
+ * @return {Object} An object with contextual info per alignment.
+ */
+function getAlignmentsInfo( layout ) {
+	const { contentSize, wideSize } = layout;
+	const alignmentInfo = {};
+	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
+	if ( sizeRegex.test( contentSize ) ) {
+		// translators: %s: container size (i.e. 600px etc)
+		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
+	}
+	if ( sizeRegex.test( wideSize ) ) {
+		// translators: %s: container size (i.e. 600px etc)
+		alignmentInfo.wide = sprintf( __( 'Max %s wide' ), wideSize );
+	}
+	return alignmentInfo;
+}

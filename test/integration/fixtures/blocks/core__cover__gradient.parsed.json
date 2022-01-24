@@ -19,9 +19,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-cover has-background-dim has-background-gradient\" style=\"background:linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-cover\">\n\t<span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-background-dim has-background-gradient\" style=\"background:linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-cover has-background-dim has-background-gradient\" style=\"background:linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
+			"\n<div class=\"wp-block-cover\">\n\t<span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-background-dim has-background-gradient\" style=\"background:linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
 			null,
 			"\n\t</div>\n</div>\n"
 		]

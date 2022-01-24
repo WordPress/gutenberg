@@ -1,9 +1,15 @@
-.edit-post-welcome-guide {
+.edit-post-welcome-guide,
+.edit-template-welcome-guide {
 	width: 312px;
 
 	&__image {
 		background: #00a0d2;
 		margin: 0 0 $grid-unit-20;
+		> img {
+			display: block;
+			max-width: 100%;
+			object-fit: cover;
+		}
 	}
 
 	&__heading {
@@ -24,5 +30,11 @@
 	&__inserter-icon {
 		margin: 0 4px;
 		vertical-align: text-top;
+	}
+}
+
+.edit-template-welcome-guide {
+	.components-button svg {
+		fill: $white;
 	}
 }
