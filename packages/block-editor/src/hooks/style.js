@@ -86,7 +86,7 @@ export function getInlineStyles( styles = {} ) {
 			// option and backwards compatibility for border radius support.
 			const styleValue = get( styles, path );
 
-			if ( ! styleValue.useEngine ) {
+			if ( ! STYLE_PROPERTY[ propKey ].useEngine ) {
 				if ( !! subPaths && ! isString( styleValue ) ) {
 					Object.entries( subPaths ).forEach( ( entry ) => {
 						const [ name, subPath ] = entry;
