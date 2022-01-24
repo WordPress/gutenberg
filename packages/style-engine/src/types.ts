@@ -7,16 +7,18 @@ export type Box = {
 
 export interface Style {
 	spacing?: {
-		padding?: string | Box;
 		margin?: string | Box;
-		lineHeight?: string;
+		padding?: string | Box;
+	};
+	typography?: {
 		fontSize?: string;
 		fontFamily?: string;
 		fontWeight?: string;
 		fontStyle?: string;
+		letterSpacing?: string;
+		lineHeight?: string;
 		textDecoration?: string;
 		textTransform?: string;
-		letterSpacing?: string;
 	};
 }
 
