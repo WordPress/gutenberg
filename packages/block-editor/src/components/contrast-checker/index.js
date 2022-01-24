@@ -41,11 +41,11 @@ function ContrastChecker( {
 	const colordBackgroundColor = colord( currentBackgroundColor );
 	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
 
-	const hasTextAndLinkColors = currentTextColor && currentLinkColor;
 	// If there's only one color passed, store in `singleTextColor`.
-	const singleTextColor = hasTextAndLinkColors
-		? null
-		: currentTextColor || currentLinkColor;
+	const singleTextColor =
+		currentTextColor && currentLinkColor
+			? null
+			: currentTextColor || currentLinkColor;
 
 	const colordTextColor = singleTextColor
 		? colord( singleTextColor )
@@ -59,25 +59,22 @@ function ContrastChecker( {
 		currentLinkColor && colordLinkColor.alpha() < 1;
 
 	// Text size.
-	const textSize =
-		isLargeText || ( isLargeText !== false && fontSize >= 24 )
-			? 'large'
-			: 'small';
+	const isReadableOptions = {
+		level: 'AA',
+		size:
+			isLargeText || ( isLargeText !== false && fontSize >= 24 )
+				? 'large'
+				: 'small',
+	};
 
 	// Readability.
 	const isTextColorReadable =
 		currentTextColor &&
-		colordTextColor.isReadable( colordBackgroundColor, {
-			level: 'AA',
-			size: textSize,
-		} );
+		colordTextColor.isReadable( colordBackgroundColor, isReadableOptions );
 
 	const isLinkColorReadable =
 		currentLinkColor &&
-		colordLinkColor.isReadable( colordBackgroundColor, {
-			level: 'AA',
-			size: textSize,
-		} );
+		colordLinkColor.isReadable( colordBackgroundColor, isReadableOptions );
 
 	// Flag to warn about transparency only if the text is otherwise readable according to colord
 	// to ensure the readability warnings take precedence.
