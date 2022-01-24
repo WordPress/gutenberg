@@ -18,7 +18,6 @@ const spinAnimation = keyframes`
 	}
  `;
 
-// The Circle can only have a centered stroke so a stacked box-shadow on the svg accomplishes a matching 1.5px border
 export const StyledSpinner = styled.svg`
 	width: ${ CONFIG.spinnerSize }px;
 	height: ${ CONFIG.spinnerSize }px;
